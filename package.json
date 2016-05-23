@@ -1,0 +1,69 @@
+{
+  "name": "kandis",
+  "version": "0.9.0",
+  "description": "coffee script tool",
+  "main": "js/main.js",
+  "scripts": {
+    "start": "electron js/main.js",
+    "compile": "cp -r js css img *.html app",
+    "install": "cd app && npm install",
+    "clean": "rm -rf dist app/js app/img app/css app/*.html app/node_modules",
+    "dist": "npm run clean && npm run compile && npm run install && build",
+    "release": "build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/monsterkodi/kandis.git"
+  },
+  "keywords": [
+    "electron",
+    "mac",
+    "osx",
+    "menu-bar",
+    "tool",
+    "coffee",
+    "script",
+    "coffee-script",
+    "coffesscript"
+  ],
+  "author": "monsterkodi",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/monsterkodi/kandis/issues"
+  },
+  "build": {
+    "app-bundle-id": "net.monsterkodi.kandis",
+    "app-category-type": "public.app-category.utilities",
+    "asar": false,
+    "osx": {
+      "background": "build/background.png",
+      "target": [
+        "dmg"
+      ],
+      "contents": [
+        {
+          "x": 100,
+          "y": 180,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 100,
+          "y": 70,
+          "type": "file"
+        }
+      ]
+    }
+  },
+  "devDependencies": {
+    "electron-builder": "next",
+    "electron-prebuilt": "^1.1.1"
+  },
+  "dependencies": {
+    "colors": "^1.1.2",
+    "html-entities": "^1.2.0",
+    "keycode": "^2.1.1",
+    "lodash": "^4.12.0",
+    "noon": "^1.0.8"
+  }
+}
