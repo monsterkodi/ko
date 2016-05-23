@@ -1,1 +1,1 @@
-![clippo](img/banner.png)
+![kandis](img/banner.png)
