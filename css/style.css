@@ -61,13 +61,14 @@ body {
   font-size: 24px;
   font-weight: bold;
   overflow: auto;
+  white-space: nowrap;
   background: #181818;
-  font-family: monospace;
+  font-family: "Andale Mono", monospace;
 }
 #cursor {
   width: 2px;
+  margin-right: -2px;
   height: 26px;
-  position: relative;
   vertical-align: text-bottom;
   display: inline-block;
   background: #ff0;

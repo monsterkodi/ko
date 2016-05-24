@@ -54,8 +54,8 @@ createWindow = ->
     win = new BrowserWindow
         width:           1000
         height:          1200
-        minWidth:        400
-        minHeight:       110
+        minWidth:        120
+        minHeight:       120
         useContentSize:  true
         backgroundColor: '#181818'
         fullscreen:      false

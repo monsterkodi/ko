@@ -28,7 +28,7 @@ $ = (id) -> document.getElementById id
 
 enterHeight = 200
 minEnterHeight = 100
-minScrollHeight = 0
+minScrollHeight = 24
 splitAt = (y) ->
     $('scroll').style.height = "#{y}px"
     $('split').style.top = "#{y}px"
@@ -56,7 +56,7 @@ split = new drag
 
 window.onresize = ->
     split.maxPos = pos sw(), sh()-minEnterHeight
-    splitAt Math.max 0, sh()-enterHeight
+    splitAt Math.max minScrollHeight, sh()-enterHeight
 
 #000   000  00000000  000   000  0000000     0000000   000   000  000   000
 #000  000   000        000 000   000   000  000   000  000 0 000  0000  000

@@ -33,7 +33,7 @@
 
   minEnterHeight = 100;
 
-  minScrollHeight = 0;
+  minScrollHeight = 24;
 
   splitAt = function(y) {
     $('scroll').style.height = y + "px";
@@ -65,7 +65,7 @@
 
   window.onresize = function() {
     split.maxPos = pos(sw(), sh() - minEnterHeight);
-    return splitAt(Math.max(0, sh() - enterHeight));
+    return splitAt(Math.max(minScrollHeight, sh() - enterHeight));
   };
 
   document.onkeydown = function(event) {
