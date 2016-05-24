@@ -1,5 +1,7 @@
 (function() {
-  var log, str;
+  var log, noon, str;
+
+  noon = require('noon');
 
   str = function(o) {
     if (typeof o === 'object') {

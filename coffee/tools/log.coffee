@@ -4,6 +4,8 @@
 #000      000   000  000   000
 #0000000   0000000    0000000 
 
+noon = require 'noon'
+
 str = (o) -> 
     if typeof o == 'object'
         if o._str?

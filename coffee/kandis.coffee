@@ -4,15 +4,19 @@
 #000  000   000   000  000  0000  000   000  000       000
 #000   000  000   000  000   000  0000000    000  0000000 
 
-electron  = require 'electron'
-keyname   = require './tools/keyname'
-drag      = require './tools/drag'
-pos       = require './tools/pos'
-{sw,sh}   = require './tools/tools'
-noon      = require 'noon'
-log       = require './tools/log'
-ipc       = electron.ipcRenderer
-encode    = require('html-entities').XmlEntities.encode
+electron    = require 'electron'
+ansiKeycode = require 'ansi-keycode'
+noon        = require 'noon'
+editor      = require './editor'
+keyname     = require './tools/keyname'
+drag        = require './tools/drag'
+pos         = require './tools/pos'
+log         = require './tools/log'
+{sw,sh}     = require './tools/tools'
+ipc         = electron.ipcRenderer
+
+encode = require('html-entities').XmlEntities.encode
+line   = ""
 
 $ = (id) -> document.getElementById id
 
@@ -32,6 +36,9 @@ splitAt = (y) ->
     enterHeight = sh()-y
 
 splitAt sh()-enterHeight
+
+editor.cursorSpan = "<span id=\"cursor\"></span>"
+$('input').innerHTML = editor.cursorSpan
 
 split = new drag
     target:  'split'
@@ -60,13 +67,24 @@ window.onresize = ->
 document.onkeydown = (event) ->
     key = keyname.ofEvent event
     switch key
-        when 'esc'              then return window.close()
-        when 'down', 'right'    then return highlight current-1
-        when 'up'  , 'left'     then return highlight current+1
-        when 'home', 'page up'  then return highlight buffers.length-1
-        when 'end', 'page down' then return highlight 0
-        when 'enter'            then return doPaste()
-        when 'backspace', 'command+backspace' then return ipc.send "del", current
-    log key
-
+        when 'esc'                       then return window.close()
+        when 'down', 'right', 'up', 'left' 
+                                              editor.moveCursor(key)
+        when 'enter'                     then editor.insertNewline()
+        when 'delete', 'ctrl+backspace'  then editor.deleteForward()     
+        when 'backspace'                 then editor.deleteBackward()     
+        when 'command+j'                 then editor.joinLine()
+        when 'ctrl+a'                    then editor.moveCursorToStartOfLine()
+        when 'ctrl+e'                    then editor.moveCursorToEndOfLine()
+        else
+            mod = keyname.modifiersOfEvent event
+            if mod and ((not key) or key.substr(mod.length+1) == 'right click')
+                return
+            if ansiKeycode(event)?.length == 1
+                editor.insertCharacter ansiKeycode event
+            else
+                log key
+    $('input').innerHTML = editor.html()
+    $('cursor')?.scrollIntoViewIfNeeded()
+    
 

@@ -49,4 +49,13 @@
     }
   };
 
+  if (!String.prototype.splice) {
+    String.prototype.splice = function(start, delCount, newSubStr) {
+      if (newSubStr == null) {
+        newSubStr = '';
+      }
+      return this.slice(0, start) + newSubStr + this.slice(start + Math.abs(delCount));
+    };
+  }
+
 }).call(this);

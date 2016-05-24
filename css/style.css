@@ -21,6 +21,7 @@ body {
   height: 100%;
   width: 100%;
   position: absolute;
+  -webkit-user-select: none;
 }
 #main {
   height: 100%;
@@ -34,40 +35,39 @@ body {
   width: 100%;
   top: 0px;
   position: absolute;
+  -webkit-app-region: drag;
 }
 #split {
   width: 100%;
   height: 10px;
   background: #111;
   position: absolute;
+  -webkit-app-region: no-drag;
 }
 #enter {
   width: 100%;
-  background: #333;
   position: absolute;
   bottom: 0px;
+  -webkit-user-select: none;
 }
-pre {
-  display: inline-block;
+#input {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   margin: 0;
-  margin-left: 7px;
-  margin-top: 2px;
+  padding: 10px;
+  font-size: 24px;
+  font-weight: bold;
+  overflow: auto;
   background: #181818;
-  border: 1px solid #161616;
-  overflow: hidden;
-  padding: 13px;
-  cursor: pointer;
-  border-radius: 6px;
+  font-family: monospace;
 }
-pre:hover {
-  background: #111;
-  border: 1px solid #666;
-}
-pre.current {
-  background: #000;
-  border: 1px solid #aaa;
-}
-.info {
-  color: #888;
-  margin-top: 10px;
+#cursor {
+  width: 2px;
+  height: 26px;
+  vertical-align: text-bottom;
+  display: inline-block;
+  background: #ff0;
 }

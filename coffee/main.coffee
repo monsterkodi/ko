@@ -58,10 +58,9 @@ createWindow = ->
         minHeight:       110
         useContentSize:  true
         backgroundColor: '#181818'
-        maximizable:     true
-        minimizable:     false
         fullscreen:      false
         show:            true
+        titleBarStyle:   'hidden'
         
     bounds = prefs.get 'bounds'
     win.setBounds bounds if bounds?
@@ -117,9 +116,7 @@ app.on 'ready', ->
     electron.globalShortcut.register prefs.get('shortcut'), showWindow
     electron.globalShortcut.register 'Command+Alt+I', () -> win?.webContents.openDevTools()
     
-    execute.init
-        hello: 'world'
-        whats: 'up?'
+    execute.init()
         
     if open
         showWindow()

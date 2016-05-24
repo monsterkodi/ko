@@ -68,10 +68,9 @@
       minHeight: 110,
       useContentSize: true,
       backgroundColor: '#181818',
-      maximizable: true,
-      minimizable: false,
       fullscreen: false,
-      show: true
+      show: true,
+      titleBarStyle: 'hidden'
     });
     bounds = prefs.get('bounds');
     if (bounds != null) {
@@ -139,10 +138,7 @@
     electron.globalShortcut.register('Command+Alt+I', function() {
       return win != null ? win.webContents.openDevTools() : void 0;
     });
-    execute.init({
-      hello: 'world',
-      whats: 'up?'
-    });
+    execute.init();
     if (open) {
       return showWindow();
     }

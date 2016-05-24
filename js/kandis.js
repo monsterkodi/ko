@@ -1,7 +1,13 @@
 (function() {
-  var $, drag, electron, encode, enterHeight, ipc, keyname, log, minEnterHeight, minScrollHeight, noon, pos, ref, sh, split, splitAt, sw;
+  var $, ansiKeycode, drag, editor, electron, encode, enterHeight, ipc, keyname, line, log, minEnterHeight, minScrollHeight, noon, pos, ref, sh, split, splitAt, sw;
 
   electron = require('electron');
+
+  ansiKeycode = require('ansi-keycode');
+
+  noon = require('noon');
+
+  editor = require('./editor');
 
   keyname = require('./tools/keyname');
 
@@ -9,15 +15,15 @@
 
   pos = require('./tools/pos');
 
-  ref = require('./tools/tools'), sw = ref.sw, sh = ref.sh;
-
-  noon = require('noon');
-
   log = require('./tools/log');
+
+  ref = require('./tools/tools'), sw = ref.sw, sh = ref.sh;
 
   ipc = electron.ipcRenderer;
 
   encode = require('html-entities').XmlEntities.encode;
+
+  line = "";
 
   $ = function(id) {
     return document.getElementById(id);
@@ -37,6 +43,10 @@
   };
 
   splitAt(sh() - enterHeight);
+
+  editor.cursorSpan = "<span id=\"cursor\"></span>";
+
+  $('input').innerHTML = editor.cursorSpan;
 
   split = new drag({
     target: 'split',
@@ -59,30 +69,49 @@
   };
 
   document.onkeydown = function(event) {
-    var key;
+    var key, mod, ref1, ref2;
     key = keyname.ofEvent(event);
     switch (key) {
       case 'esc':
         return window.close();
       case 'down':
       case 'right':
-        return highlight(current - 1);
       case 'up':
       case 'left':
-        return highlight(current + 1);
-      case 'home':
-      case 'page up':
-        return highlight(buffers.length - 1);
-      case 'end':
-      case 'page down':
-        return highlight(0);
+        editor.moveCursor(key);
+        break;
       case 'enter':
-        return doPaste();
+        editor.insertNewline();
+        break;
+      case 'delete':
+      case 'ctrl+backspace':
+        editor.deleteForward();
+        break;
       case 'backspace':
-      case 'command+backspace':
-        return ipc.send("del", current);
+        editor.deleteBackward();
+        break;
+      case 'command+j':
+        editor.joinLine();
+        break;
+      case 'ctrl+a':
+        editor.moveCursorToStartOfLine();
+        break;
+      case 'ctrl+e':
+        editor.moveCursorToEndOfLine();
+        break;
+      default:
+        mod = keyname.modifiersOfEvent(event);
+        if (mod && ((!key) || key.substr(mod.length + 1) === 'right click')) {
+          return;
+        }
+        if (((ref1 = ansiKeycode(event)) != null ? ref1.length : void 0) === 1) {
+          editor.insertCharacter(ansiKeycode(event));
+        } else {
+          log(key);
+        }
     }
-    return log(key);
+    $('input').innerHTML = editor.html();
+    return (ref2 = $('cursor')) != null ? ref2.scrollIntoViewIfNeeded() : void 0;
   };
 
 }).call(this);
