@@ -67,6 +67,7 @@ body {
 #cursor {
   width: 2px;
   height: 26px;
+  position: relative;
   vertical-align: text-bottom;
   display: inline-block;
   background: #ff0;
