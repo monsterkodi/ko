@@ -1,5 +1,5 @@
 (function() {
-  var Execute, coffee, colors, electron, log, noon, str;
+  var Execute, coffee, colors, electron, log, noon;
 
   noon = require('noon');
 
@@ -9,30 +9,7 @@
 
   electron = require('electron');
 
-  str = function(o) {
-    if (typeof o === 'object') {
-      return "\n" + noon.stringify(o, {
-        colors: true,
-        circular: true
-      });
-    } else {
-      return colors.yellow.bold(String(o));
-    }
-  };
-
-  log = function() {
-    var s;
-    return console.log(((function() {
-      var i, len, ref, results;
-      ref = [].slice.call(arguments, 0);
-      results = [];
-      for (i = 0, len = ref.length; i < len; i++) {
-        s = ref[i];
-        results.push(str(s));
-      }
-      return results;
-    }).apply(this, arguments)).join(" "));
-  };
+  log = require('./tools/log');
 
   Execute = (function() {
     function Execute() {}
@@ -41,14 +18,12 @@
       if (cfg == null) {
         cfg = {};
       }
-      return log('Execute constructor', cfg);
     };
 
     Execute.execute = function(code) {
-      var e, error, r;
+      var e, error;
       try {
-        r = coffee["eval"](code);
-        return r;
+        return coffee["eval"](code);
       } catch (error) {
         e = error;
         return console.error(colors.red.bold('[ERROR]', colors.red(e)));

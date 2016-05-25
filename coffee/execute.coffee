@@ -8,28 +8,16 @@ noon     = require 'noon'
 colors   = require 'colors'
 coffee   = require 'coffee-script'
 electron = require 'electron'
-
-str = (o) -> 
-    if typeof o == 'object'
-        "\n" + noon.stringify o, 
-        colors:   true
-        circular: true
-    else
-        colors.yellow.bold String o
-
-log = -> console.log (str(s) for s in [].slice.call arguments, 0).join " "
+log      = require './tools/log'
 
 class Execute
         
     @init: (cfg={}) => 
-        log 'Execute constructor', cfg
+        # log 'Execute constructor', cfg
 
     @execute: (code) =>
-        # log 'execute', code
         try
-            r = coffee.eval code
-            # log 'result', r
-            return r
+            return coffee.eval code
         catch e
             console.error colors.red.bold '[ERROR]', colors.red e
 
