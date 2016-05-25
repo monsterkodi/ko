@@ -4,9 +4,11 @@
 #000        000 000   000       000       000   000     000     000     
 #00000000  000   000  00000000   0000000   0000000      000     00000000
 
-noon   = require 'noon'
-colors = require 'colors'
-coffee = require 'coffee-script'
+noon     = require 'noon'
+colors   = require 'colors'
+coffee   = require 'coffee-script'
+electron = require 'electron'
+ipc      = electron.ipcMain
 
 str = (o) -> 
     if typeof o == 'object'
@@ -28,6 +30,7 @@ class Execute
         try
             r = coffee.eval code
             log 'result', r
+            ipc.send 'execute-result', r
         catch e
             console.error colors.red.bold '[ERROR]', colors.red e
 

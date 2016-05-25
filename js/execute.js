@@ -1,11 +1,15 @@
 (function() {
-  var Execute, coffee, colors, log, noon, str;
+  var Execute, coffee, colors, electron, ipc, log, noon, str;
 
   noon = require('noon');
 
   colors = require('colors');
 
   coffee = require('coffee-script');
+
+  electron = require('electron');
+
+  ipc = electron.ipcMain;
 
   str = function(o) {
     if (typeof o === 'object') {
@@ -46,7 +50,8 @@
       var e, error, r;
       try {
         r = coffee["eval"](code);
-        return log('result', r);
+        log('result', r);
+        return ipc.send('execute-result', r);
       } catch (error) {
         e = error;
         return console.error(colors.red.bold('[ERROR]', colors.red(e)));
