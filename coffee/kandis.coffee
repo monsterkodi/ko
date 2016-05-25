@@ -8,6 +8,7 @@ electron    = require 'electron'
 ansiKeycode = require 'ansi-keycode'
 noon        = require 'noon'
 editor      = require './editor'
+prefs       = require './tools/prefs'
 keyinfo     = require './tools/keyinfo'
 drag        = require './tools/drag'
 pos         = require './tools/pos'
@@ -15,11 +16,22 @@ log         = require './tools/log'
 {sw,sh}     = require './tools/tools'
 ipc         = electron.ipcRenderer
 clipboard   = electron.clipboard
+remote      = electron.remote
 
 encode = require('html-entities').XmlEntities.encode
 line   = ""
 
 $ = (id) -> document.getElementById id
+
+#00000000   00000000   00000000  00000000   0000000
+#000   000  000   000  000       000       000     
+#00000000   0000000    0000000   000000    0000000 
+#000        000   000  000       000            000
+#000        000   000  00000000  000       0000000 
+
+log remote.app?, remote.app?.getPath('userData')
+prefs.init "#{remote.app?.getPath('userData')}/kandis.json",
+    split: 300
 
 # 0000000  00000000   000      000  000000000
 #000       000   000  000      000     000   
@@ -35,8 +47,10 @@ splitAt = (y) ->
     $('split').style.top = "#{y}px"
     $('enter').style.top = "#{y+10}px"
     enterHeight = sh()-y
+    log 'setting split', y
+    prefs.set 'split', y
 
-splitAt sh()-enterHeight
+splitAt prefs.get 'split', 100
 
 splitDrag = new drag
     target:  'split'
@@ -54,6 +68,16 @@ splitDrag = new drag
 # 00000000  0000000    000     000      0000000   000   000
 
 editor.init 'input'
+if true
+    editor.lines = [
+        "for a in [0...1]"
+        "    console.log a"
+        ""
+        "    "
+        ""
+        "console.log done"
+    ]
+    editor.update()
 
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000     
@@ -64,6 +88,7 @@ editor.init 'input'
 window.onresize = ->
     splitDrag.maxPos = pos sw(), sh()-minEnterHeight
     splitAt Math.max minScrollHeight, sh()-enterHeight
+    ipc.send 'bounds'
 
 # 00     00   0000000   000   000   0000000  00000000
 # 000   000  000   000  000   000  000       000     

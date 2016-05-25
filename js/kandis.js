@@ -1,5 +1,5 @@
 (function() {
-  var $, ansiKeycode, clipboard, drag, editor, electron, encode, enterHeight, inputDrag, ipc, keyinfo, line, log, minEnterHeight, minScrollHeight, noon, pos, ref, sh, splitAt, splitDrag, sw;
+  var $, ansiKeycode, clipboard, drag, editor, electron, encode, enterHeight, inputDrag, ipc, keyinfo, line, log, minEnterHeight, minScrollHeight, noon, pos, prefs, ref, ref1, ref2, remote, sh, splitAt, splitDrag, sw;
 
   electron = require('electron');
 
@@ -8,6 +8,8 @@
   noon = require('noon');
 
   editor = require('./editor');
+
+  prefs = require('./tools/prefs');
 
   keyinfo = require('./tools/keyinfo');
 
@@ -23,6 +25,8 @@
 
   clipboard = electron.clipboard;
 
+  remote = electron.remote;
+
   encode = require('html-entities').XmlEntities.encode;
 
   line = "";
@@ -30,6 +34,12 @@
   $ = function(id) {
     return document.getElementById(id);
   };
+
+  log(remote.app != null, (ref1 = remote.app) != null ? ref1.getPath('userData') : void 0);
+
+  prefs.init(((ref2 = remote.app) != null ? ref2.getPath('userData') : void 0) + "/kandis.json", {
+    split: 300
+  });
 
   enterHeight = 200;
 
@@ -41,10 +51,12 @@
     $('scroll').style.height = y + "px";
     $('split').style.top = y + "px";
     $('enter').style.top = (y + 10) + "px";
-    return enterHeight = sh() - y;
+    enterHeight = sh() - y;
+    log('setting split', y);
+    return prefs.set('split', y);
   };
 
-  splitAt(sh() - enterHeight);
+  splitAt(prefs.get('split', 100));
 
   splitDrag = new drag({
     target: 'split',
@@ -64,9 +76,15 @@
 
   editor.init('input');
 
+  if (true) {
+    editor.lines = ["for a in [0...1]", "    console.log a", "", "    ", "", "console.log done"];
+    editor.update();
+  }
+
   window.onresize = function() {
     splitDrag.maxPos = pos(sw(), sh() - minEnterHeight);
-    return splitAt(Math.max(minScrollHeight, sh() - enterHeight));
+    splitAt(Math.max(minScrollHeight, sh() - enterHeight));
+    return ipc.send('bounds');
   };
 
   inputDrag = new drag({
@@ -97,8 +115,8 @@
   };
 
   document.onkeydown = function(event) {
-    var combo, key, mod, ref1, ref2, ref3;
-    ref1 = keyinfo.forEvent(event), mod = ref1.mod, key = ref1.key, combo = ref1.combo;
+    var combo, key, mod, ref3, ref4, ref5;
+    ref3 = keyinfo.forEvent(event), mod = ref3.mod, key = ref3.key, combo = ref3.combo;
     if (!combo) {
       return;
     }
@@ -155,7 +173,7 @@
             editor.moveCursorToEndOfLine();
             break;
           default:
-            if (((ref2 = ansiKeycode(event)) != null ? ref2.length : void 0) === 1) {
+            if (((ref4 = ansiKeycode(event)) != null ? ref4.length : void 0) === 1) {
               editor.insertCharacter(ansiKeycode(event));
             } else {
               log(combo);
@@ -164,7 +182,7 @@
     }
     editor.endSelection(event.shiftKey);
     editor.update();
-    return (ref3 = $('cursor')) != null ? ref3.scrollIntoViewIfNeeded() : void 0;
+    return (ref5 = $('cursor')) != null ? ref5.scrollIntoViewIfNeeded() : void 0;
   };
 
 }).call(this);

@@ -41,6 +41,12 @@
     };
   })(this));
 
+  ipc.on('bounds', (function(_this) {
+    return function(event, arg) {
+      return saveBounds();
+    };
+  })(this));
+
   toggleWindow = function() {
     if (win != null ? win.isVisible() : void 0) {
       win.hide();

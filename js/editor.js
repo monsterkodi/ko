@@ -278,7 +278,7 @@
     };
 
     Editor.html = function() {
-      var enc, h, i, j, l, left, mid, range, ref, right, selEnd, selStart;
+      var border, enc, h, i, j, l, left, lineRange, mid, nextRange, prevRange, range, ref, right, selEnd, selStart;
       enc = function(l) {
         var r;
         r = encode(l);
@@ -286,16 +286,43 @@
         return r;
       };
       h = [];
+      lineRange = Editor.selectedLineRange();
       for (i = j = 0, ref = Editor.lines.length; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
         l = Editor.lines[i];
-        selStart = "<span class=\"selection\">";
-        selEnd = "</span>";
-        range = Editor.selectedCharacterRangeForLineAtIndex(i);
+        if (lineRange && ((lineRange[0] <= i && i <= lineRange[1]))) {
+          range = Editor.selectedCharacterRangeForLineAtIndex(i);
+        } else {
+          range = null;
+        }
         if (range) {
-          log("selection range at line", i, ":", range[0], range[1]);
+          selEnd = "</span>";
           left = l.substr(0, range[0]);
           mid = l.substr(range[0], range[1] - range[0]);
           right = l.substr(range[1]);
+          border = "";
+          if (i === lineRange[0]) {
+            border += " tl tr";
+          } else {
+            prevRange = Editor.selectedCharacterRangeForLineAtIndex(i - 1);
+            if (range[1] > prevRange[1] || range[1] <= prevRange[0]) {
+              border += " tr";
+            }
+            if (range[0] < prevRange[0] || range[0] >= prevRange[1]) {
+              border += " tl";
+            }
+          }
+          if (i === lineRange[1]) {
+            border += " bl br";
+          } else {
+            nextRange = Editor.selectedCharacterRangeForLineAtIndex(i + 1);
+            if (range[1] > nextRange[1]) {
+              border += " br";
+            }
+            if (range[0] < nextRange[0] || range[0] >= nextRange[1]) {
+              border += " bl";
+            }
+          }
+          selStart = "<span class=\"selection" + border + "\">";
           if (i === Editor.cursor[1]) {
             if (Editor.cursor[0] === range[0]) {
               h.push(enc(left) + Editor.cursorSpan + selStart + enc(mid) + selEnd + enc(right));

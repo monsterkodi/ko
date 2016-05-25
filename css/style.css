@@ -76,5 +76,17 @@ body {
   background: #ff0;
 }
 .selection {
-  background: #00f;
+  background: rgba(255,255,255,0.25);
+}
+.selection.tl {
+  border-top-left-radius: 10px;
+}
+.selection.tr {
+  border-top-right-radius: 10px;
+}
+.selection.bl {
+  border-bottom-left-radius: 10px;
+}
+.selection.br {
+  border-bottom-right-radius: 10px;
 }

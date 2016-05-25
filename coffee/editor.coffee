@@ -220,16 +220,37 @@ class Editor
             r
 
         h = []
+        lineRange = @selectedLineRange()
         for i in [0...@lines.length]
             l = @lines[i]
-            selStart = "<span class=\"selection\">"
-            selEnd = "</span>"
-            range = @selectedCharacterRangeForLineAtIndex i
+            if lineRange and (lineRange[0] <= i <= lineRange[1])
+                range = @selectedCharacterRangeForLineAtIndex i
+            else
+                range = null
             if range
-                log "selection range at line", i, ":", range[0], range[1]
+                selEnd = "</span>"
                 left  = l.substr  0, range[0]
                 mid   = l.substr  range[0], range[1]-range[0] 
                 right = l.substr  range[1]
+                border = ""
+                if i == lineRange[0]
+                    border += " tl tr"
+                else # if i > lineRange[0]
+                    prevRange = @selectedCharacterRangeForLineAtIndex i-1
+                    if range[1] > prevRange[1] or range[1] <= prevRange[0]
+                        border += " tr"
+                    if range[0] < prevRange[0] or range[0] >= prevRange[1]
+                        border += " tl"
+                    
+                if i == lineRange[1]
+                    border += " bl br"
+                else # if i < lineRange[1]
+                    nextRange = @selectedCharacterRangeForLineAtIndex i+1
+                    if range[1] > nextRange[1]
+                        border += " br"
+                    if range[0] < nextRange[0] or range[0] >= nextRange[1]
+                        border += " bl"
+                selStart = "<span class=\"selection#{border}\">"
                 if i == @cursor[1]
                     if @cursor[0] == range[0]
                         h.push enc(left) + @cursorSpan + selStart + enc(mid) + selEnd + enc(right)
