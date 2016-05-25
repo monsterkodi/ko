@@ -29,7 +29,7 @@
       }
     },
     sw: function() {
-      return window.innerWidth;
+      return parseInt(window.getComputedStyle(document.body).width);
     },
     sh: function() {
       return parseInt(window.getComputedStyle(document.body).height);

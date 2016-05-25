@@ -50,26 +50,31 @@ body {
   bottom: 0px;
   -webkit-user-select: none;
 }
+.input,
 #input {
   position: absolute;
+  font-size: 36px;
+  font-weight: bold;
+  font-family: "Andale Mono", monospace;
+  white-space: nowrap;
+}
+#input {
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  margin: 0;
   padding: 10px;
-  font-size: 24px;
-  font-weight: bold;
   overflow: auto;
-  white-space: nowrap;
+  cursor: default;
   background: #181818;
-  font-family: "Andale Mono", monospace;
 }
 #cursor {
   width: 2px;
   margin-right: -2px;
-  height: 26px;
   vertical-align: text-bottom;
   display: inline-block;
   background: #ff0;
+}
+.selection {
+  background: #00f;
 }

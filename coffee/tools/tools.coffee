@@ -27,10 +27,7 @@ module.exports =
         else
             return pos(event.clientX + window.scrollX, event.clientY + window.scrollY)
 
-    sw: () -> window.innerWidth
-    # sh: () -> window.innerHeight
-    
-    # window.getComputedStyle $('stage_content')
+    sw: () -> parseInt window.getComputedStyle(document.body).width
     sh: () -> parseInt window.getComputedStyle(document.body).height
 
     clamp: (r1, r2, v) ->

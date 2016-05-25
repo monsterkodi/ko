@@ -8,12 +8,13 @@ electron    = require 'electron'
 ansiKeycode = require 'ansi-keycode'
 noon        = require 'noon'
 editor      = require './editor'
-keyname     = require './tools/keyname'
+keyinfo     = require './tools/keyinfo'
 drag        = require './tools/drag'
 pos         = require './tools/pos'
 log         = require './tools/log'
 {sw,sh}     = require './tools/tools'
 ipc         = electron.ipcRenderer
+clipboard   = electron.clipboard
 
 encode = require('html-entities').XmlEntities.encode
 line   = ""
@@ -37,54 +38,107 @@ splitAt = (y) ->
 
 splitAt sh()-enterHeight
 
-editor.cursorSpan = "<span id=\"cursor\"></span>"
-$('input').innerHTML = editor.cursorSpan
-
-split = new drag
+splitDrag = new drag
     target:  'split'
+    cursor:  'ns-resize'
     minPos: pos 0,minScrollHeight
     maxPos: pos sw(), sh()-minEnterHeight
     onStart: (drag) -> log 'start', drag.pos
     onMove:  (drag) -> splitAt drag.cpos.y
     onStop:  (drag) -> log 'stop', drag.pos    
 
-#00000000   00000000   0000000  000  0000000  00000000
-#000   000  000       000       000     000   000     
-#0000000    0000000   0000000   000    000    0000000 
-#000   000  000            000  000   000     000     
-#000   000  00000000  0000000   000  0000000  00000000
+# 00000000  0000000    000  000000000   0000000   00000000 
+# 000       000   000  000     000     000   000  000   000
+# 0000000   000   000  000     000     000   000  0000000  
+# 000       000   000  000     000     000   000  000   000
+# 00000000  0000000    000     000      0000000   000   000
+
+editor.init 'input'
+
+# 00000000   00000000   0000000  000  0000000  00000000
+# 000   000  000       000       000     000   000     
+# 0000000    0000000   0000000   000    000    0000000 
+# 000   000  000            000  000   000     000     
+# 000   000  00000000  0000000   000  0000000  00000000
 
 window.onresize = ->
-    split.maxPos = pos sw(), sh()-minEnterHeight
+    splitDrag.maxPos = pos sw(), sh()-minEnterHeight
     splitAt Math.max minScrollHeight, sh()-enterHeight
 
-#000   000  00000000  000   000  0000000     0000000   000   000  000   000
-#000  000   000        000 000   000   000  000   000  000 0 000  0000  000
-#0000000    0000000     00000    000   000  000   000  000000000  000 0 000
-#000  000   000          000     000   000  000   000  000   000  000  0000
-#000   000  00000000     000     0000000     0000000   00     00  000   000
+# 00     00   0000000   000   000   0000000  00000000
+# 000   000  000   000  000   000  000       000     
+# 000000000  000   000  000   000  0000000   0000000 
+# 000 0 000  000   000  000   000       000  000     
+# 000   000   0000000    0000000   0000000   00000000
+     
+inputDrag = new drag
+    target:  editor.id
+    cursor:  'default'
+    onStart: (drag, event) -> 
+        editor.startSelection event.shiftKey
+        editor.moveCursorToPos editor.posForEvent event
+        editor.endSelection event.shiftKey
+        editor.update()
+    
+    onMove:  (drag, event) -> 
+        editor.startSelection true
+        editor.moveCursorToPos editor.posForEvent event
+        editor.update()
+        
+    onStop:  (drag, event) -> 
+        log 'stop', drag.pos    
+      
+$(editor.id).ondblclick = (event) ->
+    pos   = editor.posForEvent event
+    range = editor.rangeForWordAtPos pos
+    editor.selectRange range
+    editor.update()
+
+# 000   000  00000000  000   000
+# 000  000   000        000 000 
+# 0000000    0000000     00000  
+# 000  000   000          000   
+# 000   000  00000000     000   
 
 document.onkeydown = (event) ->
-    key = keyname.ofEvent event
+    {mod, key, combo} = keyinfo.forEvent event
+    
+    # log "key:", key, "mod:", mod, "combo:", combo
+    return if not combo
     switch key
-        when 'esc'                       then return window.close()
+        when 'esc'                               then return window.close()
+        when 'right click'                       then return
         when 'down', 'right', 'up', 'left' 
-                                              editor.moveCursor(key)
-        when 'enter'                     then editor.insertNewline()
-        when 'delete', 'ctrl+backspace'  then editor.deleteForward()     
-        when 'backspace'                 then editor.deleteBackward()     
-        when 'command+j'                 then editor.joinLine()
-        when 'ctrl+a'                    then editor.moveCursorToStartOfLine()
-        when 'ctrl+e'                    then editor.moveCursorToEndOfLine()
-        else
-            mod = keyname.modifiersOfEvent event
-            if mod and ((not key) or key.substr(mod.length+1) == 'right click')
-                return
-            if ansiKeycode(event)?.length == 1
-                editor.insertCharacter ansiKeycode event
+            editor.startSelection event.shiftKey
+            if event.metaKey
+                if key == 'left'
+                    editor.moveCursorToStartOfLine()
+                else if key == 'right'
+                    editor.moveCursorToEndOfLine()
             else
-                log key
-    $('input').innerHTML = editor.html()
+                editor.moveCursor key
+        else
+            switch combo
+                when 'enter'                     then editor.insertNewline()
+                when 'delete', 'ctrl+backspace'  then editor.deleteForward()     
+                when 'backspace'                 then editor.deleteBackward()     
+                when 'command+j'                 then editor.joinLine()
+                when 'command+v'                 then editor.insertText clipboard.readText()
+                when 'ctrl+a'                    then editor.moveCursorToStartOfLine()
+                when 'ctrl+e'                    then editor.moveCursorToEndOfLine()
+                when 'ctrl+shift+a'
+                        editor.startSelection true
+                        editor.moveCursorToStartOfLine()
+                when 'ctrl+shift+e'
+                        editor.startSelection true
+                        editor.moveCursorToEndOfLine()
+                else
+                    if ansiKeycode(event)?.length == 1
+                        editor.insertCharacter ansiKeycode event
+                    else
+                        log combo
+    editor.endSelection event.shiftKey
+    editor.update()
     $('cursor')?.scrollIntoViewIfNeeded()
     
 

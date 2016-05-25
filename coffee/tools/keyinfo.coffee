@@ -8,28 +8,36 @@
 
 keycode = require 'keycode'
 
-class keyname
+class keyinfo
     
     @modifierNames = ['shift', 'ctrl', 'alt', 'command']
     
     @isModifier: (keyname) -> keyname in @modifierNames
-    @modifiersOfEvent: (event) -> 
+
+    @modifiersForEvent: (event) => 
         mods = []
         mods.push 'command' if event.metaKey
         mods.push 'alt'     if event.altKey
         mods.push 'ctrl'    if event.ctrlKey 
         mods.push 'shift'   if event.shiftKey
         return mods.join '+'
+        
     @join: () -> 
         args = [].slice.call arguments, 0
         args = args.filter (e) -> e.length
         args.join '+'
-    @ofEvent: (event) ->
+            
+    @comboForEvent: (event) =>
         key = keycode event
         if key not in @modifierNames
-            key = @join @modifiersOfEvent(event), key
-        else
-            key = ""
-        key        
+            return @join @modifiersForEvent(event), key
+        return ""
 
-module.exports = keyname
+    @keynameForEvent: (event) => keycode event
+
+    @forEvent: (event) =>
+        key:   @keynameForEvent event
+        combo: @comboForEvent event
+        mod:   @modifiersForEvent event
+
+module.exports = keyinfo
