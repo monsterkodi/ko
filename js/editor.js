@@ -40,8 +40,13 @@
     };
 
     Editor.selectRange = function(range) {
+      log('range', range);
       Editor.selection = range[0];
       return Editor.cursor = range[1];
+    };
+
+    Editor.selectAll = function() {
+      return Editor.selectRange([[0, 0], Editor.lastPos()]);
     };
 
     Editor.startSelection = function(active) {
@@ -277,6 +282,10 @@
       return Editor.deleteForward();
     };
 
+    Editor.text = function() {
+      return Editor.lines.join('\n');
+    };
+
     Editor.html = function() {
       var border, enc, h, i, j, l, left, lineRange, mid, nextRange, prevRange, range, ref, right, selEnd, selStart;
       enc = function(l) {
@@ -343,11 +352,20 @@
       return h.join('<br>');
     };
 
+    Editor.lastLineIndex = function() {
+      return Editor.lines.length - 1;
+    };
+
+    Editor.lastPos = function() {
+      var lli;
+      lli = Editor.lastLineIndex();
+      return [Editor.lines[lli].length, lli];
+    };
+
     Editor.posForEvent = function(event) {
       var sl, st;
       sl = $(Editor.id).scrollLeft;
       st = $(Editor.id).scrollTop;
-      log('scroll', sl, st);
       return [parseInt(Math.floor((Math.max(0, sl + event.offsetX - 10)) / Editor.charSize[0])), parseInt(Math.floor((Math.max(0, st + event.offsetY - 10)) / Editor.charSize[1]))];
     };
 
@@ -374,6 +392,7 @@
     };
 
     Editor.update = function() {
+      log($(Editor.id), Editor.html(), Editor.selection, Editor.cursor);
       return $(Editor.id).innerHTML = Editor.html();
     };
 

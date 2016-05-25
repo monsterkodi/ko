@@ -6,7 +6,8 @@
 
 noon = require 'noon'
 
-str = (o) -> 
+str = (o) ->
+    return 'null' if not o?
     if typeof o == 'object'
         if o._str?
             o._str()

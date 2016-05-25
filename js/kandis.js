@@ -1,5 +1,5 @@
 (function() {
-  var $, ansiKeycode, clipboard, drag, editor, electron, encode, enterHeight, inputDrag, ipc, keyinfo, line, log, minEnterHeight, minScrollHeight, noon, pos, prefs, ref, ref1, ref2, remote, sh, splitAt, splitDrag, sw;
+  var $, ansiKeycode, clipboard, drag, editor, electron, encode, enterHeight, inputDrag, ipc, keyinfo, line, log, minEnterHeight, minScrollHeight, noon, pos, prefs, ref, ref1, remote, sh, splitAt, splitDrag, sw;
 
   electron = require('electron');
 
@@ -35,9 +35,7 @@
     return document.getElementById(id);
   };
 
-  log(remote.app != null, (ref1 = remote.app) != null ? ref1.getPath('userData') : void 0);
-
-  prefs.init(((ref2 = remote.app) != null ? ref2.getPath('userData') : void 0) + "/kandis.json", {
+  prefs.init(((ref1 = remote.app) != null ? ref1.getPath('userData') : void 0) + "/kandis.json", {
     split: 300
   });
 
@@ -52,7 +50,6 @@
     $('split').style.top = y + "px";
     $('enter').style.top = (y + 10) + "px";
     enterHeight = sh() - y;
-    log('setting split', y);
     return prefs.set('split', y);
   };
 
@@ -63,29 +60,25 @@
     cursor: 'ns-resize',
     minPos: pos(0, minScrollHeight),
     maxPos: pos(sw(), sh() - minEnterHeight),
-    onStart: function(drag) {
-      return log('start', drag.pos);
-    },
     onMove: function(drag) {
       return splitAt(drag.cpos.y);
-    },
-    onStop: function(drag) {
-      return log('stop', drag.pos);
     }
   });
 
   editor.init('input');
 
   if (true) {
-    editor.lines = ["for a in [0...1]", "    console.log a", "", "    ", "", "console.log done"];
+    editor.lines = ["for a in [0...1]", "    console.log a", "console.log 'done'"];
     editor.update();
   }
 
-  window.onresize = function() {
-    splitDrag.maxPos = pos(sw(), sh() - minEnterHeight);
-    splitAt(Math.max(minScrollHeight, sh() - enterHeight));
-    return ipc.send('bounds');
-  };
+  window.onresize = (function(_this) {
+    return function() {
+      splitDrag.maxPos = pos(sw(), sh() - minEnterHeight);
+      splitAt(Math.max(minScrollHeight, sh() - enterHeight));
+      return ipc.send('bounds');
+    };
+  })(this);
 
   inputDrag = new drag({
     target: editor.id,
@@ -101,9 +94,7 @@
       editor.moveCursorToPos(editor.posForEvent(event));
       return editor.update();
     },
-    onStop: function(drag, event) {
-      return log('stop', drag.pos);
-    }
+    onStop: function(drag, event) {}
   });
 
   $(editor.id).ondblclick = function(event) {
@@ -115,8 +106,9 @@
   };
 
   document.onkeydown = function(event) {
-    var combo, key, mod, ref3, ref4, ref5;
-    ref3 = keyinfo.forEvent(event), mod = ref3.mod, key = ref3.key, combo = ref3.combo;
+    var combo, key, mod, ref2, ref3, ref4;
+    ref2 = keyinfo.forEvent(event), mod = ref2.mod, key = ref2.key, combo = ref2.combo;
+    log("key:", key, "mod:", mod, "combo:", combo);
     if (!combo) {
       return;
     }
@@ -158,12 +150,18 @@
           case 'command+v':
             editor.insertText(clipboard.readText());
             break;
+          case 'command+r':
+            return ipc.send('execute', editor.text());
           case 'ctrl+a':
             editor.moveCursorToStartOfLine();
             break;
           case 'ctrl+e':
             editor.moveCursorToEndOfLine();
             break;
+          case 'command+a':
+            editor.selectAll();
+            editor.update();
+            return;
           case 'ctrl+shift+a':
             editor.startSelection(true);
             editor.moveCursorToStartOfLine();
@@ -173,16 +171,14 @@
             editor.moveCursorToEndOfLine();
             break;
           default:
-            if (((ref4 = ansiKeycode(event)) != null ? ref4.length : void 0) === 1) {
+            if (((ref3 = ansiKeycode(event)) != null ? ref3.length : void 0) === 1) {
               editor.insertCharacter(ansiKeycode(event));
-            } else {
-              log(combo);
             }
         }
     }
     editor.endSelection(event.shiftKey);
     editor.update();
-    return (ref5 = $('cursor')) != null ? ref5.scrollIntoViewIfNeeded() : void 0;
+    return (ref4 = $('cursor')) != null ? ref4.scrollIntoViewIfNeeded() : void 0;
   };
 
 }).call(this);

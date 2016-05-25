@@ -31,8 +31,11 @@ class Editor
         return [Math.min(@cursor[0], @lines[@cursor[1]].length), @cursor[1]]
 
     @selectRange: (range) =>
+        log 'range', range
         @selection = range[0]
         @cursor    = range[1]
+
+    @selectAll: => @selectRange [[0,0], @lastPos()]
 
     @startSelection: (active) =>
         if active and not @selection?
@@ -206,6 +209,14 @@ class Editor
         return if @cursorInFirstLine() and @cursorAtStartOfLine()
         @moveCursorLeft()
         @deleteForward()
+
+    # 000000000  00000000  000   000  000000000
+    #    000     000        000 000      000   
+    #    000     0000000     00000       000   
+    #    000     000        000 000      000   
+    #    000     00000000  000   000     000   
+
+    @text: => return @lines.join '\n'
             
     # 000   000  000000000  00     00  000    
     # 000   000     000     000   000  000    
@@ -266,16 +277,27 @@ class Editor
                 h.push enc(l)
         h.join '<br>'
 
+    # 000  000   000  0000000    00000000  000   000
+    # 000  0000  000  000   000  000        000 000 
+    # 000  000 0 000  000   000  0000000     00000  
+    # 000  000  0000  000   000  000        000 000 
+    # 000  000   000  0000000    00000000  000   000
+    
+    @lastLineIndex: => @lines.length-1
+
     # 00000000    0000000    0000000
     # 000   000  000   000  000     
     # 00000000   000   000  0000000 
     # 000        000   000       000
     # 000         0000000   0000000 
     
+    @lastPos: () => 
+        lli = @lastLineIndex()
+        [@lines[lli].length, lli]
+    
     @posForEvent: (event) =>
         sl = $(@id).scrollLeft
         st = $(@id).scrollTop
-        log 'scroll', sl, st
         [parseInt(Math.floor((Math.max(0, sl + event.offsetX-10))/@charSize[0])),
          parseInt(Math.floor((Math.max(0, st + event.offsetY-10))/@charSize[1]))]
 
@@ -308,6 +330,7 @@ class Editor
     #  0000000   000        0000000    000   000     000     00000000
 
     @update: =>
+        log $(@id), @html(), @selection, @cursor
         $(@id).innerHTML = @html()
 
     # 000  000   000  000  000000000

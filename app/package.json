@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "ansi-keycode": "0.0.0",
+    "coffee-script": "^1.10.0",
     "html-entities": "^1.2.0",
     "keycode": "^2.1.1",
     "lodash": "^4.12.0",

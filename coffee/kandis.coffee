@@ -29,7 +29,6 @@ $ = (id) -> document.getElementById id
 #000        000   000  000       000            000
 #000        000   000  00000000  000       0000000 
 
-log remote.app?, remote.app?.getPath('userData')
 prefs.init "#{remote.app?.getPath('userData')}/kandis.json",
     split: 300
 
@@ -47,7 +46,6 @@ splitAt = (y) ->
     $('split').style.top = "#{y}px"
     $('enter').style.top = "#{y+10}px"
     enterHeight = sh()-y
-    log 'setting split', y
     prefs.set 'split', y
 
 splitAt prefs.get 'split', 100
@@ -57,9 +55,7 @@ splitDrag = new drag
     cursor:  'ns-resize'
     minPos: pos 0,minScrollHeight
     maxPos: pos sw(), sh()-minEnterHeight
-    onStart: (drag) -> log 'start', drag.pos
     onMove:  (drag) -> splitAt drag.cpos.y
-    onStop:  (drag) -> log 'stop', drag.pos    
 
 # 00000000  0000000    000  000000000   0000000   00000000 
 # 000       000   000  000     000     000   000  000   000
@@ -72,10 +68,7 @@ if true
     editor.lines = [
         "for a in [0...1]"
         "    console.log a"
-        ""
-        "    "
-        ""
-        "console.log done"
+        "console.log 'done'"
     ]
     editor.update()
 
@@ -85,7 +78,7 @@ if true
 # 000   000  000            000  000   000     000     
 # 000   000  00000000  0000000   000  0000000  00000000
 
-window.onresize = ->
+window.onresize = =>
     splitDrag.maxPos = pos sw(), sh()-minEnterHeight
     splitAt Math.max minScrollHeight, sh()-enterHeight
     ipc.send 'bounds'
@@ -111,7 +104,7 @@ inputDrag = new drag
         editor.update()
         
     onStop:  (drag, event) -> 
-        log 'stop', drag.pos    
+        # log 'stop', drag.pos    
       
 $(editor.id).ondblclick = (event) ->
     pos   = editor.posForEvent event
@@ -128,7 +121,7 @@ $(editor.id).ondblclick = (event) ->
 document.onkeydown = (event) ->
     {mod, key, combo} = keyinfo.forEvent event
     
-    # log "key:", key, "mod:", mod, "combo:", combo
+    log "key:", key, "mod:", mod, "combo:", combo
     return if not combo
     switch key
         when 'esc'                               then return window.close()
@@ -149,8 +142,13 @@ document.onkeydown = (event) ->
                 when 'backspace'                 then editor.deleteBackward()     
                 when 'command+j'                 then editor.joinLine()
                 when 'command+v'                 then editor.insertText clipboard.readText()
+                when 'command+r'                 then return ipc.send 'execute', editor.text()
                 when 'ctrl+a'                    then editor.moveCursorToStartOfLine()
                 when 'ctrl+e'                    then editor.moveCursorToEndOfLine()
+                when 'command+a'                
+                    editor.selectAll() 
+                    editor.update()
+                    return
                 when 'ctrl+shift+a'
                         editor.startSelection true
                         editor.moveCursorToStartOfLine()
@@ -160,8 +158,8 @@ document.onkeydown = (event) ->
                 else
                     if ansiKeycode(event)?.length == 1
                         editor.insertCharacter ansiKeycode event
-                    else
-                        log combo
+                    # else
+                    #     log combo
     editor.endSelection event.shiftKey
     editor.update()
     $('cursor')?.scrollIntoViewIfNeeded()

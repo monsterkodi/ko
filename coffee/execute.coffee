@@ -6,6 +6,7 @@
 
 noon   = require 'noon'
 colors = require 'colors'
+coffee = require 'coffee-script'
 
 str = (o) -> 
     if typeof o == 'object'
@@ -20,10 +21,15 @@ log = -> console.log (str(s) for s in [].slice.call arguments, 0).join " "
 class Execute
         
     @init: (cfg={}) => 
-        log 'constructor', cfg
+        log 'Execute constructor', cfg
 
-    @execute: (line) =>
-        log 'execute', line
+    @execute: (code) =>
+        # log 'execute', code
+        try
+            r = coffee.eval code
+            log 'result', r
+        catch e
+            console.error colors.red.bold '[ERROR]', colors.red e
 
 module.exports = Execute
 

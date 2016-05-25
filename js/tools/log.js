@@ -4,6 +4,9 @@
   noon = require('noon');
 
   str = function(o) {
+    if (o == null) {
+      return 'null';
+    }
     if (typeof o === 'object') {
       if (o._str != null) {
         return o._str();

@@ -1,9 +1,11 @@
 (function() {
-  var Execute, colors, log, noon, str;
+  var Execute, coffee, colors, log, noon, str;
 
   noon = require('noon');
 
   colors = require('colors');
+
+  coffee = require('coffee-script');
 
   str = function(o) {
     if (typeof o === 'object') {
@@ -37,11 +39,18 @@
       if (cfg == null) {
         cfg = {};
       }
-      return log('constructor', cfg);
+      return log('Execute constructor', cfg);
     };
 
-    Execute.execute = function(line) {
-      return log('execute', line);
+    Execute.execute = function(code) {
+      var e, error, r;
+      try {
+        r = coffee["eval"](code);
+        return log('result', r);
+      } catch (error) {
+        e = error;
+        return console.error(colors.red.bold('[ERROR]', colors.red(e)));
+      }
     };
 
     return Execute;
