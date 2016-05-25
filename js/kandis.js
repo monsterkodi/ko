@@ -1,5 +1,5 @@
 (function() {
-  var $, ansiKeycode, clipboard, drag, editor, electron, encode, enterHeight, inputDrag, ipc, keyinfo, line, log, minEnterHeight, minScrollHeight, noon, pos, prefs, ref, ref1, remote, sh, splitAt, splitDrag, sw;
+  var $, ansiKeycode, clipboard, drag, editor, electron, encode, enterHeight, inputDrag, ipc, keyinfo, line, log, minEnterHeight, minScrollHeight, noon, pos, prefs, ref, ref1, remote, sh, splitAt, splitDrag, str, sw;
 
   electron = require('electron');
 
@@ -19,6 +19,10 @@
 
   log = require('./tools/log');
 
+  str = require('./tools/str');
+
+  encode = require('./tools/encode');
+
   ref = require('./tools/tools'), sw = ref.sw, sh = ref.sh;
 
   ipc = electron.ipcRenderer;
@@ -26,8 +30,6 @@
   clipboard = electron.clipboard;
 
   remote = electron.remote;
-
-  encode = require('html-entities').XmlEntities.encode;
 
   line = "";
 
@@ -64,6 +66,14 @@
       return splitAt(drag.cpos.y);
     }
   });
+
+  ipc.on('execute-result', (function(_this) {
+    return function(event, arg) {
+      log('execute-result:', arg, typeof arg);
+      $('scroll').innerHTML += encode(str(arg));
+      return $('scroll').innerHTML += "<br>";
+    };
+  })(this));
 
   editor.init('input');
 
@@ -108,7 +118,6 @@
   document.onkeydown = function(event) {
     var combo, key, mod, ref2, ref3, ref4;
     ref2 = keyinfo.forEvent(event), mod = ref2.mod, key = ref2.key, combo = ref2.combo;
-    log("key:", key, "mod:", mod, "combo:", combo);
     if (!combo) {
       return;
     }

@@ -37,7 +37,7 @@
 
   ipc.on('execute', (function(_this) {
     return function(event, arg) {
-      return execute.execute(arg);
+      return event.sender.send('execute-result', execute.execute(arg));
     };
   })(this));
 

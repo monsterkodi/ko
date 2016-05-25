@@ -5,7 +5,7 @@
 
   log = require('./tools/log');
 
-  encode = require('html-entities').XmlEntities.encode;
+  encode = require('./tools/encode');
 
   $ = function(id) {
     return document.getElementById(id);
@@ -287,13 +287,7 @@
     };
 
     Editor.html = function() {
-      var border, enc, h, i, j, l, left, lineRange, mid, nextRange, prevRange, range, ref, right, selEnd, selStart;
-      enc = function(l) {
-        var r;
-        r = encode(l);
-        r = r.replace(/\s/g, '&nbsp;');
-        return r;
-      };
+      var border, h, i, j, l, left, lineRange, mid, nextRange, prevRange, range, ref, right, selEnd, selStart;
       h = [];
       lineRange = Editor.selectedLineRange();
       for (i = j = 0, ref = Editor.lines.length; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
@@ -334,19 +328,19 @@
           selStart = "<span class=\"selection" + border + "\">";
           if (i === Editor.cursor[1]) {
             if (Editor.cursor[0] === range[0]) {
-              h.push(enc(left) + Editor.cursorSpan + selStart + enc(mid) + selEnd + enc(right));
+              h.push(encode(left) + Editor.cursorSpan + selStart + encode(mid) + selEnd + encode(right));
             } else {
-              h.push(enc(left) + selStart + enc(mid) + selEnd + Editor.cursorSpan + enc(right));
+              h.push(encode(left) + selStart + encode(mid) + selEnd + Editor.cursorSpan + encode(right));
             }
           } else {
-            h.push(enc(left) + selStart + enc(mid) + selEnd + enc(right));
+            h.push(encode(left) + selStart + encode(mid) + selEnd + encode(right));
           }
         } else if (i === Editor.cursor[1]) {
           left = l.substr(0, Editor.cursor[0]);
           right = l.substr(Editor.cursor[0]);
-          h.push(enc(left) + Editor.cursorSpan + enc(right));
+          h.push(encode(left) + Editor.cursorSpan + encode(right));
         } else {
-          h.push(enc(l));
+          h.push(encode(l));
         }
       }
       return h.join('<br>');
@@ -392,7 +386,6 @@
     };
 
     Editor.update = function() {
-      log($(Editor.id), Editor.html(), Editor.selection, Editor.cursor);
       return $(Editor.id).innerHTML = Editor.html();
     };
 

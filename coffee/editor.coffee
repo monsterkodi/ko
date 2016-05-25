@@ -6,7 +6,7 @@
 
 tools  = require './tools/tools'
 log    = require './tools/log'
-encode = require('html-entities').XmlEntities.encode
+encode = require './tools/encode'
 $ = (id) -> document.getElementById id
 
 class Editor
@@ -225,11 +225,6 @@ class Editor
     # 000   000     000     000   000  0000000
                 
     @html: =>
-        enc = (l) ->
-            r = encode l
-            r = r.replace /\s/g, '&nbsp;'
-            r
-
         h = []
         lineRange = @selectedLineRange()
         for i in [0...@lines.length]
@@ -264,17 +259,17 @@ class Editor
                 selStart = "<span class=\"selection#{border}\">"
                 if i == @cursor[1]
                     if @cursor[0] == range[0]
-                        h.push enc(left) + @cursorSpan + selStart + enc(mid) + selEnd + enc(right)
+                        h.push encode(left) + @cursorSpan + selStart + encode(mid) + selEnd + encode(right)
                     else
-                        h.push enc(left) + selStart + enc(mid) + selEnd + @cursorSpan + enc(right)
+                        h.push encode(left) + selStart + encode(mid) + selEnd + @cursorSpan + encode(right)
                 else
-                    h.push enc(left) + selStart + enc(mid) + selEnd + enc(right)
+                    h.push encode(left) + selStart + encode(mid) + selEnd + encode(right)
             else if i == @cursor[1]
                 left  = l.substr  0, @cursor[0]
                 right = l.substr  @cursor[0]
-                h.push enc(left) + @cursorSpan + enc(right)
+                h.push encode(left) + @cursorSpan + encode(right)
             else
-                h.push enc(l)
+                h.push encode(l)
         h.join '<br>'
 
     # 000  000   000  0000000    00000000  000   000
@@ -330,7 +325,7 @@ class Editor
     #  0000000   000        0000000    000   000     000     00000000
 
     @update: =>
-        log $(@id), @html(), @selection, @cursor
+        # log $(@id), @html(), @selection, @cursor
         $(@id).innerHTML = @html()
 
     # 000  000   000  000  000000000

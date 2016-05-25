@@ -8,7 +8,6 @@ noon     = require 'noon'
 colors   = require 'colors'
 coffee   = require 'coffee-script'
 electron = require 'electron'
-ipc      = electron.ipcMain
 
 str = (o) -> 
     if typeof o == 'object'
@@ -29,8 +28,8 @@ class Execute
         # log 'execute', code
         try
             r = coffee.eval code
-            log 'result', r
-            ipc.send 'execute-result', r
+            # log 'result', r
+            return r
         catch e
             console.error colors.red.bold '[ERROR]', colors.red e
 

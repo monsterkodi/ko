@@ -28,7 +28,7 @@ log = -> console.log ([].slice.call arguments, 0).join " "
 #000        000 000   000       000       000   000     000     000     
 #00000000  000   000  00000000   0000000   0000000      000     00000000
 
-ipc.on 'execute', (event, arg) => execute.execute arg
+ipc.on 'execute', (event, arg) => event.sender.send 'execute-result', execute.execute arg
 ipc.on 'bounds',  (event, arg) => saveBounds()
 
 #000   000  000  000   000  0000000     0000000   000   000

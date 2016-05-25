@@ -13,12 +13,13 @@ keyinfo     = require './tools/keyinfo'
 drag        = require './tools/drag'
 pos         = require './tools/pos'
 log         = require './tools/log'
+str         = require './tools/str'
+encode      = require './tools/encode'
 {sw,sh}     = require './tools/tools'
 ipc         = electron.ipcRenderer
 clipboard   = electron.clipboard
 remote      = electron.remote
 
-encode = require('html-entities').XmlEntities.encode
 line   = ""
 
 $ = (id) -> document.getElementById id
@@ -56,6 +57,17 @@ splitDrag = new drag
     minPos: pos 0,minScrollHeight
     maxPos: pos sw(), sh()-minEnterHeight
     onMove:  (drag) -> splitAt drag.cpos.y
+
+# 00000000   00000000   0000000  000   000  000      000000000
+# 000   000  000       000       000   000  000         000   
+# 0000000    0000000   0000000   000   000  000         000   
+# 000   000  000            000  000   000  000         000   
+# 000   000  00000000  0000000    0000000   0000000     000   
+
+ipc.on 'execute-result', (event, arg) =>
+    log 'execute-result:', arg, typeof arg
+    $('scroll').innerHTML += encode str arg
+    $('scroll').innerHTML += "<br>"
 
 # 00000000  0000000    000  000000000   0000000   00000000 
 # 000       000   000  000     000     000   000  000   000
@@ -120,8 +132,7 @@ $(editor.id).ondblclick = (event) ->
 
 document.onkeydown = (event) ->
     {mod, key, combo} = keyinfo.forEvent event
-    
-    log "key:", key, "mod:", mod, "combo:", combo
+    # log "key:", key, "mod:", mod, "combo:", combo
     return if not combo
     switch key
         when 'esc'                               then return window.close()
