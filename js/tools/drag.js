@@ -73,6 +73,7 @@
         this.onStart(this, event);
       }
       this.lastPos = absPos(event);
+      event.preventDefault();
       document.addEventListener('mousemove', this.dragMove);
       return document.addEventListener('mouseup', this.dragUp);
     };

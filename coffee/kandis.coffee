@@ -14,13 +14,11 @@ pos         = require './tools/pos'
 log         = require './tools/log'
 str         = require './tools/str'
 encode      = require './tools/encode'
-{sw,sh}     = require './tools/tools'
+{sw,sh,$}   = require './tools/tools'
 ipc         = electron.ipcRenderer
 remote      = electron.remote
 
 line   = ""
-
-$ = (id) -> document.getElementById id
 
 #00000000   00000000   00000000  00000000   0000000
 #000   000  000   000  000       000       000     
@@ -50,11 +48,11 @@ splitAt = (y) ->
 splitAt prefs.get 'split', 100
 
 splitDrag = new drag
-    target:  'split'
-    cursor:  'ns-resize'
+    target: 'split'
+    cursor: 'ns-resize'
     minPos: pos 0,minScrollHeight
     maxPos: pos sw(), sh()-minEnterHeight
-    onMove:  (drag) -> splitAt drag.cpos.y
+    onMove: (drag) -> splitAt drag.cpos.y
 
 # 00000000   00000000   0000000  000   000  000      000000000
 # 000   000  000       000       000   000  000         000   

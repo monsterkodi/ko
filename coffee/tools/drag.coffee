@@ -55,6 +55,8 @@ class Drag
         @onStart @, event if @onStart?
         @lastPos = absPos event
                 
+        event.preventDefault()
+
         document.addEventListener 'mousemove', @dragMove
         document.addEventListener 'mouseup',   @dragUp
 

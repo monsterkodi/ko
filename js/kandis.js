@@ -21,17 +21,13 @@
 
   encode = require('./tools/encode');
 
-  ref = require('./tools/tools'), sw = ref.sw, sh = ref.sh;
+  ref = require('./tools/tools'), sw = ref.sw, sh = ref.sh, $ = ref.$;
 
   ipc = electron.ipcRenderer;
 
   remote = electron.remote;
 
   line = "";
-
-  $ = function(id) {
-    return document.getElementById(id);
-  };
 
   prefs.init(((ref1 = remote.app) != null ? ref1.getPath('userData') : void 0) + "/kandis.json", {
     split: 300
