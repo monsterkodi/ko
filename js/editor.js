@@ -77,7 +77,8 @@
     }
 
     Editor.prototype.done = function() {
-      return log('done');
+      log('done');
+      return this.update();
     };
 
     Editor.prototype.initCharSize = function() {
@@ -543,10 +544,10 @@
               break;
             case 'tab':
             case 'command+]':
-              return this.insertTab() + this.update() + event.preventDefault();
+              return this.insertTab() + event.preventDefault();
             case 'shift+tab':
             case 'command+[':
-              return this.deIndent() + this.update() + event.preventDefault();
+              return this.deIndent() + event.preventDefault();
             case 'delete':
             case 'ctrl+backspace':
               this.deleteForward();
@@ -591,7 +592,6 @@
           }
       }
       this.endSelection(event.shiftKey);
-      this.update();
       return (ref2 = $('cursor')) != null ? ref2.scrollIntoViewIfNeeded() : void 0;
     };
 

@@ -28,6 +28,7 @@ class Editor
 
     done: () =>
         log 'done'
+        @update()
 
     # 000  000   000  000  000000000
     # 000  0000  000  000     000   
@@ -398,8 +399,8 @@ class Editor
             else
                 switch combo
                     when 'enter'                     then @insertNewline()
-                    when 'tab', 'command+]'          then return @insertTab() + @update() + event.preventDefault() 
-                    when 'shift+tab', 'command+['    then return @deIndent()  + @update() + event.preventDefault()
+                    when 'tab', 'command+]'          then return @insertTab() + event.preventDefault() 
+                    when 'shift+tab', 'command+['    then return @deIndent()  + event.preventDefault()
                     when 'delete', 'ctrl+backspace'  then @deleteForward()     
                     when 'backspace'                 then @deleteBackward()     
                     when 'command+j'                 then @joinLine()
@@ -425,7 +426,6 @@ class Editor
                         else
                             log "ignoring", combo
         @endSelection event.shiftKey
-        @update()
         $('cursor')?.scrollIntoViewIfNeeded()
 
 module.exports = Editor
