@@ -17,7 +17,7 @@ clipboard     = electron.clipboard
 ipc           = electron.ipcMain
 win           = undefined
 tray          = undefined
-debug         = false
+debug         = true
 open          = true
 
 log = -> console.log ([].slice.call arguments, 0).join " "

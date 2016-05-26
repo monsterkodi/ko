@@ -27,8 +27,8 @@ class Editor
         @elem.innerHTML = html.cursorSpan @charSize
 
     done: () =>
-        log 'done'
-        @update()
+        # log 'done'
+        setTimeout @update, 0
 
     # 000  000   000  000  000000000
     # 000  0000  000  000     000   
@@ -53,27 +53,26 @@ class Editor
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
 
-    selectionStart: =>
-        if @selection?  
-            return [@selection[0], @selection[1]] if @selection[1] < @cursor[1]
-            return [Math.min(@cursor[0], @lines[@cursor[1]].length), @cursor[1]] if @selection[1] > @cursor[1]
-            return [Math.min(@selection[0], @cursor[0]), @cursor[1]]
-        return [Math.min(@cursor[0], @lines[@cursor[1]].length), @cursor[1]]
+    selectNone:         => @selection = @do.selection @selection, null
+    setSelection: (c,l) => @selection = @do.selection @selection, [c,l]
 
     selectRange: (range) =>
-        @selection = range[0]
-        @cursor    = range[1]
+        @do.start()
+        @setSelection range[0][0], range[0][1]
+        @setCursor    range[1][0], range[1][1]
+        @do.end()
 
-    selectAll:  => @selectRange [[0,0], @lastPos()]
-    selectNone: => @selection = null
+    selectAll: => @selectRange [[0,0], @lastPos()]
     
     startSelection: (active) =>
         if active and not @selection?
-            @selection = [Math.min(@cursor[0], @lines[@cursor[1]].length),@cursor[1]]
+            @selectRange [[Math.min(@cursor[0], @lines[@cursor[1]].length),@cursor[1]], @cursor]
 
     endSelection: (active) =>
         if @selection? and not active
-            @selection = null
+            @selectNone()
+        else
+            @update()
         
     selectionRanges: () =>
         if @selection
@@ -81,6 +80,13 @@ class Editor
             ([i, @selectedCharacterRangeForLineAtIndex(i)] for i in [range[0]..range[1]])
         else
             []
+
+    selectionStart: =>
+        if @selection?  
+            return [@selection[0], @selection[1]] if @selection[1] < @cursor[1]
+            return [Math.min(@cursor[0], @lines[@cursor[1]].length), @cursor[1]] if @selection[1] > @cursor[1]
+            return [Math.min(@selection[0], @cursor[0]), @cursor[1]]
+        return [Math.min(@cursor[0], @lines[@cursor[1]].length), @cursor[1]]
 
     selectedLineIndices: =>
         range = @selectedLineRange()
@@ -125,31 +131,26 @@ class Editor
     # 000 0 000  000   000     000     000     
     # 000   000   0000000       0      00000000
     
-    moveCursorToEndOfLine: =>
-        @cursor[0] = @lines[@cursor[1]].length
-        
-    moveCursorToStartOfLine: =>
-        @cursor[0] = 0
+    setCursor: (c,l) => 
+        l = Math.min l, @lines.length-1
+        c = Math.min c, @lines[l].length        
+        @do.cursor @cursor, [c,l]
 
-    moveCursorToLineChar: (l,c=0) =>
-        @cursor[1] = Math.min l, @lines.length-1
-        @cursor[0] = Math.min c, @lines[@cursor[1]].length
+    moveCursorToPos: (pos)   => @setCursor pos[0], pos[1]
+    moveCursorToEndOfLine:   => @setCursor @lines[@cursor[1]].length, @cursor[1]
+    moveCursorToStartOfLine: => @setCursor 0, @cursor[1]
         
-    moveCursorToPos: (pos) =>
-        @cursor[1] = Math.min pos[1], @lines.length-1
-        @cursor[0] = Math.min pos[0], @lines[@cursor[1]].length        
-
     moveCursorUp: =>
         if @cursorInFirstLine()
             @moveCursorToStartOfLine()
         else
-            @cursor[1] -= 1
+            @do.cursor @cursor, [@cursor[0], @cursor[1] - 1] # don't adjust x
 
     moveCursorDown: =>
         if @cursorInLastLine()
             @moveCursorToEndOfLine()
         else
-            @cursor[1] += 1
+            @do.cursor @cursor, [@cursor[0], @cursor[1] + 1] # don't adjust x
 
     moveCursorRight: =>
         if @cursorAtEndOfLine() 
@@ -157,16 +158,17 @@ class Editor
                 @moveCursorDown()
                 @moveCursorToStartOfLine()
         else
-            @cursor[0] += 1
+            @setCursor @cursor[0] + 1, @cursor[1]
     
     moveCursorLeft: =>
-        @cursor[0] = Math.min @lines[@cursor[1]].length, @cursor[0]
+        # @cursor[0] = Math.min @lines[@cursor[1]].length, @cursor[0]
+        @setCursor @cursor[0], @cursor[1]
         if @cursorAtStartOfLine()
             if not @cursorInFirstLine()
                 @moveCursorUp()
                 @moveCursorToEndOfLine()
         else
-            @cursor[0] -= 1
+            @setCursor @cursor[0] - 1, @cursor[1]
     
     moveCursor: (direction) =>
         switch direction
@@ -188,9 +190,9 @@ class Editor
         indent = @indentString()
         @do.change @lines, i, indent + @lines[i]
         if (@cursor[1] == i) and @cursor[0] > 0
-            @cursor[0] += indent.length
+            @setCursor @cursor[0] + indent.length, @cursor[1]
         if (@selection?[1] == i) and @selection[0] > 0
-            @selection[0] += indent.length
+            @setSelection @selection[0] + indent.length, @selection[1]
         @do.end()
     
     deIndentLineAtIndex: (i) =>
@@ -199,9 +201,9 @@ class Editor
         if @lines[i].startsWith indent
             @do.change @lines, i, @lines[i].substr indent.length
             if (@cursor[1] == i) and @cursor[0] > 0
-                @cursor[0] = Math.max 0, @cursor[0] - indent.length
+                @setCursor Math.max 0, @cursor[0] - indent.length, @cursor[1]
             if (@selection?[1] == i) and @selection[0] > 0
-                @selection[0] = Math.max 0, @selection[0] - indent.length
+                @setSelection Math.max 0, @selection[0] - indent.length, @selection[1]
         @do.end()
     
     deIndent: => 
@@ -223,7 +225,7 @@ class Editor
         @do.start()
         @deleteSelection() if @selection?
         @do.change @lines, @cursor[1], @lines[@cursor[1]].splice @cursor[0], 0, c
-        @cursor[0] += 1
+        @setCursor @cursor[0] + 1, @cursor[1]
         @do.end()
         
     insertTab: =>
@@ -407,17 +409,22 @@ class Editor
                     when 'command+v'                 then @insertText clipboard.readText()
                     when 'ctrl+a'                    then @moveCursorToStartOfLine()
                     when 'ctrl+e'                    then @moveCursorToEndOfLine()
-                    when 'command+d'                 then @selectNone()
-                    when 'command+a'                
-                        @selectAll() 
+                    when 'command+d'                 then return @selectNone()
+                    when 'command+a'                 then return @selectAll()
+                    when 'command+z'             
+                        @do.undo @
+                        @update()
+                        return
+                    when 'command+shift+z'             
+                        @do.redo @
                         @update()
                         return
                     when 'ctrl+shift+a'
-                            @startSelection true
-                            @moveCursorToStartOfLine()
+                        @startSelection true
+                        @moveCursorToStartOfLine()
                     when 'ctrl+shift+e'
-                            @startSelection true
-                            @moveCursorToEndOfLine()
+                        @startSelection true
+                        @moveCursorToEndOfLine()
                     else
                         ansiKeycode = require 'ansi-keycode'
                         if ansiKeycode(event)?.length == 1

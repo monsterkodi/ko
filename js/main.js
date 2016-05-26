@@ -27,7 +27,7 @@
 
   tray = void 0;
 
-  debug = false;
+  debug = true;
 
   open = true;
 

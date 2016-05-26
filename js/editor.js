@@ -45,10 +45,10 @@
       this.moveCursorRight = bind(this.moveCursorRight, this);
       this.moveCursorDown = bind(this.moveCursorDown, this);
       this.moveCursorUp = bind(this.moveCursorUp, this);
-      this.moveCursorToPos = bind(this.moveCursorToPos, this);
-      this.moveCursorToLineChar = bind(this.moveCursorToLineChar, this);
       this.moveCursorToStartOfLine = bind(this.moveCursorToStartOfLine, this);
       this.moveCursorToEndOfLine = bind(this.moveCursorToEndOfLine, this);
+      this.moveCursorToPos = bind(this.moveCursorToPos, this);
+      this.setCursor = bind(this.setCursor, this);
       this.cursorInFirstLine = bind(this.cursorInFirstLine, this);
       this.cursorInLastLine = bind(this.cursorInLastLine, this);
       this.cursorAtStartOfLine = bind(this.cursorAtStartOfLine, this);
@@ -56,13 +56,14 @@
       this.selectedCharacterRangeForLineAtIndex = bind(this.selectedCharacterRangeForLineAtIndex, this);
       this.selectedLineRange = bind(this.selectedLineRange, this);
       this.selectedLineIndices = bind(this.selectedLineIndices, this);
+      this.selectionStart = bind(this.selectionStart, this);
       this.selectionRanges = bind(this.selectionRanges, this);
       this.endSelection = bind(this.endSelection, this);
       this.startSelection = bind(this.startSelection, this);
-      this.selectNone = bind(this.selectNone, this);
       this.selectAll = bind(this.selectAll, this);
       this.selectRange = bind(this.selectRange, this);
-      this.selectionStart = bind(this.selectionStart, this);
+      this.setSelection = bind(this.setSelection, this);
+      this.selectNone = bind(this.selectNone, this);
       this.initCharSize = bind(this.initCharSize, this);
       this.done = bind(this.done, this);
       this["do"] = new undo(this.done);
@@ -77,8 +78,7 @@
     }
 
     Editor.prototype.done = function() {
-      log('done');
-      return this.update();
+      return setTimeout(this.update, 0);
     };
 
     Editor.prototype.initCharSize = function() {
@@ -95,41 +95,36 @@
       return o.remove();
     };
 
-    Editor.prototype.selectionStart = function() {
-      if (this.selection != null) {
-        if (this.selection[1] < this.cursor[1]) {
-          return [this.selection[0], this.selection[1]];
-        }
-        if (this.selection[1] > this.cursor[1]) {
-          return [Math.min(this.cursor[0], this.lines[this.cursor[1]].length), this.cursor[1]];
-        }
-        return [Math.min(this.selection[0], this.cursor[0]), this.cursor[1]];
-      }
-      return [Math.min(this.cursor[0], this.lines[this.cursor[1]].length), this.cursor[1]];
+    Editor.prototype.selectNone = function() {
+      return this.selection = this["do"].selection(this.selection, null);
+    };
+
+    Editor.prototype.setSelection = function(c, l) {
+      return this.selection = this["do"].selection(this.selection, [c, l]);
     };
 
     Editor.prototype.selectRange = function(range) {
-      this.selection = range[0];
-      return this.cursor = range[1];
+      this["do"].start();
+      this.setSelection(range[0][0], range[0][1]);
+      this.setCursor(range[1][0], range[1][1]);
+      return this["do"].end();
     };
 
     Editor.prototype.selectAll = function() {
       return this.selectRange([[0, 0], this.lastPos()]);
     };
 
-    Editor.prototype.selectNone = function() {
-      return this.selection = null;
-    };
-
     Editor.prototype.startSelection = function(active) {
       if (active && (this.selection == null)) {
-        return this.selection = [Math.min(this.cursor[0], this.lines[this.cursor[1]].length), this.cursor[1]];
+        return this.selectRange([[Math.min(this.cursor[0], this.lines[this.cursor[1]].length), this.cursor[1]], this.cursor]);
       }
     };
 
     Editor.prototype.endSelection = function(active) {
       if ((this.selection != null) && !active) {
-        return this.selection = null;
+        return this.selectNone();
+      } else {
+        return this.update();
       }
     };
 
@@ -145,6 +140,19 @@
       } else {
         return [];
       }
+    };
+
+    Editor.prototype.selectionStart = function() {
+      if (this.selection != null) {
+        if (this.selection[1] < this.cursor[1]) {
+          return [this.selection[0], this.selection[1]];
+        }
+        if (this.selection[1] > this.cursor[1]) {
+          return [Math.min(this.cursor[0], this.lines[this.cursor[1]].length), this.cursor[1]];
+        }
+        return [Math.min(this.selection[0], this.cursor[0]), this.cursor[1]];
+      }
+      return [Math.min(this.cursor[0], this.lines[this.cursor[1]].length), this.cursor[1]];
     };
 
     Editor.prototype.selectedLineIndices = function() {
@@ -209,32 +217,29 @@
       return this.cursor[1] === 0;
     };
 
-    Editor.prototype.moveCursorToEndOfLine = function() {
-      return this.cursor[0] = this.lines[this.cursor[1]].length;
-    };
-
-    Editor.prototype.moveCursorToStartOfLine = function() {
-      return this.cursor[0] = 0;
-    };
-
-    Editor.prototype.moveCursorToLineChar = function(l, c) {
-      if (c == null) {
-        c = 0;
-      }
-      this.cursor[1] = Math.min(l, this.lines.length - 1);
-      return this.cursor[0] = Math.min(c, this.lines[this.cursor[1]].length);
+    Editor.prototype.setCursor = function(c, l) {
+      l = Math.min(l, this.lines.length - 1);
+      c = Math.min(c, this.lines[l].length);
+      return this["do"].cursor(this.cursor, [c, l]);
     };
 
     Editor.prototype.moveCursorToPos = function(pos) {
-      this.cursor[1] = Math.min(pos[1], this.lines.length - 1);
-      return this.cursor[0] = Math.min(pos[0], this.lines[this.cursor[1]].length);
+      return this.setCursor(pos[0], pos[1]);
+    };
+
+    Editor.prototype.moveCursorToEndOfLine = function() {
+      return this.setCursor(this.lines[this.cursor[1]].length, this.cursor[1]);
+    };
+
+    Editor.prototype.moveCursorToStartOfLine = function() {
+      return this.setCursor(0, this.cursor[1]);
     };
 
     Editor.prototype.moveCursorUp = function() {
       if (this.cursorInFirstLine()) {
         return this.moveCursorToStartOfLine();
       } else {
-        return this.cursor[1] -= 1;
+        return this["do"].cursor(this.cursor, [this.cursor[0], this.cursor[1] - 1]);
       }
     };
 
@@ -242,7 +247,7 @@
       if (this.cursorInLastLine()) {
         return this.moveCursorToEndOfLine();
       } else {
-        return this.cursor[1] += 1;
+        return this["do"].cursor(this.cursor, [this.cursor[0], this.cursor[1] + 1]);
       }
     };
 
@@ -253,19 +258,19 @@
           return this.moveCursorToStartOfLine();
         }
       } else {
-        return this.cursor[0] += 1;
+        return this.setCursor(this.cursor[0] + 1, this.cursor[1]);
       }
     };
 
     Editor.prototype.moveCursorLeft = function() {
-      this.cursor[0] = Math.min(this.lines[this.cursor[1]].length, this.cursor[0]);
+      this.setCursor(this.cursor[0], this.cursor[1]);
       if (this.cursorAtStartOfLine()) {
         if (!this.cursorInFirstLine()) {
           this.moveCursorUp();
           return this.moveCursorToEndOfLine();
         }
       } else {
-        return this.cursor[0] -= 1;
+        return this.setCursor(this.cursor[0] - 1, this.cursor[1]);
       }
     };
 
@@ -292,10 +297,10 @@
       indent = this.indentString();
       this["do"].change(this.lines, i, indent + this.lines[i]);
       if ((this.cursor[1] === i) && this.cursor[0] > 0) {
-        this.cursor[0] += indent.length;
+        this.setCursor(this.cursor[0] + indent.length, this.cursor[1]);
       }
       if ((((ref = this.selection) != null ? ref[1] : void 0) === i) && this.selection[0] > 0) {
-        this.selection[0] += indent.length;
+        this.setSelection(this.selection[0] + indent.length, this.selection[1]);
       }
       return this["do"].end();
     };
@@ -307,10 +312,10 @@
       if (this.lines[i].startsWith(indent)) {
         this["do"].change(this.lines, i, this.lines[i].substr(indent.length));
         if ((this.cursor[1] === i) && this.cursor[0] > 0) {
-          this.cursor[0] = Math.max(0, this.cursor[0] - indent.length);
+          this.setCursor(Math.max(0, this.cursor[0] - indent.length, this.cursor[1]));
         }
         if ((((ref = this.selection) != null ? ref[1] : void 0) === i) && this.selection[0] > 0) {
-          this.selection[0] = Math.max(0, this.selection[0] - indent.length);
+          this.setSelection(Math.max(0, this.selection[0] - indent.length, this.selection[1]));
         }
       }
       return this["do"].end();
@@ -337,7 +342,7 @@
         this.deleteSelection();
       }
       this["do"].change(this.lines, this.cursor[1], this.lines[this.cursor[1]].splice(this.cursor[0], 0, c));
-      this.cursor[0] += 1;
+      this.setCursor(this.cursor[0] + 1, this.cursor[1]);
       return this["do"].end();
     };
 
@@ -568,10 +573,15 @@
               this.moveCursorToEndOfLine();
               break;
             case 'command+d':
-              this.selectNone();
-              break;
+              return this.selectNone();
             case 'command+a':
-              this.selectAll();
+              return this.selectAll();
+            case 'command+z':
+              this["do"].undo(this);
+              this.update();
+              return;
+            case 'command+shift+z':
+              this["do"].redo(this);
               this.update();
               return;
             case 'ctrl+shift+a':
