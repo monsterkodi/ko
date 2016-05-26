@@ -5,9 +5,8 @@
 #000   000  000   000  000   000  0000000    000  0000000 
 
 electron    = require 'electron'
-ansiKeycode = require 'ansi-keycode'
 noon        = require 'noon'
-editor      = require './editor'
+Editor      = require './editor'
 prefs       = require './tools/prefs'
 keyinfo     = require './tools/keyinfo'
 drag        = require './tools/drag'
@@ -17,7 +16,6 @@ str         = require './tools/str'
 encode      = require './tools/encode'
 {sw,sh}     = require './tools/tools'
 ipc         = electron.ipcRenderer
-clipboard   = electron.clipboard
 remote      = electron.remote
 
 line   = ""
@@ -45,7 +43,7 @@ minScrollHeight = 24
 splitAt = (y) ->
     $('scroll').style.height = "#{y}px"
     $('split').style.top = "#{y}px"
-    $('enter').style.top = "#{y+10}px"
+    $('editor').style.top = "#{y+10}px"
     enterHeight = sh()-y
     prefs.set 'split', y
 
@@ -75,13 +73,19 @@ ipc.on 'execute-result', (event, arg) =>
 # 000       000   000  000     000     000   000  000   000
 # 00000000  0000000    000     000      0000000   000   000
 
-editor.init 'input'
+editor = new Editor $('input'), 'input'
 if true
     editor.lines = [
         "for a in [0...1]"
         "    console.log a"
         "console.log 'done'"
     ]
+    editor.update()
+editor.elem.focus()
+editor.elem.ondblclick = (event) ->
+    pos   = editor.posForEvent event
+    range = editor.rangeForWordAtPos pos
+    editor.selectRange range
     editor.update()
 
 # 00000000   00000000   0000000  000  0000000  00000000
@@ -102,9 +106,10 @@ window.onresize = =>
 # 000   000   0000000    0000000   0000000   00000000
      
 inputDrag = new drag
-    target:  editor.id
+    target:  editor.elem
     cursor:  'default'
     onStart: (drag, event) -> 
+        editor.elem.focus()
         editor.startSelection event.shiftKey
         editor.moveCursorToPos editor.posForEvent event
         editor.endSelection event.shiftKey
@@ -114,16 +119,7 @@ inputDrag = new drag
         editor.startSelection true
         editor.moveCursorToPos editor.posForEvent event
         editor.update()
-        
-    onStop:  (drag, event) -> 
-        # log 'stop', drag.pos    
-      
-$(editor.id).ondblclick = (event) ->
-    pos   = editor.posForEvent event
-    range = editor.rangeForWordAtPos pos
-    editor.selectRange range
-    editor.update()
-
+              
 # 000   000  00000000  000   000
 # 000  000   000        000 000 
 # 0000000    0000000     00000  
@@ -132,47 +128,14 @@ $(editor.id).ondblclick = (event) ->
 
 document.onkeydown = (event) ->
     {mod, key, combo} = keyinfo.forEvent event
-    # log "key:", key, "mod:", mod, "combo:", combo
+    # log "document key:", key, "mod:", mod, "combo:", combo
     return if not combo
     switch key
         when 'esc'                               then return window.close()
         when 'right click'                       then return
-        when 'down', 'right', 'up', 'left' 
-            editor.startSelection event.shiftKey
-            if event.metaKey
-                if key == 'left'
-                    editor.moveCursorToStartOfLine()
-                else if key == 'right'
-                    editor.moveCursorToEndOfLine()
-            else
-                editor.moveCursor key
         else
             switch combo
-                when 'enter'                     then editor.insertNewline()
-                when 'delete', 'ctrl+backspace'  then editor.deleteForward()     
-                when 'backspace'                 then editor.deleteBackward()     
-                when 'command+j'                 then editor.joinLine()
-                when 'command+v'                 then editor.insertText clipboard.readText()
-                when 'command+r'                 then return ipc.send 'execute', editor.text()
-                when 'ctrl+a'                    then editor.moveCursorToStartOfLine()
-                when 'ctrl+e'                    then editor.moveCursorToEndOfLine()
-                when 'command+a'                
-                    editor.selectAll() 
-                    editor.update()
-                    return
-                when 'ctrl+shift+a'
-                        editor.startSelection true
-                        editor.moveCursorToStartOfLine()
-                when 'ctrl+shift+e'
-                        editor.startSelection true
-                        editor.moveCursorToEndOfLine()
-                else
-                    if ansiKeycode(event)?.length == 1
-                        editor.insertCharacter ansiKeycode event
-                    # else
-                    #     log combo
-    editor.endSelection event.shiftKey
-    editor.update()
-    $('cursor')?.scrollIntoViewIfNeeded()
+                when 'command+r', 'command+enter'
+                    return ipc.send 'execute', editor.text()
     
 

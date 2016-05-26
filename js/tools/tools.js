@@ -46,6 +46,9 @@
         v = Math.min(v, r2);
       }
       return v;
+    },
+    $: function(id) {
+      return document.getElementById(id);
     }
   };
 

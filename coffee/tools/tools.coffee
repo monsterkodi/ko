@@ -36,6 +36,8 @@ module.exports =
         v = Math.max(v, r1) if r1?
         v = Math.min(v, r2) if r2?
         v
+        
+    $: (id) -> document.getElementById id
 
 if not String.prototype.splice
     String.prototype.splice = (start, delCount, newSubStr='') ->

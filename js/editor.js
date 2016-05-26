@@ -1,371 +1,478 @@
 (function() {
-  var $, Editor, encode, log, tools;
+  var $, Editor, clamp, clipboard, html, keyinfo, log, tools,
+    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  tools = require('./tools/tools');
+  html = require('./html');
 
   log = require('./tools/log');
 
-  encode = require('./tools/encode');
+  tools = require('./tools/tools');
 
-  $ = function(id) {
-    return document.getElementById(id);
-  };
+  keyinfo = require('./tools/keyinfo');
+
+  clipboard = require('electron').clipboard;
+
+  clamp = tools.clamp;
+
+  $ = tools.$;
 
   Editor = (function() {
-    function Editor() {}
+    function Editor(elem, className) {
+      this.onKeyDown = bind(this.onKeyDown, this);
+      this.update = bind(this.update, this);
+      this.rangeForWordAtPos = bind(this.rangeForWordAtPos, this);
+      this.posForEvent = bind(this.posForEvent, this);
+      this.lastPos = bind(this.lastPos, this);
+      this.text = bind(this.text, this);
+      this.deleteBackward = bind(this.deleteBackward, this);
+      this.deleteForward = bind(this.deleteForward, this);
+      this.deleteSelection = bind(this.deleteSelection, this);
+      this.deleteCharacterRangeInLineAtIndex = bind(this.deleteCharacterRangeInLineAtIndex, this);
+      this.deleteLineAtIndex = bind(this.deleteLineAtIndex, this);
+      this.joinLine = bind(this.joinLine, this);
+      this.insertText = bind(this.insertText, this);
+      this.insertNewline = bind(this.insertNewline, this);
+      this.insertTab = bind(this.insertTab, this);
+      this.insertCharacter = bind(this.insertCharacter, this);
+      this.deIndent = bind(this.deIndent, this);
+      this.deIndentLineAtIndex = bind(this.deIndentLineAtIndex, this);
+      this.indentLineAtIndex = bind(this.indentLineAtIndex, this);
+      this.indentString = bind(this.indentString, this);
+      this.moveCursor = bind(this.moveCursor, this);
+      this.moveCursorLeft = bind(this.moveCursorLeft, this);
+      this.moveCursorRight = bind(this.moveCursorRight, this);
+      this.moveCursorDown = bind(this.moveCursorDown, this);
+      this.moveCursorUp = bind(this.moveCursorUp, this);
+      this.moveCursorToPos = bind(this.moveCursorToPos, this);
+      this.moveCursorToLineChar = bind(this.moveCursorToLineChar, this);
+      this.moveCursorToStartOfLine = bind(this.moveCursorToStartOfLine, this);
+      this.moveCursorToEndOfLine = bind(this.moveCursorToEndOfLine, this);
+      this.cursorInFirstLine = bind(this.cursorInFirstLine, this);
+      this.cursorInLastLine = bind(this.cursorInLastLine, this);
+      this.cursorAtStartOfLine = bind(this.cursorAtStartOfLine, this);
+      this.cursorAtEndOfLine = bind(this.cursorAtEndOfLine, this);
+      this.selectedCharacterRangeForLineAtIndex = bind(this.selectedCharacterRangeForLineAtIndex, this);
+      this.selectedLineRange = bind(this.selectedLineRange, this);
+      this.selectedLineIndices = bind(this.selectedLineIndices, this);
+      this.selectionRanges = bind(this.selectionRanges, this);
+      this.endSelection = bind(this.endSelection, this);
+      this.startSelection = bind(this.startSelection, this);
+      this.selectNone = bind(this.selectNone, this);
+      this.selectAll = bind(this.selectAll, this);
+      this.selectRange = bind(this.selectRange, this);
+      this.selectionStart = bind(this.selectionStart, this);
+      this.initCharSize = bind(this.initCharSize, this);
+      this.cursor = [0, 0];
+      this.selection = null;
+      this.lines = [""];
+      this.elem = elem;
+      this.clss = className;
+      this.initCharSize();
+      this.elem.onkeydown = this.onKeyDown;
+      this.elem.innerHTML = html.cursorSpan(this.charSize);
+    }
 
-    Editor.charSize = [0, 0];
+    Editor.prototype.initCharSize = function() {
+      var o;
+      o = document.createElement('div');
+      o.className = this.clss;
+      o.innerHTML = 'XXXXXXXXXX';
+      o.style = {
+        float: 'left',
+        visibility: 'hidden'
+      };
+      document.body.appendChild(o);
+      this.charSize = [o.clientWidth / o.innerHTML.length, o.clientHeight];
+      return o.remove();
+    };
 
-    Editor.cursor = [0, 0];
-
-    Editor.selection = null;
-
-    Editor.lines = [""];
-
-    Editor.cursorSpan = "";
-
-    Editor.id = "";
-
-    Editor.selectionStart = function() {
-      if (Editor.selection != null) {
-        if (Editor.selection[1] < Editor.cursor[1]) {
-          return [Editor.selection[0], Editor.selection[1]];
+    Editor.prototype.selectionStart = function() {
+      if (this.selection != null) {
+        if (this.selection[1] < this.cursor[1]) {
+          return [this.selection[0], this.selection[1]];
         }
-        if (Editor.selection[1] > Editor.cursor[1]) {
-          return [Math.min(Editor.cursor[0], Editor.lines[Editor.cursor[1]].length), Editor.cursor[1]];
+        if (this.selection[1] > this.cursor[1]) {
+          return [Math.min(this.cursor[0], this.lines[this.cursor[1]].length), this.cursor[1]];
         }
-        return [Math.min(Editor.selection[0], Editor.cursor[0]), Editor.cursor[1]];
+        return [Math.min(this.selection[0], this.cursor[0]), this.cursor[1]];
       }
-      return [Math.min(Editor.cursor[0], Editor.lines[Editor.cursor[1]].length), Editor.cursor[1]];
+      return [Math.min(this.cursor[0], this.lines[this.cursor[1]].length), this.cursor[1]];
     };
 
-    Editor.selectRange = function(range) {
-      log('range', range);
-      Editor.selection = range[0];
-      return Editor.cursor = range[1];
+    Editor.prototype.selectRange = function(range) {
+      this.selection = range[0];
+      return this.cursor = range[1];
     };
 
-    Editor.selectAll = function() {
-      return Editor.selectRange([[0, 0], Editor.lastPos()]);
+    Editor.prototype.selectAll = function() {
+      return this.selectRange([[0, 0], this.lastPos()]);
     };
 
-    Editor.startSelection = function(active) {
-      if (active && (Editor.selection == null)) {
-        return Editor.selection = [Math.min(Editor.cursor[0], Editor.lines[Editor.cursor[1]].length), Editor.cursor[1]];
-      }
+    Editor.prototype.selectNone = function() {
+      return this.selection = null;
     };
 
-    Editor.endSelection = function(active) {
-      if ((Editor.selection != null) && !active) {
-        return Editor.selection = null;
+    Editor.prototype.startSelection = function(active) {
+      if (active && (this.selection == null)) {
+        return this.selection = [Math.min(this.cursor[0], this.lines[this.cursor[1]].length), this.cursor[1]];
       }
     };
 
-    Editor.selectedLineRange = function() {
-      if (Editor.selection) {
-        return [Math.min(Editor.cursor[1], Editor.selection[1]), Math.max(Editor.cursor[1], Editor.selection[1])];
+    Editor.prototype.endSelection = function(active) {
+      if ((this.selection != null) && !active) {
+        return this.selection = null;
       }
     };
 
-    Editor.selectedCharacterRangeForLineAtIndex = function(i) {
+    Editor.prototype.selectionRanges = function() {
+      var i, j, range, ref, ref1, results;
+      if (this.selection) {
+        range = this.selectedLineRange();
+        results = [];
+        for (i = j = ref = range[0], ref1 = range[1]; ref <= ref1 ? j <= ref1 : j >= ref1; i = ref <= ref1 ? ++j : --j) {
+          results.push([i, this.selectedCharacterRangeForLineAtIndex(i)]);
+        }
+        return results;
+      } else {
+        return [];
+      }
+    };
+
+    Editor.prototype.selectedLineIndices = function() {
+      var i, j, range, ref, ref1, results;
+      range = this.selectedLineRange();
+      results = [];
+      for (i = j = ref = range[0], ref1 = range[1]; ref <= ref1 ? j <= ref1 : j >= ref1; i = ref <= ref1 ? ++j : --j) {
+        results.push(i);
+      }
+      return results;
+    };
+
+    Editor.prototype.selectedLineRange = function() {
+      if (this.selection) {
+        return [Math.min(this.cursor[1], this.selection[1]), Math.max(this.cursor[1], this.selection[1])];
+      }
+    };
+
+    Editor.prototype.selectedCharacterRangeForLineAtIndex = function(i) {
       var lines;
-      if (!Editor.selection) {
+      if (!this.selection) {
         return;
       }
-      lines = Editor.selectedLineRange();
+      lines = this.selectedLineRange();
       if (i < lines[0] || i > lines[1]) {
         return;
       }
       if ((lines[0] < i && i < lines[1])) {
-        return [0, Editor.lines[i].length];
+        return [0, this.lines[i].length];
       }
       if (lines[0] === lines[1]) {
-        return [Math.min(Editor.cursor[0], Editor.selection[0]), Math.max(Editor.cursor[0], Editor.selection[0])];
+        return [Math.min(this.cursor[0], this.selection[0]), Math.max(this.cursor[0], this.selection[0])];
       }
-      if (i === Editor.cursor[1]) {
-        if (Editor.selection[1] > i) {
-          return [Editor.cursor[0], Editor.lines[i].length];
+      if (i === this.cursor[1]) {
+        if (this.selection[1] > i) {
+          return [this.cursor[0], this.lines[i].length];
         } else {
-          return [0, Math.min(Editor.lines[i].length, Editor.cursor[0])];
+          return [0, Math.min(this.lines[i].length, this.cursor[0])];
         }
       } else {
-        if (Editor.cursor[1] > i) {
-          return [Editor.selection[0], Editor.lines[i].length];
+        if (this.cursor[1] > i) {
+          return [this.selection[0], this.lines[i].length];
         } else {
-          return [0, Math.min(Editor.lines[i].length, Editor.selection[0])];
+          return [0, Math.min(this.lines[i].length, this.selection[0])];
         }
       }
     };
 
-    Editor.cursorAtEndOfLine = function() {
-      return Editor.cursor[0] === Editor.lines[Editor.cursor[1]].length;
+    Editor.prototype.cursorAtEndOfLine = function() {
+      return this.cursor[0] === this.lines[this.cursor[1]].length;
     };
 
-    Editor.cursorAtStartOfLine = function() {
-      return Editor.cursor[0] === 0;
+    Editor.prototype.cursorAtStartOfLine = function() {
+      return this.cursor[0] === 0;
     };
 
-    Editor.cursorInLastLine = function() {
-      return Editor.cursor[1] === Editor.lines.length - 1;
+    Editor.prototype.cursorInLastLine = function() {
+      return this.cursor[1] === this.lines.length - 1;
     };
 
-    Editor.cursorInFirstLine = function() {
-      return Editor.cursor[1] === 0;
+    Editor.prototype.cursorInFirstLine = function() {
+      return this.cursor[1] === 0;
     };
 
-    Editor.moveCursorToEndOfLine = function() {
-      return Editor.cursor[0] = Editor.lines[Editor.cursor[1]].length;
+    Editor.prototype.moveCursorToEndOfLine = function() {
+      return this.cursor[0] = this.lines[this.cursor[1]].length;
     };
 
-    Editor.moveCursorToStartOfLine = function() {
-      return Editor.cursor[0] = 0;
+    Editor.prototype.moveCursorToStartOfLine = function() {
+      return this.cursor[0] = 0;
     };
 
-    Editor.moveCursorToLineChar = function(l, c) {
+    Editor.prototype.moveCursorToLineChar = function(l, c) {
       if (c == null) {
         c = 0;
       }
-      Editor.cursor[1] = Math.min(l, Editor.lines.length - 1);
-      return Editor.cursor[0] = Math.min(c, Editor.lines[Editor.cursor[1]].length);
+      this.cursor[1] = Math.min(l, this.lines.length - 1);
+      return this.cursor[0] = Math.min(c, this.lines[this.cursor[1]].length);
     };
 
-    Editor.moveCursorToPos = function(pos) {
-      Editor.cursor[1] = Math.min(pos[1], Editor.lines.length - 1);
-      return Editor.cursor[0] = Math.min(pos[0], Editor.lines[Editor.cursor[1]].length);
+    Editor.prototype.moveCursorToPos = function(pos) {
+      this.cursor[1] = Math.min(pos[1], this.lines.length - 1);
+      return this.cursor[0] = Math.min(pos[0], this.lines[this.cursor[1]].length);
     };
 
-    Editor.moveCursorUp = function() {
-      if (Editor.cursorInFirstLine()) {
-        return Editor.moveCursorToStartOfLine();
+    Editor.prototype.moveCursorUp = function() {
+      if (this.cursorInFirstLine()) {
+        return this.moveCursorToStartOfLine();
       } else {
-        return Editor.cursor[1] -= 1;
+        return this.cursor[1] -= 1;
       }
     };
 
-    Editor.moveCursorDown = function() {
-      if (Editor.cursorInLastLine()) {
-        return Editor.moveCursorToEndOfLine();
+    Editor.prototype.moveCursorDown = function() {
+      if (this.cursorInLastLine()) {
+        return this.moveCursorToEndOfLine();
       } else {
-        return Editor.cursor[1] += 1;
+        return this.cursor[1] += 1;
       }
     };
 
-    Editor.moveCursorRight = function() {
-      if (Editor.cursorAtEndOfLine()) {
-        if (!Editor.cursorInLastLine()) {
-          Editor.moveCursorDown();
-          return Editor.moveCursorToStartOfLine();
+    Editor.prototype.moveCursorRight = function() {
+      if (this.cursorAtEndOfLine()) {
+        if (!this.cursorInLastLine()) {
+          this.moveCursorDown();
+          return this.moveCursorToStartOfLine();
         }
       } else {
-        return Editor.cursor[0] += 1;
+        return this.cursor[0] += 1;
       }
     };
 
-    Editor.moveCursorLeft = function() {
-      Editor.cursor[0] = Math.min(Editor.lines[Editor.cursor[1]].length, Editor.cursor[0]);
-      if (Editor.cursorAtStartOfLine()) {
-        if (!Editor.cursorInFirstLine()) {
-          Editor.moveCursorUp();
-          return Editor.moveCursorToEndOfLine();
+    Editor.prototype.moveCursorLeft = function() {
+      this.cursor[0] = Math.min(this.lines[this.cursor[1]].length, this.cursor[0]);
+      if (this.cursorAtStartOfLine()) {
+        if (!this.cursorInFirstLine()) {
+          this.moveCursorUp();
+          return this.moveCursorToEndOfLine();
         }
       } else {
-        return Editor.cursor[0] -= 1;
+        return this.cursor[0] -= 1;
       }
     };
 
-    Editor.moveCursor = function(direction) {
+    Editor.prototype.moveCursor = function(direction) {
       switch (direction) {
         case 'left':
-          return Editor.moveCursorLeft();
+          return this.moveCursorLeft();
         case 'right':
-          return Editor.moveCursorRight();
+          return this.moveCursorRight();
         case 'up':
-          return Editor.moveCursorUp();
+          return this.moveCursorUp();
         case 'down':
-          return Editor.moveCursorDown();
+          return this.moveCursorDown();
       }
     };
 
-    Editor.insertCharacter = function(c) {
-      if (Editor.selection != null) {
-        Editor.deleteSelection();
-      }
-      Editor.lines[Editor.cursor[1]] = Editor.lines[Editor.cursor[1]].splice(Editor.cursor[0], 0, c);
-      return Editor.cursor[0] += 1;
+    Editor.prototype.indentString = function() {
+      return '    ';
     };
 
-    Editor.insertNewline = function() {
-      if (Editor.selection != null) {
-        Editor.deleteSelection();
+    Editor.prototype.indentLineAtIndex = function(i) {
+      var indent, ref;
+      indent = this.indentString();
+      this.lines[i] = indent + this.lines[i];
+      if ((this.cursor[1] === i) && this.cursor[0] > 0) {
+        this.cursor[0] += indent.length;
       }
-      if (Editor.cursorAtEndOfLine()) {
-        Editor.lines.splice(Editor.cursor[1] + 1, 0, "");
+      if ((((ref = this.selection) != null ? ref[1] : void 0) === i) && this.selection[0] > 0) {
+        return this.selection[0] += indent.length;
+      }
+    };
+
+    Editor.prototype.deIndentLineAtIndex = function(i) {
+      var indent, ref;
+      indent = this.indentString();
+      if (this.lines[i].startsWith(indent)) {
+        this.lines[i] = this.lines[i].substr(indent.length);
+        if ((this.cursor[1] === i) && this.cursor[0] > 0) {
+          this.cursor[0] = Math.max(0, this.cursor[0] - indent.length);
+        }
+        if ((((ref = this.selection) != null ? ref[1] : void 0) === i) && this.selection[0] > 0) {
+          return this.selection[0] = Math.max(0, this.selection[0] - indent.length);
+        }
+      }
+    };
+
+    Editor.prototype.deIndent = function() {
+      var i, j, len, ref, results;
+      if (this.selection != null) {
+        ref = this.selectedLineIndices();
+        results = [];
+        for (j = 0, len = ref.length; j < len; j++) {
+          i = ref[j];
+          results.push(this.deIndentLineAtIndex(i));
+        }
+        return results;
       } else {
-        Editor.lines.splice(Editor.cursor[1] + 1, 0, Editor.lines[Editor.cursor[1]].substr(Editor.cursor[0]));
-        Editor.lines[Editor.cursor[1]] = Editor.lines[Editor.cursor[1]].substr(0, Editor.cursor[0]);
+        return this.deIndentLineAtIndex(this.cursor[1]);
       }
-      return Editor.moveCursorRight();
     };
 
-    Editor.insertText = function(text) {
+    Editor.prototype.insertCharacter = function(c) {
+      if (this.selection != null) {
+        this.deleteSelection();
+      }
+      this.lines[this.cursor[1]] = this.lines[this.cursor[1]].splice(this.cursor[0], 0, c);
+      return this.cursor[0] += 1;
+    };
+
+    Editor.prototype.insertTab = function() {
+      var i, il, j, k, len, ref, ref1, results, results1;
+      if (this.selection != null) {
+        ref = this.selectedLineIndices();
+        results = [];
+        for (j = 0, len = ref.length; j < len; j++) {
+          i = ref[j];
+          results.push(this.indentLineAtIndex(i));
+        }
+        return results;
+      } else {
+        il = this.indentString().length;
+        results1 = [];
+        for (i = k = 0, ref1 = 4 - (this.cursor[0] % il); 0 <= ref1 ? k < ref1 : k > ref1; i = 0 <= ref1 ? ++k : --k) {
+          results1.push(this.insertCharacter(' '));
+        }
+        return results1;
+      }
+    };
+
+    Editor.prototype.insertNewline = function() {
+      if (this.selection != null) {
+        this.deleteSelection();
+      }
+      if (this.cursorAtEndOfLine()) {
+        this.lines.splice(this.cursor[1] + 1, 0, "");
+      } else {
+        this.lines.splice(this.cursor[1] + 1, 0, this.lines[this.cursor[1]].substr(this.cursor[0]));
+        this.lines[this.cursor[1]] = this.lines[this.cursor[1]].substr(0, this.cursor[0]);
+      }
+      return this.moveCursorRight();
+    };
+
+    Editor.prototype.insertText = function(text) {
       var c, j, len, results;
-      if (Editor.selection != null) {
-        Editor.deleteSelection();
+      if (this.selection != null) {
+        this.deleteSelection();
       }
       results = [];
       for (j = 0, len = text.length; j < len; j++) {
         c = text[j];
         if (c === '\n') {
-          results.push(Editor.insertNewline());
+          results.push(this.insertNewline());
         } else {
-          results.push(Editor.insertCharacter(c));
+          results.push(this.insertCharacter(c));
         }
       }
       return results;
     };
 
-    Editor.joinLine = function() {
-      if (!Editor.cursorInLastLine()) {
-        Editor.lines[Editor.cursor[1]] += Editor.lines[Editor.cursor[1] + 1];
-        return Editor.lines.splice(Editor.cursor[1] + 1, 1);
+    Editor.prototype.joinLine = function() {
+      if (!this.cursorInLastLine()) {
+        this.lines[this.cursor[1]] += this.lines[this.cursor[1] + 1];
+        return this.lines.splice(this.cursor[1] + 1, 1);
       }
     };
 
-    Editor.deleteLineAtIndex = function(i) {
-      return Editor.lines.splice(i, 1);
+    Editor.prototype.deleteLineAtIndex = function(i) {
+      return this.lines.splice(i, 1);
     };
 
-    Editor.deleteCharacterRangeInLineAtIndex = function(r, i) {
-      return Editor.lines[i] = Editor.lines[i].splice(r[0], r[1] - r[0]);
+    Editor.prototype.deleteCharacterRangeInLineAtIndex = function(r, i) {
+      return this.lines[i] = this.lines[i].splice(r[0], r[1] - r[0]);
     };
 
-    Editor.deleteSelection = function() {
+    Editor.prototype.deleteSelection = function() {
       var i, j, lineRange, ref, ref1;
-      lineRange = Editor.selectedLineRange();
+      lineRange = this.selectedLineRange();
       if (lineRange == null) {
         return;
       }
-      Editor.deleteCharacterRangeInLineAtIndex(Editor.selectedCharacterRangeForLineAtIndex(lineRange[1]), lineRange[1]);
+      this.deleteCharacterRangeInLineAtIndex(this.selectedCharacterRangeForLineAtIndex(lineRange[1]), lineRange[1]);
       if (lineRange[1] > lineRange[0]) {
         for (i = j = ref = lineRange[1] - 1, ref1 = lineRange[0]; ref <= ref1 ? j < ref1 : j > ref1; i = ref <= ref1 ? ++j : --j) {
-          Editor.deleteLineAtIndex(i);
+          this.deleteLineAtIndex(i);
         }
-        Editor.deleteCharacterRangeInLineAtIndex(Editor.selectedCharacterRangeForLineAtIndex(lineRange[0]), lineRange[0]);
+        this.deleteCharacterRangeInLineAtIndex(this.selectedCharacterRangeForLineAtIndex(lineRange[0]), lineRange[0]);
       }
-      Editor.cursor = Editor.selectionStart();
+      this.cursor = this.selectionStart();
       if (lineRange[1] > lineRange[0]) {
-        return Editor.joinLine();
+        return this.joinLine();
       }
     };
 
-    Editor.deleteForward = function() {
-      if (Editor.selection != null) {
-        Editor.deleteSelection();
+    Editor.prototype.deleteForward = function() {
+      if (this.selection != null) {
+        this.deleteSelection();
         return;
       }
-      if (Editor.cursorAtEndOfLine()) {
-        return Editor.joinLine();
+      if (this.cursorAtEndOfLine()) {
+        return this.joinLine();
       } else {
-        return Editor.lines[Editor.cursor[1]] = Editor.lines[Editor.cursor[1]].splice(Editor.cursor[0], 1);
+        return this.lines[this.cursor[1]] = this.lines[this.cursor[1]].splice(this.cursor[0], 1);
       }
     };
 
-    Editor.deleteBackward = function() {
-      if (Editor.selection != null) {
-        Editor.deleteSelection();
-        return;
-      }
-      if (Editor.cursorInFirstLine() && Editor.cursorAtStartOfLine()) {
-        return;
-      }
-      Editor.moveCursorLeft();
-      return Editor.deleteForward();
-    };
-
-    Editor.text = function() {
-      return Editor.lines.join('\n');
-    };
-
-    Editor.html = function() {
-      var border, h, i, j, l, left, lineRange, mid, nextRange, prevRange, range, ref, right, selEnd, selStart;
-      h = [];
-      lineRange = Editor.selectedLineRange();
-      for (i = j = 0, ref = Editor.lines.length; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
-        l = Editor.lines[i];
-        if (lineRange && ((lineRange[0] <= i && i <= lineRange[1]))) {
-          range = Editor.selectedCharacterRangeForLineAtIndex(i);
-        } else {
-          range = null;
+    Editor.prototype.deleteBackward = function() {
+      var cursorIndex, i, il, j, rc, ref, results, strToCursor;
+      if (this.selection != null) {
+        return this.deleteSelection();
+      } else {
+        if (this.cursorInFirstLine() && this.cursorAtStartOfLine()) {
+          return;
         }
-        if (range) {
-          selEnd = "</span>";
-          left = l.substr(0, range[0]);
-          mid = l.substr(range[0], range[1] - range[0]);
-          right = l.substr(range[1]);
-          border = "";
-          if (i === lineRange[0]) {
-            border += " tl tr";
-          } else {
-            prevRange = Editor.selectedCharacterRangeForLineAtIndex(i - 1);
-            if (range[1] > prevRange[1] || range[1] <= prevRange[0]) {
-              border += " tr";
-            }
-            if (range[0] < prevRange[0] || range[0] >= prevRange[1]) {
-              border += " tl";
-            }
+        cursorIndex = Math.min(this.lines[this.cursor[1]].length - 1, this.cursor[0]);
+        strToCursor = this.lines[this.cursor[1]].substr(0, cursorIndex);
+        log('strToCursor', strToCursor, "<");
+        if (strToCursor.trim() === '') {
+          il = this.indentString().length;
+          rc = cursorIndex % il || il;
+          log(il, cursorIndex, rc);
+          results = [];
+          for (i = j = 0, ref = rc; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
+            this.moveCursorLeft();
+            results.push(this.deleteForward());
           }
-          if (i === lineRange[1]) {
-            border += " bl br";
-          } else {
-            nextRange = Editor.selectedCharacterRangeForLineAtIndex(i + 1);
-            if (range[1] > nextRange[1]) {
-              border += " br";
-            }
-            if (range[0] < nextRange[0] || range[0] >= nextRange[1]) {
-              border += " bl";
-            }
-          }
-          selStart = "<span class=\"selection" + border + "\">";
-          if (i === Editor.cursor[1]) {
-            if (Editor.cursor[0] === range[0]) {
-              h.push(encode(left) + Editor.cursorSpan + selStart + encode(mid) + selEnd + encode(right));
-            } else {
-              h.push(encode(left) + selStart + encode(mid) + selEnd + Editor.cursorSpan + encode(right));
-            }
-          } else {
-            h.push(encode(left) + selStart + encode(mid) + selEnd + encode(right));
-          }
-        } else if (i === Editor.cursor[1]) {
-          left = l.substr(0, Editor.cursor[0]);
-          right = l.substr(Editor.cursor[0]);
-          h.push(encode(left) + Editor.cursorSpan + encode(right));
+          return results;
         } else {
-          h.push(encode(l));
+          this.moveCursorLeft();
+          return this.deleteForward();
         }
       }
-      return h.join('<br>');
     };
 
-    Editor.lastLineIndex = function() {
-      return Editor.lines.length - 1;
+    Editor.prototype.text = function() {
+      return this.lines.join('\n');
     };
 
-    Editor.lastPos = function() {
+    Editor.prototype.lastPos = function() {
       var lli;
-      lli = Editor.lastLineIndex();
-      return [Editor.lines[lli].length, lli];
+      lli = this.lines.length - 1;
+      return [this.lines[lli].length, lli];
     };
 
-    Editor.posForEvent = function(event) {
-      var sl, st;
-      sl = $(Editor.id).scrollLeft;
-      st = $(Editor.id).scrollTop;
-      return [parseInt(Math.floor((Math.max(0, sl + event.offsetX - 10)) / Editor.charSize[0])), parseInt(Math.floor((Math.max(0, st + event.offsetY - 10)) / Editor.charSize[1]))];
+    Editor.prototype.posForEvent = function(event) {
+      var br, lx, ly, pos, sl, st;
+      sl = this.elem.scrollLeft;
+      st = this.elem.scrollTop;
+      br = this.elem.getBoundingClientRect();
+      lx = clamp(0, this.elem.clientWidth, event.clientX - br.left);
+      ly = clamp(0, this.elem.clientHeight, event.clientY - br.top);
+      return pos = [parseInt(Math.floor((Math.max(0, sl + lx - 10)) / this.charSize[0])), parseInt(Math.floor((Math.max(0, st + ly - 10)) / this.charSize[1]))];
     };
 
-    Editor.rangeForWordAtPos = function(pos) {
+    Editor.prototype.rangeForWordAtPos = function(pos) {
       var c, l, n, r;
-      l = Editor.lines[pos[1]];
+      l = this.lines[pos[1]];
       r = [pos[0], pos[0]];
       c = l[r[0]];
       while (r[0] > 0) {
@@ -385,25 +492,91 @@
       return [[r[0], pos[1]], [r[1] + 1, pos[1]]];
     };
 
-    Editor.update = function() {
-      return $(Editor.id).innerHTML = Editor.html();
+    Editor.prototype.update = function() {
+      return this.elem.innerHTML = html.render(this.lines, this.cursor, this.selectionRanges(), this.charSize);
     };
 
-    Editor.init = function(className) {
-      var o;
-      Editor.id = className;
-      o = document.createElement('div');
-      o.className = className;
-      o.innerHTML = 'XXXXXXXXXX';
-      o.style = {
-        float: 'left',
-        visibility: 'hidden'
-      };
-      document.body.appendChild(o);
-      Editor.charSize = [o.clientWidth / o.innerHTML.length, o.clientHeight];
-      o.remove();
-      Editor.cursorSpan = "<span id=\"cursor\" style=\"height: " + Editor.charSize[1] + "px\"></span>";
-      return $(className).innerHTML = Editor.cursorSpan;
+    Editor.prototype.onKeyDown = function(event) {
+      var ansiKeycode, combo, key, mod, ref, ref1, ref2;
+      ref = keyinfo.forEvent(event), mod = ref.mod, key = ref.key, combo = ref.combo;
+      if (!combo) {
+        return;
+      }
+      switch (key) {
+        case 'right click':
+          return;
+        case 'down':
+        case 'right':
+        case 'up':
+        case 'left':
+          this.startSelection(event.shiftKey);
+          if (event.metaKey) {
+            if (key === 'left') {
+              this.moveCursorToStartOfLine();
+            } else if (key === 'right') {
+              this.moveCursorToEndOfLine();
+            }
+          } else {
+            this.moveCursor(key);
+          }
+          break;
+        default:
+          switch (combo) {
+            case 'enter':
+              this.insertNewline();
+              break;
+            case 'tab':
+            case 'command+]':
+              return this.insertTab() + this.update() + event.preventDefault();
+            case 'shift+tab':
+            case 'command+[':
+              return this.deIndent() + this.update() + event.preventDefault();
+            case 'delete':
+            case 'ctrl+backspace':
+              this.deleteForward();
+              break;
+            case 'backspace':
+              this.deleteBackward();
+              break;
+            case 'command+j':
+              this.joinLine();
+              break;
+            case 'command+v':
+              this.insertText(clipboard.readText());
+              break;
+            case 'ctrl+a':
+              this.moveCursorToStartOfLine();
+              break;
+            case 'ctrl+e':
+              this.moveCursorToEndOfLine();
+              break;
+            case 'command+d':
+              this.selectNone();
+              break;
+            case 'command+a':
+              this.selectAll();
+              this.update();
+              return;
+            case 'ctrl+shift+a':
+              this.startSelection(true);
+              this.moveCursorToStartOfLine();
+              break;
+            case 'ctrl+shift+e':
+              this.startSelection(true);
+              this.moveCursorToEndOfLine();
+              break;
+            default:
+              ansiKeycode = require('ansi-keycode');
+              if (((ref1 = ansiKeycode(event)) != null ? ref1.length : void 0) === 1) {
+                this.insertCharacter(ansiKeycode(event));
+              } else {
+                log("ignoring", combo);
+              }
+          }
+      }
+      this.endSelection(event.shiftKey);
+      this.update();
+      return (ref2 = $('cursor')) != null ? ref2.scrollIntoViewIfNeeded() : void 0;
     };
 
     return Editor;

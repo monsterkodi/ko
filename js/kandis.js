@@ -1,13 +1,11 @@
 (function() {
-  var $, ansiKeycode, clipboard, drag, editor, electron, encode, enterHeight, inputDrag, ipc, keyinfo, line, log, minEnterHeight, minScrollHeight, noon, pos, prefs, ref, ref1, remote, sh, splitAt, splitDrag, str, sw;
+  var $, Editor, drag, editor, electron, encode, enterHeight, inputDrag, ipc, keyinfo, line, log, minEnterHeight, minScrollHeight, noon, pos, prefs, ref, ref1, remote, sh, splitAt, splitDrag, str, sw;
 
   electron = require('electron');
 
-  ansiKeycode = require('ansi-keycode');
-
   noon = require('noon');
 
-  editor = require('./editor');
+  Editor = require('./editor');
 
   prefs = require('./tools/prefs');
 
@@ -26,8 +24,6 @@
   ref = require('./tools/tools'), sw = ref.sw, sh = ref.sh;
 
   ipc = electron.ipcRenderer;
-
-  clipboard = electron.clipboard;
 
   remote = electron.remote;
 
@@ -50,7 +46,7 @@
   splitAt = function(y) {
     $('scroll').style.height = y + "px";
     $('split').style.top = y + "px";
-    $('enter').style.top = (y + 10) + "px";
+    $('editor').style.top = (y + 10) + "px";
     enterHeight = sh() - y;
     return prefs.set('split', y);
   };
@@ -75,12 +71,22 @@
     };
   })(this));
 
-  editor.init('input');
+  editor = new Editor($('input'), 'input');
 
   if (true) {
     editor.lines = ["for a in [0...1]", "    console.log a", "console.log 'done'"];
     editor.update();
   }
+
+  editor.elem.focus();
+
+  editor.elem.ondblclick = function(event) {
+    var range;
+    pos = editor.posForEvent(event);
+    range = editor.rangeForWordAtPos(pos);
+    editor.selectRange(range);
+    return editor.update();
+  };
 
   window.onresize = (function(_this) {
     return function() {
@@ -91,9 +97,10 @@
   })(this);
 
   inputDrag = new drag({
-    target: editor.id,
+    target: editor.elem,
     cursor: 'default',
     onStart: function(drag, event) {
+      editor.elem.focus();
       editor.startSelection(event.shiftKey);
       editor.moveCursorToPos(editor.posForEvent(event));
       editor.endSelection(event.shiftKey);
@@ -103,20 +110,11 @@
       editor.startSelection(true);
       editor.moveCursorToPos(editor.posForEvent(event));
       return editor.update();
-    },
-    onStop: function(drag, event) {}
+    }
   });
 
-  $(editor.id).ondblclick = function(event) {
-    var range;
-    pos = editor.posForEvent(event);
-    range = editor.rangeForWordAtPos(pos);
-    editor.selectRange(range);
-    return editor.update();
-  };
-
   document.onkeydown = function(event) {
-    var combo, key, mod, ref2, ref3, ref4;
+    var combo, key, mod, ref2;
     ref2 = keyinfo.forEvent(event), mod = ref2.mod, key = ref2.key, combo = ref2.combo;
     if (!combo) {
       return;
@@ -125,69 +123,14 @@
       case 'esc':
         return window.close();
       case 'right click':
-        return;
-      case 'down':
-      case 'right':
-      case 'up':
-      case 'left':
-        editor.startSelection(event.shiftKey);
-        if (event.metaKey) {
-          if (key === 'left') {
-            editor.moveCursorToStartOfLine();
-          } else if (key === 'right') {
-            editor.moveCursorToEndOfLine();
-          }
-        } else {
-          editor.moveCursor(key);
-        }
         break;
       default:
         switch (combo) {
-          case 'enter':
-            editor.insertNewline();
-            break;
-          case 'delete':
-          case 'ctrl+backspace':
-            editor.deleteForward();
-            break;
-          case 'backspace':
-            editor.deleteBackward();
-            break;
-          case 'command+j':
-            editor.joinLine();
-            break;
-          case 'command+v':
-            editor.insertText(clipboard.readText());
-            break;
           case 'command+r':
+          case 'command+enter':
             return ipc.send('execute', editor.text());
-          case 'ctrl+a':
-            editor.moveCursorToStartOfLine();
-            break;
-          case 'ctrl+e':
-            editor.moveCursorToEndOfLine();
-            break;
-          case 'command+a':
-            editor.selectAll();
-            editor.update();
-            return;
-          case 'ctrl+shift+a':
-            editor.startSelection(true);
-            editor.moveCursorToStartOfLine();
-            break;
-          case 'ctrl+shift+e':
-            editor.startSelection(true);
-            editor.moveCursorToEndOfLine();
-            break;
-          default:
-            if (((ref3 = ansiKeycode(event)) != null ? ref3.length : void 0) === 1) {
-              editor.insertCharacter(ansiKeycode(event));
-            }
         }
     }
-    editor.endSelection(event.shiftKey);
-    editor.update();
-    return (ref4 = $('cursor')) != null ? ref4.scrollIntoViewIfNeeded() : void 0;
   };
 
 }).call(this);

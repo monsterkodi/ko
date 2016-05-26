@@ -86,7 +86,6 @@
       this.deltaSum = this.startPos.to(this.pos);
       if ((this.minPos != null) && (this.maxPos != null)) {
         this.cpos = this.pos.clamped(this.minPos, this.maxPos);
-        log(this.minPos, this.maxPos, this.pos, this.cpos);
       }
       if (this.onMove != null) {
         this.onMove(this, event);

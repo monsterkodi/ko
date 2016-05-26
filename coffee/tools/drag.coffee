@@ -68,7 +68,6 @@ class Drag
         
         if @minPos? and @maxPos? 
             @cpos = @pos.clamped @minPos, @maxPos                
-            log @minPos, @maxPos, @pos, @cpos
                     
         if @onMove?
             @onMove this, event
