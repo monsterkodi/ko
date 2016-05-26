@@ -4,6 +4,7 @@
 #000       000   000  000     000     000   000  000   000
 #00000000  0000000    000     000      0000000   000   000
 
+undo      = require './undo'
 html      = require './html'
 log       = require './tools/log'
 tools     = require './tools/tools'
@@ -15,6 +16,7 @@ $         = tools.$
 class Editor
     
     constructor: (elem, className) ->
+        @do         = new undo @done
         @cursor     = [0,0]
         @selection  = null
         @lines      = [""]
@@ -23,6 +25,9 @@ class Editor
         @initCharSize()
         @elem.onkeydown = @onKeyDown
         @elem.innerHTML = html.cursorSpan @charSize
+
+    done: () =>
+        log 'done'
 
     # 000  000   000  000  000000000
     # 000  0000  000  000     000   
@@ -178,28 +183,34 @@ class Editor
     indentString: => '    '
     
     indentLineAtIndex: (i) =>
+        @do.start()
         indent = @indentString()
-        @lines[i] = indent + @lines[i]
+        @do.change @lines, i, indent + @lines[i]
         if (@cursor[1] == i) and @cursor[0] > 0
             @cursor[0] += indent.length
         if (@selection?[1] == i) and @selection[0] > 0
             @selection[0] += indent.length
+        @do.end()
     
     deIndentLineAtIndex: (i) =>
+        @do.start()
         indent = @indentString()        
         if @lines[i].startsWith indent
-            @lines[i] = @lines[i].substr indent.length
+            @do.change @lines, i, @lines[i].substr indent.length
             if (@cursor[1] == i) and @cursor[0] > 0
                 @cursor[0] = Math.max 0, @cursor[0] - indent.length
             if (@selection?[1] == i) and @selection[0] > 0
                 @selection[0] = Math.max 0, @selection[0] - indent.length
+        @do.end()
     
     deIndent: => 
+        @do.start()
         if @selection?
             for i in @selectedLineIndices()
                 @deIndentLineAtIndex i
         else
             @deIndentLineAtIndex @cursor[1]    
+        @do.end()
             
     # 000  000   000   0000000  00000000  00000000   000000000
     # 000  0000  000  000       000       000   000     000   
@@ -208,11 +219,14 @@ class Editor
     # 000  000   000  0000000   00000000  000   000     000   
     
     insertCharacter: (c) =>
+        @do.start()
         @deleteSelection() if @selection?
-        @lines[@cursor[1]] = @lines[@cursor[1]].splice @cursor[0], 0, c
+        @do.change @lines, @cursor[1], @lines[@cursor[1]].splice @cursor[0], 0, c
         @cursor[0] += 1
+        @do.end()
         
     insertTab: =>
+        @do.start()
         if @selection?
             for i in @selectedLineIndices()
                 @indentLineAtIndex i
@@ -220,23 +234,28 @@ class Editor
             il = @indentString().length
             for i in [0...(4-(@cursor[0]%il))]
                 @insertCharacter ' '
+        @do.end()
         
     insertNewline: =>
+        @do.start()
         @deleteSelection() if @selection?
         if @cursorAtEndOfLine()
-            @lines.splice @cursor[1]+1, 0, ""
+            @do.change @lines.splice @cursor[1]+1, 0, ""
         else
-            @lines.splice @cursor[1]+1, 0, @lines[@cursor[1]].substr @cursor[0]
-            @lines[@cursor[1]] = @lines[@cursor[1]].substr 0, @cursor[0]
+            @do.insert @lines, @cursor[1]+1, @lines[@cursor[1]].substr @cursor[0]
+            @do.change @lines, @cursor[1],   @lines[@cursor[1]].substr 0, @cursor[0]
         @moveCursorRight()
+        @do.end()
         
     insertText: (text) =>
+        @do.start()
         @deleteSelection() if @selection?
         for c in text
             if c == '\n'
                 @insertNewline()
             else
                 @insertCharacter c
+        @do.end()
     
     # 0000000    00000000  000      00000000  000000000  00000000
     # 000   000  000       000      000          000     000     
@@ -246,18 +265,21 @@ class Editor
     
     joinLine: =>
         if not @cursorInLastLine()
-            @lines[@cursor[1]] += @lines[@cursor[1]+1]
-            @lines.splice @cursor[1]+1, 1
+            @do.start()
+            @do.change @lines, @cursor[1], lines[@cursor[1]] + @lines[@cursor[1]+1]
+            @do.delete @lines, @cursor[1]+1
+            @do.end()
             
     deleteLineAtIndex: (i) =>
-        @lines.splice i, 1
+        @do.delete @lines, i
         
     deleteCharacterRangeInLineAtIndex: (r, i) =>
-        @lines[i] = @lines[i].splice r[0], r[1]-r[0]
+        @do.change @lines, i, @lines[i].splice r[0], r[1]-r[0]
             
     deleteSelection: =>
         lineRange = @selectedLineRange()
         return if not lineRange?
+        @do.start()
         @deleteCharacterRangeInLineAtIndex @selectedCharacterRangeForLineAtIndex(lineRange[1]), lineRange[1]
         if lineRange[1] > lineRange[0]
             for i in [(lineRange[1]-1)...lineRange[0]]
@@ -266,6 +288,7 @@ class Editor
         @cursor = @selectionStart()
         if lineRange[1] > lineRange[0]
             @joinLine()
+        @do.end()
 
     deleteForward: =>
         if @selection?
@@ -274,7 +297,7 @@ class Editor
         if @cursorAtEndOfLine()
             @joinLine()
         else
-            @lines[@cursor[1]] = @lines[@cursor[1]].splice @cursor[0], 1
+            @do.change @lines, @cursor[1], @lines[@cursor[1]].splice @cursor[0], 1
     
     deleteBackward: =>
         if @selection?
@@ -284,16 +307,12 @@ class Editor
                 return
             cursorIndex = Math.min @lines[@cursor[1]].length-1, @cursor[0]
             strToCursor = @lines[@cursor[1]].substr 0, cursorIndex
-            log 'strToCursor', strToCursor, "<"
             if strToCursor.trim() == '' # only spaces between line start and cursor
-
                 il = @indentString().length
                 rc = cursorIndex%il or il
-                log il, cursorIndex, rc
                 for i in [0...rc]
                     @moveCursorLeft()
                     @deleteForward()
-                    
             else
                 @moveCursorLeft()
                 @deleteForward()

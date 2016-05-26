@@ -1,6 +1,8 @@
 (function() {
-  var $, Editor, clamp, clipboard, html, keyinfo, log, tools,
+  var $, Editor, clamp, clipboard, html, keyinfo, log, tools, undo,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  undo = require('./undo');
 
   html = require('./html');
 
@@ -62,6 +64,8 @@
       this.selectRange = bind(this.selectRange, this);
       this.selectionStart = bind(this.selectionStart, this);
       this.initCharSize = bind(this.initCharSize, this);
+      this.done = bind(this.done, this);
+      this["do"] = new undo(this.done);
       this.cursor = [0, 0];
       this.selection = null;
       this.lines = [""];
@@ -71,6 +75,10 @@
       this.elem.onkeydown = this.onKeyDown;
       this.elem.innerHTML = html.cursorSpan(this.charSize);
     }
+
+    Editor.prototype.done = function() {
+      return log('done');
+    };
 
     Editor.prototype.initCharSize = function() {
       var o;
@@ -279,116 +287,124 @@
 
     Editor.prototype.indentLineAtIndex = function(i) {
       var indent, ref;
+      this["do"].start();
       indent = this.indentString();
-      this.lines[i] = indent + this.lines[i];
+      this["do"].change(this.lines, i, indent + this.lines[i]);
       if ((this.cursor[1] === i) && this.cursor[0] > 0) {
         this.cursor[0] += indent.length;
       }
       if ((((ref = this.selection) != null ? ref[1] : void 0) === i) && this.selection[0] > 0) {
-        return this.selection[0] += indent.length;
+        this.selection[0] += indent.length;
       }
+      return this["do"].end();
     };
 
     Editor.prototype.deIndentLineAtIndex = function(i) {
       var indent, ref;
+      this["do"].start();
       indent = this.indentString();
       if (this.lines[i].startsWith(indent)) {
-        this.lines[i] = this.lines[i].substr(indent.length);
+        this["do"].change(this.lines, i, this.lines[i].substr(indent.length));
         if ((this.cursor[1] === i) && this.cursor[0] > 0) {
           this.cursor[0] = Math.max(0, this.cursor[0] - indent.length);
         }
         if ((((ref = this.selection) != null ? ref[1] : void 0) === i) && this.selection[0] > 0) {
-          return this.selection[0] = Math.max(0, this.selection[0] - indent.length);
+          this.selection[0] = Math.max(0, this.selection[0] - indent.length);
         }
       }
+      return this["do"].end();
     };
 
     Editor.prototype.deIndent = function() {
-      var i, j, len, ref, results;
+      var i, j, len, ref;
+      this["do"].start();
       if (this.selection != null) {
         ref = this.selectedLineIndices();
-        results = [];
         for (j = 0, len = ref.length; j < len; j++) {
           i = ref[j];
-          results.push(this.deIndentLineAtIndex(i));
+          this.deIndentLineAtIndex(i);
         }
-        return results;
       } else {
-        return this.deIndentLineAtIndex(this.cursor[1]);
+        this.deIndentLineAtIndex(this.cursor[1]);
       }
+      return this["do"].end();
     };
 
     Editor.prototype.insertCharacter = function(c) {
+      this["do"].start();
       if (this.selection != null) {
         this.deleteSelection();
       }
-      this.lines[this.cursor[1]] = this.lines[this.cursor[1]].splice(this.cursor[0], 0, c);
-      return this.cursor[0] += 1;
+      this["do"].change(this.lines, this.cursor[1], this.lines[this.cursor[1]].splice(this.cursor[0], 0, c));
+      this.cursor[0] += 1;
+      return this["do"].end();
     };
 
     Editor.prototype.insertTab = function() {
-      var i, il, j, k, len, ref, ref1, results, results1;
+      var i, il, j, k, len, ref, ref1;
+      this["do"].start();
       if (this.selection != null) {
         ref = this.selectedLineIndices();
-        results = [];
         for (j = 0, len = ref.length; j < len; j++) {
           i = ref[j];
-          results.push(this.indentLineAtIndex(i));
+          this.indentLineAtIndex(i);
         }
-        return results;
       } else {
         il = this.indentString().length;
-        results1 = [];
         for (i = k = 0, ref1 = 4 - (this.cursor[0] % il); 0 <= ref1 ? k < ref1 : k > ref1; i = 0 <= ref1 ? ++k : --k) {
-          results1.push(this.insertCharacter(' '));
+          this.insertCharacter(' ');
         }
-        return results1;
       }
+      return this["do"].end();
     };
 
     Editor.prototype.insertNewline = function() {
+      this["do"].start();
       if (this.selection != null) {
         this.deleteSelection();
       }
       if (this.cursorAtEndOfLine()) {
-        this.lines.splice(this.cursor[1] + 1, 0, "");
+        this["do"].change(this.lines.splice(this.cursor[1] + 1, 0, ""));
       } else {
-        this.lines.splice(this.cursor[1] + 1, 0, this.lines[this.cursor[1]].substr(this.cursor[0]));
-        this.lines[this.cursor[1]] = this.lines[this.cursor[1]].substr(0, this.cursor[0]);
+        this["do"].insert(this.lines, this.cursor[1] + 1, this.lines[this.cursor[1]].substr(this.cursor[0]));
+        this["do"].change(this.lines, this.cursor[1], this.lines[this.cursor[1]].substr(0, this.cursor[0]));
       }
-      return this.moveCursorRight();
+      this.moveCursorRight();
+      return this["do"].end();
     };
 
     Editor.prototype.insertText = function(text) {
-      var c, j, len, results;
+      var c, j, len;
+      this["do"].start();
       if (this.selection != null) {
         this.deleteSelection();
       }
-      results = [];
       for (j = 0, len = text.length; j < len; j++) {
         c = text[j];
         if (c === '\n') {
-          results.push(this.insertNewline());
+          this.insertNewline();
         } else {
-          results.push(this.insertCharacter(c));
+          this.insertCharacter(c);
         }
       }
-      return results;
+      return this["do"].end();
     };
 
     Editor.prototype.joinLine = function() {
       if (!this.cursorInLastLine()) {
-        this.lines[this.cursor[1]] += this.lines[this.cursor[1] + 1];
-        return this.lines.splice(this.cursor[1] + 1, 1);
+        this["do"].start();
+        this["do"].change(this.lines, this.cursor[1], lines[this.cursor[1]] + this.lines[this.cursor[1] + 1]);
+        this["do"]["delete"](this.lines, this.cursor[1] + 1);
+        return this["do"].end();
       }
     };
 
     Editor.prototype.deleteLineAtIndex = function(i) {
-      return this.lines.splice(i, 1);
+      return this["do"]["delete"](this.lines, i);
     };
 
     Editor.prototype.deleteCharacterRangeInLineAtIndex = function(r, i) {
-      return this.lines[i] = this.lines[i].splice(r[0], r[1] - r[0]);
+      return this["do"].change(this.lines, i, this.lines[i].splice(r[0], r[1] - r[0]));
     };
 
     Editor.prototype.deleteSelection = function() {
@@ -397,6 +413,7 @@
       if (lineRange == null) {
         return;
       }
+      this["do"].start();
       this.deleteCharacterRangeInLineAtIndex(this.selectedCharacterRangeForLineAtIndex(lineRange[1]), lineRange[1]);
       if (lineRange[1] > lineRange[0]) {
         for (i = j = ref = lineRange[1] - 1, ref1 = lineRange[0]; ref <= ref1 ? j < ref1 : j > ref1; i = ref <= ref1 ? ++j : --j) {
@@ -406,8 +423,9 @@
       }
       this.cursor = this.selectionStart();
       if (lineRange[1] > lineRange[0]) {
-        return this.joinLine();
+        this.joinLine();
       }
+      return this["do"].end();
     };
 
     Editor.prototype.deleteForward = function() {
@@ -418,7 +436,7 @@
       if (this.cursorAtEndOfLine()) {
         return this.joinLine();
       } else {
-        return this.lines[this.cursor[1]] = this.lines[this.cursor[1]].splice(this.cursor[0], 1);
+        return this["do"].change(this.lines, this.cursor[1], this.lines[this.cursor[1]].splice(this.cursor[0], 1));
       }
     };
 
@@ -432,11 +450,9 @@
         }
         cursorIndex = Math.min(this.lines[this.cursor[1]].length - 1, this.cursor[0]);
         strToCursor = this.lines[this.cursor[1]].substr(0, cursorIndex);
-        log('strToCursor', strToCursor, "<");
         if (strToCursor.trim() === '') {
           il = this.indentString().length;
           rc = cursorIndex % il || il;
-          log(il, cursorIndex, rc);
           results = [];
           for (i = j = 0, ref = rc; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
             this.moveCursorLeft();
