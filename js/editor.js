@@ -104,10 +104,8 @@
     };
 
     Editor.prototype.selectRange = function(range) {
-      this["do"].start();
       this.setSelection(range[0][0], range[0][1]);
-      this.setCursor(range[1][0], range[1][1]);
-      return this["do"].end();
+      return this.setCursor(range[1][0], range[1][1]);
     };
 
     Editor.prototype.selectAll = function() {

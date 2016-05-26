@@ -37,6 +37,10 @@ class undo
                 @redoAction obj, action
             @actionList.push action
             log @actionList
+        
+    lastAction: =>
+        if @actionList.length
+            return @actionList[@actionList.length-1]
             
     undoAction: (obj, action) =>
         if action.before?
@@ -48,7 +52,8 @@ class undo
             obj.lines.splice action.index, 1
             
         obj.selection = action.selBefore if action.selBefore?
-        obj.selection = null if action.selBefore == [null, null]
+        obj.selection = null if action.selBefore?[0] == null
+        log 'obj.selection', obj.selection
         obj.cursor    = action.curBefore if action.curBefore?
 
     redoAction: (obj, action) =>
@@ -61,14 +66,18 @@ class undo
             obj.lines.splice action.index, 0, action.before
         
         obj.selection = action.selAfter if action.selAfter?
-        obj.selection = null if action.selAfter == [null, null]
-        obj.cursor    = action.curAfter if action.curAfter?
+        obj.selection = null if action.selAfter?[0] == null
+        obj.cursor    = [action.curAfter[0], action.curAfter[1]] if action.curAfter?
         
     selection: (sel, pos) => 
         if sel != pos
-            @actions.push 
-                selBefore: [sel?[0], sel?[1]]
-                selAfter:  [pos?[0], pos?[1]]
+            last = @lastAction()
+            if last?.selAfter? or last?.curAfter?
+                last.selAfter = [pos?[0], pos?[1]]
+            else
+                @actions.push 
+                    selBefore: [sel?[0], sel?[1]]
+                    selAfter:  [pos?[0], pos?[1]]
             sel?[0] = pos?[0]
             sel?[1] = pos?[1]
             @check()
@@ -77,9 +86,14 @@ class undo
         
     cursor: (cur, pos) =>
         if (cur[0] != pos[0]) or (cur[1] != pos[1])
-            @actions.push 
-                curBefore: [cur[0], cur[1]]
-                curAfter:  [pos[0], pos[1]]
+            last = @lastAction()
+            if last?.selAfter? or last?.curAfter?
+                last.curAfter = [pos[0], pos[1]]
+            else
+                @actions.push 
+                    selBefore: [null, null]
+                    curBefore: [cur[0], cur[1]]
+                    curAfter:  [pos[0], pos[1]]
             cur[0] = pos[0]
             cur[1] = pos[1]
             @check()
@@ -110,7 +124,7 @@ class undo
     delete: (lines, index) =>
         @actions.push 
             index:   index
-            before:  text        
+            before:  lines[index]        
         lines.splice index, 1
         @check()
         

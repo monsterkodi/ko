@@ -57,10 +57,10 @@ class Editor
     setSelection: (c,l) => @selection = @do.selection @selection, [c,l]
 
     selectRange: (range) =>
-        @do.start()
+        # @do.start()
         @setSelection range[0][0], range[0][1]
         @setCursor    range[1][0], range[1][1]
-        @do.end()
+        # @do.end()
 
     selectAll: => @selectRange [[0,0], @lastPos()]
     
