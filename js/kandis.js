@@ -82,8 +82,7 @@
 
   editor.elem.ondblclick = function(event) {
     var range;
-    pos = editor.posForEvent(event);
-    range = editor.rangeForWordAtPos(pos);
+    range = editor.rangeForWordAtPos(editor.posForEvent(event));
     editor.selectRange(range);
     return editor.update();
   };

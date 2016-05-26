@@ -83,8 +83,7 @@ if true
     editor.update()
 editor.elem.focus()
 editor.elem.ondblclick = (event) ->
-    pos   = editor.posForEvent event
-    range = editor.rangeForWordAtPos pos
+    range = editor.rangeForWordAtPos editor.posForEvent event
     editor.selectRange range
     editor.update()
 
