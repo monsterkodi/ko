@@ -26,9 +26,7 @@ class Editor
         @elem.onkeydown = @onKeyDown
         @elem.innerHTML = html.cursorSpan @charSize
 
-    done: () =>
-        # log 'done'
-        setTimeout @update, 0
+    done: () => setTimeout @update, 0
 
     # 000  000   000  000  000000000
     # 000  0000  000  000     000   
@@ -57,10 +55,8 @@ class Editor
     setSelection: (c,l) => @selection = @do.selection @selection, [c,l]
 
     selectRange: (range) =>
-        # @do.start()
         @setSelection range[0][0], range[0][1]
         @setCursor    range[1][0], range[1][1]
-        # @do.end()
 
     selectAll: => @selectRange [[0,0], @lastPos()]
     
@@ -205,7 +201,7 @@ class Editor
         @do.change @lines, i, indent + @lines[i]
         if (@cursor[1] == i) and @cursor[0] > 0
             @setCursor @cursor[0] + indent.length, @cursor[1]
-        if (@selection?[1] == i) and @selection[0] > 0
+        if (@selection?[1] == i) #and @selection[0] > 0
             @setSelection @selection[0] + indent.length, @selection[1]
         @do.end()
     

@@ -325,7 +325,7 @@
       if ((this.cursor[1] === i) && this.cursor[0] > 0) {
         this.setCursor(this.cursor[0] + indent.length, this.cursor[1]);
       }
-      if ((((ref = this.selection) != null ? ref[1] : void 0) === i) && this.selection[0] > 0) {
+      if (((ref = this.selection) != null ? ref[1] : void 0) === i) {
         this.setSelection(this.selection[0] + indent.length, this.selection[1]);
       }
       return this["do"].end();
