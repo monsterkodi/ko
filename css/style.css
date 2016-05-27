@@ -97,3 +97,6 @@ body {
 .selection.br {
   border-bottom-right-radius: 10px;
 }
+.selection.end {
+  padding-right: 6px;
+}

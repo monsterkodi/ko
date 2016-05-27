@@ -4,6 +4,7 @@
   noon = require('noon');
 
   str = function(o) {
+    var s;
     if (o == null) {
       return 'null';
     }
@@ -11,9 +12,10 @@
       if (o._str != null) {
         return o._str();
       } else {
-        return "\n" + noon.stringify(o, {
+        s = noon.stringify(o, {
           circular: true
         });
+        return "\n" + s + "\n";
       }
     } else {
       return String(o);

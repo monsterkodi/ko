@@ -46,8 +46,7 @@
         }
         this.redoCursor(obj, action);
         this.redoSelection(obj, action);
-        this.actions.push(action);
-        return log('after REDO actions\n', this.actions, '------\nfutures\n', this.futures);
+        return this.actions.push(action);
       }
     };
 
@@ -90,8 +89,7 @@
         }
         this.undoCursor(obj, action);
         this.undoSelection(obj, action);
-        this.futures.unshift(action);
-        return log('after UNDO actions\n', this.actions, '------\nfutures\n', this.futures);
+        return this.futures.unshift(action);
       }
     };
 
@@ -150,7 +148,6 @@
           this.lastAction().selAfter = [null, null];
         }
         this.check();
-        log("selection", this.actions);
       }
       return pos;
     };
@@ -161,7 +158,6 @@
         cur[0] = pos[0];
         cur[1] = pos[1];
         this.check();
-        log("cursor", this.actions);
       }
       return pos;
     };

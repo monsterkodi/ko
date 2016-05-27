@@ -73,11 +73,13 @@ ipc.on 'execute-result', (event, arg) =>
 
 editor = new Editor $('input'), 'input'
 if true
-    editor.lines = [
-        "A"
-        "B"
-        "C"
-    ]
+    editor.lines = """
+            A
+        B
+    A
+        B
+            C    
+    """.split '\n'
     editor.update()
 editor.elem.focus()
 editor.elem.ondblclick = (event) ->

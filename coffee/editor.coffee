@@ -77,7 +77,7 @@ class Editor
     selectionRanges: () =>
         if @selection
             range = @selectedLineRange()
-            ([i, @selectedCharacterRangeForLineAtIndex(i)] for i in [range[0]..range[1]])
+            rgs = ([i, @selectedCharacterRangeForLineAtIndex(i)] for i in [range[0]..range[1]])
         else
             []
 

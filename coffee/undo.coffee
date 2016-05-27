@@ -29,7 +29,7 @@ class undo
             @redoCursor obj, action
             @redoSelection obj, action
             @actions.push action
-            log 'after REDO actions\n', @actions, '------\nfutures\n', @futures
+            # log 'after REDO actions\n', @actions, '------\nfutures\n', @futures
 
     redoLine: (obj, line) =>
         if line.after?
@@ -62,7 +62,7 @@ class undo
             @undoCursor obj, action
             @undoSelection obj, action
             @futures.unshift action
-            log 'after UNDO actions\n', @actions, '------\nfutures\n', @futures
+            # log 'after UNDO actions\n', @actions, '------\nfutures\n', @futures
                                     
     undoLine: (obj, line) =>
         if line.before?
@@ -112,7 +112,7 @@ class undo
             else
                 @lastAction().selAfter = [null, null]
             @check()
-            log "selection", @actions
+            # log "selection", @actions
         pos
         
     #  0000000  000   000  00000000 
@@ -127,7 +127,7 @@ class undo
             cur[0] = pos[0]
             cur[1] = pos[1]
             @check()
-            log "cursor", @actions
+            # log "cursor", @actions
         pos
     
     #  0000000  000000000   0000000   00000000   000000000

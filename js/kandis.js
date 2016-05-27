@@ -70,7 +70,7 @@
   editor = new Editor($('input'), 'input');
 
   if (true) {
-    editor.lines = ["A", "B", "C"];
+    editor.lines = "        A\n    B\nA\n    B\n        C    ".split('\n');
     editor.update();
   }
 

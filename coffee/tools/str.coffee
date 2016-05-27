@@ -12,8 +12,9 @@ str = (o) ->
         if o._str?
             o._str()
         else
-            "\n" + noon.stringify o, 
-            circular: true
+            s = noon.stringify o, 
+                circular: true
+            "\n#{s}\n"
     else
         String o
 

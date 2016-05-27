@@ -131,14 +131,17 @@
     };
 
     Editor.prototype.selectionRanges = function() {
-      var i, j, range, ref, ref1, results;
+      var i, range, rgs;
       if (this.selection) {
         range = this.selectedLineRange();
-        results = [];
-        for (i = j = ref = range[0], ref1 = range[1]; ref <= ref1 ? j <= ref1 : j >= ref1; i = ref <= ref1 ? ++j : --j) {
-          results.push([i, this.selectedCharacterRangeForLineAtIndex(i)]);
-        }
-        return results;
+        return rgs = (function() {
+          var j, ref, ref1, results;
+          results = [];
+          for (i = j = ref = range[0], ref1 = range[1]; ref <= ref1 ? j <= ref1 : j >= ref1; i = ref <= ref1 ? ++j : --j) {
+            results.push([i, this.selectedCharacterRangeForLineAtIndex(i)]);
+          }
+          return results;
+        }).call(this);
       } else {
         return [];
       }
