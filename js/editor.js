@@ -24,6 +24,7 @@
       this.update = bind(this.update, this);
       this.rangeForWordAtPos = bind(this.rangeForWordAtPos, this);
       this.clampPos = bind(this.clampPos, this);
+      this.cursorPos = bind(this.cursorPos, this);
       this.posForEvent = bind(this.posForEvent, this);
       this.lastPos = bind(this.lastPos, this);
       this.selectedText = bind(this.selectedText, this);
@@ -198,7 +199,7 @@
     };
 
     Editor.prototype.selectedCharacterRangeForLineAtIndex = function(i) {
-      var lines;
+      var curPos, lines;
       if (!this.selection) {
         return;
       }
@@ -209,17 +210,18 @@
       if ((lines[0] < i && i < lines[1])) {
         return [0, this.lines[i].length];
       }
+      curPos = this.cursorPos();
       if (lines[0] === lines[1]) {
-        return [Math.min(this.cursor[0], this.selection[0]), Math.max(this.cursor[0], this.selection[0])];
+        return [Math.min(curPos[0], this.selection[0]), Math.max(curPos[0], this.selection[0])];
       }
       if (i === this.cursor[1]) {
         if (this.selection[1] > i) {
-          return [this.cursor[0], this.lines[i].length];
+          return [curPos[0], this.lines[i].length];
         } else {
-          return [0, Math.min(this.lines[i].length, this.cursor[0])];
+          return [0, Math.min(this.lines[i].length, curPos[0])];
         }
       } else {
-        if (this.cursor[1] > i) {
+        if (curPos[1] > i) {
           return [this.selection[0], this.lines[i].length];
         } else {
           return [0, Math.min(this.lines[i].length, this.selection[0])];
@@ -325,7 +327,7 @@
       if ((this.cursor[1] === i) && this.cursor[0] > 0) {
         this.setCursor(this.cursor[0] + indent.length, this.cursor[1]);
       }
-      if (((ref = this.selection) != null ? ref[1] : void 0) === i) {
+      if ((((ref = this.selection) != null ? ref[1] : void 0) === i) && this.selection[0] > 0) {
         this.setSelection(this.selection[0] + indent.length, this.selection[1]);
       }
       return this["do"].end();
@@ -518,6 +520,13 @@
       lx = clamp(0, this.elem.clientWidth, event.clientX - br.left);
       ly = clamp(0, this.elem.clientHeight, event.clientY - br.top);
       return [parseInt(Math.floor((Math.max(0, sl + lx - 10)) / this.charSize[0])), parseInt(Math.floor((Math.max(0, st + ly - 10)) / this.charSize[1]))];
+    };
+
+    Editor.prototype.cursorPos = function() {
+      var c, l;
+      l = clamp(0, this.lines.length - 1, this.cursor[1]);
+      c = clamp(0, this.lines[l].length, this.cursor[0]);
+      return [c, l];
     };
 
     Editor.prototype.clampPos = function(p) {

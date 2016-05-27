@@ -29,7 +29,7 @@
 
   tray = void 0;
 
-  debug = true;
+  debug = 0;
 
   open = true;
 

@@ -1,5 +1,5 @@
 (function() {
-  var $, Editor, drag, editor, electron, encode, enterHeight, inputDrag, ipc, keyinfo, line, log, minEnterHeight, minScrollHeight, noon, pos, prefs, ref, ref1, remote, sh, splitAt, splitDrag, str, sw;
+  var $, Editor, drag, editor, editorText, electron, encode, enterHeight, inputDrag, ipc, keyinfo, log, minEnterHeight, minScrollHeight, noon, pos, prefs, ref, ref1, remote, sh, splitAt, splitDrag, str, sw;
 
   electron = require('electron');
 
@@ -27,7 +27,7 @@
 
   remote = electron.remote;
 
-  line = "";
+  editorText = "\n\n1\n 2";
 
   prefs.init(((ref1 = remote.app) != null ? ref1.getPath('userData') : void 0) + "/kandis.json", {
     split: 300
@@ -70,7 +70,7 @@
   editor = new Editor($('input'), 'input');
 
   if (true) {
-    editor.lines = "        A\n    B\nA\n    B\n        C    ".split('\n');
+    editor.lines = editorText.split('\n');
     editor.update();
   }
 

@@ -17,7 +17,6 @@ class html
             lineRange = [selectionRanges[0][0], selectionRanges[selectionRanges.length-1][0]]
         selectedCharacters = (i) -> 
             r = selectionRanges[i-selectionRanges[0][0]][1]
-            # log 'selectedCharacters:', i, r
             [r[0], r[1]]
         curSpan = @cursorSpan charSize
         
@@ -39,7 +38,7 @@ class html
                 border = ""
                 if i == lineRange[0]
                     border += " tl tr"
-                else # i > lineRange[0]
+                else
                     prevRange = selectedCharacters i-1
                     if (range[0] < prevRange[0]) or (range[0] > prevRange[1])
                         border += " tl"
@@ -48,15 +47,16 @@ class html
                     
                 if i == lineRange[1]
                     border += " bl br"
-                else # i < lineRange[1]
+                else
                     nextRange = selectedCharacters i+1
                     if range[1] > nextRange[1]
                         border += " br"
                     if (range[0] < nextRange[0]) or (range[0] > nextRange[1])
                         border += " bl"
                     
-                if range[1] == l.length or range[1]-range[0] == 0 and i != cursor[1]
-                    border += " end"
+                curX = Math.min cursor[0], l.length
+                if ((range[0] == curX) or (range[1] == curX)) and i == cursor[1]
+                    border += " cursor" # smaller border radius around cursor
                         
                 #  0000000  00000000  000      00000000   0000000  000000000
                 # 000       000       000      000       000          000   

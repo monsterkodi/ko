@@ -13,7 +13,7 @@
     };
 
     html.render = function(lines, cursor, selectionRanges, charSize) {
-      var border, curSpan, h, i, j, l, left, lineRange, mid, nextRange, prevRange, range, ref, right, selEnd, selStart, selectedCharacters;
+      var border, curSpan, curX, h, i, j, l, left, lineRange, mid, nextRange, prevRange, range, ref, right, selEnd, selStart, selectedCharacters;
       h = [];
       if (selectionRanges.length) {
         lineRange = [selectionRanges[0][0], selectionRanges[selectionRanges.length - 1][0]];
@@ -54,8 +54,9 @@
               border += " bl";
             }
           }
-          if (range[1] === l.length || range[1] - range[0] === 0 && i !== cursor[1]) {
-            border += " end";
+          curX = Math.min(cursor[0], l.length);
+          if (((range[0] === curX) || (range[1] === curX)) && i === cursor[1]) {
+            border += " cursor";
           }
           selStart = "<span class=\"selection" + border + "\">";
           selEnd = "</span>";

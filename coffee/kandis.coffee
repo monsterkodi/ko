@@ -18,7 +18,12 @@ encode      = require './tools/encode'
 ipc         = electron.ipcRenderer
 remote      = electron.remote
 
-line   = ""
+editorText  = """
+
+
+1
+ 2
+"""
 
 #00000000   00000000   00000000  00000000   0000000
 #000   000  000   000  000       000       000     
@@ -73,13 +78,7 @@ ipc.on 'execute-result', (event, arg) =>
 
 editor = new Editor $('input'), 'input'
 if true
-    editor.lines = """
-            A
-        B
-    A
-        B
-            C    
-    """.split '\n'
+    editor.lines = editorText.split '\n'
     editor.update()
 editor.elem.focus()
 editor.elem.ondblclick = (event) ->

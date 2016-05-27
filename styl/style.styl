@@ -50,9 +50,13 @@ body
     position        absolute
     bottom          0px
     
+editorFontSize = 30px // FONT SIZE
+selectionRadius = editorFontSize/3
+selectionRadiusCursor = selectionRadius / 2
+    
 .input
 #input
-    font-size       24px                  // FONT SIZE
+    font-size       editorFontSize                
     font-weight     bold
     position        absolute
     font-family     "Andale Mono", monospace
@@ -83,14 +87,24 @@ body
 .selection
     pointer-events  none
     background      rgba(255, 255, 255, 0.1) // no focus
+    padding-right   6px
+    margin-right    -6px
+    padding-left    6px
+    margin-left     -6px
     &.tl
-        border-top-left-radius 10px
-    &.tr
-        border-top-right-radius 10px
+        border-top-left-radius selectionRadius
+        &.cursor
+            border-top-left-radius selectionRadiusCursor
     &.bl
-        border-bottom-left-radius 10px
+        border-bottom-left-radius selectionRadius
+        &.cursor
+            border-bottom-left-radius  selectionRadiusCursor
+    &.tr
+        border-top-right-radius selectionRadius
+        &.cursor
+            border-top-right-radius  selectionRadiusCursor
     &.br
-        border-bottom-right-radius 10px
-    &.end
-        padding-right 6px
+        border-bottom-right-radius selectionRadius
+        &.cursor
+            border-bottom-right-radius selectionRadiusCursor
         

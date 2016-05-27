@@ -110,16 +110,17 @@ class Editor
         lines = @selectedLineRange()
         return if i < lines[0] or i > lines[1]                      # outside selection
         return [0, @lines[i].length] if lines[0] < i < lines[1]     # inside selection
+        curPos = @cursorPos()
         if lines[0] == lines[1]                                     # only one line in selection
-            return [Math.min(@cursor[0], @selection[0]), 
-                    Math.max(@cursor[0], @selection[0])]
+            return [Math.min(curPos[0], @selection[0]), 
+                    Math.max(curPos[0], @selection[0])]
         if i == @cursor[1]                                          # on cursor line
             if @selection[1] > i                                        # at start of selection
-                return [@cursor[0], @lines[i].length]
+                return [curPos[0], @lines[i].length]
             else                                                        # at end of selection
-                return [0, Math.min(@lines[i].length, @cursor[0])]
+                return [0, Math.min(@lines[i].length, curPos[0])]
         else                                                        # on selection line
-            if @cursor[1] > i                                           # at start of selection
+            if curPos[1] > i                                            # at start of selection
                 return [@selection[0], @lines[i].length]
             else                                                        # at end of selection
                 return [0, Math.min(@lines[i].length, @selection[0])]
@@ -201,7 +202,7 @@ class Editor
         @do.change @lines, i, indent + @lines[i]
         if (@cursor[1] == i) and @cursor[0] > 0
             @setCursor @cursor[0] + indent.length, @cursor[1]
-        if (@selection?[1] == i) #and @selection[0] > 0
+        if (@selection?[1] == i) and @selection[0] > 0
             @setSelection @selection[0] + indent.length, @selection[1]
         @do.end()
     
@@ -359,6 +360,11 @@ class Editor
         ly = clamp 0, @elem.clientHeight, event.clientY - br.top
         [parseInt(Math.floor((Math.max(0, sl + lx-10))/@charSize[0])),
          parseInt(Math.floor((Math.max(0, st + ly-10))/@charSize[1]))]
+        
+    cursorPos: =>
+        l = clamp 0, @lines.length-1, @cursor[1]
+        c = clamp 0, @lines[l].length, @cursor[0]
+        [ c, l ]
         
     clampPos: (p) =>
         l = clamp 0, @lines.length-1, p[1]

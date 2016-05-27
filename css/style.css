@@ -51,7 +51,7 @@ body {
 }
 .input,
 #input {
-  font-size: 24px;
+  font-size: 30px;
   font-weight: bold;
   position: absolute;
   font-family: "Andale Mono", monospace;
@@ -84,19 +84,32 @@ body {
 .selection {
   pointer-events: none;
   background: rgba(255,255,255,0.1);
+  padding-right: 6px;
+  margin-right: -6px;
+  padding-left: 6px;
+  margin-left: -6px;
 }
 .selection.tl {
   border-top-left-radius: 10px;
 }
-.selection.tr {
-  border-top-right-radius: 10px;
+.selection.tl.cursor {
+  border-top-left-radius: 5px;
 }
 .selection.bl {
   border-bottom-left-radius: 10px;
 }
+.selection.bl.cursor {
+  border-bottom-left-radius: 5px;
+}
+.selection.tr {
+  border-top-right-radius: 10px;
+}
+.selection.tr.cursor {
+  border-top-right-radius: 5px;
+}
 .selection.br {
   border-bottom-right-radius: 10px;
 }
-.selection.end {
-  padding-right: 6px;
+.selection.br.cursor {
+  border-bottom-right-radius: 5px;
 }
