@@ -7,6 +7,8 @@
 
   prefs = require('./tools/prefs');
 
+  log = require('./tools/log');
+
   fs = require('fs');
 
   execute = require('./execute');
@@ -30,10 +32,6 @@
   debug = true;
 
   open = true;
-
-  log = function() {
-    return console.log(([].slice.call(arguments, 0)).join(" "));
-  };
 
   ipc.on('execute', (function(_this) {
     return function(event, arg) {

@@ -23,8 +23,10 @@
       this.onKeyDown = bind(this.onKeyDown, this);
       this.update = bind(this.update, this);
       this.rangeForWordAtPos = bind(this.rangeForWordAtPos, this);
+      this.clampPos = bind(this.clampPos, this);
       this.posForEvent = bind(this.posForEvent, this);
       this.lastPos = bind(this.lastPos, this);
+      this.selectedText = bind(this.selectedText, this);
       this.text = bind(this.text, this);
       this.deleteBackward = bind(this.deleteBackward, this);
       this.deleteForward = bind(this.deleteForward, this);
@@ -54,6 +56,8 @@
       this.cursorAtStartOfLine = bind(this.cursorAtStartOfLine, this);
       this.cursorAtEndOfLine = bind(this.cursorAtEndOfLine, this);
       this.selectedCharacterRangeForLineAtIndex = bind(this.selectedCharacterRangeForLineAtIndex, this);
+      this.selectedTextForLineAtIndex = bind(this.selectedTextForLineAtIndex, this);
+      this.selectedLines = bind(this.selectedLines, this);
       this.selectedLineRange = bind(this.selectedLineRange, this);
       this.selectedLineIndices = bind(this.selectedLineIndices, this);
       this.selectionStart = bind(this.selectionStart, this);
@@ -167,6 +171,27 @@
       if (this.selection) {
         return [Math.min(this.cursor[1], this.selection[1]), Math.max(this.cursor[1], this.selection[1])];
       }
+    };
+
+    Editor.prototype.selectedLines = function() {
+      var i, j, len, ref, s;
+      s = [];
+      ref = this.selectedLineIndices();
+      for (j = 0, len = ref.length; j < len; j++) {
+        i = ref[j];
+        s.push(this.selectedTextForLineAtIndex(i));
+        i += 1;
+      }
+      return s;
+    };
+
+    Editor.prototype.selectedTextForLineAtIndex = function(i) {
+      var r;
+      r = this.selectedCharacterRangeForLineAtIndex(i);
+      if (r != null) {
+        return this.lines[i].substr(r[0], r[1] - r[0]);
+      }
+      return '';
     };
 
     Editor.prototype.selectedCharacterRangeForLineAtIndex = function(i) {
@@ -336,9 +361,7 @@
 
     Editor.prototype.insertCharacter = function(c) {
       this["do"].start();
-      if (this.selection != null) {
-        this.deleteSelection();
-      }
+      this.deleteSelection();
       this["do"].change(this.lines, this.cursor[1], this.lines[this.cursor[1]].splice(this.cursor[0], 0, c));
       this.setCursor(this.cursor[0] + 1, this.cursor[1]);
       return this["do"].end();
@@ -364,9 +387,7 @@
 
     Editor.prototype.insertNewline = function() {
       this["do"].start();
-      if (this.selection != null) {
-        this.deleteSelection();
-      }
+      this.deleteSelection();
       if (this.cursorAtEndOfLine()) {
         this["do"].change(this.lines.splice(this.cursor[1] + 1, 0, ""));
       } else {
@@ -380,9 +401,7 @@
     Editor.prototype.insertText = function(text) {
       var c, j, len;
       this["do"].start();
-      if (this.selection != null) {
-        this.deleteSelection();
-      }
+      this.deleteSelection();
       for (j = 0, len = text.length; j < len; j++) {
         c = text[j];
         if (c === '\n') {
@@ -397,7 +416,7 @@
     Editor.prototype.joinLine = function() {
       if (!this.cursorInLastLine()) {
         this["do"].start();
-        this["do"].change(this.lines, this.cursor[1], lines[this.cursor[1]] + this.lines[this.cursor[1] + 1]);
+        this["do"].change(this.lines, this.cursor[1], this.lines[this.cursor[1]] + this.lines[this.cursor[1] + 1]);
         this["do"]["delete"](this.lines, this.cursor[1] + 1);
         return this["do"].end();
       }
@@ -412,7 +431,10 @@
     };
 
     Editor.prototype.deleteSelection = function() {
-      var i, j, lineRange, ref, ref1;
+      var i, j, lineRange, ref, ref1, selStart;
+      if (this.selection == null) {
+        return;
+      }
       lineRange = this.selectedLineRange();
       if (lineRange == null) {
         return;
@@ -425,7 +447,8 @@
         }
         this.deleteCharacterRangeInLineAtIndex(this.selectedCharacterRangeForLineAtIndex(lineRange[0]), lineRange[0]);
       }
-      this.cursor = this.selectionStart();
+      selStart = this.selectionStart();
+      this.setCursor(selStart[0], selStart[1]);
       if (lineRange[1] > lineRange[0]) {
         this.joinLine();
       }
@@ -474,6 +497,10 @@
       return this.lines.join('\n');
     };
 
+    Editor.prototype.selectedText = function() {
+      return this.selectedLines().join('\n');
+    };
+
     Editor.prototype.lastPos = function() {
       var lli;
       lli = this.lines.length - 1;
@@ -481,19 +508,27 @@
     };
 
     Editor.prototype.posForEvent = function(event) {
-      var br, lx, ly, pos, sl, st;
+      var br, lx, ly, sl, st;
       sl = this.elem.scrollLeft;
       st = this.elem.scrollTop;
       br = this.elem.getBoundingClientRect();
       lx = clamp(0, this.elem.clientWidth, event.clientX - br.left);
       ly = clamp(0, this.elem.clientHeight, event.clientY - br.top);
-      return pos = [parseInt(Math.floor((Math.max(0, sl + lx - 10)) / this.charSize[0])), parseInt(Math.floor((Math.max(0, st + ly - 10)) / this.charSize[1]))];
+      return [parseInt(Math.floor((Math.max(0, sl + lx - 10)) / this.charSize[0])), parseInt(Math.floor((Math.max(0, st + ly - 10)) / this.charSize[1]))];
+    };
+
+    Editor.prototype.clampPos = function(p) {
+      var c, l;
+      l = clamp(0, this.lines.length - 1, p[1]);
+      c = clamp(0, this.lines[l].length - 1, p[0]);
+      return [c, l];
     };
 
     Editor.prototype.rangeForWordAtPos = function(pos) {
-      var c, l, n, r;
-      l = this.lines[pos[1]];
-      r = [pos[0], pos[0]];
+      var c, l, n, p, r;
+      p = this.clampPos(pos);
+      l = this.lines[p[1]];
+      r = [p[0], p[0]];
       c = l[r[0]];
       while (r[0] > 0) {
         n = l[r[0] - 1];
@@ -509,7 +544,7 @@
         }
         r[1] += 1;
       }
-      return [[r[0], pos[1]], [r[1] + 1, pos[1]]];
+      return [[r[0], p[1]], [r[1] + 1, p[1]]];
     };
 
     Editor.prototype.update = function() {
@@ -561,9 +596,6 @@
             case 'command+j':
               this.joinLine();
               break;
-            case 'command+v':
-              this.insertText(clipboard.readText());
-              break;
             case 'ctrl+a':
               this.moveCursorToStartOfLine();
               break;
@@ -574,6 +606,15 @@
               return this.selectNone();
             case 'command+a':
               return this.selectAll();
+            case 'command+c':
+              return clipboard.writeText(this.selectedText());
+            case 'command+v':
+              this.insertText(clipboard.readText());
+              break;
+            case 'command+x':
+              clipboard.writeText(this.selectedText());
+              this.deleteSelection();
+              break;
             case 'command+z':
               this["do"].undo(this);
               this.update();

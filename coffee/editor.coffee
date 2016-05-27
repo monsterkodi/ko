@@ -95,23 +95,37 @@ class Editor
     selectedLineRange: =>
         if @selection
             [Math.min(@cursor[1], @selection[1]), Math.max(@cursor[1], @selection[1])]
-            
+
+    selectedLines: =>
+        s = []
+        for i in @selectedLineIndices()
+            s.push @selectedTextForLineAtIndex i
+            i += 1
+        s
+    
+    selectedTextForLineAtIndex: (i) =>
+        r = @selectedCharacterRangeForLineAtIndex i
+        if r?
+            return @lines[i].substr r[0], r[1]-r[0]
+        return ''
+                
     selectedCharacterRangeForLineAtIndex: (i) =>
         return if not @selection
         lines = @selectedLineRange()
-        return if i < lines[0] or i > lines[1]
-        return [0, @lines[i].length] if lines[0] < i < lines[1]
-        if lines[0] == lines[1]
-            return [Math.min(@cursor[0], @selection[0]), Math.max(@cursor[0], @selection[0])]
-        if i == @cursor[1]
-            if @selection[1] > i
+        return if i < lines[0] or i > lines[1]                      # outside selection
+        return [0, @lines[i].length] if lines[0] < i < lines[1]     # inside selection
+        if lines[0] == lines[1]                                     # only one line in selection
+            return [Math.min(@cursor[0], @selection[0]), 
+                    Math.max(@cursor[0], @selection[0])]
+        if i == @cursor[1]                                          # on cursor line
+            if @selection[1] > i                                        # at start of selection
                 return [@cursor[0], @lines[i].length]
-            else
+            else                                                        # at end of selection
                 return [0, Math.min(@lines[i].length, @cursor[0])]
-        else
-            if @cursor[1] > i
+        else                                                        # on selection line
+            if @cursor[1] > i                                           # at start of selection
                 return [@selection[0], @lines[i].length]
-            else
+            else                                                        # at end of selection
                 return [0, Math.min(@lines[i].length, @selection[0])]
 
     #  0000000  000   000  00000000    0000000   0000000   00000000 
@@ -223,7 +237,7 @@ class Editor
     
     insertCharacter: (c) =>
         @do.start()
-        @deleteSelection() if @selection?
+        @deleteSelection()
         @do.change @lines, @cursor[1], @lines[@cursor[1]].splice @cursor[0], 0, c
         @setCursor @cursor[0] + 1, @cursor[1]
         @do.end()
@@ -241,7 +255,7 @@ class Editor
         
     insertNewline: =>
         @do.start()
-        @deleteSelection() if @selection?
+        @deleteSelection()
         if @cursorAtEndOfLine()
             @do.change @lines.splice @cursor[1]+1, 0, ""
         else
@@ -252,7 +266,7 @@ class Editor
         
     insertText: (text) =>
         @do.start()
-        @deleteSelection() if @selection?
+        @deleteSelection()
         for c in text
             if c == '\n'
                 @insertNewline()
@@ -269,7 +283,7 @@ class Editor
     joinLine: =>
         if not @cursorInLastLine()
             @do.start()
-            @do.change @lines, @cursor[1], lines[@cursor[1]] + @lines[@cursor[1]+1]
+            @do.change @lines, @cursor[1], @lines[@cursor[1]] + @lines[@cursor[1]+1]
             @do.delete @lines, @cursor[1]+1
             @do.end()
             
@@ -280,6 +294,7 @@ class Editor
         @do.change @lines, i, @lines[i].splice r[0], r[1]-r[0]
             
     deleteSelection: =>
+        return if not @selection?
         lineRange = @selectedLineRange()
         return if not lineRange?
         @do.start()
@@ -288,7 +303,8 @@ class Editor
             for i in [(lineRange[1]-1)...lineRange[0]]
                 @deleteLineAtIndex i
             @deleteCharacterRangeInLineAtIndex @selectedCharacterRangeForLineAtIndex(lineRange[0]), lineRange[0]
-        @cursor = @selectionStart()
+        selStart = @selectionStart()
+        @setCursor selStart[0], selStart[1]
         if lineRange[1] > lineRange[0]
             @joinLine()
         @do.end()
@@ -326,7 +342,8 @@ class Editor
     #    000     000        000 000      000   
     #    000     00000000  000   000     000   
 
-    text: => return @lines.join '\n'
+    text: => @lines.join '\n'
+    selectedText: => @selectedLines().join '\n'
             
     # 00000000    0000000    0000000
     # 000   000  000   000  000     
@@ -344,8 +361,13 @@ class Editor
         br = @elem.getBoundingClientRect()
         lx = clamp 0, @elem.clientWidth,  event.clientX - br.left
         ly = clamp 0, @elem.clientHeight, event.clientY - br.top
-        pos = [ parseInt(Math.floor((Math.max(0, sl + lx-10))/@charSize[0])),
-                parseInt(Math.floor((Math.max(0, st + ly-10))/@charSize[1]))]
+        [parseInt(Math.floor((Math.max(0, sl + lx-10))/@charSize[0])),
+         parseInt(Math.floor((Math.max(0, st + ly-10))/@charSize[1]))]
+        
+    clampPos: (p) =>
+        l = clamp 0, @lines.length-1, p[1]
+        c = clamp 0, @lines[l].length-1, p[0]
+        [ c, l ]
 
     # 00000000    0000000   000   000   0000000   00000000   0000000
     # 000   000  000   000  0000  000  000        000       000     
@@ -354,8 +376,9 @@ class Editor
     # 000   000  000   000  000   000   0000000   00000000  0000000 
     
     rangeForWordAtPos: (pos) =>
-        l = @lines[pos[1]]
-        r = [pos[0], pos[0]]
+        p = @clampPos pos
+        l = @lines[p[1]]
+        r = [p[0], p[0]]
         c = l[r[0]]
         while r[0] > 0
             n = l[r[0]-1]
@@ -367,7 +390,7 @@ class Editor
             if (c == ' ') and (n != ' ') or (c != ' ') and (n == ' ')
                 break
             r[1] += 1
-        [[r[0], pos[1]], [r[1]+1, pos[1]]]
+        [[r[0], p[1]], [r[1]+1, p[1]]]
 
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     
@@ -406,11 +429,15 @@ class Editor
                     when 'delete', 'ctrl+backspace'  then @deleteForward()     
                     when 'backspace'                 then @deleteBackward()     
                     when 'command+j'                 then @joinLine()
-                    when 'command+v'                 then @insertText clipboard.readText()
                     when 'ctrl+a'                    then @moveCursorToStartOfLine()
                     when 'ctrl+e'                    then @moveCursorToEndOfLine()
                     when 'command+d'                 then return @selectNone()
                     when 'command+a'                 then return @selectAll()
+                    when 'command+c'                 then return clipboard.writeText @selectedText()
+                    when 'command+v'                 then @insertText clipboard.readText()
+                    when 'command+x'                 
+                        clipboard.writeText @selectedText()
+                        @deleteSelection()
                     when 'command+z'             
                         @do.undo @
                         @update()

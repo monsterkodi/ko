@@ -70,7 +70,7 @@
   editor = new Editor($('input'), 'input');
 
   if (true) {
-    editor.lines = ["for a in [0...1]", "    console.log a", "console.log 'done'"];
+    editor.lines = ["A", "B", "C"];
     editor.update();
   }
 
