@@ -13,11 +13,11 @@ class Editor extends Buffer
     
     constructor: (elem, className) ->
         super
-        log 'Editor'
-        @do         = new undo @done
-        @cursor     = [0,0]
-        @selection  = null
-        @lines      = [""]
+        
+        @do        = new undo @done
+        @cursor    = [0,0]
+        @selection = null
+        @lines     = [""]
 
     done: () => setTimeout @update, 0 if @update?
 

@@ -11,10 +11,10 @@ clamp     = tools.clamp
 class Buffer
     
     constructor: () ->
-        log 'Buffer'
-        @cursor     = [0,0]
-        @selection  = null
-        @lines      = [""]
+
+        @cursor    = [0,0]
+        @selection = null
+        @lines     = [""]
 
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000

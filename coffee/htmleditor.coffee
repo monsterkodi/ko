@@ -15,7 +15,7 @@ class HtmlEditor extends Editor
 
     constructor: (elem, className) ->
         super
-        log 'HtmlEditor'
+
         @elem = elem
         @clss = className
 
