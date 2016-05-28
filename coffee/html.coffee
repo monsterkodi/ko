@@ -4,17 +4,22 @@
 # 000   000     000     000 0 000  000    
 # 000   000     000     000   000  0000000
 
-encode = require './tools/encode'
-log    = require './tools/log'
+encode    = require './tools/encode'
+log       = require './tools/log'
+highlight = require './highlight'
 
 class html 
     
     @cursorSpan: (charSize) => "<span id=\"cursor\" style=\"height: #{charSize[1]}px\"></span>"
     
     @render: (lines, cursor, selectionRanges, charSize) =>
+        
+        colorized = highlight.lines lines, cursor, selectionRanges
+        log 'colorized', colorized
+        
         h = []
         if selectionRanges.length
-            lineRange = [selectionRanges[0][0], selectionRanges[selectionRanges.length-1][0]]
+            selRange = [selectionRanges[0][0], selectionRanges[selectionRanges.length-1][0]]
         selectedCharacters = (i) -> 
             r = selectionRanges[i-selectionRanges[0][0]][1]
             [r[0], r[1]]
@@ -23,7 +28,9 @@ class html
         for i in [0...lines.length]
             
             l = lines[i]
-            if lineRange and (lineRange[0] <= i <= lineRange[1])
+            
+            if selRange and selRange[0] <= i <= selRange[1]
+                
                 range  = selectedCharacters i                
                 left   = l.substr  0, range[0]
                 mid    = l.substr  range[0], range[1]-range[0] 
@@ -36,7 +43,7 @@ class html
                 # 0000000     0000000   000   000  0000000    00000000  000   000
                 
                 border = ""
-                if i == lineRange[0]
+                if i == selRange[0]
                     border += " tl tr"
                 else
                     prevRange = selectedCharacters i-1
@@ -45,7 +52,7 @@ class html
                     if (range[1] > prevRange[1]) or (range[1] < prevRange[0])
                         border += " tr"
                     
-                if i == lineRange[1]
+                if i == selRange[1]
                     border += " bl br"
                 else
                     nextRange = selectedCharacters i+1
@@ -75,11 +82,14 @@ class html
                     h.push encode(left) + selStart + encode(mid) + selEnd + encode(right)
                     
             else if i == cursor[1]
+                
                 left  = l.substr  0, cursor[0]
                 right = l.substr  cursor[0]
                 h.push encode(left) + curSpan + encode(right)
+                
             else
-                h.push encode(l)
+                h.push colorized[i]
+                # h.push encode(l)
         h.join '<br>'
 
 module.exports = html

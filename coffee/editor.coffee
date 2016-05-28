@@ -142,6 +142,7 @@ class Editor
     # 000 0 000  000   000     000     000     
     # 000   000   0000000       0      00000000
     
+    setCursorPos: (p) => @setCursor p[0], p[1]
     setCursor: (c,l) => 
         l = Math.min l, @lines.length-1
         c = Math.min c, @lines[l].length        
@@ -150,6 +151,22 @@ class Editor
     moveCursorToPos: (pos)   => @setCursor pos[0], pos[1]
     moveCursorToEndOfLine:   => @setCursor @lines[@cursor[1]].length, @cursor[1]
     moveCursorToStartOfLine: => @setCursor 0, @cursor[1]
+
+    moveCursorToEndOfWord:   => 
+        r = @rangeForWordAtPos(@cursor)[1]
+        if @cursorAtEndOfLine()
+            return if @cursorInLastLine()
+            r = rangeForWordAtPos([0, @cursor[1]+1])[1]
+        @setCursorPos r
+        
+    moveCursorToStartOfWord: => 
+        r = @rangeForWordAtPos(@cursor)[0]
+        if @cursorAtStartOfLine()
+            return if @cursorInFirstLine()
+            r = @rangeForWordAtPos([@lines[@cursor[1]-1].length, @cursor[1]-1])[0]
+        else if r[0] == @cursor[0]
+            r = @rangeForWordAtPos([@cursor[0]-1, @cursor[1]])[0]
+        @setCursorPos r
         
     moveCursorUp: =>
         if @cursorInFirstLine()
@@ -304,6 +321,7 @@ class Editor
         @setCursor selStart[0], selStart[1]
         if lineRange[1] > lineRange[0]
             @joinLine()
+        @selectNone()
         @do.end()
 
     deleteForward: =>
@@ -413,7 +431,7 @@ class Editor
         # log "editor key:", key, "mod:", mod, "combo:", combo
         return if not combo
         switch key
-            when 'right click'                       then return
+            when 'right click' then return
             when 'down', 'right', 'up', 'left' 
                 @startSelection event.shiftKey
                 if event.metaKey
@@ -421,6 +439,11 @@ class Editor
                         @moveCursorToStartOfLine()
                     else if key == 'right'
                         @moveCursorToEndOfLine()
+                else if event.altKey
+                    if key == 'left'
+                        @moveCursorToStartOfWord()
+                    else if key == 'right'
+                        @moveCursorToEndOfWord()                    
                 else
                     @moveCursor key
             else
@@ -433,6 +456,7 @@ class Editor
                     when 'command+j'                 then @joinLine()
                     when 'ctrl+a'                    then @moveCursorToStartOfLine()
                     when 'ctrl+e'                    then @moveCursorToEndOfLine()
+                    when 'command+k'                 then return @selectAll() + @deleteSelection()
                     when 'command+d'                 then return @selectNone()
                     when 'command+a'                 then return @selectAll()
                     when 'command+c'                 then return clipboard.writeText @selectedText()
@@ -456,7 +480,7 @@ class Editor
                         @moveCursorToEndOfLine()
                     else
                         ansiKeycode = require 'ansi-keycode'
-                        if ansiKeycode(event)?.length == 1
+                        if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
                         # if mod == 'shift' and combo != 'shift' or combo.length == 1
                             @insertCharacter ansiKeycode event
                         else

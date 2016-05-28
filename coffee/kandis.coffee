@@ -19,10 +19,12 @@ ipc         = electron.ipcRenderer
 remote      = electron.remote
 
 editorText  = """
-
-
-1
- 2
+true
+false
+for a in [0..1]
+ ()->
+log = require 'log'
+s = "string"
 """
 
 #00000000   00000000   00000000  00000000   0000000

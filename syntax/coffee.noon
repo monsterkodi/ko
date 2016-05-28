@@ -1,0 +1,118 @@
+
+#   0000000   0000000   00000000  00000000  00000000  00000000
+#  000       000   000  000       000       000       000     
+#  000       000   000  000000    000000    0000000   0000000 
+#  000       000   000  000       000       000       000     
+#   0000000   0000000   000       000       00000000  00000000
+
+!=                             syntax.neq
+[\[\]<>+-=]                    syntax.eq
+->                             syntax.function.marker
+
+# braces
+
+[\(\)\{\}]                     syntax.bracket
+
+# keywords
+
+(^|\s)(if|else|then|for|of|in|while|do|unless|not|or|and|try|catch)(\s|$)  
+    none 
+    keyword 
+    none
+
+# require
+
+(\w+)\s*(=)\s*(require)(\(?\s*')(\S+)('\s*\)?\s*)  
+    require.variable
+    require.sign.equal 
+    keyword.require 
+    require.string.marker 
+    require.string 
+    require.string.marker
+
+# class
+
+class                          keyword.class
+
+# globals
+
+(\bconsole\.|\bprocess\.|\bglobal\.|\bmodule\.|\bexports\.|\bpath\.|\bfs\.|\bos\.)  . module
+
+# special
+
+\blog\b                        function.log
+\berr\b                        variable.err
+\berror\b                      function.err
+
+# interpolation content
+
+\#\{([^\}\#]*)\}             . interpolation
+
+
+# strings
+
+(')([^']*)(')                . string.marker.single . string . string.marker.single
+(")([^"]*)(")                . string.marker.double . string . string.marker.double
+"""                            string.marker.triple
+
+# bool
+
+true                           bool.true
+false                          bool.false 
+
+# null
+
+null|undefined                 keyword.null
+
+# functions 
+
+(\w+)\s*=\s*\([^\)]*\)\s*->  . function
+(\w+)\s*=\s*->               . function
+(\()([^\(\)]*)(\)\s*)->      . function.bracket . function.variable.argument . function.bracket
+
+# .property
+
+(\.\w+)                      . property
+
+# range
+
+(\[).*(\.\.\.).*(\])         . range.marker . range . range.marker
+
+# array index
+
+\[(\d+)\]                    . array.index
+
+# dictionary key
+
+(\S+)\s*(:)                  . dictionary.key . dictionary.key.marker
+
+# exists?
+
+\S+(\?)                      . mf
+
+# punctuation
+
+[\,\.]                         syntax.punctuation
+
+# lodash
+
+(_)\.(\w+)                   . lodash.marker . lodash.function
+
+# interpolation markers
+
+(\#\{|\})                    . interpolation.marker
+
+#number
+
+\b\d+\b                        number.int
+[^\s0].*(\b\d+\b)            . number.float
+(\b\d+\b).*[^\s0]            . number.float
+
+# comments
+
+|###|                          comment.marker
+(#)([^\{].*|$)               . comment.marker . comment
+
+# salt header
+
+^[0\s]+$                       comment.header
