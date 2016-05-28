@@ -6,6 +6,7 @@
 
 matchr = require './tools/matchr'
 encode = require './tools/encode'
+enspce = require './tools/enspce'
 log    = require './tools/log'
 noon   = require 'noon'
 _      = require 'lodash'
@@ -53,7 +54,7 @@ class highlight
                 d = diss[di]
                 clrzd = @colorize d.match, d.stack.reverse()
                 chunk = chunk.slice(0, d.start) + clrzd + chunk.slice(d.start+d.match.length)
-        chunk
+        enspce chunk
 
     # 000      000  000   000  00000000   0000000
     # 000      000  0000  000  000       000     
@@ -62,10 +63,11 @@ class highlight
     # 0000000  000  000   000  00000000  0000000 
     
     @lines: (lines, cursor, selectionRanges) =>
-        log 'highlight', lines
+        # log 'highlight', lines
         colorized = []
         for l in lines
-            colorized.push @pattern l
+            p = @pattern l
+            colorized.push p
         colorized
                 
 highlight.init()
