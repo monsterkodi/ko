@@ -4,46 +4,22 @@
 #000       000   000  000     000     000   000  000   000
 #00000000  0000000    000     000      0000000   000   000
 
-undo      = require './undo'
-html      = require './html'
-log       = require './tools/log'
-tools     = require './tools/tools'
-keyinfo   = require './tools/keyinfo'
-clipboard = require('electron').clipboard
-clamp     = tools.clamp
-$         = tools.$
+undo    = require './undo'
+Buffer  = require './buffer'
+log     = require './tools/log'
+{clamp} = require './tools/tools'
 
-class Editor
+class Editor extends Buffer
     
     constructor: (elem, className) ->
+        super
+        log 'Editor'
         @do         = new undo @done
         @cursor     = [0,0]
         @selection  = null
         @lines      = [""]
-        @elem       = elem
-        @clss       = className
-        @initCharSize()
-        @elem.onkeydown = @onKeyDown
-        @elem.innerHTML = html.cursorSpan @charSize
 
-    done: () => setTimeout @update, 0
-
-    # 000  000   000  000  000000000
-    # 000  0000  000  000     000   
-    # 000  000 0 000  000     000   
-    # 000  000  0000  000     000   
-    # 000  000   000  000     000   
-
-    initCharSize: () =>
-        o = document.createElement 'div'
-        o.className = @clss
-        o.innerHTML = 'XXXXXXXXXX'
-        o.style = 
-          float:      'left'
-          visibility: 'hidden'
-        document.body.appendChild o
-        @charSize = [o.clientWidth/o.innerHTML.length, o.clientHeight]
-        o.remove()
+    done: () => setTimeout @update, 0 if @update?
 
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000
@@ -70,72 +46,6 @@ class Editor
         else
             @update()
         
-    selectionRanges: () =>
-        if @selection
-            range = @selectedLineRange()
-            rgs = ([i, @selectedCharacterRangeForLineAtIndex(i)] for i in [range[0]..range[1]])
-        else
-            []
-
-    selectionStart: =>
-        if @selection?  
-            return [@selection[0], @selection[1]] if @selection[1] < @cursor[1]
-            return [Math.min(@cursor[0], @lines[@cursor[1]].length), @cursor[1]] if @selection[1] > @cursor[1]
-            return [Math.min(@selection[0], @cursor[0]), @cursor[1]]
-        return [Math.min(@cursor[0], @lines[@cursor[1]].length), @cursor[1]]
-
-    selectedLineIndices: =>
-        range = @selectedLineRange()
-        (i for i in [range[0]..range[1]])
-                
-    selectedLineRange: =>
-        if @selection
-            [Math.min(@cursor[1], @selection[1]), Math.max(@cursor[1], @selection[1])]
-
-    selectedLines: =>
-        s = []
-        for i in @selectedLineIndices()
-            s.push @selectedTextForLineAtIndex i
-            i += 1
-        s
-    
-    selectedTextForLineAtIndex: (i) =>
-        r = @selectedCharacterRangeForLineAtIndex i
-        if r?
-            return @lines[i].substr r[0], r[1]-r[0]
-        return ''
-                
-    selectedCharacterRangeForLineAtIndex: (i) =>
-        return if not @selection
-        lines = @selectedLineRange()
-        return if i < lines[0] or i > lines[1]                      # outside selection
-        return [0, @lines[i].length] if lines[0] < i < lines[1]     # inside selection
-        curPos = @cursorPos()
-        if lines[0] == lines[1]                                     # only one line in selection
-            return [Math.min(curPos[0], @selection[0]), 
-                    Math.max(curPos[0], @selection[0])]
-        if i == @cursor[1]                                          # on cursor line
-            if @selection[1] > i                                        # at start of selection
-                return [curPos[0], @lines[i].length]
-            else                                                        # at end of selection
-                return [0, Math.min(@lines[i].length, curPos[0])]
-        else                                                        # on selection line
-            if curPos[1] > i                                            # at start of selection
-                return [@selection[0], @lines[i].length]
-            else                                                        # at end of selection
-                return [0, Math.min(@lines[i].length, @selection[0])]
-
-    #  0000000  000   000  00000000    0000000   0000000   00000000 
-    # 000       000   000  000   000  000       000   000  000   000
-    # 000       000   000  0000000    0000000   000   000  0000000  
-    # 000       000   000  000   000       000  000   000  000   000
-    #  0000000   0000000   000   000  0000000    0000000   000   000
-
-    cursorAtEndOfLine:   => @cursor[0] == @lines[@cursor[1]].length
-    cursorAtStartOfLine: => @cursor[0] == 0
-    cursorInLastLine:    => @cursor[1] == @lines.length-1
-    cursorInFirstLine:   => @cursor[1] == 0
-
     # 00     00   0000000   000   000  00000000
     # 000   000  000   000  000   000  000     
     # 000000000  000   000   000 000   0000000 
@@ -189,7 +99,6 @@ class Editor
             @setCursor @cursor[0] + 1, @cursor[1]
     
     moveCursorLeft: =>
-        # @cursor[0] = Math.min @lines[@cursor[1]].length, @cursor[0]
         @setCursor @cursor[0], @cursor[1]
         if @cursorAtStartOfLine()
             if not @cursorInFirstLine()
@@ -350,142 +259,5 @@ class Editor
             else
                 @moveCursorLeft()
                 @deleteForward()
-
-    # 000000000  00000000  000   000  000000000
-    #    000     000        000 000      000   
-    #    000     0000000     00000       000   
-    #    000     000        000 000      000   
-    #    000     00000000  000   000     000   
-
-    text: => @lines.join '\n'
-    selectedText: => @selectedLines().join '\n'
-            
-    # 00000000    0000000    0000000
-    # 000   000  000   000  000     
-    # 00000000   000   000  0000000 
-    # 000        000   000       000
-    # 000         0000000   0000000 
-    
-    lastPos: () => 
-        lli = @lines.length-1
-        [@lines[lli].length, lli]
-    
-    posForEvent: (event) =>
-        sl = @elem.scrollLeft
-        st = @elem.scrollTop
-        br = @elem.getBoundingClientRect()
-        lx = clamp 0, @elem.clientWidth,  event.clientX - br.left
-        ly = clamp 0, @elem.clientHeight, event.clientY - br.top
-        [parseInt(Math.floor((Math.max(0, sl + lx-10))/@charSize[0])),
-         parseInt(Math.floor((Math.max(0, st + ly-10))/@charSize[1]))]
-        
-    cursorPos: =>
-        l = clamp 0, @lines.length-1, @cursor[1]
-        c = clamp 0, @lines[l].length, @cursor[0]
-        [ c, l ]
-        
-    clampPos: (p) =>
-        l = clamp 0, @lines.length-1, p[1]
-        c = clamp 0, @lines[l].length-1, p[0]
-        [ c, l ]
-
-    # 00000000    0000000   000   000   0000000   00000000   0000000
-    # 000   000  000   000  0000  000  000        000       000     
-    # 0000000    000000000  000 0 000  000  0000  0000000   0000000 
-    # 000   000  000   000  000  0000  000   000  000            000
-    # 000   000  000   000  000   000   0000000   00000000  0000000 
-    
-    rangeForWordAtPos: (pos) =>
-        p = @clampPos pos
-        l = @lines[p[1]]
-        r = [p[0], p[0]]
-        c = l[r[0]]
-        while r[0] > 0
-            n = l[r[0]-1]
-            if (c == ' ') and (n != ' ') or (c != ' ') and (n == ' ')
-                break
-            r[0] -= 1
-        while r[1] < l.length-1
-            n = l[r[1]+1]
-            if (c == ' ') and (n != ' ') or (c != ' ') and (n == ' ')
-                break
-            r[1] += 1
-        [[r[0], p[1]], [r[1]+1, p[1]]]
-
-    # 000   000  00000000   0000000     0000000   000000000  00000000
-    # 000   000  000   000  000   000  000   000     000     000     
-    # 000   000  00000000   000   000  000000000     000     0000000 
-    # 000   000  000        000   000  000   000     000     000     
-    #  0000000   000        0000000    000   000     000     00000000
-
-    update: => @elem.innerHTML = html.render @lines, @cursor, @selectionRanges(), @charSize
-
-    # 000   000  00000000  000   000
-    # 000  000   000        000 000 
-    # 0000000    0000000     00000  
-    # 000  000   000          000   
-    # 000   000  00000000     000   
-
-    onKeyDown: (event) =>
-        {mod, key, combo} = keyinfo.forEvent event
-        # log "editor key:", key, "mod:", mod, "combo:", combo
-        return if not combo
-        switch key
-            when 'right click' then return
-            when 'down', 'right', 'up', 'left' 
-                @startSelection event.shiftKey
-                if event.metaKey
-                    if key == 'left'
-                        @moveCursorToStartOfLine()
-                    else if key == 'right'
-                        @moveCursorToEndOfLine()
-                else if event.altKey
-                    if key == 'left'
-                        @moveCursorToStartOfWord()
-                    else if key == 'right'
-                        @moveCursorToEndOfWord()                    
-                else
-                    @moveCursor key
-            else
-                switch combo
-                    when 'enter'                     then @insertNewline()
-                    when 'tab', 'command+]'          then return @insertTab() + event.preventDefault() 
-                    when 'shift+tab', 'command+['    then return @deIndent()  + event.preventDefault()
-                    when 'delete', 'ctrl+backspace'  then @deleteForward()     
-                    when 'backspace'                 then @deleteBackward()     
-                    when 'command+j'                 then @joinLine()
-                    when 'ctrl+a'                    then @moveCursorToStartOfLine()
-                    when 'ctrl+e'                    then @moveCursorToEndOfLine()
-                    when 'command+k'                 then return @selectAll() + @deleteSelection()
-                    when 'command+d'                 then return @selectNone()
-                    when 'command+a'                 then return @selectAll()
-                    when 'command+c'                 then return clipboard.writeText @selectedText()
-                    when 'command+v'                 then @insertText clipboard.readText()
-                    when 'command+x'                 
-                        clipboard.writeText @selectedText()
-                        @deleteSelection()
-                    when 'command+z'             
-                        @do.undo @
-                        @update()
-                        return
-                    when 'command+shift+z'             
-                        @do.redo @
-                        @update()
-                        return
-                    when 'ctrl+shift+a'
-                        @startSelection true
-                        @moveCursorToStartOfLine()
-                    when 'ctrl+shift+e'
-                        @startSelection true
-                        @moveCursorToEndOfLine()
-                    else
-                        ansiKeycode = require 'ansi-keycode'
-                        if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
-                        # if mod == 'shift' and combo != 'shift' or combo.length == 1
-                            @insertCharacter ansiKeycode event
-                        else
-                            log "ignoring", combo
-        @endSelection event.shiftKey
-        $('cursor')?.scrollIntoViewIfNeeded()
 
 module.exports = Editor

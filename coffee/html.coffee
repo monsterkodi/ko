@@ -14,7 +14,8 @@ class html
     
     @render: (lines, cursor, selectionRanges, charSize) =>
         
-        colorized = highlight.lines lines, cursor, selectionRanges
+        # colorized = highlight.lines lines, cursor, selectionRanges
+        colorized = (encode(l) for l in lines)
         # log 'colorized', colorized
         
         h = []

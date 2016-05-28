@@ -4,123 +4,22 @@
 #000  000   000   000  000  0000  000   000  000       000
 #000   000  000   000  000   000  0000000    000  0000000 
 
-electron    = require 'electron'
-noon        = require 'noon'
-Editor      = require './editor'
-prefs       = require './tools/prefs'
-keyinfo     = require './tools/keyinfo'
-drag        = require './tools/drag'
-pos         = require './tools/pos'
-log         = require './tools/log'
-str         = require './tools/str'
-encode      = require './tools/encode'
-{sw,sh,$}   = require './tools/tools'
-ipc         = electron.ipcRenderer
-remote      = electron.remote
+electron   = require 'electron'
+noon       = require 'noon'
+HtmlEditor = require './htmleditor'
+prefs      = require './tools/prefs'
+keyinfo    = require './tools/keyinfo'
+drag       = require './tools/drag'
+pos        = require './tools/pos'
+log        = require './tools/log'
+str        = require './tools/str'
+encode     = require './tools/encode'
+{sw,sh,$}  = require './tools/tools'
+
+ipc    = electron.ipcRenderer
+remote = electron.remote
  
-editorText  = "console.log 'can\\'t load', 'hello'"
-
-__ignore = """
-
-# "-123 \#{sda} asd \#{123}", "-123 \#{sda} asd \#{123}"
-"-123 \#{sda} asd \#{123 + "qwe" + 'qwe'}", "-123 \#{sda} asd \#{123}"
-'123 \#{sda} asd \#{123}', '123 \#{sda} asd \#{123}'
-
-\#{sda} asd \#{123}
-"    +1 "
-"+1 -2"
-"-123 "
-"-1.3,+123,-2.3"
-"-2143.4"
-"[1.23]"
-"(0.5)"
-'+6.6'
-"[1..2]"
-"[2...3]"
-"[123]"
-
-123
-123 
-    +1 
-    -2
-+1 -2
--123
--123 
--1.3,+123,-2.3
--2143.4
-[1.23]
-(0.5)
-+6.6
-[1..2]
-[2...3]
-[123]
-
-a, 13, -2 , +4, b-4, b+5
-b+5
-c+6
-
-q23
-q23-23.12a
-123a
--123a
--1.3a
--2143.4a
-+6.6a
-
-123s
-a123
-[2....3]
-
-1
-2.34
-a = 56
-b: 7.8
-a: 90
-
-array = [
-    null
-    true
-    false
-    undefined
-]
-obj = 
-    a: 1
-    b: 4.5
-    c: -15.0
-    d: 'str'
-    e: "str"
-    f: \"\"\"
-    str
-    \"\"\"
-    
-obj["e"][3]
-"""
-__ignore = """
-    
-log = require 'log'
-    
-class test
-    
-    @staticVar = ''
-    
-    @staticFunc: => return @
-    
-    constructor = () ->
-
-    func: (arg) ->
-        for i in ( a for a in l if true )
-            continue if i < 10
-            break
-        console.log arg
-        
-    func2: (a,b,err) =>
-        error err
-        
-f = (args) ->
-    for a in [0..1]
-        for b in [arg.length...-16]
-            log a, b 
-"""
+editorText  = ""
 
 #00000000   00000000   00000000  00000000   0000000
 #000   000  000   000  000       000       000     
@@ -173,10 +72,9 @@ ipc.on 'execute-result', (event, arg) =>
 # 000       000   000  000     000     000   000  000   000
 # 00000000  0000000    000     000      0000000   000   000
 
-editor = new Editor $('input'), 'input'
-if true
-    editor.lines = editorText.split '\n'
-    editor.update()
+editor = new HtmlEditor $('input'), 'input'
+editor.lines = editorText.split '\n'
+editor.update()
 editor.elem.focus()
 editor.elem.ondblclick = (event) ->
     range = editor.rangeForWordAtPos editor.posForEvent event
