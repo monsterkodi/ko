@@ -15,7 +15,7 @@ class html
     @render: (lines, cursor, selectionRanges, charSize) =>
         
         colorized = highlight.lines lines, cursor, selectionRanges
-        log 'colorized', colorized
+        # log 'colorized', colorized
         
         h = []
         if selectionRanges.length

@@ -1,5 +1,5 @@
 
-editorFontSize        = 30px
+editorFontSize        = 18px
 selectionRadius       = editorFontSize/3
 selectionRadiusCursor = selectionRadius/2
 
@@ -126,42 +126,97 @@ body
 *       000     000     000  0000     000     000   000   000 000 
 *  0000000      000     000   000     000     000   000  000   000
 */
+
+.syntax
+    color           #666
     
 .bool           
     color           #88f
     &.false      
         color       #44f
     
+.number
+    color           #88f
+    &.float   
+        color       #f88
+
+.dictionary
+    color           #ff6
+
+.array
+    color           #00f
+
+.class
+    color           #ff0    
+    
+.syntax.cond
 .keyword
     color           #aaf
     &.null    
         color       #a00
+
+.variable
+    color           #0aa
     
 .range
     color           #80f
     
 .require    
     color           #0f0
-    
-.marker
-    color           #999
-        
-.syntax
-    color           #666
-    
-.class
-    color           #ff0    
 
+.this
+.marker
+    opacity         0.5
+            
+.module
+    color           #ff8
+
+.method
+    color           #ff0
+    
+.property
+    color           #ff2
+    
 .function
-    color           #f80    
+    color           #fa0
+    &.call          
+        color       #f90
+    &.marker
+        color       #55f
+        opacity     1
+        &.bound
+            color   #66f
+    &.bracket
+        color       #55f
+    &.argument
+        color       #aaf
+        &.punctuation
+            opacity  0.5
+
+.interpolation.marker
+        color       #f83
+
+.variable.err        
+    color           #f08
+
+.syntax.exists     
+    opacity         0.7
 
 .string
-    color           #f33
-    
-.number
-    color           #88f
-    &.float   
-        color       #f88
+    color           #f83
+        
+.comment
+    color           #444 !important
+
+.require
+    &.variable
+        color       #4f4
+    &.string 
+        color       #0a0
+    &.keyword.require 
+        color       #666
+    &.syntax
+        opacity     0.5
 
 /*
 *   0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000

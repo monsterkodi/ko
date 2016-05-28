@@ -17,14 +17,109 @@ encode      = require './tools/encode'
 {sw,sh,$}   = require './tools/tools'
 ipc         = electron.ipcRenderer
 remote      = electron.remote
+ 
+editorText  = "console.log 'can\\'t load', 'hello'"
 
-editorText  = """
-true
-false
-for a in [0..1]
- ()->
+__ignore = """
+
+# "-123 \#{sda} asd \#{123}", "-123 \#{sda} asd \#{123}"
+"-123 \#{sda} asd \#{123 + "qwe" + 'qwe'}", "-123 \#{sda} asd \#{123}"
+'123 \#{sda} asd \#{123}', '123 \#{sda} asd \#{123}'
+
+\#{sda} asd \#{123}
+"    +1 "
+"+1 -2"
+"-123 "
+"-1.3,+123,-2.3"
+"-2143.4"
+"[1.23]"
+"(0.5)"
+'+6.6'
+"[1..2]"
+"[2...3]"
+"[123]"
+
+123
+123 
+    +1 
+    -2
++1 -2
+-123
+-123 
+-1.3,+123,-2.3
+-2143.4
+[1.23]
+(0.5)
++6.6
+[1..2]
+[2...3]
+[123]
+
+a, 13, -2 , +4, b-4, b+5
+b+5
+c+6
+
+q23
+q23-23.12a
+123a
+-123a
+-1.3a
+-2143.4a
++6.6a
+
+123s
+a123
+[2....3]
+
+1
+2.34
+a = 56
+b: 7.8
+a: 90
+
+array = [
+    null
+    true
+    false
+    undefined
+]
+obj = 
+    a: 1
+    b: 4.5
+    c: -15.0
+    d: 'str'
+    e: "str"
+    f: \"\"\"
+    str
+    \"\"\"
+    
+obj["e"][3]
+"""
+__ignore = """
+    
 log = require 'log'
-s = "string"
+    
+class test
+    
+    @staticVar = ''
+    
+    @staticFunc: => return @
+    
+    constructor = () ->
+
+    func: (arg) ->
+        for i in ( a for a in l if true )
+            continue if i < 10
+            break
+        console.log arg
+        
+    func2: (a,b,err) =>
+        error err
+        
+f = (args) ->
+    for a in [0..1]
+        for b in [arg.length...-16]
+            log a, b 
 """
 
 #00000000   00000000   00000000  00000000   0000000

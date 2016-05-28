@@ -16,9 +16,7 @@ class highlight
     @matchrConfig = null
 
     @init: =>
-        # patterns = @expand noon.load "#{__dirname}/../syntax/coffee.noon"
         patterns = noon.load "#{__dirname}/../syntax/coffee.noon"
-        log 'highlight.patterns', patterns
         @matchrConfig = matchr.config patterns
 
     #  0000000   0000000   000       0000000   00000000   000  0000000  00000000
@@ -29,10 +27,15 @@ class highlight
     
     @colorize: (str, stack) =>
         try
-            spl = stack.map (s) -> 
-                String(s).split '.'
+            smp = stack.map (s) -> String(s).split '.'
+            chk = {}
+            spl = []
+            for s in smp
+                if not chk[s[0]]?
+                    chk[s[0]] = s.slice 1
+                    spl.push s
             spl = _.flatten spl
-            spl.reverse()
+            # log "colorize", str, stack, 'spl', spl            
             str = "<span class=\"#{spl.join ' '}\">#{encode str}</span>"
                     
         catch err

@@ -5,26 +5,29 @@
 #  000       000   000  000       000       000       000     
 #   0000000   0000000   000       000       00000000  00000000
 
-!=                             syntax.neq
-[\[\]<>+-=]                    syntax.eq
+[\<\>\+\-\=\/]                 syntax.math
+
+@                              syntax.this
+\?                             syntax.cond
+!=                             syntax.math
 ->                             syntax.function.marker
+=>                             syntax.function.marker.bound
 
 # braces
 
-[\(\)\{\}]                     syntax.bracket
+[\(\)\{\}\[\]]                 syntax.bracket
 
 # keywords
 
-(^|\s)(if|else|then|for|of|in|while|do|unless|not|or|and|try|catch)(\s|$)  
+(^|\s)(if|else|then|for|of|in|while|do|unless|not|or|and|try|catch|return|break|continue)(\s|$)  
     none 
     keyword 
     none
 
 # require
 
-(\w+)\s*(=)\s*(require)(\(?\s*')(\S+)('\s*\)?\s*)  
+(\w+|\{[^\}]+\})\s*=\s*(require)(\(?\s*')(\S+)('\s*\)?\s*)  
     require.variable
-    require.sign.equal 
     keyword.require 
     require.string.marker 
     require.string 
@@ -32,7 +35,7 @@
 
 # class
 
-class                          keyword.class
+(class)\s+(\w+)              . class.keyword . class
 
 # globals
 
@@ -44,21 +47,10 @@ class                          keyword.class
 \berr\b                        variable.err
 \berror\b                      function.err
 
-# interpolation content
-
-\#\{([^\}\#]*)\}             . interpolation
-
-
-# strings
-
-(')([^']*)(')                . string.marker.single . string . string.marker.single
-(")([^"]*)(")                . string.marker.double . string . string.marker.double
-"""                            string.marker.triple
-
 # bool
 
-true                           bool.true
-false                          bool.false 
+true                           value.bool.true
+false                          value.bool.false 
 
 # null
 
@@ -66,9 +58,18 @@ null|undefined                 keyword.null
 
 # functions 
 
-(\w+)\s*=\s*\([^\)]*\)\s*->  . function
-(\w+)\s*=\s*->               . function
-(\()([^\(\)]*)(\)\s*)->      . function.bracket . function.variable.argument . function.bracket
+(\w+)\s*[=]\s*\([^\)]*\)\s*[-=]>  . function
+(\w+)\s*[=]\s*[-=]>               . function
+(\w+)\s*[:]\s*\([^\)]*\)\s*[-=]>  . method
+(\w+)\s*[:]\s*[-=]>               . method
+(\()([^\(\)]*)(\)\s*)[-=]>        . function.bracket . function.variable.argument . function.bracket
+(\w+)\s*\([^\)]*\)                . function.call
+(\w+)\.(\w+)\s*\([^\)]*\)         . class.callee . function.call
+(\w+)\.(\w+)\s+\w+                . class.callee . function.call
+
+# class members
+
+(@\w+)\s*\=                    class.variable
 
 # .property
 
@@ -76,11 +77,8 @@ null|undefined                 keyword.null
 
 # range
 
-(\[).*(\.\.\.).*(\])         . range.marker . range . range.marker
-
-# array index
-
-\[(\d+)\]                    . array.index
+(\[).*(\.\.\.).*(\])         . range.bracket . range . range.bracket
+(\[).*(\.\.).*(\])           . range.bracket . range . range.bracket
 
 # dictionary key
 
@@ -98,21 +96,30 @@ null|undefined                 keyword.null
 
 (_)\.(\w+)                   . lodash.marker . lodash.function
 
-# interpolation markers
-
-(\#\{|\})                    . interpolation.marker
-
 #number
 
-\b\d+\b                        number.int
-[^\s0].*(\b\d+\b)            . number.float
-(\b\d+\b).*[^\s0]            . number.float
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
+    syntax.value.number.float.sign
+    value.number.float
+
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
+    syntax.value.number.int.sign
+    value.number.int
+
+# strings
+(')((?:[^'\\]*|\\['\\bfnrt\/])*)(')     . string.marker.single . value.string . string.marker.single
+(")((?:[^"\#\\]*|\\["\\bfnrt\/])*)(")   . string.marker.double . value.string . string.marker.double
+(")((?:[^"\#\\]*|\\["\\bfnrt\/])*)(\#\{)   . string.marker.double . value.string . interpolation.marker
+(\})((?:[^"\#\\]*|\\["\\bfnrt\/])*)(")     . interpolation.marker . value.string . string.marker.double
+(\})((?:[^"\#\\]*|\\["\\bfnrt\/])*)(\#\{)  . interpolation.marker . value.string . interpolation.marker
+"""                            string.marker.triple
 
 # comments
 
 |###|                          comment.marker
-(#)([^\{].*|$)               . comment.marker . comment
+(#+)([^\{].*|$)              . comment.marker . comment
 
 # salt header
 
 ^[0\s]+$                       comment.header
+
