@@ -19,18 +19,14 @@ class Editor extends Buffer
         @selection = null
         @lines     = [""]
 
-    done: => 
-        log 'done', @update
-        setTimeout @update, 0 if @update?
-
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000
     # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
 
-    selectNone:         -> @selection = @do.selection @selection, null
-    setSelection: (c,l) -> @selection = @do.selection @selection, [c,l]
+    selectNone:         -> @do.selection @, null
+    setSelection: (c,l) -> @do.selection @, [c,l]
 
     selectRanges: (ranges) ->
         @setSelection ranges[0][0], ranges[0][1]
@@ -58,39 +54,39 @@ class Editor extends Buffer
     setCursor: (c,l) -> 
         l = Math.min l, @lines.length-1
         c = Math.min c, @lines[l].length        
-        @do.cursor @cursor, [c,l]
+        @do.cursor @, [c,l]
 
     moveCursorToPos: (pos)   -> @setCursor pos[0], pos[1]
     moveCursorToEndOfLine:   -> @setCursor @lines[@cursor[1]].length, @cursor[1]
     moveCursorToStartOfLine: -> @setCursor 0, @cursor[1]
 
     moveCursorToEndOfWord:   -> 
-        r = @rangeForWordAtPos(@cursor)[1]
+        r = @rangesForWordAtPos(@cursor)[1]
         if @cursorAtEndOfLine()
             return if @cursorInLastLine()
-            r = rangeForWordAtPos([0, @cursor[1]+1])[1]
+            r = rangesForWordAtPos([0, @cursor[1]+1])[1]
         @setCursorPos r
         
     moveCursorToStartOfWord: -> 
-        r = @rangeForWordAtPos(@cursor)[0]
+        r = @rangesForWordAtPos(@cursor)[0]
         if @cursorAtStartOfLine()
             return if @cursorInFirstLine()
-            r = @rangeForWordAtPos([@lines[@cursor[1]-1].length, @cursor[1]-1])[0]
+            r = @rangesForWordAtPos([@lines[@cursor[1]-1].length, @cursor[1]-1])[0]
         else if r[0] == @cursor[0]
-            r = @rangeForWordAtPos([@cursor[0]-1, @cursor[1]])[0]
+            r = @rangesForWordAtPos([@cursor[0]-1, @cursor[1]])[0]
         @setCursorPos r
         
     moveCursorUp: ->
         if @cursorInFirstLine()
             @moveCursorToStartOfLine()
         else
-            @do.cursor @cursor, [@cursor[0], @cursor[1] - 1] # don't adjust x
+            @do.cursor @, [@cursor[0], @cursor[1] - 1] # don't adjust x
 
     moveCursorDown: ->
         if @cursorInLastLine()
             @moveCursorToEndOfLine()
         else
-            @do.cursor @cursor, [@cursor[0], @cursor[1] + 1] # don't adjust x
+            @do.cursor @, [@cursor[0], @cursor[1] + 1] # don't adjust x
 
     moveCursorRight: ->
         if @cursorAtEndOfLine() 

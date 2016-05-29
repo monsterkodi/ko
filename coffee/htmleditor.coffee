@@ -27,11 +27,11 @@ class HtmlEditor extends Editor
         @scrollRight = $('.scroll.right', @elem.parentElement)
     
         @initCharSize()
-        @scrollBy 0
         
         @elem.onkeydown = @onKeyDown
-        @elem.innerHTML = html.cursorSpan @charSize        
         @elem.addEventListener 'wheel',   @onWheel
+
+        @scrollBy 0
 
         # 00     00   0000000   000   000   0000000  00000000
         # 000   000  000   000  000   000  000       000     
@@ -43,20 +43,27 @@ class HtmlEditor extends Editor
             target:  @elem
             cursor:  'default'
             onStart: (drag, event) =>
+                
                 if @doubleClicked
-                    return if @tripleClicked
                     clearTimeout @tripleClickTimer
-                    @doubleClicked = true
-                    @tripleClicked = true
-                    @tripleClickTimer = setTimeout @onTripleClickDelay, 2000
-                    @startSelection event.shiftKey
-                    @selectRanges @rangesForCursorLine()
-                    @endSelection true
-                else
-                    @elem.focus()
-                    @startSelection event.shiftKey
-                    @moveCursorToPos @posForEvent event
-                    @endSelection event.shiftKey
+                    if @posForEvent(event)[1] == @tripleClickLineIndex
+                        return if @tripleClicked
+                        @doubleClicked = true
+                        @tripleClicked = true
+                        @tripleClickTimer = setTimeout @onTripleClickDelay, 1500
+                        @startSelection event.shiftKey
+                        @selectRanges @rangesForCursorLine()
+                        @endSelection true
+                        return
+                    else
+                        @startSelection event.shiftKey
+                        @doubleClicked = false
+                        @tripleClicked = false
+                        @tripleClickTimer = null
+
+                @elem.focus()
+                @moveCursorToPos @posForEvent event
+                @endSelection event.shiftKey
             
             onMove: (drag, event) => 
                 @startSelection true
@@ -65,10 +72,11 @@ class HtmlEditor extends Editor
                 
         @elem.ondblclick = (event) =>
             @startSelection event.shiftKey
-            range = @rangeForWordAtPos @posForEvent event
-            @selectRanges range
+            ranges = @rangesForWordAtPos @posForEvent event
+            @selectRanges ranges
             @doubleClicked = true
-            @tripleClickTimer = setTimeout @onTripleClickDelay, 2000
+            @tripleClickTimer = setTimeout @onTripleClickDelay, 1500
+            @tripleClickLineIndex = ranges[0][1]
             @endSelection true
             
     onTripleClickDelay: => @doubleClicked = @tripleClicked = false
@@ -95,28 +103,30 @@ class HtmlEditor extends Editor
     # 000   000  000        000   000  000   000     000     000     
     #  0000000   000        0000000    000   000     000     00000000
 
+    done: => 
+        log 'done', @do.changedLineIndices
+        # setTimeout @update, 0 if @update?
+        @update()
+
+    linesChanged: (lineIndices) ->
+        log 'lineIndices', lineIndices
+
     update: =>
-        while @elem.children.length < @botIndex-@topIndex
+        while @elem.children.length < @botIndex-@topIndex+2
             div = document.createElement 'div'
             div.className = 'line'
             @elem.appendChild div
         @divs = []
-        c = 0
-        i = @topIndex
-        while i <= @botIndex
+        for c in [0...@elem.children.length]
+            i = c + @topIndex
             @elem.children[c].id = "line-#{i}"
             if i < @lines.length
-                # @divs.push html.renderLine i, @lines, @cursor, @selectionRanges(), @charSize
                 span = html.renderLine i, @lines, @cursor, @selectionRanges(), @charSize
                 @divs.push span
                 @elem.children[c].innerHTML = span
             else
-                # @divs.push "<div id=\"line-#{i}\" class=\"line\"></div>"
                 @divs.push ""
                 @elem.children[c].innerHTML = ""
-            c += 1
-            i += 1
-        # @elem.innerHTML = @divs.join '\n'
 
     # 00000000    0000000    0000000
     # 000   000  000   000  000     

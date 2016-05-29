@@ -124,9 +124,10 @@ class Buffer
     # 000   000  000   000  000   000   0000000   00000000  0000000 
     
     rangeForLineAtIndex: (i) -> [0, @lines[i].length]
+    
     rangesForCursorLine:     -> [[0, @cursor[1]], [@lines[@cursor[1]].length, @cursor[1]]]
     
-    rangeForWordAtPos: (pos) ->
+    rangesForWordAtPos: (pos) ->
         p = @clampPos pos
         l = @lines[p[1]]
         r = [p[0], p[0]]
