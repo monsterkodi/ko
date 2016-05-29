@@ -144,11 +144,11 @@ class undo
     # 000       000   000  000   000
     #  0000000   0000000   000   000
     
-    cursor: (obj.cursor, pos) =>
+    cursor: (obj, pos) =>
         if (obj.cursor[0] != pos[0]) or (obj.cursor[1] != pos[1])
             @changedLineIndices = [] if not @changedLineIndices
             @changedLineIndices.push [obj.cursor[1], obj.cursor[1]]
-            @lastAction().obj.cursorAfter = [pos[0], pos[1]]
+            @lastAction().curAfter = [pos[0], pos[1]]
             obj.cursor = [pos[0], pos[1]]
             @changedLineIndices.push [obj.cursor[1], obj.cursor[1]]
             @check()

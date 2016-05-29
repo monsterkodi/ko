@@ -21,8 +21,6 @@ ipc    = electron.ipcRenderer
 remote = electron.remote
  
 editorText  = fs.readFileSync "#{__dirname}/../coffee/kandis.coffee", encoding: 'UTF8'
-# editorText  = """
-# """
     
 #00000000   00000000   00000000  00000000   0000000
 #000   000  000   000  000       000       000     
@@ -88,7 +86,7 @@ splitAt prefs.get 'split', 100
 
 window.onresize = =>
     splitDrag.maxPos = pos sw(), sh()-minEnterHeight
-    splitAt Math.max minScrollHeight, sh()-enterHeight
+    # splitAt Math.max minScrollHeight, sh()-enterHeight
     ipc.send 'bounds'
               
 # 000   000  00000000  000   000
