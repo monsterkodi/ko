@@ -8,6 +8,7 @@
 [\<\>\+\-\=\/]                 syntax.math
 
 @                              syntax.this
+\$                             syntax.this
 \?                             syntax.cond
 !=                             syntax.math
 ->                             syntax.function.marker
@@ -19,10 +20,12 @@
 
 # keywords
 
-(^|\s)(if|else|then|for|of|in|while|do|unless|not|or|and|try|catch|return|break|continue)(\s|$)  
+(^|\s)(if|else|then|for|of|in|while|do|unless|not|or|and|try|catch|return|break|continue|new|switch|when)(\s|$)  
     none 
     keyword 
     none
+    
+__dirname|__filename  keyword
 
 # require
 
@@ -64,16 +67,20 @@ null|undefined                 keyword.null
 (\w+)\s*[:]\s*[-=]>               . method
 (\()([^\(\)]*)(\)\s*)[-=]>        . function.bracket . function.variable.argument . function.bracket
 (\w+)\s*\([^\)]*\)                . function.call
-(\w+)\.(\w+)\s*\([^\)]*\)         . class.callee . function.call
-(\w+)\.(\w+)\s+\w+                . class.callee . function.call
+(\w+)\s*\.\s*(\w+)\s*\([^\)]*\)   . class.callee . function.call
+(\w+)\s*\.\s*(\w+)\s+\w+          . class.callee . function.call
 
 # class members
 
 (@\w+)\s*\=                    class.variable
 
+# class construction
+
+new\s+(\w+)                    class.callee
+
 # .property
 
-(\.\w+)                      . property
+(\w+)\s*(\.\s*\w+)           . owner . property
 
 # range
 
@@ -110,9 +117,10 @@ null|undefined                 keyword.null
 (')((?:[^'\\]*|\\['\\bfnrt\/])*)(')     . string.marker.single . value.string . string.marker.single
 (")((?:[^"\#\\]*|\\["\\bfnrt\/])*)(")   . string.marker.double . value.string . string.marker.double
 
-# (")((?:[^"\#\\]*|\\["\\bfnrt\/])*)(\#\{)   . string.marker.double . value.string . interpolation.marker
-# (\})((?:[^"\#\\]*|\\["\\bfnrt\/])*)(")     . interpolation.marker . value.string . string.marker.double
-# (\})((?:[^"\#\\]*|\\["\\bfnrt\/])*)(\#\{)  . interpolation.marker . value.string . interpolation.marker
+(")([^"\#]*)(\#\{)   . string.marker.double . value.string . interpolation.marker
+(\})([^"\#]*)(")     . interpolation.marker . value.string . string.marker.double
+(\})([^"\#]*)(\#\{)  . interpolation.marker . value.string . interpolation.marker
+    
 """                            string.marker.triple
 
 # comments
