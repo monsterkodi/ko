@@ -27,8 +27,6 @@ class HtmlEditor extends Editor
         @scrollRight = $('.scroll.right', @elem.parentElement)
     
         @initCharSize()
-        
-        # @scrollChanged()
         @scrollBy 0
         
         @elem.onkeydown = @onKeyDown
@@ -44,23 +42,36 @@ class HtmlEditor extends Editor
         @drag = new drag
             target:  @elem
             cursor:  'default'
-            onStart: (drag, event) => 
-                @elem.focus()
-                @startSelection event.shiftKey
-                @moveCursorToPos @posForEvent event
-                @endSelection event.shiftKey
-                @update()
+            onStart: (drag, event) =>
+                if @doubleClicked
+                    return if @tripleClicked
+                    clearTimeout @tripleClickTimer
+                    @doubleClicked = true
+                    @tripleClicked = true
+                    @tripleClickTimer = setTimeout @onTripleClickDelay, 2000
+                    @startSelection event.shiftKey
+                    @selectRanges @rangesForCursorLine()
+                    @endSelection true
+                else
+                    @elem.focus()
+                    @startSelection event.shiftKey
+                    @moveCursorToPos @posForEvent event
+                    @endSelection event.shiftKey
             
             onMove: (drag, event) => 
                 @startSelection true
                 @moveCursorToPos @posForEvent event
-                @update()
+                @endSelection true
                 
         @elem.ondblclick = (event) =>
+            @startSelection event.shiftKey
             range = @rangeForWordAtPos @posForEvent event
-            log 'double', range
-            @selectRange range
-            @update()
+            @selectRanges range
+            @doubleClicked = true
+            @tripleClickTimer = setTimeout @onTripleClickDelay, 2000
+            @endSelection true
+            
+    onTripleClickDelay: => @doubleClicked = @tripleClicked = false
 
     setText: (text) ->
         @lines = text.split '\n'

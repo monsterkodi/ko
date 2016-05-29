@@ -32,15 +32,15 @@ class Editor extends Buffer
     selectNone:         -> @selection = @do.selection @selection, null
     setSelection: (c,l) -> @selection = @do.selection @selection, [c,l]
 
-    selectRange: (range) ->
-        @setSelection range[0][0], range[0][1]
-        @setCursor    range[1][0], range[1][1]
+    selectRanges: (ranges) ->
+        @setSelection ranges[0][0], ranges[0][1]
+        @setCursor    ranges[1][0], ranges[1][1]
 
-    selectAll: => @selectRange [[0,0], @lastPos()]
+    selectAll: => @selectRanges [[0,0], @lastPos()]
     
     startSelection: (active) ->
         if active and not @selection?
-            @selectRange [[Math.min(@cursor[0], @lines[@cursor[1]].length),@cursor[1]], @cursor]
+            @selectRanges [[Math.min(@cursor[0], @lines[@cursor[1]].length),@cursor[1]], @cursor]
 
     endSelection: (active) ->
         if @selection? and not active
@@ -220,7 +220,7 @@ class Editor extends Buffer
             
     deleteSelection: ->
         return if not @selection?
-        lineRange = @selectedLineRange()
+        lineRange = @selectedLineIndicesRange()
         return if not lineRange?
         @do.start()
         @deleteCharacterRangeInLineAtIndex @selectedCharacterRangeForLineAtIndex(lineRange[1]), lineRange[1]
