@@ -73,11 +73,14 @@ class html
             selEnd   = "</span>"
             if i == cursor[1]
                 if cursor[0] == range[0]
-                    h = encode(left) + curSpan + selStart + encode(mid) + selEnd + encode(right)
+                    h = highlight.line l, [[range[0], curSpan+selStart], [range[1], selEnd]]
+                    # h = encode(left) + curSpan + selStart + encode(mid) + selEnd + encode(right)
                 else
-                    h = encode(left) + selStart + encode(mid) + selEnd + curSpan + encode(right)
+                    h = highlight.line l, [[range[0], selStart], [range[1], selEnd+curSpan]]
+                    # h = encode(left) + selStart + encode(mid) + selEnd + curSpan + encode(right)
             else
-                h = encode(left) + selStart + encode(mid) + selEnd + encode(right)
+                h = highlight.line l, [[range[0], selStart], [range[1], selEnd]]
+                # h = encode(left) + selStart + encode(mid) + selEnd + encode(right)
                 
         else if i == cursor[1]
             
