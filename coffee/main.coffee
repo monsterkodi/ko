@@ -18,7 +18,7 @@ clipboard     = electron.clipboard
 ipc           = electron.ipcMain
 win           = undefined
 tray          = undefined
-debug         = 1
+debug         = 0
 open          = true
 
 #00000000  000   000  00000000   0000000  000   000  000000000  00000000

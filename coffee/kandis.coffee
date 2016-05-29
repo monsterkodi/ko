@@ -6,6 +6,7 @@
 
 electron   = require 'electron'
 noon       = require 'noon'
+fs         = require 'fs'
 HtmlEditor = require './htmleditor'
 prefs      = require './tools/prefs'
 keyinfo    = require './tools/keyinfo'
@@ -19,13 +20,8 @@ encode     = require './tools/encode'
 ipc    = electron.ipcRenderer
 remote = electron.remote
  
-editorText  = """
-
-true   
-"""
-# for i in [0...100]
-#     editorText += "#{i}\n"
-
+editorText  = fs.readFileSync "#{__dirname}/../coffee/kandis.coffee", encoding: 'UTF8'
+    
 #00000000   00000000   00000000  00000000   0000000
 #000   000  000   000  000       000       000     
 #00000000   0000000    0000000   000000    0000000 
@@ -79,10 +75,6 @@ ipc.on 'execute-result', (event, arg) =>
 editor = new HtmlEditor $('input'), 'input'
 editor.setText editorText
 editor.elem.focus()
-editor.elem.ondblclick = (event) ->
-    range = editor.rangeForWordAtPos editor.posForEvent event
-    editor.selectRange range
-    editor.update()
 
 splitAt prefs.get 'split', 100
 

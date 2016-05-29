@@ -44,14 +44,20 @@ class HtmlEditor extends Editor
             onStart: (drag, event) => 
                 @elem.focus()
                 @startSelection event.shiftKey
-                @moveCursorToPos editor.posForEvent event
+                @moveCursorToPos @posForEvent event
                 @endSelection event.shiftKey
                 @update()
             
-            onMove:  (drag, event) => 
+            onMove: (drag, event) => 
                 @startSelection true
-                @moveCursorToPos editor.posForEvent event
+                @moveCursorToPos @posForEvent event
                 @update()
+                
+        @elem.ondblclick = (event) =>
+            range = @rangeForWordAtPos @posForEvent event
+            log 'double', range
+            @selectRange range
+            @update()
 
     setText: (text) ->
         @lines = text.split '\n'
