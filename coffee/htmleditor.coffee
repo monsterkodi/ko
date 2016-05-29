@@ -78,7 +78,11 @@ class HtmlEditor extends Editor
         @divs = []
         i = @topIndex
         while i <= @botIndex
-            @divs.push html.renderLine i, @lines, @cursor, @selectionRanges(), @charSize
+            # log 'render line', i, @lines.length, @topIndex, @botIndex
+            if i < @lines.length
+                @divs.push html.renderLine i, @lines, @cursor, @selectionRanges(), @charSize
+            else
+                @divs.push "<div id=\"line-#{i}\" class=\"line\"></div>"
             i += 1
         @elem.innerHTML = @divs.join '\n'
 
@@ -95,7 +99,7 @@ class HtmlEditor extends Editor
         lx = clamp 0, @elem.clientWidth,  event.clientX - br.left
         ly = clamp 0, @elem.clientHeight, event.clientY - br.top
         [parseInt(Math.floor((Math.max(0, sl + lx-10))/@charSize[0])),
-         parseInt(Math.floor((Math.max(0, st + ly-10))/@charSize[1]))]
+         parseInt(Math.floor((Math.max(0, st + ly))/@charSize[1])) + @topIndex]
 
     # 000      000  000   000  00000000   0000000
     # 000      000  0000  000  000       000     
@@ -134,9 +138,9 @@ class HtmlEditor extends Editor
 
     scrollFactor: (event) ->
         f  = 1 
-        f *= 1 + 9 * event.metaKey
-        f *= 1 + 99 * event.altKey        
-        f *= 1 + 999 * event.ctrlKey
+        f *= 1 + 1 * event.shiftKey
+        f *= 1 + 3 * event.metaKey        
+        f *= 1 + 7 * event.altKey
 
     onWheel: (event) => 
         @scrollBy event.deltaY * @scrollFactor event

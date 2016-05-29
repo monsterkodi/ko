@@ -53,10 +53,12 @@ class highlight
         for ins in inserts.reverse()
             if diss.length
                 for di in [diss.length-1..0]
+                    
                     d = diss[di]
-                    continue if not d.match?
-                    if d.start+d.match.length > ins[0]
-                        if d.start < ins[0]
+                    continue if not d.match? # jump over inserts
+                    
+                    if d.start+d.match.length > ins[0] # span end is behind insert start
+                        if d.start < ins[0] # insert overlaps with span
                             ll = ins[0]-d.start
                             lr = d.match.length - ll
                             dr = Object.assign {}, d
@@ -68,16 +70,15 @@ class highlight
                                 start: ins[0]
                                 insert: ins[1] 
                             break                           
-                        else if di == 0 or diss[di-1].match? and diss[di-1].start + diss[di-1].match.length <= ins[0]
-                            diss.splice di, 0,
-                                start: ins[0]
-                                insert: ins[1]
-                            break
-                    else 
+                    else # insert is behind span
                         diss.splice di+1, 0,
                             start: ins[0]
                             insert: ins[1]
                         break
+                if di < 0 # insert before all spans
+                    diss.splice 0, 0,
+                        start: ins[0]
+                        insert: ins[1]
             else
                 diss.push
                     start: ins[0]

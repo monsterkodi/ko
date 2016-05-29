@@ -19,7 +19,9 @@ class Editor extends Buffer
         @selection = null
         @lines     = [""]
 
-    done: () => setTimeout @update, 0 if @update?
+    done: => 
+        log 'done', @update
+        setTimeout @update, 0 if @update?
 
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000
