@@ -96,27 +96,6 @@ window.onresize = =>
     splitDrag.maxPos = pos sw(), sh()-minEnterHeight
     splitAt Math.max minScrollHeight, sh()-enterHeight
     ipc.send 'bounds'
-
-# 00     00   0000000   000   000   0000000  00000000
-# 000   000  000   000  000   000  000       000     
-# 000000000  000   000  000   000  0000000   0000000 
-# 000 0 000  000   000  000   000       000  000     
-# 000   000   0000000    0000000   0000000   00000000
-     
-inputDrag = new drag
-    target:  editor.elem
-    cursor:  'default'
-    onStart: (drag, event) -> 
-        editor.elem.focus()
-        editor.startSelection event.shiftKey
-        editor.moveCursorToPos editor.posForEvent event
-        editor.endSelection event.shiftKey
-        editor.update()
-    
-    onMove:  (drag, event) -> 
-        editor.startSelection true
-        editor.moveCursorToPos editor.posForEvent event
-        editor.update()
               
 # 000   000  00000000  000   000
 # 000  000   000        000 000 

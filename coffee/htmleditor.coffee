@@ -7,6 +7,7 @@
 Editor    = require './editor'
 html      = require './html'
 log       = require './tools/log'
+drag      = require './tools/drag'
 keyinfo   = require './tools/keyinfo'
 {clamp,$} = require './tools/tools'
 clipboard = require('electron').clipboard
@@ -31,6 +32,27 @@ class HtmlEditor extends Editor
         @elem.innerHTML = html.cursorSpan @charSize        
         @elem.addEventListener 'wheel',   @onWheel
 
+        # 00     00   0000000   000   000   0000000  00000000
+        # 000   000  000   000  000   000  000       000     
+        # 000000000  000   000  000   000  0000000   0000000 
+        # 000 0 000  000   000  000   000       000  000     
+        # 000   000   0000000    0000000   0000000   00000000
+             
+        @drag = new drag
+            target:  @elem
+            cursor:  'default'
+            onStart: (drag, event) => 
+                @elem.focus()
+                @startSelection event.shiftKey
+                @moveCursorToPos editor.posForEvent event
+                @endSelection event.shiftKey
+                @update()
+            
+            onMove:  (drag, event) => 
+                @startSelection true
+                @moveCursorToPos editor.posForEvent event
+                @update()
+
     setText: (text) ->
         @lines = text.split '\n'
         @displayLines 0, @numVisibleLines()-1
@@ -47,7 +69,6 @@ class HtmlEditor extends Editor
     #  0000000   000        0000000    000   000     000     00000000
 
     update: =>
-        # log "update", @topIndex, "...", @botIndex
         @divs = []
         i = @topIndex
         while i <= @botIndex
@@ -127,9 +148,6 @@ class HtmlEditor extends Editor
         @scroll = Math.min @scroll, @scrollMax
         @scroll = Math.max @scroll, 0
         
-        # log 'treeHeight', @treeHeight, 'scrollMax', @scrollMax
-        # log 'delta', delta, "viewLines", viewLines, "numLines", numLines, "@scroll", @scroll, "@scrollMax", @scrollMax
-        
         top = parseInt @scroll / @lineHeight
         bot = Math.min(@topIndex + viewLines - 1, numLines - 1)
 
@@ -146,9 +164,7 @@ class HtmlEditor extends Editor
 
         @topIndex = parseInt @scroll / @lineHeight    
         @botIndex = Math.min(@topIndex + viewLines - 1, numLines-1)
-        
-        # log "viewLines", viewLines, "@scroll", @scroll, "topIndex", @topIndex , "botIndex", @botIndex 
-        
+                
     #  0000000  000   000   0000000   00000000    0000000  000  0000000  00000000
     # 000       000   000  000   000  000   000  000       000     000   000     
     # 000       000000000  000000000  0000000    0000000   000    000    0000000 

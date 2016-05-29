@@ -15,11 +15,9 @@ class html
     @renderLine: (index, lines, cursor, selectionRanges, charSize) =>
         
         i = index
-        l = lines[index]
+        l = lines[index]        
+        l = " " if l.length == 0
         h = ""
-        
-        if l.length == 0
-            l = " "
         
         if selectionRanges.length
             selRange = [selectionRanges[0][0], selectionRanges[selectionRanges.length-1][0]]
@@ -27,8 +25,8 @@ class html
         selectedCharacters = (i) -> 
             r = selectionRanges[i-selectionRanges[0][0]][1]
             [r[0], r[1]]
-            
-        curSpan = @cursorSpan charSize
+                    
+        insert = []
                     
         if selRange and selRange[0] <= i <= selRange[1]
             
@@ -76,18 +74,17 @@ class html
             selEnd   = "</span>"
             if i == cursor[1]
                 if cursor[0] == range[0]
-                    selStart = curSpan+selStart
+                    selStart = @cursorSpan(charSize)+selStart
                 else
-                    selEnd = selEnd+curSpan
+                    selEnd = selEnd+@cursorSpan(charSize)
                 
-            h = highlight.line l, [[range[0], selStart], [range[1], selEnd]]
+            insert = [[range[0], selStart], [range[1], selEnd]]
                 
         else if i == cursor[1]
             
-            h = highlight.line l, [[cursor[0], curSpan]]
-            
-        else
-            h = highlight.line l
+            insert = [[cursor[0], @cursorSpan(charSize)]]
+                        
+        h = highlight.line l, insert
                         
         "<div id=\"line-#{index}\" class=\"line\">" + h + "</div>"
 
