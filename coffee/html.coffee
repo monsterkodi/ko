@@ -18,6 +18,9 @@ class html
         l = lines[index]
         h = ""
         
+        if l.length == 0
+            l = " "
+        
         if selectionRanges.length
             selRange = [selectionRanges[0][0], selectionRanges[selectionRanges.length-1][0]]
             
@@ -73,14 +76,11 @@ class html
             selEnd   = "</span>"
             if i == cursor[1]
                 if cursor[0] == range[0]
-                    h = highlight.line l, [[range[0], curSpan+selStart], [range[1], selEnd]]
-                    # h = encode(left) + curSpan + selStart + encode(mid) + selEnd + encode(right)
+                    selStart = curSpan+selStart
                 else
-                    h = highlight.line l, [[range[0], selStart], [range[1], selEnd+curSpan]]
-                    # h = encode(left) + selStart + encode(mid) + selEnd + curSpan + encode(right)
-            else
-                h = highlight.line l, [[range[0], selStart], [range[1], selEnd]]
-                # h = encode(left) + selStart + encode(mid) + selEnd + encode(right)
+                    selEnd = selEnd+curSpan
+                
+            h = highlight.line l, [[range[0], selStart], [range[1], selEnd]]
                 
         else if i == cursor[1]
             
@@ -88,10 +88,7 @@ class html
             
         else
             h = highlight.line l
-            
-        if h.length == 0
-            h = "&nbsp;"
-            
+                        
         "<div id=\"line-#{index}\" class=\"line\">" + h + "</div>"
 
 module.exports = html

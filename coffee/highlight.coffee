@@ -49,11 +49,12 @@ class highlight
     
     @line: (line, inserts=[]) =>
         rngs = matchr.ranges @matchrConfig, line
-        diss = matchr.dissect rngs        
+        diss = matchr.dissect rngs 
         for ins in inserts.reverse()
             if diss.length
                 for di in [diss.length-1..0]
                     d = diss[di]
+                    continue if not d.match?
                     if d.start+d.match.length > ins[0]
                         if d.start < ins[0]
                             ll = ins[0]-d.start
@@ -67,7 +68,7 @@ class highlight
                                 start: ins[0]
                                 insert: ins[1] 
                             break                           
-                        else if di == 0 or diss[di-1].start + diss[di-1].match.length <= ins[0]
+                        else if di == 0 or diss[di-1].match? and diss[di-1].start + diss[di-1].match.length <= ins[0]
                             diss.splice di, 0,
                                 start: ins[0]
                                 insert: ins[1]
@@ -81,7 +82,6 @@ class highlight
                 diss.push
                     start: ins[0]
                     insert: ins[1]
-        log 'diss', diss
         if diss.length
             for di in [diss.length-1..0]
                 d = diss[di]
