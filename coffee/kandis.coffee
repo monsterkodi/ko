@@ -86,7 +86,6 @@ splitAt prefs.get 'split', 100
 
 window.onresize = =>
     splitDrag.maxPos = pos sw(), sh()-minEnterHeight
-    # splitAt Math.max minScrollHeight, sh()-enterHeight
     ipc.send 'bounds'
               
 # 000   000  00000000  000   000

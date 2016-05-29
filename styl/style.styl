@@ -1,5 +1,5 @@
 
-editorFontSize        = 16px
+editorFontSize        = 20px
 selectionRadius       = round(editorFontSize / 3)
 selectionRadiusCursor = round(selectionRadius / 2)
 
@@ -25,8 +25,8 @@ editorPadding         = 10px
     background              #222
 
 ::-webkit-scrollbar-thumb
-    -webkit-border-radius   4px
-    border-radius           4px
+    // -webkit-border-radius   4px
+    // border-radius           4px
     background              #333
 
 .scroll:hover
@@ -38,7 +38,7 @@ editorPadding         = 10px
     top                 0
     bottom              0
     cursor              ns-resize
-    border-left         1px solid #000
+        
     &.left
         left            0
         width           scrollbarWidth
@@ -47,6 +47,8 @@ editorPadding         = 10px
         width           scrollbarWidth
 
 .scroll
+    // background          rgba(255,255,255,0.2)
+    // margin 1px
     background          #333
     position            absolute
     height              20%
@@ -123,6 +125,9 @@ body
     width           100%
     position        absolute
     bottom          0px
+    background      #000
+    // overflow-x      auto
+    // overflow-y      hidden
         
 .input
 #input
@@ -146,15 +151,22 @@ body
     overflow-x      auto
     overflow-y      hidden
     cursor          default
-    background      #000
+    // background      #000
     outline-width   0    
     &:focus #cursor 
         background  yellow
     &:focus > .selection
-        background  #666  // #rgba(255, 255, 255, 0.25)
+        background  #666
 
 .line
     pointer-events  none
+    //border          1px solid olive
+    position        relative
+    display         table
+    white-space     nowrap
+    // line-height     28px
+    & span
+        display     inline-block
 
 /*
 *   0000000  000   000  00000000    0000000   0000000   00000000 
@@ -169,7 +181,6 @@ body
     margin-right    -1px
     margin-left     -1px
     vertical-align  text-bottom
-    display         inline-block
     background      rgba(255, 255, 255, 0.2) // not focus
 
 /*

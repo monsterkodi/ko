@@ -87,13 +87,17 @@ class HtmlEditor extends Editor
     #    000     000        000 000      000   
     #    000     00000000  000   000     000   
 
-    setText: (text) ->
-        @lines = text.split '\n'
-        @displayLines 0, @numVisibleLines()-1
+    setText: (text) -> @setLines text.split /\n/
+        
+    setLines: (lines) ->
+        log 'setLines', lines.length
+        @lines = lines
+        @displayLines 0, @numViewLines()
 
     displayLines: (top, bot) ->
         @topIndex = top
         @botIndex = bot
+        # log "displayLines", @topIndex, @botIndex
         @updateScrollbar()
         @update()
 
@@ -106,10 +110,11 @@ class HtmlEditor extends Editor
     done: => 
         log 'done', @do.changedLineIndices
         # setTimeout @update, 0 if @update?
-        @update()
+        @scrollBy 0
 
     linesChanged: (lineIndices) ->
-        log 'lineIndices', lineIndices
+        log 'linesChanged', lineIndices
+        # @updateScrollbar()
 
     update: =>
         while @elem.children.length < @botIndex-@topIndex+2
@@ -163,17 +168,19 @@ class HtmlEditor extends Editor
     ###
         
     updateScrollbar: ->
-        vh           = Math.min @linesHeight, @viewHeight()
-        scrollTop    = parseInt (@scroll / @treeHeight) * vh
-        scrollTop    = Math.max 0, scrollTop
-        scrollHeight = parseInt (@linesHeight / @treeHeight) * vh
-        scrollHeight = Math.max scrollHeight, parseInt @lineHeight/4
-        scrollTop    = Math.min scrollTop, @viewHeight()-scrollHeight
-        
-        log "vh", vh, "scrollTop", scrollTop, "scrollHeight", scrollHeight
-        
-        @scrollRight.style.top    = "#{scrollTop}.px"
-        @scrollRight.style.height = "#{scrollHeight}.px"
+        if @treeHeight < @viewHeight()
+            @scrollRight.style.top    = "0"
+            @scrollRight.style.height = "0"
+        else
+            vh           = Math.min @linesHeight, @viewHeight()
+            scrollTop    = parseInt (@scroll / @treeHeight) * vh
+            scrollHeight = parseInt (@linesHeight / @treeHeight) * vh
+            scrollHeight = Math.max scrollHeight, parseInt @lineHeight/4
+            scrollTop    = Math.min scrollTop, @viewHeight()-scrollHeight
+            scrollTop    = Math.max 0, scrollTop
+                    
+            @scrollRight.style.top    = "#{scrollTop}.px"
+            @scrollRight.style.height = "#{scrollHeight}.px"
 
     resized: -> @scrollBy 0
                 
@@ -206,6 +213,8 @@ class HtmlEditor extends Editor
 
         if @topIndex != top or @botIndex != bot
             @displayLines top, bot
+        else
+            @updateScrollbar()
             
     #  0000000  000   000   0000000   00000000    0000000  000  0000000  00000000
     # 000       000   000  000   000  000   000  000       000     000   000     

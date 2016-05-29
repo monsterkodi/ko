@@ -114,12 +114,13 @@ new\s+(\w+)                    class.callee
     value.number.int
 
 # strings
-(')((?:[^'\\]*|\\['\\bfnrt\/])*)(')     . string.marker.single . value.string . string.marker.single
-(")((?:[^"\#\\]*|\\["\\bfnrt\/])*)(")   . string.marker.double . value.string . string.marker.double
+(')(?:[^'\\]*)(')     . string.marker.single . value.string . string.marker.single
+(")(?:[^"\\]*)(")     . string.marker.single . value.string . string.marker.single
+# (")((?:[^"\#\\]*|\\["\\bfnrt\/])*)(")   . string.marker.double . value.string . string.marker.double
 
-(")([^"\#]*)(\#\{)   . string.marker.double . value.string . interpolation.marker
-(\})([^"\#]*)(")     . interpolation.marker . value.string . string.marker.double
-(\})([^"\#]*)(\#\{)  . interpolation.marker . value.string . interpolation.marker
+# (")([^"\#]*)(\#\{)   . string.marker.double . value.string . interpolation.marker
+# (\})([^"\#]*)(")     . interpolation.marker . value.string . string.marker.double
+# (\})([^"\#]*)(\#\{)  . interpolation.marker . value.string . interpolation.marker
     
 """                            string.marker.triple
 
