@@ -19,7 +19,31 @@ encode     = require './tools/encode'
 ipc    = electron.ipcRenderer
 remote = electron.remote
  
-editorText  = ""
+editorText  = """
+#00000000   00000000   00000000  00000000   0000000
+#000   000  000   000  000       000       000     
+#00000000   0000000    0000000   000000    0000000 
+#000        000   000  000       000            000
+#000        000   000  00000000  000       0000000 
+
+    split: 300
+
+# 0000000  00000000   000      000  000000000
+#000       000   000  000      000     000   
+#0000000   00000000   000      000     000   
+#     000  000        000      000     000   
+#0000000   000        0000000  000     000   
+
+enterHeight = 200
+minEnterHeight = 100
+minScrollHeight = 24
+splitAt = (y) ->
+    enterHeight = sh()-y
+    editor?.resized()
+    prefs.set 'split', y
+"""
+# for i in [0...100]
+#     editorText += "#{i}\n"
 
 #00000000   00000000   00000000  00000000   0000000
 #000   000  000   000  000       000       000     
@@ -44,9 +68,8 @@ splitAt = (y) ->
     $('split').style.top = "#{y}px"
     $('editor').style.top = "#{y+10}px"
     enterHeight = sh()-y
+    editor?.resized()
     prefs.set 'split', y
-
-splitAt prefs.get 'split', 100
 
 splitDrag = new drag
     target: 'split'
@@ -73,13 +96,14 @@ ipc.on 'execute-result', (event, arg) =>
 # 00000000  0000000    000     000      0000000   000   000
 
 editor = new HtmlEditor $('input'), 'input'
-editor.lines = editorText.split '\n'
-editor.update()
+editor.setText editorText
 editor.elem.focus()
 editor.elem.ondblclick = (event) ->
     range = editor.rangeForWordAtPos editor.posForEvent event
     editor.selectRange range
     editor.update()
+
+splitAt prefs.get 'split', 100
 
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000     

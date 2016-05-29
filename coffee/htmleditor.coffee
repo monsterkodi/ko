@@ -18,19 +18,146 @@ class HtmlEditor extends Editor
 
         @elem = elem
         @clss = className
-
+        @divs = []
+        
+        @topIndex = 0
+        @botIndex = 0
+        @scroll   = 0
+    
         @initCharSize()
+        @scrollChanged()
         
         @elem.onkeydown = @onKeyDown
         @elem.innerHTML = html.cursorSpan @charSize        
+        @elem.addEventListener 'wheel',   @onWheel
 
-    # 000  000   000  000  000000000
-    # 000  0000  000  000     000   
-    # 000  000 0 000  000     000   
-    # 000  000  0000  000     000   
-    # 000  000   000  000     000   
+    setText: (text) ->
+        @lines = text.split '\n'
+        @displayLines 0, @numVisibleLines()-1
 
-    initCharSize: () =>
+    displayLines: (top, bot) ->
+        @topIndex = top
+        @botIndex = bot
+        @update()
+
+    # 000   000  00000000   0000000     0000000   000000000  00000000
+    # 000   000  000   000  000   000  000   000     000     000     
+    # 000   000  00000000   000   000  000000000     000     0000000 
+    # 000   000  000        000   000  000   000     000     000     
+    #  0000000   000        0000000    000   000     000     00000000
+
+    # update: => @elem.innerHTML = html.render @lines, @cursor, @selectionRanges(), @charSize
+    update: =>
+        log "update", @topIndex, "...", @botIndex
+        @divs = []
+        i = @topIndex
+        while i <= @botIndex
+            @divs.push html.renderLine i, @lines, @cursor, @selectionRanges(), @charSize
+            i += 1
+        @elem.innerHTML = @divs.join '\n'
+
+    # 00000000    0000000    0000000
+    # 000   000  000   000  000     
+    # 00000000   000   000  0000000 
+    # 000        000   000       000
+    # 000         0000000   0000000 
+    
+    posForEvent: (event) ->
+        sl = @elem.scrollLeft
+        st = @elem.scrollTop
+        br = @elem.getBoundingClientRect()
+        lx = clamp 0, @elem.clientWidth,  event.clientX - br.left
+        ly = clamp 0, @elem.clientHeight, event.clientY - br.top
+        [parseInt(Math.floor((Math.max(0, sl + lx-10))/@charSize[0])),
+         parseInt(Math.floor((Math.max(0, st + ly-10))/@charSize[1]))]
+
+    # 000      000  000   000  00000000   0000000
+    # 000      000  0000  000  000       000     
+    # 000      000  000 0 000  0000000   0000000 
+    # 000      000  000  0000  000            000
+    # 0000000  000  000   000  00000000  0000000 
+    
+    viewHeight:      -> @elem.offsetHeight
+    numViewLines:    -> Math.ceil(@viewHeight() / @lineHeight)
+    numFullLines:    -> Math.floor(@viewHeight() / @lineHeight)
+    numVisibleLines: -> @lines.length
+
+    ###
+     0000000   0000000  00000000    0000000   000      000    
+    000       000       000   000  000   000  000      000    
+    0000000   000       0000000    000   000  000      000    
+         000  000       000   000  000   000  000      000    
+    0000000    0000000  000   000   0000000   0000000  0000000
+    ###
+        
+    # updateScroll: ->
+    #     vh           = Math.min @linesHeight, @viewHeight()
+    #     scrollTop    = parseInt (@scroll / @treeHeight) * vh
+    #     scrollTop    = Math.max 0, scrollTop
+    #     scrollHeight = parseInt (@linesHeight / @treeHeight) * vh
+    #     scrollHeight = Math.max scrollHeight, parseInt @lineHeight/4
+    #     scrollTop    = Math.min scrollTop, @numFullLines()*@lineHeight-scrollHeight-1
+    #     
+    #     @scrollRight.classList.toggle 'flashy', (scrollHeight < @lineHeight)
+    #     @scrollRight.style.top    = "#{scrollTop}.px"
+    #     @scrollRight.style.height = "#{scrollHeight}.px"
+
+    resized: -> @scrollBy 0
+                
+    scrollLines: (lineDelta) -> @scrollBy lineDelta * @lineHeight
+
+    scrollFactor: (event) ->
+        f  = 1 
+        f *= 1 + 9 * event.metaKey
+        f *= 1 + 99 * event.altKey        
+        f *= 1 + 999 * event.ctrlKey
+
+    onWheel: (event) => 
+        @scrollBy event.deltaY * @scrollFactor event
+    
+    scrollBy: (delta) -> 
+
+        numLines  = @numVisibleLines()
+        viewLines = @numViewLines()
+                
+        @treeHeight  = numLines * @lineHeight
+        @linesHeight = viewLines * @lineHeight
+        @scrollMax   = @treeHeight - @linesHeight + @lineHeight
+        
+        @scroll += delta
+        @scroll = Math.min @scroll, @scrollMax
+        @scroll = Math.max @scroll, 0
+        
+        # log 'treeHeight', @treeHeight, 'scrollMax', @scrollMax
+        # log 'delta', delta, "viewLines", viewLines, "numLines", numLines, "@scroll", @scroll, "@scrollMax", @scrollMax
+        
+        top = parseInt @scroll / @lineHeight
+        bot = Math.min(@topIndex + viewLines - 1, numLines - 1)
+
+        if @topIndex != top or @botIndex != bot
+            # log "scrollChanged!", top, @topIndex, bot, @botIndex
+            @displayLines  top, bot
+            
+    scrollChanged: ->
+        
+        numLines  = @numVisibleLines()
+        viewLines = @numViewLines()
+        
+        @treeHeight = numLines * @lineHeight
+        @linesHeight = viewLines * @lineHeight
+
+        @topIndex = parseInt @scroll / @lineHeight    
+        @botIndex = Math.min(@topIndex + viewLines - 1, numLines-1)
+        
+        # log "viewLines", viewLines, "@scroll", @scroll, "topIndex", @topIndex , "botIndex", @botIndex 
+        
+    #  0000000  000   000   0000000   00000000    0000000  000  0000000  00000000
+    # 000       000   000  000   000  000   000  000       000     000   000     
+    # 000       000000000  000000000  0000000    0000000   000    000    0000000 
+    # 000       000   000  000   000  000   000       000  000   000     000     
+    #  0000000  000   000  000   000  000   000  0000000   000  0000000  00000000
+
+    initCharSize: () ->
         o = document.createElement 'div'
         o.className = @clss
         o.innerHTML = 'XXXXXXXXXX'
@@ -39,30 +166,8 @@ class HtmlEditor extends Editor
           visibility: 'hidden'
         document.body.appendChild o
         @charSize = [o.clientWidth/o.innerHTML.length, o.clientHeight]
+        @lineHeight = @charSize[1]
         o.remove()
-
-    # 000   000  00000000   0000000     0000000   000000000  00000000
-    # 000   000  000   000  000   000  000   000     000     000     
-    # 000   000  00000000   000   000  000000000     000     0000000 
-    # 000   000  000        000   000  000   000     000     000     
-    #  0000000   000        0000000    000   000     000     00000000
-
-    update: => @elem.innerHTML = html.render @lines, @cursor, @selectionRanges(), @charSize
-
-    # 00000000    0000000    0000000
-    # 000   000  000   000  000     
-    # 00000000   000   000  0000000 
-    # 000        000   000       000
-    # 000         0000000   0000000 
-    
-    posForEvent: (event) =>
-        sl = @elem.scrollLeft
-        st = @elem.scrollTop
-        br = @elem.getBoundingClientRect()
-        lx = clamp 0, @elem.clientWidth,  event.clientX - br.left
-        ly = clamp 0, @elem.clientHeight, event.clientY - br.top
-        [parseInt(Math.floor((Math.max(0, sl + lx-10))/@charSize[0])),
-         parseInt(Math.floor((Math.max(0, st + ly-10))/@charSize[1]))]
             
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

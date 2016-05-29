@@ -11,7 +11,7 @@ log     = require './tools/log'
 
 class Editor extends Buffer
     
-    constructor: (elem, className) ->
+    constructor: () ->
         super
         
         @do        = new undo @done
@@ -27,20 +27,20 @@ class Editor extends Buffer
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
 
-    selectNone:         => @selection = @do.selection @selection, null
-    setSelection: (c,l) => @selection = @do.selection @selection, [c,l]
+    selectNone:         -> @selection = @do.selection @selection, null
+    setSelection: (c,l) -> @selection = @do.selection @selection, [c,l]
 
-    selectRange: (range) =>
+    selectRange: (range) ->
         @setSelection range[0][0], range[0][1]
         @setCursor    range[1][0], range[1][1]
 
     selectAll: => @selectRange [[0,0], @lastPos()]
     
-    startSelection: (active) =>
+    startSelection: (active) ->
         if active and not @selection?
             @selectRange [[Math.min(@cursor[0], @lines[@cursor[1]].length),@cursor[1]], @cursor]
 
-    endSelection: (active) =>
+    endSelection: (active) ->
         if @selection? and not active
             @selectNone()
         else
@@ -52,24 +52,24 @@ class Editor extends Buffer
     # 000 0 000  000   000     000     000     
     # 000   000   0000000       0      00000000
     
-    setCursorPos: (p) => @setCursor p[0], p[1]
-    setCursor: (c,l) => 
+    setCursorPos: (p) -> @setCursor p[0], p[1]
+    setCursor: (c,l) -> 
         l = Math.min l, @lines.length-1
         c = Math.min c, @lines[l].length        
         @do.cursor @cursor, [c,l]
 
-    moveCursorToPos: (pos)   => @setCursor pos[0], pos[1]
-    moveCursorToEndOfLine:   => @setCursor @lines[@cursor[1]].length, @cursor[1]
-    moveCursorToStartOfLine: => @setCursor 0, @cursor[1]
+    moveCursorToPos: (pos)   -> @setCursor pos[0], pos[1]
+    moveCursorToEndOfLine:   -> @setCursor @lines[@cursor[1]].length, @cursor[1]
+    moveCursorToStartOfLine: -> @setCursor 0, @cursor[1]
 
-    moveCursorToEndOfWord:   => 
+    moveCursorToEndOfWord:   -> 
         r = @rangeForWordAtPos(@cursor)[1]
         if @cursorAtEndOfLine()
             return if @cursorInLastLine()
             r = rangeForWordAtPos([0, @cursor[1]+1])[1]
         @setCursorPos r
         
-    moveCursorToStartOfWord: => 
+    moveCursorToStartOfWord: -> 
         r = @rangeForWordAtPos(@cursor)[0]
         if @cursorAtStartOfLine()
             return if @cursorInFirstLine()
@@ -78,19 +78,19 @@ class Editor extends Buffer
             r = @rangeForWordAtPos([@cursor[0]-1, @cursor[1]])[0]
         @setCursorPos r
         
-    moveCursorUp: =>
+    moveCursorUp: ->
         if @cursorInFirstLine()
             @moveCursorToStartOfLine()
         else
             @do.cursor @cursor, [@cursor[0], @cursor[1] - 1] # don't adjust x
 
-    moveCursorDown: =>
+    moveCursorDown: ->
         if @cursorInLastLine()
             @moveCursorToEndOfLine()
         else
             @do.cursor @cursor, [@cursor[0], @cursor[1] + 1] # don't adjust x
 
-    moveCursorRight: =>
+    moveCursorRight: ->
         if @cursorAtEndOfLine() 
             if not @cursorInLastLine()
                 @moveCursorDown()
@@ -98,7 +98,7 @@ class Editor extends Buffer
         else
             @setCursor @cursor[0] + 1, @cursor[1]
     
-    moveCursorLeft: =>
+    moveCursorLeft: ->
         @setCursor @cursor[0], @cursor[1]
         if @cursorAtStartOfLine()
             if not @cursorInFirstLine()
@@ -107,7 +107,7 @@ class Editor extends Buffer
         else
             @setCursor @cursor[0] - 1, @cursor[1]
     
-    moveCursor: (direction) =>
+    moveCursor: (direction) ->
         switch direction
             when 'left'  then @moveCursorLeft()
             when 'right' then @moveCursorRight()
@@ -120,9 +120,9 @@ class Editor extends Buffer
     # 000  000  0000  000   000  000       000  0000     000   
     # 000  000   000  0000000    00000000  000   000     000   
 
-    indentString: => '    '
+    indentString: -> '    '
     
-    indentLineAtIndex: (i) =>
+    indentLineAtIndex: (i) ->
         @do.start()
         indent = @indentString()
         @do.change @lines, i, indent + @lines[i]
@@ -132,7 +132,7 @@ class Editor extends Buffer
             @setSelection @selection[0] + indent.length, @selection[1]
         @do.end()
     
-    deIndentLineAtIndex: (i) =>
+    deIndentLineAtIndex: (i) ->
         @do.start()
         indent = @indentString()        
         if @lines[i].startsWith indent
@@ -143,7 +143,7 @@ class Editor extends Buffer
                 @setSelection Math.max 0, @selection[0] - indent.length, @selection[1]
         @do.end()
     
-    deIndent: => 
+    deIndent: -> 
         @do.start()
         if @selection?
             for i in @selectedLineIndices()
@@ -158,14 +158,14 @@ class Editor extends Buffer
     # 000  000  0000       000  000       000   000     000   
     # 000  000   000  0000000   00000000  000   000     000   
     
-    insertCharacter: (c) =>
+    insertCharacter: (c) ->
         @do.start()
         @deleteSelection()
         @do.change @lines, @cursor[1], @lines[@cursor[1]].splice @cursor[0], 0, c
         @setCursor @cursor[0] + 1, @cursor[1]
         @do.end()
         
-    insertTab: =>
+    insertTab: ->
         @do.start()
         if @selection?
             for i in @selectedLineIndices()
@@ -176,7 +176,7 @@ class Editor extends Buffer
                 @insertCharacter ' '
         @do.end()
         
-    insertNewline: =>
+    insertNewline: ->
         @do.start()
         @deleteSelection()
         if @cursorAtEndOfLine()
@@ -187,7 +187,7 @@ class Editor extends Buffer
         @moveCursorRight()
         @do.end()
         
-    insertText: (text) =>
+    insertText: (text) ->
         @do.start()
         @deleteSelection()
         for c in text
@@ -203,20 +203,20 @@ class Editor extends Buffer
     # 000   000  000       000      000          000     000     
     # 0000000    00000000  0000000  00000000     000     00000000
     
-    joinLine: =>
+    joinLine: ->
         if not @cursorInLastLine()
             @do.start()
             @do.change @lines, @cursor[1], @lines[@cursor[1]] + @lines[@cursor[1]+1]
             @do.delete @lines, @cursor[1]+1
             @do.end()
             
-    deleteLineAtIndex: (i) =>
+    deleteLineAtIndex: (i) ->
         @do.delete @lines, i
         
-    deleteCharacterRangeInLineAtIndex: (r, i) =>
+    deleteCharacterRangeInLineAtIndex: (r, i) ->
         @do.change @lines, i, @lines[i].splice r[0], r[1]-r[0]
             
-    deleteSelection: =>
+    deleteSelection: ->
         return if not @selection?
         lineRange = @selectedLineRange()
         return if not lineRange?
@@ -233,7 +233,7 @@ class Editor extends Buffer
         @selectNone()
         @do.end()
 
-    deleteForward: =>
+    deleteForward: ->
         if @selection?
             @deleteSelection()
             return
@@ -242,7 +242,7 @@ class Editor extends Buffer
         else
             @do.change @lines, @cursor[1], @lines[@cursor[1]].splice @cursor[0], 1
     
-    deleteBackward: =>
+    deleteBackward: ->
         if @selection?
             @deleteSelection()
         else
