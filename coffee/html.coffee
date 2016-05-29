@@ -94,6 +94,6 @@ class html
                         
         h = highlight.line l, insert
                         
-        "<div id=\"line-#{index}\" class=\"line\">" + h + "</div>"
+        # "<div id=\"line-#{index}\" class=\"line\">" + h + "</div>"
 
 module.exports = html

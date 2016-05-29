@@ -73,6 +73,12 @@ class HtmlEditor extends Editor
             
     onTripleClickDelay: => @doubleClicked = @tripleClicked = false
 
+    # 000000000  00000000  000   000  000000000
+    #    000     000        000 000      000   
+    #    000     0000000     00000       000   
+    #    000     000        000 000      000   
+    #    000     00000000  000   000     000   
+
     setText: (text) ->
         @lines = text.split '\n'
         @displayLines 0, @numVisibleLines()-1
@@ -90,15 +96,27 @@ class HtmlEditor extends Editor
     #  0000000   000        0000000    000   000     000     00000000
 
     update: =>
+        while @elem.children.length < @botIndex-@topIndex
+            div = document.createElement 'div'
+            div.className = 'line'
+            @elem.appendChild div
         @divs = []
+        c = 0
         i = @topIndex
         while i <= @botIndex
+            @elem.children[c].id = "line-#{i}"
             if i < @lines.length
-                @divs.push html.renderLine i, @lines, @cursor, @selectionRanges(), @charSize
+                # @divs.push html.renderLine i, @lines, @cursor, @selectionRanges(), @charSize
+                span = html.renderLine i, @lines, @cursor, @selectionRanges(), @charSize
+                @divs.push span
+                @elem.children[c].innerHTML = span
             else
-                @divs.push "<div id=\"line-#{i}\" class=\"line\"></div>"
+                # @divs.push "<div id=\"line-#{i}\" class=\"line\"></div>"
+                @divs.push ""
+                @elem.children[c].innerHTML = ""
+            c += 1
             i += 1
-        @elem.innerHTML = @divs.join '\n'
+        # @elem.innerHTML = @divs.join '\n'
 
     # 00000000    0000000    0000000
     # 000   000  000   000  000     
