@@ -21,6 +21,8 @@ ipc    = electron.ipcRenderer
 remote = electron.remote
  
 editorText  = fs.readFileSync "#{__dirname}/../coffee/kandis.coffee", encoding: 'UTF8'
+# editorText  = """
+# """
     
 #00000000   00000000   00000000  00000000   0000000
 #000   000  000   000  000       000       000     

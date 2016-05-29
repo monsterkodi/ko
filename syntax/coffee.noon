@@ -107,8 +107,9 @@ null|undefined                 keyword.null
     value.number.int
 
 # strings
-# (')((?:[^'\\]*|\\['\\bfnrt\/])*)(')     . string.marker.single . value.string . string.marker.single
-# (")((?:[^"\#\\]*|\\["\\bfnrt\/])*)(")   . string.marker.double . value.string . string.marker.double
+(')((?:[^'\\]*|\\['\\bfnrt\/])*)(')     . string.marker.single . value.string . string.marker.single
+(")((?:[^"\#\\]*|\\["\\bfnrt\/])*)(")   . string.marker.double . value.string . string.marker.double
+
 # (")((?:[^"\#\\]*|\\["\\bfnrt\/])*)(\#\{)   . string.marker.double . value.string . interpolation.marker
 # (\})((?:[^"\#\\]*|\\["\\bfnrt\/])*)(")     . interpolation.marker . value.string . string.marker.double
 # (\})((?:[^"\#\\]*|\\["\\bfnrt\/])*)(\#\{)  . interpolation.marker . value.string . interpolation.marker
@@ -118,8 +119,4 @@ null|undefined                 keyword.null
 
 |###|                          comment.marker
 (#+)([^\{].*|$)              . comment.marker . comment
-
-# salt header
-
-^[0\s]+$                       comment.header
 

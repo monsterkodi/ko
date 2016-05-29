@@ -52,29 +52,31 @@ class highlight
         diss = matchr.dissect rngs 
         for ins in inserts.reverse()
             if diss.length
-                for di in [diss.length-1..0]
-                    
+                di = diss.length-1
+                while di >= 0
                     d = diss[di]
-                    continue if not d.match? # jump over inserts
-                    
-                    if d.start+d.match.length > ins[0] # span end is behind insert start
-                        if d.start < ins[0] # insert overlaps with span
-                            ll = ins[0]-d.start
-                            lr = d.match.length - ll
-                            dr = Object.assign {}, d
-                            dr.start = ins[0]
-                            dr.match = d.match.substr ll 
-                            d.match = d.match.substr 0, ll
-                            diss.splice di+1, 0, dr                                
+                    if d.match? # jump over inserts
+                        
+                        if d.start+d.match.length > ins[0] # span end is behind insert start
+                            if d.start < ins[0] # insert overlaps with span
+                                ll = ins[0]-d.start
+                                lr = d.match.length - ll
+                                dr = Object.assign {}, d
+                                dr.start = ins[0]
+                                dr.match = d.match.substr ll 
+                                d.match = d.match.substr 0, ll
+                                diss.splice di+1, 0, dr                                
+                                diss.splice di+1, 0,
+                                    start: ins[0]
+                                    insert: ins[1] 
+                                break   
+                        else # insert is behind span
                             diss.splice di+1, 0,
                                 start: ins[0]
-                                insert: ins[1] 
-                            break                           
-                    else # insert is behind span
-                        diss.splice di+1, 0,
-                            start: ins[0]
-                            insert: ins[1]
-                        break
+                                insert: ins[1]
+                            break
+                    di -= 1
+
                 if di < 0 # insert before all spans
                     diss.splice 0, 0,
                         start: ins[0]
@@ -83,6 +85,7 @@ class highlight
                 diss.push
                     start: ins[0]
                     insert: ins[1]
+
         if diss.length
             for di in [diss.length-1..0]
                 d = diss[di]
@@ -91,6 +94,7 @@ class highlight
                 else
                     clrzd = @colorize d.match, d.stack.reverse()
                     line = line.slice(0, d.start) + clrzd + line.slice(d.start+d.match.length)
+
         enspce line
                 
 highlight.init()

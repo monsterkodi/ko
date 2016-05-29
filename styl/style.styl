@@ -1,7 +1,7 @@
 
-editorFontSize        = 14px
-selectionRadius       = editorFontSize/3
-selectionRadiusCursor = selectionRadius/2
+editorFontSize        = 16px
+selectionRadius       = round(editorFontSize / 3)
+selectionRadiusCursor = round(selectionRadius / 2)
 
 scrollFontSize        = 24px
 
@@ -234,10 +234,10 @@ body
 .selection
     pointer-events  none
     background      rgba(255, 255, 255, 0.1) // no focus
-    padding-right   6px
-    margin-right    -6px
-    padding-left    6px
-    margin-left     -6px
+    padding-right   selectionRadiusCursor
+    margin-right    - selectionRadiusCursor
+    padding-left    selectionRadiusCursor
+    margin-left     - selectionRadiusCursor
     &.tl
         border-top-left-radius selectionRadius
         &.cursor

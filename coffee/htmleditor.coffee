@@ -78,7 +78,6 @@ class HtmlEditor extends Editor
         @divs = []
         i = @topIndex
         while i <= @botIndex
-            # log 'render line', i, @lines.length, @topIndex, @botIndex
             if i < @lines.length
                 @divs.push html.renderLine i, @lines, @cursor, @selectionRanges(), @charSize
             else

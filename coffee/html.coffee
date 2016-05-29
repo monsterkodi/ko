@@ -12,6 +12,12 @@ class html
     
     @cursorSpan: (charSize) => "<span id=\"cursor\" style=\"height: #{charSize[1]}px\"></span>"
     
+    # 00000000   00000000  000   000  0000000    00000000  00000000         000      000  000   000  00000000
+    # 000   000  000       0000  000  000   000  000       000   000        000      000  0000  000  000     
+    # 0000000    0000000   000 0 000  000   000  0000000   0000000          000      000  000 0 000  0000000 
+    # 000   000  000       000  0000  000   000  000       000   000        000      000  000  0000  000     
+    # 000   000  00000000  000   000  0000000    00000000  000   000        0000000  000  000   000  00000000
+    
     @renderLine: (index, lines, cursor, selectionRanges, charSize) =>
         
         i = index
@@ -31,9 +37,6 @@ class html
         if selRange and selRange[0] <= i <= selRange[1]
             
             range  = selectedCharacters i                
-            left   = l.substr  0, range[0]
-            mid    = l.substr  range[0], range[1]-range[0] 
-            right  = l.substr  range[1]
             
             # 0000000     0000000   00000000   0000000    00000000  00000000 
             # 000   000  000   000  000   000  000   000  000       000   000
@@ -71,7 +74,9 @@ class html
             # 0000000   00000000  0000000  00000000   0000000     000   
             
             selStart = "<span class=\"selection#{border}\">"
-            selEnd   = "</span>"
+            selEnd   = '</span>'
+            # if range[0] == range[1] == 0 == l.length
+            #     selEnd = '&nbsp;' + selEnd
             if i == cursor[1]
                 if cursor[0] == range[0]
                     selStart = @cursorSpan(charSize)+selStart
