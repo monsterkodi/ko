@@ -37,8 +37,12 @@ module.exports =
         v = Math.min(v, r2) if r2?
         v
         
-    $: (id) -> document.getElementById id
-
+    $: (idOrClass,e=document) -> 
+        if idOrClass.startsWith '.'
+            e.getElementsByClassName(idOrClass.substr(1).split('.').join " ")[0]
+        else
+            e.getElementById idOrClass
+    
 if not String.prototype.splice
     String.prototype.splice = (start, delCount, newSubStr='') ->
         @slice(0, start) + newSubStr + @slice(start + Math.abs(delCount))

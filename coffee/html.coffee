@@ -66,6 +66,9 @@ class html
             curX = Math.min cursor[0], l.length
             if ((range[0] == curX) or (range[1] == curX)) and i == cursor[1]
                 border += " cursor" # smaller border radius around cursor
+                
+            if range[0] == 0
+                border += " start" # wider offset at start of line
                     
             #  0000000  00000000  000      00000000   0000000  000000000
             # 000       000       000      000       000          000   
