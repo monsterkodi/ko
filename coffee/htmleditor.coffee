@@ -46,9 +46,8 @@ class HtmlEditor extends Editor
     # 000   000  000        000   000  000   000     000     000     
     #  0000000   000        0000000    000   000     000     00000000
 
-    # update: => @elem.innerHTML = html.render @lines, @cursor, @selectionRanges(), @charSize
     update: =>
-        log "update", @topIndex, "...", @botIndex
+        # log "update", @topIndex, "...", @botIndex
         @divs = []
         i = @topIndex
         while i <= @botIndex
@@ -135,8 +134,7 @@ class HtmlEditor extends Editor
         bot = Math.min(@topIndex + viewLines - 1, numLines - 1)
 
         if @topIndex != top or @botIndex != bot
-            # log "scrollChanged!", top, @topIndex, bot, @botIndex
-            @displayLines  top, bot
+            @displayLines top, bot
             
     scrollChanged: ->
         
@@ -234,7 +232,6 @@ class HtmlEditor extends Editor
                     else
                         ansiKeycode = require 'ansi-keycode'
                         if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
-                        # if mod == 'shift' and combo != 'shift' or combo.length == 1
                             @insertCharacter ansiKeycode event
                         else
                             log "ignoring", combo

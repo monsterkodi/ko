@@ -20,27 +20,8 @@ ipc    = electron.ipcRenderer
 remote = electron.remote
  
 editorText  = """
-#00000000   00000000   00000000  00000000   0000000
-#000   000  000   000  000       000       000     
-#00000000   0000000    0000000   000000    0000000 
-#000        000   000  000       000            000
-#000        000   000  00000000  000       0000000 
 
-    split: 300
-
-# 0000000  00000000   000      000  000000000
-#000       000   000  000      000     000   
-#0000000   00000000   000      000     000   
-#     000  000        000      000     000   
-#0000000   000        0000000  000     000   
-
-enterHeight = 200
-minEnterHeight = 100
-minScrollHeight = 24
-splitAt = (y) ->
-    enterHeight = sh()-y
-    editor?.resized()
-    prefs.set 'split', y
+true   
 """
 # for i in [0...100]
 #     editorText += "#{i}\n"

@@ -47,16 +47,50 @@ class highlight
     # 000      000  000  0000  000     
     # 0000000  000  000   000  00000000
     
-    @line: (chunk) =>
-        rngs = matchr.ranges @matchrConfig, chunk
-        diss = matchr.dissect rngs
-        
+    @line: (line, inserts=[]) =>
+        rngs = matchr.ranges @matchrConfig, line
+        diss = matchr.dissect rngs        
+        for ins in inserts.reverse()
+            if diss.length
+                for di in [diss.length-1..0]
+                    d = diss[di]
+                    if d.start+d.match.length > ins[0]
+                        if d.start < ins[0]
+                            ll = ins[0]-d.start
+                            lr = d.match.length - ll
+                            dr = Object.assign {}, d
+                            dr.start = ins[0]
+                            dr.match = d.match.substr ll 
+                            d.match = d.match.substr 0, ll
+                            diss.splice di+1, 0, dr                                
+                            diss.splice di+1, 0,
+                                start: ins[0]
+                                insert: ins[1] 
+                            break                           
+                        else if di == 0 or diss[di-1].start + diss[di-1].match.length <= ins[0]
+                            diss.splice di, 0,
+                                start: ins[0]
+                                insert: ins[1]
+                            break
+                    else 
+                        diss.splice di+1, 0,
+                            start: ins[0]
+                            insert: ins[1]
+                        break
+            else
+                diss.push
+                    start: ins[0]
+                    insert: ins[1]
+        log 'diss', diss
         if diss.length
             for di in [diss.length-1..0]
                 d = diss[di]
-                clrzd = @colorize d.match, d.stack.reverse()
-                chunk = chunk.slice(0, d.start) + clrzd + chunk.slice(d.start+d.match.length)
-        enspce chunk
+                if d.insert?
+                    line = line.slice(0, d.start) + d.insert + line.slice(d.start)
+                else
+                    clrzd = @colorize d.match, d.stack.reverse()
+                    line = line.slice(0, d.start) + clrzd + line.slice(d.start+d.match.length)
+        enspce line
                 
 highlight.init()
 

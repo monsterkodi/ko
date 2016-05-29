@@ -81,12 +81,10 @@ class html
                 
         else if i == cursor[1]
             
-            left  = l.substr  0, cursor[0]
-            right = l.substr  cursor[0]
-            h  = encode(left) + curSpan + encode(right)
+            h = highlight.line l, [[cursor[0], curSpan]]
             
         else
-            h = highlight.line l, cursor, selectionRanges
+            h = highlight.line l
             
         if h.length == 0
             h = "&nbsp;"
