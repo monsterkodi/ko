@@ -87,7 +87,7 @@ class highlight
                 diss.push
                     start: ins[0]
                     insert: ins[1]
-        log "diss", diss
+        # log "diss", diss
         if diss.length
             for di in [diss.length-1..0]
                 d = diss[di]

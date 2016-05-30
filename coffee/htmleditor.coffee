@@ -37,6 +37,11 @@ class HtmlEditor extends Editor
         @elem.onkeydown = @onKeyDown
         @elem.addEventListener 'wheel',   @onWheel
 
+        while @elem.children.length < 100
+            div = document.createElement 'div'
+            div.className = 'line'
+            @elem.appendChild div
+
         @scrollBy 0
 
         # 00     00   0000000   000   000   0000000  00000000
@@ -96,14 +101,13 @@ class HtmlEditor extends Editor
     setText: (text) -> @setLines text.split /\n/
         
     setLines: (lines) ->
-        # log 'setLines', lines.length
         @lines = lines
-        @displayLines 0, @numViewLines()
+        @displayLines 0
 
-    displayLines: (top, bot) ->
-        # log 'displayLines', top, bot
+    displayLines: (top) ->
+        log 'displayLines', top, top+@numViewLines()
         @topIndex = top
-        @botIndex = bot
+        @botIndex = top+@numViewLines()
         @updateScrollbar()
         @update()
 
@@ -120,8 +124,25 @@ class HtmlEditor extends Editor
         @editorHeight = @numViewLines() * @lineHeight
         @scrollMax   = @bufferHeight - @editorHeight + @lineHeight
     
+    deltaToEnsureCursorIsVisible: ->
+        delta = 0
+        cl = @cursor[1]
+        if cl < @topIndex + 2
+            newTop = Math.max 0, cl - 2
+            delta = newTop - @topIndex
+        else if cl > @botIndex - 2
+            newBot = Math.min @lines.length+1, cl + 4
+            delta = newBot - @botIndex
+        return delta
+    
     linesChanged: (lineIndices) ->
         # log 'linesChanged', lineIndices
+        
+        if delta = @deltaToEnsureCursorIsVisible() 
+            # log "delta", delta, delta * @lineHeight
+            @scrollBy delta * @lineHeight #todo: slow down when using mouse
+            return
+        
         indices = []
         for change in lineIndices
             continue if change[0] > @botIndex
@@ -135,7 +156,7 @@ class HtmlEditor extends Editor
                     
         indices.sort (a,b) -> a - b
         indices = _.sortedUniq indices
-        # log 'changed:', indices.join ','
+        # log 'cl:', @cursor[1], 't:', @topIndex, 'b:', @botIndex, 'changed:', indices.join ','
         for i in indices
             @updateLine i
             
@@ -152,10 +173,6 @@ class HtmlEditor extends Editor
 
     update: =>
         # log 'update'
-        while @elem.children.length < @botIndex-@topIndex+2
-            div = document.createElement 'div'
-            div.className = 'line'
-            @elem.appendChild div
         @divs = []
         for c in [0...@elem.children.length]
             i = c + @topIndex
@@ -189,7 +206,7 @@ class HtmlEditor extends Editor
     # 000      000  000  0000  000            000
     # 0000000  000  000   000  00000000  0000000 
     
-    viewHeight:      -> @elem.offsetHeight
+    viewHeight:      -> @elem.parentElement.offsetHeight
     numViewLines:    -> Math.ceil(@viewHeight() / @lineHeight)
     numFullLines:    -> Math.floor(@viewHeight() / @lineHeight)
     numVisibleLines: -> @lines.length
@@ -234,10 +251,9 @@ class HtmlEditor extends Editor
         @scroll = Math.max @scroll, 0
         
         top = parseInt @scroll / @lineHeight
-        bot = Math.min(@topIndex + @numViewLines() - 1, @numVisibleLines() - 1)
 
-        if @topIndex != top or @botIndex != bot
-            @displayLines top, bot
+        if @topIndex != top
+            @displayLines top
         else
             @updateScrollbar()
             
@@ -333,10 +349,14 @@ class HtmlEditor extends Editor
                     
                 event.preventDefault() # prevent view from scrolling
                 
-            when 'page up'      then @moveCursorByLines -@numFullLines()+1
-            when 'page down'    then @moveCursorByLines  @numFullLines()-1
             when 'home'         then @moveCursorToLineIndex 0
             when 'end'          then @moveCursorToLineIndex @lines.length-1
+            when 'page up'      
+                @moveCursorByLines -(@numFullLines()-3)
+                event.preventDefault() # prevent view from scrolling
+            when 'page down'    
+                @moveCursorByLines   @numFullLines()-3
+                event.preventDefault() # prevent view from scrolling
                 
             else
                 switch combo
@@ -359,7 +379,7 @@ class HtmlEditor extends Editor
                             
         @endSelection event.shiftKey # ... reset selection 
         
-        if scroll
-            $('cursor')?.scrollIntoViewIfNeeded()
+        # if scroll
+        #     $('cursor')?.scrollIntoViewIfNeeded()
 
 module.exports = HtmlEditor

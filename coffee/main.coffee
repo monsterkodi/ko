@@ -19,7 +19,7 @@ ipc           = electron.ipcMain
 win           = undefined
 tray          = undefined
 open          = true
-debug         = 1
+debug         = 0
 
 # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
 # 000        000 000   000       000       000   000     000     000     
