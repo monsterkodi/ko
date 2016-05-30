@@ -261,11 +261,15 @@ class HtmlEditor extends Editor
         @scroll = Math.max @scroll, 0
         
         top = parseInt @scroll / @lineHeight
+        
+        dff = @scroll - top * @lineHeight
 
         if @topIndex != top
             @displayLines top
         else
             @updateScrollbar()
+            
+        @elem.scrollTop = dff
             
     onWheel: (event) => 
         @scrollBy event.deltaY * @scrollFactor event
