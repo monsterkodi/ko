@@ -1,11 +1,11 @@
 
-editorFontSize        = 18px
+editorFontSize        = 14px
 selectionRadius       = round(editorFontSize / 3)
 selectionRadiusCursor = round(selectionRadius / 2)
 
 scrollFontSize        = 24px
 scrollbarWidth        = 60px
-editorPadding         = 10px
+editorPadding         = 10px 
 
 /*
 *   0000000   0000000  00000000    0000000   000      000      0000000     0000000   00000000    0000000
@@ -15,7 +15,7 @@ editorPadding         = 10px
 *  0000000    0000000  000   000   0000000   0000000  0000000  0000000    000   000  000   000  0000000 
 */
 
-.scroll
+.scroll 
 ::-webkit-scrollbar
     width                   8px
 ::-webkit-scrollbar    
@@ -132,7 +132,8 @@ body
     font-family     "Andale Mono", monospace
     white-space     nowrap
     
-#input    
+#input   
+    color           #ddd 
     border          1px solid #333
     border-bottom-left-radius    8px
     border-bottom-right-radius   8px
@@ -234,6 +235,8 @@ body
         width            1px
         margin-right    -1px
 
+// @import 'syntax'
+
 /*
 *   0000000  000   000  000   000  000000000   0000000   000   000
 *  000        000 000   0000  000     000     000   000   000 000 
@@ -251,7 +254,7 @@ body
         color       #44f
     
 .number
-    color           #88f
+    color           #66f
     &.float   
         color       #f88
 
@@ -264,16 +267,13 @@ body
 .owner
 .callee
 .class
-    color           #ff0    
+    color           #ff0
+        
+.property
+    opacity         0.8
     
-.syntax.cond
-.keyword
-    color           #aaf
-    &.null    
-        color       #a00
-
 .variable
-    color           #0aa
+    color           #a0a
     
 .range
     color           #80f
@@ -312,6 +312,18 @@ body
         &.punctuation
             opacity  0.5
 
+.class
+    &.variable
+        color       #2ae
+    &.function
+        color       #fc8
+
+.syntax.cond
+.keyword
+    color           #aaf !important
+    &.null    
+        color       #a00 !important
+
 .interpolation.marker
         color       #f83
 
@@ -322,7 +334,9 @@ body
     opacity         0.7
 
 .string
-    color           #f83
+    color           #0a0 //#f83
+    &.double
+        color       #0f0
         
 .comment
     color           #444 !important
@@ -336,6 +350,3 @@ body
         color       #666
     &.syntax
         opacity     0.5
-
-        
-        

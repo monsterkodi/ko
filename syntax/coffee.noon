@@ -5,7 +5,7 @@
 #  000       000   000  000       000       000       000     
 #   0000000   0000000   000       000       00000000  00000000
 
-[\<\>\+\-\=\/]                 syntax.math
+[\<\>\+\-\=\/\*]               syntax.math
 
 @                              syntax.this
 \$                             syntax.this
@@ -17,15 +17,6 @@
 # braces
 
 [\(\)\{\}\[\]]                 syntax.bracket
-
-# keywords
-
-(^|\s)(if|else|then|for|of|in|while|do|unless|not|or|and|try|catch|return|break|continue|new|switch|when)(\s|$)  
-    none 
-    keyword 
-    none
-    
-__dirname|__filename  keyword
 
 # require
 
@@ -59,29 +50,32 @@ false                          value.bool.false
 
 null|undefined                 keyword.null
 
-# functions 
-
-(\w+)\s*[=]\s*\([^\)]*\)\s*[-=]>  . function
-(\w+)\s*[=]\s*[-=]>               . function
-(\w+)\s*[:]\s*\([^\)]*\)\s*[-=]>  . method
-(\w+)\s*[:]\s*[-=]>               . method
-(\()([^\(\)]*)(\)\s*)[-=]>        . function.bracket . function.variable.argument . function.bracket
-(\w+)\s*\([^\)]*\)                . function.call
-(\w+)\s*\.\s*(\w+)\s*\([^\)]*\)   . class.callee . function.call
-(\w+)\s*\.\s*(\w+)\s+\w+          . class.callee . function.call
-
 # class members
 
-(@\w+)\s*\=                    class.variable
+(@\w+)(?=\s*[\=\,\+\-\.\<\>\*\/\]\[\)]|\s*$)    class.variable
+
+# .property
+
+(\s*\w+)\.                     owner
+\.(\s*\w+)                     property
+
+# functions 
+
+(\w+)\s*[=]\s*\([^\)]*\)\s*[-=]>    . function
+(\w+)\s*[=]\s*[-=]>                 . function
+(\w+)\s*[:]\s*\([^\)]*\)\s*[-=]>    . method
+(\w+)\s*[:]\s*[-=]>                 . method
+(\()([^\(\)]*)(\)\s*)[-=]>          . function.bracket . function.variable.argument . function.bracket
+
+(\w+)(?=\(|\s+[@\w\d\"\'\(\[\{])       function.call
+(@\w+)(?=\s+[\w\d@\"\'\(\[\{]|\()   . class.function.call
+(@?\w+)\s*\.\s*(\w+)\s*\([^\)]*\)   . class.callee . function.call
+(@?\w+)\s*\.\s*(\w+)\s+\w+          . class.callee . function.call
 
 # class construction
 
 new\s+(\w+)                    class.callee
-(\w+)\s*\=\s*new\s             class.object
-
-# .property
-
-(\w+)\s*(\.\s*\w+)           . owner . property
+(@?\w+)\s*\=\s*new\s           class.object
 
 # range
 
@@ -104,6 +98,15 @@ new\s+(\w+)                    class.callee
 
 (_)\.(\w+)                   . lodash.marker . lodash.function
 
+# keywords
+
+(^|\s)(if|else|then|for|of|in|while|do|unless|not|or|and|try|catch|return|break|continue|new|switch|when|super)(\s|$)  
+    none 
+    keyword 
+    none
+    
+__dirname|__filename  keyword
+
 #number
 
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
@@ -115,8 +118,8 @@ new\s+(\w+)                    class.callee
     value.number.int
 
 # strings
-(')([^'\\]*)(')              . string.marker.single . value.string . string.marker.single
-(")([^"\\]*)(")              . string.marker.single . value.string . string.marker.single
+(')([^'\\]*)(')              . string.marker.single . value.string.single . string.marker.single
+(")([^"\\]*)(")              . string.marker.double . value.string.double . string.marker.double
 # (")((?:[^"\#\\]*|\\["\\bfnrt\/])*)(")   . string.marker.double . value.string . string.marker.double
 
 # (")([^"\#]*)(\#\{)   . string.marker.double . value.string . interpolation.marker

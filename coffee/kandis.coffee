@@ -21,7 +21,29 @@ ipc    = electron.ipcRenderer
 remote = electron.remote
  
 # editorText = fs.readFileSync "#{__dirname}/../coffee/kandis.coffee", encoding: 'UTF8'
-editorText = fs.readFileSync "#{__dirname}/../coffee/main.coffee", encoding: 'UTF8'
+# editorText = fs.readFileSync "#{__dirname}/../coffee/htmleditor.coffee", encoding: 'UTF8'
+
+editorText = """
+lx = clamp 0, @elem.clientWidth,  event.clientX - br.left
+ly = clamp 0, @elem.clientHeight, event.clientY - br.top
+[parseInt(Math.floor((Math.max(0, sl + lx-10))/@charSize[0])),
+ parseInt(Math.floor((Math.max(0, st + ly))/@charSize[1])) + @topIndex]
+
+updateScrollbar: ->
+    if @bufferHeight < @viewHeight()
+        @scrollRight.style.top    = "0"
+        @scrollRight.style.height = "0"
+    else
+        vh           = Math.min @editorHeight, @viewHeight()
+        scrollTop    = parseInt (@scroll / @bufferHeight) * vh
+        scrollHeight = parseInt (@editorHeight / @bufferHeight) * vh
+        scrollHeight = Math.max scrollHeight, parseInt @lineHeight/4
+        scrollTop    = Math.min scrollTop, @viewHeight()-scrollHeight
+        scrollTop    = Math.max 0, scrollTop
+                
+        @scrollRight.style.top    = "\#{scrollTop}.px"
+        @scrollRight.style.height = "\#{scrollHeight}.px"
+"""
         
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000     
