@@ -18,23 +18,31 @@ clipboard     = electron.clipboard
 ipc           = electron.ipcMain
 win           = undefined
 tray          = undefined
-debug         = 0
 open          = true
+debug         = 1
 
-#00000000  000   000  00000000   0000000  000   000  000000000  00000000
-#000        000 000   000       000       000   000     000     000     
-#0000000     00000    0000000   000       000   000     000     0000000 
-#000        000 000   000       000       000   000     000     000     
-#00000000  000   000  00000000   0000000   0000000      000     00000000
+# 00000000  000   000  00000000   0000000  000   000  000000000  00000000
+# 000        000 000   000       000       000   000     000     000     
+# 0000000     00000    0000000   000       000   000     000     0000000 
+# 000        000 000   000       000       000   000     000     000     
+# 00000000  000   000  00000000   0000000   0000000      000     00000000
 
-ipc.on 'execute', (event, arg) => event.sender.send 'execute-result', execute.execute arg
-ipc.on 'bounds',  (event, arg) => saveBounds()
+ipc.on 'execute',   (event, arg) => event.sender.send 'execute-result', execute.execute arg
+ipc.on 'bounds',         (event) => saveBounds()
+ipc.on 'toggleDevTools', (event) => win?.webContents.toggleDevTools()
+ipc.on 'reloadWindow',   (event) => 
+    dev = win?.webContents.isDevToolsOpened()
+    if dev
+        win.webContents.closeDevTools()
+        setTimeout win.webContents.reloadIgnoringCache, 100
+    else
+        win?.webContents.reloadIgnoringCache()
 
-#000   000  000  000   000  0000000     0000000   000   000
-#000 0 000  000  0000  000  000   000  000   000  000 0 000
-#000000000  000  000 0 000  000   000  000   000  000000000
-#000   000  000  000  0000  000   000  000   000  000   000
-#00     00  000  000   000  0000000     0000000   00     00
+# 000   000  000  000   000  0000000     0000000   000   000
+# 000 0 000  000  0000  000  000   000  000   000  000 0 000
+# 000000000  000  000 0 000  000   000  000   000  000000000
+# 000   000  000  000  0000  000   000  000   000  000   000
+# 00     00  000  000   000  0000000     0000000   00     00
 
 toggleWindow = ->
     if win?.isVisible()
@@ -79,11 +87,11 @@ saveBounds = ->
     if win?
         prefs.set 'bounds', win.getBounds()
         
-#00000000   00000000   0000000   0000000    000   000
-#000   000  000       000   000  000   000   000 000 
-#0000000    0000000   000000000  000   000    00000  
-#000   000  000       000   000  000   000     000   
-#000   000  00000000  000   000  0000000       000   
+# 00000000   00000000   0000000   0000000    000   000
+# 000   000  000       000   000  000   000   000 000 
+# 0000000    0000000   000000000  000   000    00000  
+# 000   000  000       000   000  000   000     000   
+# 000   000  00000000  000   000  0000000       000   
 
 app.on 'ready', -> 
     
@@ -114,7 +122,7 @@ app.on 'ready', ->
         shortcut: 'F2'
 
     electron.globalShortcut.register prefs.get('shortcut'), showWindow
-    electron.globalShortcut.register 'Command+Alt+I', () -> win?.webContents.openDevTools()
+    # electron.globalShortcut.register 'Command+Alt+I', () -> win?.webContents.openDevTools()
     
     execute.init()
         

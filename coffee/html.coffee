@@ -22,7 +22,7 @@ class html
         
         i = index
         l = lines[index]        
-        l = " " if l.length == 0
+        # l = " " if l.length == 0
         h = ""
         
         if selectionRanges.length
@@ -36,7 +36,7 @@ class html
                     
         if selRange and selRange[0] <= i <= selRange[1]
             
-            range  = selectedCharacters i                
+            range = selectedCharacters i                
             
             # 0000000     0000000   00000000   0000000    00000000  00000000 
             # 000   000  000   000  000   000  000   000  000       000   000
@@ -78,13 +78,13 @@ class html
             
             selStart = "<span class=\"selection#{border}\">"
             selEnd   = '</span>'
-            # if range[0] == range[1] == 0 == l.length
-            #     selEnd = '&nbsp;' + selEnd
             if i == cursor[1]
                 if cursor[0] == range[0]
-                    selStart = @cursorSpan(charSize)+selStart
+                    selStart = selStart+@cursorSpan(charSize)
                 else
                     selEnd = selEnd+@cursorSpan(charSize)
+            else if range[0] == range[1]
+                selStart += '<span class="empty"></span>'
                 
             insert = [[range[0], selStart], [range[1], selEnd]]
                 
@@ -94,6 +94,4 @@ class html
                         
         h = highlight.line l, insert
                         
-        # "<div id=\"line-#{index}\" class=\"line\">" + h + "</div>"
-
 module.exports = html

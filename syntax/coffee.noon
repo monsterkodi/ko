@@ -77,6 +77,7 @@ null|undefined                 keyword.null
 # class construction
 
 new\s+(\w+)                    class.callee
+(\w+)\s*\=\s*new\s             class.object
 
 # .property
 
@@ -114,8 +115,8 @@ new\s+(\w+)                    class.callee
     value.number.int
 
 # strings
-(')(?:[^'\\]*)(')     . string.marker.single . value.string . string.marker.single
-(")(?:[^"\\]*)(")     . string.marker.single . value.string . string.marker.single
+(')([^'\\]*)(')              . string.marker.single . value.string . string.marker.single
+(")([^"\\]*)(")              . string.marker.single . value.string . string.marker.single
 # (")((?:[^"\#\\]*|\\["\\bfnrt\/])*)(")   . string.marker.double . value.string . string.marker.double
 
 # (")([^"\#]*)(\#\{)   . string.marker.double . value.string . interpolation.marker

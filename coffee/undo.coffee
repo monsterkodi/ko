@@ -54,9 +54,9 @@ class undo
             obj.selection = null 
         
     redoCursor: (obj, action) =>
-        @changedLineIndices.push obj.cursor[1]
+        @addChangedLinesForCursor obj
         obj.cursor = [action.curAfter[0], action.curAfter[1]] if action.curAfter?
-        @changedLineIndices.push obj.cursor[1]
+        @addChangedLinesForCursor obj
 
     # 000   000  000   000  0000000     0000000 
     # 000   000  0000  000  000   000  000   000
@@ -98,9 +98,9 @@ class undo
             obj.selection = null 
         
     undoCursor: (obj, action) =>
-        @changedLineIndices.push obj.cursor[1]
+        @addChangedLinesForCursor obj
         obj.cursor = action.curBefore if action.curBefore?
-        @changedLineIndices.push obj.cursor[1]
+        @addChangedLinesForCursor obj
 
     # 000       0000000    0000000  000000000
     # 000      000   000  000          000   
@@ -118,39 +118,44 @@ class undo
                 lines:     []
         return @actions[@actions.length-1]
         
-    #  0000000  00000000  000    
-    # 000       000       000    
-    # 0000000   0000000   000    
-    #      000  000       000    
-    # 0000000   00000000  0000000
+    #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
+    # 000       000       000      000       000          000     000  000   000  0000  000
+    # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
+    #      000  000       000      000       000          000     000  000   000  000  0000
+    # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
     
     selection: (obj, pos) => 
         if (obj.selection?[0] != pos?[0]) or (obj.selection?[1] != pos?[1])
             @changedLineIndices = [] if not @changedLineIndices
             if pos?
-                @changedLineIndices.push [obj.selection[1], obj.selection[1]] if obj.selection?
                 @lastAction().selAfter = [pos[0], pos[1]]
                 obj.selection = [pos[0], pos[1]]
-                @changedLineIndices.push [pos[1], -2]
+                @changedLineIndices.push obj.selectedLineIndicesRange()
             else
-                @changedLineIndices.push [obj.selection[1], -2] if obj.selection?
+                @changedLineIndices.push obj.selectedLineIndicesRange()
                 obj.selection = null
                 @lastAction().selAfter = [null, null]
             @check()
         
-    #  0000000  000   000  00000000 
-    # 000       000   000  000   000
-    # 000       000   000  0000000  
-    # 000       000   000  000   000
-    #  0000000   0000000   000   000
+    #  0000000  000   000  00000000    0000000   0000000   00000000 
+    # 000       000   000  000   000  000       000   000  000   000
+    # 000       000   000  0000000    0000000   000   000  0000000  
+    # 000       000   000  000   000       000  000   000  000   000
+    #  0000000   0000000   000   000  0000000    0000000   000   000
+
+    addChangedLinesForCursor: (obj) -> 
+        @changedLineIndices = [] if not @changedLineIndices
+        if obj.selection?
+            @changedLineIndices.push obj.selectedLineIndicesRange()
+        else
+            @changedLineIndices.push [obj.cursor[1], obj.cursor[1]]
     
     cursor: (obj, pos) =>
         if (obj.cursor[0] != pos[0]) or (obj.cursor[1] != pos[1])
-            @changedLineIndices = [] if not @changedLineIndices
-            @changedLineIndices.push [obj.cursor[1], obj.cursor[1]]
+            @addChangedLinesForCursor obj
             @lastAction().curAfter = [pos[0], pos[1]]
             obj.cursor = [pos[0], pos[1]]
-            @changedLineIndices.push [obj.cursor[1], obj.cursor[1]]
+            @addChangedLinesForCursor obj
             @check()
     
     #  0000000  000000000   0000000   00000000   000000000
@@ -220,8 +225,9 @@ class undo
     check: =>
         @futures = []
         if @groupCount == 0
-            @groupDone()
-            @changedLineIndices = null
+            if @changedLineIndices?
+                @groupDone()
+                @changedLineIndices = null
             
     end: => 
         @groupCount -= 1

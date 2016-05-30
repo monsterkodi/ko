@@ -46,6 +46,7 @@ config = (patterns) -> ( [new RegExp(p), a] for p,a of patterns )
 ranges = (regexes, str) ->
     
     rgs = []
+    return rgs if not str?
     for r in [0...regexes.length]
         reg = regexes[r][0]
         arg = regexes[r][1]

@@ -1,5 +1,5 @@
 
-editorFontSize        = 20px
+editorFontSize        = 18px
 selectionRadius       = round(editorFontSize / 3)
 selectionRadiusCursor = round(selectionRadius / 2)
 
@@ -25,8 +25,6 @@ editorPadding         = 10px
     background              #222
 
 ::-webkit-scrollbar-thumb
-    // -webkit-border-radius   4px
-    // border-radius           4px
     background              #333
 
 .scroll:hover
@@ -37,7 +35,6 @@ editorPadding         = 10px
     position            absolute
     top                 0
     bottom              0
-    cursor              ns-resize
         
     &.left
         left            0
@@ -126,8 +123,6 @@ body
     position        absolute
     bottom          0px
     background      #000
-    // overflow-x      auto
-    // overflow-y      hidden
         
 .input
 #input
@@ -148,11 +143,10 @@ body
     right           0
     padding         editorPadding
     padding-top     0
+    outline-width   0    
     overflow-x      auto
     overflow-y      hidden
     cursor          default
-    // background      #000
-    outline-width   0    
     &:focus #cursor 
         background  yellow
     &:focus > .selection
@@ -160,13 +154,24 @@ body
 
 .line
     pointer-events  none
-    //border          1px solid olive
-    position        relative
-    display         table
     white-space     nowrap
-    // line-height     28px
+    display         list-item
     & span
         display     inline-block
+
+/*
+*  000000000  00000000  00000000   00     00  000  000   000   0000000   000    
+*     000     000       000   000  000   000  000  0000  000  000   000  000    
+*     000     0000000   0000000    000000000  000  000 0 000  000000000  000    
+*     000     000       000   000  000 0 000  000  000  0000  000   000  000    
+*     000     00000000  000   000  000   000  000  000   000  000   000  0000000
+*/
+
+.terminaljs 
+	background   black
+	color        white
+	font-family  Courier, monospace
+	display      inline-block
 
 /*
 *   0000000  000   000  00000000    0000000   0000000   00000000 
@@ -177,11 +182,57 @@ body
 */
     
 #cursor
-    width           2px
+    width            2px
     margin-right    -1px
     margin-left     -1px
     vertical-align  text-bottom
     background      rgba(255, 255, 255, 0.2) // not focus
+/*
+*   0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
+*  000       000       000      000       000          000     000  000   000  0000  000
+*  0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
+*       000  000       000      000       000          000     000  000   000  000  0000
+*  0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
+*/
+        
+.selection
+    pointer-events  none
+    background      rgba(255, 255, 255, 0.2) // no focus - needs to be transparent for cursor to show through
+    
+    padding-right   selectionRadiusCursor
+    margin-right    - selectionRadiusCursor
+    padding-left    selectionRadiusCursor
+    margin-left     - selectionRadiusCursor
+    &.start
+        padding-left    editorPadding
+        margin-left     - editorPadding
+    
+    &.tl
+        border-top-left-radius selectionRadius
+        &.cursor
+            border-top-left-radius selectionRadiusCursor
+        &.start
+            border-top-left-radius 0
+            
+    &.bl
+        border-bottom-left-radius selectionRadius
+        &.cursor
+            border-bottom-left-radius  selectionRadiusCursor
+        &.start
+            border-bottom-left-radius 0
+            
+    &.tr
+        border-top-right-radius selectionRadius
+        &.cursor
+            border-top-right-radius  selectionRadiusCursor
+    &.br
+        border-bottom-right-radius selectionRadius
+        &.cursor
+            border-bottom-right-radius selectionRadiusCursor
+        
+    & .empty // used in selections of empty lines
+        width            1px
+        margin-right    -1px
 
 /*
 *   0000000  000   000  000   000  000000000   0000000   000   000
@@ -286,47 +337,5 @@ body
     &.syntax
         opacity     0.5
 
-/*
-*   0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
-*  000       000       000      000       000          000     000  000   000  0000  000
-*  0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
-*       000  000       000      000       000          000     000  000   000  000  0000
-*  0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
-*/
-        
-.selection
-    pointer-events  none
-    background      rgba(255, 255, 255, 0.2) // no focus - needs to be transparent for cursor to show through
-    padding-right   selectionRadiusCursor
-    margin-right    - selectionRadiusCursor
-    padding-left    selectionRadiusCursor
-    margin-left     - selectionRadiusCursor
-    &.start
-        padding-left    editorPadding
-        margin-left     - editorPadding
-    
-    &.tl
-        border-top-left-radius selectionRadius
-        &.cursor
-            border-top-left-radius selectionRadiusCursor
-        &.start
-            border-top-left-radius 0
-            
-    &.bl
-        border-bottom-left-radius selectionRadius
-        &.cursor
-            border-bottom-left-radius  selectionRadiusCursor
-        &.start
-            border-bottom-left-radius 0
-            
-    &.tr
-        border-top-right-radius selectionRadius
-        &.cursor
-            border-top-right-radius  selectionRadiusCursor
-    &.br
-        border-bottom-right-radius selectionRadius
-        &.cursor
-            border-bottom-right-radius selectionRadiusCursor
-            
         
         

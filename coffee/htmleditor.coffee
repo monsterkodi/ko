@@ -10,7 +10,9 @@ log       = require './tools/log'
 drag      = require './tools/drag'
 keyinfo   = require './tools/keyinfo'
 {clamp,$} = require './tools/tools'
-clipboard = require('electron').clipboard
+electron  = require('electron')
+clipboard = electron.clipboard
+webframe  = electron.webFrame
 
 class HtmlEditor extends Editor
 
@@ -25,6 +27,10 @@ class HtmlEditor extends Editor
         @botIndex = 0
         @scroll   = 0
         @scrollRight = $('.scroll.right', @elem.parentElement)
+        @scrollDrag = new drag 
+            target: $('.scrollbar.right', @elem.parentElement)
+            onMove: @onScrollDrag 
+            cursor: 'ns-resize'
     
         @initCharSize()
         
@@ -56,11 +62,11 @@ class HtmlEditor extends Editor
                         @endSelection true
                         return
                     else
-                        @startSelection event.shiftKey
                         @doubleClicked = false
                         @tripleClicked = false
                         @tripleClickTimer = null
-
+                        
+                @startSelection event.shiftKey
                 @elem.focus()
                 @moveCursorToPos @posForEvent event
                 @endSelection event.shiftKey
@@ -90,14 +96,14 @@ class HtmlEditor extends Editor
     setText: (text) -> @setLines text.split /\n/
         
     setLines: (lines) ->
-        log 'setLines', lines.length
+        # log 'setLines', lines.length
         @lines = lines
         @displayLines 0, @numViewLines()
 
     displayLines: (top, bot) ->
+        # log 'displayLines', top, bot
         @topIndex = top
         @botIndex = bot
-        # log "displayLines", @topIndex, @botIndex
         @updateScrollbar()
         @update()
 
@@ -107,16 +113,45 @@ class HtmlEditor extends Editor
     # 000   000  000        000   000  000   000     000     000     
     #  0000000   000        0000000    000   000     000     00000000
 
-    done: => 
-        log 'done', @do.changedLineIndices
-        # setTimeout @update, 0 if @update?
-        @scrollBy 0
+    done: => @linesChanged @do.changedLineIndices
 
+    updateSizeValues: ->
+        @bufferHeight  = @numVisibleLines() * @lineHeight
+        @editorHeight = @numViewLines() * @lineHeight
+        @scrollMax   = @bufferHeight - @editorHeight + @lineHeight
+    
     linesChanged: (lineIndices) ->
-        log 'linesChanged', lineIndices
-        # @updateScrollbar()
+        # log 'linesChanged', lineIndices
+        indices = []
+        for change in lineIndices
+            continue if change[0] > @botIndex
+            top = Math.max @topIndex, change[0]
+            if change[1] < 0
+                bot = 1+Math.min @botIndex, @lines.length-1
+            else
+                bot = 1+Math.min @botIndex, change[1]
+            for i in [top...bot]
+                indices.push i
+                    
+        indices.sort (a,b) -> a - b
+        indices = _.sortedUniq indices
+        # log 'changed:', indices.join ','
+        for i in indices
+            @updateLine i
+            
+        @updateSizeValues()
+        @updateScrollbar()
+
+    updateLine: (lineIndex) ->
+        if @topIndex <= lineIndex <= @botIndex
+            relIndex = lineIndex - @topIndex
+            # log 'updateLine', lineIndex, 'rel', relIndex, @topIndex, @botIndex
+            span = html.renderLine lineIndex, @lines, @cursor, @selectionRanges(), @charSize
+            @divs[relIndex] = span
+            @elem.children[relIndex].innerHTML = span
 
     update: =>
+        # log 'update'
         while @elem.children.length < @botIndex-@topIndex+2
             div = document.createElement 'div'
             div.className = 'line'
@@ -168,13 +203,13 @@ class HtmlEditor extends Editor
     ###
         
     updateScrollbar: ->
-        if @treeHeight < @viewHeight()
+        if @bufferHeight < @viewHeight()
             @scrollRight.style.top    = "0"
             @scrollRight.style.height = "0"
         else
-            vh           = Math.min @linesHeight, @viewHeight()
-            scrollTop    = parseInt (@scroll / @treeHeight) * vh
-            scrollHeight = parseInt (@linesHeight / @treeHeight) * vh
+            vh           = Math.min @editorHeight, @viewHeight()
+            scrollTop    = parseInt (@scroll / @bufferHeight) * vh
+            scrollHeight = parseInt (@editorHeight / @bufferHeight) * vh
             scrollHeight = Math.max scrollHeight, parseInt @lineHeight/4
             scrollTop    = Math.min scrollTop, @viewHeight()-scrollHeight
             scrollTop    = Math.max 0, scrollTop
@@ -192,30 +227,29 @@ class HtmlEditor extends Editor
         f *= 1 + 3 * event.metaKey        
         f *= 1 + 7 * event.altKey
 
-    onWheel: (event) => 
-        @scrollBy event.deltaY * @scrollFactor event
-    
     scrollBy: (delta) -> 
-
-        numLines  = @numVisibleLines()
-        viewLines = @numViewLines()
                 
-        @treeHeight  = numLines * @lineHeight
-        @linesHeight = viewLines * @lineHeight
-        @scrollMax   = @treeHeight - @linesHeight + @lineHeight
+        @updateSizeValues()
         
         @scroll += delta
         @scroll = Math.min @scroll, @scrollMax
         @scroll = Math.max @scroll, 0
         
         top = parseInt @scroll / @lineHeight
-        bot = Math.min(@topIndex + viewLines - 1, numLines - 1)
+        bot = Math.min(@topIndex + @numViewLines() - 1, @numVisibleLines() - 1)
 
         if @topIndex != top or @botIndex != bot
             @displayLines top, bot
         else
             @updateScrollbar()
             
+    onWheel: (event) => 
+        @scrollBy event.deltaY * @scrollFactor event
+        
+    onScrollDrag: (drag) =>
+        delta = (drag.delta.y / @editorHeight) * @bufferHeight
+        @scrollBy delta
+    
     #  0000000  000   000   0000000   00000000    0000000  000  0000000  00000000
     # 000       000   000  000   000  000   000  000       000     000   000     
     # 000       000000000  000000000  0000000    0000000   000    000    0000000 
@@ -232,7 +266,24 @@ class HtmlEditor extends Editor
         document.body.appendChild o
         @charSize = [o.clientWidth/o.innerHTML.length, o.clientHeight]
         @lineHeight = @charSize[1]
+        # log '@charSize', @charSize, '@lineHeight', @lineHeight
         o.remove()
+    
+    # 0000000   0000000    0000000   00     00
+    #    000   000   000  000   000  000   000
+    #   000    000   000  000   000  000000000
+    #  000     000   000  000   000  000 0 000
+    # 0000000   0000000    0000000   000   000
+        
+    resetZoom: -> 
+        webframe.setZoomFactor 1
+        @initCharSize()
+        
+    changeZoom: (d) -> 
+        z = webframe.getZoomFactor() 
+        z *= 1+d/10
+        webframe.setZoomFactor z
+        @initCharSize()
             
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
@@ -244,11 +295,30 @@ class HtmlEditor extends Editor
         {mod, key, combo} = keyinfo.forEvent event
         # log "editor key:", key, "mod:", mod, "combo:", combo
         return if not combo
+        return if key == 'right click' # weird right command key
+        
+        switch combo
+            when 'command+k'              then return @selectAll() + @deleteSelection()
+            when 'command+d'              then return @selectNone()
+            when 'command+a'              then return @selectAll()
+            when 'command+c'              then return clipboard.writeText @selectedText()
+            when 'tab', 'command+]'       then return @insertTab() + event.preventDefault() 
+            when 'shift+tab', 'command+[' then return @deIndent()  + event.preventDefault()
+            when 'command+z'              then return @do.undo @
+            when 'command+shift+z'        then return @do.redo @
+            when 'command+='              then return @changeZoom +1
+            when 'command+-'              then return @changeZoom -1
+            when 'command+0'              then return @resetZoom()
+        
+        # commands that might change the selection ...
+        
+        @startSelection event.shiftKey # ... starts or extend selection if shift is pressed
+        
         scroll = false
         switch key
-            when 'right click' then return
+            
             when 'down', 'right', 'up', 'left' 
-                @startSelection event.shiftKey
+                
                 if event.metaKey
                     if key == 'left'
                         @moveCursorToStartOfLine()
@@ -263,46 +333,34 @@ class HtmlEditor extends Editor
                     @moveCursor key
                     scroll = true
                     
-                event.preventDefault()
+                event.preventDefault() # prevent view from scrolling
+                
+            when 'page up'      then @moveCursorByLines -@numFullLines()+1
+            when 'page down'    then @moveCursorByLines  @numFullLines()-1
+            when 'home'         then @moveCursorToLineIndex 0
+            when 'end'          then @moveCursorToLineIndex @lines.length-1
+                
             else
                 switch combo
                     when 'enter'                     then @insertNewline()
-                    when 'tab', 'command+]'          then return @insertTab() + event.preventDefault() 
-                    when 'shift+tab', 'command+['    then return @deIndent()  + event.preventDefault()
                     when 'delete', 'ctrl+backspace'  then @deleteForward()     
                     when 'backspace'                 then @deleteBackward()     
                     when 'command+j'                 then @joinLine()
-                    when 'ctrl+a'                    then @moveCursorToStartOfLine()
-                    when 'ctrl+e'                    then @moveCursorToEndOfLine()
-                    when 'command+k'                 then return @selectAll() + @deleteSelection()
-                    when 'command+d'                 then return @selectNone()
-                    when 'command+a'                 then return @selectAll()
-                    when 'command+c'                 then return clipboard.writeText @selectedText()
+                    when 'ctrl+a', 'ctrl+shift+a'    then @moveCursorToStartOfLine()
+                    when 'ctrl+e', 'ctrl+shift+e'    then @moveCursorToEndOfLine()
                     when 'command+v'                 then @insertText clipboard.readText()
                     when 'command+x'                 
                         clipboard.writeText @selectedText()
                         @deleteSelection()
-                    when 'command+z'             
-                        @do.undo @
-                        @update()
-                        return
-                    when 'command+shift+z'             
-                        @do.redo @
-                        @update()
-                        return
-                    when 'ctrl+shift+a'
-                        @startSelection true
-                        @moveCursorToStartOfLine()
-                    when 'ctrl+shift+e'
-                        @startSelection true
-                        @moveCursorToEndOfLine()
                     else
                         ansiKeycode = require 'ansi-keycode'
                         if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
                             @insertCharacter ansiKeycode event
                         else
                             log "ignoring", combo
-        @endSelection event.shiftKey
+                            
+        @endSelection event.shiftKey # ... reset selection 
+        
         if scroll
             $('cursor')?.scrollIntoViewIfNeeded()
 

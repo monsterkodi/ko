@@ -56,3 +56,4 @@ dependencies
                 keycode         ^2.1.1
                 lodash          ^4.12.0
                 noon            ^1.0.8
+                terminal.js     ^1.0.7

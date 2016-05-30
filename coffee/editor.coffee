@@ -29,20 +29,22 @@ class Editor extends Buffer
     setSelection: (c,l) -> @do.selection @, [c,l]
 
     selectRanges: (ranges) ->
+        @do.start()
         @setSelection ranges[0][0], ranges[0][1]
         @setCursor    ranges[1][0], ranges[1][1]
+        @do.end()
 
     selectAll: => @selectRanges [[0,0], @lastPos()]
     
     startSelection: (active) ->
+        @do.start()
         if active and not @selection?
             @selectRanges [[Math.min(@cursor[0], @lines[@cursor[1]].length),@cursor[1]], @cursor]
 
     endSelection: (active) ->
         if @selection? and not active
             @selectNone()
-        else
-            @update()
+        @do.end()
         
     # 00     00   0000000   000   000  00000000
     # 000   000  000   000  000   000  000     
@@ -52,13 +54,15 @@ class Editor extends Buffer
     
     setCursorPos: (p) -> @setCursor p[0], p[1]
     setCursor: (c,l) -> 
-        l = Math.min l, @lines.length-1
-        c = Math.min c, @lines[l].length        
+        l = clamp 0, @lines.length-1, l
+        c = clamp 0, @lines[l].length, c
         @do.cursor @, [c,l]
 
-    moveCursorToPos: (pos)   -> @setCursor pos[0], pos[1]
-    moveCursorToEndOfLine:   -> @setCursor @lines[@cursor[1]].length, @cursor[1]
-    moveCursorToStartOfLine: -> @setCursor 0, @cursor[1]
+    moveCursorToPos:     (pos) -> @setCursor pos[0], pos[1]
+    moveCursorToEndOfLine:     -> @setCursor @lines[@cursor[1]].length, @cursor[1]
+    moveCursorToStartOfLine:   -> @setCursor 0, @cursor[1]
+    moveCursorByLines:     (d) -> @setCursor @cursor[0], @cursor[1]+d
+    moveCursorToLineIndex: (i) -> @setCursor @cursor[0], i
 
     moveCursorToEndOfWord:   -> 
         r = @rangesForWordAtPos(@cursor)[1]
@@ -178,7 +182,7 @@ class Editor extends Buffer
         @do.start()
         @deleteSelection()
         if @cursorAtEndOfLine()
-            @do.change @lines.splice @cursor[1]+1, 0, ""
+            @do.insert @lines, @cursor[1]+1, ""
         else
             @do.insert @lines, @cursor[1]+1, @lines[@cursor[1]].substr @cursor[0]
             @do.change @lines, @cursor[1],   @lines[@cursor[1]].substr 0, @cursor[0]
@@ -244,11 +248,11 @@ class Editor extends Buffer
         if @selection?
             @deleteSelection()
         else
-            if @cursorInFirstLine() and @cursorAtStartOfLine()
-                return
+            return if @cursorInFirstLine() and @cursorAtStartOfLine()
             cursorIndex = Math.min @lines[@cursor[1]].length-1, @cursor[0]
             strToCursor = @lines[@cursor[1]].substr 0, cursorIndex
-            if strToCursor.trim() == '' # only spaces between line start and cursor
+            @do.start()
+            if strToCursor.length and strToCursor.trim() == '' # only spaces between line start and cursor
                 il = @indentString().length
                 rc = cursorIndex%il or il
                 for i in [0...rc]
@@ -257,5 +261,6 @@ class Editor extends Buffer
             else
                 @moveCursorLeft()
                 @deleteForward()
+            @do.end()
 
 module.exports = Editor

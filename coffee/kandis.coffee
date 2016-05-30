@@ -1,8 +1,8 @@
-#000   000   0000000   000   000  0000000    000   0000000
-#000  000   000   000  0000  000  000   000  000  000     
-#0000000    000000000  000 0 000  000   000  000  0000000 
-#000  000   000   000  000  0000  000   000  000       000
-#000   000  000   000  000   000  0000000    000  0000000 
+# 000   000   0000000   000   000  0000000    000   0000000
+# 000  000   000   000  0000  000  000   000  000  000     
+# 0000000    000000000  000 0 000  000   000  000  0000000 
+# 000  000   000   000  000  0000  000   000  000       000
+# 000   000  000   000  000   000  0000000    000  0000000 
 
 electron   = require 'electron'
 noon       = require 'noon'
@@ -20,22 +20,23 @@ encode     = require './tools/encode'
 ipc    = electron.ipcRenderer
 remote = electron.remote
  
-editorText  = fs.readFileSync "#{__dirname}/../coffee/kandis.coffee", encoding: 'UTF8'
-    
-#00000000   00000000   00000000  00000000   0000000
-#000   000  000   000  000       000       000     
-#00000000   0000000    0000000   000000    0000000 
-#000        000   000  000       000            000
-#000        000   000  00000000  000       0000000 
+# editorText = fs.readFileSync "#{__dirname}/../coffee/kandis.coffee", encoding: 'UTF8'
+editorText = fs.readFileSync "#{__dirname}/../coffee/main.coffee", encoding: 'UTF8'
+        
+# 00000000   00000000   00000000  00000000   0000000
+# 000   000  000   000  000       000       000     
+# 00000000   0000000    0000000   000000    0000000 
+# 000        000   000  000       000            000
+# 000        000   000  00000000  000       0000000 
 
 prefs.init "#{remote.app?.getPath('userData')}/kandis.json",
     split: 300
 
-# 0000000  00000000   000      000  000000000
-#000       000   000  000      000     000   
-#0000000   00000000   000      000     000   
-#     000  000        000      000     000   
-#0000000   000        0000000  000     000   
+#  0000000  00000000   000      000  000000000
+# 000       000   000  000      000     000   
+# 0000000   00000000   000      000     000   
+#      000  000        000      000     000   
+# 0000000   000        0000000  000     000   
 
 enterHeight = 200
 minEnterHeight = 100
@@ -98,12 +99,14 @@ document.onkeydown = (event) ->
     {mod, key, combo} = keyinfo.forEvent event
     # log "document key:", key, "mod:", mod, "combo:", combo
     return if not combo
+    
+    switch combo
+        when 'command+r', 'command+enter' then return ipc.send 'execute', editor.text()
+        when 'command+alt+i'              then return ipc.send 'toggleDevTools'
+        when 'command+alt+ctrl+l'         then return ipc.send 'reloadWindow'
+    
     switch key
-        when 'esc'                               then return window.close()
-        when 'right click'                       then return
-        else
-            switch combo
-                when 'command+r', 'command+enter'
-                    return ipc.send 'execute', editor.text()
+        when 'esc'         then return window.close()
+        when 'right click' then return
     
 
