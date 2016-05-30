@@ -65,7 +65,7 @@ minEnterHeight = 100
 minScrollHeight = 24
 splitAt = (y) ->
     $('scroll').style.height = "#{y}px"
-    $('split').style.top = "#{y}px"
+    $('split' ).style.top = "#{y}px"
     $('editor').style.top = "#{y+10}px"
     enterHeight = sh()-y
     editor?.resized()

@@ -37,10 +37,8 @@ class HtmlEditor extends Editor
         @elem.onkeydown = @onKeyDown
         @elem.addEventListener 'wheel',   @onWheel
 
-        while @elem.children.length < 100
-            div = document.createElement 'div'
-            div.className = 'line'
-            @elem.appendChild div
+        while @elem.children.length < 170
+            @addLine()
 
         @scrollBy 0
 
@@ -102,10 +100,12 @@ class HtmlEditor extends Editor
         
     setLines: (lines) ->
         @lines = lines
+        @updateSizeValues()
+        # log 'setLines'
         @displayLines 0
 
     displayLines: (top) ->
-        log 'displayLines', top, top+@numViewLines()
+        # log 'displayLines', top, @numViewLines(), @elem.clientHeight, @elem.offsetHeight
         @topIndex = top
         @botIndex = top+@numViewLines()
         @updateScrollbar()
@@ -120,9 +120,16 @@ class HtmlEditor extends Editor
     done: => @linesChanged @do.changedLineIndices
 
     updateSizeValues: ->
-        @bufferHeight  = @numVisibleLines() * @lineHeight
+        @bufferHeight = @numVisibleLines() * @lineHeight
         @editorHeight = @numViewLines() * @lineHeight
-        @scrollMax   = @bufferHeight - @editorHeight + @lineHeight
+        @scrollMax    = @bufferHeight - @editorHeight + @lineHeight
+        # log "updateSizeValues", @viewHeight(), @editorHeight
+    
+    resized: -> 
+        oldHeight = @editorHeight
+        @updateSizeValues()
+        if @editorHeight > oldHeight
+            @displayLines @topIndex
     
     deltaToEnsureCursorIsVisible: ->
         delta = 0
@@ -171,6 +178,11 @@ class HtmlEditor extends Editor
             @divs[relIndex] = span
             @elem.children[relIndex].innerHTML = span
 
+    addLine: ->
+        div = document.createElement 'div'
+        div.className = 'line'
+        @elem.appendChild div
+
     update: =>
         # log 'update'
         @divs = []
@@ -195,8 +207,8 @@ class HtmlEditor extends Editor
         sl = @elem.scrollLeft
         st = @elem.scrollTop
         br = @elem.getBoundingClientRect()
-        lx = clamp 0, @elem.clientWidth,  event.clientX - br.left
-        ly = clamp 0, @elem.clientHeight, event.clientY - br.top
+        lx = clamp 0, @elem.offsetWidth,  event.clientX - br.left
+        ly = clamp 0, @elem.offsetHeight, event.clientY - br.top
         [parseInt(Math.floor((Math.max(0, sl + lx-10))/@charSize[0])),
          parseInt(Math.floor((Math.max(0, st + ly))/@charSize[1])) + @topIndex]
 
@@ -206,7 +218,7 @@ class HtmlEditor extends Editor
     # 000      000  000  0000  000            000
     # 0000000  000  000   000  00000000  0000000 
     
-    viewHeight:      -> @elem.parentElement.offsetHeight
+    viewHeight:      -> @elem.getBoundingClientRect().height #@elem.parentElement.offsetHeight
     numViewLines:    -> Math.ceil(@viewHeight() / @lineHeight)
     numFullLines:    -> Math.floor(@viewHeight() / @lineHeight)
     numVisibleLines: -> @lines.length
@@ -231,8 +243,6 @@ class HtmlEditor extends Editor
                     
             @scrollRight.style.top    = "#{scrollTop}.px"
             @scrollRight.style.height = "#{scrollHeight}.px"
-
-    resized: -> @scrollBy 0
                 
     scrollLines: (lineDelta) -> @scrollBy lineDelta * @lineHeight
 
@@ -295,7 +305,8 @@ class HtmlEditor extends Editor
         
     changeZoom: (d) -> 
         z = webframe.getZoomFactor() 
-        z *= 1+d/10
+        z *= 1+d/20
+        z = clamp 0.36, 5.23, z
         webframe.setZoomFactor z
         @initCharSize()
             
