@@ -23,6 +23,7 @@ class HtmlEditor extends Editor
         @clss = className
         @divs = []
         
+        @smoothScrolling = false
         @topIndex = 0
         @botIndex = 0
         @scroll   = 0
@@ -109,7 +110,23 @@ class HtmlEditor extends Editor
         @topIndex = top
         @botIndex = top+@numViewLines()
         @updateScrollbar()
-        @update()
+        
+        @divs = []
+        for c in [0...@elem.children.length]
+            i = c + @topIndex
+            @elem.children[c].id = "line-#{i}"
+            if i < @lines.length
+                span = html.renderLine i, @lines, @cursor, @selectionRanges(), @charSize
+                @divs.push span
+                @elem.children[c].innerHTML = span
+            else
+                @divs.push ""
+                @elem.children[c].innerHTML = ""
+
+    addLine: ->
+        div = document.createElement 'div'
+        div.className = 'line'
+        @elem.appendChild div
 
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     
@@ -178,25 +195,6 @@ class HtmlEditor extends Editor
             @divs[relIndex] = span
             @elem.children[relIndex].innerHTML = span
 
-    addLine: ->
-        div = document.createElement 'div'
-        div.className = 'line'
-        @elem.appendChild div
-
-    update: =>
-        # log 'update'
-        @divs = []
-        for c in [0...@elem.children.length]
-            i = c + @topIndex
-            @elem.children[c].id = "line-#{i}"
-            if i < @lines.length
-                span = html.renderLine i, @lines, @cursor, @selectionRanges(), @charSize
-                @divs.push span
-                @elem.children[c].innerHTML = span
-            else
-                @divs.push ""
-                @elem.children[c].innerHTML = ""
-
     # 00000000    0000000    0000000
     # 000   000  000   000  000     
     # 00000000   000   000  0000000 
@@ -261,15 +259,15 @@ class HtmlEditor extends Editor
         @scroll = Math.max @scroll, 0
         
         top = parseInt @scroll / @lineHeight
-        
-        dff = @scroll - top * @lineHeight
+        dff = @scroll - top * @lineHeight 
 
         if @topIndex != top
             @displayLines top
         else
             @updateScrollbar()
-            
-        @elem.scrollTop = dff
+
+        if @smoothScrolling            
+            @elem.scrollTop = dff
             
     onWheel: (event) => 
         @scrollBy event.deltaY * @scrollFactor event

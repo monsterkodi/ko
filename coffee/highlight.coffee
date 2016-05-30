@@ -48,6 +48,20 @@ class highlight
     # 0000000  000  000   000  00000000
     
     @line: (line, inserts=[]) =>
+        
+        if 0
+            slices = []
+            for ins in inserts.reverse()
+                slices.unshift encode line.slice(ins[0])
+                slices.unshift ins[1]
+                line  = line.slice(0, ins[0])
+            if slices.length
+                slices.unshift line
+                line = slices.join ''
+            else
+                line = encode line
+            return enspce line
+        
         rngs = matchr.ranges @matchrConfig, line
         # log "rngs", rngs
         diss = matchr.dissect rngs 
