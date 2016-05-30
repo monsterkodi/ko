@@ -154,7 +154,7 @@ class HtmlEditor extends Editor
         if cl < @topIndex + 2
             newTop = Math.max 0, cl - 2
             delta = newTop - @topIndex
-        else if cl > @botIndex - 2
+        else if cl > @botIndex - 4
             newBot = Math.min @lines.length+1, cl + 4
             delta = newBot - @botIndex
         return delta
