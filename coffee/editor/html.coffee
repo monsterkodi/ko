@@ -4,8 +4,8 @@
 # 000   000     000     000 0 000  000    
 # 000   000     000     000   000  0000000
 
-encode    = require './tools/encode'
-log       = require './tools/log'
+encode    = require '../tools/encode'
+log       = require '../tools/log'
 highlight = require './highlight'
 
 class html 

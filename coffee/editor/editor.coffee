@@ -6,18 +6,14 @@
 
 undo    = require './undo'
 Buffer  = require './buffer'
-log     = require './tools/log'
-{clamp} = require './tools/tools'
+log     = require '../tools/log'
+{clamp} = require '../tools/tools'
 
 class Editor extends Buffer
     
     constructor: () ->
         super
-        
-        @do        = new undo @done
-        @cursor    = [0,0]
-        @selection = null
-        @lines     = [""]
+        @do = new undo @done
 
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000
@@ -46,6 +42,24 @@ class Editor extends Buffer
             @selectNone()
         @do.end()
         
+    #  0000000  00000000   0000000   00000000    0000000  000   000
+    # 000       000       000   000  000   000  000       000   000
+    # 0000000   0000000   000000000  0000000    000       000000000
+    #      000  000       000   000  000   000  000       000   000
+    # 0000000   00000000  000   000  000   000   0000000  000   000
+
+    markSelectionForSearch: ->
+        if not @selection? 
+            @selectRanges @rangesForWordAtPos @cursorPos()
+        @searchText = @selectedText()
+        @searchRanges = @rangesForText @searchText
+        log 'searchRanges', @searchRanges
+        
+    jumpToNextSearchResult: ->
+        r = @rangeAfterPosInRanges @cursorPos, @searchRanges
+        log "jumpToNextSearchResult", r
+        @selectRanges r if r?
+        
     # 00     00   0000000   000   000  00000000
     # 000   000  000   000  000   000  000     
     # 000000000  000   000   000 000   0000000 
@@ -68,7 +82,7 @@ class Editor extends Buffer
         r = @rangesForWordAtPos(@cursor)[1]
         if @cursorAtEndOfLine()
             return if @cursorInLastLine()
-            r = rangesForWordAtPos([0, @cursor[1]+1])[1]
+            r = @rangesForWordAtPos([0, @cursor[1]+1])[1]
         @setCursorPos r
         
     moveCursorToStartOfWord: -> 

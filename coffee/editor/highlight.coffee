@@ -4,10 +4,10 @@
 # 000   000  000  000   000  000   000  000      000  000   000  000   000     000   
 # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000   
 
-matchr = require './tools/matchr'
-encode = require './tools/encode'
-enspce = require './tools/enspce'
-log    = require './tools/log'
+matchr = require '../tools/matchr'
+encode = require '../tools/encode'
+enspce = require '../tools/enspce'
+log    = require '../tools/log'
 noon   = require 'noon'
 _      = require 'lodash'
 
@@ -16,7 +16,7 @@ class highlight
     @matchrConfig = null
 
     @init: =>
-        patterns = noon.load "#{__dirname}/../syntax/coffee.noon"
+        patterns = noon.load "#{__dirname}/../../syntax/coffee.noon"
         @matchrConfig = matchr.config patterns
 
     #  0000000   0000000   000       0000000   00000000   000  0000000  00000000

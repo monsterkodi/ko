@@ -4,8 +4,8 @@
 # 000   000  000   000  000       000       000       000   000
 # 0000000     0000000   000       000       00000000  000   000
 
-log       = require './tools/log'
-tools     = require './tools/tools'
+log       = require '../tools/log'
+tools     = require '../tools/tools'
 clamp     = tools.clamp
 
 class Buffer
@@ -25,7 +25,7 @@ class Buffer
     selectionRanges: ->
         if @selection
             range = @selectedLineIndicesRange()
-            rgs = ([i, @selectedCharacterRangeForLineAtIndex(i)] for i in [range[0]..range[1]])
+            ([i, @selectedCharacterRangeForLineAtIndex(i)] for i in [range[0]..range[1]])
         else
             []
 
@@ -94,8 +94,8 @@ class Buffer
     #    000     000        000 000      000   
     #    000     00000000  000   000     000   
 
-    text:         -> @lines.join '\n'
-    selectedText: -> @selectedLines().join '\n'
+    text:          -> @lines.join '\n'
+    selectedText:  -> @selectedLines().join '\n'
             
     # 00000000    0000000    0000000
     # 000   000  000   000  000     
@@ -106,7 +106,7 @@ class Buffer
     lastPos: () -> 
         lli = @lines.length-1
         [@lines[lli].length, lli]
-    
+
     cursorPos: ->
         l = clamp 0, @lines.length-1, @cursor[1]
         c = clamp 0, @lines[l].length, @cursor[0]
@@ -123,23 +123,50 @@ class Buffer
     # 000   000  000   000  000  0000  000   000  000            000
     # 000   000  000   000  000   000   0000000   00000000  0000000 
     
+    rangeAfterPosInRanges: (pos, ranges) ->
+        for r in ranges
+            if r[0][1] > pos[1] or r[0][1] == pos[1] and r[0][0] > pos[0]
+                return r 
+    
     rangeForLineAtIndex: (i) -> [0, @lines[i].length]
     
     rangesForCursorLine:     -> [[0, @cursor[1]], [@lines[@cursor[1]].length, @cursor[1]]]
     
+    rangesForTextInLineAtIndex: (t, i) ->
+        ci = @lines[i].search(t)
+        if ci > -1 
+            [[[ci,i], [ci+t.length,i]]]
+        
+    rangesForText: (t) ->
+        s = t.split('\n')
+        r = []
+        for i in [0...@lines.length]
+            lr = @rangesForTextInLineAtIndex t, i
+            [].push.apply(r, lr)
+        r
+    
     rangesForWordAtPos: (pos) ->
         p = @clampPos pos
         l = @lines[p[1]]
+        
+        return [[0,p[1]], [0,p[1]]] if l.length == 0
+        
         r = [p[0], p[0]]
         c = l[r[0]]
+
+        wordReg = /(\@|\w)/
+        w = c.match wordReg
+
         while r[0] > 0
             n = l[r[0]-1]
-            if (c == ' ') and (n != ' ') or (c != ' ') and (n == ' ')
+            m = n.match wordReg
+            if w? != m?
                 break
             r[0] -= 1
         while r[1] < l.length-1
             n = l[r[1]+1]
-            if (c == ' ') and (n != ' ') or (c != ' ') and (n == ' ')
+            m = n.match wordReg
+            if w? != m?
                 break
             r[1] += 1
         [[r[0], p[1]], [r[1]+1, p[1]]]

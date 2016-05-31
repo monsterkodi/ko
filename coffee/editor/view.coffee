@@ -1,20 +1,20 @@
-# 000   000  000000000  00     00  000      00000000  0000000    000  000000000   0000000   00000000 
-# 000   000     000     000   000  000      000       000   000  000     000     000   000  000   000
-# 000000000     000     000000000  000      0000000   000   000  000     000     000   000  0000000  
-# 000   000     000     000 0 000  000      000       000   000  000     000     000   000  000   000
-# 000   000     000     000   000  0000000  00000000  0000000    000     000      0000000   000   000
+# 00000000  0000000    000  000000000   0000000   00000000   000   000  000  00000000  000   000
+# 000       000   000  000     000     000   000  000   000  000   000  000  000       000 0 000
+# 0000000   000   000  000     000     000   000  0000000     000 000   000  0000000   000000000
+# 000       000   000  000     000     000   000  000   000     000     000  000       000   000
+# 00000000  0000000    000     000      0000000   000   000      0      000  00000000  00     00
 
 Editor    = require './editor'
 html      = require './html'
-log       = require './tools/log'
-drag      = require './tools/drag'
-keyinfo   = require './tools/keyinfo'
-{clamp,$} = require './tools/tools'
+log       = require '../tools/log'
+drag      = require '../tools/drag'
+keyinfo   = require '../tools/keyinfo'
+{clamp,$} = require '../tools/tools'
 electron  = require('electron')
 clipboard = electron.clipboard
 webframe  = electron.webFrame
 
-class HtmlEditor extends Editor
+class EditorView extends Editor
 
     constructor: (elem, className) ->
         super
@@ -23,7 +23,7 @@ class HtmlEditor extends Editor
         @clss = className
         @divs = []
         
-        @smoothScrolling = false
+        @smoothScrolling = 1
         @topIndex = 0
         @botIndex = 0
         @scroll   = 0
@@ -37,9 +37,6 @@ class HtmlEditor extends Editor
         
         @elem.onkeydown = @onKeyDown
         @elem.addEventListener 'wheel',   @onWheel
-
-        while @elem.children.length < 170
-            @addLine()
 
         @scrollBy 0
 
@@ -102,15 +99,21 @@ class HtmlEditor extends Editor
     setLines: (lines) ->
         @lines = lines
         @updateSizeValues()
-        # log 'setLines'
         @displayLines 0
+
+    # 0000000    000   0000000  00000000   000       0000000   000   000
+    # 000   000  000  000       000   000  000      000   000   000 000 
+    # 000   000  000  0000000   00000000   000      000000000    00000  
+    # 000   000  000       000  000        000      000   000     000   
+    # 0000000    000  0000000   000        0000000  000   000     000   
 
     displayLines: (top) ->
         # log 'displayLines', top, @numViewLines(), @elem.clientHeight, @elem.offsetHeight
         @topIndex = top
         @botIndex = top+@numViewLines()
         @updateScrollbar()
-        
+        @updateNumLines()
+                
         @divs = []
         for c in [0...@elem.children.length]
             i = c + @topIndex
@@ -142,6 +145,15 @@ class HtmlEditor extends Editor
         @scrollMax    = @bufferHeight - @editorHeight + @lineHeight
         # log "updateSizeValues", @viewHeight(), @editorHeight
     
+    updateNumLines: ->
+        viewLines = @numViewLines()
+        while @elem.children.length > viewLines
+            @elem.children[@elem.children.length-1].remove()
+            
+        while @elem.children.length < viewLines
+            @addLine()
+            @updateLine @topIndex + @elem.children.length - 1
+    
     resized: -> 
         oldHeight = @editorHeight
         @updateSizeValues()
@@ -165,6 +177,7 @@ class HtmlEditor extends Editor
         if delta = @deltaToEnsureCursorIsVisible() 
             # log "delta", delta, delta * @lineHeight
             @scrollBy delta * @lineHeight #todo: slow down when using mouse
+            @scrollCursor()
             return
         
         indices = []
@@ -186,14 +199,14 @@ class HtmlEditor extends Editor
             
         @updateSizeValues()
         @updateScrollbar()
+        @scrollCursor()
 
     updateLine: (lineIndex) ->
-        if @topIndex <= lineIndex <= @botIndex
+        if @topIndex <= lineIndex < @lines.length
             relIndex = lineIndex - @topIndex
-            # log 'updateLine', lineIndex, 'rel', relIndex, @topIndex, @botIndex
             span = html.renderLine lineIndex, @lines, @cursor, @selectionRanges(), @charSize
             @divs[relIndex] = span
-            @elem.children[relIndex].innerHTML = span
+            @elem.children[relIndex]?.innerHTML = span
 
     # 00000000    0000000    0000000
     # 000   000  000   000  000     
@@ -202,6 +215,11 @@ class HtmlEditor extends Editor
     # 000         0000000   0000000 
     
     posForEvent: (event) ->
+        
+        el = document.elementsFromPoint(event.pageX, event.pageY)
+        for e in el
+            log e.id, e.className
+        
         sl = @elem.scrollLeft
         st = @elem.scrollTop
         br = @elem.getBoundingClientRect()
@@ -216,7 +234,7 @@ class HtmlEditor extends Editor
     # 000      000  000  0000  000            000
     # 0000000  000  000   000  00000000  0000000 
     
-    viewHeight:      -> @elem.getBoundingClientRect().height #@elem.parentElement.offsetHeight
+    viewHeight:      -> @elem.getBoundingClientRect().height 
     numViewLines:    -> Math.ceil(@viewHeight() / @lineHeight)
     numFullLines:    -> Math.floor(@viewHeight() / @lineHeight)
     numVisibleLines: -> @lines.length
@@ -268,6 +286,8 @@ class HtmlEditor extends Editor
 
         if @smoothScrolling            
             @elem.scrollTop = dff
+
+    scrollCursor: -> $('cursor')?.scrollIntoViewIfNeeded()
             
     onWheel: (event) => 
         @scrollBy event.deltaY * @scrollFactor event
@@ -304,6 +324,7 @@ class HtmlEditor extends Editor
     resetZoom: -> 
         webframe.setZoomFactor 1
         @initCharSize()
+        @updateNumLines()
         
     changeZoom: (d) -> 
         z = webframe.getZoomFactor() 
@@ -311,6 +332,7 @@ class HtmlEditor extends Editor
         z = clamp 0.36, 5.23, z
         webframe.setZoomFactor z
         @initCharSize()
+        @updateNumLines()
             
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
@@ -328,6 +350,8 @@ class HtmlEditor extends Editor
             when 'command+k'              then return @selectAll() + @deleteSelection()
             when 'command+d'              then return @selectNone()
             when 'command+a'              then return @selectAll()
+            when 'command+e'              then return @markSelectionForSearch()
+            when 'command+g'              then return @jumpToNextSearchResult()
             when 'command+c'              then return clipboard.writeText @selectedText()
             when 'tab', 'command+]'       then return @insertTab() + event.preventDefault() 
             when 'shift+tab', 'command+[' then return @deIndent()  + event.preventDefault()
@@ -341,7 +365,6 @@ class HtmlEditor extends Editor
         
         @startSelection event.shiftKey # ... starts or extend selection if shift is pressed
         
-        scroll = false
         switch key
             
             when 'down', 'right', 'up', 'left' 
@@ -355,10 +378,9 @@ class HtmlEditor extends Editor
                     if key == 'left'
                         @moveCursorToStartOfWord()
                     else if key == 'right'
-                        @moveCursorToEndOfWord()                    
+                        @moveCursorToEndOfWord()
                 else
                     @moveCursor key
-                    scroll = true
                     
                 event.preventDefault() # prevent view from scrolling
                 
@@ -392,7 +414,4 @@ class HtmlEditor extends Editor
                             
         @endSelection event.shiftKey # ... reset selection 
         
-        # if scroll
-        #     $('cursor')?.scrollIntoViewIfNeeded()
-
-module.exports = HtmlEditor
+module.exports = EditorView

@@ -7,7 +7,7 @@
 electron   = require 'electron'
 noon       = require 'noon'
 fs         = require 'fs'
-HtmlEditor = require './htmleditor'
+EditorView = require './editor/view'
 prefs      = require './tools/prefs'
 keyinfo    = require './tools/keyinfo'
 drag       = require './tools/drag'
@@ -21,7 +21,7 @@ ipc    = electron.ipcRenderer
 remote = electron.remote
  
 # editorText = fs.readFileSync "#{__dirname}/../coffee/kandis.coffee", encoding: 'UTF8'
-editorText = fs.readFileSync "#{__dirname}/../coffee/htmleditor.coffee", encoding: 'UTF8'
+# editorText = fs.readFileSync "#{__dirname}/../coffee/editor/view.coffee", encoding: 'UTF8'
 
 # editorText = """
 # lx = clamp 0, @elem.clientWidth,  event.clientX - br.left
@@ -78,16 +78,23 @@ splitDrag = new drag
     maxPos: pos sw(), sh()-minEnterHeight
     onMove: (drag) -> splitAt drag.cpos.y
 
-# 00000000   00000000   0000000  000   000  000      000000000
-# 000   000  000       000       000   000  000         000   
-# 0000000    0000000   0000000   000   000  000         000   
-# 000   000  000            000  000   000  000         000   
-# 000   000  00000000  0000000    0000000   0000000     000   
+# 000  00000000    0000000
+# 000  000   000  000     
+# 000  00000000   000     
+# 000  000        000     
+# 000  000         0000000
 
-ipc.on 'execute-result', (event, arg) =>
-    log 'execute-result:', arg, typeof arg
+ipc.on 'executeResult', (event, arg) =>
+    log 'executeResult:', arg, typeof arg
     $('scroll').innerHTML += encode str arg
     $('scroll').innerHTML += "<br>"
+    
+ipc.on 'openFile', (event, arg) =>
+    log 'openFile', arg
+    editor.setText fs.readFileSync arg, encoding: 'UTF8'
+
+ipc.on 'saveFile', (event, arg) =>
+    log 'saveFile', arg
 
 # 00000000  0000000    000  000000000   0000000   00000000 
 # 000       000   000  000     000     000   000  000   000
@@ -95,7 +102,7 @@ ipc.on 'execute-result', (event, arg) =>
 # 000       000   000  000     000     000   000  000   000
 # 00000000  0000000    000     000      0000000   000   000
 
-editor = new HtmlEditor $('input'), 'input'
+editor = new EditorView $('input'), 'input'
 editor.setText editorText if editorText?
 editor.elem.focus()
 

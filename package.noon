@@ -1,5 +1,5 @@
 name            kandis
-version         0.9.0
+version         0.9.1
 description     coffee script tool
 main            js/main.js
 scripts
@@ -9,7 +9,9 @@ scripts
                 clean     rm -rf dist app/js app/img app/css app/*.html app/node_modules
                 dist      npm run clean && npm run compile && npm run install && build
                 release   build
-                test      fish -c "killall Electron" -c "killall Electron" -c "npm start"
+                kill      fish -c "killall Electron" -c "killall Electron" -c "echo killed"
+                test      npm run kill && npm start
+                debug     npm run kill && npm start -- -D
 repository
                 type  git
                 url   git+https://github.com/monsterkodi/kandis.git
@@ -53,6 +55,7 @@ dependencies
                 coffee-script   ^1.10.0
                 colors          ^1.1.2
                 html-entities   ^1.2.0
+                karg            ^1.0.7
                 keycode         ^2.1.1
                 lodash          ^4.12.0
                 noon            ^1.0.8
