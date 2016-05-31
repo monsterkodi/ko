@@ -7,7 +7,7 @@
 resolve       = require './tools/resolve'
 prefs         = require './tools/prefs'
 log           = require './tools/log'
-{first,del}   = require './tools/tools'
+{first}       = require './tools/tools'
 execute       = require './execute'
 fs            = require 'fs'
 noon          = require 'noon'
@@ -19,7 +19,6 @@ Menu          = electron.Menu
 clipboard     = electron.clipboard
 ipc           = electron.ipcMain
 dialog        = electron.dialog
-currentFile   = undefined
 win           = undefined
 tray          = undefined
 
@@ -48,22 +47,15 @@ if args.verbose
 # 000        000   000  000       000            000
 # 000        000   000  00000000  000       0000000 
 
-addToRecent = (file) ->
-    recent = prefs.get 'recentFiles', []
-    del recent, file
-    recent.unshift file
-    log 'recent', recent
-    prefs.set 'recentFiles', recent
-    
-mostRecentFile = -> first prefs.get 'recentFiles', []
-
 prefs.init "#{app.getPath('userData')}/kandis.json",
     shortcut: 'F2'
 
+mostRecentFile = -> first prefs.get 'recentFiles', []
+
 if args.arglist.length
-    currentFile = resolve args.arglist[0]
+    openFile = resolve args.arglist[0]
 else
-    currentFile = mostRecentFile()
+    openFile = mostRecentFile()
 
 # 000  00000000    0000000
 # 000  000   000  000     
@@ -81,52 +73,14 @@ ipc.on 'reloadWindow',   (event) =>
         setTimeout win.webContents.reloadIgnoringCache, 100
     else
         win?.webContents.reloadIgnoringCache()
-
-# 00000000  000  000      00000000
-# 000       000  000      000     
-# 000000    000  000      0000000 
-# 000       000  000      000     
-# 000       000  0000000  00000000
-
-openFile = ->
-    dialog.showOpenDialog win,
-        title: "Open File"
-        defaultPath: resolve '.'
-        properties: ['openFile']
-        filters: [
-                name: 'Coffee-Script', extensions: ['coffee']
-                name: 'All Files', extensions: ['*']
-        ]
-        , (files) => 
-            if files.length
-                currentFile = resolve files[0]
-                addToRecent currentFile
-                win?.webContents.send 'openFile', files[0]
-
-saveFileAs = ->
-    dialog.showSaveDialog win,
-        title: "Save File As"
-        defaultPath: currentFile
-        properties: ['openFile']
-        filters: [
-                name: 'Coffee-Script', extensions: ['coffee']
-                name: 'All Files', extensions: ['*']
-        ]
-        , (filename) => 
-            if filename
-                currentFile = filename
-                addToRecent currentFile
-                saveFile()
-                
-saveFile = ->
-    log 'saveFile', currentFile
-    win?.webContents.send 'saveFile', currentFile
     
 # 000   000  000  000   000  0000000     0000000   000   000
 # 000 0 000  000  0000  000  000   000  000   000  000 0 000
 # 000000000  000  000 0 000  000   000  000   000  000000000
 # 000   000  000  000  0000  000   000  000   000  000   000
 # 00     00  000  000   000  0000000     0000000   00     00
+
+activeWindow = -> win
 
 toggleWindow = ->
     if win?.isVisible()
@@ -166,9 +120,9 @@ createWindow = ->
         app.dock.hide()
         event.preventDefault()
         
-    if currentFile
+    if openFile
         win.webContents.on 'dom-ready', ->
-            win.webContents.send 'openFile', currentFile
+            win.webContents.send 'loadFile', openFile
     win
 
 saveBounds = ->
@@ -198,19 +152,19 @@ app.on 'ready', ->
         submenu: [
             label: 'Open ...'
             accelerator: 'Command+O'
-            click: openFile 
+            click: () => activeWindow()?.webContents.send 'openFile'
         ,            
             label: 'Save'
             accelerator: 'Command+S'
-            click: saveFile
+            click: () => activeWindow()?.webContents.send 'saveFile'
         ,            
             label: 'Save As ...'
             accelerator: 'Command+Shift+S'
-            click: saveFileAs
+            click: () => activeWindow()?.webContents.send 'saveFileAs'
         ,
             label: 'Close Window'
             accelerator: 'Command+W'
-            click: -> win.close()
+            click: -> activeWindow()?.close()
         ,
             label: 'Quit'
             accelerator: 'Command+Q'
@@ -224,7 +178,7 @@ app.on 'ready', ->
     
     execute.init()
         
-    if args.show or currentFile
+    if args.show or openFile
         showWindow()
                 
             

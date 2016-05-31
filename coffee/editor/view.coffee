@@ -23,6 +23,7 @@ class EditorView extends Editor
         @clss = className
         @divs = []
         
+        @currentFile = undefined
         @smoothScrolling = 1
         @topIndex = 0
         @botIndex = 0

@@ -10,41 +10,18 @@ fs         = require 'fs'
 EditorView = require './editor/view'
 prefs      = require './tools/prefs'
 keyinfo    = require './tools/keyinfo'
+resolve    = require './tools/resolve'
 drag       = require './tools/drag'
 pos        = require './tools/pos'
 log        = require './tools/log'
 str        = require './tools/str'
 encode     = require './tools/encode'
-{sw,sh,$}  = require './tools/tools'
+{sw,sh,$,del} = require './tools/tools'
 
 ipc    = electron.ipcRenderer
 remote = electron.remote
- 
-# editorText = fs.readFileSync "#{__dirname}/../coffee/kandis.coffee", encoding: 'UTF8'
-# editorText = fs.readFileSync "#{__dirname}/../coffee/editor/view.coffee", encoding: 'UTF8'
-
-# editorText = """
-# lx = clamp 0, @elem.clientWidth,  event.clientX - br.left
-# ly = clamp 0, @elem.clientHeight, event.clientY - br.top
-# [parseInt(Math.floor((Math.max(0, sl + lx-10))/@charSize[0])),
-#  parseInt(Math.floor((Math.max(0, st + ly))/@charSize[1])) + @topIndex]
-# 
-# updateScrollbar: ->
-#     if @bufferHeight < @viewHeight()
-#         @scrollRight.style.top    = "0"
-#         @scrollRight.style.height = "0"
-#     else
-#         vh           = Math.min @editorHeight, @viewHeight()
-#         scrollTop    = parseInt (@scroll / @bufferHeight) * vh
-#         scrollHeight = parseInt (@editorHeight / @bufferHeight) * vh
-#         scrollHeight = Math.max scrollHeight, parseInt @lineHeight/4
-#         scrollTop    = Math.min scrollTop, @viewHeight()-scrollHeight
-#         scrollTop    = Math.max 0, scrollTop
-#                 
-#         @scrollRight.style.top    = "\#{scrollTop}.px"
-#         @scrollRight.style.height = "\#{scrollHeight}.px"
-# """
-        
+dialog = remote.dialog
+    
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000     
 # 00000000   0000000    0000000   000000    0000000 
@@ -54,6 +31,54 @@ remote = electron.remote
 prefs.init "#{remote.app?.getPath('userData')}/kandis.json",
     split: 300
 
+addToRecent = (file) ->
+    recent = prefs.get 'recentFiles', []
+    del recent, file
+    recent.unshift file
+    while recent.length > prefs.get 'recentFilesLength', 10
+        recent.pop()
+    prefs.set 'recentFiles', recent
+                 
+# 00000000  000  000      00000000
+# 000       000  000      000     
+# 000000    000  000      0000000 
+# 000       000  000      000     
+# 000       000  0000000  00000000
+
+loadFile = (file) ->
+    addToRecent file
+    editor.setText fs.readFileSync file, encoding: 'UTF8'
+
+openFile = ->
+    dialog.showOpenDialog 
+        title: "Open File"
+        defaultPath: resolve '.'
+        properties: ['openFile']
+        filters: [
+                name: 'Coffee-Script', extensions: ['coffee']
+                name: 'All Files', extensions: ['*']
+        ]
+        , (files) =>
+            if files?.length
+                loadFile resolve files[0]
+
+saveFileAs = ->
+    dialog.showSaveDialog 
+        title: "Save File As"
+        defaultPath: currentFile
+        properties: ['openFile']
+        filters: [
+                name: 'Coffee-Script', extensions: ['coffee']
+                name: 'All Files', extensions: ['*']
+        ]
+        , (file) => 
+            if file
+                addToRecent file
+                saveFile file
+         
+saveFile = (file) ->
+    fs.writeFileSync file ? editor.currentFile, editor.text(), encoding: 'UTF8'
+         
 #  0000000  00000000   000      000  000000000
 # 000       000   000  000      000     000   
 # 0000000   00000000   000      000     000   
@@ -89,12 +114,10 @@ ipc.on 'executeResult', (event, arg) =>
     $('scroll').innerHTML += encode str arg
     $('scroll').innerHTML += "<br>"
     
-ipc.on 'openFile', (event, arg) =>
-    log 'openFile', arg
-    editor.setText fs.readFileSync arg, encoding: 'UTF8'
-
-ipc.on 'saveFile', (event, arg) =>
-    log 'saveFile', arg
+ipc.on 'openFile',   openFile
+ipc.on 'saveFileAs', saveFileAs
+ipc.on 'saveFile',   => saveFile()
+ipc.on 'loadFile',  (event, file) => loadFile file
 
 # 00000000  0000000    000  000000000   0000000   00000000 
 # 000       000   000  000     000     000   000  000   000
@@ -133,6 +156,7 @@ document.onkeydown = (event) ->
         when 'command+r', 'command+enter' then return ipc.send 'execute', editor.text()
         when 'command+alt+i'              then return ipc.send 'toggleDevTools'
         when 'command+alt+ctrl+l'         then return ipc.send 'reloadWindow'
+        when 'command+n'                  then return ipc.send 'newFile'
     
     switch key
         when 'esc'         then return window.close()
