@@ -352,6 +352,7 @@ class EditorView extends Editor
             when 'command+a'              then return @selectAll()
             when 'command+e'              then return @markSelectionForSearch()
             when 'command+g'              then return @jumpToNextSearchResult()
+            when 'command+shift+g'        then return @jumpToPrevSearchResult()
             when 'command+c'              then return clipboard.writeText @selectedText()
             when 'tab', 'command+]'       then return @insertTab() + event.preventDefault() 
             when 'shift+tab', 'command+[' then return @deIndent()  + event.preventDefault()

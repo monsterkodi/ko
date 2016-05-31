@@ -30,6 +30,9 @@ module.exports =
     sw: () -> parseInt window.getComputedStyle(document.body).width
     sh: () -> parseInt window.getComputedStyle(document.body).height
 
+    last: (a) -> a[a.length-1] if a?.length
+    first: (a) -> a[0] if a?.length
+
     clamp: (r1, r2, v) ->
         if r1 > r2
             [r1,r2] = [r2,r1]

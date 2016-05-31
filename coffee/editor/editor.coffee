@@ -4,10 +4,10 @@
 #000       000   000  000     000     000   000  000   000
 #00000000  0000000    000     000      0000000   000   000
 
-undo    = require './undo'
-Buffer  = require './buffer'
-log     = require '../tools/log'
-{clamp} = require '../tools/tools'
+undo   = require './undo'
+Buffer = require './buffer'
+log    = require '../tools/log'
+{clamp,last} = require '../tools/tools'
 
 class Editor extends Buffer
     
@@ -56,9 +56,24 @@ class Editor extends Buffer
         log 'searchRanges', @searchRanges
         
     jumpToNextSearchResult: ->
-        r = @rangeAfterPosInRanges @cursorPos, @searchRanges
-        log "jumpToNextSearchResult", r
-        @selectRanges r if r?
+        r = @rangeAfterPosInRanges @cursorPos(), @searchRanges
+        if not r
+            @jumpToFirstSearchResult()
+        else
+            @selectRanges r
+
+    jumpToPrevSearchResult: ->
+        log 'prev'
+        r = @rangeBeforePosInRanges @cursorPos(), @searchRanges
+        log 'r', r
+        if not r
+            log 'last'
+            @jumpToLastSearchResult()
+        else
+            @selectRanges r
+            
+    jumpToLastSearchResult: -> @selectRanges last @searchRanges
+    jumpToFirstSearchResult: -> @selectRanges @searchRanges[0]
         
     # 00     00   0000000   000   000  00000000
     # 000   000  000   000  000   000  000     

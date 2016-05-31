@@ -7,6 +7,7 @@
 resolve       = require './tools/resolve'
 prefs         = require './tools/prefs'
 log           = require './tools/log'
+{first,del}   = require './tools/tools'
 execute       = require './execute'
 fs            = require 'fs'
 noon          = require 'noon'
@@ -40,8 +41,29 @@ version  #{pkg.version}
 if args.verbose
     log noon.stringify args, colors:true
 
+
+# 00000000   00000000   00000000  00000000   0000000
+# 000   000  000   000  000       000       000     
+# 00000000   0000000    0000000   000000    0000000 
+# 000        000   000  000       000            000
+# 000        000   000  00000000  000       0000000 
+
+addToRecent = (file) ->
+    recent = prefs.get 'recentFiles', []
+    del recent, file
+    recent.unshift file
+    log 'recent', recent
+    prefs.set 'recentFiles', recent
+    
+mostRecentFile = -> first prefs.get 'recentFiles', []
+
+prefs.init "#{app.getPath('userData')}/kandis.json",
+    shortcut: 'F2'
+
 if args.arglist.length
     currentFile = resolve args.arglist[0]
+else
+    currentFile = mostRecentFile()
 
 # 000  00000000    0000000
 # 000  000   000  000     
@@ -78,6 +100,7 @@ openFile = ->
         , (files) => 
             if files.length
                 currentFile = resolve files[0]
+                addToRecent currentFile
                 win?.webContents.send 'openFile', files[0]
 
 saveFileAs = ->
@@ -92,12 +115,13 @@ saveFileAs = ->
         , (filename) => 
             if filename
                 currentFile = filename
+                addToRecent currentFile
                 saveFile()
                 
 saveFile = ->
     log 'saveFile', currentFile
     win?.webContents.send 'saveFile', currentFile
-
+    
 # 000   000  000  000   000  0000000     0000000   000   000
 # 000 0 000  000  0000  000  000   000  000   000  000 0 000
 # 000000000  000  000 0 000  000   000  000   000  000000000
@@ -196,9 +220,6 @@ app.on 'ready', ->
         ]
     ]
         
-    prefs.init "#{app.getPath('userData')}/kandis.json",
-        shortcut: 'F2'
-
     electron.globalShortcut.register prefs.get('shortcut'), showWindow
     
     execute.init()

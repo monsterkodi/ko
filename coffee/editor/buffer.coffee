@@ -127,6 +127,12 @@ class Buffer
         for r in ranges
             if r[0][1] > pos[1] or r[0][1] == pos[1] and r[0][0] > pos[0]
                 return r 
+
+    rangeBeforePosInRanges: (pos, ranges) ->
+        for ri in [ranges.length-1..0]
+            r = ranges[ri]
+            if r[0][1] < pos[1] or r[0][1] == pos[1] and r[1][0] < pos[0]
+                return r 
     
     rangeForLineAtIndex: (i) -> [0, @lines[i].length]
     
