@@ -21,15 +21,19 @@ encode     = require './tools/encode'
 ipc    = electron.ipcRenderer
 remote = electron.remote
 dialog = remote.dialog
+winID  = null
     
+enterHeight     = 200
+minEnterHeight  = 100
+minScrollHeight = 24
+
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000     
 # 00000000   0000000    0000000   000000    0000000 
 # 000        000   000  000       000            000
 # 000        000   000  00000000  000       0000000 
 
-prefs.init "#{remote.app?.getPath('userData')}/kandis.json",
-    split: 300
+prefs.init "#{remote.app?.getPath('userData')}/kandis.json"
 
 addToRecent = (file) ->
     recent = prefs.get 'recentFiles', []
@@ -38,6 +42,41 @@ addToRecent = (file) ->
     while recent.length > prefs.get 'recentFilesLength', 10
         recent.pop()
     prefs.set 'recentFiles', recent
+    
+#  0000000  000000000   0000000   000000000  00000000
+# 000          000     000   000     000     000     
+# 0000000      000     000000000     000     0000000 
+#      000     000     000   000     000     000     
+# 0000000      000     000   000     000     00000000
+        
+setState = (key, value) ->
+    if winID
+        prefs.setPath "windows.#{winID}.#{key}", value
+    
+getState = (key, value) ->
+    return value if not winID
+    prefs.getPath "windows.#{winID}.#{key}", value
+    
+# 000  00000000    0000000
+# 000  000   000  000     
+# 000  00000000   000     
+# 000  000        000     
+# 000  000         0000000
+
+ipc.on 'executeResult', (event, arg) =>
+    log 'executeResult:', arg, typeof arg
+    $('scroll').innerHTML += encode str arg
+    $('scroll').innerHTML += "<br>"
+    
+ipc.on 'openFile',   => openFile()
+ipc.on 'cloneFile',  => ipc.send 'newWindowWithFile', editor.currentFile
+ipc.on 'saveFileAs', => saveFileAs()
+ipc.on 'saveFile',   => saveFile()
+ipc.on 'loadFile', (event, file) => loadFile file
+ipc.on 'setWinID', (event, id) => 
+    log 'got id', id
+    winID = id
+    splitAt getState 'split', minScrollHeight
                  
 # 00000000  000  000      00000000
 # 000       000  000      000     
@@ -45,9 +84,19 @@ addToRecent = (file) ->
 # 000       000  000      000     
 # 000       000  0000000  00000000
 
+saveFile = (file) ->
+    file ?= editor.currentFile
+    log 'save', file
+    fs.writeFileSync file, editor.text(), encoding: 'UTF8'
+    editor.currentFile = file
+    setState 'file', file
+
 loadFile = (file) ->
+    log 'load', file
     addToRecent file
     editor.setText fs.readFileSync file, encoding: 'UTF8'
+    editor.currentFile = file
+    setState 'file', file
 
 openFile = ->
     dialog.showOpenDialog 
@@ -75,26 +124,20 @@ saveFileAs = ->
             if file
                 addToRecent file
                 saveFile file
-         
-saveFile = (file) ->
-    fs.writeFileSync file ? editor.currentFile, editor.text(), encoding: 'UTF8'
-         
+                  
 #  0000000  00000000   000      000  000000000
 # 000       000   000  000      000     000   
 # 0000000   00000000   000      000     000   
 #      000  000        000      000     000   
 # 0000000   000        0000000  000     000   
 
-enterHeight = 200
-minEnterHeight = 100
-minScrollHeight = 24
 splitAt = (y) ->
     $('scroll').style.height = "#{y}px"
     $('split' ).style.top = "#{y}px"
     $('editor').style.top = "#{y+10}px"
     enterHeight = sh()-y
     editor?.resized()
-    prefs.set 'split', y
+    setState 'split', y
 
 splitDrag = new drag
     target: 'split'
@@ -102,22 +145,6 @@ splitDrag = new drag
     minPos: pos 0,minScrollHeight
     maxPos: pos sw(), sh()-minEnterHeight
     onMove: (drag) -> splitAt drag.cpos.y
-
-# 000  00000000    0000000
-# 000  000   000  000     
-# 000  00000000   000     
-# 000  000        000     
-# 000  000         0000000
-
-ipc.on 'executeResult', (event, arg) =>
-    log 'executeResult:', arg, typeof arg
-    $('scroll').innerHTML += encode str arg
-    $('scroll').innerHTML += "<br>"
-    
-ipc.on 'openFile',   openFile
-ipc.on 'saveFileAs', saveFileAs
-ipc.on 'saveFile',   => saveFile()
-ipc.on 'loadFile',  (event, file) => loadFile file
 
 # 00000000  0000000    000  000000000   0000000   00000000 
 # 000       000   000  000     000     000   000  000   000
@@ -129,8 +156,6 @@ editor = new EditorView $('input'), 'input'
 editor.setText editorText if editorText?
 editor.elem.focus()
 
-splitAt prefs.get 'split', 100
-
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000     
 # 0000000    0000000   0000000   000    000    0000000 
@@ -139,7 +164,7 @@ splitAt prefs.get 'split', 100
 
 window.onresize = =>
     splitDrag.maxPos = pos sw(), sh()-minEnterHeight
-    ipc.send 'bounds'
+    ipc.send 'saveBounds', winID if winID?
               
 # 000   000  00000000  000   000
 # 000  000   000        000 000 
@@ -154,12 +179,5 @@ document.onkeydown = (event) ->
     
     switch combo
         when 'command+r', 'command+enter' then return ipc.send 'execute', editor.text()
-        when 'command+alt+i'              then return ipc.send 'toggleDevTools'
-        when 'command+alt+ctrl+l'         then return ipc.send 'reloadWindow'
-        when 'command+n'                  then return ipc.send 'newFile'
-    
-    switch key
-        when 'esc'         then return window.close()
-        when 'right click' then return
-    
-
+        when 'command+alt+i'              then return ipc.send 'toggleDevTools', winID
+        

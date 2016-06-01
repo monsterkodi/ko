@@ -7,6 +7,7 @@
 ###
 
 _   = require 'lodash'
+log = require './log'
 fs  = require 'fs'
 
 class Prefs
@@ -25,6 +26,31 @@ class Prefs
         values[key] = value
         Prefs.save values
         
+    @setPath: (path, value) ->
+        p = Prefs.load()
+        c = p
+        s = path.split '.'
+        while s.length
+            k = s.shift()
+            if s.length
+                if not c[k]? 
+                    c[k] = {}
+                c = c[k]
+            else
+                c[k] = value
+        Prefs.save p
+
+    @getPath: (path, value) ->
+        p = Prefs.load()
+        s = path.split '.'
+        c = p
+        while s.length
+            k = s.shift()
+            c = c[k]
+            if not c?
+                return value 
+        c
+                
     @add: (key, value) ->
         values = Prefs.load()
         values[key].push value
@@ -45,8 +71,9 @@ class Prefs
         values = {}
         try
             values = JSON.parse fs.readFileSync(Prefs.path, encoding:'utf8')
-        catch        
-            console.log 'can\'t load prefs file', Prefs.path
+        catch 
+            1       
+            # console.log 'can\'t load prefs file', Prefs.path
         for key in Object.keys Prefs.defs
             if not values[key]?
                 values[key] = Prefs.defs[key]

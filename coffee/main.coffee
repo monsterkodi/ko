@@ -9,6 +9,7 @@ prefs         = require './tools/prefs'
 log           = require './tools/log'
 {first}       = require './tools/tools'
 execute       = require './execute'
+MainMenu      = require './mainmenu'
 fs            = require 'fs'
 noon          = require 'noon'
 electron      = require 'electron'
@@ -19,8 +20,9 @@ Menu          = electron.Menu
 clipboard     = electron.clipboard
 ipc           = electron.ipcMain
 dialog        = electron.dialog
-win           = undefined
 tray          = undefined
+main          = undefined
+wins          = []
 
 #  0000000   00000000    0000000    0000000
 # 000   000  000   000  000        000     
@@ -40,7 +42,6 @@ version  #{pkg.version}
 if args.verbose
     log noon.stringify args, colors:true
 
-
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000     
 # 00000000   0000000    0000000   000000    0000000 
@@ -52,10 +53,28 @@ prefs.init "#{app.getPath('userData')}/kandis.json",
 
 mostRecentFile = -> first prefs.get 'recentFiles', []
 
-if args.arglist.length
-    openFile = resolve args.arglist[0]
-else
-    openFile = mostRecentFile()
+# 000   000  000  000   000   0000000
+# 000 0 000  000  0000  000  000     
+# 000000000  000  000 0 000  0000000 
+# 000   000  000  000  0000       000
+# 00     00  000  000   000  0000000 
+
+wins        = -> BrowserWindow.getAllWindows()
+activeWin   = -> BrowserWindow.getFocusedWindow()
+visibleWins = -> (w for w in wins() when w?.isVisible())
+winWithID = (winID) -> 
+    for w in wins()
+        return w if w.id == winID
+
+# 0000000     0000000    0000000  000   000
+# 000   000  000   000  000       000  000 
+# 000   000  000   000  000       0000000  
+# 000   000  000   000  000       000  000 
+# 0000000     0000000    0000000  000   000
+
+hideDock = ->
+    return if prefs.get 'trayOnly', false
+    app.dock.hide() if app.dock
 
 # 000  00000000    0000000
 # 000  000   000  000     
@@ -64,121 +83,137 @@ else
 # 000  000         0000000
 
 ipc.on 'execute',   (event, arg) => event.sender.send 'executeResult', execute.execute arg
-ipc.on 'bounds',         (event) => saveBounds()
-ipc.on 'toggleDevTools', (event) => win?.webContents.toggleDevTools()
-ipc.on 'reloadWindow',   (event) => 
-    dev = win?.webContents.isDevToolsOpened()
-    if dev
-        win.webContents.closeDevTools()
-        setTimeout win.webContents.reloadIgnoringCache, 100
-    else
-        win?.webContents.reloadIgnoringCache()
+ipc.on 'toggleDevTools', (event) => event.sender.toggleDevTools()
+ipc.on 'newWindowWithFile', (event, file) => main.createWindow file
+ipc.on 'reloadWindow',   (event, winID) => main.reloadWin winWithID winID
+ipc.on 'saveBounds', (event, winID) => main.saveWinBounds winWithID(winID) 
     
-# 000   000  000  000   000  0000000     0000000   000   000
-# 000 0 000  000  0000  000  000   000  000   000  000 0 000
-# 000000000  000  000 0 000  000   000  000   000  000000000
-# 000   000  000  000  0000  000   000  000   000  000   000
-# 00     00  000  000   000  0000000     0000000   00     00
+# 00     00   0000000   000  000   000
+# 000   000  000   000  000  0000  000
+# 000000000  000000000  000  000 0 000
+# 000 0 000  000   000  000  000  0000
+# 000   000  000   000  000  000   000
 
-activeWindow = -> win
+class Main
+    
+    constructor: -> 
+        MainMenu.init @
+        
+        tray = new Tray "#{__dirname}/../img/menu.png"
+        tray.on 'click', @toggleWindows
+        hideDock()
+        
+        electron.globalShortcut.register prefs.get('shortcut'), @toggleWindows
 
-toggleWindow = ->
-    if win?.isVisible()
-        win.hide()    
-        app.dock.hide()        
-    else
-        showWindow()
+        execute.init()
+            
+        log "windows", prefs.get 'windows', []
+            
+        for k, w of prefs.get 'windows', {}
+            @restoreWindow w
 
-showWindow = ->
-    if win?
-        win.show()
+        for file in args.arglist
+            log 'create', file
+            @createWindow file
+
+        if not wins().length
+            log 'show'
+            if args.show
+                w = @createWindow mostRecentFile()
+                w.webContents.openDevTools() if args.debug
+        
+    reloadWin: (win) ->
+        if win?
+            dev = win.webContents.isDevToolsOpened()
+            if dev
+                win.webContents.closeDevTools()
+                setTimeout win.webContents.reloadIgnoringCache, 100
+            else
+                win.webContents.reloadIgnoringCache()
+
+    saveWinBounds: (win) ->
+        prefs.setPath "windows.#{win.id}.bounds",win.getBounds()
+    
+    toggleWindows: =>
+        if wins().length
+            if visibleWins().length
+                @hideWindows()
+            else
+                @showWindows()
+        else
+            @createWindow()
+
+    hideWindows: ->
+        for w in wins()
+            w.hide()
+            hideDock()
+            
+    showWindows: ->
+        for w in wins()
+            w.show()
+            app.dock.show()
+                
+    restoreWindow: (state) ->
+        w = @createWindow state.file
+        w.setBounds state.bounds if state.bounds?
+        w.webContents.openDevTools() if state.devTools
+        
+    focusNextWindow: (win) ->
+        allWindows = wins()
+        for w in allWindows
+            if w == win
+                i = 1 + allWindows.indexOf w
+                i = 0 if i >= allWindows.length
+                allWindows[i].focus()
+        
+    #  0000000  00000000   00000000   0000000   000000000  00000000
+    # 000       000   000  000       000   000     000     000     
+    # 000       0000000    0000000   000000000     000     0000000 
+    # 000       000   000  000       000   000     000     000     
+    #  0000000  000   000  00000000  000   000     000     00000000
+            
+    createWindow: (openFile) ->
+        win = new BrowserWindow
+            width:           1000
+            height:          1200
+            minWidth:        120
+            minHeight:       120
+            useContentSize:  true
+            backgroundColor: '#181818'
+            fullscreen:      false
+            show:            true
+            titleBarStyle:   'hidden'
+                    
+        win.loadURL "file://#{__dirname}/../index.html"
         app.dock.show()
-    else
-        createWindow()
+        win.on 'close', @onCloseWin
+        win.on 'move', @onMoveWin
+                
+        winReady = =>
+            win.webContents.send 'loadFile', openFile if openFile?
+            win.webContents.send 'setWinID', win.id
+        
+        win.webContents.on 'dom-ready', winReady
+                
+        win 
     
-createWindow = ->
-    win = new BrowserWindow
-        width:           1000
-        height:          1200
-        minWidth:        120
-        minHeight:       120
-        useContentSize:  true
-        backgroundColor: '#181818'
-        fullscreen:      false
-        show:            true
-        titleBarStyle:   'hidden'
+    onMoveWin: (event) => @saveWinBounds event.sender
+    
+    onCloseWin: (event) =>
+        if visibleWins().length == 1
+            hideDock()
+        prefs.setPath "windows.#{event.sender.id}", undefined
         
-    bounds = prefs.get 'bounds'
-    win.setBounds bounds if bounds?
-        
-    win.loadURL "file://#{__dirname}/../index.html"
-    win.webContents.openDevTools() if args.debug
-    app.dock.show()
-    win.on 'closed', -> win = null
-    win.on 'close', (event) ->
-        win.hide()
-        app.dock.hide()
-        event.preventDefault()
-        
-    if openFile
-        win.webContents.on 'dom-ready', ->
-            win.webContents.send 'loadFile', openFile
-    win
-
-saveBounds = ->
-    if win?
-        prefs.set 'bounds', win.getBounds()
-        
+    quit: => app.exit 0
+            
 # 00000000   00000000   0000000   0000000    000   000
 # 000   000  000       000   000  000   000   000 000 
 # 0000000    0000000   000000000  000   000    00000  
 # 000   000  000       000   000  000   000     000   
 # 000   000  00000000  000   000  0000000       000   
 
-app.on 'ready', -> 
-    
-    tray = new Tray "#{__dirname}/../img/menu.png"
-    tray.on 'click', toggleWindow
-    app.dock.hide() if app.dock
-    
-    # 00     00  00000000  000   000  000   000
-    # 000   000  000       0000  000  000   000
-    # 000000000  0000000   000 0 000  000   000
-    # 000 0 000  000       000  0000  000   000
-    # 000   000  00000000  000   000   0000000 
-    
-    Menu.setApplicationMenu Menu.buildFromTemplate [
-        label: app.getName()
-        submenu: [
-            label: 'Open ...'
-            accelerator: 'Command+O'
-            click: () => activeWindow()?.webContents.send 'openFile'
-        ,            
-            label: 'Save'
-            accelerator: 'Command+S'
-            click: () => activeWindow()?.webContents.send 'saveFile'
-        ,            
-            label: 'Save As ...'
-            accelerator: 'Command+Shift+S'
-            click: () => activeWindow()?.webContents.send 'saveFileAs'
-        ,
-            label: 'Close Window'
-            accelerator: 'Command+W'
-            click: -> activeWindow()?.close()
-        ,
-            label: 'Quit'
-            accelerator: 'Command+Q'
-            click: -> 
-                saveBounds()
-                app.exit 0
-        ]
-    ]
+app.on 'ready', => main = new Main
+app.on 'window-all-closed', -> 
         
-    electron.globalShortcut.register prefs.get('shortcut'), showWindow
-    
-    execute.init()
-        
-    if args.show or openFile
-        showWindow()
                 
             
