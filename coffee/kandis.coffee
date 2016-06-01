@@ -164,7 +164,7 @@ editor.view.focus()
 # 000   000  00000000  0000000   000  0000000  00000000
 
 window.onresize = =>
-    log 'resize', sw(), sh()
+    # log 'resize', sw(), sh()
     if sh()
         splitDrag.setMinMax pos(0, minScrollHeight), pos(0, sh()-minEnterHeight)
         ipc.send 'saveBounds', winID if winID?

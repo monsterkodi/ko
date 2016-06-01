@@ -5,7 +5,7 @@
 # 00000000  0000000    000     000      0000000   000   000      0      000  00000000  00     00
 
 Editor    = require './editor'
-html      = require './html'
+render    = require './render'
 log       = require '../tools/log'
 drag      = require '../tools/drag'
 keyinfo   = require '../tools/keyinfo'
@@ -128,7 +128,7 @@ class EditorView extends Editor
             i = c + @topIndex
             @elem.children[c].id = "line-#{i}"
             if i < @lines.length
-                span = html.renderLine @lines[i]
+                span = render.line @lines[i]
                 @divs.push span
                 @elem.children[c].innerHTML = span
             else
@@ -147,13 +147,16 @@ class EditorView extends Editor
         @elem.appendChild div
 
     renderCursors: ->
-        $('.cursors', @view).innerHTML = html.renderCursors [@cursor], @size
+        $('.cursors', @view).innerHTML = render.cursors [@cursor], @size
         
     renderSelection: ->
         s = @selectionsRelativeToLineIndexRange([@topIndex, @botIndex])
-        log 'renderSelection', s
-        h = html.renderSelection s, @size
-        $('.selections', @view).innerHTML = h
+        if s
+            log 'renderSelection', s
+            h = render.selection s, @size
+            $('.selections', @view).innerHTML = h
+        else
+            log 'no selection'
 
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     
@@ -233,7 +236,7 @@ class EditorView extends Editor
     updateLine: (lineIndex) ->
         if @topIndex <= lineIndex < @lines.length
             relIndex = lineIndex - @topIndex
-            span = html.renderLine @lines[lineIndex]
+            span = render.line @lines[lineIndex]
             @divs[relIndex] = span
             @elem.children[relIndex]?.innerHTML = span
 
@@ -254,7 +257,7 @@ class EditorView extends Editor
         # log 'posForEvent', lx, ly
         p = [parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth)),
              parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @topIndex]
-        log 'posForEvent cx', event.clientX, 'p0', p[0]
+        # log 'posForEvent cx', event.clientX, 'p0', p[0]
         p
 
     # 000      000  000   000  00000000   0000000
@@ -276,7 +279,6 @@ class EditorView extends Editor
         
     updateScrollbar: ->
         sbw = getStyle '.scrollhandle', 'width'
-        log 'sbw', sbw
         if @bufferHeight < @viewHeight()
             @scrollhandleRight.style.top    = "0"
             @scrollhandleRight.style.height = "0"
@@ -426,8 +428,8 @@ class EditorView extends Editor
                         ansiKeycode = require 'ansi-keycode'
                         if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
                             @insertCharacter ansiKeycode event
-                        else
-                            log "ignoring", combo
+                        # else
+                        #     log "ignoring", combo
                             
         @endSelection event.shiftKey # ... reset selection 
         

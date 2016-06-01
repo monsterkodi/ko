@@ -4,9 +4,10 @@
 # 000   000  000   000  000       000       000       000   000
 # 0000000     0000000   000       000       00000000  000   000
 
+{clamp,
+ startOf,
+ endOf}   = require '../tools/tools'
 log       = require '../tools/log'
-tools     = require '../tools/tools'
-clamp     = tools.clamp
 
 class Buffer
     
@@ -26,10 +27,15 @@ class Buffer
         @selectionsInLineIndexRange lineIndexRange
     
     selectionsInLineIndexRange: (lineIndexRange) ->
-        log 'selectionsInLineIndexRange', lineIndexRange
-        [[0,[3,8]], [1,[0,3]], [6,[6,19]]]
+        selected = @selectedLineIndicesRange()
+        # log 'selected', selected
+        if selected?
+            intersection = @rangeIntersection selected, lineIndexRange
+            # log 'intersection', intersection
+            if intersection?
+                for i in [startOf(intersection)...endOf(intersection)]
+                    [i, @selectedCharacterRangeForLineAtIndex i]
     
-
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000
     # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
@@ -137,6 +143,11 @@ class Buffer
     # 000   000  000   000  000  0000  000   000  000            000
     # 000   000  000   000  000   000   0000000   00000000  0000000 
     
+    rangeIntersection: (a,b) ->
+        s = Math.max(a[0], b[0])
+        e = Math.min(a[1], b[1])
+        [s, e] if s<=e
+            
     rangeAfterPosInRanges: (pos, ranges) ->
         for r in ranges
             if r[0][1] > pos[1] or r[0][1] == pos[1] and r[0][0] > pos[0]
