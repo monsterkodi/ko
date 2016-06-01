@@ -34,13 +34,18 @@ pkg   = require "../package.json"
 args  = require('karg') """
 
 #{pkg.name}
+
     arglist  . ? argument list           . ** .
     show     . ? open window on startup  . = true
     noprefs  . ? don't load preferences  . = false
     debug    . ? open developer tools    . = false . - D
     verbose  . ? log more                . = false
     
-version  #{pkg.version}"""
+version  #{pkg.version}
+
+""", dontExit: true
+
+app.exit(0) if not args?
 
 if args.verbose
     log noon.stringify args, colors:true

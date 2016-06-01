@@ -1,5 +1,5 @@
-name            kandis
-version         0.9.1
+name            ko
+version         0.1.0
 description     coffee script tool
 main            js/main.js
 scripts
@@ -14,23 +14,22 @@ scripts
                 debug     npm run kill && npm start -- -D
 repository
                 type  git
-                url   git+https://github.com/monsterkodi/kandis.git
+                url   git+https://github.com/monsterkodi/ko.git
 keywords
-                electron
                 mac
                 osx
-                menu-bar
                 tool
+                editor
                 coffee
                 script
                 coffee-script
-                coffesscript
+                coffeescript
 author          monsterkodi
 license         Unlicense
 bugs
-                url  https://github.com/monsterkodi/kandis/issues
+                url  https://github.com/monsterkodi/ko/issues
 build
-                app-bundle-id   net.monsterkodi.kandis
+                app-bundle-id   net.monsterkodi.ko
                 app-category-type  public.app-category.utilities
                 asar            false
                 osx
@@ -48,15 +47,15 @@ build
                       y     70
                       type  file
 devDependencies
-                electron-builder  next
-                electron-prebuilt  ^1.2.0
+                electron-builder  ^3.25.0
+                electron-prebuilt  ^1.2.1
 dependencies
                 ansi-keycode    0.0.0
                 coffee-script   ^1.10.0
                 colors          ^1.1.2
                 html-entities   ^1.2.0
-                karg            ^1.0.7
-                keycode         ^2.1.1
-                lodash          ^4.12.0
+                karg            ^1.0.8
+                keycode         ^2.1.2
+                lodash          ^4.13.1
                 noon            ^1.0.8
                 terminal.js     ^1.0.7

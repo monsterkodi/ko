@@ -71,6 +71,7 @@ ipc.on 'executeResult', (event, arg) =>
     
 ipc.on 'openFile',   => openFile()
 ipc.on 'cloneFile',  => ipc.send 'newWindowWithFile', editor.currentFile
+ipc.on 'reloadFile', => loadFile editor.currentFile
 ipc.on 'saveFileAs', => saveFileAs()
 ipc.on 'saveFile',   => saveFile()
 ipc.on 'loadFile', (event, file) => loadFile file
@@ -182,6 +183,6 @@ document.onkeydown = (event) ->
     return if not combo
     
     switch combo
-        when 'command+r', 'command+enter' then return ipc.send 'execute', editor.text()
-        when 'command+alt+i'              then return ipc.send 'toggleDevTools', winID
+        when 'command+enter' then return ipc.send 'execute', editor.text()
+        when 'command+alt+i' then return ipc.send 'toggleDevTools', winID
         

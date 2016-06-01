@@ -1,13 +1,8 @@
 # todo/ideas
 
-- selection independent from cursor
-- window reload doesn't reload buffer?
-- blinking cursor
 - font zoom
 
-- two selection modes
-    - active (cursor inside)
-    - passive (cursor movement won't destroy, but next selection will)
+- fix update
 
 - command entry
 - commands
@@ -17,6 +12,11 @@
     - execute
     - cat
         - images
+
+- two selection modes
+    - active (cursor inside)
+    - passive (cursor movement won't destroy, but next selection will)
+
 - syntax
     - md, noon, json, styl
 - history/consle/terminal
@@ -25,4 +25,4 @@
      - command
      - shortcut
 - markdown mode (replace - with ●)
-- rename? kode, kewl? ko! :-)
+- rename? kewl, kode? ko! :-)

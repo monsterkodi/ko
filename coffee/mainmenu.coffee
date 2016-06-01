@@ -44,7 +44,6 @@ class MainMenu
                 label:       "Hide #{pkg.name}"
                 accelerator: 'Command+H'
                 click:       main.hideWindows
-                # role:        'hide'
             ,
                 label:       'Hide Others'
                 accelerator: 'Command+Alt+H'
@@ -95,7 +94,7 @@ class MainMenu
             ,
                 label:       'Reload'
                 accelerator: 'CmdOrCtrl+R'
-                click:       (i,win) => main.reloadWin win
+                click:       (i,win) => win?.webContents.send "reloadFile"
             ,
                 label:       'Close Window'
                 accelerator: 'Command+W'
@@ -133,28 +132,6 @@ class MainMenu
                 accelerator: "CmdOrCtrl+V"
                 selector:    "paste:"
             ]
-        ,
-            ###
-            00000000  000  000   000  0000000  
-            000       000  0000  000  000   000
-            000000    000  000 0 000  000   000
-            000       000  000  0000  000   000
-            000       000  000   000  0000000  
-            ###
-            label: 'Find'
-            submenu: [
-                label:       'Find Path'
-                accelerator: 'CmdOrCtrl+F'
-                click:       (i,win) -> win?.emit 'findPath'
-            ,
-                label:       'Find Value'
-                accelerator: 'CmdOrCtrl+G'
-                click:       (i,win) -> win?.emit 'findValue'
-            ,
-                label:       'Clear Find'
-                accelerator: 'CmdOrCtrl+K'
-                click:       (i,win) -> win?.emit 'clearFind'
-            ]
         ,        
             ###
             000   000  000  000   000  0000000     0000000   000   000
@@ -183,6 +160,12 @@ class MainMenu
                 label:       'Cycle Through Windows'
                 accelerator: 'CmdOrCtrl+`'
                 click:       (i,win) -> main.focusNextWindow win
+            ,
+                type: 'separator'
+            ,   
+                label:       'Reload Window'
+                accelerator: 'Ctrl+Alt+Cmd+L'
+                click:       (i,win) -> main.reloadWin win
             ]
         ,        
             label: 'Help'
