@@ -79,7 +79,7 @@ class render
         else
             if sel[1][1] > next[1][1]
                 border += " br"
-            if (sel[1][0] < next[1][0]) or (sel[1][0] > next[1][1])
+            if (sel[1][1] < next[1][0]) or (sel[1][0] > next[1][1])
                 border += " bl"
             
         if sel[1][0] == 0
