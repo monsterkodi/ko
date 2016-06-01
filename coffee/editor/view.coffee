@@ -149,16 +149,16 @@ class EditorView extends Editor
         @elem.appendChild div
 
     renderCursors: ->
-        $('.cursors', @view).innerHTML = render.cursors [@cursor], @size
+        h = render.cursors @cursorsRelativeToLineIndexRange([@topIndex, @botIndex]), @size
+        $('.cursors', @view).innerHTML = h
         
     renderSelection: ->
+        h = ""
         s = @selectionsRelativeToLineIndexRange([@topIndex, @botIndex])
         if s
-            # log 'renderSelection', s
-            h = render.selection s, @size
-            $('.selections', @view).innerHTML = h
-        # else
-        #     log 'no selection'
+            log 'renderSelection', s
+            h += render.selection s, @size
+        $('.selections', @view).innerHTML = h
 
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     

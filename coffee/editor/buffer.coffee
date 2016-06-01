@@ -37,6 +37,15 @@ class Buffer
             if intersection?
                 for i in [startOf(intersection)...endOf(intersection)]
                     [i, @selectedCharacterRangeForLineAtIndex i]
+                    
+    #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
+    # 000       000   000  000   000  000       000   000  000   000  000     
+    # 000       000   000  0000000    0000000   000   000  0000000    0000000 
+    # 000       000   000  000   000       000  000   000  000   000       000
+    #  0000000   0000000   000   000  0000000    0000000   000   000  0000000 
+    
+    cursorsRelativeToLineIndexRange: (lineIndexRange) ->
+        [[@cursor[0], @cursor[1]-lineIndexRange[0]]]
     
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000
