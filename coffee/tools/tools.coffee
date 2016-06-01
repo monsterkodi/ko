@@ -58,20 +58,29 @@ module.exports =
         for rule in document.styleSheets[0].cssRules
             if rule.selectorText == selector
                 rule.style[key] = value
-                console.log 'rule', rule.style[key]
+
+    getStyle: (selector, key, value) ->
+        for rule in document.styleSheets[0].cssRules
+            if rule.selectorText == selector
+                log 'value', rule.style[key]
+                log rule
+                log rule.style
+                return rule.style[key]
+        log 'notfomund', key
+        return value
         
-    characterWidth: (clss) ->
+    characterWidth: (elem,clss) ->
         o = document.createElement 'div'
         o.className = clss
         o.innerHTML = 'XXXXXXXXXX'
-        o.style = 
-          float:      'left'
-          visibility: 'hidden'
-        document.body.appendChild o
-        log 'o', o.clientWidth, o.innerHTML.length
+        # o.style = 
+        #   float:      'left'
+        #   visibility: 'hidden'
+        elem.appendChild o
+        log 'characterWidth o', o.clientWidth, o.innerHTML.length
         w = o.clientWidth/o.innerHTML.length
-        log 'w', w
-        o.remove()
+        log 'characterWidth w', w
+        # o.remove()
         w
         
     # 0000000     0000000   00     00

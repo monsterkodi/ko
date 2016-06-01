@@ -22,6 +22,7 @@ ipc    = electron.ipcRenderer
 remote = electron.remote
 dialog = remote.dialog
 winID  = null
+editor = null
     
 enterHeight     = 200
 minEnterHeight  = 100
@@ -84,21 +85,21 @@ ipc.on 'setWinID', (event, id) =>
 # 000       000  000      000     
 # 000       000  0000000  00000000
 
-saveFile = (file) ->
+saveFile = (file) =>
     file ?= editor.currentFile
     log 'save', file
     fs.writeFileSync file, editor.text(), encoding: 'UTF8'
     editor.currentFile = file
     setState 'file', file
 
-loadFile = (file) ->
+loadFile = (file) =>
     log 'load', file
     addToRecent file
     editor.setText fs.readFileSync file, encoding: 'UTF8'
     editor.currentFile = file
     setState 'file', file
 
-openFile = ->
+openFile = =>
     dialog.showOpenDialog 
         title: "Open File"
         defaultPath: resolve '.'
@@ -111,7 +112,7 @@ openFile = ->
             if files?.length
                 loadFile resolve files[0]
 
-saveFileAs = ->
+saveFileAs = =>
     dialog.showSaveDialog 
         title: "Save File As"
         defaultPath: currentFile
@@ -132,11 +133,12 @@ saveFileAs = ->
 # 0000000   000        0000000  000     000   
 
 splitAt = (y) ->
-    log 'splitAt', y
+    # log 'splitAt', y
     $('.split-top').style.height = "#{y}px"
     $('.split-handle' ).style.top = "#{y}px"
     $('.split-bot').style.top = "#{y+10}px"
     enterHeight = sh()-y
+    splitDrag.setMinMax pos(0, minScrollHeight), pos(0, sh()-minEnterHeight)
     editor?.resized()
     setState 'split', y
 
@@ -153,7 +155,7 @@ splitDrag = new drag
 
 editor = new EditorView $('.editor')
 editor.setText editorText if editorText?
-editor.elem.focus()
+editor.view.focus()
 
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000     

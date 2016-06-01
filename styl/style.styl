@@ -4,8 +4,10 @@ selectionRadius       = round(editorFontSize / 3)
 selectionRadiusCursor = round(selectionRadius / 2)
 
 scrollFontSize        = 24px
-scrollbarWidth        = 60px
+scrollbarWidth        = 60px // transparent scroll area
+scrollhandleWidth     = 8px
 editorPadding         = 10px 
+bottomCornerRadius    = 5px
 
 fill-abs()
     position        absolute
@@ -13,6 +15,11 @@ fill-abs()
     right           0
     left            0
     top             0
+    
+*
+    outline-width   0
+
+// all  initial // to clear inherited
 
 /*
 *   0000000   0000000  00000000    0000000   000      000      0000000     0000000   00000000    0000000
@@ -22,11 +29,10 @@ fill-abs()
 *  0000000    0000000  000   000   0000000   0000000  0000000  0000000    000   000  000   000  0000000 
 */
 
-.scroll 
 ::-webkit-scrollbar
-    width                   8px
+    width                   scrollhandleWidth
 ::-webkit-scrollbar    
-    height                  8px
+    height                  scrollhandleWidth
 
 ::-webkit-scrollbar-corner
     background              #222
@@ -34,7 +40,7 @@ fill-abs()
 ::-webkit-scrollbar-thumb
     background              #333
 
-.scroll:hover
+.scrollhandle:hover
 ::-webkit-scrollbar-thumb:hover
     background              #666
 
@@ -50,12 +56,10 @@ fill-abs()
         right           0
         width           scrollbarWidth
 
-.scroll
-    // background          rgba(255,255,255,0.2)
-    // margin 1px
+.scrollhandle
     background          #333
     position            absolute
-    height              20%
+    width               scrollhandleWidth
     top                 0
     &.left
         left            0
@@ -80,16 +84,9 @@ body
     margin          0
     
 #main
-    // position        static
-    // height          100%
-    // width           100%
-    position        absolute
-    left            0
-    right           0
-    top             0
-    bottom          0
+    fill-abs()
     overflow        hidden
-    outline-width   0px    
+    outline-width   0
 
 /*
 *   0000000   0000000  00000000    0000000   000      000    
@@ -165,22 +162,29 @@ body
 *  00000000  0000000    000     000      0000000   000   000
 */
 
+.split-pane.split-bot 
+    background      #000
+    border          1px solid #333
+    border-top      0px solid
+    
+    border-bottom-left-radius    bottomCornerRadius
+    border-bottom-right-radius   bottomCornerRadius    
+
 .editor
 
     fill-abs()
-
+    
+    right  20px
+    
     overflow-x      auto
     overflow-y      hidden
 
     background      #000
     color           #ddd 
-    
-    border          1px solid #333
-    border-top      0px solid
-    
-    border-bottom-left-radius    8px
-    border-bottom-right-radius   8px    
         
+    border-bottom-left-radius    bottomCornerRadius
+    border-bottom-right-radius   bottomCornerRadius    
+            
     font-weight     bold
     font-family     "Andale Mono", monospace
     
@@ -194,6 +198,8 @@ body
 .highlights
 .selections
     pointer-events  none
+    outline-width   0
+    fill-abs()
         
 /*
 *  000      000  000   000  00000000   0000000
@@ -205,29 +211,12 @@ body
     
 .lines
     position        static
-    border          1px solid blue
-        
-    // width           100%
-    // height          100%
-    // top             0
-    // bottom          0
-    // left            0
-    // right           0
-    // padding         editorPadding
-    // padding-top     0
     cursor          default
 
 .line
-    // all             initial
     white-space     nowrap
     display         block
     position        absolute
-    border          1px solid red
-    top             initial
-    bottom          initial
-    left            initial
-    right           initial
-    width           initial
     & span
         padding     0
         margin      0

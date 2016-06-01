@@ -36,6 +36,7 @@ args  = require('karg') """
 #{pkg.name}
     arglist  . ? argument list           . ** .
     show     . ? open window on startup  . = true
+    noprefs  . ? don't load preferences  . = false
     debug    . ? open developer tools    . = false . - D
     verbose  . ? log more                . = false
     
@@ -43,6 +44,7 @@ version  #{pkg.version}"""
 
 if args.verbose
     log noon.stringify args, colors:true
+    log ''
 
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000     
@@ -115,15 +117,15 @@ class Main
 
         execute.init()
             
-        @restoreWindows()
+        @restoreWindows() if not args.noprefs
 
         for file in args.arglist
             log 'create', file
             @createWindow file
 
         if not wins().length
-            log 'show'
             if args.show
+                log 'load recent',mostRecentFile() 
                 w = @createWindow mostRecentFile()
                 w.webContents.openDevTools() if args.debug
         

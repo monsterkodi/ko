@@ -9,7 +9,9 @@ html      = require './html'
 log       = require '../tools/log'
 drag      = require '../tools/drag'
 keyinfo   = require '../tools/keyinfo'
-{clamp,$,setStyle,characterWidth} = require '../tools/tools'
+{clamp,$,
+ getStyle, setStyle,
+ characterWidth} = require '../tools/tools'
 electron  = require('electron')
 clipboard = electron.clipboard
 webframe  = electron.webFrame
@@ -25,17 +27,15 @@ class EditorView extends Editor
         
         @size = {}
         @setFontSize 24
-        
-        setStyle '.lines', 'font-size', "#{@size.lineHeight}px"
                 
         @currentFile = undefined
-        @smoothScrolling = 1
+        @smoothScrolling = true
         @topIndex = 0
         @botIndex = 0
         @scroll   = 0
-        @scrollRight = $('.scroll.right', @view)
-        @scrollDrag = new drag 
-            target: $('.scrollbar.right', @view)
+        @scrollhandleRight = $('.scrollhandle.right', @view.parentElement)
+        @scrollbarDrag = new drag 
+            target: $('.scrollbar.right', @view.parentElement)
             onMove: @onScrollDrag 
             cursor: 'ns-resize'
     
@@ -108,7 +108,7 @@ class EditorView extends Editor
     setFontSize: (fontSize) ->
         setStyle '.lines', 'font-size', "#{fontSize}px"
         @size.lineHeight = fontSize
-        @size.charWidth  = characterWidth 'line'
+        @size.charWidth  = characterWidth @elem, 'line'
         log 'setFontSize', fontSize, @size
 
     # 0000000    000   0000000  00000000   000       0000000   000   000
@@ -141,6 +141,8 @@ class EditorView extends Editor
         div = document.createElement 'div'
         div.className = 'line'
         div.style.height = "#{@size.lineHeight}px"
+        y = @elem.children.length * @size.lineHeight
+        div.style.transform = "translate(0,#{y}px)"
         @elem.appendChild div
 
     renderCursors: ->
@@ -172,7 +174,6 @@ class EditorView extends Editor
     resized: -> 
         oldHeight = @editorHeight
         @updateSizeValues()
-        log @editorHeight, oldHeight
         if @editorHeight > oldHeight
             @displayLines @topIndex
         else
@@ -236,17 +237,17 @@ class EditorView extends Editor
     
     posForEvent: (event) ->
         
-        el = document.elementsFromPoint(event.pageX, event.pageY)
-        for e in el
-            log e.id, e.className
-        
-        sl = @elem.scrollLeft
-        st = @elem.scrollTop
-        br = @elem.getBoundingClientRect()
-        lx = clamp 0, @elem.offsetWidth,  event.clientX - br.left
-        ly = clamp 0, @elem.offsetHeight, event.clientY - br.top
-        [parseInt(Math.floor((Math.max(0, sl + lx-10))/@size.charWidth)),
-         parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @topIndex]
+        sl = @view.scrollLeft
+        st = @view.scrollTop
+        br = @view.getBoundingClientRect()
+        # log 'posForEvent', sl, st, br
+        lx = clamp 0, @view.offsetWidth,  event.clientX - br.left
+        ly = clamp 0, @view.offsetHeight, event.clientY - br.top
+        # log 'posForEvent', lx, ly
+        p = [parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth)),
+             parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @topIndex]
+        log 'posForEvent cx', event.clientX, 'p0', p[0]
+        p
 
     # 000      000  000   000  00000000   0000000
     # 000      000  0000  000  000       000     
@@ -266,9 +267,13 @@ class EditorView extends Editor
     # 0000000    0000000  000   000   0000000   0000000  0000000
         
     updateScrollbar: ->
+        sbw = getStyle '.scrollhandle', 'width'
+        log 'sbw', sbw
         if @bufferHeight < @viewHeight()
-            @scrollRight.style.top    = "0"
-            @scrollRight.style.height = "0"
+            @scrollhandleRight.style.top    = "0"
+            @scrollhandleRight.style.height = "0"
+            @scrollhandleRight.style.width  = "0"
+            @view.style.right = "0"
         else
             vh           = Math.min @editorHeight, @viewHeight()
             scrollTop    = parseInt (@scroll / @bufferHeight) * vh
@@ -277,8 +282,11 @@ class EditorView extends Editor
             scrollTop    = Math.min scrollTop, @viewHeight()-scrollHeight
             scrollTop    = Math.max 0, scrollTop
                     
-            @scrollRight.style.top    = "#{scrollTop}.px"
-            @scrollRight.style.height = "#{scrollHeight}.px"
+            @scrollhandleRight.style.top    = "#{scrollTop}.px"
+            @scrollhandleRight.style.height = "#{scrollHeight}.px"
+            @scrollhandleRight.style.width  = sbw
+            @view.style.right = sbw            
+            
                 
     scrollLines: (lineDelta) -> @scrollBy lineDelta * @size.lineHeight
 
@@ -306,7 +314,7 @@ class EditorView extends Editor
             @updateScrollbar()
 
         if @smoothScrolling            
-            @elem.scrollTop = dff
+            @view.scrollTop = dff
 
     scrollCursor: -> $('.cursor', @view)?.scrollIntoViewIfNeeded()
             

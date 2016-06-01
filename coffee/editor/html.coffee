@@ -97,8 +97,9 @@ class html
         lh = size.lineHeight
         ot = size.offsetTop
         for c in cursors
-            tx = c[0] * cw - ot
+            tx = c[0] * cw
             ty = c[1] * lh - ot
+            log 'cursor', c[0], c[1], tx, ty
             h += "<div class=\"cursor-#{i} cursor\" style=\"transform: translate(#{tx}px,#{ty}px); height:#{lh}px\"></div>"
             i += 1
         h

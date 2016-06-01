@@ -33,7 +33,7 @@ class Drag
                 return
             @target = t
         if not @target?
-            error 'cant find drag target', @target
+            error 'cant find drag target'
             return
         if @minPos? and @maxPos?
             @setMinMax @minPos, @maxPos
