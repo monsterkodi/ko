@@ -16,72 +16,65 @@ class html
     # 000      000  000  0000  000     
     # 0000000  000  000   000  00000000
     
-    @renderLine: (index, lines, cursor, selectionRanges, size) =>
+    @renderLine: (line) =>
+        
+        highlight.line line
+                
+    @renderSelection: (selections, size) => # selections [ [lineIndex, [startIndex, endIndex]], ... ]
         
         h = ""
-        i = index
-        l = lines[index]        
+        p = null
+        n = null
+        for si in [0...selections.length]
+            s = selections[si]
+            n = selections[si+1] if si
+            h += @selectionSpan p, s, n, size
+            p = s
+        h
         
-        if selectionRanges.length
-            selRange = [selectionRanges[0][0], selectionRanges[selectionRanges.length-1][0]]
+    @selectionSpan: (prev, sel, next, size) =>
+                                                                
+        # 0000000     0000000   00000000   0000000    00000000  00000000 
+        # 000   000  000   000  000   000  000   000  000       000   000
+        # 0000000    000   000  0000000    000   000  0000000   0000000  
+        # 000   000  000   000  000   000  000   000  000       000   000
+        # 0000000     0000000   000   000  0000000    00000000  000   000
+        
+        border = ""
+        if not prev?
+            border += " tl tr"
+        else
+            if (sel[1][0] < prev[1][0]) or (sel[1][0] > prev[1][1])
+                border += " tl"
+            if (sel[1][1] > prev[1][1]) or (sel[1][1] < prev[1][0])
+                border += " tr"
             
-        selectedCharacters = (i) -> 
-            r = selectionRanges[i-selectionRanges[0][0]][1]
-            [r[0], r[1]]
-                    
-        insert = []
-                    
-        if selRange and selRange[0] <= i <= selRange[1]
+        if not next?
+            border += " bl br"
+        else
+            if sel[1] > next[1][1]
+                border += " br"
+            if (sel[0] < next[1][0]) or (sel[0] > next[1][1])
+                border += " bl"
             
-            range = selectedCharacters i                
-            
-            # 0000000     0000000   00000000   0000000    00000000  00000000 
-            # 000   000  000   000  000   000  000   000  000       000   000
-            # 0000000    000   000  0000000    000   000  0000000   0000000  
-            # 000   000  000   000  000   000  000   000  000       000   000
-            # 0000000     0000000   000   000  0000000    00000000  000   000
-            
-            border = ""
-            if i == selRange[0]
-                border += " tl tr"
-            else
-                prevRange = selectedCharacters i-1
-                if (range[0] < prevRange[0]) or (range[0] > prevRange[1])
-                    border += " tl"
-                if (range[1] > prevRange[1]) or (range[1] < prevRange[0])
-                    border += " tr"
+        if sel[1][0] == 0
+            border += " start" # wider offset at start of line
                 
-            if i == selRange[1]
-                border += " bl br"
-            else
-                nextRange = selectedCharacters i+1
-                if range[1] > nextRange[1]
-                    border += " br"
-                if (range[0] < nextRange[0]) or (range[0] > nextRange[1])
-                    border += " bl"
-                
-            curX = Math.min cursor[0], l.length
-            if ((range[0] == curX) or (range[1] == curX)) and i == cursor[1]
-                border += " cursor" # smaller border radius around cursor
-                
-            if range[0] == 0
-                border += " start" # wider offset at start of line
-                    
-            #  0000000  00000000  000      00000000   0000000  000000000
-            # 000       000       000      000       000          000   
-            # 0000000   0000000   000      0000000   000          000   
-            #      000  000       000      000       000          000   
-            # 0000000   00000000  0000000  00000000   0000000     000   
-            
-            selStart = "<span class=\"selection#{border}\">"
-            selEnd   = '</span>'
-
-            if range[0] == range[1]
-                selStart += '<span class="empty"></span>'
-                
-            insert = [[range[0], selStart], [range[1], selEnd]]
-                
-        h = highlight.line l, insert
+        #  0000000  00000000  000      00000000   0000000  000000000
+        # 000       000       000      000       000          000   
+        # 0000000   0000000   000      0000000   000          000   
+        #      000  000       000      000       000          000   
+        # 0000000   00000000  0000000  00000000   0000000     000   
+        
+        x = size.charWidth * sel[1][0]
+        w = size.charWidth * sel[1][1]-sel[1][0]
+        y = size.lineHeight * sel[0]
+        h = size.lineHeight
+    
+        empty = sel[1][0] == sel[1][1] and "empty" or ""
+        
+        "<span class=\"selection#{border}#{empty}\" style=\"transform: translate(#{x}px,#{y}px); width: #{w}px; height: #{h}px\"></span>"
+                        
     
     #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
     # 000       000   000  000   000  000       000   000  000   000  000     

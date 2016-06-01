@@ -128,7 +128,7 @@ class EditorView extends Editor
             i = c + @topIndex
             @elem.children[c].id = "line-#{i}"
             if i < @lines.length
-                span = html.renderLine i, @lines, @cursor, @selectionRanges(), @size
+                span = html.renderLine @lines[i]
                 @divs.push span
                 @elem.children[c].innerHTML = span
             else
@@ -136,6 +136,7 @@ class EditorView extends Editor
                 @elem.children[c].innerHTML = ""
                 
         @renderCursors()
+        @renderSelection()
 
     addLine: ->
         div = document.createElement 'div'
@@ -147,6 +148,12 @@ class EditorView extends Editor
 
     renderCursors: ->
         $('.cursors', @view).innerHTML = html.renderCursors [@cursor], @size
+        
+    renderSelection: ->
+        s = @selectionsRelativeToLineIndexRange([@topIndex, @botIndex])
+        log 'renderSelection', s
+        h = html.renderSelection s, @size
+        $('.selections', @view).innerHTML = h
 
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     
@@ -217,6 +224,7 @@ class EditorView extends Editor
             @updateLine i
             
         @renderCursors()
+        @renderSelection()
             
         @updateSizeValues()
         @updateScrollbar()
@@ -225,7 +233,7 @@ class EditorView extends Editor
     updateLine: (lineIndex) ->
         if @topIndex <= lineIndex < @lines.length
             relIndex = lineIndex - @topIndex
-            span = html.renderLine lineIndex, @lines, @cursor, @selectionRanges(), @size
+            span = html.renderLine @lines[lineIndex]
             @divs[relIndex] = span
             @elem.children[relIndex]?.innerHTML = span
 

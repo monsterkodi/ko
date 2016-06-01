@@ -200,7 +200,12 @@ body
     pointer-events  none
     outline-width   0
     fill-abs()
-        
+
+.lines
+.cursors
+.highlights
+    background  transparent
+    
 /*
 *  000      000  000   000  00000000   0000000
 *  000      000  0000  000  000       000     
@@ -217,6 +222,7 @@ body
     white-space     nowrap
     display         block
     position        absolute
+    background      transparent
     & span
         padding     0
         margin      0
@@ -260,8 +266,9 @@ body
 */
         
 .selection
+    position        absolute
     pointer-events  none
-    background      rgba(255, 255, 255, 0.2) // no focus - needs to be transparent for cursor to show through
+    background      #444 // no focus
     
     padding-right   selectionRadiusCursor
     margin-right    - selectionRadiusCursor
