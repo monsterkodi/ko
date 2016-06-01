@@ -127,7 +127,9 @@ class Main
             if args.show
                 log 'load recent',mostRecentFile() 
                 w = @createWindow mostRecentFile()
-                w.webContents.openDevTools() if args.debug
+        
+        if args.debug
+            wins()?[0]?.webContents.openDevTools() 
         
     reloadWin: (win) ->
         if win?

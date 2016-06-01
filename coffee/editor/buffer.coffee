@@ -24,7 +24,9 @@ class Buffer
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000  0000000 
 
     selectionsRelativeToLineIndexRange: (lineIndexRange) ->
-        @selectionsInLineIndexRange lineIndexRange
+        sl = @selectionsInLineIndexRange lineIndexRange
+        if sl
+            ([s[0]-lineIndexRange[0], [s[1][0], s[1][1]]] for s in sl)
     
     selectionsInLineIndexRange: (lineIndexRange) ->
         selected = @selectedLineIndicesRange()

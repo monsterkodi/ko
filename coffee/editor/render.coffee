@@ -86,8 +86,8 @@ class render
         if sel[1][0] == 0
             border += " start" # wider offset at start of line
                         
-        x = size.charWidth * sel[1][0]
-        w = size.charWidth * sel[1][1]-sel[1][0]
+        x = size.charWidth *  sel[1][0]
+        w = size.charWidth * (sel[1][1]-sel[1][0])
         y = size.lineHeight * sel[0]
         h = size.lineHeight
     

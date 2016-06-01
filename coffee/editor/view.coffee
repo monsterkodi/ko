@@ -9,9 +9,11 @@ render    = require './render'
 log       = require '../tools/log'
 drag      = require '../tools/drag'
 keyinfo   = require '../tools/keyinfo'
-{clamp,$,
- getStyle, setStyle,
- characterWidth} = require '../tools/tools'
+{
+clamp,$,
+characterWidth,
+getStyle, setStyle
+}         = require '../tools/tools'
 electron  = require('electron')
 clipboard = electron.clipboard
 webframe  = electron.webFrame
@@ -26,7 +28,7 @@ class EditorView extends Editor
         @divs = []
         
         @size = {}
-        @setFontSize 24
+        @setFontSize 15
                 
         @currentFile = undefined
         @smoothScrolling = true
@@ -152,11 +154,11 @@ class EditorView extends Editor
     renderSelection: ->
         s = @selectionsRelativeToLineIndexRange([@topIndex, @botIndex])
         if s
-            log 'renderSelection', s
+            # log 'renderSelection', s
             h = render.selection s, @size
             $('.selections', @view).innerHTML = h
-        else
-            log 'no selection'
+        # else
+        #     log 'no selection'
 
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     
