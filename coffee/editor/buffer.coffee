@@ -30,13 +30,15 @@ class Buffer
     
     selectionsInLineIndexRange: (lineIndexRange) ->
         selected = @selectedLineIndicesRange()
-        # log 'selected', selected
         if selected?
             intersection = @rangeIntersection selected, lineIndexRange
-            # log 'intersection', intersection
             if intersection?
+                sl = []
                 for i in [startOf(intersection)...endOf(intersection)]
-                    [i, @selectedCharacterRangeForLineAtIndex i]
+                    cr = @selectedCharacterRangeForLineAtIndex i
+                    if cr
+                        sl.push [i, cr]
+                sl
                     
     #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
     # 000       000   000  000   000  000       000   000  000   000  000     

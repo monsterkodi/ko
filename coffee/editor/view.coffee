@@ -156,7 +156,7 @@ class EditorView extends Editor
         h = ""
         s = @selectionsRelativeToLineIndexRange([@topIndex, @botIndex])
         if s
-            log 'renderSelection', s
+            # log 'renderSelection', s
             h += render.selection s, @size
         $('.selections', @view).innerHTML = h
 
