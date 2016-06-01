@@ -7,6 +7,13 @@ scrollFontSize        = 24px
 scrollbarWidth        = 60px
 editorPadding         = 10px 
 
+fill-abs()
+    position        absolute
+    bottom          0
+    right           0
+    left            0
+    top             0
+
 /*
 *   0000000   0000000  00000000    0000000   000      000      0000000     0000000   00000000    0000000
 *  000       000       000   000  000   000  000      000      000   000  000   000  000   000  000     
@@ -67,17 +74,23 @@ body
     background      #111
     color           #fff
     font-family     arial, helvetica, sans-serif
-    margin          0
-    height          100%
-    width           100%
-    position        absolute
     -webkit-user-select none
+    fill-abs()
+    overflow        hidden
+    margin          0
     
 #main
-    height          100%
-    width           100%
+    // position        static
+    // height          100%
+    // width           100%
     position        absolute
+    left            0
+    right           0
+    top             0
+    bottom          0
     overflow        hidden
+    outline-width   0px    
+
 /*
 *   0000000   0000000  00000000    0000000   000      000    
 *  000       000       000   000  000   000  000      000    
@@ -88,9 +101,12 @@ body
         
 #scroll
     font-size       scrollFontSize    
-    width           100%
-    top             0px
     position        absolute
+    top             0
+    bottom          0
+    left            0
+    right           0
+    overflow        auto
     -webkit-app-region drag
 
 /*
@@ -101,12 +117,45 @@ body
 *  0000000   000        0000000  000     000   
 */
     
-#split
+.split
+    position        static
+    height          100%
     width           100%
-    height          10px
     background      #333
-    position        absolute
     -webkit-app-region no-drag
+
+.split-handle
+.split-pane
+    position        absolute
+    
+.split-pane    
+    background      transparent
+
+.split-rel
+    position        static
+    width           100%
+    height          100%
+
+.split-handle
+    background      #222
+    
+.split-vert .split-handle
+    width           10px
+
+.split-horiz .split-handle
+    height 10px
+    
+.split-horiz .split-handle
+.split-top
+.split-bot
+    left            0
+    right           0
+    
+.split-top
+    top             0
+
+.split-bot
+    bottom          0
     
 /*
 *  00000000  0000000    000  000000000   0000000   00000000 
@@ -116,51 +165,88 @@ body
 *  00000000  0000000    000     000      0000000   000   000
 */
 
-#editor
-    width           100%
-    position        absolute
-    bottom          0px
-    background      #000
-        
-.input
-#input
-    font-size       editorFontSize                
-    font-weight     bold
-    position        absolute
-    font-family     "Andale Mono", monospace
-    white-space     nowrap
-    
-#input   
-    color           #ddd 
-    border          1px solid #333
-    border-bottom-left-radius    8px
-    border-bottom-right-radius   8px
-    border-top      0px solid none
-    top             0
-    bottom          0
-    left            0 
-    right           0
-    padding         editorPadding
-    padding-top     0
-    outline-width   0    
+.editor
+
+    fill-abs()
+
     overflow-x      auto
     overflow-y      hidden
-    cursor          default
-    &:focus #cursor 
+
+    background      #000
+    color           #ddd 
+    
+    border          1px solid #333
+    border-top      0px solid
+    
+    border-bottom-left-radius    8px
+    border-bottom-right-radius   8px    
+        
+    font-weight     bold
+    font-family     "Andale Mono", monospace
+    
+    &:focus .cursor 
         background  yellow
     &:focus > .selection
         background  #666
+    
+.lines
+.cursors
+.highlights
+.selections
+    pointer-events  none
+        
+/*
+*  000      000  000   000  00000000   0000000
+*  000      000  0000  000  000       000     
+*  000      000  000 0 000  0000000   0000000 
+*  000      000  000  0000  000            000
+*  0000000  000  000   000  00000000  0000000 
+*/
+    
+.lines
+    position        static
+    border          1px solid blue
+        
+    // width           100%
+    // height          100%
+    // top             0
+    // bottom          0
+    // left            0
+    // right           0
+    // padding         editorPadding
+    // padding-top     0
+    cursor          default
 
 .line
-    pointer-events  none
+    // all             initial
     white-space     nowrap
-    display         list-item
-    padding-left    10px
-    margin-left    -10px
+    display         block
+    position        absolute
+    border          1px solid red
+    top             initial
+    bottom          initial
+    left            initial
+    right           initial
+    width           initial
     & span
         padding     0
         margin      0
         display     inline-block
+
+/*
+*   0000000  000   000  00000000    0000000   0000000   00000000 
+*  000       000   000  000   000  000       000   000  000   000
+*  000       000   000  0000000    0000000   000   000  0000000  
+*  000       000   000  000   000       000  000   000  000   000
+*   0000000   0000000   000   000  0000000    0000000   000   000
+*/
+    
+.cursor
+    width            2px
+    margin-right    -1px
+    margin-left     -1px
+    display         block
+    background      rgba(255, 255, 255, 0.2) // not focus
 
 /*
 *  000000000  00000000  00000000   00     00  000  000   000   0000000   000    
@@ -176,20 +262,6 @@ body
 	font-family  Courier, monospace
 	display      inline-block
 
-/*
-*   0000000  000   000  00000000    0000000   0000000   00000000 
-*  000       000   000  000   000  000       000   000  000   000
-*  000       000   000  0000000    0000000   000   000  0000000  
-*  000       000   000  000   000       000  000   000  000   000
-*   0000000   0000000   000   000  0000000    0000000   000   000
-*/
-    
-#cursor
-    width            2px
-    margin-right    -1px
-    margin-left     -1px
-    vertical-align  text-bottom
-    background      rgba(255, 255, 255, 0.2) // not focus
 /*
 *   0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
 *  000       000       000      000       000          000     000  000   000  0000  000

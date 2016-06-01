@@ -9,35 +9,38 @@ html      = require './html'
 log       = require '../tools/log'
 drag      = require '../tools/drag'
 keyinfo   = require '../tools/keyinfo'
-{clamp,$} = require '../tools/tools'
+{clamp,$,setStyle,characterWidth} = require '../tools/tools'
 electron  = require('electron')
 clipboard = electron.clipboard
 webframe  = electron.webFrame
 
 class EditorView extends Editor
 
-    constructor: (elem, className) ->
+    constructor: (view) ->
         super
 
-        @elem = elem
-        @clss = className
+        @view = view
+        @elem = $('.lines', @view)
         @divs = []
         
+        @size = {}
+        @setFontSize 24
+        
+        setStyle '.lines', 'font-size', "#{@size.lineHeight}px"
+                
         @currentFile = undefined
         @smoothScrolling = 1
         @topIndex = 0
         @botIndex = 0
         @scroll   = 0
-        @scrollRight = $('.scroll.right', @elem.parentElement)
+        @scrollRight = $('.scroll.right', @view)
         @scrollDrag = new drag 
-            target: $('.scrollbar.right', @elem.parentElement)
+            target: $('.scrollbar.right', @view)
             onMove: @onScrollDrag 
             cursor: 'ns-resize'
     
-        @initCharSize()
-        
-        @elem.onkeydown = @onKeyDown
-        @elem.addEventListener 'wheel',   @onWheel
+        @view.onkeydown = @onKeyDown
+        @view.addEventListener 'wheel', @onWheel
 
         @scrollBy 0
 
@@ -48,7 +51,7 @@ class EditorView extends Editor
         # 000   000   0000000    0000000   0000000   00000000
              
         @drag = new drag
-            target:  @elem
+            target:  @view
             cursor:  'default'
             onStart: (drag, event) =>
                 
@@ -69,7 +72,7 @@ class EditorView extends Editor
                         @tripleClickTimer = null
                         
                 @startSelection event.shiftKey
-                @elem.focus()
+                @view.focus()
                 @moveCursorToPos @posForEvent event
                 @endSelection event.shiftKey
             
@@ -78,7 +81,7 @@ class EditorView extends Editor
                 @moveCursorToPos @posForEvent event
                 @endSelection true
                 
-        @elem.ondblclick = (event) =>
+        @view.ondblclick = (event) =>
             @startSelection event.shiftKey
             ranges = @rangesForWordAtPos @posForEvent event
             @selectRanges ranges
@@ -102,6 +105,12 @@ class EditorView extends Editor
         @updateSizeValues()
         @displayLines 0
 
+    setFontSize: (fontSize) ->
+        setStyle '.lines', 'font-size', "#{fontSize}px"
+        @size.lineHeight = fontSize
+        @size.charWidth  = characterWidth 'line'
+        log 'setFontSize', fontSize, @size
+
     # 0000000    000   0000000  00000000   000       0000000   000   000
     # 000   000  000  000       000   000  000      000   000   000 000 
     # 000   000  000  0000000   00000000   000      000000000    00000  
@@ -109,7 +118,6 @@ class EditorView extends Editor
     # 0000000    000  0000000   000        0000000  000   000     000   
 
     displayLines: (top) ->
-        # log 'displayLines', top, @numViewLines(), @elem.clientHeight, @elem.offsetHeight
         @topIndex = top
         @botIndex = top+@numViewLines()
         @updateScrollbar()
@@ -120,17 +128,23 @@ class EditorView extends Editor
             i = c + @topIndex
             @elem.children[c].id = "line-#{i}"
             if i < @lines.length
-                span = html.renderLine i, @lines, @cursor, @selectionRanges(), @charSize
+                span = html.renderLine i, @lines, @cursor, @selectionRanges(), @size
                 @divs.push span
                 @elem.children[c].innerHTML = span
             else
                 @divs.push ""
                 @elem.children[c].innerHTML = ""
+                
+        @renderCursors()
 
     addLine: ->
         div = document.createElement 'div'
         div.className = 'line'
+        div.style.height = "#{@size.lineHeight}px"
         @elem.appendChild div
+
+    renderCursors: ->
+        $('.cursors', @view).innerHTML = html.renderCursors [@cursor], @size
 
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     
@@ -141,9 +155,9 @@ class EditorView extends Editor
     done: => @linesChanged @do.changedLineIndices
 
     updateSizeValues: ->
-        @bufferHeight = @numVisibleLines() * @lineHeight
-        @editorHeight = @numViewLines() * @lineHeight
-        @scrollMax    = @bufferHeight - @editorHeight + @lineHeight
+        @bufferHeight = @numVisibleLines() * @size.lineHeight
+        @editorHeight = @numViewLines() * @size.lineHeight
+        @scrollMax    = @bufferHeight - @editorHeight + @size.lineHeight
         # log "updateSizeValues", @viewHeight(), @editorHeight
     
     updateNumLines: ->
@@ -158,8 +172,11 @@ class EditorView extends Editor
     resized: -> 
         oldHeight = @editorHeight
         @updateSizeValues()
+        log @editorHeight, oldHeight
         if @editorHeight > oldHeight
             @displayLines @topIndex
+        else
+            @updateScrollbar()
     
     deltaToEnsureCursorIsVisible: ->
         delta = 0
@@ -177,7 +194,7 @@ class EditorView extends Editor
         
         if delta = @deltaToEnsureCursorIsVisible() 
             # log "delta", delta, delta * @lineHeight
-            @scrollBy delta * @lineHeight #todo: slow down when using mouse
+            @scrollBy delta * @size.lineHeight #todo: slow down when using mouse
             @scrollCursor()
             return
         
@@ -194,9 +211,11 @@ class EditorView extends Editor
                     
         indices.sort (a,b) -> a - b
         indices = _.sortedUniq indices
-        # log 'cl:', @cursor[1], 't:', @topIndex, 'b:', @botIndex, 'changed:', indices.join ','
+
         for i in indices
             @updateLine i
+            
+        @renderCursors()
             
         @updateSizeValues()
         @updateScrollbar()
@@ -205,7 +224,7 @@ class EditorView extends Editor
     updateLine: (lineIndex) ->
         if @topIndex <= lineIndex < @lines.length
             relIndex = lineIndex - @topIndex
-            span = html.renderLine lineIndex, @lines, @cursor, @selectionRanges(), @charSize
+            span = html.renderLine lineIndex, @lines, @cursor, @selectionRanges(), @size
             @divs[relIndex] = span
             @elem.children[relIndex]?.innerHTML = span
 
@@ -226,8 +245,8 @@ class EditorView extends Editor
         br = @elem.getBoundingClientRect()
         lx = clamp 0, @elem.offsetWidth,  event.clientX - br.left
         ly = clamp 0, @elem.offsetHeight, event.clientY - br.top
-        [parseInt(Math.floor((Math.max(0, sl + lx-10))/@charSize[0])),
-         parseInt(Math.floor((Math.max(0, st + ly))/@charSize[1])) + @topIndex]
+        [parseInt(Math.floor((Math.max(0, sl + lx-10))/@size.charWidth)),
+         parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @topIndex]
 
     # 000      000  000   000  00000000   0000000
     # 000      000  0000  000  000       000     
@@ -235,9 +254,9 @@ class EditorView extends Editor
     # 000      000  000  0000  000            000
     # 0000000  000  000   000  00000000  0000000 
     
-    viewHeight:      -> @elem.getBoundingClientRect().height 
-    numViewLines:    -> Math.ceil(@viewHeight() / @lineHeight)
-    numFullLines:    -> Math.floor(@viewHeight() / @lineHeight)
+    viewHeight:      -> @view.getBoundingClientRect().height 
+    numViewLines:    -> Math.ceil(@viewHeight() / @size.lineHeight)
+    numFullLines:    -> Math.floor(@viewHeight() / @size.lineHeight)
     numVisibleLines: -> @lines.length
 
     #  0000000   0000000  00000000    0000000   000      000    
@@ -254,14 +273,14 @@ class EditorView extends Editor
             vh           = Math.min @editorHeight, @viewHeight()
             scrollTop    = parseInt (@scroll / @bufferHeight) * vh
             scrollHeight = parseInt (@editorHeight / @bufferHeight) * vh
-            scrollHeight = Math.max scrollHeight, parseInt @lineHeight/4
+            scrollHeight = Math.max scrollHeight, parseInt @size.lineHeight/4
             scrollTop    = Math.min scrollTop, @viewHeight()-scrollHeight
             scrollTop    = Math.max 0, scrollTop
                     
             @scrollRight.style.top    = "#{scrollTop}.px"
             @scrollRight.style.height = "#{scrollHeight}.px"
                 
-    scrollLines: (lineDelta) -> @scrollBy lineDelta * @lineHeight
+    scrollLines: (lineDelta) -> @scrollBy lineDelta * @size.lineHeight
 
     scrollFactor: (event) ->
         f  = 1 
@@ -276,9 +295,10 @@ class EditorView extends Editor
         @scroll += delta
         @scroll = Math.min @scroll, @scrollMax
         @scroll = Math.max @scroll, 0
+        @size.offsetTop = @scroll
         
-        top = parseInt @scroll / @lineHeight
-        dff = @scroll - top * @lineHeight 
+        top = parseInt @scroll / @size.lineHeight
+        dff = @scroll - top * @size.lineHeight 
 
         if @topIndex != top
             @displayLines top
@@ -288,7 +308,7 @@ class EditorView extends Editor
         if @smoothScrolling            
             @elem.scrollTop = dff
 
-    scrollCursor: -> $('cursor')?.scrollIntoViewIfNeeded()
+    scrollCursor: -> $('.cursor', @view)?.scrollIntoViewIfNeeded()
             
     onWheel: (event) => 
         @scrollBy event.deltaY * @scrollFactor event
@@ -296,25 +316,6 @@ class EditorView extends Editor
     onScrollDrag: (drag) =>
         delta = (drag.delta.y / @editorHeight) * @bufferHeight
         @scrollBy delta
-    
-    #  0000000  000   000   0000000   00000000    0000000  000  0000000  00000000
-    # 000       000   000  000   000  000   000  000       000     000   000     
-    # 000       000000000  000000000  0000000    0000000   000    000    0000000 
-    # 000       000   000  000   000  000   000       000  000   000     000     
-    #  0000000  000   000  000   000  000   000  0000000   000  0000000  00000000
-
-    initCharSize: () ->
-        o = document.createElement 'div'
-        o.className = @clss
-        o.innerHTML = 'XXXXXXXXXX'
-        o.style = 
-          float:      'left'
-          visibility: 'hidden'
-        document.body.appendChild o
-        @charSize = [o.clientWidth/o.innerHTML.length, o.clientHeight]
-        @lineHeight = @charSize[1]
-        # log '@charSize', @charSize, '@lineHeight', @lineHeight
-        o.remove()
     
     # 0000000   0000000    0000000   00     00
     #    000   000   000  000   000  000   000
@@ -324,7 +325,6 @@ class EditorView extends Editor
         
     resetZoom: -> 
         webframe.setZoomFactor 1
-        @initCharSize()
         @updateNumLines()
         
     changeZoom: (d) -> 
@@ -332,9 +332,8 @@ class EditorView extends Editor
         z *= 1+d/20
         z = clamp 0.36, 5.23, z
         webframe.setZoomFactor z
-        @initCharSize()
         @updateNumLines()
-            
+                    
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
     # 0000000    0000000     00000  

@@ -9,21 +9,18 @@ log       = require '../tools/log'
 highlight = require './highlight'
 
 class html 
+            
+    # 000      000  000   000  00000000
+    # 000      000  0000  000  000     
+    # 000      000  000 0 000  0000000 
+    # 000      000  000  0000  000     
+    # 0000000  000  000   000  00000000
     
-    @cursorSpan: (charSize) => "<span id=\"cursor\" style=\"height: #{charSize[1]}px\"></span>"
-    
-    # 00000000   00000000  000   000  0000000    00000000  00000000         000      000  000   000  00000000
-    # 000   000  000       0000  000  000   000  000       000   000        000      000  0000  000  000     
-    # 0000000    0000000   000 0 000  000   000  0000000   0000000          000      000  000 0 000  0000000 
-    # 000   000  000       000  0000  000   000  000       000   000        000      000  000  0000  000     
-    # 000   000  00000000  000   000  0000000    00000000  000   000        0000000  000  000   000  00000000
-    
-    @renderLine: (index, lines, cursor, selectionRanges, charSize) =>
+    @renderLine: (index, lines, cursor, selectionRanges, size) =>
         
+        h = ""
         i = index
         l = lines[index]        
-        # l = " " if l.length == 0
-        h = ""
         
         if selectionRanges.length
             selRange = [selectionRanges[0][0], selectionRanges[selectionRanges.length-1][0]]
@@ -78,20 +75,32 @@ class html
             
             selStart = "<span class=\"selection#{border}\">"
             selEnd   = '</span>'
-            if i == cursor[1]
-                if cursor[0] == range[0]
-                    selStart = selStart+@cursorSpan(charSize)
-                else
-                    selEnd = selEnd+@cursorSpan(charSize)
-            else if range[0] == range[1]
+
+            if range[0] == range[1]
                 selStart += '<span class="empty"></span>'
                 
             insert = [[range[0], selStart], [range[1], selEnd]]
                 
-        else if i == cursor[1]
-            
-            insert = [[cursor[0], @cursorSpan(charSize)]]
-                        
         h = highlight.line l, insert
+    
+    #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
+    # 000       000   000  000   000  000       000   000  000   000  000     
+    # 000       000   000  0000000    0000000   000   000  0000000    0000000 
+    # 000       000   000  000   000       000  000   000  000   000       000
+    #  0000000   0000000   000   000  0000000    0000000   000   000  0000000 
+    
+    @renderCursors: (cursors, size) =>
+        
+        h = ""
+        i = 0
+        cw = size.charWidth
+        lh = size.lineHeight
+        ot = size.offsetTop
+        for c in cursors
+            tx = c[0] * cw - ot
+            ty = c[1] * lh - ot
+            h += "<div class=\"cursor-#{i} cursor\" style=\"transform: translate(#{tx}px,#{ty}px); height:#{lh}px\"></div>"
+            i += 1
+        h
                         
 module.exports = html

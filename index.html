@@ -7,14 +7,27 @@
   </head>
   <body>
       <div id="main">
-          <div id="scroll">
-              <pre class="terminaljs" data-columns="80" data-rows="24"></pre>
-          </div>
-          <div id="split"></div>
-          <div id="editor">
-              <div id="input" tabindex="0"></div>
-              <div class="scrollbar right"><div class="scroll right"></div></div>
-          </div>
+          <div class="split split-horiz">
+              <div class="split-pane split-top">
+                 <div class="split-rel">
+                  <div id="scroll">
+                      <pre class="terminaljs" data-columns="80" data-rows="24"></pre>
+                  </div>
+              </div>
+              </div>
+              <div class="split-handle"></div>
+              <div class="split-pane split-bot">
+                 <div class="split-rel">
+                  <div class="editor" tabindex="0">
+                      <div class="selections"></div>
+                      <div class="highlights"></div>
+                      <div class="lines"></div>
+                      <div class="cursors"></div>
+                      <div class="scrollbar right"><div class="scroll right"></div></div>
+                  </div>
+                </div>
+              </div>
+        </div>
       </div>
   </body>
   <script>

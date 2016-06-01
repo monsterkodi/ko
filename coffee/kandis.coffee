@@ -74,9 +74,9 @@ ipc.on 'saveFileAs', => saveFileAs()
 ipc.on 'saveFile',   => saveFile()
 ipc.on 'loadFile', (event, file) => loadFile file
 ipc.on 'setWinID', (event, id) => 
-    log 'got id', id
     winID = id
     splitAt getState 'split', minScrollHeight
+    setState 'file', editor.currentFile # file might be loaded before id got sent
                  
 # 00000000  000  000      00000000
 # 000       000  000      000     
@@ -132,18 +132,17 @@ saveFileAs = ->
 # 0000000   000        0000000  000     000   
 
 splitAt = (y) ->
-    $('scroll').style.height = "#{y}px"
-    $('split' ).style.top = "#{y}px"
-    $('editor').style.top = "#{y+10}px"
+    log 'splitAt', y
+    $('.split-top').style.height = "#{y}px"
+    $('.split-handle' ).style.top = "#{y}px"
+    $('.split-bot').style.top = "#{y+10}px"
     enterHeight = sh()-y
     editor?.resized()
     setState 'split', y
 
 splitDrag = new drag
-    target: 'split'
+    target: $('.split-handle')
     cursor: 'ns-resize'
-    minPos: pos 0,minScrollHeight
-    maxPos: pos sw(), sh()-minEnterHeight
     onMove: (drag) -> splitAt drag.cpos.y
 
 # 00000000  0000000    000  000000000   0000000   00000000 
@@ -152,7 +151,7 @@ splitDrag = new drag
 # 000       000   000  000     000     000   000  000   000
 # 00000000  0000000    000     000      0000000   000   000
 
-editor = new EditorView $('input'), 'input'
+editor = new EditorView $('.editor')
 editor.setText editorText if editorText?
 editor.elem.focus()
 
@@ -163,8 +162,11 @@ editor.elem.focus()
 # 000   000  00000000  0000000   000  0000000  00000000
 
 window.onresize = =>
-    splitDrag.maxPos = pos sw(), sh()-minEnterHeight
-    ipc.send 'saveBounds', winID if winID?
+    log 'resize', sw(), sh()
+    if sh()
+        splitDrag.setMinMax pos(0, minScrollHeight), pos(0, sh()-minEnterHeight)
+        ipc.send 'saveBounds', winID if winID?
+        editor?.resized()
               
 # 000   000  00000000  000   000
 # 000  000   000        000 000 

@@ -6,8 +6,15 @@
 
 _   = require 'lodash'
 pos = require './pos'
+log = require './log'
 
 module.exports = 
+
+    # 0000000    000   0000000  000000000
+    # 000   000  000  000          000   
+    # 000   000  000  000          000   
+    # 000   000  000  000          000   
+    # 0000000    000   0000000     000   
 
     def: (c,d) ->
         if c?
@@ -19,6 +26,66 @@ module.exports =
 
     del: (l,e) -> _.remove l, (n) -> n == e
 
+    #  0000000   00000000   00000000    0000000   000   000
+    # 000   000  000   000  000   000  000   000   000 000 
+    # 000000000  0000000    0000000    000000000    00000  
+    # 000   000  000   000  000   000  000   000     000   
+    # 000   000  000   000  000   000  000   000     000   
+
+    last: (a) -> a[a.length-1] if a?.length
+    first: (a) -> a[0] if a?.length
+
+    # 000   000   0000000   000      000   000  00000000
+    # 000   000  000   000  000      000   000  000     
+    #  000 000   000000000  000      000   000  0000000 
+    #    000     000   000  000      000   000  000     
+    #     0      000   000  0000000   0000000   00000000
+
+    clamp: (r1, r2, v) ->
+        if r1 > r2
+            [r1,r2] = [r2,r1]
+        v = Math.max(v, r1) if r1?
+        v = Math.min(v, r2) if r2?
+        v
+        
+    #  0000000   0000000   0000000
+    # 000       000       000     
+    # 000       0000000   0000000 
+    # 000            000       000
+    #  0000000  0000000   0000000 
+    
+    setStyle: (selector, key, value) ->
+        for rule in document.styleSheets[0].cssRules
+            if rule.selectorText == selector
+                rule.style[key] = value
+                console.log 'rule', rule.style[key]
+        
+    characterWidth: (clss) ->
+        o = document.createElement 'div'
+        o.className = clss
+        o.innerHTML = 'XXXXXXXXXX'
+        o.style = 
+          float:      'left'
+          visibility: 'hidden'
+        document.body.appendChild o
+        log 'o', o.clientWidth, o.innerHTML.length
+        w = o.clientWidth/o.innerHTML.length
+        log 'w', w
+        o.remove()
+        w
+        
+    # 0000000     0000000   00     00
+    # 000   000  000   000  000   000
+    # 000   000  000   000  000000000
+    # 000   000  000   000  000 0 000
+    # 0000000     0000000   000   000
+        
+    $: (idOrClass,e=document) -> 
+        if idOrClass.startsWith '.'
+            e.getElementsByClassName(idOrClass.substr(1).split('.').join " ")[0]
+        else
+            e.getElementById idOrClass
+
     absPos: (event) ->
         event = if event? then event else window.event
         if isNaN window.scrollX
@@ -29,22 +96,12 @@ module.exports =
 
     sw: () -> parseInt window.getComputedStyle(document.body).width
     sh: () -> parseInt window.getComputedStyle(document.body).height
-
-    last: (a) -> a[a.length-1] if a?.length
-    first: (a) -> a[0] if a?.length
-
-    clamp: (r1, r2, v) ->
-        if r1 > r2
-            [r1,r2] = [r2,r1]
-        v = Math.max(v, r1) if r1?
-        v = Math.min(v, r2) if r2?
-        v
-        
-    $: (idOrClass,e=document) -> 
-        if idOrClass.startsWith '.'
-            e.getElementsByClassName(idOrClass.substr(1).split('.').join " ")[0]
-        else
-            e.getElementById idOrClass
+    
+#  0000000  000000000  00000000   000  000   000   0000000 
+# 000          000     000   000  000  0000  000  000      
+# 0000000      000     0000000    000  000 0 000  000  0000
+#      000     000     000   000  000  000  0000  000   000
+# 0000000      000     000   000  000  000   000   0000000 
     
 if not String.prototype.splice
     String.prototype.splice = (start, delCount, newSubStr='') ->

@@ -32,13 +32,15 @@ wins          = []
 
 pkg   = require "../package.json"
 args  = require('karg') """
+
 #{pkg.name}
     arglist  . ? argument list           . ** .
     show     . ? open window on startup  . = true
     debug    . ? open developer tools    . = false . - D
     verbose  . ? log more                . = false
-version  #{pkg.version}
-"""
+    
+version  #{pkg.version}"""
+
 if args.verbose
     log noon.stringify args, colors:true
 
@@ -62,7 +64,7 @@ mostRecentFile = -> first prefs.get 'recentFiles', []
 wins        = -> BrowserWindow.getAllWindows()
 activeWin   = -> BrowserWindow.getFocusedWindow()
 visibleWins = -> (w for w in wins() when w?.isVisible())
-winWithID = (winID) -> 
+winWithID   = (winID) -> 
     for w in wins()
         return w if w.id == winID
 
@@ -82,11 +84,11 @@ hideDock = ->
 # 000  000        000     
 # 000  000         0000000
 
-ipc.on 'execute',   (event, arg) => event.sender.send 'executeResult', execute.execute arg
-ipc.on 'toggleDevTools', (event) => event.sender.toggleDevTools()
-ipc.on 'newWindowWithFile', (event, file) => main.createWindow file
-ipc.on 'reloadWindow',   (event, winID) => main.reloadWin winWithID winID
-ipc.on 'saveBounds', (event, winID) => main.saveWinBounds winWithID(winID) 
+ipc.on 'execute',           (event, arg)   => event.sender.send 'executeResult', execute.execute arg
+ipc.on 'toggleDevTools',    (event)        => event.sender.toggleDevTools()
+ipc.on 'newWindowWithFile', (event, file)  => main.createWindow file
+ipc.on 'reloadWindow',      (event, winID) => main.reloadWin winWithID winID
+ipc.on 'saveBounds',        (event, winID) => main.saveWinBounds winWithID(winID) 
     
 # 00     00   0000000   000  000   000
 # 000   000  000   000  000  0000  000
@@ -97,6 +99,12 @@ ipc.on 'saveBounds', (event, winID) => main.saveWinBounds winWithID(winID)
 class Main
     
     constructor: -> 
+        
+        if app.makeSingleInstance @otherInstanceStarted
+            log 'other instance already active -> quit'
+            app.exit 0
+            return
+                
         MainMenu.init @
         
         tray = new Tray "#{__dirname}/../img/menu.png"
@@ -107,10 +115,7 @@ class Main
 
         execute.init()
             
-        log "windows", prefs.get 'windows', []
-            
-        for k, w of prefs.get 'windows', {}
-            @restoreWindow w
+        @restoreWindows()
 
         for file in args.arglist
             log 'create', file
@@ -152,11 +157,6 @@ class Main
         for w in wins()
             w.show()
             app.dock.show()
-                
-    restoreWindow: (state) ->
-        w = @createWindow state.file
-        w.setBounds state.bounds if state.bounds?
-        w.webContents.openDevTools() if state.devTools
         
     focusNextWindow: (win) ->
         allWindows = wins()
@@ -165,7 +165,24 @@ class Main
                 i = 1 + allWindows.indexOf w
                 i = 0 if i >= allWindows.length
                 allWindows[i].focus()
-        
+                
+    # 00000000   00000000   0000000  000000000   0000000   00000000   00000000
+    # 000   000  000       000          000     000   000  000   000  000     
+    # 0000000    0000000   0000000      000     000   000  0000000    0000000 
+    # 000   000  000            000     000     000   000  000   000  000     
+    # 000   000  00000000  0000000      000      0000000   000   000  00000000
+    
+    restoreWindows: ->
+        windows = prefs.get 'windows', {}
+        prefs.set 'windows', {} # clear immeditately
+        for k, w of windows
+            @restoreWin w
+                
+    restoreWin: (state) ->
+        w = @createWindow state.file
+        w.setBounds state.bounds if state.bounds?
+        w.webContents.openDevTools() if state.devTools
+                
     #  0000000  00000000   00000000   0000000   000000000  00000000
     # 000       000   000  000       000   000     000     000     
     # 000       0000000    0000000   000000000     000     0000000 
@@ -204,6 +221,21 @@ class Main
             hideDock()
         prefs.setPath "windows.#{event.sender.id}", undefined
         
+    otherInstanceStarted: (args, dir) =>
+        log 'other instance args', args, 'dir', dir
+        if not visibleWins().length
+            @toggleWindows()
+            
+        for arg in args.slice(2)
+            file = arg
+            if not arg.startsWith '/'
+                file = resolve dir + '/' + arg
+            log 'create', file
+            @createWindow file
+            
+        if !activeWin()
+            visibleWins()[0]?.focus()
+        
     quit: => app.exit 0
             
 # 00000000   00000000   0000000   0000000    000   000
@@ -214,6 +246,8 @@ class Main
 
 app.on 'ready', => main = new Main
 app.on 'window-all-closed', -> 
+    
+
         
                 
             

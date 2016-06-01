@@ -36,7 +36,7 @@ class Drag
             error 'cant find drag target', @target
             return
         if @minPos? and @maxPos?
-            [@minPos, @maxPos] = [@minPos.min(@maxPos), @minPos.max(@maxPos)]
+            @setMinMax @minPos, @maxPos
 
         @dragging  = false
         @listening = false
@@ -45,6 +45,10 @@ class Drag
         @handle.style.cursor = @cursor
         @activate() if @active
         return
+
+    setMinMax: (minPos, maxPos) =>
+        @minPos = minPos.min(maxPos)
+        @maxPos = minPos.max(maxPos)
 
     dragStart: (event) =>
         

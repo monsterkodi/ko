@@ -1,5 +1,5 @@
 name          kandis
-version       0.9.0
+version       0.9.1
 description   coffee script tool
 main          js/main.js
 repository
@@ -22,7 +22,10 @@ bugs
 dependencies
               ansi-keycode    0.0.0
               coffee-script   ^1.10.0
+              colors          ^1.1.2
               html-entities   ^1.2.0
+              karg            ^1.0.7
               keycode         ^2.1.1
               lodash          ^4.12.0
               noon            ^1.0.8
+              terminal.js     ^1.0.7
