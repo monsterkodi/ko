@@ -53,7 +53,7 @@ class render
         for si in [0...selections.length]
             s = selections[si]
             n = (si < selections.length-1) and selections[si+1] or null
-            log 'si', si, 'p', p, 's', s, 'n', n
+            # log 'si', si, 'p', p, 's', s, 'n', n
             h += @selectionSpan p, s, n, size
             p = s
         h

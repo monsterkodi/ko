@@ -71,7 +71,10 @@ class Buffer
 
     selectedLineIndices: ->
         range = @selectedLineIndicesRange()
-        (i for i in [range[0]..range[1]])
+        if range
+            (i for i in [range[0]..range[1]])
+        else 
+            []
                 
     selectedLineIndicesRange: ->
         if @selection

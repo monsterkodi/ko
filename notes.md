@@ -1,5 +1,9 @@
 # todo/ideas
 
+- fix command key down -> deselect
+
+- remember file open dialog folder
+
 - font zoom
 
 - fix update

@@ -21,7 +21,7 @@ class MainMenu
                 recent.unshift 
                     label: path.basename(f) + ' - ' + path.dirname(f)
                     path: f
-                    click: (i) -> main.loadFile i.path
+                    click: (i) -> main.createWindow i.path
         if recent.length
             recent.push
                 type: 'separator'
