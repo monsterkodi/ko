@@ -46,7 +46,7 @@ build
                       y     70
                       type  file
 devDependencies
-                electron-builder  ^3.25.0
+                electron-builder  ^4.2.0
                 electron-prebuilt  ^1.2.1
 dependencies
                 ansi-keycode    0.0.0
@@ -57,4 +57,5 @@ dependencies
                 keycode         ^2.1.2
                 lodash          ^4.13.1
                 noon            ^1.0.8
+                opener          ^1.4.1
                 terminal.js     ^1.0.7

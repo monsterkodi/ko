@@ -33,11 +33,14 @@ class keyinfo
             return @join @modifiersForEvent(event), key
         return ""
 
-    @keynameForEvent: (event) => keycode event
+    @keynameForEvent: (event) => 
+        name = keycode event
+        return "" if name in ["left command", "right command", "ctrl", "alt", "shift"]
+        name
 
     @forEvent: (event) =>
+        mod:   @modifiersForEvent event
         key:   @keynameForEvent event
         combo: @comboForEvent event
-        mod:   @modifiersForEvent event
 
 module.exports = keyinfo

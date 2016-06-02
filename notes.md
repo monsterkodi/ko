@@ -1,12 +1,20 @@
 # todo/ideas
 
-- fix command key down -> deselect
+- fix update
+- watch for change of current file
 
-- remember file open dialog folder
-
+- window list
 - font zoom
 
-- fix update
+- header with file name and dirty status
+
+- syntax
+    - md, noon, json, styl
+
+- insert comment (command-/)
+- surround selections with '"[{(
+- auto insert '"[{( 
+- multi cursor/selection
 
 - command entry
 - commands
@@ -21,12 +29,12 @@
     - active (cursor inside)
     - passive (cursor movement won't destroy, but next selection will)
 
-- syntax
-    - md, noon, json, styl
-- history/consle/terminal
+- show spaces/tabs/etc
+- history/console/terminal
 - shortcut for renaming file
 - pin
      - command
      - shortcut
+- tail -f mode
 - markdown mode (replace - with ●)
 - rename? kewl, kode? ko! :-)

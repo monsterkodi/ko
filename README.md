@@ -1,1 +1,1 @@
-![kandis](img/banner.png)
+![ko](img/banner.png)

@@ -33,6 +33,12 @@ class MainMenu
             
         Menu.setApplicationMenu Menu.buildFromTemplate [
             
+            # 000   000   0000000 
+            # 000  000   000   000
+            # 0000000    000   000
+            # 000  000   000   000
+            # 000   000   0000000 
+            
             label: pkg.name   
             submenu: [     
                 label:       "About #{pkg.name}"
@@ -54,15 +60,18 @@ class MainMenu
                 label:       'Quit'
                 accelerator: 'Command+Q'
                 click:       main.quit
+            ,
+                label:       'Close All Windows And Quit'
+                accelerator: 'Command+Alt+Q'
+                click:       main.closeWindowsAndQuit
             ]
         ,
-            ###
-            00000000  000  000      00000000
-            000       000  000      000     
-            000000    000  000      0000000 
-            000       000  000      000     
-            000       000  0000000  00000000
-            ###
+            # 00000000  000  000      00000000
+            # 000       000  000      000     
+            # 000000    000  000      0000000 
+            # 000       000  000      000     
+            # 000       000  0000000  00000000
+            
             label: 'File'
             role: 'file'
             submenu: [
@@ -77,6 +86,10 @@ class MainMenu
                 label:       'Open...'
                 accelerator: 'CmdOrCtrl+O'
                 click:       (i,win) => win?.webContents.send "openFile"
+            ,
+                label:       'Open In New Window...'
+                accelerator: 'CmdOrCtrl+Shift+O'
+                click:       (i,win) => win?.webContents.send "openFile", newWindow: true
             ,
                 label:       'Open Recent'
                 submenu:     recent
@@ -101,13 +114,12 @@ class MainMenu
                 click:       (i,win) -> win?.close()
             ]
         ,    
-            ###
-            00000000  0000000    000  000000000
-            000       000   000  000     000   
-            0000000   000   000  000     000   
-            000       000   000  000     000   
-            00000000  0000000    000     000   
-            ###
+            # 00000000  0000000    000  000000000
+            # 000       000   000  000     000   
+            # 0000000   000   000  000     000   
+            # 000       000   000  000     000   
+            # 00000000  0000000    000     000   
+            
             label: "Edit",
             submenu: [
                 label:       "Undo"
@@ -133,15 +145,13 @@ class MainMenu
                 selector:    "paste:"
             ]
         ,        
-            ###
-            000   000  000  000   000  0000000     0000000   000   000
-            000 0 000  000  0000  000  000   000  000   000  000 0 000
-            000000000  000  000 0 000  000   000  000   000  000000000
-            000   000  000  000  0000  000   000  000   000  000   000
-            00     00  000  000   000  0000000     0000000   00     00
-            ###
+            # 000   000  000  000   000  0000000     0000000   000   000
+            # 000 0 000  000  0000  000  000   000  000   000  000 0 000
+            # 000000000  000  000 0 000  000   000  000   000  000000000
+            # 000   000  000  000  0000  000   000  000   000  000   000
+            # 00     00  000  000   000  0000000     0000000   00     00
+            
             label: 'Window'
-            role: 'window'
             submenu: [
                 label:       'Minimize'
                 accelerator: 'Cmd+M'
@@ -153,9 +163,23 @@ class MainMenu
             ,
                 type: 'separator'
             ,                            
+                label:       'Close All Windows'
+                accelerator: 'Alt+Cmd+W'
+                click:       main.closeWindows
+            ,
+                label:       'Close Other Windows'
+                accelerator: 'CmdOrCtrl+Shift+w'
+                click:       main.closeOtherWindows
+            ,
+                type: 'separator'
+            ,                            
                 label:       'Bring All to Front'
                 accelerator: 'Alt+Cmd+`'
                 role:        'front'
+            ,
+                label:       'Arrange'
+                accelerator: 'Alt+Cmd+A'
+                click:       main.arrangeWindows
             ,
                 label:       'Cycle Through Windows'
                 accelerator: 'CmdOrCtrl+`'
@@ -166,8 +190,18 @@ class MainMenu
                 label:       'Reload Window'
                 accelerator: 'Ctrl+Alt+Cmd+L'
                 click:       (i,win) -> main.reloadWin win
+            ,                
+                label:       'Toggle FullScreen'
+                accelerator: 'Ctrl+Command+F'
+                click:       (i,win) -> win?.setFullScreen !win.isFullScreen()
             ]
         ,        
+            # 000   000  00000000  000      00000000 
+            # 000   000  000       000      000   000
+            # 000000000  0000000   000      00000000 
+            # 000   000  000       000      000      
+            # 000   000  00000000  0000000  000      
+            
             label: 'Help'
             role: 'help'
             submenu: []            

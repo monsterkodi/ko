@@ -21,7 +21,6 @@ webframe  = electron.webFrame
 class EditorView extends Editor
 
     constructor: (view) ->
-        super
 
         @view = view
         @elem = $('.lines', @view)
@@ -43,6 +42,8 @@ class EditorView extends Editor
     
         @view.onkeydown = @onKeyDown
         @view.addEventListener 'wheel', @onWheel
+
+        super
 
         @scrollBy 0
 
@@ -103,9 +104,10 @@ class EditorView extends Editor
     setText: (text) -> @setLines text.split /\n/
         
     setLines: (lines) ->
-        @lines = lines
+        super lines
         @updateSizeValues()
         @displayLines 0
+        @scrollBy 0
 
     setFontSize: (fontSize) ->
         setStyle '.lines', 'font-size', "#{fontSize}px"
@@ -362,7 +364,7 @@ class EditorView extends Editor
 
     onKeyDown: (event) =>
         {mod, key, combo} = keyinfo.forEvent event
-        # log "editor key:", key, "mod:", mod, "combo:", combo
+        #log "editor key:", key, "mod:", mod, "combo:", combo
         return if not combo
         return if key == 'right click' # weird right command key
         
@@ -381,6 +383,8 @@ class EditorView extends Editor
             when 'command+='              then return @changeZoom +1
             when 'command+-'              then return @changeZoom -1
             when 'command+0'              then return @resetZoom()
+        
+        return if mod and not key?.length
         
         # commands that might change the selection ...
         
@@ -430,8 +434,6 @@ class EditorView extends Editor
                         ansiKeycode = require 'ansi-keycode'
                         if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
                             @insertCharacter ansiKeycode event
-                        # else
-                        #     log "ignoring", combo
                             
         @endSelection event.shiftKey # ... reset selection 
         

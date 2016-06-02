@@ -8,10 +8,12 @@ resolve       = require './tools/resolve'
 prefs         = require './tools/prefs'
 log           = require './tools/log'
 {first}       = require './tools/tools'
+pkg           = require "../package.json"
 execute       = require './execute'
 MainMenu      = require './mainmenu'
 fs            = require 'fs'
 noon          = require 'noon'
+colors        = require 'colors'
 electron      = require 'electron'
 app           = electron.app
 BrowserWindow = electron.BrowserWindow
@@ -30,7 +32,6 @@ wins          = []
 # 000   000  000   000  000   000       000
 # 000   000  000   000   0000000   0000000 
 
-pkg   = require "../package.json"
 args  = require('karg') """
 
 #{pkg.name}
@@ -48,6 +49,7 @@ version  #{pkg.version}
 app.exit(0) if not args?
 
 if args.verbose
+    log colors.yellow.bold 'args'
     log noon.stringify args, colors:true
     log ''
 
@@ -57,8 +59,13 @@ if args.verbose
 # 000        000   000  000       000            000
 # 000        000   000  00000000  000       0000000 
 
-prefs.init "#{app.getPath('userData')}/kandis.json",
+prefs.init "#{app.getPath('userData')}/#{pkg.name}.json",
     shortcut: 'F2'
+
+if args.verbose
+    log colors.yellow.bold 'prefs'
+    log noon.stringify prefs.load(), colors:true
+    log ''
 
 mostRecentFile = -> first prefs.get 'recentFiles', []
 
@@ -70,7 +77,7 @@ mostRecentFile = -> first prefs.get 'recentFiles', []
 
 wins        = -> BrowserWindow.getAllWindows()
 activeWin   = -> BrowserWindow.getFocusedWindow()
-visibleWins = -> (w for w in wins() when w?.isVisible())
+visibleWins = -> (w for w in wins() when w?.isVisible() and not w?.isMinimized())
 winWithID   = (winID) -> 
     for w in wins()
         return w if w.id == winID
@@ -136,6 +143,12 @@ class Main
         if args.debug
             wins()?[0]?.webContents.openDevTools() 
         
+    # 000   000  000  000   000  0000000     0000000   000   000   0000000
+    # 000 0 000  000  0000  000  000   000  000   000  000 0 000  000     
+    # 000000000  000  000 0 000  000   000  000   000  000000000  0000000 
+    # 000   000  000  000  0000  000   000  000   000  000   000       000
+    # 00     00  000  000   000  0000000     0000000   00     00  0000000 
+        
     reloadWin: (win) ->
         if win?
             dev = win.webContents.isDevToolsOpened()
@@ -151,7 +164,10 @@ class Main
     toggleWindows: =>
         if wins().length
             if visibleWins().length
-                @hideWindows()
+                if activeWin()
+                    @hideWindows()
+                else
+                    @raiseWindows()
             else
                 @showWindows()
         else
@@ -166,6 +182,13 @@ class Main
         for w in wins()
             w.show()
             app.dock.show()
+            
+    raiseWindows: ->
+        if visibleWins().length
+            for w in visibleWins()
+                w.showInactive()
+            visibleWins()[0].showInactive()
+            visibleWins()[0].focus()
         
     focusNextWindow: (win) ->
         allWindows = wins()
@@ -174,6 +197,63 @@ class Main
                 i = 1 + allWindows.indexOf w
                 i = 0 if i >= allWindows.length
                 allWindows[i].focus()
+
+    closeOtherWindows:->
+        for w in wins()
+            w.close() if w != activeWin()
+    
+    closeWindows: ->
+        for w in wins()
+            w.close()
+            hideDock()
+            
+    closeWindowsAndQuit: -> 
+        @closeWindows()
+        @quit()
+        
+    #  0000000   00000000   00000000    0000000   000   000   0000000   00000000
+    # 000   000  000   000  000   000  000   000  0000  000  000        000     
+    # 000000000  0000000    0000000    000000000  000 0 000  000  0000  0000000 
+    # 000   000  000   000  000   000  000   000  000  0000  000   000  000     
+    # 000   000  000   000  000   000  000   000  000   000   0000000   00000000
+        
+    arrangeWindows: ->
+        wl = visibleWins()
+        {width, height} = electron.screen.getPrimaryDisplay().workAreaSize
+        if wl.length == 1
+            wl[0].setBounds
+                x:      parseInt width/4
+                y:      parseInt 0
+                width:  parseInt width/2
+                height: parseInt height
+            , true
+        else if wl.length > 1 and wl.length < 4
+            w = width/wl.length
+            for i in [0...wl.length]
+                wl[i].setBounds
+                    x:      parseInt i * w
+                    y:      parseInt 0
+                    width:  parseInt w
+                    height: parseInt height
+                , true
+        else if wl.length
+            w2 = parseInt wl.length/2
+            for i in [0...w2]
+                w = width/w2
+                wl[i].setBounds
+                    x:      parseInt i * w
+                    y:      parseInt 0
+                    width:  parseInt w
+                    height: parseInt height/2
+                , true
+            for i in [w2...wl.length]
+                w = width/(wl.length-w2)
+                wl[i].setBounds
+                    x:      parseInt (i-w2) * w
+                    y:      parseInt height - height/2
+                    width:  parseInt w
+                    height: parseInt height/2
+                , true
                 
     # 00000000   00000000   0000000  000000000   0000000   00000000   00000000
     # 000   000  000       000          000     000   000  000   000  000     
@@ -183,7 +263,7 @@ class Main
     
     restoreWindows: ->
         windows = prefs.get 'windows', {}
-        prefs.set 'windows', {} # clear immeditately
+        prefs.set 'windows', {} # clear immediately
         for k, w of windows
             @restoreWin w
                 
@@ -246,6 +326,29 @@ class Main
             visibleWins()[0]?.focus()
         
     quit: => app.exit 0
+    
+    ###
+     0000000   0000000     0000000   000   000  000000000
+    000   000  000   000  000   000  000   000     000   
+    000000000  0000000    000   000  000   000     000   
+    000   000  000   000  000   000  000   000     000   
+    000   000  0000000     0000000    0000000      000   
+    ###
+    
+    showAbout: =>    
+        cwd = __dirname
+        w = new BrowserWindow
+            dir:           cwd
+            preloadWindow: true
+            resizable:     true
+            frame:         true
+            show:          true
+            center:        false
+            width:         400
+            height:        420
+        # w.webContents.openDevTools()
+        w.loadURL "file://#{cwd}/../about.html"
+        w.on 'openFileDialog', @createWindow
             
 # 00000000   00000000   0000000   0000000    000   000
 # 000   000  000       000   000  000   000   000 000 
