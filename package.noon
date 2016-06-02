@@ -3,15 +3,14 @@ version         0.1.0
 description     coffee script tool
 main            js/main.js
 scripts
-                start     electron js/main.js
-                compile   cp -r js css img syntax *.html app
-                install   cd app && npm install
-                clean     rm -rf dist app/js app/img app/css app/syntax app/*.html app/node_modules
-                dist      npm run clean && npm run compile && npm run install && build
-                release   build
-                kill      fish -c "killall Electron" -c "killall Electron" -c "echo killed"
                 test      npm run kill && npm start
                 debug     npm run kill && npm start -- -D
+                start     electron js/main.js
+                dist      npm run clean && npm run compile && npm run install && build
+                kill      fish -c "killall Electron" -c "killall Electron" -c "echo killed"
+                clean     rm -rf dist app/js app/img app/css app/syntax app/*.html app/node_modules
+                compile   cp -r js css img syntax *.html app
+                install   cd app && npm install
 repository
                 type  git
                 url   git+https://github.com/monsterkodi/ko.git
