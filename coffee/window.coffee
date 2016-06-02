@@ -95,15 +95,16 @@ saveFile = (file) =>
     if not file?
         saveFileAs()
         return
+    editor.setCurrentFile null
     fs.writeFileSync file, editor.text(), encoding: 'UTF8'
-    editor.currentFile = file
+    editor.setCurrentFile file
     setState 'file', file
 
 loadFile = (file) =>
     # log 'load:', file
     addToRecent file
     editor.setText fs.readFileSync file, encoding: 'UTF8'
-    editor.currentFile = file
+    editor.setCurrentFile file
     setState 'file', file
 
 # 0000000    000   0000000   000       0000000    0000000 
@@ -217,6 +218,9 @@ window.onresize = =>
         splitDrag.setMinMax pos(0, minScrollHeight), pos(0, sh()-minEnterHeight)
         ipc.send 'saveBounds', winID if winID?
         editor?.resized()
+    
+window.onunload = =>
+    editor.setCurrentFile null # to stop watcher
               
 # 000   000  00000000  000   000
 # 000  000   000        000 000 

@@ -6,6 +6,7 @@
 
 Editor    = require './editor'
 render    = require './render'
+watcher   = require './watcher'
 log       = require '../tools/log'
 drag      = require '../tools/drag'
 keyinfo   = require '../tools/keyinfo'
@@ -29,7 +30,6 @@ class EditorView extends Editor
         @size = {}
         @setFontSize 15
                 
-        @currentFile = undefined
         @smoothScrolling = true
         @topIndex = 0
         @botIndex = 0

@@ -4,18 +4,30 @@
 #000       000   000  000     000     000   000  000   000
 #00000000  0000000    000     000      0000000   000   000
 
-undo   = require './undo'
-Buffer = require './buffer'
-log    = require '../tools/log'
+undo    = require './undo'
+Buffer  = require './buffer'
+watcher = require './watcher'
+log     = require '../tools/log'
 {clamp,last} = require '../tools/tools'
 
 class Editor extends Buffer
     
     constructor: () ->
+        @currentFile = null
+        @watch = null
         @do = new undo @done
         super
 
+    setCurrentFile: (file) ->
+        @watch?.stop()
+        @currentFile = file
+        if file?
+            @watch = new watcher @
+        else
+            @watch = null
+
     setLines: (lines) ->
+        # log 'setLines', lines.length
         super lines
         @do.reset()
 
