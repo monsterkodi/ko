@@ -21,6 +21,7 @@ bugs
 dependencies
               ansi-keycode    0.0.0
               coffee-script   ^1.10.0
+              chokidar        ^1.5.1
               colors          ^1.1.2
               html-entities   ^1.2.0
               karg            ^1.0.8

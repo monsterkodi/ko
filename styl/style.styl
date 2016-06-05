@@ -125,8 +125,8 @@ body
 .split-pane
     position        absolute
     
-.split-pane    
-    background      transparent
+// .split-pane    
+//     background      transparent
 
 .split-rel
     position        static
@@ -190,8 +190,6 @@ body
     
     &:focus .cursor 
         background  yellow
-    &:focus > .selection
-        background  #666
     
 .lines
 .cursors
@@ -201,11 +199,6 @@ body
     outline-width   0
     fill-abs()
 
-.lines
-.cursors
-.highlights
-    background  transparent
-    
 /*
 *  000      000  000   000  00000000   0000000
 *  000      000  0000  000  000       000     
@@ -222,10 +215,7 @@ body
     white-space     nowrap
     display         block
     position        absolute
-    background      transparent
     & span
-        padding     0
-        margin      0
         display     inline-block
 
 /*
@@ -264,6 +254,10 @@ body
 *       000  000       000      000       000          000     000  000   000  000  0000
 *  0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
 */
+    
+.editor
+    &:focus .selection
+        background  #444 // focus
         
 .selection
     position        absolute

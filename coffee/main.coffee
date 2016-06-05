@@ -142,6 +142,8 @@ class Main
         
         if args.debug
             wins()?[0]?.webContents.openDevTools() 
+
+        setTimeout @showWindows, 10
         
     # 000   000  000  000   000  0000000     0000000   000   000   0000000
     # 000 0 000  000  0000  000  000   000  000   000  000 0 000  000     
@@ -173,24 +175,24 @@ class Main
         else
             @createWindow()
 
-    hideWindows: ->
+    hideWindows: =>
         for w in wins()
             w.hide()
             hideDock()
             
-    showWindows: ->
+    showWindows: =>
         for w in wins()
             w.show()
             app.dock.show()
             
-    raiseWindows: ->
+    raiseWindows: =>
         if visibleWins().length
             for w in visibleWins()
                 w.showInactive()
             visibleWins()[0].showInactive()
             visibleWins()[0].focus()
         
-    focusNextWindow: (win) ->
+    focusNextWindow: (win) =>
         allWindows = wins()
         for w in allWindows
             if w == win
@@ -198,16 +200,16 @@ class Main
                 i = 0 if i >= allWindows.length
                 allWindows[i].focus()
 
-    closeOtherWindows:->
+    closeOtherWindows:=>
         for w in wins()
             w.close() if w != activeWin()
     
-    closeWindows: ->
+    closeWindows: =>
         for w in wins()
             w.close()
             hideDock()
             
-    closeWindowsAndQuit: -> 
+    closeWindowsAndQuit: => 
         @closeWindows()
         @quit()
         
@@ -263,14 +265,22 @@ class Main
     
     restoreWindows: ->
         windows = prefs.get 'windows', {}
-        prefs.set 'windows', {} # clear immediately
+        sequenced = {}
+        i = 0
         for k, w of windows
+            i += 1
+            sequenced[i] = w
+        #log 'sequenced', sequenced
+        prefs.set 'windows', sequenced
+        for k, w of sequenced
             @restoreWin w
                 
     restoreWin: (state) ->
         w = @createWindow state.file
         w.setBounds state.bounds if state.bounds?
         w.webContents.openDevTools() if state.devTools
+        w.showInactive()
+        w.focus()
                 
     #  0000000  00000000   00000000   0000000   000000000  00000000
     # 000       000   000  000       000   000     000     000     
@@ -306,6 +316,7 @@ class Main
     onMoveWin: (event) => @saveWinBounds event.sender
     
     onCloseWin: (event) =>
+        log 'onCloseWin'
         if visibleWins().length == 1
             hideDock()
         prefs.setPath "windows.#{event.sender.id}", undefined
@@ -325,15 +336,15 @@ class Main
         if !activeWin()
             visibleWins()[0]?.focus()
         
-    quit: => app.exit 0
+    quit: => 
+        log 'exit'
+        app.exit 0
     
-    ###
-     0000000   0000000     0000000   000   000  000000000
-    000   000  000   000  000   000  000   000     000   
-    000000000  0000000    000   000  000   000     000   
-    000   000  000   000  000   000  000   000     000   
-    000   000  0000000     0000000    0000000      000   
-    ###
+    #  0000000   0000000     0000000   000   000  000000000
+    # 000   000  000   000  000   000  000   000     000   
+    # 000000000  0000000    000   000  000   000     000   
+    # 000   000  000   000  000   000  000   000     000   
+    # 000   000  0000000     0000000    0000000      000   
     
     showAbout: =>    
         cwd = __dirname

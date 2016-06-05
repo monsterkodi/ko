@@ -1,14 +1,15 @@
-# 00000000  0000000    000  000000000   0000000   00000000   000   000  000  00000000  000   000
-# 000       000   000  000     000     000   000  000   000  000   000  000  000       000 0 000
-# 0000000   000   000  000     000     000   000  0000000     000 000   000  0000000   000000000
-# 000       000   000  000     000     000   000  000   000     000     000  000       000   000
-# 00000000  0000000    000     000      0000000   000   000      0      000  00000000  00     00
+# 000   000  000  00000000  000   000
+# 000   000  000  000       000 0 000
+#  000 000   000  0000000   000000000
+#    000     000  000       000   000
+#     0      000  00000000  00     00
 
 Editor    = require './editor'
 render    = require './render'
 watcher   = require './watcher'
 log       = require '../tools/log'
 drag      = require '../tools/drag'
+prefs     = require '../tools/prefs'
 keyinfo   = require '../tools/keyinfo'
 {
 clamp,$,
@@ -21,14 +22,14 @@ webframe  = electron.webFrame
 
 class EditorView extends Editor
 
-    constructor: (view) ->
+    constructor: (viewElem) ->
 
-        @view = view
+        @view = viewElem
         @elem = $('.lines', @view)
         @divs = []
         
         @size = {}
-        @setFontSize 15
+        @setFontSize prefs.get 'fontSize', 15
                 
         @smoothScrolling = true
         @topIndex = 0
@@ -109,17 +110,46 @@ class EditorView extends Editor
         @displayLines 0
         @scrollBy 0
 
+    # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
+    # 000       000   000  0000  000     000     000       000     000   000     
+    # 000000    000   000  000 0 000     000     0000000   000    000    0000000 
+    # 000       000   000  000  0000     000          000  000   000     000     
+    # 000        0000000   000   000     000     0000000   000  0000000  00000000
+
     setFontSize: (fontSize) ->
         setStyle '.lines', 'font-size', "#{fontSize}px"
-        @size.lineHeight = fontSize
+        @size.fontSize   = fontSize
+        @size.lineHeight = fontSize + Math.floor(fontSize/6)
         @size.charWidth  = characterWidth @elem, 'line'
-        log 'setFontSize', fontSize, @size
+        log 'setFontSize', @size
+
+    # 0000000   0000000    0000000   00     00
+    #    000   000   000  000   000  000   000
+    #   000    000   000  000   000  000000000
+    #  000     000   000  000   000  000 0 000
+    # 0000000   0000000    0000000   000   000
+        
+    resetZoom: -> 
+        webframe.setZoomFactor 1
+        @updateNumLines()
+        
+    changeZoom: (d) -> 
+        z = webframe.getZoomFactor() 
+        z *= 1+d/20
+        z = clamp 0.36, 5.23, z
+        webframe.setZoomFactor z
+        @updateNumLines()
 
     # 0000000    000   0000000  00000000   000       0000000   000   000
     # 000   000  000  000       000   000  000      000   000   000 000 
     # 000   000  000  0000000   00000000   000      000000000    00000  
     # 000   000  000       000  000        000      000   000     000   
     # 0000000    000  0000000   000        0000000  000   000     000   
+
+    refreshLines: ->
+        @elem.innerHTML = ""
+        @updateNumLines()
+        @displayLines @topIndex
 
     displayLines: (top) ->
         @topIndex = top
@@ -338,24 +368,7 @@ class EditorView extends Editor
     onScrollDrag: (drag) =>
         delta = (drag.delta.y / @editorHeight) * @bufferHeight
         @scrollBy delta
-    
-    # 0000000   0000000    0000000   00     00
-    #    000   000   000  000   000  000   000
-    #   000    000   000  000   000  000000000
-    #  000     000   000  000   000  000 0 000
-    # 0000000   0000000    0000000   000   000
-        
-    resetZoom: -> 
-        webframe.setZoomFactor 1
-        @updateNumLines()
-        
-    changeZoom: (d) -> 
-        z = webframe.getZoomFactor() 
-        z *= 1+d/20
-        z = clamp 0.36, 5.23, z
-        webframe.setZoomFactor z
-        @updateNumLines()
-                    
+                        
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
     # 0000000    0000000     00000  
@@ -380,9 +393,9 @@ class EditorView extends Editor
             when 'shift+tab', 'command+[' then return @deIndent()  + event.preventDefault()
             when 'command+z'              then return @do.undo @
             when 'command+shift+z'        then return @do.redo @
-            when 'command+='              then return @changeZoom +1
-            when 'command+-'              then return @changeZoom -1
-            when 'command+0'              then return @resetZoom()
+            when 'command+shift+='        then return @changeZoom +1
+            when 'command+shift+-'        then return @changeZoom -1
+            when 'command+shift+0'        then return @resetZoom()
         
         return if mod and not key?.length
         

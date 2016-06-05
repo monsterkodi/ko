@@ -17,8 +17,9 @@ pos        = require './tools/pos'
 log        = require './tools/log'
 str        = require './tools/str'
 encode     = require './tools/encode'
-pkg         = require "../package.json"
-{sw,sh,$,del} = require './tools/tools'
+pkg        = require "../package.json"
+{sw,sh,$,
+ del,clamp} = require './tools/tools'
 
 ipc    = electron.ipcRenderer
 remote = electron.remote
@@ -54,6 +55,7 @@ addToRecent = (file) ->
         
 setState = (key, value) ->
     # log 'setState', key, value
+    return if not winID
     if winID
         prefs.setPath "windows.#{winID}.#{key}", value
     
@@ -61,6 +63,10 @@ getState = (key, value) ->
     return value if not winID
     # log 'getState', key, value, prefs.getPath "windows.#{winID}.#{key}", value
     prefs.getPath "windows.#{winID}.#{key}", value
+    
+delState = (key) ->
+    return if not winID
+    prefs.setPath "windows.#{winID}.#{key}", null
     
 # 000  00000000    0000000
 # 000  000   000  000     
@@ -81,6 +87,9 @@ ipc.on 'loadFile', (event, file) => loadFile file
 ipc.on 'setWinID', (event, id) => 
     winID = id
     splitAt getState 'split', minScrollHeight
+    s = getState 'fontSize'
+    log "setWinID: fontSize", s
+    setFontSize s if s
     setState 'file', editor.currentFile # file might be loaded before id got sent
                  
 # 00000000  000  000      00000000
@@ -143,8 +152,8 @@ openFile = (options) =>
         ]
         , (files) =>
             if files?.length
-                # log 'open:', files
                 files = fileListForPathList files
+                log 'open:', files
                 if files.length >= 10
                     answer = dialog.showMessageBox
                         type: 'warning'
@@ -221,6 +230,25 @@ window.onresize = =>
     
 window.onunload = =>
     editor.setCurrentFile null # to stop watcher
+
+# 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
+# 000       000   000  0000  000     000     000       000     000   000     
+# 000000    000   000  000 0 000     000     0000000   000    000    0000000 
+# 000       000   000  000  0000     000          000  000   000     000     
+# 000        0000000   000   000     000     0000000   000  0000000  00000000
+    
+setFontSize = (s) => 
+    s = clamp 2, 100, s
+    setState "fontSize", s
+    editor.setFontSize s
+    editor.refreshLines()
+    
+changeFontSize = (d) => 
+    setFontSize clamp 2, 100, editor.size.fontSize + d
+    
+resetFontSize = => 
+    delState 'fontSize'
+    setFontSize prefs.get 'fontSize', 15
               
 # 000   000  00000000  000   000
 # 000  000   000        000 000 
@@ -236,4 +264,7 @@ document.onkeydown = (event) ->
     switch combo
         when 'command+enter' then return ipc.send 'execute', editor.text()
         when 'command+alt+i' then return ipc.send 'toggleDevTools', winID
+        when 'command+='     then return changeFontSize +1
+        when 'command+-'     then return changeFontSize -1
+        when 'command+0'     then return resetFontSize()
         
