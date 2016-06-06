@@ -47,69 +47,16 @@ class highlight
     # 000      000  000  0000  000     
     # 0000000  000  000   000  00000000
     
-    @line: (line, inserts=[]) =>
-        
-        if 0
-            slices = []
-            for ins in inserts.reverse()
-                slices.unshift encode line.slice(ins[0])
-                slices.unshift ins[1]
-                line  = line.slice(0, ins[0])
-            if slices.length
-                slices.unshift line
-                line = slices.join ''
-            else
-                line = encode line
-            return enspce line
-        
+    @line: (line) =>
+                
         rngs = matchr.ranges @matchrConfig, line
         # log "rngs", rngs
         diss = matchr.dissect rngs 
-        # log "disS", diss
-        for ins in inserts.reverse()
-            if diss.length
-                di = diss.length-1
-                while di >= 0
-                    d = diss[di]
-                    if d.match? # jump over inserts
-                        
-                        if d.start+d.match.length > ins[0] # span end is behind insert start
-                            if d.start < ins[0] # insert overlaps with span
-                                ll = ins[0]-d.start
-                                lr = d.match.length - ll
-                                dr = Object.assign {}, d
-                                dr.start = ins[0]
-                                dr.match = d.match.substr ll 
-                                d.match = d.match.substr 0, ll
-                                diss.splice di+1, 0, dr                                
-                                diss.splice di+1, 0,
-                                    start: ins[0]
-                                    insert: ins[1] 
-                                break   
-                        else # insert is behind span
-                            diss.splice di+1, 0,
-                                start: ins[0]
-                                insert: ins[1]
-                            break
-                    di -= 1
-
-                if di < 0 # insert before all spans
-                    diss.splice 0, 0,
-                        start: ins[0]
-                        insert: ins[1]
-            else
-                diss.push
-                    start: ins[0]
-                    insert: ins[1]
-        # log "diss", diss
         if diss.length
             for di in [diss.length-1..0]
                 d = diss[di]
-                if d.insert?
-                    line = line.slice(0, d.start) + d.insert + line.slice(d.start)
-                else
-                    clrzd = @colorize d.match, d.stack.reverse()
-                    line = line.slice(0, d.start) + clrzd + line.slice(d.start+d.match.length)
+                clrzd = @colorize d.match, d.stack.reverse()
+                line = line.slice(0, d.start) + clrzd + line.slice(d.start+d.match.length)
 
         enspce line
                 

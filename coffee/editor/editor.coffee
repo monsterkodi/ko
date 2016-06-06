@@ -4,11 +4,13 @@
 #000       000   000  000     000     000   000  000   000
 #00000000  0000000    000     000      0000000   000   000
 
+path    = require 'path'
 undo    = require './undo'
 Buffer  = require './buffer'
 watcher = require './watcher'
 log     = require '../tools/log'
-{clamp,last} = require '../tools/tools'
+{clamp,
+ last,$} = require '../tools/tools'
 
 class Editor extends Buffer
     
@@ -21,6 +23,7 @@ class Editor extends Buffer
     setCurrentFile: (file) ->
         @watch?.stop()
         @currentFile = file
+        @setDirty false
         if file?
             @watch = new watcher @
         else
@@ -30,6 +33,27 @@ class Editor extends Buffer
         # log 'setLines', lines.length
         super lines
         @do.reset()
+    
+    setDirty: (dirty) ->
+        @dirty = dirty
+        @updateTitlebar()
+        
+    done: ->
+        @setDirty true
+        
+    # 000000000  000  000000000  000      00000000  0000000     0000000   00000000 
+    #    000     000     000     000      000       000   000  000   000  000   000
+    #    000     000     000     000      0000000   0000000    000000000  0000000  
+    #    000     000     000     000      000       000   000  000   000  000   000
+    #    000     000     000     0000000  00000000  0000000    000   000  000   000
+    
+    updateTitlebar: ->
+        filename = path.basename @currentFile if @currentFile
+        ds = @dirty and "●" or ""
+        dc = @dirty and " dirty" or ""
+        filename = "<span class=\"title#{dc}\">#{ds} #{filename} #{ds}</span>"
+        $('.titlebar').innerHTML = filename 
+
 
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000

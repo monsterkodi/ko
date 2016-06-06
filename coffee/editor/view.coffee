@@ -28,7 +28,8 @@ class EditorView extends Editor
         @elem = $('.lines', @view)
         @divs = []
         
-        @size = {}
+        @size = 
+            offsetX: prefs.get 'lineOffset', 0
         @setFontSize prefs.get 'fontSize', 15
                 
         @smoothScrolling = true
@@ -177,7 +178,7 @@ class EditorView extends Editor
         div.className = 'line'
         div.style.height = "#{@size.lineHeight}px"
         y = @elem.children.length * @size.lineHeight
-        div.style.transform = "translate(0,#{y}px)"
+        div.style.transform = "translate(#{@size.offsetX}px,#{y}px)"
         @elem.appendChild div
 
     renderCursors: ->
@@ -198,7 +199,9 @@ class EditorView extends Editor
     # 000   000  000        000   000  000   000     000     000     
     #  0000000   000        0000000    000   000     000     00000000
 
-    done: => @linesChanged @do.changedLineIndices
+    done: => 
+        super
+        @linesChanged @do.changedLineIndices
 
     updateSizeValues: ->
         @bufferHeight = @numVisibleLines() * @size.lineHeight
@@ -286,7 +289,7 @@ class EditorView extends Editor
         st = @view.scrollTop
         br = @view.getBoundingClientRect()
         # log 'posForEvent', sl, st, br
-        lx = clamp 0, @view.offsetWidth,  event.clientX - br.left
+        lx = clamp 0, @view.offsetWidth,  event.clientX - br.left - @size.offsetX
         ly = clamp 0, @view.offsetHeight, event.clientY - br.top
         # log 'posForEvent', lx, ly
         p = [parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth)),

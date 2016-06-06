@@ -1,12 +1,16 @@
 # todo/ideas
 
-- fix update
-- watch for change of current file
+- title bar 
+    - dirty status
+    - absolute path tooltip
+    - maximize on double click
 
+- left line border
+- menu refresh when file loaded
 - window list
-- font zoom
+- restore cursor when saving
 
-- header with file name and dirty status
+- fix update
 
 - syntax
     - md, noon, json, styl
@@ -14,6 +18,7 @@
 - insert comment (command-/)
 - surround selections with '"[{(
 - auto insert '"[{( 
+
 - multi cursor/selection
 
 - command entry
@@ -37,4 +42,3 @@
      - shortcut
 - tail -f mode
 - markdown mode (replace - with ●)
-- rename? kewl, kode? ko! :-)

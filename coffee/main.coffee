@@ -240,21 +240,22 @@ class Main
                 , true
         else if wl.length
             w2 = parseInt wl.length/2
+            rh = height
             for i in [0...w2]
                 w = width/w2
                 wl[i].setBounds
                     x:      parseInt i * w
                     y:      parseInt 0
                     width:  parseInt w
-                    height: parseInt height/2
+                    height: parseInt rh/2
                 , true
             for i in [w2...wl.length]
                 w = width/(wl.length-w2)
                 wl[i].setBounds
                     x:      parseInt (i-w2) * w
-                    y:      parseInt height - height/2
+                    y:      parseInt rh/2+23
                     width:  parseInt w
-                    height: parseInt height/2
+                    height: parseInt rh/2
                 , true
                 
     # 00000000   00000000   0000000  000000000   0000000   00000000   00000000
@@ -295,7 +296,7 @@ class Main
             minWidth:        120
             minHeight:       120
             useContentSize:  true
-            backgroundColor: '#181818'
+            backgroundColor: '#000'
             fullscreen:      false
             show:            true
             titleBarStyle:   'hidden'
@@ -316,7 +317,7 @@ class Main
     onMoveWin: (event) => @saveWinBounds event.sender
     
     onCloseWin: (event) =>
-        log 'onCloseWin'
+        #log 'onCloseWin'
         if visibleWins().length == 1
             hideDock()
         prefs.setPath "windows.#{event.sender.id}", undefined

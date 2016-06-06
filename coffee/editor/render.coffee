@@ -33,7 +33,7 @@ class render
         cw = size.charWidth
         lh = size.lineHeight
         for c in cursors
-            tx = c[0] * cw
+            tx = c[0] * cw + size.offsetX
             ty = c[1] * lh
             h += "<span class=\"cursor-#{i} cursor\" style=\"transform: translate(#{tx}px,#{ty}px); height:#{lh}px\"></span>"
             i += 1
@@ -87,7 +87,7 @@ class render
             border += " start" # wider offset at start of line
                                                 
         sw = size.charWidth * (sel[1][1]-sel[1][0])
-        tx = size.charWidth *  sel[1][0]
+        tx = size.charWidth *  sel[1][0] + size.offsetX
         ty = size.lineHeight * sel[0]
         lh = size.lineHeight
     

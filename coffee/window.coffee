@@ -29,7 +29,7 @@ editor = null
     
 enterHeight     = 200
 minEnterHeight  = 100
-minScrollHeight = 24
+minScrollHeight = 22
 
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000     
