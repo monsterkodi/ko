@@ -337,6 +337,7 @@ class Main
         if visibleWins().length == 1
             hideDock()
         prefs.setPath "windows.#{event.sender.id}", undefined
+        @reloadMenu()
         
     otherInstanceStarted: (args, dir) =>
         log 'other instance args', args, 'dir', dir

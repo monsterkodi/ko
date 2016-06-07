@@ -39,14 +39,13 @@ class MainMenu
 
         current = []
         for wid,win of prefs.get 'windows', {}
-            log wid, win.file
+            accel = wid <= 9 and "CmdOrCtrl+#{wid}" or ""
             current.push 
                 label: fileLabel win.file
+                accelerator: accel
                 winid: wid
                 click: (i) -> main.activateWindowWithID i.winid
-                
-        log 'MainMenu.init current', current
-            
+                            
         Menu.setApplicationMenu Menu.buildFromTemplate [
             
             # 000   000   0000000 

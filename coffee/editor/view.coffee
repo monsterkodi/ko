@@ -30,8 +30,8 @@ class View extends Editor
         @elem = $('.lines', @view)
         @divs = []
         
-        @size = 
-            offsetX: prefs.get 'lineOffset', 0
+        @size = {}
+            
         @setFontSize prefs.get 'fontSize', 15
                 
         @syntaxName = 'txt'
@@ -139,6 +139,7 @@ class View extends Editor
         @size.fontSize   = fontSize
         @size.lineHeight = fontSize + Math.floor(fontSize/6)
         @size.charWidth  = characterWidth @elem, 'line'
+        @size.offsetX    = Math.floor @size.charWidth/2
         log 'setFontSize', @size
 
     # 0000000   0000000    0000000   00     00
@@ -220,12 +221,14 @@ class View extends Editor
     #    000     000     000     0000000  00000000  0000000    000   000  000   000
     
     updateTitlebar: ->
-        filename = path.basename @currentFile if @currentFile
-        dirty = @do.hasLineChanges()
-        ds = dirty and "●" or ""
-        dc = dirty and " dirty" or ""
-        filename = "<span class=\"title#{dc}\" data-tip=\"#{unresolve @currentFile}\">#{ds} #{filename} #{ds}</span>"
-        $('.titlebar').innerHTML = filename 
+        title = ""
+        if @currentFile?
+            title = path.basename @currentFile
+            dirty = @do.hasLineChanges()
+            ds = dirty and "●" or ""
+            dc = dirty and " dirty" or ""
+            title = "<span class=\"title#{dc}\" data-tip=\"#{unresolve @currentFile}\">#{ds} #{title} #{ds}</span>"
+        $('.titlebar').innerHTML = title 
 
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     
