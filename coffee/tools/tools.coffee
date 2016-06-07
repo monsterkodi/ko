@@ -4,9 +4,11 @@
 #   000     000   000  000   000  000           000
 #   000      0000000    0000000   0000000  0000000 
 
-_   = require 'lodash'
-pos = require './pos'
-log = require './log'
+pos  = require './pos'
+log  = require './log'
+_    = require 'lodash'
+path = require 'path'
+os   = require 'os'
 
 module.exports = 
 
@@ -50,6 +52,15 @@ module.exports =
         v = Math.max(v, r1) if r1?
         v = Math.min(v, r2) if r2?
         v
+        
+    # 00000000    0000000   000000000  000   000
+    # 000   000  000   000     000     000   000
+    # 00000000   000000000     000     000000000
+    # 000        000   000     000     000   000
+    # 000        000   000     000     000   000
+    
+    resolve: (p) -> path.normalize path.resolve p.replace /\~/, process.env.HOME
+    unresolve: (p) -> p.replace os.homedir(), "~"    
         
     #  0000000   0000000   0000000
     # 000       000       000     

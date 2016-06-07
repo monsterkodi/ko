@@ -5,6 +5,7 @@
 #  0000000   000   000  0000000     0000000 
 
 log = require '../tools/log'
+{last} = require '../tools/tools'
 {clone} = require 'lodash'
 
 class undo
@@ -23,6 +24,10 @@ class undo
         @actions = []
         @futures = []
         @groupCount = 0
+                
+    hasLineChanges: -> 
+        return false if @actions.length == 0
+        return last(@actions).lines.length > 0
         
     # 00000000   00000000  0000000     0000000 
     # 000   000  000       000   000  000   000
@@ -48,7 +53,7 @@ class undo
                 obj.lines[line.index] = line.after
                 @changedLineIndices.push [line.index, line.index]
             else
-                obj.lines.splice line.index, 0, line.before
+                obj.lines.splice line.index, 0, line.after
                 @changedLineIndices.push [line.index+1, -1]
         else if line.before?
             obj.lines.splice line.index, 1
@@ -176,12 +181,12 @@ class undo
     start: => 
         @groupCount += 1
         if @groupCount == 1
-            last = @lastAction()
+            a = @lastAction()
             @actions.push 
-                selBefore: clone last.selAfter
-                curBefore: clone last.curAfter
-                selAfter:  clone last.selAfter
-                curAfter:  clone last.curAfter
+                selBefore: clone a.selAfter
+                curBefore: clone a.curAfter
+                selAfter:  clone a.selAfter
+                curAfter:  clone a.curAfter
                 lines:     []
 
     # 00     00   0000000   0000000    000  00000000  000   000
@@ -192,8 +197,7 @@ class undo
     
     modify: (change) =>
         @changedLineIndices = [] if not @changedLineIndices
-        last = @lastAction()
-        lines = last.lines
+        lines = @lastAction().lines
         if lines.length and lines[lines.length-1].index == change.index
             lines[lines.length-1].after = change.after
         else
@@ -230,16 +234,54 @@ class undo
     # 0000000   000 0 000  000   000
     # 000       000  0000  000   000
     # 00000000  000   000  0000000  
+                
+    end: => 
+        @groupCount -= 1
+        @check()
+
+    #  0000000  000   000  00000000   0000000  000   000
+    # 000       000   000  000       000       000  000 
+    # 000       000000000  0000000   000       0000000  
+    # 000       000   000  000       000       000  000 
+    #  0000000  000   000  00000000   0000000  000   000
     
     check: =>
         @futures = []
         if @groupCount == 0
+            @merge()
             if @changedLineIndices?
                 @groupDone()
                 @changedLineIndices = null
-            
-    end: => 
-        @groupCount -= 1
-        @check()
+                
+    # 00     00  00000000  00000000    0000000   00000000
+    # 000   000  000       000   000  000        000     
+    # 000000000  0000000   0000000    000  0000  0000000 
+    # 000 0 000  000       000   000  000   000  000     
+    # 000   000  00000000  000   000   0000000   00000000
+    
+    merge: =>
+        while @actions.length >= 2
+            a = last @actions
+            b = @actions[@actions.length-2]
+            if a.lines.length == 0 
+                @actions.pop()
+                b.selAfter = a.selAfter
+                b.curAfter = a.curAfter
+            else if a.lines.length == b.lines.length
+                sameLines = true
+                for i in [0...a.lines.length]
+                    if a.lines[i].index != b.lines[i].index
+                        sameLines = false
+                        break
+                if sameLines
+                    @actions.pop()
+                    b.selAfter = a.selAfter
+                    b.curAfter = a.curAfter
+                    for i in [0...a.lines.length]
+                        b.lines[i].after = a.lines[i].after
+                else
+                    break
+            else
+                break
 
 module.exports = undo

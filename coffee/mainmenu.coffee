@@ -6,6 +6,8 @@
 
 fs    = require 'fs'
 path  = require 'path'
+{unresolve
+}     = require './tools/tools'
 prefs = require './tools/prefs'
 log   = require './tools/log'
 pkg   = require '../package.json'
@@ -14,12 +16,16 @@ Menu  = require('electron').Menu
 class MainMenu
     
     @init: (main) -> 
+        
+        fileLabel = (f) -> 
+            return path.basename(f) + ' - ' + unresolve path.dirname(f) if f?
+            "untitled"
     
         recent = []
         for f in prefs.get 'recentFiles', []
             if fs.existsSync f
                 recent.unshift 
-                    label: path.basename(f) + ' - ' + path.dirname(f)
+                    label: fileLabel f
                     path: f
                     click: (i) -> main.createWindow i.path
         if recent.length
@@ -30,6 +36,16 @@ class MainMenu
                 click: (i) -> 
                     prefs.set 'recentFiles', []
                     MainMenu.init main
+
+        current = []
+        for wid,win of prefs.get 'windows', {}
+            log wid, win.file
+            current.push 
+                label: fileLabel win.file
+                winid: wid
+                click: (i) -> main.activateWindowWithID i.winid
+                
+        log 'MainMenu.init current', current
             
         Menu.setApplicationMenu Menu.buildFromTemplate [
             
@@ -113,37 +129,15 @@ class MainMenu
                 accelerator: 'Command+W'
                 click:       (i,win) -> win?.close()
             ]
-        ,    
-            # 00000000  0000000    000  000000000
-            # 000       000   000  000     000   
-            # 0000000   000   000  000     000   
-            # 000       000   000  000     000   
-            # 00000000  0000000    000     000   
+        ,
+            # 0000000    000   000  00000000  00000000  00000000  00000000    0000000
+            # 000   000  000   000  000       000       000       000   000  000     
+            # 0000000    000   000  000000    000000    0000000   0000000    0000000 
+            # 000   000  000   000  000       000       000       000   000       000
+            # 0000000     0000000   000       000       00000000  000   000  0000000 
             
-            label: "Edit",
-            submenu: [
-                label:       "Undo"
-                accelerator: "CmdOrCtrl+Z"
-                selector:    "undo:" 
-            ,
-                label:       "Redo"
-                accelerator: "Shift+CmdOrCtrl+Z"
-                selector:    "redo:" 
-            ,
-                type: "separator" 
-            ,
-                label:       "Cut"
-                accelerator: "CmdOrCtrl+X"
-                selector:    "cut:" 
-            ,
-                label:       "Copy"
-                accelerator: "CmdOrCtrl+C"
-                selector:    "copy:" 
-            ,
-                label:       "Paste"
-                accelerator: "CmdOrCtrl+V"
-                selector:    "paste:"
-            ]
+            label: 'Buffers'
+            submenu: current
         ,        
             # 000   000  000  000   000  0000000     0000000   000   000
             # 000 0 000  000  0000  000  000   000  000   000  000 0 000
@@ -159,7 +153,7 @@ class MainMenu
             ,
                 label:       'Maximize'
                 accelerator: 'Cmd+Shift+m'
-                click:       (i,win) -> win?.maximize()
+                click:       (i,win) -> main.toggleMaximize win
             ,
                 type: 'separator'
             ,                            

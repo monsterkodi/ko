@@ -13,14 +13,16 @@ prefs     = require '../tools/prefs'
 keyinfo   = require '../tools/keyinfo'
 {
 clamp,$,
+unresolve,
 characterWidth,
 getStyle, setStyle
 }         = require '../tools/tools'
-electron  = require('electron')
+path      = require 'path'
+electron  = require 'electron'
 clipboard = electron.clipboard
 webframe  = electron.webFrame
 
-class EditorView extends Editor
+class View extends Editor
 
     constructor: (viewElem) ->
 
@@ -32,6 +34,7 @@ class EditorView extends Editor
             offsetX: prefs.get 'lineOffset', 0
         @setFontSize prefs.get 'fontSize', 15
                 
+        @syntaxName = 'txt'
         @smoothScrolling = true
         @topIndex = 0
         @botIndex = 0
@@ -94,9 +97,23 @@ class EditorView extends Editor
             @tripleClickTimer = setTimeout @onTripleClickDelay, 1500
             @tripleClickLineIndex = ranges[0][1]
             @endSelection true
-            
+                        
     onTripleClickDelay: => @doubleClicked = @tripleClicked = false
 
+    # 00000000  000  000      00000000
+    # 000       000  000      000     
+    # 000000    000  000      0000000 
+    # 000       000  000      000     
+    # 000       000  0000000  00000000
+
+    setCurrentFile: (file) ->
+        @syntaxName = 'txt'
+        if file?
+            name = path.extname(file).substr(1)
+            if name in render.syntaxNames
+                @syntaxName = name
+        super file
+    
     # 000000000  00000000  000   000  000000000
     #    000     000        000 000      000   
     #    000     0000000     00000       000   
@@ -152,6 +169,9 @@ class EditorView extends Editor
         @updateNumLines()
         @displayLines @topIndex
 
+    renderLine: (line) ->
+        render.line line, @syntaxName
+
     displayLines: (top) ->
         @topIndex = top
         @botIndex = top+@numViewLines()
@@ -163,7 +183,7 @@ class EditorView extends Editor
             i = c + @topIndex
             @elem.children[c].id = "line-#{i}"
             if i < @lines.length
-                span = render.line @lines[i]
+                span = @renderLine @lines[i]
                 @divs.push span
                 @elem.children[c].innerHTML = span
             else
@@ -192,6 +212,20 @@ class EditorView extends Editor
             # log 'renderSelection', s
             h += render.selection s, @size
         $('.selections', @view).innerHTML = h
+
+    # 000000000  000  000000000  000      00000000  0000000     0000000   00000000 
+    #    000     000     000     000      000       000   000  000   000  000   000
+    #    000     000     000     000      0000000   0000000    000000000  0000000  
+    #    000     000     000     000      000       000   000  000   000  000   000
+    #    000     000     000     0000000  00000000  0000000    000   000  000   000
+    
+    updateTitlebar: ->
+        filename = path.basename @currentFile if @currentFile
+        dirty = @do.hasLineChanges()
+        ds = dirty and "●" or ""
+        dc = dirty and " dirty" or ""
+        filename = "<span class=\"title#{dc}\" data-tip=\"#{unresolve @currentFile}\">#{ds} #{filename} #{ds}</span>"
+        $('.titlebar').innerHTML = filename 
 
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     
@@ -239,6 +273,8 @@ class EditorView extends Editor
     
     linesChanged: (lineIndices) ->
         # log 'linesChanged', lineIndices
+
+        @updateTitlebar()
         
         if delta = @deltaToEnsureCursorIsVisible() 
             # log "delta", delta, delta * @lineHeight
@@ -273,7 +309,7 @@ class EditorView extends Editor
     updateLine: (lineIndex) ->
         if @topIndex <= lineIndex < @lines.length
             relIndex = lineIndex - @topIndex
-            span = render.line @lines[lineIndex]
+            span = @renderLine @lines[lineIndex]
             @divs[relIndex] = span
             @elem.children[relIndex]?.innerHTML = span
 
@@ -453,4 +489,4 @@ class EditorView extends Editor
                             
         @endSelection event.shiftKey # ... reset selection 
         
-module.exports = EditorView
+module.exports = View

@@ -4,21 +4,72 @@
 # 000   000  000       000  0000  000   000  000       000   000
 # 000   000  00000000  000   000  0000000    00000000  000   000
 
-encode    = require '../tools/encode'
-log       = require '../tools/log'
-highlight = require './highlight'
+matchr = require '../tools/matchr'
+encode = require '../tools/encode'
+enspce = require '../tools/enspce'
+log    = require '../tools/log'
+noon   = require 'noon'
+path   = require 'path'
+fs     = require 'fs'
 
 class render 
-            
+                
+    @matchrConfigs = {}
+    @syntaxNames = []
+    
+    # 000  000   000  000  000000000
+    # 000  0000  000  000     000   
+    # 000  000 0 000  000     000   
+    # 000  000  0000  000     000   
+    # 000  000   000  000     000   
+
+    @init: =>
+        syntaxDir = "#{__dirname}/../../syntax/"
+        for syntaxFile in fs.readdirSync syntaxDir
+            syntaxName = path.basename syntaxFile, '.noon'
+            @syntaxNames.push syntaxName
+            patterns = noon.load path.join syntaxDir, syntaxFile
+            @matchrConfigs[syntaxName] = matchr.config patterns
+
+    #  0000000   0000000   000       0000000   00000000   000  0000000  00000000
+    # 000       000   000  000      000   000  000   000  000     000   000     
+    # 000       000   000  000      000   000  0000000    000    000    0000000 
+    # 000       000   000  000      000   000  000   000  000   000     000     
+    #  0000000   0000000   0000000   0000000   000   000  000  0000000  00000000
+    
+    @colorize: (str, stack) =>
+        try
+            smp = stack.map (s) -> String(s).split '.'
+            chk = {}
+            spl = []
+            for s in smp
+                if not chk[s[0]]?
+                    chk[s[0]] = s.slice 1
+                    spl.push s
+            spl = _.flatten spl
+            str = "<span class=\"#{spl.join ' '}\">#{encode str}</span>"
+                    
+        catch err
+            error err
+        str
+
     # 000      000  000   000  00000000
     # 000      000  0000  000  000     
     # 000      000  000 0 000  0000000 
     # 000      000  000  0000  000     
     # 0000000  000  000   000  00000000
     
-    @line: (line) =>
-        
-        highlight.line line
+    @line: (line, syntaxName) =>
+                
+        rngs = matchr.ranges @matchrConfigs[syntaxName], line
+        diss = matchr.dissect rngs 
+        if diss.length
+            for di in [diss.length-1..0]
+                d = diss[di]
+                clrzd = @colorize d.match, d.stack.reverse()
+                line = line.slice(0, d.start) + clrzd + line.slice(d.start+d.match.length)
+
+        enspce line
         
     #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
     # 000       000   000  000   000  000       000   000  000   000  000     
@@ -53,7 +104,6 @@ class render
         for si in [0...selections.length]
             s = selections[si]
             n = (si < selections.length-1) and selections[si+1] or null
-            # log 'si', si, 'p', p, 's', s, 'n', n
             h += @selectionSpan p, s, n, size
             p = s
         h
@@ -94,5 +144,7 @@ class render
         empty = sel[1][0] == sel[1][1] and " empty" or ""
         
         "<span class=\"selection#{border}#{empty}\" style=\"transform: translate(#{tx}px,#{ty}px); width: #{sw}px; height: #{lh}px\"></span>"
-                                                
+    
+render.init()
+                                            
 module.exports = render

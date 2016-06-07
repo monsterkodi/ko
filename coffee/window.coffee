@@ -8,10 +8,9 @@ electron   = require 'electron'
 noon       = require 'noon'
 path       = require 'path'
 fs         = require 'fs'
-EditorView = require './editor/view'
+View       = require './editor/view'
 prefs      = require './tools/prefs'
 keyinfo    = require './tools/keyinfo'
-resolve    = require './tools/resolve'
 drag       = require './tools/drag'
 pos        = require './tools/pos'
 log        = require './tools/log'
@@ -19,7 +18,8 @@ str        = require './tools/str'
 encode     = require './tools/encode'
 pkg        = require "../package.json"
 {sw,sh,$,
- del,clamp} = require './tools/tools'
+ del,clamp,
+ resolve}  = require './tools/tools'
 
 ipc    = electron.ipcRenderer
 remote = electron.remote
@@ -91,6 +91,7 @@ ipc.on 'setWinID', (event, id) =>
     log "setWinID: fontSize", s
     setFontSize s if s
     setState 'file', editor.currentFile # file might be loaded before id got sent
+    ipc.send 'reloadMenu'
                  
 # 00000000  000  000      00000000
 # 000       000  000      000     
@@ -110,11 +111,12 @@ saveFile = (file) =>
     setState 'file', file
 
 loadFile = (file) =>
-    # log 'load:', file
+    log 'load:', file
     addToRecent file
-    editor.setText fs.readFileSync file, encoding: 'UTF8'
     editor.setCurrentFile file
+    editor.setText fs.readFileSync file, encoding: 'UTF8'
     setState 'file', file
+    ipc.send 'reloadMenu'
 
 # 0000000    000   0000000   000       0000000    0000000 
 # 000   000  000  000   000  000      000   000  000      
@@ -211,9 +213,10 @@ splitDrag = new drag
 # 000       000   000  000     000     000   000  000   000
 # 00000000  0000000    000     000      0000000   000   000
 
-editor = new EditorView $('.editor')
+editor = new View $('.editor')
 editor.setText editorText if editorText?
 editor.view.focus()
+$('.titlebar').ondblclick = (event) => ipc.send 'maximizeWindow', winID
 
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000     

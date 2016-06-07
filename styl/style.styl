@@ -51,6 +51,27 @@ fill-rel()
     padding-right       70px
     -webkit-app-region  drag
 
+.titlebar span
+    position            relative
+    
+.titlebar span::before
+    content             attr(data-tip)
+    position            absolute
+    z-index             999
+    white-space         nowrap
+    background          #333
+    opacity             0  
+    top                 9999px
+    transition          opacity 0.4s ease-out 
+     
+.titlebar span:hover::before
+    opacity             1
+    top                 0px
+    // -webkit-app-region  no-drag
+    // -webkit-user-select text
+    // pointer-events      visible
+    // cursor              text
+    
 /*
 *   0000000   0000000  00000000    0000000   000      000      0000000     0000000   00000000    0000000
 *  000       000       000   000  000   000  000      000      000   000  000   000  000   000  000     
@@ -147,13 +168,6 @@ body
 .split-rel
     fill-rel()
 
-//.split
-//    border 1px solid yellow
-//.split-rel
-//    border 1px solid magenta
-//.split-pane
-//    border 1px solid white
-
 .split-handle
 .split-pane
     position        absolute
@@ -196,7 +210,7 @@ body
 
     fill-abs()
     
-    left  20px
+    // left  20px
     right  20px
     
     overflow-x      auto

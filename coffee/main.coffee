@@ -4,11 +4,11 @@
 # 000 0 000  000   000  000  000  0000
 # 000   000  000   000  000  000   000
 
-resolve       = require './tools/resolve'
+{first,
+ resolve}     = require './tools/tools'
 prefs         = require './tools/prefs'
 log           = require './tools/log'
-{first}       = require './tools/tools'
-pkg           = require "../package.json"
+pkg           = require '../package.json'
 execute       = require './execute'
 MainMenu      = require './mainmenu'
 fs            = require 'fs'
@@ -78,9 +78,10 @@ mostRecentFile = -> first prefs.get 'recentFiles', []
 wins        = -> BrowserWindow.getAllWindows()
 activeWin   = -> BrowserWindow.getFocusedWindow()
 visibleWins = -> (w for w in wins() when w?.isVisible() and not w?.isMinimized())
-winWithID   = (winID) -> 
+winWithID   = (winID) ->
+    wid = parseInt winID
     for w in wins()
-        return w if w.id == winID
+        return w if w.id == wid
 
 # 0000000     0000000    0000000  000   000
 # 000   000  000   000  000       000  000 
@@ -101,8 +102,10 @@ hideDock = ->
 ipc.on 'execute',           (event, arg)   => event.sender.send 'executeResult', execute.execute arg
 ipc.on 'toggleDevTools',    (event)        => event.sender.toggleDevTools()
 ipc.on 'newWindowWithFile', (event, file)  => main.createWindow file
+ipc.on 'maximizeWindow',    (event, winID) => main.toggleMaximize winWithID winID
 ipc.on 'reloadWindow',      (event, winID) => main.reloadWin winWithID winID
-ipc.on 'saveBounds',        (event, winID) => main.saveWinBounds winWithID(winID) 
+ipc.on 'reloadMenu',        ()             => main.reloadMenu()
+ipc.on 'saveBounds',        (event, winID) => main.saveWinBounds winWithID winID
     
 # 00     00   0000000   000  000   000
 # 000   000  000   000  000  0000  000
@@ -118,9 +121,7 @@ class Main
             log 'other instance already active -> quit'
             app.exit 0
             return
-                
-        MainMenu.init @
-        
+                        
         tray = new Tray "#{__dirname}/../img/menu.png"
         tray.on 'click', @toggleWindows
         hideDock()
@@ -143,6 +144,8 @@ class Main
         if args.debug
             wins()?[0]?.webContents.openDevTools() 
 
+        MainMenu.init @
+
         setTimeout @showWindows, 10
         
     # 000   000  000  000   000  0000000     0000000   000   000   0000000
@@ -150,6 +153,8 @@ class Main
     # 000000000  000  000 0 000  000   000  000   000  000000000  0000000 
     # 000   000  000  000  0000  000   000  000   000  000   000       000
     # 00     00  000  000   000  0000000     0000000   00     00  0000000 
+        
+    reloadMenu: -> MainMenu.init @
         
     reloadWin: (win) ->
         if win?
@@ -159,6 +164,12 @@ class Main
                 setTimeout win.webContents.reloadIgnoringCache, 100
             else
                 win.webContents.reloadIgnoringCache()
+
+    toggleMaximize: (win) ->
+        if win.isMaximized()
+            win.unmaximize() 
+        else
+            win.maximize()
 
     saveWinBounds: (win) ->
         prefs.setPath "windows.#{win.id}.bounds",win.getBounds()
@@ -199,6 +210,12 @@ class Main
                 i = 1 + allWindows.indexOf w
                 i = 0 if i >= allWindows.length
                 allWindows[i].focus()
+
+    activateWindowWithID: (wid) =>
+        w = winWithID wid
+        if not w.isVisible() 
+            w.show()
+        w.focus()
 
     closeOtherWindows:=>
         for w in wins()
@@ -271,7 +288,6 @@ class Main
         for k, w of windows
             i += 1
             sequenced[i] = w
-        #log 'sequenced', sequenced
         prefs.set 'windows', sequenced
         for k, w of sequenced
             @restoreWin w

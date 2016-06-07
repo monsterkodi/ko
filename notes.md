@@ -1,11 +1,7 @@
 # todo/ideas
 
-- title bar 
-    - dirty status
-    - absolute path tooltip
-    - maximize on double click
-
 - left line border
+- line numbers
 - menu refresh when file loaded
 - window list
 - restore cursor when saving
@@ -18,12 +14,14 @@
 - insert comment (command-/)
 - surround selections with '"[{(
 - auto insert '"[{( 
+- auto indent
 
 - multi cursor/selection
 
 - command entry
 - commands
     - find
+    - goto line
     - ls
     - shell
     - execute
