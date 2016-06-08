@@ -128,5 +128,5 @@ __dirname|__filename  keyword
 # comments
 
 |###|                          comment.marker
-(#+)([^\{].*|$)              . comment.marker . comment
+(?:^|\s+)(#+)([^\{].*|$)     . comment.marker . comment
 

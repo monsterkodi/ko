@@ -5,14 +5,17 @@
     - goto line
     - quick open
     
+- fix shift tab at line start
+    
 - left line border
 - line numbers
+- minimap
 
 - restore cursor on watcher reload
 - fix update?
 
 - syntax
-    - md, styl
+    - md, styl, html
 
 - multi cursor/selection
 - bracket matching

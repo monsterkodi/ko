@@ -4,101 +4,44 @@
 #    000     000  000       000   000
 #     0      000  00000000  00     00
 
-Editor    = require './editor'
+ViewBase  = require './viewbase'
 render    = require './render'
 watcher   = require './watcher'
 log       = require '../tools/log'
 drag      = require '../tools/drag'
-prefs     = require '../tools/prefs'
 keyinfo   = require '../tools/keyinfo'
 {
 clamp,$,
 unresolve,
-characterWidth,
-getStyle, setStyle
+getStyle,
 }         = require '../tools/tools'
 path      = require 'path'
 electron  = require 'electron'
 clipboard = electron.clipboard
 webframe  = electron.webFrame
 
-class View extends Editor
+class View extends ViewBase
 
-    constructor: (viewElem) ->
+    constructor: (viewElem) -> 
 
-        @view = viewElem
-        @elem = $('.lines', @view)
-        @divs = []
+        super viewElem
         
-        @size = {}
-            
-        @setFontSize prefs.get 'fontSize', 15
-                
-        @syntaxName = 'txt'
         @smoothScrolling = true
-        @topIndex = 0
-        @botIndex = 0
         @scroll   = 0
         @scrollhandleRight = $('.scrollhandle.right', @view.parentElement)
+        
         @scrollbarDrag = new drag 
             target: $('.scrollbar.right', @view.parentElement)
             onMove: @onScrollDrag 
             cursor: 'ns-resize'
-    
-        @view.onkeydown = @onKeyDown
-        @view.addEventListener 'wheel', @onWheel
 
-        super
+        @view.addEventListener 'wheel', @onWheel
 
         @scrollBy 0
 
-        # 00     00   0000000   000   000   0000000  00000000
-        # 000   000  000   000  000   000  000       000     
-        # 000000000  000   000  000   000  0000000   0000000 
-        # 000 0 000  000   000  000   000       000  000     
-        # 000   000   0000000    0000000   0000000   00000000
-             
-        @drag = new drag
-            target:  @view
-            cursor:  'default'
-            onStart: (drag, event) =>
-                
-                if @doubleClicked
-                    clearTimeout @tripleClickTimer
-                    if @posForEvent(event)[1] == @tripleClickLineIndex
-                        return if @tripleClicked
-                        @doubleClicked = true
-                        @tripleClicked = true
-                        @tripleClickTimer = setTimeout @onTripleClickDelay, 1500
-                        @startSelection event.shiftKey
-                        @selectRanges @rangesForCursorLine()
-                        @endSelection true
-                        return
-                    else
-                        @doubleClicked = false
-                        @tripleClicked = false
-                        @tripleClickTimer = null
-                        
-                @startSelection event.shiftKey
-                @view.focus()
-                @moveCursorToPos @posForEvent event
-                @endSelection event.shiftKey
-            
-            onMove: (drag, event) => 
-                @startSelection true
-                @moveCursorToPos @posForEvent event
-                @endSelection true
-                
-        @view.ondblclick = (event) =>
-            @startSelection event.shiftKey
-            ranges = @rangesForWordAtPos @posForEvent event
-            @selectRanges ranges
-            @doubleClicked = true
-            @tripleClickTimer = setTimeout @onTripleClickDelay, 1500
-            @tripleClickLineIndex = ranges[0][1]
-            @endSelection true
-                        
-    onTripleClickDelay: => @doubleClicked = @tripleClicked = false
+    done: =>
+        @updateTitlebar()
+        super
 
     # 00000000  000  000      00000000
     # 000       000  000      000     
@@ -113,35 +56,31 @@ class View extends Editor
             if name in render.syntaxNames
                 @syntaxName = name
         super file
-    
-    # 000000000  00000000  000   000  000000000
-    #    000     000        000 000      000   
-    #    000     0000000     00000       000   
-    #    000     000        000 000      000   
-    #    000     00000000  000   000     000   
 
-    setText: (text) -> @setLines text.split /\n/
+    # 000      000  000   000  00000000   0000000
+    # 000      000  0000  000  000       000     
+    # 000      000  000 0 000  0000000   0000000 
+    # 000      000  000  0000  000            000
+    # 0000000  000  000   000  00000000  0000000 
+    
+    linesChanged: (lineIndices) ->
+        @updateTitlebar()
         
+        if delta = @deltaToEnsureCursorIsVisible() 
+            # log "delta", delta, delta * @lineHeight
+            @scrollBy delta * @size.lineHeight #todo: slow down when using mouse
+            @scrollCursor()
+            return
+        
+        super lineIndices
+        
+        @updateScrollbar()
+        @scrollCursor()        
+    
     setLines: (lines) ->
         super lines
-        @updateSizeValues()
-        @displayLines 0
         @scrollBy 0
-
-    # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
-    # 000       000   000  0000  000     000     000       000     000   000     
-    # 000000    000   000  000 0 000     000     0000000   000    000    0000000 
-    # 000       000   000  000  0000     000          000  000   000     000     
-    # 000        0000000   000   000     000     0000000   000  0000000  00000000
-
-    setFontSize: (fontSize) ->
-        setStyle '.lines', 'font-size', "#{fontSize}px"
-        @size.fontSize   = fontSize
-        @size.lineHeight = fontSize + Math.floor(fontSize/6)
-        @size.charWidth  = characterWidth @elem, 'line'
-        @size.offsetX    = Math.floor @size.charWidth/2
-        # log 'setFontSize', @size
-
+    
     # 0000000   0000000    0000000   00     00
     #    000   000   000  000   000  000   000
     #   000    000   000  000   000  000000000
@@ -159,67 +98,12 @@ class View extends Editor
         webframe.setZoomFactor z
         @updateNumLines()
 
-    # 0000000    000   0000000  00000000   000       0000000   000   000
-    # 000   000  000  000       000   000  000      000   000   000 000 
-    # 000   000  000  0000000   00000000   000      000000000    00000  
-    # 000   000  000       000  000        000      000   000     000   
-    # 0000000    000  0000000   000        0000000  000   000     000   
-
-    refreshLines: ->
-        @elem.innerHTML = ""
-        @updateNumLines()
-        @displayLines @topIndex
-
-    renderLine: (line) ->
-        render.line line, @syntaxName
-
-    displayLines: (top) ->
-        @topIndex = top
-        @botIndex = top+@numViewLines()
-        @updateScrollbar()
-        @updateNumLines()
-                
-        @divs = []
-        for c in [0...@elem.children.length]
-            i = c + @topIndex
-            @elem.children[c].id = "line-#{i}"
-            if i < @lines.length
-                span = @renderLine @lines[i]
-                @divs.push span
-                @elem.children[c].innerHTML = span
-            else
-                @divs.push ""
-                @elem.children[c].innerHTML = ""
-                
-        @renderCursors()
-        @renderSelection()
-
-    addLine: ->
-        div = document.createElement 'div'
-        div.className = 'line'
-        div.style.height = "#{@size.lineHeight}px"
-        y = @elem.children.length * @size.lineHeight
-        div.style.transform = "translate(#{@size.offsetX}px,#{y}px)"
-        @elem.appendChild div
-
-    renderCursors: ->
-        h = render.cursors @cursorsRelativeToLineIndexRange([@topIndex, @botIndex]), @size
-        $('.cursors', @view).innerHTML = h
-        
-    renderSelection: ->
-        h = ""
-        s = @selectionsRelativeToLineIndexRange([@topIndex, @botIndex])
-        if s
-            # log 'renderSelection', s
-            h += render.selection s, @size
-        $('.selections', @view).innerHTML = h
-
     # 000000000  000  000000000  000      00000000  0000000     0000000   00000000 
     #    000     000     000     000      000       000   000  000   000  000   000
     #    000     000     000     000      0000000   0000000    000000000  0000000  
     #    000     000     000     000      000       000   000  000   000  000   000
     #    000     000     000     0000000  00000000  0000000    000   000  000   000
-    
+        
     updateTitlebar: ->
         title = ""
         if @currentFile?
@@ -239,122 +123,17 @@ class View extends Editor
     openFind: ->
         log 'openFind'
 
-    # 000   000  00000000   0000000     0000000   000000000  00000000
-    # 000   000  000   000  000   000  000   000     000     000     
-    # 000   000  00000000   000   000  000000000     000     0000000 
-    # 000   000  000        000   000  000   000     000     000     
-    #  0000000   000        0000000    000   000     000     00000000
+    # 00000000   00000000   0000000  000  0000000  00000000  0000000  
+    # 000   000  000       000       000     000   000       000   000
+    # 0000000    0000000   0000000   000    000    0000000   000   000
+    # 000   000  000            000  000   000     000       000   000
+    # 000   000  00000000  0000000   000  0000000  00000000  0000000  
 
-    done: => 
-        super
-        @linesChanged @do.changedLineIndices
-
-    updateSizeValues: ->
-        @bufferHeight = @numVisibleLines() * @size.lineHeight
-        @editorHeight = @numViewLines() * @size.lineHeight
-        @scrollMax    = @bufferHeight - @editorHeight + @size.lineHeight
-        # log "updateSizeValues", @viewHeight(), @editorHeight
-    
-    updateNumLines: ->
-        viewLines = @numViewLines()
-        while @elem.children.length > viewLines
-            @elem.children[@elem.children.length-1].remove()
-            
-        while @elem.children.length < viewLines
-            @addLine()
-            @updateLine @topIndex + @elem.children.length - 1
-    
     resized: -> 
         oldHeight = @editorHeight
-        @updateSizeValues()
-        if @editorHeight > oldHeight
-            @displayLines @topIndex
-        else
+        super
+        if @editorHeight <= oldHeight
             @updateScrollbar()
-    
-    deltaToEnsureCursorIsVisible: ->
-        delta = 0
-        cl = @cursor[1]
-        if cl < @topIndex + 2
-            newTop = Math.max 0, cl - 2
-            delta = newTop - @topIndex
-        else if cl > @botIndex - 4
-            newBot = Math.min @lines.length+1, cl + 4
-            delta = newBot - @botIndex
-        return delta
-    
-    linesChanged: (lineIndices) ->
-        # log 'linesChanged', lineIndices
-
-        @updateTitlebar()
-        
-        if delta = @deltaToEnsureCursorIsVisible() 
-            # log "delta", delta, delta * @lineHeight
-            @scrollBy delta * @size.lineHeight #todo: slow down when using mouse
-            @scrollCursor()
-            return
-        
-        indices = []
-        for change in lineIndices
-            continue if change[0] > @botIndex
-            top = Math.max @topIndex, change[0]
-            if change[1] < 0
-                bot = 1+Math.min @botIndex, @lines.length-1
-            else
-                bot = 1+Math.min @botIndex, change[1]
-            for i in [top...bot]
-                indices.push i
-                    
-        indices.sort (a,b) -> a - b
-        indices = _.sortedUniq indices
-
-        for i in indices
-            @updateLine i
-            
-        @renderCursors()
-        @renderSelection()
-            
-        @updateSizeValues()
-        @updateScrollbar()
-        @scrollCursor()
-
-    updateLine: (lineIndex) ->
-        if @topIndex <= lineIndex < @lines.length
-            relIndex = lineIndex - @topIndex
-            span = @renderLine @lines[lineIndex]
-            @divs[relIndex] = span
-            @elem.children[relIndex]?.innerHTML = span
-
-    # 00000000    0000000    0000000
-    # 000   000  000   000  000     
-    # 00000000   000   000  0000000 
-    # 000        000   000       000
-    # 000         0000000   0000000 
-    
-    posForEvent: (event) ->
-        
-        sl = @view.scrollLeft
-        st = @view.scrollTop
-        br = @view.getBoundingClientRect()
-        # log 'posForEvent', sl, st, br
-        lx = clamp 0, @view.offsetWidth,  event.clientX - br.left - @size.offsetX
-        ly = clamp 0, @view.offsetHeight, event.clientY - br.top
-        # log 'posForEvent', lx, ly
-        p = [parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth)),
-             parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @topIndex]
-        # log 'posForEvent cx', event.clientX, 'p0', p[0]
-        p
-
-    # 000      000  000   000  00000000   0000000
-    # 000      000  0000  000  000       000     
-    # 000      000  000 0 000  0000000   0000000 
-    # 000      000  000  0000  000            000
-    # 0000000  000  000   000  00000000  0000000 
-    
-    viewHeight:      -> @view.getBoundingClientRect().height 
-    numViewLines:    -> Math.ceil(@viewHeight() / @size.lineHeight)
-    numFullLines:    -> Math.floor(@viewHeight() / @size.lineHeight)
-    numVisibleLines: -> @lines.length
 
     #  0000000   0000000  00000000    0000000   000      000    
     # 000       000       000   000  000   000  000      000    
@@ -363,6 +142,7 @@ class View extends Editor
     # 0000000    0000000  000   000   0000000   0000000  0000000
         
     updateScrollbar: ->
+        return if not @scrollhandleRight?
         sbw = getStyle '.scrollhandle', 'width'
         if @bufferHeight < @viewHeight()
             @scrollhandleRight.style.top    = "0"
@@ -381,7 +161,6 @@ class View extends Editor
             @scrollhandleRight.style.height = "#{scrollHeight}.px"
             @scrollhandleRight.style.width  = sbw
             @view.style.right = sbw            
-            
                 
     scrollLines: (lineDelta) -> @scrollBy lineDelta * @size.lineHeight
 
@@ -426,58 +205,30 @@ class View extends Editor
     # 000  000   000          000   
     # 000   000  00000000     000   
 
-    onKeyDown: (event) =>
-        {mod, key, combo} = keyinfo.forEvent event
-        #log "editor key:", key, "mod:", mod, "combo:", combo
-        return if not combo
-        return if key == 'right click' # weird right command key
+    handleModKeyComboEvent: (mod, key, combo, event) =>
+        log "editor key:", key, "mod:", mod, "combo:", combo
         
         switch combo
-            when 'command+k'              then return @selectAll() + @deleteSelection()
-            when 'command+d'              then return @selectNone()
-            when 'command+a'              then return @selectAll()
-            when 'command+f'              then return @openFind()            
-            when 'command+e'              then return @markSelectionForSearch()
-            when 'command+g'              then return @jumpToNextSearchResult()
-            when 'command+shift+g'        then return @jumpToPrevSearchResult()
-            when 'command+c'              then return clipboard.writeText @selectedText()
-            when 'tab'                    then return @insertTab() + event.preventDefault() 
-            when 'shift+tab'              then return @deleteTab() + event.preventDefault()
-            when 'command+]'              then return @indent()
-            when 'command+['              then return @deIndent()
-            when 'command+z'              then return @do.undo @
-            when 'command+shift+z'        then return @do.redo @
-            when 'command+shift+='        then return @changeZoom +1
-            when 'command+shift+-'        then return @changeZoom -1
-            when 'command+shift+0'        then return @resetZoom()
-        
-        return if mod and not key?.length
-        
+            when 'command+f'        then return @openFind()            
+            when 'tab'              then return @insertTab() + event.preventDefault() 
+            when 'shift+tab'        then return @deleteTab() + event.preventDefault()
+            when 'command+]'        then return @indent()
+            when 'command+['        then return @deIndent()
+            when 'command+shift+='  then return @changeZoom +1
+            when 'command+shift+-'  then return @changeZoom -1
+            when 'command+shift+0'  then return @resetZoom()
+            when 'enter'            then return @insertNewline()
+            when 'command+j'        then return @joinLine()
+            when 'command+/'        then return @toggleLineComment()
+                
         # commands that might change the selection ...
         
         switch key
-            when 'down', 'right', 'up', 'left', 'home', 'end', 'page up', 'page down', 'ctrl+a', 'ctrl+e'   
+            when 'home', 'end', 'page up', 'page down'
                 @startSelection event.shiftKey # ... starts or extend selection if shift is pressed
         
         switch key
             
-            when 'down', 'right', 'up', 'left' 
-                                
-                if event.metaKey
-                    if key == 'left'
-                        @moveCursorToStartOfLine()
-                    else if key == 'right'
-                        @moveCursorToEndOfLine()
-                else if event.altKey
-                    if key == 'left'
-                        @moveCursorToStartOfWord()
-                    else if key == 'right'
-                        @moveCursorToEndOfWord()
-                else
-                    @moveCursor key
-                                        
-                event.preventDefault() # prevent view from scrolling
-                
             when 'home'    then @moveCursorToLineIndex 0
             when 'end'     then @moveCursorToLineIndex @lines.length-1
             when 'page up'      
@@ -487,25 +238,11 @@ class View extends Editor
                 @moveCursorByLines   @numFullLines()-3
                 event.preventDefault() # prevent view from scrolling
                 
-            else
-                switch combo
-                    when 'enter'                     then @insertNewline()
-                    when 'delete', 'ctrl+backspace'  then @deleteForward()     
-                    when 'backspace'                 then @deleteBackward()     
-                    when 'command+j'                 then @joinLine()
-                    when 'command+/'                 then @toggleLineComment()
-                    when 'ctrl+a', 'ctrl+shift+a'    then @moveCursorToStartOfLine()
-                    when 'ctrl+e', 'ctrl+shift+e'    then @moveCursorToEndOfLine()
-                    when 'command+v'                 then @insertText clipboard.readText()
-                    when 'command+x'                 
-                        clipboard.writeText @selectedText()
-                        @deleteSelection()
-                    else
-                        ansiKeycode = require 'ansi-keycode'
-                        if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
-                            @insertCharacter ansiKeycode event
-        switch key
-            when 'down', 'right', 'up', 'left', 'home', 'end', 'page up', 'page down', 'ctrl+a', 'ctrl+e'   
-                @endSelection event.shiftKey # ... reset selection 
+        switch key # ... reset selection 
+            when 'home', 'end', 'page up', 'page down'
+                @endSelection event.shiftKey 
+                return
+                
+        return 'unhandled'                
         
 module.exports = View

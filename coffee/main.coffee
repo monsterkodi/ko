@@ -373,7 +373,8 @@ class Main
             resizable:     true
             frame:         true
             show:          true
-            center:        false
+            center:        true
+            backgroundColor: '#000'            
             width:         400
             height:        420
         # w.webContents.openDevTools()

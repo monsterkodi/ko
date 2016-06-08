@@ -7,7 +7,7 @@
 
 # comments
 
-(#+)([^\{].*|$)             
+(?:^|\s+)(#+)([^\{].*|$)             
                             comment.marker
                             comment
 

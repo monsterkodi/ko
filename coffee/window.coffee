@@ -4,19 +4,20 @@
 # 000   000  000  000  0000  000   000  000   000  000   000
 # 00     00  000  000   000  0000000     0000000   00     00
 
-electron   = require 'electron'
-noon       = require 'noon'
-path       = require 'path'
-fs         = require 'fs'
-View       = require './editor/view'
-prefs      = require './tools/prefs'
-keyinfo    = require './tools/keyinfo'
-drag       = require './tools/drag'
-pos        = require './tools/pos'
-log        = require './tools/log'
-str        = require './tools/str'
-encode     = require './tools/encode'
-pkg        = require "../package.json"
+electron    = require 'electron'
+noon        = require 'noon'
+path        = require 'path'
+fs          = require 'fs'
+View        = require './editor/view'
+Commandline = require './editor/commandline'
+prefs       = require './tools/prefs'
+keyinfo     = require './tools/keyinfo'
+drag        = require './tools/drag'
+pos         = require './tools/pos'
+log         = require './tools/log'
+str         = require './tools/str'
+encode      = require './tools/encode'
+pkg         = require "../package.json"
 {sw,sh,$,
  del,clamp,
  fileList,
@@ -27,6 +28,7 @@ remote = electron.remote
 dialog = remote.dialog
 winID  = null
 editor = null
+cmmdln = null
     
 commandlineHeight = 30
 splithandleHeight = 10
@@ -212,6 +214,15 @@ splitDragTop = new drag
 editor = new View $('.editor')
 editor.setText editorText if editorText?
 editor.view.focus()
+
+#  0000000   0000000   00     00  00     00   0000000   000   000  0000000  
+# 000       000   000  000   000  000   000  000   000  0000  000  000   000
+# 000       000   000  000000000  000000000  000000000  000 0 000  000   000
+# 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
+#  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
+
+cmmdln = new Commandline $('.commandline-editor')
+
 $('.titlebar').ondblclick = (event) => ipc.send 'maximizeWindow', winID
 
 # 00000000   00000000   0000000  000  0000000  00000000
