@@ -17,17 +17,19 @@ getStyle,
 }         = require '../tools/tools'
 path      = require 'path'
 electron  = require 'electron'
-clipboard = electron.clipboard
 webframe  = electron.webFrame
 
 class View extends ViewBase
 
     constructor: (viewElem) -> 
 
+        @fontSizeDefault = 15
+        @fontSizeKey     = 'editorFontSize'
+
         super viewElem
         
-        @smoothScrolling = true
-        @scroll   = 0
+        @smoothScrolling   = true
+        @scroll            = 0
         @scrollhandleRight = $('.scrollhandle.right', @view.parentElement)
         
         @scrollbarDrag = new drag 
@@ -121,7 +123,8 @@ class View extends ViewBase
     # 000       000  000   000  0000000  
     
     openFind: ->
-        log 'openFind'
+        
+        $('.commandline-editor').focus()
 
     # 00000000   00000000   0000000  000  0000000  00000000  0000000  
     # 000   000  000       000       000     000   000       000   000

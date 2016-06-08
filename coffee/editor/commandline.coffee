@@ -12,6 +12,9 @@ class Commandline extends ViewBase
     
     constructor: (viewElem) ->
             
+        @fontSizeDefault = 24
+        @fontSizeKey     = 'commandlineFontSize'
+        
         super viewElem
         
     # 000   000  00000000  000   000

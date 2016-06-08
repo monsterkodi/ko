@@ -91,8 +91,10 @@ module.exports =
     #  0000000  0000000   0000000 
     
     setStyle: (selector, key, value) ->
+        log 'setStyle', selector, key, value
         for rule in document.styleSheets[0].cssRules
             if rule.selectorText == selector
+                log 'found'
                 rule.style[key] = value
 
     getStyle: (selector, key, value) ->

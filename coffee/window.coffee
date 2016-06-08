@@ -8,6 +8,7 @@ electron    = require 'electron'
 noon        = require 'noon'
 path        = require 'path'
 fs          = require 'fs'
+split       = require './split'
 View        = require './editor/view'
 Commandline = require './editor/commandline'
 prefs       = require './tools/prefs'
@@ -30,10 +31,6 @@ winID  = null
 editor = null
 cmmdln = null
     
-commandlineHeight = 30
-splithandleHeight = 10
-titlebarHeight    = 22
-
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000     
 # 00000000   0000000    0000000   000000    0000000 
@@ -90,7 +87,7 @@ ipc.on 'loadFile', (event, file) => loadFile file
 ipc.on 'setWinID', (event, id) => 
     winID = id
     log "setWinID: ", id
-    splitAt getState 'split', titlebarHeight
+    split.init id
     s = getState 'fontSize'
     setFontSize s if s
 
@@ -177,34 +174,6 @@ saveFileAs = =>
                 addToRecent file
                 saveFile file
                   
-#  0000000  00000000   000      000  000000000
-# 000       000   000  000      000     000   
-# 0000000   00000000   000      000     000   
-#      000  000        000      000     000   
-# 0000000   000        0000000  000     000   
-
-splitAt = (y) ->
-    # log 'splitAt', y
-    $('.split-top')         .style.height = "#{y-50}px"
-    $('.split-handle.top' ) .style.top = "#{y-40}px"
-    $('.commandline')       .style.top = "#{y-30}px"
-    $('.split-handle.bot' ) .style.top = "#{y}px"
-    $('.split-bot')         .style.top = "#{y+10}px"
-    splitDragTop.setMinMax pos(0, titlebarHeight), pos(0, sh()-commandlineHeight-2*splithandleHeight)
-    splitDragBot.setMinMax pos(0, titlebarHeight), pos(0, sh()-splithandleHeight)
-    editor?.resized()
-    setState 'split', y
-
-splitDragBot = new drag
-    target: $('.split-handle.bot')
-    cursor: 'ns-resize'
-    onMove: (drag) -> splitAt drag.cpos.y
-
-splitDragTop = new drag
-    target: $('.split-handle.top')
-    cursor: 'ns-resize'
-    onMove: (drag) -> splitAt drag.cpos.y + 40
-
 # 00000000  0000000    000  000000000   0000000   00000000 
 # 000       000   000  000     000     000   000  000   000
 # 0000000   000   000  000     000     000   000  0000000  
@@ -234,13 +203,9 @@ $('.titlebar').ondblclick = (event) => ipc.send 'maximizeWindow', winID
 window.onresize = =>
     # log 'resize', sw(), sh()
     if sh()
-        splitDragTop.setMinMax pos(0, titlebarHeight), pos(0, sh()-commandlineHeight-2*splithandleHeight)
-        splitDragBot.setMinMax pos(0, titlebarHeight), pos(0, sh()-splithandleHeight)
         ipc.send 'saveBounds', winID if winID?
-        if $('.split-handle.bot').getBoundingClientRect().bottom > sh()
-            splitAt sh()-splithandleHeight
-        else
-            editor?.resized()
+        split.resized()
+        editor?.resized()
     
 window.onunload = =>
     editor.setCurrentFile null # to stop watcher

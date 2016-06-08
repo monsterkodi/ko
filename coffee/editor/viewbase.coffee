@@ -8,14 +8,16 @@
 clamp,$,
 characterWidth,
 setStyle
-}       = require '../tools/tools'
-prefs   = require '../tools/prefs'
-drag    = require '../tools/drag'
-keyinfo = require '../tools/keyinfo'
-log     = require '../tools/log'
-render  = require './render'
-Editor  = require './editor'
-_       = require 'lodash'
+}         = require '../tools/tools'
+prefs     = require '../tools/prefs'
+drag      = require '../tools/drag'
+keyinfo   = require '../tools/keyinfo'
+log       = require '../tools/log'
+render    = require './render'
+Editor    = require './editor'
+_         = require 'lodash'
+electron  = require 'electron'
+clipboard = electron.clipboard
 
 class ViewBase extends Editor
 
@@ -29,7 +31,7 @@ class ViewBase extends Editor
         @botIndex = 0
         @size = {}
     
-        @setFontSize prefs.get 'fontSize', 15
+        @setFontSize prefs.get @fontSizeKey, @fontSizeDefault
 
         @view.onkeydown = @onKeyDown
     
@@ -103,12 +105,11 @@ class ViewBase extends Editor
     # 000        0000000   000   000     000     0000000   000  0000000  00000000
 
     setFontSize: (fontSize) ->
-        setStyle '.lines', 'font-size', "#{fontSize}px"
+        setStyle '.'+@view.className, 'font-size', "#{fontSize}px"
         @size.fontSize   = fontSize
         @size.lineHeight = fontSize + Math.floor(fontSize/6)
         @size.charWidth  = characterWidth @elem, 'line'
         @size.offsetX    = Math.floor @size.charWidth/2
-        # log 'setFontSize', @size
 
     # 0000000    000   0000000  00000000   000       0000000   000   000
     # 000   000  000  000       000   000  000      000   000   000 000 
@@ -281,7 +282,7 @@ class ViewBase extends Editor
         return if not combo
         return if key == 'right click' # weird right command key
 
-        log "viewbase key:", key, "mod:", mod, "combo:", combo
+        # log "viewbase key:", key, "mod:", mod, "combo:", combo
 
         switch combo
             when 'command+k'                then return @selectAll() + @deleteSelection()

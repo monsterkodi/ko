@@ -43,12 +43,11 @@ fill-rel()
     
 .commandline-editor
     color               #fff
-    font-size           24px    
     font-weight         bold
     background          transparent
     font-family         "Andale Mono", monospace
     -webkit-user-select text
-    border              1px solid red
+    // border              1px solid red
     fill-abs()
     overflow-x          auto
     overflow-y          hidden
@@ -231,7 +230,7 @@ body
         
     border-bottom-left-radius    bottomCornerRadius
     border-bottom-right-radius   bottomCornerRadius    
-            
+    
     font-weight     bold
     font-family     "Andale Mono", monospace
         
@@ -252,8 +251,10 @@ body
 .lines
     position        static
     cursor          default
+    font-size       inherit
 
 .line
+    font-size       inherit
     white-space     nowrap
     display         block
     position        absolute
@@ -276,7 +277,7 @@ body
     margin-right    -1px
     margin-left     -1px
     display         inline-block
-    background      #fff // not focus
+    background      #444 // not focus
     &.virtual
         background  #111 // not focus
 
