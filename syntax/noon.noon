@@ -1,0 +1,53 @@
+
+#  000   000   0000000    0000000   000   000
+#  0000  000  000   000  000   000  0000  000
+#  000 0 000  000   000  000   000  000 0 000
+#  000  0000  000   000  000   000  000  0000
+#  000   000   0000000    0000000   000   000
+
+# comments
+
+(#+)([^\{].*|$)             
+                            comment.marker
+                            comment
+
+# top level
+
+^\w+                        class
+
+# property
+
+(^\s+\S+\s\s)\s*[^\s\.]+    property
+(^\s+\S+$)                  property
+
+# keypath / semver
+
+\S+\.\S+\.\S+               keypath
+
+# path
+
+(?:^|\s\s+)(\s*[\/\S]*)(\/)(\S+)
+                            string.single
+                            string.double 
+
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
+                            syntax.value.number.float.sign
+                            value.number.float
+
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
+                            syntax.value.number.int.sign
+                            value.number.int
+
+# bool
+
+(?:^|\s+)(true)\s*$         value.bool.true
+(?:^|\s+)(false)\s*$        value.bool.false
+
+# regexp
+
+^s*([\(\[\^]\S+)            string
+
+# dim
+
+[\>\<\=\^\$\.\:\/\|\-]      marker
+

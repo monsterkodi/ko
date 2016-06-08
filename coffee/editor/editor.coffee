@@ -15,6 +15,7 @@ log     = require '../tools/log'
 class Editor extends Buffer
     
     constructor: () ->
+        @surroundCharacters = "{}[]()'\"".split ''
         @currentFile = null
         @watch = null
         @do = new undo @done
@@ -219,9 +220,12 @@ class Editor extends Buffer
     
     insertCharacter: (c) ->
         @do.start()
-        @deleteSelection()
-        @do.change @lines, @cursor[1], @lines[@cursor[1]].splice @cursor[0], 0, c
-        @setCursor @cursor[0] + 1, @cursor[1]
+        if @selection? and c in @surroundCharacters
+            log 'surround', c, @selection, @surroundCharacters
+        else
+            @deleteSelection()
+            @do.change @lines, @cursor[1], @lines[@cursor[1]].splice @cursor[0], 0, c
+            @setCursor @cursor[0] + 1, @cursor[1]
         @do.end()
         
     insertTab: ->

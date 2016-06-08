@@ -443,12 +443,16 @@ class View extends Editor
         
         # commands that might change the selection ...
         
-        @startSelection event.shiftKey # ... starts or extend selection if shift is pressed
+        # @startSelection event.shiftKey # ... starts or extend selection if shift is pressed
+
+        switch key
+            when 'down', 'right', 'up', 'left', 'home', 'end', 'page up', 'page down', 'ctrl+a', 'ctrl+e'   
+                @startSelection event.shiftKey # ... starts or extend selection if shift is pressed
         
         switch key
             
             when 'down', 'right', 'up', 'left' 
-                
+                                
                 if event.metaKey
                     if key == 'left'
                         @moveCursorToStartOfLine()
@@ -461,7 +465,7 @@ class View extends Editor
                         @moveCursorToEndOfWord()
                 else
                     @moveCursor key
-                    
+                                        
                 event.preventDefault() # prevent view from scrolling
                 
             when 'home'         then @moveCursorToLineIndex 0
@@ -489,7 +493,8 @@ class View extends Editor
                         ansiKeycode = require 'ansi-keycode'
                         if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
                             @insertCharacter ansiKeycode event
-                            
-        @endSelection event.shiftKey # ... reset selection 
+        switch key
+            when 'down', 'right', 'up', 'left', 'home', 'end', 'page up', 'page down', 'ctrl+a', 'ctrl+e'   
+                @endSelection event.shiftKey # ... reset selection 
         
 module.exports = View
