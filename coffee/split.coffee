@@ -40,7 +40,6 @@ class Split
             @splitAt sh()-@handleHeight
     
     @splitAt: (y) ->
-        # log 'splitAt', y
         $('.split-top')         .style.height = "#{y-@commandlineHeight}px"
         $('.split-handle.top' ) .style.top = "#{y-@commandlineHeight-@handleHeight}px"
         $('.commandline')       .style.top = "#{y-@commandlineHeight}px"
