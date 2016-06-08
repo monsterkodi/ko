@@ -86,7 +86,9 @@ class render
         for c in cursors
             tx = c[0] * cw + size.offsetX
             ty = c[1] * lh
-            h += "<span class=\"cursor-#{i} cursor\" style=\"transform: translate(#{tx}px,#{ty}px); height:#{lh}px\"></span>"
+            cls = ""
+            cls = c[2] if c.length > 2
+            h += "<span class=\"cursor-#{i} cursor #{cls}\" style=\"transform: translate(#{tx}px,#{ty}px); height:#{lh}px\"></span>"
             i += 1
         h
                 

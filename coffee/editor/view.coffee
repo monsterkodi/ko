@@ -140,7 +140,7 @@ class View extends Editor
         @size.lineHeight = fontSize + Math.floor(fontSize/6)
         @size.charWidth  = characterWidth @elem, 'line'
         @size.offsetX    = Math.floor @size.charWidth/2
-        log 'setFontSize', @size
+        # log 'setFontSize', @size
 
     # 0000000   0000000    0000000   00     00
     #    000   000   000  000   000  000   000
@@ -229,6 +229,15 @@ class View extends Editor
             dc = dirty and " dirty" or ""
             title = "<span class=\"title#{dc}\" data-tip=\"#{unresolve @currentFile}\">#{ds} #{title} #{ds}</span>"
         $('.titlebar').innerHTML = title 
+
+    # 00000000  000  000   000  0000000  
+    # 000       000  0000  000  000   000
+    # 000000    000  000 0 000  000   000
+    # 000       000  000  0000  000   000
+    # 000       000  000   000  0000000  
+    
+    openFind: ->
+        log 'openFind'
 
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     
@@ -427,12 +436,15 @@ class View extends Editor
             when 'command+k'              then return @selectAll() + @deleteSelection()
             when 'command+d'              then return @selectNone()
             when 'command+a'              then return @selectAll()
+            when 'command+f'              then return @openFind()            
             when 'command+e'              then return @markSelectionForSearch()
             when 'command+g'              then return @jumpToNextSearchResult()
             when 'command+shift+g'        then return @jumpToPrevSearchResult()
             when 'command+c'              then return clipboard.writeText @selectedText()
-            when 'tab', 'command+]'       then return @insertTab() + event.preventDefault() 
-            when 'shift+tab', 'command+[' then return @deIndent()  + event.preventDefault()
+            when 'tab'                    then return @insertTab() + event.preventDefault() 
+            when 'shift+tab'              then return @deleteTab() + event.preventDefault()
+            when 'command+]'              then return @indent()
+            when 'command+['              then return @deIndent()
             when 'command+z'              then return @do.undo @
             when 'command+shift+z'        then return @do.redo @
             when 'command+shift+='        then return @changeZoom +1
@@ -443,8 +455,6 @@ class View extends Editor
         
         # commands that might change the selection ...
         
-        # @startSelection event.shiftKey # ... starts or extend selection if shift is pressed
-
         switch key
             when 'down', 'right', 'up', 'left', 'home', 'end', 'page up', 'page down', 'ctrl+a', 'ctrl+e'   
                 @startSelection event.shiftKey # ... starts or extend selection if shift is pressed
@@ -468,8 +478,8 @@ class View extends Editor
                                         
                 event.preventDefault() # prevent view from scrolling
                 
-            when 'home'         then @moveCursorToLineIndex 0
-            when 'end'          then @moveCursorToLineIndex @lines.length-1
+            when 'home'    then @moveCursorToLineIndex 0
+            when 'end'     then @moveCursorToLineIndex @lines.length-1
             when 'page up'      
                 @moveCursorByLines -(@numFullLines()-3)
                 event.preventDefault() # prevent view from scrolling
@@ -483,6 +493,7 @@ class View extends Editor
                     when 'delete', 'ctrl+backspace'  then @deleteForward()     
                     when 'backspace'                 then @deleteBackward()     
                     when 'command+j'                 then @joinLine()
+                    when 'command+/'                 then @toggleLineComment()
                     when 'ctrl+a', 'ctrl+shift+a'    then @moveCursorToStartOfLine()
                     when 'ctrl+e', 'ctrl+shift+e'    then @moveCursorToEndOfLine()
                     when 'command+v'                 then @insertText clipboard.readText()

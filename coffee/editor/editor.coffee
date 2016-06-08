@@ -5,6 +5,7 @@
 #00000000  0000000    000     000      0000000   000   000
 
 path    = require 'path'
+_       = require 'lodash'
 undo    = require './undo'
 Buffer  = require './buffer'
 watcher = require './watcher'
@@ -17,6 +18,7 @@ class Editor extends Buffer
     constructor: () ->
         @surroundCharacters = "{}[]()'\"".split ''
         @currentFile = null
+        @indentString = _.padStart "", 4
         @watch = null
         @do = new undo @done
         super
@@ -116,18 +118,21 @@ class Editor extends Buffer
         c = clamp 0, @lines[l].length, c
         @do.cursor @, [c,l]
 
-    moveCursorToPos:     (pos) -> @setCursor pos[0], pos[1]
-    moveCursorToEndOfLine:     -> @setCursor @lines[@cursor[1]].length, @cursor[1]
-    moveCursorToStartOfLine:   -> @setCursor 0, @cursor[1]
-    moveCursorByLines:     (d) -> @setCursor @cursor[0], @cursor[1]+d
-    moveCursorToLineIndex: (i) -> @setCursor @cursor[0], i
+    moveCursorToPos:     (pos) -> 
+        @closingInserted = null
+        @setCursor pos[0], pos[1]
+        
+    moveCursorToEndOfLine:     -> @moveCursorToPos [@lines[@cursor[1]].length, @cursor[1]]
+    moveCursorToStartOfLine:   -> @moveCursorToPos [0, @cursor[1]]
+    moveCursorByLines:     (d) -> @moveCursorToPos [@cursor[0], @cursor[1]+d]
+    moveCursorToLineIndex: (i) -> @moveCursorToPos [@cursor[0], i]
 
     moveCursorToEndOfWord:   -> 
         r = @rangesForWordAtPos(@cursor)[1]
         if @cursorAtEndOfLine()
             return if @cursorInLastLine()
             r = @rangesForWordAtPos([0, @cursor[1]+1])[1]
-        @setCursorPos r
+        @moveCursorToPos r
         
     moveCursorToStartOfWord: -> 
         r = @rangesForWordAtPos(@cursor)[0]
@@ -136,36 +141,40 @@ class Editor extends Buffer
             r = @rangesForWordAtPos([@lines[@cursor[1]-1].length, @cursor[1]-1])[0]
         else if r[0] == @cursor[0]
             r = @rangesForWordAtPos([@cursor[0]-1, @cursor[1]])[0]
-        @setCursorPos r
+        @moveCursorToPos r
         
     moveCursorUp: ->
         if @cursorInFirstLine()
             @moveCursorToStartOfLine()
         else
+            @closingInserted = null        
             @do.cursor @, [@cursor[0], @cursor[1] - 1] # don't adjust x
 
     moveCursorDown: ->
         if @cursorInLastLine()
             @moveCursorToEndOfLine()
         else
+            @closingInserted = null        
             @do.cursor @, [@cursor[0], @cursor[1] + 1] # don't adjust x
 
-    moveCursorRight: ->
+    moveCursorRight: (n=1) ->
         if @cursorAtEndOfLine() 
             if not @cursorInLastLine()
                 @moveCursorDown()
                 @moveCursorToStartOfLine()
+                @moveCursorToPos [@cursor[0] + n - 1, @cursor[1]]
         else
-            @setCursor @cursor[0] + 1, @cursor[1]
+            @moveCursorToPos [@cursor[0] + n, @cursor[1]]
     
-    moveCursorLeft: ->
+    moveCursorLeft: (n=1) ->
         @setCursor @cursor[0], @cursor[1]
         if @cursorAtStartOfLine()
             if not @cursorInFirstLine()
                 @moveCursorUp()
                 @moveCursorToEndOfLine()
+                @moveCursorToPos [@cursor[0] - n + 1, @cursor[1]]
         else
-            @setCursor @cursor[0] - 1, @cursor[1]
+            @moveCursorToPos [@cursor[0] - n, @cursor[1]]
     
     moveCursor: (direction) ->
         switch direction
@@ -179,39 +188,57 @@ class Editor extends Buffer
     # 000  000 0 000  000   000  0000000   000 0 000     000   
     # 000  000  0000  000   000  000       000  0000     000   
     # 000  000   000  0000000    00000000  000   000     000   
-
-    indentString: -> '    '
     
     indentLineAtIndex: (i) ->
         @do.start()
-        indent = @indentString()
-        @do.change @lines, i, indent + @lines[i]
+        @do.change @lines, i, @indentString + @lines[i]
         if (@cursor[1] == i) and @cursor[0] > 0
-            @setCursor @cursor[0] + indent.length, @cursor[1]
+            @moveCursorToPos [@cursor[0] + @indentString.length, @cursor[1]]
         if (@selection?[1] == i) and @selection[0] > 0
-            @setSelection @selection[0] + indent.length, @selection[1]
+            @setSelection @selection[0] + @indentString.length, @selection[1]
         @do.end()
     
     deIndentLineAtIndex: (i) ->
         @do.start()
-        indent = @indentString()        
-        if @lines[i].startsWith indent
-            @do.change @lines, i, @lines[i].substr indent.length
-            if (@cursor[1] == i) and @cursor[0] > 0
-                @setCursor Math.max 0, @cursor[0] - indent.length, @cursor[1]
-            if (@selection?[1] == i) and @selection[0] > 0
-                @setSelection Math.max 0, @selection[0] - indent.length, @selection[1]
+        if @lines[i].startsWith @indentString
+            @do.change @lines, i, @lines[i].substr @indentString.length
+            if (@cursor[1] == i) and (@cursor[0] > 0)
+                @moveCursorToPos [Math.max(0, @cursor[0] - @indentString.length), @cursor[1]]
+            if (@selection?[1] == i) and (@selection[0] > 0)
+                @setSelection Math.max(0, @selection[0] - @indentString.length), @selection[1]
         @do.end()
     
     deIndent: -> 
         @do.start()
-        if @selection?
-            for i in @selectedLineIndices()
-                @deIndentLineAtIndex i
-        else
-            @deIndentLineAtIndex @cursor[1]    
+        for i in @cursorOrSelectedLineIndices()
+            @deIndentLineAtIndex i
         @do.end()
-            
+        
+    indent: ->
+        @indentLineAtIndex @cursor[1]
+           
+    #  0000000   0000000   00     00  00     00  00000000  000   000  000000000
+    # 000       000   000  000   000  000   000  000       0000  000     000   
+    # 000       000   000  000000000  000000000  0000000   000 0 000     000   
+    # 000       000   000  000 0 000  000 0 000  000       000  0000     000   
+    #  0000000   0000000   000   000  000   000  00000000  000   000     000   
+
+    toggleLineComment: ->
+        lineComment = "#" # todo: make this file type dependent
+        @do.start()
+        for i in @cursorOrSelectedLineIndices()
+            cs = @lines[i].indexOf lineComment
+            if cs >= 0 and @lines[i].substr(0,cs).trim().length == 0
+                @do.change @lines, i, @lines[i].splice cs, 1
+                si = @indentationAtLineIndex i
+                if si % @indentString.length == 1
+                    @do.change @lines, i, @lines[i].splice si-1, 1
+            else
+                si = @indentationAtLineIndex i
+                if @lines[i].length > si
+                    @do.change @lines, i, @lines[i].splice si, 0, lineComment + " "
+        @do.end()
+ 
     # 000  000   000   0000000  00000000  00000000   000000000
     # 000  0000  000  000       000       000   000     000   
     # 000  000 0 000  0000000   0000000   0000000       000   
@@ -219,35 +246,81 @@ class Editor extends Buffer
     # 000  000   000  0000000   00000000  000   000     000   
     
     insertCharacter: (c) ->
+
+        if c in @surroundCharacters and (@cursor[0] == 0 or @lines[@cursor[1]][@cursor[0]-1] != '\\' )
+            @insertSurroundCharacter c
+            return
+
+        if c == '\n'
+            @insertNewline()
+            return
+
         @do.start()
-        if @selection? and c in @surroundCharacters
-            log 'surround', c, @selection, @surroundCharacters
-        else
-            @deleteSelection()
-            @do.change @lines, @cursor[1], @lines[@cursor[1]].splice @cursor[0], 0, c
-            @setCursor @cursor[0] + 1, @cursor[1]
+        @deleteSelection()
+        @do.change @lines, @cursor[1], @lines[@cursor[1]].splice @cursor[0], 0, c
+        @setCursor @cursor[0] + 1, @cursor[1]
         @do.end()
         
+    insertSurroundCharacter: (c) ->
+        @do.start()
+        
+        if @selection?
+            log 'surround selection', c, @selection
+            for r in @selectionsInLineIndexRange [0,@lines.length-1]
+                [cl,cr] = switch c
+                    when "[", "]" then ["[", "]"]
+                    when "{", "}" then ["{", "}"]
+                    when "(", ")" then ["(", ")"]
+                    when "'"      then ["'", "'"]
+                    when '"'      then ['"', '"']
+                @do.change @lines, r[0], @lines[r[0]].splice r[1][1], 0, cr
+                @do.change @lines, r[0], @lines[r[0]].splice r[1][0], 0, cl                
+            @setCursor @cursor[0] + 2, @cursor[1]
+        else
+            if @closingInserted == c
+                @closingInserted = null
+                @setCursor @cursor[0] + 1, @cursor[1]
+            else
+
+                @do.change @lines, @cursor[1], @lines[@cursor[1]].splice @cursor[0], 0, c
+    
+                c2 = switch c
+                    when '"' then '"'
+                    when "'" then "'"
+                    when "[" then "]"
+                    when '{' then '}'
+                    when '(' then ')'
+
+                if c2? 
+                    @do.change @lines, @cursor[1], @lines[@cursor[1]].splice @cursor[0]+1, 0, c2 
+                    @closingInserted = c2
+                
+                @setCursor @cursor[0] + 1, @cursor[1]
+        @do.end()
+
     insertTab: ->
         @do.start()
         if @selection?
             for i in @selectedLineIndices()
                 @indentLineAtIndex i
         else
-            il = @indentString().length
+            il = @indentString.length
             for i in [0...(4-(@cursor[0]%il))]
                 @insertCharacter ' '
         @do.end()
         
     insertNewline: ->
+        @closingInserted = null
         @do.start()
         @deleteSelection()
+        indent = _.padStart "", @indentationAtLineIndex @cursor[1]
+        log ">#{indent}<", @indentationAtLineIndex @cursor[1]
         if @cursorAtEndOfLine()
-            @do.insert @lines, @cursor[1]+1, ""
+            @do.insert @lines, @cursor[1]+1, indent
         else
-            @do.insert @lines, @cursor[1]+1, @lines[@cursor[1]].substr @cursor[0]
+            @do.insert @lines, @cursor[1]+1, indent + @lines[@cursor[1]].substr @cursor[0]
             @do.change @lines, @cursor[1],   @lines[@cursor[1]].substr 0, @cursor[0]
-        @moveCursorRight()
+        @moveCursorRight indent.length+1
         @do.end()
         
     insertText: (text) ->
@@ -255,9 +328,14 @@ class Editor extends Buffer
         @deleteSelection()
         for c in text
             if c == '\n'
-                @insertNewline()
+                if @cursorAtEndOfLine()
+                    @do.insert @lines, @cursor[1]+1, ""
+                else
+                    @do.insert @lines, @cursor[1]+1, @lines[@cursor[1]].substr @cursor[0]
+                    @do.change @lines, @cursor[1],   @lines[@cursor[1]].substr 0, @cursor[0]
             else
-                @insertCharacter c
+                @do.change @lines, @cursor[1], @lines[@cursor[1]].splice @cursor[0], 0, c
+            @moveCursorRight()
         @do.end()
     
     # 0000000    00000000  000      00000000  000000000  00000000
@@ -305,6 +383,16 @@ class Editor extends Buffer
         else
             @do.change @lines, @cursor[1], @lines[@cursor[1]].splice @cursor[0], 1
     
+    deleteTab: ->
+        n = (@cursor[0] % @indentString.length) or @indentString.length
+        t = @textInRange [@cursor[1], [@cursor[0]-n, @cursor[0]]]
+        if t.trim().length == 0
+            @do.start()
+            for i in [0...n]
+                @moveCursorLeft()
+                @deleteForward()
+            @do.end()
+    
     deleteBackward: ->
         if @selection?
             @deleteSelection()
@@ -314,8 +402,8 @@ class Editor extends Buffer
             strToCursor = @lines[@cursor[1]].substr 0, cursorIndex
             @do.start()
             if strToCursor.length and strToCursor.trim() == '' # only spaces between line start and cursor
-                il = @indentString().length
-                rc = cursorIndex%il or il
+                il = @indentString.length
+                rc = (cursorIndex%il) or il
                 for i in [0...rc]
                     @moveCursorLeft()
                     @deleteForward()

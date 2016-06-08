@@ -1,27 +1,23 @@
 # todo/ideas
 
-- left line border
-- line numbers
-- menu refresh when file loaded
-- window list
-- restore cursor when saving
-
-- fix update
-
-- syntax
-    - md, noon, json, styl
-
-- insert comment (command-/)
-- surround selections with '"[{(
-- auto insert '"[{( 
-- auto indent
-
-- multi cursor/selection
-
 - command entry
-- commands
     - find
     - goto line
+    - quick open
+    
+- left line border
+- line numbers
+
+- restore cursor on watcher reload
+- fix update?
+
+- syntax
+    - md, styl
+
+- multi cursor/selection
+- bracket matching
+
+- commands
     - ls
     - shell
     - execute
@@ -32,6 +28,7 @@
     - active (cursor inside)
     - passive (cursor movement won't destroy, but next selection will)
 
+- autocomplete
 - show spaces/tabs/etc
 - history/console/terminal
 - shortcut for renaming file

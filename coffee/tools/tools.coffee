@@ -1,3 +1,4 @@
+
 #000000000   0000000    0000000   000       0000000
 #   000     000   000  000   000  000      000     
 #   000     000   000  000   000  000      0000000 
@@ -9,6 +10,7 @@ log  = require './log'
 _    = require 'lodash'
 path = require 'path'
 os   = require 'os'
+fs   = require 'fs'
 
 module.exports = 
 
@@ -61,6 +63,26 @@ module.exports =
     
     resolve: (p) -> path.normalize path.resolve p.replace /\~/, process.env.HOME
     unresolve: (p) -> p.replace os.homedir(), "~"    
+
+    fileList: (paths, opt={ignoreHidden: true}) ->
+        files = []
+        for p in paths
+            try
+                stat = fs.statSync p
+                if stat.isDirectory()
+                    dirfiles = fs.readdirSync(p)
+                    dirfiles = (path.join(p,f) for f in dirfiles)
+                    dirfiles = (f for f in dirfiles when fs.statSync(f).isFile())
+                    if opt.ignoreHidden
+                        dirfiles = dirfiles.filter (f) -> not f.startsWith '.'
+                    files = files.concat dirfiles
+                else if stat.isFile()
+                    if opt.ignoreHidden and path.basename(p).startsWith '.'
+                        continue
+                    files.push p
+            catch err
+                log err
+        files
         
     #  0000000   0000000   0000000
     # 000       000       000     

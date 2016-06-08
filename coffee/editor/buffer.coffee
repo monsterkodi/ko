@@ -48,7 +48,10 @@ class Buffer
     #  0000000   0000000   000   000  0000000    0000000   000   000  0000000 
     
     cursorsRelativeToLineIndexRange: (lineIndexRange) ->
-        [[@cursor[0], @cursor[1]-lineIndexRange[0]]]
+        c = [[Math.min(@cursor[0], @lines[@cursor[1]].length), @cursor[1]-lineIndexRange[0]]]
+        if @cursor[0] > @lines[@cursor[1]].length
+            c.push [@cursor[0], @cursor[1]-lineIndexRange[0], 'virtual']
+        c
     
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000
@@ -76,6 +79,12 @@ class Buffer
             (i for i in [range[0]..range[1]])
         else 
             []
+
+    cursorOrSelectedLineIndices: ->
+        l = @selectedLineIndices()
+        if l.length == 0
+            l = [@cursor[1]] 
+        l
                 
     selectedLineIndicesRange: ->
         if @selection
@@ -120,7 +129,7 @@ class Buffer
     # 000       000   000  000   000       000  000   000  000   000
     #  0000000   0000000   000   000  0000000    0000000   000   000
 
-    cursorAtEndOfLine:   -> @cursor[0] == @lines[@cursor[1]].length
+    cursorAtEndOfLine:   -> @cursor[0] >= @lines[@cursor[1]].length
     cursorAtStartOfLine: -> @cursor[0] == 0
     cursorInLastLine:    -> @cursor[1] == @lines.length-1
     cursorInFirstLine:   -> @cursor[1] == 0
@@ -131,8 +140,21 @@ class Buffer
     #    000     000        000 000      000   
     #    000     00000000  000   000     000   
 
-    text:          -> @lines.join '\n'
-    selectedText:  -> @selectedLines().join '\n'
+    text:            -> @lines.join '\n'
+    selectedText:    -> @selectedLines().join '\n'
+    textInRange: (r) -> @lines[r[0]].slice r[1][0], r[1][1]
+        
+    # 000  000   000  0000000    00000000  000   000  000000000
+    # 000  0000  000  000   000  000       0000  000     000   
+    # 000  000 0 000  000   000  0000000   000 0 000     000   
+    # 000  000  0000  000   000  000       000  0000     000   
+    # 000  000   000  0000000    00000000  000   000     000   
+        
+    indentationAtLineIndex: (i) ->
+        s = 0
+        while @lines[i][s] == ' '
+            s += 1
+        s
             
     # 00000000    0000000    0000000
     # 000   000  000   000  000     

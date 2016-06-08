@@ -19,6 +19,7 @@ encode     = require './tools/encode'
 pkg        = require "../package.json"
 {sw,sh,$,
  del,clamp,
+ fileList,
  resolve}  = require './tools/tools'
 
 ipc    = electron.ipcRenderer
@@ -27,9 +28,9 @@ dialog = remote.dialog
 winID  = null
 editor = null
     
-enterHeight     = 200
-minEnterHeight  = 100
-minScrollHeight = 22
+commandlineHeight = 30
+splithandleHeight = 10
+titlebarHeight    = 22
 
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000     
@@ -86,11 +87,16 @@ ipc.on 'saveFile',   => saveFile()
 ipc.on 'loadFile', (event, file) => loadFile file
 ipc.on 'setWinID', (event, id) => 
     winID = id
-    splitAt getState 'split', minScrollHeight
+    log "setWinID: ", id
+    splitAt getState 'split', titlebarHeight
     s = getState 'fontSize'
-    log "setWinID: fontSize", s
     setFontSize s if s
-    setState 'file', editor.currentFile # file might be loaded before id got sent
+
+    if getState 'file'
+        loadFile getState 'file'
+    else
+        setState 'file', editor.currentFile # files might be loaded before id got sent
+
     ipc.send 'reloadMenu'
                  
 # 00000000  000  000      00000000
@@ -124,23 +130,6 @@ loadFile = (file) =>
 # 000   000  000  000   000  000      000   000  000   000
 # 0000000    000  000   000  0000000   0000000    0000000 
 
-fileListForPathList = (paths) ->
-    files = []
-    for p in paths
-        try
-            stat = fs.statSync p
-            if stat.isDirectory()
-                dirfiles = fs.readdirSync(p)
-                dirfiles = (path.join(p,f) for f in dirfiles)
-                dirfiles = (f for f in dirfiles when fs.statSync(f).isFile())
-                files = files.concat dirfiles
-            else if stat.isFile()
-                files.push p
-        catch err
-            log err
-    log 'files', files
-    files
-
 openFile = (options) =>
     dir = path.dirname editor.currentFile if editor.currentFile
     dir ?= resolve '.'
@@ -154,7 +143,7 @@ openFile = (options) =>
         ]
         , (files) =>
             if files?.length
-                files = fileListForPathList files
+                files = fileList files
                 log 'open:', files
                 if files.length >= 10
                     answer = dialog.showMessageBox
@@ -194,18 +183,25 @@ saveFileAs = =>
 
 splitAt = (y) ->
     # log 'splitAt', y
-    $('.split-top').style.height = "#{y}px"
-    $('.split-handle' ).style.top = "#{y}px"
-    $('.split-bot').style.top = "#{y+10}px"
-    enterHeight = sh()-y
-    splitDrag.setMinMax pos(0, minScrollHeight), pos(0, sh()-minEnterHeight)
+    $('.split-top')         .style.height = "#{y-50}px"
+    $('.split-handle.top' ) .style.top = "#{y-40}px"
+    $('.commandline')       .style.top = "#{y-30}px"
+    $('.split-handle.bot' ) .style.top = "#{y}px"
+    $('.split-bot')         .style.top = "#{y+10}px"
+    splitDragTop.setMinMax pos(0, titlebarHeight), pos(0, sh()-commandlineHeight-2*splithandleHeight)
+    splitDragBot.setMinMax pos(0, titlebarHeight), pos(0, sh()-splithandleHeight)
     editor?.resized()
     setState 'split', y
 
-splitDrag = new drag
-    target: $('.split-handle')
+splitDragBot = new drag
+    target: $('.split-handle.bot')
     cursor: 'ns-resize'
     onMove: (drag) -> splitAt drag.cpos.y
+
+splitDragTop = new drag
+    target: $('.split-handle.top')
+    cursor: 'ns-resize'
+    onMove: (drag) -> splitAt drag.cpos.y + 40
 
 # 00000000  0000000    000  000000000   0000000   00000000 
 # 000       000   000  000     000     000   000  000   000
@@ -227,9 +223,13 @@ $('.titlebar').ondblclick = (event) => ipc.send 'maximizeWindow', winID
 window.onresize = =>
     # log 'resize', sw(), sh()
     if sh()
-        splitDrag.setMinMax pos(0, minScrollHeight), pos(0, sh()-minEnterHeight)
+        splitDragTop.setMinMax pos(0, titlebarHeight), pos(0, sh()-commandlineHeight-2*splithandleHeight)
+        splitDragBot.setMinMax pos(0, titlebarHeight), pos(0, sh()-splithandleHeight)
         ipc.send 'saveBounds', winID if winID?
-        editor?.resized()
+        if $('.split-handle.bot').getBoundingClientRect().bottom > sh()
+            splitAt sh()-splithandleHeight
+        else
+            editor?.resized()
     
 window.onunload = =>
     editor.setCurrentFile null # to stop watcher

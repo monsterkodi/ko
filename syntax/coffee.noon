@@ -64,8 +64,8 @@ null|undefined                 keyword.null
 (\w+)\s*[:]\s*[-=]>                 . method
 (\()([^\(\)]*)(\)\s*)[-=]>          . function.bracket . function.variable.argument . function.bracket
 
-(\w+)(?=\(|\s+[@\w\d\"\'\(\[\{])       function.call
-(@\w+)(?=\s+[\w\d@\"\'\(\[\{]|\()   . class.function.call
+(\w+)(?=\(|\s+[@\w\d\"\'\(\[\{])      function.call
+(@\w+)(?=\s+[\w\d@\"\'\(\[\{]|\()     class.function.call
 (@?\w+)\s*\.\s*(\w+)\s*\([^\)]*\)   . class.callee . function.call
 (@?\w+)\s*\.\s*(\w+)\s+\w+          . class.callee . function.call
 

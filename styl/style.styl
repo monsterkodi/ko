@@ -34,6 +34,28 @@ fill-rel()
     outline-width   0
 
 /*
+*  0000000     0000000   0000000    000   000
+*  000   000  000   000  000   000   000 000 
+*  0000000    000   000  000   000    00000  
+*  000   000  000   000  000   000     000   
+*  0000000     0000000   0000000       000   
+*/
+    
+body
+    background          #000
+    color               #fff
+    font-family         arial, helvetica, sans-serif
+    -webkit-user-select none
+    fill-abs()
+    overflow            hidden
+    margin              0
+    
+#main
+    fill-rel()
+    overflow            hidden
+    -webkit-app-region  no-drag
+
+/*
 *  000000000  000  000000000  000      00000000  0000000     0000000   00000000 
 *     000     000     000     000      000       000   000  000   000  000   000
 *     000     000     000     000      0000000   0000000    000000000  0000000  
@@ -50,6 +72,10 @@ fill-rel()
     padding-left        70px
     padding-right       70px
     -webkit-app-region  drag
+    position            absolute
+    top 0
+    left 0
+    right 0
 
 .titlebar span
     position            relative
@@ -67,10 +93,28 @@ fill-rel()
 .titlebar span:hover::before
     opacity             1
     top                 0px
-    // -webkit-app-region  no-drag
-    // -webkit-user-select text
-    // pointer-events      visible
-    // cursor              text
+
+/*
+*   0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
+*  000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
+*  000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 
+*  000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
+*   0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
+*/
+
+.commandline
+    height              28px
+    font-size           24px
+    padding-top         1px
+    padding-left        4px
+    color               #fff
+    background          #000
+    font-family         "Andale Mono", monospace
+    // border              10px solid #222
+    // border-bottom       initial
+    position            absolute
+    left                0
+    right               0
     
 /*
 *   0000000   0000000  00000000    0000000   000      000      0000000     0000000   00000000    0000000
@@ -116,28 +160,6 @@ fill-rel()
         left            0
     &.right
         right           0    
-
-/*
-*  0000000     0000000   0000000    000   000
-*  000   000  000   000  000   000   000 000 
-*  0000000    000   000  000   000    00000  
-*  000   000  000   000  000   000     000   
-*  0000000     0000000   0000000       000   
-*/
-    
-body
-    background          #000
-    color               #fff
-    font-family         arial, helvetica, sans-serif
-    -webkit-user-select none
-    fill-abs()
-    overflow            hidden
-    margin              0
-    
-#main
-    fill-rel()
-    overflow            hidden
-    -webkit-app-region  no-drag
 
 /*
 *   0000000   0000000  00000000    0000000   000      000    
@@ -210,7 +232,6 @@ body
 
     fill-abs()
     
-    // left  20px
     right  20px
     
     overflow-x      auto
@@ -224,10 +245,7 @@ body
             
     font-weight     bold
     font-family     "Andale Mono", monospace
-    
-    &:focus .cursor 
-        background  yellow
-    
+        
 .lines
 .cursors
 .highlights
@@ -262,13 +280,21 @@ body
 *  000       000   000  000   000       000  000   000  000   000
 *   0000000   0000000   000   000  0000000    0000000   000   000
 */
+
+        
+.editor:focus .cursor    // focus 
+    background  yellow
+    &.virtual
+        background  #444 
     
 .cursor
     width            2px
     margin-right    -1px
     margin-left     -1px
-    display         block
-    background      rgba(255, 255, 255, 0.2) // not focus
+    display         inline-block
+    background      #fff // not focus
+    &.virtual
+        background  #111 // not focus
 
 /*
 *  000000000  00000000  00000000   00     00  000  000   000   0000000   000    
@@ -430,9 +456,9 @@ body
     opacity         0.7
 
 .string
-    color           #0a0
+    color           #0a0    !important
     &.double
-        color       #0f0
+        color       #0f0    !important
         
 .comment
     color           #3f3f3f !important

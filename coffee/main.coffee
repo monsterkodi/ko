@@ -5,6 +5,7 @@
 # 000   000  000   000  000  000   000
 
 {first,
+ fileList,
  resolve}     = require './tools/tools'
 prefs         = require './tools/prefs'
 log           = require './tools/log'
@@ -132,9 +133,9 @@ class Main
             
         @restoreWindows() if not args.noprefs
 
-        for file in args.arglist
+        for file in fileList args.arglist
             log 'create', file
-            @createWindow file
+            @createWindow 
 
         if not wins().length
             if args.show

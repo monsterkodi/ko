@@ -22,7 +22,8 @@
 
 # keypath / semver
 
-\S+\.\S+\.\S+               keypath
+#\S+\.\S+\.\S+               keypath
+(\S+\.\S*)                  keypath
 
 # path
 
