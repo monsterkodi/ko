@@ -43,11 +43,14 @@ class Commandline extends ViewBase
         @command = @commands[name]
         @setText @command.last()
         @selectAll()
+        @command.start()
         
     execute: ->
         r = @command?.execute @lines[0]
-        if r == 'clear'
-            @setText ''
+        switch r 
+            when 'clear' then @setText ''
+            when 'editor' then split.focusOnEditor()
+        
                         
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

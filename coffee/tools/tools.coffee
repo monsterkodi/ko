@@ -85,6 +85,14 @@ module.exports =
                 log err
         files
         
+    fileExists: (file) ->
+        try
+            if fs.statSync(file).isFile()
+                fs.accessSync file, fs.R_OK | fs.W_OK
+                return true
+        catch
+            return false
+        
     #  0000000   0000000   0000000
     # 000       000       000     
     # 000       0000000   0000000 

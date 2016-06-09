@@ -17,6 +17,10 @@ class Command
         @index = 0
         @history = ['']
         
+    start: ->
+        
+    current: -> @history[@index]
+        
     execute: (command) ->
     
         _.pull @history, command

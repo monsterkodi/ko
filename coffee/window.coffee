@@ -21,6 +21,7 @@ pkg         = require "../package.json"
 {sw,sh,$,
  del,clamp,
  fileList,
+ fileExists,
  resolve}  = require './tools/tools'
 
 ipc    = electron.ipcRenderer
@@ -114,13 +115,16 @@ saveFile = (file) =>
     editor.setCurrentFile file
     setState 'file', file
 
-loadFile = (file) =>
-    log 'load:', file
-    addToRecent file
-    editor.setCurrentFile file
-    editor.setText fs.readFileSync file, encoding: 'UTF8'
-    setState 'file', file
-    ipc.send 'reloadMenu'
+loadFile = (file) =>    
+    if fileExists file
+        log 'load:', file
+        addToRecent file
+        editor.setCurrentFile file
+        editor.setText fs.readFileSync file, encoding: 'UTF8'
+        setState 'file', file
+        ipc.send 'reloadMenu'
+
+window.loadFile = loadFile
 
 # 0000000    000   0000000   000       0000000    0000000 
 # 000   000  000  000   000  000      000   000  000      

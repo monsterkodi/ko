@@ -8,7 +8,6 @@ clamp
 }       = require '../tools/tools'
 log     = require '../tools/log'
 Command = require '../commandline/command'
-split   = require '../split'
 _       = require 'lodash'
 
 class Goto extends Command
@@ -32,7 +31,7 @@ class Goto extends Command
             editor.selectNone()
             editor.moveCursorToLineIndex line
             editor.moveCursorToStartOfLine()
-            split.focusOnEditor()
+            return 'editor'
         else
             return 'clear'
             

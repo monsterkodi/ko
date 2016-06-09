@@ -6,7 +6,6 @@
 
 log     = require '../tools/log'
 Command = require '../commandline/command'
-split   = require '../split'
 
 class Find extends Command
 
@@ -20,8 +19,9 @@ class Find extends Command
         
         super command
         
-        window.editor.markTextForSearch command
-        if window.editor.searchRanges.length
-            split.focusOnEditor()
+        editor = window.editor
+        editor.markTextForSearch command
+        if editor.searchRanges.length
+            return 'editor' 
         
 module.exports = Find
