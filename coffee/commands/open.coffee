@@ -1,8 +1,8 @@
-#  0000000   000   000  000   0000000  000   000
-# 000   000  000   000  000  000       000  000 
-# 000 00 00  000   000  000  000       0000000  
-# 000 0000   000   000  000  000       000  000 
-#  00000 00   0000000   000   0000000  000   000
+#  0000000   00000000   00000000  000   000
+# 000   000  000   000  000       0000  000
+# 000   000  00000000   0000000   000 0 000
+# 000   000  000        000       000  0000
+#  0000000   000        00000000  000   000
 
 {
 fileExists
@@ -11,7 +11,7 @@ log     = require '../tools/log'
 Command = require '../commandline/command'
 path    = require 'path'
 
-class Quick extends Command
+class Open extends Command
 
     constructor: ->
         
@@ -20,7 +20,7 @@ class Quick extends Command
         super
         
     start: -> 
-        log 'Quick.start', @current(), window.editor.currentFile
+        log 'Open.start', @current(), window.editor.currentFile
         
     execute: (command) ->
         
@@ -36,4 +36,4 @@ class Quick extends Command
         if window.editor.currentFile == file
             return 'editor'
         
-module.exports = Quick
+module.exports = Open

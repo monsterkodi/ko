@@ -16,6 +16,8 @@ scrollhandleWidth     = 8px
 editorPadding         = 2px 
 bottomCornerRadius    = 4px
 frameBorder           = 5px solid #222
+commandlineHeight     = 28px
+arrowBorderSize       = (commandlineHeight / 2px)
 
 fill-abs()
     position        absolute
@@ -36,13 +38,37 @@ fill-rel()
 //  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 
 .commandline
-    height              28px
     position            absolute
-    left                0
-    right               0
     border-left         frameBorder
     border-right        frameBorder 
     
+.commandline-fill
+    fill-rel()
+    
+.commandline-command
+    font-family         sans-serif
+    font-size           18px
+    display             table-cell
+    padding-top         3px
+    padding-left        9px
+    padding-right       5px
+    color               #aaa
+    background          #333
+
+.commandline-arrow 
+    display             table-cell
+    border-top          arrowBorderSize solid transparent
+    border-bottom       arrowBorderSize solid transparent
+    border-left-width   arrowBorderSize
+    border-left-style   solid
+    background          #000
+    color               #333
+        
+.commandline-span
+    position            relative
+    display             table-cell
+    width               99%
+            
 .commandline-editor
     color               #fff
     font-weight         bold

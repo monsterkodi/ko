@@ -39,6 +39,7 @@ class Commandline extends ViewBase
         
         split.showCommandline()
         $('.commandline-editor').focus()
+        $('.commandline-command').innerHTML = name
 
         @command = @commands[name]
         @setText @command.last()
