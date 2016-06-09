@@ -7,6 +7,7 @@
 {
 $,sw,sh
 }     = require './tools/tools'
+log   = require './tools/log'
 pos   = require './tools/pos'
 drag  = require './tools/drag'
 prefs = require './tools/prefs'
@@ -14,7 +15,7 @@ prefs = require './tools/prefs'
 class Split
 
     @commandlineHeight = 30
-    @titlebarHeight    = 22
+    @titlebarHeight    = 23
     @handleHeight      = 10
     
     @init: (wid) ->
@@ -36,7 +37,7 @@ class Split
     @resized: ->
         @dragTop.setMinMax pos(0, @titlebarHeight), pos(0, sh()-@commandlineHeight-2*@handleHeight)
         @dragBot.setMinMax pos(0, @titlebarHeight), pos(0, sh()-@handleHeight)        
-        if $('.split-handle.bot').getBoundingClientRect().bottom > sh()
+        if @dragBot.target.getBoundingClientRect().bottom > sh()
             @splitAt sh()-@handleHeight
     
     @splitAt: (y) ->
@@ -48,6 +49,21 @@ class Split
         @dragTop.setMinMax pos(0, @titlebarHeight), pos(0, sh()-@commandlineHeight-2*@handleHeight)
         @dragBot.setMinMax pos(0, @titlebarHeight), pos(0, sh()-@handleHeight)
         @setState 'split', y
+
+    @showCommandline: ->
+        if @dragTop.target.getBoundingClientRect().top < 0
+            @splitAt @titlebarHeight+@commandlineHeight+@handleHeight
+
+    @hideCommandline: ->
+        if @dragBot.target.getBoundingClientRect().top > @titlebarHeight
+            @splitAt @titlebarHeight
+
+    @focusOnEditorOrHistory: ->
+        @focusOnEditor()
+        
+    @focusOnEditor: ->
+        @hideCommandline()
+        $('.editor').focus()
 
     #  0000000  000000000   0000000   000000000  00000000
     # 000          000     000   000     000     000     

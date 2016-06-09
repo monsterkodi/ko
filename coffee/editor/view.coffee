@@ -4,12 +4,13 @@
 #    000     000  000       000   000
 #     0      000  00000000  00     00
 
-ViewBase  = require './viewbase'
-render    = require './render'
-watcher   = require './watcher'
-log       = require '../tools/log'
-drag      = require '../tools/drag'
-keyinfo   = require '../tools/keyinfo'
+ViewBase = require './viewbase'
+render   = require './render'
+watcher  = require './watcher'
+split    = require '../split'
+log      = require '../tools/log'
+drag     = require '../tools/drag'
+keyinfo  = require '../tools/keyinfo'
 {
 clamp,$,
 unresolve,
@@ -123,7 +124,7 @@ class View extends ViewBase
     # 000       000  000   000  0000000  
     
     openFind: ->
-        
+        split.showCommandline()
         $('.commandline-editor').focus()
 
     # 00000000   00000000   0000000  000  0000000  00000000  0000000  
@@ -209,9 +210,10 @@ class View extends ViewBase
     # 000   000  00000000     000   
 
     handleModKeyComboEvent: (mod, key, combo, event) =>
-        log "editor key:", key, "mod:", mod, "combo:", combo
+        # log "view key:", key, "mod:", mod, "combo:", combo
         
         switch combo
+            when 'esc'              then return split.focusOnEditor()
             when 'command+f'        then return @openFind()            
             when 'tab'              then return @insertTab() + event.preventDefault() 
             when 'shift+tab'        then return @deleteTab() + event.preventDefault()

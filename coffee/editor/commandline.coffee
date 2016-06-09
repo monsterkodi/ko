@@ -7,6 +7,7 @@
 
 ViewBase  = require './viewbase'
 log       = require '../tools/log'
+split     = require '../split'
 
 class Commandline extends ViewBase
     
@@ -16,7 +17,7 @@ class Commandline extends ViewBase
         @fontSizeKey     = 'commandlineFontSize'
         
         super viewElem
-        
+                
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
     # 0000000    0000000     00000  
@@ -29,6 +30,7 @@ class Commandline extends ViewBase
             when 'enter'
                 log 'enter'
                 return
+            when 'esc' then return split.focusOnEditorOrHistory()
             when 'tab', 'shift+tab' then return
         
         # log "commandline key:", key, "mod:", mod, "combo:", combo        
