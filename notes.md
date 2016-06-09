@@ -1,10 +1,7 @@
 # todo/ideas
-
-- command entry
-    - find
-    - goto line
-    - quick open
     
+- open command
+    - look for matches in sub- and parent-directories
 - fix shift tab at line start
     
 - left line border
@@ -21,6 +18,7 @@
 - bracket matching
 
 - commands
+    - tree
     - ls
     - shell
     - execute

@@ -198,9 +198,9 @@ class Buffer
             if r[0][1] < pos[1] or r[0][1] == pos[1] and r[1][0] < pos[0]
                 return r 
     
-    rangeForLineAtIndex: (i) -> [0, @lines[i].length]
-    
-    rangesForCursorLine:     -> [[0, @cursor[1]], [@lines[@cursor[1]].length, @cursor[1]]]
+    rangeForLineAtIndex: (i)  -> [0, @lines[i].length] 
+    rangesForLineAtIndex: (i) -> [[0, i], [@lines[i].length, i]]
+    rangesForCursorLine:      -> [[0, @cursor[1]], [@lines[@cursor[1]].length, @cursor[1]]]
     
     rangesForTextInLineAtIndex: (t, i) ->
         ci = @lines[i].search(t)

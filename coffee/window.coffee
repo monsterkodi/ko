@@ -124,7 +124,7 @@ loadFile = (file) =>
         setState 'file', file
         ipc.send 'reloadMenu'
 
-openFiles = (files) =>
+openFiles = (files, options) =>
     log 'openFiles:', files
     if files?.length
         files = fileList files
@@ -166,7 +166,7 @@ openFile = (options) =>
                 name: 'Coffee-Script', extensions: ['coffee']
                 name: 'All Files', extensions: ['*']
         ]
-        , openFiles
+        , (files) => openFiles files, options
 
 saveFileAs = =>
     dialog.showSaveDialog 

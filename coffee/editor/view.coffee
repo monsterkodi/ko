@@ -213,7 +213,9 @@ class View extends ViewBase
             when 'enter'            then return @insertNewline()
             when 'command+j'        then return @joinLine()
             when 'command+/'        then return @toggleLineComment()
-                
+            when 'command+l'        then return @selectMoreLines()
+            when 'command+shift+l'  then return @selectLessLines()
+                            
         # commands that might change the selection ...
         
         switch key

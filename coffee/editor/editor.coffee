@@ -55,6 +55,32 @@ class Editor extends Buffer
     selectNone:         -> @do.selection @, null
     setSelection: (c,l) -> @do.selection @, [c,l]
 
+    selectMoreLines:     -> 
+        ranges = @selectionRanges()
+        if ranges.length == 0
+            @selectLineAtIndex @cursor[1]
+            return
+            
+        cursorLine = @rangesForCursorLine()
+            
+        if ranges.length == 1
+            range = ranges[0]
+            if range[1][0] != cursorLine[0][0] or range[1][1] != cursorLine[1][0]
+                @selectLineAtIndex @cursor[1]
+                return
+        nextLine = @rangesForLineAtIndex cursorLine[1][1]+1 
+        @setCursorPos nextLine[1]
+
+    selectLessLines:     -> 
+        ranges = @selectionRanges()
+        if ranges.length <= 1
+            return
+        prevLine = @rangesForLineAtIndex @cursor[1]-1
+        @setCursorPos prevLine[1]
+
+    selectLineAtIndex: (i) -> 
+        @selectRanges @rangesForLineAtIndex i
+
     selectRanges: (ranges) ->
         @do.start()
         @setSelection ranges[0][0], ranges[0][1]
@@ -409,6 +435,7 @@ class Editor extends Buffer
             if strToCursor.length and strToCursor.trim() == '' # only spaces between line start and cursor
                 il = @indentString.length
                 rc = (cursorIndex%il) or il
+                # log 'rc',rc
                 for i in [0...rc]
                     @moveCursorLeft()
                     @deleteForward()

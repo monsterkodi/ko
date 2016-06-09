@@ -27,6 +27,8 @@ class Goto extends Command
             editor = window.editor
             if line < 0
                 line = editor.lines.length + line
+            else 
+                line -= 1
             line = clamp 0, editor.lines.length-1, line
             editor.selectNone()
             editor.moveCursorToLineIndex line
