@@ -60,3 +60,4 @@ dependencies
                 noon            ^1.0.8
                 opener          ^1.4.1
                 terminal.js     ^1.0.7
+                walkdir         0.0.11

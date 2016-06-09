@@ -5,11 +5,15 @@
 #  0000000   000        00000000  000   000
 
 {
-fileExists
+fileExists,
+fileList,
+resolve
 }       = require '../tools/tools'
 log     = require '../tools/log'
 Command = require '../commandline/command'
 path    = require 'path'
+walkdir = require 'walkdir'
+fs      = require 'fs'
 _       = require 'lodash'
 
 class Open extends Command
@@ -17,20 +21,63 @@ class Open extends Command
     constructor: ->
         
         @shortcut = 'command+p'
+        @files    = null
+        @file     = null
+        @dir      = null
+        @pkg      = null
         
         super
         
-    start: -> log 'Open.start', @current(), window.editor.currentFile
+    packagePath: (p) ->
+        while path.dirname(p).length and path.dirname(p) not in ['.', '/']
+            p = path.dirname p
+            if fs.existsSync path.join p, 'package.noon'
+                return resolve p
+            if fs.existsSync path.join p, 'package.json'
+                return resolve p
+        null
+        
+    sortFiles: ->
+        log 'sortFiles', @files, @dir, @pkg, @file
+        base = @dir
+        weight = (f) =>
+            if f.startsWith @dir
+                return 10000-path.dirname(f).length
+            if f.startsWith path.dirname @dir
+                return 5000-path.dirname(f).length
+            else
+                return 1000-path.dirname(f).length
+        @files.sort (a,b) -> weight(b) - weight(a) 
+        log @files
+        
+    start: -> 
+        @file  = window.editor.currentFile
+        @dir   = path.dirname @file
+        @pkg   = @packagePath @dir
+        @files = []
+        that   = @
+        try
+            walkdir.sync @pkg, max_depth: 4, (p) ->
+                if path.basename(p) in ['node_modules', '.git', 'app', 'img', 'dist', 'build', '.DS_Store']
+                    @ignore p 
+                else if p == that.file
+                    @ignore p 
+                else
+                    that.files.push p
+        catch err
+            log err
+            
+        @sortFiles()
         
     execute: (command) ->
 
         super command
         
-        log 'command', command
+        # log 'command', command
         
         files = _.words command, new RegExp "[^, ]+", 'g'
         
-        log 'files', files
+        # log 'files', files
         
         for i in [0...files.length]
             file = files[i]

@@ -55,14 +55,12 @@ class Editor extends Buffer
     selectNone:         -> @do.selection @, null
     setSelection: (c,l) -> @do.selection @, [c,l]
 
-    selectMoreLines:     -> 
+    selectMoreLines: -> 
         ranges = @selectionRanges()
         if ranges.length == 0
             @selectLineAtIndex @cursor[1]
             return
-            
         cursorLine = @rangesForCursorLine()
-            
         if ranges.length == 1
             range = ranges[0]
             if range[1][0] != cursorLine[0][0] or range[1][1] != cursorLine[1][0]
@@ -71,7 +69,7 @@ class Editor extends Buffer
         nextLine = @rangesForLineAtIndex cursorLine[1][1]+1 
         @setCursorPos nextLine[1]
 
-    selectLessLines:     -> 
+    selectLessLines: -> 
         ranges = @selectionRanges()
         if ranges.length <= 1
             return

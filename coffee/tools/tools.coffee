@@ -77,6 +77,7 @@ module.exports =
                     if opt.ignoreHidden
                         dirfiles = dirfiles.filter (f) -> not f.startsWith '.'
                     files = files.concat dirfiles
+                    
                 else if stat.isFile()
                     if opt.ignoreHidden and path.basename(p).startsWith '.'
                         continue
