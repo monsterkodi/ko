@@ -66,6 +66,7 @@ module.exports =
 
     fileList: (paths, opt={ignoreHidden: true}) ->
         files = []
+        paths = [paths] if typeof paths == 'string'
         for p in paths
             try
                 stat = fs.statSync p

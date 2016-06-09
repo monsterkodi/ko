@@ -10,7 +10,7 @@ path        = require 'path'
 fs          = require 'fs'
 split       = require './split'
 View        = require './editor/view'
-Commandline = require './editor/commandline'
+Commandline = require './commandline/commandline'
 prefs       = require './tools/prefs'
 keyinfo     = require './tools/keyinfo'
 drag        = require './tools/drag'
@@ -29,7 +29,6 @@ remote = electron.remote
 dialog = remote.dialog
 winID  = null
 editor = null
-cmmdln = null
     
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000     
@@ -184,6 +183,7 @@ saveFileAs = =>
 editor = new View $('.editor')
 editor.setText editorText if editorText?
 editor.view.focus()
+window.editor = editor
 
 #  0000000   0000000   00     00  00     00   0000000   000   000  0000000  
 # 000       000   000  000   000  000   000  000   000  0000  000  000   000
@@ -191,7 +191,7 @@ editor.view.focus()
 # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
 
-cmmdln = new Commandline $('.commandline-editor')
+window.commandline = new Commandline $('.commandline-editor')
 
 $('.titlebar').ondblclick = (event) => ipc.send 'maximizeWindow', winID
 

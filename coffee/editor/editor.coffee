@@ -79,6 +79,11 @@ class Editor extends Buffer
     #      000  000       000   000  000   000  000       000   000
     # 0000000   00000000  000   000  000   000   0000000  000   000
 
+    markTextForSearch: (text) ->
+        @selectRanges @rangesForText text
+        @searchText = text
+        @searchRanges = @rangesForText @searchText
+
     markSelectionForSearch: ->
         if not @selection? 
             @selectRanges @rangesForWordAtPos @cursorPos()

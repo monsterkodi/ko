@@ -116,17 +116,14 @@ class View extends ViewBase
             title = "<span class=\"title#{dc}\" data-tip=\"#{unresolve @currentFile}\">#{ds} #{title} #{ds}</span>"
         $('.titlebar').innerHTML = title 
 
-    # 00000000  000  000   000  0000000  
-    # 000       000  0000  000  000   000
-    # 000000    000  000 0 000  000   000
-    # 000       000  000  0000  000   000
-    # 000       000  000   000  0000000  
+    #  0000000   0000000   00     00  00     00   0000000   000   000  0000000     0000000
+    # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000     
+    # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  0000000 
+    # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000       000
+    #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000 
     
-    openFind: ->
-        split.showCommandline()
-        $('.commandline-editor').focus()
-        
-    openQuick: -> @openFind()
+    openFind: -> window.commandline.startCommand 'find'
+    openQuick: -> window.commandline.startCommand 'quick'
 
     # 00000000   00000000   0000000  000  0000000  00000000  0000000  
     # 000   000  000       000       000     000   000       000   000

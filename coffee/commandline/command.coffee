@@ -1,0 +1,36 @@
+#  0000000   0000000   00     00  00     00   0000000   000   000  0000000  
+# 000       000   000  000   000  000   000  000   000  0000  000  000   000
+# 000       000   000  000000000  000000000  000000000  000 0 000  000   000
+# 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
+#  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
+
+{
+clamp
+}   = require '../tools/tools'
+log = require '../tools/log'
+_   = require 'lodash'
+
+class Command
+
+    constructor: () ->
+    
+        @index = 0
+        @history = ['']
+        
+    execute: (command) ->
+    
+        _.pull @history, command
+        @history.push command
+        @index = @history.length-1
+    
+        log 'execute command', command
+
+    prev: -> 
+        @index = clamp 0, @history.length-1, @index-1
+        @history[@index]
+        
+    next: -> 
+        @index = clamp 0, @history.length-1, @index+1
+        @history[@index]
+
+module.exports = Command

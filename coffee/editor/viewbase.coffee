@@ -283,6 +283,9 @@ class ViewBase extends Editor
         return if key == 'right click' # weird right command key
 
         # log "viewbase key:", key, "mod:", mod, "combo:", combo
+        
+        if 'unhandled' != @handleModKeyComboEvent mod, key, combo, event
+            return
 
         switch combo
             when 'command+k'                then return @selectAll() + @deleteSelection()
@@ -336,9 +339,13 @@ class ViewBase extends Editor
             @endSelection event.shiftKey 
             return
                         
-        if 'unhandled' == @handleModKeyComboEvent mod, key, combo, event
-            ansiKeycode = require 'ansi-keycode'
-            if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
-                @insertCharacter ansiKeycode event
+        # if 'unhandled' == @handleModKeyComboEvent mod, key, combo, event
+        #     ansiKeycode = require 'ansi-keycode'
+        #     if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
+        #         @insertCharacter ansiKeycode event
+
+        ansiKeycode = require 'ansi-keycode'
+        if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
+            @insertCharacter ansiKeycode event
 
 module.exports = ViewBase            
