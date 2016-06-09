@@ -4,18 +4,18 @@
 #    000     000  000       000   000
 #     0      000  00000000  00     00
 
-ViewBase = require './viewbase'
-render   = require './render'
-watcher  = require './watcher'
-split    = require '../split'
-log      = require '../tools/log'
-drag     = require '../tools/drag'
-keyinfo  = require '../tools/keyinfo'
 {
 clamp,$,
 unresolve,
 getStyle,
 }         = require '../tools/tools'
+log       = require '../tools/log'
+drag      = require '../tools/drag'
+keyinfo   = require '../tools/keyinfo'
+split     = require '../split'
+ViewBase  = require './viewbase'
+render    = require './render'
+watcher   = require './watcher'
 path      = require 'path'
 electron  = require 'electron'
 webframe  = electron.webFrame
@@ -40,8 +40,6 @@ class View extends ViewBase
 
         @view.addEventListener 'wheel', @onWheel
 
-        @scrollBy 0
-
     done: =>
         @updateTitlebar()
         super
@@ -59,6 +57,7 @@ class View extends ViewBase
             if name in render.syntaxNames
                 @syntaxName = name
         super file
+        @scrollBy 0
 
     # 000      000  000   000  00000000   0000000
     # 000      000  0000  000  000       000     
@@ -126,6 +125,8 @@ class View extends ViewBase
     openFind: ->
         split.showCommandline()
         $('.commandline-editor').focus()
+        
+    openQuick: -> @openFind()
 
     # 00000000   00000000   0000000  000  0000000  00000000  0000000  
     # 000   000  000       000       000     000   000       000   000
@@ -214,7 +215,8 @@ class View extends ViewBase
         
         switch combo
             when 'esc'              then return split.focusOnEditor()
-            when 'command+f'        then return @openFind()            
+            when 'command+f'        then return @openFind()  
+            when 'command+p'        then return @openQuick()     
             when 'tab'              then return @insertTab() + event.preventDefault() 
             when 'shift+tab'        then return @deleteTab() + event.preventDefault()
             when 'command+]'        then return @indent()

@@ -16,7 +16,7 @@ class Split
 
     @commandlineHeight = 30
     @titlebarHeight    = 23
-    @handleHeight      = 10
+    @handleHeight      = 6
     
     @init: (wid) ->
         
@@ -26,11 +26,13 @@ class Split
             target: $('.split-handle.bot')
             cursor: 'ns-resize'
             onMove: (drag) => @splitAt drag.cpos.y
+            onStop: (drag) => @snap()
 
         @dragTop = new drag
             target: $('.split-handle.top')
             cursor: 'ns-resize'
             onMove: (drag) => @splitAt drag.cpos.y + 40
+            onStop: (drag) => @snap()
     
         @splitAt @getState 'split', @titlebarHeight
     
@@ -44,8 +46,8 @@ class Split
         $('.split-top')         .style.height = "#{y-@commandlineHeight}px"
         $('.split-handle.top' ) .style.top = "#{y-@commandlineHeight-@handleHeight}px"
         $('.commandline')       .style.top = "#{y-@commandlineHeight}px"
-        $('.split-handle.bot' ) .style.top = "#{y}px"
-        $('.split-bot')         .style.top = "#{y+@handleHeight}px"
+        $('.split-handle.bot' ) .style.top = "#{y-2}px"
+        $('.split-bot')         .style.top = "#{y+@handleHeight-2}px"
         @dragTop.setMinMax pos(0, @titlebarHeight), pos(0, sh()-@commandlineHeight-2*@handleHeight)
         @dragBot.setMinMax pos(0, @titlebarHeight), pos(0, sh()-@handleHeight)
         @setState 'split', y
@@ -56,7 +58,16 @@ class Split
 
     @hideCommandline: ->
         if @dragBot.target.getBoundingClientRect().top > @titlebarHeight
-            @splitAt @titlebarHeight
+            @splitAt @titlebarHeight+2
+        
+    @snap: ->
+        log 'snap'
+        t = @dragBot.target.getBoundingClientRect().top
+        if t > @titlebarHeight
+            if t < @titlebarHeight+(@commandlineHeight+@handleHeight)/2
+                @splitAt @titlebarHeight+2
+            else if t <  @titlebarHeight+(@commandlineHeight+@handleHeight)*2
+                @splitAt @titlebarHeight+@commandlineHeight+@handleHeight
 
     @focusOnEditorOrHistory: ->
         @focusOnEditor()

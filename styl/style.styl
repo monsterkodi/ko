@@ -14,7 +14,8 @@ scrollFontSize        = 24px
 scrollbarWidth        = 60px // transparent scroll area
 scrollhandleWidth     = 8px
 editorPadding         = 2px 
-bottomCornerRadius    = 5px
+bottomCornerRadius    = 4px
+frameBorder           = 5px solid #222
 
 fill-abs()
     position        absolute
@@ -27,7 +28,7 @@ fill-rel()
     position        static
     height          100%
     width           100%
-
+    
 //  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
 // 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
 // 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 
@@ -36,18 +37,17 @@ fill-rel()
 
 .commandline
     height              28px
-    background          #000
     position            absolute
     left                0
     right               0
+    border-left         frameBorder
+    border-right        frameBorder 
     
 .commandline-editor
     color               #fff
     font-weight         bold
-    background          transparent
+    background          #000
     font-family         "Andale Mono", monospace
-    -webkit-user-select text
-    // border              1px solid red
     fill-abs()
     overflow-x          auto
     overflow-y          hidden
@@ -162,13 +162,11 @@ body
 // 0000000    0000000  000   000   0000000   0000000  0000000
         
 #scroll
-    font-size       scrollFontSize    
-    position        absolute
-    top             0
-    bottom          0
-    left            0
-    right           0
-    overflow        auto
+    font-size           scrollFontSize    
+    fill-abs()
+    overflow            auto
+    border-left         frameBorder
+    border-right        frameBorder    
 
 //  0000000  00000000   000      000  000000000
 // 000       000   000  000      000     000   
@@ -210,7 +208,7 @@ body
 
 .split-pane.split-bot 
     background      #000
-    border          1px solid #333
+    border          frameBorder
     border-top      0px solid
     
     border-bottom-left-radius    bottomCornerRadius
@@ -227,9 +225,6 @@ body
 
     background      #000
     color           #ddd 
-        
-    border-bottom-left-radius    bottomCornerRadius
-    border-bottom-right-radius   bottomCornerRadius    
     
     font-weight     bold
     font-family     "Andale Mono", monospace
@@ -239,7 +234,6 @@ body
 .highlights
 .selections
     pointer-events  none
-    outline-width   0
     fill-abs()
 
 // 000      000  000   000  00000000   0000000
