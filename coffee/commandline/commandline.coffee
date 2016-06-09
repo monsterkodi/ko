@@ -22,7 +22,7 @@ class Commandline extends ViewBase
         
         super viewElem
         
-        @commandMap = {}
+        @commands = {}
         @command = null
         
         @loadCommands()
@@ -33,26 +33,31 @@ class Commandline extends ViewBase
         
         for file in files
             commandClass = require file
-            @commandMap[commandClass.name.toLowerCase()] = new commandClass()
-        
-        # log 'loadCommands', @commandMap
-        
+            @commands[commandClass.name.toLowerCase()] = new commandClass()
+                
     startCommand: (name) ->
         
         split.showCommandline()
         $('.commandline-editor').focus()
 
-        @command = @commandMap[name]
-        
-        # log 'startCommand', name, @command
-                
+        @command = @commands[name]
+        @setText @commands.last()
+                        
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
     # 0000000    0000000     00000  
     # 000  000   000          000   
     # 000   000  00000000     000   
 
-    handleModKeyComboEvent: (mod, key, combo, event) =>
+    globalModKeyComboEvent: (mod, key, combo, event) ->
+        for n,c of @commands
+            if combo == c.shortcut
+                @startCommand n
+                return
+        return 'unhandled'            
+        
+
+    handleModKeyComboEvent: (mod, key, combo, event) ->
 
         switch combo
             when 'enter'
@@ -63,7 +68,6 @@ class Commandline extends ViewBase
             when 'esc'  then return split.focusOnEditorOrHistory()
             when 'tab', 'shift+tab' then return
         
-        # log "commandline key:", key, "mod:", mod, "combo:", combo        
         return 'unhandled'
     
 module.exports = Commandline

@@ -5,7 +5,6 @@
 # 00     00  000  000   000  0000000     0000000   00     00
 
 electron    = require 'electron'
-noon        = require 'noon'
 path        = require 'path'
 fs          = require 'fs'
 split       = require './split'
@@ -239,7 +238,11 @@ resetFontSize = =>
 document.onkeydown = (event) ->
     {mod, key, combo} = keyinfo.forEvent event
     # log "document key:", key, "mod:", mod, "combo:", combo
+    
     return if not combo
+    
+    return if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
+        return
     
     switch combo
         when 'command+enter' then return ipc.send 'execute', editor.text()
@@ -247,4 +250,3 @@ document.onkeydown = (event) ->
         when 'command+='     then return changeFontSize +1
         when 'command+-'     then return changeFontSize -1
         when 'command+0'     then return resetFontSize()
-        

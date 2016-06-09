@@ -116,15 +116,6 @@ class View extends ViewBase
             title = "<span class=\"title#{dc}\" data-tip=\"#{unresolve @currentFile}\">#{ds} #{title} #{ds}</span>"
         $('.titlebar').innerHTML = title 
 
-    #  0000000   0000000   00     00  00     00   0000000   000   000  0000000     0000000
-    # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000     
-    # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  0000000 
-    # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000       000
-    #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000 
-    
-    openFind: -> window.commandline.startCommand 'find'
-    openQuick: -> window.commandline.startCommand 'quick'
-
     # 00000000   00000000   0000000  000  0000000  00000000  0000000  
     # 000   000  000       000       000     000   000       000   000
     # 0000000    0000000   0000000   000    000    0000000   000   000
@@ -212,8 +203,6 @@ class View extends ViewBase
         
         switch combo
             when 'esc'              then return split.focusOnEditor()
-            when 'command+f'        then return @openFind()  
-            when 'command+p'        then return @openQuick()     
             when 'tab'              then return @insertTab() + event.preventDefault() 
             when 'shift+tab'        then return @deleteTab() + event.preventDefault()
             when 'command+]'        then return @indent()

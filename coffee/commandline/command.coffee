@@ -23,7 +23,7 @@ class Command
         @history.push command
         @index = @history.length-1
     
-        log 'execute command', command
+        # log 'execute command', command
 
     prev: -> 
         @index = clamp 0, @history.length-1, @index-1
@@ -31,6 +31,10 @@ class Command
         
     next: -> 
         @index = clamp 0, @history.length-1, @index+1
+        @history[@index]
+        
+    last: ->
+        @index = @history.length-1
         @history[@index]
 
 module.exports = Command

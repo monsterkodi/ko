@@ -11,6 +11,8 @@ class Quick extends Command
 
     constructor: ->
         
+        @shortcut = 'command+p'
+        
         super
         
     execute: (command) ->
