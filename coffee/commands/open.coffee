@@ -10,6 +10,7 @@ fileExists
 log     = require '../tools/log'
 Command = require '../commandline/command'
 path    = require 'path'
+_       = require 'lodash'
 
 class Open extends Command
 
@@ -19,21 +20,30 @@ class Open extends Command
         
         super
         
-    start: -> 
-        log 'Open.start', @current(), window.editor.currentFile
+    start: -> log 'Open.start', @current(), window.editor.currentFile
         
     execute: (command) ->
-        
+
         super command
         
-        file = path.join path.dirname(window.editor.currentFile), command
-        log file
-        if not fileExists file
-            if '' == path.extname file
-                if fileExists file + '.coffee'
-                    file += '.coffee'
-        window.loadFile file
-        if window.editor.currentFile == file
+        log 'command', command
+        
+        files = _.words command, new RegExp "[^, ]+", 'g'
+        
+        log 'files', files
+        
+        for i in [0...files.length]
+            file = files[i]
+            file = path.join path.dirname(window.editor.currentFile), file
+            if not fileExists file
+                if '' == path.extname file
+                    if fileExists file + '.coffee'
+                        file += '.coffee'
+            files.splice i, 1, file
+        
+        log 'files after', files    
+        opened = window.openFiles files
+        if opened?.length
             return 'editor'
         
 module.exports = Open

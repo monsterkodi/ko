@@ -124,6 +124,29 @@ loadFile = (file) =>
         setState 'file', file
         ipc.send 'reloadMenu'
 
+openFiles = (files) =>
+    log 'openFiles:', files
+    if files?.length
+        files = fileList files
+        log 'open:', files
+        if files.length >= 10
+            answer = dialog.showMessageBox
+                type: 'warning'
+                buttons: ['Cancel', 'Open All']
+                defaultId: 0
+                cancelId: 0
+                title: "A Lot of Files Warning"
+                message: "You have selected #{files.length} files."
+                detail: "Are you sure you want to open that many files?"
+            return if answer != 1
+        setState 'openFilePath', path.dirname files[0]                    
+        if not options?.newWindow
+            loadFile resolve files.shift()
+        for file in files
+            ipc.send 'newWindowWithFile', file
+        return files
+
+window.openFiles = openFiles
 window.loadFile = loadFile
 
 # 0000000    000   0000000   000       0000000    0000000 
@@ -143,25 +166,7 @@ openFile = (options) =>
                 name: 'Coffee-Script', extensions: ['coffee']
                 name: 'All Files', extensions: ['*']
         ]
-        , (files) =>
-            if files?.length
-                files = fileList files
-                log 'open:', files
-                if files.length >= 10
-                    answer = dialog.showMessageBox
-                        type: 'warning'
-                        buttons: ['Cancel', 'Open All']
-                        defaultId: 0
-                        cancelId: 0
-                        title: "A Lot of Files Warning"
-                        message: "You have selected #{files.length} files."
-                        detail: "Are you sure you want to open that many files?"
-                    return if answer != 1
-                setState 'openFilePath', path.dirname files[0]                    
-                if not options?.newWindow
-                    loadFile resolve files.shift()
-                for file in files
-                    ipc.send 'newWindowWithFile', file
+        , openFiles
 
 saveFileAs = =>
     dialog.showSaveDialog 
