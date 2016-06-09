@@ -19,6 +19,7 @@ class Find extends Command
         super command
         
         window.editor.markTextForSearch command
-        split.focusOnEditor()
+        if window.editor.searchRanges.length
+            split.focusOnEditor()
         
 module.exports = Find

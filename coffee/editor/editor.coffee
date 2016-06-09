@@ -83,14 +83,16 @@ class Editor extends Buffer
         # @selectRanges @rangesForText text
         @searchText = text
         @searchRanges = @rangesForText @searchText
-        log 'markTextForSearch searchRanges', @searchRanges
+        if @searchRanges.length
+            @selectRanges @searchRanges[0]
+        # log 'markTextForSearch searchRanges', @searchRanges
 
     markSelectionForSearch: ->
         if not @selection? 
             @selectRanges @rangesForWordAtPos @cursorPos()
         @searchText = @selectedText()
         @searchRanges = @rangesForText @searchText
-        log 'markSelectionForSearch searchRanges', @searchRanges
+        # log 'markSelectionForSearch searchRanges', @searchRanges
         
     jumpToNextSearchResult: ->
         r = @rangeAfterPosInRanges @cursorPos(), @searchRanges
