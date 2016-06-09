@@ -80,16 +80,17 @@ class Editor extends Buffer
     # 0000000   00000000  000   000  000   000   0000000  000   000
 
     markTextForSearch: (text) ->
-        @selectRanges @rangesForText text
+        # @selectRanges @rangesForText text
         @searchText = text
         @searchRanges = @rangesForText @searchText
+        log 'markTextForSearch searchRanges', @searchRanges
 
     markSelectionForSearch: ->
         if not @selection? 
             @selectRanges @rangesForWordAtPos @cursorPos()
         @searchText = @selectedText()
         @searchRanges = @rangesForText @searchText
-        log 'searchRanges', @searchRanges
+        log 'markSelectionForSearch searchRanges', @searchRanges
         
     jumpToNextSearchResult: ->
         r = @rangeAfterPosInRanges @cursorPos(), @searchRanges
@@ -99,11 +100,8 @@ class Editor extends Buffer
             @selectRanges r
 
     jumpToPrevSearchResult: ->
-        log 'prev'
         r = @rangeBeforePosInRanges @cursorPos(), @searchRanges
-        log 'r', r
         if not r
-            log 'last'
             @jumpToLastSearchResult()
         else
             @selectRanges r
