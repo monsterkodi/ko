@@ -41,7 +41,13 @@ class Commandline extends ViewBase
         $('.commandline-editor').focus()
 
         @command = @commands[name]
-        @setText @commands.last()
+        @setText @command.last()
+        @selectAll()
+        
+    execute: ->
+        r = @command?.execute @lines[0]
+        if r == 'clear'
+            @setText ''
                         
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
@@ -60,12 +66,10 @@ class Commandline extends ViewBase
     handleModKeyComboEvent: (mod, key, combo, event) ->
 
         switch combo
-            when 'enter'
-                @command?.execute @lines[0]
-                return
-            when 'up'   then return @setText @command?.prev()
-            when 'down' then return @setText @command?.next()
-            when 'esc'  then return split.focusOnEditorOrHistory()
+            when 'enter' then return @execute()
+            when 'up'    then return @setText @command?.prev()
+            when 'down'  then return @setText @command?.next()
+            when 'esc'   then return split.focusOnEditorOrHistory()
             when 'tab', 'shift+tab' then return
         
         return 'unhandled'

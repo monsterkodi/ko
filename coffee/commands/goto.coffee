@@ -9,6 +9,7 @@ clamp
 log     = require '../tools/log'
 Command = require '../commandline/command'
 split   = require '../split'
+_       = require 'lodash'
 
 class Goto extends Command
 
@@ -20,15 +21,20 @@ class Goto extends Command
         
     execute: (command) ->
         
-        super command
         line = parseInt command
-        if line != NaN
+        if _.isNumber(line) and not _.isNaN(line)
+            super command
+            log 'goto line', line
             editor = window.editor
             if line < 0
                 line = editor.lines.length + line
             line = clamp 0, editor.lines.length-1, line
             editor.selectNone()
             editor.moveCursorToLineIndex line
+            editor.moveCursorToStartOfLine()
             split.focusOnEditor()
+        else
+            return 'clear'
+            
         
 module.exports = Goto
