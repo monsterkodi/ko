@@ -38,7 +38,6 @@ class Open extends Command
         null
         
     sortFiles: ->
-        log 'sortFiles', @files, @dir, @pkg, @file
         base = @dir
         weight = (f) =>
             if f.startsWith @dir
@@ -49,6 +48,17 @@ class Open extends Command
                 return 1000-path.dirname(f).length
         @files.sort (a,b) -> weight(b) - weight(a) 
         log @files
+        
+    showList: ->
+        cmdline = window.commandline
+        list = document.createElement 'div'
+        list.className = 'list'
+        for file in @files
+            div = document.createElement 'div'
+            div.className = 'list-file'
+            div.innerHTML = file
+            list.appendChild div
+        cmdline.view.appendChild list 
         
     start: -> 
         @file  = window.editor.currentFile
@@ -68,6 +78,7 @@ class Open extends Command
             log err
             
         @sortFiles()
+        @showList()
         
     execute: (command) ->
 
