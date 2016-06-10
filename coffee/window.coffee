@@ -7,6 +7,7 @@
 electron    = require 'electron'
 path        = require 'path'
 fs          = require 'fs'
+_           = require 'lodash'
 split       = require './split'
 View        = require './editor/view'
 Commandline = require './commandline/commandline'
@@ -139,12 +140,13 @@ openFiles = (files, options) =>
                 message: "You have selected #{files.length} files."
                 detail: "Are you sure you want to open that many files?"
             return if answer != 1
+        ofiles = _.clone files
         setState 'openFilePath', path.dirname files[0]                    
         if not options?.newWindow
             loadFile resolve files.shift()
         for file in files
             ipc.send 'newWindowWithFile', file
-        return files
+        return ofiles
 
 window.openFiles = openFiles
 window.loadFile = loadFile

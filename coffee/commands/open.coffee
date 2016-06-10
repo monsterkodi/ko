@@ -43,52 +43,37 @@ class Open extends Command
                 return resolve p
             p = path.dirname p
         null
-        
-    sortFiles: ->
-        base = @dir
-        weight = (f) =>
-            if f.startsWith @dir
-                return 10000-path.dirname(f).length
-            if f.startsWith path.dirname @dir
-                return 5000-path.dirname(f).length
-            else
-                return 1000-path.dirname(f).length
-        @files.sort (a,b) -> weight(b) - weight(a) 
-        
-    showList: ->
-        cmdline = window.commandline
-        list = document.createElement 'div'
-        list.className = 'list'
-        list.style.top = split.botHandle.style.top
-        list.style.left = "5px"
-        for file in @files
-            div = document.createElement 'div'
-            div.className = 'list-file'
-            div.innerHTML = render.line relative(file, @dir), 'ko'
-            list.appendChild div
-        split.elem.appendChild list 
-        @list = list
-        
-    hideList: ->
-        log 'hideList'
-        @list?.remove()
-        @list = null
-        
-    changed: (command) ->
-        return if not @list?
-        @list.innerHTML = ""
-        command  = command.trim()
-        relativ  = (relative(f, @dir) for f in @files)
-        fuzzied  = fuzzy.filter command, relativ       
-        filtered = (f.string for f in fuzzied)
-        for file in filtered
+            
+    listFiles: (files) ->
+        for file in files
             div = document.createElement 'div'
             div.className = 'list-file'
             div.innerHTML = render.line file, 'ko'
             @list.appendChild div
             div.value = file
+
+    changed: (command) ->
+        return if not @list?
+        @list.innerHTML = ""
+        command  = command.trim()
+        fuzzied  = fuzzy.filter command, @files       
+        filtered = (f.string for f in fuzzied)
+        @listFiles filtered
         @select 0
-    
+        
+    showList: ->
+        cmdline = window.commandline
+        @list = document.createElement 'div'
+        @list.className = 'list'
+        @list.style.top = split.botHandle.style.top
+        @list.style.left = "5px"
+        split.elem.appendChild @list 
+        @listFiles @files
+        
+    hideList: ->
+        @list?.remove()
+        @list = null
+            
     prev: -> 
         if @index == @history.length-1 and @selected > 0
             @select clamp 0, @list.children.length, @selected-1
@@ -104,9 +89,10 @@ class Open extends Command
             super
         
     select: (i) ->
-        @list.children[@selected].className = 'list-file'
+        @list?.children[@selected]?.className = 'list-file'
         @selected = i
-        @list.children[@selected].className = 'list-file selected'
+        @list?.children[@selected]?.className = 'list-file selected'
+        @list?.children[@selected]?.scrollIntoViewIfNeeded()
         
     start: -> 
         @files = []
@@ -136,7 +122,17 @@ class Open extends Command
         catch err
             log err
             
-        @sortFiles()
+        base = @dir
+        weight = (f) =>
+            if f.startsWith @dir
+                return 10000-path.dirname(f).length
+            if f.startsWith path.dirname @dir
+                return 5000-path.dirname(f).length
+            else
+                return 1000-path.dirname(f).length
+        @files.sort (a,b) -> weight(b) - weight(a)
+        @files = (relative(f, @dir) for f in @files)
+
         @showList()
         
     cancel: ->
@@ -145,7 +141,7 @@ class Open extends Command
         
     execute: (command) ->
 
-        selected = @list.children[@selected]?.value ? command
+        selected = @list?.children[@selected]?.value ? command
 
         super selected
         
@@ -154,7 +150,7 @@ class Open extends Command
         
         files = _.words selected, new RegExp "[^, ]+", 'g'
         
-        log 'files', files
+        # log 'files', files
         
         for i in [0...files.length]
             file = files[i]
@@ -167,6 +163,7 @@ class Open extends Command
         
         # log 'files after', files    
         opened = window.openFiles files
+        log 'opened', opened
         if opened?.length
             return 'editor'
         
