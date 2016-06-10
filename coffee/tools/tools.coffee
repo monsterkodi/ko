@@ -93,6 +93,11 @@ module.exports =
                 return true
         catch
             return false
+            
+    relative: (absolute, to) ->
+        d = path.normalize path.resolve to.replace /\~/, process.env.HOME
+        r = path.relative d, absolute
+        r
         
     #  0000000   0000000   0000000
     # 000       000       000     

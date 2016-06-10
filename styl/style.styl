@@ -82,17 +82,31 @@ fill-rel()
 // 0000000  000  0000000      000   
 
 .list
+    position            absolute
+    top                 commandlineHeight
+    left 0
+    right 0
     overflow-x          hidden
     overflow-y          auto
     width               500px
-    height              500px
+    max-height          500px
+    background          #222
+    border              4px solid #333
     
 .list-file
     width               100%
     height              20px
+    font-family         "Andale Mono", monospace
+    font-size           16px
+    padding-left        5px
+    padding-top         2px
+    padding-bottom      2px
     overflow-x          auto
     overflow-y          hidden
-    
+    &::-webkit-scrollbar    
+        height          1px
+    &.selected
+        background      #333    
 
 // 0000000     0000000   0000000    000   000
 // 000   000  000   000  000   000   000 000 
@@ -488,3 +502,35 @@ body
         color       #666
     &.syntax
         opacity     0.5
+            
+.path
+    color #fff
+    &.coffee
+        color       #ff0
+    &.noon
+        color       #bbf
+    &.js
+        color       #f33
+    &.json
+        color       #888
+    &.md
+        color       #0f0
+    &.pug
+        color       #0af
+    &.css
+        color       #05a
+    &.styl
+        color       #08f
+    &.jade
+        color       #fa0
+    &.html
+        color       #0a0
+    &.dirname 
+        color       #888
+    &.extname
+        opacity     0.7
+    &.separator
+        opacity     0.2
+    &.marker
+        opacity     0.4
+                        

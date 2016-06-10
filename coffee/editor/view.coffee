@@ -202,7 +202,7 @@ class View extends ViewBase
         # log "view key:", key, "mod:", mod, "combo:", combo
         
         switch combo
-            when 'esc'              then return split.focusOnEditor()
+            # when 'esc'              then return split.focusOnEditor()
             when 'tab'              then return @insertTab() + event.preventDefault() 
             when 'shift+tab'        then return @deleteTab() + event.preventDefault()
             when 'command+]'        then return @indent()

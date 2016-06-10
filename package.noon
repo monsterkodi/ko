@@ -53,6 +53,7 @@ dependencies
                 chokidar        ^1.5.1
                 coffee-script   ^1.10.0
                 colors          ^1.1.2
+                fuzzy           ^0.1.1
                 html-entities   ^1.2.0
                 karg            ^1.0.8
                 keycode         ^2.1.2

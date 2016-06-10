@@ -20,16 +20,23 @@ class Split
     
     @init: (wid) ->
         
-        @winID = wid
-                
+        @winID       = wid
+        @elem        = $('.split')
+        @topHandle   = $('.split-handle.top')
+        @botHandle   = $('.split-handle.bot')
+        @topView     = $('.split-top')
+        @botView     = $('.split-bot')
+        @commandLine = $('.commandline')
+        @editor      = $('.editor')                
+        
         @dragBot = new drag
-            target: $('.split-handle.bot')
+            target: @botHandle
             cursor: 'ns-resize'
             onMove: (drag) => @splitAt drag.cpos.y
             onStop: (drag) => @snap()
 
         @dragTop = new drag
-            target: $('.split-handle.top')
+            target: @topHandle
             cursor: 'ns-resize'
             onMove: (drag) => @splitAt drag.cpos.y + 40
             onStop: (drag) => @snap()
@@ -43,11 +50,11 @@ class Split
             @splitAt sh()-@handleHeight
     
     @splitAt: (y) ->
-        $('.split-top')         .style.height = "#{y-@commandlineHeight}px"
-        $('.split-handle.top' ) .style.top = "#{y-@commandlineHeight-@handleHeight}px"
-        $('.commandline')       .style.top = "#{y-@commandlineHeight}px"
-        $('.split-handle.bot' ) .style.top = "#{y-2}px"
-        $('.split-bot')         .style.top = "#{y+@handleHeight-2}px"
+        @topView    .style.height = "#{y-@commandlineHeight}px"
+        @topHandle  .style.top = "#{y-@commandlineHeight-@handleHeight}px"
+        @commandLine.style.top = "#{y-@commandlineHeight}px"
+        @botHandle  .style.top = "#{y-2}px"
+        @botView    .style.top = "#{y+@handleHeight-2}px"
         @dragTop.setMinMax pos(0, @titlebarHeight), pos(0, sh()-@commandlineHeight-2*@handleHeight)
         @dragBot.setMinMax pos(0, @titlebarHeight), pos(0, sh()-@handleHeight)
         @setState 'split', y
@@ -61,7 +68,6 @@ class Split
             @splitAt @titlebarHeight+2
         
     @snap: ->
-        log 'snap'
         t = @dragBot.target.getBoundingClientRect().top
         if t > @titlebarHeight
             if t < @titlebarHeight+(@commandlineHeight+@handleHeight)/2
@@ -74,7 +80,7 @@ class Split
         
     @focusOnEditor: ->
         @hideCommandline()
-        $('.editor').focus()
+        @editor.focus()
 
     #  0000000  000000000   0000000   000000000  00000000
     # 000          000     000   000     000     000     

@@ -10,7 +10,6 @@
 (?:^|\s+)(#+)([^\{].*|$)             
                             comment.marker
                             comment
-
 # top level
 
 ^\w+                        class
@@ -22,7 +21,6 @@
 
 # keypath / semver
 
-#\S+\.\S+\.\S+               keypath
 (\S+\.\S*)                  keypath
 
 # path
@@ -30,15 +28,16 @@
 (?:^|\s\s+)(\s*[\/\S]*)(\/)(\S+)
                             string.single
                             string.double 
+# float
 
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
                             syntax.value.number.float.sign
                             value.number.float
+# int 
 
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
                             syntax.value.number.int.sign
                             value.number.int
-
 # bool
 
 (?:^|\s+)(true)\s*$         value.bool.true

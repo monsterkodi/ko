@@ -22,10 +22,16 @@ class Commandline extends ViewBase
         
         super viewElem
         
+        @view.onblur = @onFocusOut
+        
         @commands = {}
         @command = null
         
         @loadCommands()
+        
+    linesChanged: (lines) ->
+        super lines
+        @command?.changed @lines[0]
         
     loadCommands: ->
         
@@ -52,6 +58,12 @@ class Commandline extends ViewBase
             when 'clear' then @setText ''
             when 'editor' then split.focusOnEditor()
         
+    cancel: ->
+        @command?.cancel()
+        split.focusOnEditorOrHistory()
+        
+    onFocusOut: =>
+        @command?.cancel()
                         
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
@@ -61,11 +73,9 @@ class Commandline extends ViewBase
 
     globalModKeyComboEvent: (mod, key, combo, event) ->
         for n,c of @commands
-            if combo == c.shortcut
-                @startCommand n
-                return
+            if combo == 'esc' then return @cancel()
+            if combo == c.shortcut then return  @startCommand n
         return 'unhandled'            
-        
 
     handleModKeyComboEvent: (mod, key, combo, event) ->
 
@@ -73,7 +83,7 @@ class Commandline extends ViewBase
             when 'enter' then return @execute()
             when 'up'    then return @setText @command?.prev()
             when 'down'  then return @setText @command?.next()
-            when 'esc'   then return split.focusOnEditorOrHistory()
+            when 'esc'   then return @cancel()
             when 'tab', 'shift+tab' then return
         
         return 'unhandled'

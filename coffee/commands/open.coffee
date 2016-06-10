@@ -7,12 +7,18 @@
 {
 fileExists,
 fileList,
-resolve
+relative,
+resolve,
+clamp,
+$
 }       = require '../tools/tools'
 log     = require '../tools/log'
 Command = require '../commandline/command'
+render  = require '../editor/render'
+split   = require '../split'
 path    = require 'path'
 walkdir = require 'walkdir'
+fuzzy   = require 'fuzzy'
 fs      = require 'fs'
 _       = require 'lodash'
 
@@ -25,16 +31,17 @@ class Open extends Command
         @file     = null
         @dir      = null
         @pkg      = null
+        @selected = 0
         
         super
         
     packagePath: (p) ->
-        while path.dirname(p).length and path.dirname(p) not in ['.', '/']
-            p = path.dirname p
+        while p.length and p not in ['.', '/']            
             if fs.existsSync path.join p, 'package.noon'
                 return resolve p
             if fs.existsSync path.join p, 'package.json'
                 return resolve p
+            p = path.dirname p
         null
         
     sortFiles: ->
@@ -47,59 +54,118 @@ class Open extends Command
             else
                 return 1000-path.dirname(f).length
         @files.sort (a,b) -> weight(b) - weight(a) 
-        log @files
         
     showList: ->
         cmdline = window.commandline
         list = document.createElement 'div'
         list.className = 'list'
+        list.style.top = split.botHandle.style.top
+        list.style.left = "5px"
         for file in @files
             div = document.createElement 'div'
             div.className = 'list-file'
-            div.innerHTML = file
+            div.innerHTML = render.line relative(file, @dir), 'ko'
             list.appendChild div
-        cmdline.view.appendChild list 
+        split.elem.appendChild list 
+        @list = list
+        
+    hideList: ->
+        log 'hideList'
+        @list?.remove()
+        @list = null
+        
+    changed: (command) ->
+        return if not @list?
+        @list.innerHTML = ""
+        command  = command.trim()
+        relativ  = (relative(f, @dir) for f in @files)
+        fuzzied  = fuzzy.filter command, relativ       
+        filtered = (f.string for f in fuzzied)
+        for file in filtered
+            div = document.createElement 'div'
+            div.className = 'list-file'
+            div.innerHTML = render.line file, 'ko'
+            @list.appendChild div
+            div.value = file
+        @select 0
+    
+    prev: -> 
+        if @index == @history.length-1 and @selected > 0
+            @select clamp 0, @list.children.length, @selected-1
+            @list.children[@selected]?.value ? @history[@index]
+        else
+            super
+        
+    next: -> 
+        if @index == @history.length-1
+            @select clamp 0, @list.children.length, @selected+1
+            @list.children[@selected]?.value ? @history[@index]
+        else
+            super
+        
+    select: (i) ->
+        @list.children[@selected].className = 'list-file'
+        @selected = i
+        @list.children[@selected].className = 'list-file selected'
         
     start: -> 
-        @file  = window.editor.currentFile
-        @dir   = path.dirname @file
-        @pkg   = @packagePath @dir
         @files = []
-        that   = @
+        @selected = 0
+        if window.editor.currentFile?
+            @file  = window.editor.currentFile 
+            @dir   = path.dirname @file
+            @pkg   = @packagePath @dir
+        else
+            @file = null
+            @dir  = @pkg = resolve '~'
+        that = @
         try
-            walkdir.sync @pkg, max_depth: 4, (p) ->
-                if path.basename(p) in ['node_modules', '.git', 'app', 'img', 'dist', 'build', '.DS_Store']
+            walkdir.sync @pkg, max_depth: 3, (p) ->
+                name = path.basename p
+                extn = path.extname p
+                if name in ['node_modules', 'app', 'img', 'dist', 'build', 'Library', 'Applications']
                     @ignore p 
-                else if p == that.file
-                    @ignore p 
-                else
+                else if name in ['.konrad.noon', '.gitignore', '.npmignore']
                     that.files.push p
+                else if (p == that.file) or (name.startsWith '.') or extn in ['.app']
+                    @ignore p 
+                else if extn in ['.coffee', '.styl', '.js', '.html', '.md', '.noon', '.json', '.sh', '.py', '.css']
+                    that.files.push p
+                if that.files.length > 500
+                    @end()
         catch err
             log err
             
         @sortFiles()
         @showList()
         
+    cancel: ->
+        @hideList()
+        super
+        
     execute: (command) ->
 
-        super command
+        selected = @list.children[@selected]?.value ? command
+
+        super selected
         
-        # log 'command', command
+        @hideList()
+        log 'command', selected
         
-        files = _.words command, new RegExp "[^, ]+", 'g'
+        files = _.words selected, new RegExp "[^, ]+", 'g'
         
-        # log 'files', files
+        log 'files', files
         
         for i in [0...files.length]
             file = files[i]
-            file = path.join path.dirname(window.editor.currentFile), file
+            file = path.join @dir, file
             if not fileExists file
                 if '' == path.extname file
                     if fileExists file + '.coffee'
                         file += '.coffee'
             files.splice i, 1, file
         
-        log 'files after', files    
+        # log 'files after', files    
         opened = window.openFiles files
         if opened?.length
             return 'editor'
