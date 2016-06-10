@@ -52,8 +52,8 @@ class Editor extends Buffer
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
 
-    selectNone:         -> @do.selection @, null
-    setSelection: (c,l) -> @do.selection @, [c,l]
+    selectNone:         -> @do.selection @, []
+    setSelection: (c,l) -> @do.selection @, [[c,l]]
 
     selectMoreLines: -> 
         start = false
@@ -103,9 +103,9 @@ class Editor extends Buffer
             @selectRanges @searchRanges[0]
 
     markSelectionForSearch: ->
-        if not @selection? 
-            @selectRanges @rangesForWordAtPos @cursorPos()
-        @searchText = @selectedText()
+        if selections.length == 0 
+            @selectRange @rangeForWordAtPos @cursorPos()
+        @searchText = @textInRange @selections[0]
         @searchRanges = @rangesForText @searchText
         
     jumpToNextSearchResult: ->
@@ -414,26 +414,17 @@ class Editor extends Buffer
     deleteLineAtIndex: (i) ->
         @do.delete @lines, i
         
-    deleteCharacterRangeInLineAtIndex: (r, i) ->
-        @do.change @lines, i, @lines[i].splice r[0], r[1]-r[0]
+    deleteSelectionRange: (s) ->
+        @do.start()
+        @do.change @lines, s[0], @lines[s[0]].splice s[1][0], s[1][1]-s[1][0]
+        i = 
+        @do.end()
             
     deleteSelection: ->
-        for s in @selections
-        # return if not @selection?
-        # lineRange = @selectedLineIndicesRange()
-        # return if not lineRange?
-        # @do.start()
-        # @deleteCharacterRangeInLineAtIndex @selectedCharacterRangeForLineAtIndex(lineRange[1]), lineRange[1]
-        # if lineRange[1] > lineRange[0]
-        #     for i in [(lineRange[1]-1)...lineRange[0]]
-        #         @deleteLineAtIndex i
-        #     @deleteCharacterRangeInLineAtIndex @selectedCharacterRangeForLineAtIndex(lineRange[0]), lineRange[0]
-        # selStart = @selectionStart()
-        # @setCursor selStart[0], selStart[1]
-        # if lineRange[1] > lineRange[0]
-        #     @joinLine()
-        # @selectNone()
-        # @do.end()
+        @do.start()
+        for s in @reversedSelections()
+            @deleteSelectionRange s
+        @do.end()
 
     deleteForward: ->
         if @selection?

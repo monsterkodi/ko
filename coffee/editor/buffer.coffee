@@ -72,38 +72,39 @@ class Buffer
         if @selection
             [Math.min(@cursors[0][1], @selection[1]), Math.max(@cursors[0][1], @selection[1])]
 
-    selectedLines: ->
-        s = []
-        for i in @selectedLineIndices()
-            s.push @selectedTextForLineAtIndex i
-            i += 1
-        s
+    # selectedLines: ->
+    #     s = []
+    #     for i in @selectedLineIndices()
+    #         s.push @selectedTextForLineAtIndex i
+    #         i += 1
+    #     s
     
-    selectedTextForLineAtIndex: (i) ->
-        r = @selectedCharacterRangeForLineAtIndex i
-        if r?
-            return @lines[i].substr r[0], r[1]-r[0]
-        return ''
+    # selectedTextForLineAtIndex: (i) ->
+    #     r = @selectedCharacterRangeForLineAtIndex i
+    #     if r?
+    #         return @lines[i].substr r[0], r[1]-r[0]
+    #     return ''
                 
-    selectedCharacterRangeForLineAtIndex: (i) ->
-        return if not @selection
-        lines = @selectedLineIndicesRange()
-        return if i < lines[0] or i > lines[1]                      # outside selection
-        return [0, @lines[i].length] if lines[0] < i < lines[1]     # inside selection
-        curPos = @cursorPos()
-        if lines[0] == lines[1]                                     # only one line in selection
-            return [Math.min(curPos[0], @selection[0]), 
-                    Math.max(curPos[0], @selection[0])]
-        if i == @cursors[0][1]                                      # on cursor line
-            if @selection[1] > i                                        # at start of selection
-                return [curPos[0], @lines[i].length]
-            else                                                        # at end of selection
-                return [0, Math.min(@lines[i].length, curPos[0])]
-        else                                                        # on selection line
-            if curPos[1] > i                                            # at start of selection
-                return [@selection[0], @lines[i].length]
-            else                                                        # at end of selection
-                return [0, Math.min(@lines[i].length, @selection[0])]
+    # selectedCharacterRangeForLineAtIndex: (i) ->
+            
+        # return if not @selection
+        # lines = @selectedLineIndicesRange()
+        # return if i < lines[0] or i > lines[1]                      # outside selection
+        # return [0, @lines[i].length] if lines[0] < i < lines[1]     # inside selection
+        # curPos = @cursorPos()
+        # if lines[0] == lines[1]                                     # only one line in selection
+        #     return [Math.min(curPos[0], @selection[0]), 
+        #             Math.max(curPos[0], @selection[0])]
+        # if i == @cursors[0][1]                                      # on cursor line
+        #     if @selection[1] > i                                        # at start of selection
+        #         return [curPos[0], @lines[i].length]
+        #     else                                                        # at end of selection
+        #         return [0, Math.min(@lines[i].length, curPos[0])]
+        # else                                                        # on selection line
+        #     if curPos[1] > i                                            # at start of selection
+        #         return [@selection[0], @lines[i].length]
+        #     else                                                        # at end of selection
+        #         return [0, Math.min(@lines[i].length, @selection[0])]
 
     #  0000000  000   000  00000000    0000000   0000000   00000000 
     # 000       000   000  000   000  000       000   000  000   000
@@ -123,8 +124,13 @@ class Buffer
     #    000     00000000  000   000     000   
 
     text:            -> @lines.join '\n'
-    selectedText:    -> @selectedLines().join '\n'
+    # selectedText:    -> @selectedLines().join '\n'
     textInRange: (r) -> @lines[r[0]].slice r[1][0], r[1][1]
+    textOfSelectionForClipboard: -> 
+        t = []
+        for s in @selection
+            t.push textInRange s
+        t.join '\n'
         
     # 000  000   000  0000000    00000000  000   000  000000000
     # 000  0000  000  000   000  000       0000  000     000   
@@ -197,11 +203,11 @@ class Buffer
             [].push.apply(r, lr)
         r
     
-    rangesForWordAtPos: (pos) ->
+    rangeForWordAtPos: (pos) ->
         p = @clampPos pos
         l = @lines[p[1]]
         
-        return [[0,p[1]], [0,p[1]]] if l.length == 0
+        return [p[1], [0,0]] if l.length == 0
         
         r = [p[0], p[0]]
         c = l[r[0]]
@@ -221,6 +227,32 @@ class Buffer
             if w? != m?
                 break
             r[1] += 1
-        [[r[0], p[1]], [r[1]+1, p[1]]]
+        [p[1], [r[0], r[1]+1]]
+    
+    # rangesForWordAtPos: (pos) ->
+    #     p = @clampPos pos
+    #     l = @lines[p[1]]
+    #     
+    #     return [[0,p[1]], [0,p[1]]] if l.length == 0
+    #     
+    #     r = [p[0], p[0]]
+    #     c = l[r[0]]
+    # 
+    #     wordReg = /(\@|\w)/
+    #     w = c.match wordReg
+    # 
+    #     while r[0] > 0
+    #         n = l[r[0]-1]
+    #         m = n.match wordReg
+    #         if w? != m?
+    #             break
+    #         r[0] -= 1
+    #     while r[1] < l.length-1
+    #         n = l[r[1]+1]
+    #         m = n.match wordReg
+    #         if w? != m?
+    #             break
+    #         r[1] += 1
+    #     [[r[0], p[1]], [r[1]+1, p[1]]]
 
 module.exports = Buffer

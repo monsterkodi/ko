@@ -300,14 +300,14 @@ class ViewBase extends Editor
             when 'command+e'                then return @markSelectionForSearch()
             when 'command+g'                then return @jumpToNextSearchResult()
             when 'command+shift+g'          then return @jumpToPrevSearchResult()
-            when 'command+c'                then return clipboard.writeText @selectedText()
+            when 'command+c'                then return clipboard.writeText @textOfSelectionForClipboard()
             when 'command+z'                then return @do.undo @
             when 'command+shift+z'          then return @do.redo @
             when 'delete', 'ctrl+backspace' then return @deleteForward()     
             when 'backspace'                then return @deleteBackward()     
             when 'command+v'                then return @insertText clipboard.readText()
             when 'command+x'                 
-                clipboard.writeText @selectedText()
+                clipboard.writeText @textOfSelectionForClipboard()
                 @deleteSelection()
                 return
 
