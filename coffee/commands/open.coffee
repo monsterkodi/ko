@@ -35,31 +35,26 @@ class Open extends Command
         @selected = 0
         
         super
-        
-    packagePath: (p) ->
-        while p.length and p not in ['.', '/']            
-            if fs.existsSync path.join p, 'package.noon'
-                return resolve p
-            if fs.existsSync path.join p, 'package.json'
-                return resolve p
-            p = path.dirname p
-        null
-            
-    listFiles: (files) ->
-        for file in files
-            div = document.createElement 'div'
-            div.className = 'list-file'
-            div.innerHTML = render.line file, 'ko'
-            @list.appendChild div
-            div.value = file
+                    
+    #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
+    # 000       000   000  000   000  0000  000  000        000       000   000
+    # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
+    # 000       000   000  000   000  000  0000  000   000  000       000   000
+    #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
 
     changed: (command) ->
-        return if not @list?
-        @list.innerHTML = ""
+        log 'changed', command, @files.slice 0,10
+        return if not @list? 
         command  = command.trim()
-        fuzzied  = fuzzy.filter command, @files       
-        filtered = (f.string for f in fuzzied)
-        @listFiles filtered
+        if command.length
+            fuzzied  = fuzzy.filter command, @files       
+            filtered = (f.string for f in fuzzied)
+            @listFiles filtered
+            log 'filtered', filtered.slice 0,10
+        else
+            log 'unfiltered', @files.slice 0,10
+            @listFiles @files
+        
         @select 0
         
     showList: ->
@@ -67,13 +62,14 @@ class Open extends Command
         @list = document.createElement 'div'
         @list.className = 'list'
         @list.style.top = split.botHandle.style.top
-        @list.style.left = "5px"
         split.elem.appendChild @list 
         @listFiles @files
         
-    hideList: ->
-        @list?.remove()
-        @list = null
+    # 00000000   00000000   00000000  000   000
+    # 000   000  000   000  000       000   000
+    # 00000000   0000000    0000000    000 000 
+    # 000        000   000  000          000   
+    # 000        000   000  00000000      0    
             
     prev: -> 
         if @index == @history.length-1 and @selected > 0
@@ -82,6 +78,12 @@ class Open extends Command
         else
             super
         
+    # 000   000  00000000  000   000  000000000
+    # 0000  000  000        000 000      000   
+    # 000 0 000  0000000     00000       000   
+    # 000  0000  000        000 000      000   
+    # 000   000  00000000  000   000     000   
+    
     next: -> 
         if @index == @history.length-1
             @select clamp 0, @list.children.length, @selected+1
@@ -89,13 +91,31 @@ class Open extends Command
         else
             super
         
+    #  0000000  00000000  000      00000000   0000000  000000000
+    # 000       000       000      000       000          000   
+    # 0000000   0000000   000      0000000   000          000   
+    #      000  000       000      000       000          000   
+    # 0000000   00000000  0000000  00000000   0000000     000   
+        
     select: (i) ->
         @list?.children[@selected]?.className = 'list-file'
         @selected = clamp 0, @list?.children.length-1, i
         @list?.children[@selected]?.className = 'list-file selected'
         @list?.children[@selected]?.scrollIntoViewIfNeeded()
         
+    openFileAtIndex: (i) =>
+        @select i
+        if @execute() == 'editor'
+            split.focusEditor()
+    
+    #  0000000  000000000   0000000   00000000   000000000
+    # 000          000     000   000  000   000     000   
+    # 0000000      000     000000000  0000000       000   
+    #      000     000     000   000  000   000     000   
+    # 0000000      000     000   000  000   000     000   
+        
     start: -> 
+        window.openFileAtIndex = @openFileAtIndex
         @files = []
         @selected = 0
         if window.editor.currentFile?
@@ -114,8 +134,6 @@ class Open extends Command
                     @ignore p 
                 else if name in ['.konrad.noon', '.gitignore', '.npmignore']
                     that.files.push p
-                # else if p == that.file
-                #     @ignore p
                 else if (name.startsWith '.') or extn in ['.app']
                     @ignore p 
                 else if extn in ['.coffee', '.styl', '.js', '.html', '.md', '.noon', '.json', '.sh', '.py', '.css']
@@ -140,21 +158,22 @@ class Open extends Command
             @files = _.concat h, @files
                     
         @files = (relative(f, @dir) for f in @files)
+        @files = _.uniq @files
 
         @showList()
         @select h.length - 1
         v = @list?.children[@selected]?.value 
         return v
-        
-    cancel: ->
-        @hideList()
-        super
+            
+    # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
+    # 000        000 000   000       000       000   000     000     000     
+    # 0000000     00000    0000000   000       000   000     000     0000000 
+    # 000        000 000   000       000       000   000     000     000     
+    # 00000000  000   000  00000000   0000000   0000000      000     00000000
         
     execute: (command) ->
 
         selected = @list?.children[@selected]?.value ? command
-
-        # super selected
 
         @hideList()
         
@@ -176,5 +195,56 @@ class Open extends Command
             else
                 super selected
             return 'editor'
+
+    # 00000000    0000000    0000000  000   000   0000000    0000000   00000000
+    # 000   000  000   000  000       000  000   000   000  000        000     
+    # 00000000   000000000  000       0000000    000000000  000  0000  0000000 
+    # 000        000   000  000       000  000   000   000  000   000  000     
+    # 000        000   000   0000000  000   000  000   000   0000000   00000000
+    
+    packagePath: (p) ->
+        while p.length and p not in ['.', '/']            
+            if fs.existsSync path.join p, 'package.noon'
+                return resolve p
+            if fs.existsSync path.join p, 'package.json'
+                return resolve p
+            p = path.dirname p
+        null
+    
+    # 000      000   0000000  000000000
+    # 000      000  000          000   
+    # 000      000  0000000      000   
+    # 000      000       000     000   
+    # 0000000  000  0000000      000   
+            
+    listFiles: (files) ->
+        @list.innerHTML = ""        
+        if files.length <= 1
+            @list.style.display = 'none'
+        else
+            @list.style.display = 'unset'
+            index = 0
+            for file in files
+                div = document.createElement 'div'
+                div.className = 'list-file'
+                div.innerHTML = render.line file, 'ko'
+                div.setAttribute "onclick", "window.openFileAtIndex(#{index});"
+                @list.appendChild div
+                div.value = file
+                index += 1
+    
+    # 000   000  000  0000000    00000000
+    # 000   000  000  000   000  000     
+    # 000000000  000  000   000  0000000 
+    # 000   000  000  000   000  000     
+    # 000   000  000  0000000    00000000
+            
+    hideList: ->
+        @list?.remove()
+        @list = null
+                
+    cancel: ->
+        @hideList()
+        super
         
 module.exports = Open

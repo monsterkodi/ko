@@ -29,6 +29,33 @@ class undo
         return false if @actions.length == 0
         return last(@actions).lines.length > 0
         
+    #  0000000  000   000   0000000   000   000   0000000   00000000  000  000   000  00000000   0000000 
+    # 000       000   000  000   000  0000  000  000        000       000  0000  000  000       000   000
+    # 000       000000000  000000000  000 0 000  000  0000  0000000   000  000 0 000  000000    000   000
+    # 000       000   000  000   000  000  0000  000   000  000       000  000  0000  000       000   000
+    #  0000000  000   000  000   000  000   000   0000000   00000000  000  000   000  000        0000000 
+
+    newChangedInfo: ->
+        @changeInfo = 
+            cursor: []
+            selection: []
+            changed: []
+            inserted: []
+            removed: []
+            
+    getChangeInfo: ->
+        if not @changeInfo?
+            @changeInfo = 
+                cursor: []
+                selection: []
+                changed: []
+                inserted: []
+                removed: []
+        @changeInfo
+        
+    delChangeInfo: ->
+        @changeInfo = null
+        
     # 00000000   00000000  0000000     0000000 
     # 000   000  000       000   000  000   000
     # 0000000    0000000   000   000  000   000
@@ -38,6 +65,7 @@ class undo
     redo: (obj) =>
         if @futures.length
             @changedLineIndices = []
+            @newChangeInfo()
             action = @futures.shift()
             for line in action.lines
                 @redoLine obj, line
@@ -45,6 +73,9 @@ class undo
             @redoSelection obj, action
             @actions.push action
             obj.linesChanged @changedLineIndices
+            obj.changed @changeInfo
+            log "redo @changeInfo", @changeInfo
+            @delChangeInfo()
             @changedLineIndices = null
 
     redoLine: (obj, line) =>
@@ -52,19 +83,24 @@ class undo
             if line.before?
                 obj.lines[line.index] = line.after
                 @changedLineIndices.push [line.index, line.index]
+                @changeInfo.changed.push line.index
             else
                 obj.lines.splice line.index, 0, line.after
                 @changedLineIndices.push [line.index+1, -1]
+                @changeInfo.inserted.push line.index+1
         else if line.before?
             obj.lines.splice line.index, 1
             @changedLineIndices.push [line.index, -1]
+            @changeInfo.removed.push line.index+1
 
     redoSelection: (obj, action) =>
         if action.selAfter?
             obj.selection = action.selAfter 
             @changedLineIndices.push obj.selectedLineIndicesRange()
+            @changeInfo.selection.push obj.selectedLineIndicesRange()
         if action.selAfter?[0] == null
             @changedLineIndices.push obj.selectedLineIndicesRange()
+            @changeInfo.selection.push obj.selectedLineIndicesRange()
             obj.selection = null 
         
     redoCursor: (obj, action) =>
@@ -81,6 +117,7 @@ class undo
     undo: (obj) =>
         if @actions.length
             @changedLineIndices = []
+            @newChangeInfo()
             action = @actions.pop()
             if action.lines.length
                 for i in [action.lines.length-1..0]
@@ -89,6 +126,9 @@ class undo
             @undoSelection obj, action
             @futures.unshift action
             obj.linesChanged @changedLineIndices
+            obj.changed @changeInfo
+            log "undo @changeInfo", @changeInfo
+            @delChangeInfo()
             @changedLineIndices = null
                                     
     undoLine: (obj, line) =>
@@ -96,19 +136,24 @@ class undo
             if line.after?
                 obj.lines[line.index] = line.before
                 @changedLineIndices.push [line.index, line.index]
+                @changeInfo.changed.push line.index
             else
                 obj.lines.splice line.index, 0, line.before
                 @changedLineIndices.push [line.index+1, -1]
+                @changeInfo.inserted.push line.index+1
         else if line.after?
             obj.lines.splice line.index, 1
             @changedLineIndices.push [line.index, -1]
+            @changeInfo.removed.push line.index
             
     undoSelection: (obj, action) =>
         if action.selBefore?
             obj.selection = action.selBefore 
             @changedLineIndices.push obj.selectedLineIndicesRange()
+            @changeInfo.selection.push obj.selectedLineIndicesRange()
         if action.selBefore?[0] == null
             @changedLineIndices.push obj.selectedLineIndicesRange()
+            @changeInfo.selection.push obj.selectedLineIndicesRange()
             obj.selection = null 
         
     undoCursor: (obj, action) =>
@@ -145,8 +190,10 @@ class undo
                 @lastAction().selAfter = [pos[0], pos[1]]
                 obj.selection = [pos[0], pos[1]]
                 @changedLineIndices.push obj.selectedLineIndicesRange()
+                @getChangeInfo().selection.push obj.selectedLineIndicesRange()
             else
                 @changedLineIndices.push obj.selectedLineIndicesRange()
+                @getChangeInfo().selection.push obj.selectedLineIndicesRange()
                 obj.selection = null
                 @lastAction().selAfter = [null, null]
             @check()
@@ -163,6 +210,7 @@ class undo
             @changedLineIndices.push obj.selectedLineIndicesRange()
         else
             @changedLineIndices.push [obj.cursor[1], obj.cursor[1]]
+        @getChangeInfo().cursor.push obj.cursor[1]
     
     cursor: (obj, pos) =>
         if (obj.cursor[0] != pos[0]) or (obj.cursor[1] != pos[1])
@@ -211,6 +259,7 @@ class undo
             after:  text
         lines[index] = text
         @changedLineIndices.push [index, index]
+        @getChangeInfo().changed.push index
         @check()
         
     insert: (lines, index, text) =>
@@ -219,6 +268,7 @@ class undo
             after:  text        
         lines.splice index, 0, text
         @changedLineIndices.push [index+1, -1]
+        @getChangeInfo().inserted.push index+1
         @check()
         
     delete: (lines, index) =>
@@ -227,6 +277,7 @@ class undo
             before:  lines[index]        
         lines.splice index, 1
         @changedLineIndices.push [index, -1]
+        @getChangeInfo().removed.push index
         @check()
         
     # 00000000  000   000  0000000  
@@ -249,9 +300,10 @@ class undo
         @futures = []
         if @groupCount == 0
             @merge()
-            if @changedLineIndices?
+            if @changedLineIndices? # replace with @changeInfo?
                 @groupDone()
                 @changedLineIndices = null
+                @delChangeInfo()
                 
     # 00     00  00000000  00000000    0000000   00000000
     # 000   000  000       000   000  000        000     

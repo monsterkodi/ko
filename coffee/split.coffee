@@ -80,6 +80,9 @@ class Split
         
     @focusOnEditor: ->
         @hideCommandline()
+        @focusEditor()
+        
+    @focusEditor: ->
         @editor.focus()
 
     #  0000000  000000000   0000000   000000000  00000000

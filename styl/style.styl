@@ -12,12 +12,11 @@ selectionRadiusCursor = round(selectionRadius / 2)
 
 scrollFontSize        = 24px
 scrollbarWidth        = 60px // transparent scroll area
-scrollhandleWidth     = 8px
-editorPadding         = 2px 
+scrollhandleWidth     = 6px
+editorPadding         = 8px 
 bottomCornerRadius    = 4px
 frameBorder           = 5px solid #222
-commandlineHeight     = 28px
-arrowBorderSize       = (commandlineHeight / 2px)
+commandlineHeight     = 30px
 
 fill-abs()
     position        absolute
@@ -38,28 +37,23 @@ fill-rel()
 //  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 
 .commandline
+    display             table
+    padding             0
+    margin              0
+    height              commandlineHeight
     position            absolute
     border-left         frameBorder
     border-right        frameBorder 
         
 .commandline-command
-    font-family         sans-serif
-    font-size           18px
+    font-family         "Andale Mono", monospace
+    font-size           24px
     display             table-cell
-    padding-top         3px
+    padding-top         0px
     padding-left        9px
-    padding-right       5px
+    padding-right       9px
     color               #aaa
     background          #333
-
-.commandline-arrow 
-    display             table-cell
-    border-top          arrowBorderSize solid transparent
-    border-bottom       arrowBorderSize solid transparent
-    border-left-width   arrowBorderSize
-    border-left-style   solid
-    background          #000
-    color               #333
         
 .commandline-span
     position            relative
@@ -83,15 +77,13 @@ fill-rel()
 
 .list
     position            absolute
-    top                 commandlineHeight
-    left 0
-    right 0
+    left                0
     overflow-x          hidden
     overflow-y          auto
     width               500px
     max-height          500px
     background          #222
-    border              4px solid #333
+    border              frameBorder
     
 .list-file
     width               100%
@@ -103,6 +95,8 @@ fill-rel()
     padding-bottom      2px
     overflow-x          auto
     overflow-y          hidden
+    cursor              pointer
+    -webkit-user-select none
     &::-webkit-scrollbar    
         height          1px
     &.selected
@@ -147,9 +141,9 @@ body
     padding-right       70px
     -webkit-app-region  drag
     position            absolute
-    top 0
-    left 0
-    right 0
+    top                 0
+    left                0
+    right               0
 
 .titlebar span
     position            relative

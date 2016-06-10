@@ -91,9 +91,10 @@ class ViewBase extends Editor
     #    000     000        000 000      000   
     #    000     00000000  000   000     000   
 
-    setText: (text) -> @setLines text.split /\n/
+    setText: (text) -> @setLines text?.split /\n/
         
     setLines: (lines) ->
+        lines ?= ['']
         super lines
         @updateSizeValues()
         @displayLines 0
@@ -174,7 +175,8 @@ class ViewBase extends Editor
 
     done: => 
         super
-        @linesChanged @do.changedLineIndices
+        @linesChanged @do.changedLineIndices # todo remove
+        @changed @do.changeInfo
 
     updateSizeValues: ->
         @bufferHeight = @numVisibleLines() * @size.lineHeight
@@ -208,9 +210,10 @@ class ViewBase extends Editor
             delta = newBot - @botIndex
         return delta
     
-    linesChanged: (lineIndices) ->
-        # log 'linesChanged', lineIndices
-                
+    changed: (changeInfo) ->
+        log 'viewbase.changed', changeInfo
+    
+    linesChanged: (lineIndices) ->                
         indices = []
         for change in lineIndices
             continue if change[0] > @botIndex
@@ -250,13 +253,10 @@ class ViewBase extends Editor
         sl = @view.scrollLeft
         st = @view.scrollTop
         br = @view.getBoundingClientRect()
-        # log 'posForEvent', sl, st, br
         lx = clamp 0, @view.offsetWidth,  event.clientX - br.left - @size.offsetX
         ly = clamp 0, @view.offsetHeight, event.clientY - br.top
-        # log 'posForEvent', lx, ly
         p = [parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth)),
              parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @topIndex]
-        # log 'posForEvent cx', event.clientX, 'p0', p[0]
         p
 
     # 000      000  000   000  00000000   0000000
@@ -339,11 +339,6 @@ class ViewBase extends Editor
             @endSelection event.shiftKey 
             return
                         
-        # if 'unhandled' == @handleModKeyComboEvent mod, key, combo, event
-        #     ansiKeycode = require 'ansi-keycode'
-        #     if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
-        #         @insertCharacter ansiKeycode event
-
         ansiKeycode = require 'ansi-keycode'
         if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
             @insertCharacter ansiKeycode event

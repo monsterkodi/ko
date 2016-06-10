@@ -22,16 +22,18 @@ class Commandline extends ViewBase
         
         super viewElem
         
-        @view.onblur = @onFocusOut
+        # @view.onblur = @onFocusOut
         
         @commands = {}
         @command = null
         
         @loadCommands()
         
-    linesChanged: (lines) ->
-        super lines
-        @command?.changed @lines[0]
+    changed: (changeInfo) ->
+        super changeInfo
+        if changeInfo.changed.length
+            log 'command line text changed', changeInfo
+            @command?.changed @lines[0]
         
     loadCommands: ->
         
@@ -42,7 +44,7 @@ class Commandline extends ViewBase
             @commands[commandClass.name.toLowerCase()] = new commandClass()
                 
     startCommand: (name) ->
-        
+        @command?.cancel()
         split.showCommandline()
         $('.commandline-editor').focus()
         $('.commandline-command').innerHTML = name
@@ -54,8 +56,8 @@ class Commandline extends ViewBase
     execute: ->
         r = @command?.execute @lines[0]
         switch r 
-            when 'clear' then @setText ''
-            when 'editor' then split.focusOnEditor()
+            when 'clear'  then @setText ''
+            when 'editor' then split.focusEditor()
         
     cancel: ->
         @command?.cancel()
