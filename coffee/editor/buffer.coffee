@@ -4,12 +4,14 @@
 # 000   000  000   000  000       000       000       000   000
 # 0000000     0000000   000       000       00000000  000   000
 
-{clamp,
- startOf,
- first,
- last,
- endOf}   = require '../tools/tools'
-log       = require '../tools/log'
+{
+clamp,
+startOf,
+endOf,
+first,
+last
+}   = require '../tools/tools'
+log = require '../tools/log'
 
 class Buffer
     
@@ -71,9 +73,8 @@ class Buffer
         l
                 
     selectedLineIndicesRange: ->
-        log 'selectedLineIndicesRange', @selections
+        # log 'selectedLineIndicesRange', @selections
         if @selections.length
-            log 'selectedLineIndicesRange', @selections, first(@selections), last(@selections)
             [first(@selections)[0], last(@selections)[0]]
         else
             []
@@ -157,10 +158,15 @@ class Buffer
             if r[0][1] < pos[1] or r[0][1] == pos[1] and r[1][0] < pos[0]
                 return r 
     
-    rangeForLineAtIndex: (i)  -> [i, [0, @lines[i].length]] 
-    rangesForLinesFromTopToBot: (top,bot) ->
-    rangesForAllLines: -> return @rangesForLinesFromTopToBot @topIndex, @botIndex
-    
+    rangeForLineAtIndex: (i) -> [i, [0, @lines[i].length]] 
+    rangesForAllLines: -> @rangesForLinesFromTopToBot 0, @lines.length-1
+    rangesForLinesFromTopToBot: (top,bot) -> 
+        r = []
+        ir = [top,bot]
+        for li in [startOf(ir)..endOf(ir)]
+            r.push @rangeForLineAtIndex li
+        r
+            
     rangesForCursors: -> ([c[1], [c[0], c[0]]] for c in @cursors)
     
     rangesForTextInLineAtIndex: (t, i) ->
@@ -201,5 +207,11 @@ class Buffer
                 break
             r[1] += 1
         [p[1], [r[0], r[1]+1]]
+        
+    rangeStartingOrEndingAtPos: (ranges, p) ->
+        for r in ranges
+            if r[0] == p[1]
+                if r[1][0] == p[0] or r[1][1] == p[0]
+                    return r
     
 module.exports = Buffer

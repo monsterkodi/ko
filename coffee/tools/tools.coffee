@@ -35,11 +35,11 @@ module.exports =
     # 000   000  000   000  000   000  000   000     000   
     # 000   000  000   000  000   000  000   000     000   
 
-    last: (a) -> a[a.length-1] if a?.length
+    last:  (a) -> a[a.length-1] if a?.length
     first: (a) -> a[0] if a?.length
     
     startOf: (r) -> r[0]
-    endOf: (r) -> r[1] + Math.max(1,r[1]-r[0])
+    endOf:   (r) -> r[0] + Math.max 1, r[1]-r[0]
 
     # 000   000   0000000   000      000   000  00000000
     # 000   000  000   000  000      000   000  000     

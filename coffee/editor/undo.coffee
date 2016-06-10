@@ -73,7 +73,7 @@ class undo
     changeInfoSelection: (obj) ->
         @getChangeInfo()
         @changeInfo.selection.push obj.selectedLineIndicesRange()
-        log 'changeInfoSelection', @changeInfo.selection
+        # log 'changeInfoSelection', @changeInfo.selection
             
     delChangeInfo: ->
         @changeInfo = null

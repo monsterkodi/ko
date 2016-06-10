@@ -23,7 +23,6 @@ class Goto extends Command
         line = parseInt command
         if _.isNumber(line) and not _.isNaN(line)
             super command
-            log 'goto line', line
             editor = window.editor
             if line < 0
                 line = editor.lines.length + line
@@ -31,8 +30,7 @@ class Goto extends Command
                 line -= 1
             line = clamp 0, editor.lines.length-1, line
             editor.selectNone()
-            editor.moveCursorToLineIndex line
-            editor.moveCursorToStartOfLine()
+            editor.setCursor 0, line
             return 'editor'
         else
             return 'clear'

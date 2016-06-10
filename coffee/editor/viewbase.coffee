@@ -55,33 +55,25 @@ class ViewBase extends Editor
                         @doubleClicked = true
                         @tripleClicked = true
                         @tripleClickTimer = setTimeout @onTripleClickDelay, 1500
-                        @startSelection event.shiftKey
                         @selectRange @rangeForLineAtIndex @cursors[0][1]
-                        @endSelection true
                         return
                     else
                         @doubleClicked = false
                         @tripleClicked = false
                         @tripleClickTimer = null
                         
-                @startSelection event.shiftKey
                 @view.focus()
-                @moveCursorToPos @cursors[0], @posForEvent event
-                @endSelection event.shiftKey
+                @moveCursorToPos @cursors[0], @posForEvent(event), event.shiftKey
             
             onMove: (drag, event) => 
-                @startSelection true
-                @moveCursorToPos @cursors[0], @posForEvent event
-                @endSelection true
+                @moveCursorToPos @cursors[0], @posForEvent(event), true
                 
         @view.ondblclick = (event) =>
-            @startSelection event.shiftKey
             range = @rangeForWordAtPos @posForEvent event
             @selectRange range
             @doubleClicked = true
             @tripleClickTimer = setTimeout @onTripleClickDelay, 1500
             @tripleClickLineIndex = range[0]
-            @endSelection true
                         
     onTripleClickDelay: => @doubleClicked = @tripleClicked = false
 
@@ -210,8 +202,8 @@ class ViewBase extends Editor
         return delta
     
     changed: (changeInfo) ->
-        log 'viewbase.changed', @topIndex, @botIndex
-        log 'viewbase.changed', changeInfo
+        # log 'viewbase.changed', @topIndex, @botIndex
+        log 'viewbase.changed selection', changeInfo.selection
         indices = []
         info = _.cloneDeep changeInfo
         for i in info.changed
@@ -232,7 +224,7 @@ class ViewBase extends Editor
         indices.sort (a,b) -> a - b
         indices = _.sortedUniq indices
         
-        log 'indices', indices    
+        # log 'indices', indices    
         for i in indices
             @updateLine i
         if changeInfo.cursor.length
@@ -314,38 +306,29 @@ class ViewBase extends Editor
 
         return if mod and not key?.length
         
-        # commands that might change the selection ...
-        
-        if key in ['down', 'right', 'up', 'left'] or combo in ['ctrl+a', 'ctrl+e', 'ctrl+shift+a', 'ctrl+shift+e']
-            @startSelection event.shiftKey # ... starts or extend selection if shift is pressed
-        
         switch key
             
             when 'down', 'right', 'up', 'left' 
                                 
                 if event.metaKey
                     if key == 'left'
-                        @moveCursorToStartOfLine()
+                        @moveCursorToStartOfLine event.shiftKey
                     else if key == 'right'
-                        @moveCursorToEndOfLine()
+                        @moveCursorToEndOfLine   event.shiftKey
                 else if event.altKey
                     if key == 'left'
-                        @moveCursorToStartOfWord()
+                        @moveCursorToStartOfWord event.shiftKey
                     else if key == 'right'
-                        @moveCursorToEndOfWord()
+                        @moveCursorToEndOfWord   event.shiftKey
                 else
-                    @moveCursors key
+                    @moveCursors key, event.shiftKey
                                         
                 event.preventDefault() # prevent view from scrolling
             else
                 switch combo
-                    when 'ctrl+a', 'ctrl+shift+a'    then @moveCursorToStartOfLine()
-                    when 'ctrl+e', 'ctrl+shift+e'    then @moveCursorToEndOfLine()
-                                                            
-        if key in ['down', 'right', 'up', 'left'] or combo in ['ctrl+a', 'ctrl+e', 'ctrl+shift+a', 'ctrl+shift+e'] # ... reset selection 
-            @endSelection event.shiftKey 
-            return
-                        
+                    when 'ctrl+a', 'ctrl+shift+a'    then @moveCursorToStartOfLine event.shiftKey
+                    when 'ctrl+e', 'ctrl+shift+e'    then @moveCursorToEndOfLine   event.shiftKey
+                                                                                    
         ansiKeycode = require 'ansi-keycode'
         if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
             @insertCharacter ansiKeycode event

@@ -206,7 +206,6 @@ class View extends ViewBase
         # log "view key:", key, "mod:", mod, "combo:", combo
         
         switch combo
-            # when 'esc'              then return split.focusOnEditor()
             when 'tab'              then return @insertTab() + event.preventDefault() 
             when 'shift+tab'        then return @deleteTab() + event.preventDefault()
             when 'command+]'        then return @indent()
@@ -223,25 +222,16 @@ class View extends ViewBase
         # commands that might change the selection ...
         
         switch key
-            when 'home', 'end', 'page up', 'page down'
-                @startSelection event.shiftKey # ... starts or extend selection if shift is pressed
-        
-        switch key
             
-            when 'home'    then @moveCursorToLineIndex 0
-            when 'end'     then @moveCursorToLineIndex @lines.length-1
+            when 'home'    then @moveCursorToLineIndex 0, event.shiftKey
+            when 'end'     then @moveCursorToLineIndex @lines.length-1, event.shiftKey
             when 'page up'      
-                @moveCursorByLines -(@numFullLines()-3)
+                @moveCursorByLines -(@numFullLines()-3), event.shiftKey
                 event.preventDefault() # prevent view from scrolling
             when 'page down'    
-                @moveCursorByLines   @numFullLines()-3
+                @moveCursorByLines   @numFullLines()-3, event.shiftKey
                 event.preventDefault() # prevent view from scrolling
-                
-        switch key # ... reset selection 
-            when 'home', 'end', 'page up', 'page down'
-                @endSelection event.shiftKey 
-                return
-                
+                                
         return 'unhandled'                
         
 module.exports = View
