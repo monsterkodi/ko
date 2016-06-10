@@ -175,7 +175,6 @@ class ViewBase extends Editor
 
     done: => 
         super
-        @linesChanged @do.changedLineIndices # todo remove
         @changed @do.changeInfo
 
     updateSizeValues: ->
@@ -211,30 +210,37 @@ class ViewBase extends Editor
         return delta
     
     changed: (changeInfo) ->
+        log 'viewbase.changed', @topIndex, @botIndex
         log 'viewbase.changed', changeInfo
-    
-    linesChanged: (lineIndices) ->                
         indices = []
-        for change in lineIndices
-            continue if change[0] > @botIndex
-            top = Math.max @topIndex, change[0]
-            if change[1] < 0
-                bot = 1+Math.min @botIndex, @lines.length-1
-            else
-                bot = 1+Math.min @botIndex, change[1]
-            for i in [top...bot]
-                indices.push i
-                    
+        info = _.cloneDeep changeInfo
+        for i in info.changed
+            continue if i < @topIndex
+            break if i > @botIndex
+            indices.push i
+            
+        if info.inserted.length
+            if info.inserted[0] < @botIndex
+                for i in [Math.max(@topIndex, info.inserted[0])..@botIndex]
+                    indices.push i
+
+        if info.deleted.length
+            if info.deleted[0] < @botIndex
+                for i in [Math.max(@topIndex, info.deleted[0])..@botIndex]
+                    indices.push i
+                                                            
         indices.sort (a,b) -> a - b
         indices = _.sortedUniq indices
-
+        
+        log 'indices', indices    
         for i in indices
             @updateLine i
-            
-        @renderCursors()
-        @renderSelection()            
-        @updateSizeValues()
-
+        if changeInfo.cursor.length
+            @renderCursors()
+        if changeInfo.selection.length
+            @renderSelection()            
+        @updateSizeValues()        
+    
     updateLine: (lineIndex) ->
         if @topIndex <= lineIndex < @lines.length
             relIndex = lineIndex - @topIndex

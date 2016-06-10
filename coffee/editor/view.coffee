@@ -65,8 +65,10 @@ class View extends ViewBase
     # 000      000  000  0000  000            000
     # 0000000  000  000   000  00000000  0000000 
     
-    linesChanged: (lineIndices) ->
-        @updateTitlebar()
+    changed: (changeInfo) ->
+        
+        if changeInfo.changed.length or changeInfo.deleted.length or changeInfo.inserted.length
+            @updateTitlebar() # sets dirty flag
         
         if delta = @deltaToEnsureCursorIsVisible() 
             # log "delta", delta, delta * @lineHeight
@@ -74,10 +76,12 @@ class View extends ViewBase
             @scrollCursor()
             return
         
-        super lineIndices
+        super changeInfo
         
-        @updateScrollbar()
-        @scrollCursor()        
+        if changeInfo.deleted.length or changeInfo.inserted.length
+            @updateScrollbar()
+        if changeInfo.cursor.length
+            @scrollCursor()        
     
     setLines: (lines) ->
         super lines

@@ -104,19 +104,16 @@ class Editor extends Buffer
     # 0000000   00000000  000   000  000   000   0000000  000   000
 
     markTextForSearch: (text) ->
-        # @selectRanges @rangesForText text
         @searchText = text
         @searchRanges = @rangesForText @searchText
         if @searchRanges.length
             @selectRanges @searchRanges[0]
-        # log 'markTextForSearch searchRanges', @searchRanges
 
     markSelectionForSearch: ->
         if not @selection? 
             @selectRanges @rangesForWordAtPos @cursorPos()
         @searchText = @selectedText()
         @searchRanges = @rangesForText @searchText
-        # log 'markSelectionForSearch searchRanges', @searchRanges
         
     jumpToNextSearchResult: ->
         r = @rangeAfterPosInRanges @cursorPos(), @searchRanges
@@ -141,11 +138,12 @@ class Editor extends Buffer
     # 000 0 000  000   000     000     000     
     # 000   000   0000000       0      00000000
     
-    setCursorPos: (p) -> @setCursor p[0], p[1]
     setCursor: (c,l) -> 
         l = clamp 0, @lines.length-1, l
         c = clamp 0, @lines[l].length, c
         @do.cursor @, [c,l]
+
+    setCursorPos: (p) -> @setCursor p[0], p[1]
 
     moveCursorToPos:     (pos) -> 
         @closingInserted = null
