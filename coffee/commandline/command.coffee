@@ -17,7 +17,7 @@ class Command
         @index = 0
         @history = ['']
         
-    start: ->
+    start: -> @last()
     cancel: ->
     changed: (command) ->
         

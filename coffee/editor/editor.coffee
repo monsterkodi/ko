@@ -343,7 +343,6 @@ class Editor extends Buffer
         @do.start()
         @deleteSelection()
         indent = _.padStart "", @indentationAtLineIndex @cursor[1]
-        log ">#{indent}<", @indentationAtLineIndex @cursor[1]
         if @cursorAtEndOfLine()
             @do.insert @lines, @cursor[1]+1, indent
         else
@@ -433,7 +432,7 @@ class Editor extends Buffer
             if strToCursor.length and strToCursor.trim() == '' # only spaces between line start and cursor
                 il = @indentString.length
                 rc = (cursorIndex%il) or il
-                # log 'rc',rc
+                log 'deleteBackward rc',rc, 'cursorIndex', cursorIndex 
                 for i in [0...rc]
                     @moveCursorLeft()
                     @deleteForward()

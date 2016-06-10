@@ -10,6 +10,7 @@ fileList,
 relative,
 resolve,
 clamp,
+last,
 $
 }       = require '../tools/tools'
 log     = require '../tools/log'
@@ -90,7 +91,7 @@ class Open extends Command
         
     select: (i) ->
         @list?.children[@selected]?.className = 'list-file'
-        @selected = i
+        @selected = clamp 0, @list?.children.length-1, i
         @list?.children[@selected]?.className = 'list-file selected'
         @list?.children[@selected]?.scrollIntoViewIfNeeded()
         
@@ -113,7 +114,9 @@ class Open extends Command
                     @ignore p 
                 else if name in ['.konrad.noon', '.gitignore', '.npmignore']
                     that.files.push p
-                else if (p == that.file) or (name.startsWith '.') or extn in ['.app']
+                # else if p == that.file
+                #     @ignore p
+                else if (name.startsWith '.') or extn in ['.app']
                     @ignore p 
                 else if extn in ['.coffee', '.styl', '.js', '.html', '.md', '.noon', '.json', '.sh', '.py', '.css']
                     that.files.push p
@@ -131,9 +134,23 @@ class Open extends Command
             else
                 return 1000-path.dirname(f).length
         @files.sort (a,b) -> weight(b) - weight(a)
+        
+        if @history.length
+            h = (f for f in @history when f.length and (f != @file))
+            log "h:", h, 'files:', @files.slice 0, 10
+            @files = _.concat h, @files
+            log '@files:', @files.slice 0, 10
+            
+        log '@file:', @file,'@dir:', @dir, '@history:', @history
+        
         @files = (relative(f, @dir) for f in @files)
 
         @showList()
+        @select h.length - 1
+        log '@selected', @selected
+        v = @list?.children[@selected]?.value 
+        log 'v:', v
+        return v
         
     cancel: ->
         @hideList()
@@ -143,15 +160,12 @@ class Open extends Command
 
         selected = @list?.children[@selected]?.value ? command
 
-        super selected
-        
+        # super selected
+
         @hideList()
-        log 'command', selected
         
         files = _.words selected, new RegExp "[^, ]+", 'g'
-        
-        # log 'files', files
-        
+                
         for i in [0...files.length]
             file = files[i]
             file = path.join @dir, file
@@ -161,10 +175,12 @@ class Open extends Command
                         file += '.coffee'
             files.splice i, 1, file
         
-        # log 'files after', files    
         opened = window.openFiles files
-        log 'opened', opened
         if opened?.length
+            if opened.length == 1
+                super opened[0]
+            else
+                super selected
             return 'editor'
         
 module.exports = Open

@@ -48,9 +48,8 @@ class Commandline extends ViewBase
         $('.commandline-command').innerHTML = name
 
         @command = @commands[name]
-        @setText @command.last()
-        @selectAll()
-        @command.start()
+        @setText @command.start()
+        # @selectAll()
         
     execute: ->
         r = @command?.execute @lines[0]

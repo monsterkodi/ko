@@ -1,7 +1,6 @@
 # todo/ideas
     
-- open command
-    - look for matches in sub- and parent-directories
+- focus on editor after devTools opened
 - fix shift tab at line start
     
 - left line border
@@ -19,6 +18,7 @@
 
 - commands
     - tree
+    - tabs?
     - ls
     - shell
     - execute

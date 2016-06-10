@@ -86,7 +86,7 @@ ipc.on 'saveFile',   => saveFile()
 ipc.on 'loadFile', (event, file) => loadFile file
 ipc.on 'setWinID', (event, id) => 
     winID = id
-    log "setWinID: ", id
+    # log "setWinID: ", id
     split.init id
     s = getState 'fontSize'
     setFontSize s if s
@@ -107,7 +107,7 @@ ipc.on 'setWinID', (event, id) =>
 
 saveFile = (file) =>
     file ?= editor.currentFile
-    log 'save:', file
+    # log 'save:', file
     if not file?
         saveFileAs()
         return
@@ -118,7 +118,7 @@ saveFile = (file) =>
 
 loadFile = (file) =>    
     if fileExists file
-        log 'load:', file
+        # log 'load:', file
         addToRecent file
         editor.setCurrentFile file
         editor.setText fs.readFileSync file, encoding: 'UTF8'
@@ -126,10 +126,10 @@ loadFile = (file) =>
         ipc.send 'reloadMenu'
 
 openFiles = (files, options) =>
-    log 'openFiles:', files
+    # log 'openFiles:', files
     if files?.length
-        files = fileList files
-        log 'open:', files
+        files = fileList files, ignoreHidden: false
+        # log 'open:', files
         if files.length >= 10
             answer = dialog.showMessageBox
                 type: 'warning'
