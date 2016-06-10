@@ -91,6 +91,23 @@ class Buffer
     cursorInLastLine:    (c=@cursors[0]) -> c[1] == @lines.length-1
     cursorInFirstLine:   (c=@cursors[0]) -> c[1] == 0
 
+    endOfWordAtCursor: (c=@cursors[0]) =>
+        r = @rangeForWordAtPos c
+        if @cursorAtEndOfLine c
+            return c if @cursorInLastLine c
+            r = @rangeForWordAtPos [0, c[1]+1]
+        [r[1][1], r[0]]
+
+    startOfWordAtCursor: (c=@cursors[0]) =>
+        r = @rangeForWordAtPos c
+        if @cursorAtStartOfLine c
+            return c if @cursorInFirstLine c
+            r = @rangeForWordAtPos [@lines[c[1]-1].length, c[1]-1]
+        else if r[0] == c[0]
+            r = @rangeForWordAtPos [c[0]-1, c[1]]
+        [r[1][0], r[0]]
+
+
     # 000000000  00000000  000   000  000000000
     #    000     000        000 000      000   
     #    000     0000000     00000       000   

@@ -313,7 +313,7 @@ class ViewBase extends Editor
                     if key == 'left'
                         @moveCursorToStartOfLine event.shiftKey
                     else if key == 'right'
-                        @moveCursorToEndOfLine   event.shiftKey
+                        @moveCursorsToEndOfLine   event.shiftKey
                 else if event.altKey
                     if key == 'left'
                         @moveCursorToStartOfWord event.shiftKey
@@ -326,7 +326,7 @@ class ViewBase extends Editor
             else
                 switch combo
                     when 'ctrl+a', 'ctrl+shift+a'    then @moveCursorToStartOfLine event.shiftKey
-                    when 'ctrl+e', 'ctrl+shift+e'    then @moveCursorToEndOfLine   event.shiftKey
+                    when 'ctrl+e', 'ctrl+shift+e'    then @moveCursorsToEndOfLine   event.shiftKey
                                                                                     
         ansiKeycode = require 'ansi-keycode'
         if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]

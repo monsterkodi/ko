@@ -142,154 +142,111 @@ class Editor extends Buffer
     # 000 0 000  000   000     000     000     
     # 000   000   0000000       0      00000000
 
-    setCursorPos: (c, p, e) ->
-        @do.start()
+    setCursorPos: (c, p) ->
+        # @do.start()
         
-        if e
-            oldCursors = _.cloneDeep @cursors
-            oldCursorRanges = @rangesForCursors()
+        # if e
+        #     oldCursors = _.cloneDeep @cursors
+        #     oldCursorRanges = @rangesForCursors()
             
         newCursors = _.cloneDeep @cursors
         i = @cursors.indexOf c
         newCursors[i] = p
         @do.cursor @, newCursors
-        if not e
-            if @selections.length
-                @do.selection @, []
-        else # adjust selection
-            if @selections.length == 0
-                @do.selection @, oldCursorRanges
+        
+        # if not e
+        #     if @selections.length
+        #         @do.selection @, []
+        # else # adjust selection
+        #     if @selections.length == 0
+        #         @do.selection @, oldCursorRanges
+        #     
+        #     newSelection = _.cloneDeep @selections
+        #     for ci in [0...oldCursors.length]
+        #         oc = oldCursors[ci]
+        #         nc = newCursors[ci]
+        #         s = @rangeStartingOrEndingAtPos newSelection, oc
+        #         if s
+        #             if nc[1] != oc[1]
+        #                 # log 'cursor moved to new line!', oc[1], nc[1]
+        #                 # log 'last line was', s[0]
+        #                 if nc[1] > s[0]
+        #                     # log 'selecting down from ', s[0], 'to', nc[1]
+        #                     s[1][1] = @lines[s[0]].length
+        #                     for li in [s[0]+1...nc[1]]
+        #                         newSelection.push @rangeForLineAtIndex li
+        #                     newSelection.push [nc[1], [0, nc[0]]]
+        #                     # log "newSelection", newSelection
+        #                 else
+        #                     # log 'selecting up from ', nc[1], 'to', s[0]
+        #                     s[1][0] = 0
+        #                     for li in [s[0]-1...nc[1]]
+        #                         newSelection.push @rangeForLineAtIndex li
+        #                     newSelection.push [nc[1], [nc[0], @lines[nc[1]].length]]
+        #                     # log "newSelection", newSelection
+        #             else
+        #                 if s[1][1]==s[1][0]
+        #                     s[1][0] = Math.min(s[1][1], nc[0])
+        #                     s[1][1] = Math.max(s[1][1], nc[0])
+        #                 else if oc[0] == s[1][0]
+        #                     s[1][0] = nc[0]
+        #                 else if oc[0] == s[1][1]
+        #                     s[1][1] = nc[0]
+        #         else
+        #             log 'no range for oldCursor pos', oc
+        #             
+        #     # log "setCursorPos", newSelection.length
+        #     @do.selection @, @cleanRanges newSelection
             
-            newSelection = _.cloneDeep @selections
-            for ci in [0...oldCursors.length]
-                oc = oldCursors[ci]
-                nc = newCursors[ci]
-                s = @rangeStartingOrEndingAtPos newSelection, oc
-                if s
-                    if nc[1] != oc[1]
-                        # log 'cursor moved to new line!', oc[1], nc[1]
-                        # log 'last line was', s[0]
-                        if nc[1] > s[0]
-                            # log 'selecting down from ', s[0], 'to', nc[1]
-                            s[1][1] = @lines[s[0]].length
-                            for li in [s[0]+1...nc[1]]
-                                newSelection.push @rangeForLineAtIndex li
-                            newSelection.push [nc[1], [0, nc[0]]]
-                            # log "newSelection", newSelection
-                        else
-                            # log 'selecting up from ', nc[1], 'to', s[0]
-                            s[1][0] = 0
-                            for li in [s[0]-1...nc[1]]
-                                newSelection.push @rangeForLineAtIndex li
-                            newSelection.push [nc[1], [nc[0], @lines[nc[1]].length]]
-                            # log "newSelection", newSelection
-                    else
-                        if s[1][1]==s[1][0]
-                            s[1][0] = Math.min(s[1][1], nc[0])
-                            s[1][1] = Math.max(s[1][1], nc[0])
-                        else if oc[0] == s[1][0]
-                            s[1][0] = nc[0]
-                        else if oc[0] == s[1][1]
-                            s[1][1] = nc[0]
-                else
-                    log 'no range for oldCursor pos', oc
-                    
-            # log "setCursorPos", newSelection.length
-            @do.selection @, @cleanRanges newSelection
-            
-        @do.end()
+        # @do.end()
 
-    moveCursorToPos: (c, p, e) -> 
+    moveCursorToPos: (c, p) -> 
         @closingInserted = null
-        @setCursorPos c, p, e
+        @setCursorPos c, p
         
-    moveCursorToEndOfLine: (e) -> 
-        for c in @cursors
-            @moveCursorToPos c, [@lines[c[1]].length, c[1]], e
+    startSelection: (e) ->
+        if e and @selections.length == 0
+            @initialCursors = _.cloneDeep @cursors
+            @do.selection @, @rangesForCursors()
             
-    moveCursorToStartOfLine: (e) -> 
-        for c in @cursors
-            @moveCursorToPos c, [0, c[1]], e
-            
-    moveCursorByLines: (d) -> 
-        for c in @cursors
-            @moveCursorToPos c, [c[0], c[1]+d]
-            
-    moveCursorToLineIndex: (i, e) -> 
-        @moveCursorToPos @cursors[0], [@cursors[0][0], i], e
-
-    moveCursorToEndOfWord: (e) -> 
-        for c in @cursors
-            r = @rangeForWordAtPos c
-            if @cursorAtEndOfLine c
-                continue if @cursorInLastLine c
-                r = @rangeForWordAtPos [0, c[1]+1]
-            @moveCursorToPos c, [r[1][1], r[0]], e
+    endSelection: (e) ->
+        if not e and @selections.length
+            @do.selection @, []
         
-    moveCursorToStartOfWord: (e) -> 
+    moveAllCursors: (e, f) ->
+        @startSelection e
         for c in @cursors
-            r = @rangeForWordAtPos c
-            if @cursorAtStartOfLine c
-                continue if @cursorInFirstLine c
-                r = @rangeForWordAtPos [@lines[c[1]-1].length, c[1]-1]
-            else if r[0] == c[0]
-                r = @rangeForWordAtPos [c[0]-1, c[1]]
-            @moveCursorToPos c, [r[1][0], r[0]], e
+            @moveCursorToPos c, f(c)
+        @endSelection e
         
-    moveCursorUp: (c, e) ->
-        if @cursorInFirstLine c
-            @moveCursorToStartOfLine c, e
-        else
-            @closingInserted = null
-            @setCursorPos c, [c[0], c[1]-1], e # don't adjust x
-
-    moveCursorDown: (c, e) ->
-        if @cursorInLastLine c
-            @moveCursorToEndOfLine c, e
-        else
-            @closingInserted = null
-            @setCursorPos c, [c[0], c[1]+1], e # don't adjust x
-
-    moveCursorRight: (c, e, n=1) ->
-        if @cursorAtEndOfLine c
-            if not @cursorInLastLine c
-                @moveCursorDown c, e
-                @moveCursorToStartOfLine c, e
-                @moveCursorToPos c, [c[0]+n-1, c[1]], e
-        else
-            @moveCursorToPos c, [c[0]+n, c[1]], e
-    
-    moveCursorLeft: (c, e, n=1) ->
-        if @cursorAtStartOfLine c
-            if not @cursorInFirstLine c
-                @moveCursorUp c, e
-                @moveCursorToEndOfLine c, e
-                @moveCursorToPos c, [c[0]-n+1, c[1]], e
-        else
-            @moveCursorToPos c, [c[0]-n, c[1]], e
-
-    moveCursorsUp: (e) ->
-        for c in @cursors
-            @moveCursorUp c, e
+    moveCursorsToEndOfLine:   (e) -> @moveAllCursors e, (c) -> [@lines[c[1]].length, c[1]]
+    moveCursorsToStartOfLine: (e) -> @moveAllCursors e, (c) -> [0, c[1]]
+    moveCursorsToEndOfWord:   (e) -> @moveAllCursors e, @endOfWordAtCursor
+    moveCursorsToStartOfWord: (e) -> @moveAllCursors e, @startOfWordAtCursor
+    moveCursorsUp:            (e) -> @moveAllCursors e, (c) -> [c[0], c[1]-1]
+    moveCursorsDown:          (e) -> @moveAllCursors e, (c) -> [c[0], c[1]+1]
             
-    moveCursorsDown: (e) ->
-        for c in @cursors
-            @moveCursorDown c, e
-    
+    moveCursorsByLines: (d) -> 
+        deltaMove = (d) -> (c) -> [c[0], c[1]+d]
+        @moveAllCursors e, deltaMove(d)
+            
     moveCursorsRight: (e, n=1) ->
-        for c in @cursors
-            @moveCursorRight c, e, n
-            
-    moveCursorsLeft: (e, n=1) ->
-        for c in @cursors
-            @moveCursorLeft c, e, n
+        moveRight = (n) -> (c) -> [c[0]+n, c[1]]
+        @moveAllCursors e, moveRight(n)
     
+    moveCursorLeft: (e, n=1) ->
+        moveLeft = (n) -> (c) -> [c[0]-n, c[1]]
+        @moveAllCursors e, moveRight(n)
+        
     moveCursors: (direction, e) ->
         switch direction
             when 'left'  then @moveCursorsLeft e
             when 'right' then @moveCursorsRight e
             when 'up'    then @moveCursorsUp e
             when 'down'  then @moveCursorsDown e
+
+    moveCursorToLineIndex: (i, e) -> # todo handle e
+        @moveCursorToPos @cursors[0], [@cursors[0][0], i]
         
     # 000  000   000  0000000    00000000  000   000  000000000
     # 000  0000  000  000   000  000       0000  000     000   
