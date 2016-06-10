@@ -49,7 +49,7 @@ class Commandline extends ViewBase
 
         @command = @commands[name]
         @setText @command.start()
-        # @selectAll()
+        @selectAll()
         
     execute: ->
         r = @command?.execute @lines[0]

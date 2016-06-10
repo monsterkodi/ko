@@ -137,19 +137,13 @@ class Open extends Command
         
         if @history.length
             h = (f for f in @history when f.length and (f != @file))
-            log "h:", h, 'files:', @files.slice 0, 10
             @files = _.concat h, @files
-            log '@files:', @files.slice 0, 10
-            
-        log '@file:', @file,'@dir:', @dir, '@history:', @history
-        
+                    
         @files = (relative(f, @dir) for f in @files)
 
         @showList()
         @select h.length - 1
-        log '@selected', @selected
         v = @list?.children[@selected]?.value 
-        log 'v:', v
         return v
         
     cancel: ->
