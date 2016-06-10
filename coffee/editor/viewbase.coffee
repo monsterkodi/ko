@@ -200,7 +200,7 @@ class ViewBase extends Editor
     
     deltaToEnsureCursorIsVisible: ->
         delta = 0
-        cl = @cursor[1]
+        cl = @cursors[0][1]
         if cl < @topIndex + 2
             newTop = Math.max 0, cl - 2
             delta = newTop - @topIndex
@@ -333,7 +333,7 @@ class ViewBase extends Editor
                     else if key == 'right'
                         @moveCursorToEndOfWord()
                 else
-                    @moveCursor key
+                    @moveCursors key
                                         
                 event.preventDefault() # prevent view from scrolling
             else

@@ -66,8 +66,9 @@ class undo
         
     changeInfoCursor: (obj) ->
         @getChangeInfo()
-        if @changeInfo.cursor.indexOf(obj.cursor[1]) < 0
-            @changeInfo.cursor.push obj.cursor[1]
+        for c in obj.cursors
+            if @changeInfo.cursor.indexOf(c[1]) < 0
+                @changeInfo.cursor.push c[1]
             
     delChangeInfo: ->
         @changeInfo = null
@@ -202,13 +203,12 @@ class undo
     # 000       000   000  000   000       000  000   000  000   000
     #  0000000   0000000   000   000  0000000    0000000   000   000
 
-    cursor: (obj, pos) =>
-        if (obj.cursor[0] != pos[0]) or (obj.cursor[1] != pos[1])
-            @changeInfoCursor obj
-            @lastAction().curAfter = [pos[0], pos[1]]
-            obj.cursor = [pos[0], pos[1]]
-            @changeInfoCursor obj
-            @check()
+    cursor: (obj, newCursors) =>
+        @changeInfoCursor obj
+        @lastAction().curAfter = newCursors
+        obj.cursors = newCursors
+        @changeInfoCursor obj
+        @check()
     
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
