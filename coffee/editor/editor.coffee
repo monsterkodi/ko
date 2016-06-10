@@ -53,8 +53,10 @@ class Editor extends Buffer
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
 
     selectRange: (range) ->
+        log 'selectRange range', range
         @do.start()
         @do.selection @, [range]
+        log 'selectRange selections', @selections
         @setCursor range[1][1], range[0]
         @do.end()
 
@@ -81,12 +83,12 @@ class Editor extends Buffer
     
     startSelection: (active) ->
         @do.start()
-        if active and @selections.length == 0
+        if active and (@selections.length == 0)
             cp = @cursorPos()
             @selectRange [cp[1], [cp[0], cp[0]]]
 
     endSelection: (active) ->
-        if @selections.length == 0 and not active
+        if (@selections.length == 0) and not active
             @selectNone()
         @do.end()
         

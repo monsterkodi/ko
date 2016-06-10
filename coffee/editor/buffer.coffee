@@ -6,6 +6,8 @@
 
 {clamp,
  startOf,
+ first,
+ last,
  endOf}   = require '../tools/tools'
 log       = require '../tools/log'
 
@@ -60,12 +62,7 @@ class Buffer
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
             
-    selectedLineIndices: ->
-        range = @selectedLineIndicesRange()
-        if range
-            (i for i in [range[0]..range[1]])
-        else 
-            []
+    selectedLineIndices: -> (s[0] for s in @selections)
 
     cursorOrSelectedLineIndices: ->
         l = @selectedLineIndices()
@@ -74,8 +71,12 @@ class Buffer
         l
                 
     selectedLineIndicesRange: ->
-        if @selection
-            [Math.min(@cursors[0][1], @selection[1]), Math.max(@cursors[0][1], @selection[1])]
+        log 'selectedLineIndicesRange', @selections
+        if @selections.length
+            log 'selectedLineIndicesRange', @selections, first(@selections), last(@selections)
+            [first(@selections)[0], last(@selections)[0]]
+        else
+            []
 
     #  0000000  000   000  00000000    0000000   0000000   00000000 
     # 000       000   000  000   000  000       000   000  000   000

@@ -37,12 +37,12 @@ class undo
 
     newChangeInfo: ->
         @changeInfo = 
-            cursor: []
+            cursor:    []
             selection: []
-            changed: []
-            inserted: []
-            deleted: []
-            hist: ""
+            changed:   []
+            inserted:  []
+            deleted:   []
+            hist:      ""
             
     getChangeInfo: ->
         if not @changeInfo?
@@ -69,6 +69,11 @@ class undo
         for c in obj.cursors
             if @changeInfo.cursor.indexOf(c[1]) < 0
                 @changeInfo.cursor.push c[1]
+
+    changeInfoSelection: (obj) ->
+        @getChangeInfo()
+        @changeInfo.selection.push obj.selectedLineIndicesRange()
+        log 'changeInfoSelection', @changeInfo.selection
             
     delChangeInfo: ->
         @changeInfo = null
@@ -105,12 +110,12 @@ class undo
             @changeInfoLineDelete line.index
 
     redoSelection: (obj, action) =>
-        if action.selAfter?
-            obj.selection = action.selAfter 
-            @changeInfo.selection.push obj.selectedLineIndicesRange()
-        if action.selAfter?[0] == null
-            @changeInfo.selection.push obj.selectedLineIndicesRange()
-            obj.selection = null 
+        if action.selAfter.length
+            obj.selections = _.cloneDeep action.selAfter
+            @changeInfoSelection obj
+        if action.selAfter.length == 0
+            @changeInfoSelection obj
+            obj.selections = [] 
         
     redoCursor: (obj, action) =>
         @changeInfoCursor obj 
@@ -151,12 +156,12 @@ class undo
             @changeInfoLineDelete line.index
             
     undoSelection: (obj, action) =>
-        if action.selBefore?
-            obj.selection = action.selBefore 
-            @changeInfo.selection.push obj.selectedLineIndicesRange()
-        if action.selBefore?[0] == null
-            @changeInfo.selection.push obj.selectedLineIndicesRange()
-            obj.selection = null 
+        if action.selBefore.length
+            obj.selections = _.cloneDeep action.selBefore 
+            @changeInfoSelection obj
+        if action.selBefore.length == 0
+            @changeInfoSelection obj
+            obj.selections = [] 
         
     undoCursor: (obj, action) =>
         @changeInfoCursor obj
@@ -172,10 +177,10 @@ class undo
     lastAction: =>
         if @actions.length == 0
             @actions.push
-                selBefore: [null, null]
-                selAfter:  [null, null]
-                curBefore: [0,0]
-                curAfter:  [0,0]
+                selBefore: []
+                selAfter:  []
+                curBefore: [[0,0]]
+                curAfter:  [[0,0]]
                 lines:     []
         return @actions[@actions.length-1]
         
@@ -185,17 +190,16 @@ class undo
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
     
-    selection: (obj, pos) => 
-        if (obj.selection?[0] != pos?[0]) or (obj.selection?[1] != pos?[1])
-            if pos?
-                @lastAction().selAfter = [pos[0], pos[1]]
-                obj.selection = [pos[0], pos[1]]
-                @getChangeInfo().selection.push obj.selectedLineIndicesRange()
-            else
-                @getChangeInfo().selection.push obj.selectedLineIndicesRange()
-                obj.selection = null
-                @lastAction().selAfter = [null, null]
-            @check()
+    selection: (obj, newSelections) => 
+        if newSelections.length
+            @lastAction().selAfter = _.cloneDeep newSelections
+            obj.selections = newSelections
+            @changeInfoSelection obj
+        else
+            @changeInfoSelection obj
+            obj.selections = []
+            @lastAction().selAfter = []
+        @check()
         
     #  0000000  000   000  00000000    0000000   0000000   00000000 
     # 000       000   000  000   000  000       000   000  000   000
