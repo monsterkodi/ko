@@ -135,6 +135,15 @@ class Editor extends Buffer
         l = clamp 0, @lines.length-1, l
         c = clamp 0, @lines[l].length, c
         @do.cursor @, [[c,l]]
+        
+    addCursorAtPos: (p) ->
+        if @cursorAtPos p
+            log 'has c', p
+        else
+            newCursors = _.cloneDeep @cursors
+            newCursors.push p
+            @do.cursor @, newCursors        
+            log 'num cursors', @cursors.length
 
     # 00     00   0000000   000   000  00000000
     # 000   000  000   000  000   000  000     
@@ -143,12 +152,6 @@ class Editor extends Buffer
     # 000   000   0000000       0      00000000
 
     setCursorPos: (c, p) ->
-        # @do.start()
-        
-        # if e
-        #     oldCursors = _.cloneDeep @cursors
-        #     oldCursorRanges = @rangesForCursors()
-            
         newCursors = _.cloneDeep @cursors
         i = @cursors.indexOf c
         newCursors[i] = p
@@ -204,6 +207,11 @@ class Editor extends Buffer
         @closingInserted = null
         @setCursorPos c, p
         
+    setCursorToPos: (p, e) ->
+        @startSelection e
+        @do.cursor @, [p]
+        @endSelection e
+        
     startSelection: (e) ->
         if e and @selections.length == 0
             @initialCursors = _.cloneDeep @cursors
@@ -215,28 +223,31 @@ class Editor extends Buffer
         
     moveAllCursors: (e, f) ->
         @startSelection e
+        
+        newCursors = _.cloneDeep @cursors
+        
         for c in @cursors
-            @moveCursorToPos c, f(c)
+            i = @cursors.indexOf c
+            log 'i', i, c
+            newCursors[i] = f(c)
+        @do.cursor @, newCursors
+
         @endSelection e
         
-    moveCursorsToEndOfLine:   (e) -> @moveAllCursors e, (c) -> [@lines[c[1]].length, c[1]]
+    moveCursorsToEndOfLine:   (e) -> @moveAllCursors e, (c) => [@lines[c[1]].length, c[1]]
     moveCursorsToStartOfLine: (e) -> @moveAllCursors e, (c) -> [0, c[1]]
     moveCursorsToEndOfWord:   (e) -> @moveAllCursors e, @endOfWordAtCursor
     moveCursorsToStartOfWord: (e) -> @moveAllCursors e, @startOfWordAtCursor
     moveCursorsUp:            (e) -> @moveAllCursors e, (c) -> [c[0], c[1]-1]
     moveCursorsDown:          (e) -> @moveAllCursors e, (c) -> [c[0], c[1]+1]
-            
-    moveCursorsByLines: (d) -> 
-        deltaMove = (d) -> (c) -> [c[0], c[1]+d]
-        @moveAllCursors e, deltaMove(d)
-            
+                        
     moveCursorsRight: (e, n=1) ->
         moveRight = (n) -> (c) -> [c[0]+n, c[1]]
         @moveAllCursors e, moveRight(n)
     
-    moveCursorLeft: (e, n=1) ->
+    moveCursorsLeft: (e, n=1) ->
         moveLeft = (n) -> (c) -> [c[0]-n, c[1]]
-        @moveAllCursors e, moveRight(n)
+        @moveAllCursors e, moveLeft(n)
         
     moveCursors: (direction, e) ->
         switch direction

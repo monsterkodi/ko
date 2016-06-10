@@ -58,6 +58,11 @@ class Buffer
             if c[1] >= lineIndexRange[0] and c[1] <= lineIndexRange[1]
                 cl.push [c[0], c[1] - lineIndexRange[0]]
         cl
+        
+    cursorAtPos: (p) ->
+        for c in @cursors
+            if c[0] == p[0] and c[1] == p[1]
+                return c
     
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000

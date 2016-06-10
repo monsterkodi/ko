@@ -63,10 +63,18 @@ class ViewBase extends Editor
                         @tripleClickTimer = null
                         
                 @view.focus()
-                @moveCursorToPos @cursors[0], @posForEvent(event), event.shiftKey
+                p = @posForEvent event
+                if event.metaKey
+                    @addCursorAtPos p
+                else
+                    @setCursorToPos p, event.shiftKey
             
             onMove: (drag, event) => 
-                @moveCursorToPos @cursors[0], @posForEvent(event), true
+                p = @posForEvent event
+                if event.metaKey
+                    @addCursorAtPos [@cursors[0][0], p[1]]  # todo: nearest cursor instead of first
+                else
+                    @setCursorToPos p, true
                 
         @view.ondblclick = (event) =>
             range = @rangeForWordAtPos @posForEvent event
@@ -311,21 +319,21 @@ class ViewBase extends Editor
                                 
                 if event.metaKey
                     if key == 'left'
-                        @moveCursorToStartOfLine event.shiftKey
+                        @moveCursorsToStartOfLine event.shiftKey
                     else if key == 'right'
                         @moveCursorsToEndOfLine   event.shiftKey
                 else if event.altKey
                     if key == 'left'
-                        @moveCursorToStartOfWord event.shiftKey
+                        @moveCursorsToStartOfWord event.shiftKey
                     else if key == 'right'
-                        @moveCursorToEndOfWord   event.shiftKey
+                        @moveCursorsToEndOfWord   event.shiftKey
                 else
                     @moveCursors key, event.shiftKey
                                         
                 event.preventDefault() # prevent view from scrolling
             else
                 switch combo
-                    when 'ctrl+a', 'ctrl+shift+a'    then @moveCursorToStartOfLine event.shiftKey
+                    when 'ctrl+a', 'ctrl+shift+a'    then @moveCursorsToStartOfLine event.shiftKey
                     when 'ctrl+e', 'ctrl+shift+e'    then @moveCursorsToEndOfLine   event.shiftKey
                                                                                     
         ansiKeycode = require 'ansi-keycode'
