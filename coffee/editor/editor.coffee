@@ -56,25 +56,36 @@ class Editor extends Buffer
     setSelection: (c,l) -> @do.selection @, [c,l]
 
     selectMoreLines: -> 
-        ranges = @selectionRanges()
-        if ranges.length == 0
-            @selectLineAtIndex @cursor[1]
-            return
-        cursorLine = @rangesForCursorLine()
-        if ranges.length == 1
-            range = ranges[0]
-            if range[1][0] != cursorLine[0][0] or range[1][1] != cursorLine[1][0]
-                @selectLineAtIndex @cursor[1]
-                return
-        nextLine = @rangesForLineAtIndex cursorLine[1][1]+1 
-        @setCursorPos nextLine[1]
+        # ranges = @selectionRanges()
+        # if ranges.length == 0
+        #     @selectLineAtIndex @cursor[1]
+        #     return
+        # cursorLine = @rangesForCursorLine()
+        # if ranges.length == 1
+        #     range = ranges[0]
+        #     if range[1][0] != cursorLine[0][0] or range[1][1] != cursorLine[1][0]
+        #         @selectLineAtIndex @cursor[1]
+        #         return
+        # nextLine = @rangesForLineAtIndex cursorLine[1][1]+1 
+        # @setCursorPos nextLine[1]
+
+        start = false
+        for c in @cursors
+            if not @isSelectedLineAtIndex c[1]
+                @selectLineAtIndex c[1]
+                start = true
+        return if start
+        for c in @cursors
+            @selectLineAtIndex c[1]+1
 
     selectLessLines: -> 
-        ranges = @selectionRanges()
-        if ranges.length <= 1
-            return
-        prevLine = @rangesForLineAtIndex @cursor[1]-1
-        @setCursorPos prevLine[1]
+        # ranges = @selectionRanges()
+        # if ranges.length <= 1
+        #     return
+        # prevLine = @rangesForLineAtIndex @cursor[1]-1
+        # @setCursorPos prevLine[1]
+        for c in @cursors
+            @deselectLineAtIndex c[1]
 
     selectLineAtIndex: (i) -> 
         @selectRanges @rangesForLineAtIndex i

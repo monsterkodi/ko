@@ -15,8 +15,10 @@ class Buffer
 
     setLines: (lines) ->
         @lines     = lines
-        @cursor    = [0,0]
-        @selection = null
+        # @cursor    = [0,0] 
+        # @selection = null 
+        @cursors   = [[0,0]]
+        @selections = []
             
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000   0000000
     # 000       000       000      000       000          000     000  000   000  0000  000  000     
@@ -30,16 +32,21 @@ class Buffer
             ([s[0]-lineIndexRange[0], [s[1][0], s[1][1]]] for s in sl)
     
     selectionsInLineIndexRange: (lineIndexRange) ->
-        selected = @selectedLineIndicesRange()
-        if selected?
-            intersection = @rangeIntersection selected, lineIndexRange
-            if intersection?
-                sl = []
-                for i in [startOf(intersection)...endOf(intersection)]
-                    cr = @selectedCharacterRangeForLineAtIndex i
-                    if cr
-                        sl.push [i, cr]
-                sl
+        # selected = @selectedLineIndicesRange()
+        # if selected?
+        #     intersection = @rangeIntersection selected, lineIndexRange
+        #     if intersection?
+        #         sl = []
+        #         for i in [startOf(intersection)...endOf(intersection)]
+        #             cr = @selectedCharacterRangeForLineAtIndex i
+        #             if cr
+        #                 sl.push [i, cr]
+        #         sl
+        sl = []
+        for s in @selections
+            if s[0] >= lineIndexRange[0] and s[0] <= lineIndexRange[1]
+                sl.push _.clone s
+        sl
                     
     #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
     # 000       000   000  000   000  000       000   000  000   000  000     
@@ -48,10 +55,15 @@ class Buffer
     #  0000000   0000000   000   000  0000000    0000000   000   000  0000000 
     
     cursorsRelativeToLineIndexRange: (lineIndexRange) ->
-        c = [[Math.min(@cursor[0], @lines[@cursor[1]].length), @cursor[1]-lineIndexRange[0]]]
-        if @cursor[0] > @lines[@cursor[1]].length
-            c.push [@cursor[0], @cursor[1]-lineIndexRange[0], 'virtual']
-        c
+        # c = [[Math.min(@cursor[0], @lines[@cursor[1]].length), @cursor[1]-lineIndexRange[0]]]
+        # if @cursor[0] > @lines[@cursor[1]].length
+        #     c.push [@cursor[0], @cursor[1]-lineIndexRange[0], 'virtual']
+        # c
+        cl = []
+        for c in @cursors
+            if c[1] >= lineIndexRange[0] and c[1] <= lineIndexRange[1]
+                cl.push [c[0], c[1] - lineIndexRange[0]]
+        cl
     
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000
@@ -59,12 +71,12 @@ class Buffer
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
             
-    selectionRanges: ->
-        if @selection
-            range = @selectedLineIndicesRange()
-            ([i, @selectedCharacterRangeForLineAtIndex(i)] for i in [range[0]..range[1]])
-        else
-            []
+    # selectionRanges: ->
+    #     if @selection
+    #         range = @selectedLineIndicesRange()
+    #         ([i, @selectedCharacterRangeForLineAtIndex(i)] for i in [range[0]..range[1]])
+    #     else
+    #         []
 
     selectionStart: ->
         if @selection?  
