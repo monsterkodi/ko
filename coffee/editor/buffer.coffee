@@ -161,6 +161,8 @@ class Buffer
     rangesForLinesFromTopToBot: (top,bot) ->
     rangesForAllLines: -> return @rangesForLinesFromTopToBot @topIndex, @botIndex
     
+    rangesForCursors: -> ([c[1], [c[0], c[0]]] for c in @cursors)
+    
     rangesForTextInLineAtIndex: (t, i) ->
         ci = @lines[i].search(t)
         if ci > -1 

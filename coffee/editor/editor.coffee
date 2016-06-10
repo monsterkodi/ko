@@ -60,9 +60,18 @@ class Editor extends Buffer
         @setCursor range[1][1], range[0]
         @do.end()
 
+    selectAdditionalRange: (range) ->
+        log 'selectAdditionalRange range', range
+        @do.start()
+        s = _.cloneDeep @selections
+        s.push range
+        @do.selection @, s
+        @setCursor range[1][1], range[0]
+        @do.end()        
+
     selectNone: -> @do.selection @, []
 
-    selectLineAtIndex: (i) -> @selectRange @rangeForLineAtIndex i
+    selectLineAtIndex: (i) -> @selectAdditionalRange @rangeForLineAtIndex i
 
     selectMoreLines: -> 
         start = false
@@ -84,12 +93,27 @@ class Editor extends Buffer
     startSelection: (active) ->
         @do.start()
         if active and (@selections.length == 0)
-            cp = @cursorPos()
-            @selectRange [cp[1], [cp[0], cp[0]]]
+            for c in @cursors
+                @do.selection @, @rangesForCursors()
 
     endSelection: (active) ->
-        if (@selections.length == 0) and not active
+        if (@selections.length > 0) and not active
             @selectNone()
+        else if active and @selections.length > 0
+            newSelections = _.cloneDeep @selections
+            if @selections.length != @cursors.length
+                log 'warning! length missmatch', @selections.length, @cursors.length
+            for i in [0...@cursors.length]
+                s = @newSelections[i]
+                c = @cursors[i]
+                if s[0] != c[1]
+                    log 'warning! line missmatch', i, s[0], c[1]
+                if c[0] < s[1][0]
+                    s[1][0] = c[0]
+                else 
+                    s[1][1] = c[0]
+            @do.selection @, newSelections
+                
         @do.end()
         
     #  0000000  00000000   0000000   00000000    0000000  000   000
