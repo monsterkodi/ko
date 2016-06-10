@@ -5,6 +5,7 @@
 #00000000  0000000    000     000      0000000   000   000
 
 path    = require 'path'
+assert  = require 'assert'
 _       = require 'lodash'
 undo    = require './undo'
 Buffer  = require './buffer'
@@ -156,9 +157,7 @@ class Editor extends Buffer
             if @selections.length
                 @do.selection @, []
         else # adjust selection
-            # log 'adjust selection'
             if @selections.length == 0
-                # log 'new selection', oldCursorRanges
                 @do.selection @, oldCursorRanges
             
             newSelection = _.cloneDeep @selections
@@ -168,22 +167,22 @@ class Editor extends Buffer
                 s = @rangeStartingOrEndingAtPos newSelection, oc
                 if s
                     if nc[1] != oc[1]
-                        log 'cursor moved to new line!', oc[1], nc[1]
-                        log 'last line was', s[0]
+                        # log 'cursor moved to new line!', oc[1], nc[1]
+                        # log 'last line was', s[0]
                         if nc[1] > s[0]
-                            log 'selecting down from ', s[0], 'to', nc[1]
+                            # log 'selecting down from ', s[0], 'to', nc[1]
                             s[1][1] = @lines[s[0]].length
                             for li in [s[0]+1...nc[1]]
                                 newSelection.push @rangeForLineAtIndex li
                             newSelection.push [nc[1], [0, nc[0]]]
-                            log "newSelection", newSelection
+                            # log "newSelection", newSelection
                         else
-                            log 'selecting up from ', nc[1], 'to', s[0]
+                            # log 'selecting up from ', nc[1], 'to', s[0]
                             s[1][0] = 0
                             for li in [s[0]-1...nc[1]]
                                 newSelection.push @rangeForLineAtIndex li
                             newSelection.push [nc[1], [nc[0], @lines[nc[1]].length]]
-                            log "newSelection", newSelection
+                            # log "newSelection", newSelection
                     else
                         if s[1][1]==s[1][0]
                             s[1][0] = Math.min(s[1][1], nc[0])
@@ -194,9 +193,9 @@ class Editor extends Buffer
                             s[1][1] = nc[0]
                 else
                     log 'no range for oldCursor pos', oc
-
-            log 'adjusted selection', oldCursorRanges
-            @do.selection @, newSelection
+                    
+            # log "setCursorPos", newSelection.length
+            @do.selection @, @cleanRanges newSelection
             
         @do.end()
 
@@ -366,9 +365,12 @@ class Editor extends Buffer
 
         @do.start()
         @deleteSelection()
+        log 'insertCharacter', @cursors
         for c in @cursors
+            throw new Error if c.length < 2
+            throw new Error if c[1] >= @lines.length
             @do.change @lines, c[1], @lines[c[1]].splice c[0], 0, ch
-            @setCursorPos c, c[0]+1, c[1]
+            @setCursorPos c, [c[0]+1, c[1]]
         @do.end()
         
     insertSurroundCharacter: (ch) ->
@@ -506,10 +508,16 @@ class Editor extends Buffer
         else
             @do.start()
             for c in @cursors
-                @deleteBackwardForCursor c
+                @deleteBackwardAtCursor c
             @do.end()
+
+    deleteForwardAtCursor: (c) ->
+        if @cursorAtEndOfLine c
+            @joinLineOfCursor c
+        else
+            @do.change @lines, c[1], @lines[c[1]].splice c[0], 1
             
-    deleteBackwardForCursor: (c) ->
+    deleteBackwardAtCursor: (c) ->
         return if @cursorInFirstLine(c) and @cursorAtStartOfLine(c)
         cursorIndex = Math.min @lines[c[1]].length-1, c[0]
         strToCursor = @lines[c[1]].substr 0, cursorIndex
@@ -519,11 +527,11 @@ class Editor extends Buffer
             rc = (cursorIndex%il) or il
             log 'deleteBackward rc',rc, 'cursorIndex', cursorIndex 
             for i in [0...rc]
-                @moveCursorLeft()
-                @deleteForward()
+                @moveCursorLeft c
+                @deleteForwardAtCursor c
         else
-            @moveCursorLeft()
-            @deleteForward()
+            @moveCursorLeft c
+            @deleteForwardAtCursor c
         @do.end()
 
 module.exports = Editor

@@ -50,7 +50,8 @@ class Split
             @splitAt sh()-@handleHeight
     
     @splitAt: (y) ->
-        @topView    .style.height = "#{y-@commandlineHeight}px"
+        @topView    .style.height = "#{y-@commandlineHeight-@titlebarHeight-@handleHeight}px"
+        @topView    .style.top = "#{@titlebarHeight}px"
         @topHandle  .style.top = "#{y-@commandlineHeight-@handleHeight}px"
         @commandLine.style.top = "#{y-@commandlineHeight}px"
         @botHandle  .style.top = "#{y-2}px"

@@ -10,8 +10,9 @@ startOf,
 endOf,
 first,
 last
-}   = require '../tools/tools'
-log = require '../tools/log'
+}      = require '../tools/tools'
+log    = require '../tools/log'
+assert = require 'assert'
 
 class Buffer
     
@@ -158,12 +159,15 @@ class Buffer
             if r[0][1] < pos[1] or r[0][1] == pos[1] and r[1][0] < pos[0]
                 return r 
     
-    rangeForLineAtIndex: (i) -> [i, [0, @lines[i].length]] 
+    rangeForLineAtIndex: (i) -> 
+        throw new Error() if i >= @lines.length
+        [i, [0, @lines[i].length]] 
+        
     rangesForAllLines: -> @rangesForLinesFromTopToBot 0, @lines.length-1
     rangesForLinesFromTopToBot: (top,bot) -> 
         r = []
         ir = [top,bot]
-        for li in [startOf(ir)..endOf(ir)]
+        for li in [startOf(ir)...endOf(ir)]
             r.push @rangeForLineAtIndex li
         r
             
@@ -208,10 +212,39 @@ class Buffer
             r[1] += 1
         [p[1], [r[0], r[1]+1]]
         
+    # 000000000   0000000    0000000   000       0000000
+    #    000     000   000  000   000  000      000     
+    #    000     000   000  000   000  000      0000000 
+    #    000     000   000  000   000  000           000
+    #    000      0000000    0000000   0000000  0000000 
+        
     rangeStartingOrEndingAtPos: (ranges, p) ->
         for r in ranges
             if r[0] == p[1]
                 if r[1][0] == p[0] or r[1][1] == p[0]
                     return r
+                
+    sortRanges: (ranges) ->
+        ranges.sort (a,b) -> 
+            if a[0]!=b[0]
+                a[0]-b[0]
+            else
+                if a[1][0]!=b[1][0]
+                    a[1][0]-b[1][0]
+                else
+                    a[1][1]-b[1][1]
+                    
+    cleanRanges: (ranges) ->
+        @sortRanges ranges 
+        if ranges.length > 1
+            for ri in [ranges.length-1...0]
+                r = ranges[ri]
+                p = ranges[ri-1]
+                if r[0] == p[0] # on same line
+                    if r[1][0] <= p[1][1] # starts before previous ends
+                        p[1][1] = Math.max(p[1][1], r[1][1])
+                        ranges.splice ri, 1
+        log 'cleaned', ranges.join ','                               
+        ranges
     
 module.exports = Buffer

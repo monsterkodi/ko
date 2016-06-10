@@ -202,8 +202,7 @@ class ViewBase extends Editor
         return delta
     
     changed: (changeInfo) ->
-        # log 'viewbase.changed', @topIndex, @botIndex
-        log 'viewbase.changed selection', changeInfo.selection
+        # log 'viewbase.changed selection', changeInfo.selection
         indices = []
         info = _.cloneDeep changeInfo
         for i in info.changed
@@ -253,9 +252,9 @@ class ViewBase extends Editor
         br = @view.getBoundingClientRect()
         lx = clamp 0, @view.offsetWidth,  event.clientX - br.left - @size.offsetX
         ly = clamp 0, @view.offsetHeight, event.clientY - br.top
-        p = [parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth)),
-             parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @topIndex]
-        # log 'posForEvent', p
+        px = parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth))
+        py = parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @topIndex
+        p = [px, Math.min(@lines.length-1, py)]
         p
 
     # 000      000  000   000  00000000   0000000
