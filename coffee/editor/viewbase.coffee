@@ -56,7 +56,7 @@ class ViewBase extends Editor
                         @tripleClicked = true
                         @tripleClickTimer = setTimeout @onTripleClickDelay, 1500
                         @startSelection event.shiftKey
-                        @selectRanges @rangesForCursorLine()
+                        @selectRange @rangeForLineAtIndex @cursors[0][1]
                         @endSelection true
                         return
                     else
@@ -66,21 +66,21 @@ class ViewBase extends Editor
                         
                 @startSelection event.shiftKey
                 @view.focus()
-                @moveCursorToPos @posForEvent event
+                @moveCursorToPos @cursors[0], @posForEvent event
                 @endSelection event.shiftKey
             
             onMove: (drag, event) => 
                 @startSelection true
-                @moveCursorToPos @posForEvent event
+                @moveCursorToPos @cursors[0], @posForEvent event
                 @endSelection true
                 
         @view.ondblclick = (event) =>
             @startSelection event.shiftKey
-            ranges = @rangesForWordAtPos @posForEvent event
-            @selectRanges ranges
+            range = @rangeForWordAtPos @posForEvent event
+            @selectRange range
             @doubleClicked = true
             @tripleClickTimer = setTimeout @onTripleClickDelay, 1500
-            @tripleClickLineIndex = ranges[0][1]
+            @tripleClickLineIndex = range[0]
             @endSelection true
                         
     onTripleClickDelay: => @doubleClicked = @tripleClicked = false
@@ -263,6 +263,7 @@ class ViewBase extends Editor
         ly = clamp 0, @view.offsetHeight, event.clientY - br.top
         p = [parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth)),
              parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @topIndex]
+        # log 'posForEvent', p
         p
 
     # 000      000  000   000  00000000   0000000

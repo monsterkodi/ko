@@ -52,8 +52,15 @@ class Editor extends Buffer
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
 
-    selectNone:         -> @do.selection @, []
-    setSelection: (c,l) -> @do.selection @, [[c,l]]
+    selectRange: (range) ->
+        @do.start()
+        @do.selection @, [range]
+        @setCursor range[1][1], range[0]
+        @do.end()
+
+    selectNone: -> @do.selection @, []
+
+    selectLineAtIndex: (i) -> @selectRange @rangeForLineAtIndex i
 
     selectMoreLines: -> 
         start = false
@@ -69,24 +76,17 @@ class Editor extends Buffer
         for c in @cursors
             @deselectLineAtIndex c[1]
 
-    selectLineAtIndex: (i) -> 
-        @selectRanges @rangesForLineAtIndex i
-
-    selectRanges: (ranges) ->
-        @do.start()
-        @setSelection ranges[0][0], ranges[0][1]
-        @setCursor    ranges[1][0], ranges[1][1]
-        @do.end()
-
-    selectAll: => @selectRanges [[0,0], @lastPos()]
+    selectAll: => 
+        @do.selection @, @rangesForAllLines()
     
     startSelection: (active) ->
         @do.start()
-        if active and not @selection?
-            @selectRanges [[Math.min(@cursors[0][0], @lines[@cursors[0][1]].length), @cursors[0][1]], @cursors[0]]
+        if active and @selections.length == 0
+            cp = @cursorPos()
+            @selectRange [cp[1], [cp[0], cp[0]]]
 
     endSelection: (active) ->
-        if @selection? and not active
+        if @selections.length == 0 and not active
             @selectNone()
         @do.end()
         
@@ -100,7 +100,7 @@ class Editor extends Buffer
         @searchText = text
         @searchRanges = @rangesForText @searchText
         if @searchRanges.length
-            @selectRanges @searchRanges[0]
+            @selectRange @searchRanges[0]
 
     markSelectionForSearch: ->
         if selections.length == 0 
@@ -113,17 +113,17 @@ class Editor extends Buffer
         if not r
             @jumpToFirstSearchResult()
         else
-            @selectRanges r
+            @selectRange r
 
     jumpToPrevSearchResult: ->
         r = @rangeBeforePosInRanges @cursorPos(), @searchRanges
         if not r
             @jumpToLastSearchResult()
         else
-            @selectRanges r
+            @selectRange r
             
-    jumpToLastSearchResult: -> @selectRanges last @searchRanges
-    jumpToFirstSearchResult: -> @selectRanges @searchRanges[0]
+    jumpToLastSearchResult: -> @selectRange last @searchRanges
+    jumpToFirstSearchResult: -> @selectRange @searchRanges[0]
         
     # 00     00   0000000   000   000  00000000
     # 000   000  000   000  000   000  000     
@@ -163,21 +163,21 @@ class Editor extends Buffer
 
     moveCursorToEndOfWord:   -> 
         for c in @cursors
-            r = @rangesForWordAtPos(c)[1]
+            r = @rangeForWordAtPos c
             if @cursorAtEndOfLine c
                 continue if @cursorInLastLine c
-                r = @rangesForWordAtPos([0, c[1]+1])[1]
-            @moveCursorToPos c, r
+                r = @rangeForWordAtPos [0, c[1]+1]
+            @moveCursorToPos c, [r[1][1], r[0]]
         
     moveCursorToStartOfWord: -> 
         for c in @cursors
-            r = @rangesForWordAtPos(c)[0]
+            r = @rangeForWordAtPos c
             if @cursorAtStartOfLine c
                 continue if @cursorInFirstLine c
-                r = @rangesForWordAtPos([@lines[c[1]-1].length, c[1]-1])[0]
+                r = @rangeForWordAtPos [@lines[c[1]-1].length, c[1]-1]
             else if r[0] == c[0]
-                r = @rangesForWordAtPos([c[0]-1, c[1]])[0]
-            @moveCursorToPos c, r
+                r = @rangeForWordAtPos [c[0]-1, c[1]]
+            @moveCursorToPos c, [r[1][0], r[0]]
         
     moveCursorUp: (c) ->
         if @cursorInFirstLine c
@@ -207,7 +207,7 @@ class Editor extends Buffer
             if not @cursorInFirstLine c
                 @moveCursorUp c
                 @moveCursorToEndOfLine c
-                @moveCursorToPos [c[0]-n+1, c[1]]
+                @moveCursorToPos c, [c[0]-n+1, c[1]]
         else
             @moveCursorToPos c, [c[0]-n, c[1]]
 
