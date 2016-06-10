@@ -262,3 +262,5 @@ document.onkeydown = (event) ->
         when 'command+='     then return changeFontSize +1
         when 'command+-'     then return changeFontSize -1
         when 'command+0'     then return resetFontSize()
+        
+        

@@ -63,6 +63,8 @@ class Buffer
         for c in @cursors
             if c[0] == p[0] and c[1] == p[1]
                 return c
+                
+    indexOfCursor: (c) -> @cursors.indexOf c
     
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000
@@ -256,6 +258,23 @@ class Buffer
                 else
                     a[1][1]-b[1][1]
                     
+    sortPositions: (positions) ->
+        positions.sort (a,b) ->
+            if a[1]!=b[1]
+                a[1]-b[1]
+            else
+                a[0]-b[0]
+            
+    cleanCursors: (cs) ->
+        @sortPositions cs
+        if cs.length > 1
+            for ci in [cs.length-1...0]
+                c = cs[ci]
+                p = cs[ci-1]
+                if c[1] == p[1] and c[0] == p[0] 
+                    cs.splice ci, 1
+        cs
+                    
     cleanRanges: (ranges) ->
         @sortRanges ranges 
         if ranges.length > 1
@@ -266,7 +285,7 @@ class Buffer
                     if r[1][0] <= p[1][1] # starts before previous ends
                         p[1][1] = Math.max(p[1][1], r[1][1])
                         ranges.splice ri, 1
-        log 'cleaned', ranges.join ','                               
+        # log 'cleaned', ranges.join ','
         ranges
     
 module.exports = Buffer

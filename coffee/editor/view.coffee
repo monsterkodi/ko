@@ -218,19 +218,20 @@ class View extends ViewBase
             when 'command+/'        then return @toggleLineComment()
             when 'command+l'        then return @selectMoreLines()
             when 'command+shift+l'  then return @selectLessLines()
-                            
-        # commands that might change the selection ...
-        
+                                    
         switch key
             
-            when 'home'    then @moveCursorToLineIndex 0, event.shiftKey
-            when 'end'     then @moveCursorToLineIndex @lines.length-1, event.shiftKey
+            when 'esc'     then return @cancelCursors()
+            when 'home'    then return @moveCursorToLineIndex 0, event.shiftKey
+            when 'end'     then return @moveCursorToLineIndex @lines.length-1, event.shiftKey
             when 'page up'      
                 @moveCursorByLines -(@numFullLines()-3), event.shiftKey
                 event.preventDefault() # prevent view from scrolling
+                return
             when 'page down'    
                 @moveCursorByLines   @numFullLines()-3, event.shiftKey
                 event.preventDefault() # prevent view from scrolling
+                return
                                 
         return 'unhandled'                
         

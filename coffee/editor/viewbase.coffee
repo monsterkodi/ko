@@ -5,9 +5,11 @@
 #    000     000  000       000   000  000   000  000   000       000  000     
 #     0      000  00000000  00     00  0000000    000   000  0000000   00000000
 {
-clamp,$,
 characterWidth,
-setStyle
+setStyle,
+clamp,
+last,
+$
 }         = require '../tools/tools'
 prefs     = require '../tools/prefs'
 drag      = require '../tools/drag'
@@ -65,14 +67,14 @@ class ViewBase extends Editor
                 @view.focus()
                 p = @posForEvent event
                 if event.metaKey
-                    @addCursorAtPos p
+                    @toggleCursorAtPos p
                 else
                     @setCursorToPos p, event.shiftKey
             
             onMove: (drag, event) => 
                 p = @posForEvent event
                 if event.metaKey
-                    @addCursorAtPos [@cursors[0][0], p[1]]  # todo: nearest cursor instead of first
+                    @addCursorAtPos [last(@cursors)[0], p[1]]  # todo: nearest cursor instead of last
                 else
                     @setCursorToPos p, true
                 
@@ -318,10 +320,10 @@ class ViewBase extends Editor
             when 'down', 'right', 'up', 'left' 
                                 
                 if event.metaKey
-                    if key == 'left'
-                        @moveCursorsToStartOfLine event.shiftKey
-                    else if key == 'right'
-                        @moveCursorsToEndOfLine   event.shiftKey
+                    switch key 
+                        when 'left'  then @moveCursorsToStartOfLine event.shiftKey
+                        when 'right' then @moveCursorsToEndOfLine   event.shiftKey
+                        when 'up','down' then @addCursors key
                 else if event.altKey
                     if key == 'left'
                         @moveCursorsToStartOfWord event.shiftKey

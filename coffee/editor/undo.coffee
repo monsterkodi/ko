@@ -208,6 +208,7 @@ class undo
     #  0000000   0000000   000   000  0000000    0000000   000   000
 
     cursor: (obj, newCursors) =>
+        obj.cleanCursors newCursors
         @changeInfoCursor obj
         @lastAction().curAfter = newCursors
         obj.cursors = newCursors
