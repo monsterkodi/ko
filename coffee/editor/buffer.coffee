@@ -178,8 +178,8 @@ class Buffer
     textInRange: (r) -> @lines[r[0]].slice r[1][0], r[1][1]
     textOfSelectionForClipboard: -> 
         t = []
-        for s in @selection
-            t.push textInRange s
+        for s in @selections
+            t.push @textInRange s
         t.join '\n'
         
     # 000  000   000  0000000    00000000  000   000  000000000

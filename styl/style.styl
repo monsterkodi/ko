@@ -318,6 +318,12 @@ body
     background      yellow
   to 
     background      #444
+
+@keyframes blink-virtual
+  from 
+    background      #08f
+  to 
+    background      transparent
         
 *:focus .cursor
     background          yellow // focus 
@@ -328,6 +334,7 @@ body
     animation-timing-function ease-in-out
     &.virtual
         background      #444 
+        animation-name  blink-virtual
     
 .cursor
     width            2px

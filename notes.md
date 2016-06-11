@@ -1,6 +1,9 @@
 # todo/ideas
     
-- log in scroll
+- fix virtual cursors
+- fix delete backwards
+- fix cursor positions
+- log in scroll area
     
 - focus on editor after devTools opened
 - fix shift tab at line start

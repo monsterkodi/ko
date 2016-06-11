@@ -172,7 +172,13 @@ class ViewBase extends Editor
         @elem.appendChild div
 
     renderCursors: ->
-        h = render.cursors @cursorsRelativeToLineIndexRange([@topIndex, @botIndex]), @size
+        cs = @cursorsRelativeToLineIndexRange [@topIndex, @botIndex]
+        vc = []
+        for c in cs
+            if c[0] > @lines[@topIndex+c[1]].length
+                vc.push [@lines[@topIndex+c[1]].length, c[1], 'virtual']
+        cs = cs.concat vc
+        h = render.cursors cs, @size
         $('.cursors', @view).innerHTML = h
         
     renderSelection: ->
