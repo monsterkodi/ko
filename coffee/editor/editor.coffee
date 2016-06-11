@@ -54,15 +54,15 @@ class Editor extends Buffer
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
 
     selectRange: (range) ->
-        log 'selectRange range', range
+        # log 'selectRange range', range
         @do.start()
         @do.selection @, [range]
-        log 'selectRange selections', @selections
+        # log 'selectRange selections', @selections
         @setCursor range[1][1], range[0]
         @do.end()
 
     selectAdditionalRange: (range) ->
-        log 'selectAdditionalRange range', range
+        # log 'selectAdditionalRange range', range
         @do.start()
         s = _.cloneDeep @selections
         s.push range
@@ -162,6 +162,19 @@ class Editor extends Buffer
         for c in @cursors
             newCursors.push [c[0], c[1]+d]
         @do.cursor @, newCursors 
+
+    delCursors: (dir='up') ->
+        newCursors = _.cloneDeep @cursors
+        d = switch dir
+            when 'up' 
+                for c in @reversedCursors()
+                    if @cursorAtPos([c[0], c[1]-1]) and not @cursorAtPos [c[0], c[1]+1]
+                        newCursors.splice @indexOfCursor(c), 1
+            when 'down' 
+                for c in @reversedCursors()
+                    if @cursorAtPos([c[0], c[1]+1]) and not @cursorAtPos [c[0], c[1]-1]
+                        newCursors.splice @indexOfCursor(c), 1    
+        @do.cursor @, newCursors 
         
     cancelCursors: () ->
         @do.cursor @, [@cursors[0]]
@@ -173,6 +186,8 @@ class Editor extends Buffer
     # 0000000   000  000   000   0000000   0000000  00000000
     
     singleCursorAtPos: (p, e) ->
+        if @initialCursors?.length > 1
+            @initialCursors = _.cloneDeep [@initialCursors[0]]
         @startSelection e
         @do.cursor @, [p]
         @endSelection e
@@ -194,9 +209,8 @@ class Editor extends Buffer
                 
     startSelection: (e) ->
         if e and not @initialCursors
-            @initialCursors = _.cloneDeep @cursors            
+            @initialCursors = _.cloneDeep @cursors
             @do.selection @, @rangesForCursors @initialCursors
-            log "---------- startSelection", @initialCursors, @selections.length
         if not e
             @do.selection @, []
             
@@ -206,11 +220,9 @@ class Editor extends Buffer
             if @selections.length
                 @selectNone()
             @initialCursors = _.cloneDeep @cursors
-            log "---------- restartSelection", @initialCursors, @selections.length
             
         if e and @initialCursors
-            log 'endSelection initialCursors:', @initialCursors
-            newSelection = [] #_.cloneDeep @selections
+            newSelection = []
             if @initialCursors.length != @cursors.length
                 log 'warn! @initialCursors.length != @cursors.length', @initialCursors.length, @cursors.length
             
@@ -218,12 +230,10 @@ class Editor extends Buffer
                 ic = @initialCursors[ci]
                 cc = @cursors[ci]
                 ranges = @rangesBetweenPositions ic, cc
-                log 'ranges between', ic, 'and', cc, '->', ranges
                 newSelection = newSelection.concat ranges
-                log "concat selection:", newSelection
                     
             newSelection = @cleanRanges newSelection
-            log "endSelection ->", newSelection
+            # log "endSelection ->", newSelection
             @do.selection @, newSelection
         
     moveAllCursors: (e, f) ->

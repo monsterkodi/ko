@@ -65,6 +65,11 @@ class Buffer
                 return c
                 
     indexOfCursor: (c) -> @cursors.indexOf c
+
+    reversedCursors: ->
+        cs = _.clone @cursors
+        cs.reverse()
+        cs
     
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000
@@ -178,7 +183,7 @@ class Buffer
         if b[1] - a[1] > 1
             for i in [a[1]+1...b[1]]
                 r.push [i, [0,@lines[i].length]]
-        log 'rangesBetweenPositions a:', a, 'b:', b, '->', r
+        # log 'rangesBetweenPositions a:', a, 'b:', b, '->', r
         r
     
     rangesForCursors: (cs=@cursors) -> ([c[1], [c[0], c[0]]] for c in cs)

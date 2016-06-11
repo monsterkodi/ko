@@ -323,7 +323,6 @@ class ViewBase extends Editor
                     switch key 
                         when 'left'  then @moveCursorsToStartOfLine event.shiftKey
                         when 'right' then @moveCursorsToEndOfLine   event.shiftKey
-                        when 'up','down' then @addCursors key
                 else if event.altKey
                     if key == 'left'
                         @moveCursorsToStartOfWord event.shiftKey

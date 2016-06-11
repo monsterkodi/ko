@@ -218,6 +218,8 @@ class View extends ViewBase
             when 'command+/'        then return @toggleLineComment()
             when 'command+l'        then return @selectMoreLines()
             when 'command+shift+l'  then return @selectLessLines()
+            when 'command+up', 'command+down' then return @addCursors key
+            when 'command+shift+up', 'command+shift+down' then return @delCursors key
                                     
         switch key
             
