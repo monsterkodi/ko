@@ -355,16 +355,14 @@ body
 // 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000   
 // 000   000  000  000   000  000   000  000      000  000   000  000   000     000   
 // 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000   
-    
-*:focus .highlight
-        // background  rgba(255, 255, 255, 0.25) // focus
-        border      2px solid yellow
-        
+            
 .highlight
     position        absolute
     pointer-events  none
-    // background      rgba(255, 255, 255, 0.05) // no focus
-    border          2px solid #222
+    background      rgba(255,255,255, 0.1)
+
+*:focus .highlight
+    background rgba(255,255,255, 0.2)
 
 //  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
 // 000       000       000      000       000          000     000  000   000  0000  000
