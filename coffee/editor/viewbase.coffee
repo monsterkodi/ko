@@ -69,14 +69,14 @@ class ViewBase extends Editor
                 if event.metaKey
                     @toggleCursorAtPos p
                 else
-                    @setCursorToPos p, event.shiftKey
+                    @singleCursorAtPos p, event.shiftKey
             
             onMove: (drag, event) => 
                 p = @posForEvent event
                 if event.metaKey
                     @addCursorAtPos [last(@cursors)[0], p[1]]  # todo: nearest cursor instead of last
                 else
-                    @setCursorToPos p, true
+                    @singleCursorAtPos p, true
                 
         @view.ondblclick = (event) =>
             range = @rangeForWordAtPos @posForEvent event

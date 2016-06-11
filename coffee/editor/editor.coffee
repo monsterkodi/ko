@@ -166,6 +166,17 @@ class Editor extends Buffer
     cancelCursors: () ->
         @do.cursor @, [@cursors[0]]
 
+    #  0000000  000  000   000   0000000   000      00000000
+    # 000       000  0000  000  000        000      000     
+    # 0000000   000  000 0 000  000  0000  000      0000000 
+    #      000  000  000  0000  000   000  000      000     
+    # 0000000   000  000   000   0000000   0000000  00000000
+    
+    singleCursorAtPos: (p, e) ->
+        @startSelection e
+        @do.cursor @, [p]
+        @endSelection e
+
     # 00     00   0000000   000   000  00000000
     # 000   000  000   000  000   000  000     
     # 000000000  000   000   000 000   0000000 
@@ -177,79 +188,51 @@ class Editor extends Buffer
         newCursors[@indexOfCursor(c)] = p
         @do.cursor @, newCursors
         
-        # if not e
-        #     if @selections.length
-        #         @do.selection @, []
-        # else # adjust selection
-        #     if @selections.length == 0
-        #         @do.selection @, oldCursorRanges
-        #     
-        #     newSelection = _.cloneDeep @selections
-        #     for ci in [0...oldCursors.length]
-        #         oc = oldCursors[ci]
-        #         nc = newCursors[ci]
-        #         s = @rangeStartingOrEndingAtPos newSelection, oc
-        #         if s
-        #             if nc[1] != oc[1]
-        #                 # log 'cursor moved to new line!', oc[1], nc[1]
-        #                 # log 'last line was', s[0]
-        #                 if nc[1] > s[0]
-        #                     # log 'selecting down from ', s[0], 'to', nc[1]
-        #                     s[1][1] = @lines[s[0]].length
-        #                     for li in [s[0]+1...nc[1]]
-        #                         newSelection.push @rangeForLineAtIndex li
-        #                     newSelection.push [nc[1], [0, nc[0]]]
-        #                     # log "newSelection", newSelection
-        #                 else
-        #                     # log 'selecting up from ', nc[1], 'to', s[0]
-        #                     s[1][0] = 0
-        #                     for li in [s[0]-1...nc[1]]
-        #                         newSelection.push @rangeForLineAtIndex li
-        #                     newSelection.push [nc[1], [nc[0], @lines[nc[1]].length]]
-        #                     # log "newSelection", newSelection
-        #             else
-        #                 if s[1][1]==s[1][0]
-        #                     s[1][0] = Math.min(s[1][1], nc[0])
-        #                     s[1][1] = Math.max(s[1][1], nc[0])
-        #                 else if oc[0] == s[1][0]
-        #                     s[1][0] = nc[0]
-        #                 else if oc[0] == s[1][1]
-        #                     s[1][1] = nc[0]
-        #         else
-        #             log 'no range for oldCursor pos', oc
-        #             
-        #     # log "setCursorPos", newSelection.length
-        #     @do.selection @, @cleanRanges newSelection
-            
-        # @do.end()
-
     moveCursorToPos: (c, p) -> 
         @closingInserted = null
         @setCursorPos c, p
-        
-    setCursorToPos: (p, e) ->
-        @startSelection e
-        @do.cursor @, [p]
-        @endSelection e
-        
+                
     startSelection: (e) ->
-        if e and @selections.length == 0
-            @initialCursors = _.cloneDeep @cursors
-            @do.selection @, @rangesForCursors()
+        if e and not @initialCursors
+            @initialCursors = _.cloneDeep @cursors            
+            @do.selection @, @rangesForCursors @initialCursors
+            log "---------- startSelection", @initialCursors, @selections.length
+        if not e
+            @do.selection @, []
             
     endSelection: (e) ->
-        if not e and @selections.length
-            @do.selection @, []
+        
+        if not e
+            if @selections.length
+                @selectNone()
+            @initialCursors = _.cloneDeep @cursors
+            log "---------- restartSelection", @initialCursors, @selections.length
+            
+        if e and @initialCursors
+            log 'endSelection initialCursors:', @initialCursors
+            newSelection = [] #_.cloneDeep @selections
+            if @initialCursors.length != @cursors.length
+                log 'warn! @initialCursors.length != @cursors.length', @initialCursors.length, @cursors.length
+            
+            for ci in [0...@initialCursors.length]
+                ic = @initialCursors[ci]
+                cc = @cursors[ci]
+                ranges = @rangesBetweenPositions ic, cc
+                log 'ranges between', ic, 'and', cc, '->', ranges
+                newSelection = newSelection.concat ranges
+                log "concat selection:", newSelection
+                    
+            newSelection = @cleanRanges newSelection
+            log "endSelection ->", newSelection
+            @do.selection @, newSelection
         
     moveAllCursors: (e, f) ->
         @startSelection e
-        
         newCursors = _.cloneDeep @cursors
         
         for c in @cursors
             newCursors[@indexOfCursor(c)] = f(c)
         @do.cursor @, newCursors
-
         @endSelection e
         
     moveCursorsToEndOfLine:   (e) -> @moveAllCursors e, (c) => [@lines[c[1]].length, c[1]]

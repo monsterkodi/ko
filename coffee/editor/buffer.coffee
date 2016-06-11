@@ -167,10 +167,21 @@ class Buffer
     # 000   000  000   000  000  0000  000   000  000            000
     # 000   000  000   000  000   000   0000000   00000000  0000000 
     
-    rangeIntersection: (a,b) ->
-        s = Math.max(a[0], b[0])
-        e = Math.min(a[1], b[1])
-        [s, e] if s<=e
+    rangesBetweenPositions: (a, b) ->
+        r = []
+        [a,b] = @sortPositions [a,b]
+        if a[1] == b[1]
+            r.push [a[1], [a[0], b[0]]]
+        else
+            r.push [a[1], [a[0], @lines[a[1]].length]]
+            r.push [b[1], [0, b[0]]]
+        if b[1] - a[1] > 1
+            for i in [a[1]+1...b[1]]
+                r.push [i, [0,@lines[i].length]]
+        log 'rangesBetweenPositions a:', a, 'b:', b, '->', r
+        r
+    
+    rangesForCursors: (cs=@cursors) -> ([c[1], [c[0], c[0]]] for c in cs)
             
     rangeAfterPosInRanges: (pos, ranges) ->
         for r in ranges
@@ -194,9 +205,7 @@ class Buffer
         for li in [startOf(ir)...endOf(ir)]
             r.push @rangeForLineAtIndex li
         r
-            
-    rangesForCursors: -> ([c[1], [c[0], c[0]]] for c in @cursors)
-    
+                
     rangesForTextInLineAtIndex: (t, i) ->
         ci = @lines[i].search(t)
         if ci > -1 
@@ -235,6 +244,17 @@ class Buffer
                 break
             r[1] += 1
         [p[1], [r[0], r[1]+1]]
+        
+    # 000   000  000   000  000   000   0000000  00000000  0000000    00000 
+    # 000   000  0000  000  000   000  000       000       000   000     000
+    # 000   000  000 0 000  000   000  0000000   0000000   000   000   000  
+    # 000   000  000  0000  000   000       000  000       000   000        
+    #  0000000   000   000   0000000   0000000   00000000  0000000     000  
+    
+    rangeIntersection: (a,b) ->
+        s = Math.max(a[0], b[0])
+        e = Math.min(a[1], b[1])
+        [s, e] if s<=e
         
     # 000000000   0000000    0000000   000       0000000
     #    000     000   000  000   000  000      000     
@@ -285,7 +305,6 @@ class Buffer
                     if r[1][0] <= p[1][1] # starts before previous ends
                         p[1][1] = Math.max(p[1][1], r[1][1])
                         ranges.splice ri, 1
-        # log 'cleaned', ranges.join ','
         ranges
     
 module.exports = Buffer
