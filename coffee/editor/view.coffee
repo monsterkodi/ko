@@ -223,7 +223,7 @@ class View extends ViewBase
                                     
         switch key
             
-            when 'esc'     then return @cancelCursors()
+            when 'esc'     then return @cancelCursorsAndHighlights()
             when 'home'    then return @moveCursorToLineIndex 0, event.shiftKey
             when 'end'     then return @moveCursorToLineIndex @lines.length-1, event.shiftKey
             when 'page up'      

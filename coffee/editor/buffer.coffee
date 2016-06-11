@@ -115,6 +115,14 @@ class Buffer
             [first(@selections)[0], last(@selections)[0]]
         else
             []
+            
+    isSelectedLineAtIndex: (li) ->
+        il = @selectedLineIndices()
+        if li in il
+            s = @selections[il.indexOf li]
+            if s[1][0] == 0 and s[1][1] == @lines[li].length
+                return true
+        false
 
     #  0000000  000   000  00000000    0000000   0000000   00000000 
     # 000       000   000  000   000  000       000   000  000   000
@@ -277,7 +285,9 @@ class Buffer
             if w? != m?
                 break
             r[1] += 1
-        [p[1], [r[0], r[1]+1]]
+        range = [p[1], [r[0], r[1]+1]]
+        log 'rangeForWordAtPos', pos, range
+        range
         
     # 000   000  000   000  000   000   0000000  00000000  0000000    00000 
     # 000   000  0000  000  000   000  000       000       000   000     000
@@ -302,6 +312,12 @@ class Buffer
                 if r[1][0] == p[0] or r[1][1] == p[0]
                     return r
                 
+    #  0000000   0000000   00000000   000000000
+    # 000       000   000  000   000     000   
+    # 0000000   000   000  0000000       000   
+    #      000  000   000  000   000     000   
+    # 0000000    0000000   000   000     000   
+                
     sortRanges: (ranges) ->
         ranges.sort (a,b) -> 
             if a[0]!=b[0]
@@ -318,8 +334,26 @@ class Buffer
                 a[1]-b[1]
             else
                 a[0]-b[0]
-            
+                
+    #  0000000  000       0000000   00     00  00000000 
+    # 000       000      000   000  000   000  000   000
+    # 000       000      000000000  000000000  00000000 
+    # 000       000      000   000  000 0 000  000      
+    #  0000000  0000000  000   000  000   000  000      
+                
+    clampPositions: (positions) ->
+        for p in positions
+            p[0] = Math.max p[0], 0
+            p[1] = clamp 0, @lines.length-1, p[1]
+           
+    #  0000000  000      00000000   0000000   000   000
+    # 000       000      000       000   000  0000  000
+    # 000       000      0000000   000000000  000 0 000
+    # 000       000      000       000   000  000  0000
+    #  0000000  0000000  00000000  000   000  000   000
+              
     cleanCursors: (cs) ->
+        @clampPositions cs
         @sortPositions cs
         if cs.length > 1
             for ci in [cs.length-1...0]

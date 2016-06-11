@@ -54,15 +54,13 @@ class Editor extends Buffer
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
 
     selectRange: (range) ->
-        # log 'selectRange range', range
         @do.start()
         @do.selection @, [range]
-        # log 'selectRange selections', @selections
-        @setCursor range[1][1], range[0]
+        # @setCursor range[1][1], range[0]
+        # @singleCursorAtPos [range[1][1], range[0]], true
         @do.end()
 
     selectAdditionalRange: (range) ->
-        # log 'selectAdditionalRange range', range
         @do.start()
         s = _.cloneDeep @selections
         s.push range
@@ -73,6 +71,11 @@ class Editor extends Buffer
     selectNone: -> @do.selection @, []
 
     selectLineAtIndex: (i) -> @selectAdditionalRange @rangeForLineAtIndex i
+    deselectLineAtIndex: (i) ->
+        # @do.start()
+        # @do.selection @, [range]
+        # @setCursor range[1][1], range[0]
+        # @do.end()
 
     selectMoreLines: -> 
         start = false
@@ -80,6 +83,7 @@ class Editor extends Buffer
             if not @isSelectedLineAtIndex c[1]
                 @selectLineAtIndex c[1]
                 start = true
+        log 'selectMore: strted', start
         return if start
         for c in @cursors
             @selectLineAtIndex c[1]+1
@@ -183,6 +187,11 @@ class Editor extends Buffer
     cancelCursors: () ->
         @do.cursor @, [@cursors[0]]
 
+    cancelCursorsAndHighlights: () ->
+        @cancelCursors()
+        @highlights = []
+        @renderHighlights()    
+
     #  0000000  000  000   000   0000000   000      00000000
     # 000       000  0000  000  000        000      000     
     # 0000000   000  000 0 000  000  0000  000      0000000 
@@ -190,8 +199,10 @@ class Editor extends Buffer
     # 0000000   000  000   000   0000000   0000000  00000000
     
     singleCursorAtPos: (p, e) ->
-        if @initialCursors?.length > 1
+        if e and @initialCursors?.length > 1
             @initialCursors = _.cloneDeep [@initialCursors[0]]
+        else if not e
+            @initialCursors = _.cloneDeep [p]
         @startSelection e
         @do.cursor @, [p]
         @endSelection e
@@ -402,7 +413,7 @@ class Editor extends Buffer
             for c in @cursors
                 for i in [0...(4-(c[0]%il))]
                     @do.change @lines, c[1], @lines[c[1]].splice c[0], 0, ' '
-                    @setCursor c, c[0]+1, c[1]
+                    @setCursorPos c, [c[0]+1, c[1]]
         @do.end()
         
     insertNewline: ->
