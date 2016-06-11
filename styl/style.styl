@@ -312,8 +312,16 @@ body
 // 000       000   000  000   000       000  000   000  000   000
 //  0000000   0000000   000   000  0000000    0000000   000   000
         
+        
+@keyframes blink 
+  from 
+    color: black
+  to 
+    color: yellow
+        
 *:focus .cursor
     background      yellow // focus 
+    animation-name  blink
     &.virtual
         background  #444 
     
