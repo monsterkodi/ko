@@ -22,6 +22,7 @@ class Buffer
         @lines      = lines
         @cursors    = [[0,0]]
         @selections = []
+        @highlights = []
             
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000   0000000
     # 000       000       000      000       000          000     000  000   000  0000  000  000     
@@ -43,6 +44,29 @@ class Buffer
         
     reversedSelections: ->
         r = _.clone @selections
+        r.reverse()
+        r
+
+    # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000   0000000
+    # 000   000  000  000        000   000  000      000  000        000   000     000     000     
+    # 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000     0000000 
+    # 000   000  000  000   000  000   000  000      000  000   000  000   000     000          000
+    # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     0000000 
+
+    highlightsRelativeToLineIndexRange: (lineIndexRange) ->
+        hl = @highlightsInLineIndexRange lineIndexRange
+        if hl
+            ([s[0]-lineIndexRange[0], [s[1][0], s[1][1]]] for s in hl)
+    
+    highlightsInLineIndexRange: (lineIndexRange) ->
+        hl = []
+        for s in @highlights
+            if s[0] >= lineIndexRange[0] and s[0] <= lineIndexRange[1]
+                hl.push _.clone s
+        hl
+        
+    reversedHighlights: ->
+        r = _.clone @highlights
         r.reverse()
         r
                     
@@ -210,20 +234,25 @@ class Buffer
         for li in [startOf(ir)...endOf(ir)]
             r.push @rangeForLineAtIndex li
         r
-                
+    
     rangesForTextInLineAtIndex: (t, i) ->
-        ci = @lines[i].search(t)
-        if ci > -1 
-            [[[ci,i], [ci+t.length,i]]]
+        r = []
+        si = 0
+        l = @lines[i]
+        while (ci = l.search(t)) > -1 
+            r.push [i, [si+ci, si+ci+t.length]]
+            si += ci+t.length
+            l = l.slice si
+        # log 'rangesForTextInLineAtIndex', i, @lines[i], 't:', t, 'r::', r
+        r
         
     rangesForText: (t) ->
-        s = t.split('\n')
+        t = t.split('\n')[0]
         r = []
-        for i in [0...@lines.length]
-            lr = @rangesForTextInLineAtIndex t, i
-            [].push.apply(r, lr)
+        for li in [0...@lines.length]
+            r = r.concat @rangesForTextInLineAtIndex t, li
         r
-    
+                
     rangeForWordAtPos: (pos) ->
         p = @clampPos pos
         l = @lines[p[1]]

@@ -1,5 +1,7 @@
 # todo/ideas
     
+- log in scroll
+    
 - focus on editor after devTools opened
 - fix shift tab at line start
     

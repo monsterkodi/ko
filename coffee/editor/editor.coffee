@@ -96,34 +96,38 @@ class Editor extends Buffer
     #      000  000       000   000  000   000  000       000   000
     # 0000000   00000000  000   000  000   000   0000000  000   000
 
-    markTextForSearch: (text) ->
+    markTextForSearch: (text) -> # called from find command
         @searchText = text
-        @searchRanges = @rangesForText @searchText
-        if @searchRanges.length
-            @selectRange @searchRanges[0]
+        @highlights = @rangesForText @searchText
+        if @highlights.length
+            @selectRange @highlights[0]
+        log 'markTextForSearch', @highlights
+        @renderHighlights()
 
-    markSelectionForSearch: ->
-        if selections.length == 0 
+    markSelectionForSearch: -> # called from keyboard shortcut
+        if @selections.length == 0 
             @selectRange @rangeForWordAtPos @cursorPos()
         @searchText = @textInRange @selections[0]
-        @searchRanges = @rangesForText @searchText
+        @highlights = @rangesForText @searchText
+        log 'markSelectionForSearch', @highlights
+        @renderHighlights()
         
     jumpToNextSearchResult: ->
-        r = @rangeAfterPosInRanges @cursorPos(), @searchRanges
+        r = @rangeAfterPosInRanges @cursorPos(), @highlights
         if not r
             @jumpToFirstSearchResult()
         else
             @selectRange r
 
     jumpToPrevSearchResult: ->
-        r = @rangeBeforePosInRanges @cursorPos(), @searchRanges
+        r = @rangeBeforePosInRanges @cursorPos(), @highlights
         if not r
             @jumpToLastSearchResult()
         else
             @selectRange r
             
-    jumpToLastSearchResult: -> @selectRange last @searchRanges
-    jumpToFirstSearchResult: -> @selectRange @searchRanges[0]
+    jumpToLastSearchResult: -> @selectRange last @highlights
+    jumpToFirstSearchResult: -> @selectRange @highlights[0]
         
     #  0000000  000   000  00000000    0000000   0000000   00000000 
     # 000       000   000  000   000  000       000   000  000   000

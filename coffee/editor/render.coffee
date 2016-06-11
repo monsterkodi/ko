@@ -77,13 +77,13 @@ class render
     # 000       000   000  000   000       000  000   000  000   000       000
     #  0000000   0000000   000   000  0000000    0000000   000   000  0000000 
     
-    @cursors: (cursors, size) => # cursors: [ [charIndex, lineIndex] ... ]  (lineIndex relative to view)
+    @cursors: (cs, size) => # cs: [ [charIndex, lineIndex] ... ]  (lineIndex relative to view)
         
         h = ""
         i = 0
         cw = size.charWidth
         lh = size.lineHeight
-        for c in cursors
+        for c in cs
             tx = c[0] * cw + size.offsetX
             ty = c[1] * lh
             cls = ""
@@ -98,14 +98,14 @@ class render
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
                 
-    @selection: (selections, size) => # selections: [ [lineIndex, [startIndex, endIndex]], ... ]  (lineIndex relative to view)
+    @selection: (ss, size) => # ss: [ [lineIndex, [startIndex, endIndex]], ... ]  (lineIndex relative to view)
         
         h = ""
         p = null
         n = null
-        for si in [0...selections.length]
-            s = selections[si]
-            n = (si < selections.length-1) and selections[si+1] or null
+        for si in [0...ss.length]
+            s = ss[si]
+            n = (si < ss.length-1) and ss[si+1] or null
             h += @selectionSpan p, s, n, size
             p = s
         h

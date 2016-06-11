@@ -27,6 +27,7 @@ class ViewBase extends Editor
     
         @syntaxName = 'txt'    
         @view = viewElem
+        @initLayers ["selections", "highlights", "lines", "cursors"]
         @elem = $('.lines', @view)
         @divs = []        
         @topIndex = 0
@@ -86,6 +87,18 @@ class ViewBase extends Editor
             @tripleClickLineIndex = range[0]
                         
     onTripleClickDelay: => @doubleClicked = @tripleClicked = false
+
+    # 000       0000000   000   000  00000000  00000000    0000000
+    # 000      000   000   000 000   000       000   000  000     
+    # 000      000000000    00000    0000000   0000000    0000000 
+    # 000      000   000     000     000       000   000       000
+    # 0000000  000   000     000     00000000  000   000  0000000 
+    
+    initLayers: (layerClasses) ->
+        for cls in layerClasses
+            div = document.createElement 'div'
+            div.className = cls
+            @view.appendChild div
 
     # 000000000  00000000  000   000  000000000
     #    000     000        000 000      000   
@@ -148,6 +161,7 @@ class ViewBase extends Editor
                 
         @renderCursors()
         @renderSelection()
+        @renderHighlights()
 
     addLine: ->
         div = document.createElement 'div'
@@ -165,9 +179,17 @@ class ViewBase extends Editor
         h = ""
         s = @selectionsRelativeToLineIndexRange([@topIndex, @botIndex])
         if s
-            # log 'renderSelection', s
             h += render.selection s, @size
         $('.selections', @view).innerHTML = h
+
+    renderHighlights: ->
+        log 'renderHighlights1', @highlights
+        h = ""
+        s = @highlightsRelativeToLineIndexRange([@topIndex, @botIndex])
+        log 'renderHighlights2', s
+        if s
+            h += render.selection s, @size
+        $('.highlights', @view).innerHTML = h
         
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     
@@ -211,6 +233,12 @@ class ViewBase extends Editor
             delta = newBot - @botIndex
         return delta
     
+    #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
+    # 000       000   000  000   000  0000  000  000        000       000   000
+    # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
+    # 000       000   000  000   000  000  0000  000   000  000       000   000
+    #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
+    
     changed: (changeInfo) ->
         # log 'viewbase.changed selection', changeInfo.selection
         indices = []
@@ -239,7 +267,10 @@ class ViewBase extends Editor
         if changeInfo.cursor.length
             @renderCursors()
         if changeInfo.selection.length
-            @renderSelection()            
+            @renderSelection()   
+                     
+        @renderHighlights()
+                     
         @updateSizeValues()        
     
     updateLine: (lineIndex) ->

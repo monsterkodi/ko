@@ -209,6 +209,8 @@ class undo
 
     cursor: (obj, newCursors) =>
         obj.cleanCursors newCursors
+        if newCursors.length != obj.cursors.length
+            obj.initialCursors = _.cloneDeep newCursors
         @changeInfoCursor obj
         @lastAction().curAfter = newCursors
         obj.cursors = newCursors
