@@ -315,15 +315,18 @@ body
         
 @keyframes blink 
   from 
-    color: black
+    background      yellow
   to 
-    color: yellow
+    background      #444
         
 *:focus .cursor
-    background      yellow // focus 
-    animation-name  blink
+    background          yellow // focus 
+    animation-name      blink
+    animation-duration  500ms
+    animation-iteration-count infinite
+    animation-direction alternate
     &.virtual
-        background  #444 
+        background      #444 
     
 .cursor
     width            2px
