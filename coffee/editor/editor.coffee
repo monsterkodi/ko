@@ -60,37 +60,46 @@ class Editor extends Buffer
         # @singleCursorAtPos [range[1][1], range[0]], true
         @do.end()
 
-    selectAdditionalRange: (range) ->
-        @do.start()
-        s = _.cloneDeep @selections
-        s.push range
-        @do.selection @, s
-        @setCursor range[1][1], range[0]
-        @do.end()        
-
     selectNone: -> @do.selection @, []
 
-    selectLineAtIndex: (i) -> @selectAdditionalRange @rangeForLineAtIndex i
-    deselectLineAtIndex: (i) ->
-        # @do.start()
-        # @do.selection @, [range]
-        # @setCursor range[1][1], range[0]
-        # @do.end()
-
-    selectMoreLines: -> 
+    selectMoreLines: ->
+        @do.start()
+        newSelections = _.cloneDeep @selections
+        newCursors = _.cloneDeep @cursors
+        
+        selectCursorLineAtIndex = (c,i) =>
+            range = @rangeForLineAtIndex i
+            newSelections.push range
+            newCursors[@indexOfCursor(c)] = [range[1][1], range[0]]
+            
         start = false
         for c in @cursors
             if not @isSelectedLineAtIndex c[1]
-                @selectLineAtIndex c[1]
+                selectCursorLineAtIndex c, c[1]
                 start = true
-        log 'selectMore: strted', start
-        return if start
-        for c in @cursors
-            @selectLineAtIndex c[1]+1
+        if not start
+            for c in @cursors
+                selectCursorLineAtIndex c, c[1]+1
+        @do.selection @, newSelections
+        @do.cursor @, newCursors
+        @do.end()       
 
     selectLessLines: -> 
-        for c in @cursors
-            @deselectLineAtIndex c[1]
+        @do.start()
+        newSelections = _.cloneDeep @selections
+        newCursors = _.cloneDeep @cursors
+        
+        for c in @reversedCursors() #@cursors
+            thisSel = @selectionsAtLineIndex(c[1])
+            if thisSel.length
+                if @isSelectedLineAtIndex c[1]-1
+                    s = @selectionsAtLineIndex(c[1]-1)[0]
+                    newCursors[@indexOfCursor(c)] = [s[1][1], s[0]]
+                newSelections.splice @indexOfSelection(thisSel[0]), 1
+
+        @do.selection @, newSelections
+        @do.cursor @, newCursors
+        @do.end()       
 
     selectAll: => @do.selection @, @rangesForAllLines()
             
@@ -463,28 +472,34 @@ class Editor extends Buffer
             
     deleteLineAtIndex: (i) ->
         @do.delete @lines, i
-        
-    deleteSelectionRange: (s) ->
-        @do.start()
-        @do.change @lines, s[0], @lines[s[0]].splice s[1][0], s[1][1]-s[1][0]
-        i = 
-        @do.end()
-            
+                    
     deleteSelection: ->
         @do.start()
+        newCursors = _.cloneDeep @cursors
         for s in @reversedSelections()
-            @deleteSelectionRange s
+            
+            # @startOfContinuousSelection
+            for c in @cursorsInRange s
+                newCursors[@indexOfCursor(c)][0] = s[1][0]
+
+            if @isSelectedLineAtIndex s[0]
+                @do.delete @lines, s[0]
+            else
+                @do.change @lines, s[0], @lines[s[0]].splice s[1][0], s[1][1]-s[1][0]
+                
+        @do.selection @, []
+        @do.cursor @, newCursors
         @do.end()
 
     deleteForward: ->
         if @selection?
             @deleteSelection()
-            return
-        for c in @cursors
-            if @cursorAtEndOfLine c
-                @joinLineOfCursor c
-            else
-                @do.change @lines, c[1], @lines[c[1]].splice c[0], 1
+        else
+            for c in @cursors
+                if @cursorAtEndOfLine c
+                    @joinLineOfCursor c
+                else
+                    @do.change @lines, c[1], @lines[c[1]].splice c[0], 1
         
     deleteTab: ->
         @do.start()
@@ -499,7 +514,7 @@ class Editor extends Buffer
         @do.end()
     
     deleteBackward: ->
-        if @selection?
+        if @selections.length
             @deleteSelection()
         else
             @do.start()

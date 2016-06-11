@@ -88,6 +88,13 @@ class Buffer
             if c[0] == p[0] and c[1] == p[1]
                 return c
                 
+    cursorsInRange: (r) ->
+        cs = []
+        for c in @cursors
+            if @isPosInRange c, r
+                cs.push c
+        cs
+                
     indexOfCursor: (c) -> @cursors.indexOf c
 
     reversedCursors: ->
@@ -123,6 +130,15 @@ class Buffer
             if s[1][0] == 0 and s[1][1] == @lines[li].length
                 return true
         false
+        
+    selectionsAtLineIndex: (li) ->
+        sl = []
+        for s in @selections
+            if s[0] == li
+                sl.push s
+        sl
+        
+    indexOfSelection: (s) -> @selections.indexOf s
 
     #  0000000  000   000  00000000    0000000   0000000   00000000 
     # 000       000   000  000   000  000       000   000  000   000
@@ -197,6 +213,9 @@ class Buffer
         l = clamp 0, @lines.length-1, p[1]
         c = clamp 0, @lines[l].length-1, p[0]
         [ c, l ]
+        
+    isPosInRange: (p, r) ->
+        return (p[1] == r[0]) and (r[1][0] <= p[0] <= r[1][1])
 
     # 00000000    0000000   000   000   0000000   00000000   0000000
     # 000   000  000   000  0000  000  000        000       000     
