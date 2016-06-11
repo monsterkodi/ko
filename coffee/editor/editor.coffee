@@ -4,15 +4,19 @@
 #000       000   000  000     000     000   000  000   000
 #00000000  0000000    000     000      0000000   000   000
 
+{
+clamp,
+first,
+last,
+$
+}       = require '../tools/tools'
+log     = require '../tools/log'
+watcher = require './watcher'
+Buffer  = require './buffer'
+undo    = require './undo'
 path    = require 'path'
 assert  = require 'assert'
 _       = require 'lodash'
-undo    = require './undo'
-Buffer  = require './buffer'
-watcher = require './watcher'
-log     = require '../tools/log'
-{clamp,
- last,$} = require '../tools/tools'
 
 class Editor extends Buffer
     
@@ -46,6 +50,28 @@ class Editor extends Buffer
         @do.reset()
             
     done: => 
+        
+    #  0000000  000  000   000   0000000   000      00000000
+    # 000       000  0000  000  000        000      000     
+    # 0000000   000  000 0 000  000  0000  000      0000000 
+    #      000  000  000  0000  000   000  000      000     
+    # 0000000   000  000   000   0000000   0000000  00000000
+    
+    singleCursorAtPos: (p, e) ->
+        if e and @initialCursors?.length > 1
+            @initialCursors = _.cloneDeep [@initialCursors[0]]
+        else if not e
+            @initialCursors = _.cloneDeep [p]
+        @startSelection e
+        @do.cursor @, [p]
+        @endSelection e
+        
+    selectSingleRange: (r) ->
+        log 'selectSingleRange', r
+        @initialCursors = _.cloneDeep [[r[1][0], r[0]]]
+        @startSelection true
+        @do.cursor @, [[r[1][1], r[0]]]
+        @endSelection true
             
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000
@@ -59,6 +85,34 @@ class Editor extends Buffer
         # @setCursor range[1][1], range[0]
         # @singleCursorAtPos [range[1][1], range[0]], true
         @do.end()
+
+    startSelection: (e) ->
+        if e and not @initialCursors
+            @initialCursors = _.cloneDeep @cursors
+            @do.selection @, @rangesForCursors @initialCursors
+        if not e
+            @do.selection @, []
+            
+    endSelection: (e) ->
+        
+        if not e
+            if @selections.length
+                @selectNone()
+            @initialCursors = _.cloneDeep @cursors
+            
+        if e and @initialCursors
+            newSelection = []
+            if @initialCursors.length != @cursors.length
+                log 'warn! @initialCursors.length != @cursors.length', @initialCursors.length, @cursors.length
+            
+            for ci in [0...@initialCursors.length]
+                ic = @initialCursors[ci]
+                cc = @cursors[ci]
+                ranges = @rangesBetweenPositions ic, cc
+                newSelection = newSelection.concat ranges
+                    
+            newSelection = @cleanRanges newSelection
+            @do.selection @, newSelection
 
     selectNone: -> @do.selection @, []
 
@@ -114,7 +168,6 @@ class Editor extends Buffer
         @highlights = @rangesForText @searchText
         if @highlights.length
             @selectRange @highlights[0]
-        # log 'highlightText', @highlights
         @renderHighlights()
 
     highlightTextOfSelection: -> # called from keyboard shortcut
@@ -122,27 +175,20 @@ class Editor extends Buffer
             @selectRange @rangeForWordAtPos @cursorPos()
         @searchText = @textInRange @selections[0]
         @highlights = @rangesForText @searchText
-        # log 'highlightTextOfSelection', @highlights
         @renderHighlights()
     
     selectNextHighlight: ->
         r = @rangeAfterPosInRanges @cursorPos(), @highlights
-        log 'selectNextHighlight r', r
-        if not r
-            @selectFirstHighlight()
-        else
-            @selectRange r
+        r ?= first @highlights
+        @selectSingleRange r
 
     selectPrevHighlight: ->
         r = @rangeBeforePosInRanges @cursorPos(), @highlights
-        if not r
-            @selectLastHighlight()
-        else
-            @selectRange r
-            
-    selectLastHighlight: -> @selectRange last @highlights
-    selectFirstHighlight: -> @selectRange @highlights[0]
-        
+        log 'selectPrevHighlight1', r
+        r ?= last @highlights
+        log 'selectPrevHighlight2', r
+        @selectSingleRange r
+                    
     #  0000000  000   000  00000000    0000000   0000000   00000000 
     # 000       000   000  000   000  000       000   000  000   000
     # 000       000   000  0000000    0000000   000   000  0000000  
@@ -200,22 +246,7 @@ class Editor extends Buffer
     cancelCursorsAndHighlights: () ->
         @cancelCursors()
         @highlights = []
-        @renderHighlights()    
-
-    #  0000000  000  000   000   0000000   000      00000000
-    # 000       000  0000  000  000        000      000     
-    # 0000000   000  000 0 000  000  0000  000      0000000 
-    #      000  000  000  0000  000   000  000      000     
-    # 0000000   000  000   000   0000000   0000000  00000000
-    
-    singleCursorAtPos: (p, e) ->
-        if e and @initialCursors?.length > 1
-            @initialCursors = _.cloneDeep [@initialCursors[0]]
-        else if not e
-            @initialCursors = _.cloneDeep [p]
-        @startSelection e
-        @do.cursor @, [p]
-        @endSelection e
+        @renderHighlights()            
 
     # 00     00   0000000   000   000  00000000
     # 000   000  000   000  000   000  000     
@@ -231,36 +262,7 @@ class Editor extends Buffer
     moveCursorToPos: (c, p) -> 
         @closingInserted = null
         @setCursorPos c, p
-                
-    startSelection: (e) ->
-        if e and not @initialCursors
-            @initialCursors = _.cloneDeep @cursors
-            @do.selection @, @rangesForCursors @initialCursors
-        if not e
-            @do.selection @, []
-            
-    endSelection: (e) ->
-        
-        if not e
-            if @selections.length
-                @selectNone()
-            @initialCursors = _.cloneDeep @cursors
-            
-        if e and @initialCursors
-            newSelection = []
-            if @initialCursors.length != @cursors.length
-                log 'warn! @initialCursors.length != @cursors.length', @initialCursors.length, @cursors.length
-            
-            for ci in [0...@initialCursors.length]
-                ic = @initialCursors[ci]
-                cc = @cursors[ci]
-                ranges = @rangesBetweenPositions ic, cc
-                newSelection = newSelection.concat ranges
-                    
-            newSelection = @cleanRanges newSelection
-            # log "endSelection ->", newSelection
-            @do.selection @, newSelection
-        
+                        
     moveAllCursors: (e, f) ->
         @startSelection e
         newCursors = _.cloneDeep @cursors
