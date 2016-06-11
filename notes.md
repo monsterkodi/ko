@@ -1,9 +1,15 @@
 # todo/ideas
     
-- fix virtual cursors
-- fix delete backwards
-- fix cursor positions
+- command-d
+- fix delete backwards!
+
+- insert spaces when inserting at virtual cursors
+
 - log in scroll area
+
+- search in multiple files
+
+- git status in gutter?
     
 - focus on editor after devTools opened
 - fix shift tab at line start
@@ -45,3 +51,6 @@
      - shortcut
 - tail -f mode
 - markdown mode (replace - with ●)
+
+- cosmetic
+  - fix highlight rounded borders     

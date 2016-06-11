@@ -70,8 +70,10 @@ class View extends ViewBase
         if changeInfo.changed.length or changeInfo.deleted.length or changeInfo.inserted.length
             @updateTitlebar() # sets dirty flag
         
-        if delta = @deltaToEnsureCursorIsVisible() 
-            # log "delta", delta, delta * @lineHeight
+        # log 'changed', changeInfo
+        
+        if delta = @deltaToEnsureCursorIsVisible() and changeInfo.cursor.length
+            log 'view.changed: scroll by delta', delta
             @scrollBy delta * @size.lineHeight #todo: slow down when using mouse
             @scrollCursor()
             return

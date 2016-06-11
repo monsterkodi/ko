@@ -79,13 +79,6 @@ class Editor extends Buffer
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
 
-    selectRange: (range) ->
-        @do.start()
-        @do.selection @, [range]
-        # @setCursor range[1][1], range[0]
-        # @singleCursorAtPos [range[1][1], range[0]], true
-        @do.end()
-
     startSelection: (e) ->
         if e and not @initialCursors
             @initialCursors = _.cloneDeep @cursors
@@ -113,6 +106,13 @@ class Editor extends Buffer
                     
             newSelection = @cleanRanges newSelection
             @do.selection @, newSelection
+
+    addRangeToSelection: (range) ->
+        @do.start()
+        newSelections = _.cloneDeep @selections
+        newSelections.push range
+        @do.selection @, newSelections
+        @do.end()
 
     selectNone: -> @do.selection @, []
 
@@ -167,12 +167,14 @@ class Editor extends Buffer
         @searchText = text
         @highlights = @rangesForText @searchText
         if @highlights.length
-            @selectRange @highlights[0]
+            r = @rangeAfterPosInRanges @cursorPos(), @highlights
+            r ?= first @highlights
+            @selectSingleRange r
         @renderHighlights()
 
-    highlightTextOfSelection: -> # called from keyboard shortcut
+    highlightTextOfSelection: -> # called from keyboard shortcuts
         if @selections.length == 0 
-            @selectRange @rangeForWordAtPos @cursorPos()
+            @selectSingleRange @rangeForWordAtPos @cursorPos()
         @searchText = @textInRange @selections[0]
         @highlights = @rangesForText @searchText
         @renderHighlights()
@@ -184,10 +186,13 @@ class Editor extends Buffer
 
     selectPrevHighlight: ->
         r = @rangeBeforePosInRanges @cursorPos(), @highlights
-        log 'selectPrevHighlight1', r
         r ?= last @highlights
-        log 'selectPrevHighlight2', r
         @selectSingleRange r
+
+    addNextHighlightToSelection: ->
+        r = @rangeAfterPosInRanges @cursorPos(), @highlights
+        r ?= first @highlights
+        @selectSingleRange r        
                     
     #  0000000  000   000  00000000    0000000   0000000   00000000 
     # 000       000   000  000   000  000       000   000  000   000
@@ -486,7 +491,10 @@ class Editor extends Buffer
                 newCursors[@indexOfCursor(c)][0] = s[1][0]
 
             if @isSelectedLineAtIndex s[0]
-                @do.delete @lines, s[0]
+                if @lines.length > 1
+                    @do.delete @lines, s[0]
+                else
+                    @do.change @lines, s[0], @lines[s[0]].splice s[1][0], s[1][1]-s[1][0]
             else
                 @do.change @lines, s[0], @lines[s[0]].splice s[1][0], s[1][1]-s[1][0]
                 

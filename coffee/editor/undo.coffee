@@ -266,12 +266,16 @@ class undo
         @check()
         
     delete: (lines, index) =>
-        @modify
-            index:   index
-            before:  lines[index]        
-        lines.splice index, 1
-        @changeInfoLineDelete index
-        @check()
+        if lines.length > 1
+            @modify
+                index:   index
+                before:  lines[index]        
+            lines.splice index, 1
+            @changeInfoLineDelete index
+            @check()
+        else
+            log 'warning! last line deleted?' 
+            alert 'wtf?'
         
     # 00000000  000   000  0000000  
     # 000       0000  000  000   000
