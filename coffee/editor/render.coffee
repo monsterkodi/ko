@@ -98,7 +98,7 @@ class render
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
                 
-    @selection: (ss, size) => # ss: [ [lineIndex, [startIndex, endIndex]], ... ]  (lineIndex relative to view)
+    @selection: (ss, size, clss='selection') => # ss: [ [lineIndex, [startIndex, endIndex]], ... ]  (lineIndex relative to view)
         
         h = ""
         p = null
@@ -106,11 +106,11 @@ class render
         for si in [0...ss.length]
             s = ss[si]
             n = (si < ss.length-1) and ss[si+1] or null
-            h += @selectionSpan p, s, n, size
+            h += @selectionSpan p, s, n, size, clss
             p = s
         h
         
-    @selectionSpan: (prev, sel, next, size) =>
+    @selectionSpan: (prev, sel, next, size, clss) =>
                                                                 
         # 0000000     0000000   00000000   0000000    00000000  00000000 
         # 000   000  000   000  000   000  000   000  000       000   000
@@ -145,7 +145,7 @@ class render
     
         empty = sel[1][0] == sel[1][1] and " empty" or ""
         
-        "<span class=\"selection#{border}#{empty}\" style=\"transform: translate(#{tx}px,#{ty}px); width: #{sw}px; height: #{lh}px\"></span>"
+        "<span class=\"#{clss}#{border}#{empty}\" style=\"transform: translate(#{tx}px,#{ty}px); width: #{sw}px; height: #{lh}px\"></span>"
     
 render.init()
                                             

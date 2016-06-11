@@ -20,7 +20,7 @@ class Find extends Command
         super command
         
         editor = window.editor
-        editor.markTextForSearch command
+        editor.highlightText command
         if editor.searchRanges.length
             return 'editor' 
         

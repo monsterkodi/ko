@@ -90,44 +90,44 @@ class Editor extends Buffer
 
     selectAll: => @do.selection @, @rangesForAllLines()
             
-    #  0000000  00000000   0000000   00000000    0000000  000   000
-    # 000       000       000   000  000   000  000       000   000
-    # 0000000   0000000   000000000  0000000    000       000000000
-    #      000  000       000   000  000   000  000       000   000
-    # 0000000   00000000  000   000  000   000   0000000  000   000
+    # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000
+    # 000   000  000  000        000   000  000      000  000        000   000     000   
+    # 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000   
+    # 000   000  000  000   000  000   000  000      000  000   000  000   000     000   
+    # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000   
 
-    markTextForSearch: (text) -> # called from find command
+    highlightText: (text) -> # called from find command
         @searchText = text
         @highlights = @rangesForText @searchText
         if @highlights.length
             @selectRange @highlights[0]
-        log 'markTextForSearch', @highlights
+        # log 'highlightText', @highlights
         @renderHighlights()
 
-    markSelectionForSearch: -> # called from keyboard shortcut
+    highlightTextOfSelection: -> # called from keyboard shortcut
         if @selections.length == 0 
             @selectRange @rangeForWordAtPos @cursorPos()
         @searchText = @textInRange @selections[0]
         @highlights = @rangesForText @searchText
-        log 'markSelectionForSearch', @highlights
+        # log 'highlightTextOfSelection', @highlights
         @renderHighlights()
-        
-    jumpToNextSearchResult: ->
+    
+    selectNextHighlight: ->
         r = @rangeAfterPosInRanges @cursorPos(), @highlights
         if not r
-            @jumpToFirstSearchResult()
+            @selectFirstHighlight()
         else
             @selectRange r
 
-    jumpToPrevSearchResult: ->
+    selectPrevHighlight: ->
         r = @rangeBeforePosInRanges @cursorPos(), @highlights
         if not r
-            @jumpToLastSearchResult()
+            @selectLastHighlight()
         else
             @selectRange r
             
-    jumpToLastSearchResult: -> @selectRange last @highlights
-    jumpToFirstSearchResult: -> @selectRange @highlights[0]
+    selectLastHighlight: -> @selectRange last @highlights
+    selectFirstHighlight: -> @selectRange @highlights[0]
         
     #  0000000  000   000  00000000    0000000   0000000   00000000 
     # 000       000   000  000   000  000       000   000  000   000

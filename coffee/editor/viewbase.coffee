@@ -177,18 +177,16 @@ class ViewBase extends Editor
         
     renderSelection: ->
         h = ""
-        s = @selectionsRelativeToLineIndexRange([@topIndex, @botIndex])
+        s = @selectionsRelativeToLineIndexRange [@topIndex, @botIndex]
         if s
             h += render.selection s, @size
         $('.selections', @view).innerHTML = h
 
     renderHighlights: ->
-        log 'renderHighlights1', @highlights
         h = ""
-        s = @highlightsRelativeToLineIndexRange([@topIndex, @botIndex])
-        log 'renderHighlights2', s
+        s = @highlightsRelativeToLineIndexRange [@topIndex, @botIndex]
         if s
-            h += render.selection s, @size
+            h += render.selection s, @size, "highlight"
         $('.highlights', @view).innerHTML = h
         
     # 000   000  00000000   0000000     0000000   000000000  00000000
@@ -330,9 +328,9 @@ class ViewBase extends Editor
             when 'command+k'                then return @selectAll() + @deleteSelection()
             when 'command+d'                then return @selectNone()
             when 'command+a'                then return @selectAll()
-            when 'command+e'                then return @markSelectionForSearch()
-            when 'command+g'                then return @jumpToNextSearchResult()
-            when 'command+shift+g'          then return @jumpToPrevSearchResult()
+            when 'command+e'                then return @highlightTextOfSelection()
+            when 'command+g'                then return @selectNextHighlight()
+            when 'command+shift+g'          then return @selectPrevHighlight()
             when 'command+c'                then return clipboard.writeText @textOfSelectionForClipboard()
             when 'command+z'                then return @do.undo @
             when 'command+shift+z'          then return @do.redo @
