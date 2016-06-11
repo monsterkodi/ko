@@ -89,7 +89,7 @@ class Editor extends Buffer
         newSelections = _.cloneDeep @selections
         newCursors = _.cloneDeep @cursors
         
-        for c in @reversedCursors() #@cursors
+        for c in @reversedCursors()
             thisSel = @selectionsAtLineIndex(c[1])
             if thisSel.length
                 if @isSelectedLineAtIndex c[1]-1
@@ -127,6 +127,7 @@ class Editor extends Buffer
     
     selectNextHighlight: ->
         r = @rangeAfterPosInRanges @cursorPos(), @highlights
+        log 'selectNextHighlight r', r
         if not r
             @selectFirstHighlight()
         else
