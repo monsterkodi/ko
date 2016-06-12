@@ -548,7 +548,7 @@ class Editor extends Buffer
                 nc[0] = sp[0]
                 nc[1] = sp[1]
 
-            if @isSelectedLineAtIndex s[0]
+            if @isSelectedLineAtIndex(s[0]) and @lines.length > 1
                 @do.delete @lines, s[0]
                 # move cursors below deleted line up
                 for nc in @positionsBelowLineIndexInPositions s[0], newCursors

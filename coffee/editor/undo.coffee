@@ -304,7 +304,7 @@ class undo
     cleanChangeInfo: ->
         @changeInfo.deleted.sort (a,b) -> a-b
         @changeInfo.cursor.sort (a,b) -> a-b
-        log 'cleanChangeInfo', @changeInfo
+        # log 'cleanChangeInfo', @changeInfo
                 
     # 00     00  00000000  00000000    0000000   00000000
     # 000   000  000       000   000  000        000     

@@ -1,6 +1,7 @@
 # todo/ideas
-    
-- fix delete backwards!
+
+- fix scroll to cursor on command+g / find    
+- fix word selection boundaries
 
 - history of file locations
 

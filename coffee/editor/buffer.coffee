@@ -68,6 +68,19 @@ class Buffer
     cursorInLastLine:    (c=@cursors[0]) -> c[1] == @lines.length-1
     cursorInFirstLine:   (c=@cursors[0]) -> c[1] == 0
 
+    # 000   000   0000000   00000000   0000000  
+    # 000 0 000  000   000  000   000  000   000
+    # 000000000  000   000  0000000    000   000
+    # 000   000  000   000  000   000  000   000
+    # 00     00   0000000   000   000  0000000  
+
+    rangeForWordAtPos: (pos) ->
+        p = @clampPos pos
+        wr = @wordRangesInLineAtIndex p[1]
+        r = @rangeAtPosInRanges p, wr
+        log 'rangeForWordAtPos', p, p[1], @lines[p[1]], wr, r
+        r
+
     endOfWordAtCursor: (c=@cursors[0]) =>
         r = @rangeForWordAtPos c
         if @cursorAtEndOfLine c
@@ -76,14 +89,22 @@ class Buffer
         [r[1][1], r[0]]
 
     startOfWordAtCursor: (c=@cursors[0]) =>
-        r = @rangeForWordAtPos c
         if @cursorAtStartOfLine c
             return c if @cursorInFirstLine c
             r = @rangeForWordAtPos [@lines[c[1]-1].length, c[1]-1]
-        else if r[0] == c[0]
-            r = @rangeForWordAtPos [c[0]-1, c[1]]
+        else 
+            r = @rangeForWordAtPos c
+            if r[1][0] == c[0]
+                r = @rangeForWordAtPos [c[0]-1, c[1]]
         [r[1][0], r[0]]
-            
+        
+    wordRangesInLineAtIndex: (i) ->
+        r = []
+        re = new RegExp "(\\s+|\\w+|[^\\s])", 'g'
+        while (mtch = re.exec(@lines[i])) != null
+            r.push [i, [mtch.index, re.lastIndex]]
+        r.length and r or [i, [0,0]]
+                        
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000   0000000
     # 000       000       000      000       000          000     000  000   000  0000  000  000     
     # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000  0000000 
@@ -252,7 +273,8 @@ class Buffer
     rangesForCursors: (cs=@cursors) -> ([c[1], [c[0], c[0]]] for c in cs)
     
     rangeAtPosInRanges: (pos, ranges) ->
-        for r in ranges
+        for ri in [ranges.length-1..0]
+            r = ranges[ri]
             if (r[0] == pos[1]) and (r[1][0] <= pos[0] <= r[1][1])
                 return r
             
@@ -268,7 +290,8 @@ class Buffer
                 return r
     
     rangeStartingOrEndingAtPosInRanges: (p, ranges) ->
-        for r in ranges
+        for ri in [ranges.length-1..0]
+            r = ranges[ri]
             if r[0] == p[1]
                 if r[1][0] == p[0] or r[1][1] == p[0]
                     return r
@@ -298,34 +321,7 @@ class Buffer
         for li in [0...@lines.length]
             r = r.concat @rangesForTextInLineAtIndex t, li
         r
-                
-    rangeForWordAtPos: (pos) ->
-        p = @clampPos pos
-        l = @lines[p[1]]
-        
-        return [p[1], [0,0]] if l.length == 0
-        
-        r = [p[0], p[0]]
-        c = l[r[0]]
-
-        wordReg = /(\@|\w)/
-        w = c.match wordReg
-
-        while r[0] > 0
-            n = l[r[0]-1]
-            m = n.match wordReg
-            if w? != m?
-                break
-            r[0] -= 1
-        while r[1] < l.length-1
-            n = l[r[1]+1]
-            m = n.match wordReg
-            if w? != m?
-                break
-            r[1] += 1
-        range = [p[1], [r[0], r[1]+1]]
-        range
-        
+                                        
     # 000   000  000   000  000   000   0000000  00000000  0000000    00000 
     # 000   000  0000  000  000   000  000       000       000   000     000
     # 000   000  000 0 000  000   000  0000000   0000000   000   000   000  
