@@ -72,7 +72,9 @@ class View extends ViewBase
         
         # log 'changed', changeInfo
         
-        if delta = @deltaToEnsureCursorIsVisible() and changeInfo.cursor.length
+        delta = @deltaToEnsureCursorsAreVisible()
+        log 'view.changed: delta', delta
+        if delta and changeInfo.cursor.length
             log 'view.changed: scroll by delta', delta
             @scrollBy delta * @size.lineHeight #todo: slow down when using mouse
             @scrollCursor()
@@ -220,7 +222,8 @@ class View extends ViewBase
             when 'command+/'        then return @toggleLineComment()
             when 'command+l'        then return @selectMoreLines()
             when 'command+shift+l'  then return @selectLessLines()
-            when 'command+up', 'command+down' then return @addCursors key
+            when 'control+up',       'control+down'       then return @alignCursors key
+            when 'command+up',       'command+down'       then return @addCursors key
             when 'command+shift+up', 'command+shift+down' then return @delCursors key
                                     
         switch key

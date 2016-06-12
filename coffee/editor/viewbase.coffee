@@ -232,17 +232,29 @@ class ViewBase extends Editor
         if @editorHeight > oldHeight
             @displayLines @topIndex
     
-    deltaToEnsureCursorIsVisible: ->
-        delta = 0
+    deltaToEnsureCursorsAreVisible: ->
+        topdelta = 0
         cl = @cursors[0][1]
         if cl < @topIndex + 2
-            newTop = Math.max 0, cl - 2
-            delta = newTop - @topIndex
+            topdelta = Math.max(0, cl - 2) - @topIndex
         else if cl > @botIndex - 4
-            newBot = Math.min @lines.length+1, cl + 4
-            delta = newBot - @botIndex
-        return delta
-    
+            topdelta = Math.min(@lines.length+1, cl + 4) - @botIndex
+        
+        botdelta = 0
+        cl = last(@cursors)[1]
+        if cl < @topIndex + 2
+            botdelta = Math.max(0, cl - 2) - @topIndex
+        else if cl > @botIndex - 4
+            botdelta = Math.min(@lines.length+1, cl + 4) - @botIndex
+            
+        # log topdelta, botdelta
+        if botdelta > 0
+            Math.max botdelta, topdelta
+        else if topdelta < 0
+            Math.min botdelta, topdelta
+        else
+            botdelta
+            
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000
     # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000

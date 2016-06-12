@@ -1,6 +1,6 @@
 name            ko
-version         0.1.0
-description     coffee script tool
+version         0.2.0
+description     coffee script editor
 main            js/main.js
 scripts
                 test      npm run kill && npm start
@@ -18,6 +18,7 @@ keywords
                 mac
                 osx
                 tool
+                shell
                 editor
                 coffee
                 script
