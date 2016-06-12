@@ -45,7 +45,6 @@ class Editor extends Buffer
             @watch = null
 
     setLines: (lines) ->
-        # log 'setLines', lines.length
         super lines
         @do.reset()
             
@@ -67,7 +66,6 @@ class Editor extends Buffer
         @endSelection e
         
     selectSingleRange: (r) ->
-        log 'selectSingleRange', r
         @initialCursors = _.cloneDeep [[r[1][0], r[0]]]
         @startSelection true
         @do.cursor @, [[r[1][1], r[0]]]
@@ -107,11 +105,18 @@ class Editor extends Buffer
             newSelection = @cleanRanges newSelection
             @do.selection @, newSelection
 
+    #  0000000   0000000    0000000    00000000    0000000   000   000   0000000   00000000
+    # 000   000  000   000  000   000  000   000  000   000  0000  000  000        000     
+    # 000000000  000   000  000   000  0000000    000000000  000 0 000  000  0000  0000000 
+    # 000   000  000   000  000   000  000   000  000   000  000  0000  000   000  000     
+    # 000   000  0000000    0000000    000   000  000   000  000   000   0000000   00000000
+    
     addRangeToSelection: (range) ->
         @do.start()
         newSelections = _.cloneDeep @selections
         newSelections.push range
         @do.selection @, newSelections
+        @do.cursor @, [@rangeEndPos range]
         @do.end()
 
     selectNone: -> @do.selection @, []
@@ -173,7 +178,7 @@ class Editor extends Buffer
         @renderHighlights()
 
     highlightTextOfSelection: -> # called from keyboard shortcuts
-        if @selections.length == 0 
+        if @selections.length == 0 # or @selections.length > 1 ?
             @selectSingleRange @rangeForWordAtPos @cursorPos()
         @searchText = @textInRange @selections[0]
         @highlights = @rangesForText @searchText
@@ -189,10 +194,31 @@ class Editor extends Buffer
         r ?= last @highlights
         @selectSingleRange r
 
-    addNextHighlightToSelection: ->
-        r = @rangeAfterPosInRanges @cursorPos(), @highlights
-        r ?= first @highlights
-        @selectSingleRange r        
+    highlightWordAndAddToSelection: ->
+        if @highlights.length == 0
+            @highlightTextOfSelection() # this also selects
+        else
+            cp = @cursorPos()
+            sr = @rangeAtPosInRanges cp, @selections
+            if sr # cursor in selection -> select next highlight
+                r = @rangeAfterPosInRanges cp, @highlights
+            else # select current highlight first
+                r = @rangeAtPosInRanges cp, @highlights
+            r ?= first @highlights
+            @addRangeToSelection r        
+            
+    removeSelectedHighlight: ->
+        cp = @cursorPos()
+        sr = @rangeAtPosInRanges cp, @selections
+        hr = @rangeAtPosInRanges cp, @highlights
+        if sr and hr
+            newSelections = _.cloneDeep @selections
+            newSelections.splice @indexOfSelection(sr), 1
+            @do.selection @, newSelections
+            pr = @rangeBeforePosInRanges cp, @highlights
+            pr ?= last @highlights
+            if pr 
+                @do.cursor @, [@rangeEndPos pr]
                     
     #  0000000  000   000  00000000    0000000   0000000   00000000 
     # 000       000   000  000   000  000       000   000  000   000

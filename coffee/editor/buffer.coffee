@@ -217,6 +217,9 @@ class Buffer
     isPosInRange: (p, r) ->
         return (p[1] == r[0]) and (r[1][0] <= p[0] <= r[1][1])
 
+    rangeEndPos:   (r) -> [r[1][1], r[0]]
+    rangeStartPos: (r) -> [r[1][0], r[0]]
+
     # 00000000    0000000   000   000   0000000   00000000   0000000
     # 000   000  000   000  0000  000  000        000       000     
     # 0000000    000000000  000 0 000  000  0000  0000000   0000000 
@@ -238,17 +241,33 @@ class Buffer
         r
     
     rangesForCursors: (cs=@cursors) -> ([c[1], [c[0], c[0]]] for c in cs)
-            
-    rangeAfterPosInRanges: (pos, ranges) ->
-        for r in ranges
-            if (r[0] > pos[1]) or ((r[0] == pos[1]) and (r[1][0] > pos[0]))
-                return r
+    
+    
 
+    rangeAtPosInRanges: (pos, ranges) ->
+        for r in ranges
+            if (r[0] == pos[1]) and (r[1][0] <= pos[0] <= r[1][1])
+                return r
+            
     rangeBeforePosInRanges: (pos, ranges) ->
         for ri in [ranges.length-1..0]
             r = ranges[ri]
             if (r[0] < pos[1]) or ((r[0] == pos[1]) and (r[1][1] < pos[0]))
                 return r 
+    
+    rangeAfterPosInRanges: (pos, ranges) ->
+        for r in ranges
+            if (r[0] > pos[1]) or ((r[0] == pos[1]) and (r[1][0] > pos[0]))
+                return r
+    
+    
+    rangeStartingOrEndingAtPosInRanges: (p, ranges) ->
+        for r in ranges
+            if r[0] == p[1]
+                if r[1][0] == p[0] or r[1][1] == p[0]
+                    return r
+        
+    
     
     rangeForLineAtIndex: (i) -> 
         throw new Error() if i >= @lines.length
@@ -319,18 +338,6 @@ class Buffer
         e = Math.min(a[1], b[1])
         [s, e] if s<=e
         
-    # 000000000   0000000    0000000   000       0000000
-    #    000     000   000  000   000  000      000     
-    #    000     000   000  000   000  000      0000000 
-    #    000     000   000  000   000  000           000
-    #    000      0000000    0000000   0000000  0000000 
-        
-    rangeStartingOrEndingAtPos: (ranges, p) ->
-        for r in ranges
-            if r[0] == p[1]
-                if r[1][0] == p[0] or r[1][1] == p[0]
-                    return r
-                
     #  0000000   0000000   00000000   000000000
     # 000       000   000  000   000     000   
     # 0000000   000   000  0000000       000   

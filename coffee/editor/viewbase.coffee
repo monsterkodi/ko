@@ -236,14 +236,12 @@ class ViewBase extends Editor
     deltaToEnsureCursorIsVisible: ->
         delta = 0
         cl = @cursors[0][1]
-        log 'cl', cl, @topIndex, @botIndex
         if cl < @topIndex + 2
             newTop = Math.max 0, cl - 2
             delta = newTop - @topIndex
         else if cl > @botIndex - 4
             newBot = Math.min @lines.length+1, cl + 4
             delta = newBot - @botIndex
-        log 'delta', delta
         return delta
     
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
@@ -344,7 +342,8 @@ class ViewBase extends Editor
             when 'command+a'                then return @selectAll()
             when 'command+shift+a'          then return @selectNone()
             when 'command+e'                then return @highlightTextOfSelection()
-            when 'command+d'                then return @addNextHighlightToSelection()
+            when 'command+d'                then return @highlightWordAndAddToSelection()
+            when 'command+shift+d'          then return @removeSelectedHighlight()
             when 'command+g'                then return @selectNextHighlight()
             when 'command+shift+g'          then return @selectPrevHighlight()
             when 'command+c'                then return clipboard.writeText @textOfSelectionForClipboard()

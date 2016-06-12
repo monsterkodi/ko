@@ -3,6 +3,8 @@
 - command-d
 - fix delete backwards!
 
+- history of file locations
+
 - insert spaces when inserting at virtual cursors
 
 - log in scroll area
