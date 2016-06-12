@@ -31,9 +31,10 @@ class Goto extends Command
             line = clamp 0, editor.lines.length-1, line
             editor.selectNone()
             editor.setCursor 0, line
-            return 'editor'
+
+            focus: 'editor'
         else
-            return 'clear'
+            text: ''
             
         
 module.exports = Goto

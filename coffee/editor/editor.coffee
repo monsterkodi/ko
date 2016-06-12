@@ -149,10 +149,10 @@ class Editor extends Buffer
         newCursors = _.cloneDeep @cursors
         
         for c in @reversedCursors()
-            thisSel = @selectionsAtLineIndex(c[1])
+            thisSel = @selectionsInLineAtIndex(c[1])
             if thisSel.length
                 if @isSelectedLineAtIndex c[1]-1
-                    s = @selectionsAtLineIndex(c[1]-1)[0]
+                    s = @selectionsInLineAtIndex(c[1]-1)[0]
                     newCursors[@indexOfCursor(c)] = [s[1][1], s[0]]
                 newSelections.splice @indexOfSelection(thisSel[0]), 1
 
@@ -355,34 +355,39 @@ class Editor extends Buffer
     # 000  000 0 000  000   000  0000000   000 0 000     000   
     # 000  000  0000  000   000  000       000  0000     000   
     # 000  000   000  0000000    00000000  000   000     000   
-    
-    indentLineAtIndex: (i) ->
-        @do.start()
-        @do.change @lines, i, @indentString + @lines[i]
-        if (@cursors[0][1] == i) and @cursors[0][0] > 0
-            @moveCursorToPos @cursors[0], [@cursors[0][0] + @indentString.length, @cursors[0][1]]
-        if (@selection?[1] == i) and @selection[0] > 0
-            @setSelection @selection[0] + @indentString.length, @selection[1]
-        @do.end()
-    
-    deIndentLineAtIndex: (i) ->
-        @do.start()
-        if @lines[i].startsWith @indentString
-            @do.change @lines, i, @lines[i].substr @indentString.length
-            if (@cursors[0][1] == i) and (@cursors[0][0] > 0)
-                @moveCursorToPos @cursors[0], [Math.max(0, @cursors[0][0] - @indentString.length), @cursors[0][1]]
-            if (@selection?[1] == i) and (@selection[0] > 0)
-                @setSelection Math.max(0, @selection[0] - @indentString.length), @selection[1]
-        @do.end()
-    
+            
     deIndent: -> 
         @do.start()
-        for i in @cursorOrSelectedLineIndices()
-            @deIndentLineAtIndex i
+        newSelections = _.cloneDeep @selections
+        newCursors = _.cloneDeep @cursors
+        for i in @cursorAndSelectedLineIndices()
+            if @lines[i].startsWith @indentString
+                @do.change @lines, i, @lines[i].substr @indentString.length
+                for c in @cursorsInLineAtIndex i
+                    newCursors[@indexOfCursor c][0] -= @indentString.length
+                for s in @selectionsInLineAtIndex i
+                    ns = newSelections[@indexOfSelection s]
+                    ns[1][0] -= @indentString.length
+                    ns[1][1] -= @indentString.length
+        @do.selection @, newSelections
+        @do.cursor @, newCursors
         @do.end()
         
     indent: ->
-        @indentLineAtIndex @cursors[0][1]
+        @do.start()
+        newSelections = _.cloneDeep @selections
+        newCursors = _.cloneDeep @cursors
+        for i in @cursorAndSelectedLineIndices()
+            @do.change @lines, i, @indentString + @lines[i]
+            for c in @cursorsInLineAtIndex i
+                newCursors[@indexOfCursor c][0] += @indentString.length
+            for s in @selectionsInLineAtIndex i
+                ns = newSelections[@indexOfSelection s]
+                ns[1][0] += @indentString.length
+                ns[1][1] += @indentString.length
+        @do.selection @, newSelections
+        @do.cursor @, newCursors
+        @do.end()
            
     #  0000000   0000000   00     00  00     00  00000000  000   000  000000000
     # 000       000   000  000   000  000   000  000       0000  000     000   
@@ -393,7 +398,7 @@ class Editor extends Buffer
     toggleLineComment: ->
         lineComment = "#" # todo: make this file type dependent
         @do.start()
-        for i in @cursorOrSelectedLineIndices()
+        for i in @cursorAndSelectedLineIndices()
             cs = @lines[i].indexOf lineComment
             if cs >= 0 and @lines[i].substr(0,cs).trim().length == 0
                 @do.change @lines, i, @lines[i].splice cs, 1
@@ -435,7 +440,7 @@ class Editor extends Buffer
     insertSurroundCharacter: (ch) ->
         @do.start()
         
-        if @selection?
+        if @selections.length
             # log 'surround selection', ch, @selection
             for r in @selectionsInLineIndexRange [0,@lines.length-1]
                 [cl,cr] = switch ch
@@ -470,17 +475,13 @@ class Editor extends Buffer
 
     insertTab: ->
         @do.start()
-        if @selection?
-            for i in @selectedLineIndices()
-                @indentLineAtIndex i
+        if @selections.length
+            @indent()
         else
             newCursors = _.cloneDeep @cursors
             il = @indentString.length
             for c in @cursors
                 n = 4-(c[0]%il)
-                # for i in [0...(4-(c[0]%il))]
-                #     @do.change @lines, c[1], @lines[c[1]].splice c[0], 0, ' '
-                # @setCursorPos c, [c[0]+1, c[1]]
                 @do.change @lines, c[1], @lines[c[1]].splice c[0], 0, _.padStart "", n
                 newCursors[@indexOfCursor c] = [c[0]+n, c[1]]
             @do.cursor @, newCursors
@@ -557,7 +558,7 @@ class Editor extends Buffer
         @clearHighlights()
 
     deleteForward: ->
-        if @selection?
+        if @selections.length
             @deleteSelection()
         else
             for c in @cursors

@@ -191,7 +191,9 @@ class Open extends Command
                 super opened[0]
             else
                 super selected
-            return 'editor'
+                
+            text:  (path.basename(f) for f in opened).join ' '
+            focus: 'editor'
 
     # 00000000    0000000    0000000  000   000   0000000    0000000   00000000
     # 000   000  000   000  000       000  000   000   000  000        000     

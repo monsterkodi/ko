@@ -22,6 +22,6 @@ class Find extends Command
         editor = window.editor
         editor.highlightText command
         if editor.highlights.length
-            return 'editor' 
+            focus: 'editor' 
         
 module.exports = Find

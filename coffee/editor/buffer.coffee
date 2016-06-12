@@ -43,9 +43,9 @@ class Buffer
         sl
         
     reversedSelections: ->
-        r = _.clone @selections
-        r.reverse()
-        r
+        sl = _.clone @selections
+        sl.reverse()
+        sl
 
     # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000   0000000
     # 000   000  000  000        000   000  000      000  000        000   000     000     000     
@@ -79,11 +79,11 @@ class Buffer
     #  0000000   0000000   000   000  0000000    0000000   000   000  0000000 
     
     cursorsRelativeToLineIndexRange: (lineIndexRange) ->
-        cl = []
+        cs = []
         for c in @cursors
             if c[1] >= lineIndexRange[0] and c[1] <= lineIndexRange[1]
-                cl.push [c[0], c[1] - lineIndexRange[0]]
-        cl
+                cs.push [c[0], c[1] - lineIndexRange[0]]
+        cs
         
     cursorAtPos: (p) ->
         for c in @cursors
@@ -103,6 +103,13 @@ class Buffer
         cs = _.clone @cursors
         cs.reverse()
         cs
+
+    cursorsInLineAtIndex: (li) ->
+        cs = []
+        for c in @cursors
+            if c[1] == li
+                cs.push c
+        cs
     
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000
@@ -110,16 +117,13 @@ class Buffer
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
             
-    selectedLineIndices: -> (s[0] for s in @selections)
+    selectedLineIndices: -> _.uniq (s[0] for s in @selections)
+    cursorLineIndices:   -> _.uniq (c[1] for c in @cursors)
 
-    cursorOrSelectedLineIndices: ->
-        l = @selectedLineIndices()
-        if l.length == 0
-            l = [@cursors[0][1]] 
-        l
+    cursorAndSelectedLineIndices: ->
+        _.uniq @selectedLineIndices().concat @cursorLineIndices()
                 
     selectedLineIndicesRange: ->
-        # log 'selectedLineIndicesRange', @selections
         if @selections.length
             [first(@selections)[0], last(@selections)[0]]
         else
@@ -133,7 +137,7 @@ class Buffer
                 return true
         false
         
-    selectionsAtLineIndex: (li) ->
+    selectionsInLineAtIndex: (li) ->
         sl = []
         for s in @selections
             if s[0] == li
@@ -290,7 +294,6 @@ class Buffer
         r = []
         for li in [0...@lines.length]
             r = r.concat @rangesForTextInLineAtIndex t, li
-        log 'rangesForText', t, r
         r
                 
     rangeForWordAtPos: (pos) ->
