@@ -217,8 +217,9 @@ class Buffer
     isPosInRange: (p, r) ->
         return (p[1] == r[0]) and (r[1][0] <= p[0] <= r[1][1])
 
-    rangeEndPos:   (r) -> [r[1][1], r[0]]
-    rangeStartPos: (r) -> [r[1][0], r[0]]
+    rangeEndPos:   (r)   -> [r[1][1], r[0]]
+    rangeStartPos: (r)   -> [r[1][0], r[0]]
+    rangeIndexPos: (r,i) -> [r[1][i], r[0]]
 
     # 00000000    0000000   000   000   0000000   00000000   0000000
     # 000   000  000   000  0000  000  000        000       000     
@@ -237,13 +238,10 @@ class Buffer
         if b[1] - a[1] > 1
             for i in [a[1]+1...b[1]]
                 r.push [i, [0,@lines[i].length]]
-        # log 'rangesBetweenPositions a:', a, 'b:', b, '->', r
         r
     
     rangesForCursors: (cs=@cursors) -> ([c[1], [c[0], c[0]]] for c in cs)
     
-    
-
     rangeAtPosInRanges: (pos, ranges) ->
         for r in ranges
             if (r[0] == pos[1]) and (r[1][0] <= pos[0] <= r[1][1])
@@ -260,15 +258,12 @@ class Buffer
             if (r[0] > pos[1]) or ((r[0] == pos[1]) and (r[1][0] > pos[0]))
                 return r
     
-    
     rangeStartingOrEndingAtPosInRanges: (p, ranges) ->
         for r in ranges
             if r[0] == p[1]
                 if r[1][0] == p[0] or r[1][1] == p[0]
                     return r
         
-    
-    
     rangeForLineAtIndex: (i) -> 
         throw new Error() if i >= @lines.length
         [i, [0, @lines[i].length]] 
@@ -289,7 +284,6 @@ class Buffer
             r.push [i, [si+ci, si+ci+t.length]]
             si += ci+t.length
             l = l.slice si
-        # log 'rangesForTextInLineAtIndex', i, @lines[i], 't:', t, 'r::', r
         r
         
     rangesForText: (t) ->
@@ -324,7 +318,6 @@ class Buffer
                 break
             r[1] += 1
         range = [p[1], [r[0], r[1]+1]]
-        log 'rangeForWordAtPos', pos, range
         range
         
     # 000   000  000   000  000   000   0000000  00000000  0000000    00000 

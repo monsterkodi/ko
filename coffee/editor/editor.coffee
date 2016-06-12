@@ -263,6 +263,15 @@ class Editor extends Buffer
             newCursors.push [c[0], c[1]+d]
         @do.cursor @, newCursors 
 
+    addCursorsForSelections: (i) ->
+        @do.start()
+        @do.cursor @, (@rangeIndexPos(s,i) for s in @selections) 
+        @do.selection @, []
+        @do.end()
+    
+    cursorsAtStartOfSelections: -> @addCursorsForSelections 0
+    cursorsAtEndOfSelections: -> @addCursorsForSelections 1
+
     delCursors: (dir='up') ->
         newCursors = _.cloneDeep @cursors
         d = switch dir
@@ -324,6 +333,12 @@ class Editor extends Buffer
         @moveAllCursors e, moveLeft(n)
         
     moveCursors: (direction, e) ->
+        
+        if @selections.length > 1 and @cursors.length == 1
+            switch direction
+                when 'left'  then return @cursorsAtStartOfSelections()
+                when 'right' then return @cursorsAtEndOfSelections()
+        
         switch direction
             when 'left'  then @moveCursorsLeft e
             when 'right' then @moveCursorsRight e
