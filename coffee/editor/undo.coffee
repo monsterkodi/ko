@@ -91,8 +91,10 @@ class undo
             @redoCursor obj, action
             @redoSelection obj, action
             @actions.push action
+            
+            @cleanChangeInfo()
             obj.changed @changeInfo
-            log "redo @changeInfo", @changeInfo
+            # log "redo @changeInfo", @changeInfo
             @delChangeInfo()
 
     redoLine: (obj, line) ->
@@ -137,6 +139,7 @@ class undo
             @undoSelection obj, action
             @futures.unshift action
 
+            @cleanChangeInfo()
             obj.changed @changeInfo
             # log "undo @changeInfo", @changeInfo
             @delChangeInfo()

@@ -504,7 +504,7 @@ class Editor extends Buffer
         
         newCursors = _.cloneDeep @cursors
 
-        for c in @cursors #@reversedCursors()
+        for c in @cursors
             oc = _.cloneDeep newCursors[@indexOfCursor c]                
             if opt.indent
                 indent = _.padStart "", @indentationAtLineIndex oc[1]            

@@ -1,16 +1,13 @@
 # todo/ideas
 
-- fix undo of insert newline of multiple cursors
-- clamp cursors before inserting
+- clamp cursors when clicking without command
+- or insert spaces when inserting at virtual cursors
 
 - open command
     - re-load files when input resolves to existing directory
     
 - minimap    
 - history of file locations
-
-- insert spaces when inserting at virtual cursors
-
 - log in scroll area
 
 - search in multiple files

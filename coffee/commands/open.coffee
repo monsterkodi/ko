@@ -47,7 +47,7 @@ class Open extends Command
         return if not @list? 
         command  = command.trim()
         if command.length
-            log 'command', command, @resolvedPath command
+            # log 'command', command, @resolvedPath command
             if dirExists @resolvedPath command
                 log 'rebuild files for', @resolvedPath command
                 @dir = @resolvedPath command
@@ -55,7 +55,7 @@ class Open extends Command
                 @buildFileList()
                 @listFiles @files
                 @select 0                
-                log @files.splice 0,10
+                # log @files.splice 0,10
             else
                 fuzzied  = fuzzy.filter command, @files       
                 filtered = (f.string for f in fuzzied)
@@ -113,7 +113,7 @@ class Open extends Command
         
     openFileAtIndex: (i) =>
         @select i
-        if @execute() == 'editor'
+        if @execute().focus == 'editor'
             split.focusEditor()
     
     #  0000000  000000000   0000000   00000000   000000000
@@ -151,7 +151,8 @@ class Open extends Command
     buildFileList: ->   
         that = @
         try
-            walkdir.sync @pkg, max_depth: 3, (p) ->
+            dir = @pkg ? @dir
+            walkdir.sync dir, max_depth: 3, (p) ->
                 name = path.basename p
                 extn = path.extname p
                 if name in ['node_modules', 'app', 'img', 'dist', 'build', 'Library', 'Applications']
@@ -165,16 +166,36 @@ class Open extends Command
                 if that.files.length > 500
                     @end()
         catch err
-            log err
+            log 'open.buildFileList.error:', err
+            log 'while loading dir:', dir
             
         base = @dir
+        
+        # 000   000  00000000  000   0000000   000   000  000000000
+        # 000 0 000  000       000  000        000   000     000   
+        # 000000000  0000000   000  000  0000  000000000     000   
+        # 000   000  000       000  000   000  000   000     000   
+        # 00     00  00000000  000   0000000   000   000     000   
+        
         weight = (f) =>
+            
+            extnameBonus = switch path.extname(f)
+                when '.coffee', '.noon' then 100
+                when '.md' then 50
+                when '.js', '.json' then -1000000
+                else 
+                    0 
+                
+            bonus = extnameBonus - path.basename(f).length
+            log 'f', f, bonus, extnameBonus
+                
             if f.startsWith @dir
-                return 10000-path.dirname(f).length
+                return 10000-path.dirname(f).length+bonus
             if f.startsWith path.dirname @dir
-                return 5000-path.dirname(f).length
+                return 5000-path.dirname(f).length+bonus
             else
-                return 1000-path.dirname(f).length
+                return 1000-path.dirname(f).length+bonus
+                
         @files.sort (a,b) -> weight(b) - weight(a)
         
         if @history.length
@@ -218,6 +239,9 @@ class Open extends Command
                 
             text:  (path.basename(f) for f in opened).join ' '
             focus: 'editor'
+            status: 'ok'
+        else
+            status: 'failed'
 
     # 00000000    0000000    0000000  000   000   0000000    0000000   00000000
     # 000   000  000   000  000       000  000   000   000  000        000     

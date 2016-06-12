@@ -126,10 +126,10 @@ loadFile = (file) =>
         setState 'file', file
         ipc.send 'reloadMenu'
 
-openFiles = (files, options) =>
-    # log 'openFiles:', files
-    if files?.length
-        files = fileList files, ignoreHidden: false
+openFiles = (ofiles, options) =>
+    # log 'openFiles:', ofiles    
+    if ofiles?.length
+        files = fileList ofiles, ignoreHidden: false
         # log 'open:', files
         if files.length >= 10
             answer = dialog.showMessageBox
@@ -141,7 +141,9 @@ openFiles = (files, options) =>
                 message: "You have selected #{files.length} files."
                 detail: "Are you sure you want to open that many files?"
             return if answer != 1
-        ofiles = _.clone files
+        if files.length == 0
+            log 'window.openFiles.warning: no files for?', ofiles
+            return []
         setState 'openFilePath', path.dirname files[0]                    
         if not options?.newWindow
             loadFile resolve files.shift()

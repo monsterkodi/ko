@@ -78,7 +78,7 @@ class Buffer
         p = @clampPos pos
         wr = @wordRangesInLineAtIndex p[1]
         r = @rangeAtPosInRanges p, wr
-        log 'rangeForWordAtPos', p, p[1], @lines[p[1]], wr, r
+        # log 'rangeForWordAtPos', p, p[1], @lines[p[1]], wr, r
         r
 
     endOfWordAtCursor: (c=@cursors[0]) =>

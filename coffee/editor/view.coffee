@@ -73,9 +73,9 @@ class View extends ViewBase
         # log 'changed', changeInfo
         
         delta = @deltaToEnsureCursorsAreVisible()
-        log 'view.changed: delta', delta
+        # log 'view.changed: delta', delta
         if delta and changeInfo.cursor.length
-            log 'view.changed: scroll by delta', delta
+            # log 'view.changed: scroll by delta', delta
             @scrollBy delta * @size.lineHeight #todo: slow down when using mouse
             @scrollCursor()
             return

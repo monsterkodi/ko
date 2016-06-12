@@ -82,7 +82,7 @@ module.exports =
                         continue
                     files.push p
             catch err
-                log err
+                log 'tools.fileList.error:', err
         files
         
     fileExists: (file) ->

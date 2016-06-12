@@ -55,8 +55,8 @@ class Commandline extends ViewBase
         
     execute: ->
         r = @command?.execute @lines[0]
-        @setText r.text if r.text?
-        split.focusEditor() if r.focus == 'editor'
+        @setText r.text if r?.text?
+        split.focusEditor() if r?.focus == 'editor'
         
     cancel: ->
         @command?.cancel()
