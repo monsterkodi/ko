@@ -132,6 +132,7 @@ class undo
         if @actions.length
             @newChangeInfo()
             action = @actions.pop()
+            log 'undo action', action
             if action.lines.length
                 for i in [action.lines.length-1..0]
                     @undoLine obj, action.lines[i]
@@ -165,7 +166,7 @@ class undo
         
     undoCursor: (obj, action) =>
         @changeInfoCursor obj
-        obj.cursor = action.curBefore if action.curBefore?
+        obj.cursors = action.curBefore if action.curBefore?
         @changeInfoCursor obj
         
     # 000       0000000    0000000  000000000

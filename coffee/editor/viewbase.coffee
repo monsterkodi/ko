@@ -216,7 +216,6 @@ class ViewBase extends Editor
         @bufferHeight = @numVisibleLines() * @size.lineHeight
         @editorHeight = @numViewLines() * @size.lineHeight
         @scrollMax    = @bufferHeight - @editorHeight + @size.lineHeight
-        # log "updateSizeValues", @viewHeight(), @editorHeight
     
     updateNumLines: ->
         viewLines = @numViewLines()
@@ -281,7 +280,6 @@ class ViewBase extends Editor
             @renderSelection()   
                      
         @renderHighlights()
-                     
         @updateSizeValues()        
     
     updateLine: (lineIndex) ->
@@ -332,7 +330,7 @@ class ViewBase extends Editor
         return if not combo
         return if key == 'right click' # weird right command key
 
-        log "viewbase key:", key, "mod:", mod, "combo:", combo
+        # log "viewbase key:", key, "mod:", mod, "combo:", combo
         
         if 'unhandled' != @handleModKeyComboEvent mod, key, combo, event
             return

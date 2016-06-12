@@ -69,6 +69,8 @@ class Buffer
         r = _.clone @highlights
         r.reverse()
         r
+        
+    posInHighlights: (p) -> @highlights.length and @rangeAtPosInRanges p, @highlights
                     
     #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
     # 000       000   000  000   000  000       000   000  000   000  000     

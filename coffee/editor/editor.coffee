@@ -169,8 +169,7 @@ class Editor extends Buffer
     # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000   
 
     highlightText: (text) -> # called from find command
-        @searchText = text
-        @highlights = @rangesForText @searchText
+        @highlights = @rangesForText text
         if @highlights.length
             r = @rangeAfterPosInRanges @cursorPos(), @highlights
             r ?= first @highlights
@@ -180,8 +179,7 @@ class Editor extends Buffer
     highlightTextOfSelectionOrWordAtCursor: -> # called from keyboard shortcuts
         if @selections.length == 0 # or @selections.length > 1 ?
             @selectSingleRange @rangeForWordAtPos @cursorPos()
-        @searchText = @textInRange @selections[0]
-        @highlights = @rangesForText @searchText
+        @highlights = @rangesForText @textInRange @selections[0]
         @renderHighlights()
 
     clearHighlights: ->
@@ -189,7 +187,7 @@ class Editor extends Buffer
         @renderHighlights()
 
     selectAllHighlights: ->
-        if @highlights.length == 0
+        if not @posInHighlights @cursorPos()
             @highlightTextOfSelectionOrWordAtCursor()
         @do.selection @, _.cloneDeep @highlights
     
@@ -204,10 +202,10 @@ class Editor extends Buffer
         @selectSingleRange r
 
     highlightWordAndAddToSelection: ->
-        if @highlights.length == 0
+        cp = @cursorPos()
+        if not @posInHighlights cp
             @highlightTextOfSelectionOrWordAtCursor() # this also selects
         else
-            cp = @cursorPos()
             sr = @rangeAtPosInRanges cp, @selections
             if sr # cursor in selection -> select next highlight
                 r = @rangeAfterPosInRanges cp, @highlights
@@ -426,12 +424,12 @@ class Editor extends Buffer
 
         @do.start()
         @deleteSelection()
-        # log 'insertCharacter', @cursors
+        newCursors = _.cloneDeep @cursors
         for c in @cursors
-            throw new Error if c.length < 2
-            throw new Error if c[1] >= @lines.length
+            alert 'wtf?' if c.length < 2 or c[1] >= @lines.length
             @do.change @lines, c[1], @lines[c[1]].splice c[0], 0, ch
-            @setCursorPos c, [c[0]+1, c[1]]
+            newCursors[@indexOfCursor c] = [c[0]+1, c[1]]
+        @do.cursor @, newCursors
         @do.end()
         
     insertSurroundCharacter: (ch) ->
@@ -490,7 +488,7 @@ class Editor extends Buffer
         
         newCursors = _.cloneDeep @cursors
 
-        for c in @cursors
+        for c in @reversedCursors() #@cursors
             indent = _.padStart "", @indentationAtLineIndex c[1]
             if @cursorAtEndOfLine c
                 @do.insert @lines, c[1]+1, indent

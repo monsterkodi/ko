@@ -1,6 +1,5 @@
 # todo/ideas
     
-- command-d
 - fix delete backwards!
 
 - history of file locations
