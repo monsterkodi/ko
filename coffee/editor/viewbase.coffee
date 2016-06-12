@@ -397,6 +397,6 @@ class ViewBase extends Editor
                                                                                     
         ansiKeycode = require 'ansi-keycode'
         if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
-            @insertCharacter ansiKeycode event
+            @insertUserCharacter ansiKeycode event
 
 module.exports = ViewBase            

@@ -419,14 +419,22 @@ class Editor extends Buffer
     # 000  000  0000       000  000       000   000     000   
     # 000  000   000  0000000   00000000  000   000     000   
     
-    insertCharacter: (ch) ->
+    insertUserCharacter: (ch) ->
         @clearHighlights()
         if ch in @surroundCharacters #and (@cursor[0] == 0 or @lines[@cursor[1]][@cursor[0]-1] != '\\' )
             @insertSurroundCharacter ch
             return
 
         if ch == '\n'
-            @insertNewline()
+            @insertNewline indent:true
+            return
+            
+        @insertCharacter ch
+    
+    insertCharacter: (ch) ->
+
+        if ch == '\n'
+            @insertNewline indent:false
             return
 
         @do.start()
@@ -489,22 +497,34 @@ class Editor extends Buffer
             @do.cursor @, newCursors
             @do.end()   
         
-    insertNewline: ->
+    insertNewline: (opt) ->
         @closingInserted = null
         @do.start()
         @deleteSelection()
         
         newCursors = _.cloneDeep @cursors
 
-        for c in @reversedCursors() #@cursors
-            indent = _.padStart "", @indentationAtLineIndex c[1]
-            if @cursorAtEndOfLine c
-                @do.insert @lines, c[1]+1, indent
+        for c in @cursors #@reversedCursors()
+            oc = _.cloneDeep newCursors[@indexOfCursor c]                
+            if opt.indent
+                indent = _.padStart "", @indentationAtLineIndex oc[1]            
             else
-                @do.insert @lines, c[1]+1, indent + @lines[c[1]].substr c[0]
-                @do.change @lines, c[1],   @lines[c[1]].substr 0, c[0]
+                indent = ''
+
+            ll = oc[0]
                 
-            newCursors[@indexOfCursor(c)] = [indent.length, c[1]+1]
+            if @cursorAtEndOfLine oc
+                @do.insert @lines, oc[1]+1, indent
+            else
+                @do.insert @lines, oc[1]+1, indent + @lines[oc[1]].substr(oc[0]).trimLeft()
+                @do.change @lines, oc[1],   @lines[oc[1]].substr 0, oc[0]
+
+            # move cursors in and below deleted line down
+            
+            for nc in @positionsFromPosInPositions oc, newCursors
+                if nc[1] == oc[1]
+                    nc[0] += indent.length - ll
+                nc[1] += 1     
         
         @do.cursor @, newCursors    
         @do.end()

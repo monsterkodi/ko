@@ -212,7 +212,7 @@ class View extends ViewBase
         switch combo
             when 'tab'              then return @insertTab() + event.preventDefault() 
             when 'shift+tab'        then return @deleteTab() + event.preventDefault()
-            when 'enter'            then return @insertNewline()
+            when 'enter'            then return @insertNewline indent:true
             when 'command+]'        then return @indent()
             when 'command+['        then return @deIndent()
             when 'command+shift+='  then return @changeZoom +1

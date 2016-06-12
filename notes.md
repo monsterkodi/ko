@@ -1,6 +1,6 @@
 # todo/ideas
 
-- fix tab insertion when pasting
+- fix undo of insert newline of multiple cursors
 - clamp cursors before inserting
 
 - open command
