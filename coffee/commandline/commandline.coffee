@@ -32,7 +32,7 @@ class Commandline extends ViewBase
     changed: (changeInfo) ->
         super changeInfo
         if changeInfo.changed.length
-            log 'command line text changed', changeInfo
+            # log 'command line text changed', changeInfo
             @command?.changed @lines[0]
         
     loadCommands: ->

@@ -43,16 +43,13 @@ class Open extends Command
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
 
     changed: (command) ->
-        log 'changed', command, @files.slice 0,10
         return if not @list? 
         command  = command.trim()
         if command.length
             fuzzied  = fuzzy.filter command, @files       
             filtered = (f.string for f in fuzzied)
             @listFiles filtered
-            log 'filtered', filtered.slice 0,10
         else
-            log 'unfiltered', @files.slice 0,10
             @listFiles @files
         
         @select 0
@@ -219,7 +216,7 @@ class Open extends Command
             
     listFiles: (files) ->
         @list.innerHTML = ""        
-        if files.length <= 1
+        if files.length == 0
             @list.style.display = 'none'
         else
             @list.style.display = 'unset'

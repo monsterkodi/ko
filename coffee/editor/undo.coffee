@@ -132,7 +132,6 @@ class undo
         if @actions.length
             @newChangeInfo()
             action = @actions.pop()
-            log 'undo action', action
             if action.lines.length
                 for i in [action.lines.length-1..0]
                     @undoLine obj, action.lines[i]
@@ -141,7 +140,7 @@ class undo
             @futures.unshift action
 
             obj.changed @changeInfo
-            log "undo @changeInfo", @changeInfo
+            # log "undo @changeInfo", @changeInfo
             @delChangeInfo()
                                     
     undoLine: (obj, line) =>

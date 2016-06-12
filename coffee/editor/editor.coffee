@@ -474,11 +474,16 @@ class Editor extends Buffer
             for i in @selectedLineIndices()
                 @indentLineAtIndex i
         else
+            newCursors = _.cloneDeep @cursors
             il = @indentString.length
             for c in @cursors
-                for i in [0...(4-(c[0]%il))]
-                    @do.change @lines, c[1], @lines[c[1]].splice c[0], 0, ' '
-                    @setCursorPos c, [c[0]+1, c[1]]
+                n = 4-(c[0]%il)
+                # for i in [0...(4-(c[0]%il))]
+                #     @do.change @lines, c[1], @lines[c[1]].splice c[0], 0, ' '
+                # @setCursorPos c, [c[0]+1, c[1]]
+                @do.change @lines, c[1], @lines[c[1]].splice c[0], 0, _.padStart "", n
+                newCursors[@indexOfCursor c] = [c[0]+n, c[1]]
+            @do.cursor @, newCursors
         @do.end()
         
     insertNewline: ->
@@ -566,11 +571,12 @@ class Editor extends Buffer
         @do.start()
         newCursors = _.cloneDeep @cursors
         for c in @cursors
-            n = (c[0] % @indentString.length) or @indentString.length
-            t = @textInRange [c[1], [c[0]-n, c[0]]]
-            if t.trim().length == 0
-                @do.change @lines, c[1], @lines[c[1]].splice c[0]-n, n
-                newCursors[@indexOfCursor(c)] = [c[0]-n, c[1]]
+            if c[0]
+                n = (c[0] % @indentString.length) or @indentString.length
+                t = @textInRange [c[1], [c[0]-n, c[0]]]
+                if t.trim().length == 0
+                    @do.change @lines, c[1], @lines[c[1]].splice c[0]-n, n
+                    newCursors[@indexOfCursor(c)] = [c[0]-n, c[1]]
         @do.cursor @, newCursors
         @do.end()
         @clearHighlights()

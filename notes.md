@@ -13,9 +13,6 @@
 - git status in gutter?
     
 - focus on editor after devTools opened
-- fix shift tab at line start
-    
-- find: select first match after cursor pos
     
 - left line border
 - line numbers
@@ -27,7 +24,6 @@
 - syntax
     - md, styl, html
 
-- multi cursor/selection
 - bracket matching
 
 - commands
