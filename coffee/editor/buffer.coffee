@@ -279,20 +279,18 @@ class Buffer
         r
     
     rangesForTextInLineAtIndex: (t, i) ->
+        re = new RegExp t, 'g'
         r = []
-        si = 0
-        l = @lines[i]
-        while (ci = l.search(t)) > -1 
-            r.push [i, [si+ci, si+ci+t.length]]
-            si += ci+t.length
-            l = l.slice si
+        while (mtch = re.exec(@lines[i])) != null
+            r.push [i, [mtch.index, re.lastIndex]]
         r
-        
+                    
     rangesForText: (t) ->
         t = t.split('\n')[0]
         r = []
         for li in [0...@lines.length]
             r = r.concat @rangesForTextInLineAtIndex t, li
+        log 'rangesForText', t, r
         r
                 
     rangeForWordAtPos: (pos) ->
