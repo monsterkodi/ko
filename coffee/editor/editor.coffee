@@ -595,13 +595,28 @@ class Editor extends Buffer
         else
             @do.start()
             newCursors = _.cloneDeep @cursors
-            for c in @cursors
-                n = (c[0] % @indentString.length) or @indentString.length
-                t = @textInRange [c[1], [c[0]-n, c[0]]]
-                if t.trim().length != 0
-                    n = 1
-                @do.change @lines, c[1], @lines[c[1]].splice c[0]-n, n
-                newCursors[@indexOfCursor(c)] = [c[0]-n, c[1]]
+            for c in @reversedCursors()
+            
+                if c[0] == 0 
+                    if c[1] > 0
+                        ll = @lines[c[1]-1].length
+                        # newCursors[@indexOfCursor(c)] = [ll, c[1]-1]
+                        @do.change @lines, c[1]-1, @lines[c[1]-1] + @lines[c[1]]
+                        @do.delete @lines, c[1]
+                        # move cursors in joined line
+                        for nc in @positionsInLineAtIndexInPositions c[1], newCursors
+                            nc[1] -= 1
+                            nc[0] += ll
+                        # move cursors below deleted line up
+                        for nc in @positionsBelowLineIndexInPositions c[1], newCursors
+                            nc[1] -= 1
+                else
+                    n = (c[0] % @indentString.length) or @indentString.length
+                    t = @textInRange [c[1], [c[0]-n, c[0]]]
+                    if t.trim().length != 0
+                        n = 1
+                    @do.change @lines, c[1], @lines[c[1]].splice c[0]-n, n
+                    newCursors[@indexOfCursor(c)] = [c[0]-n, c[1]]
 
             @do.cursor @, newCursors
             @do.end()

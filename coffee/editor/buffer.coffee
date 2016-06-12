@@ -249,6 +249,7 @@ class Buffer
     rangeStartPos: (r)   -> [r[1][0], r[0]]
     rangeIndexPos: (r,i) -> [r[1][i], r[0]]
     
+    positionsInLineAtIndexInPositions: (li,pl) -> (p for p in pl when p[1] == li)
     positionsBelowLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] > li)
 
     # 00000000    0000000   000   000   0000000   00000000   0000000

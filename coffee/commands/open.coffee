@@ -6,6 +6,7 @@
 
 {
 fileExists,
+dirExists,
 fileList,
 relative,
 resolve,
@@ -46,9 +47,19 @@ class Open extends Command
         return if not @list? 
         command  = command.trim()
         if command.length
-            fuzzied  = fuzzy.filter command, @files       
-            filtered = (f.string for f in fuzzied)
-            @listFiles filtered
+            log 'command', command, @resolvedPath command
+            if dirExists @resolvedPath command
+                log 'rebuild files for', @resolvedPath command
+                @dir = @resolvedPath command
+                @pkg = @resolvedPath command
+                @buildFileList()
+                @listFiles @files
+                @select 0                
+                log @files.splice 0,10
+            else
+                fuzzied  = fuzzy.filter command, @files       
+                filtered = (f.string for f in fuzzied)
+                @listFiles filtered
         else
             @listFiles @files
         
@@ -122,6 +133,22 @@ class Open extends Command
         else
             @file = null
             @dir  = @pkg = resolve '~'
+            
+        @buildFileList()
+
+        @showList()
+        @select @lastFileIndex
+            
+        v = @list?.children[@selected]?.value 
+        return v
+        
+    # 0000000    000   000  000  000      0000000  
+    # 000   000  000   000  000  000      000   000
+    # 0000000    000   000  000  000      000   000
+    # 000   000  000   000  000  000      000   000
+    # 0000000     0000000   000  0000000  0000000  
+            
+    buildFileList: ->   
         that = @
         try
             walkdir.sync @pkg, max_depth: 3, (p) ->
@@ -152,16 +179,12 @@ class Open extends Command
         
         if @history.length
             h = (f for f in @history when f.length and (f != @file))
+            @lastFileIndex = h.length - 1
             @files = _.concat h, @files
                     
         @files = (relative(f, @dir) for f in @files)
         @files = _.uniq @files
-
-        @showList()
-        @select h.length - 1
-        v = @list?.children[@selected]?.value 
-        return v
-            
+                    
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
     # 0000000     00000    0000000   000       000   000     000     0000000 
@@ -178,7 +201,8 @@ class Open extends Command
                 
         for i in [0...files.length]
             file = files[i]
-            file = path.join @dir, file
+            file = @resolvedPath file
+            # log 'open.execute file:', file
             if not fileExists file
                 if '' == path.extname file
                     if fileExists file + '.coffee'
@@ -209,6 +233,18 @@ class Open extends Command
                 return resolve p
             p = path.dirname p
         null
+    
+    # 00000000   00000000   0000000   0000000   000      000   000  00000000  0000000  
+    # 000   000  000       000       000   000  000      000   000  000       000   000
+    # 0000000    0000000   0000000   000   000  000       000 000   0000000   000   000
+    # 000   000  000            000  000   000  000         000     000       000   000
+    # 000   000  00000000  0000000    0000000   0000000      0      00000000  0000000  
+    
+    resolvedPath: (p) ->
+        if p[0] in ['~', '/']
+            resolve p
+        else
+            resolve path.join @dir, p
     
     # 000      000   0000000  000000000
     # 000      000  000          000   

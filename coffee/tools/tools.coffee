@@ -92,7 +92,15 @@ module.exports =
                 return true
         catch
             return false
-            
+
+    dirExists: (dir) ->
+        try
+            if fs.statSync(dir).isDirectory()
+                fs.accessSync dir, fs.R_OK
+                return true
+        catch
+            return false
+                                                          
     relative: (absolute, to) ->
         return absolute if not absolute?.startsWith '/'
         d = path.normalize path.resolve to.replace /\~/, process.env.HOME

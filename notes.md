@@ -1,8 +1,12 @@
 # todo/ideas
 
-- fix scroll to cursor on command+g / find    
-- fix word selection boundaries
+- fix tab insertion when pasting
+- clamp cursors before inserting
 
+- open command
+    - re-load files when input resolves to existing directory
+    
+- minimap    
 - history of file locations
 
 - insert spaces when inserting at virtual cursors
@@ -17,7 +21,6 @@
     
 - left line border
 - line numbers
-- minimap
 
 - restore cursor on watcher reload
 - fix update?
