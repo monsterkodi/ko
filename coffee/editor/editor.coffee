@@ -372,6 +372,7 @@ class Editor extends Buffer
         @do.selection @, newSelections
         @do.cursor @, newCursors
         @do.end()
+        @clearHighlights()
         
     indent: ->
         @do.start()
@@ -388,6 +389,7 @@ class Editor extends Buffer
         @do.selection @, newSelections
         @do.cursor @, newCursors
         @do.end()
+        @clearHighlights()
            
     #  0000000   0000000   00     00  00     00  00000000  000   000  000000000
     # 000       000   000  000   000  000   000  000       0000  000     000   
@@ -474,10 +476,10 @@ class Editor extends Buffer
         @do.end()
 
     insertTab: ->
-        @do.start()
         if @selections.length
             @indent()
         else
+            @do.start()
             newCursors = _.cloneDeep @cursors
             il = @indentString.length
             for c in @cursors
@@ -485,7 +487,7 @@ class Editor extends Buffer
                 @do.change @lines, c[1], @lines[c[1]].splice c[0], 0, _.padStart "", n
                 newCursors[@indexOfCursor c] = [c[0]+n, c[1]]
             @do.cursor @, newCursors
-        @do.end()
+            @do.end()   
         
     insertNewline: ->
         @closingInserted = null
@@ -569,18 +571,21 @@ class Editor extends Buffer
             @clearHighlights()
         
     deleteTab: ->
-        @do.start()
-        newCursors = _.cloneDeep @cursors
-        for c in @cursors
-            if c[0]
-                n = (c[0] % @indentString.length) or @indentString.length
-                t = @textInRange [c[1], [c[0]-n, c[0]]]
-                if t.trim().length == 0
-                    @do.change @lines, c[1], @lines[c[1]].splice c[0]-n, n
-                    newCursors[@indexOfCursor(c)] = [c[0]-n, c[1]]
-        @do.cursor @, newCursors
-        @do.end()
-        @clearHighlights()
+        if @selections.length
+            @deIndent()
+        else
+            @do.start()
+            newCursors = _.cloneDeep @cursors
+            for c in @cursors
+                if c[0]
+                    n = (c[0] % @indentString.length) or @indentString.length
+                    t = @textInRange [c[1], [c[0]-n, c[0]]]
+                    if t.trim().length == 0
+                        @do.change @lines, c[1], @lines[c[1]].splice c[0]-n, n
+                        newCursors[@indexOfCursor(c)] = [c[0]-n, c[1]]
+            @do.cursor @, newCursors
+            @do.end()
+            @clearHighlights()
     
     deleteBackward: ->
         if @selections.length
