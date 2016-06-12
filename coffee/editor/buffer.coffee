@@ -399,6 +399,7 @@ class Buffer
                     if r[1][0] <= p[1][1] # starts before previous ends
                         p[1][1] = Math.max(p[1][1], r[1][1])
                         ranges.splice ri, 1
+        log ranges
         ranges
     
 module.exports = Buffer

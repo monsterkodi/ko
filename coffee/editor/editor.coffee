@@ -102,7 +102,7 @@ class Editor extends Buffer
                 ranges = @rangesBetweenPositions ic, cc
                 newSelection = newSelection.concat ranges
                     
-            newSelection = @cleanRanges newSelection
+            # newSelection = @cleanRanges newSelection
             @do.selection @, newSelection
 
     #  0000000   0000000    0000000    00000000    0000000   000   000   0000000   00000000
@@ -177,12 +177,17 @@ class Editor extends Buffer
             @selectSingleRange r
         @renderHighlights()
 
-    highlightTextOfSelection: -> # called from keyboard shortcuts
+    highlightTextOfSelectionOrWordAtCursor: -> # called from keyboard shortcuts
         if @selections.length == 0 # or @selections.length > 1 ?
             @selectSingleRange @rangeForWordAtPos @cursorPos()
         @searchText = @textInRange @selections[0]
         @highlights = @rangesForText @searchText
         @renderHighlights()
+
+    selectAllHighlights: ->
+        if @highlights.length == 0
+            @highlightTextOfSelectionOrWordAtCursor()
+        @do.selection @, _.cloneDeep @highlights
     
     selectNextHighlight: ->
         r = @rangeAfterPosInRanges @cursorPos(), @highlights
@@ -196,7 +201,7 @@ class Editor extends Buffer
 
     highlightWordAndAddToSelection: ->
         if @highlights.length == 0
-            @highlightTextOfSelection() # this also selects
+            @highlightTextOfSelectionOrWordAtCursor() # this also selects
         else
             cp = @cursorPos()
             sr = @rangeAtPosInRanges cp, @selections
@@ -215,10 +220,10 @@ class Editor extends Buffer
             newSelections = _.cloneDeep @selections
             newSelections.splice @indexOfSelection(sr), 1
             @do.selection @, newSelections
-            pr = @rangeBeforePosInRanges cp, @highlights
-            pr ?= last @highlights
-            if pr 
-                @do.cursor @, [@rangeEndPos pr]
+        pr = @rangeBeforePosInRanges cp, @highlights
+        pr ?= last @highlights
+        if pr 
+            @do.cursor @, [@rangeEndPos pr]
                     
     #  0000000  000   000  00000000    0000000   0000000   00000000 
     # 000       000   000  000   000  000       000   000  000   000

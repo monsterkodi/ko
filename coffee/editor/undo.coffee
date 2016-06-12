@@ -192,6 +192,7 @@ class undo
     
     selection: (obj, newSelections) => 
         if newSelections.length
+            newSelections = obj.cleanRanges newSelections
             @lastAction().selAfter = _.cloneDeep newSelections
             obj.selections = newSelections
             @changeInfoSelection obj

@@ -332,7 +332,7 @@ class ViewBase extends Editor
         return if not combo
         return if key == 'right click' # weird right command key
 
-        # log "viewbase key:", key, "mod:", mod, "combo:", combo
+        log "viewbase key:", key, "mod:", mod, "combo:", combo
         
         if 'unhandled' != @handleModKeyComboEvent mod, key, combo, event
             return
@@ -341,9 +341,10 @@ class ViewBase extends Editor
             when 'command+k'                then return @selectAll() + @deleteSelection()
             when 'command+a'                then return @selectAll()
             when 'command+shift+a'          then return @selectNone()
-            when 'command+e'                then return @highlightTextOfSelection()
+            when 'command+e'                then return @highlightTextOfSelectionOrWordAtCursor()
             when 'command+d'                then return @highlightWordAndAddToSelection()
             when 'command+shift+d'          then return @removeSelectedHighlight()
+            when 'command+alt+d'            then return @selectAllHighlights()
             when 'command+g'                then return @selectNextHighlight()
             when 'command+shift+g'          then return @selectPrevHighlight()
             when 'command+c'                then return clipboard.writeText @textOfSelectionForClipboard()
