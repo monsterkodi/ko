@@ -239,7 +239,8 @@ class Buffer
         
     clampPos: (p) ->
         l = clamp 0, @lines.length-1, p[1]
-        c = clamp 0, @lines[l].length-1, p[0]
+        # c = clamp 0, @lines[l].length-1, p[0]
+        c = clamp 0, @lines[l].length, p[0]
         [ c, l ]
         
     isPosInRange: (p, r) ->

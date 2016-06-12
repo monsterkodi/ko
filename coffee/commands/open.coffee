@@ -187,7 +187,6 @@ class Open extends Command
                     0 
                 
             bonus = extnameBonus - path.basename(f).length
-            log 'f', f, bonus, extnameBonus
                 
             if f.startsWith @dir
                 return 10000-path.dirname(f).length+bonus

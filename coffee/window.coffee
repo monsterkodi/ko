@@ -117,9 +117,8 @@ saveFile = (file) =>
     setState 'file', file
 
 loadFile = (file) =>  
-    log 'load:', file
+    # log 'load:', file
     if fileExists file
-        # log 'load:', file
         addToRecent file
         editor.setCurrentFile file
         editor.setText fs.readFileSync file, encoding: 'UTF8'

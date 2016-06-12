@@ -191,7 +191,7 @@ class undo
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
     
-    selection: (obj, newSelections) -> 
+    selections: (obj, newSelections) -> 
         if newSelections.length
             newSelections = obj.cleanRanges newSelections
             @lastAction().selAfter = _.cloneDeep newSelections
@@ -209,7 +209,7 @@ class undo
     # 000       000   000  000   000       000  000   000  000   000
     #  0000000   0000000   000   000  0000000    0000000   000   000
 
-    cursor: (obj, newCursors) ->
+    cursors: (obj, newCursors) ->
         obj.cleanCursors newCursors
         if newCursors.length != obj.cursors.length
             obj.initialCursors = _.cloneDeep newCursors

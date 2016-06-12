@@ -341,10 +341,10 @@ class ViewBase extends Editor
     onKeyDown: (event) =>
         {mod, key, combo} = keyinfo.forEvent event
 
+        # log "viewbase key:", key, "mod:", mod, "combo:", combo
+
         return if not combo
         return if key == 'right click' # weird right command key
-
-        # log "viewbase key:", key, "mod:", mod, "combo:", combo
         
         if 'unhandled' != @handleModKeyComboEvent mod, key, combo, event
             return

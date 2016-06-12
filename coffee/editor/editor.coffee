@@ -57,18 +57,19 @@ class Editor extends Buffer
     # 0000000   000  000   000   0000000   0000000  00000000
     
     singleCursorAtPos: (p, e) ->
+        p = @clampPos p
         if e and @initialCursors?.length > 1
             @initialCursors = _.cloneDeep [@initialCursors[0]]
         else if not e
             @initialCursors = _.cloneDeep [p]
         @startSelection e
-        @do.cursor @, [p]
+        @do.cursors @, [p]
         @endSelection e
         
     selectSingleRange: (r) ->
         @initialCursors = _.cloneDeep [[r[1][0], r[0]]]
         @startSelection true
-        @do.cursor @, [[r[1][1], r[0]]]
+        @do.cursors @, [[r[1][1], r[0]]]
         @endSelection true
             
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
@@ -80,9 +81,9 @@ class Editor extends Buffer
     startSelection: (e) ->
         if e and not @initialCursors
             @initialCursors = _.cloneDeep @cursors
-            @do.selection @, @rangesForCursors @initialCursors
+            @do.selections @, @rangesForCursors @initialCursors
         if not e
-            @do.selection @, []
+            @do.selections @, []
             
     endSelection: (e) ->
         
@@ -103,7 +104,7 @@ class Editor extends Buffer
                 newSelection = newSelection.concat ranges
                     
             # newSelection = @cleanRanges newSelection
-            @do.selection @, newSelection
+            @do.selections @, newSelection
 
     #  0000000   0000000    0000000    00000000    0000000   000   000   0000000   00000000
     # 000   000  000   000  000   000  000   000  000   000  0000  000  000        000     
@@ -115,11 +116,11 @@ class Editor extends Buffer
         @do.start()
         newSelections = _.cloneDeep @selections
         newSelections.push range
-        @do.selection @, newSelections
-        @do.cursor @, [@rangeEndPos range]
+        @do.selections @, newSelections
+        @do.cursors @, [@rangeEndPos range]
         @do.end()
 
-    selectNone: -> @do.selection @, []
+    selectNone: -> @do.selections @, []
 
     selectMoreLines: ->
         @do.start()
@@ -139,8 +140,8 @@ class Editor extends Buffer
         if not start
             for c in @cursors
                 selectCursorLineAtIndex c, c[1]+1
-        @do.selection @, newSelections
-        @do.cursor @, newCursors
+        @do.selections @, newSelections
+        @do.cursors @, newCursors
         @do.end()       
 
     selectLessLines: -> 
@@ -156,11 +157,11 @@ class Editor extends Buffer
                     newCursors[@indexOfCursor(c)] = [s[1][1], s[0]]
                 newSelections.splice @indexOfSelection(thisSel[0]), 1
 
-        @do.selection @, newSelections
-        @do.cursor @, newCursors
+        @do.selections @, newSelections
+        @do.cursors @, newCursors
         @do.end()       
 
-    selectAll: => @do.selection @, @rangesForAllLines()
+    selectAll: => @do.selections @, @rangesForAllLines()
             
     # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000
     # 000   000  000  000        000   000  000      000  000        000   000     000   
@@ -189,7 +190,7 @@ class Editor extends Buffer
     selectAllHighlights: ->
         if not @posInHighlights @cursorPos()
             @highlightTextOfSelectionOrWordAtCursor()
-        @do.selection @, _.cloneDeep @highlights
+        @do.selections @, _.cloneDeep @highlights
     
     selectNextHighlight: ->
         r = @rangeAfterPosInRanges @cursorPos(), @highlights
@@ -221,11 +222,11 @@ class Editor extends Buffer
         if sr and hr
             newSelections = _.cloneDeep @selections
             newSelections.splice @indexOfSelection(sr), 1
-            @do.selection @, newSelections
+            @do.selections @, newSelections
         pr = @rangeBeforePosInRanges cp, @highlights
         pr ?= last @highlights
         if pr 
-            @do.cursor @, [@rangeEndPos pr]
+            @do.cursors @, [@rangeEndPos pr]
                     
     #  0000000  000   000  00000000    0000000   0000000   00000000 
     # 000       000   000  000   000  000       000   000  000   000
@@ -236,7 +237,7 @@ class Editor extends Buffer
     setCursor: (c,l) -> 
         l = clamp 0, @lines.length-1, l
         c = clamp 0, @lines[l].length, c
-        @do.cursor @, [[c,l]]
+        @do.cursors @, [[c,l]]
         
     toggleCursorAtPos: (p) ->
         if @cursorAtPos p
@@ -247,14 +248,14 @@ class Editor extends Buffer
     addCursorAtPos: (p) ->
         newCursors = _.cloneDeep @cursors
         newCursors.push p
-        @do.cursor @, newCursors        
+        @do.cursors @, newCursors        
         
     delCursorAtPos: (p) ->
         c = @cursorAtPos p
         if c and @cursors.length > 1
             newCursors = _.cloneDeep @cursors
             newCursors.splice @indexOfCursor(c), 1
-            @do.cursor @, newCursors        
+            @do.cursors @, newCursors        
                     
     addCursors: (dir='down') ->
         d = switch dir
@@ -263,13 +264,24 @@ class Editor extends Buffer
         newCursors = _.cloneDeep @cursors
         for c in @cursors
             newCursors.push [c[0], c[1]+d]
-        @do.cursor @, newCursors 
+        @do.cursors @, newCursors 
 
     addCursorsForSelections: (i) ->
         @do.start()
-        @do.cursor @, (@rangeIndexPos(s,i) for s in @selections) 
-        @do.selection @, []
+        @do.cursors @, (@rangeIndexPos(s,i) for s in @selections) 
+        @do.selections @, []
         @do.end()
+    
+    alignCursors: (dir='down') ->
+        charPos = switch dir
+            when 'up'    then last(@cursors)[0]
+            when 'down'  then first(@cursors)[0]
+            when 'left'  then _.min (c[0] for c in @cursors)
+            when 'right' then _.max (c[0] for c in @cursors)
+        newCursors = []
+        for c in @cursors
+            newCursors.push [charPos, c[1]]
+        @do.cursors @, newCursors
     
     cursorsAtStartOfSelections: -> @addCursorsForSelections 0
     cursorsAtEndOfSelections: -> @addCursorsForSelections 1
@@ -285,10 +297,10 @@ class Editor extends Buffer
                 for c in @reversedCursors()
                     if @cursorAtPos([c[0], c[1]+1]) and not @cursorAtPos [c[0], c[1]-1]
                         newCursors.splice @indexOfCursor(c), 1    
-        @do.cursor @, newCursors 
+        @do.cursors @, newCursors 
         
     cancelCursors: () ->
-        @do.cursor @, [@cursors[0]]
+        @do.cursors @, [@cursors[0]]
 
     cancelCursorsAndHighlights: () ->
         @cancelCursors()
@@ -304,7 +316,7 @@ class Editor extends Buffer
     setCursorPos: (c, p) ->
         newCursors = _.cloneDeep @cursors
         newCursors[@indexOfCursor(c)] = p
-        @do.cursor @, newCursors
+        @do.cursors @, newCursors
         
     moveCursorToPos: (c, p) -> 
         @closingInserted = null
@@ -316,7 +328,7 @@ class Editor extends Buffer
         
         for c in @cursors
             newCursors[@indexOfCursor(c)] = f(c)
-        @do.cursor @, newCursors
+        @do.cursors @, newCursors
         @endSelection e
         
     moveCursorsToEndOfLine:   (e) -> @moveAllCursors e, (c) => [@lines[c[1]].length, c[1]]
@@ -369,8 +381,8 @@ class Editor extends Buffer
                     ns = newSelections[@indexOfSelection s]
                     ns[1][0] -= @indentString.length
                     ns[1][1] -= @indentString.length
-        @do.selection @, newSelections
-        @do.cursor @, newCursors
+        @do.selections @, newSelections
+        @do.cursors @, newCursors
         @do.end()
         @clearHighlights()
         
@@ -386,8 +398,8 @@ class Editor extends Buffer
                 ns = newSelections[@indexOfSelection s]
                 ns[1][0] += @indentString.length
                 ns[1][1] += @indentString.length
-        @do.selection @, newSelections
-        @do.cursor @, newCursors
+        @do.selections @, newSelections
+        @do.cursors @, newCursors
         @do.end()
         @clearHighlights()
            
@@ -444,7 +456,7 @@ class Editor extends Buffer
             alert 'wtf?' if c.length < 2 or c[1] >= @lines.length
             @do.change @lines, c[1], @lines[c[1]].splice c[0], 0, ch
             newCursors[@indexOfCursor c] = [c[0]+1, c[1]]
-        @do.cursor @, newCursors
+        @do.cursors @, newCursors
         @do.end()
         
     insertSurroundCharacter: (ch) ->
@@ -494,7 +506,7 @@ class Editor extends Buffer
                 n = 4-(c[0]%il)
                 @do.change @lines, c[1], @lines[c[1]].splice c[0], 0, _.padStart "", n
                 newCursors[@indexOfCursor c] = [c[0]+n, c[1]]
-            @do.cursor @, newCursors
+            @do.cursors @, newCursors
             @do.end()   
         
     insertNewline: (opt) ->
@@ -526,7 +538,7 @@ class Editor extends Buffer
                     nc[0] += indent.length - ll
                 nc[1] += 1     
         
-        @do.cursor @, newCursors    
+        @do.cursors @, newCursors    
         @do.end()
         
     insertText: (text) ->
@@ -576,8 +588,8 @@ class Editor extends Buffer
             else
                 @do.change @lines, s[0], @lines[s[0]].splice s[1][0], s[1][1]-s[1][0]
                 
-        @do.selection @, []
-        @do.cursor @, newCursors
+        @do.selections @, []
+        @do.cursors @, newCursors
         @do.end()
         @clearHighlights()
 
@@ -605,7 +617,7 @@ class Editor extends Buffer
                     if t.trim().length == 0
                         @do.change @lines, c[1], @lines[c[1]].splice c[0]-n, n
                         newCursors[@indexOfCursor(c)] = [c[0]-n, c[1]]
-            @do.cursor @, newCursors
+            @do.cursors @, newCursors
             @do.end()
             @clearHighlights()
     
@@ -638,7 +650,7 @@ class Editor extends Buffer
                     @do.change @lines, c[1], @lines[c[1]].splice c[0]-n, n
                     newCursors[@indexOfCursor(c)] = [c[0]-n, c[1]]
 
-            @do.cursor @, newCursors
+            @do.cursors @, newCursors
             @do.end()
             @clearHighlights()
             
