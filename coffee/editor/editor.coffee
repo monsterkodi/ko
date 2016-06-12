@@ -184,6 +184,10 @@ class Editor extends Buffer
         @highlights = @rangesForText @searchText
         @renderHighlights()
 
+    clearHighlights: ->
+        @highlights = []
+        @renderHighlights()
+
     selectAllHighlights: ->
         if @highlights.length == 0
             @highlightTextOfSelectionOrWordAtCursor()
@@ -411,7 +415,7 @@ class Editor extends Buffer
     # 000  000   000  0000000   00000000  000   000     000   
     
     insertCharacter: (ch) ->
-
+        @clearHighlights()
         if ch in @surroundCharacters #and (@cursor[0] == 0 or @lines[@cursor[1]][@cursor[0]-1] != '\\' )
             @insertSurroundCharacter ch
             return
@@ -422,7 +426,7 @@ class Editor extends Buffer
 
         @do.start()
         @deleteSelection()
-        log 'insertCharacter', @cursors
+        # log 'insertCharacter', @cursors
         for c in @cursors
             throw new Error if c.length < 2
             throw new Error if c[1] >= @lines.length
@@ -434,7 +438,7 @@ class Editor extends Buffer
         @do.start()
         
         if @selection?
-            log 'surround selection', ch, @selection
+            # log 'surround selection', ch, @selection
             for r in @selectionsInLineIndexRange [0,@lines.length-1]
                 [cl,cr] = switch ch
                     when "[", "]" then ["[", "]"]
@@ -547,6 +551,7 @@ class Editor extends Buffer
         @do.selection @, []
         @do.cursor @, newCursors
         @do.end()
+        @clearHighlights()
 
     deleteForward: ->
         if @selection?
@@ -557,6 +562,7 @@ class Editor extends Buffer
                     @joinLineOfCursor c
                 else
                     @do.change @lines, c[1], @lines[c[1]].splice c[0], 1
+            @clearHighlights()
         
     deleteTab: ->
         @do.start()
@@ -569,6 +575,7 @@ class Editor extends Buffer
                 newCursors[@indexOfCursor(c)] = [c[0]-n, c[1]]
         @do.cursor @, newCursors
         @do.end()
+        @clearHighlights()
     
     deleteBackward: ->
         if @selections.length
@@ -586,5 +593,6 @@ class Editor extends Buffer
 
             @do.cursor @, newCursors
             @do.end()
+            @clearHighlights()
             
 module.exports = Editor
