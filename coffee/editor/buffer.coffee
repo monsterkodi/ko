@@ -23,55 +23,7 @@ class Buffer
         @cursors    = [[0,0]]
         @selections = []
         @highlights = []
-            
-    #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000   0000000
-    # 000       000       000      000       000          000     000  000   000  0000  000  000     
-    # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000  0000000 
-    #      000  000       000      000       000          000     000  000   000  000  0000       000
-    # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000  0000000 
 
-    selectionsRelativeToLineIndexRange: (lineIndexRange) ->
-        sl = @selectionsInLineIndexRange lineIndexRange
-        if sl
-            ([s[0]-lineIndexRange[0], [s[1][0], s[1][1]]] for s in sl)
-    
-    selectionsInLineIndexRange: (lineIndexRange) ->
-        sl = []
-        for s in @selections
-            if s[0] >= lineIndexRange[0] and s[0] <= lineIndexRange[1]
-                sl.push _.clone s
-        sl
-        
-    reversedSelections: ->
-        sl = _.clone @selections
-        sl.reverse()
-        sl
-
-    # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000   0000000
-    # 000   000  000  000        000   000  000      000  000        000   000     000     000     
-    # 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000     0000000 
-    # 000   000  000  000   000  000   000  000      000  000   000  000   000     000          000
-    # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     0000000 
-
-    highlightsRelativeToLineIndexRange: (lineIndexRange) ->
-        hl = @highlightsInLineIndexRange lineIndexRange
-        if hl
-            ([s[0]-lineIndexRange[0], [s[1][0], s[1][1]]] for s in hl)
-    
-    highlightsInLineIndexRange: (lineIndexRange) ->
-        hl = []
-        for s in @highlights
-            if s[0] >= lineIndexRange[0] and s[0] <= lineIndexRange[1]
-                hl.push _.clone s
-        hl
-        
-    reversedHighlights: ->
-        r = _.clone @highlights
-        r.reverse()
-        r
-        
-    posInHighlights: (p) -> @highlights.length and @rangeAtPosInRanges p, @highlights
-                    
     #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
     # 000       000   000  000   000  000       000   000  000   000  000     
     # 000       000   000  0000000    0000000   000   000  0000000    0000000 
@@ -111,12 +63,50 @@ class Buffer
                 cs.push c
         cs
     
-    #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
-    # 000       000       000      000       000          000     000  000   000  0000  000
-    # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
-    #      000  000       000      000       000          000     000  000   000  000  0000
-    # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
+    cursorAtEndOfLine:   (c=@cursors[0]) -> c[0] >= @lines[c[1]].length
+    cursorAtStartOfLine: (c=@cursors[0]) -> c[0] == 0
+    cursorInLastLine:    (c=@cursors[0]) -> c[1] == @lines.length-1
+    cursorInFirstLine:   (c=@cursors[0]) -> c[1] == 0
+
+    endOfWordAtCursor: (c=@cursors[0]) =>
+        r = @rangeForWordAtPos c
+        if @cursorAtEndOfLine c
+            return c if @cursorInLastLine c
+            r = @rangeForWordAtPos [0, c[1]+1]
+        [r[1][1], r[0]]
+
+    startOfWordAtCursor: (c=@cursors[0]) =>
+        r = @rangeForWordAtPos c
+        if @cursorAtStartOfLine c
+            return c if @cursorInFirstLine c
+            r = @rangeForWordAtPos [@lines[c[1]-1].length, c[1]-1]
+        else if r[0] == c[0]
+            r = @rangeForWordAtPos [c[0]-1, c[1]]
+        [r[1][0], r[0]]
             
+    #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000   0000000
+    # 000       000       000      000       000          000     000  000   000  0000  000  000     
+    # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000  0000000 
+    #      000  000       000      000       000          000     000  000   000  000  0000       000
+    # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000  0000000 
+
+    selectionsRelativeToLineIndexRange: (lineIndexRange) ->
+        sl = @selectionsInLineIndexRange lineIndexRange
+        if sl
+            ([s[0]-lineIndexRange[0], [s[1][0], s[1][1]]] for s in sl)
+    
+    selectionsInLineIndexRange: (lineIndexRange) ->
+        sl = []
+        for s in @selections
+            if s[0] >= lineIndexRange[0] and s[0] <= lineIndexRange[1]
+                sl.push _.clone s
+        sl
+        
+    reversedSelections: ->
+        sl = _.clone @selections
+        sl.reverse()
+        sl
+
     selectedLineIndices: -> _.uniq (s[0] for s in @selections)
     cursorLineIndices:   -> _.uniq (c[1] for c in @cursors)
 
@@ -145,35 +135,46 @@ class Buffer
         sl
         
     indexOfSelection: (s) -> @selections.indexOf s
+    
+    startPosOfContinuousSelectionAtPos: (p) ->
+        r = @rangeAtPosInRanges p, @selections
+        if r
+            sp = @rangeStartPos r
+            while (sp[0] == 0) and (sp[1] > 0)
+                plr = @rangeForLineAtIndex sp[1]-1
+                r = @rangeAtPosInRanges @rangeEndPos(plr), @selections
+                if r
+                    sp = @rangeStartPos plr
+                else
+                    break
+        # log 'startPosOfContinuousSelectionAtPos', p, sp
+        sp
 
-    #  0000000  000   000  00000000    0000000   0000000   00000000 
-    # 000       000   000  000   000  000       000   000  000   000
-    # 000       000   000  0000000    0000000   000   000  0000000  
-    # 000       000   000  000   000       000  000   000  000   000
-    #  0000000   0000000   000   000  0000000    0000000   000   000
+    # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000   0000000
+    # 000   000  000  000        000   000  000      000  000        000   000     000     000     
+    # 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000     0000000 
+    # 000   000  000  000   000  000   000  000      000  000   000  000   000     000          000
+    # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     0000000 
 
-    cursorAtEndOfLine:   (c=@cursors[0]) -> c[0] >= @lines[c[1]].length
-    cursorAtStartOfLine: (c=@cursors[0]) -> c[0] == 0
-    cursorInLastLine:    (c=@cursors[0]) -> c[1] == @lines.length-1
-    cursorInFirstLine:   (c=@cursors[0]) -> c[1] == 0
-
-    endOfWordAtCursor: (c=@cursors[0]) =>
-        r = @rangeForWordAtPos c
-        if @cursorAtEndOfLine c
-            return c if @cursorInLastLine c
-            r = @rangeForWordAtPos [0, c[1]+1]
-        [r[1][1], r[0]]
-
-    startOfWordAtCursor: (c=@cursors[0]) =>
-        r = @rangeForWordAtPos c
-        if @cursorAtStartOfLine c
-            return c if @cursorInFirstLine c
-            r = @rangeForWordAtPos [@lines[c[1]-1].length, c[1]-1]
-        else if r[0] == c[0]
-            r = @rangeForWordAtPos [c[0]-1, c[1]]
-        [r[1][0], r[0]]
-
-
+    highlightsRelativeToLineIndexRange: (lineIndexRange) ->
+        hl = @highlightsInLineIndexRange lineIndexRange
+        if hl
+            ([s[0]-lineIndexRange[0], [s[1][0], s[1][1]]] for s in hl)
+    
+    highlightsInLineIndexRange: (lineIndexRange) ->
+        hl = []
+        for s in @highlights
+            if s[0] >= lineIndexRange[0] and s[0] <= lineIndexRange[1]
+                hl.push _.clone s
+        hl
+        
+    reversedHighlights: ->
+        r = _.clone @highlights
+        r.reverse()
+        r
+        
+    posInHighlights: (p) -> @highlights.length and @rangeAtPosInRanges p, @highlights
+                    
     # 000000000  00000000  000   000  000000000
     #    000     000        000 000      000   
     #    000     0000000     00000       000   
@@ -226,6 +227,8 @@ class Buffer
     rangeEndPos:   (r)   -> [r[1][1], r[0]]
     rangeStartPos: (r)   -> [r[1][0], r[0]]
     rangeIndexPos: (r,i) -> [r[1][i], r[0]]
+    
+    positionsBelowLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] > li)
 
     # 00000000    0000000   000   000   0000000   00000000   0000000
     # 000   000  000   000  0000  000  000        000       000     
@@ -395,7 +398,6 @@ class Buffer
                     if r[1][0] <= p[1][1] # starts before previous ends
                         p[1][1] = Math.max(p[1][1], r[1][1])
                         ranges.splice ri, 1
-        log ranges
         ranges
     
 module.exports = Buffer

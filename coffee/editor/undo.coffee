@@ -73,10 +73,8 @@ class undo
     changeInfoSelection: (obj) ->
         @getChangeInfo()
         @changeInfo.selection.push obj.selectedLineIndicesRange()
-        # log 'changeInfoSelection', @changeInfo.selection
             
-    delChangeInfo: ->
-        @changeInfo = null
+    delChangeInfo: -> @changeInfo = null
         
     # 00000000   00000000  0000000     0000000 
     # 000   000  000       000   000  000   000
@@ -84,7 +82,7 @@ class undo
     # 000   000  000       000   000  000   000
     # 000   000  00000000  0000000     0000000 
 
-    redo: (obj) =>
+    redo: (obj) ->
         if @futures.length
             @newChangeInfo()
             action = @futures.shift()
@@ -97,7 +95,7 @@ class undo
             log "redo @changeInfo", @changeInfo
             @delChangeInfo()
 
-    redoLine: (obj, line) =>
+    redoLine: (obj, line) ->
         if line.after?
             if line.before?
                 obj.lines[line.index] = line.after
@@ -109,7 +107,7 @@ class undo
             obj.lines.splice line.index, 1
             @changeInfoLineDelete line.index
 
-    redoSelection: (obj, action) =>
+    redoSelection: (obj, action) ->
         if action.selAfter.length
             obj.selections = _.cloneDeep action.selAfter
             @changeInfoSelection obj
@@ -117,7 +115,7 @@ class undo
             @changeInfoSelection obj
             obj.selections = [] 
         
-    redoCursor: (obj, action) =>
+    redoCursor: (obj, action) ->
         @changeInfoCursor obj 
         obj.cursor = [action.curAfter[0], action.curAfter[1]] if action.curAfter?
         @changeInfoCursor obj
@@ -128,7 +126,7 @@ class undo
     # 000   000  000  0000  000   000  000   000
     #  0000000   000   000  0000000     0000000 
     
-    undo: (obj) =>
+    undo: (obj) ->
         if @actions.length
             @newChangeInfo()
             action = @actions.pop()
@@ -143,7 +141,7 @@ class undo
             # log "undo @changeInfo", @changeInfo
             @delChangeInfo()
                                     
-    undoLine: (obj, line) =>
+    undoLine: (obj, line) ->
         if line.before?
             if line.after?
                 obj.lines[line.index] = line.before
@@ -155,7 +153,7 @@ class undo
             obj.lines.splice line.index, 1
             @changeInfoLineDelete line.index
             
-    undoSelection: (obj, action) =>
+    undoSelection: (obj, action) ->
         if action.selBefore.length
             obj.selections = _.cloneDeep action.selBefore 
             @changeInfoSelection obj
@@ -163,7 +161,7 @@ class undo
             @changeInfoSelection obj
             obj.selections = [] 
         
-    undoCursor: (obj, action) =>
+    undoCursor: (obj, action) ->
         @changeInfoCursor obj
         obj.cursors = action.curBefore if action.curBefore?
         @changeInfoCursor obj
@@ -174,7 +172,7 @@ class undo
     # 000      000   000       000     000   
     # 0000000  000   000  0000000      000   
     
-    lastAction: =>
+    lastAction: ->
         if @actions.length == 0
             @actions.push
                 selBefore: []
@@ -190,7 +188,7 @@ class undo
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
     
-    selection: (obj, newSelections) => 
+    selection: (obj, newSelections) -> 
         if newSelections.length
             newSelections = obj.cleanRanges newSelections
             @lastAction().selAfter = _.cloneDeep newSelections
@@ -208,7 +206,7 @@ class undo
     # 000       000   000  000   000       000  000   000  000   000
     #  0000000   0000000   000   000  0000000    0000000   000   000
 
-    cursor: (obj, newCursors) =>
+    cursor: (obj, newCursors) ->
         obj.cleanCursors newCursors
         if newCursors.length != obj.cursors.length
             obj.initialCursors = _.cloneDeep newCursors
@@ -224,7 +222,7 @@ class undo
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
         
-    start: => 
+    start: -> 
         @groupCount += 1
         if @groupCount == 1
             a = @lastAction()
@@ -241,14 +239,14 @@ class undo
     # 000 0 000  000   000  000   000  000  000          000   
     # 000   000   0000000   0000000    000  000          000   
     
-    modify: (change) =>
+    modify: (change) ->
         lines = @lastAction().lines
         if lines.length and lines[lines.length-1].index == change.index
             lines[lines.length-1].after = change.after
         else
             lines.push change
     
-    change: (lines, index, text) =>
+    change: (lines, index, text) ->
         return if lines[index] == text
         @modify
             index:  index
@@ -258,7 +256,7 @@ class undo
         @changeInfoLineChange index
         @check()
         
-    insert: (lines, index, text) =>
+    insert: (lines, index, text) ->
         @modify
             index:  index
             after:  text        
@@ -266,7 +264,7 @@ class undo
         @changeInfoLineInsert index
         @check()
         
-    delete: (lines, index) =>
+    delete: (lines, index) ->
         if lines.length > 1
             @modify
                 index:   index
@@ -284,7 +282,7 @@ class undo
     # 000       000  0000  000   000
     # 00000000  000   000  0000000  
                 
-    end: => 
+    end: -> 
         @groupCount -= 1
         @check()
 
@@ -294,13 +292,19 @@ class undo
     # 000       000   000  000       000       000  000 
     #  0000000  000   000  00000000   0000000  000   000
     
-    check: =>
+    check: ->
         @futures = []
         if @groupCount == 0
             @merge()
             if @changeInfo?
+                @cleanChangeInfo()
                 @groupDone()
                 @delChangeInfo()
+        
+    cleanChangeInfo: ->
+        @changeInfo.deleted.sort (a,b) -> a-b
+        @changeInfo.cursor.sort (a,b) -> a-b
+        log 'cleanChangeInfo', @changeInfo
                 
     # 00     00  00000000  00000000    0000000   00000000
     # 000   000  000       000   000  000        000     
@@ -308,7 +312,7 @@ class undo
     # 000 0 000  000       000   000  000   000  000     
     # 000   000  00000000  000   000   0000000   00000000
     
-    merge: =>
+    merge: ->
         while @actions.length >= 2
             a = last @actions
             b = @actions[@actions.length-2]

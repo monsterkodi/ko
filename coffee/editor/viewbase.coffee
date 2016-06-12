@@ -250,7 +250,8 @@ class ViewBase extends Editor
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
     changed: (changeInfo) ->
-        # log 'viewbase.changed selection', changeInfo.selection
+        # log 'Viewbase.changed changeInfo', changeInfo
+        # log 'Viewbase.changed changeInfo.deleted', changeInfo.deleted
         indices = []
         info = _.cloneDeep changeInfo
         for i in info.changed
@@ -267,11 +268,13 @@ class ViewBase extends Editor
             if info.deleted[0] < @botIndex
                 for i in [Math.max(@topIndex, info.deleted[0])..@botIndex]
                     indices.push i
+                    
+            # log 'deleted indices:', indices
                                                             
         indices.sort (a,b) -> a - b
         indices = _.sortedUniq indices
         
-        # log 'indices', indices    
+        # log 'sorted unique indices', indices    
         for i in indices
             @updateLine i
         if changeInfo.cursor.length

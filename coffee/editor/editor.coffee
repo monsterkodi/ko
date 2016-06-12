@@ -542,15 +542,17 @@ class Editor extends Buffer
         newCursors = _.cloneDeep @cursors
         for s in @reversedSelections()
             
-            # @startOfContinuousSelection
             for c in @cursorsInRange s
-                newCursors[@indexOfCursor(c)][0] = s[1][0]
+                nc = newCursors[@indexOfCursor(c)]
+                sp = @startPosOfContinuousSelectionAtPos c
+                nc[0] = sp[0]
+                nc[1] = sp[1]
 
             if @isSelectedLineAtIndex s[0]
-                if @lines.length > 1
-                    @do.delete @lines, s[0]
-                else
-                    @do.change @lines, s[0], @lines[s[0]].splice s[1][0], s[1][1]-s[1][0]
+                @do.delete @lines, s[0]
+                # move cursors below deleted line up
+                for nc in @positionsBelowLineIndexInPositions s[0], newCursors
+                    nc[1] -= 1
             else
                 @do.change @lines, s[0], @lines[s[0]].splice s[1][0], s[1][1]-s[1][0]
                 
