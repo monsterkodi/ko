@@ -46,7 +46,6 @@ class View extends ViewBase
         @view.addEventListener 'wheel', @onWheel
         
     done: =>
-        log 'well done'
         @updateTitlebar()
         @changed @do.changeInfo
 

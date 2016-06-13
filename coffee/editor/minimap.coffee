@@ -6,6 +6,7 @@
 
 {
 getStyle,
+last,
 $
 }       = require '../tools/tools'
 log     = require '../tools/log'
@@ -85,16 +86,34 @@ class Minimap
             l.addClass 'space'
             line.add l
             
-        rgs = @editor.nonSpaceRangesInLineAtIndex li
-        for r in @editor.nonSpaceRangesInLineAtIndex li
-            c = @s.rect()
-            c.attr
-                height: 2
-                x:      r[1][0]
-                width:  r[1][1]-r[1][0]
-            if t.trimLeft()[0] == '#'
-                c.addClass 'comment' 
-            line.add c
+        if @editor.syntax.diss[li].length
+            for r in @editor.syntax.diss[li]
+                if r.match?
+                    continue if r.match.trim().length == 0
+                else
+                    log 'r', r
+                    continue
+                c = @s.rect()
+                c.attr
+                    height: 2
+                    x:      r.start
+                    width:  r.match.length
+                if r.stack?.length
+                    for cls in last(r.stack).split '.'
+                        c.addClass cls
+                else
+                    c.addClass 'text'
+                line.add c
+        else
+            rgs = @editor.nonSpaceRangesInLineAtIndex li
+            for r in @editor.nonSpaceRangesInLineAtIndex li
+                c = @s.rect()
+                c.attr
+                    height: 2
+                    x:      r[1][0]
+                    width:  r[1][1]-r[1][0]                    
+                c.addClass 'text'
+                line.add c
         line
                 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
@@ -104,7 +123,7 @@ class Minimap
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
     changed: (changeInfo) ->
-        log 'minimap.changed', changeInfo.sorted
+        # log 'minimap.changed', changeInfo.sorted
         invalidated = @lines.length
         for [li, change] in changeInfo.sorted
             switch change
@@ -121,8 +140,6 @@ class Minimap
             @lines[li].attr
                 transform: "translate(0 #{li*2})"
                 
-        # log "lines", @lines.length
-
     # 00000000   00000000  000   000  0000000    00000000  00000000 
     # 000   000  000       0000  000  000   000  000       000   000
     # 0000000    0000000   000 0 000  000   000  0000000   0000000  

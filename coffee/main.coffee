@@ -334,7 +334,6 @@ class Main
     onMoveWin: (event) => @saveWinBounds event.sender
     
     onCloseWin: (event) =>
-        #log 'onCloseWin'
         if visibleWins().length == 1
             hideDock()
         prefs.setPath "windows.#{event.sender.id}", undefined

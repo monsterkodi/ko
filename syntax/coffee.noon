@@ -129,3 +129,5 @@ __dirname|__filename  keyword
 |###|                          comment.marker
 (?:^|\s+)(#+)([^\{].*|$)     . comment.marker . comment
 
+# salter headers
+^\s*\#\s+([0\s]+)$           . comment.header
