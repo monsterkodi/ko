@@ -117,7 +117,7 @@ saveFile = (file) =>
     setState 'file', file
 
 loadFile = (file) =>  
-    # log 'load:', file
+    log 'load:', file
     if fileExists file
         addToRecent file
         editor.setCurrentFile file

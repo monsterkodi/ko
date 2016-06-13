@@ -22,7 +22,9 @@ class Commandline extends ViewBase
         
         super viewElem
         
-        # @view.onblur = @onFocusOut
+        # @view.onblur =  => @command?.cancel()
+        
+        @cmmd = $('.commandline-command')
         
         @commands = {}
         @command = null
@@ -32,7 +34,6 @@ class Commandline extends ViewBase
     changed: (changeInfo) ->
         super changeInfo
         if changeInfo.changed.length
-            # log 'command line text changed', changeInfo
             @command?.changed @lines[0]
         
     loadCommands: ->
@@ -43,15 +44,19 @@ class Commandline extends ViewBase
             commandClass = require file
             @commands[commandClass.name.toLowerCase()] = new commandClass @
                 
-    startCommand: (name) ->
+    startCommand: (name, combo) ->
         @command?.cancel()
         split.showCommandline()
-        $('.commandline-editor').focus()
-        $('.commandline-command').innerHTML = name
+        @view.focus()
+        @setName name
 
         @command = @commands[name]
-        @setText @command.start()
+        @setText @command.start combo # <-- command start
         @selectAll()
+        
+    setName: (name) -> 
+        log "commandline.setName", name, @cmmd?
+        @cmmd.innerHTML = name
         
     execute: ->
         r = @command?.execute @lines[0]
@@ -61,10 +66,7 @@ class Commandline extends ViewBase
     cancel: ->
         @command?.cancel()
         split.focusOnEditorOrHistory()
-        
-    onFocusOut: =>
-        @command?.cancel()
-                        
+                                
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
     # 0000000    0000000     00000  
@@ -74,7 +76,7 @@ class Commandline extends ViewBase
     globalModKeyComboEvent: (mod, key, combo, event) ->
         for n,c of @commands
             if combo == 'esc' then return @cancel()
-            if combo == c.shortcut then return  @startCommand n
+            if combo in c.shortcuts then return  @startCommand n, combo
         return 'unhandled'            
 
     handleModKeyComboEvent: (mod, key, combo, event) ->

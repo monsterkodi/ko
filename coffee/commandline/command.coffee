@@ -44,6 +44,8 @@ class Command
     setText: (t) -> 
         @commandline.setText t
         @commandline.selectAll()
-        
+    
+    setName: (n) ->
+        @commandline.setName n
 
 module.exports = Command

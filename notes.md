@@ -1,7 +1,7 @@
 # todo/ideas
 
-- scroll log on input
-- refactor syntax matching for minimap
+- log view below editor
+    - scroll on input
 - highlight cursor line(s?)
 - highlight last cursor
 - line numbers

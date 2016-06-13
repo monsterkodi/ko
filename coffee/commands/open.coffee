@@ -40,12 +40,13 @@ class Open extends Command
 
     constructor: ->
         
-        @shortcut = 'command+p'
-        @files    = null
-        @file     = null
-        @dir      = null
-        @pkg      = null
-        @selected = 0
+        @shortcuts = ['command+p', 'command+shift+p']
+        @files     = null
+        @file      = null
+        @dir       = null
+        @pkg       = null
+        @combo     = null
+        @selected  = 0
         
         super
                     
@@ -135,7 +136,7 @@ class Open extends Command
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
         
-    start: -> 
+    start: (@combo) -> 
         window.openFileAtIndex = @openFileAtIndex
         @files = []
         @selected = 0
@@ -148,6 +149,10 @@ class Open extends Command
             @dir  = @pkg = resolve '~'
             
         @startWalker()
+        
+        if @combo == @shortcuts[1]
+            @setName "new window"
+            
         return ""
         
     # 000   000   0000000   000      000   000  00000000  00000000 
@@ -249,8 +254,10 @@ class Open extends Command
                     if fileExists file + '.coffee'
                         file += '.coffee'
             files.splice i, 1, file
-        
-        opened = window.openFiles files
+            
+        options = 
+            newWindow: @combo == @shortcuts[1] # lazy bastard :)
+        opened = window.openFiles files, options
         if opened?.length
             if opened.length == 1
                 super opened[0]

@@ -42,10 +42,10 @@ class Editor extends Buffer
         @updateTitlebar()
         if file?
             @watch = new watcher @
+            @setText fs.readFileSync file, encoding: 'UTF8'
         else
             @watch = null
         # log 'editor.setCurrentFile', file    
-        @setText fs.readFileSync file, encoding: 'UTF8'
 
     #  0000000  00000000  000000000  000      000  000   000  00000000   0000000
     # 000       000          000     000      000  0000  000  000       000     

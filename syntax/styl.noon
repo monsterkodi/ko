@@ -70,5 +70,4 @@
 
 # salt header
 
-(^\*?)([0\s]+$)             . comment.marker . comment
-
+^\s*\/\/\s+([0\s]+)$        . comment.header

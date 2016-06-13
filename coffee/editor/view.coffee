@@ -90,7 +90,7 @@ class View extends ViewBase
             name = path.extname(file).substr(1)
             if name in syntax.syntaxNames
                 @syntax.name = name
-        
+        log 'view.setCurrentFile', file, @syntax.name
         super file # -> setText -> setLines
         
         @scrollBy 0

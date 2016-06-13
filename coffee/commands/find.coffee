@@ -11,7 +11,7 @@ class Find extends Command
 
     constructor: ->
         
-        @shortcut = 'command+f'
+        @shortcuts = ['command+f']
         
         super
         

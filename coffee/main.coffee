@@ -324,8 +324,9 @@ class Main
         win.on 'move', @onMoveWin
                 
         winReady = =>
-            win.webContents.send 'loadFile', openFile if openFile?
             win.webContents.send 'setWinID', win.id
+            if openFile?
+                win.webContents.send 'loadFile', openFile 
         
         win.webContents.on 'dom-ready', winReady
                 

@@ -14,7 +14,7 @@ class Goto extends Command
 
     constructor: ->
         
-        @shortcut = 'command+;'
+        @shortcuts = ['command+;']
         
         super
         
