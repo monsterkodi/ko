@@ -102,17 +102,8 @@ class Minimap
                     for cls in last(r.stack).split '.'
                         c.addClass cls
                 else
+                    log 'no stack?', li
                     c.addClass 'text'
-                line.add c
-        else
-            rgs = @editor.nonSpaceRangesInLineAtIndex li
-            for r in @editor.nonSpaceRangesInLineAtIndex li
-                c = @s.rect()
-                c.attr
-                    height: 2
-                    x:      r[1][0]
-                    width:  r[1][1]-r[1][0]                    
-                c.addClass 'text'
                 line.add c
         line
                 

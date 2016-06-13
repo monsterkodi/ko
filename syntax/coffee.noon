@@ -13,6 +13,8 @@
 ->                             syntax.function.marker
 =>                             syntax.function.marker.bound
 
+\S+                            text
+
 # braces
 
 [\(\)\{\}\[\]]                 syntax.bracket
