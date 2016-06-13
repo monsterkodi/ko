@@ -1,10 +1,8 @@
 # todo/ideas
 
-- clamp cursors when clicking without command
-- or insert spaces when inserting at virtual cursors
-
-- open command
-    - re-load files when input resolves to existing directory
+- insert spaces when inserting at virtual cursors
+- open in new window command-shift-p
+- scroll search result to top when executing find command
     
 - minimap    
 - history of file locations
@@ -23,7 +21,7 @@
 - fix update?
 
 - syntax
-    - md, styl, html
+    - md, styl, pug, html
 
 - bracket matching
 

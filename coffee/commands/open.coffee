@@ -1,3 +1,4 @@
+
 #  0000000   00000000   00000000  000   000
 # 000   000  000   000  000       0000  000
 # 000   000  00000000   0000000   000 0 000
@@ -24,6 +25,15 @@ fuzzy   = require 'fuzzy'
 fs      = require 'fs'
 _       = require 'lodash'
 
+fileExtensions = [
+    '.coffee', '.js', 
+    '.styl', '.css'
+    '.pug', '.jade', '.html', 
+    '.md', 
+    '.noon', '.json', 
+    '.sh', '.py'
+    ]
+    
 class Open extends Command
 
     constructor: ->
@@ -161,7 +171,7 @@ class Open extends Command
                     that.files.push p
                 else if (name.startsWith '.') or extn in ['.app']
                     @ignore p 
-                else if extn in ['.coffee', '.styl', '.js', '.html', '.md', '.noon', '.json', '.sh', '.py', '.css']
+                else if extn in fileExtensions
                     that.files.push p
                 if that.files.length > 500
                     @end()
@@ -180,8 +190,9 @@ class Open extends Command
         weight = (f) =>
             
             extnameBonus = switch path.extname(f)
-                when '.coffee', '.noon' then 100
-                when '.md' then 50
+                when '.coffee' then 100
+                when '.md', '.styl', 'pug' then 50
+                when '.noon' then 25
                 when '.js', '.json' then -1000000
                 else 
                     0 

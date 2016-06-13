@@ -120,6 +120,7 @@ class ViewBase extends Editor
         super lines
         @updateSizeValues()
         @displayLines 0
+        @minimap?.renderLines()
 
     # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
     # 000       000   000  0000  000     000     000       000     000   000     
@@ -292,7 +293,8 @@ class ViewBase extends Editor
             @renderSelection()   
                      
         @renderHighlights()
-        @updateSizeValues()        
+        @updateSizeValues()  
+        @minimap?.changed changeInfo
     
     updateLine: (lineIndex) ->
         if @topIndex <= lineIndex < @lines.length

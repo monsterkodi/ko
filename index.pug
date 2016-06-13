@@ -1,0 +1,29 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset='utf-8')
+        title ko
+        link(rel='stylesheet' href='css/style.css' type='text/css')
+    body
+        #main
+            .split.split-horiz
+                .split-pane.split-top
+                    .split-rel
+                        #scroll
+                            pre.terminaljs(data-columns="80" data-rows="24")
+                .split-handle.top
+                .commandline
+                    span.commandline-command
+                    span.commandline-span
+                        .commandline-editor(tabindex="1")
+                .split-handle.bot
+                .split-pane.split-bot
+                    .split-rel
+                        .editor(tabindex="0")
+                        svg.minimap
+                        .scrollbar.right
+                            .scrollhandle.right
+        div.titlebar
+    script.
+        require('./js/window.js')
+

@@ -1,39 +1,36 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>ko</title>
-        <link rel='stylesheet' href='./css/style.css'>
-    </head>
-    <body>
-        <div id="main">
-            <div class="split split-horiz">
-                <div class="split-pane split-top">
-                    <div class="split-rel">
-                        <div id="scroll">
-                            <pre class="terminaljs" data-columns="80" data-rows="24"></pre>
-                        </div>
-                    </div>
-                </div>
-                <div class="split-handle top"></div>
-                <div class="commandline">
-                    <span class="commandline-command"></span>
-                    <span class="commandline-span">
-                        <div class="commandline-editor" tabindex="1"></div>
-                    </span>
-                </div>
-                <div class="split-handle bot"></div>
-                <div class="split-pane split-bot">
-                    <div class="split-rel">
-                        <div class="editor" tabindex="0"></div>
-                        <div class="scrollbar right"><div class="scrollhandle right"></div></div>
-                    </div>
-                </div>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ko</title>
+    <link rel="stylesheet" href="css/style.css" type="text/css">
+  </head>
+  <body>
+    <div id="main">
+      <div class="split split-horiz">
+        <div class="split-pane split-top">
+          <div class="split-rel">
+            <div id="scroll">
+              <pre class="terminaljs" data-columns="80" data-rows="24"></pre>
             </div>
+          </div>
         </div>
-        <div class="titlebar"></div>
-    </body>
-    <script>
-        require('./js/window.js')
-    </script>
+        <div class="split-handle top"></div>
+        <div class="commandline"><span class="commandline-command"></span><span class="commandline-span">
+            <div class="commandline-editor" tabindex="1"></div></span></div>
+        <div class="split-handle bot"></div>
+        <div class="split-pane split-bot">
+          <div class="split-rel">
+            <div class="editor" tabindex="0"></div>
+            <svg class="minimap"></svg>
+            <div class="scrollbar right">
+              <div class="scrollhandle right"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="titlebar"></div>
+  </body>
+  <script>require('./js/window.js')</script>
 </html>

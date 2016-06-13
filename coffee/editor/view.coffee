@@ -14,6 +14,7 @@ drag      = require '../tools/drag'
 keyinfo   = require '../tools/keyinfo'
 split     = require '../split'
 ViewBase  = require './viewbase'
+Minimap   = require './minimap'
 render    = require './render'
 watcher   = require './watcher'
 path      = require 'path'
@@ -28,7 +29,9 @@ class View extends ViewBase
         @fontSizeKey     = 'editorFontSize'
 
         super viewElem
-        
+
+        @minimap = new Minimap @
+                
         @smoothScrolling   = true
         @scroll            = 0
         @scrollhandleRight = $('.scrollhandle.right', @view.parentElement)
@@ -39,7 +42,7 @@ class View extends ViewBase
             cursor: 'ns-resize'
 
         @view.addEventListener 'wheel', @onWheel
-
+        
     done: =>
         @updateTitlebar()
         super
@@ -135,6 +138,7 @@ class View extends ViewBase
         super
         if @editorHeight <= oldHeight
             @updateScrollbar()
+            @minimap?.resized()
 
     #  0000000   0000000  00000000    0000000   000      000    
     # 000       000       000   000  000   000  000      000    
@@ -143,6 +147,7 @@ class View extends ViewBase
     # 0000000    0000000  000   000   0000000   0000000  0000000
         
     updateScrollbar: ->
+        @minimap?.updateScroll()
         return if not @scrollhandleRight?
         sbw = getStyle '.scrollhandle', 'width'
         if @bufferHeight < @viewHeight()

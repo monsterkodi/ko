@@ -4,8 +4,9 @@ app/img
 app/css
 app/js
 app/index.html
+app/syntax
 dist
 js
 css
 Icon?
-app/syntax
+*.html

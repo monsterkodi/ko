@@ -98,13 +98,20 @@ class Buffer
                 r = @rangeForWordAtPos [c[0]-1, c[1]]
         [r[1][0], r[0]]
         
-    wordRangesInLineAtIndex: (i) ->
+    wordRangesInLineAtIndex: (li) ->
         r = []
         re = new RegExp "(\\s+|\\w+|[^\\s])", 'g'
-        while (mtch = re.exec(@lines[i])) != null
-            r.push [i, [mtch.index, re.lastIndex]]
-        r.length and r or [i, [0,0]]
-                        
+        while (mtch = re.exec(@lines[li])) != null
+            r.push [li, [mtch.index, re.lastIndex]]
+        r.length and r or [[li, [0,0]]]
+       
+    nonSpaceRangesInLineAtIndex: (li) ->                        
+        r = []
+        re = new RegExp "([^\\s]+)", 'g'
+        while (mtch = re.exec(@lines[li])) != null
+            r.push [li, [mtch.index, re.lastIndex]]
+        r.length and r or [[li, [0,0]]]
+
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000   0000000
     # 000       000       000      000       000          000     000  000   000  0000  000  000     
     # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000  0000000 
@@ -324,7 +331,7 @@ class Buffer
         r = []
         for li in [0...@lines.length]
             r = r.concat @rangesForTextInLineAtIndex t, li
-        r
+        r        
                                         
     # 000   000  000   000  000   000   0000000  00000000  0000000    00000 
     # 000   000  0000  000  000   000  000       000       000   000     000
