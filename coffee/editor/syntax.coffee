@@ -27,7 +27,7 @@ class syntax
     
     changed: (changeInfo) ->
         if changeInfo.deleted.length or changeInfo.inserted.length or changeInfo.changed.length
-            # log 'syntax.sorded', changeInfo.sorted        
+            # log 'syntax.sorted', changeInfo.sorted        
             for [li, change] in changeInfo.sorted
                 switch change
                     when 'deleted'  then @diss.splice li, 1
@@ -40,13 +40,11 @@ class syntax
     # 000        000   000  000   000       000  000     
     # 000        000   000  000   000  0000000   00000000
         
-    parse: ->
-        @diss = []
-        for li in [0...@editor.lines]
-            log 'parse', li
-            @diss.push @dissForLineIndex li
-            if li > 10
-                break
+    parse: -> @diss = []
+        # for li in [0...@editor.lines]
+        #     @diss.push @dissForLineIndex li
+        #     if li > 10
+        #         break
 
     dissForLineIndex: (lineIndex) -> 
         syntax.dissForTextAndSyntax @editor.lines[lineIndex], @name
@@ -55,9 +53,8 @@ class syntax
         matchr.dissect matchr.ranges syntax.matchrConfigs[n], line
         
     getDiss: (li) ->
-        # log 'getDiss', li
         while li >= @diss.length
-            log 'getDiss', li
+            diss = matchr.dissect matchr.ranges syntax.matchrConfigs[@name], @editor.lines[li]
             @diss.push @dissForLineIndex @diss.length # insert blanks?
         @diss[li]
         

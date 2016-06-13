@@ -25,6 +25,7 @@ class Minimap
             viewBox:  '0 0 120 0'
 
         @lines = []
+        @top = 0
 
         @buffer = @s.rect()
         @buffer.attr
@@ -52,11 +53,12 @@ class Minimap
         
         if @editor.lines.length > @editor.viewHeight()/2 
             top = Math.max 0, @editor.botIndex*2 - @editor.viewHeight()
-        else
-            top = 0
+            if top != @top
+                @renderLines top
+                # log 'minimap.scroll.top', @top # check for overlaps?
         
         @s.attr
-            viewBox:  "0 #{top} 120 #{@editor.viewHeight()}"
+            viewBox:  "0 0 120 #{@editor.viewHeight()}"
             
         @buffer.attr
             height:   @editor.lines.length*2
@@ -75,7 +77,7 @@ class Minimap
         t = @editor.lines[li]
         line = @s.group()       
         line.attr
-            transform: "translate(0 #{li*2})"
+            transform: "translate(0 #{(li-@top)*2})"
          
         if showSpaces?
             l = @s.rect()
@@ -101,11 +103,11 @@ class Minimap
                     x:      r.start
                     width:  r.match.length
                 if r.stack?.length
-                    if last(r.stack).split?
+                    if last(r.stack)?.split?
                         for cls in last(r.stack).split '.'
                             c.addClass cls
                     else
-                        log 'warning! no stack.split?', li, r.stack
+                        log 'warning! no last(r.stack)?.split?', li, r.stack
                 else
                     log 'warning! no stack?', li, r
                     c.addClass 'text'
@@ -142,13 +144,13 @@ class Minimap
     # 000   000  000       000  0000  000   000  000       000   000
     # 000   000  00000000  000   000  0000000    00000000  000   000
     
-    renderLines: () ->
+    renderLines: (@top=0) ->
         
         return if @editor.viewHeight() <= 0
         # profile 'minimap.renderLines'
         @clear()
-        bot = Math.min @editor.lines.length, @editor.viewHeight()/2
-        for li in [0...bot]           
+        @bot = Math.min @editor.lines.length, @top+@editor.viewHeight()/2
+        for li in [@top...@bot]           
             @lines.push @lineForIndex li
                             
         @scroll()
