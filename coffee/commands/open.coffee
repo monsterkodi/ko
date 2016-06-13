@@ -19,6 +19,7 @@ log     = require '../tools/log'
 profile = require '../tools/profile'
 Command = require '../commandline/command'
 render  = require '../editor/render'
+syntax  = require '../editor/syntax'
 split   = require '../split'
 path    = require 'path'
 walkdir = require 'walkdir'
@@ -305,7 +306,7 @@ class Open extends Command
             for file in files
                 div = document.createElement 'div'
                 div.className = 'list-file'
-                div.innerHTML = render.line file, 'ko'
+                div.innerHTML = render.line file, syntax.dissForTextAndSyntax file, 'ko'
                 div.setAttribute "onclick", "window.openFileAtIndex(#{index});"
                 @list.appendChild div
                 div.value = file

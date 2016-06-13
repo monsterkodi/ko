@@ -47,9 +47,7 @@ class Editor extends Buffer
     setLines: (lines) ->
         super lines
         @do.reset()
-            
-    done: => 
-        
+                    
     #  0000000  000  000   000   0000000   000      00000000
     # 000       000  0000  000  000        000      000     
     # 0000000   000  000 0 000  000  0000  000      0000000 

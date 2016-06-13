@@ -4,33 +4,12 @@
 # 000   000  000       000  0000  000   000  000       000   000
 # 000   000  00000000  000   000  0000000    00000000  000   000
 
-matchr = require '../tools/matchr'
 encode = require '../tools/encode'
 enspce = require '../tools/enspce'
 log    = require '../tools/log'
-noon   = require 'noon'
-path   = require 'path'
-fs     = require 'fs'
 
 class render 
                 
-    @matchrConfigs = {}
-    @syntaxNames = []
-    
-    # 000  000   000  000  000000000
-    # 000  0000  000  000     000   
-    # 000  000 0 000  000     000   
-    # 000  000  0000  000     000   
-    # 000  000   000  000     000   
-
-    @init: =>
-        syntaxDir = "#{__dirname}/../../syntax/"
-        for syntaxFile in fs.readdirSync syntaxDir
-            syntaxName = path.basename syntaxFile, '.noon'
-            @syntaxNames.push syntaxName
-            patterns = noon.load path.join syntaxDir, syntaxFile
-            @matchrConfigs[syntaxName] = matchr.config patterns
-
     #  0000000   0000000   000       0000000   00000000   000  0000000  00000000
     # 000       000   000  000      000   000  000   000  000     000   000     
     # 000       000   000  000      000   000  0000000    000    000    0000000 
@@ -59,14 +38,15 @@ class render
     # 000      000  000  0000  000     
     # 0000000  000  000   000  00000000
     
-    @line: (line, syntaxName) =>
-                
-        rngs = matchr.ranges @matchrConfigs[syntaxName], line
-        diss = matchr.dissect rngs 
-        if diss.length
+    @line: (line, diss) =>
+        if diss?.length
             for di in [diss.length-1..0]
                 d = diss[di]
-                clrzd = @colorize d.match, d.stack.reverse()
+                if d.stack?
+                    clrzd = @colorize d.match, d.stack.reverse()
+                else
+                    log 'wtf?'
+                    clrzd = encode d.match
                 line = line.slice(0, d.start) + clrzd + line.slice(d.start+d.match.length)
 
         enspce line
@@ -146,7 +126,5 @@ class render
         empty = sel[1][0] == sel[1][1] and " empty" or ""
         
         "<span class=\"#{clss}#{border}#{empty}\" style=\"transform: translate(#{tx}px,#{ty}px); width: #{sw}px; height: #{lh}px\"></span>"
-    
-render.init()
-                                            
+                                                
 module.exports = render

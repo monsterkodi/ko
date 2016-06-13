@@ -16,6 +16,7 @@ drag      = require '../tools/drag'
 keyinfo   = require '../tools/keyinfo'
 log       = require '../tools/log'
 render    = require './render'
+syntax    = require './syntax'
 Editor    = require './editor'
 _         = require 'lodash'
 electron  = require 'electron'
@@ -23,16 +24,23 @@ clipboard = electron.clipboard
 
 class ViewBase extends Editor
 
+    # 000  000   000  000  000000000
+    # 000  0000  000  000     000   
+    # 000  000 0 000  000     000   
+    # 000  000  0000  000     000   
+    # 000  000   000  000     000   
+
     constructor: (viewElem) ->
-    
-        @syntaxName = 'txt'    
+         
         @view = viewElem
         @initLayers ["selections", "highlights", "lines", "cursors"]
         @elem = $('.lines', @view)
-        @divs = []        
+        @divs = []   
+        @diss = []
         @topIndex = 0
         @botIndex = 0
         @size = {}
+        @syntax = new syntax @
     
         @setFontSize prefs.get @fontSizeKey, @fontSizeDefault
 
@@ -107,20 +115,28 @@ class ViewBase extends Editor
             div.className = cls
             @view.appendChild div
 
-    # 000000000  00000000  000   000  000000000
-    #    000     000        000 000      000   
-    #    000     0000000     00000       000   
-    #    000     000        000 000      000   
-    #    000     00000000  000   000     000   
+    #  0000000  00000000  000000000  000000000  00000000  000   000  000000000
+    # 000       000          000        000     000        000 000      000   
+    # 0000000   0000000      000        000     0000000     00000       000   
+    #      000  000          000        000     000        000 000      000   
+    # 0000000   00000000     000        000     00000000  000   000     000   
 
     setText: (text) -> @setLines text?.split /\n/
+        
+    #  0000000  00000000  000000000  000      000  000   000  00000000   0000000
+    # 000       000          000     000      000  0000  000  000       000     
+    # 0000000   0000000      000     000      000  000 0 000  0000000   0000000 
+    #      000  000          000     000      000  000  0000  000            000
+    # 0000000   00000000     000     0000000  000  000   000  00000000  0000000 
         
     setLines: (lines) ->
         lines ?= ['']
         super lines
+        
+        @syntax.parse()
+                
         @updateSizeValues()
-        @displayLines 0
-        @minimap?.renderLines()
+        @displayLines 0        
 
     # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
     # 000       000   000  0000  000     000     000       000     000   000     
@@ -146,8 +162,8 @@ class ViewBase extends Editor
         @updateNumLines()
         @displayLines @topIndex
 
-    renderLine: (line) ->
-        render.line line, @syntaxName
+    renderLineAtIndex: (li) ->
+        render.line @lines[li], @syntax.diss[li]
 
     displayLines: (top) ->
         @topIndex = top
@@ -155,12 +171,13 @@ class ViewBase extends Editor
         @updateScrollbar?()
         @updateNumLines()
                 
-        @divs = []
+        @divs = []        
+        
         for c in [0...@elem.children.length]
             i = c + @topIndex
             @elem.children[c].id = "line-#{i}"
             if i < @lines.length
-                span = @renderLine @lines[i]
+                span = @renderLineAtIndex i
                 @divs.push span
                 @elem.children[c].innerHTML = span
             else
@@ -210,7 +227,7 @@ class ViewBase extends Editor
     #  0000000   000        0000000    000   000     000     00000000
 
     done: => 
-        super
+        log 'done'
         @changed @do.changeInfo
 
     updateSizeValues: ->
@@ -248,7 +265,6 @@ class ViewBase extends Editor
         else if cl > @botIndex - 4
             botdelta = Math.min(@lines.length+1, cl + 4) - @botIndex
             
-        # log topdelta, botdelta
         if botdelta > 0
             Math.max botdelta, topdelta
         else if topdelta < 0
@@ -263,7 +279,8 @@ class ViewBase extends Editor
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
     changed: (changeInfo) ->
-        # log 'Viewbase.changed changeInfo.deleted', changeInfo.deleted
+
+        @syntax.changed changeInfo
         indices = []
         info = _.cloneDeep changeInfo
         for i in info.changed
@@ -284,7 +301,6 @@ class ViewBase extends Editor
         indices.sort (a,b) -> a - b
         indices = _.sortedUniq indices
                 
-        # log 'sorted unique indices', indices    
         for i in indices
             @updateLine i
         if changeInfo.cursor.length
@@ -294,12 +310,11 @@ class ViewBase extends Editor
                      
         @renderHighlights()
         @updateSizeValues()  
-        @minimap?.changed changeInfo
     
     updateLine: (lineIndex) ->
         if @topIndex <= lineIndex < @lines.length
             relIndex = lineIndex - @topIndex
-            span = @renderLine @lines[lineIndex]
+            span = @renderLineAtIndex lineIndex
             @divs[relIndex] = span
             @elem.children[relIndex]?.innerHTML = span
         else if lineIndex >= @lines.length and lineIndex < @botIndex

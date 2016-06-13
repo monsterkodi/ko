@@ -15,7 +15,7 @@ keyinfo   = require '../tools/keyinfo'
 split     = require '../split'
 ViewBase  = require './viewbase'
 Minimap   = require './minimap'
-render    = require './render'
+syntax    = require './syntax'
 watcher   = require './watcher'
 path      = require 'path'
 electron  = require 'electron'
@@ -28,9 +28,9 @@ class View extends ViewBase
         @fontSizeDefault = 15
         @fontSizeKey     = 'editorFontSize'
 
-        super viewElem
-
         @minimap = new Minimap @
+        
+        super viewElem
                 
         @view.style.right = "#{@minimap.width()}px"                
                 
@@ -46,41 +46,26 @@ class View extends ViewBase
         @view.addEventListener 'wheel', @onWheel
         
     done: =>
+        log 'well done'
         @updateTitlebar()
-        super
+        @changed @do.changeInfo
 
-    # 00000000  000  000      00000000
-    # 000       000  000      000     
-    # 000000    000  000      0000000 
-    # 000       000  000      000     
-    # 000       000  0000000  00000000
-
-    setCurrentFile: (file) ->
-        @syntaxName = 'txt'
-        if file?
-            name = path.extname(file).substr(1)
-            if name in render.syntaxNames
-                @syntaxName = name
-        super file
-        @scrollBy 0
-
-    # 000      000  000   000  00000000   0000000
-    # 000      000  0000  000  000       000     
-    # 000      000  000 0 000  0000000   0000000 
-    # 000      000  000  0000  000            000
-    # 0000000  000  000   000  00000000  0000000 
+    #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
+    # 000       000   000  000   000  0000  000  000        000       000   000
+    # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
+    # 000       000   000  000   000  000  0000  000   000  000       000   000
+    #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
-    changed: (changeInfo) ->
+    changed: (changeInfo) ->        
         
         if changeInfo.changed.length or changeInfo.deleted.length or changeInfo.inserted.length
             @updateTitlebar() # sets dirty flag
         
-        # log 'changed', changeInfo
+        @minimap.changed changeInfo
         
         delta = @deltaToEnsureCursorsAreVisible()
-        # log 'view.changed: delta', delta
+
         if delta and changeInfo.cursor.length
-            # log 'view.changed: scroll by delta', delta
             @scrollBy delta * @size.lineHeight #todo: slow down when using mouse
             @scrollCursor()
             return
@@ -91,9 +76,31 @@ class View extends ViewBase
             @updateScrollbar()
         if changeInfo.cursor.length
             @scrollCursor()        
+
+    # 00000000  000  000      00000000
+    # 000       000  000      000     
+    # 000000    000  000      0000000 
+    # 000       000  000      000     
+    # 000       000  0000000  00000000
+
+    setCurrentFile: (file) ->
+        @syntax.name = 'txt'
+        if file?
+            name = path.extname(file).substr(1)
+            if name in syntax.syntaxNames
+                @syntax.name = name
+        super file
+        @scrollBy 0
+
+    # 000      000  000   000  00000000   0000000
+    # 000      000  0000  000  000       000     
+    # 000      000  000 0 000  0000000   0000000 
+    # 000      000  000  0000  000            000
+    # 0000000  000  000   000  00000000  0000000 
     
     setLines: (lines) ->
         super lines
+        @minimap.renderLines()
         @scrollBy 0
     
     # 0000000   0000000    0000000   00     00

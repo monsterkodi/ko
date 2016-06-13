@@ -1,5 +1,6 @@
 # todo/ideas
 
+- scroll log on input
 - refactor syntax matching for minimap
 - highlight cursor line(s?)
 - highlight last cursor
@@ -8,8 +9,6 @@
 - insert spaces when inserting at virtual cursors
 
 - history of file locations
-- log in scroll area
-
 - search in multiple files
 
 - git status in gutter?

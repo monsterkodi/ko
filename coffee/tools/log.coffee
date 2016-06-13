@@ -6,6 +6,16 @@
 
 str  = require './str'
 
-log = -> console.log (str(s) for s in [].slice.call arguments, 0).join " "
+log = -> 
+    console.log (str(s) for s in [].slice.call arguments, 0).join " "
+    
+logScroll = -> 
+    s = (str(s) for s in [].slice.call arguments, 0).join " "
+    console.log s
+    tools = require './tools'
+    tools.$('scroll').innerHTML += s + "<br>"
 
-module.exports = log
+if window?
+    module.exports = logScroll
+else
+    module.exports = log

@@ -4,8 +4,8 @@
 # 000   000  000  0000  000   000  000   000
 #  0000000   000   000  0000000     0000000 
 
-log = require '../tools/log'
-{last} = require '../tools/tools'
+log     = require '../tools/log'
+{last}  = require '../tools/tools'
 {clone} = require 'lodash'
 
 class undo
@@ -42,7 +42,7 @@ class undo
             changed:   []
             inserted:  []
             deleted:   []
-            hist:      ""
+            sorted:    []
             
     getChangeInfo: ->
         if not @changeInfo?
@@ -53,16 +53,20 @@ class undo
         @getChangeInfo()
         if @changeInfo.changed.indexOf(i) < 0
             @changeInfo.changed.push i
+            @changeInfo.sorted.push [i, 'changed']
 
     changeInfoLineInsert: (i) ->
         @getChangeInfo()
         @changeInfo.inserted.push i
-        @changeInfo.hist += "+#{i}"
+        @changeInfo.sorted.push [i, 'inserted']
 
     changeInfoLineDelete: (i) ->
         @getChangeInfo()
         @changeInfo.deleted.push i
-        @changeInfo.hist += "-#{i}"
+        for c in @changeInfo.sorted
+            if c[0] > i
+                c[0] -= 1
+        @changeInfo.sorted.push [i, 'deleted']        
         
     changeInfoCursor: (obj) ->
         @getChangeInfo()
@@ -304,9 +308,24 @@ class undo
                 @groupDone()
                 @delChangeInfo()
         
+    #  0000000  000      00000000   0000000   000   000
+    # 000       000      000       000   000  0000  000
+    # 000       000      0000000   000000000  000 0 000
+    # 000       000      000       000   000  000  0000
+    #  0000000  0000000  00000000  000   000  000   000
+        
     cleanChangeInfo: ->
-        @changeInfo.deleted.sort (a,b) -> a-b
-        @changeInfo.cursor.sort (a,b) -> a-b
+        @changeInfo.inserted.sort (a,b) -> a-b
+        @changeInfo.deleted.sort  (a,b) -> a-b
+        @changeInfo.changed.sort  (a,b) -> a-b
+        @changeInfo.cursor.sort   (a,b) -> a-b
+        
+        if @changeInfo.sorted.length
+            deleted = [] # move deleted to front
+            for i in [@changeInfo.sorted.length-1..0]
+                if @changeInfo.sorted[i][1] == 'deleted'
+                    deleted.unshift @changeInfo.sorted.splice(i, 1)[0]
+            @changeInfo.sorted = deleted.concat @changeInfo.sorted
         # log 'cleanChangeInfo', @changeInfo
                 
     # 00     00  00000000  00000000    0000000   00000000
