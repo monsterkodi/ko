@@ -31,8 +31,8 @@ class syntax
             for [li, change] in changeInfo.sorted
                 switch change
                     when 'deleted'  then @diss.splice li, 1
-                    when 'inserted' then @diss.splice li, 0, @dissForLine @editor.lines[li]
-                    when 'changed'  then @diss[li] = @dissForLine @editor.lines[li]
+                    when 'inserted' then @diss.splice li, 0, @dissForLineIndex li
+                    when 'changed'  then @diss[li] = @dissForLineIndex li
                 
     # 00000000    0000000   00000000    0000000  00000000
     # 000   000  000   000  000   000  000       000     
@@ -42,13 +42,24 @@ class syntax
         
     parse: ->
         @diss = []
-        for line in @editor.lines
-            @diss.push @dissForLine line
+        for li in [0...@editor.lines]
+            log 'parse', li
+            @diss.push @dissForLineIndex li
+            if li > 10
+                break
 
-    dissForLine: (line) -> syntax.dissForTextAndSyntax line, @name
+    dissForLineIndex: (lineIndex) -> 
+        syntax.dissForTextAndSyntax @editor.lines[lineIndex], @name
 
     @dissForTextAndSyntax: (line, n) ->
         matchr.dissect matchr.ranges syntax.matchrConfigs[n], line
+        
+    getDiss: (li) ->
+        # log 'getDiss', li
+        while li >= @diss.length
+            log 'getDiss', li
+            @diss.push @dissForLineIndex @diss.length # insert blanks?
+        @diss[li]
         
     # 000  000   000  000  000000000
     # 000  0000  000  000     000   

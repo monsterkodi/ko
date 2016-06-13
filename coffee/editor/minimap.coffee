@@ -85,9 +85,10 @@ class Minimap
                 width:  t.length
             l.addClass 'space'
             line.add l
-            
-        if @editor.syntax.diss[li].length
-            for r in @editor.syntax.diss[li]
+        
+        diss = @editor.syntax.getDiss li
+        if diss.length
+            for r in diss
                 # log 'li', li, r
                 if r.match?
                     continue if r.match.trim().length == 0 # ignore spaces
@@ -100,10 +101,13 @@ class Minimap
                     x:      r.start
                     width:  r.match.length
                 if r.stack?.length
-                    for cls in last(r.stack).split '.'
-                        c.addClass cls
+                    if last(r.stack).split?
+                        for cls in last(r.stack).split '.'
+                            c.addClass cls
+                    else
+                        log 'warning! no stack.split?', li, r.stack
                 else
-                    log 'warning! no stack?', li
+                    log 'warning! no stack?', li, r
                     c.addClass 'text'
                 line.add c            
         line
@@ -143,7 +147,8 @@ class Minimap
         return if @editor.viewHeight() <= 0
         # profile 'minimap.renderLines'
         @clear()
-        for li in [0...@editor.lines.length]            
+        bot = Math.min @editor.lines.length, @editor.viewHeight()/2
+        for li in [0...bot]           
             @lines.push @lineForIndex li
                             
         @scroll()

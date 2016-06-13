@@ -162,7 +162,7 @@ class ViewBase extends Editor
         @displayLines @topIndex
 
     renderLineAtIndex: (li) ->
-        render.line @lines[li], @syntax.diss[li]
+        render.line @lines[li], @syntax.getDiss li
 
     displayLines: (top) ->
         @topIndex = top
