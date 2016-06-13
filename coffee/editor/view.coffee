@@ -32,6 +32,8 @@ class View extends ViewBase
 
         @minimap = new Minimap @
                 
+        @view.style.right = "#{@minimap.width()}px"                
+                
         @smoothScrolling   = true
         @scroll            = 0
         @scrollhandleRight = $('.scrollhandle.right', @view.parentElement)
@@ -138,8 +140,8 @@ class View extends ViewBase
         super
         if @editorHeight <= oldHeight
             @updateScrollbar()
-            @minimap?.resized()
-
+            @minimap?.scroll()
+            
     #  0000000   0000000  00000000    0000000   000      000    
     # 000       000       000   000  000   000  000      000    
     # 0000000   000       0000000    000   000  000      000    
@@ -147,15 +149,13 @@ class View extends ViewBase
     # 0000000    0000000  000   000   0000000   0000000  0000000
         
     updateScrollbar: ->
-        @minimap?.updateScroll()
+        @minimap?.scroll()
         return if not @scrollhandleRight?
         sbw = parseInt getStyle '.scrollhandle', 'width'
-        mmw = @minimap?.width() ? 0
         if @bufferHeight < @viewHeight()
             @scrollhandleRight.style.top    = "0"
             @scrollhandleRight.style.height = "0"
             @scrollhandleRight.style.width  = "0"
-            @view.style.right = "#{mmw}px"
         else
             vh           = Math.min @editorHeight, @viewHeight()
             scrollTop    = parseInt (@scroll / @bufferHeight) * vh
@@ -167,7 +167,6 @@ class View extends ViewBase
             @scrollhandleRight.style.top    = "#{scrollTop}px"
             @scrollhandleRight.style.height = "#{scrollHeight}px"
             # @scrollhandleRight.style.width  = "#{sbw}px"
-            @view.style.right = "#{mmw}px"
                 
     scrollLines: (lineDelta) -> @scrollBy lineDelta * @size.lineHeight
 

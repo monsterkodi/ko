@@ -452,10 +452,15 @@ class Editor extends Buffer
         @do.start()
         @deleteSelection()
         newCursors = _.cloneDeep @cursors
+        
         for c in @cursors
-            alert 'wtf?' if c.length < 2 or c[1] >= @lines.length
-            @do.change @lines, c[1], @lines[c[1]].splice c[0], 0, ch
-            newCursors[@indexOfCursor c] = [c[0]+1, c[1]]
+            oc = newCursors[@indexOfCursor c]
+            alert 'wtf?' if oc.length < 2 or oc[1] >= @lines.length
+            @do.change @lines, oc[1], @lines[oc[1]].splice oc[0], 0, ch
+            for nc in @positionsInLineAtIndexInPositions oc[1], newCursors
+                if nc[0] >= oc[0]
+                    nc[0] += 1
+
         @do.cursors @, newCursors
         @do.end()
         
@@ -592,17 +597,6 @@ class Editor extends Buffer
         @do.cursors @, newCursors
         @do.end()
         @clearHighlights()
-
-    deleteForward: ->
-        if @selections.length
-            @deleteSelection()
-        else
-            for c in @cursors
-                if @cursorAtEndOfLine c
-                    @joinLineOfCursor c
-                else
-                    @do.change @lines, c[1], @lines[c[1]].splice c[0], 1
-            @clearHighlights()
         
     deleteTab: ->
         if @selections.length
@@ -620,7 +614,40 @@ class Editor extends Buffer
             @do.cursors @, newCursors
             @do.end()
             @clearHighlights()
-    
+            
+    deleteForward: ->
+        if @selections.length
+            @deleteSelection()
+        else
+            @do.start()
+            newCursors = _.cloneDeep @cursors
+            for c in @reversedCursors()
+            
+                if @cursorAtEndOfLine c # cursor at end of line
+                    if not @cursorInLastLine c # cursor not in first line
+                    
+                        ll = @lines[c[1]].length
+                    
+                        @do.change @lines, c[1], @lines[c[1]] + @lines[c[1]+1]
+                        @do.delete @lines, c[1]+1
+                                    
+                        # move cursors in joined line
+                        for nc in @positionsInLineAtIndexInPositions c[1]+1, newCursors
+                            nc[1] -= 1
+                            nc[0] += ll
+                        # move cursors below deleted line up
+                        for nc in @positionsBelowLineIndexInPositions c[1]+1, newCursors
+                            nc[1] -= 1
+                else
+                    @do.change @lines, c[1], @lines[c[1]].splice c[0], 1
+                    for nc in @positionsInLineAtIndexInPositions c[1], newCursors
+                        if nc[0] > c[0]
+                            nc[0] -= 1
+
+            @do.cursors @, newCursors
+            @do.end()
+            @clearHighlights()
+            
     deleteBackward: ->
         if @selections.length
             @deleteSelection()
@@ -629,10 +656,9 @@ class Editor extends Buffer
             newCursors = _.cloneDeep @cursors
             for c in @reversedCursors()
             
-                if c[0] == 0 
-                    if c[1] > 0
+                if c[0] == 0 # cursor at start of line
+                    if c[1] > 0 # cursor not in first line
                         ll = @lines[c[1]-1].length
-                        # newCursors[@indexOfCursor(c)] = [ll, c[1]-1]
                         @do.change @lines, c[1]-1, @lines[c[1]-1] + @lines[c[1]]
                         @do.delete @lines, c[1]
                         # move cursors in joined line
@@ -648,7 +674,9 @@ class Editor extends Buffer
                     if t.trim().length != 0
                         n = 1
                     @do.change @lines, c[1], @lines[c[1]].splice c[0]-n, n
-                    newCursors[@indexOfCursor(c)] = [c[0]-n, c[1]]
+                    for nc in @positionsInLineAtIndexInPositions c[1], newCursors
+                        if nc[0] >= c[0]
+                            nc[0] -= n
 
             @do.cursors @, newCursors
             @do.end()

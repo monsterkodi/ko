@@ -1,10 +1,12 @@
 # todo/ideas
 
-- insert spaces when inserting at virtual cursors
+- refactor syntax matching for minimap
+- highlight cursor line(s?)
+- highlight last cursor
+- line numbers
 - open in new window command-shift-p
-- scroll search result to top when executing find command
-    
-- minimap    
+- insert spaces when inserting at virtual cursors
+
 - history of file locations
 - log in scroll area
 

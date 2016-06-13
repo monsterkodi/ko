@@ -38,31 +38,19 @@ class Minimap
             y:         0
             width:    '100%'
         @topBot.addClass 'topBot'
-        
-    # 00000000   00000000   0000000  000  0000000  00000000  0000000  
-    # 000   000  000       000       000     000   000       000   000
-    # 0000000    0000000   0000000   000    000    0000000   000   000
-    # 000   000  000            000  000   000     000       000   000
-    # 000   000  00000000  0000000   000  0000000  00000000  0000000  
-            
-    resized: ->
-        @s.attr
-            viewBox:  "0 0 120 #{@editor.viewHeight()}"
-        # log 'minimap.resized', @editor.viewHeight()
-        
+                
     #  0000000   0000000  00000000    0000000   000      000    
     # 000       000       000   000  000   000  000      000    
     # 0000000   000       0000000    000   000  000      000    
     #      000  000       000   000  000   000  000      000    
     # 0000000    0000000  000   000   0000000   0000000  0000000
             
-    updateScroll: ->
+    scroll: ->
         return if @editor.viewHeight() <= 0
-        log 'updateScroll vh', @editor.viewHeight(), 'll', @editor.lines.length, 'tb', @editor.botIndex-@editor.topIndex
+        # log 'scroll vh', @editor.viewHeight(), 'll', @editor.lines.length, 'tb', @editor.botIndex-@editor.topIndex
         
         if @editor.lines.length > @editor.viewHeight()/2 
             top = Math.max 0, @editor.botIndex*2 - @editor.viewHeight()
-            log 'overflow', top
         else
             top = 0
         
@@ -113,7 +101,7 @@ class Minimap
                     c.addClass 'comment' 
                 line.add c
                 
-        @resized()
+        @scroll()
         profile 'minimap.done'
 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
