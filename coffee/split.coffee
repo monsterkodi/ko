@@ -18,6 +18,12 @@ class Split
     @titlebarHeight    = 23
     @handleHeight      = 6
     
+    # 000  000   000  000  000000000
+    # 000  0000  000  000     000   
+    # 000  000 0 000  000     000   
+    # 000  000  0000  000     000   
+    # 000  000   000  000     000   
+    
     @init: (wid) ->
         
         @winID       = wid
@@ -43,11 +49,24 @@ class Split
     
         @splitAt @getState 'split', @titlebarHeight
     
+    # 00000000   00000000   0000000  000  0000000  00000000  0000000  
+    # 000   000  000       000       000     000   000       000   000
+    # 0000000    0000000   0000000   000    000    0000000   000   000
+    # 000   000  000            000  000   000     000       000   000
+    # 000   000  00000000  0000000   000  0000000  00000000  0000000  
+    
     @resized: ->
+        return if not @dragTop
         @dragTop.setMinMax pos(0, @titlebarHeight), pos(0, sh()-@commandlineHeight-2*@handleHeight)
         @dragBot.setMinMax pos(0, @titlebarHeight), pos(0, sh()-@handleHeight)        
         if @dragBot.target.getBoundingClientRect().bottom > sh()
             @splitAt sh()-@handleHeight
+    
+    #  0000000  00000000   000      000  000000000
+    # 000       000   000  000      000     000   
+    # 0000000   00000000   000      000     000   
+    #      000  000        000      000     000   
+    # 0000000   000        0000000  000     000   
     
     @splitAt: (y) ->
         @topView    .style.height = "#{y-@commandlineHeight-@titlebarHeight-@handleHeight}px"
@@ -60,6 +79,12 @@ class Split
         @dragBot.setMinMax pos(0, @titlebarHeight), pos(0, sh()-@handleHeight)
         @setState 'split', y
 
+    #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
+    # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
+    # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 
+    # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
+    #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
+    
     @showCommandline: ->
         if @dragTop.target.getBoundingClientRect().top < 0
             @splitAt @titlebarHeight+@commandlineHeight+@handleHeight
@@ -67,7 +92,13 @@ class Split
     @hideCommandline: ->
         if @dragBot.target.getBoundingClientRect().top > @titlebarHeight
             @splitAt @titlebarHeight+2
-        
+     
+    #  0000000  000   000   0000000   00000000 
+    # 000       0000  000  000   000  000   000
+    # 0000000   000 0 000  000000000  00000000 
+    #      000  000  0000  000   000  000      
+    # 0000000   000   000  000   000  000      
+    
     @snap: ->
         t = @dragBot.target.getBoundingClientRect().top
         if t > @titlebarHeight
@@ -76,6 +107,12 @@ class Split
             else if t <  @titlebarHeight+(@commandlineHeight+@handleHeight)*2
                 @splitAt @titlebarHeight+@commandlineHeight+@handleHeight
 
+    # 00000000   0000000    0000000  000   000   0000000
+    # 000       000   000  000       000   000  000     
+    # 000000    000   000  000       000   000  0000000 
+    # 000       000   000  000       000   000       000
+    # 000        0000000    0000000   0000000   0000000 
+    
     @focusOnEditorOrHistory: ->
         @focusOnEditor()
         

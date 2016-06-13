@@ -12,7 +12,7 @@ _   = require 'lodash'
 
 class Command
 
-    constructor: () ->
+    constructor: (@commandline) ->
     
         @index = 0
         @history = ['']
@@ -40,5 +40,10 @@ class Command
     last: ->
         @index = @history.length-1
         @history[@index]
+        
+    setText: (t) -> 
+        @commandline.setText t
+        @commandline.selectAll()
+        
 
 module.exports = Command

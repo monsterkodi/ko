@@ -242,9 +242,9 @@ class Main
         {width, height} = electron.screen.getPrimaryDisplay().workAreaSize
         if wl.length == 1
             wl[0].setBounds
-                x:      parseInt width/4
+                x:      parseInt (width-height)/2
                 y:      parseInt 0
-                width:  parseInt width/2
+                width:  parseInt height
                 height: parseInt height
             , true
         else if wl.length > 1 and wl.length < 4
@@ -310,8 +310,8 @@ class Main
         win = new BrowserWindow
             width:           1000
             height:          1200
-            minWidth:        120
-            minHeight:       120
+            minWidth:        140
+            minHeight:       140
             useContentSize:  true
             backgroundColor: '#000'
             fullscreen:      false
@@ -388,9 +388,5 @@ class Main
 # 000   000  00000000  000   000  0000000       000   
 
 app.on 'ready', => main = new Main
-app.on 'window-all-closed', -> 
-    
+app.on 'window-all-closed', ->
 
-        
-                
-            

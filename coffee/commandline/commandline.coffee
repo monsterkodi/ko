@@ -41,7 +41,7 @@ class Commandline extends ViewBase
         
         for file in files
             commandClass = require file
-            @commands[commandClass.name.toLowerCase()] = new commandClass()
+            @commands[commandClass.name.toLowerCase()] = new commandClass @
                 
     startCommand: (name) ->
         @command?.cancel()

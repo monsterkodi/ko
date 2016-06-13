@@ -149,12 +149,13 @@ class View extends ViewBase
     updateScrollbar: ->
         @minimap?.updateScroll()
         return if not @scrollhandleRight?
-        sbw = getStyle '.scrollhandle', 'width'
+        sbw = parseInt getStyle '.scrollhandle', 'width'
+        mmw = @minimap?.width() ? 0
         if @bufferHeight < @viewHeight()
             @scrollhandleRight.style.top    = "0"
             @scrollhandleRight.style.height = "0"
             @scrollhandleRight.style.width  = "0"
-            @view.style.right = "0"
+            @view.style.right = "#{mmw}px"
         else
             vh           = Math.min @editorHeight, @viewHeight()
             scrollTop    = parseInt (@scroll / @bufferHeight) * vh
@@ -163,10 +164,10 @@ class View extends ViewBase
             scrollTop    = Math.min scrollTop, @viewHeight()-scrollHeight
             scrollTop    = Math.max 0, scrollTop
                     
-            @scrollhandleRight.style.top    = "#{scrollTop}.px"
-            @scrollhandleRight.style.height = "#{scrollHeight}.px"
-            @scrollhandleRight.style.width  = sbw
-            @view.style.right = sbw            
+            @scrollhandleRight.style.top    = "#{scrollTop}px"
+            @scrollhandleRight.style.height = "#{scrollHeight}px"
+            @scrollhandleRight.style.width  = "#{sbw}px"
+            @view.style.right = "#{mmw}px"
                 
     scrollLines: (lineDelta) -> @scrollBy lineDelta * @size.lineHeight
 

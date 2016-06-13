@@ -16,6 +16,7 @@ last,
 $
 }       = require '../tools/tools'
 log     = require '../tools/log'
+profile = require '../tools/profile'
 Command = require '../commandline/command'
 render  = require '../editor/render'
 split   = require '../split'
@@ -62,7 +63,8 @@ class Open extends Command
                 log 'rebuild files for', @resolvedPath command
                 @dir = @resolvedPath command
                 @pkg = @resolvedPath command
-                @buildFileList()
+                @lastFileIndex = -1
+                @startWalker()
                 @listFiles @files
                 @select 0                
                 # log @files.splice 0,10
@@ -76,7 +78,7 @@ class Open extends Command
         @select 0
         
     showList: ->
-        cmdline = window.commandline
+        @list?.remove()
         @list = document.createElement 'div'
         @list.className = 'list'
         @list.style.top = split.botHandle.style.top
@@ -144,25 +146,22 @@ class Open extends Command
             @file = null
             @dir  = @pkg = resolve '~'
             
-        @buildFileList()
-
-        @showList()
-        @select @lastFileIndex
-            
-        v = @list?.children[@selected]?.value 
-        return v
+        @startWalker()
+        return ""
         
-    # 0000000    000   000  000  000      0000000  
-    # 000   000  000   000  000  000      000   000
-    # 0000000    000   000  000  000      000   000
-    # 000   000  000   000  000  000      000   000
-    # 0000000     0000000   000  0000000  0000000  
+    # 000   000   0000000   000      000   000  00000000  00000000 
+    # 000 0 000  000   000  000      000  000   000       000   000
+    # 000000000  000000000  000      0000000    0000000   0000000  
+    # 000   000  000   000  000      000  000   000       000   000
+    # 00     00  000   000  0000000  000   000  00000000  000   000
             
-    buildFileList: ->   
+    startWalker: ->           
+        # profile 'walker start'
         that = @
         try
             dir = @pkg ? @dir
-            walkdir.sync dir, max_depth: 3, (p) ->
+            @walker = walkdir.walk dir, max_depth: 3
+            @walker.on 'path', (p,stat) ->
                 name = path.basename p
                 extn = path.extname p
                 if name in ['node_modules', 'app', 'img', 'dist', 'build', 'Library', 'Applications']
@@ -174,11 +173,16 @@ class Open extends Command
                 else if extn in fileExtensions
                     that.files.push p
                 if that.files.length > 500
+                    log 'max files reached', @end?
                     @end()
+            @walker.on 'end', @walkerDone
+                
         catch err
-            log 'open.buildFileList.error:', err
-            log 'while loading dir:', dir
+            log "open.startWalker.error: #{err} dir: #{dir}"
+            log "#{err.stack}"
             
+    walkerDone: =>
+        # profile 'walker done'
         base = @dir
         
         # 000   000  00000000  000   0000000   000   000  000000000
@@ -191,13 +195,13 @@ class Open extends Command
             
             extnameBonus = switch path.extname(f)
                 when '.coffee' then 100
-                when '.md', '.styl', 'pug' then 50
+                when '.md', '.styl', '.pug' then 50
                 when '.noon' then 25
-                when '.js', '.json' then -1000000
+                when '.js', '.json', '.html' then -1000000
                 else 
                     0 
                 
-            bonus = extnameBonus - path.basename(f).length
+            bonus = extnameBonus #- path.basename(f).length
                 
             if f.startsWith @dir
                 return 10000-path.dirname(f).length+bonus
@@ -215,6 +219,11 @@ class Open extends Command
                     
         @files = (relative(f, @dir) for f in @files)
         @files = _.uniq @files
+
+        @showList()
+        @select @lastFileIndex
+        if @lastFileIndex >= 0   
+            @setText @list?.children[@selected]?.value 
                     
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     

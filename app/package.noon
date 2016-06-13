@@ -31,5 +31,7 @@ dependencies
               lodash          ^4.13.1
               noon            ^1.0.8
               opener          ^1.4.1
+              performance-now  ^0.2.0
+              snapsvg         ^0.4.0
               terminal.js     ^1.0.7
               walkdir         0.0.11
