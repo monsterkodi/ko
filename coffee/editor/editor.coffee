@@ -15,6 +15,7 @@ watcher = require './watcher'
 Buffer  = require './buffer'
 undo    = require './undo'
 path    = require 'path'
+fs      = require 'fs'
 assert  = require 'assert'
 _       = require 'lodash'
 
@@ -43,6 +44,14 @@ class Editor extends Buffer
             @watch = new watcher @
         else
             @watch = null
+        # log 'editor.setCurrentFile', file    
+        @setText fs.readFileSync file, encoding: 'UTF8'
+
+    #  0000000  00000000  000000000  000      000  000   000  00000000   0000000
+    # 000       000          000     000      000  0000  000  000       000     
+    # 0000000   0000000      000     000      000  000 0 000  0000000   0000000 
+    #      000  000          000     000      000  000  0000  000            000
+    # 0000000   00000000     000     0000000  000  000   000  00000000  0000000 
 
     setLines: (lines) ->
         super lines

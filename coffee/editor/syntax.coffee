@@ -44,14 +44,12 @@ class syntax
         @diss = []
         for line in @editor.lines
             @diss.push @dissForLine line
-        # log 'syntax.parse @diss.length', @diss.length
 
     dissForLine: (line) -> syntax.dissForTextAndSyntax line, @name
 
-    @dissForTextAndSyntax: (line, name) ->
-        matchr.dissect matchr.ranges syntax.matchrConfigs[name], line
+    @dissForTextAndSyntax: (line, n) ->
+        matchr.dissect matchr.ranges syntax.matchrConfigs[n], line
         
-
     # 000  000   000  000  000000000
     # 000  0000  000  000     000   
     # 000  000 0 000  000     000   
@@ -65,7 +63,6 @@ class syntax
             @syntaxNames.push syntaxName
             patterns = noon.load path.join syntaxDir, syntaxFile
             @matchrConfigs[syntaxName] = matchr.config patterns
-        # log 'syntax.init', @syntaxNames
 
 syntax.init()
 module.exports = syntax

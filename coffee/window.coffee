@@ -111,7 +111,7 @@ saveFile = (file) =>
     if not file?
         saveFileAs()
         return
-    editor.setCurrentFile null
+    editor.setCurrentFile null # to stop watcher
     fs.writeFileSync file, editor.text(), encoding: 'UTF8'
     editor.setCurrentFile file
     setState 'file', file
@@ -121,7 +121,6 @@ loadFile = (file) =>
     if fileExists file
         addToRecent file
         editor.setCurrentFile file
-        editor.setText fs.readFileSync file, encoding: 'UTF8'
         setState 'file', file
         ipc.send 'reloadMenu'
 

@@ -4,29 +4,31 @@
 #  000 0 000  000   000  000   000  000  000   000   000  000   000  000   000  000  0000
 #  000   000  000   000  000   000  000   000  0000000     0000000   00     00  000   000
 
+\S+                                     text
+
 # header
 
-(^#\s+)(.+)                             . xd . Byf
-(^##\s+)(.+)                            . xd . Bwf
-(^###\s+)(.+)                           . xd .  yf
-(^####+\s+)(.+)                         . xd .  yf
+(^#\s+)(.+)                             . syntax . comment.header
+(^##\s+)(.+)                            . syntax . class
+(^###\s+)(.+)                           . syntax . function
+(^####+\s+)(.+)                         . syntax . keyword
 
 # path
 
-\((\s*\S+\.[^\s\)\.\!\?]+)\)            . g
-(\s*[\/\S]+)(\/)([^\s\)\.\!\?]+)        . k . d . f
+\((\s*\S+\.[^\s\)\.\!\?]+)\)            . string
+(\s*[\/\S]+)(\/)([^\s\)\.\!\?]+)        . string.marker . string . string.double
 
 # url
 
-(file|git|https?)(://)([^\s\)\.\!\?]+)  . r . r . y
+(file|git|https?)(://)([^\s\)\.\!\?]+)  . string . string.marker . string.double
 
 # image and link
 
 (\!?\[)([^\]]+)(\])(\()([^\)]+)(\))     . xd . mf . xd . xd . k . xd 
 
-(^[-\*]\s)                                fy
-(^\s+[-\*]\s)(.+)                       . dy . x
+(^[-\*]\s)                                class
+(^\s+[-\*]\s)(.+)                       . function.marker . function
 
 # pre
 
-```\S*                                  . fxd
+```\S*                                  . keyword

@@ -132,7 +132,6 @@ class ViewBase extends Editor
     setLines: (lines) ->
         lines ?= ['']
         super lines
-        
         @syntax.parse()
                 
         @updateSizeValues()
@@ -226,9 +225,7 @@ class ViewBase extends Editor
     # 000   000  000        000   000  000   000     000     000     
     #  0000000   000        0000000    000   000     000     00000000
 
-    done: => 
-        log 'done'
-        @changed @do.changeInfo
+    done: => @changed @do.changeInfo
 
     updateSizeValues: ->
         @bufferHeight = @numVisibleLines() * @size.lineHeight

@@ -43,7 +43,7 @@ class render
             for di in [diss.length-1..0]
                 d = diss[di]
                 if d.stack?
-                    clrzd = @colorize d.match, d.stack.reverse()
+                    clrzd = @colorize d.match, d.stack.reversed()
                 else
                     log 'wtf?'
                     clrzd = encode d.match

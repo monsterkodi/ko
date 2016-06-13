@@ -46,8 +46,8 @@ class View extends ViewBase
         @view.addEventListener 'wheel', @onWheel
         
     done: =>
-        @updateTitlebar()
-        @changed @do.changeInfo
+        # @updateTitlebar()
+        super # @changed @do.changeInfo
 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000
@@ -60,16 +60,17 @@ class View extends ViewBase
         if changeInfo.changed.length or changeInfo.deleted.length or changeInfo.inserted.length
             @updateTitlebar() # sets dirty flag
         
-        @minimap.changed changeInfo
-        
         delta = @deltaToEnsureCursorsAreVisible()
 
         if delta and changeInfo.cursor.length
             @scrollBy delta * @size.lineHeight #todo: slow down when using mouse
             @scrollCursor()
+            @minimap.changed changeInfo
             return
         
         super changeInfo
+        
+        @minimap.changed changeInfo
         
         if changeInfo.deleted.length or changeInfo.inserted.length
             @updateScrollbar()
@@ -83,12 +84,15 @@ class View extends ViewBase
     # 000       000  0000000  00000000
 
     setCurrentFile: (file) ->
+        
         @syntax.name = 'txt'
         if file?
             name = path.extname(file).substr(1)
             if name in syntax.syntaxNames
                 @syntax.name = name
-        super file
+        
+        super file # -> setText -> setLines
+        
         @scrollBy 0
 
     # 000      000  000   000  00000000   0000000

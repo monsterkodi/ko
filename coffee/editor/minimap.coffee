@@ -88,10 +88,11 @@ class Minimap
             
         if @editor.syntax.diss[li].length
             for r in @editor.syntax.diss[li]
+                # log 'li', li, r
                 if r.match?
-                    continue if r.match.trim().length == 0
+                    continue if r.match.trim().length == 0 # ignore spaces
                 else
-                    log 'r', r
+                    log 'warning! no match?', li, r
                     continue
                 c = @s.rect()
                 c.attr
@@ -102,9 +103,9 @@ class Minimap
                     for cls in last(r.stack).split '.'
                         c.addClass cls
                 else
-                    log 'no stack?', li
+                    log 'warning! no stack?', li
                     c.addClass 'text'
-                line.add c
+                line.add c            
         line
                 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
@@ -138,14 +139,15 @@ class Minimap
     # 000   000  00000000  000   000  0000000    00000000  000   000
     
     renderLines: () ->
+        
         return if @editor.viewHeight() <= 0
-        profile 'minimap.renderLines'
+        # profile 'minimap.renderLines'
         @clear()
         for li in [0...@editor.lines.length]            
             @lines.push @lineForIndex li
                             
         @scroll()
-        profile 'minimap.done'
+        # profile 'minimap.done'
     
     width: -> parseInt getStyle '.minimap', 'width'
     
