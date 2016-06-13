@@ -166,7 +166,7 @@ class View extends ViewBase
                     
             @scrollhandleRight.style.top    = "#{scrollTop}px"
             @scrollhandleRight.style.height = "#{scrollHeight}px"
-            @scrollhandleRight.style.width  = "#{sbw}px"
+            # @scrollhandleRight.style.width  = "#{sbw}px"
             @view.style.right = "#{mmw}px"
                 
     scrollLines: (lineDelta) -> @scrollBy lineDelta * @size.lineHeight

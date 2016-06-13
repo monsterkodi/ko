@@ -377,7 +377,6 @@ class Main
             backgroundColor: '#000'            
             width:         400
             height:        420
-        # w.webContents.openDevTools()
         w.loadURL "file://#{cwd}/../about.html"
         w.on 'openFileDialog', @createWindow
             
