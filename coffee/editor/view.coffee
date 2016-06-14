@@ -35,7 +35,6 @@ class View extends ViewBase
         @view.style.right = "#{@minimap.width()}px"                
                 
         @smoothScrolling   = true
-        @scroll            = 0
         @scrollhandleRight = $('.scrollhandle.right', @view.parentElement)
         
         @scrollbarDrag = new drag 
@@ -162,14 +161,15 @@ class View extends ViewBase
         @minimap?.scroll()
         return if not @scrollhandleRight?
         sbw = parseInt getStyle '.scrollhandle', 'width'
-        if @bufferHeight < @viewHeight()
+        if @lines.length * @size.lineHeight < @viewHeight()
             @scrollhandleRight.style.top    = "0"
             @scrollhandleRight.style.height = "0"
             @scrollhandleRight.style.width  = "0"
         else
+            bh           = @lines.length * @size.lineHeight
             vh           = Math.min @editorHeight, @viewHeight()
-            scrollTop    = parseInt (@scroll / @bufferHeight) * vh
-            scrollHeight = parseInt (@editorHeight / @bufferHeight) * vh
+            scrollTop    = parseInt (@scroll.scroll / bh) * vh
+            scrollHeight = parseInt (@editorHeight / bh) * vh
             scrollHeight = Math.max scrollHeight, parseInt @size.lineHeight/4
             scrollTop    = Math.min scrollTop, @viewHeight()-scrollHeight
             scrollTop    = Math.max 0, scrollTop
@@ -188,23 +188,15 @@ class View extends ViewBase
 
     scrollBy: (delta) -> 
                 
-        @updateSizeValues()
+        @scroll.by delta
         
-        @scroll += delta
-        @scroll = Math.min @scroll, @scrollMax
-        @scroll = Math.max @scroll, 0
-        @size.offsetTop = @scroll
-        
-        top = parseInt @scroll / @size.lineHeight
-        dff = @scroll - top * @size.lineHeight 
-
-        if @topIndex != top
-            @displayLines top
+        if @topIndex != @scroll.top
+            @displayLines @scroll.top
         else
             @updateScrollbar()
 
-        if @smoothScrolling            
-            @view.scrollTop = dff
+        if @scroll.smooth            
+            @view.scrollTop = @scroll.offsetTop
 
     scrollCursor: -> $('.cursor', @view)?.scrollIntoViewIfNeeded()
             
@@ -212,7 +204,7 @@ class View extends ViewBase
         @scrollBy event.deltaY * @scrollFactor event
         
     onScrollDrag: (drag) =>
-        delta = (drag.delta.y / @editorHeight) * @bufferHeight
+        delta = (drag.delta.y / @editorHeight) * @lines.length * @size.lineHeight
         @scrollBy delta
                         
     # 000   000  00000000  000   000

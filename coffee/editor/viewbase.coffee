@@ -17,6 +17,7 @@ keyinfo   = require '../tools/keyinfo'
 log       = require '../tools/log'
 render    = require './render'
 syntax    = require './syntax'
+scroll    = require './scroll'
 Editor    = require './editor'
 _         = require 'lodash'
 electron  = require 'electron'
@@ -43,6 +44,10 @@ class ViewBase extends Editor
         @syntax = new syntax @
     
         @setFontSize prefs.get @fontSizeKey, @fontSizeDefault
+
+        @scroll = new scroll 
+            lineHeight: @size.lineHeight
+            viewHeight: @viewHeight()
 
         @view.onkeydown = @onKeyDown
     
@@ -133,8 +138,7 @@ class ViewBase extends Editor
         lines ?= ['']
         super lines
         @syntax.parse()
-                
-        @updateSizeValues()
+        @scroll.setNumLines @lines.length        
         @displayLines 0        
 
     # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
@@ -149,6 +153,8 @@ class ViewBase extends Editor
         @size.lineHeight = fontSize + Math.floor(fontSize/6)
         @size.charWidth  = characterWidth @elem, 'line'
         @size.offsetX    = Math.floor @size.charWidth/2
+        
+        @scroll?.setLineHeight @size.lineHeight
 
     # 0000000    000   0000000  00000000   000       0000000   000   000
     # 000   000  000  000       000   000  000      000   000   000 000 
@@ -226,11 +232,6 @@ class ViewBase extends Editor
     #  0000000   000        0000000    000   000     000     00000000
 
     done: => @changed @do.changeInfo
-
-    updateSizeValues: ->
-        @bufferHeight = @numVisibleLines() * @size.lineHeight
-        @editorHeight = @numViewLines() * @size.lineHeight
-        @scrollMax    = @bufferHeight - @editorHeight + @size.lineHeight
     
     updateNumLines: ->
         viewLines = @numViewLines()
@@ -242,10 +243,8 @@ class ViewBase extends Editor
             @updateLine @topIndex + @elem.children.length - 1
     
     resized: -> 
-        oldHeight = @editorHeight
-        @updateSizeValues()
-        if @editorHeight > oldHeight
-            @displayLines @topIndex
+        @scroll.setViewHeight @viewHeight()
+        @displayLines @scroll.top # todo remove
     
     deltaToEnsureCursorsAreVisible: ->
         topdelta = 0
@@ -306,7 +305,6 @@ class ViewBase extends Editor
             @renderSelection()   
                      
         @renderHighlights()
-        @updateSizeValues()  
     
     updateLine: (lineIndex) ->
         if @topIndex <= lineIndex < @lines.length
@@ -344,7 +342,6 @@ class ViewBase extends Editor
     viewHeight:      -> @view.getBoundingClientRect().height 
     numViewLines:    -> Math.ceil(@viewHeight() / @size.lineHeight)
     numFullLines:    -> Math.floor(@viewHeight() / @size.lineHeight)
-    numVisibleLines: -> @lines.length
     
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

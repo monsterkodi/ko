@@ -39,9 +39,7 @@ class Split
         
         @handles     = [@topHandle, @botHandle, @logHandle]
         @panes       = [@topView, @commandLine, @botView, @logView]
-        
-        log 'panes', (p.className for p in @panes)
-        
+                
         @logVisible = @getState 'logVisible', false
         if @logVisible
             @logView.style.display = 'initial'
@@ -68,7 +66,6 @@ class Split
 
         @constrainDrag()
     
-        log 'split.init top', @elemTop(), 'height', @elemHeight()
         @applySplit @getState 'split', [0,0,@elemHeight()-@handleHeight]
     
     # 00000000   00000000   0000000  000  0000000  00000000  0000000  
@@ -86,7 +83,6 @@ class Split
         for h in [0...@handles.length]
             s.push clamp 0, @elemHeight(), @splitPosY h
             
-        log "resized", @elemHeight(), s
         @applySplit s
     
     #  0000000   0000000   000   000   0000000  000000000  00000000    0000000   000  000   000
@@ -117,9 +113,7 @@ class Split
     #      000  000        000      000     000   
     # 0000000   000        0000000  000     000   
     
-    @splitAt: (i, y) ->
-        log "splitAt i #{i} y #{y}"
-        
+    @splitAt: (i, y) ->        
         s = []
         for h in [0...@handles.length]
             if h == i
@@ -131,7 +125,6 @@ class Split
             else
                 s.push @splitPosY h
 
-        log "splitAt i #{i} y #{y} s #{s}"
         @applySplit s
     
     #  0000000   00000000   00000000   000      000   000
@@ -152,7 +145,6 @@ class Split
         else
             s[2] = @elemHeight()
             
-        log 'applySplit', s
         for h in [0...s.length]
             prevY = h > 0 and s[h-1] or 0
             thisY = s[h]

@@ -1,8 +1,6 @@
 # todo/ideas
 
-- log view below editor
-    - scroll on input
-- shift move cursor down    
+- shift move cursor down
     - extend selection to end of line if previous line is fully selected
 - insert newline if pasting fully selected lines
 - highlight cursor line(s?)
