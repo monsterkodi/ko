@@ -31,7 +31,9 @@ class View extends ViewBase
         @minimap = new Minimap @
         
         super viewElem
-                
+            
+        @scroll.on 'scroll', @updateScrollbar    
+        
         @view.style.right = "#{@minimap.width()}px"                
                 
         @smoothScrolling   = true
@@ -72,7 +74,7 @@ class View extends ViewBase
         @minimap.changed changeInfo
         
         if changeInfo.deleted.length or changeInfo.inserted.length
-            @updateScrollbar()
+            @scroll.setNumLines @lines.length
         if changeInfo.cursor.length
             @scrollCursor()        
 
@@ -137,19 +139,6 @@ class View extends ViewBase
             dc = dirty and " dirty" or ""
             title = "<span class=\"title#{dc}\" data-tip=\"#{unresolve @currentFile}\">#{ds} #{title} #{ds}</span>"
         $('.titlebar').innerHTML = title 
-
-    # 00000000   00000000   0000000  000  0000000  00000000  0000000  
-    # 000   000  000       000       000     000   000       000   000
-    # 0000000    0000000   0000000   000    000    0000000   000   000
-    # 000   000  000            000  000   000     000       000   000
-    # 000   000  00000000  0000000   000  0000000  00000000  0000000  
-
-    resized: -> 
-        oldHeight = @editorHeight
-        super
-        if @editorHeight <= oldHeight
-            @updateScrollbar()
-            @minimap?.scroll()
             
     #  0000000   0000000  00000000    0000000   000      000    
     # 000       000       000   000  000   000  000      000    
@@ -157,7 +146,8 @@ class View extends ViewBase
     #      000  000       000   000  000   000  000      000    
     # 0000000    0000000  000   000   0000000   0000000  0000000
         
-    updateScrollbar: ->
+    updateScrollbar: =>
+        # log "view.updateScrollbar #{@minimap?}"
         @minimap?.scroll()
         return if not @scrollhandleRight?
         sbw = parseInt getStyle '.scrollhandle', 'width'
@@ -187,16 +177,10 @@ class View extends ViewBase
         f *= 1 + 7 * event.altKey
 
     scrollBy: (delta) -> 
-                
+            
         @scroll.by delta
         
-        if @topIndex != @scroll.top
-            @displayLines @scroll.top
-        else
-            @updateScrollbar()
-
-        if @scroll.smooth            
-            @view.scrollTop = @scroll.offsetTop
+        @view.scrollTop = @scroll.offsetTop
 
     scrollCursor: -> $('.cursor', @view)?.scrollIntoViewIfNeeded()
             

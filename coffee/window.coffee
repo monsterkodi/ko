@@ -95,7 +95,6 @@ ipc.on 'setWinID', (event, id) =>
         loadFile getState 'file'
     else
         setState 'file', editor.currentFile # files might be loaded before id got sent
-        editor.displayLines 0
 
     ipc.send 'reloadMenu'
                  
@@ -232,7 +231,6 @@ setFontSize = (s) =>
     s = clamp 2, 100, s
     setState "fontSize", s
     editor.setFontSize s
-    editor.refreshLines()
     
 changeFontSize = (d) => 
     setFontSize clamp 2, 100, editor.size.fontSize + d

@@ -14,7 +14,7 @@ str = (o) ->
         else
             s = noon.stringify o, 
                 circular: true
-            "\n#{s}\n"
+            "\n#{s}"
     else
         String o
 

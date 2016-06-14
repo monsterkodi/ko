@@ -38,8 +38,6 @@ class ViewBase extends Editor
         @elem = $('.lines', @view)
         @divs = []   
         @diss = []
-        @topIndex = 0
-        @botIndex = 0
         @size = {}
         @syntax = new syntax @
     
@@ -48,6 +46,9 @@ class ViewBase extends Editor
         @scroll = new scroll 
             lineHeight: @size.lineHeight
             viewHeight: @viewHeight()
+            
+        @scroll.on 'top', @displayLines   
+        @scroll.on 'exposeLine', @exposeLineAtIndex     
 
         @view.onkeydown = @onKeyDown
     
@@ -138,8 +139,8 @@ class ViewBase extends Editor
         lines ?= ['']
         super lines
         @syntax.parse()
+        @scroll.setViewHeight @viewHeight()
         @scroll.setNumLines @lines.length        
-        @displayLines 0        
 
     # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
     # 000       000   000  0000  000     000     000       000     000   000     
@@ -162,24 +163,22 @@ class ViewBase extends Editor
     # 000   000  000       000  000        000      000   000     000   
     # 0000000    000  0000000   000        0000000  000   000     000   
 
-    refreshLines: ->
-        @elem.innerHTML = ""
-        @updateNumLines()
-        @displayLines @topIndex
+    renderLineAtIndex: (li) -> render.line @lines[li], @syntax.getDiss li
 
-    renderLineAtIndex: (li) ->
-        render.line @lines[li], @syntax.getDiss li
+    exposeLineAtIndex: (li) => 
+        log "viewbase.exposeLineAtIndex #{li}"
+        while @elem.children.length < viewLines
+            log "viewbase.exposeLineAtIndex addLine #{@elem.children.length} < #{viewLines}"
+            @addLine()
 
-    displayLines: (top) ->
-        @topIndex = top
-        @botIndex = top+@numViewLines()
-        @updateScrollbar?()
+    displayLines: (top) =>
+
         @updateNumLines()
                 
         @divs = []        
         
         for c in [0...@elem.children.length]
-            i = c + @topIndex
+            i = c + @scroll.top
             @elem.children[c].id = "line-#{i}"
             if i < @lines.length
                 span = @renderLineAtIndex i
@@ -202,25 +201,25 @@ class ViewBase extends Editor
         @elem.appendChild div
 
     renderCursors: ->
-        cs = @cursorsRelativeToLineIndexRange [@topIndex, @botIndex]
+        cs = @cursorsRelativeToLineIndexRange [@scroll.top, @scroll.bot]
         vc = []
         for c in cs
-            if c[0] > @lines[@topIndex+c[1]].length
-                vc.push [@lines[@topIndex+c[1]].length, c[1], 'virtual']
+            if c[0] > @lines[@scroll.top+c[1]].length
+                vc.push [@lines[@scroll.top+c[1]].length, c[1], 'virtual']
         cs = cs.concat vc
         h = render.cursors cs, @size
         $('.cursors', @view).innerHTML = h
         
     renderSelection: ->
         h = ""
-        s = @selectionsRelativeToLineIndexRange [@topIndex, @botIndex]
+        s = @selectionsRelativeToLineIndexRange [@scroll.top, @scroll.bot]
         if s
             h += render.selection s, @size
         $('.selections', @view).innerHTML = h
 
     renderHighlights: ->
         h = ""
-        s = @highlightsRelativeToLineIndexRange [@topIndex, @botIndex]
+        s = @highlightsRelativeToLineIndexRange [@scroll.top, @scroll.bot]
         if s
             h += render.selection s, @size, "highlight"
         $('.highlights', @view).innerHTML = h
@@ -240,26 +239,30 @@ class ViewBase extends Editor
             
         while @elem.children.length < viewLines
             @addLine()
-            @updateLine @topIndex + @elem.children.length - 1
+            @updateLine @scroll.top + @elem.children.length - 1
     
-    resized: -> 
-        @scroll.setViewHeight @viewHeight()
-        @displayLines @scroll.top # todo remove
+    # 00000000   00000000   0000000  000  0000000  00000000  0000000  
+    # 000   000  000       000       000     000   000       000   000
+    # 0000000    0000000   0000000   000    000    0000000   000   000
+    # 000   000  000            000  000   000     000       000   000
+    # 000   000  00000000  0000000   000  0000000  00000000  0000000  
+    
+    resized: -> @scroll.setViewHeight @viewHeight()
     
     deltaToEnsureCursorsAreVisible: ->
         topdelta = 0
         cl = @cursors[0][1]
-        if cl < @topIndex + 2
-            topdelta = Math.max(0, cl - 2) - @topIndex
-        else if cl > @botIndex - 4
-            topdelta = Math.min(@lines.length+1, cl + 4) - @botIndex
+        if cl < @scroll.top + 2
+            topdelta = Math.max(0, cl - 2) - @scroll.top
+        else if cl > @scroll.bot - 4
+            topdelta = Math.min(@lines.length+1, cl + 4) - @scroll.bot
         
         botdelta = 0
         cl = last(@cursors)[1]
-        if cl < @topIndex + 2
-            botdelta = Math.max(0, cl - 2) - @topIndex
-        else if cl > @botIndex - 4
-            botdelta = Math.min(@lines.length+1, cl + 4) - @botIndex
+        if cl < @scroll.top + 2
+            botdelta = Math.max(0, cl - 2) - @scroll.top
+        else if cl > @scroll.bot - 4
+            botdelta = Math.min(@lines.length+1, cl + 4) - @scroll.bot
             
         if botdelta > 0
             Math.max botdelta, topdelta
@@ -280,18 +283,18 @@ class ViewBase extends Editor
         indices = []
         info = _.cloneDeep changeInfo
         for i in info.changed
-            continue if i < @topIndex
-            break if i > @botIndex
+            continue if i < @scroll.top
+            break if i > @scroll.bot
             indices.push i
             
         if info.inserted.length
-            if info.inserted[0] < @botIndex
-                for i in [Math.max(@topIndex, info.inserted[0])..@botIndex]
+            if info.inserted[0] < @scroll.bot
+                for i in [Math.max(@scroll.top, info.inserted[0])..@scroll.bot]
                     indices.push i
 
         if info.deleted.length
-            if info.deleted[0] < @botIndex
-                for i in [Math.max(@topIndex, info.deleted[0])..@botIndex]
+            if info.deleted[0] < @scroll.bot
+                for i in [Math.max(@scroll.top, info.deleted[0])..@scroll.bot]
                     indices.push i
                                                                                 
         indices.sort (a,b) -> a - b
@@ -307,13 +310,13 @@ class ViewBase extends Editor
         @renderHighlights()
     
     updateLine: (lineIndex) ->
-        if @topIndex <= lineIndex < @lines.length
-            relIndex = lineIndex - @topIndex
+        if @scroll.top <= lineIndex < @lines.length
+            relIndex = lineIndex - @scroll.top
             span = @renderLineAtIndex lineIndex
             @divs[relIndex] = span
             @elem.children[relIndex]?.innerHTML = span
-        else if lineIndex >= @lines.length and lineIndex < @botIndex
-            @elem.children[lineIndex-@topIndex].innerHTML = ""
+        else if lineIndex >= @lines.length and lineIndex < @scroll.bot
+            @elem.children[lineIndex-@scroll.top].innerHTML = ""
 
     # 00000000    0000000    0000000
     # 000   000  000   000  000     
@@ -329,7 +332,7 @@ class ViewBase extends Editor
         lx = clamp 0, @view.offsetWidth,  event.clientX - br.left - @size.offsetX
         ly = clamp 0, @view.offsetHeight, event.clientY - br.top
         px = parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth))
-        py = parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @topIndex
+        py = parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @scroll.top
         p = [px, Math.min(@lines.length-1, py)]
         p
 

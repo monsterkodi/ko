@@ -48,24 +48,26 @@ class Minimap
     # 0000000    0000000  000   000   0000000   0000000  0000000
             
     scroll: ->
-        return if @editor.viewHeight() <= 0
-        # log 'scroll vh', @editor.viewHeight(), 'll', @editor.lines.length, 'tb', @editor.botIndex-@editor.topIndex
         
-        if @editor.lines.length > @editor.viewHeight()/2 
-            top = Math.max 0, @editor.botIndex*2 - @editor.viewHeight()
+        log "minimap.scroll"
+        scroll = @editor.scroll
+        return if scroll.viewHeight <= 0
+        
+        if scroll.numLines > scroll.viewHeight/2 
+            top = Math.max 0, scroll.bot*2 - scoll.viewHeight
             if top != @top
                 @renderLines top
                 # log 'minimap.scroll.top', @top # check for overlaps?
         
         @s.attr
-            viewBox:  "0 0 120 #{@editor.viewHeight()}"
+            viewBox:  "0 0 120 #{scroll.viewHeight}"
             
         @buffer.attr
-            height:   @editor.lines.length*2
+            height:   scroll.numLines*2
         
         @topBot.attr 
-            y:        @editor.topIndex*2
-            height:   (@editor.botIndex-@editor.topIndex)*2
+            y:        scroll.top*2
+            height:   (scroll.bot-scroll.top)*2
 
     # 000      000  000   000  00000000
     # 000      000  0000  000  000     
@@ -145,11 +147,11 @@ class Minimap
     # 000   000  00000000  000   000  0000000    00000000  000   000
     
     renderLines: (@top=0) ->
-        
-        return if @editor.viewHeight() <= 0
+        scroll = @editor.scroll
+        return if scroll.viewHeight <= 0
         # profile 'minimap.renderLines'
         @clear()
-        @bot = Math.min @editor.lines.length, @top+@editor.viewHeight()/2
+        @bot = Math.min scroll.numLines, @top+scroll.viewHeight/2
         for li in [@top...@bot]           
             @lines.push @lineForIndex li
                             

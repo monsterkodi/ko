@@ -56,8 +56,10 @@ class scroll extends events
     setTop: (top) ->
         if top != @top
             log "setTop #{@top} -> #{top}"
-        @top = top
-        @bot = @top+@viewLines
+            @top = top
+            @bot = @top+@viewLines
+            @emit 'top', @top
+            @emit 'scroll'
 
     # 000   000  000  00000000  000   000  000   000  00000000  000   0000000   000   000  000000000
     # 000   000  000  000       000 0 000  000   000  000       000  000        000   000     000   
@@ -74,12 +76,14 @@ class scroll extends events
             # some lines hidden
             hidden = []
             log "scroll.setViewHeight hidden #{hidden}"
-            
+                    
         if @viewHeight != h
+            log "scroll.setViewHeight #{@viewHeight} -> #{h}"
             @viewHeight = h        
             @fullLines  = Math.ceil(@viewHeight / @lineHeight)
             @viewLines  = Math.ceil(@viewHeight / @lineHeight)
-            @scrollMax  = @fullHeight - @viewHeight        
+            @scrollMax  = @fullHeight - @viewHeight   
+            @by 0     
     
     # 000   000  000   000  00     00  000      000  000   000  00000000   0000000
     # 0000  000  000   000  000   000  000      000  0000  000  000       000     
@@ -91,16 +95,18 @@ class scroll extends events
         if n > @numLines
             # new lines exposed?
             exposed = []
-            log "scroll.setNumLines exposed #{exposed}"
+            log "scroll.setNumLines exposed #{exposed}"            
         else if n < @numLines
             # some lines removed
             hidden = []
             log "scroll.setViewHeight hidden #{hidden}"
         
         if @numLines != n
+            log "scroll.setNumLines #{@numLines} -> #{n}"
             @numLines = n
             @fullHeight = @numLines * @lineHeight
             @scrollMax  = @fullHeight - @viewHeight
+            @by 0
 
     # 000      000  000   000  00000000  000   000  00000000  000   0000000   000   000  000000000
     # 000      000  0000  000  000       000   000  000       000  000        000   000     000   
@@ -118,12 +124,13 @@ class scroll extends events
             exposed = []
             log "scroll.setLineHeight exposed #{exposed}"
             
-        if h != @lineHeight
+        if @lineHeight != h
+            log "scroll.setLineHeight #{@lineHeight} -> #{h}"
             @lineHeight = h
             @fullHeight = @numLines * @lineHeight
             @fullLines  = Math.ceil(@viewHeight / @lineHeight)
             @viewLines  = Math.ceil(@viewHeight / @lineHeight)
             @scrollMax  = @fullHeight - @viewHeight
-        
+            @by 0
 
 module.exports = scroll
