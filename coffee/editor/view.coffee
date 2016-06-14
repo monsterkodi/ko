@@ -93,7 +93,7 @@ class View extends ViewBase
         log 'view.setCurrentFile', file, @syntax.name
         super file # -> setText -> setLines
         
-        @scrollBy 0
+        # @scrollBy 0
 
     # 000      000  000   000  00000000   0000000
     # 000      000  0000  000  000       000     

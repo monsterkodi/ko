@@ -32,8 +32,9 @@ class ViewBase extends Editor
     # 000  000   000  000     000   
 
     constructor: (viewElem) ->
-         
-        @view = viewElem
+        @name = viewElem
+        @name = @name.slice 1 if @name[0] == '.'
+        @view = $(viewElem)
         @initLayers ["selections", "highlights", "lines", "cursors"]
         @elem = $('.lines', @view)
         @diss = []
@@ -138,8 +139,10 @@ class ViewBase extends Editor
     setLines: (lines) ->
         lines ?= ['']
         super lines
-        @syntax.parse()
+        @syntax.parse()        
+        log "viewbase.setLines viewHeight #{@viewHeight()}" if @name == 'editor'
         @scroll.setViewHeight @viewHeight()
+        log "viewbase.setLines numLines #{lines.length}" if @name == 'editor'
         @scroll.setNumLines @lines.length        
 
     # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
@@ -172,9 +175,12 @@ class ViewBase extends Editor
     # 00000000  000   000  000         0000000   0000000   00000000
 
     exposeLineAtIndex: (li) =>
-        log "viewbase.exposeLineAtIndex #{li}"
-        log "viewbase.exposeLineAtIndex children #{@elem.children.length}"
-        @addLine().innerHTML = @renderLineAtIndex li
+        # log "viewbase.exposeLineAtIndex #{li}"
+        # log "viewbase.exposeLineAtIndex children #{@elem.children.length}"
+        html = @renderLineAtIndex li
+        log "viewbase.exposeLineAtIndex #{li} #{html}"
+        log "viewbase.exposeLineAtIndex #{@lines[li]} #{@lines.length}"
+        @addLine().innerHTML = html
     
     addLine: ->
         div = document.createElement 'div'

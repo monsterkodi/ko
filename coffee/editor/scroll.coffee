@@ -27,9 +27,9 @@ class scroll extends events
         @top        = 0
         @bot        = @top+@fullLines
         @exposeTop  = 0
-        @exposeBot  = 0
+        @exposeBot  = -1
         
-        log 'scroll', @
+        # log 'scroll', @
         
     # 0000000    000   000
     # 000   000   000 000 
@@ -87,7 +87,7 @@ class scroll extends events
         #     emit 'exposeLine', @exposeTop
         # log "scroll.expose bot #{@bot} exposeBot #{@exposeBot}"
         while @bot > @exposeBot
-            log "scroll.expose below #{@bot} < #{@exposeBot}"
+            # log "scroll.expose below #{@bot} < #{@exposeBot}"
             @exposeBot += 1
             @emit 'exposeLine', @exposeBot
     
@@ -118,7 +118,7 @@ class scroll extends events
                     
         if @viewHeight != h
             o = @viewHeight
-            log "scroll.setViewHeight #{@viewHeight} -> #{h}"
+            # log "scroll.setViewHeight #{@viewHeight} -> #{h}"
             @viewHeight = h        
             @fullLines  = Math.ceil(@viewHeight / @lineHeight)
             @viewLines  = Math.ceil(@viewHeight / @lineHeight)
@@ -141,7 +141,7 @@ class scroll extends events
         
         if @numLines != n
             o = @numLines
-            log "scroll.setNumLines #{@numLines} -> #{n}"
+            # log "scroll.setNumLines #{@numLines} -> #{n}"
             @numLines = n
             @fullHeight = @numLines * @lineHeight
             @scrollMax  = @fullHeight - @viewHeight
@@ -162,7 +162,7 @@ class scroll extends events
     setLineHeight: (h) ->
             
         if @lineHeight != h
-            log "scroll.setLineHeight #{@lineHeight} -> #{h}"
+            # log "scroll.setLineHeight #{@lineHeight} -> #{h}"
             o = @lineHeight
             @lineHeight = h
             @fullHeight = @numLines * @lineHeight

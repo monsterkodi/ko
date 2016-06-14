@@ -95,8 +95,9 @@ ipc.on 'setWinID', (event, id) =>
     s = getState 'fontSize'
     setFontSize s if s
 
-    if getState 'file'
-        loadFile getState 'file'
+    if file = getState 'file'
+        log "window.ipc.on.setWinID load file from state #{file}"
+        loadFile file
     else
         setState 'file', editor.currentFile # files might be loaded before id got sent
 
@@ -114,7 +115,7 @@ saveFile = (file) =>
     if not file?
         saveFileAs()
         return
-    editor.setCurrentFile null # to stop watcher
+    editor.setCurrentFile null # to stop watcher and reset scroll
     fs.writeFileSync file, editor.text(), encoding: 'UTF8'
     editor.setCurrentFile file
     setState 'file', file
@@ -194,7 +195,7 @@ saveFileAs = =>
 # 000       000   000  000     000     000   000  000   000
 # 00000000  0000000    000     000      0000000   000   000
 
-editor = new View $('.editor')
+editor = new View '.editor'
 editor.setText editorText if editorText?
 editor.view.focus()
 window.editor = editor
@@ -205,7 +206,7 @@ window.editor = editor
 # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
 
-window.commandline = new Commandline $('.commandline-editor')
+window.commandline = new Commandline '.commandline-editor'
 
 $('.titlebar').ondblclick = (event) => ipc.send 'maximizeWindow', winID
 
@@ -223,7 +224,7 @@ window.onresize = =>
         # editor?.resized()
     
 window.onunload = =>
-    editor.setCurrentFile null # to stop watcher
+    editor.setCurrentFile null # to stop watcher (and reset scroll?)
 
 # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
 # 000       000   000  0000  000     000     000       000     000   000     

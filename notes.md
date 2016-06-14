@@ -9,6 +9,9 @@
 - open in new window command-shift-p
 - insert spaces when inserting at virtual cursors
 
+- autoconvert '' to "" when #{} entered
+- dbg "class.method arg: #{arg}, ..."
+
 - history of file locations
 - search in multiple files
 
