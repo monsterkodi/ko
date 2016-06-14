@@ -20,7 +20,6 @@ profile = require '../tools/profile'
 Command = require '../commandline/command'
 render  = require '../editor/render'
 syntax  = require '../editor/syntax'
-split   = require '../split'
 path    = require 'path'
 walkdir = require 'walkdir'
 fuzzy   = require 'fuzzy'
@@ -83,8 +82,8 @@ class Open extends Command
         @list?.remove()
         @list = document.createElement 'div'
         @list.className = 'list'
-        @list.style.top = split.botHandle.style.top
-        split.elem.appendChild @list 
+        @list.style.top = window.split.botHandle.style.top
+        window.split.elem.appendChild @list 
         @listFiles @files
         
     # 00000000   00000000   00000000  000   000
@@ -128,7 +127,7 @@ class Open extends Command
     openFileAtIndex: (i) =>
         @select i
         if @execute().focus == 'editor'
-            split.focusEditor()
+            window.split.focusEditor()
     
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   

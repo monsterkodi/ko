@@ -48,13 +48,12 @@ class Minimap
     # 0000000    0000000  000   000   0000000   0000000  0000000
             
     scroll: ->
-        
-        log "minimap.scroll"
+        # log "minimap.scroll"
         scroll = @editor.scroll
         return if scroll.viewHeight <= 0
         
         if scroll.numLines > scroll.viewHeight/2 
-            top = Math.max 0, scroll.bot*2 - scoll.viewHeight
+            top = Math.max 0, scroll.bot*2 - scroll.viewHeight
             if top != @top
                 @renderLines top
                 # log 'minimap.scroll.top', @top # check for overlaps?

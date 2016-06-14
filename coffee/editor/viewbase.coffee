@@ -36,7 +36,6 @@ class ViewBase extends Editor
         @view = viewElem
         @initLayers ["selections", "highlights", "lines", "cursors"]
         @elem = $('.lines', @view)
-        @divs = []   
         @diss = []
         @size = {}
         @syntax = new syntax @
@@ -47,8 +46,9 @@ class ViewBase extends Editor
             lineHeight: @size.lineHeight
             viewHeight: @viewHeight()
             
-        @scroll.on 'top', @displayLines   
+        @scroll.on 'top',        @topChange
         @scroll.on 'exposeLine', @exposeLineAtIndex     
+        @scroll.on 'vanishLine', @vanishLineAtIndex     
 
         @view.onkeydown = @onKeyDown
     
@@ -165,33 +165,17 @@ class ViewBase extends Editor
 
     renderLineAtIndex: (li) -> render.line @lines[li], @syntax.getDiss li
 
-    exposeLineAtIndex: (li) => 
+    # 00000000  000   000  00000000    0000000    0000000  00000000
+    # 000        000 000   000   000  000   000  000       000     
+    # 0000000     00000    00000000   000   000  0000000   0000000 
+    # 000        000 000   000        000   000       000  000     
+    # 00000000  000   000  000         0000000   0000000   00000000
+
+    exposeLineAtIndex: (li) =>
         log "viewbase.exposeLineAtIndex #{li}"
-        while @elem.children.length < viewLines
-            log "viewbase.exposeLineAtIndex addLine #{@elem.children.length} < #{viewLines}"
-            @addLine()
-
-    displayLines: (top) =>
-
-        @updateNumLines()
-                
-        @divs = []        
-        
-        for c in [0...@elem.children.length]
-            i = c + @scroll.top
-            @elem.children[c].id = "line-#{i}"
-            if i < @lines.length
-                span = @renderLineAtIndex i
-                @divs.push span
-                @elem.children[c].innerHTML = span
-            else
-                @divs.push ""
-                @elem.children[c].innerHTML = ""
-                
-        @renderCursors()
-        @renderSelection()
-        @renderHighlights()
-
+        log "viewbase.exposeLineAtIndex children #{@elem.children.length}"
+        @addLine().innerHTML = @renderLineAtIndex li
+    
     addLine: ->
         div = document.createElement 'div'
         div.className = 'line'
@@ -199,6 +183,31 @@ class ViewBase extends Editor
         y = @elem.children.length * @size.lineHeight
         div.style.transform = "translate(#{@size.offsetX}px,#{y}px)"
         @elem.appendChild div
+        div    
+    
+    # 000   000   0000000   000   000  000   0000000  000   000
+    # 000   000  000   000  0000  000  000  000       000   000
+    #  000 000   000000000  000 0 000  000  0000000   000000000
+    #    000     000   000  000  0000  000       000  000   000
+    #     0      000   000  000   000  000  0000000   000   000
+    
+    vanishLineAtIndex: (li) =>
+        log "viewbase.exposeLineAtIndex #{li}"
+        while @elem.children.length > li
+            log "viewbase.vanishLineAtIndex addLine #{@elem.children.length} < #{li}"
+            @elem.children[@elem.children.length-1].remove()
+
+    # 000000000   0000000   00000000    0000000  000   000   0000000   000   000   0000000   00000000
+    #    000     000   000  000   000  000       000   000  000   000  0000  000  000        000     
+    #    000     000   000  00000000   000       000000000  000000000  000 0 000  000  0000  0000000 
+    #    000     000   000  000        000       000   000  000   000  000  0000  000   000  000     
+    #    000      0000000   000         0000000  000   000  000   000  000   000   0000000   00000000
+    
+    topChange: () =>
+                                        
+        @renderCursors()
+        @renderSelection()
+        @renderHighlights()
 
     renderCursors: ->
         cs = @cursorsRelativeToLineIndexRange [@scroll.top, @scroll.bot]
@@ -231,16 +240,7 @@ class ViewBase extends Editor
     #  0000000   000        0000000    000   000     000     00000000
 
     done: => @changed @do.changeInfo
-    
-    updateNumLines: ->
-        viewLines = @numViewLines()
-        while @elem.children.length > viewLines
-            @elem.children[@elem.children.length-1].remove()
-            
-        while @elem.children.length < viewLines
-            @addLine()
-            @updateLine @scroll.top + @elem.children.length - 1
-    
+        
     # 00000000   00000000   0000000  000  0000000  00000000  0000000  
     # 000   000  000       000       000     000   000       000   000
     # 0000000    0000000   0000000   000    000    0000000   000   000
@@ -313,7 +313,6 @@ class ViewBase extends Editor
         if @scroll.top <= lineIndex < @lines.length
             relIndex = lineIndex - @scroll.top
             span = @renderLineAtIndex lineIndex
-            @divs[relIndex] = span
             @elem.children[relIndex]?.innerHTML = span
         else if lineIndex >= @lines.length and lineIndex < @scroll.bot
             @elem.children[lineIndex-@scroll.top].innerHTML = ""

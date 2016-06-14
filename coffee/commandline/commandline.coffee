@@ -10,7 +10,6 @@ $,fileList
 }         = require '../tools/tools'
 ViewBase  = require '../editor/viewbase'
 log       = require '../tools/log'
-split     = require '../split'
 path      = require 'path'
 
 class Commandline extends ViewBase
@@ -46,7 +45,7 @@ class Commandline extends ViewBase
                 
     startCommand: (name, combo) ->
         @command?.cancel()
-        split.showCommandline()
+        window.split.showCommandline()
         @view.focus()
         @setName name
 
@@ -61,11 +60,11 @@ class Commandline extends ViewBase
     execute: ->
         r = @command?.execute @lines[0]
         @setText r.text if r?.text?
-        split.focusEditor() if r?.focus == 'editor'
+        window.split.focusEditor() if r?.focus == 'editor'
         
     cancel: ->
         @command?.cancel()
-        split.focusOnEditorOrHistory()
+        window.split.focusOnEditorOrHistory()
                                 
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

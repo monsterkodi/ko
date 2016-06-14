@@ -12,11 +12,9 @@ log   = require './tools/log'
 pos   = require './tools/pos'
 drag  = require './tools/drag'
 prefs = require './tools/prefs'
+event = require 'events'
  
-class Split
-
-    @commandlineHeight = 30
-    @handleHeight      = 6
+class Split extends event
     
     # 000  000   000  000  000000000
     # 000  0000  000  000     000   
@@ -24,7 +22,10 @@ class Split
     # 000  000  0000  000     000   
     # 000  000   000  000     000   
     
-    @init: (wid) ->
+    constructor: (wid) ->
+
+        @commandlineHeight = 30
+        @handleHeight      = 6
         
         @winID       = wid
         @elem        = $('.split')
@@ -36,7 +37,7 @@ class Split
         @logView     = $('.split-log')
         @commandLine = $('.commandline')
         @editor      = $('.editor')
-        
+
         @handles     = [@topHandle, @botHandle, @logHandle]
         @panes       = [@topView, @commandLine, @botView, @logView]
                 
@@ -74,7 +75,7 @@ class Split
     # 000   000  000            000  000   000     000       000   000
     # 000   000  00000000  0000000   000  0000000  00000000  0000000  
     
-    @resized: ->
+    resized: ->
         return if not @dragTop
         
         @constrainDrag()
@@ -91,7 +92,7 @@ class Split
     # 000       000   000  000  0000       000     000     000   000  000   000  000  000  0000
     #  0000000   0000000   000   000  0000000      000     000   000  000   000  000  000   000
     
-    @constrainDrag: ->
+    constrainDrag: ->
         @dragTop.setMinMax pos(0, @elemTop()), pos(0, @elemTop()+@elemHeight()-@commandlineHeight-@handleHeight)
         @dragBot.setMinMax pos(0, @elemTop()), pos(0, @elemTop()+@elemHeight())
         @dragLog.setMinMax pos(0, @elemTop()), pos(0, @elemTop()+@elemHeight())
@@ -102,10 +103,10 @@ class Split
     # 000        000   000       000    0         000  000   000     000     
     # 000         0000000   0000000          0000000   000  0000000  00000000
     
-    @elemTop:    -> @elem.getBoundingClientRect().top
-    @elemHeight: -> @elem.getBoundingClientRect().height
-    @splitPosY:  (i) -> @handles[i].getBoundingClientRect().top - @elemTop()
-    @paneHeight: (i) -> @panes[i].getBoundingClientRect().height
+    elemTop:    -> @elem.getBoundingClientRect().top
+    elemHeight: -> @elem.getBoundingClientRect().height
+    splitPosY:  (i) -> @handles[i].getBoundingClientRect().top - @elemTop()
+    paneHeight: (i) -> @panes[i].getBoundingClientRect().height
     
     #  0000000  00000000   000      000  000000000
     # 000       000   000  000      000     000   
@@ -113,7 +114,7 @@ class Split
     #      000  000        000      000     000   
     # 0000000   000        0000000  000     000   
     
-    @splitAt: (i, y) ->        
+    splitAt: (i, y) ->        
         s = []
         for h in [0...@handles.length]
             if h == i
@@ -133,7 +134,7 @@ class Split
     # 000   000  000        000        000         000   
     # 000   000  000        000        0000000     000   
         
-    @applySplit: (s) ->
+    applySplit: (s) ->
         
         if s[1] >= @commandlineHeight + @handleHeight
             s[0] = s[1] - @commandlineHeight - @handleHeight
@@ -148,9 +149,19 @@ class Split
         for h in [0...s.length]
             prevY = h > 0 and s[h-1] or 0
             thisY = s[h]
+            # oldHeight = parseInt(@panes[h].style.height)
+            oldHeight = @panes[h].getBoundingClientRect().height
             @panes[h].style.top    = "#{prevY+(thisY>0 and @handleHeight or 0)}px"
-            @panes[h].style.height = "#{thisY-prevY-@handleHeight}px"
-            @handles[h].style.top  = "#{s[h]}px"
+            @handles[h].style.top  = "#{s[h]}px"            
+            log "split.applySplit #{thisY} - #{prevY} - #{@handleHeight}"
+            newHeight = thisY-prevY-@handleHeight
+            log "split.applySplit #{oldHeight} #{newHeight}"
+            if newHeight != oldHeight
+                @panes[h].style.height = "#{newHeight}px"
+                @emit 'paneHeight', 
+                    paneIndex: h
+                    oldHeight: oldHeight
+                    newHeight: newHeight
         
         if @logVisible
             @logView.style.top = "#{last(s)+@handleHeight}px"
@@ -163,8 +174,8 @@ class Split
     # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
     #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
     
-    @showCommandline: -> @splitAt 0, 0
-    @hideCommandline: -> @splitAt 1, 0
+    showCommandline: -> @splitAt 0, 0
+    hideCommandline: -> @splitAt 1, 0
     
     # 000       0000000    0000000 
     # 000      000   000  000      
@@ -172,16 +183,16 @@ class Split
     # 000      000   000  000   000
     # 0000000   0000000    0000000 
     
-    @showLog:   -> @setLogVisible true
-    @hideLog:   -> @setLogVisible false    
-    @toggleLog: -> @setLogVisible not @logVisible    
-    @setLogVisible: (v) ->
+    showLog:   -> @setLogVisible true
+    hideLog:   -> @setLogVisible false    
+    toggleLog: -> @setLogVisible not @logVisible    
+    setLogVisible: (v) ->
         @logVisible = v
         @setState 'logVisible', v
         @logView.style.display = v and 'initial' or 'none'
         @splitAt 2, @elemHeight() - (v and Math.max(100, @getState('logHeight', 200)) or 0)
         
-    @clearLog: -> $('.logview').innerHTML = ""
+    clearLog: -> $('.logview').innerHTML = ""
      
     #  0000000  000   000   0000000   00000000 
     # 000       0000  000  000   000  000   000
@@ -189,7 +200,7 @@ class Split
     #      000  000  0000  000   000  000      
     # 0000000   000   000  000   000  000      
     
-    @snap: ->
+    snap: ->
         y1 = @splitPosY 1
         if y1 > 0
             if y1 < (@commandlineHeight+@handleHeight)/2
@@ -203,14 +214,14 @@ class Split
     # 000       000   000  000       000   000       000
     # 000        0000000    0000000   0000000   0000000 
     
-    @focusOnEditorOrHistory: ->
+    focusOnEditorOrHistory: ->
         @focusOnEditor()
         
-    @focusOnEditor: ->
+    focusOnEditor: ->
         @hideCommandline()
         @focusEditor()
         
-    @focusEditor: ->
+    focusEditor: ->
         @editor.focus()
 
     #  0000000  000000000   0000000   000000000  00000000
@@ -219,11 +230,11 @@ class Split
     #      000     000     000   000     000     000     
     # 0000000      000     000   000     000     00000000
             
-    @setState: (key, value) ->
+    setState: (key, value) ->
         if @winID
             prefs.setPath "windows.#{@winID}.#{key}", value
         
-    @getState: (key, value) ->
+    getState: (key, value) ->
         if @winID
             prefs.getPath "windows.#{@winID}.#{key}", value
 

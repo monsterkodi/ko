@@ -12,7 +12,6 @@ getStyle,
 log       = require '../tools/log'
 drag      = require '../tools/drag'
 keyinfo   = require '../tools/keyinfo'
-split     = require '../split'
 ViewBase  = require './viewbase'
 Minimap   = require './minimap'
 syntax    = require './syntax'
@@ -115,14 +114,14 @@ class View extends ViewBase
         
     resetZoom: -> 
         webframe.setZoomFactor 1
-        @updateNumLines()
+        @scroll.setViewHeight @viewHeight()
         
     changeZoom: (d) -> 
         z = webframe.getZoomFactor() 
         z *= 1+d/20
         z = clamp 0.36, 5.23, z
         webframe.setZoomFactor z
-        @updateNumLines()
+        @scroll.setViewHeight @viewHeight()
 
     # 000000000  000  000000000  000      00000000  0000000     0000000   00000000 
     #    000     000     000     000      000       000   000  000   000  000   000
@@ -179,7 +178,7 @@ class View extends ViewBase
     scrollBy: (delta) -> 
             
         @scroll.by delta
-        
+        # log "view.scrollBy @scroll.offsetTop #{@scroll.offsetTop}"
         @view.scrollTop = @scroll.offsetTop
 
     scrollCursor: -> $('.cursor', @view)?.scrollIntoViewIfNeeded()

@@ -77,7 +77,7 @@ delState = (key) ->
 ipc.on 'executeResult', (event, arg) =>
     $('scroll').innerHTML += encode str arg
     $('scroll').innerHTML += "<br>"
-    $('scroll').parentElement.scrollTop = "-50px"
+    # $('scroll').parentElement.scrollTop = "-50px"
 ipc.on 'openFile', (event, options) => openFile options
 ipc.on 'cloneFile',  => ipc.send 'newWindowWithFile', editor.currentFile
 ipc.on 'reloadFile', => loadFile editor.currentFile
@@ -87,7 +87,11 @@ ipc.on 'loadFile', (event, file) => loadFile file
 ipc.on 'setWinID', (event, id) => 
     winID = id
     # log "setWinID: ", id
-    split.init id
+    window.split = new split id
+    window.split.on 'paneHeight', (e) ->
+        # log "window.on.split.paneHeight #{e}"
+        if e.paneIndex == 2
+            window.editor?.resized()
     s = getState 'fontSize'
     setFontSize s if s
 
@@ -215,8 +219,8 @@ window.onresize = =>
     log 'resize', sw(), sh()
     if sh()
         ipc.send 'saveBounds', winID if winID?
-        split.resized()
-        editor?.resized()
+        window.split.resized()
+        # editor?.resized()
     
 window.onunload = =>
     editor.setCurrentFile null # to stop watcher
@@ -257,8 +261,8 @@ document.onkeydown = (event) ->
     switch combo
         when 'command+enter' then return ipc.send 'execute', editor.text()
         when 'command+alt+i' then return ipc.send 'toggleDevTools', winID
-        when 'command+alt+l' then return split.toggleLog()
-        when 'command+alt+k' then return split.clearLog()
+        when 'command+alt+l' then return window.split.toggleLog()
+        when 'command+alt+k' then return window.split.clearLog()
         when 'command+='     then return changeFontSize +1
         when 'command+-'     then return changeFontSize -1
         when 'command+0'     then return resetFontSize()
