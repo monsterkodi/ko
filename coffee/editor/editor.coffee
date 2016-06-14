@@ -342,8 +342,9 @@ class Editor extends Buffer
     moveCursorsToStartOfLine: (e) -> @moveAllCursors e, (c) -> [0, c[1]]
     moveCursorsToEndOfWord:   (e) -> @moveAllCursors e, @endOfWordAtCursor
     moveCursorsToStartOfWord: (e) -> @moveAllCursors e, @startOfWordAtCursor
-    moveCursorsUp:            (e) -> @moveAllCursors e, (c) -> [c[0], c[1]-1]
-    moveCursorsDown:          (e) -> @moveAllCursors e, (c) -> [c[0], c[1]+1]
+    
+    moveCursorsUp:   (e, n=1) -> @moveAllCursors e, ((n)->(c)->[c[0],c[1]-n])(n)
+    moveCursorsDown: (e, n=1) -> @moveAllCursors e, ((n)->(c)->[c[0],c[1]+n])(n)
                         
     moveCursorsRight: (e, n=1) ->
         moveRight = (n) -> (c) -> [c[0]+n, c[1]]

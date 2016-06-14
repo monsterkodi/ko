@@ -213,7 +213,7 @@ $('.titlebar').ondblclick = (event) => ipc.send 'maximizeWindow', winID
 # 000   000  00000000  0000000   000  0000000  00000000
 
 window.onresize = =>
-    # log 'resize', sw(), sh()
+    log 'resize', sw(), sh()
     if sh()
         ipc.send 'saveBounds', winID if winID?
         split.resized()
@@ -259,6 +259,8 @@ document.onkeydown = (event) ->
     switch combo
         when 'command+enter' then return ipc.send 'execute', editor.text()
         when 'command+alt+i' then return ipc.send 'toggleDevTools', winID
+        when 'command+alt+l' then return split.toggleLog()
+        when 'command+alt+k' then return split.clearLog()
         when 'command+='     then return changeFontSize +1
         when 'command+-'     then return changeFontSize -1
         when 'command+0'     then return resetFontSize()

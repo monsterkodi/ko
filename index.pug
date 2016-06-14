@@ -6,23 +6,30 @@ html(lang="en")
         link(rel='stylesheet' href='css/style.css' type='text/css')
     body
         #main
-            .split.split-horiz
-                .split-pane.split-top
-                    .split-rel
-                        #scroll                             
-                .split-handle.top
-                .commandline
-                    span.commandline-command
-                    span.commandline-span
-                        .commandline-editor(tabindex="1")
-                .split-handle.bot
-                .split-pane.split-bot
-                    .split-rel
-                        .editor(tabindex="0")
-                        svg.minimap
-                        .scrollbar.right
-                            .scrollhandle.right
-        div.titlebar
+            .titlebar
+            .split-area
+                .split
+                    .split-pane.split-top
+                        .split-rel
+                            #scroll                             
+                    .split-handle.top
+                    .commandline
+                        span.commandline-command
+                        span.commandline-span
+                            .commandline-editor(tabindex="1")
+                    .split-handle.bot
+                    .split-pane.split-bot
+                        .split-rel
+                            .editor(tabindex="0")
+                            svg.minimap
+                            .scrollbar.right
+                                .scrollhandle.right
+                    .split-handle.log
+                    .split-pane.split-log
+                        .split-rel
+                            .logview
+                            .scrollbar.right
+                                .scrollhandle.right        
     script.
         require('./js/window.js')
 

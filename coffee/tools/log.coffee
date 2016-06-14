@@ -13,7 +13,11 @@ logScroll = ->
     s = (str(s) for s in [].slice.call arguments, 0).join " "
     console.log s
     tools = require './tools'
-    tools.$('scroll').innerHTML += s + "<br>"
+    div = document.createElement 'div'
+    div.className = 'logline'
+    div.innerHTML = s
+    tools.$('.logview').appendChild div
+    div.scrollIntoViewIfNeeded()
 
 if window?
     module.exports = logScroll

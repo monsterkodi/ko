@@ -3,9 +3,10 @@
 # 0000000   00000000   000      000     000   
 #      000  000        000      000     000   
 # 0000000   000        0000000  000     000   
-
 {
-$,sw,sh
+$,
+clamp,
+last
 }     = require './tools/tools'
 log   = require './tools/log'
 pos   = require './tools/pos'
@@ -15,7 +16,6 @@ prefs = require './tools/prefs'
 class Split
 
     @commandlineHeight = 30
-    @titlebarHeight    = 23
     @handleHeight      = 6
     
     # 000  000   000  000  000000000
@@ -30,24 +30,46 @@ class Split
         @elem        = $('.split')
         @topHandle   = $('.split-handle.top')
         @botHandle   = $('.split-handle.bot')
+        @logHandle   = $('.split-handle.log')
         @topView     = $('.split-top')
         @botView     = $('.split-bot')
+        @logView     = $('.split-log')
         @commandLine = $('.commandline')
-        @editor      = $('.editor')                
+        @editor      = $('.editor')
         
-        @dragBot = new drag
-            target: @botHandle
-            cursor: 'ns-resize'
-            onMove: (drag) => @splitAt drag.cpos.y
-            onStop: (drag) => @snap()
+        @handles     = [@topHandle, @botHandle, @logHandle]
+        @panes       = [@topView, @commandLine, @botView, @logView]
+        
+        log 'panes', (p.className for p in @panes)
+        
+        @logVisible = @getState 'logVisible', false
+        if @logVisible
+            @logView.style.display = 'initial'
+        else
+            @logView.style.display = 'none'
 
         @dragTop = new drag
             target: @topHandle
             cursor: 'ns-resize'
-            onMove: (drag) => @splitAt drag.cpos.y + 40
+            onMove: (drag) => @splitAt 0, drag.cpos.y - @elemTop()
             onStop: (drag) => @snap()
+        
+        @dragBot = new drag
+            target: @botHandle
+            cursor: 'ns-resize'
+            onMove: (drag) => @splitAt 1, drag.cpos.y - @elemTop()
+            onStop: (drag) => @snap()
+
+        @dragLog = new drag
+            target: @logHandle
+            cursor: 'ns-resize'
+            onMove: (drag) => @splitAt 2, drag.cpos.y - @elemTop()
+            onStop: (drag) => @snap()
+
+        @constrainDrag()
     
-        @splitAt @getState 'split', @titlebarHeight
+        log 'split.init top', @elemTop(), 'height', @elemHeight()
+        @applySplit @getState 'split', [0,0,@elemHeight()-@handleHeight]
     
     # 00000000   00000000   0000000  000  0000000  00000000  0000000  
     # 000   000  000       000       000     000   000       000   000
@@ -57,10 +79,37 @@ class Split
     
     @resized: ->
         return if not @dragTop
-        @dragTop.setMinMax pos(0, @titlebarHeight), pos(0, sh()-@commandlineHeight-2*@handleHeight)
-        @dragBot.setMinMax pos(0, @titlebarHeight), pos(0, sh()-@handleHeight)        
-        if @dragBot.target.getBoundingClientRect().bottom > sh()
-            @splitAt sh()-@handleHeight
+        
+        @constrainDrag()
+                
+        s = []
+        for h in [0...@handles.length]
+            s.push clamp 0, @elemHeight(), @splitPosY h
+            
+        log "resized", @elemHeight(), s
+        @applySplit s
+    
+    #  0000000   0000000   000   000   0000000  000000000  00000000    0000000   000  000   000
+    # 000       000   000  0000  000  000          000     000   000  000   000  000  0000  000
+    # 000       000   000  000 0 000  0000000      000     0000000    000000000  000  000 0 000
+    # 000       000   000  000  0000       000     000     000   000  000   000  000  000  0000
+    #  0000000   0000000   000   000  0000000      000     000   000  000   000  000  000   000
+    
+    @constrainDrag: ->
+        @dragTop.setMinMax pos(0, @elemTop()), pos(0, @elemTop()+@elemHeight()-@commandlineHeight-@handleHeight)
+        @dragBot.setMinMax pos(0, @elemTop()), pos(0, @elemTop()+@elemHeight())
+        @dragLog.setMinMax pos(0, @elemTop()), pos(0, @elemTop()+@elemHeight())
+        
+    # 00000000    0000000    0000000          0000000  000  0000000  00000000
+    # 000   000  000   000  000         0    000       000     000   000     
+    # 00000000   000   000  0000000   00000  0000000   000    000    0000000 
+    # 000        000   000       000    0         000  000   000     000     
+    # 000         0000000   0000000          0000000   000  0000000  00000000
+    
+    @elemTop:    -> @elem.getBoundingClientRect().top
+    @elemHeight: -> @elem.getBoundingClientRect().height
+    @splitPosY:  (i) -> @handles[i].getBoundingClientRect().top - @elemTop()
+    @paneHeight: (i) -> @panes[i].getBoundingClientRect().height
     
     #  0000000  00000000   000      000  000000000
     # 000       000   000  000      000     000   
@@ -68,30 +117,79 @@ class Split
     #      000  000        000      000     000   
     # 0000000   000        0000000  000     000   
     
-    @splitAt: (y) ->
-        @topView    .style.height = "#{y-@commandlineHeight-@titlebarHeight-@handleHeight}px"
-        @topView    .style.top = "#{@titlebarHeight}px"
-        @topHandle  .style.top = "#{y-@commandlineHeight-@handleHeight}px"
-        @commandLine.style.top = "#{y-@commandlineHeight}px"
-        @botHandle  .style.top = "#{y-2}px"
-        @botView    .style.top = "#{y+@handleHeight-2}px"
-        @dragTop.setMinMax pos(0, @titlebarHeight), pos(0, sh()-@commandlineHeight-2*@handleHeight)
-        @dragBot.setMinMax pos(0, @titlebarHeight), pos(0, sh()-@handleHeight)
-        @setState 'split', y
+    @splitAt: (i, y) ->
+        log "splitAt i #{i} y #{y}"
+        
+        s = []
+        for h in [0...@handles.length]
+            if h == i
+                s.push y
+                if i == 1
+                    s[0] = Math.max(0,y - @commandlineHeight - @handleHeight)
+            else if i == 0 and h == 1
+                s.push s[0] + @commandlineHeight + @handleHeight
+            else
+                s.push @splitPosY h
 
+        log "splitAt i #{i} y #{y} s #{s}"
+        @applySplit s
+    
+    #  0000000   00000000   00000000   000      000   000
+    # 000   000  000   000  000   000  000       000 000 
+    # 000000000  00000000   00000000   000        00000  
+    # 000   000  000        000        000         000   
+    # 000   000  000        000        0000000     000   
+        
+    @applySplit: (s) ->
+        
+        if s[1] >= @commandlineHeight + @handleHeight
+            s[0] = s[1] - @commandlineHeight - @handleHeight
+        for i in [1...s.length]
+            s[i] = clamp s[i-1], @elemHeight(), s[i]
+            
+        if @logVisible
+            @setState 'logHeight', s[2]
+        else
+            s[2] = @elemHeight()
+            
+        log 'applySplit', s
+        for h in [0...s.length]
+            prevY = h > 0 and s[h-1] or 0
+            thisY = s[h]
+            @panes[h].style.top    = "#{prevY+(thisY>0 and @handleHeight or 0)}px"
+            @panes[h].style.height = "#{thisY-prevY-@handleHeight}px"
+            @handles[h].style.top  = "#{s[h]}px"
+        
+        if @logVisible
+            @logView.style.top = "#{last(s)+@handleHeight}px"
+            
+        @setState 'split', s
+        
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
     # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
     # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 
     # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
     #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
     
-    @showCommandline: ->
-        if @dragTop.target.getBoundingClientRect().top < 0
-            @splitAt @titlebarHeight+@commandlineHeight+@handleHeight
-
-    @hideCommandline: ->
-        if @dragBot.target.getBoundingClientRect().top > @titlebarHeight
-            @splitAt @titlebarHeight+2
+    @showCommandline: -> @splitAt 0, 0
+    @hideCommandline: -> @splitAt 1, 0
+    
+    # 000       0000000    0000000 
+    # 000      000   000  000      
+    # 000      000   000  000  0000
+    # 000      000   000  000   000
+    # 0000000   0000000    0000000 
+    
+    @showLog:   -> @setLogVisible true
+    @hideLog:   -> @setLogVisible false    
+    @toggleLog: -> @setLogVisible not @logVisible    
+    @setLogVisible: (v) ->
+        @logVisible = v
+        @setState 'logVisible', v
+        @logView.style.display = v and 'initial' or 'none'
+        @splitAt 2, @elemHeight() - (v and Math.max(100, @getState('logHeight', 200)) or 0)
+        
+    @clearLog: -> $('.logview').innerHTML = ""
      
     #  0000000  000   000   0000000   00000000 
     # 000       0000  000  000   000  000   000
@@ -100,12 +198,12 @@ class Split
     # 0000000   000   000  000   000  000      
     
     @snap: ->
-        t = @dragBot.target.getBoundingClientRect().top
-        if t > @titlebarHeight
-            if t < @titlebarHeight+(@commandlineHeight+@handleHeight)/2
-                @splitAt @titlebarHeight+2
-            else if t <  @titlebarHeight+(@commandlineHeight+@handleHeight)*2
-                @splitAt @titlebarHeight+@commandlineHeight+@handleHeight
+        y1 = @splitPosY 1
+        if y1 > 0
+            if y1 < (@commandlineHeight+@handleHeight)/2
+                @splitAt 1, 0
+            else if y1 <  (@commandlineHeight+@handleHeight)*2
+                @splitAt 0, 0
 
     # 00000000   0000000    0000000  000   000   0000000
     # 000       000   000  000       000   000  000     

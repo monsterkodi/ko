@@ -247,11 +247,11 @@ class View extends ViewBase
             when 'home'    then return @moveCursorToLineIndex 0, event.shiftKey
             when 'end'     then return @moveCursorToLineIndex @lines.length-1, event.shiftKey
             when 'page up'      
-                @moveCursorByLines -(@numFullLines()-3), event.shiftKey
+                @moveCursorsUp event.shiftKey, @numFullLines()-3
                 event.preventDefault() # prevent view from scrolling
                 return
             when 'page down'    
-                @moveCursorByLines   @numFullLines()-3, event.shiftKey
+                @moveCursorsDown event.shiftKey, @numFullLines()-3
                 event.preventDefault() # prevent view from scrolling
                 return
                                 

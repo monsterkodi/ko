@@ -17,6 +17,8 @@ editorPadding         = 8px
 bottomCornerRadius    = 4px
 frameBorder           = 5px solid #222
 commandlineHeight     = 30px
+titlebarHeight        = 22px
+splithandleHeight     = 6px
 
 fill-abs()
     position        absolute
@@ -42,8 +44,6 @@ fill-rel()
     margin              0
     height              commandlineHeight
     position            absolute
-    border-left         frameBorder
-    border-right        frameBorder 
         
 .commandline-command
     font-family         "Andale Mono", monospace
@@ -113,17 +113,17 @@ fill-rel()
     outline-width   0
     
 body
+    overflow            hidden
     background          #000
     color               #fff
     font-family         arial, helvetica, sans-serif
     -webkit-user-select none
     fill-abs()
-    overflow            hidden
     margin              0
     
 #main
-    fill-rel()
     overflow            hidden
+    fill-rel()
     -webkit-app-region  no-drag
 
 // 000000000  000  000000000  000      00000000  0000000     0000000   00000000 
@@ -133,7 +133,7 @@ body
 //    000     000     000     0000000  00000000  0000000    000   000  000   000
 
 .titlebar
-    height              20px
+    height              titlebarHeight
     background          #333
     color               #aaa
     font-size           14px
@@ -217,8 +217,6 @@ body
     font-family         "Andale Mono", monospace
     fill-abs()
     overflow            auto
-    border-left         frameBorder
-    border-right        frameBorder    
 
 //  0000000  00000000   000      000  000000000
 // 000       000   000  000      000     000   
@@ -226,32 +224,40 @@ body
 //      000  000        000      000     000   
 // 0000000   000        0000000  000     000   
     
+.split-area
+    overflow            hidden
+    position            absolute
+    left                0
+    right               0
+    bottom              0
+    top                 titlebarHeight
+    border-left         frameBorder
+    border-right        frameBorder
+    border-bottom       frameBorder
+    
 .split
+    overflow            hidden
+    position            static
+    width               100%
+    height              100%
+    
 .split-rel
     fill-rel()
 
 .split-handle
 .split-pane
-    position        absolute
+    overflow            hidden
+    position            absolute
+    left                0
+    right               0
+    
+.split-log
+    bottom              0
     
 .split-handle
-    background      #222
-    
-.split-vert .split-handle
-    width           10px
-
-.split-horiz .split-handle
-    height          10px
-    
-.split-horiz .split-handle
-.split-top
-.split-bot
-    left            0
-    right           0
-    
-.split-bot
-    bottom          0
-    
+    background          #222
+    height              splithandleHeight
+                
 // 00000000  0000000    000  000000000   0000000   00000000 
 // 000       000   000  000     000     000   000  000   000
 // 0000000   000   000  000     000     000   000  0000000  
@@ -260,11 +266,6 @@ body
 
 .split-pane.split-bot 
     background      #000
-    border          frameBorder
-    border-top      0px solid
-    
-    border-bottom-left-radius    bottomCornerRadius
-    border-bottom-right-radius   bottomCornerRadius    
 
 .editor
 
@@ -368,6 +369,28 @@ rect
         fill        #222
     &.buffer
         fill        #111
+
+/*
+*  000       0000000    0000000 
+*  000      000   000  000      
+*  000      000   000  000  0000
+*  000      000   000  000   000
+*  0000000   0000000    0000000 
+*/
+
+.logview
+
+    fill-abs()
+        
+    overflow-x      auto
+    overflow-y      auto
+
+    background      #000
+    color           #ddd 
+    
+    font-size       14px
+    font-weight     bold
+    font-family     "Andale Mono", monospace
 
 // 000000000  00000000  00000000   00     00  000  000   000   0000000   000    
 //    000     000       000   000  000   000  000  0000  000  000   000  000    
