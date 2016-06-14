@@ -66,7 +66,7 @@ class Minimap
         
         @topBot.attr 
             y:        scroll.top*2
-            height:   (scroll.bot-scroll.top)*2
+            height:   Math.max 0, (scroll.bot-scroll.top)*2
 
     # 000      000  000   000  00000000
     # 000      000  0000  000  000     

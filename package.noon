@@ -59,7 +59,7 @@ dependencies
                 karg            ^1.0.8
                 keycode         ^2.1.2
                 lodash          ^4.13.1
-                noon            ^1.0.8
+                noon            ^1.0.9
                 opener          ^1.4.1
                 performance-now  ^0.2.0
                 snapsvg         ^0.4.0

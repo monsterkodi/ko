@@ -45,7 +45,7 @@ class Editor extends Buffer
             @setText fs.readFileSync file, encoding: 'UTF8'
         else
             @watch = null
-            @setLines ['']
+            @setLines []
         # log 'editor.setCurrentFile', file    
 
     #  0000000  00000000  000000000  000      000  000   000  00000000   0000000

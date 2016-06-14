@@ -137,12 +137,14 @@ class ViewBase extends Editor
     # 0000000   00000000     000     0000000  000  000   000  00000000  0000000 
         
     setLines: (lines) ->
+        # log "viewbase.setLines lines", lines if @name == 'editor'        
+        @scroll.reset() if lines.length == 0
         lines ?= ['']
         super lines
         @syntax.parse()        
-        log "viewbase.setLines viewHeight #{@viewHeight()}" if @name == 'editor'
+        # log "viewbase.setLines viewHeight #{@viewHeight()}" if @name == 'editor'
         @scroll.setViewHeight @viewHeight()
-        log "viewbase.setLines numLines #{lines.length}" if @name == 'editor'
+        # log "viewbase.setLines numLines #{lines.length}" if @name == 'editor'
         @scroll.setNumLines @lines.length        
 
     # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
@@ -178,8 +180,8 @@ class ViewBase extends Editor
         # log "viewbase.exposeLineAtIndex #{li}"
         # log "viewbase.exposeLineAtIndex children #{@elem.children.length}"
         html = @renderLineAtIndex li
-        log "viewbase.exposeLineAtIndex #{li} #{html}"
-        log "viewbase.exposeLineAtIndex #{@lines[li]} #{@lines.length}"
+        # log "viewbase.exposeLineAtIndex #{li} #{html}"
+        # log "viewbase.exposeLineAtIndex #{@lines[li]} #{@lines.length}"
         @addLine().innerHTML = html
     
     addLine: ->
@@ -198,9 +200,9 @@ class ViewBase extends Editor
     #     0      000   000  000   000  000  0000000   000   000
     
     vanishLineAtIndex: (li) =>
-        log "viewbase.exposeLineAtIndex #{li}"
+        # log "viewbase.exposeLineAtIndex #{li}"
         while @elem.children.length > li
-            log "viewbase.vanishLineAtIndex addLine #{@elem.children.length} < #{li}"
+            # log "viewbase.vanishLineAtIndex remove line #{li} #{@elem.children.length}"
             @elem.children[@elem.children.length-1].remove()
 
     # 000000000   0000000   00000000    0000000  000   000   0000000   000   000   0000000   00000000
@@ -211,9 +213,9 @@ class ViewBase extends Editor
     
     topChange: () =>
                                         
-        @renderCursors()
-        @renderSelection()
-        @renderHighlights()
+        # @renderCursors()
+        # @renderSelection()
+        # @renderHighlights()
 
     renderCursors: ->
         cs = @cursorsRelativeToLineIndexRange [@scroll.top, @scroll.bot]

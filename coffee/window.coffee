@@ -80,10 +80,14 @@ ipc.on 'executeResult', (event, arg) =>
     # $('scroll').parentElement.scrollTop = "-50px"
 ipc.on 'openFile', (event, options) => openFile options
 ipc.on 'cloneFile',  => ipc.send 'newWindowWithFile', editor.currentFile
-ipc.on 'reloadFile', => loadFile editor.currentFile
+ipc.on 'reloadFile', => 
+    log "window.ipc.reloadFile"
+    loadFile editor.currentFile
 ipc.on 'saveFileAs', => saveFileAs()
 ipc.on 'saveFile',   => saveFile()
-ipc.on 'loadFile', (event, file) => loadFile file
+ipc.on 'loadFile', (event, file) => 
+    log "window.ipc.loadFile"
+    loadFile file
 ipc.on 'setWinID', (event, id) => 
     winID = id
     # log "setWinID: ", id
@@ -95,10 +99,7 @@ ipc.on 'setWinID', (event, id) =>
     s = getState 'fontSize'
     setFontSize s if s
 
-    if file = getState 'file'
-        log "window.ipc.on.setWinID load file from state #{file}"
-        loadFile file
-    else
+    if editor?.currentFile
         setState 'file', editor.currentFile # files might be loaded before id got sent
 
     ipc.send 'reloadMenu'
@@ -121,9 +122,10 @@ saveFile = (file) =>
     setState 'file', file
 
 loadFile = (file) =>  
-    log 'load:', file
+    log 'window.loadFile file:', file
     if fileExists file
         addToRecent file
+        editor.setCurrentFile null # to stop watcher and reset scroll
         editor.setCurrentFile file
         setState 'file', file
         ipc.send 'reloadMenu'
@@ -148,6 +150,7 @@ openFiles = (ofiles, options) =>
             return []
         setState 'openFilePath', path.dirname files[0]                    
         if not options?.newWindow
+            log "window.openFiles not new window"
             loadFile resolve files.shift()
         for file in files
             ipc.send 'newWindowWithFile', file
@@ -220,7 +223,7 @@ window.onresize = =>
     log 'resize', sw(), sh()
     if sh()
         ipc.send 'saveBounds', winID if winID?
-        window.split.resized()
+        window.split?.resized()
         # editor?.resized()
     
 window.onunload = =>

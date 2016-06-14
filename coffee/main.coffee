@@ -294,6 +294,7 @@ class Main
             @restoreWin w
                 
     restoreWin: (state) ->
+        log "restoreWin #{state}"
         w = @createWindow state.file
         w.setBounds state.bounds if state.bounds?
         w.webContents.openDevTools() if state.devTools
@@ -326,6 +327,7 @@ class Main
         winReady = =>
             win.webContents.send 'setWinID', win.id
             if openFile?
+                log "main.createWindow.winReady openFile #{openFile}"
                 win.webContents.send 'loadFile', openFile 
         
         win.webContents.on 'dom-ready', winReady

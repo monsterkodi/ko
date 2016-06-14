@@ -104,7 +104,6 @@ class View extends ViewBase
     setLines: (lines) ->
         super lines
         @minimap.renderLines()
-        @scrollBy 0
     
     # 0000000   0000000    0000000   00     00
     #    000   000   000  000   000  000   000
@@ -167,7 +166,7 @@ class View extends ViewBase
             @scrollhandleRight.style.height = "#{scrollHeight}px"
             # @scrollhandleRight.style.width  = "#{sbw}px"
                 
-    scrollLines: (lineDelta) -> @scrollBy lineDelta * @size.lineHeight
+    scrollLines: (delta) -> @scrollBy delta * @size.lineHeight
 
     scrollFactor: (event) ->
         f  = 1 
