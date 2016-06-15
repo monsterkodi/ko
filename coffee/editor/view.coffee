@@ -89,7 +89,7 @@ class View extends ViewBase
             name = path.extname(file).substr(1)
             if name in syntax.syntaxNames
                 @syntax.name = name
-        log 'view.setCurrentFile', file, @syntax.name
+        # log 'view.setCurrentFile', file, @syntax.name
         super file # -> setText -> setLines
 
         @restoreScrollCursorsAndSelections() if file
@@ -201,6 +201,7 @@ class View extends ViewBase
     saveScrollCursorsAndSelections: ->
         @savedState = 
             file:       @currentFile
+            scroll:     @scroll.scroll
             cursors:    _.cloneDeep @cursors
             selections: _.cloneDeep @selections
             highlights: _.cloneDeep @highlights
@@ -213,13 +214,19 @@ class View extends ViewBase
     
     restoreScrollCursorsAndSelections: ->
         if @savedState.file == @currentFile
+            # log "view.restoreScrollCursorsAndSelections restore:", @savedState
             @cursors    = @savedState.cursors
             @selections = @savedState.selections
             @highlights = @savedState.highlights
+            delta = @savedState.scroll - @scroll.scroll
+            # log "view.restoreScrollCursorsAndSelections delta:", delta
+            if delta
+                @scrollBy delta
+            else
+                @renderCursors()
+                @renderSelection()
+                @renderHighlights()
             @savedState = null
-            @renderCursors()
-            @renderSelection()
-            @renderHighlights()
                         
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

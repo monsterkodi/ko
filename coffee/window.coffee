@@ -81,12 +81,12 @@ ipc.on 'executeResult', (event, arg) =>
 ipc.on 'openFile', (event, options) => openFile options
 ipc.on 'cloneFile',  => ipc.send 'newWindowWithFile', editor.currentFile
 ipc.on 'reloadFile', => 
-    log "window.ipc.reloadFile"
+    # log "window.ipc.reloadFile"
     loadFile editor.currentFile
 ipc.on 'saveFileAs', => saveFileAs()
 ipc.on 'saveFile',   => saveFile()
 ipc.on 'loadFile', (event, file) => 
-    log "window.ipc.loadFile"
+    # log "window.ipc.loadFile"
     loadFile file
 ipc.on 'setWinID', (event, id) => 
     winID = id
