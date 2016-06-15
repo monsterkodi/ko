@@ -23,6 +23,12 @@ _         = require 'lodash'
 electron  = require 'electron'
 clipboard = electron.clipboard
 
+# 0000000    000      000   000  0000000  
+# 000   000  000      000   000  000   000
+# 0000000    000      000   000  0000000  
+# 000   000  000      000   000  000   000
+# 0000000    0000000   0000000   0000000  
+
 class ViewBase extends Editor
 
     # 000  000   000  000  000000000
@@ -239,8 +245,13 @@ class ViewBase extends Editor
     
     vanishLineAtIndex: (li) =>
         # log "viewbase.vanishLineAtIndex #{li}"
+        if li < 0
+            li = @elem.children.length-1
+        else if li != @elem.children.length-1
+            log "warning! viewbase.vanishLineAtIndex #{li} expected #{@elem.children.length-1}"
+            return
+            li = @elem.children.length-1
         @elem.lastChild?.remove()
-        
         @emit 'lineVanished', 
             lineIndex: li
         
@@ -385,18 +396,18 @@ class ViewBase extends Editor
         indices = []
         info = _.cloneDeep changeInfo
         for i in info.changed
-            continue if i < @scroll.top
-            break if i > @scroll.bot
+            continue if i < @scroll.exposeTop
+            break if i > @scroll.exposeBot
             indices.push i
             
         if info.inserted.length
-            if info.inserted[0] < @scroll.bot
-                for i in [Math.max(@scroll.top, info.inserted[0])..@scroll.bot]
+            if info.inserted[0] < @scroll.exposeBot
+                for i in [Math.max(@scroll.exposeTop, info.inserted[0])..@scroll.exposeBot]
                     indices.push i
 
         if info.deleted.length
-            if info.deleted[0] < @scroll.bot
-                for i in [Math.max(@scroll.top, info.deleted[0])..@scroll.bot]
+            if info.deleted[0] < @scroll.exposeBot
+                for i in [Math.max(@scroll.exposeTop, info.deleted[0])..@scroll.exposeBot]
                     indices.push i
                                                                                 
         indices.sort (a,b) -> a - b
@@ -411,14 +422,20 @@ class ViewBase extends Editor
                      
         @renderHighlights()
     
+    # 000   000  00000000   0000000     0000000   000000000  00000000
+    # 000   000  000   000  000   000  000   000     000     000     
+    # 000   000  00000000   000   000  000000000     000     0000000 
+    # 000   000  000        000   000  000   000     000     000     
+    #  0000000   000        0000000    000   000     000     00000000
+    
     updateLine: (li) ->
         if @scroll.exposeTop <= li < @lines.length
             relIndex = li - @scroll.exposeTop
             span = @renderLineAtIndex li
             # log "viewbase.updateLine li #{li} relIndex #{relIndex}"
             @elem.children[relIndex]?.innerHTML = span
-        else if li >= @lines.length and li < @scroll.bot
-            @elem.children[li-@scroll.top].innerHTML = ""
+        else 
+            @vanishLineAtIndex -1            
 
     # 00000000    0000000    0000000
     # 000   000  000   000  000     

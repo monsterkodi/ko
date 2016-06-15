@@ -1,19 +1,17 @@
 # todo/ideas
 
 - numbers
-    - handle font size change
     - highlight selected lines
     
+- find
+    - case insensitive    
+
 - minimap 
     - use scroll
     - fix drag speed
-
-- scroll
-    - fix font size change
-    - fix line height on font change
     
 - cursors
-    - swap virutal if single cursor
+    - swap virutal if single cursor!!!
     - remember last cursor
     - highlight last cursor
     - highlight cursor line(s?)

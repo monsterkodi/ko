@@ -294,7 +294,7 @@ class Main
             @restoreWin w
                 
     restoreWin: (state) ->
-        log "restoreWin #{state}"
+        # log "restoreWin #{state}"
         w = @createWindow state.file
         w.setBounds state.bounds if state.bounds?
         w.webContents.openDevTools() if state.devTools
@@ -315,7 +315,7 @@ class Main
             minHeight:       140
             useContentSize:  true
             backgroundColor: '#000'
-            fullscreen:      false
+            fullscreenable:  true
             show:            true
             titleBarStyle:   'hidden'
                     
