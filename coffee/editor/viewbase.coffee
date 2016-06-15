@@ -233,8 +233,10 @@ class ViewBase extends Editor
     vanishLineAtIndex: (li) =>
         # log "viewbase.vanishLineAtIndex #{li}"
         @elem.lastChild?.remove()
-        # log "viewbase.vanishLineAtIndex #{li} children #{@elem.children.length}"
-
+        
+        @emit 'lineVanished', 
+            lineIndex: li
+        
     # 000000000   0000000   00000000    0000000  000   000   0000000   000   000   0000000   00000000
     #    000     000   000  000   000  000       000   000  000   000  0000  000  000        000     
     #    000     000   000  00000000   000       000000000  000000000  000 0 000  000  0000  0000000 
@@ -245,24 +247,31 @@ class ViewBase extends Editor
         # log "viewbase.exposeTopChange #{e.old} -> #{e.new}"
         
         num = Math.abs e.num
-        # log "viewbase.exposeTopChange", e
-        # log "viewbase.exposeTopChange children #{@elem.children.length} scroll", @scroll.info()
+
         for n in [0...num]
             if e.num < 0
                 @elem.firstChild.remove()
-                # log "viewbase.exposeTopChange top-- children #{@elem.children.length}"
+                li = e.new - (num - n)
+                
+                @emit 'lineVanishedTop', 
+                    lineIndex: li
+                
             else 
                 div = @addLine()
                 li = e.new + num - n - 1
                 div.innerHTML = @renderLineAtIndex li
                 @elem.insertBefore div, @elem.firstChild
-                # log "viewbase.exposeTopChange top++ children #{@elem.children.length}"
-        # log "viewbase.exposeTopChange numChildren #{@elem.children.length}"
-
+                
+                @emit 'lineExposedTop', 
+                    lineIndex: li
+                    lineDiv: div
+                
         y = 0
         for c in @elem.children
             c.style.transform = "translate(#{@size.offsetX}px,#{y}px)"
             y += @size.lineHeight
+            
+        @emit 'exposeTopChanged', e            
             
         @renderHighlights()
         @renderSelection()

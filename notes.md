@@ -2,16 +2,17 @@
 
 - numbers
     - vanish lines
-    - even darker
-    - fix right border color
-    - move number down (pad-top?)
     - handle font size change
     - highlight selected lines    
     
+- minimap 
+    - use scroll
+    - fix drag speed
+
 - scroll
     - fix font size change
     - fix line height on font change
-
+    
 - cursors
     - swap virutal if single cursor
     - remember last cursor

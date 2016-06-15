@@ -258,7 +258,7 @@ document.onkeydown = (event) ->
     
     return if not combo
     
-    return if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
+    if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
         return
     
     switch combo
@@ -269,5 +269,4 @@ document.onkeydown = (event) ->
         when 'command+='     then return changeFontSize +1
         when 'command+-'     then return changeFontSize -1
         when 'command+0'     then return resetFontSize()
-        
-        
+                

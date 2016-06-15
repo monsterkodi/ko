@@ -138,6 +138,7 @@ dissect = (ranges) ->
     d = d.filter (i) -> i.match?
     d = d.map (i) -> 
         i.stack = i.stack.sort((a,b)->a[0]-b[0]).map (j) -> j[1]
+        i.stack = _.flatten _.without i.stack, null
         i
 
 module.exports = 

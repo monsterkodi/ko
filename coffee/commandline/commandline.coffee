@@ -34,7 +34,7 @@ class Commandline extends ViewBase
         @loadCommands()
     
     setLines: (l) ->
-        log 'Commandline.setLines', l
+        # log 'Commandline.setLines', l
         @scroll.reset()
         super l
     

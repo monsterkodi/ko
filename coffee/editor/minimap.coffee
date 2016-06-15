@@ -108,7 +108,7 @@ class Minimap
                         for cls in last(r.stack).split '.'
                             c.addClass cls
                     else
-                        log 'warning! no last(r.stack)?.split?', li, r.stack
+                        log 'warning! minimap.lineForIndex no last(r.stack)?.split? line:', li, 'stack:', r.stack
                 else
                     log 'warning! no stack?', li, r
                     c.addClass 'text'

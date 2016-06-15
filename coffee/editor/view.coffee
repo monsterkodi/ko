@@ -71,7 +71,7 @@ class View extends ViewBase
             @renderCursors()
 
             if delta = @deltaToEnsureCursorsAreVisible()
-                log "view.changed cursor delta #{delta}"
+                # log "view.changed cursor delta #{delta}"
                 @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth 
 
     # 00000000  000  000      00000000
@@ -82,6 +82,8 @@ class View extends ViewBase
 
     setCurrentFile: (file) ->
         
+        @saveScrollCursorsAndSelections() if not file
+        
         @syntax.name = 'txt'
         if file?
             name = path.extname(file).substr(1)
@@ -89,7 +91,9 @@ class View extends ViewBase
                 @syntax.name = name
         log 'view.setCurrentFile', file, @syntax.name
         super file # -> setText -> setLines
-        
+
+        @restoreScrollCursorsAndSelections() if file
+                
     # 000      000  000   000  00000000   0000000
     # 000      000  0000  000  000       000     
     # 000      000  000 0 000  0000000   0000000 
@@ -187,6 +191,35 @@ class View extends ViewBase
         
         delta = (drag.delta.y / (@scroll.viewLines * @scroll.lineHeight)) * @lines.length * @size.lineHeight
         @scrollBy delta
+
+    #  0000000   0000000   000   000  00000000
+    # 000       000   000  000   000  000     
+    # 0000000   000000000   000 000   0000000 
+    #      000  000   000     000     000     
+    # 0000000   000   000      0      00000000
+        
+    saveScrollCursorsAndSelections: ->
+        @savedState = 
+            file:       @currentFile
+            cursors:    _.cloneDeep @cursors
+            selections: _.cloneDeep @selections
+            highlights: _.cloneDeep @highlights
+    
+    # 00000000   00000000   0000000  000000000   0000000   00000000   00000000
+    # 000   000  000       000          000     000   000  000   000  000     
+    # 0000000    0000000   0000000      000     000   000  0000000    0000000 
+    # 000   000  000            000     000     000   000  000   000  000     
+    # 000   000  00000000  0000000      000      0000000   000   000  00000000
+    
+    restoreScrollCursorsAndSelections: ->
+        if @savedState.file == @currentFile
+            @cursors    = @savedState.cursors
+            @selections = @savedState.selections
+            @highlights = @savedState.highlights
+            @savedState = null
+            @renderCursors()
+            @renderSelection()
+            @renderHighlights()
                         
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
