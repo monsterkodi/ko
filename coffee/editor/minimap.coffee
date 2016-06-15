@@ -55,7 +55,7 @@ class Minimap
         if scroll.numLines > scroll.viewHeight/2 
             top = Math.max 0, scroll.bot*2 - scroll.viewHeight
             if top != @top
-                @renderLines top
+                @render top
                 # log 'minimap.scroll.top', @top # check for overlaps?
         
         @s.attr
@@ -145,15 +145,15 @@ class Minimap
     # 000   000  000       000  0000  000   000  000       000   000
     # 000   000  00000000  000   000  0000000    00000000  000   000
     
-    renderLines: (@top=0) ->
+    render: (@top=0) ->
+        # profile 'minimap.render'
+        @clear()
         scroll = @editor.scroll
         return if scroll.viewHeight <= 0
-        # profile 'minimap.renderLines'
-        @clear()
+        return if scroll.numLines <= 0
         @bot = Math.min scroll.numLines, @top+scroll.viewHeight/2
         for li in [@top...@bot]           
-            @lines.push @lineForIndex li
-                            
+            @lines.push @lineForIndex li                            
         @scroll()
         # profile 'minimap.done'
     

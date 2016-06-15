@@ -218,14 +218,18 @@ class ViewBase extends Editor
         # @renderHighlights()
 
     renderCursors: ->
-        cs = @cursorsRelativeToLineIndexRange [@scroll.top, @scroll.bot]
+        log "viewbase.renderCursors", @scroll.exposeTop, @scroll.exposeBot
+        cs = @cursorsRelativeToLineIndexRange [@scroll.exposeTop, @scroll.exposeBot]
+        log "viewbase.renderCursors", cs
         vc = []
         for c in cs
             if c[0] > @lines[@scroll.top+c[1]].length
                 vc.push [@lines[@scroll.top+c[1]].length, c[1], 'virtual']
         cs = cs.concat vc
-        h = render.cursors cs, @size
-        $('.cursors', @view).innerHTML = h
+        # log "viewbase.renderCursors", cs 
+        html = render.cursors cs, @size
+        # log "viewbase.renderCursors", html 
+        $('.cursors', @view).innerHTML = html
         
     renderSelection: ->
         h = ""
@@ -341,6 +345,7 @@ class ViewBase extends Editor
         px = parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth))
         py = parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @scroll.top
         p = [px, Math.min(@lines.length-1, py)]
+        log "viewbase.posForEvent x:#{event.clientX} y:#{event.clientY} line:#{p[1]} col:#{p[0]}"
         p
 
     # 000      000  000   000  00000000   0000000

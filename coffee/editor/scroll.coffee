@@ -40,9 +40,9 @@ class scroll extends events
         @exposeTop  = 0
         @exposeBot  = -1
 
-        @fullLines  = Math.ceil(@viewHeight / @lineHeight)
-        @viewLines  = Math.ceil(@viewHeight / @lineHeight)
-        @scrollMax  = Math.max(0,@fullHeight - @viewHeight)
+        @fullLines  = Math.floor(@viewHeight / @lineHeight)  # num lines in view (excluding partials)
+        @viewLines  = Math.ceil(@viewHeight / @lineHeight)   # num lines in view (including partial)
+        @scrollMax  = Math.max(0,@fullHeight - @viewHeight)  # maximum scroll offset (pixels)
         
     # 0000000    000   000
     # 000   000   000 000 

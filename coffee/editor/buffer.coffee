@@ -35,6 +35,8 @@ class Buffer
         for c in @cursors
             if c[1] >= lineIndexRange[0] and c[1] <= lineIndexRange[1]
                 cs.push [c[0], c[1] - lineIndexRange[0]]
+            else
+                log "buffer.cursorsRelativeToLineIndexRange skip #{c}"
         cs
         
     cursorAtPos: (p) ->

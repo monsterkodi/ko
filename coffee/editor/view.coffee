@@ -61,12 +61,13 @@ class View extends ViewBase
             @updateTitlebar() # sets dirty flag
         
         delta = @deltaToEnsureCursorsAreVisible()
+        # log "view.changed cursor delta #{delta}"
 
-        if delta and changeInfo.cursor.length
-            @scrollBy delta * @size.lineHeight #todo: slow down when using mouse
-            @scrollCursor()
-            @minimap.changed changeInfo
-            return
+        # if delta and changeInfo.cursor.length
+        #     @scrollBy delta * @size.lineHeight #todo: slow down when using mouse
+        #     @scrollCursor()
+        #     @minimap.changed changeInfo
+        #     return
         
         super changeInfo
         
@@ -74,8 +75,10 @@ class View extends ViewBase
         
         if changeInfo.deleted.length or changeInfo.inserted.length
             @scroll.setNumLines @lines.length
+            
         if changeInfo.cursor.length
-            @scrollCursor()        
+            @renderCursors()
+            # @scrollCursor()        
 
     # 00000000  000  000      00000000
     # 000       000  000      000     
@@ -103,7 +106,7 @@ class View extends ViewBase
     
     setLines: (lines) ->
         super lines
-        @minimap.renderLines()
+        @minimap.render()
     
     # 0000000   0000000    0000000   00     00
     #    000   000   000  000   000  000   000
@@ -155,9 +158,9 @@ class View extends ViewBase
             @scrollhandleRight.style.width  = "0"
         else
             bh           = @lines.length * @size.lineHeight
-            vh           = Math.min @editorHeight, @viewHeight()
+            vh           = Math.min (@scroll.viewLines * @scroll.lineHeight), @viewHeight()
             scrollTop    = parseInt (@scroll.scroll / bh) * vh
-            scrollHeight = parseInt (@editorHeight / bh) * vh
+            scrollHeight = parseInt ((@scroll.viewLines * @scroll.lineHeight) / bh) * vh
             scrollHeight = Math.max scrollHeight, parseInt @size.lineHeight/4
             scrollTop    = Math.min scrollTop, @viewHeight()-scrollHeight
             scrollTop    = Math.max 0, scrollTop
@@ -180,13 +183,16 @@ class View extends ViewBase
         # log "view.scrollBy @scroll.offsetTop #{@scroll.offsetTop}"
         @view.scrollTop = @scroll.offsetTop
 
-    scrollCursor: -> $('.cursor', @view)?.scrollIntoViewIfNeeded()
+    scrollCursor: -> 
+        # log "view.scrollCursor todo"
+        # $('.cursor', @view)?.scrollIntoViewIfNeeded()
             
     onWheel: (event) => 
         @scrollBy event.deltaY * @scrollFactor event
         
     onScrollDrag: (drag) =>
-        delta = (drag.delta.y / @editorHeight) * @lines.length * @size.lineHeight
+        
+        delta = (drag.delta.y / (@scroll.viewLines * @scroll.lineHeight)) * @lines.length * @size.lineHeight
         @scrollBy delta
                         
     # 000   000  00000000  000   000

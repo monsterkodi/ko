@@ -220,11 +220,9 @@ $('.titlebar').ondblclick = (event) => ipc.send 'maximizeWindow', winID
 # 000   000  00000000  0000000   000  0000000  00000000
 
 window.onresize = =>
-    log 'resize', sw(), sh()
     if sh()
         ipc.send 'saveBounds', winID if winID?
         window.split?.resized()
-        # editor?.resized()
     
 window.onunload = =>
     editor.setCurrentFile null # to stop watcher (and reset scroll?)
