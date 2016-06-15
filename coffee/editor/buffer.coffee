@@ -13,8 +13,9 @@ last
 }      = require '../tools/tools'
 log    = require '../tools/log'
 assert = require 'assert'
+event  = require 'events'
 
-class Buffer
+class Buffer extends event
     
     constructor: () -> @setLines [""]
 
@@ -30,13 +31,13 @@ class Buffer
     # 000       000   000  000   000       000  000   000  000   000       000
     #  0000000   0000000   000   000  0000000    0000000   000   000  0000000 
     
-    cursorsRelativeToLineIndexRange: (lineIndexRange) ->
+    cursorsInLineIndexRangeRelativeToLineIndex: (lineIndexRange, relIndex) ->
         cs = []
         for c in @cursors
             if c[1] >= lineIndexRange[0] and c[1] <= lineIndexRange[1]
-                cs.push [c[0], c[1] - lineIndexRange[0]]
-            else
-                log "buffer.cursorsRelativeToLineIndexRange skip #{c}"
+                cs.push [c[0], c[1] - relIndex]
+            # else
+            #     log "buffer.cursorsInLineIndexRangeRelativeToLineIndex skip line #{c[1]} col #{c[0]}"
         cs
         
     cursorAtPos: (p) ->
@@ -120,10 +121,10 @@ class Buffer
     #      000  000       000      000       000          000     000  000   000  000  0000       000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000  0000000 
 
-    selectionsRelativeToLineIndexRange: (lineIndexRange) ->
+    selectionsInLineIndexRangeRelativeToLineIndex: (lineIndexRange, relIndex) ->
         sl = @selectionsInLineIndexRange lineIndexRange
         if sl
-            ([s[0]-lineIndexRange[0], [s[1][0], s[1][1]]] for s in sl)
+            ([s[0]-relIndex, [s[1][0], s[1][1]]] for s in sl)
     
     selectionsInLineIndexRange: (lineIndexRange) ->
         sl = []
@@ -186,10 +187,10 @@ class Buffer
     # 000   000  000  000   000  000   000  000      000  000   000  000   000     000          000
     # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     0000000 
 
-    highlightsRelativeToLineIndexRange: (lineIndexRange) ->
+    highlightsInLineIndexRangeRelativeToLineIndex: (lineIndexRange, relIndex) ->
         hl = @highlightsInLineIndexRange lineIndexRange
         if hl
-            ([s[0]-lineIndexRange[0], [s[1][0], s[1][1]]] for s in hl)
+            ([s[0]-relIndex, [s[1][0], s[1][1]]] for s in hl)
     
     highlightsInLineIndexRange: (lineIndexRange) ->
         hl = []
@@ -285,6 +286,8 @@ class Buffer
     
     rangesForCursors: (cs=@cursors) -> ([c[1], [c[0], c[0]]] for c in cs)
     
+    rangesForLineIndexInRanges: (li, ranges) -> (r for r in ranges when r[0]==li)
+    
     rangeAtPosInRanges: (pos, ranges) ->
         for ri in [ranges.length-1..0]
             r = ranges[ri]
@@ -313,7 +316,8 @@ class Buffer
         throw new Error() if i >= @lines.length
         [i, [0, @lines[i].length]] 
         
-    rangesForAllLines: -> @rangesForLinesFromTopToBot 0, @lines.length-1
+    rangesForAllLines: -> @rangesForLinesFromTopToBot 0, @lines.length
+    
     rangesForLinesFromTopToBot: (top,bot) -> 
         r = []
         ir = [top,bot]

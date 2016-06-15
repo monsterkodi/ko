@@ -7,25 +7,25 @@ html(lang="en")
     body
         #main
             .titlebar
-            .split-area
+            .area
                 .split
-                    .split-pane.split-top
-                        .split-rel
+                    .pane.top
+                        .rel
                             #scroll                             
-                    .split-handle.top
+                    .handle.top
                     .commandline
                         span.commandline-command
                         span.commandline-span
                             .commandline-editor(tabindex="1")
-                    .split-handle.bot
-                    .split-pane.split-bot
-                        .split-rel
+                    .handle.edit
+                    .pane.edit
+                        .rel
                             .editor(tabindex="0")
                             svg.minimap
                             .scrollbar.right
                                 .scrollhandle.right
-                    .split-handle.log
-                    .split-pane.split-log
+                    .handle.log
+                    .pane.log
                         .split-rel
                             .logview
                             .scrollbar.right

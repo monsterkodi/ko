@@ -45,7 +45,7 @@ class render
                 if d.stack?
                     clrzd = @colorize d.match, d.stack.reversed()
                 else
-                    log 'wtf?'
+                    log 'warning! render.line no stack?'
                     clrzd = encode d.match
                 line = line.slice(0, d.start) + clrzd + line.slice(d.start+d.match.length)
 

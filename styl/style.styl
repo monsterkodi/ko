@@ -13,7 +13,8 @@ selectionRadiusCursor = round(selectionRadius / 2)
 scrollFontSize        = 16px
 scrollbarWidth        = 120px // transparent scroll area
 scrollhandleWidth     = 6px
-editorPadding         = 8px 
+numbersWidth          = 50px
+editorPadding         = (8px + numbersWidth) 
 bottomCornerRadius    = 4px
 frameBorder           = 5px solid #222
 commandlineHeight     = 30px
@@ -200,7 +201,7 @@ body
         width           scrollbarWidth
 
 .scrollhandle
-    background          #333
+    background          #33f
     position            absolute
     width               scrollhandleWidth
     top                 0
@@ -227,7 +228,7 @@ body
 //      000  000        000      000     000   
 // 0000000   000        0000000  000     000   
     
-.split-area
+.area
     overflow            hidden
     position            absolute
     left                0
@@ -244,30 +245,30 @@ body
     width               100%
     height              100%
     
-.split-rel
+.rel
     fill-rel()
 
-.split-handle
-.split-pane
+.handle
+    background          #222
+    height              splithandleHeight
+
+.handle
+.pane
     overflow            hidden
     position            absolute
     left                0
     right               0
     
-.split-log
+.log
     bottom              0
-    
-.split-handle
-    background          #222
-    height              splithandleHeight
-                
+                    
 // 00000000  0000000    000  000000000   0000000   00000000 
 // 000       000   000  000     000     000   000  000   000
 // 0000000   000   000  000     000     000   000  0000000  
 // 000       000   000  000     000     000   000  000   000
 // 00000000  0000000    000     000      0000000   000   000
 
-.split-pane.split-bot 
+.pane.edit 
     background      #000
 
 .editor
@@ -348,6 +349,30 @@ body
     &.virtual
         background  #111 // not focus
 
+// 000   000  000   000  00     00  0000000    00000000  00000000    0000000
+// 0000  000  000   000  000   000  000   000  000       000   000  000     
+// 000 0 000  000   000  000000000  0000000    0000000   0000000    0000000 
+// 000  0000  000   000  000 0 000  000   000  000       000   000       000
+// 000   000   0000000   000   000  0000000    00000000  000   000  0000000 
+
+.numbers
+    position        absolute
+    left            0
+    top             0
+    bottom          0
+    width           numbersWidth
+    pointer-events  none
+    font-size       12px
+    
+.linenumber
+    color           #444
+    display         block
+    width           100%
+    background      rgba(0, 0, 0, 0.5)
+    border-right    1px solid rgba(100, 100, 100, 0.2)
+    &.selected
+        color       #f80
+    
 // 00     00  000  000   000  000  00     00   0000000   00000000 
 // 000   000  000  0000  000  000  000   000  000   000  000   000
 // 000000000  000  000 0 000  000  000000000  000000000  00000000 
@@ -362,7 +387,8 @@ body
     width           120px
     overflow        hidden
     pointer-events  none
-    background      #000
+    background      #080808
+    border-left     1px solid #222
     
 rect
     fill            #888
@@ -371,7 +397,7 @@ rect
     &.topBot
         fill        #222
     &.buffer
-        fill        #111
+        fill        #000
 
 /*
 *  000       0000000    0000000 

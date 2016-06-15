@@ -35,7 +35,7 @@ class ViewBase extends Editor
         @name = viewElem
         @name = @name.slice 1 if @name[0] == '.'
         @view = $(viewElem)
-        @initLayers ["selections", "highlights", "lines", "cursors"]
+        @initLayers ["selections", "highlights", "numbers", "lines", "cursors"]
         @elem = $('.lines', @view)
         @diss = []
         @size = {}
@@ -47,7 +47,7 @@ class ViewBase extends Editor
             lineHeight: @size.lineHeight
             viewHeight: @viewHeight()
             
-        @scroll.on 'top',        @topChange
+        @scroll.on 'exposeTop',  @exposeTopChange
         @scroll.on 'exposeLine', @exposeLineAtIndex     
         @scroll.on 'vanishLine', @vanishLineAtIndex     
 
@@ -118,9 +118,12 @@ class ViewBase extends Editor
     
     initLayers: (layerClasses) ->
         for cls in layerClasses
-            div = document.createElement 'div'
-            div.className = cls
-            @view.appendChild div
+            @addLayer cls
+        
+    addLayer: (cls) ->
+        div = document.createElement 'div'
+        div.className = cls
+        @view.appendChild div
 
     #  0000000  00000000  000000000  000000000  00000000  000   000  000000000
     # 000       000          000        000     000        000 000      000   
@@ -155,18 +158,19 @@ class ViewBase extends Editor
 
     setFontSize: (fontSize) ->
         setStyle '.'+@view.className, 'font-size', "#{fontSize}px"
-        @size.fontSize   = fontSize
-        @size.lineHeight = fontSize + Math.floor(fontSize/6)
-        @size.charWidth  = characterWidth @elem, 'line'
-        @size.offsetX    = Math.floor @size.charWidth/2
+        @size.numbersWidth = 50
+        @size.fontSize     = fontSize
+        @size.lineHeight   = fontSize + Math.floor(fontSize/6)
+        @size.charWidth    = characterWidth @elem, 'line'
+        @size.offsetX      = Math.floor @size.charWidth/2 + @size.numbersWidth
         
         @scroll?.setLineHeight @size.lineHeight
 
-    # 0000000    000   0000000  00000000   000       0000000   000   000
-    # 000   000  000  000       000   000  000      000   000   000 000 
-    # 000   000  000  0000000   00000000   000      000000000    00000  
-    # 000   000  000       000  000        000      000   000     000   
-    # 0000000    000  0000000   000        0000000  000   000     000   
+    # 00000000   00000000  000   000  0000000    00000000  00000000   000      000  000   000  00000000
+    # 000   000  000       0000  000  000   000  000       000   000  000      000  0000  000  000     
+    # 0000000    0000000   000 0 000  000   000  0000000   0000000    000      000  000 0 000  0000000 
+    # 000   000  000       000  0000  000   000  000       000   000  000      000  000  0000  000     
+    # 000   000  00000000  000   000  0000000    00000000  000   000  0000000  000  000   000  00000000
 
     renderLineAtIndex: (li) -> render.line @lines[li], @syntax.getDiss li
 
@@ -177,12 +181,29 @@ class ViewBase extends Editor
     # 00000000  000   000  000         0000000   0000000   00000000
 
     exposeLineAtIndex: (li) =>
-        # log "viewbase.exposeLineAtIndex #{li}"
+        log "viewbase.exposeLineAtIndex #{li}"
         # log "viewbase.exposeLineAtIndex children #{@elem.children.length}"
         html = @renderLineAtIndex li
         # log "viewbase.exposeLineAtIndex #{li} #{html}"
         # log "viewbase.exposeLineAtIndex #{@lines[li]} #{@lines.length}"
-        @addLine().innerHTML = html
+        lineDiv = @addLine()
+        lineDiv.innerHTML = html
+        @emit 'lineExposed', 
+            lineIndex: @elem.children.length # + @scroll.exposeTop 
+            lineDiv: lineDiv
+
+        @renderCursors() if @cursorsInLineAtIndex(li).length
+        @renderSelection() if @rangesForLineIndexInRanges(li, @selections).length
+        @renderHighlights() if @rangesForLineIndexInRanges(li, @highlights).length
+            
+            
+        lineDiv
+    
+    #  0000000   0000000    0000000    000      000  000   000  00000000
+    # 000   000  000   000  000   000  000      000  0000  000  000     
+    # 000000000  000   000  000   000  000      000  000 0 000  0000000 
+    # 000   000  000   000  000   000  000      000  000  0000  000     
+    # 000   000  0000000    0000000    0000000  000  000   000  00000000
     
     addLine: ->
         div = document.createElement 'div'
@@ -205,42 +226,70 @@ class ViewBase extends Editor
             # log "viewbase.vanishLineAtIndex remove line #{li} #{@elem.children.length}"
             @elem.children[@elem.children.length-1].remove()
 
-    # 000000000   0000000   00000000    0000000  000   000   0000000   000   000   0000000   00000000
-    #    000     000   000  000   000  000       000   000  000   000  0000  000  000        000     
-    #    000     000   000  00000000   000       000000000  000000000  000 0 000  000  0000  0000000 
-    #    000     000   000  000        000       000   000  000   000  000  0000  000   000  000     
-    #    000      0000000   000         0000000  000   000  000   000  000   000   0000000   00000000
-    
-    topChange: () =>
-                                        
-        # @renderCursors()
-        # @renderSelection()
-        # @renderHighlights()
+    exposeTopChange: (e) =>
+        log "viewbase.exposeTopChange #{e.old} -> #{e.new}"
+        log "viewbase.exposeTopChange num #{e.num}"
+        
+        for n in [0...e.num]
+            @elem.firstChild.remove()
 
+        y = 0
+        for c in @elem.children
+            c.style.transform = "translate(#{@size.offsetX}px,#{y}px)"
+            y += @size.lineHeight
+            
+        @renderHighlights()
+        @renderSelection()
+        @renderCursors()
+
+    # 00000000   00000000  000   000  0000000    00000000  00000000 
+    # 000   000  000       0000  000  000   000  000       000   000
+    # 0000000    0000000   000 0 000  000   000  0000000   0000000  
+    # 000   000  000       000  0000  000   000  000       000   000
+    # 000   000  00000000  000   000  0000000    00000000  000   000
+            
+    #             0000000  000   000  00000000    0000000   0000000   00000000    0000000
+    #            000       000   000  000   000  000       000   000  000   000  000     
+    #            000       000   000  0000000    0000000   000   000  0000000    0000000 
+    #            000       000   000  000   000       000  000   000  000   000       000
+    #             0000000   0000000   000   000  0000000    0000000   000   000  0000000 
+                                        
     renderCursors: ->
-        log "viewbase.renderCursors", @scroll.exposeTop, @scroll.exposeBot
-        cs = @cursorsRelativeToLineIndexRange [@scroll.exposeTop, @scroll.exposeBot]
-        log "viewbase.renderCursors", cs
+        # log "viewbase.renderCursors top #{@scroll.top} bot #{@scroll.bot}"
+        cs = @cursorsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
+        # log "viewbase.renderCursors", cs
         vc = []
         for c in cs
-            if c[0] > @lines[@scroll.top+c[1]].length
-                vc.push [@lines[@scroll.top+c[1]].length, c[1], 'virtual']
+            if c[0] > @lines[@scroll.exposeTop+c[1]].length
+                vc.push [@lines[@scroll.exposeTop+c[1]].length, c[1], 'virtual']
         cs = cs.concat vc
-        # log "viewbase.renderCursors", cs 
+        # log "viewbase.renderCursors", cs
         html = render.cursors cs, @size
         # log "viewbase.renderCursors", html 
         $('.cursors', @view).innerHTML = html
         
+    #              0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
+    #             000       000       000      000       000          000     000  000   000  0000  000
+    #             0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
+    #                  000  000       000      000       000          000     000  000   000  000  0000
+    #             0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
+    
     renderSelection: ->
         h = ""
-        s = @selectionsRelativeToLineIndexRange [@scroll.top, @scroll.bot]
+        s = @selectionsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
         if s
             h += render.selection s, @size
         $('.selections', @view).innerHTML = h
 
+    #             000   000  000   0000000   000   000  000      000   0000000   000   000  000000000
+    #             000   000  000  000        000   000  000      000  000        000   000     000   
+    #             000000000  000  000  0000  000000000  000      000  000  0000  000000000     000   
+    #             000   000  000  000   000  000   000  000      000  000   000  000   000     000   
+    #             000   000  000   0000000   000   000  0000000  000   0000000   000   000     000   
+
     renderHighlights: ->
         h = ""
-        s = @highlightsRelativeToLineIndexRange [@scroll.top, @scroll.bot]
+        s = @highlightsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
         if s
             h += render.selection s, @size, "highlight"
         $('.highlights', @view).innerHTML = h
@@ -342,10 +391,11 @@ class ViewBase extends Editor
         br = @view.getBoundingClientRect()
         lx = clamp 0, @view.offsetWidth,  event.clientX - br.left - @size.offsetX
         ly = clamp 0, @view.offsetHeight, event.clientY - br.top
+        log "viewbase.posForEvent ly:#{ly} clientY:#{event.clientY} br.top: #{br.top} st: #{st}"
         px = parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth))
-        py = parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @scroll.top
+        py = parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @scroll.exposeTop
         p = [px, Math.min(@lines.length-1, py)]
-        log "viewbase.posForEvent x:#{event.clientX} y:#{event.clientY} line:#{p[1]} col:#{p[0]}"
+        log "viewbase.posForEvent clientY:#{event.clientY} -> line:#{p[1]} col:#{p[0]}"
         p
 
     # 000      000  000   000  00000000   0000000
@@ -424,4 +474,4 @@ class ViewBase extends Editor
         if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
             @insertUserCharacter ansiKeycode event
 
-module.exports = ViewBase            
+module.exports = ViewBase

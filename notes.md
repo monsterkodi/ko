@@ -1,11 +1,11 @@
 # todo/ideas
 
+- mark selected lines in numbers
 - shift move cursor down
     - extend selection to end of line if previous line is fully selected
 - insert newline if pasting fully selected lines
 - highlight cursor line(s?)
 - highlight last cursor
-- line numbers
 - open in new window command-shift-p
 - insert spaces when inserting at virtual cursors
 

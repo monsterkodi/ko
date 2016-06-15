@@ -29,23 +29,23 @@ class Split extends event
         
         @winID       = wid
         @elem        = $('.split')
-        @topHandle   = $('.split-handle.top')
-        @botHandle   = $('.split-handle.bot')
-        @logHandle   = $('.split-handle.log')
-        @topView     = $('.split-top')
-        @botView     = $('.split-bot')
-        @logView     = $('.split-log')
+        @topPane     = $('.pane.top')
+        @topHandle   = $('.handle.top')
         @commandLine = $('.commandline')
+        @editHandle  = $('.handle.edit')
+        @editPane    = $('.pane.edit')
+        @logHandle   = $('.handle.log')
+        @logPane     = $('.pane.log')
         @editor      = $('.editor')
 
-        @handles     = [@topHandle, @botHandle, @logHandle]
-        @panes       = [@topView, @commandLine, @botView, @logView]
+        @handles     = [@topHandle, @editHandle, @logHandle]
+        @panes       = [@topPane, @commandLine, @editPane, @logPane]
                 
         @logVisible = @getState 'logVisible', false
         if @logVisible
-            @logView.style.display = 'initial'
+            @logPane.style.display = 'initial'
         else
-            @logView.style.display = 'none'
+            @logPane.style.display = 'none'
 
         @dragTop = new drag
             target: @topHandle
@@ -54,7 +54,7 @@ class Split extends event
             onStop: (drag) => @snap()
         
         @dragBot = new drag
-            target: @botHandle
+            target: @editHandle
             cursor: 'ns-resize'
             onMove: (drag) => @splitAt 1, drag.cpos.y - @elemTop()
             onStop: (drag) => @snap()
@@ -164,7 +164,7 @@ class Split extends event
                     newHeight: newHeight
         
         if @logVisible
-            @logView.style.top = "#{last(s)+@handleHeight}px"
+            @logPane.style.top = "#{last(s)+@handleHeight}px"
             
         @setState 'split', s
         
@@ -189,7 +189,7 @@ class Split extends event
     setLogVisible: (v) ->
         @logVisible = v
         @setState 'logVisible', v
-        @logView.style.display = v and 'initial' or 'none'
+        @logPane.style.display = v and 'initial' or 'none'
         @splitAt 2, @elemHeight() - (v and Math.max(100, @getState('logHeight', 200)) or 0)
         
     clearLog: -> $('.logview').innerHTML = ""

@@ -14,6 +14,7 @@ drag      = require '../tools/drag'
 keyinfo   = require '../tools/keyinfo'
 ViewBase  = require './viewbase'
 Minimap   = require './minimap'
+Numbers   = require './numbers'
 syntax    = require './syntax'
 watcher   = require './watcher'
 path      = require 'path'
@@ -30,6 +31,8 @@ class View extends ViewBase
         @minimap = new Minimap @
         
         super viewElem
+
+        @numbers = new Numbers @
             
         @scroll.on 'scroll', @updateScrollbar    
         
@@ -37,18 +40,15 @@ class View extends ViewBase
                 
         @smoothScrolling   = true
         @scrollhandleRight = $('.scrollhandle.right', @view.parentElement)
-        
+        @scrollbarRight = $('.scrollbar.right', @view.parentElement)
         @scrollbarDrag = new drag 
-            target: $('.scrollbar.right', @view.parentElement)
+            target: @scrollbarRight
             onMove: @onScrollDrag 
             cursor: 'ns-resize'
-
+            
+        @scrollbarRight.addEventListener 'wheel', @onWheel
         @view.addEventListener 'wheel', @onWheel
         
-    done: =>
-        # @updateTitlebar()
-        super # @changed @do.changeInfo
-
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000
     # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
@@ -59,16 +59,7 @@ class View extends ViewBase
         
         if changeInfo.changed.length or changeInfo.deleted.length or changeInfo.inserted.length
             @updateTitlebar() # sets dirty flag
-        
-        delta = @deltaToEnsureCursorsAreVisible()
-        # log "view.changed cursor delta #{delta}"
-
-        # if delta and changeInfo.cursor.length
-        #     @scrollBy delta * @size.lineHeight #todo: slow down when using mouse
-        #     @scrollCursor()
-        #     @minimap.changed changeInfo
-        #     return
-        
+                
         super changeInfo
         
         @minimap.changed changeInfo
@@ -78,7 +69,10 @@ class View extends ViewBase
             
         if changeInfo.cursor.length
             @renderCursors()
-            # @scrollCursor()        
+
+            if delta = @deltaToEnsureCursorsAreVisible()
+                log "view.changed cursor delta #{delta}"
+                @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth 
 
     # 00000000  000  000      00000000
     # 000       000  000      000     
@@ -96,8 +90,6 @@ class View extends ViewBase
         log 'view.setCurrentFile', file, @syntax.name
         super file # -> setText -> setLines
         
-        # @scrollBy 0
-
     # 000      000  000   000  00000000   0000000
     # 000      000  0000  000  000       000     
     # 000      000  000 0 000  0000000   0000000 
@@ -148,10 +140,11 @@ class View extends ViewBase
     # 0000000    0000000  000   000   0000000   0000000  0000000
         
     updateScrollbar: =>
-        # log "view.updateScrollbar #{@minimap?}"
+
         @minimap?.scroll()
+        
         return if not @scrollhandleRight?
-        sbw = parseInt getStyle '.scrollhandle', 'width'
+        
         if @lines.length * @size.lineHeight < @viewHeight()
             @scrollhandleRight.style.top    = "0"
             @scrollhandleRight.style.height = "0"
@@ -167,7 +160,7 @@ class View extends ViewBase
                     
             @scrollhandleRight.style.top    = "#{scrollTop}px"
             @scrollhandleRight.style.height = "#{scrollHeight}px"
-            # @scrollhandleRight.style.width  = "#{sbw}px"
+            @scrollhandleRight.style.width  = "2px"
                 
     scrollLines: (delta) -> @scrollBy delta * @size.lineHeight
 

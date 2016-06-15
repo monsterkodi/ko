@@ -82,7 +82,7 @@ class Open extends Command
         @list?.remove()
         @list = document.createElement 'div'
         @list.className = 'list'
-        @list.style.top = window.split.botHandle.style.top
+        @list.style.top = window.split.editHandle.style.top
         window.split.elem.appendChild @list 
         @listFiles @files
         
