@@ -1,4 +1,3 @@
-
 # 000   000  000  00000000  000   000  0000000     0000000    0000000  00000000
 # 000   000  000  000       000 0 000  000   000  000   000  000       000     
 #  000 000   000  0000000   000000000  0000000    000000000  0000000   0000000 
@@ -125,7 +124,12 @@ class ViewBase extends Editor
         div = document.createElement 'div'
         div.className = cls
         @view.appendChild div
-
+        
+    updateLayers: () ->
+        @renderHighlights()
+        @renderSelection()
+        @renderCursors()
+        
     #  0000000  00000000  000000000  000000000  00000000  000   000  000000000
     # 000       000          000        000     000        000 000      000   
     # 0000000   0000000      000        000     0000000     00000       000   
@@ -157,15 +161,18 @@ class ViewBase extends Editor
     # 000       000   000  000  0000     000          000  000   000     000     
     # 000        0000000   000   000     000     0000000   000  0000000  00000000
 
-    setFontSize: (fontSize) ->
+    setFontSize: (fontSize) =>
         setStyle '.'+@view.className, 'font-size', "#{fontSize}px"
         @size.numbersWidth = 50
         @size.fontSize     = fontSize
         @size.lineHeight   = fontSize + Math.floor(fontSize/6)
         @size.charWidth    = characterWidth @elem, 'line'
         @size.offsetX      = Math.floor @size.charWidth/2 + @size.numbersWidth
-        # log "viewbase.setFontSize", @size
+        # log "viewbase.setFontSize #{@size.fontSize} #{@size.lineHeight}"
+        
         @scroll?.setLineHeight @size.lineHeight
+            
+        @emit 'fontSizeChanged'
 
     # 000   000  000   000  00     00  0000000    00000000  00000000    0000000
     # 0000  000  000   000  000   000  000   000  000       000   000  000     
@@ -265,19 +272,11 @@ class ViewBase extends Editor
                 @emit 'lineExposedTop', 
                     lineIndex: li
                     lineDiv: div
-                
-        y = 0
-        for c in @elem.children
-            c.style.transform = "translate(#{@size.offsetX}px,#{y}px)"
-            y += @size.lineHeight
-            
+             
+        @updateLinePositions()
+        @updateLayers()            
         @emit 'exposeTopChanged', e            
-            
-        @renderHighlights()
-        @renderSelection()
-        @renderCursors()
-        
-
+           
     # 00000000   00000000  000   000  0000000    00000000  00000000 
     # 000   000  000       0000  000  000   000  000       000   000
     # 0000000    0000000   000 0 000  000   000  0000000   0000000  
@@ -337,7 +336,13 @@ class ViewBase extends Editor
     #  0000000   000        0000000    000   000     000     00000000
 
     done: => @changed @do.changeInfo
-        
+
+    updateLinePositions: () ->
+        y = 0
+        for c in @elem.children
+            c.style.transform = "translate(#{@size.offsetX}px,#{y}px)"
+            y += @size.lineHeight
+
     # 00000000   00000000   0000000  000  0000000  00000000  0000000  
     # 000   000  000       000       000     000   000       000   000
     # 0000000    0000000   0000000   000    000    0000000   000   000
@@ -396,7 +401,7 @@ class ViewBase extends Editor
                                                                                 
         indices.sort (a,b) -> a - b
         indices = _.sortedUniq indices
-                
+        # log "viewbase.changed indices", indices        
         for i in indices
             @updateLine i
         if changeInfo.cursor.length
@@ -406,13 +411,14 @@ class ViewBase extends Editor
                      
         @renderHighlights()
     
-    updateLine: (lineIndex) ->
-        if @scroll.top <= lineIndex < @lines.length
-            relIndex = lineIndex - @scroll.top
-            span = @renderLineAtIndex lineIndex
+    updateLine: (li) ->
+        if @scroll.exposeTop <= li < @lines.length
+            relIndex = li - @scroll.exposeTop
+            span = @renderLineAtIndex li
+            # log "viewbase.updateLine li #{li} relIndex #{relIndex}"
             @elem.children[relIndex]?.innerHTML = span
-        else if lineIndex >= @lines.length and lineIndex < @scroll.bot
-            @elem.children[lineIndex-@scroll.top].innerHTML = ""
+        else if li >= @lines.length and li < @scroll.bot
+            @elem.children[li-@scroll.top].innerHTML = ""
 
     # 00000000    0000000    0000000
     # 000   000  000   000  000     

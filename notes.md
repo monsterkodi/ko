@@ -1,9 +1,8 @@
 # todo/ideas
 
 - numbers
-    - vanish lines
     - handle font size change
-    - highlight selected lines    
+    - highlight selected lines
     
 - minimap 
     - use scroll

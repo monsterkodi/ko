@@ -21,7 +21,14 @@ class Numbers
         @editor.on 'lineExposedTop',   @onLineExposedTop
         @editor.on 'lineVanishedTop',  @onLineVanishedTop
         @editor.on 'exposeTopChanged', @renumber
-        @elem.style.lineHeight = "#{@editor.size.lineHeight}px"
+        @editor.on 'fontSizeChanged',  @onFontSizeChange
+        @onFontSizeChange()
+        
+    onFontSizeChange: => 
+        @elem.style.lineHeight = "#{@editor.size.lineHeight}px"        
+        if @editor.size.fontSize < 13
+            log "@editor.size.fontSize", @editor.size.fontSize
+            setStyle '.numbers', 'font-size', "#{@editor.size.fontSize}px"
     
     # 000      000  000   000  00000000  00000000  000   000  00000000    0000000    0000000  00000000  0000000  
     # 000      000  0000  000  000       000        000 000   000   000  000   000  000       000       000   000

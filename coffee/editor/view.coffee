@@ -175,9 +175,11 @@ class View extends ViewBase
         f *= 1 + 7 * event.altKey
 
     scrollBy: (delta) -> 
-            
         @scroll.by delta
-        # log "view.scrollBy @scroll.offsetTop #{@scroll.offsetTop}"
+        @view.scrollTop = @scroll.offsetTop
+
+    scrollTo: (p) -> 
+        @scroll.to p
         @view.scrollTop = @scroll.offsetTop
 
     scrollCursor: -> 
@@ -223,9 +225,7 @@ class View extends ViewBase
             if delta
                 @scrollBy delta
             else
-                @renderCursors()
-                @renderSelection()
-                @renderHighlights()
+                @updateLayers()
             @savedState = null
                         
     # 000   000  00000000  000   000

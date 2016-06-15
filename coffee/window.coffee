@@ -151,7 +151,7 @@ openFiles = (ofiles, options) =>
             return []
         setState 'openFilePath', path.dirname files[0]                    
         if not options?.newWindow
-            log "window.openFiles not new window"
+            # log "window.openFiles not new window
             loadFile resolve files.shift()
         for file in files
             ipc.send 'newWindowWithFile', file
@@ -238,6 +238,7 @@ setFontSize = (s) =>
     s = clamp 2, 100, s
     setState "fontSize", s
     editor.setFontSize s
+    loadFile editor.currentFile
     
 changeFontSize = (d) => 
     setFontSize clamp 2, 100, editor.size.fontSize + d
