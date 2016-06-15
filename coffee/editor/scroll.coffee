@@ -98,11 +98,13 @@ class scroll extends events
             @emit 'top', @top
             
         newBot = Math.min @top+@viewLines, @numLines-1
+        log "scroll.setTop @top #{@top} @bot #{@bot} newBot #{newBot} viewLines #{@viewLines} numLines #{@numLines}"
         if @bot != newBot
-            # log "scroll.setTop @top #{@top} @bot #{@bot} newBot #{newBot} viewLines #{@viewLines} numLines #{@numLines}"
             @bot = newBot
-            @expose()
             @emit 'bot', @bot
+            @expose()
+        if @exposeBot < 0
+            @expose()
 
     # 00000000  000   000  00000000    0000000    0000000  00000000
     # 000        000 000   000   000  000   000  000       000     
@@ -165,7 +167,7 @@ class scroll extends events
     setViewHeight: (h) ->
                     
         if @viewHeight != h
-            # log "scroll.setViewHeight #{@viewHeight} -> #{h}"
+            log "scroll.setViewHeight #{@viewHeight} -> #{h}"
             @viewHeight = h        
             @calc()
             @by 0     
@@ -179,7 +181,7 @@ class scroll extends events
     setNumLines: (n) ->
         
         if @numLines != n
-            # log "scroll.setNumLines #{@numLines} -> #{n}"
+            log "scroll.setNumLines #{@numLines} -> #{n}"
             @numLines = n
             @fullHeight = @numLines * @lineHeight
             @calc()

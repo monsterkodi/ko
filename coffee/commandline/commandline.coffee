@@ -18,8 +18,11 @@ class Commandline extends ViewBase
             
         @fontSizeDefault = 24
         @fontSizeKey     = 'commandlineFontSize'
-        
+
         super viewElem
+        
+        @hideNumbers()
+        @setText ""
         
         # @view.onblur =  => @command?.cancel()
         
@@ -27,11 +30,21 @@ class Commandline extends ViewBase
         
         @commands = {}
         @command = null
-        
+
         @loadCommands()
+    
+    setLines: (l) ->
+        log 'Commandline.setLines', l
+        @scroll.reset()
+        super l
+    
+    setAndSelectText: (t) ->
+        @setLines [t]
+        @selectAll()
         
     changed: (changeInfo) ->
         super changeInfo
+        log 'Commandline changed', changeInfo, @lines
         if changeInfo.changed.length
             @command?.changed @lines[0]
         
@@ -50,8 +63,7 @@ class Commandline extends ViewBase
         @setName name
 
         @command = @commands[name]
-        @setText @command.start combo # <-- command start
-        @selectAll()
+        @setAndSelectText @command.start combo # <-- command start
         
     setName: (name) -> 
         log "commandline.setName", name, @cmmd?
@@ -60,6 +72,7 @@ class Commandline extends ViewBase
     execute: ->
         r = @command?.execute @lines[0]
         @setText r.text if r?.text?
+        @selectNone()
         window.split.focusEditor() if r?.focus == 'editor'
         
     cancel: ->
@@ -81,10 +94,11 @@ class Commandline extends ViewBase
     handleModKeyComboEvent: (mod, key, combo, event) ->
 
         switch combo
-            when 'enter' then return @execute()
-            when 'up'    then return @setText @command?.prev()
-            when 'down'  then return @setText @command?.next()
-            when 'esc'   then return @cancel()
+            when 'enter'            then return @execute()
+            when 'up'               then return @setAndSelectText @command?.prev()
+            when 'down'             then return @setAndSelectText @command?.next()
+            when 'esc'              then return @cancel()
+            when 'command+k'        then return @selectAll() + @deleteSelection()
             when 'tab', 'shift+tab' then return
         
         return 'unhandled'

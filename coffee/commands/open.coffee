@@ -228,7 +228,7 @@ class Open extends Command
         @showList()
         @select @lastFileIndex
         if @lastFileIndex >= 0   
-            @setText @list?.children[@selected]?.value 
+            @commandline.setAndSelectText @list?.children[@selected]?.value 
                     
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     

@@ -48,7 +48,7 @@ class ViewBase extends Editor
             viewHeight: @viewHeight()
             
         @scroll.on 'exposeTop',  @exposeTopChange
-        @scroll.on 'exposeLine', @exposeLineAtIndex     
+        @scroll.on 'exposeLine', @exposeLineAtIndex
         @scroll.on 'vanishLine', @vanishLineAtIndex     
 
         @view.onkeydown = @onKeyDown
@@ -165,6 +165,17 @@ class ViewBase extends Editor
         @size.offsetX      = Math.floor @size.charWidth/2 + @size.numbersWidth
         
         @scroll?.setLineHeight @size.lineHeight
+
+    # 000   000  000   000  00     00  0000000    00000000  00000000    0000000
+    # 0000  000  000   000  000   000  000   000  000       000   000  000     
+    # 000 0 000  000   000  000000000  0000000    0000000   0000000    0000000 
+    # 000  0000  000   000  000 0 000  000   000  000       000   000       000
+    # 000   000   0000000   000   000  0000000    00000000  000   000  0000000 
+    
+    hideNumbers: ->
+        @size.numbersWidth = 0
+        @size.offsetX      = Math.floor @size.charWidth/2
+        @scroll?.reset()
 
     # 00000000   00000000  000   000  0000000    00000000  00000000   000      000  000   000  00000000
     # 000   000  000       0000  000  000   000  000       000   000  000      000  0000  000  000     
@@ -407,7 +418,7 @@ class ViewBase extends Editor
     viewHeight:      -> @view.getBoundingClientRect().height 
     numViewLines:    -> Math.ceil(@viewHeight() / @size.lineHeight)
     numFullLines:    -> Math.floor(@viewHeight() / @size.lineHeight)
-    
+        
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
     # 0000000    0000000     00000  
@@ -426,7 +437,6 @@ class ViewBase extends Editor
             return
 
         switch combo
-            when 'command+k'                then return @selectAll() + @deleteSelection()
             when 'command+a'                then return @selectAll()
             when 'command+shift+a'          then return @selectNone()
             when 'command+e'                then return @highlightTextOfSelectionOrWordAtCursor()
@@ -467,8 +477,8 @@ class ViewBase extends Editor
                 event.preventDefault() # prevent view from scrolling
             else
                 switch combo
-                    when 'ctrl+a', 'ctrl+shift+a'    then @moveCursorsToStartOfLine event.shiftKey
-                    when 'ctrl+e', 'ctrl+shift+e'    then @moveCursorsToEndOfLine   event.shiftKey
+                    when 'ctrl+a', 'ctrl+shift+a' then @moveCursorsToStartOfLine event.shiftKey
+                    when 'ctrl+e', 'ctrl+shift+e' then @moveCursorsToEndOfLine   event.shiftKey
                                                                                     
         ansiKeycode = require 'ansi-keycode'
         if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
