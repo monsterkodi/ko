@@ -264,7 +264,7 @@ document.onkeydown = (event) ->
         when 'command+enter' then return ipc.send 'execute', editor.text()
         when 'command+alt+i' then return ipc.send 'toggleDevTools', winID
         when 'command+alt+k' then return window.split.toggleLog()
-        when 'command+k'     then return window.split.clearLog()
+        when 'command+k'     then return window.split.showOrClearLog()
         when 'command+='     then return changeFontSize +1
         when 'command+-'     then return changeFontSize -1
         when 'command+0'     then return resetFontSize()

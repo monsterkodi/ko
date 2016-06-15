@@ -15,6 +15,7 @@ prefs     = require '../tools/prefs'
 drag      = require '../tools/drag'
 keyinfo   = require '../tools/keyinfo'
 log       = require '../tools/log'
+str       = require '../tools/str'
 render    = require './render'
 syntax    = require './syntax'
 scroll    = require './scroll'
@@ -163,7 +164,7 @@ class ViewBase extends Editor
         @size.lineHeight   = fontSize + Math.floor(fontSize/6)
         @size.charWidth    = characterWidth @elem, 'line'
         @size.offsetX      = Math.floor @size.charWidth/2 + @size.numbersWidth
-        
+        # log "viewbase.setFontSize", @size
         @scroll?.setLineHeight @size.lineHeight
 
     # 000   000  000   000  00     00  0000000    00000000  00000000    0000000
@@ -192,13 +193,14 @@ class ViewBase extends Editor
     # 00000000  000   000  000         0000000   0000000   00000000
 
     exposeLineAtIndex: (li) =>
-        log "viewbase.exposeLineAtIndex #{li}"
         # log "viewbase.exposeLineAtIndex children #{@elem.children.length}"
         html = @renderLineAtIndex li
         # log "viewbase.exposeLineAtIndex #{li} #{html}"
         # log "viewbase.exposeLineAtIndex #{@lines[li]} #{@lines.length}"
         lineDiv = @addLine()
         lineDiv.innerHTML = html
+        @elem.appendChild lineDiv
+        # log "viewbase.exposeLineAtIndex #{li} children #{@elem.children.length}"
         @emit 'lineExposed', 
             lineIndex: @elem.children.length # + @scroll.exposeTop 
             lineDiv: lineDiv
@@ -206,8 +208,6 @@ class ViewBase extends Editor
         @renderCursors() if @cursorsInLineAtIndex(li).length
         @renderSelection() if @rangesForLineIndexInRanges(li, @selections).length
         @renderHighlights() if @rangesForLineIndexInRanges(li, @highlights).length
-            
-            
         lineDiv
     
     #  0000000   0000000    0000000    000      000  000   000  00000000
@@ -222,7 +222,6 @@ class ViewBase extends Editor
         div.style.height = "#{@size.lineHeight}px"
         y = @elem.children.length * @size.lineHeight
         div.style.transform = "translate(#{@size.offsetX}px,#{y}px)"
-        @elem.appendChild div
         div    
     
     # 000   000   0000000   000   000  000   0000000  000   000
@@ -232,17 +231,33 @@ class ViewBase extends Editor
     #     0      000   000  000   000  000  0000000   000   000
     
     vanishLineAtIndex: (li) =>
-        # log "viewbase.exposeLineAtIndex #{li}"
-        while @elem.children.length > li
-            # log "viewbase.vanishLineAtIndex remove line #{li} #{@elem.children.length}"
-            @elem.children[@elem.children.length-1].remove()
+        # log "viewbase.vanishLineAtIndex #{li}"
+        @elem.lastChild.remove()
+        # log "viewbase.vanishLineAtIndex #{li} children #{@elem.children.length}"
+
+    # 000000000   0000000   00000000    0000000  000   000   0000000   000   000   0000000   00000000
+    #    000     000   000  000   000  000       000   000  000   000  0000  000  000        000     
+    #    000     000   000  00000000   000       000000000  000000000  000 0 000  000  0000  0000000 
+    #    000     000   000  000        000       000   000  000   000  000  0000  000   000  000     
+    #    000      0000000   000         0000000  000   000  000   000  000   000   0000000   00000000
 
     exposeTopChange: (e) =>
-        log "viewbase.exposeTopChange #{e.old} -> #{e.new}"
-        log "viewbase.exposeTopChange num #{e.num}"
+        # log "viewbase.exposeTopChange #{e.old} -> #{e.new}"
         
-        for n in [0...e.num]
-            @elem.firstChild.remove()
+        num = Math.abs e.num
+        # log "viewbase.exposeTopChange", e
+        # log "viewbase.exposeTopChange children #{@elem.children.length} scroll", @scroll.info()
+        for n in [0...num]
+            if e.num < 0
+                @elem.firstChild.remove()
+                # log "viewbase.exposeTopChange top-- children #{@elem.children.length}"
+            else 
+                div = @addLine()
+                li = e.new + num - n - 1
+                div.innerHTML = @renderLineAtIndex li
+                @elem.insertBefore div, @elem.firstChild
+                # log "viewbase.exposeTopChange top++ children #{@elem.children.length}"
+        # log "viewbase.exposeTopChange numChildren #{@elem.children.length}"
 
         y = 0
         for c in @elem.children
@@ -252,6 +267,7 @@ class ViewBase extends Editor
         @renderHighlights()
         @renderSelection()
         @renderCursors()
+        
 
     # 00000000   00000000  000   000  0000000    00000000  00000000 
     # 000   000  000       0000  000  000   000  000       000   000

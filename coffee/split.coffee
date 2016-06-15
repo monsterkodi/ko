@@ -193,6 +193,11 @@ class Split extends event
         @splitAt 2, @elemHeight() - (v and Math.max(100, @getState('logHeight', 200)) or 0)
         
     clearLog: -> $('.logview').innerHTML = ""
+    showOrClearLog: -> 
+        if @logVisible
+            @clearLog()
+        else
+            @showLog()
      
     #  0000000  000   000   0000000   00000000 
     # 000       0000  000  000   000  000   000

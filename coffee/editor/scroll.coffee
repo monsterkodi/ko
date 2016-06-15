@@ -45,6 +45,17 @@ class scroll extends events
         @fullLines  = Math.floor(@viewHeight / @lineHeight)  # number of lines in view (excluding partials)
         @viewLines  = Math.ceil(@viewHeight / @lineHeight)   # number of lines in view (including partials)
 
+    # 000  000   000  00000000   0000000 
+    # 000  0000  000  000       000   000
+    # 000  000 0 000  000000    000   000
+    # 000  000  0000  000       000   000
+    # 000  000   000  000        0000000 
+    
+    info: ->
+        topbot: "#{@top} - #{@bot}"
+        expose: "#{@exposeTop} - #{@exposeBot}"
+        scroll: "#{@scroll} offsetTop #{@offsetTop}"
+
     # 00000000   00000000   0000000  00000000  000000000
     # 000   000  000       000       000          000   
     # 0000000    0000000   0000000   0000000      000   
@@ -98,7 +109,7 @@ class scroll extends events
             @emit 'top', @top
             
         newBot = Math.min @top+@viewLines, @numLines-1
-        log "scroll.setTop @top #{@top} @bot #{@bot} newBot #{newBot} viewLines #{@viewLines} numLines #{@numLines}"
+        # log "scroll.setTop @top #{@top} @bot #{@bot} newBot #{newBot} viewLines #{@viewLines} numLines #{@numLines}"
         if @bot != newBot
             @bot = newBot
             @emit 'bot', @bot
@@ -136,14 +147,23 @@ class scroll extends events
         exposed = @exposeBot - @exposeTop
         # log "scroll.checkExpose exposeTop #{@exposeTop} exposeBot #{@exposeBot}?"
         # log "scroll.checkExpose exposed #{exposed} > expMax #{expMax}?"
-        if exposed > expMax
+        
+        emitNewExposeTop = (newExposeTop) =>
             old = @exposeTop
-            @exposeTop = @exposeBot - expMax
-            log "scroll.checkExpose emit exposeTop #{old} -> #{@exposeTop}"
+            @exposeTop = newExposeTop
+            # log "scroll.checkExpose emit exposeTop #{old} -> #{newExposeTop} (num #{-(newExposeTop-old)})"
             @emit 'exposeTop',
                 old: old
                 new: @exposeTop
-                num: old-@exposeTop
+                num: -(newExposeTop-old)
+        
+        if exposed > expMax
+            emitNewExposeTop @exposeBot - expMax
+        else if @top < @exposeTop 
+            emitNewExposeTop @top
+            @vanish()
+            # log "scroll.checkExpose vanished", @info()
+        
     
     # 000   000   0000000   000   000  000   0000000  000   000
     # 000   000  000   000  0000  000  000  000       000   000
@@ -154,9 +174,9 @@ class scroll extends events
     vanish: ->
         while @bot < @exposeBot    
             # log "scroll.vanish bot #{@bot} < #{@exposeBot}"
+            # log "scroll.vanish", @info()
             @emit 'vanishLine', @exposeBot
             @exposeBot -= 1
-                    
 
     # 000   000  000  00000000  000   000  000   000  00000000  000   0000000   000   000  000000000
     # 000   000  000  000       000 0 000  000   000  000       000  000        000   000     000   
@@ -167,7 +187,7 @@ class scroll extends events
     setViewHeight: (h) ->
                     
         if @viewHeight != h
-            log "scroll.setViewHeight #{@viewHeight} -> #{h}"
+            # log "scroll.setViewHeight #{@viewHeight} -> #{h}"
             @viewHeight = h        
             @calc()
             @by 0     
@@ -181,7 +201,7 @@ class scroll extends events
     setNumLines: (n) ->
         
         if @numLines != n
-            log "scroll.setNumLines #{@numLines} -> #{n}"
+            # log "scroll.setNumLines #{@numLines} -> #{n}"
             @numLines = n
             @fullHeight = @numLines * @lineHeight
             @calc()

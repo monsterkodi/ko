@@ -22,10 +22,10 @@ class Commandline extends ViewBase
         super viewElem
         
         @hideNumbers()
+        @size.lineHeight = @scroll.viewHeight
+        @scroll?.setLineHeight @size.lineHeight
         @setText ""
-        
-        # @view.onblur =  => @command?.cancel()
-        
+                
         @cmmd = $('.commandline-command')
         
         @commands = {}
@@ -44,7 +44,7 @@ class Commandline extends ViewBase
         
     changed: (changeInfo) ->
         super changeInfo
-        log 'Commandline changed', changeInfo, @lines
+        # log 'Commandline changed', changeInfo, @lines
         if changeInfo.changed.length
             @command?.changed @lines[0]
         
@@ -66,7 +66,7 @@ class Commandline extends ViewBase
         @setAndSelectText @command.start combo # <-- command start
         
     setName: (name) -> 
-        log "commandline.setName", name, @cmmd?
+        # log "commandline.setName", name, @cmmd?
         @cmmd.innerHTML = name
         
     execute: ->
