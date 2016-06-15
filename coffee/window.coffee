@@ -112,12 +112,13 @@ ipc.on 'setWinID', (event, id) =>
 
 saveFile = (file) =>
     file ?= editor.currentFile
-    # log 'save:', file
+    log 'window.saveFile file:', file
     if not file?
         saveFileAs()
         return
+    txt = editor.text()
     editor.setCurrentFile null # to stop watcher and reset scroll
-    fs.writeFileSync file, editor.text(), encoding: 'UTF8'
+    fs.writeFileSync file, txt, encoding: 'UTF8'
     editor.setCurrentFile file
     setState 'file', file
 

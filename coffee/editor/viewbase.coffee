@@ -232,7 +232,7 @@ class ViewBase extends Editor
     
     vanishLineAtIndex: (li) =>
         # log "viewbase.vanishLineAtIndex #{li}"
-        @elem.lastChild.remove()
+        @elem.lastChild?.remove()
         # log "viewbase.vanishLineAtIndex #{li} children #{@elem.children.length}"
 
     # 000000000   0000000   00000000    0000000  000   000   0000000   000   000   0000000   00000000

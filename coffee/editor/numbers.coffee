@@ -30,8 +30,8 @@ class Numbers
         # log "Numbers.onLineAdded", e
         div = document.createElement "div"
         div.className = "linenumber"
-        pre = document.createElement "pre"
-        pre.innerHTML = _.padStart "#{e.lineIndex}", 5
+        pre = document.createElement "span"
+        pre.innerHTML = "#{e.lineIndex}" #_.padStart "#{e.lineIndex}", 5
         div.appendChild pre
         @elem.appendChild div
     

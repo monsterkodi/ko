@@ -20,6 +20,7 @@ frameBorder           = 5px solid #222
 commandlineHeight     = 30px
 titlebarHeight        = 22px
 splithandleHeight     = 6px
+thinBorder            = 1px solid #222
 
 fill-abs()
     position        absolute
@@ -362,14 +363,19 @@ body
     bottom          0
     width           numbersWidth
     pointer-events  none
-    font-size       12px
+    font-size       13px
+    font-weight     bold
+    font-family     "Andale Mono", monospace
     
 .linenumber
-    color           #444
-    display         block
-    width           100%
-    background      rgba(0, 0, 0, 0.5)
-    border-right    1px solid rgba(100, 100, 100, 0.2)
+    & span
+        text-align      right
+        color           #333
+        display         block
+        padding-right   6px
+    width           numbersWidth
+    background      rgba(0, 0, 0, 0.5) // this darkens selection
+    border-right    thinBorder // 1px solid rgba(100, 100, 100, 0.2)
     &.selected
         color       #f80
     
@@ -388,7 +394,7 @@ body
     overflow        hidden
     pointer-events  none
     background      #080808
-    border-left     1px solid #222
+    border-left     thinBorder
     
 rect
     fill            #888
