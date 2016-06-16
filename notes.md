@@ -4,19 +4,16 @@
     - highlight selected lines
 
 - find
-    - case insensitive by default
+    - case insensitive by default!!!
     - optional case sensitive mode
-    - scroll find result to top of view
+    - scroll find result to top of view!!
 
 - minimap 
-    - fix redundant update line position calls
-    - mouse wheel
-    - drag
-    - click
     - fix drag speed
+    - fix max scroll of topBot rect (last line)
     
 - scrollbar
-    - click
+    - mousedown
     - blue if small, gray if large
 
 - misc    
@@ -38,8 +35,11 @@
     - extend selection to end of line if previous line is fully selected
     
 - editing
+    - fix "'#([{ insert
     - insert newline if pasting fully selected lines
-    - indent one level more when inserting newline after =>, -> 
+    - indent one level more when inserting newline ...
+        - after =>, -> 
+        - when next line is indented one level more
     - autoconvert '' to "" when #{} entered
     - dbg "class.method arg: #{arg}, ..."
 
@@ -70,8 +70,8 @@
     - passive (cursor movement won't destroy, but next selection will)
 
 - autocomplete
-- show spaces/tabs/etc
-- history/console/terminal
+- show invisbles (spaces,tabs,etc)
+- history,console,terminal
 - shortcut for renaming file
 - pin
      - command

@@ -123,7 +123,7 @@ class Minimap
     
     changed: (changeInfo) ->
         return if not changeInfo.sorted.length
-        log 'minimap.changed', changeInfo.sorted
+        # log 'minimap.changed', changeInfo.sorted
         invalidated = @lines.length
         for [li, change] in changeInfo.sorted
             switch change
@@ -192,7 +192,7 @@ class Minimap
     # 0000000  000  000   000  00000000        000         0000000   0000000 
     
     updateLinePositions: (start=0) ->
-        log 'minimap.updateLinePositions', start
+        # log 'minimap.updateLinePositions', start
         for li in [start...@lines.length]
             @lines[li].attr
                 transform: "translate(0 #{li*2})"    
