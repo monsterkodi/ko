@@ -2,13 +2,27 @@
 
 - numbers
     - highlight selected lines
-    
+
 - find
-    - case insensitive    
+    - case insensitive by default
+    - optional case sensitive mode
+    - scroll find result to top of view
 
 - minimap 
-    - use scroll
+    - fix redundant update line position calls
+    - mouse wheel
+    - drag
+    - click
     - fix drag speed
+    
+- scrollbar
+    - click
+    - blue if small, gray if large
+
+- misc    
+    - command-enter: deselect, insert newline, indent, and single cursor
+    - comment line characters per filetype    
+    - remember scroll positions per file
     
 - cursors
     - remember last cursor
@@ -23,10 +37,11 @@
 - shift move cursor down
     - extend selection to end of line if previous line is fully selected
     
-- insert newline if pasting fully selected lines
-
-- autoconvert '' to "" when #{} entered
-- dbg "class.method arg: #{arg}, ..."
+- editing
+    - insert newline if pasting fully selected lines
+    - indent one level more when inserting newline after =>, -> 
+    - autoconvert '' to "" when #{} entered
+    - dbg "class.method arg: #{arg}, ..."
 
 - history of file locations
 - search in multiple files

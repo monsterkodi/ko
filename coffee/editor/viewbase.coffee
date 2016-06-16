@@ -413,11 +413,11 @@ class ViewBase extends Editor
         br = @view.getBoundingClientRect()
         lx = clamp 0, @view.offsetWidth,  event.clientX - br.left - @size.offsetX
         ly = clamp 0, @view.offsetHeight, event.clientY - br.top
-        log "viewbase.posForEvent ly:#{ly} clientY:#{event.clientY} br.top: #{br.top} st: #{st}"
+        # log "viewbase.posForEvent ly:#{ly} clientY:#{event.clientY} br.top: #{br.top} st: #{st}"
         px = parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth))
         py = parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @scroll.exposeTop
         p = [px, Math.min(@lines.length-1, py)]
-        log "viewbase.posForEvent clientY:#{event.clientY} -> line:#{p[1]} col:#{p[0]}"
+        # log "viewbase.posForEvent clientY:#{event.clientY} -> line:#{p[1]} col:#{p[0]}"
         p
 
     # 000      000  000   000  00000000   0000000
@@ -430,6 +430,7 @@ class ViewBase extends Editor
     numViewLines:    -> Math.ceil(@viewHeight() / @size.lineHeight)
     numFullLines:    -> Math.floor(@viewHeight() / @size.lineHeight)
 
+    focus: -> @view.focus()
 
     # 00     00   0000000   000   000   0000000  00000000
     # 000   000  000   000  000   000  000       000     

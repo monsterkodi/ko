@@ -47,6 +47,7 @@ class View extends ViewBase
             onMove: @onScrollDrag 
             cursor: 'ns-resize'
 
+        @minimap.elem.addEventListener 'wheel', @onWheel
         @scrollbarLeft.addEventListener 'wheel', @onWheel
         @view.addEventListener 'wheel', @onWheel
         

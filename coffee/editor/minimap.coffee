@@ -10,6 +10,7 @@ last,
 $
 }       = require '../tools/tools'
 log     = require '../tools/log'
+drag    = require '../tools/drag'
 profile = require '../tools/profile'
 scroll  = require './scroll'
 Snap    = require 'snapsvg'
@@ -19,6 +20,7 @@ class Minimap
     constructor: (@editor) ->
         
         @elem = $(".minimap")
+        @elem.onmousedown = @onClick
         
         @s = Snap ".minimap"
         @s.attr
@@ -32,6 +34,11 @@ class Minimap
             exposeMax: -2
             lineHeight: 2
             viewHeight: @editor.viewHeight()
+            
+        @drag = new drag 
+            target: @elem
+            onMove: @onDrag 
+            cursor: 'pointer'
             
         # log 'minimap.scroll', @scroll.info()
         
@@ -115,7 +122,8 @@ class Minimap
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
     changed: (changeInfo) ->
-        # log 'minimap.changed', changeInfo.sorted
+        return if not changeInfo.sorted.length
+        log 'minimap.changed', changeInfo.sorted
         invalidated = @lines.length
         for [li, change] in changeInfo.sorted
             switch change
@@ -189,6 +197,32 @@ class Minimap
             @lines[li].attr
                 transform: "translate(0 #{li*2})"    
 
+    # 00     00   0000000   000   000   0000000  00000000
+    # 000   000  000   000  000   000  000       000     
+    # 000000000  000   000  000   000  0000000   0000000 
+    # 000 0 000  000   000  000   000       000  000     
+    # 000   000   0000000    0000000   0000000   00000000
+    
+    onDrag: (drag, event) => 
+        li = @lineForEvent event
+        @jumpToLine li    
+        if event.clientY % 2 and li > 0
+            @editor.scrollBy @editor.scroll.lineHeight/2
+    onClick: (event) => @jumpToLine @lineForEvent event    
+    jumpToLine: (li) ->        
+        @editor.scrollTo (li-5) * @editor.scroll.lineHeight
+        @editor.singleCursorAtPos [0, li+5]
+        @editor.focus()
+
+    lineForEvent: (event) ->
+        st = @elem.scrollTop
+        br = @elem.getBoundingClientRect()
+        ly = clamp 0, @elem.offsetHeight, event.clientY - br.top
+        py = parseInt(Math.floor((Math.max(0, st + ly))/@scroll.lineHeight)) + @scroll.exposeTop
+        li = Math.min(@scroll.numLines-1, py)
+        # log "minimap.lineForEvent #{li}"
+        li
+                
     #  0000000   000   000  00000000  0000000    000  000000000   0000000   00000000 
     # 000   000  0000  000  000       000   000  000     000     000   000  000   000
     # 000   000  000 0 000  0000000   000   000  000     000     000   000  0000000  
