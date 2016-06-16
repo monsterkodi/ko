@@ -120,7 +120,7 @@ class Minimap
         for [li, change] in changeInfo.sorted
             switch change
                 when 'changed'  
-                    @lines.splice(li, 1, @lineForIndex li)[0].remove()
+                    @lines.splice(li, 1, @lineForIndex li)[0]?.remove()
                 when 'deleted' 
                     @lines.splice(li, 1)[0].remove()
                     invalidated = Math.min invalidated, li
@@ -222,7 +222,8 @@ class Minimap
     # 000       000      000       000   000  000   000
     #  0000000  0000000  00000000  000   000  000   000
     
-    clear: ->
+    clear: =>
+        log 'minimap.clear'
         for l in @lines
             l.remove()
         @lines = []        

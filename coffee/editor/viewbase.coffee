@@ -227,7 +227,7 @@ class ViewBase extends Editor
         # log "viewbase.vanishLine li: #{li}"
         if (not li?) or (li < 0 )
             li = @elem.children.length-1
-        if li == @elem.children.length-1
+        if li == @scroll.exposeTop + @elem.children.length - 1
             @elem.lastChild?.remove()
             @emit 'lineVanished', 
                 lineIndex: li
@@ -273,7 +273,9 @@ class ViewBase extends Editor
     # 000       000      000       000   000  000   000
     #  0000000  0000000  00000000  000   000  000   000
     
-    clearLines: => @elem.innerHTML = ""
+    clearLines: => 
+        @elem.innerHTML = ""
+        @emit 'clearLines'
                    
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     

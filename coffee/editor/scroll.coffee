@@ -172,26 +172,33 @@ class scroll extends events
                 new: @exposeTop
                 num: -(@top-old)
                 
-        while @bot > @exposeBot
+        while (@bot > @exposeBot)
             @exposeBot += 1
             @exposed = @exposeBot - @exposeTop
             log "scroll.expose emit exposeLine #{@exposeBot}" if @dbg
             @emit 'exposeLine', @exposeBot
-                        
-        # log "scroll.expose end", @info() if @dbg
-    
-    # 000   000   0000000   000   000  000   0000000  000   000
-    # 000   000  000   000  0000  000  000  000       000   000
-    #  000 000   000000000  000 0 000  000  0000000   000000000
-    #    000     000   000  000  0000  000       000  000   000
-    #     0      000   000  000   000  000  0000000   000   000
-        
-    vanish: =>
-        while @bot < @exposeBot and @exposed > @exposeNum
+                            
+        # 000   000   0000000   000   000  000   0000000  000   000
+        # 000   000  000   000  0000  000  000  000       000   000
+        #  000 000   000000000  000 0 000  000  0000000   000000000
+        #    000     000   000  000  0000  000       000  000   000
+        #     0      000   000  000   000  000  0000000   000   000
+
+        while (@bot < @exposeBot) and (@exposed > @exposeNum)
             log "scroll.vanish emit vanishLine #{@exposeBot}" if @dbg
             @emit 'vanishLine', @exposeBot
             @exposeBot -= 1
             @exposed = @exposeBot - @exposeTop
+            
+        if (@top > @exposeTop) and (@exposed > @exposeNum)
+            old = @exposeTop
+            @exposeTop = @top
+            @exposed = @exposeBot - @exposeTop
+            log "scroll.expose emit exposeTop #{old} -> #{@exposeTop} (num #{-(@top-old)})" if @dbg
+            @emit 'exposeTop',
+                old: old
+                new: @exposeTop
+                num: -(@top-old)            
 
     # 000   000  000  00000000  000   000  000   000  00000000  000   0000000   000   000  000000000
     # 000   000  000  000       000 0 000  000   000  000       000  000        000   000     000   
