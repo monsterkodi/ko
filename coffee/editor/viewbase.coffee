@@ -88,12 +88,17 @@ class ViewBase extends Editor
         
     setLines: (lines) ->
         # log "viewbase.setLines lines", lines if @name == 'editor'        
-        @scroll.reset() if lines.length == 0
+        if lines.length == 0
+            @scroll.reset() 
+        
         lines ?= ['']
         super lines
         @syntax.parse()
         # log "viewbase.setLines viewHeight #{@viewHeight()}" if @name == 'editor'
-        @scroll.setViewHeight @viewHeight()
+        if @scroll.viewHeight != @viewHeight()
+            @scroll.setViewHeight @viewHeight()
+            # log "viewbase.setLines emit viewHeight #{@viewHeight()}"
+            @emit 'viewHeight', @viewHeight() 
         # log "viewbase.setLines numLines #{lines.length}" if @name == 'editor'
         @scroll.setNumLines @lines.length
 
@@ -368,6 +373,7 @@ class ViewBase extends Editor
     
     resized: -> 
         @scroll?.setViewHeight @viewHeight()
+        log "viewbase.resized emit viewHeight #{@viewHeight()}"
         @emit 'viewHeight', @viewHeight()
     
     deltaToEnsureCursorsAreVisible: ->

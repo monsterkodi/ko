@@ -24,7 +24,7 @@ class Buffer extends event
         @cursors    = [[0,0]]
         @selections = []
         @highlights = []
-        log "editor.setLines emit numLines #{@lines.length}"
+        # log "buffer.setLines emit numLines #{@lines.length}"
         @emit 'numLines', @lines.length
 
     #  0000000  000   000  00000000    0000000   0000000   00000000    0000000

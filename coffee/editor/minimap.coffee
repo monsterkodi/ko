@@ -28,11 +28,11 @@ class Minimap
         @lines = []
         
         @scroll = new scroll 
-            dbg:        false
+            # dbg:        true
             lineHeight: 2
             viewHeight: @editor.viewHeight()
             
-        log 'minimap.scroll', @scroll.info()
+        # log 'minimap.scroll', @scroll.info()
         
         @scroll.on 'clearLines', @clearLines
         @scroll.on 'exposeTop',  @exposeTop

@@ -33,7 +33,7 @@ class View extends ViewBase
         @minimap = new Minimap @
         @numbers = new Numbers @
             
-        @scroll.dbg = true
+        # @scroll.dbg = true
         @scroll.on 'scroll', @updateScrollbar    
         
         @view.style.right = "#{@minimap.width()}px"                
