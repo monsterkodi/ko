@@ -37,16 +37,17 @@ class View extends ViewBase
         @scroll.on 'scroll', @updateScrollbar    
         
         @view.style.right = "#{@minimap.width()}px"                
-                
-        @smoothScrolling   = true
-        @scrollhandleRight = $('.scrollhandle.right', @view.parentElement)
-        @scrollbarRight = $('.scrollbar.right', @view.parentElement)
+
+        @scrollhandleLeft = $('.scrollhandle.left', @view.parentElement)
+        @scrollbarLeft = $('.scrollbar.left', @view.parentElement)
+
+        @smoothScrolling = true
         @scrollbarDrag = new drag 
-            target: @scrollbarRight
+            target: @scrollbarLeft
             onMove: @onScrollDrag 
             cursor: 'ns-resize'
-            
-        @scrollbarRight.addEventListener 'wheel', @onWheel
+
+        @scrollbarLeft.addEventListener 'wheel', @onWheel
         @view.addEventListener 'wheel', @onWheel
         
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
@@ -135,12 +136,12 @@ class View extends ViewBase
         
     updateScrollbar: =>
         
-        return if not @scrollhandleRight?
+        return if not @scrollhandleLeft?
         
         if @lines.length * @size.lineHeight < @viewHeight()
-            @scrollhandleRight.style.top    = "0"
-            @scrollhandleRight.style.height = "0"
-            @scrollhandleRight.style.width  = "0"
+            @scrollhandleLeft.style.top     = "0"
+            @scrollhandleLeft.style.height  = "0"
+            @scrollhandleLeft.style.width   = "0"
         else
             bh           = @lines.length * @size.lineHeight
             vh           = Math.min (@scroll.viewLines * @scroll.lineHeight), @viewHeight()
@@ -150,9 +151,9 @@ class View extends ViewBase
             scrollTop    = Math.min scrollTop, @viewHeight()-scrollHeight
             scrollTop    = Math.max 0, scrollTop
                     
-            @scrollhandleRight.style.top    = "#{scrollTop}px"
-            @scrollhandleRight.style.height = "#{scrollHeight}px"
-            @scrollhandleRight.style.width  = "2px"
+            @scrollhandleLeft.style.top     = "#{scrollTop}px"
+            @scrollhandleLeft.style.height  = "#{scrollHeight}px"
+            @scrollhandleLeft.style.width   = "2px"
                 
     scrollLines: (delta) -> @scrollBy delta * @size.lineHeight
 
@@ -178,7 +179,6 @@ class View extends ViewBase
         @scrollBy event.deltaY * @scrollFactor event
         
     onScrollDrag: (drag) =>
-        
         delta = (drag.delta.y / (@scroll.viewLines * @scroll.lineHeight)) * @lines.length * @size.lineHeight
         @scrollBy delta
 

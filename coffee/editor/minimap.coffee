@@ -203,15 +203,14 @@ class Minimap
         fh = @scroll.fullHeight - @scroll.viewHeight
             
         if @scroll.fullHeight > @scroll.viewHeight
-            
-            if st < @scroll.viewHeight
+            tf = (@scroll.viewHeight - topBotHeight)/2
+            if st < tf
                 tp = 0
-            else if st > @scroll.fullHeight - @scroll.viewHeight
+            else if st > @scroll.fullHeight - tf
                 tp = @scroll.fullHeight - @scroll.viewHeight
             else
-                tp = st - @scroll.viewHeight
-            st -= tp
-            
+                tp = st - tf
+                        
             @scroll.to clamp 0, @scroll.scrollMax, tp
 
         @topBot.attr 
