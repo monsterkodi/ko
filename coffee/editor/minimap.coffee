@@ -199,10 +199,10 @@ class Minimap
     
     updateView: =>
         @s.attr
-             viewBox:  "0 0 120 #{@scroll.viewHeight}"   
-        
-        log 'scroll.viewHeight', @scroll.viewHeight, @scroll.info()     
+             viewBox: "0 0 120 #{@scroll.viewHeight}"   
+                
         return if @scroll.viewHeight == 0
+        # log "minimap.updateView @scroll.viewHeight", @scroll.viewHeight, @scroll.info()     
                   
         @buffer.attr
             height:   @scroll.numLines*2

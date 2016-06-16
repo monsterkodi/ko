@@ -162,7 +162,7 @@ class scroll extends events
                 @emit 'exposeLine', @exposeBot
             return
         
-        if (@top < @exposeBot) # move exposeTop
+        if (@top < @exposeTop) # move exposeTop
             old = @exposeTop
             @exposeTop = @top
             @exposed = @exposeBot - @exposeTop
@@ -178,7 +178,7 @@ class scroll extends events
             log "scroll.expose emit exposeLine #{@exposeBot}" if @dbg
             @emit 'exposeLine', @exposeBot
                         
-        log "scroll.expose end", @info() if @dbg
+        # log "scroll.expose end", @info() if @dbg
     
     # 000   000   0000000   000   000  000   0000000  000   000
     # 000   000  000   000  0000  000  000  000       000   000
