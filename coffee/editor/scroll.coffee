@@ -81,7 +81,7 @@ class scroll extends events
     #    000     000   000
     #    000      0000000 
     
-    to: (p) => @by -@scroll
+    to: (p) => @by p-@scroll
         
     # 0000000    000   000
     # 000   000   000 000 
@@ -90,11 +90,11 @@ class scroll extends events
     # 0000000       000   
         
     by: (delta) => 
-        # log "scroll.by delta #{delta}", @ if @dbg                
+        log "scroll.by delta #{delta} scroll #{@scroll} scrollMax #{@scrollMax}" if @dbg
         @scroll = clamp 0, @scrollMax, @scroll+delta
-        # log "scroll.by delta #{delta} scroll #{@scroll} scrollMax #{@scrollMax}" if @dbg
+        log "scroll.by new delta #{delta} scroll #{@scroll} scrollMax #{@scrollMax}" if @dbg
         top = parseInt @scroll / @lineHeight
-        # log "scroll.by delta #{delta} scroll #{@scroll} lineHeight #{@lineHeight}" if @dbg
+        log "scroll.by top #{@top} lineHeight #{@lineHeight}" if @dbg
         @offsetSmooth = @scroll - top * @lineHeight 
 
         @setTop top
@@ -102,9 +102,10 @@ class scroll extends events
         offset = 0
         offset += @offsetSmooth if @smooth
         offset += (@top - @exposeTop) * @lineHeight
-        # log "scroll.by delta #{delta} offset #{offset}"
+        log "scroll.by delta #{delta} offset #{offset}"
         if offset != @topOffset
             @offsetTop = offset
+            log "scroll.by emit scroll @scroll #{@scroll} @offsetTop #{@offsetTop}" if @dbg
             @emit 'scroll', @scroll, @offsetTop
 
     #  0000000  00000000  000000000  000000000   0000000   00000000 

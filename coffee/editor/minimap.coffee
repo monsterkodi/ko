@@ -3,9 +3,9 @@
 # 000000000  000  000 0 000  000  000000000  000000000  00000000 
 # 000 0 000  000  000  0000  000  000 0 000  000   000  000      
 # 000   000  000  000   000  000  000   000  000   000  000      
-
 {
 getStyle,
+clamp,
 last,
 $
 }       = require '../tools/tools'
@@ -28,7 +28,7 @@ class Minimap
         @lines = []
         
         @scroll = new scroll 
-            # dbg:        true
+            dbg:        true
             lineHeight: 2
             viewHeight: @editor.viewHeight()
             
@@ -38,10 +38,10 @@ class Minimap
         @scroll.on 'exposeTop',  @exposeTop
         @scroll.on 'exposeLine', @exposeLine
         @scroll.on 'vanishLine', @vanishLine
-        @scroll.on 'scroll',     @updateView
+        @scroll.on 'scroll',     @onScroll
 
-        @editor.on 'viewHeight',    @scroll.setViewHeight
-        @editor.on 'numLines',      @scroll.setNumLines
+        @editor.on 'viewHeight',    @onEditorViewHeight
+        @editor.on 'numLines',      @onEditorLineNum
         @editor.scroll.on 'scroll', @onEditorScroll
 
         @buffer = @s.rect()
@@ -144,7 +144,6 @@ class Minimap
             else
                 lines.unshift @lineForIndex li
         @updateLinePositions 0  
-        @updateView()  
                                 
     # 00000000  000   000  00000000    0000000    0000000  00000000
     # 000        000 000   000   000  000   000  000       000     
@@ -155,7 +154,6 @@ class Minimap
     exposeLine: (li) =>
         # log 'minimap.exposeLine', li
         @lines.push @lineForIndex li                            
-        @updateView()
         
     # 000   000   0000000   000   000  000   0000000  000   000
     # 000   000  000   000  0000  000  000  000       000   000
@@ -167,7 +165,6 @@ class Minimap
         # log 'minimap.vanishLine', li
         if li == @lines.length-1
             @lines.pop().remove()
-        # @updateView()
     
     #  0000000  000      00000000   0000000   00000000 
     # 000       000      000       000   000  000   000
@@ -187,32 +184,52 @@ class Minimap
     # 0000000  000  000   000  00000000        000         0000000   0000000 
     
     updateLinePositions: (start=0) ->
+        log 'minimap.updateLinePositions', start
         for li in [start...@lines.length]
             @lines[li].attr
                 transform: "translate(0 #{li*2})"    
 
-    # 000   000  00000000   0000000     0000000   000000000  00000000  000   000  000  00000000  000   000
-    # 000   000  000   000  000   000  000   000     000     000       000   000  000  000       000 0 000
-    # 000   000  00000000   000   000  000000000     000     0000000    000 000   000  0000000   000000000
-    # 000   000  000        000   000  000   000     000     000          000     000  000       000   000
-    #  0000000   000        0000000    000   000     000     00000000      0      000  00000000  00     00
-    
-    updateView: =>
-        @s.attr
-             viewBox: "0 0 120 #{@scroll.viewHeight}"   
-                
-        return if @scroll.viewHeight == 0
-        # log "minimap.updateView @scroll.viewHeight", @scroll.viewHeight, @scroll.info()     
-                  
-        @buffer.attr
-            height:   @scroll.numLines*2
-        
-        @topBot.attr 
-            y:        @scroll.top*2
-            height:   Math.max 0, (@scroll.exposeBot-@scroll.exposeTop)*2
+    #  0000000   000   000  00000000  0000000    000  000000000   0000000   00000000 
+    # 000   000  0000  000  000       000   000  000     000     000   000  000   000
+    # 000   000  000 0 000  0000000   000   000  000     000     000   000  0000000  
+    # 000   000  000  0000  000       000   000  000     000     000   000  000   000
+    #  0000000   000   000  00000000  0000000    000     000      0000000   000   000
     
     onEditorScroll: (scroll, topOffset) =>
         # log 'minimap.onEditorScroll', scroll, topOffset
+        topBotHeight = (@editor.scroll.bot-@editor.scroll.top)*2
+        # log "minimap.onEditorScroll topBotHeight #{topBotHeight}"
+        @topBot.attr 
+            y:        @editor.scroll.top*2
+            height:   Math.max 0, topBotHeight
+            
+        if @scroll.fullHeight > @scroll.viewHeight
+            fh = @scroll.fullHeight - @scroll.viewHeight
+            rf = @editor.scroll.top*2 / @scroll.viewHeight
+            # log "minimap.onEditorScroll fh #{fh} rf #{rf}"
+            sc = parseInt fh * rf
+            # log "minimap.onEditorScroll sc #{sc} max #{@scroll.scrollMax}"
+            @scroll.to clamp 0, @scroll.scrollMax, sc
+    
+    onEditorViewHeight: (h) => @scroll.setViewHeight h
+    
+    onEditorLineNum: (n) => 
+        @scroll.setNumLines n        
+        @buffer.attr
+            height:  n*@scroll.lineHeight
+            
+    #  0000000   000   000   0000000   0000000  00000000    0000000   000      000    
+    # 000   000  0000  000  000       000       000   000  000   000  000      000    
+    # 000   000  000 0 000  0000000   000       0000000    000   000  000      000    
+    # 000   000  000  0000       000  000       000   000  000   000  000      000    
+    #  0000000   000   000  0000000    0000000  000   000   0000000   0000000  0000000
+            
+    onScroll: (scroll, topOffset) =>
+        t = @scroll.top * 2
+        h = @scroll.viewHeight
+        log "minimap.onScroll t #{t} h #{h}"
+        @s.attr
+             viewBox: "0 #{t} 120 #{h}"   
     
     width: -> parseInt getStyle '.minimap', 'width'
     
