@@ -33,10 +33,11 @@ class Minimap
             viewHeight: @editor.viewHeight()
             
         log 'minimap.scroll', @scroll.info()
-            
-        @scroll.on 'exposeTop',  @exposeTopChange
-        @scroll.on 'exposeLine', @exposeLineAtIndex
-        @scroll.on 'vanishLine', @vanishLineAtIndex     
+        
+        @scroll.on 'clearLines', @clearLines
+        @scroll.on 'exposeTop',  @exposeTop
+        @scroll.on 'exposeLine', @exposeLine
+        @scroll.on 'vanishLine', @vanishLine
         @scroll.on 'scroll',     @updateView
 
         @editor.on 'viewHeight',    @scroll.setViewHeight
@@ -135,7 +136,7 @@ class Minimap
     #    000     000   000  000        000       000   000  000   000  000  0000  000   000  000     
     #    000      0000000   000         0000000  000   000  000   000  000   000   0000000   00000000
     
-    exposeTopChange: (e) =>
+    exposeTop: (e) =>
         num = Math.abs e.num
         for n in [0...num]
             if e.num < 0
@@ -151,8 +152,8 @@ class Minimap
     # 000        000 000   000        000   000       000  000     
     # 00000000  000   000  000         0000000   0000000   00000000
         
-    exposeLineAtIndex: (li) =>
-        # log 'minimap.exposeLineAtIndex', li
+    exposeLine: (li) =>
+        # log 'minimap.exposeLine', li
         @lines.push @lineForIndex li                            
         @updateView()
         
@@ -162,11 +163,22 @@ class Minimap
     #    000     000   000  000  0000  000       000  000   000
     #     0      000   000  000   000  000  0000000   000   000
     
-    vanishLineAtIndex: (li) =>
-        # log 'minimap.vanishLineAtIndex', li
+    vanishLine: (li) =>
+        # log 'minimap.vanishLine', li
         if li == @lines.length-1
             @lines.pop().remove()
         # @updateView()
+    
+    #  0000000  000      00000000   0000000   00000000 
+    # 000       000      000       000   000  000   000
+    # 000       000      0000000   000000000  0000000  
+    # 000       000      000       000   000  000   000
+    #  0000000  0000000  00000000  000   000  000   000
+    
+    clearLines: =>
+        for l in @lines
+            l.remove()
+        @lines = []
     
     # 000      000  000   000  00000000        00000000    0000000    0000000
     # 000      000  0000  000  000             000   000  000   000  000     

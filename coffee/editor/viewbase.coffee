@@ -47,9 +47,10 @@ class ViewBase extends Editor
             lineHeight: @size.lineHeight
             viewHeight: @viewHeight()
             
-        @scroll.on 'exposeTop',  @exposeTopChange
-        @scroll.on 'exposeLine', @exposeLineAtIndex
-        @scroll.on 'vanishLine', @vanishLineAtIndex     
+        @scroll.on 'clearLines', @clearLines
+        @scroll.on 'exposeTop',  @exposeTop
+        @scroll.on 'exposeLine', @exposeLine
+        @scroll.on 'vanishLine', @vanishLine
 
         @view.onkeydown = @onKeyDown
     
@@ -189,18 +190,18 @@ class ViewBase extends Editor
     # 000        000 000   000        000   000       000  000     
     # 00000000  000   000  000         0000000   0000000   00000000
 
-    exposeLineAtIndex: (li) =>
-        # log "viewbase.exposeLineAtIndex children #{@elem.children.length}"
+    exposeLine: (li) =>
+        # log "viewbase.exposeLine children #{@elem.children.length}"
         html = @renderLineAtIndex li
-        # log "viewbase.exposeLineAtIndex #{li} #{html}"
-        # log "viewbase.exposeLineAtIndex #{@lines[li]} #{@lines.length}"
+        # log "viewbase.exposeLine #{li} #{html}"
+        # log "viewbase.exposeLine #{@lines[li]} #{@lines.length}"
         lineDiv = @addLine()
         lineDiv.innerHTML = html
         @elem.appendChild lineDiv
-        # log "viewbase.exposeLineAtIndex #{li} children #{@elem.children.length}"
+        # log "viewbase.exposeLine #{li} children #{@elem.children.length}"
         
         if li != @elem.children.length-1+@scroll.exposeTop 
-            log "viewbase.exposeLineAtIndex wtf? #{li} != #{@elem.children.length-1+@scroll.exposeTop }"
+            log "viewbase.exposeLine wtf? #{li} != #{@elem.children.length-1+@scroll.exposeTop }"
         
         @emit 'lineExposed', 
             lineIndex: li # @elem.children.length-1 + @scroll.exposeTop 
@@ -217,22 +218,24 @@ class ViewBase extends Editor
     #    000     000   000  000  0000  000       000  000   000
     #     0      000   000  000   000  000  0000000   000   000
     
-    vanishLineAtIndex: (li) =>
-        # log "viewbase.vanishLineAtIndex #{li}"
-        if li < 0
+    vanishLine: (li) =>
+        # log "viewbase.vanishLine li: #{li}"
+        if (not li?) or (li < 0 )
             li = @elem.children.length-1
         if li == @elem.children.length-1
             @elem.lastChild?.remove()
             @emit 'lineVanished', 
                 lineIndex: li
+        else
+            log "warning! viewbase.vanishLine wrong line index? li: #{li} children: #{@elem.children.length}"
         
-    # 000000000   0000000   00000000    0000000  000   000   0000000   000   000   0000000   00000000
-    #    000     000   000  000   000  000       000   000  000   000  0000  000  000        000     
-    #    000     000   000  00000000   000       000000000  000000000  000 0 000  000  0000  0000000 
-    #    000     000   000  000        000       000   000  000   000  000  0000  000   000  000     
-    #    000      0000000   000         0000000  000   000  000   000  000   000   0000000   00000000
+    # 00000000  000   000  00000000    0000000    0000000  00000000  000000000   0000000   00000000 
+    # 000        000 000   000   000  000   000  000       000          000     000   000  000   000
+    # 0000000     00000    00000000   000   000  0000000   0000000      000     000   000  00000000 
+    # 000        000 000   000        000   000       000  000          000     000   000  000      
+    # 00000000  000   000  000         0000000   0000000   00000000     000      0000000   000      
 
-    exposeTopChange: (e) =>
+    exposeTop: (e) =>
         # log "viewbase.exposeTopChange #{e.old} -> #{e.new}"
         
         num = Math.abs e.num
@@ -258,6 +261,14 @@ class ViewBase extends Editor
         @updateLinePositions()
         @updateLayers()            
         @emit 'exposeTopChanged', e            
+        
+    #  0000000  000      00000000   0000000   00000000 
+    # 000       000      000       000   000  000   000
+    # 000       000      0000000   000000000  0000000  
+    # 000       000      000       000   000  000   000
+    #  0000000  0000000  00000000  000   000  000   000
+    
+    clearLines: => @elem.innerHTML = ""
                    
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     
@@ -286,7 +297,7 @@ class ViewBase extends Editor
             # log "viewbase.updateLine li #{li} relIndex #{relIndex}"
             @elem.children[relIndex]?.innerHTML = span
         else 
-            @vanishLineAtIndex -1            
+            @vanishLine()
 
     # 00000000   00000000  000   000  0000000    00000000  00000000 
     # 000   000  000       0000  000  000   000  000       000   000

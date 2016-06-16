@@ -71,12 +71,8 @@ class scroll extends events
     # 000   000  00000000  0000000   00000000     000   
     
     reset: =>
-        # log "scroll.reset"
-        while @exposeBot >= 0  
-            log "scroll.reset emit vanishLine #{@exposeBot}"  if @dbg
-            @emit 'vanishLine', @exposeBot
-            @exposeBot -= 1
-        
+        log "scroll.reset emit clearLines" if @dbg
+        @emit 'clearLines'
         @init()
 
     # 000000000   0000000 
@@ -141,49 +137,47 @@ class scroll extends events
     expose: =>
         # log "scroll.expose start", @info() if @dbg
         
-        while @bot > @exposeBot
-            @exposeBot += 1
-            log "scroll.expose emit exposeLine #{@exposeBot}" if @dbg
-            @emit 'exposeLine', @exposeBot
-
-        @exposed = @exposeBot - @exposeTop
-            
-        return if @exposeNum == 0 # nothing to expose or vanish if expose range is unlimited
+        if @exposeNum == 0 # only exposing if expose range is unlimited
+            while @bot > @exposeBot
+                @exposeBot += 1
+                @exposed = @exposeBot - @exposeTop
+                log "scroll.expose emit exposeLine #{@exposeBot}" if @dbg
+                @emit 'exposeLine', @exposeBot
+            return
         
         topDiff = @exposeTop - @top
         botDiff = @exposeBot - @bot
         
         return if (@exposed <= @exposedNum) and (topDiff <= 0) and (botDiff >= 0)
         
-        emitNewExposeTop = (newExposeTop) =>
+        if (@top >= @exposeBot) or (@bot <= @exposeTop) # new range outside, start from scratch
+            log "scroll.expose emit clearLines" if @dbg
+            @emit 'clearLines'
+            @exposeTop = @top
+            @exposeBot = @top-1
+            while @bot > @exposeBot
+                @exposeBot += 1
+                @exposed = @exposeBot - @exposeTop
+                log "scroll.expose emit exposeLine #{@exposeBot}" if @dbg
+                @emit 'exposeLine', @exposeBot
+            return
+        
+        if (@top < @exposeBot) # move exposeTop
             old = @exposeTop
-            @exposeTop = newExposeTop
+            @exposeTop = @top
             @exposed = @exposeBot - @exposeTop
-            log "scroll.expose emit exposeTop #{old} -> #{@exposeTop} (num #{-(newExposeTop-old)})" if @dbg
+            log "scroll.expose emit exposeTop #{old} -> #{@exposeTop} (num #{-(@top-old)})" if @dbg
             @emit 'exposeTop',
                 old: old
                 new: @exposeTop
-                num: -(newExposeTop-old)
-
-        if (@top >= @exposeBot) or (@bot <= @exposeTop) # new range outside, start from scratch
-            
-        # if @exposed > @exposedNum
-        #     vanish() 
-        # 
-        # if (@exposed > @exposedNum) and (@top > @exposeTop)
-        #     n = Math.min @exposedNum - @exposed, @top - @exposeTop
-        #     emitNewExposeTop @exposeTop+n
-        # 
-        # if (@exposed > @exposedNum)
-        #     log "??? scroll.expose @exposed > @exposedNum?", @info()
-        # 
-        # 
-        # else if @top < @exposeTop 
-        #     emitNewExposeTop @top
-        #     @vanish()
-        # else 
-        #     log "??? scroll.expose info:", @info()
-            
+                num: -(@top-old)
+                
+        while @bot > @exposeBot
+            @exposeBot += 1
+            @exposed = @exposeBot - @exposeTop
+            log "scroll.expose emit exposeLine #{@exposeBot}" if @dbg
+            @emit 'exposeLine', @exposeBot
+                        
         log "scroll.expose end", @info() if @dbg
     
     # 000   000   0000000   000   000  000   0000000  000   000
