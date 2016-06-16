@@ -204,14 +204,13 @@ class Minimap
             
         if @scroll.fullHeight > @scroll.viewHeight
             
-            if st < @scroll.viewHeight / 2
+            if st < @scroll.viewHeight
                 tp = 0
-            else if st > @scroll.fullHeight - @scroll.viewHeight / 2
+            else if st > @scroll.fullHeight - @scroll.viewHeight
                 tp = @scroll.fullHeight - @scroll.viewHeight
-                st = @scroll.viewHeight - st
             else
-                tp = st - @scroll.viewHeight / 2
-                st = @scroll.viewHeight / 2
+                tp = st - @scroll.viewHeight
+            st -= tp
             
             @scroll.to clamp 0, @scroll.scrollMax, tp
 
