@@ -29,6 +29,7 @@ class Minimap
         
         @scroll = new scroll 
             # dbg:        true
+            exposeMax: -2
             lineHeight: 2
             viewHeight: @editor.viewHeight()
             
@@ -67,9 +68,8 @@ class Minimap
     lineForIndex: (li) ->
         t = @editor.lines[li]
         line = @s.group()       
-        y = (li-@scroll.exposeTop)*2
         line.attr
-            transform: "translate(0 #{y})"
+            transform: "translate(0 #{li*2})"
          
         # if showSpaces?
         #     l = @s.rect()
@@ -198,18 +198,26 @@ class Minimap
     onEditorScroll: (scroll, topOffset) =>
         # log 'minimap.onEditorScroll', scroll, topOffset
         topBotHeight = (@editor.scroll.bot-@editor.scroll.top)*2
-        # log "minimap.onEditorScroll topBotHeight #{topBotHeight}"
-        @topBot.attr 
-            y:        @editor.scroll.top*2
-            height:   Math.max 0, topBotHeight
+            
+        st = @editor.scroll.top*2
+        fh = @scroll.fullHeight - @scroll.viewHeight
             
         if @scroll.fullHeight > @scroll.viewHeight
-            fh = @scroll.fullHeight - @scroll.viewHeight
-            rf = @editor.scroll.top*2 / @scroll.viewHeight
-            # log "minimap.onEditorScroll fh #{fh} rf #{rf}"
-            sc = parseInt fh * rf
-            # log "minimap.onEditorScroll sc #{sc} max #{@scroll.scrollMax}"
-            @scroll.to clamp 0, @scroll.scrollMax, sc
+            
+            if st < @scroll.viewHeight / 2
+                tp = 0
+            else if st > @scroll.fullHeight - @scroll.viewHeight / 2
+                tp = @scroll.fullHeight - @scroll.viewHeight
+                st = @scroll.viewHeight - st
+            else
+                tp = st - @scroll.viewHeight / 2
+                st = @scroll.viewHeight / 2
+            
+            @scroll.to clamp 0, @scroll.scrollMax, tp
+
+        @topBot.attr 
+            y:        st
+            height:   Math.max 0, topBotHeight
     
     onEditorViewHeight: (h) => @scroll.setViewHeight h
     
@@ -227,7 +235,7 @@ class Minimap
     onScroll: (scroll, topOffset) =>
         t = @scroll.top * 2
         h = @scroll.viewHeight
-        log "minimap.onScroll t #{t} h #{h}"
+        # log "minimap.onScroll t #{t} h #{h}"
         @s.attr
              viewBox: "0 #{t} 120 #{h}"   
     
