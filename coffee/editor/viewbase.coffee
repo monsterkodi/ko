@@ -23,12 +23,6 @@ _         = require 'lodash'
 electron  = require 'electron'
 clipboard = electron.clipboard
 
-# 0000000    000      000   000  0000000  
-# 000   000  000      000   000  000   000
-# 0000000    000      000   000  0000000  
-# 000   000  000      000   000  000   000
-# 0000000    0000000   0000000   0000000  
-
 class ViewBase extends Editor
 
     # 000  000   000  000  000000000
@@ -61,12 +55,370 @@ class ViewBase extends Editor
     
         super
 
-        # 00     00   0000000   000   000   0000000  00000000
-        # 000   000  000   000  000   000  000       000     
-        # 000000000  000   000  000   000  0000000   0000000 
-        # 000 0 000  000   000  000   000       000  000     
-        # 000   000   0000000    0000000   0000000   00000000
+        @initDrag()
+
+    # 000       0000000   000   000  00000000  00000000    0000000
+    # 000      000   000   000 000   000       000   000  000     
+    # 000      000000000    00000    0000000   0000000    0000000 
+    # 000      000   000     000     000       000   000       000
+    # 0000000  000   000     000     00000000  000   000  0000000 
+    
+    initLayers: (layerClasses) ->
+        for cls in layerClasses
+            @addLayer cls
+        
+    addLayer: (cls) ->
+        div = document.createElement 'div'
+        div.className = cls
+        @view.appendChild div
+        
+    updateLayers: () ->
+        @renderHighlights()
+        @renderSelection()
+        @renderCursors()
+                
+    #  0000000  00000000  000000000  000      000  000   000  00000000   0000000
+    # 000       000          000     000      000  0000  000  000       000     
+    # 0000000   0000000      000     000      000  000 0 000  0000000   0000000 
+    #      000  000          000     000      000  000  0000  000            000
+    # 0000000   00000000     000     0000000  000  000   000  00000000  0000000 
+
+    setText: (text) -> @setLines text?.split /\n/
+        
+    setLines: (lines) ->
+        # log "viewbase.setLines lines", lines if @name == 'editor'        
+        @scroll.reset() if lines.length == 0
+        lines ?= ['']
+        super lines
+        @syntax.parse()
+        # log "viewbase.setLines viewHeight #{@viewHeight()}" if @name == 'editor'
+        @scroll.setViewHeight @viewHeight()
+        # log "viewbase.setLines numLines #{lines.length}" if @name == 'editor'
+        @scroll.setNumLines @lines.length
+
+    # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
+    # 000       000   000  0000  000     000     000       000     000   000     
+    # 000000    000   000  000 0 000     000     0000000   000    000    0000000 
+    # 000       000   000  000  0000     000          000  000   000     000     
+    # 000        0000000   000   000     000     0000000   000  0000000  00000000
+
+    setFontSize: (fontSize) =>
+        setStyle '.'+@view.className, 'font-size', "#{fontSize}px"
+        @size.numbersWidth = 50
+        @size.fontSize     = fontSize
+        @size.lineHeight   = fontSize + Math.floor(fontSize/6)
+        @size.charWidth    = characterWidth @elem, 'line'
+        @size.offsetX      = Math.floor @size.charWidth/2 + @size.numbersWidth
+        # log "viewbase.setFontSize #{@size.fontSize} #{@size.lineHeight}"
+        
+        @scroll?.setLineHeight @size.lineHeight
+            
+        @emit 'fontSizeChanged'
+
+    # 000   000  000   000  00     00  0000000    00000000  00000000    0000000
+    # 0000  000  000   000  000   000  000   000  000       000   000  000     
+    # 000 0 000  000   000  000000000  0000000    0000000   0000000    0000000 
+    # 000  0000  000   000  000 0 000  000   000  000       000   000       000
+    # 000   000   0000000   000   000  0000000    00000000  000   000  0000000 
+    
+    hideNumbers: ->
+        @size.numbersWidth = 0
+        @size.offsetX      = Math.floor @size.charWidth/2
+        @scroll?.reset()
+
+    #  0000000   0000000    0000000    000      000  000   000  00000000
+    # 000   000  000   000  000   000  000      000  0000  000  000     
+    # 000000000  000   000  000   000  000      000  000 0 000  0000000 
+    # 000   000  000   000  000   000  000      000  000  0000  000     
+    # 000   000  0000000    0000000    0000000  000  000   000  00000000
+    
+    addLine: ->
+        div = document.createElement 'div'
+        div.className = 'line'
+        div.style.height = "#{@size.lineHeight}px"
+        y = @elem.children.length * @size.lineHeight
+        div.style.transform = "translate(#{@size.offsetX}px,#{y}px)"
+        div    
+
+    #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
+    # 000       000   000  000   000  0000  000  000        000       000   000
+    # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
+    # 000       000   000  000   000  000  0000  000   000  000       000   000
+    #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
+    
+    changed: (changeInfo) ->
+        # log changeInfo
+        if changeInfo.deleted.length or changeInfo.inserted.length
+            log "viewbase.changed ++ #{changeInfo.inserted} -- #{changeInfo.deleted}"
+        # if changeInfo.changed.length
+        #     log "viewbase.changed .. #{changeInfo.changed}"
+        @syntax.changed changeInfo
+        indices = []
+        info = _.cloneDeep changeInfo
+        for i in info.changed
+            continue if i < @scroll.exposeTop
+            break if i > @scroll.exposeBot
+            indices.push i
+            
+        if info.inserted.length
+            if info.inserted[0] < @scroll.exposeBot
+                for i in [Math.max(@scroll.exposeTop, info.inserted[0])..@scroll.exposeBot]
+                    indices.push i
+
+        if info.deleted.length
+            if info.deleted[0] < @scroll.exposeBot
+                for i in [Math.max(@scroll.exposeTop, info.deleted[0])..@scroll.exposeBot]
+                    indices.push i
+                                                                                
+        indices.sort (a,b) -> a - b
+        indices = _.sortedUniq indices
+        # log "viewbase.changed indices", indices        
+        for i in indices
+            @updateLine i
+            
+        if changeInfo.cursor.length
+            @renderCursors()
+        if changeInfo.selection.length
+            @renderSelection()   
+                     
+        @renderHighlights()
+
+    # 00000000  000   000  00000000    0000000    0000000  00000000
+    # 000        000 000   000   000  000   000  000       000     
+    # 0000000     00000    00000000   000   000  0000000   0000000 
+    # 000        000 000   000        000   000       000  000     
+    # 00000000  000   000  000         0000000   0000000   00000000
+
+    exposeLineAtIndex: (li) =>
+        # log "viewbase.exposeLineAtIndex children #{@elem.children.length}"
+        html = @renderLineAtIndex li
+        # log "viewbase.exposeLineAtIndex #{li} #{html}"
+        # log "viewbase.exposeLineAtIndex #{@lines[li]} #{@lines.length}"
+        lineDiv = @addLine()
+        lineDiv.innerHTML = html
+        @elem.appendChild lineDiv
+        # log "viewbase.exposeLineAtIndex #{li} children #{@elem.children.length}"
+        
+        if li != @elem.children.length-1+@scroll.exposeTop 
+            log "viewbase.exposeLineAtIndex wtf? #{li} != #{@elem.children.length-1+@scroll.exposeTop }"
+        
+        @emit 'lineExposed', 
+            lineIndex: li # @elem.children.length-1 + @scroll.exposeTop 
+            lineDiv: lineDiv
+
+        @renderCursors() if @cursorsInLineAtIndex(li).length
+        @renderSelection() if @rangesForLineIndexInRanges(li, @selections).length
+        @renderHighlights() if @rangesForLineIndexInRanges(li, @highlights).length
+        lineDiv
+        
+    # 000   000   0000000   000   000  000   0000000  000   000
+    # 000   000  000   000  0000  000  000  000       000   000
+    #  000 000   000000000  000 0 000  000  0000000   000000000
+    #    000     000   000  000  0000  000       000  000   000
+    #     0      000   000  000   000  000  0000000   000   000
+    
+    vanishLineAtIndex: (li) =>
+        # log "viewbase.vanishLineAtIndex #{li}"
+        if li < 0
+            li = @elem.children.length-1
+        if li == @elem.children.length-1
+            @elem.lastChild?.remove()
+            @emit 'lineVanished', 
+                lineIndex: li
+        
+    # 000000000   0000000   00000000    0000000  000   000   0000000   000   000   0000000   00000000
+    #    000     000   000  000   000  000       000   000  000   000  0000  000  000        000     
+    #    000     000   000  00000000   000       000000000  000000000  000 0 000  000  0000  0000000 
+    #    000     000   000  000        000       000   000  000   000  000  0000  000   000  000     
+    #    000      0000000   000         0000000  000   000  000   000  000   000   0000000   00000000
+
+    exposeTopChange: (e) =>
+        # log "viewbase.exposeTopChange #{e.old} -> #{e.new}"
+        
+        num = Math.abs e.num
+
+        for n in [0...num]
+            if e.num < 0
+                @elem.firstChild.remove()
+                li = e.new - (num - n)
+                
+                @emit 'lineVanishedTop', 
+                    lineIndex: li
+                
+            else 
+                div = @addLine()
+                li = e.new + num - n - 1
+                div.innerHTML = @renderLineAtIndex li
+                @elem.insertBefore div, @elem.firstChild
+                
+                @emit 'lineExposedTop', 
+                    lineIndex: li
+                    lineDiv: div
              
+        @updateLinePositions()
+        @updateLayers()            
+        @emit 'exposeTopChanged', e            
+                   
+    # 000   000  00000000   0000000     0000000   000000000  00000000
+    # 000   000  000   000  000   000  000   000     000     000     
+    # 000   000  00000000   000   000  000000000     000     0000000 
+    # 000   000  000        000   000  000   000     000     000     
+    #  0000000   000        0000000    000   000     000     00000000
+
+    done: => @changed @do.changeInfo
+
+    updateLinePositions: () ->
+        y = 0
+        for c in @elem.children
+            c.style.transform = "translate(#{@size.offsetX}px,#{y}px)"
+            y += @size.lineHeight
+                
+    # 000   000  00000000   0000000     0000000   000000000  00000000
+    # 000   000  000   000  000   000  000   000     000     000     
+    # 000   000  00000000   000   000  000000000     000     0000000 
+    # 000   000  000        000   000  000   000     000     000     
+    #  0000000   000        0000000    000   000     000     00000000
+    
+    updateLine: (li) ->
+        if @scroll.exposeTop <= li < @lines.length
+            relIndex = li - @scroll.exposeTop
+            span = @renderLineAtIndex li
+            # log "viewbase.updateLine li #{li} relIndex #{relIndex}"
+            @elem.children[relIndex]?.innerHTML = span
+        else 
+            @vanishLineAtIndex -1            
+
+    # 00000000   00000000  000   000  0000000    00000000  00000000 
+    # 000   000  000       0000  000  000   000  000       000   000
+    # 0000000    0000000   000 0 000  000   000  0000000   0000000  
+    # 000   000  000       000  0000  000   000  000       000   000
+    # 000   000  00000000  000   000  0000000    00000000  000   000
+            
+    renderLineAtIndex: (li) -> render.line @lines[li], @syntax.getDiss li
+            
+            #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
+            # 000       000   000  000   000  000       000   000  000   000  000     
+            # 000       000   000  0000000    0000000   000   000  0000000    0000000 
+            # 000       000   000  000   000       000  000   000  000   000       000
+            #  0000000   0000000   000   000  0000000    0000000   000   000  0000000 
+                                        
+    renderCursors: ->
+        # log "viewbase.renderCursors top #{@scroll.top} bot #{@scroll.bot}"
+        cs = @cursorsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
+        # log "viewbase.renderCursors", cs
+        vc = [] # virtual cursors
+        if @cursors.length == 1 # probably not the best place to do this
+            if cs.length == 1
+                sc = @cursors[0]
+                if sc[0] > @lines[sc[1]].length
+                    rli = sc[1]-@scroll.exposeTop
+                    cs = [[@lines[sc[1]].length, rli], [sc[0], rli, 'virtual']]
+        else if @cursors.length > 1
+            for c in cs
+                if c[0] > @lines[@scroll.exposeTop+c[1]].length
+                    vc.push [@lines[@scroll.exposeTop+c[1]].length, c[1], 'virtual']
+            cs = cs.concat vc
+        # log "viewbase.renderCursors", cs
+        html = render.cursors cs, @size
+        # log "viewbase.renderCursors", html 
+        $('.cursors', @view).innerHTML = html
+        
+            #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
+            # 000       000       000      000       000          000     000  000   000  0000  000
+            # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
+            #      000  000       000      000       000          000     000  000   000  000  0000
+            # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
+    
+    renderSelection: ->
+        h = ""
+        s = @selectionsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
+        if s
+            h += render.selection s, @size
+        $('.selections', @view).innerHTML = h
+
+            # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000
+            # 000   000  000  000        000   000  000      000  000        000   000     000   
+            # 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000   
+            # 000   000  000  000   000  000   000  000      000  000   000  000   000     000   
+            # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000   
+
+    renderHighlights: ->
+        h = ""
+        s = @highlightsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
+        if s
+            h += render.selection s, @size, "highlight"
+        $('.highlights', @view).innerHTML = h
+
+    # 00000000   00000000   0000000  000  0000000  00000000  0000000  
+    # 000   000  000       000       000     000   000       000   000
+    # 0000000    0000000   0000000   000    000    0000000   000   000
+    # 000   000  000            000  000   000     000       000   000
+    # 000   000  00000000  0000000   000  0000000  00000000  0000000  
+    
+    resized: -> 
+        @scroll?.setViewHeight @viewHeight()
+        @emit 'viewHeight', @viewHeight()
+    
+    deltaToEnsureCursorsAreVisible: ->
+        topdelta = 0
+        cl = @cursors[0][1]
+        if cl < @scroll.top + 2
+            topdelta = Math.max(0, cl - 2) - @scroll.top
+        else if cl > @scroll.bot - 4
+            topdelta = Math.min(@lines.length+1, cl + 4) - @scroll.bot
+        
+        botdelta = 0
+        cl = last(@cursors)[1]
+        if cl < @scroll.top + 2
+            botdelta = Math.max(0, cl - 2) - @scroll.top
+        else if cl > @scroll.bot - 4
+            botdelta = Math.min(@lines.length+1, cl + 4) - @scroll.bot
+            
+        if botdelta > 0
+            Math.max botdelta, topdelta
+        else if topdelta < 0
+            Math.min botdelta, topdelta
+        else
+            botdelta
+
+    # 00000000    0000000    0000000
+    # 000   000  000   000  000     
+    # 00000000   000   000  0000000 
+    # 000        000   000       000
+    # 000         0000000   0000000 
+    
+    posForEvent: (event) ->
+        
+        sl = @view.scrollLeft
+        st = @view.scrollTop
+        br = @view.getBoundingClientRect()
+        lx = clamp 0, @view.offsetWidth,  event.clientX - br.left - @size.offsetX
+        ly = clamp 0, @view.offsetHeight, event.clientY - br.top
+        log "viewbase.posForEvent ly:#{ly} clientY:#{event.clientY} br.top: #{br.top} st: #{st}"
+        px = parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth))
+        py = parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @scroll.exposeTop
+        p = [px, Math.min(@lines.length-1, py)]
+        log "viewbase.posForEvent clientY:#{event.clientY} -> line:#{p[1]} col:#{p[0]}"
+        p
+
+    # 000      000  000   000  00000000   0000000
+    # 000      000  0000  000  000       000     
+    # 000      000  000 0 000  0000000   0000000 
+    # 000      000  000  0000  000            000
+    # 0000000  000  000   000  00000000  0000000 
+    
+    viewHeight:      -> @view?.getBoundingClientRect().height 
+    numViewLines:    -> Math.ceil(@viewHeight() / @size.lineHeight)
+    numFullLines:    -> Math.floor(@viewHeight() / @size.lineHeight)
+
+
+    # 00     00   0000000   000   000   0000000  00000000
+    # 000   000  000   000  000   000  000       000     
+    # 000000000  000   000  000   000  0000000   0000000 
+    # 000 0 000  000   000  000   000       000  000     
+    # 000   000   0000000    0000000   0000000   00000000
+
+    initDrag: ->
         @drag = new drag
             target:  @view
             cursor:  'default'
@@ -115,357 +467,6 @@ class ViewBase extends Editor
             @tripleClickLineIndex = range[0]
                         
     onTripleClickDelay: => @doubleClicked = @tripleClicked = false
-
-    # 000       0000000   000   000  00000000  00000000    0000000
-    # 000      000   000   000 000   000       000   000  000     
-    # 000      000000000    00000    0000000   0000000    0000000 
-    # 000      000   000     000     000       000   000       000
-    # 0000000  000   000     000     00000000  000   000  0000000 
-    
-    initLayers: (layerClasses) ->
-        for cls in layerClasses
-            @addLayer cls
-        
-    addLayer: (cls) ->
-        div = document.createElement 'div'
-        div.className = cls
-        @view.appendChild div
-        
-    updateLayers: () ->
-        @renderHighlights()
-        @renderSelection()
-        @renderCursors()
-        
-    #  0000000  00000000  000000000  000000000  00000000  000   000  000000000
-    # 000       000          000        000     000        000 000      000   
-    # 0000000   0000000      000        000     0000000     00000       000   
-    #      000  000          000        000     000        000 000      000   
-    # 0000000   00000000     000        000     00000000  000   000     000   
-
-    setText: (text) -> @setLines text?.split /\n/
-        
-    #  0000000  00000000  000000000  000      000  000   000  00000000   0000000
-    # 000       000          000     000      000  0000  000  000       000     
-    # 0000000   0000000      000     000      000  000 0 000  0000000   0000000 
-    #      000  000          000     000      000  000  0000  000            000
-    # 0000000   00000000     000     0000000  000  000   000  00000000  0000000 
-        
-    setLines: (lines) ->
-        # log "viewbase.setLines lines", lines if @name == 'editor'        
-        @scroll.reset() if lines.length == 0
-        lines ?= ['']
-        super lines
-        @syntax.parse()        
-        # log "viewbase.setLines viewHeight #{@viewHeight()}" if @name == 'editor'
-        @scroll.setViewHeight @viewHeight()
-        # log "viewbase.setLines numLines #{lines.length}" if @name == 'editor'
-        @scroll.setNumLines @lines.length        
-
-    # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
-    # 000       000   000  0000  000     000     000       000     000   000     
-    # 000000    000   000  000 0 000     000     0000000   000    000    0000000 
-    # 000       000   000  000  0000     000          000  000   000     000     
-    # 000        0000000   000   000     000     0000000   000  0000000  00000000
-
-    setFontSize: (fontSize) =>
-        setStyle '.'+@view.className, 'font-size', "#{fontSize}px"
-        @size.numbersWidth = 50
-        @size.fontSize     = fontSize
-        @size.lineHeight   = fontSize + Math.floor(fontSize/6)
-        @size.charWidth    = characterWidth @elem, 'line'
-        @size.offsetX      = Math.floor @size.charWidth/2 + @size.numbersWidth
-        # log "viewbase.setFontSize #{@size.fontSize} #{@size.lineHeight}"
-        
-        @scroll?.setLineHeight @size.lineHeight
-            
-        @emit 'fontSizeChanged'
-
-    # 000   000  000   000  00     00  0000000    00000000  00000000    0000000
-    # 0000  000  000   000  000   000  000   000  000       000   000  000     
-    # 000 0 000  000   000  000000000  0000000    0000000   0000000    0000000 
-    # 000  0000  000   000  000 0 000  000   000  000       000   000       000
-    # 000   000   0000000   000   000  0000000    00000000  000   000  0000000 
-    
-    hideNumbers: ->
-        @size.numbersWidth = 0
-        @size.offsetX      = Math.floor @size.charWidth/2
-        @scroll?.reset()
-
-    # 00000000   00000000  000   000  0000000    00000000  00000000   000      000  000   000  00000000
-    # 000   000  000       0000  000  000   000  000       000   000  000      000  0000  000  000     
-    # 0000000    0000000   000 0 000  000   000  0000000   0000000    000      000  000 0 000  0000000 
-    # 000   000  000       000  0000  000   000  000       000   000  000      000  000  0000  000     
-    # 000   000  00000000  000   000  0000000    00000000  000   000  0000000  000  000   000  00000000
-
-    renderLineAtIndex: (li) -> render.line @lines[li], @syntax.getDiss li
-
-    # 00000000  000   000  00000000    0000000    0000000  00000000
-    # 000        000 000   000   000  000   000  000       000     
-    # 0000000     00000    00000000   000   000  0000000   0000000 
-    # 000        000 000   000        000   000       000  000     
-    # 00000000  000   000  000         0000000   0000000   00000000
-
-    exposeLineAtIndex: (li) =>
-        # log "viewbase.exposeLineAtIndex children #{@elem.children.length}"
-        html = @renderLineAtIndex li
-        # log "viewbase.exposeLineAtIndex #{li} #{html}"
-        # log "viewbase.exposeLineAtIndex #{@lines[li]} #{@lines.length}"
-        lineDiv = @addLine()
-        lineDiv.innerHTML = html
-        @elem.appendChild lineDiv
-        # log "viewbase.exposeLineAtIndex #{li} children #{@elem.children.length}"
-        @emit 'lineExposed', 
-            lineIndex: @elem.children.length # + @scroll.exposeTop 
-            lineDiv: lineDiv
-
-        @renderCursors() if @cursorsInLineAtIndex(li).length
-        @renderSelection() if @rangesForLineIndexInRanges(li, @selections).length
-        @renderHighlights() if @rangesForLineIndexInRanges(li, @highlights).length
-        lineDiv
-    
-    #  0000000   0000000    0000000    000      000  000   000  00000000
-    # 000   000  000   000  000   000  000      000  0000  000  000     
-    # 000000000  000   000  000   000  000      000  000 0 000  0000000 
-    # 000   000  000   000  000   000  000      000  000  0000  000     
-    # 000   000  0000000    0000000    0000000  000  000   000  00000000
-    
-    addLine: ->
-        div = document.createElement 'div'
-        div.className = 'line'
-        div.style.height = "#{@size.lineHeight}px"
-        y = @elem.children.length * @size.lineHeight
-        div.style.transform = "translate(#{@size.offsetX}px,#{y}px)"
-        div    
-    
-    # 000   000   0000000   000   000  000   0000000  000   000
-    # 000   000  000   000  0000  000  000  000       000   000
-    #  000 000   000000000  000 0 000  000  0000000   000000000
-    #    000     000   000  000  0000  000       000  000   000
-    #     0      000   000  000   000  000  0000000   000   000
-    
-    vanishLineAtIndex: (li) =>
-        # log "viewbase.vanishLineAtIndex #{li}"
-        if li < 0
-            li = @elem.children.length-1
-        else if li != @elem.children.length-1
-            log "warning! viewbase.vanishLineAtIndex #{li} expected #{@elem.children.length-1}"
-            return
-            li = @elem.children.length-1
-        @elem.lastChild?.remove()
-        @emit 'lineVanished', 
-            lineIndex: li
-        
-    # 000000000   0000000   00000000    0000000  000   000   0000000   000   000   0000000   00000000
-    #    000     000   000  000   000  000       000   000  000   000  0000  000  000        000     
-    #    000     000   000  00000000   000       000000000  000000000  000 0 000  000  0000  0000000 
-    #    000     000   000  000        000       000   000  000   000  000  0000  000   000  000     
-    #    000      0000000   000         0000000  000   000  000   000  000   000   0000000   00000000
-
-    exposeTopChange: (e) =>
-        # log "viewbase.exposeTopChange #{e.old} -> #{e.new}"
-        
-        num = Math.abs e.num
-
-        for n in [0...num]
-            if e.num < 0
-                @elem.firstChild.remove()
-                li = e.new - (num - n)
-                
-                @emit 'lineVanishedTop', 
-                    lineIndex: li
-                
-            else 
-                div = @addLine()
-                li = e.new + num - n - 1
-                div.innerHTML = @renderLineAtIndex li
-                @elem.insertBefore div, @elem.firstChild
-                
-                @emit 'lineExposedTop', 
-                    lineIndex: li
-                    lineDiv: div
-             
-        @updateLinePositions()
-        @updateLayers()            
-        @emit 'exposeTopChanged', e            
-           
-    # 00000000   00000000  000   000  0000000    00000000  00000000 
-    # 000   000  000       0000  000  000   000  000       000   000
-    # 0000000    0000000   000 0 000  000   000  0000000   0000000  
-    # 000   000  000       000  0000  000   000  000       000   000
-    # 000   000  00000000  000   000  0000000    00000000  000   000
-            
-    #             0000000  000   000  00000000    0000000   0000000   00000000    0000000
-    #            000       000   000  000   000  000       000   000  000   000  000     
-    #            000       000   000  0000000    0000000   000   000  0000000    0000000 
-    #            000       000   000  000   000       000  000   000  000   000       000
-    #             0000000   0000000   000   000  0000000    0000000   000   000  0000000 
-                                        
-    renderCursors: ->
-        # log "viewbase.renderCursors top #{@scroll.top} bot #{@scroll.bot}"
-        cs = @cursorsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
-        # log "viewbase.renderCursors", cs
-        vc = []
-        for c in cs
-            if c[0] > @lines[@scroll.exposeTop+c[1]].length
-                vc.push [@lines[@scroll.exposeTop+c[1]].length, c[1], 'virtual']
-        cs = cs.concat vc
-        # log "viewbase.renderCursors", cs
-        html = render.cursors cs, @size
-        # log "viewbase.renderCursors", html 
-        $('.cursors', @view).innerHTML = html
-        
-    #              0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
-    #             000       000       000      000       000          000     000  000   000  0000  000
-    #             0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
-    #                  000  000       000      000       000          000     000  000   000  000  0000
-    #             0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
-    
-    renderSelection: ->
-        h = ""
-        s = @selectionsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
-        if s
-            h += render.selection s, @size
-        $('.selections', @view).innerHTML = h
-
-    #             000   000  000   0000000   000   000  000      000   0000000   000   000  000000000
-    #             000   000  000  000        000   000  000      000  000        000   000     000   
-    #             000000000  000  000  0000  000000000  000      000  000  0000  000000000     000   
-    #             000   000  000  000   000  000   000  000      000  000   000  000   000     000   
-    #             000   000  000   0000000   000   000  0000000  000   0000000   000   000     000   
-
-    renderHighlights: ->
-        h = ""
-        s = @highlightsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
-        if s
-            h += render.selection s, @size, "highlight"
-        $('.highlights', @view).innerHTML = h
-        
-    # 000   000  00000000   0000000     0000000   000000000  00000000
-    # 000   000  000   000  000   000  000   000     000     000     
-    # 000   000  00000000   000   000  000000000     000     0000000 
-    # 000   000  000        000   000  000   000     000     000     
-    #  0000000   000        0000000    000   000     000     00000000
-
-    done: => @changed @do.changeInfo
-
-    updateLinePositions: () ->
-        y = 0
-        for c in @elem.children
-            c.style.transform = "translate(#{@size.offsetX}px,#{y}px)"
-            y += @size.lineHeight
-
-    # 00000000   00000000   0000000  000  0000000  00000000  0000000  
-    # 000   000  000       000       000     000   000       000   000
-    # 0000000    0000000   0000000   000    000    0000000   000   000
-    # 000   000  000            000  000   000     000       000   000
-    # 000   000  00000000  0000000   000  0000000  00000000  0000000  
-    
-    resized: -> @scroll.setViewHeight @viewHeight()
-    
-    deltaToEnsureCursorsAreVisible: ->
-        topdelta = 0
-        cl = @cursors[0][1]
-        if cl < @scroll.top + 2
-            topdelta = Math.max(0, cl - 2) - @scroll.top
-        else if cl > @scroll.bot - 4
-            topdelta = Math.min(@lines.length+1, cl + 4) - @scroll.bot
-        
-        botdelta = 0
-        cl = last(@cursors)[1]
-        if cl < @scroll.top + 2
-            botdelta = Math.max(0, cl - 2) - @scroll.top
-        else if cl > @scroll.bot - 4
-            botdelta = Math.min(@lines.length+1, cl + 4) - @scroll.bot
-            
-        if botdelta > 0
-            Math.max botdelta, topdelta
-        else if topdelta < 0
-            Math.min botdelta, topdelta
-        else
-            botdelta
-            
-    #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
-    # 000       000   000  000   000  0000  000  000        000       000   000
-    # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
-    # 000       000   000  000   000  000  0000  000   000  000       000   000
-    #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
-    
-    changed: (changeInfo) ->
-
-        @syntax.changed changeInfo
-        indices = []
-        info = _.cloneDeep changeInfo
-        for i in info.changed
-            continue if i < @scroll.exposeTop
-            break if i > @scroll.exposeBot
-            indices.push i
-            
-        if info.inserted.length
-            if info.inserted[0] < @scroll.exposeBot
-                for i in [Math.max(@scroll.exposeTop, info.inserted[0])..@scroll.exposeBot]
-                    indices.push i
-
-        if info.deleted.length
-            if info.deleted[0] < @scroll.exposeBot
-                for i in [Math.max(@scroll.exposeTop, info.deleted[0])..@scroll.exposeBot]
-                    indices.push i
-                                                                                
-        indices.sort (a,b) -> a - b
-        indices = _.sortedUniq indices
-        # log "viewbase.changed indices", indices        
-        for i in indices
-            @updateLine i
-        if changeInfo.cursor.length
-            @renderCursors()
-        if changeInfo.selection.length
-            @renderSelection()   
-                     
-        @renderHighlights()
-    
-    # 000   000  00000000   0000000     0000000   000000000  00000000
-    # 000   000  000   000  000   000  000   000     000     000     
-    # 000   000  00000000   000   000  000000000     000     0000000 
-    # 000   000  000        000   000  000   000     000     000     
-    #  0000000   000        0000000    000   000     000     00000000
-    
-    updateLine: (li) ->
-        if @scroll.exposeTop <= li < @lines.length
-            relIndex = li - @scroll.exposeTop
-            span = @renderLineAtIndex li
-            # log "viewbase.updateLine li #{li} relIndex #{relIndex}"
-            @elem.children[relIndex]?.innerHTML = span
-        else 
-            @vanishLineAtIndex -1            
-
-    # 00000000    0000000    0000000
-    # 000   000  000   000  000     
-    # 00000000   000   000  0000000 
-    # 000        000   000       000
-    # 000         0000000   0000000 
-    
-    posForEvent: (event) ->
-        
-        sl = @view.scrollLeft
-        st = @view.scrollTop
-        br = @view.getBoundingClientRect()
-        lx = clamp 0, @view.offsetWidth,  event.clientX - br.left - @size.offsetX
-        ly = clamp 0, @view.offsetHeight, event.clientY - br.top
-        # log "viewbase.posForEvent ly:#{ly} clientY:#{event.clientY} br.top: #{br.top} st: #{st}"
-        px = parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth))
-        py = parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @scroll.exposeTop
-        p = [px, Math.min(@lines.length-1, py)]
-        # log "viewbase.posForEvent clientY:#{event.clientY} -> line:#{p[1]} col:#{p[0]}"
-        p
-
-    # 000      000  000   000  00000000   0000000
-    # 000      000  0000  000  000       000     
-    # 000      000  000 0 000  0000000   0000000 
-    # 000      000  000  0000  000            000
-    # 0000000  000  000   000  00000000  0000000 
-    
-    viewHeight:      -> @view.getBoundingClientRect().height 
-    numViewLines:    -> Math.ceil(@viewHeight() / @size.lineHeight)
-    numFullLines:    -> Math.floor(@viewHeight() / @size.lineHeight)
         
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

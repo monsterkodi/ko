@@ -11,7 +11,6 @@
     - fix drag speed
     
 - cursors
-    - swap virutal if single cursor!!!
     - remember last cursor
     - highlight last cursor
     - highlight cursor line(s?)

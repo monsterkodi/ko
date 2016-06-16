@@ -11,6 +11,7 @@ $
 }       = require '../tools/tools'
 log     = require '../tools/log'
 profile = require '../tools/profile'
+scroll  = require './scroll'
 Snap    = require 'snapsvg'
 
 class Minimap
@@ -25,49 +26,37 @@ class Minimap
             viewBox:  '0 0 120 0'
 
         @lines = []
-        @top = 0
+        
+        @scroll = new scroll 
+            dbg:        false
+            lineHeight: 2
+            viewHeight: @editor.viewHeight()
+            
+        log 'minimap.scroll', @scroll.info()
+            
+        @scroll.on 'exposeTop',  @exposeTopChange
+        @scroll.on 'exposeLine', @exposeLineAtIndex
+        @scroll.on 'vanishLine', @vanishLineAtIndex     
+        @scroll.on 'scroll',     @updateView
+
+        @editor.on 'viewHeight',    @scroll.setViewHeight
+        @editor.on 'numLines',      @scroll.setNumLines
+        @editor.scroll.on 'scroll', @onEditorScroll
 
         @buffer = @s.rect()
+        @buffer.addClass 'buffer'
         @buffer.attr
             x:         0
             y:         0
             width:    '100%'
-        @buffer.addClass 'buffer'
-
+        
         @topBot = @s.rect()
+        @topBot.addClass 'topBot'
         @topBot.attr
             x:         0
             y:         0
             width:    '100%'
-        @topBot.addClass 'topBot'
                 
-    #  0000000   0000000  00000000    0000000   000      000    
-    # 000       000       000   000  000   000  000      000    
-    # 0000000   000       0000000    000   000  000      000    
-    #      000  000       000   000  000   000  000      000    
-    # 0000000    0000000  000   000   0000000   0000000  0000000
-            
-    scroll: ->
-        # log "minimap.scroll"
-        scroll = @editor.scroll
-        return if scroll.viewHeight <= 0
-        
-        if scroll.numLines > scroll.viewHeight/2 
-            top = Math.max 0, scroll.bot*2 - scroll.viewHeight
-            if top != @top
-                @render top
-                # log 'minimap.scroll.top', @top # check for overlaps?
-        
-        @s.attr
-            viewBox:  "0 0 120 #{scroll.viewHeight}"
-            
-        @buffer.attr
-            height:   scroll.numLines*2
-        
-        @topBot.attr 
-            y:        scroll.top*2
-            height:   Math.max 0, (scroll.bot-scroll.top)*2
-
     # 000      000  000   000  00000000
     # 000      000  0000  000  000     
     # 000      000  000 0 000  0000000 
@@ -77,32 +66,33 @@ class Minimap
     lineForIndex: (li) ->
         t = @editor.lines[li]
         line = @s.group()       
+        y = (li-@scroll.exposeTop)*2
         line.attr
-            transform: "translate(0 #{(li-@top)*2})"
+            transform: "translate(0 #{y})"
          
-        if showSpaces?
-            l = @s.rect()
-            l.attr
-                height: 2
-                x:      0
-                width:  t.length
-            l.addClass 'space'
-            line.add l
+        # if showSpaces?
+        #     l = @s.rect()
+        #     l.attr
+        #         height: 2
+        #         x:      0
+        #         width:  t.length
+        #     l.addClass 'space'
+        #     line.add l
         
         diss = @editor.syntax.getDiss li
         if diss.length
             for r in diss
-                # log 'li', li, r
                 if r.match?
                     continue if r.match.trim().length == 0 # ignore spaces
                 else
-                    log 'warning! no match?', li, r
+                    log 'warning! minimap.lineForIndex no match?', li, r
                     continue
                 c = @s.rect()
                 c.attr
                     height: 2
                     x:      r.start
                     width:  r.match.length
+                                        
                 if r.stack?.length
                     if last(r.stack)?.split?
                         for cls in last(r.stack).split '.'
@@ -110,9 +100,11 @@ class Minimap
                     else
                         log 'warning! minimap.lineForIndex no last(r.stack)?.split? line:', li, 'stack:', r.stack
                 else
-                    log 'warning! no stack?', li, r
+                    log 'warning! minimap.lineForIndex no stack?', li, r
                     c.addClass 'text'
-                line.add c            
+                line.add c 
+        # else
+        #     log 'warning! minimap.lineForIndex no diss?', li, diss
         line
                 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
@@ -134,28 +126,81 @@ class Minimap
                 when 'inserted' 
                     @lines.splice li, 0, @lineForIndex li
                     invalidated = Math.min invalidated, li
-                
-        for li in [invalidated...@lines.length]
-            @lines[li].attr
-                transform: "translate(0 #{li*2})"
-                
-    # 00000000   00000000  000   000  0000000    00000000  00000000 
-    # 000   000  000       0000  000  000   000  000       000   000
-    # 0000000    0000000   000 0 000  000   000  0000000   0000000  
-    # 000   000  000       000  0000  000   000  000       000   000
-    # 000   000  00000000  000   000  0000000    00000000  000   000
+        
+        @updateLinePositions invalidated
     
-    render: (@top=0) ->
-        # profile 'minimap.render'
-        @clear()
-        scroll = @editor.scroll
-        return if scroll.viewHeight <= 0
-        return if scroll.numLines <= 0
-        @bot = Math.min scroll.numLines, @top+scroll.viewHeight/2
-        for li in [@top...@bot]           
-            @lines.push @lineForIndex li                            
-        @scroll()
-        # profile 'minimap.done'
+    # 000000000   0000000   00000000    0000000  000   000   0000000   000   000   0000000   00000000
+    #    000     000   000  000   000  000       000   000  000   000  0000  000  000        000     
+    #    000     000   000  00000000   000       000000000  000000000  000 0 000  000  0000  0000000 
+    #    000     000   000  000        000       000   000  000   000  000  0000  000   000  000     
+    #    000      0000000   000         0000000  000   000  000   000  000   000   0000000   00000000
+    
+    exposeTopChange: (e) =>
+        num = Math.abs e.num
+        for n in [0...num]
+            if e.num < 0
+                lines.shift().remove()
+            else
+                lines.unshift @lineForIndex li
+        @updateLinePositions 0  
+        @updateView()  
+                                
+    # 00000000  000   000  00000000    0000000    0000000  00000000
+    # 000        000 000   000   000  000   000  000       000     
+    # 0000000     00000    00000000   000   000  0000000   0000000 
+    # 000        000 000   000        000   000       000  000     
+    # 00000000  000   000  000         0000000   0000000   00000000
+        
+    exposeLineAtIndex: (li) =>
+        # log 'minimap.exposeLineAtIndex', li
+        @lines.push @lineForIndex li                            
+        @updateView()
+        
+    # 000   000   0000000   000   000  000   0000000  000   000
+    # 000   000  000   000  0000  000  000  000       000   000
+    #  000 000   000000000  000 0 000  000  0000000   000000000
+    #    000     000   000  000  0000  000       000  000   000
+    #     0      000   000  000   000  000  0000000   000   000
+    
+    vanishLineAtIndex: (li) =>
+        # log 'minimap.vanishLineAtIndex', li
+        if li == @lines.length-1
+            @lines.pop().remove()
+        # @updateView()
+    
+    # 000      000  000   000  00000000        00000000    0000000    0000000
+    # 000      000  0000  000  000             000   000  000   000  000     
+    # 000      000  000 0 000  0000000         00000000   000   000  0000000 
+    # 000      000  000  0000  000             000        000   000       000
+    # 0000000  000  000   000  00000000        000         0000000   0000000 
+    
+    updateLinePositions: (start=0) ->
+        for li in [start...@lines.length]
+            @lines[li].attr
+                transform: "translate(0 #{li*2})"    
+
+    # 000   000  00000000   0000000     0000000   000000000  00000000  000   000  000  00000000  000   000
+    # 000   000  000   000  000   000  000   000     000     000       000   000  000  000       000 0 000
+    # 000   000  00000000   000   000  000000000     000     0000000    000 000   000  0000000   000000000
+    # 000   000  000        000   000  000   000     000     000          000     000  000       000   000
+    #  0000000   000        0000000    000   000     000     00000000      0      000  00000000  00     00
+    
+    updateView: =>
+        @s.attr
+             viewBox:  "0 0 120 #{@scroll.viewHeight}"   
+        
+        log 'scroll.viewHeight', @scroll.viewHeight, @scroll.info()     
+        return if @scroll.viewHeight == 0
+                  
+        @buffer.attr
+            height:   @scroll.numLines*2
+        
+        @topBot.attr 
+            y:        @scroll.top*2
+            height:   Math.max 0, (@scroll.exposeBot-@scroll.exposeTop)*2
+    
+    onEditorScroll: (scroll, topOffset) =>
+        # log 'minimap.onEditorScroll', scroll, topOffset
     
     width: -> parseInt getStyle '.minimap', 'width'
     

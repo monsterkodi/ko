@@ -58,6 +58,7 @@ class Numbers
     # 000   000  0000000    0000000    0000000  000  000   000  00000000
     
     addLine: (li) ->
+        # log 'numbers.addLine', li
         div = document.createElement "div"
         div.className = "linenumber"
         pre = document.createElement "span"
@@ -72,7 +73,7 @@ class Numbers
     # 000   000  00000000  000   000   0000000   000   000  0000000    00000000  000   000
         
     renumber: (e) =>
-        li = e.new+1
+        li = e.new # +1
         for e in @elem.children
             e.firstChild.innerHTML = "#{li}"
             li += 1

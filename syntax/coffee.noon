@@ -86,7 +86,7 @@ new\s+(\w+)                    class.callee
 
 # exists?
 
-\S+(\?)                      . syntax.exists
+\S+(\?)                        syntax.exists
 
 # punctuation
 
@@ -132,4 +132,5 @@ __dirname|__filename  keyword
 (?:^|\s+)(#+)([^\{].*|$)     . comment.marker . comment
 
 # salter headers
-^\s*\#\s+([0\s]+)$           . comment.header
+^\s*\#\s+([0\s]+)$             comment.header
+^([0\s]+)$                     comment.header

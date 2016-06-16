@@ -1,8 +1,8 @@
-#00000000  0000000    000  000000000   0000000   00000000 
-#000       000   000  000     000     000   000  000   000
-#0000000   000   000  000     000     000   000  0000000  
-#000       000   000  000     000     000   000  000   000
-#00000000  0000000    000     000      0000000   000   000
+# 00000000  0000000    000  000000000   0000000   00000000 
+# 000       000   000  000     000     000   000  000   000
+# 0000000   000   000  000     000     000   000  0000000  
+# 000       000   000  000     000     000   000  000   000
+# 00000000  0000000    000     000      0000000   000   000
 
 {
 clamp,
@@ -290,6 +290,12 @@ class Editor extends Buffer
         for c in @cursors
             newCursors.push [charPos, c[1]]
         @do.cursors @, newCursors
+        
+    clampCursors: ->
+        newCursors = []
+        for c in @cursors
+            newCursors.push @clampPos c
+        @do.cursors @, newCursors
     
     cursorsAtStartOfSelections: -> @addCursorsForSelections 0
     cursorsAtEndOfSelections: -> @addCursorsForSelections 1
@@ -442,6 +448,7 @@ class Editor extends Buffer
     
     insertUserCharacter: (ch) ->
         @clearHighlights()
+        @clampCursors() # todo: insert spaces instead in multi cursor mode
         if ch in @surroundCharacters #and (@cursor[0] == 0 or @lines[@cursor[1]][@cursor[0]-1] != '\\' )
             @insertSurroundCharacter ch
             return

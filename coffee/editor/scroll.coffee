@@ -16,8 +16,9 @@ class scroll extends events
 
         @lineHeight = cfg.lineHeight ? 0
         @viewHeight = cfg.viewHeight ? 0
-        @exposeMax  = cfg.exposeMax ? -1 # <0: -v * viewLines | 0: unlimited | >0: v * line
+        @exposeMax  = cfg.exposeMax ? -2 # <0: -v * viewLines | 0: unlimited | >0: v * line
         @smooth     = cfg.smooth ? true
+        @dbg        = cfg.dbg
         @init()
         
     # 000  000   000  000  000000000
@@ -35,6 +36,7 @@ class scroll extends events
         @numLines     = 0 # total number of lines in buffer
         @top          = 0 # index of first visible line in view
         @bot          = 0 # index of last  visible line in view
+        @exposed      = 0 # number of currently exposed lines
         @exposeTop    = 0 # index of topmost line in view (always <= @top)
         @exposeBot    = -1 # index of bottom line in view (always >= @bot)
         @calc()
@@ -44,6 +46,12 @@ class scroll extends events
         @scrollMax  = Math.max(0,@fullHeight - @viewHeight + @lineHeight)  # maximum scroll offset (pixels)
         @fullLines  = Math.floor(@viewHeight / @lineHeight)  # number of lines in view (excluding partials)
         @viewLines  = Math.ceil(@viewHeight / @lineHeight)   # number of lines in view (including partials)
+        if @exposeMax < 0
+            @exposeNum = -@exposeMax * @viewLines # maximum size of expose range is viewHeight dependent
+        else
+            @exposeNum = @exposeMax
+        
+        # log "scroll.calc", @ if @dbg
 
     # 000  000   000  00000000   0000000 
     # 000  0000  000  000       000   000
@@ -52,9 +60,9 @@ class scroll extends events
     # 000  000   000  000        0000000 
     
     info: ->
-        topbot: "#{@top} - #{@bot}"
-        expose: "#{@exposeTop} - #{@exposeBot}"
-        scroll: "#{@scroll} offsetTop #{@offsetTop}"
+        topbot: "#{@top} .. #{@bot} = #{@bot-@top} / #{@numLines}"
+        expose: "#{@exposeTop} .. #{@exposeBot} = #{@exposed} / #{@exposeNum}"
+        scroll: "#{@scroll} offsetTop #{@offsetTop} max #{@scrollMax} full #{@fullLines} view #{@viewLines}"
         
     # 00000000   00000000   0000000  00000000  000000000
     # 000   000  000       000       000          000   
@@ -62,14 +70,22 @@ class scroll extends events
     # 000   000  000            000  000          000   
     # 000   000  00000000  0000000   00000000     000   
     
-    reset: ->
+    reset: =>
         # log "scroll.reset"
         while @exposeBot >= 0  
-            # log "scroll.reset vanish #{@exposeBot}"
+            log "scroll.reset emit vanishLine #{@exposeBot}"  if @dbg
             @emit 'vanishLine', @exposeBot
             @exposeBot -= 1
         
         @init()
+
+    # 000000000   0000000 
+    #    000     000   000
+    #    000     000   000
+    #    000     000   000
+    #    000      0000000 
+    
+    to: (p) => @by -@scroll
         
     # 0000000    000   000
     # 000   000   000 000 
@@ -77,12 +93,12 @@ class scroll extends events
     # 000   000     000   
     # 0000000       000   
         
-    by: (delta) -> 
-                        
+    by: (delta) => 
+        # log "scroll.by delta #{delta}", @ if @dbg                
         @scroll = clamp 0, @scrollMax, @scroll+delta
-        
+        # log "scroll.by delta #{delta} scroll #{@scroll} scrollMax #{@scrollMax}" if @dbg
         top = parseInt @scroll / @lineHeight
-        
+        # log "scroll.by delta #{delta} scroll #{@scroll} lineHeight #{@lineHeight}" if @dbg
         @offsetSmooth = @scroll - top * @lineHeight 
 
         @setTop top
@@ -93,9 +109,7 @@ class scroll extends events
         # log "scroll.by delta #{delta} offset #{offset}"
         if offset != @topOffset
             @offsetTop = offset
-            @emit 'scroll', @topOffset
-
-    to: (p) -> @by -@scroll
+            @emit 'scroll', @scroll, @offsetTop
 
     #  0000000  00000000  000000000  000000000   0000000   00000000 
     # 000       000          000        000     000   000  000   000
@@ -103,7 +117,7 @@ class scroll extends events
     #      000  000          000        000     000   000  000      
     # 0000000   00000000     000        000      0000000   000      
             
-    setTop: (top) ->
+    setTop: (top) =>
 
         if top != @top
             # log "scroll.setTop #{@top} -> #{top}"
@@ -115,9 +129,8 @@ class scroll extends events
         if @bot != newBot
             @bot = newBot
             @emit 'bot', @bot
-            @expose()
-        if @exposeBot < 0
-            @expose()
+            
+        @expose()
 
     # 00000000  000   000  00000000    0000000    0000000  00000000
     # 000        000 000   000   000  000   000  000       000     
@@ -125,47 +138,53 @@ class scroll extends events
     # 000        000 000   000        000   000       000  000     
     # 00000000  000   000  000         0000000   0000000   00000000
     
-    expose: ->
-        # log "scroll.expose bot #{@bot} exposeBot #{@exposeBot}"
+    expose: =>
+        # log "scroll.expose start", @info() if @dbg
+        
         while @bot > @exposeBot
-            # log "scroll.expose below #{@bot} < #{@exposeBot}"
             @exposeBot += 1
+            log "scroll.expose emit exposeLine #{@exposeBot}" if @dbg
             @emit 'exposeLine', @exposeBot
+
+        @exposed = @exposeBot - @exposeTop
             
-        @checkExpose()
+        return if @exposeNum == 0 # nothing to expose or vanish if expose range is unlimited
         
-    #  0000000  000   000  00000000   0000000  000   000
-    # 000       000   000  000       000       000  000 
-    # 000       000000000  0000000   000       0000000  
-    # 000       000   000  000       000       000  000 
-    #  0000000  000   000  00000000   0000000  000   000
+        topDiff = @exposeTop - @top
+        botDiff = @exposeBot - @bot
         
-    checkExpose: ->
-        # log "scroll.checkExpose @exposeMax #{@exposeMax}"
-        return if @exposeMax == 0
-        expMax = @exposeMax
-        if expMax < 0
-            expMax = -expMax * @viewLines
-        exposed = @exposeBot - @exposeTop
-        # log "scroll.checkExpose exposeTop #{@exposeTop} exposeBot #{@exposeBot}?"
-        # log "scroll.checkExpose exposed #{exposed} > expMax #{expMax}?"
+        return if (@exposed <= @exposedNum) and (topDiff <= 0) and (botDiff >= 0)
         
         emitNewExposeTop = (newExposeTop) =>
             old = @exposeTop
             @exposeTop = newExposeTop
-            # log "scroll.checkExpose emit exposeTop #{old} -> #{newExposeTop} (num #{-(newExposeTop-old)})"
+            @exposed = @exposeBot - @exposeTop
+            log "scroll.expose emit exposeTop #{old} -> #{@exposeTop} (num #{-(newExposeTop-old)})" if @dbg
             @emit 'exposeTop',
                 old: old
                 new: @exposeTop
                 num: -(newExposeTop-old)
-        
-        if exposed > expMax
-            emitNewExposeTop @exposeBot - expMax
-        else if @top < @exposeTop 
-            emitNewExposeTop @top
-            @vanish()
-            # log "scroll.checkExpose vanished", @info()
-        
+
+        if (@top >= @exposeBot) or (@bot <= @exposeTop) # new range outside, start from scratch
+            
+        # if @exposed > @exposedNum
+        #     vanish() 
+        # 
+        # if (@exposed > @exposedNum) and (@top > @exposeTop)
+        #     n = Math.min @exposedNum - @exposed, @top - @exposeTop
+        #     emitNewExposeTop @exposeTop+n
+        # 
+        # if (@exposed > @exposedNum)
+        #     log "??? scroll.expose @exposed > @exposedNum?", @info()
+        # 
+        # 
+        # else if @top < @exposeTop 
+        #     emitNewExposeTop @top
+        #     @vanish()
+        # else 
+        #     log "??? scroll.expose info:", @info()
+            
+        log "scroll.expose end", @info() if @dbg
     
     # 000   000   0000000   000   000  000   0000000  000   000
     # 000   000  000   000  0000  000  000  000       000   000
@@ -173,12 +192,12 @@ class scroll extends events
     #    000     000   000  000  0000  000       000  000   000
     #     0      000   000  000   000  000  0000000   000   000
         
-    vanish: ->
-        while @bot < @exposeBot    
-            # log "scroll.vanish bot #{@bot} < #{@exposeBot}"
-            # log "scroll.vanish", @info()
+    vanish: =>
+        while @bot < @exposeBot and @exposed > @exposeNum
+            log "scroll.vanish emit vanishLine #{@exposeBot}" if @dbg
             @emit 'vanishLine', @exposeBot
             @exposeBot -= 1
+            @exposed = @exposeBot - @exposeTop
 
     # 000   000  000  00000000  000   000  000   000  00000000  000   0000000   000   000  000000000
     # 000   000  000  000       000 0 000  000   000  000       000  000        000   000     000   
@@ -186,11 +205,11 @@ class scroll extends events
     #    000     000  000       000   000  000   000  000       000  000   000  000   000     000   
     #     0      000  00000000  00     00  000   000  00000000  000   0000000   000   000     000   
 
-    setViewHeight: (h) ->
+    setViewHeight: (h) =>
                     
         if @viewHeight != h
-            # log "scroll.setViewHeight #{@viewHeight} -> #{h}"
-            @viewHeight = h        
+            log "scroll.setViewHeight #{@viewHeight} -> #{h}" if @dbg
+            @viewHeight = h
             @calc()
             @by 0     
             
@@ -200,10 +219,10 @@ class scroll extends events
     # 000  0000  000   000  000 0 000  000      000  000  0000  000            000
     # 000   000   0000000   000   000  0000000  000  000   000  00000000  0000000 
         
-    setNumLines: (n) ->
+    setNumLines: (n) =>
         
         if @numLines != n
-            # log "scroll.setNumLines #{@numLines} -> #{n}"
+            log "scroll.setNumLines #{@numLines} -> #{n}" if @dbg
             @numLines = n
             @fullHeight = @numLines * @lineHeight
             @calc()
@@ -215,10 +234,10 @@ class scroll extends events
     # 000      000  000  0000  000       000   000  000       000  000   000  000   000     000   
     # 0000000  000  000   000  00000000  000   000  00000000  000   0000000   000   000     000   
 
-    setLineHeight: (h) ->
+    setLineHeight: (h) =>
             
         if @lineHeight != h
-            # log "scroll.setLineHeight #{@lineHeight} -> #{h}"
+            log "scroll.setLineHeight #{@lineHeight} -> #{h}" if @dbg
             @lineHeight = h
             @fullHeight = @numLines * @lineHeight
             @calc()

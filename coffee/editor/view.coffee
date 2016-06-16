@@ -28,12 +28,12 @@ class View extends ViewBase
         @fontSizeDefault = 15
         @fontSizeKey     = 'editorFontSize'
 
-        @minimap = new Minimap @
-        
         super viewElem
-
+        
+        @minimap = new Minimap @
         @numbers = new Numbers @
             
+        @scroll.dbg = true
         @scroll.on 'scroll', @updateScrollbar    
         
         @view.style.right = "#{@minimap.width()}px"                
@@ -62,7 +62,7 @@ class View extends ViewBase
                 
         super changeInfo
         
-        @minimap.changed changeInfo
+        @minimap?.changed changeInfo
         
         if changeInfo.deleted.length or changeInfo.inserted.length
             @scroll.setNumLines @lines.length
@@ -93,17 +93,7 @@ class View extends ViewBase
         super file # -> setText -> setLines
 
         @restoreScrollCursorsAndSelections() if file
-                
-    # 000      000  000   000  00000000   0000000
-    # 000      000  0000  000  000       000     
-    # 000      000  000 0 000  0000000   0000000 
-    # 000      000  000  0000  000            000
-    # 0000000  000  000   000  00000000  0000000 
-    
-    setLines: (lines) ->
-        super lines
-        @minimap.render()
-    
+                    
     # 0000000   0000000    0000000   00     00
     #    000   000   000  000   000  000   000
     #   000    000   000  000   000  000000000
@@ -144,8 +134,6 @@ class View extends ViewBase
     # 0000000    0000000  000   000   0000000   0000000  0000000
         
     updateScrollbar: =>
-
-        @minimap?.scroll()
         
         return if not @scrollhandleRight?
         
