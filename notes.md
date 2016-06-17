@@ -36,6 +36,7 @@
     - extend selection to end of line if previous line is fully selected
     
 - editing
+    - cmd-x: cut whole line when no selection
     - fix "'#([{ insert
     - insert newline if pasting fully selected lines
     - indent one level more when inserting newline ...
