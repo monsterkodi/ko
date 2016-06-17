@@ -43,9 +43,11 @@ class scroll extends events
 
     calc: ->
 
-        @scrollMax  = Math.max(0,@fullHeight - @viewHeight + @lineHeight)  # maximum scroll offset (pixels)
+        # @scrollMax  = Math.max(0,@fullHeight - @viewHeight + @lineHeight)  # maximum scroll offset (pixels)
+        @scrollMax  = Math.max(0,@fullHeight - @viewHeight)  # maximum scroll offset (pixels)
         @fullLines  = Math.floor(@viewHeight / @lineHeight)  # number of lines in view (excluding partials)
         @viewLines  = Math.ceil(@viewHeight / @lineHeight)   # number of lines in view (including partials)
+
         if @exposeMax < 0
             @exposeNum = -@exposeMax * @viewLines # maximum size of expose range is viewHeight dependent
         else

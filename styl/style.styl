@@ -377,9 +377,13 @@ body
     width               numbersWidth
     background          rgba(0, 0, 0, 0.5) // this darkens selection
     border-right        thinBorder // 1px solid rgba(100, 100, 100, 0.2)
-    &.selected  
-        color           #f80
-    
+    &.highligd span 
+        color           #666
+    &.selected span 
+        color           #aaa
+    &.cursored span 
+        color           #ff0
+        
 // 00     00  000  000   000  000  00     00   0000000   00000000 
 // 000   000  000  0000  000  000  000   000  000   000  000   000
 // 000000000  000  000 0 000  000  000000000  000000000  00000000 

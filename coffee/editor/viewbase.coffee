@@ -8,8 +8,7 @@ characterWidth,
 setStyle,
 clamp,
 last,
-$
-}         = require '../tools/tools'
+$}        = require '../tools/tools'
 prefs     = require '../tools/prefs'
 drag      = require '../tools/drag'
 keyinfo   = require '../tools/keyinfo'
@@ -184,8 +183,10 @@ class ViewBase extends Editor
             
         if changeInfo.cursor.length
             @renderCursors()
+            @emit 'cursors', changeInfo.cursor
         if changeInfo.selection.length
             @renderSelection()   
+            @emit 'selection', changeInfo.selection
                      
         @renderHighlights()
 
@@ -375,7 +376,7 @@ class ViewBase extends Editor
     
     resized: -> 
         @scroll?.setViewHeight @viewHeight()
-        log "viewbase.resized emit viewHeight #{@viewHeight()}"
+        # log "viewbase.resized emit viewHeight #{@viewHeight()}"
         @emit 'viewHeight', @viewHeight()
     
     deltaToEnsureCursorsAreVisible: ->

@@ -197,6 +197,15 @@ class Minimap
             @lines[li].attr
                 transform: "translate(0 #{li*2})"    
 
+    lineForEvent: (event) ->
+        st = @elem.scrollTop
+        br = @elem.getBoundingClientRect()
+        ly = clamp 0, @elem.offsetHeight, event.clientY - br.top
+        py = parseInt(Math.floor(ly/@scroll.lineHeight)) + @scroll.top
+        li = Math.min(@scroll.numLines-1, py)
+        # log "minimap.lineForEvent #{li}"
+        li
+        
     # 00     00   0000000   000   000   0000000  00000000
     # 000   000  000   000  000   000  000       000     
     # 000000000  000   000  000   000  0000000   0000000 
@@ -213,15 +222,6 @@ class Minimap
         @editor.scrollTo (li-5) * @editor.scroll.lineHeight
         @editor.singleCursorAtPos [0, li+5]
         @editor.focus()
-
-    lineForEvent: (event) ->
-        st = @elem.scrollTop
-        br = @elem.getBoundingClientRect()
-        ly = clamp 0, @elem.offsetHeight, event.clientY - br.top
-        py = parseInt(Math.floor((Math.max(0, st + ly))/@scroll.lineHeight)) + @scroll.exposeTop
-        li = Math.min(@scroll.numLines-1, py)
-        # log "minimap.lineForEvent #{li}"
-        li
                 
     #  0000000   000   000  00000000  0000000    000  000000000   0000000   00000000 
     # 000   000  0000  000  000       000   000  000     000     000   000  000   000
@@ -231,20 +231,16 @@ class Minimap
     
     onEditorScroll: (scroll, topOffset) =>
         # log 'minimap.onEditorScroll', scroll, topOffset
-        topBotHeight = (@editor.scroll.bot-@editor.scroll.top)*2
+        topBotHeight = (@editor.scroll.bot-@editor.scroll.top+1)*2
             
         st = @editor.scroll.top*2
-        fh = @scroll.fullHeight - @scroll.viewHeight
+        # fh = @scroll.fullHeight - @scroll.viewHeight
+        fh = @scroll.scrollMax
             
         if @scroll.fullHeight > @scroll.viewHeight
             tf = (@scroll.viewHeight - topBotHeight)/2
-            if st < tf
-                tp = 0
-            else if st > @scroll.fullHeight - tf
-                tp = @scroll.fullHeight - @scroll.viewHeight
-            else
-                tp = st - tf
-                        
+            tp = clamp 0, fh, st - tf
+            # log "onEditorScroll #{tp} #{tp} #{@scroll.scrollMax}"
             @scroll.to clamp 0, @scroll.scrollMax, tp
 
         @topBot.attr 

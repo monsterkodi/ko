@@ -14,6 +14,7 @@ last
 log    = require '../tools/log'
 assert = require 'assert'
 event  = require 'events'
+_      = require 'lodash'
 
 class Buffer extends event
     
@@ -287,7 +288,42 @@ class Buffer extends event
         r
     
     rangesForCursors: (cs=@cursors) -> ([c[1], [c[0], c[0]]] for c in cs)
+            
+    rangeForLineAtIndex: (i) -> 
+        throw new Error() if i >= @lines.length
+        [i, [0, @lines[i].length]] 
+        
+    rangesForAllLines: -> @rangesForLinesFromTopToBot 0, @lines.length
     
+    rangesForLinesFromTopToBot: (top,bot) -> 
+        r = []
+        ir = [top,bot]
+        for li in [startOf(ir)...endOf(ir)]
+            r.push @rangeForLineAtIndex li
+        r
+    
+    rangesForTextInLineAtIndex: (t, i, opt) ->
+        s = 'i'
+        s = '' if opt?.caseSensitive
+        re = new RegExp t, 'g' + s
+        r = []
+        while (mtch = re.exec(@lines[i])) != null
+            r.push [i, [mtch.index, re.lastIndex]]
+        r
+                    
+    rangesForText: (t, opt) ->
+        t = t.split('\n')[0]
+        r = []
+        for li in [0...@lines.length]
+            r = r.concat @rangesForTextInLineAtIndex t, li, opt
+        r        
+      
+    # 000  000   000        00000000    0000000   000   000   0000000   00000000   0000000
+    # 000  0000  000        000   000  000   000  0000  000  000        000       000     
+    # 000  000 0 000        0000000    000000000  000 0 000  000  0000  0000000   0000000 
+    # 000  000  0000        000   000  000   000  000  0000  000   000  000            000
+    # 000  000   000        000   000  000   000  000   000   0000000   00000000  0000000 
+      
     rangesForLineIndexInRanges: (li, ranges) -> (r for r in ranges when r[0]==li)
     
     rangeAtPosInRanges: (pos, ranges) ->
@@ -313,34 +349,12 @@ class Buffer extends event
             if r[0] == p[1]
                 if r[1][0] == p[0] or r[1][1] == p[0]
                     return r
-        
-    rangeForLineAtIndex: (i) -> 
-        throw new Error() if i >= @lines.length
-        [i, [0, @lines[i].length]] 
-        
-    rangesForAllLines: -> @rangesForLinesFromTopToBot 0, @lines.length
     
-    rangesForLinesFromTopToBot: (top,bot) -> 
-        r = []
-        ir = [top,bot]
-        for li in [startOf(ir)...endOf(ir)]
-            r.push @rangeForLineAtIndex li
-        r
-    
-    rangesForTextInLineAtIndex: (t, i) ->
-        re = new RegExp t, 'g'
-        r = []
-        while (mtch = re.exec(@lines[i])) != null
-            r.push [i, [mtch.index, re.lastIndex]]
-        r
+    rangesFromTopToBotInRanges: (top, bot, ranges) ->
+        (r for r in ranges when top <= r[0] <= bot)
+        
+    sortedLineIndicesInRanges: (ranges) -> _.uniq(s[0] for s in ranges).sort (a,b)->(a-b)
                     
-    rangesForText: (t) ->
-        t = t.split('\n')[0]
-        r = []
-        for li in [0...@lines.length]
-            r = r.concat @rangesForTextInLineAtIndex t, li
-        r        
-                                        
     # 000   000  000   000  000   000   0000000  00000000  0000000    00000 
     # 000   000  0000  000  000   000  000       000       000   000     000
     # 000   000  000 0 000  000   000  0000000   0000000   000   000   000  

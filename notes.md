@@ -1,19 +1,17 @@
 # todo/ideas
 
-- numbers
-    - highlight selected lines
-
 - find
+    - escape dots in search string
     - case insensitive by default!!!
     - optional case sensitive mode
     - scroll find result to top of view!!
 
 - minimap 
-    - fix drag speed
-    - fix max scroll of topBot rect (last line)
+    - shift drag: extend selection
+    - command drag: don't clear selection and dont' single select
+    - more linear scrolling when dragging
     
 - scrollbar
-    - mousedown
     - blue if small, gray if large
 
 - misc    
@@ -26,6 +24,9 @@
     - highlight last cursor
     - highlight cursor line(s?)
     - insert spaces when inserting at virtual cursors
+
+- selection
+    - fix selection after comment lines
 
 - restore cursor and scroll
     - on watcher reload
@@ -47,9 +48,7 @@
 - search in multiple files
 
 - git status in gutter?
-    
-- focus on editor after devTools opened
-        
+            
 - syntax
     - fix md
     - pug, html, js

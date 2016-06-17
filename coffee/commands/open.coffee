@@ -26,14 +26,16 @@ fuzzy   = require 'fuzzy'
 fs      = require 'fs'
 _       = require 'lodash'
 
-fileExtensions = [
-    '.coffee', '.js', 
-    '.styl', '.css'
-    '.pug', '.jade', '.html', 
-    '.md', 
-    '.noon', '.json', 
-    '.sh', '.py'
+fileTypes = [
+    'coffee', 'js', 
+    'styl', 'css'
+    'pug', 'jade', 'html', 
+    'md', 'txt',
+    'noon', 'json', 
+    'cpp', 'h',
+    'sh', 'py'
     ]
+fileExtensions = (".#{e}" for e in fileTypes)    
     
 class Open extends Command
 
@@ -77,7 +79,13 @@ class Open extends Command
             @listFiles @files
         
         @select 0
-        
+
+    # 000      000   0000000  000000000
+    # 000      000  000          000   
+    # 000      000  0000000      000   
+    # 000      000       000     000   
+    # 0000000  000  0000000      000   
+
     showList: ->
         @list?.remove()
         @list = document.createElement 'div'
@@ -85,7 +93,23 @@ class Open extends Command
         @list.style.top = window.split.editHandle.style.top
         window.split.elem.appendChild @list 
         @listFiles @files
-        
+            
+    listFiles: (files) ->
+        @list.innerHTML = ""        
+        if files.length == 0
+            @list.style.display = 'none'
+        else
+            @list.style.display = 'unset'
+            index = 0
+            for file in files
+                div = document.createElement 'div'
+                div.className = 'list-file'
+                div.innerHTML = render.line file, syntax.dissForTextAndSyntax file, 'ko'
+                div.setAttribute "onclick", "window.openFileAtIndex(#{index});"
+                @list.appendChild div
+                div.value = file
+                index += 1
+                
     # 00000000   00000000   00000000  000   000
     # 000   000  000   000  000       000   000
     # 00000000   0000000    0000000    000 000 
@@ -295,29 +319,7 @@ class Open extends Command
             resolve p
         else
             resolve path.join @dir, p
-    
-    # 000      000   0000000  000000000
-    # 000      000  000          000   
-    # 000      000  0000000      000   
-    # 000      000       000     000   
-    # 0000000  000  0000000      000   
-            
-    listFiles: (files) ->
-        @list.innerHTML = ""        
-        if files.length == 0
-            @list.style.display = 'none'
-        else
-            @list.style.display = 'unset'
-            index = 0
-            for file in files
-                div = document.createElement 'div'
-                div.className = 'list-file'
-                div.innerHTML = render.line file, syntax.dissForTextAndSyntax file, 'ko'
-                div.setAttribute "onclick", "window.openFileAtIndex(#{index});"
-                @list.appendChild div
-                div.value = file
-                index += 1
-    
+        
     # 000   000  000  0000000    00000000
     # 000   000  000  000   000  000     
     # 000000000  000  000   000  0000000 

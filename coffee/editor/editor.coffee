@@ -177,23 +177,26 @@ class Editor extends Buffer
     # 000   000  000  000   000  000   000  000      000  000   000  000   000     000   
     # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000   
 
-    highlightText: (text) -> # called from find command
-        @highlights = @rangesForText text
+    highlightText: (text, opt) -> # called from find command
+        @highlights = @rangesForText text, opt
         if @highlights.length
             r = @rangeAfterPosInRanges @cursorPos(), @highlights
             r ?= first @highlights
             @selectSingleRange r
         @renderHighlights()
+        @emit 'highlight', @highlights
 
     highlightTextOfSelectionOrWordAtCursor: -> # called from keyboard shortcuts
         if @selections.length == 0 # or @selections.length > 1 ?
             @selectSingleRange @rangeForWordAtPos @cursorPos()
         @highlights = @rangesForText @textInRange @selections[0]
         @renderHighlights()
+        @emit 'highlight', @highlights
 
     clearHighlights: ->
         @highlights = []
         @renderHighlights()
+        @emit 'highlight', @highlights
 
     selectAllHighlights: ->
         if not @posInHighlights @cursorPos()
@@ -319,7 +322,8 @@ class Editor extends Buffer
     cancelCursorsAndHighlights: () ->
         @cancelCursors()
         @highlights = []
-        @renderHighlights()            
+        @renderHighlights()
+        @emit 'highlights', @highlights
 
     # 00     00   0000000   000   000  00000000
     # 000   000  000   000  000   000  000     

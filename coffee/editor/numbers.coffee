@@ -8,8 +8,9 @@ setStyle,
 first,
 last,
 $
-}        = require '../tools/tools'
-log      = require '../tools/log'
+}   = require '../tools/tools'
+log = require '../tools/log'
+_   = require 'lodash'
 
 class Numbers
 
@@ -23,7 +24,44 @@ class Numbers
         @editor.on 'lineVanishedTop',  @onLineVanishedTop
         @editor.on 'exposeTopChanged', @renumber
         @editor.on 'fontSizeChanged',  @onFontSizeChange
+        @editor.on 'highlight',        @onSelectionOrCursors
+        @editor.on 'selection',        @onSelectionOrCursors
+        @editor.on 'cursors',          @onSelectionOrCursors
         @onFontSizeChange()
+    
+    #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
+    # 000       000       000      000       000          000     000  000   000  0000  000
+    # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
+    #      000  000       000      000       000          000     000  000   000  000  0000
+    # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
+       
+    onSelectionOrCursors: =>
+        top = @editor.scroll.exposeTop
+        bot = @editor.scroll.exposeBot
+        sr = @editor.rangesFromTopToBotInRanges top, bot, @editor.selections
+        hr = @editor.rangesFromTopToBotInRanges top, bot, @editor.highlights        
+        cr = @editor.rangesFromTopToBotInRanges top, bot, @editor.rangesForCursors()
+        hi = @editor.sortedLineIndicesInRanges hr
+        si = @editor.sortedLineIndicesInRanges sr
+        ci = @editor.sortedLineIndicesInRanges cr
+        li = top
+        for child in @elem.children
+            if li in ci
+                cls = 'cursored'
+            else if li in si
+                cls = 'selected'
+            else if li in hi
+                cls = 'highligd'
+            else
+                cls = ''
+            li += 1
+            child.className = 'linenumber ' + cls
+       
+    # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
+    # 000       000   000  0000  000     000     000       000     000   000     
+    # 000000    000   000  000 0 000     000     0000000   000    000    0000000 
+    # 000       000   000  000  0000     000          000  000   000     000     
+    # 000        0000000   000   000     000     0000000   000  0000000  00000000
         
     onFontSizeChange: => 
         @elem.style.lineHeight = "#{@editor.size.lineHeight}px"        

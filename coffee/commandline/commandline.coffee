@@ -86,9 +86,13 @@ class Commandline extends ViewBase
     # 000   000  00000000     000   
 
     globalModKeyComboEvent: (mod, key, combo, event) ->
-        for n,c of @commands
+        log "combo #{combo}", combo
+        for n,c of @commands            
+            log "------ #{n} #{(">#{s}<" for s in c.shortcuts)}"        
             if combo == 'esc' then return @cancel()
-            if combo in c.shortcuts then return  @startCommand n, combo
+            for sc in c.shortcuts
+                log "|#{sc}| <> |#{combo}| #{String(sc) == String(combo)}"
+                if sc == combo then return @startCommand n, combo                
         return 'unhandled'            
 
     handleModKeyComboEvent: (mod, key, combo, event) ->

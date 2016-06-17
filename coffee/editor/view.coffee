@@ -5,10 +5,10 @@
 #     0      000  00000000  00     00
 
 {
-clamp,$,
 unresolve,
 getStyle,
-}         = require '../tools/tools'
+clamp,
+$}        = require '../tools/tools'
 log       = require '../tools/log'
 drag      = require '../tools/drag'
 keyinfo   = require '../tools/keyinfo'
@@ -40,12 +40,12 @@ class View extends ViewBase
 
         @scrollhandleLeft = $('.scrollhandle.left', @view.parentElement)
         @scrollbarLeft = $('.scrollbar.left', @view.parentElement)
-
         @smoothScrolling = true
         @scrollbarDrag = new drag 
-            target: @scrollbarLeft
-            onMove: @onScrollDrag 
-            cursor: 'ns-resize'
+            target:  @scrollbarLeft
+            onStart: @onScrollStart
+            onMove:  @onScrollDrag 
+            cursor:  'ns-resize'
 
         @minimap.elem.addEventListener 'wheel', @onWheel
         @scrollbarLeft.addEventListener 'wheel', @onWheel
@@ -178,6 +178,13 @@ class View extends ViewBase
             
     onWheel: (event) => 
         @scrollBy event.deltaY * @scrollFactor event
+        
+    onScrollStart: (drag, event) =>
+        br = @scrollbarLeft.getBoundingClientRect()
+        sy = clamp 0, @scroll.viewHeight, event.clientY - br.top
+        ln = parseInt @scroll.numLines * sy/@scroll.viewHeight
+        ly = (ln - @scroll.viewLines / 2) * @scroll.lineHeight
+        @scrollTo ly
         
     onScrollDrag: (drag) =>
         delta = (drag.delta.y / (@scroll.viewLines * @scroll.lineHeight)) * @lines.length * @size.lineHeight

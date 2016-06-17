@@ -11,16 +11,25 @@ class Find extends Command
 
     constructor: ->
         
-        @shortcuts = ['command+f']
-        
+        @shortcuts = ["command+f", "command+shift+f"]
+        @caseSensitive = false
         super
+        
+    start: (combo) ->
+        @caseSensitive = @combo == @shortcuts[1]
+        
+        if @caseSensitive
+            @setName "Find"
+            
+        super combo
         
     execute: (command) ->
         
         super command
         
         editor = window.editor
-        editor.highlightText command
+        editor.highlightText command, 
+            caseSensitive: @caseSensitive
         if editor.highlights.length
             focus: 'editor' 
         
