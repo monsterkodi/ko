@@ -3,7 +3,6 @@
 #  000 000   000  0000000   000000000
 #    000     000  000       000   000
 #     0      000  00000000  00     00
-
 {
 unresolve,
 getStyle,
@@ -30,6 +29,7 @@ class View extends ViewBase
 
         super viewElem
         
+        @do.dbg = true
         @minimap = new Minimap @
         @numbers = new Numbers @
             

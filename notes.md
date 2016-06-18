@@ -1,14 +1,15 @@
 # todo/ideas
 
-- find
-    - escape dots in search string
-    - case insensitive by default!!!
-    - optional case sensitive mode
-    - scroll find result to top of view!!
+- fix "'#([{ insert
 
+- find
+    - search in multiple files!!!
+    - escape dots in search string
+    - scroll find result to top of view!!
+    
 - minimap 
     - shift drag: extend selection
-    - command drag: don't clear selection and dont' single select
+    - command drag: don't clear selection and don't single select
     - more linear scrolling when dragging
     
 - scrollbar
@@ -18,6 +19,9 @@
     - command-enter: deselect, insert newline, indent, and single cursor
     - comment line characters per filetype    
     - remember scroll positions per file
+    
+- log 
+    - use editor (without minimap?)
     
 - cursors
     - remember last cursor
@@ -36,8 +40,6 @@
     - extend selection to end of line if previous line is fully selected
     
 - editing
-    - cmd-x: cut whole line when no selection
-    - fix "'#([{ insert
     - insert newline if pasting fully selected lines
     - indent one level more when inserting newline ...
         - after =>, -> 
@@ -46,7 +48,6 @@
     - dbg "class.method arg: #{arg}, ..."
 
 - history of file locations
-- search in multiple files
 
 - git status in gutter?
             

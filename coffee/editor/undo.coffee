@@ -173,22 +173,6 @@ class undo
         obj.cursors = action.curBefore if action.curBefore?
         @changeInfoCursor obj
         
-    # 000       0000000    0000000  000000000
-    # 000      000   000  000          000   
-    # 000      000000000  0000000      000   
-    # 000      000   000       000     000   
-    # 0000000  000   000  0000000      000   
-    
-    lastAction: ->
-        if @actions.length == 0
-            @actions.push
-                selBefore: []
-                selAfter:  []
-                curBefore: [[0,0]]
-                curAfter:  [[0,0]]
-                lines:     []
-        return @actions[@actions.length-1]
-        
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000
     # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
@@ -218,11 +202,28 @@ class undo
         if newCursors.length != obj.cursors.length
             obj.initialCursors = _.cloneDeep newCursors
         @changeInfoCursor obj
-        @lastAction().curAfter = newCursors
+        @lastAction().curBefore = _.cloneDeep newCursors if not @actions.length
+        @lastAction().curAfter  = _.cloneDeep newCursors
         obj.cursors = newCursors
         @changeInfoCursor obj
         @check()
+
+    # 000       0000000    0000000  000000000
+    # 000      000   000  000          000   
+    # 000      000000000  0000000      000   
+    # 000      000   000       000     000   
+    # 0000000  000   000  0000000      000   
     
+    lastAction: ->
+        if @actions.length == 0
+            @actions.push
+                selBefore: []
+                selAfter:  []
+                curBefore: [[0,0]]
+                curAfter:  [[0,0]]
+                lines:     []
+        return @actions[@actions.length-1]
+            
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
     # 0000000      000     000000000  0000000       000   
@@ -232,7 +233,7 @@ class undo
     start: -> 
         @groupCount += 1
         if @groupCount == 1
-            a = @lastAction()
+            a = @lastAction()            
             @actions.push 
                 selBefore: clone a.selAfter
                 curBefore: clone a.curAfter
@@ -334,10 +335,11 @@ class undo
     # 000 0 000  000       000   000  000   000  000     
     # 000   000  00000000  000   000   0000000   00000000
     
-    merge: ->
+    merge: ->        
+        # log "\nundo.merge before", @actions
         while @actions.length >= 2
-            a = last @actions
             b = @actions[@actions.length-2]
+            a = last @actions
             if a.lines.length == 0 
                 @actions.pop()
                 b.selAfter = a.selAfter
@@ -345,9 +347,11 @@ class undo
             else if a.lines.length == b.lines.length
                 sameLines = true
                 for i in [0...a.lines.length]
-                    if a.lines[i].index != b.lines[i].index
-                        sameLines = false
-                        break
+                    if a.lines[i].index != b.lines[i].index or 
+                        not a.lines[i].after or
+                            not b.lines[i].after
+                                sameLines = false
+                                break                    
                 if sameLines
                     @actions.pop()
                     b.selAfter = a.selAfter
@@ -358,5 +362,6 @@ class undo
                     break
             else
                 break
-
+        # log "\nundo.merge merged", @actions
+        
 module.exports = undo

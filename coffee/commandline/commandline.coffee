@@ -4,7 +4,6 @@
 # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 
 # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
-
 {
 $,fileList
 }         = require '../tools/tools'
@@ -49,9 +48,7 @@ class Commandline extends ViewBase
             @command?.changed @lines[0]
         
     loadCommands: ->
-        
         files = fileList "#{__dirname}/../commands"
-        
         for file in files
             commandClass = require file
             @commands[commandClass.name.toLowerCase()] = new commandClass @
@@ -86,12 +83,9 @@ class Commandline extends ViewBase
     # 000   000  00000000     000   
 
     globalModKeyComboEvent: (mod, key, combo, event) ->
-        log "combo #{combo}", combo
         for n,c of @commands            
-            log "------ #{n} #{(">#{s}<" for s in c.shortcuts)}"        
             if combo == 'esc' then return @cancel()
             for sc in c.shortcuts
-                log "|#{sc}| <> |#{combo}| #{String(sc) == String(combo)}"
                 if sc == combo then return @startCommand n, combo                
         return 'unhandled'            
 

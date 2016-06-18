@@ -234,7 +234,7 @@ class ViewBase extends Editor
                 lineIndex: li
         else
             log "warning! viewbase.vanishLine wrong line index? li: #{li} children: #{@elem.children.length}"
-        
+
     # 00000000  000   000  00000000    0000000    0000000  00000000  000000000   0000000   00000000 
     # 000        000 000   000   000  000   000  000       000          000     000   000  000   000
     # 0000000     00000    00000000   000   000  0000000   0000000      000     000   000  00000000 
@@ -267,17 +267,7 @@ class ViewBase extends Editor
         @updateLinePositions()
         @updateLayers()            
         @emit 'exposeTopChanged', e            
-        
-    #  0000000  000      00000000   0000000   00000000 
-    # 000       000      000       000   000  000   000
-    # 000       000      0000000   000000000  0000000  
-    # 000       000      000       000   000  000   000
-    #  0000000  0000000  00000000  000   000  000   000
-    
-    clearLines: => 
-        @elem.innerHTML = ""
-        @emit 'clearLines'
-                   
+                           
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     
     # 000   000  00000000   000   000  000000000     000     0000000 
@@ -292,12 +282,6 @@ class ViewBase extends Editor
             c.style.transform = "translate(#{@size.offsetX}px,#{y}px)"
             y += @size.lineHeight
                 
-    # 000   000  00000000   0000000     0000000   000000000  00000000
-    # 000   000  000   000  000   000  000   000     000     000     
-    # 000   000  00000000   000   000  000000000     000     0000000 
-    # 000   000  000        000   000  000   000     000     000     
-    #  0000000   000        0000000    000   000     000     00000000
-    
     updateLine: (li) ->
         if @scroll.exposeTop <= li < @lines.length
             relIndex = li - @scroll.exposeTop
@@ -314,13 +298,7 @@ class ViewBase extends Editor
     # 000   000  00000000  000   000  0000000    00000000  000   000
             
     renderLineAtIndex: (li) -> render.line @lines[li], @syntax.getDiss li
-            
-            #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
-            # 000       000   000  000   000  000       000   000  000   000  000     
-            # 000       000   000  0000000    0000000   000   000  0000000    0000000 
-            # 000       000   000  000   000       000  000   000  000   000       000
-            #  0000000   0000000   000   000  0000000    0000000   000   000  0000000 
-                                        
+                                                    
     renderCursors: ->
         # log "viewbase.renderCursors top #{@scroll.top} bot #{@scroll.bot}"
         cs = @cursorsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
@@ -341,25 +319,13 @@ class ViewBase extends Editor
         html = render.cursors cs, @size
         # log "viewbase.renderCursors", html 
         $('.cursors', @view).innerHTML = html
-        
-            #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
-            # 000       000       000      000       000          000     000  000   000  0000  000
-            # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
-            #      000  000       000      000       000          000     000  000   000  000  0000
-            # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
-    
+            
     renderSelection: ->
         h = ""
         s = @selectionsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
         if s
             h += render.selection s, @size
         $('.selections', @view).innerHTML = h
-
-            # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000
-            # 000   000  000  000        000   000  000      000  000        000   000     000   
-            # 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000   
-            # 000   000  000  000   000  000   000  000      000  000   000  000   000     000   
-            # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000   
 
     renderHighlights: ->
         h = ""
@@ -430,6 +396,10 @@ class ViewBase extends Editor
     viewHeight:      -> @view?.getBoundingClientRect().height 
     numViewLines:    -> Math.ceil(@viewHeight() / @size.lineHeight)
     numFullLines:    -> Math.floor(@viewHeight() / @size.lineHeight)
+    
+    clearLines: => 
+        @elem.innerHTML = ""
+        @emit 'clearLines'
 
     focus: -> @view.focus()
 
@@ -521,9 +491,11 @@ class ViewBase extends Editor
             when 'delete', 'ctrl+backspace' then return @deleteForward()     
             when 'backspace'                then return @deleteBackward()     
             when 'command+v'                then return @insertText clipboard.readText()
-            when 'command+x'                 
+            when 'command+x'   
+                @do.start()
                 clipboard.writeText @textOfSelectionForClipboard()
                 @deleteSelection()
+                @do.end()
                 return
 
         return if mod and not key?.length

@@ -3,7 +3,6 @@
 # 000       000   000  000000000  000000000  000000000  000 0 000  000   000
 # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
-
 {
 clamp
 }   = require '../tools/tools'
@@ -13,7 +12,6 @@ _   = require 'lodash'
 class Command
 
     constructor: (@commandline) ->
-    
         @index = 0
         @history = ['']
         
@@ -23,8 +21,7 @@ class Command
         
     current: -> @history[@index]
         
-    execute: (command) ->
-    
+    execute: (command) ->    
         _.pull @history, command
         @history.push command
         @index = @history.length-1

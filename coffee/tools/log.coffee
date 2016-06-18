@@ -4,7 +4,7 @@
 #000      000   000  000   000
 #0000000   0000000    0000000 
 
-str  = require './str'
+str    = require './str'
 
 log = -> 
     console.log (str(s) for s in [].slice.call arguments, 0).join " "
@@ -12,11 +12,14 @@ log = ->
 logScroll = -> 
     s = (str(s) for s in [].slice.call arguments, 0).join " "
     console.log s
-    tools = require './tools'
-    div = document.createElement 'pre'
-    div.className = 'logline'
-    div.innerHTML = s.trim()
-    tools.$('.logview').appendChild div
+    tools  = require './tools'
+    encode = require './encode'
+    enspce = require './enspce'
+    for l in s.split '\n' 
+        div = document.createElement 'div'
+        div.className = 'logline'
+        div.innerHTML = encode l
+        tools.$('.logview').appendChild div
     div.scrollIntoViewIfNeeded()
 
 if window?

@@ -148,7 +148,7 @@ class Minimap
         num = Math.abs e.num
         for n in [0...num]
             if e.num < 0
-                lines.shift().remove()
+                lines.shift()?.remove()
             else
                 lines.unshift @lineForIndex li
         @updateLinePositions 0  

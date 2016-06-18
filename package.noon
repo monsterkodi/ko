@@ -47,11 +47,11 @@ build
                       y     70
                       type  file
 devDependencies
-                electron-builder  ^4.2.0
-                electron-prebuilt  ^1.2.1
+                electron-builder  ^5.4.2
+                electron-prebuilt  ^1.2.3
 dependencies
                 ansi-keycode    0.0.0
-                chokidar        ^1.5.1
+                chokidar        ^1.5.2
                 coffee-script   ^1.10.0
                 colors          ^1.1.2
                 fuzzy           ^0.1.1

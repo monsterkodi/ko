@@ -3,13 +3,11 @@
 # 0000000   000   000  000     000     000   000  0000000  
 # 000       000   000  000     000     000   000  000   000
 # 00000000  0000000    000     000      0000000   000   000
-
 {
 clamp,
 first,
 last,
-$
-}       = require '../tools/tools'
+$}      = require '../tools/tools'
 log     = require '../tools/log'
 watcher = require './watcher'
 Buffer  = require './buffer'
@@ -27,6 +25,7 @@ class Editor extends Buffer
         @indentString = _.padStart "", 4
         @watch = null
         @do = new undo @done
+        @dbg = false
         super
 
     # 00000000  000  000      00000000
@@ -90,7 +89,7 @@ class Editor extends Buffer
         if e and not @initialCursors
             @initialCursors = _.cloneDeep @cursors
             @do.selections @, @rangesForCursors @initialCursors
-        if not e
+        if not e and @do.actions.length
             @do.selections @, []
             
     endSelection: (e) ->
@@ -113,6 +112,13 @@ class Editor extends Buffer
                     
             # newSelection = @cleanRanges newSelection
             @do.selections @, newSelection
+
+    textOfSelectionForClipboard: -> 
+        @selectMoreLines() if @selections.length == 0
+        t = []
+        for s in @selections
+            t.push @textInRange s
+        t.join '\n'
 
     #  0000000   0000000    0000000    00000000    0000000   000   000   0000000   00000000
     # 000   000  000   000  000   000  000   000  000   000  0000  000  000        000     
@@ -183,8 +189,9 @@ class Editor extends Buffer
             r = @rangeAfterPosInRanges @cursorPos(), @highlights
             r ?= first @highlights
             @selectSingleRange r
-        @renderHighlights()
-        @emit 'highlight', @highlights
+            
+            @renderHighlights()
+            @emit 'highlight', @highlights
 
     highlightTextOfSelectionOrWordAtCursor: -> # called from keyboard shortcuts
         if @selections.length == 0 # or @selections.length > 1 ?

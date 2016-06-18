@@ -11,16 +11,14 @@ class Find extends Command
 
     constructor: ->
         
-        @shortcuts = ["command+f", "command+shift+f"]
+        @shortcuts = ["command+f", "command+alt+f", "command+shift+f"]
         @caseSensitive = false
         super
         
     start: (combo) ->
-        @caseSensitive = @combo == @shortcuts[1]
-        
-        if @caseSensitive
-            @setName "Find"
-            
+        @caseSensitive = combo == @shortcuts[1]
+        @setName "Find" if @caseSensitive
+        @setName "Search" if combo == @shortcuts[2]
         super combo
         
     execute: (command) ->
