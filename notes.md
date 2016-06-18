@@ -1,10 +1,8 @@
 # todo/ideas
 
-- fix "'#([{ insert
-
 - find
-    - search in multiple files!!!
-    - escape dots in search string
+    - "search" in "multiple" files!!!
+    - escape dots in "search" string
     - scroll find result to top of view!!
     
 - minimap 

@@ -493,27 +493,30 @@ class Editor extends Buffer
         
     insertSurroundCharacter: (ch) ->
         @do.start()
-        
+        # log "editor.insertSurroundCharacter #{ch}"
         if @selections.length
-            # log 'surround selection', ch, @selection
-            for r in @selectionsInLineIndexRange [0,@lines.length-1]
+            newSelections = _.cloneDeep @selections
+            for s in @selections
                 [cl,cr] = switch ch
                     when "[", "]" then ["[", "]"]
                     when "{", "}" then ["{", "}"]
                     when "(", ")" then ["(", ")"]
                     when "'"      then ["'", "'"]
                     when '"'      then ['"', '"']
-                @do.change @lines, r[0], @lines[r[0]].splice r[1][1], 0, cr
-                @do.change @lines, r[0], @lines[r[0]].splice r[1][0], 0, cl                
+                @do.change @lines, s[0], @lines[s[0]].splice s[1][1], 0, cr
+                @do.change @lines, s[0], @lines[s[0]].splice s[1][0], 0, cl
+                newSelections[@indexOfSelection s][1][0] += 1
+                newSelections[@indexOfSelection s][1][1] += 1
+            @do.selections @, newSelections
             @setCursorPos @cursors[0], [@cursors[0][0]+2, @cursors[0][1]]
         else
             if @closingInserted == ch
                 @closingInserted = null
-                @moveCursorRight()
+                @moveCursorsRight()
             else
                 for c in @cursors
                     @do.change @lines, c[1], @lines[c[1]].splice c[0], 0, ch
-                    c2 = switch c
+                    c2 = switch ch
                         when '"' then '"'
                         when "'" then "'"
                         when "[" then "]"
