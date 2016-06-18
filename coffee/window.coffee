@@ -94,7 +94,7 @@ ipc.on 'setWinID', (event, id) =>
     # log "setWinID: ", id
     window.split = new split id
     window.split.on 'paneHeight', (e) ->
-        log "window.on.split.paneHeight", e
+        # log "window.on.split.paneHeight", e
         if e.paneIndex == 2
             window.editor?.resized()
         if e.paneIndex == 3

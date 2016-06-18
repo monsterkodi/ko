@@ -10,7 +10,7 @@ editorFontSize        = 16px
 selectionRadius       = round(editorFontSize / 3)
 selectionRadiusCursor = round(selectionRadius / 2)
 
-scrollFontSize        = 16px
+pinboardFontSize      = 15px
 scrollbarWidth        = 12px // transparent scroll area
 scrollhandleWidth     = 6px
 numbersWidth          = 50px
@@ -211,14 +211,14 @@ body
     &.right
         right           0    
 
-//  0000000   0000000  00000000    0000000   000      000    
-// 000       000       000   000  000   000  000      000    
-// 0000000   000       0000000    000   000  000      000    
-//      000  000       000   000  000   000  000      000    
-// 0000000    0000000  000   000   0000000   0000000  0000000
+// 00000000   000  000   000  0000000     0000000    0000000   00000000   0000000  
+// 000   000  000  0000  000  000   000  000   000  000   000  000   000  000   000
+// 00000000   000  000 0 000  0000000    000   000  000000000  0000000    000   000
+// 000        000  000  0000  000   000  000   000  000   000  000   000  000   000
+// 000        000  000   000  0000000     0000000   000   000  000   000  0000000  
         
-#scroll
-    font-size           scrollFontSize  
+.pinboard
+    font-size           pinboardFontSize  
     font-family         "Andale Mono", monospace
     fill-abs()
     overflow            auto

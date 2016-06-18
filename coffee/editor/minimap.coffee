@@ -6,8 +6,7 @@
 {
 getStyle,
 clamp,
-last,
-$}      = require '../tools/tools'
+last}   = require '../tools/tools'
 log     = require '../tools/log'
 drag    = require '../tools/drag'
 profile = require '../tools/profile'
@@ -17,17 +16,20 @@ Snap    = require 'snapsvg'
 class Minimap
 
     constructor: (@editor) ->
-        
-        @elem = $(".minimap", @editor.view.parentElement)
-        @elem.onmousedown = @onClick
-        
-        @editor.view.style.right = "#{@width()}px"
-        @elem.addEventListener 'wheel', @editor.scrollbar?.onWheel
-        
-        @s = Snap @elem # ".minimap"
+                
+        @s = Snap()
         @s.attr
+            class:    'minimap'
             overflow: 'hidden'
             viewBox:  '0 0 120 0'
+            
+        @elem = @s.node        
+        @elem.className = 'minimap'
+        @elem.onmousedown = @onClick
+        @elem.addEventListener 'wheel', @editor.scrollbar?.onWheel
+
+        @editor.view.style.right = "#{@width()}px"
+        @editor.view.parentElement.appendChild @elem
 
         @lines = []
         
@@ -67,7 +69,7 @@ class Minimap
             x:         0
             y:         0
             width:    '100%'
-                
+            
     # 000      000  000   000  00000000
     # 000      000  0000  000  000     
     # 000      000  000 0 000  0000000 
@@ -80,15 +82,6 @@ class Minimap
         line.attr
             transform: "translate(0 #{li*2})"
          
-        # if showSpaces?
-        #     l = @s.rect()
-        #     l.attr
-        #         height: 2
-        #         x:      0
-        #         width:  t.length
-        #     l.addClass 'space'
-        #     line.add l
-        
         diss = @editor.syntax.getDiss li
         if diss.length
             for r in diss
@@ -113,8 +106,6 @@ class Minimap
                     log 'warning! minimap.lineForIndex no stack?', li, r
                     c.addClass 'text'
                 line.add c 
-        # else
-        #     log 'warning! minimap.lineForIndex no diss?', li, diss
         line
                 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
@@ -236,13 +227,11 @@ class Minimap
         topBotHeight = (@editor.scroll.bot-@editor.scroll.top+1)*2
             
         st = @editor.scroll.top*2
-        # fh = @scroll.fullHeight - @scroll.viewHeight
         fh = @scroll.scrollMax
             
         if @scroll.fullHeight > @scroll.viewHeight
             tf = (@scroll.viewHeight - topBotHeight)/2
             tp = clamp 0, fh, st - tf
-            # log "onEditorScroll #{tp} #{tp} #{@scroll.scrollMax}"
             @scroll.to clamp 0, @scroll.scrollMax, tp
 
         @topBot.attr 
@@ -278,7 +267,6 @@ class Minimap
     #  0000000  0000000  00000000  000   000  000   000
     
     clear: =>
-        log 'minimap.clear'
         for l in @lines
             l.remove()
         @lines = []        

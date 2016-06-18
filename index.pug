@@ -11,7 +11,7 @@ html(lang="en")
                 .split
                     .pane.top
                         .rel
-                            #scroll                             
+                            .pinboard(tabindex="3")
                     .handle.top
                     .commandline
                         span.commandline-command
@@ -21,16 +21,10 @@ html(lang="en")
                     .pane.edit
                         .rel
                             .editor(tabindex="0")
-                            svg.minimap
-                            //- .scrollbar.left
-                            //-     .scrollhandle.left
                     .handle.log
                     .pane.log
                         .rel
                             .logview(tabindex="2")
-                            svg.minimap
-                            //- .scrollbar.left
-                            //-     .scrollhandle.left
     script.
         require('./js/window.js')
 

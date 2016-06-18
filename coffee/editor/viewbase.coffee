@@ -102,14 +102,12 @@ class ViewBase extends Editor
         
         lines ?= ['']
         super lines
-        @syntax.parse()
-        # log "viewbase.setLines viewHeight #{@viewHeight()}" if @name == 'editor'
+        @syntax.parse()        
         if @scroll.viewHeight != @viewHeight()
             @scroll.setViewHeight @viewHeight()
-            # log "viewbase.setLines emit viewHeight #{@viewHeight()}"
-            @emit 'viewHeight', @viewHeight() 
-        # log "viewbase.setLines numLines #{lines.length}" if @name == 'editor'
+            @emit 'viewHeight', @viewHeight()
         @scroll.setNumLines @lines.length
+        @updateLayers()
 
     # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
     # 000       000   000  0000  000     000     000       000     000   000     
@@ -118,7 +116,7 @@ class ViewBase extends Editor
     # 000        0000000   000   000     000     0000000   000  0000000  00000000
 
     setFontSize: (fontSize) =>
-        log "viewbase.setFontSize className #{@view.className} size #{fontSize}"
+        # log "viewbase.setFontSize className #{@view.className} size #{fontSize}"
         @view.style.fontSize = "#{fontSize}px"
         # setStyle '.'+@view.className, 'font-size', "#{fontSize}px"
         @size.numbersWidth = 50
@@ -126,7 +124,7 @@ class ViewBase extends Editor
         @size.lineHeight   = fontSize + Math.floor(fontSize/6)
         @size.charWidth    = characterWidth @elem, 'line'
         @size.offsetX      = Math.floor @size.charWidth/2 + @size.numbersWidth
-        log "viewbase.setFontSize className #{@view.className} fontSize #{@size.fontSize} lineHeight #{@size.lineHeight}"
+        # log "viewbase.setFontSize className #{@view.className} fontSize #{@size.fontSize} lineHeight #{@size.lineHeight}"
         
         @scroll?.setLineHeight @size.lineHeight
             

@@ -4,13 +4,11 @@
 #    000     000       000   000  000 0 000
 #    000     00000000  000   000  000   000
 {
-$
-}             = require '../tools/tools'
+$}            = require '../tools/tools'
 log           = require '../tools/log'
 child_process = require 'child_process'
-Terminal      = require 'terminal.js'
+ansihtml      = require '../tools/ansihtml'
 Command       = require '../commandline/command'
-_             = require 'lodash'
 
 class Term extends Command
 
@@ -23,11 +21,8 @@ class Term extends Command
         @childp.on 'disconnect', @onExit
         @childp.stdout.on 'data', @onData
         @childp.stdout.on 'end', @onEnd        
-        @childp.stdin.write 'echo hello\n'
-        @term = new Terminal columns: 100, rows: 20
-        # log "Term.constructor", @childp
-        # @child_pty.stdout.pipe(stream).pipe(pty.stdin);
-        log "Term.constructor", @childp.connected
+        @ansihtml = new ansihtml()
+        # log "Term.constructor"
         super
     
     onExit: (code) =>
@@ -37,12 +32,13 @@ class Term extends Command
         log "Term.onEnd"
         
     onData: (out) =>        
-        @term.write out.toString()
-        log @term.toString "html"
-        # log "Term.onData", out.toString()
+        s = out.toString()
+        log s
+        h = @ansihtml.toHtml s
+        log h
+        $('.pinboard').innerHTML += h
         
     execute: (command) ->
-        
         log "term.execute command #{command}"
         @childp.stdin.write "#{command}\n"
         text: ''
