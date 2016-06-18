@@ -56,7 +56,7 @@ class Editor extends Buffer
     setLines: (lines) ->
         super lines
         @do.reset()
-                    
+                            
     #  0000000  000  000   000   0000000   000      00000000
     # 000       000  0000  000  000        000      000     
     # 0000000   000  000 0 000  000  0000  000      0000000 
@@ -576,8 +576,8 @@ class Editor extends Buffer
         @do.cursors @, newCursors    
         @do.end()
         
-    insertText: (text) ->
-        @do.start()
+    insertTextFromClipboard: (text) -> #todo insert multiple lines into multiple selections
+        @do.start()        
         for ch in text
             @insertCharacter ch
         @do.end()

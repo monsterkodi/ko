@@ -11,6 +11,7 @@ _           = require 'lodash'
 split       = require './split'
 View        = require './editor/view'
 Commandline = require './commandline/commandline'
+LogView     = require './logview/logview'
 prefs       = require './tools/prefs'
 keyinfo     = require './tools/keyinfo'
 drag        = require './tools/drag'
@@ -213,6 +214,14 @@ window.editor = editor
 window.commandline = new Commandline '.commandline-editor'
 
 $('.titlebar').ondblclick = (event) => ipc.send 'maximizeWindow', winID
+
+# 000       0000000    0000000   000   000  000  00000000  000   000
+# 000      000   000  000        000   000  000  000       000 0 000
+# 000      000   000  000  0000   000 000   000  0000000   000000000
+# 000      000   000  000   000     000     000  000       000   000
+# 0000000   0000000    0000000       0      000  00000000  00     00
+
+window.logview = new LogView '.logview'
 
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000     

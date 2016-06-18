@@ -45,7 +45,8 @@
 - indent one level more when inserting newline ...
     - after =>, -> 
     - when next line is indented one level more
-- autoconvert '' to "" when #{} entered
+- surround selection with #{} if inside string
+    - autoconvert '' to "" when #{} entered
 - dbg "class.method arg: #{arg}, ..."
 - history of file locations
             

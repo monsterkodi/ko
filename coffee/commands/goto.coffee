@@ -15,7 +15,6 @@ class Goto extends Command
     constructor: ->
         
         @shortcuts = ['command+;']
-        
         super
         
     execute: (command) ->
@@ -35,6 +34,5 @@ class Goto extends Command
             focus: 'editor'
         else
             text: ''
-            
         
 module.exports = Goto

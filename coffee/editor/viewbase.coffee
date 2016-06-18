@@ -85,6 +85,16 @@ class ViewBase extends Editor
 
     setText: (text) -> @setLines text?.split /\n/
         
+    appendText: (text) ->
+        
+        ts = text?.split /\n/
+        [].push.apply @lines, ts
+        @syntax.parse()
+        @emit 'numLines', @lines.length
+        if @scroll.viewHeight != @viewHeight()
+            @scroll.setViewHeight @viewHeight()        
+        @scroll.setNumLines @lines.length
+        
     setLines: (lines) ->
         # log "viewbase.setLines lines", lines if @name == 'editor'        
         if lines.length == 0
@@ -108,13 +118,15 @@ class ViewBase extends Editor
     # 000        0000000   000   000     000     0000000   000  0000000  00000000
 
     setFontSize: (fontSize) =>
-        setStyle '.'+@view.className, 'font-size', "#{fontSize}px"
+        log "viewbase.setFontSize className #{@view.className} size #{fontSize}"
+        @view.style.fontSize = "#{fontSize}px"
+        # setStyle '.'+@view.className, 'font-size', "#{fontSize}px"
         @size.numbersWidth = 50
         @size.fontSize     = fontSize
         @size.lineHeight   = fontSize + Math.floor(fontSize/6)
         @size.charWidth    = characterWidth @elem, 'line'
         @size.offsetX      = Math.floor @size.charWidth/2 + @size.numbersWidth
-        # log "viewbase.setFontSize #{@size.fontSize} #{@size.lineHeight}"
+        log "viewbase.setFontSize className #{@view.className} fontSize #{@size.fontSize} lineHeight #{@size.lineHeight}"
         
         @scroll?.setLineHeight @size.lineHeight
             
@@ -152,7 +164,7 @@ class ViewBase extends Editor
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
     changed: (changeInfo) ->
-        log "viewbase.changed .. #{changeInfo.sorted}"
+        # log "viewbase.changed .. #{changeInfo.sorted}"
         @syntax.changed changeInfo
         
         numChanges = 0        
@@ -208,7 +220,7 @@ class ViewBase extends Editor
         @elem.insertBefore div, @elem.children[ri]
         @emit 'lineInserted', li
         @scroll.insertLine li
-
+        
     # 00000000  000   000  00000000    0000000    0000000  00000000
     # 000        000 000   000   000  000   000  000       000     
     # 0000000     00000    00000000   000   000  0000000   0000000 
@@ -492,8 +504,9 @@ class ViewBase extends Editor
         return if not combo
         return if key == 'right click' # weird right command key
         
-        if 'unhandled' != @handleModKeyComboEvent mod, key, combo, event
-            return
+        if @handleModKeyComboEvent?
+            if 'unhandled' != @handleModKeyComboEvent mod, key, combo, event
+                return
 
         switch combo
             when 'command+a'                then return @selectAll()
@@ -509,7 +522,7 @@ class ViewBase extends Editor
             when 'command+shift+z'          then return @do.redo @
             when 'delete', 'ctrl+backspace' then return @deleteForward()     
             when 'backspace'                then return @deleteBackward()     
-            when 'command+v'                then return @insertText clipboard.readText()
+            when 'command+v'                then return @insertTextFromClipboard clipboard.readText()
             when 'command+x'   
                 @do.start()
                 clipboard.writeText @textOfSelectionForClipboard()

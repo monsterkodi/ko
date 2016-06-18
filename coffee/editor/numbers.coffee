@@ -16,7 +16,7 @@ class Numbers
 
     constructor: (@editor) ->
         
-        @elem = $(".numbers")
+        @elem = $(".numbers", @editor.view)
         @editor.on 'clearLines',       @onClearLines
         @editor.on 'lineInserted',     @onLineInserted
         @editor.on 'lineDeleted',      @onLineDeleted
@@ -68,8 +68,8 @@ class Numbers
     onFontSizeChange: => 
         @elem.style.lineHeight = "#{@editor.size.lineHeight}px"        
         if @editor.size.fontSize < 13
-            log "@editor.size.fontSize", @editor.size.fontSize
-            setStyle '.numbers', 'font-size', "#{@editor.size.fontSize}px"
+            # log "@editor.size.fontSize", @editor.size.fontSize
+            @elem.style.fontSize = "#{@editor.size.fontSize}px"
     
     # 00000000  000   000  00000000    0000000    0000000  00000000
     # 000        000 000   000   000  000   000  000       000     

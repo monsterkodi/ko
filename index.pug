@@ -22,14 +22,15 @@ html(lang="en")
                         .rel
                             .editor(tabindex="0")
                             svg.minimap
-                            .scrollbar.left
-                                .scrollhandle.left
+                            //- .scrollbar.left
+                            //-     .scrollhandle.left
                     .handle.log
                     .pane.log
-                        .split-rel
-                            .logview
-                            .scrollbar.right
-                                .scrollhandle.right        
+                        .rel
+                            .logview(tabindex="2")
+                            svg.minimap
+                            //- .scrollbar.left
+                            //-     .scrollhandle.left
     script.
         require('./js/window.js')
 

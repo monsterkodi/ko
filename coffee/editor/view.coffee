@@ -13,6 +13,7 @@ drag      = require '../tools/drag'
 keyinfo   = require '../tools/keyinfo'
 ViewBase  = require './viewbase'
 Minimap   = require './minimap'
+Scrollbar = require './scrollbar'
 Numbers   = require './numbers'
 syntax    = require './syntax'
 watcher   = require './watcher'
@@ -29,28 +30,11 @@ class View extends ViewBase
 
         super viewElem
         
-        @do.dbg = true
-        @minimap = new Minimap @
-        @numbers = new Numbers @
-            
-        # @scroll.dbg = true
-        @scroll.on 'scroll', @updateScrollbar    
-        
-        @view.style.right = "#{@minimap.width()}px"                
-
-        @scrollhandleLeft = $('.scrollhandle.left', @view.parentElement)
-        @scrollbarLeft = $('.scrollbar.left', @view.parentElement)
-        @smoothScrolling = true
-        @scrollbarDrag = new drag 
-            target:  @scrollbarLeft
-            onStart: @onScrollStart
-            onMove:  @onScrollDrag 
-            cursor:  'ns-resize'
-
-        @minimap.elem.addEventListener 'wheel', @onWheel
-        @scrollbarLeft.addEventListener 'wheel', @onWheel
-        @view.addEventListener 'wheel', @onWheel
-        
+        # @do.dbg    = true
+        @scrollbar = new Scrollbar @
+        @minimap   = new Minimap @
+        @numbers   = new Numbers @
+                    
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000
     # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
@@ -134,35 +118,8 @@ class View extends ViewBase
     # 0000000   000       0000000    000   000  000      000    
     #      000  000       000   000  000   000  000      000    
     # 0000000    0000000  000   000   0000000   0000000  0000000
-        
-    updateScrollbar: =>
-        
-        return if not @scrollhandleLeft?
-        
-        if @lines.length * @size.lineHeight < @viewHeight()
-            @scrollhandleLeft.style.top     = "0"
-            @scrollhandleLeft.style.height  = "0"
-            @scrollhandleLeft.style.width   = "0"
-        else
-            bh           = @lines.length * @size.lineHeight
-            vh           = Math.min (@scroll.viewLines * @scroll.lineHeight), @viewHeight()
-            scrollTop    = parseInt (@scroll.scroll / bh) * vh
-            scrollHeight = parseInt ((@scroll.viewLines * @scroll.lineHeight) / bh) * vh
-            scrollHeight = Math.max scrollHeight, parseInt @size.lineHeight/4
-            scrollTop    = Math.min scrollTop, @viewHeight()-scrollHeight
-            scrollTop    = Math.max 0, scrollTop
-                    
-            @scrollhandleLeft.style.top     = "#{scrollTop}px"
-            @scrollhandleLeft.style.height  = "#{scrollHeight}px"
-            @scrollhandleLeft.style.width   = "2px"
-                
+                        
     scrollLines: (delta) -> @scrollBy delta * @size.lineHeight
-
-    scrollFactor: (event) ->
-        f  = 1 
-        f *= 1 + 1 * event.shiftKey
-        f *= 1 + 3 * event.metaKey        
-        f *= 1 + 7 * event.altKey
 
     scrollBy: (delta) -> 
         @scroll.by delta
@@ -175,21 +132,7 @@ class View extends ViewBase
     scrollCursor: -> 
         # log "view.scrollCursor todo"
         # $('.cursor', @view)?.scrollIntoViewIfNeeded()
-            
-    onWheel: (event) => 
-        @scrollBy event.deltaY * @scrollFactor event
-        
-    onScrollStart: (drag, event) =>
-        br = @scrollbarLeft.getBoundingClientRect()
-        sy = clamp 0, @scroll.viewHeight, event.clientY - br.top
-        ln = parseInt @scroll.numLines * sy/@scroll.viewHeight
-        ly = (ln - @scroll.viewLines / 2) * @scroll.lineHeight
-        @scrollTo ly
-        
-    onScrollDrag: (drag) =>
-        delta = (drag.delta.y / (@scroll.viewLines * @scroll.lineHeight)) * @lines.length * @size.lineHeight
-        @scrollBy delta
-
+                    
     #  0000000   0000000   000   000  00000000
     # 000       000   000  000   000  000     
     # 0000000   000000000   000 000   0000000 

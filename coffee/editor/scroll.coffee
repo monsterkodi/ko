@@ -28,7 +28,6 @@ class scroll extends events
     # 000  000   000  000     000   
 
     init: ->
-        # log "scroll.init"
         @scroll       = 0 # current scroll value from document start (pixels)
         @offsetTop    = 0 # height of view above first visible line (pixels)
         @offsetSmooth = 0 # smooth scrolling offset / part of top line that is hidden (pixels)
@@ -42,11 +41,10 @@ class scroll extends events
         @calc()
 
     calc: ->
-
-        # @scrollMax  = Math.max(0,@fullHeight - @viewHeight + @lineHeight)  # maximum scroll offset (pixels)
-        @scrollMax  = Math.max(0,@fullHeight - @viewHeight)  # maximum scroll offset (pixels)
-        @fullLines  = Math.floor(@viewHeight / @lineHeight)  # number of lines in view (excluding partials)
-        @viewLines  = Math.ceil(@viewHeight / @lineHeight)   # number of lines in view (including partials)
+        @scrollMax   = Math.max(0,@fullHeight - @viewHeight)  # maximum scroll offset (pixels)
+        @fullLines   = Math.floor(@viewHeight / @lineHeight)  # number of lines in view (excluding partials)
+        @viewLines   = Math.ceil(@viewHeight / @lineHeight)   # number of lines in view (including partials)
+        @linesHeight = @viewLines * @lineHeight               # height of visible lines (pixels)
 
         if @exposeMax < 0
             @exposeNum = -@exposeMax * @viewLines # maximum size of expose range is viewHeight dependent

@@ -7,8 +7,7 @@
 getStyle,
 clamp,
 last,
-$
-}       = require '../tools/tools'
+$}      = require '../tools/tools'
 log     = require '../tools/log'
 drag    = require '../tools/drag'
 profile = require '../tools/profile'
@@ -19,10 +18,13 @@ class Minimap
 
     constructor: (@editor) ->
         
-        @elem = $(".minimap")
+        @elem = $(".minimap", @editor.view.parentElement)
         @elem.onmousedown = @onClick
         
-        @s = Snap ".minimap"
+        @editor.view.style.right = "#{@width()}px"
+        @elem.addEventListener 'wheel', @editor.scrollbar?.onWheel
+        
+        @s = Snap @elem # ".minimap"
         @s.attr
             overflow: 'hidden'
             viewBox:  '0 0 120 0'

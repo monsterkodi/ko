@@ -192,7 +192,7 @@ class Split extends event
         @logPane.style.display = v and 'initial' or 'none'
         @splitAt 2, @elemHeight() - (v and Math.max(100, @getState('logHeight', 200)) or 0)
         
-    clearLog: -> $('.logview').innerHTML = ""
+    clearLog: -> window.logview.setText ""
     showOrClearLog: -> 
         if @logVisible
             @clearLog()
