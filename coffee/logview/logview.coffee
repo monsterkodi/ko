@@ -24,4 +24,14 @@ class LogView extends ViewBase
         @numbers   = new Numbers @
         @minimap   = new Minimap @
                 
+    appendText: (text) ->
+        
+        tail = @cursorPos()[1] == @lines.length-1 and @cursors.length == 1
+        console.log "logview.appendText #{tail} #{@lines.length}"
+        super text
+        if tail
+            @singleCursorAtPos [0, @lines.length-1] 
+            @scrollTo @scroll.fullHeight
+            console.log "logview.appendText #{tail} #{@lines.length} #{@cursors}"
+                
 module.exports = LogView

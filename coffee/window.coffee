@@ -94,9 +94,11 @@ ipc.on 'setWinID', (event, id) =>
     # log "setWinID: ", id
     window.split = new split id
     window.split.on 'paneHeight', (e) ->
-        # log "window.on.split.paneHeight #{e}"
+        log "window.on.split.paneHeight", e
         if e.paneIndex == 2
             window.editor?.resized()
+        if e.paneIndex == 3
+            window.logview?.resized()
     s = getState 'fontSize'
     setFontSize s if s
 
@@ -200,10 +202,9 @@ saveFileAs = =>
 # 000       000   000  000     000     000   000  000   000
 # 00000000  0000000    000     000      0000000   000   000
 
-editor = new View '.editor'
+editor = window.editor = new View '.editor'
 editor.setText editorText if editorText?
 editor.view.focus()
-window.editor = editor
 
 #  0000000   0000000   00     00  00     00   0000000   000   000  0000000  
 # 000       000   000  000   000  000   000  000   000  0000  000  000   000
@@ -211,7 +212,7 @@ window.editor = editor
 # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
 
-window.commandline = new Commandline '.commandline-editor'
+commandline = window.commandline = new Commandline '.commandline-editor'
 
 $('.titlebar').ondblclick = (event) => ipc.send 'maximizeWindow', winID
 
@@ -221,7 +222,7 @@ $('.titlebar').ondblclick = (event) => ipc.send 'maximizeWindow', winID
 # 000      000   000  000   000     000     000  000       000   000
 # 0000000   0000000    0000000       0      000  00000000  00     00
 
-window.logview = new LogView '.logview'
+logview = window.logview = new LogView '.logview'
 
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000     
@@ -255,6 +256,25 @@ changeFontSize = (d) =>
 resetFontSize = => 
     delState 'fontSize'
     setFontSize prefs.get 'fontSize', 15
+
+# 0000000   0000000    0000000   00     00
+#    000   000   000  000   000  000   000
+#   000    000   000  000   000  000000000
+#  000     000   000  000   000  000 0 000
+# 0000000   0000000    0000000   000   000
+    
+resetZoom: -> 
+    webframe.setZoomFactor 1
+    editor.resized()
+    logview.resized()
+    
+changeZoom: (d) -> 
+    z = webframe.getZoomFactor() 
+    z *= 1+d/20
+    z = clamp 0.36, 5.23, z
+    webframe.setZoomFactor z
+    editor.resized()
+    logview.resized()
               
 # 000   000  00000000  000   000
 # 000  000   000        000 000 
@@ -272,11 +292,15 @@ document.onkeydown = (event) ->
         return
     
     switch combo
-        when 'command+enter' then return ipc.send 'execute', editor.text()
-        when 'command+alt+i' then return ipc.send 'toggleDevTools', winID
-        when 'command+alt+k' then return window.split.toggleLog()
-        when 'command+k'     then return window.split.showOrClearLog()
-        when 'command+='     then return changeFontSize +1
-        when 'command+-'     then return changeFontSize -1
-        when 'command+0'     then return resetFontSize()
+        when 'command+enter'    then return ipc.send 'execute', editor.text()
+        when 'command+alt+i'    then return ipc.send 'toggleDevTools', winID
+        when 'command+alt+k'    then return window.split.toggleLog()
+        when 'command+k'        then return window.split.showOrClearLog()
+        when 'command+='        then return changeFontSize +1
+        when 'command+-'        then return changeFontSize -1
+        when 'command+0'        then return resetFontSize()
+        when 'command+shift+='  then return @changeZoom +1
+        when 'command+shift+-'  then return @changeZoom -1
+        when 'command+shift+0'  then return @resetZoom()
+        
                 

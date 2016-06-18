@@ -398,6 +398,26 @@ class ViewBase extends Editor
         else
             botdelta
 
+    #  0000000   0000000  00000000    0000000   000      000    
+    # 000       000       000   000  000   000  000      000    
+    # 0000000   000       0000000    000   000  000      000    
+    #      000  000       000   000  000   000  000      000    
+    # 0000000    0000000  000   000   0000000   0000000  0000000
+                        
+    scrollLines: (delta) -> @scrollBy delta * @size.lineHeight
+
+    scrollBy: (delta) -> 
+        @scroll.by delta
+        @view.scrollTop = @scroll.offsetTop
+
+    scrollTo: (p) -> 
+        @scroll.to p
+        @view.scrollTop = @scroll.offsetTop
+
+    scrollCursor: -> 
+        # log "view.scrollCursor todo"
+        # $('.cursor', @view)?.scrollIntoViewIfNeeded()
+                    
     # 00000000    0000000    0000000
     # 000   000  000   000  000     
     # 00000000   000   000  0000000 

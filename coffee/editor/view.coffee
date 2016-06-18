@@ -80,23 +80,6 @@ class View extends ViewBase
 
         @restoreScrollCursorsAndSelections() if file
                     
-    # 0000000   0000000    0000000   00     00
-    #    000   000   000  000   000  000   000
-    #   000    000   000  000   000  000000000
-    #  000     000   000  000   000  000 0 000
-    # 0000000   0000000    0000000   000   000
-        
-    resetZoom: -> 
-        webframe.setZoomFactor 1
-        @scroll.setViewHeight @viewHeight()
-        
-    changeZoom: (d) -> 
-        z = webframe.getZoomFactor() 
-        z *= 1+d/20
-        z = clamp 0.36, 5.23, z
-        webframe.setZoomFactor z
-        @scroll.setViewHeight @viewHeight()
-
     # 000000000  000  000000000  000      00000000  0000000     0000000   00000000 
     #    000     000     000     000      000       000   000  000   000  000   000
     #    000     000     000     000      0000000   0000000    000000000  0000000  
@@ -113,26 +96,6 @@ class View extends ViewBase
             title = "<span class=\"title#{dc}\" data-tip=\"#{unresolve @currentFile}\">#{ds} #{title} #{ds}</span>"
         $('.titlebar').innerHTML = title 
             
-    #  0000000   0000000  00000000    0000000   000      000    
-    # 000       000       000   000  000   000  000      000    
-    # 0000000   000       0000000    000   000  000      000    
-    #      000  000       000   000  000   000  000      000    
-    # 0000000    0000000  000   000   0000000   0000000  0000000
-                        
-    scrollLines: (delta) -> @scrollBy delta * @size.lineHeight
-
-    scrollBy: (delta) -> 
-        @scroll.by delta
-        @view.scrollTop = @scroll.offsetTop
-
-    scrollTo: (p) -> 
-        @scroll.to p
-        @view.scrollTop = @scroll.offsetTop
-
-    scrollCursor: -> 
-        # log "view.scrollCursor todo"
-        # $('.cursor', @view)?.scrollIntoViewIfNeeded()
-                    
     #  0000000   0000000   000   000  00000000
     # 000       000   000  000   000  000     
     # 0000000   000000000   000 000   0000000 
@@ -182,9 +145,6 @@ class View extends ViewBase
             when 'enter'            then return @insertNewline indent:true
             when 'command+]'        then return @indent()
             when 'command+['        then return @deIndent()
-            when 'command+shift+='  then return @changeZoom +1
-            when 'command+shift+-'  then return @changeZoom -1
-            when 'command+shift+0'  then return @resetZoom()
             when 'command+j'        then return @joinLine()
             when 'command+/'        then return @toggleLineComment()
             when 'command+l'        then return @selectMoreLines()

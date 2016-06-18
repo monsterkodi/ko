@@ -61,7 +61,7 @@ class Scrollbar
     
     onWheel: (event) => 
         
-        scrollFactor: ->
+        scrollFactor = ->
             f  = 1 
             f *= 1 + 1 * event.shiftKey
             f *= 1 + 3 * event.metaKey        
