@@ -154,17 +154,20 @@ class ViewBase extends Editor
     changed: (changeInfo) ->
         log "viewbase.changed .. #{changeInfo.sorted}"
         @syntax.changed changeInfo
-                
+        
+        numChanges = 0        
         for change in changeInfo.sorted
             [li,ch] = change
             # log "viewbase.changed li #{li} change #{ch}"
             switch ch
                 when 'changed'  then @updateLine li
-                when 'deleted'  then @deleteLine li
-                when 'inserted' then @insertLine li
-            
-        @updateLinePositions()
-            
+                when 'deleted'  
+                    numChanges -= 1 
+                    @deleteLine li
+                when 'inserted' 
+                    numChanges += 1
+                    @insertLine li
+                        
         if changeInfo.cursor.length
             @renderCursors()
             @emit 'cursors', changeInfo.cursor
@@ -172,9 +175,9 @@ class ViewBase extends Editor
             @renderSelection()   
             @emit 'selection', changeInfo.selection
         
-        # @scroll.dbg = true
-        @scrollBy 0
-        # @scroll.dbg = false
+        if numChanges != 0
+            @updateLinePositions()
+            @scrollBy 0
                      
         @renderHighlights()
 
@@ -188,8 +191,8 @@ class ViewBase extends Editor
         ri = li - @scroll.exposeTop
         # log "viewbase.deleteLine #{li} ri #{ri}"
         @elem.children[ri]?.remove()
-        @scroll.deleteLine li
         @emit 'lineDeleted', li
+        @scroll.deleteLine li
         
     # 000  000   000   0000000  00000000  00000000   000000000
     # 000  0000  000  000       000       000   000     000   
@@ -203,8 +206,8 @@ class ViewBase extends Editor
         div = @addLine()
         div.innerHTML = @renderLineAtIndex li
         @elem.insertBefore div, @elem.children[ri]
-        @scroll.insertLine li
         @emit 'lineInserted', li
+        @scroll.insertLine li
 
     # 00000000  000   000  00000000    0000000    0000000  00000000
     # 000        000 000   000   000  000   000  000       000     

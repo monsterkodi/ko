@@ -460,7 +460,7 @@ class Editor extends Buffer
     insertUserCharacter: (ch) ->
         @clearHighlights()
         @clampCursors() # todo: insert spaces instead in multi cursor mode
-        if ch in @surroundCharacters #and (@cursor[0] == 0 or @lines[@cursor[1]][@cursor[0]-1] != '\\' )
+        if ch in @surroundCharacters
             @insertSurroundCharacter ch
             return
 
