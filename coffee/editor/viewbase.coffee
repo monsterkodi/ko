@@ -152,34 +152,18 @@ class ViewBase extends Editor
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
     changed: (changeInfo) ->
-        # log changeInfo
-        if changeInfo.deleted.length or changeInfo.inserted.length
-            log "viewbase.changed ++ #{changeInfo.inserted} -- #{changeInfo.deleted}"
-        # if changeInfo.changed.length
-        #     log "viewbase.changed .. #{changeInfo.changed}"
+        log "viewbase.changed .. #{changeInfo.sorted}"
         @syntax.changed changeInfo
-        indices = []
-        info = _.cloneDeep changeInfo
-        for i in info.changed
-            continue if i < @scroll.exposeTop
-            break if i > @scroll.exposeBot
-            indices.push i
+                
+        for change in changeInfo.sorted
+            [li,ch] = change
+            # log "viewbase.changed li #{li} change #{ch}"
+            switch ch
+                when 'changed'  then @updateLine li
+                when 'deleted'  then @deleteLine li
+                when 'inserted' then @insertLine li
             
-        if info.inserted.length
-            if info.inserted[0] < @scroll.exposeBot
-                for i in [Math.max(@scroll.exposeTop, info.inserted[0])..@scroll.exposeBot]
-                    indices.push i
-
-        if info.deleted.length
-            if info.deleted[0] < @scroll.exposeBot
-                for i in [Math.max(@scroll.exposeTop, info.deleted[0])..@scroll.exposeBot]
-                    indices.push i
-                                                                                
-        indices.sort (a,b) -> a - b
-        indices = _.sortedUniq indices
-        # log "viewbase.changed indices", indices        
-        for i in indices
-            @updateLine i
+        @updateLinePositions()
             
         if changeInfo.cursor.length
             @renderCursors()
@@ -187,8 +171,40 @@ class ViewBase extends Editor
         if changeInfo.selection.length
             @renderSelection()   
             @emit 'selection', changeInfo.selection
+        
+        # @scroll.dbg = true
+        @scrollBy 0
+        # @scroll.dbg = false
                      
         @renderHighlights()
+
+    # 0000000    00000000  000      00000000  000000000  00000000
+    # 000   000  000       000      000          000     000     
+    # 000   000  0000000   000      0000000      000     0000000 
+    # 000   000  000       000      000          000     000     
+    # 0000000    00000000  0000000  00000000     000     00000000
+
+    deleteLine: (li) ->
+        ri = li - @scroll.exposeTop
+        # log "viewbase.deleteLine #{li} ri #{ri}"
+        @elem.children[ri]?.remove()
+        @scroll.deleteLine li
+        @emit 'lineDeleted', li
+        
+    # 000  000   000   0000000  00000000  00000000   000000000
+    # 000  0000  000  000       000       000   000     000   
+    # 000  000 0 000  0000000   0000000   0000000       000   
+    # 000  000  0000       000  000       000   000     000   
+    # 000  000   000  0000000   00000000  000   000     000   
+        
+    insertLine: (li) ->
+        ri = li - @scroll.exposeTop
+        # log "viewbase.insertLine #{li} ri #{ri}"
+        div = @addLine()
+        div.innerHTML = @renderLineAtIndex li
+        @elem.insertBefore div, @elem.children[ri]
+        @scroll.insertLine li
+        @emit 'lineInserted', li
 
     # 00000000  000   000  00000000    0000000    0000000  00000000
     # 000        000 000   000   000  000   000  000       000     
@@ -197,7 +213,7 @@ class ViewBase extends Editor
     # 00000000  000   000  000         0000000   0000000   00000000
 
     exposeLine: (li) =>
-        # log "viewbase.exposeLine children #{@elem.children.length}"
+        # log "viewbase.exposeLine li #{li} children #{@elem.children.length}"
         html = @renderLineAtIndex li
         # log "viewbase.exposeLine #{li} #{html}"
         # log "viewbase.exposeLine #{@lines[li]} #{@lines.length}"
@@ -288,8 +304,8 @@ class ViewBase extends Editor
             span = @renderLineAtIndex li
             # log "viewbase.updateLine li #{li} relIndex #{relIndex}"
             @elem.children[relIndex]?.innerHTML = span
-        else 
-            @vanishLine()
+        # else 
+        #     @vanishLine()
 
     # 00000000   00000000  000   000  0000000    00000000  00000000 
     # 000   000  000       0000  000  000   000  000       000   000

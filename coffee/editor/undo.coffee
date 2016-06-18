@@ -63,9 +63,9 @@ class undo
     changeInfoLineDelete: (i) ->
         @getChangeInfo()
         @changeInfo.deleted.push i
-        for c in @changeInfo.sorted
-            if c[0] > i
-                c[0] -= 1
+        # for c in @changeInfo.sorted
+        #     if c[0] > i
+        #         c[0] -= 1
         @changeInfo.sorted.push [i, 'deleted']        
         
     changeInfoCursor: (obj) ->

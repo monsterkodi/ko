@@ -1,10 +1,8 @@
-
 #  0000000   00000000   00000000  000   000
 # 000   000  000   000  000       0000  000
 # 000   000  00000000   0000000   000 0 000
 # 000   000  000        000       000  0000
 #  0000000   000        00000000  000   000
-
 {
 fileExists,
 dirExists,
@@ -13,8 +11,7 @@ relative,
 resolve,
 clamp,
 last,
-$
-}       = require '../tools/tools'
+$}      = require '../tools/tools'
 log     = require '../tools/log'
 profile = require '../tools/profile'
 Command = require '../commandline/command'
@@ -63,7 +60,7 @@ class Open extends Command
         if command.length
             # log 'command', command, @resolvedPath command
             if dirExists @resolvedPath command
-                log 'rebuild files for', @resolvedPath command
+                log 'open.changed rebuild files for', @resolvedPath command
                 @dir = @resolvedPath command
                 @pkg = @resolvedPath command
                 @lastFileIndex = -1
@@ -148,9 +145,18 @@ class Open extends Command
         @list?.children[@selected]?.className = 'list-file selected'
         @list?.children[@selected]?.scrollIntoViewIfNeeded()
         
+    #  0000000   00000000   00000000  000   000  00000000  000  000      00000000
+    # 000   000  000   000  000       0000  000  000       000  000      000     
+    # 000   000  00000000   0000000   000 0 000  000000    000  000      0000000 
+    # 000   000  000        000       000  0000  000       000  000      000     
+    #  0000000   000        00000000  000   000  000       000  0000000  00000000
+        
     openFileAtIndex: (i) =>
         @select i
-        if @execute().focus == 'editor'
+        e = @execute()
+        if e.focus == 'editor'
+            @setText e.text
+            @commandline.selectNone()
             window.split.focusEditor()
     
     #  0000000  000000000   0000000   00000000   000000000
@@ -281,6 +287,7 @@ class Open extends Command
         options = 
             newWindow: @combo == @shortcuts[1] # lazy bastard :)
         opened = window.openFiles files, options
+        # log "open.execute opened #{opened.length} #{opened}"
         if opened?.length
             if opened.length == 1
                 super opened[0]

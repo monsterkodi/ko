@@ -18,6 +18,8 @@ class Numbers
         
         @elem = $(".numbers")
         @editor.on 'clearLines',       @onClearLines
+        @editor.on 'lineInserted',     @onLineInserted
+        @editor.on 'lineDeleted',      @onLineDeleted
         @editor.on 'lineExposed',      @onLineExposed
         @editor.on 'lineVanished',     @onLineVanished
         @editor.on 'lineExposedTop',   @onLineExposedTop
@@ -80,6 +82,17 @@ class Numbers
         
     onLineExposedTop: (e) =>
         @elem.insertBefore @addLine(e.lineIndex), @elem.firstChild
+        
+    onLineInserted: (li) =>
+        top = @editor.scroll.exposeTop
+        bot = @editor.scroll.exposeBot                
+        @elem.appendChild @addLine @editor.lines.length-1
+        
+    onLineDeleted: (li) =>
+        top = @editor.scroll.exposeTop
+        bot = @editor.scroll.exposeBot
+        if top <= li <= bot
+            @elem.lastChild.remove()
     
     # 000   000   0000000   000   000  000   0000000  000   000
     # 000   000  000   000  0000  000  000  000       000   000

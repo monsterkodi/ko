@@ -127,6 +127,7 @@ class scroll extends events
         # log "scroll.setTop @top #{@top} @bot #{@bot} newBot #{newBot} viewLines #{@viewLines} numLines #{@numLines}"
         if @bot != newBot
             @bot = newBot
+            log "scroll.setTop emit bot #{@bot}" if @dbg
             @emit 'bot', @bot
             
         @expose()
@@ -138,7 +139,7 @@ class scroll extends events
     # 00000000  000   000  000         0000000   0000000   00000000
     
     expose: =>
-        # log "scroll.expose start", @info() if @dbg
+        log "scroll.expose start", @info() if @dbg
         
         if @exposeNum == 0 # only exposing if expose range is unlimited
             while @bot > @exposeBot
@@ -187,7 +188,7 @@ class scroll extends events
         #    000     000   000  000  0000  000       000  000   000
         #     0      000   000  000   000  000  0000000   000   000
 
-        while (@bot < @exposeBot) and (@exposed > @exposeNum)
+        while (@bot < @exposeBot) and (@exposed > @exposeNum) or (@exposeBot > @numLines-1)
             log "scroll.vanish emit vanishLine #{@exposeBot}" if @dbg
             @emit 'vanishLine', @exposeBot
             @exposeBot -= 1
@@ -203,6 +204,42 @@ class scroll extends events
                 new: @exposeTop
                 num: -(@top-old)            
 
+    # 000  000   000   0000000  00000000  00000000   000000000
+    # 000  0000  000  000       000       000   000     000   
+    # 000  000 0 000  0000000   0000000   0000000       000   
+    # 000  000  0000       000  000       000   000     000   
+    # 000  000   000  0000000   00000000  000   000     000   
+    
+    insertLine: (li) =>
+        # log "scroll.insertLine #{li}", @info()
+        @numLines += 1
+        @fullHeight = @numLines * @lineHeight
+        @exposeTop += 1 if li < @exposeTop
+        @exposeBot += 1 if li <= @exposeBot or li == @numLines-1
+        @top += 1 if li < @top
+        @bot += 1 if li <= @bot
+        @exposed = @exposeBot - @exposeTop
+        # log "scroll.insertLine #{li}", @info()
+        @calc()
+        
+    # 0000000    00000000  000      00000000  000000000  00000000
+    # 000   000  000       000      000          000     000     
+    # 000   000  0000000   000      0000000      000     0000000 
+    # 000   000  000       000      000          000     000     
+    # 0000000    00000000  0000000  00000000     000     00000000
+
+    deleteLine: (li) =>
+        # log "scroll.deleteLine #{li}", @info()
+        @numLines -= 1
+        @fullHeight = @numLines * @lineHeight
+        @exposeTop -= 1 if li < @exposeTop
+        @exposeBot -= 1 if li <= @exposeBot
+        @top -= 1 if li < @top
+        @bot -= 1 if li <= @bot
+        @exposed = @exposeBot - @exposeTop
+        # log "scroll.deleteLine #{li}", @info()
+        @calc()
+    
     # 000   000  000  00000000  000   000  000   000  00000000  000   0000000   000   000  000000000
     # 000   000  000  000       000 0 000  000   000  000       000  000        000   000     000   
     #  000 000   000  0000000   000000000  000000000  0000000   000  000  0000  000000000     000   

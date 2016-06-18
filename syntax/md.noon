@@ -8,26 +8,26 @@
 
 # header
 
-(^#\s+)(.+)                             . syntax . comment.header
-(^##\s+)(.+)                            . syntax . class
-(^###\s+)(.+)                           . syntax . function
-(^####+\s+)(.+)                         . syntax . keyword
+(^#\s+)(.+)                             . marker.path.coffee     . header.path.coffee
+(^##\s+)(.+)                            . marker.header.class    . header.class
+(^###\s+)(.+)                           . marker.header.string.double   . header.string.double
+(^####+\s+)(.+)                         . marker.header.keyword . header.keyword
+(^#####+\s+)(.+)                        . marker.header.number   . header.number
 
 # path
 
-\((\s*\S+\.[^\s\)\.\!\?]+)\)            . string
-(\s*[\/\S]+)(\/)([^\s\)\.\!\?]+)        . string.marker . string . string.double
+(\(\s*)(\S+\.[^\s\)\.\!\?]+)(\))        . string.marker . string . string.marker
 
 # url
 
 (file|git|https?)(://)([^\s\)\.\!\?]+)  . string . string.marker . string.double
 
-# image and link
+# image
 
-(\!?\[)([^\]]+)(\])(\()([^\)]+)(\))     . xd . mf . xd . xd . k . xd 
+(\!\[)(\S+)(\])                         . function.marker . function . function.marker    
 
-(^[-\*]\s)                                class
-(^\s+[-\*]\s)(.+)                       . function.marker . function
+(^[-\*]\s+)(.+)                         . class.marker . class
+(^\s+[-\*]\s)(.+)                       . text.marker . text
 
 # pre
 
