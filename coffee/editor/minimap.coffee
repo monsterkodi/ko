@@ -255,7 +255,7 @@ class Minimap
     onScroll: (scroll, topOffset) =>
         t = @scroll.top * 2
         h = @scroll.viewHeight
-        console.log "minimap.onScroll t #{t} h #{h}"
+        # console.log "minimap.onScroll t #{t} h #{h}"
         @s.attr
              viewBox: "0 #{t} 120 #{h}"   
     

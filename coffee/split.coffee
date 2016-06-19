@@ -22,12 +22,11 @@ class Split extends event
     # 000  000  0000  000     000   
     # 000  000   000  000     000   
     
-    constructor: (wid) ->
+    constructor: () ->
 
         @commandlineHeight = 30
         @handleHeight      = 6
         
-        @winID       = wid
         @elem        = $('.split')
         @topPane     = $('.pane.top')
         @topHandle   = $('.handle.top')
@@ -40,12 +39,9 @@ class Split extends event
 
         @handles     = [@topHandle, @editHandle, @logHandle]
         @panes       = [@topPane, @commandLine, @editPane, @logPane]
-                
-        @logVisible = @getState 'logVisible', false
-        if @logVisible
-            @logPane.style.display = 'initial'
-        else
-            @logPane.style.display = 'none'
+                            
+        @logVisible = false
+        @logPane.style.display = 'none'
 
         @dragTop = new drag
             target: @topHandle
@@ -67,7 +63,15 @@ class Split extends event
 
         @constrainDrag()
     
-        @applySplit @getState 'split', [0,0,@elemHeight()-@handleHeight]
+    setWinID: (@winID) ->
+        s = @getState 'split', [0,0,@elemHeight()-@handleHeight]        
+        @logVisible = @getState 'logVisible', false
+        @logHeight  = @getState 'logHeight', 300
+        # log "Split.setWinID #{@winID} #{@logVisible}", s
+        if @logVisible
+            @logPane.style.display = 'initial'
+        
+        @applySplit s
     
     # 00000000   00000000   0000000  000  0000000  00000000  0000000  
     # 000   000  000       000       000     000   000       000   000
@@ -76,7 +80,6 @@ class Split extends event
     # 000   000  00000000  0000000   000  0000000  00000000  0000000  
     
     resized: ->
-        return if not @dragTop
         
         @constrainDrag()
                 
@@ -135,7 +138,7 @@ class Split extends event
     # 000   000  000        000        0000000     000   
         
     applySplit: (s) ->
-        
+        log "split.applySplit", s
         if s[1] >= @commandlineHeight + @handleHeight
             s[0] = s[1] - @commandlineHeight - @handleHeight
         for i in [1...s.length]
@@ -161,7 +164,14 @@ class Split extends event
                     newHeight: newHeight
         
         if @logVisible
+            oldHeight = @logPane.getBoundingClientRect().height
             @logPane.style.top = "#{last(s)+@handleHeight}px"
+            newHeight = @logPane.getBoundingClientRect().height
+            if newHeight != oldHeight
+                @emit 'paneHeight',
+                    paneIndex: 3
+                    oldHeight: oldHeight
+                    newHeight: newHeight
             
         @setState 'split', s
         
@@ -239,5 +249,7 @@ class Split extends event
     getState: (key, value) ->
         if @winID
             prefs.getPath "windows.#{@winID}.#{key}", value
+        else
+            value
 
 module.exports = Split

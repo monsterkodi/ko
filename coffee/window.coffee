@@ -8,7 +8,7 @@ electron    = require 'electron'
 path        = require 'path'
 fs          = require 'fs'
 _           = require 'lodash'
-split       = require './split'
+Split       = require './split'
 View        = require './editor/view'
 Commandline = require './commandline/commandline'
 Terminal    = require './terminal/terminal'
@@ -91,27 +91,12 @@ ipc.on 'reloadFile', =>
 ipc.on 'saveFileAs', => saveFileAs()
 ipc.on 'saveFile',   => saveFile()
 ipc.on 'loadFile', (event, file) => 
-    # log "window.ipc.loadFile"
+    log "window.ipc.loadFile #{file}"
     loadFile file
 ipc.on 'setWinID', (event, id) => 
-    winID = id
-    # log "setWinID: ", id
-    window.split = new split id
-    window.split.on 'paneHeight', (e) ->
-        log "window.on.split.paneHeight", e
-        if e.paneIndex == 0
-            window.terminal?.resized()
-        if e.paneIndex == 2
-            window.editor?.resized()
-        if e.paneIndex == 3
-            window.logview?.resized()
-    s = getState 'fontSize'
-    setFontSize s if s
-
-    if editor?.currentFile
-        setState 'file', editor.currentFile # files might be loaded before id got sent
-
-    ipc.send 'reloadMenu'
+    # log "window.ipc.setWinID #{id} #{window.split?}"
+    winID = window.winID = id
+    window.split?.setWinID id    
                  
 # 00000000  000  000      00000000
 # 000       000  000      000     
@@ -238,6 +223,22 @@ editor.view.focus()
 
 logview = window.logview = new LogView '.logview'
 
+#  0000000  00000000   000      000  000000000
+# 000       000   000  000      000     000   
+# 0000000   00000000   000      000     000   
+#      000  000        000      000     000   
+# 0000000   000        0000000  000     000   
+
+split = window.split = new Split()
+split.on 'paneHeight', (e) =>
+    # log "window.on.split.paneHeight", e
+    if e.paneIndex == 0
+        terminal.resized()
+    if e.paneIndex == 2
+        editor.resized()
+    if e.paneIndex == 3
+        logview.resized()
+
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000     
 # 0000000    0000000   0000000   000    000    0000000 
@@ -245,9 +246,14 @@ logview = window.logview = new LogView '.logview'
 # 000   000  00000000  0000000   000  0000000  00000000
 
 window.onresize = =>
+    # log "window.onresize sh #{sh()}"
     if sh()
         ipc.send 'saveBounds', winID if winID?
-        window.split?.resized()
+        split.resized()
+
+window.onload = =>
+    log "window.onload sh #{sh()} #{window.split?}"
+    split.resized()
     
 window.onunload = =>
     editor.setCurrentFile null # to stop watcher (and reset scroll?)
@@ -270,6 +276,14 @@ changeFontSize = (d) =>
 resetFontSize = => 
     delState 'fontSize'
     setFontSize prefs.get 'fontSize', 15
+
+s = getState 'fontSize'
+setFontSize s if s
+
+# if editor?.currentFile
+#     setState 'file', editor.currentFile # files might be loaded before id got sent
+
+# ipc.send 'reloadMenu'
 
 # 0000000   0000000    0000000   00     00
 #    000   000   000  000   000  000   000
