@@ -30,6 +30,9 @@ class Minimap
 
         @editor.view.style.right = "#{@width()}px"
         @editor.view.parentElement.appendChild @elem
+        @editor.on 'viewHeight',    @onEditorViewHeight
+        @editor.on 'numLines',      @onEditorLineNum
+        @editor.scroll.on 'scroll', @onEditorScroll
 
         @lines = []
         
@@ -51,10 +54,6 @@ class Minimap
         @scroll.on 'exposeLine', @exposeLine
         @scroll.on 'vanishLine', @vanishLine
         @scroll.on 'scroll',     @onScroll
-
-        @editor.on 'viewHeight',    @onEditorViewHeight
-        @editor.on 'numLines',      @onEditorLineNum
-        @editor.scroll.on 'scroll', @onEditorScroll
 
         @buffer = @s.rect()
         @buffer.addClass 'buffer'
@@ -131,19 +130,19 @@ class Minimap
         
         @updateLinePositions invalidated
     
-    # 000000000   0000000   00000000    0000000  000   000   0000000   000   000   0000000   00000000
-    #    000     000   000  000   000  000       000   000  000   000  0000  000  000        000     
-    #    000     000   000  00000000   000       000000000  000000000  000 0 000  000  0000  0000000 
-    #    000     000   000  000        000       000   000  000   000  000  0000  000   000  000     
-    #    000      0000000   000         0000000  000   000  000   000  000   000   0000000   00000000
+    # 00000000  000   000  00000000    0000000    0000000  00000000  000000000   0000000   00000000 
+    # 000        000 000   000   000  000   000  000       000          000     000   000  000   000
+    # 0000000     00000    00000000   000   000  0000000   0000000      000     000   000  00000000 
+    # 000        000 000   000        000   000       000  000          000     000   000  000      
+    # 00000000  000   000  000         0000000   0000000   00000000     000      0000000   000      
     
     exposeTop: (e) =>
         num = Math.abs e.num
         for n in [0...num]
             if e.num < 0
-                lines.shift()?.remove()
+                @lines.shift()?.remove()
             else
-                lines.unshift @lineForIndex li
+                @lines.unshift @lineForIndex li
         @updateLinePositions 0  
                                 
     # 00000000  000   000  00000000    0000000    0000000  00000000
@@ -238,7 +237,9 @@ class Minimap
             y:        st
             height:   Math.max 0, topBotHeight
     
-    onEditorViewHeight: (h) => @scroll.setViewHeight h
+    onEditorViewHeight: (h) => 
+        log "minimap.onEditorViewHeight #{h} #{@editor.name}"
+        @scroll.setViewHeight h
     
     onEditorLineNum: (n) => 
         @scroll.setNumLines n        
@@ -254,7 +255,7 @@ class Minimap
     onScroll: (scroll, topOffset) =>
         t = @scroll.top * 2
         h = @scroll.viewHeight
-        # log "minimap.onScroll t #{t} h #{h}"
+        console.log "minimap.onScroll t #{t} h #{h}"
         @s.attr
              viewBox: "0 #{t} 120 #{h}"   
     

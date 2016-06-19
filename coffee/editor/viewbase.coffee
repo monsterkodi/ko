@@ -40,7 +40,7 @@ class ViewBase extends Editor
         @size = {}
         @syntax = new syntax @
     
-        @setFontSize prefs.get @fontSizeKey, @fontSizeDefault
+        @setFontSize prefs.get "#{@name}FontSize", @fontSizeDefault
 
         @scroll = new scroll 
             lineHeight: @size.lineHeight

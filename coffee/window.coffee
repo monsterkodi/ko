@@ -11,6 +11,7 @@ _           = require 'lodash'
 split       = require './split'
 View        = require './editor/view'
 Commandline = require './commandline/commandline'
+Terminal    = require './terminal/terminal'
 LogView     = require './logview/logview'
 prefs       = require './tools/prefs'
 keyinfo     = require './tools/keyinfo'
@@ -31,6 +32,9 @@ remote = electron.remote
 dialog = remote.dialog
 winID  = null
 editor = null
+logview = null
+terminal = null
+commandline = null
     
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000     
@@ -94,7 +98,9 @@ ipc.on 'setWinID', (event, id) =>
     # log "setWinID: ", id
     window.split = new split id
     window.split.on 'paneHeight', (e) ->
-        # log "window.on.split.paneHeight", e
+        log "window.on.split.paneHeight", e
+        if e.paneIndex == 0
+            window.terminal?.resized()
         if e.paneIndex == 2
             window.editor?.resized()
         if e.paneIndex == 3
@@ -195,6 +201,24 @@ saveFileAs = =>
             if file
                 addToRecent file
                 saveFile file
+
+$('.titlebar').ondblclick = (event) => ipc.send 'maximizeWindow', winID
+
+# 000000000  00000000  00000000   00     00  000  000   000   0000000   000    
+#    000     000       000   000  000   000  000  0000  000  000   000  000    
+#    000     0000000   0000000    000000000  000  000 0 000  000000000  000    
+#    000     000       000   000  000 0 000  000  000  0000  000   000  000    
+#    000     00000000  000   000  000   000  000  000   000  000   000  0000000
+
+terminal = window.terminal = new Terminal '.terminal'
+
+#  0000000   0000000   00     00  00     00   0000000   000   000  0000000  
+# 000       000   000  000   000  000   000  000   000  0000  000  000   000
+# 000       000   000  000000000  000000000  000000000  000 0 000  000   000
+# 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
+#  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
+
+commandline = window.commandline = new Commandline '.commandline-editor'
                   
 # 00000000  0000000    000  000000000   0000000   00000000 
 # 000       000   000  000     000     000   000  000   000
@@ -205,16 +229,6 @@ saveFileAs = =>
 editor = window.editor = new View '.editor'
 editor.setText editorText if editorText?
 editor.view.focus()
-
-#  0000000   0000000   00     00  00     00   0000000   000   000  0000000  
-# 000       000   000  000   000  000   000  000   000  0000  000  000   000
-# 000       000   000  000000000  000000000  000000000  000 0 000  000   000
-# 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
-#  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
-
-commandline = window.commandline = new Commandline '.commandline-editor'
-
-$('.titlebar').ondblclick = (event) => ipc.send 'maximizeWindow', winID
 
 # 000       0000000    0000000   000   000  000  00000000  000   000
 # 000      000   000  000        000   000  000  000       000 0 000

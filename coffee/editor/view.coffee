@@ -26,7 +26,6 @@ class View extends ViewBase
     constructor: (viewElem) -> 
 
         @fontSizeDefault = 15
-        @fontSizeKey     = 'editorFontSize'
 
         super viewElem
         

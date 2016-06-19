@@ -149,13 +149,10 @@ class Split extends event
         for h in [0...s.length]
             prevY = h > 0 and s[h-1] or 0
             thisY = s[h]
-            # oldHeight = parseInt(@panes[h].style.height)
             oldHeight = @panes[h].getBoundingClientRect().height
             @panes[h].style.top    = "#{prevY+(thisY>0 and @handleHeight or 0)}px"
             @handles[h].style.top  = "#{s[h]}px"            
-            # log "split.applySplit #{thisY} - #{prevY} - #{@handleHeight}"
             newHeight = thisY-prevY-@handleHeight
-            # log "split.applySplit #{oldHeight} #{newHeight}"
             if newHeight != oldHeight
                 @panes[h].style.height = "#{newHeight}px"
                 @emit 'paneHeight', 
@@ -174,8 +171,10 @@ class Split extends event
     # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
     #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
     
-    showCommandline: -> @splitAt 0, 0
     hideCommandline: -> @splitAt 1, 0
+    showCommandline: -> 
+        if 0 >= @splitPosY 1
+            @splitAt 0, 0
     
     # 000       0000000    0000000 
     # 000      000   000  000      
@@ -219,16 +218,14 @@ class Split extends event
     # 000       000   000  000       000   000       000
     # 000        0000000    0000000   0000000   0000000 
     
-    focusOnEditorOrHistory: ->
-        @focusOnEditor()
+    focusEditor: -> @editor.focus()
+
+    focusOnEditorOrHistory: -> @focusOnEditor()
         
     focusOnEditor: ->
         @hideCommandline()
         @focusEditor()
         
-    focusEditor: ->
-        @editor.focus()
-
     #  0000000  000000000   0000000   000000000  00000000
     # 000          000     000   000     000     000     
     # 0000000      000     000000000     000     0000000 

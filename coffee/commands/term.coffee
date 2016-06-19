@@ -3,11 +3,9 @@
 #    000     0000000   0000000    000000000
 #    000     000       000   000  000 0 000
 #    000     00000000  000   000  000   000
-{
-$}            = require '../tools/tools'
+
 log           = require '../tools/log'
 child_process = require 'child_process'
-ansihtml      = require '../tools/ansihtml'
 Command       = require '../commandline/command'
 
 class Term extends Command
@@ -21,7 +19,6 @@ class Term extends Command
         @childp.on 'disconnect', @onExit
         @childp.stdout.on 'data', @onData
         @childp.stdout.on 'end', @onEnd        
-        @ansihtml = new ansihtml()
         # log "Term.constructor"
         super
     
@@ -34,9 +31,7 @@ class Term extends Command
     onData: (out) =>        
         s = out.toString()
         log s
-        h = @ansihtml.toHtml s
-        log h
-        $('.pinboard').innerHTML += h
+        window.terminal?.output s
         
     execute: (command) ->
         log "term.execute command #{command}"
