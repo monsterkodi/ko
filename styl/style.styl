@@ -176,18 +176,24 @@ body
 
 ::-webkit-scrollbar
     width                   scrollhandleWidth
-::-webkit-scrollbar    
-    height                  scrollhandleWidth
+::-webkit-scrollbar
+    height                  scrollhandleWidth  
+    background-color        transparent
 
 ::-webkit-scrollbar-corner
-    background              #222
+    background-color        #222
 
 ::-webkit-scrollbar-thumb
-    background              #333
+    background-color        #333
 
-.scrollhandle:hover
+::-webkit-scrollbar-track
+    background-color        transparent
+    
+::-webkit-scrollbar-thumb
+    background-color        #333 // rgba(255,255,255,0.15)
+    
 ::-webkit-scrollbar-thumb:hover
-    background              #666
+    background-color        #b00 // rgba(255,255,255,0.3)
 
 .scrollbar
     position            absolute
@@ -400,38 +406,6 @@ rect
     &.buffer
         fill        #000
 
-// 000       0000000    0000000 
-// 000      000   000  000      
-// 000      000   000  000  0000
-// 000      000   000  000   000
-// 0000000   0000000    0000000 
-
-// .logview
-// 
-//     fill-abs()
-//         
-//     overflow-x      auto
-//     overflow-y      auto
-// 
-//     background      #000
-//     color           #ddd 
-//     
-//     font-size       10px
-//     font-weight     bold
-//     font-family     "Andale Mono", monospace
-
-// 000000000  00000000  00000000   00     00  000  000   000   0000000   000    
-//    000     000       000   000  000   000  000  0000  000  000   000  000    
-//    000     0000000   0000000    000000000  000  000 0 000  000000000  000    
-//    000     000       000   000  000 0 000  000  000  0000  000   000  000    
-//    000     00000000  000   000  000   000  000  000   000  000   000  0000000
-
-.terminaljs 
-	background   black
-	color        white
-	font-family  Courier, monospace
-	display      inline-block
-
 // 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000
 // 000   000  000  000        000   000  000      000  000        000   000     000   
 // 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000   
@@ -488,271 +462,4 @@ rect
         border-top-right-radius selectionRadius
     &.br
         border-bottom-right-radius selectionRadius
-                    
-// @import 'syntax'
-
-//  0000000  000   000  000   000  000000000   0000000   000   000
-// 000        000 000   0000  000     000     000   000   000 000 
-// 0000000     00000    000 0 000     000     000000000    00000  
-//      000     000     000  0000     000     000   000   000 000 
-// 0000000      000     000   000     000     000   000  000   000
-
-.syntax
-    color           #666
-    
-.bool           
-    color           #88f
-    &.false      
-        color       #44f
-    
-.number
-    color           #66f
-    &.float   
-        color       #f88
-
-.dictionary
-    color           #ff6
-
-.array
-    color           #00f
-
-.owner
-.callee
-.class
-    color           #ff8
-        
-.property
-    opacity         0.8
-    
-.variable
-    color           #a0a
-    
-.range
-    color           #80f
-    
-.require    
-    color           #0f0
-
-.this
-    opacity         0.7
-        
-.marker
-    opacity         0.5
-            
-.module
-    color           #ff8
-
-.method
-    color           #ff0
-    
-.property
-    color           #f90 // #ff2
-    
-.function
-    color           #fa0
-    &.call          
-        color       #ff0 // #f90
-    &.marker
-        color       #55f
-        opacity     1
-        &.bound
-            color   #66f
-    &.bracket
-        color       #55f
-    &.argument
-        color       #aaf
-        &.punctuation
-            opacity  0.5
-
-.class
-    &.variable
-        color       #2ae
-    &.function
-        color       #fc8
-
-.keypath
-    color           #f80
-
-.syntax.cond
-.keyword
-    color           #aaf !important
-    &.null    
-        color       #a00 !important
-
-.interpolation.marker
-        color       #f83
-
-.variable.err        
-    color           #f08
-
-.syntax.exists     
-    opacity         0.7
-
-.string
-    color           #0a0    !important
-    &.double
-        color       #0f0    !important
-        
-.comment
-.comment.string
-.comment.string.double
-    color           #4f4f4f !important
-
-.require
-    &.variable
-        color       #4f4
-    &.string 
-        color       #0a0
-    &.keyword.require 
-        color       #666
-    &.syntax
-        opacity     0.5
-            
-.path
-    color #fff
-    &.coffee
-        color       #ff0
-    &.noon
-        color       #bbf
-    &.js
-        color       #f33
-    &.json
-        color       #888
-    &.md
-        color       #0f0
-    &.pug
-        color       #0af
-    &.css
-        color       #05a
-    &.styl
-        color       #08f
-    &.jade
-        color       #fa0
-    &.html
-        color       #0a0
-    &.dirname 
-        color       #888
-    &.extname
-        opacity     0.7
-    &.separator
-        opacity     0.2
-    &.marker
-        opacity     0.4
-            
-// 00     00  000  000   000  000  00     00   0000000   00000000 
-// 000   000  000  0000  000  000  000   000  000   000  000   000
-// 000000000  000  000 0 000  000  000000000  000000000  00000000 
-// 000 0 000  000  000  0000  000  000 0 000  000   000  000      
-// 000   000  000  000   000  000  000   000  000   000  000      
-
-rect.text
-    fill           #888
-            
-rect.syntax
-    fill           darken(#666, 50%)
-    
-rect.bool           
-    fill           darken(#88f, 50%)
-    &.false      
-        fill       darken(#44f, 50%)
-    
-rect.number
-    fill           darken(#66f, 50%)
-    &.float   
-        fill       darken(#f88, 50%)
-
-rect.dictionary
-    fill           darken(#ff6, 50%)
-
-rect.array
-    fill           darken(#00f, 50%)
-
-rect.owner
-rect.callee
-rect.class
-    fill           darken(#ff8, 50%)
-            
-rect.variable
-    fill           darken(#a0a, 50%)
-    
-rect.range
-    fill           darken(#80f, 50%)
-    
-rect.require    
-    fill           darken(#0f0, 50%)
-
-rect.this
-    opacity        darken(#008, 50%)
-        
-rect.marker
-    opacity        darken(#555, 50%)
-            
-rect.module
-    fill           darken(#ff8, 50%)
-
-rect.method
-    fill           darken(#ff0, 50%)
-    
-rect.property
-    fill           darken(#f90, 70%)
-    
-rect.function
-    fill           darken(#fa0, 50%)
-    &.call          
-        fill       darken(#ff0, 50%)
-    &.marker
-        fill       darken(#55f, 10%)
-        &.bound
-            fill   darken(#66f, 10%)
-    &.bracket
-        fill       darken(#55f, 10%)
-    &.argument
-        fill       darken(#aaf, 10%)
-        &.punctuation
-            fill   darken(#88b, 10%)
-
-rect.class
-    &.variable
-        fill       darken(#2ae, 50%)
-    &.function
-        fill       darken(#fc8, 50%)
-
-rect.keypath
-    fill           darken(#f80, 50%)
-
-rect.syntax.cond
-rect.keyword
-    fill           darken(#aaf, 10%) !important
-    &.null    
-        fill       darken(#a00, 10%) !important
-
-rect.interpolation.marker
-        fill       darken(#f83, 50%)
-
-rect.variable.err        
-    fill           darken(#f08, 50%)
-
-rect.syntax.exists     
-    opacity        #33a
-
-rect.string
-    fill           darken(#0a0, 10%)    !important
-    &.double
-        fill       darken(#0f0, 20%)    !important
-        
-rect.comment
-rect.comment.string
-rect.comment.string.double
-    fill           darken(#3f3f3f, 10%) !important
-
-rect.comment.header
-    fill           #ccf !important
-
-rect.require
-    &.variable
-        fill       darken(#4f4, 50%) 
-    &.string 
-        fill       darken(#0a0, 50%) 
-    &.keyword.require 
-        fill       darken(#666, 50%) 
-                                    
+                                                        

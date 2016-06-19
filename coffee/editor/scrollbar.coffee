@@ -7,6 +7,7 @@
 clamp
 }    = require '../tools/tools'
 drag = require '../tools/drag'
+log  = require '../tools/log'
 
 class Scrollbar
 
@@ -93,5 +94,9 @@ class Scrollbar
             @handle.style.top     = "#{scrollTop}px"
             @handle.style.height  = "#{scrollHeight}px"
             @handle.style.width   = "2px"
+            cf = 1 - clamp 0, 1, (scrollHeight-10)/200
+            cs = "rgb(#{parseInt 47+cf*80},#{parseInt 47+cf*80},#{parseInt 47+cf*208})"
+            # log "cf #{cf} cs #{cs}" if @editor.name == 'editor'
+            @handle.style.backgroundColor = cs
     
 module.exports = Scrollbar

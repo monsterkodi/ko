@@ -11,16 +11,10 @@
 - command drag: don't clear selection and don't single select
 - more linear scrolling when dragging
     
-#### scrollbar
-- blue if small, gray if large
-
 #### misc    
 - command-enter: deselect, insert newline, indent, and single cursor
 - comment line characters per filetype    
 - remember scroll positions per file
-    
-#### log 
-- use editor (without minimap?)
     
 #### cursors
 - remember last cursor
