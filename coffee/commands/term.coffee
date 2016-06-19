@@ -30,11 +30,10 @@ class Term extends Command
         
     onData: (out) =>        
         s = out.toString()
-        log s
         window.terminal?.output s
         
     execute: (command) ->
-        log "term.execute command #{command}"
+        # log "term.execute command #{command}"
         @childp.stdin.write "#{command}\n"
         text: ''
         

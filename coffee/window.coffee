@@ -91,7 +91,7 @@ ipc.on 'reloadFile', =>
 ipc.on 'saveFileAs', => saveFileAs()
 ipc.on 'saveFile',   => saveFile()
 ipc.on 'loadFile', (event, file) => 
-    log "window.ipc.loadFile #{file}"
+    # log "window.ipc.loadFile #{file}"
     loadFile file
 ipc.on 'setWinID', (event, id) => 
     # log "window.ipc.setWinID #{id} #{window.split?}"
@@ -117,7 +117,7 @@ saveFile = (file) =>
     setState 'file', file
 
 loadFile = (file) =>  
-    log 'window.loadFile file:', file
+    # log 'window.loadFile file:', file
     if fileExists file
         addToRecent file
         editor.setCurrentFile null # to stop watcher and reset scroll
@@ -252,7 +252,7 @@ window.onresize = =>
         split.resized()
 
 window.onload = =>
-    log "window.onload sh #{sh()} #{window.split?}"
+    # log "window.onload sh #{sh()} #{window.split?}"
     split.resized()
     
 window.onunload = =>

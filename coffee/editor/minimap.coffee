@@ -76,6 +76,7 @@ class Minimap
     # 0000000  000  000   000  00000000
     
     lineForIndex: (li) ->
+        # log "minimap.lineForIndex #{li}" if @editor.name == 'editor'
         t = @editor.lines[li]
         line = @s.group()       
         line.attr
@@ -137,12 +138,18 @@ class Minimap
     # 00000000  000   000  000         0000000   0000000   00000000     000      0000000   000      
     
     exposeTop: (e) =>
+        # log "minimap.exposeTop", e, @scroll.info() if @editor.name == 'editor'
+        # log "minimap.exposeTop", @lines.length if @editor.name == 'editor'
         num = Math.abs e.num
         for n in [0...num]
             if e.num < 0
+                li = e.new - (num - n)
+                # log "minimap.exposeTop #{li}"
                 @lines.shift()?.remove()
             else
+                li = e.new + num - n - 1
                 @lines.unshift @lineForIndex li
+        # log "minimap.exposeTop", @lines.length if @editor.name == 'editor'
         @updateLinePositions 0  
                                 
     # 00000000  000   000  00000000    0000000    0000000  00000000
@@ -152,8 +159,9 @@ class Minimap
     # 00000000  000   000  000         0000000   0000000   00000000
         
     exposeLine: (li) =>
-        # log 'minimap.exposeLine', li
-        @lines.push @lineForIndex li                            
+        # log 'minimap.exposeLine', li if @editor.name == 'editor'
+        @lines.push @lineForIndex li
+        @updateLinePositions @lines.length-1
         
     # 000   000   0000000   000   000  000   0000000  000   000
     # 000   000  000   000  0000  000  000  000       000   000
@@ -187,7 +195,7 @@ class Minimap
         # log 'minimap.updateLinePositions', start
         for li in [start...@lines.length]
             @lines[li].attr
-                transform: "translate(0 #{li*2})"    
+                transform: "translate(0 #{li*2})"
 
     lineForEvent: (event) ->
         st = @elem.scrollTop
@@ -222,23 +230,26 @@ class Minimap
     #  0000000   000   000  00000000  0000000    000     000      0000000   000   000
     
     onEditorScroll: (scroll, topOffset) =>
-        # log 'minimap.onEditorScroll', scroll, topOffset
+        # log "minimap.onEditorScroll scroll #{scroll} topOffset #{topOffset}" if @editor.name == 'editor'
         topBotHeight = (@editor.scroll.bot-@editor.scroll.top+1)*2
-            
+        # log "minimap.onEditorScroll topBotHeight #{topBotHeight}" if @editor.name == 'editor'
         st = @editor.scroll.top*2
         fh = @scroll.scrollMax
             
+        # log "minimap.onEditorScroll st #{st} fh #{fh}" if @editor.name == 'editor'
+            
         if @scroll.fullHeight > @scroll.viewHeight
-            tf = (@scroll.viewHeight - topBotHeight)/2
-            tp = clamp 0, fh, st - tf
-            @scroll.to clamp 0, @scroll.scrollMax, tp
+            tf = parseInt (@scroll.viewHeight - topBotHeight)/2
+            tp = clamp 0, Math.min(fh, @scroll.scrollMax), st - tf
+            # log "minimap.onEditorScroll tf #{tf} tp #{tp}" if @editor.name == 'editor'
+            @scroll.to tp
 
         @topBot.attr 
-            y:        st
+            y:        st - @scroll.exposeTop*@scroll.lineHeight
             height:   Math.max 0, topBotHeight
     
     onEditorViewHeight: (h) => 
-        log "minimap.onEditorViewHeight #{h} #{@editor.name}"
+        # log "minimap.onEditorViewHeight #{h} #{@editor.name}"
         @scroll.setViewHeight h
     
     onEditorLineNum: (n) => 
@@ -253,11 +264,9 @@ class Minimap
     #  0000000   000   000  0000000    0000000  000   000   0000000   0000000  0000000
             
     onScroll: (scroll, topOffset) =>
-        t = @scroll.top * 2
-        h = @scroll.viewHeight
-        # console.log "minimap.onScroll t #{t} h #{h}"
+        # log "minimap.onScroll scroll #{scroll} topOffset #{topOffset} viewHeight #{@scroll.viewHeight}" if @editor.name == 'editor'
         @s.attr
-             viewBox: "0 #{t} 120 #{h}"   
+             viewBox: "0 #{topOffset} 120 #{@scroll.viewHeight}"   
     
     width: -> parseInt getStyle '.minimap', 'width'
     

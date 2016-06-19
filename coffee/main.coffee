@@ -173,6 +173,7 @@ class Main
             win.maximize()
 
     saveWinBounds: (win) ->
+        # log "main.saveWinBounds"
         prefs.setPath "windows.#{win.id}.bounds",win.getBounds()
     
     toggleWindows: =>
@@ -325,20 +326,15 @@ class Main
         win.on 'move', @onMoveWin
                 
         winReady = =>
-            log "main.createWindow.winReady send setWinID #{win.id}"
+            # log "main.createWindow.winReady send setWinID #{win.id}"
             win.webContents.send 'setWinID', win.id
-            
-        winLoading = => 
-            log "main.createWindow.winLoading send setWinID #{win.id}"
-            win.webContents.send 'setWinID', win.id
-            
+                        
         winLoaded = =>
             if openFile?
-                log "main.createWindow.winLoaded send laodFile #{openFile}"
+                # log "main.createWindow.winLoaded send laodFile #{openFile}"
                 win.webContents.send 'loadFile', openFile 
         
         win.webContents.on 'dom-ready',         winReady
-        win.webContents.on 'did-start-loading', winLoading
         win.webContents.on 'did-finish-load',   winLoaded
                 
         win 

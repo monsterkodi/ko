@@ -66,6 +66,7 @@ class Prefs
         Prefs.save values
 
     @load: () ->
+        # log "prefs.load"
         values = {}
         try
             values = JSON.parse fs.readFileSync(Prefs.path, encoding:'utf8')

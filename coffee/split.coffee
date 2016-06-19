@@ -138,7 +138,7 @@ class Split extends event
     # 000   000  000        000        0000000     000   
         
     applySplit: (s) ->
-        log "split.applySplit", s
+        # log "split.applySplit", s
         if s[1] >= @commandlineHeight + @handleHeight
             s[0] = s[1] - @commandlineHeight - @handleHeight
         for i in [1...s.length]
