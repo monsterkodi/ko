@@ -6,7 +6,6 @@
 {
 fileExists,
 dirExists,
-fileList,
 relative,
 resolve,
 clamp,
@@ -59,16 +58,7 @@ class Open extends Command
         command  = command.trim()
         if command.length
             # log 'command', command, @resolvedPath command
-            if dirExists @resolvedPath command
-                log 'open.changed rebuild files for', @resolvedPath command
-                @dir = @resolvedPath command
-                @pkg = @resolvedPath command
-                @lastFileIndex = -1
-                @startWalker()
-                @listFiles @files
-                @select 0                
-                # log @files.splice 0,10
-            else
+            
                 fuzzied  = fuzzy.filter command, @files       
                 filtered = (f.string for f in fuzzied)
                 @listFiles filtered
@@ -218,7 +208,6 @@ class Open extends Command
             
     walkerDone: =>
         # profile 'walker done'
-        base = @dir
         
         # 000   000  00000000  000   0000000   000   000  000000000
         # 000 0 000  000       000  000        000   000     000   
@@ -228,7 +217,7 @@ class Open extends Command
         
         weight = (f) =>
             
-            extnameBonus = switch path.extname(f)
+            extnameBonus = switch path.extname(f)            
                 when '.coffee' then 100
                 when '.md', '.styl', '.pug' then 50
                 when '.noon' then 25
@@ -237,7 +226,7 @@ class Open extends Command
                     0 
                 
             bonus = extnameBonus #- path.basename(f).length
-                
+                            
             if f.startsWith @dir
                 return 10000-path.dirname(f).length+bonus
             if f.startsWith path.dirname @dir
@@ -267,25 +256,44 @@ class Open extends Command
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
         
     execute: (command) ->
+        if command in ['pwd', '.']
+            return text: @dir, select: true
+        else if dirExists @resolvedPath command
+            resolved = @resolvedPath command
+            @dir = resolved
+            @pkg = @packagePath @dir
+            log "open.execute @dir #{@dir} @pkg #{@pkg}"
+            @lastFileIndex = -1
+            @files = []
+            @selected = 0
+            @startWalker()
+            return text: @dir, select: true
 
-        selected = @list?.children[@selected]?.value ? command
+        listValue = @list?.children[@selected]?.value
 
         @hideList()
-        
-        files = _.words selected, new RegExp "[^, ]+", 'g'
-                
-        for i in [0...files.length]
-            file = files[i]
-            file = @resolvedPath file
-            # log 'open.execute file:', file
-            if not fileExists file
-                if '' == path.extname file
-                    if fileExists file + '.coffee'
-                        file += '.coffee'
-            files.splice i, 1, file
+
+        log "selected #{@selected} listValue #{@listValue}"
+
+        if listValue
+            files = [@resolvedPath listValue]
+        else
+            files = _.words command, new RegExp "[^, ]+", 'g'
+                    
+            for i in [0...files.length]
+                file = files[i]
+                file = @resolvedPath file
+                # log 'open.execute file:', file
+                if not fileExists file
+                    if '' == path.extname file
+                        if fileExists file + '.coffee'
+                            file += '.coffee'
+                files.splice i, 1, file
             
         options = 
             newWindow: @combo == @shortcuts[1] # lazy bastard :)
+        
+        log "open.execute files", files            
         opened = window.openFiles files, options
         # log "open.execute opened #{opened.length} #{opened}"
         if opened?.length
@@ -321,11 +329,12 @@ class Open extends Command
     # 000   000  000            000  000   000  000         000     000       000   000
     # 000   000  00000000  0000000    0000000   0000000      0      00000000  0000000  
     
-    resolvedPath: (p) ->
+    resolvedPath: (p, parent=@dir) ->
+        return parent if not p?
         if p[0] in ['~', '/']
             resolve p
         else
-            resolve path.join @dir, p
+            resolve path.join parent, p
         
     # 000   000  000  0000000    00000000
     # 000   000  000  000   000  000     

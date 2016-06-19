@@ -5,12 +5,21 @@
 - **scroll find result to top of view**
 - escape dots in search string
 - highlight while entering
-  
-#### minimap 
-- shift drag: extend selection
-- command drag: don't clear selection and don't single select
-- more linear scrolling when dragging
-    
+
+#### editor
+- autocomple
+    - from buffer
+    - from similar files
+
+#### open
+- change current pkg dir on enter only
+- pwd: show current pkg dir
+
+#### terminal
+- autocomplete
+    - dirs and files
+    - /usr/local/bin, /usr/bin and /bin
+      
 #### misc    
 - command-enter: deselect, insert newline, indent, and single cursor
 - comment line characters per filetype    
@@ -43,7 +52,12 @@
     - autoconvert '' to "" when #{} entered
 - dbg "class.method arg: #{arg}, ..."
 - history of file locations
-            
+
+#### minimap 
+- shift drag: extend selection
+- command drag: don't clear selection and don't single select
+- more linear scrolling when dragging
+
 #### syntax
 - fix md
 - pug, html, js

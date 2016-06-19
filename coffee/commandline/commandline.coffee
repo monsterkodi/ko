@@ -5,8 +5,8 @@
 # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 {
-$,fileList
-}         = require '../tools/tools'
+fileList,
+$}        = require '../tools/tools'
 ViewBase  = require '../editor/viewbase'
 log       = require '../tools/log'
 path      = require 'path'
@@ -68,7 +68,8 @@ class Commandline extends ViewBase
     execute: ->
         r = @command?.execute @lines[0]
         @setText r.text if r?.text?
-        @selectNone()
+        if r.select then @selectAll()
+        else @selectNone() 
         window.split.focusEditor() if r?.focus == 'editor'
         
     cancel: ->

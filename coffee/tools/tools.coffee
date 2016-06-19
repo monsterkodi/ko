@@ -63,7 +63,7 @@ module.exports =
     resolve: (p) -> path.normalize path.resolve p.replace /\~/, process.env.HOME
     unresolve: (p) -> p.replace os.homedir(), "~"    
 
-    fileList: (paths, opt={ignoreHidden: true}) ->
+    fileList: (paths, opt={ignoreHidden: true, logError: true}) ->
         files = []
         paths = [paths] if typeof paths == 'string'
         for p in paths
@@ -82,7 +82,8 @@ module.exports =
                         continue
                     files.push p
             catch err
-                log 'tools.fileList.error:', err
+                if opt.logError
+                    log 'tools.fileList.error:', err
         files
         
     fileExists: (file) ->

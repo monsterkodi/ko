@@ -4,10 +4,9 @@
 #      000  000        000      000     000   
 # 0000000   000        0000000  000     000   
 {
-$,
 clamp,
-last
-}     = require './tools/tools'
+last,
+$}    = require './tools/tools'
 log   = require './tools/log'
 pos   = require './tools/pos'
 drag  = require './tools/drag'
