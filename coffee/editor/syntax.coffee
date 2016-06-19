@@ -34,17 +34,19 @@ class syntax
                     when 'inserted' then @diss.splice li, 0, @dissForLineIndex li
                     when 'changed'  then @diss[li] = @dissForLineIndex li
                 
-    # 00000000    0000000   00000000    0000000  00000000
-    # 000   000  000   000  000   000  000       000     
-    # 00000000   000000000  0000000    0000000   0000000 
-    # 000        000   000  000   000       000  000     
-    # 000        000   000  000   000  0000000   00000000
+    #  0000000  000      00000000   0000000   00000000 
+    # 000       000      000       000   000  000   000
+    # 000       000      0000000   000000000  0000000  
+    # 000       000      000       000   000  000   000
+    #  0000000  0000000  00000000  000   000  000   000
         
-    parse: -> @diss = []
-        # for li in [0...@editor.lines]
-        #     @diss.push @dissForLineIndex li
-        #     if li > 10
-        #         break
+    clear: -> @diss = []
+
+    # 0000000    000   0000000   0000000
+    # 000   000  000  000       000     
+    # 000   000  000  0000000   0000000 
+    # 000   000  000       000       000
+    # 0000000    000  0000000   0000000 
 
     dissForLineIndex: (lineIndex) -> 
         syntax.dissForTextAndSyntax @editor.lines[lineIndex], @name
@@ -54,8 +56,11 @@ class syntax
         
     getDiss: (li) ->
         while li >= @diss.length
+            @diss.push null
+        if @diss[li] == null
             diss = matchr.dissect matchr.ranges syntax.matchrConfigs[@name], @editor.lines[li]
-            @diss.push @dissForLineIndex @diss.length # insert blanks?
+            # console.log "getDiss #{li}"
+            @diss[li] = diss
         @diss[li]
         
     # 000  000   000  000  000000000

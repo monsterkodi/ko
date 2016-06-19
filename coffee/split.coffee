@@ -153,7 +153,9 @@ class Split extends event
             prevY = h > 0 and s[h-1] or 0
             thisY = s[h]
             oldHeight = @panes[h].getBoundingClientRect().height
-            @panes[h].style.top    = "#{prevY+(thisY>0 and @handleHeight or 0)}px"
+            top = prevY+(h>0 and thisY>0 and @handleHeight or 0)
+            # log "split.applySplit pane #{h} prevY #{prevY} thisY #{thisY} top #{top}",s if h == 0
+            @panes[h].style.top    = "#{top}px"
             @handles[h].style.top  = "#{s[h]}px"            
             newHeight = thisY-prevY-@handleHeight
             if newHeight != oldHeight

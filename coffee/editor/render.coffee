@@ -10,28 +10,6 @@ log    = require '../tools/log'
 
 class render 
                 
-    #  0000000   0000000   000       0000000   00000000   000  0000000  00000000
-    # 000       000   000  000      000   000  000   000  000     000   000     
-    # 000       000   000  000      000   000  0000000    000    000    0000000 
-    # 000       000   000  000      000   000  000   000  000   000     000     
-    #  0000000   0000000   0000000   0000000   000   000  000  0000000  00000000
-    
-    @colorize: (str, stack) =>
-        try
-            smp = stack.map (s) -> String(s).split '.'
-            chk = {}
-            spl = []
-            for s in smp
-                if not chk[s[0]]?
-                    chk[s[0]] = s.slice 1
-                    spl.push s
-            spl = _.flatten spl
-            str = "<span class=\"#{spl.join ' '}\">#{encode str}</span>"
-                    
-        catch err
-            error err
-        str
-
     # 000      000  000   000  00000000
     # 000      000  0000  000  000     
     # 000      000  000 0 000  0000000 
@@ -42,12 +20,13 @@ class render
         if diss?.length
             for di in [diss.length-1..0]
                 d = diss[di]
-                if d.stack?
-                    clrzd = @colorize d.match, d.stack.reversed()
+                enc = encode d.match
+                if d.cls?
+                    clrzd = "<span class=\"#{d.cls.join ' '}\">#{enc}</span>"
                 else
-                    log 'warning! render.line no stack?'
-                    clrzd = encode d.match
-                line = line.slice(0, d.start) + clrzd + line.slice(d.start+d.match.length)
+                    console.log 'warning! render.line no stack?'
+                    clrzd = enc
+                line = line.slice(0, d.start) + clrzd + line.slice(d.start+(d.match?.length ? 0))
 
         enspce line
         

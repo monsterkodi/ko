@@ -7,6 +7,8 @@
 encode = require('html-entities').XmlEntities.encode
 
 module.exports = (s) ->
-    r = encode s
-    r = r.replace /\s/g, '&nbsp;'
-    r
+    if s
+        r = encode s
+        r = r.replace /\s/g, '&nbsp;'
+    else
+        ''

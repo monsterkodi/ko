@@ -37,7 +37,7 @@ class Minimap
         @lines = []
         
         @scroll = new scroll 
-            # dbg:        true
+            # dbg:        @editor.name == 'terminal'
             exposeMax: -2
             lineHeight: 2
             viewHeight: @editor.viewHeight()
@@ -76,8 +76,8 @@ class Minimap
     # 0000000  000  000   000  00000000
     
     lineForIndex: (li) ->
-        # log "minimap.lineForIndex #{li}" if @editor.name == 'editor'
-        t = @editor.lines[li]
+        # console.log "minimap.lineForIndex #{li}" if @editor.name == 'terminal'
+        # t = @editor.lines[li]
         line = @s.group()       
         line.attr
             transform: "translate(0 #{li*2})"
@@ -88,23 +88,20 @@ class Minimap
                 if r.match?
                     continue if r.match.trim().length == 0 # ignore spaces
                 else
-                    log 'warning! minimap.lineForIndex no match?', li, r
+                    console.log 'warning! minimap.lineForIndex no match?', li, r
                     continue
                 c = @s.rect()
                 c.attr
                     height: 2
                     x:      r.start
                     width:  r.match.length
-                                        
-                if r.stack?.length
-                    if last(r.stack)?.split?
-                        for cls in last(r.stack).split '.'
-                            c.addClass cls
-                    else
-                        log 'warning! minimap.lineForIndex no last(r.stack)?.split? line:', li, 'stack:', r.stack
+
+                if r.cls?
+                    for cls in r.cls
+                        c.addClass cls
                 else
-                    log 'warning! minimap.lineForIndex no stack?', li, r
                     c.addClass 'text'
+                                        
                 line.add c 
         line
                 
@@ -150,7 +147,7 @@ class Minimap
                 li = e.new + num - n - 1
                 @lines.unshift @lineForIndex li
         # log "minimap.exposeTop", @lines.length if @editor.name == 'editor'
-        @updateLinePositions 0  
+        # @updateLinePositions 0  
                                 
     # 00000000  000   000  00000000    0000000    0000000  00000000
     # 000        000 000   000   000  000   000  000       000     
@@ -161,7 +158,7 @@ class Minimap
     exposeLine: (li) =>
         # log 'minimap.exposeLine', li if @editor.name == 'editor'
         @lines.push @lineForIndex li
-        @updateLinePositions @lines.length-1
+        # @updateLinePositions @lines.length-1
         
     # 000   000   0000000   000   000  000   0000000  000   000
     # 000   000  000   000  0000  000  000  000       000   000
@@ -192,10 +189,11 @@ class Minimap
     # 0000000  000  000   000  00000000        000         0000000   0000000 
     
     updateLinePositions: (start=0) ->
-        # log 'minimap.updateLinePositions', start
+        return if start >= @lines.length
+        log "minimap.updateLinePositions start #{start} #{@lines.length}"
         for li in [start...@lines.length]
             @lines[li].attr
-                transform: "translate(0 #{li*2})"
+                transform: "translate(0 #{(@scroll.exposeTop+li)*2})"
 
     lineForEvent: (event) ->
         st = @elem.scrollTop
@@ -245,7 +243,7 @@ class Minimap
             @scroll.to tp
 
         @topBot.attr 
-            y:        st - @scroll.exposeTop*@scroll.lineHeight
+            y:        st
             height:   Math.max 0, topBotHeight
     
     onEditorViewHeight: (h) => 
@@ -266,7 +264,7 @@ class Minimap
     onScroll: (scroll, topOffset) =>
         # log "minimap.onScroll scroll #{scroll} topOffset #{topOffset} viewHeight #{@scroll.viewHeight}" if @editor.name == 'editor'
         @s.attr
-             viewBox: "0 #{topOffset} 120 #{@scroll.viewHeight}"   
+             viewBox: "0 #{scroll} 120 #{@scroll.viewHeight}"   
     
     width: -> parseInt getStyle '.minimap', 'width'
     

@@ -79,10 +79,7 @@ delState = (key) ->
 # 000  000        000     
 # 000  000         0000000
 
-ipc.on 'executeResult', (event, arg) =>
-    $('scroll').innerHTML += encode str arg
-    $('scroll').innerHTML += "<br>"
-    # $('scroll').parentElement.scrollTop = "-50px"
+ipc.on 'executeResult', (event, arg) => terminal.appendText str arg
 ipc.on 'openFile', (event, options) => openFile options
 ipc.on 'cloneFile',  => ipc.send 'newWindowWithFile', editor.currentFile
 ipc.on 'reloadFile', => 

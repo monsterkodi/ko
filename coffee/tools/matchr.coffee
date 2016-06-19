@@ -3,7 +3,9 @@
 # 000000000  000000000     000     000       000000000  0000000  
 # 000 0 000  000   000     000     000       000   000  000   000
 # 000   000  000   000     000      0000000  000   000  000   000
-
+{
+last
+} = require './tools'
 _ = require 'lodash'
 
 #  0000000   0000000   000   000  00000000  000   0000000 
@@ -100,6 +102,7 @@ ranges = (regexes, str) ->
 
 dissect = (ranges) -> 
     return [] if not ranges.length
+    # console.log "dissect -- #{JSON.stringify ranges}"
     di = []
     for ri in [0...ranges.length]
         rg = ranges[ri]
@@ -117,7 +120,8 @@ dissect = (ranges) ->
             si = di[i][0]
             d.push
                 start: si
-                stack: []
+                cid:   0
+                cls:   []
 
     p = 0
     for ri in [0...ranges.length]
@@ -126,7 +130,13 @@ dissect = (ranges) ->
             p += 1 
         pn = p
         while d[pn].start < rg.start+rg.match.length
-            d[pn].stack.push [rg.index, rg.value]
+            if  d[pn].cid < rg.index and rg.value?
+                if not rg.value.split?
+                    # console.log 'wtf?', rg.value, rg.match
+                    d[pn].cls = last(rg.value).split '.'
+                else
+                    d[pn].cls = rg.value.split '.' 
+                d[pn].cid = rg.index
             if pn+1 < d.length
                 if not d[pn].match
                     d[pn].match = rg.match.substr d[pn].start-rg.start, d[pn+1].start-d[pn].start
@@ -136,10 +146,8 @@ dissect = (ranges) ->
                     d[pn].match = rg.match.substr d[pn].start-rg.start
                 break
     d = d.filter (i) -> i.match?
-    d = d.map (i) -> 
-        i.stack = i.stack.sort((a,b)->a[0]-b[0]).map (j) -> j[1]
-        i.stack = _.flatten _.without i.stack, null
-        i
+    # console.log "dissect ==", JSON.stringify d
+    d
 
 module.exports = 
     config:  config

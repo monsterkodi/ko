@@ -89,7 +89,6 @@ class ViewBase extends Editor
         
         ts = text?.split /\n/
         [].push.apply @lines, ts
-        @syntax.parse()
         @emit 'numLines', @lines.length
         if @scroll.viewHeight != @viewHeight()
             @scroll.setViewHeight @viewHeight()        
@@ -102,7 +101,7 @@ class ViewBase extends Editor
         
         lines ?= ['']
         super lines
-        @syntax.parse()        
+        @syntax.clear()      
         if @scroll.viewHeight != @viewHeight()
             @scroll.setViewHeight @viewHeight()
             @emit 'viewHeight', @viewHeight()
@@ -236,7 +235,7 @@ class ViewBase extends Editor
         # log "viewbase.exposeLine #{li} children #{@elem.children.length}"
         
         if li != @elem.children.length-1+@scroll.exposeTop 
-            log "viewbase.exposeLine wtf? #{li} != #{@elem.children.length-1+@scroll.exposeTop }"
+            console.log "viewbase.exposeLine wtf? #{li} != #{@elem.children.length-1+@scroll.exposeTop }"
         
         @emit 'lineExposed', 
             lineIndex: li # @elem.children.length-1 + @scroll.exposeTop 

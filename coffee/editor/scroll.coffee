@@ -143,7 +143,6 @@ class scroll extends events
             while @bot > @exposeBot
                 @exposeBot += 1
                 @exposed = @exposeBot - @exposeTop
-                log "scroll.expose emit exposeLine #{@exposeBot}" if @dbg
                 @emit 'exposeLine', @exposeBot
             return
         
