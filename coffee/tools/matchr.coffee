@@ -132,10 +132,12 @@ dissect = (ranges) ->
         while d[pn].start < rg.start+rg.match.length
             if  d[pn].cid < rg.index and rg.value?
                 if not rg.value.split?
-                    # console.log 'wtf?', rg.value, rg.match
-                    d[pn].cls = last(rg.value).split '.'
-                else
-                    d[pn].cls = rg.value.split '.' 
+                    for r in rg.value
+                        for c in rg.value.split '.' 
+                            d[pn].cls.push c if d[pn].cls.indexOf(c) < 0
+                else 
+                    for c in rg.value.split '.' 
+                        d[pn].cls.push c if d[pn].cls.indexOf(c) < 0
                 d[pn].cid = rg.index
             if pn+1 < d.length
                 if not d[pn].match
@@ -145,7 +147,17 @@ dissect = (ranges) ->
                 if not d[pn].match
                     d[pn].match = rg.match.substr d[pn].start-rg.start
                 break
-    d = d.filter (i) -> i.match?
+                
+    d = d.filter (i) -> i.match?.trim().length
+    for i in d
+        i.clss = i.cls.join ' '
+    if d.length > 1
+        for i in [d.length-2..0]
+            if d[i].start + d[i].match.length == d[i+1].start
+                if d[i].clss == d[i+1].clss
+                    d[i].match += d[i+1].match
+                    d.splice i+1, 1
+        
     # console.log "dissect ==", JSON.stringify d
     d
 

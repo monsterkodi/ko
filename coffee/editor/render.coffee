@@ -22,7 +22,7 @@ class render
                 d = diss[di]
                 enc = encode d.match
                 if d.cls?
-                    clrzd = "<span class=\"#{d.cls.join ' '}\">#{enc}</span>"
+                    clrzd = "<span class=\"#{d.clss}\">#{enc}</span>"
                 else
                     console.log 'warning! render.line no stack?'
                     clrzd = enc

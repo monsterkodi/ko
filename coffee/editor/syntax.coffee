@@ -59,7 +59,6 @@ class syntax
             @diss.push null
         if @diss[li] == null
             diss = matchr.dissect matchr.ranges syntax.matchrConfigs[@name], @editor.lines[li]
-            # console.log "getDiss #{li}"
             @diss[li] = diss
         @diss[li]
         

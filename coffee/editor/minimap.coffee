@@ -77,12 +77,12 @@ class Minimap
     
     lineForIndex: (li) ->
         # console.log "minimap.lineForIndex #{li}" if @editor.name == 'terminal'
-        # t = @editor.lines[li]
-        line = @s.group()       
-        line.attr
-            transform: "translate(0 #{li*2})"
+        line = @s.group()  
+        line.transform "translate(0 #{li*2})"     
          
         diss = @editor.syntax.getDiss li
+        # console.log "#{@editor.name}.minimap.lineForIndex #{li} diss #{JSON.stringify diss}" if @editor.name != 'logview'
+        # console.log "#{@editor.name}.minimap.lineForIndex #{li} diss.length #{diss.length}" if @editor.name != 'logview'
         if diss.length
             for r in diss
                 if r.match?
@@ -90,17 +90,10 @@ class Minimap
                 else
                     console.log 'warning! minimap.lineForIndex no match?', li, r
                     continue
-                c = @s.rect()
-                c.attr
-                    height: 2
-                    x:      r.start
-                    width:  r.match.length
+                c = @s.rect r.start, 0, r.match.length, 2
 
-                if r.cls?
-                    for cls in r.cls
-                        c.addClass cls
-                else
-                    c.addClass 'text'
+                for cls in r.cls ? ['text']
+                    c.addClass cls
                                         
                 line.add c 
         line
@@ -126,7 +119,9 @@ class Minimap
                     @lines.splice li, 0, @lineForIndex li
                     invalidated = Math.min invalidated, li
         
-        @updateLinePositions invalidated
+        if invalidated < @lines.length
+            for li in [invalidated...@lines.length] 
+                @lines[li].transform "translate(0 #{(@scroll.exposeTop+li)*2})"
     
     # 00000000  000   000  00000000    0000000    0000000  00000000  000000000   0000000   00000000 
     # 000        000 000   000   000  000   000  000       000          000     000   000  000   000
@@ -147,7 +142,6 @@ class Minimap
                 li = e.new + num - n - 1
                 @lines.unshift @lineForIndex li
         # log "minimap.exposeTop", @lines.length if @editor.name == 'editor'
-        # @updateLinePositions 0  
                                 
     # 00000000  000   000  00000000    0000000    0000000  00000000
     # 000        000 000   000   000  000   000  000       000     
@@ -158,7 +152,6 @@ class Minimap
     exposeLine: (li) =>
         # log 'minimap.exposeLine', li if @editor.name == 'editor'
         @lines.push @lineForIndex li
-        # @updateLinePositions @lines.length-1
         
     # 000   000   0000000   000   000  000   0000000  000   000
     # 000   000  000   000  0000  000  000  000       000   000
@@ -188,13 +181,6 @@ class Minimap
     # 000      000  000  0000  000             000        000   000       000
     # 0000000  000  000   000  00000000        000         0000000   0000000 
     
-    updateLinePositions: (start=0) ->
-        return if start >= @lines.length
-        log "minimap.updateLinePositions start #{start} #{@lines.length}"
-        for li in [start...@lines.length]
-            @lines[li].attr
-                transform: "translate(0 #{(@scroll.exposeTop+li)*2})"
-
     lineForEvent: (event) ->
         st = @elem.scrollTop
         br = @elem.getBoundingClientRect()
