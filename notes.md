@@ -12,6 +12,7 @@
     - from similar files
 
 #### open
+- fix click
 - don't select recent when pwd was changed
 - fix selection index of last file 
 
