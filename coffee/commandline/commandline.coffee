@@ -68,7 +68,7 @@ class Commandline extends ViewBase
     execute: ->
         r = @command?.execute @lines[0]
         @setText r.text if r?.text?
-        if r.select then @selectAll()
+        if r?.select then @selectAll()
         else @selectNone() 
         window.split.focusEditor() if r?.focus == 'editor'
         

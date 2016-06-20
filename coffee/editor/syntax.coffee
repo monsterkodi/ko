@@ -3,12 +3,13 @@
 # 0000000     00000    000 0 000     000     000000000    00000  
 #      000     000     000  0000     000     000   000   000 000 
 # 0000000      000     000   000     000     000   000  000   000
-
-fs     = require 'fs'
+{
+$}     = require '../tools/tools'
+matchr = require '../tools/matchr'
+log    = require '../tools/log'
 path   = require 'path'
 noon   = require 'noon'
-log    = require '../tools/log'
-matchr = require '../tools/matchr'
+fs     = require 'fs'
 
 class syntax
     
@@ -18,6 +19,7 @@ class syntax
     constructor: (@editor) ->
         @name ='txt'
         @diss = []
+        @colors = {}
         
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000
@@ -61,6 +63,21 @@ class syntax
             diss = matchr.dissect matchr.ranges syntax.matchrConfigs[@name], @editor.lines[li]
             @diss[li] = diss
         @diss[li]
+    
+    #  0000000   0000000   000       0000000   00000000 
+    # 000       000   000  000      000   000  000   000
+    # 000       000   000  000      000   000  0000000  
+    # 000       000   000  000      000   000  000   000
+    #  0000000   0000000   0000000   0000000   000   000
+    
+    colorForClassnames: (clss) ->
+        if not @colors[clss]?
+            div = document.createElement 'div'
+            div.className = clss
+            $('main').appendChild div
+            @colors[clss] = window.getComputedStyle(div).color
+            div.remove()
+        return @colors[clss]
         
     # 000  000   000  000  000000000
     # 000  0000  000  000     000   

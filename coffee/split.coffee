@@ -156,7 +156,7 @@ class Split extends event
             # log "split.applySplit pane #{h} prevY #{prevY} thisY #{thisY} top #{top}",s if h == 0
             @panes[h].style.top    = "#{top}px"
             @handles[h].style.top  = "#{s[h]}px"            
-            newHeight = thisY-prevY-@handleHeight
+            newHeight = thisY-prevY-(h>0 and @handleHeight or 0)
             if newHeight != oldHeight
                 @panes[h].style.height = "#{newHeight}px"
                 @emit 'paneHeight', 

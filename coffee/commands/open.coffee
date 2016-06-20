@@ -57,7 +57,6 @@ class Open extends Command
         return if not @list? 
         command  = command.trim()
         if command.length
-            log "open.changed files", @files.slice 0,10
             fuzzied  = fuzzy.filter command, @files       
             filtered = (f.string for f in fuzzied)
             
@@ -201,7 +200,6 @@ class Open extends Command
             
     startWalker: ->           
         # profile 'walker start'
-        # log "startWalker @dir #{@dir}"
         that = @
         try
             dir = @pkg ? @dir
@@ -221,11 +219,9 @@ class Open extends Command
                 else if stat.isDirectory()
                     if p != dir
                         that.files.push p 
-                    else
-                        log "skip ****** #{p}"
                         
                 if that.files.length > 500
-                    log 'max files reached', @end?
+                    # log 'max files reached', @end?
                     @end()
             
             @walker.on 'path', onWalkerPath dir
@@ -270,8 +266,6 @@ class Open extends Command
                             
         @files.sort (a,b) -> absWeight(b) - absWeight(a)
         
-        # log "@files1 #{@files.slice 0,10}"
-        
         if @history.length
             h = (f for f in @history when f.length and (f != @file))
             @lastFileIndex = h.length - 1
@@ -279,7 +273,6 @@ class Open extends Command
         
         @files = (relative(f, @dir) for f in @files)
         
-        log "@files 2 -----", @files.slice 0,10
         @files = @files.filter (f) -> f.length 
         @files.sort (a,b) -> relWeight(b) - relWeight(a)
         
@@ -308,11 +301,9 @@ class Open extends Command
             else if listValue? 
                 if dirExists @resolvedPath listValue
                     resolved = listValue
-            # log "resolved #{resolved} @selected #{@selected} listValue #{listValue}"
             if resolved?
                 @dir = resolved
                 @pkg = @packagePath @dir
-                # log "open.execute @dir #{@dir} @pkg #{@pkg}"
                 @lastFileIndex = -1
                 @files = []
                 @selected = 0
@@ -320,8 +311,6 @@ class Open extends Command
                 return text: @dir, select: true
 
         @hideList()
-
-        # log "selected #{@selected} listValue #{@listValue}"
 
         if listValue
             files = [@resolvedPath listValue]
@@ -331,7 +320,6 @@ class Open extends Command
             for i in [0...files.length]
                 file = files[i]
                 file = @resolvedPath file
-                # log 'open.execute file:', file
                 if not fileExists file
                     if '' == path.extname file
                         if fileExists file + '.coffee'
@@ -341,9 +329,7 @@ class Open extends Command
         options = 
             newWindow: @combo == @shortcuts[1] # lazy bastard :)
         
-        # log "open.execute files", files            
         opened = window.openFiles files, options
-        # log "open.execute opened #{opened.length} #{opened}"
         if opened?.length
             if opened.length == 1
                 super opened[0]

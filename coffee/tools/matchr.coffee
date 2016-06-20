@@ -133,7 +133,8 @@ dissect = (ranges) ->
             if  d[pn].cid < rg.index and rg.value?
                 if not rg.value.split?
                     for r in rg.value
-                        for c in rg.value.split '.' 
+                        continue if not r.split?
+                        for c in r.split '.' 
                             d[pn].cls.push c if d[pn].cls.indexOf(c) < 0
                 else 
                     for c in rg.value.split '.' 

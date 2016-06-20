@@ -25,7 +25,6 @@ class Buffer extends event
         @cursors    = [[0,0]]
         @selections = []
         @highlights = []
-        # log "buffer.setLines emit numLines #{@lines.length}"
         @emit 'numLines', @lines.length
 
     #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
@@ -39,8 +38,6 @@ class Buffer extends event
         for c in @cursors
             if c[1] >= lineIndexRange[0] and c[1] <= lineIndexRange[1]
                 cs.push [c[0], c[1] - relIndex]
-            # else
-            #     log "buffer.cursorsInLineIndexRangeRelativeToLineIndex skip line #{c[1]} col #{c[0]}"
         cs
         
     cursorAtPos: (p) ->
@@ -84,7 +81,6 @@ class Buffer extends event
         p = @clampPos pos
         wr = @wordRangesInLineAtIndex p[1]
         r = @rangeAtPosInRanges p, wr
-        # log 'rangeForWordAtPos', p, p[1], @lines[p[1]], wr, r
         r
 
     endOfWordAtCursor: (c=@cursors[0]) =>
@@ -181,7 +177,6 @@ class Buffer extends event
                     sp = @rangeStartPos plr
                 else
                     break
-        # log 'startPosOfContinuousSelectionAtPos', p, sp
         sp
 
     # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000   0000000
@@ -247,7 +242,6 @@ class Buffer extends event
         
     clampPos: (p) ->
         l = clamp 0, @lines.length-1, p[1]
-        # c = clamp 0, @lines[l].length-1, p[0]
         c = clamp 0, @lines[l].length, p[0]
         [ c, l ]
         

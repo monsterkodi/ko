@@ -132,5 +132,5 @@ __dirname|__filename  keyword
 (?:^|\s+)(#+)([^\{].*|$)     . comment.marker . comment
 
 # salter headers
-^\s*\#([0\s]+)$                comment.header
+^\s*(\#)([0\s]+)$            . header.comment.marker . comment.header
 ^([0\s]+)$                     comment.header

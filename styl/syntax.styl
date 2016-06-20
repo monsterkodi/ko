@@ -4,6 +4,9 @@
 //      000     000     000  0000     000     000   000   000 000 
 // 0000000      000     000   000     000     000   000  000   000
 
+.minimap
+    opacity         0.7
+
 .syntax
     color           #666
     
@@ -104,7 +107,12 @@
 .comment.string
 .comment.string.double
     color           #4f4f4f !important
-
+.comment.header.minimap
+    color           #0a0 !important
+    opacity         1
+.header.marker.minimap
+    color           #222 !important
+            
 .require
     &.variable
         color       #4f4
@@ -146,119 +154,3 @@
     &.marker
         opacity     0.4
             
-// 00     00  000  000   000  000  00     00   0000000   00000000 
-// 000   000  000  0000  000  000  000   000  000   000  000   000
-// 000000000  000  000 0 000  000  000000000  000000000  00000000 
-// 000 0 000  000  000  0000  000  000 0 000  000   000  000      
-// 000   000  000  000   000  000  000   000  000   000  000      
-
-rect.text
-    fill           #888
-            
-rect.syntax
-    fill           darken(#666, 50%)
-    
-rect.bool           
-    fill           darken(#88f, 50%)
-    &.false      
-        fill       darken(#44f, 50%)
-    
-rect.number
-    fill           darken(#66f, 50%)
-    &.float   
-        fill       darken(#f88, 50%)
-
-rect.dictionary
-    fill           darken(#ff6, 50%)
-
-rect.array
-    fill           darken(#00f, 50%)
-
-rect.owner
-rect.callee
-rect.class
-    fill           darken(#ff8, 50%)
-            
-rect.variable
-    fill           darken(#a0a, 50%)
-    
-rect.range
-    fill           darken(#80f, 50%)
-    
-rect.require    
-    fill           darken(#0f0, 50%)
-
-rect.this
-    opacity        darken(#008, 50%)
-        
-rect.marker
-    opacity        darken(#555, 50%)
-            
-rect.module
-    fill           darken(#ff8, 50%)
-
-rect.method
-    fill           darken(#ff0, 50%)
-    
-rect.property
-    fill           darken(#f90, 70%)
-    
-rect.function
-    fill           darken(#fa0, 50%)
-    &.call          
-        fill       darken(#ff0, 50%)
-    &.marker
-        fill       darken(#55f, 10%)
-        &.bound
-            fill   darken(#66f, 10%)
-    &.bracket
-        fill       darken(#55f, 10%)
-    &.argument
-        fill       darken(#aaf, 10%)
-        &.punctuation
-            fill   darken(#88b, 10%)
-
-rect.class
-    &.variable
-        fill       darken(#2ae, 50%)
-    &.function
-        fill       darken(#fc8, 50%)
-
-rect.keypath
-    fill           darken(#f80, 50%)
-
-rect.syntax.cond
-rect.keyword
-    fill           darken(#aaf, 10%) !important
-    &.null    
-        fill       darken(#a00, 10%) !important
-
-rect.interpolation.marker
-        fill       darken(#f83, 50%)
-
-rect.variable.err        
-    fill           darken(#f08, 50%)
-
-rect.syntax.exists     
-    opacity        #33a
-
-rect.string
-    fill           darken(#0a0, 10%)    !important
-    &.double
-        fill       darken(#0f0, 20%)    !important
-        
-rect.comment
-rect.comment.string
-rect.comment.string.double
-    fill           darken(#3f3f3f, 10%) !important
-
-rect.comment.header
-    fill           #ccf !important
-
-rect.require
-    &.variable
-        fill       darken(#4f4, 50%) 
-    &.string 
-        fill       darken(#0a0, 50%) 
-    &.keyword.require 
-        fill       darken(#666, 50%) 

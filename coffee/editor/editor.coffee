@@ -111,7 +111,6 @@ class Editor extends Buffer
                 ranges = @rangesBetweenPositions ic, cc
                 newSelection = newSelection.concat ranges
                     
-            # newSelection = @cleanRanges newSelection
             @do.selections @, newSelection
 
     textOfSelectionForClipboard: -> 

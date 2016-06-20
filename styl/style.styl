@@ -387,25 +387,34 @@ body
 // 000   000  000  000   000  000  000   000  000   000  000      
 
 .minimap
-    position        absolute
-    top             0
-    bottom          0
-    right           0
-    width           120px
-    overflow        hidden
-    cursor          pointer
-    background      #080808
-    border-left     thinBorder
-    
-rect
-    fill            #888
-    &.comment
-        fill        #fff
-    &.topBot
-        fill        #222
-    &.buffer
-        fill        #000
+    position            absolute
+    top                 0
+    bottom              0
+    right               0
+    width               120px
+    overflow            hidden
+    cursor              pointer
+    background          #080808
+    border-left         thinBorder
 
+.minimapCanvas
+    pointer-events      none
+    position            absolute
+    top                 0
+    right               0
+    background-color    #000
+    overflow            hidden
+    display             block
+
+.minimapCanvasTop
+    pointer-events      none
+    position            absolute
+    top                 0
+    right               0
+    background-color    transparent
+    overflow            hidden
+    display             block
+        
 // 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000
 // 000   000  000  000        000   000  000      000  000        000   000     000   
 // 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000   
