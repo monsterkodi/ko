@@ -18,6 +18,7 @@
 
 #### terminal
 - *ansihtml*
+- shortcuts to hide editor / center input
 - autocomplete
     - dirs and files
     - /usr/local/bin, /usr/bin and /bin
@@ -26,6 +27,11 @@
 - command-enter: deselect, insert newline, indent, and single cursor
 - comment line characters per filetype    
 - remember scroll positions per file
+    
+#### minimap
+- show selections, highlights and cursors
+- figure out how to get rid of anti-aliasing
+- don't render beyond minimap width
     
 #### cursors
 - remember last cursor
