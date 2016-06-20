@@ -74,9 +74,10 @@ class Editor extends Buffer
         @endSelection e
         
     selectSingleRange: (r) ->
-        @initialCursors = _.cloneDeep [[r[1][0], r[0]]]
+        @cursors = [[r[1][0], r[0]]]
+        @initialCursors = null
         @startSelection true
-        @do.cursors @, [[r[1][1], r[0]]]
+        @do.cursors @, [[r[1][1], r[0]]]      
         @endSelection true
             
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
@@ -193,12 +194,17 @@ class Editor extends Buffer
             @renderHighlights()
             @emit 'highlight', @highlights
 
-    highlightTextOfSelectionOrWordAtCursor: -> # called from keyboard shortcuts
-        if @selections.length == 0 # or @selections.length > 1 ?
-            @selectSingleRange @rangeForWordAtPos @cursorPos()
-        @highlights = @rangesForText @textInRange @selections[0]
-        @renderHighlights()
-        @emit 'highlight', @highlights
+    highlightTextOfSelectionOrWordAtCursor: -> # called from keyboard shortcuts        
+        
+        if @selections.length == 0 
+            srange = @rangeForWordAtPos @cursorPos()
+            @selectSingleRange srange
+            
+        text =  @textInRange @selections[0]
+        if text.length
+            @highlights = @rangesForText text
+            @renderHighlights()
+            @emit 'highlight', @highlights
 
     clearHighlights: ->
         @highlights = []
@@ -373,12 +379,7 @@ class Editor extends Buffer
         @moveAllCursors e, moveLeft(n)
         
     moveCursors: (direction, e) ->
-        
-        if @selections.length > 1 and @cursors.length == 1
-            switch direction
-                when 'left'  then return @cursorsAtStartOfSelections()
-                when 'right' then return @cursorsAtEndOfSelections()
-        
+                
         switch direction
             when 'left'  then @moveCursorsLeft e
             when 'right' then @moveCursorsRight e

@@ -12,10 +12,11 @@
     - from similar files
 
 #### open
-- include dirs in files
 - don't select recent when pwd was changed
+- fix selection index of last file 
 
 #### terminal
+- *ansihtml*
 - autocomplete
     - dirs and files
     - /usr/local/bin, /usr/bin and /bin
@@ -44,6 +45,7 @@
 - extend selection to end of line if previous line is fully selected
     
 #### editing
+- dont switch to multicursors on shift-right/left
 - insert newline if pasting fully selected lines
 - indent one level more when inserting newline ...
     - after =>, -> 

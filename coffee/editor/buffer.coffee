@@ -240,7 +240,7 @@ class Buffer extends event
         lli = @lines.length-1
         [@lines[lli].length, lli]
 
-    cursorPos: ->
+    cursorPos: -> # todo: last cursor
         l = clamp 0, @lines.length-1, @cursors[0][1]
         c = clamp 0, @lines[l].length, @cursors[0][0]
         [ c, l ]

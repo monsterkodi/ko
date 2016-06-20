@@ -554,6 +554,12 @@ class ViewBase extends Editor
             when 'down', 'right', 'up', 'left' 
                                 
                 if event.metaKey
+                
+                    if not event.shiftKey and @selections.length > 1 and @cursors.length == 1
+                        switch key
+                            when 'left'  then return @cursorsAtStartOfSelections()
+                            when 'right' then return @cursorsAtEndOfSelections()
+            
                     switch key 
                         when 'left'  then @moveCursorsToStartOfLine event.shiftKey
                         when 'right' then @moveCursorsToEndOfLine   event.shiftKey
