@@ -9,7 +9,7 @@ Command = require '../commandline/command'
 
 class Find extends Command
 
-    constructor: ->
+    constructor: (@commandline) ->
         
         @shortcuts = ["command+f", "command+alt+f", "command+shift+f"]
         @caseSensitive = false

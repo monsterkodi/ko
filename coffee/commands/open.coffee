@@ -35,7 +35,7 @@ fileExtensions = (".#{e}" for e in fileTypes)
     
 class Open extends Command
 
-    constructor: ->
+    constructor: (@commandline) ->
         
         @shortcuts = ['command+p', 'command+shift+p']
         @files     = null
@@ -57,11 +57,29 @@ class Open extends Command
         return if not @list? 
         command  = command.trim()
         if command.length
-            # log 'command', command, @resolvedPath command
+            log "open.changed files", @files.slice 0,10
+            fuzzied  = fuzzy.filter command, @files       
+            filtered = (f.string for f in fuzzied)
             
-                fuzzied  = fuzzy.filter command, @files       
-                filtered = (f.string for f in fuzzied)
-                @listFiles filtered
+            matchWeight = (f) ->
+                bonus = switch path.extname(f)         
+                    when '.coffee' then 100
+                    when '.md', '.styl', '.pug' then 50
+                    when '.noon' then 25
+                    when '.js', '.json', '.html' then -100
+                    else 
+                        0 
+                        
+                if f == command 
+                    bonus += 99999999
+                if f.startsWith command
+                    bonus += 100000 - f.length                        
+                if path.basename(f).startsWith command
+                    bonus += 10000 - path.basename(f).length
+                bonus
+                
+            filtered.sort (a,b) -> matchWeight(b) - matchWeight(a)
+            @listFiles filtered
         else
             @listFiles @files
         
@@ -163,9 +181,10 @@ class Open extends Command
             @file  = window.editor.currentFile 
             @dir   = path.dirname @file
             @pkg   = @packagePath @dir
-        else
+        else 
             @file = null
-            @dir  = @pkg = resolve '~'
+            if not @dir?
+                @dir = @pkg = resolve '~'
             
         @startWalker()
         
@@ -182,11 +201,13 @@ class Open extends Command
             
     startWalker: ->           
         # profile 'walker start'
+        # log "startWalker @dir #{@dir}"
         that = @
         try
             dir = @pkg ? @dir
             @walker = walkdir.walk dir, max_depth: 3
-            @walker.on 'path', (p,stat) ->
+            
+            onWalkerPath = (dir) -> (p,stat) ->
                 name = path.basename p
                 extn = path.extname p
                 if name in ['node_modules', 'app', 'img', 'dist', 'build', 'Library', 'Applications']
@@ -197,9 +218,17 @@ class Open extends Command
                     @ignore p 
                 else if extn in fileExtensions
                     that.files.push p
+                else if stat.isDirectory()
+                    if p != dir
+                        that.files.push p 
+                    else
+                        log "skip ****** #{p}"
+                        
                 if that.files.length > 500
                     log 'max files reached', @end?
                     @end()
+            
+            @walker.on 'path', onWalkerPath dir
             @walker.on 'end', @walkerDone
                 
         catch err
@@ -208,6 +237,7 @@ class Open extends Command
             
     walkerDone: =>
         # profile 'walker done'
+        log "walkerDone @dir #{@dir}"
         
         # 000   000  00000000  000   0000000   000   000  000000000
         # 000 0 000  000       000  000        000   000     000   
@@ -215,33 +245,44 @@ class Open extends Command
         # 000   000  000       000  000   000  000   000     000   
         # 00     00  00000000  000   0000000   000   000     000   
         
-        weight = (f) =>
+        absWeight = (f) =>
             
-            extnameBonus = switch path.extname(f)            
+            penalty = path.dirname(f).length            
+                            
+            if f.startsWith @dir
+                return 10000-penalty
+            if f.startsWith path.dirname @dir
+                return 5000-penalty
+            else
+                return 1000-penalty
+        
+        relWeight = (f) =>
+            
+            bonus = switch path.extname(f)         
                 when '.coffee' then 100
                 when '.md', '.styl', '.pug' then 50
                 when '.noon' then 25
                 when '.js', '.json', '.html' then -1000000
                 else 
                     0 
-                
-            bonus = extnameBonus #- path.basename(f).length
+                                
+            return bonus + 100*(100-f.split(/[\/\.]/).length) #- f.length
                             
-            if f.startsWith @dir
-                return 10000-path.dirname(f).length+bonus
-            if f.startsWith path.dirname @dir
-                return 5000-path.dirname(f).length+bonus
-            else
-                return 1000-path.dirname(f).length+bonus
-                
-        @files.sort (a,b) -> weight(b) - weight(a)
+        @files.sort (a,b) -> absWeight(b) - absWeight(a)
+        
+        # log "@files1 #{@files.slice 0,10}"
         
         if @history.length
             h = (f for f in @history when f.length and (f != @file))
             @lastFileIndex = h.length - 1
             @files = _.concat h, @files
-                    
+        
         @files = (relative(f, @dir) for f in @files)
+        
+        log "@files 2 -----", @files.slice 0,10
+        @files = @files.filter (f) -> f.length 
+        @files.sort (a,b) -> relWeight(b) - relWeight(a)
+        
         @files = _.uniq @files
 
         @showList()
@@ -256,24 +297,31 @@ class Open extends Command
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
         
     execute: (command) ->
+        
+        listValue = @list?.children[@selected]?.value
+
         if command in ['pwd', '.']
             return text: @dir, select: true
-        else if dirExists @resolvedPath command
-            resolved = @resolvedPath command
-            @dir = resolved
-            @pkg = @packagePath @dir
-            log "open.execute @dir #{@dir} @pkg #{@pkg}"
-            @lastFileIndex = -1
-            @files = []
-            @selected = 0
-            @startWalker()
-            return text: @dir, select: true
-
-        listValue = @list?.children[@selected]?.value
+        else
+            if dirExists @resolvedPath command
+                resolved = @resolvedPath command
+            else if listValue? 
+                if dirExists @resolvedPath listValue
+                    resolved = listValue
+            # log "resolved #{resolved} @selected #{@selected} listValue #{listValue}"
+            if resolved?
+                @dir = resolved
+                @pkg = @packagePath @dir
+                # log "open.execute @dir #{@dir} @pkg #{@pkg}"
+                @lastFileIndex = -1
+                @files = []
+                @selected = 0
+                @startWalker()
+                return text: @dir, select: true
 
         @hideList()
 
-        log "selected #{@selected} listValue #{@listValue}"
+        # log "selected #{@selected} listValue #{@listValue}"
 
         if listValue
             files = [@resolvedPath listValue]
@@ -293,7 +341,7 @@ class Open extends Command
         options = 
             newWindow: @combo == @shortcuts[1] # lazy bastard :)
         
-        log "open.execute files", files            
+        # log "open.execute files", files            
         opened = window.openFiles files, options
         # log "open.execute opened #{opened.length} #{opened}"
         if opened?.length

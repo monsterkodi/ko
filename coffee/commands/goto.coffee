@@ -12,10 +12,10 @@ _       = require 'lodash'
 
 class Goto extends Command
 
-    constructor: ->
+    constructor: (@commandline) ->
         
         @shortcuts = ['command+;']
-        super
+        super 
         
     execute: (command) ->
         

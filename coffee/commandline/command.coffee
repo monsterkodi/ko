@@ -11,7 +11,7 @@ _   = require 'lodash'
 
 class Command
 
-    constructor: (@commandline) ->
+    constructor: () ->
         @index = 0
         @history = ['']
         
@@ -41,6 +41,9 @@ class Command
     setText: (t) -> 
         @commandline.setText t
         @commandline.selectAll()
+        
+    getText: ->
+        @commandline.lines[0]
     
     setName: (n) ->
         @commandline.setName n

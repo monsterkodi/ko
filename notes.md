@@ -12,8 +12,8 @@
     - from similar files
 
 #### open
-- change current pkg dir on enter only
-- pwd: show current pkg dir
+- include dirs in files
+- don't select recent when pwd was changed
 
 #### terminal
 - autocomplete

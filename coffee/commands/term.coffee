@@ -10,7 +10,7 @@ Command       = require '../commandline/command'
 
 class Term extends Command
 
-    constructor: ->
+    constructor: (@commandline) ->
         
         @shortcuts = ['command+t']
         @childp    = child_process.spawn '/usr/local/bin/bash', []
