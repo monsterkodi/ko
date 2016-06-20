@@ -123,7 +123,7 @@ loadFile = (file) =>
         ipc.send 'reloadMenu'
 
 openFiles = (ofiles, options) =>
-    log 'openFiles:', ofiles    
+    # log 'openFiles:', ofiles    
     if ofiles?.length
         files = fileList ofiles, ignoreHidden: false
         # log 'open:', files

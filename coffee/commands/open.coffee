@@ -110,8 +110,8 @@ class Open extends Command
                 div.className = 'list-file'
                 div.innerHTML = render.line file, syntax.dissForTextAndSyntax file, 'ko'
                 div.setAttribute "onclick", "window.openFileAtIndex(#{index});"
-                @list.appendChild div
                 div.value = file
+                @list.appendChild div
                 index += 1
                 
     # 00000000   00000000   00000000  000   000
@@ -160,7 +160,7 @@ class Open extends Command
         
     openFileAtIndex: (i) =>
         @select i
-        e = @execute()
+        e = @execute @list.children[i].value
         if e.focus == 'editor'
             @setText e.text
             @commandline.selectNone()
@@ -233,7 +233,7 @@ class Open extends Command
             
     walkerDone: =>
         # profile 'walker done'
-        log "walkerDone @dir #{@dir}"
+        # log "walkerDone @dir #{@dir}"
         
         # 000   000  00000000  000   0000000   000   000  000000000
         # 000 0 000  000       000  000        000   000     000   
@@ -265,17 +265,17 @@ class Open extends Command
             return bonus + 100*(100-f.split(/[\/\.]/).length) #- f.length
                             
         @files.sort (a,b) -> absWeight(b) - absWeight(a)
-        
-        if @history.length
-            h = (f for f in @history when f.length and (f != @file))
-            @lastFileIndex = h.length - 1
-            @files = _.concat h, @files
-        
+                
         @files = (relative(f, @dir) for f in @files)
         
         @files = @files.filter (f) -> f.length 
         @files.sort (a,b) -> relWeight(b) - relWeight(a)
-        
+
+        if @history.length
+            h = (relative(f, @dir) for f in @history when f.length and (f != @file))
+            @lastFileIndex = h.length - 1
+            @files = _.concat h, @files
+
         @files = _.uniq @files
 
         @showList()
