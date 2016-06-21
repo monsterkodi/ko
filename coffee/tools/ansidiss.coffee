@@ -121,8 +121,9 @@ class ansiDiss
                 switch 
                     when code is 0          then nextDiss {}
                     when code is 1          then dss.cls.push 'bold'
-                    when 2 < code < 5       then dss.style.push 'text-decoration:underLine'
-                    when 4 < code < 7       then dss.style.push 'text-decoration:overline'
+                    when 2 < code < 5       then dss.style.push 'text-decoration:underline'
+                    when 4 < code < 7       then 
+                    when 38, 53             then
                     when code is 8          then dss.style.push 'display:none'
                     when code is 9          then dss.style.push 'text-decoration:line-through'
                     when 29 < code < 38     then dss.style.push STYLES["ef#{code - 30}"]
@@ -134,6 +135,7 @@ class ansiDiss
                     when 89 < code < 98     then dss.style.push STYLES["ef#{8+code - 90}"]
                     when 99 < code < 108    then dss.style.push STYLES["eb#{8+code - 100}"]
                     else
+                        dss.style.push 'text-decoration:overline'
                         log "ansiCode", code
             ''
         tokens = [

@@ -3,10 +3,14 @@
 #### find
 - *search in multiple files*
 - *scroll find result to top of view*
-- escape dots in search string
+- *escape dots in search string*
 - highlight while entering
+- make search results clickable
+- make search results editable
+- make search results keyboard navigatable
 
 #### editor
+- fix esc
 - *autocomple*
     - from buffer
     - from similar files
@@ -16,6 +20,7 @@
 
 #### terminal
 - *ansihtml*
+- add special column (on top of numbers) for input marker and search result lines
 - shortcuts to hide editor / center input
 - autocomplete
     - dirs and files
@@ -28,10 +33,10 @@
     
 #### minimap
 - show selections, highlights and cursors
-- figure out how to get rid of anti-aliasing
-- don't render beyond minimap width
+- *don't render beyond minimap width*
     
 #### cursors
+- *fix initialCursors mess*
 - remember last cursor
 - highlight last cursor
 - highlight cursor line(s?)
@@ -39,7 +44,6 @@
 - paste multiple lines into multiple selections/cursors
 
 #### selection
-- fix selection after comment lines
 - two selection modes
 - active (cursor inside)
 - passive (cursor movement won't destroy, but next selection will)
@@ -50,6 +54,7 @@
 - extend selection to end of line if previous line is fully selected
     
 #### editing
+- make special stuff file type dependent, eg. add * to surround characters for md
 - when pasting text at indent level, remove leading space columns
 - ctrl+command+/  align cursor block
 - dont switch to multicursors on shift-right/left

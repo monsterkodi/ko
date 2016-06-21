@@ -10,9 +10,7 @@ log     = require '../tools/log'
 
 class undo
     
-    constructor: (done=->) ->
-        @reset()
-        @groupDone = done
+    constructor: (@editor, @groupDone=->) -> @reset()
 
     # 00000000   00000000   0000000  00000000  000000000
     # 000   000  000       000       000          000   
@@ -68,15 +66,15 @@ class undo
         #         c[0] -= 1
         @changeInfo.sorted.push [i, 'deleted']        
         
-    changeInfoCursor: (obj) ->
+    changeInfoCursor: ->
         @getChangeInfo()
-        for c in obj.cursors
+        for c in @editor.cursors
             if @changeInfo.cursor.indexOf(c[1]) < 0
                 @changeInfo.cursor.push c[1]
 
-    changeInfoSelection: (obj) ->
+    changeInfoSelection: ->
         @getChangeInfo()
-        @changeInfo.selection.push obj.selectedLineIndicesRange()
+        @changeInfo.selection.push @editor.selectedLineIndicesRange()
             
     delChangeInfo: -> @changeInfo = null
         
@@ -86,45 +84,45 @@ class undo
     # 000   000  000       000   000  000   000
     # 000   000  00000000  0000000     0000000 
 
-    redo: (obj) ->
+    redo: ->
         if @futures.length
             @newChangeInfo()
             action = @futures.shift()
             for line in action.lines
-                @redoLine obj, line
-            @redoCursor obj, action
-            @redoSelection obj, action
+                @redoLine line
+            @redoCursor action
+            @redoSelection action
             @actions.push action
             
             @cleanChangeInfo()
-            obj.changed @changeInfo
+            @editor.changed @changeInfo
             # log "redo @changeInfo", @changeInfo
             @delChangeInfo()
 
-    redoLine: (obj, line) ->
+    redoLine: (line) ->
         if line.after?
             if line.before?
-                obj.lines[line.index] = line.after
+                @editor.lines[line.index] = line.after
                 @changeInfoLineChange line.index
             else
-                obj.lines.splice line.index, 0, line.after
+                @editor.lines.splice line.index, 0, line.after
                 @changeInfoLineInsert line.index
         else if line.before?
-            obj.lines.splice line.index, 1
+            @editor.lines.splice line.index, 1
             @changeInfoLineDelete line.index
 
-    redoSelection: (obj, action) ->
+    redoSelection: (action) ->
         if action.selAfter.length
-            obj.selections = _.cloneDeep action.selAfter
-            @changeInfoSelection obj
+            @editor.selections = _.cloneDeep action.selAfter
+            @changeInfoSelection()
         if action.selAfter.length == 0
-            @changeInfoSelection obj
-            obj.selections = [] 
+            @changeInfoSelection()
+            @editor.selections = [] 
         
-    redoCursor: (obj, action) ->
-        @changeInfoCursor obj 
-        obj.cursor = [action.curAfter[0], action.curAfter[1]] if action.curAfter?
-        @changeInfoCursor obj
+    redoCursor: (action) ->
+        @changeInfoCursor()
+        @editor.cursor = [action.curAfter[0], action.curAfter[1]] if action.curAfter?
+        @changeInfoCursor()
 
     # 000   000  000   000  0000000     0000000 
     # 000   000  0000  000  000   000  000   000
@@ -132,46 +130,46 @@ class undo
     # 000   000  000  0000  000   000  000   000
     #  0000000   000   000  0000000     0000000 
     
-    undo: (obj) ->
+    undo: ->
         if @actions.length
             @newChangeInfo()
             action = @actions.pop()
             if action.lines.length
                 for i in [action.lines.length-1..0]
-                    @undoLine obj, action.lines[i]
-            @undoCursor obj, action
-            @undoSelection obj, action
+                    @undoLine action.lines[i]
+            @undoCursor action
+            @undoSelection action
             @futures.unshift action
 
             @cleanChangeInfo()
-            obj.changed @changeInfo
+            @editor.changed @changeInfo
             # log "undo @changeInfo", @changeInfo
             @delChangeInfo()
                                     
-    undoLine: (obj, line) ->
+    undoLine: (line) ->
         if line.before?
             if line.after?
-                obj.lines[line.index] = line.before
+                @editor.lines[line.index] = line.before
                 @changeInfoLineChange line.index
             else
-                obj.lines.splice line.index, 0, line.before
+                @editor.lines.splice line.index, 0, line.before
                 @changeInfoLineInsert line.index
         else if line.after?
-            obj.lines.splice line.index, 1
+            @editor.lines.splice line.index, 1
             @changeInfoLineDelete line.index
             
-    undoSelection: (obj, action) ->
+    undoSelection: (action) ->
         if action.selBefore.length
-            obj.selections = _.cloneDeep action.selBefore 
-            @changeInfoSelection obj
+            @editor.selections = _.cloneDeep action.selBefore 
+            @changeInfoSelection()
         if action.selBefore.length == 0
-            @changeInfoSelection obj
-            obj.selections = [] 
+            @changeInfoSelection()
+            @editor.selections = [] 
         
-    undoCursor: (obj, action) ->
-        @changeInfoCursor obj
-        obj.cursors = action.curBefore if action.curBefore?
-        @changeInfoCursor obj
+    undoCursor: (action) ->
+        @changeInfoCursor()
+        @editor.cursors = action.curBefore if action.curBefore?
+        @changeInfoCursor()
         
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000
@@ -179,15 +177,15 @@ class undo
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
     
-    selections: (obj, newSelections) -> 
+    selections: (newSelections) -> 
         if newSelections.length
-            newSelections = obj.cleanRanges newSelections
+            newSelections = @editor.cleanRanges newSelections
             @lastAction().selAfter = _.cloneDeep newSelections
-            obj.selections = newSelections
-            @changeInfoSelection obj
+            @editor.selections = newSelections
+            @changeInfoSelection()
         else
-            @changeInfoSelection obj
-            obj.selections = []
+            @changeInfoSelection()
+            @editor.selections = []
             @lastAction().selAfter = []
         @check()
         
@@ -197,15 +195,15 @@ class undo
     # 000       000   000  000   000       000  000   000  000   000
     #  0000000   0000000   000   000  0000000    0000000   000   000
 
-    cursors: (obj, newCursors) ->
-        obj.cleanCursors newCursors
-        if newCursors.length != obj.cursors.length
-            obj.initialCursors = _.cloneDeep newCursors
-        @changeInfoCursor obj
+    cursors: (newCursors) ->
+        @editor.cleanCursors newCursors
+        if newCursors.length != @editor.cursors.length
+            @editor.initialCursors = _.cloneDeep newCursors
+        @changeInfoCursor()
         @lastAction().curBefore = _.cloneDeep newCursors if not @actions.length
         @lastAction().curAfter  = _.cloneDeep newCursors
-        obj.cursors = newCursors
-        @changeInfoCursor obj
+        @editor.cursors = newCursors
+        @changeInfoCursor()
         @check()
 
     # 000       0000000    0000000  000000000

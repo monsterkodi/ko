@@ -531,7 +531,7 @@ class ViewBase extends Editor
             when 'command+]'                then return @indent()
             when 'command+['                then return @deIndent()
             when 'command+j'                then return @joinLine()
-            when 'command+/'                then return @toggleLineComment()
+            when 'command+/'                then return @toggleComment()
             when 'command+a'                then return @selectAll()
             when 'command+shift+a'          then return @selectNone()
             when 'command+e'                then return @highlightTextOfSelectionOrWordAtCursor()
@@ -543,8 +543,8 @@ class ViewBase extends Editor
             when 'command+l'                then return @selectMoreLines()
             when 'command+shift+l'          then return @selectLessLines()            
             when 'command+c'                then return clipboard.writeText @textOfSelectionForClipboard()
-            when 'command+z'                then return @do.undo @
-            when 'command+shift+z'          then return @do.redo @
+            when 'command+z'                then return @do.undo()
+            when 'command+shift+z'          then return @do.redo()
             when 'delete', 'ctrl+backspace' then return @deleteForward()     
             when 'backspace'                then return @deleteBackward()     
             when 'command+v'                then return @insertTextFromClipboard clipboard.readText()

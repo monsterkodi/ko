@@ -84,7 +84,7 @@ class Commandline extends ViewBase
         @setName r.name if r?.name?
         if r?.select then @selectAll()
         else @selectNone() 
-        log "commandline.results #{@command.name}", r
+        log "commandline.results #{@command?} #{@command?.name}", r
         window.split.focus  r.focus  if r?.focus?
         window.split.reveal r.reveal if r?.reveal?
         
