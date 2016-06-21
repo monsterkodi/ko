@@ -88,7 +88,7 @@ ipc.on 'reloadFile', =>
 ipc.on 'saveFileAs', => saveFileAs()
 ipc.on 'saveFile',   => saveFile()
 ipc.on 'loadFile', (event, file) => 
-    # log "window.ipc.loadFile #{file}"
+    log "window.ipc.loadFile #{file}"
     loadFile file
 ipc.on 'setWinID', (event, id) => 
     # log "window.ipc.setWinID #{id} #{window.split?}"
@@ -114,7 +114,7 @@ saveFile = (file) =>
     setState 'file', file
 
 loadFile = (file) =>  
-    # log 'window.loadFile file:', file
+    log 'window.loadFile file:', file
     if fileExists file
         addToRecent file
         editor.setCurrentFile null # to stop watcher and reset scroll
@@ -142,7 +142,7 @@ openFiles = (ofiles, options) =>
             return []
         setState 'openFilePath', path.dirname files[0]                    
         if not options?.newWindow
-            # log "window.openFiles not new window
+            log "window.openFiles not new window"
             loadFile resolve files.shift()
         for file in files
             ipc.send 'newWindowWithFile', file
@@ -186,6 +186,22 @@ saveFileAs = =>
 
 $('.titlebar').ondblclick = (event) => ipc.send 'maximizeWindow', winID
 
+#  0000000  00000000   000      000  000000000
+# 000       000   000  000      000     000   
+# 0000000   00000000   000      000     000   
+#      000  000        000      000     000   
+# 0000000   000        0000000  000     000   
+
+split = window.split = new Split()
+split.on 'paneHeight', (e) =>
+    # log "window.on.split.paneHeight", e
+    if e.paneIndex == 0
+        terminal.resized()
+    if e.paneIndex == 2
+        editor.resized()
+    if e.paneIndex == 3
+        logview.resized()
+
 # 000000000  00000000  00000000   00     00  000  000   000   0000000   000    
 #    000     000       000   000  000   000  000  0000  000  000   000  000    
 #    000     0000000   0000000    000000000  000  000 0 000  000000000  000    
@@ -194,14 +210,6 @@ $('.titlebar').ondblclick = (event) => ipc.send 'maximizeWindow', winID
 
 terminal = window.terminal = new Terminal '.terminal'
 
-#  0000000   0000000   00     00  00     00   0000000   000   000  0000000  
-# 000       000   000  000   000  000   000  000   000  0000  000  000   000
-# 000       000   000  000000000  000000000  000000000  000 0 000  000   000
-# 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
-#  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
-
-commandline = window.commandline = new Commandline '.commandline-editor'
-                  
 # 00000000  0000000    000  000000000   0000000   00000000 
 # 000       000   000  000     000     000   000  000   000
 # 0000000   000   000  000     000     000   000  0000000  
@@ -220,22 +228,18 @@ editor.view.focus()
 
 logview = window.logview = new LogView '.logview'
 
-#  0000000  00000000   000      000  000000000
-# 000       000   000  000      000     000   
-# 0000000   00000000   000      000     000   
-#      000  000        000      000     000   
-# 0000000   000        0000000  000     000   
+#  0000000   0000000   00     00  00     00   0000000   000   000  0000000  
+# 000       000   000  000   000  000   000  000   000  0000  000  000   000
+# 000       000   000  000000000  000000000  000000000  000 0 000  000   000
+# 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
+#  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
 
-split = window.split = new Split()
-split.on 'paneHeight', (e) =>
-    # log "window.on.split.paneHeight", e
-    if e.paneIndex == 0
-        terminal.resized()
-    if e.paneIndex == 2
-        editor.resized()
-    if e.paneIndex == 3
-        logview.resized()
+commandline = window.commandline = new Commandline '.commandline-editor'
 
+commandline.startCommand 'term', 'command+t'
+commandline.setLines ['color-ls -l index.html']
+commandline.execute()
+                  
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000     
 # 0000000    0000000   0000000   000    000    0000000 
@@ -265,6 +269,7 @@ setFontSize = (s) =>
     s = clamp 2, 100, s
     setState "fontSize", s
     editor.setFontSize s
+    log "setFontSize loadFile #{editor.currentFile}"
     loadFile editor.currentFile
     
 changeFontSize = (d) => 
@@ -276,11 +281,6 @@ resetFontSize = =>
 
 s = getState 'fontSize'
 setFontSize s if s
-
-# if editor?.currentFile
-#     setState 'file', editor.currentFile # files might be loaded before id got sent
-
-# ipc.send 'reloadMenu'
 
 # 0000000   0000000    0000000   00     00
 #    000   000   000  000   000  000   000

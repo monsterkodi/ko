@@ -331,8 +331,12 @@ class Main
                         
         winLoaded = =>
             if openFile?
-                # log "main.createWindow.winLoaded send laodFile #{openFile}"
-                win.webContents.send 'loadFile', openFile 
+                log "main.createWindow.winLoaded send loadFile #{openFile}"
+                win.webContents.send 'loadFile', openFile
+                openFile = null
+            else
+                file = prefs.getPath "windows.#{win.id}.file"
+                win.webContents.send 'loadFile', file if file?
         
         win.webContents.on 'dom-ready',         winReady
         win.webContents.on 'did-finish-load',   winLoaded

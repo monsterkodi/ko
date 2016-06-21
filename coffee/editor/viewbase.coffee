@@ -82,8 +82,6 @@ class ViewBase extends Editor
     # 0000000   0000000      000     000      000  000 0 000  0000000   0000000 
     #      000  000          000     000      000  000  0000  000            000
     # 0000000   00000000     000     0000000  000  000   000  00000000  0000000 
-
-    setText: (text) -> @setLines text?.split /\n/
         
     appendText: (text) ->
         
@@ -449,6 +447,8 @@ class ViewBase extends Editor
         @elem.innerHTML = ""
         @emit 'clearLines'
 
+    clear: => @setLines ['']
+        
     focus: -> @view.focus()
 
     # 00     00   0000000   000   000   0000000  00000000

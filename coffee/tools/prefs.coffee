@@ -28,6 +28,7 @@ class Prefs
         p = Prefs.load()
         c = p
         s = path.split '.'
+        log "@setPath #{path}"
         while s.length
             k = s.shift()
             if s.length

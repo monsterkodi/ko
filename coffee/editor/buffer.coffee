@@ -20,8 +20,7 @@ class Buffer extends event
     
     constructor: () -> @setLines ['']
 
-    setLines: (lines) ->
-        @lines      = lines
+    setLines: (@lines) ->
         @cursors    = [[0,0]]
         @selections = []
         @highlights = []

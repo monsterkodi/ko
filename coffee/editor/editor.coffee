@@ -53,6 +53,11 @@ class Editor extends Buffer
     #      000  000          000     000      000  000  0000  000            000
     # 0000000   00000000     000     0000000  000  000   000  00000000  0000000 
 
+    setText: (text="") -> 
+        rgx = new RegExp '\t', 'g'
+        indent = @indentString
+        @setLines text.split(/\n/).map (l) -> l.replace rgx, indent
+
     setLines: (lines) ->
         super lines
         @do.reset()

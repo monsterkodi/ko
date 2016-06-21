@@ -19,22 +19,20 @@ class Term extends Command
         @childp.on 'disconnect', @onExit
         @childp.stdout.on 'data', @onData
         @childp.stdout.on 'end', @onEnd        
-        # log "Term.constructor"
         super
     
-    onExit: (code) =>
-        log "Term.onExit #{code}"
-    
-    onEnd: () =>
-        log "Term.onEnd"
-        
-    onData: (out) =>        
-        s = out.toString()
-        window.terminal?.output s
+    onExit: (code) => log "Term.onExit #{code}"
+    onEnd:         => log "Term.onEnd"
+    onData: (out)  => window.terminal?.output out.toString()
         
     execute: (command) ->
         # log "term.execute command #{command}"
-        @childp.stdin.write "#{command}\n"
+        super command
+        switch command
+            when 'history' then window.terminal?.output @history.join '\n'
+            when 'clear'   then window.terminal?.clear()
+            else
+                @childp.stdin.write "#{command}\n"
         text: ''
         
 module.exports = Term

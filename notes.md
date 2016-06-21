@@ -1,13 +1,13 @@
 # todo/ideas
 
 #### find
-- **search in multiple files**
-- **scroll find result to top of view**
+- *search in multiple files*
+- *scroll find result to top of view*
 - escape dots in search string
 - highlight while entering
 
 #### editor
-- **autocomple**
+- *autocomple*
     - from buffer
     - from similar files
 
@@ -50,6 +50,8 @@
 - extend selection to end of line if previous line is fully selected
     
 #### editing
+- when pasting text at indent level, remove leading space columns
+- ctrl+command+/  align cursor block
 - dont switch to multicursors on shift-right/left
 - insert newline if pasting fully selected lines
 - indent one level more when inserting newline ...
@@ -85,9 +87,9 @@
 - history,console,terminal
 - shortcut for renaming file
 - pin
-     - command
-     - shortcut
+    - command
+    - shortcut
 - tail -f mode
 - markdown mode (replace - with ●)
 - cosmetic
-  - fix highlight rounded borders     
+    - fix highlight rounded borders     

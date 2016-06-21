@@ -7,6 +7,7 @@
 $}     = require '../tools/tools'
 matchr = require '../tools/matchr'
 log    = require '../tools/log'
+_      = require 'lodash'
 path   = require 'path'
 noon   = require 'noon'
 fs     = require 'fs'
@@ -29,7 +30,7 @@ class syntax
     
     changed: (changeInfo) ->
         if changeInfo.deleted.length or changeInfo.inserted.length or changeInfo.changed.length
-            # log 'syntax.sorted', changeInfo.sorted        
+            # log 'syntax.sorted', changeInfo.sorted if @editor.name is 'terminal'
             for [li, change] in changeInfo.sorted
                 switch change
                     when 'deleted'  then @diss.splice li, 1
@@ -57,12 +58,20 @@ class syntax
         matchr.dissect matchr.ranges syntax.matchrConfigs[n], line
         
     getDiss: (li) ->
-        while li >= @diss.length
-            @diss.push null
-        if @diss[li] == null
+        # log "?? #{@diss.length} #{li}" if @editor.name is 'terminal'
+        if not @diss[li]?
+            # log "++ #{li} #{@diss[li]}" if @editor.name is 'terminal'
             diss = matchr.dissect matchr.ranges syntax.matchrConfigs[@name], @editor.lines[li]
             @diss[li] = diss
+            
+        # log "#{li}", @diss[li] if @editor.name is 'terminal' and @diss[li]?.length
         @diss[li]
+    
+    setDiss: (li, dss) ->
+        # log "syntax.setDiss #{li}", dss if @editor.name is 'terminal'
+        @diss[li] = dss
+        # log "== #{@diss.length} #{@diss[li]}" if @editor.name is 'terminal'
+        @diss[li]    
     
     #  0000000   0000000   000       0000000   00000000 
     # 000       000   000  000      000   000  000   000

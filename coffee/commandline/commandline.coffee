@@ -30,19 +30,19 @@ class Commandline extends ViewBase
         @command = null
 
         @loadCommands()
-    
+
+    setName: (name) -> @cmmd.innerHTML = name
+                
     setLines: (l) ->
-        # log 'Commandline.setLines', l
         @scroll.reset()
         super l
     
     setAndSelectText: (t) ->
         @setLines [t]
         @selectAll()
-        
+
     changed: (changeInfo) ->
         super changeInfo
-        # log 'Commandline changed', changeInfo, @lines
         if changeInfo.changed.length
             @command?.changed @lines[0]
         
@@ -50,24 +50,37 @@ class Commandline extends ViewBase
         files = fileList "#{__dirname}/../commands"
         for file in files
             commandClass = require file
-            @commands[commandClass.name.toLowerCase()] = new commandClass @
-                
+            command = new commandClass @
+            command.setPrefsID commandClass.name.toLowerCase()
+            @commands[command.prefsID] = command
+          
+    #  0000000  000000000   0000000   00000000   000000000
+    # 000          000     000   000  000   000     000   
+    # 0000000      000     000000000  0000000       000   
+    #      000     000     000   000  000   000     000   
+    # 0000000      000     000   000  000   000     000   
+    
     startCommand: (name, combo) ->
         @command?.cancel()
         window.split.showCommandline()
         @view.focus()
         @setName name
-
         @command = @commands[name]
-        @setAndSelectText @command.start combo # <-- command start
-        
-    setName: (name) -> 
-        # log "commandline.setName", name, @cmmd?
-        @cmmd.innerHTML = name
-        
+        @results @command.start combo # <-- command start
+        # @setAndSelectText 
+                
+    # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
+    # 000        000 000   000       000       000   000     000     000     
+    # 0000000     00000    0000000   000       000   000     000     0000000 
+    # 000        000 000   000       000       000   000     000     000     
+    # 00000000  000   000  00000000   0000000   0000000      000     00000000
+    
     execute: ->
-        r = @command?.execute @lines[0]
+        @results @command?.execute @lines[0]
+        
+    results: (r) ->
         @setText r.text if r?.text?
+        @setName r.name if r?.name?
         if r?.select then @selectAll()
         else @selectNone() 
         window.split.focusEditor() if r?.focus == 'editor'

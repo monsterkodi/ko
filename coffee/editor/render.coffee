@@ -21,13 +21,13 @@ class render
             for di in [diss.length-1..0]
                 d = diss[di]
                 enc = encode d.match
-                if d.cls?
-                    clrzd = "<span class=\"#{d.clss}\">#{enc}</span>"
-                else
-                    console.log 'warning! render.line no stack?'
-                    clrzd = enc
+                styl = clss = ""
+                styl = " style=\"#{d.styl}\"" if d.styl?
+                clss = " class=\"#{d.clss}\"" if d.clss?
+                if not (styl+clss).length then console.log 'warning! render.line no clss and no color in diss?', JSON.stringify diss
+                clrzd = "<span#{clss}#{styl}>#{enc}</span>"
                 line = line.slice(0, d.start) + clrzd + line.slice(d.start+(d.match?.length ? 0))
-
+        # console.log "line: #{enspce line}"
         enspce line
         
     #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
@@ -37,9 +37,8 @@ class render
     #  0000000   0000000   000   000  0000000    0000000   000   000  0000000 
     
     @cursors: (cs, size) => # cs: [ [charIndex, lineIndex] ... ]  (lineIndex relative to view)
-        
-        h = ""
         i = 0
+        h = ""
         cw = size.charWidth
         lh = size.lineHeight
         for c in cs
@@ -58,7 +57,6 @@ class render
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
                 
     @selection: (ss, size, clss='selection') => # ss: [ [lineIndex, [startIndex, endIndex]], ... ]  (lineIndex relative to view)
-        
         h = ""
         p = null
         n = null

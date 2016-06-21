@@ -78,6 +78,7 @@ class View extends ViewBase
         super file # -> setText -> setLines
 
         @restoreScrollCursorsAndSelections() if file
+        @numbers.onSelectionOrCursors()
                     
     # 000000000  000  000000000  000      00000000  0000000     0000000   00000000 
     #    000     000     000     000      000       000   000  000   000  000   000

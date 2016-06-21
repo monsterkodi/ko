@@ -92,11 +92,12 @@ ranges = (regexes, str) ->
 # 0000000    000  0000000   0000000   00000000   0000000     000   
 # 
 # accepts a list of ranges
-# returns a new list of objects
+# returns a list of objects:
 # 
 #     match: the matched substring
 #     start: position of match in str
-#     stack: list of values
+#     cls:   list of classnames
+#     clss:  string of classnames joined with a space
 #     
 #     with none of the [start, start+match.length] ranges overlapping
 

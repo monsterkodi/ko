@@ -8,11 +8,11 @@
 
 # header
 
-(^#\s+)(.+)                             . marker.path.coffee     . header.path.coffee
-(^##\s+)(.+)                            . marker.header.class    . header.class
-(^###\s+)(.+)                           . marker.header.string.double   . header.string.double
-(^####+\s+)(.+)                         . marker.header.keyword . header.keyword
-(^#####+\s+)(.+)                        . marker.header.number   . header.number
+(^#\s+)(.+)                             . md.marker.h1   . md.h1
+(^##\s+)(.+)                            . md.marker.h2   . md.h2
+(^###\s+)(.+)                           . md.marker.h3   . md.h3
+(^####+\s+)(.+)                         . md.marker.h4   . md.h4
+(^#####+\s+)(.+)                        . md.marker.h5   . md.h5
 
 # path
 
@@ -26,9 +26,16 @@
 
 (\!\[)(\S+)(\])                         . function.marker . function . function.marker    
 
-(^[-\*]\s+)(.+)                         . class.marker . class
-(^\s+[-\*]\s)(.+)                       . text.marker . text
+# li
+
+(^[-\*]\s+)(.+)                         . md.li1.marker . md.li1
+(^\s{1,4}[-\*]\s)(.+)                   . md.li2.marker . md.li2
+(^\s{5,}[-\*]\s)(.+)                    . md.li3.marker . md.li3
 
 # pre
 
 ```\S*                                  . keyword
+
+# bold
+
+(\*)([^\*]+)(\*)                        . md.bold.marker . md.bold . md.bold.marker
