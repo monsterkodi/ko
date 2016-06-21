@@ -57,7 +57,7 @@ addToRecent = (file) ->
 # 0000000      000     000000000     000     0000000 
 #      000     000     000   000     000     000     
 # 0000000      000     000   000     000     00000000
-        
+   
 setState = (key, value) ->
     # log 'setState', key, value
     return if not winID
@@ -220,6 +220,20 @@ editor = window.editor = new View '.editor'
 editor.setText editorText if editorText?
 editor.view.focus()
 
+window.editorWithName = (n) ->
+    switch n
+        when 'editor'   then editor
+        when 'command'  then commandline
+        when 'terminal' then terminal
+        when 'logview'  then logview
+        
+window.editorWithClassName = (n) ->
+    switch n
+        when '.editor'      then editor
+        when '.commandline' then commandline
+        when '.terminal'    then terminal
+        when '.logview'     then logview    
+
 # 000       0000000    0000000   000   000  000  00000000  000   000
 # 000      000   000  000        000   000  000  000       000 0 000
 # 000      000   000  000  0000   000 000   000  0000000   000000000
@@ -269,8 +283,8 @@ setFontSize = (s) =>
     s = clamp 2, 100, s
     setState "fontSize", s
     editor.setFontSize s
-    log "setFontSize loadFile #{editor.currentFile}"
-    loadFile editor.currentFile
+    log "setFontSize loadFile #{editor.currentFile}" if editor.currentFile?
+    loadFile editor.currentFile if editor.currentFile?
     
 changeFontSize = (d) => 
     setFontSize clamp 2, 100, editor.size.fontSize + d

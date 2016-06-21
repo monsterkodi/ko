@@ -87,10 +87,10 @@ class ViewBase extends Editor
         
         ts = text?.split /\n/
         [].push.apply @lines, ts
-        @emit 'numLines', @lines.length
         if @scroll.viewHeight != @viewHeight()
             @scroll.setViewHeight @viewHeight()        
         @scroll.setNumLines @lines.length
+        @emit 'numLines', @lines.length
         
     setLines: (lines) ->
         # log "viewbase.setLines lines", lines if @name == 'editor'        
@@ -119,8 +119,9 @@ class ViewBase extends Editor
         @size.numbersWidth = 50
         @size.fontSize     = fontSize
         @size.lineHeight   = fontSize + Math.floor(fontSize/6)
-        @size.charWidth    = characterWidth @elem, 'line'
+        @size.charWidth    = fontSize * 0.6 # characterWidth @elem, 'line'
         @size.offsetX      = Math.floor @size.charWidth/2 + @size.numbersWidth
+        # log "viewbase.setFontSize #{fontSize} charWidth #{@size.charWidth}"
         # log "viewbase.setFontSize className #{@view.className} fontSize #{@size.fontSize} lineHeight #{@size.lineHeight}"
         
         @scroll?.setLineHeight @size.lineHeight
@@ -526,6 +527,13 @@ class ViewBase extends Editor
                 return
 
         switch combo
+            when 'tab'                      then return @insertTab() + event.preventDefault() 
+            when 'shift+tab'                then return @deleteTab() + event.preventDefault()
+            when 'enter'                    then return @insertNewline indent:true
+            when 'command+]'                then return @indent()
+            when 'command+['                then return @deIndent()
+            when 'command+j'                then return @joinLine()
+            when 'command+/'                then return @toggleLineComment()
             when 'command+a'                then return @selectAll()
             when 'command+shift+a'          then return @selectNone()
             when 'command+e'                then return @highlightTextOfSelectionOrWordAtCursor()
@@ -534,6 +542,8 @@ class ViewBase extends Editor
             when 'command+alt+d'            then return @selectAllHighlights()
             when 'command+g'                then return @selectNextHighlight()
             when 'command+shift+g'          then return @selectPrevHighlight()
+            when 'command+l'                then return @selectMoreLines()
+            when 'command+shift+l'          then return @selectLessLines()            
             when 'command+c'                then return clipboard.writeText @textOfSelectionForClipboard()
             when 'command+z'                then return @do.undo @
             when 'command+shift+z'          then return @do.redo @
@@ -546,10 +556,25 @@ class ViewBase extends Editor
                 @deleteSelection()
                 @do.end()
                 return
+            when 'ctrl+up', 'ctrl+down', 'ctrl+left', 'ctrl+right' then return @alignCursors key
+            when 'command+up',       'command+down'       then return @addCursors key
+            when 'command+shift+up', 'command+shift+down' then return @delCursors key            
 
         return if mod and not key?.length
         
         switch key
+            
+            when 'esc'     then return @cancelCursorsAndHighlights()
+            when 'home'    then return @moveCursorToLineIndex 0, event.shiftKey
+            when 'end'     then return @moveCursorToLineIndex @lines.length-1, event.shiftKey
+            when 'page up'      
+                @moveCursorsUp event.shiftKey, @numFullLines()-3
+                event.preventDefault() # prevent view from scrolling
+                return
+            when 'page down'    
+                @moveCursorsDown event.shiftKey, @numFullLines()-3
+                event.preventDefault() # prevent view from scrolling
+                return
             
             when 'down', 'right', 'up', 'left' 
                                 

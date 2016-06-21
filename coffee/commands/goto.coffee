@@ -31,8 +31,8 @@ class Goto extends Command
             editor.selectNone()
             editor.setCursor 0, line
 
-            focus: 'editor'
+            focus: @focus
         else
             text: ''
-        
+                    
 module.exports = Goto

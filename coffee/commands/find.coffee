@@ -44,12 +44,17 @@ class Find extends Command
         editor = window.editor
         if @searchInFiles
             @startSearchInFiles command, editor.currentFile
-            focus: 'terminal'
-        else
-            editor.highlightText command, 
-                caseSensitive: @caseSensitive
-            if editor.highlights.length
-                focus: 'editor' 
+            focus: '.terminal'
+            reveal: 'terminal'
+        else # search in editor
+            editor = window.editorWithClassName @focus
+            if editor?
+                editor.highlightText command, 
+                    caseSensitive: @caseSensitive
+                if editor.highlights.length
+                    focus: @focus 
+            else
+                log "find.execute warning! no editor for @focus #{@focus}?"
       
     #  0000000  00000000   0000000   00000000    0000000  000   000
     # 000       000       000   000  000   000  000       000   000
@@ -58,7 +63,7 @@ class Find extends Command
     # 0000000   00000000  000   000  000   000   0000000  000   000
     
     startSearchInFiles: (text, file) ->
-        log "find.startSearchInFiles #{text} #{file}"
+        # log "find.startSearchInFiles #{text} #{file}"
         @walker = new walker
             root:        walker.packagePath path.dirname file
             includeDirs: false
@@ -99,9 +104,11 @@ class FileSearcher extends stream.Writable
     
     end: (chunk, encoding, cb) ->
         if @found.length
-            log "#{@file}:"
+            # log "#{@file}:"
+            window.terminal.appendText "#{@file}:"
             for f in @found
                 dss = matchr.dissect f[2]
-                log "#{_.padStart f[0], 4} #{f[1]}" #, dss
+                # log "#{_.padStart f[0], 4} #{f[1]}" #, dss
+                window.terminal.appendText "#{_.padStart f[0], 4} #{f[1]}"
                 
 module.exports = Find

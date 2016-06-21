@@ -160,11 +160,13 @@ class Open extends Command
         
     openFileAtIndex: (i) =>
         @select i
-        e = @execute @list.children[i].value
-        if e.focus == 'editor'
-            @setText e.text
-            @commandline.selectNone()
-            window.split.focusEditor()
+        @setText @list.children[i].value
+        @commandline.execute() 
+        #@execute @list.children[i].value
+        # if e.focus == '.editor'
+        #     @setText e.text
+        #     @commandline.selectNone()
+        #     window.split.focusEditor()
     
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -337,7 +339,8 @@ class Open extends Command
                 super selected
                 
             text:  (path.basename(f) for f in opened).join ' '
-            focus: 'editor'
+            focus: '.editor'
+            reveal: 'editor'
             status: 'ok'
         else
             status: 'failed'

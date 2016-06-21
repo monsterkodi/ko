@@ -180,6 +180,7 @@ class undo
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
     
     selections: (obj, newSelections) -> 
+        console.log "newSelections", newSelections
         if newSelections.length
             newSelections = obj.cleanRanges newSelections
             @lastAction().selAfter = _.cloneDeep newSelections

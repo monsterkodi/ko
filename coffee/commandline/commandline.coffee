@@ -63,9 +63,11 @@ class Commandline extends ViewBase
     startCommand: (name, combo) ->
         @command?.cancel()
         window.split.showCommandline()
+        @command = @commands[name]
+        @command.focus = "."+document.activeElement.className
+        log "commandline.startCommand #{name} focus #{@command.focus}"
         @view.focus()
         @setName name
-        @command = @commands[name]
         @results @command.start combo # <-- command start
         # @setAndSelectText 
                 
@@ -75,19 +77,18 @@ class Commandline extends ViewBase
     # 000        000 000   000       000       000   000     000     000     
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
     
-    execute: ->
-        @results @command?.execute @lines[0]
+    execute: -> @results @command?.execute @lines[0]
         
     results: (r) ->
         @setText r.text if r?.text?
         @setName r.name if r?.name?
         if r?.select then @selectAll()
         else @selectNone() 
-        window.split.focusEditor() if r?.focus == 'editor'
+        log "commandline.results #{@command.name}", r
+        window.split.focus  r.focus  if r?.focus?
+        window.split.reveal r.reveal if r?.reveal?
         
-    cancel: ->
-        @command?.cancel()
-        window.split.focusOnEditorOrHistory()
+    cancel: -> @results @command?.cancel()
                                 
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
@@ -97,7 +98,9 @@ class Commandline extends ViewBase
 
     globalModKeyComboEvent: (mod, key, combo, event) ->
         for n,c of @commands            
-            if combo == 'esc' then return @cancel()
+            if combo == 'esc'
+                if document.activeElement == @view
+                    return @cancel()
             for sc in c.shortcuts
                 if sc == combo then return @startCommand n, combo                
         return 'unhandled'            

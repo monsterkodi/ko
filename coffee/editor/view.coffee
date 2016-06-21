@@ -128,45 +128,6 @@ class View extends ViewBase
                 @scrollBy delta
             else
                 @updateLayers()
-            @savedState = null
-                        
-    # 000   000  00000000  000   000
-    # 000  000   000        000 000 
-    # 0000000    0000000     00000  
-    # 000  000   000          000   
-    # 000   000  00000000     000   
-
-    handleModKeyComboEvent: (mod, key, combo, event) =>
-        # log "view key:", key, "mod:", mod, "combo:", combo
-        
-        switch combo
-            when 'tab'              then return @insertTab() + event.preventDefault() 
-            when 'shift+tab'        then return @deleteTab() + event.preventDefault()
-            when 'enter'            then return @insertNewline indent:true
-            when 'command+]'        then return @indent()
-            when 'command+['        then return @deIndent()
-            when 'command+j'        then return @joinLine()
-            when 'command+/'        then return @toggleLineComment()
-            when 'command+l'        then return @selectMoreLines()
-            when 'command+shift+l'  then return @selectLessLines()
-            when 'ctrl+up', 'ctrl+down', 'ctrl+left', 'ctrl+right' then return @alignCursors key
-            when 'command+up',       'command+down'       then return @addCursors key
-            when 'command+shift+up', 'command+shift+down' then return @delCursors key
-                                    
-        switch key
-            
-            when 'esc'     then return @cancelCursorsAndHighlights()
-            when 'home'    then return @moveCursorToLineIndex 0, event.shiftKey
-            when 'end'     then return @moveCursorToLineIndex @lines.length-1, event.shiftKey
-            when 'page up'      
-                @moveCursorsUp event.shiftKey, @numFullLines()-3
-                event.preventDefault() # prevent view from scrolling
-                return
-            when 'page down'    
-                @moveCursorsDown event.shiftKey, @numFullLines()-3
-                event.preventDefault() # prevent view from scrolling
-                return
-                                
-        return 'unhandled'                
+            @savedState = null                        
         
 module.exports = View

@@ -187,6 +187,19 @@ class Split extends event
         if 0 >= @splitPosY 1
             @splitAt 0, 0
     
+    show: (n) ->
+        log "split.show #{n}"
+        switch n
+            when 'terminal' then log "0, #{0.5*@splitPosY 2} if #{@paneHeight(0)} < 100"
+            when 'editor'   then log "1, #{0.5*@splitPosY 2} if #{@paneHeight(2)} < 100"
+            when 'command'  then log "0, #{0               } if #{@paneHeight(1)} < #{@commandlineHeight}"
+        switch n
+            when 'terminal' then @splitAt 0, 0.5*@splitPosY 2 if @paneHeight(0) < 100
+            when 'editor'   then @splitAt 1, 0.5*@splitPosY 2 if @paneHeight(2) < 100
+            when 'command'  then @splitAt 0, 0                if @paneHeight(1) < @commandlineHeight
+            else
+                log "split.show warning! unhandled #{n}!"
+
     # 000       0000000    0000000 
     # 000      000   000  000      
     # 000      000   000  000  0000
@@ -229,13 +242,11 @@ class Split extends event
     # 000       000   000  000       000   000       000
     # 000        0000000    0000000   0000000   0000000 
     
-    focusEditor: -> @editor.focus()
-
-    focusOnEditorOrHistory: -> @focusOnEditor()
+    focus: (n) -> 
+        log "split.focus #{n} #{$(n)?}"
+        $(n)?.focus()
         
-    focusOnEditor: ->
-        @hideCommandline()
-        @focusEditor()
+    reveal: (n) -> @show n
         
     #  0000000  000000000   0000000   000000000  00000000
     # 000          000     000   000     000     000     

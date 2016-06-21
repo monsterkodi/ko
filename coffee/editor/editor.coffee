@@ -79,6 +79,7 @@ class Editor extends Buffer
         @endSelection e
         
     selectSingleRange: (r) ->
+        console.log "editor.selectSingleRange", r
         @cursors = [[r[1][0], r[0]]]
         @initialCursors = null
         @startSelection true
@@ -94,6 +95,7 @@ class Editor extends Buffer
     startSelection: (e) ->
         if e and not @initialCursors
             @initialCursors = _.cloneDeep @cursors
+            log "startSelection", @initialCursors
             @do.selections @, @rangesForCursors @initialCursors
         if not e and @do.actions.length
             @do.selections @, []
@@ -358,6 +360,7 @@ class Editor extends Buffer
         @setCursorPos c, p
                         
     moveAllCursors: (e, f) ->
+        log "moveAllCursors", e, f, @cursors
         @startSelection e
         newCursors = _.cloneDeep @cursors
         

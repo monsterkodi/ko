@@ -24,7 +24,7 @@ class Command
         text: @last()
         select: true
         
-    cancel: ->
+    cancel: -> focus: @focus
     changed: (command) ->
                 
     execute: (command) ->    
