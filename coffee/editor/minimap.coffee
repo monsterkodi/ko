@@ -65,15 +65,18 @@ class Minimap
         @drawTopBot()
 
     drawLines: =>
+        # log "minimap.drawLines #{@scroll.top}..#{@scroll.bot}" if @editor.name == 'terminal'
         @canvas.height = @height
         @canvas.width = @width
         ctx = @canvas.getContext '2d'
         for li in [@scroll.top..@scroll.bot]
             diss = @editor.syntax.getDiss li
+            # log "diss.length #{diss?.length}" if @editor.name == 'terminal'
             if diss?.length
                 for r in diss
                     ctx.fillStyle = @editor.syntax.colorForClassnames r.clss + " minimap"
                     y = parseInt((li-@scroll.top)*@scroll.lineHeight)
+                    # log "y:#{y}" if @editor.name == 'terminal'
                     ctx.fillRect 2*r.start, y, 2*r.match.length, @scroll.lineHeight
                     
     drawTopBot: =>
@@ -142,7 +145,8 @@ class Minimap
         @draw()
             
     updateTransform: =>
-        @height = Math.min @scroll.lineHeight*@editor.lines.length, 2*@editor.viewHeight()
+        numLines = @editor.lines?.length ? 1
+        @height = Math.min @scroll.lineHeight*numLines, 2*@editor.viewHeight()
         @scroll.setViewHeight @height
         @canvasTop.style.transform = "translate3d(#{parseInt @width/4}px, #{parseInt -@height/4}px, 0px) scale3d(0.5, 0.5, 1)"
         @canvas.style.transform    = "translate3d(#{parseInt @width/4}px, #{parseInt -@height/4}px, 0px) scale3d(0.5, 0.5, 1)"
@@ -156,7 +160,6 @@ class Minimap
     onScroll: (scroll, topOffset) => @draw()
             
     width:  -> parseInt getStyle '.minimap', 'width'
-    height: -> parseInt Math.min @editor.lines.length*@scroll.lineHeight, @editor.scroll.viewHeight
     
     #  0000000  000      00000000   0000000   00000000 
     # 000       000      000       000   000  000   000

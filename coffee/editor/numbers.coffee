@@ -7,8 +7,7 @@
 setStyle,
 first,
 last,
-$
-}   = require '../tools/tools'
+$}  = require '../tools/tools'
 log = require '../tools/log'
 _   = require 'lodash'
 
@@ -78,9 +77,11 @@ class Numbers
     # 00000000  000   000  000         0000000   0000000   00000000
         
     onLineExposed: (e) =>
+        # console.log "numbers.onLineExposed #{@editor.name} #{e.lineIndex}" if @editor.name == 'logview'
         @elem.appendChild @addLine e.lineIndex
         
     onLineExposedTop: (e) =>
+        # console.log "numbers.onLineExposedTop #{@editor.name} #{e.lineIndex}" if @editor.name == 'logview'
         @elem.insertBefore @addLine(e.lineIndex), @elem.firstChild
         
     # 000  000   000   0000000  00000000  00000000   000000000  00000000  0000000  
@@ -123,7 +124,7 @@ class Numbers
     # 000   000  0000000    0000000    0000000  000  000   000  00000000
     
     addLine: (li) ->
-        # log 'numbers.addLine', li
+        # console.log "numbers.addLine #{@editor.name} #{li}" if @editor.name == 'logview'
         div = document.createElement "div"
         div.className = "linenumber"
         pre = document.createElement "span"
@@ -138,7 +139,8 @@ class Numbers
     # 000   000  00000000  000   000   0000000   000   000  0000000    00000000  000   000
         
     renumber: (e) =>
-        li = e.new # +1
+        console.log "numbers.renumber #{@editor.name} from #{e.new} to #{e.new+@elem.children.length-1}" if @editor.name == 'logview'
+        li = e.new
         for e in @elem.children
             e.firstChild.innerHTML = "#{li}"
             li += 1

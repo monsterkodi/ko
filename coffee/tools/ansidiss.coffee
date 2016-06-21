@@ -5,6 +5,7 @@ entities = require 'entities'
 _        = require 'lodash'
 
 STYLES =
+    fg:   'color:#0a0'
     ef0:  'color:#000'
     ef1:  'color:#A00'
     ef2:  'color:#0A0'
@@ -21,6 +22,7 @@ STYLES =
     ef13: 'color:#F5F'
     ef14: 'color:#5FF'
     ef15: 'color:#FFF'
+    bg:   'background-color:#0F0'
     eb0:  'background-color:#000'
     eb1:  'background-color:#A00'
     eb2:  'background-color:#0A0'
@@ -126,6 +128,8 @@ class ansiDiss
                     when 29 < code < 38     then dss.style.push STYLES["ef#{code - 30}"]
                     when code is 39         then dss.style.push STYLES["fg"]
                     when 39 < code < 48     then dss.style.push STYLES["eb#{code - 40}"]
+                    when code is 18         then dss.style.push STYLES["fg"]
+                    when code is 48         then dss.style.push STYLES["bg"]
                     when code is 49         then dss.style.push STYLES["bg"]
                     when 89 < code < 98     then dss.style.push STYLES["ef#{8+code - 90}"]
                     when 99 < code < 108    then dss.style.push STYLES["eb#{8+code - 100}"]

@@ -22,6 +22,8 @@ class LogView extends ViewBase
         @scrollbar = new Scrollbar @
         @numbers   = new Numbers @
         @minimap   = new Minimap @
+        
+        @setLines @lines
                 
     #  0000000   00000000   00000000   00000000  000   000  0000000  
     # 000   000  000   000  000   000  000       0000  000  000   000

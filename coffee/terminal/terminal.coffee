@@ -22,7 +22,9 @@ class Terminal extends ViewBase
         @scrollbar = new Scrollbar @
         @numbers   = new Numbers @
         @minimap   = new Minimap @        
-        @ansidiss  = new ansiDiss()        
+        @ansidiss  = new ansiDiss()    
+        
+        @setLines @lines   
 
     #  0000000   000   000  000000000  00000000   000   000  000000000
     # 000   000  000   000     000     000   000  000   000     000   

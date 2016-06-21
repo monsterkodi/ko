@@ -188,11 +188,7 @@ class Split extends event
             @splitAt 0, 0
     
     show: (n) ->
-        log "split.show #{n}"
-        switch n
-            when 'terminal' then log "0, #{0.5*@splitPosY 2} if #{@paneHeight(0)} < 100"
-            when 'editor'   then log "1, #{0.5*@splitPosY 2} if #{@paneHeight(2)} < 100"
-            when 'command'  then log "0, #{0               } if #{@paneHeight(1)} < #{@commandlineHeight}"
+        # log "split.show #{n}"
         switch n
             when 'terminal' then @splitAt 0, 0.5*@splitPosY 2 if @paneHeight(0) < 100
             when 'editor'   then @splitAt 1, 0.5*@splitPosY 2 if @paneHeight(2) < 100

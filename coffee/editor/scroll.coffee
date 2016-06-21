@@ -90,6 +90,7 @@ class scroll extends events
     # 0000000       000   
         
     by: (delta) => 
+        delta = 0 if Number.isNaN delta
         # log "scroll.by delta #{delta} scroll #{@scroll} scrollMax #{@scrollMax}" if @dbg
         @scroll = parseInt clamp 0, @scrollMax, @scroll+delta
         # log "scroll.by new delta #{delta} scroll #{@scroll} scrollMax #{@scrollMax}" if @dbg
@@ -105,7 +106,7 @@ class scroll extends events
         # log "scroll.by delta #{delta} offset #{offset}" if @dbg
         if offset != @topOffset
             @offsetTop = parseInt offset
-            log "scroll.by emit scroll @scroll #{@scroll} @offsetTop #{@offsetTop}" if @dbg
+            # log "scroll.by emit scroll @scroll #{@scroll} @offsetTop #{@offsetTop}" if @dbg
             @emit 'scroll', @scroll, @offsetTop
 
     #  0000000  00000000  000000000  000000000   0000000   00000000 
@@ -117,15 +118,15 @@ class scroll extends events
     setTop: (top) =>
 
         if top != @top
-            # log "scroll.setTop #{@top} -> #{top}"
+            # log "scroll.setTop #{@top} -> #{top}" if @dbg
             @top = top
             @emit 'top', @top
             
         newBot = Math.min @top+@viewLines, @numLines-1
-        # log "scroll.setTop @top #{@top} @bot #{@bot} newBot #{newBot} viewLines #{@viewLines} numLines #{@numLines}"
+        # log "scroll.setTop @top #{@top} @bot #{@bot} newBot #{newBot} viewLines #{@viewLines} numLines #{@numLines}"  if @dbg
         if @bot != newBot
             @bot = newBot
-            log "scroll.setTop emit bot #{@bot}" if @dbg
+            # log "scroll.setTop emit bot #{@bot}" if @dbg
             @emit 'bot', @bot
             
         @expose()
@@ -159,7 +160,7 @@ class scroll extends events
             while @bot > @exposeBot
                 @exposeBot += 1
                 @exposed = @exposeBot - @exposeTop
-                log "scroll.expose emit exposeLine #{@exposeBot}" if @dbg
+                # log "scroll.expose emit exposeLine #{@exposeBot}" if @dbg
                 @emit 'exposeLine', @exposeBot
             return
         
@@ -176,7 +177,7 @@ class scroll extends events
         while (@bot > @exposeBot)
             @exposeBot += 1
             @exposed = @exposeBot - @exposeTop
-            log "scroll.expose emit exposeLine #{@exposeBot}" if @dbg
+            console.log "scroll.expose emit exposeLine #{@exposeBot}" #if @dbg
             @emit 'exposeLine', @exposeBot
                             
         # 000   000   0000000   000   000  000   0000000  000   000

@@ -52,10 +52,8 @@ class ViewBase extends Editor
         @scroll.on 'vanishLine', @vanishLine
 
         @view.onkeydown = @onKeyDown
-    
+        @initDrag()    
         super
-
-        @initDrag()
 
     # 000       0000000   000   000  00000000  00000000    0000000
     # 000      000   000   000 000   000       000   000  000     
@@ -231,13 +229,13 @@ class ViewBase extends Editor
         lineDiv = @addLine()
         lineDiv.innerHTML = html
         @elem.appendChild lineDiv
-        # log "viewbase.exposeLine #{li} children #{@elem.children.length}"
+        # console.log "viewbase.#{@name}.exposeLine #{li} children #{@elem.children.length}"
         
         if li != @elem.children.length-1+@scroll.exposeTop 
             console.log "viewbase.exposeLine wtf? #{li} != #{@elem.children.length-1+@scroll.exposeTop }"
         
         @emit 'lineExposed', 
-            lineIndex: li # @elem.children.length-1 + @scroll.exposeTop 
+            lineIndex: li
             lineDiv: lineDiv
 
         @renderCursors() if @cursorsInLineAtIndex(li).length

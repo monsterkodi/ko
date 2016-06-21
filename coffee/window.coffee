@@ -250,9 +250,9 @@ logview = window.logview = new LogView '.logview'
 
 commandline = window.commandline = new Commandline '.commandline-editor'
 
-commandline.startCommand 'term', 'command+t'
-commandline.setLines ['color-ls -l index.html']
-commandline.execute()
+# commandline.startCommand 'term', 'command+t'
+# commandline.setLines ['color-ls -l index.html']
+# commandline.execute()
                   
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000     

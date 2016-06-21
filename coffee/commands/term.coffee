@@ -34,5 +34,6 @@ class Term extends Command
             else
                 @childp.stdin.write "#{command}\n"
         text: ''
+        reveal: 'terminal'
         
 module.exports = Term
