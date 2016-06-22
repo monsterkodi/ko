@@ -90,7 +90,7 @@ class Minimap
         y = parseInt @scroll.lineHeight * (@editor.scroll.top-@scroll.top)
         ctx.fillRect 0, y, @width, 2*Math.max 0, tb
         
-    changed: (changeInfo) -> @draw()
+    changed: (changeInfo) -> @draw() if changeInfo.sorted.length
     
     # 00     00   0000000   000   000   0000000  00000000
     # 000   000  000   000  000   000  000       000     

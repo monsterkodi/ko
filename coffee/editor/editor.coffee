@@ -75,7 +75,7 @@ class Editor extends Buffer
         else if not e
             @initialCursors = _.cloneDeep [p]
         @startSelection e
-        @do.cursors [p]
+        @do.cursors [p], true
         @endSelection e
         
     selectSingleRange: (r) ->
@@ -85,7 +85,7 @@ class Editor extends Buffer
         @cursors = [[r[1][0], r[0]]]
         @initialCursors = null
         @startSelection true
-        @do.cursors [[r[1][1], r[0]]]      
+        @do.cursors [[r[1][1], r[0]]], true     
         @endSelection true
             
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
@@ -97,7 +97,6 @@ class Editor extends Buffer
     startSelection: (e) ->
         if e and not @initialCursors
             @initialCursors = _.cloneDeep @cursors
-            # log "startSelection #{@initialCursors}", @initialCursors
             @do.selections @rangesForCursors @initialCursors
         if not e and @do.actions.length
             @do.selections []
@@ -373,7 +372,7 @@ class Editor extends Buffer
                     newCursors[@indexOfCursor(c)] = newPos
         else
             newCursors[0] = f(@cursors[0])
-        @do.cursors newCursors
+        @do.cursors newCursors, e
         @endSelection e
         
     moveCursorsToEndOfLine:   (e) -> @moveAllCursors e, (c) => [@lines[c[1]].length, c[1]]

@@ -195,9 +195,9 @@ class undo
     # 000       000   000  000   000       000  000   000  000   000
     #  0000000   0000000   000   000  0000000    0000000   000   000
 
-    cursors: (newCursors) ->
+    cursors: (newCursors, keepInitial) ->
         @editor.cleanCursors newCursors
-        if newCursors.length != @editor.cursors.length
+        if not keepInitial or newCursors.length != @editor.cursors.length
             @editor.initialCursors = _.cloneDeep newCursors
         @changeInfoCursor()
         @lastAction().curBefore = _.cloneDeep newCursors if not @actions.length
