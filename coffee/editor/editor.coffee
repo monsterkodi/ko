@@ -21,7 +21,6 @@ class Editor extends Buffer
     
     constructor: () ->
         @surroundCharacters = "#*{}[]()'\"".split ''
-        # log "surroundCharacters #{@surroundCharacters}"
         @currentFile = null
         @indentString = _.padStart "", 4
         @watch = null
@@ -526,7 +525,21 @@ class Editor extends Buffer
         @do.cursors newCursors
         @do.end()
         
+    #  0000000  000   000  00000000   00000000    0000000   000   000  000   000  0000000  
+    # 000       000   000  000   000  000   000  000   000  000   000  0000  000  000   000
+    # 0000000   000   000  0000000    0000000    000   000  000   000  000 0 000  000   000
+    #      000  000   000  000   000  000   000  000   000  000   000  000  0000  000   000
+    # 0000000    0000000   000   000  000   000   0000000    0000000   000   000  0000000  
+        
     insertSurroundCharacter: (ch) ->
+        
+        if @closingSurround?
+            if @closingSurround == ch
+                @selectNone()
+                @deleteForward()
+                @closingSurround = null
+                return false
+        @closingSurround = null
         
         if ch == '#' # check if any cursor or selection is inside a string
             found = false
@@ -548,15 +561,19 @@ class Editor extends Buffer
             
         newSelections = _.cloneDeep @selections
         newCursors = _.cloneDeep @cursors
+
+        [cl,cr] = switch ch
+            when '[', ']' then ['[', ']']
+            when '{', '}' then ['{', '}']
+            when '(', ')' then ['(', ')']
+            when "'"      then ["'", "'"]
+            when '"'      then ['"', '"']
+            when '*'      then ['*', '*']                    
+            when '#'      then ['#{', '}']
+            
+        @closingSurround = cr
+
         for s in @selections
-            [cl,cr] = switch ch
-                when '[', ']' then ['[', ']']
-                when '{', '}' then ['{', '}']
-                when '(', ')' then ['(', ')']
-                when "'"      then ["'", "'"]
-                when '"'      then ['"', '"']
-                when '*'      then ['*', '*']                    
-                when '#'      then ['#{', '}']
                 
             if cl == '#{'
                 # convert single string to double string
@@ -568,7 +585,7 @@ class Editor extends Buffer
 
             @do.change @lines, s[0], @lines[s[0]].splice s[1][1], 0, cr
             @do.change @lines, s[0], @lines[s[0]].splice s[1][0], 0, cl
-                        
+                            
             newSelections[@indexOfSelection s][1][0] += cl.length
             newSelections[@indexOfSelection s][1][1] += cl.length
             for c in @cursorsInRange s

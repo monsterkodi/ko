@@ -243,6 +243,7 @@ class Buffer extends event
         c = clamp 0, @lines[l].length, p[0]
         [ c, l ]
         
+    isSamePos: (a,b) -> a[1]==b[1] and a[0]==b[0]
     isPosInRange: (p, r) ->
         return (p[1] == r[0]) and (r[1][0] <= p[0] <= r[1][1])
         
