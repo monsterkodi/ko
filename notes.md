@@ -2,8 +2,9 @@
 
 #### find
 - *search in multiple files*
-- *scroll find result to top of view*
+- *scroll find result to top of view* (same for goto)
 - *escape dots in search string*
+- keep command+e search string longer
 - highlight while entering
 
 #### search
@@ -16,7 +17,7 @@
 #### editor
 - fix esc
 - check undo (merges too much?)
-- *autocomple*
+- *autocomplete*
     - from buffer
     - from similar files
 
@@ -39,16 +40,16 @@
 - font zoom shortcut
       
 #### misc    
+- updates numbers when removing highlights (esc)
 - command-enter: deselect, insert newline, indent, and single cursor
 - comment line characters per filetype    
 - remember scroll positions per file
     
 #### minimap
 - show selections, highlights and cursors
-- *don't render beyond minimap width*
     
 #### cursors
-- *fix initialCursors mess*
+- **fix initialCursors mess**
 - remember last cursor
 - highlight last cursor
 - highlight cursor line(s?)
@@ -56,26 +57,28 @@
 - paste multiple lines into multiple selections/cursors
 
 #### selection
+- select all highlights shortcut?
 - two selection modes
 - active (cursor inside)
 - passive (cursor movement won't destroy, but next selection will)
-- restore cursor and scroll
-- on watcher reload
-- on save/saveAs reload
 - shift move cursor down
 - extend selection to end of line if previous line is fully selected
     
 #### editing
+- *fix closing surround*
+- *command up/down: move selected lines if only lines selected*
+- *trim indentation spaces when joining lines*
+- fancy close terminal, commandline or on esc when no highlight is canceled
+- delete forward swallows spaces?
+- on second command+e: select including leading @
+- #< to add salter header of next word
 - make special stuff file type dependent, eg. add * to surround characters for md
 - when pasting text at indent level, remove leading space columns
 - ctrl+command+/  align cursor block
-- dont switch to multicursors on shift-right/left
-- insert newline if pasting fully selected lines
+- *insert newline when pasting and cursor at start of line*
 - indent one level more when inserting newline ...
     - after =>, -> 
     - when next line is indented one level more
-- surround selection with #{} if inside string
-    - autoconvert '' to "" when #{} entered
 - dbg "class.method arg: #{arg}, ..."
 - history of file locations
 
@@ -98,6 +101,7 @@
     - images
 
 #### nice to have
+- save window positions as layouts
 - bracket matching
 - git status in gutter?
 - show invisbles (spaces,tabs,etc)
@@ -110,3 +114,4 @@
 - markdown mode (replace - with ●)
 - cosmetic
     - fix highlight rounded borders     
+    

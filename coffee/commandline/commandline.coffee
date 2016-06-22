@@ -1,4 +1,3 @@
-
 #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
 # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
 # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 
@@ -9,6 +8,7 @@ fileList,
 $}        = require '../tools/tools'
 ViewBase  = require '../editor/viewbase'
 log       = require '../tools/log'
+split     = require '../split'
 path      = require 'path'
 
 class Commandline extends ViewBase
@@ -30,6 +30,8 @@ class Commandline extends ViewBase
         @command = null
 
         @loadCommands()
+        
+        window.split.on 'paneHeight', @onPaneHeight
 
     setName: (name) -> @cmmd.innerHTML = name
                 
@@ -53,6 +55,8 @@ class Commandline extends ViewBase
             command = new commandClass @
             command.setPrefsID commandClass.name.toLowerCase()
             @commands[command.prefsID] = command
+            
+    onPaneHeight: (e) => if e.paneIndex == 0 then @command?.onPosY? e.newHeight
           
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -106,7 +110,7 @@ class Commandline extends ViewBase
         return 'unhandled'            
 
     handleModKeyComboEvent: (mod, key, combo, event) ->
-
+        split = window.split
         switch combo
             when 'enter'            then return @execute()
             when 'up'               then return @setAndSelectText @command?.prev()
@@ -114,6 +118,12 @@ class Commandline extends ViewBase
             when 'esc'              then return @cancel()
             when 'command+k'        then return @selectAll() + @deleteSelection()
             when 'tab', 'shift+tab' then return
+            when 'home', 'command+up'    then return split.do 'maximize editor'
+            when 'end', 'command+down'   then return split.do 'maximize terminal'
+            when 'page up', 'alt+up'     then return split.do 'enlarge editor by 10'
+            when 'ctrl+up'               then return split.do 'enlarge editor by 1'
+            when 'page down', 'alt+down' then return split.do 'enlarge terminal by 10'
+            when 'ctrl+down'             then return split.do 'enlarge terminal by 1'
         
         return 'unhandled'
     

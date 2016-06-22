@@ -3,14 +3,13 @@
 # 0000000    000   000  000000    000000    0000000   0000000  
 # 000   000  000   000  000       000       000       000   000
 # 0000000     0000000   000       000       00000000  000   000
-
 {
 clamp,
 startOf,
 endOf,
 first,
 last
-}      = require '../tools/tools'
+}      = require "../tools/tools"
 log    = require '../tools/log'
 assert = require 'assert'
 event  = require 'events'
@@ -246,15 +245,38 @@ class Buffer extends event
         
     isPosInRange: (p, r) ->
         return (p[1] == r[0]) and (r[1][0] <= p[0] <= r[1][1])
-
-    rangeEndPos:   (r)   -> [r[1][1], r[0]]
-    rangeStartPos: (r)   -> [r[1][0], r[0]]
-    rangeIndexPos: (r,i) -> [r[1][i], r[0]]
-    
+        
     positionsFromPosInPositions: (p, pl) -> 
         (r for r in pl when ((r[1] > p[1]) or ((r[1] == p[1]) and (r[0] >= p[0]))))
     positionsInLineAtIndexInPositions: (li,pl) -> (p for p in pl when p[1] == li)
     positionsBelowLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] > li)
+
+    # 00000000    0000000   000   000   0000000   00000000
+    # 000   000  000   000  0000  000  000        000     
+    # 0000000    000000000  000 0 000  000  0000  0000000 
+    # 000   000  000   000  000  0000  000   000  000     
+    # 000   000  000   000  000   000   0000000   00000000
+
+    rangeEndPos:   (r)   -> [r[1][1], r[0]]
+    rangeStartPos: (r)   -> [r[1][0], r[0]]
+    rangeIndexPos: (r,i) -> [r[1][i], r[0]]
+    rangeForPos: (p) -> [p[1], [p[0], p[0]]]
+    rangeForLineAtIndex: (i) -> 
+        throw new Error() if i >= @lines.length
+        [i, [0, @lines[i].length]] 
+
+    isRangeInString: (r) -> @rangeOfStringSurroundingRange(r)?
+   
+    rangeOfInnerStringSurroundingRange: (r) ->
+        rgs = @rangesOfStringsInLineAtIndex r[0]
+        rgs = @rangesShrunkenBy rgs, 1
+        @rangeContainingRangeInRanges r, rgs
+        
+    rangeOfStringSurroundingRange: (r) ->
+        if ir = @rangeOfInnerStringSurroundingRange r
+            @rangeGrownBy ir, 1
+            
+    rangeGrownBy: (r,delta) -> [r[0], [r[1][0]-delta, r[1][1]+delta]]
 
     # 00000000    0000000   000   000   0000000   00000000   0000000
     # 000   000  000   000  0000  000  000        000       000     
@@ -276,11 +298,7 @@ class Buffer extends event
         r
     
     rangesForCursors: (cs=@cursors) -> ([c[1], [c[0], c[0]]] for c in cs)
-            
-    rangeForLineAtIndex: (i) -> 
-        throw new Error() if i >= @lines.length
-        [i, [0, @lines[i].length]] 
-        
+                   
     rangesForAllLines: -> @rangesForLinesFromTopToBot 0, @lines.length
     
     rangesForLinesFromTopToBot: (top,bot) -> 
@@ -306,6 +324,23 @@ class Buffer extends event
             r = r.concat @rangesForTextInLineAtIndex t, li, opt
         r        
       
+    rangesOfStringsInLineAtIndex: (li) -> # todo: handle #{}
+        t = @lines[li]
+        r = []
+        ss = -1
+        cc = null
+        for i in [0...t.length]
+            c = t[i]
+            if not cc and c in "'\""
+                cc = c
+                ss = i
+            else if c == cc
+                if (t[i-1] != '\\') or (i>2 and t[i-2] == '\\')
+                    r.push [li, [ss, i+1]]
+                    cc = null
+                    ss = -1
+        r
+      
     # 000  000   000        00000000    0000000   000   000   0000000   00000000   0000000
     # 000  0000  000        000   000  000   000  0000  000  000        000       000     
     # 000  000 0 000        0000000    000000000  000 0 000  000  0000  0000000   0000000 
@@ -315,12 +350,14 @@ class Buffer extends event
     rangesForLineIndexInRanges: (li, ranges) -> (r for r in ranges when r[0]==li)
     
     rangeAtPosInRanges: (pos, ranges) ->
+        return if ranges.length == 0
         for ri in [ranges.length-1..0]
             r = ranges[ri]
             if (r[0] == pos[1]) and (r[1][0] <= pos[0] <= r[1][1])
                 return r
             
     rangeBeforePosInRanges: (pos, ranges) ->
+        return if ranges.length == 0
         for ri in [ranges.length-1..0]
             r = ranges[ri]
             if (r[0] < pos[1]) or ((r[0] == pos[1]) and (r[1][1] < pos[0]))
@@ -332,6 +369,7 @@ class Buffer extends event
                 return r
     
     rangeStartingOrEndingAtPosInRanges: (p, ranges) ->
+        return if ranges.length == 0
         for ri in [ranges.length-1..0]
             r = ranges[ri]
             if r[0] == p[1]
@@ -341,8 +379,15 @@ class Buffer extends event
     rangesFromTopToBotInRanges: (top, bot, ranges) ->
         (r for r in ranges when top <= r[0] <= bot)
         
+    rangeContainingRangeInRanges: (r, ranges) ->
+        if cr = @rangeAtPosInRanges @rangeStartPos(r), ranges
+            return cr if cr[1][1] >= r[1][1]
+        
     sortedLineIndicesInRanges: (ranges) -> _.uniq(s[0] for s in ranges).sort (a,b)->(a-b)
-                    
+    
+    rangesShrunkenBy: (ranges, delta) ->
+        ([r[0], [r[1][0]+delta, r[1][1]-delta]] for r in ranges when (r[1][1]-r[1][0])>=2*delta)
+                             
     # 000   000  000   000  000   000   0000000  00000000  0000000    00000 
     # 000   000  0000  000  000   000  000       000       000   000     000
     # 000   000  000 0 000  000   000  0000000   0000000   000   000   000  

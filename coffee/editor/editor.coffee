@@ -20,7 +20,8 @@ _       = require 'lodash'
 class Editor extends Buffer
     
     constructor: () ->
-        @surroundCharacters = "{}[]()'\"".split ''
+        @surroundCharacters = "#*{}[]()'\"".split ''
+        # log "surroundCharacters #{@surroundCharacters}"
         @currentFile = null
         @indentString = _.padStart "", 4
         @watch = null
@@ -79,7 +80,9 @@ class Editor extends Buffer
         @endSelection e
         
     selectSingleRange: (r) ->
-        console.log "editor.selectSingleRange", r
+        if not r?
+            log "editor.#{name}.selectSingleRange warning! undefined range #{r}"
+            return
         @cursors = [[r[1][0], r[0]]]
         @initialCursors = null
         @startSelection true
@@ -95,7 +98,7 @@ class Editor extends Buffer
     startSelection: (e) ->
         if e and not @initialCursors
             @initialCursors = _.cloneDeep @cursors
-            log "startSelection", @initialCursors
+            # log "startSelection #{@initialCursors}", @initialCursors
             @do.selections @rangesForCursors @initialCursors
         if not e and @do.actions.length
             @do.selections []
@@ -110,7 +113,7 @@ class Editor extends Buffer
         if e and @initialCursors
             newSelection = []
             if @initialCursors.length != @cursors.length
-                log 'warn! @initialCursors.length != @cursors.length', @initialCursors.length, @cursors.length
+                log 'editor.ednSelection warning! @initialCursors.length != @cursors.length', @initialCursors.length, @cursors.length
             
             for ci in [0...@initialCursors.length]
                 ic = @initialCursors[ci]
@@ -196,7 +199,7 @@ class Editor extends Buffer
             r = @rangeAfterPosInRanges @cursorPos(), @highlights
             r ?= first @highlights
             @selectSingleRange r
-            
+            @scrollCursorToTop()
             @renderHighlights()
             @emit 'highlight', @highlights
 
@@ -206,7 +209,7 @@ class Editor extends Buffer
             srange = @rangeForWordAtPos @cursorPos()
             @selectSingleRange srange
             
-        text =  @textInRange @selections[0]
+        text = @textInRange @selections[0]
         if text.length
             @highlights = @rangesForText text
             @renderHighlights()
@@ -226,6 +229,7 @@ class Editor extends Buffer
         r = @rangeAfterPosInRanges @cursorPos(), @highlights
         r ?= first @highlights
         @selectSingleRange r
+        @scrollCursorToTop()
 
     selectPrevHighlight: ->
         r = @rangeBeforePosInRanges @cursorPos(), @highlights
@@ -243,7 +247,8 @@ class Editor extends Buffer
             else # select current highlight first
                 r = @rangeAtPosInRanges cp, @highlights
             r ?= first @highlights
-            @addRangeToSelection r        
+            @addRangeToSelection r
+            @scrollCursorToTop()
             
     removeSelectedHighlight: ->
         cp = @cursorPos()
@@ -492,8 +497,7 @@ class Editor extends Buffer
         @clearHighlights()
         @clampCursors() # todo: insert spaces instead in multi cursor mode
         if ch in @surroundCharacters
-            @insertSurroundCharacter ch
-            return
+            return if @insertSurroundCharacter ch
 
         if ch == '\n'
             @insertNewline indent:true
@@ -523,43 +527,56 @@ class Editor extends Buffer
         @do.end()
         
     insertSurroundCharacter: (ch) ->
-        @do.start()
-        # log "editor.insertSurroundCharacter #{ch}"
-        if @selections.length
-            newSelections = _.cloneDeep @selections
+        
+        if ch == '#' # check if any cursor or selection is inside a string
+            found = false
             for s in @selections
-                [cl,cr] = switch ch
-                    when "[", "]" then ["[", "]"]
-                    when "{", "}" then ["{", "}"]
-                    when "(", ")" then ["(", ")"]
-                    when "'"      then ["'", "'"]
-                    when '"'      then ['"', '"']
-                @do.change @lines, s[0], @lines[s[0]].splice s[1][1], 0, cr
-                @do.change @lines, s[0], @lines[s[0]].splice s[1][0], 0, cl
-                newSelections[@indexOfSelection s][1][0] += 1
-                newSelections[@indexOfSelection s][1][1] += 1
-            @do.selections newSelections
-            @setCursorPos @cursors[0], [@cursors[0][0]+2, @cursors[0][1]]
-        else
-            if @closingInserted == ch
-                @closingInserted = null
-                @moveCursorsRight()
-            else
-                for c in @cursors
-                    @do.change @lines, c[1], @lines[c[1]].splice c[0], 0, ch
-                    c2 = switch ch
-                        when '"' then '"'
-                        when "'" then "'"
-                        when "[" then "]"
-                        when '{' then '}'
-                        when '(' then ')'
-
-                    if c2? 
-                        @do.change @lines, c[1], @lines[c[1]].splice c[0]+1, 0, c2 
-                        @closingInserted = c2
+                if @isRangeInString s
+                    found = true
+                    break
                     
-                    @setCursorPos c, [c[0]+1, c[1]]
+            if not found
+                for c in @cursors
+                    if @isRangeInString @rangeForPos c
+                        found = true
+                        break
+            return false if not found
+        
+        @do.start()
+        if @selections.length == 0
+            @do.selections @rangesForCursors()
+            
+        newSelections = _.cloneDeep @selections
+        newCursors = _.cloneDeep @cursors
+        for s in @selections
+            [cl,cr] = switch ch
+                when '[', ']' then ['[', ']']
+                when '{', '}' then ['{', '}']
+                when '(', ')' then ['(', ')']
+                when "'"      then ["'", "'"]
+                when '"'      then ['"', '"']
+                when '*'      then ['*', '*']                    
+                when '#'      then ['#{', '}']
+                
+            if cl == '#{'
+                # convert single string to double string
+                if sr = @rangeOfStringSurroundingRange s
+                    if @lines[sr[0]][sr[1][0]] == "'"
+                        @do.change @lines, s[0], @lines[s[0]].splice sr[1][0], 1, '"'
+                    if @lines[sr[0]][sr[1][1]-1] == "'"
+                        @do.change @lines, s[0], @lines[s[0]].splice sr[1][1]-1, 1, '"'
+
+            @do.change @lines, s[0], @lines[s[0]].splice s[1][1], 0, cr
+            @do.change @lines, s[0], @lines[s[0]].splice s[1][0], 0, cl
+                        
+            newSelections[@indexOfSelection s][1][0] += cl.length
+            newSelections[@indexOfSelection s][1][1] += cl.length
+            for c in @cursorsInRange s
+                newCursors[@indexOfCursor c][0] += cl.length
+        @do.selections newSelections
+        @do.cursors newCursors
         @do.end()
+        return true
 
     insertTab: ->
         if @selections.length

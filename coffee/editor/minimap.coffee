@@ -74,6 +74,7 @@ class Minimap
             # log "diss.length #{diss?.length}" if @editor.name == 'terminal'
             if diss?.length
                 for r in diss
+                    break if 2*r.start >= @width
                     ctx.fillStyle = @editor.syntax.colorForClassnames r.clss + " minimap"
                     y = parseInt((li-@scroll.top)*@scroll.lineHeight)
                     # log "y:#{y}" if @editor.name == 'terminal'

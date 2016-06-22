@@ -411,6 +411,19 @@ class ViewBase extends Editor
     scrollCursor: -> 
         # log "view.scrollCursor todo"
         # $('.cursor', @view)?.scrollIntoViewIfNeeded()
+        
+    scrollCursorToTop: ->
+        cp = @cursorPos()
+        # log "viewbase.scrollCursorToTop #{cp[1]} #{cp[1] - @scroll.top}"
+        if cp[1] - @scroll.top > 7
+            rg = [@scroll.top, Math.max 0, cp[1]-1]
+            sl = @selectionsInLineIndexRange rg
+            hl = @highlightsInLineIndexRange rg
+            log "#{sl.length} #{hl.length}"
+            if sl.length == 0 == hl.length
+                delta = @scroll.lineHeight * (cp[1] - @scroll.top - 7)
+                # log "viewbase.scrollCursorToTop #{delta}"
+                @scrollBy delta
                     
     # 00000000    0000000    0000000
     # 000   000  000   000  000     

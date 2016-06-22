@@ -17,6 +17,12 @@ class Goto extends Command
         @shortcuts = ['command+;']
         super 
         
+    # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
+    # 000        000 000   000       000       000   000     000     000     
+    # 0000000     00000    0000000   000       000   000     000     0000000 
+    # 000        000 000   000       000       000   000     000     000     
+    # 00000000  000   000  00000000   0000000   0000000      000     00000000
+        
     execute: (command) ->
         
         line = parseInt command
@@ -28,8 +34,10 @@ class Goto extends Command
             else 
                 line -= 1
             line = clamp 0, editor.lines.length-1, line
-            editor.selectNone()
-            editor.setCursor 0, line
+            # editor.selectNone()
+            # editor.setCursor 0, line
+            editor.singleCursorAtPos [0,line]
+            editor.scrollCursorToTop()
 
             focus: @focus
         else

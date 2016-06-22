@@ -18,8 +18,6 @@ class Drag
         _.extend @, def cfg,
                 target  : null
                 handle  : null
-                minPos  : null
-                maxPos  : null
                 onStart : null
                 onMove  : null
                 onStop  : null
@@ -35,8 +33,6 @@ class Drag
         if not @target?
             error 'cant find drag target'
             return
-        if @minPos? and @maxPos?
-            @setMinMax @minPos, @maxPos
 
         @dragging  = false
         @listening = false
@@ -46,18 +42,14 @@ class Drag
         @activate() if @active
         return
 
-    setMinMax: (minPos, maxPos) =>
-        @minPos = minPos.min(maxPos)
-        @maxPos = minPos.max(maxPos)
-
     dragStart: (event) =>
         
         return if @dragging or not @listening
         @dragging = true
         @startPos = absPos event
-        @pos     = absPos event
+        @pos      = absPos event
         @onStart @, event if @onStart?
-        @lastPos = absPos event
+        @lastPos  = absPos event
                 
         event.preventDefault()
 
@@ -72,9 +64,6 @@ class Drag
         @delta = @lastPos.to @pos
         @deltaSum = @startPos.to @pos
         
-        if @minPos? and @maxPos? 
-            @cpos = @pos.clamped @minPos, @maxPos                
-                    
         if @onMove?
             @onMove this, event
 

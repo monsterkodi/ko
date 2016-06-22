@@ -138,7 +138,7 @@ class scroll extends events
     # 00000000  000   000  000         0000000   0000000   00000000
     
     expose: =>
-        log "scroll.expose start", @info() if @dbg
+        console.log "scroll.expose start", @info() if @dbg
         
         if @exposeNum == 0 # only exposing if expose range is unlimited
             while @bot > @exposeBot
@@ -153,14 +153,14 @@ class scroll extends events
         return if (@exposed <= @exposedNum) and (topDiff <= 0) and (botDiff >= 0)
         
         if (@top >= @exposeBot) or (@bot <= @exposeTop) # new range outside, start from scratch
-            log "scroll.expose emit clearLines" if @dbg
+            console.log "scroll.expose emit clearLines" if @dbg
             @emit 'clearLines'
             @exposeTop = @top
             @exposeBot = @top-1
             while @bot > @exposeBot
                 @exposeBot += 1
                 @exposed = @exposeBot - @exposeTop
-                # log "scroll.expose emit exposeLine #{@exposeBot}" if @dbg
+                console.log "scroll.expose emit exposeLine #{@exposeBot}" if @dbg
                 @emit 'exposeLine', @exposeBot
             return
         
@@ -168,7 +168,7 @@ class scroll extends events
             old = @exposeTop
             @exposeTop = @top
             @exposed = @exposeBot - @exposeTop
-            log "scroll.expose emit exposeTop #{old} -> #{@exposeTop} (num #{-(@top-old)})" if @dbg
+            console.log "scroll.expose emit exposeTop #{old} -> #{@exposeTop} (num #{-(@top-old)})" if @dbg
             @emit 'exposeTop',
                 old: old
                 new: @exposeTop
@@ -177,7 +177,7 @@ class scroll extends events
         while (@bot > @exposeBot)
             @exposeBot += 1
             @exposed = @exposeBot - @exposeTop
-            console.log "scroll.expose emit exposeLine #{@exposeBot}" #if @dbg
+            console.log "scroll.expose emit exposeLine #{@exposeBot}" if @dbg
             @emit 'exposeLine', @exposeBot
                             
         # 000   000   0000000   000   000  000   0000000  000   000

@@ -94,7 +94,7 @@ class Open extends Command
         @list?.remove()
         @list = document.createElement 'div'
         @list.className = 'list'
-        @list.style.top = window.split.editHandle.style.top
+        @positionList()
         window.split.elem.appendChild @list 
         @listFiles @files
             
@@ -113,6 +113,18 @@ class Open extends Command
                 div.value = file
                 @list.appendChild div
                 index += 1
+
+    onPosY: (posY) => @positionList()
+    
+    positionList: ->
+        return if not @list?
+        split = window.split
+        listTop = split.splitPosY 1
+        log "open.positionList listTop #{listTop} #{split.elemHeight() - listTop}"
+        listHeight = @list.getBoundingClientRect().height
+        if (split.elemHeight() - listTop) < listHeight
+            listTop = split.splitPosY(0) - listHeight
+        @list?.style.top = "#{listTop}px"
                 
     # 00000000   00000000   00000000  000   000
     # 000   000  000   000  000       000   000

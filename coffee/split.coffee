@@ -12,7 +12,7 @@ pos   = require './tools/pos'
 drag  = require './tools/drag'
 prefs = require './tools/prefs'
 event = require 'events'
- 
+
 class Split extends event
     
     # 000  000   000  000  000000000
@@ -45,23 +45,27 @@ class Split extends event
         @dragTop = new drag
             target: @topHandle
             cursor: 'ns-resize'
-            onMove: (drag) => @splitAt 0, drag.cpos.y - @elemTop()
             onStop: (drag) => @snap()
+            onMove: (drag) => @splitAt 0, drag.pos.y - @elemTop()
         
         @dragBot = new drag
             target: @editHandle
             cursor: 'ns-resize'
-            onMove: (drag) => @splitAt 1, drag.cpos.y - @elemTop()
             onStop: (drag) => @snap()
-
+            onMove: (drag) => @splitAt 1, drag.pos.y - @elemTop()
+            
         @dragLog = new drag
             target: @logHandle
             cursor: 'ns-resize'
-            onMove: (drag) => @splitAt 2, drag.cpos.y - @elemTop()
             onStop: (drag) => @snap()
+            onMove: (drag) => 
+                log "split.dragLog.move #{@paneHeight(2)} #{@splitPosY(2)-@splitPosY(1)}"
+                if @splitPosY(2)-@splitPosY(1) < 10
+                    @splitAt 1, drag.pos.y - @elemTop()
+                    @splitAt 2, drag.pos.y - @elemTop()
+                else
+                    @splitAt 2, drag.pos.y - @elemTop()
 
-        @constrainDrag()
-    
     setWinID: (@winID) ->
         s = @getState 'split', [0,0,@elemHeight()-@handleHeight]        
         @logVisible = @getState 'logVisible', false
@@ -80,25 +84,12 @@ class Split extends event
     
     resized: ->
         
-        @constrainDrag()
-                
         s = []
         for h in [0...@handles.length]
             s.push clamp 0, @elemHeight(), @splitPosY h
             
         @applySplit s
     
-    #  0000000   0000000   000   000   0000000  000000000  00000000    0000000   000  000   000
-    # 000       000   000  0000  000  000          000     000   000  000   000  000  0000  000
-    # 000       000   000  000 0 000  0000000      000     0000000    000000000  000  000 0 000
-    # 000       000   000  000  0000       000     000     000   000  000   000  000  000  0000
-    #  0000000   0000000   000   000  0000000      000     000   000  000   000  000  000   000
-    
-    constrainDrag: ->
-        @dragTop.setMinMax pos(0, @elemTop()), pos(0, @elemTop()+@elemHeight()-@commandlineHeight-@handleHeight)
-        @dragBot.setMinMax pos(0, @elemTop()), pos(0, @elemTop()+@elemHeight())
-        @dragLog.setMinMax pos(0, @elemTop()), pos(0, @elemTop()+@elemHeight())
-        
     # 00000000    0000000    0000000          0000000  000  0000000  00000000
     # 000   000  000   000  000         0    000       000     000   000     
     # 00000000   000   000  0000000   00000  0000000   000    000    0000000 
@@ -107,9 +98,50 @@ class Split extends event
     
     elemTop:    -> @elem.getBoundingClientRect().top
     elemHeight: -> @elem.getBoundingClientRect().height
-    splitPosY:  (i) -> @handles[i].getBoundingClientRect().top - @elemTop()
-    paneHeight: (i) -> @panes[i].getBoundingClientRect().height
+    splitPosY:  (i) -> 
+        if i < @handles.length
+            @handles[i].getBoundingClientRect().top - @elemTop()
+        else
+            @elemHeight()
+            
+    paneHeight: (i) -> 
+        if i is 0 then @splitPosY 0
+        else @splitPosY(i)-@splitPosY(i-1)-@handleHeight
+
+    # 0000000     0000000 
+    # 000   000  000   000
+    # 000   000  000   000
+    # 000   000  000   000
+    # 0000000     0000000 
     
+    do: (sentence) ->
+        words = sentence.split ' '
+        action = words[0]
+        what = words[1]
+        if what? and action in ['maximize', 'enlarge']
+            switch action
+                when 'maximize' then delta = 999
+                when 'enlarge'
+                    if words[2] == 'by'
+                        delta = parseInt words[3]
+                    else
+                        delta = 1
+            switch what
+                when 'editor'   then return @moveCommandLineBy -delta
+                when 'terminal' then return @moveCommandLineBy  delta        
+            
+        log "split.do warning! unhandled do command? #{sentence}?"
+        
+    # 00     00   0000000   000   000  00000000   0000000  00     00  0000000  
+    # 000   000  000   000  000   000  000       000       000   000  000   000
+    # 000000000  000   000   000 000   0000000   000       000000000  000   000
+    # 000 0 000  000   000     000     000       000       000 0 000  000   000
+    # 000   000   0000000       0      00000000   0000000  000   000  0000000  
+    
+    moveCommandLineBy: (delta) ->
+        pixels = window.editor.size.lineHeight * delta
+        @splitAt 0, clamp 0, @elemHeight() - @commandlineHeight - @handleHeight, pixels + @splitPosY 0       
+        
     #  0000000  00000000   000      000  000000000
     # 000       000   000  000      000     000   
     # 0000000   00000000   000      000     000   
@@ -137,43 +169,55 @@ class Split extends event
     # 000   000  000        000        0000000     000   
         
     applySplit: (s) ->
-        # log "split.applySplit", s
+        # log "split.applySplit s", s
         if s[1] >= @commandlineHeight + @handleHeight
             s[0] = s[1] - @commandlineHeight - @handleHeight
-        for i in [1...s.length]
-            s[i] = clamp s[i-1], @elemHeight(), s[i]
+        for i in [0...s.length]
+            s[i] = clamp i and s[i-1] or 0, @elemHeight(), s[i]
             
-        if @logVisible
-            @setState 'logHeight', s[2]
-        else
-            s[2] = @elemHeight()
+        # if not @logVisible
+            # s[2] = @elemHeight()
             
-        for h in [0...s.length]
+        paneHeights = (@paneHeight(i) for i in [0...@panes.length])
+        
+        # log "split.applySplit paneHeights", paneHeights
+        
+        paneHeightChanges = []
+        for h in [0...@panes.length]
             prevY = h > 0 and s[h-1] or 0
-            thisY = s[h]
-            oldHeight = @panes[h].getBoundingClientRect().height
+            thisY = last s
+            oldHeight = paneHeights[h]
             top = prevY+(h>0 and thisY>0 and @handleHeight or 0)
             # log "split.applySplit pane #{h} prevY #{prevY} thisY #{thisY} top #{top}",s if h == 0
             @panes[h].style.top    = "#{top}px"
-            @handles[h].style.top  = "#{s[h]}px"            
-            newHeight = thisY-prevY-(h>0 and @handleHeight or 0)
+            @handles[h].style.top  = "#{s[h]}px" if h < s.length            
+            # log "split.applySplit h #{h} thisY #{thisY} prevY #{prevY}"
+            # newHeight = thisY-prevY-(h>0 and @handleHeight or 0)
+            newHeight = switch
+                when h is 0 then s[0]
+                when h is s.length then @elemHeight()-last s
+                else Math.max 0, s[h]-s[h-1]-@handleHeight
+
+            log "split.applySplit h #{h} newHeight #{newHeight}"
             if newHeight != oldHeight
-                @panes[h].style.height = "#{newHeight}px"
-                @emit 'paneHeight', 
+                if h == s-1
+                    @logPane.style.top = "#{newHeight}px"
+                else
+                    @panes[h].style.height = "#{newHeight}px"
+                paneHeightChanges.push
                     paneIndex: h
                     oldHeight: oldHeight
                     newHeight: newHeight
-        
-        if @logVisible
-            oldHeight = @logPane.getBoundingClientRect().height
-            @logPane.style.top = "#{last(s)+@handleHeight}px"
-            newHeight = @logPane.getBoundingClientRect().height
-            if newHeight != oldHeight
-                @emit 'paneHeight',
-                    paneIndex: 3
-                    oldHeight: oldHeight
-                    newHeight: newHeight
+
+        # log "split.applySplit paneHeightChanges", paneHeightChanges
+
+        for phc in paneHeightChanges
+            if phc.paneIndex == 3 #and phc.newHeight == 0 and @logVisible
+                @logVisible = phc.newHeight > 0 # hideLog
+                @setState 'logHeight', phc.newHeight
             
+            @emit 'paneHeight', phc
+        
         @setState 'split', s
         
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
@@ -225,12 +269,20 @@ class Split extends event
     # 0000000   000   000  000   000  000      
     
     snap: ->
+        y0 = @splitPosY 0
         y1 = @splitPosY 1
-        if y1 > 0
+        y2 = @splitPosY 2
+        if y0 < 0 
+            @splitAt 0, 0
+        else if y1 > 0
             if y1 < (@commandlineHeight+@handleHeight)/2
                 @splitAt 1, 0
             else if y1 <  (@commandlineHeight+@handleHeight)*2
                 @splitAt 0, 0
+            else if y1 > @splitPosY(2) - 40
+                @splitAt 1, @splitPosY(2)
+        else if y2 > @elemHeight()
+            @splitAt 2, @elemHeight()
 
     # 00000000   0000000    0000000  000   000   0000000
     # 000       000   000  000       000   000  000     
