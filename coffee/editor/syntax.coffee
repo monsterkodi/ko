@@ -54,9 +54,12 @@ class syntax
     dissForLineIndex: (lineIndex) -> 
         syntax.dissForTextAndSyntax @editor.lines[lineIndex], @name
 
+    @rangesForTextAndSyntax: (line, n) ->
+        matchr.ranges syntax.matchrConfigs[n], line
+
     @dissForTextAndSyntax: (line, n) ->
         matchr.dissect matchr.ranges syntax.matchrConfigs[n], line
-        
+
     getDiss: (li) ->
         # log "?? #{@diss.length} #{li}" if @editor.name is 'terminal'
         if not @diss[li]?

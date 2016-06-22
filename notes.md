@@ -5,12 +5,17 @@
 - *scroll find result to top of view*
 - *escape dots in search string*
 - highlight while entering
+
+#### search
+- *output start and end*
+- use syntax of file for search result display
 - make search results clickable
 - make search results editable
 - make search results keyboard navigatable
 
 #### editor
 - fix esc
+- check undo (merges too much?)
 - *autocomple*
     - from buffer
     - from similar files
@@ -19,12 +24,19 @@
 - don't select recent when pwd was changed
 
 #### terminal
+- *output command*
+- *alias*
 - *ansihtml*
 - add special column (on top of numbers) for input marker and search result lines
 - shortcuts to hide editor / center input
 - autocomplete
     - dirs and files
     - /usr/local/bin, /usr/bin and /bin
+- font zoom shortcut
+- number history output and add !# command
+      
+#### logview
+- font zoom shortcut
       
 #### misc    
 - command-enter: deselect, insert newline, indent, and single cursor

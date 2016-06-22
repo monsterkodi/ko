@@ -7,6 +7,7 @@
 log     = require '../tools/log'
 walker  = require '../tools/walker'
 matchr  = require '../tools/matchr'
+syntax  = require '../editor/syntax'
 Command = require '../commandline/command'
 path    = require 'path'
 fs      = require 'fs'
@@ -86,7 +87,7 @@ class FileSearcher extends stream.Writable
     
     constructor: (@text, @file) ->
         @line = 0
-        @patterns = matchr.config "(#{@text})": "found"
+        @patterns = matchr.config "#{@text}": "found"
         @found = []
         super
     
@@ -107,8 +108,11 @@ class FileSearcher extends stream.Writable
             # log "#{@file}:"
             window.terminal.appendText "#{@file}:"
             for f in @found
-                dss = matchr.dissect f[2]
-                # log "#{_.padStart f[0], 4} #{f[1]}" #, dss
-                window.terminal.appendText "#{_.padStart f[0], 4} #{f[1]}"
+                ranges = f[2].concat syntax.rangesForTextAndSyntax f[1], 'coffee'
+                # log "FileSearcher.end ranges", ranges
+                dss = matchr.dissect ranges, join:true
+                # log "#{_.padStart f[0], 4} #{f[1]}", dss
+                # window.terminal.appendText "#{_.padStart f[0], 4} #{f[1]}"
+                window.terminal.appendLineDiss f[1], dss
                 
 module.exports = Find

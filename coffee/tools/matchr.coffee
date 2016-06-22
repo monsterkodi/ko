@@ -101,7 +101,7 @@ ranges = (regexes, str) ->
 #     
 #     with none of the [start, start+match.length] ranges overlapping
 
-dissect = (ranges) -> 
+dissect = (ranges, opt={join:false}) -> 
     return [] if not ranges.length
     # console.log "dissect -- #{JSON.stringify ranges}"
     di = []
@@ -131,7 +131,7 @@ dissect = (ranges) ->
             p += 1 
         pn = p
         while d[pn].start < rg.start+rg.match.length
-            if  d[pn].cid < rg.index and rg.value?
+            if  (d[pn].cid < rg.index or opt.join) and rg.value?
                 if not rg.value.split?
                     for r in rg.value
                         continue if not r.split?
