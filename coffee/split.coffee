@@ -59,7 +59,7 @@ class Split extends event
             cursor: 'ns-resize'
             onStop: (drag) => @snap()
             onMove: (drag) => 
-                log "split.dragLog.move #{@paneHeight(2)} #{@splitPosY(2)-@splitPosY(1)}"
+                # log "split.dragLog.move #{@paneHeight(2)} #{@splitPosY(2)-@splitPosY(1)}"
                 if @splitPosY(2)-@splitPosY(1) < 10
                     @splitAt 1, drag.pos.y - @elemTop()
                     @splitAt 2, drag.pos.y - @elemTop()
@@ -68,12 +68,7 @@ class Split extends event
 
     setWinID: (@winID) ->
         s = @getState 'split', [0,0,@elemHeight()-@handleHeight]        
-        @logVisible = @getState 'logVisible', false
-        @logHeight  = @getState 'logHeight', 300
-        # log "Split.setWinID #{@winID} #{@logVisible}", s
-        if @logVisible
-            @logPane.style.display = 'initial'
-        
+        @setLogVisible @getState 'logVisible', false
         @applySplit s
     
     # 00000000   00000000   0000000  000  0000000  00000000  0000000  
@@ -85,8 +80,11 @@ class Split extends event
     resized: ->
         
         s = []
+        e = @editorHeight()
         for h in [0...@handles.length]
             s.push clamp 0, @elemHeight(), @splitPosY h
+        if e == 0 # keep editor closed
+            s[1] = s[2] = @elemHeight()
             
         @applySplit s
     
@@ -106,7 +104,11 @@ class Split extends event
             
     paneHeight: (i) -> 
         if i is 0 then @splitPosY 0
-        else @splitPosY(i)-@splitPosY(i-1)-@handleHeight
+        else Math.max 0, @splitPosY(i)-@splitPosY(i-1)-@handleHeight
+        
+    terminalHeight:    -> @paneHeight 0
+    editorHeight:      -> @paneHeight 2
+    logviewHeight:     -> @paneHeight 3
 
     # 0000000     0000000 
     # 000   000  000   000
@@ -120,12 +122,16 @@ class Split extends event
         what = words[1]
         if what? and action in ['maximize', 'enlarge']
             switch action
-                when 'maximize' then delta = 999
+                when 'maximize' then delta = @elemHeight()
                 when 'enlarge'
                     if words[2] == 'by'
                         delta = parseInt words[3]
                     else
-                        delta = 1
+                        fh = @terminalHeight() + @commandlineHeight + @editorHeight()
+                        delta = parseInt 0.25 * fh #- switch what
+                            # when 'editor'   then @editorHeight()
+                            # when 'terminal' then @terminalHeight()
+                        
             switch what
                 when 'editor'   then return @moveCommandLineBy -delta
                 when 'terminal' then return @moveCommandLineBy  delta        
@@ -139,8 +145,7 @@ class Split extends event
     # 000   000   0000000       0      00000000   0000000  000   000  0000000  
     
     moveCommandLineBy: (delta) ->
-        pixels = window.editor.size.lineHeight * delta
-        @splitAt 0, clamp 0, @elemHeight() - @commandlineHeight - @handleHeight, pixels + @splitPosY 0       
+        @splitAt 0, clamp 0, @elemHeight() - @commandlineHeight - @handleHeight, delta + @splitPosY 0       
         
     #  0000000  00000000   000      000  000000000
     # 000       000   000  000      000     000   
@@ -175,8 +180,8 @@ class Split extends event
         for i in [0...s.length]
             s[i] = clamp i and s[i-1] or 0, @elemHeight(), s[i]
             
-        # if not @logVisible
-            # s[2] = @elemHeight()
+        if not @logVisible
+            s[2] = @elemHeight()
             
         paneHeights = (@paneHeight(i) for i in [0...@panes.length])
         
@@ -188,20 +193,17 @@ class Split extends event
             thisY = last s
             oldHeight = paneHeights[h]
             top = prevY+(h>0 and thisY>0 and @handleHeight or 0)
-            # log "split.applySplit pane #{h} prevY #{prevY} thisY #{thisY} top #{top}",s if h == 0
             @panes[h].style.top    = "#{top}px"
             @handles[h].style.top  = "#{s[h]}px" if h < s.length            
-            # log "split.applySplit h #{h} thisY #{thisY} prevY #{prevY}"
-            # newHeight = thisY-prevY-(h>0 and @handleHeight or 0)
             newHeight = switch
                 when h is 0 then s[0]
-                when h is s.length then @elemHeight()-last s
+                when h is s.length then @elemHeight()-last(s)-@handleHeight
                 else Math.max 0, s[h]-s[h-1]-@handleHeight
 
-            log "split.applySplit h #{h} newHeight #{newHeight}"
+            # log "split.applySplit h #{h} newHeight #{newHeight}"
             if newHeight != oldHeight
-                if h == s-1
-                    @logPane.style.top = "#{newHeight}px"
+                if h == @panes.length-1
+                    @logPane.style.top = "#{@elemHeight()-newHeight}px"
                 else
                     @panes[h].style.height = "#{newHeight}px"
                 paneHeightChanges.push
@@ -209,12 +211,11 @@ class Split extends event
                     oldHeight: oldHeight
                     newHeight: newHeight
 
-        # log "split.applySplit paneHeightChanges", paneHeightChanges
-
         for phc in paneHeightChanges
-            if phc.paneIndex == 3 #and phc.newHeight == 0 and @logVisible
-                @logVisible = phc.newHeight > 0 # hideLog
-                @setState 'logHeight', phc.newHeight
+            if phc.paneIndex == 3
+                @setLogVisible phc.newHeight > 0
+                if phc.newHeight > 0
+                    @setState 'logHeight', phc.newHeight
             
             @emit 'paneHeight', phc
         
@@ -247,16 +248,22 @@ class Split extends event
     # 0000000   0000000    0000000 
     
     showLog:   -> @setLogVisible true
-    hideLog:   -> @setLogVisible false    
-    toggleLog: -> @setLogVisible not @logVisible    
+    hideLog:   -> @setLogVisible false
+    toggleLog: -> @setLogVisible not @logVisible
     setLogVisible: (v) ->
-        @logVisible = v
-        @setState 'logVisible', v
-        @logPane.style.display = v and 'initial' or 'none'
-        @splitAt 2, @elemHeight() - (v and Math.max(100, @getState('logHeight', 200)) or 0)
         
+        if @logVisible != v
+            @logVisible = v
+            @setState 'logVisible', v
+            @logPane.style.display = v and 'initial' or 'none'
+            if v and @logviewHeight() <= 0
+                @splitAt 2, @elemHeight() - Math.max(100, @getState('logHeight', 200))-@handleHeight
+            else if @logviewHeight() > 0 and not v
+                @splitAt 2, @elemHeight()
+            
     clearLog: -> window.logview.setText ""
     showOrClearLog: -> 
+        log "showOrClearLog #{@logVisible}"
         if @logVisible
             @clearLog()
         else

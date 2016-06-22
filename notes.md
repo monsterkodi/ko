@@ -65,7 +65,7 @@
 - extend selection to end of line if previous line is fully selected
     
 #### editing
-- *fix closing surround*
+- ***fix closing surround***
 - *command up/down: move selected lines if only lines selected*
 - *trim indentation spaces when joining lines*
 - fancy close terminal, commandline or on esc when no highlight is canceled

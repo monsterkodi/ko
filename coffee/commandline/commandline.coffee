@@ -120,10 +120,10 @@ class Commandline extends ViewBase
             when 'tab', 'shift+tab' then return
             when 'home', 'command+up'    then return split.do 'maximize editor'
             when 'end', 'command+down'   then return split.do 'maximize terminal'
-            when 'page up', 'alt+up'     then return split.do 'enlarge editor by 10'
-            when 'ctrl+up'               then return split.do 'enlarge editor by 1'
-            when 'page down', 'alt+down' then return split.do 'enlarge terminal by 10'
-            when 'ctrl+down'             then return split.do 'enlarge terminal by 1'
+            when 'page up', 'alt+up'     then return split.do 'enlarge editor'
+            when 'ctrl+up'               then return split.do 'enlarge editor by 20'
+            when 'page down', 'alt+down' then return split.do 'enlarge terminal'
+            when 'ctrl+down'             then return split.do 'enlarge terminal by 20'
         
         return 'unhandled'
     
