@@ -15,6 +15,7 @@
 - make search results keyboard navigatable
 
 #### editor
+- alt-click: jump to definition
 - fix esc
 - check undo (merges too much?)
 - *autocomplete*
@@ -23,8 +24,10 @@
 
 #### open
 - don't select recent when pwd was changed
+- show relative path when navigating in history
 
 #### terminal
+- limit history length
 - *output command*
 - *alias*
 - *ansihtml*
@@ -43,7 +46,6 @@
 - updates numbers when removing highlights (esc)
 - command-enter: deselect, insert newline, indent, and single cursor
 - comment line characters per filetype    
-- remember scroll positions per file
     
 #### minimap
 - show selections, highlights and cursors

@@ -111,7 +111,7 @@ class Editor extends Buffer
         if e and @initialCursors
             newSelection = []
             if @initialCursors.length != @cursors.length
-                log 'editor.ednSelection warning! @initialCursors.length != @cursors.length', @initialCursors.length, @cursors.length
+                log 'editor.endSelection warning! @initialCursors.length != @cursors.length', @initialCursors.length, @cursors.length
             
             for ci in [0...@initialCursors.length]
                 ic = @initialCursors[ci]

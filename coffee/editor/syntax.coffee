@@ -71,10 +71,15 @@ class syntax
         @diss[li]
     
     setDiss: (li, dss) ->
-        # log "syntax.setDiss #{li}", dss if @editor.name is 'terminal'
         @diss[li] = dss
-        # log "== #{@diss.length} #{@diss[li]}" if @editor.name is 'terminal'
         @diss[li]    
+    
+    @lineForDiss: (dss) -> 
+        l = ""
+        for d in dss
+            l = _.padEnd l, d.start
+            l += d.match
+        l
     
     #  0000000   0000000   000       0000000   00000000 
     # 000       000   000  000      000   000  000   000

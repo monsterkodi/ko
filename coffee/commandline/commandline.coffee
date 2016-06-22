@@ -69,7 +69,7 @@ class Commandline extends ViewBase
         window.split.showCommandline()
         @command = @commands[name]
         @command.focus = "."+document.activeElement.className
-        log "commandline.startCommand #{name} focus #{@command.focus}"
+        # log "commandline.startCommand #{name} focus #{@command.focus}"
         @view.focus()
         @setName name
         @results @command.start combo # <-- command start
@@ -88,7 +88,7 @@ class Commandline extends ViewBase
         @setName r.name if r?.name?
         if r?.select then @selectAll()
         else @selectNone() 
-        log "commandline.results #{@command?} #{@command?.name}", r
+        # log "commandline.results #{@command?} #{@command?.name}", r
         window.split.focus  r.focus  if r?.focus?
         window.split.reveal r.reveal if r?.reveal?
         

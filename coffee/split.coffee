@@ -263,7 +263,6 @@ class Split extends event
             
     clearLog: -> window.logview.setText ""
     showOrClearLog: -> 
-        log "showOrClearLog #{@logVisible}"
         if @logVisible
             @clearLog()
         else
@@ -297,9 +296,7 @@ class Split extends event
     # 000       000   000  000       000   000       000
     # 000        0000000    0000000   0000000   0000000 
     
-    focus: (n) -> 
-        log "split.focus #{n} #{$(n)?}"
-        $(n)?.focus()
+    focus: (n) -> $(n)?.focus()
         
     reveal: (n) -> @show n
         

@@ -10,6 +10,7 @@ clamp,
 $}        = require '../tools/tools'
 log       = require '../tools/log'
 drag      = require '../tools/drag'
+prefs     = require '../tools/prefs'
 keyinfo   = require '../tools/keyinfo'
 ViewBase  = require './viewbase'
 Minimap   = require './minimap'
@@ -103,12 +104,17 @@ class View extends ViewBase
     # 0000000   000   000      0      00000000
         
     saveScrollCursorsAndSelections: ->
-        @savedState = 
+        return if not @currentFile
+        savedState = 
             file:       @currentFile
             scroll:     @scroll.scroll
             cursors:    _.cloneDeep @cursors
             selections: _.cloneDeep @selections
             highlights: _.cloneDeep @highlights
+            
+        filePositions = prefs.get 'filePositions', {}
+        filePositions[@currentFile] = savedState
+        prefs.set 'filePositions', filePositions        
     
     # 00000000   00000000   0000000  000000000   0000000   00000000   00000000
     # 000   000  000       000          000     000   000  000   000  000     
@@ -117,17 +123,19 @@ class View extends ViewBase
     # 000   000  00000000  0000000      000      0000000   000   000  00000000
     
     restoreScrollCursorsAndSelections: ->
-        if @savedState.file == @currentFile
-            # log "view.restoreScrollCursorsAndSelections restore:", @savedState
-            @cursors    = @savedState.cursors
-            @selections = @savedState.selections
-            @highlights = @savedState.highlights
-            delta = @savedState.scroll - @scroll.scroll
+        return if not @currentFile
+        filePositions = prefs.get 'filePositions', {}
+        if filePositions[@currentFile]? 
+            savedState = filePositions[@currentFile]
+            # log "view.restoreScrollCursorsAndSelections restore:", savedState
+            @cursors    = savedState.cursors
+            @selections = savedState.selections
+            @highlights = savedState.highlights
+            delta = savedState.scroll - @scroll.scroll
             # log "view.restoreScrollCursorsAndSelections delta:", delta
             if delta
                 @scrollBy delta
             else
                 @updateLayers()
-            @savedState = null                        
         
 module.exports = View
