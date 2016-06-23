@@ -21,6 +21,7 @@ class Buffer extends event
 
     setLines: (@lines) ->
         @cursors    = [[0,0]]
+        @mainCursor = 0 # index into cursors
         @selections = []
         @highlights = []
         @emit 'numLines', @lines.length
@@ -252,9 +253,9 @@ class Buffer extends event
         lli = @lines.length-1
         [@lines[lli].length, lli]
 
-    cursorPos: -> # todo: last cursor
-        l = clamp 0, @lines.length-1, @cursors[0][1]
-        c = clamp 0, @lines[l].length, @cursors[0][0]
+    cursorPos: -> 
+        l = clamp 0, @lines.length-1, @cursors[@mainCursor][1]
+        c = clamp 0, @lines[l].length, @cursors[@mainCursor][0]
         [ c, l ]
         
     clampPos: (p) ->

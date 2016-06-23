@@ -12,11 +12,8 @@
 #      000  000       000   000  000   000  000       000   000
 # 0000000   00000000  000   000  000   000   0000000  000   000
 
-(▶ )([^']+')(.+)(':)       . class . class.marker . class . class.marker
-●.*\/                         marker
-
-\.                          marker
-\/                          separator
+(▸ )([^']+')(.+)(':)       . class . class.marker . class . class.marker
+●.*\/                       marker
 
 (?:^|\s\s+)([\/\S]*\/)(\S+)
                             path.dirname
@@ -24,13 +21,15 @@
 
 (?:[^\/\.]+)(\.[^\/]+)      path.extname
 
-(\w+\.coffee\b)             coffee.path
-(\w+\.noon\b)               noon.path
-(\w+\.json\b)               json.path
-(\w+\.styl\b)               styl.path
-(\w+\.html\b)               html.path
-(\w+\.pug\b)                pug.path
-(\w+\.css\b)                css.path
-(\w+\.js\b)                 js.path
-(\w+\.md\b)                 md.path
+([\.\/\w]+\.coffee\b)       coffee.path
+([\.\/\w]+\.noon\b)         noon.path
+([\.\/\w]+\.json\b)         json.path
+([\.\/\w]+\.styl\b)         styl.path
+([\.\/\w]+\.html\b)         html.path
+([\.\/\w]+\.pug\b)          pug.path
+([\.\/\w]+\.css\b)          css.path
+([\.\/\w]+\.js\b)           js.path
+([\.\/\w]+\.md\b)           md.path
 
+\.                          marker
+\/                          separator.marker

@@ -1,25 +1,23 @@
 # todo/ideas
 
-#### find
-- *search in multiple files*
-- keep command+e search string longer
-- highlight while entering
-- display number of matches somewhere
-
 #### search
+- *make search results clickable*
 - insert salter headers
 - output search end
-- make search results clickable
 - make search results editable
 - make search results keyboard navigatable
+
+#### find
+- *keep command+e search string longer*
+- highlight while entering
+- display number of matches somewhere
 
 #### editor
 - *autocomplete*
     - from buffer
     - from similar files
-- alt-click: jump to definition
+- *alt-click: jump to definition*
 - check undo (merges too much?)
-- save cursors/selection/scroll before reloading window
 - don't clear undo buffer on save?
 - save backup files?
 - history of file locations
@@ -32,7 +30,7 @@
 - fancy close terminal, commandline or on esc when no highlight is canceled
 - delete forward swallows spaces?
 - on second command+e: select including leading @
-- #< to add salter header of next word
+- *#< to add salter header of next word*
 - when pasting text at indent level, remove leading space columns
 - *align cursors with inserting spaces when ctrl+alt+right*
 - *ctrl+command+/  align cursors block*
@@ -40,7 +38,7 @@
 - *indent one level more when inserting newline ...*
     - after =>, -> 
     - when next line is indented one level more
-- dbg "class.method arg: #{arg}, ..."
+- *dbg "class.method arg: #{arg}, ..."*
 - fix surround at end of line
 - command-enter: deselect, insert newline, indent, and single cursor
 
@@ -107,6 +105,4 @@
 - shortcut for renaming file
 - tail -f mode
 - markdown mode (replace - with ●)
-- cosmetic
-    - fix highlight rounded borders     
     

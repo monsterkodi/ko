@@ -9,9 +9,10 @@ walker  = require '../tools/walker'
 matchr  = require '../tools/matchr'
 syntax  = require '../editor/syntax'
 Command = require '../commandline/command'
+_       = require 'lodash'
+stream  = require 'stream'
 path    = require 'path'
 fs      = require 'fs'
-stream  = require 'stream'
 
 class Search extends Command
 
@@ -43,8 +44,11 @@ class Search extends Command
     execute: (command) ->
         return if not command.length
         super command
-        editor = window.editor
-        @startSearchInFiles command, editor.currentFile
+        @startSearchInFiles 
+            text: command
+            regx: @regexpSearch and command or _.escapeRegExp command
+            file: window.editor.currentFile
+            case: @caseSensitive # doesnt work yet
         focus: '.terminal'
         reveal: 'terminal'
       
@@ -54,22 +58,22 @@ class Search extends Command
     #      000  000       000   000  000   000  000       000   000
     # 0000000   00000000  000   000  000   000   0000000  000   000
     
-    startSearchInFiles: (text, file) ->
+    startSearchInFiles: (opt) ->
         terminal = window.terminal
         terminal.appendText ''
-        terminal.appendDiss syntax.dissForTextAndSyntax "▶ Search for '#{text}':", 'ko'       
+        terminal.appendDiss syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'       
         terminal.appendText ''
         terminal.moveCursorToLineIndex terminal.lines.length-1
         @walker = new walker
-            root:        walker.packagePath path.dirname file
+            root:        walker.packagePath path.dirname opt.file
             includeDirs: false
-            file:        (f,stat) => @searchInFile text, f
+            file:        (f,stat) => @searchInFile opt, f
         @walker.cfg.ignore.push 'js'
         @walker.start()
         
-    searchInFile: (text, file) ->
+    searchInFile: (opt, file) ->
         stream = fs.createReadStream file, encoding: 'utf8'
-        stream.pipe new FileSearcher text, file
+        stream.pipe new FileSearcher opt, file
 
 #  0000000  00000000   0000000   00000000    0000000  000   000  00000000  00000000 
 # 000       000       000   000  000   000  000       000   000  000       000   000
@@ -79,9 +83,9 @@ class Search extends Command
 
 class FileSearcher extends stream.Writable
     
-    constructor: (@text, @file) ->
+    constructor: (@opt, @file) ->
         @line = 0
-        @patterns = matchr.config "#{@text}": "found"
+        @patterns = matchr.config "#{@opt.regx}": "found"
         @found = []
         super
     
