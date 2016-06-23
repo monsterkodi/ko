@@ -34,8 +34,6 @@ class Goto extends Command
             else 
                 line -= 1
             line = clamp 0, editor.lines.length-1, line
-            # editor.selectNone()
-            # editor.setCursor 0, line
             editor.singleCursorAtPos [0,line]
             editor.scrollCursorToTop()
 

@@ -20,7 +20,7 @@
                             basename
 
 (?:[^\/\.]+)(\.[^\/]+)      extname
-
+(?:^\s*|\/)(\.\w+)(?:\s|$)  dotfile
 ([\.\/\w]+\.coffee\b)       coffee
 ([\.\/\w]+\.noon\b)         noon
 ([\.\/\w]+\.json\b)         json

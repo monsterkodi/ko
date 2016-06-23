@@ -12,7 +12,9 @@ clamp,
 last,
 $}      = require '../tools/tools'
 log     = require '../tools/log'
+prefs   = require '../tools/prefs'
 profile = require '../tools/profile'
+walker  = require '../tools/walker'
 Command = require '../commandline/command'
 render  = require '../editor/render'
 syntax  = require '../editor/syntax'
@@ -56,18 +58,21 @@ class Open extends Command
     changed: (command) ->
         return if not @list? 
         command  = command.trim()
+        return if command in ['.', '..']
         if command.length
             fuzzied  = fuzzy.filter command, @files       
             filtered = (f.string for f in fuzzied)
             
             matchWeight = (f) ->
                 bonus = switch path.extname(f)         
-                    when '.coffee' then 100
-                    when '.md', '.styl', '.pug' then 50
-                    when '.noon' then 25
+                    when '.coffee' then 1000
+                    when '.md', '.styl', '.pug' then 500
+                    when '.noon' then 250
                     when '.js', '.json', '.html' then -100
                     else 
                         0 
+                        
+                bonus += (10-f.split(/[\/\.]/).length)
                         
                 if f == command 
                     bonus += 99999999
@@ -76,7 +81,7 @@ class Open extends Command
                 if path.basename(f).startsWith command
                     bonus += 10000 - path.basename(f).length
                 bonus
-                
+    
             filtered.sort (a,b) -> matchWeight(b) - matchWeight(a)
             @listFiles filtered
         else
@@ -91,11 +96,12 @@ class Open extends Command
     # 0000000  000  0000000      000   
 
     showList: ->
-        @list?.remove()
-        @list = document.createElement 'div'
-        @list.className = 'list'
-        @positionList()
-        window.split.elem.appendChild @list 
+        # @list?.remove()
+        if not @list?
+            @list = document.createElement 'div' 
+            @list.className = 'list'
+            @positionList()
+            window.split.elem.appendChild @list 
         @listFiles @files
             
     listFiles: (files) ->
@@ -107,9 +113,10 @@ class Open extends Command
             index = 0
             for file in files
                 div = document.createElement 'div'
-                div.className = 'list-file'
+                # div.className = dirExists(@resolvedPath file) and 'list-item list-dir' or 'list-item list-file'
+                div.className = 'list-item'
                 div.innerHTML = render.line file, syntax.dissForTextAndSyntax file, 'ko', join: true
-                div.setAttribute "onclick", "window.openFileAtIndex(#{index});"
+                div.setAttribute "onmousedown", "window.openFileAtIndex(#{index});"
                 div.value = file
                 @list.appendChild div
                 index += 1
@@ -136,7 +143,8 @@ class Open extends Command
         if @index == @history.length-1 and @selected > 0
             @select clamp 0, @list.children.length, @selected-1
             @list.children[@selected]?.value ? @history[@index]
-        else
+        else if @navigating
+            @select(-1)
             super
         
     # 000   000  00000000  000   000  000000000
@@ -159,10 +167,11 @@ class Open extends Command
     # 0000000   00000000  0000000  00000000   0000000     000   
         
     select: (i) ->
-        @list?.children[@selected]?.className = 'list-file'
-        @selected = clamp 0, @list?.children.length-1, i
-        @list?.children[@selected]?.className = 'list-file selected'
-        @list?.children[@selected]?.scrollIntoViewIfNeeded()
+        @list?.children[@selected]?.classList.remove 'selected'
+        @selected = clamp -1, @list?.children.length-1, i
+        if @selected >= 0
+            @list?.children[@selected]?.classList.add 'selected'
+            @list?.children[@selected]?.scrollIntoViewIfNeeded()
         
     #  0000000   00000000   00000000  000   000  00000000  000  000      00000000
     # 000   000  000   000  000       0000  000  000       000  000      000     
@@ -173,12 +182,8 @@ class Open extends Command
     openFileAtIndex: (i) =>
         @select i
         @setText @list.children[i].value
-        @commandline.execute() 
-        #@execute @list.children[i].value
-        # if e.focus == '.editor'
-        #     @setText e.text
-        #     @commandline.selectNone()
-        #     window.split.focusEditor()
+        @commandline.execute()
+        @skipBlur = true
     
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -188,23 +193,46 @@ class Open extends Command
         
     start: (@combo) -> 
         window.openFileAtIndex = @openFileAtIndex
-        @files = []
-        @selected = 0
+        opt = {}
         if window.editor.currentFile?
-            @file  = window.editor.currentFile 
-            @dir   = path.dirname @file
-            @pkg   = @packagePath @dir
+            opt.file = window.editor.currentFile 
         else 
-            @file = null
-            if not @dir?
-                @dir = @pkg = resolve '~'
-            
-        @startWalker()
+            opt.dir = @dir ? path.dirname last prefs.get 'recentFiles', ['~']
         
+        @loadDir opt
+            
         if @combo == @shortcuts[1]
             @setName "new window"
             
         return ""
+    
+    # 000       0000000    0000000   0000000    0000000    000  00000000 
+    # 000      000   000  000   000  000   000  000   000  000  000   000
+    # 000      000   000  000000000  000   000  000   000  000  0000000  
+    # 000      000   000  000   000  000   000  000   000  000  000   000
+    # 0000000   0000000   000   000  0000000    0000000    000  000   000
+        
+    loadDir: (opt) ->        
+        opt.dir     = path.dirname opt.file if not opt.dir?
+        opt.dir     = path.basename opt.dir if not dirExists opt.dir
+        @dir        = opt.dir ? @dir
+        @pkg        = walker.packagePath(@dir) ? @dir
+        @file       = opt.file
+        @files      = []
+        @selected   = 0
+        @navigating = opt.navigating
+        wopt = 
+            root:        @pkg
+            includeDirs: true
+            done:        @walkerDone
+        if @navigating
+            fopt = _.clone wopt
+            fopt.maxDepth = 1
+            fopt.maxFiles = 30
+            @fastWalker = new walker fopt
+            @fastWalker.start()
+        @walker = new walker wopt
+        @walker.start()        
         
     # 000   000   0000000   000      000   000  00000000  00000000 
     # 000 0 000  000   000  000      000  000   000       000   000
@@ -212,42 +240,9 @@ class Open extends Command
     # 000   000  000   000  000      000  000   000       000   000
     # 00     00  000   000  0000000  000   000  00000000  000   000
             
-    startWalker: ->           
-        # profile 'walker start'
-        that = @
-        try
-            dir = @pkg ? @dir
-            @walker = walkdir.walk dir, max_depth: 3
-            
-            onWalkerPath = (dir) -> (p,stat) ->
-                name = path.basename p
-                extn = path.extname p
-                if name in ['node_modules', 'app', 'img', 'dist', 'build', 'Library', 'Applications']
-                    @ignore p 
-                else if name in ['.konrad.noon', '.gitignore', '.npmignore']
-                    that.files.push p
-                else if (name.startsWith '.') or extn in ['.app']
-                    @ignore p 
-                else if extn in fileExtensions
-                    that.files.push p
-                else if stat.isDirectory()
-                    if p != dir
-                        that.files.push p 
-                        
-                if that.files.length > 500
-                    # log 'max files reached', @end?
-                    @end()
-            
-            @walker.on 'path', onWalkerPath dir
-            @walker.on 'end', @walkerDone
-                
-        catch err
-            log "open.startWalker.error: #{err} dir: #{dir}"
-            log "#{err.stack}"
-            
-    walkerDone: =>
+    walkerDone: (@files) =>
         # profile 'walker done'
-        # log "walkerDone @dir #{@dir}"
+        # log "walkerDone @dir #{@dir} @files", @files.length
         
         # 000   000  00000000  000   0000000   000   000  000000000
         # 000 0 000  000       000  000        000   000     000   
@@ -257,27 +252,43 @@ class Open extends Command
         
         absWeight = (f) =>
             
+            if not @navigating
+                bonus = switch path.extname(f)         
+                    when '.coffee' then 100
+                    when '.md', '.styl', '.pug' then 50
+                    when '.noon' then 25
+                    when '.js', '.json', '.html' then -1000000
+                    else 
+                        0 
+            else
+                bonus = 0
+                
             penalty = path.dirname(f).length            
                             
             if f.startsWith @dir
-                return 10000-penalty
+                return 10000-penalty+bonus
             if f.startsWith path.dirname @dir
-                return 5000-penalty
+                return 5000-penalty+bonus
             else
-                return 1000-penalty
+                return 1000-penalty+bonus
         
         relWeight = (f) =>
             
-            bonus = switch path.extname(f)         
-                when '.coffee' then 100
-                when '.md', '.styl', '.pug' then 50
-                when '.noon' then 25
-                when '.js', '.json', '.html' then -1000000
-                else 
-                    0 
-                                
-            return bonus + 100*(100-f.split(/[\/\.]/).length) #- f.length
-                            
+            if @navigating
+                bonus = switch path.extname(f)         
+                    when '.coffee' then 100
+                    when '.md', '.styl', '.pug' then 50
+                    when '.noon' then 25
+                    when '.js', '.json', '.html' then -1000000
+                    else 
+                        0
+            else
+                bonus = 0
+
+            bonus = 1000000 if f == '..'
+            return bonus + 1000*(1000-f.split(/[\/\.]/).length)
+                
+        @files.push '..' if '..' not in @files            
         @files.sort (a,b) -> absWeight(b) - absWeight(a)
                 
         @files = (relative(f, @dir) for f in @files)
@@ -285,17 +296,20 @@ class Open extends Command
         @files = @files.filter (f) -> f.length 
         @files.sort (a,b) -> relWeight(b) - relWeight(a)
 
-        if @history.length
+        if @history.length and not @navigating
             h = (relative(f, @dir) for f in @history when f.length and (f != @file))
             @lastFileIndex = h.length - 1
             @files = _.concat h, @files
+        else if @navigating
+            @lastFileIndex = 0
 
         @files = _.uniq @files
 
         @showList()
+        @grabFocus()
         @select @lastFileIndex
-        if @lastFileIndex >= 0   
-            @commandline.setAndSelectText @list?.children[@selected]?.value 
+        text = @navigating ? @list?.children[@selected]?.value
+        @commandline.setAndSelectText text
                     
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
@@ -305,23 +319,25 @@ class Open extends Command
         
     execute: (command) ->
         
-        listValue = @list?.children[@selected]?.value
+        listValue = @list?.children[@selected]?.value if @selected >= 0
 
-        if command in ['pwd', '.']
+        if command in ['.', '..']
+            @dir = path.dirname @dir if command == '..'
+            @loadDir
+                navigating: @dir
+                dir:        @dir
             return text: @dir, select: true
         else
-            if dirExists @resolvedPath command
-                resolved = @resolvedPath command
-            else if listValue? 
+            if @selected >= 0 and listValue? 
                 if dirExists @resolvedPath listValue
-                    resolved = listValue
+                    resolved = @resolvedPath listValue
+            else if dirExists @resolvedPath command
+                resolved = @resolvedPath command
+            # log "resolved #{resolved}"
             if resolved?
-                @dir = resolved
-                @pkg = @packagePath @dir
-                @lastFileIndex = -1
-                @files = []
-                @selected = 0
-                @startWalker()
+                @loadDir
+                    navigating: resolved
+                    dir:        resolved
                 return text: @dir, select: true
 
         @hideList()
@@ -357,21 +373,6 @@ class Open extends Command
         else
             status: 'failed'
 
-    # 00000000    0000000    0000000  000   000   0000000    0000000   00000000
-    # 000   000  000   000  000       000  000   000   000  000        000     
-    # 00000000   000000000  000       0000000    000000000  000  0000  0000000 
-    # 000        000   000  000       000  000   000   000  000   000  000     
-    # 000        000   000   0000000  000   000  000   000   0000000   00000000
-    
-    packagePath: (p) ->
-        while p.length and p not in ['.', '/']            
-            if fs.existsSync path.join p, 'package.noon'
-                return resolve p
-            if fs.existsSync path.join p, 'package.json'
-                return resolve p
-            p = path.dirname p
-        null
-    
     # 00000000   00000000   0000000   0000000   000      000   000  00000000  0000000  
     # 000   000  000       000       000   000  000      000   000  000       000   000
     # 0000000    0000000   0000000   000   000  000       000 000   0000000   000   000
@@ -391,7 +392,12 @@ class Open extends Command
     # 000   000  000  000   000  000     
     # 000   000  000  0000000    00000000
          
-    onBlur: => @hideList()
+    onBlur: => 
+        if not @skipBlur
+            log 'blur'
+            @hideList()
+        else
+            @skipBlur = null
             
     hideList: ->
         @list?.remove()

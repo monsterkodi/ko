@@ -58,18 +58,18 @@ addToRecent = (file) ->
 #      000     000     000   000     000     000     
 # 0000000      000     000   000     000     00000000
    
-setState = (key, value) ->
+setState = window.setState = (key, value) ->
     # log 'setState', key, value
     return if not winID
     if winID
         prefs.setPath "windows.#{winID}.#{key}", value
     
-getState = (key, value) ->
+getState = window.getState = (key, value) ->
     return value if not winID
     # log 'getState', key, value, prefs.getPath "windows.#{winID}.#{key}", value
     prefs.getPath "windows.#{winID}.#{key}", value
     
-delState = (key) ->
+delState = window.delState = (key) ->
     return if not winID
     prefs.setPath "windows.#{winID}.#{key}", null
     

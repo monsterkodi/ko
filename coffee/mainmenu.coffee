@@ -44,7 +44,7 @@ class MainMenu
             accel = i <= 9 and "CmdOrCtrl+#{i}" or ""
             i += 1
             current.push 
-                label: fileLabel win.file
+                label: fileLabel win?.file ? 'new'
                 accelerator: accel
                 winid: wid
                 click: (i) -> main.activateWindowWithID i.winid

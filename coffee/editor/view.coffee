@@ -10,7 +10,6 @@ clamp,
 $}        = require '../tools/tools'
 log       = require '../tools/log'
 drag      = require '../tools/drag'
-prefs     = require '../tools/prefs'
 keyinfo   = require '../tools/keyinfo'
 ViewBase  = require './viewbase'
 Minimap   = require './minimap'
@@ -111,10 +110,10 @@ class View extends ViewBase
         s.selections = _.cloneDeep @selections if @selections.length
         s.highlights = _.cloneDeep @highlights if @highlights.length
             
-        filePositions = prefs.get 'filePositions', {}
+        filePositions = window.getState 'filePositions', {}
         filePositions[@currentFile] = s
         # log "#{@currentFile} saveState", filePositions
-        prefs.set 'filePositions', filePositions        
+        window.setState 'filePositions', filePositions       
     
     # 00000000   00000000   0000000  000000000   0000000   00000000   00000000
     # 000   000  000       000          000     000   000  000   000  000     
@@ -124,7 +123,7 @@ class View extends ViewBase
     
     restoreScrollCursorsAndSelections: ->
         return if not @currentFile
-        filePositions = prefs.get 'filePositions', {}
+        filePositions = window.getState 'filePositions', {}
         # log "#{@currentFile} restoreState", filePositions
         if filePositions[@currentFile]? 
             s = filePositions[@currentFile]

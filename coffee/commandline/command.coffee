@@ -21,9 +21,11 @@ class Command
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
         
     start: -> 
+        @loadState()
         text: @last()
         select: true
     
+    grabFocus: -> @commandline.focus()
     onBlur: ->
     setFocus: (focus) -> @focus = focus ? '.editor'
     cancel: -> focus: @focus
@@ -81,6 +83,9 @@ class Command
 
     setPrefsID: (id) ->
         @prefsID = id
+        @loadState()
+        
+    loadState: ->
         @index   = @getState 'index', 0
         @history = @getState 'history', ['']
 

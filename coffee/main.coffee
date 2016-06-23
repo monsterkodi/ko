@@ -135,7 +135,7 @@ class Main
 
         for file in fileList args.arglist
             log 'create', file
-            @createWindow 
+            @createWindow file
 
         if not wins().length
             if args.show
@@ -155,7 +155,7 @@ class Main
     # 000   000  000  000  0000  000   000  000   000  000   000       000
     # 00     00  000  000   000  0000000     0000000   00     00  0000000 
         
-    reloadMenu: -> MainMenu.init @
+    reloadMenu: => MainMenu.init @
         
     reloadWin: (win) ->
         if win?
@@ -215,6 +215,7 @@ class Main
 
     activateWindowWithID: (wid) =>
         w = winWithID wid
+        return if not w?
         if not w.isVisible() 
             w.show()
         w.focus()
@@ -336,7 +337,14 @@ class Main
                 openFile = null
             else
                 file = prefs.getPath "windows.#{win.id}.file"
-                win.webContents.send 'loadFile', file if file?
+                if file?
+                    win.webContents.send 'loadFile', file
+                    
+            saveState = =>                 
+                @saveWinBounds win
+                @reloadMenu()
+                    
+            setTimeout saveState, 1000
         
         win.webContents.on 'dom-ready',         winReady
         win.webContents.on 'did-finish-load',   winLoaded

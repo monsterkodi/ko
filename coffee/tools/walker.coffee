@@ -37,6 +37,7 @@ class Walker
     
     start: ->           
         # profile 'walker start'
+        
         try
             dir = @cfg.root
             @walker = walkdir.walk dir, max_depth: @cfg.maxDepth

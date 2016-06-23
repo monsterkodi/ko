@@ -13,6 +13,7 @@
 - display number of matches somewhere
 
 #### editor
+- *send changes between windows*
 - *autocomplete*
     - from buffer
     - from similar files
