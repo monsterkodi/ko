@@ -12,6 +12,7 @@ class Prefs
 
     @path = null
     @defs = null
+    @debug = true
 
     @init: (path, defs={}) ->
         Prefs.path = path 
@@ -47,7 +48,7 @@ class Prefs
             k = s.shift()
             c = c[k]
             if not c?
-                return value 
+                return value
         c
                 
     @add: (key, value) ->
@@ -80,7 +81,7 @@ class Prefs
         values
 
     @save: (values) ->
-        json = JSON.stringify(values, null, "    ")
+        json = JSON.stringify(values, null, "    ")        
         console.log 'prefs.save', Prefs.path, json if Prefs.debug
         fs.writeFileSync Prefs.path, json, encoding:'utf8'
 

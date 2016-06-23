@@ -62,8 +62,9 @@ class render
         n = null
         for si in [0...ss.length]
             s = ss[si]
-            n = (si < ss.length-1) and ss[si+1] or null
-            h += @selectionSpan p, s, n, size, clss
+            n = (si < ss.length-1) and (ss[si+1][0] == s[0]+1) and ss[si+1] or null
+            b = p?[0] == s[0]-1 and p or null
+            h += @selectionSpan b, s, n, size, clss
             p = s
         h
         
@@ -87,7 +88,7 @@ class render
         if not next
             border += " bl br"
         else
-            if sel[1][1] > next[1][1]
+            if sel[1][1] > next[1][1] or (sel[1][1] < next[1][0])
                 border += " br"
             if (sel[1][0] < next[1][0]) or (sel[1][0] > next[1][1])
                 border += " bl"

@@ -105,15 +105,15 @@ class View extends ViewBase
         
     saveScrollCursorsAndSelections: ->
         return if not @currentFile
-        savedState = 
-            file:       @currentFile
-            scroll:     @scroll.scroll
-            cursors:    _.cloneDeep @cursors
-            selections: _.cloneDeep @selections
-            highlights: _.cloneDeep @highlights
+        s = {}
+        s.scroll     = @scroll.scroll if @scroll.scroll
+        s.cursors    = _.cloneDeep @cursors if @cursors.length > 1 or @cursors[0][0] or @cursors[0][1]
+        s.selections = _.cloneDeep @selections if @selections.length
+        s.highlights = _.cloneDeep @highlights if @highlights.length
             
         filePositions = prefs.get 'filePositions', {}
-        filePositions[@currentFile] = savedState
+        filePositions[@currentFile] = s
+        # log "#{@currentFile} saveState", filePositions
         prefs.set 'filePositions', filePositions        
     
     # 00000000   00000000   0000000  000000000   0000000   00000000   00000000
@@ -125,14 +125,14 @@ class View extends ViewBase
     restoreScrollCursorsAndSelections: ->
         return if not @currentFile
         filePositions = prefs.get 'filePositions', {}
+        # log "#{@currentFile} restoreState", filePositions
         if filePositions[@currentFile]? 
-            savedState = filePositions[@currentFile]
-            # log "view.restoreScrollCursorsAndSelections restore:", savedState
-            @cursors    = savedState.cursors
-            @selections = savedState.selections
-            @highlights = savedState.highlights
-            delta = savedState.scroll - @scroll.scroll
-            # log "view.restoreScrollCursorsAndSelections delta:", delta
+            s = filePositions[@currentFile]
+            # log "#{@currentFile} restoreState", s
+            @cursors    = s.cursors    ? [[0,0]]
+            @selections = s.selections ? []
+            @highlights = s.highlights ? []
+            delta = (s.scroll ? @scroll.scroll) - @scroll.scroll
             if delta
                 @scrollBy delta
             else

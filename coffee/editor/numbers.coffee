@@ -47,14 +47,13 @@ class Numbers
         ci = @editor.sortedLineIndicesInRanges cr
         li = top
         for child in @elem.children
+            cls = ''
             if li in ci
-                cls = 'cursored'
-            else if li in si
-                cls = 'selected'
-            else if li in hi
-                cls = 'highligd'
-            else
-                cls = ''
+                cls += ' cursored'
+            if li in si
+                cls += ' selected'
+            if li in hi
+                cls += ' highligd'
             li += 1
             child.className = 'linenumber ' + cls
        

@@ -374,11 +374,15 @@ body
     background          rgba(0, 0, 0, 0.5) // this darkens selection
     border-right        thinBorder // 1px solid rgba(100, 100, 100, 0.2)
     &.highligd span 
-        color           #666
+        color           rgba(155,155,255, 0.6)
     &.selected span 
         color           #aaa
+    &.highligd.selected:not(.cursored) span 
+        color           #bbf
     &.cursored span 
         color           #ff0
+    &.cursored.selected span 
+        color           #ff8
         
 // 00     00  000  000   000  000  00     00   0000000   00000000 
 // 000   000  000  0000  000  000  000   000  000   000  000   000
@@ -422,7 +426,7 @@ body
 .highlight
     position        absolute
     pointer-events  none
-    background      rgba(255,255,255, 0.2)
+    background      rgba(155,155,255, 0.3)
 
 // *:focus .highlight
 //     background rgba(255,255,255, 0.2)

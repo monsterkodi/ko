@@ -147,6 +147,18 @@ class Buffer extends event
         else
             []
             
+    continuousSelectedLineIndexRanges: ->
+        slirs = []
+        for s in @selections
+            if slirs.length
+                if last(slirs)[1] == s[0]-1
+                    last(slirs)[1] += 1
+                else
+                    slirs.push [s[0],s[0]]
+            else 
+                slirs.push [s[0],s[0]]
+        slirs
+            
     isSelectedLineAtIndex: (li) ->
         il = @selectedLineIndices()
         if li in il
@@ -164,7 +176,7 @@ class Buffer extends event
         
     indexOfSelection: (s) -> @selections.indexOf s
     
-    startPosOfContinuousSelectionAtPos: (p) ->
+    startPosOfContinuousSelectionAtPos: (p) -> # used by deleteSelection to calculate cursor positions
         r = @rangeAtPosInRanges p, @selections
         if r
             sp = @rangeStartPos r
@@ -176,6 +188,12 @@ class Buffer extends event
                 else
                     break
         sp
+        
+    onlyFullLinesSelected: -> 
+        return false if not @selections.length
+        for s in @selections
+            return false if not @isSameRange s, @rangeForLineAtIndex s[0]
+        return true
 
     # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000   0000000
     # 000   000  000  000        000   000  000      000  000        000   000     000     000     
@@ -210,6 +228,7 @@ class Buffer extends event
 
     text:            -> @lines.join '\n'
     textInRange: (r) -> @lines[r[0]].slice r[1][0], r[1][1]
+    textInRanges: (rgs) -> (@textInRange(r) for r in rgs)
         
     # 000  000   000  0000000    00000000  000   000  000000000
     # 000  0000  000  000   000  000       0000  000     000   
@@ -266,6 +285,7 @@ class Buffer extends event
         throw new Error() if i >= @lines.length
         [i, [0, @lines[i].length]] 
 
+    isSameRange: (a,b) -> a[0]==b[0] and a[1][0]==b[1][0] and a[1][1]==b[1][1]
     isRangeInString: (r) -> @rangeOfStringSurroundingRange(r)?
    
     rangeOfInnerStringSurroundingRange: (r) ->
@@ -285,17 +305,17 @@ class Buffer extends event
     # 000   000  000   000  000  0000  000   000  000            000
     # 000   000  000   000  000   000   0000000   00000000  0000000 
     
-    rangesBetweenPositions: (a, b) ->
+    rangesBetweenPositions: (a, b, extend=false) ->
         r = []
         [a,b] = @sortPositions [a,b]
         if a[1] == b[1]
             r.push [a[1], [a[0], b[0]]]
         else
             r.push [a[1], [a[0], @lines[a[1]].length]]
-            r.push [b[1], [0, b[0]]]
-        if b[1] - a[1] > 1
-            for i in [a[1]+1...b[1]]
-                r.push [i, [0,@lines[i].length]]
+            if b[1] - a[1] > 1
+                for i in [a[1]+1...b[1]]
+                    r.push [i, [0,@lines[i].length]]
+            r.push [b[1], [0, extend and b[0] == 0 and @lines[b[1]].length or b[0]]]
         r
     
     rangesForCursors: (cs=@cursors) -> ([c[1], [c[0], c[0]]] for c in cs)
@@ -312,6 +332,8 @@ class Buffer extends event
     rangesForTextInLineAtIndex: (t, i, opt) ->
         s = 'i'
         s = '' if opt?.caseSensitive
+        t = _.escapeRegExp t if not opt?.regexp
+        
         re = new RegExp t, 'g' + s
         r = []
         while (mtch = re.exec(@lines[i])) != null

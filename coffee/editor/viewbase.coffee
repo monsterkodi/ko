@@ -412,16 +412,16 @@ class ViewBase extends Editor
         # log "view.scrollCursor todo"
         # $('.cursor', @view)?.scrollIntoViewIfNeeded()
         
-    scrollCursorToTop: ->
+    scrollCursorToTop: (topDist=7) ->
         cp = @cursorPos()
         # log "viewbase.scrollCursorToTop #{cp[1]} #{cp[1] - @scroll.top}"
-        if cp[1] - @scroll.top > 7
+        if cp[1] - @scroll.top > topDist
             rg = [@scroll.top, Math.max 0, cp[1]-1]
             sl = @selectionsInLineIndexRange rg
             hl = @highlightsInLineIndexRange rg
             log "#{sl.length} #{hl.length}"
             if sl.length == 0 == hl.length
-                delta = @scroll.lineHeight * (cp[1] - @scroll.top - 7)
+                delta = @scroll.lineHeight * (cp[1] - @scroll.top - topDist)
                 # log "viewbase.scrollCursorToTop #{delta}"
                 @scrollBy delta
                     
@@ -567,9 +567,33 @@ class ViewBase extends Editor
                 @deleteSelection()
                 @do.end()
                 return
+                
+            when 'command+left', 'command+right'   
+                if @selections.length > 1 and @cursors.length == 1
+                    switch key
+                        when 'left'  then return @cursorsAtStartOfSelections()
+                        when 'right' then return @cursorsAtEndOfSelections()
+                else
+                    switch key
+                        when 'left'  then return @moveCursorsToStartOfLine()
+                        when 'right' then return @moveCursorsToEndOfLine()
+                        
+            when 'command+shift+left', 'command+shift+right'   
+                switch key
+                    when 'left'  then return @moveCursorsToStartOfLine true
+                    when 'right' then return @moveCursorsToEndOfLine true
+                    
+            when 'alt+left', 'alt+right', 'alt+shift+left', 'alt+shift+right'
+                switch key
+                    when 'left'  then return @moveCursorsToStartOfWord event.shiftKey
+                    when 'right' then return @moveCursorsToEndOfWord   event.shiftKey
+                
+            when 'command+up',   'command+down'                    
+                if @onlyFullLinesSelected() then return @moveSelectedLines key
+                else                             return @addCursors        key
+                
+            when 'command+shift+up', 'command+shift+down'          then return @delCursors   key
             when 'ctrl+up', 'ctrl+down', 'ctrl+left', 'ctrl+right' then return @alignCursors key
-            when 'command+up',       'command+down'       then return @addCursors key
-            when 'command+shift+up', 'command+shift+down' then return @delCursors key            
 
         return if mod and not key?.length
         
@@ -588,25 +612,7 @@ class ViewBase extends Editor
                 return
             
             when 'down', 'right', 'up', 'left' 
-                                
-                if event.metaKey
-                
-                    if not event.shiftKey and @selections.length > 1 and @cursors.length == 1
-                        switch key
-                            when 'left'  then return @cursorsAtStartOfSelections()
-                            when 'right' then return @cursorsAtEndOfSelections()
-            
-                    switch key 
-                        when 'left'  then @moveCursorsToStartOfLine event.shiftKey
-                        when 'right' then @moveCursorsToEndOfLine   event.shiftKey
-                else if event.altKey
-                    if key == 'left'
-                        @moveCursorsToStartOfWord event.shiftKey
-                    else if key == 'right'
-                        @moveCursorsToEndOfWord   event.shiftKey
-                else
-                    @moveCursors key, event.shiftKey
-                                        
+                @moveCursors key, event.shiftKey
                 event.preventDefault() # prevent view from scrolling
             else
                 switch combo

@@ -41,6 +41,7 @@ class Search extends Command
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
     
     execute: (command) ->
+        return if not command.length
         super command
         editor = window.editor
         @startSearchInFiles command, editor.currentFile
@@ -54,9 +55,11 @@ class Search extends Command
     # 0000000   00000000  000   000  000   000   0000000  000   000
     
     startSearchInFiles: (text, file) ->
-        window.terminal.appendText ''
-        window.terminal.appendDiss syntax.dissForTextAndSyntax "▶ Search for '#{text}':", 'ko'       
-        window.terminal.appendText ''
+        terminal = window.terminal
+        terminal.appendText ''
+        terminal.appendDiss syntax.dissForTextAndSyntax "▶ Search for '#{text}':", 'ko'       
+        terminal.appendText ''
+        terminal.moveCursorToLineIndex terminal.lines.length-1
         @walker = new walker
             root:        walker.packagePath path.dirname file
             includeDirs: false
@@ -93,12 +96,14 @@ class FileSearcher extends stream.Writable
     
     end: (chunk, encoding, cb) ->
         if @found.length
-            window.terminal.appendText ''
-            window.terminal.appendDiss syntax.dissForTextAndSyntax "● #{@file}:", 'ko'
-            window.terminal.appendText ''
+            terminal = window.terminal
+            terminal.appendDiss syntax.dissForTextAndSyntax "● #{@file}:", 'ko'
+            terminal.appendText ''
             for f in @found
                 ranges = f[2].concat syntax.rangesForTextAndSyntax f[1], 'coffee'
                 dss = matchr.dissect ranges, join:true
-                window.terminal.appendLineDiss f[1], dss                
+                terminal.appendLineDiss f[1], dss                
+            terminal.appendText ''
+            terminal.scrollCursorToTop 3
                 
 module.exports = Search
