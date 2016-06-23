@@ -108,7 +108,7 @@ class Open extends Command
             for file in files
                 div = document.createElement 'div'
                 div.className = 'list-file'
-                div.innerHTML = render.line file, syntax.dissForTextAndSyntax file, 'ko'
+                div.innerHTML = render.line file, syntax.dissForTextAndSyntax file, 'ko', join: true
                 div.setAttribute "onclick", "window.openFileAtIndex(#{index});"
                 div.value = file
                 @list.appendChild div
@@ -120,7 +120,7 @@ class Open extends Command
         return if not @list?
         split = window.split
         listTop = split.splitPosY 1
-        log "open.positionList listTop #{listTop} #{split.elemHeight() - listTop}"
+        # log "open.positionList listTop #{listTop} #{split.elemHeight() - listTop}"
         listHeight = @list.getBoundingClientRect().height
         if (split.elemHeight() - listTop) < listHeight
             listTop = split.splitPosY(0) - listHeight
@@ -390,6 +390,8 @@ class Open extends Command
     # 000000000  000  000   000  0000000 
     # 000   000  000  000   000  000     
     # 000   000  000  0000000    00000000
+         
+    onBlur: => @hideList()
             
     hideList: ->
         @list?.remove()

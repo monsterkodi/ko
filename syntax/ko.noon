@@ -16,20 +16,20 @@
 ●.*\/                       marker
 
 (?:^|\s\s+)([\/\S]*\/)(\S+)
-                            path.dirname
-                            path.basename
+                            dirname
+                            basename
 
-(?:[^\/\.]+)(\.[^\/]+)      path.extname
+(?:[^\/\.]+)(\.[^\/]+)      extname
 
-([\.\/\w]+\.coffee\b)       coffee.path
-([\.\/\w]+\.noon\b)         noon.path
-([\.\/\w]+\.json\b)         json.path
-([\.\/\w]+\.styl\b)         styl.path
-([\.\/\w]+\.html\b)         html.path
-([\.\/\w]+\.pug\b)          pug.path
-([\.\/\w]+\.css\b)          css.path
-([\.\/\w]+\.js\b)           js.path
-([\.\/\w]+\.md\b)           md.path
+([\.\/\w]+\.coffee\b)       coffee
+([\.\/\w]+\.noon\b)         noon
+([\.\/\w]+\.json\b)         json
+([\.\/\w]+\.styl\b)         styl
+([\.\/\w]+\.html\b)         html
+([\.\/\w]+\.pug\b)          pug
+([\.\/\w]+\.css\b)          css
+([\.\/\w]+\.js\b)           js
+([\.\/\w]+\.md\b)           md
 
 \.                          marker
-\/                          separator.marker
+\/                          separator

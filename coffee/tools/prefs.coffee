@@ -68,7 +68,7 @@ class Prefs
         Prefs.save values
 
     @load: () ->
-        # log "prefs.load"
+        log "prefs.load"
         values = {}
         try
             values = JSON.parse fs.readFileSync(Prefs.path, encoding:'utf8')
@@ -84,5 +84,6 @@ class Prefs
         json = JSON.stringify(values, null, "    ")        
         # console.log 'prefs.save', Prefs.path, json if Prefs.debug
         fs.writeFileSync Prefs.path, json, encoding:'utf8'
+        log "prefs.save"
 
 module.exports = Prefs

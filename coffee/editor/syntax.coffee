@@ -57,14 +57,15 @@ class syntax
     @rangesForTextAndSyntax: (line, n) ->
         matchr.ranges syntax.matchrConfigs[n], line
 
-    @dissForTextAndSyntax: (line, n) ->
-        matchr.dissect matchr.ranges syntax.matchrConfigs[n], line
+    @dissForTextAndSyntax: (line, n, opt) ->
+        matchr.dissect matchr.ranges(syntax.matchrConfigs[n], line), opt
 
-    getDiss: (li) ->
+    getDiss: (li, opt) ->
         # log "?? #{@diss.length} #{li}" if @editor.name is 'terminal'
         if not @diss[li]?
             # log "++ #{li} #{@diss[li]}" if @editor.name is 'terminal'
-            diss = matchr.dissect matchr.ranges syntax.matchrConfigs[@name], @editor.lines[li]
+            rgs = matchr.ranges syntax.matchrConfigs[@name], @editor.lines[li]
+            diss = matchr.dissect rgs, opt
             @diss[li] = diss
             
         # log "#{li}", @diss[li] if @editor.name is 'terminal' and @diss[li]?.length

@@ -32,6 +32,8 @@ class Commandline extends ViewBase
         @loadCommands()
         
         window.split.on 'paneHeight', @onPaneHeight
+        
+        @view.onblur = () => @command?.onBlur()
 
     setName: (name) -> @cmmd.innerHTML = name
                 
@@ -68,8 +70,9 @@ class Commandline extends ViewBase
         @command?.cancel()
         window.split.showCommandline()
         @command = @commands[name]
-        @command.focus = "."+document.activeElement.className
-        # log "commandline.startCommand #{name} focus #{@command.focus}"
+        activeClass = "."+document.activeElement.className
+        @command.setFocus activeClass if activeClass != '.commandline'
+        log "commandline.startCommand #{name} focus #{@command.focus}"
         @view.focus()
         @setName name
         @results @command.start combo # <-- command start

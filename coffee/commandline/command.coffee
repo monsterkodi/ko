@@ -23,7 +23,9 @@ class Command
     start: -> 
         text: @last()
         select: true
-        
+    
+    onBlur: ->
+    setFocus: (focus) -> @focus = focus ? '.editor'
     cancel: -> focus: @focus
     changed: (command) ->
                 

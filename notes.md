@@ -50,6 +50,7 @@
 - *paste multiple lines into multiple selections/cursors*
 
 #### open
+- *close list on focus out*
 - don't select recent when pwd was changed
 - show relative path when navigating in history
 
