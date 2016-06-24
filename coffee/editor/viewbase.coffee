@@ -424,6 +424,7 @@ class ViewBase extends Editor
                 delta = @scroll.lineHeight * (cp[1] - @scroll.top - topDist)
                 # log "viewbase.scrollCursorToTop #{delta}"
                 @scrollBy delta
+                @numbers.updateColors()
                     
     # 00000000    0000000    0000000
     # 000   000  000   000  000     

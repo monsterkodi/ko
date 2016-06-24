@@ -28,8 +28,10 @@ class Command
     grabFocus: -> @commandline.focus()
     onBlur: ->
     setFocus: (focus) -> @focus = focus ? '.editor'
-    cancel: -> focus: @focus
     changed: (command) ->
+    cancel: -> 
+        focus: @focus
+        @setText ''
                 
     execute: (command) ->    
         _.pull @history, command

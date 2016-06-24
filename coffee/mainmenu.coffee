@@ -38,17 +38,6 @@ class MainMenu
                     prefs.set 'recentFiles', []
                     MainMenu.init main
 
-        current = []
-        i = 1
-        for wid, win of prefs.get 'windows', {}
-            accel = i <= 9 and "CmdOrCtrl+#{i}" or ""
-            i += 1
-            current.push 
-                label: fileLabel win?.file ? 'new'
-                accelerator: accel
-                winid: wid
-                click: (i) -> main.activateWindowWithID i.winid
-
         Menu.setApplicationMenu Menu.buildFromTemplate [
             
             # 000   000   0000000 
@@ -131,15 +120,6 @@ class MainMenu
                 accelerator: 'Command+W'
                 click:       (i,win) -> win?.close()
             ]
-        ,
-            # 0000000    000   000  00000000  00000000  00000000  00000000    0000000
-            # 000   000  000   000  000       000       000       000   000  000     
-            # 0000000    000   000  000000    000000    0000000   0000000    0000000 
-            # 000   000  000   000  000       000       000       000   000       000
-            # 0000000     0000000   000       000       00000000  000   000  0000000 
-            
-            label: 'Buffers'
-            submenu: current
         ,        
             # 000   000  000  000   000  0000000     0000000   000   000
             # 000 0 000  000  0000  000  000   000  000   000  000 0 000

@@ -203,9 +203,7 @@ class Open extends Command
             
         if @combo == @shortcuts[1]
             @setName "new window"
-            
-        return ""
-    
+                
     # 000       0000000    0000000   0000000    0000000    000  00000000 
     # 000      000   000  000   000  000   000  000   000  000  000   000
     # 000      000   000  000000000  000   000  000   000  000  0000000  
@@ -308,7 +306,7 @@ class Open extends Command
         @showList()
         @grabFocus()
         @select @lastFileIndex
-        text = @navigating ? @list?.children[@selected]?.value
+        text = @navigating ? @dir #@list?.children[@selected]?.value
         @commandline.setAndSelectText text
                     
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000

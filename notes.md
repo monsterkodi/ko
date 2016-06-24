@@ -1,5 +1,10 @@
 # todo/ideas
 
+#### find
+- *keep command+e search string longer*
+- highlight while entering
+- display number of matches somewhere
+
 #### search
 - *make search results clickable*
 - insert salter headers
@@ -7,10 +12,8 @@
 - make search results editable
 - make search results keyboard navigatable
 
-#### find
-- *keep command+e search string longer*
-- highlight while entering
-- display number of matches somewhere
+#### windows
+- cycle through windows command
 
 #### editor
 - *send changes between windows*
@@ -51,8 +54,6 @@
 - *paste multiple lines into multiple selections/cursors*
 
 #### open
-- *close list on focus out*
-- don't select recent when pwd was changed
 - show relative path when navigating in history
 
 #### terminal
@@ -99,6 +100,7 @@
     - images
 
 #### nice to have
+- clean empty buffers on open file
 - help (shortcuts)
 - save window positions as layouts
 - bracket matching

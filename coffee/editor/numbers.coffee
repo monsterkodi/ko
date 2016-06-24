@@ -25,9 +25,9 @@ class Numbers
         @editor.on 'lineVanishedTop',  @onLineVanishedTop
         @editor.on 'exposeTopChanged', @renumber
         @editor.on 'fontSizeChanged',  @onFontSizeChange
-        @editor.on 'highlight',        @onSelectionOrCursors
-        @editor.on 'selection',        @onSelectionOrCursors
-        @editor.on 'cursors',          @onSelectionOrCursors
+        @editor.on 'highlight',        @updateColors
+        @editor.on 'selection',        @updateColors
+        @editor.on 'cursors',          @updateColors
         @onFontSizeChange()
     
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
@@ -36,7 +36,7 @@ class Numbers
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
        
-    onSelectionOrCursors: =>
+    updateColors: =>
         top = @editor.scroll.exposeTop
         bot = @editor.scroll.exposeBot
         sr = @editor.rangesFromTopToBotInRanges top, bot, @editor.selections
@@ -143,5 +143,6 @@ class Numbers
         for e in @elem.children
             e.firstChild.innerHTML = "#{li}"
             li += 1
+        @updateColors()
 
 module.exports = Numbers
