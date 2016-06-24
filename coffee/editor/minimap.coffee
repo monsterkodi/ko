@@ -17,12 +17,15 @@ class Minimap
     constructor: (@editor) ->
         
         @width = 240
-        
+        @height = 8192
+            
         @elem = document.createElement 'div'
         @elem.className = 'minimap'
 
         @canvas = document.createElement 'canvas'
         @canvas.className = "minimapCanvas"
+        @canvas.height = @height
+        @canvas.width  = @width
             
         @elem.addEventListener 'wheel', @editor.scrollbar?.onWheel
         @elem.appendChild @canvas
@@ -38,11 +41,11 @@ class Minimap
         @editor.scroll.on 'scroll', @onEditorScroll
 
         @scroll = new scroll 
-            exposeMax:  4096
+            exposeMax:  @height/4
             lineHeight: 4
             viewHeight: 2*@editor.viewHeight()
             
-        @scroll.dbg = true if @editor.name == 'editor'
+        # @scroll.dbg = true if @editor.name == 'editor'
                     
         @drag = new drag 
             target:  @elem
@@ -67,7 +70,7 @@ class Minimap
 
     drawLines: (top=@scroll.exposeTop, bot=@scroll.exposeBot) =>
         ctx = @canvas.getContext '2d'
-        log "minimap.drawLines #{top}..#{bot} #{@scroll.exposeTop}..#{@scroll.exposeBot}" if @editor.name != 'logview'
+        # log "minimap.drawLines #{top}..#{bot} #{@scroll.exposeTop}..#{@scroll.exposeBot}" if @editor.name != 'logview'
         for li in [top..bot]
             diss = @editor.syntax.getDiss li
             # log "diss.length #{diss?.length}" if @editor.name == 'terminal'
@@ -147,37 +150,28 @@ class Minimap
     onEditorScroll: =>
         if @scroll.fullHeight > @scroll.viewHeight
             pc = @editor.scroll.scroll / @editor.scroll.scrollMax
-            tp = parseInt pc * @scroll.scrollMax/2
-            # log "minimap.onEditorScroll pc: #{pc} tp: #{tp} sm: #{@scroll.scrollMax} fh: #{@scroll.fullHeight} vh: #{@scroll.viewHeight}"
+            tp = parseInt pc * @scroll.scrollMax
+            # log "minimap.onEditorScroll pc: #{pc} tp: #{tp} sm: #{@scroll.scrollMax}" #" fh: #{@scroll.fullHeight} vh: #{@scroll.viewHeight}"
             @scroll.to tp
-            @drawTopBot()
-        else
-            @drawTopBot()
+        @drawTopBot()
     
     onEditorNumLines: (n) => 
-        log "minimap.onEditorNumLines #{n}" if @editor.name != 'logview'
+        # log "minimap.onEditorNumLines #{n}" if @editor.name != 'logview'
         @onEditorViewHeight @editor.viewHeight() if n and @canvas.height <= @scroll.lineHeight
         @scroll.setNumLines n
             
     onEditorViewHeight: (h) => 
         @scroll.setViewHeight 2*@editor.viewHeight()
-        @height = @scroll.lineHeight * Math.min @editor.lines.length, @scroll.exposeMax
-        return if @height == 0
-        @onEditorScroll()
+        # log "minimap.onEditorViewHeight h #{h} @height #{@height}", @scroll.info() if @editor.name != 'logview'
         @updateTransform()
-        log "minimap.onEditorViewHeight h #{h} @height #{@height}", @scroll.info() if @editor.name != 'logview'
-        if @canvas.height != @height
-            @canvas.height = @height
-            @canvas.width  = @width
-            @drawLines() if @scroll.exposeBot >= 0  
-        @drawTopBot()
+        @onEditorScroll()
             
     updateTransform: =>
     
-        y  = parseInt -@height/4-@scroll.offsetTop
+        y  = parseInt -@height/4-@scroll.offsetTop/2
         x  = parseInt @width/4
         
-        log "minimap.updateTransform y: #{y} vh: #{@scroll.viewHeight} sm: #{@scroll.scrollMax} eh: #{2*@editor.viewHeight()} fh: #{@height}" if @editor.name != 'logview'
+        # log "minimap.updateTransform y: #{y} vh: #{@scroll.viewHeight} sm: #{@scroll.scrollMax} eh: #{2*@editor.viewHeight()} fh: #{@height}" if @editor.name != 'logview'
         
         @canvasTop.style.transform = "translate3d(#{x}px, #{y}px, 0px) scale3d(0.5, 0.5, 1)"
         @canvas.style.transform    = "translate3d(#{x}px, #{y}px, 0px) scale3d(0.5, 0.5, 1)"
@@ -202,7 +196,7 @@ class Minimap
     
     clearLines: => @clear()
     clear: =>
-        log "minimap.clear" if @editor.name != 'logview'
+        # log "minimap.clear" if @editor.name != 'logview'
         @canvasTop.width = @canvasTop.width
         @canvas.width    = @canvas.width
         
