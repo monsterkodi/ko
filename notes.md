@@ -30,6 +30,9 @@
     - comment line characters
 
 #### editing
+- *fix triple click not working second time*
+- *meta doubleclick adds word to selection*
+- *command+d activates multicursor*
 - *trim indentation spaces when joining lines*
 - fancy close terminal, commandline or on esc when no highlight is canceled
 - delete forward swallows spaces?

@@ -63,7 +63,7 @@ class Search extends Command
         terminal.appendText ''
         terminal.appendDiss syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'       
         terminal.appendText ''
-        terminal.moveCursorToLineIndex terminal.lines.length-1
+        terminal.singleCursorAtPos [0, terminal.lines.length-1]
         @walker = new walker
             root:        walker.packagePath path.dirname opt.file
             includeDirs: false

@@ -136,7 +136,7 @@ class ansiDiss
                     when 99 < code < 108    then dss.style.push STYLES["eb#{8+code - 100}"]
                     else
                         dss.style.push 'text-decoration:overline'
-                        log "ansiCode", code
+                        log "ansidiss.tokenize ansiCode", code
             ''
         tokens = [
             {pattern: /^\x08+/,                     sub: ''}

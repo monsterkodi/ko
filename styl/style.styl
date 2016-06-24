@@ -327,7 +327,7 @@ body
     background      transparent
         
 *:focus .cursor
-    background          yellow // focus 
+    background          #ff0 // focus 
     animation-name      blink
     animation-duration  500ms
     animation-iteration-count infinite
@@ -336,6 +336,10 @@ body
     &.virtual
         background      #444 
         animation-name  blink-virtual
+        animation-duration 1000ms
+    &.main
+        background  #f80
+        animation-duration 250ms
     
 .cursor
     width            2px
@@ -343,6 +347,12 @@ body
     margin-left     -1px
     display         inline-block
     background      #444 // not focus
+    &.main
+        width        4px
+        margin-right -2px
+        margin-left  -2px
+        border-radius 2px
+        background  #666
     &.virtual
         background  #111 // not focus
 

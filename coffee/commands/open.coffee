@@ -392,7 +392,6 @@ class Open extends Command
          
     onBlur: => 
         if not @skipBlur
-            log 'blur'
             @hideList()
         else
             @skipBlur = null

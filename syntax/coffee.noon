@@ -90,7 +90,7 @@ new\s+(\w+)                    class.callee
 
 # punctuation
 
-[\,\.]                         syntax.punctuation
+[\,\.\;]                       syntax.punctuation
 
 # lodash
 

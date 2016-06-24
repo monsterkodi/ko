@@ -325,9 +325,7 @@ class ViewBase extends Editor
     renderLineAtIndex: (li) -> render.line @lines[li], @syntax.getDiss li
                                                     
     renderCursors: ->
-        # log "viewbase.renderCursors top #{@scroll.top} bot #{@scroll.bot}"
         cs = @cursorsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
-        # log "viewbase.renderCursors", cs
         vc = [] # virtual cursors
         if @cursors.length == 1 # probably not the best place to do this
             if cs.length == 1
@@ -337,12 +335,12 @@ class ViewBase extends Editor
                     cs = [[@lines[sc[1]].length, rli], [sc[0], rli, 'virtual']]
         else if @cursors.length > 1
             for c in cs
+                if @isMainCursor [c[0], c[1] + @scroll.exposeTop]
+                    c[2] = 'main'
                 if c[0] > @lines[@scroll.exposeTop+c[1]].length
                     vc.push [@lines[@scroll.exposeTop+c[1]].length, c[1], 'virtual']
             cs = cs.concat vc
-        # log "viewbase.renderCursors", cs
         html = render.cursors cs, @size
-        # log "viewbase.renderCursors", html 
         $('.cursors', @view).innerHTML = html
             
     renderSelection: ->
@@ -385,6 +383,15 @@ class ViewBase extends Editor
         else if cl > @scroll.bot - 4
             botdelta = Math.min(@lines.length+1, cl + 4) - @scroll.bot
             
+        maindelta = 0
+        cl = @mainCursor[1]
+        if cl < @scroll.top + 2
+            maindelta = Math.max(0, cl - 2) - @scroll.top
+        else if cl > @scroll.bot - 4
+            maindelta = Math.min(@lines.length+1, cl + 4) - @scroll.bot
+            
+        return maindelta
+            
         if botdelta > 0
             Math.max botdelta, topdelta
         else if topdelta < 0
@@ -424,7 +431,7 @@ class ViewBase extends Editor
                 delta = @scroll.lineHeight * (cp[1] - @scroll.top - topDist)
                 # log "viewbase.scrollCursorToTop #{delta}"
                 @scrollBy delta
-                @numbers.updateColors()
+                @numbers?.updateColors()
                     
     # 00000000    0000000    0000000
     # 000   000  000   000  000     
@@ -569,30 +576,21 @@ class ViewBase extends Editor
                 @do.end()
                 return
                 
+            when 'alt+up',     'alt+down'     then return @moveLines  key
+            when 'command+up', 'command+down' then return @addCursors key
+                
             when 'command+left', 'command+right'   
                 if @selections.length > 1 and @cursors.length == 1
-                    switch key
-                        when 'left'  then return @cursorsAtStartOfSelections()
-                        when 'right' then return @cursorsAtEndOfSelections()
+                    return @setCursorsAtSelectionBoundary key
                 else
-                    switch key
-                        when 'left'  then return @moveCursorsToStartOfLine()
-                        when 'right' then return @moveCursorsToEndOfLine()
+                    return @moveCursorsToLineBoundary key
                         
             when 'command+shift+left', 'command+shift+right'   
-                switch key
-                    when 'left'  then return @moveCursorsToStartOfLine true
-                    when 'right' then return @moveCursorsToEndOfLine true
+                    return @moveCursorsToLineBoundary key, true
                     
             when 'alt+left', 'alt+right', 'alt+shift+left', 'alt+shift+right'
-                switch key
-                    when 'left'  then return @moveCursorsToStartOfWord event.shiftKey
-                    when 'right' then return @moveCursorsToEndOfWord   event.shiftKey
-                
-            when 'command+up',   'command+down'                    
-                if @onlyFullLinesSelected() then return @moveSelectedLines key
-                else                             return @addCursors        key
-                
+                return @moveCursorsToWordBoundary key, event.shiftKey
+
             when 'command+shift+up', 'command+shift+down'          then return @delCursors   key
             when 'ctrl+up', 'ctrl+down', 'ctrl+left', 'ctrl+right' then return @alignCursors key
 
@@ -601,8 +599,8 @@ class ViewBase extends Editor
         switch key
             
             when 'esc'     then return @cancelCursorsAndHighlights()
-            when 'home'    then return @moveCursorToLineIndex 0, event.shiftKey
-            when 'end'     then return @moveCursorToLineIndex @lines.length-1, event.shiftKey
+            when 'home'    then return @singleCursorAtPos [0,0], event.shiftKey
+            when 'end'     then return @singleCursorAtPos [0,@lines.length-1], event.shiftKey
             when 'page up'      
                 @moveCursorsUp event.shiftKey, @numFullLines()-3
                 event.preventDefault() # prevent view from scrolling

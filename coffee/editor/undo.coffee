@@ -74,7 +74,7 @@ class undo
 
     changeInfoSelection: ->
         @getChangeInfo()
-        @changeInfo.selection.push @editor.selectedLineIndicesRange()
+        @changeInfo.selection.push @editor.selectedLineIndexRange()
             
     delChangeInfo: -> @changeInfo = null
         
@@ -196,6 +196,7 @@ class undo
     #  0000000   0000000   000   000  0000000    0000000   000   000
 
     cursors: (newCursors, keepInitial) ->
+        @editor.mainCursor = [last(newCursors)[0], last(newCursors)[1]] if not @editor.mainCursor
         @editor.cleanCursors newCursors
         if not keepInitial or newCursors.length != @editor.cursors.length
             @editor.initialCursors = _.cloneDeep newCursors
@@ -203,6 +204,7 @@ class undo
         @lastAction().curBefore = _.cloneDeep newCursors if not @actions.length
         @lastAction().curAfter  = _.cloneDeep newCursors
         @editor.cursors = newCursors
+        @editor.mainCursor = [newCursors[0][0], newCursors[0][1]] if newCursors.length == 1        
         @changeInfoCursor()
         @check()
 

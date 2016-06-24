@@ -21,7 +21,7 @@ class Buffer extends event
 
     setLines: (@lines) ->
         @cursors    = [[0,0]]
-        @mainCursor = 0 # index into cursors
+        @mainCursor = [0,0]
         @selections = []
         @highlights = []
         @emit 'numLines', @lines.length
@@ -52,6 +52,7 @@ class Buffer extends event
         cs
                 
     indexOfCursor: (c) -> @cursors.indexOf c
+    isMainCursor: (c) -> @isSamePos c, @mainCursor
 
     reversedCursors: ->
         cs = _.clone @cursors
@@ -65,10 +66,11 @@ class Buffer extends event
                 cs.push c
         cs
     
-    cursorAtEndOfLine:   (c=@cursors[0]) -> c[0] >= @lines[c[1]].length
-    cursorAtStartOfLine: (c=@cursors[0]) -> c[0] == 0
-    cursorInLastLine:    (c=@cursors[0]) -> c[1] == @lines.length-1
-    cursorInFirstLine:   (c=@cursors[0]) -> c[1] == 0
+    isCursorAtEndOfLine:   (c=@mainCursor) -> c[0] >= @lines[c[1]].length
+    isCursorAtStartOfLine: (c=@mainCursor) -> c[0] == 0
+    isCursorInLastLine:    (c=@mainCursor) -> c[1] == @lines.length-1
+    isCursorInFirstLine:   (c=@mainCursor) -> c[1] == 0
+    isCursorInRange:     (r,c=@mainCursor) -> @isPosInRange c, r
 
     # 000   000   0000000   00000000   0000000  
     # 000 0 000  000   000  000   000  000   000
@@ -82,16 +84,16 @@ class Buffer extends event
         r = @rangeAtPosInRanges p, wr
         r
 
-    endOfWordAtCursor: (c=@cursors[0]) =>
+    endOfWordAtCursor: (c=@mainCursor) =>
         r = @rangeForWordAtPos c
-        if @cursorAtEndOfLine c
-            return c if @cursorInLastLine c
+        if @isCursorAtEndOfLine c
+            return c if @isCursorInLastLine c
             r = @rangeForWordAtPos [0, c[1]+1]
         [r[1][1], r[0]]
 
-    startOfWordAtCursor: (c=@cursors[0]) =>
-        if @cursorAtStartOfLine c
-            return c if @cursorInFirstLine c
+    startOfWordAtCursor: (c=@mainCursor) =>
+        if @isCursorAtStartOfLine c
+            return c if @isCursorInFirstLine c
             r = @rangeForWordAtPos [@lines[c[1]-1].length, c[1]-1]
         else 
             r = @rangeForWordAtPos c
@@ -142,23 +144,22 @@ class Buffer extends event
     cursorAndSelectedLineIndices: ->
         _.uniq @selectedLineIndices().concat @cursorLineIndices()
                 
-    selectedLineIndicesRange: ->
+    continuousCursorAndSelectedLineIndexRanges: ->
+        il = @cursorAndSelectedLineIndices()
+        csr = []
+        if il.length
+            for li in il
+                if csr.length and last(csr)[1] == li-1
+                    last(csr)[1] = li
+                else
+                    csr.push [li,li]
+        csr
+            
+    selectedLineIndexRange: ->
         if @selections.length
             [first(@selections)[0], last(@selections)[0]]
         else
             []
-            
-    continuousSelectedLineIndexRanges: ->
-        slirs = []
-        for s in @selections
-            if slirs.length
-                if last(slirs)[1] == s[0]-1
-                    last(slirs)[1] += 1
-                else
-                    slirs.push [s[0],s[0]]
-            else 
-                slirs.push [s[0],s[0]]
-        slirs
             
     isSelectedLineAtIndex: (li) ->
         il = @selectedLineIndices()
@@ -254,8 +255,8 @@ class Buffer extends event
         [@lines[lli].length, lli]
 
     cursorPos: -> 
-        l = clamp 0, @lines.length-1, @cursors[@mainCursor][1]
-        c = clamp 0, @lines[l].length, @cursors[@mainCursor][0]
+        l = clamp 0, @lines.length-1, @mainCursor[1]
+        c = clamp 0, @lines[l].length, @mainCursor[0]
         [ c, l ]
         
     clampPos: (p) ->
@@ -264,8 +265,7 @@ class Buffer extends event
         [ c, l ]
         
     isSamePos: (a,b) -> a[1]==b[1] and a[0]==b[0]
-    isPosInRange: (p, r) ->
-        return (p[1] == r[0]) and (r[1][0] <= p[0] <= r[1][1])
+    isPosInRange: (p, r) -> (p[1] == r[0]) and (r[1][0] <= p[0] <= r[1][1])
         
     positionsFromPosInPositions: (p, pl) -> 
         (r for r in pl when ((r[1] > p[1]) or ((r[1] == p[1]) and (r[0] >= p[0]))))

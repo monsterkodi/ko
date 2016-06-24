@@ -25,9 +25,9 @@ class Numbers
         @editor.on 'lineVanishedTop',  @onLineVanishedTop
         @editor.on 'exposeTopChanged', @renumber
         @editor.on 'fontSizeChanged',  @onFontSizeChange
-        @editor.on 'highlight',        @updateColors
-        @editor.on 'selection',        @updateColors
-        @editor.on 'cursors',          @updateColors
+        @editor.on 'highlight',        => @updateColors()
+        @editor.on 'selection',        => @updateColors()
+        @editor.on 'cursors',          => @updateColors()
         @onFontSizeChange()
     
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
@@ -36,9 +36,8 @@ class Numbers
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
        
-    updateColors: =>
-        top = @editor.scroll.exposeTop
-        bot = @editor.scroll.exposeBot
+    updateColors: (top=@editor.scroll.exposeTop, bot=@editor.scroll.exposeBot) =>
+        # log "numbers.updateColors #{top} #{bot}" if @editor.name == 'editor'
         sr = @editor.rangesFromTopToBotInRanges top, bot, @editor.selections
         hr = @editor.rangesFromTopToBotInRanges top, bot, @editor.highlights        
         cr = @editor.rangesFromTopToBotInRanges top, bot, @editor.rangesForCursors()
@@ -46,16 +45,18 @@ class Numbers
         si = @editor.sortedLineIndicesInRanges sr
         ci = @editor.sortedLineIndicesInRanges cr
         li = top
-        for child in @elem.children
+        for li in [top..bot]
+            child = @elem.children[li-@editor.scroll.exposeTop]
+            break if not child?
             cls = ''
             if li in ci
                 cls += ' cursored'
             if li in si
                 cls += ' selected'
             if li in hi
-                cls += ' highligd'
-            li += 1
+                cls += ' highligd'            
             child.className = 'linenumber ' + cls
+            li += 1
        
     # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
     # 000       000   000  0000  000     000     000       000     000   000     
@@ -76,12 +77,14 @@ class Numbers
     # 00000000  000   000  000         0000000   0000000   00000000
         
     onLineExposed: (e) =>
-        # console.log "numbers.onLineExposed #{@editor.name} #{e.lineIndex}" if @editor.name == 'logview'
+        # log "numbers.onLineExposed #{@editor.name} #{e.lineIndex}" if @editor.name == 'editor'
         @elem.appendChild @addLine e.lineIndex
+        @updateColors e.lineIndex, e.lineIndex
         
     onLineExposedTop: (e) =>
-        # console.log "numbers.onLineExposedTop #{@editor.name} #{e.lineIndex}" if @editor.name == 'logview'
+        # log "numbers.onLineExposedTop #{@editor.name} #{e.lineIndex}" if @editor.name == 'editor'
         @elem.insertBefore @addLine(e.lineIndex), @elem.firstChild
+        @updateColors e.lineIndex, e.lineIndex
         
     # 000  000   000   0000000  00000000  00000000   000000000  00000000  0000000  
     # 000  0000  000  000       000       000   000     000     000       000   000
@@ -138,7 +141,7 @@ class Numbers
     # 000   000  00000000  000   000   0000000   000   000  0000000    00000000  000   000
         
     renumber: (e) =>
-        console.log "numbers.renumber #{@editor.name} from #{e.new} to #{e.new+@elem.children.length-1}" if @editor.name == 'logview'
+        # log "numbers.renumber #{@editor.name} from #{e.new} to #{e.new+@elem.children.length-1}" if @editor.name == 'editor'
         li = e.new
         for e in @elem.children
             e.firstChild.innerHTML = "#{li}"
