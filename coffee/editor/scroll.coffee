@@ -3,7 +3,6 @@
 # 0000000   000       0000000    000   000  000      000    
 #      000  000       000   000  000   000  000      000    
 # 0000000    0000000  000   000   0000000   0000000  0000000
-
 {
 clamp
 }      = require '../tools/tools'
@@ -16,7 +15,7 @@ class scroll extends events
 
         @lineHeight = cfg.lineHeight ? 0
         @viewHeight = cfg.viewHeight ? 0
-        @exposeMax  = cfg.exposeMax ? -2 # <0: -v * viewLines | 0: unlimited | >0: v * line
+        @exposeMax  = cfg.exposeMax ? -2 # <0: -v * viewLines | 0: unlimited | >0: v * 1
         @smooth     = cfg.smooth ? true
         @dbg        = cfg.dbg
         @init()
@@ -104,7 +103,7 @@ class scroll extends events
         offset += @offsetSmooth if @smooth
         offset += (@top - @exposeTop) * @lineHeight
         # log "scroll.by delta #{delta} offset #{offset}" if @dbg
-        if offset != @topOffset
+        if offset != @offsetTop
             @offsetTop = parseInt offset
             # log "scroll.by emit scroll @scroll #{@scroll} @offsetTop #{@offsetTop}" if @dbg
             @emit 'scroll', @scroll, @offsetTop

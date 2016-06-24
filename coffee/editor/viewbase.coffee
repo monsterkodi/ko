@@ -578,6 +578,8 @@ class ViewBase extends Editor
                 
             when 'alt+up',     'alt+down'     then return @moveLines  key
             when 'command+up', 'command+down' then return @addCursors key
+            when 'ctrl+a', 'ctrl+shift+a'     then return @moveCursorsToLineBoundary 'left',  event.shiftKey
+            when 'ctrl+e', 'ctrl+shift+e'     then return @moveCursorsToLineBoundary 'right', event.shiftKey
                 
             when 'command+left', 'command+right'   
                 if @selections.length > 1 and @cursors.length == 1
@@ -599,7 +601,7 @@ class ViewBase extends Editor
         switch key
             
             when 'esc'     then return @cancelCursorsAndHighlights()
-            when 'home'    then return @singleCursorAtPos [0,0], event.shiftKey
+            when 'home'    then return @singleCursorAtPos [0, 0],              event.shiftKey
             when 'end'     then return @singleCursorAtPos [0,@lines.length-1], event.shiftKey
             when 'page up'      
                 @moveCursorsUp event.shiftKey, @numFullLines()-3
@@ -613,10 +615,6 @@ class ViewBase extends Editor
             when 'down', 'right', 'up', 'left' 
                 @moveCursors key, event.shiftKey
                 event.preventDefault() # prevent view from scrolling
-            else
-                switch combo
-                    when 'ctrl+a', 'ctrl+shift+a' then @moveCursorsToStartOfLine event.shiftKey
-                    when 'ctrl+e', 'ctrl+shift+e' then @moveCursorsToEndOfLine   event.shiftKey
                                                                                     
         ansiKeycode = require 'ansi-keycode'
         if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]

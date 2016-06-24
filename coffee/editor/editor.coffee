@@ -648,7 +648,7 @@ class Editor extends Buffer
         l = text.split '\n'
         if @cursorPos()[0] == 0 and @cursorPos()[1] > 0
             @moveCursorsUp()
-            @moveCursorsToEndOfLine()
+            @moveCursorsToLineBoundary 'right'
             @insertNewline()
         for ch in text
             @insertCharacter ch
@@ -732,7 +732,7 @@ class Editor extends Buffer
     # 0000000    00000000  0000000  00000000     000     00000000
     
     joinLineOfCursor: (c) -> # todo: multicursor
-        if not @cursorInLastLine c
+        if not @isCursorInLastLine c
             @do.start()
             @do.change @lines, c[1], @lines[c[1]] + @lines[c[1]+1]
             @do.delete @lines, c[1]+1
@@ -797,7 +797,7 @@ class Editor extends Buffer
             for c in @reversedCursors()
             
                 if @isCursorAtEndOfLine c # cursor at end of line
-                    if not @cursorInLastLine c # cursor not in first line
+                    if not @isCursorInLastLine c # cursor not in first line
                     
                         ll = @lines[c[1]].length
                     
