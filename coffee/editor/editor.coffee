@@ -500,8 +500,7 @@ class Editor extends Buffer
                     @newCursorDelta newCursors, c, -@indentString.length
                 for s in @selectionsInLineAtIndex i
                     ns = newSelections[@indexOfSelection s]
-                    ns[1][0] -= @indentSt
-                    ring.length
+                    ns[1][0] -= @indentString.length
                     ns[1][1] -= @indentString.length
         @do.selections newSelections
         @do.cursors newCursors

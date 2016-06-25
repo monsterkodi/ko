@@ -178,6 +178,7 @@ class ViewBase extends Editor
             @renderCursors()
             $('.main', @view)?.scrollIntoViewIfNeeded()
             @emit 'cursors', changeInfo.cursor
+            
         if changeInfo.selection.length
             @renderSelection()   
             @emit 'selection', changeInfo.selection

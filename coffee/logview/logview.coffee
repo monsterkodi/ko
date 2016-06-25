@@ -15,7 +15,7 @@ class LogView extends ViewBase
 
     constructor: (viewElem) ->
         
-        @fontSizeDefault = 10
+        @fontSizeDefault = 12
         
         super viewElem
         

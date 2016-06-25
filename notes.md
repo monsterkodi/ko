@@ -17,6 +17,7 @@
 
 #### editor
 - *send changes between windows*
+- *store unsaved changes in prefs*
 - *autocomplete*
     - from buffer
     - from similar files
@@ -30,12 +31,13 @@
     - comment line characters
 
 #### editing
+- *fix surround at end of line (no join)*
 - *fix triple click not working second time*
 - *meta doubleclick adds word to selection*
 - *command+d activates multicursor*
 - *trim indentation spaces when joining lines*
-- fancy close terminal, commandline or on esc when no highlight is canceled
 - delete forward swallows spaces?
+- fancy close terminal, commandline or on esc when no highlight is canceled
 - on second command+e: select including leading @
 - *#< to add salter header of next word*
 - when pasting text at indent level, remove leading space columns
@@ -48,6 +50,7 @@
 - *dbg "class.method arg: #{arg}, ..."*
 - fix surround at end of line
 - command-enter: deselect, insert newline, indent, and single cursor
+- move mainCursor to leftmost/rightmost cursor in its line on 'left'/'right' actions
 
 #### cursors
 - *remember last cursor*
