@@ -92,6 +92,8 @@ class Minimap
         ctx.fillStyle = "rgba(255,255,255,0.15)"
         y = parseInt @scroll.lineHeight * (@editor.scroll.top-@scroll.exposeTop*@scroll.lineHeight)
         ctx.fillRect 0, y, @width, 2*Math.max 0, tb
+        b = parseInt @scroll.lineHeight * (@scroll.numLines-@scroll.exposeTop*@scroll.lineHeight)
+        ctx.fillRect 0, b, @width, @scroll.lineHeight/2
        
     # 00000000  000   000  00000000    0000000    0000000  00000000
     # 000        000 000   000   000  000   000  000       000     

@@ -31,14 +31,7 @@ class Buffer extends event
     # 000       000   000  0000000    0000000   000   000  0000000    0000000 
     # 000       000   000  000   000       000  000   000  000   000       000
     #  0000000   0000000   000   000  0000000    0000000   000   000  0000000 
-    
-    cursorsInLineIndexRangeRelativeToLineIndex: (lineIndexRange, relIndex) ->
-        cs = []
-        for c in @cursors
-            if c[1] >= lineIndexRange[0] and c[1] <= lineIndexRange[1]
-                cs.push [c[0], c[1] - relIndex]
-        cs
-        
+            
     cursorAtPos: (p) ->
         for c in @cursors
             if c[0] == p[0] and c[1] == p[1]

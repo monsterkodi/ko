@@ -176,6 +176,7 @@ class ViewBase extends Editor
                         
         if changeInfo.cursor.length
             @renderCursors()
+            $('.main', @view)?.scrollIntoViewIfNeeded()
             @emit 'cursors', changeInfo.cursor
         if changeInfo.selection.length
             @renderSelection()   
@@ -325,15 +326,21 @@ class ViewBase extends Editor
     renderLineAtIndex: (li) -> render.line @lines[li], @syntax.getDiss li
                                                     
     renderCursors: ->
-        cs = @cursorsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
-        vc = [] # virtual cursors
-        if @cursors.length == 1 # probably not the best place to do this
+        
+        cs = []
+        for c in @cursors
+            if c[1] >= @scroll.exposeTop and c[1] <= @scroll.exposeBot
+                cs.push [c[0], c[1] - @scroll.exposeTop]
+        
+        if @cursors.length == 1
             if cs.length == 1
-                sc = @cursors[0]
+                sc = @mainCursor
+                ri = sc[1]-@scroll.exposeTop
+                cs[0][2] = 'main off'
                 if sc[0] > @lines[sc[1]].length
-                    rli = sc[1]-@scroll.exposeTop
-                    cs = [[@lines[sc[1]].length, rli], [sc[0], rli, 'virtual']]
+                    cs.push [@lines[sc[1]].length, ri, 'virtual']
         else if @cursors.length > 1
+            vc = [] # virtual cursors
             for c in cs
                 if @isMainCursor [c[0], c[1] + @scroll.exposeTop]
                     c[2] = 'main'
@@ -415,10 +422,6 @@ class ViewBase extends Editor
         @scroll.to p
         @view.scrollTop = @scroll.offsetTop
 
-    scrollCursor: -> 
-        # log "view.scrollCursor todo"
-        # $('.cursor', @view)?.scrollIntoViewIfNeeded()
-        
     scrollCursorToTop: (topDist=7) ->
         cp = @cursorPos()
         # log "viewbase.scrollCursorToTop #{cp[1]} #{cp[1] - @scroll.top}"

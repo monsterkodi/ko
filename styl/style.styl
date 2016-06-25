@@ -314,48 +314,57 @@ body
 //  0000000   0000000   000   000  0000000    0000000   000   000
         
         
-@keyframes blink 
-  from 
-    background      yellow
-  to 
-    background      #444
+//@keyframes blink 
+//  from 
+//    background      #ff0
+//  to 
+//    background      #444
+//
+//@keyframes blink-virtual
+//  from 
+//    background      #08f
+//  to 
+//    background      transparent
+//
+//*:focus .cursor
+//   animation-name      blink
+//   animation-duration  500ms
+//   animation-iteration-count infinite
+//   animation-direction alternate
+//   animation-timing-function ease-in-out
+//   &.virtual
+//       background      #444 
+//       animation-name  blink-virtual
+//       animation-duration 1000ms
+//   &.main
+//       background  #f80
+//       animation-duration 250ms
 
-@keyframes blink-virtual
-  from 
-    background      #08f
-  to 
-    background      transparent
-        
-*:focus .cursor
-    background          #ff0 // focus 
-    animation-name      blink
-    animation-duration  500ms
-    animation-iteration-count infinite
-    animation-direction alternate
-    animation-timing-function ease-in-out
-    &.virtual
-        background      #444 
-        animation-name  blink-virtual
-        animation-duration 1000ms
-    &.main
-        background  #f80
-        animation-duration 250ms
-    
 .cursor
     width            2px
     margin-right    -1px
     margin-left     -1px
     display         inline-block
-    background      #444 // not focus
-    &.main
+    &.main:not(.off)
         width        4px
         margin-right -2px
         margin-left  -2px
-        border-radius 2px
-        background  #666
-    &.virtual
-        background  #111 // not focus
+        border-radius 2px       
 
+*:focus .cursor      // focus colors
+    background          #f80 
+    &.virtual
+        background      #08f
+    &.main
+        background      #ff0
+    
+.cursor               // blur colors
+    background          #444
+    &.main
+        background      #666 
+    &.virtual
+        background      #111
+        
 // 000   000  000   000  00     00  0000000    00000000  00000000    0000000
 // 0000  000  000   000  000   000  000   000  000       000   000  000     
 // 000 0 000  000   000  000000000  0000000    0000000   0000000    0000000 

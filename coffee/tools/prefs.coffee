@@ -52,6 +52,12 @@ class Prefs
                 
     @del: (key, value) -> @s(key, null) and _.pull @cache[key], value
 
+    # 000       0000000    0000000   0000000  
+    # 000      000   000  000   000  000   000
+    # 000      000   000  000000000  000   000
+    # 000      000   000  000   000  000   000
+    # 0000000   0000000   000   000  0000000  
+
     @load: () ->
         # log "prefs.load"
         @cache = {}
@@ -65,13 +71,27 @@ class Prefs
                 @cache[key] = Prefs.defs[key]
         @cache
 
+    #  0000000
+    # 000     
+    # 0000000 
+    #      000
+    # 0000000 
+    
     @s: (keypath, value) ->
         @changes.push [keypath, value]
         if @timer then clearTimeout @timer
+        # else           log "prefs.s"
         @timer = setTimeout @save, @timeout
+
+    #  0000000   0000000   000   000  00000000
+    # 000       000   000  000   000  000     
+    # 0000000   000000000   000 000   0000000 
+    #      000  000   000     000     000     
+    # 0000000   000   000      0      00000000
 
     @save: =>
         @load()
+        @timer = null
         for c in @changes
             @setPath c[0], c[1], true        
         json = JSON.stringify(@cache, null, "    ")      

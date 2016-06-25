@@ -346,13 +346,16 @@ class Editor extends Buffer
 
     alignCursors: (dir='down') ->
         charPos = switch dir
-            when 'up'    then last(@cursors)[0]
-            when 'down'  then first(@cursors)[0]
+            when 'up'    then first(@cursors)[0]
+            when 'down'  then last( @cursors)[0]
             when 'left'  then _.min (c[0] for c in @cursors)
             when 'right' then _.max (c[0] for c in @cursors)
         newCursors = _.cloneDeep @cursors
         for c in @cursors
             @newCursorSet newCursors, c, charPos, c[1]
+        switch dir
+            when 'up'   then @mainCursor = first newCursors
+            when 'down' then @mainCursor = last  newCursors
         @do.cursors newCursors
         
     clampCursors: ->
@@ -432,41 +435,46 @@ class Editor extends Buffer
     # 000 0 000  000   000     000     000     
     # 000   000   0000000       0      00000000
 
-    moveAllCursors: (e, f, keepLine=false) ->
-        @startSelection e
+    moveAllCursors: (f, opt={}) ->
+        @startSelection opt.extend
         newCursors = _.cloneDeep @cursors        
         if @cursors.length > 1
             for c in @cursors
                 newPos = f(c)
-                if newPos[1] == c[1] or not keepLine
+                if newPos[1] == c[1] or not opt.keepLine
                     @newCursorSet newCursors, c, newPos
         else
             @newCursorSet newCursors, @cursors[0], f(@cursors[0])
-        @do.cursors newCursors, e
-        @endSelection e
+        @mainCursor = first newCursors if opt.main == 'first'        
+        @mainCursor = last  newCursors if opt.main == 'last'        
+        @do.cursors newCursors, opt.extend
+        @endSelection opt.extend
         
     moveCursorsToLineBoundary: (leftOrRight, e) ->
         f = switch leftOrRight
             when 'right' then (c) => [@lines[c[1]].length, c[1]]
             when 'left' then (c) -> [0, c[1]]
-        @moveAllCursors e, f
+        @moveAllCursors f, extend:e, keepLine:true
     
     moveCursorsToWordBoundary: (leftOrRight, e) -> 
         f = switch leftOrRight
             when 'right' then @endOfWordAtCursor
             when 'left' then @startOfWordAtCursor
-        @moveAllCursors e, f, true
+        @moveAllCursors f, extend:e, keepLine:true
     
-    moveCursorsUp:   (e, n=1) -> @moveAllCursors e, ((n)->(c)->[c[0],c[1]-n])(n)
-    moveCursorsDown: (e, n=1) -> @moveAllCursors e, ((n)->(c)->[c[0],c[1]+n])(n)
+    moveCursorsDown: (e, n=1) -> 
+        @moveAllCursors ((n)->(c)->[c[0],c[1]+n])(n), extend:e, main: 'last'
+        
+    moveCursorsUp:   (e, n=1) -> 
+        @moveAllCursors ((n)->(c)->[c[0],c[1]-n])(n), extend:e, main: 'first'
                         
     moveCursorsRight: (e, n=1) ->
         moveRight = (n) -> (c) -> [c[0]+n, c[1]]
-        @moveAllCursors e, moveRight(n), true
+        @moveAllCursors moveRight(n), extend:e, keepLine:true
     
     moveCursorsLeft: (e, n=1) ->
-        moveLeft = (n) -> (c) -> [c[0]-n, c[1]]
-        @moveAllCursors e, moveLeft(n), true
+        moveLeft = (n) -> (c) -> [Math.max(0,c[0]-n), c[1]]
+        @moveAllCursors moveLeft(n), extend:e, keepLine:true
         
     moveCursors: (direction, e) ->
         switch direction
