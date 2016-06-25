@@ -12,9 +12,6 @@ log       = require '../tools/log'
 drag      = require '../tools/drag'
 keyinfo   = require '../tools/keyinfo'
 ViewBase  = require './viewbase'
-Minimap   = require './minimap'
-Scrollbar = require './scrollbar'
-Numbers   = require './numbers'
 syntax    = require './syntax'
 watcher   = require './watcher'
 path      = require 'path'
@@ -26,13 +23,7 @@ class View extends ViewBase
     constructor: (viewElem) -> 
 
         @fontSizeDefault = 14
-
-        super viewElem
-        
-        # @do.dbg    = true
-        @scrollbar = new Scrollbar @
-        @minimap   = new Minimap @
-        @numbers   = new Numbers @
+        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Autocomplete']        
                     
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000

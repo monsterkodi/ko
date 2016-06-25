@@ -6,9 +6,6 @@
 {
 $}        = require '../tools/tools'
 ViewBase  = require '../editor/viewbase'
-Numbers   = require '../editor/numbers'
-Scrollbar = require '../editor/scrollbar'
-Minimap   = require '../editor/minimap'
 log       = require '../tools/log'
 
 class LogView extends ViewBase
@@ -17,11 +14,7 @@ class LogView extends ViewBase
         
         @fontSizeDefault = 12
         
-        super viewElem
-        
-        @scrollbar = new Scrollbar @
-        @numbers   = new Numbers @
-        @minimap   = new Minimap @
+        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap']
         
         @setLines @lines
                 

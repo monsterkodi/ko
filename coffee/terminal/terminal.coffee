@@ -5,9 +5,6 @@
 #    000     00000000  000   000  000   000  000  000   000  000   000  0000000
 
 ViewBase  = require '../editor/viewbase'
-Numbers   = require '../editor/numbers'
-Scrollbar = require '../editor/scrollbar'
-Minimap   = require '../editor/minimap'
 syntax    = require '../editor/syntax'
 ansiDiss  = require '../tools/ansidiss'
 log       = require '../tools/log'
@@ -18,11 +15,8 @@ class Terminal extends ViewBase
         
         @fontSizeDefault = 15
         
-        super viewElem
-        
-        @scrollbar = new Scrollbar @
-        @numbers   = new Numbers @
-        @minimap   = new Minimap @        
+        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap'] # Autocomplete?
+
         @ansidiss  = new ansiDiss()    
         
         @setLines @lines   

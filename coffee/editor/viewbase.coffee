@@ -8,19 +8,19 @@ characterWidth,
 setStyle,
 clamp,
 last,
-$}        = require '../tools/tools'
-prefs     = require '../tools/prefs'
-drag      = require '../tools/drag'
-keyinfo   = require '../tools/keyinfo'
-log       = require '../tools/log'
-str       = require '../tools/str'
-render    = require './render'
-syntax    = require './syntax'
-scroll    = require './scroll'
-Editor    = require './editor'
-_         = require 'lodash'
-electron  = require 'electron'
-clipboard = electron.clipboard
+$}         = require '../tools/tools'
+prefs      = require '../tools/prefs'
+drag       = require '../tools/drag'
+keyinfo    = require '../tools/keyinfo'
+log        = require '../tools/log'
+str        = require '../tools/str'
+render     = require './render'
+syntax     = require './syntax'
+scroll     = require './scroll'
+Editor     = require './editor'
+_          = require 'lodash'
+electron   = require 'electron'
+clipboard  = electron.clipboard
 
 class ViewBase extends Editor
 
@@ -30,16 +30,17 @@ class ViewBase extends Editor
     # 000  000  0000  000     000   
     # 000  000   000  000     000   
 
-    constructor: (viewElem) ->
+    constructor: (viewElem, @config) ->
         @name = viewElem
         @name = @name.slice 1 if @name[0] == '.'
         @view = $(viewElem)
+        @view.onpaste = (event) => log "view on paste #{@name}", event
         @initLayers ["selections", "highlights", "numbers", "lines", "cursors"]
         @elem = $('.lines', @view)
         @diss = []
         @size = {}
         @syntax = new syntax @
-    
+                
         @setFontSize prefs.get "#{@name}FontSize", @fontSizeDefault
 
         @scroll = new scroll 
@@ -53,8 +54,20 @@ class ViewBase extends Editor
 
         @view.onkeydown = @onKeyDown
         @initDrag()    
+        
         super
-
+        
+        # 00000000  00000000   0000000   000000000  000   000  00000000   00000000   0000000
+        # 000       000       000   000     000     000   000  000   000  000       000     
+        # 000000    0000000   000000000     000     000   000  0000000    0000000   0000000 
+        # 000       000       000   000     000     000   000  000   000  000            000
+        # 000       00000000  000   000     000      0000000   000   000  00000000  0000000 
+        
+        for feature in @config.features
+            featureName = feature.toLowerCase()
+            featureClss = require "./#{featureName}"
+            @[featureName] = new featureClss @                
+            
     # 000       0000000   000   000  00000000  00000000    0000000
     # 000      000   000   000 000   000       000   000  000     
     # 000      000000000    00000    0000000   0000000    0000000 
@@ -88,6 +101,7 @@ class ViewBase extends Editor
         if @scroll.viewHeight != @viewHeight()
             @scroll.setViewHeight @viewHeight()        
         @scroll.setNumLines @lines.length
+        @emit  'linesAppended', ts
         @emit 'numLines', @lines.length
         
     setLines: (lines) ->
@@ -114,28 +128,17 @@ class ViewBase extends Editor
         # log "viewbase.setFontSize className #{@view.className} size #{fontSize}"
         @view.style.fontSize = "#{fontSize}px"
         # setStyle '.'+@view.className, 'font-size', "#{fontSize}px"
-        @size.numbersWidth = 50
+        @size.numbersWidth = 'Numbers' in @config.features and 50 or 0
         @size.fontSize     = fontSize
         @size.lineHeight   = fontSize + Math.floor(fontSize/6)
         @size.charWidth    = fontSize * 0.6 # characterWidth @elem, 'line'
         @size.offsetX      = Math.floor @size.charWidth/2 + @size.numbersWidth
         # log "viewbase.setFontSize #{fontSize} charWidth #{@size.charWidth}"
         # log "viewbase.setFontSize className #{@view.className} fontSize #{@size.fontSize} lineHeight #{@size.lineHeight}"
-        
+
         @scroll?.setLineHeight @size.lineHeight
             
         @emit 'fontSizeChanged'
-
-    # 000   000  000   000  00     00  0000000    00000000  00000000    0000000
-    # 0000  000  000   000  000   000  000   000  000       000   000  000     
-    # 000 0 000  000   000  000000000  0000000    0000000   0000000    0000000 
-    # 000  0000  000   000  000 0 000  000   000  000       000   000       000
-    # 000   000   0000000   000   000  0000000    00000000  000   000  0000000 
-    
-    hideNumbers: ->
-        @size.numbersWidth = 0
-        @size.offsetX      = Math.floor @size.charWidth/2
-        @scroll?.reset()
 
     #  0000000   0000000    0000000    000      000  000   000  00000000
     # 000   000  000   000  000   000  000      000  0000  000  000     
@@ -167,7 +170,9 @@ class ViewBase extends Editor
             [li,ch,oi] = change
             # log "viewbase.changed li #{li} change #{ch} oi #{oi} @lines[li] #{@lines[li]} diss", @syntax.getDiss li
             switch ch
-                when 'changed' then @updateLine li, oi
+                when 'changed' 
+                    @updateLine li, oi
+                    @emit 'lineChanged', li
                 when 'deleted'  
                     numChanges -= 1 
                     @deleteLine li, oi
@@ -199,8 +204,8 @@ class ViewBase extends Editor
     deleteLine: (li, oi) ->
         # log "viewbase.deleteLine li #{li} oi #{oi}"
         @elem.children[oi - @scroll.exposeTop]?.remove()
-        @emit 'lineDeleted', oi - @scroll.exposeTop
         @scroll.deleteLine li, oi
+        @emit 'lineDeleted', oi - @scroll.exposeTop
         
     # 000  000   000   0000000  00000000  00000000   000000000
     # 000  0000  000  000       000       000   000     000   
@@ -213,8 +218,8 @@ class ViewBase extends Editor
         div.innerHTML = @renderLineAtIndex li
         # log "viewbase.insertLine li #{li} oi #{oi}", div.innerHTML
         @elem.insertBefore div, @elem.children[oi - @scroll.exposeTop]
-        @emit 'lineInserted', li
         @scroll.insertLine li, oi
+        @emit 'lineInserted', li
         
     # 00000000  000   000  00000000    0000000    0000000  00000000
     # 000        000 000   000   000  000   000  000       000     

@@ -22,6 +22,7 @@
     - from buffer
     - from similar files
 - *alt-click: jump to definition*
+- *make pasteable from clippo*
 - check undo (merges too much?)
 - don't clear undo buffer on save?
 - save backup files?

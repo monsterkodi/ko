@@ -61,6 +61,7 @@ class Editor extends Buffer
     setLines: (lines) ->
         super lines
         @do.reset()
+        @emit 'linesSet', @lines
                             
     #  0000000  000  000   000   0000000   000      00000000
     # 000       000  0000  000  000        000      000     
@@ -595,6 +596,7 @@ class Editor extends Buffer
             
         @insertCharacter ch
         @do.end()
+        @emit 'characterInserted', ch
     
     insertCharacter: (ch, opt) ->
 

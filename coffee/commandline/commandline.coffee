@@ -17,9 +17,8 @@ class Commandline extends ViewBase
             
         @fontSizeDefault = 24
 
-        super viewElem
+        super viewElem, features: []
         
-        @hideNumbers()
         @size.lineHeight = @scroll.viewHeight
         @scroll?.setLineHeight @size.lineHeight
         @setText ""

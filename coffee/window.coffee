@@ -142,7 +142,7 @@ openFiles = (ofiles, options) =>
             return []
         setState 'openFilePath', path.dirname files[0]                    
         if not options?.newWindow
-            log "window.openFiles not new window"
+            # log "window.openFiles not new window"
             loadFile resolve files.shift()
         for file in files
             ipc.send 'newWindowWithFile', file
@@ -196,11 +196,11 @@ split = window.split = new Split()
 split.on 'paneHeight', (e) =>
     # log "window.on.split.paneHeight", e
     if e.paneIndex == 0
-        terminal.resized()
+        window.terminal?.resized()
     if e.paneIndex == 2
-        editor.resized()
+        window.editor?.resized()
     if e.paneIndex == 3
-        logview.resized()
+        window.logview?.resized()
 
 # 000000000  00000000  00000000   00     00  000  000   000   0000000   000    
 #    000     000       000   000  000   000  000  0000  000  000   000  000    
