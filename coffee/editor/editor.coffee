@@ -800,7 +800,8 @@ class Editor extends Buffer
         @closingSurround = cr
 
         for s in @selections
-                
+            ns = newSelections[@indexOfSelection s]
+            leftdelta = cl.length
             if cl == '#{'
                 # convert single string to double string
                 if sr = @rangeOfStringSurroundingRange s
@@ -808,14 +809,25 @@ class Editor extends Buffer
                         @do.change @lines, s[0], @lines[s[0]].splice sr[1][0], 1, '"'
                     if @lines[sr[0]][sr[1][1]-1] == "'"
                         @do.change @lines, s[0], @lines[s[0]].splice sr[1][1]-1, 1, '"'
+            else if cl == '('
+                # remove space after callee
+                before = @lines[s[0]].slice 0, s[1][0]
+                trimmed = before.trimRight()
+                if not /(if|when|in|and|or|is|not)$/.test trimmed
+                    spaces = before.length-trimmed.length
+                    @do.change @lines, s[0], @lines[s[0]].splice trimmed.length, spaces
+                    ns[1][0] -= spaces
+                    ns[1][1] -= spaces
+                    leftdelta -= spaces
 
-            @do.change @lines, s[0], @lines[s[0]].splice s[1][1], 0, cr
-            @do.change @lines, s[0], @lines[s[0]].splice s[1][0], 0, cl
+            @do.change @lines, s[0], @lines[s[0]].splice ns[1][1], 0, cr
+            @do.change @lines, s[0], @lines[s[0]].splice ns[1][0], 0, cl
                             
-            newSelections[@indexOfSelection s][1][0] += cl.length
-            newSelections[@indexOfSelection s][1][1] += cl.length
+            ns[1][0] += cl.length
+            ns[1][1] += cl.length
+            
             for c in @cursorsInRange s
-                @newCursorDelta newCursors, c, cl.length
+                @newCursorDelta newCursors, c, leftdelta
                 
         @do.selections newSelections
         @do.cursors newCursors

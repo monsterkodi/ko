@@ -41,12 +41,9 @@
 - multicursors when pasting multiple lines at col > 0
 - *align cursors with inserting spaces when ctrl+alt+right*
 - *ctrl+command+/  align cursors block*
-- *indent one level more when inserting newline ...*
-    - after =>, -> 
-    - when next line is indented one level more?
+- indent more when inserting newline and next line is indented more?
 - *dbg "class.method arg: #{arg}, ..."*
-- fix surround at end of line
-- command-enter: deselect, insert newline, indent, and single cursor
+- *command-enter: deselect, insert newline, indent, and single cursor*
 - move mainCursor to leftmost/rightmost cursor in its line on 'left'/'right' actions
 - highlight cursor line(s?)
 
