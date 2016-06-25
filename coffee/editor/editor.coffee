@@ -138,8 +138,9 @@ class Editor extends Buffer
         @do.start()
         newSelections = _.cloneDeep @selections
         newSelections.push range
+        @mainCursor = @rangeEndPos(range)
+        @do.cursors (@rangeEndPos(r) for r in newSelections)
         @do.selections newSelections
-        @do.cursors [@rangeEndPos range]
         @do.end()
 
     selectNone: => @do.selections []
@@ -573,24 +574,34 @@ class Editor extends Buffer
     # 000  000   000  0000000   00000000  000   000     000   
     
     insertUserCharacter: (ch) ->
+        @do.start()
         @clearHighlights()
-        @clampCursors() # todo: insert spaces instead in multi cursor mode
+        if @cursors.length == 1
+            @clampCursors()
+        else
+            for c in @cursors # fill spaces between line ends and cursors
+                if c[0] > @lines[c[1]].length
+                    @do.change @lines, c[1], @lines[c[1]].splice c[0], 0, _.padStart '', c[0]-@lines[c[1]].length
+                
         if ch in @surroundCharacters
-            return if @insertSurroundCharacter ch
+            if @insertSurroundCharacter ch
+                @do.end()
+                return
 
         if ch == '\n'
             @insertNewline indent:true
+            @do.end()
             return
             
         @insertCharacter ch
+        @do.end()
     
-    insertCharacter: (ch) ->
+    insertCharacter: (ch, opt) ->
 
         if ch == '\n'
-            @insertNewline indent:false
+            @insertNewline()
             return
 
-        @do.start()
         @deleteSelection()
         newCursors = _.cloneDeep @cursors
         
@@ -605,7 +616,6 @@ class Editor extends Buffer
                         nc[0] += 1
 
         @do.cursors newCursors
-        @do.end()
         
     insertTab: ->
         if @selections.length
@@ -642,7 +652,9 @@ class Editor extends Buffer
             if @isCursorAtEndOfLine oc
                 @do.insert @lines, oc[1]+1, indent
             else
-                @do.insert @lines, oc[1]+1, indent + @lines[oc[1]].substr(oc[0]).trimLeft()
+                rest = @lines[oc[1]].substr(oc[0])
+                rest = rest.trimLeft() if opt?.indent
+                @do.insert @lines, oc[1]+1, indent + rest
                 @do.change @lines, oc[1],   @lines[oc[1]].substr 0, oc[0]
 
             # move cursors in and below deleted line down
@@ -654,15 +666,55 @@ class Editor extends Buffer
         @do.cursors newCursors    
         @do.end()
         
-    insertTextFromClipboard: (text) -> #todo: insert multiple lines into multiple selections
-        @do.start()
+    # 00000000    0000000    0000000  000000000  00000000
+    # 000   000  000   000  000          000     000     
+    # 00000000   000000000  0000000      000     0000000 
+    # 000        000   000       000     000     000     
+    # 000        000   000  0000000      000     00000000
+        
+    paste: (text) -> 
+        
+        @do.start()        
+        @deleteSelection()        
+        
         l = text.split '\n'
-        if @cursorPos()[0] == 0 and @cursorPos()[1] > 0
-            @moveCursorsUp()
-            @moveCursorsToLineBoundary 'right'
-            @insertNewline()
-        for ch in text
-            @insertCharacter ch
+        if @cursors.length > 1 and l.length == 1
+            l = (l[0] for c in @cursors)
+        
+        if @cursors.length > 1 or l.length == 1 and not @isCursorAtStartOfLine()
+            newCursors = _.cloneDeep @cursors
+            # log "insert.paste: paste #{l.length} lines into #{@cursors.length} cursors"
+            for ci in [@cursors.length-1..0]
+                c = @cursors[ci]
+                insert = l[ci % l.length]
+                @do.change @lines, c[1], @lines[c[1]].splice c[0], 0, insert
+                for c in @positionsAfterLineColInPositions c[1], c[0], @cursors
+                    @newCursorDelta newCursors, c, insert.length
+        else
+            # log "insert.paste: paste #{l.length} lines into single cursor"
+            cp = @cursorPos()
+            li = cp[1]
+            if not @isCursorAtStartOfLine()
+                rest = @lines[li].substr(@cursorPos()[0]).trimLeft()
+                indt = _.padStart "", @indentationAtLineIndex cp[1] 
+                before = @lines[cp[1]].substr 0, cp[0]
+                if before.trim().length
+                    @do.change @lines, li, before
+                    li += 1
+                    if (indt + rest).trim().length
+                        l.push indt + rest
+                        @mainCursor = [0,li+l.length-1]
+                    else
+                        @mainCursor = null
+            else 
+                @mainCursor = null
+            for line in l
+                @do.insert @lines, li, line
+                li += 1
+            @mainCursor = [0, li] if not @mainCursor?           
+            newCursors = [@mainCursor]
+                
+        @do.cursors newCursors
         @do.end()
     
     #  0000000  000   000  00000000   00000000    0000000   000   000  000   000  0000000  

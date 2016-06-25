@@ -490,17 +490,15 @@ class ViewBase extends Editor
                     if @posForEvent(event)[1] == @tripleClickLineIndex
                         clearTimeout @tripleClickTimer                        
                         @tripleClickTimer = setTimeout @onTripleClickDelay, 1500
-                        # log "viewbase.drag.onStart #{@tripleClickTimer} #{@doubleClicked} #{@tripleClicked}"
                         if not @tripleClicked
                             @tripleClicked = true
-                            r = @rangeForLineAtIndex @cursors[0][1]
-                            if event.shiftKey
+                            r = @rangeForLineAtIndex @tripleClickLineIndex
+                            if event.metaKey
                                 @addRangeToSelection r
                             else
                                 @selectSingleRange r
                         return
                     else if @tripleClickTimer
-                        clearTimeout @tripleClickTimer
                         @onTripleClickDelay()
                         
                 @view.focus()
@@ -513,22 +511,23 @@ class ViewBase extends Editor
             onMove: (drag, event) => 
                 p = @posForEvent event
                 if event.metaKey
-                    @addCursorAtPos [last(@cursors)[0], p[1]]  # todo: nearest cursor instead of last
+                    @addCursorAtPos [@mainCursor[0], p[1]]  # todo: nearest cursor instead of last
                 else
                     @singleCursorAtPos p, true
                 
         @view.ondblclick = (event) =>
             range = @rangeForWordAtPos @posForEvent event
-            if event.shiftKey
+            if event.metaKey
                 @addRangeToSelection range
             else
                 @selectSingleRange range
+            @onTripleClickDelay()
             @doubleClicked = true
             @tripleClickTimer = setTimeout @onTripleClickDelay, 1500
             @tripleClickLineIndex = range[0]
                         
     onTripleClickDelay: => 
-        # log "viewbase.onTripleClickDelay #{@tripleClickTimer}"
+        clearTimeout @tripleClickTimer
         @tripleClickTimer = null
         @tripleClickLineIndex = -1
         @doubleClicked = @tripleClicked = false
@@ -574,7 +573,7 @@ class ViewBase extends Editor
             when 'command+shift+z'          then return @do.redo()
             when 'delete', 'ctrl+backspace' then return @deleteForward()     
             when 'backspace'                then return @deleteBackward()     
-            when 'command+v'                then return @insertTextFromClipboard clipboard.readText()
+            when 'command+v'                then return @paste clipboard.readText()
             when 'command+x'   
                 @do.start()
                 clipboard.writeText @textOfSelectionForClipboard()

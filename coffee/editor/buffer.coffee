@@ -264,6 +264,7 @@ class Buffer extends event
         (r for r in pl when ((r[1] > p[1]) or ((r[1] == p[1]) and (r[0] >= p[0]))))
     positionsInLineAtIndexInPositions: (li,pl) -> (p for p in pl when p[1] == li)
     positionsBelowLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] > li)
+    positionsAfterLineColInPositions: (li,col,pl) -> (p for p in pl when p[1] == li and p[0]>=col)
 
     # 00000000    0000000   000   000   0000000   00000000
     # 000   000  000   000  0000  000  000        000     
