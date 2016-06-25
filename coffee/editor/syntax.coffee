@@ -29,13 +29,14 @@ class syntax
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
     changed: (changeInfo) ->
-        if changeInfo.deleted.length or changeInfo.inserted.length or changeInfo.changed.length
-            # log 'syntax.sorted', changeInfo.sorted if @editor.name is 'terminal'
-            for [li, change] in changeInfo.sorted
-                switch change
-                    when 'deleted'  then @diss.splice li, 1
-                    when 'inserted' then @diss.splice li, 0, @dissForLineIndex li
-                    when 'changed'  then @diss[li] = @dissForLineIndex li
+        if changeInfo.sorted.length
+            # log "syntax.sorted diss[0..5] before", @diss.slice 0,5 if @editor.name is 'editor'
+            for [li, ch, oi] in changeInfo.sorted                
+                switch ch
+                    when 'deleted'  then @diss.splice oi, 1
+                    when 'inserted' then @diss.splice oi, 0, @dissForLineIndex li
+                    when 'changed'  then @diss[oi] = @dissForLineIndex li
+            log "syntax.sorted diss[0..5] after", @diss.slice 0,5 if @editor.name is 'editor'
                 
     #  0000000  000      00000000   0000000   00000000 
     # 000       000      000       000   000  000   000

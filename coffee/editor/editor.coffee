@@ -633,6 +633,12 @@ class Editor extends Buffer
             @do.cursors newCursors
             @do.end()   
         
+    # 000   000  00000000  000   000  000      000  000   000  00000000
+    # 0000  000  000       000 0 000  000      000  0000  000  000     
+    # 000 0 000  0000000   000000000  000      000  000 0 000  0000000 
+    # 000  0000  000       000   000  000      000  000  0000  000     
+    # 000   000  00000000  00     00  0000000  000  000   000  00000000
+        
     insertNewline: (opt) ->
         @closingInserted = null
         @do.start()
@@ -640,28 +646,26 @@ class Editor extends Buffer
         
         newCursors = _.cloneDeep @cursors
 
-        for c in @cursors
-            oc = _.cloneDeep newCursors[@indexOfCursor c]                
+        for c in @cursors.reversed()
             if opt?.indent
-                indent = _.padStart "", @indentationAtLineIndex oc[1]            
+                indent = _.padStart "", @indentationAtLineIndex c[1]
             else
                 indent = ''
 
-            ll = oc[0]
+            bl = c[0]
                 
-            if @isCursorAtEndOfLine oc
-                @do.insert @lines, oc[1]+1, indent
+            if @isCursorAtEndOfLine c
+                @do.insert @lines, c[1]+1, indent
             else
-                rest = @lines[oc[1]].substr(oc[0])
+                rest = @lines[c[1]].substr(c[0])
                 rest = rest.trimLeft() if opt?.indent
-                @do.insert @lines, oc[1]+1, indent + rest
-                @do.change @lines, oc[1],   @lines[oc[1]].substr 0, oc[0]
+                @do.insert @lines, c[1]+1, indent + rest
+                @do.change @lines, c[1],   @lines[c[1]].substr 0, c[0]
 
             # move cursors in and below deleted line down
-            for nc in @positionsFromPosInPositions oc, newCursors
-                if nc[1] == oc[1]
-                    nc[0] += indent.length - ll                    
-                nc[1] += 1     
+            for nc in @positionsFromPosInPositions c, newCursors                
+                nc[0] += indent.length - bl if nc[1] == c[1]
+                nc[1] += 1   
         
         @do.cursors newCursors    
         @do.end()
@@ -801,17 +805,23 @@ class Editor extends Buffer
     # 000   000  000       000      000          000     000     
     # 0000000    00000000  0000000  00000000     000     00000000
     
-    joinLineOfCursor: (c) -> # todo: multicursor
-        if not @isCursorInLastLine c
-            @do.start()
-            @do.change @lines, c[1], @lines[c[1]] + @lines[c[1]+1]
-            @do.delete @lines, c[1]+1
-            @do.end()
-            
-    joinLine: ->
+    joinLines: ->
         @do.start()
-        for c in @cursors
-            @joinLineOfCursor c
+        newCursors = []
+        for c in @cursors.reversed()
+            if not @isCursorInLastLine c
+                before = @lines[c[1]].trimRight() + " "
+                after  = @lines[c[1]+1].trimLeft()
+                @do.change @lines, c[1], before + after
+                @do.delete @lines, c[1]+1
+                newCursors.push [before.length, c[1]]
+                for c in @positionsInLineAtIndexInPositions c[1]+1, newCursors 
+                    c[1] -= 1
+                    c[0] += before.length
+                for c in @positionsBelowLineIndexInPositions c[1], newCursors 
+                    c[1] -= 1
+        @do.cursors newCursors
+        @mainCursor = first @cursors
         @do.end()
             
     deleteLineAtIndex: (i) ->

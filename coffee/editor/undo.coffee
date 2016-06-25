@@ -51,20 +51,23 @@ class undo
         @getChangeInfo()
         if @changeInfo.changed.indexOf(i) < 0
             @changeInfo.changed.push i
-            @changeInfo.sorted.push [i, 'changed']
+            @changeInfo.sorted.push [i, 'changed', i]
 
     changeInfoLineInsert: (i) ->
         @getChangeInfo()
         @changeInfo.inserted.push i
-        @changeInfo.sorted.push [i, 'inserted']
+        for c in @changeInfo.sorted
+            if c[0] >= i
+                c[0] += 1
+        @changeInfo.sorted.push [i, 'inserted', i]
 
     changeInfoLineDelete: (i) ->
         @getChangeInfo()
         @changeInfo.deleted.push i
-        # for c in @changeInfo.sorted
-        #     if c[0] > i
-        #         c[0] -= 1
-        @changeInfo.sorted.push [i, 'deleted']        
+        for c in @changeInfo.sorted
+            if c[0] > i
+                c[0] -= 1
+        @changeInfo.sorted.push [i, 'deleted', i]        
         
     changeInfoCursor: ->
         @getChangeInfo()
@@ -134,6 +137,7 @@ class undo
         if @actions.length
             @newChangeInfo()
             action = @actions.pop()
+            log "undo.undo", action
             if action.lines.length
                 for i in [action.lines.length-1..0]
                     @undoLine action.lines[i]
@@ -249,8 +253,8 @@ class undo
     
     modify: (change) ->
         lines = @lastAction().lines
-        if lines.length and lines[lines.length-1].index == change.index
-            lines[lines.length-1].after = change.after
+        if lines.length and last(lines).index == change.index and change.before?
+            last(lines).after = change.after
         else
             lines.push change
     
@@ -321,12 +325,12 @@ class undo
         @changeInfo.changed.sort  (a,b) -> a-b
         @changeInfo.cursor.sort   (a,b) -> a-b
         
-        if @changeInfo.sorted.length
-            deleted = [] # move deleted to front
-            for i in [@changeInfo.sorted.length-1..0]
-                if @changeInfo.sorted[i][1] == 'deleted'
-                    deleted.unshift @changeInfo.sorted.splice(i, 1)[0]
-            @changeInfo.sorted = deleted.concat @changeInfo.sorted
+        # if @changeInfo.sorted.length
+        #     deleted = [] # move deleted to front
+        #     for i in [@changeInfo.sorted.length-1..0]
+        #         if @changeInfo.sorted[i][1] == 'deleted'
+        #             deleted.unshift @changeInfo.sorted.splice(i, 1)[0]
+        #     @changeInfo.sorted = deleted.concat @changeInfo.sorted
         # log 'cleanChangeInfo', @changeInfo
                 
     # 00     00  00000000  00000000    0000000   00000000

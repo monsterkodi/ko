@@ -158,21 +158,22 @@ class ViewBase extends Editor
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
     changed: (changeInfo) ->
-        # log "viewbase.changed .. #{changeInfo.sorted}"
+        log "viewbase.changed .. #{changeInfo.sorted}" if changeInfo.sorted.length
         @syntax.changed changeInfo
         
-        numChanges = 0        
-        for change in changeInfo.sorted
-            [li,ch] = change
-            # log "viewbase.changed li #{li} change #{ch}"
+        numChanges = 0   
+        changes = _.cloneDeep changeInfo.sorted    
+        while (change = changes.shift())
+            [li,ch,oi] = change
+            log "viewbase.changed li #{li} change #{ch} oi #{oi} @lines[li] #{@lines[li]} diss", @syntax.getDiss li
             switch ch
-                when 'changed'  then @updateLine li
+                when 'changed' then @updateLine li, oi
                 when 'deleted'  
                     numChanges -= 1 
-                    @deleteLine li
+                    @deleteLine li, oi
                 when 'inserted' 
                     numChanges += 1
-                    @insertLine li
+                    @insertLine li, oi
                         
         if changeInfo.cursor.length
             @renderCursors()
@@ -195,12 +196,11 @@ class ViewBase extends Editor
     # 000   000  000       000      000          000     000     
     # 0000000    00000000  0000000  00000000     000     00000000
 
-    deleteLine: (li) ->
-        ri = li - @scroll.exposeTop
-        # log "viewbase.deleteLine #{li} ri #{ri}"
-        @elem.children[ri]?.remove()
-        @emit 'lineDeleted', li
-        @scroll.deleteLine li
+    deleteLine: (li, oi) ->
+        # log "viewbase.deleteLine li #{li} oi #{oi}"
+        @elem.children[oi - @scroll.exposeTop]?.remove()
+        @emit 'lineDeleted', oi - @scroll.exposeTop
+        @scroll.deleteLine li, oi
         
     # 000  000   000   0000000  00000000  00000000   000000000
     # 000  0000  000  000       000       000   000     000   
@@ -208,14 +208,13 @@ class ViewBase extends Editor
     # 000  000  0000       000  000       000   000     000   
     # 000  000   000  0000000   00000000  000   000     000   
         
-    insertLine: (li) ->
-        ri = li - @scroll.exposeTop
-        # log "viewbase.insertLine #{li} ri #{ri}"
+    insertLine: (li, oi) ->        
         div = @addLine()
         div.innerHTML = @renderLineAtIndex li
-        @elem.insertBefore div, @elem.children[ri]
+        # log "viewbase.insertLine li #{li} oi #{oi}", div.innerHTML
+        @elem.insertBefore div, @elem.children[oi - @scroll.exposeTop]
         @emit 'lineInserted', li
-        @scroll.insertLine li
+        @scroll.insertLine li, oi
         
     # 00000000  000   000  00000000    0000000    0000000  00000000
     # 000        000 000   000   000  000   000  000       000     
@@ -309,14 +308,11 @@ class ViewBase extends Editor
             c.style.transform = "translate(#{@size.offsetX}px,#{y}px)"
             y += @size.lineHeight
                 
-    updateLine: (li) ->
+    updateLine: (li, oi) ->
         if @scroll.exposeTop <= li < @lines.length
-            relIndex = li - @scroll.exposeTop
             span = @renderLineAtIndex li
-            # log "viewbase.updateLine li #{li} relIndex #{relIndex}"
-            @elem.children[relIndex]?.innerHTML = span
-        # else 
-        #     @vanishLine()
+            # log "viewbase.updateLine li #{li} oi #{oi}", span
+            @elem.children[oi - @scroll.exposeTop]?.innerHTML = span
 
     # 00000000   00000000  000   000  0000000    00000000  00000000 
     # 000   000  000       0000  000  000   000  000       000   000
@@ -556,7 +552,7 @@ class ViewBase extends Editor
             when 'enter'                    then return @insertNewline indent:true
             when 'command+]'                then return @indent()
             when 'command+['                then return @deIndent()
-            when 'command+j'                then return @joinLine()
+            when 'command+j'                then return @joinLines()
             when 'command+/'                then return @toggleComment()
             when 'command+a'                then return @selectAll()
             when 'command+shift+a'          then return @selectNone()

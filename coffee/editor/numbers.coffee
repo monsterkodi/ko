@@ -92,10 +92,7 @@ class Numbers
     # 000  000  0000       000  000       000   000     000     000       000   000
     # 000  000   000  0000000   00000000  000   000     000     00000000  0000000  
         
-    onLineInserted: (li) =>
-        top = @editor.scroll.exposeTop
-        bot = @editor.scroll.exposeBot                
-        @elem.appendChild @addLine @editor.scroll.exposeBot+1
+    onLineInserted: (li) => @elem.appendChild @addLine @elem.children.length - @editor.scroll.exposeTop
         
     # 0000000    00000000  000      00000000  000000000  00000000  0000000  
     # 000   000  000       000      000          000     000       000   000

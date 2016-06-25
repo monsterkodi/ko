@@ -49,11 +49,7 @@
 - fix surround at end of line
 - command-enter: deselect, insert newline, indent, and single cursor
 - move mainCursor to leftmost/rightmost cursor in its line on 'left'/'right' actions
-
-#### cursors
 - highlight cursor line(s?)
-- insert spaces when inserting at virtual cursors
-- *paste multiple lines into multiple selections/cursors*
 
 #### open
 - show relative path when navigating in history

@@ -207,14 +207,14 @@ class scroll extends events
     # 000  000  0000       000  000       000   000     000   
     # 000  000   000  0000000   00000000  000   000     000   
     
-    insertLine: (li) =>
+    insertLine: (li,oi) =>
         # log "scroll.insertLine #{li}", @info()
         @numLines += 1
         @fullHeight = @numLines * @lineHeight
-        @exposeTop += 1 if li < @exposeTop
-        @exposeBot += 1 if li <= @exposeBot or li == @numLines-1
-        @top += 1 if li < @top
-        @bot += 1 if li <= @bot
+        @exposeTop += 1 if oi < @exposeTop
+        @exposeBot += 1 if oi <= @exposeBot or oi == @numLines-1
+        @top += 1 if oi < @top
+        @bot += 1 if oi <= @bot
         @exposed = @exposeBot - @exposeTop
         # log "scroll.insertLine #{li}", @info()
         @calc()
@@ -225,14 +225,14 @@ class scroll extends events
     # 000   000  000       000      000          000     000     
     # 0000000    00000000  0000000  00000000     000     00000000
 
-    deleteLine: (li) =>
+    deleteLine: (li,oi) =>
         # log "scroll.deleteLine #{li}", @info()
         @numLines -= 1
         @fullHeight = @numLines * @lineHeight
-        @exposeTop -= 1 if li < @exposeTop
-        @exposeBot -= 1 if li <= @exposeBot
-        @top -= 1 if li < @top
-        @bot -= 1 if li <= @bot
+        @exposeTop -= 1 if oi < @exposeTop
+        @exposeBot -= 1 if oi <= @exposeBot
+        @top -= 1 if oi < @top
+        @bot -= 1 if oi <= @bot
         @exposed = @exposeBot - @exposeTop
         # log "scroll.deleteLine #{li}", @info()
         @calc()
