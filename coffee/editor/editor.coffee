@@ -647,20 +647,43 @@ class Editor extends Buffer
         newCursors = _.cloneDeep @cursors
 
         for c in @cursors.reversed()
+        
+            after = @lines[c[1]].substr(c[0])
+            after = after.trimLeft() if opt?.indent
+            before =  @lines[c[1]].substr 0, c[0]
+        
             if opt?.indent
-                indent = _.padStart "", @indentationAtLineIndex c[1]
+                line = before.trimRight()
+                il = 0
+                for e in ['->', '=>', ':', ',', '=']
+                    if line.endsWith e
+                        il = @indentString.length
+                if il == 0
+                    if /(else\s*$|switch|for|while|class)/.test before
+                        il = @indentString.length
+                    else if /^(\s+when|\s*if)(?!.*\sthen\s)/.test line
+                        il = @indentString.length 
+                if /(when|if)/.test before
+                    if after.startsWith 'then '
+                        after = after.slice(4).trimLeft()
+                    else if before.trim().endsWith 'then'
+                        before = before.trimRight()
+                        before = before.slice 0, before.length-4
+                        
+                else if before.trim().startsWith 'return'
+                    il = - @indentString.length 
+                il += @indentationAtLineIndex c[1]
+                indent = _.padStart "", il
             else
                 indent = ''
 
             bl = c[0]
-                
+            
             if @isCursorAtEndOfLine c
                 @do.insert @lines, c[1]+1, indent
             else
-                rest = @lines[c[1]].substr(c[0])
-                rest = rest.trimLeft() if opt?.indent
-                @do.insert @lines, c[1]+1, indent + rest
-                @do.change @lines, c[1],   @lines[c[1]].substr 0, c[0]
+                @do.insert @lines, c[1]+1, indent + after
+                @do.change @lines, c[1],   before
 
             # move cursors in and below deleted line down
             for nc in @positionsFromPosInPositions c, newCursors                

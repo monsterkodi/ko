@@ -165,8 +165,8 @@ openFile = (options) =>
         defaultPath: getState 'openFilePath',  dir
         properties: ['openFile', 'openDirectory', 'multiSelections']
         filters: [
-                name: 'Coffee-Script', extensions: ['coffee']
-                name: 'All Files', extensions: ['*']
+            name: 'Coffee-Script', extensions: ['coffee']
+            name: 'All Files', extensions: ['*']
         ]
         , (files) => openFiles files, options
 
@@ -176,8 +176,8 @@ saveFileAs = =>
         defaultPath: editor.currentFile
         properties: ['openFile', 'createDirectory']
         filters: [
-                name: 'Coffee-Script', extensions: ['coffee']
-                name: 'All Files', extensions: ['*']
+            name: 'Coffee-Script', extensions: ['coffee']
+            name: 'All Files', extensions: ['*']
         ]
         , (file) => 
             if file

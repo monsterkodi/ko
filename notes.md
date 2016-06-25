@@ -31,20 +31,19 @@
     - comment line characters
 
 #### editing
-- don't scroll when no new range added on command+d
+- don't scroll when no new range added with command+d
 - fix command+up main cursor vanishes at top
-- *trim indentation spaces when joining lines*
 - delete forward swallows spaces?
-- fancy close terminal, commandline or on esc when no highlight is canceled
+- *fancy close terminal, commandline or on esc when no highlight is canceled*
 - on second command+e: select including leading @
 - *#< to add salter header of next word*
 - when pasting text at indent level, remove leading space columns
+- multicursors when pasting multiple lines at col > 0
 - *align cursors with inserting spaces when ctrl+alt+right*
 - *ctrl+command+/  align cursors block*
-- *move cursor to start of next line when pasting and cursor at start of line*
 - *indent one level more when inserting newline ...*
     - after =>, -> 
-    - when next line is indented one level more
+    - when next line is indented one level more?
 - *dbg "class.method arg: #{arg}, ..."*
 - fix surround at end of line
 - command-enter: deselect, insert newline, indent, and single cursor

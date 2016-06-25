@@ -158,14 +158,14 @@ class ViewBase extends Editor
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
     changed: (changeInfo) ->
-        log "viewbase.changed .. #{changeInfo.sorted}" if changeInfo.sorted.length
+        # log "viewbase.changed .. #{changeInfo.sorted}" if changeInfo.sorted.length
         @syntax.changed changeInfo
         
         numChanges = 0   
         changes = _.cloneDeep changeInfo.sorted    
         while (change = changes.shift())
             [li,ch,oi] = change
-            log "viewbase.changed li #{li} change #{ch} oi #{oi} @lines[li] #{@lines[li]} diss", @syntax.getDiss li
+            # log "viewbase.changed li #{li} change #{ch} oi #{oi} @lines[li] #{@lines[li]} diss", @syntax.getDiss li
             switch ch
                 when 'changed' then @updateLine li, oi
                 when 'deleted'  

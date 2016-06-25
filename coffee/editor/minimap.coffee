@@ -78,12 +78,13 @@ class Minimap
         # @log "minimap.drawLines #{top}..#{bot} #{@scroll.exposeTop}..#{@scroll.exposeBot}"
         for li in [top..bot]
             diss = @editor.syntax.getDiss li
-            # @log "diss.length #{diss?.length}"
+            # @log "minimap.drawLines li #{li} diss", diss
             if diss?.length
+                y = parseInt((li-@scroll.exposeTop)*@scroll.lineHeight)
+                ctx.clearRect 0, y, @width, @scroll.lineHeight
                 for r in diss
                     break if 2*r.start >= @width
-                    ctx.fillStyle = @editor.syntax.colorForClassnames r.clss + " minimap"
-                    y = parseInt((li-@scroll.exposeTop)*@scroll.lineHeight)
+                    ctx.fillStyle = @editor.syntax.colorForClassnames r.clss + " minimap"                    
                     # @log "minimap.drawLines y:#{y}"
                     ctx.fillRect @offsetLeft+2*r.start, y, 2*r.match.length, @scroll.lineHeight
                 
@@ -94,8 +95,9 @@ class Minimap
         lh = @scroll.lineHeight/2
         tb = (@editor.scroll.bot-@editor.scroll.top+1)*lh
         ctx.fillStyle = "rgba(255,255,255,0.15)"
-        y = parseInt @scroll.lineHeight * (@editor.scroll.top-@scroll.exposeTop*@scroll.lineHeight)
-        ctx.fillRect 0, y, @width, 2*Math.max 0, tb
+        # y = parseInt @scroll.lineHeight * (@editor.scroll.top-@scroll.exposeTop*@scroll.lineHeight)
+        y = parseInt @scroll.lineHeight * @editor.scroll.top - @scroll.exposeTop*@scroll.lineHeight
+        ctx.fillRect 0, y, @width, 2*Math.max 4, tb
         # b = parseInt @scroll.lineHeight * (@scroll.numLines-@scroll.exposeTop*@scroll.lineHeight)
         b = parseInt @scroll.lineHeight * (@editor.lines.length-0.5-@scroll.exposeTop*@scroll.lineHeight)
         ctx.fillRect 0, b, @width, @scroll.lineHeight/2
@@ -118,6 +120,7 @@ class Minimap
     changed: (changeInfo) ->
         ci = changeInfo
         return if not ci.sorted.length
+        # @log "minimap.changed changeInfo",  ci
         
         firstInserted = first(ci.inserted) ? @scroll.exposeBot+1
         firstDeleted  = first(ci.deleted)  ? @scroll.exposeBot+1
@@ -211,7 +214,7 @@ class Minimap
     #  0000000  0000000  00000000  000   000  000   000
     
     clearRange: (top, bot) -> 
-        @log "minimap.clearRange #{top} #{bot}"
+        # @log "minimap.clearRange #{top} #{bot}"
         ctx = @canvas.getContext '2d'
         ctx.clearRect 0, (top-@scroll.exposeTop)*@scroll.lineHeight, 2*@width, (bot-top)*@scroll.lineHeight
         

@@ -71,7 +71,7 @@ class Commandline extends ViewBase
         window.split.showCommandline()
         @command = @commands[name]
         activeClass = "."+document.activeElement.className
-        @command.setFocus activeClass if activeClass != '.commandline-editor'
+        @command.setFocus activeClass != '.commandline-editor' and activeClass or null
         log "commandline.startCommand #{name} focus #{@command.focus}"
         @view.focus()
         @setName name
@@ -89,7 +89,7 @@ class Commandline extends ViewBase
         @setText r.text if r?.text?
         @setName r.name if r?.name?
         if r?.select then @selectAll()
-        else @selectNone() 
+        else @selectNone()
         # log "commandline.results #{@command?} #{@command?.name}", r
         window.split.focus  r.focus  if r?.focus?
         window.split.reveal r.reveal if r?.reveal?
@@ -114,12 +114,12 @@ class Commandline extends ViewBase
     handleModKeyComboEvent: (mod, key, combo, event) ->
         split = window.split
         switch combo
-            when 'enter'            then return @execute()
-            when 'up'               then return @setAndSelectText @command?.prev()
-            when 'down'             then return @setAndSelectText @command?.next()
-            when 'esc'              then return @cancel()
-            when 'command+k'        then return @selectAll() + @deleteSelection()
-            when 'tab', 'shift+tab' then return
+            when 'enter'                 then return @execute()
+            when 'up'                    then return @setAndSelectText @command?.prev()
+            when 'down'                  then return @setAndSelectText @command?.next()
+            when 'esc'                   then return @cancel()
+            when 'command+k'             then return @selectAll() + @deleteSelection()
+            when 'tab', 'shift+tab'      then return
             when 'home', 'command+up'    then return split.do 'maximize editor'
             when 'end', 'command+down'   then return split.do 'maximize terminal'
             when 'page up', 'alt+up'     then return split.do 'enlarge editor'

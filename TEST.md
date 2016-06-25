@@ -6,14 +6,7 @@ aaa bbb aaa
             aaa bbb aaa
                 aaa 
                     bbb
-123
-456
-%%%%
-++
-|
-Xaaa
 aaa bbb aaa
-asdasdasdasd
 asdasdasdasdasdasdasdas
 asdasdasdsadasdasdasdasdas
 asdasdasdasdsadasdasdasdasdasd
@@ -33,6 +26,3 @@ asdasdas
 dasdasd
 asdasd
 asda
-
-
-

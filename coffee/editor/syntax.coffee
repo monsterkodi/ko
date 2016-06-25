@@ -36,7 +36,7 @@ class syntax
                     when 'deleted'  then @diss.splice oi, 1
                     when 'inserted' then @diss.splice oi, 0, @dissForLineIndex li
                     when 'changed'  then @diss[oi] = @dissForLineIndex li
-            log "syntax.sorted diss[0..5] after", @diss.slice 0,5 if @editor.name is 'editor'
+            # log "syntax.sorted diss[0..5] after", @diss.slice 0,5 if @editor.name is 'editor'
                 
     #  0000000  000      00000000   0000000   00000000 
     # 000       000      000       000   000  000   000
