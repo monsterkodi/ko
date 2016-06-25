@@ -430,7 +430,6 @@ class ViewBase extends Editor
             rg = [@scroll.top, Math.max 0, cp[1]-1]
             sl = @selectionsInLineIndexRange rg
             hl = @highlightsInLineIndexRange rg
-            log "#{sl.length} #{hl.length}"
             if sl.length == 0 == hl.length
                 delta = @scroll.lineHeight * (cp[1] - @scroll.top - topDist)
                 # log "viewbase.scrollCursorToTop #{delta}"
@@ -486,24 +485,23 @@ class ViewBase extends Editor
             target:  @view
             cursor:  'default'
             onStart: (drag, event) =>
-                
+                                
                 if @doubleClicked
-                    clearTimeout @tripleClickTimer
                     if @posForEvent(event)[1] == @tripleClickLineIndex
-                        return if @tripleClicked
-                        @doubleClicked = true
-                        @tripleClicked = true
+                        clearTimeout @tripleClickTimer                        
                         @tripleClickTimer = setTimeout @onTripleClickDelay, 1500
-                        r = @rangeForLineAtIndex @cursors[0][1]
-                        if event.shiftKey
-                            @addRangeToSelection r
-                        else
-                            @selectSingleRange r
+                        # log "viewbase.drag.onStart #{@tripleClickTimer} #{@doubleClicked} #{@tripleClicked}"
+                        if not @tripleClicked
+                            @tripleClicked = true
+                            r = @rangeForLineAtIndex @cursors[0][1]
+                            if event.shiftKey
+                                @addRangeToSelection r
+                            else
+                                @selectSingleRange r
                         return
-                    else
-                        @doubleClicked = false
-                        @tripleClicked = false
-                        @tripleClickTimer = null
+                    else if @tripleClickTimer
+                        clearTimeout @tripleClickTimer
+                        @onTripleClickDelay()
                         
                 @view.focus()
                 p = @posForEvent event
@@ -529,7 +527,11 @@ class ViewBase extends Editor
             @tripleClickTimer = setTimeout @onTripleClickDelay, 1500
             @tripleClickLineIndex = range[0]
                         
-    onTripleClickDelay: => @doubleClicked = @tripleClicked = false
+    onTripleClickDelay: => 
+        # log "viewbase.onTripleClickDelay #{@tripleClickTimer}"
+        @tripleClickTimer = null
+        @tripleClickLineIndex = -1
+        @doubleClicked = @tripleClicked = false
         
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

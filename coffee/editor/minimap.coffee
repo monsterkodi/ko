@@ -18,8 +18,9 @@ class Minimap
 
     constructor: (@editor) ->
         
-        @width = 240
+        @width = 2*parseInt getStyle '.minimap', 'width'
         @height = 8192
+        @offsetLeft = 6
             
         @elem = document.createElement 'div'
         @elem.className = 'minimap'
@@ -34,6 +35,8 @@ class Minimap
 
         @canvasTop = document.createElement 'canvas'
         @canvasTop.className = "minimapCanvasTop"
+        @canvasTop.height = @height
+        @canvasTop.width  = @width
         @elem.appendChild @canvasTop
         
         @editor.view.style.right = "#{@width/2}px"
@@ -82,7 +85,7 @@ class Minimap
                     ctx.fillStyle = @editor.syntax.colorForClassnames r.clss + " minimap"
                     y = parseInt((li-@scroll.exposeTop)*@scroll.lineHeight)
                     # @log "minimap.drawLines y:#{y}"
-                    ctx.fillRect 2*r.start, y, 2*r.match.length, @scroll.lineHeight
+                    ctx.fillRect @offsetLeft+2*r.start, y, 2*r.match.length, @scroll.lineHeight
                 
     drawTopBot: =>
         @canvasTop.height = @height
@@ -93,7 +96,8 @@ class Minimap
         ctx.fillStyle = "rgba(255,255,255,0.15)"
         y = parseInt @scroll.lineHeight * (@editor.scroll.top-@scroll.exposeTop*@scroll.lineHeight)
         ctx.fillRect 0, y, @width, 2*Math.max 0, tb
-        b = parseInt @scroll.lineHeight * (@scroll.numLines-@scroll.exposeTop*@scroll.lineHeight)
+        # b = parseInt @scroll.lineHeight * (@scroll.numLines-@scroll.exposeTop*@scroll.lineHeight)
+        b = parseInt @scroll.lineHeight * (@editor.lines.length-0.5-@scroll.exposeTop*@scroll.lineHeight)
         ctx.fillRect 0, b, @width, @scroll.lineHeight/2
        
     # 00000000  000   000  00000000    0000000    0000000  00000000
@@ -102,13 +106,8 @@ class Minimap
     # 000        000 000   000        000   000       000  000     
     # 00000000  000   000  000         0000000   0000000   00000000
     
-    exposeTop: (e) => 
-        # @log "minimap.exposeTop", e
-        @drawLines()
-        
-    exposeLine: (li) => 
-        # @log "minimap.exposeLine", li
-        @drawLines li, li
+    exposeTop:   (e) => @drawLines()
+    exposeLine: (li) => @drawLines li, li
         
     #  0000000  000   000   0000000   000   000   0000000   00000000
     # 000       000   000  000   000  0000  000  000        000     
@@ -124,7 +123,7 @@ class Minimap
         firstDeleted  = first(ci.deleted)  ? @scroll.exposeBot+1
         redraw = Math.min firstInserted, firstDeleted
             
-        @log "minimap.changed redraw",  redraw
+        # @log "minimap.changed redraw",  redraw
         
         for c in ci.changed
             break if c >= redraw
@@ -132,8 +131,9 @@ class Minimap
         
         if redraw <= @scroll.exposeBot            
             @clearRange redraw, @scroll.exposeBot
-            @drawLines redraw, @scroll.exposeBot
             @scroll.setNumLines @editor.lines.length
+            @drawLines redraw, @scroll.exposeBot
+            @drawTopBot()
         
     # 00     00   0000000   000   000   0000000  00000000
     # 000   000  000   000  000   000  000       000     
@@ -156,6 +156,7 @@ class Minimap
         @editor.scrollTo (li-5) * @editor.scroll.lineHeight
         @editor.singleCursorAtPos [0, li+5]
         @editor.focus()
+        @onEditorScroll()
 
     lineIndexForEvent: (event) ->
         st = @elem.scrollTop
@@ -203,8 +204,6 @@ class Minimap
         @canvasTop.style.transform = "translate3d(#{x}px, #{y}px, 0px) scale3d(0.5, 0.5, 1)"
         @canvas.style.transform    = "translate3d(#{x}px, #{y}px, 0px) scale3d(0.5, 0.5, 1)"
         
-    width: -> parseInt getStyle '.minimap', 'width'
-    
     #  0000000  000      00000000   0000000   00000000 
     # 000       000      000       000   000  000   000
     # 000       000      0000000   000000000  0000000  
@@ -214,9 +213,7 @@ class Minimap
     clearRange: (top, bot) -> 
         @log "minimap.clearRange #{top} #{bot}"
         ctx = @canvas.getContext '2d'
-        @log "minimap.clearRange", getStyle '.minimapCanvas', 'background-color'
-        ctx.fillStyle = '#000' #getStyle '.minimapCanvas', 'background-color'
-        ctx.fillRect 0, (top-@scroll.exposeTop)*@scroll.lineHeight, 2*@width, (bot-top)*@scroll.lineHeight
+        ctx.clearRect 0, (top-@scroll.exposeTop)*@scroll.lineHeight, 2*@width, (bot-top)*@scroll.lineHeight
         
     clearAll: =>
         # @log "minimap.clear"

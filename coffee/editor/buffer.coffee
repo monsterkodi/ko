@@ -313,7 +313,7 @@ class Buffer extends event
         r
     
     rangesForCursors: (cs=@cursors) -> ([c[1], [c[0], c[0]]] for c in cs)
-                   
+    rangesForCursorLines: (cs=@cursors) -> (@rangeForLineAtIndex c[1] for c in cs)                  
     rangesForAllLines: -> @rangesForLinesFromTopToBot 0, @lines.length
     
     rangesForLinesFromTopToBot: (top,bot) -> 

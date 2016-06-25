@@ -462,9 +462,6 @@ class Editor extends Buffer
             when 'left' then @startOfWordAtCursor
         @moveAllCursors f, extend:e, keepLine:true
     
-    moveCursorsDown: (e, n=1) -> 
-        @moveAllCursors ((n)->(c)->[c[0],c[1]+n])(n), extend:e, main: 'last'
-        
     moveCursorsUp:   (e, n=1) -> 
         @moveAllCursors ((n)->(c)->[c[0],c[1]-n])(n), extend:e, main: 'first'
                         
@@ -475,6 +472,13 @@ class Editor extends Buffer
     moveCursorsLeft: (e, n=1) ->
         moveLeft = (n) -> (c) -> [Math.max(0,c[0]-n), c[1]]
         @moveAllCursors moveLeft(n), extend:e, keepLine:true
+        
+    moveCursorsDown: (e, n=1) ->
+        if e and @selections.length == 0 # selecting lines down
+            if 0 == _.max (c[0] for c in @cursors) # all cursors in first column
+                @do.selections @rangesForCursorLines() # select lines without moving cursors
+                return
+        @moveAllCursors ((n)->(c)->[c[0],c[1]+n])(n), extend:e, main: 'last'
         
     moveCursors: (direction, e) ->
         switch direction
@@ -671,10 +675,17 @@ class Editor extends Buffer
         
         if @closingSurround?
             if @closingSurround == ch
-                @selectNone()
-                @deleteForward()
-                @closingSurround = null
-                return false
+                for c in @cursors
+                    if @lines[c[1]][c[0]] != ch
+                        @closingSurround = null
+                        break
+                if @closingSurround == ch
+                    @do.start()
+                    @selectNone()
+                    @deleteForward()
+                    @do.end()
+                    @closingSurround = null
+                    return false
         @closingSurround = null
         
         if ch == '#' # check if any cursor or selection is inside a string

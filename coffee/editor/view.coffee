@@ -25,7 +25,7 @@ class View extends ViewBase
 
     constructor: (viewElem) -> 
 
-        @fontSizeDefault = 15
+        @fontSizeDefault = 14
 
         super viewElem
         

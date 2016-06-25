@@ -314,7 +314,7 @@ class Main
             width:           1000
             height:          1200
             minWidth:        140
-            minHeight:       140
+            minHeight:       130
             useContentSize:  true
             backgroundColor: '#000'
             fullscreenable:  true

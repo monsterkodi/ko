@@ -6,11 +6,11 @@
 
 // all  initial -- to clear inherited
 
-editorFontSize        = 16px
+editorFontSize        = 14px
 selectionRadius       = round(editorFontSize / 3)
 selectionRadiusCursor = round(selectionRadius / 2)
 
-pinboardFontSize      = 15px
+minimapWidth          = 130px
 scrollbarWidth        = 12px // transparent scroll area
 scrollhandleWidth     = 6px
 numbersWidth          = 50px
@@ -49,7 +49,7 @@ pre
     margin              0
     height              commandlineHeight
     position            absolute
-        
+
 .commandline-command
     font-family         "Andale Mono", monospace
     font-size           24px
@@ -139,6 +139,7 @@ body
 
 .titlebar
     height              titlebarHeight
+    box-sizing          border-box
     background          #333
     color               #aaa
     font-size           14px
@@ -272,8 +273,7 @@ body
 
     fill-abs()
         
-    overflow-x      auto
-    overflow-y      hidden
+    overflow        hidden
 
     background      #000
     color           #ddd 
@@ -414,10 +414,11 @@ body
     top                 0
     bottom              0
     right               0
-    width               120px
+    width               minimapWidth
     overflow            hidden
     cursor              pointer
-    background          #141414
+    opacity             0.8
+    background          #000
     border-left         thinBorder
 
 .minimapCanvas

@@ -13,7 +13,7 @@
 - make search results keyboard navigatable
 
 #### windows
-- cycle through windows command
+- cycle through windows command: windows list
 
 #### editor
 - *send changes between windows*
@@ -31,8 +31,7 @@
     - comment line characters
 
 #### editing
-- *fix surround at end of line (no join)*
-- *fix triple click not working second time*
+- don't scroll when no new range added on command+d
 - *meta doubleclick adds word to selection*
 - *command+d activates multicursor*
 - *trim indentation spaces when joining lines*
@@ -53,8 +52,6 @@
 - move mainCursor to leftmost/rightmost cursor in its line on 'left'/'right' actions
 
 #### cursors
-- *remember last cursor*
-- *highlight last cursor*
 - highlight cursor line(s?)
 - insert spaces when inserting at virtual cursors
 - *paste multiple lines into multiple selections/cursors*

@@ -27,6 +27,8 @@ class Split extends event
         @handleHeight      = 6
         
         @elem        = $('.split')
+        @area        = $('.area')
+        @titlebar    = $('.titlebar')
         @topPane     = $('.pane.top')
         @topHandle   = $('.handle.top')
         @commandLine = $('.commandline')
