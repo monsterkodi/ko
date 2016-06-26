@@ -16,6 +16,7 @@
 - cycle through windows command: windows list
 
 #### editor
+- *fix horizontal scrolling*
 - *send changes between windows*
 - *store unsaved changes in prefs*
 - *autocomplete*
@@ -31,6 +32,7 @@
     - comment line characters
 
 #### editing
+- *move to indentation first on command+left*
 - don't scroll when no new range added with command+d
 - fix command+up main cursor vanishes at top
 - delete forward swallows spaces?

@@ -75,13 +75,15 @@ class ViewBase extends Editor
     # 0000000  000   000     000     00000000  000   000  0000000 
     
     initLayers: (layerClasses) ->
+        @layers = {}
         for cls in layerClasses
-            @addLayer cls
+            @layers[cls] = @addLayer cls
         
     addLayer: (cls) ->
         div = document.createElement 'div'
         div.className = cls
         @view.appendChild div
+        div
         
     updateLayers: () ->
         @renderHighlights()
@@ -443,19 +445,39 @@ class ViewBase extends Editor
     # 000        000   000       000
     # 000         0000000   0000000 
     
-    posForEvent: (event) ->
-        
+    posAtXY:(x,y) ->
+    
         sl = @view.scrollLeft
         st = @view.scrollTop
         br = @view.getBoundingClientRect()
-        lx = clamp 0, @view.offsetWidth,  event.clientX - br.left - @size.offsetX
-        ly = clamp 0, @view.offsetHeight, event.clientY - br.top
-        # log "viewbase.posForEvent ly:#{ly} clientY:#{event.clientY} br.top: #{br.top} st: #{st}"
+        lx = clamp 0, @view.offsetWidth,  x - br.left - @size.offsetX
+        ly = clamp 0, @view.offsetHeight, y - br.top
+        # log "viewbase.posForEvent ly:#{ly} y:#{y} br.top: #{br.top} st: #{st}"
         px = parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth))
         py = parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @scroll.exposeTop
         p = [px, Math.min(@lines.length-1, py)]
-        # log "viewbase.posForEvent clientY:#{event.clientY} -> line:#{p[1]} col:#{p[0]}"
+        # log "viewbase.posForEvent y:#{y} -> line:#{p[1]} col:#{p[0]}"
         p
+        
+    posForEvent: (event) -> @posAtXY event.clientX, event.clientY
+
+    lineElemAtXY:(x,y) -> 
+        p = @posAtXY x,y
+        ci = p[1]-@scroll.exposeTop
+        @layers['lines'].children[ci]
+        
+    lineSpanAtXY:(x,y) ->
+        lineElem = @lineElemAtXY x,y        
+        if lineElem?
+            lr = lineElem.getBoundingClientRect()
+            # log "viewbase.lineSpanAtXY #{x} #{y} #{lineElem.className} lr", lr
+            for e in lineElem.children
+                br = e.getBoundingClientRect()
+                # log "lineSpanAtXY #{e.className} #{e.innerHTML} #{br.left} #{br.width}"
+                if br.left <= x and br.left+br.width >= x
+                    return e
+        log "not found! #{x} #{y} line #{lineElem?}"
+        null
 
     # 000      000  000   000  00000000   0000000
     # 000      000  0000  000  000       000     

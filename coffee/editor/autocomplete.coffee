@@ -12,7 +12,7 @@ fuzzy = require 'fuzzy'
 
 class Autocomplete
 
-    constructor: (@editor) ->
+    constructor: (@editor) -> 
         
         @wordlist = []
         @wordinfo = {}
@@ -26,27 +26,18 @@ class Autocomplete
         @editor.on 'lineChanged',   @onLineChanged
         @editor.on 'linesAppended', @onLinesAppended
 
-    close: ->
-        @list?.remove()
-        @span?.remove()
-        @selected   = -1
-        @list       = null
-        @span       = null
-        @completion = null
-        @firstMatch = null
-        @matchList  = []
-
-    # 00     00   0000000   000000000   0000000  000   000
-    # 000   000  000   000     000     000       000   000
-    # 000000000  000000000     000     000       000000000
-    # 000 0 000  000   000     000     000       000   000
-    # 000   000  000   000     000      0000000  000   000
+    #  0000000   000   000  00000000  0000000    000  000000000
+    # 000   000  0000  000  000       000   000  000     000   
+    # 000   000  000 0 000  0000000   000   000  000     000   
+    # 000   000  000  0000  000       000   000  000     000   
+    #  0000000   000   000  00000000  0000000    000     000   
 
     onEdit: (info) =>
-        
+    
         @close()
+        return if info.action != 'insert'
         
-        @word = last info.before.split ' '
+        @word = last info.before.split new RegExp "[^\\w\\d\\-\\@]+", 'g'
         return if not @word?.length
         return if not @wordlist?.length
         
@@ -56,25 +47,56 @@ class Autocomplete
                     @firstMatch = w 
                 else
                     @matchList.push w
-        # log "autocomplete.match #{firstMatch}"
+                    
+        # log "autocomplete.match #{@firstMatch}"
         
         return if not @firstMatch?
         @completion = @firstMatch.slice @word.length
+        
         # log "autocomplete.match word: #{word} match: #{@firstMatch.string} info:", info
         cursor = $('.main', @editor.view)
+        if not cursor?
+            log "warning! no cursor?"
         @span = document.createElement 'span'
-        @span.innerHTML = @completion
-        @span.className = 'autocomplete'
+        @span.textContent = @completion
+        @span.className = 'autocomplete-span'
+        @span.style.opacity = 1
+        @span.style.background = "#44a"
+        @span.style.color = "#fff"
+
+        cr = cursor.getBoundingClientRect()
+        sp = @editor.lineSpanAtXY cr.left, cr.top  
+        le = @editor.lineElemAtXY cr.left, cr.top
+        if sp?            
+            if info.after[0] == ' ' or info.after.length == 0
+                sp.insertAdjacentElement 'afterend', @span
+            else
+                inner = sp.innerHTML
+                log "fake insert! word #{@word} inner #{inner}"
+                @cloneBefore = sp.cloneNode true
+                @cloneAfter = sp.cloneNode true
+                @cloneSrc = sp
+                log "fake insert! word #{@word} #{@cloneBefore.innerHTML}|#{@cloneAfter.innerHTML}"
+                @cloneBefore.innerHTML = @word
+                @cloneAfter.innerHTML = inner.slice @word.length
+                log "fake insert! sp.innerHTML: #{sp.innerHTML} #{@cloneBefore.innerHTML}|#{@cloneAfter.innerHTML}"
+                sp.insertAdjacentElement 'afterend', @cloneAfter
+                sp.insertAdjacentElement 'beforebegin', @cloneBefore
+                sp.insertAdjacentElement 'beforebegin', @span
+                sp.style.display = 'none'
+        else
+            log "warning! no sp? #{cr.left} #{cr.top}"
+        
         if @matchList.length
             @list = document.createElement 'div'
-            @list.className = "list"
+            @list.className = 'autocomplete-list'
             for m in @matchList
                 item = document.createElement 'div'
-                item.className = 'item'
-                item.innerHTML = m
+                item.className = 'autocomplete-item'
+                item.textContent = m
                 @list.appendChild item
-            @span.appendChild @list
-        cursor.appendChild @span
+            cursor.appendChild @list
+            
         # log "autocomplete.match #{@completion}"
 
     selectedCompletion: ->
@@ -90,17 +112,20 @@ class Autocomplete
     # 000   000  000   000      0      000   0000000   000   000     000     00000000
     
     navigate: (delta) ->
-        log "autocomplete.navigate delta #{delta}"
+        # log "autocomplete.navigate delta #{delta}"
         return if not @list
         @list.children[@selected]?.classList.remove 'selected'
         @selected = clamp -1, @matchList.length-1, @selected+delta
-        log "autocomplete.navigate selected #{@selected}"
+        # log "autocomplete.navigate selected #{@selected}"
         if @selected >= 0
             @list.children[@selected]?.classList.add 'selected'
             @list.children[@selected]?.scrollIntoViewIfNeeded()
             
         @span.innerHTML = @selectedCompletion()
-        @span.appendChild @list
+        @span.classList.remove 'selected' if @selected < 0
+        @span.classList.add    'selected' if @selected >= 0
+        # log "navigate @span.innerHTML #{@span.innerHTML}"
+        @navigating = true
         
     prev: -> @navigate -1    
     next: -> @navigate 1
@@ -113,15 +138,19 @@ class Autocomplete
     
     parseLines:(lines, opt) ->
         for l in lines
-            words = l.split new RegExp "[^\\#\\w\\d\"\'-@]+", 'g'
+            words = l.split new RegExp "[^\\#\\w\\d\"\'\\-\\@]+", 'g'
             words = words.filter (w) -> 
-                w.length > 1 and not /([\\'\\"_]+|([0\\#]+))/.test w 
+                return false if w.length < 2
+                return false if w[0] in ['-'] and w.length < 3
+                return not /([\\'\\"_]+|(^[0\\#]+$))/.test w 
+            for w in words
+                words.push w.slice 1 if w[0] in ['@']
             for w in words
                 info  = @wordinfo[w] ? {}
                 count = info.count ? 0
                 count += opt?.count ? 1
                 info.count = count
-                @wordinfo[w] = info
+                @wordinfo[w] = info                
                 
         # log "Completion.parseLines #{@editor.name} lines: #{lines.length} @wordinfo:", @wordinfo 
         
@@ -144,6 +173,28 @@ class Autocomplete
         # log "Completion.parseLines #{@editor.name} @wordlist:", @wordlist if opt.action != 'change'
         # log "Completion.parseLines #{@editor.name} @wordlist:", @wordlist.length
                 
+    #  0000000  000       0000000    0000000  00000000
+    # 000       000      000   000  000       000     
+    # 000       000      000   000  0000000   0000000 
+    # 000       000      000   000       000  000     
+    #  0000000  0000000   0000000   0000000   00000000
+
+    close: ->
+        @list?.remove()
+        @span?.remove()
+        @navigating = false
+        @selected   = -1
+        @list       = null
+        @span       = null
+        @completion = null
+        @firstMatch = null
+        
+        @cloneBefore?.remove()
+        @cloneAfter?.remove()
+        @cloneSrc?.style.display = 'initial'
+        
+        @matchList  = []
+
     #  0000000   000   000
     # 000   000  0000  000
     # 000   000  000 0 000
@@ -183,6 +234,8 @@ class Autocomplete
                 when 'up'
                     if @selected >= 0
                         @prev()
+                        return
+                    else if @navigating
                         return
         @close()   
         return 'unhandled'

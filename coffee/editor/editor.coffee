@@ -310,8 +310,9 @@ class Editor extends Buffer
     # 000       000 0 000  000     000     000       000   000  000     000   
     # 00000000  000   000  000     000     00000000  0000000    000     000   
 
-    emitEdit: ->
+    emitEdit: (action) ->
         @emit 'edit',
+            action:    action
             line:      @lines[@mainCursor[1]]
             before:    @lines[@mainCursor[1]].slice 0, @mainCursor[0]
             after:     @lines[@mainCursor[1]].slice @mainCursor[0]
@@ -609,7 +610,7 @@ class Editor extends Buffer
             
         @insertCharacter ch
         @do.end()
-        @emitEdit()
+        @emitEdit 'insert'
     
     insertCharacter: (ch, opt) ->
 
@@ -900,7 +901,7 @@ class Editor extends Buffer
         @do.cursors newCursors
         @do.end()
         @clearHighlights()
-        @emitEdit()
+        @emitEdit 'delete'
         
     deleteTab: ->
         if @selections.length
@@ -951,7 +952,7 @@ class Editor extends Buffer
             @do.cursors newCursors
             @do.end()
             @clearHighlights()
-            @emitEdit()
+            @emitEdit 'delete'
             
     deleteBackward: ->
         if @selections.length
@@ -986,6 +987,6 @@ class Editor extends Buffer
             @do.cursors newCursors
             @do.end()
             @clearHighlights()
-            @emitEdit()                
+            @emitEdit 'delete'                
             
 module.exports = Editor

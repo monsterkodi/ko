@@ -17,7 +17,7 @@
 # tags
 
 \b(html|body|section|header|footer|ul|li|a|b|br|p|center|table|title|link|nav|tr|th|td|div|span|img|h\d|dt|blockquote|pre|hr|svg|path)\b   keyword
-\b(color|opacity|width|margin|padding|position|pointer-events|radius|height|width|outline|overflow|family|weight|cursor|display|background|size|content|white-space|transition|transform|z-index)\b  keyword
+\b(color|opacity|max-|min-|box-|sizing|width|margin|padding|position|pointer-events|radius|height|width|outline|overflow|family|weight|cursor|display|background|size|content|white-space|transition|transform|z-index)\b  keyword
 \b(overflow\-?[xy]?|border|bottom|left|right|top|font|padding)(\-?)\b     . keyword . keyword.marker
 (-webkit-[\w\-]+)  keyword
 
@@ -61,7 +61,7 @@
 (#)([a-fA-F0-9]{3})          . module.marker . module
 (#)([a-fA-F0-9]{6})          . module.marker . module
 (rgba?\s*\()([^\)]+)(\))     . module.marker . module . module.marker
-\b(red|green|blue|yellow|magenta|cyan|black|gray|white|orange)\b   module
+\s(red|green|blue|yellow|magenta|cyan|black|gray|white|orange)(?:\s|$)   module
 
 # comments
 
