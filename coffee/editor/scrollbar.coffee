@@ -67,8 +67,14 @@ class Scrollbar
             f *= 1 + 1 * event.shiftKey
             f *= 1 + 3 * event.metaKey        
             f *= 1 + 7 * event.altKey
-
-        @editor.scrollBy event.deltaY * scrollFactor()
+            
+        if Math.abs(event.deltaX) >= 2*Math.abs(event.deltaY) or Math.abs(event.deltaY) == 0
+            scrollX = event.deltaX
+            scrollY = 0
+        else 
+            scrollX = 0
+            scrollY = event.deltaY
+        @editor.scrollBy scrollY * scrollFactor(), scrollX
 
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     

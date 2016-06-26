@@ -120,6 +120,8 @@ class ViewBase extends Editor
             @scroll.setViewHeight @viewHeight()
             @emit 'viewHeight', @viewHeight()
         @scroll.setNumLines @lines.length
+        @view.scrollLeft = 0
+        @updateScrollOffset()
         @updateLayers()
 
     # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
@@ -423,8 +425,9 @@ class ViewBase extends Editor
                         
     scrollLines: (delta) -> @scrollBy delta * @size.lineHeight
 
-    scrollBy: (delta) -> 
+    scrollBy: (delta, x) -> 
         @scroll.by delta
+        @view.scrollLeft += x/2
         @updateScrollOffset()
         
     scrollTo: (p) -> 
@@ -443,7 +446,7 @@ class ViewBase extends Editor
                 # log "viewbase.scrollCursorToTop #{delta}"
                 @scrollBy delta
                 @numbers?.updateColors()
-                    
+
     updateScrollOffset: ->
         @view.scrollTop = @scroll.offsetTop
         @numbers?.elem.style.left = "#{@view.scrollLeft}px"

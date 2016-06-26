@@ -123,7 +123,10 @@ class Main
             app.exit 0
             return
         
-        app.on 'open-file', (event, path) => @createWindow path
+        app.on 'open-file', (event, path) => 
+            log "app.on open-file"
+            @createWindow path
+            event.preventDefault()
                         
         tray = new Tray "#{__dirname}/../img/menu.png"
         tray.on 'click', @toggleWindows
