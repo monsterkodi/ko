@@ -19,7 +19,6 @@
 - *send changes between windows*
 - *store unsaved changes in prefs*
 - *autocomplete*
-    - from buffer
     - from similar files
 - *alt-click: jump to definition*
 - *make pasteable from clippo*

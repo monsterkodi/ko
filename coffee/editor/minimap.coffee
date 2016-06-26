@@ -51,6 +51,7 @@ class Minimap
             viewHeight: 2*@editor.viewHeight()
             
         # @scroll.dbg = true if @editor.name == 'editor'
+        # @editor.scroll.dbg = true if @editor.name == 'editor'
                     
         @drag = new drag 
             target:  @elem
@@ -79,9 +80,9 @@ class Minimap
         for li in [top..bot]
             diss = @editor.syntax.getDiss li
             # @log "minimap.drawLines li #{li} diss", diss
+            y = parseInt((li-@scroll.exposeTop)*@scroll.lineHeight)
+            ctx.clearRect 0, y, @width, @scroll.lineHeight
             if diss?.length
-                y = parseInt((li-@scroll.exposeTop)*@scroll.lineHeight)
-                ctx.clearRect 0, y, @width, @scroll.lineHeight
                 for r in diss
                     break if 2*r.start >= @width
                     ctx.fillStyle = @editor.syntax.colorForClassnames r.clss + " minimap"                    

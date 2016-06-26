@@ -303,6 +303,19 @@ class Editor extends Buffer
         pr ?= last @highlights
         if pr 
             @do.cursors [@rangeEndPos pr]
+
+    # 00000000  00     00  000  000000000  00000000  0000000    000  000000000
+    # 000       000   000  000     000     000       000   000  000     000   
+    # 0000000   000000000  000     000     0000000   000   000  000     000   
+    # 000       000 0 000  000     000     000       000   000  000     000   
+    # 00000000  000   000  000     000     00000000  0000000    000     000   
+
+    emitEdit: ->
+        @emit 'edit',
+            line:      @lines[@mainCursor[1]]
+            before:    @lines[@mainCursor[1]].slice 0, @mainCursor[0]
+            after:     @lines[@mainCursor[1]].slice @mainCursor[0]
+            cursor:    @mainCursor
                     
     #  0000000  000   000  00000000    0000000   0000000   00000000 
     # 000       000   000  000   000  000       000   000  000   000
@@ -596,9 +609,7 @@ class Editor extends Buffer
             
         @insertCharacter ch
         @do.end()
-        @emit 'characterInserted',
-            character: ch
-            text:       @lines[@mainCursor[1]]
+        @emitEdit()
     
     insertCharacter: (ch, opt) ->
 
@@ -663,7 +674,7 @@ class Editor extends Buffer
                     if line.endsWith e
                         il = @indentString.length
                 if il == 0
-                    if /(else\s*$|switch|for|while|class)/.test before
+                    if /(^|\s)(else\s*$|switch\s|for\s|while\s|class\s)/.test before
                         il = @indentString.length
                     else if /^(\s+when|\s*if)(?!.*\sthen\s)/.test line
                         il = @indentString.length 
@@ -673,9 +684,9 @@ class Editor extends Buffer
                     else if before.trim().endsWith 'then'
                         before = before.trimRight()
                         before = before.slice 0, before.length-4
-                        
                 else if before.trim().startsWith 'return'
-                    il = - @indentString.length 
+                    il = -@indentString.length 
+                    
                 il += @indentationAtLineIndex c[1]
                 indent = _.padStart "", il
             else
@@ -889,6 +900,7 @@ class Editor extends Buffer
         @do.cursors newCursors
         @do.end()
         @clearHighlights()
+        @emitEdit()
         
     deleteTab: ->
         if @selections.length
@@ -939,6 +951,7 @@ class Editor extends Buffer
             @do.cursors newCursors
             @do.end()
             @clearHighlights()
+            @emitEdit()
             
     deleteBackward: ->
         if @selections.length
@@ -973,5 +986,6 @@ class Editor extends Buffer
             @do.cursors newCursors
             @do.end()
             @clearHighlights()
+            @emitEdit()                
             
 module.exports = Editor

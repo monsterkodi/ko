@@ -50,6 +50,7 @@ class scroll extends events
         else
             @exposeNum = @exposeMax
         
+        @offsetTop    = -1 # little hack to emit initial scroll
         # log "scroll.calc", @ if @dbg
 
     # 000  000   000  00000000   0000000 
@@ -102,10 +103,10 @@ class scroll extends events
         offset = 0
         offset += @offsetSmooth if @smooth
         offset += (@top - @exposeTop) * @lineHeight
-        # log "scroll.by delta #{delta} offset #{offset}" if @dbg
+        # log "scroll.by delta #{delta} offset #{offset} @offsetTop #{@offsetTop}" if @dbg
         if offset != @offsetTop
             @offsetTop = parseInt offset
-            # log "scroll.by emit scroll @scroll #{@scroll} @offsetTop #{@offsetTop}" if @dbg
+            log "scroll.by emit scroll @scroll #{@scroll} @offsetTop #{@offsetTop}" if @dbg
             @emit 'scroll', @scroll, @offsetTop
 
     #  0000000  00000000  000000000  000000000   0000000   00000000 
@@ -117,7 +118,7 @@ class scroll extends events
     setTop: (top) =>
 
         if top != @top
-            # log "scroll.setTop #{@top} -> #{top}" if @dbg
+            log "scroll.setTop emit #{@top} -> #{top}" if @dbg
             @top = top
             @emit 'top', @top
             
@@ -125,7 +126,7 @@ class scroll extends events
         # log "scroll.setTop @top #{@top} @bot #{@bot} newBot #{newBot} viewLines #{@viewLines} numLines #{@numLines}"  if @dbg
         if @bot != newBot
             @bot = newBot
-            # log "scroll.setTop emit bot #{@bot}" if @dbg
+            log "scroll.setTop emit bot #{@bot}" if @dbg
             @emit 'bot', @bot
             
         @expose()

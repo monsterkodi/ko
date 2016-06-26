@@ -22,7 +22,7 @@ webframe  = electron.webFrame
 class View extends ViewBase
 
     constructor: (viewElem) -> 
-
+        
         @fontSizeDefault = 14
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Autocomplete']        
                     

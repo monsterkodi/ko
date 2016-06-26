@@ -546,11 +546,15 @@ class ViewBase extends Editor
 
         return if not combo
         return if key == 'right click' # weird right command key
+
+        if @autocomplete?
+            if 'unhandled' != @autocomplete.handleModKeyComboEvent mod, key, combo, event
+                return
         
         if @handleModKeyComboEvent?
             if 'unhandled' != @handleModKeyComboEvent mod, key, combo, event
                 return
-
+            
         switch combo
             when 'tab'                      then return @insertTab() + event.preventDefault() 
             when 'shift+tab'                then return @deleteTab() + event.preventDefault()
