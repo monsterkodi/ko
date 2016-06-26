@@ -418,12 +418,14 @@ body
     position        absolute
     left            0
     top             0
-    bottom          0
+    // bottom          0
+    display         block
     width           numbersWidth
     pointer-events  none
     font-size       13px
     font-weight     bold
     font-family     "Andale Mono", monospace
+    background      rgba(0, 0, 0, 0.5) // this darkens selection
     
 .linenumber
     & span
@@ -433,7 +435,6 @@ body
         font-weight     bold
         padding-right   8px
     width               numbersWidth
-    background          rgba(0, 0, 0, 0.5) // this darkens selection
     border-right        thinBorder // 1px solid rgba(100, 100, 100, 0.2)
     &.highligd span 
         color           rgba(155,155,255, 0.6)

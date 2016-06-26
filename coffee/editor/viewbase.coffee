@@ -35,7 +35,9 @@ class ViewBase extends Editor
         @name = @name.slice 1 if @name[0] == '.'
         @view = $(viewElem)
         @view.onpaste = (event) => log "view on paste #{@name}", event
-        @initLayers ["selections", "highlights", "numbers", "lines", "cursors"]
+        layerNames = ["selections", "highlights", "lines", "cursors"]
+        layerNames.push "numbers" if "Numbers" in @config.features
+        @initLayers layerNames
         @elem = $('.lines', @view)
         @diss = []
         @size = {}
@@ -185,6 +187,7 @@ class ViewBase extends Editor
         if changeInfo.cursor.length
             @renderCursors()
             $('.main', @view)?.scrollIntoViewIfNeeded()
+            @updateScrollOffset()
             @emit 'cursors', changeInfo.cursor
             
         if changeInfo.selection.length
@@ -376,6 +379,8 @@ class ViewBase extends Editor
     
     resized: -> 
         @scroll?.setViewHeight @viewHeight()
+        @numbers?.elem.style.height = "#{@viewHeight}px"
+        @updateScrollOffset()
         # log "viewbase.resized emit viewHeight #{@viewHeight()}"
         @emit 'viewHeight', @viewHeight()
     
@@ -420,11 +425,11 @@ class ViewBase extends Editor
 
     scrollBy: (delta) -> 
         @scroll.by delta
-        @view.scrollTop = @scroll.offsetTop
-
+        @updateScrollOffset()
+        
     scrollTo: (p) -> 
         @scroll.to p
-        @view.scrollTop = @scroll.offsetTop
+        @updateScrollOffset()
 
     scrollCursorToTop: (topDist=7) ->
         cp = @cursorPos()
@@ -439,6 +444,11 @@ class ViewBase extends Editor
                 @scrollBy delta
                 @numbers?.updateColors()
                     
+    updateScrollOffset: ->
+        @view.scrollTop = @scroll.offsetTop
+        @numbers?.elem.style.left = "#{@view.scrollLeft}px"
+        @numbers?.elem.style.background = @view.scrollLeft and '#000' or "rgba(0,0,0,0.5)"
+
     # 00000000    0000000    0000000
     # 000   000  000   000  000     
     # 00000000   000   000  0000000 

@@ -264,6 +264,7 @@ window.onresize = =>
     # log "window.onresize sh #{sh()}"
     if sh()
         ipc.send 'saveBounds', winID if winID?
+        editor.resized()
         split.resized()
 
 window.onload = =>
