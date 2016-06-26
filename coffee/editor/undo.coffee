@@ -258,30 +258,31 @@ class undo
         else
             lines.push change
     
-    change: (lines, index, text) ->
-        return if lines[index] == text
+    change: (index, text) ->
+        return if @editor.lines[index] == text
         @modify
             index:  index
-            before: lines[index]
+            before: @editor.lines[index]
             after:  text
-        lines[index] = text
+        @editor.lines[index] = text
         @changeInfoLineChange index
         @check()
         
-    insert: (lines, index, text) ->
+    insert: (index, text) ->
         @modify
             index:  index
             after:  text        
-        lines.splice index, 0, text
+        @editor.lines.splice index, 0, text
         @changeInfoLineInsert index
         @check()
         
-    delete: (lines, index) ->
-        if lines.length > 1
+    delete: (index) ->
+        if @editor.lines.length > 1
             @modify
                 index:   index
-                before:  lines[index]        
-            lines.splice index, 1
+                before:  @editor.lines[index]        
+            @editor.emit 'willDeleteLine', index, @editor.lines[index]
+            @editor.lines.splice index, 1
             @changeInfoLineDelete index
             @check()
         else

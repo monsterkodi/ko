@@ -6,9 +6,9 @@
 {
 clamp,
 last,
-$} = require '../tools/tools'
+$}    = require '../tools/tools'
 log   = require '../tools/log'
-fuzzy = require 'fuzzy'
+_     = require 'lodash'
 
 class Autocomplete
 
@@ -19,12 +19,12 @@ class Autocomplete
         
         @close()
     
-        @editor.on 'edit',          @onEdit
-        @editor.on 'linesSet',      @onLinesSet
-        @editor.on 'lineInserted',  @onLineInserted
-        @editor.on 'lineDeleted',   @onLineDeleted
-        @editor.on 'lineChanged',   @onLineChanged
-        @editor.on 'linesAppended', @onLinesAppended
+        @editor.on 'edit',           @onEdit
+        @editor.on 'linesSet',       @onLinesSet
+        @editor.on 'lineInserted',   @onLineInserted
+        @editor.on 'willDeleteLine', @onWillDeleteLine
+        @editor.on 'lineChanged',    @onLineChanged
+        @editor.on 'linesAppended',  @onLinesAppended
 
     #  0000000   000   000  00000000  0000000    000  000000000
     # 000   000  0000  000  000       000   000  000     000   
@@ -35,6 +35,13 @@ class Autocomplete
     onEdit: (info) =>
     
         @close()
+        
+        if info.action == 'delete'            
+            w = last info.before.split new RegExp "[^\\w\\d\\-\\@]+", 'g'
+            if @wordinfo[w]?.temp and @wordinfo[w]?.count <= 0
+                _.pull @wordlist, w
+                delete @wordinfo[w]
+        
         return if info.action != 'insert'
         
         @word = last info.before.split new RegExp "[^\\w\\d\\-\\@]+", 'g'
@@ -72,14 +79,11 @@ class Autocomplete
                 sp.insertAdjacentElement 'afterend', @span
             else
                 inner = sp.innerHTML
-                log "fake insert! word #{@word} inner #{inner}"
                 @cloneBefore = sp.cloneNode true
                 @cloneAfter = sp.cloneNode true
                 @cloneSrc = sp
-                log "fake insert! word #{@word} #{@cloneBefore.innerHTML}|#{@cloneAfter.innerHTML}"
                 @cloneBefore.innerHTML = @word
                 @cloneAfter.innerHTML = inner.slice @word.length
-                log "fake insert! sp.innerHTML: #{sp.innerHTML} #{@cloneBefore.innerHTML}|#{@cloneAfter.innerHTML}"
                 sp.insertAdjacentElement 'afterend', @cloneAfter
                 sp.insertAdjacentElement 'beforebegin', @cloneBefore
                 sp.insertAdjacentElement 'beforebegin', @span
@@ -137,19 +141,29 @@ class Autocomplete
     # 000        000   000  000   000  0000000   00000000
     
     parseLines:(lines, opt) ->
+        
+        # todo remove/ignore word before cursor when action is 'change'
+                
         for l in lines
+            if not l?.split?
+                log "warning! no split?", lines
             words = l.split new RegExp "[^\\#\\w\\d\"\'\\-\\@]+", 'g'
-            words = words.filter (w) -> 
+            words = words.filter (w) => 
                 return false if w.length < 2
                 return false if w[0] in ['-'] and w.length < 3
+                return false if @word == w.slice 0, w.length-1
+                # log "#{w} != #{@word}" if opt.action == 'change'
                 return not /([\\'\\"_]+|(^[0\\#]+$))/.test w 
+                
             for w in words
                 words.push w.slice 1 if w[0] in ['@']
+            
             for w in words
                 info  = @wordinfo[w] ? {}
                 count = info.count ? 0
                 count += opt?.count ? 1
                 info.count = count
+                info.temp = true if opt.action is 'change'
                 @wordinfo[w] = info                
                 
         # log "Completion.parseLines #{@editor.name} lines: #{lines.length} @wordinfo:", @wordinfo 
@@ -162,16 +176,18 @@ class Autocomplete
         
         weight = (w) -> 
             [word, info] = w
-            (word.length - 3) - (info.count)
+            # (word.length - 3) - (info.count)
+            info.count
             
-        sorted = ([w,i] for w,i of @wordinfo).sort (a,b) -> weight(a) - weight(b)
+        sorted = ([w,i] for w,i of @wordinfo).sort (a,b) -> weight(b) - weight(a)
         
         # log "Completion.parseLines #{@editor.name} sorted:", sorted
         
         @wordlist = (s[0] for s in sorted)
         
-        # log "Completion.parseLines #{@editor.name} @wordlist:", @wordlist if opt.action != 'change'
-        # log "Completion.parseLines #{@editor.name} @wordlist:", @wordlist.length
+        # log "Completion.parseLines -- #{@editor.name} @wordlist:", @wordlist #if opt.action != 'change'
+        # log "Completion.parseLines -- #{@word} action #{opt.action}"
+        # log "Completion.parseLines -- #{@editor.name} @wordlist:", @wordlist.length
                 
     #  0000000  000       0000000    0000000  00000000
     # 000       000      000   000  000       000     
@@ -201,10 +217,10 @@ class Autocomplete
     # 000   000  000  0000
     #  0000000   000   000
             
-    onLinesAppended: (lines)  => @parseLines lines, action: 'append'
-    onLineInserted:  (li)     => @parseLines [@editor.lines[li]], action: 'insert'
-    onLineChanged:   (li)     => #@parseLines [@editor.lines[li]], action: 'change', count: 0
-    onLineDeleted:   (li)     => @parseLines [@editor.lines[li]], action: 'delete', count: -1
+    onLinesAppended:  (lines)    => @parseLines lines, action: 'append'
+    onLineInserted:   (li)       => @parseLines [@editor.lines[li]], action: 'insert'
+    onLineChanged:    (li)       => @parseLines [@editor.lines[li]], action: 'change', count: 0
+    onWillDeleteLine: (li, line) => @parseLines [line], action: 'delete', count: -1
     onLinesSet:      (lines)  => 
         if lines.length
             @parseLines lines, action: 'set' 

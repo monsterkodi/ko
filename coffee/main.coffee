@@ -122,6 +122,8 @@ class Main
             log 'other instance already active -> quit'
             app.exit 0
             return
+        
+        app.on 'open-file', (event, path) => @createWindow path
                         
         tray = new Tray "#{__dirname}/../img/menu.png"
         tray.on 'click', @toggleWindows
