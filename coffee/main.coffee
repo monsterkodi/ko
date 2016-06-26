@@ -412,7 +412,6 @@ class Main
 # 000   000  00000000  000   000  0000000       000   
 
 app.on 'open-file', (event, path) => 
-    log "app.on open-file"
     if not main?
         openFiles.push path
     else

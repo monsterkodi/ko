@@ -16,11 +16,9 @@
 - cycle through windows command: windows list
 
 #### editor
-- *fix horizontal scrolling*
 - *send changes between windows*
 - *store unsaved changes in prefs*
-- *autocomplete*
-    - from similar files
+- *autocomplete from similar files*
 - *alt-click: jump to definition*
 - *make pasteable from clippo*
 - check undo (merges too much?)
@@ -29,22 +27,22 @@
 - history of file locations
 - make special stuff file type dependent
     - eg. add * to surround characters for md
-    - comment line characters
+    - comment line characters (# or //)
 
 #### editing
 - *move to indentation first on command+left*
+- *#< to add salter header of next word*
+- *align cursors with inserting spaces when ctrl+alt+right*
+- *ctrl+command+/  align cursors block*
+- *dbg "class.method arg: #{arg}, ..."*
+- *command-enter: deselect, insert newline, indent, and single cursor*
 - don't scroll when no new range added with command+d
 - fix command+up main cursor vanishes at top
 - delete forward swallows spaces?
 - on second command+e: select including leading @
-- *#< to add salter header of next word*
 - when pasting text at indent level, remove leading space columns
 - multicursors when pasting multiple lines at col > 0
-- *align cursors with inserting spaces when ctrl+alt+right*
-- *ctrl+command+/  align cursors block*
 - indent more when inserting newline and next line is indented more?
-- *dbg "class.method arg: #{arg}, ..."*
-- *command-enter: deselect, insert newline, indent, and single cursor*
 - move mainCursor to leftmost/rightmost cursor in its line on 'left'/'right' actions
 - highlight cursor line(s?)
 
@@ -52,10 +50,10 @@
 - show relative path when navigating in history
 
 #### terminal
-- limit history length
 - *output command*
 - *alias*
 - *ansihtml*
+- limit history length
 - add special column (on top of numbers) for input marker and search result lines
 - shortcuts to hide editor / center input
 - autocomplete
