@@ -25,6 +25,7 @@ ipc           = electron.ipcMain
 dialog        = electron.dialog
 tray          = undefined
 main          = undefined
+openFiles     = []
 wins          = []
 
 #  0000000   00000000    0000000    0000000
@@ -116,31 +117,31 @@ ipc.on 'saveBounds',        (event, winID) => main.saveWinBounds winWithID winID
 
 class Main
     
-    constructor: -> 
+    constructor: (openFiles) -> 
         
         if app.makeSingleInstance @otherInstanceStarted
             log 'other instance already active -> quit'
             app.exit 0
             return
-        
-        app.on 'open-file', (event, path) => 
-            log "app.on open-file"
-            @createWindow path
-            event.preventDefault()
-                        
+
         tray = new Tray "#{__dirname}/../img/menu.png"
         tray.on 'click', @toggleWindows
+                                
         hideDock()
         
         electron.globalShortcut.register prefs.get('shortcut'), @toggleWindows
 
         execute.init()
             
-        @restoreWindows() if not args.noprefs
-
-        for file in fileList args.arglist
-            log 'create', file
-            @createWindow file
+        @restoreWindows() if not args.noprefs and not openFiles.length
+        
+        if openFiles.length
+            for file in openFiles
+                @createWindow file
+        else
+            for file in fileList args.arglist
+                log 'create', file
+                @createWindow file
 
         if not wins().length
             if args.show
@@ -410,6 +411,16 @@ class Main
 # 000   000  000       000   000  000   000     000   
 # 000   000  00000000  000   000  0000000       000   
 
-app.on 'ready', => main = new Main
+app.on 'open-file', (event, path) => 
+    log "app.on open-file"
+    if not main?
+        openFiles.push path
+    else
+        main.createWindow path
+    event.preventDefault()
+
+app.on 'ready', => 
+    main = new Main openFiles
+    
 app.on 'window-all-closed', ->
 
