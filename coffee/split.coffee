@@ -108,9 +108,13 @@ class Split extends event
         if i is 0 then @splitPosY 0
         else Math.max 0, @splitPosY(i)-@splitPosY(i-1)-@handleHeight
         
-    terminalHeight:    -> @paneHeight 0
-    editorHeight:      -> @paneHeight 2
-    logviewHeight:     -> @paneHeight 3
+    terminalHeight: -> @paneHeight 0
+    editorHeight:   -> @paneHeight 2
+    logviewHeight:  -> @paneHeight 3
+    
+    terminalVisible: -> @terminalHeight() > 0
+    hideTerminal:      -> @splitAt 0, 0
+    commandlineVisible:  -> @splitPosY(1) > 0
 
     # 0000000     0000000 
     # 000   000  000   000

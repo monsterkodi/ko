@@ -11,6 +11,7 @@ $}        = require '../tools/tools'
 log       = require '../tools/log'
 drag      = require '../tools/drag'
 keyinfo   = require '../tools/keyinfo'
+split     = require '../split'
 ViewBase  = require './viewbase'
 syntax    = require './syntax'
 watcher   = require './watcher'
@@ -127,5 +128,27 @@ class View extends ViewBase
                 @scrollBy delta
             else
                 @updateLayers()
+
+    # 000   000  00000000  000   000
+    # 000  000   000        000 000 
+    # 0000000    0000000     00000  
+    # 000  000   000          000   
+    # 000   000  00000000     000   
+
+    handleModKeyComboEvent: (mod, key, combo, event) ->
+        switch combo
+            when 'esc'
+                if @cursors.length > 1 or @highlights.length
+                    @cancelCursorsAndHighlights()
+                if @selections.length
+                    @selectNone()
+                else 
+                    split = window.split
+                    if split.terminalVisible()
+                        split.hideTerminal()
+                    else if split.commandlineVisible()
+                        split.hideCommandline()
+                return
+        return 'unhandled'
         
 module.exports = View

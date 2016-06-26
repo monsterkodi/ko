@@ -35,7 +35,6 @@
 - don't scroll when no new range added with command+d
 - fix command+up main cursor vanishes at top
 - delete forward swallows spaces?
-- *fancy close terminal, commandline or on esc when no highlight is canceled*
 - on second command+e: select including leading @
 - *#< to add salter header of next word*
 - when pasting text at indent level, remove leading space columns

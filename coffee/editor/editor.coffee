@@ -596,7 +596,9 @@ class Editor extends Buffer
             
         @insertCharacter ch
         @do.end()
-        @emit 'characterInserted', ch
+        @emit 'characterInserted',
+            character: ch
+            text:       @lines[@mainCursor[1]]
     
     insertCharacter: (ch, opt) ->
 

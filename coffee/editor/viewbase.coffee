@@ -328,7 +328,6 @@ class ViewBase extends Editor
     renderLineAtIndex: (li) -> render.line @lines[li], @syntax.getDiss li
                                                     
     renderCursors: ->
-        
         cs = []
         for c in @cursors
             if c[1] >= @scroll.exposeTop and c[1] <= @scroll.exposeBot
@@ -336,11 +335,12 @@ class ViewBase extends Editor
         
         if @cursors.length == 1
             if cs.length == 1
-                sc = @mainCursor
-                ri = sc[1]-@scroll.exposeTop
-                cs[0][2] = 'main off'
-                if sc[0] > @lines[sc[1]].length
-                    cs.push [@lines[sc[1]].length, ri, 'virtual']
+                ri = @mainCursor[1]-@scroll.exposeTop
+                if @mainCursor[0] > @lines[@mainCursor[1]].length
+                    cs[0][2] = 'virtual'
+                    cs.push [@lines[@mainCursor[1]].length, ri, 'main off']
+                else
+                    cs[0][2] = 'main off'
         else if @cursors.length > 1
             vc = [] # virtual cursors
             for c in cs
