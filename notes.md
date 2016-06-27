@@ -33,6 +33,10 @@
 - *align cursors with inserting spaces when ctrl+alt+right*
 - *ctrl+command+/  align cursors block*
 - *dbg "class.method arg: #{arg}, ..."*
+- clamp cursors after pasting
+- select continuous,rectangular ranges with command+shift+M 
+- remove from selection when alt/ctrl is down?
+- make autocomplete work with multicursors
 - command+d activates multicursors
 - don't scroll when no new range added with command+d
 - fix command+up main cursor vanishes at top

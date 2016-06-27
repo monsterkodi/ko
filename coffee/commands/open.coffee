@@ -58,7 +58,7 @@ class Open extends Command
     changed: (command) ->
         return if not @list? 
         command  = command.trim()
-        return if command in ['.', '..']
+        return if command in ['.', '..', '/', '~']
         if command.length
             fuzzied  = fuzzy.filter command, @files       
             filtered = (f.string for f in fuzzied)
@@ -96,7 +96,6 @@ class Open extends Command
     # 0000000  000  0000000      000   
 
     showList: ->
-        # @list?.remove()
         if not @list?
             @list = document.createElement 'div' 
             @list.className = 'list'
@@ -113,7 +112,6 @@ class Open extends Command
             index = 0
             for file in files
                 div = document.createElement 'div'
-                # div.className = dirExists(@resolvedPath file) and 'list-item list-dir' or 'list-item list-file'
                 div.className = 'list-item'
                 div.innerHTML = render.line file, syntax.dissForTextAndSyntax file, 'ko', join: true
                 div.setAttribute "onmousedown", "window.openFileAtIndex(#{index});"
@@ -127,7 +125,6 @@ class Open extends Command
         return if not @list?
         split = window.split
         listTop = split.splitPosY 1
-        # log "open.positionList listTop #{listTop} #{split.elemHeight() - listTop}"
         listHeight = @list.getBoundingClientRect().height
         if (split.elemHeight() - listTop) < listHeight
             listTop = split.splitPosY(0) - listHeight
@@ -319,8 +316,8 @@ class Open extends Command
         
         listValue = @list?.children[@selected]?.value if @selected >= 0
 
-        if command in ['.', '..']
-            @dir = path.dirname @dir if command == '..'
+        if command in ['.', '..', '/', '~']
+            @dir = @resolvedPath command
             @loadDir
                 navigating: @dir
                 dir:        @dir

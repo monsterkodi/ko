@@ -237,10 +237,10 @@ class Editor extends Buffer
     highlightText: (text, opt) -> # called from find command
         @highlights = @rangesForText text, opt
         if @highlights.length
-            r = @rangeAfterPosInRanges @cursorPos(), @highlights
-            r ?= first @highlights
-            @selectSingleRange r
-            @scrollCursorToTop()
+            switch opt.select
+                when 'after' then @selectSingleRange @rangeAfterPosInRanges(@cursorPos(), @highlights) ? first @highlights
+                when 'first' then @selectSingleRange first @highlights            
+            @scrollCursorToTop() if not opt.noScroll
             @renderHighlights()
             @emit 'highlight', @highlights
 

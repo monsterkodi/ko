@@ -33,6 +33,7 @@ build
                 app-bundle-id   net.monsterkodi.ko
                 app-category-type  public.app-category.utilities
                 asar            false
+                productName     ko
                 osx
                   background  build/background.png
                   target

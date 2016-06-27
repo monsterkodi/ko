@@ -27,6 +27,22 @@ class Find extends Command
         @setName "Find" if @caseSensitive
         @setName "/find/" if @regexpSearch
         super combo
+
+    #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
+    # 000       000   000  000   000  0000  000  000        000       000   000
+    # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
+    # 000       000   000  000   000  000  0000  000   000  000       000   000
+    #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
+
+    changed: (command) ->
+        if editor = window.editorWithClassName @focus
+            if command.length
+                editor.highlightText command, 
+                    caseSensitive: @caseSensitive
+                    regexp: @regexpSearch
+                    select: 'keep'
+            else
+                editor.clearHighlights()
     
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
@@ -36,11 +52,13 @@ class Find extends Command
     
     execute: (command) ->
         super command
-        editor = window.editorWithClassName @focus
-        if editor?
+        if editor = window.editorWithClassName @focus
+            
             editor.highlightText command, 
                 caseSensitive: @caseSensitive
                 regexp: @regexpSearch
+                select: 'after'
+                
             if editor.highlights.length
                 focus: @focus 
         else
