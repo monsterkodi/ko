@@ -2,7 +2,7 @@
 
 #### find
 - *keep command+e search string longer*
-- highlight while entering
+- *highlight while entering*
 - display number of matches somewhere
 
 #### search
@@ -16,11 +16,10 @@
 - cycle through windows command: windows list
 
 #### editor
-- *send changes between windows*
-- *store unsaved changes in prefs*
 - *autocomplete from similar files*
 - *alt-click: jump to definition*
-- *make pasteable from clippo*
+- *send changes between windows*
+- *store unsaved changes in prefs*
 - check undo (merges too much?)
 - don't clear undo buffer on save?
 - save backup files?
@@ -30,12 +29,11 @@
     - comment line characters (# or //)
 
 #### editing
-- *move to indentation first on command+left*
 - *#< to add salter header of next word*
 - *align cursors with inserting spaces when ctrl+alt+right*
 - *ctrl+command+/  align cursors block*
 - *dbg "class.method arg: #{arg}, ..."*
-- *command-enter: deselect, insert newline, indent, and single cursor*
+- command+d activates multicursors
 - don't scroll when no new range added with command+d
 - fix command+up main cursor vanishes at top
 - delete forward swallows spaces?
@@ -55,30 +53,27 @@
 - *ansihtml*
 - limit history length
 - add special column (on top of numbers) for input marker and search result lines
-- shortcuts to hide editor / center input
 - autocomplete
     - dirs and files
     - /usr/local/bin, /usr/bin and /bin
-- font zoom shortcut
-- number history output and add !# command
+- number history output and add !(n) command
+- font zoom
       
 #### logview
-- font zoom shortcut
+- font zoom
       
 #### minimap
 - show selections, highlights and cursors
     
 #### selection
 - two selection modes
-- active (cursor inside)
-- passive (cursor movement won't destroy, but next selection will)
+    - active (cursor inside)
+    - passive (cursor movement won't destroy, but next selection will)
 - shift move cursor down
-- extend selection to end of line if previous line is fully selected
     
 #### minimap 
 - shift drag: extend selection
 - command drag: don't clear selection and don't single select
-- smoother (subline offset) scrolling
 
 #### syntax
 - pug, html, js

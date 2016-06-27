@@ -1,4 +1,5 @@
 name            ko
+productName     ko
 version         0.5.0
 description     coffee script editor
 main            js/main.js
@@ -47,8 +48,8 @@ build
                       y     70
                       type  file
 devDependencies
-                electron-builder  4.2.0
-                electron-prebuilt  1.2.1
+                electron-builder  ^5.7.0
+                electron-prebuilt  ^1.2.1
 dependencies
                 ansi-keycode    0.0.0
                 chokidar        ^1.5.2

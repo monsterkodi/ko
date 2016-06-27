@@ -81,6 +81,7 @@ delState = window.delState = (key) ->
 
 ipc.on 'executeResult', (event, arg) => terminal.appendText str arg
 ipc.on 'openFile', (event, options) => openFile options
+ipc.on 'focusEditor', (event) => split.focus '.editor'
 ipc.on 'cloneFile',  => ipc.send 'newWindowWithFile', editor.currentFile
 ipc.on 'reloadFile', => 
     # log "window.ipc.reloadFile"

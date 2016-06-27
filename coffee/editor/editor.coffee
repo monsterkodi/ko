@@ -262,9 +262,12 @@ class Editor extends Buffer
         @emit 'highlight', @highlights
 
     selectAllHighlights: ->
+        @do.start()
         if not @posInHighlights @cursorPos()
             @highlightTextOfSelectionOrWordAtCursor()
         @do.selections _.cloneDeep @highlights
+        @do.cursors (@rangeEndPos(r) for r in @selections)
+        @do.end()
     
     selectNextHighlight: ->
         r = @rangeAfterPosInRanges @cursorPos(), @highlights
@@ -465,18 +468,26 @@ class Editor extends Buffer
         @mainCursor = last  newCursors if opt.main == 'last'        
         @do.cursors newCursors, opt.extend
         @endSelection opt.extend
+        true
         
     moveCursorsToLineBoundary: (leftOrRight, e) ->
         f = switch leftOrRight
             when 'right' then (c) => [@lines[c[1]].length, c[1]]
-            when 'left' then (c) -> [0, c[1]]
+            when 'left' then (c) => 
+                if @lines[c[1]].slice(0,c[0]).trim().length == 0
+                    [0, c[1]]
+                else
+                    d = @lines[c[1]].length - @lines[c[1]].trimLeft().length
+                    [d, c[1]]
         @moveAllCursors f, extend:e, keepLine:true
+        true
     
     moveCursorsToWordBoundary: (leftOrRight, e) -> 
         f = switch leftOrRight
             when 'right' then @endOfWordAtCursor
             when 'left' then @startOfWordAtCursor
         @moveAllCursors f, extend:e, keepLine:true
+        true
     
     moveCursorsUp:   (e, n=1) -> 
         @moveAllCursors ((n)->(c)->[c[0],c[1]-n])(n), extend:e, main: 'first'

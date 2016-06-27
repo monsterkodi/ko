@@ -127,7 +127,9 @@ class Main
         tray = new Tray "#{__dirname}/../img/menu.png"
         tray.on 'click', @toggleWindows
                                 
-        hideDock()
+        app.setName pkg.productName
+                                
+        # hideDock()
         
         electron.globalShortcut.register prefs.get('shortcut'), @toggleWindows
 
@@ -405,11 +407,16 @@ class Main
         w.loadURL "file://#{cwd}/../about.html"
         w.on 'openFileDialog', @createWindow
             
-# 00000000   00000000   0000000   0000000    000   000
-# 000   000  000       000   000  000   000   000 000 
-# 0000000    0000000   000000000  000   000    00000  
-# 000   000  000       000   000  000   000     000   
-# 000   000  00000000  000   000  0000000       000   
+#  0000000   00000000   00000000         0000000   000   000
+# 000   000  000   000  000   000       000   000  0000  000
+# 000000000  00000000   00000000        000   000  000 0 000
+# 000   000  000        000        000  000   000  000  0000
+# 000   000  000        000        000   0000000   000   000
+
+app.on 'activate', (event, hasVisibleWindows) => log "app.on activate #{hasVisibleWindows}"
+app.on 'browser-window-focus', (event, win) =>
+    log "app.on browser-window-focus #{win.id}"
+    # win.webContents.send 'focusEditor'
 
 app.on 'open-file', (event, path) => 
     if not main?
@@ -418,8 +425,9 @@ app.on 'open-file', (event, path) =>
         main.createWindow path
     event.preventDefault()
 
-app.on 'ready', => 
-    main = new Main openFiles
+app.on 'ready', => main = new Main openFiles
     
 app.on 'window-all-closed', ->
+    
+app.setName pkg.productName
 

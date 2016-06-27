@@ -593,7 +593,8 @@ class ViewBase extends Editor
         switch combo
             when 'tab'                      then return @insertTab() + event.preventDefault() 
             when 'shift+tab'                then return @deleteTab() + event.preventDefault()
-            when 'enter'                    then return @insertNewline indent:true
+            when 'enter'                    then return @insertNewline indent: true
+            when 'command+enter'            then return @moveCursorsToLineBoundary('right') and @insertNewline indent: true
             when 'command+]'                then return @indent()
             when 'command+['                then return @deIndent()
             when 'command+j'                then return @joinLines()

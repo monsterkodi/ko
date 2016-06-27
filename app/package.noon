@@ -1,4 +1,5 @@
 name          ko
+productName   ko
 version       0.5.0
 description   coffee script editor
 main          js/main.js
