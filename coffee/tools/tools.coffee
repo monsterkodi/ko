@@ -70,11 +70,11 @@ module.exports =
             try
                 stat = fs.statSync p
                 if stat.isDirectory()
-                    dirfiles = fs.readdirSync(p)
+                    dirfiles = fs.readdirSync p
                     dirfiles = (path.join(p,f) for f in dirfiles)
                     dirfiles = (f for f in dirfiles when fs.statSync(f).isFile())
                     if opt.ignoreHidden
-                        dirfiles = dirfiles.filter (f) -> not f.startsWith '.'
+                        dirfiles = dirfiles.filter (f) -> not path.basename(f).startsWith '.'
                     files = files.concat dirfiles
                     
                 else if stat.isFile()

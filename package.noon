@@ -4,9 +4,6 @@ version         0.5.0
 description     coffee script editor
 main            js/main.js
 scripts
-                test      npm run kill && npm start
-                debug     npm run kill && npm start -- -D
-                start     electron js/main.js
                 dist      npm run clean && npm run compile && npm run install && build
                 kill      fish -c "killall Electron" -c "killall Electron" -c "echo killed"
                 clean     rm -rf dist app/js app/img app/css app/syntax app/*.html app/node_modules
@@ -49,7 +46,7 @@ build
                       y     70
                       type  file
 devDependencies
-                electron-builder  ^5.7.0
+                electron-builder  ^5.10.1
                 electron-prebuilt  ^1.2.1
 dependencies
                 ansi-keycode    0.0.0
@@ -59,11 +56,11 @@ dependencies
                 entities        ^1.1.1
                 fuzzy           ^0.1.1
                 html-entities   ^1.2.0
-                karg            ^1.0.8
+                karg            >=1.0.9
                 keycode         ^2.1.2
                 lodash          ^4.13.1
-                noon            ^1.0.9
+                nconf           ^0.8.4
+                noon            >=1.0.9
                 opener          ^1.4.1
                 performance-now  ^0.2.0
-                snapsvg         ^0.4.0
                 walkdir         0.0.11

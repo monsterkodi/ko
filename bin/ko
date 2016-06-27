@@ -18,7 +18,7 @@ if [ $_DEV ]; then
     killall Electron 2> /dev/null
     cd ~/s/ko
     ./node_modules/electron-prebuilt/cli.js ./js/main.js "$@" &
-    exit $?
+    exit 0
 elif [ -x "/Applications/$_NAME" ]; then
     _PATH="/Applications"
 elif [ -x "$HOME/Applications/$_NAME" ]; then
@@ -32,7 +32,7 @@ else
 fi
 
 if [ $_LOG ]; then
-    echo "$_PATH/$_NAME/Contents/MacOS/ko"
+    # echo "$_PATH/$_NAME/Contents/MacOS/ko"
     "$_PATH/$_NAME/Contents/MacOS/ko" --executed-from="$(pwd)" "$@"
     exit $?
 else

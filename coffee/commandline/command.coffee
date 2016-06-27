@@ -94,14 +94,14 @@ class Command
     setState: (key, value) ->
         return if not @prefsID
         if @prefsID
-            prefs.setPath "command.#{@prefsID}.#{key}", value
+            prefs.set "command:#{@prefsID}:#{key}", value
         
     getState: (key, value) ->
         return value if not @prefsID
-        prefs.getPath "command.#{@prefsID}.#{key}", value
+        prefs.get "command:#{@prefsID}:#{key}", value
         
     delState: (key) ->
         return if not @prefsID
-        prefs.setPath "command.#{@prefsID}.#{key}", null
+        prefs.del "command:#{@prefsID}:#{key}"
 
 module.exports = Command

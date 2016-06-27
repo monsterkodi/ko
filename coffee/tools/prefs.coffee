@@ -4,72 +4,39 @@
 # 000        000   000  000       000            000
 # 000        000   000  00000000  000       0000000 
 
-_   = require 'lodash'
-log = require './log'
-fs  = require 'fs'
+_     = require 'lodash'
+nconf = require 'nconf'
+noon  = require 'noon'
+log   = require './log'
+fs    = require 'fs'
 
 class Prefs
 
     @path = null
-    @defs = null    
-    @debug = true
-    @cache = {}
     @changes = []
     @timer = null
-    @timeout = 2000
+    @timeout = 1000
 
     @init: (path, defs={}) ->
         Prefs.path = path 
-        Prefs.defs = defs
-        Prefs.load()
+        nconf.use 'user',
+            type: 'file'
+            format: 
+                parse: noon.parse
+                stringify: (o,n,i) -> noon.stringify o, indent: i, maxalign: 8
+            file: path
+        nconf.defaults defs
 
-    @get: (key, value) -> @cache[key] ? value
-    @set: (key, value) -> @s(key, value) and @cache[key] = value
+    @get: (key, value) -> nconf.get(key) ? value
+    @set: (key, value, skipSave) ->
+        log "prefs.set #{key}: #{value} s:#{skipSave}"
+        @s(key, value) if not skipSave
+        if value?
+            nconf.set key, value    
+        else
+            nconf.clear key
         
-    @setPath: (path, value, skip) ->
-        @s path, value if not skip
-        c = @cache
-        s = path.split '.'
-        # log "@setPath #{path}"
-        while s.length
-            k = s.shift()
-            if s.length
-                if not c[k]? 
-                    c[k] = {}
-                c = c[k]
-            else
-                c[k] = value        
-
-    @getPath: (path, value) ->
-        s = path.split '.'
-        c = @cache
-        while s.length
-            k = s.shift()
-            c = c[k]
-            if not c?
-                return value
-        c
-                
-    @del: (key, value) -> @s(key, null) and _.pull @cache[key], value
-
-    # 000       0000000    0000000   0000000  
-    # 000      000   000  000   000  000   000
-    # 000      000   000  000000000  000   000
-    # 000      000   000  000   000  000   000
-    # 0000000   0000000   000   000  0000000  
-
-    @load: () ->
-        # log "prefs.load"
-        @cache = {}
-        try
-            @cache = JSON.parse fs.readFileSync(Prefs.path, encoding:'utf8')
-        catch 
-            1       
-            # console.log 'can\'t load prefs file', Prefs.path
-        for key in Object.keys Prefs.defs
-            if not @cache[key]?
-                @cache[key] = Prefs.defs[key]
-        @cache
+    @del: (key, value) -> @set key
 
     #  0000000
     # 000     
@@ -77,10 +44,9 @@ class Prefs
     #      000
     # 0000000 
     
-    @s: (keypath, value) ->
-        @changes.push [keypath, value]
+    @s: (key, value) ->
+        @changes.push [key, value]
         if @timer then clearTimeout @timer
-        # else           log "prefs.s"
         @timer = setTimeout @save, @timeout
 
     #  0000000   0000000   000   000  00000000
@@ -90,13 +56,17 @@ class Prefs
     # 0000000   000   000      0      00000000
 
     @save: =>
-        @load()
         @timer = null
-        for c in @changes
-            @setPath c[0], c[1], true        
-        json = JSON.stringify(@cache, null, "    ")      
-        # console.log 'prefs.save', Prefs.path, json if Prefs.debug
-        fs.writeFileSync Prefs.path, json, encoding:'utf8'
-        # log "prefs.save"
+        log "prefs.save"
+        nconf.load (err) =>
+            if not err?
+                log "nconf loaded"
+                for c in @changes
+                    @set c[0], c[1], true
+                nconf.save (err) => 
+                    log "nconf save error:", err if err?
+                    log "nconf saved", nconf.get 'windows' if not err?
+                @changes = []
+            else log "nconf load error:", err
 
 module.exports = Prefs

@@ -6,6 +6,7 @@
 
 {first,
  fileList,
+ fileExists,
  resolve}     = require './tools/tools'
 prefs         = require './tools/prefs'
 log           = require './tools/log'
@@ -39,20 +40,21 @@ args  = require('karg') """
 
 #{pkg.name}
 
-    arglist   . ? argument list           . ** .
+    filelist  . ? files to open           . ** .
     show      . ? open window on startup  . = true
     prefs     . ? show preferences        . = false
     noprefs   . ? don't load preferences  . = false
-    debug     . ? debug mode              . = false
-    test      . ? test mode               . = false
-    devtools  . ? open developer tools    . = false . - D
     verbose   . ? log more                . = false
+    debug     . ? debug mode              . = false
+    DevTools  . ? open developer tools    . = false
+    test      .                             = false
     
 version  #{pkg.version}
 
 """, dontExit: true
 
-app.exit(0) if not args?
+if not args?
+    app.exit(0) 
 
 if args.verbose
     log colors.white.bold "\nko", colors.gray "v#{pkg.version}\n"
@@ -69,15 +71,15 @@ if args.verbose
 # 000        000   000  000       000            000
 # 000        000   000  00000000  000       0000000 
 
-prefs.init "#{app.getPath('userData')}/#{pkg.name}.json",
+prefs.init "#{app.getPath('appData')}/#{pkg.name}/ko.noon",
     shortcut: 'F2'
-
+    
 if args.prefs
     log colors.yellow.bold 'prefs'
-    log noon.stringify prefs.load(), colors:true
-    log ''
+    if fileExists prefs.path
+        log noon.stringify noon.load(prefs.path), colors:true
 
-mostRecentFile = -> first prefs.get 'recentFiles', []
+mostRecentFile = -> first prefs.get 'recentFiles'
 
 # 000   000  000  000   000   0000000
 # 000 0 000  000  0000  000  000     
@@ -145,13 +147,14 @@ class Main
             
         @restoreWindows() if not args.noprefs and not openFiles.length
         
+        if not openFiles.length and args.filelist.length
+            openFiles = fileList args.filelist
+            @dbg "Main.constructor openFiles = fileList args.filelist: #{openFiles}"
+            
         if openFiles.length
             for file in openFiles
-                @createWindow file
-        else
-            for file in fileList args.arglist
-                @dbg "Main.constructor open args file: #{file}"
-                @createWindow file
+                @dbg "Main.constructor openFiles.file: #{file}"
+                @createWindow file            
 
         if not wins().length
             if args.show
@@ -190,7 +193,7 @@ class Main
 
     saveWinBounds: (win) ->
         # log "main.saveWinBounds"
-        prefs.setPath "windows.#{win.id}.bounds",win.getBounds()
+        prefs.set "windows:#{win.id}:bounds",win.getBounds()
     
     toggleWindows: =>
         if wins().length
@@ -238,12 +241,17 @@ class Main
 
     closeOtherWindows:=>
         for w in wins()
-            w.close() if w != activeWin()
+            if w != activeWin()
+                @closeWindow w
+    
+    closeWindow: (w) =>
+        prefs.del "windows.#{w.id}"
+        w?.close()
     
     closeWindows: =>
         for w in wins()
-            w.close()
-            hideDock()
+            @closeWindow w
+        hideDock()
             
     closeWindowsAndQuit: => 
         @closeWindows()
@@ -308,11 +316,12 @@ class Main
             i += 1
             sequenced[i] = w
         prefs.set 'windows', sequenced
+        @dbg "main.restoreWindows #{Object.keys sequenced}"
         for k, w of sequenced
             @restoreWin w
                 
     restoreWin: (state) ->
-        # @dbg "restoreWin #{state}"
+        # @dbg "main.restoreWin", #{state}
         w = @createWindow state.file
         w.setBounds state.bounds if state.bounds?
         w.webContents.openDevTools() if state.devTools
@@ -352,7 +361,7 @@ class Main
                 win.webContents.send 'loadFile', openFile
                 openFile = null
             else
-                file = prefs.getPath "windows.#{win.id}.file"
+                file = prefs.get "windows:#{win.id}:file"
                 if file?
                     win.webContents.send 'loadFile', file
                     
@@ -372,8 +381,7 @@ class Main
     onCloseWin: (event) =>
         if visibleWins().length == 1
             hideDock()
-        prefs.setPath "windows.#{event.sender.id}", undefined
-        @reloadMenu()
+        @dbg "main.onCloseWin #{event.sender.id}"
         
     otherInstanceStarted: (args, dir) =>
         @log "main.otherInstanceStarted args args: #{args} dir: #{dir}"
@@ -391,8 +399,10 @@ class Main
             visibleWins()[0]?.focus()
         
     quit: => 
-        log 'exit'
+        @dbg "main.quit app.exit 0"
         app.exit 0
+        @dbg "main.quit process.exit 0"
+        process.exit 0
     
     #  0000000   0000000     0000000   000   000  000000000
     # 000   000  000   000  000   000  000   000     000   
@@ -409,7 +419,7 @@ class Main
             frame:         true
             show:          true
             center:        true
-            backgroundColor: '#000'            
+            backgroundColor: '#333'            
             width:         400
             height:        420
         w.loadURL "file://#{cwd}/../about.html"

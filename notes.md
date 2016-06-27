@@ -1,5 +1,6 @@
 # todo/ideas
 
+*fix autocomplete*
 *replace prefs with nconf?*
 
 #### find

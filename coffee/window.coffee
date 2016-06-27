@@ -42,7 +42,7 @@ commandline = null
 # 000        000   000  000       000            000
 # 000        000   000  00000000  000       0000000 
 
-prefs.init "#{remote.app?.getPath('userData')}/#{pkg.name}.json"
+prefs.init "#{remote.app?.getPath('appData')}/#{pkg.name}/ko.noon",
 
 addToRecent = (file) ->
     recent = prefs.get 'recentFiles', []
@@ -62,16 +62,16 @@ setState = window.setState = (key, value) ->
     # log 'setState', key, value
     return if not winID
     if winID
-        prefs.setPath "windows.#{winID}.#{key}", value
+        prefs.set "windows:#{winID}:#{key}", value
     
 getState = window.getState = (key, value) ->
     return value if not winID
     # log 'getState', key, value, prefs.getPath "windows.#{winID}.#{key}", value
-    prefs.getPath "windows.#{winID}.#{key}", value
+    prefs.get "windows:#{winID}:#{key}", value
     
 delState = window.delState = (key) ->
     return if not winID
-    prefs.setPath "windows.#{winID}.#{key}", null
+    prefs.del "windows:#{winID}:#{key}"
     
 # 000  00000000    0000000
 # 000  000   000  000     

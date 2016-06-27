@@ -118,7 +118,7 @@ class MainMenu
             ,
                 label:       'Close Window'
                 accelerator: 'Command+W'
-                click:       (i,win) -> win?.close()
+                click:       (i,win) -> main.closeWindow win
             ]
         ,        
             # 000   000  000  000   000  0000000     0000000   000   000

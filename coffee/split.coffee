@@ -314,11 +314,11 @@ class Split extends event
             
     setState: (key, value) ->
         if @winID
-            prefs.setPath "windows.#{@winID}.#{key}", value
+            prefs.set "windows:#{@winID}:#{key}", value
         
     getState: (key, value) ->
         if @winID
-            prefs.getPath "windows.#{@winID}.#{key}", value
+            prefs.get "windows:#{@winID}:#{key}", value
         else
             value
 
