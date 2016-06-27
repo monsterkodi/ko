@@ -7,7 +7,7 @@
 clr                  = {} 
 clr.black            = #000000
 clr.gray-most-dark   = #181818
-clr.gray-dark        = #333333
+clr.gray-dark        = #333
 clr.gray-medium      = #666666
 clr.gray             = #888888
 clr.white            = #ffffff
@@ -19,7 +19,7 @@ clr.blue-medium      = #6666ff
 clr.blue-bright      = #8888ff
 clr.blue-very-bright = #aaaaff
 
-clr.background       = clr.gray-most-dark
+clr.background       = clr.gray-dark
 
 body
     font-family         Verdana
@@ -31,7 +31,6 @@ body
 
 body
     margin              0px
-    font-size           18px
     overflow            hidden
     
 a
@@ -48,15 +47,18 @@ a
     right               0
 
 #icon
-    margin-top          30px
-    margin-bottom       30px
+    margin-top          50px
+    margin-bottom       10px
+    padding-left        30px
     cursor              pointer
 
 #name
     font-weight         bold
+    font-size           60px
+    display             none
     
 #version
-    font-size           14px
-    color:              clr.gray-dark
+    font-size           20px
+    color:              clr.gray-medium
     &:hover 
-        color:          clr.gray-medium
+        color:          clr.blue-medium

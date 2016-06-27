@@ -8,7 +8,7 @@ getStyle,
 clamp,
 first,
 last}   = require '../tools/tools'
-tlog    = require '../tools/log'
+log     = require '../tools/log'
 str     = require '../tools/str'
 drag    = require '../tools/drag'
 profile = require '../tools/profile'
@@ -228,6 +228,6 @@ class Minimap
         if @editor.name == 'logview'
             console.log (str(s) for s in [].slice.call arguments, 0).join " "
         else
-            tlog (str(s) for s in [].slice.call arguments, 0).join " "
+            log (str(s) for s in [].slice.call arguments, 0).join " "
         
 module.exports = Minimap

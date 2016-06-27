@@ -9,6 +9,7 @@ first,
 last,
 $}  = require '../tools/tools'
 log = require '../tools/log'
+str = require '../tools/str'
 _   = require 'lodash'
 
 class Numbers
@@ -149,6 +150,6 @@ class Numbers
         if @editor.name == 'logview'
             console.log (str(s) for s in [].slice.call arguments, 0).join " "
         else
-            @log (str(s) for s in [].slice.call arguments, 0).join " "
+            log (str(s) for s in [].slice.call arguments, 0).join " "
 
 module.exports = Numbers

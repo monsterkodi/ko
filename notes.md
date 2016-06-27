@@ -1,8 +1,9 @@
 # todo/ideas
 
+*replace prefs with nconf?*
+
 #### find
 - *keep command+e search string longer*
-- *highlight while entering*
 - display number of matches somewhere
 
 #### search
@@ -14,6 +15,9 @@
 
 #### windows
 - cycle through windows command: windows list
+- *window id in titlebar*
+- command+n to switch to window with id n
+- recent files in titlebar?
 
 #### editor
 - *autocomplete from similar files*
@@ -33,6 +37,7 @@
 - *align cursors with inserting spaces when ctrl+alt+right*
 - *ctrl+command+/  align cursors block*
 - *dbg "class.method arg: #{arg}, ..."*
+- *delete backwards over line boundaries only if command is down*
 - clamp cursors after pasting
 - select continuous,rectangular ranges with command+shift+M 
 - remove from selection when alt/ctrl is down?
@@ -49,6 +54,8 @@
 - highlight cursor line(s?)
 
 #### open
+- *when navigating, don't filter files in @dir*
+- command-p alias: -n for previuous files
 - show relative path when navigating in history
 
 #### terminal
@@ -80,7 +87,8 @@
 - command drag: don't clear selection and don't single select
 
 #### syntax
-- pug, html, js
+- pug, html, js, bash
+- look at hashbang if no extname
 
 #### commands
 - tree

@@ -9,6 +9,7 @@
  resolve}     = require './tools/tools'
 prefs         = require './tools/prefs'
 log           = require './tools/log'
+str           = require './tools/str'
 pkg           = require '../package.json'
 execute       = require './execute'
 MainMenu      = require './mainmenu'
@@ -38,11 +39,14 @@ args  = require('karg') """
 
 #{pkg.name}
 
-    arglist  . ? argument list           . ** .
-    show     . ? open window on startup  . = true
-    noprefs  . ? don't load preferences  . = false
-    debug    . ? open developer tools    . = false . - D
-    verbose  . ? log more                . = false
+    arglist   . ? argument list           . ** .
+    show      . ? open window on startup  . = true
+    prefs     . ? show preferences        . = false
+    noprefs   . ? don't load preferences  . = false
+    debug     . ? debug mode              . = false
+    test      . ? test mode               . = false
+    devtools  . ? open developer tools    . = false . - D
+    verbose   . ? log more                . = false
     
 version  #{pkg.version}
 
@@ -51,6 +55,10 @@ version  #{pkg.version}
 app.exit(0) if not args?
 
 if args.verbose
+    log colors.white.bold "\nko", colors.gray "v#{pkg.version}\n"
+    log colors.yellow.bold 'process'
+    p = cwd: process.cwd()
+    log noon.stringify p, colors:true
     log colors.yellow.bold 'args'
     log noon.stringify args, colors:true
     log ''
@@ -64,7 +72,7 @@ if args.verbose
 prefs.init "#{app.getPath('userData')}/#{pkg.name}.json",
     shortcut: 'F2'
 
-if args.verbose
+if args.prefs
     log colors.yellow.bold 'prefs'
     log noon.stringify prefs.load(), colors:true
     log ''
@@ -142,16 +150,16 @@ class Main
                 @createWindow file
         else
             for file in fileList args.arglist
-                log 'create', file
+                @dbg "Main.constructor open args file: #{file}"
                 @createWindow file
 
         if not wins().length
             if args.show
-                log 'load recent',mostRecentFile() 
+                @dbg "Main.constructor open recent file: #{mostRecentFile()}" 
                 w = @createWindow mostRecentFile()
         
-        if args.debug
-            wins()?[0]?.webContents.openDevTools() 
+        if args.devtools
+            wins()?[0]?.webContents.openDevTools()
 
         MainMenu.init @
 
@@ -304,7 +312,7 @@ class Main
             @restoreWin w
                 
     restoreWin: (state) ->
-        # log "restoreWin #{state}"
+        # @dbg "restoreWin #{state}"
         w = @createWindow state.file
         w.setBounds state.bounds if state.bounds?
         w.webContents.openDevTools() if state.devTools
@@ -335,12 +343,12 @@ class Main
         win.on 'move', @onMoveWin
                 
         winReady = =>
-            # log "main.createWindow.winReady send setWinID #{win.id}"
+            # @dbg "main.createWindow.winReady send setWinID #{win.id}"
             win.webContents.send 'setWinID', win.id
                         
         winLoaded = =>
             if openFile?
-                log "main.createWindow.winLoaded send loadFile #{openFile}"
+                @dbg "main.createWindow.winLoaded send loadFile openFile: #{openFile}"
                 win.webContents.send 'loadFile', openFile
                 openFile = null
             else
@@ -368,7 +376,7 @@ class Main
         @reloadMenu()
         
     otherInstanceStarted: (args, dir) =>
-        log 'other instance args', args, 'dir', dir
+        @log "main.otherInstanceStarted args args: #{args} dir: #{dir}"
         if not visibleWins().length
             @toggleWindows()
             
@@ -376,7 +384,7 @@ class Main
             file = arg
             if not arg.startsWith '/'
                 file = resolve dir + '/' + arg
-            log 'create', file
+            @log 'create', file
             @createWindow file
             
         if !activeWin()
@@ -406,6 +414,9 @@ class Main
             height:        420
         w.loadURL "file://#{cwd}/../about.html"
         w.on 'openFileDialog', @createWindow
+
+    log: -> log (str(s) for s in [].slice.call arguments, 0).join " " if args.verbose
+    dbg: -> log (str(s) for s in [].slice.call arguments, 0).join " " if args.debug
             
 #  0000000   00000000   00000000         0000000   000   000
 # 000   000  000   000  000   000       000   000  0000  000
@@ -413,10 +424,8 @@ class Main
 # 000   000  000        000        000  000   000  000  0000
 # 000   000  000        000        000   0000000   000   000
 
-app.on 'activate', (event, hasVisibleWindows) => log "app.on activate #{hasVisibleWindows}"
-app.on 'browser-window-focus', (event, win) =>
-    log "app.on browser-window-focus #{win.id}"
-    # win.webContents.send 'focusEditor'
+app.on 'activate', (event, hasVisibleWindows) => #log "app.on activate #{hasVisibleWindows}"
+app.on 'browser-window-focus', (event, win)   => #log "app.on browser-window-focus #{win.id}"
 
 app.on 'open-file', (event, path) => 
     if not main?
