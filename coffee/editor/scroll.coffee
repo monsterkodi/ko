@@ -62,7 +62,7 @@ class scroll extends events
     info: ->
         topbot: "#{@top} .. #{@bot} = #{@bot-@top} / #{@numLines}"
         expose: "#{@exposeTop} .. #{@exposeBot} = #{@exposed} / #{@exposeNum}"
-        scroll: "#{@scroll} offsetTop #{@offsetTop} max #{@scrollMax} full #{@fullLines} view lines #{@viewLines} height #{@viewHeight}"
+        scroll: "#{@scroll} offsetTop #{@offsetTop} scrollMax #{@scrollMax} fullLines #{@fullLines} viewLines #{@viewLines} viewHeight #{@viewHeight}"
         
     # 00000000   00000000   0000000  00000000  000000000
     # 000   000  000       000       000          000   

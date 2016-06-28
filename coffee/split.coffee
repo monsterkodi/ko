@@ -235,10 +235,14 @@ class Split extends event
     # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
     #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
     
-    hideCommandline: -> @splitAt 1, 0
+    hideCommandline: -> 
+        @splitAt 1, 0
+        @emit 'commandline', 'hidden'
+        
     showCommandline: -> 
         if 0 >= @splitPosY 1
             @splitAt 0, 0
+            @emit 'commandline', 'shown'
     
     show: (n) ->
         # log "split.show #{n}"

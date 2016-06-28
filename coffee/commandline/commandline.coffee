@@ -107,6 +107,7 @@ class Commandline extends ViewBase
         for n,c of @commands            
             if combo == 'esc'
                 if document.activeElement == @view
+                    log "commandline.globalModKeyComboEvent esc"
                     return @cancel()
             for sc in c.shortcuts
                 if sc == combo then return @startCommand n, combo                

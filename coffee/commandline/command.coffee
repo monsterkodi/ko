@@ -29,9 +29,9 @@ class Command
     onBlur: ->
     setFocus: (focus) -> @focus = focus ? '.editor'
     changed: (command) ->
-    cancel: -> 
-        focus: @focus
+    cancel: ->
         @setText ''
+        focus: @focus        
                 
     execute: (command) ->    
         _.pull @history, command

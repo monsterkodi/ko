@@ -23,6 +23,7 @@ class View extends ViewBase
 
     constructor: (viewElem) -> 
         
+        window.split.on 'commandline', @onCommandline
         @fontSizeDefault = 14
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Autocomplete']        
                     
@@ -87,6 +88,20 @@ class View extends ViewBase
             dc = dirty and " dirty" or ""
             title = "<span class=\"title#{dc}\" data-tip=\"#{unresolve @currentFile}\">#{ds} #{title} #{ds}</span>"
         $('.titlebar').innerHTML = title 
+        
+    #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
+    # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
+    # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 
+    # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
+    #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
+    
+    onCommandline: (e) =>
+        switch e
+            when 'hidden', 'shown'
+                d = window.split.commandlineHeight + window.split.handleHeight
+                d = Math.min d, @scroll.scrollMax - @scroll.scroll
+                d *= -1 if e == 'hidden'
+                @scrollBy d
             
     #  0000000   0000000   000   000  00000000
     # 000       000   000  000   000  000     

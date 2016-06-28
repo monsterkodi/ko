@@ -24,6 +24,7 @@
 - *alt-click: jump to definition*
 - *send changes between windows*
 - *store unsaved changes in prefs*
+- save and restore scrollX/Left
 - check undo (merges too much?)
 - don't clear undo buffer on save?
 - save backup files?
@@ -38,6 +39,8 @@
 - *ctrl+command+/  align cursors block*
 - *dbg "class.method arg: #{arg}, ..."*
 - *delete backwards over line boundaries only if command is down*
+- make editor scroll to the right position when commandline opens
+- fix escape on commandline
 - no surround for ' inside words
 - clamp cursors after pasting
 - select continuous,rectangular ranges with command+shift+M 
