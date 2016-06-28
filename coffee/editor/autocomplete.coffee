@@ -18,6 +18,12 @@ class Autocomplete
         @wordinfo = {}
         
         @close()
+        
+        specials = "_-@#"
+        @especial = ("\\"+c for c in specials.split '').join ''
+        @headerRegExp     = new RegExp "^[0#{@especial}]+$"
+        @notSpecialRegExp = new RegExp "[^#{@especial}]"
+        @splitRegExp      = new RegExp "[^\\w\\d#{@especial}]+", 'g'        
     
         @editor.on 'edit',           @onEdit
         @editor.on 'linesSet',       @onLinesSet
@@ -25,6 +31,8 @@ class Autocomplete
         @editor.on 'willDeleteLine', @onWillDeleteLine
         @editor.on 'lineChanged',    @onLineChanged
         @editor.on 'linesAppended',  @onLinesAppended
+        @editor.on 'cursorMoved',    @close
+        @editor.on 'blur',           @close
 
     #  0000000   000   000  00000000  0000000    000  000000000
     # 000   000  0000  000  000       000   000  000     000   
@@ -33,43 +41,50 @@ class Autocomplete
     #  0000000   000   000  00000000  0000000    000     000   
 
     onEdit: (info) =>
-    
         @close()
-        
-        if info.action == 'delete'            
-            w = last info.before.split new RegExp "[^\\w\\d\\-\\@]+", 'g'
-            if @wordinfo[w]?.temp and @wordinfo[w]?.count <= 0
-                _.pull @wordlist, w
-                delete @wordinfo[w]
-        
-        return if info.action != 'insert'
-        
-        @word = last info.before.split new RegExp "[^\\w\\d\\-\\@]+", 'g'
-        return if not @word?.length
-        return if not @wordlist?.length
-        
-        for w in @wordlist
-            if w.startsWith(@word) and w.length > @word.length
-                if not @firstMatch
-                    @firstMatch = w 
-                else
-                    @matchList.push w
+        @word = last info.before.split @splitRegExp
+        switch info.action
+            
+            when 'delete'            
+                if @wordinfo[@word]?.temp and @wordinfo[@word]?.count <= 0
+                    _.pull @wordlist, @word
+                    delete @wordinfo[@word]
                     
-        # log "autocomplete.match #{@firstMatch}"
+            when 'insert'        
+                return if not @word?.length
+                return if not @wordlist?.length
+                
+                for w in @wordlist
+                    if w.startsWith(@word) and w.length > @word.length
+                        if not @firstMatch
+                            @firstMatch = w 
+                        else
+                            @matchList.push w
+                            
+                return if not @firstMatch?
+                @completion = @firstMatch.slice @word.length
+                
+                @open info
         
-        return if not @firstMatch?
-        @completion = @firstMatch.slice @word.length
-        
-        # log "autocomplete.match word: #{word} match: #{@firstMatch.string} info:", info
+    #  0000000   00000000   00000000  000   000
+    # 000   000  000   000  000       0000  000
+    # 000   000  00000000   0000000   000 0 000
+    # 000   000  000        000       000  0000
+    #  0000000   000        00000000  000   000
+    
+    open: (info) ->
+        # log "autocomplete.open word: #{@word} @firstMatch: #{@firstMatch} info:", info
         cursor = $('.main', @editor.view)
         if not cursor?
             log "warning! no cursor?"
+            return
+        
         @span = document.createElement 'span'
         @span.textContent = @completion
-        @span.className = 'autocomplete-span'
-        @span.style.opacity = 1
-        @span.style.background = "#44a"
-        @span.style.color = "#fff"
+        @span.className     = 'autocomplete-span'
+        @span.style.opacity   = 1
+        @span.style.background  = "#44a"
+        @span.style.color       = "#fff"
 
         cr = cursor.getBoundingClientRect()
         sp = @editor.lineSpanAtXY cr.left, cr.top  
@@ -78,12 +93,16 @@ class Autocomplete
             if info.after[0] == ' ' or info.after.length == 0
                 sp.insertAdjacentElement 'afterend', @span
             else
-                inner = sp.innerHTML
+                inner        = sp.innerHTML                
+                log "inner #{inner}"
                 @cloneBefore = sp.cloneNode true
-                @cloneAfter = sp.cloneNode true
-                @cloneSrc = sp
-                @cloneBefore.innerHTML = @word
-                @cloneAfter.innerHTML = inner.slice @word.length
+                @cloneAfter  = sp.cloneNode true
+                @cloneSrc    = sp
+                ws = @word.splice @word.indexOf /\w/
+                befor = inner.slice 0, ws.length
+                after = inner.slice ws.length
+                @cloneBefore.innerHTML = befor
+                @cloneAfter .innerHTML = after
                 sp.insertAdjacentElement 'afterend', @cloneAfter
                 sp.insertAdjacentElement 'beforebegin', @cloneBefore
                 sp.insertAdjacentElement 'beforebegin', @span
@@ -141,22 +160,24 @@ class Autocomplete
     # 000        000   000  000   000  0000000   00000000
     
     parseLines:(lines, opt) ->
-        
-        # todo remove/ignore word before cursor when action is 'change'
-                
+        @close()
+        cursorWord = @cursorWord()
         for l in lines
             if not l?.split?
                 log "warning! no split?", lines
-            words = l.split new RegExp "[^\\#\\w\\d\"\'\\-\\@]+", 'g'
+                alert 'wtf?'            
+            words = l.split @splitRegExp
             words = words.filter (w) => 
                 return false if w.length < 2
-                return false if w[0] in ['-'] and w.length < 3
+                return false if w[0] in ['-', "#", '_'] and w.length < 3
                 return false if @word == w.slice 0, w.length-1
-                # log "#{w} != #{@word}" if opt.action == 'change'
-                return not /([\\'\\"_]+|(^[0\\#]+$))/.test w 
+                return false if w == cursorWord
+                return false if @headerRegExp.test w
+                true
                 
             for w in words
-                words.push w.slice 1 if w[0] in ['@']
+                i = w.search @notSpecialRegExp
+                words.push w.slice i if i > 0 
             
             for w in words
                 info  = @wordinfo[w] ? {}
@@ -166,28 +187,27 @@ class Autocomplete
                 info.temp = true if opt.action is 'change'
                 @wordinfo[w] = info                
                 
-        # log "Completion.parseLines #{@editor.name} lines: #{lines.length} @wordinfo:", @wordinfo 
-        
-        # 000   000  00000000  000   0000000   000   000  000000000
-        # 000 0 000  000       000  000        000   000     000   
-        # 000000000  0000000   000  000  0000  000000000     000   
-        # 000   000  000       000  000   000  000   000     000   
-        # 00     00  00000000  000   0000000   000   000     000   
-        
-        weight = (w) -> 
-            [word, info] = w
-            # (word.length - 3) - (info.count)
-            info.count
+        weight = (wi) -> wi[1].count
             
         sorted = ([w,i] for w,i of @wordinfo).sort (a,b) -> weight(b) - weight(a)
         
-        # log "Completion.parseLines #{@editor.name} sorted:", sorted
-        
         @wordlist = (s[0] for s in sorted)
         
-        # log "Completion.parseLines -- #{@editor.name} @wordlist:", @wordlist #if opt.action != 'change'
-        # log "Completion.parseLines -- #{@word} action #{opt.action}"
-        # log "Completion.parseLines -- #{@editor.name} @wordlist:", @wordlist.length
+        # log "Completion.parseLines -- #{@editor.name} @wordlist:", @wordlist.slice 0, 40
+                
+    #  0000000  000   000  00000000    0000000   0000000   00000000   000   000   0000000   00000000   0000000  
+    # 000       000   000  000   000  000       000   000  000   000  000 0 000  000   000  000   000  000   000
+    # 000       000   000  0000000    0000000   000   000  0000000    000000000  000   000  0000000    000   000
+    # 000       000   000  000   000       000  000   000  000   000  000   000  000   000  000   000  000   000
+    #  0000000   0000000   000   000  0000000    0000000   000   000  00     00   0000000   000   000  0000000  
+    
+    cursorWord: ->
+        saveRegExp = @editor.wordRegExp
+        @editor.wordRegExp = new RegExp "(\\s+|[\\w#{@especial}]+|[^\\s])", 'g'
+        cursorWord = @editor.wordAtCursor()
+        @editor.wordRegExp = saveRegExp
+        # log "autocomplete.cursorWord #{cursorWord}"
+        cursorWord
                 
     #  0000000  000       0000000    0000000  00000000
     # 000       000      000   000  000       000     
@@ -195,7 +215,7 @@ class Autocomplete
     # 000       000      000   000       000  000     
     #  0000000  0000000   0000000   0000000   00000000
 
-    close: ->
+    close: =>
         @list?.remove()
         @span?.remove()
         @navigating = false

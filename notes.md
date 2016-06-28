@@ -38,6 +38,7 @@
 - *ctrl+command+/  align cursors block*
 - *dbg "class.method arg: #{arg}, ..."*
 - *delete backwards over line boundaries only if command is down*
+- no surround for ' inside words
 - clamp cursors after pasting
 - select continuous,rectangular ranges with command+shift+M 
 - remove from selection when alt/ctrl is down?

@@ -163,7 +163,8 @@ class Main
                 @dbg "Main.constructor open recent file: #{mostRecentFile()}" 
                 w = @createWindow mostRecentFile()
         
-        if args.devtools
+        if args.DevTools
+            log "open dev tools", wins()?[0]?
             wins()?[0]?.webContents.openDevTools()
 
         MainMenu.init @

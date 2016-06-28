@@ -35,6 +35,7 @@ class ViewBase extends Editor
         @name = @name.slice 1 if @name[0] == '.'
         @view = $(viewElem)
         @view.onpaste = (event) => log "view on paste #{@name}", event
+        @view.onblur  = (event) => @emit 'blur'
         layerNames = ["selections", "highlights", "lines", "cursors"]
         layerNames.push "numbers" if "Numbers" in @config.features
         @initLayers layerNames
@@ -190,6 +191,7 @@ class ViewBase extends Editor
             @renderCursors()
             $('.main', @view)?.scrollIntoViewIfNeeded()
             @updateScrollOffset()
+            @emit 'cursorMoved', @cursorPos()
             @emit 'cursors', changeInfo.cursor
             
         if changeInfo.selection.length

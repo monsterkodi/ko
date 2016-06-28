@@ -1,30 +1,7 @@
-123
-1to3
-4to6
-456
-aaa bbb aaa
-    aaa bbb aaa
-        aaa bbb aaa
-            aaa bbb aaa
-                aaa 
-                    bbb
-aaa bbb aaa
-asdasdasdasdasdasdasdas
-asdasdasdsadasdasdasdasdas
-asdasdasdasdsadasdasdasdasdasd
-asdasdasdasdasdasdasdasdasdsadsdasd
-asdasdasdasdasdasdasdasdsadasd
-asdasdasdasdasdasdasdsadas
-asdasdasdasdasdasdsadas
-asdasdasdsadasdsadsad
-asdasdasdasdasasdasd
-asdasdasdasdasdasd
-asdasdasdasdsadad
-asdasdasdsadas
-asdasdasdasda
-dasdasdasdad
-asdasdasds
-asdasdas
-dasdasd
-asdasd
-asda
+nadjo ist mein name.
+my name is nadja.
+na, was ist dein name?
+mein name ist hase.
+und ich heisse nadja. nadjo ist mein bruder.
+brother's name is norbert. norbert is nadja's bruder.
+is norbert nadja's brother?

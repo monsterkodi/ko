@@ -120,12 +120,14 @@ class Open extends Command
                 index += 1
 
     onBot: (bot) => 
-        clh = window.split.commandlineHeight
-        bot += window.split.handleHeight
-        if bot < clh/2 
+        hh = window.split.handleHeight
+        cl = window.split.commandlineHeight
+        clh = cl+hh
+        if bot < hh
             @hideList()
-        if bot < clh
-            @list?.style.opacity = "#{(bot-clh/2)/(clh/2)}"
+        if bot-hh < clh
+            o = clamp 0, 1, (bot-2*hh-cl/2.0)/(cl/2.0)
+            @list?.style.opacity = "#{o}"
         else
             @list?.style.opacity = "1"
             @positionList()

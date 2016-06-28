@@ -18,7 +18,9 @@ _      = require 'lodash'
 
 class Buffer extends event
     
-    constructor: () -> @setLines ['']
+    constructor: () -> 
+        @wordRegExp = new RegExp "(\\s+|\\w+|[^\\s])", 'g'
+        @setLines ['']
 
     setLines: (@lines) ->
         @cursors    = [[0,0]]
@@ -72,6 +74,7 @@ class Buffer extends event
     # 000   000  000   000  000   000  000   000
     # 00     00   0000000   000   000  0000000  
 
+    wordAtCursor: (c=@mainCursor) -> @textInRange @rangeForWordAtPos c
     rangeForWordAtPos: (pos) ->
         p = @clampPos pos
         wr = @wordRangesInLineAtIndex p[1]
@@ -97,7 +100,7 @@ class Buffer extends event
         
     wordRangesInLineAtIndex: (li) ->
         r = []
-        re = new RegExp "(\\s+|\\w+|[^\\s])", 'g'
+        re = @wordRegExp
         while (mtch = re.exec(@lines[li])) != null
             r.push [li, [mtch.index, re.lastIndex]]
         r.length and r or [[li, [0,0]]]
