@@ -1,7 +1,6 @@
 # todo/ideas
 
 *fix autocomplete*
-*replace prefs with nconf?*
 
 #### find
 - *keep command+e search string longer*
@@ -74,9 +73,6 @@
 #### logview
 - font zoom
       
-#### minimap
-- show selections, highlights and cursors
-    
 #### selection
 - two selection modes
     - active (cursor inside)
@@ -85,6 +81,7 @@
     
 #### minimap 
 - shift drag: extend selection
+- show selections, highlights and cursors
 - command drag: don't clear selection and don't single select
 
 #### syntax

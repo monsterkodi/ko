@@ -30,7 +30,7 @@ class Commandline extends ViewBase
 
         @loadCommands()
         
-        window.split.on 'paneHeight', @onPaneHeight
+        window.split.on 'split', @onSplit
         
         @view.onblur = () => @command?.onBlur()
 
@@ -57,7 +57,9 @@ class Commandline extends ViewBase
             command.setPrefsID commandClass.name.toLowerCase()
             @commands[command.prefsID] = command
             
-    onPaneHeight: (e) => if e.paneIndex == 0 then @command?.onPosY? e.newHeight
+    onSplit: (s) => 
+        @command?.onTop? s[0] + window.split.handleHeight
+        @command?.onBot? s[1] + window.split.handleHeight
           
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   

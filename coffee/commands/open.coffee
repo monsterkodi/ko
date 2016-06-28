@@ -119,7 +119,16 @@ class Open extends Command
                 @list.appendChild div
                 index += 1
 
-    onPosY: (posY) => @positionList()
+    onBot: (bot) => 
+        clh = window.split.commandlineHeight
+        bot += window.split.handleHeight
+        if bot < clh/2 
+            @hideList()
+        if bot < clh
+            @list?.style.opacity = "#{(bot-clh/2)/(clh/2)}"
+        else
+            @list?.style.opacity = "1"
+            @positionList()
     
     positionList: ->
         return if not @list?

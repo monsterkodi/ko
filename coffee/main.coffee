@@ -118,7 +118,9 @@ ipc.on 'maximizeWindow',    (event, winID) => main.toggleMaximize winWithID winI
 ipc.on 'reloadWindow',      (event, winID) => main.reloadWin winWithID winID
 ipc.on 'reloadMenu',        ()             => main.reloadMenu()
 ipc.on 'saveBounds',        (event, winID) => main.saveWinBounds winWithID winID
-    
+ipc.on 'prefSet',           (event, k, v)  => prefs.set k, v
+ipc.on 'prefGet',           (event, k, d)  => event.returnValue = prefs.get k, d
+
 # 00     00   0000000   000  000   000
 # 000   000  000   000  000  0000  000
 # 000000000  000000000  000  000 0 000
@@ -245,7 +247,7 @@ class Main
                 @closeWindow w
     
     closeWindow: (w) =>
-        prefs.del "windows.#{w.id}"
+        prefs.del "windows:#{w.id}"
         w?.close()
     
     closeWindows: =>
@@ -313,8 +315,9 @@ class Main
         sequenced = {}
         i = 0
         for k, w of windows
-            i += 1
-            sequenced[i] = w
+            if w.file
+                i += 1
+                sequenced[i] = w
         prefs.set 'windows', sequenced
         @dbg "main.restoreWindows #{Object.keys sequenced}"
         for k, w of sequenced
@@ -399,10 +402,12 @@ class Main
             visibleWins()[0]?.focus()
         
     quit: => 
-        @dbg "main.quit app.exit 0"
-        app.exit 0
-        @dbg "main.quit process.exit 0"
-        process.exit 0
+        prefs.save (ok) =>
+            @dbg "prefs saved ok:#{ok}"
+            @dbg "main.quit app.exit 0"
+            app.exit 0
+            @dbg "main.quit process.exit 0"
+            process.exit 0
     
     #  0000000   0000000     0000000   000   000  000000000
     # 000   000  000   000  000   000  000   000     000   

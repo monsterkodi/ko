@@ -155,8 +155,8 @@ class Editor extends Buffer
 
     selectMoreLines: ->
         @do.start()
-        newSelections = _.cloneDeep @selections
         newCursors = _.cloneDeep @cursors
+        newSelections = _.cloneDeep @selections
         
         selectCursorLineAtIndex = (c,i) =>
             range = @rangeForLineAtIndex i
@@ -168,17 +168,19 @@ class Editor extends Buffer
             if not @isSelectedLineAtIndex c[1]
                 selectCursorLineAtIndex c, c[1]
                 start = true
+                
         if not start
             for c in @cursors
-                selectCursorLineAtIndex c, c[1]+1
+                selectCursorLineAtIndex c, c[1]+1 if c[1] < @lines.length-1
+                
         @do.selections newSelections
         @do.cursors newCursors
         @do.end()       
 
     selectLessLines: -> 
         @do.start()
-        newSelections = _.cloneDeep @selections
         newCursors = _.cloneDeep @cursors
+        newSelections = _.cloneDeep @selections
         
         for c in @reversedCursors()
             thisSel = @selectionsInLineAtIndex(c[1])
@@ -840,7 +842,7 @@ class Editor extends Buffer
                 # remove space after callee
                 before = @lines[s[0]].slice 0, s[1][0]
                 trimmed = before.trimRight()
-                if not /(if|when|in|and|or|is|not)$/.test trimmed
+                if /\w$/.test(trimmed) and not /(if|when|in|and|or|is|not|else)$/.test trimmed
                     spaces = before.length-trimmed.length
                     @do.change s[0], @lines[s[0]].splice trimmed.length, spaces
                     ns[1][0] -= spaces

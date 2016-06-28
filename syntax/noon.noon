@@ -18,8 +18,8 @@
 
 # property
 
-(^\s+\S+\s\s)\s*[^\s\.]+    property
-(^\s+\S+$)                  property
+(^\s+[\w-]+\s\s)\s*[^\s\.]+    property
+(^\s+[\w-]+$)                  property
 
 # keypath / semver
 

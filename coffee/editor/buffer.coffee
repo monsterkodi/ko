@@ -12,6 +12,7 @@ last
 }      = require "../tools/tools"
 log    = require '../tools/log'
 assert = require 'assert'
+fuzzy  = require 'fuzzy'
 event  = require 'events'
 _      = require 'lodash'
 
@@ -253,6 +254,7 @@ class Buffer extends event
         [ c, l ]
         
     clampPos: (p) ->
+        alert("wtf?") if not @lines.length
         l = clamp 0, @lines.length-1, p[1]
         c = clamp 0, @lines[l].length, p[0]
         [ c, l ]
@@ -324,17 +326,6 @@ class Buffer extends event
             r.push @rangeForLineAtIndex li
         r
     
-    rangesForTextInLineAtIndex: (t, i, opt) ->
-        s = 'i'
-        s = '' if opt?.caseSensitive
-        t = _.escapeRegExp t if not opt?.regexp
-        
-        re = new RegExp t, 'g' + s
-        r = []
-        while (mtch = re.exec(@lines[i])) != null
-            r.push [i, [mtch.index, re.lastIndex]]
-        r
-                    
     rangesForText: (t, opt) ->
         t = t.split('\n')[0]
         r = []
@@ -342,6 +333,27 @@ class Buffer extends event
             r = r.concat @rangesForTextInLineAtIndex t, li, opt
         r        
       
+    rangesForTextInLineAtIndex: (t, i, opt) ->
+        r = []
+        type = opt?.type ? 'str'
+        switch type
+            when 'fuzzy'
+                re = new RegExp "\\w+", 'g'            
+                while (mtch = re.exec(@lines[i])) != null
+                    r.push [i, [mtch.index, re.lastIndex]] if fuzzy.test t, @lines[i].slice mtch.index, re.lastIndex
+            else
+                t = _.escapeRegExp t if type in ['str', 'Str', 'glob']
+                switch type
+                    when 'str', 'reg' then s = 'gi'
+                    when 'Str', 'Reg' then s = 'g'
+                if type is 'glob'
+                    t = t.replace new RegExp("\\\*", 'g'), "\w*"
+                    log "glob regexp #{t}"
+                re = new RegExp t, s            
+                while (mtch = re.exec(@lines[i])) != null
+                    r.push [i, [mtch.index, re.lastIndex]]
+        r
+                    
     rangesOfStringsInLineAtIndex: (li) -> # todo: handle #{}
         t = @lines[li]
         r = []

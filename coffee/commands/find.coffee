@@ -10,9 +10,9 @@ Command = require '../commandline/command'
 class Find extends Command
 
     constructor: (@commandline) ->
-        @shortcuts = ["command+f", "ctrl+f", "alt+f"]
-        @caseSensitive = false
-        @regexpSearch = false
+        @shortcuts = ["command+f", "ctrl+f", "alt+f", "ctrl+alt+f", "command+alt+f", "ctrl+command+f"]
+        @types     = ['str',  'Str',   'reg',    'Reg',    'fuzzy', 'glob']
+        @names     = ['find', 'FinD',  '/find/', '/FinD/', 'fiZd',  'f*nd']
         super
         
     #  0000000  000000000   0000000   00000000   000000000
@@ -22,10 +22,9 @@ class Find extends Command
     # 0000000      000     000   000  000   000     000   
         
     start: (combo) ->
-        @caseSensitive = combo == @shortcuts[1]
-        @regexpSearch = combo == @shortcuts[2]
-        @setName "Find" if @caseSensitive
-        @setName "/find/" if @regexpSearch
+        index = @shortcuts.indexOf combo
+        @type = @types[index]
+        @setName @names[index]
         super combo
 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
@@ -38,8 +37,7 @@ class Find extends Command
         if editor = window.editorWithClassName @focus
             if command.length
                 editor.highlightText command, 
-                    caseSensitive: @caseSensitive
-                    regexp: @regexpSearch
+                    type: @type
                     select: 'keep'
             else
                 editor.clearHighlights()
@@ -55,8 +53,7 @@ class Find extends Command
         if editor = window.editorWithClassName @focus
             
             editor.highlightText command, 
-                caseSensitive: @caseSensitive
-                regexp: @regexpSearch
+                type: @type
                 select: 'after'
                 
             if editor.highlights.length

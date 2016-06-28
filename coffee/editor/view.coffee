@@ -57,9 +57,9 @@ class View extends ViewBase
     # 000       000  000      000     
     # 000       000  0000000  00000000
 
-    setCurrentFile: (file) ->
+    setCurrentFile: (file, opt) ->
         
-        @saveScrollCursorsAndSelections() if not file
+        @saveScrollCursorsAndSelections() if not file and not opt?.noSaveScroll
         
         @syntax.name = 'txt'
         if file?
@@ -104,7 +104,6 @@ class View extends ViewBase
             
         filePositions = window.getState 'filePositions', {}
         filePositions[@currentFile] = s
-        # log "#{@currentFile} saveState", filePositions
         window.setState 'filePositions', filePositions       
     
     # 00000000   00000000   0000000  000000000   0000000   00000000   00000000

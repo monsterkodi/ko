@@ -68,6 +68,7 @@ module.exports =
         paths = [paths] if typeof paths == 'string'
         for p in paths
             try
+                [p,l] = p.split ':'
                 stat = fs.statSync p
                 if stat.isDirectory()
                     dirfiles = fs.readdirSync p
@@ -80,6 +81,7 @@ module.exports =
                 else if stat.isFile()
                     if opt.ignoreHidden and path.basename(p).startsWith '.'
                         continue
+                    p += ":#{l}" if l?
                     files.push p
             catch err
                 if opt.logError

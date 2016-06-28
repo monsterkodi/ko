@@ -128,7 +128,7 @@ class Numbers
         div = document.createElement "div"
         div.className = "linenumber"
         pre = document.createElement "span"
-        pre.innerHTML = "#{li}"
+        pre.textContent = "#{li+1}"
         div.appendChild pre
         div
         
@@ -139,8 +139,8 @@ class Numbers
     # 000   000  00000000  000   000   0000000   000   000  0000000    00000000  000   000
         
     renumber: (e) =>
-        @log "numbers.renumber #{@editor.name} from #{e.new} to #{e.new+@elem.children.length-1}" if @editor.name == 'editor'
-        li = e.new
+        # @log "numbers.renumber #{@editor.name} from #{e.new} to #{e.new+@elem.children.length-1}" if @editor.name == 'editor'
+        li = e.new+1
         for e in @elem.children
             e.firstChild.textContent = "#{li}"
             li += 1

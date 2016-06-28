@@ -42,8 +42,7 @@ commandline = null
 # 000        000   000  000       000            000
 # 000        000   000  00000000  000       0000000 
 
-prefs.init "#{remote.app?.getPath('appData')}/#{pkg.name}/ko.noon",
-
+prefs.init()
 addToRecent = (file) ->
     recent = prefs.get 'recentFiles', []
     del recent, file
@@ -116,18 +115,21 @@ saveFile = (file) =>
 
 loadFile = (file) =>  
     log 'window.loadFile file:', file
+    [file,line] = file.split ':'
     if fileExists file
         addToRecent file
         editor.setCurrentFile null # to stop watcher and reset scroll
         editor.setCurrentFile file
+        editor.singleCursorAtPos [0, parseInt(line)-1] if line?
+        editor.scrollCursorToTop()
         setState 'file', file
-        ipc.send 'reloadMenu'
+        # ipc.send 'reloadMenu'
 
 openFiles = (ofiles, options) =>
     # log 'openFiles:', ofiles    
     if ofiles?.length
         files = fileList ofiles, ignoreHidden: false
-        # log 'open:', files
+        log "window.openFiles", files
         if files.length >= 10
             answer = dialog.showMessageBox
                 type: 'warning'
@@ -273,7 +275,7 @@ window.onload = =>
     split.resized()
     
 window.onunload = =>
-    editor.setCurrentFile null # to stop watcher (and reset scroll?)
+    editor.setCurrentFile null, noSaveScroll: true # to stop watcher
 
 # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
 # 000       000   000  0000  000     000     000       000     000   000     

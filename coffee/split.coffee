@@ -31,7 +31,7 @@ class Split extends event
         @titlebar    = $('.titlebar')
         @topPane     = $('.pane.top')
         @topHandle   = $('.handle.top')
-        @commandLine = $('.commandline')
+        @commandline = $('.commandline')
         @editHandle  = $('.handle.edit')
         @editPane    = $('.pane.edit')
         @logHandle   = $('.handle.log')
@@ -39,7 +39,7 @@ class Split extends event
         @editor      = $('.editor')
 
         @handles     = [@topHandle, @editHandle, @logHandle]
-        @panes       = [@topPane, @commandLine, @editPane, @logPane]
+        @panes       = [@topPane, @commandline, @editPane, @logPane]
                             
         @logVisible = false
         @logPane.style.display = 'none'
@@ -224,6 +224,8 @@ class Split extends event
                     @setState 'logHeight', phc.newHeight
             
             @emit 'paneHeight', phc
+            
+        @emit 'split', s
         
         @setState 'split', s
         
