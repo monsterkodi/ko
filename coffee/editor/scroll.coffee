@@ -90,6 +90,8 @@ class scroll extends events
     # 0000000       000   
         
     by: (delta) => 
+        
+        scroll = @scroll
         delta = 0 if Number.isNaN delta
         # log "scroll.by delta #{delta} scroll #{@scroll} scrollMax #{@scrollMax}" if @dbg
         @scroll = parseInt clamp 0, @scrollMax, @scroll+delta
@@ -97,15 +99,16 @@ class scroll extends events
         top = parseInt @scroll / @lineHeight
         # log "scroll.by top #{@top} lineHeight #{@lineHeight}" if @dbg
         @offsetSmooth = @scroll - top * @lineHeight 
-
+        
         @setTop top
 
         offset = 0
         offset += @offsetSmooth if @smooth
-        offset += (@top - @exposeTop) * @lineHeight
+        offset += (top - @exposeTop) * @lineHeight
+        
         # log "scroll.by delta #{delta} offset #{offset} @offsetTop #{@offsetTop}" if @dbg
-        if offset != @offsetTop
-            @offsetTop = parseInt offset
+        if offset != @offsetTop or scroll != @scroll
+            @offsetTop = parseInt offset            
             log "scroll.by emit scroll @scroll #{@scroll} @offsetTop #{@offsetTop}" if @dbg
             @emit 'scroll', @scroll, @offsetTop
 

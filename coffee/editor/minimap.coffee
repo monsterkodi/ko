@@ -180,7 +180,6 @@ class Minimap
         if @scroll.fullHeight > @scroll.viewHeight
             pc = @editor.scroll.scroll / @editor.scroll.scrollMax
             tp = parseInt pc * @scroll.scrollMax
-            # @log "minimap.onEditorScroll pc: #{pc} tp: #{tp} sm: #{@scroll.scrollMax}" #" fh: #{@scroll.fullHeight} vh: #{@scroll.viewHeight}"
             @scroll.to tp
         @drawTopBot()
     
@@ -194,7 +193,7 @@ class Minimap
         # @log "minimap.onEditorViewHeight h #{h} @height #{@height}", @scroll.info()
         @onScroll()
         @onEditorScroll()
-            
+
     #  0000000   0000000  00000000    0000000   000      000    
     # 000       000       000   000  000   000  000      000    
     # 0000000   000       0000000    000   000  000      000    

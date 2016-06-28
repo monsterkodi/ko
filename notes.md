@@ -39,8 +39,6 @@
 - *ctrl+command+/  align cursors block*
 - *dbg "class.method arg: #{arg}, ..."*
 - *delete backwards over line boundaries only if command is down*
-- make editor scroll to the right position when commandline opens
-- fix escape on commandline
 - no surround for ' inside words
 - clamp cursors after pasting
 - select continuous,rectangular ranges with command+shift+M 
@@ -84,6 +82,7 @@
 - shift move cursor down
     
 #### minimap 
+- *fix scroll when paging up*
 - shift drag: extend selection
 - show selections, highlights and cursors
 - command drag: don't clear selection and don't single select
