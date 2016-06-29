@@ -107,27 +107,30 @@ class Commandline extends ViewBase
         for n,c of @commands            
             if combo == 'esc'
                 if document.activeElement == @view
-                    log "commandline.globalModKeyComboEvent esc"
+                    # log "commandline.globalModKeyComboEvent esc"
                     return @cancel()
             for sc in c.shortcuts
                 if sc == combo then return @startCommand n, combo                
         return 'unhandled'            
 
     handleModKeyComboEvent: (mod, key, combo, event) ->
+        
+        return if @command?.handleModKeyComboEvent(mod, key, combo, event) != 'unhandled'
+        
         split = window.split
         switch combo
-            when 'enter'                 then return @execute()
-            when 'up'                    then return @setAndSelectText @command?.prev()
-            when 'down'                  then return @setAndSelectText @command?.next()
-            when 'esc'                   then return @cancel()
-            when 'command+k'             then return @selectAll() + @deleteSelection()
-            when 'tab', 'shift+tab'      then return
-            when 'home', 'command+up'    then return split.do 'maximize editor'
-            when 'end', 'command+down'   then return split.do 'maximize terminal'
-            when 'page up', 'alt+up'     then return split.do 'enlarge editor'
-            when 'ctrl+up'               then return split.do 'enlarge editor by 20'
-            when 'page down', 'alt+down' then return split.do 'enlarge terminal'
-            when 'ctrl+down'             then return split.do 'enlarge terminal by 20'
+            when 'enter'                then return @execute()
+            when 'up'                   then return @setAndSelectText @command?.prev()
+            when 'down'                 then return @setAndSelectText @command?.next()
+            when 'esc'                  then return @cancel()
+            when 'command+k'            then return @selectAll() + @deleteSelection()
+            when 'tab', 'shift+tab'     then return
+            when 'home', 'command+up'   then return split.do 'maximize editor'
+            when 'end', 'command+down'  then return split.do 'maximize terminal'
+            when 'alt+up'               then return split.do 'enlarge editor'
+            when 'ctrl+up'              then return split.do 'enlarge editor by 20'
+            when 'alt+down'             then return split.do 'enlarge terminal'
+            when 'ctrl+down'            then return split.do 'enlarge terminal by 20'
         
         return 'unhandled'
     

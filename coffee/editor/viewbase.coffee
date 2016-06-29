@@ -490,7 +490,12 @@ class ViewBase extends Editor
                 br = e.getBoundingClientRect()
                 # log "lineSpanAtXY #{e.className} #{e.innerHTML} #{br.left} #{br.width}"
                 if br.left <= x and br.left+br.width >= x
-                    return e
+                    offset = x-br.left
+                    info =  
+                        span:       e
+                        offsetLeft: offset
+                        offsetChar: parseInt offset/@size.charWidth
+                    return info
         log "not found! #{x} #{y} line #{lineElem?}"
         null
 

@@ -87,7 +87,7 @@ mostRecentFile = -> first prefs.get 'recentFiles'
 # 000   000  000  000  0000       000
 # 00     00  000  000   000  0000000 
 
-wins        = -> BrowserWindow.getAllWindows()
+wins        = -> BrowserWindow.getAllWindows().sort (a,b) -> a.id - b.id 
 activeWin   = -> BrowserWindow.getFocusedWindow()
 visibleWins = -> (w for w in wins() when w?.isVisible() and not w?.isMinimized())
 winWithID   = (winID) ->
@@ -115,11 +115,12 @@ ipc.on 'execute',           (event, arg)   => event.sender.send 'executeResult',
 ipc.on 'toggleDevTools',    (event)        => event.sender.toggleDevTools()
 ipc.on 'newWindowWithFile', (event, file)  => main.createWindow file
 ipc.on 'maximizeWindow',    (event, winID) => main.toggleMaximize winWithID winID
-ipc.on 'reloadWindow',      (event, winID) => main.reloadWin winWithID winID
-ipc.on 'reloadMenu',        ()             => main.reloadMenu()
 ipc.on 'saveBounds',        (event, winID) => main.saveWinBounds winWithID winID
+ipc.on 'focusWindow',       (event, winID) => main.focusWindow winWithID winID
+ipc.on 'reloadWindow',      (event, winID) => main.reloadWin winWithID winID
 ipc.on 'prefSet',           (event, k, v)  => prefs.set k, v
 ipc.on 'prefGet',           (event, k, d)  => event.returnValue = prefs.get k, d
+ipc.on 'reloadMenu',        ()             => main.reloadMenu() # still in use?
 
 # 00     00   0000000   000  000   000
 # 000   000  000   000  000  0000  000
@@ -226,14 +227,18 @@ class Main
                 w.showInactive()
             visibleWins()[0].showInactive()
             visibleWins()[0].focus()
-        
+
+    focusWindow: (win) => 
+        win?.focus()
+                
     focusNextWindow: (win) =>
         allWindows = wins()
         for w in allWindows
             if w == win
                 i = 1 + allWindows.indexOf w
                 i = 0 if i >= allWindows.length
-                allWindows[i].focus()
+                @focusWindow allWindows[i]
+                return
 
     activateWindowWithID: (wid) =>
         w = winWithID wid

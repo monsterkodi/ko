@@ -16,11 +16,12 @@ scrollhandleWidth     = 6px
 numbersWidth          = 50px
 editorPadding         = (8px + numbersWidth) 
 bottomCornerRadius    = 4px
-frameBorder           = scrollhandleWidth solid #222
+frameColor            = #222
+frameBorder           = scrollhandleWidth solid frameColor
 commandlineHeight     = 30px
 titlebarHeight        = 22px
 splithandleHeight     = 6px
-thinBorder            = 1px solid #222
+thinBorder            = 1px solid frameColor
 
 fill-abs()
     position        absolute
@@ -124,27 +125,28 @@ pre
     
 .autocomplete-list 
     position            absolute
-    max-height          7em
     width               auto
-    border              none
     overflow-x          hidden
     overflow-y          auto
     left                0
     top                 100%
+    background          #222
     &::-webkit-scrollbar
-        width            2px
+        width            4px
+        background-color #333
     &::-webkit-scrollbar-thumb
-        background-color #88f
+        width            2px
+        background-color #55b
     
 .autocomplete-item
+    white-space         nowrap
     width               100%
-    background          #22a
     color               #ccc
     display             block
     padding-left        5px
     padding-right       10px
-    padding-top         2px
-    padding-bottom      2px
+    // padding-top         1px
+    // padding-bottom      1px
     overflow            hidden
     cursor              pointer
     -webkit-user-select none    
@@ -187,7 +189,6 @@ body
     background          #333
     color               #aaa
     font-size           14px
-    padding-top         3px
     padding-left        70px
     padding-right       70px
     -webkit-app-region  drag
@@ -196,10 +197,14 @@ body
     left                0
     right               0
 
-.titlebar span
-    position            relative
+.titlebar .title
+.titlebar .dot
+    display             inline-block
+    vertical-align      top
+    padding-left        10px
+    padding-top         3px 
     
-.titlebar span::before
+.titlebar .title::before
     content             attr(data-tip)
     position            absolute
     z-index             999
@@ -209,9 +214,32 @@ body
     top                 9999px
     transition          opacity 0.2s ease-out 
      
-.titlebar span:hover::before
+.titlebar .title:hover::before
     opacity             1
-    top                 0px
+    top                 3px
+    
+.titlebar .winid
+    color               #555
+    &.focus
+        color           #F5BF4F
+    display             inline-block
+    vertical-align      top
+    padding-left        3px
+    padding-top         3px
+
+.titlebar .separator
+    opacity             1
+    background          frameColor
+    height              100%
+    width               2px
+    display             inline-block
+    
+.titlebar .dot.clean
+    color               #444
+
+.titlebar .title.dirty
+.titlebar .dot.dirty
+    color               #aaf
     
 //  0000000   0000000  00000000    0000000   000      000      0000000     0000000   00000000 
 // 000       000       000   000  000   000  000      000      000   000  000   000  000   000

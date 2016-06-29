@@ -84,10 +84,14 @@ class View extends ViewBase
         if @currentFile?
             title = path.basename @currentFile
             dirty = @do.hasLineChanges()
-            ds = dirty and "●" or ""
-            dc = dirty and " dirty" or ""
-            title = "<span class=\"title#{dc}\" data-tip=\"#{unresolve @currentFile}\">#{ds} #{title} #{ds}</span>"
-        $('.titlebar').innerHTML = title 
+            ic = document.hasFocus() and " focus" or ""
+            id = "<span class=\"winid #{ic}\">#{window.winID}</span>"
+            sep = "<span class=\"separator\"></span>"
+            dc = dirty and " dirty" or "clean"
+            db = "<span class=\"dot #{dc}\">●</span>"
+            da = dirty and "●" or ""
+            title = id + db + "<span class=\"title #{dc}\" data-tip=\"#{unresolve @currentFile}\">#{title} #{da}</span>"
+        $('.titlebar').innerHTML = title
         
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
     # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     

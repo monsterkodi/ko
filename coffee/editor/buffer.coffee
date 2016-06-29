@@ -98,19 +98,15 @@ class Buffer extends event
                 r = @rangeForWordAtPos [c[0]-1, c[1]]
         [r[1][0], r[0]]
         
-    wordRangesInLineAtIndex: (li) ->
-        r = []
-        re = @wordRegExp
-        while (mtch = re.exec(@lines[li])) != null
-            r.push [li, [mtch.index, re.lastIndex]]
+    wordRangesInLineAtIndex: (li, rgx=@wordRegExp) -> 
+        r = @rangesWithLineIndexInTextForRegExp li, @lines[li], rgx
         r.length and r or [[li, [0,0]]]
-       
-    nonSpaceRangesInLineAtIndex: (li) ->                        
+               
+    rangesWithLineIndexInTextForRegExp: (li, text, rgx) ->
         r = []
-        re = new RegExp "([^\\s]+)", 'g'
-        while (mtch = re.exec(@lines[li])) != null
-            r.push [li, [mtch.index, re.lastIndex]]
-        r.length and r or [[li, [0,0]]]
+        while (mtch = rgx.exec(text)) != null
+            r.push [li, [mtch.index, rgx.lastIndex]]
+        r
 
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000   0000000
     # 000       000       000      000       000          000     000  000   000  0000  000  000     
@@ -227,7 +223,7 @@ class Buffer extends event
 
     text:            -> @lines.join '\n'
     textInRange: (r) -> @lines[r[0]].slice r[1][0], r[1][1]
-    textInRanges: (rgs) -> (@textInRange(r) for r in rgs)
+    textsInRanges: (rgs) -> (@textInRange(r) for r in rgs)
         
     # 000  000   000  0000000    00000000  000   000  000000000
     # 000  0000  000  000   000  000       0000  000     000   
@@ -388,6 +384,37 @@ class Buffer extends event
             r = ranges[ri]
             if (r[0] == pos[1]) and (r[1][0] <= pos[0] <= r[1][1])
                 return r
+
+    rangesBeforePosInRanges: (pos, ranges) ->
+        return [] if ranges.length == 0
+        rs = []
+        for r in ranges
+            if (r[0] > pos[1]) or ((r[0] == pos[1]) and (r[1][0] > pos[0]))
+                return rs 
+            rs.push r
+        rs
+
+    rangesAfterPosInRanges: (pos, ranges) ->
+        return [] if ranges.length == 0
+        rs = []
+        for ri in [ranges.length-1..0]
+            r = ranges[ri]
+            if (r[0] < pos[1]) or ((r[0] == pos[1]) and (r[1][1] < pos[0]))
+                return rs 
+            rs.unshift r
+        rs
+        
+    rangesSplitAtPosInRanges: (pos, ranges) ->
+        return [[],null,[]] if ranges.length == 0
+        [bef,at,aft] = [[],null,[]]
+        for ri in [0...ranges.length]
+            r = ranges[ri]
+            if (r[0] == pos[1]) and (r[1][0] <= pos[0] <= r[1][1])
+                at = r
+                aft = ranges.slice ri+1
+                break
+            bef.push r
+        [bef,at,aft]
             
     rangeBeforePosInRanges: (pos, ranges) ->
         return if ranges.length == 0

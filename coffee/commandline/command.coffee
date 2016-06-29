@@ -25,20 +25,13 @@ class Command
         text: @last()
         select: true
     
-    grabFocus: -> @commandline.focus()
-    onBlur: ->
-    setFocus: (focus) -> @focus = focus ? '.editor'
     changed: (command) ->
     cancel: ->
-        @setText ''
+        # @setText ''
+        text: ''
         focus: @focus        
                 
-    execute: (command) ->    
-        _.pull @history, command
-        @history.push command
-        @index = @history.length-1
-        @setState 'history', @history
-        @setState 'index', @index
+    execute: (command) -> @setCurrent command
     
     # 000   000  000   0000000  000000000   0000000   00000000   000   000
     # 000   000  000  000          000     000   000  000   000   000 000 
@@ -46,7 +39,19 @@ class Command
     # 000   000  000       000     000     000   000  000   000     000   
     # 000   000  000  0000000      000      0000000   000   000     000   
     
-    current: -> @history[@index]
+    setCurrentText: (command) -> 
+        @setCurrent command
+        @setText    command
+        
+    setCurrent: (command) -> 
+        _.pull @history, command
+        @history.push command
+        @index = @history.length-1
+        # log "command.setCurrent #{@index} #{command}"
+        @setState 'history', @history
+        @setState 'index', @index
+        
+    current: -> @history[@index]    
 
     prev: -> 
         @index = clamp 0, @history.length-1, @index-1
@@ -77,6 +82,16 @@ class Command
         @name = n
         @commandline.setName n
 
+    # 00000000   0000000    0000000  000   000   0000000
+    # 000       000   000  000       000   000  000     
+    # 000000    000   000  000       000   000  0000000 
+    # 000       000   000  000       000   000       000
+    # 000        0000000    0000000   0000000   0000000 
+    
+    grabFocus: -> @commandline.focus()
+    setFocus: (focus) -> @focus = focus ? '.editor'
+    onBlur: ->
+
     #  0000000  000000000   0000000   000000000  00000000
     # 000          000     000   000     000     000     
     # 0000000      000     000000000     000     0000000 
@@ -103,5 +118,7 @@ class Command
     delState: (key) ->
         return if not @prefsID
         prefs.del "command:#{@prefsID}:#{key}"
+
+    handleModKeyComboEvent: (mod, key, combo, event) -> 'unhandled'
 
 module.exports = Command

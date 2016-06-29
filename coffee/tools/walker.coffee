@@ -45,11 +45,15 @@ class Walker
             onWalkerPath = (cfg) -> (p,stat) ->
                 name = path.basename p
                 extn = path.extname p
-                
-                if cfg.filter?(p) 
+
+                if cfg.filter?(p)
                     return @ignore p
+                else if cfg.includeDir? and path.dirname(p) == cfg.includeDir
+                    cfg.files.push p
+                    @ignore p if name in cfg.ignore
+                    @ignore p if name.startsWith('.') and not cfg.dotFiles
                 else if name in cfg.ignore
-                    return @ignore p 
+                    return @ignore p
                 else if name in cfg.include
                     cfg.files.push p
                 else if name.startsWith '.'
@@ -58,7 +62,7 @@ class Walker
                     else
                         return @ignore p 
                 else if extn in cfg.ignoreExt
-                    @ignore
+                    return @ignore p
                 else if extn in cfg.includeExt
                     cfg.files.push p
                 else if stat.isDirectory()
@@ -66,11 +70,11 @@ class Walker
                         cfg.files.push p 
                         
                 cfg.path? p, stat
-                if stat.isDirectory() 
+                if stat.isDirectory()
                     if cfg.includeDirs
                         cfg.dir? p, stat
                 else
-                    if path.extname(p) in cfg.includeExt or path.basename(p) in cfg.include                       
+                    if path.extname(p) in cfg.includeExt or path.basename(p) in cfg.include
                         cfg.file? p, stat
                         
                 if cfg.files.length > cfg.maxFiles

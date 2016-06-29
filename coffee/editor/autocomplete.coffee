@@ -21,9 +21,11 @@ class Autocomplete
         
         specials = "_-@#"
         @especial = ("\\"+c for c in specials.split '').join ''
-        @headerRegExp     = new RegExp "^[0#{@especial}]+$"
-        @notSpecialRegExp = new RegExp "[^#{@especial}]"
-        @splitRegExp      = new RegExp "[^\\w\\d#{@especial}]+", 'g'        
+        @headerRegExp      = new RegExp "^[0#{@especial}]+$"
+        @notSpecialRegExp  = new RegExp "[^#{@especial}]"
+        @specialWordRegExp = new RegExp "(\\s+|[\\w#{@especial}]+|[^\\s])", 'g'
+        @splitRegExp       = new RegExp "[^\\w\\d#{@especial}]+", 'g'        
+        
     
         @editor.on 'edit',           @onEdit
         @editor.on 'linesSet',       @onLinesSet
@@ -80,33 +82,41 @@ class Autocomplete
             return
         
         @span = document.createElement 'span'
+        @span.className = 'autocomplete-span'
         @span.textContent = @completion
-        @span.className     = 'autocomplete-span'
-        @span.style.opacity   = 1
-        @span.style.background  = "#44a"
-        @span.style.color       = "#fff"
+        @span.style.opacity    = 1
+        @span.style.background = "#44a"
+        @span.style.color      = "#fff"
+
+        # [splitsBefore, cursorWord, splitsAfter] = @cursorWords()
+        # log "splits #{splitsBefore.join '|'} --- #{cursorWord} --- #{splitsAfter.join '|'}"
 
         cr = cursor.getBoundingClientRect()
-        sp = @editor.lineSpanAtXY cr.left, cr.top  
-        le = @editor.lineElemAtXY cr.left, cr.top
-        if sp?            
-            if info.after[0] == ' ' or info.after.length == 0
-                sp.insertAdjacentElement 'afterend', @span
-            else
-                inner        = sp.innerHTML                
-                log "inner #{inner}"
-                @cloneBefore = sp.cloneNode true
-                @cloneAfter  = sp.cloneNode true
-                @cloneSrc    = sp
-                ws = @word.splice @word.indexOf /\w/
-                befor = inner.slice 0, ws.length
-                after = inner.slice ws.length
-                @cloneBefore.innerHTML = befor
-                @cloneAfter .innerHTML = after
-                sp.insertAdjacentElement 'afterend', @cloneAfter
-                sp.insertAdjacentElement 'beforebegin', @cloneBefore
-                sp.insertAdjacentElement 'beforebegin', @span
-                sp.style.display = 'none'
+        spanInfo = @editor.lineSpanAtXY cr.left, cr.top  
+        if spanInfo?
+            sp = spanInfo.span
+            # log "spanInfo", spanInfo
+            inner        = sp.innerHTML                
+            @cloneBefore = sp.cloneNode true
+            @cloneAfter  = sp.cloneNode true
+            @cloneSrc    = sp
+            
+            ws = @word.slice @word.search /\w/
+            wi = ws.length
+            
+            # innerRanges = @editor.rangesWithLineIndexInTextForRegExp info.cursor[1], inner, @specialWordRegExp
+            # innerSplit = (inner.slice(r[1][0], r[1][1]) for r in innerRanges)
+            # if innerSplit.length
+                # log "innerSplit #{innerSplit.join '|'}"
+            
+            # log "spanInfo.offsetChar #{spanInfo.offsetChar} wi #{wi}"
+            
+            @cloneBefore.innerHTML = inner.slice 0, spanInfo.offsetChar + 1 #wi
+            @cloneAfter .innerHTML = inner.slice    spanInfo.offsetChar + 1 #wi
+            sp.insertAdjacentElement 'afterend',    @cloneAfter
+            sp.insertAdjacentElement 'beforebegin', @cloneBefore
+            sp.insertAdjacentElement 'beforebegin', @span
+            sp.style.display = 'none'
         else
             log "warning! no sp? #{cr.left} #{cr.top}"
         
@@ -135,19 +145,15 @@ class Autocomplete
     # 000   000  000   000      0      000   0000000   000   000     000     00000000
     
     navigate: (delta) ->
-        # log "autocomplete.navigate delta #{delta}"
         return if not @list
         @list.children[@selected]?.classList.remove 'selected'
         @selected = clamp -1, @matchList.length-1, @selected+delta
-        # log "autocomplete.navigate selected #{@selected}"
         if @selected >= 0
             @list.children[@selected]?.classList.add 'selected'
             @list.children[@selected]?.scrollIntoViewIfNeeded()
-            
         @span.innerHTML = @selectedCompletion()
         @span.classList.remove 'selected' if @selected < 0
         @span.classList.add    'selected' if @selected >= 0
-        # log "navigate @span.innerHTML #{@span.innerHTML}"
         @navigating = true
         
     prev: -> @navigate -1    
@@ -201,13 +207,13 @@ class Autocomplete
     # 000       000   000  000   000       000  000   000  000   000  000   000  000   000  000   000  000   000
     #  0000000   0000000   000   000  0000000    0000000   000   000  00     00   0000000   000   000  0000000  
     
-    cursorWord: ->
-        saveRegExp = @editor.wordRegExp
-        @editor.wordRegExp = new RegExp "(\\s+|[\\w#{@especial}]+|[^\\s])", 'g'
-        cursorWord = @editor.wordAtCursor()
-        @editor.wordRegExp = saveRegExp
-        # log "autocomplete.cursorWord #{cursorWord}"
-        cursorWord
+    cursorWords: -> 
+        cp = @editor.cursorPos()
+        words = @editor.wordRangesInLineAtIndex cp[1], @specialWordRegExp        
+        [befor, cursr, after] = @editor.rangesSplitAtPosInRanges cp, words
+        [@editor.textsInRanges(befor), @editor.textInRange(cursr), @editor.textsInRanges(after)]
+        
+    cursorWord: -> @cursorWords()[1]
                 
     #  0000000  000       0000000    0000000  00000000
     # 000       000      000   000  000       000     

@@ -39,13 +39,14 @@ class Open extends Command
 
     constructor: (@commandline) ->
         
-        @shortcuts = ['command+p', 'command+shift+p']
-        @files     = null
-        @file      = null
-        @dir       = null
-        @pkg       = null
-        @combo     = null
-        @selected  = 0
+        @shortcuts  = ['command+p', 'command+shift+p']
+        @files      = null
+        @file       = null
+        @dir        = null
+        @pkg        = null
+        @combo      = null
+        @selected   = 0
+        @navigating = false
         
         super
                     
@@ -63,7 +64,8 @@ class Open extends Command
             fuzzied  = fuzzy.filter command, @files       
             filtered = (f.string for f in fuzzied)
             
-            matchWeight = (f) ->
+            matchWeight = (f) =>
+                
                 bonus = switch path.extname(f)         
                     when '.coffee' then 1000
                     when '.md', '.styl', '.pug' then 500
@@ -71,7 +73,7 @@ class Open extends Command
                     when '.js', '.json', '.html' then -100
                     else 
                         0 
-                        
+
                 bonus += (10-f.split(/[\/\.]/).length)
                         
                 if f == command 
@@ -80,6 +82,7 @@ class Open extends Command
                     bonus += 100000 - f.length                        
                 if path.basename(f).startsWith command
                     bonus += 10000 - path.basename(f).length
+                                        
                 bonus
     
             filtered.sort (a,b) -> matchWeight(b) - matchWeight(a)
@@ -181,11 +184,11 @@ class Open extends Command
             @list?.children[@selected]?.classList.add 'selected'
             @list?.children[@selected]?.scrollIntoViewIfNeeded()
         
-    #  0000000   00000000   00000000  000   000  00000000  000  000      00000000
-    # 000   000  000   000  000       0000  000  000       000  000      000     
-    # 000   000  00000000   0000000   000 0 000  000000    000  000      0000000 
-    # 000   000  000        000       000  0000  000       000  000      000     
-    #  0000000   000        00000000  000   000  000       000  0000000  00000000
+    #  0000000   00000000   00000000  000   000          00000000  000  000      00000000
+    # 000   000  000   000  000       0000  000          000       000  000      000     
+    # 000   000  00000000   0000000   000 0 000          000000    000  000      0000000 
+    # 000   000  000        000       000  0000          000       000  000      000     
+    #  0000000   000        00000000  000   000          000       000  0000000  00000000
         
     openFileAtIndex: (i) =>
         @select i
@@ -212,11 +215,11 @@ class Open extends Command
         if @combo == @shortcuts[1]
             @setName "new window"
                 
-    # 000       0000000    0000000   0000000    0000000    000  00000000 
-    # 000      000   000  000   000  000   000  000   000  000  000   000
-    # 000      000   000  000000000  000   000  000   000  000  0000000  
-    # 000      000   000  000   000  000   000  000   000  000  000   000
-    # 0000000   0000000   000   000  0000000    0000000    000  000   000
+    # 000       0000000    0000000   0000000          0000000    000  00000000 
+    # 000      000   000  000   000  000   000        000   000  000  000   000
+    # 000      000   000  000000000  000   000        000   000  000  0000000  
+    # 000      000   000  000   000  000   000        000   000  000  000   000
+    # 0000000   0000000   000   000  0000000          0000000    000  000   000
         
     loadDir: (opt) ->        
         opt.dir     = path.dirname opt.file if not opt.dir?
@@ -230,6 +233,7 @@ class Open extends Command
         wopt = 
             root:        @pkg
             includeDirs: true
+            includeDir:  @dir
             done:        @walkerDone
         if @navigating
             fopt = _.clone wopt
@@ -285,7 +289,7 @@ class Open extends Command
                     when '.coffee' then 100
                     when '.md', '.styl', '.pug' then 50
                     when '.noon' then 25
-                    when '.js', '.json', '.html' then -1000000
+                    when '.js', '.json', '.html' then -10
                     else 
                         0
             else
@@ -362,8 +366,7 @@ class Open extends Command
                             file += '.coffee'
                 files.splice i, 1, file
             
-        options = 
-            newWindow: @combo == @shortcuts[1] # lazy bastard :)
+        options = newWindow: @combo == @shortcuts[1] # lazy bastard :)
         
         opened = window.openFiles files, options
         if opened?.length
@@ -411,5 +414,19 @@ class Open extends Command
     cancel: ->
         @hideList()
         super
+
+    # 000   000  00000000  000   000
+    # 000  000   000        000 000 
+    # 0000000    0000000     00000  
+    # 000  000   000          000   
+    # 000   000  00000000     000   
+    
+    handleModKeyComboEvent: (mod, key, combo, event) ->
+        switch combo
+            when 'page up', 'page down'
+                if @index == @history.length-1
+                    return @select clamp 0, @list.children.length, @selected+20*(combo=='page up' and -1 or 1)
+                    
+        super mod, key, combo, event
         
 module.exports = Open

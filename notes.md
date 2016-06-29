@@ -1,11 +1,5 @@
 # todo/ideas
 
-*fix autocomplete*
-
-#### find
-- *keep command+e search string longer*
-- display number of matches somewhere
-
 #### search
 - *make search results clickable*
 - insert salter headers
@@ -15,9 +9,8 @@
 
 #### windows
 - cycle through windows command: windows list
-- *window id in titlebar*
-- command+n to switch to window with id n
 - recent files in titlebar?
+- list buffers when clicking buffer number in titlebar
 
 #### editor
 - *autocomplete from similar files*
@@ -34,11 +27,11 @@
     - comment line characters (# or //)
 
 #### editing
-- *#< to add salter header of next word*
 - *align cursors with inserting spaces when ctrl+alt+right*
 - *ctrl+command+/  align cursors block*
 - *dbg "class.method arg: #{arg}, ..."*
-- *delete backwards over line boundaries only if command is down*
+- *multicursors delete backwards over line boundaries only if command is down*
+- #< to add salter header of next word
 - no surround for ' inside words
 - clamp cursors after pasting
 - select continuous,rectangular ranges with command+shift+M 
@@ -55,6 +48,9 @@
 - move mainCursor to leftmost/rightmost cursor in its line on 'left'/'right' actions
 - highlight cursor line(s?)
 
+#### find
+- display number of matches somewhere
+
 #### open
 - *when navigating, don't filter files in @dir*
 - command-p alias: -n for previuous files
@@ -64,6 +60,7 @@
 - *output command*
 - *alias*
 - *ansihtml*
+- fix escape
 - limit history length
 - add special column (on top of numbers) for input marker and search result lines
 - autocomplete

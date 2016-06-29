@@ -318,6 +318,15 @@ changeZoom: (d) ->
     webframe.setZoomFactor z
     editor.resized()
     logview.resized()
+
+# 00000000   0000000    0000000  000   000   0000000
+# 000       000   000  000       000   000  000     
+# 000000    000   000  000       000   000  0000000 
+# 000       000   000  000       000   000       000
+# 000        0000000    0000000   0000000   0000000 
+
+window.onfocus = (event) -> window.editor.updateTitlebar()
+window.onblur = (event) -> window.editor.updateTitlebar()
               
 # 000   000  00000000  000   000
 # 000  000   000        000 000 
@@ -333,6 +342,9 @@ document.onkeydown = (event) ->
     
     if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
         return
+
+    for i in [1..9]
+        if combo is "command+#{i}" then return ipc.send 'focusWindow', i
     
     switch combo
         when 'command+enter'    then return ipc.send 'execute', editor.text()

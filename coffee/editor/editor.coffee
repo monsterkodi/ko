@@ -239,15 +239,15 @@ class Editor extends Buffer
     highlightText: (text, opt) -> # called from find command
         @highlights = @rangesForText text, opt
         if @highlights.length
-            switch opt.select
+            switch opt?.select
                 when 'after' then @selectSingleRange @rangeAfterPosInRanges(@cursorPos(), @highlights) ? first @highlights
                 when 'first' then @selectSingleRange first @highlights            
-            @scrollCursorToTop() if not opt.noScroll
+            @scrollCursorToTop() if not opt?.noScroll
             @renderHighlights()
             @emit 'highlight', @highlights
 
     highlightTextOfSelectionOrWordAtCursor: -> # called from keyboard shortcuts        
-        
+            
         if @selections.length == 0 
             srange = @rangeForWordAtPos @cursorPos()
             @selectSingleRange srange
@@ -257,6 +257,9 @@ class Editor extends Buffer
             @highlights = @rangesForText text
             @renderHighlights()
             @emit 'highlight', @highlights
+            
+            log "set find text #{text}"
+            window.commandline.commands.find?.setCurrentText text
 
     clearHighlights: ->
         @highlights = []
@@ -275,7 +278,7 @@ class Editor extends Buffer
         log "selectNextHighlight #{@highlights.length}"
         if not @highlights.length
             searchText = window.commandline.commands.find?.current()
-            log "command+g #{searchText}"
+            log "editor.selectNextHighlight use find command text #{searchText}"
             @highlightText searchText if searchText?
         r = @rangeAfterPosInRanges @cursorPos(), @highlights
         r ?= first @highlights
