@@ -353,6 +353,7 @@ class Main
             backgroundColor: '#000'
             fullscreenable:  true
             show:            true
+            hasShadow:       false
             titleBarStyle:   'hidden'
                     
         win.loadURL "file://#{__dirname}/../index.html"

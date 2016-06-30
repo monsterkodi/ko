@@ -63,7 +63,8 @@ null|undefined                 keyword.null
 (\w+)\s*[=]\s*[-=]>                 . function
 (\w+)\s*[:]\s*\([^\)]*\)\s*[-=]>    . method
 (\w+)\s*[:]\s*[-=]>                 . method
-(\()([^\(\)]*)(\)\s*)[-=]>          . function.bracket . function.variable.argument . function.bracket
+# (\()([^\(\)]*)(\)\s*)[-=]>          . function.bracket . function.variable.argument . function.bracket
+(\()[^\(\)]*(\)\s*)[-=]>            . function.bracket . function.bracket
 
 (\w+)(?=\(|\s+[@\w\d\"\'\(\[\{])      function.call
 (@\w+)(?=\s+[\w\d@\+\-\"\'\(\[\{]|\()   class.function.call
@@ -116,7 +117,7 @@ __dirname|__filename  keyword
     value.number.int
 
 # strings
-(')([^'\\]*)(')              . string.marker.single . value.string.single . string.marker.single
+(')([^']*)(')                . string.marker.single . value.string.single . string.marker.single
 (")([^"\\]*)(")              . string.marker.double . value.string.double . string.marker.double
 # (")((?:[^"\#\\]*|\\["\\bfnrt\/])*)(")   . string.marker.double . value.string . string.marker.double
 

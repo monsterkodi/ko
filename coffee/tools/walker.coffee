@@ -49,7 +49,7 @@ class Walker
 
                 if cfg.filter?(p)
                     return @ignore p
-                else if name in ['.DS_Store', 'Icon?'] or extn in ['.pyc']
+                else if name in ['.DS_Store', 'Icon\r'] or extn in ['.pyc']
                     return @ignore p
                 else if cfg.includeDir? and path.dirname(p) == cfg.includeDir
                     cfg.files.push p

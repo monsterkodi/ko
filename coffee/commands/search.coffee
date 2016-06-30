@@ -101,7 +101,10 @@ class FileSearcher extends stream.Writable
     end: (chunk, encoding, cb) ->
         if @found.length
             terminal = window.terminal
-            terminal.appendDiss syntax.dissForTextAndSyntax "● #{@file}:", 'ko'
+            meta = 
+                diss: syntax.dissForTextAndSyntax "● #{@file}:", 'ko'
+                href: @file
+            terminal.appendMeta meta
             terminal.appendText ''
             for f in @found
                 ranges = f[2].concat syntax.rangesForTextAndSyntax f[1], 'coffee'

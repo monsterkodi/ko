@@ -36,9 +36,14 @@ class ViewBase extends Editor
         @view = $(viewElem)
         @view.onpaste = (event) => log "view on paste #{@name}", event
         @view.onblur  = (event) => @emit 'blur'
-        layerNames = ["selections", "highlights", "lines", "cursors"]
-        layerNames.push "numbers" if "Numbers" in @config.features
-        @initLayers layerNames
+        layer = []
+        layer.push 'selections' 
+        layer.push 'highlights' 
+        layer.push 'meta'         if 'Meta'    in @config.features
+        layer.push 'lines' 
+        layer.push 'cursors'
+        layer.push 'numbers'      if 'Numbers' in @config.features
+        @initLayers layer
         @elem = $('.lines', @view)
         @diss = []
         @size = {}
@@ -144,7 +149,11 @@ class ViewBase extends Editor
     appendText: (text) ->
         
         ts = text?.split /\n/
-        [].push.apply @lines, ts
+        for t in ts
+            @lines.push t
+            @emit 'lineAppended', 
+                lineIndex: @lines.length-1
+                text: t
         if @scroll.viewHeight != @viewHeight()
             @scroll.setViewHeight @viewHeight()        
         @scroll.setNumLines @lines.length

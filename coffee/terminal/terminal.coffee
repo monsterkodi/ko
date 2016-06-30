@@ -15,7 +15,7 @@ class Terminal extends ViewBase
         
         @fontSizeDefault = 15
         
-        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap'] # Autocomplete?
+        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Meta'] # Autocomplete?
 
         @ansidiss  = new ansiDiss()    
         
@@ -52,6 +52,16 @@ class Terminal extends ViewBase
             @scrollTo @scroll.fullHeight
             
     appendDiss: (diss) -> @appendLineDiss syntax.lineForDiss(diss), diss        
+    
+    # 00     00  00000000  000000000   0000000 
+    # 000   000  000          000     000   000
+    # 000000000  0000000      000     000000000
+    # 000 0 000  000          000     000   000
+    # 000   000  00000000     000     000   000
+    
+    appendMeta: (meta) -> 
+        @meta.append meta
+        @appendLineDiss syntax.lineForDiss(meta.diss), meta.diss if meta.diss?
             
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000

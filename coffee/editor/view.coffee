@@ -88,9 +88,9 @@ class View extends ViewBase
             id = "<span class=\"winid #{ic}\">#{window.winID}</span>"
             sep = "<span class=\"separator\"></span>"
             dc = dirty and " dirty" or "clean"
-            db = "<span class=\"dot #{dc}\">●</span>"
+            db = "<span class=\"dot #{dc}#{ic}\">●</span>"
             da = dirty and "●" or ""
-            title = id + db + "<span class=\"title #{dc}\" data-tip=\"#{unresolve @currentFile}\">#{title} #{da}</span>"
+            title = id + db + "<span class=\"title #{dc}#{ic}\" data-tip=\"#{unresolve @currentFile}\">#{title} #{da}</span>"
         $('.titlebar').innerHTML = title
         
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000

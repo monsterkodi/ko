@@ -9,6 +9,7 @@
 editorFontSize        = 14px
 selectionRadius       = round(editorFontSize / 3)
 selectionRadiusCursor = round(selectionRadius / 2)
+metaRadius            = ceil(editorFontSize/2)
 
 minimapWidth          = 130px
 scrollbarWidth        = 12px // transparent scroll area
@@ -37,6 +38,24 @@ fill-rel()
     
 pre 
     margin          0
+
+// 00     00  00000000  000000000   0000000 
+// 000   000  000          000     000   000
+// 000000000  0000000      000     000000000
+// 000 0 000  000          000     000   000
+// 000   000  00000000     000     000   000
+
+.meta
+    position        absolute
+    pointer-events  all
+    background      #333
+    
+    padding-right     metaRadius
+    margin-right    - metaRadius
+    margin-left     - editorPadding
+    padding-left      editorPadding
+    border-top-right-radius   metaRadius
+    border-bottom-right-radius   metaRadius
     
 //  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
 // 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
@@ -112,9 +131,12 @@ pre
     &.directory
         color           #aaf
         font-weight     bold
+    &::before
+        content         "∘ "
+        color           transparent
     &.directory::before
         content         "▸ "
-        color           #558
+        color           #88f
 
 //  0000000   000   000  000000000   0000000    0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
 // 000   000  000   000     000     000   000  000       000   000  000   000  000   000  000      000          000     000     
@@ -227,26 +249,30 @@ body
 .titlebar .winid
     color               #555
     &.focus
-        color           #F5BF4F
+        color           #FDBC40
     display             inline-block
     vertical-align      top
     padding-left        3px
     padding-top         3px
 
-.titlebar .separator
-    opacity             1
-    background          frameColor
-    height              100%
-    width               2px
-    display             inline-block
-    
 .titlebar .dot.clean
     color               #444
+    &.focus
+        color           #FC615D
 
+.titlebar .title.focus
+    color               #34C749
 .titlebar .title.dirty
 .titlebar .dot.dirty
     color               #aaf
-    
+
+// .titlebar .separator
+//    opacity             1
+//    background          frameColor
+//    height              100%
+//    width               2px
+//    display             inline-block
+        
 //  0000000   0000000  00000000    0000000   000      000      0000000     0000000   00000000 
 // 000       000       000   000  000   000  000      000      000   000  000   000  000   000
 // 0000000   000       0000000    000   000  000      000      0000000    000000000  0000000  

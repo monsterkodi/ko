@@ -11,6 +11,7 @@
 - cycle through windows command: windows list
 - recent files in titlebar?
 - list buffers when clicking buffer number in titlebar
+- lock windows together
 
 #### editor
 - *autocomplete from similar files*
@@ -52,7 +53,6 @@
 - display number of matches somewhere
 
 #### open
-- *when navigating, don't filter files in @dir*
 - command-p alias: -n for previuous files
 - show relative path when navigating in history
 
@@ -79,7 +79,6 @@
 - shift move cursor down
     
 #### minimap 
-- *fix scroll when paging up*
 - shift drag: extend selection
 - show selections, highlights and cursors
 - command drag: don't clear selection and don't single select
