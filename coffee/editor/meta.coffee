@@ -37,7 +37,6 @@ class Meta
     # 0000000    000      0    
 
     addDiv: (meta) ->
-        # log "meta.addDiv li #{meta[0]}"
         size = @editor.size
         sw = size.charWidth * (meta[1][1]-meta[1][0])
         tx = size.charWidth *  meta[1][0] + size.offsetX
@@ -50,7 +49,7 @@ class Meta
         div.style.width = "#{sw}px"
         div.style.height = "#{lh}px"
         @elem.appendChild div
-        if meta.div?
+        if meta.div? # todo remove
             log "meta.addDiv wtf? li #{meta[0]}"
             meta.div.remove()
         meta.div = div
@@ -61,9 +60,7 @@ class Meta
     # 000   000  000        000        000       000  0000  000   000
     # 000   000  000        000        00000000  000   000  0000000  
     
-    append: (meta) -> 
-        log "meta.append @editor.lines.length #{@editor.lines.length}"
-        @metas.push [@editor.lines.length, [0, 0], meta]
+    append: (meta) -> @metas.push [@editor.lines.length, [0, 0], meta]
     
     #  0000000   00000000   00000000   00000000  000   000  0000000    00000000  0000000  
     # 000   000  000   000  000   000  000       0000  000  000   000  000       000   000
@@ -93,14 +90,11 @@ class Meta
         
     onLineExposed: (e) =>
         for meta in @metasAtLineIndex e.lineIndex
-            log "meta.onLineExposed li #{e.lineIndex}"
             @addDiv meta
         
-    onLineExposedTop: (e) => @onLineExposed e #log "meta.onLineExposedTop e", e
+    onLineExposedTop: (e) => @onLineExposed e
     
-    onExposeTopChanged: (e) => 
-        log "meta.onExposeTopChanged e.new #{e.new} @editor.scroll.exposeBot #{@editor.scroll.exposeBot}"
-        @updatePositionsBelowLineIndex e.new
+    onExposeTopChanged: (e) => @updatePositionsBelowLineIndex e.new
         
     updatePositionsBelowLineIndex: (li) ->      
         size = @editor.size
@@ -116,7 +110,6 @@ class Meta
     # 000  000   000  0000000   00000000  000   000     000     00000000  0000000  
         
     onLineInserted: (li) => 
-        log "meta.onLineInserted li #{li}"
         for meta in @editor.rangesFromTopToBotInRanges li+1, @editor.lines.length, @metas
             meta[0] += 1
         @updatePositionsBelowLineIndex li
@@ -129,7 +122,6 @@ class Meta
     
     onWillDeleteLine: (li) => log "meta.onWillDeleteLine li #{li}"    
     onLineDeleted: (li) => 
-        log "meta.onLineDeleted li #{li}"
         @onLineVanished lineIndex: li
         _.pullAll @metas, @metasAtLineIndex li
         for meta in @editor.rangesFromTopToBotInRanges li+1, @editor.lines.length, @metas
@@ -147,7 +139,6 @@ class Meta
         @updatePositionsBelowLineIndex e.lineIndex
         
     onLineVanished:    (e) => 
-        # log "meta.onLineVanished e", e
         for meta in @metasAtLineIndex e.lineIndex
             meta.div?.remove()
             meta.div = null        
@@ -159,8 +150,8 @@ class Meta
     #  0000000  0000000  00000000  000   000  000   000
             
     onClearLines: => 
-        # log "meta.onClearLines"
-        @metas = []
         @elem.innerHTML = ""
+        for meta in @metas
+            meta.div = null
     
 module.exports = Meta
