@@ -88,7 +88,7 @@ ipc.on 'reloadFile', =>
 ipc.on 'saveFileAs', => saveFileAs()
 ipc.on 'saveFile',   => saveFile()
 ipc.on 'loadFile', (event, file) => 
-    log "window.ipc.loadFile #{file}"
+    # log "window.ipc.loadFile #{file}"
     loadFile file
 ipc.on 'setWinID', (event, id) => 
     # log "window.ipc.setWinID #{id} #{window.split?}"
@@ -103,7 +103,7 @@ ipc.on 'setWinID', (event, id) =>
 
 saveFile = (file) =>
     file ?= editor.currentFile
-    log 'window.saveFile file:', file
+    # log 'window.saveFile file:', file
     if not file?
         saveFileAs()
         return
@@ -114,7 +114,7 @@ saveFile = (file) =>
     setState 'file', file
 
 loadFile = (file) =>  
-    log 'window.loadFile file:', file
+    # log 'window.loadFile file:', file
     [file,line] = file.split ':'
     if fileExists file
         addToRecent file
@@ -253,10 +253,6 @@ logview = window.logview = new LogView '.logview'
 
 commandline = window.commandline = new Commandline '.commandline-editor'
 
-# commandline.startCommand 'term', 'command+t'
-# commandline.setLines ['color-ls -l index.html']
-# commandline.execute()
-                  
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000     
 # 0000000    0000000   0000000   000    000    0000000 
@@ -264,18 +260,13 @@ commandline = window.commandline = new Commandline '.commandline-editor'
 # 000   000  00000000  0000000   000  0000000  00000000
 
 window.onresize = =>
-    # log "window.onresize sh #{sh()}"
     if sh()
         ipc.send 'saveBounds', winID if winID?
         editor.resized()
         split.resized()
 
-window.onload = =>
-    # log "window.onload sh #{sh()} #{window.split?}"
-    split.resized()
-    
-window.onunload = =>
-    editor.setCurrentFile null, noSaveScroll: true # to stop watcher
+window.onload = => split.resized()
+window.onunload = => editor.setCurrentFile null, noSaveScroll: true # to stop watcher
 
 # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
 # 000       000   000  0000  000     000     000       000     000   000     
@@ -336,7 +327,6 @@ window.onblur = (event) -> window.editor.updateTitlebar()
 
 document.onkeydown = (event) ->
     {mod, key, combo} = keyinfo.forEvent event
-    # log "document key:", key, "mod:", mod, "combo:", combo
     
     return if not combo
     

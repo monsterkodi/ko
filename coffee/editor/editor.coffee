@@ -275,7 +275,7 @@ class Editor extends Buffer
         @do.end()
     
     selectNextHighlight: -> # command+g
-        log "selectNextHighlight #{@highlights.length}"
+        # log "selectNextHighlight #{@highlights.length}"
         if not @highlights.length
             searchText = window.commandline.commands.find?.current()
             log "editor.selectNextHighlight use find command text #{searchText}"
@@ -395,9 +395,9 @@ class Editor extends Buffer
             @newCursorSet newCursors, c, @clampPos c
         @do.cursors newCursors
     
-    setCursorsAtSelectionBoundary: (leftOrRight='right') -> 
+    setCursorsAtSelectionBoundary: (leftOrRight='right') ->
         i = leftOrRight == 'right' and 1 or 0
-        @do.start()     
+        @do.start()
         newCursors = []
         main = false
         for s in @selections
@@ -409,7 +409,6 @@ class Editor extends Buffer
         # @do.cursors (@rangeIndexPos(s,i) for s in @selections) # todo mainCursor
         @mainCursor = null if not main
         @do.cursors newCursors
-        # @do.selections []
         @do.end()       
 
     delCursors: (dir='up') ->
@@ -980,6 +979,9 @@ class Editor extends Buffer
     deleteBackward: ->
         if @selections.length
             @deleteSelection()
+        if @cursors.length == 1 and not @isSamePos @mainCursor, @cursorPos()
+            @mainCursor = @cursorPos()
+            @do.cursors [@mainCursor]
         else
             @do.start()
             newCursors = _.cloneDeep @cursors

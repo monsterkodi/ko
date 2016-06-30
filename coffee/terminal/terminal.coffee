@@ -61,7 +61,10 @@ class Terminal extends ViewBase
     
     appendMeta: (meta) -> 
         @meta.append meta
-        @appendLineDiss syntax.lineForDiss(meta.diss), meta.diss if meta.diss?
+        if meta.diss?
+            @appendLineDiss syntax.lineForDiss(meta.diss), meta.diss 
+        else
+            @appendLineDiss ''
             
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000

@@ -73,7 +73,7 @@ class Commandline extends ViewBase
         @command = @commands[name]
         activeClass = "."+document.activeElement.className
         @command.setFocus activeClass != '.commandline-editor' and activeClass or null
-        log "commandline.startCommand #{name} focus #{@command.focus}"
+        # log "commandline.startCommand #{name} focus #{@command.focus}"
         @view.focus()
         @setName name
         @results @command.start combo # <-- command start

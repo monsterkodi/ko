@@ -61,7 +61,7 @@ class Search extends Command
     startSearchInFiles: (opt) ->
         terminal = window.terminal
         terminal.appendText ''
-        terminal.appendDiss syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'       
+        terminal.appendDiss syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'
         terminal.appendText ''
         terminal.singleCursorAtPos [0, terminal.lines.length-1]
         @walker = new walker
@@ -105,12 +105,12 @@ class FileSearcher extends stream.Writable
                 diss: syntax.dissForTextAndSyntax "● #{@file}:", 'ko'
                 href: @file
             terminal.appendMeta meta
-            terminal.appendText ''
+            terminal.appendMeta clss: 'spacer'
             for f in @found
                 ranges = f[2].concat syntax.rangesForTextAndSyntax f[1], 'coffee'
                 dss = matchr.dissect ranges, join:true
                 terminal.appendLineDiss f[1], dss                
-            terminal.appendText ''
+            terminal.appendMeta clss: 'spacer'
             terminal.scrollCursorToTop 3
                 
 module.exports = Search

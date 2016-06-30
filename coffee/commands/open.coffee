@@ -65,7 +65,7 @@ class Open extends Command
             filtered = (f.string for f in fuzzied)
             
             matchWeight = (f) =>
-                
+                f = f.slice 0, f.length-2 if f.endsWith ' >'
                 bonus = switch path.extname(f)         
                     when '.coffee' then 1000
                     when '.md', '.styl', '.pug' then 500
@@ -76,13 +76,13 @@ class Open extends Command
 
                 bonus += (10-f.split(/[\/\.]/).length)
                         
-                if f == command 
+                if f == command
                     bonus += 99999999
                 if f.startsWith command
                     bonus += 100000 - f.length                        
                 if path.basename(f).startsWith command
                     bonus += 10000 - path.basename(f).length
-                                        
+                 
                 bonus
     
             filtered.sort (a,b) -> matchWeight(b) - matchWeight(a)
@@ -246,7 +246,7 @@ class Open extends Command
             fopt.root     = @dir
             fopt.maxDepth = 1
             fopt.maxFiles = 300
-            log "open.loadDir fastWalker", fopt
+            # log "open.loadDir fastWalker", fopt
             @fastWalker = new walker fopt
             @fastWalker.start()
             # return

@@ -249,7 +249,7 @@ body
 .titlebar .winid
     color               #555
     &.focus
-        color           #FDBC40
+        color           #34C749
     display             inline-block
     vertical-align      top
     padding-left        3px
@@ -258,7 +258,7 @@ body
 .titlebar .dot.clean
     color               #444
     &.focus
-        color           #FC615D
+        color           #34C749
 
 .titlebar .title.focus
     color               #34C749
@@ -417,32 +417,19 @@ body
 // 000       000   000  000   000       000  000   000  000   000
 //  0000000   0000000   000   000  0000000    0000000   000   000
         
-        
-//@keyframes blink 
-//  from 
-//    background      #ff0
-//  to 
-//    background      #444
-//
-//@keyframes blink-virtual
-//  from 
-//    background      #08f
-//  to 
-//    background      transparent
-//
-//*:focus .cursor
-//   animation-name      blink
-//   animation-duration  500ms
-//   animation-iteration-count infinite
-//   animation-direction alternate
-//   animation-timing-function ease-in-out
-//   &.virtual
-//       background      #444 
-//       animation-name  blink-virtual
-//       animation-duration 1000ms
-//   &.main
-//       background  #f80
-//       animation-duration 250ms
+@keyframes blink 
+  from 
+    background      #ff0
+  to 
+    background      #800
+    
+*:focus .cursor.main
+   animation-name      blink
+   animation-duration  500ms
+   animation-iteration-count infinite
+   animation-direction alternate
+   animation-timing-function ease-in-out
+   //background  #f80
 
 .cursor
     width            2px
@@ -552,9 +539,6 @@ body
     position        absolute
     pointer-events  none
     background      rgba(155,155,255, 0.3)
-
-// *:focus .highlight
-//     background rgba(255,255,255, 0.2)
 
 //  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
 // 000       000       000      000       000          000     000  000   000  0000  000
