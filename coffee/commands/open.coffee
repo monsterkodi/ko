@@ -113,9 +113,13 @@ class Open extends Command
         else
             @list.style.display = 'unset'
             index = 0
-            for file in files
+            for fileOrDir in files
+                file = fileOrDir
                 div = document.createElement 'div'
                 div.className = 'list-item'
+                if file.endsWith ' >'
+                    file = file.slice 0, file.length-2
+                    div.classList.add 'directory'
                 div.innerHTML = render.line file, syntax.dissForTextAndSyntax file, 'ko', join: true
                 div.setAttribute "onmousedown", "window.openFileAtIndex(#{index});"
                 div.value = file
@@ -228,6 +232,8 @@ class Open extends Command
         @pkg        = walker.packagePath(@dir) ? @dir
         @file       = opt.file
         @files      = []
+        @paths      = []
+        @stats      = []
         @selected   = 0
         @navigating = opt.navigating
         wopt = 
@@ -237,10 +243,13 @@ class Open extends Command
             done:        @walkerDone
         if @navigating
             fopt = _.clone wopt
+            fopt.root     = @dir
             fopt.maxDepth = 1
-            fopt.maxFiles = 30
+            fopt.maxFiles = 300
+            log "open.loadDir fastWalker", fopt
             @fastWalker = new walker fopt
             @fastWalker.start()
+            # return
         @walker = new walker wopt
         @walker.start()        
         
@@ -250,9 +259,16 @@ class Open extends Command
     # 000   000  000   000  000      000  000   000       000   000
     # 00     00  000   000  0000000  000   000  00000000  000   000
             
-    walkerDone: (@files) =>
+    walkerDone: (fileList, statList) =>
         # profile 'walker done'
-        # log "walkerDone @dir #{@dir} @files", @files.length
+        @paths = @paths.concat fileList
+        @stats = @stats.concat statList
+        @files = _.clone @paths
+        for i in [0...@files.length]
+            if @stats[i].isDirectory()
+                @files[i] += " >"
+            
+        # log "walkerDone @dir #{@dir} @paths", @paths
         
         # 000   000  00000000  000   0000000   000   000  000000000
         # 000 0 000  000       000  000        000   000     000   

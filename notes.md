@@ -85,8 +85,7 @@
 - command drag: don't clear selection and don't single select
 
 #### syntax
-- pug, html, js, bash
-- look at hashbang if no extname
+- pug, html, js, (ba)sh
 
 #### commands
 - tree

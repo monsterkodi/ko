@@ -16,12 +16,13 @@ fs       = require 'fs'
 class Walker
 
     constructor: (@cfg) ->
-    
+        
+        @cfg.files       = []
+        @cfg.stats       = []
         @cfg.maxDepth    ?= 3
         @cfg.dotFiles    ?= false
         @cfg.includeDirs ?= true
         @cfg.maxFiles    ?= 500
-        @cfg.files       ?= []
         @cfg.ignore      ?= ['node_modules', 'app', 'img', 'dist', 'build', 'Library', 'Applications']
         @cfg.include     ?= ['.konrad.noon', '.gitignore', '.npmignore']
         @cfg.ignoreExt   ?= ['.app']
@@ -41,33 +42,40 @@ class Walker
         try
             dir = @cfg.root
             @walker = walkdir.walk dir, max_depth: @cfg.maxDepth
-            
+            # log "walker.start cfg", @cfg
             onWalkerPath = (cfg) -> (p,stat) ->
                 name = path.basename p
                 extn = path.extname p
 
                 if cfg.filter?(p)
                     return @ignore p
+                else if name in ['.DS_Store', 'Icon?'] or extn in ['.pyc']
+                    return @ignore p
                 else if cfg.includeDir? and path.dirname(p) == cfg.includeDir
                     cfg.files.push p
+                    cfg.stats.push stat
                     @ignore p if name in cfg.ignore
                     @ignore p if name.startsWith('.') and not cfg.dotFiles
                 else if name in cfg.ignore
                     return @ignore p
                 else if name in cfg.include
                     cfg.files.push p
+                    cfg.stats.push stat
                 else if name.startsWith '.'
                     if cfg.dotFiles
                         cfg.files.push p
+                        cfg.stats.push stat
                     else
                         return @ignore p 
                 else if extn in cfg.ignoreExt
                     return @ignore p
                 else if extn in cfg.includeExt
                     cfg.files.push p
+                    cfg.stats.push stat
                 else if stat.isDirectory()
                     if p != cfg.root and cfg.includeDirs
                         cfg.files.push p 
+                        cfg.stats.push stat
                         
                 cfg.path? p, stat
                 if stat.isDirectory()
@@ -82,7 +90,7 @@ class Walker
                     @end()
             
             @walker.on 'path', onWalkerPath @cfg
-            @walker.on 'end', => @cfg.done? @cfg.files
+            @walker.on 'end', => @cfg.done? @cfg.files, @cfg.stats
                 
         catch err
             log "walker.start.error: #{err} dir: #{dir}"

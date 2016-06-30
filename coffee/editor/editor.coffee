@@ -242,9 +242,9 @@ class Editor extends Buffer
             switch opt?.select
                 when 'after' then @selectSingleRange @rangeAfterPosInRanges(@cursorPos(), @highlights) ? first @highlights
                 when 'first' then @selectSingleRange first @highlights            
-            @scrollCursorToTop() if not opt?.noScroll
-            @renderHighlights()
-            @emit 'highlight', @highlights
+            @scrollCursorToTop() if not opt?.noScroll            
+        @renderHighlights()
+        @emit 'highlight', @highlights
 
     highlightTextOfSelectionOrWordAtCursor: -> # called from keyboard shortcuts        
             

@@ -37,7 +37,7 @@ class Find extends Command
         if editor = window.editorWithClassName @focus
             if command.length
                 editor.highlightText command, 
-                    type: @type
+                    type:   @type
                     select: 'keep'
             else
                 editor.clearHighlights()

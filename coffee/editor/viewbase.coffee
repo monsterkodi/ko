@@ -92,23 +92,33 @@ class ViewBase extends Editor
         @renderHighlights()
         @renderSelection()
         @renderCursors()
+
+    #  0000000  00000000  000000000        000000000  00000000  000   000  000000000
+    # 000       000          000              000     000        000 000      000   
+    # 0000000   0000000      000              000     0000000     00000       000   
+    #      000  000          000              000     000        000 000      000   
+    # 0000000   00000000     000              000     00000000  000   000     000   
+    
+    setText: (text) ->
+        if @syntax.name == 'txt'
+            if text.startsWith "#!"
+                firstLine = text.slice 0, text.search /\r?\n/
+                lastWord = last firstLine.split ' '
+                switch lastWord
+                    when 'python'      then @syntax.name = 'py'
+                    when 'node'        then @syntax.name = 'js'
+                    when 'bash', 'sh'  then @syntax.name = 'sh'
+                    else 
+                        if lastWord in syntax.syntaxNames
+                            @syntax.name = lastWord
+        super text
                 
     #  0000000  00000000  000000000  000      000  000   000  00000000   0000000
     # 000       000          000     000      000  0000  000  000       000     
     # 0000000   0000000      000     000      000  000 0 000  0000000   0000000 
     #      000  000          000     000      000  000  0000  000            000
     # 0000000   00000000     000     0000000  000  000   000  00000000  0000000 
-        
-    appendText: (text) ->
-        
-        ts = text?.split /\n/
-        [].push.apply @lines, ts
-        if @scroll.viewHeight != @viewHeight()
-            @scroll.setViewHeight @viewHeight()        
-        @scroll.setNumLines @lines.length
-        @emit  'linesAppended', ts
-        @emit 'numLines', @lines.length
-        
+
     setLines: (lines) ->
         # log "viewbase.setLines lines", lines if @name == 'editor'        
         if lines.length == 0
@@ -124,6 +134,22 @@ class ViewBase extends Editor
         @view.scrollLeft = 0
         @updateScrollOffset()
         @updateLayers()
+
+    #  0000000   00000000   00000000   00000000  000   000  0000000          000000000  00000000  000   000  000000000
+    # 000   000  000   000  000   000  000       0000  000  000   000           000     000        000 000      000   
+    # 000000000  00000000   00000000   0000000   000 0 000  000   000           000     0000000     00000       000   
+    # 000   000  000        000        000       000  0000  000   000           000     000        000 000      000   
+    # 000   000  000        000        00000000  000   000  0000000             000     00000000  000   000     000   
+    
+    appendText: (text) ->
+        
+        ts = text?.split /\n/
+        [].push.apply @lines, ts
+        if @scroll.viewHeight != @viewHeight()
+            @scroll.setViewHeight @viewHeight()        
+        @scroll.setNumLines @lines.length
+        @emit  'linesAppended', ts
+        @emit 'numLines', @lines.length
 
     # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
     # 000       000   000  0000  000     000     000       000     000   000     
