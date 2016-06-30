@@ -48,6 +48,10 @@ class Meta
         div.style.transform = "translate(#{tx}px,#{ty}px)"
         div.style.width = "#{sw}px"
         div.style.height = "#{lh}px"
+        if meta[2].href?
+            log "meta[2].href #{meta[2].href}"
+            div.setAttribute 'onclick', "window.loadFile('#{meta[2].href}');" 
+            div.classList.add 'href'
         @elem.appendChild div
         if meta.div? # todo remove
             log "meta.addDiv wtf? li #{meta[0]}"

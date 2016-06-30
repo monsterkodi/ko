@@ -36,7 +36,7 @@ class Numbers
     # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
-       
+    
     updateColors: (top=@editor.scroll.exposeTop, bot=@editor.scroll.exposeBot) =>
         # @log "numbers.updateColors #{top} #{bot}" if @editor.name == 'editor'
         sr = @editor.rangesFromTopToBotInRanges top, bot, @editor.selections
@@ -52,6 +52,8 @@ class Numbers
             cls = ''
             if li in ci
                 cls += ' cursored'
+            if li == @editor.mainCursor[1]
+                cls += ' main'
             if li in si
                 cls += ' selected'
             if li in hi

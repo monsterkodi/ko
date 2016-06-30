@@ -1,7 +1,9 @@
 # todo/ideas
 
 #### search
-- *make search results clickable*
+- *hrefs for search results*
+- *line numebrs for search results*
+- *fix meta spacers*
 - insert salter headers
 - output search end
 - make search results editable
@@ -32,6 +34,7 @@
 - *ctrl+command+/  align cursors block*
 - *dbg "class.method arg: #{arg}, ..."*
 - *multicursors delete backwards over line boundaries only if command is down*
+- *handle unicode character length*
 - #< to add salter header of next word
 - no surround for ' inside words
 - clamp cursors after pasting
