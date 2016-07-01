@@ -35,8 +35,8 @@ class Buffer extends event
     # 000       000   000  000   000       000  000   000  000   000       000
     #  0000000   0000000   000   000  0000000    0000000   000   000  0000000 
             
-    cursorAtPos: (p) ->
-        for c in @cursors
+    cursorAtPos: (p,cl=@cursors) ->
+        for c in cl
             if c[0] == p[0] and c[1] == p[1]
                 return c
                 
@@ -266,6 +266,8 @@ class Buffer extends event
     positionsInLineAtIndexInPositions: (li,pl) -> (p for p in pl when p[1] == li)
     positionsBelowLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] > li)
     positionsAfterLineColInPositions: (li,col,pl) -> (p for p in pl when p[1] == li and p[0]>=col)
+        
+    posClosestToPosInPositions: (p,pl) -> last pl
 
     # 00000000    0000000   000   000   0000000   00000000
     # 000   000  000   000  0000  000  000        000     

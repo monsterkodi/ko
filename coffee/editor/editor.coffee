@@ -76,7 +76,8 @@ class Editor extends Buffer
         else if not e
             @initialCursors = _.cloneDeep [p]
         @startSelection e
-        @do.cursors [[p[0], p[1]]], true
+        @mainCursor = [p[0], p[1]]
+        @do.cursors [@mainCursor], true
         @endSelection e
         
     selectSingleRange: (r) ->
@@ -86,7 +87,8 @@ class Editor extends Buffer
         @cursors = [[r[1][0], r[0]]]
         @initialCursors = null
         @startSelection true
-        @do.cursors [[r[1][1], r[0]]], true     
+        @mainCursor = [r[1][1], r[0]]
+        @do.cursors [@mainCursor], true     
         @endSelection true
             
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
@@ -139,8 +141,9 @@ class Editor extends Buffer
         @do.start()
         newSelections = _.cloneDeep @selections
         newSelections.push range
-        @mainCursor = @rangeEndPos(range)
-        @do.cursors (@rangeEndPos(r) for r in newSelections)
+        newCursors = (@rangeEndPos(r) for r in newSelections)
+        @mainCursor = last newCursors
+        @do.cursors newCursors
         @do.selections newSelections
         @do.end()
 
@@ -361,7 +364,7 @@ class Editor extends Buffer
         if c and @cursors.length > 1
             newCursors = _.cloneDeep @cursors
             newCursors.splice @indexOfCursor(c), 1
-            @mainCursor = null if @isMainCursor c
+            @mainCursor = @posClosestToPosInPositions @mainCursor, newCursors if c == @mainCursor
             @do.cursors newCursors        
                     
     addCursors: (dir='down') ->
@@ -370,9 +373,12 @@ class Editor extends Buffer
             when 'down' then +1
         newCursors = _.cloneDeep @cursors
         for c in @cursors
-            if not @cursorAtPos [c[0], c[1]+d]
-                newCursors.push [c[0], c[1]+d]
-        @mainCursor=null
+            if not @cursorAtPos [c[0], c[1]+d]                
+                newCursors.push [c[0], c[1]+d]                
+        @sortPositions newCursors
+        switch dir
+            when 'up'   then @mainCursor = first newCursors
+            when 'down' then @mainCursor = last  newCursors
         @do.cursors newCursors 
 
     alignCursors: (dir='down') ->
@@ -406,26 +412,26 @@ class Editor extends Buffer
                 @mainCursor = p
                 main = true
             newCursors.push p
-        # @do.cursors (@rangeIndexPos(s,i) for s in @selections) # todo mainCursor
-        @mainCursor = null if not main
+        @mainCursor = last newCursors if not main
         @do.cursors newCursors
         @do.end()       
 
     delCursors: (dir='up') ->
         newCursors = _.cloneDeep @cursors
+        @mainCursor = newCursors[@indexOfCursor @mainCursor]
         d = switch dir
             when 'up' 
-                for c in @reversedCursors()
+                for c in @reversedCursors()                    
                     if @cursorAtPos([c[0], c[1]-1]) and not @cursorAtPos [c[0], c[1]+1]
-                        newCursors.splice @indexOfCursor(c), 1
-                        if @isMainCursor c
-                            @mainCursor = [c[0], c[1]-1]
+                        ci = @indexOfCursor c
+                        @mainCursor = @cursorAtPos([c[0], c[1]-1], newCursors) if newCursors[ci] == @mainCursor
+                        newCursors.splice ci, 1
             when 'down' 
                 for c in @reversedCursors()
                     if @cursorAtPos([c[0], c[1]+1]) and not @cursorAtPos [c[0], c[1]-1]
-                        newCursors.splice @indexOfCursor(c), 1
-                        if @isMainCursor c
-                            @mainCursor = [c[0], c[1]+1]
+                        ci = @indexOfCursor c
+                        @mainCursor = @cursorAtPos([c[0], c[1]+1], newCursors) if newCursors[ci] == @mainCursor
+                        newCursors.splice ci, 1
         @do.cursors newCursors 
         
     cancelCursors: () -> @do.cursors [@mainCursor] 
@@ -444,24 +450,20 @@ class Editor extends Buffer
     
     oldCursorDelta: (newCursors, oc, dx, dy=0) ->
         nc = newCursors[@indexOfCursor oc]
+        @mainCursor = nc if oc == @mainCursor
         @newCursorDelta newCursors, nc, dx, dy
 
     oldCursorSet: (newCursors, oc, x, y) ->
         nc = newCursors[@indexOfCursor oc]
+        @mainCursor = nc if oc == @mainCursor
         @newCursorSet newCursors, nc, x, y
         
     newCursorDelta: (newCursors, nc, dx, dy=0) ->
-        if @isMainCursor nc
-            @mainCursor[0] += dx
-            @mainCursor[1] += dy
         nc[0] += dx
         nc[1] += dy
         
     newCursorSet: (newCursors, nc, x, y) ->    
         [x,y] = x if not y? and x.length >=2
-        if @isMainCursor nc
-            @mainCursor[0] = x
-            @mainCursor[1] = y
         nc[0] = x
         nc[1] = y
 
@@ -671,9 +673,7 @@ class Editor extends Buffer
             for c in @cursors
                 n = 4-(c[0]%il)
                 @do.change c[1], @lines[c[1]].splice c[0], 0, _.padStart "", n
-                newCursors[@indexOfCursor c] = [c[0]+n, c[1]]
-                if @isMainCursor c
-                    @mainCursor = [c[0]+n, c[1]]
+                @oldCursorDelta newCursors, c, n
             @do.cursors newCursors
             @do.end()   
         

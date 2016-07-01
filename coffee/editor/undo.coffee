@@ -200,15 +200,19 @@ class undo
     #  0000000   0000000   000   000  0000000    0000000   000   000
 
     cursors: (newCursors, keepInitial) ->
-        @editor.mainCursor = [last(newCursors)[0], last(newCursors)[1]] if not @editor.mainCursor
+        # @editor.mainCursor = [last(newCursors)[0], last(newCursors)[1]] if not @editor.mainCursor?
+        if @editor.cursors.indexOf(@editor.mainCursor) > 0
+            @editor.mainCursor = newCursors[@editor.cursors.indexOf @editor.mainCursor]
+        @editor.mainCursor = last(newCursors) if not @editor.mainCursor?
         @editor.cleanCursors newCursors
         if not keepInitial or newCursors.length != @editor.cursors.length
             @editor.initialCursors = _.cloneDeep newCursors
         @changeInfoCursor()
         @lastAction().curBefore = _.cloneDeep newCursors if not @actions.length
         @lastAction().curAfter  = _.cloneDeep newCursors
+        # todo: store main cursor index
         @editor.cursors = newCursors
-        @editor.mainCursor = [newCursors[0][0], newCursors[0][1]] if newCursors.length == 1        
+        # @editor.mainCursor = [newCursors[0][0], newCursors[0][1]] if newCursors.length == 1        
         @changeInfoCursor()
         @check()
 
@@ -326,14 +330,6 @@ class undo
         @changeInfo.changed.sort  (a,b) -> a-b
         @changeInfo.cursor.sort   (a,b) -> a-b
         
-        # if @changeInfo.sorted.length
-        #     deleted = [] # move deleted to front
-        #     for i in [@changeInfo.sorted.length-1..0]
-        #         if @changeInfo.sorted[i][1] == 'deleted'
-        #             deleted.unshift @changeInfo.sorted.splice(i, 1)[0]
-        #     @changeInfo.sorted = deleted.concat @changeInfo.sorted
-        # log 'cleanChangeInfo', @changeInfo
-                
     # 00     00  00000000  00000000    0000000   00000000
     # 000   000  000       000   000  000        000     
     # 000000000  0000000   0000000    000  0000  0000000 
