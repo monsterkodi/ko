@@ -55,6 +55,7 @@ class Autocomplete
             when 'insert'        
                 return if not @word?.length
                 return if not @wordlist?.length
+                return if @editor.cursors.length > 1 # todo: make it work with multicursors
                 
                 for w in @wordlist
                     if w.startsWith(@word) and w.length > @word.length
@@ -75,7 +76,7 @@ class Autocomplete
     #  0000000   000        00000000  000   000
     
     open: (info) ->
-        # log "autocomplete.open word: #{@word} @firstMatch: #{@firstMatch} info:", info
+        log "autocomplete.open word: #{@word} @firstMatch: #{@firstMatch} info:", info
         cursor = $('.main', @editor.view)
         if not cursor?
             log "warning! no cursor?"
