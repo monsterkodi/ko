@@ -197,15 +197,19 @@ class undo
             @lastAction().selAfter = []
         @check()
         
-    #  0000000  000   000  00000000    0000000   0000000   00000000 
-    # 000       000   000  000   000  000       000   000  000   000
-    # 000       000   000  0000000    0000000   000   000  0000000  
-    # 000       000   000  000   000       000  000   000  000   000
-    #  0000000   0000000   000   000  0000000    0000000   000   000
+    #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
+    # 000       000   000  000   000  000       000   000  000   000  000     
+    # 000       000   000  0000000    0000000   000   000  0000000    0000000 
+    # 000       000   000  000   000       000  000   000  000   000       000
+    #  0000000   0000000   000   000  0000000    0000000   000   000  0000000 
 
-    cursors: (newCursors, keepInitial) ->
-
-        @editor.mainCursor = last(newCursors) if not @editor.mainCursor?
+    cursors: (newCursors, opt) ->
+        
+        if not newCursors? or newCursors.length < 1
+            alert('empty cursors') 
+            throw new Error
+            
+        @editor.mainCursor = @editor.posClosestToPosInPositions(@editor.mainCursor, newCursors) if opt?.closestMain
         
         if newCursors.indexOf(@editor.mainCursor) < 0
             if @editor.indexOfCursor(@editor.mainCursor) >= 0
@@ -213,32 +217,19 @@ class undo
             else
                 @editor.mainCursor = last(newCursors)        
         
-        if newCursors.indexOf(@editor.mainCursor) < 0
-            alert('before clean')
-            throw new Error
-            @editor.mainCursor = last(newCursors)        
-        
         @editor.cleanCursors newCursors
         
-        if newCursors.indexOf(@editor.mainCursor) < 0
-            alert('after clean')
-            throw new Error
-            @editor.mainCursor = last(newCursors)
-            
-        if not keepInitial or newCursors.length != @editor.cursors.length
+        if not opt?.keepInitial or newCursors.length != @editor.cursors.length
             @editor.initialCursors = _.cloneDeep newCursors
         @changeInfoCursor()
         if not @actions.length
             @lastAction().curBefore  = _.cloneDeep newCursors 
-            @lastAction().mainBefore = newCursors.indexOf @mainCursor
+            @lastAction().mainBefore = newCursors.indexOf @editor.mainCursor
         @lastAction().curAfter  = _.cloneDeep newCursors        
-        @lastAction().mainAfter = newCursors.indexOf @mainCursor
+        @lastAction().mainAfter = newCursors.indexOf @editor.mainCursor
         @editor.cursors = newCursors
         @changeInfoCursor()
-        if newCursors.indexOf(@editor.mainCursor) < 0
-            alert()
-            throw new Error
-            @editor.mainCursor = last(newCursors)        
+        
         @check()
 
     # 000       0000000    0000000  000000000

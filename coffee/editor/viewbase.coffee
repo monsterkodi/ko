@@ -500,7 +500,7 @@ class ViewBase extends Editor
         sl = @view.scrollLeft
         st = @view.scrollTop
         br = @view.getBoundingClientRect()
-        lx = clamp 0, @view.offsetWidth,  x - br.left - @size.offsetX
+        lx = clamp 0, @view.offsetWidth,  x - br.left - @size.offsetX + @size.charWidth/3
         ly = clamp 0, @view.offsetHeight, y - br.top
         # log "viewbase.posForEvent ly:#{ly} y:#{y} br.top: #{br.top} st: #{st}"
         px = parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth))
@@ -516,7 +516,7 @@ class ViewBase extends Editor
         ci = p[1]-@scroll.exposeTop
         @layers['lines'].children[ci]
         
-    lineSpanAtXY:(x,y) ->
+    lineSpanAtXY:(x,y) -> # not used ?
         lineElem = @lineElemAtXY x,y        
         if lineElem?
             lr = lineElem.getBoundingClientRect()

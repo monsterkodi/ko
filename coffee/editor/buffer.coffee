@@ -248,6 +248,9 @@ class Buffer extends event
         [@lines[lli].length, lli]
 
     cursorPos: -> 
+        if not @mainCursor?
+            alert('no main cursor!')
+            throw new Error
         l = clamp 0, @lines.length-1, @mainCursor[1]
         c = clamp 0, @lines[l].length, @mainCursor[0]
         [ c, l ]
@@ -267,7 +270,16 @@ class Buffer extends event
     positionsBelowLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] > li)
     positionsAfterLineColInPositions: (li,col,pl) -> (p for p in pl when p[1] == li and p[0]>=col)
         
-    posClosestToPosInPositions: (p,pl) -> last pl
+    manhattanDistance: (a,b) -> Math.abs(a[1]-b[1])+Math.abs(a[0]-b[0])
+        
+    posClosestToPosInPositions: (p,pl) -> 
+        minDist = 999999        
+        for ps in pl
+            mDist = @manhattanDistance ps, p
+            if mDist < minDist
+                minDist = mDist
+                minPos = ps
+        minPos ? last pl
 
     # 00000000    0000000   000   000   0000000   00000000
     # 000   000  000   000  0000  000  000        000     

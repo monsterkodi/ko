@@ -77,7 +77,7 @@ class Editor extends Buffer
             @initialCursors = _.cloneDeep [p]
         @startSelection e
         @mainCursor = [p[0], p[1]]
-        @do.cursors [@mainCursor], true
+        @do.cursors [@mainCursor], keepInitial: true
         @endSelection e
         
     selectSingleRange: (r) ->
@@ -88,7 +88,7 @@ class Editor extends Buffer
         @initialCursors = null
         @startSelection true
         @mainCursor = [r[1][1], r[0]]
-        @do.cursors [@mainCursor], true     
+        @do.cursors [@mainCursor], keepInitial: true     
         @endSelection true
             
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
@@ -146,6 +146,18 @@ class Editor extends Buffer
         @do.cursors newCursors
         @do.selections newSelections
         @do.end()
+
+    removeFromSelection: (sel) ->
+        @do.start()
+        si = @selections.indexOf sel
+        newSelections = _.cloneDeep @selections
+        newSelections.splice si, 1
+        if newSelections.length
+            newCursors = (@rangeEndPos(r) for r in newSelections)
+            @mainCursor = newCursors[(newCursors.length+si-1) % newCursors.length]
+            @do.cursors newCursors
+        @do.selections newSelections
+        @do.end()        
 
     selectNone: => @do.selections []
     selectAll: => @do.selections @rangesForAllLines()
@@ -274,7 +286,8 @@ class Editor extends Buffer
         if not @posInHighlights @cursorPos()
             @highlightTextOfSelectionOrWordAtCursor()
         @do.selections _.cloneDeep @highlights
-        @do.cursors (@rangeEndPos(r) for r in @selections)
+        if @selections.length
+            @do.cursors (@rangeEndPos(r) for r in @selections), closestMain: true
         @do.end()
     
     selectNextHighlight: -> # command+g
@@ -295,11 +308,12 @@ class Editor extends Buffer
         r ?= last @highlights
         @selectSingleRange r
 
-    highlightWordAndAddToSelection: ->
+    highlightWordAndAddToSelection: -> # command+d
         cp = @cursorPos()
         if not @posInHighlights cp
             @highlightTextOfSelectionOrWordAtCursor() # this also selects
         else
+            @do.start()
             sr = @rangeAtPosInRanges cp, @selections
             if sr # cursor in selection -> select next highlight
                 r = @rangeAfterPosInRanges cp, @highlights
@@ -308,19 +322,13 @@ class Editor extends Buffer
             r ?= first @highlights
             @addRangeToSelection r
             @scrollCursorToTop()
+            @do.end()
             
-    removeSelectedHighlight: ->
+    removeSelectedHighlight: -> # command+shift+d
         cp = @cursorPos()
         sr = @rangeAtPosInRanges cp, @selections
-        hr = @rangeAtPosInRanges cp, @highlights
-        if sr and hr
-            newSelections = _.cloneDeep @selections
-            newSelections.splice @indexOfSelection(sr), 1
-            @do.selections newSelections
-        pr = @rangeBeforePosInRanges cp, @highlights
-        pr ?= last @highlights
-        if pr 
-            @do.cursors [@rangeEndPos pr]
+        hr = @rangeAtPosInRanges cp, @highlights        
+        @removeFromSelection sr if sr and hr
 
     # 00000000  00     00  000  000000000       00000000  0000000    000  000000000
     # 000       000   000  000     000          000       000   000  000     000   
@@ -364,8 +372,7 @@ class Editor extends Buffer
         if c and @cursors.length > 1
             newCursors = _.cloneDeep @cursors
             newCursors.splice @indexOfCursor(c), 1
-            @mainCursor = @posClosestToPosInPositions @mainCursor, newCursors if c == @mainCursor
-            @do.cursors newCursors        
+            @do.cursors newCursors, closestMain: true        
                     
     addCursors: (dir='down') ->
         d = switch dir
@@ -485,7 +492,7 @@ class Editor extends Buffer
             @oldCursorSet newCursors, @cursors[0], f(@cursors[0])
         @mainCursor = first newCursors if opt.main == 'first'        
         @mainCursor = last  newCursors if opt.main == 'last'        
-        @do.cursors newCursors, opt.extend
+        @do.cursors newCursors, keepInitial: opt.extend
         @endSelection opt.extend
         true
         
@@ -908,7 +915,6 @@ class Editor extends Buffer
                     
     deleteSelection: ->
         @do.start()
-        log "editor.deleteSelection - @mainCursor[0] #{@mainCursor[0]}"
         newCursors = _.cloneDeep @cursors
         for s in @reversedSelections()
             
@@ -927,7 +933,6 @@ class Editor extends Buffer
         @do.selections []
         @do.cursors newCursors
         @do.end()
-        log "editor.deleteSelection > @mainCursor[0] #{@mainCursor[0]}"
         @emitEdit 'delete'
         @clearHighlights()        
         
