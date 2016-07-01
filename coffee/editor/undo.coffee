@@ -124,7 +124,9 @@ class undo
         
     redoCursor: (action) ->
         @changeInfoCursor()
-        @editor.cursor = [action.curAfter[0], action.curAfter[1]] if action.curAfter?
+        if action.curAfter?
+            @editor.cursors = action.curAfter
+            @editor.mainCursor = @editor.cursors[action.mainAfter]
         @changeInfoCursor()
 
     # 000   000  000   000  0000000     0000000 
@@ -172,7 +174,9 @@ class undo
         
     undoCursor: (action) ->
         @changeInfoCursor()
-        @editor.cursors = action.curBefore if action.curBefore?
+        if action.curBefore?
+            @editor.cursors = action.curBefore 
+            @editor.mainCursor = @editor.cursors[action.mainBefore]
         @changeInfoCursor()
         
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
@@ -200,20 +204,41 @@ class undo
     #  0000000   0000000   000   000  0000000    0000000   000   000
 
     cursors: (newCursors, keepInitial) ->
-        # @editor.mainCursor = [last(newCursors)[0], last(newCursors)[1]] if not @editor.mainCursor?
-        if @editor.cursors.indexOf(@editor.mainCursor) > 0
-            @editor.mainCursor = newCursors[@editor.cursors.indexOf @editor.mainCursor]
+
         @editor.mainCursor = last(newCursors) if not @editor.mainCursor?
+        
+        if newCursors.indexOf(@editor.mainCursor) < 0
+            if @editor.indexOfCursor(@editor.mainCursor) >= 0
+                @editor.mainCursor = newCursors[Math.min newCursors.length-1, @editor.indexOfCursor @editor.mainCursor]
+            else
+                @editor.mainCursor = last(newCursors)        
+        
+        if newCursors.indexOf(@editor.mainCursor) < 0
+            alert('before clean')
+            throw new Error
+            @editor.mainCursor = last(newCursors)        
+        
         @editor.cleanCursors newCursors
+        
+        if newCursors.indexOf(@editor.mainCursor) < 0
+            alert('after clean')
+            throw new Error
+            @editor.mainCursor = last(newCursors)
+            
         if not keepInitial or newCursors.length != @editor.cursors.length
             @editor.initialCursors = _.cloneDeep newCursors
         @changeInfoCursor()
-        @lastAction().curBefore = _.cloneDeep newCursors if not @actions.length
-        @lastAction().curAfter  = _.cloneDeep newCursors
-        # todo: store main cursor index
+        if not @actions.length
+            @lastAction().curBefore  = _.cloneDeep newCursors 
+            @lastAction().mainBefore = newCursors.indexOf @mainCursor
+        @lastAction().curAfter  = _.cloneDeep newCursors        
+        @lastAction().mainAfter = newCursors.indexOf @mainCursor
         @editor.cursors = newCursors
-        # @editor.mainCursor = [newCursors[0][0], newCursors[0][1]] if newCursors.length == 1        
         @changeInfoCursor()
+        if newCursors.indexOf(@editor.mainCursor) < 0
+            alert()
+            throw new Error
+            @editor.mainCursor = last(newCursors)        
         @check()
 
     # 000       0000000    0000000  000000000
@@ -225,11 +250,13 @@ class undo
     lastAction: ->
         if @actions.length == 0
             @actions.push
-                selBefore: []
-                selAfter:  []
-                curBefore: [[0,0]]
-                curAfter:  [[0,0]]
-                lines:     []
+                selBefore:  []
+                selAfter:   []
+                curBefore:  [[0,0]]
+                curAfter:   [[0,0]]
+                mainBefore: 0
+                mainAfter:  0
+                lines:      []
         return @actions[@actions.length-1]
             
     #  0000000  000000000   0000000   00000000   000000000
@@ -243,11 +270,13 @@ class undo
         if @groupCount == 1
             a = @lastAction()            
             @actions.push 
-                selBefore: clone a.selAfter
-                curBefore: clone a.curAfter
-                selAfter:  clone a.selAfter
-                curAfter:  clone a.curAfter
-                lines:     []
+                selBefore:  clone a.selAfter
+                curBefore:  clone a.curAfter
+                selAfter:   clone a.selAfter
+                curAfter:   clone a.curAfter
+                mainBefore: a.mainBefore
+                mainAfter:  a.mainAfter
+                lines:      []
 
     # 00     00   0000000   0000000    000  00000000  000   000
     # 000   000  000   000  000   000  000  000        000 000 
@@ -343,8 +372,9 @@ class undo
             a = last @actions
             if a.lines.length == 0 
                 @actions.pop()
-                b.selAfter = a.selAfter
-                b.curAfter = a.curAfter
+                b.selAfter  = a.selAfter
+                b.curAfter  = a.curAfter
+                b.mainAfter = a.mainAfter
             else if a.lines.length == b.lines.length
                 sameLines = true
                 for i in [0...a.lines.length]
@@ -355,8 +385,9 @@ class undo
                                 break                    
                 if sameLines
                     @actions.pop()
-                    b.selAfter = a.selAfter
-                    b.curAfter = a.curAfter
+                    b.selAfter  = a.selAfter
+                    b.curAfter  = a.curAfter
+                    b.mainAfter = a.mainAfter
                     for i in [0...a.lines.length]
                         b.lines[i].after = a.lines[i].after
                 else

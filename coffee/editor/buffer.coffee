@@ -501,14 +501,15 @@ class Buffer extends event
     # 000       000      000       000   000  000  0000
     #  0000000  0000000  00000000  000   000  000   000
               
-    cleanCursors: (cs) ->
+    cleanCursors: (cs=@cursors) ->
         @clampPositions cs
         @sortPositions cs
         if cs.length > 1
-            for ci in [cs.length-1...0]
+            for ci in [cs.length-1..1]
                 c = cs[ci]
                 p = cs[ci-1]
-                if c[1] == p[1] and c[0] == p[0] 
+                if c[1] == p[1] and c[0] == p[0]
+                    @mainCursor = p if @mainCursor == c
                     cs.splice ci, 1
         cs
                     

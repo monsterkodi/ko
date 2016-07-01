@@ -116,6 +116,7 @@ class View extends ViewBase
     saveScrollCursorsAndSelections: ->
         return if not @currentFile
         s = {}
+        s.main       = @indexOfCursor(@mainCursor) if @indexOfCursor(@mainCursor) > 0
         s.scroll     = @scroll.scroll if @scroll.scroll
         s.cursors    = _.cloneDeep @cursors if @cursors.length > 1 or @cursors[0][0] or @cursors[0][1]
         s.selections = _.cloneDeep @selections if @selections.length
@@ -141,11 +142,11 @@ class View extends ViewBase
             @cursors    = s.cursors    ? [[0,0]]
             @selections = s.selections ? []
             @highlights = s.highlights ? []
+            @mainCursor = @cursors[Math.min @cursors.length-1, s.main ? 0]
             delta = (s.scroll ? @scroll.scroll) - @scroll.scroll
             if delta
                 @scrollBy delta
-            else
-                @updateLayers()
+            @updateLayers()
 
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
