@@ -1,0 +1,103 @@
+# 00000000   000   000
+# 000   000   000 000 
+# 00000000     00000  
+# 000           000   
+# 000           000   
+
+\S+                            text
+
+[\<\>\+\-\=\/\*]               syntax.math
+
+@                              syntax.this
+\$                             syntax.this
+\?                             syntax.cond
+!=                             syntax.math
+->                             syntax.function.marker
+=>                             syntax.function.marker.bound
+
+# braces
+
+[\(\)\{\}\[\]]                 syntax.bracket
+
+# require
+
+(\w+|\{[^\}]+\})\s*=\s*(require)\s+
+    require.variable
+    keyword.require 
+
+# class
+
+(class)\s+(\w+)              . class.keyword . class
+
+# globals
+
+(\bsys\.|\btypes\.|\bpath\.|\bos\.|\bjson\.|\bargparse\.)  . module
+
+# special
+
+\blog\b                        function.log
+\berr\b                        variable.err
+\berror\b                      function.err
+
+# bool
+
+True                           value.bool.true
+False                          value.bool.false 
+
+# null
+
+None                           keyword.null
+
+# class members
+
+(@\w+)(?=\s*[\?\=\,\+\-\.\<\>\*\/\]\[\)]|\s*$)    class.variable
+
+# .property
+
+(\s*\w+)\.                     owner
+\.(\s*\w+)                     property
+
+# functions 
+
+(:\s*)($|#.*$)   keyword
+
+def\s+(\w+)\s*(\()[^\)]*(\))\s*:    . function . function.bracket . function.bracket
+
+(\w+)(?=\(|\s+[@\w\d\"\'\(\[\{])      function.call
+
+# dictionary key
+
+("\S+"|'\S+')\s*(:)                 . dictionary.key . dictionary.key.marker
+
+# punctuation
+
+[\,\.\;]                       syntax.punctuation
+
+# keywords
+
+(?:^|\s)(else:|try:|range|print|of|in|not|or|and|return|import|break|continue|global)(?:\s|$)   keyword 
+(?:^|\s)(def|if|elif|for|while|except)\s.*(:)\s*(?:$|#.*$)      . keyword . keyword
+    
+__name__|__class__  keyword
+
+#number
+
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
+    syntax.value.number.float.sign
+    value.number.float
+
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
+    syntax.value.number.int.sign
+    value.number.int
+
+# strings
+(')([^'\\]*)(')              . string.marker.single . value.string.single . string.marker.single
+(")([^"\\]*)(")              . string.marker.double . value.string.double . string.marker.double
+    
+# comments
+
+(?:^|\s+)(#+)([^\{].*|$)     . comment.marker . comment
+
+# salter headers
+^\s*(\#)([0\s]+)$            . header.comment.marker . comment.header
+^([0\s]+)$                     comment.header
