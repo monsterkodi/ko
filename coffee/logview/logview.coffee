@@ -48,7 +48,7 @@ class LogView extends ViewBase
         if changeInfo.deleted.length or changeInfo.inserted.length
             @scroll.setNumLines @lines.length
             
-        if changeInfo.cursor.length
+        if changeInfo.cursors.length
             @renderCursors()
 
             if delta = @deltaToEnsureCursorsAreVisible()

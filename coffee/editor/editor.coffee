@@ -261,7 +261,7 @@ class Editor extends Buffer
         @renderHighlights()
         @emit 'highlight', @highlights
 
-    highlightTextOfSelectionOrWordAtCursor: -> # called from keyboard shortcuts        
+    highlightTextOfSelectionOrWordAtCursor: -> # command+e       
             
         if @selections.length == 0 
             srange = @rangeForWordAtPos @cursorPos()
@@ -269,11 +269,9 @@ class Editor extends Buffer
             
         text = @textInRange @selections[0]
         if text.length
-            @highlights = @rangesForText text
+            @highlights = @rangesForText text, max:9999
             @renderHighlights()
             @emit 'highlight', @highlights
-            
-            log "set find text #{text}"
             window.commandline.commands.find?.setCurrentText text
 
     clearHighlights: ->

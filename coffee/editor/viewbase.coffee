@@ -222,12 +222,12 @@ class ViewBase extends Editor
                     numChanges += 1
                     @insertLine li, oi
                         
-        if changeInfo.cursor.length
+        if changeInfo.cursors.length
             @renderCursors()
             $('.main', @view)?.scrollIntoViewIfNeeded()
             @updateScrollOffset()
             @emit 'cursorMoved', @cursorPos()
-            @emit 'cursors', changeInfo.cursor
+            @emit 'cursors', changeInfo.cursors
             
         if changeInfo.selection.length
             @renderSelection()   

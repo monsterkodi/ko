@@ -105,8 +105,60 @@ pre
     background          #000
     font-family         "Andale Mono", monospace
     fill-abs()
+    right               minimapWidth
     overflow-x          auto
     overflow-y          hidden
+
+// 000  000   000  00000000   0000000 
+// 000  0000  000  000       000   000
+// 000  000 0 000  000000    000   000
+// 000  000  0000  000       000   000
+// 000  000   000  000        0000000 
+    
+.info
+    width               minimapWidth
+    position            absolute
+    right               0
+    top                 0
+    bottom              0
+    background          #111
+    border-left         thinBorder    
+    font-family         "Menlo", "Andale Mono", monospace
+    font-weight         bold
+    font-size           12px
+    & .info-line
+        display         block
+
+infoPadding           = 10px   
+    
+.info-lines
+    padding-left      ( infoPadding / 2 )
+    color               #555
+
+.info-cursor-line
+.info-cursor-column
+    padding-left        infoPadding
+    color               #ff0
+    &.virtual           
+        color           #08f
+        
+.info-cursors
+    padding-left        infoPadding
+    color               #f80
+    &.single
+        display         none
+
+.info-selections
+    padding-left        infoPadding
+    color               #888
+    &.empty
+        display         none
+
+.info-highlights
+    padding-left        infoPadding
+    color               rgb(103,103,171)
+    &.empty
+        display         none
 
 // 000      000   0000000  000000000
 // 000      000  000          000   

@@ -13,6 +13,7 @@ View        = require './editor/view'
 Commandline = require './commandline/commandline'
 Terminal    = require './terminal/terminal'
 LogView     = require './logview/logview'
+Info        = require './editor/info'
 prefs       = require './tools/prefs'
 keyinfo     = require './tools/keyinfo'
 drag        = require './tools/drag'
@@ -252,6 +253,14 @@ logview = window.logview = new LogView '.logview'
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
 
 commandline = window.commandline = new Commandline '.commandline-editor'
+
+# 000  000   000  00000000   0000000 
+# 000  0000  000  000       000   000
+# 000  000 0 000  000000    000   000
+# 000  000  0000  000       000   000
+# 000  000   000  000        0000000 
+
+info        = window.info = new Info editor
 
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000     

@@ -62,6 +62,7 @@ class Buffer extends event
                 cs.push c
         cs
     
+    isCursorVirtual:       (c=@mainCursor) -> c[0] > @lines[c[1]].length
     isCursorAtEndOfLine:   (c=@mainCursor) -> c[0] >= @lines[c[1]].length
     isCursorAtStartOfLine: (c=@mainCursor) -> c[0] == 0
     isCursorInLastLine:    (c=@mainCursor) -> c[1] == @lines.length-1
@@ -344,6 +345,7 @@ class Buffer extends event
         r = []
         for li in [0...@lines.length]
             r = r.concat @rangesForTextInLineAtIndex t, li, opt
+            break if r.length >= (opt?.max ? 999)
         r        
       
     rangesForTextInLineAtIndex: (t, i, opt) ->

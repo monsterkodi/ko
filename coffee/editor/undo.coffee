@@ -35,7 +35,7 @@ class undo
 
     newChangeInfo: ->
         @changeInfo = 
-            cursor:    []
+            cursors:   []
             selection: []
             changed:   []
             inserted:  []
@@ -72,8 +72,8 @@ class undo
     changeInfoCursor: ->
         @getChangeInfo()
         for c in @editor.cursors
-            if @changeInfo.cursor.indexOf(c[1]) < 0
-                @changeInfo.cursor.push c[1]
+            if @changeInfo.cursors.indexOf(c[1]) < 0
+                @changeInfo.cursors.push c[1]
 
     changeInfoSelection: ->
         @getChangeInfo()
@@ -348,7 +348,7 @@ class undo
         @changeInfo.inserted.sort (a,b) -> a-b
         @changeInfo.deleted.sort  (a,b) -> a-b
         @changeInfo.changed.sort  (a,b) -> a-b
-        @changeInfo.cursor.sort   (a,b) -> a-b
+        @changeInfo.cursors.sort  (a,b) -> a-b
         
     # 00     00  00000000  00000000    0000000   00000000
     # 000   000  000       000   000  000        000     
