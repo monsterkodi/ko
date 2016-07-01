@@ -26,9 +26,9 @@ class Numbers
         @editor.on 'lineVanishedTop',  @onLineVanishedTop
         @editor.on 'exposeTopChanged', @renumber
         @editor.on 'fontSizeChanged',  @onFontSizeChange
-        @editor.on 'highlight',        => @updateColors()
-        @editor.on 'selection',        => @updateColors()
-        @editor.on 'cursors',          => @updateColors()
+        @editor.on 'highlight',        @updateColors
+        @editor.on 'selection',        @updateColors
+        @editor.on 'cursor',           @updateColors
         @onFontSizeChange()
     
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000

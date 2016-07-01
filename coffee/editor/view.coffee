@@ -142,11 +142,13 @@ class View extends ViewBase
             @cursors    = s.cursors    ? [[0,0]]
             @selections = s.selections ? []
             @highlights = s.highlights ? []
-            @mainCursor = @cursors[Math.min @cursors.length-1, s.main ? 0]
+            @mainCursor = @cursors[Math.min @cursors.length-1, s.main ? 0]            
             delta = (s.scroll ? @scroll.scroll) - @scroll.scroll
             if delta
                 @scrollBy delta
             @updateLayers()
+            @emit 'cursor'
+            @emit 'selection'
 
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

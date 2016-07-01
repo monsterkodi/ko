@@ -259,7 +259,7 @@ class Editor extends Buffer
                 when 'first' then @selectSingleRange first @highlights            
             @scrollCursorToTop() if not opt?.noScroll            
         @renderHighlights()
-        @emit 'highlight', @highlights
+        @emit 'highlight'
 
     highlightTextOfSelectionOrWordAtCursor: -> # command+e       
             
@@ -271,13 +271,13 @@ class Editor extends Buffer
         if text.length
             @highlights = @rangesForText text, max:9999
             @renderHighlights()
-            @emit 'highlight', @highlights
+            @emit 'highlight'
             window.commandline.commands.find?.setCurrentText text
 
     clearHighlights: ->
         @highlights = []
         @renderHighlights()
-        @emit 'highlight', @highlights
+        @emit 'highlight'
 
     selectAllHighlights: ->
         @do.start()
@@ -373,18 +373,20 @@ class Editor extends Buffer
             @do.cursors newCursors, closestMain: true        
                     
     addCursors: (dir='down') ->
+        return if @cursors.length >= 999
         d = switch dir
             when 'up' then -1
             when 'down' then +1
         newCursors = _.cloneDeep @cursors
         for c in @cursors
             if not @cursorAtPos [c[0], c[1]+d]                
-                newCursors.push [c[0], c[1]+d]                
+                newCursors.push [c[0], c[1]+d]
+                break if newCursors.length >= 999
         @sortPositions newCursors
         switch dir
             when 'up'   then @mainCursor = first newCursors
             when 'down' then @mainCursor = last  newCursors
-        @do.cursors newCursors 
+        @do.cursors newCursors
 
     alignCursors: (dir='down') ->
         charPos = switch dir
@@ -445,7 +447,7 @@ class Editor extends Buffer
         @cancelCursors()
         @highlights = []
         @renderHighlights()
-        @emit 'highlight', @highlights
+        @emit 'highlight'
 
     # 000   000  00000000  000   000          0000000  000   000  00000000    0000000   0000000   00000000 
     # 0000  000  000       000 0 000         000       000   000  000   000  000       000   000  000   000

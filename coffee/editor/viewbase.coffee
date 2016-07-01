@@ -226,12 +226,11 @@ class ViewBase extends Editor
             @renderCursors()
             $('.main', @view)?.scrollIntoViewIfNeeded()
             @updateScrollOffset()
-            @emit 'cursorMoved', @cursorPos()
-            @emit 'cursors', changeInfo.cursors
+            @emit 'cursor'
             
         if changeInfo.selection.length
             @renderSelection()   
-            @emit 'selection', changeInfo.selection
+            @emit 'selection'
         
         if numChanges != 0
             @updateLinePositions()

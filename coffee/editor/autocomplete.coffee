@@ -33,7 +33,7 @@ class Autocomplete
         @editor.on 'willDeleteLine', @onWillDeleteLine
         @editor.on 'lineChanged',    @onLineChanged
         @editor.on 'linesAppended',  @onLinesAppended
-        @editor.on 'cursorMoved',    @close
+        @editor.on 'cursor',         @close
         @editor.on 'blur',           @close
 
     #  0000000   000   000  00000000  0000000    000  000000000

@@ -15,7 +15,7 @@ class Info
         @editor.on 'lineInserted', @onNumLines
         @editor.on 'lineDeleted',  @onNumLines
         @editor.on 'selection',    @onSelection
-        @editor.on 'cursorMoved',  @onCursor
+        @editor.on 'cursor',       @onCursor
 
         @topline = document.createElement 'div'
         @topline.className = "info-line top"

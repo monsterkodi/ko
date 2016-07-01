@@ -21,7 +21,6 @@ class Meta
         @editor.on 'lineAppended',     @onLineAppended
         @editor.on 'clearLines',       @onClearLines
         @editor.on 'lineInserted',     @onLineInserted
-        # @editor.on 'willDeleteLine',   @onWillDeleteLine
         @editor.on 'lineDeleted',      @onLineDeleted
         @editor.on 'lineExposed',      @onLineExposed
         @editor.on 'lineVanished',     @onLineVanished
