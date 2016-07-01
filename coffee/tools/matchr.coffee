@@ -18,6 +18,16 @@ _ = require 'lodash'
 
 config = (patterns) -> ( [new RegExp(p), a] for p,a of patterns )
 
+sortRanges = (rgs) ->
+    rgs.sort (a,b) -> 
+        if a.start == b.start
+            if a.match.length == b.match.length
+                a.index - b.index
+            else
+                a.match.length - b.match.length
+        else
+            a.start - b.start
+
 # 00000000    0000000   000   000   0000000   00000000   0000000
 # 000   000  000   000  0000  000  000        000       000     
 # 0000000    000000000  000 0 000  000  0000  0000000   0000000 
@@ -75,15 +85,7 @@ ranges = (regexes, str) ->
                     gs += match[j+1].length
                 i += match.index + match[0].length
                 s = str.slice i
-            
-    rgs.sort (a,b) -> 
-        if a.start == b.start
-            if a.match.length == b.match.length
-                a.index - b.index
-            else
-                a.match.length - b.match.length
-        else
-            a.start - b.start
+    sortRanges rgs        
 
 # 0000000    000   0000000   0000000  00000000   0000000  000000000
 # 000   000  000  000       000       000       000          000   
@@ -164,6 +166,7 @@ dissect = (ranges, opt={join:false}) ->
     d
 
 module.exports = 
-    config:  config
-    ranges:  ranges
-    dissect: dissect
+    config:     config
+    ranges:     ranges
+    dissect:    dissect
+    sortRanges: sortRanges

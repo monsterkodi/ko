@@ -83,6 +83,12 @@ class syntax
             l += d.match
         l
     
+    @nameForFile: (file) ->
+        extn = path.extname(file).slice(1)
+        if extn in @syntaxNames
+            return extn
+        return 'txt' # todo: look at shebang
+    
     #  0000000   0000000   000       0000000   00000000 
     # 000       000   000  000      000   000  000   000
     # 000       000   000  000      000   000  0000000  

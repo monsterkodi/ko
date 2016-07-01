@@ -106,10 +106,17 @@ class FileSearcher extends stream.Writable
                 href: @file
             terminal.appendMeta meta
             terminal.appendMeta clss: 'spacer'
+            
             for f in @found
-                ranges = f[2].concat syntax.rangesForTextAndSyntax f[1], 'coffee'
-                dss = matchr.dissect ranges, join:true
-                terminal.appendLineDiss f[1], dss                
+                rgs = f[2].concat syntax.rangesForTextAndSyntax f[1], syntax.nameForFile @file
+                matchr.sortRanges rgs
+                dss = matchr.dissect rgs, join:true
+                meta =
+                    diss: dss
+                    href: "#{@file}:#{f[0]}"
+                    clss: 'searchResult'
+                terminal.appendMeta meta
+                
             terminal.appendMeta clss: 'spacer'
             terminal.scrollCursorToTop 3
                 

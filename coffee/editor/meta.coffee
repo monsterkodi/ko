@@ -21,7 +21,7 @@ class Meta
         @editor.on 'lineAppended',     @onLineAppended
         @editor.on 'clearLines',       @onClearLines
         @editor.on 'lineInserted',     @onLineInserted
-        @editor.on 'willDeleteLine',   @onWillDeleteLine
+        # @editor.on 'willDeleteLine',   @onWillDeleteLine
         @editor.on 'lineDeleted',      @onLineDeleted
         @editor.on 'lineExposed',      @onLineExposed
         @editor.on 'lineVanished',     @onLineVanished
@@ -44,12 +44,11 @@ class Meta
         lh = size.lineHeight
         
         div = document.createElement 'div'
-        div.className = "meta"
+        div.className = "meta #{meta[2].clss ? ''}"
         div.style.transform = "translate(#{tx}px,#{ty}px)"
         div.style.width = "#{sw}px"
         div.style.height = "#{lh}px"
         if meta[2].href?
-            log "meta[2].href #{meta[2].href}"
             div.setAttribute 'onclick', "window.loadFile('#{meta[2].href}');" 
             div.classList.add 'href'
         @elem.appendChild div
@@ -124,7 +123,7 @@ class Meta
     # 000   000  000       000      000          000     000       000   000
     # 0000000    00000000  0000000  00000000     000     00000000  0000000  
     
-    onWillDeleteLine: (li) => log "meta.onWillDeleteLine li #{li}"    
+    # onWillDeleteLine: (li) => #log "meta.onWillDeleteLine li #{li}"    
     onLineDeleted: (li) => 
         @onLineVanished lineIndex: li
         _.pullAll @metas, @metasAtLineIndex li

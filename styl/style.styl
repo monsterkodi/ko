@@ -49,6 +49,7 @@ pre
     position        absolute
     pointer-events  all
     background      #333
+    opacity         0.8
     
     padding-right     metaRadius
     margin-right    - metaRadius
@@ -59,6 +60,15 @@ pre
     
     &.href
         cursor          pointer
+
+    &.searchResult
+    &.spacer
+        background      #000
+        border-top-right-radius 0
+        border-bottom-right-radius 0
+        
+    &.searchResult
+        background      transparent
     
 //  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
 // 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
@@ -482,7 +492,7 @@ body
   to 
     color      #800
     
-.linenumber.cursored.main span  
+*:focus .linenumber.cursored.main span  
    animation-name      number-blink
    animation-duration  500ms
    animation-iteration-count infinite

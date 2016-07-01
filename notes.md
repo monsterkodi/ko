@@ -1,9 +1,7 @@
 # todo/ideas
 
 #### search
-- *hrefs for search results*
-- *line numebrs for search results*
-- *fix meta spacers*
+- *line numbers for search results*
 - insert salter headers
 - output search end
 - make search results editable

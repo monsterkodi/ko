@@ -15,7 +15,7 @@ class Terminal extends ViewBase
         
         @fontSizeDefault = 15
         
-        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Meta'] # Autocomplete?
+        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Meta']
 
         @ansidiss  = new ansiDiss()    
         
