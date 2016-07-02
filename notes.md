@@ -5,7 +5,6 @@
 - insert salter headers
 - output search end
 - make search results editable
-- make search results keyboard navigatable
 
 #### windows
 - cycle through windows command: windows list
@@ -18,6 +17,7 @@
 - *alt-click: jump to definition*
 - *send changes between windows*
 - *store unsaved changes in prefs*
+- set cursor column when opening with second :n
 - save and restore scrollX/Left
 - check undo (merges too much?)
 - don't clear undo buffer on save?
@@ -49,9 +49,6 @@
 - indent more when inserting newline and next line is indented more?
 - move mainCursor to leftmost/rightmost cursor in its line on 'left'/'right' actions
 - highlight cursor line(s?)
-
-#### find
-- display number of matches somewhere
 
 #### open
 - command-p alias: -n for previuous files

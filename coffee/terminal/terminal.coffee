@@ -85,5 +85,26 @@ class Terminal extends ViewBase
 
             if delta = @deltaToEnsureCursorsAreVisible()
                 @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth 
+    
+    # 000   000  00000000  000   000
+    # 000  000   000        000 000 
+    # 0000000    0000000     00000  
+    # 000  000   000          000   
+    # 000   000  00000000     000   
+    
+    handleModKeyComboEvent: (mod, key, combo, event) ->
+        
+        switch combo
+            when 'enter'
+                if href = @meta.hrefAtLineIndex @cursorPos()[1]
+                    window.loadFile "#{href}" 
+                return
+            when 'command+enter'
+                if href = @meta.hrefAtLineIndex @cursorPos()[1]
+                    window.loadFile "#{href}" 
+                    window.editor.focus()
+                return
+                
+        return 'unhandled'
                 
 module.exports = Terminal

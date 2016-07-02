@@ -107,7 +107,7 @@ class Numbers
         top = @editor.scroll.exposeTop
         bot = @editor.scroll.exposeBot
         if top <= li <= bot+1
-            @elem.lastChild.remove()
+            @elem.lastChild?.remove()
     
     # 000   000   0000000   000   000  000   0000000  000   000
     # 000   000  000   000  0000  000  000  000       000   000

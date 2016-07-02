@@ -35,7 +35,8 @@ class ViewBase extends Editor
         @name = @name.slice 1 if @name[0] == '.'
         @view = $(viewElem)
         @view.onpaste = (event) => log "view on paste #{@name}", event
-        @view.onblur  = (event) => @emit 'blur'
+        @view.onblur  = (event) => @emit 'blur', @
+        @view.onfocus = (event) => @emit 'focus', @
         layer = []
         layer.push 'selections' 
         layer.push 'highlights' 

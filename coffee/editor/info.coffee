@@ -5,17 +5,17 @@
 # 000  000   000  000        0000000 
 {
 $} = require '../tools/tools'
+log = require '../tools/log'
 
 class Info
     
-    constructor: (@editor) ->                  
+    constructor: (editor) ->                  
         
+        window.editor.on   'focus', @setEditor
+        window.logview.on  'focus', @setEditor
+        window.terminal.on 'focus', @setEditor
+                
         @elem = $('.info')
-        @editor.on 'numLines',     @onNumLines
-        @editor.on 'lineInserted', @onNumLines
-        @editor.on 'lineDeleted',  @onNumLines
-        @editor.on 'selection',    @onSelection
-        @editor.on 'cursor',       @onCursor
 
         @topline = document.createElement 'div'
         @topline.className = "info-line top"
@@ -50,6 +50,31 @@ class Info
         @botline.appendChild @lines
         
         @elem.appendChild @botline
+        
+        @setEditor editor        
+
+    setEditor: (editor) =>
+        
+        return if editor == @editor
+        
+        if @editor?
+            @editor.removeListener 'numLines',     @onNumLines
+            @editor.removeListener 'lineInserted', @onNumLines
+            @editor.removeListener 'lineDeleted',  @onNumLines
+            @editor.removeListener 'selection',    @onSelection
+            @editor.removeListener 'highlight',    @onHighlight
+            @editor.removeListener 'cursor',       @onCursor
+                
+        @editor = editor
+        
+        @editor.on 'numLines',     @onNumLines
+        @editor.on 'lineInserted', @onNumLines
+        @editor.on 'lineDeleted',  @onNumLines
+        @editor.on 'selection',    @onSelection
+        @editor.on 'highlight',    @onHighlight
+        @editor.on 'cursor',       @onCursor
+        
+        @onNumLines()
 
     onNumLines: => @lines.textContent = @editor.lines.length
     
@@ -63,6 +88,8 @@ class Info
     onSelection: =>
         @selections.textContent = @editor.selections?.length
         @selections.classList.toggle 'empty', @editor.selections?.length == 0
+        
+    onHighlight: =>
         @highlights.textContent = @editor.highlights?.length
         @highlights.classList.toggle 'empty', @editor.highlights?.length == 0
     

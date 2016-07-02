@@ -75,6 +75,9 @@ class Meta
             meta[1][1] = e.text.length if meta[1][1] is 0
                 
     metasAtLineIndex: (li) -> @editor.rangesForLineIndexInRanges li, @metas
+    hrefAtLineIndex:  (li) -> 
+        for meta in @metasAtLineIndex li
+            return meta[2].href if meta[2].href?
 
     # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
     # 000       000   000  0000  000     000     000       000     000   000     

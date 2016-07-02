@@ -76,7 +76,7 @@ class Autocomplete
     #  0000000   000        00000000  000   000
     
     open: (info) ->
-        log "autocomplete.open word: #{@word} @firstMatch: #{@firstMatch} info:", info
+        # log "autocomplete.open word: #{@word} @firstMatch: #{@firstMatch} info:", info
         cursor = $('.main', @editor.view)
         if not cursor?
             log "warning! no cursor?"
