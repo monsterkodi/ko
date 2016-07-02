@@ -26,10 +26,15 @@ class Command
         select: true
     
     changed: (command) ->
+        
     cancel: ->
         # @setText ''
         text: ''
-        focus: @focus        
+        focus: @focus   
+        
+    clear: ->
+        text: ''
+        focus: @focus
                 
     execute: (command) -> @setCurrent command
     
@@ -47,7 +52,6 @@ class Command
         _.pull @history, command
         @history.push command
         @index = @history.length-1
-        # log "command.setCurrent #{@index} #{command}"
         @setState 'history', @history
         @setState 'index', @index
         

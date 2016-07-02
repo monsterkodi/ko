@@ -170,14 +170,11 @@ class ViewBase extends Editor
     setFontSize: (fontSize) =>
         # log "viewbase.setFontSize className #{@view.className} size #{fontSize}"
         @view.style.fontSize = "#{fontSize}px"
-        # setStyle '.'+@view.className, 'font-size', "#{fontSize}px"
         @size.numbersWidth = 'Numbers' in @config.features and 50 or 0
         @size.fontSize     = fontSize
         @size.lineHeight   = fontSize + Math.floor(fontSize/6)
         @size.charWidth    = fontSize * 0.6 # characterWidth @elem, 'line'
         @size.offsetX      = Math.floor @size.charWidth/2 + @size.numbersWidth
-        # log "viewbase.setFontSize #{fontSize} charWidth #{@size.charWidth}"
-        # log "viewbase.setFontSize className #{@view.className} fontSize #{@size.fontSize} lineHeight #{@size.lineHeight}"
 
         @scroll?.setLineHeight @size.lineHeight
             
@@ -246,7 +243,6 @@ class ViewBase extends Editor
     # 0000000    00000000  0000000  00000000     000     00000000
 
     deleteLine: (li, oi) ->
-        # log "viewbase.deleteLine li #{li} oi #{oi}"
         @elem.children[oi - @scroll.exposeTop]?.remove()
         @scroll.deleteLine li, oi
         @emit 'lineDeleted', oi - @scroll.exposeTop
@@ -260,7 +256,6 @@ class ViewBase extends Editor
     insertLine: (li, oi) ->        
         div = @addLine()
         div.innerHTML = @renderLineAtIndex li
-        # log "viewbase.insertLine li #{li} oi #{oi}", div.innerHTML
         @elem.insertBefore div, @elem.children[oi - @scroll.exposeTop]
         @scroll.insertLine li, oi
         @emit 'lineInserted', li
@@ -272,14 +267,10 @@ class ViewBase extends Editor
     # 00000000  000   000  000         0000000   0000000   00000000
 
     exposeLine: (li) =>
-        # log "viewbase.exposeLine li #{li} children #{@elem.children.length}"
         html = @renderLineAtIndex li
-        # log "viewbase.exposeLine #{li} #{html}"
-        # log "viewbase.exposeLine #{@lines[li]} #{@lines.length}"
         lineDiv = @addLine()
         lineDiv.innerHTML = html
         @elem.appendChild lineDiv
-        # console.log "viewbase.#{@name}.exposeLine #{li} children #{@elem.children.length}"
         
         if li != @elem.children.length-1+@scroll.exposeTop 
             console.log "viewbase.exposeLine wtf? #{li} != #{@elem.children.length-1+@scroll.exposeTop }"
@@ -300,7 +291,6 @@ class ViewBase extends Editor
     #     0      000   000  000   000  000  0000000   000   000
     
     vanishLine: (li) =>
-        # log "viewbase.vanishLine li: #{li}"
         if (not li?) or (li < 0 )
             li = @elem.children.length-1
         if li == @scroll.exposeTop + @elem.children.length - 1
@@ -318,7 +308,6 @@ class ViewBase extends Editor
 
     exposeTop: (e) =>
         # log "viewbase.exposeTopChange #{e.old} -> #{e.new}"
-        
         num = Math.abs e.num
 
         for n in [0...num]
@@ -360,7 +349,6 @@ class ViewBase extends Editor
     updateLine: (li, oi) ->
         if @scroll.exposeTop <= li < @lines.length
             span = @renderLineAtIndex li
-            # log "viewbase.updateLine li #{li} oi #{oi}", span
             @elem.children[oi - @scroll.exposeTop]?.innerHTML = span
 
     # 00000000   00000000  000   000  0000000    00000000  00000000 
@@ -502,11 +490,9 @@ class ViewBase extends Editor
         br = @view.getBoundingClientRect()
         lx = clamp 0, @view.offsetWidth,  x - br.left - @size.offsetX + @size.charWidth/3
         ly = clamp 0, @view.offsetHeight, y - br.top
-        # log "viewbase.posForEvent ly:#{ly} y:#{y} br.top: #{br.top} st: #{st}"
         px = parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth))
         py = parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @scroll.exposeTop
         p = [px, Math.min(@lines.length-1, py)]
-        # log "viewbase.posForEvent y:#{y} -> line:#{p[1]} col:#{p[0]}"
         p
         
     posForEvent: (event) -> @posAtXY event.clientX, event.clientY
@@ -520,10 +506,8 @@ class ViewBase extends Editor
         lineElem = @lineElemAtXY x,y        
         if lineElem?
             lr = lineElem.getBoundingClientRect()
-            # log "viewbase.lineSpanAtXY #{x} #{y} #{lineElem.className} lr", lr
             for e in lineElem.children
                 br = e.getBoundingClientRect()
-                # log "lineSpanAtXY #{e.className} #{e.innerHTML} #{br.left} #{br.width}"
                 if br.left <= x and br.left+br.width >= x
                     offset = x-br.left
                     info =  

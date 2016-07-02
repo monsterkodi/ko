@@ -27,7 +27,6 @@ class Prefs
         else
             @path = path
             @timer = null
-            # log "prefs.init file: #{@path}"
             nconf.use 'user',
                 type: 'file'
                 format: 
@@ -73,7 +72,6 @@ class Prefs
         @timer = null
         nconf.save (err) => 
             log "nconf save error:", err if err?
-            # log "prefs saved" if not err?
             cb? !err?
         
 module.exports = Prefs

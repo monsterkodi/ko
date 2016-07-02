@@ -139,7 +139,6 @@ class undo
         if @actions.length
             @newChangeInfo()
             action = @actions.pop()
-            # log "undo.undo", action
             if action.lines.length
                 for i in [action.lines.length-1..0]
                     @undoLine action.lines[i]
@@ -149,7 +148,6 @@ class undo
 
             @cleanChangeInfo()
             @editor.changed @changeInfo
-            # log "undo @changeInfo", @changeInfo
             @delChangeInfo()
                                     
     undoLine: (line) ->

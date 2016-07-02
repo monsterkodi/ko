@@ -2,7 +2,6 @@
 
 #### search
 - *line numbers for search results*
-- insert salter headers
 - output search end
 - make search results editable
 

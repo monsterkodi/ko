@@ -184,13 +184,11 @@ class Minimap
         @drawTopBot()
     
     onEditorNumLines: (n) => 
-        # @log "minimap.onEditorNumLines #{n}" if @editor.name != 'logview'
         @onEditorViewHeight @editor.viewHeight() if n and @canvas.height <= @scroll.lineHeight
         @scroll.setNumLines n
             
     onEditorViewHeight: (h) => 
         @scroll.setViewHeight 2*@editor.viewHeight()
-        # @log "minimap.onEditorViewHeight h #{h} @height #{@height}", @scroll.info()
         @onScroll()
         @onEditorScroll()
 
@@ -203,7 +201,6 @@ class Minimap
     onScroll: =>
         y  = parseInt -@height/4-@scroll.offsetTop/2
         x  = parseInt @width/4
-        # @log "minimap.updateTransform y: #{y} vh: #{@scroll.viewHeight} sm: #{@scroll.scrollMax} eh: #{2*@editor.viewHeight()} fh: #{@height}"
         @canvasTop.style.transform = "translate3d(#{x}px, #{y}px, 0px) scale3d(0.5, 0.5, 1)"
         @canvas.style.transform    = "translate3d(#{x}px, #{y}px, 0px) scale3d(0.5, 0.5, 1)"
         
@@ -214,12 +211,10 @@ class Minimap
     #  0000000  0000000  00000000  000   000  000   000
     
     clearRange: (top, bot) -> 
-        # @log "minimap.clearRange #{top} #{bot}"
         ctx = @canvas.getContext '2d'
         ctx.clearRect 0, (top-@scroll.exposeTop)*@scroll.lineHeight, 2*@width, (bot-top)*@scroll.lineHeight
         
     clearAll: =>
-        # @log "minimap.clear"
         @canvasTop.width = @canvasTop.width
         @canvas.width    = @canvas.width
         

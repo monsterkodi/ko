@@ -73,7 +73,6 @@ class Commandline extends ViewBase
         @command = @commands[name]
         activeClass = "."+document.activeElement.className
         @command.setFocus activeClass != '.commandline-editor' and activeClass or null
-        # log "commandline.startCommand #{name} focus #{@command.focus}"
         @view.focus()
         @setName name
         @results @command.start combo # <-- command start
@@ -91,11 +90,11 @@ class Commandline extends ViewBase
         @setName r.name if r?.name?
         if r?.select then @selectAll()
         else @selectNone()
-        # log "commandline.results #{@command?} #{@command?.name}", r
         window.split.focus  r.focus  if r?.focus?
         window.split.reveal r.reveal if r?.reveal?
         
     cancel: -> @results @command?.cancel()
+    clear:  -> @results @command?.clear()
                                 
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
@@ -107,7 +106,6 @@ class Commandline extends ViewBase
         for n,c of @commands            
             if combo == 'esc'
                 if document.activeElement == @view
-                    # log "commandline.globalModKeyComboEvent esc"
                     return @cancel()
             for sc in c.shortcuts
                 if sc == combo then return @startCommand n, combo                
@@ -123,7 +121,7 @@ class Commandline extends ViewBase
             when 'up'                   then return @setAndSelectText @command?.prev()
             when 'down'                 then return @setAndSelectText @command?.next()
             when 'esc'                  then return @cancel()
-            when 'command+k'            then return @selectAll() + @deleteSelection()
+            when 'command+k'            then return @clear()
             when 'tab', 'shift+tab'     then return
             when 'home', 'command+up'   then return split.do 'maximize editor'
             when 'end', 'command+down'  then return split.do 'maximize terminal'

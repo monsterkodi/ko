@@ -35,6 +35,10 @@ class Search extends Command
         @setName "/search/" if @regexpSearch
         super combo
     
+    clear: ->
+        window.terminal.clear()
+        text: ''
+    
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
     # 0000000     00000    0000000   000       000   000     000     0000000 
@@ -60,7 +64,10 @@ class Search extends Command
     
     startSearchInFiles: (opt) ->
         terminal = window.terminal
-        terminal.appendText ''
+        meta = 
+            clss: 'salt'
+            text: opt.text.slice 0, 12
+        terminal.appendMeta meta
         terminal.appendDiss syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'
         terminal.appendText ''
         terminal.singleCursorAtPos [0, terminal.lines.length-1]

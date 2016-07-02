@@ -4,3 +4,5 @@ ignore
     /app/img/
     /app/js/
     /syntax/
+    
+noon    . ext json . replace .. coffee/  js/    

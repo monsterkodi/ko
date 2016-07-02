@@ -7,6 +7,7 @@
 ViewBase  = require '../editor/viewbase'
 syntax    = require '../editor/syntax'
 ansiDiss  = require '../tools/ansidiss'
+salt      = require '../tools/salt'
 log       = require '../tools/log'
 
 class Terminal extends ViewBase
@@ -63,8 +64,14 @@ class Terminal extends ViewBase
         @meta.append meta
         if meta.diss?
             @appendLineDiss syntax.lineForDiss(meta.diss), meta.diss 
+        else if meta.clss == 'salt'
+            @appendText '\n' + salt(meta.text) + '\n'
         else
             @appendLineDiss ''
+           
+    clear: ->
+        @meta.clear()
+        super
             
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000

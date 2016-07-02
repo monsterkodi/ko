@@ -153,7 +153,11 @@ class Meta
     # 000       000      0000000   000000000  0000000  
     # 000       000      000       000   000  000   000
     #  0000000  0000000  00000000  000   000  000   000
-            
+          
+    clear: => 
+        @elem.innerHTML = ""
+        @metas = []
+        
     onClearLines: => 
         @elem.innerHTML = ""
         for meta in @metas
