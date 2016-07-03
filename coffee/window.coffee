@@ -85,7 +85,7 @@ ipc.on 'focusEditor', (event) => split.focus '.editor'
 ipc.on 'cloneFile',  => ipc.send 'newWindowWithFile', editor.currentFile
 ipc.on 'reloadFile', => 
     # log "window.ipc.reloadFile"
-    loadFile editor.currentFile
+    loadFile editor.currentFile, true
 ipc.on 'saveFileAs', => saveFileAs()
 ipc.on 'saveFile',   => saveFile()
 ipc.on 'loadFile', (event, file) => 
@@ -114,17 +114,17 @@ saveFile = (file) =>
     editor.setCurrentFile file
     setState 'file', file
 
-loadFile = (file) =>  
+loadFile = (file, reload) =>  
     # log 'window.loadFile file:', file
     [file,line] = file.split ':'
-    if fileExists file
+    if file != editor.currentFile or reload
+        return if not fileExists file
         addToRecent file
         editor.setCurrentFile null # to stop watcher and reset scroll
         editor.setCurrentFile file
-        editor.singleCursorAtPos [0, parseInt(line)-1] if line?
-        editor.scrollCursorToTop()
         setState 'file', file
-        # ipc.send 'reloadMenu'
+    editor.singleCursorAtPos [0, parseInt(line)-1] if line?
+    editor.scrollCursorToTop()        
 
 openFiles = (ofiles, options) =>
     # log 'openFiles:', ofiles    

@@ -219,22 +219,26 @@ class ViewBase extends Editor
                 when 'inserted' 
                     numChanges += 1
                     @insertLine li, oi
-                        
+              
+        if numChanges != 0 
+            @updateLinePositions()
+
+        @scroll.setNumLines @lines.length
+        @scrollBy 0
+            
         if changeInfo.cursors.length
             @renderCursors()
+            if delta = @deltaToEnsureCursorsAreVisible()
+                @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth 
             $('.main', @view)?.scrollIntoViewIfNeeded()
-            @updateScrollOffset()
             @emit 'cursor'
             
         if changeInfo.selection.length
             @renderSelection()   
             @emit 'selection'
-        
-        if numChanges != 0
-            @updateLinePositions()
-            @scrollBy 0
-                     
+
         @renderHighlights()
+        @emit 'changed', changeInfo
 
     # 0000000    00000000  000      00000000  000000000  00000000
     # 000   000  000       000      000          000     000     
@@ -433,14 +437,7 @@ class ViewBase extends Editor
         else if cl > @scroll.bot - 4
             maindelta = Math.min(@lines.length+1, cl + 4) - @scroll.bot
             
-        return maindelta
-            
-        if botdelta > 0
-            Math.max botdelta, topdelta
-        else if topdelta < 0
-            Math.min botdelta, topdelta
-        else
-            botdelta
+        maindelta
 
     #  0000000   0000000  00000000    0000000   000      000    
     # 000       000       000   000  000   000  000      000    

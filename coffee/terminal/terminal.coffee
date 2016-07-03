@@ -73,26 +73,6 @@ class Terminal extends ViewBase
         @meta.clear()
         super
             
-    #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
-    # 000       000   000  000   000  0000  000  000        000       000   000
-    # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
-    # 000       000   000  000   000  000  0000  000   000  000       000   000
-    #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
-
-    changed: (changeInfo) ->        
-        
-        super changeInfo
-        @minimap?.changed changeInfo
-        
-        if changeInfo.deleted.length or changeInfo.inserted.length
-            @scroll.setNumLines @lines.length
-            
-        if changeInfo.cursors.length
-            @renderCursors()
-
-            if delta = @deltaToEnsureCursorsAreVisible()
-                @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth 
-    
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
     # 0000000    0000000     00000  

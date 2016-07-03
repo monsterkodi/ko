@@ -34,23 +34,9 @@ class View extends ViewBase
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
     changed: (changeInfo) ->        
-        
-        if changeInfo.changed.length or changeInfo.deleted.length or changeInfo.inserted.length
-            @updateTitlebar() # sets dirty flag
-                
         super changeInfo
-        
-        @minimap?.changed changeInfo
-        
-        if changeInfo.deleted.length or changeInfo.inserted.length
-            @scroll.setNumLines @lines.length
-            
-        if changeInfo.cursors.length
-            @renderCursors()
-
-            if delta = @deltaToEnsureCursorsAreVisible()
-                # log "view.changed cursor delta #{delta}"
-                @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth 
+        if changeInfo.sorted.length
+            @updateTitlebar() # sets dirty flag
 
     # 00000000  000  000      00000000
     # 000       000  000      000     

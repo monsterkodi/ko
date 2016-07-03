@@ -12,7 +12,7 @@ log = require '../tools/log'
 str = require '../tools/str'
 _   = require 'lodash'
 
-class Meta
+class Meta 
     
     constructor: (@editor) ->
         
@@ -51,10 +51,10 @@ class Meta
             div.setAttribute 'onclick', "window.loadFile('#{meta[2].href}');" 
             div.classList.add 'href'
         @elem.appendChild div
-        if meta.div? # todo remove
+        if meta[2].div? # todo remove
             log "meta.addDiv wtf? li #{meta[0]}"
-            meta.div.remove()
-        meta.div = div
+            meta[2].div.remove()
+        meta[2].div = div
         
     #  0000000   00000000   00000000   00000000  000   000  0000000  
     # 000   000  000   000  000   000  000       0000  000  000   000
@@ -106,7 +106,7 @@ class Meta
         for meta in @editor.rangesFromTopToBotInRanges li, @editor.scroll.exposeBot, @metas
             tx = size.charWidth *  meta[1][0] + size.offsetX
             ty = size.lineHeight * (meta[0] - @editor.scroll.exposeTop)
-            meta.div?.style.transform = "translate(#{tx}px,#{ty}px)"        
+            meta[2].div?.style.transform = "translate(#{tx}px,#{ty}px)"        
         
     # 000  000   000   0000000  00000000  00000000   000000000  00000000  0000000  
     # 000  0000  000  000       000       000   000     000     000       000   000
@@ -145,8 +145,8 @@ class Meta
         
     onLineVanished:    (e) => 
         for meta in @metasAtLineIndex e.lineIndex
-            meta.div?.remove()
-            meta.div = null        
+            meta[2].div?.remove()
+            meta[2].div = null        
     
     #  0000000  000      00000000   0000000   00000000 
     # 000       000      000       000   000  000   000
@@ -161,6 +161,6 @@ class Meta
     onClearLines: => 
         @elem.innerHTML = ""
         for meta in @metas
-            meta.div = null
+            meta[2].div = null
     
 module.exports = Meta

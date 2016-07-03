@@ -43,6 +43,7 @@ class Minimap
         @editor.view.parentElement.appendChild @elem
         @editor.on 'viewHeight',    @onEditorViewHeight
         @editor.on 'numLines',      @onEditorNumLines
+        @editor.on 'changed',       @onChanged
         @editor.scroll.on 'scroll', @onEditorScroll
 
         @scroll = new scroll 
@@ -118,10 +119,12 @@ class Minimap
     # 000       000   000  000   000  000  0000  000   000  000     
     #  0000000  000   000  000   000  000   000   0000000   00000000
     
-    changed: (changeInfo) ->
+    onChanged: (changeInfo) =>
         ci = changeInfo
         return if not ci.sorted.length
         # @log "minimap.changed changeInfo",  ci
+        
+        @scroll.setNumLines @editor.lines.length
         
         firstInserted = first(ci.inserted) ? @scroll.exposeBot+1
         firstDeleted  = first(ci.deleted)  ? @scroll.exposeBot+1
@@ -134,8 +137,7 @@ class Minimap
             @drawLines c, c
         
         if redraw <= @scroll.exposeBot            
-            @clearRange redraw, @scroll.exposeBot
-            @scroll.setNumLines @editor.lines.length
+            @clearRange redraw, @scroll.viewHeight/@scroll.lineHeight
             @drawLines redraw, @scroll.exposeBot
             @drawTopBot()
         
