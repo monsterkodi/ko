@@ -33,3 +33,6 @@
 
 \.                          marker
 \/                          separator
+
+# salter headers
+^([0\s]+)$                  comment.header

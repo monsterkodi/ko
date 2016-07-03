@@ -28,6 +28,27 @@ class Meta
         @editor.on 'lineVanishedTop',  @onLineVanishedTop
         @editor.on 'exposeTopChanged', @onExposeTopChanged
         @editor.on 'fontSizeChanged',  @onFontSizeChange
+        
+        @editor.numbers.on 'numberAdded',   @onNumber
+        @editor.numbers.on 'numberChanged', @onNumber
+
+    # 000   000  000   000  00     00  0000000    00000000  00000000 
+    # 0000  000  000   000  000   000  000   000  000       000   000
+    # 000 0 000  000   000  000000000  0000000    0000000   0000000  
+    # 000  0000  000   000  000 0 000  000   000  000       000   000
+    # 000   000   0000000   000   000  0000000    00000000  000   000
+    
+    onNumber: (e) =>
+        metas = @metasAtLineIndex e.lineIndex
+        # log "meta.onNumber li #{e.lineIndex} num metas #{metas.length}" if metas.length
+        for meta in metas
+            # log "meta.onNumber", meta[2].clss
+            switch meta[2].clss
+                # when 'salt', 'spacer' then e.numberSpan.innerHTML = '&nbsp;'
+                when 'searchResult'
+                    e.numberSpan.textContent = meta[2].href.split(':')[1]
+                else
+                    e.numberSpan.innerHTML = '&nbsp;'
 
     # 0000000    000  000   000
     # 000   000  000  000   000

@@ -7,12 +7,13 @@
 setStyle,
 first,
 last,
-$}  = require '../tools/tools'
-log = require '../tools/log'
-str = require '../tools/str'
-_   = require 'lodash'
+$}    = require '../tools/tools'
+log   = require '../tools/log'
+str   = require '../tools/str'
+_     = require 'lodash'
+event = require 'events'
 
-class Numbers
+class Numbers extends event
 
     constructor: (@editor) ->
         
@@ -126,12 +127,16 @@ class Numbers
     # 000   000  0000000    0000000    0000000  000  000   000  00000000
     
     addLine: (li) ->
-        # @log "numbers.addLine #{@editor.name} #{li}" if @editor.name == 'logview'
+        # @log "numbers.addLine #{@editor.name} #{li}"
         div = document.createElement "div"
         div.className = "linenumber"
         pre = document.createElement "span"
         pre.textContent = "#{li+1}"
         div.appendChild pre
+        @emit 'numberAdded', 
+            numberDiv:  div 
+            numberSpan: pre
+            lineIndex:  li
         div
         
     # 00000000   00000000  000   000  000   000  00     00  0000000    00000000  00000000 
@@ -141,10 +146,14 @@ class Numbers
     # 000   000  00000000  000   000   0000000   000   000  0000000    00000000  000   000
         
     renumber: (e) =>
-        # @log "numbers.renumber #{@editor.name} from #{e.new} to #{e.new+@elem.children.length-1}" if @editor.name == 'editor'
+        # @log "numbers.renumber #{@editor.name} from #{e.new} to #{e.new+@elem.children.length-1}"
         li = e.new+1
-        for e in @elem.children
-            e.firstChild.textContent = "#{li}"
+        for div in @elem.children
+            div.firstChild.textContent = "#{li}"
+            @emit 'numberChanged', 
+                numberDiv:  div
+                numberSpan: div.firstChild
+                lineIndex:  li-1
             li += 1
         @updateColors()
 

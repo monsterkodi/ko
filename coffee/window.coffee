@@ -23,6 +23,7 @@ str         = require './tools/str'
 encode      = require './tools/encode'
 pkg         = require "../package.json"
 {sw,sh,$,
+ last,
  del,clamp,
  fileList,
  fileExists,
@@ -94,7 +95,12 @@ ipc.on 'loadFile', (event, file) =>
 ipc.on 'setWinID', (event, id) => 
     # log "window.ipc.setWinID #{id} #{window.split?}"
     winID = window.winID = id
-    window.split?.setWinID id    
+    window.split?.setWinID id 
+    
+ipc.on 'fileLinesChanged', (event, file, lineChanges) =>
+    if file == editor.currentFile
+        # log "window ipc.on.fileLinesChanged winID #{winID} file #{file}", lineChanges
+        editor.applyForeignLineChanges lineChanges
                  
 # 00000000  000  000      00000000
 # 000       000  000      000     
@@ -223,6 +229,12 @@ terminal = window.terminal = new Terminal '.terminal'
 editor = window.editor = new View '.editor'
 editor.setText editorText if editorText?
 editor.view.focus()
+
+editor.on 'changed', (changeInfo) =>
+    log "window editor.on.changed", changeInfo
+    return if changeInfo.foreign
+    if changeInfo.sorted.length and last(editor.do.actions).lines.length
+        ipc.send 'winFileLinesChanged', winID, editor.currentFile, last(editor.do.actions).lines
 
 window.editorWithName = (n) ->
     switch n

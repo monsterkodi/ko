@@ -65,7 +65,10 @@ class Terminal extends ViewBase
         if meta.diss?
             @appendLineDiss syntax.lineForDiss(meta.diss), meta.diss 
         else if meta.clss == 'salt'
-            @appendText '\n' + salt(meta.text) + '\n'
+            @appendMeta clss: 'spacer'
+            for l in salt(meta.text).split '\n'
+                @appendMeta clss: 'spacer', diss: syntax.dissForTextAndSyntax l, 'ko'
+            @appendMeta clss: 'spacer'
         else
             @appendLineDiss ''
            

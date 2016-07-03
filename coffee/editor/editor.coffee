@@ -28,6 +28,26 @@ class Editor extends Buffer
         @dbg = false
         super
 
+    #  0000000   00000000   00000000   000      000   000
+    # 000   000  000   000  000   000  000       000 000 
+    # 000000000  00000000   00000000   000        00000  
+    # 000   000  000        000        000         000   
+    # 000   000  000        000        0000000     000   
+    
+    applyForeignLineChanges: (lineChanges) =>
+        @do.start()
+        for change in lineChanges
+            log "editor.applyForeignLineChanges ", change
+            if change.before? and change.after?
+                @do.change change.index, change.after
+            else if change.before?
+                @do.delete change.index
+            else if change.after?
+                @do.insert change.index, change.after
+            else
+                log "editor.applyForeignLineChanges wtf?"
+        @do.end foreign: true
+
     # 00000000  000  000      00000000
     # 000       000  000      000     
     # 000000    000  000      0000000 

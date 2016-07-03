@@ -1,9 +1,13 @@
 # todo/ideas
 
-#### search
-- *line numbers for search results*
-- output search end
+### file state
+- send changes between windows
 - make search results editable
+- save backup files?
+- don't clear undo buffer on save?
+
+#### search
+- output search end?
 
 #### windows
 - cycle through windows command: windows list
@@ -14,13 +18,10 @@
 #### editor
 - *autocomplete from similar files*
 - *alt-click: jump to definition*
-- *send changes between windows*
 - *store unsaved changes in prefs*
 - set cursor column when opening with second :n
 - save and restore scrollX/Left
 - check undo (merges too much?)
-- don't clear undo buffer on save?
-- save backup files?
 - history of file locations
 - make special stuff file type dependent
     - eg. add * to surround characters for md

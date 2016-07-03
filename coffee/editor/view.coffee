@@ -14,7 +14,6 @@ keyinfo   = require '../tools/keyinfo'
 split     = require '../split'
 ViewBase  = require './viewbase'
 syntax    = require './syntax'
-watcher   = require './watcher'
 path      = require 'path'
 electron  = require 'electron'
 webframe  = electron.webFrame

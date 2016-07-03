@@ -199,6 +199,8 @@ class ViewBase extends Editor
     # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
     # 000       000   000  000   000  000  0000  000   000  000       000   000
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
+  
+    done: => @changed @do.changeInfo
     
     changed: (changeInfo) ->
         # log "viewbase.changed .. #{changeInfo.sorted}" if changeInfo.sorted.length
@@ -231,6 +233,7 @@ class ViewBase extends Editor
             if delta = @deltaToEnsureCursorsAreVisible()
                 @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth 
             $('.main', @view)?.scrollIntoViewIfNeeded()
+            @updateScrollOffset()
             @emit 'cursor'
             
         if changeInfo.selection.length
@@ -249,7 +252,7 @@ class ViewBase extends Editor
     deleteLine: (li, oi) ->
         @elem.children[oi - @scroll.exposeTop]?.remove()
         @scroll.deleteLine li, oi
-        @emit 'lineDeleted', oi - @scroll.exposeTop
+        @emit 'lineDeleted', oi
         
     # 000  000   000   0000000  00000000  00000000   000000000
     # 000  0000  000  000       000       000   000     000   
@@ -341,8 +344,6 @@ class ViewBase extends Editor
     # 000   000  00000000   000   000  000000000     000     0000000 
     # 000   000  000        000   000  000   000     000     000     
     #  0000000   000        0000000    000   000     000     00000000
-
-    done: => @changed @do.changeInfo
 
     updateLinePositions: () ->
         y = 0

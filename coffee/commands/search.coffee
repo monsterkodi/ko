@@ -64,12 +64,13 @@ class Search extends Command
     
     startSearchInFiles: (opt) ->
         terminal = window.terminal
-        meta = 
-            clss: 'salt'
-            text: opt.text.slice 0, 12
-        terminal.appendMeta meta
-        terminal.appendDiss syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'
-        terminal.appendText ''
+        # meta = 
+            # clss: 'salt'
+            # text: opt.text.slice 0, 12
+        terminal.appendMeta clss: 'salt', text: opt.text.slice 0, 12
+        # terminal.appendDiss syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'
+        terminal.appendMeta diss: syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'
+        terminal.appendMeta clss: 'spacer'
         terminal.singleCursorAtPos [0, terminal.lines.length-1]
         @walker = new walker
             root:        walker.packagePath path.dirname opt.file
