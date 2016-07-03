@@ -219,6 +219,8 @@ split.on 'paneHeight', (e) =>
 #    000     00000000  000   000  000   000  000  000   000  000   000  0000000
 
 terminal = window.terminal = new Terminal '.terminal'
+terminal.on 'fileLineChange', (file, lineChange) =>
+    ipc.send 'winFileLinesChanged', winID, file, [lineChange]
 
 # 00000000  0000000    000  000000000   0000000   00000000 
 # 000       000   000  000     000     000   000  000   000

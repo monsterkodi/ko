@@ -18,6 +18,7 @@ class Meta
         
         @metas = [] # [lineIndex, [start, end], {href: ...}]
         @elem = $(".meta", @editor.view)
+        @editor.on 'changed',          @onChanged
         @editor.on 'lineAppended',     @onLineAppended
         @editor.on 'clearLines',       @onClearLines
         @editor.on 'lineInserted',     @onLineInserted
@@ -31,6 +32,22 @@ class Meta
         
         @editor.numbers.on 'numberAdded',   @onNumber
         @editor.numbers.on 'numberChanged', @onNumber
+
+    #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
+    # 000       000   000  000   000  0000  000  000        000       000   000
+    # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
+    # 000       000   000  000   000  000  0000  000   000  000       000   000
+    #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
+    
+    changed: (changeInfo) =>
+        return if not changeInfo.sorted.length
+        return if not last(@editor.do.actions).lines.length
+        for change in last(@editor.do.actions).lines
+            for meta in @metasAtLineIndex change.lineIndex
+                if meta[2].clss == "searchResult"
+                    log "post foreign change #{change.lineIndex}"
+                    file = meta[2].href.split(':')[0]
+                    emit 'fileLineChange', file, change
 
     # 000   000  000   000  00     00  0000000    00000000  00000000 
     # 0000  000  000   000  000   000  000   000  000       000   000
