@@ -754,7 +754,8 @@ class Editor extends Buffer
     paste: (text) -> 
         
         @do.start()        
-        @deleteSelection()        
+        @deleteSelection()   
+        @clampCursors()
         
         l = text.split '\n'
         if @cursors.length > 1 and l.length == 1

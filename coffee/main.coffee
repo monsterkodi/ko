@@ -196,7 +196,6 @@ class Main
             win.maximize()
 
     saveWinBounds: (win) ->
-        # log "main.saveWinBounds"
         prefs.set "windows:#{win.id}:bounds",win.getBounds()
     
     toggleWindows: =>
@@ -272,6 +271,8 @@ class Main
     # 000   000  000   000  000   000  000   000  000   000   0000000   00000000
         
     arrangeWindows: ->
+        animate = false
+        frameSize = 6
         wl = visibleWins()
         {width, height} = electron.screen.getPrimaryDisplay().workAreaSize
         if wl.length == 1
@@ -280,35 +281,35 @@ class Main
                 y:      parseInt 0
                 width:  parseInt height
                 height: parseInt height
-            , true
-        else if wl.length > 1 and wl.length < 4
+            , animate
+        else if wl.length == 2 or wl.length == 3
             w = width/wl.length
             for i in [0...wl.length]
                 wl[i].setBounds
-                    x:      parseInt i * w
+                    x:      parseInt i * w - (i > 0 and frameSize/2 or 0)
+                    width:  parseInt w + ((i == 0 or i == wl.length-1) and frameSize/2 or frameSize)
                     y:      parseInt 0
-                    width:  parseInt w
                     height: parseInt height
-                , true
+                , animate
         else if wl.length
             w2 = parseInt wl.length/2
             rh = height
             for i in [0...w2]
                 w = width/w2
                 wl[i].setBounds
-                    x:      parseInt i * w
+                    x:      parseInt i * w - (i > 0 and frameSize/2 or 0)
+                    width:  parseInt w + ((i == 0 or i == w2-1) and frameSize/2 or frameSize)
                     y:      parseInt 0
-                    width:  parseInt w
                     height: parseInt rh/2
-                , true
+                , animate
             for i in [w2...wl.length]
                 w = width/(wl.length-w2)
                 wl[i].setBounds
-                    x:      parseInt (i-w2) * w
-                    y:      parseInt rh/2+23
-                    width:  parseInt w
+                    x:      parseInt (i-w2) * w - (i-w2 > 0 and frameSize/2 or 0)
+                    y:      parseInt rh/2+23 
+                    width:  parseInt w + ((i-w2 == 0 or i == wl.length-1) and frameSize/2 or frameSize)
                     height: parseInt rh/2
-                , true
+                , animate
                 
     # 00000000   00000000   0000000  000000000   0000000   00000000   00000000
     # 000   000  000       000          000     000   000  000   000  000     
@@ -358,8 +359,9 @@ class Main
                     
         win.loadURL "file://#{__dirname}/../index.html"
         app.dock.show()
-        win.on 'close', @onCloseWin
-        win.on 'move', @onMoveWin
+        win.on 'close',  @onCloseWin
+        win.on 'move',   @onMoveWin
+        win.on 'resize', @onResizeWin
                 
         winReady = =>
             # @dbg "main.createWindow.winReady send setWinID #{win.id}"
@@ -387,6 +389,34 @@ class Main
         win 
     
     onMoveWin: (event) => @saveWinBounds event.sender
+    
+    # 00000000   00000000   0000000  000  0000000  00000000
+    # 000   000  000       000       000     000   000     
+    # 0000000    0000000   0000000   000    000    0000000 
+    # 000   000  000            000  000   000     000     
+    # 000   000  00000000  0000000   000  0000000  00000000
+    
+    onResizeWin: (event) => 
+        frameSize = 6
+        wb = event.sender.getBounds()
+        for w in wins()
+            continue if w == event.sender
+            b = w.getBounds()
+            if b.height == wb.height and b.y == wb.y
+                if b.x < wb.x 
+                    if b.x+b.width-wb.x > -200
+                        w.setBounds 
+                            x:      b.x
+                            y:      b.y
+                            width:  wb.x - b.x + frameSize
+                            height: b.height
+                else if b.x+b.width > wb.x+wb.width
+                    if b.x-wb.x-wb.width < 200
+                        w.setBounds
+                            x:      wb.x+wb.width-frameSize
+                            y:      b.y
+                            width:  b.x+b.width - (wb.x+wb.width-frameSize)
+                            height: b.height
     
     onCloseWin: (event) =>
         if visibleWins().length == 1

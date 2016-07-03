@@ -24,6 +24,10 @@ class Term extends Command
     onExit: (code) => log "Term.onExit #{code}"
     onEnd:         => log "Term.onEnd"
     onData: (out)  => window.terminal?.output out.toString()
+
+    clear: ->
+        window.terminal.clear()
+        text: ''
         
     execute: (command) ->
         # log "term.execute command #{command}"

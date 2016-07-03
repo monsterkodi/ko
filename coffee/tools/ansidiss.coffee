@@ -72,17 +72,14 @@ toHexString = (num) ->
 class ansiDiss
     
     constructor: () ->
-        # log "STYLES", STYLES
 
     dissect: (@input) ->
-        # log "ansiDiss.dissect @input #{@input}"
         @diss  = []
         @text  = ""
         @tokenize()
         [@text, @diss]
 
     addText: (t) => 
-        # log "addText #{@text} + #{t}"
         @text += t
         ''
 
@@ -157,6 +154,4 @@ class ansiDiss
             process(handler, i) for handler, i in tokens
             break if @input.length == length
             
-        # log "@diss", @diss
-
 module.exports = ansiDiss

@@ -32,35 +32,35 @@
 - *dbg "class.method arg: #{arg}, ..."*
 - *multicursors delete backwards over line boundaries only if command is down*
 - *handle unicode character length*
+- invert selection (command+i, select full lines without cursors/selections)
 - #< to add salter header of next word
 - no surround for ' inside words
-- clamp cursors after pasting
+- insert spaces when pasting into multicursors
 - select continuous,rectangular ranges with command+shift+M 
 - remove from selection when alt/ctrl is down?
 - make autocomplete work with multicursors
-- command+d activates multicursors
 - don't scroll when no new range added with command+d
-- fix command+up main cursor vanishes at top
 - delete forward swallows spaces?
-- on second command+e: select including leading @
+- on second command+e: select including leading @ or surrounding '""'
 - when pasting text at indent level, remove leading space columns
 - multicursors when pasting multiple lines at col > 0
 - indent more when inserting newline and next line is indented more?
 - move mainCursor to leftmost/rightmost cursor in its line on 'left'/'right' actions
-- highlight cursor line(s?)
 
 #### open
 - command-p alias: -n for previuous files
 - show relative path when navigating in history
 
 #### terminal
-- *output command*
+- *output command* as salt?
 - *alias*
 - *ansihtml*
 - fix escape
 - limit history length
 - add special column (on top of numbers) for input marker and search result lines
 - autocomplete
+    - history
+    - commands
     - dirs and files
     - /usr/local/bin, /usr/bin and /bin
 - number history output and add !(n) command

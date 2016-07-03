@@ -250,8 +250,8 @@ class Open extends Command
             @fastWalker = new walker fopt
             @fastWalker.start()
             # return
-        @walker = new walker wopt
-        @walker.start()        
+        @Walker = new walker wopt
+        @Walker.start()        
         
     # 000   000   0000000   000      000   000  00000000  00000000 
     # 000 0 000  000   000  000      000  000   000       000   000
