@@ -39,15 +39,19 @@ class Meta
     # 000       000   000  000   000  000  0000  000   000  000       000   000
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
-    changed: (changeInfo) =>
+    onChanged: (changeInfo) =>
+        # log "meta.onChanged", last(@editor.do.actions)
         return if not changeInfo.sorted.length
         return if not last(@editor.do.actions).lines.length
         for change in last(@editor.do.actions).lines
-            for meta in @metasAtLineIndex change.lineIndex
+            for meta in @metasAtLineIndex change.index
                 if meta[2].clss == "searchResult"
-                    log "post foreign change #{change.lineIndex}"
-                    file = meta[2].href.split(':')[0]
-                    emit 'fileLineChange', file, change
+                    [file, line] = meta[2].href.split(':')
+                    line -= 1
+                    lineChange = _.clone change
+                    lineChange.index = line
+                    # log "post foreign change #{line} #{file}", lineChange
+                    @editor.emit 'fileLineChange', file, lineChange
 
     # 000   000  000   000  00     00  0000000    00000000  00000000 
     # 0000  000  000   000  000   000  000   000  000       000   000

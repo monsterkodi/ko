@@ -220,7 +220,8 @@ split.on 'paneHeight', (e) =>
 
 terminal = window.terminal = new Terminal '.terminal'
 terminal.on 'fileLineChange', (file, lineChange) =>
-    ipc.send 'winFileLinesChanged', winID, file, [lineChange]
+    # log "window terminal.on.fileLineChange", file, lineChange
+    ipc.send 'winFileLinesChanged', -1, file, [lineChange]
 
 # 00000000  0000000    000  000000000   0000000   00000000 
 # 000       000   000  000     000     000   000  000   000
@@ -233,7 +234,6 @@ editor.setText editorText if editorText?
 editor.view.focus()
 
 editor.on 'changed', (changeInfo) =>
-    log "window editor.on.changed", changeInfo
     return if changeInfo.foreign
     if changeInfo.sorted.length and last(editor.do.actions).lines.length
         ipc.send 'winFileLinesChanged', winID, editor.currentFile, last(editor.do.actions).lines

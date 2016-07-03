@@ -37,7 +37,7 @@ class Editor extends Buffer
     applyForeignLineChanges: (lineChanges) =>
         @do.start()
         for change in lineChanges
-            log "editor.applyForeignLineChanges ", change
+            # log "editor.applyForeignLineChanges ", change
             if change.before? and change.after?
                 @do.change change.index, change.after
             else if change.before?

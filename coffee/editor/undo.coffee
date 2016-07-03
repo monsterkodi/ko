@@ -318,7 +318,6 @@ class undo
     # 00000000  000   000  0000000  
                 
     end: (opt) -> 
-        log "undo.end #{@changeInfo?}", opt
         @changeInfo?.foreign = opt?.foreign
         @groupCount -= 1
         @check()
