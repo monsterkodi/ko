@@ -44,9 +44,9 @@ class Commandline extends ViewBase
         @setLines [t]
         @selectAll()
 
-    changed: (changeInfo) ->
-        super changeInfo
-        if changeInfo.changed.length
+    changed: (changeInfo, action) ->
+        super changeInfo, action
+        if changeInfo.sorted.length
             @command?.changed @lines[0]
         
     loadCommands: ->

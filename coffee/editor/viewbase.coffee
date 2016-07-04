@@ -200,9 +200,7 @@ class ViewBase extends Editor
     # 000       000   000  000   000  000  0000  000   000  000       000   000
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
   
-    done: => @changed @do.changeInfo
-    
-    changed: (changeInfo) ->
+    changed: (changeInfo, action) ->
         # log "viewbase.changed .. #{changeInfo.sorted}" if changeInfo.sorted.length
         @syntax.changed changeInfo
         
@@ -241,7 +239,7 @@ class ViewBase extends Editor
             @emit 'selection'
 
         @renderHighlights()
-        @emit 'changed', changeInfo
+        @emit 'changed', changeInfo, action
 
     # 0000000    00000000  000      00000000  000000000  00000000
     # 000   000  000       000      000          000     000     

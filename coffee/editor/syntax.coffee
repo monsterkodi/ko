@@ -28,7 +28,7 @@ class syntax
     # 000       000   000  000   000  000  0000  000   000  000       000   000
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
-    changed: (changeInfo) ->
+    changed: (changeInfo, action) ->
         if changeInfo.sorted.length
             # log "syntax.sorted diss[0..5] before", @diss.slice 0,5 if @editor.name is 'editor'
             for [li, ch, oi] in changeInfo.sorted                

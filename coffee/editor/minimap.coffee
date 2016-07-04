@@ -122,7 +122,6 @@ class Minimap
     onChanged: (changeInfo) =>
         ci = changeInfo
         return if not ci.sorted.length
-        # @log "minimap.changed changeInfo",  ci
         
         @scroll.setNumLines @editor.lines.length
         
@@ -130,8 +129,6 @@ class Minimap
         firstDeleted  = first(ci.deleted)  ? @scroll.exposeBot+1
         redraw = Math.min firstInserted, firstDeleted
             
-        # @log "minimap.changed redraw",  redraw
-        
         for c in ci.changed
             break if c >= redraw
             @drawLines c, c

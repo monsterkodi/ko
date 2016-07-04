@@ -99,7 +99,7 @@ ipc.on 'setWinID', (event, id) =>
     
 ipc.on 'fileLinesChanged', (event, file, lineChanges) =>
     if file == editor.currentFile
-        # log "window ipc.on.fileLinesChanged winID #{winID} file #{file}", lineChanges
+        # log "window ipc.on.fileLinesChanged file #{file}", lineChanges
         editor.applyForeignLineChanges lineChanges
                  
 # 00000000  000  000      00000000
@@ -233,10 +233,10 @@ editor = window.editor = new View '.editor'
 editor.setText editorText if editorText?
 editor.view.focus()
 
-editor.on 'changed', (changeInfo) =>
+editor.on 'changed', (changeInfo, action) =>
     return if changeInfo.foreign
-    if changeInfo.sorted.length and last(editor.do.actions).lines.length
-        ipc.send 'winFileLinesChanged', winID, editor.currentFile, last(editor.do.actions).lines
+    if changeInfo.sorted.length and action.lines.length
+        ipc.send 'winFileLinesChanged', winID, editor.currentFile, action.lines
 
 window.editorWithName = (n) ->
     switch n

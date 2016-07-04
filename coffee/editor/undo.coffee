@@ -10,7 +10,7 @@ log     = require '../tools/log'
 
 class undo
     
-    constructor: (@editor, @groupDone=->) -> @reset()
+    constructor: (@editor) -> @reset()
 
     # 00000000   00000000   0000000  00000000  000000000
     # 000   000  000       000       000          000   
@@ -98,8 +98,7 @@ class undo
             @actions.push action
             
             @cleanChangeInfo()
-            @editor.changed @changeInfo
-            # log "redo @changeInfo", @changeInfo
+            @editor.changed @changeInfo, action
             @delChangeInfo()
 
     redoLine: (line) ->
@@ -139,15 +138,23 @@ class undo
         if @actions.length
             @newChangeInfo()
             action = @actions.pop()
+            undoLines = []
             if action.lines.length
                 for i in [action.lines.length-1..0]
                     @undoLine action.lines[i]
+                    undoLines.push 
+                        before: action.lines[i].after
+                        after:  action.lines[i].before
+                        index:  action.lines[i].index
+                        
             @undoCursor action
             @undoSelection action
             @futures.unshift action
 
             @cleanChangeInfo()
-            @editor.changed @changeInfo
+            # log "undo.undo changeInfo.sorted", @changeInfo.sorted
+            # log "undo.undo action.lines", action.lines
+            @editor.changed @changeInfo, lines: undoLines
             @delChangeInfo()
                                     
     undoLine: (line) ->
@@ -334,7 +341,7 @@ class undo
             @merge()
             if @changeInfo?
                 @cleanChangeInfo()
-                @groupDone()
+                @editor.changed @changeInfo, last @actions
                 @delChangeInfo()
         
     #  0000000  000      00000000   0000000   000   000

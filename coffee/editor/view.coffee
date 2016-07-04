@@ -32,8 +32,8 @@ class View extends ViewBase
     # 000       000   000  000   000  000  0000  000   000  000       000   000
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
-    changed: (changeInfo) ->        
-        super changeInfo
+    changed: (changeInfo, action) ->        
+        super changeInfo, action
         if changeInfo.sorted.length
             @updateTitlebar() # sets dirty flag
 
