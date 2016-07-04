@@ -16,7 +16,7 @@ class Scrollbar
 
         @elem = document.createElement 'div'
         @elem.className = 'scrollbar left'
-        @editor.view.parentElement.appendChild @elem
+        @editor.view.appendChild @elem
         
         @handle = document.createElement 'div'
         @handle.className = 'scrollhandle left'
@@ -29,7 +29,7 @@ class Scrollbar
             cursor:  'ns-resize'
             
         @elem.addEventListener 'wheel', @onWheel
-        @editor.view.addEventListener 'wheel', @onWheel            
+        @editor.layers.addEventListener 'wheel', @onWheel            
 
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   

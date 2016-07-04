@@ -409,6 +409,7 @@ class Main
             if b.height == wb.height and b.y == wb.y
                 if b.x < wb.x 
                     if b.x+b.width-wb.x > -200
+                        w.showInactive()
                         w.setBounds 
                             x:      b.x
                             y:      b.y
@@ -416,6 +417,7 @@ class Main
                             height: b.height
                 else if b.x+b.width > wb.x+wb.width
                     if b.x-wb.x-wb.width < 200
+                        w.showInactive()
                         w.setBounds
                             x:      wb.x+wb.width-frameSize
                             y:      b.y

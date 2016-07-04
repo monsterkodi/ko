@@ -99,7 +99,7 @@ class syntax
         if not @colors[clss]?
             div = document.createElement 'div'
             div.className = clss
-            $('main').appendChild div
+            document.body.appendChild div
             @colors[clss] = window.getComputedStyle(div).color
             div.remove()
         return @colors[clss]

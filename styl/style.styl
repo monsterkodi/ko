@@ -31,11 +31,6 @@ fill-abs()
     left            0
     top             0
     
-fill-rel()
-    position        static
-    height          100%
-    width           100%
-    
 pre 
     margin          0
 
@@ -81,7 +76,7 @@ pre
     padding             0
     margin              0
     height              commandlineHeight
-    position            absolute
+    position            relative
 
 .commandline-command
     font-family         "Andale Mono", monospace
@@ -116,6 +111,7 @@ pre
 // 000  000   000  000        0000000 
     
 .info
+    overflow            hidden
     width               minimapWidth
     position            absolute
     right               0
@@ -258,19 +254,15 @@ infoPadding           = 10px
     outline-width   0
     
 body
-    overflow            hidden
-    background          #000
-    color               #fff
-    font-family         arial, helvetica, sans-serif
-    -webkit-user-select none
     fill-abs()
     margin              0
-    
-#main
+    background          #000
+    color               #fff
     overflow            hidden
-    fill-rel()
+    font-family         arial, helvetica, sans-serif
+    -webkit-user-select none
     -webkit-app-region  no-drag
-
+    
 // 000000000  000  000000000  000      00000000  0000000     0000000   00000000 
 //    000     000     000     000      000       000   000  000   000  000   000
 //    000     000     000     000      0000000   0000000    000000000  0000000  
@@ -285,11 +277,10 @@ body
     font-size           14px
     padding-left        70px
     padding-right       70px
+    white-space         nowrap
     -webkit-app-region  drag
-    position            absolute
-    top                 0
-    left                0
-    right               0
+    position            static
+    display             block
 
 .titlebar .title
 .titlebar .dot
@@ -393,37 +384,22 @@ body
 // 0000000   00000000   000      000     000   
 //      000  000        000      000     000   
 // 0000000   000        0000000  000     000   
-    
-.area
+        
+.split
     overflow            hidden
-    position            absolute
-    left                0
-    right               0
-    bottom              0
-    top                 titlebarHeight
+    position            relative
+    display             block
     border-left         frameBorder
     border-right        frameBorder
     border-bottom       frameBorder
+    box-sizing          border-box
     
-.split
-    overflow            hidden
-    position            static
-    width               100%
-    height              100%
-    
-.rel
-    fill-rel()
-
 .handle
     background          #222
     height              splithandleHeight
-
-.handle
-.pane
     overflow            hidden
-    position            absolute
-    left                0
-    right               0
+    position            relative
+    // width               100%
     
 .log
     bottom              0
@@ -434,14 +410,13 @@ body
 // 000       000   000  000     000     000   000  000   000
 // 00000000  0000000    000     000      0000000   000   000
 
-.pane.edit 
-    background      #000
-
 .terminal
 .logview
 .editor
 
-    fill-abs()
+    position        relative
+    //width           100%
+    display         block
         
     overflow        hidden
 
@@ -450,6 +425,10 @@ body
     
     font-weight     bold
     font-family     "Andale Mono", monospace
+    
+.layers
+    position        relative 
+    overflow        hidden
         
 .lines
 .cursors
@@ -465,7 +444,6 @@ body
 // 0000000  000  000   000  00000000  0000000 
     
 .lines
-    // position        static
     cursor          default
     font-size       inherit
 

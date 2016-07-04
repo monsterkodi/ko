@@ -8,6 +8,7 @@ characterWidth,
 setStyle,
 clamp,
 last,
+sw,
 $}         = require '../tools/tools'
 prefs      = require '../tools/prefs'
 drag       = require '../tools/drag'
@@ -33,10 +34,15 @@ class ViewBase extends Editor
     constructor: (viewElem, @config) ->
         @name = viewElem
         @name = @name.slice 1 if @name[0] == '.'
-        @view = $(viewElem)
+        @view = $(viewElem)        
+        @layers = document.createElement 'div'
+        @layers.className = "layers"
+        @view.appendChild @layers
+        
         @view.onpaste = (event) => log "view on paste #{@name}", event
         @view.onblur  = (event) => @emit 'blur', @
         @view.onfocus = (event) => @emit 'focus', @
+        
         layer = []
         layer.push 'selections' 
         layer.push 'highlights' 
@@ -45,7 +51,8 @@ class ViewBase extends Editor
         layer.push 'cursors'
         layer.push 'numbers'      if 'Numbers' in @config.features
         @initLayers layer
-        @elem = $('.lines', @view)
+        
+        @elem = $('.lines', @layers)
         @diss = []
         @size = {}
         @syntax = new syntax @
@@ -84,14 +91,14 @@ class ViewBase extends Editor
     # 0000000  000   000     000     00000000  000   000  0000000 
     
     initLayers: (layerClasses) ->
-        @layers = {}
+        @layerDict = {}
         for cls in layerClasses
-            @layers[cls] = @addLayer cls
+            @layerDict[cls] = @addLayer cls
         
     addLayer: (cls) ->
         div = document.createElement 'div'
         div.className = cls
-        @view.appendChild div
+        @layers.appendChild div
         div
         
     updateLayers: () ->
@@ -137,7 +144,7 @@ class ViewBase extends Editor
             @scroll.setViewHeight @viewHeight()
             @emit 'viewHeight', @viewHeight()
         @scroll.setNumLines @lines.length
-        @view.scrollLeft = 0
+        @layers.scrollLeft = 0
         @updateScrollOffset()
         @updateLayers()
 
@@ -230,7 +237,7 @@ class ViewBase extends Editor
             @renderCursors()
             if delta = @deltaToEnsureCursorsAreVisible()
                 @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth 
-            $('.main', @view)?.scrollIntoViewIfNeeded()
+            $('.main', @layers)?.scrollIntoViewIfNeeded()
             @updateScrollOffset()
             @emit 'cursor'
             
@@ -385,21 +392,21 @@ class ViewBase extends Editor
                     vc.push [@lines[@scroll.exposeTop+c[1]].length, c[1], 'virtual']
             cs = cs.concat vc
         html = render.cursors cs, @size
-        $('.cursors', @view).innerHTML = html
+        $('.cursors', @layers).innerHTML = html
             
     renderSelection: ->
         h = ""
         s = @selectionsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
         if s
             h += render.selection s, @size
-        $('.selections', @view).innerHTML = h
+        $('.selections', @layers).innerHTML = h
 
     renderHighlights: ->
         h = ""
         s = @highlightsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
         if s
             h += render.selection s, @size, "highlight"
-        $('.highlights', @view).innerHTML = h
+        $('.highlights', @layers).innerHTML = h
 
     # 00000000   00000000   0000000  000  0000000  00000000  0000000  
     # 000   000  000       000       000     000   000       000   000
@@ -408,8 +415,11 @@ class ViewBase extends Editor
     # 000   000  00000000  0000000   000  0000000  00000000  0000000  
     
     resized: -> 
+        # @view.style.width = "#{sw()-12}px"
         @scroll?.setViewHeight @viewHeight()
         @numbers?.elem.style.height = "#{@viewHeight}px"
+        @layers.style.width = "#{sw()-@view.getBoundingClientRect().left-130-6}px"
+        @layers.style.height = "#{@viewHeight()}px"
         @updateScrollOffset()
         # log "viewbase.resized emit viewHeight #{@viewHeight()}"
         @emit 'viewHeight', @viewHeight()
@@ -448,7 +458,7 @@ class ViewBase extends Editor
 
     scrollBy: (delta, x) -> 
         @scroll.by delta
-        @view.scrollLeft += x/2
+        @layers.scrollLeft += x/2
         @updateScrollOffset()
         
     scrollTo: (p) -> 
@@ -469,9 +479,9 @@ class ViewBase extends Editor
                 @numbers?.updateColors()
 
     updateScrollOffset: ->
-        @view.scrollTop = @scroll.offsetTop
-        @numbers?.elem.style.left = "#{@view.scrollLeft}px"
-        @numbers?.elem.style.background = @view.scrollLeft and '#000' or "rgba(0,0,0,0.5)"
+        @layers.scrollTop = @scroll.offsetTop
+        @numbers?.elem.style.left = "#{@layers.scrollLeft}px"
+        @numbers?.elem.style.background = @layers.scrollLeft and '#000' or "rgba(0,0,0,0.5)"
 
     # 00000000    0000000    0000000
     # 000   000  000   000  000     
@@ -481,11 +491,11 @@ class ViewBase extends Editor
     
     posAtXY:(x,y) ->
     
-        sl = @view.scrollLeft
-        st = @view.scrollTop
-        br = @view.getBoundingClientRect()
-        lx = clamp 0, @view.offsetWidth,  x - br.left - @size.offsetX + @size.charWidth/3
-        ly = clamp 0, @view.offsetHeight, y - br.top
+        sl = @layers.scrollLeft
+        st = @layers.scrollTop
+        br = @layers.getBoundingClientRect()
+        lx = clamp 0, @layers.offsetWidth,  x - br.left - @size.offsetX + @size.charWidth/3
+        ly = clamp 0, @layers.offsetHeight, y - br.top
         px = parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth))
         py = parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @scroll.exposeTop
         p = [px, Math.min(@lines.length-1, py)]
@@ -496,7 +506,7 @@ class ViewBase extends Editor
     lineElemAtXY:(x,y) -> 
         p = @posAtXY x,y
         ci = p[1]-@scroll.exposeTop
-        @layers['lines'].children[ci]
+        @layerDict['lines'].children[ci]
         
     lineSpanAtXY:(x,y) -> # not used ?
         lineElem = @lineElemAtXY x,y        
@@ -521,6 +531,7 @@ class ViewBase extends Editor
     # 0000000  000  000   000  00000000  0000000 
     
     viewHeight:      -> @view?.getBoundingClientRect().height 
+    viewWidth:       -> @view?.getBoundingClientRect().width 
     numViewLines:    -> Math.ceil(@viewHeight() / @size.lineHeight)
     numFullLines:    -> Math.floor(@viewHeight() / @size.lineHeight)
     
@@ -540,7 +551,7 @@ class ViewBase extends Editor
 
     initDrag: ->
         @drag = new drag
-            target:  @view
+            target:  @layers
             cursor:  'default'
             onStart: (drag, event) =>
                                 

@@ -159,8 +159,10 @@ module.exports =
         else
             return pos(event.clientX + window.scrollX, event.clientY + window.scrollY)
 
-    sw: () -> parseInt window.getComputedStyle(document.body).width
-    sh: () -> parseInt window.getComputedStyle(document.body).height
+    # sw: () -> parseInt window.getComputedStyle(document.body).width
+    # sh: () -> parseInt window.getComputedStyle(document.body).height
+    sw: () -> document.body.clientWidth
+    sh: () -> document.body.clientHeight
     
 #  0000000  000000000  00000000   000  000   000   0000000 
 # 000          000     000   000  000  0000  000  000      

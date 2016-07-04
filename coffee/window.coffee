@@ -203,14 +203,11 @@ $('.titlebar').ondblclick = (event) => ipc.send 'maximizeWindow', winID
 # 0000000   000        0000000  000     000   
 
 split = window.split = new Split()
-split.on 'paneHeight', (e) =>
-    # log "window.on.split.paneHeight", e
-    if e.paneIndex == 0
-        window.terminal?.resized()
-    if e.paneIndex == 2
-        window.editor?.resized()
-    if e.paneIndex == 3
-        window.logview?.resized()
+split.on 'split', =>
+    terminal.resized()
+    commandline.resized()
+    editor.resized()
+    logview.resized()
 
 # 000000000  00000000  00000000   00     00  000  000   000   0000000   000    
 #    000     000       000   000  000   000  000  0000  000  000   000  000    
@@ -282,11 +279,9 @@ info        = window.info = new Info editor
 # 000   000  000            000  000   000     000     
 # 000   000  00000000  0000000   000  0000000  00000000
 
-window.onresize = =>
-    if sh()
-        ipc.send 'saveBounds', winID if winID?
-        editor.resized()
-        split.resized()
+window.onresize = ->
+    split.resized()
+    ipc.send 'saveBounds', winID if winID?
 
 window.onload = => split.resized()
 window.onunload = => editor.setCurrentFile null, noSaveScroll: true # to stop watcher
