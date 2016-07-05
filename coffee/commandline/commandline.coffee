@@ -46,6 +46,12 @@ class Commandline extends ViewBase
         @setLines [t ? '']
         @selectAll()
 
+    #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
+    # 000       000   000  000   000  0000  000  000        000       000   000
+    # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
+    # 000       000   000  000   000  000  0000  000   000  000       000   000
+    #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
+
     changed: (changeInfo, action) ->
         super changeInfo, action
         if changeInfo.sorted.length

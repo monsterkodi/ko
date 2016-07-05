@@ -109,6 +109,7 @@ class Numbers extends event
         bot = @editor.scroll.exposeBot
         if top <= li <= bot+1
             @elem.lastChild?.remove()
+            @renumberFromLineIndex top
     
     # 000   000   0000000   000   000  000   0000000  000   000
     # 000   000  000   000  0000  000  000  000       000   000
@@ -147,13 +148,15 @@ class Numbers extends event
         
     renumber: (e) =>
         # @log "numbers.renumber #{@editor.name} from #{e.new} to #{e.new+@elem.children.length-1}"
-        li = e.new+1
+        @renumberFromLineIndex e.new
+
+    renumberFromLineIndex: (li) ->
         for div in @elem.children
-            div.firstChild.textContent = "#{li}"
+            div.firstChild.textContent = "#{li+1}"
             @emit 'numberChanged', 
                 numberDiv:  div
                 numberSpan: div.firstChild
-                lineIndex:  li-1
+                lineIndex:  li
             li += 1
         @updateColors()
 

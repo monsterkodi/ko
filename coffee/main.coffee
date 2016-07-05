@@ -280,6 +280,7 @@ class Main
         wl = visibleWins()
         {width, height} = electron.screen.getPrimaryDisplay().workAreaSize
         if wl.length == 1
+            wl[0].showInactive()
             wl[0].setBounds
                 x:      parseInt (width-height)/2
                 y:      parseInt 0
@@ -289,6 +290,7 @@ class Main
         else if wl.length == 2 or wl.length == 3
             w = width/wl.length
             for i in [0...wl.length]
+                wl[i].showInactive()
                 wl[i].setBounds
                     x:      parseInt i * w - (i > 0 and frameSize/2 or 0)
                     width:  parseInt w + ((i == 0 or i == wl.length-1) and frameSize/2 or frameSize)
@@ -300,6 +302,7 @@ class Main
             rh = height
             for i in [0...w2]
                 w = width/w2
+                wl[i].showInactive()
                 wl[i].setBounds
                     x:      parseInt i * w - (i > 0 and frameSize/2 or 0)
                     width:  parseInt w + ((i == 0 or i == w2-1) and frameSize/2 or frameSize)
@@ -308,6 +311,7 @@ class Main
                 , animate
             for i in [w2...wl.length]
                 w = width/(wl.length-w2)
+                wl[i].showInactive()
                 wl[i].setBounds
                     x:      parseInt (i-w2) * w - (i-w2 > 0 and frameSize/2 or 0)
                     y:      parseInt rh/2+23 

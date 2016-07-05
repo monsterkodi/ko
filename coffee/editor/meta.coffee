@@ -22,7 +22,7 @@ class Meta
         @editor.on 'lineAppended',     @onLineAppended
         @editor.on 'clearLines',       @onClearLines
         @editor.on 'lineInserted',     @onLineInserted
-        @editor.on 'lineDeleted',      @onLineDeleted
+        @editor.on 'willDeleteLine',   @onWillDeleteLine
         @editor.on 'lineExposed',      @onLineExposed
         @editor.on 'lineVanished',     @onLineVanished
         @editor.on 'lineExposedTop',   @onLineExposedTop
@@ -40,7 +40,6 @@ class Meta
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
     onChanged: (changeInfo, action) =>
-        # log "meta.onChanged", action
         return if not changeInfo.sorted.length
         return if not action.lines.length
         for change in action.lines
@@ -60,11 +59,8 @@ class Meta
     
     onNumber: (e) =>
         metas = @metasAtLineIndex e.lineIndex
-        # log "meta.onNumber li #{e.lineIndex} num metas #{metas.length}" if metas.length
         for meta in metas
-            # log "meta.onNumber", meta[2].clss
             switch meta[2].clss
-                # when 'salt', 'spacer' then e.numberSpan.innerHTML = '&nbsp;'
                 when 'searchResult'
                     e.numberSpan.textContent = meta[2].href.split(':')[1]
                 else
@@ -94,6 +90,7 @@ class Meta
         @elem.appendChild div
         if meta[2].div? # todo remove
             log "meta.addDiv wtf? li #{meta[0]}"
+            alert "remove me!"
             meta[2].div.remove()
         meta[2].div = div
         
@@ -166,8 +163,7 @@ class Meta
     # 000   000  000       000      000          000     000       000   000
     # 0000000    00000000  0000000  00000000     000     00000000  0000000  
     
-    # onWillDeleteLine: (li) => #log "meta.onWillDeleteLine li #{li}"    
-    onLineDeleted: (li) => 
+    onWillDeleteLine: (li) => 
         @onLineVanished lineIndex: li
         _.pullAll @metas, @metasAtLineIndex li
         for meta in @editor.rangesFromTopToBotInRanges li+1, @editor.lines.length, @metas
