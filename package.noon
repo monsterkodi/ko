@@ -1,6 +1,6 @@
 name            ko
 productName     ko
-version         0.6.0
+version         0.7.0
 description     coffee script editor
 main            js/main.js
 scripts

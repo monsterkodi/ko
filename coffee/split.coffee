@@ -87,7 +87,7 @@ class Split extends event
         
         if i == 0
             s[1] = s[0] + @commandlineHeight + @handleHeight
-        if i == 1 #and s[1] > @commandlineHeight + @handleHeight 
+        if i == 1
             s[0] = s[1] - @commandlineHeight - @handleHeight
                 
         @applySplit s
@@ -101,16 +101,18 @@ class Split extends event
     applySplit: (s) ->
         for i in [0...s.length]
             s[i] = clamp (i and s[i-1] or -@handleHeight), @elemHeight(), s[i]
+        @handles[0].style.height = "#{clamp 0, @handleHeight, @handleHeight+s[0]}px"
             
         if not @logVisible
             s[2] = @elemHeight()
             
         @splitPos = _.clone s
+        # log "split.applySplit #{@splitPos.join ','}"
         
         for h in [0...@panes.length]
             newHeight = Math.max 0, switch
                 when h is 0 then s[0]
-                when h is s.length then @elemHeight()-last(s)-@handleHeight
+                when h is s.length then @logVisible and @elemHeight()-last(s)-@handleHeight or 0
                 else s[h]-s[h-1]-@handleHeight
                     
             @panes[h].style.height = "#{newHeight}px"
@@ -136,7 +138,7 @@ class Split extends event
         s = []
         e = @editorHeight()
         for h in [0...@handles.length]
-            s.push clamp 0, @elemHeight(), @splitPosY h
+            s.push clamp -@handleHeight, @elemHeight(), @splitPosY h
         if e == 0 # keep editor closed
             s[1] = s[2] = @elemHeight()            
         @applySplit s
@@ -260,8 +262,10 @@ class Split extends event
         y0 = @splitPosY 0
         y1 = @splitPosY 1
         y2 = @splitPosY 2
-        if y0 < 0 
-            @splitAt 0, 0
+        if y0 < -@handleHeight
+            @splitAt 0, -@handleHeight
+        else if y1 < 0
+            @splitAt 1, 0
         else if y1 > 0
             if y1 < (@commandlineHeight+@handleHeight)/2
                 @splitAt 1, 0

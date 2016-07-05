@@ -65,9 +65,7 @@ class Commandline extends ViewBase
             command.setPrefsID commandClass.name.toLowerCase()
             @commands[command.prefsID] = command
             
-    onSplit: (s) => 
-        @command?.onTop? s[0] + window.split.handleHeight
-        @command?.onBot? s[1] + window.split.handleHeight
+    onSplit: (s) => @command?.onBot? s[1]
           
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   

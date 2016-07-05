@@ -40,17 +40,21 @@ class Meta
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
     onChanged: (changeInfo, action) =>
-        return if not changeInfo.sorted.length
-        return if not action.lines.length
-        for change in action.lines
-            for meta in @metasAtLineIndex change.index
+        return if not changeInfo.changed.length
+        # log "meta.onChanged #{changeInfo.changed.join ','}"
+        for li in changeInfo.changed
+            for meta in @metasAtLineIndex li
+                # log "meta.onChanged #{meta[2].clss}"
                 if meta[2].clss == "searchResult"
                     [file, line] = meta[2].href.split(':')
                     line -= 1
-                    lineChange = _.clone change
-                    lineChange.index = line
+                    change = (a for a in action.lines when a.index == li)[0]
+                    lineChange = 
+                        before: change.before
+                        after: change.after
+                        index: line
                     @editor.emit 'fileLineChange', file, lineChange
-
+                    
     # 000   000  000   000  00     00  0000000    00000000  00000000 
     # 0000  000  000   000  000   000  000   000  000       000   000
     # 000 0 000  000   000  000000000  0000000    0000000   0000000  
