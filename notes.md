@@ -1,22 +1,25 @@
 # todo/ideas
 
 ### file state
-- send changes between windows
-- make search results editable
 - save backup files?
 - don't clear undo buffer on save?
 
 #### search
+- *save changes*
 - output search end?
+- fix broken syntax highlighting when editing
+
+#### autocomplete
+- *autocomplete from similar files*
+- *make autocomplete work with multicursors*
+- fix editing scraps
 
 #### windows
 - cycle through windows command: windows list
 - recent files in titlebar?
 - list buffers when clicking buffer number in titlebar
-- lock windows together
 
 #### editor
-- *autocomplete from similar files*
 - *alt-click: jump to definition*
 - *store unsaved changes in prefs*
 - set cursor column when opening with second :n
@@ -39,7 +42,6 @@
 - insert spaces when pasting into multicursors
 - select continuous,rectangular ranges with command+shift+M 
 - remove from selection when alt/ctrl is down?
-- make autocomplete work with multicursors
 - don't scroll when no new range added with command+d
 - delete forward swallows spaces?
 - on second command+e: select including leading @ or surrounding '""'

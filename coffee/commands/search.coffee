@@ -67,7 +67,7 @@ class Search extends Command
         # meta = 
             # clss: 'salt'
             # text: opt.text.slice 0, 12
-        terminal.appendMeta clss: 'salt', text: opt.text.slice 0, 12
+        terminal.appendMeta clss: 'salt', text: opt.text.slice 0, 14
         # terminal.appendDiss syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'
         terminal.appendMeta diss: syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'
         terminal.appendMeta clss: 'spacer'
