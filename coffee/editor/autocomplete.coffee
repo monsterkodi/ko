@@ -169,11 +169,11 @@ class Autocomplete
         beforeLength = @clones[0].innerHTML.length
         for ci in [1...@clones.length]
             c = @clones[ci]
-            offset = parseInt @cloned[ci-1].style.transform.split('translateX(')[1]
+            offset = parseFloat @cloned[ci-1].style.transform.split('translateX(')[1]
             charOffset = numChars
             charOffset += beforeLength if ci == 1
             c.style.transform = "translatex(#{offset+@editor.size.charWidth*charOffset}px)"
-        spanOffset = parseInt @cloned[0].style.transform.split('translateX(')[1]
+        spanOffset = parseFloat @cloned[0].style.transform.split('translateX(')[1]
         spanOffset += @editor.size.charWidth*beforeLength
         @span.style.transform = "translatex(#{spanOffset}px)"
         

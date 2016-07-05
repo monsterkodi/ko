@@ -21,7 +21,7 @@ class render
         if diss?.length
             for di in [diss.length-1..0]
                 d = diss[di]
-                tx = Math.floor d.start * size.charWidth
+                tx = d.start * size.charWidth
                 clss = d.clss? and " class=\"#{d.clss}\"" or ''
                 clrzd = "<span style=\"transform:translatex(#{tx}px);#{d.styl ? ''}\"#{clss}>#{encode d.match}</span>"
                 l = clrzd + l
