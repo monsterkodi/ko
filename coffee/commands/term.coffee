@@ -23,7 +23,10 @@ class Term extends Command
     
     onExit: (code) => log "Term.onExit #{code}"
     onEnd:         => log "Term.onEnd"
-    onData: (out)  => window.terminal?.output out.toString()
+    onData: (out)  => 
+        terminal = window.terminal
+        terminal.output out.toString()
+        terminal.scrollCursorToTop 5
 
     clear: ->
         window.terminal.clear()
@@ -32,11 +35,14 @@ class Term extends Command
     execute: (command) ->
         # log "term.execute command #{command}"
         super command
+        terminal.appendMeta clss: 'salt', text: command.slice 0, 14
+        terminal.singleCursorAtPos [0, terminal.lines.length-2]
         switch command
             when 'history' then window.terminal?.output @history.join '\n'
             when 'clear'   then window.terminal?.clear()
             else
                 @childp.stdin.write "#{command}\n"
+        terminal.scrollCursorToTop 5        
         text: ''
         reveal: 'terminal'
         
