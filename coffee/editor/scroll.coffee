@@ -51,7 +51,6 @@ class scroll extends events
             @exposeNum = @exposeMax
         
         @offsetTop    = -1 # little hack to emit initial scroll
-        # log "scroll.calc", @ if @dbg
 
     # 000  000   000  00000000   0000000 
     # 000  0000  000  000       000   000
@@ -71,7 +70,6 @@ class scroll extends events
     # 000   000  00000000  0000000   00000000     000   
     
     reset: =>
-        log "scroll.reset emit clearLines" if @dbg
         @emit 'clearLines'
         @init()
 
@@ -93,11 +91,8 @@ class scroll extends events
         
         scroll = @scroll
         delta = 0 if Number.isNaN delta
-        # log "scroll.by delta #{delta} scroll #{@scroll} scrollMax #{@scrollMax}" if @dbg
         @scroll = parseInt clamp 0, @scrollMax, @scroll+delta
-        # log "scroll.by new delta #{delta} scroll #{@scroll} scrollMax #{@scrollMax}" if @dbg
         top = parseInt @scroll / @lineHeight
-        # log "scroll.by top #{@top} lineHeight #{@lineHeight}" if @dbg
         @offsetSmooth = @scroll - top * @lineHeight 
         
         @setTop top
@@ -106,10 +101,8 @@ class scroll extends events
         offset += @offsetSmooth if @smooth
         offset += (top - @exposeTop) * @lineHeight
         
-        # log "scroll.by delta #{delta} offset #{offset} @offsetTop #{@offsetTop}" if @dbg
         if offset != @offsetTop or scroll != @scroll
             @offsetTop = parseInt offset            
-            log "scroll.by emit scroll @scroll #{@scroll} @offsetTop #{@offsetTop}" if @dbg
             @emit 'scroll', @scroll, @offsetTop
 
     #  0000000  00000000  000000000  000000000   0000000   00000000 
@@ -121,15 +114,12 @@ class scroll extends events
     setTop: (top) =>
 
         if top != @top
-            log "scroll.setTop emit #{@top} -> #{top}" if @dbg
             @top = top
             @emit 'top', @top
             
         newBot = Math.min @top+@viewLines, @numLines-1
-        # log "scroll.setTop @top #{@top} @bot #{@bot} newBot #{newBot} viewLines #{@viewLines} numLines #{@numLines}"  if @dbg
         if @bot != newBot
             @bot = newBot
-            log "scroll.setTop emit bot #{@bot}" if @dbg
             @emit 'bot', @bot
             
         @expose()
@@ -156,14 +146,12 @@ class scroll extends events
         return if (@exposed <= @exposedNum) and (topDiff <= 0) and (botDiff >= 0)
         
         if (@top >= @exposeBot) or (@bot <= @exposeTop) # new range outside, start from scratch
-            console.log "scroll.expose emit clearLines" if @dbg
             @emit 'clearLines'
             @exposeTop = @top
             @exposeBot = @top-1
             while @bot > @exposeBot
                 @exposeBot += 1
                 @exposed = @exposeBot - @exposeTop
-                console.log "scroll.expose emit exposeLine #{@exposeBot}" if @dbg
                 @emit 'exposeLine', @exposeBot
             return
         
@@ -171,7 +159,6 @@ class scroll extends events
             old = @exposeTop
             @exposeTop = @top
             @exposed = @exposeBot - @exposeTop
-            console.log "scroll.expose emit exposeTop #{old} -> #{@exposeTop} (num #{-(@top-old)})" if @dbg
             @emit 'exposeTop',
                 old: old
                 new: @exposeTop
@@ -180,7 +167,6 @@ class scroll extends events
         while (@bot > @exposeBot)
             @exposeBot += 1
             @exposed = @exposeBot - @exposeTop
-            console.log "scroll.expose emit exposeLine #{@exposeBot}" if @dbg
             @emit 'exposeLine', @exposeBot
                             
         # 000   000   0000000   000   000  000   0000000  000   000
@@ -190,7 +176,6 @@ class scroll extends events
         #     0      000   000  000   000  000  0000000   000   000
 
         while (@bot < @exposeBot) and (@exposed > @exposeNum) or (@exposeBot > @numLines-1)
-            log "scroll.vanish emit vanishLine #{@exposeBot}" if @dbg
             @emit 'vanishLine', @exposeBot
             @exposeBot -= 1
             @exposed = @exposeBot - @exposeTop
@@ -199,7 +184,6 @@ class scroll extends events
             old = @exposeTop
             @exposeTop = @top
             @exposed = @exposeBot - @exposeTop
-            log "scroll.expose emit exposeTop #{old} -> #{@exposeTop} (num #{-(@top-old)})" if @dbg
             @emit 'exposeTop',
                 old: old
                 new: @exposeTop
@@ -212,7 +196,6 @@ class scroll extends events
     # 000  000   000  0000000   00000000  000   000     000   
     
     insertLine: (li,oi) =>
-        # log "scroll.insertLine #{li}", @info()
         @numLines += 1
         @fullHeight = @numLines * @lineHeight
         @exposeTop += 1 if oi < @exposeTop
@@ -220,7 +203,6 @@ class scroll extends events
         @top += 1 if oi < @top
         @bot += 1 if oi <= @bot
         @exposed = @exposeBot - @exposeTop
-        # log "scroll.insertLine #{li}", @info()
         @calc()
         
     # 0000000    00000000  000      00000000  000000000  00000000
@@ -230,7 +212,6 @@ class scroll extends events
     # 0000000    00000000  0000000  00000000     000     00000000
 
     deleteLine: (li,oi) =>
-        # log "scroll.deleteLine #{li}", @info()
         @numLines -= 1
         @fullHeight = @numLines * @lineHeight
         @exposeTop -= 1 if oi < @exposeTop
@@ -238,7 +219,6 @@ class scroll extends events
         @top -= 1 if oi < @top
         @bot -= 1 if oi <= @bot
         @exposed = @exposeBot - @exposeTop
-        # log "scroll.deleteLine #{li}", @info()
         @calc()
     
     # 000   000  000  00000000  000   000  000   000  00000000  000   0000000   000   000  000000000
@@ -250,7 +230,6 @@ class scroll extends events
     setViewHeight: (h) =>
                     
         if @viewHeight != h
-            log "scroll.setViewHeight #{@viewHeight} -> #{h}" if @dbg
             @viewHeight = h
             @calc()
             @by 0     
@@ -264,7 +243,6 @@ class scroll extends events
     setNumLines: (n) =>
         
         if @numLines != n
-            log "scroll.setNumLines #{@numLines} -> #{n}" if @dbg
             @numLines = n
             @fullHeight = @numLines * @lineHeight
             @calc()
@@ -279,7 +257,6 @@ class scroll extends events
     setLineHeight: (h) =>
             
         if @lineHeight != h
-            log "scroll.setLineHeight #{@lineHeight} -> #{h}" if @dbg
             @lineHeight = h
             @fullHeight = @numLines * @lineHeight
             @calc()

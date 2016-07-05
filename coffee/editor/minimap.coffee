@@ -39,7 +39,6 @@ class Minimap
         @canvasTop.width  = @width
         @elem.appendChild @canvasTop
         
-        # @editor.layers.style.right = "#{@width/2}px"
         @editor.view.appendChild @elem
         @editor.on 'viewHeight',    @onEditorViewHeight
         @editor.on 'numLines',      @onEditorNumLines

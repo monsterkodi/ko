@@ -120,7 +120,7 @@ class Open extends Command
                 if file.endsWith ' >'
                     file = file.slice 0, file.length-2
                     div.classList.add 'directory'
-                div.innerHTML = render.line file, syntax.dissForTextAndSyntax file, 'ko', join: true
+                div.innerHTML = render.line file, syntax.dissForTextAndSyntax(file, 'ko', join: true), charWidth:0
                 div.setAttribute "onmousedown", "window.openFileAtIndex(#{index});"
                 div.value = file
                 @list.appendChild div
@@ -173,6 +173,7 @@ class Open extends Command
             @select clamp 0, @list.children.length, @selected+1
             @list.children[@selected]?.value ? @history[@index]
         else
+            @select(-1)
             super
         
     #  0000000  00000000  000      00000000   0000000  000000000
@@ -284,10 +285,9 @@ class Open extends Command
                     when '.md', '.styl', '.pug' then 50
                     when '.noon' then 25
                     when '.js', '.json', '.html' then -1000000
-                    else 
-                        0 
+                    else 0 
             else
-                bonus = 0
+                bonus = 0                
                 
             penalty = path.dirname(f).length            
                             
@@ -306,8 +306,7 @@ class Open extends Command
                     when '.md', '.styl', '.pug' then 50
                     when '.noon' then 25
                     when '.js', '.json', '.html' then -10
-                    else 
-                        0
+                    else 0
             else
                 bonus = 0
 

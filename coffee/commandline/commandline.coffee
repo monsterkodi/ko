@@ -19,7 +19,7 @@ class Commandline extends ViewBase
 
         super viewElem, features: []
         
-        @size.lineHeight = @scroll.viewHeight
+        @size.lineHeight = 30
         @scroll?.setLineHeight @size.lineHeight
         @setText ""
                 
@@ -34,14 +34,16 @@ class Commandline extends ViewBase
         
         @view.onblur = () => @command?.onBlur()
 
-    setName: (name) -> @cmmd.innerHTML = name
+    setName: (name) -> 
+        @cmmd.innerHTML = name
+        @layers.style.width = @view.style.width
                 
     setLines: (l) ->
         @scroll.reset()
         super l
     
     setAndSelectText: (t) ->
-        @setLines [t]
+        @setLines [t ? '']
         @selectAll()
 
     changed: (changeInfo, action) ->

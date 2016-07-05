@@ -5,8 +5,8 @@
 # 000   000  00000000  000   000  0000000    00000000  000   000
 
 encode = require '../tools/encode'
-enspce = require '../tools/enspce'
 log    = require '../tools/log'
+str    = require '../tools/str'
 
 class render 
                 
@@ -16,19 +16,16 @@ class render
     # 000      000  000  0000  000     
     # 0000000  000  000   000  00000000
     
-    @line: (line, diss) =>
+    @line: (line, diss, size) =>
+        l = ""
         if diss?.length
             for di in [diss.length-1..0]
                 d = diss[di]
-                enc = encode d.match
-                styl = clss = ""
-                styl = " style=\"#{d.styl}\"" if d.styl?
-                clss = " class=\"#{d.clss}\"" if d.clss?
-                if not (styl+clss).length then console.log 'warning! render.line no clss and no color in diss?', JSON.stringify diss
-                clrzd = "<span#{clss}#{styl}>#{enc}</span>"
-                line = line.slice(0, d.start) + clrzd + line.slice(d.start+(d.match?.length ? 0))
-        # console.log "line: #{enspce line}"
-        enspce line
+                tx = Math.floor d.start * size.charWidth
+                clss = d.clss? and " class=\"#{d.clss}\"" or ''
+                clrzd = "<span style=\"transform:translatex(#{tx}px);#{d.styl ? ''}\"#{clss}>#{encode d.match}</span>"
+                l = clrzd + l
+        l
         
     #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
     # 000       000   000  000   000  000       000   000  000   000  000     

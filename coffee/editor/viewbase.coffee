@@ -279,22 +279,18 @@ class ViewBase extends Editor
     # 00000000  000   000  000         0000000   0000000   00000000
 
     exposeLine: (li) =>
-        html = @renderLineAtIndex li
-        lineDiv = @addLine()
-        lineDiv.innerHTML = html
-        @elem.appendChild lineDiv
-        
-        if li != @elem.children.length-1+@scroll.exposeTop 
-            console.log "viewbase.exposeLine wtf? #{li} != #{@elem.children.length-1+@scroll.exposeTop }"
+        div = @addLine()
+        div.innerHTML = @renderLineAtIndex li
+        @elem.appendChild div
         
         @emit 'lineExposed', 
             lineIndex: li
-            lineDiv: lineDiv
+            lineDiv: div
 
         @renderCursors() if @cursorsInLineAtIndex(li).length
         @renderSelection() if @rangesForLineIndexInRanges(li, @selections).length
         @renderHighlights() if @rangesForLineIndexInRanges(li, @highlights).length
-        lineDiv
+        div
         
     # 000   000   0000000   000   000  000   0000000  000   000
     # 000   000  000   000  0000  000  000  000       000   000
@@ -367,7 +363,7 @@ class ViewBase extends Editor
     # 000   000  000       000  0000  000   000  000       000   000
     # 000   000  00000000  000   000  0000000    00000000  000   000
             
-    renderLineAtIndex: (li) -> render.line @lines[li], @syntax.getDiss li
+    renderLineAtIndex: (li) -> render.line @lines[li], @syntax.getDiss(li), @size
                                                     
     renderCursors: ->
         cs = []
@@ -415,13 +411,11 @@ class ViewBase extends Editor
     # 000   000  00000000  0000000   000  0000000  00000000  0000000  
     
     resized: -> 
-        # @view.style.width = "#{sw()-12}px"
         @scroll?.setViewHeight @viewHeight()
         @numbers?.elem.style.height = "#{@viewHeight}px"
         @layers.style.width = "#{sw()-@view.getBoundingClientRect().left-130-6}px"
         @layers.style.height = "#{@viewHeight()}px"
         @updateScrollOffset()
-        # log "viewbase.resized emit viewHeight #{@viewHeight()}"
         @emit 'viewHeight', @viewHeight()
     
     deltaToEnsureCursorsAreVisible: ->
@@ -508,7 +502,7 @@ class ViewBase extends Editor
         ci = p[1]-@scroll.exposeTop
         @layerDict['lines'].children[ci]
         
-    lineSpanAtXY:(x,y) -> # not used ?
+    lineSpanAtXY:(x,y) ->
         lineElem = @lineElemAtXY x,y        
         if lineElem?
             lr = lineElem.getBoundingClientRect()

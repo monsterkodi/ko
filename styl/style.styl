@@ -72,16 +72,14 @@ pre
 //  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 
 .commandline
-    display             table
     padding             0
     margin              0
-    height              commandlineHeight
-    position            relative
+    display             flex
+    white-space         nowrap 
 
 .commandline-command
     font-family         "Andale Mono", monospace
     font-size           24px
-    display             table-cell
     padding-top         0px
     padding-left        9px
     padding-right       9px
@@ -91,8 +89,8 @@ pre
         
 .commandline-span
     position            relative
-    display             table-cell
-    width               99%
+    flex-grow           1
+    white-space         nowrap 
             
 .commandline-editor
     color               #fff
@@ -453,7 +451,8 @@ body
     display         block
     position        absolute
     & span
-        display     inline-block
+        //display     inline-block
+        position    absolute
 
 //  0000000  000   000  00000000    0000000   0000000   00000000 
 // 000       000   000  000   000  000       000   000  000   000

@@ -16,6 +16,8 @@ class Autocomplete
         
         @wordlist = []
         @wordinfo = {}
+        @clones = []
+        @cloned = []
         
         @close()
         
@@ -25,7 +27,6 @@ class Autocomplete
         @notSpecialRegExp  = new RegExp "[^#{@especial}]"
         @specialWordRegExp = new RegExp "(\\s+|[\\w#{@especial}]+|[^\\s])", 'g'
         @splitRegExp       = new RegExp "[^\\w\\d#{@especial}]+", 'g'        
-        
     
         @editor.on 'edit',           @onEdit
         @editor.on 'linesSet',       @onLinesSet
@@ -76,12 +77,11 @@ class Autocomplete
     #  0000000   000        00000000  000   000
     
     open: (info) ->
-        # log "autocomplete.open word: #{@word} @firstMatch: #{@firstMatch} info:", info
         cursor = $('.main', @editor.view)
         if not cursor?
             log "warning! no cursor?"
             return
-        
+
         @span = document.createElement 'span'
         @span.className = 'autocomplete-span'
         @span.textContent = @completion
@@ -89,35 +89,35 @@ class Autocomplete
         @span.style.background = "#44a"
         @span.style.color      = "#fff"
 
-        # [splitsBefore, cursorWord, splitsAfter] = @cursorWords()
-        # log "splits #{splitsBefore.join '|'} --- #{cursorWord} --- #{splitsAfter.join '|'}"
-
         cr = cursor.getBoundingClientRect()
-        spanInfo = @editor.lineSpanAtXY cr.left, cr.top  
+        spanInfo = @editor.lineSpanAtXY cr.left, cr.top
         if spanInfo?
             sp = spanInfo.span
-            # log "spanInfo", spanInfo
-            inner        = sp.innerHTML                
-            @cloneBefore = sp.cloneNode true
-            @cloneAfter  = sp.cloneNode true
-            @cloneSrc    = sp
+            inner = sp.innerHTML
+            @clones.push sp.cloneNode true
+            @clones.push sp.cloneNode true
+            @cloned.push sp
             
             ws = @word.slice @word.search /\w/
             wi = ws.length
             
-            # innerRanges = @editor.rangesWithLineIndexInTextForRegExp info.cursor[1], inner, @specialWordRegExp
-            # innerSplit = (inner.slice(r[1][0], r[1][1]) for r in innerRanges)
-            # if innerSplit.length
-                # log "innerSplit #{innerSplit.join '|'}"
+            @clones[0].innerHTML = inner.slice 0, spanInfo.offsetChar + 1 
+            @clones[1].innerHTML = inner.slice    spanInfo.offsetChar + 1
+                        
+            sibling = sp
+            while sibling = sibling.nextSibling
+                @clones.push sibling.cloneNode true
+                @cloned.push sibling
+                
+            sp.parentElement.appendChild @span
             
-            # log "spanInfo.offsetChar #{spanInfo.offsetChar} wi #{wi}"
-            
-            @cloneBefore.innerHTML = inner.slice 0, spanInfo.offsetChar + 1 #wi
-            @cloneAfter .innerHTML = inner.slice    spanInfo.offsetChar + 1 #wi
-            sp.insertAdjacentElement 'afterend',    @cloneAfter
-            sp.insertAdjacentElement 'beforebegin', @cloneBefore
-            sp.insertAdjacentElement 'beforebegin', @span
-            sp.style.display = 'none'
+            for c in @cloned
+                c.style.display = 'none'
+
+            for c in @clones
+                @span.insertAdjacentElement 'afterend', c
+                
+            @moveClonesBy @completion.length
         else
             log "warning! no sp? #{cr.left} #{cr.top}"
         
@@ -131,8 +131,6 @@ class Autocomplete
                 @list.appendChild item
             cursor.appendChild @list
             
-        # log "autocomplete.match #{@completion}"
-
     selectedCompletion: ->
         if @selected >= 0
             @matchList[@selected].slice @word.length
@@ -153,12 +151,31 @@ class Autocomplete
             @list.children[@selected]?.classList.add 'selected'
             @list.children[@selected]?.scrollIntoViewIfNeeded()
         @span.innerHTML = @selectedCompletion()
+        @moveClonesBy @span.innerHTML.length
         @span.classList.remove 'selected' if @selected < 0
         @span.classList.add    'selected' if @selected >= 0
         @navigating = true
         
     prev: -> @navigate -1    
     next: -> @navigate 1
+
+    # 00     00   0000000   000   000  00000000   0000000  000       0000000   000   000  00000000   0000000
+    # 000   000  000   000  000   000  000       000       000      000   000  0000  000  000       000     
+    # 000000000  000   000   000 000   0000000   000       000      000   000  000 0 000  0000000   0000000 
+    # 000 0 000  000   000     000     000       000       000      000   000  000  0000  000            000
+    # 000   000   0000000       0      00000000   0000000  0000000   0000000   000   000  00000000  0000000 
+
+    moveClonesBy: (numChars) ->
+        beforeLength = @clones[0].innerHTML.length
+        for ci in [1...@clones.length]
+            c = @clones[ci]
+            offset = parseInt @cloned[ci-1].style.transform.split('translateX(')[1]
+            charOffset = numChars
+            charOffset += beforeLength if ci == 1
+            c.style.transform = "translatex(#{offset+@editor.size.charWidth*charOffset}px)"
+        spanOffset = parseInt @cloned[0].style.transform.split('translateX(')[1]
+        spanOffset += @editor.size.charWidth*beforeLength
+        @span.style.transform = "translatex(#{spanOffset}px)"
         
     # 00000000    0000000   00000000    0000000  00000000
     # 000   000  000   000  000   000  000       000     
@@ -172,9 +189,9 @@ class Autocomplete
         for l in lines
             if not l?.split?
                 log "warning! no split?", lines
-                alert 'wtf?'            
+                alert 'wtf??'            
             words = l.split @splitRegExp
-            words = words.filter (w) => 
+            @words = words.filter (w) => 
                 return false if w.length < 2
                 return false if w[0] in ['-', "#", '_'] and w.length < 3
                 return false if @word == w.slice 0, w.length-1
@@ -232,10 +249,13 @@ class Autocomplete
         @completion = null
         @firstMatch = null
         
-        @cloneBefore?.remove()
-        @cloneAfter?.remove()
-        @cloneSrc?.style.display = 'initial'
+        for c in @clones
+            c.remove()
+        for c in @cloned
+            c.style.display = 'initial'
         
+        @clones = []
+        @cloned = []
         @matchList  = []
 
     #  0000000   000   000
@@ -248,7 +268,7 @@ class Autocomplete
     onLineInserted:   (li)       => @parseLines [@editor.lines[li]], action: 'insert'
     onLineChanged:    (li)       => @parseLines [@editor.lines[li]], action: 'change', count: 0
     onWillDeleteLine: (li, line) => @parseLines [line], action: 'delete', count: -1
-    onLinesSet:      (lines)  => 
+    onLinesSet:       (lines)    => 
         if lines.length
             @parseLines lines, action: 'set' 
         else @wordinfo = {}
