@@ -129,8 +129,9 @@ loadFile = (file, reload) =>
         editor.setCurrentFile null # to stop watcher and reset scroll
         editor.setCurrentFile file
         setState 'file', file
-    editor.singleCursorAtPos [0, parseInt(line)-1] if line?
-    editor.scrollCursorToTop()        
+    if line?
+        editor.singleCursorAtPos [0, parseInt(line)-1] 
+        editor.scrollCursorToTop()        
 
 openFiles = (ofiles, options) =>
     # log 'openFiles:', ofiles    

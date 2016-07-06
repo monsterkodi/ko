@@ -237,8 +237,8 @@ class ViewBase extends Editor
             @renderCursors()
             if delta = @deltaToEnsureCursorsAreVisible()
                 @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth 
-            $('.main', @layers)?.scrollIntoViewIfNeeded()
             @updateScrollOffset()
+            @updateCursorOffset()
             @emit 'cursor'
             
         if changeInfo.selection.length
@@ -450,7 +450,7 @@ class ViewBase extends Editor
                         
     scrollLines: (delta) -> @scrollBy delta * @size.lineHeight
 
-    scrollBy: (delta, x) -> 
+    scrollBy: (delta, x=0) -> 
         @scroll.by delta
         @layers.scrollLeft += x/2
         @updateScrollOffset()
@@ -461,19 +461,28 @@ class ViewBase extends Editor
 
     scrollCursorToTop: (topDist=7) ->
         cp = @cursorPos()
-        # log "viewbase.scrollCursorToTop #{cp[1]} #{cp[1] - @scroll.top}"
         if cp[1] - @scroll.top > topDist
             rg = [@scroll.top, Math.max 0, cp[1]-1]
             sl = @selectionsInLineIndexRange rg
             hl = @highlightsInLineIndexRange rg
             if sl.length == 0 == hl.length
                 delta = @scroll.lineHeight * (cp[1] - @scroll.top - topDist)
-                # log "viewbase.scrollCursorToTop #{delta}"
                 @scrollBy delta
                 @numbers?.updateColors()
 
     updateScrollOffset: ->
         @layers.scrollTop = @scroll.offsetTop
+        @updateNumbersOffset()
+    
+    updateCursorOffset: ->
+        cx = @mainCursor[0]*@size.charWidth+@size.offsetX
+        if cx-@layers.scrollLeft > @layersWidth()
+            @layers.scrollLeft = Math.max 0, cx - @layersWidth() + @size.charWidth
+        else if cx-@size.offsetX-@layers.scrollLeft < 0          
+            @layers.scrollLeft = Math.max 0, cx - @size.offsetX
+        @updateNumbersOffset()
+
+    updateNumbersOffset: ->
         @numbers?.elem.style.left = "#{@layers.scrollLeft}px"
         @numbers?.elem.style.background = @layers.scrollLeft and '#000' or "rgba(0,0,0,0.5)"
 
@@ -526,6 +535,7 @@ class ViewBase extends Editor
     
     viewHeight:      -> @view?.getBoundingClientRect().height 
     viewWidth:       -> @view?.getBoundingClientRect().width 
+    layersWidth:     -> @layers?.getBoundingClientRect().width 
     numViewLines:    -> Math.ceil(@viewHeight() / @size.lineHeight)
     numFullLines:    -> Math.floor(@viewHeight() / @size.lineHeight)
     

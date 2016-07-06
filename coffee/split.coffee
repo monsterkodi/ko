@@ -107,11 +107,9 @@ class Split extends event
         @handles[0].style.height = "#{clamp 0, @handleHeight, @handleHeight+s[0]}px"
             
         if not @logVisible
-            log "sets[2] to elemHeight"
             s[2] = @elemHeight()
             
         @splitPos = _.clone s
-        # log "split.applySplit #{@splitPos.join ','}"
         
         for h in [0...@panes.length]
             newHeight = Math.max 0, switch
@@ -124,9 +122,8 @@ class Split extends event
                 if newHeight > 0
                     @setState 'logHeight', newHeight
                 else
-                    log "new log height #{newHeight} <= 0", s
                     @setLogVisible false if @logVisible
-            
+        @elem.scrollTop = 0
         @setState 'split', s
         @emit     'split', s
         
@@ -247,8 +244,9 @@ class Split extends event
             else if @logviewHeight() > 0 and not v
                 @splitAt 2, @elemHeight()
             display = v and 'inherit' or 'none'
-            @logview.style.display = display
-            @logHandle.style.display = display
+            @logview.style.display   = display
+            @logHandle.style.display = display            
+            window.logview.resized()
             
     clearLog: -> window.logview.setText ""
     showOrClearLog: -> 

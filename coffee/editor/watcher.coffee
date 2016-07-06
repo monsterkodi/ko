@@ -11,10 +11,9 @@ chokidar = require 'chokidar'
 class watcher
 
     constructor: (@editor) ->
-        # log 'watcher', @editor?, @editor?.currentFile
         @w = chokidar.watch @editor.currentFile, 
             ignoreInitial: true
-        @w.on 'change', (p) => #@editor.setText fs.readFileSync p, encoding: 'UTF8'
+        @w.on 'change', (p) => 
             window.loadFile @editor.currentFile, true
         @w.on 'unlink', (p) => @editor.setText ""
         

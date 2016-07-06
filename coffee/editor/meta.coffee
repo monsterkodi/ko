@@ -11,6 +11,7 @@ $}  = require '../tools/tools'
 log = require '../tools/log'
 str = require '../tools/str'
 _   = require 'lodash'
+fs  = require 'fs'
 
 class Meta 
     
@@ -57,26 +58,47 @@ class Meta
                         button = @saveButton li
                         if not meta[2].span.innerHTML.startsWith "<span"
                             meta[2].span.innerHTML = button
-                        log "span.innerHTML #{meta[2].span.innerHTML}"
                     else 
                         log "no span?"
          
-    saveMeta: (meta) ->
-        [file, line] = meta[2].href.split(':')
-        log "save line #{line} in file #{file}"
+    #  0000000   0000000   000   000  00000000
+    # 000       000   000  000   000  000     
+    # 0000000   000000000   000 000   0000000 
+    #      000  000   000     000     000     
+    # 0000000   000   000      0      00000000
+         
+    saveFileLineMetas: (file, lineMetas) ->
+        fs.readFile file, encoding: 'UTF8', (err, data) =>
+            return if err
+            lines = data.split /\r?\n/
+            for l in lineMetas
+                lines[l[0]] = l[1]
+            data = lines.join '\n'
+            fs.writeFile file, data, encoding: 'UTF8', (err) =>
+                return if err
+                for l in lineMetas
+                    meta = l[2]
+                    delete meta[2].state
+                    meta[2].span.innerHTML = meta[2].href.split(':')[1]
                     
     saveLine: (li) -> 
         for meta in @metasAtLineIndex li
             if meta[2].state == 'unsaved'
-                @saveMeta meta
+                [file, line] = meta[2].href.split(':')
+                @saveFileLineMetas file, [[line-1, @editor.lines[meta[0]], meta]]
 
     saveChanges: ->
-        saved = false
+        fileLineMetas = {}
         for meta in @metas
             if meta[2].state == 'unsaved'
-                @saveMeta meta
-                saved = true
-        saved
+                [file, line] = meta[2].href.split(':')
+                fileLineMetas[file] = [] if not fileLineMetas[file]?
+                fileLineMetas[file].push [meta[0], @editor.lines[meta[0]], meta]
+
+        for file, lineMetas of fileLineMetas
+            @saveFileLineMetas file, lineMetas
+        
+        fileLineMetas.length
         
     saveButton: (li) ->
         "<span class=\"saveButton\" onclick=\"window.terminal.meta.saveLine(#{li});\">&#128190;</span>"

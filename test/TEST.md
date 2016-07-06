@@ -1,8 +1,23 @@
-nadjo ist mein hugga wasn'jetzt los?.
-my hugga wasn'jetzt los? is nadja.
-na, was ist dein hugga wasn'jetzt los??
-mein hugga wasn'jetzt los? ist hase.
-und ich heisse nadja. nadjo ist mein bruder.
-brother's hugga wasn'jetzt los? is norbert. norbert is nadja's bruder.
-norbert is nadjas bro!
-hast du hunger?
+
+bl|ub
+bl23
+b-!o#123
+b!o#XXX
+
+b!|+++===#oi
+b!|+++===#00a
+b!+++===#234
+
+b!|+++===#234
+b!o#1
+b!o#2
+
+b!|+++===#A
+b-|!o#2
+bl|uboi
+b00a
+blub1asd asdZXC
+blub23as sdfZXC
+bl45
+blub5asd asfZXC
+bl|ub2
