@@ -1,6 +1,7 @@
 # todo/ideas
 
 ### file state
+- *save before open new file*
 - save backup files?
 - don't clear undo buffer on save?
 
@@ -19,7 +20,6 @@
 - list buffers when clicking buffer number in titlebar
 
 #### editor
-- *save before open new file*
 - *alt-click: jump to definition*
 - *store unsaved changes in prefs*
 - set cursor column when opening with second :n
@@ -58,6 +58,7 @@
 #### terminal
 - *alias*
 - *ansihtml*
+- fix minimap update when deleting lines
 - fix escape
 - limit history length
 - add special column (on top of numbers) for input marker and search result lines

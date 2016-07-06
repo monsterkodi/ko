@@ -63,7 +63,6 @@ null|undefined                 keyword.null
 (\w+)\s*[=]\s*[-=]>                 . function
 (\w+)\s*[:]\s*\([^\)]*\)\s*[-=]>    . method
 (\w+)\s*[:]\s*[-=]>                 . method
-# (\()([^\(\)]*)(\)\s*)[-=]>          . function.bracket . function.variable.argument . function.bracket
 (\()[^\(\)]*(\)\s*)[-=]>            . function.bracket . function.bracket
 
 (\w+)(?=\(|\s+[@\w\d\"\'\(\[\{])      function.call

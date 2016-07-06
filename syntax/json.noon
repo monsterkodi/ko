@@ -14,7 +14,13 @@
 
 # number
 
-\s[+-]?\d+\.?\d*\b              number.value
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
+    syntax.value.number.float.sign
+    value.number.float
+
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
+    syntax.value.number.int.sign
+    value.number.int
 
 # bool
 
