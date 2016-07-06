@@ -168,7 +168,7 @@ class MainMenu
                 click:       (i,win) -> main.reloadWin win
             ,                
                 label:       'Toggle FullScreen'
-                accelerator: 'Ctrl+Command+F'
+                accelerator: 'Ctrl+Command+Alt+F'
                 click:       (i,win) -> win?.setFullScreen !win.isFullScreen()
             ]
         ,        

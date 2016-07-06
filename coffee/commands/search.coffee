@@ -17,9 +17,8 @@ fs      = require 'fs'
 class Search extends Command
 
     constructor: (@commandline) ->
-        @shortcuts = ["command+shift+f", "ctrl+shift+f", "alt+shift+f"]
-        @caseSensitive = false
-        @regexpSearch = false
+        @shortcuts = ["command+shift+f", "ctrl+shift+f", "alt+shift+f", "alt+ctrl+shift+f"]
+        @names     = ["search", "Search", "/search/", "/Search/"]
         super
         
     #  0000000  000000000   0000000   00000000   000000000
@@ -28,12 +27,9 @@ class Search extends Command
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
         
-    start: (combo) ->
-        @caseSensitive = combo == @shortcuts[1]
-        @regexpSearch = combo == @shortcuts[2]
-        @setName "Search" if @caseSensitive
-        @setName "/search/" if @regexpSearch
-        super combo
+    start: (@combo) ->
+        @setName @names[@shortcuts.indexOf @combo]
+        super @combo
     
     clear: ->
         window.terminal.clear()
@@ -50,9 +46,8 @@ class Search extends Command
         super command
         @startSearchInFiles 
             text: command
-            regx: @regexpSearch and command or _.escapeRegExp command
+            name: @name
             file: window.editor.currentFile
-            case: @caseSensitive # doesnt work yet
         focus: '.terminal'
         reveal: 'terminal'
       
@@ -89,7 +84,12 @@ class FileSearcher extends stream.Writable
     
     constructor: (@opt, @file) ->
         @line = 0
-        @patterns = matchr.config "#{@opt.regx}": "found"
+        [txt, ropt] = switch @opt.name
+            when 'search'   then [_.escapeRegExp(@opt.text), 'i']
+            when 'Search'   then [_.escapeRegExp(@opt.text), '']
+            when '/search/' then [@opt.text, 'i']
+            when '/Search/' then [@opt.text, '']
+        @patterns = [[new RegExp(txt, ropt), 'found']]
         @found = []
         super
     
@@ -111,7 +111,8 @@ class FileSearcher extends stream.Writable
             terminal.appendMeta meta
             terminal.appendMeta clss: 'spacer'
             
-            for f in @found
+            for fi in [0...@found.length]
+                f = @found[fi]
                 rgs = f[2].concat syntax.rangesForTextAndSyntax f[1], syntax.nameForFile @file
                 matchr.sortRanges rgs
                 dss = matchr.dissect rgs, join:true
@@ -119,6 +120,8 @@ class FileSearcher extends stream.Writable
                     diss: dss
                     href: "#{@file}:#{f[0]}"
                     clss: 'searchResult'
+                if fi and @found[fi-1][0] != f[0]-1
+                    terminal.appendMeta clss: 'spacer'
                 terminal.appendMeta meta
                 
             terminal.appendMeta clss: 'spacer'

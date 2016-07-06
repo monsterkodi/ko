@@ -5,8 +5,6 @@
 - don't clear undo buffer on save?
 
 #### search
-- *mark unsaved changes in numbers*
-- *save changes*
 - output search end?
 - fix broken syntax highlighting when editing
 
@@ -21,6 +19,7 @@
 - list buffers when clicking buffer number in titlebar
 
 #### editor
+- *save before open new file*
 - *alt-click: jump to definition*
 - *store unsaved changes in prefs*
 - set cursor column when opening with second :n

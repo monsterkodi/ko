@@ -13,7 +13,7 @@ _ = require 'lodash'
 # 000       000   000  000 0 000  000000    000  000  0000
 # 000       000   000  000  0000  000       000  000   000
 #  0000000   0000000   000   000  000       000   0000000 
-#
+
 # convert the patterns object to a list of [RegExp(key), value] pairs
 
 config = (patterns) -> ( [new RegExp(p), a] for p,a of patterns )
@@ -33,17 +33,17 @@ sortRanges = (rgs) ->
 # 0000000    000000000  000 0 000  000  0000  0000000   0000000 
 # 000   000  000   000  000  0000  000   000  000            000
 # 000   000  000   000  000   000   0000000   00000000  0000000 
-#
+
 # accepts a list of [regexp, value(s)] pairs and a string
 # returns a list of objects with information about the matches:
-# 
+  
 #     match: the matched substring
 #     start: position of match in str
 #     value: the value for the match
 #     index: the index of the regexp 
-#     
+      
 #     the objects are sorted by start, match.length and index
-#     
+      
 #     if the regexp has capture groups then 
 #         the value for the match of the nth group is
 #             the nth item of values(s) if value(s) is an array
@@ -92,15 +92,15 @@ ranges = (regexes, str) ->
 # 000   000  000  0000000   0000000   0000000   000          000   
 # 000   000  000       000       000  000       000          000   
 # 0000000    000  0000000   0000000   00000000   0000000     000   
-# 
+ 
 # accepts a list of ranges
 # returns a list of objects:
-# 
+ 
 #     match: the matched substring
 #     start: position of match in str
 #     cls:   list of classnames
 #     clss:  string of classnames joined with a space
-#     
+     
 #     with none of the [start, start+match.length] ranges overlapping
 
 dissect = (ranges, opt={join:false}) -> 

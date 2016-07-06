@@ -10,9 +10,9 @@ Command = require '../commandline/command'
 class Find extends Command
 
     constructor: (@commandline) ->
-        @shortcuts = ["command+f", "ctrl+f", "alt+f", "ctrl+alt+f", "command+alt+f", "ctrl+command+f"]
+        @shortcuts = ["command+f", "ctrl+f", "alt+f", "alt+ctrl+f", "command+alt+f", "command+ctrl+f"]
         @types     = ['str',  'Str',   'reg',    'Reg',    'fuzzy', 'glob']
-        @names     = ['find', 'FinD',  '/find/', '/FinD/', 'fiZd',  'f*nd']
+        @names     = ['find', 'Find',  '/find/', '/Find/', 'fiZd',  'f*nd']
         super
         
     #  0000000  000000000   0000000   00000000   000000000

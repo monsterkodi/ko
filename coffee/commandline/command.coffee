@@ -28,7 +28,6 @@ class Command
     changed: (command) ->
         
     cancel: ->
-        # @setText ''
         text: ''
         focus: @focus   
         
@@ -48,7 +47,8 @@ class Command
         @setCurrent command
         @setText    command
         
-    setCurrent: (command) -> 
+    setCurrent: (command) ->
+        @loadState() if not @history?
         _.pull @history, command
         @history.push command
         @index = @history.length-1

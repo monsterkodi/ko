@@ -129,6 +129,10 @@ loadFile = (file, reload) =>
         editor.setCurrentFile null # to stop watcher and reset scroll
         editor.setCurrentFile file
         setState 'file', file
+        if not commandline.command?
+            commandline.command = commandline.commands['open']
+            commandline.command.loadState()
+            commandline.setText path.basename file
     if line?
         editor.singleCursorAtPos [0, parseInt(line)-1] 
         editor.scrollCursorToTop()        
@@ -346,7 +350,7 @@ window.onblur = (event) -> window.editor.updateTitlebar()
 
 document.onkeydown = (event) ->
     {mod, key, combo} = keyinfo.forEvent event
-    
+
     return if not combo
     
     if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event

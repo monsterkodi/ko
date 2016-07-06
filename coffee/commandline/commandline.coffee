@@ -119,7 +119,8 @@ class Commandline extends ViewBase
 
     handleModKeyComboEvent: (mod, key, combo, event) ->
         
-        return if @command?.handleModKeyComboEvent(mod, key, combo, event) != 'unhandled'
+        if @command?
+            return if @command.handleModKeyComboEvent(mod, key, combo, event) != 'unhandled'
         
         split = window.split
         switch combo

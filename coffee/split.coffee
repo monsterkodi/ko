@@ -38,7 +38,7 @@ class Split extends event
         @editor      = $('.editor')
         @logview     = $('.logview')
 
-        @splitPos    = [0,0,@elemHeight()]
+        @splitPos    = [-@handleHeight,0,@elemHeight()]
 
         @handles     = [@topHandle, @editHandle, @logHandle]
         @panes       = [@terminal, @commandline, @editor, @logview]
@@ -67,7 +67,7 @@ class Split extends event
                     @splitAt 2, drag.pos.y - @elemTop() - @handleHeight/2
 
     setWinID: (@winID) ->
-        s = @getState 'split', [0,0,@elemHeight()]        
+        s = @getState 'split', [-@handleHeight,0,@elemHeight()]        
         @logVisible = s[2] < @elemHeight()
         display = @logVisible and 'inherit' or 'none'
         @logview.style.display = display
@@ -209,6 +209,8 @@ class Split extends event
     # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 
     # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
     #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
+    
+    isCommandlineVisible: -> @splitPosY(1) > @commandlineHeight 
     
     hideCommandline: -> 
         @splitAt 1, 0

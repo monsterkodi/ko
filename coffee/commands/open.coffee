@@ -40,6 +40,7 @@ class Open extends Command
     constructor: (@commandline) ->
         
         @shortcuts  = ['command+p', 'command+shift+p']
+        @names      = ["open", "new window"]
         @files      = null
         @file       = null
         @dir        = null
@@ -57,7 +58,9 @@ class Open extends Command
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
 
     changed: (command) ->
-        return if not @list? 
+        if not @list? 
+            @start @shortcuts[0]
+            # return
         command  = command.trim()
         return if command in ['.', '..', '/', '~']
         if command.length
@@ -211,9 +214,7 @@ class Open extends Command
             opt.dir = @dir ? path.dirname last prefs.get 'recentFiles', ['~']
         
         @loadDir opt
-            
-        if @combo == @shortcuts[1]
-            @setName "new window"
+        @setName @names[@shortcuts.indexOf @combo]
                 
     # 000       0000000    0000000   0000000          0000000    000  00000000 
     # 000      000   000  000   000  000   000        000   000  000  000   000
