@@ -26,7 +26,7 @@ class Split extends event
 
         @commandlineHeight = 30
         @handleHeight      = 6
-        @logVisible        = true
+        @logVisible        = undefined
         
         @elem        = $('.split')
         @titlebar    = $('.titlebar')
@@ -68,7 +68,10 @@ class Split extends event
 
     setWinID: (@winID) ->
         s = @getState 'split', [0,0,@elemHeight()]        
-        @setLogVisible @getState 'logVisible', false
+        @logVisible = s[2] < @elemHeight()
+        display = @logVisible and 'inherit' or 'none'
+        @logview.style.display = display
+        @logHandle.style.display = display        
         @applySplit s
 
     #  0000000  00000000   000      000  000000000
@@ -104,6 +107,7 @@ class Split extends event
         @handles[0].style.height = "#{clamp 0, @handleHeight, @handleHeight+s[0]}px"
             
         if not @logVisible
+            log "sets[2] to elemHeight"
             s[2] = @elemHeight()
             
         @splitPos = _.clone s
@@ -117,9 +121,11 @@ class Split extends event
                     
             @panes[h].style.height = "#{newHeight}px"
             if h == 3
-                @setLogVisible newHeight > 0
                 if newHeight > 0
                     @setState 'logHeight', newHeight
+                else
+                    log "new log height #{newHeight} <= 0", s
+                    @setLogVisible false if @logVisible
             
         @setState 'split', s
         @emit     'split', s
@@ -236,7 +242,6 @@ class Split extends event
     setLogVisible: (v) ->
         if @logVisible != v
             @logVisible = v
-            @setState 'logVisible', v
             if v and @logviewHeight() <= 0
                 @splitAt 2, @elemHeight() - Math.max(100, @getState('logHeight', 200))-@handleHeight
             else if @logviewHeight() > 0 and not v

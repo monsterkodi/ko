@@ -4,11 +4,13 @@
 #  000   000       000  000   000  000  0000
 #   0000000   0000000    0000000   000   000
 
-\S+                            text
+\S+                             text
+
+"([^"]+)"                       string
 
 # keys
 
-("[^"]*")\s*:                   property
+("[^"]*")\s*:                   class
 
 # number
 
@@ -21,11 +23,9 @@
 
 # url
 
-"(\S+://)(\S+)"   
+"(\S+://)(\S+)"
                                 string.marker.double
                                 string.value.double
-
-"([\^\w]*[\/\.]\S+)"            keypath
 
 # dim
 

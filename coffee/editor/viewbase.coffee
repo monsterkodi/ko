@@ -120,7 +120,7 @@ class ViewBase extends Editor
                 switch lastWord
                     when 'python'      then @syntax.name = 'py'
                     when 'node'        then @syntax.name = 'js'
-                    when 'bash', 'sh'  then @syntax.name = 'sh'
+                    when 'bash'        then @syntax.name = 'sh'
                     else 
                         if lastWord in syntax.syntaxNames
                             @syntax.name = lastWord

@@ -5,6 +5,7 @@
 - don't clear undo buffer on save?
 
 #### search
+- *mark unsaved changes in numbers*
 - *save changes*
 - output search end?
 - fix broken syntax highlighting when editing
@@ -53,9 +54,9 @@
 #### open
 - command-p alias: -n for previuous files
 - show relative path when navigating in history
+- resolve environment variables
 
 #### terminal
-- *output command* as salt?
 - *alias*
 - *ansihtml*
 - fix escape
@@ -84,7 +85,7 @@
 - command drag: don't clear selection and don't single select
 
 #### syntax
-- pug, html, js, (ba)sh
+- (ba)sh
 
 #### commands
 - tree

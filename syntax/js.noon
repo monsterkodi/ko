@@ -1,0 +1,94 @@
+#        000   0000000
+#        000  000     
+#        000  0000000 
+#  000   000       000
+#   0000000   0000000 
+
+\S+                            text
+
+\!                             syntax.punctuation
+[\[\]\<\>\+\-\=\?\:]           syntax.punctuation
+!=                             syntax.punctuation
+
+# keywords
+
+(:?^|\s)(if|else|then|for|in|var|return|try|catch)(:?\s|$)   keyword
+
+# globals
+
+\b(console|process|global|module|exports|path|fs|os)\b   module
+
+# special
+
+\blog\b                        function.log
+\berr\b                        variable.err
+\berror\b                      function.err
+
+# strings
+
+(')([^']*)(')                . string.marker.single . value.string.single . string.marker.single
+(")([^"\\]*)(")              . string.marker.double . value.string.double . string.marker.double
+
+# bool
+
+true                           value.bool.true
+false                          value.bool.false
+
+this                           this
+
+# null
+
+null|undefined                 keyword.null
+
+# braces, semicolon
+
+[\(\)\{\}\;]                   syntax.punctuation
+[\{\}\;]                       syntax.punctuation
+([\)]);                        syntax.punctuation
+
+# functions
+
+(\b\S+)(\()[^\)]*(\))              . function
+(\w+)\s*=\s*function\([^\)]*\)\s*  . function
+(\w+)\s*=\s*function               . function
+function                             function
+
+# require
+
+(\w+)\s*=\s*(require)\(?\s*'\S+'\s*\)?\s*  . require.variable . require.keyword
+
+# dictionary key
+
+(\S+)(:)                     . dictionary.key . dictionary.key.marker
+
+# punctuation
+
+[\,\.]                         marker
+
+# lodash
+
+(_)\.\w+                       module 
+
+# .property
+
+\.(\w+)                        property
+
+#number
+
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
+    syntax.value.number.float.sign
+    value.number.float
+
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
+    syntax.value.number.int.sign
+    value.number.int
+
+# comments
+
+\*/                            comment.marker
+(//|/\*|^\s+\*)(.*)          . comment.marker . comment
+
+# salt header
+
+^[0\s]+$                       comment.header
+

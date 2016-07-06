@@ -41,10 +41,8 @@ class Meta
     
     onChanged: (changeInfo, action) =>
         return if not changeInfo.changed.length
-        # log "meta.onChanged #{changeInfo.changed.join ','}"
         for li in changeInfo.changed
             for meta in @metasAtLineIndex li
-                # log "meta.onChanged #{meta[2].clss}"
                 if meta[2].clss == "searchResult"
                     [file, line] = meta[2].href.split(':')
                     line -= 1
@@ -54,6 +52,34 @@ class Meta
                         after: change.after
                         index: line
                     @editor.emit 'fileLineChange', file, lineChange
+                    meta[2].state = 'unsaved'
+                    if meta[2].span?
+                        button = @saveButton li
+                        if not meta[2].span.innerHTML.startsWith "<span"
+                            meta[2].span.innerHTML = button
+                        log "span.innerHTML #{meta[2].span.innerHTML}"
+                    else 
+                        log "no span?"
+         
+    saveMeta: (meta) ->
+        [file, line] = meta[2].href.split(':')
+        log "save line #{line} in file #{file}"
+                    
+    saveLine: (li) -> 
+        for meta in @metasAtLineIndex li
+            if meta[2].state == 'unsaved'
+                @saveMeta meta
+
+    saveChanges: ->
+        saved = false
+        for meta in @metas
+            if meta[2].state == 'unsaved'
+                @saveMeta meta
+                saved = true
+        saved
+        
+    saveButton: (li) ->
+        "<span class=\"saveButton\" onclick=\"window.terminal.meta.saveLine(#{li});\">&#128190;</span>"
                     
     # 000   000  000   000  00     00  0000000    00000000  00000000 
     # 0000  000  000   000  000   000  000   000  000       000   000
@@ -64,9 +90,10 @@ class Meta
     onNumber: (e) =>
         metas = @metasAtLineIndex e.lineIndex
         for meta in metas
+            meta[2].span = e.numberSpan
             switch meta[2].clss
                 when 'searchResult'
-                    e.numberSpan.textContent = meta[2].href.split(':')[1]
+                    e.numberSpan.innerHTML = meta[2].state == 'unsaved' and @saveButton(meta[0]) or meta[2].href.split(':')[1]
                 else
                     e.numberSpan.innerHTML = '&nbsp;'
 

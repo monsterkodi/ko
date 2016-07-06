@@ -94,6 +94,8 @@ class Terminal extends ViewBase
                     window.loadFile "#{href}" 
                     window.editor.focus()
                 return
+            when 'command+s'
+                return if @meta.saveChanges()
                 
         return 'unhandled'
                 

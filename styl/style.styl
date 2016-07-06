@@ -33,37 +33,6 @@ fill-abs()
     
 pre 
     margin          0
-
-// 00     00  00000000  000000000   0000000 
-// 000   000  000          000     000   000
-// 000000000  0000000      000     000000000
-// 000 0 000  000          000     000   000
-// 000   000  00000000     000     000   000
-
-.meta
-    position        absolute
-    pointer-events  all
-    background      #333
-    opacity         0.8
-    
-    padding-right     metaRadius
-    margin-right    - metaRadius
-    margin-left     - editorPadding
-    padding-left      editorPadding
-    border-top-right-radius   metaRadius
-    border-bottom-right-radius   metaRadius
-    
-    &.href
-        cursor          pointer
-
-    &.searchResult
-    &.spacer
-        background      #000
-        border-top-right-radius 0
-        border-bottom-right-radius 0
-        
-    &.searchResult
-        background      transparent
     
 //  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
 // 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
@@ -530,14 +499,18 @@ body
    animation-timing-function ease-in-out
     
 .linenumber
-    & span
-        text-align      right
-        color           #333
-        display         block
-        font-weight     bold
-        padding-right   8px
+    display             block
     width               numbersWidth
     border-right        thinBorder
+    
+    & span
+        display         inline-block
+        width           (numbersWidth - 8px)
+        text-align      right
+        color           #333        
+        font-weight     bold
+        //padding-right   8px
+        
     &.highligd span 
         color           rgba(155,155,255, 0.6)
     &.selected span 
@@ -548,6 +521,47 @@ body
         color           #f80
     &.cursored.selected span 
         color           #ff8
+
+// 00     00  00000000  000000000   0000000 
+// 000   000  000          000     000   000
+// 000000000  0000000      000     000000000
+// 000 0 000  000          000     000   000
+// 000   000  00000000     000     000   000
+
+.meta
+    position        absolute
+    pointer-events  all
+    background      #333
+    opacity         0.8
+    
+    padding-right     metaRadius
+    margin-right    - metaRadius
+    margin-left     - editorPadding
+    padding-left      editorPadding
+    border-top-right-radius   metaRadius
+    border-bottom-right-radius   metaRadius
+    
+    &.href
+        cursor          pointer
+
+    &.searchResult
+    &.spacer
+        background      #000
+        border-top-right-radius 0
+        border-bottom-right-radius 0
+        
+    &.searchResult
+        background      transparent
+
+.linenumber span .saveButton    
+    pointer-events      all
+    cursor              pointer
+    background          #f80
+    width               initial
+    padding-top         1px
+    padding-left        3px
+    padding-right       4px
+    border-radius       4px
         
 // 00     00  000  000   000  000  00     00   0000000   00000000 
 // 000   000  000  0000  000  000  000   000  000   000  000   000
