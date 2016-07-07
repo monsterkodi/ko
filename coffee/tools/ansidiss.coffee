@@ -5,40 +5,38 @@ entities = require 'entities'
 _        = require 'lodash'
 
 STYLES =
-    fg:   'color:#0a0'
-    ef0:  'color:#000'
-    ef1:  'color:#A00'
-    ef2:  'color:#0A0'
-    ef3:  'color:#A50'
-    ef4:  'color:#00A'
-    ef5:  'color:#A0A'
-    ef6:  'color:#0AA'
-    ef7:  'color:#AAA'
-    ef8:  'color:#555'
-    ef9:  'color:#F55'
-    ef10: 'color:#5F5'
-    ef11: 'color:#FF5'
-    ef12: 'color:#55F'
-    ef13: 'color:#F5F'
-    ef14: 'color:#5FF'
-    ef15: 'color:#FFF'
-    bg:   'background-color:#0F0'
-    eb0:  'background-color:#000'
-    eb1:  'background-color:#A00'
-    eb2:  'background-color:#0A0'
-    eb3:  'background-color:#A50'
-    eb4:  'background-color:#00A'
-    eb5:  'background-color:#A0A'
-    eb6:  'background-color:#0AA'
-    eb7:  'background-color:#AAA'
-    eb8:  'background-color:#555'
-    eb9:  'background-color:#F55'
-    eb10: 'background-color:#5F5'
-    eb11: 'background-color:#FF5'
-    eb12: 'background-color:#55F'
-    eb13: 'background-color:#F5F'
-    eb14: 'background-color:#5FF'
-    eb15: 'background-color:#FFF'
+    f0:  'color:#000' # normal intensity
+    f1:  'color:#A00'
+    f2:  'color:#0A0'
+    f3:  'color:#A50'
+    f4:  'color:#00A'
+    f5:  'color:#A0A'
+    f6:  'color:#0AA'
+    f7:  'color:#AAA'
+    f8:  'color:#555' # high intensity
+    f9:  'color:#F55'
+    f10: 'color:#5F5'
+    f11: 'color:#FF5'
+    f12: 'color:#55F'
+    f13: 'color:#F5F'
+    f14: 'color:#5FF'
+    f15: 'color:#FFF'
+    b0:  'background-color:#000' # normal intensity
+    b1:  'background-color:#A00'
+    b2:  'background-color:#0A0'
+    b3:  'background-color:#A50'
+    b4:  'background-color:#00A'
+    b5:  'background-color:#A0A'
+    b6:  'background-color:#0AA'
+    b7:  'background-color:#AAA'
+    b8:  'background-color:#555' # high intensity
+    b9:  'background-color:#F55'
+    b10: 'background-color:#5F5'
+    b11: 'background-color:#FF5'
+    b12: 'background-color:#55F'
+    b13: 'background-color:#F5F'
+    b14: 'background-color:#5FF'
+    b15: 'background-color:#FFF'
 
 toHexString = (num) ->
     num = num.toString(16)
@@ -53,15 +51,15 @@ toHexString = (num) ->
             g = if green > 0 then green * 40 + 55 else 0
             b = if blue  > 0 then blue  * 40 + 55 else 0
             rgb = (toHexString(n) for n in [r, g, b]).join('')
-            STYLES["ef#{c}"] = "color:##{rgb}"
-            STYLES["eb#{c}"] = "background-color:##{rgb}"
+            STYLES["f#{c}"] = "color:##{rgb}"
+            STYLES["b#{c}"] = "background-color:##{rgb}"
 
 
 [0..23].forEach (gray) ->
     c = gray+232
     l = toHexString(gray*10 + 8)
-    STYLES["ef#{c}"] = "color:##{l}#{l}#{l}"
-    STYLES["eb#{c}"] = "background-color:##{l}#{l}#{l}"
+    STYLES["f#{c}"] = "color:##{l}#{l}#{l}"
+    STYLES["b#{c}"] = "background-color:##{l}#{l}#{l}"
 
 #  0000000   000   000   0000000  000  0000000    000   0000000   0000000
 # 000   000  0000  000  000       000  000   000  000  000       000     
@@ -76,79 +74,85 @@ class ansiDiss
     dissect: (@input) ->
         @diss  = []
         @text  = ""
+        # log "ansidiss.dissect @input #{@input}"
         @tokenize()
+        # log "ansidiss.dissect @text #{@text} @diss", @diss
         [@text, @diss]
 
-    addText: (t) => 
-        @text += t
-        ''
-
     tokenize: () ->
-        dss = 
-            start: 0
-            cls: []
-            style: []
+        
+        start       = 0
+        ansiHandler = 2
         ansiMatch   = false
-        ansiHandler = 3
         
-        nextDiss = (next) =>
-            dss.match = _.trimEnd @text.slice dss.start
-            while dss.match.startsWith ' '
-                dss.start += 1
-                dss.match = dss.match.slice 1
-            dss.clss = dss.cls.join " "
-            dss.styl = dss.style.join ";"
-            @diss.push dss if dss.match.length
-            dss = next
-            dss.start = @text.length
-            dss.cls ?= []
-            dss.style ?= []
-        
-        termCode = (m, c) =>
-            nextDiss style: [STYLES["ef#{c}"]]
-            ''
+        fg = bg = ''
+        st = []
+
+        resetStyle = () ->
+            fg = ''
+            bg = ''
+            st = []
             
+        addStyle = (style) -> st.push style if style not in st
+        delStyle = (style) -> _.pull st, style
+        
+        addText = (t) =>
+            
+            @text += t
+            
+            match = @text.slice start
+            if match.length
+                style = ''
+                style += fg + ';'    if fg.length
+                style += bg + ';'    if bg.length
+                style += st.join ';' if st.length
+                @diss.push
+                    match: match
+                    start: start
+                    styl:  style
+                                        
+            start = @text.length
+            ''
+        
         ansiCode = (m, c) =>
             ansiMatch = true
-            c = '0' if c.trim().length is 0
-            # log "c", c
-            cs = c.trimRight(';').split(';')
+            c = '0' if c.trim().length is 0            
+            cs = c.trimRight(';').split(';')            
             for code in cs
                 code = parseInt code, 10
                 switch 
-                    when code is 0          then nextDiss {}
-                    when code is 1          then dss.cls.push 'bold'
-                    when 2 < code < 5       then dss.style.push 'text-decoration:underline'
-                    when 4 < code < 7       then 
-                    when 38, 53             then
-                    when code is 8          then dss.style.push 'display:none'
-                    when code is 9          then dss.style.push 'text-decoration:line-through'
-                    when 29 < code < 38     then dss.style.push STYLES["ef#{code - 30}"]
-                    when code is 39         then dss.style.push STYLES["fg"]
-                    when 39 < code < 48     then dss.style.push STYLES["eb#{code - 40}"]
-                    when code is 18         then dss.style.push STYLES["fg"]
-                    when code is 48         then dss.style.push STYLES["bg"]
-                    when code is 49         then dss.style.push STYLES["bg"]
-                    when 89 < code < 98     then dss.style.push STYLES["ef#{8+code - 90}"]
-                    when 99 < code < 108    then dss.style.push STYLES["eb#{8+code - 100}"]
-                    else
-                        dss.style.push 'text-decoration:overline'
-                        log "ansidiss.tokenize ansiCode", code
+                    when code is 0          then resetStyle()
+                    when code is 1          then addStyle 'font-weight:bold'
+                    when code is 2          then addStyle 'opacity:0.5'
+                    when code is 4          then addStyle 'text-decoration:underline'
+                    when code is 8          then addStyle 'display:none'
+                    when code is 9          then addStyle 'text-decoration:line-through'
+                    when code is 39         then fg = STYLES["f15"] # default foreground
+                    when code is 49         then fg = STYLES["b0"]  # default background
+                    when code is 38         then fg = STYLES["f#{cs[2]}"] # extended fg 38;5;[0-255]
+                    when code is 48         then bg = STYLES["b#{cs[2]}"] # extended bg 48;5;[0-255]
+                    when 30 <= code <= 37   then fg = STYLES["f#{code - 30}"] # normal intensity
+                    when 40 <= code <= 47   then bg = STYLES["b#{code - 40}"]
+                    when 90 <= code <= 97   then fg = STYLES["f#{8+code - 90}"]  # high intensity
+                    when 100 <= code <= 107 then bg = STYLES["b#{8+code - 100}"]
+                    when code is 28         then delStyle 'display:none'
+                    when code is 22         
+                        delStyle 'font-weight:bold'
+                        delStyle 'opacity:0.5'
             ''
+            
         tokens = [
             {pattern: /^\x08+/,                     sub: ''}
             {pattern: /^\x1b\[[012]?K/,             sub: ''}
-            {pattern: /^\x1b\[38;5;(\d+)m/,         sub: termCode}
             {pattern: /^\x1b\[((?:\d{1,3};?)+|)m/,  sub: ansiCode} 
             {pattern: /^\x1b\[?[\d;]{0,3}/,         sub: ''}
-            {pattern: /^([^\x1b\x08\n]+)/,          sub: @addText}
+            {pattern: /^([^\x1b\x08\n]+)/,          sub: addText}
          ]
 
         process = (handler, i) =>
-            if i > ansiHandler and ansiMatch then return else ansiMatch = false # give ansiHandler another chance if it matches
-            matches = @input.match handler.pattern
-            @input  = @input.replace handler.pattern, handler.sub
-            return if !matches?
+            return if i > ansiHandler and ansiMatch # give ansiHandler another chance if it matches
+            ansiMatch = false
+            @input = @input.replace handler.pattern, handler.sub
 
         while (length = @input.length) > 0
             process(handler, i) for handler, i in tokens

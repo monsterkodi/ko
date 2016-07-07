@@ -12,7 +12,7 @@ prefs         = require './tools/prefs'
 log           = require './tools/log'
 str           = require './tools/str'
 pkg           = require '../package.json'
-execute       = require './execute'
+Execute       = require './execute'
 MainMenu      = require './mainmenu'
 fs            = require 'fs'
 noon          = require 'noon'
@@ -27,6 +27,7 @@ ipc           = electron.ipcMain
 dialog        = electron.dialog
 tray          = undefined
 main          = undefined
+execute       = undefined
 openFiles     = []
 wins          = []
 
@@ -111,6 +112,7 @@ hideDock = ->
 # 000  000        000     
 # 000  000         0000000
 
+ipc.on 'shellCommand',      (event, cfg)   => new Execute cfg
 ipc.on 'execute',           (event, arg)   => event.sender.send 'executeResult', execute.execute arg
 ipc.on 'toggleDevTools',    (event)        => event.sender.toggleDevTools()
 ipc.on 'newWindowWithFile', (event, file)  => main.createWindow file
@@ -146,11 +148,7 @@ class Main
                                 
         app.setName pkg.productName
                                 
-        # hideDock()
-        
         electron.globalShortcut.register prefs.get('shortcut'), @toggleWindows
-
-        execute.init()
             
         @restoreWindows() if not args.noprefs and not openFiles.length
         
@@ -256,7 +254,7 @@ class Main
                 @closeWindow w
     
     closeWindow: (w) =>
-        prefs.del "windows:#{w.id}"
+        # prefs.del "windows:#{w.id}"
         w?.close()
     
     closeWindows: =>
@@ -429,6 +427,7 @@ class Main
                             height: b.height
     
     onCloseWin: (event) =>
+        prefs.del "windows:#{event.sender.id}"
         if visibleWins().length == 1
             hideDock()
         @dbg "main.onCloseWin #{event.sender.id}"

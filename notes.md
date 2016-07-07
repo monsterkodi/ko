@@ -1,7 +1,6 @@
 # todo/ideas
 
 ### file state
-- *save before open new file*
 - save backup files?
 - don't clear undo buffer on save?
 
@@ -21,7 +20,6 @@
 
 #### editor
 - *alt-click: jump to definition*
-- *store unsaved changes in prefs*
 - set cursor column when opening with second :n
 - save and restore scrollX/Left
 - check undo (merges too much?)
@@ -60,8 +58,6 @@
 - *ansihtml*
 - fix minimap update when deleting lines
 - fix escape
-- limit history length
-- add special column (on top of numbers) for input marker and search result lines
 - autocomplete
     - history
     - commands
@@ -77,15 +73,9 @@
 - two selection modes
     - active (cursor inside)
     - passive (cursor movement won't destroy, but next selection will)
-- shift move cursor down
     
 #### minimap 
-- shift drag: extend selection
 - show selections, highlights and cursors
-- command drag: don't clear selection and don't single select
-
-#### syntax
-- (ba)sh
 
 #### commands
 - tree

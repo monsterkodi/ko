@@ -149,14 +149,16 @@ class Minimap
             ry = event.clientY - br.top
             pc = 2*ry / @scroll.viewHeight
             li = parseInt pc * @editor.scroll.numLines
-            @jumpToLine li
+            @jumpToLine li, event
         else
-            @jumpToLine @lineIndexForEvent event
+            @jumpToLine @lineIndexForEvent(event), event
 
-    onStart: (drag,event) => @jumpToLine @lineIndexForEvent event
-    jumpToLine: (li) ->        
+    onStart: (drag,event) => @jumpToLine @lineIndexForEvent(event), event
+    
+    jumpToLine: (li, event) ->        
         @editor.scrollTo (li-5) * @editor.scroll.lineHeight
-        @editor.singleCursorAtPos [0, li+5]
+        if not event.metaKey
+            @editor.singleCursorAtPos [0, li+5], event.shiftKey
         @editor.focus()
         @onEditorScroll()
 

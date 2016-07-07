@@ -29,6 +29,7 @@ class Terminal extends ViewBase
     #  0000000    0000000      000     000         0000000      000   
 
     output: (s) -> 
+        # log 'terminal.output', s
         for l in s.split '\n'
             [t,d] = @ansidiss.dissect l
             @appendLineDiss t, d
@@ -40,14 +41,9 @@ class Terminal extends ViewBase
     # 000   000  000        000        00000000  000   000  0000000  
                 
     appendLineDiss: (text, diss=[]) ->
-        # log "terminal.appendLineDiss #{@lines.length}: #{text} diss #{diss.length}" if diss.length
-
         @syntax.setDiss @lines.length, diss if diss?.length
-        
         tail = @cursorPos()[1] == @lines.length-1 and @cursors.length == 1
-
         @appendText text
-                
         if tail
             @singleCursorAtPos [0, @lines.length-1] 
             @scrollTo @scroll.fullHeight
@@ -70,7 +66,10 @@ class Terminal extends ViewBase
             for l in salt(meta.text).split '\n'
                 @appendMeta clss: 'spacer', diss: syntax.dissForTextAndSyntax l, 'ko'
             @appendMeta clss: 'spacer'
-            @do.delete 0 if del1st
+            if del1st
+                @do.start()
+                @do.delete 0 
+                @do.end()
         else
             @appendLineDiss ''
            

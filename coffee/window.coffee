@@ -80,6 +80,7 @@ delState = window.delState = (key) ->
 # 000  000        000     
 # 000  000         0000000
 
+ipc.on 'shellCommandData', (event, cmdData) => commandline.commands['term'].onShellCommandData cmdData
 ipc.on 'executeResult', (event, arg) => terminal.appendText str arg
 ipc.on 'openFile', (event, options) => openFile options
 ipc.on 'focusEditor', (event) => split.focus '.editor'
@@ -125,10 +126,18 @@ loadFile = (file, reload) =>
     [file,line] = file.split ':'
     if file != editor.currentFile or reload
         return if not fileExists file
-        addToRecent file
+        
+        if editor.currentFile? and editor.do.hasLineChanges()
+            saveChanges = [_.clone(editor.currentFile), _.clone(editor.text())]
+            
+        addToRecent file        
         editor.setCurrentFile null # to stop watcher and reset scroll
         editor.setCurrentFile file
         setState 'file', file
+        
+        if saveChanges?
+            fs.writeFileSync saveChanges[0], saveChanges[1], encoding: 'UTF8'
+            
         if not commandline.command?
             commandline.command = commandline.commands['open']
             commandline.command.loadState()
@@ -232,6 +241,31 @@ terminal.on 'fileLineChange', (file, lineChange) =>
 # 00000000  0000000    000     000      0000000   000   000
 
 editor = window.editor = new View '.editor'
+
+#  0000000   0000000   00     00  00     00   0000000   000   000  0000000  
+# 000       000   000  000   000  000   000  000   000  0000  000  000   000
+# 000       000   000  000000000  000000000  000000000  000 0 000  000   000
+# 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
+#  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
+
+commandline = window.commandline = new Commandline '.commandline-editor'
+
+# 000       0000000    0000000   000   000  000  00000000  000   000
+# 000      000   000  000        000   000  000  000       000 0 000
+# 000      000   000  000  0000   000 000   000  0000000   000000000
+# 000      000   000  000   000     000     000  000       000   000
+# 0000000   0000000    0000000       0      000  00000000  00     00
+
+logview = window.logview = new LogView '.logview'
+
+# 000  000   000  00000000   0000000 
+# 000  0000  000  000       000   000
+# 000  000 0 000  000000    000   000
+# 000  000  0000  000       000   000
+# 000  000   000  000        0000000 
+
+info = window.info = new Info editor
+
 editor.setText editorText if editorText?
 editor.view.focus()
 
@@ -253,30 +287,6 @@ window.editorWithClassName = (n) ->
         when '.commandline' then commandline
         when '.terminal'    then terminal
         when '.logview'     then logview    
-
-# 000       0000000    0000000   000   000  000  00000000  000   000
-# 000      000   000  000        000   000  000  000       000 0 000
-# 000      000   000  000  0000   000 000   000  0000000   000000000
-# 000      000   000  000   000     000     000  000       000   000
-# 0000000   0000000    0000000       0      000  00000000  00     00
-
-logview = window.logview = new LogView '.logview'
-
-#  0000000   0000000   00     00  00     00   0000000   000   000  0000000  
-# 000       000   000  000   000  000   000  000   000  0000  000  000   000
-# 000       000   000  000000000  000000000  000000000  000 0 000  000   000
-# 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
-#  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
-
-commandline = window.commandline = new Commandline '.commandline-editor'
-
-# 000  000   000  00000000   0000000 
-# 000  0000  000  000       000   000
-# 000  000 0 000  000000    000   000
-# 000  000  0000  000       000   000
-# 000  000   000  000        0000000 
-
-info        = window.info = new Info editor
 
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000     

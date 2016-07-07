@@ -4,28 +4,22 @@
 #    000     000       000   000  000 0 000
 #    000     00000000  000   000  000   000
 
-log           = require '../tools/log'
-child_process = require 'child_process'
-Command       = require '../commandline/command'
+log      = require '../tools/log'
+Command  = require '../commandline/command'
+electron = require 'electron'
+ipc      = electron.ipcRenderer
 
 class Term extends Command
 
     constructor: (@commandline) ->
-        
         @shortcuts = ['command+t']
-        @childp    = child_process.spawn '/usr/local/bin/bash', []
-        @childp.on 'exit', @onExit
-        @childp.on 'close', @onExit
-        @childp.on 'disconnect', @onExit
-        @childp.stdout.on 'data', @onData
-        @childp.stdout.on 'end', @onEnd        
         super
-    
-    onExit: (code) => log "Term.onExit #{code}"
-    onEnd:         => log "Term.onEnd"
-    onData: (out)  => 
+        @maxHistory = 100
+        @cmdID = 0
+        
+    onShellCommandData: (cmdData)  => 
         terminal = window.terminal
-        terminal.output out.toString()
+        terminal.output cmdData.data
         terminal.scrollCursorToTop 5
 
     clear: ->
@@ -33,16 +27,17 @@ class Term extends Command
         text: ''
         
     execute: (command) ->
-        # log "term.execute command #{command}"
         super command
-        terminal.appendMeta clss: 'salt', text: command.slice 0, 14
+        terminal.appendMeta clss: 'salt', text: command.slice 0, 32
         terminal.singleCursorAtPos [0, terminal.lines.length-2]
         switch command
             when 'history' then window.terminal?.output @history.join '\n'
             when 'clear'   then window.terminal?.clear()
             else
-                @childp.stdin.write "#{command}\n"
+                ipc.send 'shellCommand', winID: window.winID, cmdID: @cmdID, command: command
+                @cmdID += 1
         terminal.scrollCursorToTop 5        
+        
         text: ''
         reveal: 'terminal'
         
