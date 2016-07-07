@@ -561,8 +561,8 @@ class ViewBase extends Editor
                                 
                 if @doubleClicked
                     if @posForEvent(event)[1] == @tripleClickLineIndex
-                        clearTimeout @tripleClickTimer                        
-                        @tripleClickTimer = setTimeout @onTripleClickDelay, 1500
+                        clearTimeout @tripleClickTimer
+                        @tripleClickTimer = setTimeout @onTripleClickDelay, @stickySelection and 300 or 1000
                         if not @tripleClicked
                             @tripleClicked = true
                             r = @rangeForLineAtIndex @tripleClickLineIndex
@@ -584,7 +584,7 @@ class ViewBase extends Editor
             onMove: (drag, event) => 
                 p = @posForEvent event
                 if event.metaKey
-                    @addCursorAtPos [@mainCursor[0], p[1]]  # todo: nearest cursor instead of last
+                    @addCursorAtPos [@mainCursor[0], p[1]]
                 else
                     @singleCursorAtPos p, true
                 
@@ -596,7 +596,7 @@ class ViewBase extends Editor
                 @selectSingleRange range
             @onTripleClickDelay()
             @doubleClicked = true
-            @tripleClickTimer = setTimeout @onTripleClickDelay, 1500
+            @tripleClickTimer = setTimeout @onTripleClickDelay, @stickySelection and 300 or 1000
             @tripleClickLineIndex = range[0]
                         
     onTripleClickDelay: => 
@@ -626,8 +626,6 @@ class ViewBase extends Editor
 
     onKeyDown: (event) =>
         {mod, key, combo} = keyinfo.forEvent event
-
-        # log "viewbase key:", key, "mod:", mod, "combo:", combo
 
         return if not combo
         return if key == 'right click' # weird right command key

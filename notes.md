@@ -15,25 +15,20 @@
 
 #### windows
 - cycle through windows command: windows list
-- recent files in titlebar?
 - list buffers when clicking buffer number in titlebar
 
 #### editor
 - *alt-click: jump to definition*
-- set cursor column when opening with second :n
 - save and restore scrollX/Left
 - check undo (merges too much?)
-- history of file locations
 - make special stuff file type dependent
     - eg. add * to surround characters for md
-    - comment line characters (# or //)
 
 #### editing
 - *align cursors with inserting spaces when ctrl+alt+right*
 - *ctrl+command+/  align cursors block*
 - *dbg "class.method arg: #{arg}, ..."*
 - *multicursors delete backwards over line boundaries only if command is down*
-- *handle unicode character length*
 - invert selection (command+i, select full lines without cursors/selections)
 - #< to add salter header of next word
 - no surround for ' inside words
