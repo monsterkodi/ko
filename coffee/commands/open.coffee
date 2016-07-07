@@ -62,7 +62,6 @@ class Open extends Command
     changed: (command) ->
         if not @list? 
             @start @shortcuts[0]
-            # return
         command  = command.trim()
         return if command in ['.', '..', '/', '~']
         if command.length
@@ -356,7 +355,6 @@ class Open extends Command
                     resolved = @resolvedPath listValue
             else if dirExists @resolvedPath command
                 resolved = @resolvedPath command
-            # log "resolved #{resolved}"
             if resolved?
                 @loadDir
                     navigating: resolved
@@ -379,7 +377,7 @@ class Open extends Command
                             file += '.coffee'
                 files.splice i, 1, file
             
-        options = newWindow: @combo == @shortcuts[1] # lazy bastard :)
+        options = newWindow: @name == "new window"
         
         opened = window.openFiles files, options
         if opened?.length

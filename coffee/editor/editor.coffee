@@ -563,6 +563,15 @@ class Editor extends Buffer
             if 0 == _.max (c[0] for c in @cursors) # all cursors in first column
                 @do.selections @rangesForCursorLines() # select lines without moving cursors
                 return
+        else if e and @stickySelection and @cursors.length == 1
+            if @mainCursor[0] == 0 and not @isSelectedLineAtIndex @mainCursor[1]
+                @do.start()
+                newSelections = _.cloneDeep @selections
+                newSelections.push @rangeForLineAtIndex @mainCursor[1]
+                @do.selections newSelections
+                @do.end()
+                return
+            
         @moveAllCursors ((n)->(c)->[c[0],c[1]+n])(n), extend:e, main: 'last'
         
     moveCursors: (direction, e) ->

@@ -634,11 +634,13 @@ class ViewBase extends Editor
 
         if @autocomplete?
             if 'unhandled' != @autocomplete.handleModKeyComboEvent mod, key, combo, event
+                event.preventDefault()
                 event.stopPropagation()
                 return
         
         if @handleModKeyComboEvent?
             if 'unhandled' != @handleModKeyComboEvent mod, key, combo, event
+                event.preventDefault()
                 event.stopPropagation()
                 return
             

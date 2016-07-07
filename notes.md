@@ -1,7 +1,5 @@
 # todo/ideas
 
-* fix open new window autoinsert newline *
-
 ### file state
 - save backup files?
 - don't clear undo buffer on save?

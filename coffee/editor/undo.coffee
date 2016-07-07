@@ -152,8 +152,6 @@ class undo
             @futures.unshift action
 
             @cleanChangeInfo()
-            # log "undo.undo changeInfo.sorted", @changeInfo.sorted
-            # log "undo.undo action.lines", action.lines
             @editor.changed @changeInfo, lines: undoLines
             @delChangeInfo()
                                     
@@ -363,7 +361,6 @@ class undo
     # 000   000  00000000  000   000   0000000   00000000
     
     merge: ->        
-        # log "\nundo.merge before", @actions
         while @actions.length >= 2
             b = @actions[@actions.length-2]
             a = last @actions
@@ -391,6 +388,5 @@ class undo
                     break
             else
                 break
-        # log "\nundo.merge merged", @actions
         
 module.exports = undo

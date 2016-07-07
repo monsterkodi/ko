@@ -1,9 +1,5 @@
 apple
 abakus
 abrasive
-blob
-blub
-blobber
-blorb
 blobber
 blork
