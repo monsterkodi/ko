@@ -24,10 +24,15 @@ class Info
         @cursorColumn.className = "info-cursor-column"
         @topline.appendChild @cursorColumn
 
+        @sticky = document.createElement 'span'
+        @sticky.className = "info-sticky empty"
+        @sticky.innerHTML = '○'
+        @topline.appendChild @sticky
+
         @cursors = document.createElement 'span'
         @cursors.className = "info-cursors"
         @topline.appendChild @cursors
-
+        
         @selections = document.createElement 'span'
         @selections.className = "info-selections"
         @topline.appendChild @selections
@@ -55,7 +60,7 @@ class Info
 
     setEditor: (editor) =>
         
-        return if editor == @editor
+        return if editor == @editor         
         
         if @editor?
             @editor.removeListener 'numLines',     @onNumLines
@@ -83,11 +88,13 @@ class Info
         @cursorColumn.textContent = @editor.mainCursor[0]
         @cursors.textContent = @editor.cursors.length
         @cursorColumn.classList.toggle 'virtual', @editor.isCursorVirtual()
-        @cursors.classList.toggle 'single', @editor.cursors.length == 1
+        @cursors.classList.toggle 'empty', @editor.cursors.length == 1
+        @sticky.classList.toggle 'empty', not @editor.stickySelection
         
     onSelection: =>
         @selections.textContent = @editor.selections?.length
         @selections.classList.toggle 'empty', @editor.selections?.length == 0
+        @sticky.classList.toggle 'empty', not @editor.stickySelection
         
     onHighlight: =>
         @highlights.textContent = @editor.highlights?.length

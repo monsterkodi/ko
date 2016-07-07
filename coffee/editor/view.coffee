@@ -64,19 +64,24 @@ class View extends ViewBase
     #    000     000     000     000      000       000   000  000   000  000   000
     #    000     000     000     0000000  00000000  0000000    000   000  000   000
         
-    updateTitlebar: ->
-        title = ""
+    updateTitlebar: ->    
         if @currentFile?
-            title = path.basename @currentFile
-            dirty = @do.hasLineChanges()
-            ic = document.hasFocus() and " focus" or ""
-            id = "<span class=\"winid #{ic}\">#{window.winID}</span>"
-            sep = "<span class=\"separator\"></span>"
-            dc = dirty and " dirty" or "clean"
-            db = "<span class=\"dot #{dc}#{ic}\">●</span>"
-            da = dirty and "●" or ""
-            title = id + db + "<span class=\"title #{dc}#{ic}\" data-tip=\"#{unresolve @currentFile}\">#{title} #{da}</span>"
-        $('.titlebar').innerHTML = title
+            title   = path.basename @currentFile
+            tooltip = unresolve @currentFile
+        else
+            title = ''
+        dirty = @do.hasLineChanges()
+        ic = document.hasFocus() and " focus" or ""
+        id = "<span class=\"winid #{ic}\">#{window.winID}</span>"
+        sep = "<span class=\"separator\"></span>"
+        dc = dirty and " dirty" or "clean"
+        dot = @stickySelection and "○" or "●"
+        db = "<span class=\"dot #{dc}#{ic}\">#{dot}</span>"
+        da = dirty and dot or ""
+        txt = id + db 
+        if title.length
+            txt += "<span class=\"title #{dc}#{ic}\" data-tip=\"#{tooltip}\">#{title} #{da}</span>"
+        $('.titlebar').innerHTML = txt
         
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
     # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
@@ -142,19 +147,15 @@ class View extends ViewBase
     # 000   000  00000000     000   
 
     handleModKeyComboEvent: (mod, key, combo, event) ->
+        return if 'unhandled' != super mod, key, combo, event
         switch combo
             when 'esc'
-                if @cursors.length > 1 or @highlights.length
-                    @cancelCursorsAndHighlights()
-                if @selections.length
-                    @selectNone()
-                else 
-                    split = window.split
-                    if split.terminalVisible()
-                        split.hideTerminal()
-                    else if split.commandlineVisible()
-                        split.hideCommandline()
+                split = window.split
+                if split.terminalVisible()
+                    split.hideTerminal()
+                else if split.commandlineVisible()
+                    split.hideCommandline()
                 return
-        return 'unhandled'
+        'unhandled'
         
 module.exports = View

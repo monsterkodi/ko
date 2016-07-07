@@ -142,8 +142,9 @@ class Split extends event
         e = @editorHeight()
         for h in [0...@handles.length]
             s.push clamp -@handleHeight, @elemHeight(), @splitPosY h
-        if e == 0 # keep editor closed
-            s[1] = s[2] = @elemHeight()            
+        if e == 0 and not @logVisible # keep editor closed
+            s[1] = s[2] = @elemHeight()  
+            s[0] = s[1] - @commandlineHeight - @handleHeight
         @applySplit s
     
     # 00000000    0000000    0000000          0000000  000  0000000  00000000

@@ -611,6 +611,19 @@ class ViewBase extends Editor
     # 000  000   000          000   
     # 000   000  00000000     000   
 
+
+    handleModKeyComboEvent: (mod, key, combo, event) ->
+        
+        switch combo
+            when 'esc'
+                if @cursors.length > 1 or @highlights.length
+                    return @clearCursorsAndHighlights()
+                if @stickySelection
+                    return @endStickySelection()
+                if @selections.length
+                    return @selectNone()
+        'unhandled'
+
     onKeyDown: (event) =>
         {mod, key, combo} = keyinfo.forEvent event
 
@@ -630,6 +643,7 @@ class ViewBase extends Editor
                 return
             
         switch combo
+            when 'command+esc'              then return @startStickySelection()
             when 'tab'                      then return @insertTab() + event.preventDefault() 
             when 'shift+tab'                then return @deleteTab() + event.preventDefault()
             when 'enter'                    then return @insertNewline indent: true
@@ -685,7 +699,7 @@ class ViewBase extends Editor
         
         switch key
             
-            when 'esc'     then return @cancelCursorsAndHighlights()
+            when 'esc'     then return @clearCursorsAndHighlights()
             when 'home'    then return @singleCursorAtPos [0, 0],              event.shiftKey
             when 'end'     then return @singleCursorAtPos [0,@lines.length-1], event.shiftKey
             when 'page up'      

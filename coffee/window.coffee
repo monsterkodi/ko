@@ -97,6 +97,7 @@ ipc.on 'setWinID', (event, id) =>
     # log "window.ipc.setWinID #{id} #{window.split?}"
     winID = window.winID = id
     window.split?.setWinID id 
+    editor.updateTitlebar()
     
 ipc.on 'fileLinesChanged', (event, file, lineChanges) =>
     if file == editor.currentFile

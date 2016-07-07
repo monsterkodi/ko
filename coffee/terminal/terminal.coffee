@@ -84,7 +84,7 @@ class Terminal extends ViewBase
     # 000   000  00000000     000   
     
     handleModKeyComboEvent: (mod, key, combo, event) ->
-        
+        return if 'unhandled' != super mod, key, combo, event
         switch combo
             when 'enter'
                 if href = @meta.hrefAtLineIndex @cursorPos()[1]
@@ -98,6 +98,6 @@ class Terminal extends ViewBase
             when 'command+s'
                 return if @meta.saveChanges()
                 
-        return 'unhandled'
+        'unhandled'
                 
 module.exports = Terminal

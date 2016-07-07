@@ -30,6 +30,7 @@ class Scrollbar
 
         @elem.addEventListener 'wheel', @onWheel
         @editor.layers.addEventListener 'wheel', @onWheel
+        @editor.layers.addEventListener 'scroll', @onScroll
 
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000
@@ -75,6 +76,11 @@ class Scrollbar
             scrollX = 0
             scrollY = event.deltaY
         @editor.scrollBy scrollY * scrollFactor(), scrollX
+        
+        event.preventDefault()
+        event.stopPropagation()
+
+    onScroll: (event) => @editor.updateScrollOffset()
 
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000

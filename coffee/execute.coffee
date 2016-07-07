@@ -30,30 +30,25 @@ class Execute
             console.error colors.red.bold '[ERROR]', colors.red e
 
     shell: (command) =>
-        @childp = pty.spawn '/usr/local/bin/bash', [], 
+        @childp = pty.spawn '/usr/local/bin/bash', ['-c', command], 
             name: 'xterm-color'
             cwd: @cwd
             env: process.env
-        @childp.write command # + '\n'
         @childp.on 'data', @onShellData
         
     onShellData: (data) =>
-        log "onShellData |#{data}|"
-        data = @rest+data
+        oRest = @rest
         @rest = ''
         if not data.endsWith '\n'
             lastIndex = data.lastIndexOf '\n'
-            log "lastIndex #{lastIndex}"
             if lastIndex < 0
-                @rest += data
+                @rest = oRest+data
                 return
             @rest = data.slice lastIndex+1
             data = data.slice 0, lastIndex        
-            log "rest #{@rest}"
         else 
             data = data.slice 0,data.length-2
-            
+        data = oRest+data    
         electron.BrowserWindow.fromId(@winID).webContents.send 'shellCommandData', cmd: @cmdID, data: data
 
 module.exports = Execute
-

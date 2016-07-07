@@ -23,6 +23,7 @@ class Editor extends Buffer
         @surroundCharacters = "{}[]()#'\"".split ''
         @currentFile = null
         @indentString = _.padStart "", 4
+        @stickySelection = false
         @watch = null
         @do = new undo @
         @dbg = false
@@ -116,22 +117,34 @@ class Editor extends Buffer
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
 
+    startStickySelection: () -> 
+        @stickySelection = true
+        @updateTitlebar?()
+        @emit 'selection'
+
+    endStickySelection: () ->
+        @stickySelection = false
+        @updateTitlebar?()
+        @emit 'selection'
+        
     startSelection: (e) ->
         if e and not @initialCursors
             @initialCursors = _.cloneDeep @cursors
-            @do.selections @rangesForCursors @initialCursors
+            if not @stickySelection
+                @do.selections @rangesForCursors @initialCursors
         if not e and @do.actions.length
-            @do.selections []
+            if not @stickySelection
+                @do.selections []
             
     endSelection: (e) ->
         
         if not e
-            if @selections.length
+            if @selections.length and not @stickySelection
                 @selectNone()
             @initialCursors = _.cloneDeep @cursors
             
         if e and @initialCursors
-            newSelection = []
+            newSelection = @stickySelection and _.cloneDeep(@selections) or []
             if @initialCursors.length != @cursors.length
                 log 'editor.endSelection warning! @initialCursors.length != @cursors.length', @initialCursors.length, @cursors.length
             
@@ -460,10 +473,10 @@ class Editor extends Buffer
                         newCursors.splice ci, 1
         @do.cursors newCursors 
         
-    cancelCursors: () -> @do.cursors [@mainCursor] 
+    clearCursors: () -> @do.cursors [@mainCursor] 
 
-    cancelCursorsAndHighlights: () ->
-        @cancelCursors()
+    clearCursorsAndHighlights: () ->
+        @clearCursors()
         @highlights = []
         @renderHighlights()
         @emit 'highlight'

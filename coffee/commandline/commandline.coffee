@@ -122,6 +122,7 @@ class Commandline extends ViewBase
         if @command?
             return if @command.handleModKeyComboEvent(mod, key, combo, event) != 'unhandled'
         
+        return if 'unhandled' != super mod, key, combo, event
         split = window.split
         switch combo
             when 'enter'                then return @execute()

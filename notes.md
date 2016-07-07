@@ -1,5 +1,7 @@
 # todo/ideas
 
+* fix open new window autoinsert newline *
+
 ### file state
 - save backup files?
 - don't clear undo buffer on save?
@@ -69,11 +71,6 @@
 #### logview
 - font zoom
       
-#### selection
-- two selection modes
-    - active (cursor inside)
-    - passive (cursor movement won't destroy, but next selection will)
-    
 #### minimap 
 - show selections, highlights and cursors
 

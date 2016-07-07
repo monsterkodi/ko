@@ -1,3 +1,4 @@
+
 //  0000000  000000000  000   000  000    
 // 000          000      000 000   000    
 // 0000000      000       00000    000    
@@ -103,28 +104,31 @@ infoPadding           = 10px
 
 .info-cursor-line
 .info-cursor-column
-    padding-left        infoPadding
     color               #ff0
     &.virtual           
         color           #08f
-        
+
+.info-sticky     
 .info-cursors
+.info-selections
+.info-highlights     
+.info-cursor-line
+.info-cursor-column
     padding-left        infoPadding
-    color               #f80
-    &.single
+    &.empty
         display         none
+
+.info-cursors
+    color               #f80
+
+.info-sticky
+    color               #88f
 
 .info-selections
-    padding-left        infoPadding
     color               #888
-    &.empty
-        display         none
 
 .info-highlights
-    padding-left        infoPadding
     color               rgb(103,103,171)
-    &.empty
-        display         none
 
 // 000      000   0000000  000000000
 // 000      000  000          000   
@@ -394,7 +398,10 @@ body
     
 .layers
     position        relative 
-    overflow        hidden
+    overflow-x      visible
+    overflow-y      hidden
+    &::-webkit-scrollbar
+        height      2px
         
 .lines
 .cursors
