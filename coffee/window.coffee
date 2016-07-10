@@ -134,6 +134,7 @@ loadFile = (file, reload) =>
         addToRecent file        
         editor.setCurrentFile null # to stop watcher and reset scroll
         editor.setCurrentFile file
+        ipc.send 'fileLoaded', file
         setState 'file', file
         
         if saveChanges?

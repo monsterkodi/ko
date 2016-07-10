@@ -13,6 +13,7 @@ log           = require './tools/log'
 str           = require './tools/str'
 pkg           = require '../package.json'
 Execute       = require './execute'
+Indexer       = require './indexer'
 MainMenu      = require './mainmenu'
 fs            = require 'fs'
 noon          = require 'noon'
@@ -116,6 +117,7 @@ ipc.on 'shellCommand',      (event, cfg)   => new Execute cfg
 ipc.on 'execute',           (event, arg)   => event.sender.send 'executeResult', execute.execute arg
 ipc.on 'toggleDevTools',    (event)        => event.sender.toggleDevTools()
 ipc.on 'newWindowWithFile', (event, file)  => main.createWindow file
+ipc.on 'fileLoaded',        (event, file)  => main.indexer.indexFile file
 ipc.on 'maximizeWindow',    (event, winID) => main.toggleMaximize winWithID winID
 ipc.on 'saveBounds',        (event, winID) => main.saveWinBounds winWithID winID
 ipc.on 'focusWindow',       (event, winID) => main.focusWindow winWithID winID
@@ -143,6 +145,8 @@ class Main
             log 'other instance already active -> quit'
             app.exit 0
             return
+
+        @indexer = new Indexer
 
         tray = new Tray "#{__dirname}/../img/menu.png"
         tray.on 'click', @toggleWindows

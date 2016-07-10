@@ -12,6 +12,7 @@
 
 #### autocomplete
 - *autocomplete from similar files*
+- *autocomplete from required files*
 - *make autocomplete work with multicursors*
 
 #### windows
@@ -33,7 +34,6 @@
 - invert selection (command+i, select full lines without cursors/selections)
 - #< to add salter header of next word
 - no surround for ' inside words
-- insert spaces when pasting into multicursors
 - select continuous,rectangular ranges with command+shift+M 
 - remove from selection when alt/ctrl is down?
 - don't scroll when no new range added with command+d

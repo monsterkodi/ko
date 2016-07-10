@@ -673,9 +673,7 @@ class Editor extends Buffer
         if @cursors.length == 1
             @clampCursors()
         else
-            for c in @cursors # fill spaces between line ends and cursors
-                if c[0] > @lines[c[1]].length
-                    @do.change c[1], @lines[c[1]].splice c[0], 0, _.padStart '', c[0]-@lines[c[1]].length
+            @fillVirtualSpaces()
                 
         if ch in @surroundCharacters
             if @insertSurroundCharacter ch
@@ -685,16 +683,6 @@ class Editor extends Buffer
         if ch == '\n'
             @insertNewline indent:true
             @do.end()
-            return
-            
-        @insertCharacter ch
-        @do.end()
-        @emitEdit 'insert'
-    
-    insertCharacter: (ch, opt) ->
-
-        if ch == '\n'
-            @insertNewline()
             return
 
         @deleteSelection()
@@ -711,7 +699,15 @@ class Editor extends Buffer
                         nc[0] += 1
 
         @do.cursors newCursors
-        
+            
+        @do.end()
+        @emitEdit 'insert'
+    
+    fillVirtualSpaces: () -> # fill spaces between line ends and cursors
+        for c in @cursors 
+            if c[0] > @lines[c[1]].length
+                @do.change c[1], @lines[c[1]].splice c[0], 0, _.padStart '', c[0]-@lines[c[1]].length
+    
     insertTab: ->
         if @selections.length
             @indent()
@@ -797,7 +793,7 @@ class Editor extends Buffer
         
         @do.start()        
         @deleteSelection()   
-        @clampCursors()
+        @fillVirtualSpaces()
         
         l = text.split '\n'
         if @cursors.length > 1 and l.length == 1
