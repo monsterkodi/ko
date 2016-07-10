@@ -9,8 +9,9 @@ last,
 $}    = require '../tools/tools'
 log   = require '../tools/log'
 _     = require 'lodash'
+event = require 'events'
 
-class Autocomplete
+class Autocomplete extends event
 
     constructor: (@editor) -> 
         
@@ -24,6 +25,7 @@ class Autocomplete
         specials = "_-@#"
         @especial = ("\\"+c for c in specials.split '').join ''
         @headerRegExp      = new RegExp "^[0#{@especial}]+$"
+        
         @notSpecialRegExp  = new RegExp "[^#{@especial}]"
         @specialWordRegExp = new RegExp "(\\s+|[\\w#{@especial}]+|[^\\s])", 'g'
         @splitRegExp       = new RegExp "[^\\w\\d#{@especial}]+", 'g'        
@@ -191,7 +193,7 @@ class Autocomplete
                 log "warning! no split?", lines
                 alert 'wtf??'            
             words = l.split @splitRegExp
-            @words = words.filter (w) => 
+            words = words.filter (w) => 
                 return false if w.length < 2
                 return false if w[0] in ['-', "#", '_'] and w.length < 3
                 return false if @word == w.slice 0, w.length-1
@@ -199,7 +201,7 @@ class Autocomplete
                 return false if @headerRegExp.test w
                 true
                 
-            for w in words
+            for w in words # append words without leading special character
                 i = w.search @notSpecialRegExp
                 words.push w.slice i if i > 0 
             
@@ -216,6 +218,7 @@ class Autocomplete
         sorted = ([w,i] for w,i of @wordinfo).sort (a,b) -> weight(b) - weight(a)
         
         @wordlist = (s[0] for s in sorted)
+        @emit 'wordCount', @wordlist.length
         
         # log "Completion.parseLines -- #{@editor.name} @wordlist:", @wordlist.slice 0, 40
                 
@@ -271,7 +274,7 @@ class Autocomplete
     onLinesSet:       (lines)    => 
         if lines.length
             @parseLines lines, action: 'set' 
-        else @wordinfo = {}
+        # else @wordinfo = {}
 
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

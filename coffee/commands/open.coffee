@@ -49,7 +49,7 @@ class Open extends Command
         @selected   = 0
         @navigating = false
         
-        super
+        super @commandline
         
         @maxHistory = 10
                     

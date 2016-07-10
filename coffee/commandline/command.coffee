@@ -12,7 +12,7 @@ _     = require 'lodash'
 
 class Command
 
-    constructor: ->
+    constructor: (@commandline) ->
         @maxHistory = 20
                 
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
@@ -46,10 +46,11 @@ class Command
     
     setCurrentText: (command) -> 
         @setCurrent command
-        @setText    command
+        if @commandline.command == @
+            @setText command
         
     setCurrent: (command) ->
-        # @loadState() if not @history?
+        @loadState() if not @history?
         _.pull @history, command
         @history.push command
         while @history.length > @maxHistory

@@ -97,10 +97,9 @@ class ansiDiss
         delStyle = (style) -> _.pull st, style
         
         addText = (t) =>
-            
             @text += t
-            
-            match = @text.slice start
+            txt = @text.slice start
+            match = txt.trim()
             if match.length
                 style = ''
                 style += fg + ';'    if fg.length
@@ -108,9 +107,8 @@ class ansiDiss
                 style += st.join ';' if st.length
                 @diss.push
                     match: match
-                    start: start
+                    start: start + txt.search /[^\s]/
                     styl:  style
-                                        
             start = @text.length
             ''
         

@@ -1,17 +1,18 @@
 # todo/ideas
 
+#### minimap 
+- highlight changed lines?
+
 ### file state
 - save backup files?
 - don't clear undo buffer on save?
 
 #### search
-- output search end?
 - fix broken syntax highlighting when editing
 
 #### autocomplete
 - *autocomplete from similar files*
 - *make autocomplete work with multicursors*
-- fix editing scraps
 
 #### windows
 - cycle through windows command: windows list
@@ -49,9 +50,6 @@
 - resolve environment variables
 
 #### terminal
-- *alias*
-- *ansihtml*
-- fix minimap update when deleting lines
 - fix escape
 - autocomplete
     - history
@@ -64,9 +62,6 @@
 #### logview
 - font zoom
       
-#### minimap 
-- show selections, highlights and cursors
-
 #### commands
 - tree
 - tabs?

@@ -103,6 +103,15 @@ class syntax
             @colors[clss] = window.getComputedStyle(div).color
             div.remove()
         return @colors[clss]
+
+    colorForStyle: (styl) ->
+        if not @colors[styl]?
+            div = document.createElement 'div'
+            div.style = styl
+            document.body.appendChild div
+            @colors[styl] = window.getComputedStyle(div).color
+            div.remove()
+        return @colors[styl]
         
     # 000  000   000  000  000000000
     # 000  0000  000  000     000   

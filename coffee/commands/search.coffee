@@ -19,7 +19,7 @@ class Search extends Command
     constructor: (@commandline) ->
         @shortcuts = ["command+shift+f", "ctrl+shift+f", "alt+shift+f", "alt+ctrl+shift+f"]
         @names     = ["search", "Search", "/search/", "/Search/"]
-        super
+        super @commandline
         
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   

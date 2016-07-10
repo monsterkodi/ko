@@ -108,6 +108,7 @@ infoPadding           = 10px
     &.virtual           
         color           #08f
 
+.info-words
 .info-sticky     
 .info-cursors
 .info-selections
@@ -117,6 +118,9 @@ infoPadding           = 10px
     padding-left        infoPadding
     &.empty
         display         none
+
+.info-words
+    color               #0a0
 
 .info-cursors
     color               #f80
@@ -434,18 +438,18 @@ body
 // 000       000   000  000   000       000  000   000  000   000
 //  0000000   0000000   000   000  0000000    0000000   000   000
         
-@keyframes blink 
-  from 
-    background      #ff0
-  to 
-    background      #800
-    
-*:focus .cursor.main
-   animation-name      blink
-   animation-duration  500ms
-   animation-iteration-count infinite
-   animation-direction alternate
-   animation-timing-function ease-in-out
+//@keyframes blink 
+//  from 
+//    background      #ff0
+//  to 
+//    background      #800
+//    
+//*:focus .cursor.main
+//   animation-name      blink
+//   animation-duration  500ms
+//   animation-iteration-count infinite
+//   animation-direction alternate
+//   animation-timing-function ease-in-out
 
 .cursor
     width            2px
@@ -489,19 +493,19 @@ body
     font-family     font
     background      rgba(0, 0, 0, 0.5) // this darkens selection
 
-@keyframes number-blink 
-  from 
-    color      #ff0
-  to 
-    color      #800
-    
-*:focus .linenumber.cursored.main span  
-   animation-name      number-blink
-   animation-duration  500ms
-   animation-iteration-count infinite
-   animation-direction alternate
-   animation-timing-function ease-in-out
-    
+//@keyframes number-blink 
+//  from 
+//    color      #ff0
+//  to 
+//    color      #800
+//    
+//*:focus .linenumber.cursored.main span  
+//   animation-name      number-blink
+//   animation-duration  500ms
+//   animation-iteration-count infinite
+//   animation-direction alternate
+//   animation-timing-function ease-in-out
+
 .linenumber
     display             block
     width               numbersWidth
@@ -580,25 +584,27 @@ body
     width               minimapWidth
     overflow            hidden
     cursor              pointer
-    opacity             0.8
     background          #000
     border-left         thinBorder
 
-.minimapCanvas
+canvas
     pointer-events      none
     position            absolute
     top                 0
     right               0
-    background-color    #000
     overflow            hidden
 
-.minimapCanvasTop
-    pointer-events      none
-    position            absolute
-    top                 0
-    right               0
+.minimapSelections
+    background-color    #000
+    
+.minimapLines
     background-color    transparent
-    overflow            hidden
+    opacity             0.8
+
+.minimapHighlights
+.minimapCursors
+.minimapTopBot
+    background-color    transparent
         
 // 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000
 // 000   000  000  000        000   000  000      000  000        000   000     000   

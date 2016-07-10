@@ -13,7 +13,7 @@ class Find extends Command
         @shortcuts = ["command+f", "ctrl+f", "alt+f", "alt+ctrl+f", "command+alt+f", "command+ctrl+f"]
         @types     = ['str',  'Str',   'reg',    'Reg',    'fuzzy', 'glob']
         @names     = ['find', 'Find',  '/find/', '/Find/', 'fiZd',  'f*nd']
-        super
+        super @commandline
         
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   

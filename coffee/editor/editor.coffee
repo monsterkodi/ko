@@ -305,6 +305,7 @@ class Editor extends Buffer
             @renderHighlights()
             @emit 'highlight'
             window.commandline.commands.find?.setCurrentText text
+            window.commandline.commands.search?.setCurrentText text
 
     clearHighlights: ->
         @highlights = []

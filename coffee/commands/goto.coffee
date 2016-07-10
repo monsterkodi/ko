@@ -16,7 +16,7 @@ class Goto extends Command
         
         @shortcuts = ['command+;', 'command+shift+;']
         @names     = ['goto', 'selecto']
-        super 
+        super @commandline
 
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
