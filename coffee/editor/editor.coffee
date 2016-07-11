@@ -961,7 +961,8 @@ class Editor extends Buffer
                 sp = @startPosOfContinuousSelectionAtPos c
                 @oldCursorSet newCursors, c, sp[0], sp[1]
 
-            if @isSelectedLineAtIndex(s[0]) and @lines.length > 1
+            lineSelected = s[1][0] == 0 and s[1][1] == @lines[s[0]].length
+            if lineSelected and @lines.length > 1
                 @do.delete s[0]
                 # move cursors below deleted line up
                 for nc in @positionsBelowLineIndexInPositions s[0], newCursors

@@ -44,7 +44,6 @@
 - move mainCursor to leftmost/rightmost cursor in its line on 'left'/'right' actions
 
 #### open
-- command-p alias: -n for previuous files
 - show relative path when navigating in history
 - resolve environment variables
 
@@ -71,6 +70,7 @@
     - images
 
 #### nice to have
+- resizable minimap
 - clean empty buffers on open file
 - help (shortcuts)
 - save window positions as layouts

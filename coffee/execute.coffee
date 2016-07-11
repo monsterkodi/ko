@@ -20,8 +20,9 @@ class Execute
         @command = cfg?.command
         @cwd     = cfg?.cwd ? process.cwd()
         @rest    = ''
+        @shell()
         if @command?
-            @shell @command
+            @term cfg
 
     execute: (code) =>
         try
@@ -30,11 +31,17 @@ class Execute
             console.error colors.red.bold '[ERROR]', colors.red e
 
     shell: (command) =>
-        @childp = pty.spawn '/usr/local/bin/bash', ['-c', command], 
+        @childp = pty.spawn '/usr/local/bin/bash', ['-i'], #, ['-c', command], 
             name: 'xterm-color'
             cwd: @cwd
             env: process.env
         @childp.on 'data', @onShellData
+        
+    term: (cfg) =>
+        log "execute.term", cfg
+        @rest    = ''
+        @cmdID   = cfg?.cmdID
+        @childp.write cfg.command + '\n'
         
     onShellData: (data) =>
         oRest = @rest

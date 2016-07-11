@@ -29,10 +29,11 @@ class Terminal extends ViewBase
     #  0000000    0000000      000     000         0000000      000   
 
     output: (s) -> 
-        # log 'terminal.output', s
         for l in s.split '\n'
-            [t,d] = @ansidiss.dissect l
-            @appendLineDiss t, d
+            [text,diss] = @ansidiss.dissect l
+            @syntax.setDiss @lines.length, diss if diss?.length
+            @appendText text
+            # @appendLineDiss text, diss
                 
     #  0000000   00000000   00000000   00000000  000   000  0000000  
     # 000   000  000   000  000   000  000       0000  000  000   000

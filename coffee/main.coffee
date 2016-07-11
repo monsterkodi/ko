@@ -113,7 +113,6 @@ hideDock = ->
 # 000  000        000     
 # 000  000         0000000
 
-ipc.on 'shellCommand',      (event, cfg)   => new Execute cfg
 ipc.on 'execute',           (event, arg)   => event.sender.send 'executeResult', execute.execute arg
 ipc.on 'toggleDevTools',    (event)        => event.sender.toggleDevTools()
 ipc.on 'newWindowWithFile', (event, file)  => main.createWindow file
@@ -133,6 +132,14 @@ ipc.on 'winFileLinesChanged', (event, winID, file, lineChanges) =>
             w.webContents.send 'fileLinesChanged', file, lineChanges
             
 ipc.on 'indexer', (event, item) => event.returnValue = main.indexer[item]
+
+winShells = {}
+
+ipc.on 'shellCommand', (event, cfg) => 
+    if winShells[cfg.winID]?
+        winShells[cfg.winID].term cfg
+    else
+        winShells[cfg.winID] = new Execute cfg
                         
 # 00     00   0000000   000  000   000
 # 000   000  000   000  000  0000  000
