@@ -411,7 +411,7 @@ class ViewBase extends Editor
     # 000   000  00000000  0000000   000  0000000  00000000  0000000  
     
     resized: -> 
-        @scroll?.setViewHeight @viewHeight()
+        @scroll?.setViewHeight @view.clientHeight #@viewHeight()
         @numbers?.elem.style.height = "#{@viewHeight}px"
         @layers.style.width = "#{sw()-@view.getBoundingClientRect().left-130-6}px"
         @layers.style.height = "#{@viewHeight()}px"
@@ -533,9 +533,9 @@ class ViewBase extends Editor
     # 000      000  000  0000  000            000
     # 0000000  000  000   000  00000000  0000000 
     
-    viewHeight:   -> @view?.getBoundingClientRect().height 
-    viewWidth:    -> @view?.getBoundingClientRect().width 
-    layersWidth:  -> @layers?.getBoundingClientRect().width 
+    viewHeight:   -> @scroll?.viewHeight ? @view?.clientHeight #@view?.getBoundingClientRect().height 
+    viewWidth:    -> @view?.clientWidth #@view?.getBoundingClientRect().width 
+    layersWidth:  -> @layers?.clientWidth #@layers?.getBoundingClientRect().width 
     numViewLines: -> Math.ceil(@viewHeight() / @size.lineHeight)
     numFullLines: -> Math.floor(@viewHeight() / @size.lineHeight)
     
