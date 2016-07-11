@@ -73,9 +73,9 @@ class AnsiDiss
     dissect: (@input) ->
         @diss  = []
         @text  = ""
-        log "ansidiss.dissect @input #{@input}"
+        # log "ansidiss.dissect @input #{@input}"
         @tokenize()
-        log "ansidiss.dissect @text #{@text} @diss", @diss
+        # log "ansidiss.dissect @text #{@text} @diss", @diss
         [@text, @diss]
 
     tokenize: () ->

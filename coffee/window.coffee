@@ -144,9 +144,13 @@ loadFile = (file, reload) =>
             commandline.command = commandline.commands['open']
             commandline.command.loadState()
             commandline.setText path.basename file
+    
+    window.split.reveal 'editor'
+        
     if line?
         editor.singleCursorAtPos [0, parseInt(line)-1] 
         editor.scrollCursorToTop()        
+        
 
 openFiles = (ofiles, options) =>
     # log 'openFiles:', ofiles    

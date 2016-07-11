@@ -31,18 +31,17 @@ class Term extends Command
         terminal = window.terminal
         alias = @getState 'alias', {}
         
-        if aliasList.length == 0
-            terminal.appendMeta clss: 'salt', text: 'alias'            
-            terminal.singleCursorAtPos [0, terminal.lines.length-1]
-            for key,cmd of alias
-                terminal.output "#{key} #{cmd}" 
-            return text: '', reveal: 'terminal'
-        else if aliasList.length == 1
+        if aliasList.length == 1
             delete alias[aliasList[0]]
-        else 
+        else if aliasList.length > 1
             alias[aliasList[0]] = aliasList.slice(1).join ' '
-        @setState 'alias', alias
-        
+        @setState 'alias', alias if aliasList.length
+        terminal.appendMeta clss: 'salt', text: 'alias ' + aliasList.join ' '
+        terminal.singleCursorAtPos [0, terminal.lines.length-1]
+        for key,cmd of alias
+            terminal.output "#{key} #{cmd}" 
+        return text: '', reveal: 'terminal'
+    
     resolveCommand: (command) ->
         commands = command.split ';'
         if commands.length > 1

@@ -14,29 +14,28 @@
 
 (▸ )([^']+')(.+)(':)       . class . class.marker . class . class.marker
 
-(● )(\w+)                  . class.marker . class
-(▸ )(\w+)                  . method.marker . method
-(▸ @)(\w+)                 . static.method.marker . static.method
+^(● )(\w+)$                . class.marker . class
+^\s+(▸ )(\w+)$             . method.marker . method
+^\s+(▸ @)(\w+)$            . static.method.marker . static.method
 
-●.*\/                       marker
-
-(?:^|\s\s+)([\/\S]*\/)(\S+)
+(?:^|\s\s+)(\~?[\/\S]*\/)(\S+)
                             dirname
                             basename
 
 (?:[^\/\.]+)(\.[^\/]+)      extname
 (?:^\s*|\/)(\.\w+)(?:\s|$)  dotfile
-([\.\/\-\_\w]+\.coffee\b)   coffee
-([\.\/\-\_\w]+\.noon\b)     noon
-([\.\/\-\_\w]+\.json\b)     json
-([\.\/\-\_\w]+\.styl\b)     styl
-([\.\/\-\_\w]+\.html\b)     html
-([\.\/\-\_\w]+\.pug\b)      pug
-([\.\/\-\_\w]+\.css\b)      css
-([\.\/\-\_\w]+\.js\b)       js
-([\.\/\-\_\w]+\.md\b)       md
+(●?\s?~?[\.\/\-\_\w]+\.coffee\b)   coffee
+(●?\s?~?[\.\/\-\_\w]+\.noon\b)     noon
+(●?\s?~?[\.\/\-\_\w]+\.json\b)     json
+(●?\s?~?[\.\/\-\_\w]+\.styl\b)     styl
+(●?\s?~?[\.\/\-\_\w]+\.html\b)     html
+(●?\s?~?[\.\/\-\_\w]+\.pug\b)      pug
+(●?\s?~?[\.\/\-\_\w]+\.css\b)      css
+(●?\s?~?[\.\/\-\_\w]+\.js\b)       js
+(●?\s?~?[\.\/\-\_\w]+\.md\b)       md
 
-\.                          marker
+# ●                           keyword
+[\.]                        marker
 \/                          separator
 
 # salter headers

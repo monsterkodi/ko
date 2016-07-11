@@ -3,7 +3,9 @@
 # 0000000   0000000   000000000  0000000    000       000000000
 #      000  000       000   000  000   000  000       000   000
 # 0000000   00000000  000   000  000   000   0000000  000   000
-
+{
+unresolve
+}       = require '../tools/tools'
 log     = require '../tools/log'
 walker  = require '../tools/walker'
 matchr  = require '../tools/matchr'
@@ -106,7 +108,7 @@ class FileSearcher extends stream.Writable
         if @found.length
             terminal = window.terminal
             meta = 
-                diss: syntax.dissForTextAndSyntax "● #{@file}:", 'ko'
+                diss: syntax.dissForTextAndSyntax "● #{unresolve @file}:", 'ko'
                 href: @file
             terminal.appendMeta meta
             terminal.appendMeta clss: 'spacer'
