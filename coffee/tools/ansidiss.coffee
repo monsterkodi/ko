@@ -6,10 +6,10 @@ _        = require 'lodash'
 
 STYLES =
     f0:  'color:#000' # normal intensity
-    f1:  'color:#A00'
+    f1:  'color:#E00'
     f2:  'color:#0A0'
     f3:  'color:#A50'
-    f4:  'color:#00A'
+    f4:  'color:#00E'
     f5:  'color:#A0A'
     f6:  'color:#0AA'
     f7:  'color:#AAA'
@@ -49,11 +49,10 @@ toHexString = (num) ->
             c = 16 + (red * 36) + (green * 6) + blue
             r = if red   > 0 then red   * 40 + 55 else 0
             g = if green > 0 then green * 40 + 55 else 0
-            b = if blue  > 0 then blue  * 40 + 55 else 0
+            b = if blue  > 0 then blue  * 40 + 55 else 0            
             rgb = (toHexString(n) for n in [r, g, b]).join('')
             STYLES["f#{c}"] = "color:##{rgb}"
             STYLES["b#{c}"] = "background-color:##{rgb}"
-
 
 [0..23].forEach (gray) ->
     c = gray+232
@@ -67,16 +66,16 @@ toHexString = (num) ->
 # 000   000  000  0000       000  000  000   000  000       000       000
 # 000   000  000   000  0000000   000  0000000    000  0000000   0000000 
 
-class ansiDiss
+class AnsiDiss
     
     constructor: () ->
 
     dissect: (@input) ->
         @diss  = []
         @text  = ""
-        # log "ansidiss.dissect @input #{@input}"
+        log "ansidiss.dissect @input #{@input}"
         @tokenize()
-        # log "ansidiss.dissect @text #{@text} @diss", @diss
+        log "ansidiss.dissect @text #{@text} @diss", @diss
         [@text, @diss]
 
     tokenize: () ->
@@ -112,6 +111,12 @@ class ansiDiss
             start = @text.length
             ''
         
+        toHighIntensity = (c) ->
+            for i in [0..7]
+                if c == STYLES["f#{i}"]
+                    return STYLES["f#{8+i}"]
+            c
+        
         ansiCode = (m, c) =>
             ansiMatch = true
             c = '0' if c.trim().length is 0            
@@ -120,13 +125,15 @@ class ansiDiss
                 code = parseInt code, 10
                 switch 
                     when code is 0          then resetStyle()
-                    when code is 1          then addStyle 'font-weight:bold'
+                    when code is 1          
+                        addStyle 'font-weight:bold'
+                        fg = toHighIntensity fg
                     when code is 2          then addStyle 'opacity:0.5'
                     when code is 4          then addStyle 'text-decoration:underline'
                     when code is 8          then addStyle 'display:none'
                     when code is 9          then addStyle 'text-decoration:line-through'
                     when code is 39         then fg = STYLES["f15"] # default foreground
-                    when code is 49         then fg = STYLES["b0"]  # default background
+                    when code is 49         then bg = STYLES["b0"]  # default background
                     when code is 38         then fg = STYLES["f#{cs[2]}"] # extended fg 38;5;[0-255]
                     when code is 48         then bg = STYLES["b#{cs[2]}"] # extended bg 48;5;[0-255]
                     when 30 <= code <= 37   then fg = STYLES["f#{code - 30}"] # normal intensity
@@ -137,6 +144,7 @@ class ansiDiss
                     when code is 22         
                         delStyle 'font-weight:bold'
                         delStyle 'opacity:0.5'
+                break if code in [38, 48]
             ''
             
         tokens = [
@@ -156,4 +164,4 @@ class ansiDiss
             process(handler, i) for handler, i in tokens
             break if @input.length == length
             
-module.exports = ansiDiss
+module.exports = AnsiDiss

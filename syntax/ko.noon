@@ -26,15 +26,15 @@
 
 (?:[^\/\.]+)(\.[^\/]+)      extname
 (?:^\s*|\/)(\.\w+)(?:\s|$)  dotfile
-([\.\/\w]+\.coffee\b)       coffee
-([\.\/\w]+\.noon\b)         noon
-([\.\/\w]+\.json\b)         json
-([\.\/\w]+\.styl\b)         styl
-([\.\/\w]+\.html\b)         html
-([\.\/\w]+\.pug\b)          pug
-([\.\/\w]+\.css\b)          css
-([\.\/\w]+\.js\b)           js
-([\.\/\w]+\.md\b)           md
+([\.\/\-\_\w]+\.coffee\b)   coffee
+([\.\/\-\_\w]+\.noon\b)     noon
+([\.\/\-\_\w]+\.json\b)     json
+([\.\/\-\_\w]+\.styl\b)     styl
+([\.\/\-\_\w]+\.html\b)     html
+([\.\/\-\_\w]+\.pug\b)      pug
+([\.\/\-\_\w]+\.css\b)      css
+([\.\/\-\_\w]+\.js\b)       js
+([\.\/\-\_\w]+\.md\b)       md
 
 \.                          marker
 \/                          separator

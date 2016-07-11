@@ -97,7 +97,14 @@ class Terminal extends ViewBase
                 return
             when 'command+s'
                 return if @meta.saveChanges()
+            when 'esc'
+                split = window.split
+                if split.editorVisible()
+                    split.hideEditor()
+                else 
+                    split.focus '.commandline-editor'
+                return
                 
         'unhandled'
-                
+
 module.exports = Terminal

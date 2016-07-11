@@ -8,7 +8,7 @@ encode = require '../tools/encode'
 log    = require '../tools/log'
 str    = require '../tools/str'
 
-class render 
+class Render 
                 
     # 000      000  000   000  00000000
     # 000      000  0000  000  000     
@@ -102,4 +102,4 @@ class render
         
         "<span class=\"#{clss}#{border}#{empty}\" style=\"transform: translate(#{tx}px,#{ty}px); width: #{sw}px; height: #{lh}px\"></span>"
                                                 
-module.exports = render
+module.exports = Render

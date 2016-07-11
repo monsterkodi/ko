@@ -33,6 +33,7 @@ class Term extends Command
         
         if aliasList.length == 0
             terminal.appendMeta clss: 'salt', text: 'alias'            
+            terminal.singleCursorAtPos [0, terminal.lines.length-1]
             for key,cmd of alias
                 terminal.output "#{key} #{cmd}" 
             return text: '', reveal: 'terminal'
@@ -67,14 +68,15 @@ class Term extends Command
             cmds = @resolveCommand command
             for cmd in cmds
                 terminal.appendMeta clss: 'salt', text: cmd.slice 0, 32                        
-                terminal.singleCursorAtPos [0, terminal.lines.length-2]
+                terminal.singleCursorAtPos [0, terminal.lines.length-1]
                 switch cmd
                     when 'history' then terminal.output @history.join '\n'
                     when 'clear'   then terminal.clear()
                     when 'classes' 
+                        window.split.reveal 'terminal'
                         classes = ipc.sendSync 'indexer', 'classes'
                         for clss, info of classes
-                            terminal.appendMeta clss: 'spacer'
+                            terminal.appendMeta clss: 'salt', text: clss
                             meta =
                                 diss: syntax.dissForTextAndSyntax "● #{clss}", 'ko'
                                 href: "#{info.file}:#{info.line+1}"

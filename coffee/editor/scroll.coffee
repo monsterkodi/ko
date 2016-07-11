@@ -9,7 +9,7 @@ clamp
 log    = require '../tools/log'
 events = require 'events'
 
-class scroll extends events
+class Scroll extends events
 
     constructor: (cfg) ->
 
@@ -262,4 +262,4 @@ class scroll extends events
             @calc()
             @by 0
 
-module.exports = scroll
+module.exports = Scroll

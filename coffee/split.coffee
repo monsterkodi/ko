@@ -169,6 +169,8 @@ class Split extends event
     
     terminalVisible:    -> @terminalHeight() > 0
     hideTerminal:       -> @splitAt 0, 0
+    editorVisible:      -> @editorHeight() > 0
+    hideEditor:         -> @splitAt 1, @elemHeight()
     commandlineVisible: -> @splitPosY(1) > 0
 
     # 0000000     0000000 

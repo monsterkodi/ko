@@ -8,7 +8,7 @@ fs       = require 'fs'
 log      = require '../tools/log'
 chokidar = require 'chokidar'
 
-class watcher
+class Watcher
 
     constructor: (@editor) ->
         @w = chokidar.watch @editor.currentFile, 
@@ -19,4 +19,4 @@ class watcher
         
     stop: -> @w.close()
 
-module.exports = watcher
+module.exports = Watcher

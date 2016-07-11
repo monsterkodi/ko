@@ -12,7 +12,7 @@ path   = require 'path'
 noon   = require 'noon'
 fs     = require 'fs'
 
-class syntax
+class Syntax
     
     @matchrConfigs = {}
     @syntaxNames = []
@@ -53,19 +53,19 @@ class syntax
     # 0000000    000  0000000   0000000 
 
     dissForLineIndex: (lineIndex) -> 
-        syntax.dissForTextAndSyntax @editor.lines[lineIndex], @name
+        Syntax.dissForTextAndSyntax @editor.lines[lineIndex], @name
 
     @rangesForTextAndSyntax: (line, n) ->
-        matchr.ranges syntax.matchrConfigs[n], line
+        matchr.ranges Syntax.matchrConfigs[n], line
 
     @dissForTextAndSyntax: (line, n, opt) ->
-        matchr.dissect matchr.ranges(syntax.matchrConfigs[n], line), opt
+        matchr.dissect matchr.ranges(Syntax.matchrConfigs[n], line), opt
 
     getDiss: (li, opt) ->
         # log "?? #{@diss.length} #{li}" if @editor.name is 'terminal'
         if not @diss[li]?
             # log "++ #{li} #{@diss[li]}" if @editor.name is 'terminal'
-            rgs = matchr.ranges syntax.matchrConfigs[@name], @editor.lines[li]
+            rgs = matchr.ranges Syntax.matchrConfigs[@name], @editor.lines[li]
             diss = matchr.dissect rgs, opt
             @diss[li] = diss
             
@@ -127,5 +127,5 @@ class syntax
             patterns = noon.load path.join syntaxDir, syntaxFile
             @matchrConfigs[syntaxName] = matchr.config patterns
 
-syntax.init()
-module.exports = syntax
+Syntax.init()
+module.exports = Syntax

@@ -6,7 +6,7 @@
 
 keycode = require 'keycode'
 
-class keyinfo
+class Keyinfo
     
     @modifierNames = ['shift', 'ctrl', 'alt', 'command']
     
@@ -41,4 +41,4 @@ class keyinfo
         key:   @keynameForEvent event
         combo: @comboForEvent event
 
-module.exports = keyinfo
+module.exports = Keyinfo

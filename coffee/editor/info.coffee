@@ -56,8 +56,9 @@ class Info
 
         @words = document.createElement 'span'
         @words.className = "info-words empty"
-        @words.onclick = => log @editor.autocomplete.wordlist
+        @words.onclick = => log window.editor.autocomplete.wordlist
         @botline.appendChild @words
+        window.editor.autocomplete.on 'wordCount', @onWordCount
         
         @elem.appendChild @botline
         
@@ -74,7 +75,7 @@ class Info
             @editor.removeListener 'selection',    @onSelection
             @editor.removeListener 'highlight',    @onHighlight
             @editor.removeListener 'cursor',       @onCursor
-            @editor.autocomplete?.removeListener 'wordCount', @onWordCount
+            # @editor.autocomplete?.removeListener 'wordCount', @onWordCount
                 
         @editor = editor
         
@@ -84,7 +85,7 @@ class Info
         @editor.on 'selection',    @onSelection
         @editor.on 'highlight',    @onHighlight
         @editor.on 'cursor',       @onCursor
-        @editor.autocomplete?.on 'wordCount', @onWordCount
+        # @editor.autocomplete?.on 'wordCount', @onWordCount
         
         @onNumLines()
 

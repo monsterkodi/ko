@@ -83,7 +83,5 @@ class Indexer
             if @queue.length
                 file = @queue.shift()
                 @indexFile file
-            # else
-                # log "indexer.indexFile #{file} classes:", @classes, "\nfiles:", @files
                         
 module.exports = Indexer

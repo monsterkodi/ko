@@ -8,7 +8,7 @@ log     = require '../tools/log'
 {last}  = require '../tools/tools'
 {clone} = require 'lodash'
 
-class undo
+class Undo
     
     constructor: (@editor) -> @reset()
 
@@ -389,4 +389,4 @@ class undo
             else
                 break
         
-module.exports = undo
+module.exports = Undo
