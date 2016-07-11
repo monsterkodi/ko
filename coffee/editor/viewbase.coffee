@@ -533,11 +533,11 @@ class ViewBase extends Editor
     # 000      000  000  0000  000            000
     # 0000000  000  000   000  00000000  0000000 
     
-    viewHeight:      -> @view?.getBoundingClientRect().height 
-    viewWidth:       -> @view?.getBoundingClientRect().width 
-    layersWidth:     -> @layers?.getBoundingClientRect().width 
-    numViewLines:    -> Math.ceil(@viewHeight() / @size.lineHeight)
-    numFullLines:    -> Math.floor(@viewHeight() / @size.lineHeight)
+    viewHeight:   -> @view?.getBoundingClientRect().height 
+    viewWidth:    -> @view?.getBoundingClientRect().width 
+    layersWidth:  -> @layers?.getBoundingClientRect().width 
+    numViewLines: -> Math.ceil(@viewHeight() / @size.lineHeight)
+    numFullLines: -> Math.floor(@viewHeight() / @size.lineHeight)
     
     clearLines: => 
         @elem.innerHTML = ""
@@ -576,7 +576,9 @@ class ViewBase extends Editor
                         
                 @view.focus()
                 p = @posForEvent event
-                if event.metaKey
+                if event.altKey
+                    @jumpToDefinition @wordAtCursor p
+                else if event.metaKey
                     @toggleCursorAtPos p
                 else
                     @singleCursorAtPos p, event.shiftKey
@@ -659,6 +661,7 @@ class ViewBase extends Editor
             when 'command+shift+d'          then return @removeSelectedHighlight()
             when 'command+alt+d'            then return @selectAllHighlights()
             when 'command+g'                then return @selectNextHighlight()
+            when 'command+g'                then return @jumpToDefinition @wordAtCursor()
             when 'command+shift+g'          then return @selectPrevHighlight()
             when 'command+l'                then return @selectMoreLines()
             when 'command+shift+l'          then return @selectLessLines()            

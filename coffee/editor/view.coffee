@@ -16,6 +16,7 @@ ViewBase  = require './viewbase'
 syntax    = require './syntax'
 path      = require 'path'
 electron  = require 'electron'
+ipc       = electron.ipcRenderer
 webframe  = electron.webFrame
 
 class View extends ViewBase
@@ -115,6 +116,19 @@ class View extends ViewBase
         filePositions = window.getState 'filePositions', {}
         filePositions[@currentFile] = s
         window.setState 'filePositions', filePositions       
+    
+    #       000  000   000  00     00  00000000   000000000   0000000   0000000    00000000  00000000  000  000   000  000  000000000  000   0000000   000   000
+    #       000  000   000  000   000  000   000     000     000   000  000   000  000       000       000  0000  000  000     000     000  000   000  0000  000
+    #       000  000   000  000000000  00000000      000     000   000  000   000  0000000   000000    000  000 0 000  000     000     000  000   000  000 0 000
+    # 000   000  000   000  000 0 000  000           000     000   000  000   000  000       000       000  000  0000  000     000     000  000   000  000  0000
+    #  0000000    0000000   000   000  000           000      0000000   0000000    00000000  000       000  000   000  000     000     000   0000000   000   000
+    
+    jumpToDefinition: (word) ->
+        classes = ipc.sendSync 'indexer', 'classes'
+        for clss, info of classes
+            for mthd, minfo of info.methods
+                if mthd == word
+                    window.loadFile "#{info.file}:#{minfo.line+1}"
     
     # 00000000   00000000   0000000  000000000   0000000   00000000   00000000
     # 000   000  000       000          000     000   000  000   000  000     

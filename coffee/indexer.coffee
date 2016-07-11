@@ -3,10 +3,14 @@
 # 000  000 0 000  000   000  0000000     00000    0000000   0000000  
 # 000  000  0000  000   000  000        000 000   000       000   000
 # 000  000   000  0000000    00000000  000   000  00000000  000   000
-
-log = require './tools/log'
-_   = require 'lodash'
-fs  = require 'fs'
+{
+fileExists,
+resolve
+}    = require './tools/tools'
+log  = require './tools/log'
+_    = require 'lodash'
+fs   = require 'fs'
+path = require 'path'
 
 class Indexer
     
@@ -15,14 +19,25 @@ class Indexer
         @files   = {}
         @classes = {}
         @words   = {}
+        @queue   = [] 
         
         @splitRegExp = new RegExp "[^\\w\\d#\\_]+", 'g'        
-        
+      
+    # 000  000   000  0000000    00000000  000   000  00000000  000  000      00000000
+    # 000  0000  000  000   000  000        000 000   000       000  000      000     
+    # 000  000 0 000  000   000  0000000     00000    000000    000  000      0000000 
+    # 000  000  0000  000   000  000        000 000   000       000  000      000     
+    # 000  000   000  0000000    00000000  000   000  000       000  0000000  00000000
+    
     indexFile: (file) ->
+        
+        return if @files[file]?
+        
         fs.readFile file, 'utf8', (err, data) =>
-            
+            return if err?
             lines = data.split /\r?\n/
-            _.set @files, "#{file}.lines", lines.length
+            fileInfo = 
+                lines: lines.length
             
             currentClass = null
             for li in [0...lines.length]
@@ -33,7 +48,7 @@ class Indexer
                     if indent < 4
                         currentClass = null
                     else if indent == 4
-                        m = line.match /^\s+(\w+)\s*\:\s*(\([\w\s\,]*\))?\s*[=-]\>/
+                        m = line.match /^\s+([\@]?\w+)\s*\:\s*(\([\w\s\,]*\))?\s*[=-]\>/
                         if m?[1]?
                             _.set @classes, "#{currentClass}.methods.#{m[1]}", 
                                 line: li                
@@ -51,13 +66,24 @@ class Indexer
                                     file: file
                                     line: li
                         when 'require'
-                            m = line.match /^\s*(\w+)\s+=\s+require\s+[\'\"]([\.\/\w]+)[\'\"]/
+                            m = line.match /^\s*([\w\{\}]+)\s+=\s+require\s+[\'\"]([\.\/\w]+)[\'\"]/
                             if m?[1]? and m[2]?
-                                _.update @files, "#{file}.require", (r) => 
-                                    if r? then r.push [m[1], m[2]]
-                                    else r = [[m[1], m[2]]]
-                                    r                    
+                                r = fileInfo.require ? []
+                                r.push [m[1], m[2]]
+                                fileInfo.require = r
+                                
+                                abspath = resolve path.join path.dirname(file), m[2] 
+                                abspath += '.coffee'
+                                if (m[2][0] == '.') and (not @files[abspath]?) and (@queue.indexOf(abspath) < 0)
+                                    if fileExists abspath 
+                                        @queue.push abspath
+                                    
+            @files[file] = fileInfo
                     
-            log "indexer.indexFile #{file} classes:", @classes, "\nfiles:", @files
-            
+            if @queue.length
+                file = @queue.shift()
+                @indexFile file
+            # else
+                # log "indexer.indexFile #{file} classes:", @classes, "\nfiles:", @files
+                        
 module.exports = Indexer

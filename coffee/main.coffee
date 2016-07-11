@@ -125,11 +125,14 @@ ipc.on 'reloadWindow',      (event, winID) => main.reloadWin winWithID winID
 ipc.on 'prefSet',           (event, k, v)  => prefs.set k, v
 ipc.on 'prefGet',           (event, k, d)  => event.returnValue = prefs.get k, d
 ipc.on 'reloadMenu',        ()             => main.reloadMenu() # still in use?
+
 ipc.on 'winFileLinesChanged', (event, winID, file, lineChanges) => 
     return if not winID
     for w in wins()
         if w.id != winID
             w.webContents.send 'fileLinesChanged', file, lineChanges
+            
+ipc.on 'indexer', (event, item) => event.returnValue = main.indexer[item]
                         
 # 00     00   0000000   000  000   000
 # 000   000  000   000  000  0000  000

@@ -13,6 +13,11 @@
 # 0000000   00000000  000   000  000   000   0000000  000   000
 
 (▸ )([^']+')(.+)(':)       . class . class.marker . class . class.marker
+
+(● )(\w+)                  . class.marker . class
+(▸ )(\w+)                  . method.marker . method
+(▸ @)(\w+)                 . static.method.marker . static.method
+
 ●.*\/                       marker
 
 (?:^|\s\s+)([\/\S]*\/)(\S+)

@@ -20,7 +20,6 @@
 - list buffers when clicking buffer number in titlebar
 
 #### editor
-- *alt-click: jump to definition*
 - save and restore scrollX/Left
 - check undo (merges too much?)
 - make special stuff file type dependent

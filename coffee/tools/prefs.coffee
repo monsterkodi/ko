@@ -31,13 +31,7 @@ class Prefs
                 type: 'file'
                 format: 
                     parse: noon.parse
-                    stringify: (o,n,i) -> 
-                        # if typeof(o) == 'object' and o.constructor.name == 'Array'
-                            # log 'array'
-                            # ("|#{v}|" for v in o).join '\n'
-                        # else
-                            # log "no array", o
-                        noon.stringify o, {indent: i, maxalign: 8}
+                    stringify: (o,n,i) -> noon.stringify o, {indent: i, maxalign: 8}
                 file: path
             nconf.defaults defs
     

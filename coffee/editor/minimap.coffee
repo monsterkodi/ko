@@ -197,10 +197,13 @@ class Minimap
         for c in changeInfo.changed
             break if c >= redraw
             @drawLines c, c
+            
+        @clearRange redraw, @scroll.exposeTop + @scroll.viewHeight / @scroll.lineHeight
         
         if redraw <= @scroll.exposeBot            
             @drawLines redraw, @scroll.exposeBot
             @drawTopBot()
+            
         
     # 00     00   0000000   000   000   0000000  00000000
     # 000   000  000   000  000   000  000       000     

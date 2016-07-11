@@ -5,6 +5,7 @@
 #    000     00000000  000   000  000   000
 
 log      = require '../tools/log'
+syntax   = require '../editor/syntax'
 Command  = require '../commandline/command'
 electron = require 'electron'
 ipc      = electron.ipcRenderer
@@ -70,6 +71,22 @@ class Term extends Command
                 switch cmd
                     when 'history' then terminal.output @history.join '\n'
                     when 'clear'   then terminal.clear()
+                    when 'classes' 
+                        classes = ipc.sendSync 'indexer', 'classes'
+                        for clss, info of classes
+                            terminal.appendMeta clss: 'spacer'
+                            meta =
+                                diss: syntax.dissForTextAndSyntax "● #{clss}", 'ko'
+                                href: "#{info.file}:#{info.line+1}"
+                                clss: 'searchResult'
+                            terminal.appendMeta meta
+                            
+                            for mthd, minfo of info.methods
+                                meta =
+                                    diss: syntax.dissForTextAndSyntax "    ▸ #{mthd}", 'ko'
+                                    href: "#{info.file}:#{minfo.line+1}"
+                                    clss: 'searchResult'
+                                terminal.appendMeta meta
                     else
                         ipc.send 'shellCommand', winID: window.winID, cmdID: @cmdID, command: cmd
                         @cmdID += 1
