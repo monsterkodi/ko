@@ -27,14 +27,14 @@ thinBorder            = 1px solid frameColor
 font                  = "Menlo", "Andale Mono", monospace
 
 fill-abs()
-    position        absolute
-    bottom          0
-    right           0
-    left            0
-    top             0
+    position            absolute
+    bottom              0
+    right               0
+    left                0
+    top                 0
     
 pre 
-    margin          0
+    margin              0
     
 //  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
 // 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
@@ -229,7 +229,7 @@ infoPadding           = 10px
 // 0000000     0000000   0000000       000   
 
 *
-    outline-width   0
+    outline-width       0
     
 body
     fill-abs()
@@ -390,28 +390,28 @@ body
 .terminal
 .logview
 .editor
-    position        relative
-    display         block
+    position            relative
+    display             block
         
-    overflow        hidden
+    overflow            hidden
 
-    background      #000
-    color           #ddd 
+    background          #000
+    color               #ddd 
     
-    font-family     font
+    font-family         font
     
 .layers
-    position        relative 
-    overflow-x      visible
-    overflow-y      hidden
+    position            relative 
+    overflow-x          visible
+    overflow-y          hidden
     &::-webkit-scrollbar
-        height      2px
+        height          2px
         
 .lines
 .cursors
 .highlights
 .selections
-    pointer-events  none
+    pointer-events      none
     fill-abs()
 
 // 000      000  000   000  00000000   0000000
@@ -421,16 +421,16 @@ body
 // 0000000  000  000   000  00000000  0000000 
     
 .lines
-    cursor          default
-    font-size       inherit
+    cursor              default
+    font-size           inherit
 
 .line
-    font-size       inherit
-    white-space     nowrap
-    display         block
-    position        absolute
+    font-size           inherit
+    white-space         nowrap
+    display             block
+    position            absolute
     & span
-        position    absolute
+        position        absolute
 
 //  0000000  000   000  00000000    0000000   0000000   00000000 
 // 000       000   000  000   000  000       000   000  000   000
@@ -452,24 +452,24 @@ body
 //   animation-timing-function ease-in-out
 
 .cursor
-    width            2px
-    margin-right    -1px
-    margin-left     -1px
-    display         inline-block
+    width                2px
+    margin-right        -1px
+    margin-left         -1px
+    display             inline-block
     &.main:not(.off)
-        width        4px
-        margin-right -2px
-        margin-left  -2px
-        border-radius 2px       
+        width            4px
+        margin-right    -2px
+        margin-left     -2px
+        border-radius    2px       
         
-*:focus .cursor      // focus colors
+*:focus .cursor         // focus colors
     background          #f80 
     &.virtual
         background      #08f
     &.main
         background      #ff0
     
-.cursor               // blur colors
+.cursor                 // blur colors
     background          #444
     &.main
         background      #666 
@@ -483,15 +483,15 @@ body
 // 000   000   0000000   000   000  0000000    00000000  000   000  0000000 
 
 .numbers
-    position        absolute
-    left            0
-    top             0
-    display         block
-    width           numbersWidth
-    pointer-events  none
-    font-size       13px
-    font-family     font
-    background      rgba(0, 0, 0, 0.5) // this darkens selection
+    position            absolute
+    left                0
+    top                 0
+    display             block
+    width               numbersWidth
+    pointer-events      none
+    font-size           13px
+    font-family         font
+    background          rgba(0, 0, 0, 0.5) // this darkens selection
 
 //@keyframes number-blink 
 //  from 
@@ -535,15 +535,15 @@ body
 // 000   000  00000000     000     000   000
 
 .meta
-    position        absolute
-    pointer-events  all
-    background      #333
-    opacity         0.8
+    position            absolute
+    pointer-events      all
+    background          #333
+    opacity             0.8
     
-    padding-right     metaRadius
-    margin-right    - metaRadius
-    margin-left     - editorPadding
-    padding-left      editorPadding
+    padding-right             metaRadius
+    margin-right            - metaRadius
+    margin-left             - editorPadding
+    padding-left              editorPadding
     border-top-right-radius   metaRadius
     border-bottom-right-radius   metaRadius
     
@@ -613,9 +613,9 @@ canvas
 // 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000   
             
 .highlight
-    position        absolute
-    pointer-events  none
-    background      rgba(155,155,255, 0.3)
+    position            absolute
+    pointer-events      none
+    background          rgba(155,155,255, 0.3)
 
 //  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
 // 000       000       000      000       000          000     000  000   000  0000  000
@@ -624,12 +624,12 @@ canvas
 // 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
     
 *:focus .selection
-        background  #444 // focus
+        background      #444 // focus
         
 .selection
-    position        absolute
-    pointer-events  none
-    background      #282828 // no focus
+    position            absolute
+    pointer-events      none
+    background          #282828 // no focus
     
     & .empty // used in selections of empty lines
         width            1px
@@ -637,10 +637,10 @@ canvas
     
 .selection
 .highlight    
-    padding-right   selectionRadiusCursor
-    margin-right    - selectionRadiusCursor
-    padding-left    selectionRadiusCursor
-    margin-left     - selectionRadiusCursor
+    padding-right       selectionRadiusCursor
+    margin-right        - selectionRadiusCursor
+    padding-left        selectionRadiusCursor
+    margin-left         - selectionRadiusCursor
     &.start
         padding-left    editorPadding
         margin-left     - editorPadding

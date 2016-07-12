@@ -682,7 +682,7 @@ class ViewBase extends Editor
             when 'command+up', 'command+down' then return @addCursors key
             when 'ctrl+a', 'ctrl+shift+a'     then return @moveCursorsToLineBoundary 'left',  event.shiftKey
             when 'ctrl+e', 'ctrl+shift+e'     then return @moveCursorsToLineBoundary 'right', event.shiftKey
-            when 'alt+ctrl+right'             then return @alignCursorsAndText()
+            when 'ctrl+shift+right'           then return @alignCursorsAndText()
                 
             when 'command+left', 'command+right'   
                 if @selections.length > 1 and @cursors.length == 1
@@ -696,8 +696,10 @@ class ViewBase extends Editor
             when 'alt+left', 'alt+right', 'alt+shift+left', 'alt+shift+right'
                 return @moveCursorsToWordBoundary key, event.shiftKey
 
-            when 'command+shift+up', 'command+shift+down'          then return @delCursors   key
-            when 'ctrl+up', 'ctrl+down', 'ctrl+left', 'ctrl+right' then return @alignCursors key
+            when 'command+shift+up', 'command+shift+down'          then return @delCursors    key
+            when 'ctrl+up', 'ctrl+down', 'ctrl+left', 'ctrl+right' then return @alignCursors  key
+            when 'ctrl+shift+up', 'ctrl+shift+down'                then return @addMainCursor key
+            when 'alt+ctrl+up', 'alt+ctrl+down', 'alt+ctrl+left', 'alt+ctrl+right' then return @moveMainCursor key
 
         return if mod and not key?.length
         

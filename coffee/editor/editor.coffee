@@ -24,6 +24,7 @@ class Editor extends Buffer
         @currentFile = null
         @indentString = _.padStart "", 4
         @stickySelection = false
+        @mainCursorMove = 0
         @watch = null
         @do = new undo @
         @dbg = false
@@ -381,7 +382,8 @@ class Editor extends Buffer
     # 000       000   000  000   000       000  000   000  000   000
     #  0000000   0000000   000   000  0000000    0000000   000   000
     
-    setCursor: (c,l) -> 
+    setCursor: (c,l) ->
+        @mainCursorMove = 0
         l = clamp 0, @lines.length-1, l
         c = clamp 0, @lines[l].length, c
         @do.cursors [[c,l]]
@@ -393,19 +395,35 @@ class Editor extends Buffer
             @addCursorAtPos p
         
     addCursorAtPos: (p) ->
+        @mainCursorMove = 0
         newCursors = _.cloneDeep @cursors
         newCursors.push p
         @mainCursor = p
         @do.cursors newCursors        
         
     delCursorAtPos: (p) ->
+        @mainCursorMove = 0
         c = @cursorAtPos p
         if c and @cursors.length > 1
             newCursors = _.cloneDeep @cursors
             newCursors.splice @indexOfCursor(c), 1
             @do.cursors newCursors, closestMain: true        
+           
+    addMainCursor: (dir='down') ->
+        @mainCursorMove = 0
+        d = switch dir
+            when 'up' then -1
+            when 'down' then +1
+        newCursors = _.cloneDeep @cursors
+        if not @cursorAtPos [@mainCursor[0], @mainCursor[1]+d]
+            newCursors.push [@mainCursor[0], @mainCursor[1]+d]
+            @mainCursor = last newCursors
+        else
+            @mainCursor = @cursorAtPos [@mainCursor[0], @mainCursor[1]+d]
+        @do.cursors newCursors
                     
     addCursors: (dir='down') ->
+        @mainCursorMove = 0
         return if @cursors.length >= 999
         d = switch dir
             when 'up' then -1
@@ -422,6 +440,7 @@ class Editor extends Buffer
         @do.cursors newCursors
 
     alignCursorsAndText: ->
+        @mainCursorMove = 0
         @clearHighlights()
         newCursors = _.cloneDeep @cursors
         newX = _.max (c[0] for c in @cursors)
@@ -434,6 +453,7 @@ class Editor extends Buffer
         @do.cursors newCursors
 
     alignCursors: (dir='down') ->
+        @mainCursorMove = 0
         charPos = switch dir
             when 'up'    then first(@cursors)[0]
             when 'down'  then last( @cursors)[0]
@@ -454,6 +474,7 @@ class Editor extends Buffer
         @do.cursors newCursors
     
     setCursorsAtSelectionBoundary: (leftOrRight='right') ->
+        @mainCursorMove = 0
         i = leftOrRight == 'right' and 1 or 0
         @do.start()
         newCursors = []
@@ -469,6 +490,7 @@ class Editor extends Buffer
         @do.end()       
 
     delCursors: (dir='up') ->
+        @mainCursorMove = 0
         newCursors = _.cloneDeep @cursors
         @mainCursor = newCursors[@indexOfCursor @mainCursor]
         d = switch dir
@@ -486,7 +508,9 @@ class Editor extends Buffer
                         newCursors.splice ci, 1
         @do.cursors newCursors 
         
-    clearCursors: () -> @do.cursors [@mainCursor] 
+    clearCursors: () -> 
+        @mainCursorMove = 0
+        @do.cursors [@mainCursor] 
 
     clearCursorsAndHighlights: () ->
         @clearCursors()
@@ -526,6 +550,7 @@ class Editor extends Buffer
     # 000   000   0000000       0      00000000
 
     moveAllCursors: (f, opt={}) ->
+        @mainCursorMove = 0
         @startSelection opt.extend
         newCursors = _.cloneDeep @cursors        
         if @cursors.length > 1
@@ -540,11 +565,29 @@ class Editor extends Buffer
         @do.cursors newCursors, keepInitial: opt.extend
         @endSelection opt.extend
         true
+
+    moveMainCursor: (dir='down') ->
+        @mainCursorMove += 1
+        [dx, dy] = switch dir
+            when 'up'    then [0,-1]
+            when 'down'  then [0,+1]
+            when 'left'  then [-1,0]
+            when 'right' then [+1,0]
+        newCursors = _.cloneDeep @cursors
+        if @mainCursorMove > 1
+            _.remove newCursors, (c) => @isSamePos c, @mainCursor
+        if not @cursorAtPos [@mainCursor[0]+dx, @mainCursor[1]+dy]
+            newCursors.push [@mainCursor[0]+dx, @mainCursor[1]+dy]
+            @mainCursor = last newCursors
+        else
+            @mainCursor = @cursorAtPos [@mainCursor[0]+dx, @mainCursor[1]+dy], newCursors
+        @do.cursors newCursors
         
     moveCursorsToLineBoundary: (leftOrRight, e) ->
+        @mainCursorMove = 0
         f = switch leftOrRight
             when 'right' then (c) => [@lines[c[1]].length, c[1]]
-            when 'left' then (c) => 
+            when 'left'  then (c) => 
                 if @lines[c[1]].slice(0,c[0]).trim().length == 0
                     [0, c[1]]
                 else
@@ -554,13 +597,14 @@ class Editor extends Buffer
         true
     
     moveCursorsToWordBoundary: (leftOrRight, e) -> 
+        @mainCursorMove = 0
         f = switch leftOrRight
             when 'right' then @endOfWordAtCursor
-            when 'left' then @startOfWordAtCursor
+            when 'left'  then @startOfWordAtCursor
         @moveAllCursors f, extend:e, keepLine:true
         true
     
-    moveCursorsUp:   (e, n=1) -> 
+    moveCursorsUp:   (e, n=1) ->                 
         @moveAllCursors ((n)->(c)->[c[0],c[1]-n])(n), extend:e, main: 'first'
                         
     moveCursorsRight: (e, n=1) ->
@@ -589,10 +633,10 @@ class Editor extends Buffer
         
     moveCursors: (direction, e) ->
         switch direction
-            when 'left'  then @moveCursorsLeft e
+            when 'left'  then @moveCursorsLeft  e
             when 'right' then @moveCursorsRight e
-            when 'up'    then @moveCursorsUp e
-            when 'down'  then @moveCursorsDown e
+            when 'up'    then @moveCursorsUp    e
+            when 'down'  then @moveCursorsDown  e
 
     # 000  000   000  0000000    00000000  000   000  000000000
     # 000  0000  000  000   000  000       0000  000     000   
