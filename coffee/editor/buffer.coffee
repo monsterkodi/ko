@@ -11,7 +11,6 @@ first,
 last
 }      = require "../tools/tools"
 log    = require '../tools/log'
-assert = require 'assert'
 fuzzy  = require 'fuzzy'
 event  = require 'events'
 _      = require 'lodash'

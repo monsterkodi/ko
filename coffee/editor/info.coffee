@@ -6,6 +6,8 @@
 {
 $} = require '../tools/tools'
 log = require '../tools/log'
+electron = require 'electron'
+ipc = electron.ipcRenderer
 
 class Info
     
@@ -59,6 +61,12 @@ class Info
         @words.onclick = => log window.editor.autocomplete.wordlist
         @botline.appendChild @words
         window.editor.autocomplete.on 'wordCount', @onWordCount
+
+        @funcs = document.createElement 'span'
+        @funcs.className = "info-funcs empty"
+        @funcs.onclick = => log "funcs:", ipc.sendSync 'indexer', 'funcs' #, 'classes'
+        @botline.appendChild @funcs
+        ipc.on 'funcsCount', (event, count) => @onFuncsCount count
         
         @elem.appendChild @botline
         
@@ -75,7 +83,6 @@ class Info
             @editor.removeListener 'selection',    @onSelection
             @editor.removeListener 'highlight',    @onHighlight
             @editor.removeListener 'cursor',       @onCursor
-            # @editor.autocomplete?.removeListener 'wordCount', @onWordCount
                 
         @editor = editor
         
@@ -85,7 +92,6 @@ class Info
         @editor.on 'selection',    @onSelection
         @editor.on 'highlight',    @onHighlight
         @editor.on 'cursor',       @onCursor
-        # @editor.autocomplete?.on 'wordCount', @onWordCount
         
         @onNumLines()
 
@@ -94,6 +100,10 @@ class Info
     onWordCount: (wc) =>
         @words.textContent = wc
         @words.classList.toggle 'empty', wc == 0
+
+    onFuncsCount: (fc) =>
+        @funcs.textContent = fc
+        @funcs.classList.toggle 'empty', fc == 0
     
     onCursor: => 
         @cursorLine.textContent = @editor.mainCursor[1]+1

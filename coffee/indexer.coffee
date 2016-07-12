@@ -6,11 +6,13 @@
 {
 fileExists,
 resolve
-}    = require './tools/tools'
-log  = require './tools/log'
-_    = require 'lodash'
-fs   = require 'fs'
-path = require 'path'
+}        = require './tools/tools'
+log      = require './tools/log'
+_        = require 'lodash'
+fs       = require 'fs'
+path     = require 'path'
+electron = require 'electron'
+BrowserWindow = electron.BrowserWindow
 
 class Indexer
     
@@ -18,6 +20,7 @@ class Indexer
         
         @files   = {}
         @classes = {}
+        @funcs   = Object.create null #new Map
         @words   = {}
         @queue   = [] 
         
@@ -38,7 +41,7 @@ class Indexer
             lines = data.split /\r?\n/
             fileInfo = 
                 lines: lines.length
-            
+            funcAdded = false
             currentClass = null
             for li in [0...lines.length]
                 line = lines[li]
@@ -51,7 +54,19 @@ class Indexer
                         m = line.match /^\s+([\@]?\w+)\s*\:\s*(\([^\)]*\))?\s*[=-]\>/
                         if m?[1]?
                             _.set @classes, "#{currentClass}.methods.#{m[1]}", 
-                                line: li                
+                                line: li
+                                
+                            funcInfo = 
+                                line: li
+                                class: currentClass
+                                
+                            # funcInfos = @funcs.get(m[1]) ? []
+                            # funcInfos.push funcInfo
+                            # @funcs.set m[1], funcInfos
+                            funcInfos = @funcs[m[1]] ? []
+                            funcInfos.push funcInfo
+                            @funcs[m[1]] = funcInfos
+                            funcAdded = true
                 
                 words = line.split @splitRegExp
                 for word in words
@@ -77,7 +92,11 @@ class Indexer
                                 if (m[2][0] == '.') and (not @files[abspath]?) and (@queue.indexOf(abspath) < 0)
                                     if fileExists abspath 
                                         @queue.push abspath
-                                    
+            
+            if funcAdded
+                for win in BrowserWindow.getAllWindows()
+                    win.webContents.send 'funcsCount', Object.keys(@funcs).length #@funcs.size
+                    
             @files[file] = fileInfo
                     
             if @queue.length

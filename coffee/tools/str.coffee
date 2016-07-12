@@ -9,7 +9,7 @@ noon = require 'noon'
 str = (o) ->
     return 'null' if not o?
     if typeof o == 'object'
-        if o._str?
+        if o._str? and typeof(o._str) == 'function'
             o._str()
         else
             s = noon.stringify o, 

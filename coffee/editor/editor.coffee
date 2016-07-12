@@ -14,7 +14,6 @@ Buffer  = require './buffer'
 undo    = require './undo'
 path    = require 'path'
 fs      = require 'fs'
-assert  = require 'assert'
 _       = require 'lodash'
 
 class Editor extends Buffer
@@ -1095,7 +1094,7 @@ class Editor extends Buffer
             newCursors = _.cloneDeep @cursors
             for c in @reversedCursors()
                 if c[0] == 0        # cursor at start of line
-                    if opt?.ignoreLineBoundary
+                    if opt?.ignoreLineBoundary or @cursors.length == 1
                         if c[1] > 0 # cursor not in first line
                             ll = @lines[c[1]-1].length
                             @do.change c[1]-1, @lines[c[1]-1] + @lines[c[1]]

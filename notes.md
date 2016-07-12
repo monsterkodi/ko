@@ -25,7 +25,6 @@
     - eg. add * to surround characters for md
 
 #### editing
-- *dbg "class.method arg: #{arg}, ..."*
 - invert selection (command+i, select full lines without cursors/selections)
 - #< to add salter header of next word
 - no surround for ' inside words

@@ -94,12 +94,8 @@ pre
     & .info-line
         display         block
 
-infoPadding           = 10px   
+infoPadding = 6px   
     
-.info-lines
-    padding-left      ( infoPadding / 2 )
-    color               #555
-
 .info-cursor-line
 .info-cursor-column
     color               #ff0
@@ -107,6 +103,8 @@ infoPadding           = 10px
         color           #08f
 
 .info-words
+.info-lines
+.info-funcs
 .info-sticky     
 .info-cursors
 .info-selections
@@ -117,8 +115,18 @@ infoPadding           = 10px
     &.empty
         display         none
 
+.info-cursor-line
+.info-cursor-column
+    padding-left        (infoPadding / 2)
+
+.info-lines
+    color               #555
+
 .info-words
     color               #0a0
+
+.info-funcs
+    color               #f80
 
 .info-cursors
     color               #f80

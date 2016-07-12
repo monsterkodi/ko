@@ -3,10 +3,16 @@
 # 000000000  000000000  000       0000000    000   000
 # 000 0 000  000   000  000       000   000  000   000
 # 000   000  000   000   0000000  000   000   0000000 
-
-log     = require '../tools/log'
-Command = require '../commandline/command'
-_       = require 'lodash'
+{
+fileExists,
+last}    = require '../tools/tools'
+log      = require '../tools/log'
+Command  = require '../commandline/command'
+_        = require 'lodash'
+fs       = require 'fs'
+path     = require 'path'
+electron = require 'electron'
+ipc      = electron.ipcRenderer
 
 class Macro extends Command
 
@@ -38,20 +44,45 @@ class Macro extends Command
         super command
         editor = window.editor
         cp = editor.cursorPos()
+        args = command.split /\s+/
+        command = args.shift()
+        log "command:#{command} args:#{args}"
         switch command
             when 'dbg'
-                indent = editor.indentStringForLineAtIndex cp[1]
+                li = if editor.isCursorInIndent() then cp[1] else cp[1]+1
+                indent = editor.indentStringForLineAtIndex li
                 insert = indent + 'log "'
-                for t in editor.textsInRanges editor.selections
+                r = args.length and args or editor.textsInRanges editor.selections
+                for t in r
                     insert += "#{t}:\#{#{t}} "
                 insert = insert.trimRight()
                 insert += '"'
-                li = if editor.isCursorInIndent() then cp[1] else cp[1]+1
                 editor.do.start()
                 editor.do.insert li, insert
                 editor.singleCursorAtPos [editor.lines[li].length, li]
                 editor.do.end()
-                return text: ''
-        focus: '.'+editor.name
+                return focus: '.'+editor.name
+            when 'class'
+                clss = args.length and args[0] or last editor.textsInRanges(editor.selections)
+                clss ?= 'Class'
+                file = path.join path.dirname(editor.currentFile), clss.toLowerCase() + '.coffee'
+                if fileExists file
+                    return text: "file #{file} exists!"
+                text = """
+                \#> #{clss}
+                
+                class #{clss}
+                    
+                    constructor: () ->
+                        
+                        
+                module.exports = #{clss}
+                
+                """
+                fs.writeFileSync file, text
+                ipc.send 'newWindowWithFile', file
+                return focus: '.'+editor.name
+            
+        text: ''
                     
 module.exports = Macro
