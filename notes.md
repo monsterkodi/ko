@@ -25,10 +25,7 @@
     - eg. add * to surround characters for md
 
 #### editing
-- *align cursors with inserting spaces when ctrl+alt+right*
-- *ctrl+command+/  align cursors block*
 - *dbg "class.method arg: #{arg}, ..."*
-- *multicursors delete backwards over line boundaries only if command is down*
 - invert selection (command+i, select full lines without cursors/selections)
 - #< to add salter header of next word
 - no surround for ' inside words

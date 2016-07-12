@@ -46,10 +46,10 @@ class ViewBase extends Editor
         layer = []
         layer.push 'selections' 
         layer.push 'highlights' 
-        layer.push 'meta'         if 'Meta'    in @config.features
+        layer.push 'meta'    if 'Meta'    in @config.features
         layer.push 'lines' 
         layer.push 'cursors'
-        layer.push 'numbers'      if 'Numbers' in @config.features
+        layer.push 'numbers' if 'Numbers' in @config.features
         @initLayers layer
         
         @elem = $('.lines', @layers)
@@ -669,7 +669,7 @@ class ViewBase extends Editor
             when 'command+z'                then return @do.undo()
             when 'command+shift+z'          then return @do.redo()
             when 'delete', 'ctrl+backspace' then return @deleteForward()     
-            when 'backspace'                then return @deleteBackward()     
+            when 'backspace', 'command+backspace' then return @deleteBackward ignoreLineBoundary: combo == 'command+backspace'    
             when 'command+v'                then return @paste clipboard.readText()
             when 'command+x'   
                 @do.start()

@@ -1080,7 +1080,7 @@ class Editor extends Buffer
             @emitEdit 'delete'
             @clearHighlights()
             
-    deleteBackward: ->
+    deleteBackward: (opt) ->
         if @selections.length
             @deleteSelection()
         else if @cursors.length == 1 and not @isSamePos @mainCursor, @cursorPos()
@@ -1090,21 +1090,21 @@ class Editor extends Buffer
             @do.start()
             newCursors = _.cloneDeep @cursors
             for c in @reversedCursors()
-            
-                if c[0] == 0 # cursor at start of line
-                    if c[1] > 0 # cursor not in first line
-                        ll = @lines[c[1]-1].length
-                        @do.change c[1]-1, @lines[c[1]-1] + @lines[c[1]]
-                        @do.delete c[1]
-                        # move cursors in joined line
-                        for nc in @positionsInLineAtIndexInPositions c[1], newCursors
-                            @newCursorDelta newCursors, nc, ll, -1
-                        # move cursors below deleted line up
-                        for nc in @positionsBelowLineIndexInPositions c[1], newCursors
-                            @newCursorDelta newCursors, nc, 0, -1
+                if c[0] == 0        # cursor at start of line
+                    if opt?.ignoreLineBoundary
+                        if c[1] > 0 # cursor not in first line
+                            ll = @lines[c[1]-1].length
+                            @do.change c[1]-1, @lines[c[1]-1] + @lines[c[1]]
+                            @do.delete c[1]
+                            # move cursors in joined line
+                            for nc in @positionsInLineAtIndexInPositions c[1], newCursors
+                                @newCursorDelta newCursors, nc, ll, -1
+                            # move cursors below deleted line up
+                            for nc in @positionsBelowLineIndexInPositions c[1], newCursors
+                                @newCursorDelta newCursors, nc, 0, -1
                 else
                     n = (c[0] % @indentString.length) or @indentString.length
-                    t = @textInRange [c[1], [c[0]-n, c[0]]]
+                    t = @textInRange [c[1], [c[0]-n-1, c[0]]]
                     if t.trim().length != 0
                         n = 1
                     @do.change c[1], @lines[c[1]].splice c[0]-n, n
