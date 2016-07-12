@@ -16,7 +16,6 @@
 - *make autocomplete work with multicursors*
 
 #### windows
-- cycle through windows command: windows list
 - list buffers when clicking buffer number in titlebar
 
 #### editor

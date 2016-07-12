@@ -421,6 +421,18 @@ class Editor extends Buffer
             when 'down' then @mainCursor = last  newCursors
         @do.cursors newCursors
 
+    alignCursorsAndText: ->
+        @clearHighlights()
+        newCursors = _.cloneDeep @cursors
+        newX = _.max (c[0] for c in @cursors)
+        lines = {}
+        for c in @cursors
+            lines[c[1]] = c[0]
+            @oldCursorSet newCursors, c, newX, c[1]
+        for li, cx of lines
+            @do.change li, @lines[li].slice(0, cx) + _.padStart('', newX-cx) + @lines[li].slice(cx)
+        @do.cursors newCursors
+
     alignCursors: (dir='down') ->
         charPos = switch dir
             when 'up'    then first(@cursors)[0]
@@ -591,7 +603,7 @@ class Editor extends Buffer
     deIndent: -> 
         @do.start()
         newSelections = _.cloneDeep @selections
-        newCursors = _.cloneDeep @cursors
+        newCursors    = _.cloneDeep @cursors
         for i in @cursorAndSelectedLineIndices()
             if @lines[i].startsWith @indentString
                 @do.change i, @lines[i].substr @indentString.length
@@ -609,7 +621,7 @@ class Editor extends Buffer
     indent: ->
         @do.start()
         newSelections = _.cloneDeep @selections
-        newCursors = _.cloneDeep @cursors
+        newCursors    = _.cloneDeep @cursors
         for i in @cursorAndSelectedLineIndices()
             @do.change i, @indentString + @lines[i]
             for c in @cursorsInLineAtIndex i
@@ -632,7 +644,7 @@ class Editor extends Buffer
     toggleComment: ->
         lineComment = "#" # todo: make this file type dependent
         @do.start()
-        newCursors = _.cloneDeep @cursors
+        newCursors    = _.cloneDeep @cursors
         newSelections = _.cloneDeep @selections
         
         moveInLine = (i, d) => 
@@ -737,9 +749,9 @@ class Editor extends Buffer
 
         for c in @cursors.reversed()
         
-            after = @lines[c[1]].substr(c[0])
-            after = after.trimLeft() if opt?.indent
-            before =  @lines[c[1]].substr 0, c[0]
+            after  = @lines[c[1]].substr(c[0])
+            after  = after.trimLeft() if opt?.indent
+            before = @lines[c[1]].substr 0, c[0]
         
             if opt?.indent
                 line = before.trimRight()
@@ -777,8 +789,6 @@ class Editor extends Buffer
             # move cursors in and below deleted line down
             for nc in @positionsFromPosInPositions c, newCursors
                 @newCursorDelta newCursors, nc, nc[1] == c[1] and indent.length - bl or 0, 1
-                # nc[0] += indent.length - bl if nc[1] == c[1]
-                # nc[1] += 1   
         
         @do.cursors newCursors    
         @do.end()
@@ -813,8 +823,8 @@ class Editor extends Buffer
             cp = @cursorPos()
             li = cp[1]
             if not @isCursorAtStartOfLine()
-                rest = @lines[li].substr(@cursorPos()[0]).trimLeft()
-                indt = _.padStart "", @indentationAtLineIndex cp[1] 
+                rest   = @lines[li].substr(@cursorPos()[0]).trimLeft()
+                indt   = _.padStart "", @indentationAtLineIndex cp[1] 
                 before = @lines[cp[1]].substr 0, cp[0]
                 if before.trim().length
                     @do.change li, before

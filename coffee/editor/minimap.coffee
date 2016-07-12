@@ -93,7 +93,6 @@ class Minimap
     # 0000000    000   000  000   000  00     00
 
     drawSelections: =>
-
         @selections.height = @height
         @selections.width = @width
         ctx = @selections.getContext '2d'
@@ -122,7 +121,6 @@ class Minimap
                     ctx.fillRect @offsetLeft+2*r.start, y, 2*r.match.length, @scroll.lineHeight
 
     drawHighlights: =>
-        
         @highlights.height = @height
         @highlights.width = @width
         ctx = @highlights.getContext '2d'
@@ -182,7 +180,7 @@ class Minimap
     #  0000000  000   000  000   000  000   000   0000000   00000000
     
     onChanged: (changeInfo) =>
-        
+        # @log "minimap.onChanged", changeInfo
         @drawSelections() if changeInfo.selection.length
         @drawCursors()    if changeInfo.cursors.length
         
@@ -198,7 +196,7 @@ class Minimap
             break if c >= redraw
             @drawLines c, c
             
-        @clearRange redraw, @scroll.exposeTop + @scroll.viewHeight / @scroll.lineHeight
+        @clearRange redraw, @scroll.exposeTop + @height / @scroll.lineHeight
         
         if redraw <= @scroll.exposeBot            
             @drawLines redraw, @scroll.exposeBot

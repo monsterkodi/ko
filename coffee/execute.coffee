@@ -31,14 +31,13 @@ class Execute
             console.error colors.red.bold '[ERROR]', colors.red e
 
     shell: (command) =>
-        @childp = pty.spawn '/usr/local/bin/bash', ['-i'], #, ['-c', command], 
+        @childp = pty.spawn '/usr/local/bin/bash', ['-i'], 
             name: 'xterm-color'
             cwd: @cwd
             env: process.env
         @childp.on 'data', @onShellData
         
     term: (cfg) =>
-        log "execute.term", cfg
         @rest    = ''
         @cmdID   = cfg?.cmdID
         @childp.write cfg.command + '\n'

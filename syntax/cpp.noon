@@ -1,0 +1,89 @@
+#  0000000  00000000   00000000 
+# 000       000   000  000   000
+# 000       00000000   00000000 
+# 000       000        000      
+#  0000000  000        000      
+
+\S+                            text
+
+[\<\>\+\-\=\/\*]               syntax.math
+
+!=                             syntax.math
+
+# braces
+
+[\(\)\{\}\[\]]                 syntax.bracket
+
+# include
+
+(#)(include)\s+([\<\"])(.*)([\>\"])   . macro.marker . macro.define . string.marker.require . string.require . string.marker.require
+
+# class
+
+(class)\s+(\w+)              . class.keyword . class
+
+# bool
+
+true                           value.bool.true
+false                          value.bool.false 
+([\!])\w+                    . operator.negate
+
+# macros
+
+(\#)(define|pragma|endif|if|ifdef|ifndef)(.*)  . macro.marker . macro.define . macro
+(\b[A-Z\_]+)(\()([^\)]*)(\))                   . macro.call . macro.marker . macro.argument . macro.marker
+[A-Z0-9]+[\_][A-Z0-9\_]+                         macro.call
+
+# null
+
+NULL                           keyword.null
+
+# .property
+
+\.(\s*\w+)                     property
+
+(\w+)(\:\:)                  . namespace . namespace.marker
+
+\:\:(iterator|pair|string)   . namespace.member
+
+# class construction
+
+new\s+(\w+)                    class.callee
+(@?\w+)\s*\=\s*new\s           class.object
+
+# punctuation
+
+[\,\.\;\/\&\*]                 syntax.punctuation
+
+# keywords
+this                           keyword.this
+(^|\s|\b)(if|else|then|for|auto|using|namespace|while|do|return|break|continue|const|new|switch|case|default|const_cast|static_cast|dynamic_cast|reinterpret_cast|public:?|protected:?|private:?)([\;\s]|$)  
+    none 
+    keyword 
+    none
+    
+\b(uint32_t|void|bool|int|float|double|long|unsigned)\b  . keyword
+    
+#number
+
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
+    syntax.value.number.float.sign
+    value.number.float
+
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
+    syntax.value.number.int.sign
+    value.number.int
+
+# strings
+(')([^']*)(')                . string.marker.single . value.string.single . string.marker.single
+(")([^"\\]*)(")              . string.marker.double . value.string.double . string.marker.double
+    
+# comments
+
+(\/\/)\s*(.*)                . comment.marker . comment
+(\/\*)(.*)(\*\/)             . comment.marker . comment . comment.marker
+
+# salter headers
+^\s*(\#)([0\s]+)$            . header.comment.marker . comment.header
+^([0\s]+)$                     comment.header
+

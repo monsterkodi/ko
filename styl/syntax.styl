@@ -43,7 +43,7 @@
         
 .marker
     opacity         0.5
-            
+
 .module
     color           #ff8
 
@@ -72,12 +72,21 @@
         &.punctuation
             opacity  0.5
 
+.operator
+    &.negate
+        color       #ff0
+
 .class
     &.variable
         color       #2ae
     &.function
         color       #fc8
 
+.namespace
+    color           #a22
+    &.member
+        color       #f80
+        
 .keypath
     color           #f80
 
@@ -86,6 +95,15 @@
     color           #aaf !important
     &.null    
         color       #a00 !important
+
+.macro
+    color           #c0f
+    &.define
+        color       #80c
+    &.call
+        color       #f0f
+    &.argument
+        color       #f8f
 
 .interpolation.marker
         color       #f83

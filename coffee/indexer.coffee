@@ -48,7 +48,7 @@ class Indexer
                     if indent < 4
                         currentClass = null
                     else if indent == 4
-                        m = line.match /^\s+([\@]?\w+)\s*\:\s*(\([\w\s\,]*\))?\s*[=-]\>/
+                        m = line.match /^\s+([\@]?\w+)\s*\:\s*(\([^\)]*\))?\s*[=-]\>/
                         if m?[1]?
                             _.set @classes, "#{currentClass}.methods.#{m[1]}", 
                                 line: li                

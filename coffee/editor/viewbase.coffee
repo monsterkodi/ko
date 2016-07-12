@@ -180,7 +180,7 @@ class ViewBase extends Editor
         @size.numbersWidth = 'Numbers' in @config.features and 50 or 0
         @size.fontSize     = fontSize
         @size.lineHeight   = fontSize + Math.floor(fontSize/6)
-        @size.charWidth    = fontSize * 0.6 # characterWidth @elem, 'line'
+        @size.charWidth    = fontSize * 0.6 
         @size.offsetX      = Math.floor @size.charWidth/2 + @size.numbersWidth
 
         @scroll?.setLineHeight @size.lineHeight
@@ -533,10 +533,10 @@ class ViewBase extends Editor
     # 000      000  000  0000  000            000
     # 0000000  000  000   000  00000000  0000000 
     
-    viewHeight:   -> @scroll?.viewHeight ? @view?.clientHeight #@view?.getBoundingClientRect().height 
-    viewWidth:    -> @view?.clientWidth #@view?.getBoundingClientRect().width 
-    layersWidth:  -> @layers?.clientWidth #@layers?.getBoundingClientRect().width 
-    numViewLines: -> Math.ceil(@viewHeight() / @size.lineHeight)
+    viewHeight:   -> @scroll?.viewHeight ? @view?.clientHeight 
+    viewWidth:    -> @view?.clientWidth # not used?
+    layersWidth:  -> @layers?.clientWidth 
+    numViewLines: -> Math.ceil(@viewHeight() / @size.lineHeight) # not used?
     numFullLines: -> Math.floor(@viewHeight() / @size.lineHeight)
     
     clearLines: => 
@@ -682,6 +682,7 @@ class ViewBase extends Editor
             when 'command+up', 'command+down' then return @addCursors key
             when 'ctrl+a', 'ctrl+shift+a'     then return @moveCursorsToLineBoundary 'left',  event.shiftKey
             when 'ctrl+e', 'ctrl+shift+e'     then return @moveCursorsToLineBoundary 'right', event.shiftKey
+            when 'alt+ctrl+right'             then return @alignCursorsAndText()
                 
             when 'command+left', 'command+right'   
                 if @selections.length > 1 and @cursors.length == 1
@@ -702,9 +703,9 @@ class ViewBase extends Editor
         
         switch key
             
-            when 'esc'     then return @clearCursorsAndHighlights()
-            when 'home'    then return @singleCursorAtPos [0, 0],              event.shiftKey
-            when 'end'     then return @singleCursorAtPos [0,@lines.length-1], event.shiftKey
+            when 'esc'  then return @clearCursorsAndHighlights()
+            when 'home' then return @singleCursorAtPos [0, 0],              event.shiftKey
+            when 'end'  then return @singleCursorAtPos [0,@lines.length-1], event.shiftKey
             when 'page up'      
                 @moveCursorsUp event.shiftKey, @numFullLines()-3
                 event.preventDefault() # prevent view from scrolling
