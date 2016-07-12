@@ -87,7 +87,7 @@ ipc.on 'focusEditor', (event) => split.focus '.editor'
 ipc.on 'cloneFile',  => ipc.send 'newWindowWithFile', editor.currentFile
 ipc.on 'reloadFile', => 
     # log "window.ipc.reloadFile"
-    loadFile editor.currentFile, true
+    loadFile editor.currentFile, reload: true, dontSave: true
 ipc.on 'saveFileAs', => saveFileAs()
 ipc.on 'saveFile',   => saveFile()
 ipc.on 'loadFile', (event, file) => 
@@ -122,13 +122,13 @@ saveFile = (file) =>
     editor.setCurrentFile file
     setState 'file', file
 
-loadFile = (file, reload) =>  
+loadFile = (file, opt) =>  
     # log 'window.loadFile file:', file
     [file,line] = file.split ':'
-    if file != editor.currentFile or reload
+    if file != editor.currentFile or opt?.reload
         return if not fileExists file
         
-        if editor.currentFile? and editor.do.hasLineChanges()
+        if editor.currentFile? and editor.do.hasLineChanges() and not opt?.dontSave
             saveChanges = [_.clone(editor.currentFile), _.clone(editor.text())]
             
         addToRecent file        

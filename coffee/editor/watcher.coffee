@@ -14,7 +14,7 @@ class Watcher
         @w = chokidar.watch @editor.currentFile, 
             ignoreInitial: true
         @w.on 'change', (p) => 
-            window.loadFile @editor.currentFile, true
+            window.loadFile @editor.currentFile, reload: true, dontSave: true
         @w.on 'unlink', (p) => @editor.setText ""
         
     stop: -> @w.close()

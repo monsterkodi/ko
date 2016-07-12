@@ -65,6 +65,7 @@ class Buffer extends event
     isCursorVirtual:       (c=@mainCursor) -> c[0] > @lines[c[1]].length
     isCursorAtEndOfLine:   (c=@mainCursor) -> c[0] >= @lines[c[1]].length
     isCursorAtStartOfLine: (c=@mainCursor) -> c[0] == 0
+    isCursorInIndent:      (c=@mainCursor) -> @lines[c[1]].slice(0, c[0]).trim().length == 0
     isCursorInLastLine:    (c=@mainCursor) -> c[1] == @lines.length-1
     isCursorInFirstLine:   (c=@mainCursor) -> c[1] == 0
     isCursorInRange:     (r,c=@mainCursor) -> @isPosInRange c, r
@@ -232,9 +233,9 @@ class Buffer extends event
     # 000  000  0000  000   000  000       000  0000     000   
     # 000  000   000  0000000    00000000  000   000     000   
         
-    indentationAtLineIndex: (i) ->
+    indentationAtLineIndex: (li) ->
         s = 0
-        while @lines[i][s] == ' '
+        while @lines[li][s] == ' '
             s += 1
         s
             

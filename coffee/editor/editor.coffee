@@ -227,7 +227,7 @@ class Editor extends Buffer
 
     selectLessLines: -> 
         @do.start()
-        newCursors = _.cloneDeep @cursors
+        newCursors    = _.cloneDeep @cursors
         newSelections = _.cloneDeep @selections
         
         for c in @reversedCursors()
@@ -323,7 +323,6 @@ class Editor extends Buffer
         @do.end()
     
     selectNextHighlight: -> # command+g
-        # log "selectNextHighlight #{@highlights.length}"
         if not @highlights.length
             searchText = window.commandline.commands.find?.current()
             log "editor.selectNextHighlight use find command text #{searchText}"
@@ -370,11 +369,11 @@ class Editor extends Buffer
 
     emitEdit: (action) ->
         @emit 'edit',
-            action:    action
-            line:      @lines[@mainCursor[1]]
-            before:    @lines[@mainCursor[1]].slice 0, @mainCursor[0]
-            after:     @lines[@mainCursor[1]].slice @mainCursor[0]
-            cursor:    @mainCursor
+            action: action
+            line:   @lines[@mainCursor[1]]
+            before: @lines[@mainCursor[1]].slice 0, @mainCursor[0]
+            after:  @lines[@mainCursor[1]].slice @mainCursor[0]
+            cursor: @mainCursor
                     
     #  0000000  000   000  00000000    0000000   0000000   00000000 
     # 000       000   000  000   000  000       000   000  000   000
@@ -678,6 +677,8 @@ class Editor extends Buffer
         @do.cursors newCursors
         @do.end()
         @clearHighlights()
+
+    indentStringForLineAtIndex: (li) -> _.padStart "", @indentationAtLineIndex li
            
     #  0000000   0000000   00     00  00     00  00000000  000   000  000000000
     # 000       000   000  000   000  000   000  000       0000  000     000   
@@ -686,7 +687,9 @@ class Editor extends Buffer
     #  0000000   0000000   000   000  000   000  00000000  000   000     000   
 
     toggleComment: ->
-        lineComment = "#" # todo: make this file type dependent
+        lineComment = switch path.extname @currentFile
+            when '.cpp', '.h', '.styl', '.pug' then '//'
+            else '#'
         @do.start()
         newCursors    = _.cloneDeep @cursors
         newSelections = _.cloneDeep @selections
@@ -803,6 +806,7 @@ class Editor extends Buffer
                 for e in ['->', '=>', ':', ',', '=']
                     if line.endsWith e
                         il = @indentString.length
+                        break
                 if il == 0
                     if /(^|\s)(else\s*$|switch\s|for\s|while\s|class\s)/.test before
                         il = @indentString.length
