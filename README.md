@@ -76,7 +76,7 @@ ko is an editor for Mac OS X
 - **⌘up|down**             grow all vertical cursor lines up or down
 - **^⇧up|down**            grow only main cursor line up or down
 - **^up|down|left|right**  move main cursor independently (clears other cursors when moving over them)
-- **^⌥up|down|left|right** align all cursors vertically with left|up|down|right-most cursor
+- **^⌥up|down|left|right** align all cursors vertically with up|down|left|right-most cursor
 - **^⇧right**              align all cursors vertically with right-most cursor while moving text to the right
 - **⌘delete**              delete backwards over line boundaries
 - cursors can be positioned after the end of line
@@ -100,16 +100,18 @@ ko is an editor for Mac OS X
 - **⌘⇧N** clone current file in new window
 - **F2** global shortcut to activate ko
 - **⌘⌥Q** close all windows (won't restore on next start) and quit
+- **⌥up|down** move selected|cursor lines up|down
+- **⌥/** toggle comment on selected|cursor lines
 
-### missing stuff
+## missing features
 
 - no plugin system
+- no customization
 - no git integration
 - no bracket matching
-- no customization
 
-#### notes 
+## notes 
 
-- completely undocumented
+- not very well documented
 - pre-release in active development
 - use at your own risk!
