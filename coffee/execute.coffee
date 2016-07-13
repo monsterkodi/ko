@@ -20,7 +20,7 @@ class Execute
         @command = cfg?.command
         @cwd     = cfg?.cwd ? process.cwd()
         @rest    = ''
-        @shell()
+        @shell() if cfg?.winID
         if @command?
             @term cfg
 

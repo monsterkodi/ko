@@ -113,7 +113,8 @@ hideDock = ->
 # 000  000        000     
 # 000  000         0000000
 
-ipc.on 'execute',           (event, arg)   => event.sender.send 'executeResult', execute.execute arg
+coffeeExecute = new Execute
+ipc.on 'execute',           (event, arg)   => event.sender.send 'executeResult', coffeeExecute.execute arg
 ipc.on 'toggleDevTools',    (event)        => event.sender.toggleDevTools()
 ipc.on 'newWindowWithFile', (event, file)  => main.createWindow file
 ipc.on 'fileLoaded',        (event, file)  => main.indexer.indexFile file

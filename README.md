@@ -96,12 +96,16 @@ ko is an editor for Mac OS X
 - accepts negative numbers for jumping to lines relative to end of file
 
 ## misc
+non-standard keyboard shortcuts:
 - **⌘A** tile windows
 - **⌘⇧N** clone current file in new window
 - **F2** global shortcut to activate ko
 - **⌘⌥Q** close all windows (won't restore on next start) and quit
 - **⌥up|down** move selected|cursor lines up|down
 - **⌥/** toggle comment on selected|cursor lines
+- **⌘L** select more lines
+- **⌘⇧L** select less lines
+- **⌘return** evaluate current buffer with coffee in main process and print the result in terminal window
 
 ## missing features
 
