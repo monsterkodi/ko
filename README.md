@@ -84,6 +84,23 @@ ko is an editor for Mac OS X
     - the orange/yellow position shows where text will be inserted
     - missing spaces are added automatically in multicursor mode
 
+## open
+- **⌘P** open file quickly
+- **⌘⇧P** open file quickly in new window
+- while list is open
+    - **.** list current directory without previous files
+    - **..** navigate directory up
+
+## goto
+- **⌘;** activate goto
+- accepts negative numbers for jumping to lines relative to end of file
+
+## misc
+- **⌘A** tile windows
+- **⌘⇧N** clone current file in new window
+- **F2** global shortcut to activate ko
+- **⌘⌥Q** close all windows (won't restore on next start) and quit
+
 ### missing stuff
 
 - no plugin system
