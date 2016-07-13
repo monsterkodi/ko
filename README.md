@@ -36,17 +36,17 @@ ko is an editor for Mac OS X
     - for coffee, cpp, h, html, js, json, md, noon, pug, py, sh, styl       
     - ansi-colors in terminal view
 
-### minimap
+## minimap
 
 - **⌘** while dragging to turn off cursor placement
 - **⇧** while dragging/clicking to select lines
 
-### terminal
+## terminal
 
 - **⌘T** to activate input
 - only for commands that terminate for now!
 
-### find
+## find
 - search in current file
     - **⌘F**  case insensitive
     - **^F**  case sensitive
@@ -55,7 +55,7 @@ ko is an editor for Mac OS X
     - **⌘⌥F** fuzzy search
     - **⌘^F** glob search
      
-### search
+## search
 - search in project files
     - **⌘⇧F**   case   insensitive
     - **^⇧F**   case   sensitive
@@ -64,14 +64,14 @@ ko is an editor for Mac OS X
 - editing search result lines will ...
     - mark them for saving
     - changes are propagated immediately to all open files
-    - ⌘S while the search-results view has focus will save all pending changes in open **and** closed files
+    - **⌘S** while the search-results view has focus will save all pending changes in open **and** closed files
     - deleting lines from the search results will **not** remove them from their original files
     - changes from the editor are not yet propagated to old search results
         - this means: only edit and save **fresh** search results
     - this is a very powerful feature but not tested thoroughly and probably not working correctly in all cases!
     - use at your own risk! backup your files! 
 
-### multicursors
+## multicursors
 - **⌘click**               add or remove single cursor
 - **⌘up|down**             grow all vertical cursor lines up or down
 - **^⇧up|down**            grow only main cursor line up or down
