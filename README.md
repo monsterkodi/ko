@@ -1,5 +1,5 @@
 ![ko](img/banner.png)
-![ko](img/readme.png)
+![readme](img/readme.png)
 
 # about ko
 
@@ -46,6 +46,8 @@ ko is an editor for Mac OS X
 - **⌘T** to activate input
 - only for commands that terminate for now!
 
+![terminal](img/terminal.png)
+
 ## find
 - search in current file
     - **⌘F**  case insensitive
@@ -71,6 +73,8 @@ ko is an editor for Mac OS X
     - this is a very powerful feature but not tested thoroughly and probably not working correctly in all cases!
     - use at your own risk! backup your files! 
 
+![search](img/search.png)
+
 ## multicursors
 - **⌘click**               add or remove single cursor
 - **⌘up|down**             grow all vertical cursor lines up or down
@@ -84,12 +88,16 @@ ko is an editor for Mac OS X
     - the orange/yellow position shows where text will be inserted
     - missing spaces are added automatically in multicursor mode
 
+![cursors](img/cursors.png)
+
 ## open
 - **⌘P** open file quickly
 - **⌘⇧P** open file quickly in new window
 - while list is open
     - **.** list current directory without previous files
     - **..** navigate directory up
+
+![open](img/open.png)
 
 ## goto
 - **⌘;** activate goto
@@ -103,8 +111,7 @@ non-standard keyboard shortcuts:
 - **⌘⌥Q** close all windows (won't restore on next start) and quit
 - **⌥up|down** move selected|cursor lines up|down
 - **⌥/** toggle comment on selected|cursor lines
-- **⌘L** select more lines
-- **⌘⇧L** select less lines
+- **⌘L** select more lines **⌘⇧L** select less lines
 - **⌘return** evaluate current buffer with coffee in main process and print the result in terminal window
 
 ## missing features
