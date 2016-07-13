@@ -7,6 +7,10 @@
 .syntax
     color           #666
     
+.invisible
+    color           #888
+    opacity         0.5
+    
 .bool           
     color           #88f
     &.false      
@@ -27,7 +31,6 @@
 .callee
 .class
     color           #ff8
-    // font-weight     bold
             
 .variable
     color           #a0a
@@ -54,12 +57,12 @@
     
 .property
     opacity         0.8
-    color           #fd8 // #ff2
+    color           #fd8
     
 .function
     color           #fa0
     &.call          
-        color       #ff0 // #f90
+        color       #ff0
     &.marker
         color       #55f
         opacity     1
@@ -115,9 +118,9 @@
     opacity         0.7
 
 .string
-    color           #0a0    !important
+    color           #0a0 !important
     &.double
-        color       #0f0    !important
+        color       #0f0 !important
         
 .comment
 .comment.string
@@ -126,7 +129,7 @@
 
 .comment.header
     color           #004f00 !important
-    background      #040 !important
+    background      rgba(0,128,0,0.5) !important
     border-radius   5px
     
 .comment.header.minimap

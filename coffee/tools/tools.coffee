@@ -117,7 +117,6 @@ module.exports =
     #  0000000  0000000   0000000 
     
     setStyle: (selector, key, value) ->
-        # log 'setStyle', selector, key, value
         for rule in document.styleSheets[0].cssRules
             if rule.selectorText == selector
                 rule.style[key] = value
@@ -125,20 +124,9 @@ module.exports =
     getStyle: (selector, key, value) ->
         for rule in document.styleSheets[0].cssRules
             if rule.selectorText == selector
-                # log 'value', rule.style[key]
                 return rule.style[key]
         return value
-        
-    characterWidth: (elem,clss) ->
-        o = document.createElement 'div'
-        o.className = clss
-        o.innerHTML = 'XXXXXXXXXX'
-        elem.appendChild o
-        w = o.clientWidth/o.innerHTML.length
-        # log 'characterWidth w', w
-        o.remove()
-        w
-        
+                
     # 0000000     0000000   00     00
     # 000   000  000   000  000   000
     # 000   000  000   000  000000000
@@ -159,8 +147,6 @@ module.exports =
         else
             return pos(event.clientX + window.scrollX, event.clientY + window.scrollY)
 
-    # sw: () -> parseInt window.getComputedStyle(document.body).width
-    # sh: () -> parseInt window.getComputedStyle(document.body).height
     sw: () -> document.body.clientWidth
     sh: () -> document.body.clientHeight
     

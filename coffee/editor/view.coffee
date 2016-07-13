@@ -53,7 +53,6 @@ class View extends ViewBase
             name = path.extname(file).substr(1)
             if name in syntax.syntaxNames
                 @syntax.name = name            
-        # log 'view.setCurrentFile', file, @syntax.name
         super file # -> setText -> setLines
 
         @restoreScrollCursorsAndSelections() if file
@@ -130,6 +129,14 @@ class View extends ViewBase
                 if mthd == word
                     window.loadFile "#{info.file}:#{minfo.line+1}"
     
+    funcInfoAtLineIndex: (li) ->
+        files = ipc.sendSync 'indexer', 'files'
+        fileInfo = files[@currentFile]
+        for func in fileInfo.funcs
+            if func[0] <= li <= func[1]
+                return func[3] + '.' + func[2] + ' '
+        ''
+    
     # 00000000   00000000   0000000  000000000   0000000   00000000   00000000
     # 000   000  000       000          000     000   000  000   000  000     
     # 0000000    0000000   0000000      000     000   000  0000000    0000000 
@@ -139,10 +146,8 @@ class View extends ViewBase
     restoreScrollCursorsAndSelections: ->
         return if not @currentFile
         filePositions = window.getState 'filePositions', {}
-        # log "#{@currentFile} restoreState", filePositions
         if filePositions[@currentFile]? 
             s = filePositions[@currentFile]
-            # log "#{@currentFile} restoreState", s
             @cursors    = s.cursors    ? [[0,0]]
             @selections = s.selections ? []
             @highlights = s.highlights ? []

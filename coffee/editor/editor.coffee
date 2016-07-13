@@ -1010,13 +1010,15 @@ class Editor extends Buffer
         @do.delete i
                     
     deleteSelection: ->
+        return if @selections.length == 0
         @do.start()
         newCursors = _.cloneDeep @cursors
+        
+        for c in @cursors
+            sp = @startPosOfContinuousSelectionAtPos c
+            @oldCursorSet newCursors, c, sp[0], sp[1]
+
         for s in @reversedSelections()
-            
-            for c in @cursorsInRange s
-                sp = @startPosOfContinuousSelectionAtPos c
-                @oldCursorSet newCursors, c, sp[0], sp[1]
 
             lineSelected = s[1][0] == 0 and s[1][1] == @lines[s[0]].length
             if lineSelected and @lines.length > 1
@@ -1026,7 +1028,9 @@ class Editor extends Buffer
                     @newCursorSet newCursors, nc, 0, -1
             else
                 @do.change s[0], @lines[s[0]].splice s[1][0], s[1][1]-s[1][0]
-                
+                for nc in @positionsFromPosInPositions [s[1][1], s[0]], @positionsInLineAtIndexInPositions s[0], newCursors
+                    @newCursorDelta newCursors, nc, -(s[1][1]-s[1][0])
+                    
         @do.selections []
         @do.cursors newCursors
         @do.end()
@@ -1107,7 +1111,7 @@ class Editor extends Buffer
                                 @newCursorDelta newCursors, nc, 0, -1
                 else
                     n = (c[0] % @indentString.length) or @indentString.length
-                    t = @textInRange [c[1], [c[0]-n-1, c[0]]]
+                    t = @textInRange [c[1], [Math.max(0, c[0]-n-1), c[0]]]
                     if t.trim().length != 0
                         n = 1
                     @do.change c[1], @lines[c[1]].splice c[0]-n, n

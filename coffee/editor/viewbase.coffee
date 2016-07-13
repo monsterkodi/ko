@@ -133,7 +133,6 @@ class ViewBase extends Editor
     # 0000000   00000000     000     0000000  000  000   000  00000000  0000000 
 
     setLines: (lines) ->
-        # log "viewbase.setLines lines", lines if @name == 'editor'        
         if lines.length == 0
             @scroll.reset() 
         
@@ -184,7 +183,7 @@ class ViewBase extends Editor
         @size.offsetX      = Math.floor @size.charWidth/2 + @size.numbersWidth
 
         @scroll?.setLineHeight @size.lineHeight
-            
+
         @emit 'fontSizeChanged'
 
     #  0000000   0000000    0000000    000      000  000   000  00000000
@@ -212,7 +211,7 @@ class ViewBase extends Editor
         @syntax.changed changeInfo
         
         numChanges = 0   
-        changes = _.cloneDeep changeInfo.sorted    
+        changes = _.cloneDeep changeInfo.sorted
         while (change = changes.shift())
             [li,ch,oi] = change
             # log "viewbase.changed li #{li} change #{ch} oi #{oi} @lines[li] #{@lines[li]} diss", @syntax.getDiss li
@@ -267,7 +266,7 @@ class ViewBase extends Editor
         
     insertLine: (li, oi) ->        
         div = @addLine()
-        div.innerHTML = @renderLineAtIndex li
+        div.innerHTML = @renderLineAtIndex li                
         @elem.insertBefore div, @elem.children[oi - @scroll.exposeTop]
         @scroll.insertLine li, oi
         @emit 'lineInserted', li
@@ -323,9 +322,9 @@ class ViewBase extends Editor
                 @elem.firstChild.remove()
                 li = e.new - (num - n)
                 
-                @emit 'lineVanishedTop', 
+                @emit 'lineVanishedTop',
                     lineIndex: li
-                
+
             else 
                 div = @addLine()
                 li = e.new + num - n - 1
@@ -335,11 +334,11 @@ class ViewBase extends Editor
                 @emit 'lineExposedTop', 
                     lineIndex: li
                     lineDiv: div
-             
+
         @updateLinePositions()
-        @updateLayers()            
-        @emit 'exposeTopChanged', e            
-                           
+        @updateLayers()
+        @emit 'exposeTopChanged', e
+
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     
     # 000   000  00000000   000   000  000000000     000     0000000 
@@ -357,14 +356,24 @@ class ViewBase extends Editor
             span = @renderLineAtIndex li
             @elem.children[oi - @scroll.exposeTop]?.innerHTML = span
 
+    updateLines: () ->
+        for li in [@scroll.exposeTop..@scroll.exposeBot]
+            @updateLine li, li
+
     # 00000000   00000000  000   000  0000000    00000000  00000000 
     # 000   000  000       0000  000  000   000  000       000   000
     # 0000000    0000000   000 0 000  000   000  0000000   0000000  
     # 000   000  000       000  0000  000   000  000       000   000
     # 000   000  00000000  000   000  0000000    00000000  000   000
             
-    renderLineAtIndex: (li) -> render.line @lines[li], @syntax.getDiss(li), @size
-                                                    
+    renderLineAtIndex: (li) -> 
+        html = render.line @lines[li], @syntax.getDiss(li), @size
+        if @showInvisibles
+            tx = @lines[li].length * @size.charWidth + 1 # &#8227;
+            html += "<span class=\"invisible newline\" style=\"transform:translate(#{tx}px, -1.5px);\">&#9687;</span>"
+            # html += "<span class=\"invisible newline\" style=\"transform:translatex(#{tx}px);\">∘</span>"
+        html
+    
     renderCursors: ->
         cs = []
         for c in @cursors
@@ -447,10 +456,10 @@ class ViewBase extends Editor
     # 0000000   000       0000000    000   000  000      000    
     #      000  000       000   000  000   000  000      000    
     # 0000000    0000000  000   000   0000000   0000000  0000000
-                        
+
     scrollLines: (delta) -> @scrollBy delta * @size.lineHeight
 
-    scrollBy: (delta, x=0) -> 
+    scrollBy: (delta, x=0) ->
         @scroll.by delta
         @layers.scrollLeft += x/2
         @updateScrollOffset()
@@ -646,7 +655,7 @@ class ViewBase extends Editor
             
         switch combo
             when 'command+esc'              then return @startStickySelection()
-            when 'tab'                      then return @insertTab() + event.preventDefault() 
+            when 'tab'                      then return @insertTab() + event.preventDefault()
             when 'shift+tab'                then return @deleteTab() + event.preventDefault()
             when 'enter'                    then return @insertNewline indent: true
             when 'command+enter'            then return @moveCursorsToLineBoundary('right') and @insertNewline indent: true
@@ -664,12 +673,12 @@ class ViewBase extends Editor
             when 'command+g'                then return @jumpToDefinition @wordAtCursor()
             when 'command+shift+g'          then return @selectPrevHighlight()
             when 'command+l'                then return @selectMoreLines()
-            when 'command+shift+l'          then return @selectLessLines()            
+            when 'command+shift+l'          then return @selectLessLines()
             when 'command+c'                then return clipboard.writeText @textOfSelectionForClipboard()
             when 'command+z'                then return @do.undo()
             when 'command+shift+z'          then return @do.redo()
-            when 'delete', 'ctrl+backspace' then return @deleteForward()     
-            when 'backspace', 'command+backspace' then return @deleteBackward ignoreLineBoundary: combo == 'command+backspace'    
+            when 'delete', 'ctrl+backspace' then return @deleteForward()
+            when 'backspace', 'command+backspace' then return @deleteBackward ignoreLineBoundary: combo == 'command+backspace'
             when 'command+v'                then return @paste clipboard.readText()
             when 'command+x'   
                 @do.start()
@@ -716,7 +725,7 @@ class ViewBase extends Editor
             when 'down', 'right', 'up', 'left' 
                 @moveCursors key, event.shiftKey
                 event.preventDefault() # prevent view from scrolling
-                                                                                    
+
         ansiKeycode = require 'ansi-keycode'
         if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
             @insertUserCharacter ansiKeycode event

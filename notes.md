@@ -1,8 +1,5 @@
 # todo/ideas
 
-#### minimap 
-- highlight changed lines?
-
 ### file state
 - save backup files?
 - don't clear undo buffer on save?
@@ -11,14 +8,13 @@
 - fix broken syntax highlighting when editing
 
 #### autocomplete
-- *autocomplete from similar files*
-- *autocomplete from required files*
 - *make autocomplete work with multicursors*
 
 #### windows
 - list buffers when clicking buffer number in titlebar
 
 #### editor
+- *fix multicursor editing wrong offset*
 - save and restore scrollX/Left
 - check undo (merges too much?)
 - make special stuff file type dependent
@@ -50,10 +46,6 @@
     - dirs and files
     - /usr/local/bin, /usr/bin and /bin
 - number history output and add !(n) command
-- font zoom
-      
-#### logview
-- font zoom
       
 #### commands
 - tree
@@ -71,7 +63,6 @@
 - save window positions as layouts
 - bracket matching
 - git status in gutter?
-- show invisbles (spaces,tabs,etc)
 - shortcut for renaming file
 - tail -f mode
 - markdown mode (replace - with ●)

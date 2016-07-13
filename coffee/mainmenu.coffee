@@ -130,7 +130,7 @@ class MainMenu
             label: 'Window'
             submenu: [
                 label:       'Minimize'
-                accelerator: 'Cmd+M'
+                accelerator: 'Alt+Cmd+M'
                 click:       (i,win) -> win?.minimize()
             ,
                 label:       'Maximize'

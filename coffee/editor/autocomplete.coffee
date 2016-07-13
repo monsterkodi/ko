@@ -6,10 +6,12 @@
 {
 clamp,
 last,
-$}    = require '../tools/tools'
-log   = require '../tools/log'
-_     = require 'lodash'
-event = require 'events'
+$}       = require '../tools/tools'
+log      = require '../tools/log'
+_        = require 'lodash'
+event    = require 'events'
+electron = require 'electron'
+ipc      = electron.ipcRenderer
 
 class Autocomplete extends event
 
@@ -38,6 +40,7 @@ class Autocomplete extends event
         @editor.on 'linesAppended',  @onLinesAppended
         @editor.on 'cursor',         @close
         @editor.on 'blur',           @close
+        ipc.on 'funcsCount',         @onFuncsCount
 
     #  0000000   000   000  00000000  0000000    000  000000000
     # 000   000  0000  000  000       000   000  000     000   
@@ -199,11 +202,14 @@ class Autocomplete extends event
                 return false if @word == w.slice 0, w.length-1
                 return false if w == cursorWord
                 return false if @headerRegExp.test w
+                return false if /^[\-]?[\d]+$/.test w
                 true
                 
             for w in words # append words without leading special character
                 i = w.search @notSpecialRegExp
-                words.push w.slice i if i > 0 
+                if i > 0 and w[0] != "#"
+                    w = w.slice i
+                    words.push w if not /^[\-]?[\d]+$/.test w
             
             for w in words
                 info  = @wordinfo[w] ? {}
@@ -212,15 +218,21 @@ class Autocomplete extends event
                 info.count = count
                 info.temp = true if opt.action is 'change'
                 @wordinfo[w] = info                
-                
+        @updateWordlist()
+    
+    updateWordlist: ->
         weight = (wi) -> wi[1].count
-            
         sorted = ([w,i] for w,i of @wordinfo).sort (a,b) -> weight(b) - weight(a)
-        
         @wordlist = (s[0] for s in sorted)
         @emit 'wordCount', @wordlist.length
-        
-        # log "Completion.parseLines -- #{@editor.name} @wordlist:", @wordlist.slice 0, 40
+         
+    onFuncsCount: =>
+        funcs = ipc.sendSync 'indexer', 'funcs'
+        for func,info of funcs
+            info  = @wordinfo[func] ? {}
+            info.count = Math.max 20, info.count ? 1
+            @wordinfo[func] = info
+        @updateWordlist()
                 
     #  0000000  000   000  00000000    0000000   0000000   00000000   000   000   0000000   00000000   0000000  
     # 000       000   000  000   000  000       000   000  000   000  000 0 000  000   000  000   000  000   000
@@ -271,10 +283,7 @@ class Autocomplete extends event
     onLineInserted:   (li)       => @parseLines [@editor.lines[li]], action: 'insert'
     onLineChanged:    (li)       => @parseLines [@editor.lines[li]], action: 'change', count: 0
     onWillDeleteLine: (li, line) => @parseLines [line], action: 'delete', count: -1
-    onLinesSet:       (lines)    => 
-        if lines.length
-            @parseLines lines, action: 'set' 
-        # else @wordinfo = {}
+    onLinesSet:       (lines)    => @parseLines lines, action: 'set' if lines.length
 
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
@@ -283,7 +292,6 @@ class Autocomplete extends event
     # 000   000  00000000     000   
 
     handleModKeyComboEvent: (mod, key, combo, event) ->
-        # log "autocomplete.handleModKeyComboEvent combo #{combo}"
         return 'unhandled' if not @span?
         
         switch combo

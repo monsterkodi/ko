@@ -46,12 +46,15 @@ class Macro extends Command
         cp = editor.cursorPos()
         args = command.split /\s+/
         command = args.shift()
-        log "command:#{command} args:#{args}"
         switch command
+            when 'inv' 
+                editor.showInvisibles = !editor.showInvisibles
+                editor.updateLines()
             when 'dbg'
                 li = if editor.isCursorInIndent() then cp[1] else cp[1]+1
                 indent = editor.indentStringForLineAtIndex li
                 insert = indent + 'log "'
+                insert += editor.funcInfoAtLineIndex li
                 r = args.length and args or editor.textsInRanges editor.selections
                 for t in r
                     insert += "#{t}:\#{#{t}} "

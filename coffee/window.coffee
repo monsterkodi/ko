@@ -85,23 +85,17 @@ ipc.on 'executeResult', (event, arg) => terminal.appendText str arg
 ipc.on 'openFile', (event, options) => openFile options
 ipc.on 'focusEditor', (event) => split.focus '.editor'
 ipc.on 'cloneFile',  => ipc.send 'newWindowWithFile', editor.currentFile
-ipc.on 'reloadFile', => 
-    # log "window.ipc.reloadFile"
-    loadFile editor.currentFile, reload: true, dontSave: true
+ipc.on 'reloadFile', => loadFile editor.currentFile, reload: true, dontSave: true
 ipc.on 'saveFileAs', => saveFileAs()
 ipc.on 'saveFile',   => saveFile()
-ipc.on 'loadFile', (event, file) => 
-    # log "window.ipc.loadFile #{file}"
-    loadFile file
+ipc.on 'loadFile', (event, file) => loadFile file
 ipc.on 'setWinID', (event, id) => 
-    # log "window.ipc.setWinID #{id} #{window.split?}"
     winID = window.winID = id
     window.split?.setWinID id 
     editor.updateTitlebar()
     
 ipc.on 'fileLinesChanged', (event, file, lineChanges) =>
     if file == editor.currentFile
-        # log "window ipc.on.fileLinesChanged file #{file}", lineChanges
         editor.applyForeignLineChanges lineChanges
                  
 # 00000000  000  000      00000000
@@ -112,7 +106,6 @@ ipc.on 'fileLinesChanged', (event, file, lineChanges) =>
 
 saveFile = (file) =>
     file ?= editor.currentFile
-    # log 'window.saveFile file:', file
     if not file?
         saveFileAs()
         return
@@ -123,7 +116,6 @@ saveFile = (file) =>
     setState 'file', file
 
 loadFile = (file, opt) =>  
-    # log 'window.loadFile file:', file
     [file,line] = file.split ':'
     if file != editor.currentFile or opt?.reload
         return if not fileExists file
@@ -153,7 +145,6 @@ loadFile = (file, opt) =>
         
 
 openFiles = (ofiles, options) =>
-    # log 'openFiles:', ofiles    
     if ofiles?.length
         files = fileList ofiles, ignoreHidden: false
         log "window.openFiles", files
@@ -172,7 +163,6 @@ openFiles = (ofiles, options) =>
             return []
         setState 'openFilePath', path.dirname files[0]                    
         if not options?.newWindow
-            # log "window.openFiles not new window"
             loadFile resolve files.shift()
         for file in files
             ipc.send 'newWindowWithFile', file
@@ -237,7 +227,6 @@ split.on 'split', =>
 
 terminal = window.terminal = new Terminal '.terminal'
 terminal.on 'fileLineChange', (file, lineChange) =>
-    # log "window terminal.on.fileLineChange", file, lineChange
     ipc.send 'winFileLinesChanged', -1, file, [lineChange]
 
 # 00000000  0000000    000  000000000   0000000   00000000 
@@ -314,18 +303,16 @@ window.onunload = => editor.setCurrentFile null, noSaveScroll: true # to stop wa
 # 000        0000000   000   000     000     0000000   000  0000000  00000000
     
 setFontSize = (s) => 
-    s = clamp 2, 100, s
+    s = clamp 8, 80, s
     setState "fontSize", s
     editor.setFontSize s
-    log "setFontSize loadFile #{editor.currentFile}" if editor.currentFile?
-    loadFile editor.currentFile if editor.currentFile?
+    loadFile editor.currentFile, reload:true if editor.currentFile?
     
-changeFontSize = (d) => 
-    setFontSize clamp 2, 100, editor.size.fontSize + d
+changeFontSize = (d) => setFontSize editor.size.fontSize + d
     
 resetFontSize = => 
     delState 'fontSize'
-    setFontSize prefs.get 'fontSize', 15
+    setFontSize prefs.get 'fontSize', editor.fontSizeDefault
 
 s = getState 'fontSize'
 setFontSize s if s
@@ -356,7 +343,7 @@ changeZoom: (d) ->
 # 000        0000000    0000000   0000000   0000000 
 
 window.onfocus = (event) -> window.editor.updateTitlebar()
-window.onblur = (event) -> window.editor.updateTitlebar()
+window.onblur  = (event) -> window.editor.updateTitlebar()
               
 # 000   000  00000000  000   000
 # 000  000   000        000 000 

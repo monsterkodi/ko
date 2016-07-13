@@ -5,7 +5,8 @@
 # 000  000   000  0000000    00000000  000   000  00000000  000   000
 {
 fileExists,
-resolve
+resolve,
+last
 }        = require './tools/tools'
 log      = require './tools/log'
 _        = require 'lodash'
@@ -18,10 +19,10 @@ class Indexer
     
     constructor: () ->
         
-        @files   = {}
-        @classes = {}
-        @funcs   = Object.create null #new Map
-        @words   = {}
+        @files   = Object.create null
+        @classes = Object.create null
+        @funcs   = Object.create null
+        @words   = Object.create null
         @queue   = [] 
         
         @splitRegExp = new RegExp "[^\\w\\d#\\_]+", 'g'        
@@ -41,16 +42,22 @@ class Indexer
             lines = data.split /\r?\n/
             fileInfo = 
                 lines: lines.length
+                funcs: []
             funcAdded = false
+            funcStack = []
             currentClass = null
             for li in [0...lines.length]
                 line = lines[li]
                 
-                if currentClass? and line.trim().length                    
+                if line.trim().length # ignoring empty lines
                     indent = line.search /\S/
-                    if indent < 4
-                        currentClass = null
-                    else if indent == 4
+                    
+                    while funcStack.length and indent <= last(funcStack)[0]
+                        last(funcStack)[1].last = li - 1
+                        funcInfo = funcStack.pop()
+                        fileInfo.funcs.push [funcInfo[1].line, funcInfo[1].last, funcInfo[2], funcInfo[1].class ? path.basename file, path.extname file]
+            
+                    if currentClass? and indent == 4                        
                         m = line.match /^\s+([\@]?\w+)\s*\:\s*(\([^\)]*\))?\s*[=-]\>/
                         if m?[1]?
                             _.set @classes, "#{currentClass}.methods.#{m[1]}", 
@@ -60,14 +67,29 @@ class Indexer
                                 line: li
                                 class: currentClass
                                 
-                            # funcInfos = @funcs.get(m[1]) ? []
-                            # funcInfos.push funcInfo
-                            # @funcs.set m[1], funcInfos
                             funcInfos = @funcs[m[1]] ? []
                             funcInfos.push funcInfo
                             @funcs[m[1]] = funcInfos
+                                                        
+                            funcStack.push [indent, funcInfo, m[1]]
+                            
                             funcAdded = true
-                
+                    else
+                        currentClass = null if indent < 4
+                        m = line.match /^\s*([\w\.]+)\s*[\:\=]\s*(\([^\)]*\))?\s*[=-]\>/
+                        if m?[1]?
+                            
+                            funcInfo = 
+                                line: li
+                                file: file
+                                
+                            funcInfos = @funcs[m[1]] ? []
+                            funcInfos.push funcInfo
+                            @funcs[m[1]] = funcInfos
+                                                        
+                            funcStack.push [indent, funcInfo, m[1]]
+                            funcAdded = true
+
                 words = line.split @splitRegExp
                 for word in words
                     _.update @words, "#{word}.count", (n) -> (n ? 0) + 1 
@@ -92,12 +114,20 @@ class Indexer
                                 if (m[2][0] == '.') and (not @files[abspath]?) and (@queue.indexOf(abspath) < 0)
                                     if fileExists abspath 
                                         @queue.push abspath
-            
             if funcAdded
+                
+                while funcStack.length
+                    last(funcStack)[1].last = li - 1
+                    funcInfo = funcStack.pop()    
+                    fileInfo.funcs.push [funcInfo[1].line, funcInfo[1].last, funcInfo[2], funcInfo[1].class ? path.basename file, path.extname file]
+                
                 for win in BrowserWindow.getAllWindows()
-                    win.webContents.send 'funcsCount', Object.keys(@funcs).length #@funcs.size
+                    win.webContents.send 'funcsCount', Object.keys(@funcs).length
                     
             @files[file] = fileInfo
+
+            for win in BrowserWindow.getAllWindows()
+                win.webContents.send 'filesCount', Object.keys(@files).length
                     
             if @queue.length
                 file = @queue.shift()

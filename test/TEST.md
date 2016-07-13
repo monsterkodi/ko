@@ -1,5 +1,5 @@
 apple    apple    apple    apple    apple
-abakus   abakus   abakus   abakus   abakus
-abrasive abrasive abrasive abrasive abrasive
+apples   apples   apples   apples   apples
+ablative ablative ablative ablative ablative
 blobber  blobber  blobber  blobber  blobber
 blork    blork    blork    blork    blork

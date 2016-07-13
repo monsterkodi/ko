@@ -64,9 +64,15 @@ class Info
 
         @funcs = document.createElement 'span'
         @funcs.className = "info-funcs empty"
-        @funcs.onclick = => log "funcs:", ipc.sendSync 'indexer', 'funcs' #, 'classes'
+        @funcs.onclick = => log "funcs:", ipc.sendSync 'indexer', 'funcs'
         @botline.appendChild @funcs
         ipc.on 'funcsCount', (event, count) => @onFuncsCount count
+
+        @files = document.createElement 'span'
+        @files.className = "info-files"
+        @files.onclick = => log "files:", ipc.sendSync 'indexer', 'files'
+        @botline.appendChild @files
+        ipc.on 'filesCount', (event, count) => @onFilesCount count
         
         @elem.appendChild @botline
         
@@ -104,6 +110,10 @@ class Info
     onFuncsCount: (fc) =>
         @funcs.textContent = fc
         @funcs.classList.toggle 'empty', fc == 0
+
+    onFilesCount: (fc) =>
+        @files.textContent = fc
+        @files.classList.toggle 'empty', fc == 0
     
     onCursor: => 
         @cursorLine.textContent = @editor.mainCursor[1]+1
