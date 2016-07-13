@@ -42,7 +42,7 @@ args  = require('karg') """
 
 #{pkg.name}
 
-    filelist  . ? files to open           . ** .
+    filelist  . ? files to open           . **
     show      . ? open window on startup  . = true
     prefs     . ? show preferences        . = false
     noprefs   . ? don't load preferences  . = false
@@ -453,6 +453,7 @@ class Main
             @toggleWindows()
             
         for arg in args.slice(2)
+            continue if arg.startsWith '-'
             file = arg
             if not arg.startsWith '/'
                 file = resolve dir + '/' + arg
