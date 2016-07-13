@@ -38,29 +38,29 @@ ko is an editor for Mac OS X
 
 ### minimap
 
-- ⌘ while dragging to turn of cursor placement
-- ⇧ shift while dragging/clicking to select lines
+- **⌘** while dragging to turn off cursor placement
+- **⇧** while dragging/clicking to select lines
 
 ### terminal
 
-- ⌘-T to activate input
+- **⌘T** to activate input
 - only for commands that terminate for now!
 
 ### find
 - search in current file
-    - ⌘F  case insensitive
-    - ^F  case sensitive
-    - ⌥F  regexp insensitive
-    - ^⌥F regexp sensitive
-    - ⌘⌥F fuzzy search
-    - ⌘^F glob search
+    - **⌘F**  case insensitive
+    - **^F**  case sensitive
+    - **⌥F**  regexp insensitive
+    - **^⌥F** regexp sensitive
+    - **⌘⌥F** fuzzy search
+    - **⌘^F** glob search
      
 ### search
 - search in project files
-    - ⌘⇧F   case   insensitive
-    - ^⇧F   case   sensitive
-    - ⌥⇧F   regexp insensitive
-    - ^⌥⇧F  regexp sensitive
+    - **⌘⇧F**   case   insensitive
+    - **^⇧F**   case   sensitive
+    - **⌥⇧F**   regexp insensitive
+    - **^⌥⇧F**  regexp sensitive
 - editing search result lines will ...
     - mark them for saving
     - changes are propagated immediately to all open files
@@ -72,13 +72,13 @@ ko is an editor for Mac OS X
     - use at your own risk! backup your files! 
 
 ### multicursors
-- ⌘click               add or remove single cursor
-- ⌘up|down             grow all vertical cursor lines up or down
-- ^⇧up|down            grow only main cursor line up or down
-- ^up|down|left|right  move main cursor independently (clears other cursors when moving over them)
-- ^⌥up|down|left|right align all cursors vertically with left|up|down|right-most cursor
-- ^⇧right              align all cursors vertically with right-most cursor while moving text to the right
-- ⌘delete              delete backwards over line boundaries
+- **⌘click**               add or remove single cursor
+- **⌘up|down**             grow all vertical cursor lines up or down
+- **^⇧up|down**            grow only main cursor line up or down
+- **^up|down|left|right**  move main cursor independently (clears other cursors when moving over them)
+- **^⌥up|down|left|right** align all cursors vertically with left|up|down|right-most cursor
+- **^⇧right**              align all cursors vertically with right-most cursor while moving text to the right
+- **⌘delete**              delete backwards over line boundaries
 - cursors can be positioned after the end of line
     - cursors after the end of line have two representations: blue and orange/yellow
     - the orange/yellow position shows where text will be inserted
