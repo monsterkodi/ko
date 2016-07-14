@@ -1,12 +1,12 @@
 # todo/ideas
 
-- *jump to functions*
-- *make sure that active window is frontmost when stacking* 
+- *jump to functions and classes*
 - *colorize command names*
 
 #### open
 - show relative path when navigating in history
 - resolve environment variables
+- shared recent files of stacked windows
 
 #### tool
 - measure 
@@ -44,7 +44,6 @@
 - indent more when inserting newline and next line is indented more?
 
 #### terminal
-- fix escape
 - autocomplete
     - history
     - commands

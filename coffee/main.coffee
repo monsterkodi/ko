@@ -306,6 +306,7 @@ class Main
                 width:  parseInt ww
                 height: parseInt height
             , animate
+        activeWin().show()
         
     windowsAreStacked: ->
         wl = visibleWins()

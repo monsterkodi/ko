@@ -30,7 +30,8 @@ class Command
         
     cancel: ->
         text: ''
-        focus: @focus   
+        focus: @focus
+        reveal: 'editor'
         
     clear: ->
         text: ''

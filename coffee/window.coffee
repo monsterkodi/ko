@@ -132,10 +132,7 @@ loadFile = (file, opt) =>
             log "window.loadFile saveChanges:#{saveChanges}"
             fs.writeFileSync saveChanges[0], saveChanges[1], encoding: 'UTF8'
             
-        if not commandline.command?
-            commandline.command = commandline.commands['open']
-            commandline.command.loadState()
-            commandline.setText path.basename file
+        commandline.fileLoaded file
     
     window.split.reveal 'editor'
         

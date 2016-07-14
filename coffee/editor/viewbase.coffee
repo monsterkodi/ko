@@ -420,12 +420,13 @@ class ViewBase extends Editor
     # 000   000  00000000  0000000   000  0000000  00000000  0000000  
     
     resized: -> 
-        @scroll?.setViewHeight @view.clientHeight #@viewHeight()
-        @numbers?.elem.style.height = "#{@viewHeight}px"
+        vh = @view.clientHeight
+        @scroll?.setViewHeight vh
+        @numbers?.elem.style.height = "#{vh}px"
         @layers.style.width = "#{sw()-@view.getBoundingClientRect().left-130-6}px"
-        @layers.style.height = "#{@viewHeight()}px"
+        @layers.style.height = "#{vh}px"
         @updateScrollOffset()
-        @emit 'viewHeight', @viewHeight()
+        @emit 'viewHeight', vh
     
     deltaToEnsureCursorsAreVisible: ->
         topdelta = 0

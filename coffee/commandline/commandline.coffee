@@ -58,6 +58,8 @@ class Commandline extends ViewBase
     changed: (changeInfo, action) ->
         super changeInfo, action
         if changeInfo.sorted.length
+            @cmmd.classList.remove 'empty'
+            @cmmd.classList.add 'active'
             @command?.changed @lines[0]
         
     loadCommands: ->
@@ -69,6 +71,18 @@ class Commandline extends ViewBase
             @commands[command.prefsID] = command
             
     onSplit: (s) => @command?.onBot? s[1]
+    
+    # 00000000  000  000      00000000        000       0000000    0000000   0000000    00000000  0000000  
+    # 000       000  000      000             000      000   000  000   000  000   000  000       000   000
+    # 000000    000  000      0000000         000      000   000  000000000  000   000  0000000   000   000
+    # 000       000  000      000             000      000   000  000   000  000   000  000       000   000
+    # 000       000  0000000  00000000        0000000   0000000   000   000  0000000    00000000  0000000  
+    
+    fileLoaded: (file) ->
+        if not @command?
+            @command = @commands['open']
+            @command.loadState()
+            @setText path.basename file
           
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -117,7 +131,8 @@ class Commandline extends ViewBase
         for n,c of @commands            
             if combo == 'esc'
                 if document.activeElement == @view
-                    return @cancel()
+                    @cancel()
+                    return 
             for sc in c.shortcuts
                 if sc == combo then return @startCommand n, combo                
         return 'unhandled'            
