@@ -47,24 +47,37 @@ class Macro extends Command
         args = command.split /\s+/
         command = args.shift()
         switch command
+            
             when 'inv' 
                 editor.showInvisibles = !editor.showInvisibles
                 editor.updateLines()
+                
             when 'dbg'
                 li = if editor.isCursorInIndent() then cp[1] else cp[1]+1
                 indent = editor.indentStringForLineAtIndex li
                 insert = indent + 'log "'
                 insert += editor.funcInfoAtLineIndex li
-                r = args.length and args or editor.textsInRanges editor.selections
-                for t in r
+                lst = args.length and parseInt args[0] or 0
+                args.shift() if lst
+                if args.length
+                    vs = args
+                else
+                    cw = editor.wordsAtCursors editor.positionsNotInRanges editor.cursors, editor.selections
+                    sw = editor.textsInRanges editor.selections
+                    vs = _.uniq cw.concat sw                
+                for ti in [0...vs.length - lst]
+                    t = vs[ti]
                     insert += "#{t}:\#{#{t}} "
                 insert = insert.trimRight()
                 insert += '"'
+                if lst
+                    insert += (", #{vs[ti]}" for ti in [vs.length - lst...vs.length]).join ''
                 editor.do.start()
                 editor.do.insert li, insert
                 editor.singleCursorAtPos [editor.lines[li].length, li]
                 editor.do.end()
                 return focus: '.'+editor.name
+            
             when 'class'
                 clss = args.length and args[0] or last editor.textsInRanges(editor.selections)
                 clss ?= 'Class'

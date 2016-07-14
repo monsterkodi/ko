@@ -70,7 +70,8 @@ class Info
 
         @files = document.createElement 'span'
         @files.className = "info-files"
-        @files.onclick = => log "files:", ipc.sendSync 'indexer', 'files'
+        @files.onclick = => #log "files:", ipc.sendSync 'indexer', 'files'
+            log "files:", (k for k,v of ipc.sendSync('indexer', 'files'))
         @botline.appendChild @files
         ipc.on 'filesCount', (event, count) => @onFilesCount count
         

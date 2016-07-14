@@ -76,6 +76,7 @@ class Buffer extends event
     # 00     00   0000000   000   000  0000000  
 
     wordAtCursor: (c=@mainCursor) -> @textInRange @rangeForWordAtPos c
+    wordsAtCursors: (cs=@cursors) -> (@textInRange @rangeForWordAtPos c for c in cs)
     rangeForWordAtPos: (pos) ->
         p = @clampPos pos
         wr = @wordRangesInLineAtIndex p[1]
@@ -264,13 +265,14 @@ class Buffer extends event
         
     isSamePos: (a,b) -> a[1]==b[1] and a[0]==b[0]
     isPosInRange: (p, r) -> (p[1] == r[0]) and (r[1][0] <= p[0] <= r[1][1])
+    isPosInRanges: (p, rgs) -> @rangeAtPosInRanges(p, rgs)?
         
     positionsFromPosInPositions: (p, pl) -> 
         (r for r in pl when ((r[1] > p[1]) or ((r[1] == p[1]) and (r[0] >= p[0]))))
     positionsInLineAtIndexInPositions: (li,pl) -> (p for p in pl when p[1] == li)
     positionsBelowLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] > li)
     positionsAfterLineColInPositions: (li,col,pl) -> (p for p in pl when p[1] == li and p[0]>=col)
-        
+    positionsNotInRanges: (pss, rgs) -> _.filter pss, (p) => not @isPosInRanges p, rgs
     manhattanDistance: (a,b) -> Math.abs(a[1]-b[1])+Math.abs(a[0]-b[0])
         
     posClosestToPosInPositions: (p,pl) -> 

@@ -103,6 +103,7 @@ ipc.on 'fileLinesChanged', (event, file, lineChanges) =>
 # 000       000  0000000  00000000
 
 saveFile = (file) =>
+    log "window.saveFile file:#{file}"
     file ?= editor.currentFile
     if not file?
         saveFileAs()
@@ -118,13 +119,13 @@ loadFile = (file, opt) =>
     if file != editor.currentFile or opt?.reload
         return if not fileExists file
         
-        if editor.currentFile? and editor.do.hasLineChanges() and not opt?.dontSave
+        if editor.currentFile? and not opt?.dontSave and editor.do.hasLineChanges() 
             saveChanges = [_.clone(editor.currentFile), _.clone(editor.text())]
             
         addToRecent file        
         editor.setCurrentFile null # to stop watcher and reset scroll
         editor.setCurrentFile file
-        ipc.send 'fileLoaded', file
+        ipc.send 'fileLoaded', file, winID
         setState 'file', file
         
         if saveChanges?
@@ -143,7 +144,7 @@ loadFile = (file, opt) =>
         editor.scrollCursorToTop()        
         
 
-openFiles = (ofiles, options) =>
+openFiles = (ofiles, options) => # called from file dialog and open command
     if ofiles?.length
         files = fileList ofiles, ignoreHidden: false
         log "window.openFiles", files
@@ -162,7 +163,9 @@ openFiles = (ofiles, options) =>
             return []
         setState 'openFilePath', path.dirname files[0]                    
         if not options?.newWindow
-            loadFile resolve files.shift()
+            file = resolve files.shift()
+            if not ipc.sendSync 'activateWindowWithFile', file
+                loadFile file
         for file in files
             ipc.send 'newWindowWithFile', file
         return ofiles

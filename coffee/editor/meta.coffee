@@ -68,23 +68,26 @@ class Meta
     # 0000000   000   000      0      00000000
          
     saveFileLineMetas: (file, lineMetas) ->
-        log "Meta.saveFileLineMetas file:#{file} lineMetas:", lineMetas
+        # log "Meta.saveFileLineMetas file:#{file} lineMetas:", lineMetas
+        log "Meta.saveFileLineMetas file:#{file}"
         fs.readFile file, encoding: 'UTF8', (err, data) =>
             if err?
                 log "Meta.saveFileLineMetas readFile err:#{err}"
                 return
             lines = data.split /\r?\n/
-            for l in lineMetas
-                lines[l[0]] = l[1]
+            log "Meta.saveFileLineMetas 1 lines:", lines
+            for lineMeta in lineMetas
+                lines[lineMeta[0]] = lineMeta[1]
+            log "Meta.saveFileLineMetas 2 lines:", lines
             data = lines.join '\n'
             fs.writeFile file, data, encoding: 'UTF8', (err) =>
                 if err?
                     log "Meta.saveFileLineMetas writeFile err:#{err}"
                     return
-                for l in lineMetas
-                    meta = l[2]
+                for lineMeta in lineMetas
+                    meta = lineMeta[2]
                     delete meta[2].state
-                    meta[2].span.innerHTML = meta[2].href.split(':')[1]
+                    meta[2].span.innerHTML = lineMeta[0]+1
                     
     saveLine: (li) -> 
         for meta in @metasAtLineIndex li
@@ -98,7 +101,7 @@ class Meta
             if meta[2].state == 'unsaved'
                 [file, line] = meta[2].href.split(':')
                 fileLineMetas[file] = [] if not fileLineMetas[file]?
-                fileLineMetas[file].push [meta[0], @editor.lines[meta[0]], meta]
+                fileLineMetas[file].push [line-1, @editor.lines[meta[0]], meta]
 
         for file, lineMetas of fileLineMetas
             @saveFileLineMetas file, lineMetas

@@ -15,6 +15,7 @@ pkg           = require '../package.json'
 Execute       = require './execute'
 Indexer       = require './indexer'
 MainMenu      = require './mainmenu'
+_             = require 'lodash'
 fs            = require 'fs'
 noon          = require 'noon'
 colors        = require 'colors'
@@ -117,7 +118,6 @@ coffeeExecute = new Execute
 ipc.on 'execute',           (event, arg)   => event.sender.send 'executeResult', coffeeExecute.execute arg
 ipc.on 'toggleDevTools',    (event)        => event.sender.toggleDevTools()
 ipc.on 'newWindowWithFile', (event, file)  => main.createWindow file
-ipc.on 'fileLoaded',        (event, file)  => main.indexer.indexFile file
 ipc.on 'maximizeWindow',    (event, winID) => main.toggleMaximize winWithID winID
 ipc.on 'saveBounds',        (event, winID) => main.saveWinBounds winWithID winID
 ipc.on 'focusWindow',       (event, winID) => main.focusWindow winWithID winID
@@ -125,6 +125,17 @@ ipc.on 'reloadWindow',      (event, winID) => main.reloadWin winWithID winID
 ipc.on 'prefSet',           (event, k, v)  => prefs.set k, v
 ipc.on 'prefGet',           (event, k, d)  => event.returnValue = prefs.get k, d
 ipc.on 'reloadMenu',        ()             => main.reloadMenu() # still in use?
+
+ipc.on 'activateWindowWithFile', (event, file) => 
+    for w in wins()
+        if w.currentFile == file
+            main.activateWindowWithID w.id
+            event.returnValue = w.id
+    event.returnValue = null
+
+ipc.on 'fileLoaded',        (event, file, winID)  => 
+    winWithID(winID).currentFile = file 
+    main.indexer.indexFile file
 
 ipc.on 'winFileLinesChanged', (event, winID, file, lineChanges) => 
     return if not winID
@@ -170,20 +181,16 @@ class Main
         
         if not openFiles.length and args.filelist.length
             openFiles = fileList args.filelist
-            @dbg "Main.constructor openFiles = fileList args.filelist: #{openFiles}"
             
         if openFiles.length
             for file in openFiles
-                @dbg "Main.constructor openFiles.file: #{file}"
                 @createWindow file            
 
         if not wins().length
             if args.show
-                @dbg "Main.constructor open recent file: #{mostRecentFile()}" 
                 w = @createWindow mostRecentFile()
         
         if args.DevTools
-            log "open dev tools", wins()?[0]?
             wins()?[0]?.webContents.openDevTools()
 
         MainMenu.init @
@@ -269,9 +276,7 @@ class Main
             if w != activeWin()
                 @closeWindow w
     
-    closeWindow: (w) =>
-        # prefs.del "windows:#{w.id}"
-        w?.close()
+    closeWindow: (w) => w?.close()
     
     closeWindows: =>
         for w in wins()
@@ -281,6 +286,35 @@ class Main
     closeWindowsAndQuit: => 
         @closeWindows()
         @quit()
+      
+    #  0000000  000000000   0000000    0000000  000   000
+    # 000          000     000   000  000       000  000 
+    # 0000000      000     000000000  000       0000000  
+    #      000     000     000   000  000       000  000 
+    # 0000000      000     000   000   0000000  000   000
+    
+    stackWindows: ->
+        animate = false
+        {width, height} = electron.screen.getPrimaryDisplay().workAreaSize
+        ww = height + 122
+        wl = visibleWins()
+        for w in wl
+            w.showInactive()
+            w.setBounds
+                x:      parseInt (width-ww)/2
+                y:      parseInt 0
+                width:  parseInt ww
+                height: parseInt height
+            , animate
+        
+    windowsAreStacked: ->
+        wl = visibleWins()
+        return false if not wl.length
+        w0 = wl[0].getBounds()
+        for wi in [1...wl.length]
+            if not _.isEqual wl[wi].getBounds(), w0
+                return false
+        true
         
     #  0000000   00000000   00000000    0000000   000   000   0000000   00000000
     # 000   000  000   000  000   000  000   000  0000  000  000        000     
@@ -288,19 +322,13 @@ class Main
     # 000   000  000   000  000   000  000   000  000  0000  000   000  000     
     # 000   000  000   000  000   000  000   000  000   000   0000000   00000000
         
-    arrangeWindows: ->
+    arrangeWindows: =>
         animate = false
         frameSize = 6
         wl = visibleWins()
         {width, height} = electron.screen.getPrimaryDisplay().workAreaSize
-        if wl.length == 1
-            wl[0].showInactive()
-            wl[0].setBounds
-                x:      parseInt (width-height)/2
-                y:      parseInt 0
-                width:  parseInt height
-                height: parseInt height
-            , animate
+        if wl.length == 1 or not @windowsAreStacked()
+            @stackWindows()
         else if wl.length == 2 or wl.length == 3
             w = width/wl.length
             for i in [0...wl.length]
@@ -348,12 +376,10 @@ class Main
                 i += 1
                 sequenced[i] = w
         prefs.set 'windows', sequenced
-        @dbg "main.restoreWindows #{Object.keys sequenced}"
         for k, w of sequenced
             @restoreWin w
                 
     restoreWin: (state) ->
-        # @dbg "main.restoreWin", #{state}
         w = @createWindow state.file
         w.setBounds state.bounds if state.bounds?
         w.webContents.openDevTools() if state.devTools
@@ -385,13 +411,10 @@ class Main
         win.on 'move',   @onMoveWin
         win.on 'resize', @onResizeWin
                 
-        winReady = =>
-            # @dbg "main.createWindow.winReady send setWinID #{win.id}"
-            win.webContents.send 'setWinID', win.id
+        winReady = => win.webContents.send 'setWinID', win.id
                         
         winLoaded = =>
             if openFile?
-                @dbg "main.createWindow.winLoaded send loadFile openFile: #{openFile}"
                 win.webContents.send 'loadFile', openFile
                 openFile = null
             else
@@ -446,10 +469,8 @@ class Main
         prefs.del "windows:#{event.sender.id}"
         if visibleWins().length == 1
             hideDock()
-        @dbg "main.onCloseWin #{event.sender.id}"
         
     otherInstanceStarted: (args, dir) =>
-        @log "main.otherInstanceStarted args args: #{args} dir: #{dir}"
         if not visibleWins().length
             @toggleWindows()
             
@@ -458,7 +479,6 @@ class Main
             file = arg
             if not arg.startsWith '/'
                 file = resolve dir + '/' + arg
-            @log 'create', file
             @createWindow file
             
         if !activeWin()
@@ -466,10 +486,7 @@ class Main
         
     quit: => 
         prefs.save (ok) =>
-            @dbg "prefs saved ok:#{ok}"
-            @dbg "main.quit app.exit 0"
             app.exit 0
-            @dbg "main.quit process.exit 0"
             process.exit 0
     
     #  0000000   0000000     0000000   000   000  000000000

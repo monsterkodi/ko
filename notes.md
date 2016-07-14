@@ -1,6 +1,21 @@
 # todo/ideas
 
-### file state
+- *jump to functions*
+- *make sure that active window is frontmost when stacking* 
+- *colorize command names*
+
+#### open
+- show relative path when navigating in history
+- resolve environment variables
+
+#### tool
+- measure 
+- color
+
+#### macro
+- require
+
+#### file state
 - save backup files?
 - don't clear undo buffer on save?
 
@@ -27,10 +42,6 @@
 - when pasting text at indent level, remove leading space columns
 - multicursors when pasting multiple lines at col > 0
 - indent more when inserting newline and next line is indented more?
-
-#### open
-- show relative path when navigating in history
-- resolve environment variables
 
 #### terminal
 - fix escape

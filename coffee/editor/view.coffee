@@ -123,11 +123,16 @@ class View extends ViewBase
     #  0000000    0000000   000   000  000           000      0000000   0000000    00000000  000       000  000   000  000     000     000   0000000   000   000
     
     jumpToDefinition: (word) ->
-        classes = ipc.sendSync 'indexer', 'classes'
-        for clss, info of classes
-            for mthd, minfo of info.methods
-                if mthd == word
-                    window.loadFile "#{info.file}:#{minfo.line+1}"
+        funcs = ipc.sendSync 'indexer', 'funcs'
+        log "View.jumpToDefinition word:#{word} funcs:#{funcs}"
+        for func, info of funcs
+            if func == word
+                window.loadFile "#{info.file}:#{info.line+1}"
+        # classes = ipc.sendSync 'indexer', 'classes'
+        # for clss, info of classes
+            # for mthd, minfo of info.methods
+                # if mthd == word
+                    # window.loadFile "#{info.file}:#{minfo.line+1}"
     
     funcInfoAtLineIndex: (li) ->
         files = ipc.sendSync 'indexer', 'files'

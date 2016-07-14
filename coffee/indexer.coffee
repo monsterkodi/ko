@@ -64,7 +64,8 @@ class Indexer
                                 line: li
                                 
                             funcInfo = 
-                                line: li
+                                line:  li
+                                file:  file
                                 class: currentClass
                                 
                             funcInfos = @funcs[m[1]] ? []

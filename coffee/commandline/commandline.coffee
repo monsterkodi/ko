@@ -24,6 +24,7 @@ class Commandline extends ViewBase
         @setText ""
                 
         @cmmd = $('.commandline-command')
+        @cmmd.classList.add 'empty'
         
         @commands = {}
         @command = null
@@ -32,7 +33,9 @@ class Commandline extends ViewBase
         
         window.split.on 'split', @onSplit
         
-        @view.onblur = () => @command?.onBlur()
+        @view.onblur = () => 
+            @cmmd.classList.remove 'active'
+            @command?.onBlur()
 
     setName: (name) -> 
         @cmmd.innerHTML = name
@@ -82,6 +85,8 @@ class Commandline extends ViewBase
         @view.focus()
         @setName name
         @results @command.start combo # <-- command start
+        @cmmd.classList.remove 'empty'
+        @cmmd.classList.add 'active'
                 
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     

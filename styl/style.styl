@@ -53,11 +53,15 @@ pre
     padding-left        9px
     padding-right       9px
     color               #aaa
-    background          #333   
+    background          #222   
     min-width           (numbersWidth + 1px)
     box-sizing          border-box
     white-space         nowrap 
     border-right        thinBorder
+    &.empty
+        background      #000   
+    &.active
+        background      #333   
         
 .commandline-span
     position            relative
