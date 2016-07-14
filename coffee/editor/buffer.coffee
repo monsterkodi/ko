@@ -135,11 +135,11 @@ class Buffer extends event
     selectedLineIndices: -> _.uniq (s[0] for s in @selections)
     cursorLineIndices:   -> _.uniq (c[1] for c in @cursors)
 
-    cursorAndSelectedLineIndices: ->
+    selectedAndCursorLineIndices: ->
         _.uniq @selectedLineIndices().concat @cursorLineIndices()
                 
     continuousCursorAndSelectedLineIndexRanges: ->
-        il = @cursorAndSelectedLineIndices()
+        il = @selectedAndCursorLineIndices()
         csr = []
         if il.length
             for li in il
@@ -330,7 +330,7 @@ class Buffer extends event
         r
     
     rangesForCursors: (cs=@cursors) -> ([c[1], [c[0], c[0]]] for c in cs)
-    rangesForCursorLines: (cs=@cursors) -> (@rangeForLineAtIndex c[1] for c in cs)                  
+    rangesForCursorLines: (cs=@cursors) -> (@rangeForLineAtIndex c[1] for c in cs)  
     rangesForAllLines: -> @rangesForLinesFromTopToBot 0, @lines.length
     
     rangesForLinesFromTopToBot: (top,bot) -> 

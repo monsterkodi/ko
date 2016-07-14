@@ -7,9 +7,6 @@
 #### search
 - fix broken syntax highlighting when editing
 
-#### autocomplete
-- *make autocomplete work with multicursors*
-
 #### windows
 - list buffers when clicking buffer number in titlebar
 
@@ -20,7 +17,6 @@
     - eg. add * to surround characters for md
 
 #### editing
-- invert selection (command+i, select full lines without cursors/selections)
 - #< to add salter header of next word
 - no surround for ' inside words
 - select continuous,rectangular ranges with command+shift+M 
@@ -31,7 +27,6 @@
 - when pasting text at indent level, remove leading space columns
 - multicursors when pasting multiple lines at col > 0
 - indent more when inserting newline and next line is indented more?
-- move mainCursor to leftmost/rightmost cursor in its line on 'left'/'right' actions
 
 #### open
 - show relative path when navigating in history

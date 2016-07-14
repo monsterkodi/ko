@@ -191,8 +191,15 @@ class Editor extends Buffer
         @do.selections newSelections
         @do.end()        
 
-    selectNone: => @do.selections []
-    selectAll: => @do.selections @rangesForAllLines()
+    selectNone:     => @do.selections []
+    selectAll:      => @do.selections @rangesForAllLines()
+    selectInverted: => 
+        invertedRanges = []        
+        sc = @selectedAndCursorLineIndices()
+        for li in [0...@lines.length]
+            if li not in sc
+                invertedRanges.push @rangeForLineAtIndex li
+        @do.selections invertedRanges
 
     # 00000000  000   000  000      000            000      000  000   000  00000000   0000000
     # 000       000   000  000      000            000      000  0000  000  000       000     
@@ -550,16 +557,21 @@ class Editor extends Buffer
     moveAllCursors: (f, opt={}) ->
         @mainCursorMove = 0
         @startSelection opt.extend
-        newCursors = _.cloneDeep @cursors        
+        newCursors = _.cloneDeep @cursors
+        mainLine = @mainCursor[1]
         if @cursors.length > 1
             for c in @cursors
                 newPos = f(c)
                 if newPos[1] == c[1] or not opt.keepLine
+                    mainLine = newPos[1] if c == @mainCursor
                     @oldCursorSet newCursors, c, newPos
         else
             @oldCursorSet newCursors, @cursors[0], f(@cursors[0])
-        @mainCursor = first newCursors if opt.main == 'first'        
-        @mainCursor = last  newCursors if opt.main == 'last'        
+            mainLine = newCursors[0][1]
+        @mainCursor = first newCursors if opt.main == 'top'
+        @mainCursor = last  newCursors if opt.main == 'bot'
+        @mainCursor = first @positionsInLineAtIndexInPositions mainLine, newCursors if opt.main == 'left'
+        @mainCursor = last  @positionsInLineAtIndexInPositions mainLine, newCursors if opt.main == 'right'
         @do.cursors newCursors, keepInitial: opt.extend
         @endSelection opt.extend
         true
@@ -603,15 +615,15 @@ class Editor extends Buffer
         true
     
     moveCursorsUp:   (e, n=1) ->                 
-        @moveAllCursors ((n)->(c)->[c[0],c[1]-n])(n), extend:e, main: 'first'
+        @moveAllCursors ((n)->(c)->[c[0],c[1]-n])(n), extend:e, main: 'top'
                         
     moveCursorsRight: (e, n=1) ->
         moveRight = (n) -> (c) -> [c[0]+n, c[1]]
-        @moveAllCursors moveRight(n), extend:e, keepLine:true
+        @moveAllCursors moveRight(n), extend:e, keepLine:true, main: 'right'
     
     moveCursorsLeft: (e, n=1) ->
         moveLeft = (n) -> (c) -> [Math.max(0,c[0]-n), c[1]]
-        @moveAllCursors moveLeft(n), extend:e, keepLine:true
+        @moveAllCursors moveLeft(n), extend:e, keepLine:true, main: 'left'
         
     moveCursorsDown: (e, n=1) ->
         if e and @selections.length == 0 # selecting lines down
@@ -627,7 +639,7 @@ class Editor extends Buffer
                 @do.end()
                 return
             
-        @moveAllCursors ((n)->(c)->[c[0],c[1]+n])(n), extend:e, main: 'last'
+        @moveAllCursors ((n)->(c)->[c[0],c[1]+n])(n), extend:e, main: 'bot'
         
     moveCursors: (direction, e) ->
         switch direction
@@ -646,7 +658,7 @@ class Editor extends Buffer
         @do.start()
         newSelections = _.cloneDeep @selections
         newCursors    = _.cloneDeep @cursors
-        for i in @cursorAndSelectedLineIndices()
+        for i in @selectedAndCursorLineIndices()
             if @lines[i].startsWith @indentString
                 @do.change i, @lines[i].substr @indentString.length
                 for c in @cursorsInLineAtIndex i
@@ -664,7 +676,7 @@ class Editor extends Buffer
         @do.start()
         newSelections = _.cloneDeep @selections
         newCursors    = _.cloneDeep @cursors
-        for i in @cursorAndSelectedLineIndices()
+        for i in @selectedAndCursorLineIndices()
             @do.change i, @indentString + @lines[i]
             for c in @cursorsInLineAtIndex i
                 @oldCursorDelta newCursors, c, @indentString.length
@@ -700,7 +712,7 @@ class Editor extends Buffer
             for c in @cursorsInLineAtIndex i
                 @oldCursorDelta newCursors, c, d
                 
-        for i in @cursorAndSelectedLineIndices()
+        for i in @selectedAndCursorLineIndices()
             cs = @lines[i].indexOf lineComment
             if cs >= 0 and @lines[i].substr(0,cs).trim().length == 0
                 @do.change i, @lines[i].splice cs, 1

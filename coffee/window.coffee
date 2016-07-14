@@ -60,20 +60,18 @@ addToRecent = (file) ->
 # 0000000      000     000   000     000     00000000
    
 setState = window.setState = (key, value) ->
-    # log 'setState', key, value
     return if not winID
     if winID
         prefs.set "windows:#{winID}:#{key}", value
     
 getState = window.getState = (key, value) ->
     return value if not winID
-    # log 'getState', key, value, prefs.getPath "windows.#{winID}.#{key}", value
     prefs.get "windows:#{winID}:#{key}", value
     
 delState = window.delState = (key) ->
     return if not winID
     prefs.del "windows:#{winID}:#{key}"
-    
+
 # 000  00000000    0000000
 # 000  000   000  000     
 # 000  00000000   000     
@@ -130,6 +128,7 @@ loadFile = (file, opt) =>
         setState 'file', file
         
         if saveChanges?
+            log "window.loadFile saveChanges:#{saveChanges}"
             fs.writeFileSync saveChanges[0], saveChanges[1], encoding: 'UTF8'
             
         if not commandline.command?
@@ -293,7 +292,7 @@ window.onresize = ->
     split.resized()
     ipc.send 'saveBounds', winID if winID?
 
-window.onload = => split.resized()
+window.onload   = => split.resized()
 window.onunload = => editor.setCurrentFile null, noSaveScroll: true # to stop watcher
 
 # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000

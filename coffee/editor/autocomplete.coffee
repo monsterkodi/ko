@@ -61,7 +61,6 @@ class Autocomplete extends event
             when 'insert'        
                 return if not @word?.length
                 return if not @wordlist?.length
-                return if @editor.cursors.length > 1 # todo: make it work with multicursors
                 
                 for w in @wordlist
                     if w.startsWith(@word) and w.length > @word.length

@@ -105,14 +105,19 @@ ko is an editor for Mac OS X
 
 ## misc
 non-standard keyboard shortcuts:
+- **F2** global shortcut to activate ko
 - **⌘A** tile windows
 - **⌘⇧N** clone current file in new window
-- **F2** global shortcut to activate ko
-- **⌘⌥Q** close all windows (won't restore on next start) and quit
+- **⌘L** select more lines **⌘⇧L** select less lines
 - **⌥up|down** move selected|cursor lines up|down
 - **⌥/** toggle comment on selected|cursor lines
-- **⌘L** select more lines **⌘⇧L** select less lines
-- **⌘return** evaluate current buffer with coffee in main process and print the result in terminal window
+- **⌘I** inverted line selection: select lines without a cursor or a selection
+- **⌘⌥Q** close all windows (won't restore on next start) and quit
+- **⌘return** evaluate current buffer with coffee in main process and print the result in terminal view
+- while command input has focus:
+    - ^up|down move command input up|down
+    - ⌘up|down move command input to top|bottom of window
+    - ⌥up|down move command input a quarter of window up|down
 
 ## missing features
 

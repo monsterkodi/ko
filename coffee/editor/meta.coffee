@@ -68,14 +68,19 @@ class Meta
     # 0000000   000   000      0      00000000
          
     saveFileLineMetas: (file, lineMetas) ->
+        log "Meta.saveFileLineMetas file:#{file} lineMetas:", lineMetas
         fs.readFile file, encoding: 'UTF8', (err, data) =>
-            return if err
+            if err?
+                log "Meta.saveFileLineMetas readFile err:#{err}"
+                return
             lines = data.split /\r?\n/
             for l in lineMetas
                 lines[l[0]] = l[1]
             data = lines.join '\n'
             fs.writeFile file, data, encoding: 'UTF8', (err) =>
-                return if err
+                if err?
+                    log "Meta.saveFileLineMetas writeFile err:#{err}"
+                    return
                 for l in lineMetas
                     meta = l[2]
                     delete meta[2].state

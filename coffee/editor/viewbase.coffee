@@ -664,6 +664,7 @@ class ViewBase extends Editor
             when 'command+j'                then return @joinLines()
             when 'command+/'                then return @toggleComment()
             when 'command+a'                then return @selectAll()
+            when 'command+i'                then return @selectInverted()
             when 'command+shift+a'          then return @selectNone()
             when 'command+e'                then return @highlightTextOfSelectionOrWordAtCursor()
             when 'command+d'                then return @highlightWordAndAddToSelection()
