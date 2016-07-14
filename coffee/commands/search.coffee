@@ -127,6 +127,6 @@ class FileSearcher extends stream.Writable
                 terminal.appendMeta meta
                 
             terminal.appendMeta clss: 'spacer'
-            terminal.scrollCursorToTop 7
+            terminal.scrollCursorToTop()
                 
 module.exports = Search

@@ -83,6 +83,7 @@ ko is an editor for Mac OS X
 - **^⌥up|down|left|right** align all cursors vertically with up|down|left|right-most cursor
 - **^⇧right**              align all cursors vertically with right-most cursor while moving text to the right
 - **⌘delete**              delete backwards over line boundaries
+
 - cursors can be positioned after the end of line
     - cursors after the end of line have two representations: blue and orange/yellow
     - the orange/yellow position shows where text will be inserted
@@ -100,8 +101,11 @@ ko is an editor for Mac OS X
 ![open](img/open.png)
 
 ## goto
-- **⌘;** activate goto
-- accepts negative numbers for jumping to lines relative to end of file
+- **⌘;** activates goto command
+- text: jump to function, class or file
+- positive number: jump to line
+- negative number: jump to line relative to end of file
+- **⌥enter** to goto word under main cursor
 
 ## misc
 non-standard keyboard shortcuts:
@@ -121,10 +125,12 @@ non-standard keyboard shortcuts:
 
 ## missing features
 
-- no plugin system
-- no customization
-- no git integration
-- no bracket matching
+- plugin system
+- customization
+- git integration
+- bracket matching
+- regression tests
+- correct highlighting of complex strings
 
 ## notes 
 

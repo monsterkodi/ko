@@ -103,8 +103,8 @@ ipc.on 'fileLinesChanged', (event, file, lineChanges) =>
 # 000       000  0000000  00000000
 
 saveFile = (file) =>
-    log "window.saveFile file:#{file}"
     file ?= editor.currentFile
+    log "window.saveFile file:#{file}"
     if not file?
         saveFileAs()
         return
@@ -137,6 +137,7 @@ loadFile = (file, opt) =>
     window.split.reveal 'editor'
         
     if line?
+        # log "window.loadFile line:#{line}"
         editor.singleCursorAtPos [0, parseInt(line)-1] 
         editor.scrollCursorToTop()        
         
@@ -372,4 +373,3 @@ document.onkeydown = (event) ->
         when 'command+shift+-'  then return @changeZoom -1
         when 'command+shift+0'  then return @resetZoom()
         
-                

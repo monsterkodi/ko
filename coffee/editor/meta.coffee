@@ -146,7 +146,9 @@ class Meta
         div.style.width = "#{sw}px"
         div.style.height = "#{lh}px"
         if meta[2].href?
-            div.setAttribute 'onclick', "window.loadFile('#{meta[2].href}');" 
+            # div.setAttribute 'onclick', "window.loadFile('#{meta[2].href}');" 
+            div.addEventListener 'mousedown', @onClick
+            div.href = meta[2].href
             div.classList.add 'href'
         @elem.appendChild div
         if meta[2].div? # todo remove
@@ -154,6 +156,11 @@ class Meta
             alert "remove me!"
             meta[2].div.remove()
         meta[2].div = div
+       
+    onClick: (event) =>
+        if not event.altKey
+            event.stopPropagation()
+            window.loadFile event.target.href
         
     #  0000000   00000000   00000000   00000000  000   000  0000000  
     # 000   000  000   000  000   000  000       0000  000  000   000

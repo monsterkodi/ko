@@ -48,8 +48,8 @@ args  = require('karg') """
     prefs     . ? show preferences        . = false
     noprefs   . ? don't load preferences  . = false
     verbose   . ? log more                . = false
-    debug     . ? debug mode              . = false
     DevTools  . ? open developer tools    . = false
+    debug     .                             = false
     test      .                             = false
     
 version  #{pkg.version}

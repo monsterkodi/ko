@@ -3,7 +3,10 @@
 - *jump to file (require|path)*
 - *jump to list when multiple matches*
 - *colorize command names*
-- *keep (visible) winIDs consecutive from 1*
+
+#### indexer
+- *index whole project in background*
+- *keep index up to date when file changes*
 
 #### open
 - show relative path when navigating in history
@@ -25,6 +28,7 @@
 - fix broken syntax highlighting when editing
 
 #### windows
+- *keep (visible) winIDs consecutive from 1*
 - list buffers when clicking buffer number in titlebar
 
 #### editor
@@ -68,7 +72,7 @@
 - help (shortcuts)
 - save window positions as layouts
 - bracket matching
-- git status in gutter?
+- git status in numbers
 - shortcut for renaming file
 - tail -f mode
 - markdown mode (replace - with ●)

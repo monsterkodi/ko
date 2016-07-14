@@ -235,6 +235,7 @@ class ViewBase extends Editor
         if changeInfo.cursors.length
             @renderCursors()
             if delta = @deltaToEnsureCursorsAreVisible()
+                # log "ViewBase.changed deltaToEnsureCursorsAreVisible:#{delta}"
                 @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth 
             @updateScrollOffset()
             @updateCursorOffset()
@@ -470,6 +471,7 @@ class ViewBase extends Editor
         @updateScrollOffset()
 
     scrollCursorToTop: (topDist=7) ->
+        # log "ViewBase.scrollCursorToTop topDist:#{topDist}"
         cp = @cursorPos()
         if cp[1] - @scroll.top > topDist
             rg = [@scroll.top, Math.max 0, cp[1]-1]
@@ -587,7 +589,7 @@ class ViewBase extends Editor
                 @view.focus()
                 p = @posForEvent event
                 if event.altKey
-                    @jumpToDefinition @wordAtCursor p
+                    @jumpTo @wordAtCursor p
                 else if event.metaKey
                     @toggleCursorAtPos p
                 else
@@ -623,25 +625,33 @@ class ViewBase extends Editor
     # 000   000  000   000  000 0 000  000                 000     000   000
     #  0000000    0000000   000   000  000                 000      0000000 
     
-    jumpToDefinition: (word) ->
+    jumpTo: (word) ->
         find = word.toLowerCase()
+        
+        jumpToFileLine = (file, line) =>
+            # log "ViewBase.jumpToFileLine file:#{file} line:#{line} currentFile:#{@currentFile}"
+            if file == @currentFile
+                @singleCursorAtPos [0, line]
+            else
+                window.loadFile "#{file}:#{line+1}"
+        
         funcs = ipc.sendSync 'indexer', 'funcs'
         for func, infos of funcs
             if func.toLowerCase() == find
                 info = infos[0]
-                window.loadFile "#{info.file}:#{info.line+1}"
+                jumpToFileLine info.file, info.line
                 return
         
         classes = ipc.sendSync 'indexer', 'classes'
         for clss, info of classes
             if clss.toLowerCase() == find
-                window.loadFile "#{info.file}:#{info.line+1}"
+                jumpToFileLine info.file, info.line
                 return
 
         files = ipc.sendSync 'indexer', 'files'
         for file, info of files
-            if fileName(file).toLowerCase() == find
-                window.loadFile "#{file}:7"
+            if fileName(file).toLowerCase() == find and file != @currentFile
+                jumpToFileLine file, 6
     
     funcInfoAtLineIndex: (li) ->
         files = ipc.sendSync 'indexer', 'files'
@@ -694,7 +704,7 @@ class ViewBase extends Editor
             when 'shift+tab'                then return @deleteTab() + event.preventDefault()
             when 'enter'                    then return @insertNewline indent: true
             when 'command+enter'            then return @moveCursorsToLineBoundary('right') and @insertNewline indent: true
-            when 'alt+enter'                then return @jumpToDefinition @wordAtCursor()
+            when 'alt+enter'                then return @jumpTo @wordAtCursor()
             when 'command+]'                then return @indent()
             when 'command+['                then return @deIndent()
             when 'command+j'                then return @joinLines()

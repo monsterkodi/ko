@@ -37,9 +37,9 @@ class Goto extends Command
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
         
     execute: (command) ->
-        
-        line = parseInt command
-        if _.isNumber(line) and not _.isNaN(line)
+        command = command.trim()
+        if /^\-?\d+$/.test command
+            line = parseInt command
             super command
             editor = window.editorWithClassName @focus
             if line < 0
@@ -49,7 +49,10 @@ class Goto extends Command
             line = clamp 0, editor.lines.length-1, line
             editor.singleCursorAtPos [0,line], @name == 'selecto'
             editor.scrollCursorToTop()
-
+            focus: @focus
+        else if command.length and @name != 'selecto'
+            super command
+            window.editor.jumpTo command
             focus: @focus
         else
             text: ''

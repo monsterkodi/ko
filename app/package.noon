@@ -1,7 +1,7 @@
 name          ko
 productName   ko
-version       0.8.0
-description   an editor for mac os x
+version       0.9.0
+description   an editor for macOS
 main          js/main.js
 repository
               type  git

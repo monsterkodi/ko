@@ -2,12 +2,12 @@
 
 _NAME="ko.app"
 
-while getopts ":dDthp" opt; do
+while getopts ":thpdDV" opt; do
     case "$opt" in
         t)
             _DEV=1
             ;;
-        h|p|d|D)
+        h|p|d|D|V)
             _LOG=1
             ;;
   esac
@@ -36,6 +36,6 @@ if [ $_LOG ]; then
     "$_PATH/$_NAME/Contents/MacOS/ko" --executed-from="$(pwd)" "$@"
     exit $?
 else
-    echo "open $_PATH/$_NAME"
+    # echo "open $_PATH/$_NAME"
     open -a "$_PATH/$_NAME" -n --args --executed-from="$(pwd)" --path-environment="$_PATH" "$@"
 fi
