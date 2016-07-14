@@ -1,7 +1,9 @@
 # todo/ideas
 
-- *jump to functions and classes*
+- *jump to file (require|path)*
+- *jump to list when multiple matches*
 - *colorize command names*
+- *keep (visible) winIDs consecutive from 1*
 
 #### open
 - show relative path when navigating in history

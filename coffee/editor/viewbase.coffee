@@ -4,24 +4,24 @@
 #    000     000  000       000   000  000   000  000   000       000  000     
 #     0      000  00000000  00     00  0000000    000   000  0000000   00000000
 {
-characterWidth,
-setStyle,
+fileName,
 clamp,
 last,
 sw,
-$}         = require '../tools/tools'
-prefs      = require '../tools/prefs'
-drag       = require '../tools/drag'
-keyinfo    = require '../tools/keyinfo'
-log        = require '../tools/log'
-str        = require '../tools/str'
-render     = require './render'
-syntax     = require './syntax'
-scroll     = require './scroll'
-Editor     = require './editor'
-_          = require 'lodash'
-electron   = require 'electron'
-clipboard  = electron.clipboard
+$}        = require '../tools/tools'
+prefs     = require '../tools/prefs'
+drag      = require '../tools/drag'
+keyinfo   = require '../tools/keyinfo'
+log       = require '../tools/log'
+str       = require '../tools/str'
+render    = require './render'
+syntax    = require './syntax'
+scroll    = require './scroll'
+Editor    = require './editor'
+_         = require 'lodash'
+electron  = require 'electron'
+clipboard = electron.clipboard
+ipc       = electron.ipcRenderer
 
 class ViewBase extends Editor
 
@@ -616,6 +616,40 @@ class ViewBase extends Editor
         @tripleClickTimer = null
         @tripleClickLineIndex = -1
         @doubleClicked = @tripleClicked = false
+       
+    #       000  000   000  00     00  00000000         000000000   0000000 
+    #       000  000   000  000   000  000   000           000     000   000
+    #       000  000   000  000000000  00000000            000     000   000
+    # 000   000  000   000  000 0 000  000                 000     000   000
+    #  0000000    0000000   000   000  000                 000      0000000 
+    
+    jumpToDefinition: (word) ->
+        find = word.toLowerCase()
+        funcs = ipc.sendSync 'indexer', 'funcs'
+        for func, infos of funcs
+            if func.toLowerCase() == find
+                info = infos[0]
+                window.loadFile "#{info.file}:#{info.line+1}"
+                return
+        
+        classes = ipc.sendSync 'indexer', 'classes'
+        for clss, info of classes
+            if clss.toLowerCase() == find
+                window.loadFile "#{info.file}:#{info.line+1}"
+                return
+
+        files = ipc.sendSync 'indexer', 'files'
+        for file, info of files
+            if fileName(file).toLowerCase() == find
+                window.loadFile "#{file}:7"
+    
+    funcInfoAtLineIndex: (li) ->
+        files = ipc.sendSync 'indexer', 'files'
+        fileInfo = files[@currentFile]
+        for func in fileInfo.funcs
+            if func[0] <= li <= func[1]
+                return func[3] + '.' + func[2] + ' '
+        ''
         
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
@@ -660,6 +694,7 @@ class ViewBase extends Editor
             when 'shift+tab'                then return @deleteTab() + event.preventDefault()
             when 'enter'                    then return @insertNewline indent: true
             when 'command+enter'            then return @moveCursorsToLineBoundary('right') and @insertNewline indent: true
+            when 'alt+enter'                then return @jumpToDefinition @wordAtCursor()
             when 'command+]'                then return @indent()
             when 'command+['                then return @deIndent()
             when 'command+j'                then return @joinLines()
@@ -672,7 +707,6 @@ class ViewBase extends Editor
             when 'command+shift+d'          then return @removeSelectedHighlight()
             when 'command+alt+d'            then return @selectAllHighlights()
             when 'command+g'                then return @selectNextHighlight()
-            when 'command+g'                then return @jumpToDefinition @wordAtCursor()
             when 'command+shift+g'          then return @selectPrevHighlight()
             when 'command+l'                then return @selectMoreLines()
             when 'command+shift+l'          then return @selectLessLines()

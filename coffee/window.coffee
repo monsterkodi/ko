@@ -140,11 +140,10 @@ loadFile = (file, opt) =>
         editor.singleCursorAtPos [0, parseInt(line)-1] 
         editor.scrollCursorToTop()        
         
-
 openFiles = (ofiles, options) => # called from file dialog and open command
     if ofiles?.length
         files = fileList ofiles, ignoreHidden: false
-        log "window.openFiles", files
+        # log "window.openFiles files:", files
         if files.length >= 10
             answer = dialog.showMessageBox
                 type: 'warning'

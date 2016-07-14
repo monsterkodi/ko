@@ -16,7 +16,6 @@ ViewBase  = require './viewbase'
 syntax    = require './syntax'
 path      = require 'path'
 electron  = require 'electron'
-ipc       = electron.ipcRenderer
 webframe  = electron.webFrame
 
 class View extends ViewBase
@@ -115,33 +114,7 @@ class View extends ViewBase
         filePositions = window.getState 'filePositions', {}
         filePositions[@currentFile] = s
         window.setState 'filePositions', filePositions       
-    
-    #       000  000   000  00     00  00000000   000000000   0000000   0000000    00000000  00000000  000  000   000  000  000000000  000   0000000   000   000
-    #       000  000   000  000   000  000   000     000     000   000  000   000  000       000       000  0000  000  000     000     000  000   000  0000  000
-    #       000  000   000  000000000  00000000      000     000   000  000   000  0000000   000000    000  000 0 000  000     000     000  000   000  000 0 000
-    # 000   000  000   000  000 0 000  000           000     000   000  000   000  000       000       000  000  0000  000     000     000  000   000  000  0000
-    #  0000000    0000000   000   000  000           000      0000000   0000000    00000000  000       000  000   000  000     000     000   0000000   000   000
-    
-    jumpToDefinition: (word) ->
-        funcs = ipc.sendSync 'indexer', 'funcs'
-        log "View.jumpToDefinition word:#{word} funcs:#{funcs}"
-        for func, info of funcs
-            if func == word
-                window.loadFile "#{info.file}:#{info.line+1}"
-        # classes = ipc.sendSync 'indexer', 'classes'
-        # for clss, info of classes
-            # for mthd, minfo of info.methods
-                # if mthd == word
-                    # window.loadFile "#{info.file}:#{minfo.line+1}"
-    
-    funcInfoAtLineIndex: (li) ->
-        files = ipc.sendSync 'indexer', 'files'
-        fileInfo = files[@currentFile]
-        for func in fileInfo.funcs
-            if func[0] <= li <= func[1]
-                return func[3] + '.' + func[2] + ' '
-        ''
-    
+        
     # 00000000   00000000   0000000  000000000   0000000   00000000   00000000
     # 000   000  000       000          000     000   000  000   000  000     
     # 0000000    0000000   0000000      000     000   000  0000000    0000000 
