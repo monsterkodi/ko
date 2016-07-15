@@ -4,12 +4,12 @@
 # 000   000  000  000  0000  000   000  000   000  000   000
 # 00     00  000  000   000  0000000     0000000   00     00
 {
- last,
- sw,sh,$,
- fileList,
- fileExists,
- del,clamp,
- resolve}   = require './tools/tools'
+last,
+sw,sh,$,
+fileList,
+fileExists,
+del,clamp,
+resolve}    = require './tools/tools'
 Split       = require './split'
 View        = require './editor/view'
 Commandline = require './commandline/commandline'

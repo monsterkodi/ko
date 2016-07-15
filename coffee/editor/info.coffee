@@ -55,10 +55,13 @@ class Info
         
         @lines = document.createElement 'span'
         @lines.className = "info-lines"
+        @lines.style.cursor = 'pointer'
+        @lines.onclick = => @editor.singleCursorAtPos [0, @editor.lines.length]
         @botline.appendChild @lines
 
         @words = document.createElement 'span'
         @words.className = "info-words empty"
+        @words.style.cursor = 'pointer'
         @words.onclick = => 
             log window.editor.autocomplete.wordlist
             window.split.show 'logview'
@@ -67,6 +70,7 @@ class Info
 
         @funcs = document.createElement 'span'
         @funcs.className = "info-funcs empty"
+        @funcs.style.cursor = 'pointer'
         @funcs.onclick = => 
             log "funcs:", ipc.sendSync 'indexer', 'funcs'
             window.split.show 'logview'
@@ -75,6 +79,7 @@ class Info
 
         @files = document.createElement 'span'
         @files.className = "info-files"
+        @files.style.cursor = 'pointer'
         @files.onclick = => #log "files:", ipc.sendSync 'indexer', 'files'
             log "files:", (k for k,v of ipc.sendSync('indexer', 'files'))
             window.split.show 'logview'
@@ -106,10 +111,10 @@ class Info
         @editor.on 'highlight',    @onHighlight
         @editor.on 'cursor',       @onCursor
         
-        @onNumLines()
+        @onNumLines @editor.lines.length
 
     onNumLines: (lc) => 
-        @lines.textContent = shortCount lc
+        @lines.textContent = shortCount lc ? 0
         
     onWordCount: (wc) =>
         @words.textContent = shortCount wc

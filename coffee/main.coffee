@@ -3,11 +3,11 @@
 # 000000000  000000000  000  000 0 000
 # 000 0 000  000   000  000  000  0000
 # 000   000  000   000  000  000   000
-
-{first,
- fileList,
- fileExists,
- resolve}     = require './tools/tools'
+{
+first,
+fileList,
+fileExists,
+resolve}      = require './tools/tools'
 prefs         = require './tools/prefs'
 log           = require './tools/log'
 str           = require './tools/str'
@@ -75,7 +75,7 @@ if args.verbose
 # 000        000   000  00000000  000       0000000 
 
 prefs.init "#{app.getPath('appData')}/#{pkg.name}/ko.noon",
-    shortcut: 'F2'
+    shortcut:       'F2'
     
 if args.prefs
     log colors.yellow.bold 'prefs'
@@ -294,7 +294,6 @@ class Main
     # 0000000      000     000   000   0000000  000   000
     
     stackWindows: ->
-        animate = false
         {width, height} = electron.screen.getPrimaryDisplay().workAreaSize
         ww = height + 122
         wl = visibleWins()
@@ -305,12 +304,12 @@ class Main
                 y:      parseInt 0
                 width:  parseInt ww
                 height: parseInt height
-            , animate
         activeWin().show()
         
     windowsAreStacked: ->
         wl = visibleWins()
         return false if not wl.length
+        return false if wl.length == 1 and wl[0].getBounds().width == electron.screen.getPrimaryDisplay().workAreaSize.width
         w0 = wl[0].getBounds()
         for wi in [1...wl.length]
             if not _.isEqual wl[wi].getBounds(), w0
@@ -324,12 +323,18 @@ class Main
     # 000   000  000   000  000   000  000   000  000   000   0000000   00000000
         
     arrangeWindows: =>
-        animate = false
         frameSize = 6
         wl = visibleWins()
         {width, height} = electron.screen.getPrimaryDisplay().workAreaSize
-        if wl.length == 1 or not @windowsAreStacked()
+        if not @windowsAreStacked()
             @stackWindows()
+        else if wl.length == 1
+            wl[0].showInactive()
+            wl[0].setBounds
+                x:      0
+                y:      0
+                width:  width
+                height: height
         else if wl.length == 2 or wl.length == 3
             w = width/wl.length
             for i in [0...wl.length]
@@ -339,7 +344,6 @@ class Main
                     width:  parseInt w + ((i == 0 or i == wl.length-1) and frameSize/2 or frameSize)
                     y:      parseInt 0
                     height: parseInt height
-                , animate
         else if wl.length
             w2 = parseInt wl.length/2
             rh = height
@@ -351,7 +355,6 @@ class Main
                     width:  parseInt w + ((i == 0 or i == w2-1) and frameSize/2 or frameSize)
                     y:      parseInt 0
                     height: parseInt rh/2
-                , animate
             for i in [w2...wl.length]
                 w = width/(wl.length-w2)
                 wl[i].showInactive()
@@ -360,7 +363,6 @@ class Main
                     y:      parseInt rh/2+23 
                     width:  parseInt w + ((i-w2 == 0 or i == wl.length-1) and frameSize/2 or frameSize)
                     height: parseInt rh/2
-                , animate
                 
     # 00000000   00000000   0000000  000000000   0000000   00000000   00000000
     # 000   000  000       000          000     000   000  000   000  000     

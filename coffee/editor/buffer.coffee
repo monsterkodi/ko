@@ -190,7 +190,7 @@ class Buffer extends event
         return false if not @selections.length
         for s in @selections
             return false if not @isSameRange s, @rangeForLineAtIndex s[0]
-        return true
+        true
 
     # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000   0000000
     # 000   000  000  000        000   000  000      000  000        000   000     000     000     

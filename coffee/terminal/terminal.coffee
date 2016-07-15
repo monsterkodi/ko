@@ -33,7 +33,6 @@ class Terminal extends ViewBase
             [text,diss] = @ansidiss.dissect l
             @syntax.setDiss @lines.length, diss if diss?.length
             @appendText text
-            # @appendLineDiss text, diss
                 
     #  0000000   00000000   00000000   00000000  000   000  0000000  
     # 000   000  000   000  000   000  000       0000  000  000   000
