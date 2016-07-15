@@ -5,14 +5,14 @@
 # 000   000  000   000   0000000  000   000   0000000 
 {
 fileExists,
-last}    = require '../tools/tools'
-log      = require '../tools/log'
-Command  = require '../commandline/command'
-_        = require 'lodash'
-fs       = require 'fs'
-path     = require 'path'
-electron = require 'electron'
-ipc      = electron.ipcRenderer
+last}      = require '../tools/tools'
+log        = require '../tools/log'
+Command    = require '../commandline/command'
+_          = require 'lodash'
+atomicFile = require 'write-file-atomic'
+path       = require 'path'
+electron   = require 'electron'
+ipc        = electron.ipcRenderer
 
 class Macro extends Command
 
@@ -95,8 +95,9 @@ class Macro extends Command
                 module.exports = #{clss}
                 
                 """
-                fs.writeFileSync file, text
-                ipc.send 'newWindowWithFile', file
+                atomicFile file, text, encoding: 'utf8', (err) =>
+                    if not err?
+                        ipc.send 'newWindowWithFile', file
                 return focus: '.'+editor.name
             
         text: ''
