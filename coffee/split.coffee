@@ -229,6 +229,7 @@ class Split extends event
             when 'terminal' then @splitAt 0, 0.5*@splitPosY 2 if @paneHeight(0) < 100
             when 'editor'   then @splitAt 1, 0.5*@splitPosY 2 if @paneHeight(2) < 100
             when 'command'  then @splitAt 0, 0                if @paneHeight(1) < @commandlineHeight
+            when 'logview'  then @showLog()
             else
                 log "split.show warning! unhandled #{n}!"
 

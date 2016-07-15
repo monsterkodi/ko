@@ -52,15 +52,18 @@ pre
     padding-top         0px
     padding-left        9px
     padding-right       9px
+    cursor              pointer
     color               #aaa
     background          #222   
     min-width           (numbersWidth + 1px)
     box-sizing          border-box
     white-space         nowrap 
-    border-right        thinBorder
     &.empty
-        background      #000   
-    &.active
+        border-right    thinBorder
+        background      #000
+        
+// .list-item        
+.commandline-command.active
         background      #333
         &.open
             color       #8f0
@@ -174,8 +177,7 @@ infoPadding = 6px
     width               500px
     max-height          500px
     background          #222
-    border              frameBorder
-    border-left         none
+    border-top          frameBorder
     
 .list-item
     width               100%

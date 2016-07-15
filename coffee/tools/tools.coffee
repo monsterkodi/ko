@@ -54,6 +54,13 @@ module.exports =
         v = Math.min(v, r2) if r2?
         v
         
+    shortCount: (v) ->
+        v = parseInt v
+        switch
+            when v > 999999 then "#{Math.floor v/1000000}M"
+            when v > 999    then "#{Math.floor v/1000}k"
+            else                 "#{v}"
+        
     # 00000000    0000000   000000000  000   000
     # 000   000  000   000     000     000   000
     # 00000000   000000000     000     000000000
@@ -110,6 +117,8 @@ module.exports =
         d = path.normalize path.resolve to.replace /\~/, process.env.HOME
         r = path.relative d, absolute
         r
+        
+    swapExt: (p, ext) -> path.join(path.dirname(p), path.basename(p, path.extname(p))) + ext
         
     #  0000000   0000000   0000000
     # 000       000       000     

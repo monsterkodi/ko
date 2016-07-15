@@ -64,7 +64,8 @@ class Macro extends Command
                 else
                     cw = editor.wordsAtCursors editor.positionsNotInRanges editor.cursors, editor.selections
                     sw = editor.textsInRanges editor.selections
-                    vs = _.uniq cw.concat sw                
+                    vs = _.uniq cw.concat sw
+                    vs = vs.filter (w) -> w.trim().length
                 for ti in [0...vs.length - lst]
                     t = vs[ti]
                     insert += "#{t}:\#{#{t}} "

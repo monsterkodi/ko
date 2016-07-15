@@ -168,7 +168,7 @@ class Open extends Command
     # 000   000  00000000  000   000     000   
     
     next: -> 
-        if @index == @history.length-1
+        if @list? and @index == @history.length-1
             @select clamp 0, @list.children.length, @selected+1
             @list.children[@selected]?.value ? @history[@index]
         else

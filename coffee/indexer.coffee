@@ -115,6 +115,21 @@ class Indexer
                                 if (m[2][0] == '.') and (not @files[abspath]?) and (@queue.indexOf(abspath) < 0)
                                     if fileExists abspath 
                                         @queue.push abspath
+                        when "#include"
+                            log "found include", line
+                            m = line.match /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
+                            if m?[1]?
+                                r = fileInfo.require ? []
+                                r.push [null, m[1]]
+                                fileInfo.require = r
+                                
+                                abspath = resolve path.join path.dirname(file), m[1] 
+                                abspath += '.coffee' if not path.extname m[1]
+                                if not @files[abspath]? and @queue.indexOf(abspath) < 0
+                                    if fileExists abspath 
+                                        log "queue", abspath
+                                        @queue.push abspath
+                            
             if funcAdded
                 
                 while funcStack.length

@@ -1,8 +1,11 @@
-#  0000000  00000000   00000000 
-# 000       000   000  000   000
-# 000       00000000   00000000 
-# 000       000        000      
-#  0000000  000        000      
+#  0000000  00000000   00000000         000   000
+# 000       000   000  000   000        000   000
+# 000       00000000   00000000         000000000
+# 000       000        000              000   000
+#  0000000  000        000              000   000
+
+ko
+    extnames                 . cpp . cc . hpp . h
 
 \S+                            text
 
@@ -28,6 +31,10 @@ true                           value.bool.true
 false                          value.bool.false 
 ([\!])\w+                    . operator.negate
 
+# punctuation
+
+[\,\.\;\:\/\&\*]                 syntax.punctuation
+
 # macros
 
 (\#)(define|pragma|endif|if|ifdef|ifndef)(.*)  . macro.marker . macro.define . macro
@@ -41,6 +48,7 @@ NULL                           keyword.null
 # .property
 
 \.(\s*\w+)                     property
+\:\:(\w+)                      property
 
 (\w+)(\:\:)                  . namespace . namespace.marker
 
@@ -49,24 +57,29 @@ NULL                           keyword.null
 # class construction
 
 new\s+(\w+)                    class.callee
-(@?\w+)\s*\=\s*new\s           class.object
+(\w+)\s*\=\s*new\s             class.object
 
-# punctuation
+^(\w+)(\:\:)(\w+)\s*\(             . class . class.marker . class.method.definition
+^\S+[^\:]*\s(\w+)(\:\:)(\w+)\s*\(  . class . class.marker . class.method.definition
 
-[\,\.\;\/\&\*]                 syntax.punctuation
+(?!\-\>|\.)([\w]+)\s*\(              function.call
+(?!\-\>|\.)([\w]+)(?:\<\w+\>)\s*\(   function.call
+(?:\-\>|\.)\s*([^\s\(]+)\s*\(        method.call
+
+(\<)([^\<\>\-]+)(\>)         . template.marker . template . template.marker
 
 # keywords
 this                           keyword.this
-(^|\s|\b)(if|else|then|for|auto|using|namespace|while|do|return|break|continue|const|new|switch|case|default|const_cast|static_cast|dynamic_cast|reinterpret_cast|public:?|protected:?|private:?)([\;\s]|$)  
+(^|\s|\b)(if|else|then|for|auto|using|namespace|while|do|return|break|continue|new|switch|case|default|const_cast|static_cast|dynamic_cast|reinterpret_cast|public:?|protected:?|private:?)([\;\s]|$)  
     none 
     keyword 
     none
     
-\b(uint32_t|void|bool|int|float|double|long|unsigned)\b  . keyword
+\b(uint32_t|void|bool|int|float|double|long|unsigned|virtual|typedef|const)\b  . keyword
     
 #number
 
-(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+f?)(?:$|[^\.\"\'\w]|\.\.\.?)   
     syntax.value.number.float.sign
     value.number.float
 
@@ -80,10 +93,10 @@ this                           keyword.this
     
 # comments
 
-(\/\/)\s*(.*)                . comment.marker . comment
+(\/\/+)\s*(.*)               . comment.marker . comment
 (\/\*)(.*)(\*\/)             . comment.marker . comment . comment.marker
 
 # salter headers
-^\s*(\#)([0\s]+)$            . header.comment.marker . comment.header
+^\s*(\/\/)([0\s]+)$          . header.comment.marker . comment.header
 ^([0\s]+)$                     comment.header
 

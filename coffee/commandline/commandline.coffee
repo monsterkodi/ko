@@ -5,10 +5,13 @@
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 {
 fileList,
+clamp,
 $}        = require '../tools/tools'
 ViewBase  = require '../editor/viewbase'
 log       = require '../tools/log'
 split     = require '../split'
+render    = require '../editor/render'
+syntax    = require '../editor/syntax'
 path      = require 'path'
 
 class Commandline extends ViewBase
@@ -25,6 +28,7 @@ class Commandline extends ViewBase
                 
         @cmmd = $('.commandline-command')
         @cmmd.classList.add 'empty'
+        @cmmd.addEventListener 'mousedown', @onCmmdClick
         
         @commands = {}
         @command = null
@@ -38,8 +42,22 @@ class Commandline extends ViewBase
             @command?.onBlur()
             
         @view.onfocus = () =>
-            @cmmd.className = "commandline-command active #{@command?.constructor.name.toLowerCase()}"
+            @cmmd.className = "commandline-command active #{@command?.prefsID}"
 
+    # 000       0000000    0000000   0000000  
+    # 000      000   000  000   000  000   000
+    # 000      000   000  000000000  000   000
+    # 000      000   000  000   000  000   000
+    # 0000000   0000000   000   000  0000000  
+    
+    loadCommands: ->
+        files = fileList "#{__dirname}/../commands"
+        for file in files
+            commandClass = require file
+            command = new commandClass @
+            command.setPrefsID commandClass.name.toLowerCase()
+            @commands[command.prefsID] = command
+            
     setName: (name) -> 
         @cmmd.innerHTML = name
         @layers.style.width = @view.style.width
@@ -61,18 +79,19 @@ class Commandline extends ViewBase
     changed: (changeInfo, action) ->
         super changeInfo, action
         if changeInfo.sorted.length
-            @cmmd.className = "commandline-command active #{@command?.constructor.name.toLowerCase()}"
+            @cmmd.className = "commandline-command active #{@command?.prefsID}"
             @command?.changed @lines[0]
         
-    loadCommands: ->
-        files = fileList "#{__dirname}/../commands"
-        for file in files
-            commandClass = require file
-            command = new commandClass @
-            command.setPrefsID commandClass.name.toLowerCase()
-            @commands[command.prefsID] = command
-            
-    onSplit: (s) => @command?.onBot? s[1]
+    onSplit: (s) => 
+        @command?.onBot? s[1]
+        
+        cl = window.split.commandlineHeight + window.split.handleHeight
+        if s[1] < cl
+            @list?.style.opacity = "#{clamp 0, 1, s[1]/cl}"
+        else
+            @list?.style.opacity = "1"
+        
+        @positionList()
     
     # 00000000  000  000      00000000        000       0000000    0000000   0000000    00000000  0000000  
     # 000       000  000      000             000      000   000  000   000  000   000  000       000   000
@@ -101,7 +120,7 @@ class Commandline extends ViewBase
         @view.focus()
         @setName name
         @results @command.start combo # <-- command start
-        @cmmd.className = "commandline-command active #{@command.constructor.name.toLowerCase()}"
+        @cmmd.className = "commandline-command active #{@command.prefsID}"
                 
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
@@ -121,6 +140,51 @@ class Commandline extends ViewBase
         
     cancel: -> @results @command?.cancel()
     clear:  -> @results @command?.clear()
+      
+    # 000      000   0000000  000000000
+    # 000      000  000          000   
+    # 000      000  0000000      000   
+    # 000      000       000     000   
+    # 0000000  000  0000000      000   
+    
+    onCmmdClick: =>
+        log "commandline.onCmmdClick"
+        if not @list?
+            @list = document.createElement 'div' 
+            @list.className = 'list'
+            @positionList()
+            window.split.elem.appendChild @list 
+        @listCommands()
+
+    listCommands: ->
+        @list.innerHTML = ""        
+        @list.style.display = 'unset'
+        for name, cmmd of @commands
+            for ci in [0...cmmd.shortcuts.length]
+                combo = cmmd.shortcuts[ci]
+                cname = cmmd.names[ci]
+                div = document.createElement 'div'
+                div.className = "list-item #{cmmd.prefsID}"
+                shortcut = "<span style=\"position:absolute; right: 0; opacity: 0.7;\">#{combo}</span>" 
+                namespan = "<span class=\"ko\" style=\"position:absolute; left: #{ci > 0 and 40 or 6}px\">#{cname}</span>" 
+                div.innerHTML = namespan + shortcut
+                start = (name,combo) => (event) => 
+                    @list.remove()
+                    @list = null
+                    @startCommand name, combo
+                    event.stopPropagation()
+                    event.preventDefault()
+                div.addEventListener 'mousedown', start name, combo
+                @list.appendChild div
+        
+    positionList: ->
+        return if not @list?
+        split = window.split
+        listTop = split.splitPosY 1
+        listHeight = @list.getBoundingClientRect().height
+        if (split.elemHeight() - listTop) < listHeight
+            listTop = split.splitPosY(0) - listHeight
+        @list?.style.top = "#{listTop}px"        
                                 
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

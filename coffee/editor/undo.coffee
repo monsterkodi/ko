@@ -321,9 +321,10 @@ class Undo
     # 0000000   000 0 000  000   000
     # 000       000  0000  000   000
     # 00000000  000   000  0000000  
-                
-    end: (opt) -> 
-        @changeInfo?.foreign = opt?.foreign
+
+    end: (opt) ->
+        if opt?.foreign
+            @changeInfo?.foreign = opt.foreign
         @groupCount -= 1
         @check()
 
@@ -332,8 +333,9 @@ class Undo
     # 000       000000000  0000000   000       0000000  
     # 000       000   000  000       000       000  000 
     #  0000000  000   000  00000000   0000000  000   000
-    
+
     check: ->
+        # log "Undo.check #{@editor.name} @groupCount #{@groupCount} changeInfo:", @changeInfo if @editor.name == 'editor'
         @futures = []
         if @groupCount == 0
             @merge()

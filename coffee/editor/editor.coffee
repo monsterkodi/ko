@@ -801,14 +801,14 @@ class Editor extends Buffer
         
     insertNewline: (opt) ->
         @closingInserted = null
-        @do.start()
         @deleteSelection()
+        @do.start()
         
         newCursors = _.cloneDeep @cursors
-
+        
         for c in @cursors.reversed()
         
-            after  = @lines[c[1]].substr(c[0])
+            after  = @lines[c[1]].substr c[0]
             after  = after.trimLeft() if opt?.indent
             before = @lines[c[1]].substr 0, c[0]
         
@@ -861,8 +861,8 @@ class Editor extends Buffer
         
     paste: (text) -> 
         
+        @deleteSelection()
         @do.start()        
-        @deleteSelection()   
         @fillVirtualSpaces()
         
         l = text.split '\n'

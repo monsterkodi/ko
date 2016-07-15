@@ -4,6 +4,7 @@
 # 000  000  0000  000       000   000
 # 000  000   000  000        0000000 
 {
+shortCount,
 $} = require '../tools/tools'
 log = require '../tools/log'
 electron = require 'electron'
@@ -58,13 +59,17 @@ class Info
 
         @words = document.createElement 'span'
         @words.className = "info-words empty"
-        @words.onclick = => log window.editor.autocomplete.wordlist
+        @words.onclick = => 
+            log window.editor.autocomplete.wordlist
+            window.split.show 'logview'
         @botline.appendChild @words
         window.editor.autocomplete.on 'wordCount', @onWordCount
 
         @funcs = document.createElement 'span'
         @funcs.className = "info-funcs empty"
-        @funcs.onclick = => log "funcs:", ipc.sendSync 'indexer', 'funcs'
+        @funcs.onclick = => 
+            log "funcs:", ipc.sendSync 'indexer', 'funcs'
+            window.split.show 'logview'
         @botline.appendChild @funcs
         ipc.on 'funcsCount', (event, count) => @onFuncsCount count
 
@@ -72,6 +77,7 @@ class Info
         @files.className = "info-files"
         @files.onclick = => #log "files:", ipc.sendSync 'indexer', 'files'
             log "files:", (k for k,v of ipc.sendSync('indexer', 'files'))
+            window.split.show 'logview'
         @botline.appendChild @files
         ipc.on 'filesCount', (event, count) => @onFilesCount count
         
@@ -102,18 +108,19 @@ class Info
         
         @onNumLines()
 
-    onNumLines: => @lines.textContent = @editor.lines.length
+    onNumLines: (lc) => 
+        @lines.textContent = shortCount lc
         
     onWordCount: (wc) =>
-        @words.textContent = wc
+        @words.textContent = shortCount wc
         @words.classList.toggle 'empty', wc == 0
 
     onFuncsCount: (fc) =>
-        @funcs.textContent = fc
+        @funcs.textContent = shortCount fc
         @funcs.classList.toggle 'empty', fc == 0
 
     onFilesCount: (fc) =>
-        @files.textContent = fc
+        @files.textContent = shortCount fc
         @files.classList.toggle 'empty', fc == 0
     
     onCursor: => 

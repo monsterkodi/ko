@@ -49,20 +49,20 @@
 
 .module
     color           #ff8
-
-.method
-    color           #ff0
-    &.static
-        color       #ff8
-    
+        
 .property
     opacity         0.8
     color           #fd8
+
+.namespace
+    color           #48a
+    &.member
+        color       #f80
     
 .function
     color           #fa0
     &.call          
-        color       #ff0
+        color       #f80
     &.marker
         color       #55f
         opacity     1
@@ -75,6 +75,20 @@
         &.punctuation
             opacity  0.5
 
+.method
+    color           #ff0
+    &.call          
+        color       #fa0
+    &.definition
+    &.static
+        color       #ff8
+        opacity     1
+    &.template
+        color       #2aa
+
+.template
+    color           #2aa
+    
 .operator
     &.negate
         color       #ff0
@@ -82,14 +96,7 @@
 .class
     &.variable
         color       #2ae
-    &.function
-        color       #fc8
-
-.namespace
-    color           #a22
-    &.member
-        color       #f80
-        
+       
 .keypath
     color           #f80
 

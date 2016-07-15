@@ -14,6 +14,7 @@ class Term extends Command
 
     constructor: (@commandline) ->
         @shortcuts = ['command+t']
+        @names     = ['term']
         super @commandline
         @maxHistory = 100
         @cmdID = 0

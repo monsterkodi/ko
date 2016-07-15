@@ -4,7 +4,9 @@
 #    000     000  000       000   000  000   000  000   000       000  000     
 #     0      000  00000000  00     00  0000000    000   000  0000000   00000000
 {
+fileExists,
 fileName,
+swapExt,
 clamp,
 last,
 sw,
@@ -19,6 +21,7 @@ syntax    = require './syntax'
 scroll    = require './scroll'
 Editor    = require './editor'
 _         = require 'lodash'
+path      = require 'path'
 electron  = require 'electron'
 clipboard = electron.clipboard
 ipc       = electron.ipcRenderer
@@ -174,7 +177,6 @@ class ViewBase extends Editor
     # 000        0000000   000   000     000     0000000   000  0000000  00000000
 
     setFontSize: (fontSize) =>
-        # log "viewbase.setFontSize className #{@view.className} size #{fontSize}"
         @view.style.fontSize = "#{fontSize}px"
         @size.numbersWidth = 'Numbers' in @config.features and 50 or 0
         @size.fontSize     = fontSize
@@ -207,14 +209,12 @@ class ViewBase extends Editor
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
   
     changed: (changeInfo, action) ->
-        # log "viewbase.changed .. #{changeInfo.sorted}" if changeInfo.sorted.length
         @syntax.changed changeInfo
         
         numChanges = 0   
         changes = _.cloneDeep changeInfo.sorted
         while (change = changes.shift())
             [li,ch,oi] = change
-            # log "viewbase.changed li #{li} change #{ch} oi #{oi} @lines[li] #{@lines[li]} diss", @syntax.getDiss li
             switch ch
                 when 'changed' 
                     @updateLine li, oi
@@ -235,7 +235,6 @@ class ViewBase extends Editor
         if changeInfo.cursors.length
             @renderCursors()
             if delta = @deltaToEnsureCursorsAreVisible()
-                # log "ViewBase.changed deltaToEnsureCursorsAreVisible:#{delta}"
                 @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth 
             @updateScrollOffset()
             @updateCursorOffset()
@@ -315,9 +314,7 @@ class ViewBase extends Editor
     # 00000000  000   000  000         0000000   0000000   00000000     000      0000000   000      
 
     exposeTop: (e) =>
-        # log "viewbase.exposeTopChange #{e.old} -> #{e.new}"
         num = Math.abs e.num
-
         for n in [0...num]
             if e.num < 0
                 @elem.firstChild.remove()
@@ -325,7 +322,6 @@ class ViewBase extends Editor
                 
                 @emit 'lineVanishedTop',
                     lineIndex: li
-
             else 
                 div = @addLine()
                 li = e.new + num - n - 1
@@ -366,13 +362,12 @@ class ViewBase extends Editor
     # 0000000    0000000   000 0 000  000   000  0000000   0000000  
     # 000   000  000       000  0000  000   000  000       000   000
     # 000   000  00000000  000   000  0000000    00000000  000   000
-            
+
     renderLineAtIndex: (li) -> 
         html = render.line @lines[li], @syntax.getDiss(li), @size
         if @showInvisibles
-            tx = @lines[li].length * @size.charWidth + 1 # &#8227;
+            tx = @lines[li].length * @size.charWidth + 1
             html += "<span class=\"invisible newline\" style=\"transform:translate(#{tx}px, -1.5px);\">&#9687;</span>"
-            # html += "<span class=\"invisible newline\" style=\"transform:translatex(#{tx}px);\">∘</span>"
         html
     
     renderCursors: ->
@@ -419,7 +414,7 @@ class ViewBase extends Editor
     # 0000000    0000000   0000000   000    000    0000000   000   000
     # 000   000  000            000  000   000     000       000   000
     # 000   000  00000000  0000000   000  0000000  00000000  0000000  
-    
+
     resized: -> 
         vh = @view.clientHeight
         @scroll?.setViewHeight vh
@@ -428,7 +423,7 @@ class ViewBase extends Editor
         @layers.style.height = "#{vh}px"
         @updateScrollOffset()
         @emit 'viewHeight', vh
-    
+
     deltaToEnsureCursorsAreVisible: ->
         topdelta = 0
         cl = @cursors[0][1]
@@ -485,7 +480,7 @@ class ViewBase extends Editor
     updateScrollOffset: ->
         @layers.scrollTop = @scroll.offsetTop
         @updateNumbersOffset()
-    
+
     updateCursorOffset: ->
         cx = @mainCursor[0]*@size.charWidth+@size.offsetX
         if cx-@layers.scrollLeft > @layersWidth()
@@ -503,9 +498,9 @@ class ViewBase extends Editor
     # 00000000   000   000  0000000 
     # 000        000   000       000
     # 000         0000000   0000000 
-    
+
     posAtXY:(x,y) ->
-    
+
         sl = @layers.scrollLeft
         st = @layers.scrollTop
         br = @layers.getBoundingClientRect()
@@ -629,7 +624,6 @@ class ViewBase extends Editor
         find = word.toLowerCase()
         
         jumpToFileLine = (file, line) =>
-            # log "ViewBase.jumpToFileLine file:#{file} line:#{line} currentFile:#{@currentFile}"
             if file == @currentFile
                 @singleCursorAtPos [0, line]
             else
@@ -643,18 +637,49 @@ class ViewBase extends Editor
                     if i.file == @currentFile
                         info = i
                 jumpToFileLine info.file, info.line
-                return
+                return true
         
         classes = ipc.sendSync 'indexer', 'classes'
         for clss, info of classes
             if clss.toLowerCase() == find
                 jumpToFileLine info.file, info.line
-                return
+                return true
 
         files = ipc.sendSync 'indexer', 'files'
         for file, info of files
             if fileName(file).toLowerCase() == find and file != @currentFile
                 jumpToFileLine file, 6
+                return true
+            
+        false
+    
+    jumpToCounterpart: () ->
+        
+        counterparts = 
+            '.cpp':     ['.hpp', '.h']
+            '.cc':      ['.hpp', '.h']
+            '.h':       ['.cpp', '.c']
+            '.hpp':     ['.cpp', '.c']
+            '.coffee':  ['.js']
+            '.js':      ['.coffee']
+            '.pug':     ['.html']
+            '.html':    ['.pug']
+            '.css':     ['.styl']
+            '.styl':    ['.css']
+            
+        for ext in (counterparts[path.extname @currentFile] ? [])
+            if fileExists swapExt @currentFile, ext
+                window.loadFile swapExt @currentFile, ext
+                return
+
+        for ext in (counterparts[path.extname @currentFile] ? [])
+            counter = swapExt @currentFile, ext
+            counter = counter.replace "/#{path.extname(@currentFile).slice 1}/", "/#{ext.slice 1}/"
+            if fileExists counter
+                window.loadFile counter
+                return true
+            
+        false
     
     funcInfoAtLineIndex: (li) ->
         files = ipc.sendSync 'indexer', 'files'
@@ -738,6 +763,7 @@ class ViewBase extends Editor
                 
             when 'alt+up',     'alt+down'     then return @moveLines  key
             when 'command+up', 'command+down' then return @addCursors key
+            when 'command+alt+up'             then return @jumpToCounterpart()
             when 'ctrl+a',     'ctrl+shift+a' then return @moveCursorsToLineBoundary 'left',  event.shiftKey
             when 'ctrl+e',     'ctrl+shift+e' then return @moveCursorsToLineBoundary 'right', event.shiftKey
             when 'ctrl+shift+right'           then return @alignCursorsAndText()
@@ -762,11 +788,11 @@ class ViewBase extends Editor
             when 'esc'  then return @clearCursorsAndHighlights()
             when 'home' then return @singleCursorAtPos [0, 0],              event.shiftKey
             when 'end'  then return @singleCursorAtPos [0,@lines.length-1], event.shiftKey
-            when 'page up'      
+            when 'page up'
                 @moveCursorsUp event.shiftKey, @numFullLines()-3
                 event.preventDefault() # prevent view from scrolling
                 return
-            when 'page down'    
+            when 'page down'
                 @moveCursorsDown event.shiftKey, @numFullLines()-3
                 event.preventDefault() # prevent view from scrolling
                 return

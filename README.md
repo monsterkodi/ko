@@ -118,6 +118,7 @@ non-standard keyboard shortcuts:
 - **⌘I** inverted line selection: select lines without a cursor or a selection
 - **⌘⌥Q** close all windows (won't restore on next start) and quit
 - **⌘return** evaluate current buffer with coffee in main process and print the result in terminal view
+- **⌘⌥up** jump to counterpart file (coffee <-> js, cpp <-> h, pug <-> html, etc)
 - while command input has focus:
     - ^up|down move command input up|down
     - ⌘up|down move command input to top|bottom of window

@@ -38,4 +38,4 @@
 
 # bold
 
-(\*)([^\*]+)(\*)                        . md.bold.marker . md.bold . md.bold.marker
+(\*+)([^\*]+)(\*+)                      . md.bold.marker . md.bold . md.bold.marker

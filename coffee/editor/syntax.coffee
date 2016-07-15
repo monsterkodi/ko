@@ -121,9 +121,17 @@ class Syntax
         syntaxDir = "#{__dirname}/../../syntax/"
         for syntaxFile in fs.readdirSync syntaxDir
             syntaxName = path.basename syntaxFile, '.noon'
-            @syntaxNames.push syntaxName
             patterns = noon.load path.join syntaxDir, syntaxFile
-            @matchrConfigs[syntaxName] = matchr.config patterns
+            if patterns.ko?.extnames?
+                extnames = patterns.ko.extnames
+                delete patterns.ko
+                config = matchr.config patterns
+                for syntaxName in extnames
+                    @syntaxNames.push syntaxName
+                    @matchrConfigs[syntaxName] = config
+            else
+                @syntaxNames.push syntaxName
+                @matchrConfigs[syntaxName] = matchr.config patterns
 
 Syntax.init()
 module.exports = Syntax
