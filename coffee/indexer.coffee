@@ -67,12 +67,17 @@ class Indexer
                                 line:  li
                                 file:  file
                                 class: currentClass
+                            
+                            funcName = m[1]
+                            if funcName.startsWith '@'
+                                funcName = funcName.slice 1 
+                                funcInfo.static = true
                                 
-                            funcInfos = @funcs[m[1]] ? []
+                            funcInfos = @funcs[funcName] ? []
                             funcInfos.push funcInfo
-                            @funcs[m[1]] = funcInfos
+                            @funcs[funcName] = funcInfos
                                                         
-                            funcStack.push [indent, funcInfo, m[1]]
+                            funcStack.push [indent, funcInfo, funcName]
                             
                             funcAdded = true
                     else

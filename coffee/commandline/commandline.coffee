@@ -38,7 +38,10 @@ class Commandline extends ViewBase
         window.split.on 'split', @onSplit
         
         @view.onblur = () => 
+            log "Commandline.constructor view.onblur"
             @cmmd.classList.remove 'active'
+            @list?.remove()
+            @list = null
             @command?.onBlur()
             
         @view.onfocus = () =>
@@ -147,14 +150,17 @@ class Commandline extends ViewBase
     # 000      000       000     000   
     # 0000000  000  0000000      000   
     
-    onCmmdClick: =>
-        log "commandline.onCmmdClick"
+    onCmmdClick: (event) =>
         if not @list?
             @list = document.createElement 'div' 
             @list.className = 'list'
             @positionList()
             window.split.elem.appendChild @list 
+        @command?.hideList?()
         @listCommands()
+        @focus()
+        event.preventDefault()
+        event.stopPropagation()
 
     listCommands: ->
         @list.innerHTML = ""        
@@ -164,9 +170,9 @@ class Commandline extends ViewBase
                 combo = cmmd.shortcuts[ci]
                 cname = cmmd.names[ci]
                 div = document.createElement 'div'
-                div.className = "list-item #{cmmd.prefsID}"
-                shortcut = "<span style=\"position:absolute; right: 0; opacity: 0.7;\">#{combo}</span>" 
-                namespan = "<span class=\"ko\" style=\"position:absolute; left: #{ci > 0 and 40 or 6}px\">#{cname}</span>" 
+                div.className = "list-item"
+                namespan = "<span class=\"ko command #{cmmd.prefsID}\" style=\"position:absolute; left: #{ci > 0 and 40 or 6}px\">#{cname}</span>" 
+                shortcut = "<span class=\"ko shortcut #{cmmd.prefsID}\"style=\"position:absolute; right: 0;\">#{combo}</span>" 
                 div.innerHTML = namespan + shortcut
                 start = (name,combo) => (event) => 
                     @list.remove()
@@ -182,6 +188,7 @@ class Commandline extends ViewBase
         split = window.split
         listTop = split.splitPosY 1
         listHeight = @list.getBoundingClientRect().height
+        log "Commandline.positionList listTop:#{listTop} listHeight:#{listHeight}"
         if (split.elemHeight() - listTop) < listHeight
             listTop = split.splitPosY(0) - listHeight
         @list?.style.top = "#{listTop}px"        

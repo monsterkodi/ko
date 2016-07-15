@@ -51,13 +51,9 @@ class Find extends Command
     execute: (command) ->
         super command
         if editor = window.editorWithClassName @focus
-            
             editor.highlightText command, 
                 type: @type
                 select: 'after'
-                
-            if editor.highlights.length
-                focus: @focus 
         else
             log "find.execute warning! no editor for @focus #{@focus}?"
       

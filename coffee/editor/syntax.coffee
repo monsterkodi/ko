@@ -60,14 +60,10 @@ class Syntax
         matchr.dissect matchr.ranges(Syntax.matchrConfigs[n], line), opt
 
     getDiss: (li, opt) ->
-        # log "?? #{@diss.length} #{li}" if @editor.name is 'terminal'
         if not @diss[li]?
-            # log "++ #{li} #{@diss[li]}" if @editor.name is 'terminal'
             rgs = matchr.ranges Syntax.matchrConfigs[@name], @editor.lines[li]
             diss = matchr.dissect rgs, opt
             @diss[li] = diss
-            
-        # log "#{li}", @diss[li] if @editor.name is 'terminal' and @diss[li]?.length
         @diss[li]
     
     setDiss: (li, dss) ->

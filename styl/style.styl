@@ -61,22 +61,28 @@ pre
     &.empty
         border-right    thinBorder
         background      #000
-        
-// .list-item        
-.commandline-command.active
+    &.active
         background      #333
-        &.open
-            color       #8f0
-        &.goto
-            color       #66f
-        &.find
-            color       #f5f
-        &.search
-            color       #0a0
-        &.macro
-            color       #bbb
-        &.term
-            color       #f00
+        
+span.ko
+.commandline-command.active
+    &.open
+        color       #8f0
+    &.goto
+        color       #66f
+    &.find
+        color       #f5f
+    &.search
+        color       #0a0
+    &.macro
+        color       #bbb
+    &.term
+        color       #f00
+        
+.ko.shortcut
+    opacity         0.5
+.ko.command
+    font-weight     bold
         
 .commandline-span
     position            relative
