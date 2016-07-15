@@ -38,7 +38,6 @@ class Commandline extends ViewBase
         window.split.on 'split', @onSplit
         
         @view.onblur = () => 
-            log "Commandline.constructor view.onblur"
             @cmmd.classList.remove 'active'
             @list?.remove()
             @list = null

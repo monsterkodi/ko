@@ -118,15 +118,7 @@ class ViewBase extends Editor
     setText: (text) ->
         if @syntax.name == 'txt'
             if text.startsWith "#!"
-                firstLine = text.slice 0, text.search /\r?\n/
-                lastWord = last firstLine.split ' '
-                switch lastWord
-                    when 'python'      then @syntax.name = 'py'
-                    when 'node'        then @syntax.name = 'js'
-                    when 'bash'        then @syntax.name = 'sh'
-                    else 
-                        if lastWord in syntax.syntaxNames
-                            @syntax.name = lastWord
+                @syntax.name = syntax.nameForShebang text.slice 0, text.search /\r?\n/
         super text
                 
     #  0000000  00000000  000000000  000      000  000   000  00000000   0000000

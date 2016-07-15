@@ -330,7 +330,6 @@ class Editor extends Buffer
     selectNextHighlight: -> # command+g
         if not @highlights.length
             searchText = window.commandline.commands.find?.current()
-            log "editor.selectNextHighlight use find command text #{searchText}"
             @highlightText searchText if searchText?
         r = @rangeAfterPosInRanges @cursorPos(), @highlights
         r ?= first @highlights

@@ -4,6 +4,7 @@
 #      000     000     000  0000     000     000   000   000 000 
 # 0000000      000     000   000     000     000   000  000   000
 {
+last,
 $}     = require '../tools/tools'
 matchr = require '../tools/matchr'
 log    = require '../tools/log'
@@ -76,13 +77,7 @@ class Syntax
             l = _.padEnd l, d.start
             l += d.match
         l
-    
-    @nameForFile: (file) ->
-        extn = path.extname(file).slice(1)
-        if extn in @syntaxNames
-            return extn
-        return 'txt' # todo: look at shebang
-    
+        
     #  0000000   0000000   000       0000000   00000000 
     # 000       000   000  000      000   000  000   000
     # 000       000   000  000      000   000  0000000  
@@ -106,7 +101,24 @@ class Syntax
             @colors[styl] = window.getComputedStyle(div).color
             div.remove()
         return @colors[styl]
-        
+
+    #  0000000  000   000  00000000  0000000     0000000   000   000   0000000 
+    # 000       000   000  000       000   000  000   000  0000  000  000      
+    # 0000000   000000000  0000000   0000000    000000000  000 0 000  000  0000
+    #      000  000   000  000       000   000  000   000  000  0000  000   000
+    # 0000000   000   000  00000000  0000000    000   000  000   000   0000000 
+    
+    @nameForShebang: (shebang) ->        
+        lastWord = last shebang.split /[\s\/]/
+        switch lastWord
+            when 'python' then return 'py'
+            when 'node'   then return 'js'
+            when 'bash'   then return 'sh'
+            else 
+                if lastWord in @syntaxNames
+                    return lastWord
+        'txt'
+    
     # 000  000   000  000  000000000
     # 000  0000  000  000     000   
     # 000  000 0 000  000     000   

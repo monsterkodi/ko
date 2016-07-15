@@ -95,18 +95,28 @@ class FileSearcher extends stream.Writable
             when '/Search/' then [@opt.text, '']
         @patterns = [[new RegExp(txt, ropt), 'found']]
         @found = []
+        extn = path.extname(@file).slice 1
+        if extn in syntax.syntaxNames
+            @syntaxName = extn
+        else
+            @syntaxName = null
         super
-    
+            
     write: (chunk, encoding, cb) ->        
         lines = chunk.split '\n'
+        if not @syntaxName?
+            if lines[0].startsWith "#!"
+                @syntaxName = syntax.nameForShebang lines[0]
+            else
+                @syntaxName = 'txt'
         for l in lines
             @line += 1            
             rngs = matchr.ranges @patterns, l
             if rngs.length
                 @found.push [@line, l, rngs]
         true
-    
-    end: (chunk, encoding, cb) ->
+        
+    end: (chunk, encoding, cb) =>
         if @found.length
             terminal = window.terminal
             meta = 
@@ -117,7 +127,7 @@ class FileSearcher extends stream.Writable
             
             for fi in [0...@found.length]
                 f = @found[fi]
-                rgs = f[2].concat syntax.rangesForTextAndSyntax f[1], syntax.nameForFile @file
+                rgs = f[2].concat syntax.rangesForTextAndSyntax f[1], @syntaxName
                 matchr.sortRanges rgs
                 dss = matchr.dissect rgs, join:true
                 meta =
