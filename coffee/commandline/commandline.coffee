@@ -36,6 +36,9 @@ class Commandline extends ViewBase
         @view.onblur = () => 
             @cmmd.classList.remove 'active'
             @command?.onBlur()
+            
+        @view.onfocus = () =>
+            @cmmd.className = "commandline-command active #{@command?.constructor.name.toLowerCase()}"
 
     setName: (name) -> 
         @cmmd.innerHTML = name
@@ -58,8 +61,7 @@ class Commandline extends ViewBase
     changed: (changeInfo, action) ->
         super changeInfo, action
         if changeInfo.sorted.length
-            @cmmd.classList.remove 'empty'
-            @cmmd.classList.add 'active'
+            @cmmd.className = "commandline-command active #{@command?.constructor.name.toLowerCase()}"
             @command?.changed @lines[0]
         
     loadCommands: ->
@@ -99,8 +101,7 @@ class Commandline extends ViewBase
         @view.focus()
         @setName name
         @results @command.start combo # <-- command start
-        @cmmd.classList.remove 'empty'
-        @cmmd.classList.add 'active'
+        @cmmd.className = "commandline-command active #{@command.constructor.name.toLowerCase()}"
                 
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     

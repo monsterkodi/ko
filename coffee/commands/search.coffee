@@ -34,8 +34,10 @@ class Search extends Command
         super @combo
     
     clear: ->
-        window.terminal.clear()
-        text: ''
+        if window.terminal.lines.length > 1
+            window.terminal.clear()
+        else
+            text: ''
     
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     

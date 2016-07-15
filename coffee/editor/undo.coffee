@@ -209,7 +209,7 @@ class Undo
     cursors: (newCursors, opt) ->
         
         if not newCursors? or newCursors.length < 1
-            alert('empty cursors') 
+            alert 'warning! empty cursors?'
             throw new Error
             
         @editor.mainCursor = @editor.posClosestToPosInPositions(@editor.mainCursor, newCursors) if opt?.closestMain
@@ -313,8 +313,8 @@ class Undo
             @changeInfoLineDelete index
             @check()
         else
-            log 'warning! last line deleted?' 
-            alert 'wtf?'
+            alert 'warning! last line deleted?'
+            throw new Error
         
     # 00000000  000   000  0000000  
     # 000       0000  000  000   000

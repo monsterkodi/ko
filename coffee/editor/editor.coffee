@@ -61,11 +61,10 @@ class Editor extends Buffer
         @updateTitlebar()
         if file?
             @watch = new watcher @
-            @setText fs.readFileSync file, encoding: 'UTF8'
+            @setText fs.readFileSync file, encoding: 'utf8'
         else
             @watch = null
             @setLines []
-        # log 'editor.setCurrentFile', file    
 
     #  0000000  00000000  000000000         000      000  000   000  00000000   0000000
     # 000       000          000            000      000  0000  000  000       000     
@@ -760,7 +759,9 @@ class Editor extends Buffer
         
         for c in @cursors # this looks weird
             oc = newCursors[@indexOfCursor c]
-            alert 'wtf?' if oc.length < 2 or oc[1] >= @lines.length
+            if oc.length < 2 or oc[1] >= @lines.length
+                alert "wtf?"
+                throw new Error
             @do.change oc[1], @lines[oc[1]].splice oc[0], 0, ch
             for nc in @positionsInLineAtIndexInPositions oc[1], newCursors
                 if nc[0] >= oc[0]

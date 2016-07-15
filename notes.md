@@ -2,7 +2,6 @@
 
 - *jump to file (require|path)*
 - *jump to list when multiple matches*
-- *colorize command names*
 
 #### indexer
 - *index whole project in background*

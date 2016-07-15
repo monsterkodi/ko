@@ -251,14 +251,16 @@ class Buffer extends event
 
     cursorPos: -> 
         if not @mainCursor?
-            alert('no main cursor!')
+            alert 'no main cursor!'
             throw new Error
         l = clamp 0, @lines.length-1, @mainCursor[1]
         c = clamp 0, @lines[l].length, @mainCursor[0]
         [ c, l ]
         
-    clampPos: (p) ->
-        alert("wtf?") if not @lines.length
+    clampPos: (p) ->        
+        if not @lines.length
+            alert "no line?"
+            throw new Error
         l = clamp 0, @lines.length-1, p[1]
         c = clamp 0, @lines[l].length, p[0]
         [ c, l ]

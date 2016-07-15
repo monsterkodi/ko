@@ -639,6 +639,9 @@ class ViewBase extends Editor
         for func, infos of funcs
             if func.toLowerCase() == find
                 info = infos[0]
+                for i in infos
+                    if i.file == @currentFile
+                        info = i
                 jumpToFileLine info.file, info.line
                 return
         

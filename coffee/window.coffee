@@ -3,11 +3,13 @@
 # 000000000  000  000 0 000  000   000  000   000  000000000
 # 000   000  000  000  0000  000   000  000   000  000   000
 # 00     00  000  000   000  0000000     0000000   00     00
-
-electron    = require 'electron'
-path        = require 'path'
-fs          = require 'fs'
-_           = require 'lodash'
+{
+ last,
+ sw,sh,$,
+ fileList,
+ fileExists,
+ del,clamp,
+ resolve}   = require './tools/tools'
 Split       = require './split'
 View        = require './editor/view'
 Commandline = require './commandline/commandline'
@@ -21,23 +23,22 @@ pos         = require './tools/pos'
 log         = require './tools/log'
 str         = require './tools/str'
 encode      = require './tools/encode'
+_           = require 'lodash'
+fs          = require 'fs'
+path        = require 'path'
+electron    = require 'electron'
+atomicFile  = require 'write-file-atomic'
 pkg         = require "../package.json"
-{sw,sh,$,
- last,
- del,clamp,
- fileList,
- fileExists,
- resolve}  = require './tools/tools'
 
-ipc    = electron.ipcRenderer
-remote = electron.remote
-dialog = remote.dialog
-winID  = null
-editor = null
-logview = null
-terminal = null
+ipc         = electron.ipcRenderer
+remote      = electron.remote
+dialog      = remote.dialog
+winID       = null
+editor      = null
+logview     = null
+terminal    = null
 commandline = null
-    
+
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000     
 # 00000000   0000000    0000000   000000    0000000 
@@ -102,17 +103,31 @@ ipc.on 'fileLinesChanged', (event, file, lineChanges) =>
 # 000       000  000      000     
 # 000       000  0000000  00000000
 
+#  0000000   0000000   000   000  00000000
+# 000       000   000  000   000  000     
+# 0000000   000000000   000 000   0000000 
+#      000  000   000     000     000     
+# 0000000   000   000      0      00000000
+
 saveFile = (file) =>
     file ?= editor.currentFile
-    log "window.saveFile file:#{file}"
+    # log "window.saveFile file:#{file}"
     if not file?
         saveFileAs()
         return
-    txt = editor.text()
-    editor.setCurrentFile null # to stop watcher and reset scroll
-    fs.writeFileSync file, txt, encoding: 'UTF8'
-    editor.setCurrentFile file
-    setState 'file', file
+    atomicFile file, editor.text(), encoding: 'utf8', (err) =>
+        editor.setCurrentFile null # to stop watcher and reset scroll
+        if err?
+            alert err
+        else
+            editor.setCurrentFile file
+            setState 'file', file
+
+# 000       0000000    0000000   0000000  
+# 000      000   000  000   000  000   000
+# 000      000   000  000000000  000   000
+# 000      000   000  000   000  000   000
+# 0000000   0000000   000   000  0000000  
 
 loadFile = (file, opt) =>  
     [file,line] = file.split ':'
@@ -121,30 +136,30 @@ loadFile = (file, opt) =>
         
         if editor.currentFile? and not opt?.dontSave and editor.do.hasLineChanges() 
             saveChanges = [_.clone(editor.currentFile), _.clone(editor.text())]
+            atomicFile saveChanges[0], saveChanges[1], encoding: 'utf8'
             
         addToRecent file        
         editor.setCurrentFile null # to stop watcher and reset scroll
         editor.setCurrentFile file
         ipc.send 'fileLoaded', file, winID
         setState 'file', file
-        
-        if saveChanges?
-            log "window.loadFile saveChanges:#{saveChanges}"
-            fs.writeFileSync saveChanges[0], saveChanges[1], encoding: 'UTF8'
-            
         commandline.fileLoaded file
     
     window.split.reveal 'editor'
         
     if line?
-        # log "window.loadFile line:#{line}"
         editor.singleCursorAtPos [0, parseInt(line)-1] 
         editor.scrollCursorToTop()        
-        
+  
+#  0000000   00000000   00000000  000   000        00000000  000  000      00000000   0000000
+# 000   000  000   000  000       0000  000        000       000  000      000       000     
+# 000   000  00000000   0000000   000 0 000        000000    000  000      0000000   0000000 
+# 000   000  000        000       000  0000        000       000  000      000            000
+#  0000000   000        00000000  000   000        000       000  0000000  00000000  0000000 
+
 openFiles = (ofiles, options) => # called from file dialog and open command
     if ofiles?.length
         files = fileList ofiles, ignoreHidden: false
-        # log "window.openFiles files:", files
         if files.length >= 10
             answer = dialog.showMessageBox
                 type: 'warning'

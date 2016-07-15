@@ -192,8 +192,8 @@ class Autocomplete extends event
         cursorWord = @cursorWord()
         for l in lines
             if not l?.split?
-                log "warning! no split?", lines
-                alert 'wtf??'            
+                alert "warning! no split?", lines  
+                throw new Error
             words = l.split @splitRegExp
             words = words.filter (w) => 
                 return false if w.length < 2
