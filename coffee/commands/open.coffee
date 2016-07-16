@@ -215,7 +215,7 @@ class Open extends Command
             opt.dir = @dir ? path.dirname last prefs.get 'recentFiles', ['~']
         
         @loadDir opt
-        @setName @names[@shortcuts.indexOf @combo]
+        super @combo
                 
     # 000       0000000    0000000   0000000          0000000    000  00000000 
     # 000      000   000  000   000  000   000        000   000  000  000   000

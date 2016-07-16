@@ -23,15 +23,11 @@ class Search extends Command
         @names     = ["search", "Search", "/search/", "/Search/"]
         super @commandline
         
-    #  0000000  000000000   0000000   00000000   000000000
-    # 000          000     000   000  000   000     000   
-    # 0000000      000     000000000  0000000       000   
-    #      000     000     000   000  000   000     000   
-    # 0000000      000     000   000  000   000     000   
-        
-    start: (@combo) ->
-        @setName @names[@shortcuts.indexOf @combo]
-        super @combo
+    #  0000000  000      00000000   0000000   00000000 
+    # 000       000      000       000   000  000   000
+    # 000       000      0000000   000000000  0000000  
+    # 000       000      000       000   000  000   000
+    #  0000000  0000000  00000000  000   000  000   000
     
     clear: ->
         if window.terminal.lines.length > 1

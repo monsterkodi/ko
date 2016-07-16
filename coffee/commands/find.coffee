@@ -21,11 +21,9 @@ class Find extends Command
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
         
-    start: (combo) ->
-        index = @shortcuts.indexOf combo
-        @type = @types[index]
-        @setName @names[index]
-        super combo
+    start: (@combo) ->
+        @type = @types[@shortcuts.indexOf @combo]
+        super @combo
 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000

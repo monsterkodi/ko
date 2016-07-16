@@ -141,6 +141,7 @@ class Commandline extends ViewBase
         else @selectNone()
         window.split.focus  r.focus  if r?.focus?
         window.split.reveal r.reveal if r?.reveal?
+        window.split.do     r.do     if r?.do?
         
     cancel: -> @results @command?.cancel()
     clear:  -> @results @command?.clear()

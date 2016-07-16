@@ -1,10 +1,10 @@
 # todo/ideas
 
+- *history overview as columns of minimaps* ctrl+alt+esc|up|down
+
 - *jump to file (require|path)*
 - *jump to list when multiple matches*
-
-- *display dirty status in window list*
-- *navigation history* ctrl+alt+left|right
+- display dirty status in window list
 
 #### indexer
 - *index whole project in background*
@@ -49,7 +49,7 @@
 - indent more when inserting newline and next line is indented more?
 
 #### terminal
-- autocomplete
+- *autocomplete*
     - history
     - commands
     - dirs and files
@@ -57,6 +57,7 @@
 - number history output and add !(n) command
 
 #### commands
+- *autocomplete*
 - tree
 - tabs?
 - ls

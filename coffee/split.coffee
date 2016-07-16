@@ -28,15 +28,15 @@ class Split extends event
         @handleHeight      = 6
         @logVisible        = undefined
         
-        @elem        = $('.split')
-        @titlebar    = $('.titlebar')
-        @topHandle   = $('.handle.top')
+        @elem        = $('.split'      )
+        @titlebar    = $('.titlebar'   )
+        @topHandle   = $('.handle.top' )
         @editHandle  = $('.handle.edit')
-        @logHandle   = $('.handle.log')
-        @terminal    = $('.terminal')
+        @logHandle   = $('.handle.log' )
+        @terminal    = $('.terminal'   )
         @commandline = $('.commandline')
-        @editor      = $('.editor')
-        @logview     = $('.logview')
+        @editor      = $('.editor'     )
+        @logview     = $('.logview'    )
 
         @splitPos    = [-@handleHeight,0,@elemHeight()]
 
@@ -88,10 +88,8 @@ class Split extends event
             else
                 s.push @splitPosY h
         
-        if i == 0
-            s[1] = s[0] + @commandlineHeight + @handleHeight
-        if i == 1
-            s[0] = s[1] - @commandlineHeight - @handleHeight
+        if i == 0 then s[1] = s[0] + @commandlineHeight + @handleHeight
+        if i == 1 then s[0] = s[1] - @commandlineHeight - @handleHeight
                 
         @applySplit s
     
@@ -155,23 +153,20 @@ class Split extends event
     
     elemTop:    -> @elem.getBoundingClientRect().top
     elemHeight: -> @elem.getBoundingClientRect().height - @handleHeight
-    splitPosY:  (i) -> 
-        if i < @splitPos.length
-            @splitPos[i]
-        else
-            @elemHeight()
-            
+    
+    splitPosY:  (i) -> if i < @splitPos.length then @splitPos[i] else @elemHeight()
     paneHeight: (i) -> @panes[i].getBoundingClientRect().height
         
-    terminalHeight:    -> @paneHeight 0
-    editorHeight:      -> @paneHeight 2
-    logviewHeight:     -> @paneHeight 3
+    terminalHeight: -> @paneHeight 0
+    editorHeight:   -> @paneHeight 2
+    logviewHeight:  -> @paneHeight 3
     
+    hideTerminal:   -> @splitAt 0, 0
+    hideEditor:     -> @splitAt 1, @elemHeight()
+    
+    commandlineVisible: -> @splitPosY(1)     > 0
     terminalVisible:    -> @terminalHeight() > 0
-    hideTerminal:       -> @splitAt 0, 0
-    editorVisible:      -> @editorHeight() > 0
-    hideEditor:         -> @splitAt 1, @elemHeight()
-    commandlineVisible: -> @splitPosY(1) > 0
+    editorVisible:      -> @editorHeight()   > 0
 
     # 0000000     0000000 
     # 000   000  000   000
@@ -180,23 +175,26 @@ class Split extends event
     # 0000000     0000000 
     
     do: (sentence) ->
-        words = sentence.split ' '
+        sentence = sentence.trim()
+        return if not sentence.length
+        words = sentence.split /\s+/
         action = words[0]
         what = words[1]
-        if what? and action in ['maximize', 'enlarge']
-            switch action
-                when 'maximize' then delta = @elemHeight()
-                when 'enlarge'
-                    if words[2] == 'by'
-                        delta = parseInt words[3]
-                    else
-                        fh = @terminalHeight() + @commandlineHeight + @editorHeight()
-                        delta = parseInt 0.25 * fh
-            switch what
-                when 'editor'   then return @moveCommandLineBy -delta
-                when 'terminal' then return @moveCommandLineBy  delta        
-            
-        log "split.do warning! unhandled do command? #{sentence}?"
+        switch action
+            when 'focus'    then return @focus what
+            when 'reveal'   then return @show what
+            when 'maximize' then delta = @elemHeight()
+            when 'enlarge'
+                if words[2] == 'by'
+                    delta = parseInt words[3]
+                else
+                    fh = @terminalHeight() + @commandlineHeight + @editorHeight()
+                    delta = parseInt 0.25 * fh
+        switch what
+            when 'editor'   then return @moveCommandLineBy -delta
+            when 'terminal' then return @moveCommandLineBy  delta                    
+        alert "split.do warning! unhandled do command? #{sentence}?"
+        throw new Error
         
     # 00     00   0000000   000   000  00000000   0000000  00     00  0000000  
     # 000   000  000   000  000   000  000       000       000   000  000   000
@@ -280,8 +278,8 @@ class Split extends event
                 @splitAt 1, 0
             else if y1 <  (@commandlineHeight+@handleHeight)*2
                 @splitAt 0, 0
-            else if y1 > @splitPosY(2) - 40
-                @splitAt 1, @splitPosY(2)
+            else if y1 > y2 - 40
+                @splitAt 1, y2
         else if y2 > @elemHeight()
             @splitAt 2, @elemHeight()
 
@@ -291,10 +289,14 @@ class Split extends event
     # 000       000   000  000       000   000       000
     # 000        0000000    0000000   0000000   0000000 
     
-    focus: (n) -> $(n)?.focus()
+    focus: (n) -> 
+        if n[0] != '.'
+            n  = n == 'commandline' and '.commandline-editor' or '.' + n
+        $(n)?.focus()
+            
     reveal: (n) -> @show n
     focusAnything: ->
-        return @focus '.editor' if @editorVisible()
+        return @focus '.editor'   if @editorVisible()
         return @focus '.terminal' if @terminalVisible()
         @focus '.commandline-editor'
         

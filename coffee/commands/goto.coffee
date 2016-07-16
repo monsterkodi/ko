@@ -24,9 +24,8 @@ class Goto extends Command
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
         
-    start: (combo) ->
-        @setName @names[@shortcuts.indexOf combo]
-        super combo
+    start: (@combo) ->
+        super @combo
         text: @last() ? "-1"
         select: true
         

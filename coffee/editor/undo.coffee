@@ -335,7 +335,6 @@ class Undo
     #  0000000  000   000  00000000   0000000  000   000
 
     check: ->
-        # log "Undo.check #{@editor.name} @groupCount #{@groupCount} changeInfo:", @changeInfo if @editor.name == 'editor'
         @futures = []
         if @groupCount == 0
             @merge()

@@ -21,7 +21,9 @@ class Command
     # 000        000 000   000       000       000   000     000     000     
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
         
-    start: -> 
+    start: (combo) -> 
+        index = @shortcuts.indexOf combo
+        @setName @names[index]
         @loadState()
         text: @last()
         select: true
@@ -64,15 +66,15 @@ class Command
 
     prev: -> 
         @index = clamp 0, @history.length-1, @index-1
-        @history[@index]
+        new String @history[@index]
         
     next: -> 
         @index = clamp 0, @history.length-1, @index+1
-        @history[@index]
+        new String @history[@index]
         
     last: ->
         @index = @history.length-1
-        @history[@index]
+        new String @history[@index]
         
     # 000000000  00000000  000   000  000000000
     #    000     000        000 000      000   

@@ -13,9 +13,17 @@ _        = require 'lodash'
 fs       = require 'fs'
 path     = require 'path'
 electron = require 'electron'
+
 BrowserWindow = electron.BrowserWindow
 
 class Indexer
+    
+    @requireRegExp = /^\s*([\w\{\}]+)\s+=\s+require\s+[\'\"]([\.\/\w]+)[\'\"]/
+    @classRegExp   = /^\s*class\s+(\w+)(\s+extends\s\w+)?/
+    @includeRegExp = /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
+    @methodRegExp  = /^\s+([\@]?\w+)\s*\:\s*(\([^\)]*\))?\s*[=-]\>/
+    @funcRegExp    = /^\s*([\w\.]+)\s*[\:\=]\s*(\([^\)]*\))?\s*[=-]\>/
+    @splitRegExp   = new RegExp "[^\\w\\d#\\_]+", 'g'        
     
     constructor: () ->
         
@@ -24,14 +32,12 @@ class Indexer
         @funcs   = Object.create null
         @words   = Object.create null
         @queue   = [] 
-        
-        @splitRegExp = new RegExp "[^\\w\\d#\\_]+", 'g'        
       
-    # 000  000   000  0000000    00000000  000   000  00000000  000  000      00000000
-    # 000  0000  000  000   000  000        000 000   000       000  000      000     
-    # 000  000 0 000  000   000  0000000     00000    000000    000  000      0000000 
-    # 000  000  0000  000   000  000        000 000   000       000  000      000     
-    # 000  000   000  0000000    00000000  000   000  000       000  0000000  00000000
+    # 000  000   000  0000000    00000000  000   000        00000000  000  000      00000000
+    # 000  0000  000  000   000  000        000 000         000       000  000      000     
+    # 000  000 0 000  000   000  0000000     00000          000000    000  000      0000000 
+    # 000  000  0000  000   000  000        000 000         000       000  000      000     
+    # 000  000   000  0000000    00000000  000   000        000       000  0000000  00000000
     
     indexFile: (file) ->
         
@@ -57,8 +63,15 @@ class Indexer
                         funcInfo = funcStack.pop()
                         fileInfo.funcs.push [funcInfo[1].line, funcInfo[1].last, funcInfo[2], funcInfo[1].class ? path.basename file, path.extname file]
             
-                    if currentClass? and indent == 4                        
-                        m = line.match /^\s+([\@]?\w+)\s*\:\s*(\([^\)]*\))?\s*[=-]\>/
+                    if currentClass? and indent == 4   
+                        
+                        # 00     00  00000000  000000000  000   000   0000000   0000000     0000000
+                        # 000   000  000          000     000   000  000   000  000   000  000     
+                        # 000000000  0000000      000     000000000  000   000  000   000  0000000 
+                        # 000 0 000  000          000     000   000  000   000  000   000       000
+                        # 000   000  00000000     000     000   000   0000000   0000000    0000000 
+                        
+                        m = line.match @methodRegExp
                         if m?[1]?
                             _.set @classes, "#{currentClass}.methods.#{m[1]}", 
                                 line: li
@@ -81,8 +94,15 @@ class Indexer
                             
                             funcAdded = true
                     else
+                        
+                        # 00000000  000   000  000   000   0000000  000000000  000   0000000   000   000   0000000
+                        # 000       000   000  0000  000  000          000     000  000   000  0000  000  000     
+                        # 000000    000   000  000 0 000  000          000     000  000   000  000 0 000  0000000 
+                        # 000       000   000  000  0000  000          000     000  000   000  000  0000       000
+                        # 000        0000000   000   000   0000000     000     000   0000000   000   000  0000000 
+                        
                         currentClass = null if indent < 4
-                        m = line.match /^\s*([\w\.]+)\s*[\:\=]\s*(\([^\)]*\))?\s*[=-]\>/
+                        m = line.match @funcRegExp
                         if m?[1]?
                             
                             funcInfo = 
@@ -101,27 +121,44 @@ class Indexer
                     _.update @words, "#{word}.count", (n) -> (n ? 0) + 1 
                     
                     switch word
+                        
+                        #  0000000  000       0000000    0000000   0000000
+                        # 000       000      000   000  000       000     
+                        # 000       000      000000000  0000000   0000000 
+                        # 000       000      000   000       000       000
+                        #  0000000  0000000  000   000  0000000   0000000 
                         when 'class'
-                            m = line.match /^\s*class\s+(\w+)(\s+extends\s\w+)?/
+                            m = line.match @classRegExp
                             if m?[1]?
                                 currentClass = m[1]
                                 _.set @classes, "#{m[1]}", 
                                     file: file
                                     line: li
+                                    
+                        # 00000000   00000000   0000000   000   000  000  00000000   00000000
+                        # 000   000  000       000   000  000   000  000  000   000  000     
+                        # 0000000    0000000   000 00 00  000   000  000  0000000    0000000 
+                        # 000   000  000       000 0000   000   000  000  000   000  000     
+                        # 000   000  00000000   00000 00   0000000   000  000   000  00000000
                         when 'require'
-                            m = line.match /^\s*([\w\{\}]+)\s+=\s+require\s+[\'\"]([\.\/\w]+)[\'\"]/
+                            m = line.match @requireRegExp
                             if m?[1]? and m[2]?
                                 r = fileInfo.require ? []
                                 r.push [m[1], m[2]]
                                 fileInfo.require = r
-                                
                                 abspath = resolve path.join path.dirname(file), m[2] 
                                 abspath += '.coffee'
                                 if (m[2][0] == '.') and (not @files[abspath]?) and (@queue.indexOf(abspath) < 0)
                                     if fileExists abspath 
                                         @queue.push abspath
+                                        
+                        #  00  00   000  000   000   0000000  000      000   000  0000000    00000000
+                        # 00000000  000  0000  000  000       000      000   000  000   000  000     
+                        #  00  00   000  000 0 000  000       000      000   000  000   000  0000000 
+                        # 00000000  000  000  0000  000       000      000   000  000   000  000     
+                        #  00  00   000  000   000   0000000  0000000   0000000   0000000    00000000
                         when "#include"
-                            m = line.match /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
+                            m = line.match @includeRegExp
                             if m?[1]?
                                 r = fileInfo.require ? []
                                 r.push [null, m[1]]

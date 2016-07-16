@@ -13,11 +13,11 @@ ipc      = electron.ipcRenderer
 class Term extends Command
 
     constructor: (@commandline) ->
-        @shortcuts = ['command+t']
-        @names     = ['term']
+        @shortcuts  = ['command+t', 'command+shift+t']
+        @names      = ['term', 'Term']
         super @commandline
         @maxHistory = 100
-        @cmdID = 0
+        @cmdID      = 0
         
     onShellCommandData: (cmdData)  => 
         terminal = window.terminal
@@ -117,7 +117,7 @@ class Term extends Command
                     @cmdID += 1
                     
         terminal.scrollCursorToTop 5
-        text: ''
-        reveal: 'terminal'
+        text:    ''
+        do:      (@name == 'Term' and 'maximize' or 'reveal') + ' terminal'
         
 module.exports = Term
