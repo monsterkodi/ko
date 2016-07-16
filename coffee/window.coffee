@@ -16,6 +16,7 @@ Commandline = require './commandline/commandline'
 Terminal    = require './terminal/terminal'
 LogView     = require './logview/logview'
 Titlebar    = require './titlebar'
+Navigate    = require './navigate'
 Info        = require './editor/info'
 prefs       = require './tools/prefs'
 keyinfo     = require './tools/keyinfo'
@@ -80,10 +81,11 @@ delState = window.delState = (key) ->
 # 000  000        000     
 # 000  000         0000000
 
-ipc.on 'shellCommandData', (event, cmdData) => commandline.commands['term'].onShellCommandData cmdData
-ipc.on 'executeResult', (event, arg) => terminal.appendText str arg
-ipc.on 'openFile', (event, options) => openFile options
-ipc.on 'focusEditor', (event) => split.focus '.editor'
+ipc.on 'shellCommandData',  (event, cmdData) => commandline.commands['term'].onShellCommandData cmdData
+ipc.on 'executeResult',     (event, arg) => terminal.appendText str arg
+ipc.on 'singleCursorAtPos', (event, pos) => editor.singleCursorAtPos pos
+ipc.on 'openFile',          (event, options) => openFile options
+ipc.on 'focusEditor',       (event) => split.focus '.editor'
 ipc.on 'cloneFile',  => ipc.send 'newWindowWithFile', editor.currentFile
 ipc.on 'reloadFile', => loadFile editor.currentFile, reload: true, dontSave: true
 ipc.on 'saveFileAs', => saveFileAs()
@@ -226,6 +228,7 @@ saveFileAs = =>
 #    000     000     000     0000000  00000000  0000000    000   000  000   000
 
 titlebar = window.titlebar = new Titlebar
+navigate = window.navigate = new Navigate
 
 #  0000000  00000000   000      000  000000000
 # 000       000   000  000      000     000   
@@ -289,6 +292,9 @@ editor.on 'changed', (changeInfo, action) =>
     return if changeInfo.foreign
     if changeInfo.sorted.length and action.lines.length
         ipc.send 'winFileLinesChanged', winID, editor.currentFile, action.lines
+        navigate.addFilePos
+            file: editor.currentFile
+            pos:  editor.cursorPos()
 
 window.editorWithName = (n) ->
     switch n
@@ -382,26 +388,30 @@ document.onkeydown = (event) ->
     {mod, key, combo} = keyinfo.forEvent event
 
     return if not combo
-    return if 'unhandled' != window.titlebar.globalModKeyComboEvent mod, key, combo, event
+    return if 'unhandled' != window.titlebar   .globalModKeyComboEvent mod, key, combo, event
     return if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
+
+    stop = (event) ->
+        event.preventDefault()
+        event.stopPropagation()        
 
     for i in [1..9]
         if combo is "command+#{i}" or combo is "alt+#{i}"
             ipc.send 'activateWindow', i
-            event.preventDefault()
-            event.stopPropagation()
-            return 
-    
+            return stop event
+        
     switch combo
-        when 'command+enter'    then return ipc.send 'execute', editor.text()
-        when 'command+alt+i'    then return ipc.send 'toggleDevTools', winID
-        when 'command+alt+k'    then return window.split.toggleLog()
-        when 'command+k'        then return window.split.showOrClearLog()
-        when 'command+='        then return changeFontSize +1
-        when 'command+-'        then return changeFontSize -1
-        when 'command+0'        then return resetFontSize()
-        when 'command+shift+='  then return @changeZoom +1
-        when 'command+shift+-'  then return @changeZoom -1
-        when 'command+shift+0'  then return @resetZoom()
-        when 'alt+`'            then return window.titlebar.showList()
+        when 'command+enter'     then return ipc.send 'execute', editor.text()
+        when 'command+alt+i'     then return ipc.send 'toggleDevTools', winID
+        when 'command+alt+k'     then return split.toggleLog()
+        when 'command+k'         then return split.showOrClearLog()
+        when 'command+='         then return changeFontSize +1
+        when 'command+-'         then return changeFontSize -1
+        when 'command+0'         then return resetFontSize()
+        when 'command+shift+='   then return @changeZoom +1
+        when 'command+shift+-'   then return @changeZoom -1
+        when 'command+shift+0'   then return @resetZoom()
+        when 'alt+`'             then return titlebar.showList()
+        when 'alt+ctrl+left'     then return stop event, navigate.backward()
+        when 'alt+ctrl+right'    then return stop event, navigate.forward()
         

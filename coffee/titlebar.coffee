@@ -49,7 +49,6 @@ class Titlebar
     # 0000000  000  0000000      000   
     
     showList: (event) => 
-        log "Titlebar.showList list:#{@list?}"
         return if @list?
         document.activeElement.blur()
         @selected = -1
@@ -62,7 +61,6 @@ class Titlebar
         event?.stopPropagation()
 
     closeList: =>
-        log "Titlebar.closeList @list?:#{@list?}"
         if @list?
             window.split.focusAnything()
             @selected = -1
@@ -107,7 +105,6 @@ class Titlebar
             when 'down' then +1
         @selected = @list.children.length-1 if @selected < -1
         @selected = -1 if @selected >= @list.children.length
-        log "Titlebar.navigate -> @selected:#{@selected}"
         @list.children[@selected].classList.add 'selected' if @selected > -1
         
     # 000   000  00000000  000   000
@@ -119,8 +116,8 @@ class Titlebar
     globalModKeyComboEvent: (mod, key, combo, event) ->
         if @list? 
             switch combo
-                when 'esc'        then return @closeList()
-                when 'up', 'down' then return @navigate key
+                when 'esc', 'alt+`' then return @closeList()
+                when 'up', 'down'   then return @navigate key
                 when 'enter'      
                     event.stopPropagation()
                     event.preventDefault()

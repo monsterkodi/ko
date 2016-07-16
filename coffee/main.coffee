@@ -13,6 +13,7 @@ log           = require './tools/log'
 str           = require './tools/str'
 pkg           = require '../package.json'
 Execute       = require './execute'
+Navigate      = require './navigate'
 Indexer       = require './indexer'
 MainMenu      = require './mainmenu'
 _             = require 'lodash'
@@ -28,9 +29,9 @@ clipboard     = electron.clipboard
 ipc           = electron.ipcMain
 dialog        = electron.dialog
 disableSnap   = false
-tray          = undefined
-main          = undefined
-execute       = undefined
+main          = undefined # created in app.on 'ready'
+navigate      = undefined # created in app.on 'ready'
+tray          = undefined # created in Main.constructor
 openFiles     = []
 wins          = []
 
@@ -75,9 +76,8 @@ if args.verbose
 # 000        000   000  000       000            000
 # 000        000   000  00000000  000       0000000 
 
-prefs.init "#{app.getPath('appData')}/#{pkg.name}/ko.noon",
-    shortcut:       'F2'
-    
+prefs.init "#{app.getPath('appData')}/#{pkg.name}/ko.noon", shortcut: 'F2'
+
 if args.prefs
     log colors.yellow.bold 'prefs'
     if fileExists prefs.path
@@ -99,6 +99,8 @@ winWithID   = (winID) ->
     for w in wins()
         return w if w.id == wid
 
+screenSize  = -> electron.screen.getPrimaryDisplay().workAreaSize
+
 # 0000000     0000000    0000000  000   000
 # 000   000  000   000  000       000  000 
 # 000   000  000   000  000       0000000  
@@ -116,30 +118,26 @@ hideDock = ->
 # 000  000         0000000
 
 coffeeExecute = new Execute
-ipc.on 'execute',           (event, arg)   => event.sender.send 'executeResult', coffeeExecute.execute arg
-ipc.on 'toggleDevTools',    (event)        => event.sender.toggleDevTools()
-ipc.on 'newWindowWithFile', (event, file)  => main.createWindow file
-ipc.on 'maximizeWindow',    (event, winID) => main.toggleMaximize winWithID winID
-ipc.on 'activateWindow',    (event, winID) => main.activateWindowWithID winID
-ipc.on 'saveBounds',        (event, winID) => main.saveWinBounds winWithID winID
-ipc.on 'reloadWindow',      (event, winID) => main.reloadWin winWithID winID
-ipc.on 'prefSet',           (event, k, v)  => prefs.set k, v
-ipc.on 'prefGet',           (event, k, d)  => event.returnValue = prefs.get k, d
-ipc.on 'reloadMenu',        ()             => main.reloadMenu() # still in use?
-ipc.on 'winInfos',          (event)        => 
+ipc.on 'newWindowWithFile',      (event, file)   => main.newWindowWithFile file
+ipc.on 'activateWindowWithFile', (event, file)   => event.returnValue = main.activateWindowWithFile file
+ipc.on 'toggleDevTools',         (event)         => event.sender.toggleDevTools()
+ipc.on 'execute',                (event, arg)    => event.sender.send 'executeResult', coffeeExecute.execute arg
+ipc.on 'maximizeWindow',         (event, winID)  => main.toggleMaximize winWithID winID
+ipc.on 'activateWindow',         (event, winID)  => main.activateWindowWithID winID
+ipc.on 'saveBounds',             (event, winID)  => main.saveWinBounds winWithID winID
+ipc.on 'reloadWindow',           (event, winID)  => main.reloadWin winWithID winID
+ipc.on 'prefSet',                (event, k, v)   => prefs.set k, v
+ipc.on 'prefGet',                (event, k, d)   => event.returnValue = prefs.get k, d
+ipc.on 'reloadMenu',             ()              => main.reloadMenu() # still in use?
+ipc.on 'navigate',               (event, action) => navigate.action action
+ipc.on 'indexer',                (event, item)   => event.returnValue = main.indexer[item]
+ipc.on 'winInfos',               (event)         => 
     infos = []
     for w in wins()
         infos.push 
             id: w.id
             file: w.currentFile            
     event.returnValue = infos
-
-ipc.on 'activateWindowWithFile', (event, file) => 
-    for w in wins()
-        if w.currentFile == file
-            main.activateWindowWithID w.id
-            event.returnValue = w.id
-    event.returnValue = null
 
 ipc.on 'fileLoaded',        (event, file, winID)  => 
     winWithID(winID).currentFile = file 
@@ -151,8 +149,6 @@ ipc.on 'winFileLinesChanged', (event, winID, file, lineChanges) =>
         if w.id != winID
             w.webContents.send 'fileLinesChanged', file, lineChanges
             
-ipc.on 'indexer', (event, item) => event.returnValue = main.indexer[item]
-
 winShells = {}
 
 ipc.on 'shellCommand', (event, cfg) => 
@@ -211,6 +207,7 @@ class Main
     # 000   000  000  000  0000  000   000  000   000  000   000       000
     # 00     00  000  000   000  0000000     0000000   00     00  0000000 
         
+    winWithID: winWithID
     reloadMenu: => MainMenu.init @
         
     reloadWin: (win) ->
@@ -278,6 +275,13 @@ class Main
             w.show()
         w.focus()
 
+    activateWindowWithFile: (file) =>
+        for w in wins()
+            if w.currentFile == file
+                @activateWindowWithID w.id
+                return w.id
+        null
+
     closeOtherWindows:=>
         for w in wins()
             if w != activeWin()
@@ -299,9 +303,9 @@ class Main
     # 0000000      000     000000000  000       0000000  
     #      000     000     000   000  000       000  000 
     # 0000000      000     000   000   0000000  000   000
-    
+        
     stackWindows: ->
-        {width, height} = electron.screen.getPrimaryDisplay().workAreaSize
+        {width, height} = screenSize()
         ww = height + 122
         wl = visibleWins()
         for w in wl
@@ -316,7 +320,7 @@ class Main
     windowsAreStacked: ->
         wl = visibleWins()
         return false if not wl.length
-        return false if wl.length == 1 and wl[0].getBounds().width == electron.screen.getPrimaryDisplay().workAreaSize.width
+        return false if wl.length == 1 and wl[0].getBounds().width == screenSize().width
         w0 = wl[0].getBounds()
         for wi in [1...wl.length]
             if not _.isEqual wl[wi].getBounds(), w0
@@ -333,7 +337,7 @@ class Main
         disableSnap = true
         frameSize = 6
         wl = visibleWins()
-        {width, height} = electron.screen.getPrimaryDisplay().workAreaSize
+        {width, height} = screenSize()
         if not @windowsAreStacked()
             @stackWindows()
         else if wl.length == 1
@@ -403,6 +407,8 @@ class Main
     # 000       0000000    0000000   000000000     000     0000000 
     # 000       000   000  000       000   000     000     000     
     #  0000000  000   000  00000000  000   000     000     00000000
+       
+    newWindowWithFile: (file) -> @createWindow(file).id
             
     createWindow: (openFile) ->
         win = new BrowserWindow
@@ -411,10 +417,10 @@ class Main
             minWidth:        140
             minHeight:       130
             useContentSize:  true
-            backgroundColor: '#000'
             fullscreenable:  true
             show:            true
             hasShadow:       false
+            backgroundColor: '#000'
             titleBarStyle:   'hidden'
                     
         win.loadURL "file://#{__dirname}/../index.html"
@@ -541,7 +547,9 @@ app.on 'open-file', (event, path) =>
         main.createWindow path
     event.preventDefault()
 
-app.on 'ready', => main = new Main openFiles
+app.on 'ready', => 
+    main     = new Main openFiles
+    navigate = new Navigate main
     
 app.on 'window-all-closed', ->
     

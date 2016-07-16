@@ -4,6 +4,7 @@
 - *jump to list when multiple matches*
 
 - *display dirty status in window list*
+- *navigation history* ctrl+alt+left|right
 
 #### indexer
 - *index whole project in background*
@@ -35,6 +36,7 @@
     - eg. add * to surround characters for md
 
 #### editing
+- autocomplete navigate backwards from bottom
 - #< to add salter header of next word
 - no surround for ' inside words
 - select continuous,rectangular ranges with command+shift+M 
@@ -53,7 +55,7 @@
     - dirs and files
     - /usr/local/bin, /usr/bin and /bin
 - number history output and add !(n) command
-      
+
 #### commands
 - tree
 - tabs?
