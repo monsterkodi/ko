@@ -15,6 +15,7 @@ View        = require './editor/view'
 Commandline = require './commandline/commandline'
 Terminal    = require './terminal/terminal'
 LogView     = require './logview/logview'
+Titlebar    = require './titlebar'
 Info        = require './editor/info'
 prefs       = require './tools/prefs'
 keyinfo     = require './tools/keyinfo'
@@ -218,7 +219,13 @@ saveFileAs = =>
                 addToRecent file
                 saveFile file
 
-$('.titlebar').ondblclick = (event) => ipc.send 'maximizeWindow', winID
+# 000000000  000  000000000  000      00000000  0000000     0000000   00000000 
+#    000     000     000     000      000       000   000  000   000  000   000
+#    000     000     000     000      0000000   0000000    000000000  0000000  
+#    000     000     000     000      000       000   000  000   000  000   000
+#    000     000     000     0000000  00000000  0000000    000   000  000   000
+
+titlebar = window.titlebar = new Titlebar
 
 #  0000000  00000000   000      000  000000000
 # 000       000   000  000      000     000   

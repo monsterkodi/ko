@@ -9,6 +9,7 @@ keycode = require 'keycode'
 class Keyinfo
     
     @modifierNames = ['shift', 'ctrl', 'alt', 'command']
+    @modifierChars = ['⇧', '^', '⌥', '⌘']
     
     @isModifier: (keyname) -> keyname in @modifierNames
 
@@ -40,5 +41,11 @@ class Keyinfo
         mod:   @modifiersForEvent event
         key:   @keynameForEvent event
         combo: @comboForEvent event
+        
+    @short: (combo) ->
+        for i in [0...@modifierNames.length]
+            modifierName = @modifierNames[i]+'+'
+            combo = combo.replace modifierName, @modifierChars[i]
+        combo.toUpperCase()
 
 module.exports = Keyinfo

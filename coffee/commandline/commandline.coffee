@@ -9,6 +9,7 @@ clamp,
 $}        = require '../tools/tools'
 ViewBase  = require '../editor/viewbase'
 log       = require '../tools/log'
+keyinfo   = require '../tools/keyinfo'
 split     = require '../split'
 render    = require '../editor/render'
 syntax    = require '../editor/syntax'
@@ -152,7 +153,7 @@ class Commandline extends ViewBase
     onCmmdClick: (event) =>
         if not @list?
             @list = document.createElement 'div' 
-            @list.className = 'list'
+            @list.className = 'list commands'
             @positionList()
             window.split.elem.appendChild @list 
         @command?.hideList?()
@@ -171,7 +172,7 @@ class Commandline extends ViewBase
                 div = document.createElement 'div'
                 div.className = "list-item"
                 namespan = "<span class=\"ko command #{cmmd.prefsID}\" style=\"position:absolute; left: #{ci > 0 and 40 or 6}px\">#{cname}</span>" 
-                shortcut = "<span class=\"ko shortcut #{cmmd.prefsID}\"style=\"position:absolute; right: 0;\">#{combo}</span>" 
+                shortcut = "<span class=\"ko shortcut #{cmmd.prefsID}\"style=\"position:absolute; right: 6px;\">#{keyinfo.short combo}</span>" 
                 div.innerHTML = namespan + shortcut
                 start = (name,combo) => (event) => 
                     @list.remove()
@@ -187,7 +188,6 @@ class Commandline extends ViewBase
         split = window.split
         listTop = split.splitPosY 1
         listHeight = @list.getBoundingClientRect().height
-        log "Commandline.positionList listTop:#{listTop} listHeight:#{listHeight}"
         if (split.elemHeight() - listTop) < listHeight
             listTop = split.splitPosY(0) - listHeight
         @list?.style.top = "#{listTop}px"        
