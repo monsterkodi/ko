@@ -27,6 +27,7 @@ Menu          = electron.Menu
 clipboard     = electron.clipboard
 ipc           = electron.ipcMain
 dialog        = electron.dialog
+disableSnap   = false
 tray          = undefined
 main          = undefined
 execute       = undefined
@@ -121,7 +122,6 @@ ipc.on 'newWindowWithFile', (event, file)  => main.createWindow file
 ipc.on 'maximizeWindow',    (event, winID) => main.toggleMaximize winWithID winID
 ipc.on 'activateWindow',    (event, winID) => main.activateWindowWithID winID
 ipc.on 'saveBounds',        (event, winID) => main.saveWinBounds winWithID winID
-ipc.on 'focusWindow',       (event, winID) => main.focusWindow winWithID winID
 ipc.on 'reloadWindow',      (event, winID) => main.reloadWin winWithID winID
 ipc.on 'prefSet',           (event, k, v)  => prefs.set k, v
 ipc.on 'prefGet',           (event, k, d)  => event.returnValue = prefs.get k, d
@@ -223,10 +223,12 @@ class Main
                 win.webContents.reloadIgnoringCache()
 
     toggleMaximize: (win) ->
+        disableSnap = true
         if win.isMaximized()
             win.unmaximize() 
         else
             win.maximize()
+        disableSnap = false
 
     saveWinBounds: (win) ->
         prefs.set "windows:#{win.id}:bounds",win.getBounds()
@@ -260,16 +262,13 @@ class Main
             visibleWins()[0].showInactive()
             visibleWins()[0].focus()
 
-    focusWindow: (win) => 
-        win?.focus()
-                
-    focusNextWindow: (win) =>
+    activateNextWindow: (win) =>
         allWindows = wins()
         for w in allWindows
             if w == win
                 i = 1 + allWindows.indexOf w
                 i = 0 if i >= allWindows.length
-                @focusWindow allWindows[i]
+                @activateWindowWithID allWindows[i].id
                 return
 
     activateWindowWithID: (wid) =>
@@ -331,6 +330,7 @@ class Main
     # 000   000  000   000  000   000  000   000  000   000   0000000   00000000
         
     arrangeWindows: =>
+        disableSnap = true
         frameSize = 6
         wl = visibleWins()
         {width, height} = electron.screen.getPrimaryDisplay().workAreaSize
@@ -371,6 +371,7 @@ class Main
                     y:      parseInt rh/2+23 
                     width:  parseInt w + ((i-w2 == 0 or i == wl.length-1) and frameSize/2 or frameSize)
                     height: parseInt rh/2
+        disableSnap = false
                 
     # 00000000   00000000   0000000  000000000   0000000   00000000   00000000
     # 000   000  000       000          000     000   000  000   000  000     
@@ -439,9 +440,8 @@ class Main
                     
             setTimeout saveState, 1000
         
-        win.webContents.on 'dom-ready',         winReady
-        win.webContents.on 'did-finish-load',   winLoaded
-                
+        win.webContents.on 'dom-ready',       winReady
+        win.webContents.on 'did-finish-load', winLoaded
         win 
     
     onMoveWin: (event) => @saveWinBounds event.sender
@@ -453,6 +453,7 @@ class Main
     # 000   000  00000000  0000000   000  0000000  00000000
     
     onResizeWin: (event) => 
+        return if disableSnap
         frameSize = 6
         wb = event.sender.getBounds()
         for w in wins()
@@ -509,15 +510,15 @@ class Main
     showAbout: =>    
         cwd = __dirname
         w = new BrowserWindow
-            dir:           cwd
-            preloadWindow: true
-            resizable:     true
-            frame:         true
-            show:          true
-            center:        true
+            dir:             cwd
+            preloadWindow:   true
+            resizable:       true
+            frame:           true
+            show:            true
+            center:          true
             backgroundColor: '#333'            
-            width:         400
-            height:        420
+            width:           400
+            height:          420
         w.loadURL "file://#{cwd}/../about.html"
         w.on 'openFileDialog', @createWindow
 

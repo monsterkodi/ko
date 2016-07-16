@@ -293,6 +293,10 @@ class Split extends event
     
     focus: (n) -> $(n)?.focus()
     reveal: (n) -> @show n
+    focusAnything: ->
+        return @focus '.editor' if @editorVisible()
+        return @focus '.terminal' if @terminalVisible()
+        @focus '.commandline-editor'
         
     #  0000000  000000000   0000000   000000000  00000000
     # 000          000     000   000     000     000     

@@ -2,7 +2,8 @@
 
 - *jump to file (require|path)*
 - *jump to list when multiple matches*
-- *fix layout when aligning*
+
+- *display dirty status in window list*
 
 #### indexer
 - *index whole project in background*
@@ -18,7 +19,7 @@
 - color
 
 #### macro
-- require
+- *require*
 
 #### file state
 - save backup files?
@@ -26,9 +27,6 @@
 
 #### search
 - fix broken syntax highlighting when editing
-
-#### windows
-- *keep (visible) winIDs consecutive from 1*
 
 #### editor
 - save and restore scrollX/Left
@@ -74,5 +72,4 @@
 - git status in numbers
 - shortcut for renaming file
 - tail -f mode
-- markdown mode (replace - with ●)
     

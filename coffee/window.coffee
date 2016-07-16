@@ -382,12 +382,15 @@ document.onkeydown = (event) ->
     {mod, key, combo} = keyinfo.forEvent event
 
     return if not combo
-    
-    if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
-        return
+    return if 'unhandled' != window.titlebar.globalModKeyComboEvent mod, key, combo, event
+    return if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
 
     for i in [1..9]
-        if combo is "command+#{i}" then return ipc.send 'focusWindow', i
+        if combo is "command+#{i}" or combo is "alt+#{i}"
+            ipc.send 'activateWindow', i
+            event.preventDefault()
+            event.stopPropagation()
+            return 
     
     switch combo
         when 'command+enter'    then return ipc.send 'execute', editor.text()
@@ -400,4 +403,5 @@ document.onkeydown = (event) ->
         when 'command+shift+='  then return @changeZoom +1
         when 'command+shift+-'  then return @changeZoom -1
         when 'command+shift+0'  then return @resetZoom()
+        when 'alt+`'            then return window.titlebar.showList()
         

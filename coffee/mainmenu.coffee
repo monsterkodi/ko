@@ -159,7 +159,7 @@ class MainMenu
             ,
                 label:       'Cycle Through Windows'
                 accelerator: 'CmdOrCtrl+`'
-                click:       (i,win) -> main.focusNextWindow win
+                click:       (i,win) -> main.activateNextWindow win
             ,
                 type: 'separator'
             ,   
