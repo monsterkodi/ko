@@ -2,6 +2,7 @@
 
 - *jump to file (require|path)*
 - *jump to list when multiple matches*
+- *fix layout when aligning*
 
 #### indexer
 - *index whole project in background*
@@ -28,7 +29,6 @@
 
 #### windows
 - *keep (visible) winIDs consecutive from 1*
-- list buffers when clicking buffer number in titlebar
 
 #### editor
 - save and restore scrollX/Left

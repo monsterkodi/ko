@@ -20,6 +20,7 @@ frameColor            = #222
 frameBorder           = scrollhandleWidth solid frameColor
 commandlineHeight     = 30px
 titlebarHeight        = 22px
+titlebarFontSize      = 14px
 splithandleHeight     = 6px
 thinBorder            = 1px solid frameColor
 font                  = "Menlo", "Andale Mono", monospace
@@ -205,6 +206,8 @@ infoPadding = 6px
         height          1px
     &.selected
         background      #333
+
+.list.open .list-item
     &.directory
         color           #aaf
         font-weight     bold
@@ -214,6 +217,18 @@ infoPadding = 6px
     &.directory::before
         content         "▸ "
         color           #88f
+
+.list.windows
+    min-width           200px
+    & .list-item
+        font-size       titlebarFontSize    
+    & .dot
+        padding-left    10px
+        padding-right   10px
+        color           #006600
+    & .winid    
+        color           #008815
+        padding-left    62px
 
 //  0000000   000   000  000000000   0000000    0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
 // 000   000  000   000     000     000   000  000       000   000  000   000  000   000  000      000          000     000     
@@ -289,7 +304,7 @@ body
     box-sizing          border-box
     background          #333
     color               #aaa
-    font-size           14px
+    font-size           titlebarFontSize
     padding-left        70px
     padding-right       70px
     white-space         nowrap
@@ -303,7 +318,7 @@ body
     vertical-align      top
     padding-left        10px
     padding-top         3px 
-    
+        
 .titlebar .title::before
     content             attr(data-tip)
     position            absolute
@@ -317,7 +332,7 @@ body
 .titlebar .title:hover::before
     opacity             1
     top                 3px
-    
+
 .titlebar .winid
     color               #555
     &.focus
@@ -632,7 +647,8 @@ canvas
     right               0
     overflow            hidden
 
-.minimapSelections
+// .minimapSelections
+.minimapTopBot
     background-color    #000
     
 .minimapLines
@@ -640,8 +656,9 @@ canvas
     opacity             0.8
 
 .minimapHighlights
+.minimapSelections
 .minimapCursors
-.minimapTopBot
+// .minimapTopBot
     background-color    transparent
         
 // 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000

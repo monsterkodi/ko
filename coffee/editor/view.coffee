@@ -63,24 +63,13 @@ class View extends ViewBase
     #    000     000     000     000      000       000   000  000   000  000   000
     #    000     000     000     0000000  00000000  0000000    000   000  000   000
         
-    updateTitlebar: ->    
-        if @currentFile?
-            title   = path.basename @currentFile
-            tooltip = unresolve @currentFile
-        else
-            title = ''
-        dirty = @do.hasLineChanges()
-        ic = document.hasFocus() and " focus" or ""
-        id = "<span class=\"winid #{ic}\">#{window.winID}</span>"
-        sep = "<span class=\"separator\"></span>"
-        dc = dirty and " dirty" or "clean"
-        dot = @stickySelection and "○" or "●"
-        db = "<span class=\"dot #{dc}#{ic}\">#{dot}</span>"
-        da = dirty and dot or ""
-        txt = id + db 
-        if title.length
-            txt += "<span class=\"title #{dc}#{ic}\" data-tip=\"#{tooltip}\">#{title} #{da}</span>"
-        $('.titlebar').innerHTML = txt
+    updateTitlebar: ->
+        window.titlebar.update
+            winID:  window.winID
+            focus:  document.hasFocus()
+            dirty:  @do.hasLineChanges()
+            file:   @currentFile
+            sticky: @stickySelection            
         
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
     # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     

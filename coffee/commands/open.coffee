@@ -105,7 +105,7 @@ class Open extends Command
     showList: ->
         if not @list?
             @list = document.createElement 'div' 
-            @list.className = 'list'
+            @list.className = 'list open'
             @positionList()
             window.split.elem.appendChild @list 
         @listFiles @files

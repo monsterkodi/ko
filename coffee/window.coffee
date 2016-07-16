@@ -363,8 +363,14 @@ changeZoom: (d) ->
 # 000       000   000  000       000   000       000
 # 000        0000000    0000000   0000000   0000000 
 
-window.onfocus = (event) -> window.editor.updateTitlebar()
 window.onblur  = (event) -> window.editor.updateTitlebar()
+window.onfocus = (event) -> 
+    window.editor.updateTitlebar()
+    if document.activeElement.className == 'body'
+        if split.editorVisible()
+            split.focus '.editor'
+        else
+            split.focus '.commandline-editor'
               
 # 000   000  00000000  000   000
 # 000  000   000        000 000 

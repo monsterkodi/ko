@@ -25,6 +25,12 @@ class Minimap
         @elem = document.createElement 'div'
         @elem.className = 'minimap'
 
+        @topbot = document.createElement 'canvas'
+        @topbot.className = "minimapTopBot"
+        @topbot.height = @height
+        @topbot.width  = @width
+        @elem.appendChild @topbot
+
         @selections = document.createElement 'canvas'
         @selections.className = "minimapSelections"
         @selections.height = @height
@@ -51,12 +57,6 @@ class Minimap
         @cursors.width  = @width
         @elem.appendChild @cursors
 
-        @topbot = document.createElement 'canvas'
-        @topbot.className = "minimapTopBot"
-        @topbot.height = @height
-        @topbot.width  = @width
-        @elem.appendChild @topbot
-        
         @editor.view.appendChild @elem
         @editor.on 'viewHeight',    @onEditorViewHeight
         @editor.on 'numLines',      @onEditorNumLines
@@ -106,7 +106,6 @@ class Minimap
                 
     drawLines: (top=@scroll.exposeTop, bot=@scroll.exposeBot) =>
         ctx = @lines.getContext '2d'
-        # @log "minimap.drawLines #{top}..#{bot} #{@scroll.exposeTop}..#{@scroll.exposeBot}"
         for li in [top..bot]
             diss = @editor.syntax.getDiss li
             y = parseInt((li-@scroll.exposeTop)*@scroll.lineHeight)
@@ -154,11 +153,10 @@ class Minimap
 
     drawTopBot: =>
         @topbot.height = @height
-        @topbot.width = @width
         ctx = @topbot.getContext '2d'
         lh = @scroll.lineHeight/2
         tb = (@editor.scroll.bot-@editor.scroll.top+1)*lh
-        ctx.fillStyle = "rgba(255,255,255,0.15)"
+        ctx.fillStyle = '#222'
         y = parseInt @scroll.lineHeight * @editor.scroll.top - @scroll.exposeTop*@scroll.lineHeight
         ctx.fillRect 0, y, @width, 2*Math.max 4, tb
         b = parseInt @scroll.lineHeight * (@editor.lines.length-0.5-@scroll.exposeTop*@scroll.lineHeight)
@@ -180,7 +178,6 @@ class Minimap
     #  0000000  000   000  000   000  000   000   0000000   00000000
     
     onChanged: (changeInfo) =>
-        # @log "minimap.onChanged", changeInfo
         @drawSelections() if changeInfo.selection.length
         @drawCursors()    if changeInfo.cursors.length
         

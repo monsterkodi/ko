@@ -80,6 +80,7 @@ class Commandline extends ViewBase
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
 
     changed: (changeInfo, action) ->
+        @hideList()
         super changeInfo, action
         if changeInfo.sorted.length
             @cmmd.className = "commandline-command active #{@command?.prefsID}"
@@ -175,13 +176,16 @@ class Commandline extends ViewBase
                 shortcut = "<span class=\"ko shortcut #{cmmd.prefsID}\"style=\"position:absolute; right: 6px;\">#{keyinfo.short combo}</span>" 
                 div.innerHTML = namespan + shortcut
                 start = (name,combo) => (event) => 
-                    @list.remove()
-                    @list = null
+                    @hideList()
                     @startCommand name, combo
                     event.stopPropagation()
                     event.preventDefault()
                 div.addEventListener 'mousedown', start name, combo
                 @list.appendChild div
+
+    hideList: ->
+        @list?.remove()
+        @list = null
         
     positionList: ->
         return if not @list?
