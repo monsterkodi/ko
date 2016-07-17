@@ -95,10 +95,19 @@ class Term extends Command
             switch cmd
                 when 'history' then terminal.output @history.join '\n'
                 when 'clear'   then terminal.clear()
-                when 'classes' 
+                when 'classes'
+                    
+                    #  0000000  000       0000000    0000000   0000000  00000000   0000000
+                    # 000       000      000   000  000       000       000       000     
+                    # 000       000      000000000  0000000   0000000   0000000   0000000 
+                    # 000       000      000   000       000       000  000            000
+                    #  0000000  0000000  000   000  0000000   0000000   00000000  0000000 
+                    
                     window.split.reveal 'terminal'
                     classes = ipc.sendSync 'indexer', 'classes'
-                    for clss, info of classes
+                    log "term.execute classes:", classes
+                    for clss in Object.keys(classes).sort()
+                        info = classes[clss]
                         terminal.appendMeta clss: 'salt', text: clss
                         meta =
                             diss: syntax.dissForTextAndSyntax "● #{clss}", 'ko'

@@ -616,10 +616,9 @@ class ViewBase extends Editor
         find = word.toLowerCase()
         
         jumpToFileLine = (file, line) =>
-            if file == @currentFile
-                @singleCursorAtPos [0, line]
-            else
-                window.loadFile "#{file}:#{line+1}"
+            window.navigate.gotoFilePos
+                file: file
+                pos:  [0, line]
         
         funcs = ipc.sendSync 'indexer', 'funcs'
         for func, infos of funcs

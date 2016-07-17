@@ -139,7 +139,7 @@ ipc.on 'winInfos',               (event)         =>
             file: w.currentFile            
     event.returnValue = infos
 
-ipc.on 'fileLoaded',        (event, file, winID)  => 
+ipc.on 'fileLoaded', (event, file, winID) => 
     winWithID(winID).currentFile = file 
     main.indexer.indexFile file
 
@@ -422,7 +422,7 @@ class Main
             hasShadow:       false
             backgroundColor: '#000'
             titleBarStyle:   'hidden'
-                    
+
         win.loadURL "file://#{__dirname}/../index.html"
         app.dock.show()
         win.on 'close',  @onCloseWin
@@ -433,11 +433,13 @@ class Main
                         
         winLoaded = =>
             if openFile?
+                win.currentFile = openFile
                 win.webContents.send 'loadFile', openFile
                 openFile = null
             else
                 file = prefs.get "windows:#{win.id}:file"
                 if file?
+                    win.currentFile = file
                     win.webContents.send 'loadFile', file
                     
             saveState = =>                 

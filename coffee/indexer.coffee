@@ -9,6 +9,7 @@ resolve,
 last
 }        = require './tools/tools'
 log      = require './tools/log'
+Walker   = require './tools/walker'
 _        = require 'lodash'
 fs       = require 'fs'
 path     = require 'path'
@@ -26,13 +27,46 @@ class Indexer
     @splitRegExp   = new RegExp "[^\\w\\d#\\_]+", 'g'        
     
     constructor: () ->
-        
+        @dirs    = Object.create null
         @files   = Object.create null
         @classes = Object.create null
         @funcs   = Object.create null
         @words   = Object.create null
+        @walker  = null
         @queue   = [] 
-      
+    
+    # 000  000   000  0000000    00000000  000   000        0000000    000  00000000 
+    # 000  0000  000  000   000  000        000 000         000   000  000  000   000
+    # 000  000 0 000  000   000  0000000     00000          000   000  000  0000000  
+    # 000  000  0000  000   000  000        000 000         000   000  000  000   000
+    # 000  000   000  0000000    00000000  000   000        0000000    000  000   000
+    
+    indexDir: (dir) ->
+        
+        return if @dirs[dir]?
+        @dirs[dir] = 
+            name: path.basename dir
+            
+        wopt = 
+            root:        dir
+            includeDir:  dir
+            includeDirs: true
+            dir:         @onWalkerDir
+            file:        @onWalkerFile
+        
+        @walker = new Walker wopt
+        @walker.cfg.ignore.push 'js'
+        @walker.start()        
+    
+    onWalkerDir: (p, stat) =>
+        if not @dirs[p]?
+            @dirs[p] = 
+                name: path.basename p
+        
+    onWalkerFile: (p, stat) =>
+        if not @files[p]? and @queue.indexOf(p) < 0
+            @queue.push p
+        
     # 000  000   000  0000000    00000000  000   000        00000000  000  000      00000000
     # 000  0000  000  000   000  000        000 000         000       000  000      000     
     # 000  000 0 000  000   000  0000000     00000          000000    000  000      0000000 
@@ -71,7 +105,7 @@ class Indexer
                         # 000 0 000  000          000     000   000  000   000  000   000       000
                         # 000   000  00000000     000     000   000   0000000   0000000    0000000 
                         
-                        m = line.match @methodRegExp
+                        m = line.match Indexer.methodRegExp
                         if m?[1]?
                             _.set @classes, "#{currentClass}.methods.#{m[1]}", 
                                 line: li
@@ -102,7 +136,7 @@ class Indexer
                         # 000        0000000   000   000   0000000     000     000   0000000   000   000  0000000 
                         
                         currentClass = null if indent < 4
-                        m = line.match @funcRegExp
+                        m = line.match Indexer.funcRegExp
                         if m?[1]?
                             
                             funcInfo = 
@@ -116,10 +150,9 @@ class Indexer
                             funcStack.push [indent, funcInfo, m[1]]
                             funcAdded = true
 
-                words = line.split @splitRegExp
+                words = line.split Indexer.splitRegExp
                 for word in words
                     _.update @words, "#{word}.count", (n) -> (n ? 0) + 1 
-                    
                     switch word
                         
                         #  0000000  000       0000000    0000000   0000000
@@ -128,7 +161,7 @@ class Indexer
                         # 000       000      000   000       000       000
                         #  0000000  0000000  000   000  0000000   0000000 
                         when 'class'
-                            m = line.match @classRegExp
+                            m = line.match Indexer.classRegExp
                             if m?[1]?
                                 currentClass = m[1]
                                 _.set @classes, "#{m[1]}", 
@@ -141,7 +174,7 @@ class Indexer
                         # 000   000  000       000 0000   000   000  000  000   000  000     
                         # 000   000  00000000   00000 00   0000000   000  000   000  00000000
                         when 'require'
-                            m = line.match @requireRegExp
+                            m = line.match Indexer.requireRegExp
                             if m?[1]? and m[2]?
                                 r = fileInfo.require ? []
                                 r.push [m[1], m[2]]
@@ -158,7 +191,7 @@ class Indexer
                         # 00000000  000  000  0000  000       000      000   000  000   000  000     
                         #  00  00   000  000   000   0000000  0000000   0000000   0000000    00000000
                         when "#include"
-                            m = line.match @includeRegExp
+                            m = line.match Indexer.includeRegExp
                             if m?[1]?
                                 r = fileInfo.require ? []
                                 r.push [null, m[1]]
@@ -183,6 +216,10 @@ class Indexer
 
             for win in BrowserWindow.getAllWindows()
                 win.webContents.send 'filesCount', Object.keys(@files).length
+            
+            pkgPath = Walker.packagePath file
+            if not @dirs[pkgPath]?
+                @indexDir pkgPath
                     
             if @queue.length
                 file = @queue.shift()

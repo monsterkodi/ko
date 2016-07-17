@@ -47,6 +47,15 @@ class Navigate
                     pos:  opt.pos
                     
                 @currentIndex = @filePositions.length-1
+                
+            when 'gotoFilePos'
+                @filePositions = @filePositions.filter (filePos) -> not (filePos.file == opt.file and filePos.pos[1] == opt.pos[1])
+                @filePositions.push 
+                    file: opt.file
+                    pos:  opt.pos
+                    
+                @currentIndex = @filePositions.length-1
+                @navigateToFilePos @filePositions[@currentIndex]
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000
     # 0000  000  000   000  000   000  000  000        000   000     000     000     
@@ -67,6 +76,10 @@ class Navigate
     
     addFilePos: (opt) -> # called from window on editing
         opt.action = 'addFilePos'
+        ipc.send 'navigate', opt
+        
+    gotoFilePos: (opt) -> # called from window jumpTo
+        opt.action = 'gotoFilePos'
         ipc.send 'navigate', opt
 
     backward: () -> ipc.send 'navigate', action: 'backward'

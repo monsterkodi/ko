@@ -14,7 +14,7 @@ $}      = require '../tools/tools'
 log     = require '../tools/log'
 prefs   = require '../tools/prefs'
 profile = require '../tools/profile'
-walker  = require '../tools/walker'
+Walker  = require '../tools/walker'
 Command = require '../commandline/command'
 render  = require '../editor/render'
 syntax  = require '../editor/syntax'
@@ -227,7 +227,7 @@ class Open extends Command
         opt.dir     = path.dirname opt.file if not opt.dir?
         opt.dir     = path.basename opt.dir if not dirExists opt.dir
         @dir        = opt.dir ? @dir
-        @pkg        = walker.packagePath(@dir) ? @dir
+        @pkg        = Walker.packagePath(@dir) ? @dir
         @file       = opt.file
         @files      = []
         @paths      = []
@@ -245,11 +245,11 @@ class Open extends Command
             fopt.maxDepth = 1
             fopt.maxFiles = 300
             # log "open.loadDir fastWalker", fopt
-            @fastWalker = new walker fopt
+            @fastWalker = new Walker fopt
             @fastWalker.start()
             # return
-        @Walker = new walker wopt
-        @Walker.start()        
+        @walker = new Walker wopt
+        @walker.start()        
         
     # 000   000   0000000   000      000   000  00000000  00000000 
     # 000 0 000  000   000  000      000  000   000       000   000

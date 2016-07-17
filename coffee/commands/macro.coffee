@@ -98,7 +98,7 @@ class Macro extends Command
                     editor.moveCursorsDown false, texts.length
                     editor.do.end()
                     return do: "focus #{editor.name}"
-            
+
             # 0000000    0000000     0000000 
             # 000   000  000   000  000      
             # 000   000  0000000    000  0000
@@ -124,7 +124,7 @@ class Macro extends Command
                 editor.singleCursorAtPos [editor.lines[li].length, li]
                 editor.do.end()
                 focus: '.'+editor.name
-            
+
             #  0000000  000       0000000    0000000   0000000
             # 000       000      000   000  000       000     
             # 000       000      000000000  0000000   0000000 

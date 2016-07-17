@@ -17,7 +17,7 @@ fs      = require 'fs'
 _       = require 'lodash'
 
 class Editor extends Buffer
-    
+
     constructor: () ->
         @surroundCharacters = "{}[]()#'\"".split ''
         @currentFile = null

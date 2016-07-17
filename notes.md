@@ -7,7 +7,6 @@
 - display dirty status in window list
 
 #### indexer
-- *index whole project in background*
 - *keep index up to date when file changes*
 
 #### open
