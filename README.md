@@ -110,7 +110,7 @@ ko is an editor for Mac OS X
 ## misc
 non-standard keyboard shortcuts:
 - **F2** global shortcut to activate ko
-- **⌘A** tile windows
+- **⌘A** switch between tiled and stacked windows
 - **⌘⇧N** clone current file in new window
 - **⌘L** select more lines **⌘⇧L** select less lines
 - **⌥up|down** move selected|cursor lines up|down

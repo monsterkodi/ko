@@ -13,13 +13,11 @@
 - show relative path when navigating in history
 - resolve environment variables
 - shared recent files of stacked windows
+- *automatically start salter and konrad in pkg dir*
 
 #### tool
 - measure 
 - color
-
-#### macro
-- *require*
 
 #### file state
 - save backup files?

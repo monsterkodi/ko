@@ -43,7 +43,8 @@ class Indexer
     
     indexDir: (dir) ->
         
-        return if @dirs[dir]?
+        return if not dir? or @dirs[dir]?
+        log "Indexer.indexDir dir:#{dir}"
         @dirs[dir] = 
             name: path.basename dir
             
@@ -53,6 +54,7 @@ class Indexer
             includeDirs: true
             dir:         @onWalkerDir
             file:        @onWalkerFile
+            done:        @shiftQueue
         
         @walker = new Walker wopt
         @walker.cfg.ignore.push 'js'
@@ -66,7 +68,7 @@ class Indexer
     onWalkerFile: (p, stat) =>
         if not @files[p]? and @queue.indexOf(p) < 0
             @queue.push p
-        
+            
     # 000  000   000  0000000    00000000  000   000        00000000  000  000      00000000
     # 000  0000  000  000   000  000        000 000         000       000  000      000     
     # 000  000 0 000  000   000  0000000     00000          000000    000  000      0000000 
@@ -75,7 +77,9 @@ class Indexer
     
     indexFile: (file) ->
         
-        return if @files[file]?
+        return @shiftQueue() if @files[file]?
+        
+        # log "Indexer.indexFile file:#{file}"
         
         fs.readFile file, 'utf8', (err, data) =>
             return if err?
@@ -200,7 +204,6 @@ class Indexer
                                 abspath += '.coffee' if not path.extname m[1]
                                 if not @files[abspath]? and @queue.indexOf(abspath) < 0
                                     if fileExists abspath 
-                                        log "queue", abspath
                                         @queue.push abspath
             if funcAdded
                 
@@ -217,12 +220,14 @@ class Indexer
             for win in BrowserWindow.getAllWindows()
                 win.webContents.send 'filesCount', Object.keys(@files).length
             
-            pkgPath = Walker.packagePath file
-            if not @dirs[pkgPath]?
-                @indexDir pkgPath
-                    
-            if @queue.length
-                file = @queue.shift()
-                @indexFile file
+            @indexDir path.dirname file
+            @indexDir Walker.packagePath file
+            
+            @shiftQueue()
+            
+    shiftQueue: =>
+        if @queue.length
+            file = @queue.shift()
+            @indexFile file
                         
 module.exports = Indexer
