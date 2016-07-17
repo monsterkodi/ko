@@ -65,7 +65,7 @@ class Term extends Command
     # 0000000   000        0000000  000     000           000   000  0000000  000  000   000  0000000 
     
     splitAlias: (command) ->
-        commands = command.split ';'
+        commands = command.trim().split ';'
         if commands.length > 1
             cmds = []
             for cmd in commands
@@ -73,7 +73,17 @@ class Term extends Command
             cmds
         else            
             alias = @getState 'alias', {}
-            split = command.split ' '
+            split = command.trim().split ' '
+            
+            if /^[!]+\d*/.test split[0]
+                if split[0][1] == '!'
+                    index = @history.length-1
+                else
+                    index = parseInt(split[0].slice(1))-1
+                if 0 <= index < @history.length
+                    split.splice 0, 1, @history[index].split ' '
+                    log "hist subst #{index} #{@history[index]}", split
+            
             if alias[split[0]]?
                 @splitAlias (alias[split[0]] + ' ' + split.slice(1).join ' ').trim()
             else
@@ -101,7 +111,7 @@ class Term extends Command
             if cmd == 'alias'
                 @alias args
                 continue
-                
+                                
             switch cmd
                 when 'clear' then terminal.clear()
                 
@@ -123,7 +133,7 @@ class Term extends Command
                             line: li
                             clss: 'termCommand'
                         terminal.appendMeta meta
-                    
+                                            
                 when 'files'
                     
                     # 00000000  000  000      00000000   0000000
