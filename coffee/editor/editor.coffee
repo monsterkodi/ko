@@ -415,8 +415,8 @@ class Editor extends Buffer
     addMainCursor: (dir='down') ->
         @mainCursorMove = 0
         d = switch dir
-            when 'up' then -1
-            when 'down' then +1
+            when 'up'    then -1
+            when 'down'  then +1
         newCursors = _.cloneDeep @cursors
         if not @cursorAtPos [@mainCursor[0], @mainCursor[1]+d]
             newCursors.push [@mainCursor[0], @mainCursor[1]+d]
@@ -429,8 +429,8 @@ class Editor extends Buffer
         @mainCursorMove = 0
         return if @cursors.length >= 999
         d = switch dir
-            when 'up' then -1
-            when 'down' then +1
+            when 'up'    then -1
+            when 'down'  then +1
         newCursors = _.cloneDeep @cursors
         for c in @cursors
             if not @cursorAtPos [c[0], c[1]+d]                
@@ -438,11 +438,12 @@ class Editor extends Buffer
                 break if newCursors.length >= 999
         @sortPositions newCursors
         switch dir
-            when 'up'   then @mainCursor = first newCursors
-            when 'down' then @mainCursor = last  newCursors
+            when 'up'    then @mainCursor = first newCursors
+            when 'down'  then @mainCursor = last  newCursors
         @do.cursors newCursors
 
     alignCursorsAndText: ->
+        @do.start()
         @mainCursorMove = 0
         @clearHighlights()
         newCursors = _.cloneDeep @cursors
@@ -454,8 +455,10 @@ class Editor extends Buffer
         for li, cx of lines
             @do.change li, @lines[li].slice(0, cx) + _.padStart('', newX-cx) + @lines[li].slice(cx)
         @do.cursors newCursors
+        @do.end()
 
     alignCursors: (dir='down') ->
+        @do.start()
         @mainCursorMove = 0
         charPos = switch dir
             when 'up'    then first(@cursors)[0]
@@ -466,9 +469,10 @@ class Editor extends Buffer
         for c in @cursors
             @oldCursorSet newCursors, c, charPos, c[1]
         switch dir
-            when 'up'   then @mainCursor = first newCursors
-            when 'down' then @mainCursor = last  newCursors
+            when 'up'    then @mainCursor = first newCursors
+            when 'down'  then @mainCursor = last  newCursors
         @do.cursors newCursors
+        @do.end()
         
     clampCursors: ->
         newCursors = _.cloneDeep @cursors

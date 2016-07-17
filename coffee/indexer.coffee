@@ -44,7 +44,7 @@ class Indexer
     indexDir: (dir) ->
         
         return if not dir? or @dirs[dir]?
-        log "Indexer.indexDir dir:#{dir}"
+        # log "Indexer.indexDir dir:#{dir}"
         @dirs[dir] = 
             name: path.basename dir
             

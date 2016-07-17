@@ -3,7 +3,8 @@
 #  000 000   000  0000000   000000000  0000000    000000000  0000000   0000000 
 #    000     000  000       000   000  000   000  000   000       000  000     
 #     0      000  00000000  00     00  0000000    000   000  0000000   00000000
-{title
+{
+title
 fileExists,
 fileName,
 swapExt,
@@ -705,22 +706,20 @@ class ViewBase extends Editor
         return if not combo
         return if key == 'right click' # weird right command key
 
+        stop = (event) ->
+            event.preventDefault()
+            event.stopPropagation()        
+
         if @autocomplete?
-            if 'unhandled' != @autocomplete.handleModKeyComboEvent mod, key, combo, event
-                event.preventDefault()
-                event.stopPropagation()
-                return
+            return stop event if 'unhandled' != @autocomplete.handleModKeyComboEvent mod, key, combo, event
         
         if @handleModKeyComboEvent?
-            if 'unhandled' != @handleModKeyComboEvent mod, key, combo, event
-                event.preventDefault()
-                event.stopPropagation()
-                return
+            return stop event if 'unhandled' != @handleModKeyComboEvent mod, key, combo, event
             
         switch combo
             when 'command+esc'              then return @startStickySelection()
-            when 'tab'                      then return @insertTab() + event.preventDefault()
-            when 'shift+tab'                then return @deleteTab() + event.preventDefault()
+            when 'tab'                      then return stop event, @insertTab()
+            when 'shift+tab'                then return stop event, @deleteTab()
             when 'enter'                    then return @insertNewline indent: true
             when 'command+enter'            then return @moveCursorsToLineBoundary('right') and @insertNewline indent: true
             when 'alt+enter'                then return @jumpTo @wordAtCursor()
@@ -781,16 +780,14 @@ class ViewBase extends Editor
             when 'end'  then return @singleCursorAtPos [0,@lines.length-1], event.shiftKey
             when 'page up'
                 @moveCursorsUp event.shiftKey, @numFullLines()-3
-                event.preventDefault() # prevent view from scrolling
-                return
+                return stop event
             when 'page down'
                 @moveCursorsDown event.shiftKey, @numFullLines()-3
-                event.preventDefault() # prevent view from scrolling
-                return
+                return stop event
             
             when 'down', 'right', 'up', 'left' 
                 @moveCursors key, event.shiftKey
-                event.preventDefault() # prevent view from scrolling
+                stop event
 
         ansiKeycode = require 'ansi-keycode'
         if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]

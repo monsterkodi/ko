@@ -134,9 +134,9 @@ class AnsiDiss
                     when code is 49         then bg = STYLES["b0"]  # default background
                     when code is 38         then fg = STYLES["f#{cs[2]}"] # extended fg 38;5;[0-255]
                     when code is 48         then bg = STYLES["b#{cs[2]}"] # extended bg 48;5;[0-255]
-                    when 30 <= code <= 37   then fg = STYLES["f#{code - 30}"] # normal intensity
-                    when 40 <= code <= 47   then bg = STYLES["b#{code - 40}"]
-                    when 90 <= code <= 97   then fg = STYLES["f#{8+code - 90}"]  # high intensity
+                    when  30 <= code <= 37  then fg = STYLES["f#{code - 30}"] # normal intensity
+                    when  40 <= code <= 47  then bg = STYLES["b#{code - 40}"]
+                    when  90 <= code <= 97  then fg = STYLES["f#{8+code - 90}"]  # high intensity
                     when 100 <= code <= 107 then bg = STYLES["b#{8+code - 100}"]
                     when code is 28         then delStyle 'display:none'
                     when code is 22         

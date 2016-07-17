@@ -71,9 +71,9 @@ class Open extends Command
             matchWeight = (f) =>
                 f = f.slice 0, f.length-2 if f.endsWith ' >'
                 bonus = switch path.extname(f)         
-                    when '.coffee' then 1000
-                    when '.md', '.styl', '.pug' then 500
-                    when '.noon' then 250
+                    when '.coffee'               then 1000
+                    when '.md', '.styl', '.pug'  then 500
+                    when '.noon'                 then 250
                     when '.js', '.json', '.html' then -100
                     else 
                         0 
@@ -278,9 +278,9 @@ class Open extends Command
             
             if not @navigating
                 bonus = switch path.extname(f)         
-                    when '.coffee' then 100
-                    when '.md', '.styl', '.pug' then 50
-                    when '.noon' then 25
+                    when '.coffee'               then 100
+                    when '.md', '.styl', '.pug'  then 50
+                    when '.noon'                 then 25
                     when '.js', '.json', '.html' then -1000000
                     else 0 
             else
@@ -299,9 +299,9 @@ class Open extends Command
             
             if @navigating
                 bonus = switch path.extname(f)         
-                    when '.coffee' then 100
-                    when '.md', '.styl', '.pug' then 50
-                    when '.noon' then 25
+                    when '.coffee'               then 100
+                    when '.md', '.styl', '.pug'  then 50
+                    when '.noon'                 then 25
                     when '.js', '.json', '.html' then -10
                     else 0
             else

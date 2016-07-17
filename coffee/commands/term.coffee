@@ -3,11 +3,14 @@
 #    000     0000000   0000000    000000000
 #    000     000       000   000  000 0 000
 #    000     00000000  000   000  000   000
-
+{
+unresolve
+}        = require '../tools/tools'
 log      = require '../tools/log'
 syntax   = require '../editor/syntax'
 Command  = require '../commandline/command'
 electron = require 'electron'
+path     = require 'path'
 ipc      = electron.ipcRenderer
 
 class Term extends Command
@@ -86,15 +89,82 @@ class Term extends Command
         super command
         terminal = window.terminal
         cmds = @splitAlias command
-        for cmd in cmds
-            terminal.appendMeta clss: 'salt', text: cmd.slice 0, 32                        
+        for cmmd in cmds
+            terminal.appendMeta clss: 'salt', text: cmmd.slice 0, 32                        
             terminal.singleCursorAtPos [0, terminal.lines.length-1]
-            if cmd.startsWith 'alias'
-                @alias cmd.split(' ').slice 1
+                
+            args = cmmd.split ' '
+            cmd  = args.shift()
+                
+            if cmd == 'alias'
+                @alias args
                 continue
+                
             switch cmd
                 when 'history' then terminal.output @history.join '\n'
                 when 'clear'   then terminal.clear()
+                when 'files'
+                    
+                    # 00000000  000  000      00000000   0000000
+                    # 000       000  000      000       000     
+                    # 000000    000  000      0000000   0000000 
+                    # 000       000  000      000            000
+                    # 000       000  0000000  00000000  0000000 
+                    
+                    window.split.reveal 'terminal'
+                    files = ipc.sendSync 'indexer', 'files'
+                    lastDir = ''
+                    li = 1
+                    for file in Object.keys(files).sort()
+                        continue if args.length and not new RegExp(".*(#{args.join '|'})").test file
+                        info = files[file]
+                        pth  = unresolve file
+                        if lastDir != path.dirname pth
+                            lastDir = path.dirname pth
+                        else
+                            pth = _.padStart('', lastDir.length+1) + path.basename pth
+                        meta =
+                            diss: syntax.dissForTextAndSyntax "◼ #{pth}", 'ko'
+                            href: "#{file}:0"
+                            line: li
+                            clss: 'searchResult'
+                        terminal.appendMeta meta
+                        li += 1
+                        
+                when 'funcs'
+                    
+                    # 00000000  000   000  000   000   0000000   0000000
+                    # 000       000   000  0000  000  000       000     
+                    # 000000    000   000  000 0 000  000       0000000 
+                    # 000       000   000  000  0000  000            000
+                    # 000        0000000   000   000   0000000  0000000 
+                    
+                    window.split.reveal 'terminal'
+                    funcs = ipc.sendSync 'indexer', 'funcs'
+                    char = ''
+                    for func in Object.keys(funcs).sort()
+                        infos = funcs[func]
+                        funcn = func
+                        funcn = "@#{func}" if infos[0].static 
+                        continue if args.length and not new RegExp(".*(#{args.join '|'})").test funcn
+                        i = 0
+                        for info in infos
+                            if func[0] != char
+                                char = func[0]
+                                terminal.appendMeta clss: 'salt', text: char                        
+                            classOrFile = info.class? and "● #{info.class}" or "◼ #{path.basename info.file}"
+                            if i == 0
+                                diss = syntax.dissForTextAndSyntax "▸ #{funcn} #{classOrFile}", 'ko'
+                            else
+                                spcs = _.padStart '', "▸ #{func}".length
+                                diss = syntax.dissForTextAndSyntax "#{spcs} #{classOrFile}", 'ko'
+                            meta =
+                                diss: diss
+                                href: "#{info.file}:#{info.line+1}"
+                                clss: 'searchResult'
+                            terminal.appendMeta meta
+                            i += 1
+                        
                 when 'classes'
                     
                     #  0000000  000       0000000    0000000   0000000  00000000   0000000
@@ -105,8 +175,8 @@ class Term extends Command
                     
                     window.split.reveal 'terminal'
                     classes = ipc.sendSync 'indexer', 'classes'
-                    log "term.execute classes:", classes
                     for clss in Object.keys(classes).sort()
+                        continue if args.length and not new RegExp(".*(#{args.join '|'})", 'i').test clss
                         info = classes[clss]
                         terminal.appendMeta clss: 'salt', text: clss
                         meta =
@@ -122,7 +192,7 @@ class Term extends Command
                                 clss: 'searchResult'
                             terminal.appendMeta meta
                 else
-                    ipc.send 'shellCommand', winID: window.winID, cmdID: @cmdID, command: cmd
+                    ipc.send 'shellCommand', winID: window.winID, cmdID: @cmdID, command: cmmd
                     @cmdID += 1
                     
         terminal.scrollCursorToTop 5

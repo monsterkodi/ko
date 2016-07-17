@@ -112,6 +112,7 @@ non-standard keyboard shortcuts:
 - **F2** global shortcut to activate ko
 - **⌘A** switch between tiled and stacked windows
 - **⌘⇧N** clone current file in new window
+- **⌥`** open window list
 - **⌘L** select more lines **⌘⇧L** select less lines
 - **⌥up|down** move selected|cursor lines up|down
 - **⌥/** toggle comment on selected|cursor lines

@@ -123,7 +123,7 @@ class Meta
             meta[2].span = e.numberSpan
             switch meta[2].clss
                 when 'searchResult'
-                    e.numberSpan.innerHTML = meta[2].state == 'unsaved' and @saveButton(meta[0]) or meta[2].href.split(':')[1]
+                    e.numberSpan.innerHTML = meta[2].state == 'unsaved' and @saveButton(meta[0]) or meta[2].line or meta[2].href.split(':')[1]
                 else
                     e.numberSpan.innerHTML = '&nbsp;'
 
@@ -155,7 +155,7 @@ class Meta
        
     onClick: (event) =>
         if not event.altKey
-            event.stopPropagation()
+            # event.stopPropagation()
             window.loadFile event.target.href
         
     #  0000000   00000000   00000000   00000000  000   000  0000000  
