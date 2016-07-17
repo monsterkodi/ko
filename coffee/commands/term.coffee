@@ -103,14 +103,20 @@ class Term extends Command
             alias = @getState 'alias', {}
             split = command.trim().split ' '
             if /^[!]+\d*/.test split[0]
-                if split[0][1] == '!'
-                    split.splice 0, 1, last @history
+                if split[0] == '!'
+                    return ['history']
+                else if split[0][1] == '!'
+                    if split[0][2] == '~'
+                        @deleteCommandWithID @commandIDs[last @history]
+                        return ['history']
+                    else
+                        split.splice 0, 1, last @history
                 else if split[0][1] == '~'
                     if split[0].length > 2
                         @deleteCommandWithID split[0].slice 2
                     for id in split.slice 1
                         @deleteCommandWithID id
-                    return ['']
+                    return ['history']
                 else if @idCommands[parseInt(split[0].slice(1))]?
                     split.splice 0, 1, @idCommands[parseInt(split[0].slice(1))]                
             
@@ -170,6 +176,7 @@ class Term extends Command
                     
                     for h in @history
                         continue if args.length and not filterRegExp(args).test h
+                        continue if not @commandIDs[h]
                         meta =
                             diss: syntax.dissForTextAndSyntax "#{h}", 'ko'
                             cmmd: h
