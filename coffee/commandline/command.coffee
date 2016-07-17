@@ -47,6 +47,12 @@ class Command
     # 000   000  000       000     000     000   000  000   000     000   
     # 000   000  000  0000000      000      0000000   000   000     000   
     
+    clearHistory: ->
+        @history = []
+        @index   = -1
+        @setState 'history', @history
+        @setState 'index', @index
+    
     setCurrentText: (command) -> 
         @setCurrent command
         if @commandline.command == @

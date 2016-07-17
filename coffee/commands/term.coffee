@@ -4,7 +4,9 @@
 #    000     000       000   000  000 0 000
 #    000     00000000  000   000  000   000
 {
-unresolve
+unresolve,
+clamp,
+last
 }        = require '../tools/tools'
 log      = require '../tools/log'
 syntax   = require '../editor/syntax'
@@ -16,6 +18,8 @@ ipc      = electron.ipcRenderer
 class Term extends Command
 
     constructor: (@commandline) ->
+        @idCommands = Object.create null
+        @commandIDs = Object.create null
         @shortcuts  = ['command+t', 'command+shift+t']
         @names      = ['term', 'Term']
         super @commandline
@@ -38,6 +42,30 @@ class Term extends Command
             window.terminal.clear()
         else
             text: ''
+            
+    loadState: ->
+        @idCommands = @getState 'idCommands', Object.create null
+        @commandIDs = @getState 'commandIDs', Object.create null
+        super
+
+    clearHistory: ->
+        @idCommands = Object.create null
+        @commandIDs = Object.create null
+        @setState 'commandIDs', @commandIDs
+        @setState 'idCommands', @idCommands
+        super 
+
+    deleteCommandWithID: (id) ->
+        id = parseInt id
+        if cmmd = @idCommands[id]
+            _.pull @history, cmmd
+            @index = clamp 0, @history.length-1, @index
+            delete @commandIDs[cmmd]
+            delete @idCommands[id]
+            @setState 'index',      @index
+            @setState 'history',    @history
+            @setState 'commandIDs', @commandIDs
+            @setState 'idCommands', @idCommands
        
     #  0000000   000      000   0000000    0000000
     # 000   000  000      000  000   000  000     
@@ -74,20 +102,22 @@ class Term extends Command
         else            
             alias = @getState 'alias', {}
             split = command.trim().split ' '
-            
             if /^[!]+\d*/.test split[0]
                 if split[0][1] == '!'
-                    index = @history.length-1
-                else
-                    index = parseInt(split[0].slice(1))-1
-                if 0 <= index < @history.length
-                    split.splice 0, 1, @history[index].split ' '
-                    log "hist subst #{index} #{@history[index]}", split
+                    split.splice 0, 1, last @history
+                else if split[0][1] == '~'
+                    if split[0].length > 2
+                        @deleteCommandWithID split[0].slice 2
+                    for id in split.slice 1
+                        @deleteCommandWithID id
+                    return ['']
+                else if @idCommands[parseInt(split[0].slice(1))]?
+                    split.splice 0, 1, @idCommands[parseInt(split[0].slice(1))]                
             
             if alias[split[0]]?
                 @splitAlias (alias[split[0]] + ' ' + split.slice(1).join ' ').trim()
             else
-                [command.trim()]
+                [split.join ' ']
                 
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
@@ -96,9 +126,20 @@ class Term extends Command
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
     
     execute: (command) ->
-        super command
+        return if not command.trim().length
         terminal = window.terminal
         cmds = @splitAlias command
+        command = cmds.join ' '
+        switch
+            when command[0] == '!'            then
+            when command == 'clear'           then
+            when command.startsWith 'history' then
+            else 
+                @commandIDs[command] = Object.keys(@commandIDs).length+1 if not @commandIDs[command]?
+                @idCommands[@commandIDs[command]] = command
+                @setState 'commandIDs', @commandIDs
+                @setState 'idCommands', @idCommands
+                super command # @setCurrent command -> moves items in @history
         for cmmd in cmds
             terminal.appendMeta clss: 'salt', text: cmmd.slice 0, 32                        
             terminal.singleCursorAtPos [0, terminal.lines.length-1]
@@ -123,14 +164,16 @@ class Term extends Command
                     # 000   000  000       000     000     000   000  000   000     000   
                     # 000   000  000  0000000      000      0000000   000   000     000   
                     
-                    li = 0
+                    if args.length == 1 and args[0] == 'clear'
+                        @clearHistory()
+                        return
+                    
                     for h in @history
-                        li += 1
                         continue if args.length and not filterRegExp(args).test h
                         meta =
                             diss: syntax.dissForTextAndSyntax "#{h}", 'ko'
                             cmmd: h
-                            line: li
+                            line: @commandIDs[h]
                             clss: 'termCommand'
                         terminal.appendMeta meta
                                             

@@ -222,6 +222,7 @@ class Commandline extends ViewBase
         split = window.split
         switch combo
             when 'enter'                then return @execute()
+            when 'command+enter'        then return @execute() + window.split.do "focus #{@command?.focus}"
             when 'up'                   then return @setAndSelectText @command?.prev()
             when 'down'                 then return @setAndSelectText @command?.next()
             when 'esc'                  then return @cancel()

@@ -123,7 +123,7 @@ class Meta
             meta[2].span = e.numberSpan
             switch meta[2].clss
                 when 'searchResult', 'termCommand'
-                    e.numberSpan.innerHTML = meta[2].state == 'unsaved' and @saveButton(meta[0]) or meta[2].line or meta[2].href.split(':')[1]
+                    e.numberSpan.innerHTML = meta[2].state == 'unsaved' and @saveButton(meta[0]) or meta[2].line? and meta[2].line or meta[2].href?.split(':')[1] or '?'
                 else
                     e.numberSpan.innerHTML = '&nbsp;'
 
