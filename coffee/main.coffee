@@ -408,12 +408,18 @@ class Main
     # 000       000   000  000       000   000     000     000     
     #  0000000  000   000  00000000  000   000     000     00000000
        
-    newWindowWithFile: (file) -> @createWindow(file).id
+    newWindowWithFile: (file, pos) -> @createWindow(file, pos).id
             
-    createWindow: (openFile) ->
+    createWindow: (openFile, pos) ->
+        
+        {width, height} = screenSize()
+        ww = height + 122
+        
         win = new BrowserWindow
-            width:           1000
-            height:          1200
+            x:               parseInt (width-ww)/2
+            y:               0
+            width:           ww
+            height:          height
             minWidth:        140
             minHeight:       130
             useContentSize:  true
@@ -435,6 +441,7 @@ class Main
             if openFile?
                 win.currentFile = openFile
                 win.webContents.send 'loadFile', openFile
+                win.webContents.send 'singleCursorAtPos', pos if pos?
                 openFile = null
             else
                 file = prefs.get "windows:#{win.id}:file"

@@ -65,8 +65,10 @@ class Navigate
     
     navigateToFilePos: (filePos) ->
         id = @main.activateWindowWithFile filePos.file
-        id = @main.newWindowWithFile filePos.file if not id?
-        @main.winWithID(id).send 'singleCursorAtPos', filePos.pos if id?
+        if id?
+            @main.winWithID(id).webContents.send 'singleCursorAtPos', filePos.pos 
+        else
+            @main.newWindowWithFile filePos.file, filePos.pos if not id?
     
     #  0000000   0000000    0000000          00000000  000  000      00000000        00000000    0000000    0000000
     # 000   000  000   000  000   000        000       000  000      000             000   000  000   000  000     
