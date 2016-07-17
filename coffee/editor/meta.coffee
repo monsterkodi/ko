@@ -122,7 +122,7 @@ class Meta
         for meta in metas
             meta[2].span = e.numberSpan
             switch meta[2].clss
-                when 'searchResult'
+                when 'searchResult', 'termCommand'
                     e.numberSpan.innerHTML = meta[2].state == 'unsaved' and @saveButton(meta[0]) or meta[2].line or meta[2].href.split(':')[1]
                 else
                     e.numberSpan.innerHTML = '&nbsp;'
@@ -146,17 +146,22 @@ class Meta
         div.style.width = "#{sw}px"
         div.style.height = "#{lh}px"
         if meta[2].href?
-            # div.setAttribute 'onclick', "window.loadFile('#{meta[2].href}');" 
             div.addEventListener 'mousedown', @onClick
             div.href = meta[2].href
             div.classList.add 'href'
+        else if meta[2].cmmd?
+            div.addEventListener 'mousedown', @onClick
+            div.cmmd = meta[2].cmmd
+            div.classList.add 'cmmd'
         @elem.appendChild div
         meta[2].div = div
        
     onClick: (event) =>
         if not event.altKey
-            # event.stopPropagation()
-            window.loadFile event.target.href
+            if event.target.href?
+                window.loadFile event.target.href
+            else if event.target.cmmd?
+                window.commandline.commands['term'].execute event.target.cmmd
         
     #  0000000   00000000   00000000   00000000  000   000  0000000  
     # 000   000  000   000  000   000  000       0000  000  000   000

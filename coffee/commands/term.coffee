@@ -19,7 +19,7 @@ class Term extends Command
         @shortcuts  = ['command+t', 'command+shift+t']
         @names      = ['term', 'Term']
         super @commandline
-        @maxHistory = 100
+        @maxHistory = 99
         @cmdID      = 0
         
     onShellCommandData: (cmdData)  => 
@@ -95,14 +95,35 @@ class Term extends Command
                 
             args = cmmd.split ' '
             cmd  = args.shift()
+              
+            filterRegExp = (args) -> new RegExp("(#{args.join '|'})", 'i')
                 
             if cmd == 'alias'
                 @alias args
                 continue
                 
             switch cmd
-                when 'history' then terminal.output @history.join '\n'
-                when 'clear'   then terminal.clear()
+                when 'clear' then terminal.clear()
+                
+                when 'history' 
+                    
+                    # 000   000  000   0000000  000000000   0000000   00000000   000   000
+                    # 000   000  000  000          000     000   000  000   000   000 000 
+                    # 000000000  000  0000000      000     000   000  0000000      00000  
+                    # 000   000  000       000     000     000   000  000   000     000   
+                    # 000   000  000  0000000      000      0000000   000   000     000   
+                    
+                    li = 0
+                    for h in @history
+                        li += 1
+                        continue if args.length and not filterRegExp(args).test h
+                        meta =
+                            diss: syntax.dissForTextAndSyntax "#{h}", 'ko'
+                            cmmd: h
+                            line: li
+                            clss: 'termCommand'
+                        terminal.appendMeta meta
+                    
                 when 'files'
                     
                     # 00000000  000  000      00000000   0000000
@@ -116,7 +137,7 @@ class Term extends Command
                     lastDir = ''
                     li = 1
                     for file in Object.keys(files).sort()
-                        continue if args.length and not new RegExp(".*(#{args.join '|'})").test file
+                        continue if args.length and not filterRegExp(args).test file
                         info = files[file]
                         pth  = unresolve file
                         if lastDir != path.dirname pth
@@ -146,7 +167,7 @@ class Term extends Command
                         infos = funcs[func]
                         funcn = func
                         funcn = "@#{func}" if infos[0].static 
-                        continue if args.length and not new RegExp(".*(#{args.join '|'})").test funcn
+                        continue if args.length and not filterRegExp(args).test funcn
                         i = 0
                         for info in infos
                             if func[0] != char
@@ -176,7 +197,7 @@ class Term extends Command
                     window.split.reveal 'terminal'
                     classes = ipc.sendSync 'indexer', 'classes'
                     for clss in Object.keys(classes).sort()
-                        continue if args.length and not new RegExp(".*(#{args.join '|'})", 'i').test clss
+                        continue if args.length and not filterRegExp(args).test clss
                         info = classes[clss]
                         terminal.appendMeta clss: 'salt', text: clss
                         meta =
