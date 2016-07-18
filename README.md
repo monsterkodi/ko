@@ -14,7 +14,7 @@ ko is an editor for macOS
     - includes lots fancy of shortcuts
 
 **commandline**
-- a single, non-intrusive input line to 
+- a single, non-intrusive input line to ...
     - open files quickly
     - find in text and search in files
     - input terminal and macro commands
