@@ -11,17 +11,15 @@ ko is an editor for macOS
     - loads large files
     - keyboard centric (nothing you can only do with the mouse)
 - **commandline**
-    - a single, non-intrusive input line to controll ko
+    - a single, non-intrusive input line to 
+        - open files quickly
+        - find in text and search in files
+        - input terminal and macro commands
 - **terminal**
     - alias
     - history
     - echos commands as ascii headers
     - output of commands editable/searchable
-- **minimap**
-    - shows cursors and selections
-    - also for terminal/search-result!
-    - can be used to select large portions of text
-    - sets cursor by default when dragging/clicking
 - **file search**
     - search for strings/regexp in project files
     - automatic determination of project files
@@ -33,8 +31,13 @@ ko is an editor for macOS
         - main cursor is always distuingishable
         - main cursor can be moved independently from other cursors
     - powerful set of keyboard shortcuts
+- **minimap**
+    - shows cursors and selections
+    - also for terminal/search-result!
+    - can be used to select large portions of text
+    - sets cursor by default when dragging/clicking
 - **autocomplete**
-    - completes words from visited files
+    - completes words from visited files and project files
 - **syntax highlighting**
     - for coffee, cpp, h, html, js, json, md, noon, pug, py, sh, styl       
     - ansi-colors in terminal view
@@ -60,34 +63,29 @@ ko is an editor for macOS
     
 ![commandline](img/commandline.png)
 
-## minimap
-
-- **⌘** while dragging to turn off cursor placement
-- **⇧** while dragging/clicking to select lines
-
 ## terminal
 
 - **⌘T** to activate input
 - special commands
-    - alias
+    - **alias**
         - without argument: list aliases
         - with one argument: clear alias
-        - with tow arguments: set alias
-    - history
+        - with two arguments: set alias
+    - **history**
         - without argument: list command history
         - !! to repeat last command
         - !n to repeat command with id n
         - !~n to remove command with id n
-    - classes
+    - **classes**
         - list coffee-script classes and their methods
         - with argument: filter
-    - funcs
+    - **funcs**
         - list coffee-script functions and methods
         - with argument: filter
-    - files
+    - **files**
         - list indexed project files
         - with argument: filter
-- all other commands are passed to a child_process running bash
+- all other commands are passed to a child process running bash
     - only works for commands that terminate!
 
 ![terminal](img/terminal.png)
@@ -152,6 +150,11 @@ ko is an editor for macOS
 - negative number: jump to line relative to end of file
 - **⌥enter** (in editor) goto word under main cursor
 - **⌥click** (in editor) goto clicked word
+
+## minimap
+
+- **⌘** while dragging to turn off cursor placement
+- **⇧** while dragging/clicking to select lines
 
 ## misc
 non-standard keyboard shortcuts:
