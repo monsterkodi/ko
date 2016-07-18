@@ -83,9 +83,7 @@ delState = window.delState = (key) ->
 
 ipc.on 'shellCommandData',  (event, cmdData) => commandline.commands['term'].onShellCommandData cmdData
 ipc.on 'executeResult',     (event, arg) => terminal.appendText str arg
-ipc.on 'singleCursorAtPos', (event, pos) => 
-    log "singleCursorAtPos #{editor?}", pos
-    editor.singleCursorAtPos pos
+ipc.on 'singleCursorAtPos', (event, pos) => editor.singleCursorAtPos pos
 ipc.on 'openFile',          (event, options) => openFile options
 ipc.on 'focusEditor',       (event) => split.focus '.editor'
 ipc.on 'cloneFile',  => ipc.send 'newWindowWithFile', editor.currentFile
@@ -116,7 +114,6 @@ ipc.on 'fileLinesChanged', (event, file, lineChanges) =>
 
 saveFile = (file) =>
     file ?= editor.currentFile
-    # log "window.saveFile file:#{file}"
     if not file?
         saveFileAs()
         return

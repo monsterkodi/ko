@@ -214,7 +214,7 @@ class Commandline extends ViewBase
         return 'unhandled'            
 
     handleModKeyComboEvent: (mod, key, combo, event) ->
-        
+        # log "Commandline.handleModKeyComboEvent mod:#{mod} key:#{key} combo:#{combo}"
         if @command?
             return if @command.handleModKeyComboEvent(mod, key, combo, event) != 'unhandled'
         

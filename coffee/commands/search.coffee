@@ -22,7 +22,9 @@ class Search extends Command
         @shortcuts = ["command+shift+f", "ctrl+shift+f", "alt+shift+f", "alt+ctrl+shift+f"]
         @names     = ["search", "Search", "/search/", "/Search/"]
         super @commandline
-        
+     
+    historyKey: -> @name
+            
     #  0000000  000      00000000   0000000   00000000 
     # 000       000      000       000   000  000   000
     # 000       000      0000000   000000000  0000000  
@@ -43,13 +45,15 @@ class Search extends Command
     
     execute: (command) ->
         return if not command.length
-        super command
+        command = super command
         @startSearchInFiles 
             text: command
             name: @name
             file: window.editor.currentFile
         focus: '.terminal'
         reveal: 'terminal'
+        text:   command
+        select: true
       
     #  0000000  00000000   0000000   00000000    0000000  000   000
     # 000       000       000   000  000   000  000       000   000
@@ -116,7 +120,7 @@ class FileSearcher extends stream.Writable
         if @found.length
             terminal = window.terminal
             meta = 
-                diss: syntax.dissForTextAndSyntax "● #{unresolve @file}:", 'ko'
+                diss: syntax.dissForTextAndSyntax "◼ #{unresolve @file}", 'ko'
                 href: @file
             terminal.appendMeta meta
             terminal.appendMeta clss: 'spacer'

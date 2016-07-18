@@ -363,11 +363,11 @@ class Buffer extends event
             else
                 t = _.escapeRegExp t if type in ['str', 'Str', 'glob']
                 switch type
-                    when 'str', 'reg' then s = 'gi'
-                    when 'Str', 'Reg' then s = 'g'
+                    when 'str', 'reg', 'glob' then s = 'gi'
+                    when 'Str', 'Reg'         then s = 'g'
                 if type is 'glob'
-                    t = t.replace new RegExp("\\\*", 'g'), "\w*"
-                    log "glob regexp #{t}"
+                    t = t.replace new RegExp("\\*", 'g'), "\w*"
+                    return r if not t.length
                 re = new RegExp t, s            
                 while (mtch = re.exec(@lines[i])) != null
                     r.push [i, [mtch.index, re.lastIndex]]

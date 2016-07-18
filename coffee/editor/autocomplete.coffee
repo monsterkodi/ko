@@ -58,7 +58,7 @@ class Autocomplete extends event
                     _.pull @wordlist, @word
                     delete @wordinfo[@word]
                     
-            when 'insert'        
+            when 'insert'
                 return if not @word?.length
                 return if not @wordlist?.length
                 
@@ -158,10 +158,10 @@ class Autocomplete extends event
         @moveClonesBy @span.innerHTML.length
         @span.classList.remove 'selected' if @selected < 0
         @span.classList.add    'selected' if @selected >= 0
-        @navigating = true
         
     prev: -> @navigate -1    
     next: -> @navigate 1
+    last: -> @navigate @matchList.length - @selected
 
     # 00     00   0000000   000   000  00000000   0000000  000       0000000   000   000  00000000   0000000
     # 000   000  000   000  000   000  000       000       000      000   000  0000  000  000       000     
@@ -256,7 +256,6 @@ class Autocomplete extends event
     close: =>
         @list?.remove()
         @span?.remove()
-        @navigating = false
         @selected   = -1
         @list       = null
         @span       = null
@@ -308,7 +307,8 @@ class Autocomplete extends event
                     if @selected >= 0
                         @prev()
                         return
-                    else if @navigating
+                    else 
+                        @last()
                         return
         @close()   
         return 'unhandled'

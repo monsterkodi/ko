@@ -60,7 +60,7 @@ class Open extends Command
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
 
     changed: (command) ->
-        if not @list? 
+        if not @list?
             @start @shortcuts[0]
         command  = command.trim()
         return if command in ['.', '..', '/', '~']
@@ -103,11 +103,7 @@ class Open extends Command
     # 0000000  000  0000000      000   
 
     showList: ->
-        if not @list?
-            @list = document.createElement 'div' 
-            @list.className = 'list open'
-            @positionList()
-            window.split.elem.appendChild @list 
+        super
         @listFiles @files
             
     listFiles: (files) ->
@@ -129,65 +125,7 @@ class Open extends Command
                 div.value = file
                 @list.appendChild div
                 index += 1
-
-    onBot: (bot) => 
-        cl = window.split.commandlineHeight + window.split.handleHeight
-        if bot < cl
-            @list?.style.opacity = "#{clamp 0, 1, bot/cl}"
-        else
-            @list?.style.opacity = "1"
-        @positionList()
-    
-    positionList: ->
-        return if not @list?
-        split = window.split
-        listTop = split.splitPosY 1
-        listHeight = @list.getBoundingClientRect().height
-        if (split.elemHeight() - listTop) < listHeight
-            listTop = split.splitPosY(0) - listHeight
-        @list?.style.top = "#{listTop}px"
                 
-    # 00000000   00000000   00000000  000   000
-    # 000   000  000   000  000       000   000
-    # 00000000   0000000    0000000    000 000 
-    # 000        000   000  000          000   
-    # 000        000   000  00000000      0    
-            
-    prev: -> 
-        if @index == @history.length-1 and @selected > 0
-            @select clamp 0, @list.children.length, @selected-1
-            @list.children[@selected]?.value ? @history[@index]
-        else if @navigating
-            @select(-1)
-            super
-        
-    # 000   000  00000000  000   000  000000000
-    # 0000  000  000        000 000      000   
-    # 000 0 000  0000000     00000       000   
-    # 000  0000  000        000 000      000   
-    # 000   000  00000000  000   000     000   
-    
-    next: -> 
-        if @list? and @index == @history.length-1
-            @select clamp 0, @list.children.length, @selected+1
-            @list.children[@selected]?.value ? @history[@index]
-        else
-            @select(-1)
-            super
-        
-    #  0000000  00000000  000      00000000   0000000  000000000
-    # 000       000       000      000       000          000   
-    # 0000000   0000000   000      0000000   000          000   
-    #      000  000       000      000       000          000   
-    # 0000000   00000000  0000000  00000000   0000000     000   
-        
-    select: (i) ->
-        @list?.children[@selected]?.classList.remove 'selected'
-        @selected = clamp -1, @list?.children.length-1, i
-        if @selected >= 0
-            @list?.children[@selected]?.classList.add 'selected'
-            @list?.children[@selected]?.scrollIntoViewIfNeeded()
-        
     #  0000000   00000000   00000000  000   000          00000000  000  000      00000000
     # 000   000  000   000  000       0000  000          000       000  000      000     
     # 000   000  00000000   0000000   000 0 000          000000    000  000      0000000 
@@ -244,10 +182,8 @@ class Open extends Command
             fopt.root     = @dir
             fopt.maxDepth = 1
             fopt.maxFiles = 300
-            # log "open.loadDir fastWalker", fopt
             @fastWalker = new Walker fopt
             @fastWalker.start()
-            # return
         @walker = new Walker wopt
         @walker.start()        
         
@@ -266,8 +202,6 @@ class Open extends Command
             if @stats[i].isDirectory()
                 @files[i] += " >"
             
-        # log "walkerDone @dir #{@dir} @paths", @paths
-        
         # 000   000  00000000  000   0000000   000   000  000000000
         # 000 0 000  000       000  000        000   000     000   
         # 000000000  0000000   000  000  0000  000000000     000   
@@ -330,7 +264,7 @@ class Open extends Command
         @showList()
         @grabFocus()
         @select @lastFileIndex
-        text = @navigating ? @dir #@list?.children[@selected]?.value
+        text = @navigating ? @dir
         @commandline.setAndSelectText text
                     
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
@@ -405,39 +339,5 @@ class Open extends Command
             resolve p
         else
             resolve path.join parent, p
-        
-    # 000   000  000  0000000    00000000
-    # 000   000  000  000   000  000     
-    # 000000000  000  000   000  0000000 
-    # 000   000  000  000   000  000     
-    # 000   000  000  0000000    00000000
-         
-    onBlur: => 
-        if not @skipBlur
-            @hideList()
-        else
-            @skipBlur = null
-            
-    hideList: ->
-        @list?.remove()
-        @list = null
                 
-    cancel: ->
-        @hideList()
-        super
-
-    # 000   000  00000000  000   000
-    # 000  000   000        000 000 
-    # 0000000    0000000     00000  
-    # 000  000   000          000   
-    # 000   000  00000000     000   
-    
-    handleModKeyComboEvent: (mod, key, combo, event) ->
-        switch combo
-            when 'page up', 'page down'
-                if @index == @history.length-1
-                    return @select clamp 0, @list.children.length, @selected+20*(combo=='page up' and -1 or 1)
-                    
-        super mod, key, combo, event
-        
 module.exports = Open

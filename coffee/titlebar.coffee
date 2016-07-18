@@ -77,7 +77,8 @@ class Titlebar
             div.className = "list-item"
             div.winID     = info.id
             file = unresolve info.file
-            fileSpan = render.line file, syntax.dissForTextAndSyntax(file, 'ko', join: true), charWidth:0
+            diss = syntax.dissForTextAndSyntax(file, 'ko', join: true)
+            fileSpan = render.line file, diss, charWidth:0
             id  = "<span class=\"winid\">#{info.id}</span>"
             dc  = info.dirty and " dirty" or "clean"
             dot = "<span class=\"dot #{dc}\">●</span>"

@@ -21,6 +21,7 @@ class Macro extends Command
     constructor: (@commandline) ->
         
         @shortcuts = ['command+m']
+        @macros    = ['dbg', 'class', 'inv', 'req']
         @names     = ['macro']
         super @commandline
 
@@ -34,6 +35,14 @@ class Macro extends Command
         super @combo
         text: @last() ? "dbg"
         select: true
+
+    # 000      000   0000000  000000000
+    # 000      000  000          000   
+    # 000      000  0000000      000   
+    # 000      000       000     000   
+    # 0000000  000  0000000      000   
+    
+    listItems: () -> @macros
         
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
@@ -42,10 +51,12 @@ class Macro extends Command
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
         
     execute: (command) ->
-        super command
-        editor = window.editor
-        cp = editor.cursorPos()
-        args = command.split /\s+/
+        
+        command = super command
+        
+        editor  = window.editor
+        cp      = editor.cursorPos()
+        args    = command.split /\s+/
         command = args.shift()
         
         wordsInArgsOrCursorsOrSelection = (args) ->

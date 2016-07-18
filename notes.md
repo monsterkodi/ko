@@ -1,6 +1,6 @@
 # todo/ideas
 
-- *history overview as columns of minimaps* ctrl+alt+esc|up|down
+- *navigation overview as columns of minimaps* ctrl+alt+esc|up|down
 
 - *jump to file (require|path)*
 - *jump to list when multiple matches*
@@ -19,6 +19,12 @@
 - measure 
 - color
 
+#### coffee syntax
+- fix
+    prev: -> @navigate -1    
+    next: -> @navigate 1
+    for i in [1...@clones.length]
+    
 #### file state
 - save backup files?
 - don't clear undo buffer on save?
@@ -47,9 +53,9 @@
 
 #### terminal
 - *autocomplete*
+    - dirs and files *inline*
     - history
     - commands
-    - dirs and files
     - /usr/local/bin, /usr/bin and /bin
 - number history output and add !(n) command
 

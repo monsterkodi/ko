@@ -14,7 +14,9 @@ class Find extends Command
         @types     = ['str',  'Str',   'reg',    'Reg',    'fuzzy', 'glob']
         @names     = ['find', 'Find',  '/find/', '/Find/', 'fiZd',  'f*nd']
         super @commandline
-        
+       
+    historyKey: -> @name
+    
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
     # 0000000      000     000000000  0000000       000   
@@ -32,6 +34,7 @@ class Find extends Command
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
 
     changed: (command) ->
+        super command
         if editor = window.editorWithClassName @focus
             if command.length
                 editor.highlightText command, 
@@ -47,12 +50,14 @@ class Find extends Command
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
     
     execute: (command) ->
-        super command
+        command = super command
         if editor = window.editorWithClassName @focus
             editor.highlightText command, 
                 type: @type
                 select: 'after'
         else
             log "find.execute warning! no editor for @focus #{@focus}?"
+        text:   command
+        select: true
       
 module.exports = Find
