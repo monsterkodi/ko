@@ -102,6 +102,12 @@ class Open extends Command
     # 000      000       000     000   
     # 0000000  000  0000000      000   
 
+    next: -> 
+        if not @list?
+            @showList()
+            @select -1
+        super
+
     showList: ->
         super
         @listFiles @files
@@ -154,6 +160,7 @@ class Open extends Command
         
         @loadDir opt
         super @combo
+        text: ''
                 
     # 000       0000000    0000000   0000000          0000000    000  00000000 
     # 000      000   000  000   000  000   000        000   000  000  000   000
@@ -264,7 +271,7 @@ class Open extends Command
         @showList()
         @grabFocus()
         @select @lastFileIndex
-        text = @navigating ? @dir
+        text = @navigating ? @list.children[@selected].value  #@dir
         @commandline.setAndSelectText text
                     
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000

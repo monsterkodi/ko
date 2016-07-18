@@ -42,8 +42,6 @@ class Command
             if 0 <= @selected < @list?.children.length
                 command = @list?.children[@selected]?.value
             @hideList()
-        else 
-            log "execute #{command}"
         @setCurrent command
         command
     
@@ -184,11 +182,14 @@ class Command
             @showItems @listItems() 
             @select -1
         if @list? 
-            @select clamp 0, @list.children.length, @selected+1
-            @list.children[@selected]?.value
-        else
+            @select clamp 0, @list.children.length-1, @selected+1
+            return @list.children[@selected]?.value
+        else if @history.length
             @selected = clamp 0, @history.length-1, @selected+1
-            new String @history[@selected]
+            return new @history[@selected]
+        else
+            @selected = -1
+            return ''
 
     # 000   000  000  0000000    00000000
     # 000   000  000  000   000  000     
@@ -212,12 +213,12 @@ class Command
     # 000   000  000       000     000     000   000  000   000     000   
     # 000   000  000  0000000      000      0000000   000   000     000   
     
-    historyKey: -> ''
+    historyKey: -> 'history'
     
     clearHistory: ->
         @history = []
         @selected = -1
-        @setState "history#{@historyKey()}", @history
+        @setState @historyKey(), @history
     
     setCurrentText: (command) -> 
         @setCurrent command
@@ -231,7 +232,7 @@ class Command
         while @history.length > @maxHistory
             @history.shift()
         @selected = @history.length-1
-        @setState "history#{@historyKey()}", @history
+        @setState @historyKey(), @history
         
     current: -> @history[@selected] ? ''
         
@@ -241,7 +242,8 @@ class Command
             @list.children[@selected]?.value
         else            
             @selected = @history.length-1
-            new String @history[@selected]
+            return @history[@selected] if @selected >= 0
+        ''
         
     # 000000000  00000000  000   000  000000000
     #    000     000        000 000      000   
@@ -270,7 +272,6 @@ class Command
     setFocus: (focus) -> 
         return if focus == '.body'
         @focus = focus ? '.editor'
-    onBlur: ->
 
     #  0000000  000000000   0000000   000000000  00000000
     # 000          000     000   000     000     000     
@@ -283,7 +284,7 @@ class Command
         @loadState()
         
     loadState: ->
-        @history = @getState "history#{@historyKey()}", []
+        @history = @getState @historyKey(), []
         @selected = @history.length-1
 
     setState: (key, value) ->

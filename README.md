@@ -3,20 +3,23 @@
 
 # about ko
 
-ko is an editor for Mac OS X
+ko is an editor for macOS
     
 ## main features
 
 - **fast**
     - loads large files
+- **command-line**
+- **terminal**
+    - alias
+    - history
+    - echos commands as ascii headers
+    - output of commands editable/searchable
 - **minimap**
     - shows cursors and selections
     - also for terminal/search-result
     - can be used to select large portions of text
     - sets cursor by default when dragging/clicking
-- **terminal**
-    - shell commands as ascii headers
-    - output of commands editable/searchable
 - **file search**
     - search for strings/regexp in project files
     - automatic determination of project files
@@ -30,11 +33,40 @@ ko is an editor for Mac OS X
     - powerful set of keyboard shortcuts
 - **autocomplete**
     - completes words from visited files
-    - completes function/method names from required files
-    - optimized for coffee-script
 - **syntax highlighting**
     - for coffee, cpp, h, html, js, json, md, noon, pug, py, sh, styl       
     - ansi-colors in terminal view
+- **optimized for coffee-script**
+    - completes function/method names from required files
+    - terminal commands to list classes and functions/methods
+    - includes a few nifty macros
+        - debg log
+        - require
+
+## command-line
+    - a single, non-intrusive input line to controll ko
+    - the command-line operates in different modes:
+        - open
+            - new window
+        - search
+            - Search
+            - /search/
+            - /Search/
+        - find
+            - Find
+            - /find/
+            - /Find/
+            - fiZd
+            - f*nd
+        - term
+            - Term
+        - goto
+            - selecto
+        - macro
+    - each mode keeps it's own history
+    - clicking on the command name lists all modes and their shortcuts:
+    
+![commandline](img/commandline.png)
 
 ## minimap
 
@@ -44,7 +76,27 @@ ko is an editor for Mac OS X
 ## terminal
 
 - **⌘T** to activate input
-- only for commands that terminate for now!
+- special commands
+    - alias
+        - without argument: list aliases
+        - with one argument: clear alias
+        - with tow arguments: set alias
+    - history
+        - without argument: list command history
+        - !! to repeat last command
+        - !n to repeat command with id n
+        - !~n to remove command with id n
+    - classes
+        - list coffee-script classes and their methods
+        - with argument: filter
+    - funcs
+        - list coffee-script functions and methods
+        - with argument: filter
+    - files
+        - list indexed project files
+        - with argument: filter
+- all other commands are passed to a child_process running bash
+    - only works for commands that terminate!
 
 ![terminal](img/terminal.png)
 
@@ -63,10 +115,11 @@ ko is an editor for Mac OS X
     - **^⇧F**   case   sensitive
     - **⌥⇧F**   regexp insensitive
     - **^⌥⇧F**  regexp sensitive
+    
 - editing search result lines will ...
     - mark them for saving
     - changes are propagated immediately to all open files
-    - **⌘S** while the search-results view has focus will save all pending changes in open **and** closed files
+    - **⌘S** (while the search-results view has focus) will save all pending changes in open **and** closed files
     - deleting lines from the search results will **not** remove them from their original files
     - changes from the editor are not yet propagated to old search results
         - this means: only edit and save **fresh** search results
@@ -94,6 +147,7 @@ ko is an editor for Mac OS X
 ## open
 - **⌘P** open file quickly
 - **⌘⇧P** open file quickly in new window
+
 - while list is open
     - **.** list current directory without previous files
     - **..** navigate directory up
@@ -105,7 +159,7 @@ ko is an editor for Mac OS X
 - text: jump to function, class or file
 - positive number: jump to line
 - negative number: jump to line relative to end of file
-- **⌥enter** to goto word under main cursor
+- **⌥enter** (in editor) goto word under main cursor
 
 ## misc
 non-standard keyboard shortcuts:
@@ -120,6 +174,7 @@ non-standard keyboard shortcuts:
 - **⌘⌥Q** close all windows (won't restore on next start) and quit
 - **⌘return** evaluate current buffer with coffee in main process and print the result in terminal view
 - **⌘⌥up** jump to counterpart file (coffee <-> js, cpp <-> h, pug <-> html, etc)
+
 - while command input has focus:
     - ^up|down move command input up|down
     - ⌘up|down move command input to top|bottom of window

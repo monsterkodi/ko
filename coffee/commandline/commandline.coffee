@@ -167,7 +167,8 @@ class Commandline extends ViewBase
     listCommands: ->
         @list.innerHTML = ""        
         @list.style.display = 'unset'
-        for name, cmmd of @commands
+        for name in ['open', 'search', 'find', 'term', 'goto', 'macro']
+            cmmd = @commands[name]
             for ci in [0...cmmd.shortcuts.length]
                 combo = cmmd.shortcuts[ci]
                 cname = cmmd.names[ci]

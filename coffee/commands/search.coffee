@@ -45,6 +45,9 @@ class Search extends Command
     
     execute: (command) ->
         return if not command.length
+        switch @name
+            when '/search/', '/Search/'
+                return if command in ['^', '$', '.']
         command = super command
         @startSearchInFiles 
             text: command

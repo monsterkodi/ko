@@ -71,12 +71,13 @@ class Titlebar
         @list.innerHTML = ""        
         @list.style.display = 'unset'
         winInfos = ipc.sendSync 'winInfos'
+        log "Titlebar.listBuffers", winInfos
         for info in winInfos
             continue if info.id == window.winID
             div = document.createElement 'div'
             div.className = "list-item"
             div.winID     = info.id
-            file = unresolve info.file
+            file = unresolve info.file ? ''
             diss = syntax.dissForTextAndSyntax(file, 'ko', join: true)
             fileSpan = render.line file, diss, charWidth:0
             id  = "<span class=\"winid\">#{info.id}</span>"
