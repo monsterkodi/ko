@@ -54,10 +54,16 @@ class Editor extends Buffer
     # 000       000  000      000     
     # 000       000  0000000  00000000
 
-    setCurrentFile: (file) ->
-        @watch?.stop()
+    stopWatcher: ->
+        if @watch?
+            @watch?.stop()
+            @watch = null
+
+    setCurrentFile: (file, opt) ->
+        @stopWatcher()
         @currentFile = file
-        @do.reset()
+        if not opt?.keepUndo
+            @do.reset() 
         @updateTitlebar()
         if file?
             @watch = new watcher @
@@ -79,7 +85,6 @@ class Editor extends Buffer
 
     setLines: (lines) ->
         super lines
-        @do.reset()
         @emit 'linesSet', @lines
                             
     #  0000000  000  000   000   0000000   000      00000000

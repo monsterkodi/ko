@@ -23,7 +23,7 @@ ko is an editor for macOS
 **terminal**
 - alias
 - history
-- echos commands as ascii headers
+- echos commands as ascii-headers
 - output of commands editable/searchable
 
 **file search**
@@ -47,7 +47,10 @@ ko is an editor for macOS
 
 **autocomplete**
 - completes words from visited files and project files
-
+- automatic determination of project files:
+    - indexes files below directory containing .git or package.json
+    - ignores node_modules, .git, etc.
+    
 **syntax highlighting**
 - for coffee, cpp, h, html, js, json, md, noon, pug, py, sh, styl       
 - ansi-colors in terminal view
@@ -55,10 +58,10 @@ ko is an editor for macOS
 **optimized for coffee-script**
 - completes function/method names from required files
 - terminal commands to list classes and functions/methods
-- includes a few nifty macros
+- includes a few nifty macros:
     - **dbg** insert log line which outputs class.method + variables under cursors
     - **req** insert require statement for word at cursor
-    - **class** creates new file with simple class skeleton
+    - **class** creates a new file with simple class skeleton
     - **inv** toggle display of line-breaks
 
 ## command-line

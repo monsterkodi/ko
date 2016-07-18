@@ -87,7 +87,7 @@ ipc.on 'singleCursorAtPos', (event, pos) => editor.singleCursorAtPos pos
 ipc.on 'openFile',          (event, options) => openFile options
 ipc.on 'focusEditor',       (event) => split.focus '.editor'
 ipc.on 'cloneFile',  => ipc.send 'newWindowWithFile', editor.currentFile
-ipc.on 'reloadFile', => loadFile editor.currentFile, reload: true, dontSave: true
+ipc.on 'reloadFile', => reloadFile()
 ipc.on 'saveFileAs', => saveFileAs()
 ipc.on 'saveFile',   => saveFile()
 ipc.on 'loadFile', (event, file) => loadFile file
@@ -117,12 +117,13 @@ saveFile = (file) =>
     if not file?
         saveFileAs()
         return
+    editor.stopWatcher()
     atomicFile file, editor.text(), encoding: 'utf8', (err) =>
-        editor.setCurrentFile null # to stop watcher and reset scroll
+        editor.setCurrentFile null, keepUndo: true # to store scroll
         if err?
             alert err
         else
-            editor.setCurrentFile file
+            editor.setCurrentFile file, keepUndo: true
             setState 'file', file
 
 # 000       0000000    0000000   0000000  
@@ -131,18 +132,25 @@ saveFile = (file) =>
 # 000      000   000  000   000  000   000
 # 0000000   0000000   000   000  0000000  
 
-loadFile = (file, opt) =>  
+reloadFile = =>
+    loadFile editor.currentFile, 
+        reload:   true
+        dontSave: true
+        keepUndo: false
+
+loadFile = (file, opt={}) =>  
     [file,line] = file.split ':'
     if file != editor.currentFile or opt?.reload
         return if not fileExists file
-        
+        log "window.loadFile #{file}"
         if editor.currentFile? and not opt?.dontSave and editor.do.hasLineChanges() 
             saveChanges = [_.clone(editor.currentFile), _.clone(editor.text())]
             atomicFile saveChanges[0], saveChanges[1], encoding: 'utf8'
             
-        addToRecent file        
-        editor.setCurrentFile null # to stop watcher and reset scroll
-        editor.setCurrentFile file
+        addToRecent file   
+        opt.keepUndo = file == editor.currentFile if not opt.keepUndo?
+        editor.setCurrentFile null, opt  # to stop watcher and reset scroll
+        editor.setCurrentFile file, opt
         ipc.send 'fileLoaded', file, winID
         setState 'file', file
         commandline.fileLoaded file

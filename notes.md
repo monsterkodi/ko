@@ -1,9 +1,9 @@
 # todo/ideas
 
 - *navigation overview as columns of minimaps* ctrl+alt+esc|up|down
-
 - *jump to file (require|path)*
 - *jump to list when multiple matches*
+
 - display dirty status in window list
 
 #### indexer
@@ -16,7 +16,7 @@
 - *automatically start salter and konrad in pkg dir*
 
 #### tool
-- measure 
+- measure
 - color
 
 #### coffee syntax
@@ -24,7 +24,7 @@
     prev: -> @navigate -1    
     next: -> @navigate 1
     for i in [1...@clones.length]
-    
+
 #### file state
 - save backup files?
 - don't clear undo buffer on save?
@@ -34,6 +34,7 @@
 
 #### editor
 - save and restore scrollX/Left
+- keep undo when saving?
 - check undo (merges too much?)
 - make special stuff file type dependent
     - eg. add * to surround characters for md
@@ -54,8 +55,6 @@
 #### terminal
 - *autocomplete*
     - dirs and files *inline*
-    - history
-    - commands
     - /usr/local/bin, /usr/bin and /bin
 - number history output and add !(n) command
 

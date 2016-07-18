@@ -35,7 +35,8 @@ class View extends ViewBase
     changed: (changeInfo, action) ->        
         super changeInfo, action
         if changeInfo.sorted.length
-            @updateTitlebar() # sets dirty flag
+            @dirty = true # set dirty flag
+            @updateTitlebar() 
 
     # 00000000  000  000      00000000
     # 000       000  000      000     
@@ -46,13 +47,13 @@ class View extends ViewBase
     setCurrentFile: (file, opt) ->
         
         @saveScrollCursorsAndSelections() if not file and not opt?.noSaveScroll
-        
+        @dirty = false
         @syntax.name = 'txt'
         if file?
             name = path.extname(file).substr(1)
             if name in syntax.syntaxNames
                 @syntax.name = name            
-        super file # -> setText -> setLines
+        super file, opt # -> setText -> setLines
 
         @restoreScrollCursorsAndSelections() if file
         @numbers.updateColors()
@@ -67,7 +68,7 @@ class View extends ViewBase
         window.titlebar.update
             winID:  window.winID
             focus:  document.hasFocus()
-            dirty:  @do.hasLineChanges()
+            dirty:  @dirty ? false
             file:   @currentFile
             sticky: @stickySelection            
         
