@@ -40,31 +40,37 @@ ko is an editor for macOS
     - completes function/method names from required files
     - terminal commands to list classes and functions/methods
     - includes a few nifty macros
-        - debg log
-        - require
+        - dbg
+            - insert log line which outputs class.method + variables under cursors
+        - req
+            - insert require statement for word at cursor
+        - class 
+            - creates new file with simple class skeleton
+        - inv
+            - toggle display of line-breaks
 
 ## command-line
-    - a single, non-intrusive input line to controll ko
-    - the command-line operates in different modes:
-        - open
-            - new window
-        - search
-            - Search
-            - /search/
-            - /Search/
-        - find
-            - Find
-            - /find/
-            - /Find/
-            - fiZd
-            - f*nd
-        - term
-            - Term
-        - goto
-            - selecto
-        - macro
-    - each mode keeps it's own history
-    - clicking on the command name lists all modes and their shortcuts:
+- a single, non-intrusive input line to controll ko
+- the command-line operates in different modes:
+    - open
+        - new window
+    - search
+        - Search
+        - /search/
+        - /Search/
+    - find
+        - Find
+        - /find/
+        - /Find/
+        - fiZd
+        - f*nd
+    - term
+        - Term
+    - goto
+        - selecto
+    - macro
+- each mode keeps it's own history
+- clicking on the command name lists all modes and their shortcuts:
     
 ![commandline](img/commandline.png)
 
@@ -147,7 +153,6 @@ ko is an editor for macOS
 ## open
 - **⌘P** open file quickly
 - **⌘⇧P** open file quickly in new window
-
 - while list is open
     - **.** list current directory without previous files
     - **..** navigate directory up
@@ -160,6 +165,7 @@ ko is an editor for macOS
 - positive number: jump to line
 - negative number: jump to line relative to end of file
 - **⌥enter** (in editor) goto word under main cursor
+- **⌥click** (in editor) goto clicked word
 
 ## misc
 non-standard keyboard shortcuts:
