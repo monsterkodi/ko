@@ -68,27 +68,29 @@ ko is an editor for macOS
 ## terminal
 
 - **⌘T** to activate input
-- special commands
-    - **alias**
-        - without argument: list aliases
-        - with one argument: clear alias
-        - with two arguments: set alias
-    - **history**
-        - without argument: list command history
-        - !! to repeat last command
-        - !n to repeat command with id n
-        - !~n to remove command with id n
-    - **classes**
-        - list coffee-script classes and their methods
-        - with argument: filter
-    - **funcs**
-        - list coffee-script functions and methods
-        - with argument: filter
-    - **files**
-        - list indexed project files
-        - with argument: filter
-- all other commands are passed to a child process running bash
-    - only works for commands that terminate!
+
+special commands
+- **alias**
+    - without argument: list aliases
+    - with one argument: clear alias
+    - with two arguments: set alias
+- **history**
+    - without argument: list command history
+    - !! to repeat last command
+    - !n to repeat command with id n
+    - !~n to remove command with id n
+- **classes**
+    - list coffee-script classes and their methods
+    - with argument: filter
+- **funcs**
+    - list coffee-script functions and methods
+    - with argument: filter
+- **files**
+    - list indexed project files
+    - with argument: filter
+    
+all other commands are passed to a child process running bash
+- only works for commands that terminate!
 
 ![terminal](img/terminal.png)
 
@@ -139,6 +141,7 @@ cursors can be positioned after the end of line
 ## open
 - **⌘P** open file quickly
 - **⌘⇧P** open file quickly in new window
+
 while list is open
 - **.** list current directory without previous files
 - **..** navigate directory up
@@ -152,8 +155,8 @@ while list is open
 - negative number: jump to line relative to end of file
 
 in editor:
-    - **⌥enter** goto word under main cursor
-    - **⌥click** goto clicked word
+- **⌥enter** goto word under main cursor
+- **⌥click** goto clicked word
 
 ## minimap
 
@@ -175,9 +178,9 @@ non-standard keyboard shortcuts:
 - **⌘⌥up** jump to counterpart file (coffee <-> js, cpp <-> h, pug <-> html, etc)
 
 while command input has focus:
-- ^up|down move command input up|down
-- ⌘up|down move command input to top|bottom of window
-- ⌥up|down move command input a quarter of window up|down
+- **^up|down** move command input up|down
+- **⌘up|down** move command input to top|bottom of window
+- **⌥up|down** move command input a quarter of window up|down
 
 ## missing features
 
