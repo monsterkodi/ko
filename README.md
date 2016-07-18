@@ -9,6 +9,7 @@ ko is an editor for macOS
 
 - **fast**
     - loads large files
+    - keyboard centric (nothing you can only do with the mouse)
 - **command-line**
 - **terminal**
     - alias
