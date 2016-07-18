@@ -10,7 +10,8 @@ ko is an editor for macOS
 - **fast**
     - loads large files
     - keyboard centric (nothing you can only do with the mouse)
-- **command-line**
+- **commandline**
+    - a single, non-intrusive input line to controll ko
 - **terminal**
     - alias
     - history
@@ -18,7 +19,7 @@ ko is an editor for macOS
     - output of commands editable/searchable
 - **minimap**
     - shows cursors and selections
-    - also for terminal/search-result
+    - also for terminal/search-result!
     - can be used to select large portions of text
     - sets cursor by default when dragging/clicking
 - **file search**
@@ -41,35 +42,19 @@ ko is an editor for macOS
     - completes function/method names from required files
     - terminal commands to list classes and functions/methods
     - includes a few nifty macros
-        - dbg
-            - insert log line which outputs class.method + variables under cursors
-        - req
-            - insert require statement for word at cursor
-        - class 
-            - creates new file with simple class skeleton
-        - inv
-            - toggle display of line-breaks
+        - **dbg** insert log line which outputs class.method + variables under cursors
+        - **req** insert require statement for word at cursor
+        - **class** creates new file with simple class skeleton
+        - **inv** toggle display of line-breaks
 
 ## command-line
-- a single, non-intrusive input line to controll ko
 - the command-line operates in different modes:
-    - open
-        - new window
-    - search
-        - Search
-        - /search/
-        - /Search/
-    - find
-        - Find
-        - /find/
-        - /Find/
-        - fiZd
-        - f*nd
-    - term
-        - Term
-    - goto
-        - selecto
-    - macro
+    - **open** new window
+    - **search** Search /search/ /Search/
+    - **find** Find /find/ /Find/ fiZd f*nd
+    - **term** Term
+    - **goto** selecto
+    - **macro**
 - each mode keeps it's own history
 - clicking on the command name lists all modes and their shortcuts:
     
