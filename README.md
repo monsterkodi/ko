@@ -9,7 +9,9 @@ ko is an editor for macOS
 
 - **fast**
     - loads large files
-    - keyboard centric (nothing you can only do with the mouse)
+    - keyboard centric 
+        - nothing you can do with the mouse only
+        - includes lots fancy of shortcuts
 - **commandline**
     - a single, non-intrusive input line to 
         - open files quickly
@@ -91,30 +93,30 @@ ko is an editor for macOS
 ![terminal](img/terminal.png)
 
 ## find
-- search in current file
-    - **⌘F**  case insensitive
-    - **^F**  case sensitive
-    - **⌥F**  regexp insensitive
-    - **^⌥F** regexp sensitive
-    - **⌘⌥F** fuzzy search
-    - **⌘^F** glob search
+search in current file
+- **⌘F**  case insensitive
+- **^F**  case sensitive
+- **⌥F**  regexp insensitive
+- **^⌥F** regexp sensitive
+- **⌘⌥F** fuzzy search
+- **⌘^F** glob search
      
 ## search
-- search in project files
-    - **⌘⇧F**   case   insensitive
-    - **^⇧F**   case   sensitive
-    - **⌥⇧F**   regexp insensitive
-    - **^⌥⇧F**  regexp sensitive
+search in project files
+- **⌘⇧F**   case   insensitive
+- **^⇧F**   case   sensitive
+- **⌥⇧F**   regexp insensitive
+- **^⌥⇧F**  regexp sensitive
     
-- editing search result lines will ...
-    - mark them for saving
-    - changes are propagated immediately to all open files
-    - **⌘S** (while the search-results view has focus) will save all pending changes in open **and** closed files
-    - deleting lines from the search results will **not** remove them from their original files
-    - changes from the editor are not yet propagated to old search results
-        - this means: only edit and save **fresh** search results
-    - this is a very powerful feature but not tested thoroughly and probably not working correctly in all cases!
-    - use at your own risk! backup your files! 
+editing search result lines will ...
+- mark them for saving
+- changes are propagated immediately to all open files
+- **⌘S** (while the search-results view has focus) will save all pending changes in open **and** closed files
+- deleting lines from the search results will **not** remove them from their original files
+- changes from the editor are not yet propagated to old search results
+    - this means: only edit and save **fresh** search results
+- this is a very powerful feature but not tested thoroughly and probably not working correctly in all cases!
+- use at your own risk! backup your files! 
 
 ![search](img/search.png)
 
@@ -127,19 +129,19 @@ ko is an editor for macOS
 - **^⇧right**              align all cursors vertically with right-most cursor while moving text to the right
 - **⌘delete**              delete backwards over line boundaries
 
-- cursors can be positioned after the end of line
-    - cursors after the end of line have two representations: blue and orange/yellow
-    - the orange/yellow position shows where text will be inserted
-    - missing spaces are added automatically in multicursor mode
+cursors can be positioned after the end of line
+- cursors after the end of line have two representations: blue and orange/yellow
+- the orange/yellow position shows where text will be inserted
+- missing spaces are added automatically in multicursor mode
 
 ![cursors](img/cursors.png)
 
 ## open
 - **⌘P** open file quickly
 - **⌘⇧P** open file quickly in new window
-- while list is open
-    - **.** list current directory without previous files
-    - **..** navigate directory up
+while list is open
+- **.** list current directory without previous files
+- **..** navigate directory up
 
 ![open](img/open.png)
 
@@ -148,8 +150,10 @@ ko is an editor for macOS
 - text: jump to function, class or file
 - positive number: jump to line
 - negative number: jump to line relative to end of file
-- **⌥enter** (in editor) goto word under main cursor
-- **⌥click** (in editor) goto clicked word
+
+in editor:
+    - **⌥enter** goto word under main cursor
+    - **⌥click** goto clicked word
 
 ## minimap
 
@@ -170,10 +174,10 @@ non-standard keyboard shortcuts:
 - **⌘return** evaluate current buffer with coffee in main process and print the result in terminal view
 - **⌘⌥up** jump to counterpart file (coffee <-> js, cpp <-> h, pug <-> html, etc)
 
-- while command input has focus:
-    - ^up|down move command input up|down
-    - ⌘up|down move command input to top|bottom of window
-    - ⌥up|down move command input a quarter of window up|down
+while command input has focus:
+- ^up|down move command input up|down
+- ⌘up|down move command input to top|bottom of window
+- ⌥up|down move command input a quarter of window up|down
 
 ## missing features
 
