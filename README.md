@@ -7,53 +7,61 @@ ko is an editor for macOS
     
 ## main features
 
-- **fast**
-    - loads large files
-    - keyboard centric 
-        - nothing you can do with the mouse only
-        - includes lots fancy of shortcuts
-- **commandline**
-    - a single, non-intrusive input line to 
-        - open files quickly
-        - find in text and search in files
-        - input terminal and macro commands
-- **terminal**
-    - alias
-    - history
-    - echos commands as ascii headers
-    - output of commands editable/searchable
-- **file search**
-    - search for strings/regexp in project files
-    - automatic determination of project files
-    - search results are editable
-        - edits can be saved back to files
-        - more powerful than conventional search and replace
-- **multicursors**
-    - not all cursors are equal
-        - main cursor is always distuingishable
-        - main cursor can be moved independently from other cursors
-    - powerful set of keyboard shortcuts
-- **minimap**
-    - shows cursors and selections
-    - also for terminal/search-result!
-    - can be used to select large portions of text
-    - sets cursor by default when dragging/clicking
-- **autocomplete**
-    - completes words from visited files and project files
-- **syntax highlighting**
-    - for coffee, cpp, h, html, js, json, md, noon, pug, py, sh, styl       
-    - ansi-colors in terminal view
-- **optimized for coffee-script**
-    - completes function/method names from required files
-    - terminal commands to list classes and functions/methods
-    - includes a few nifty macros
-        - **dbg** insert log line which outputs class.method + variables under cursors
-        - **req** insert require statement for word at cursor
-        - **class** creates new file with simple class skeleton
-        - **inv** toggle display of line-breaks
+**fast**
+- loads large files
+- keyboard centric 
+    - nothing you can do with the mouse only
+    - includes lots fancy of shortcuts
+
+**commandline**
+- a single, non-intrusive input line to 
+    - open files quickly
+    - find in text and search in files
+    - input terminal and macro commands
+
+**terminal**
+- alias
+- history
+- echos commands as ascii headers
+- output of commands editable/searchable
+
+**file search**
+- search for strings/regexp in project files
+- automatic determination of project files
+- search results are editable
+    - edits can be saved back to files
+    - more powerful than conventional search and replace
+
+**multicursors**
+- not all cursors are equal
+    - main cursor is always distuingishable
+    - main cursor can be moved independently from other cursors
+- powerful set of keyboard shortcuts
+
+**minimap**
+- shows cursors and selections
+- also for terminal/search-result!
+- can be used to select large portions of text
+- sets cursor by default when dragging/clicking
+
+**autocomplete**
+- completes words from visited files and project files
+
+**syntax highlighting**
+- for coffee, cpp, h, html, js, json, md, noon, pug, py, sh, styl       
+- ansi-colors in terminal view
+
+**optimized for coffee-script**
+- completes function/method names from required files
+- terminal commands to list classes and functions/methods
+- includes a few nifty macros
+    - **dbg** insert log line which outputs class.method + variables under cursors
+    - **req** insert require statement for word at cursor
+    - **class** creates new file with simple class skeleton
+    - **inv** toggle display of line-breaks
 
 ## command-line
-- the command-line operates in different modes:
+- operates in different modes:
     - **open** new window
     - **search** Search /search/ /Search/
     - **find** Find /find/ /Find/ fiZd f*nd
@@ -142,7 +150,7 @@ cursors can be positioned after the end of line
 - **⌘P** open file quickly
 - **⌘⇧P** open file quickly in new window
 
-while list is open
+while list is open:
 - **.** list current directory without previous files
 - **..** navigate directory up
 
@@ -150,9 +158,9 @@ while list is open
 
 ## goto
 - **⌘;** activates goto command
-- text: jump to function, class or file
-- positive number: jump to line
-- negative number: jump to line relative to end of file
+- **text** jump to function, class or file
+- **positive number** jump to line
+- **negative number** jump to line relative to end of file
 
 in editor:
 - **⌥enter** goto word under main cursor
