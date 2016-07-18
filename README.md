@@ -11,13 +11,14 @@ ko is an editor for macOS
 - loads large files
 - keyboard centric 
     - nothing you can do with the mouse only
-    - includes lots fancy of shortcuts
+    - includes lots of fancy shortcuts
 
 **commandline**
-- a single, non-intrusive input line to ...
+- a single, non-intrusive input field to ...
     - open files quickly
     - find in text and search in files
     - input terminal and macro commands
+    - goto lines or class/method/function-definitions
 
 **terminal**
 - alias
@@ -33,13 +34,13 @@ ko is an editor for macOS
     - more powerful than conventional search and replace
 
 **multicursors**
-- not all cursors are equal
+- not all cursors are equal:
     - main cursor is always distuingishable
     - main cursor can be moved independently from other cursors
-- powerful set of keyboard shortcuts
+- powerful set of keyboard shortcuts for modification of cursors
 
 **minimap**
-- shows cursors and selections
+- shows cursors, highlights and selections
 - also for terminal/search-result!
 - can be used to select large portions of text
 - sets cursor by default when dragging/clicking
