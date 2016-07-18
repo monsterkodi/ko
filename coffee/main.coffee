@@ -29,9 +29,10 @@ clipboard     = electron.clipboard
 ipc           = electron.ipcMain
 dialog        = electron.dialog
 disableSnap   = false
-main          = undefined # created in app.on 'ready'
-navigate      = undefined # created in app.on 'ready'
-tray          = undefined # created in Main.constructor
+main          = undefined # < created in app.on 'ready'
+navigate      = undefined # <
+tray          = undefined # < created in Main.constructor
+coffeeExecute = undefined # <
 openFiles     = []
 wins          = []
 
@@ -117,11 +118,11 @@ hideDock = ->
 # 000  000        000     
 # 000  000         0000000
 
-coffeeExecute = new Execute
 ipc.on 'newWindowWithFile',      (event, file)   => main.newWindowWithFile file
 ipc.on 'activateWindowWithFile', (event, file)   => event.returnValue = main.activateWindowWithFile file
 ipc.on 'toggleDevTools',         (event)         => event.sender.toggleDevTools()
 ipc.on 'execute',                (event, arg)    => event.sender.send 'executeResult', coffeeExecute.execute arg
+ipc.on 'executeCoffee',          (event, cfg)    => coffeeExecute.executeCoffee cfg
 ipc.on 'maximizeWindow',         (event, winID)  => main.toggleMaximize winWithID winID
 ipc.on 'activateWindow',         (event, winID)  => main.activateWindowWithID winID
 ipc.on 'saveBounds',             (event, winID)  => main.saveWinBounds winWithID winID
@@ -129,7 +130,7 @@ ipc.on 'reloadWindow',           (event, winID)  => main.reloadWin winWithID win
 ipc.on 'prefSet',                (event, k, v)   => prefs.set k, v
 ipc.on 'prefGet',                (event, k, d)   => event.returnValue = prefs.get k, d
 ipc.on 'reloadMenu',             ()              => main.reloadMenu() # still in use?
-ipc.on 'navigate',               (event, action) => navigate.action action
+ipc.on 'navigate',               (event, action) => event.returnValue = navigate.action action
 ipc.on 'indexer',                (event, item)   => event.returnValue = main.indexer[item]
 ipc.on 'winInfos',               (event)         => 
     infos = []
@@ -172,7 +173,8 @@ class Main
             app.exit 0
             return
 
-        @indexer = new Indexer
+        @indexer      = new Indexer
+        coffeeExecute = new Execute main: @
 
         tray = new Tray "#{__dirname}/../img/menu.png"
         tray.on 'click', @toggleWindows

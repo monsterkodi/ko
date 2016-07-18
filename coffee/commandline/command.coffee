@@ -90,7 +90,7 @@ class Command
     showList: ->
         if not @list?
             @list = document.createElement 'div' 
-            @list.className = 'list open'
+            @list.className = "list #{@prefsID}"
             @positionList()
             window.split.elem.appendChild @list 
     
@@ -107,16 +107,16 @@ class Command
             index = 0
             for item in items
                 continue if not item? or not item.trim?().length
+                prefix = @itemPrefix?(item) or ''
                 div = document.createElement 'div'
                 div.className = 'list-item'
-                div.innerHTML = item 
+                div.innerHTML = prefix + item 
                 div.value     = item
                 div.addEventListener 'mousedown', @listClick
                 @list.appendChild div
                 index += 1
     
     listClick: (event) => 
-        log "listClick #{event.target.value}"
         @selected = -1
         @execute event.target.value
     

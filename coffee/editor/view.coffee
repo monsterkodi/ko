@@ -16,6 +16,7 @@ ViewBase  = require './viewbase'
 syntax    = require './syntax'
 path      = require 'path'
 electron  = require 'electron'
+ipc       = electron.ipcRenderer
 webframe  = electron.webFrame
 
 class View extends ViewBase
@@ -136,6 +137,7 @@ class View extends ViewBase
     handleModKeyComboEvent: (mod, key, combo, event) ->
         return if 'unhandled' != super mod, key, combo, event
         switch combo
+            when 'ctrl+enter' then window.commandline.commands.coffee.executeText @text()              
             when 'esc'
                 split = window.split
                 if split.terminalVisible()

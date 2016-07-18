@@ -20,6 +20,7 @@ class Commandline extends ViewBase
     constructor: (viewElem) ->
             
         @fontSizeDefault = 24
+        @mainCommands = ['open', 'search', 'find', 'goto', 'term', 'coffee', 'macro']
 
         super viewElem, features: []
         
@@ -167,7 +168,7 @@ class Commandline extends ViewBase
     listCommands: ->
         @list.innerHTML = ""        
         @list.style.display = 'unset'
-        for name in ['open', 'search', 'find', 'term', 'goto', 'macro']
+        for name in @mainCommands
             cmmd = @commands[name]
             for ci in [0...cmmd.shortcuts.length]
                 combo = cmmd.shortcuts[ci]

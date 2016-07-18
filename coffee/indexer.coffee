@@ -27,6 +27,7 @@ class Indexer
     @splitRegExp   = new RegExp "[^\\w\\d#\\_]+", 'g'        
     
     constructor: () ->
+        @collectBins()
         @dirs    = Object.create null
         @files   = Object.create null
         @classes = Object.create null
@@ -34,6 +35,16 @@ class Indexer
         @words   = Object.create null
         @walker  = null
         @queue   = [] 
+    
+    collectBins: ->
+        @bins = []
+        for dir in ['/bin', '/usr/bin', '/usr/local/bin']
+            @walker = new Walker 
+                root:        dir
+                includeDirs: false
+                includeExt:  [''] # report files without extension
+                file:        (p) => @bins.push path.basename p            
+            @walker.start()        
     
     # 000  000   000  0000000    00000000  000   000        0000000    000  00000000 
     # 000  0000  000  000   000  000        000 000         000   000  000  000   000

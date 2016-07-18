@@ -54,7 +54,7 @@ pre
     padding-left        9px
     padding-right       9px
     cursor              pointer
-    color               #aaa
+    color               #aaa 
     background          #222   
     min-width           (numbersWidth + 1px)
     box-sizing          border-box
@@ -75,10 +75,16 @@ span.ko
         color       #f5f
     &.search
         color       #0a0
-    &.macro
-        color       #bbb
     &.term
+        color       #f80
+    &.coffee
         color       #f00
+    &.macro
+        color       #fff
+
+.commandline-command.macro
+.commandline-command.coffee
+    color           #aaa 
         
 .ko.shortcut
     opacity         0.5
@@ -603,6 +609,7 @@ body
     &.href
         cursor          pointer
 
+    &.coffeeResult
     &.searchResult
     &.spacer
         background      #000
@@ -610,6 +617,7 @@ body
         border-bottom-right-radius 0
         
     &.searchResult
+    &.coffeeResult
         background      transparent
 
 .linenumber span .saveButton    

@@ -32,13 +32,13 @@ class Navigate
                 return if not @filePositions.length or @currentIndex == 0
                 @currentIndex -= 1
                 filePos = @filePositions[@currentIndex]
-                @navigateToFilePos filePos
+                @navigateToFilePos filePos, opt
                 
             when 'forward'
                 return if not @filePositions.length or @currentIndex == @filePositions.length-1
                 @currentIndex += 1
                 filePos = @filePositions[@currentIndex]
-                @navigateToFilePos filePos
+                @navigateToFilePos filePos, opt
                 
             when 'addFilePos'
                 @filePositions = @filePositions.filter (filePos) -> not (filePos.file == opt.file and filePos.pos[1] == opt.pos[1])
@@ -55,7 +55,7 @@ class Navigate
                     pos:  opt.pos
                     
                 @currentIndex = @filePositions.length-1
-                @navigateToFilePos @filePositions[@currentIndex]
+                @navigateToFilePos @filePositions[@currentIndex], opt
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000
     # 0000  000  000   000  000   000  000  000        000   000     000     000     
@@ -63,12 +63,15 @@ class Navigate
     # 000  0000  000   000     000     000  000   000  000   000     000     000     
     # 000   000  000   000      0      000   0000000   000   000     000     00000000
     
-    navigateToFilePos: (filePos) ->
+    navigateToFilePos: (filePos, opt) ->
         id = @main.activateWindowWithFile filePos.file
         if id?
-            @main.winWithID(id).webContents.send 'singleCursorAtPos', filePos.pos 
+            @main.winWithID(id).webContents.send 'singleCursorAtPos', filePos.pos
         else
-            @main.newWindowWithFile filePos.file, filePos.pos if not id?
+            if opt?.newWindow
+                @main.loadFile "#{filePos.file}:#{filePos.pos[1]}:#{filePos.pos[0]}"
+            else
+                filePos
     
     #  0000000   0000000    0000000          00000000  000  000      00000000        00000000    0000000    0000000
     # 000   000  000   000  000   000        000       000  000      000             000   000  000   000  000     
@@ -82,7 +85,10 @@ class Navigate
         
     gotoFilePos: (opt) -> # called from window jumpTo
         opt.action = 'gotoFilePos'
-        ipc.send 'navigate', opt
+        r = ipc.sendSync 'navigate', opt
+        if r?
+            window.openFile r.file
+            window.editor.singleCursorAtPos r.pos
 
     backward: () -> ipc.send 'navigate', action: 'backward'
     forward:  () -> ipc.send 'navigate', action: 'forward'

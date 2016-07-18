@@ -9,7 +9,8 @@ clamp,
 last
 }        = require '../tools/tools'
 log      = require '../tools/log'
-syntax   = require '../editor/syntax'
+Syntax   = require '../editor/syntax'
+Walker   = require '../tools/walker'
 Command  = require '../commandline/command'
 electron = require 'electron'
 path     = require 'path'
@@ -25,12 +26,31 @@ class Term extends Command
         super @commandline
         @maxHistory = 99
         @cmdID      = 0
+        @bins       = ipc.sendSync 'indexer', 'bins'
         
     onShellCommandData: (cmdData)  => 
         terminal = window.terminal
         terminal.output cmdData.data
         terminal.scrollCursorToTop 5
 
+    # 000      000   0000000  000000000
+    # 000      000  000          000   
+    # 000      000  0000000      000   
+    # 000      000       000     000   
+    # 0000000  000  0000000      000   
+    
+    listItems: () -> 
+        _.concat @history.reversed(), _.intersection @bins, [
+            'cat', 'colorcat'
+            'ls', 'color-ls'
+        ]
+
+    itemPrefix: (item) ->
+        if item in @bins
+            '● '
+        else
+            '▸ '
+    
     #  0000000  000      00000000   0000000   00000000 
     # 000       000      000       000   000  000   000
     # 000       000      0000000   000000000  0000000  
@@ -178,7 +198,7 @@ class Term extends Command
                         continue if args.length and not filterRegExp(args).test h
                         continue if not @commandIDs[h]
                         meta =
-                            diss: syntax.dissForTextAndSyntax "#{h}", 'ko'
+                            diss: Syntax.dissForTextAndSyntax "#{h}", 'ko'
                             cmmd: h
                             line: @commandIDs[h]
                             clss: 'termCommand'
@@ -205,7 +225,7 @@ class Term extends Command
                         else
                             pth = _.padStart('', lastDir.length+1) + path.basename pth
                         meta =
-                            diss: syntax.dissForTextAndSyntax "◼ #{pth}", 'ko'
+                            diss: Syntax.dissForTextAndSyntax "◼ #{pth}", 'ko'
                             href: "#{file}:0"
                             line: li
                             clss: 'searchResult'
@@ -235,10 +255,10 @@ class Term extends Command
                                 terminal.appendMeta clss: 'salt', text: char                        
                             classOrFile = info.class? and "● #{info.class}" or "◼ #{path.basename info.file}"
                             if i == 0
-                                diss = syntax.dissForTextAndSyntax "▸ #{funcn} #{classOrFile}", 'ko'
+                                diss = Syntax.dissForTextAndSyntax "▸ #{funcn} #{classOrFile}", 'ko'
                             else
                                 spcs = _.padStart '', "▸ #{func}".length
-                                diss = syntax.dissForTextAndSyntax "#{spcs} #{classOrFile}", 'ko'
+                                diss = Syntax.dissForTextAndSyntax "#{spcs} #{classOrFile}", 'ko'
                             meta =
                                 diss: diss
                                 href: "#{info.file}:#{info.line+1}"
@@ -261,14 +281,14 @@ class Term extends Command
                         info = classes[clss]
                         terminal.appendMeta clss: 'salt', text: clss
                         meta =
-                            diss: syntax.dissForTextAndSyntax "● #{clss}", 'ko'
+                            diss: Syntax.dissForTextAndSyntax "● #{clss}", 'ko'
                             href: "#{info.file}:#{info.line+1}"
                             clss: 'searchResult'
                         terminal.appendMeta meta
                         
                         for mthd, minfo of info.methods
                             meta =
-                                diss: syntax.dissForTextAndSyntax "    ▸ #{mthd}", 'ko'
+                                diss: Syntax.dissForTextAndSyntax "    ▸ #{mthd}", 'ko'
                                 href: "#{info.file}:#{minfo.line+1}"
                                 clss: 'searchResult'
                             terminal.appendMeta meta

@@ -67,7 +67,7 @@ class Walker
                         return @ignore p 
                 else if extn in cfg.ignoreExt
                     return @ignore p
-                else if extn in cfg.includeExt
+                else if extn in cfg.includeExt or cfg.includeExt.indexOf('') >= 0
                     cfg.files.push p
                     cfg.stats.push stat
                 else if stat.isDirectory()
@@ -80,7 +80,7 @@ class Walker
                     if cfg.includeDirs
                         cfg.dir? p, stat
                 else
-                    if path.extname(p) in cfg.includeExt or path.basename(p) in cfg.include
+                    if path.extname(p) in cfg.includeExt or path.basename(p) in cfg.include or cfg.includeExt.indexOf('') >= 0
                         cfg.file? p, stat
                         
                 if cfg.files.length > cfg.maxFiles

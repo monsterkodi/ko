@@ -82,7 +82,6 @@ delState = window.delState = (key) ->
 # 000  000         0000000
 
 ipc.on 'shellCommandData',  (event, cmdData) => commandline.commands['term'].onShellCommandData cmdData
-ipc.on 'executeResult',     (event, arg) => terminal.appendText str arg
 ipc.on 'singleCursorAtPos', (event, pos) => editor.singleCursorAtPos pos
 ipc.on 'openFile',          (event, options) => openFile options
 ipc.on 'focusEditor',       (event) => split.focus '.editor'
@@ -112,7 +111,7 @@ ipc.on 'fileLinesChanged', (event, file, lineChanges) =>
 #      000  000   000     000     000     
 # 0000000   000   000      0      00000000
 
-saveFile = (file) =>
+saveFile = (file) => 
     file ?= editor.currentFile
     if not file?
         saveFileAs()
@@ -138,8 +137,8 @@ reloadFile = =>
         dontSave: true
         keepUndo: false
 
-loadFile = (file, opt={}) =>  
-    [file,line] = file.split ':'
+loadFile = openFile = (file, opt={}) =>
+    [file,line,column] = file.split ':'
     if file != editor.currentFile or opt?.reload
         return if not fileExists file
         log "window.loadFile #{file}"
@@ -158,7 +157,7 @@ loadFile = (file, opt={}) =>
     window.split.reveal 'editor'
         
     if line?
-        editor.singleCursorAtPos [0, parseInt(line)-1] 
+        editor.singleCursorAtPos [column? and parseInt(column) or 0, parseInt(line)-1] 
         editor.scrollCursorToTop()        
   
 #  0000000   00000000   00000000  000   000        00000000  000  000      00000000   0000000
@@ -193,7 +192,8 @@ openFiles = (ofiles, options) => # called from file dialog and open command
         return ofiles
 
 window.openFiles = openFiles
-window.loadFile = loadFile
+window.openFile  = openFile
+window.loadFile  = loadFile
 
 # 0000000    000   0000000   000       0000000    0000000 
 # 000   000  000  000   000  000      000   000  000      
@@ -406,10 +406,14 @@ document.onkeydown = (event) ->
         if combo is "command+#{i}" or combo is "alt+#{i}"
             ipc.send 'activateWindow', i
             return stop event
-        
+    log "#{combo}"  
     switch combo
-        when 'command+enter'     then return ipc.send 'execute', editor.text()
         when 'command+alt+i'     then return ipc.send 'toggleDevTools', winID
+        when 'command+alt+`'     
+            log "close file"
+            editor.setCurrentFile null
+            editor.setLines ['']
+            return 
         when 'command+alt+k'     then return split.toggleLog()
         when 'command+k'         then return split.showOrClearLog()
         when 'command+='         then return changeFontSize +1

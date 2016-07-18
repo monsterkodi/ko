@@ -133,4 +133,4 @@ __dirname|__filename  keyword
 
 # salter headers
 ^\s*(\#)([0\s]+)$            . header.comment.marker . comment.header
-^([0\s]+)$                     comment.header
+^(\s*0[0\s]+)$                 comment.header
