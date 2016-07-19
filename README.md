@@ -17,7 +17,7 @@ ko is an editor for macOS
 - a single, non-intrusive input field to ...
     - open files quickly
     - find in text and search in files
-    - input terminal and macro commands
+    - input terminal, coffee-script and macro commands
     - goto lines or class/method/function-definitions
 
 **terminal**
@@ -94,14 +94,19 @@ special commands
     - !~n to remove command with id n
 - **classes**
     - list coffee-script classes and their methods
-    - with argument: filter
+    - click on result jumps to definition
 - **funcs**
     - list coffee-script functions and methods
-    - with argument: filter
+    - click on result jumps to definition
 - **files**
     - list indexed project files
-    - with argument: filter
-    
+    - click on result opens file
+- **words**
+    - list indexed words
+    - click on word starts search command
+
+classes, funcs, files and words results can be filtered by adding arguments
+
 all other commands are passed to a child process running bash
 - only works for commands that terminate!
 

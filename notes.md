@@ -53,13 +53,9 @@
 - indent more when inserting newline and next line is indented more?
 
 #### terminal
-- *autocomplete*
-    - dirs and files *inline*
-    - /usr/local/bin, /usr/bin and /bin
-- number history output and add !(n) command
+- *autocomplete dirs and files*
 
 #### commands
-- *autocomplete*
 - tree
 - tabs?
 - ls

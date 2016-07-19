@@ -169,9 +169,8 @@ class Meta
     onClick: (event) =>
         if not event.altKey
             if event.target.href?
-                log "event.target.href:#{event.target.href}"
-                split = event.target.href.split(':')
-                if split.length == 1 or _.isFinite split[1]
+                split = event.target.href.split ':'
+                if split.length == 1 or _.isFinite parseInt split[1]
                     window.loadFile event.target.href
                 else
                     if window.commandline.commands[split[0]]?

@@ -246,7 +246,7 @@ class Term extends Command
                             pth = _.padStart('', lastDir.length+1) + path.basename pth
                         meta =
                             diss: Syntax.dissForTextAndSyntax "◼ #{pth}", 'ko'
-                            href: "#{file}:0"
+                            href: "#{file}:1"
                             line: li
                             clss: 'termResult'
                         terminal.appendMeta meta

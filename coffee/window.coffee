@@ -144,7 +144,7 @@ loadFile = openFile = (file, opt={}) =>
     [file,line,column] = file.split ':'
     if file != editor.currentFile or opt?.reload
         return if not fileExists file
-        log "window.loadFile #{file}"
+        # log "window.loadFile #{file}"
         if editor.currentFile? and not opt?.dontSave and editor.do.hasLineChanges() 
             saveChanges = [_.clone(editor.currentFile), _.clone(editor.text())]
             atomicFile saveChanges[0], saveChanges[1], encoding: 'utf8'
