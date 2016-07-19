@@ -263,7 +263,7 @@ class Open extends Command
             h = (relative(f, @dir) for f in @history when f.length and (f != @file))
             @lastFileIndex = h.length - 1
             @files = _.concat h, @files
-        else if @navigating
+        if @navigating or @lastFileIndex < 0
             @lastFileIndex = 0
 
         @files = _.uniq @files
@@ -271,7 +271,7 @@ class Open extends Command
         @showList()
         @grabFocus()
         @select @lastFileIndex
-        text = @navigating ? @list.children[@selected].value  #@dir
+        text = @navigating ? @list.children[@selected].value
         @commandline.setAndSelectText text
                     
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
