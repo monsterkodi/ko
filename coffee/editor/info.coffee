@@ -19,12 +19,19 @@ class Info
         window.terminal.on 'focus', @setEditor
                 
         @elem = $('.info')
-
+        
+        # 000000000   0000000   00000000         000      000  000   000  00000000
+        #    000     000   000  000   000        000      000  0000  000  000     
+        #    000     000   000  00000000         000      000  000 0 000  0000000 
+        #    000     000   000  000              000      000  000  0000  000     
+        #    000      0000000   000              0000000  000  000   000  00000000
+        
         @topline = document.createElement 'div'
         @topline.className = "info-line top"
         
         @cursorColumn = document.createElement 'span'
         @cursorColumn.className = "info-cursor-column"
+        @cursorColumn.onclick = => @editor.focus() + @editor.singleCursorAtPos [0, @editor.cursorPos()[1]]
         @topline.appendChild @cursorColumn
 
         @sticky = document.createElement 'span'
@@ -34,67 +41,78 @@ class Info
 
         @cursors = document.createElement 'span'
         @cursors.className = "info-cursors"
+        @cursors.onclick = => @editor.focus() + @editor.clearCursors()
         @topline.appendChild @cursors
         
         @selections = document.createElement 'span'
         @selections.className = "info-selections"
+        @selections.onclick = => @editor.focus() + @editor.clearSelections()
         @topline.appendChild @selections
 
         @highlights = document.createElement 'span'
         @highlights.className = "info-highlights"
+        @highlights.onclick = => @editor.focus() + @editor.clearHighlights()
         @topline.appendChild @highlights
         
+        @classes = document.createElement 'span'
+        @classes.className = "info-classes empty"
+        @classes.onclick = => @termCommand 'classes'
+        @topline.appendChild @classes
+        ipc.on 'classesCount', (event, count) => @onClassesCount count
+
+        @funcs = document.createElement 'span'
+        @funcs.className = "info-funcs empty"
+        @funcs.onclick = => @termCommand 'funcs'
+        @topline.appendChild @funcs
+        ipc.on 'funcsCount', (event, count) => @onFuncsCount count
+
         @elem.appendChild @topline
 
+        # 0000000     0000000   000000000        000      000  000   000  00000000
+        # 000   000  000   000     000           000      000  0000  000  000     
+        # 0000000    000   000     000           000      000  000 0 000  0000000 
+        # 000   000  000   000     000           000      000  000  0000  000     
+        # 0000000     0000000      000           0000000  000  000   000  00000000
+        
         @botline = document.createElement 'div'
         @botline.className = "info-line bot"
         
         @cursorLine = document.createElement 'span'
         @cursorLine.className = "info-cursor-line"
+        @cursorLine.onclick = => @editor.focus() + @editor.singleCursorAtPos [0, 0]
         @botline.appendChild @cursorLine
         
         @lines = document.createElement 'span'
         @lines.className = "info-lines"
-        @lines.style.cursor = 'pointer'
-        @lines.onclick = => @editor.singleCursorAtPos [0, @editor.lines.length]
+        @lines.onclick = => @editor.focus() + @editor.singleCursorAtPos [0, @editor.lines.length]
         @botline.appendChild @lines
-
-        @words = document.createElement 'span'
-        @words.className = "info-words empty"
-        @words.style.cursor = 'pointer'
-        @words.onclick = => @termCommand 'words'
-        @botline.appendChild @words
-        window.editor.autocomplete.on 'wordCount', @onWordCount
-
-        @classes = document.createElement 'span'
-        @classes.className = "info-classes empty"
-        @classes.style.cursor = 'pointer'
-        @classes.onclick = => @termCommand 'classes'
-        @botline.appendChild @classes
-        ipc.on 'classesCount', (event, count) => @onClassesCount count
-
-        @funcs = document.createElement 'span'
-        @funcs.className = "info-funcs empty"
-        @funcs.style.cursor = 'pointer'
-        @funcs.onclick = => @termCommand 'funcs'
-        @botline.appendChild @funcs
-        ipc.on 'funcsCount', (event, count) => @onFuncsCount count
 
         @files = document.createElement 'span'
         @files.className = "info-files"
-        @files.style.cursor = 'pointer'
         @files.onclick = => @termCommand 'files'
         @botline.appendChild @files
         ipc.on 'filesCount', (event, count) => @onFilesCount count
         
+        @words = document.createElement 'span'
+        @words.className = "info-words empty"
+        @words.onclick = => @termCommand 'words'
+        @botline.appendChild @words
+        window.editor.autocomplete.on 'wordCount', @onWordCount
+
         @elem.appendChild @botline
         
         @setEditor editor        
 
     termCommand: (cmmd) ->
-        window.commandline.commands.term.execute cmmd
         window.split.do 'reveal terminal'
+        window.commandline.commands.term.execute cmmd
 
+    #  0000000  00000000  000000000        00000000  0000000    000  000000000   0000000   00000000 
+    # 000       000          000           000       000   000  000     000     000   000  000   000
+    # 0000000   0000000      000           0000000   000   000  000     000     000   000  0000000  
+    #      000  000          000           000       000   000  000     000     000   000  000   000
+    # 0000000   00000000     000           00000000  0000000    000     000      0000000   000   000
+    
     setEditor: (editor) =>
         
         return if editor == @editor         
@@ -118,6 +136,12 @@ class Info
         
         @onNumLines @editor.lines.length
 
+    #  0000000   000   000                     
+    # 000   000  0000  000                     
+    # 000   000  000 0 000                     
+    # 000   000  000  0000        000  000  000
+    #  0000000   000   000        000  000  000
+    
     onNumLines: (lc) => 
         @lines.textContent = shortCount lc ? 0
         
