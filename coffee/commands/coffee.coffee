@@ -64,6 +64,7 @@ class Coffee extends Command
                 clss: 'coffeeCommand'
         terminal.singleCursorAtPos [0, terminal.lines.length-1]
         ipc.send 'executeCoffee', winID: window.winID, cmdID: @cmdID, command: command        
+        @hideList()
         do: (@name == 'Coffee' and 'maximize' or 'reveal') + ' terminal'
     
     executeText: (text) -> @execute text

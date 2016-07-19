@@ -62,33 +62,38 @@ class Info
         @words = document.createElement 'span'
         @words.className = "info-words empty"
         @words.style.cursor = 'pointer'
-        @words.onclick = => 
-            log window.editor.autocomplete.wordlist
-            window.split.show 'logview'
+        @words.onclick = => @termCommand 'words'
         @botline.appendChild @words
         window.editor.autocomplete.on 'wordCount', @onWordCount
+
+        @classes = document.createElement 'span'
+        @classes.className = "info-classes empty"
+        @classes.style.cursor = 'pointer'
+        @classes.onclick = => @termCommand 'classes'
+        @botline.appendChild @classes
+        ipc.on 'classesCount', (event, count) => @onClassesCount count
 
         @funcs = document.createElement 'span'
         @funcs.className = "info-funcs empty"
         @funcs.style.cursor = 'pointer'
-        @funcs.onclick = => 
-            log "funcs:", ipc.sendSync 'indexer', 'funcs'
-            window.split.show 'logview'
+        @funcs.onclick = => @termCommand 'funcs'
         @botline.appendChild @funcs
         ipc.on 'funcsCount', (event, count) => @onFuncsCount count
 
         @files = document.createElement 'span'
         @files.className = "info-files"
         @files.style.cursor = 'pointer'
-        @files.onclick = => #log "files:", ipc.sendSync 'indexer', 'files'
-            log "files:", (k for k,v of ipc.sendSync('indexer', 'files'))
-            window.split.show 'logview'
+        @files.onclick = => @termCommand 'files'
         @botline.appendChild @files
         ipc.on 'filesCount', (event, count) => @onFilesCount count
         
         @elem.appendChild @botline
         
         @setEditor editor        
+
+    termCommand: (cmmd) ->
+        window.commandline.commands.term.execute cmmd
+        window.split.do 'reveal terminal'
 
     setEditor: (editor) =>
         
@@ -119,6 +124,10 @@ class Info
     onWordCount: (wc) =>
         @words.textContent = shortCount wc
         @words.classList.toggle 'empty', wc == 0
+
+    onClassesCount: (cc) =>
+        @classes.textContent = shortCount cc
+        @classes.classList.toggle 'empty', cc == 0
 
     onFuncsCount: (fc) =>
         @funcs.textContent = shortCount fc

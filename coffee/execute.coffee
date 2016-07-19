@@ -48,7 +48,6 @@ class Execute
                 ipc           = electron.ipcMain
                 BrowserWindow = electron.BrowserWindow
                 log = -> BrowserWindow.fromId(winID).webContents.send 'executeResult', [].slice.call(arguments, 0), cmdID
-                console.log 'global:', Object.keys global
                 """
         catch e
             console.error colors.red.bold '[ERROR]', colors.red e
@@ -64,7 +63,8 @@ class Execute
         coffee.eval "winID = #{cfg.winID}"
         coffee.eval "cmdID = #{cfg.cmdID}"
         result = @execute cfg.command
-        log "send result #{result} to #{cfg.winID}"
+        result = str(result) if not result.error?
+        # log "send result #{result} to #{cfg.winID}"
         @main.winWithID(cfg.winID).webContents.send 'executeResult', result, cfg.cmdID
 
     #  0000000  000   000  00000000  000      000    

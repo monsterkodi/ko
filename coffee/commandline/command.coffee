@@ -91,7 +91,6 @@ class Command
         if not @list?
             @list = document.createElement 'div' 
             @list.className = "list #{@prefsID}"
-            @positionList()
             window.split.elem.appendChild @list 
     
     listItems: () -> @history.reversed()
@@ -115,6 +114,7 @@ class Command
                 div.addEventListener 'mousedown', @listClick
                 @list.appendChild div
                 index += 1
+        @positionList()
     
     listClick: (event) => 
         @selected = -1
@@ -133,6 +133,7 @@ class Command
         split = window.split
         listTop = split.splitPosY 1
         listHeight = @list.getBoundingClientRect().height
+        log "Command.positionList split.elemHeight() #{split.elemHeight()} - listTop:#{listTop} < listHeight:#{listHeight}"
         if (split.elemHeight() - listTop) < listHeight
             listTop = split.splitPosY(0) - listHeight
         @list?.style.top = "#{listTop}px"

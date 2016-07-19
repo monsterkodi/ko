@@ -55,7 +55,6 @@ class Indexer
     indexDir: (dir) ->
         
         return if not dir? or @dirs[dir]?
-        # log "Indexer.indexDir dir:#{dir}"
         @dirs[dir] = 
             name: path.basename dir
             
@@ -89,8 +88,6 @@ class Indexer
     indexFile: (file) ->
         
         return @shiftQueue() if @files[file]?
-        
-        # log "Indexer.indexFile file:#{file}"
         
         fs.readFile file, 'utf8', (err, data) =>
             return if err?
@@ -232,12 +229,13 @@ class Indexer
                     fileInfo.funcs.push [funcInfo[1].line, funcInfo[1].last, funcInfo[2], funcInfo[1].class ? path.basename file, path.extname file]
                 
                 for win in BrowserWindow.getAllWindows()
-                    win.webContents.send 'funcsCount', Object.keys(@funcs).length
+                    win.webContents.send 'classesCount', _.size @classes
+                    win.webContents.send 'funcsCount',   _.size @funcs
                     
             @files[file] = fileInfo
 
             for win in BrowserWindow.getAllWindows()
-                win.webContents.send 'filesCount', Object.keys(@files).length
+                win.webContents.send 'filesCount', _.size @files
             
             @indexDir path.dirname file
             @indexDir Walker.packagePath file

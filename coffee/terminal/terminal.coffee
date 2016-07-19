@@ -14,7 +14,7 @@ class Terminal extends ViewBase
 
     constructor: (viewElem) ->
         
-        @fontSizeDefault = 15
+        @fontSizeDefault = 14
         
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Meta']
 

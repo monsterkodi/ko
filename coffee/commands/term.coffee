@@ -292,6 +292,31 @@ class Term extends Command
                                 href: "#{info.file}:#{minfo.line+1}"
                                 clss: 'searchResult'
                             terminal.appendMeta meta
+                            
+                when 'words'
+                    
+                    # 000   000   0000000   00000000   0000000     0000000
+                    # 000 0 000  000   000  000   000  000   000  000     
+                    # 000000000  000   000  0000000    000   000  0000000 
+                    # 000   000  000   000  000   000  000   000       000
+                    # 00     00   0000000   000   000  0000000    0000000 
+                    
+                    window.split.reveal 'terminal'
+                    words = ipc.sendSync 'indexer', 'words'
+                    char = ''
+                    for word in Object.keys(words).sort()
+                        continue if args.length and not filterRegExp(args).test word
+                        info = words[word]
+                        log "word #{word}", info
+                        if word[0] != char
+                            char = word[0]
+                            terminal.appendMeta clss: 'salt', text: char                        
+                        diss = Syntax.dissForTextAndSyntax "▸ #{word} #{info.count}", 'ko'
+                        meta =
+                            diss: diss
+                            clss: 'searchResult'
+                        terminal.appendMeta meta
+                            
                 else
                     ipc.send 'shellCommand', winID: window.winID, cmdID: @cmdID, command: cmmd
                     @cmdID += 1
