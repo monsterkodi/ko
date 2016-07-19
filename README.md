@@ -188,6 +188,8 @@ evaluates coffee-script code in the main process and prints results in terminal
 - the commandline input is nice to do quick math calculations or other single line tasks
 - you can evaluate complex code too, just press **^enter** in the editor to evaluate its whole text
 
+![cursors](img/coffee.png)
+
 ## minimap
 
 - **⌘** while dragging to turn off cursor placement

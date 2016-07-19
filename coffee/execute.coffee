@@ -43,7 +43,7 @@ class Execute
                 str    = require './js/tools/str'
                 _      = require 'lodash'
                 coffee = require 'coffee-script'
-                {sqrt,pow,sin,cos,PI} = Math
+                {max,min,abs,round,ceil,floor,sqrt,pow,exp,log10,sin,cos,tan,acos,asin,atan,PI,E} = Math
                 (global[r] = require r for r in ['path', 'fs', 'noon', 'colors', 'electron'])                    
                 ipc           = electron.ipcMain
                 BrowserWindow = electron.BrowserWindow
