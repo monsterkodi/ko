@@ -122,8 +122,12 @@ class Meta
         for meta in metas
             meta[2].span = e.numberSpan
             switch meta[2].clss
-                when 'searchResult', 'termCommand', 'coffeeCommand', 'coffeeResult'
-                    e.numberSpan.innerHTML = meta[2].state == 'unsaved' and @saveButton(meta[0]) or meta[2].line? and meta[2].line or meta[2].href?.split(':')[1] or '?'
+                when 'searchResult', 'termCommand', 'termResult', 'coffeeCommand', 'coffeeResult'
+                    num = meta[2].state == 'unsaved' and @saveButton(meta[0]) 
+                    num = meta[2].line? and meta[2].line if not num
+                    num = meta[2].href?.split(':')[1] if not num
+                    num = '?' if not num 
+                    e.numberSpan.innerHTML = num
                 else
                     e.numberSpan.innerHTML = '&nbsp;'
 
@@ -155,13 +159,28 @@ class Meta
             div.classList.add 'cmmd'
         @elem.appendChild div
         meta[2].div = div
-       
+    
+    #  0000000  000      000   0000000  000   000
+    # 000       000      000  000       000  000 
+    # 000       000      000  000       0000000  
+    # 000       000      000  000       000  000 
+    #  0000000  0000000  000   0000000  000   000
+    
     onClick: (event) =>
         if not event.altKey
             if event.target.href?
-                window.loadFile event.target.href
+                log "event.target.href:#{event.target.href}"
+                split = event.target.href.split(':')
+                if split.length == 1 or _.isFinite split[1]
+                    window.loadFile event.target.href
+                else
+                    if window.commandline.commands[split[0]]?
+                        command = window.commandline.commands[split[0]]
+                        window.commandline.startCommand split[0], command.shortcuts[0]
+                        window.commandline.setText split[1]
+                        command.execute split[1]
             else if event.target.cmmd?
-                window.commandline.commands['term'].execute event.target.cmmd
+                window.commandline.commands.term.execute event.target.cmmd
         
     #  0000000   00000000   00000000   00000000  000   000  0000000  
     # 000   000  000   000  000   000  000       0000  000  000   000

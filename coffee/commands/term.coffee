@@ -41,8 +41,16 @@ class Term extends Command
     
     listItems: () -> 
         _.concat @history.reversed(), _.intersection @bins, [
-            'cat', 'colorcat'
-            'ls', 'color-ls'
+            'cat', 'colorcat', 
+            'ls', 'color-ls',
+            'konrad', 'noon', 'sds', 'strudl',
+            'atom', 'subl', 'code',
+            'git', 'ksdiff', 'diff',
+            'coffee', 'node', 'python'
+            'apropos', 'which',
+            'ag', 'grep', 'find',
+            'tail', 'head', 'wc', 'sort', 
+            'cd', 'rm', 'mkdir', 'rmdir'
         ]
 
     itemPrefix: (item) ->
@@ -145,6 +153,18 @@ class Term extends Command
             else
                 [split.join ' ']
                 
+    #  0000000  000000000   0000000   00000000   000000000
+    # 000          000     000   000  000   000     000   
+    # 0000000      000     000000000  0000000       000   
+    #      000     000     000   000  000   000     000   
+    # 0000000      000     000   000  000   000     000   
+    
+    start: (combo) ->
+        super combo
+        text:   @last()
+        select: true
+        do:     'reveal terminal'
+                
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
     # 0000000     00000    0000000   000       000   000     000     0000000 
@@ -228,7 +248,7 @@ class Term extends Command
                             diss: Syntax.dissForTextAndSyntax "◼ #{pth}", 'ko'
                             href: "#{file}:0"
                             line: li
-                            clss: 'searchResult'
+                            clss: 'termResult'
                         terminal.appendMeta meta
                         li += 1
                         
@@ -262,7 +282,7 @@ class Term extends Command
                             meta =
                                 diss: diss
                                 href: "#{info.file}:#{info.line+1}"
-                                clss: 'searchResult'
+                                clss: 'termResult'
                             terminal.appendMeta meta
                             i += 1
                         
@@ -283,14 +303,14 @@ class Term extends Command
                         meta =
                             diss: Syntax.dissForTextAndSyntax "● #{clss}", 'ko'
                             href: "#{info.file}:#{info.line+1}"
-                            clss: 'searchResult'
+                            clss: 'termResult'
                         terminal.appendMeta meta
                         
                         for mthd, minfo of info.methods
                             meta =
                                 diss: Syntax.dissForTextAndSyntax "    ▸ #{mthd}", 'ko'
                                 href: "#{info.file}:#{minfo.line+1}"
-                                clss: 'searchResult'
+                                clss: 'termResult'
                             terminal.appendMeta meta
                             
                 when 'words'
@@ -307,14 +327,15 @@ class Term extends Command
                     for word in Object.keys(words).sort()
                         continue if args.length and not filterRegExp(args).test word
                         info = words[word]
-                        log "word #{word}", info
                         if word[0] != char
                             char = word[0]
                             terminal.appendMeta clss: 'salt', text: char                        
-                        diss = Syntax.dissForTextAndSyntax "▸ #{word} #{info.count}", 'ko'
+                        diss = Syntax.dissForTextAndSyntax "▸ #{word}", 'ko'
                         meta =
                             diss: diss
-                            clss: 'searchResult'
+                            line: info.count
+                            href: "search:#{word}"
+                            clss: 'termResult'
                         terminal.appendMeta meta
                             
                 else

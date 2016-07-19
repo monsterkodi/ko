@@ -138,6 +138,9 @@ reloadFile = =>
         keepUndo: false
 
 loadFile = openFile = (file, opt={}) =>
+    if not file?
+        alert "window.loadFile no file?"
+        throw new Error
     [file,line,column] = file.split ':'
     if file != editor.currentFile or opt?.reload
         return if not fileExists file
@@ -413,15 +416,16 @@ document.onkeydown = (event) ->
             editor.setLines ['']
             ipc.send 'fileLoaded', '', winID
             return 
-        when 'command+alt+k'     then return split.toggleLog()
-        when 'command+k'         then return split.showOrClearLog()
-        when 'command+='         then return changeFontSize +1
-        when 'command+-'         then return changeFontSize -1
-        when 'command+0'         then return resetFontSize()
-        when 'command+shift+='   then return @changeZoom +1
-        when 'command+shift+-'   then return @changeZoom -1
-        when 'command+shift+0'   then return @resetZoom()
-        when 'alt+`'             then return titlebar.showList()
-        when 'alt+ctrl+left'     then return stop event, navigate.backward()
-        when 'alt+ctrl+right'    then return stop event, navigate.forward()
+        when 'command+k'          then return commandline.clear()
+        when 'command+alt+k'      then return split.toggleLog()
+        when 'command+alt+ctrl+k' then return split.showOrClearLog()
+        when 'command+='          then return changeFontSize +1
+        when 'command+-'          then return changeFontSize -1
+        when 'command+0'          then return resetFontSize()
+        when 'command+shift+='    then return @changeZoom +1
+        when 'command+shift+-'    then return @changeZoom -1
+        when 'command+shift+0'    then return @resetZoom()
+        when 'alt+`'              then return titlebar.showList()
+        when 'alt+ctrl+left'      then return stop event, navigate.backward()
+        when 'alt+ctrl+right'     then return stop event, navigate.forward()
         
