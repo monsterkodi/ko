@@ -157,12 +157,22 @@ cursors can be positioned after the end of line
 ![cursors](img/cursors.png)
 
 ## open
+
+opens files quickly via fuzzy matching
 - **⌘P** open file quickly
 - **⌘⇧P** open file quickly in new window
 
+on activation, it ...
+- lists recent files on top 
+- the most recent file is selected by default
+    
 while list is open:
 - **.** list current directory without previous files
 - **..** navigate directory up
+
+the list content depends on the file currently opened in the editor
+- files in surrounding project directories are included
+- switching projects is simple: just open a single file in the new project
 
 ![open](img/open.png)
 
