@@ -162,6 +162,7 @@ class Commandline extends ViewBase
         @command?.hideList?()
         @listCommands()
         @focus()
+        @positionList()
         event.preventDefault()
         event.stopPropagation()
 

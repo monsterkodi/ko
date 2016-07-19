@@ -69,8 +69,9 @@ ko is an editor for macOS
     - **open** new window
     - **search** Search /search/ /Search/
     - **find** Find /find/ /Find/ fiZd f*nd
-    - **term** Term
     - **goto** selecto
+    - **term** Term
+    - **coffee**
     - **macro**
 - each mode keeps it's own history
 - clicking on the command name lists all modes and their shortcuts:
@@ -169,6 +170,14 @@ while list is open:
 in editor:
 - **⌥enter** goto word under main cursor
 - **⌥click** goto clicked word
+
+## coffee
+
+evaluates coffee-script code in the main process and prints results in terminal
+- since code is evaluated in the main process, results are shared between windows
+
+in editor:
+- **^enter** to evaluate text of current buffer
 
 ## minimap
 

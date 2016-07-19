@@ -167,7 +167,15 @@ class Indexer
 
                 words = line.split Indexer.splitRegExp
                 for word in words
-                    _.update @words, "#{word}.count", (n) -> (n ? 0) + 1 
+                    
+                    switch 
+                        when word.length < 2 then
+                        when word[0] in ['-', "#", '_'] and word.length < 3 then
+                        when /^[0\_\-\@\#]+$/.test word then
+                        when /^[\-]?[\d]+$/.test word then
+                        else
+                            _.update @words, "#{word}.count", (n) -> (n ? 0) + 1 
+                    
                     switch word
                         
                         #  0000000  000       0000000    0000000   0000000

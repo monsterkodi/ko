@@ -38,7 +38,9 @@ class Execute
     
     initCoffee: =>
         try
+            global.main = @main
             coffee.eval """
+                str    = require './js/tools/str'
                 _      = require 'lodash'
                 coffee = require 'coffee-script'
                 {sqrt,pow,sin,cos,PI} = Math

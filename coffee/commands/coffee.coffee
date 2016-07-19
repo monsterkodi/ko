@@ -29,7 +29,6 @@ class Coffee extends Command
     #  0000000   000   000        000   000  00000000  0000000    0000000   0000000     000  
     
     onResult: (event,result,cmdID) =>
-        log "result #{cmdID} #{result}"
         terminal = window.terminal
         if result.error?
             terminal.appendMeta 

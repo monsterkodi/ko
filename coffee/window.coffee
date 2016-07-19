@@ -406,13 +406,12 @@ document.onkeydown = (event) ->
         if combo is "command+#{i}" or combo is "alt+#{i}"
             ipc.send 'activateWindow', i
             return stop event
-    log "#{combo}"  
     switch combo
         when 'command+alt+i'     then return ipc.send 'toggleDevTools', winID
         when 'command+alt+`'     
-            log "close file"
             editor.setCurrentFile null
             editor.setLines ['']
+            ipc.send 'fileLoaded', '', winID
             return 
         when 'command+alt+k'     then return split.toggleLog()
         when 'command+k'         then return split.showOrClearLog()

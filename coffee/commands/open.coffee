@@ -110,6 +110,7 @@ class Open extends Command
     showList: ->
         super
         @listFiles @files
+        @positionList()
             
     listFiles: (files) ->
         @list.innerHTML = ""        

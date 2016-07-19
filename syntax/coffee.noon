@@ -112,7 +112,11 @@ __dirname|__filename  keyword
     value.number.float
 
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
-    syntax.value.number.int.sign
+    sign.number.int
+    value.number.int
+
+(?:^|[^\.\"\'\w]|\.\.\.?)(0x)([\da-f]+)(?:$|[^\.\"\'\w]|\.\.\.?)   
+    marker.number.int
     value.number.int
 
 # strings

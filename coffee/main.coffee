@@ -100,8 +100,6 @@ winWithID   = (winID) ->
     for w in wins()
         return w if w.id == wid
 
-screenSize  = -> electron.screen.getPrimaryDisplay().workAreaSize
-
 # 0000000     0000000    0000000  000   000
 # 000   000  000   000  000       000  000 
 # 000   000  000   000  000       0000000  
@@ -209,7 +207,11 @@ class Main
     # 000   000  000  000  0000  000   000  000   000  000   000       000
     # 00     00  000  000   000  0000000     0000000   00     00  0000000 
         
-    winWithID: winWithID
+    wins:        wins
+    winWithID:   winWithID
+    activeWin:   activeWin
+    visibleWins: visibleWins
+    
     reloadMenu: => MainMenu.init @
         
     reloadWin: (win) ->
@@ -305,9 +307,11 @@ class Main
     # 0000000      000     000000000  000       0000000  
     #      000     000     000   000  000       000  000 
     # 0000000      000     000   000   0000000  000   000
-        
+     
+    screenSize: -> electron.screen.getPrimaryDisplay().workAreaSize
+    
     stackWindows: ->
-        {width, height} = screenSize()
+        {width, height} = @screenSize()
         ww = height + 122
         wl = visibleWins()
         for w in wl
@@ -322,7 +326,7 @@ class Main
     windowsAreStacked: ->
         wl = visibleWins()
         return false if not wl.length
-        return false if wl.length == 1 and wl[0].getBounds().width == screenSize().width
+        return false if wl.length == 1 and wl[0].getBounds().width == @screenSize().width
         w0 = wl[0].getBounds()
         for wi in [1...wl.length]
             if not _.isEqual wl[wi].getBounds(), w0
@@ -339,7 +343,7 @@ class Main
         disableSnap = true
         frameSize = 6
         wl = visibleWins()
-        {width, height} = screenSize()
+        {width, height} = @screenSize()
         if not @windowsAreStacked()
             @stackWindows()
         else if wl.length == 1
@@ -414,7 +418,7 @@ class Main
             
     createWindow: (openFile, pos) ->
         
-        {width, height} = screenSize()
+        {width, height} = @screenSize()
         ww = height + 122
         
         win = new BrowserWindow
