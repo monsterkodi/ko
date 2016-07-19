@@ -3,6 +3,7 @@
 - *navigation overview as columns of minimaps* ctrl+alt+esc|up|down
 - *jump to file (require|path)*
 - *jump to list when multiple matches*
+- *save term aliases in seperate file*
 
 - display dirty status in window list
 

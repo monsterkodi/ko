@@ -77,7 +77,7 @@ class Indexer
         
     onWalkerFile: (p, stat) =>
         if not @files[p]? and @queue.indexOf(p) < 0
-            if stat.size < 654321
+            if stat.size < 654321 # obviously some arbitrary number :)
                 @queue.push p
             else
                 log "warning! file #{p} too large? #{stat.size}. skipping indexing!"

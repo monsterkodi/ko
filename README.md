@@ -179,10 +179,14 @@ in editor:
 ## coffee
 
 evaluates coffee-script code in the main process and prints results in terminal
-- since code is evaluated in the main process, results are shared between windows
+- since the code is evaluated in the main process ...
+    - indexer internals and windows are accessible (via global **main** object)
+    - results are 
+        - persistent for the lifetime of the app
+        - shared between windows
 
-in editor:
-- **^enter** to evaluate text of current buffer
+- the commandline input is nice to do quick math calculations or other single line tasks
+- you can evaluate complex code too, just press **^enter** in the editor to evaluate its whole text
 
 ## minimap
 
@@ -207,6 +211,14 @@ while command input has focus:
 - **^up|down** move command input up|down
 - **⌘up|down** move command input to top|bottom of window
 - **⌥up|down** move command input a quarter of window up|down
+
+# to use ko from a terminal
+
+    ln -s /Applications/ko.app/Contents/Resources/app/bin/ko /usr/local/bin 
+    
+# ko stores window settings, command histories and other stuff in
+
+    ~/Library/Application\ Support/ko/ko.noon
 
 ## missing features
 

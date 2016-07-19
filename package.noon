@@ -6,8 +6,8 @@ main            js/main.js
 scripts
                 dist      npm run clean && npm run compile && npm run install && build
                 kill      fish -c "killall Electron" -c "killall Electron" -c "echo killed"
-                clean     rm -rf dist app/js app/img app/css app/syntax app/*.html app/node_modules
-                compile   cp -r js css img syntax *.html app
+                clean     rm -rf dist app/js app/img app/css app/bin app/syntax app/*.html app/node_modules
+                compile   cp -r js css img bin syntax *.html app
                 install   cd app && npm install
 repository
                 type  git
@@ -25,7 +25,7 @@ license         Unlicense
 bugs
                 url  https://github.com/monsterkodi/ko/issues
 build
-                app-bundle-id   net.monsterkodi.ko
+                appId           net.monsterkodi.ko
                 app-category-type  public.app-category.utilities
                 asar            false
                 productName     ko
