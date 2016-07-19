@@ -228,7 +228,7 @@ while command input has focus:
 
     ln -s /Applications/ko.app/Contents/Resources/app/bin/ko /usr/local/bin 
     
-### ko stores window settings, command histories and other stuff in
+### settings (windows, command histories and other stuff) are saved to
 
     ~/Library/Application\ Support/ko/ko.noon
 
@@ -241,8 +241,7 @@ while command input has focus:
 - regression tests
 - correct highlighting of complex strings
 
-## notes 
+## final note
 
-- not very well documented
-- pre-release in active development
-- use at your own risk!
+this is a pre-release in active development!
+use at your own risk!
