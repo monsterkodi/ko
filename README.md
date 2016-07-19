@@ -41,7 +41,7 @@ ko is an editor for macOS
 
 **minimap**
 - shows cursors, highlights and selections
-- also for terminal/search-result!
+- also for terminal, search- and coffe-script results!
 - can be used to select large portions of text
 - sets cursor by default when dragging/clicking
 
@@ -134,8 +134,8 @@ editing search result lines will ...
 - **⌘S** (while the search-results view has focus) will save all pending changes in open **and** closed files
 - deleting lines from the search results will **not** remove them from their original files
 - changes from the editor are not yet propagated to old search results
-    - this means: only edit and save **fresh** search results
-- this is a very powerful feature but not tested thoroughly and probably not working correctly in all cases!
+    - this means: only edit and save **fresh** search results!
+- this is a very powerful feature but not tested thoroughly yet and probably not working correctly in all cases!
 - use at your own risk! backup your files! 
 
 ![search](img/search.png)
@@ -172,7 +172,7 @@ while list is open:
 
 the list content depends on the file currently opened in the editor
 - files in surrounding project directories are included
-- switching projects is simple: just open a single file in the new project
+- switching projects is simple: just open a file in the new project
 
 ![open](img/open.png)
 
@@ -224,11 +224,11 @@ while command input has focus:
 - **⌘up|down** move command input to top|bottom of window
 - **⌥up|down** move command input a quarter of window up|down
 
-# to use ko from a terminal
+### to use ko from a terminal
 
     ln -s /Applications/ko.app/Contents/Resources/app/bin/ko /usr/local/bin 
     
-# ko stores window settings, command histories and other stuff in
+### ko stores window settings, command histories and other stuff in
 
     ~/Library/Application\ Support/ko/ko.noon
 
