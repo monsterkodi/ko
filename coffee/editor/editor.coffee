@@ -616,7 +616,7 @@ class Editor extends Buffer
         @moveAllCursors f, extend:e, keepLine:true
         true
     
-    moveCursorsToWordBoundary: (leftOrRight, e) -> 
+    moveCursorsToWordBoundary: (leftOrRight, e) ->
         @mainCursorMove = 0
         f = switch leftOrRight
             when 'right' then @endOfWordAtCursor
