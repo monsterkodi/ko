@@ -116,6 +116,12 @@ module.exports =
         return absolute if not absolute?.startsWith '/'
         d = path.normalize path.resolve to.replace /\~/, process.env.HOME
         r = path.relative d, absolute
+        if r.startsWith '../../' 
+            unresolved = absolute.replace(os.homedir(), "~")
+            if unresolved.length < r.length
+                r = unresolved
+        if absolute.length < r.length    
+            r = absolute
         r
         
     swapExt: (p, ext) -> path.join(path.dirname(p), path.basename(p, path.extname(p))) + ext
