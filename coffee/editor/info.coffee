@@ -136,6 +136,17 @@ class Info
         
         @onNumLines @editor.lines.length
 
+    # 00000000   00000000  000       0000000    0000000   0000000  
+    # 000   000  000       000      000   000  000   000  000   000
+    # 0000000    0000000   000      000   000  000000000  000   000
+    # 000   000  000       000      000   000  000   000  000   000
+    # 000   000  00000000  0000000   0000000   000   000  0000000  
+    
+    reload: =>
+        @onClassesCount _.size ipc.sendSync 'indexer', 'classes'
+        @onFuncsCount   _.size ipc.sendSync 'indexer', 'funcs'
+        @onFilesCount   _.size ipc.sendSync 'indexer', 'files'
+
     #  0000000   000   000                     
     # 000   000  0000  000                     
     # 000   000  000 0 000                     

@@ -328,7 +328,10 @@ window.onresize = ->
     split.resized()
     ipc.send 'saveBounds', winID if winID?
 
-window.onload   = => split.resized()
+window.onload = => 
+    info.reload()
+    split.resized()
+    
 window.onunload = => editor.setCurrentFile null, noSaveScroll: true # to stop watcher
 
 # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
