@@ -249,7 +249,7 @@ class Term extends Command
                             href: "#{file}:1"
                             line: li
                             clss: 'termResult'
-                        terminal.appendMeta meta
+                        terminal.queueMeta meta
                         li += 1
                         
                 when 'funcs'
@@ -272,7 +272,7 @@ class Term extends Command
                         for info in infos
                             if func[0] != char
                                 char = func[0]
-                                terminal.appendMeta clss: 'salt', text: char                        
+                                terminal.queueMeta clss: 'salt', text: char                        
                             classOrFile = info.class? and "● #{info.class}" or "◼ #{path.basename info.file}"
                             if i == 0
                                 diss = Syntax.dissForTextAndSyntax "▸ #{funcn} #{classOrFile}", 'ko'
@@ -283,7 +283,7 @@ class Term extends Command
                                 diss: diss
                                 href: "#{info.file}:#{info.line+1}"
                                 clss: 'termResult'
-                            terminal.appendMeta meta
+                            terminal.queueMeta meta
                             i += 1
                         
                 when 'classes'
@@ -299,19 +299,19 @@ class Term extends Command
                     for clss in Object.keys(classes).sort()
                         continue if args.length and not filterRegExp(args).test clss
                         info = classes[clss]
-                        terminal.appendMeta clss: 'salt', text: clss
+                        terminal.queueMeta clss: 'salt', text: clss
                         meta =
                             diss: Syntax.dissForTextAndSyntax "● #{clss}", 'ko'
                             href: "#{info.file}:#{info.line+1}"
                             clss: 'termResult'
-                        terminal.appendMeta meta
+                        terminal.queueMeta meta
                         
                         for mthd, minfo of info.methods
                             meta =
                                 diss: Syntax.dissForTextAndSyntax "    ▸ #{mthd}", 'ko'
                                 href: "#{minfo.file}:#{minfo.line+1}"
                                 clss: 'termResult'
-                            terminal.appendMeta meta
+                            terminal.queueMeta meta
                             
                 when 'words'
                     
@@ -329,14 +329,14 @@ class Term extends Command
                         info = words[word]
                         if word[0] != char
                             char = word[0]
-                            terminal.appendMeta clss: 'salt', text: char                        
+                            terminal.queueMeta clss: 'salt', text: char                        
                         diss = Syntax.dissForTextAndSyntax "▸ #{word}", 'ko'
                         meta =
                             diss: diss
                             line: info.count
                             href: "search:#{word}"
                             clss: 'termResult'
-                        terminal.appendMeta meta
+                        terminal.queueMeta meta
                             
                 else
                     ipc.send 'shellCommand', winID: window.winID, cmdID: @cmdID, command: cmmd

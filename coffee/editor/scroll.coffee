@@ -156,13 +156,7 @@ class Scroll extends events
             return
         
         if (@top < @exposeTop) # move exposeTop
-            old = @exposeTop
-            @exposeTop = @top
-            @exposed = @exposeBot - @exposeTop
-            @emit 'exposeTop',
-                old: old
-                new: @exposeTop
-                num: -(@top-old)
+            @changeExposeTop @top
                 
         while (@bot > @exposeBot)
             @exposeBot += 1
@@ -181,14 +175,39 @@ class Scroll extends events
             @exposed = @exposeBot - @exposeTop
             
         if (@top > @exposeTop) and (@exposed > @exposeNum)
+            @changeExposeTop @top 
+
+    changeExposeTop: (top) =>
+        if top != @exposeTop
             old = @exposeTop
-            @exposeTop = @top
+            @exposeTop = top
             @exposed = @exposeBot - @exposeTop
             @emit 'exposeTop',
                 old: old
                 new: @exposeTop
-                num: -(@top-old)            
+                num: -(top-old)
 
+    changeExposeBot: (bot) =>
+        if bot != @exposeBot
+            while @exposeBot > bot
+                @emit 'vanishLine', @exposeBot
+                @exposeBot -= 1
+                @exposed = @exposeBot - @exposeTop                
+            while @exposeBot < bot
+                @exposeBot += 1
+                @exposed = @exposeBot - @exposeTop
+                @emit 'exposeLine', @exposeBot
+        
+    changeTop: (top) =>
+        if @top != top
+            @top = top
+            @emit 'top', @top
+        
+    changeBot: (bot) =>
+        if @bot != bot
+            @bot = bot
+            @emit 'bot', @bot
+        
     # 000  000   000   0000000  00000000  00000000   000000000
     # 000  0000  000  000       000       000   000     000   
     # 000  000 0 000  0000000   0000000   0000000       000   
@@ -198,10 +217,10 @@ class Scroll extends events
     insertLine: (li,oi) =>
         @numLines += 1
         @fullHeight = @numLines * @lineHeight
-        @exposeTop += 1 if oi < @exposeTop
-        @exposeBot += 1 if oi <= @exposeBot or oi == @numLines-1
-        @top += 1 if oi < @top
-        @bot += 1 if oi <= @bot
+        @changeExposeTop @exposeTop + 1 if oi < @exposeTop
+        @changeExposeBot @exposeBot + 1 if oi <= @exposeBot or oi == @numLines-1
+        @changeTop @top + 1 if oi < @top
+        @changeTop @bot + 1 if oi <= @bot
         @exposed = @exposeBot - @exposeTop
         @calc()
         
@@ -214,10 +233,10 @@ class Scroll extends events
     deleteLine: (li,oi) =>
         @numLines -= 1
         @fullHeight = @numLines * @lineHeight
-        @exposeTop -= 1 if oi < @exposeTop
-        @exposeBot -= 1 if oi <= @exposeBot
-        @top -= 1 if oi < @top
-        @bot -= 1 if oi <= @bot
+        @changeExposeTop @exposeTop - 1 if oi < @exposeTop
+        @changeExposeBot @exposeBot - 1 if oi <= @exposeBot
+        @changeTop @top - 1 if oi < @top
+        @changeTop @bot - 1 if oi <= @bot
         @exposed = @exposeBot - @exposeTop
         @calc()
     

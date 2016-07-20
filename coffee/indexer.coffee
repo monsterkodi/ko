@@ -82,15 +82,19 @@ class Indexer
             else
                 log "warning! file #{p} too large? #{stat.size}. skipping indexing!"
        
+    #  0000000   0000000    0000000          00     00  00000000  000000000  000   000   0000000   0000000  
+    # 000   000  000   000  000   000        000   000  000          000     000   000  000   000  000   000
+    # 000000000  000   000  000   000        000000000  0000000      000     000000000  000   000  000   000
+    # 000   000  000   000  000   000        000 0 000  000          000     000   000  000   000  000   000
+    # 000   000  0000000    0000000          000   000  00000000     000     000   000   0000000   0000000  
+    
     addMethod: (className, funcName, file, li) ->
-        log "Indexer.addMethod className:#{className} funcName:#{funcName} file:#{file} li:#{li}"
             
         funcInfo = 
             line:  li
             file:  file
             class: className
 
-        
         if funcName.startsWith '@'
             funcName = funcName.slice 1 
             funcInfo.static = true
@@ -100,9 +104,6 @@ class Indexer
         funcInfos = @funcs[funcName] ? []
         funcInfos.push funcInfo
         @funcs[funcName] = funcInfos
-        
-        log "classes[#{className}]", @classes[className]
-        
         funcInfo
             
     # 000  000   000  0000000    00000000  000   000        00000000  000  000      00000000

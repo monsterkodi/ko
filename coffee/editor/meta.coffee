@@ -226,11 +226,12 @@ class Meta
     
     onExposeTopChanged: (e) => @updatePositionsBelowLineIndex e.new
         
-    updatePositionsBelowLineIndex: (li) ->      
+    updatePositionsBelowLineIndex: (li) ->     
         size = @editor.size
         for meta in @editor.rangesFromTopToBotInRanges li, @editor.scroll.exposeBot, @metas
             tx = size.charWidth *  meta[1][0] + size.offsetX
             ty = size.lineHeight * (meta[0] - @editor.scroll.exposeTop)
+            # console.log "Meta.updatePositionsBelowLineIndex ty:#{ty} #{meta[0]} - @editor.scroll.exposeTop:#{@editor.scroll.exposeTop}"
             meta[2].div?.style.transform = "translate(#{tx}px,#{ty}px)"        
         
     # 000  000   000   0000000  00000000  00000000   000000000  00000000  0000000  
@@ -251,8 +252,10 @@ class Meta
     # 0000000    00000000  0000000  00000000     000     00000000  0000000  
     
     onWillDeleteLine: (li) => 
+        # log "Meta.onWillDeleteLine li:#{li}"
         @onLineVanished lineIndex: li
         _.pullAll @metas, @metasAtLineIndex li
+        # log "pulled", @metas
         for meta in @editor.rangesFromTopToBotInRanges li+1, @editor.lines.length, @metas
             meta[0] -= 1
         @updatePositionsBelowLineIndex li
@@ -267,7 +270,7 @@ class Meta
         @onLineVanished e
         @updatePositionsBelowLineIndex e.lineIndex
         
-    onLineVanished:    (e) => 
+    onLineVanished: (e) => 
         for meta in @metasAtLineIndex e.lineIndex
             meta[2].div?.remove()
             meta[2].div = null        

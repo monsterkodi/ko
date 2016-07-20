@@ -312,18 +312,14 @@ class ViewBase extends Editor
             if e.num < 0
                 @elem.firstChild.remove()
                 li = e.new - (num - n)
-                
-                @emit 'lineVanishedTop',
-                    lineIndex: li
+                @emit 'lineVanishedTop', lineIndex: li
             else 
                 div = @addLine()
                 li = e.new + num - n - 1
                 div.innerHTML = @renderLineAtIndex li
                 @elem.insertBefore div, @elem.firstChild
                 
-                @emit 'lineExposedTop', 
-                    lineIndex: li
-                    lineDiv: div
+                @emit 'lineExposedTop', lineIndex: li, lineDiv: div
 
         @updateLinePositions()
         @updateLayers()

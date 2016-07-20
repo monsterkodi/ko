@@ -15,6 +15,7 @@ class Terminal extends ViewBase
     constructor: (viewElem) ->
         
         @fontSizeDefault = 14
+        @metaQueue = []
         
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Meta']
 
@@ -56,7 +57,10 @@ class Terminal extends ViewBase
     # 000 0 000  000          000     000   000
     # 000   000  00000000     000     000   000
     
-    appendMeta: (meta) -> 
+    appendMeta: (meta) ->
+        if not meta?
+            alert('no meta?')
+            throw new Error
         @meta.append meta
         if meta.diss?
             @appendLineDiss syntax.lineForDiss(meta.diss), meta.diss 
@@ -72,6 +76,20 @@ class Terminal extends ViewBase
                 @do.end()
         else
             @appendLineDiss ''
+        
+    queueMeta: (meta) ->
+        @metaQueue.push meta
+        clearTimeout @metaTimer
+        @metaTimer = setTimeout @dequeueMeta, 0
+        
+    dequeueMeta: =>
+        count = 0
+        while meta = @metaQueue.shift()
+            @appendMeta meta
+            count += 1
+            break if count > 20
+        clearTimeout @metaTimer
+        @metaTimer = setTimeout @dequeueMeta, 0 if @metaQueue.length
            
     clear: ->
         @meta.clear()
