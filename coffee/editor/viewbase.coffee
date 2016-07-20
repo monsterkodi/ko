@@ -293,12 +293,11 @@ class ViewBase extends Editor
     vanishLine: (li) =>
         if (not li?) or (li < 0 )
             li = @elem.children.length-1
-        if li == @scroll.exposeTop + @elem.children.length - 1
-            @elem.lastChild?.remove()
-            @emit 'lineVanished', 
-                lineIndex: li
-        else
-            log "warning! viewbase.vanishLine wrong line index? li: #{li} children: #{@elem.children.length}"
+        if li == @scroll.exposeTop + @elem.children.length - 1 and @elem.lastChild?
+            @elem.lastChild.remove()
+            @emit 'lineVanished', lineIndex: li
+        # else
+            # log "warning! viewbase.vanishLine wrong line index? li: #{li} children: #{@elem.children.length}"
 
     # 00000000  000   000  00000000    0000000    0000000  00000000  000000000   0000000   00000000 
     # 000        000 000   000   000  000   000  000       000          000     000   000  000   000
