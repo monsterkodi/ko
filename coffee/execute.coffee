@@ -63,8 +63,10 @@ class Execute
         coffee.eval "winID = #{cfg.winID}"
         coffee.eval "cmdID = #{cfg.cmdID}"
         result = @execute cfg.command
-        result = str(result) if not result.error?
-        # log "send result #{result} to #{cfg.winID}"
+        if not result?
+            result = 'undefined'
+        else if typeof(result) != 'object' or not result.error? and _.size(result) == 1
+            result = str result
         @main.winWithID(cfg.winID).webContents.send 'executeResult', result, cfg.cmdID
 
     #  0000000  000   000  00000000  000      000    
