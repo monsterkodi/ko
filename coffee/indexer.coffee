@@ -81,6 +81,29 @@ class Indexer
                 @queue.push p
             else
                 log "warning! file #{p} too large? #{stat.size}. skipping indexing!"
+       
+    addMethod: (className, funcName, file, li) ->
+        log "Indexer.addMethod className:#{className} funcName:#{funcName} file:#{file} li:#{li}"
+            
+        funcInfo = 
+            line:  li
+            file:  file
+            class: className
+
+        
+        if funcName.startsWith '@'
+            funcName = funcName.slice 1 
+            funcInfo.static = true
+
+        _.set @classes, "#{className}.methods.#{funcName}", funcInfo
+        
+        funcInfos = @funcs[funcName] ? []
+        funcInfos.push funcInfo
+        @funcs[funcName] = funcInfos
+        
+        log "classes[#{className}]", @classes[className]
+        
+        funcInfo
             
     # 000  000   000  0000000    00000000  000   000        00000000  000  000      00000000
     # 000  0000  000  000   000  000        000 000         000       000  000      000     
@@ -91,6 +114,9 @@ class Indexer
     indexFile: (file) ->
         
         return @shiftQueue() if @files[file]?
+        
+        isCpp = path.extname(file) in ['.cpp', '.cc']
+        isHpp = path.extname(file) in ['.hpp', '.h']
         
         fs.readFile file, 'utf8', (err, data) =>
             return if err?
@@ -122,27 +148,22 @@ class Indexer
                         
                         m = line.match Indexer.methodRegExp
                         if m?[1]?
-                            _.set @classes, "#{currentClass}.methods.#{m[1]}", 
-                                line: li
-                                
-                            funcInfo = 
-                                line:  li
-                                file:  file
-                                class: currentClass
-                            
                             funcName = m[1]
-                            if funcName.startsWith '@'
-                                funcName = funcName.slice 1 
-                                funcInfo.static = true
-                                
-                            funcInfos = @funcs[funcName] ? []
-                            funcInfos.push funcInfo
-                            @funcs[funcName] = funcInfos
-                                                        
+                            funcInfo = @addMethod currentClass, funcName, file, li                                                            
                             funcStack.push [indent, funcInfo, funcName]
-                            
                             funcAdded = true
                     else
+                        
+                        if isCpp or isHpp
+                            methodRegExp = /(\w+)(\<[^\>]+\>)?\:\:(\w+)\s*(\([^\)]*\))\s*(const)?$/
+                            m = line.match methodRegExp
+                            if m?[1]? and m?[3]?
+                                className = m[1]
+                                funcName  = m[3]
+                                funcInfo = @addMethod className, funcName, file, li                                                            
+                                funcStack.push [indent, funcInfo, funcName]
+                                funcAdded = true
+                                continue
                         
                         # 00000000  000   000  000   000   0000000  000000000  000   0000000   000   000   0000000
                         # 000       000   000  0000  000  000          000     000  000   000  0000  000  000     
@@ -187,9 +208,8 @@ class Indexer
                             m = line.match Indexer.classRegExp
                             if m?[1]?
                                 currentClass = m[1]
-                                _.set @classes, "#{m[1]}", 
-                                    file: file
-                                    line: li
+                                _.set @classes, "#{m[1]}.file", file
+                                _.set @classes, "#{m[1]}.line", li
                                     
                         # 00000000   00000000   0000000   000   000  000  00000000   00000000
                         # 000   000  000       000   000  000   000  000  000   000  000     

@@ -1039,8 +1039,8 @@ class Editor extends Buffer
         newCursors = _.cloneDeep @cursors
         
         for c in @cursors
-            sp = @startPosOfContinuousSelectionAtPos c
-            @oldCursorSet newCursors, c, sp[0], sp[1]
+            sp = @startPosOfContinuousSelectionAtPos c            
+            @oldCursorSet newCursors, c, sp[0], sp[1] if sp?
 
         for s in @reversedSelections()
 

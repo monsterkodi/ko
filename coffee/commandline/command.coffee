@@ -134,11 +134,13 @@ class Command
         listTop = split.splitPosY 1
         listHeight = @list.getBoundingClientRect().height
         if (split.elemHeight() - listTop) < listHeight
-            listTop = split.splitPosY(0) - listHeight
-            if listTop < 0
-                @list.style.height = "#{listHeight+listTop}px"
-                listTop = 0                
-        log "Command.positionList split.elemHeight() #{split.elemHeight()} - listTop:#{listTop} < listHeight:#{listHeight}"
+            if split.splitPosY(0) > split.splitPosY(1) - split.splitPosY(1)
+                listTop = split.splitPosY(0) - listHeight
+                if listTop < 0
+                    @list.style.height = "#{listHeight+listTop}px"
+                    listTop = 0
+            else
+                @list.style.height = "#{split.elemHeight() - listTop}px"
         @list?.style.top = "#{listTop}px"
 
     #  0000000  00000000  000      00000000   0000000  000000000

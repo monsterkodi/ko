@@ -309,7 +309,7 @@ class Term extends Command
                         for mthd, minfo of info.methods
                             meta =
                                 diss: Syntax.dissForTextAndSyntax "    ▸ #{mthd}", 'ko'
-                                href: "#{info.file}:#{minfo.line+1}"
+                                href: "#{minfo.file}:#{minfo.line+1}"
                                 clss: 'termResult'
                             terminal.appendMeta meta
                             
