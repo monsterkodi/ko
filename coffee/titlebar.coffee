@@ -50,13 +50,15 @@ class Titlebar
     
     showList: (event) => 
         return if @list?
+        winInfos = ipc.sendSync 'winInfos'
+        return if winInfos.length < 2
         document.activeElement.blur()
         @selected = -1
         @list = document.createElement 'div' 
         @list.className = 'list windows'
         @list.style.top = 0
         window.split.elem.appendChild @list             
-        @listBuffers()
+        @listWinInfos winInfos
         event?.preventDefault()
         event?.stopPropagation()
 
@@ -67,11 +69,9 @@ class Titlebar
             @list?.remove()
             @list = null
 
-    listBuffers: ->
+    listWinInfos: (winInfos) ->
         @list.innerHTML = ""        
         @list.style.display = 'unset'
-        winInfos = ipc.sendSync 'winInfos'
-        log "Titlebar.listBuffers", winInfos
         for info in winInfos
             continue if info.id == window.winID
             div = document.createElement 'div'

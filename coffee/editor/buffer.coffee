@@ -261,6 +261,11 @@ class Buffer extends event
         if not @lines.length
             alert "no line?"
             throw new Error
+            return
+        if not p? or not p[0]? or not p[1]?
+            alert "no p? #{p}"
+            throw new Error
+            return
         l = clamp 0, @lines.length-1, p[1]
         c = clamp 0, @lines[l].length, p[0]
         [ c, l ]

@@ -138,9 +138,7 @@ reloadFile = =>
         keepUndo: false
 
 loadFile = openFile = (file, opt={}) =>
-    if not file?
-        alert "window.loadFile no file?"
-        throw new Error
+    return if not file? or not file.length
     [file,line,column] = file.split ':'
     if file != editor.currentFile or opt?.reload
         return if not fileExists file

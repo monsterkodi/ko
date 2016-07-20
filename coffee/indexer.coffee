@@ -20,7 +20,7 @@ BrowserWindow = electron.BrowserWindow
 class Indexer
     
     @requireRegExp = /^\s*([\w\{\}]+)\s+=\s+require\s+[\'\"]([\.\/\w]+)[\'\"]/
-    @classRegExp   = /^\s*class\s+(\w+)(\s+extends\s\w+)?/
+    @classRegExp   = /^\s*class\s+(\w+)(\s+extends\s\w+|\s*:\s*[\w\,\s\<\>]+)?\s*$/
     @includeRegExp = /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
     @methodRegExp  = /^\s+([\@]?\w+)\s*\:\s*(\([^\)]*\))?\s*[=-]\>/
     @funcRegExp    = /^\s*([\w\.]+)\s*[\:\=]\s*(\([^\)]*\))?\s*[=-]\>/
