@@ -924,20 +924,23 @@ class Editor extends Buffer
         
     insertSurroundCharacter: (ch) ->
         
-        if @closingSurround?
-            if @closingSurround == ch
+        @surroundStack = [] if not @surroundStack?
+        if @surroundStack.length
+            log "Editor.insertSurroundCharacter @surroundStack.length:#{@surroundStack.length}"
+            if last(@surroundStack)[1] == ch
+                log "Editor.insertSurroundCharacter last(@surroundStack)[1] == ch:#{last(@surroundStack)[1] == ch}"
                 for c in @cursors
                     if @lines[c[1]][c[0]] != ch
-                        @closingSurround = null
+                        log "Editor.insertSurroundCharacter reset stack!"
+                        @surroundStack = []
                         break
-                if @closingSurround == ch
+                if @surroundStack.length and last(@surroundStack)[1] == ch
                     @do.start()
                     @selectNone()
                     @deleteForward()
                     @do.end()
-                    @closingSurround = null
+                    @surroundStack.pop()
                     return false
-        @closingSurround = null
         
         if ch == '#' # check if any cursor or selection is inside a string
             found = false
@@ -955,9 +958,10 @@ class Editor extends Buffer
         
         @do.start()
         if @selections.length == 0
-            @do.selections @rangesForCursors()
+            newSelections = @rangesForCursors()
+        else
+            newSelections = _.cloneDeep @selections
             
-        newSelections = _.cloneDeep @selections
         newCursors = _.cloneDeep @cursors
 
         [cl,cr] = switch ch
@@ -969,39 +973,41 @@ class Editor extends Buffer
             when '*'      then ['*', '*']                    
             when '#'      then ['#{', '}']
             
-        @closingSurround = cr
-
-        for s in @selections
-            ns = newSelections[@indexOfSelection s]
+        @surroundStack.push [cl,cr]
+        log "Editor.insertSurroundCharacter", @surroundStack
+        
+        for ns in newSelections
             leftdelta = cl.length
-            if cl == '#{'
-                # convert single string to double string
-                if sr = @rangeOfStringSurroundingRange s
+            for c in @cursorsInRange ns
+                @oldCursorDelta newCursors, c, leftdelta
+            
+            if cl == '#{' # convert single string to double string
+                if sr = @rangeOfStringSurroundingRange ns
                     if @lines[sr[0]][sr[1][0]] == "'"
-                        @do.change s[0], @lines[s[0]].splice sr[1][0], 1, '"'
+                        @do.change ns[0], @lines[ns[0]].splice sr[1][0], 1, '"'
                     if @lines[sr[0]][sr[1][1]-1] == "'"
-                        @do.change s[0], @lines[s[0]].splice sr[1][1]-1, 1, '"'
-            else if cl == '('
-                # remove space after callee
-                before = @lines[s[0]].slice 0, s[1][0]
+                        @do.change ns[0], @lines[ns[0]].splice sr[1][1]-1, 1, '"'
+                        
+            else if cl == '(' and @lengthOfRange(ns) > 0 # remove space after callee
+                before = @lines[ns[0]].slice 0, ns[1][0]
+                after  = @lines[ns[0]].slice ns[1][0]
                 trimmed = before.trimRight()
-                if /\w$/.test(trimmed) and not /(if|when|in|and|or|is|not|else)$/.test trimmed
+                beforeGood = /\w$/.test(trimmed) and not /(if|when|in|and|or|is|not|else|return)$/.test trimmed
+                afterGood = after.trim().length and not after.startsWith ' '
+                if beforeGood and afterGood
                     spaces = before.length-trimmed.length
-                    @do.change s[0], @lines[s[0]].splice trimmed.length, spaces
+                    @do.change ns[0], @lines[ns[0]].splice trimmed.length, spaces
                     ns[1][0] -= spaces
                     ns[1][1] -= spaces
                     leftdelta -= spaces
 
-            @do.change s[0], @lines[s[0]].splice ns[1][1], 0, cr
-            @do.change s[0], @lines[s[0]].splice ns[1][0], 0, cl
+            @do.change ns[0], @lines[ns[0]].splice ns[1][1], 0, cr
+            @do.change ns[0], @lines[ns[0]].splice ns[1][0], 0, cl
                             
             ns[1][0] += cl.length
             ns[1][1] += cl.length
             
-            for c in @cursorsInRange s
-                @oldCursorDelta newCursors, c, leftdelta
-                
-        @do.selections newSelections
+        @do.selections @rangesNotEmptyInRanges newSelections
         @do.cursors newCursors
         @do.end()
         return true
@@ -1118,6 +1124,8 @@ class Editor extends Buffer
             @clearHighlights()
             
     deleteBackward: (opt) ->
+        log "#}editor.deleteBackward @closingSurround #{@closingSurround}"
+        
         @do.start()
         if @selections.length
             @deleteSelection()

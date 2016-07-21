@@ -320,6 +320,8 @@ class Buffer extends event
             @rangeGrownBy ir, 1
             
     rangeGrownBy: (r,delta) -> [r[0], [r[1][0]-delta, r[1][1]+delta]]
+    
+    lengthOfRange: (r) -> r[1][1] - r[1][0]
 
     # 00000000    0000000   000   000   0000000   00000000   0000000
     # 000   000  000   000  0000  000  000        000       000     
@@ -474,6 +476,8 @@ class Buffer extends event
     
     rangesShrunkenBy: (ranges, delta) ->
         ([r[0], [r[1][0]+delta, r[1][1]-delta]] for r in ranges when (r[1][1]-r[1][0])>=2*delta)
+            
+    rangesNotEmptyInRanges: (ranges) -> _.filter ranges, (r) -> r[1][1]-r[1][0]
                              
     #  0000000   0000000   00000000   000000000
     # 000       000   000  000   000     000   
