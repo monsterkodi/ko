@@ -179,9 +179,11 @@ class Buffer extends event
             sp = @rangeStartPos r
             while (sp[0] == 0) and (sp[1] > 0)
                 plr = @rangeForLineAtIndex sp[1]-1
-                r = @rangeAtPosInRanges @rangeEndPos(plr), @selections
-                if r
+                sil = @selectionsInLineAtIndex sp[1]-1
+                if sil.length == 1 and @isSameRange sil[0], plr
                     sp = @rangeStartPos plr
+                else if sil.length and last(sil)[1][1] == plr[1][1]
+                    sp = @rangeStartPos last sil
                 else
                     break
         sp

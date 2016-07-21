@@ -1032,7 +1032,13 @@ class Editor extends Buffer
             
     deleteLineAtIndex: (i) ->
         @do.delete i
-                    
+    
+    #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
+    # 000       000       000      000       000          000     000  000   000  0000  000
+    # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
+    #      000  000       000      000       000          000     000  000   000  000  0000
+    # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
+    
     deleteSelection: ->
         return if @selections.length == 0
         @do.start()
@@ -1112,13 +1118,13 @@ class Editor extends Buffer
             @clearHighlights()
             
     deleteBackward: (opt) ->
+        @do.start()
         if @selections.length
             @deleteSelection()
         else if @cursors.length == 1 and not @isSamePos @mainCursor, @cursorPos()
             @mainCursor = @cursorPos()
             @do.cursors [@mainCursor]
         else
-            @do.start()
             newCursors = _.cloneDeep @cursors
             for c in @reversedCursors()
                 if c[0] == 0        # cursor at start of line
@@ -1144,8 +1150,8 @@ class Editor extends Buffer
                             @newCursorDelta newCursors, nc, -n
 
             @do.cursors newCursors
-            @do.end()
             @emitEdit 'delete'                
             @clearHighlights()
+        @do.end()
             
 module.exports = Editor
