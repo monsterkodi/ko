@@ -3,6 +3,7 @@
 - *save term aliases in seperate file*
 - *make goto work with partial func names*
 - *add cursor positions to navigation history when goto in or jumping to file*
+- *open previous on second start of open command*
 
 - *jump to file (require|path)*
 - *jump to list when multiple matches*
@@ -18,7 +19,6 @@
 - shared recent files of stacked windows
 
 #### editing
-- #< to add salter header of next word
 - select continuous, rectangular ranges with command+shift+M 
 - remove from selection when alt/ctrl is down?
 - don't scroll when no new range added with command+d

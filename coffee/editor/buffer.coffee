@@ -77,6 +77,7 @@ class Buffer extends event
 
     wordAtCursor: (c=@mainCursor) -> @textInRange @rangeForWordAtPos c
     wordsAtCursors: (cs=@cursors) -> (@textInRange @rangeForWordAtPos c for c in cs)
+        
     rangeForWordAtPos: (pos) ->
         p = @clampPos pos
         wr = @wordRangesInLineAtIndex p[1]
@@ -275,9 +276,8 @@ class Buffer extends event
     isSamePos: (a,b) -> a[1]==b[1] and a[0]==b[0]
     isPosInRange: (p, r) -> (p[1] == r[0]) and (r[1][0] <= p[0] <= r[1][1])
     isPosInRanges: (p, rgs) -> @rangeAtPosInRanges(p, rgs)?
-        
-    positionsFromPosInPositions: (p, pl) -> 
-        (r for r in pl when ((r[1] > p[1]) or ((r[1] == p[1]) and (r[0] >= p[0]))))
+    
+    positionsFromPosInPositions: (p, pl) -> (r for r in pl when ((r[1] > p[1]) or ((r[1] == p[1]) and (r[0] >= p[0]))))
     positionsInLineAtIndexInPositions: (li,pl) -> (p for p in pl when p[1] == li)
     positionsBelowLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] > li)
     positionsAfterLineColInPositions: (li,col,pl) -> (p for p in pl when p[1] == li and p[0]>=col)
@@ -293,6 +293,16 @@ class Buffer extends event
                 minPos = ps
         minPos ? last pl
 
+    wordStartPosAfterPos: (p=@cursorPos()) ->
+        return p if p[0] < @lines[p[1]].length and @lines[p[1]][p[0]] != ' '
+        while p[0] < @lines[p[1]].length-1
+            return [p[0]+1, p[1]] if @lines[p[1]][p[0]+1] != ' '
+            p[0] += 1
+        if p[1] < @lines.length-1
+            @wordStartPosAfterPos [0, p[1]+1]
+        else
+            null
+            
     # 00000000    0000000   000   000   0000000   00000000
     # 000   000  000   000  0000  000  000        000     
     # 0000000    000000000  000 0 000  000  0000  0000000 

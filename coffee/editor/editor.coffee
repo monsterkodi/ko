@@ -113,6 +113,11 @@ class Editor extends Buffer
             when 'html'   then @surroundCharacters = @surroundCharacters.concat '<>'.split ''
             when 'coffee' then @surroundCharacters = @surroundCharacters.concat '#'.split ''
                 
+        @lineComment = switch @fileType
+            when 'cpp', 'hpp', 'styl', '.pug' then '//'
+            when 'txt' then '--'
+            else '#'        
+                
     #  0000000  00000000  000000000         000      000  000   000  00000000   0000000
     # 000       000          000            000      000  0000  000  000       000     
     # 0000000   0000000      000            000      000  000 0 000  0000000   0000000 
@@ -768,9 +773,7 @@ class Editor extends Buffer
     #  0000000   0000000   000   000  000   000  00000000  000   000     000   
 
     toggleComment: ->
-        lineComment = switch path.extname @currentFile
-            when '.cpp', '.h', '.styl', '.pug' then '//'
-            else '#'
+        
         @do.start()
         newCursors    = _.cloneDeep @cursors
         newSelections = _.cloneDeep @selections
@@ -783,11 +786,11 @@ class Editor extends Buffer
                 @oldCursorDelta newCursors, c, d
                 
         for i in @selectedAndCursorLineIndices()
-            cs = @lines[i].indexOf lineComment
+            cs = @lines[i].indexOf @lineComment
             if cs >= 0 and @lines[i].substr(0,cs).trim().length == 0
                 # remove comment
-                @do.change i, @lines[i].splice cs, lineComment.length
-                moveInLine i, -lineComment.length
+                @do.change i, @lines[i].splice cs, @lineComment.length
+                moveInLine i, -@lineComment.length
                 si = @indentationAtLineIndex i
                 if si % @indentString.length == 1 # remove space after indent
                     @do.change i, @lines[i].splice si-1, 1
@@ -795,8 +798,8 @@ class Editor extends Buffer
             else # insert comment
                 si = @indentationAtLineIndex i
                 if @lines[i].length > si
-                    l = (lineComment + " ").length
-                    @do.change i, @lines[i].splice si, 0, lineComment + " "
+                    l = (@lineComment + " ").length
+                    @do.change i, @lines[i].splice si, 0, @lineComment + " "
                     moveInLine i, l
         @do.selections newSelections
         @do.cursors newCursors
@@ -825,7 +828,19 @@ class Editor extends Buffer
             @insertNewline indent:true
             @do.end()
             return
-
+    
+        if ch == '<' and @cursors.length == 1
+            cp = @cursorPos()
+            cl = @lineComment.length
+            if cp[0] >= cl and @lines[cp[1]][cp[0]-cl] == @lineComment
+                ws = @wordStartPosAfterPos()
+                if ws?
+                    wd = @textInRange @rangeForWordAtPos ws
+                    wd += @textInRange @rangeForWordAtPos [ws[0]+1, ws[1]] if wd == '@'
+                    @do.change cp[1], @lines[cp[1]].splice cp[0], 0, '>' + wd
+                    @do.end()
+                    return
+        
         @deleteSelection()
         newCursors = _.cloneDeep @cursors
         
@@ -850,7 +865,7 @@ class Editor extends Buffer
         for c in @cursors 
             if c[0] > @lines[c[1]].length
                 @do.change c[1], @lines[c[1]].splice c[0], 0, _.padStart '', c[0]-@lines[c[1]].length
-    
+
     insertTab: ->
         if @selections.length
             @indent()
@@ -1250,5 +1265,5 @@ class Editor extends Buffer
                     if nc[0] >= c[0]
                         @newCursorDelta newCursors, nc, -n
         @do.cursors newCursors
-      
+        
 module.exports = Editor
