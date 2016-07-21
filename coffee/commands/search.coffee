@@ -107,11 +107,7 @@ class FileSearcher extends stream.Writable
             
     write: (chunk, encoding, cb) ->        
         lines = chunk.split '\n'
-        if not @syntaxName?
-            if lines[0].startsWith "#!"
-                @syntaxName = syntax.nameForShebang lines[0]
-            else
-                @syntaxName = 'txt'
+        @syntaxName = syntax.shebang lines[0] if not @syntaxName?
         for l in lines
             @line += 1            
             rngs = matchr.ranges @patterns, l

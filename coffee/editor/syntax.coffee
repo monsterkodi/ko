@@ -108,15 +108,16 @@ class Syntax
     #      000  000   000  000       000   000  000   000  000  0000  000   000
     # 0000000   000   000  00000000  0000000    000   000  000   000   0000000 
     
-    @nameForShebang: (shebang) ->        
-        lastWord = last shebang.split /[\s\/]/
-        switch lastWord
-            when 'python' then return 'py'
-            when 'node'   then return 'js'
-            when 'bash'   then return 'sh'
-            else 
-                if lastWord in @syntaxNames
-                    return lastWord
+    @shebang: (line) ->
+        if line.startsWith "#!"
+            lastWord = last line.split /[\s\/]/
+            switch lastWord
+                when 'python' then return 'py'
+                when 'node'   then return 'js'
+                when 'bash'   then return 'sh'
+                else 
+                    if lastWord in @syntaxNames
+                        return lastWord
         'txt'
     
     # 000  000   000  000  000000000

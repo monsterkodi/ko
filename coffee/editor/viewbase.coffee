@@ -118,8 +118,7 @@ class ViewBase extends Editor
     
     setText: (text) ->
         if @syntax.name == 'txt'
-            if text.startsWith "#!"
-                @syntax.name = syntax.nameForShebang text.slice 0, text.search /\r?\n/
+            @syntax.name = syntax.shebang text.slice 0, text.search /\r?\n/
         super text
                 
     #  0000000  00000000  000000000  000      000  000   000  00000000   0000000

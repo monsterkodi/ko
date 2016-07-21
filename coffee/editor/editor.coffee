@@ -4,6 +4,7 @@
 # 000       000   000  000     000     000   000  000   000
 # 00000000  0000000    000     000      0000000   000   000
 {
+extName,
 clamp,
 first,
 last,
@@ -11,6 +12,7 @@ $}      = require '../tools/tools'
 log     = require '../tools/log'
 watcher = require './watcher'
 Buffer  = require './buffer'
+Syntax  = require './syntax'
 undo    = require './undo'
 path    = require 'path'
 fs      = require 'fs'
@@ -19,15 +21,17 @@ _       = require 'lodash'
 class Editor extends Buffer
 
     constructor: () ->
-        @surroundStack = []
-        @surroundCharacters = "{}[]()#'\"".split ''
-        @currentFile = null
-        @indentString = _.padStart "", 4
-        @stickySelection = false
-        @mainCursorMove = 0
-        @watch = null
-        @do = new undo @
-        @dbg = false
+        @surroundStack      = []
+        @surroundCharacters = []
+        @surroundPairs      = Object.create null
+        @currentFile        = null
+        @fileType           = 'txt'
+        @indentString       = _.padStart "", 4
+        @stickySelection    = false
+        @mainCursorMove     = 0
+        @watch              = null
+        @do                 = new undo @
+        @dbg                = false
         super
 
     #  0000000   00000000   00000000   000      000   000
@@ -63,16 +67,51 @@ class Editor extends Buffer
     setCurrentFile: (file, opt) ->
         @stopWatcher()
         @currentFile = file
-        if not opt?.keepUndo
-            @do.reset() 
+        @do.reset() if not opt?.keepUndo
         @updateTitlebar()
         if file?
             @watch = new watcher @
             @setText fs.readFileSync file, encoding: 'utf8'
+            @setupFileType()
         else
+            @fileType = ''
             @watch = null
             @setLines []
 
+    # 000000000  000   000  00000000   00000000
+    #    000      000 000   000   000  000     
+    #    000       00000    00000000   0000000 
+    #    000        000     000        000     
+    #    000        000     000        00000000
+    
+    setupFileType: ->
+        @fileType = Syntax.shebang @lines[0]
+        if @fileType == 'txt'
+            ext = extName @currentFile
+            if ext in Syntax.syntaxNames
+                @fileType = ext
+                
+        # log "setupFileType @fileType:#{@fileType}"
+
+        @surroundPairs = 
+            '[': ['[', ']']
+            ']': ['[', ']']
+            '{': ['{', '}']
+            '}': ['{', '}']
+            '(': ['(', ')']
+            ')': ['(', ')']
+            '<': ['<', '>']
+            '>': ['<', '>']
+            '#': ['#{', '}']
+            "'": ["'", "'"]
+            '"': ['"', '"']
+            '*': ['*', '*']                    
+        
+        @surroundCharacters = "{}[]()\"'".split ''
+        switch @fileType
+            when 'md'   then @surroundCharacters = @surroundCharacters.concat '*'.split ''
+            when 'html' then @surroundCharacters = @surroundCharacters.concat '<>'.split ''
+                
     #  0000000  00000000  000000000         000      000  000   000  00000000   0000000
     # 000       000          000            000      000  0000  000  000       000     
     # 0000000   0000000      000            000      000  000 0 000  0000000   0000000 
@@ -991,14 +1030,15 @@ class Editor extends Buffer
             
         newCursors = _.cloneDeep @cursors
 
-        [cl,cr] = switch ch
-            when '[', ']' then ['[', ']']
-            when '{', '}' then ['{', '}']
-            when '(', ')' then ['(', ')']
-            when "'"      then ["'", "'"]
-            when '"'      then ['"', '"']
-            when '*'      then ['*', '*']                    
-            when '#'      then ['#{', '}']
+        [cl,cr] = @surroundPairs[ch]
+        # [cl,cr] = switch ch
+            # when '[', ']' then ['[', ']']
+            # when '{', '}' then ['{', '}']
+            # when '(', ')' then ['(', ')']
+            # when "'"      then ["'", "'"]
+            # when '"'      then ['"', '"']
+            # when '*'      then ['*', '*']                    
+            # when '#'      then ['#{', '}']
             
         @surroundStack.push [cl,cr]
         

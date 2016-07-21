@@ -70,6 +70,7 @@ module.exports =
     resolve:   (p) -> path.normalize path.resolve p.replace /\~/, process.env.HOME
     unresolve: (p) -> p.replace os.homedir(), "~"    
     fileName:  (p) -> path.basename p, path.extname p
+    extName:   (p) -> path.extname(p).slice 1
 
     fileList: (paths, opt={ignoreHidden: true, logError: true}) ->
         files = []
@@ -125,7 +126,7 @@ module.exports =
         r
         
     swapExt: (p, ext) -> path.join(path.dirname(p), path.basename(p, path.extname(p))) + ext
-        
+            
     #  0000000   0000000   0000000
     # 000       000       000     
     # 000       0000000   0000000 
