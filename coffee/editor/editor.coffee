@@ -832,7 +832,7 @@ class Editor extends Buffer
     # 000   000  00000000  00     00  0000000  000  000   000  00000000
         
     insertNewline: (opt) ->
-        @closingInserted = null
+        @surroundStack = []
         @deleteSelection()
         @do.start()
         
@@ -847,25 +847,31 @@ class Editor extends Buffer
             if opt?.indent
                 line = before.trimRight()
                 il = 0
+                thisIndent = @indentationAtLineIndex c[1]
+                indentLength = @indentString.length
                 for e in ['->', '=>', ':', ',', '=']
                     if line.endsWith e
-                        il = @indentString.length
+                        il = thisIndent + indentLength
                         break
                 if il == 0
                     if /(^|\s)(else\s*$|switch\s|for\s|while\s|class\s)/.test before
-                        il = @indentString.length
-                    else if /^(\s+when|\s*if)(?!.*\sthen\s)/.test line
-                        il = @indentString.length 
-                if /(when|if)/.test before
+                        il = thisIndent + indentLength
+                    else if /^(\s+when|\s*if|\s*else\s+if\s+)(?!.*\sthen\s)/.test line
+                        il = thisIndent + indentLength
+                    else il = thisIndent
+                
+                if /(when|if)/.test before 
                     if after.startsWith 'then '
-                        after = after.slice(4).trimLeft()
+                        after = after.slice(4).trimLeft() # remove then
                     else if before.trim().endsWith 'then'
                         before = before.trimRight()
-                        before = before.slice 0, before.length-4
-                else if before.trim().startsWith 'return'
-                    il = -@indentString.length 
-                    
-                il += @indentationAtLineIndex c[1]
+                        before = before.slice 0, before.length-4 # remove then
+                        
+                else if before.trim().startsWith 'return' # indent less after return
+                    il = -indentLength
+                
+                nextIndent = @indentationAtLineIndex c[1]+1
+                il = nextIndent if nextIndent > il
                 indent = _.padStart "", il
             else
                 indent = ''
@@ -1210,5 +1216,5 @@ class Editor extends Buffer
                     if nc[0] >= c[0]
                         @newCursorDelta newCursors, nc, -n
         @do.cursors newCursors
-            
+      
 module.exports = Editor

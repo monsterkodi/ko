@@ -237,7 +237,7 @@ class Buffer extends event
         
     indentationAtLineIndex: (li) ->
         s = 0
-        while @lines[li][s] == ' '
+        while li < @lines.length and @lines[li][s] == ' '
             s += 1
         s
             

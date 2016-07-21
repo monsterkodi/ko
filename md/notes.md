@@ -4,6 +4,8 @@
 - *jump to file (require|path)*
 - *jump to list when multiple matches*
 - *save term aliases in seperate file*
+- *make goto work with partial func names*
+- *add cursor positions to navigation history when goto in or jumping to file*
 
 - display dirty status in window list
 - colorize term/coffee history
@@ -46,10 +48,9 @@
 - remove from selection when alt/ctrl is down?
 - don't scroll when no new range added with command+d
 - delete forward swallows spaces?
-- on second command+e: select including leading @ or surrounding '""'
 - when pasting text at indent level, remove leading space columns
-- multicursors when pasting multiple lines at col > 0
-- indent more when inserting newline and next line is indented more?
+- multicursors and indent when pasting multiple lines at single cursor in col > 0
+- indent to next line's indent when inserting newline and next line is indented more
 
 #### terminal
 - *autocomplete dirs and files*
