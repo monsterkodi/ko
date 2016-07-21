@@ -5,6 +5,7 @@
 - *jump to list when multiple matches*
 - *save term aliases in seperate file*
 
+- filter recent files not existing from open history
 - display dirty status in window list
 - colorize term/coffee history
 

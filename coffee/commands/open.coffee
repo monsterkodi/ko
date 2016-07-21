@@ -260,7 +260,13 @@ class Open extends Command
         @files.sort (a,b) -> relWeight(b) - relWeight(a)
 
         if @history.length and not @navigating
-            h = (relative(f, @dir) for f in @history when f.length and (f != @file))
+            h = []
+            for f in @history
+                if f.length and (f != @file)
+                    if fileExists f
+                        h.push relative(f, @dir) 
+                    else
+                        _.pullAll @history, f
             @lastFileIndex = h.length - 1
             @files = _.concat h, @files
         if @navigating or @lastFileIndex < 0
