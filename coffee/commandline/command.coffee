@@ -28,7 +28,9 @@ class Command
         index = @shortcuts.indexOf combo
         @setName @names[index]
         @loadState()
-        text:   @last()
+        text = @getText()
+        text = @last() if not text?.length
+        text:   text
         select: true
         
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
@@ -261,8 +263,7 @@ class Command
         @commandline.setText t
         @commandline.selectAll()
         
-    getText: ->
-        @commandline.lines[0]
+    getText: -> @commandline.lines[0]
     
     setName: (n) ->
         @name = n

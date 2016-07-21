@@ -33,7 +33,9 @@ class Macro extends Command
         
     start: (@combo) ->
         super @combo
-        text: @last() ? "dbg"
+        text = @last()
+        text = 'dbg' if not text?.length
+        text:   text
         select: true
 
     # 000      000   0000000  000000000

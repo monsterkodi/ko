@@ -124,6 +124,7 @@ class Commandline extends ViewBase
         @command.setFocus activeClass != '.commandline-editor' and activeClass or null
         @view.focus()
         @setName name
+        combo = @command.shortcuts[0] if not combo?
         @results @command.start combo # <-- command start
         @cmmd.className = "commandline-command active #{@command.prefsID}"
                 

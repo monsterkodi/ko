@@ -26,7 +26,9 @@ class Goto extends Command
         
     start: (@combo) ->
         super @combo
-        text: @last() ? "-1"
+        text = @last()
+        text = '-1' if not text?.length
+        text:   text
         select: true
         
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000

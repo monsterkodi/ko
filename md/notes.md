@@ -5,7 +5,6 @@
 - *jump to list when multiple matches*
 - *save term aliases in seperate file*
 
-- filter recent files not existing from open history
 - display dirty status in window list
 - colorize term/coffee history
 
@@ -13,7 +12,6 @@
 - *keep index up to date when file changes*
 
 #### open
-- show relative path when navigating in history
 - resolve environment variables
 - shared recent files of stacked windows
 - *automatically start salter and konrad in pkg dir*
@@ -37,7 +35,6 @@
 
 #### editor
 - save and restore scrollX/Left
-- keep undo when saving?
 - check undo (merges too much?)
 - make special stuff file type dependent
     - eg. add * to surround characters for md
@@ -45,7 +42,6 @@
 #### editing
 - autocomplete navigate backwards from bottom
 - #< to add salter header of next word
-- no surround for ' inside words
 - select continuous,rectangular ranges with command+shift+M 
 - remove from selection when alt/ctrl is down?
 - don't scroll when no new range added with command+d

@@ -313,11 +313,30 @@ class Editor extends Buffer
             
         text = @textInRange @selections[0]
         if text.length
+            
+            if @highlights.length
+                if text == @textInRange first @highlights # see if we can grow the current selection
+                    largerRange = [@selections[0][0], [@selections[0][1][0]-1, @selections[0][1][1]]]
+                    largerText = @textInRange largerRange
+                    if largerText[0] in "@#$%&*+-!?:.'\"/" or /[A-Za-z]/.test largerText[0]
+                        if largerText[0] in "'\"" # grow strings in both directions
+                            nr = [@selections[0][0], [@selections[0][1][0]-1, @selections[0][1][1]+1]] 
+                            nt = @textInRange nr
+                            if nt[nt.length-1] == largerText[0]
+                                largerText = nt
+                                largerRange = nr
+                        else if /[A-Za-z]/.test largerText[0] # grow whole words
+                            while largerRange[1][0] > 0 and /[A-Za-z]/.test @lines[largerRange[0]][largerRange[1][0]-1]
+                                largerRange[1][0] -= 1
+                                largerText = @textInRange largerRange
+                        text = largerText                        
+                        @selectSingleRange largerRange if @selections.length == 1
+            
             @highlights = @rangesForText text, max:9999
             @renderHighlights()
             @emit 'highlight'
-            window.commandline.commands.find?.setCurrentText text
-            window.commandline.commands.search?.setCurrentText text
+            window.commandline.startCommand 'find' if window.commandline.command?.prefsID not in ['search', 'find']
+            window.commandline.setText text
 
     clearHighlights: ->
         @highlights = []
@@ -953,6 +972,10 @@ class Editor extends Buffer
                         found = true
                         break
             return false if not found
+        if ch == "'" and not @selections.length # check if any alpabetical character is before any cursor
+            for c in @cursors
+                if c[0] > 0 and /[A-Za-z]/.test @lines[c[1]][c[0]-1] 
+                    return false
         
         @do.start()
         if @selections.length == 0
@@ -972,7 +995,6 @@ class Editor extends Buffer
             when '#'      then ['#{', '}']
             
         @surroundStack.push [cl,cr]
-        log "Editor.insertSurroundCharacter", @surroundStack
         
         for ns in newSelections
             leftdelta = cl.length
