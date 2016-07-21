@@ -67,7 +67,8 @@ class Editor extends Buffer
     setCurrentFile: (file, opt) ->
         @stopWatcher()
         @currentFile = file
-        @do.reset() if not opt?.keepUndo
+        if not opt?.keepUndo? or opt.keepUndo == false
+            @do.reset()
         @updateTitlebar()
         if file?
             @watch = new watcher @
