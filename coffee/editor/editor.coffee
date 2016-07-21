@@ -19,6 +19,7 @@ _       = require 'lodash'
 class Editor extends Buffer
 
     constructor: () ->
+        @surroundStack = []
         @surroundCharacters = "{}[]()#'\"".split ''
         @currentFile = null
         @indentString = _.padStart "", 4
@@ -922,16 +923,12 @@ class Editor extends Buffer
     #      000  000   000  000   000  000   000  000   000  000   000  000  0000  000   000
     # 0000000    0000000   000   000  000   000   0000000    0000000   000   000  0000000  
         
-    insertSurroundCharacter: (ch) ->
+    insertSurroundCharacter: (ch) ->        
         
-        @surroundStack = [] if not @surroundStack?
         if @surroundStack.length
-            log "Editor.insertSurroundCharacter @surroundStack.length:#{@surroundStack.length}"
             if last(@surroundStack)[1] == ch
-                log "Editor.insertSurroundCharacter last(@surroundStack)[1] == ch:#{last(@surroundStack)[1] == ch}"
-                for c in @cursors
+                for c in @cursors 
                     if @lines[c[1]][c[0]] != ch
-                        log "Editor.insertSurroundCharacter reset stack!"
                         @surroundStack = []
                         break
                 if @surroundStack.length and last(@surroundStack)[1] == ch
@@ -1036,8 +1033,7 @@ class Editor extends Buffer
         @mainCursor = first @cursors
         @do.end()
             
-    deleteLineAtIndex: (i) ->
-        @do.delete i
+    deleteLineAtIndex: (i) -> @do.delete i
     
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000
@@ -1070,7 +1066,6 @@ class Editor extends Buffer
         @do.selections []
         @do.cursors newCursors
         @do.end()
-        @emitEdit 'delete'
         @clearHighlights()        
         
     deleteTab: ->
@@ -1089,7 +1084,13 @@ class Editor extends Buffer
             @do.cursors newCursors
             @do.end()
             @clearHighlights()
-            
+    
+    # 00000000   0000000   00000000   000   000   0000000   00000000   0000000  
+    # 000       000   000  000   000  000 0 000  000   000  000   000  000   000
+    # 000000    000   000  0000000    000000000  000000000  0000000    000   000
+    # 000       000   000  000   000  000   000  000   000  000   000  000   000
+    # 000        0000000   000   000  00     00  000   000  000   000  0000000  
+    
     deleteForward: ->
         if @selections.length
             @deleteSelection()
@@ -1120,11 +1121,15 @@ class Editor extends Buffer
 
             @do.cursors newCursors
             @do.end()
-            @emitEdit 'delete'
             @clearHighlights()
-            
+     
+    # 0000000     0000000    0000000  000   000  000   000   0000000   00000000   0000000  
+    # 000   000  000   000  000       000  000   000 0 000  000   000  000   000  000   000
+    # 0000000    000000000  000       0000000    000000000  000000000  0000000    000   000
+    # 000   000  000   000  000       000  000   000   000  000   000  000   000  000   000
+    # 0000000    000   000   0000000  000   000  00     00  000   000  000   000  0000000  
+    
     deleteBackward: (opt) ->
-        log "#}editor.deleteBackward @closingSurround #{@closingSurround}"
         
         @do.start()
         if @selections.length
@@ -1133,33 +1138,54 @@ class Editor extends Buffer
             @mainCursor = @cursorPos()
             @do.cursors [@mainCursor]
         else
-            newCursors = _.cloneDeep @cursors
-            for c in @reversedCursors()
-                if c[0] == 0        # cursor at start of line
-                    if opt?.ignoreLineBoundary or @cursors.length == 1
-                        if c[1] > 0 # cursor not in first line
-                            ll = @lines[c[1]-1].length
-                            @do.change c[1]-1, @lines[c[1]-1] + @lines[c[1]]
-                            @do.delete c[1]
-                            # move cursors in joined line
-                            for nc in @positionsInLineAtIndexInPositions c[1], newCursors
-                                @newCursorDelta newCursors, nc, ll, -1
-                            # move cursors below deleted line up
-                            for nc in @positionsBelowLineIndexInPositions c[1], newCursors
-                                @newCursorDelta newCursors, nc, 0, -1
-                else
-                    n = (c[0] % @indentString.length) or @indentString.length
-                    t = @textInRange [c[1], [Math.max(0, c[0]-n-1), c[0]]]
-                    if t.trim().length != 0
-                        n = 1
-                    @do.change c[1], @lines[c[1]].splice c[0]-n, n
-                    for nc in @positionsInLineAtIndexInPositions c[1], newCursors
-                        if nc[0] >= c[0]
-                            @newCursorDelta newCursors, nc, -n
-
-            @do.cursors newCursors
-            @emitEdit 'delete'                
+            if @surroundStack.length
+                so = last(@surroundStack)[0]
+                sc = last(@surroundStack)[1]
+                for c in @cursors
+                    prv = ''
+                    prv = @lines[c[1]].slice c[0]-so.length, c[0] if c[0] >= so.length
+                    nxt = @lines[c[1]].slice c[0], c[0]+sc.length
+                    if prv != so or nxt != sc
+                        @surroundStack = []
+                        break
+                if @surroundStack.length
+                    for i in [0...so.length]
+                        @deleteCharacterBackward opt
+                    for i in [0...sc.length]
+                        @deleteForward()
+                    @surroundStack.pop()
+                    @clearHighlights()
+                    @do.end()
+                    return
+            
+            @deleteCharacterBackward opt
             @clearHighlights()
         @do.end()
+
+    deleteCharacterBackward: (opt) ->
+        newCursors = _.cloneDeep @cursors        
+        for c in @reversedCursors()
+            if c[0] == 0        # cursor at start of line
+                if opt?.ignoreLineBoundary or @cursors.length == 1
+                    if c[1] > 0 # cursor not in first line
+                        ll = @lines[c[1]-1].length
+                        @do.change c[1]-1, @lines[c[1]-1] + @lines[c[1]]
+                        @do.delete c[1]
+                        # move cursors in joined line
+                        for nc in @positionsInLineAtIndexInPositions c[1], newCursors
+                            @newCursorDelta newCursors, nc, ll, -1
+                        # move cursors below deleted line up
+                        for nc in @positionsBelowLineIndexInPositions c[1], newCursors
+                            @newCursorDelta newCursors, nc, 0, -1
+            else
+                n = (c[0] % @indentString.length) or @indentString.length
+                t = @textInRange [c[1], [Math.max(0, c[0]-n-1), c[0]]]
+                if t.trim().length != 0
+                    n = 1
+                @do.change c[1], @lines[c[1]].splice c[0]-n, n
+                for nc in @positionsInLineAtIndexInPositions c[1], newCursors
+                    if nc[0] >= c[0]
+                        @newCursorDelta newCursors, nc, -n
+        @do.cursors newCursors
             
 module.exports = Editor
