@@ -6,6 +6,7 @@
 - *save term aliases in seperate file*
 
 - display dirty status in window list
+- colorize term/coffee history
 
 #### indexer
 - *keep index up to date when file changes*
