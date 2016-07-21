@@ -10,7 +10,7 @@
 - colorize term/coffee history
 
 #### indexer
-- *keep index up to date when file changes*
+- *keep index up to date when (file) changes*
 
 #### open
 - *automatically start salter and konrad in pkg dir*
@@ -39,8 +39,6 @@
 #### editor
 - save and restore scrollX/Left
 - check undo (merges too much?)
-- make special stuff file type dependent
-    - () magic only for coffee
 
 #### terminal
 - *autocomplete dirs and files*

@@ -109,8 +109,9 @@ class Editor extends Buffer
         
         @surroundCharacters = "{}[]()\"'".split ''
         switch @fileType
-            when 'md'   then @surroundCharacters = @surroundCharacters.concat '*'.split ''
-            when 'html' then @surroundCharacters = @surroundCharacters.concat '<>'.split ''
+            when 'md'     then @surroundCharacters = @surroundCharacters.concat '*'.split ''
+            when 'html'   then @surroundCharacters = @surroundCharacters.concat '<>'.split ''
+            when 'coffee' then @surroundCharacters = @surroundCharacters.concat '#'.split ''
                 
     #  0000000  00000000  000000000         000      000  000   000  00000000   0000000
     # 000       000          000            000      000  0000  000  000       000     
@@ -1004,7 +1005,7 @@ class Editor extends Buffer
                     @surroundStack.pop()
                     return false
         
-        if ch == '#' # check if any cursor or selection is inside a string
+        if ch == '#' and @fileType == 'coffee' # check if any cursor or selection is inside a string
             found = false
             for s in @selections
                 if @isRangeInString s
@@ -1017,6 +1018,7 @@ class Editor extends Buffer
                         found = true
                         break
             return false if not found
+            
         if ch == "'" and not @selections.length # check if any alpabetical character is before any cursor
             for c in @cursors
                 if c[0] > 0 and /[A-Za-z]/.test @lines[c[1]][c[0]-1] 
@@ -1031,14 +1033,6 @@ class Editor extends Buffer
         newCursors = _.cloneDeep @cursors
 
         [cl,cr] = @surroundPairs[ch]
-        # [cl,cr] = switch ch
-            # when '[', ']' then ['[', ']']
-            # when '{', '}' then ['{', '}']
-            # when '(', ')' then ['(', ')']
-            # when "'"      then ["'", "'"]
-            # when '"'      then ['"', '"']
-            # when '*'      then ['*', '*']                    
-            # when '#'      then ['#{', '}']
             
         @surroundStack.push [cl,cr]
         
@@ -1054,7 +1048,7 @@ class Editor extends Buffer
                     if @lines[sr[0]][sr[1][1]-1] == "'"
                         @do.change ns[0], @lines[ns[0]].splice sr[1][1]-1, 1, '"'
                         
-            else if cl == '(' and @lengthOfRange(ns) > 0 # remove space after callee
+            else if @fileType == 'coffee' and cl == '(' and @lengthOfRange(ns) > 0 # remove space after callee
                 before = @lines[ns[0]].slice 0, ns[1][0]
                 after  = @lines[ns[0]].slice ns[1][0]
                 trimmed = before.trimRight()
