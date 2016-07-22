@@ -44,7 +44,7 @@ class Macro extends Command
     # 000      000       000     000   
     # 0000000  000  0000000      000   
     
-    listItems: () -> @macros
+    listItems: () -> @macros.concat super()
         
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
@@ -161,8 +161,10 @@ class Macro extends Command
                 
                 """
                 atomicFile file, text, encoding: 'utf8', (err) =>
-                    if not err?
-                        ipc.send 'newWindowWithFile', file
+                    if err?
+                        log 'writing class skeleton failed', err
+                        return
+                    ipc.send 'newWindowWithFile', file
                 return focus: '.'+editor.name
             
         text: ''

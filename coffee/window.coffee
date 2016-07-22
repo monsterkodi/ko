@@ -137,7 +137,7 @@ reloadFile = =>
         dontSave: true
         keepUndo: false
 
-loadFile = openFile = (file, opt={}) =>
+loadFile = (file, opt={}) =>
     return if not file? or not file.length
     [file,line,column] = file.split ':'
     if file != editor.currentFile or opt?.reload
@@ -145,7 +145,10 @@ loadFile = openFile = (file, opt={}) =>
         # log "window.loadFile #{file}"
         if editor.currentFile? and not opt?.dontSave and editor.do.hasLineChanges() 
             saveChanges = [_.clone(editor.currentFile), _.clone(editor.text())]
-            atomicFile saveChanges[0], saveChanges[1], encoding: 'utf8'
+            atomicFile saveChanges[0], saveChanges[1], encoding: 'utf8', (err) =>
+                    if err?
+                        log "saving changes to #{file} failed", err
+                        return
             
         addToRecent file   
         opt.keepUndo = file == editor.currentFile if not opt.keepUndo?
@@ -160,6 +163,8 @@ loadFile = openFile = (file, opt={}) =>
     if line?
         editor.singleCursorAtPos [column? and parseInt(column) or 0, parseInt(line)-1] 
         editor.scrollCursorToTop()        
+  
+openFile = loadFile  
   
 #  0000000   00000000   00000000  000   000        00000000  000  000      00000000   0000000
 # 000   000  000   000  000       0000  000        000       000  000      000       000     

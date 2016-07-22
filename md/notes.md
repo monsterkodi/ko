@@ -14,7 +14,7 @@
 - *keep index up to date when (file) changes*
 
 #### open
-- *automatically start salter and konrad in pkg dir*
+- *automatically start konrad in pkg dir*
 - resolve environment variables
 - shared recent files of stacked windows
 
@@ -25,6 +25,7 @@
 - delete forward swallows spaces?
 - when pasting text at indent level, remove leading space columns
 - multicursors and indent when pasting multiple lines at single cursor in col > 0
+- edit salter headers like normal text?
 
 #### coffee syntax
 - fix

@@ -5,10 +5,13 @@
 #  0000000    0000000      000      0000000 
 {
 clamp
-}       = require '../tools/tools'
-log     = require '../tools/log'
-Command = require '../commandline/command'
-_       = require 'lodash'
+}        = require '../tools/tools'
+log      = require '../tools/log'
+Command  = require '../commandline/command'
+_        = require 'lodash'
+electron = require 'electron'
+
+ipc = electron.ipcRenderer
 
 class Goto extends Command
 
@@ -26,10 +29,24 @@ class Goto extends Command
         
     start: (@combo) ->
         super @combo
-        text = @last()
-        text = '-1' if not text?.length
-        text:   text
+        @showList()
+        @showItems @listItems() 
+        @select -1
+        # text = @last()
+        # text = '-1' if not text?.length
+        # text:   text
         select: true
+     
+    # 000      000   0000000  000000000  000  000000000  00000000  00     00   0000000
+    # 000      000  000          000     000     000     000       000   000  000     
+    # 000      000  0000000      000     000     000     0000000   000000000  0000000 
+    # 000      000       000     000     000     000     000       000 0 000       000
+    # 0000000  000  0000000      000     000     000     00000000  000   000  0000000 
+    
+    listItems: () -> 
+        files = ipc.sendSync 'indexer', 'files'
+        funcs = files[window.editor.currentFile].funcs
+        funcNames = (info[2] for info in funcs)
         
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
