@@ -19,7 +19,6 @@ class Numbers extends event
         
         @elem = $(".numbers", @editor.view)
         @editor.on 'clearLines',       @onClearLines
-        @editor.on 'lineInserted',     @onLineInserted
         @editor.on 'lineDeleted',      @onLineDeleted
         @editor.on 'lineExposed',      @onLineExposed
         @editor.on 'lineVanished',     @onLineVanished
@@ -39,7 +38,6 @@ class Numbers extends event
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
     
     updateColors: (top=@editor.scroll.exposeTop, bot=@editor.scroll.exposeBot) =>
-        # @log "numbers.updateColors #{top} #{bot}" if @editor.name == 'editor'
         sr = @editor.rangesFromTopToBotInRanges top, bot, @editor.selections
         hr = @editor.rangesFromTopToBotInRanges top, bot, @editor.highlights        
         cr = @editor.rangesFromTopToBotInRanges top, bot, @editor.rangesForCursors()
@@ -71,7 +69,6 @@ class Numbers extends event
     onFontSizeChange: => 
         @elem.style.lineHeight = "#{@editor.size.lineHeight}px"        
         if @editor.size.fontSize < 13
-            # @log "@editor.size.fontSize", @editor.size.fontSize
             @elem.style.fontSize = "#{@editor.size.fontSize}px"
     
     # 00000000  000   000  00000000    0000000    0000000  00000000
@@ -81,22 +78,12 @@ class Numbers extends event
     # 00000000  000   000  000         0000000   0000000   00000000
         
     onLineExposed: (e) =>
-        # @log "numbers.onLineExposed #{@editor.name} #{e.lineIndex}" if @editor.name == 'editor'
         @elem.appendChild @addLine e.lineIndex
         @updateColors e.lineIndex, e.lineIndex
         
     onLineExposedTop: (e) =>
-        # @log "numbers.onLineExposedTop #{@editor.name} #{e.lineIndex}" if @editor.name == 'editor'
         @elem.insertBefore @addLine(e.lineIndex), @elem.firstChild
         @updateColors e.lineIndex, e.lineIndex
-        
-    # 000  000   000   0000000  00000000  00000000   000000000  00000000  0000000  
-    # 000  0000  000  000       000       000   000     000     000       000   000
-    # 000  000 0 000  0000000   0000000   0000000       000     0000000   000   000
-    # 000  000  0000       000  000       000   000     000     000       000   000
-    # 000  000   000  0000000   00000000  000   000     000     00000000  0000000  
-        
-    onLineInserted: (li) => @elem.appendChild @addLine @elem.children.length - @editor.scroll.exposeTop
         
     # 0000000    00000000  000      00000000  000000000  00000000  0000000  
     # 000   000  000       000      000          000     000       000   000
@@ -128,7 +115,6 @@ class Numbers extends event
     # 000   000  0000000    0000000    0000000  000  000   000  00000000
     
     addLine: (li) ->
-        # @log "numbers.addLine #{@editor.name} #{li}"
         div = document.createElement "div"
         div.className = "linenumber"
         pre = document.createElement "span"
@@ -147,7 +133,6 @@ class Numbers extends event
     # 000   000  00000000  000   000   0000000   000   000  0000000    00000000  000   000
         
     renumber: (e) =>
-        # @log "numbers.renumber #{@editor.name} from #{e.new} to #{e.new+@elem.children.length-1}"
         @renumberFromLineIndex e.new
 
     renumberFromLineIndex: (li) ->
