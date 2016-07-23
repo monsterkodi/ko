@@ -203,13 +203,26 @@ evaluates coffee-script code in the main process and prints results in terminal
 ## windows
 
 - **⌘A** switch between tiled and stacked windows
+- **⌘W** close active window
 - **⌘⇧W** close all windows except active window
 - **⌘`** activate next window
-- **⌘⇧`** activate previuous window
+- **⌘⇧`** activate previous window
 - **⌥`** open window list
 - **⌥[1-9]** activate window with id
 - **⌘⇧N** clone current file in new window
 - **⌘⌥Q** close all windows (they won't restore on next start) and quit
+
+## ascii-headers
+
+the ascii-header mode lets you insert or edit ascii-headers
+- **⌘3* activates the ascii-header mode
+
+if the cursor is not in an ascii-header, the word at the main cursor will be inserted as an ascii-header.
+    
+in ascii-header mode ...
+    - cursors are green
+    - backspace deletes the header character at the cursors 
+    - most characters will be inserted automatically just by typing
 
 ## minimap
 
