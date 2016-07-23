@@ -116,10 +116,12 @@ class Commandline extends ViewBase
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
     
-    startCommand: (name, combo) ->        
+    startCommand: (name, combo, event) ->        
+        event?.preventDefault()
+        event?.stopPropagation()
         r = @command?.cancel combo
-        log "startCommand #{name} #{combo}", r
         if r?.status == 'ok'
+            log "r:", r
             @results r
             return
         window.split.showCommandline()
@@ -218,7 +220,7 @@ class Commandline extends ViewBase
                     @cancel()
                     return 
             for sc in c.shortcuts
-                if sc == combo then return @startCommand n, combo                
+                if sc == combo then return @startCommand n, combo, event
         return 'unhandled'            
 
     handleModKeyComboEvent: (mod, key, combo, event) ->

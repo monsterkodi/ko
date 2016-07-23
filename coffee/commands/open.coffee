@@ -162,7 +162,7 @@ class Open extends Command
     # 0000000      000     000   000  000   000     000   
         
     start: (@combo) -> 
-        log "Open.start combo:#{@combo} #{@list?}"
+        # log "Open.start combo:#{@combo} #{@list?}"
         window.openFileAtIndex = @openFileAtIndex
         opt = {}
         if window.editor.currentFile?
@@ -289,7 +289,7 @@ class Open extends Command
         @showList()
         @grabFocus()
         @select @lastFileIndex
-        text = @navigating ? @list.children[@selected].value
+        text = @navigating and @dir or @list.children[@selected].value
         @commandline.setAndSelectText text
                     
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000

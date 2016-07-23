@@ -495,6 +495,7 @@ class Editor extends Buffer
             @emit 'highlight'
             window.commandline.startCommand 'find' if window.commandline.command?.prefsID not in ['search', 'find']
             window.commandline.setText text
+            @focus()
 
     clearHighlights: ->
         @highlights = []
@@ -1242,7 +1243,7 @@ class Editor extends Buffer
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
     
     deleteSelection: ->
-        return if @selections.length == 0
+        return if not @selections.length
         @do.start()
         newCursors = _.cloneDeep @cursors
         
@@ -1259,6 +1260,10 @@ class Editor extends Buffer
                 for nc in @positionsBelowLineIndexInPositions s[0], newCursors
                     @newCursorSet newCursors, nc, 0, -1
             else
+                continue if s[0] >= @lines.length
+                if not @lines[s[0]].splice?
+                    log "wtf? #{@lines.length} #{@lines[0]} lines:", @lines
+                    break
                 @do.change s[0], @lines[s[0]].splice s[1][0], s[1][1]-s[1][0]
                 for nc in @positionsFromPosInPositions [s[1][1], s[0]], @positionsInLineAtIndexInPositions s[0], newCursors
                     @newCursorDelta newCursors, nc, -(s[1][1]-s[1][0])
