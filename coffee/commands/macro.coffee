@@ -61,11 +61,11 @@ class Macro extends Command
         args    = command.split /\s+/
         command = args.shift()
         
-        wordsInArgsOrCursorsOrSelection = (args) ->
+        wordsInArgsOrCursorsOrSelection = (args, opt) ->
             if args.length
                 return args
             else
-                cw = editor.wordsAtCursors editor.positionsNotInRanges editor.cursors, editor.selections
+                cw = editor.wordsAtCursors editor.positionsNotInRanges(editor.cursors, editor.selections), opt
                 sw = editor.textsInRanges editor.selections
                 ws = _.uniq cw.concat sw
                 ws.filter (w) -> w.trim().length
@@ -124,7 +124,7 @@ class Macro extends Command
                 insert += editor.funcInfoAtLineIndex li
                 lst = args.length and parseInt args[0] or 0
                 args.shift() if lst
-                words = wordsInArgsOrCursorsOrSelection args
+                words = wordsInArgsOrCursorsOrSelection args, include: "#@.-"
                 for ti in [0...words.length - lst]
                     t = words[ti]
                     insert += "#{t}:\#{#{t}} "

@@ -75,12 +75,12 @@ class Buffer extends event
     # 000   000  000   000  000   000  000   000
     # 00     00   0000000   000   000  0000000  
 
-    wordAtCursor: (c=@mainCursor) -> @textInRange @rangeForWordAtPos c
-    wordsAtCursors: (cs=@cursors) -> (@textInRange @rangeForWordAtPos c for c in cs)
+    wordAtCursor: (c=@mainCursor, opt) -> @textInRange @rangeForWordAtPos c, opt
+    wordsAtCursors: (cs=@cursors, opt) -> (@textInRange @rangeForWordAtPos(c, opt) for c in cs)
         
-    rangeForWordAtPos: (pos) ->
+    rangeForWordAtPos: (pos, opt) ->
         p = @clampPos pos
-        wr = @wordRangesInLineAtIndex p[1]
+        wr = @wordRangesInLineAtIndex p[1], opt
         r = @rangeAtPosInRanges p, wr
         r
 
@@ -101,15 +101,12 @@ class Buffer extends event
                 r = @rangeForWordAtPos [c[0]-1, c[1]]
         [r[1][0], r[0]]
         
-    wordRangesInLineAtIndex: (li, rgx=@wordRegExp) -> 
-        r = @rangesWithLineIndexInTextForRegExp li, @lines[li], rgx
-        r.length and r or [[li, [0,0]]]
-               
-    rangesWithLineIndexInTextForRegExp: (li, text, rgx) ->
+    wordRangesInLineAtIndex: (li, opt={regExp:@wordRegExp}) ->
+        opt.regExp = new RegExp "(\\s+|[\\w#{opt.include}]+|[^\\s])", 'g' if opt?.include?.length
         r = []
-        while (mtch = rgx.exec(text)) != null
-            r.push [li, [mtch.index, rgx.lastIndex]]
-        r
+        while (mtch = opt.regExp.exec(@lines[li])) != null
+            r.push [li, [mtch.index, opt.regExp.lastIndex]]
+        r.length and r or [[li, [0,0]]]
 
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000   0000000
     # 000       000       000      000       000          000     000  000   000  0000  000  000     

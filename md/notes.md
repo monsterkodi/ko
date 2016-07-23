@@ -3,8 +3,6 @@
 - *make goto work with partial func names*
 - *add cursor positions to navigation history when goto in or jumping to file*
 
-- include @ when selecting words at cursor for macros
-
 - *jump to file (require|path)*
 - *jump to list when multiple matches*
 
