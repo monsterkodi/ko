@@ -24,7 +24,6 @@
 - delete forward swallows spaces?
 - when pasting text at indent level, remove leading space columns
 - multicursors and indent when pasting multiple lines at single cursor in col > 0
-- edit salter headers like normal text?
 
 #### coffee syntax
 - fix

@@ -140,7 +140,7 @@ class Editor extends Buffer
     # 0000000   000000000  000         000     0000000   0000000  
     #      000  000   000  000         000     000       000   000
     # 0000000   000   000  0000000     000     00000000  000   000
-                            
+                                
     startSalter: ->
         cp = @cursorPos()
         if rgs = @salterRangesAtPos()
@@ -150,7 +150,9 @@ class Editor extends Buffer
                 ci += 1
             col = cols[ci]
             @do.start()
-            @do.cursors ([col, r[0]] for r in rgs)
+            newCursors = ([col, r[0]] for r in rgs)
+            @mainCursor = last newCursors
+            @do.cursors newCursors
             @do.end()
         else
             word = @wordAtCursor().trim()
@@ -165,6 +167,7 @@ class Editor extends Buffer
                 newCursors.push [s.length, li]
                 li -= 1
             @do.insert cp[1], indt
+            @mainCursor = first newCursors
             @do.cursors newCursors
             @do.end()
         @setSalterMode true
@@ -1000,6 +1003,12 @@ class Editor extends Buffer
     # 000   000  00000000  00     00  0000000  000  000   000  00000000
         
     insertNewline: (opt) ->
+        
+        if @salterMode?
+            @mainCursor = @rangeEndPos @rangeForLineAtIndex @mainCursor[1]
+            @cursors = [@mainCursor]
+            @setSalterMode false
+            
         @surroundStack = []
         @deleteSelection()
         @do.start()
@@ -1258,6 +1267,7 @@ class Editor extends Buffer
         @do.cursors newCursors
         @do.end()
         @clearHighlights()        
+        @checkSalterMode()
         
     deleteTab: ->
         if @selections.length

@@ -686,6 +686,8 @@ class ViewBase extends Editor
         
         switch combo
             when 'esc'
+                if @salterMode
+                    return @setSalterMode false
                 if @cursors.length > 1 or @highlights.length
                     return @clearCursorsAndHighlights()
                 if @stickySelection
