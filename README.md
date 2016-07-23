@@ -200,22 +200,29 @@ evaluates coffee-script code in the main process and prints results in terminal
 
 ![cursors](img/coffee.png)
 
+## windows
+
+- **⌘A** switch between tiled and stacked windows
+- **⌘⇧W** close all windows except active window
+- **⌘`** activate next window
+- **⌘⇧`** activate previuous window
+- **⌥`** open window list
+- **⌥[1-9]** activate window with id
+- **⌘⇧N** clone current file in new window
+- **⌘⌥Q** close all windows (they won't restore on next start) and quit
+
 ## minimap
 
 - **⌘** while dragging to turn off cursor placement
 - **⇧** while dragging/clicking to select lines
 
 ## misc
-non-standard keyboard shortcuts:
+
 - **F2** global shortcut to activate ko
-- **⌘A** switch between tiled and stacked windows
-- **⌘⇧N** clone current file in new window
-- **⌥`** open window list
 - **⌘L** select more lines **⌘⇧L** select less lines
 - **⌥up|down** move selected|cursor lines up|down
 - **⌥/** toggle comment on selected|cursor lines
 - **⌘I** inverted line selection: select lines without a cursor or a selection
-- **⌘⌥Q** close all windows (won't restore on next start) and quit
 - **⌘return** evaluate current buffer with coffee in main process and print the result in terminal view
 - **⌘⌥up** jump to counterpart file (coffee <-> js, cpp <-> h, pug <-> html, etc)
 
