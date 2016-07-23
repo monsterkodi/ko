@@ -144,8 +144,7 @@ class Editor extends Buffer
     startSalter: ->
         cp = @cursorPos()
         if rgs = @salterRangesAtPos()
-            stxt = (@textInRange r for r in rgs)
-            cols = @columnsInSalt stxt
+            cols = @columnsInSalt (@textInRange r for r in rgs)
             ci = 0
             while ci < cols.length and cp[0] > cols[ci]
                 ci += 1
@@ -154,15 +153,64 @@ class Editor extends Buffer
             @do.cursors ([col, r[0]] for r in rgs)
             @do.end()
         else
-            log 'new salter with word', @wordAtCursor()
-            indent = _.padStart '', @indentationAtLineIndex cp[1]
-            stxt = salt(@wordAtCursor()).split '\n'
-            stxt = ("#{indent}#{@lineComment} #{s}" for s in stxt)
+            word = @wordAtCursor().trim()
+            indt = _.padStart '', @indentationAtLineIndex cp[1]
+            stxt = word.length and salt(word).split('\n') or ['', '', '', '', '']
+            stxt = ("#{indt}#{@lineComment} #{s}" for s in stxt)
             @do.start()
+            newCursors = []
+            li = cp[1]+5
             for s in stxt.reversed()
                 @do.insert cp[1], s
+                newCursors.push [s.length, li]
+                li -= 1
+            @do.insert cp[1], indt
+            @do.cursors newCursors
             @do.end()
-    
+        @setSalterMode true
+        
+    insertSalterCharacter: (ch) ->
+        if ch == ' '
+            char = ['    ', '    ', '    ', '    ', '    ']
+        else
+            char = salt(ch).split '\n'
+        if char.length == 5
+            @paste ("  #{s}" for s in char).join '\n'
+        else
+            @setSalterMode false
+        true
+
+    deleteSalterCharacter: ->
+        return if not @salterMode
+        cp = @cursorPos()
+        if rgs = @salterRangesAtPos()
+            cols = @columnsInSalt (@textInRange r for r in rgs)
+            ci = cols.length-1
+            while ci > 0 and cols[ci-1] >= cp[0]
+                ci -= 1
+            if ci > 0
+                length = cols[ci]-cols[ci-1]
+                for r in rgs
+                    @do.change r[0], @lines[r[0]].splice cols[ci-1], length
+                @do.cursors ([cols[ci-1], r[0]] for r in rgs)
+                
+    checkSalterMode: ->        
+        return if not @salterMode
+        # log 'salterMode?'
+        @setSalterMode false
+        return if @cursors.length != 5
+        cp = @cursors[0]
+        for c in @cursors.slice 1
+            return if c[0] != cp[0]
+            return if c[1] != cp[1]+1
+            cp = c
+        rgs = @salterRangesAtPos()
+        return if not rgs? or rgs[0][0] != @cursors[0][1]
+        cols = @columnsInSalt (@textInRange r for r in rgs)
+        return if @cursors[0][0] < cols[0]
+        # log "salterMode still active!"
+        @setSalterMode true
+                                    
     columnsInSalt: (salt) ->
         max = _.max (s.length for s in salt)
         min = _.min (s.search /0/ for s in salt)
@@ -188,6 +236,10 @@ class Editor extends Buffer
             rgs.unshift @rangeForLineAtIndex li
             li -= 1
         return rgs if rgs.length == 5
+      
+    setSalterMode: (active=true) ->
+        @salterMode = active
+        @layerDict?['cursors']?.classList.toggle "salterMode", active
                             
     #  0000000  000  000   000   0000000   000      00000000
     # 000       000  0000  000  000        000      000     
@@ -261,6 +313,8 @@ class Editor extends Buffer
                 newSelection = newSelection.concat ranges
                     
             @do.selections newSelection
+            
+        @checkSalterMode()
 
     textOfSelectionForClipboard: -> 
         @selectMoreLines() if @selections.length == 0
@@ -685,7 +739,7 @@ class Editor extends Buffer
     # 000 0 000  000   000     000     000     
     # 000   000   0000000       0      00000000
 
-    moveAllCursors: (f, opt={}) ->
+    moveAllCursors: (f, opt={}) ->        
         @mainCursorMove = 0
         @startSelection opt.extend
         newCursors = _.cloneDeep @cursors
@@ -868,6 +922,9 @@ class Editor extends Buffer
     # 000  000   000  0000000   00000000  000   000     000   
     
     insertUserCharacter: (ch) ->
+        
+        return if @salterMode and @insertSalterCharacter ch
+        
         @do.start()
         @clearHighlights()
         if @cursors.length == 1
@@ -1264,14 +1321,16 @@ class Editor extends Buffer
     # 0000000    000   000   0000000  000   000  00     00  000   000  000   000  0000000  
     
     deleteBackward: (opt) ->
-        
+                
         @do.start()
         if @selections.length
             @deleteSelection()
         else if @cursors.length == 1 and not @isSamePos @mainCursor, @cursorPos()
             @mainCursor = @cursorPos()
             @do.cursors [@mainCursor]
-        else
+        else if @salterMode
+            @deleteSalterCharacter()
+        else            
             if @surroundStack.length
                 so = last(@surroundStack)[0]
                 sc = last(@surroundStack)[1]
