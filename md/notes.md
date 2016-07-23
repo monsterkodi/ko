@@ -4,13 +4,13 @@
 - *add cursor positions to navigation history when goto in or jumping to file*
 - *open previous on second start of open command*
 
+- include @ when selecting words at cursor for macros
+- fix commanline getting focus on command+e
+
 - *jump to file (require|path)*
 - *jump to list when multiple matches*
 
 - colorize term/coffee history
-
-#### indexer
-- *keep index up to date when (file) changes*
 
 #### open
 - *automatically start konrad in pkg dir*

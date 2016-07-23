@@ -220,11 +220,11 @@ the ascii-header mode lets you insert or edit ascii-headers
 if the cursor is not in a header already, one will be generated for the word at the main cursor.
     
 in ascii-header mode ...
-    - cursors are green
-    - backspace deletes the header character at the cursors 
-    - most characters will be inserted automatically just by typing them
+- cursors are green
+- backspace deletes the header character at the cursors 
+- most characters will be inserted automatically just by typing them
     
-the header mode will deactivate itself automatically in most circumstances. you can also force deactivate it with **esc**
+the mode will deactivate itself automatically in most circumstances. you can also force deactivate it with **esc**
 
 ## minimap
 

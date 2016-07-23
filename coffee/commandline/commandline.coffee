@@ -116,8 +116,12 @@ class Commandline extends ViewBase
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
     
-    startCommand: (name, combo) ->
-        @command?.cancel()
+    startCommand: (name, combo) ->        
+        r = @command?.cancel combo
+        log "startCommand #{name} #{combo}", r
+        if r?.status == 'ok'
+            @results r
+            return
         window.split.showCommandline()
         @command = @commands[name]
         activeClass = "."+document.activeElement.className

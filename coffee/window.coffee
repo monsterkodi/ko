@@ -111,7 +111,7 @@ ipc.on 'fileLinesChanged', (event, file, lineChanges) =>
 #      000  000   000     000     000     
 # 0000000   000   000      0      00000000
 
-saveFile = (file) => 
+saveFile = (file) =>
     file ?= editor.currentFile
     if not file?
         saveFileAs()
@@ -123,6 +123,7 @@ saveFile = (file) =>
             alert err
         else
             editor.setCurrentFile file, keepUndo: true
+            ipc.send 'fileSaved', file, winID
             setState 'file', file
 
 # 000       0000000    0000000   0000000  

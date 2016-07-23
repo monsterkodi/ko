@@ -143,6 +143,17 @@ class Open extends Command
         @setText @list.children[i].value
         @commandline.execute()
         @skipBlur = true
+
+    #  0000000   0000000   000   000   0000000  00000000  000    
+    # 000       000   000  0000  000  000       000       000    
+    # 000       000000000  000 0 000  000       0000000   000    
+    # 000       000   000  000  0000  000       000       000    
+    #  0000000  000   000  000   000   0000000  00000000  0000000
+    
+    cancel: (combo) ->
+        if combo == @shortcuts[0]
+            return @execute() if not @navigating and @list? and @lastFileIndex == @selected == @history.length-2
+        super combo
     
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -151,6 +162,7 @@ class Open extends Command
     # 0000000      000     000   000  000   000     000   
         
     start: (@combo) -> 
+        log "Open.start combo:#{@combo} #{@list?}"
         window.openFileAtIndex = @openFileAtIndex
         opt = {}
         if window.editor.currentFile?
@@ -178,7 +190,7 @@ class Open extends Command
         @paths      = []
         @stats      = []
         @selected   = 0
-        @navigating = opt.navigating
+        @navigating = opt.navigating ? false
         wopt = 
             root:        @pkg
             includeDirs: true
@@ -302,7 +314,8 @@ class Open extends Command
                     resolved = @resolvedPath listValue
             else if dirExists @resolvedPath command
                 resolved = @resolvedPath command
-            if resolved?
+            if resolved? and @dir != resolved
+                log "execute load dir", resolved
                 @loadDir
                     navigating: resolved
                     dir:        resolved

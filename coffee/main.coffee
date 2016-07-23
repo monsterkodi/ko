@@ -143,6 +143,8 @@ ipc.on 'fileLoaded', (event, file, winID) =>
     winWithID(winID).currentFile = file 
     main.indexer.indexFile file
 
+ipc.on 'fileSaved', (event, file, winID) => main.indexer.indexFile file, refresh: true
+
 ipc.on 'winFileLinesChanged', (event, winID, file, lineChanges) => 
     return if not winID
     for w in wins()

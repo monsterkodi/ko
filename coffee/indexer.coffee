@@ -105,6 +105,20 @@ class Indexer
         funcInfos.push funcInfo
         @funcs[funcName] = funcInfos
         funcInfo
+    
+    # 00000000   00000000  00     00   0000000   000   000  00000000        00000000  000  000      00000000
+    # 000   000  000       000   000  000   000  000   000  000             000       000  000      000     
+    # 0000000    0000000   000000000  000   000   000 000   0000000         000000    000  000      0000000 
+    # 000   000  000       000 0 000  000   000     000     000             000       000  000      000     
+    # 000   000  00000000  000   000   0000000       0      00000000        000       000  0000000  00000000
+    
+    removeFile: (file) ->
+        return if not @files[file]?
+        for name,infos of @funcs
+            _.remove infos, (v) => v.file == file
+            delete @funcs[name] if not infos.length
+        @classes = _.omitBy @classes, (v) -> v.file == file
+        delete @files[file]
             
     # 000  000   000  0000000    00000000  000   000        00000000  000  000      00000000
     # 000  0000  000  000   000  000        000 000         000       000  000      000     
@@ -112,7 +126,9 @@ class Indexer
     # 000  000  0000  000   000  000        000 000         000       000  000      000     
     # 000  000   000  0000000    00000000  000   000        000       000  0000000  00000000
     
-    indexFile: (file) ->
+    indexFile: (file, opt) ->
+        
+        @removeFile file if opt?.refresh 
         
         return @shiftQueue() if @files[file]?
         
