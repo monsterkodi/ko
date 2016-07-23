@@ -106,7 +106,6 @@ class Macro extends Command
                 if texts.length
                     editor.do.start()
                     for text in texts.reversed()
-                        log "insert text #{text} at #{lastIndex+1}"
                         editor.do.insert lastIndex, text
                     editor.moveCursorsDown false, texts.length
                     editor.do.end()

@@ -94,6 +94,7 @@ class Open extends Command
             @listFiles @files
         
         @select 0
+        @positionList()
 
     # 000      000   0000000  000000000
     # 000      000  000          000   

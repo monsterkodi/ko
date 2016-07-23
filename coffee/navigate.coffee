@@ -3,7 +3,9 @@
 # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000 
 # 000  0000  000   000     000     000  000   000  000   000     000     000     
 # 000   000  000   000      0      000   0000000   000   000     000     00000000
-{last
+{
+clamp,
+last
 }        = require './tools/tools'
 log      = require './tools/log'
 _        = require 'lodash'
@@ -29,20 +31,18 @@ class Navigate
         switch opt.action
             
             when 'backward'
-                return if not @filePositions.length or @currentIndex == 0
-                @currentIndex -= 1
-                filePos = @filePositions[@currentIndex]
-                @navigateToFilePos filePos, opt
+                return if not @filePositions.length
+                @currentIndex = clamp 0, @filePositions.length-1, (@filePositions.length + @currentIndex-1) % @filePositions.length
+                @navigateToFilePos @filePositions[@currentIndex], opt
                 
             when 'forward'
-                return if not @filePositions.length or @currentIndex == @filePositions.length-1
-                @currentIndex += 1
-                filePos = @filePositions[@currentIndex]
-                @navigateToFilePos filePos, opt
+                return if not @filePositions.length
+                @currentIndex = clamp 0, @filePositions.length-1, (@currentIndex+1) % @filePositions.length
+                @navigateToFilePos @filePositions[@currentIndex], opt
                                 
             when 'gotoFilePos'
                 @filePositions = @filePositions.filter (filePos) -> not (filePos.file == opt.file and filePos.pos[1] == opt.pos[1])
-                @filePositions.push 
+                @filePositions.push
                     file: opt.file
                     pos:  opt.pos
                     
@@ -50,12 +50,14 @@ class Navigate
                 @navigateToFilePos @filePositions[@currentIndex], opt
 
             when 'addFilePos'
+                return if not opt?.file?.length
+                isAtEnd = @currentIndex == @filePositions.length-1
                 @filePositions = @filePositions.filter (filePos) -> not (filePos.file == opt.file and filePos.pos[1] == opt.pos[1])
                 @filePositions.push 
                     file: opt.file
                     pos:  opt.pos
                     
-                @currentIndex = @filePositions.length-1
+                @currentIndex = @filePositions.length-1 if isAtEnd
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000
     # 0000  000  000   000  000   000  000  000        000   000     000     000     
@@ -70,6 +72,9 @@ class Navigate
         else
             if opt?.newWindow
                 @main.loadFile "#{filePos.file}:#{filePos.pos[1]}:#{filePos.pos[0]}"
+            else if opt?.winID?
+                win = @main.winWithID opt.winID
+                win?.webContents.send 'loadFile', "#{filePos.file}:#{filePos.pos[1]}:#{filePos.pos[0]}"
         filePos
     
     #  0000000   0000000    0000000          00000000  000  000      00000000        00000000    0000000    0000000
@@ -92,7 +97,7 @@ class Navigate
             alert("wrong file pos? #{r}")
             throw new Error
 
-    backward: () -> ipc.send 'navigate', action: 'backward'
-    forward:  () -> ipc.send 'navigate', action: 'forward'
+    backward: () -> ipc.send 'navigate', action: 'backward', winID: window.winID
+    forward:  () -> ipc.send 'navigate', action: 'forward' , winID: window.winID
                 
 module.exports = Navigate

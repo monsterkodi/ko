@@ -151,7 +151,9 @@ loadFile = (file, opt={}) =>
                         log "saving changes to #{file} failed", err
                         return
             
-        addToRecent file   
+        addToRecent file
+        ipc.send 'navigate', action: 'addFilePos', file: editor.currentFile, pos: editor.cursorPos()
+        
         opt.keepUndo = file == editor.currentFile if not opt.keepUndo?
         editor.setCurrentFile null, opt  # to stop watcher and reset scroll
         editor.setCurrentFile file, opt
@@ -306,9 +308,7 @@ editor.on 'changed', (changeInfo, action) =>
     return if changeInfo.foreign
     if changeInfo.sorted.length and action.lines.length
         ipc.send 'winFileLinesChanged', winID, editor.currentFile, action.lines
-        navigate.addFilePos
-            file: editor.currentFile
-            pos:  editor.cursorPos()
+        navigate.addFilePos file: editor.currentFile, pos:  editor.cursorPos()
 
 window.editorWithName = (n) ->
     switch n
