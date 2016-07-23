@@ -49,7 +49,6 @@ class MainMenu
             label: pkg.name   
             submenu: [     
                 label:       "About #{pkg.name}"
-                accelerator: 'CmdOrCtrl+.'
                 click:        main.showAbout
             ,
                 type: 'separator'

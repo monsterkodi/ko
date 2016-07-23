@@ -12,7 +12,7 @@ fs    = require 'fs'
 
 class Prefs
     
-    @timeout = 5000
+    @timeout = 2000
 
     # 000  000   000  000  000000000
     # 000  0000  000  000     000   

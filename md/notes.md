@@ -1,6 +1,5 @@
 # todo/ideas
 
-- *save term aliases in seperate file*
 - *make goto work with partial func names*
 - *add cursor positions to navigation history when goto in or jumping to file*
 - *open previous on second start of open command*

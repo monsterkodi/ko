@@ -17,7 +17,7 @@ class Coffee extends Command
     constructor: (@commandline) ->
         @cmdID      = 0
         @commands   = Object.create null
-        @shortcuts  = ['ctrl+c', 'ctrl+shift+c']
+        @shortcuts  = ['command+.', 'command+shift+.']
         @names      = ["coffee", "Coffee"]
         super @commandline
         ipc.on 'executeResult', @onResult

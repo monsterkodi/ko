@@ -4,6 +4,7 @@
 #    000     000       000   000  000 0 000
 #    000     00000000  000   000  000   000
 {
+fileExists,
 unresolve,
 clamp,
 last
@@ -14,6 +15,7 @@ Walker   = require '../tools/walker'
 Command  = require '../commandline/command'
 electron = require 'electron'
 path     = require 'path'
+noon     = require 'noon'
 ipc      = electron.ipcRenderer
 
 class Term extends Command
@@ -101,17 +103,23 @@ class Term extends Command
     # 000   000  000      000  000   000       000
     # 000   000  0000000  000  000   000  0000000 
     
-    alias: (aliasList) ->
+    aliasCmd: (aliasList) ->
         terminal = window.terminal
-        alias = @getState 'alias', {}
-        
+        alias = ipc.sendSync 'alias'
         if aliasList.length == 1
             delete alias[aliasList[0]]
         else if aliasList.length > 1
             alias[aliasList[0]] = aliasList.slice(1).join ' '
-        @setState 'alias', alias if aliasList.length
+        ipc.send 'alias', alias if aliasList.length
+        li = 0
         for key,cmd of alias
-            terminal.output "#{key} #{cmd}" 
+            li += 1
+            meta =
+                diss: Syntax.dissForTextAndSyntax "#{_.padEnd key, 10} #{cmd}" , 'noon'
+                line: li
+                clss: 'termResult'
+            terminal.appendMeta meta
+            
         return text: '', reveal: 'terminal'
     
     #  0000000  00000000   000      000  000000000         0000000   000      000   0000000    0000000
@@ -128,7 +136,7 @@ class Term extends Command
                 cmds = cmds.concat @splitAlias cmd.trim()
             cmds
         else            
-            alias = @getState 'alias', {}
+            alias = ipc.sendSync 'alias'
             split = command.trim().split ' '
             if /^[!]+\d*/.test split[0]
                 if split[0] == '!'
@@ -196,7 +204,7 @@ class Term extends Command
             filterRegExp = (args) -> new RegExp("(#{args.join '|'})", 'i')
                 
             if cmd == 'alias'
-                @alias args
+                @aliasCmd args
                 continue
                                 
             switch cmd

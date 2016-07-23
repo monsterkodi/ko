@@ -116,6 +116,7 @@ hideDock = ->
 # 000  000        000     
 # 000  000         0000000
 
+ipc.on 'alias',                  (event, dict)   => main.alias event, dict
 ipc.on 'newWindowWithFile',      (event, file)   => main.newWindowWithFile file
 ipc.on 'activateWindowWithFile', (event, file)   => event.returnValue = main.activateWindowWithFile file
 ipc.on 'toggleDevTools',         (event)         => event.sender.toggleDevTools()
@@ -521,6 +522,21 @@ class Main
         prefs.save (ok) =>
             app.exit 0
             process.exit 0
+    
+    #  0000000   000      000   0000000    0000000
+    # 000   000  000      000  000   000  000     
+    # 000000000  000      000  000000000  0000000 
+    # 000   000  000      000  000   000       000
+    # 000   000  0000000  000  000   000  0000000 
+    
+    alias: (event, dict) =>
+        aliasFile = "#{app.getPath('appData')}/#{pkg.name}/alias.noon"
+        if dict?
+            noon.save aliasFile, dict
+        if fileExists aliasFile
+            event.returnValue = noon.load aliasFile
+        else
+            event.returnValue = {}
     
     #  0000000   0000000     0000000   000   000  000000000
     # 000   000  000   000  000   000  000   000     000   
