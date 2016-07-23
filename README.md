@@ -217,12 +217,14 @@ evaluates coffee-script code in the main process and prints results in terminal
 the ascii-header mode lets you insert or edit ascii-headers
 - **⌘3* activates the ascii-header mode
 
-if the cursor is not in an ascii-header, the word at the main cursor will be inserted as an ascii-header.
+if the cursor is not in a header already, one will be generated for the word at the main cursor.
     
 in ascii-header mode ...
     - cursors are green
     - backspace deletes the header character at the cursors 
-    - most characters will be inserted automatically just by typing
+    - most characters will be inserted automatically just by typing them
+    
+the header mode will deactivate itself automatically in most circumstances. you can also force deactivate it with **esc**
 
 ## minimap
 
