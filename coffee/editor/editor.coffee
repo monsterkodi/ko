@@ -10,6 +10,7 @@ first,
 last,
 $}      = require '../tools/tools'
 log     = require '../tools/log'
+salt    = require '../tools/salt'
 watcher = require './watcher'
 Buffer  = require './buffer'
 Syntax  = require './syntax'
@@ -133,6 +134,60 @@ class Editor extends Buffer
     setLines: (lines) ->
         super lines
         @emit 'linesSet', @lines
+        
+    #  0000000   0000000   000      000000000  00000000  00000000 
+    # 000       000   000  000         000     000       000   000
+    # 0000000   000000000  000         000     0000000   0000000  
+    #      000  000   000  000         000     000       000   000
+    # 0000000   000   000  0000000     000     00000000  000   000
+                            
+    startSalter: ->
+        cp = @cursorPos()
+        if rgs = @salterRangesAtPos()
+            stxt = (@textInRange r for r in rgs)
+            cols = @columnsInSalt stxt
+            ci = 0
+            while ci < cols.length and cp[0] > cols[ci]
+                ci += 1
+            col = cols[ci]
+            @do.start()
+            @do.cursors ([col, r[0]] for r in rgs)
+            @do.end()
+        else
+            log 'new salter with word', @wordAtCursor()
+            indent = _.padStart '', @indentationAtLineIndex cp[1]
+            stxt = salt(@wordAtCursor()).split '\n'
+            stxt = ("#{indent}#{@lineComment} #{s}" for s in stxt)
+            @do.start()
+            for s in stxt.reversed()
+                @do.insert cp[1], s
+            @do.end()
+    
+    columnsInSalt: (salt) ->
+        max = _.max (s.length for s in salt)
+        min = _.min (s.search /0/ for s in salt)
+        cols = [min]
+        for col in [min..max]
+            s = 0
+            for i in [0...5]
+                s += 1 if salt[i].slice(col, col+2) == '  '
+            cols.push col if s == 5
+        cols.push max
+        cols
+    
+    salterRangesAtPos: (p=@cursorPos()) ->
+        salterRegExp = new RegExp("^\\s*#{@lineComment}[0\\s]+$")
+        rgs = []
+        li = p[1]
+        while rgs.length < 5 and li < @lines.length and salterRegExp.test @lines[li]
+            rgs.push @rangeForLineAtIndex li
+            li += 1
+        return if not rgs.length
+        li = p[1]-1
+        while rgs.length < 5 and li >= 0 and salterRegExp.test @lines[li]
+            rgs.unshift @rangeForLineAtIndex li
+            li -= 1
+        return rgs if rgs.length == 5
                             
     #  0000000  000  000   000   0000000   000      00000000
     # 000       000  0000  000  000        000      000     

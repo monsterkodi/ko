@@ -229,7 +229,7 @@ class Term extends Command
                             diss: Syntax.dissForTextAndSyntax "#{h}", 'ko'
                             cmmd: h
                             line: @commandIDs[h]
-                            clss: 'termCommand'
+                            clss: 'termResult'
                         terminal.appendMeta meta
                                             
                 when 'files'

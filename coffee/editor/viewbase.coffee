@@ -711,6 +711,7 @@ class ViewBase extends Editor
             return stop event if 'unhandled' != @handleModKeyComboEvent mod, key, combo, event
             
         switch combo
+            when 'command+3'                then return @startSalter()
             when 'command+esc'              then return @startStickySelection()
             when 'tab'                      then return stop event, @insertTab()
             when 'shift+tab'                then return stop event, @deleteTab()

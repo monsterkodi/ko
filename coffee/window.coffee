@@ -412,7 +412,7 @@ document.onkeydown = (event) ->
         event.stopPropagation()        
 
     for i in [1..9]
-        if combo is "command+#{i}" or combo is "alt+#{i}"
+        if combo is "alt+#{i}" # or combo is "command+#{i}"
             ipc.send 'activateWindow', i
             return stop event
     switch combo
