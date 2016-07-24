@@ -1,6 +1,6 @@
 name            ko
 productName     ko
-version         0.9.6
+version         0.9.5
 description     an editor for macOS
 main            js/main.js
 preferGlobal    true
@@ -71,3 +71,7 @@ dependencies
                 pty.js          ^0.3.1
                 walkdir         0.0.11
                 write-file-atomic  ^1.1.4
+maintainers
+                .
+                  name    monsterkodi
+                  email   monsterkodi@gmx.net
