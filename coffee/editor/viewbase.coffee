@@ -272,17 +272,24 @@ class ViewBase extends Editor
     # 00000000  000   000  000         0000000   0000000   00000000
 
     exposeLine: (li) =>
-        div = @addLine()
-        div.innerHTML = @renderLineAtIndex li
-        @elem.appendChild div
+        if li > @elem.children.length - 1 + @scroll.exposeTop
+            console.log "ViewBase.exposeLine li:#{li} children #{@elem.children.length} exposeTop #{@scroll.exposeTop}"        
+            div = @addLine()
+            div.innerHTML = @renderLineAtIndex li
+            @elem.appendChild div
         
-        @emit 'lineExposed', 
-            lineIndex: li
-            lineDiv: div
-
-        @renderCursors() if @cursorsInLineAtIndex(li).length
-        @renderSelection() if @rangesForLineIndexInRanges(li, @selections).length
-        @renderHighlights() if @rangesForLineIndexInRanges(li, @highlights).length
+            @emit 'lineExposed', 
+                lineIndex: li
+                lineDiv: div
+    
+            @renderCursors() if @cursorsInLineAtIndex(li).length
+            @renderSelection() if @rangesForLineIndexInRanges(li, @selections).length
+            @renderHighlights() if @rangesForLineIndexInRanges(li, @highlights).length
+        else
+            div = @elem.children[li-@scroll.exposeTop]
+            @emit 'lineExposed', 
+                lineIndex: li
+                lineDiv: div
         div
         
     # 000   000   0000000   000   000  000   0000000  000   000
@@ -297,8 +304,6 @@ class ViewBase extends Editor
         if li == @scroll.exposeTop + @elem.children.length - 1 and @elem.lastChild?
             @elem.lastChild.remove()
             @emit 'lineVanished', lineIndex: li
-        # else
-            # log "warning! viewbase.vanishLine wrong line index? li: #{li} children: #{@elem.children.length}"
 
     # 00000000  000   000  00000000    0000000    0000000  00000000  000000000   0000000   00000000 
     # 000        000 000   000   000  000   000  000       000          000     000   000  000   000

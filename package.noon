@@ -1,6 +1,6 @@
 name            ko
 productName     ko
-version         0.9.3
+version         0.9.4
 description     an editor for macOS
 main            js/main.js
 scripts
@@ -15,6 +15,7 @@ repository
 keywords
                 mac
                 osx
+                macOS
                 editor
                 coffee
                 script

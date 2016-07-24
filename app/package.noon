@@ -1,14 +1,17 @@
 name          ko
 productName   ko
-version       0.9.3
+version       0.9.4
 description   an editor for macOS
 main          js/main.js
+bin
+              ko  ./bin/ko
 repository
               type  git
               url   git+https://github.com/monsterkodi/ko.git
 keywords
               mac
               osx
+              macOS
               editor
               coffee
               script
