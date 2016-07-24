@@ -25,7 +25,6 @@
 - fix
     prev: -> @navigate -1    
     next: -> @navigate 1
-    for i in [1...@clones.length]
 
 #### file state
 - save backup files?

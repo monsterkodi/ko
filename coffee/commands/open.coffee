@@ -114,6 +114,7 @@ class Open extends Command
         @positionList()
             
     listFiles: (files) ->
+        return if not @list?
         @list.innerHTML = ""        
         if files.length == 0
             @list.style.display = 'none'
@@ -127,7 +128,7 @@ class Open extends Command
                 if file.endsWith ' >'
                     file = file.slice 0, file.length-2
                     div.classList.add 'directory'
-                div.innerHTML = render.line file, syntax.dissForTextAndSyntax(file, 'ko', join: true), charWidth:0
+                div.innerHTML = render.line syntax.dissForTextAndSyntax(file, 'ko')
                 div.setAttribute "onmousedown", "window.openFileAtIndex(#{index});"
                 div.value = file
                 @list.appendChild div

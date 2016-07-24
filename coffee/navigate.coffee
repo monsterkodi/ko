@@ -10,6 +10,7 @@ last
 log      = require './tools/log'
 _        = require 'lodash'
 electron = require 'electron'
+
 ipc           = electron.ipcRenderer
 BrowserWindow = electron.BrowserWindow
 
@@ -29,7 +30,7 @@ class Navigate
     # 000   000   0000000     000     000   0000000   000   000
 
     action: (opt) =>
-        # log "action #{opt.action} @currentIndex #{@currentIndex} #{@navigating}", ("#{f.file}:#{f.pos[1]}" for f in @filePositions)
+        # log "action #{opt.action} @currentIndex #{@currentIndex} #{@navigating}", ("#{f.file}:#{f.pos[1]}" for f in @filePositions), opt
         switch opt.action
 
             when 'backward'
@@ -48,7 +49,10 @@ class Navigate
                 return if not opt?.file?.length
                 hasFile = _.find @filePositions, (v) -> v.file == opt.file
                 if opt?.for in ['edit', 'goto'] or not @navigating or not hasFile
-                    @navigating = false
+                    @navigating = false if opt?.for in ['edit', 'goto']
+                    if @currentIndex != @filePositions.length-1
+                        @filePositions = @filePositions.slice(@currentIndex).concat @filePositions.slice 0, @currentIndex 
+                        
                     @filePositions = @filePositions.filter (filePos) -> not (filePos.file == opt.file and Math.abs(filePos.pos[1] - opt.pos[1]) < 2)
                     @filePositions.push 
                         file: opt.file
@@ -64,9 +68,10 @@ class Navigate
     # 000   000  000   000      0      000   0000000   000   000     000     00000000
     
     navigateToFilePos: (filePos, opt) ->
+        log "Navigate.navigateToFilePos", filePos, opt
         id = @main.activateWindowWithFile filePos.file
         if id?
-            @main.winWithID(id).webContents.send 'singleCursorAtPos', filePos.pos
+            @main.winWithID(id).webContents.send 'singleCursorAtPos', filePos.pos, opt.select
         else
             if opt?.newWindow
                 @main.loadFile "#{filePos.file}:#{filePos.pos[1]+1}:#{filePos.pos[0]}"

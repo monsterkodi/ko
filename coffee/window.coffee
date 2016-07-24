@@ -82,7 +82,7 @@ delState = window.delState = (key) ->
 # 000  000         0000000
 
 ipc.on 'shellCommandData',  (event, cmdData) => commandline.commands['term'].onShellCommandData cmdData
-ipc.on 'singleCursorAtPos', (event, pos) => editor.singleCursorAtPos pos
+ipc.on 'singleCursorAtPos', (event, pos, extend) => editor.singleCursorAtPos pos, extend
 ipc.on 'openFile',          (event, options) => openFile options
 ipc.on 'focusEditor',       (event) => split.focus '.editor'
 ipc.on 'cloneFile',  => ipc.send 'newWindowWithFile', editor.currentFile
@@ -155,8 +155,8 @@ loadFile = (file, opt={}) =>
         ipc.send 'navigate', 
             action: 'addFilePos'
             file: editor.currentFile
-            pos: editor.cursorPos()
-            for: 'jump'
+            pos:  editor.cursorPos()
+            for: 'load'
         
         opt.keepUndo = file == editor.currentFile if not opt.keepUndo?
         editor.setCurrentFile null, opt  # to stop watcher and reset scroll

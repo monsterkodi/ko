@@ -16,7 +16,7 @@ class Render
     # 000      000  000  0000  000     
     # 0000000  000  000   000  00000000
     
-    @line: (line, diss, size) =>
+    @line: (diss, size={charWidth:0}) =>
         l = ""
         if diss?.length
             for di in [diss.length-1..0]

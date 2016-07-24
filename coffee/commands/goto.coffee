@@ -32,9 +32,6 @@ class Goto extends Command
         @showList()
         @showItems @listItems() 
         @select -1
-        # text = @last()
-        # text = '-1' if not text?.length
-        # text:   text
         select: true
      
     # 000      000   0000000  000000000  000  000000000  00000000  00     00   0000000
@@ -47,6 +44,11 @@ class Goto extends Command
         files = ipc.sendSync 'indexer', 'files'
         funcs = files[window.editor.currentFile].funcs
         funcNames = (info[2] for info in funcs)
+        clsss = ipc.sendSync 'indexer', 'classes'
+        @clssNames = _.keys clsss
+        funcNames.concat @clssNames
+
+    itemPrefix: (item) -> item in @clssNames and '● ' or '▸ '
         
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
@@ -55,10 +57,9 @@ class Goto extends Command
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
         
     execute: (command) ->
-        command = command.trim()
+        command = super command
         if /^\-?\d+$/.test command
             line = parseInt command
-            super command
             editor = window.editorWithClassName @focus
             if line < 0
                 line = editor.lines.length + line
@@ -68,9 +69,8 @@ class Goto extends Command
             editor.singleCursorAtPos [0,line], @name == 'selecto'
             editor.scrollCursorToTop()
             focus: @focus
-        else if command.length and @name != 'selecto'
-            super command
-            window.editor.jumpTo command
+        else if command.length
+            window.editor.jumpTo command, dontList: true, select: @name == 'selecto'
             focus: @focus
         else
             text: ''

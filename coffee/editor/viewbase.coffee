@@ -351,7 +351,7 @@ class ViewBase extends Editor
     # 000   000  00000000  000   000  0000000    00000000  000   000
 
     renderLineAtIndex: (li) -> 
-        html = render.line @lines[li], @syntax.getDiss(li), @size
+        html = render.line @syntax.getDiss(li), @size
         if @showInvisibles
             tx = @lines[li].length * @size.charWidth + 1
             html += "<span class=\"invisible newline\" style=\"transform:translate(#{tx}px, -1.5px);\">&#9687;</span>"
@@ -607,13 +607,19 @@ class ViewBase extends Editor
     # 000   000  000   000  000 0 000  000                 000     000   000
     #  0000000    0000000   000   000  000                 000      0000000 
     
-    jumpTo: (word) ->
+    jumpTo: (word, opt) ->
+        # log "ViewBase.jumpTo word:#{word}", opt
         find = word.toLowerCase()
-        
+        find = find.slice 1 if find[0] == '@'
         jumpToFileLine = (file, line) =>
+            window.navigate.addFilePos
+                file: @currentFile
+                pos:  @cursorPos()
             window.navigate.gotoFilePos
                 file: file
                 pos:  [0, line]
+                winID: window.winID
+                select: opt?.select
         
         funcs = ipc.sendSync 'indexer', 'funcs'
         for func, infos of funcs
@@ -622,6 +628,8 @@ class ViewBase extends Editor
                 for i in infos
                     if i.file == @currentFile
                         info = i
+                if infos.length > 1 and not opt?.dontList
+                    window.commandline.commands.term.execute "funcs ^#{word}$"
                 jumpToFileLine info.file, info.line
                 return true
         
@@ -636,7 +644,6 @@ class ViewBase extends Editor
             if fileName(file).toLowerCase() == find and file != @currentFile
                 jumpToFileLine file, 6
                 return true
-            
         false
     
     jumpToCounterpart: () ->

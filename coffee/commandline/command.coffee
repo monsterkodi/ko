@@ -9,7 +9,7 @@ clamp
 log    = require '../tools/log'
 prefs  = require '../tools/prefs'
 render = require '../editor/render'
-syntax = require '../editor/syntax'
+Syntax = require '../editor/syntax'
 _      = require 'lodash'
 fuzzy  = require 'fuzzy'
 
@@ -44,6 +44,7 @@ class Command
             if 0 <= @selected < @list?.children.length
                 command = @list?.children[@selected]?.value
             @hideList()
+        command = command.trim()
         @setCurrent command
         command
     
@@ -62,10 +63,14 @@ class Command
                 fuzzied  = fuzzy.filter command, (new String(s) for s in items)
                 filtered = (f.string for f in fuzzied)
                 @showItems filtered
-                @select -1
+                # @select -1
+                @select 0
+                @positionList()
             else
                 @showItems items
-                @select -1
+                # @select -1
+                @select 0
+                @positionList()
        
     #  0000000   0000000   000   000   0000000  00000000  000    
     # 000       000   000  0000  000  000       000       000    
@@ -111,7 +116,8 @@ class Command
                 prefix = @itemPrefix?(item) or ''
                 div = document.createElement 'div'
                 div.className = 'list-item'
-                div.innerHTML = prefix + item 
+                text = prefix + item
+                div.innerHTML = render.line Syntax.dissForTextAndSyntax(text, 'ko')
                 div.value     = item
                 div.addEventListener 'mousedown', @listClick
                 @list.appendChild div
