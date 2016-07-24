@@ -4,12 +4,13 @@
 #000        000 000   000       000       000   000     000     000     
 #00000000  000   000  00000000   0000000   0000000      000     00000000
 
+log      = require './tools/log'
+str      = require './tools/str'
+_        = require 'lodash'
 noon     = require 'noon'
 colors   = require 'colors'
 coffee   = require 'coffee-script'
 electron = require 'electron'
-log      = require './tools/log'
-str      = require './tools/str'
 pty      = require 'pty.js'
 
 class Execute

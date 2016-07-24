@@ -4,9 +4,9 @@
 # 000   000  000  0000  000   000  000   000
 #  0000000   000   000  0000000     0000000 
 
-log     = require '../tools/log'
-{last}  = require '../tools/tools'
-{clone} = require 'lodash'
+log    = require '../tools/log'
+{last} = require '../tools/tools'
+_      = require 'lodash'
 
 class Undo
     
@@ -264,10 +264,10 @@ class Undo
         if @groupCount == 1
             a = @lastAction()            
             @actions.push 
-                selBefore:  clone a.selAfter
-                curBefore:  clone a.curAfter
-                selAfter:   clone a.selAfter
-                curAfter:   clone a.curAfter
+                selBefore:  _.clone a.selAfter
+                curBefore:  _.clone a.curAfter
+                selAfter:   _.clone a.selAfter
+                curAfter:   _.clone a.curAfter
                 mainBefore: a.mainBefore
                 mainAfter:  a.mainAfter
                 lines:      []

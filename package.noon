@@ -1,6 +1,6 @@
 name            ko
 productName     ko
-version         0.9.4
+version         0.9.5
 description     an editor for macOS
 main            js/main.js
 preferGlobal    true

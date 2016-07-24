@@ -273,7 +273,6 @@ class ViewBase extends Editor
 
     exposeLine: (li) =>
         if li > @elem.children.length - 1 + @scroll.exposeTop
-            console.log "ViewBase.exposeLine li:#{li} children #{@elem.children.length} exposeTop #{@scroll.exposeTop}"        
             div = @addLine()
             div.innerHTML = @renderLineAtIndex li
             @elem.appendChild div

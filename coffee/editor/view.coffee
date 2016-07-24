@@ -14,6 +14,7 @@ keyinfo   = require '../tools/keyinfo'
 split     = require '../split'
 ViewBase  = require './viewbase'
 syntax    = require './syntax'
+_         = require 'lodash'
 path      = require 'path'
 electron  = require 'electron'
 ipc       = electron.ipcRenderer
