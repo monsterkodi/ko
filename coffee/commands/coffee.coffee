@@ -20,6 +20,7 @@ class Coffee extends Command
         @shortcuts  = ['command+.', 'command+shift+.']
         @names      = ["coffee", "Coffee"]
         super @commandline
+        @syntaxName = 'coffee'
         ipc.on 'executeResult', @onResult
     
     #  0000000   000   000        00000000   00000000   0000000  000   000  000      000000000

@@ -157,6 +157,10 @@ class Meta
             div.addEventListener 'mousedown', @onClick
             div.cmmd = meta[2].cmmd
             div.classList.add 'cmmd'
+        else if meta[2].list?
+            div.addEventListener 'mousedown', @onClick
+            div.list = meta[2].list
+            div.classList.add 'cmmd'
         @elem.appendChild div
         meta[2].div = div
     
@@ -180,6 +184,8 @@ class Meta
                         command.execute split[1]
             else if event.target.cmmd?
                 window.commandline.commands.term.execute event.target.cmmd
+            else if event.target.list?
+                window.commandline.command.listClick event.target.list
         
     #  0000000   00000000   00000000   00000000  000   000  0000000  
     # 000   000  000   000  000   000  000       0000  000  000   000

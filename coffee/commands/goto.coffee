@@ -43,13 +43,11 @@ class Goto extends Command
     listItems: () -> 
         files = ipc.sendSync 'indexer', 'files'
         funcs = files[window.editor.currentFile].funcs
-        funcNames = (info[2] for info in funcs)
+        funcNames = ({text: info[2], line:'▸'} for info in funcs)
         clsss = ipc.sendSync 'indexer', 'classes'
-        @clssNames = _.keys clsss
+        @clssNames = ({text: k, line:'●'} for k in _.keys clsss)
         funcNames.concat @clssNames
 
-    itemPrefix: (item) -> item in @clssNames and '● ' or '▸ '
-        
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
     # 0000000     00000    0000000   000       000   000     000     0000000 

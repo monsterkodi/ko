@@ -21,7 +21,7 @@ class Terminal extends ViewBase
 
         @ansidiss  = new ansiDiss()    
         
-        @setLines @lines   
+        @setLines @lines
 
     #  0000000   000   000  000000000  00000000   000   000  000000000
     # 000   000  000   000     000     000   000  000   000     000   

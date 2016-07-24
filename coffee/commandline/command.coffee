@@ -5,18 +5,20 @@
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
 {
 clamp
-}      = require '../tools/tools'
-log    = require '../tools/log'
-prefs  = require '../tools/prefs'
-render = require '../editor/render'
-Syntax = require '../editor/syntax'
-_      = require 'lodash'
-fuzzy  = require 'fuzzy'
+}           = require '../tools/tools'
+log         = require '../tools/log'
+prefs       = require '../tools/prefs'
+Syntax      = require '../editor/syntax'
+CommandList = require './commandlist'
+_           = require 'lodash'
+fuzzy       = require 'fuzzy'
 
 class Command
 
     constructor: (@commandline) ->
-        @maxHistory = 20
+        @syntaxName   = 'ko'
+        @maxHistory   = 20
+        @maxListLines = 15
         
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -40,9 +42,9 @@ class Command
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
         
     execute: (command) ->
-        if @list? 
-            if 0 <= @selected < @list?.children.length
-                command = @list?.children[@selected]?.value
+        if @commandList? 
+            if 0 <= @selected < @commandList.lines.length
+                command = @commandList?.lines[@selected]
             @hideList()
         command = command.trim()
         @setCurrent command
@@ -55,20 +57,18 @@ class Command
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
     changed: (command) ->
-        return if not @list?
+        return if not @commandList?
         if @listItems().length
             items = @listItems()
             command = command.trim()
             if command.length
-                fuzzied  = fuzzy.filter command, (new String(s) for s in items)
+                fuzzied  = fuzzy.filter command, (new String(s.text ? s) for s in items)
                 filtered = (f.string for f in fuzzied)
-                @showItems filtered
-                # @select -1
+                @showItems _.filter items, (i) => (i.text ? i) in filtered
                 @select 0
                 @positionList()
             else
                 @showItems items
-                # @select -1
                 @select 0
                 @positionList()
        
@@ -95,61 +95,67 @@ class Command
     # 0000000  000  0000000      000   
 
     showList: ->
-        if not @list?
-            @list = document.createElement 'div' 
-            @list.className = "list #{@prefsID}"
-            window.split.elem.appendChild @list 
+        if not @commandList?
+            listView = document.createElement 'div' 
+            listView.className = "commandlist #{@prefsID}"
+            window.split.elem.appendChild listView
+            @commandList = new CommandList '.commandlist'
     
     listItems: () -> @history.reversed()
 
-    showItems: (items) ->    
-        return if not @list? and not items.length
-        @showList() if not @list?
-        @list.innerHTML = ""        
+    showItems: (items) ->
+        return if not @commandList? and not items.length
+        @showList() if not @commandList?
         if items.length == 0
-            @list.style.display = 'none'
+            @commandList.view.style.display = 'none'
+            @commandList.setText ''
         else
-            @list.style.display = 'unset'
+            @commandList.setLines ['']
+            @commandList.view.style.display = 'unset'
             index = 0
             for item in items
-                continue if not item? or not item.trim?().length
-                prefix = @itemPrefix?(item) or ''
-                div = document.createElement 'div'
-                div.className = 'list-item'
-                text = prefix + item
-                div.innerHTML = render.line Syntax.dissForTextAndSyntax(text, 'ko')
-                div.value     = item
-                div.addEventListener 'mousedown', @listClick
-                @list.appendChild div
+                continue if not item? 
+                text = (item.text ? item).trim()              
+                continue if not text.length
+                line = item.line ? ' '
+                type = item.syntax ? @syntaxName
+                @commandList.appendMeta 
+                    line: line
+                    diss: Syntax.dissForTextAndSyntax text, type, @commandList.size
+                    clss: 'searchResult'
+                    list: index
                 index += 1
+        @commandList.view.style.height = "#{4 + @commandList.size.lineHeight * Math.min @maxListLines, items.length}px"
+        @commandList.resized()
         @positionList()
     
-    listClick: (event) => 
-        @selected = -1
-        @execute event.target.value
+    listClick: (index) => 
+        log "listClick index #{index}"
+        @selected = index
+        @execute @commandList.lines[index]
     
     onBot: (bot) => 
         cl = window.split.commandlineHeight + window.split.handleHeight
         if bot < cl
-            @list?.style.opacity = "#{clamp 0, 1, bot/cl}"
+            @commandList?.view.style.opacity = "#{clamp 0, 1, bot/cl}"
         else
-            @list?.style.opacity = "1"
+            @commandList?.view.style.opacity = "1"
         @positionList()
     
     positionList: ->
-        return if not @list?
+        return if not @commandList?
         split = window.split
         listTop = split.splitPosY 1
-        listHeight = @list.getBoundingClientRect().height
+        listHeight = @commandList.view.getBoundingClientRect().height
         if (split.elemHeight() - listTop) < listHeight
             if split.splitPosY(0) > split.splitPosY(1) - split.splitPosY(1)
                 listTop = split.splitPosY(0) - listHeight
                 if listTop < 0
-                    @list.style.height = "#{listHeight+listTop}px"
+                    @commandList.view.style.height = "#{listHeight+listTop}px"
                     listTop = 0
             else
-                @list.style.height = "#{split.elemHeight() - listTop}px"
-        @list?.style.top = "#{listTop}px"
+                @commandList.view.style.height = "#{split.elemHeight() - listTop}px"
+        @commandList?.view.style.top = "#{listTop}px"
 
     #  0000000  00000000  000      00000000   0000000  000000000
     # 000       000       000      000       000          000   
@@ -157,12 +163,13 @@ class Command
     #      000  000       000      000       000          000   
     # 0000000   00000000  0000000  00000000   0000000     000   
         
-    select: (i) ->
-        @list?.children[@selected]?.classList.remove 'selected'
-        @selected = clamp -1, @list?.children.length-1, i
+    select: (i) -> 
+        @selected = clamp -1, @commandList?.lines.length-1, i
         if @selected >= 0
-            @list?.children[@selected]?.classList.add 'selected'
-            @list?.children[@selected]?.scrollIntoViewIfNeeded()
+            @commandList?.selectSingleRange @commandList.rangeForLineAtIndex @selected
+            @commandList.do.cursors [[0, @selected]]
+        else
+            @commandList?.singleCursorAtPos [0,0] 
                 
     # 00000000   00000000   00000000  000   000
     # 000   000  000   000  000       000   000
@@ -171,12 +178,12 @@ class Command
     # 000        000   000  00000000      0    
             
     prev: -> 
-        if @list?
-            @select clamp -1, @list.children.length-1, @selected-1
+        if @commandList?
+            @select clamp -1, @commandList.lines.length-1, @selected-1
             if @selected < 0
                 @hideList() 
             else
-                return @list.children[@selected]?.value
+                return @commandList.lines[@selected]
         else            
             if @selected < 0
                 @selected = @history.length-1 
@@ -192,12 +199,12 @@ class Command
     # 000   000  00000000  000   000     000   
     
     next: -> 
-        if not @list? and @listItems().length
+        if not @commandList? and @listItems().length
             @showItems @listItems() 
             @select -1
-        if @list? 
-            @select clamp 0, @list.children.length-1, @selected+1
-            return @list.children[@selected]?.value
+        if @commandList? 
+            @select clamp 0, @commandList.lines.length-1, @selected+1
+            return @commandList.lines[@selected]
         else if @history.length
             @selected = clamp 0, @history.length-1, @selected+1
             return new @history[@selected]
@@ -218,8 +225,8 @@ class Command
             @skipBlur = null
             
     hideList: ->
-        @list?.remove()
-        @list = null
+        @commandList?.view.remove()
+        @commandList = null
                 
     # 000   000  000   0000000  000000000   0000000   00000000   000   000
     # 000   000  000  000          000     000   000  000   000   000 000 
@@ -251,9 +258,9 @@ class Command
     current: -> @history[@selected] ? ''
         
     last: ->
-        if @list?
-            @selected = @list.children.length-1
-            @list.children[@selected]?.value
+        if @commandList?
+            @selected = @commandList.lines.length-1
+            @commandList.lines[@selected]
         else            
             @selected = @history.length-1
             return @history[@selected] if @selected >= 0
@@ -322,8 +329,8 @@ class Command
     handleModKeyComboEvent: (mod, key, combo, event) -> 
         switch combo
             when 'page up', 'page down'
-                if @list?
-                    return @select clamp 0, @list.children.length, @selected+20*(combo=='page up' and -1 or 1)
+                if @commandList?
+                    return @select clamp 0, @commandList.lines.length, @selected+@maxListLines*(combo=='page up' and -1 or 1)
         'unhandled'
 
 module.exports = Command

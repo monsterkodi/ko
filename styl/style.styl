@@ -187,6 +187,18 @@ infoPadding = 6px
 // 000      000       000     000   
 // 0000000  000  0000000      000   
 
+.commandlist
+    position            absolute
+    left                0
+    overflow-x          hidden
+    overflow-y          auto
+    width               500px
+    // min-width           300px
+    // max-height          460px
+    // min-height          100px
+    background          #1a1a1a
+    border-top          frameBorder
+
 .list
     position            absolute
     left                0
@@ -222,12 +234,6 @@ infoPadding = 6px
     &.directory
         color           #aaf
         font-weight     bold
-    &::before
-        content         "∘ "
-        color           transparent
-    &.directory::before
-        content         "▸ "
-        color           #88f
 
 .list.windows
     min-width           200px
@@ -469,8 +475,10 @@ body
     overflow-y          hidden
     &::-webkit-scrollbar
         height          2px
+        
 .commandline-editor .layers
     min-height          commandlineHeight
+
 .lines
 .cursors
 .highlights

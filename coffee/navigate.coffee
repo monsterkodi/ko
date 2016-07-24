@@ -68,7 +68,7 @@ class Navigate
     # 000   000  000   000      0      000   0000000   000   000     000     00000000
     
     navigateToFilePos: (filePos, opt) ->
-        log "Navigate.navigateToFilePos", filePos, opt
+        # log "Navigate.navigateToFilePos", filePos, opt
         id = @main.activateWindowWithFile filePos.file
         if id?
             @main.winWithID(id).webContents.send 'singleCursorAtPos', filePos.pos, opt.select

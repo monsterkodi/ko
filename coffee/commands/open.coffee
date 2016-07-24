@@ -59,10 +59,11 @@ class Open extends Command
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
 
     changed: (command) ->
-        if not @list?
+        if not @commandList?
             @start @shortcuts[0]
         command  = command.trim()
         return if command in ['.', '..', '/', '~']
+        
         if command.length
             fuzzied  = fuzzy.filter command, @files       
             filtered = (f.string for f in fuzzied)
@@ -76,7 +77,7 @@ class Open extends Command
                     when '.js', '.json', '.html' then -100
                     else 
                         0 
-
+    
                 bonus += (10-f.split(/[\/\.]/).length)
                         
                 if f == command
@@ -89,10 +90,13 @@ class Open extends Command
                 bonus
     
             filtered.sort (a,b) -> matchWeight(b) - matchWeight(a)
-            @listFiles filtered
+            items = @listItems()
+            sorted = []
+            for f in filtered
+                sorted.push _.find items, (i) -> i.text == f
+            @showItems sorted
         else
-            @listFiles @files
-        
+            @showItems @listItems()
         @select 0
         @positionList()
 
@@ -102,50 +106,17 @@ class Open extends Command
     # 000      000       000     000   
     # 0000000  000  0000000      000   
 
-    next: -> 
-        if not @list?
-            @showList()
-            @select -1
-        super
-
-    showList: ->
-        super
-        @listFiles @files
-        @positionList()
-            
-    listFiles: (files) ->
-        return if not @list?
-        @list.innerHTML = ""        
-        if files.length == 0
-            @list.style.display = 'none'
-        else
-            @list.style.display = 'unset'
-            index = 0
-            for fileOrDir in files
-                file = fileOrDir
-                div = document.createElement 'div'
-                div.className = 'list-item'
-                if file.endsWith ' >'
-                    file = file.slice 0, file.length-2
-                    div.classList.add 'directory'
-                div.innerHTML = render.line syntax.dissForTextAndSyntax(file, 'ko')
-                div.setAttribute "onmousedown", "window.openFileAtIndex(#{index});"
-                div.value = file
-                @list.appendChild div
-                index += 1
+    listItems: () ->
+        items = []
+        for file in @files
+            item = Object.create null
+            if file.endsWith ' >'
+                file = file.slice 0, file.length-2
+                item.line = '▸'
+            item.text = file
+            items.push item
+        items
                 
-    #  0000000   00000000   00000000  000   000          00000000  000  000      00000000
-    # 000   000  000   000  000       0000  000          000       000  000      000     
-    # 000   000  00000000   0000000   000 0 000          000000    000  000      0000000 
-    # 000   000  000        000       000  0000          000       000  000      000     
-    #  0000000   000        00000000  000   000          000       000  0000000  00000000
-        
-    openFileAtIndex: (i) =>
-        @select i
-        @setText @list.children[i].value
-        @commandline.execute()
-        @skipBlur = true
-
     #  0000000   0000000   000   000   0000000  00000000  000    
     # 000       000   000  0000  000  000       000       000    
     # 000       000000000  000 0 000  000       0000000   000    
@@ -154,7 +125,7 @@ class Open extends Command
     
     cancel: (combo) ->
         if combo == @shortcuts[0]
-            return @execute() if not @navigating and @list? and @lastFileIndex == @selected == @history.length-2
+            return @execute() if not @navigating and @commandList? and @lastFileIndex == @selected == @history.length-2
         super combo
     
     #  0000000  000000000   0000000   00000000   000000000
@@ -165,7 +136,6 @@ class Open extends Command
         
     start: (@combo) -> 
         # log "Open.start combo:#{@combo} #{@list?}"
-        window.openFileAtIndex = @openFileAtIndex
         opt = {}
         if window.editor.currentFile?
             opt.file = window.editor.currentFile 
@@ -289,9 +259,10 @@ class Open extends Command
         @files = _.uniq @files
 
         @showList()
+        @showItems @listItems()
         @grabFocus()
         @select @lastFileIndex
-        text = @navigating and @dir or @list.children[@selected].value
+        text = @navigating and @dir or @commandList.lines[@selected]
         @commandline.setAndSelectText text
                     
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
@@ -302,7 +273,7 @@ class Open extends Command
         
     execute: (command) ->
         
-        listValue = @list?.children[@selected]?.value if @selected >= 0
+        listValue = @commandList?.lines[@selected] if @selected >= 0
 
         if command in ['.', '..', '/', '~']
             @dir = @resolvedPath command

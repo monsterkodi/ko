@@ -42,7 +42,7 @@ class Term extends Command
     # 0000000  000  0000000      000   
     
     listItems: () -> 
-        _.concat @history.reversed(), _.intersection @bins, [
+        items = _.concat @history.reversed(), _.intersection @bins, [
             'cat', 'colorcat', 
             'ls', 'color-ls',
             'konrad', 'noon', 'sds', 'strudl',
@@ -54,13 +54,8 @@ class Term extends Command
             'tail', 'head', 'wc', 'sort', 
             'cd', 'rm', 'mkdir', 'rmdir'
         ]
+        ({text: i, line: i in @bins and '●' or '▸'} for i in items)
 
-    itemPrefix: (item) ->
-        if item in @bins
-            '● '
-        else
-            '▸ '
-    
     #  0000000  000      00000000   0000000   00000000 
     # 000       000      000       000   000  000   000
     # 000       000      0000000   000000000  0000000  
