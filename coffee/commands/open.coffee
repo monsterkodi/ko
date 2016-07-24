@@ -114,6 +114,7 @@ class Open extends Command
             if file.endsWith ' >'
                 file = file.slice 0, file.length-2
                 item.line = '▸'
+                item.clss = 'directory'
             item.text = file
             items.push item
         items
@@ -289,7 +290,6 @@ class Open extends Command
             else if dirExists @resolvedPath command
                 resolved = @resolvedPath command
             if resolved? and @dir != resolved
-                log "execute load dir", resolved
                 @loadDir
                     navigating: resolved
                     dir:        resolved

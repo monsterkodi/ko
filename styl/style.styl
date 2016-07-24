@@ -105,6 +105,30 @@ span.ko
     overflow-x          auto
     overflow-y          hidden
 
+//  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000   0000000  000000000
+// 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  000          000   
+// 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  0000000      000   
+// 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000       000     000   
+//  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  0000000      000   
+
+.commandlist
+    position            absolute
+    left                0
+    overflow-x          hidden
+    overflow-y          auto
+    width               500px
+    background          #1a1a1a
+
+.commandlist.coffee
+    width               800px
+
+.commandlist.open .linenumber.selected span    
+    color               #aaf
+.commandlist.goto .linenumber.selected span    
+    color               #66f
+.commandlist.term .linenumber.selected span    
+    color               #f80
+
 // 000  000   000  00000000   0000000 
 // 000  0000  000  000       000   000
 // 000  000 0 000  000000    000   000
@@ -187,17 +211,6 @@ infoPadding = 6px
 // 000      000       000     000   
 // 0000000  000  0000000      000   
 
-.commandlist
-    position            absolute
-    left                0
-    overflow-x          hidden
-    overflow-y          auto
-    width               500px
-    background          #1a1a1a
-
-.commandlist.coffee
-    width               800px
-
 .list
     position            absolute
     left                0
@@ -227,11 +240,6 @@ infoPadding = 6px
         height          1px
     &.selected
         background      #333
-
-.list.open .list-item
-    &.directory
-        color           #aaf
-        font-weight     bold
 
 .list.windows
     min-width           200px

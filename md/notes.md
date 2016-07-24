@@ -5,8 +5,7 @@
 
 - *jump to file (require|path)*
 - *jump to list when multiple matches*
-
-- colorize term/coffee history
+- *scroll to top on goto*
 
 #### open
 - *automatically start konrad in pkg dir*

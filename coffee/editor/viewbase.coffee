@@ -60,7 +60,9 @@ class ViewBase extends Editor
         @diss = []
         @size = {}
         @syntax = new syntax @
-                
+        
+        @config.lineHeightFactor ?= 1.0/6.0        
+        
         @setFontSize prefs.get "#{@name}FontSize", @fontSizeDefault
 
         @scroll = new scroll 
@@ -172,7 +174,7 @@ class ViewBase extends Editor
         @view.style.fontSize = "#{fontSize}px"
         @size.numbersWidth = 'Numbers' in @config.features and 50 or 0
         @size.fontSize     = fontSize
-        @size.lineHeight   = fontSize + Math.floor(fontSize/6)
+        @size.lineHeight   = fontSize + Math.floor(fontSize*@config.lineHeightFactor)
         @size.charWidth    = fontSize * 0.6 
         @size.offsetX      = Math.floor @size.charWidth/2 + @size.numbersWidth
 
@@ -405,7 +407,9 @@ class ViewBase extends Editor
     resized: -> 
         vh = @view.clientHeight
         @scroll?.setViewHeight vh
-        @numbers?.elem.style.height = "#{vh}px"
+        log "viewbase resized vh #{vh}"
+        # @numbers?.elem.style.height = "#{vh}px"
+        @numbers?.elem.style.height = "#{@scroll.exposeNum * @scroll.lineHeight}px"
         @layers.style.width = "#{sw()-@view.getBoundingClientRect().left-130-6}px"
         @layers.style.height = "#{vh}px"
         @updateScrollOffset()

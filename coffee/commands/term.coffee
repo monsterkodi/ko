@@ -54,7 +54,7 @@ class Term extends Command
             'tail', 'head', 'wc', 'sort', 
             'cd', 'rm', 'mkdir', 'rmdir'
         ]
-        ({text: i, line: i in @bins and '●' or '▸'} for i in items)
+        ({text: i, line: i in @bins and '●' or '▸', type: 'sh'} for i in items)
 
     #  0000000  000      00000000   0000000   00000000 
     # 000       000      000       000   000  000   000

@@ -22,9 +22,12 @@ false                          value.bool.false
 
 \`                             operator.execute
 
+^[\w\-]+                       function
+\s(\-)(\w+)                  . keyword.marker . keyword
+
 # punctuation
 
-[\,\.\:\;\#\$\?\|]             syntax.punctuation
+[\,\.\:\;\#\$\^\?\|\~]         syntax.punctuation
 
 \b(if|elif|fi|then|else|echo|exit|while|case|esac|done|do|in|set)\b  keyword
 

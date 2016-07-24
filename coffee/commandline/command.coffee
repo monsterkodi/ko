@@ -115,11 +115,18 @@ class Command
             continue if not item? 
             text = (item.text ? item).trim()              
             continue if not text.length
-            line = item.line ? ' '
-            type = item.syntax ? @syntaxName
+            rngs = item.rngs ? []
+            if item.clss?
+                rngs.push 
+                    match: text
+                    start: 0
+                    value: item.clss
+                    index: 0
             @commandList.appendMeta 
-                line: line
-                diss: Syntax.dissForTextAndSyntax text, type, @commandList.size
+                line: item.line ? ' '
+                text: text
+                rngs: rngs
+                type: item.type ? @syntaxName
                 clss: 'searchResult'
                 list: index
             index += 1

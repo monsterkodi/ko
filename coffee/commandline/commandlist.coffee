@@ -5,7 +5,8 @@
 #    0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  0000000      000   
 
 ViewBase = require '../editor/viewbase'
-syntax   = require '../editor/syntax'
+Syntax   = require '../editor/syntax'
+matchr   = require '../tools/matchr'
 salt     = require '../tools/salt'
 log      = require '../tools/log'
 
@@ -13,10 +14,12 @@ class CommandList extends ViewBase
 
     constructor: (viewElem) ->
         
-        @fontSizeDefault = 20
+        @fontSizeDefault = 19
         @metaQueue = []
         
-        super viewElem, features: ['Scrollbar', 'Numbers', 'Meta']
+        super viewElem, 
+            features: ['Scrollbar', 'Numbers', 'Meta']
+            lineHeightFactor: 1.0/3.0
 
         @numbers.elem.style.fontSize = "#{@fontSizeDefault}px"
         @setLines @lines
@@ -44,8 +47,15 @@ class CommandList extends ViewBase
         @meta.append meta
         del1st = @lines.length == 1 and @lines[0].length == 0
         if meta.diss?
-            @appendLineDiss syntax.lineForDiss(meta.diss), meta.diss 
-        else
+            @appendLineDiss Syntax.lineForDiss(meta.diss), meta.diss 
+        else if meta.text? and meta.text.trim().length
+            r = meta.rngs ? []
+            text = meta.text.trim()
+            rngs = r.concat Syntax.rangesForTextAndSyntax text, meta.type or 'ko'
+            matchr.sortRanges rngs
+            diss = matchr.dissect rngs, join:true
+            @appendLineDiss text, diss 
+        else    
             @appendLineDiss ''
         if del1st
             @do.start()
