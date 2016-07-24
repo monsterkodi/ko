@@ -100,31 +100,29 @@ class Command
             listView.className = "commandlist #{@prefsID}"
             window.split.elem.appendChild listView
             @commandList = new CommandList '.commandlist'
+            @commandList.numbers.opacity = 0.1
+            @commandList.numbers.setOpacity 0.1
     
     listItems: () -> @history.reversed()
 
     showItems: (items) ->
         return if not @commandList? and not items.length
+        return @hideList() if not items.length
         @showList() if not @commandList?
-        if items.length == 0
-            @commandList.view.style.display = 'none'
-            @commandList.setText ''
-        else
-            @commandList.setLines ['']
-            @commandList.view.style.display = 'unset'
-            index = 0
-            for item in items
-                continue if not item? 
-                text = (item.text ? item).trim()              
-                continue if not text.length
-                line = item.line ? ' '
-                type = item.syntax ? @syntaxName
-                @commandList.appendMeta 
-                    line: line
-                    diss: Syntax.dissForTextAndSyntax text, type, @commandList.size
-                    clss: 'searchResult'
-                    list: index
-                index += 1
+        @commandList.setLines ['']
+        index = 0
+        for item in items
+            continue if not item? 
+            text = (item.text ? item).trim()              
+            continue if not text.length
+            line = item.line ? ' '
+            type = item.syntax ? @syntaxName
+            @commandList.appendMeta 
+                line: line
+                diss: Syntax.dissForTextAndSyntax text, type, @commandList.size
+                clss: 'searchResult'
+                list: index
+            index += 1
         @commandList.view.style.height = "#{4 + @commandList.size.lineHeight * Math.min @maxListLines, items.length}px"
         @commandList.resized()
         @positionList()
@@ -145,7 +143,7 @@ class Command
     positionList: ->
         return if not @commandList?
         split = window.split
-        listTop = split.splitPosY 1
+        listTop = 6+split.splitPosY 1
         listHeight = @commandList.view.getBoundingClientRect().height
         if (split.elemHeight() - listTop) < listHeight
             if split.splitPosY(0) > split.splitPosY(1) - split.splitPosY(1)
@@ -219,10 +217,10 @@ class Command
     # 000   000  000  0000000    00000000
          
     onBlur: => 
-        if not @skipBlur
-            @hideList()
-        else
-            @skipBlur = null
+        # if not @skipBlur
+            # @hideList()
+        # else
+            # @skipBlur = null
             
     hideList: ->
         @commandList?.view.remove()

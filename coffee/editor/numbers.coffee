@@ -16,7 +16,7 @@ event = require 'events'
 class Numbers extends event
 
     constructor: (@editor) ->
-        
+        @opacity = 0.5
         @elem = $(".numbers", @editor.view)
         @editor.on 'clearLines',       @onClearLines
         @editor.on 'lineDeleted',      @onLineDeleted
@@ -30,6 +30,8 @@ class Numbers extends event
         @editor.on 'selection',        @updateColors
         @editor.on 'cursor',           @updateColors
         @onFontSizeChange()
+
+    setOpacity: (o) -> @elem.style.background = "rgba(0,0,0,#{o})"
     
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000

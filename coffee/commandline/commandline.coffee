@@ -121,7 +121,6 @@ class Commandline extends ViewBase
         event?.stopPropagation()
         r = @command?.cancel combo
         if r?.status == 'ok'
-            log "r:", r
             @results r
             return
         window.split.showCommandline()

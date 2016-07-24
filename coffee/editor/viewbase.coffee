@@ -478,7 +478,7 @@ class ViewBase extends Editor
 
     updateNumbersOffset: ->
         @numbers?.elem.style.left = "#{@layers.scrollLeft}px"
-        @numbers?.elem.style.background = @layers.scrollLeft and '#000' or "rgba(0,0,0,0.5)"
+        @numbers?.setOpacity @layers.scrollLeft and 1 or @numbers?.opacity
 
     # 00000000    0000000    0000000
     # 000   000  000   000  000     

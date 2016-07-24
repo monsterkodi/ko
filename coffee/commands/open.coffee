@@ -62,7 +62,7 @@ class Open extends Command
         if not @commandList?
             @start @shortcuts[0]
         command  = command.trim()
-        return if command in ['.', '..', '/', '~']
+        return if command in ['.', '/', '~']
         
         if command.length
             fuzzied  = fuzzy.filter command, @files       
@@ -88,11 +88,12 @@ class Open extends Command
                     bonus += 10000 - path.basename(f).length
                  
                 bonus
-    
+                
             filtered.sort (a,b) -> matchWeight(b) - matchWeight(a)
             items = @listItems()
             sorted = []
             for f in filtered
+                f = f.slice 0, f.length-2 if f.endsWith ' >'
                 sorted.push _.find items, (i) -> i.text == f
             @showItems sorted
         else
@@ -125,7 +126,8 @@ class Open extends Command
     
     cancel: (combo) ->
         if combo == @shortcuts[0]
-            return @execute() if not @navigating and @commandList? and @lastFileIndex == @selected == @history.length-2
+            if not @navigating and @commandList? and @lastFileIndex == @selected
+                return @execute()
         super combo
     
     #  0000000  000000000   0000000   00000000   000000000
@@ -135,7 +137,6 @@ class Open extends Command
     # 0000000      000     000   000  000   000     000   
         
     start: (@combo) -> 
-        # log "Open.start combo:#{@combo} #{@list?}"
         opt = {}
         if window.editor.currentFile?
             opt.file = window.editor.currentFile 
@@ -232,10 +233,10 @@ class Open extends Command
             else
                 bonus = 0
 
-            bonus = 1000000 if f == '..'
+            bonus = 1000000 if f == '.. >'
             return bonus + 1000*(1000-f.split(/[\/\.]/).length)
                 
-        @files.push '..' if '..' not in @files            
+        @files.push '.. >' if '.. >' not in @files            
         @files.sort (a,b) -> absWeight(b) - absWeight(a)
                 
         @files = (relative(f, @dir) for f in @files)
