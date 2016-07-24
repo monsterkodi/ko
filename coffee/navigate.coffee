@@ -20,6 +20,7 @@ class Navigate
         return if not @main?
         @filePositions = []
         @currentIndex = -1
+        @navigating = false
  
     #  0000000    0000000  000000000  000   0000000   000   000
     # 000   000  000          000     000  000   000  0000  000
@@ -28,37 +29,33 @@ class Navigate
     # 000   000   0000000     000     000   0000000   000   000
 
     action: (opt) =>
-        log "action #{opt.action}", ("#{f.file}:#{f.pos[1]}" for f in @filePositions)
+        # log "action #{opt.action} @currentIndex #{@currentIndex} #{@navigating}", ("#{f.file}:#{f.pos[1]}" for f in @filePositions)
         switch opt.action
 
             when 'backward'
                 return if not @filePositions.length
                 @currentIndex = clamp 0, @filePositions.length-1, (@filePositions.length + @currentIndex-1) % @filePositions.length
+                @navigating = true
                 @navigateToFilePos @filePositions[@currentIndex], opt
                 
             when 'forward'
                 return if not @filePositions.length
                 @currentIndex = clamp 0, @filePositions.length-1, (@currentIndex+1) % @filePositions.length
+                @navigating = true
                 @navigateToFilePos @filePositions[@currentIndex], opt
                                 
-            when 'gotoFilePos'
-                @filePositions = @filePositions.filter (filePos) -> not (filePos.file == opt.file and filePos.pos[1] == opt.pos[1])
-                @filePositions.push
-                    file: opt.file
-                    pos:  opt.pos
-                    
-                @currentIndex = @filePositions.length-1
-                @navigateToFilePos @filePositions[@currentIndex], opt
-
             when 'addFilePos'
                 return if not opt?.file?.length
-                isAtEnd = @currentIndex == @filePositions.length-1
-                log "isAtEnd #{isAtEnd} #{opt.pos[1]}"
-                @filePositions = @filePositions.filter (filePos) -> not (filePos.file == opt.file and filePos.pos[1] == opt.pos[1])
-                @filePositions.push 
-                    file: opt.file
-                    pos:  opt.pos  
-                @currentIndex = @filePositions.length-1 if isAtEnd
+                hasFile = _.find @filePositions, (v) -> v.file == opt.file
+                if opt?.for in ['edit', 'goto'] or not @navigating or not hasFile
+                    @navigating = false
+                    @filePositions = @filePositions.filter (filePos) -> not (filePos.file == opt.file and Math.abs(filePos.pos[1] - opt.pos[1]) < 2)
+                    @filePositions.push 
+                        file: opt.file
+                        pos:  opt.pos  
+                    @currentIndex = @filePositions.length-1
+                    if opt?.for == 'goto'
+                        @navigateToFilePos @filePositions[@currentIndex], opt
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000
     # 0000  000  000   000  000   000  000  000        000   000     000     000     
@@ -86,17 +83,13 @@ class Navigate
     
     addFilePos: (opt) -> # called from window on editing
         opt.action = 'addFilePos'
+        opt.for = 'edit'
         ipc.send 'navigate', opt
         
     gotoFilePos: (opt) -> # called from window jumpTo
-        opt.action = 'gotoFilePos'
-        r = ipc.sendSync 'navigate', opt
-        if r? and r.file? and r.pos?
-            window.openFile r.file
-            window.editor.singleCursorAtPos r.pos
-        else
-            alert("wrong file pos? #{r}")
-            throw new Error
+        opt.action = 'addFilePos'
+        opt.for = 'goto'
+        ipc.send 'navigate', opt
 
     backward: () -> ipc.send 'navigate', action: 'backward', winID: window.winID
     forward:  () -> ipc.send 'navigate', action: 'forward' , winID: window.winID

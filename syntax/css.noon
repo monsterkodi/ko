@@ -29,10 +29,6 @@
 
 (\.)(\S+)                       . class.marker . class
 
-# attr
-
-# (:)([^\s\:]+)                . xfd . xf
-
 #number
 
 \-?\b\d+\b                      value.number.int

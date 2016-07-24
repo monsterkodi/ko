@@ -330,7 +330,7 @@ class Main
         wl = visibleWins()
         return false if not wl.length
         return false if wl.length == 1 and wl[0].getBounds().width == @screenSize().width
-        w0 = wl[0].getBounds()
+        w0 = wl[0].getBounds()        
         for wi in [1...wl.length]
             if not _.isEqual wl[wi].getBounds(), w0
                 return false

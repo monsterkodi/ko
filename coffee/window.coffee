@@ -152,7 +152,11 @@ loadFile = (file, opt={}) =>
                         return
             
         addToRecent file
-        ipc.send 'navigate', action: 'addFilePos', file: editor.currentFile, pos: editor.cursorPos()
+        ipc.send 'navigate', 
+            action: 'addFilePos'
+            file: editor.currentFile
+            pos: editor.cursorPos()
+            for: 'jump'
         
         opt.keepUndo = file == editor.currentFile if not opt.keepUndo?
         editor.setCurrentFile null, opt  # to stop watcher and reset scroll

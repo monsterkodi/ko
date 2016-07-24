@@ -65,20 +65,25 @@ null|undefined                 keyword.null
 (\w+)\s*[:]\s*[-=]>                 . method
 (\()[^\(\)]*(\)\s*)[-=]>            . function.bracket . function.bracket
 
-(\w+)(?=\(|\s+[@\w\d\"\'\(\[\{])      function.call
-(@\w+)(?=\s+[\w\d@\+\-\"\'\(\[\{]|\()   class.function.call
-(@?\w+)\s*\.\s*(\w+)\s*\([^\)]*\)   . class.callee . function.call
-(@?\w+)\s*\.\s*(\w+)\s+\w+          . class.callee . function.call
+(\w+)(?=\(|\s+[@\w\d\"\'\(\[\{])         function.call
+(@\w+)(?=\s+[\w\d@\+\-\"\'\(\[\{]|\()    class.function.call
+(@?\w+)\s*(\.\s*\w+)\s*\([^\)]*\)      . class.callee . function.call
+(@?\w+)\s*(\.\s*\w+)\s+\w+             . class.callee . function.call
 
 # class construction
-
+    
 new\s+(\w+)                    class.callee
 (@?\w+)\s*\=\s*new\s           class.object
 
+(?:[^\.])([\.])(?:[^\.])       . marker
+
 # range
 
-(\[).*(\.\.\.).*(\])         . range.bracket . range . range.bracket
-(\[).*(\.\.).*(\])           . range.bracket . range . range.bracket
+(\[).*[^\.](\.\.\.?)[^\.].*(\])  . range.bracket . range . range.bracket
+
+# punctuation
+
+[\,\;]                         syntax.punctuation
 
 # dictionary key
 
@@ -87,10 +92,6 @@ new\s+(\w+)                    class.callee
 # exists?
 
 \S+(\?)                        syntax.exists
-
-# punctuation
-
-[\,\.\;]                       syntax.punctuation
 
 # lodash
 
@@ -120,14 +121,9 @@ __dirname|__filename  keyword
     value.number.int
 
 # strings
+
 (')([^']*)(')                . string.marker.single . value.string.single . string.marker.single
 (")([^"\\]*)(")              . string.marker.double . value.string.double . string.marker.double
-# (")((?:[^"\#\\]*|\\["\\bfnrt\/])*)(")   . string.marker.double . value.string . string.marker.double
-
-# (")([^"\#]*)(\#\{)   . string.marker.double . value.string . interpolation.marker
-# (\})([^"\#]*)(")     . interpolation.marker . value.string . string.marker.double
-# (\})([^"\#]*)(\#\{)  . interpolation.marker . value.string . interpolation.marker
-    
 """                            string.marker.triple
 
 # comments
@@ -136,5 +132,6 @@ __dirname|__filename  keyword
 (?:^|\s+)(#+)([^\{].*|$)     . comment.marker . comment
 
 # salter headers
+
 ^\s*(\#)([0\s]+)$            . header.comment.marker . comment.header
 ^(\s*0[0\s]+)$                 comment.header
