@@ -28,8 +28,9 @@ class Navigate
     # 000   000   0000000     000     000   0000000   000   000
 
     action: (opt) =>
+        log "action #{opt.action}", ("#{f.file}:#{f.pos[1]}" for f in @filePositions)
         switch opt.action
-            
+
             when 'backward'
                 return if not @filePositions.length
                 @currentIndex = clamp 0, @filePositions.length-1, (@filePositions.length + @currentIndex-1) % @filePositions.length
@@ -52,11 +53,11 @@ class Navigate
             when 'addFilePos'
                 return if not opt?.file?.length
                 isAtEnd = @currentIndex == @filePositions.length-1
+                log "isAtEnd #{isAtEnd} #{opt.pos[1]}"
                 @filePositions = @filePositions.filter (filePos) -> not (filePos.file == opt.file and filePos.pos[1] == opt.pos[1])
                 @filePositions.push 
                     file: opt.file
-                    pos:  opt.pos
-                    
+                    pos:  opt.pos  
                 @currentIndex = @filePositions.length-1 if isAtEnd
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000
@@ -71,10 +72,10 @@ class Navigate
             @main.winWithID(id).webContents.send 'singleCursorAtPos', filePos.pos
         else
             if opt?.newWindow
-                @main.loadFile "#{filePos.file}:#{filePos.pos[1]}:#{filePos.pos[0]}"
+                @main.loadFile "#{filePos.file}:#{filePos.pos[1]+1}:#{filePos.pos[0]}"
             else if opt?.winID?
                 win = @main.winWithID opt.winID
-                win?.webContents.send 'loadFile', "#{filePos.file}:#{filePos.pos[1]}:#{filePos.pos[0]}"
+                win?.webContents.send 'loadFile', "#{filePos.file}:#{filePos.pos[1]+1}:#{filePos.pos[0]}"
         filePos
     
     #  0000000   0000000    0000000          00000000  000  000      00000000        00000000    0000000    0000000

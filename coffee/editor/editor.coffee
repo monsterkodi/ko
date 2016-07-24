@@ -93,7 +93,7 @@ class Editor extends Buffer
             if ext in Syntax.syntaxNames
                 @fileType = ext
                 
-        # log "setupFileType @fileType:#{@fileType}"
+        log "setupFileType @fileType:#{@fileType}"
 
         @surroundPairs = 
             '[': ['[', ']']

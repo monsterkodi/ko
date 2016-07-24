@@ -10,15 +10,11 @@
 
 [\(\)\{\}]                     punctuation.marker
 
-# key vaue
-
-# (^\s+\S+\s+)(.+)             . owner . property
-
 # tags
 
 \b(html|body|section|header|footer|ul|li|a|b|br|p|center|table|title|link|nav|tr|th|td|div|span|img|h\d|dt|blockquote|pre|hr|svg|path)\b   keyword
-\b(color|opacity|max-|min-|box-|sizing|width|position|pointer-events|radius|height|width|outline|overflow|family|weight|cursor|display|background|size|content|white-space|transition|transform|z-index)\b  keyword
-\b(overflow\-?[xy]?|border|bottom|left|right|top|font|margin|padding)(\-?)\b     . keyword . keyword.marker
+\b(color|opacity|max-|min-|box-?|sizing|width|position|pointer-events|radius|height|width|outline|overflow|family|weight|cursor|display|background|size|content|white-space|transition|transform|z-index)\b  keyword
+\b(overflow-?[xy]?|border-?|bottom|left|right|top|font|margin|padding)(-?)\b     . keyword . keyword.marker
 (-webkit-[\w\-]+)  keyword
 
 # none

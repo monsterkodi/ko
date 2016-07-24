@@ -308,7 +308,7 @@ editor.on 'changed', (changeInfo, action) =>
     return if changeInfo.foreign
     if changeInfo.sorted.length and action.lines.length
         ipc.send 'winFileLinesChanged', winID, editor.currentFile, action.lines
-        navigate.addFilePos file: editor.currentFile, pos:  editor.cursorPos()
+        navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
 
 window.editorWithName = (n) ->
     switch n
@@ -413,9 +413,10 @@ document.onkeydown = (event) ->
         event.stopPropagation()        
 
     for i in [1..9]
-        if combo is "alt+#{i}" # or combo is "command+#{i}"
+        if combo is "alt+#{i}"
             ipc.send 'activateWindow', i
             return stop event
+    
     switch combo
         when 'command+alt+i'     then return ipc.send 'toggleDevTools', winID
         when 'command+alt+`'     
@@ -433,6 +434,6 @@ document.onkeydown = (event) ->
         when 'command+shift+-'    then return @changeZoom -1
         when 'command+shift+0'    then return @resetZoom()
         when 'alt+`'              then return titlebar.showList()
-        when 'alt+ctrl+left'      then return stop event, navigate.backward()
-        when 'alt+ctrl+right'     then return stop event, navigate.forward()
+        when 'command+ctrl+left'  then return stop event, navigate.backward()
+        when 'command+ctrl+right' then return stop event, navigate.forward()
         

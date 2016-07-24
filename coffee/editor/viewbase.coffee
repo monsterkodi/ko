@@ -688,8 +688,10 @@ class ViewBase extends Editor
             when 'esc'
                 if @salterMode
                     return @setSalterMode false
-                if @cursors.length > 1 or @highlights.length
-                    return @clearCursorsAndHighlights()
+                if @highlights.length
+                    return @clearHighlights()
+                if @cursors.length > 1
+                    return @clearCursors()
                 if @stickySelection
                     return @endStickySelection()
                 if @selections.length
@@ -698,7 +700,6 @@ class ViewBase extends Editor
 
     onKeyDown: (event) =>
         {mod, key, combo} = keyinfo.forEvent event
-
         return if not combo
         return if key == 'right click' # weird right command key
 
@@ -767,7 +768,10 @@ class ViewBase extends Editor
             when 'alt+ctrl+up', 'alt+ctrl+down', 'alt+ctrl+left', 'alt+ctrl+right'   then return @alignCursors  key
             when 'ctrl+up',     'ctrl+down',     'ctrl+left',      'ctrl+right'      then return @moveMainCursor key
             when 'alt+left',    'alt+right',     'alt+shift+left', 'alt+shift+right' then return @moveCursorsToWordBoundary key, event.shiftKey
-
+            when 'down', 'right', 'up', 'left', 'shift+down', 'shift+right', 'shift+up', 'shift+left' 
+                @moveCursors key, event.shiftKey
+                stop event
+                
         return if mod and not key?.length
         
         switch key
@@ -782,10 +786,6 @@ class ViewBase extends Editor
                 @moveCursorsDown event.shiftKey, @numFullLines()-3
                 return stop event
             
-            when 'down', 'right', 'up', 'left' 
-                @moveCursors key, event.shiftKey
-                stop event
-
         ansiKeycode = require 'ansi-keycode'
         if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
             @insertUserCharacter ansiKeycode event

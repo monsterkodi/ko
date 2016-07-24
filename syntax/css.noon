@@ -1,0 +1,63 @@
+#  0000000   0000000   0000000
+# 000       000       000     
+# 000       0000000   0000000 
+# 000            000       000
+#  0000000  0000000   0000000 
+
+\S+                            text
+
+# braces
+
+[\(\)\{\}]                     punctuation.marker
+
+# tags
+
+\b(html|body|section|header|footer|ul|li|a|b|br|p|center|table|title|link|nav|tr|th|td|div|span|img|h\d|dt|blockquote|pre|hr|svg|path)\b   keyword
+\b(color|opacity|max-|min-|box-?|sizing|width|position|pointer-events|radius|height|width|outline|overflow|family|weight|cursor|display|background|size|content|white-space|transition|transform|z-index)\b  keyword
+\b(overflow-?[xy]?|border-?|bottom|left|right|top|font|margin|padding)(\-?)\b     . keyword . keyword.marker
+(-webkit-[\w\-]+)  keyword
+
+# none
+
+\b(none)\b                      null
+
+# array index
+
+\[(\d+)\]                       value.int
+
+# class
+
+(\.)(\S+)                       . class.marker . class
+
+# attr
+
+# (:)([^\s\:]+)                . xfd . xf
+
+#number
+
+\-?\b\d+\b                      value.number.int
+(\b\d+\.\d+\b)                  value.number.float
+(\-?\d+)(px|%)                . value.number.int . value.number.marker                    
+
+# colors
+
+(#)([\da-fA-F]{3})              . module.marker . module
+(#)([\da-fA-F]{6})              . module.marker . module
+(rgba?\s*\()([^\)]+)(\))        . module.marker . module . module.marker
+\b(red|green|blue|yellow|magenta|cyan|black|gray|white|orange)\b   module
+
+# strings
+(')([^']*)(')                . string.marker.single . value.string.single . string.marker.single
+(")([^"\\]*)(")              . string.marker.double . value.string.double . string.marker.double
+
+# punctuation
+[\,\.\;\&]                      marker
+
+# comments
+
+\/\*|\*\/                     comment
+(\/\/)(.*)                  . comment.marker . comment
+
+# salt header
+
+^\s*\/\/\s+([0\s]+)$        . comment.header
