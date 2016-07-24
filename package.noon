@@ -3,12 +3,15 @@ productName     ko
 version         0.9.4
 description     an editor for macOS
 main            js/main.js
+preferGlobal    true
+bin
+                ko  ./bin/ko
 scripts
-                dist      npm run clean && npm run compile && npm run install && build
+                dist      npm run clean && npm run compile && npm run initapp && build
                 kill      fish -c "killall Electron" -c "killall Electron" -c "echo killed"
                 clean     rm -rf dist app/js app/img app/css app/bin app/syntax app/*.html app/node_modules
                 compile   cp -r js css img bin syntax *.html app
-                install   cd app && npm install
+                initapp   cd app && npm install
 repository
                 type  git
                 url   git+https://github.com/monsterkodi/ko.git
@@ -52,7 +55,10 @@ dependencies
                 chokidar        ^1.5.2
                 coffee-script   ^1.10.0
                 colors          ^1.1.2
+                dmg             ^0.1.0
+                download        ^5.0.2
                 entities        ^1.1.1
+                fs-extra        ^0.30.0
                 fuzzy           ^0.1.1
                 html-entities   ^1.2.0
                 karg            >=1.0.9

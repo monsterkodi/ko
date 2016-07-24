@@ -2,6 +2,7 @@ node_modules
 package.json
 app/img
 app/css
+app/bin
 app/js
 app/index.html
 app/syntax

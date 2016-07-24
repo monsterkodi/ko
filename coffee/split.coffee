@@ -12,6 +12,7 @@ log   = require './tools/log'
 pos   = require './tools/pos'
 drag  = require './tools/drag'
 prefs = require './tools/prefs'
+_     = require 'lodash'
 event = require 'events'
 
 class Split extends event

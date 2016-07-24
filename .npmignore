@@ -1,0 +1,14 @@
+node_modules
+.git
+app
+dist
+build
+coffee
+syntax
+test
+styl
+pug
+css
+js
+md
+package.noon

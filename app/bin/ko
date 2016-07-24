@@ -26,8 +26,8 @@ elif [ -x "$HOME/Applications/$_NAME" ]; then
 else
     _PATH="$(mdfind \"kMDItemCFBundleIdentifier == 'net.monsterkodi.ko'\" | grep -v ShipIt | head -1 | xargs -0 dirname)"
     if [ ! -x "$_PATH/$_NAME" ]; then
-        echo "sorry, can't locate $_NAME."
-        exit 1
+        node "`dirname $0`/../lib/node_modules/ko/bin/download.js" $*
+        exit 0
     fi
 fi
 
