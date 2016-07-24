@@ -1,0 +1,155 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/Cellar/node/6.3.0/bin/node',
+1 verbose cli   '/usr/local/bin/npm',
+1 verbose cli   'publish' ]
+2 info using npm@3.10.5
+3 info using node@v6.3.0
+4 verbose publish [ '.' ]
+5 silly cache add args [ '.', null ]
+6 verbose cache add spec .
+7 silly cache add parsed spec Result {
+7 silly cache add   raw: '.',
+7 silly cache add   scope: null,
+7 silly cache add   escapedName: null,
+7 silly cache add   name: null,
+7 silly cache add   rawSpec: '.',
+7 silly cache add   spec: '/Users/kodi/s/ko',
+7 silly cache add   type: 'directory' }
+8 verbose addLocalDirectory /Users/kodi/.npm/ko/0.9.5/package.tgz not in flight; packing
+9 verbose correctMkdir /Users/kodi/.npm correctMkdir not in flight; initializing
+10 info lifecycle ko@0.9.5~prepublish: ko@0.9.5
+11 silly lifecycle ko@0.9.5~prepublish: no script for prepublish, continuing
+12 verbose tar pack [ '/Users/kodi/.npm/ko/0.9.5/package.tgz', '/Users/kodi/s/ko' ]
+13 verbose tarball /Users/kodi/.npm/ko/0.9.5/package.tgz
+14 verbose folder /Users/kodi/s/ko
+15 verbose addLocalTarball adding from inside cache /Users/kodi/.npm/ko/0.9.5/package.tgz
+16 verbose correctMkdir /Users/kodi/.npm correctMkdir not in flight; initializing
+17 silly cache afterAdd ko@0.9.5
+18 verbose afterAdd /Users/kodi/.npm/ko/0.9.5/package/package.json not in flight; writing
+19 verbose correctMkdir /Users/kodi/.npm correctMkdir not in flight; initializing
+20 verbose afterAdd /Users/kodi/.npm/ko/0.9.5/package/package.json written
+21 silly publish { name: 'ko',
+21 silly publish   productName: 'ko',
+21 silly publish   version: '0.9.5',
+21 silly publish   description: 'an editor for macOS',
+21 silly publish   main: 'js/main.js',
+21 silly publish   preferGlobal: true,
+21 silly publish   bin: { ko: './bin/ko' },
+21 silly publish   scripts:
+21 silly publish    { dist: 'npm run clean && npm run compile && npm run initapp && build',
+21 silly publish      kill: 'fish -c "killall Electron" -c "killall Electron" -c "echo killed"',
+21 silly publish      clean: 'rm -rf dist app/js app/img app/css app/bin app/syntax app/*.html app/node_modules',
+21 silly publish      compile: 'cp -r js css img bin syntax *.html app',
+21 silly publish      initapp: 'cd app && npm install' },
+21 silly publish   repository:
+21 silly publish    { type: 'git',
+21 silly publish      url: 'git+https://github.com/monsterkodi/ko.git' },
+21 silly publish   keywords:
+21 silly publish    [ 'mac',
+21 silly publish      'osx',
+21 silly publish      'macOS',
+21 silly publish      'editor',
+21 silly publish      'coffee',
+21 silly publish      'script',
+21 silly publish      'coffee-script',
+21 silly publish      'coffeescript' ],
+21 silly publish   author: { name: 'monsterkodi' },
+21 silly publish   license: 'Unlicense',
+21 silly publish   bugs: { url: 'https://github.com/monsterkodi/ko/issues' },
+21 silly publish   build:
+21 silly publish    { appId: 'net.monsterkodi.ko',
+21 silly publish      'app-category-type': 'public.app-category.utilities',
+21 silly publish      asar: false,
+21 silly publish      productName: 'ko',
+21 silly publish      osx:
+21 silly publish       { background: 'build/background.png',
+21 silly publish         target: [Object],
+21 silly publish         contents: [Object] } },
+21 silly publish   devDependencies: { 'electron-builder': '^5.10.1', 'electron-prebuilt': '^1.2.1' },
+21 silly publish   dependencies:
+21 silly publish    { 'ansi-keycode': '0.0.0',
+21 silly publish      chokidar: '^1.5.2',
+21 silly publish      'coffee-script': '^1.10.0',
+21 silly publish      colors: '^1.1.2',
+21 silly publish      dmg: '^0.1.0',
+21 silly publish      download: '^5.0.2',
+21 silly publish      entities: '^1.1.1',
+21 silly publish      'fs-extra': '^0.30.0',
+21 silly publish      fuzzy: '^0.1.1',
+21 silly publish      'html-entities': '^1.2.0',
+21 silly publish      karg: '>=1.0.9',
+21 silly publish      keycode: '^2.1.2',
+21 silly publish      lodash: '^4.13.1',
+21 silly publish      nconf: '^0.8.4',
+21 silly publish      noon: '>=1.0.12',
+21 silly publish      opener: '^1.4.1',
+21 silly publish      'performance-now': '^0.2.0',
+21 silly publish      'pty.js': '^0.3.1',
+21 silly publish      walkdir: '0.0.11',
+21 silly publish      'write-file-atomic': '^1.1.4' },
+21 silly publish   readme: '![ko](img/banner.png)\n![readme](img/readme.png)\n\n# about ko\n\nko is an editor for macOS\n    \n## main features\n\n**fast**\n- loads large files\n- keyboard centric \n    - nothing you can do with the mouse only\n    - includes lots of fancy shortcuts\n\n**commandline**\n- a single, non-intrusive input field to ...\n    - open files quickly\n    - find in text and search in files\n    - input terminal, coffee-script and macro commands\n    - goto lines or class/method/function-definitions\n\n**terminal**\n- alias\n- history\n- echos commands as ascii-headers\n- output of commands editable/searchable\n\n**file search**\n- search for strings/regexp in project files\n- automatic determination of project files\n- search results are editable\n    - edits can be saved back to files\n    - more powerful than conventional search and replace\n\n**multicursors**\n- not all cursors are equal:\n    - main cursor is always distuingishable\n    - main cursor can be moved independently from other cursors\n- powerful set of keyboard shortcuts for modification of cursors\n\n**minimap**\n- shows cursors, highlights and selections\n- also for terminal, search- and coffe-script results!\n- can be used to select large portions of text\n- sets cursor by default when dragging/clicking\n\n**autocomplete**\n- completes words from visited files and project files\n- automatic determination of project files:\n    - indexes files below directory containing .git or package.json\n    - ignores node_modules, .git, etc.\n    \n**syntax highlighting**\n- for coffee, cpp, h, html, js, json, md, noon, pug, py, sh, styl       \n- ansi-colors in terminal view\n\n**optimized for coffee-script**\n- completes function/method names from required files\n- terminal commands to list classes and functions/methods\n- includes a few nifty macros:\n    - **dbg** insert log line which outputs class.method + variables under cursors\n    - **req** insert require statement for word at cursor\n    - **class** creates a new file with simple class skeleton\n    - **inv** toggle display of line-breaks\n\n## command-line\n- operates in different modes:\n    - **open** new window\n    - **search** Search /search/ /Search/\n    - **find** Find /find/ /Find/ fiZd f*nd\n    - **goto** selecto\n    - **term** Term\n    - **coffee**\n    - **macro**\n- each mode keeps it\'s own history\n- clicking on the command name lists all modes and their shortcuts:\n    \n![commandline](img/commandline.png)\n\n## terminal\n\n- **⌘T** to activate input\n\nspecial commands\n- **alias**\n    - without argument: list aliases\n    - with one argument: clear alias\n    - with two arguments: set alias\n- **history**\n    - without argument: list command history\n    - !! to repeat last command\n    - !n to repeat command with id n\n    - !~n to remove command with id n\n- **classes**\n    - list coffee-script classes and their methods\n    - click on result jumps to definition\n- **funcs**\n    - list coffee-script functions and methods\n    - click on result jumps to definition\n- **files**\n    - list indexed project files\n    - click on result opens file\n- **words**\n    - list indexed words\n    - click on word starts search command\n\nclasses, funcs, files and words results can be filtered by adding arguments\n\nall other commands are passed to a child process running bash\n- only works for commands that terminate!\n\n![terminal](img/terminal.png)\n\n## find\nsearch in current file\n- **⌘F**  case insensitive\n- **^F**  case sensitive\n- **⌥F**  regexp insensitive\n- **^⌥F** regexp sensitive\n- **⌘⌥F** fuzzy search\n- **⌘^F** glob search\n     \n## search\nsearch in project files\n- **⌘⇧F**   case   insensitive\n- **^⇧F**   case   sensitive\n- **⌥⇧F**   regexp insensitive\n- **^⌥⇧F**  regexp sensitive\n    \nediting search result lines will ...\n- mark them for saving\n- changes are propagated immediately to all open files\n- **⌘S** (while the search-results view has focus) will save all pending changes in open **and** closed files\n- deleting lines from the search results will **not** remove them from their original files\n- changes from the editor are not yet propagated to old search results\n    - this means: only edit and save **fresh** search results!\n- this is a very powerful feature but not tested thoroughly yet and probably not working correctly in all cases!\n- use at your own risk! backup your files! \n\n![search](img/search.png)\n\n## multicursors\n- **⌘click**               add or remove single cursor\n- **⌘up|down**             grow all vertical cursor lines up or down\n- **^⇧up|down**            grow only main cursor line up or down\n- **^up|down|left|right**  move main cursor independently (clears other cursors when moving over them)\n- **^⌥up|down|left|right** align all cursors vertically with up|down|left|right-most cursor\n- **^⇧right**              align all cursors vertically with right-most cursor while moving text to the right\n- **⌘delete**              delete backwards over line boundaries\n\ncursors can be positioned after the end of line\n- cursors after the end of line have two representations: blue and orange/yellow\n- the orange/yellow position shows where text will be inserted\n- missing spaces are added automatically in multicursor mode\n\n![cursors](img/cursors.png)\n\n## open\n\nopens files quickly via fuzzy matching\n- **⌘P** open file quickly\n- **⌘⇧P** open file quickly in new window\n\non activation, it ...\n- lists recent files on top \n- the most recent file is selected by default\n    \nwhile list is open:\n- **.** list current directory without previous files\n- **..** navigate directory up\n\nthe list content depends on the file currently opened in the editor\n- files in surrounding project directories are included\n- switching projects is simple: just open a file in the new project\n\n![open](img/open.png)\n\n## goto\n- **⌘;** activates goto command\n- **text** jump to function, class or file\n- **positive number** jump to line\n- **negative number** jump to line relative to end of file\n\nin editor:\n- **⌥enter** goto word under main cursor\n- **⌥click** goto clicked word\n\n## coffee\n\nevaluates coffee-script code in the main process and prints results in terminal\n- since the code is evaluated in the main process ...\n    - indexer internals and windows are accessible (via global **main** object)\n    - results are \n        - persistent for the lifetime of the app\n        - shared between windows\n\n- the commandline input is nice to do quick math calculations or other single line tasks\n- you can evaluate complex code too, just press **^enter** in the editor to evaluate its whole text\n\n![cursors](img/coffee.png)\n\n## windows\n\n- **⌘⌥A** switch between tiled and stacked windows\n- **⌘W** close active window\n- **⌘⇧W** close all windows except active window\n- **⌘`** activate next window\n- **⌘⇧`** activate previous window\n- **⌥`** open window list\n- **⌥[1-9]** activate window with id\n- **⌘⇧N** clone current file in new window\n- **⌘⌥Q** close all windows (they won\'t restore on next start) and quit\n\n## ascii-headers\n\nthe ascii-header mode lets you insert or edit ascii-headers\n- **⌘3** activates the ascii-header mode\n\nif the cursor is not in a header already, one will be generated for the word at the main cursor.\n    \nin ascii-header mode ...\n- cursors are green\n- backspace deletes the header character at the cursors \n- most characters will be inserted automatically just by typing them\n    \nthe mode will deactivate itself automatically in most circumstances. you can also force deactivate it with **esc**\n\n## minimap\n\n- **⌘** while dragging to turn off cursor placement\n- **⇧** while dragging/clicking to select lines\n\n## misc\n\n- **F2** global shortcut to activate ko\n- **⌘L** select more lines **⌘⇧L** select less lines\n- **⌥up|down** move selected|cursor lines up|down\n- **⌥/** toggle comment on selected|cursor lines\n- **⌘I** inverted line selection: select lines without a cursor or a selection\n- **⌘return** evaluate current buffer with coffee in main process and print the result in terminal view\n- **⌘⌥up** jump to counterpart file (coffee <-> js, cpp <-> h, pug <-> html, etc)\n\nwhile command input has focus:\n- **^up|down** move command input up|down\n- **⌘up|down** move command input to top|bottom of window\n- **⌥up|down** move command input a quarter of window up|down\n\n### to use ko from a terminal\n\n    ln -s /Applications/ko.app/Contents/Resources/app/bin/ko /usr/local/bin \n    \n### settings (windows, command histories and other stuff) are saved to\n\n    ~/Library/Application\\ Support/ko/ko.noon\n\n## missing features\n\n- plugin system\n- customization\n- git integration\n- bracket matching\n- regression tests\n- correct highlighting of complex strings\n\n## final note\n\nthis is a pre-release in active development!\nuse at your own risk!\n',
+21 silly publish   readmeFilename: 'README.md',
+21 silly publish   gitHead: '78580f2e2e4c36e61f9299c9388ace1f7655dc3a',
+21 silly publish   homepage: 'https://github.com/monsterkodi/ko#readme',
+21 silly publish   _id: 'ko@0.9.5',
+21 silly publish   _shasum: '7182a97bfee564135791f182166eb9b713f2b83f',
+21 silly publish   _from: '.' }
+22 verbose getPublishConfig undefined
+23 silly mapToRegistry name ko
+24 silly mapToRegistry using default registry
+25 silly mapToRegistry registry https://registry.npmjs.org/
+26 silly mapToRegistry data Result {
+26 silly mapToRegistry   raw: 'ko',
+26 silly mapToRegistry   scope: null,
+26 silly mapToRegistry   escapedName: 'ko',
+26 silly mapToRegistry   name: 'ko',
+26 silly mapToRegistry   rawSpec: '',
+26 silly mapToRegistry   spec: 'latest',
+26 silly mapToRegistry   type: 'tag' }
+27 silly mapToRegistry uri https://registry.npmjs.org/ko
+28 verbose publish registryBase https://registry.npmjs.org/
+29 silly publish uploading /Users/kodi/.npm/ko/0.9.5/package.tgz
+30 verbose request uri https://registry.npmjs.org/ko
+31 verbose request sending authorization for write operation
+32 info attempt registry request try #1 at 1:31:13 AM
+33 verbose request using bearer token for auth
+34 verbose request id b067bfaf0421a416
+35 http request PUT https://registry.npmjs.org/ko
+36 http 403 https://registry.npmjs.org/ko
+37 verbose headers { 'content-type': 'application/json',
+37 verbose headers   'cache-control': 'max-age=300',
+37 verbose headers   'content-length': '96',
+37 verbose headers   'accept-ranges': 'bytes',
+37 verbose headers   date: 'Sun, 24 Jul 2016 23:31:23 GMT',
+37 verbose headers   via: '1.1 varnish',
+37 verbose headers   connection: 'keep-alive',
+37 verbose headers   'x-served-by': 'cache-fra1223-FRA',
+37 verbose headers   'x-cache': 'MISS',
+37 verbose headers   'x-cache-hits': '0',
+37 verbose headers   'x-timer': 'S1469403074.105877,VS0,VE9078',
+37 verbose headers   vary: 'Accept-Encoding' }
+38 verbose request invalidating /Users/kodi/.npm/registry.npmjs.org/ko on PUT
+39 error publish Failed PUT 403
+40 verbose stack Error: you do not have permission to publish "ko". Are you logged in as the correct user? : ko
+40 verbose stack     at makeError (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:264:12)
+40 verbose stack     at CachingRegistryClient.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:252:14)
+40 verbose stack     at Request._callback (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:172:14)
+40 verbose stack     at Request.self.callback (/usr/local/lib/node_modules/npm/node_modules/request/request.js:200:22)
+40 verbose stack     at emitTwo (events.js:106:13)
+40 verbose stack     at Request.emit (events.js:191:7)
+40 verbose stack     at Request.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:1067:10)
+40 verbose stack     at emitOne (events.js:101:20)
+40 verbose stack     at Request.emit (events.js:188:7)
+40 verbose stack     at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:988:12)
+41 verbose statusCode 403
+42 verbose pkgid ko
+43 verbose cwd /Users/kodi/s/ko
+44 error Darwin 15.5.0
+45 error argv "/usr/local/Cellar/node/6.3.0/bin/node" "/usr/local/bin/npm" "publish"
+46 error node v6.3.0
+47 error npm  v3.10.5
+48 error code E403
+49 error you do not have permission to publish "ko". Are you logged in as the correct user? : ko
+50 error If you need help, you may report this error at:
+50 error     <https://github.com/npm/npm/issues>
+51 verbose exit [ 1, true ]

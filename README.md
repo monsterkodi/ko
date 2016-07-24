@@ -202,7 +202,7 @@ evaluates coffee-script code in the main process and prints results in terminal
 
 ## windows
 
-- **⌘A** switch between tiled and stacked windows
+- **⌘⌥A** switch between tiled and stacked windows
 - **⌘W** close active window
 - **⌘⇧W** close all windows except active window
 - **⌘`** activate next window
@@ -215,7 +215,7 @@ evaluates coffee-script code in the main process and prints results in terminal
 ## ascii-headers
 
 the ascii-header mode lets you insert or edit ascii-headers
-- **⌘3* activates the ascii-header mode
+- **⌘3** activates the ascii-header mode
 
 if the cursor is not in a header already, one will be generated for the word at the main cursor.
     
