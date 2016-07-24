@@ -76,7 +76,8 @@ class Macro extends Command
             # 000  0000  000  000   000
             # 000  000 0 000   000 000 
             # 000  000  0000     000   
-            # 000  000   000      0    
+            # 000  000   000      0  
+            
             when 'inv' 
                 editor.showInvisibles = !editor.showInvisibles
                 editor.updateLines()
@@ -86,6 +87,7 @@ class Macro extends Command
             # 0000000    0000000   000 00 00
             # 000   000  000       000 0000 
             # 000   000  00000000   00000 00
+            
             when 'req'
                 words = wordsInArgsOrCursorsOrSelection args
                 lastIndex = 0
@@ -109,13 +111,14 @@ class Macro extends Command
                         editor.do.insert lastIndex, text
                     editor.moveCursorsDown false, texts.length
                     editor.do.end()
-                    return do: "focus #{editor.name}"
+                    return do: "focus editor"
 
             # 0000000    0000000     0000000 
             # 000   000  000   000  000      
             # 000   000  0000000    000  0000
             # 000   000  000   000  000   000
             # 0000000    0000000     0000000 
+            
             when 'dbg'
                 li = if editor.isCursorInIndent() then cp[1] else cp[1]+1
                 indent = editor.indentStringForLineAtIndex li
@@ -142,6 +145,7 @@ class Macro extends Command
             # 000       000      000000000  0000000   0000000 
             # 000       000      000   000       000       000
             #  0000000  0000000  000   000  0000000   0000000 
+            
             when 'class'
                 clss = args.length and args[0] or last editor.textsInRanges(editor.selections)
                 clss ?= 'Class'

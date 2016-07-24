@@ -69,9 +69,11 @@ class Goto extends Command
             editor.singleCursorAtPos [0,line], @name == 'selecto'
             editor.scrollCursorToTop()
             focus: @focus
+            do: "reveal #{editor.name}"
         else if command.length
             window.editor.jumpTo command, dontList: true, select: @name == 'selecto'
-            focus: @focus
+            focus: '.editor'
+            do: "reveal editor"
         else
             text: ''
                     

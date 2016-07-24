@@ -1,11 +1,6 @@
 # todo/ideas
 
-- *make goto work with partial func names*
-- *add cursor positions to navigation history when goto in or jumping to file*
-
 - *jump to file (require|path)*
-- *jump to list when multiple matches*
-- *scroll to top on goto*
 
 #### open
 - *automatically start konrad in pkg dir*
@@ -19,11 +14,6 @@
 - delete forward swallows spaces?
 - when pasting text at indent level, remove leading space columns
 - multicursors and indent when pasting multiple lines at single cursor in col > 0
-
-#### coffee syntax
-- fix
-    prev: -> @navigate -1    
-    next: -> @navigate 1
 
 #### file state
 - save backup files?

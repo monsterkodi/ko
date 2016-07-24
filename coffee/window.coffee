@@ -82,7 +82,9 @@ delState = window.delState = (key) ->
 # 000  000         0000000
 
 ipc.on 'shellCommandData',  (event, cmdData) => commandline.commands['term'].onShellCommandData cmdData
-ipc.on 'singleCursorAtPos', (event, pos, extend) => editor.singleCursorAtPos pos, extend
+ipc.on 'singleCursorAtPos', (event, pos, extend) => 
+    editor.singleCursorAtPos pos, extend
+    editor.scrollCursorToTop()
 ipc.on 'openFile',          (event, options) => openFile options
 ipc.on 'focusEditor',       (event) => split.focus '.editor'
 ipc.on 'cloneFile',  => ipc.send 'newWindowWithFile', editor.currentFile

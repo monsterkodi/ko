@@ -75,8 +75,7 @@ class Open extends Command
                     when '.md', '.styl', '.pug'  then 500
                     when '.noon'                 then 250
                     when '.js', '.json', '.html' then -100
-                    else 
-                        0 
+                    else 0
     
                 bonus += (10-f.split(/[\/\.]/).length)
                         

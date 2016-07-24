@@ -407,8 +407,6 @@ class ViewBase extends Editor
     resized: -> 
         vh = @view.clientHeight
         @scroll?.setViewHeight vh
-        log "viewbase resized vh #{vh}"
-        # @numbers?.elem.style.height = "#{vh}px"
         @numbers?.elem.style.height = "#{@scroll.exposeNum * @scroll.lineHeight}px"
         @layers.style.width = "#{sw()-@view.getBoundingClientRect().left-130-6}px"
         @layers.style.height = "#{vh}px"
@@ -691,7 +689,6 @@ class ViewBase extends Editor
     # 0000000    0000000     00000  
     # 000  000   000          000   
     # 000   000  00000000     000   
-
 
     handleModKeyComboEvent: (mod, key, combo, event) ->
         

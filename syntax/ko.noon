@@ -9,26 +9,32 @@
 ([^']+')(.+)(':)          . class . class.marker . class . class.marker
 (@)(\w+)                  . static.method.marker . static.method
 
-(?:^|\s\s+)(\s*\~?[\/\S]*\/)(\S+)
+(▸ )([^']+')(.+)(':)       . class . class.marker . class . class.marker
+(● )(\w+)                 . class.marker . class
+(▸ )([\w\.]+)             . method.marker . method
+(▸ @)(\w+)                . static.method.marker . static.method
+
+(?:^|\s\s+)([◼●]?\s*\~?[\/\S]*\/)(\S+)
                             dirname
                             basename
+[◼]                         dirname
 
 (?:^\s*|\/)(\.\w+)(?:\s|$)  dotfile
-(\s*~?[\.\/\-\_\w]+\.coffee\b)   coffee
-(\s*~?[\.\/\-\_\w]+\.noon\b)     noon
-(\s*~?[\.\/\-\_\w]+\.json\b)     json
-(\s*~?[\.\/\-\_\w]+\.styl\b)     styl
-(\s*~?[\.\/\-\_\w]+\.html\b)     html
-(\s*~?[\.\/\-\_\w]+\.jade\b)     jade
-(\s*~?[\.\/\-\_\w]+\.pug\b)      pug
-(\s*~?[\.\/\-\_\w]+\.css\b)      css
-(\s*~?[\.\/\-\_\w]+\.cp?p?\b)    cpp
-(\s*~?[\.\/\-\_\w]+\.cc\b)       cpp
-(\s*~?[\.\/\-\_\w]+\.hp?p?\b)    hpp
-(\s*~?[\.\/\-\_\w]+\.js\b)       js
-(\s*~?[\.\/\-\_\w]+\.py\b)       py
-(\s*~?[\.\/\-\_\w]+\.sh\b)       sh
-(\s*~?[\.\/\-\_\w]+\.md\b)       md
+([◼●]?\s*~?[\.\/\-\_\w]+\.coffee\b)   coffee
+([◼●]?\s*~?[\.\/\-\_\w]+\.noon\b)     noon
+([◼●]?\s*~?[\.\/\-\_\w]+\.json\b)     json
+([◼●]?\s*~?[\.\/\-\_\w]+\.styl\b)     styl
+([◼●]?\s*~?[\.\/\-\_\w]+\.html\b)     html
+([◼●]?\s*~?[\.\/\-\_\w]+\.jade\b)     jade
+([◼●]?\s*~?[\.\/\-\_\w]+\.pug\b)      pug
+([◼●]?\s*~?[\.\/\-\_\w]+\.css\b)      css
+([◼●]?\s*~?[\.\/\-\_\w]+\.cp?p?\b)    cpp
+([◼●]?\s*~?[\.\/\-\_\w]+\.cc\b)       cpp
+([◼●]?\s*~?[\.\/\-\_\w]+\.hp?p?\b)    hpp
+([◼●]?\s*~?[\.\/\-\_\w]+\.js\b)       js
+([◼●]?\s*~?[\.\/\-\_\w]+\.py\b)       py
+([◼●]?\s*~?[\.\/\-\_\w]+\.sh\b)       sh
+([◼●]?\s*~?[\.\/\-\_\w]+\.md\b)       md
 
 \.\w+\s*$                   extname
 # [\.]                        marker

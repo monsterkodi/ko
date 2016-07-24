@@ -6,7 +6,7 @@
 
 class Pos
 
-    constructor: (@x, @y) -> 
+    constructor: (@x, @y) ->
         
     copy: => new Pos @x, @y
 
