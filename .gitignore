@@ -12,4 +12,5 @@ dist
 js
 css
 Icon?
-*.htmlnpm-debug.log
+*.html
+npm-debug.log
