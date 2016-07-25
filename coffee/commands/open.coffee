@@ -59,14 +59,14 @@ class Open extends Command
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
 
     changed: (command) ->
-        if not @commandList?
-            @start @shortcuts[0]
+            
         command  = command.trim()
         return if command in ['.', '/', '~']
         
         if command.length
-            fuzzied  = fuzzy.filter command, @files       
-            filtered = (f.string for f in fuzzied)
+            fileNames = (f[0] for f in @files)
+            fuzzied   = fuzzy.filter command, fileNames
+            filtered  = (f.string for f in fuzzied)
             
             matchWeight = (f) =>
                 f = f.slice 0, f.length-2 if f.endsWith ' >'
@@ -87,19 +87,67 @@ class Open extends Command
                     bonus += 10000 - path.basename(f).length
                  
                 bonus
-                
-            filtered.sort (a,b) -> matchWeight(b) - matchWeight(a)
-            items = @listItems()
-            sorted = []
-            for f in filtered
-                f = f.slice 0, f.length-2 if f.endsWith ' >'
-                sorted.push _.find items, (i) -> i.text == f
-            @showItems sorted
+
+            if not filtered.length  
+                log "nothing to sort? #{command}"
+                @hideList()
+                return
+            else 
+                filtered.sort (a,b) -> matchWeight(b) - matchWeight(a)
+                items = @listItems()
+                sorted = []
+                for f in filtered
+                    f = f.slice 0, f.length-2 if f.endsWith ' >'
+                    sorted.push _.find items, (i) -> i.text == f
+                if sorted.length
+                    @showItems sorted                
+                    if sorted[0].startsWith command
+                        log 'select 0'
+                        @select 0
+                    else 
+                        log 'select -1'
+                        @select -1
+                else 
+                    @select -1
         else
             @showItems @listItems()
-        @select 0
+            @select 0
         @positionList()
 
+    
+    # 000   000  00000000  000   0000000   000   000  000000000
+    # 000 0 000  000       000  000        000   000     000   
+    # 000000000  0000000   000  000  0000  000000000     000   
+    # 000   000  000       000  000   000  000   000     000   
+    # 00     00  00000000  000   0000000   000   000     000   
+    
+    weightedFiles: ->
+        weight = (fs) =>
+            [f, s] = fs
+            
+            extensionBonus = switch path.extname(f)
+                when '.coffee'               then 100
+                when '.md', '.styl', '.pug'  then 50
+                when '.noon'                 then 25
+                when '.js', '.json', '.html' then -1000000
+                else 0 
+
+            directoryBonus = 0
+            if s.isDirectory()
+                directoryBonus = 65535-path.basename(f).charCodeAt(0)
+                            
+            lengthPenalty = path.dirname(f).length
+            
+            localBonus = 0
+            localBonus += 10000 if f.startsWith @dir
+            localBonus -= relative(f, @dir).split('/').length * 200
+            
+            localBonus + directoryBonus + extensionBonus - lengthPenalty
+        
+        @files.sort (a,b) -> weight(b) - weight(a)
+        log "weightedFiles:", (f[0] for f in @files)
+        @files
+    
     # 000      000   0000000  000000000
     # 000      000  000          000   
     # 000      000  0000000      000   
@@ -108,14 +156,34 @@ class Open extends Command
 
     listItems: () ->
         items = []
-        for file in @files
+        
+        @lastFileIndex = 0
+
+        if not @navigating
+            if @history.length
+                for f in @history
+                    if f.length and (f != @file) and fileExists f
+                        item = Object.create null
+                        item.text = relative f, @dir
+                        items.push item
+                        @lastFileIndex = items.length-1
+                    else
+                        _.pullAll @history, f
+        else
             item = Object.create null
-            if file.endsWith ' >'
-                file = file.slice 0, file.length-2
+            item.line = '▸'
+            item.clss = 'directory'
+            item.text = '..'
+            items.push item
+                
+        for file in @weightedFiles()
+            item = Object.create null
+            if file[1].isDirectory()
                 item.line = '▸'
                 item.clss = 'directory'
-            item.text = file
+            item.text = relative file[0], @dir
             items.push item
+                        
         items
                 
     #  0000000   0000000   000   000   0000000  00000000  000    
@@ -160,8 +228,6 @@ class Open extends Command
         @pkg        = Walker.packagePath(@dir) ? @dir
         @file       = opt.file
         @files      = []
-        @paths      = []
-        @stats      = []
         @selected   = 0
         @navigating = opt.navigating ? false
         wopt = 
@@ -186,79 +252,10 @@ class Open extends Command
     # 00     00  000   000  0000000  000   000  00000000  000   000
             
     walkerDone: (fileList, statList) =>
-        # profile 'walker done'
-        @paths = @paths.concat fileList
-        @stats = @stats.concat statList
-        @files = _.clone @paths
-        for i in [0...@files.length]
-            if @stats[i].isDirectory()
-                @files[i] += " >"
+        @files = []
+        for i in [0...fileList.length]
+            @files.push [fileList[i], statList[i]]
             
-        # 000   000  00000000  000   0000000   000   000  000000000
-        # 000 0 000  000       000  000        000   000     000   
-        # 000000000  0000000   000  000  0000  000000000     000   
-        # 000   000  000       000  000   000  000   000     000   
-        # 00     00  00000000  000   0000000   000   000     000   
-        
-        absWeight = (f) =>
-            
-            if not @navigating
-                bonus = switch path.extname(f)         
-                    when '.coffee'               then 100
-                    when '.md', '.styl', '.pug'  then 50
-                    when '.noon'                 then 25
-                    when '.js', '.json', '.html' then -1000000
-                    else 0 
-            else
-                bonus = 0                
-                
-            penalty = path.dirname(f).length            
-                            
-            if f.startsWith @dir
-                return 10000-penalty+bonus
-            if f.startsWith path.dirname @dir
-                return 5000-penalty+bonus
-            else
-                return 1000-penalty+bonus
-        
-        relWeight = (f) =>
-            
-            if @navigating
-                bonus = switch path.extname(f)         
-                    when '.coffee'               then 100
-                    when '.md', '.styl', '.pug'  then 50
-                    when '.noon'                 then 25
-                    when '.js', '.json', '.html' then -10
-                    else 0
-            else
-                bonus = 0
-
-            bonus = 1000000 if f == '.. >'
-            return bonus + 1000*(1000-f.split(/[\/\.]/).length)
-                
-        @files.push '.. >' if '.. >' not in @files            
-        @files.sort (a,b) -> absWeight(b) - absWeight(a)
-                
-        @files = (relative(f, @dir) for f in @files)
-        
-        @files = @files.filter (f) -> f.length 
-        @files.sort (a,b) -> relWeight(b) - relWeight(a)
-
-        if @history.length and not @navigating
-            h = []
-            for f in @history
-                if f.length and (f != @file)
-                    if fileExists f
-                        h.push relative(f, @dir) 
-                    else
-                        _.pullAll @history, f
-            @lastFileIndex = h.length - 1
-            @files = _.concat h, @files
-        if @navigating or @lastFileIndex < 0
-            @lastFileIndex = 0
-
-        @files = _.uniq @files
-
         @showList()
         @showItems @listItems()
         @grabFocus()

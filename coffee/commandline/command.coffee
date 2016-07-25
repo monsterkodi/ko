@@ -224,10 +224,10 @@ class Command
     # 000   000  000  0000000    00000000
          
     onBlur: => 
-        # if not @skipBlur
-            # @hideList()
-        # else
-            # @skipBlur = null
+        if not @skipBlur
+            @hideList()
+        else
+            @skipBlur = null
             
     hideList: ->
         @commandList?.view.remove()
@@ -247,6 +247,7 @@ class Command
         @setState @historyKey(), @history
     
     setCurrentText: (command) -> 
+        log "Command.setCurrentText command:#{command}"
         @setCurrent command
         if @commandline.command == @
             @setText command
@@ -278,6 +279,7 @@ class Command
     #    000     00000000  000   000     000   
     
     setText: (t) -> 
+        log "Command.setText t:#{t}"
         @commandline.setText t
         @commandline.selectAll()
         

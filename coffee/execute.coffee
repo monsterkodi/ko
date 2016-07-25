@@ -16,14 +16,14 @@ pty      = require 'pty.js'
 class Execute
         
     constructor: (cfg={}) -> 
-        
-        @main    = cfg?.main
-        
+        # log "Execute.constructor", cfg
         @childp  = null
+        @main    = cfg?.main
         @winID   = cfg?.winID
         @cmdID   = cfg?.cmdID
         @command = cfg?.command
         @cwd     = cfg?.cwd ? process.cwd()
+        # log "Execute.constructor @cwd", @cwd
         @rest    = ''
         @shell() if cfg?.winID
         if @command?
@@ -38,10 +38,14 @@ class Execute
     #  0000000   0000000   000       000       00000000  00000000
     
     initCoffee: =>
+        log 'Execute.initCoffee'
         try
             global.main = @main
+            restoreCWD = process.cwd()
+            process.chdir __dirname
+            # log "Execute.initCoffee restoreCWD:#{restoreCWD} __dirname:#{__dirname}"
             coffee.eval """
-                str    = require './js/tools/str'
+                str    = require './tools/str'
                 _      = require 'lodash'
                 coffee = require 'coffee-script'
                 {max,min,abs,round,ceil,floor,sqrt,pow,exp,log10,sin,cos,tan,acos,asin,atan,PI,E} = Math
@@ -50,7 +54,9 @@ class Execute
                 BrowserWindow = electron.BrowserWindow
                 log = -> BrowserWindow.fromId(winID).webContents.send 'executeResult', [].slice.call(arguments, 0), cmdID
                 """
+            process.chdir restoreCWD
         catch e
+            console.log 'wtf?'
             console.error colors.red.bold '[ERROR]', colors.red e
     
     execute: (code) =>
