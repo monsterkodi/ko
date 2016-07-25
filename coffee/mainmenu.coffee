@@ -48,12 +48,12 @@ class MainMenu
             
             label: pkg.name   
             submenu: [     
-                label:       "About #{pkg.name}"
+                label:       "About #{pkg.productName}"
                 click:        main.showAbout
             ,
                 type: 'separator'
             ,
-                label:       "Hide #{pkg.name}"
+                label:       "Hide #{pkg.productName}"
                 accelerator: 'Command+H'
                 click:       main.hideWindows
             ,

@@ -44,7 +44,7 @@ wins          = []
 
 args  = require('karg') """
 
-#{pkg.name}
+#{pkg.productName}
 
     filelist  . ? files to open           . **
     show      . ? open window on startup  . = true
@@ -77,7 +77,7 @@ if args.verbose
 # 000        000   000  000       000            000
 # 000        000   000  00000000  000       0000000 
 
-prefs.init "#{app.getPath('appData')}/#{pkg.name}/ko.noon", shortcut: 'F2'
+prefs.init "#{app.getPath('appData')}/#{pkg.productName}/ko.noon", shortcut: 'F2'
 
 if args.prefs
     log colors.yellow.bold 'prefs'
@@ -532,7 +532,7 @@ class Main
     # 000   000  0000000  000  000   000  0000000 
     
     alias: (event, dict) =>
-        aliasFile = "#{app.getPath('appData')}/#{pkg.name}/alias.noon"
+        aliasFile = "#{app.getPath('appData')}/#{pkg.productName}/alias.noon"
         if dict?
             noon.save aliasFile, dict
         if fileExists aliasFile

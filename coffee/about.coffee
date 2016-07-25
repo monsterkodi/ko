@@ -13,5 +13,5 @@ window.openRepoURL = () ->
     url = url.slice 0, url.length-4 if url.endsWith(".git")
     require("opener")(url)
 
-$('name').innerHTML = pkg.name
+$('name').innerHTML = pkg.productName
 $('version').innerHTML = pkg.version
