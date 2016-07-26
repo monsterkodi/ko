@@ -7,7 +7,7 @@
 pos  = require './pos'
 log  = require './log'
 _    = require 'lodash'
-vsprintf = require('sprintf-js').vsprintf
+sfmt = require 'sprintf-js'
 path = require 'path'
 os   = require 'os'
 fs   = require 'fs'
@@ -178,7 +178,7 @@ if not String.prototype.splice
     String.prototype.splice = (start, delCount, newSubStr='') ->
         @slice(0, start) + newSubStr + @slice(start + Math.abs(delCount))
     String.prototype.strip = String.prototype.trim
-    String.prototype.fmt = -> vsprintf @, [].slice.call arguments
+    String.prototype.fmt = -> sfmt.vsprintf @, [].slice.call arguments
 
 #  0000000   00000000   00000000    0000000   000   000
 # 000   000  000   000  000   000  000   000   000 000 

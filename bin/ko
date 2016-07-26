@@ -35,7 +35,7 @@ else
 fi
 
 if [ $_LOG ]; then
-    echo "$_PATH/$_NAME/Contents/MacOS/ko"
+    # echo "$_PATH/$_NAME/Contents/MacOS/ko"
     "$_PATH/$_NAME/Contents/MacOS/ko" --executed-from="$(pwd)" "$@"
     exit $?
 else

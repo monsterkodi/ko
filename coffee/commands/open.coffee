@@ -62,11 +62,11 @@ class Open extends Command
             
         command = command.trim()
         return if command in ['.', '/', '~']
-        
-        items = @listItems()    
+
+        items = @listItems flat: true    
         if command.length
             fuzzied = fuzzy.filter command, items, extract: (o) -> o.text            
-            items = (f.original for f in fuzzied)
+            items = (f.original for f in _.sortBy fuzzied, (o) -> o.index)
                     
         if items.length
             @showItems items
@@ -82,53 +82,50 @@ class Open extends Command
     # 000000000  0000000   000  000  0000  000000000     000   
     # 000   000  000       000  000   000  000   000     000   
     # 00     00  00000000  000   0000000   000   000     000   
-    
-    weightedFiles: ->
-        
-        currentText = @getText()
-        
-        weight = (fs) =>
-            
-            [f, s] = fs
-            r = relative f, @dir
-            b = path.basename f
-            
-            # local 
-            #    directories
-            #    files
-            # sub/directories
-            # parent
-            # sibling/directories 
-            
-            if f.startsWith @dir
-                localBonus = (5-r.split('/').length) * 10000
-            else
-                localBonus = (5-r.split('../').length) * 1000
-                
-            localBonus += 1000000 if r.startsWith currentText
-            localBonus += 100000  if b.startsWith currentText                            
-                            
-            extensionBonus = switch path.extname(f)
-                when '.coffee'               then 100
-                when '.md', '.styl', '.pug'  then 50
-                when '.noon'                 then 25
-                when '.js', '.json', '.html' then -1000000
-                else 0 
 
-            extensionBonus -= 400 if b[0] == '.'
+    weight: (fs, opt) =>
+        
+        [f, s] = fs
+        r = relative f, @dir
+        b = path.basename f
+        
+        currentText = @getText().trim()
+        
+        # local 
+        #    directories
+        #    files
+        # sub/directories
+        # parent
+        # sibling/directories
+        
+        if f.startsWith @dir
+            localBonus = Math.max 0, (5-r.split('/').length) * 10000
+        else
+            localBonus = Math.max 0, (5-r.split('../').length) * 1000
 
-            directoryBonus = 0
-            if s.isDirectory()
-                directoryBonus = 500
-                            
-            lengthPenalty = path.dirname(f).length
+        relBonus  = currentText.length and r.startsWith(currentText) and 1000000 * (currentText.length/r.length) or 0 
+        baseBonus = currentText.length and b.startsWith(currentText) and 100000 or 0
                         
-            localBonus + directoryBonus + extensionBonus - lengthPenalty
+        extensionBonus = switch path.extname b
+            when '.coffee'               then 100
+            when '.md', '.styl', '.pug'  then 50
+            when '.noon'                 then 25
+            when '.js', '.json', '.html' then -100000
+            else 0 
+        extensionBonus -= 400 if b[0] == '.'
         
-        @files = _.sortBy @files, (o) -> o[0]
-        @files = _.sortBy @files, (o) -> 0xffffffff - weight o
-        # log "weightedFiles:", (f[0] for f in @files)
-        @files
+        directoryBonus = 0
+        directoryBonus += 500 if s.isDirectory()
+                        
+        lengthPenalty = path.dirname(f).length
+        
+        if opt?.flat
+            w = extensionBonus + relBonus + baseBonus - lengthPenalty
+        else
+            w = localBonus + relBonus + baseBonus + directoryBonus + extensionBonus - lengthPenalty
+        w
+
+    weightedFiles: (opt) -> _.sortBy @files, (o) => 0xffffffff - @weight o, opt
     
     # 000      000   0000000  000000000
     # 000      000  000          000   
@@ -136,7 +133,7 @@ class Open extends Command
     # 000      000       000     000   
     # 0000000  000  0000000      000   
 
-    listItems: () ->
+    listItems: (opt) ->
         items = []
         
         @lastFileIndex = 0
@@ -158,14 +155,14 @@ class Open extends Command
             item.text = '..'
             items.push item
                 
-        for file in @weightedFiles()
+        for file in @weightedFiles opt
             item = Object.create null
             if file[1].isDirectory()
                 item.line = '▸'
                 item.clss = 'directory'
             item.text = relative file[0], @dir
             items.push item
-                        
+        
         items = _.uniqBy items, (o) -> o.text
         items
                 
@@ -238,7 +235,7 @@ class Open extends Command
         @files = []
         for i in [0...fileList.length]
             @files.push [fileList[i], statList[i]]
-            
+        @files = _.sortBy @files, (o) => relative(o[0], @dir).replace(/\./g, 'z')
         @showList()
         @showItems @listItems()
         @grabFocus()

@@ -73,7 +73,12 @@ class Commandline extends ViewBase
     setAndSelectText: (t) ->
         @setLines [t ? '']
         @selectAll()
+        @selectSingleRange @rangeForLineAtIndex 0
 
+    setText: (t) ->
+        @setLines [t ? '']
+        @singleCursorAtPos [@lines[0].length, 0]
+    
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000
     # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
@@ -226,6 +231,10 @@ class Commandline extends ViewBase
         # log "Commandline.handleModKeyComboEvent mod:#{mod} key:#{key} combo:#{combo}"
         if @command?
             return if @command.handleModKeyComboEvent(mod, key, combo, event) != 'unhandled'
+
+        stop = (event) ->
+            event.preventDefault()
+            event.stopPropagation()        
         
         return if 'unhandled' != super mod, key, combo, event
         split = window.split
@@ -243,6 +252,10 @@ class Commandline extends ViewBase
             when 'ctrl+up'              then return split.do 'enlarge editor by 20'
             when 'alt+down'             then return split.do 'enlarge terminal'
             when 'ctrl+down'            then return split.do 'enlarge terminal by 20'
+            when 'right'
+                if @isCursorAtEndOfLine()
+                    @command?.complete()
+                    return stop event
         
         return 'unhandled'
     

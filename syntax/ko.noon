@@ -19,7 +19,7 @@
                             basename
 [◼]                         dirname
 
-(?:^\s*|\/)(\.\w+)(?:\s|$)  dotfile
+(?:^\s*|\/)(\.[\-\_\w][\.\-\_\w]*)(?:\s|$)  dotfile
 ([◼●]?\s*~?[\.\/\-\_\w]+\.coffee\b)   coffee
 ([◼●]?\s*~?[\.\/\-\_\w]+\.noon\b)     noon
 ([◼●]?\s*~?[\.\/\-\_\w]+\.json\b)     json
@@ -36,8 +36,7 @@
 ([◼●]?\s*~?[\.\/\-\_\w]+\.sh\b)       sh
 ([◼●]?\s*~?[\.\/\-\_\w]+\.md\b)       md
 
-\.\w+\s*$                   extname
-# [\.]                        marker
+\.[\-\_\w]+\s*$             extname
 [\/]                        separator
 
 # salter headers

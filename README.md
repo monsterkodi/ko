@@ -58,6 +58,8 @@ ko is an editor for macOS
 **optimized for coffee-script**
 - completes function/method names from required files
 - terminal commands to list classes and functions/methods
+- autoconverts 'simple' strings when "#{}" is inserted
+- deletes whitespace after function names when surrounding selected arguments with ()
 - includes a few nifty macros:
     - **dbg** insert log line which outputs class.method + variables under cursors
     - **req** insert require statement for word at cursor
@@ -216,6 +218,7 @@ evaluates coffee-script code in the main process and prints results in terminal
 
 the ascii-header mode lets you insert or edit ascii-headers
 - **⌘3** activates the ascii-header mode
+- typing **#>** will create a header for the following word and switch to header mode as well
 
 if the cursor is not in a header already, one will be generated for the word at the main cursor.
     
@@ -248,11 +251,22 @@ while command input has focus:
 
 ### to use ko from a terminal
 
-    ln -s /Applications/ko.app/Contents/Resources/app/bin/ko /usr/local/bin 
+either install the npm package
+
+    npm install -g ko-editor
+    ko
+
+or download the release dmg from github and create a symlink:
+
+    ln -s /Applications/ko.app/Contents/Resources/app/bin/ko /usr/local/bin
     
 ### settings (windows, command histories and other stuff) are saved to
 
     ~/Library/Application\ Support/ko/ko.noon
+   
+terminal aliases are stored in
+
+    ~/Library/Application\ Support/ko/alias.noon
 
 ## missing features
 

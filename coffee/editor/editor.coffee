@@ -141,9 +141,9 @@ class Editor extends Buffer
     #      000  000   000  000         000     000       000   000
     # 0000000   000   000  0000000     000     00000000  000   000
                                 
-    startSalter: ->
+    startSalter: (opt) ->
         cp = @cursorPos()
-        if rgs = @salterRangesAtPos()
+        if not opt?.word and rgs = @salterRangesAtPos()
             cols = @columnsInSalt (@textInRange r for r in rgs)
             ci = 0
             while ci < cols.length and cp[0] > cols[ci]
@@ -155,7 +155,7 @@ class Editor extends Buffer
             @do.cursors newCursors
             @do.end()
         else
-            word = @wordAtCursor().trim()
+            word = opt?.word ? @wordAtCursor().trim()
             indt = _.padStart '', @indentationAtLineIndex cp[1]
             stxt = word.length and salt(word).split('\n') or ['', '', '', '', '']
             stxt = ("#{indt}#{@lineComment} #{s}" for s in stxt)
@@ -199,7 +199,6 @@ class Editor extends Buffer
                 
     checkSalterMode: ->        
         return if not @salterMode
-        # log 'salterMode?'
         @setSalterMode false
         return if @cursors.length != 5
         cp = @cursors[0]
@@ -211,7 +210,6 @@ class Editor extends Buffer
         return if not rgs? or rgs[0][0] != @cursors[0][1]
         cols = @columnsInSalt (@textInRange r for r in rgs)
         return if @cursors[0][0] < cols[0]
-        # log "salterMode still active!"
         @setSalterMode true
                                     
     columnsInSalt: (salt) ->
@@ -924,7 +922,7 @@ class Editor extends Buffer
     # 000  000 0 000  0000000   0000000   0000000       000   
     # 000  000  0000       000  000       000   000     000   
     # 000  000   000  0000000   00000000  000   000     000   
-    
+        
     insertUserCharacter: (ch) ->
         
         return if @salterMode and @insertSalterCharacter ch
@@ -935,7 +933,7 @@ class Editor extends Buffer
             @clampCursors()
         else
             @fillVirtualSpaces()
-                
+        
         if ch in @surroundCharacters
             if @insertSurroundCharacter ch
                 @do.end()
@@ -946,16 +944,15 @@ class Editor extends Buffer
             @do.end()
             return
     
-        if ch == '<' and @cursors.length == 1 and @lineComment?
+        if ch == '>' and @cursors.length == 1 and @lineComment?
             cp = @cursorPos()
             cl = @lineComment.length
-            if cp[0] >= cl and @lines[cp[1]][cp[0]-cl] == @lineComment
+            if cp[0] >= cl and @lines[cp[1]].slice(cp[0]-cl, cp[0]) == @lineComment
                 ws = @wordStartPosAfterPos()
                 if ws?
-                    wd = @textInRange @rangeForWordAtPos ws
-                    wd += @textInRange @rangeForWordAtPos [ws[0]+1, ws[1]] if wd == '@'
-                    @do.change cp[1], @lines[cp[1]].splice cp[0], 0, '>' + wd
+                    @do.delete cp[1]
                     @do.end()
+                    @startSalter ws
                     return
         
         @deleteSelection()
