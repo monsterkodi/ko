@@ -63,26 +63,17 @@ class Open extends Command
         command = command.trim()
         return if command in ['.', '/', '~']
         
+        items = @listItems()    
         if command.length
-            items     = @listItems()                
-            fileNames = (i.text for i in items)
-            fuzzied   = fuzzy.filter command, fileNames
-            filtered  = (f.string for f in fuzzied)
-            
-            if not filtered.length  
-                log "nothing to sort? #{command}"
-                @hideList()
-                return
-            else 
-                sorted = _.filter items, (i) -> i.text in filtered
-                if sorted.length
-                    @showItems sorted
-                    @select 0
-                else 
-                    @select -1
-        else
-            @showItems @listItems()
+            fuzzied = fuzzy.filter command, items, extract: (o) -> o.text            
+            items = (f.original for f in fuzzied)
+                    
+        if items.length
+            @showItems items
             @select 0
+        else
+            @hideList()
+            @select -1
         @positionList()
 
     
