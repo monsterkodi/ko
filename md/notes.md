@@ -17,7 +17,6 @@
 
 #### file state
 - save backup files?
-- don't clear undo buffer on save?
 
 #### editor
 - save and restore scrollX/Left

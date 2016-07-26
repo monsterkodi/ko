@@ -452,6 +452,8 @@ class Main
                 win.webContents.send 'loadFile', openFile
                 win.webContents.send 'singleCursorAtPos', pos if pos?
                 openFile = null
+                win.showInactive()
+                win.focus()
             else
                 file = prefs.get "windows:#{win.id}:file"
                 if file?
@@ -515,7 +517,8 @@ class Main
             file = arg
             if not arg.startsWith '/'
                 file = resolve dir + '/' + arg
-            @createWindow file
+            w = @activateWindowWithFile file
+            w = @createWindow file if not w?
             
         if !activeWin()
             visibleWins()[0]?.focus()
