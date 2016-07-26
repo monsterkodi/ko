@@ -946,7 +946,7 @@ class Editor extends Buffer
             @do.end()
             return
     
-        if ch == '<' and @cursors.length == 1
+        if ch == '<' and @cursors.length == 1 and @lineComment?
             cp = @cursorPos()
             cl = @lineComment.length
             if cp[0] >= cl and @lines[cp[1]][cp[0]-cl] == @lineComment
