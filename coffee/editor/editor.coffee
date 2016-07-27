@@ -93,8 +93,6 @@ class Editor extends Buffer
             if ext in Syntax.syntaxNames
                 @fileType = ext
                 
-        # log "setupFileType @fileType:#{@fileType}"
-
         @surroundPairs = 
             '[': ['[', ']']
             ']': ['[', ']']
@@ -114,9 +112,21 @@ class Editor extends Buffer
             when 'md'     then @surroundCharacters = @surroundCharacters.concat '*'.split ''
             when 'html'   then @surroundCharacters = @surroundCharacters.concat '<>'.split ''
             when 'coffee' then @surroundCharacters = @surroundCharacters.concat '#'.split ''
+             
+        @indentNewLineMore = null
+        
+        switch @fileType
+            when 'coffee' 
+                @indentNewLineMore = 
+                    lineEndsWith: ['->', '=>', ':', '=']
+                    beforeRegExp: /(^|\s)(else\s*$|switch\s|for\s|while\s|class\s)/
+                    lineRegExp:   /^(\s+when|\s*if|\s*else\s+if\s+)(?!.*\sthen\s)/
+            when 'cpp', 'cc', 'hpp', 'h', 'js', 'css'
+                @indentNewLineMore = 
+                    lineEndsWith: ['{']
                 
         @lineComment = switch @fileType
-            when 'cpp', 'hpp', 'styl', '.pug' then '//'
+            when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug' then '//'
             when 'txt' then '--'
             else '#'        
                 
@@ -929,10 +939,7 @@ class Editor extends Buffer
         
         @do.start()
         @clearHighlights()
-        if @cursors.length == 1
-            @clampCursors()
-        else
-            @fillVirtualSpaces()
+        @clampCursorOrFillVirtualSpaces()
         
         if ch in @surroundCharacters
             if @insertSurroundCharacter ch
@@ -974,6 +981,12 @@ class Editor extends Buffer
             
         @do.end()
         @emitEdit 'insert'
+    
+    clampCursorOrFillVirtualSpaces: ->
+        if @cursors.length == 1
+            @clampCursors()
+        else
+            @fillVirtualSpaces()        
     
     fillVirtualSpaces: () -> # fill spaces between line ends and cursors
         for c in @cursors 
@@ -1024,26 +1037,32 @@ class Editor extends Buffer
                 il = 0
                 thisIndent = @indentationAtLineIndex c[1]
                 indentLength = @indentString.length
-                for e in ['->', '=>', ':', ',', '=']
-                    if line.endsWith e
-                        il = thisIndent + indentLength
-                        break
-                if il == 0
-                    if /(^|\s)(else\s*$|switch\s|for\s|while\s|class\s)/.test before
-                        il = thisIndent + indentLength
-                    else if /^(\s+when|\s*if|\s*else\s+if\s+)(?!.*\sthen\s)/.test line
-                        il = thisIndent + indentLength
-                    else il = thisIndent
                 
-                if /(when|if)/.test before 
-                    if after.startsWith 'then '
-                        after = after.slice(4).trimLeft() # remove then
-                    else if before.trim().endsWith 'then'
-                        before = before.trimRight()
-                        before = before.slice 0, before.length-4 # remove then
-                        
-                else if before.trim().startsWith 'return' # indent less after return
-                    il = -indentLength
+                if @indentNewLineMore?
+                    log "Editor.insertNewline", @indentNewLineMore.lineEndsWith
+                    if @indentNewLineMore.lineEndsWith?.length
+                        for e in @indentNewLineMore.lineEndsWith
+                            if line.endsWith e
+                                il = thisIndent + indentLength
+                                break
+                    if il == 0
+                        if @indentNewLineMore.beforeRegExp? and @indentNewLineMore.beforeRegExp.test before
+                            il = thisIndent + indentLength
+                        else if @indentNewLineMore.lineRegExp? and @indentNewLineMore.lineRegExp.test line
+                            il = thisIndent + indentLength
+                if il == 0
+                    il = thisIndent
+                                
+                if @fileType == 'coffee' 
+                    if /(when|if)/.test before 
+                        if after.startsWith 'then '
+                            after = after.slice(4).trimLeft() # remove then
+                        else if before.trim().endsWith 'then'
+                            before = before.trimRight()
+                            before = before.slice 0, before.length-4 # remove then
+                            
+                    else if before.trim().startsWith 'return' # indent less after return
+                        il = -indentLength
                 
                 nextIndent = @indentationAtLineIndex c[1]+1
                 il = nextIndent if nextIndent > il
@@ -1076,7 +1095,7 @@ class Editor extends Buffer
         
         @deleteSelection()
         @do.start()        
-        @fillVirtualSpaces()
+        @clampCursorOrFillVirtualSpaces()
         
         l = text.split '\n'
         if @cursors.length > 1 and l.length == 1

@@ -1,8 +1,7 @@
 # todo/ideas
 
-- *fix pasting at single virtual cursor*
 - *improve cpp editing (indent, autobrackets)*
-- *improve bracket inserting*
+- *improve bracket inserting (evaluate brackets in line)*
 
 #### terminal
 - *autocomplete dirs and files*
