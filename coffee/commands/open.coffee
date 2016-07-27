@@ -108,6 +108,7 @@ class Open extends Command
                         
         extensionBonus = switch path.extname b
             when '.coffee'               then 100
+            when '.cpp', '.hpp', '.h'    then 90
             when '.md', '.styl', '.pug'  then 50
             when '.noon'                 then 25
             when '.js', '.json', '.html' then -100000
@@ -210,18 +211,26 @@ class Open extends Command
         @files      = []
         @selected   = 0
         @navigating = opt.navigating ? false
-        wopt = 
-            root:        @pkg
-            includeDirs: true
-            includeDir:  @dir
+        log "Open.loadDir @pkg:#{@pkg} @dir:#{@dir}"
+        fopt = 
             done:        @walkerDone
-        if @navigating
-            fopt = _.clone wopt
-            fopt.root     = @dir
-            fopt.maxDepth = 1
-            fopt.maxFiles = 300
-            @fastWalker = new Walker fopt
-            @fastWalker.start()
+            root:        @dir
+            includeDir:  @dir
+            includeDirs: true
+            maxFiles:    300
+            maxDepth:    2
+        
+        @fastWalker = new Walker fopt
+        @fastWalker.start()
+
+        wopt = 
+            done:        @walkerDone
+            root:        @pkg
+            includeDir:  @dir
+            includeDirs: true
+            maxFiles:    2000
+            maxDepth:    5
+        
         @walker = new Walker wopt
         @walker.start()        
         
@@ -232,7 +241,6 @@ class Open extends Command
     # 00     00  000   000  0000000  000   000  00000000  000   000
             
     walkerDone: (fileList, statList) =>
-        @files = []
         for i in [0...fileList.length]
             @files.push [fileList[i], statList[i]]
         @files = _.sortBy @files, (o) => relative(o[0], @dir).replace(/\./g, 'z')

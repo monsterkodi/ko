@@ -1,6 +1,11 @@
 # todo/ideas
 
-- *jump to file (require|path)*
+- *fix pasting at single virtual cursor*
+- *improve cpp editing (indent, autobrackets)*
+- *improve bracket inserting*
+
+#### terminal
+- *autocomplete dirs and files*
 
 #### open
 - *automatically start konrad in pkg dir*
@@ -21,9 +26,7 @@
 #### editor
 - save and restore scrollX/Left
 - check undo (merges too much?)
-
-#### terminal
-- *autocomplete dirs and files*
+- *jump to file (include|path)*
 
 #### commands
 - ls (color-ls + meta?)
