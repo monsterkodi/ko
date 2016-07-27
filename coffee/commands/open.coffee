@@ -61,8 +61,10 @@ class Open extends Command
     changed: (command) ->
             
         command = command.trim()
-        return if command in ['.', '/', '~']
-
+        
+        if command in ['.', '/', '~'] or command.endsWith '/'
+            return @navigateDir command
+            
         items = @listItems flat: true    
         if command.length
             fuzzied = fuzzy.filter command, items, extract: (o) -> o.text            
@@ -71,11 +73,38 @@ class Open extends Command
         if items.length
             @showItems items
             @select 0
+            @positionList()
         else
-            @hideList()
-            @select -1
-        @positionList()
+            if path.dirname(resolve(command)) == @dir
+                base = path.basename command
+                items = @listItems flat: false, excludeUp: true
+                items = _.filter items, (i) -> i.file.startsWith resolve(command)
+                if items.length
+                    @showItems items
+                    @select 0
+                    @positionList()
+                    return
+            log "navigateDir no match? #{@dir} #{command}"
+            @navigateDir command
 
+    #  0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
+    # 000       000   000  000   000  000   000  000      000          000     000     
+    # 000       000   000  000000000  00000000   000      0000000      000     0000000 
+    # 000       000   000  000 0 000  000        000      000          000     000     
+    #  0000000   0000000   000   000  000        0000000  00000000     000     00000000
+
+    complete: -> 
+        return if not @commandList? 
+        if @commandList.lines[@selected].startsWith(path.basename @getText()) and not @getText().trim().endsWith('/')
+            @setText path.join(path.dirname(@getText()), @commandList.lines[@selected])+'/'
+            @changed @getText()
+            true
+        else if not @getText().trim().endsWith('/') and dirExists resolve @getText()
+            @setText @getText() + '/'
+            @changed @getText()
+            true            
+        else
+            super
     
     # 000   000  00000000  000   0000000   000   000  000000000
     # 000 0 000  000       000  000        000   000     000   
@@ -145,24 +174,38 @@ class Open extends Command
                     if f.length and (f != @file) and fileExists f
                         item = Object.create null
                         item.text = relative f, @dir
+                        item.file = f
                         items.push item
                         @lastFileIndex = items.length-1
                     else
                         _.pullAll @history, f
-        if @dir != '/'
+
+        if @navigating and opt?.includeThis
+            item = Object.create null
+            item.line = '▸'
+            item.clss = 'directory'
+            item.text = '.'
+            item.file = @dir
+            items.push item            
+        
+        if @dir != '/' and not opt?.excludeUp
             item = Object.create null
             item.line = '▸'
             item.clss = 'directory'
             item.text = '..'
+            item.file = path.dirname @dir
             items.push item
                 
         for file in @weightedFiles opt
-            item = Object.create null
-            if file[1].isDirectory()
-                item.line = '▸'
-                item.clss = 'directory'
-            item.text = relative file[0], @dir
-            items.push item
+            rel = relative file[0], @dir
+            if rel.length
+                item = Object.create null
+                if file[1].isDirectory()
+                    item.line = '▸'
+                    item.clss = 'directory'
+                item.text = relative file[0], @dir
+                item.file = file[0]
+                items.push item
         
         items = _.uniqBy items, (o) -> o.text
         items
@@ -195,7 +238,16 @@ class Open extends Command
         @loadDir opt
         super @combo
         text: ''
-                
+       
+    navigateDir: (dir) ->
+        r = @loadDir 
+            dir: dir
+            noPkg: true
+            navigating: true
+        if r
+            @hideList()
+            @select -1                
+    
     # 000       0000000    0000000   0000000          0000000    000  00000000 
     # 000      000   000  000   000  000   000        000   000  000  000   000
     # 000      000   000  000000000  000   000        000   000  000  0000000  
@@ -204,14 +256,18 @@ class Open extends Command
         
     loadDir: (opt) ->        
         opt.dir     = path.dirname opt.file if not opt.dir?
-        opt.dir     = path.basename opt.dir if not dirExists opt.dir
-        @dir        = opt.dir ? @dir
-        @pkg        = Walker.packagePath(@dir) ? @dir
+        opt.dir     = resolve opt.dir if not dirExists opt.dir
+        opt.dir     = path.dirname resolve opt.dir if not dirExists opt.dir
+        newdir      = resolve(opt.dir ? @dir)
+        return false if newdir == @dir
+        return false if not dirExists newdir
+        @dir = newdir
+        log "loadDir new @dir #{@dir}"
+        @pkg        = opt.noPkg and @dir or Walker.packagePath(@dir) or @dir
         @file       = opt.file
         @files      = []
         @selected   = 0
         @navigating = opt.navigating ? false
-        log "Open.loadDir @pkg:#{@pkg} @dir:#{@dir}"
         fopt = 
             done:        @walkerDone
             root:        @dir
@@ -232,7 +288,8 @@ class Open extends Command
             maxDepth:    5
         
         @walker = new Walker wopt
-        @walker.start()        
+        @walker.start()   
+        true
         
     # 000   000   0000000   000      000   000  00000000  00000000 
     # 000 0 000  000   000  000      000  000   000       000   000
@@ -245,11 +302,13 @@ class Open extends Command
             @files.push [fileList[i], statList[i]]
         @files = _.sortBy @files, (o) => relative(o[0], @dir).replace(/\./g, 'z')
         @showList()
-        @showItems @listItems()
+        @showItems @listItems includeThis: true
         @grabFocus()
         @select @lastFileIndex
-        text = @navigating and @dir or @commandList.lines[@selected]
-        @commandline.setAndSelectText text
+        if not @navigating
+            @setAndSelectText @commandList.lines[@selected]
+        else if @getText() == '.'
+            @setText @dir
                     
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
@@ -263,6 +322,7 @@ class Open extends Command
 
         if command in ['.', '..', '/', '~']
             @dir = @resolvedPath command
+            log "execute @resolvedPath #{command} == dir == #{@dir}"
             @loadDir
                 navigating: @dir
                 dir:        @dir
@@ -273,7 +333,8 @@ class Open extends Command
                     resolved = @resolvedPath listValue
             else if dirExists @resolvedPath command
                 resolved = @resolvedPath command
-            if resolved? and @dir != resolved
+            if resolved? 
+                # if @dir != resolved
                 @loadDir
                     navigating: resolved
                     dir:        resolved

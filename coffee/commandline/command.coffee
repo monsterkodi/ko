@@ -246,11 +246,11 @@ class Command
         @selected = -1
         @setState @historyKey(), @history
     
-    setCurrentText: (command) -> 
-        log "Command.setCurrentText command:#{command}"
-        @setCurrent command
-        if @commandline.command == @
-            @setAndSelectText command
+    # setCurrentText: (command) -> 
+        # log "Command.setCurrentText command:#{command}"
+        # @setCurrent command
+        # if @commandline.command == @
+            # @setAndSelectText command
         
     setCurrent: (command) ->
         @loadState() if not @history?
@@ -291,6 +291,7 @@ class Command
         return if not @commandList? 
         if @commandList.lines[@selected] != @getText() and @commandList.lines[@selected].startsWith @getText()
             @setText @commandList.lines[@selected]
+            true
     
     # 00000000   0000000    0000000  000   000   0000000
     # 000       000   000  000       000   000  000     

@@ -254,7 +254,10 @@ class Commandline extends ViewBase
             when 'ctrl+down'            then return split.do 'enlarge terminal by 20'
             when 'right'
                 if @isCursorAtEndOfLine()
-                    @command?.complete()
+                    if @command?.complete()
+                        return stop event
+                    if @selections.length
+                        @do.selections []
                     return stop event
         
         return 'unhandled'
