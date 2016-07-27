@@ -266,13 +266,14 @@ class Open extends Command
     # 0000000   0000000   000   000  0000000          0000000    000  000   000
         
     loadDir: (opt) ->
-        opt.dir     = path.dirname opt.file if not opt.dir?
-        opt.dir     = resolve opt.dir if not dirExists opt.dir
-        opt.dir     = path.dirname resolve opt.dir if not dirExists opt.dir
-        newdir      = @resolvedPath(opt.dir) ? @dir
-        
+        opt.dir = path.dirname opt.file if not opt.dir?
+        if not dirExists opt.dir
+            opt.dir = resolve opt.dir
+            if not dirExists opt.dir
+                opt.dir = path.dirname resolve opt.dir
+        newdir = @resolvedPath(opt.dir) ? @dir
         return false if newdir == @dir and not opt.reload
-        return false if not dirExists newdir
+        # return false if not dirExists newdir
         
         @dir        = newdir
         @pkg        = opt.noPkg and @dir or Walker.packagePath(@dir) or @dir
@@ -280,6 +281,18 @@ class Open extends Command
         @files      = []
         @selected   = 0
         @navigating = opt.navigating ? false
+
+        topt = 
+            done:        @walkerDone
+            root:        @dir
+            includeDir:  @dir
+            includeDirs: true
+            maxFiles:    100
+            maxDepth:    1
+        
+        @thisWalker = new Walker topt
+        @thisWalker.start()
+        
         fopt = 
             done:        @walkerDone
             root:        @dir

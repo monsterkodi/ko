@@ -1,10 +1,6 @@
 ![ko](img/banner.png)
 ![readme](img/readme.png)
 
-# about ko
-
-ko is an editor for macOS
-    
 ## main features
 
 **fast**
@@ -17,7 +13,7 @@ ko is an editor for macOS
 - a single, non-intrusive input field to ...
     - open files quickly
     - find in text and search in files
-    - input terminal, coffee-script and macro commands
+    - input terminal-, coffee-script- and macro-commands
     - goto lines or class/method/function-definitions
 
 **terminal**
@@ -41,24 +37,26 @@ ko is an editor for macOS
 
 **minimap**
 - shows cursors, highlights and selections
-- also for terminal, search- and coffe-script results!
+- also for terminal-, search- and coffe-script-results!
 - can be used to select large portions of text
 - sets cursor by default when dragging/clicking
+- includes a special mode to insert or edit ascii-headers that show up nicely in the minimap
 
 **autocomplete**
 - completes words from visited files and project files
 - automatic determination of project files:
     - indexes files below directory containing .git or package.json
     - ignores node_modules, .git, etc.
-    
+
 **syntax highlighting**
 - for coffee, cpp, h, html, js, json, md, noon, pug, py, sh, styl       
 - ansi-colors in terminal view
 
 **optimized for coffee-script**
 - completes function/method names from required files
-- terminal commands to list classes and functions/methods
+- terminal commands to list classes, files or functions/methods
 - autoconverts 'simple' strings when "#{}" is inserted
+- removes 'then' when breaking single-line 'when' or 'if' statements  
 - deletes whitespace after function names when surrounding selected arguments with ()
 - includes a few nifty macros:
     - **dbg** insert log line which outputs class.method + variables under cursors
