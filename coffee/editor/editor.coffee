@@ -114,6 +114,8 @@ class Editor extends Buffer
             when 'coffee' then @surroundCharacters = @surroundCharacters.concat '#'.split ''
              
         @indentNewLineMore = null
+        @indentNewLineLess = null
+        @insertIndentedEmptyLineBetween = '{}'
         
         switch @fileType
             when 'coffee' 
@@ -121,9 +123,8 @@ class Editor extends Buffer
                     lineEndsWith: ['->', '=>', ':', '=']
                     beforeRegExp: /(^|\s)(else\s*$|switch\s|for\s|while\s|class\s)/
                     lineRegExp:   /^(\s+when|\s*if|\s*else\s+if\s+)(?!.*\sthen\s)/
-            when 'cpp', 'cc', 'hpp', 'h', 'js', 'css'
-                @indentNewLineMore = 
-                    lineEndsWith: ['{']
+                @indentNewLineLess = 
+                    beforeRegExp: /^s+return/
                 
         @lineComment = switch @fileType
             when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug' then '//'
@@ -1039,7 +1040,6 @@ class Editor extends Buffer
                 indentLength = @indentString.length
                 
                 if @indentNewLineMore?
-                    log "Editor.insertNewline", @indentNewLineMore.lineEndsWith
                     if @indentNewLineMore.lineEndsWith?.length
                         for e in @indentNewLineMore.lineEndsWith
                             if line.endsWith e
@@ -1050,8 +1050,15 @@ class Editor extends Buffer
                             il = thisIndent + indentLength
                         else if @indentNewLineMore.lineRegExp? and @indentNewLineMore.lineRegExp.test line
                             il = thisIndent + indentLength
+                            
                 if il == 0
                     il = thisIndent
+                                
+                if il >= indentLength and @indentNewLineLess?
+                    if @indentNewLineLess.beforeRegExp? and @indentNewLineLess.beforeRegExp.test before
+                        il = -indentLength
+                    else if @indentNewLineLess.afterRegExp? and @indentNewLineLess.afterRegExp.test after
+                        il = -indentLength
                                 
                 if @fileType == 'coffee' 
                     if /(when|if)/.test before 
@@ -1059,10 +1066,7 @@ class Editor extends Buffer
                             after = after.slice(4).trimLeft() # remove then
                         else if before.trim().endsWith 'then'
                             before = before.trimRight()
-                            before = before.slice 0, before.length-4 # remove then
-                            
-                    else if before.trim().startsWith 'return' # indent less after return
-                        il = -indentLength
+                            before = before.slice 0, before.length-4 # remove then                            
                 
                 nextIndent = @indentationAtLineIndex c[1]+1
                 il = nextIndent if nextIndent > il
@@ -1076,7 +1080,11 @@ class Editor extends Buffer
                 @do.insert c[1]+1, indent
             else
                 @do.insert c[1]+1, indent + after
-                @do.change c[1],   before
+                if @insertIndentedEmptyLineBetween?
+                    if (before.trimRight().endsWith @insertIndentedEmptyLineBetween[0]) and (after.trimLeft().startsWith @insertIndentedEmptyLineBetween[1])
+                        indent += @indentString
+                        @do.insert c[1]+1, indent
+                @do.change c[1], before
 
             # move cursors in and below deleted line down
             for nc in @positionsFromPosInPositions c, newCursors

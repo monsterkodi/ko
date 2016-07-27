@@ -70,8 +70,10 @@ class Search extends Command
         terminal.appendMeta diss: syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'
         terminal.appendMeta clss: 'spacer'
         terminal.singleCursorAtPos [0, terminal.lines.length-2]
+        dir = walker.packagePath path.dirname opt.file
+        dir ?= path.dirname opt.file
         @walker = new walker
-            root:        walker.packagePath path.dirname opt.file
+            root:        dir
             includeDirs: false
             file:        (f,stat) => @searchInFile opt, f
         @walker.cfg.ignore.push 'js'

@@ -1,6 +1,6 @@
 # todo/ideas
 
-- *improve cpp editing (indent, autobrackets)*
+- *improve cpp editing (autobrackets)*
 - *improve bracket inserting (evaluate brackets in line)*
 
 #### terminal
