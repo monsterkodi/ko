@@ -49,8 +49,8 @@ class Open extends Command
         @navigating = false
         
         super @commandline
-        
-        @maxHistory = 10
+        @maxHistory   = 10
+        @maxListLines = 20
                     
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000
@@ -59,8 +59,16 @@ class Open extends Command
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
 
     changed: (command) ->
-            
         command = command.trim()
+
+        if command == '.' and @navigating == false
+            @navigating = true
+            @setText ''
+            @showItems @listItems includeThis: false
+            @select 0
+            @positionList()            
+            @setAndSelectText @dir  
+            return
         
         if command in ['.', '/', '~'] or command.endsWith '/'
             return @navigateDir command
@@ -84,7 +92,6 @@ class Open extends Command
                     @select 0
                     @positionList()
                     return
-            log "navigateDir no match? #{@dir} #{command}"
             @navigateDir command
 
     #  0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
@@ -96,8 +103,10 @@ class Open extends Command
     complete: -> 
         return if not @commandList? 
         if @commandList.lines[@selected].startsWith(path.basename @getText()) and not @getText().trim().endsWith('/')
-            @setText path.join(path.dirname(@getText()), @commandList.lines[@selected])+'/'
-            @changed @getText()
+            @setText path.join(path.dirname(@getText()), @commandList.lines[@selected])
+            if dirExists resolve @getText()
+                @setText @getText() + '/'
+                @changed @getText()
             true
         else if not @getText().trim().endsWith('/') and dirExists resolve @getText()
             @setText @getText() + '/'
@@ -229,12 +238,14 @@ class Open extends Command
     # 0000000      000     000   000  000   000     000   
         
     start: (@combo) -> 
-        opt = {}
+        opt = 
+            reload: true
         if window.editor.currentFile?
             opt.file = window.editor.currentFile 
+            opt.dir  = path.dirname opt.file
         else 
             opt.dir = @dir ? path.dirname last prefs.get 'recentFiles', ['~']
-        
+            
         @loadDir opt
         super @combo
         text: ''
@@ -254,15 +265,16 @@ class Open extends Command
     # 000      000   000  000   000  000   000        000   000  000  000   000
     # 0000000   0000000   000   000  0000000          0000000    000  000   000
         
-    loadDir: (opt) ->        
+    loadDir: (opt) ->
         opt.dir     = path.dirname opt.file if not opt.dir?
         opt.dir     = resolve opt.dir if not dirExists opt.dir
         opt.dir     = path.dirname resolve opt.dir if not dirExists opt.dir
-        newdir      = resolve(opt.dir ? @dir)
-        return false if newdir == @dir
+        newdir      = @resolvedPath(opt.dir) ? @dir
+        
+        return false if newdir == @dir and not opt.reload
         return false if not dirExists newdir
-        @dir = newdir
-        log "loadDir new @dir #{@dir}"
+        
+        @dir        = newdir
         @pkg        = opt.noPkg and @dir or Walker.packagePath(@dir) or @dir
         @file       = opt.file
         @files      = []
@@ -302,7 +314,7 @@ class Open extends Command
             @files.push [fileList[i], statList[i]]
         @files = _.sortBy @files, (o) => relative(o[0], @dir).replace(/\./g, 'z')
         @showList()
-        @showItems @listItems includeThis: true
+        @showItems @listItems includeThis: false
         @grabFocus()
         @select @lastFileIndex
         if not @navigating
@@ -321,11 +333,9 @@ class Open extends Command
         listValue = @commandList?.lines[@selected] if @selected >= 0
 
         if command in ['.', '..', '/', '~']
-            @dir = @resolvedPath command
-            log "execute @resolvedPath #{command} == dir == #{@dir}"
             @loadDir
-                navigating: @dir
-                dir:        @dir
+                navigating: true
+                dir:        @resolvedPath command
             return text: @dir, select: true
         else
             if @selected >= 0 and listValue? 
@@ -334,9 +344,8 @@ class Open extends Command
             else if dirExists @resolvedPath command
                 resolved = @resolvedPath command
             if resolved? 
-                # if @dir != resolved
                 @loadDir
-                    navigating: resolved
+                    navigating: true
                     dir:        resolved
                 return text: @dir, select: true
 
@@ -384,5 +393,21 @@ class Open extends Command
             resolve p
         else
             resolve path.join parent, p
-                
+
+    # 000   000  00000000  000   000
+    # 000  000   000        000 000 
+    # 0000000    0000000     00000  
+    # 000  000   000          000   
+    # 000   000  00000000     000   
+    
+    handleModKeyComboEvent: (mod, key, combo, event) -> 
+        switch combo
+            when 'backspace'
+                if not @getText().length and @commandList?.lines[@selected] == '..'
+                    @loadDir
+                        navigating: true
+                        dir:        path.dirname @dir
+                    return @commandline.results text: @dir, select: true
+        super mod, key, combo, event
+
 module.exports = Open
