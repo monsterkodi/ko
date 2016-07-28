@@ -96,8 +96,12 @@ ipc.on 'setWinID', (event, id) =>
     winID = window.winID = id
     window.split?.setWinID id 
     editor.updateTitlebar()
+    
+    s = getState 'fontSize'
+    editor.setFontSize s if s
+    
     if getState 'centerText'
-        screenWidth = electron.screen.getPrimaryDisplay().workAreaSize.width
+        screenWidth = screenSize().width
         editor.centerText sw() == screenWidth, screenWidth
     
 ipc.on 'fileLinesChanged', (event, file, lineChanges) =>
@@ -339,11 +343,13 @@ window.editorWithClassName = (n) ->
 # 000   000  000            000  000   000     000     
 # 000   000  00000000  0000000   000  0000000  00000000
 
+screenSize = => electron.screen.getPrimaryDisplay().workAreaSize
+
 window.onresize = ->
     split.resized()
     ipc.send 'saveBounds', winID if winID?
     if getState 'centerText', false
-        screenWidth = electron.screen.getPrimaryDisplay().workAreaSize.width
+        screenWidth = screenSize().width
         editor.centerText sw() == screenWidth, screenWidth
 
 window.onload = => 
@@ -359,13 +365,12 @@ window.onunload = => editor.setCurrentFile null, noSaveScroll: true # to stop wa
 #  0000000  00000000  000   000     000     00000000  000   000     000     00000000  000   000     000   
 
 toggleCenterText = =>
-    screenWidth = electron.screen.getPrimaryDisplay().workAreaSize.width
     if not getState 'centerText', false
         setState 'centerText', true
-        editor.centerText sw() == screenWidth, screenWidth
+        editor.centerText sw() == screenSize().width
     else
         setState 'centerText', false
-        editor.centerText false, screenWidth
+        editor.centerText false
 
 # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
 # 000       000   000  0000  000     000     000       000     000   000     
@@ -383,10 +388,7 @@ changeFontSize = (d) => setFontSize editor.size.fontSize + d
     
 resetFontSize = => 
     delState 'fontSize'
-    setFontSize prefs.get 'fontSize', editor.fontSizeDefault
-
-s = getState 'fontSize'
-setFontSize s if s
+    setFontSize editor.fontSizeDefault
 
 # 0000000   0000000    0000000   00     00
 #    000   000   000  000   000  000   000

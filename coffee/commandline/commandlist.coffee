@@ -19,7 +19,7 @@ class CommandList extends ViewBase
         
         super viewElem, 
             features: ['Scrollbar', 'Numbers', 'Meta']
-            lineHeightFactor: 1.0/3.0
+            lineHeight: 1.4
 
         @numbers.elem.style.fontSize = "#{@fontSizeDefault}px"
         @setLines @lines

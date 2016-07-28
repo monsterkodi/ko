@@ -7,6 +7,7 @@
 title
 fileExists,
 fileName,
+setStyle,
 swapExt,
 clamp,
 last,
@@ -61,7 +62,7 @@ class ViewBase extends Editor
         @size = {}
         @syntax = new syntax @
         
-        @config.lineHeightFactor ?= 1.0/6.0        
+        @config.lineHeight ?= 1.2
         
         @setFontSize prefs.get "#{@name}FontSize", @fontSizeDefault
 
@@ -174,12 +175,15 @@ class ViewBase extends Editor
         @view.style.fontSize = "#{fontSize}px"
         @size.numbersWidth = 'Numbers' in @config.features and 50 or 0
         @size.fontSize     = fontSize
-        @size.lineHeight   = fontSize + Math.floor(fontSize*@config.lineHeightFactor)
+        @size.lineHeight   = Math.floor fontSize * @config.lineHeight
         @size.charWidth    = fontSize * 0.6 
         @size.offsetX      = Math.floor @size.charWidth/2 + @size.numbersWidth
+        @size.offsetX      = Math.max @size.offsetX, (@screenSize().width - 12 - @size.numbersWidth - 120 - @size.charWidth * 80) / 2 if @size.centerText
 
         @scroll?.setLineHeight @size.lineHeight
-
+        
+        setStyle '.comment.header', 'border-radius', "#{parseInt fontSize/3}px", 1
+        
         @emit 'fontSizeChanged'
 
     #  0000000  00000000  000   000  000000000  00000000  00000000   000000000  00000000  000   000  000000000
@@ -188,7 +192,8 @@ class ViewBase extends Editor
     # 000       000       000  0000     000     000       000   000     000     000        000 000      000   
     #  0000000  00000000  000   000     000     00000000  000   000     000     00000000  000   000     000   
     
-    centerText: (center, screenWidth) ->
+    centerText: (center) ->
+        screenWidth = @screenSize().width
         if center
             @size.offsetX = (screenWidth - 12 - @size.numbersWidth - 120 - @size.charWidth * 80) / 2
             @size.centerText = true
@@ -274,7 +279,7 @@ class ViewBase extends Editor
     # 000  000  0000       000  000       000   000     000   
     # 000  000   000  0000000   00000000  000   000     000   
         
-    insertLine: (li, oi) ->        
+    insertLine: (li, oi) -> 
         div = @addLine()
         div.innerHTML = @renderLineAtIndex li
         @elem.insertBefore div, @elem.children[oi - @scroll.exposeTop]
@@ -288,6 +293,7 @@ class ViewBase extends Editor
     # 00000000  000   000  000         0000000   0000000   00000000
 
     exposeLine: (li) =>
+        # log "exposeLine #{li}" if @name == 'editor'
         if li > @elem.children.length - 1 + @scroll.exposeTop
             div = @addLine()
             div.innerHTML = @renderLineAtIndex li
@@ -338,7 +344,6 @@ class ViewBase extends Editor
                 li = e.new + num - n - 1
                 div.innerHTML = @renderLineAtIndex li
                 @elem.insertBefore div, @elem.firstChild
-                
                 @emit 'lineExposedTop', lineIndex: li, lineDiv: div
 
         @updateLinePositions()
@@ -433,6 +438,8 @@ class ViewBase extends Editor
         @updateScrollOffset()
         @emit 'viewHeight', vh
 
+    screenSize: -> electron.screen.getPrimaryDisplay().workAreaSize
+    
     deltaToEnsureCursorsAreVisible: ->
         topdelta = 0
         cl = @cursors[0][1]
@@ -475,7 +482,6 @@ class ViewBase extends Editor
         @updateScrollOffset()
 
     scrollCursorToTop: (topDist=7) ->
-        # log "ViewBase.scrollCursorToTop topDist:#{topDist}"
         cp = @cursorPos()
         if cp[1] - @scroll.top > topDist
             rg = [@scroll.top, Math.max 0, cp[1]-1]
@@ -499,8 +505,10 @@ class ViewBase extends Editor
         @updateNumbersOffset()
 
     updateNumbersOffset: ->
-        @numbers?.elem.style.left = "#{@layers.scrollLeft}px"
-        @numbers?.setOpacity @layers.scrollLeft and 1 or @numbers?.opacity
+        return if not @numbers?
+        if @layers.scrollLeft or @numbers.elem.style.left? and @numbers.elem.style.left != '0px'
+            @numbers.elem.style.left = "#{@layers.scrollLeft}px"
+            @numbers.setOpacity @layers.scrollLeft and 1 or @numbers.opacity
 
     # 00000000    0000000    0000000
     # 000   000  000   000  000     

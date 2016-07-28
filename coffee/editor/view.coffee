@@ -119,7 +119,7 @@ class View extends ViewBase
         return if not @currentFile
         filePositions = window.getState 'filePositions', {}
         if filePositions[@currentFile]? 
-            s = filePositions[@currentFile]
+            s = filePositions[@currentFile]            
             @cursors    = s.cursors    ? [[0,0]]
             @selections = s.selections ? []
             @highlights = s.highlights ? []
