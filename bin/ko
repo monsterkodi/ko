@@ -40,5 +40,5 @@ if [ $_LOG ]; then
     exit $?
 else
     # echo "open $_PATH/$_NAME"
-    open -a "$_PATH/$_NAME" -n --args --executed-from="$(pwd)" --path-environment="$_PATH" "$@"
+    open -a "$_PATH/$_NAME" -- "$@"
 fi
