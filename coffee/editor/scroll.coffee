@@ -15,7 +15,7 @@ class Scroll extends events
 
         @lineHeight = cfg.lineHeight ? 0
         @viewHeight = cfg.viewHeight ? 0
-        @exposeMax  = cfg.exposeMax ? -2 # <0: -v * viewLines | 0: unlimited | >0: v * 1
+        @exposeMax  = cfg.exposeMax ? -4 # <0: -v * viewLines | 0: unlimited | >0: v * 1
         @smooth     = cfg.smooth ? true
         @dbg        = cfg.dbg
         @init()

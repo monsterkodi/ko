@@ -244,6 +244,7 @@ the mode will deactivate itself automatically in most circumstances. you can als
 - **⌘I** inverted line selection: select lines without a cursor or a selection
 - **⌘return** evaluate current buffer with coffee in main process and print the result in terminal view
 - **⌘⌥up** jump to counterpart file (coffee <-> js, cpp <-> h, pug <-> html, etc)
+- **⌘\** toggle text offset when window is as wide as screen
 
 while the command input has focus:
 - **^up|down** move command input up|down
