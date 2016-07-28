@@ -328,6 +328,7 @@ class Main
         
     windowsAreStacked: ->
         wl = visibleWins()
+        w.setFullScreen false for w in wl
         return false if not wl.length
         return false if wl.length == 1 and wl[0].getBounds().width == @screenSize().width
         w0 = wl[0].getBounds()        
@@ -347,9 +348,15 @@ class Main
         frameSize = 6
         wl = visibleWins()
         {width, height} = @screenSize()
+        
         if not @windowsAreStacked()
             @stackWindows()
-        else if wl.length == 1
+            disableSnap = false
+            return
+        
+        w.setFullScreen false for w in wl
+            
+        if wl.length == 1
             wl[0].showInactive()
             wl[0].setBounds
                 x:      0

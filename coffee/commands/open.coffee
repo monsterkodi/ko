@@ -73,7 +73,7 @@ class Open extends Command
         if command in ['.', '/', '~'] or command.endsWith '/'
             return @navigateDir command
             
-        items = @listItems flat: true    
+        items = @listItems flat: true, navigating: @navigating    
         if command.length
             fuzzied = fuzzy.filter command, items, extract: (o) -> o.text            
             items = (f.original for f in _.sortBy fuzzied, (o) -> o.index)
@@ -421,6 +421,8 @@ class Open extends Command
                         navigating: true
                         dir:        path.dirname @dir
                     return @commandline.results text: @dir, select: true
+                else if @commandline.isSelectedLineAtIndex 0
+                    @navigating = true
         super mod, key, combo, event
 
 module.exports = Open
