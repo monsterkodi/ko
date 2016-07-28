@@ -11,7 +11,7 @@
 
 **commandline**
 - a single, non-intrusive input field to ...
-    - open files quickly
+    - navigate the file system and open files quickly
     - find in text and search in files
     - input terminal-, coffee-script- and macro-commands
     - goto lines or class/method/function-definitions
@@ -64,17 +64,20 @@
     - **class** creates a new file with simple class skeleton
     - **inv** toggle display of line-breaks
 
-## command-line
-- operates in different modes:
-    - **open** new window
-    - **search** Search /search/ /Search/
-    - **find** Find /find/ /Find/ fiZd f*nd
-    - **goto** selecto
-    - **term** Term
-    - **coffee**
-    - **macro**
-- each mode keeps it's own history
-- clicking on the command name lists all modes and their shortcuts:
+## commandline
+
+operates in different modes:
+- **open** new window
+- **search** Search /search/ /Search/
+- **find** Find /find/ /Find/ fiZd f*nd
+- **goto** selecto
+- **term** Term
+- **coffee**
+- **macro**
+
+each mode keeps it's own history
+
+clicking on the command name lists all modes and their shortcuts:
     
 ![commandline](img/commandline.png)
 
@@ -242,7 +245,7 @@ the mode will deactivate itself automatically in most circumstances. you can als
 - **⌘return** evaluate current buffer with coffee in main process and print the result in terminal view
 - **⌘⌥up** jump to counterpart file (coffee <-> js, cpp <-> h, pug <-> html, etc)
 
-while command input has focus:
+while the command input has focus:
 - **^up|down** move command input up|down
 - **⌘up|down** move command input to top|bottom of window
 - **⌥up|down** move command input a quarter of window up|down

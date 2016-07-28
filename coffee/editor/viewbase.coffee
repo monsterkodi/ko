@@ -260,7 +260,7 @@ class ViewBase extends Editor
         
     insertLine: (li, oi) ->        
         div = @addLine()
-        div.innerHTML = @renderLineAtIndex li                
+        div.innerHTML = @renderLineAtIndex li
         @elem.insertBefore div, @elem.children[oi - @scroll.exposeTop]
         @scroll.insertLine li, oi
         @emit 'lineInserted', li

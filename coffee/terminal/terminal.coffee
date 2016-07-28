@@ -117,10 +117,8 @@ class Terminal extends ViewBase
                 return if @meta.saveChanges()
             when 'esc'
                 split = window.split
-                if split.editorVisible()
-                    split.hideEditor()
-                else 
-                    split.focus '.commandline-editor'
+                split.focus '.commandline-editor'
+                split.do 'maximize editor'
                 return
                 
         'unhandled'
