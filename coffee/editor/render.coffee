@@ -90,7 +90,7 @@ class Render
             if (sel[1][0] < next[1][0]) or (sel[1][0] > next[1][1])
                 border += " bl"
             
-        if sel[1][0] == 0
+        if sel[1][0] == 0 and not size.centerText
             border += " start" # wider offset at start of line
                                                 
         sw = size.charWidth * (sel[1][1]-sel[1][0])

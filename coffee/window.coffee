@@ -96,6 +96,9 @@ ipc.on 'setWinID', (event, id) =>
     winID = window.winID = id
     window.split?.setWinID id 
     editor.updateTitlebar()
+    if getState 'centerText'
+        screenWidth = electron.screen.getPrimaryDisplay().workAreaSize.width
+        editor.centerText sw() == screenWidth, screenWidth
     
 ipc.on 'fileLinesChanged', (event, file, lineChanges) =>
     if file == editor.currentFile
@@ -339,12 +342,30 @@ window.editorWithClassName = (n) ->
 window.onresize = ->
     split.resized()
     ipc.send 'saveBounds', winID if winID?
+    if getState 'centerText', false
+        screenWidth = electron.screen.getPrimaryDisplay().workAreaSize.width
+        editor.centerText sw() == screenWidth, screenWidth
 
 window.onload = => 
     info.reload()
     split.resized()
     
 window.onunload = => editor.setCurrentFile null, noSaveScroll: true # to stop watcher
+
+#  0000000  00000000  000   000  000000000  00000000  00000000   000000000  00000000  000   000  000000000
+# 000       000       0000  000     000     000       000   000     000     000        000 000      000   
+# 000       0000000   000 0 000     000     0000000   0000000       000     0000000     00000       000   
+# 000       000       000  0000     000     000       000   000     000     000        000 000      000   
+#  0000000  00000000  000   000     000     00000000  000   000     000     00000000  000   000     000   
+
+toggleCenterText = =>
+    screenWidth = electron.screen.getPrimaryDisplay().workAreaSize.width
+    if not getState 'centerText', false
+        setState 'centerText', true
+        editor.centerText sw() == screenWidth, screenWidth
+    else
+        setState 'centerText', false
+        editor.centerText false, screenWidth
 
 # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
 # 000       000   000  0000  000     000     000       000     000   000     
@@ -429,7 +450,8 @@ document.onkeydown = (event) ->
             editor.setCurrentFile null
             editor.setLines ['']
             ipc.send 'fileLoaded', '', winID
-            return 
+            return
+        when 'command+\\'         then return toggleCenterText()
         when 'command+k'          then return commandline.clear()
         when 'command+alt+k'      then return split.toggleLog()
         when 'command+alt+ctrl+k' then return split.showOrClearLog()

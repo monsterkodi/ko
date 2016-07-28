@@ -118,7 +118,7 @@ class Terminal extends ViewBase
             when 'esc'
                 split = window.split
                 split.focus '.commandline-editor'
-                split.do 'maximize editor'
+                split.do    'enlarge editor'
                 return
                 
         'unhandled'

@@ -182,6 +182,22 @@ class ViewBase extends Editor
 
         @emit 'fontSizeChanged'
 
+    #  0000000  00000000  000   000  000000000  00000000  00000000   000000000  00000000  000   000  000000000
+    # 000       000       0000  000     000     000       000   000     000     000        000 000      000   
+    # 000       0000000   000 0 000     000     0000000   0000000       000     0000000     00000       000   
+    # 000       000       000  0000     000     000       000   000     000     000        000 000      000   
+    #  0000000  00000000  000   000     000     00000000  000   000     000     00000000  000   000     000   
+    
+    centerText: (center, screenWidth) ->
+        if center
+            @size.offsetX = (screenWidth - 12 - @size.numbersWidth - 120 - @size.charWidth * 80) / 2
+            @size.centerText = true
+        else
+            @size.offsetX = Math.floor @size.charWidth/2 + @size.numbersWidth
+            @size.centerText = false
+        @updateLinePositions()
+        @updateLayers()
+    
     #  0000000   0000000    0000000    000      000  000   000  00000000
     # 000   000  000   000  000   000  000      000  0000  000  000     
     # 000000000  000   000  000   000  000      000  000 0 000  0000000 

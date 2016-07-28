@@ -607,13 +607,17 @@ body
     &.highligd span 
         color           rgba(155,155,255, 0.6)
     &.selected span 
-        color           #aaa
+        color           #555
     &.highligd.selected:not(.cursored) span
         color           #bbf
     &.cursored span 
-        color           #f80
+        color           #f20
     &.cursored.selected span 
-        color           #ff8
+        color           #f80
+    &.cursored.main span 
+        color           #fd0
+    &.cursored.main.selected span
+        color           #ff0
 
 // 00     00  00000000  000000000   0000000 
 // 000   000  000          000     000   000
