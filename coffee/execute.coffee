@@ -16,14 +16,12 @@ pty      = require 'pty.js'
 class Execute
         
     constructor: (cfg={}) -> 
-        # log "Execute.constructor", cfg
         @childp  = null
         @main    = cfg?.main
         @winID   = cfg?.winID
         @cmdID   = cfg?.cmdID
         @command = cfg?.command
         @cwd     = cfg?.cwd ? process.cwd()
-        # log "Execute.constructor @cwd", @cwd
         @rest    = ''
         @shell() if cfg?.winID
         if @command?
@@ -38,12 +36,10 @@ class Execute
     #  0000000   0000000   000       000       00000000  00000000
     
     initCoffee: =>
-        log 'Execute.initCoffee'
         try
             global.main = @main
             restoreCWD = process.cwd()
             process.chdir __dirname
-            # log "Execute.initCoffee restoreCWD:#{restoreCWD} __dirname:#{__dirname}"
             coffee.eval """
                 str    = require './tools/str'
                 _      = require 'lodash'

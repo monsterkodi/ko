@@ -103,7 +103,9 @@ class View extends ViewBase
         s.selections = _.cloneDeep @selections if @selections.length
         s.highlights = _.cloneDeep @highlights if @highlights.length
             
-        filePositions = window.getState 'filePositions', {}
+        filePositions = window.getState 'filePositions', Object.create null
+        if not _.isPlainObject filePositions
+            filePositions = Object.create null
         filePositions[@currentFile] = s
         window.setState 'filePositions', filePositions       
         

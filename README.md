@@ -166,7 +166,7 @@ on activation, it ...
 - lists recent files on top 
 - the most recent file is selected by default
     
-while list is open:
+while the list is open:
 - **.** list current directory without previous files
 - **..** navigate directory up
 
