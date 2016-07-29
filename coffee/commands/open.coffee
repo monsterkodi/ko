@@ -227,7 +227,10 @@ class Open extends Command
     cancel: (combo) ->
         if combo == @shortcuts[0]
             if not @navigating and @commandList? and @lastFileIndex == @selected
-                return @execute()
+                @walker.stop()
+                @fastWalker.stop()
+                @thisWalker.stop()
+                return @execute()                
         super combo
     
     #  0000000  000000000   0000000   00000000   000000000
