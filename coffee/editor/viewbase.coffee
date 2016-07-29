@@ -69,10 +69,8 @@ class ViewBase extends Editor
         @scroll = new scroll 
             lineHeight: @size.lineHeight
             viewHeight: @viewHeight()
-            # exposeMax: -4
             
         @scroll.on 'clearLines',  @clearLines
-        # @scroll.on 'exposeTop',  @exposeTop
         @scroll.on 'exposeLines', @exposeLines
         @scroll.on 'exposeLine',  @exposeLine
         @scroll.on 'vanishLine',  @vanishLine
@@ -337,8 +335,6 @@ class ViewBase extends Editor
     # 000        000 000   000        000   000       000  000          000     000   000  000      
     # 00000000  000   000  000         0000000   0000000   00000000     000      0000000   000      
 
-    exposeTop: (e) =>
-        
     exposeLines: (e) =>
         
         for n in [0...e.num]
@@ -346,7 +342,6 @@ class ViewBase extends Editor
             li = e.top + n
             div.innerHTML = @renderLineAtIndex li
             @elem.appendChild div
-            # @emit 'lineExposedTop', lineIndex: li, lineDiv: div
 
         @updateLinePositions()
         @updateLayers()
@@ -501,10 +496,10 @@ class ViewBase extends Editor
 
     updateCursorOffset: ->
         cx = @mainCursor[0]*@size.charWidth+@size.offsetX
-        if cx-@layers.scrollLeft > @layersWidth
+        if cx-@scroll.offsetLeft > @layersWidth
             @scroll.offsetLeft = Math.max 0, cx - @layersWidth + @size.charWidth
             @layers.scrollLeft = @scroll.offsetLeft
-        else if cx-@size.offsetX-@layers.scrollLeft < 0
+        else if cx-@size.offsetX-@scroll.offsetLeft < 0
             @scroll.offsetLeft = Math.max 0, cx - @size.offsetX
             @layers.scrollLeft = @scroll.offsetLeft
     
@@ -633,7 +628,7 @@ class ViewBase extends Editor
     #  0000000    0000000   000   000  000                 000      0000000 
     
     jumpTo: (word, opt) ->
-        # log "ViewBase.jumpTo word:#{word}", opt
+        
         find = word.toLowerCase()
         find = find.slice 1 if find[0] == '@'
         jumpToFileLine = (file, line) =>

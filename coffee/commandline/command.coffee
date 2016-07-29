@@ -220,12 +220,6 @@ class Command
         @selected = -1
         @setState @historyKey(), @history
     
-    # setCurrentText: (command) -> 
-        # log "Command.setCurrentText command:#{command}"
-        # @setCurrent command
-        # if @commandline.command == @
-            # @setAndSelectText command
-        
     setCurrent: (command) ->
         @loadState() if not @history?
         _.pull @history, command

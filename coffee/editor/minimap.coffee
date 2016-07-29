@@ -77,10 +77,10 @@ class Minimap
             onMove:  @onDrag 
             cursor: 'pointer'
             
-        @scroll.on 'clearLines', @clearAll
-        @scroll.on 'scroll',     @onScroll
-        @scroll.on 'exposeTop',  @exposeTop
-        @scroll.on 'exposeLine', @exposeLine
+        @scroll.on 'clearLines',   @clearAll
+        @scroll.on 'scroll',       @onScroll
+        @scroll.on 'exposeLines',  @onExposeLines
+        @scroll.on 'exposeLine',   @exposeLine
 
         @onScroll()  
         @drawLines()
@@ -168,7 +168,7 @@ class Minimap
     # 000        000 000   000        000   000       000  000     
     # 00000000  000   000  000         0000000   0000000   00000000
     
-    exposeTop:   (e) => @drawLines()
+    onExposeLines: (e) => @drawLines e.top, e.bot
     exposeLine: (li) => @drawLines li, li
         
     #  0000000  000   000   0000000   000   000   0000000   00000000

@@ -82,8 +82,7 @@ class Numbers extends event
         @updateColors e.lineIndex, e.lineIndex
 
     onLinesExposed: (e) => 
-        console.log "number.onLinesExposed #{e.top} #{e.num}"
-        for li in [e.top...e.top+e.num]
+        for li in [e.top..e.bot]
             @elem.appendChild @divForLine li
     
     # 0000000    00000000  000      00000000  000000000  00000000  0000000  

@@ -34,7 +34,6 @@ class Scroll extends events
         @numLines     = 0 # total number of lines in buffer
         @top          = 0 # index of first visible line in view
         @bot          = 0 # index of last  visible line in view
-        @exposed      = 0 # number of currently exposed lines
         @exposeTop    = 0 # index of topmost line in view (always <= @top)
         @exposeBot    = -1 # index of bottom line in view (always >= @bot)
         @calc()
@@ -60,7 +59,7 @@ class Scroll extends events
     
     info: ->
         topbot: "#{@top} .. #{@bot} = #{@bot-@top} / #{@numLines}"
-        expose: "#{@exposeTop} .. #{@exposeBot} = #{@exposed} / #{@exposeNum}"
+        expose: "#{@exposeTop} .. #{@exposeBot} = #{@exposeBot-@exposeTop} / #{@exposeNum}"
         scroll: "#{@scroll} offsetTop #{@offsetTop} scrollMax #{@scrollMax} fullLines #{@fullLines} viewLines #{@viewLines} viewHeight #{@viewHeight}"
         
     # 00000000   00000000   0000000  00000000  000000000
@@ -136,14 +135,13 @@ class Scroll extends events
         if @exposeNum == 0 # only exposing if expose range is unlimited
             while @bot > @exposeBot
                 @exposeBot += 1
-                @exposed = @exposeBot - @exposeTop
                 @emit 'exposeLine', @exposeBot
             return
         
-        topDiff = @exposeTop - @top
-        botDiff = @exposeBot - @bot
-        
-        return if (@exposed <= @exposedNum) and (topDiff <= 0) and (botDiff >= 0)
+        # topDiff = @exposeTop - @top
+        # botDiff = @exposeBot - @bot
+        # exposed = @exposeBot-@exposeTop+1
+        # return if (exposed <= @exposedNum) and (topDiff <= 0) and (botDiff >= 0)
         
         if (@top >= @exposeBot) or (@bot <= @exposeTop) # new range outside, start from scratch
             @emit 'clearLines'
@@ -151,7 +149,6 @@ class Scroll extends events
             @exposeBot = @top-1
             while @bot > @exposeBot
                 @exposeBot += 1
-                @exposed = @exposeBot - @exposeTop
                 @emit 'exposeLine', @exposeBot
             return
         
@@ -159,13 +156,11 @@ class Scroll extends events
             @emit 'clearLines'
             @exposeTop = Math.max 0, @top - (@exposeNum - @viewLines)
             @exposeBot = @bot
-            @exposed = @exposeBot - @exposeTop
-            @emit 'exposeLines', top:@exposeTop, num: @exposed
+            @emit 'exposeLines', top:@exposeTop, bot:@exposeBot, num: @exposeBot - @exposeTop + 1
             return
                 
         while (@bot > @exposeBot)
             @exposeBot += 1
-            @exposed = @exposeBot - @exposeTop
             @emit 'exposeLine', @exposeBot
                             
         # 000   000   0000000   000   000  000   0000000  000   000
@@ -174,31 +169,17 @@ class Scroll extends events
         #    000     000   000  000  0000  000       000  000   000
         #     0      000   000  000   000  000  0000000   000   000
 
-        while (@bot < @exposeBot) and (@exposed > @exposeNum) or (@exposeBot > @numLines-1)
+        while (@bot < @exposeBot) and (@exposeBot-@exposeTop >= @exposeNum) or (@exposeBot > @numLines-1)
             @emit 'vanishLine', @exposeBot
             @exposeBot -= 1
-            @exposed = @exposeBot - @exposeTop
             
-    # changeExposeTop: (top) =>
-        # console.log "changeExposeTop #{top}"
-        # if top != @exposeTop
-            # old = @exposeTop
-            # @exposeTop = top
-            # @exposed = @exposeBot - @exposeTop
-            # @emit 'exposeTop',
-                # old: old
-                # new: @exposeTop
-                # num: -(top-old)
-
     changeExposeBot: (bot) =>
         if bot != @exposeBot
             while @exposeBot > bot
                 @emit 'vanishLine', @exposeBot
                 @exposeBot -= 1
-                @exposed = @exposeBot - @exposeTop                
             while @exposeBot < bot
                 @exposeBot += 1
-                @exposed = @exposeBot - @exposeTop
                 @emit 'exposeLine', @exposeBot
         
     changeTop: (top) =>
@@ -221,10 +202,8 @@ class Scroll extends events
         @changeExposeBot @exposeBot + 1 if oi <= @exposeBot or oi == @numLines-1
         @changeBot @bot + 1 if oi <= @bot
         @changeTop @top + 1 if oi < @top
-        # @changeExposeTop @exposeTop + 1 if oi < @exposeTop
         @numLines += 1
         @fullHeight = @numLines * @lineHeight
-        @exposed = @exposeBot - @exposeTop
         @calc()
         
     # 0000000    00000000  000      00000000  000000000  00000000
@@ -236,11 +215,8 @@ class Scroll extends events
     deleteLine: (li,oi) =>
         @changeExposeBot @exposeBot - 1 if oi <= @exposeBot
         @changeBot @bot - 1 if oi <= @bot
-        @changeTop @top - 1 if oi < @top
-        # @changeExposeTop @exposeTop - 1 if oi < @exposeTop
         @numLines -= 1
         @fullHeight = @numLines * @lineHeight
-        @exposed = @exposeBot - @exposeTop
         @calc()
     
     # 000   000  000  00000000  000   000  000   000  00000000  000   0000000   000   000  000000000
