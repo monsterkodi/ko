@@ -50,7 +50,6 @@ class Open extends Command
         
         super @commandline
         @maxHistory   = 10
-        @maxListLines = 20
                     
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000

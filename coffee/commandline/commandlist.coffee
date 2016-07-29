@@ -12,18 +12,53 @@ log      = require '../tools/log'
 
 class CommandList extends ViewBase
 
-    constructor: (viewElem) ->
+    constructor: (viewElem, opt) ->
         
         @fontSizeDefault = 19
-        @metaQueue = []
+        @maxLines        = 17
+        @metaQueue       = []
+        @syntaxName      = opt.syntax ? 'ko'
         
         super viewElem, 
             features: ['Scrollbar', 'Numbers', 'Meta']
             lineHeight: 1.4
 
-        @numbers.elem.style.fontSize = "#{@fontSizeDefault}px"
+        @numbers.elem.style.fontSize = "#{@fontSizeDefault}px"        
         @setLines @lines
-
+        @numbers.opacity = 0.1
+        @numbers.setOpacity 0.1
+    
+    #  0000000   0000000    0000000    000  000000000  00000000  00     00   0000000
+    # 000   000  000   000  000   000  000     000     000       000   000  000     
+    # 000000000  000   000  000   000  000     000     0000000   000000000  0000000 
+    # 000   000  000   000  000   000  000     000     000       000 0 000       000
+    # 000   000  0000000    0000000    000     000     00000000  000   000  0000000 
+    
+    addItems: (items) ->
+        @setLines ['']
+        index = 0
+        for item in items
+            continue if not item? 
+            text = (item.text ? item).trim()
+            continue if not text.length
+            rngs = item.rngs ? []
+            if item.clss?
+                rngs.push 
+                    match: text
+                    start: 0
+                    value: item.clss
+                    index: 0
+            @appendMeta 
+                line: item.line ? ' '
+                text: text
+                rngs: rngs
+                type: item.type ? @syntaxName
+                clss: 'searchResult'
+                list: index
+            index += 1
+        @view.style.height = "#{@size.lineHeight * Math.min @maxLines, items.length}px"
+        @resized()  
+    
     #  0000000   00000000   00000000   00000000  000   000  0000000  
     # 000   000  000   000  000   000  000       0000  000  000   000
     # 000000000  00000000   00000000   0000000   000 0 000  000   000

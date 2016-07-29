@@ -18,7 +18,6 @@ class Command
     constructor: (@commandline) ->
         @syntaxName   = 'ko'
         @maxHistory   = 20
-        @maxListLines = 15
         
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -99,9 +98,7 @@ class Command
             listView = document.createElement 'div' 
             listView.className = "commandlist #{@prefsID}"
             window.split.elem.appendChild listView
-            @commandList = new CommandList '.commandlist'
-            @commandList.numbers.opacity = 0.1
-            @commandList.numbers.setOpacity 0.1
+            @commandList = new CommandList '.commandlist', syntax: @syntaxName
     
     listItems: () -> @history.reversed()
 
@@ -109,33 +106,10 @@ class Command
         return if not @commandList? and not items.length
         return @hideList() if not items.length
         @showList() if not @commandList?
-        @commandList.setLines ['']
-        index = 0
-        for item in items
-            continue if not item? 
-            text = (item.text ? item).trim()
-            continue if not text.length
-            rngs = item.rngs ? []
-            if item.clss?
-                rngs.push 
-                    match: text
-                    start: 0
-                    value: item.clss
-                    index: 0
-            @commandList.appendMeta 
-                line: item.line ? ' '
-                text: text
-                rngs: rngs
-                type: item.type ? @syntaxName
-                clss: 'searchResult'
-                list: index
-            index += 1
-        @commandList.view.style.height = "#{4 + @commandList.size.lineHeight * Math.min @maxListLines, items.length}px"
-        @commandList.resized()
+        @commandList.addItems items
         @positionList()
     
     listClick: (index) => 
-        log "listClick index #{index}"
         @selected = index
         @execute @commandList.lines[index]
     
@@ -341,7 +315,7 @@ class Command
         switch combo
             when 'page up', 'page down'
                 if @commandList?
-                    return @select clamp 0, @commandList.lines.length, @selected+@maxListLines*(combo=='page up' and -1 or 1)
+                    return @select clamp 0, @commandList.lines.length, @selected+@commandList.maxLines*(combo=='page up' and -1 or 1)
         'unhandled'
 
 module.exports = Command
