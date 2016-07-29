@@ -25,12 +25,11 @@ class Meta
         @editor.on 'willDeleteLine',   @onWillDeleteLine
         @editor.on 'lineExposed',      @onLineExposed
         @editor.on 'lineVanished',     @onLineVanished
-        @editor.on 'lineExposedTop',   @onLineExposedTop
         @editor.on 'lineVanishedTop',  @onLineVanishedTop
-        @editor.on 'exposeTopChanged', @onExposeTopChanged
+        @editor.on 'linesExposed',     @onLinesExposed
         @editor.on 'fontSizeChanged',  @onFontSizeChange
         
-        @editor.numbers.on 'numberAdded',   @onNumber
+        # @editor.numbers.on 'numberAdded',   @onNumber
         @editor.numbers.on 'numberChanged', @onNumber
 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
@@ -227,9 +226,7 @@ class Meta
         for meta in @metasAtLineIndex e.lineIndex
             @addDiv meta
         
-    onLineExposedTop: (e) => @onLineExposed e
-    
-    onExposeTopChanged: (e) => @updatePositionsBelowLineIndex e.new
+    onLinesExposed: (e) => @updatePositionsBelowLineIndex e.top
         
     updatePositionsBelowLineIndex: (li) ->     
         size = @editor.size

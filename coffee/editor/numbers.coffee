@@ -21,9 +21,8 @@ class Numbers extends event
         @editor.on 'lineDeleted',      @onLineDeleted
         @editor.on 'lineExposed',      @onLineExposed
         @editor.on 'lineVanished',     @onLineVanished
-        @editor.on 'lineExposedTop',   @onLineExposedTop
         @editor.on 'lineVanishedTop',  @onLineVanishedTop
-        @editor.on 'exposeTopChanged', @renumber
+        @editor.on 'linesExposed',     @onLinesExposed
         @editor.on 'fontSizeChanged',  @onFontSizeChange
         @editor.on 'highlight',        @updateColors
         @editor.on 'selection',        @updateColors
@@ -81,11 +80,12 @@ class Numbers extends event
     onLineExposed: (e) =>
         @elem.appendChild @addLine e.lineIndex
         @updateColors e.lineIndex, e.lineIndex
-        
-    onLineExposedTop: (e) =>
-        @elem.insertBefore @addLine(e.lineIndex), @elem.firstChild
-        @updateColors e.lineIndex, e.lineIndex
-        
+
+    onLinesExposed: (e) => 
+        console.log "number.onLinesExposed #{e.top} #{e.num}"
+        for li in [e.top...e.top+e.num]
+            @elem.appendChild @divForLine li
+    
     # 0000000    00000000  000      00000000  000000000  00000000  0000000  
     # 000   000  000       000      000          000     000       000   000
     # 000   000  0000000   000      0000000      000     0000000   000   000
@@ -115,15 +115,19 @@ class Numbers extends event
     # 000   000  000   000  000   000  000      000  000  0000  000     
     # 000   000  0000000    0000000    0000000  000  000   000  00000000
     
-    addLine: (li) ->
+    divForLine: (li) ->
         div = document.createElement "div"
         div.className = "linenumber"
         pre = document.createElement "span"
         pre.textContent = "#{li+1}"
         div.appendChild pre
+        div        
+    
+    addLine: (li) ->
+        div = @divForLine li
         @emit 'numberAdded', 
             numberDiv:  div 
-            numberSpan: pre
+            numberSpan: div.firstChild
             lineIndex:  li
         div
         
@@ -133,9 +137,6 @@ class Numbers extends event
     # 000   000  000       000  0000  000   000  000 0 000  000   000  000       000   000
     # 000   000  00000000  000   000   0000000   000   000  0000000    00000000  000   000
         
-    renumber: (e) =>
-        @renumberFromLineIndex e.new
-
     renumberFromLineIndex: (li) ->
         for div in @elem.children
             div.firstChild.textContent = "#{li+1}"

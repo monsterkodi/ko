@@ -102,7 +102,7 @@ class Scroll extends events
         offset += (top - @exposeTop) * @lineHeight
         
         if offset != @offsetTop or scroll != @scroll
-            @offsetTop = parseInt offset            
+            @offsetTop = parseInt offset
             @emit 'scroll', @scroll, @offsetTop
 
     #  0000000  00000000  000000000  000000000   0000000   00000000 
@@ -156,7 +156,12 @@ class Scroll extends events
             return
         
         if (@top < @exposeTop) # move exposeTop
-            @changeExposeTop @top
+            @emit 'clearLines'
+            @exposeTop = Math.max 0, @top - (@exposeNum - @viewLines)
+            @exposeBot = @bot
+            @exposed = @exposeBot - @exposeTop
+            @emit 'exposeLines', top:@exposeTop, num: @exposed
+            return
                 
         while (@bot > @exposeBot)
             @exposeBot += 1
@@ -174,18 +179,16 @@ class Scroll extends events
             @exposeBot -= 1
             @exposed = @exposeBot - @exposeTop
             
-        if (@top > @exposeTop) and (@exposed > @exposeNum)
-            @changeExposeTop @top 
-
-    changeExposeTop: (top) =>
-        if top != @exposeTop
-            old = @exposeTop
-            @exposeTop = top
-            @exposed = @exposeBot - @exposeTop
-            @emit 'exposeTop',
-                old: old
-                new: @exposeTop
-                num: -(top-old)
+    # changeExposeTop: (top) =>
+        # console.log "changeExposeTop #{top}"
+        # if top != @exposeTop
+            # old = @exposeTop
+            # @exposeTop = top
+            # @exposed = @exposeBot - @exposeTop
+            # @emit 'exposeTop',
+                # old: old
+                # new: @exposeTop
+                # num: -(top-old)
 
     changeExposeBot: (bot) =>
         if bot != @exposeBot
@@ -218,7 +221,7 @@ class Scroll extends events
         @changeExposeBot @exposeBot + 1 if oi <= @exposeBot or oi == @numLines-1
         @changeBot @bot + 1 if oi <= @bot
         @changeTop @top + 1 if oi < @top
-        @changeExposeTop @exposeTop + 1 if oi < @exposeTop
+        # @changeExposeTop @exposeTop + 1 if oi < @exposeTop
         @numLines += 1
         @fullHeight = @numLines * @lineHeight
         @exposed = @exposeBot - @exposeTop
@@ -234,7 +237,7 @@ class Scroll extends events
         @changeExposeBot @exposeBot - 1 if oi <= @exposeBot
         @changeBot @bot - 1 if oi <= @bot
         @changeTop @top - 1 if oi < @top
-        @changeExposeTop @exposeTop - 1 if oi < @exposeTop
+        # @changeExposeTop @exposeTop - 1 if oi < @exposeTop
         @numLines -= 1
         @fullHeight = @numLines * @lineHeight
         @exposed = @exposeBot - @exposeTop

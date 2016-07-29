@@ -71,10 +71,11 @@ class ViewBase extends Editor
             viewHeight: @viewHeight()
             # exposeMax: -4
             
-        @scroll.on 'clearLines', @clearLines
-        @scroll.on 'exposeTop',  @exposeTop
-        @scroll.on 'exposeLine', @exposeLine
-        @scroll.on 'vanishLine', @vanishLine
+        @scroll.on 'clearLines',  @clearLines
+        # @scroll.on 'exposeTop',  @exposeTop
+        @scroll.on 'exposeLines', @exposeLines
+        @scroll.on 'exposeLine',  @exposeLine
+        @scroll.on 'vanishLine',  @vanishLine
 
         @view.onkeydown = @onKeyDown
         @initDrag()    
@@ -338,22 +339,18 @@ class ViewBase extends Editor
 
     exposeTop: (e) =>
         
-        num = Math.abs e.num
-        for n in [0...num]
-            if e.num < 0
-                @elem.firstChild.remove()
-                li = e.new - (num - n)
-                @emit 'lineVanishedTop', lineIndex: li
-            else 
-                div = @addLine()
-                li = e.new + num - n - 1
-                div.innerHTML = @renderLineAtIndex li
-                @elem.insertBefore div, @elem.firstChild
-                @emit 'lineExposedTop', lineIndex: li, lineDiv: div
+    exposeLines: (e) =>
+        
+        for n in [0...e.num]
+            div = @addLine()
+            li = e.top + n
+            div.innerHTML = @renderLineAtIndex li
+            @elem.appendChild div
+            # @emit 'lineExposedTop', lineIndex: li, lineDiv: div
 
         @updateLinePositions()
         @updateLayers()
-        @emit 'exposeTopChanged', e
+        @emit 'linesExposed', e
 
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     
@@ -559,9 +556,6 @@ class ViewBase extends Editor
     # 0000000  000  000   000  00000000  0000000 
     
     viewHeight:   -> @scroll?.viewHeight ? @view?.clientHeight 
-    # viewWidth:    -> @view?.clientWidth # not used?
-    # layersWidth:  -> @layers?.clientWidth 
-    numViewLines: -> Math.ceil(@viewHeight() / @size.lineHeight) # not used?
     numFullLines: -> Math.floor(@viewHeight() / @size.lineHeight)
     
     clearLines: => 
