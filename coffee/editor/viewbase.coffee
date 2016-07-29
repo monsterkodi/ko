@@ -178,7 +178,7 @@ class ViewBase extends Editor
         @size.lineHeight   = Math.floor fontSize * @config.lineHeight
         @size.charWidth    = fontSize * 0.6 
         @size.offsetX      = Math.floor @size.charWidth/2 + @size.numbersWidth
-        @size.offsetX      = Math.max @size.offsetX, (@screenSize().width - 12 - @size.numbersWidth - 120 - @size.charWidth * 80) / 2 if @size.centerText
+        @size.offsetX      = Math.max @size.offsetX, (@screenSize().width - @screenSize().height) / 2 if @size.centerText
 
         @scroll?.setLineHeight @size.lineHeight
         
@@ -193,9 +193,9 @@ class ViewBase extends Editor
     #  0000000  00000000  000   000     000     00000000  000   000     000     00000000  000   000     000   
     
     centerText: (center) ->
-        screenWidth = @screenSize().width
         if center
-            @size.offsetX = (screenWidth - 12 - @size.numbersWidth - 120 - @size.charWidth * 80) / 2
+            @size.offsetX = Math.floor @size.charWidth/2 + @size.numbersWidth
+            @size.offsetX = Math.max @size.offsetX, (@screenSize().width - @screenSize().height) / 2 
             @size.centerText = true
         else
             @size.offsetX = Math.floor @size.charWidth/2 + @size.numbersWidth
