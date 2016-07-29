@@ -5,7 +5,6 @@
 #     0      000  00000000  00     00
 {
 unresolve,
-getStyle,
 clamp,
 $}        = require '../tools/tools'
 log       = require '../tools/log'

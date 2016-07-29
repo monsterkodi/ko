@@ -69,6 +69,7 @@ class ViewBase extends Editor
         @scroll = new scroll 
             lineHeight: @size.lineHeight
             viewHeight: @viewHeight()
+            # exposeMax: -4
             
         @scroll.on 'clearLines', @clearLines
         @scroll.on 'exposeTop',  @exposeTop
@@ -142,6 +143,8 @@ class ViewBase extends Editor
             @emit 'viewHeight', @viewHeight()
         @scroll.setNumLines @lines.length
         @layers.scrollLeft = 0
+        @layersWidth  = @layers.offsetWidth
+        @layersHeight = @layers.offsetHeight
         @updateScrollOffset()
         @updateLayers()
 
@@ -243,9 +246,11 @@ class ViewBase extends Editor
               
         if numChanges != 0 
             @updateLinePositions()
+            @layersWidth  = @layers.offsetWidth
+            @layersHeight = @layers.offsetHeight
 
         @scroll.setNumLines @lines.length
-        @scrollBy 0
+        @scroll.by 0
             
         if changeInfo.cursors.length
             @renderCursors()
@@ -293,7 +298,6 @@ class ViewBase extends Editor
     # 00000000  000   000  000         0000000   0000000   00000000
 
     exposeLine: (li) =>
-        # log "exposeLine #{li}" if @name == 'editor'
         if li > @elem.children.length - 1 + @scroll.exposeTop
             div = @addLine()
             div.innerHTML = @renderLineAtIndex li
@@ -333,6 +337,7 @@ class ViewBase extends Editor
     # 00000000  000   000  000         0000000   0000000   00000000     000      0000000   000      
 
     exposeTop: (e) =>
+        
         num = Math.abs e.num
         for n in [0...num]
             if e.num < 0
@@ -472,12 +477,13 @@ class ViewBase extends Editor
 
     scrollLines: (delta) -> @scrollBy delta * @size.lineHeight
 
-    scrollBy: (delta, x=0) ->
-        @scroll.by delta
-        @layers.scrollLeft += x/2
+    scrollBy: (delta, x=0) ->        
+        # console.log "scrollBy #{delta}"
+        @scroll.by delta if delta
+        @layers.scrollLeft += x/2 if x
         @updateScrollOffset()
         
-    scrollTo: (p) -> 
+    scrollTo: (p) ->
         @scroll.to p
         @updateScrollOffset()
 
@@ -492,24 +498,19 @@ class ViewBase extends Editor
                 @scrollBy delta
                 @numbers?.updateColors()
 
-    updateScrollOffset: ->
-        @layers.scrollTop = @scroll.offsetTop
-        @updateNumbersOffset()
+    updateScrollOffset: ->        
+        @layers.scrollTop = @scroll.offsetTop if @scroll.offsetTop != @scrollOffsetTop
+        @scrollOffsetTop = @scroll.offsetTop
 
     updateCursorOffset: ->
         cx = @mainCursor[0]*@size.charWidth+@size.offsetX
-        if cx-@layers.scrollLeft > @layersWidth()
-            @layers.scrollLeft = Math.max 0, cx - @layersWidth() + @size.charWidth
-        else if cx-@size.offsetX-@layers.scrollLeft < 0          
-            @layers.scrollLeft = Math.max 0, cx - @size.offsetX
-        @updateNumbersOffset()
-
-    updateNumbersOffset: ->
-        return if not @numbers?
-        if @layers.scrollLeft or @numbers.elem.style.left? and @numbers.elem.style.left != '0px'
-            @numbers.elem.style.left = "#{@layers.scrollLeft}px"
-            @numbers.setOpacity @layers.scrollLeft and 1 or @numbers.opacity
-
+        if cx-@layers.scrollLeft > @layersWidth
+            @scroll.offsetLeft = Math.max 0, cx - @layersWidth + @size.charWidth
+            @layers.scrollLeft = @scroll.offsetLeft
+        else if cx-@size.offsetX-@layers.scrollLeft < 0
+            @scroll.offsetLeft = Math.max 0, cx - @size.offsetX
+            @layers.scrollLeft = @scroll.offsetLeft
+    
     # 00000000    0000000    0000000
     # 000   000  000   000  000     
     # 00000000   000   000  0000000 
@@ -558,8 +559,8 @@ class ViewBase extends Editor
     # 0000000  000  000   000  00000000  0000000 
     
     viewHeight:   -> @scroll?.viewHeight ? @view?.clientHeight 
-    viewWidth:    -> @view?.clientWidth # not used?
-    layersWidth:  -> @layers?.clientWidth 
+    # viewWidth:    -> @view?.clientWidth # not used?
+    # layersWidth:  -> @layers?.clientWidth 
     numViewLines: -> Math.ceil(@viewHeight() / @size.lineHeight) # not used?
     numFullLines: -> Math.floor(@viewHeight() / @size.lineHeight)
     

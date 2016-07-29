@@ -31,6 +31,9 @@ class Scrollbar
         @elem.addEventListener 'wheel', @onWheel
         @editor.layers.addEventListener 'wheel', @onWheel
         @editor.layers.addEventListener 'scroll', @onScroll
+        
+        @scrollX = @scrollY = 0
+        window.requestAnimationFrame @scrollAnim
 
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000
@@ -62,7 +65,7 @@ class Scrollbar
     # 00     00  000   000  00000000  00000000  0000000
 
     onWheel: (event) =>
-
+        
         scrollFactor = ->
             f  = 1
             f *= 1 + 1 * event.shiftKey
@@ -70,15 +73,19 @@ class Scrollbar
             f *= 1 + 7 * event.altKey
 
         if Math.abs(event.deltaX) >= 2*Math.abs(event.deltaY) or Math.abs(event.deltaY) == 0
-            scrollX = event.deltaX
-            scrollY = 0
+            @scrollX += event.deltaX
         else
-            scrollX = 0
-            scrollY = event.deltaY
-        @editor.scrollBy scrollY * scrollFactor(), scrollX
-        
+            @scrollY += event.deltaY * scrollFactor()
+            
         event.preventDefault()
         event.stopPropagation()
+        
+    scrollAnim: =>
+        if @scrollX or @scrollY
+            @editor.scrollBy @scrollY, @scrollX
+            @scrollX  = 0
+            @scrollY  = 0
+        window.requestAnimationFrame @scrollAnim
 
     onScroll: (event) => @editor.updateScrollOffset()
 
@@ -89,7 +96,6 @@ class Scrollbar
     #  0000000   000        0000000    000   000     000     00000000
 
     update: =>
-
         if @editor.lines.length * @editor.size.lineHeight < @editor.viewHeight()
             @handle.style.top     = "0"
             @handle.style.height  = "0"
@@ -108,7 +114,6 @@ class Scrollbar
             @handle.style.width   = "2px"
             cf = 1 - clamp 0, 1, (scrollHeight-10)/200
             cs = "rgb(#{parseInt 47+cf*80},#{parseInt 47+cf*80},#{parseInt 47+cf*208})"
-            # log "cf #{cf} cs #{cs}" if @editor.name == 'editor'
             @handle.style.backgroundColor = cs
 
 module.exports = Scrollbar

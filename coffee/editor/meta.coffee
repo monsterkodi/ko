@@ -4,7 +4,6 @@
 # 000 0 000  000          000     000   000
 # 000   000  00000000     000     000   000
 {
-setStyle,
 first,
 last,
 $}  = require '../tools/tools'
