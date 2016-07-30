@@ -329,11 +329,11 @@ class ViewBase extends Editor
             @elem.lastChild.remove()
             @emit 'lineVanished', lineIndex: li
 
-    # 00000000  000   000  00000000    0000000    0000000  00000000  000000000   0000000   00000000 
-    # 000        000 000   000   000  000   000  000       000          000     000   000  000   000
-    # 0000000     00000    00000000   000   000  0000000   0000000      000     000   000  00000000 
-    # 000        000 000   000        000   000       000  000          000     000   000  000      
-    # 00000000  000   000  000         0000000   0000000   00000000     000      0000000   000      
+    # 00000000  000   000  00000000    0000000    0000000  00000000        000      000  000   000  00000000   0000000
+    # 000        000 000   000   000  000   000  000       000             000      000  0000  000  000       000     
+    # 0000000     00000    00000000   000   000  0000000   0000000         000      000  000 0 000  0000000   0000000 
+    # 000        000 000   000        000   000       000  000             000      000  000  0000  000            000
+    # 00000000  000   000  000         0000000   0000000   00000000        0000000  000  000   000  00000000  0000000 
 
     exposeLines: (e) =>
         
@@ -368,6 +368,11 @@ class ViewBase extends Editor
         for li in [@scroll.exposeTop..@scroll.exposeBot]
             @updateLine li, li
 
+    clearHighlights: () ->
+        if @highlights.length
+            $('.highlights', @layers).innerHTML = ''
+            super
+    
     # 00000000   00000000  000   000  0000000    00000000  00000000 
     # 000   000  000       0000  000  000   000  000       000   000
     # 0000000    0000000   000 0 000  000   000  0000000   0000000  
@@ -413,7 +418,7 @@ class ViewBase extends Editor
             h += render.selection s, @size
         $('.selections', @layers).innerHTML = h
 
-    renderHighlights: ->
+    renderHighlights: ->        
         h = ""
         s = @highlightsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
         if s
@@ -470,7 +475,6 @@ class ViewBase extends Editor
     scrollLines: (delta) -> @scrollBy delta * @size.lineHeight
 
     scrollBy: (delta, x=0) ->        
-        # console.log "scrollBy #{delta}"
         @scroll.by delta if delta
         @layers.scrollLeft += x/2 if x
         @updateScrollOffset()

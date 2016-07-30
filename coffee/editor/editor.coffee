@@ -509,7 +509,6 @@ class Editor extends Buffer
     clearHighlights: ->
         if @highlights.length
             @highlights = []
-            $('.highlights', @layers).innerHTML = ''
             @emit 'highlight'
 
     selectAllHighlights: ->
