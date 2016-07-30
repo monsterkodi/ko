@@ -245,6 +245,7 @@ class ViewBase extends Editor
               
         if numChanges != 0 
             @updateLinePositions()
+            @clearHighlights()
             @layersWidth  = @layers.offsetWidth
             @layersHeight = @layers.offsetHeight
 
@@ -263,7 +264,6 @@ class ViewBase extends Editor
             @renderSelection()   
             @emit 'selection'
 
-        @renderHighlights()
         @emit 'changed', changeInfo, action
 
     # 0000000    00000000  000      00000000  000000000  00000000
@@ -488,7 +488,6 @@ class ViewBase extends Editor
             if sl.length == 0 == hl.length
                 delta = @scroll.lineHeight * (cp[1] - @scroll.top - topDist)
                 @scrollBy delta
-                @numbers?.updateColors()
 
     updateScrollOffset: ->        
         @layers.scrollTop = @scroll.offsetTop if @scroll.offsetTop != @scrollOffsetTop

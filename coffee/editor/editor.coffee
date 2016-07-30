@@ -507,9 +507,10 @@ class Editor extends Buffer
             @focus()
 
     clearHighlights: ->
-        @highlights = []
-        @renderHighlights()
-        @emit 'highlight'
+        if @highlights.length
+            @highlights = []
+            $('.highlights', @layers).innerHTML = ''
+            @emit 'highlight'
 
     selectAllHighlights: ->
         @do.start()
@@ -638,7 +639,6 @@ class Editor extends Buffer
     alignCursorsAndText: ->
         @do.start()
         @mainCursorMove = 0
-        @clearHighlights()
         newCursors = _.cloneDeep @cursors
         newX = _.max (c[0] for c in @cursors)
         lines = {}
@@ -714,9 +714,7 @@ class Editor extends Buffer
 
     clearCursorsAndHighlights: () ->
         @clearCursors()
-        @highlights = []
-        @renderHighlights()
-        @emit 'highlight'
+        @clearHighlights()
         
     clearSelections: () ->
         @do.selections []
@@ -868,7 +866,6 @@ class Editor extends Buffer
         @do.selections newSelections
         @do.cursors newCursors
         @do.end()
-        @clearHighlights()
         
     indent: ->
         @do.start()
@@ -885,7 +882,6 @@ class Editor extends Buffer
         @do.selections newSelections
         @do.cursors newCursors
         @do.end()
-        @clearHighlights()
 
     indentStringForLineAtIndex: (li) -> _.padStart "", @indentationAtLineIndex li
            
@@ -939,7 +935,6 @@ class Editor extends Buffer
         return if @salterMode and @insertSalterCharacter ch
         
         @do.start()
-        @clearHighlights()
         @clampCursorOrFillVirtualSpaces()
         
         if ch in @surroundCharacters
@@ -1295,7 +1290,6 @@ class Editor extends Buffer
         @do.selections []
         @do.cursors newCursors
         @do.end()
-        @clearHighlights()        
         @checkSalterMode()
         
     deleteTab: ->
@@ -1313,7 +1307,6 @@ class Editor extends Buffer
                         @oldCursorDelta newCursors, c, -n
             @do.cursors newCursors
             @do.end()
-            @clearHighlights()
     
     # 00000000   0000000   00000000   000   000   0000000   00000000   0000000  
     # 000       000   000  000   000  000 0 000  000   000  000   000  000   000
@@ -1351,7 +1344,6 @@ class Editor extends Buffer
 
             @do.cursors newCursors
             @do.end()
-            @clearHighlights()
      
     # 0000000     0000000    0000000  000   000  000   000   0000000   00000000   0000000  
     # 000   000  000   000  000       000  000   000 0 000  000   000  000   000  000   000
@@ -1386,12 +1378,10 @@ class Editor extends Buffer
                     for i in [0...sc.length]
                         @deleteForward()
                     @surroundStack.pop()
-                    @clearHighlights()
                     @do.end()
                     return
             
             @deleteCharacterBackward opt
-            @clearHighlights()
         @do.end()
 
     deleteCharacterBackward: (opt) ->

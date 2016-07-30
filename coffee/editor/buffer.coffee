@@ -147,13 +147,7 @@ class Buffer extends event
                 else
                     csr.push [li,li]
         csr
-            
-    selectedLineIndexRange: ->
-        if @selections.length
-            [first(@selections)[0], last(@selections)[0]]
-        else
-            []
-            
+                        
     isSelectedLineAtIndex: (li) ->
         il = @selectedLineIndices()
         if li in il
@@ -481,8 +475,6 @@ class Buffer extends event
         if cr = @rangeAtPosInRanges @rangeStartPos(r), ranges
             return cr if cr[1][1] >= r[1][1]
         
-    sortedLineIndicesInRanges: (ranges) -> _.uniq(s[0] for s in ranges).sort (a,b)->(a-b)
-    
     rangesShrunkenBy: (ranges, delta) ->
         ([r[0], [r[1][0]+delta, r[1][1]-delta]] for r in ranges when (r[1][1]-r[1][0])>=2*delta)
             

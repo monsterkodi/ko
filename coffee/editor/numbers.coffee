@@ -25,10 +25,18 @@ class Numbers extends event
         @editor.on 'linesExposed',     @onLinesExposed
         @editor.on 'fontSizeChanged',  @onFontSizeChange
         @editor.on 'highlight',        @updateColors
-        @editor.on 'selection',        @updateColors
-        @editor.on 'cursor',           @updateColors
+        @editor.on 'changed',          @onChanged
         @onFontSizeChange()
 
+    onChanged: (changeInfo) =>
+        if changeInfo.cursors?.length
+            for c in changeInfo.cursors
+                @updateColors c, c
+        if changeInfo.selection?.length
+            for s in changeInfo.selection
+                for li in [s[0]..s[1]]
+                    @updateColors li, li
+    
     setOpacity: (o) -> @elem.style.background = "rgba(0,0,0,#{o})"
     
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
@@ -38,12 +46,9 @@ class Numbers extends event
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
     
     updateColors: (top=@editor.scroll.exposeTop, bot=@editor.scroll.exposeBot) =>
-        sr = @editor.rangesFromTopToBotInRanges top, bot, @editor.selections
-        hr = @editor.rangesFromTopToBotInRanges top, bot, @editor.highlights        
-        cr = @editor.rangesFromTopToBotInRanges top, bot, @editor.rangesForCursors()
-        hi = @editor.sortedLineIndicesInRanges hr
-        si = @editor.sortedLineIndicesInRanges sr
-        ci = @editor.sortedLineIndicesInRanges cr
+        si = (s[0] for s in @editor.rangesFromTopToBotInRanges top, bot, @editor.selections)
+        hi = (s[0] for s in @editor.rangesFromTopToBotInRanges top, bot, @editor.highlights)
+        ci = (s[0] for s in @editor.rangesFromTopToBotInRanges top, bot, @editor.rangesForCursors())
         li = top
         for li in [top..bot]
             child = @elem.children[li-@editor.scroll.exposeTop]
@@ -94,10 +99,17 @@ class Numbers extends event
     onLineDeleted: (li) =>
         top = @editor.scroll.exposeTop
         bot = @editor.scroll.exposeBot
-        if top <= li <= bot+1
+        if top <= li <= bot
+            for i in [li..bot]
+                div = @elem.children[li-top]
+                div.firstChild.textContent = "#{li+1}"
+                @emit 'numberChanged', 
+                    numberDiv:  div
+                    numberSpan: div.firstChild
+                    lineIndex:  i
+                @updateColors i
             @elem.lastChild?.remove()
-            @renumberFromLineIndex top
-    
+        
     # 000   000   0000000   000   000  000   0000000  000   000
     # 000   000  000   000  0000  000  000  000       000   000
     #  000 000   000000000  000 0 000  000  0000000   000000000
@@ -130,22 +142,6 @@ class Numbers extends event
             lineIndex:  li
         div
         
-    # 00000000   00000000  000   000  000   000  00     00  0000000    00000000  00000000 
-    # 000   000  000       0000  000  000   000  000   000  000   000  000       000   000
-    # 0000000    0000000   000 0 000  000   000  000000000  0000000    0000000   0000000  
-    # 000   000  000       000  0000  000   000  000 0 000  000   000  000       000   000
-    # 000   000  00000000  000   000   0000000   000   000  0000000    00000000  000   000
-        
-    renumberFromLineIndex: (li) ->
-        for div in @elem.children
-            div.firstChild.textContent = "#{li+1}"
-            @emit 'numberChanged', 
-                numberDiv:  div
-                numberSpan: div.firstChild
-                lineIndex:  li
-            li += 1
-        @updateColors()
-
     log: -> 
         if @editor.name == 'logview'
             console.log (str(s) for s in [].slice.call arguments, 0).join " "

@@ -3,9 +3,10 @@
 # 000   000  000 0 000  000   000  000   000
 # 000   000  000  0000  000   000  000   000
 #  0000000   000   000  0000000     0000000 
-
+{
+first, 
+last}  = require '../tools/tools'
 log    = require '../tools/log'
-{last} = require '../tools/tools'
 _      = require 'lodash'
 
 class Undo
@@ -76,8 +77,9 @@ class Undo
                 @changeInfo.cursors.push c[1]
 
     changeInfoSelection: ->
-        @getChangeInfo()
-        @changeInfo.selection.push @editor.selectedLineIndexRange()
+        if @editor.selections.length
+            @getChangeInfo()
+            @changeInfo.selection.push [first(@editor.selections)[0], last(@editor.selections)[0]]
             
     delChangeInfo: -> @changeInfo = null
         
