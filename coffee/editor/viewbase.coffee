@@ -115,7 +115,6 @@ class ViewBase extends Editor
         super text
                 
     setLines: (lines) ->
-        # log "setLines #{@name} #{lines.length}" if @name == 'commandlist'
         if lines.length == 0
             @scroll.reset() 
         
@@ -254,7 +253,6 @@ class ViewBase extends Editor
     # 00000000  000   000  000         0000000   0000000   00000000
 
     exposeLine: (li) =>
-        # log "expose line #{li}" if @name == 'commandlist'
         div = @divForLineAtIndex li
         @elem.appendChild div
         
@@ -268,7 +266,6 @@ class ViewBase extends Editor
         
     exposeLines: (e) =>
         before = @elem.firstChild
-        # log "ViewBase.exposeLines #{@name} before #{before?.lineIndex}", e if @name == 'commandlist'
         for li in [e.top..e.bot]
             div = @divForLineAtIndex li
             @elem.insertBefore div, before
@@ -289,7 +286,6 @@ class ViewBase extends Editor
     #     0      000   000  000   000  000  0000000   000   000
     
     vanishLines: (e) =>
-        # log "vanish lines", e if @name != 'logview'
         top = e.top ? 0
         while top
             li = @elem.firstChild.lineIndex
