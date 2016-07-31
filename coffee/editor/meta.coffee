@@ -26,7 +26,6 @@ class Meta
         @editor.on 'lineExposed',      @onLineExposed
         @editor.on 'linesExposed',     @onLinesExposed
         @editor.on 'lineVanished',     @onLineVanished
-        # @editor.on 'lineVanishedTop',  @onLineVanishedTop
         @editor.on 'exposeTopChanged', @onExposeTopChanged
         @editor.on 'fontSizeChanged',  @onFontSizeChange
         
@@ -278,10 +277,6 @@ class Meta
     #    000     000   000  000  0000  000       000  000   000
     #     0      000   000  000   000  000  0000000   000   000
 
-    # onLineVanishedTop: (e) => 
-    #     @onLineVanished e
-    #     @updatePositionsBelowLineIndex e.lineIndex
-        
     onLineVanished: (e) => 
         for meta in @metasAtLineIndex e.lineIndex
             meta[2].div?.remove()

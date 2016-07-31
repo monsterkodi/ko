@@ -269,13 +269,14 @@ class ViewBase extends Editor
     exposeLines: (e) =>
         before = @elem.firstChild
         # log "ViewBase.exposeLines #{@name} before #{before?.lineIndex}", e if @name == 'commandlist'
-        for n in [0...e.num]
-            li = e.top + n
+        for li in [e.top..e.bot]
             div = @divForLineAtIndex li
             @elem.insertBefore div, before
+
+        for li in [e.bot..e.top]
             @emit 'lineExposed',
                 lineIndex: li
-                lineDiv: div
+                lineDiv: @elem.children[li-e.top]
 
         @updateLinePositions()
         @updateLayers()
@@ -303,7 +304,6 @@ class ViewBase extends Editor
             bot -= 1
         @updateLinePositions()
         @updateLayers()
-        
     
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     

@@ -19,10 +19,9 @@ class Numbers extends event
         @elem = $(".numbers", @editor.view)
         @editor.on 'clearLines',       @onClearLines
         @editor.on 'lineDeleted',      @onLineDeleted
+        @editor.on 'lineInserted',     @onLineInserted
         @editor.on 'lineExposed',      @onLineExposed
         @editor.on 'lineVanished',     @onLineVanished
-        @editor.on 'lineVanishedTop',  @onLineVanishedTop
-        @editor.on 'linesExposed',     @onLinesExposed
         @editor.on 'fontSizeChanged',  @onFontSizeChange
         @editor.on 'highlight',        @onHighlight
         @editor.on 'changed',          @onChanged
@@ -40,13 +39,12 @@ class Numbers extends event
                     @updateColor li
     
     setOpacity: (o) -> @elem.style.background = "rgba(0,0,0,#{o})"
-
     
-    # 000   000  00000000   0000000     0000000   000000000  00000000   0000000   0000000   000       0000000   00000000 
-    # 000   000  000   000  000   000  000   000     000     000       000       000   000  000      000   000  000   000
-    # 000   000  00000000   000   000  000000000     000     0000000   000       000   000  000      000   000  0000000  
-    # 000   000  000        000   000  000   000     000     000       000       000   000  000      000   000  000   000
-    #  0000000   000        0000000    000   000     000     00000000   0000000   0000000   0000000   0000000   000   000
+    #  0000000   0000000   000       0000000   00000000 
+    # 000       000   000  000      000   000  000   000
+    # 000       000   000  000      000   000  0000000  
+    # 000       000   000  000      000   000  000   000
+    #  0000000   0000000   0000000   0000000   000   000
     
     updateColor: (li) =>
         si = (s[0] for s in @editor.rangesFromTopToBotInRanges li, li, @editor.selections)
@@ -65,11 +63,11 @@ class Numbers extends event
             cls += ' highligd'            
         child.className = 'linenumber ' + cls
        
-    # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
-    # 000       000   000  0000  000     000     000       000     000   000     
-    # 000000    000   000  000 0 000     000     0000000   000    000    0000000 
-    # 000       000   000  000  0000     000          000  000   000     000     
-    # 000        0000000   000   000     000     0000000   000  0000000  00000000
+    # 00000000   0000000   000   000  000000000
+    # 000       000   000  0000  000     000   
+    # 000000    000   000  000 0 000     000   
+    # 000       000   000  000  0000     000   
+    # 000        0000000   000   000     000   
         
     onFontSizeChange: => 
         @elem.style.lineHeight = "#{@editor.size.lineHeight}px"        
@@ -83,21 +81,45 @@ class Numbers extends event
     # 00000000  000   000  000         0000000   0000000   00000000
         
     onLineExposed: (e) =>
-        @elem.appendChild @addLine e.lineIndex
+        if e.lineIndex < @elem.firstChild?.lineIndex
+            @elem.insertBefore @addLine(e.lineIndex), @elem.firstChild
+        else if e.lineIndex > @elem.lastChild?.lineIndex
+            @elem.appendChild @addLine e.lineIndex
+        else
+            @elem.appendChild @addLine e.lineIndex
         @updateColor e.lineIndex
 
-    onLinesExposed: (e) => 
-        before = @elem.firstChild
-        for li in [e.top..e.bot]
-            @elem.insertBefore @addLine(li), before
-            @updateColor li
+    onLineInserted: (li) =>
+        top = @editor.scroll.exposeTop
+        bot = @editor.scroll.exposeBot
+        if top <= li <= bot
+            for i in [li...bot]
+                div = @elem.children[li-top]
+                div.firstChild.textContent = "#{li+1}"
+                @emit 'numberChanged', 
+                    numberDiv:  div
+                    numberSpan: div.firstChild
+                    lineIndex:  i
+                @updateColor i
+            @onLineExposed lineIndex: bot
+                    
+    # 000   000   0000000   000   000  000   0000000  000   000
+    # 000   000  000   000  0000  000  000  000       000   000
+    #  000 000   000000000  000 0 000  000  0000000   000000000
+    #    000     000   000  000  0000  000       000  000   000
+    #     0      000   000  000   000  000  0000000   000   000
     
-    # 0000000    00000000  000      00000000  000000000  00000000  0000000  
-    # 000   000  000       000      000          000     000       000   000
-    # 000   000  0000000   000      0000000      000     0000000   000   000
-    # 000   000  000       000      000          000     000       000   000
-    # 0000000    00000000  0000000  00000000     000     00000000  0000000  
+    onClearLines: => @elem.innerHTML = ""
         
+    onLineVanished: (e) => 
+        
+        if @elem.firstChild?.lineIndex == e.lineIndex
+            @elem.firstChild.remove()
+        else if @elem.lastChild?.lineIndex == e.lineIndex
+            @elem.lastChild.remove()
+        else
+            log "vanish? #{@editor.name} #{e.lineIndex} #{@elem.firstChild.lineIndex} #{@elem.lastChild.lineIndex}" if @editor.name != 'logview'
+    
     onLineDeleted: (li) =>
         top = @editor.scroll.exposeTop
         bot = @editor.scroll.exposeBot
@@ -110,18 +132,8 @@ class Numbers extends event
                     numberSpan: div.firstChild
                     lineIndex:  i
                 @updateColor i
-            @elem.lastChild?.remove()
+        @elem.lastChild?.remove()
         
-    # 000   000   0000000   000   000  000   0000000  000   000
-    # 000   000  000   000  0000  000  000  000       000   000
-    #  000 000   000000000  000 0 000  000  0000000   000000000
-    #    000     000   000  000  0000  000       000  000   000
-    #     0      000   000  000   000  000  0000000   000   000
-    
-    onLineVanished:    (e) => @elem.lastChild?.remove()
-    onLineVanishedTop: (e) => @elem.firstChild?.remove()
-    onClearLines:          => @elem.innerHTML = ""
-    
     #  0000000   0000000    0000000    000      000  000   000  00000000
     # 000   000  000   000  000   000  000      000  0000  000  000     
     # 000000000  000   000  000   000  000      000  000 0 000  0000000 
@@ -130,7 +142,8 @@ class Numbers extends event
     
     divForLine: (li) ->
         div = document.createElement "div"
-        div.className = "linenumber"
+        div.className = "linenumber"        
+        div.lineIndex = li
         pre = document.createElement "span"
         pre.textContent = "#{li+1}"
         div.appendChild pre
@@ -144,10 +157,4 @@ class Numbers extends event
             lineIndex:  li
         div
         
-    log: -> 
-        if @editor.name == 'logview'
-            console.log (str(s) for s in [].slice.call arguments, 0).join " "
-        else
-            log (str(s) for s in [].slice.call arguments, 0).join " "
-
 module.exports = Numbers
