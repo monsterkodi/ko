@@ -65,10 +65,10 @@ class Buffer extends event
                 cs.push c
         cs
     
-    isCursorVirtual:       (c=@mainCursor) -> c[1] < @lines.length and c[0] > @lines[c[1]].length
-    isCursorAtEndOfLine:   (c=@mainCursor) -> c[1] < @lines.length and c[0] >= @lines[c[1]].length
+    isCursorVirtual:       (c=@mainCursor) -> @lines.length and c[1] < @lines.length and c[0] > @lines[c[1]].length
+    isCursorAtEndOfLine:   (c=@mainCursor) -> @lines.length and c[1] < @lines.length and c[0] >= @lines[c[1]].length
     isCursorAtStartOfLine: (c=@mainCursor) -> c[0] == 0
-    isCursorInIndent:      (c=@mainCursor) -> @lines[c[1]].slice(0, c[0]).trim().length == 0
+    isCursorInIndent:      (c=@mainCursor) -> @lines.length and @lines[c[1]].slice(0, c[0]).trim().length == 0
     isCursorInLastLine:    (c=@mainCursor) -> c[1] == @lines.length-1
     isCursorInFirstLine:   (c=@mainCursor) -> c[1] == 0
     isCursorInRange:     (r,c=@mainCursor) -> @isPosInRange c, r
@@ -258,14 +258,12 @@ class Buffer extends event
             @clampPos @mainCursor 
         
     clampPos: (p) ->        
-        if not @lines.length
-            alert "no line?"
-            throw new Error
-            return
         if not p? or not p[0]? or not p[1]?
             alert "no p? #{p}"
             throw new Error
             return
+        if not @lines.length
+            return [0,-1]
         l = clamp 0, @lines.length-1,  p[1]
         c = clamp 0, @lines[l].length, p[0]
         [ c, l ]

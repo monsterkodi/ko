@@ -17,6 +17,7 @@ Terminal    = require './terminal/terminal'
 LogView     = require './logview/logview'
 Titlebar    = require './titlebar'
 Navigate    = require './navigate'
+FPS         = require './tools/fps'
 Info        = require './editor/info'
 prefs       = require './tools/prefs'
 keyinfo     = require './tools/keyinfo'
@@ -103,6 +104,8 @@ ipc.on 'setWinID', (event, id) =>
     if getState 'centerText'
         screenWidth = screenSize().width
         editor.centerText sw() == screenWidth, screenWidth
+        
+    fps.toggle() if getState 'fps'
     
 ipc.on 'fileLinesChanged', (event, file, lineChanges) =>
     if file == editor.currentFile
@@ -336,6 +339,14 @@ window.editorWithClassName = (n) ->
         when '.commandline' then commandline
         when '.terminal'    then terminal
         when '.logview'     then logview    
+
+# 00000000  00000000    0000000
+# 000       000   000  000     
+# 000000    00000000   0000000 
+# 000       000             000
+# 000       000        0000000 
+
+fps = window.fps = new FPS()
 
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000     

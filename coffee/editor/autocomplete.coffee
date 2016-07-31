@@ -189,10 +189,12 @@ class Autocomplete extends event
     
     parseLines:(lines, opt) ->
         @close()
+        # log 'autocomplete.parseLines lines', lines
+        return if not lines?
         cursorWord = @cursorWord()
         for l in lines
             if not l?.split?
-                alert "warning! no split?", lines  
+                alert "autocomplete.parseLines: warning! line has no split? #{l} #{lines?}"
                 throw new Error
             words = l.split @splitRegExp
             words = words.filter (w) => 

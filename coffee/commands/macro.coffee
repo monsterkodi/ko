@@ -81,6 +81,9 @@ class Macro extends Command
             when 'inv' 
                 editor.showInvisibles = !editor.showInvisibles
                 editor.updateLines()
+
+            when 'fps' 
+                window.fps?.toggle()
             
             # 00000000   00000000   0000000 
             # 000   000  000       000   000

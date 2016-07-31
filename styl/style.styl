@@ -17,7 +17,8 @@ numbersWidth          = 50px
 editorPadding         = (8px + numbersWidth) 
 bottomCornerRadius    = 4px
 frameColor            = #222
-frameBorder           = scrollhandleWidth solid frameColor
+frameWidth            = scrollhandleWidth
+frameBorder           = frameWidth solid frameColor
 commandlineHeight     = 30px
 titlebarHeight        = 22px
 titlebarFontSize      = 14px
@@ -132,6 +133,23 @@ span.ko
 .commandlist.term .linenumber.selected span    
     color               #f80
 
+//   00000000  00000000    0000000
+//   000       000   000  000     
+//   000000    00000000   0000000 
+//   000       000             000
+//   000       000        0000000 
+
+.fps
+    pointer-events  none
+    position        absolute
+    right           (minimapWidth + 1)
+    top             0
+    width           minimapWidth
+    height          commandlineHeight
+
+.fpsCanvas
+    background-color transparent
+    
 // 000  000   000  00000000   0000000 
 // 000  0000  000  000       000   000
 // 000  000 0 000  000000    000   000
@@ -647,7 +665,7 @@ body
     border-left         thinBorder
     pointer-events      auto
 
-canvas
+.minimap canvas
     pointer-events      none
     position            absolute
     top                 0

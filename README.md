@@ -62,7 +62,6 @@
     - **dbg** insert log line which outputs class.method + variables under cursors
     - **req** insert require statement for word at cursor
     - **class** creates a new file with simple class skeleton
-    - **inv** toggle display of line-breaks
 
 ## commandline
 
