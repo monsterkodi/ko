@@ -29,8 +29,8 @@ class Scrollbar
             cursor:  'ns-resize'
 
         @elem.addEventListener 'wheel', @onWheel
-        @editor.layers.addEventListener 'wheel', @onWheel
-        @editor.layers.addEventListener 'scroll', @onScroll
+        @editor.view.addEventListener 'wheel',  @onWheel
+        # @editor.layers.addEventListener 'scroll', @onScroll
         
         @scrollX = @scrollY = 0
         window.requestAnimationFrame @scrollAnim

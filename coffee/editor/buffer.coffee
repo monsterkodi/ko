@@ -19,11 +19,15 @@ class Buffer extends event
     
     constructor: () -> 
         @wordRegExp = new RegExp "(\\s+|\\w+|[^\\s])", 'g'
-        @setLines ['']
+        @lines      = []
+        @selections = []
+        @highlights = []
+        @mainCursor = [0,-1]
+        @cursors    = [@mainCursor]
 
     setLines: (@lines) ->
-        @cursors    = [[0,0]]
-        @mainCursor = [0,0]
+        @mainCursor = [0,@lines.length-1]
+        @cursors    = [@mainCursor]
         @selections = []
         @highlights = []
         @emit 'numLines', @lines.length
@@ -61,8 +65,8 @@ class Buffer extends event
                 cs.push c
         cs
     
-    isCursorVirtual:       (c=@mainCursor) -> c[0] > @lines[c[1]].length
-    isCursorAtEndOfLine:   (c=@mainCursor) -> c[0] >= @lines[c[1]].length
+    isCursorVirtual:       (c=@mainCursor) -> c[1] < @lines.length and c[0] > @lines[c[1]].length
+    isCursorAtEndOfLine:   (c=@mainCursor) -> c[1] < @lines.length and c[0] >= @lines[c[1]].length
     isCursorAtStartOfLine: (c=@mainCursor) -> c[0] == 0
     isCursorInIndent:      (c=@mainCursor) -> @lines[c[1]].slice(0, c[0]).trim().length == 0
     isCursorInLastLine:    (c=@mainCursor) -> c[1] == @lines.length-1
@@ -246,12 +250,12 @@ class Buffer extends event
         [@lines[lli].length, lli]
 
     cursorPos: -> 
+        return [0,-1] if not @lines.length
         if not @mainCursor?
             alert 'no main cursor!'
             throw new Error
-        l = clamp 0, @lines.length-1, @mainCursor[1]
-        c = clamp 0, @lines[l].length, @mainCursor[0]
-        [ c, l ]
+        else 
+            @clampPos @mainCursor 
         
     clampPos: (p) ->        
         if not @lines.length
@@ -262,7 +266,7 @@ class Buffer extends event
             alert "no p? #{p}"
             throw new Error
             return
-        l = clamp 0, @lines.length-1, p[1]
+        l = clamp 0, @lines.length-1,  p[1]
         c = clamp 0, @lines[l].length, p[0]
         [ c, l ]
         
@@ -514,7 +518,6 @@ class Buffer extends event
             p[0] = Math.max p[0], 0
             p[1] = clamp 0, @lines.length-1, p[1]
            
-              
     cleanCursors: (cs=@cursors) ->
         @clampPositions cs
         @sortPositions cs

@@ -24,7 +24,7 @@ class View extends ViewBase
     constructor: (viewElem) -> 
         
         window.split.on 'commandline', @onCommandline
-        @fontSizeDefault = 14
+        @fontSizeDefault = 16
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Autocomplete']        
                     
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
@@ -57,7 +57,6 @@ class View extends ViewBase
         super file, opt # -> setText -> setLines
 
         @restoreScrollCursorsAndSelections() if file
-        @numbers.updateColors()
                     
     # 000000000  000  000000000  000      00000000  0000000     0000000   00000000 
     #    000     000     000     000      000       000   000  000   000  000   000
@@ -124,9 +123,13 @@ class View extends ViewBase
             @highlights = s.highlights ? []
             @mainCursor = @cursors[Math.min @cursors.length-1, s.main ? 0]            
             delta = (s.scroll ? @scroll.scroll) - @scroll.scroll
-            if delta
-                @scrollBy delta
+            @scrollBy delta if delta
             @updateLayers()
+            
+            @numbers.updateColor c[1] for c in @cursors
+            @numbers.updateColor s[0] for s in @selections
+            @numbers.updateColor h[0] for h in @highlights
+            
             @emit 'cursor'
             @emit 'selection'
 

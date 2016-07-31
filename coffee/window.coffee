@@ -448,11 +448,11 @@ document.onkeydown = (event) ->
     
     switch combo
         when 'command+alt+i'     then return ipc.send 'toggleDevTools', winID
-        when 'command+alt+`'     
-            editor.setCurrentFile null
-            editor.setLines ['']
-            ipc.send 'fileLoaded', '', winID
-            return
+        # when 'command+alt+`'     
+        #     editor.setCurrentFile null
+        #     editor.setLines []
+        #     ipc.send 'fileLoaded', '', winID
+        #     return
         when 'command+\\'         then return toggleCenterText()
         when 'command+k'          then return commandline.clear()
         when 'command+alt+k'      then return split.toggleLog()

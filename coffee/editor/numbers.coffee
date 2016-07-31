@@ -24,46 +24,46 @@ class Numbers extends event
         @editor.on 'lineVanishedTop',  @onLineVanishedTop
         @editor.on 'linesExposed',     @onLinesExposed
         @editor.on 'fontSizeChanged',  @onFontSizeChange
-        @editor.on 'highlight',        @updateColors
+        @editor.on 'highlight',        @onHighlight
         @editor.on 'changed',          @onChanged
         @onFontSizeChange()
 
+    onHighlight: => @updateColor h[0] for h in @editor.highlights
+    
     onChanged: (changeInfo) =>
         if changeInfo.cursors?.length
             for c in changeInfo.cursors
-                @updateColors c, c
+                @updateColor c
         if changeInfo.selection?.length
             for s in changeInfo.selection
                 for li in [s[0]..s[1]]
-                    @updateColors li, li
+                    @updateColor li
     
     setOpacity: (o) -> @elem.style.background = "rgba(0,0,0,#{o})"
+
     
-    #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
-    # 000       000       000      000       000          000     000  000   000  0000  000
-    # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
-    #      000  000       000      000       000          000     000  000   000  000  0000
-    # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
+    # 000   000  00000000   0000000     0000000   000000000  00000000   0000000   0000000   000       0000000   00000000 
+    # 000   000  000   000  000   000  000   000     000     000       000       000   000  000      000   000  000   000
+    # 000   000  00000000   000   000  000000000     000     0000000   000       000   000  000      000   000  0000000  
+    # 000   000  000        000   000  000   000     000     000       000       000   000  000      000   000  000   000
+    #  0000000   000        0000000    000   000     000     00000000   0000000   0000000   0000000   0000000   000   000
     
-    updateColors: (top=@editor.scroll.exposeTop, bot=@editor.scroll.exposeBot) =>
-        si = (s[0] for s in @editor.rangesFromTopToBotInRanges top, bot, @editor.selections)
-        hi = (s[0] for s in @editor.rangesFromTopToBotInRanges top, bot, @editor.highlights)
-        ci = (s[0] for s in @editor.rangesFromTopToBotInRanges top, bot, @editor.rangesForCursors())
-        li = top
-        for li in [top..bot]
-            child = @elem.children[li-@editor.scroll.exposeTop]
-            break if not child?
-            cls = ''
-            if li in ci
-                cls += ' cursored'
-            if li == @editor.mainCursor[1]
-                cls += ' main'
-            if li in si
-                cls += ' selected'
-            if li in hi
-                cls += ' highligd'            
-            child.className = 'linenumber ' + cls
-            li += 1
+    updateColor: (li) =>
+        si = (s[0] for s in @editor.rangesFromTopToBotInRanges li, li, @editor.selections)
+        hi = (s[0] for s in @editor.rangesFromTopToBotInRanges li, li, @editor.highlights)
+        ci = (s[0] for s in @editor.rangesFromTopToBotInRanges li, li, @editor.rangesForCursors())
+        child = @elem.children[li-@editor.scroll.exposeTop]
+        return if not child?
+        cls = ''
+        if li in ci
+            cls += ' cursored'
+        if li == @editor.mainCursor[1]
+            cls += ' main'
+        if li in si
+            cls += ' selected'
+        if li in hi
+            cls += ' highligd'            
+        child.className = 'linenumber ' + cls
        
     # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
     # 000       000   000  0000  000     000     000       000     000   000     
@@ -84,11 +84,13 @@ class Numbers extends event
         
     onLineExposed: (e) =>
         @elem.appendChild @addLine e.lineIndex
-        @updateColors e.lineIndex, e.lineIndex
+        @updateColor e.lineIndex
 
     onLinesExposed: (e) => 
+        before = @elem.firstChild
         for li in [e.top..e.bot]
-            @elem.appendChild @divForLine li
+            @elem.insertBefore @addLine(li), before
+            @updateColor li
     
     # 0000000    00000000  000      00000000  000000000  00000000  0000000  
     # 000   000  000       000      000          000     000       000   000
@@ -107,7 +109,7 @@ class Numbers extends event
                     numberDiv:  div
                     numberSpan: div.firstChild
                     lineIndex:  i
-                @updateColors i
+                @updateColor i
             @elem.lastChild?.remove()
         
     # 000   000   0000000   000   000  000   0000000  000   000

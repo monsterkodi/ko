@@ -27,6 +27,26 @@ class Render
                 l = clrzd + l
         l
         
+    @lineDiv: (y, diss, size) =>
+        
+        div = document.createElement 'div'
+        div.className = 'line'
+        div.style.height = "#{size.lineHeight}px"
+        div.style.transform = "translate(#{size.offsetX}px,#{y}px)"
+        
+        if diss?.length
+            for d in diss
+                span = document.createElement 'span'
+                span.style.transform = "translatex(#{d.start * size.charWidth}px)"
+                span.className = d.clss if d.clss?
+                span.textContent = d.match
+                if d.styl?
+                    for st in d.styl.split ';'
+                        ss = st.split ':'
+                        span.style[ss[0]] = ss[1]
+                div.appendChild span
+        div
+        
     #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
     # 000       000   000  000   000  000       000   000  000   000  000     
     # 000       000   000  0000000    0000000   000   000  0000000    0000000 

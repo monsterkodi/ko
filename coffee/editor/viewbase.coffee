@@ -30,16 +30,11 @@ ipc       = electron.ipcRenderer
 
 class ViewBase extends Editor
 
-    # 000  000   000  000  000000000
-    # 000  0000  000  000     000   
-    # 000  000 0 000  000     000   
-    # 000  000  0000  000     000   
-    # 000  000   000  000     000   
-
     constructor: (viewElem, @config) ->
         @name = viewElem
         @name = @name.slice 1 if @name[0] == '.'
-        @view = $(viewElem)        
+        @view = $(viewElem)  
+        
         @layers = document.createElement 'div'
         @layers.className = "layers"
         @view.appendChild @layers
@@ -49,15 +44,15 @@ class ViewBase extends Editor
         @view.onfocus = (event) => @emit 'focus', @
         
         layer = []
-        layer.push 'selections' 
-        layer.push 'highlights' 
+        layer.push 'selections'
+        layer.push 'highlights'
         layer.push 'meta'    if 'Meta'    in @config.features
         layer.push 'lines' 
         layer.push 'cursors'
         layer.push 'numbers' if 'Numbers' in @config.features
         @initLayers layer
         
-        @elem = $('.lines', @layers)
+        @elem = @layerDict.lines
         @diss = []
         @size = {}
         @syntax = new syntax @
@@ -69,22 +64,17 @@ class ViewBase extends Editor
         @scroll = new scroll 
             lineHeight: @size.lineHeight
             viewHeight: @viewHeight()
+            exposeMax: -5
             
         @scroll.on 'clearLines',  @clearLines
         @scroll.on 'exposeLines', @exposeLines
+        @scroll.on 'vanishLines', @vanishLines
         @scroll.on 'exposeLine',  @exposeLine
-        @scroll.on 'vanishLine',  @vanishLine
 
         @view.onkeydown = @onKeyDown
         @initDrag()    
         
         super
-        
-        # 00000000  00000000   0000000   000000000  000   000  00000000   00000000   0000000
-        # 000       000       000   000     000     000   000  000   000  000       000     
-        # 000000    0000000   000000000     000     000   000  0000000    0000000   0000000 
-        # 000       000       000   000     000     000   000  000   000  000            000
-        # 000       00000000  000   000     000      0000000   000   000  00000000  0000000 
         
         for feature in @config.features
             featureName = feature.toLowerCase()
@@ -113,28 +103,23 @@ class ViewBase extends Editor
         @renderSelection()
         @renderCursors()
 
-    #  0000000  00000000  000000000        000000000  00000000  000   000  000000000
-    # 000       000          000              000     000        000 000      000   
-    # 0000000   0000000      000              000     0000000     00000       000   
-    #      000  000          000              000     000        000 000      000   
-    # 0000000   00000000     000              000     00000000  000   000     000   
+    # 000000000  00000000  000   000  000000000
+    #    000     000        000 000      000   
+    #    000     0000000     00000       000   
+    #    000     000        000 000      000   
+    #    000     00000000  000   000     000   
     
     setText: (text) ->
         if @syntax.name == 'txt'
             @syntax.name = syntax.shebang text.slice 0, text.search /\r?\n/
         super text
                 
-    #  0000000  00000000  000000000  000      000  000   000  00000000   0000000
-    # 000       000          000     000      000  0000  000  000       000     
-    # 0000000   0000000      000     000      000  000 0 000  0000000   0000000 
-    #      000  000          000     000      000  000  0000  000            000
-    # 0000000   00000000     000     0000000  000  000   000  00000000  0000000 
-
     setLines: (lines) ->
+        # log "setLines #{@name} #{lines.length}" if @name == 'commandlist'
         if lines.length == 0
             @scroll.reset() 
         
-        lines ?= ['']
+        lines ?= []
         super lines
         @syntax.clear()      
         if @scroll.viewHeight != @viewHeight()
@@ -147,12 +132,6 @@ class ViewBase extends Editor
         @updateScrollOffset()
         @updateLayers()
 
-    #  0000000   00000000   00000000   00000000  000   000  0000000          000000000  00000000  000   000  000000000
-    # 000   000  000   000  000   000  000       0000  000  000   000           000     000        000 000      000   
-    # 000000000  00000000   00000000   0000000   000 0 000  000   000           000     0000000     00000       000   
-    # 000   000  000        000        000       000  0000  000   000           000     000        000 000      000   
-    # 000   000  000        000        00000000  000   000  0000000             000     00000000  000   000     000   
-    
     appendText: (text) ->
         
         ts = text?.split /\n/
@@ -167,11 +146,11 @@ class ViewBase extends Editor
         @emit  'linesAppended', ts
         @emit 'numLines', @lines.length
 
-    # 00000000   0000000   000   000  000000000   0000000  000  0000000  00000000
-    # 000       000   000  0000  000     000     000       000     000   000     
-    # 000000    000   000  000 0 000     000     0000000   000    000    0000000 
-    # 000       000   000  000  0000     000          000  000   000     000     
-    # 000        0000000   000   000     000     0000000   000  0000000  00000000
+    # 00000000   0000000   000   000  000000000
+    # 000       000   000  0000  000     000   
+    # 000000    000   000  000 0 000     000   
+    # 000       000   000  000  0000     000   
+    # 000        0000000   000   000     000   
 
     setFontSize: (fontSize) =>
         @view.style.fontSize = "#{fontSize}px"
@@ -188,11 +167,11 @@ class ViewBase extends Editor
         
         @emit 'fontSizeChanged'
 
-    #  0000000  00000000  000   000  000000000  00000000  00000000   000000000  00000000  000   000  000000000
-    # 000       000       0000  000     000     000       000   000     000     000        000 000      000   
-    # 000       0000000   000 0 000     000     0000000   0000000       000     0000000     00000       000   
-    # 000       000       000  0000     000     000       000   000     000     000        000 000      000   
-    #  0000000  00000000  000   000     000     00000000  000   000     000     00000000  000   000     000   
+    #  0000000  00000000  000   000  000000000  00000000  00000000 
+    # 000       000       0000  000     000     000       000   000
+    # 000       0000000   000 0 000     000     0000000   0000000  
+    # 000       000       000  0000     000     000       000   000
+    #  0000000  00000000  000   000     000     00000000  000   000
     
     centerText: (center) ->
         if center
@@ -205,20 +184,6 @@ class ViewBase extends Editor
         @updateLinePositions()
         @updateLayers()
     
-    #  0000000   0000000    0000000    000      000  000   000  00000000
-    # 000   000  000   000  000   000  000      000  0000  000  000     
-    # 000000000  000   000  000   000  000      000  000 0 000  0000000 
-    # 000   000  000   000  000   000  000      000  000  0000  000     
-    # 000   000  0000000    0000000    0000000  000  000   000  00000000
-    
-    addLine: ->
-        div = document.createElement 'div'
-        div.className = 'line'
-        div.style.height = "#{@size.lineHeight}px"
-        y = @elem.children.length * @size.lineHeight
-        div.style.transform = "translate(#{@size.offsetX}px,#{y}px)"
-        div    
-
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000
     # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
@@ -247,7 +212,6 @@ class ViewBase extends Editor
             @updateLinePositions()
             @clearHighlights()
             @layersWidth  = @layers.offsetWidth
-            @layersHeight = @layers.offsetHeight
 
         @scroll.setNumLines @lines.length
         @scroll.by 0
@@ -266,26 +230,19 @@ class ViewBase extends Editor
 
         @emit 'changed', changeInfo, action
 
-    # 0000000    00000000  000      00000000  000000000  00000000
-    # 000   000  000       000      000          000     000     
-    # 000   000  0000000   000      0000000      000     0000000 
-    # 000   000  000       000      000          000     000     
-    # 0000000    00000000  0000000  00000000     000     00000000
-
+    # 00000000  0000000    000  000000000
+    # 000       000   000  000     000   
+    # 0000000   000   000  000     000   
+    # 000       000   000  000     000   
+    # 00000000  0000000    000     000   
+    
     deleteLine: (li, oi) ->
         @elem.children[oi - @scroll.exposeTop]?.remove()
         @scroll.deleteLine li, oi
         @emit 'lineDeleted', oi
         
-    # 000  000   000   0000000  00000000  00000000   000000000
-    # 000  0000  000  000       000       000   000     000   
-    # 000  000 0 000  0000000   0000000   0000000       000   
-    # 000  000  0000       000  000       000   000     000   
-    # 000  000   000  0000000   00000000  000   000     000   
-        
     insertLine: (li, oi) -> 
-        div = @addLine()
-        div.innerHTML = @renderLineAtIndex li
+        div = @divForLineAtIndex li
         @elem.insertBefore div, @elem.children[oi - @scroll.exposeTop]
         @scroll.insertLine li, oi
         @emit 'lineInserted', li
@@ -297,56 +254,57 @@ class ViewBase extends Editor
     # 00000000  000   000  000         0000000   0000000   00000000
 
     exposeLine: (li) =>
-        if li > @elem.children.length - 1 + @scroll.exposeTop
-            div = @addLine()
-            div.innerHTML = @renderLineAtIndex li
-            @elem.appendChild div
+        # log "expose line #{li}" if @name == 'commandlist'
+        div = @divForLineAtIndex li
+        @elem.appendChild div
         
-            @emit 'lineExposed', 
+        @emit 'lineExposed',
+            lineIndex: li
+            lineDiv: div
+            
+        @renderCursors() if @cursorsInLineAtIndex(li).length
+        @renderSelection() if @rangesForLineIndexInRanges(li, @selections).length
+        @renderHighlights() if @rangesForLineIndexInRanges(li, @highlights).length
+        
+    exposeLines: (e) =>
+        before = @elem.firstChild
+        # log "ViewBase.exposeLines #{@name} before #{before?.lineIndex}", e if @name == 'commandlist'
+        for n in [0...e.num]
+            li = e.top + n
+            div = @divForLineAtIndex li
+            @elem.insertBefore div, before
+            @emit 'lineExposed',
                 lineIndex: li
                 lineDiv: div
-    
-            @renderCursors() if @cursorsInLineAtIndex(li).length
-            @renderSelection() if @rangesForLineIndexInRanges(li, @selections).length
-            @renderHighlights() if @rangesForLineIndexInRanges(li, @highlights).length
-        else
-            div = @elem.children[li-@scroll.exposeTop]
-            @emit 'lineExposed', 
-                lineIndex: li
-                lineDiv: div
-        div
-        
+
+        @updateLinePositions()
+        @updateLayers()
+        @emit 'linesExposed', e
+
     # 000   000   0000000   000   000  000   0000000  000   000
     # 000   000  000   000  0000  000  000  000       000   000
     #  000 000   000000000  000 0 000  000  0000000   000000000
     #    000     000   000  000  0000  000       000  000   000
     #     0      000   000  000   000  000  0000000   000   000
     
-    vanishLine: (li) =>
-        if (not li?) or (li < 0 )
-            li = @elem.children.length-1
-        if li == @scroll.exposeTop + @elem.children.length - 1 and @elem.lastChild?
+    vanishLines: (e) =>
+        # log "vanish lines", e if @name != 'logview'
+        top = e.top ? 0
+        while top
+            li = @elem.firstChild.lineIndex
+            @elem.firstChild.remove()
+            @emit 'lineVanished', lineIndex: li
+            top -= 1
+        bot = e.bot ? 0
+        while bot
+            li = @elem.lastChild.lineIndex
             @elem.lastChild.remove()
             @emit 'lineVanished', lineIndex: li
-
-    # 00000000  000   000  00000000    0000000    0000000  00000000        000      000  000   000  00000000   0000000
-    # 000        000 000   000   000  000   000  000       000             000      000  0000  000  000       000     
-    # 0000000     00000    00000000   000   000  0000000   0000000         000      000  000 0 000  0000000   0000000 
-    # 000        000 000   000        000   000       000  000             000      000  000  0000  000            000
-    # 00000000  000   000  000         0000000   0000000   00000000        0000000  000  000   000  00000000  0000000 
-
-    exposeLines: (e) =>
-        
-        for n in [0...e.num]
-            div = @addLine()
-            li = e.top + n
-            div.innerHTML = @renderLineAtIndex li
-            @elem.appendChild div
-
+            bot -= 1
         @updateLinePositions()
         @updateLayers()
-        @emit 'linesExposed', e
-
+        
+    
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     
     # 000   000  00000000   000   000  000000000     000     0000000 
@@ -361,8 +319,9 @@ class ViewBase extends Editor
                 
     updateLine: (li, oi) ->
         if @scroll.exposeTop <= li < @lines.length
-            span = @renderLineAtIndex li
-            @elem.children[oi - @scroll.exposeTop]?.innerHTML = span
+            if (oi - @scroll.exposeTop) < @elem.children.length
+                div = @divForLineAtIndex li
+                @elem.replaceChild div, @elem.children[oi - @scroll.exposeTop]
 
     updateLines: () ->
         for li in [@scroll.exposeTop..@scroll.exposeBot]
@@ -379,12 +338,10 @@ class ViewBase extends Editor
     # 000   000  000       000  0000  000   000  000       000   000
     # 000   000  00000000  000   000  0000000    00000000  000   000
 
-    renderLineAtIndex: (li) -> 
-        html = render.line @syntax.getDiss(li), @size
-        if @showInvisibles
-            tx = @lines[li].length * @size.charWidth + 1
-            html += "<span class=\"invisible newline\" style=\"transform:translate(#{tx}px, -1.5px);\">&#9687;</span>"
-        html
+    divForLineAtIndex: (li) ->
+        div = render.lineDiv (li-@scroll.exposeTop) * @size.lineHeight, @syntax.getDiss(li), @size
+        div.lineIndex = li
+        div
     
     renderCursors: ->
         cs = []
@@ -425,15 +382,15 @@ class ViewBase extends Editor
             h += render.selection s, @size, "highlight"
         $('.highlights', @layers).innerHTML = h
 
-    # 00000000   00000000   0000000  000  0000000  00000000  0000000  
-    # 000   000  000       000       000     000   000       000   000
-    # 0000000    0000000   0000000   000    000    0000000   000   000
-    # 000   000  000            000  000   000     000       000   000
-    # 000   000  00000000  0000000   000  0000000  00000000  0000000  
+    # 00000000   00000000   0000000  000  0000000  00000000
+    # 000   000  000       000       000     000   000     
+    # 0000000    0000000   0000000   000    000    0000000 
+    # 000   000  000            000  000   000     000     
+    # 000   000  00000000  0000000   000  0000000  00000000
 
     resized: -> 
         vh = @view.clientHeight
-        @scroll?.setViewHeight vh
+        @scroll.setViewHeight vh
         @numbers?.elem.style.height = "#{@scroll.exposeNum * @scroll.lineHeight}px"
         @layers.style.width = "#{sw()-@view.getBoundingClientRect().left-130-6}px"
         @layers.style.height = "#{vh}px"
@@ -475,6 +432,7 @@ class ViewBase extends Editor
     scrollLines: (delta) -> @scrollBy delta * @size.lineHeight
 
     scrollBy: (delta, x=0) ->        
+        # console.log "scrollBy #{delta}"
         @scroll.by delta if delta
         @layers.scrollLeft += x/2 if x
         @updateScrollOffset()
@@ -499,10 +457,10 @@ class ViewBase extends Editor
 
     updateCursorOffset: ->
         cx = @mainCursor[0]*@size.charWidth+@size.offsetX
-        if cx-@scroll.offsetLeft > @layersWidth
+        if cx-@layers.scrollLeft > @layersWidth
             @scroll.offsetLeft = Math.max 0, cx - @layersWidth + @size.charWidth
             @layers.scrollLeft = @scroll.offsetLeft
-        else if cx-@size.offsetX-@scroll.offsetLeft < 0
+        else if cx-@size.offsetX-@layers.scrollLeft < 0
             @scroll.offsetLeft = Math.max 0, cx - @size.offsetX
             @layers.scrollLeft = @scroll.offsetLeft
     
@@ -515,8 +473,8 @@ class ViewBase extends Editor
     posAtXY:(x,y) ->
 
         sl = @layers.scrollLeft
-        st = @layers.scrollTop
-        br = @layers.getBoundingClientRect()
+        st = @scroll.offsetTop
+        br = @view.getBoundingClientRect()
         lx = clamp 0, @layers.offsetWidth,  x - br.left - @size.offsetX + @size.charWidth/3
         ly = clamp 0, @layers.offsetHeight, y - br.top
         px = parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth))
@@ -547,29 +505,24 @@ class ViewBase extends Editor
         log "not found! #{x} #{y} line #{lineElem?}"
         null
 
-    # 000      000  000   000  00000000   0000000
-    # 000      000  0000  000  000       000     
-    # 000      000  000 0 000  0000000   0000000 
-    # 000      000  000  0000  000            000
-    # 0000000  000  000   000  00000000  0000000 
-    
     viewHeight:   -> @scroll?.viewHeight ? @view?.clientHeight 
     numFullLines: -> Math.floor(@viewHeight() / @size.lineHeight)
     
-    clearLines: => 
-        @elem.innerHTML = ""
+    clearLines: =>
+        while lastChild = @elem.lastChild 
+            @elem.removeChild lastChild
         @emit 'clearLines'
 
-    clear: => @setLines ['']
+    clear: => @setLines []
         
     focus: -> @view.focus()
 
-    # 00     00   0000000   000   000   0000000  00000000
-    # 000   000  000   000  000   000  000       000     
-    # 000000000  000   000  000   000  0000000   0000000 
-    # 000 0 000  000   000  000   000       000  000     
-    # 000   000   0000000    0000000   0000000   00000000
-
+    #   0000000    00000000    0000000    0000000 
+    #   000   000  000   000  000   000  000      
+    #   000   000  0000000    000000000  000  0000
+    #   000   000  000   000  000   000  000   000
+    #   0000000    000   000  000   000   0000000 
+    
     initDrag: ->
         @drag = new drag
             target:  @layers
@@ -624,11 +577,11 @@ class ViewBase extends Editor
         @tripleClickLineIndex = -1
         @doubleClicked = @tripleClicked = false
        
-    #       000  000   000  00     00  00000000         000000000   0000000 
-    #       000  000   000  000   000  000   000           000     000   000
-    #       000  000   000  000000000  00000000            000     000   000
-    # 000   000  000   000  000 0 000  000                 000     000   000
-    #  0000000    0000000   000   000  000                 000      0000000 
+    #       000  000   000  00     00  00000000 
+    #       000  000   000  000   000  000   000
+    #       000  000   000  000000000  00000000 
+    # 000   000  000   000  000 0 000  000      
+    #  0000000    0000000   000   000  000      
     
     jumpTo: (word, opt) ->
         
@@ -734,7 +687,7 @@ class ViewBase extends Editor
 
         stop = (event) ->
             event.preventDefault()
-            event.stopPropagation()        
+            event.stopPropagation()
 
         if @autocomplete?
             return stop event if 'unhandled' != @autocomplete.handleModKeyComboEvent mod, key, combo, event

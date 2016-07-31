@@ -64,7 +64,7 @@ class Term extends Command
     #  0000000  0000000  00000000  000   000  000   000
     
     clear: ->
-        if window.terminal.lines.length > 1
+        if window.terminal.lines.length > 0
             window.terminal.clear()
         else
             text: ''

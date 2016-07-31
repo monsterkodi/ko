@@ -24,7 +24,6 @@ class CommandList extends ViewBase
             lineHeight: 1.4
 
         @numbers.elem.style.fontSize = "#{@fontSizeDefault}px"        
-        @setLines @lines
         @numbers.opacity = 0.1
         @numbers.setOpacity 0.1
     
@@ -35,7 +34,8 @@ class CommandList extends ViewBase
     # 000   000  0000000    0000000    000     000     00000000  000   000  0000000 
     
     addItems: (items) ->
-        @setLines ['']
+        @clear()
+        # log "CommandList.addItems #{items.length}", @scroll.info()
         index = 0
         for item in items
             continue if not item? 
@@ -57,8 +57,9 @@ class CommandList extends ViewBase
                 list: index
             index += 1
         @view.style.height = "#{@size.lineHeight * Math.min @maxLines, items.length}px"
-        @resized()  
-    
+        @resized()
+        # log "CommandList.addItems #{items.length}", @scroll.info()
+        
     #  0000000   00000000   00000000   00000000  000   000  0000000  
     # 000   000  000   000  000   000  000       0000  000  000   000
     # 000000000  00000000   00000000   0000000   000 0 000  000   000
@@ -80,11 +81,10 @@ class CommandList extends ViewBase
             alert('no meta?')
             throw new Error
         @meta.append meta
-        del1st = @lines.length == 1 and @lines[0].length == 0
         if meta.diss?
             @appendLineDiss Syntax.lineForDiss(meta.diss), meta.diss 
         else if meta.text? and meta.text.trim().length
-            r = meta.rngs ? []
+            r    = meta.rngs ? []
             text = meta.text.trim()
             rngs = r.concat Syntax.rangesForTextAndSyntax text, meta.type or 'ko'
             matchr.sortRanges rngs
@@ -92,10 +92,6 @@ class CommandList extends ViewBase
             @appendLineDiss text, diss 
         else    
             @appendLineDiss ''
-        if del1st
-            @do.start()
-            @do.delete 0 
-            @do.end()
         
     queueMeta: (meta) ->
         @metaQueue.push meta

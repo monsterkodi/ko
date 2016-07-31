@@ -18,17 +18,16 @@ class Minimap
 
     constructor: (@editor) ->
         
-        @width = 2*parseInt getStyle '.minimap', 'width'
+        minimapWidth = parseInt getStyle '.minimap', 'width'
+        @width = 2*minimapWidth
         @height = 8192
         @offsetLeft = 6
             
         @elem = document.createElement 'div'
         @elem.className = 'minimap'
 
-        @topbot = document.createElement 'canvas'
-        @topbot.className = "minimapTopBot"
-        @topbot.height = @height
-        @topbot.width  = @width
+        @topbot = document.createElement 'div'
+        @topbot.className = "topbot"
         @elem.appendChild @topbot
 
         @selections = document.createElement 'canvas'
@@ -106,10 +105,12 @@ class Minimap
                 
     drawLines: (top=@scroll.exposeTop, bot=@scroll.exposeBot) =>
         ctx = @lines.getContext '2d'
+        y = parseInt((top-@scroll.exposeTop)*@scroll.lineHeight)
+        ctx.clearRect 0, y, @width, (bot-top+1)*@scroll.lineHeight        
         for li in [top..bot]
             diss = @editor.syntax.getDiss li
             y = parseInt((li-@scroll.exposeTop)*@scroll.lineHeight)
-            ctx.clearRect 0, y, @width, @scroll.lineHeight
+            # ctx.clearRect 0, y, @width, @scroll.lineHeight
             if diss?.length
                 for r in diss
                     break if 2*r.start >= @width
@@ -152,15 +153,11 @@ class Minimap
         ctx.fillRect @offsetLeft-4, y, @offsetLeft-2, @scroll.lineHeight
 
     drawTopBot: =>
-        @topbot.height = @height
-        ctx = @topbot.getContext '2d'
         lh = @scroll.lineHeight/2
         tb = (@editor.scroll.bot-@editor.scroll.top+1)*lh
-        ctx.fillStyle = '#222'
-        y = parseInt @scroll.lineHeight * @editor.scroll.top - @scroll.exposeTop*@scroll.lineHeight
-        ctx.fillRect 0, y, @width, 2*Math.max 4, tb
-        b = parseInt @scroll.lineHeight * (@editor.lines.length-0.5-@scroll.exposeTop*@scroll.lineHeight)
-        ctx.fillRect 0, b, @width, @scroll.lineHeight/2
+        ty = @editor.scroll.scrollMax and (Math.min(0.5*@scroll.viewHeight, @scroll.numLines*2)-tb) * (@editor.scroll.scroll / @editor.scroll.scrollMax) or 0
+        @topbot.style.height = "#{tb}px"
+        @topbot.style.top    = "#{ty}px"
        
     # 00000000  000   000  00000000    0000000    0000000  00000000
     # 000        000 000   000   000  000   000  000       000     
@@ -169,7 +166,7 @@ class Minimap
     # 00000000  000   000  000         0000000   0000000   00000000
     
     onExposeLines: (e) => @drawLines e.top, e.bot
-    exposeLine: (li) => @drawLines li, li
+    exposeLine: (li)   => @drawLines li, li
         
     #  0000000  000   000   0000000   000   000   0000000   00000000
     # 000       000   000  000   000  0000  000  000        000     
@@ -197,8 +194,6 @@ class Minimap
         
         if redraw <= @scroll.exposeBot            
             @drawLines redraw, @scroll.exposeBot
-            @drawTopBot()
-            
         
     # 00     00   0000000   000   000   0000000  00000000
     # 000   000  000   000  000   000  000       000     
@@ -268,7 +263,6 @@ class Minimap
         @selections.style.transform = t
         @highlights.style.transform = t
         @cursors.style.transform    = t
-        @topbot.style.transform     = t
         @lines.style.transform      = t
         
     #  0000000  000      00000000   0000000   00000000 
@@ -278,7 +272,6 @@ class Minimap
     #  0000000  0000000  00000000  000   000  000   000
     
     clearRange: (top, bot) -> 
-        # @log "minimap.clearRange #{top} #{bot}"
         ctx = @lines.getContext '2d'
         ctx.clearRect 0, (top-@scroll.exposeTop)*@scroll.lineHeight, 2*@width, (bot-top)*@scroll.lineHeight
         
@@ -288,11 +281,5 @@ class Minimap
         @cursors.width    = @cursors.width
         @topbot.width     = @topbot.width
         @lines.width      = @lines.width
-        
-    log: -> 
-        if @editor.name == 'logview'
-            console.log (str(s) for s in [].slice.call arguments, 0).join " "
-        else
-            log (str(s) for s in [].slice.call arguments, 0).join " "
         
 module.exports = Minimap

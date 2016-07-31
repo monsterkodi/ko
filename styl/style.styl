@@ -483,13 +483,6 @@ body
 .commandline-editor .layers
     min-height          commandlineHeight
 
-.lines
-.cursors
-.highlights
-.selections
-    pointer-events      none
-    fill-abs()
-
 // 000      000  000   000  00000000   0000000
 // 000      000  0000  000  000       000     
 // 000      000  000 0 000  0000000   0000000 
@@ -499,6 +492,7 @@ body
 .lines
     cursor              default
     font-size           inherit
+    pointer-events      none
 
 .line
     font-size           inherit
@@ -506,6 +500,7 @@ body
     position            absolute
     & span
         position        absolute
+        pointer-events  none
 
 //  0000000  000   000  00000000    0000000   0000000   00000000 
 // 000       000   000  000   000  000       000   000  000   000
@@ -513,19 +508,6 @@ body
 // 000       000   000  000   000       000  000   000  000   000
 //  0000000   0000000   000   000  0000000    0000000   000   000
         
-//@keyframes blink 
-//  from 
-//    background      #ff0
-//  to 
-//    background      #800
-//    
-//*:focus .cursor.main
-//   animation-name      blink
-//   animation-duration  500ms
-//   animation-iteration-count infinite
-//   animation-direction alternate
-//   animation-timing-function ease-in-out
-
 .cursor
     width                2px
     margin-right        -1px
@@ -575,19 +557,6 @@ body
 .commandlist .layers .numbers
     background          rgba(0, 0, 0, 0.1) // this darkens selection
 
-//@keyframes number-blink 
-//  from 
-//    color      #ff0
-//  to 
-//    color      #800
-//    
-//*:focus .linenumber.cursored.main span  
-//   animation-name      number-blink
-//   animation-duration  500ms
-//   animation-iteration-count infinite
-//   animation-direction alternate
-//   animation-timing-function ease-in-out
-
 .linenumber
     width               numbersWidth
     border-right        thinBorder
@@ -621,7 +590,7 @@ body
 
 .meta
     position            absolute
-    pointer-events      all
+    pointer-events      auto
     background          #333
     opacity             0.8
     
@@ -633,7 +602,8 @@ body
     border-bottom-right-radius   metaRadius
     
     &.href
-        cursor          pointer
+        cursor              pointer
+        background-color    #333
 
     &.coffeeResult
     &.searchResult
@@ -649,7 +619,7 @@ body
         background      transparent
 
 .linenumber span .saveButton    
-    pointer-events      all
+    pointer-events      auto
     cursor              pointer
     background          #f80
     width               initial
@@ -675,6 +645,7 @@ body
     cursor              pointer
     background          #000
     border-left         thinBorder
+    pointer-events      auto
 
 canvas
     pointer-events      none
@@ -682,6 +653,13 @@ canvas
     top                 0
     right               0
     overflow            hidden
+
+.topbot
+    background-color    #222
+    position            absolute
+    right               0
+    width               minimapWidth
+    pointer-events      none
 
 .minimapTopBot
     background-color    #000

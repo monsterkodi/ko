@@ -14,7 +14,7 @@ class Terminal extends ViewBase
 
     constructor: (viewElem) ->
         
-        @fontSizeDefault = 14
+        @fontSizeDefault = 15
         @metaQueue = []
         
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Meta']
@@ -65,15 +65,15 @@ class Terminal extends ViewBase
         if meta.diss?
             @appendLineDiss syntax.lineForDiss(meta.diss), meta.diss 
         else if meta.clss == 'salt'
-            del1st = @lines.length == 1 and @lines[0].length == 0
+            # del1st = @lines.length == 1 and @lines[0].length == 0
             @appendMeta clss: 'spacer'
             for l in salt(meta.text).split '\n'
                 @appendMeta clss: 'spacer', diss: syntax.dissForTextAndSyntax l, 'ko'
             @appendMeta clss: 'spacer'
-            if del1st
-                @do.start()
-                @do.delete 0 
-                @do.end()
+            # if del1st
+                # @do.start()
+                # @do.delete 0 
+                # @do.end()
         else
             @appendLineDiss ''
         

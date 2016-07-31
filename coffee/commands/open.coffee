@@ -62,7 +62,7 @@ class Open extends Command
 
         if command == '.' and @navigating == false
             @navigating = true
-            @setText ''
+            @setLines []
             @showItems @listItems includeThis: false
             @select 0
             @positionList()            

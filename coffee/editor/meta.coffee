@@ -24,9 +24,10 @@ class Meta
         @editor.on 'lineInserted',     @onLineInserted
         @editor.on 'willDeleteLine',   @onWillDeleteLine
         @editor.on 'lineExposed',      @onLineExposed
-        @editor.on 'lineVanished',     @onLineVanished
-        @editor.on 'lineVanishedTop',  @onLineVanishedTop
         @editor.on 'linesExposed',     @onLinesExposed
+        @editor.on 'lineVanished',     @onLineVanished
+        # @editor.on 'lineVanishedTop',  @onLineVanishedTop
+        @editor.on 'exposeTopChanged', @onExposeTopChanged
         @editor.on 'fontSizeChanged',  @onFontSizeChange
         
         @editor.numbers.on 'numberAdded',   @onNumber
@@ -116,6 +117,7 @@ class Meta
     # 000   000   0000000   000   000  0000000    00000000  000   000
     
     onNumber: (e) =>
+        # log 'onNumber', e
         metas = @metasAtLineIndex e.lineIndex
         for meta in metas
             meta[2].span = e.numberSpan
@@ -136,6 +138,7 @@ class Meta
     # 0000000    000      0    
 
     addDiv: (meta) ->
+        # log "addDiv", meta
         size = @editor.size
         sw = size.charWidth * (meta[1][1]-meta[1][0])
         tx = size.charWidth *  meta[1][0] + size.offsetX
@@ -199,7 +202,8 @@ class Meta
     # 000   000  000        000        000       000  0000  000   000  000       000   000
     # 000   000  000        000        00000000  000   000  0000000    00000000  0000000  
         
-    onLineAppended: (e) =>        
+    onLineAppended: (e) =>  
+        # log "meta.onLineAppended #{e.lineIndex}"
         for meta in @metasAtLineIndex e.lineIndex
             meta[1][1] = e.text.length if meta[1][1] is 0
                 
@@ -223,10 +227,18 @@ class Meta
     # 00000000  000   000  000         0000000   0000000   00000000
         
     onLineExposed: (e) =>
+        # log "onLineExposed #{e.lineIndex}"
         for meta in @metasAtLineIndex e.lineIndex
+            # log "onLineExposed #{e.lineIndex}", meta
             @addDiv meta
         
-    onLinesExposed: (e) => @updatePositionsBelowLineIndex e.top
+    onLinesExposed: (e) => 
+        # log "meta.onLinesExposed", e
+        # for li in [e.top..e.bot]
+            # @onLineExposed lineIndex: li
+        @updatePositionsBelowLineIndex e.top
+        
+    onExposeTopChanged: (e) => @updatePositionsBelowLineIndex e.new
         
     updatePositionsBelowLineIndex: (li) ->     
         size = @editor.size
@@ -253,6 +265,7 @@ class Meta
     # 0000000    00000000  0000000  00000000     000     00000000  0000000  
     
     onWillDeleteLine: (li) => 
+        # log "Meta.onWillDeleteLine li:#{li}"
         @onLineVanished lineIndex: li
         _.pullAll @metas, @metasAtLineIndex li
         for meta in @editor.rangesFromTopToBotInRanges li+1, @editor.lines.length, @metas
@@ -265,14 +278,15 @@ class Meta
     #    000     000   000  000  0000  000       000  000   000
     #     0      000   000  000   000  000  0000000   000   000
 
-    onLineVanishedTop: (e) => 
-        @onLineVanished e
-        @updatePositionsBelowLineIndex e.lineIndex
+    # onLineVanishedTop: (e) => 
+    #     @onLineVanished e
+    #     @updatePositionsBelowLineIndex e.lineIndex
         
     onLineVanished: (e) => 
         for meta in @metasAtLineIndex e.lineIndex
             meta[2].div?.remove()
-            meta[2].div = null        
+            meta[2].div = null
+        @updatePositionsBelowLineIndex e.lineIndex
     
     #  0000000  000      00000000   0000000   00000000 
     # 000       000      000       000   000  000   000
