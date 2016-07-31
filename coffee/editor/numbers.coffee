@@ -115,23 +115,23 @@ class Numbers extends event
         
         if @elem.firstChild?.lineIndex == e.lineIndex
             @elem.firstChild.remove()
-        else if @elem.lastChild?.lineIndex == e.lineIndex
+        else if @elem.lastChild?.lineIndex >= e.lineIndex
             @elem.lastChild.remove()
-        else
-            log "vanish? #{@editor.name} #{e.lineIndex} #{@elem.firstChild.lineIndex} #{@elem.lastChild.lineIndex}" if @editor.name != 'logview'
+        # else
+            # log "vanish? #{@editor.name} #{e.lineIndex} #{@elem.firstChild.lineIndex} #{@elem.lastChild.lineIndex}" if @editor.name != 'logview'
     
     onLineDeleted: (li) =>
         top = @editor.scroll.exposeTop
         bot = @editor.scroll.exposeBot
         if top <= li <= bot
             for i in [li..bot]
-                div = @elem.children[li-top]
-                div.firstChild.textContent = "#{li+1}"
+                div = @elem.children[i-top]
+                div.firstChild.textContent = "#{i+1}"
+                @updateColor i
                 @emit 'numberChanged', 
                     numberDiv:  div
                     numberSpan: div.firstChild
                     lineIndex:  i
-                @updateColor i
         @elem.lastChild?.remove()
         
     #  0000000   0000000    0000000    000      000  000   000  00000000

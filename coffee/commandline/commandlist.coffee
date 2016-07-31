@@ -35,7 +35,6 @@ class CommandList extends ViewBase
     
     addItems: (items) ->
         @clear()
-        # log "CommandList.addItems #{items.length}", @scroll.info()
         index = 0
         for item in items
             continue if not item? 
@@ -58,7 +57,6 @@ class CommandList extends ViewBase
             index += 1
         @view.style.height = "#{@size.lineHeight * Math.min @maxLines, items.length}px"
         @resized()
-        # log "CommandList.addItems #{items.length}", @scroll.info()
         
     #  0000000   00000000   00000000   00000000  000   000  0000000  
     # 000   000  000   000  000   000  000       0000  000  000   000

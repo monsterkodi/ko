@@ -191,8 +191,9 @@ class Term extends Command
                 @setState 'idCommands', @idCommands
                 super command # @setCurrent command -> moves items in @history
         for cmmd in cmds
-            terminal.appendMeta clss: 'salt', text: cmmd.slice 0, 32                        
-            terminal.singleCursorAtPos [0, terminal.lines.length-1]
+            terminal.appendMeta clss: 'salt', text: cmmd.slice 0, 32
+            terminal.singleCursorAtPos [0, terminal.lines.length-2]
+            terminal.scrollCursorToTop 5
                 
             args = cmmd.split ' '
             cmd  = args.shift()
