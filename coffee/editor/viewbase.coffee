@@ -341,6 +341,13 @@ class ViewBase extends Editor
     divForLineAtIndex: (li) ->
         div = render.lineDiv (li-@scroll.exposeTop) * @size.lineHeight, @syntax.getDiss(li), @size
         div.lineIndex = li
+        if @showInvisibles
+            tx = @lines[li].length * @size.charWidth + 1
+            span = document.createElement 'span'
+            span.className = "invisible newline"
+            span.style.transform = "translate(#{tx}px, -1.5px)"
+            span.innerHTML = '&#9687;'
+            div.appendChild span
         div
     
     renderCursors: ->
