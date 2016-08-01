@@ -300,7 +300,7 @@ the mode will deactivate itself automatically in most circumstances. you can als
 #   000  000   000  000        0000000 
 --->
 ## info area
-the space between the minimaps displays some useful numbers
+at the right end of the commandline (above the editor minimap) some useful numbers are displayed:
 - top row:
     - cursor column
     - cursors
