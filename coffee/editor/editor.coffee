@@ -468,8 +468,9 @@ class Editor extends Buffer
         @highlights = @rangesForText text, opt
         if @highlights.length
             switch opt?.select
-                when 'after' then @selectSingleRange @rangeAfterPosInRanges(@cursorPos(), @highlights) ? first @highlights
-                when 'first' then @selectSingleRange first @highlights            
+                when 'after'  then @selectSingleRange @rangeAfterPosInRanges(@cursorPos(), @highlights) ? first @highlights
+                when 'before' then @selectSingleRange @rangeBeforePosInRanges(@cursorPos(), @highlights) ? first @highlights
+                when 'first'  then @selectSingleRange first @highlights            
             @scrollCursorToTop() if not opt?.noScroll            
         @renderHighlights()
         @emit 'highlight'

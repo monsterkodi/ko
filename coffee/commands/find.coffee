@@ -59,5 +59,25 @@ class Find extends Command
             log "find.execute warning! no editor for @focus #{@focus}?"
         text:   command
         select: true
+        
+    # 000   000  00000000  000   000
+    # 000  000   000        000 000 
+    # 0000000    0000000     00000  
+    # 000  000   000          000   
+    # 000   000  00000000     000   
+    
+    handleModKeyComboEvent: (mod, key, combo, event) -> 
+        switch combo
+            when 'shift+enter'
+                if editor = window.editorWithClassName @focus
+                    editor.highlightText @getText(),
+                        type: @type
+                        select: 'before'
+                    return
+            when 'tab'
+                if editor = window.editorWithClassName @focus
+                    editor.focus()
+                    return
+        super mod, key, combo, event
       
 module.exports = Find

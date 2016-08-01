@@ -137,6 +137,12 @@ search in current file
 - **⌘⌥F** fuzzy search
 - **⌘^F** glob search
      
+when the find commandline has focus
+- **enter** select next highlighted word
+- **shift+enter** select previous highlighted word
+- **tab** set focus on editor
+- **⌘enter** select next highlighted word and set focus on editor
+
 <!---
 #    0000000  00000000   0000000   00000000    0000000  000   000
 #   000       000       000   000  000   000  000       000   000
