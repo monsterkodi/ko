@@ -23,8 +23,7 @@
     - goto lines or class/method/function-definitions
 
 **terminal**
-- alias
-- history
+- alias, history
 - echos commands as ascii-headers
 - output of commands editable/searchable
 
@@ -282,6 +281,8 @@ coffee-script macros
 
 - **⌘** while dragging to turn off cursor placement
 - **⇧** while dragging/clicking to select lines
+
+![minimap](img/minimap.png)
 
 <!---
 #   00     00  000   000  000      000000000  000   0000000  000   000  00000000    0000000   0000000   00000000    0000000
