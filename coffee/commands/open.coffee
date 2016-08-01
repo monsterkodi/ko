@@ -129,6 +129,8 @@ class Open extends Command
         # parent
         # sibling/directories
         
+        return item.bonus if item.bonus?
+        
         f = item.file
         r = item.text
         b = path.basename f
@@ -138,7 +140,8 @@ class Open extends Command
         else
             localBonus = Math.max 0, (5-r.split('../').length) * 0x00000333
 
-        relBonus = baseBonus = 0
+        relBonus = 0
+        baseBonus = 0
         if opt?.currentText?.length
             relBonus  = r.startsWith(opt.currentText) and 0x0000ffff * (opt.currentText.length/r.length) or 0 
             baseBonus = b.startsWith(opt.currentText) and 0x00000888 or 0
@@ -162,7 +165,8 @@ class Open extends Command
             w = localBonus + relBonus + baseBonus + directoryBonus + extensionBonus - lengthPenalty
         w
 
-    weightedItems: (items, opt) -> _.sortBy items, (o) => 0xffffffff - @weight o, opt
+    weightedItems: (items, opt) -> 
+        _.sortBy items, (o) => 0xffffffff - @weight o, opt
     
     # 000      000   0000000  000000000
     # 000      000  000          000   
@@ -177,13 +181,16 @@ class Open extends Command
 
         if not @navigating
             if @history.length
+                bonus = 0x000fffff
                 for f in @history
                     if f.length and (f != @file) and fileExists f
                         item = Object.create null
                         item.text = relative f, @dir
                         item.file = f
+                        item.bonus = bonus
                         items.push item
                         @lastFileIndex = items.length-1
+                        bonus -= 1
                     else
                         _.pullAll @history, f
 

@@ -24,8 +24,12 @@ keywords
                 script
                 coffee-script
                 coffeescript
-author          monsterkodi
 license         Unlicense
+author          monsterkodi
+maintainers
+                .
+                  name    monsterkodi
+                  email   monsterkodi@gmx.net
 bugs
                 url  https://github.com/monsterkodi/ko/issues
 build
@@ -73,7 +77,3 @@ dependencies
                 underscore.string  ^3.3.4
                 walkdir         0.0.11
                 write-file-atomic  ^1.1.4
-maintainers
-                .
-                  name    monsterkodi
-                  email   monsterkodi@gmx.net

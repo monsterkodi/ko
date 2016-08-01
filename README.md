@@ -342,11 +342,15 @@ when clicking on these numbers:
 ## misc
 
 - **F2** global shortcut to activate ko
-- **⌘L** select more lines **⌘⇧L** select less lines
+- **⌘E** (selects word under cursor and) highlights occurences of selected word
+- **⌘D** (selects word under cursor and) selects next highlighted word 
+- **⌘⇧D** deselects last selected word
 - **⌥up|down** move selected|cursor lines up|down
+- **⌘L** select more lines **⌘⇧L** select less lines
 - **⌥/** toggle comment on selected|cursor lines
 - **⌘I** inverted line selection: select lines without a cursor or a selection
-- **⌘return** evaluate current buffer with coffee in main process and print the result in terminal view
+- **⌘return** insert empty line below cursor and move cursor down
+- **^return** evaluate current buffer with coffee in main process and print the result in terminal view
 - **⌘⌥up** jump to counterpart file (coffee <-> js, cpp <-> h, pug <-> html, etc)
 - **⌘\** toggle text offset when window is as wide as screen
 
