@@ -39,7 +39,7 @@ false                          value.bool.false
 
 (\#)(define|pragma|endif|if|ifdef|ifndef)(.*)  . macro.marker . macro.define . macro
 (\b[A-Z\_]+)(\()([^\)]*)(\))                   . macro.call . macro.marker . macro.argument . macro.marker
-[A-Z0-9]+[\_][A-Z0-9\_]+                         macro.call
+\b[A-Z0-9\_]+\b                                  macro
 
 # null
 
