@@ -87,6 +87,11 @@ clicking on the command name lists all modes and their shortcuts:
     
 ![commandline](img/commandline.png)
 
+while the commandline has focus:
+- **^up|down** move command input up|down
+- **⌘up|down** move command input to top|bottom of window
+- **⌥up|down** move command input a quarter of window up|down
+
 ## terminal
 
 - **⌘T** to activate input
@@ -354,14 +359,9 @@ when clicking on these numbers:
 - **⌘⌥up** jump to counterpart file (coffee <-> js, cpp <-> h, pug <-> html, etc)
 - **⌘\** toggle text offset when window is as wide as screen
 
-- macro commands
-    **inv** toggle display of line endings
-    **fps** toggle the fps graph besides the info area
-
-while the command input has focus:
-- **^up|down** move command input up|down
-- **⌘up|down** move command input to top|bottom of window
-- **⌥up|down** move command input a quarter of window up|down
+macro commands
+- **inv** toggle display of line endings
+- **fps** toggle the fps graph besides the info area
 
 ### to use ko from a terminal
 
