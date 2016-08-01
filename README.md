@@ -64,11 +64,11 @@
     - **class** creates a new file with simple class skeleton
 
 <!---
- 0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
-000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
-000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 
-000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
- 0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
+#    0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
+#   000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
+#   000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 
+#   000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
+#    0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 --->
 ## commandline
 
@@ -121,6 +121,13 @@ all other commands are passed to a child process running bash
 
 ![terminal](img/terminal.png)
 
+<!---
+#   00000000  000  000   000  0000000  
+#   000       000  0000  000  000   000
+#   000000    000  000 0 000  000   000
+#   000       000  000  0000  000   000
+#   000       000  000   000  0000000  
+--->
 ## find
 search in current file
 - **⌘F**  case insensitive
@@ -130,6 +137,13 @@ search in current file
 - **⌘⌥F** fuzzy search
 - **⌘^F** glob search
      
+<!---
+#    0000000  00000000   0000000   00000000    0000000  000   000
+#   000       000       000   000  000   000  000       000   000
+#   0000000   0000000   000000000  0000000    000       000000000
+#        000  000       000   000  000   000  000       000   000
+#   0000000   00000000  000   000  000   000   0000000  000   000
+--->
 ## search
 search in project files
 - **⌘⇧F**   case   insensitive
@@ -165,6 +179,13 @@ cursors can be positioned after the end of line
 
 ![cursors](img/cursors.png)
 
+<!---
+#    0000000   00000000   00000000  000   000
+#   000   000  000   000  000       0000  000
+#   000   000  00000000   0000000   000 0 000
+#   000   000  000        000       000  0000
+#    0000000   000        00000000  000   000
+--->
 ## open
 
 opens files quickly via fuzzy matching
@@ -195,6 +216,13 @@ in editor:
 - **⌥enter** goto word under main cursor
 - **⌥click** goto clicked word
 
+<!---
+#    0000000   0000000   00000000  00000000  00000000  00000000
+#   000       000   000  000       000       000       000     
+#   000       000   000  000000    000000    0000000   0000000 
+#   000       000   000  000       000       000       000     
+#    0000000   0000000   000       000       00000000  00000000
+--->
 ## coffee
 
 evaluates coffee-script code in the main process and prints results in terminal
@@ -209,6 +237,13 @@ evaluates coffee-script code in the main process and prints results in terminal
 
 ![cursors](img/coffee.png)
 
+<!---
+#   000   000  000  000   000  0000000     0000000   000   000   0000000
+#   000 0 000  000  0000  000  000   000  000   000  000 0 000  000     
+#   000000000  000  000 0 000  000   000  000   000  000000000  0000000 
+#   000   000  000  000  0000  000   000  000   000  000   000       000
+#   00     00  000  000   000  0000000     0000000   00     00  0000000 
+--->
 ## windows
 
 - **⌘⌥A** switch between tiled and stacked windows
@@ -221,6 +256,13 @@ evaluates coffee-script code in the main process and prints results in terminal
 - **⌘⇧N** clone current file in new window
 - **⌘⌥Q** close all windows (they won't restore on next start) and quit
 
+<!---
+#    0000000   0000000   000      000000000
+#   000       000   000  000         000   
+#   0000000   000000000  000         000   
+#        000  000   000  000         000   
+#   0000000   000   000  0000000     000   
+--->
 ## ascii-headers
 
 the ascii-header mode lets you insert or edit ascii-headers
@@ -238,11 +280,25 @@ in ascii-header mode ...
     
 the mode will deactivate itself automatically in most circumstances. you can also force deactivate it with **esc**
 
+<!---
+#   00     00  000  000   000  000  00     00   0000000   00000000 
+#   000   000  000  0000  000  000  000   000  000   000  000   000
+#   000000000  000  000 0 000  000  000000000  000000000  00000000 
+#   000 0 000  000  000  0000  000  000 0 000  000   000  000      
+#   000   000  000  000   000  000  000   000  000   000  000      
+--->
 ## minimap
 
 - **⌘** while dragging to turn off cursor placement
 - **⇧** while dragging/clicking to select lines
 
+<!---
+#   000  000   000  00000000   0000000 
+#   000  0000  000  000       000   000
+#   000  000 0 000  000000    000   000
+#   000  000  0000  000       000   000
+#   000  000   000  000        0000000 
+--->
 ## info area
 the space between the minimaps displays some useful numbers
 - top row:
@@ -269,7 +325,14 @@ when clicking on these numbers:
     - clear the selections|highlights|cursors
 - indexed classes|functions|files|words
     - run the term command classes|funcs|files|words
-    
+
+<!---
+#   00     00  000   0000000   0000000
+#   000   000  000  000       000     
+#   000000000  000  0000000   000     
+#   000 0 000  000       000  000     
+#   000   000  000  0000000    0000000
+--->
 ## misc
 
 - **F2** global shortcut to activate ko

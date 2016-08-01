@@ -109,9 +109,11 @@ class Editor extends Buffer
         
         @surroundCharacters = "{}[]()\"'".split ''
         switch @fileType
-            when 'md'     then @surroundCharacters = @surroundCharacters.concat '*'.split ''
             when 'html'   then @surroundCharacters = @surroundCharacters.concat '<>'.split ''
             when 'coffee' then @surroundCharacters = @surroundCharacters.concat '#'.split ''
+            when 'md'     
+                @surroundCharacters = @surroundCharacters.concat '*<'.split ''
+                @surroundPairs['<'] = ['<!---', '--->']
              
         @indentNewLineMore = null
         @indentNewLineLess = null
@@ -250,6 +252,7 @@ class Editor extends Buffer
         return rgs if rgs.length == 5
       
     setSalterMode: (active=true) ->
+        log "set salter mode #{active}"
         @salterMode = active
         @layerDict?['cursors']?.classList.toggle "salterMode", active
                             
@@ -1010,7 +1013,7 @@ class Editor extends Buffer
         
     insertNewline: (opt) ->
         
-        if @salterMode?
+        if @salterMode
             @mainCursor = @rangeEndPos @rangeForLineAtIndex @mainCursor[1]
             @cursors = [@mainCursor]
             @setSalterMode false

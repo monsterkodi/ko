@@ -39,3 +39,6 @@
 # bold
 
 (\*+)([^\*]+)(\*+)                      . md.bold.marker . md.bold . md.bold.marker
+
+(\<!---|---\>)                            comment.marker
+
