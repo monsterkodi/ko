@@ -36,9 +36,7 @@
     - more powerful than conventional search and replace
 
 **multicursors**
-- not all cursors are equal:
-    - main cursor is always distuingishable
-    - main cursor can be moved independently from other cursors
+- a little less chaotic than some other implementations
 - powerful set of keyboard shortcuts for modification of cursors
 
 **minimap**
@@ -243,7 +241,6 @@ evaluates coffee-script code in the main process and prints results in terminal
     - results are 
         - persistent for the lifetime of the app
         - shared between windows
-
 - the commandline input is nice to do quick math calculations or other single line tasks
 - you can evaluate complex code too, just press **^enter** in the editor to evaluate its whole text
 
@@ -267,6 +264,14 @@ coffee-script macros
 - **class** creates a new file with simple class skeleton
 
 <!---
+#   00     00  000   0000000   0000000
+#   000   000  000  000       000     
+#   000000000  000  0000000   000     
+#   000 0 000  000       000  000     
+#   000   000  000  0000000    0000000
+--->
+# misc
+<!---
 #   00     00  000  000   000  000  00     00   0000000   00000000 
 #   000   000  000  0000  000  000  000   000  000   000  000   000
 #   000000000  000  000 0 000  000  000000000  000000000  00000000 
@@ -286,6 +291,19 @@ coffee-script macros
 #   000   000   0000000   0000000     000     000   0000000   0000000   000   000  0000000    0000000   000   000  0000000 
 --->
 ## multicursors
+
+ko differs a bit from common implementations of multicursors:
+- not all cursors are equal:
+    - main cursor is always distuingishable
+    - main cursor can be moved independently from other cursors
+- in most cases cursors are kept in their respective lines
+    - no weird cursor chaos when some cursors cross line boundaries and some don't
+- in ko, cursors can be positioned after the end of lines
+    - cursors after the end of line have two representations: blue and orange/yellow
+    - the orange/yellow position shows where text will be inserted
+    - missing spaces are added automatically in multicursor mode
+
+the main shortcuts:
 - **⌘click**               add or remove single cursor
 - **⌘up|down**             grow all vertical cursor lines up or down
 - **^⇧up|down**            grow only main cursor line up or down
@@ -294,13 +312,7 @@ coffee-script macros
 - **^⇧right**              align all cursors vertically with right-most cursor while moving text to the right
 - **⌘delete**              delete backwards over line boundaries
 
-cursors can be positioned after the end of line
-- cursors after the end of line have two representations: blue and orange/yellow
-- the orange/yellow position shows where text will be inserted
-- missing spaces are added automatically in multicursor mode
-
 ![cursors](img/cursors.png)
-
 <!---
 #   000   000  000  000   000  0000000     0000000   000   000   0000000
 #   000 0 000  000  0000  000  000   000  000   000  000 0 000  000     
@@ -310,6 +322,10 @@ cursors can be positioned after the end of line
 --->
 ## windows
 
+ko is a multi window application. 
+it compensates a lacking tabbing feature by autoalignment of tiled windows and fast switching to recent files.
+
+window handling shortcuts:
 - **⌘⌥A** switch between tiled and stacked windows
 - **⌘W** close active window
 - **⌘⇧W** close all windows except active window
@@ -331,18 +347,17 @@ cursors can be positioned after the end of line
 
 the ascii-header mode lets you insert or edit ascii-headers
 - **⌘3** activates the ascii-header mode
+    - if the cursor is not in a header already, one will be generated for the word at the main cursor
 - typing **#>** will create a header for the following word and switch to header mode as well
-
-if the cursor is not in a header already, one will be generated for the word at the main cursor.
     
 ![cursors](img/salt.png)
 
 in ascii-header mode ...
 - cursors are green
 - backspace deletes the header character at the cursors 
-- most characters will be inserted automatically just by typing them
+- insert common characters as headers just by typing them
     
-the mode will deactivate itself automatically in most circumstances. you can also force deactivate it with **esc**
+the mode deactivates itself automatically in most circumstances. you can force the deactivation any time with **esc**
 
 <!---
 #   000  000   000  00000000   0000000 
@@ -379,14 +394,13 @@ when clicking on these numbers:
     - run the term command classes|funcs|files|words
 
 <!---
-#   00     00  000   0000000   0000000
-#   000   000  000  000       000     
-#   000000000  000  0000000   000     
-#   000 0 000  000       000  000     
-#   000   000  000  0000000    0000000
+#    0000000  000   000   0000000   00000000   000000000   0000000  000   000  000000000   0000000
+#   000       000   000  000   000  000   000     000     000       000   000     000     000     
+#   0000000   000000000  000   000  0000000       000     000       000   000     000     0000000 
+#        000  000   000  000   000  000   000     000     000       000   000     000          000
+#   0000000   000   000   0000000   000   000     000      0000000   0000000      000     0000000 
 --->
-## misc
-
+## various shortcuts
 - **F2** global shortcut to activate ko
 - **⌘E** (selects word under cursor and) highlights occurences of selected word
 - **⌘D** (selects word under cursor and) selects next highlighted word 
@@ -399,6 +413,7 @@ when clicking on these numbers:
 - **^return** evaluate current buffer with coffee in main process and print the result in terminal view
 - **⌘⌥up** jump to counterpart file (coffee <-> js, cpp <-> h, pug <-> html, etc)
 - **⌘\** toggle left side text offset when window is as wide as screen
+- **⌘R** reload/revert current file
 
 ### to use ko from a terminal
 
