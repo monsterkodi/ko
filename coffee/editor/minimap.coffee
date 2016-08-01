@@ -68,8 +68,6 @@ class Minimap
             lineHeight: 4
             viewHeight: 2*@editor.viewHeight()
             
-        # @scroll.dbg = true if @editor.name == 'editor'
-                    
         @drag = new drag 
             target:  @elem
             onStart: @onStart
@@ -79,6 +77,7 @@ class Minimap
         @scroll.on 'clearLines',   @clearAll
         @scroll.on 'scroll',       @onScroll
         @scroll.on 'exposeLines',  @onExposeLines
+        @scroll.on 'vanishLines',  @onVanishLines
         @scroll.on 'exposeLine',   @exposeLine
 
         @onScroll()  
@@ -165,8 +164,15 @@ class Minimap
     # 000        000 000   000        000   000       000  000     
     # 00000000  000   000  000         0000000   0000000   00000000
     
-    onExposeLines: (e) => @drawLines e.top, e.bot
     exposeLine: (li)   => @drawLines li, li
+    onExposeLines: (e) => @drawLines @scroll.exposeTop, @scroll.exposeBot
+    
+    onVanishLines: (e) => 
+        # log "onVanishLines #{e.top ? 0} #{e.bot ? 0}"
+        if e.top?
+            @drawLines @scroll.exposeTop, @scroll.exposeBot
+        else
+            @clearRange @scroll.exposeBot, @scroll.exposeBot+@scroll.numLines
         
     #  0000000  000   000   0000000   000   000   0000000   00000000
     # 000       000   000  000   000  0000  000  000        000     
@@ -179,19 +185,19 @@ class Minimap
         @drawCursors()    if changeInfo.cursors.length
         
         return if not changeInfo.sorted.length
-        
+         
         @scroll.setNumLines @editor.lines.length
-        
+         
         firstInserted = first(changeInfo.inserted) ? @scroll.exposeBot+1
         firstDeleted  = first(changeInfo.deleted)  ? @scroll.exposeBot+1
         redraw = Math.min firstInserted, firstDeleted
-            
+             
         for c in changeInfo.changed
             break if c >= redraw
             @drawLines c, c
-            
-        @clearRange redraw, @scroll.exposeTop + @height / @scroll.lineHeight
-        
+             
+        # @clearRange redraw, @scroll.exposeTop + @height / @scroll.lineHeight
+         
         if redraw <= @scroll.exposeBot            
             @drawLines redraw, @scroll.exposeBot
         
@@ -238,14 +244,19 @@ class Minimap
         if @scroll.fullHeight > @scroll.viewHeight
             pc = @editor.scroll.scroll / @editor.scroll.scrollMax
             tp = parseInt pc * @scroll.scrollMax
+            # log "onEditorScroll pc #{pc} tp #{tp} scrollMax #{@scroll.scrollMax}" if @editor.name != 'logview'
             @scroll.to tp
+        # else
+            # log "onEditorScroll #{@scroll.fullHeight} <= #{@scroll.viewHeight}?" if @editor.name != 'logview'
         @drawTopBot()
     
     onEditorNumLines: (n) => 
+        # log "onEditorNumLines #{n}" if @editor.name != 'logview'
         @onEditorViewHeight @editor.viewHeight() if n and @lines.height <= @scroll.lineHeight
         @scroll.setNumLines n
             
     onEditorViewHeight: (h) => 
+        # log "onEditorViewHeight #{h}" if @editor.name != 'logview'
         @scroll.setViewHeight 2*@editor.viewHeight()
         @onScroll()
         @onEditorScroll()
