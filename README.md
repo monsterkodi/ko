@@ -222,6 +222,8 @@ the ascii-header mode lets you insert or edit ascii-headers
 
 if the cursor is not in a header already, one will be generated for the word at the main cursor.
     
+![cursors](img/salt.png)
+
 in ascii-header mode ...
 - cursors are green
 - backspace deletes the header character at the cursors 
@@ -234,6 +236,32 @@ the mode will deactivate itself automatically in most circumstances. you can als
 - **⌘** while dragging to turn off cursor placement
 - **⇧** while dragging/clicking to select lines
 
+## info area
+the space between the minimaps displays some useful numbers
+- top row:
+    - cursor column
+    - [selections]
+    - [highlights]
+    - indexed classes
+    - indexed functions
+- bottom row:
+    - cursor line
+    - line count
+    - indexed files
+    - indexed words
+
+![readme](img/info.png)
+
+when clicking on these numbers:
+- cursor column|line
+    - set cursor to column|line 0
+- line count
+    - set cursors to last line     
+- selections|highlights|cursors
+    - clear the selections|highlights|cursors
+- indexed classes|functions|files|words
+    - run the term command classes|funcs|files|words
+    
 ## misc
 
 - **F2** global shortcut to activate ko
@@ -244,6 +272,10 @@ the mode will deactivate itself automatically in most circumstances. you can als
 - **⌘return** evaluate current buffer with coffee in main process and print the result in terminal view
 - **⌘⌥up** jump to counterpart file (coffee <-> js, cpp <-> h, pug <-> html, etc)
 - **⌘\** toggle text offset when window is as wide as screen
+
+- macro commands
+    **inv** toggle display of line endings
+    **fps** toggle the fps graph besides the info area
 
 while the command input has focus:
 - **^up|down** move command input up|down

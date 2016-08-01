@@ -32,28 +32,28 @@ class Minimap
 
         @selections = document.createElement 'canvas'
         @selections.className = "minimapSelections"
-        @selections.height = @height
-        @selections.width  = @width
+        @selections.height    = @height
+        @selections.width     = @width
         @elem.appendChild @selections
 
         @lines = document.createElement 'canvas'
         @lines.className = "minimapLines"
-        @lines.height = @height
-        @lines.width  = @width
+        @lines.height    = @height
+        @lines.width     = @width
             
         @elem.addEventListener 'wheel', @editor.scrollbar?.onWheel
         @elem.appendChild @lines
 
         @highlights = document.createElement 'canvas'
         @highlights.className = "minimapHighlights"
-        @highlights.height = @height
-        @highlights.width  = @width
+        @highlights.height    = @height
+        @highlights.width     = @width
         @elem.appendChild @highlights
 
         @cursors = document.createElement 'canvas'
         @cursors.className = "minimapCursors"
-        @cursors.height = @height
-        @cursors.width  = @width
+        @cursors.height    = @height
+        @cursors.width     = @width
         @elem.appendChild @cursors
 
         @editor.view.appendChild @elem
@@ -74,11 +74,11 @@ class Minimap
             onMove:  @onDrag 
             cursor: 'pointer'
             
-        @scroll.on 'clearLines',   @clearAll
-        @scroll.on 'scroll',       @onScroll
-        @scroll.on 'exposeLines',  @onExposeLines
-        @scroll.on 'vanishLines',  @onVanishLines
-        @scroll.on 'exposeLine',   @exposeLine
+        @scroll.on 'clearLines',  @clearAll
+        @scroll.on 'scroll',      @onScroll
+        @scroll.on 'exposeLines', @onExposeLines
+        @scroll.on 'vanishLines', @onVanishLines
+        @scroll.on 'exposeLine',  @exposeLine
 
         @onScroll()  
         @drawLines()
@@ -109,7 +109,6 @@ class Minimap
         for li in [top..bot]
             diss = @editor.syntax.getDiss li
             y = parseInt((li-@scroll.exposeTop)*@scroll.lineHeight)
-            # ctx.clearRect 0, y, @width, @scroll.lineHeight
             if diss?.length
                 for r in diss
                     break if 2*r.start >= @width
@@ -168,7 +167,6 @@ class Minimap
     onExposeLines: (e) => @drawLines @scroll.exposeTop, @scroll.exposeBot
     
     onVanishLines: (e) => 
-        # log "onVanishLines #{e.top ? 0} #{e.bot ? 0}"
         if e.top?
             @drawLines @scroll.exposeTop, @scroll.exposeBot
         else
@@ -196,8 +194,6 @@ class Minimap
             break if c >= redraw
             @drawLines c, c
              
-        # @clearRange redraw, @scroll.exposeTop + @height / @scroll.lineHeight
-         
         if redraw <= @scroll.exposeBot            
             @drawLines redraw, @scroll.exposeBot
         
@@ -244,19 +240,14 @@ class Minimap
         if @scroll.fullHeight > @scroll.viewHeight
             pc = @editor.scroll.scroll / @editor.scroll.scrollMax
             tp = parseInt pc * @scroll.scrollMax
-            # log "onEditorScroll pc #{pc} tp #{tp} scrollMax #{@scroll.scrollMax}" if @editor.name != 'logview'
             @scroll.to tp
-        # else
-            # log "onEditorScroll #{@scroll.fullHeight} <= #{@scroll.viewHeight}?" if @editor.name != 'logview'
         @drawTopBot()
     
     onEditorNumLines: (n) => 
-        # log "onEditorNumLines #{n}" if @editor.name != 'logview'
         @onEditorViewHeight @editor.viewHeight() if n and @lines.height <= @scroll.lineHeight
         @scroll.setNumLines n
             
     onEditorViewHeight: (h) => 
-        # log "onEditorViewHeight #{h}" if @editor.name != 'logview'
         @scroll.setViewHeight 2*@editor.viewHeight()
         @onScroll()
         @onEditorScroll()
@@ -292,5 +283,6 @@ class Minimap
         @cursors.width    = @cursors.width
         @topbot.width     = @topbot.width
         @lines.width      = @lines.width
+        @drawTopBot()
         
 module.exports = Minimap
