@@ -1,6 +1,12 @@
 ![ko](img/banner.png)
 ![readme](img/readme.png)
-
+<!---
+#   00000000  00000000   0000000   000000000  000   000  00000000   00000000   0000000
+#   000       000       000   000     000     000   000  000   000  000       000     
+#   000000    0000000   000000000     000     000   000  0000000    0000000   0000000 
+#   000       000       000   000     000     000   000  000   000  000            000
+#   000       00000000  000   000     000      0000000   000   000  00000000  0000000 
+--->
 ## main features
 
 **fast**
@@ -58,10 +64,7 @@
 - autoconverts 'simple' strings when "#{}" is inserted
 - removes 'then' when breaking single-line 'when' or 'if' statements  
 - deletes whitespace after function names when surrounding selected arguments with ()
-- includes a few nifty macros:
-    - **dbg** insert log line which outputs class.method + variables under cursors
-    - **req** insert require statement for word at cursor
-    - **class** creates a new file with simple class skeleton
+- includes a some nifty macros for coffee-script
 
 <!---
 #    0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
@@ -74,8 +77,8 @@
 
 operates in different modes:
 - **open** new window
-- **search** Search /search/ /Search/
 - **find** Find /find/ /Find/ fiZd f*nd
+- **search** Search /search/ /Search/
 - **goto** selecto
 - **term** Term
 - **coffee**
@@ -92,9 +95,108 @@ while the commandline has focus:
 - **⌘up|down** move command input to top|bottom of window
 - **⌥up|down** move command input a quarter of window up|down
 
-## terminal
+<!---
+#    0000000   00000000   00000000  000   000
+#   000   000  000   000  000       0000  000
+#   000   000  00000000   0000000   000 0 000
+#   000   000  000        000       000  0000
+#    0000000   000        00000000  000   000
+--->
+### open
 
-- **⌘T** to activate input
+opens files quickly via fuzzy matching
+- **⌘P** open file quickly
+- **⌘⇧P** open file quickly in new window
+
+on activation, it ...
+- lists recent files on top 
+- the most recent file is selected by default
+    
+while the list is open:
+- **.** list current directory without previous files
+- **..** navigate directory up
+
+the list content depends on the file currently opened in the editor
+- files in surrounding project directories are included
+- switching projects is simple: just open a file in the new project
+
+![open](img/open.png)
+
+<!---
+#   00000000  000  000   000  0000000  
+#   000       000  0000  000  000   000
+#   000000    000  000 0 000  000   000
+#   000       000  000  0000  000   000
+#   000       000  000   000  0000000  
+--->
+### find
+search in current file
+- **⌘F**  case insensitive
+- **^F**  case sensitive
+- **⌥F**  regexp insensitive
+- **^⌥F** regexp sensitive
+- **⌘⌥F** fuzzy search
+- **⌘^F** glob search
+     
+when the find commandline has focus
+- **enter** select next highlighted word
+- **shift+enter** select previous highlighted word
+- **tab** set focus on editor
+- **⌘enter** select next highlighted word and set focus on editor
+
+<!---
+#    0000000  00000000   0000000   00000000    0000000  000   000
+#   000       000       000   000  000   000  000       000   000
+#   0000000   0000000   000000000  0000000    000       000000000
+#        000  000       000   000  000   000  000       000   000
+#   0000000   00000000  000   000  000   000   0000000  000   000
+--->
+### search
+search in project files
+- **⌘⇧F**   case   insensitive
+- **^⇧F**   case   sensitive
+- **⌥⇧F**   regexp insensitive
+- **^⌥⇧F**  regexp sensitive
+    
+editing search result lines will ...
+- mark them for saving
+- changes are propagated immediately to all open files
+- **⌘S** (while the search-results view has focus) will save all pending changes in open **and** closed files
+- deleting lines from the search results will **not** remove them from their original files
+- changes from the editor are not yet propagated to old search results
+    - this means: only edit and save **fresh** search results!
+- this is a very powerful feature but not tested thoroughly yet and probably not working correctly in all cases!
+- use at your own risk! backup your files! 
+
+![search](img/search.png)
+
+<!---
+#    0000000    0000000   000000000   0000000 
+#   000        000   000     000     000   000
+#   000  0000  000   000     000     000   000
+#   000   000  000   000     000     000   000
+#    0000000    0000000      000      0000000 
+--->
+### goto
+- **⌘;** activates goto command
+- **text** jump to function, class or file
+- **positive number** jump to line
+- **negative number** jump to line relative to end of file
+
+in editor:
+- **⌥enter** goto word under main cursor
+- **⌥click** goto clicked word
+
+<!---
+#   000000000  00000000  00000000   00     00
+#      000     000       000   000  000   000
+#      000     0000000   0000000    000000000
+#      000     000       000   000  000 0 000
+#      000     00000000  000   000  000   000
+--->
+## term
+
+- **⌘T** to activate pseudo terminal input
 
 special commands
 - **alias**
@@ -127,53 +229,50 @@ all other commands are passed to a child process running bash
 ![terminal](img/terminal.png)
 
 <!---
-#   00000000  000  000   000  0000000  
-#   000       000  0000  000  000   000
-#   000000    000  000 0 000  000   000
-#   000       000  000  0000  000   000
-#   000       000  000   000  0000000  
+#    0000000   0000000   00000000  00000000  00000000  00000000
+#   000       000   000  000       000       000       000     
+#   000       000   000  000000    000000    0000000   0000000 
+#   000       000   000  000       000       000       000     
+#    0000000   0000000   000       000       00000000  00000000
 --->
-## find
-search in current file
-- **⌘F**  case insensitive
-- **^F**  case sensitive
-- **⌥F**  regexp insensitive
-- **^⌥F** regexp sensitive
-- **⌘⌥F** fuzzy search
-- **⌘^F** glob search
-     
-when the find commandline has focus
-- **enter** select next highlighted word
-- **shift+enter** select previous highlighted word
-- **tab** set focus on editor
-- **⌘enter** select next highlighted word and set focus on editor
+### coffee
+
+evaluates coffee-script code in the main process and prints results in terminal
+- since the code is evaluated in the main process ...
+    - indexer internals and windows are accessible (via global **main** object)
+    - results are 
+        - persistent for the lifetime of the app
+        - shared between windows
+
+- the commandline input is nice to do quick math calculations or other single line tasks
+- you can evaluate complex code too, just press **^enter** in the editor to evaluate its whole text
+
+![cursors](img/coffee.png)
 
 <!---
-#    0000000  00000000   0000000   00000000    0000000  000   000
-#   000       000       000   000  000   000  000       000   000
-#   0000000   0000000   000000000  0000000    000       000000000
-#        000  000       000   000  000   000  000       000   000
-#   0000000   00000000  000   000  000   000   0000000  000   000
+#   00     00   0000000    0000000  00000000    0000000 
+#   000   000  000   000  000       000   000  000   000
+#   000000000  000000000  000       0000000    000   000
+#   000 0 000  000   000  000       000   000  000   000
+#   000   000  000   000   0000000  000   000   0000000 
 --->
-## search
-search in project files
-- **⌘⇧F**   case   insensitive
-- **^⇧F**   case   sensitive
-- **⌥⇧F**   regexp insensitive
-- **^⌥⇧F**  regexp sensitive
-    
-editing search result lines will ...
-- mark them for saving
-- changes are propagated immediately to all open files
-- **⌘S** (while the search-results view has focus) will save all pending changes in open **and** closed files
-- deleting lines from the search results will **not** remove them from their original files
-- changes from the editor are not yet propagated to old search results
-    - this means: only edit and save **fresh** search results!
-- this is a very powerful feature but not tested thoroughly yet and probably not working correctly in all cases!
-- use at your own risk! backup your files! 
+### macro
+general macros
+- **inv** toggle display of line endings
+- **fps** toggle the fps graph besides the info area
 
-![search](img/search.png)
+coffee-script macros
+- **dbg** insert log line which outputs class.method + variables under cursors
+- **req** insert require statement for word at cursor
+- **class** creates a new file with simple class skeleton
 
+<!---
+#   00     00  000   000  000      000000000  000   0000000  000   000  00000000    0000000   0000000   00000000    0000000
+#   000   000  000   000  000         000     000  000       000   000  000   000  000       000   000  000   000  000     
+#   000000000  000   000  000         000     000  000       000   000  0000000    0000000   000   000  0000000    0000000 
+#   000 0 000  000   000  000         000     000  000       000   000  000   000       000  000   000  000   000       000
+#   000   000   0000000   0000000     000     000   0000000   0000000   000   000  0000000    0000000   000   000  0000000 
+--->
 ## multicursors
 - **⌘click**               add or remove single cursor
 - **⌘up|down**             grow all vertical cursor lines up or down
@@ -189,64 +288,6 @@ cursors can be positioned after the end of line
 - missing spaces are added automatically in multicursor mode
 
 ![cursors](img/cursors.png)
-
-<!---
-#    0000000   00000000   00000000  000   000
-#   000   000  000   000  000       0000  000
-#   000   000  00000000   0000000   000 0 000
-#   000   000  000        000       000  0000
-#    0000000   000        00000000  000   000
---->
-## open
-
-opens files quickly via fuzzy matching
-- **⌘P** open file quickly
-- **⌘⇧P** open file quickly in new window
-
-on activation, it ...
-- lists recent files on top 
-- the most recent file is selected by default
-    
-while the list is open:
-- **.** list current directory without previous files
-- **..** navigate directory up
-
-the list content depends on the file currently opened in the editor
-- files in surrounding project directories are included
-- switching projects is simple: just open a file in the new project
-
-![open](img/open.png)
-
-## goto
-- **⌘;** activates goto command
-- **text** jump to function, class or file
-- **positive number** jump to line
-- **negative number** jump to line relative to end of file
-
-in editor:
-- **⌥enter** goto word under main cursor
-- **⌥click** goto clicked word
-
-<!---
-#    0000000   0000000   00000000  00000000  00000000  00000000
-#   000       000   000  000       000       000       000     
-#   000       000   000  000000    000000    0000000   0000000 
-#   000       000   000  000       000       000       000     
-#    0000000   0000000   000       000       00000000  00000000
---->
-## coffee
-
-evaluates coffee-script code in the main process and prints results in terminal
-- since the code is evaluated in the main process ...
-    - indexer internals and windows are accessible (via global **main** object)
-    - results are 
-        - persistent for the lifetime of the app
-        - shared between windows
-
-- the commandline input is nice to do quick math calculations or other single line tasks
-- you can evaluate complex code too, just press **^enter** in the editor to evaluate its whole text
-
-![cursors](img/coffee.png)
 
 <!---
 #   000   000  000  000   000  0000000     0000000   000   000   0000000
@@ -268,11 +309,11 @@ evaluates coffee-script code in the main process and prints results in terminal
 - **⌘⌥Q** close all windows (they won't restore on next start) and quit
 
 <!---
-#    0000000   0000000   000      000000000
-#   000       000   000  000         000   
-#   0000000   000000000  000         000   
-#        000  000   000  000         000   
-#   0000000   000   000  0000000     000   
+#    0000000    0000000   0000000  000  000          000   000  00000000   0000000   0000000    00000000  00000000    0000000
+#   000   000  000       000       000  000          000   000  000       000   000  000   000  000       000   000  000     
+#   000000000  0000000   000       000  000  000000  000000000  0000000   000000000  000   000  0000000   0000000    0000000 
+#   000   000       000  000       000  000          000   000  000       000   000  000   000  000       000   000       000
+#   000   000  0000000    0000000  000  000          000   000  00000000  000   000  0000000    00000000  000   000  0000000 
 --->
 ## ascii-headers
 
@@ -310,7 +351,7 @@ the mode will deactivate itself automatically in most circumstances. you can als
 #   000  000  0000  000       000   000
 #   000  000   000  000        0000000 
 --->
-## info area
+## info
 at the right end of the commandline (above the editor minimap) some useful numbers are displayed:
 - top row:
     - cursor column
@@ -358,10 +399,6 @@ when clicking on these numbers:
 - **^return** evaluate current buffer with coffee in main process and print the result in terminal view
 - **⌘⌥up** jump to counterpart file (coffee <-> js, cpp <-> h, pug <-> html, etc)
 - **⌘\** toggle text offset when window is as wide as screen
-
-macro commands
-- **inv** toggle display of line endings
-- **fps** toggle the fps graph besides the info area
 
 ### to use ko from a terminal
 
