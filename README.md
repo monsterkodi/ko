@@ -7,7 +7,7 @@
 #   000       000       000   000     000     000   000  000   000  000            000
 #   000       00000000  000   000     000      0000000   000   000  00000000  0000000 
 --->
-## main features
+# main features
 
 **fast**
 - loads large files
@@ -73,7 +73,7 @@
 #   000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
 #    0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 --->
-## commandline
+# commandline
 
 operates in different modes:
 - **open** new window
@@ -102,7 +102,7 @@ while the commandline has focus:
 #   000   000  000        000       000  0000
 #    0000000   000        00000000  000   000
 --->
-### open
+## open
 
 opens files quickly via fuzzy matching
 - **⌘P** open file quickly
@@ -129,7 +129,7 @@ the list content depends on the file currently opened in the editor
 #   000       000  000  0000  000   000
 #   000       000  000   000  0000000  
 --->
-### find
+## find
 search in current file
 - **⌘F**  case insensitive
 - **^F**  case sensitive
@@ -151,7 +151,7 @@ when the find commandline has focus
 #        000  000       000   000  000   000  000       000   000
 #   0000000   00000000  000   000  000   000   0000000  000   000
 --->
-### search
+## search
 search in project files
 - **⌘⇧F**   case   insensitive
 - **^⇧F**   case   sensitive
@@ -177,7 +177,7 @@ editing search result lines will ...
 #   000   000  000   000     000     000   000
 #    0000000    0000000      000      0000000 
 --->
-### goto
+## goto
 - **⌘;** activates goto command
 - **text** jump to function, class or file
 - **positive number** jump to line
@@ -235,7 +235,7 @@ all other commands are passed to a child process running bash
 #   000       000   000  000       000       000       000     
 #    0000000   0000000   000       000       00000000  00000000
 --->
-### coffee
+## coffee
 
 evaluates coffee-script code in the main process and prints results in terminal
 - since the code is evaluated in the main process ...
@@ -256,7 +256,7 @@ evaluates coffee-script code in the main process and prints results in terminal
 #   000 0 000  000   000  000       000   000  000   000
 #   000   000  000   000   0000000  000   000   0000000 
 --->
-### macro
+## macro
 general macros
 - **inv** toggle display of line endings
 - **fps** toggle the fps graph besides the info area
