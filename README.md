@@ -267,6 +267,18 @@ coffee-script macros
 - **class** creates a new file with simple class skeleton
 
 <!---
+#   00     00  000  000   000  000  00     00   0000000   00000000 
+#   000   000  000  0000  000  000  000   000  000   000  000   000
+#   000000000  000  000 0 000  000  000000000  000000000  00000000 
+#   000 0 000  000  000  0000  000  000 0 000  000   000  000      
+#   000   000  000  000   000  000  000   000  000   000  000      
+--->
+## minimap
+
+- **⌘** while dragging to turn off cursor placement
+- **⇧** while dragging/clicking to select lines
+
+<!---
 #   00     00  000   000  000      000000000  000   0000000  000   000  00000000    0000000   0000000   00000000    0000000
 #   000   000  000   000  000         000     000  000       000   000  000   000  000       000   000  000   000  000     
 #   000000000  000   000  000         000     000  000       000   000  0000000    0000000   000   000  0000000    0000000 
@@ -333,18 +345,6 @@ in ascii-header mode ...
 the mode will deactivate itself automatically in most circumstances. you can also force deactivate it with **esc**
 
 <!---
-#   00     00  000  000   000  000  00     00   0000000   00000000 
-#   000   000  000  0000  000  000  000   000  000   000  000   000
-#   000000000  000  000 0 000  000  000000000  000000000  00000000 
-#   000 0 000  000  000  0000  000  000 0 000  000   000  000      
-#   000   000  000  000   000  000  000   000  000   000  000      
---->
-## minimap
-
-- **⌘** while dragging to turn off cursor placement
-- **⇧** while dragging/clicking to select lines
-
-<!---
 #   000  000   000  00000000   0000000 
 #   000  0000  000  000       000   000
 #   000  000 0 000  000000    000   000
@@ -398,7 +398,7 @@ when clicking on these numbers:
 - **⌘return** insert empty line below cursor and move cursor down
 - **^return** evaluate current buffer with coffee in main process and print the result in terminal view
 - **⌘⌥up** jump to counterpart file (coffee <-> js, cpp <-> h, pug <-> html, etc)
-- **⌘\** toggle text offset when window is as wide as screen
+- **⌘\** toggle left side text offset when window is as wide as screen
 
 ### to use ko from a terminal
 
