@@ -240,6 +240,7 @@ the mode will deactivate itself automatically in most circumstances. you can als
 the space between the minimaps displays some useful numbers
 - top row:
     - cursor column
+    - cursors
     - [selections]
     - [highlights]
     - indexed classes

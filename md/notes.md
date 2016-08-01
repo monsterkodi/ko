@@ -1,5 +1,6 @@
 # todo/ideas
 
+- *fix return in first line*
 - *shift-enter in find command: jump backwards*
 
 - *improve bracket inserting (evaluate brackets in line)*
