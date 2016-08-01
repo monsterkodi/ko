@@ -252,7 +252,6 @@ class Editor extends Buffer
         return rgs if rgs.length == 5
       
     setSalterMode: (active=true) ->
-        log "set salter mode #{active}"
         @salterMode = active
         @layerDict?['cursors']?.classList.toggle "salterMode", active
                             

@@ -72,7 +72,7 @@ class Open extends Command
         if command in ['.', '/', '~'] or command.endsWith '/'
             return @navigateDir command
             
-        items = @listItems flat: true, navigating: @navigating    
+        items = @listItems flat: true, navigating: @navigating, currentText: @getText().trim()    
         if command.length
             fuzzied = fuzzy.filter command, items, extract: (o) -> o.text            
             items = (f.original for f in _.sortBy fuzzied, (o) -> o.index)
@@ -120,13 +120,7 @@ class Open extends Command
     # 000   000  000       000  000   000  000   000     000   
     # 00     00  00000000  000   0000000   000   000     000   
 
-    weight: (fs, opt) =>
-        
-        [f, s] = fs
-        r = relative f, @dir
-        b = path.basename f
-        
-        currentText = @getText().trim()
+    weight: (item, opt) =>            
         
         # local 
         #    directories
@@ -135,14 +129,20 @@ class Open extends Command
         # parent
         # sibling/directories
         
+        f = item.file
+        r = item.text
+        b = path.basename f
+                
         if f.startsWith @dir
-            localBonus = Math.max 0, (5-r.split('/').length) * 10000
+            localBonus = Math.max 0, (5-r.split('/').length) * 0x00000fff
         else
-            localBonus = Math.max 0, (5-r.split('../').length) * 1000
+            localBonus = Math.max 0, (5-r.split('../').length) * 0x00000333
 
-        relBonus  = currentText.length and r.startsWith(currentText) and 1000000 * (currentText.length/r.length) or 0 
-        baseBonus = currentText.length and b.startsWith(currentText) and 100000 or 0
-                        
+        relBonus = baseBonus = 0
+        if opt?.currentText?.length
+            relBonus  = r.startsWith(opt.currentText) and 0x0000ffff * (opt.currentText.length/r.length) or 0 
+            baseBonus = b.startsWith(opt.currentText) and 0x00000888 or 0
+           
         extensionBonus = switch path.extname b
             when '.coffee'               then 100
             when '.cpp', '.hpp', '.h'    then 90
@@ -152,8 +152,7 @@ class Open extends Command
             else 0 
         extensionBonus -= 400 if b[0] == '.'
         
-        directoryBonus = 0
-        directoryBonus += 500 if s.isDirectory()
+        directoryBonus = item.line == '▸' and 500 or 0
                         
         lengthPenalty = path.dirname(f).length
         
@@ -163,7 +162,7 @@ class Open extends Command
             w = localBonus + relBonus + baseBonus + directoryBonus + extensionBonus - lengthPenalty
         w
 
-    weightedFiles: (opt) -> _.sortBy @files, (o) => 0xffffffff - @weight o, opt
+    weightedItems: (items, opt) -> _.sortBy items, (o) => 0xffffffff - @weight o, opt
     
     # 000      000   0000000  000000000
     # 000      000  000          000   
@@ -204,17 +203,18 @@ class Open extends Command
             item.file = path.dirname @dir
             items.push item
                 
-        for file in @weightedFiles opt
+        for file in @files
             rel = relative file[0], @dir
             if rel.length
                 item = Object.create null
                 if file[1].isDirectory()
                     item.line = '▸'
                     item.clss = 'directory'
-                item.text = relative file[0], @dir
+                item.text = rel
                 item.file = file[0]
                 items.push item
         
+        items = @weightedItems items, opt
         items = _.uniqBy items, (o) -> o.text
         items
                 
@@ -275,7 +275,6 @@ class Open extends Command
                 opt.dir = path.dirname resolve opt.dir
         newdir = @resolvedPath(opt.dir) ? @dir
         return false if newdir == @dir and not opt.reload
-        # return false if not dirExists newdir
         
         @dir        = newdir
         @pkg        = opt.noPkg and @dir or Walker.packagePath(@dir) or @dir
