@@ -304,7 +304,9 @@ ko differs a bit from common implementations of multicursors:
     - the orange/yellow position shows where text will be inserted
     - missing spaces are added automatically in multicursor mode
 
-the main shortcuts:
+![cursors](img/cursors.png)
+
+shortcuts:
 - **⌘click**               add or remove single cursor
 - **⌘up|down**             grow all vertical cursor lines up or down
 - **^⇧up|down**            grow only main cursor line up or down
@@ -313,7 +315,6 @@ the main shortcuts:
 - **^⇧right**              align all cursors vertically with right-most cursor while moving text to the right
 - **⌘delete**              delete backwards over line boundaries
 
-![cursors](img/cursors.png)
 <!---
 #   000   000  000  000   000  0000000     0000000   000   000   0000000
 #   000 0 000  000  0000  000  000   000  000   000  000 0 000  000     
@@ -326,7 +327,7 @@ the main shortcuts:
 ko is a multi window application. 
 it compensates a lacking tabbing feature by autoalignment of tiled windows and fast switching to recent files.
 
-window handling shortcuts:
+shortcuts:
 - **⌘⌥A** switch between tiled and stacked windows
 - **⌘W** close active window
 - **⌘⇧W** close all windows except active window
@@ -369,6 +370,7 @@ the mode deactivates itself automatically in most circumstances. you can force t
 --->
 ## info
 at the right end of the commandline (above the editor minimap) some useful numbers are displayed:
+![readme](img/info.png)
 - top row:
     - cursor column
     - cursors
@@ -381,8 +383,6 @@ at the right end of the commandline (above the editor minimap) some useful numbe
     - line count
     - indexed files
     - indexed words
-
-![readme](img/info.png)
 
 when clicking on these numbers:
 - cursor column|line
