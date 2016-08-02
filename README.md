@@ -370,6 +370,7 @@ the mode deactivates itself automatically in most circumstances. you can force t
 --->
 ## info
 at the right end of the commandline (above the editor minimap) some useful numbers are displayed:
+
 ![readme](img/info.png)
 - top row:
     - cursor column

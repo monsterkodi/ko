@@ -761,9 +761,10 @@ class ViewBase extends Editor
         
         switch key
             
-            when 'esc'  then return @clearCursorsAndHighlights()
-            when 'home' then return @singleCursorAtPos [0, 0],              event.shiftKey
-            when 'end'  then return @singleCursorAtPos [0,@lines.length-1], event.shiftKey
+            when 'esc'       then return @clearCursorsAndHighlights()
+            when 'home'      then return @singleCursorAtPos [0, 0],              event.shiftKey
+            when 'end'       then return @singleCursorAtPos [0,@lines.length-1], event.shiftKey
+            when 'backspace' then return
             when 'page up'
                 @moveCursorsUp event.shiftKey, @numFullLines()-3
                 return stop event

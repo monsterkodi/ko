@@ -27,7 +27,12 @@ class Numbers extends event
         @editor.on 'changed',          @onChanged
         @onFontSizeChange()
 
-    onHighlight: => @updateColor h[0] for h in @editor.highlights
+    onHighlight: => 
+        if @editor.highlights.length
+            @updateColor h[0] for h in @editor.highlights
+        else
+            for li in [@editor.scroll.exposeTop..@editor.scroll.exposeBot]
+                @updateColor li
     
     onChanged: (changeInfo) =>
         if changeInfo.cursors?.length
