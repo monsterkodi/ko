@@ -1,6 +1,8 @@
 # todo/ideas
 
 - *improve bracket inserting (evaluate brackets in line)*
+- *fix window auto alignment*
+- *set current dir when starting from terminal*
 
 #### terminal
 - *autocomplete dirs and files*
@@ -17,6 +19,7 @@
 - delete forward swallows spaces?
 - when pasting text at indent level, remove leading space columns
 - multicursors and indent when pasting multiple lines at single cursor in col > 0
+- update cursor positions on foreign changes
 
 #### file state
 - save backup files?
