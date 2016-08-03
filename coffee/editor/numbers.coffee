@@ -23,23 +23,10 @@ class Numbers extends event
         @editor.on 'lineExposed',      @onLineExposed
         @editor.on 'lineVanished',     @onLineVanished
         @editor.on 'fontSizeChanged',  @onFontSizeChange
-        @editor.on 'highlight',        @onHighlight
-        @editor.on 'changed',          @onChanged
+        @editor.on 'highlight',        @updateColors
+        @editor.on 'changed',          @updateColors
         @onFontSizeChange()
 
-    onHighlight: => 
-        for li in [@editor.scroll.exposeTop..@editor.scroll.exposeBot]
-            @updateColor li
-    
-    onChanged: (changeInfo) =>
-        if changeInfo.cursors?.length
-            for c in changeInfo.cursors
-                @updateColor c
-        if changeInfo.selection?.length
-            for s in changeInfo.selection
-                for li in [s[0]..s[1]]
-                    @updateColor li
-    
     setOpacity: (o) -> @elem.style.background = "rgba(0,0,0,#{o})"
     
     #  0000000   0000000   000       0000000   00000000 
@@ -65,6 +52,10 @@ class Numbers extends event
             cls += ' highligd'            
         child.className = 'linenumber ' + cls
        
+    updateColors: =>
+        for li in [@editor.scroll.exposeTop..@editor.scroll.exposeBot]
+            @updateColor li
+    
     # 00000000   0000000   000   000  000000000
     # 000       000   000  0000  000     000   
     # 000000    000   000  000 0 000     000   
@@ -98,6 +89,9 @@ class Numbers extends event
         if top <= li
             for i in [li-top...@elem.children.length]
                 div = @elem.children[i]
+                if not div?.firstChild?
+                    alert "no div child? #{li} #{i} #{li-top} #{@elem.children.length}"
+                    throw new Error
                 div.firstChild.textContent = "#{top+i+1}"
                 @emit 'numberChanged', 
                     numberDiv:  div

@@ -168,20 +168,21 @@ class Editor extends Buffer
             @do.cursors newCursors
             @do.end()
         else # create new header
-            word = opt?.word ? @wordAtCursor().trim()
+            word = opt?.word ? @selectionTextOrWordAtCursor().trim()
             indt = _.padStart '', @indentationAtLineIndex cp[1]
             stxt = word.length and salt(word).split('\n') or ['', '', '', '', '']
             stxt = ("#{indt}#{@lineComment} #{s}" for s in stxt)
             @do.start()
             newCursors = []
-            li = cp[1]+5
-            for s in stxt.reversed()
-                @do.insert cp[1], s
-                newCursors.push [s.length, li]
-                li -= 1
             @do.insert cp[1], indt
-            @mainCursor = first newCursors
+            li = cp[1]+1
+            for s in stxt
+                @do.insert li, s
+                newCursors.push [s.length, li]
+                li += 1
+            @mainCursor = last newCursors
             @do.cursors newCursors
+            @do.selections []
             @do.end()
         @setSalterMode true
         
@@ -477,7 +478,7 @@ class Editor extends Buffer
 
     highlightTextOfSelectionOrWordAtCursor: -> # command+e       
             
-        if @selections.length == 0 
+        if @selections.length == 0
             srange = @rangeForWordAtPos @cursorPos()
             @selectSingleRange srange
             

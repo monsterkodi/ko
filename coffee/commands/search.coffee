@@ -4,17 +4,20 @@
 #      000  000       000   000  000   000  000       000   000
 # 0000000   00000000  000   000  000   000   0000000  000   000
 {
-unresolve
-}       = require '../tools/tools'
-log     = require '../tools/log'
-walker  = require '../tools/walker'
-matchr  = require '../tools/matchr'
-syntax  = require '../editor/syntax'
-Command = require '../commandline/command'
-_       = require 'lodash'
-stream  = require 'stream'
-path    = require 'path'
-fs      = require 'fs'
+unresolve,
+first
+}        = require '../tools/tools'
+log      = require '../tools/log'
+walker   = require '../tools/walker'
+matchr   = require '../tools/matchr'
+syntax   = require '../editor/syntax'
+Command  = require '../commandline/command'
+_        = require 'lodash'
+stream   = require 'stream'
+path     = require 'path'
+fs       = require 'fs'
+electron = require 'electron'
+ipc      = electron.ipcRenderer
 
 class Search extends Command
 
@@ -49,10 +52,12 @@ class Search extends Command
             when '/search/', '/Search/'
                 return if command in ['^', '$', '.']
         command = super command
+        file = window.editor.currentFile ? first _.keys(ipc.sendSync('indexer', 'files'))
+        return if not file?
         @startSearchInFiles 
             text: command
             name: @name
-            file: window.editor.currentFile
+            file: file
         focus: '.terminal'
         reveal: 'terminal'
         text:   command

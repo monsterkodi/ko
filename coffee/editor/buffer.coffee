@@ -81,7 +81,13 @@ class Buffer extends event
 
     wordAtCursor: (c=@mainCursor, opt) -> @textInRange @rangeForWordAtPos c, opt
     wordsAtCursors: (cs=@cursors, opt) -> (@textInRange @rangeForWordAtPos(c, opt) for c in cs)
-        
+
+    selectionTextOrWordAtCursor: () ->
+        if @selections.length == 1 
+            @textInRange @selections[0]
+        else
+            @wordAtCursor()
+    
     rangeForWordAtPos: (pos, opt) ->
         p = @clampPos pos
         wr = @wordRangesInLineAtIndex p[1], opt

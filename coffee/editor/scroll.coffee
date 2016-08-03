@@ -36,6 +36,7 @@ class Scroll extends events
         @exposeTop    = 0 # index of topmost line in view (always <= @top)
         @exposeBot    = -1 # index of bottom line in view (always >= @bot)
         @calc()
+        @offsetTop    = -1 # hack to emit initial scroll
 
     calc: ->
         @scrollMax   = Math.max(0,@fullHeight - @viewHeight)  # maximum scroll offset (pixels)
@@ -49,7 +50,6 @@ class Scroll extends events
             @exposeNum = @exposeMax
             
         @exposeHeight = @exposeNum * @lineHeight
-        @offsetTop    = -1 # hack to emit initial scroll
 
     # 000  000   000  00000000   0000000 
     # 000  0000  000  000       000   000
@@ -161,11 +161,12 @@ class Scroll extends events
     # 000  000   000  0000000   00000000  000   000     000   
     
     insertLine: (li,oi) =>
-        # console.log "Scroll.insertLine li:#{li} oi:#{oi}" if @dbg
-        @exposeBot += 1 if oi <= @exposeBot or oi == @numLines-1
-        @bot += 1 if oi <= @bot
-        @top += 1 if oi < @top
-        @numLines += 1
+        # console.log "Scroll.insertLine li:#{li} oi:#{oi} #{@exposeTop} #{@top} #{@bot} #{@exposeBot}" if @dbg
+        @exposeBot += 1 if @lineIndexIsInExpose oi
+        @bot       += 1 if @lineIndexIsInView oi
+        @top       += 1 if oi < @top
+        @numLines  += 1
+        # console.log "Scroll.insertLine li:#{li} oi:#{oi} #{@exposeTop} #{@top} #{@bot} #{@exposeBot}" if @dbg
         @fullHeight = @numLines * @lineHeight
         @calc()
         
@@ -176,11 +177,19 @@ class Scroll extends events
     # 0000000    00000000  0000000  00000000     000     00000000
 
     deleteLine: (li,oi) =>
-        @exposeBot -= 1 if oi <= @exposeBot
-        @bot -= 1 if oi <= @bot
-        @numLines -= 1
+        @exposeBot -= 1 if @lineIndexIsInExpose oi
+        @bot       -= 1 if @lineIndexIsInView oi
+        @numLines  -= 1
         @fullHeight = @numLines * @lineHeight
         @calc()
+    
+    lineIndexIsInView: (li) -> 
+        return true if @top <= li <= @bot
+        return @bot-@top+1 < @fullLines
+        
+    lineIndexIsInExpose: (li) ->
+        return true if @exposeTop <= li <= @exposeBot 
+        return @exposeBot-@exposeTop+1 < @exposeNum
     
     # 000   000  000  00000000  000   000  000   000  00000000  000   0000000   000   000  000000000
     # 000   000  000  000       000 0 000  000   000  000       000  000        000   000     000   

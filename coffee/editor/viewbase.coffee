@@ -192,11 +192,20 @@ class ViewBase extends Editor
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
   
     changed: (changeInfo, action) ->
-        # log "changed", changeInfo.sorted if @name == 'editor'
         @syntax.changed changeInfo
         
         numChanges = 0   
         changes = _.cloneDeep changeInfo.sorted
+        
+        changes.sort (a,b) -> 
+            if a[2] == b[2]
+                if a[0]==b[0]
+                    order = ['inserted', 'deleted', 'changed']
+                    order.indexOf(a[1]) - order.indexOf(b[1])
+                a[0]-b[0]
+            else
+                a[2]-b[2]
+
         while (change = changes.shift())
             [li,ch,oi] = change
             switch ch
@@ -208,7 +217,7 @@ class ViewBase extends Editor
                     @deleteLine li, oi
                 when 'inserted' 
                     numChanges += 1
-                    @insertLine li, oi
+                    @insertLine li, oi                    
               
         if numChanges != 0 
             @updateLinePositions()
@@ -244,10 +253,8 @@ class ViewBase extends Editor
         @emit 'lineDeleted', oi
         
     insertLine: (li, oi) -> 
-        # log "ViewBase.insertLine li:#{li} oi:#{oi}"
-        return if oi >  @scroll.exposeBot and @scroll.exposeBot - @scroll.exposeTop == @scroll.exposeNum
-        return if oi <= @scroll.exposeTop
-        # log "ViewBase.insertLine li:#{li} oi:#{oi}"
+        return if not @scroll.lineIndexIsInExpose oi
+        # log "ViewBase.insertLine li:#{li} oi:#{oi}" if @name == 'editor'
         div = @divForLineAtIndex li
         @elem.insertBefore div, @elem.children[oi - @scroll.exposeTop]
         @scroll.insertLine li, oi
@@ -260,6 +267,7 @@ class ViewBase extends Editor
     # 00000000  000   000  000         0000000   0000000   00000000
 
     exposeLine: (li) =>
+        # log "exposeLine #{li}" if @name == "editor"
         div = @divForLineAtIndex li
         @elem.appendChild div
         
@@ -274,6 +282,7 @@ class ViewBase extends Editor
     exposeLines: (e) =>
         before = @elem.firstChild
         for li in [e.top..e.bot]
+            # log "exposeLines #{li}" if @name == 'editor'
             div = @divForLineAtIndex li
             @elem.insertBefore div, before
 
@@ -343,6 +352,7 @@ class ViewBase extends Editor
     # 000   000  00000000  000   000  0000000    00000000  000   000
 
     divForLineAtIndex: (li) ->
+        # log "divForLineAtIndex #{li}" if @name == 'editor'
         div = render.lineDiv (li-@scroll.exposeTop) * @size.lineHeight, @syntax.getDiss(li), @size
         div.lineIndex = li
         if @showInvisibles
@@ -381,21 +391,24 @@ class ViewBase extends Editor
                     vc.push [@lines[@scroll.exposeTop+c[1]].length, c[1], 'virtual']
             cs = cs.concat vc
         html = render.cursors cs, @size
-        $('.cursors', @layers).innerHTML = html
+        # $('.cursors', @layers).innerHTML = html
+        @layerDict.cursors.innerHTML = html
             
     renderSelection: ->
         h = ""
         s = @selectionsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
         if s
             h += render.selection s, @size
-        $('.selections', @layers).innerHTML = h
+        # $('.selections', @layers).innerHTML = h
+        @layerDict.selections.innerHTML = h
 
     renderHighlights: ->        
         h = ""
         s = @highlightsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
         if s
             h += render.selection s, @size, "highlight"
-        $('.highlights', @layers).innerHTML = h
+        # $('.highlights', @layers).innerHTML = h
+        @layerDict.highlights.innerHTML = h
 
     # 00000000   00000000   0000000  000  0000000  00000000
     # 000   000  000       000       000     000   000     
@@ -447,12 +460,13 @@ class ViewBase extends Editor
     scrollLines: (delta) -> @scrollBy delta * @size.lineHeight
 
     scrollBy: (delta, x=0) ->        
-        # console.log "scrollBy #{delta}"
+        # log "scrollBy #{delta}" if @name == 'editor'
         @scroll.by delta if delta
         @layers.scrollLeft += x/2 if x
         @updateScrollOffset()
         
     scrollTo: (p) ->
+        # log "scrollTo #{p}" if @name == 'editor'
         @scroll.to p
         @updateScrollOffset()
 
@@ -467,8 +481,10 @@ class ViewBase extends Editor
                 @scrollBy delta
 
     updateScrollOffset: ->        
-        @layers.scrollTop = @scroll.offsetTop if @scroll.offsetTop != @scrollOffsetTop
-        @scrollOffsetTop = @scroll.offsetTop
+        if @scroll.offsetTop != @scrollOffsetTop
+            @layers.scrollTop = @scroll.offsetTop 
+            @scrollOffsetTop = @scroll.offsetTop
+            # log "ViewBase.updateScrollOffset @scrollOffsetTop:#{@scrollOffsetTop}" if @name == 'editor'
 
     updateCursorOffset: ->
         cx = @mainCursor[0]*@size.charWidth+@size.offsetX
