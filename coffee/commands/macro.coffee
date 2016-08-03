@@ -124,8 +124,9 @@ class Macro extends Command
             # 0000000    0000000     0000000 
             
             when 'dbg'
-                li = if editor.isCursorInIndent() then cp[1] else cp[1]+1
+                li = cp[1]
                 indent = editor.indentStringForLineAtIndex li
+                li += 1 if not editor.isCursorInIndent() and not editor.isCursorInLastLine()
                 insert = indent + 'log "'
                 insert += editor.funcInfoAtLineIndex li
                 lst = args.length and parseInt args[0] or 0

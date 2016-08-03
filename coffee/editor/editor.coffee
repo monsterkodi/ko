@@ -886,7 +886,28 @@ class Editor extends Buffer
         @do.cursors newCursors
         @do.end()
 
-    indentStringForLineAtIndex: (li) -> _.padStart "", @indentationAtLineIndex li
+    indentStringForLineAtIndex: (li) -> 
+        if li < @lines.length
+            il = 0
+            thisIndent = @indentationAtLineIndex li
+            indentLength = @indentString.length
+            
+            if @indentNewLineMore?
+                if @indentNewLineMore.lineEndsWith?.length
+                    for e in @indentNewLineMore.lineEndsWith
+                        if @lines[li].endsWith e
+                            il = thisIndent + indentLength
+                            break
+                if il == 0
+                    if @indentNewLineMore.lineRegExp? and @indentNewLineMore.lineRegExp.test @lines[li]
+                        il = thisIndent + indentLength
+                        
+            il = thisIndent if il == 0
+            il = Math.max il, @indentationAtLineIndex li+1
+            
+            _.padStart "", il
+        else
+            ''
            
     #  0000000   0000000   00     00  00     00  00000000  000   000  000000000
     # 000       000   000  000   000  000   000  000       0000  000     000   
@@ -1066,8 +1087,7 @@ class Editor extends Buffer
                             before = before.trimRight()
                             before = before.slice 0, before.length-4 # remove then                            
                 
-                nextIndent = @indentationAtLineIndex c[1]+1
-                il = nextIndent if nextIndent > il
+                il = Math.max il, @indentationAtLineIndex c[1]+1
                 indent = _.padStart "", il
             else
                 indent = ''
@@ -1355,7 +1375,7 @@ class Editor extends Buffer
     # 0000000    000   000   0000000  000   000  00     00  000   000  000   000  0000000  
     
     deleteBackward: (opt) ->
-                
+        
         @do.start()
         if @selections.length
             @deleteSelection()
