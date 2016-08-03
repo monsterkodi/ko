@@ -161,12 +161,10 @@ class Scroll extends events
     # 000  000   000  0000000   00000000  000   000     000   
     
     insertLine: (li,oi) =>
-        # console.log "Scroll.insertLine li:#{li} oi:#{oi} #{@exposeTop} #{@top} #{@bot} #{@exposeBot}" if @dbg
         @exposeBot += 1 if @lineIndexIsInExpose oi
         @bot       += 1 if @lineIndexIsInView oi
         @top       += 1 if oi < @top
         @numLines  += 1
-        # console.log "Scroll.insertLine li:#{li} oi:#{oi} #{@exposeTop} #{@top} #{@bot} #{@exposeBot}" if @dbg
         @fullHeight = @numLines * @lineHeight
         @calc()
         
@@ -177,11 +175,11 @@ class Scroll extends events
     # 0000000    00000000  0000000  00000000     000     00000000
 
     deleteLine: (li,oi) =>
-        @exposeBot -= 1 if @lineIndexIsInExpose oi
+        @exposeBot -= 1 if @lineIndexIsInExpose(oi) or @numLines < @exposeNum
         @bot       -= 1 if @lineIndexIsInView oi
-        @numLines  -= 1
-        @fullHeight = @numLines * @lineHeight
-        @calc()
+        # @numLines  -= 1
+        # @fullHeight = @numLines * @lineHeight
+        # @calc()
     
     lineIndexIsInView: (li) -> 
         return true if @top <= li <= @bot

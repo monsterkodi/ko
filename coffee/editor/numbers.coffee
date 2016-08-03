@@ -81,6 +81,7 @@ class Numbers extends event
             @elem.appendChild @addLine e.lineIndex
         else
             # log "skip expose #{e.lineIndex}" if @editor.name == 'editor'
+            return
         @updateColor e.lineIndex
 
     onLineInserted: (li) =>
@@ -108,19 +109,17 @@ class Numbers extends event
     #    000     000   000  000  0000  000       000  000   000
     #     0      000   000  000   000  000  0000000   000   000
     
-    onClearLines: => @elem.innerHTML = ""
+    onClearLines: =>  @elem.innerHTML = ""
         
     onLineVanished: (e) => 
-        # console.log "numbers.onLineVanished #{e.lineIndex}" if @editor.name == 'editor'
         if @elem.firstChild?.lineIndex == e.lineIndex
             @elem.firstChild.remove()
         else if @elem.lastChild?.lineIndex >= e.lineIndex
             @elem.lastChild.remove()
-        else
-            log "vanish? #{@editor.name} #{e.lineIndex} #{@elem.firstChild.lineIndex} #{@elem.lastChild.lineIndex}" if @editor.name != 'logview'
+        # else
+            # log "vanish? #{@editor.name} #{e.lineIndex} #{@elem.firstChild.lineIndex} #{@elem.lastChild.lineIndex}" if @editor.name != 'logview'
     
     onLineDeleted: (li) =>
-        # console.log "numbers.onLineDeleted #{li}" if @editor.name == 'editor'
         top = @editor.scroll.exposeTop
         if top <= li
             for i in [li-top...@elem.children.length]

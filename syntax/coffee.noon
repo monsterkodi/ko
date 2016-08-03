@@ -50,7 +50,7 @@ null|undefined                 keyword.null
 
 # class members
 
-(@\w+)(?=\s*[\?\!\=\,\.\<\>\*\/\]\)]|\[|\s+[\+\-]\s+|\s*$)    class.variable
+(@\w+)(?=\s*[\?\!\+\-\=\,\.\<\>\*\/\]\)]|\[|\s+[\+\-]\s+|\s*$|\s+and|\s+or|\s+if|\s+then)    class.variable
 
 # .property
 
@@ -65,10 +65,10 @@ null|undefined                 keyword.null
 (\w+)\s*[:]\s*[-=]>                 . method
 (\()[^\(\)]*(\)\s*)[-=]>            . function.bracket . function.bracket
 
-(\w+)(?=\(|\s+[@\w\d\"\'\(\[\{])         function.call
-(@\w+)(?=\s+[\w\d@\+\-\"\'\(\[\{]|\()    class.function.call
-(@?\w+)\s*(\.\s*\w+)\s*\([^\)]*\)      . class.callee . function.call
-(@?\w+)\s*(\.\s*\w+)\s+\w+             . class.callee . function.call
+([a-zA-Z]\w*)(?!\s+or|\s+i[fs]|\s+and|\s+then)(?=\(|\s+[@\w\d\"\'\(\[\{])    function.call
+(@[a-zA-Z]\w*)(?!\s+or|\s+i[fs]|\s+and|\s+then)(?=\(|\s+[@\w\d\"\'\(\[\{])   class.function.call
+(@?[a-zA-Z]\w*)\s*(\.\s*\w+)\s*\([^\)]*\)       . class.callee . function.call
+(@?[a-zA-Z]\w*)\s*(\.\s*\w+)\s+\w+              . class.callee . function.call
 
 # class construction
     

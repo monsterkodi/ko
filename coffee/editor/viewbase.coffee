@@ -193,19 +193,30 @@ class ViewBase extends Editor
   
     changed: (changeInfo, action) ->
         @syntax.changed changeInfo
-        
+    
         numChanges = 0   
         changes = _.cloneDeep changeInfo.sorted
         
-        changes.sort (a,b) -> 
-            if a[2] == b[2]
-                if a[0]==b[0]
+        oldScrollLines = @scroll.numLines
+        
+        changes.sort (a,b) ->
+            [na,oa] = [a[0],a[2]]
+            [nb,ob] = [b[0],b[2]]
+            if a[1] == 'deleted' == b[1]
+                if na == nb
+                    return ob-oa # delete later lines first
+                else
+                    return na-nb
+            if oa == ob
+                if na==nb
                     order = ['inserted', 'deleted', 'changed']
-                    order.indexOf(a[1]) - order.indexOf(b[1])
-                a[0]-b[0]
+                    return order.indexOf(a[1]) - order.indexOf(b[1])
+                return na-nb
             else
-                a[2]-b[2]
-
+                return oa-ob
+        
+        # log "ViewBase.changed changes", changes
+        
         while (change = changes.shift())
             [li,ch,oi] = change
             switch ch
@@ -218,8 +229,10 @@ class ViewBase extends Editor
                 when 'inserted' 
                     numChanges += 1
                     @insertLine li, oi                    
-              
-        if numChanges != 0 
+        
+        if changeInfo.inserted.length or changeInfo.deleted.length            
+            @scroll.setNumLines @lines.length
+            @updateScrollOffset()
             @updateLinePositions()
             @layersWidth = @layers.offsetWidth
 
@@ -267,7 +280,6 @@ class ViewBase extends Editor
     # 00000000  000   000  000         0000000   0000000   00000000
 
     exposeLine: (li) =>
-        # log "exposeLine #{li}" if @name == "editor"
         div = @divForLineAtIndex li
         @elem.appendChild div
         
@@ -282,11 +294,10 @@ class ViewBase extends Editor
     exposeLines: (e) =>
         before = @elem.firstChild
         for li in [e.top..e.bot]
-            # log "exposeLines #{li}" if @name == 'editor'
             div = @divForLineAtIndex li
             @elem.insertBefore div, before
 
-        for li in [e.bot..e.top]
+        for li in (before? and [e.bot..e.top] or [e.top..e.bot])
             @emit 'lineExposed',
                 lineIndex: li
                 lineDiv: @elem.children[li-e.top]
@@ -302,7 +313,6 @@ class ViewBase extends Editor
     #     0      000   000  000   000  000  0000000   000   000
     
     vanishLines: (e) =>
-        # log "viewbase.vanishLines", e
         top = e.top ? 0
         while top
             li = @elem.firstChild.lineIndex
