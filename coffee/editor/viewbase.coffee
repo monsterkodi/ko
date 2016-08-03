@@ -124,7 +124,9 @@ class ViewBase extends Editor
         if @scroll.viewHeight != @viewHeight()
             @scroll.setViewHeight @viewHeight()
             @emit 'viewHeight', @viewHeight()
+        # log "viewbase.setLines #{@lines.length}" if @name == 'editor'
         @scroll.setNumLines @lines.length
+        # log "viewbase.setLines #{@lines.length} #{@scroll.exposeTop} #{@scroll.exposeBot}" if @name == 'editor'
         @layers.scrollLeft = 0
         @layersWidth  = @layers.offsetWidth
         @layersHeight = @layers.offsetHeight
@@ -190,6 +192,7 @@ class ViewBase extends Editor
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
   
     changed: (changeInfo, action) ->
+        # log "changed", changeInfo.sorted if @name == 'editor'
         @syntax.changed changeInfo
         
         numChanges = 0   
@@ -209,12 +212,11 @@ class ViewBase extends Editor
               
         if numChanges != 0 
             @updateLinePositions()
-            @clearHighlights()
-            @layersWidth  = @layers.offsetWidth
+            @layersWidth = @layers.offsetWidth
 
-        @scroll.setNumLines @lines.length
-        @scroll.by 0
-            
+        if changeInfo.sorted.length
+            @clearHighlights()
+        
         if changeInfo.cursors.length
             @renderCursors()
             if delta = @deltaToEnsureCursorsAreVisible()
@@ -226,7 +228,6 @@ class ViewBase extends Editor
         if changeInfo.selection.length
             @renderSelection()   
             @emit 'selection'
-
         @emit 'changed', changeInfo, action
 
     # 00000000  0000000    000  000000000
@@ -236,11 +237,17 @@ class ViewBase extends Editor
     # 00000000  0000000    000     000   
     
     deleteLine: (li, oi) ->
+        return if oi > @scroll.exposeBot
+        return if oi < @scroll.exposeTop
         @elem.children[oi - @scroll.exposeTop]?.remove()
         @scroll.deleteLine li, oi
         @emit 'lineDeleted', oi
         
     insertLine: (li, oi) -> 
+        # log "ViewBase.insertLine li:#{li} oi:#{oi}"
+        return if oi >  @scroll.exposeBot and @scroll.exposeBot - @scroll.exposeTop == @scroll.exposeNum
+        return if oi <= @scroll.exposeTop
+        # log "ViewBase.insertLine li:#{li} oi:#{oi}"
         div = @divForLineAtIndex li
         @elem.insertBefore div, @elem.children[oi - @scroll.exposeTop]
         @scroll.insertLine li, oi
@@ -286,6 +293,7 @@ class ViewBase extends Editor
     #     0      000   000  000   000  000  0000000   000   000
     
     vanishLines: (e) =>
+        # log "viewbase.vanishLines", e
         top = e.top ? 0
         while top
             li = @elem.firstChild.lineIndex
@@ -345,6 +353,10 @@ class ViewBase extends Editor
             span.innerHTML = '&#9687;'
             div.appendChild span
         div
+    
+    findDivForLineAtIndex: (li) ->
+        for i in [@elem.lines.length-1..0]
+            return @elem.children[i] if @elem.children[i].lineIndex == li
     
     renderCursors: ->
         cs = []

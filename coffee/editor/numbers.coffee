@@ -28,11 +28,8 @@ class Numbers extends event
         @onFontSizeChange()
 
     onHighlight: => 
-        if @editor.highlights.length
-            @updateColor h[0] for h in @editor.highlights
-        else
-            for li in [@editor.scroll.exposeTop..@editor.scroll.exposeBot]
-                @updateColor li
+        for li in [@editor.scroll.exposeTop..@editor.scroll.exposeBot]
+            @updateColor li
     
     onChanged: (changeInfo) =>
         if changeInfo.cursors?.length
@@ -86,27 +83,30 @@ class Numbers extends event
     # 00000000  000   000  000         0000000   0000000   00000000
         
     onLineExposed: (e) =>
+        # log "numbers.onLineExposed #{e.lineIndex}" if @editor.name == 'editor'
         if e.lineIndex < @elem.firstChild?.lineIndex
             @elem.insertBefore @addLine(e.lineIndex), @elem.firstChild
-        else if e.lineIndex > @elem.lastChild?.lineIndex
+        else if e.lineIndex > @elem.lastChild?.lineIndex or not @elem.lastChild?
             @elem.appendChild @addLine e.lineIndex
         else
-            @elem.appendChild @addLine e.lineIndex
+            # log "skip expose #{e.lineIndex}" if @editor.name == 'editor'
         @updateColor e.lineIndex
 
     onLineInserted: (li) =>
+        # log "numbers.onLineInserted #{li}" if @editor.name == 'editor'
         top = @editor.scroll.exposeTop
-        bot = @editor.scroll.exposeBot
-        if top <= li <= bot
-            for i in [li...bot]
-                div = @elem.children[li-top]
-                div.firstChild.textContent = "#{li+1}"
+        if top <= li
+            for i in [li-top...@elem.children.length]
+                div = @elem.children[i]
+                div.firstChild.textContent = "#{top+i+1}"
                 @emit 'numberChanged', 
                     numberDiv:  div
                     numberSpan: div.firstChild
-                    lineIndex:  i
-                @updateColor i
-            @onLineExposed lineIndex: bot
+                    lineIndex:  top+i
+                @updateColor top+i
+            i = top+@elem.children.length
+            @elem.appendChild @addLine i
+            @updateColor i
                     
     # 000   000   0000000   000   000  000   0000000  000   000
     # 000   000  000   000  0000  000  000  000       000   000
@@ -117,26 +117,26 @@ class Numbers extends event
     onClearLines: => @elem.innerHTML = ""
         
     onLineVanished: (e) => 
-        
+        # console.log "numbers.onLineVanished #{e.lineIndex}" if @editor.name == 'editor'
         if @elem.firstChild?.lineIndex == e.lineIndex
             @elem.firstChild.remove()
         else if @elem.lastChild?.lineIndex >= e.lineIndex
             @elem.lastChild.remove()
-        # else
-            # log "vanish? #{@editor.name} #{e.lineIndex} #{@elem.firstChild.lineIndex} #{@elem.lastChild.lineIndex}" if @editor.name != 'logview'
+        else
+            log "vanish? #{@editor.name} #{e.lineIndex} #{@elem.firstChild.lineIndex} #{@elem.lastChild.lineIndex}" if @editor.name != 'logview'
     
     onLineDeleted: (li) =>
+        # console.log "numbers.onLineDeleted #{li}" if @editor.name == 'editor'
         top = @editor.scroll.exposeTop
-        bot = @editor.scroll.exposeBot
-        if top <= li <= bot
-            for i in [li..bot]
-                div = @elem.children[i-top]
-                div.firstChild.textContent = "#{i+1}"
-                @updateColor i
+        if top <= li
+            for i in [li-top...@elem.children.length]
+                div = @elem.children[i]
+                div.firstChild.textContent = "#{top+i+1}"
+                @updateColor top+i
                 @emit 'numberChanged', 
                     numberDiv:  div
                     numberSpan: div.firstChild
-                    lineIndex:  i
+                    lineIndex:  top+i
         @elem.lastChild?.remove()
         
     #  0000000   0000000    0000000    000      000  000   000  00000000

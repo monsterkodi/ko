@@ -7,6 +7,7 @@
 fileExists,
 last}      = require '../tools/tools'
 log        = require '../tools/log'
+salt       = require '../tools/salt'
 indexer    = require '../indexer'
 Command    = require '../commandline/command'
 _          = require 'lodash'
@@ -155,8 +156,9 @@ class Macro extends Command
                 file = path.join path.dirname(editor.currentFile), clss.toLowerCase() + '.coffee'
                 if fileExists file
                     return text: "file #{file} exists!"
-                text = """
-                \#> #{clss}
+                text = ("# "+s for s in salt(clss).split '\n').join '\n'
+                text += '\n'
+                text += """
                 
                 class #{clss}
                     

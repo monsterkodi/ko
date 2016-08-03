@@ -72,8 +72,9 @@ class Undo
         
     changeInfoCursor: ->
         @getChangeInfo()
+        # log "Undo.changeInfoCursor", @editor.cursors if @editor.name == 'editor'
         for c in @editor.cursors
-            if @changeInfo.cursors.indexOf(c[1]) < 0
+            if c[1] >= 0 and @changeInfo.cursors.indexOf(c[1]) < 0
                 @changeInfo.cursors.push c[1]
 
     changeInfoSelection: ->

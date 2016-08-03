@@ -22,17 +22,18 @@ _       = require 'lodash'
 class Editor extends Buffer
 
     constructor: () ->
+        @lines              = []
         @surroundStack      = []
         @surroundCharacters = []
         @surroundPairs      = Object.create null
         @currentFile        = null
-        @fileType           = 'txt'
         @indentString       = _.padStart "", 4
         @stickySelection    = false
         @mainCursorMove     = 0
         @watch              = null
         @do                 = new undo @
         @dbg                = false
+        @setupFileType()
         super
 
     #  0000000   00000000   00000000   000      000   000
@@ -74,11 +75,10 @@ class Editor extends Buffer
         if file?
             @watch = new watcher @
             @setText fs.readFileSync file, encoding: 'utf8'
-            @setupFileType()
         else
-            @fileType = ''
             @watch = null
             @setLines []
+        @setupFileType()
 
     # 000000000  000   000  00000000   00000000
     #    000      000 000   000   000  000     
@@ -87,8 +87,9 @@ class Editor extends Buffer
     #    000        000     000        00000000
     
     setupFileType: ->
-        @fileType = Syntax.shebang @lines[0]
-        if @fileType == 'txt'
+        @fileType = 'txt'
+        @fileType = Syntax.shebang @lines[0] if @lines.length
+        if @fileType == 'txt' and @currentFile?
             ext = extName @currentFile
             if ext in Syntax.syntaxNames
                 @fileType = ext
@@ -130,7 +131,6 @@ class Editor extends Buffer
                 
         @lineComment = switch @fileType
             when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug' then '//'
-            when 'txt' then '--'
             else '#'        
                 
     #  0000000  00000000  000000000         000      000  000   000  00000000   0000000
@@ -156,7 +156,7 @@ class Editor extends Buffer
                                 
     startSalter: (opt) ->
         cp = @cursorPos()
-        if not opt?.word and rgs = @salterRangesAtPos()
+        if not opt?.word and rgs = @salterRangesAtPos() # edit existing header
             cols = @columnsInSalt (@textInRange r for r in rgs)
             ci = 0
             while ci < cols.length and cp[0] > cols[ci]
@@ -167,7 +167,7 @@ class Editor extends Buffer
             @mainCursor = last newCursors
             @do.cursors newCursors
             @do.end()
-        else
+        else # create new header
             word = opt?.word ? @wordAtCursor().trim()
             indt = _.padStart '', @indentationAtLineIndex cp[1]
             stxt = word.length and salt(word).split('\n') or ['', '', '', '', '']

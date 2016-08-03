@@ -25,7 +25,8 @@ class View extends ViewBase
         
         window.split.on 'commandline', @onCommandline
         @fontSizeDefault = 16
-        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Autocomplete']        
+        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Autocomplete', 'Brackets']        
+        @scroll.dbg = true
         @setText ''
                     
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
