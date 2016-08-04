@@ -81,7 +81,7 @@ class Render
             s = ss[si]
             n = (si < ss.length-1) and (ss[si+1][0] == s[0]+1) and ss[si+1] or null # next line selection
             b = p?[0] == s[0]-1 and p or null # selection in line before
-            h += @selectionSpan b, s, n, size, clss
+            h += @selectionSpan b, s, n, size, s[2] ? clss
             p = s
         h
         
@@ -92,7 +92,7 @@ class Render
         # 0000000    000   000  0000000    000   000  0000000   0000000  
         # 000   000  000   000  000   000  000   000  000       000   000
         # 0000000     0000000   000   000  0000000    00000000  000   000
-                
+        console.log clss        
         border = ""
         if not prev
             border += " tl tr"

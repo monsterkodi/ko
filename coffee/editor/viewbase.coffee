@@ -491,7 +491,6 @@ class ViewBase extends Editor
         if @scroll.offsetTop != @scrollOffsetTop
             @layers.scrollTop = @scroll.offsetTop 
             @scrollOffsetTop = @scroll.offsetTop
-            # log "ViewBase.updateScrollOffset @scrollOffsetTop:#{@scrollOffsetTop}" if @name == 'editor'
 
     updateCursorOffset: ->
         cx = @mainCursor[0]*@size.charWidth+@size.offsetX

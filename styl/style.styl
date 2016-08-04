@@ -14,7 +14,7 @@ minimapWidth          = 130px
 scrollbarWidth        = 12px // transparent scroll area
 scrollhandleWidth     = 6px
 numbersWidth          = 50px
-editorPadding         = (8px + numbersWidth) 
+editorPadding         = (8px + numbersWidth)
 bottomCornerRadius    = 4px
 frameColor            = #222
 frameWidth            = scrollhandleWidth
@@ -702,6 +702,12 @@ body
     pointer-events      none
     background          rgba(155,155,255, 0.3)
 
+.bracketmatch
+    position            absolute
+    pointer-events      none
+    text-decoration     underline
+    background          rgba(255,255,255, 0.2)
+
 //  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
 // 000       000       000      000       000          000     000  000   000  0000  000
 // 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
@@ -720,6 +726,7 @@ body
         width            1px
         margin-right    -1px
     
+.bracketmatch
 .selection
 .highlight    
     padding-right       selectionRadiusCursor
@@ -744,4 +751,9 @@ body
         border-top-right-radius selectionRadius
     &.br
         border-bottom-right-radius selectionRadius
-                                                        
+
+.bracketmatch
+    padding-right       0
+    margin-right        0
+    padding-left        0
+    margin-left         0

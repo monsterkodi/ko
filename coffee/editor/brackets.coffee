@@ -48,9 +48,7 @@ class Brackets
                 for firstAfterIndex in [0...rngs.length]
                     break if rngs[firstAfterIndex].start >= cp
                 before = rngs.slice 0, firstAfterIndex
-                # log "\nbefore:", ("#{r.value} #{r.start} #{r.match}" for r in before) if before.length
                 after  = rngs.slice firstAfterIndex
-                # log "\nafter:", ("#{r.value} #{r.start} #{r.match}" for r in after) if after.length
                 
                 return if @highlightAfter   after  if not before.length
                 return if @highlightBefore  before if not after.length
@@ -58,12 +56,14 @@ class Brackets
 
                 # log "\nbefore:", ("#{r.value} #{r.start} #{r.match}" for r in before) if before.length
                 # log "\nafter:", ("#{r.value} #{r.start} #{r.match}" for r in after) if after.length
+        @clear()
+        @editor.renderHighlights()
         
     highlightAfter: (after) ->
         fst = first after
         if fst.value == 'open'
             nxt = after[1]
-            if nxt.match == @close[fst.match]
+            if nxt?.match == @close[fst.match]
                 @highlight fst, nxt
                 true
 
@@ -71,7 +71,7 @@ class Brackets
         lst = last before
         if lst.value == 'close'
             prv = before[before.length-2]
-            if prv.match == @open[lst.match]
+            if prv?.match == @open[lst.match]
                 @highlight prv, lst
                 true
                 
@@ -85,5 +85,12 @@ class Brackets
 
     highlight: (opn, cls) ->
         # log "#{opn.match} #{cls.match} #{opn.start} #{cls.start}"
+        @clear()
+        @editor.highlights.push [@editor.cursorPos()[1], [opn.start, opn.start+opn.match.length], 'bracketmatch']
+        @editor.highlights.push [@editor.cursorPos()[1], [cls.start, cls.start+cls.match.length], 'bracketmatch']
+        @editor.renderHighlights()
+
+    clear: ->
+        @editor.highlights = @editor.highlights.filter (h) -> not h[2]? or h[2] != 'bracketmatch'
 
 module.exports = Brackets

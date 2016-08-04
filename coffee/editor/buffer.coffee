@@ -205,7 +205,7 @@ class Buffer extends event
     highlightsInLineIndexRangeRelativeToLineIndex: (lineIndexRange, relIndex) ->
         hl = @highlightsInLineIndexRange lineIndexRange
         if hl
-            ([s[0]-relIndex, [s[1][0], s[1][1]]] for s in hl)
+            ([s[0]-relIndex, [s[1][0], s[1][1]], s[2]] for s in hl)
     
     highlightsInLineIndexRange: (lineIndexRange) ->
         hl = []
