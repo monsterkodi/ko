@@ -401,7 +401,6 @@ class ViewBase extends Editor
                     vc.push [@lines[@scroll.exposeTop+c[1]].length, c[1], 'virtual']
             cs = cs.concat vc
         html = render.cursors cs, @size
-        # $('.cursors', @layers).innerHTML = html
         @layerDict.cursors.innerHTML = html
             
     renderSelection: ->
@@ -409,7 +408,6 @@ class ViewBase extends Editor
         s = @selectionsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
         if s
             h += render.selection s, @size
-        # $('.selections', @layers).innerHTML = h
         @layerDict.selections.innerHTML = h
 
     renderHighlights: ->        
@@ -417,7 +415,6 @@ class ViewBase extends Editor
         s = @highlightsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
         if s
             h += render.selection s, @size, "highlight"
-        # $('.highlights', @layers).innerHTML = h
         @layerDict.highlights.innerHTML = h
 
     # 00000000   00000000   0000000  000  0000000  00000000

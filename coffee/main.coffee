@@ -494,7 +494,7 @@ class Main
             b = w.getBounds()
             if b.height == wb.height and b.y == wb.y
                 if b.x < wb.x 
-                    if b.x+b.width-wb.x > -200
+                    if Math.abs(b.x+b.width-wb.x) < 100
                         w.showInactive()
                         w.setBounds 
                             x:      b.x
@@ -502,7 +502,7 @@ class Main
                             width:  wb.x - b.x + frameSize
                             height: b.height
                 else if b.x+b.width > wb.x+wb.width
-                    if b.x-wb.x-wb.width < 200
+                    if Math.abs(wb.x+wb.width-b.x) < 100
                         w.showInactive()
                         w.setBounds
                             x:      wb.x+wb.width-frameSize

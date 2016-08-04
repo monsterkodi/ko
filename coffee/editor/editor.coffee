@@ -798,7 +798,10 @@ class Editor extends Buffer
             when 'right' then (c) => [@lines[c[1]].length, c[1]]
             when 'left'  then (c) => 
                 if @lines[c[1]].slice(0,c[0]).trim().length == 0
-                    [0, c[1]]
+                    if c[0] == 0 and @lines[c[1]].trimLeft().length < @lines[c[1]].length
+                        [@lines[c[1]].length-@lines[c[1]].trimLeft().length, c[1]]
+                    else
+                        [0, c[1]]
                 else
                     d = @lines[c[1]].length - @lines[c[1]].trimLeft().length
                     [d, c[1]]
