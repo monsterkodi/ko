@@ -24,7 +24,7 @@ class Indexer
     @includeRegExp = /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
     @methodRegExp  = /^\s+([\@]?\w+)\s*\:\s*(\([^\)]*\))?\s*[=-]\>/
     @funcRegExp    = /^\s*([\w\.]+)\s*[\:\=]\s*(\([^\)]*\))?\s*[=-]\>/
-    @splitRegExp   = new RegExp "[^\\w\\d#\\_]+", 'g'        
+    @splitRegExp   = new RegExp "[^\\w\\d\\_]+", 'g'        
     
     constructor: () ->
         @collectBins()
@@ -207,10 +207,11 @@ class Indexer
                 for word in words
                     
                     switch 
-                        when word.length < 2 then
-                        when word[0] in ['-', "#", '_'] and word.length < 3 then
-                        when /^[0\_\-\@\#]+$/.test word then
-                        when /^[\-]?[\d]+$/.test word then
+                        when word.length < 3 then # exclude when too short
+                        when word[0] in ['-', "#", '_'] and word.length < 4 then # exclude when starts with special and is short
+                        when /^[0\_\-\@\#]+$/.test word then # exlude when consist of special characters only
+                        when /^[\-]?\d/.test word then # exlude when starts with number
+                        when word.length < 4 and /[a-fA-F](\d[a-fA-F]|[a-fA-F]\d|\d\d)/.test word then # exclude short hex numbers
                         else
                             _.update @words, "#{word}.count", (n) -> (n ? 0) + 1 
                     

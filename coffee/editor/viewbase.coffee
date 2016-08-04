@@ -211,11 +211,11 @@ class ViewBase extends Editor
                 if na==nb
                     order = ['inserted', 'deleted', 'changed']
                     return order.indexOf(a[1]) - order.indexOf(b[1])
-                return na-nb
+                return nb-na # insert later lines first
             else
                 return oa-ob
         
-        # log "ViewBase.changed changes", changes
+        # log "ViewBase.changed changes", changes if @name == 'editor'
         
         while (change = changes.shift())
             [li,ch,oi] = change
@@ -271,7 +271,7 @@ class ViewBase extends Editor
         div = @divForLineAtIndex li
         @elem.insertBefore div, @elem.children[oi - @scroll.exposeTop]
         @scroll.insertLine li, oi
-        @emit 'lineInserted', li
+        @emit 'lineInserted', li, oi
         
     # 00000000  000   000  00000000    0000000    0000000  00000000
     # 000        000 000   000   000  000   000  000       000     

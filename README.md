@@ -329,6 +329,7 @@ it compensates a lacking tabbing feature by autoalignment of tiled windows and f
 
 shortcuts:
 - **⌘⌥A** switch between tiled and stacked windows
+- **^W** close file in active window
 - **⌘W** close active window
 - **⌘⇧W** close all windows except active window
 - **⌘`** activate next window
@@ -374,7 +375,7 @@ at the right end of the commandline (above the editor minimap) some useful numbe
 ![readme](img/info.png)
 - top row:
     - cursor column
-    - cursors
+    - [cursors]
     - [selections]
     - [highlights]
     - indexed classes

@@ -198,12 +198,13 @@ class Autocomplete extends event
                 throw new Error
             words = l.split @splitRegExp
             words = words.filter (w) => 
-                return false if w.length < 2
-                return false if w[0] in ['-', "#", '_'] and w.length < 3
+                return false if w.length < 3
+                return false if w[0] in ['-', "#", '_'] and w.length < 4
                 return false if @word == w.slice 0, w.length-1
                 return false if w == cursorWord
                 return false if @headerRegExp.test w
-                return false if /^[\-]?[\d]+$/.test w
+                return false if /^[\-]?\d/.test w
+                return false if w.length < 4 and /[a-fA-F](\d[a-fA-F]|[a-fA-F]\d|\d\d)/.test w
                 true
                 
             for w in words # append words without leading special character

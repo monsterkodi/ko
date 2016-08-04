@@ -84,11 +84,11 @@ class Numbers extends event
             return
         @updateColor e.lineIndex
 
-    onLineInserted: (li) =>
+    onLineInserted: (li, oi) =>
         # log "numbers.onLineInserted #{li}" if @editor.name == 'editor'
         top = @editor.scroll.exposeTop
-        if top <= li
-            for i in [li-top...@elem.children.length]
+        if top <= oi
+            for i in [oi-top...@elem.children.length]
                 div = @elem.children[i]
                 if not div?.firstChild?
                     alert "no div child? #{li} #{i} #{li-top} #{@elem.children.length}"
