@@ -1301,9 +1301,8 @@ class Editor extends Buffer
             lineSelected = s[1][0] == 0 and s[1][1] == @lines[s[0]].length
             if lineSelected and @lines.length > 1
                 @do.delete s[0]
-                # move cursors below deleted line up
                 for nc in @positionsBelowLineIndexInPositions s[0], newCursors
-                    @newCursorSet newCursors, nc, 0, -1
+                    @newCursorDelta newCursors, nc, 0, -1 # move cursors below deleted line up
             else
                 continue if s[0] >= @lines.length
                 if not @lines[s[0]].splice?

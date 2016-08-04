@@ -206,7 +206,7 @@ class ViewBase extends Editor
                 if na == nb
                     return ob-oa # delete later lines first
                 else
-                    return na-nb
+                    return nb-na # delete later lines first
             if oa == ob
                 if na==nb
                     order = ['inserted', 'deleted', 'changed']
