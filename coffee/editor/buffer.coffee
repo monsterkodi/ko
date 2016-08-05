@@ -175,7 +175,7 @@ class Buffer extends event
         
     indexOfSelection: (s) -> @selections.indexOf s
     
-    startPosOfContinuousSelectionAtPos: (p) -> # used by deleteSelection to calculate cursor positions
+    continuousSelectionAtPos: (p) -> # used by deleteSelection to calculate cursor positions
         r = @rangeAtPosInRanges p, @selections
         if r
             sp = @rangeStartPos r
@@ -188,7 +188,17 @@ class Buffer extends event
                     sp = @rangeStartPos last sil
                 else
                     break
-        sp
+            ep = @rangeEndPos r
+            while (ep[0] == @lines[ep[1]].length) and (ep[1] < @lines.length-1)
+                nlr = @rangeForLineAtIndex ep[1]+1
+                sil = @selectionsInLineAtIndex ep[1]+1
+                if sil.length == 1 and @isSameRange sil[0], nlr
+                    ep = @rangeEndPos nlr
+                else if sil.length and first(sil)[1][0] == 0
+                    ep = @rangeEndPos first sil
+                else
+                    break                    
+            [sp, ep]
         
     onlyFullLinesSelected: -> 
         return false if not @selections.length

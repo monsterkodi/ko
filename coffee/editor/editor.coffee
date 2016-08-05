@@ -1291,10 +1291,12 @@ class Editor extends Buffer
         return if not @selections.length
         @do.start()
         newCursors = _.cloneDeep @cursors
-        
+        joinLines = []
         for c in @cursors
-            sp = @startPosOfContinuousSelectionAtPos c            
+            [sp, ep] = @continuousSelectionAtPos c
             @oldCursorSet newCursors, c, sp[0], sp[1] if sp?
+            if sp[1] < ep[1] and sp[0] > 0 and ep[0] < @lines[ep[1]].length 
+                joinLines.push sp[1] # selection spans multiple lines and first and last line are cut
 
         for s in @reversedSelections()
             continue if s[0] >= @lines.length
@@ -1305,13 +1307,15 @@ class Editor extends Buffer
                     @newCursorDelta newCursors, nc, 0, -1 # move cursors below deleted line up
             else
                 continue if s[0] >= @lines.length
-                if not @lines[s[0]].splice?
-                    log "wtf? #{@lines.length} #{@lines[0]} lines:", @lines
-                    break
                 @do.change s[0], @lines[s[0]].splice s[1][0], s[1][1]-s[1][0]
                 for nc in @positionsFromPosInPositions [s[1][1], s[0]], @positionsInLineAtIndexInPositions s[0], newCursors
                     @newCursorDelta newCursors, nc, -(s[1][1]-s[1][0])
-                    
+
+            if s[0] in joinLines # == last joinLines?
+                @do.change s[0], @lines[s[0]] + @lines[s[0]+1]
+                @do.delete s[0]+1
+                _.pull joinLines, s[0]
+        
         @do.selections []
         @do.cursors newCursors
         @do.end()

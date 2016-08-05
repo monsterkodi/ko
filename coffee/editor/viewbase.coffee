@@ -202,7 +202,7 @@ class ViewBase extends Editor
         changes.sort (a,b) ->
             [na,oa] = [a[0],a[2]]
             [nb,ob] = [b[0],b[2]]
-            if a[1] == 'deleted' == b[1]
+            if a[1] in ['deleted', 'changed'] and b[1] in ['deleted', 'changed']
                 if na == nb
                     return ob-oa # delete later lines first
                 else

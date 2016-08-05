@@ -1,7 +1,7 @@
 # todo/ideas
 
-- *improve bracket inserting (evaluate brackets in line)*
-- *fix window auto alignment*
+- *fix salter indent*
+- *fix double click*
 - *set current dir when starting from terminal*
 
 #### terminal
@@ -13,6 +13,7 @@
 - shared recent files of stacked windows
 
 #### editing
+- *improve bracket inserting (evaluate brackets in line)*
 - select continuous, rectangular ranges with command+shift+M 
 - remove from selection when alt/ctrl is down?
 - don't scroll when no new range added with command+d
@@ -21,10 +22,8 @@
 - multicursors and indent when pasting multiple lines at single cursor in col > 0
 - update cursor positions on foreign changes
 
-#### file state
-- save backup files?
-
 #### editor
+- fix horizontal scrolling
 - save and restore scrollX/Left
 - check undo (merges too much?)
 - *jump to file (include|path)*
@@ -35,7 +34,7 @@
 - tabs?
 - cat images?
 
-#### search
+#### terminal
 - fix broken syntax highlighting when editing
 
 #### tool
@@ -43,14 +42,13 @@
 - color
 
 #### nice to have
+- git status in numbers
 - dirty status in window list
 - navigation overview as columns of minimaps (ctrl+alt+esc|up|down)
 - resizable minimap
-- clean empty buffers on open file
-- help (shortcuts)
-- save window positions as layouts
-- bracket matching
-- git status in numbers
 - shortcut for renaming file
+- clean empty buffers on open file
+- save window positions as layouts
+- help (shortcuts)
 - tail -f mode
     
