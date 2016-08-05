@@ -27,21 +27,20 @@ class Brackets
         @config = matchr.config 
             "[\\{\\[\\(]":   'open'
             "[\\}\\]\\)]":   'close'
-            "[\\\"\\']":     'string'
         
     onCursor: => 
-        if @editor.highlights.length # don't highlight brackets when another highlights exist
+        if @editor.highlights.length # don't highlight brackets when other highlights exist
             for h in @editor.highlights
                 return if h[2] != 'bracketmatch'
                 
-        [before, after] = @beforeAfterForPos @editor.cursorPos()
-                                
+        cp = @editor.cursorPos()
+        [before, after] = @beforeAfterForPos cp
+        # log "Brackets.onCursor before:#{before.length} after:#{after.length}"
         if after.length or before.length
-            return if @highlightAfter after if not before.length
-            return if @highlightBefore before if not after.length
-            return if @highlightBetween before, after
+            if after.length and first(after).start == cp[0] and first(after).value == 'open' then cp[0] += 1
+            if before.length and last(before).start == cp[0]-1 and last(before).value == 'close' then cp[0] -= 1
 
-        return if @highlightInside @editor.cursorPos()
+        return if @highlightInside cp
                 
         # log "\nbefore:", ("#{r.value} #{r.start} #{r.match}" for r in before) if before.length
         # log "\nafter:", ("#{r.value} #{r.start} #{r.match}" for r in after) if after.length
@@ -51,29 +50,50 @@ class Brackets
 
     highlightInside: (pos) ->
         log "Brackets.highlightInside pos:#{pos} #{@editor.scroll.top} #{@editor.scroll.bot}"
-        
+        stack = []
         pp = pos
         while pp[1] >= @editor.scroll.top # find last open bracket before
             [before, after] = @beforeAfterForPos pp
-            # log "Brackets.highlightInside", before, after
+            while before.length 
+                prev = before.pop()
+                if prev.value == 'open'
+                    if stack.length
+                        if @open[last(stack).match] == prev.match
+                            stack.pop()                            
+                            continue
+                        else
+                            return # stack mismatch
+                    lastOpen = prev
+                    break
+                else # if prev is 'close'
+                    stack.push prev
             
-            if before.length and last(before).value == 'open'
-                lastOpen = last before
-                break
+            break if lastOpen?
             return if pp[1] < 1
             pp = [@editor.lines[pp[1]-1].length, pp[1]-1]
         
         return if not lastOpen?
         log "Brackets.highlightInside lastOpen:", lastOpen
         
+        stack = []
         pp = pos
         while pp[1] <= @editor.scroll.bot # find first close bracket after
             [before, after] = @beforeAfterForPos pp
-            # log "Brackets.highlightInside", before, after
-
-            if after.length and first(after).value == 'close'
-                firstClose = first after
-                break
+            while after.length
+                next = after.shift()
+                if next.value == 'close'
+                    if stack.length
+                        if @close[last(stack).match] == next.match
+                            stack.pop()                            
+                            continue
+                        else
+                            return # stack mismatch
+                    firstClose = next
+                    break
+                else # if next is 'open'
+                    stack.push next
+                
+            break if firstClose?
             return if pp[1] >= @editor.lines.length-1
             pp = [0, pp[1]+1]
         
@@ -100,38 +120,14 @@ class Brackets
             r.line = li for r in rngs
             lst = last rngs
             fst = first rngs
-            if fst.start <= cp and lst.start + lst.match.length >= cp
-                for firstAfterIndex in [0...rngs.length]
-                    break if rngs[firstAfterIndex].start >= cp
-                before = rngs.slice 0, firstAfterIndex
-                after  = rngs.slice firstAfterIndex
-                return [before, after]
+            # if fst.start <= cp and lst.start + lst.match.length >= cp
+            for firstAfterIndex in [0...rngs.length]
+                break if rngs[firstAfterIndex].start >= cp
+            before = rngs.slice 0, firstAfterIndex
+            after  = rngs.slice firstAfterIndex
+            return [before, after]
         [[],[]]
     
-    highlightAfter: (after) ->
-        fst = first after
-        if fst.value == 'open'
-            nxt = after[1]
-            if nxt?.match == @close[fst.match]
-                @highlight fst, nxt
-                true
-
-    highlightBefore: (before) ->
-        lst = last before
-        if lst.value == 'close'
-            prv = before[before.length-2]
-            if prv?.match == @open[lst.match]
-                @highlight prv, lst
-                true
-                
-    highlightBetween: (before, after) ->
-        prv = last before
-        nxt = first after        
-        return if not prv? or not nxt?
-        if prv.value == 'open' and nxt.value == 'close' and @close[prv.match] == nxt.match
-            @highlight prv, nxt
-            true
-
     highlight: (opn, cls) ->
         # log "#{opn.match} #{cls.match} #{opn.start} #{cls.start}"
         @clear()
