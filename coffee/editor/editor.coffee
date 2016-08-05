@@ -275,7 +275,7 @@ class Editor extends Buffer
         
     selectSingleRange: (r) ->
         if not r?
-            log "editor.#{name}.selectSingleRange warning! undefined range #{r}"
+            log "editor.#{name}.selectSingleRange warning! undefined range!"
             return
         @cursors = [[r[1][0], r[0]]]
         @initialCursors = null
@@ -530,7 +530,7 @@ class Editor extends Buffer
             @highlightText searchText if searchText?
         r = @rangeAfterPosInRanges @cursorPos(), @highlights
         r ?= first @highlights
-        @selectSingleRange r
+        @selectSingleRange r if r?
         @scrollCursorToTop()
 
     selectPrevHighlight: -> # command+shift+g
@@ -538,7 +538,7 @@ class Editor extends Buffer
             @highlightText window.commandline.commands.find?.current()
         r = @rangeBeforePosInRanges @cursorPos(), @highlights
         r ?= last @highlights
-        @selectSingleRange r
+        @selectSingleRange r if r?
 
     highlightWordAndAddToSelection: -> # command+d
         cp = @cursorPos()
