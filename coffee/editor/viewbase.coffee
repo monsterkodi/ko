@@ -241,8 +241,7 @@ class ViewBase extends Editor
         
         if changeInfo.cursors.length
             @renderCursors()
-            if delta = @deltaToEnsureCursorsAreVisible()
-                @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth 
+            @scrollCursorIntoView()
             @updateScrollOffset()
             @updateCursorOffset()
             @emit 'cursor'
@@ -487,6 +486,10 @@ class ViewBase extends Editor
                 delta = @scroll.lineHeight * (cp[1] - @scroll.top - topDist)
                 @scrollBy delta
 
+    scrollCursorIntoView: (topDist=7) ->
+        if delta = @deltaToEnsureCursorsAreVisible()
+            @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth 
+    
     updateScrollOffset: ->        
         if @scroll.offsetTop != @scrollOffsetTop
             @layers.scrollTop = @scroll.offsetTop 

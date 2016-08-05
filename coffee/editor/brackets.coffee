@@ -35,21 +35,17 @@ class Brackets
                 
         cp = @editor.cursorPos()
         [before, after] = @beforeAfterForPos cp
-        # log "Brackets.onCursor before:#{before.length} after:#{after.length}"
+
         if after.length or before.length
             if after.length and first(after).start == cp[0] and first(after).value == 'open' then cp[0] += 1
             if before.length and last(before).start == cp[0]-1 and last(before).value == 'close' then cp[0] -= 1
 
         return if @highlightInside cp
                 
-        # log "\nbefore:", ("#{r.value} #{r.start} #{r.match}" for r in before) if before.length
-        # log "\nafter:", ("#{r.value} #{r.start} #{r.match}" for r in after) if after.length
-            
         @clear()
         @editor.renderHighlights()
 
     highlightInside: (pos) ->
-        log "Brackets.highlightInside pos:#{pos} #{@editor.scroll.top} #{@editor.scroll.bot}"
         stack = []
         pp = pos
         while pp[1] >= @editor.scroll.top # find last open bracket before
@@ -73,7 +69,6 @@ class Brackets
             pp = [@editor.lines[pp[1]-1].length, pp[1]-1]
         
         return if not lastOpen?
-        log "Brackets.highlightInside lastOpen:", lastOpen
         
         stack = []
         pp = pos
@@ -99,8 +94,6 @@ class Brackets
         
         return if not firstClose?
         
-        log "highlightInside firstClose:", firstClose
-        
         if @close[lastOpen.match] == firstClose.match
             @highlight lastOpen, firstClose
             true
@@ -120,7 +113,6 @@ class Brackets
             r.line = li for r in rngs
             lst = last rngs
             fst = first rngs
-            # if fst.start <= cp and lst.start + lst.match.length >= cp
             for firstAfterIndex in [0...rngs.length]
                 break if rngs[firstAfterIndex].start >= cp
             before = rngs.slice 0, firstAfterIndex
@@ -129,7 +121,6 @@ class Brackets
         [[],[]]
     
     highlight: (opn, cls) ->
-        # log "#{opn.match} #{cls.match} #{opn.start} #{cls.start}"
         @clear()
         @editor.highlights.push [opn.line, [opn.start, opn.start+opn.match.length], 'bracketmatch']
         @editor.highlights.push [cls.line, [cls.start, cls.start+cls.match.length], 'bracketmatch']

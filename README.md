@@ -442,7 +442,6 @@ terminal aliases are stored in
 - plugin system
 - customization
 - git integration
-- bracket matching
 - regression tests
 - correct highlighting of complex strings
 

@@ -531,7 +531,7 @@ class Editor extends Buffer
         r = @rangeAfterPosInRanges @cursorPos(), @highlights
         r ?= first @highlights
         @selectSingleRange r if r?
-        @scrollCursorToTop()
+        @scrollCursorIntoView()
 
     selectPrevHighlight: -> # command+shift+g
         if not @highlights.length
