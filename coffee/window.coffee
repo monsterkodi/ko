@@ -146,9 +146,10 @@ saveFile = (file) =>
 
 reloadFile = =>
     loadFile editor.currentFile, 
-        reload:   true
-        dontSave: true
-        keepUndo: false
+        reload:          true
+        dontSave:        true
+        dontSaveCursors: true
+        keepUndo:        false
 
 loadFile = (file, opt={}) =>
     return if not file? or not file.length

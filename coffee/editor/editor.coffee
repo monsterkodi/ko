@@ -67,6 +67,7 @@ class Editor extends Buffer
             @watch = null
 
     setCurrentFile: (file, opt) ->
+        @setSalterMode false
         @stopWatcher()
         @currentFile = file
         if not opt?.keepUndo? or opt.keepUndo == false
@@ -169,7 +170,8 @@ class Editor extends Buffer
             @do.end()
         else # create new header
             word = opt?.word ? @selectionTextOrWordAtCursor().trim()
-            indt = _.padStart '', @indentationAtLineIndex cp[1]
+            # indt = _.padStart '', @indentationAtLineIndex cp[1]
+            indt = @indentStringForLineAtIndex cp[1]
             stxt = word.length and salt(word).split('\n') or ['', '', '', '', '']
             stxt = ("#{indt}#{@lineComment} #{s}" for s in stxt)
             @do.start()

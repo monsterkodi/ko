@@ -49,7 +49,7 @@ class View extends ViewBase
 
     setCurrentFile: (file, opt) ->
         
-        @saveScrollCursorsAndSelections() if not file and not opt?.noSaveScroll
+        @saveScrollCursorsAndSelections opt if not file and not opt?.noSaveScroll
         @dirty = false
         @syntax.name = 'txt'
         if file?
@@ -94,15 +94,21 @@ class View extends ViewBase
     #      000  000   000     000     000     
     # 0000000   000   000      0      00000000
         
-    saveScrollCursorsAndSelections: ->
+    saveScrollCursorsAndSelections: (opt) ->
         return if not @currentFile
         s = {}
-        s.main       = @indexOfCursor(@mainCursor) if @indexOfCursor(@mainCursor) > 0
-        s.scroll     = @scroll.scroll if @scroll.scroll
-        s.cursors    = _.cloneDeep @cursors if @cursors.length > 1 or @cursors[0][0] or @cursors[0][1]
-        s.selections = _.cloneDeep @selections if @selections.length
-        s.highlights = _.cloneDeep @highlights if @highlights.length
+        
+        if opt?.dontSaveCursors
+            s.main       = 0
+            s.cursors    = [@mainCursor] 
+        else        
+            s.main       = @indexOfCursor(@mainCursor) if @indexOfCursor(@mainCursor) > 0
+            s.cursors    = _.cloneDeep @cursors if @cursors.length > 1 or @cursors[0][0] or @cursors[0][1]
+            s.selections = _.cloneDeep @selections if @selections.length
+            s.highlights = _.cloneDeep @highlights if @highlights.length
             
+        s.scroll     = @scroll.scroll if @scroll.scroll
+                
         filePositions = window.getState 'filePositions', Object.create null
         if not _.isPlainObject filePositions
             filePositions = Object.create null
