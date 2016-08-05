@@ -1,7 +1,5 @@
 # todo/ideas
 
-- *fix salter indent*
-- *fix double click*
 - *set current dir when starting from terminal*
 
 #### terminal

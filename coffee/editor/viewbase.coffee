@@ -31,6 +31,9 @@ ipc       = electron.ipcRenderer
 class ViewBase extends Editor
 
     constructor: (viewElem, @config) ->
+        
+        @clickCount = 0
+        
         @name = viewElem
         @name = @name.slice 1 if @name[0] == '.'
         @view = $(viewElem)  
@@ -568,23 +571,32 @@ class ViewBase extends Editor
             target:  @layers
             cursor:  'default'
             onStart: (drag, event) =>
-                                
-                if @doubleClicked
-                    if @posForEvent(event)[1] == @tripleClickLineIndex
-                        clearTimeout @tripleClickTimer
-                        @tripleClickTimer = setTimeout @onTripleClickDelay, @stickySelection and 300 or 1000
-                        if not @tripleClicked
-                            @tripleClicked = true
-                            r = @rangeForLineAtIndex @tripleClickLineIndex
+                # log "viewbase.onStart @clickCount:#{@clickCount}"
+                eventPos = @posForEvent event
+                if @clickCount
+                    if eventPos[1] == @clickLineIndex                        
+                        @startClickTimer()
+                        @clickCount += 1
+                        if @clickCount == 2
+                            range = @rangeForWordAtPos eventPos
+                            if event.metaKey
+                                @addRangeToSelection range
+                            else
+                                @selectSingleRange range
+                        if @clickCount == 3
+                            r = @rangeForLineAtIndex @clickLineIndex
                             if event.metaKey
                                 @addRangeToSelection r
                             else
                                 @selectSingleRange r
                         return
-                    else if @tripleClickTimer
-                        @onTripleClickDelay()
+                    else
+                        @onClickTimeout()
                         
-                @view.focus()
+                @clickCount = 1
+                @clickLineIndex = eventPos[1]
+                @startClickTimer()
+                
                 p = @posForEvent event
                 if event.altKey
                     @jumpTo @wordAtCursor p
@@ -600,22 +612,15 @@ class ViewBase extends Editor
                 else
                     @singleCursorAtPos p, true
                 
-        @view.ondblclick = (event) =>
-            range = @rangeForWordAtPos @posForEvent event
-            if event.metaKey
-                @addRangeToSelection range
-            else
-                @selectSingleRange range
-            @onTripleClickDelay()
-            @doubleClicked = true
-            @tripleClickTimer = setTimeout @onTripleClickDelay, @stickySelection and 300 or 1000
-            @tripleClickLineIndex = range[0]
-                        
-    onTripleClickDelay: => 
-        clearTimeout @tripleClickTimer
-        @tripleClickTimer = null
-        @tripleClickLineIndex = -1
-        @doubleClicked = @tripleClicked = false
+    startClickTimer: =>
+        clearTimeout @clickTimer
+        @clickTimer = setTimeout @onClickTimeout, @stickySelection and 300 or 1000
+    
+    onClickTimeout: => 
+        clearTimeout    @clickTimer
+        @clickTimer     = null
+        @clickCount     = 0
+        @clickLineIndex = -1
        
     #       000  000   000  00     00  00000000 
     #       000  000   000  000   000  000   000
