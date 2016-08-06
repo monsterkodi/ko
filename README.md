@@ -249,6 +249,10 @@ evaluates coffee-script code in the main process and prints results in terminal
 
 ![cursors](img/coffee.png)
 
+shortcuts
+- **⌘.** to activate coffee input
+- **^return** evaluate current editor buffer
+
 <!---
 #   00     00   0000000    0000000  00000000    0000000 
 #   000   000  000   000  000       000   000  000   000
@@ -394,7 +398,7 @@ when clicking on these numbers:
 - cursor column|line
     - set cursor to column|line 0
 - line count
-    - set cursors to last line     
+    - set cursor to last line     
 - selections|highlights|cursors
     - clear the selections|highlights|cursors
 - indexed classes|functions|files|words
@@ -411,14 +415,13 @@ when clicking on these numbers:
 - **F2** global shortcut to activate ko
 - **⌘E** (selects word under cursor and) highlights occurences of selected word
 - **⌘G** select next highlight (works for string and bracket highlights as well)
-- **⌘D** (selects word under cursor and) selects next highlighted word 
+- **⌘D** (selects word under cursor and) adds next highlighted word to selection
 - **⌘⇧D** deselects last selected word
 - **⌥up|down** move selected|cursor lines up|down
 - **⌘L** select more lines **⌘⇧L** select less lines
 - **⌥/** toggle comment on selected|cursor lines
 - **⌘I** inverted line selection: select lines without a cursor or a selection
 - **⌘return** insert empty line below cursor and move cursor down
-- **^return** evaluate current buffer with coffee in main process and print the result in terminal view
 - **⌘⌥up** jump to counterpart file (coffee <-> js, cpp <-> h, pug <-> html, etc)
 - **⌘\** toggle left side text offset when window is as wide as screen
 - **⌘R** reload/revert current file
