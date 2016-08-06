@@ -122,8 +122,8 @@ __dirname|__filename  keyword
 
 # strings
 
-(')([^']*)(')                . string.marker.single . value.string.single . string.marker.single
-(")([^"\\]*)(")              . string.marker.double . value.string.double . string.marker.double
+(')([^\']*)(')               . string.marker.single . value.string.single . string.marker.single
+(")([^\"]*)(")               . string.marker.double . value.string.double . string.marker.double
 """                            string.marker.triple
 
 # comments

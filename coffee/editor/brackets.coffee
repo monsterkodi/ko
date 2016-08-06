@@ -31,7 +31,7 @@ class Brackets
     onCursor: => 
         if @editor.highlights.length # don't highlight brackets when other highlights exist
             for h in @editor.highlights
-                return if h[2] != 'bracketmatch'
+                return if not h[2]?
                 
         cp = @editor.cursorPos()
         [before, after] = @beforeAfterForPos cp
@@ -102,8 +102,14 @@ class Brackets
     
     beforeAfterForPos: (pos) ->
         [cp, li] = pos
-        rngs = matchr.ranges @config, @editor.lines[li]       
-        
+        line = @editor.lines[li]
+        rngs = matchr.ranges @config, line     
+    
+        if rngs.length # remove escaped
+            for i in [rngs.length-1..0]
+                if rngs[i].start > 0 and line[rngs[i].start-1] == '\\'
+                    rngs.splice i, 1
+                    
         if rngs.length > 1 #remove trivial: (), {}, []
             for i in [rngs.length-1..1]
                 if rngs[i-1].value == 'open' and rngs[i].value == 'close' and
@@ -129,6 +135,6 @@ class Brackets
         @editor.renderHighlights()
 
     clear: ->
-        @editor.highlights = @editor.highlights.filter (h) -> not h[2]? or h[2] != 'bracketmatch'
+        @editor.highlights = @editor.highlights.filter (h) -> h[2] != 'bracketmatch'
 
 module.exports = Brackets

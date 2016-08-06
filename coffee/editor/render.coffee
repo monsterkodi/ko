@@ -117,6 +117,7 @@ class Render
         tx = size.charWidth *  sel[1][0] + size.offsetX
         ty = size.lineHeight * sel[0]
         lh = size.lineHeight
+        lh /= 2 if clss == 'stringmatch'
     
         empty = sel[1][0] == sel[1][1] and " empty" or ""
         

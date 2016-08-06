@@ -708,6 +708,12 @@ body
     text-decoration     underline
     background          rgba(255,255,255, 0.2)
 
+.stringmatch
+    position            absolute
+    pointer-events      none
+    text-decoration     underline
+    background          rgba(255,255,0, 0.5) // rgba(155,255,155, 0.2)
+
 //  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
 // 000       000       000      000       000          000     000  000   000  0000  000
 // 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
@@ -727,6 +733,7 @@ body
         margin-right    -1px
     
 .bracketmatch
+.stringmatch
 .selection
 .highlight    
     padding-right       selectionRadiusCursor
@@ -752,6 +759,7 @@ body
     &.br
         border-bottom-right-radius selectionRadius
 
+.stringmatch
 .bracketmatch
     padding-right       0
     margin-right        0
