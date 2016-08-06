@@ -36,35 +36,41 @@ class Strings
         [cp, li] = pos
         line = @editor.lines[li]
         rngs = matchr.ranges @config, line       
-        log "rngs", rngs.length if rngs.length
         return if not rngs.length
         for i in [0...rngs.length]
             ths = rngs[i]
             
-            if ths.start > 0 and line[ths.start-1] == '\\' # ignore escaped
+            if ths.start > 0 and line[ths.start-1] == '\\' 
+                if ths.start-1 <= 0 or line[ths.start-2] != '\\'
+                    continue # ignore escaped
+                
+            if last(stack)?.match == "'" == ths.match and last(stack).start == ths.start-1
+                stack.pop() # remove ''
                 continue
                 
-            if last(stack)?.match == "'" == ths.match and last(stack).start == ths.start-1 # remove ''
-                stack.pop()
-                continue
-                        
             if last(stack)?.match == ths.match
                 pairs.push [stack.pop(), ths]
                 if not pair? 
-                    if last(pairs)[0].start <= cp <= ths.start 
+                    if last(pairs)[0].start <= cp <= ths.start+1
                         pair = last pairs
                 continue
 
+            if stack.length > 1 and stack[stack.length-2].match == ths.match
+                stack.pop()
+                pairs.push [stack.pop(), ths]
+                if not pair? 
+                    if last(pairs)[0].start <= cp <= ths.start+1
+                        pair = last pairs
+                continue
+            
             stack.push ths
         
         if pair?
             @highlight pair, li
-            # log "Strings.highlightInside stack:", stack, "pairs:", pairs
             true
         
     highlight: (pair, li) ->
         @clear()
-        log "highlight pair #{li}", pair
         [opn,cls] = pair
         @editor.highlights.push [li, [opn.start, opn.start+opn.match.length], 'stringmatch']
         @editor.highlights.push [li, [cls.start, cls.start+cls.match.length], 'stringmatch']
