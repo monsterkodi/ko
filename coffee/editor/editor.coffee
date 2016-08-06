@@ -1266,14 +1266,17 @@ class Editor extends Buffer
 
             @do.change ns[0], @lines[ns[0]].splice ns[1][1], 0, cr
             @do.change ns[0], @lines[ns[0]].splice ns[1][0], 0, cl
-
-            for c in @positionsAfterLineColInPositions ns[0], ns[1][1], @cursors
-                @oldCursorDelta newCursors, c, cr.length
+            
             for c in @positionsAfterLineColInPositions ns[0], ns[1][0], @cursors
                 @oldCursorDelta newCursors, c, cl.length
+                
+            for c in @positionsAfterLineColInPositions ns[0], ns[1][1]+1, @cursors
+                @oldCursorDelta newCursors, c, cr.length
+                
             for os in @rangesAfterLineColInRanges ns[0], ns[1][1], newSelections
                 os[1][0] += cr.length
                 os[1][1] += cr.length
+                
             for os in @rangesAfterLineColInRanges ns[0], ns[1][0], newSelections
                 os[1][0] += cl.length
                 os[1][1] += cl.length
@@ -1321,10 +1324,12 @@ class Editor extends Buffer
         newCursors = _.cloneDeep @cursors
         joinLines = []
         for c in @cursors
-            [sp, ep] = @continuousSelectionAtPos c
-            @oldCursorSet newCursors, c, sp[0], sp[1] if sp?
-            if sp[1] < ep[1] and sp[0] > 0 and ep[0] < @lines[ep[1]].length 
-                joinLines.push sp[1] # selection spans multiple lines and first and last line are cut
+            csel = @continuousSelectionAtPos c
+            if csel?
+                [sp, ep] = csel
+                @oldCursorSet newCursors, c, sp[0], sp[1]
+                if sp[1] < ep[1] and sp[0] > 0 and ep[0] < @lines[ep[1]].length 
+                    joinLines.push sp[1] # selection spans multiple lines and first and last line are cut
 
         for s in @reversedSelections()
             continue if s[0] >= @lines.length
