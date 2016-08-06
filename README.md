@@ -13,13 +13,13 @@
 - loads large files
 - keyboard centric 
     - nothing you can do with the mouse only
-    - includes lots of fancy shortcuts
+    - includes many shortcuts and advanced editing features
 
 **commandline**
 - a single, non-intrusive input field to ...
     - navigate the file system and open files quickly
     - find in text and search in files
-    - input terminal-, coffee-script- and macro-commands
+    - input terminal-, script- and macro-commands
     - goto lines or class/method/function-definitions
 
 **terminal**
@@ -40,7 +40,7 @@
 
 **minimap**
 - shows cursors, highlights and selections
-- also for terminal-, search- and coffe-script-results!
+- also for terminal-, search- and script-results!
 - can be used to select large portions of text
 - sets cursor by default when dragging/clicking
 - includes a special mode to insert or edit ascii-headers that show up nicely in the minimap

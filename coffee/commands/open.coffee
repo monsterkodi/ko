@@ -61,8 +61,8 @@ class Open extends Command
         command = command.trim()
 
         if command == '.' and @navigating == false
+            @setText ''
             @navigating = true
-            @setLines []
             @showItems @listItems includeThis: false
             @select 0
             @positionList()            
@@ -178,6 +178,7 @@ class Open extends Command
         items = []
         
         @lastFileIndex = 0
+        @dir = resolve '~' if not @dir?
 
         if not @navigating
             if @history.length
@@ -247,8 +248,8 @@ class Open extends Command
     # 0000000      000     000   000  000   000     000   
         
     start: (@combo) -> 
-        opt = 
-            reload: true
+        opt = reload: true
+            
         if window.editor.currentFile?
             opt.file = window.editor.currentFile 
             opt.dir  = path.dirname opt.file
@@ -275,11 +276,20 @@ class Open extends Command
     # 0000000   0000000   000   000  0000000          0000000    000  000   000
         
     loadDir: (opt) ->
-        opt.dir = path.dirname opt.file if not opt.dir?
+        
+        opt.dir = path.dirname opt.file if not opt.dir? and opt.file?
         if not dirExists opt.dir
             opt.dir = resolve opt.dir
             if not dirExists opt.dir
                 opt.dir = path.dirname resolve opt.dir
+                if not dirExists opt.dir
+                    opt.dir = resolve '~'
+                    if not dirExists opt.dir
+                        alert 'wtf?'
+                        throw new Error
+                        return
+                        
+        @dir = resolve '.' if not @dir?
         newdir = @resolvedPath(opt.dir) ? @dir
         return false if newdir == @dir and not opt.reload
         
@@ -409,7 +419,7 @@ class Open extends Command
     # 000   000  00000000  0000000    0000000   0000000      0      00000000  0000000  
     
     resolvedPath: (p, parent=@dir) ->
-        return parent if not p?
+        return (parent ? resolve '~') if not p?
         if p[0] in ['~', '/']
             resolve p
         else

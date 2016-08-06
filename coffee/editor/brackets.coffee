@@ -48,7 +48,7 @@ class Brackets
     highlightInside: (pos) ->
         stack = []
         pp = pos
-        while pp[1] >= @editor.scroll.top # find last open bracket before
+        while pp[1] >= 0 # @editor.scroll.top # find last open bracket before
             [before, after] = @beforeAfterForPos pp
             while before.length 
                 prev = before.pop()
@@ -58,6 +58,7 @@ class Brackets
                             stack.pop()                            
                             continue
                         else
+                            log "brackets stack mismatch at #{pp[0]} #{pp[1]} stack: #{last(stack).match} <> prev: #{prev.match}"
                             return # stack mismatch
                     lastOpen = prev
                     break
@@ -72,7 +73,7 @@ class Brackets
         
         stack = []
         pp = pos
-        while pp[1] <= @editor.scroll.bot # find first close bracket after
+        while pp[1] <= @editor.lines.length # @editor.scroll.bot # find first close bracket after
             [before, after] = @beforeAfterForPos pp
             while after.length
                 next = after.shift()
@@ -82,6 +83,7 @@ class Brackets
                             stack.pop()                            
                             continue
                         else
+                            log "brackets stack mismatch at #{pp[0]} #{pp[1]} stack: #{last(stack).match} <> next: #{next.match}"
                             return # stack mismatch
                     firstClose = next
                     break
