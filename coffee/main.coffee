@@ -6,6 +6,7 @@
 {
 first,
 fileList,
+dirExists,
 fileExists,
 resolve}      = require './tools/tools'
 prefs         = require './tools/prefs'
@@ -21,6 +22,7 @@ fs            = require 'fs'
 noon          = require 'noon'
 colors        = require 'colors'
 electron      = require 'electron'
+childp        = require 'child_process'
 app           = electron.app
 BrowserWindow = electron.BrowserWindow
 Tray          = electron.Tray
@@ -42,6 +44,8 @@ wins          = []
 # 000   000  000   000  000   000       000
 # 000   000  000   000   0000000   0000000 
 
+# childp.execSync "syslog -s -l error \"argv: #{process.argv.join ' '}\""
+
 args  = require('karg') """
 
 #{pkg.productName}
@@ -59,9 +63,11 @@ version  #{pkg.version}
 
 """, dontExit: true
 
-if not args?
-    app.exit(0) 
+app.exit 0 if not args?
 
+while args.filelist.length and dirExists first args.filelist
+    process.chdir args.filelist.shift()
+    
 if args.verbose
     log colors.white.bold "\nko", colors.gray "v#{pkg.version}\n"
     log colors.yellow.bold 'process'
@@ -524,6 +530,7 @@ class Main
             file = arg
             if not arg.startsWith '/'
                 file = resolve dir + '/' + arg
+            continue if not fileExists file
             w = @activateWindowWithFile file
             w = @createWindow file if not w?
             

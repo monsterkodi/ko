@@ -36,9 +36,9 @@ fi
 
 if [ $_LOG ]; then
     echo "$_PATH/$_NAME/Contents/MacOS/ko"
-    "$_PATH/$_NAME/Contents/MacOS/ko" --executed-from="$(pwd)" "$@"
+    "$_PATH/$_NAME/Contents/MacOS/ko" "$(pwd)" "$@"
     exit $?
 else
     echo "open $_PATH/$_NAME"
-    open -a "$_PATH/$_NAME" -- "$@"
+    open -a "$_PATH/$_NAME" --args app "$(pwd)" "$@"
 fi

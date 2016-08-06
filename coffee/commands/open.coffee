@@ -254,7 +254,8 @@ class Open extends Command
             opt.file = window.editor.currentFile 
             opt.dir  = path.dirname opt.file
         else 
-            opt.dir = @dir ? path.dirname last prefs.get 'recentFiles', ['~']
+            @dir ?= process.cwd()
+            opt.dir = @dir
             
         @loadDir opt
         super @combo
