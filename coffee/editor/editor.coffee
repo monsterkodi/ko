@@ -448,7 +448,7 @@ class Editor extends Buffer
                 when 'up'   then (si = r[0]-1) ; ls.push @lines[si]
                 when 'down' then (si = r[0])   ; ls.unshift @lines[r[1]+1]
 
-            for i in [0...ls.length]    
+            for i in [0...ls.length]
                 @do.change si+i, ls[i]
 
         for s in @selections
@@ -509,6 +509,8 @@ class Editor extends Buffer
             @renderHighlights()
             @emit 'highlight'
             window.commandline.startCommand 'find' if window.commandline.command?.prefsID not in ['search', 'find']
+            window.commandline.commands.find.currentText = text
+            window.commandline.commands.search.currentText = text
             window.commandline.setText text
             @focus()
 
@@ -527,9 +529,10 @@ class Editor extends Buffer
         @do.end()
     
     selectNextHighlight: -> # command+g
-        if not @highlights.length
-            searchText = window.commandline.commands.find?.current()
-            @highlightText searchText if searchText?
+        if not @highlights.length            
+            searchText = window.commandline.commands.find?.currentText
+            @highlightText searchText if searchText?.length
+        return if not @highlights.length
         r = @rangeAfterPosInRanges @cursorPos(), @highlights
         r ?= first @highlights
         @selectSingleRange r if r?
@@ -537,7 +540,9 @@ class Editor extends Buffer
 
     selectPrevHighlight: -> # command+shift+g
         if not @highlights.length
-            @highlightText window.commandline.commands.find?.current()
+            searchText = window.commandline.commands.find?.currentText
+            @highlightText searchText if searchText?.length
+        return if not @highlights.length
         r = @rangeBeforePosInRanges @cursorPos(), @highlights
         r ?= last @highlights
         @selectSingleRange r if r?

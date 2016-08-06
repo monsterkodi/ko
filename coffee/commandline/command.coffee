@@ -252,8 +252,13 @@ class Command
     #    000     000        000 000      000   
     #    000     00000000  000   000     000   
     
-    setText:          (t) -> @commandline.setText t
-    setAndSelectText: (t) -> @commandline.setAndSelectText t
+    setText:          (t) -> 
+        @currentText = t
+        @commandline.setText t
+        
+    setAndSelectText: (t) -> 
+        @currentText = t
+        @commandline.setAndSelectText t
         
     getText: -> @commandline.lines[0]
         

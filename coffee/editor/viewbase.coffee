@@ -577,7 +577,7 @@ class ViewBase extends Editor
                 eventPos = @posForEvent event
                 
                 if @clickCount
-                    if eventPos[1] == @clickLineIndex
+                    if @isSamePos eventPos, @clickPos
                         @startClickTimer()
                         @clickCount += 1
                         if @clickCount == 2
@@ -587,7 +587,7 @@ class ViewBase extends Editor
                             else
                                 @selectSingleRange range
                         if @clickCount == 3
-                            r = @rangeForLineAtIndex @clickLineIndex
+                            r = @rangeForLineAtIndex @clickPos[1]
                             if event.metaKey
                                 @addRangeToSelection r
                             else
@@ -597,7 +597,7 @@ class ViewBase extends Editor
                         @onClickTimeout()
                         
                 @clickCount = 1
-                @clickLineIndex = eventPos[1]
+                @clickPos = eventPos
                 @startClickTimer()
                 
                 p = @posForEvent event
@@ -620,10 +620,10 @@ class ViewBase extends Editor
         @clickTimer = setTimeout @onClickTimeout, @stickySelection and 300 or 1000
     
     onClickTimeout: => 
-        clearTimeout    @clickTimer
-        @clickTimer     = null
-        @clickCount     = 0
-        @clickLineIndex = -1
+        clearTimeout @clickTimer
+        @clickCount  = 0
+        @clickTimer  = null
+        @clickPos    = null
        
     #       000  000   000  00     00  00000000 
     #       000  000   000  000   000  000   000
