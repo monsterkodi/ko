@@ -55,13 +55,15 @@
 - for coffee, cpp, h, html, js, json, md, noon, pug, py, sh, styl       
 - ansi-colors in terminal view
 
-**optimized for coffee-script**
-- completes function/method names from required files
-- terminal commands to list classes, files or functions/methods
+**bracket and string matching**
+
+**coffee-script**
+- automatically indexes local required files
+- terminal commands to list indexed classes, files or functions/methods
 - autoconverts 'simple' strings when "#{}" is inserted
 - removes 'then' when breaking single-line 'when' or 'if' statements  
+- adds 'then' when joining line after 'when' or 'if' statements  
 - deletes whitespace after function names when surrounding selected arguments with ()
-- includes a some nifty macros for coffee-script
 
 <!---
 #    0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
@@ -408,6 +410,7 @@ when clicking on these numbers:
 ## various shortcuts
 - **F2** global shortcut to activate ko
 - **⌘E** (selects word under cursor and) highlights occurences of selected word
+- **⌘G** select next highlight (works for string and bracket highlights as well)
 - **⌘D** (selects word under cursor and) selects next highlighted word 
 - **⌘⇧D** deselects last selected word
 - **⌥up|down** move selected|cursor lines up|down
@@ -445,7 +448,7 @@ terminal aliases are stored in
 - customization
 - git integration
 - regression tests
-- correct highlighting of complex strings
+- correct highlighting of multiline- and complex strings
 
 ## final note
 

@@ -20,7 +20,8 @@ class Commandline extends ViewBase
     constructor: (viewElem) ->
             
         @fontSizeDefault = 24
-        @mainCommands = ['open', 'search', 'find', 'goto', 'term', 'coffee', 'macro']
+        @mainCommands = ['open', 'search', 'find', 'goto', 'term', 'coffee', 'build', 'macro']
+        @hideCommands = ['selecto', 'Term', 'Build', 'Coffee']
 
         super viewElem, features: []
         
@@ -185,6 +186,7 @@ class Commandline extends ViewBase
             for ci in [0...cmmd.shortcuts.length]
                 combo = cmmd.shortcuts[ci]
                 cname = cmmd.names[ci]
+                continue if cname in @hideCommands
                 div = document.createElement 'div'
                 div.className = "list-item"
                 namespan = "<span class=\"ko command #{cmmd.prefsID}\" style=\"position:absolute; left: #{ci > 0 and 40 or 6}px\">#{cname}</span>" 
