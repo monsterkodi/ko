@@ -427,6 +427,7 @@ class Buffer extends event
     # 000  000   000        000   000  000   000  000   000   0000000   00000000  0000000 
       
     rangesForLineIndexInRanges: (li, ranges) -> (r for r in ranges when r[0]==li)
+    rangesAfterLineColInRanges: (li,col,ranges) -> (r for r in ranges when r[0]==li and r[1][0] >= col)
     
     rangeAtPosInRanges: (pos, ranges) ->
         return if ranges.length == 0

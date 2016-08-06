@@ -2,6 +2,7 @@
 
 - **fix multiple surrounds in same line**
 - *fix changing file permissions*
+- fix commandlist switching sides when other side is smaller
 
 #### build
 - command+b

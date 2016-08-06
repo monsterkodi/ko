@@ -1242,12 +1242,9 @@ class Editor extends Buffer
         [cl,cr] = @surroundPairs[ch]
             
         @surroundStack.push [cl,cr]
-        
-        for ns in newSelections
-            leftdelta = cl.length
-            for c in @cursorsInRange ns
-                @oldCursorDelta newCursors, c, leftdelta
-            
+
+        for ns in newSelections.reversed()
+                                    
             if cl == '#{' # convert single string to double string
                 if sr = @rangeOfStringSurroundingRange ns
                     if @lines[sr[0]][sr[1][0]] == "'"
@@ -1266,13 +1263,20 @@ class Editor extends Buffer
                     @do.change ns[0], @lines[ns[0]].splice trimmed.length, spaces
                     ns[1][0] -= spaces
                     ns[1][1] -= spaces
-                    leftdelta -= spaces
 
             @do.change ns[0], @lines[ns[0]].splice ns[1][1], 0, cr
             @do.change ns[0], @lines[ns[0]].splice ns[1][0], 0, cl
-                            
-            ns[1][0] += cl.length
-            ns[1][1] += cl.length
+
+            for c in @positionsAfterLineColInPositions ns[0], ns[1][1], @cursors
+                @oldCursorDelta newCursors, c, cr.length
+            for c in @positionsAfterLineColInPositions ns[0], ns[1][0], @cursors
+                @oldCursorDelta newCursors, c, cl.length
+            for os in @rangesAfterLineColInRanges ns[0], ns[1][1], newSelections
+                os[1][0] += cr.length
+                os[1][1] += cr.length
+            for os in @rangesAfterLineColInRanges ns[0], ns[1][0], newSelections
+                os[1][0] += cl.length
+                os[1][1] += cl.length
             
         @do.selections @rangesNotEmptyInRanges newSelections
         @do.cursors newCursors

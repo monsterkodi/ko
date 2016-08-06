@@ -210,7 +210,12 @@ class Commandline extends ViewBase
         if (split.elemHeight() - listTop) < listHeight
             listTop = split.splitPosY(0) - listHeight
         @list?.style.top = "#{listTop}px"        
-                                
+    
+    resized: -> 
+        @list?.resized()
+        @command?.commandList?.resized()
+        super
+        
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
     # 0000000    0000000     00000  

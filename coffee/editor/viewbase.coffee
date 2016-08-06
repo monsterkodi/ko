@@ -751,7 +751,7 @@ class ViewBase extends Editor
             when 'enter'                    then return @insertNewline indent: true
             when 'command+enter'            then return @moveCursorsToLineBoundary('right') and @insertNewline indent: true
             when 'alt+enter'                then return @jumpTo @wordAtCursor()
-            when 'command+]'                then return @indent()
+            when 'command+]'                then [return] @indent()
             when 'command+['                then return @deIndent()
             when 'command+j'                then return @joinLines()
             when 'command+/'                then return @toggleComment()
