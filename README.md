@@ -163,7 +163,7 @@ editing search result lines will ...
 - changes from the editor are not yet propagated to old search results
     - this means: only edit and save **fresh** search results!
 - this is a very powerful feature but not tested thoroughly yet and probably not working correctly in all cases!
-- use at your own risk! backup your files! 
+- use at your own risk! backup your files!
 
 ![search](img/search.png)
 
@@ -176,9 +176,11 @@ editing search result lines will ...
 --->
 ## goto
 - **⌘;** activates goto command
-- **text** jump to function, class or file
+- **text** jump to function, class or file (fuzzy matched)
 - **positive number** jump to line
 - **negative number** jump to line relative to end of file
+
+![search](img/goto.png)
 
 in editor:
 - **⌥enter** goto word under main cursor
