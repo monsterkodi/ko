@@ -188,7 +188,7 @@ class Open extends Command
                         item = Object.create null
                         item.text = relative f, @dir
                         item.file = f
-                        item.bonus = bonus
+                        item.bonus = bonus if not opt?.flat
                         items.push item
                         @lastFileIndex = items.length-1
                         bonus -= 1
