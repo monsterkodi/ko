@@ -88,13 +88,21 @@ class Editor extends Buffer
     #    000        000     000        00000000
     
     setupFileType: ->
+        oldType   = @fileType
         @fileType = 'txt'
         @fileType = Syntax.shebang @lines[0] if @lines.length
         if @fileType == 'txt' and @currentFile?
             ext = extName @currentFile
             if ext in Syntax.syntaxNames
                 @fileType = ext
-                
+        
+        @stringCharacters =
+            "'":  'single'
+            '"':  'double'
+        switch @fileType
+            when 'md' then @stringCharacters['*'] = 'bold'
+            when 'noon' then @stringCharacters['|'] = 'pipe'
+        
         @surroundPairs = 
             '[': ['[', ']']
             ']': ['[', ']']
@@ -132,7 +140,10 @@ class Editor extends Buffer
                 
         @lineComment = switch @fileType
             when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug' then '//'
-            else '#'        
+            else '#'  
+            
+        if oldType != @fileType
+            @emit 'fileTypeChanged', @fileType
                 
     #  0000000  00000000  000000000         000      000  000   000  00000000   0000000
     # 000       000          000            000      000  0000  000  000       000     
@@ -275,14 +286,14 @@ class Editor extends Buffer
         @do.cursors [@mainCursor], keepInitial: true
         @endSelection e
         
-    selectSingleRange: (r) ->
+    selectSingleRange: (r, opt) ->
         if not r?
             log "editor.#{name}.selectSingleRange warning! undefined range!"
             return
         @cursors = [[r[1][0], r[0]]]
         @initialCursors = null
         @startSelection true
-        @mainCursor = [r[1][1], r[0]]
+        @mainCursor = [opt?.before and r[1][0] or r[1][1], r[0]]
         @do.cursors [@mainCursor], keepInitial: true     
         @endSelection true
             
@@ -540,8 +551,9 @@ class Editor extends Buffer
         return if not @highlights.length
         r = @rangeAfterPosInRanges @cursorPos(), @highlights
         r ?= first @highlights
-        @selectSingleRange r if r?
-        @scrollCursorIntoView()
+        if r?
+            @selectSingleRange r, before: r[2]?.value == 'close'
+            @scrollCursorIntoView()
 
     selectPrevHighlight: -> # command+shift+g
         if not @highlights.length

@@ -37,6 +37,7 @@ tray          = undefined # < created in Main.constructor
 coffeeExecute = undefined # <
 openFiles     = []
 wins          = []
+WIN_SNAP_DIST = 150
 
 #  0000000   00000000    0000000    0000000
 # 000   000  000   000  000        000     
@@ -499,7 +500,7 @@ class Main
             b = w.getBounds()
             if b.height == wb.height and b.y == wb.y
                 if b.x < wb.x 
-                    if Math.abs(b.x+b.width-wb.x) < 100
+                    if Math.abs(b.x+b.width-wb.x) < WIN_SNAP_DIST
                         w.showInactive()
                         w.setBounds 
                             x:      b.x
@@ -507,7 +508,7 @@ class Main
                             width:  wb.x - b.x + frameSize
                             height: b.height
                 else if b.x+b.width > wb.x+wb.width
-                    if Math.abs(wb.x+wb.width-b.x) < 100
+                    if Math.abs(wb.x+wb.width-b.x) < WIN_SNAP_DIST
                         w.showInactive()
                         w.setBounds
                             x:      wb.x+wb.width-frameSize

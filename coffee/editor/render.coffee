@@ -81,7 +81,7 @@ class Render
             s = ss[si]
             n = (si < ss.length-1) and (ss[si+1][0] == s[0]+1) and ss[si+1] or null # next line selection
             b = p?[0] == s[0]-1 and p or null # selection in line before
-            h += @selectionSpan b, s, n, size, s[2] ? clss
+            h += @selectionSpan b, s, n, size, s[2]?.clss ? s[2] ? clss
             p = s
         h
         
@@ -117,9 +117,15 @@ class Render
         tx = size.charWidth *  sel[1][0] + size.offsetX
         ty = size.lineHeight * sel[0]
         lh = size.lineHeight
-        lh /= 2 if clss == 'stringmatch'
+        # log 'clss', clss
+        if clss.startsWith 'stringmatch'
+            lh /= 2 if clss.endsWith 'single'
+            lh /= 2 if clss.endsWith 'double'
+            if clss.endsWith 'bold'
+                ty += lh/4 
+                lh /= 2 
     
-        empty = sel[1][0] == sel[1][1] and " empty" or ""
+        empty = sel[1][0] == sel[1][1] and "empty" or ""
         
         "<span class=\"#{clss}#{border}#{empty}\" style=\"transform: translate(#{tx}px,#{ty}px); width: #{sw}px; height: #{lh}px\"></span>"
                                                 

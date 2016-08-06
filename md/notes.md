@@ -1,9 +1,15 @@
 # todo/ideas
 
+- **fix multiple surrounds in same line**
 - *fix changing file permissions*
 
+#### build
+- command+b
+- pane
+- load 
+
 #### terminal
-- *autocomplete dirs and files*
+- autocomplete dirs and files
 
 #### open
 - *automatically start konrad in pkg dir*
@@ -12,6 +18,7 @@
 
 #### editing
 - *improve bracket inserting (evaluate brackets in line)*
+- select between cursors shortcut?
 - select continuous, rectangular ranges with command+shift+M 
 - remove from selection when alt/ctrl is down?
 - don't scroll when no new range added with command+d
@@ -24,7 +31,7 @@
 - fix horizontal scrolling
 - save and restore scrollX/Left
 - check undo (merges too much?)
-- *jump to file (include|path)*
+- jump to file (include|path)
 
 #### commands
 - ls (color-ls + meta?)

@@ -130,11 +130,13 @@ class Brackets
     
     highlight: (opn, cls) ->
         @clear()
-        @editor.highlights.push [opn.line, [opn.start, opn.start+opn.match.length], 'bracketmatch']
-        @editor.highlights.push [cls.line, [cls.start, cls.start+cls.match.length], 'bracketmatch']
+        opn.clss = 'bracketmatch'
+        cls.clss = 'bracketmatch'
+        @editor.highlights.push [opn.line, [opn.start, opn.start+opn.match.length], opn]
+        @editor.highlights.push [cls.line, [cls.start, cls.start+cls.match.length], cls]
         @editor.renderHighlights()
 
     clear: ->
-        @editor.highlights = @editor.highlights.filter (h) -> h[2] != 'bracketmatch'
+        @editor.highlights = @editor.highlights.filter (h) -> h[2]?.clss != 'bracketmatch'
 
 module.exports = Brackets

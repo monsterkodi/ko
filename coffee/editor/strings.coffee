@@ -9,17 +9,20 @@ last
 }      = require '../tools/tools'
 log    = require '../tools/log'
 matchr = require '../tools/matchr'
+_      = require 'lodash'
 
 class Strings
     
     constructor: (@editor) ->
         
         @editor.on 'cursor', @onCursor
-        @config = matchr.config
-            "\\'":  'single'
-            '\\"':  'double'
+        @editor.on 'fileTypeChanged', @setupConfig
+        @setupConfig()
+            
+    setupConfig: => 
+        @config = ( [new RegExp(_.escapeRegExp(p)), a] for p,a of @editor.stringCharacters )
         
-    onCursor: => 
+    onCursor: =>
         if @editor.highlights.length # don't highlight strings when other highlights exist
             for h in @editor.highlights
                 return if not h[2]?
@@ -72,11 +75,13 @@ class Strings
     highlight: (pair, li) ->
         @clear()
         [opn,cls] = pair
-        @editor.highlights.push [li, [opn.start, opn.start+opn.match.length], 'stringmatch']
-        @editor.highlights.push [li, [cls.start, cls.start+cls.match.length], 'stringmatch']
+        pair[0].clss = "stringmatch #{@editor.stringCharacters[opn.match]}"
+        pair[1].clss = "stringmatch #{@editor.stringCharacters[cls.match]}"
+        @editor.highlights.push [li, [opn.start, opn.start+opn.match.length], pair[0]]
+        @editor.highlights.push [li, [cls.start, cls.start+cls.match.length], pair[1]]
         @editor.renderHighlights()
         
     clear: ->
-        @editor.highlights = @editor.highlights.filter (h) -> h[2] != 'stringmatch'
+        @editor.highlights = @editor.highlights.filter (h) -> not h[2]?.clss.startsWith 'stringmatch'
 
 module.exports = Strings
