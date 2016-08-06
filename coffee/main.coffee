@@ -176,7 +176,6 @@ class Main
     constructor: (openFiles) -> 
         
         if app.makeSingleInstance @otherInstanceStarted
-            log 'other instance already active -> quit'
             app.exit 0
             return
 

@@ -2,13 +2,10 @@
 
 _NAME="ko.app"
 
-while getopts ":thpdDVv" opt; do
+while getopts ":t" opt; do
     case "$opt" in
         t)
             _DEV=1
-            ;;
-        h|p|d|D|V|v)
-            _LOG=1
             ;;
   esac
 done
@@ -34,11 +31,5 @@ else
     fi
 fi
 
-if [ $_LOG ]; then
-    # echo "$_PATH/$_NAME/Contents/MacOS/ko"
-    "$_PATH/$_NAME/Contents/MacOS/ko" "$(pwd)" "$@"
-    exit $?
-else
-    # echo "open $_PATH/$_NAME"
-    open -a "$_PATH/$_NAME" --args app "$(pwd)" "$@"
-fi
+# echo "$_PATH/$_NAME/Contents/MacOS/ko"
+"$_PATH/$_NAME/Contents/MacOS/ko" "$(pwd)" "$@" &

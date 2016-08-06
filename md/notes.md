@@ -1,6 +1,6 @@
 # todo/ideas
 
-- *set current dir when starting from terminal*
+- *fix changing file permissions*
 
 #### terminal
 - *autocomplete dirs and files*
