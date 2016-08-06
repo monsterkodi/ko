@@ -571,10 +571,13 @@ class ViewBase extends Editor
             target:  @layers
             cursor:  'default'
             onStart: (drag, event) =>
-                # log "viewbase.onStart @clickCount:#{@clickCount}"
+
+                @view.focus()  
+                
                 eventPos = @posForEvent event
+                
                 if @clickCount
-                    if eventPos[1] == @clickLineIndex                        
+                    if eventPos[1] == @clickLineIndex
                         @startClickTimer()
                         @clickCount += 1
                         if @clickCount == 2
