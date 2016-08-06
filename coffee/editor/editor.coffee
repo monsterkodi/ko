@@ -376,8 +376,13 @@ class Editor extends Buffer
         for li in [0...@lines.length]
             if li not in sc
                 invertedRanges.push @rangeForLineAtIndex li
-        @do.selections invertedRanges
-
+        if invertedRanges.length
+            @do.start()
+            @mainCursor = @rangeStartPos first invertedRanges
+            @do.cursors [@mainCursor]
+            @do.selections invertedRanges
+            @do.end()
+    
     # 00000000  000   000  000      000            000      000  000   000  00000000   0000000
     # 000       000   000  000      000            000      000  0000  000  000       000     
     # 000000    000   000  000      000            000      000  000 0 000  0000000   0000000 

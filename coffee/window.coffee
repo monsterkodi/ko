@@ -157,9 +157,8 @@ loadFile = (file, opt={}) =>
     if file != editor.currentFile or opt?.reload
         return if not fileExists file
         # log "window.loadFile #{file}"
-        if editor.currentFile? and not opt?.dontSave and editor.do.hasLineChanges() 
-            saveChanges = [_.clone(editor.currentFile), _.clone(editor.text())]
-            atomicFile saveChanges[0], saveChanges[1], encoding: 'utf8', (err) =>
+        if editor.currentFile? and not opt?.dontSave and editor.do.hasLineChanges() and fileExists editor.currentFile
+            atomicFile editor.currentFile, _.clone(editor.text()), encoding: 'utf8', (err) =>
                     if err?
                         log "saving changes to #{file} failed", err
                         return
