@@ -55,8 +55,6 @@
 - for coffee, cpp, h, html, js, json, md, noon, pug, py, sh, styl       
 - ansi-colors in terminal view
 
-**bracket and string matching**
-
 **coffee-script**
 - automatically indexes local required files
 - terminal commands to list indexed classes, files or functions/methods
@@ -253,6 +251,23 @@ shortcuts
 - **⌘.** to activate coffee input
 - **^return** evaluate current editor buffer
 
+# 0000000    000   000  000  000      0000000  
+# 000   000  000   000  000  000      000   000
+# 0000000    000   000  000  000      000   000
+# 000   000  000   000  000  000      000   000
+# 0000000     0000000   000  0000000  0000000  
+
+## build
+
+the build command is an experimental feature:
+it replaces the terminal view with an area that can be filled with arbitrary stuff
+three examples are included:
+- **test** displays a simple 'hello world' in html
+- **voronoi** interactive voronoi mesh rendered with snap.svg
+- **3d** renders and animates a cube with three.js
+
+![cursors](img/build.png)
+
 <!---
 #   00     00   0000000    0000000  00000000    0000000 
 #   000   000  000   000  000       000   000  000   000
@@ -359,7 +374,6 @@ shortcuts:
 the ascii-header mode lets you insert or edit ascii-headers
 - **⌘3** activates the ascii-header mode
     - if the cursor is not in a header already, one will be generated for the word at the main cursor
-- typing **#>** will create a header for the following word and switch to header mode as well
     
 ![cursors](img/salt.png)
 
@@ -369,6 +383,15 @@ in ascii-header mode ...
 - insert common characters as headers just by typing them
     
 the mode deactivates itself automatically in most circumstances. you can force the deactivation any time with **esc**
+
+## bracket and string matching
+
+matching brackets and string borders are highlighted automatically for the main cursor.
+the find result highlighting overrides bracket and string highlighting.
+
+shortcuts:
+- **⌘G** jumps to the closing bracket or the end of the string
+- **⌘⇧G** jumps to the opening bracket or the start of the string
 
 <!---
 #   000  000   000  00000000   0000000 
