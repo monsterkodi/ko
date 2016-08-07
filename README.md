@@ -265,7 +265,7 @@ the build command is an experimental feature:
 
 three examples are included:
 - **test** displays a simple 'hello world' in html
-- **voronoi** interactive voronoi mesh rendered with snap.svg
+- **voronoi** interactive voronoi mesh rendered with snap.svg and gorhill/Javascript-Voronoi
 - **3d** renders and animates a cube with three.js
 
 ![build](img/build.png)
