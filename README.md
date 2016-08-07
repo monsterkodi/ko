@@ -180,7 +180,7 @@ editing search result lines will ...
 - **positive number** jump to line
 - **negative number** jump to line relative to end of file
 
-![search](img/goto.png)
+![goto](img/goto.png)
 
 in editor:
 - **⌥enter** goto word under main cursor
@@ -245,7 +245,7 @@ evaluates coffee-script code in the main process and prints results in terminal
 - the commandline input is nice to do quick math calculations or other single line tasks
 - you can evaluate complex code too, just press **^enter** in the editor to evaluate its whole text
 
-![cursors](img/coffee.png)
+![coffee](img/coffee.png)
 
 shortcuts
 - **⌘.** to activate coffee input
@@ -268,7 +268,7 @@ three examples are included:
 - **voronoi** interactive voronoi mesh rendered with snap.svg
 - **3d** renders and animates a cube with three.js
 
-![cursors](img/build.png)
+![build](img/build.png)
 
 <!---
 #   00     00   0000000    0000000  00000000    0000000 
@@ -377,7 +377,7 @@ the ascii-header mode lets you insert or edit ascii-headers
 - **⌘3** activates the ascii-header mode
     - if the cursor is not in a header already, one will be generated for the word at the main cursor
     
-![cursors](img/salt.png)
+![salt](img/salt.png)
 
 in ascii-header mode ...
 - cursors are green
@@ -391,7 +391,7 @@ the mode deactivates itself automatically in most circumstances. you can force t
 matching brackets and string borders are highlighted automatically for the main cursor.
 - the find result highlighting overrides bracket and string highlighting.
 
-![cursors](img/matching.png)
+![matching](img/matching.png)
 
 shortcuts:
 - **⌘G** jumps to the closing bracket or the end of the string
@@ -407,7 +407,7 @@ shortcuts:
 ## info
 at the right end of the commandline (above the editor minimap) some useful numbers are displayed:
 
-![readme](img/info.png)
+![info](img/info.png)
 - top row:
     - cursor column
     - [cursors]
