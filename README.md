@@ -389,7 +389,9 @@ the mode deactivates itself automatically in most circumstances. you can force t
 ## bracket and string matching
 
 matching brackets and string borders are highlighted automatically for the main cursor.
-the find result highlighting overrides bracket and string highlighting.
+- the find result highlighting overrides bracket and string highlighting.
+
+![cursors](img/matching.png)
 
 shortcuts:
 - **⌘G** jumps to the closing bracket or the end of the string
