@@ -251,16 +251,18 @@ shortcuts
 - **⌘.** to activate coffee input
 - **^return** evaluate current editor buffer
 
+<!---
 # 0000000    000   000  000  000      0000000  
 # 000   000  000   000  000  000      000   000
 # 0000000    000   000  000  000      000   000
 # 000   000  000   000  000  000      000   000
 # 0000000     0000000   000  0000000  0000000  
-
+--->
 ## build
 
 the build command is an experimental feature:
-it replaces the terminal view with an area that can be filled with arbitrary stuff
+- it replaces the terminal view with an area that can be filled with arbitrary stuff.
+
 three examples are included:
 - **test** displays a simple 'hello world' in html
 - **voronoi** interactive voronoi mesh rendered with snap.svg
