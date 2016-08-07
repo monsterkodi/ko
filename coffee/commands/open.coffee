@@ -151,9 +151,10 @@ class Open extends Command
             when '.cpp', '.hpp', '.h'    then 90
             when '.md', '.styl', '.pug'  then 50
             when '.noon'                 then 25
-            when '.js', '.json', '.html' then -100000
+            when '.js', '.json', '.html' then -10
             else 0 
         extensionBonus -= 400 if b[0] == '.'
+        extensionBonus += 0x00ffffff if item.text == '..'
         
         directoryBonus = item.line == '▸' and 500 or 0
                         
