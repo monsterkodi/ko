@@ -1,23 +1,23 @@
 module.exports =
     name:   "jump"
-                        "scheme":   "red_scheme",
-                        "size":     (7,7,13),    
-                        "intro":    "jump", 
-                        "help":     (  "$scale(1.5)mission:\nget to the exit!\n\n" + \
+                        scheme:   "red_scheme",
+                        size:     (7,7,13),
+                        intro:    "jump",
+                        help:     """  "$scale"""1.5)mission:\nget to the exit!\n\n" + \
                                         "jump on the stones to reach it\n\n" + \
                                         "you can attach to a stone when falling by\n" + \
                                         "if you move into its direction",
-                                    ),
-                        "player":   {   "position":         [0,0,5],
+                                    """
+                        player:   {   position:         [0,0,5],
                                     },
-                        "exits":    [
+                        exits:    [
                                         {
-                                            "name":         "exit",
-                                            "active":       1,
-                                            "position":     [0,0,4],
+                                            name:         "exit",
+                                            active:       1,
+                                            position:     [0,0,4],
                                         },
                                     ],
-                        "create": ->
+                        create: ->
 # 
 s = world.getSize()
 

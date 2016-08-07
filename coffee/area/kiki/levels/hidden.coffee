@@ -1,9 +1,9 @@
 module.exports =
     name:   "hidden"
-    "scheme":   "metal_scheme",
-    "size":     [9,9,9],
-    "intro":    "hidden", 
-    "help":     """
+    scheme:   "metal_scheme",
+    size:     [9,9,9],
+    intro:    "hidden",
+    help:     """
                 $scale(1.5)mission:
                 activate the exit!
                 
@@ -13,14 +13,14 @@ module.exports =
                 use the stones to
                 reach the exit
                 """
-    "player":   "position": [0,-3,1]
+    player:   position: [0,-3,1]
                 
-    "exits":    [
-        "name":         "exit",
-        "active":       0,
-        "position":     [0,0,0],
+    exits:    [
+        name:         "exit",
+        active:       0,
+        position:     [0,0,0],
     ],
-    "create": ->
+    create: ->
         s = world.getSize()
         
         world.addObjectAtPos(KikiStone (), KikiPos(0,0,1))
@@ -68,8 +68,8 @@ module.exports =
             exit = kikiObjectToGate (world.getObjectWithName("exit"))
             exit.setActive (world.switch_counter == 5)
         
-        switch1.getEventWithName("switched").addAction (continuous (lambda s=switch1: switched(s)))
-        switch2.getEventWithName("switched").addAction (continuous (lambda s=switch2: switched(s)))
-        switch3.getEventWithName("switched").addAction (continuous (lambda s=switch3: switched(s)))
-        switch4.getEventWithName("switched").addAction (continuous (lambda s=switch4: switched(s)))
-        switch5.getEventWithName("switched").addAction (continuous (lambda s=switch5: switched(s)))
+        switch1.getEventWithName("switched").addAction (continuous (()-> s=switch1: switched(s)))
+        switch2.getEventWithName("switched").addAction (continuous (()-> s=switch2: switched(s)))
+        switch3.getEventWithName("switched").addAction (continuous (()-> s=switch3: switched(s)))
+        switch4.getEventWithName("switched").addAction (continuous (()-> s=switch4: switched(s)))
+        switch5.getEventWithName("switched").addAction (continuous (()-> s=switch5: switched(s)))

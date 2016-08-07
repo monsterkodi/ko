@@ -25,25 +25,25 @@ def func_mini():
  
 	
     name:   "mini"
-                        "scheme":   "tron_scheme",
-                        "size":     [5,5,7],
-                        "intro":    "mini",    
-                        "help":     ( 
+                        scheme:   "tron_scheme",
+                        size:     [5,5,7],
+                        intro:    "mini",
+                        help:     """
                                         "$scale(1.5)mission:\nget to the exit!",
-                                    ),
-                        "player":   {   "coordinates":     [2,4,4],
-                                        "nostatus":         0,
+                                    """
+                        player:   {   coordinates:     [2,4,4],
+                                        nostatus:         0,
 					"orientation"	:	rotx90
 
 				    },
-                        "exits":    [
+                        exits:    [
                                         {
-                                            "name":         "exit",
-                                            "active":       1,
-                                            "position":     [0,0,1],
+                                            name:         "exit",
+                                            active:       1,
+                                            position:     [0,0,1],
                                         },
 				    ],
-			 "create": func_mini,
+    create: func_mini,
 			}
 
 # .................................................................................................................

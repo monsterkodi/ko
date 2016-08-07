@@ -24,25 +24,25 @@ def func_pool():
  
 	
     name:   "pool"
-                        "scheme":   "green_scheme",
-                        "size":     (11,11,11),
-                        "intro":    "pool",    
-                        "help":     ( 
+                        scheme:   "green_scheme",
+                        size:     (11,11,11),
+                        intro:    "pool",
+                        help:     """
                                         "$scale(1.5)mission:\nget to the exit!",
-                                    ),
-                        "player":   {   "coordinates":     (5,10,5),
-                                        "nostatus":         0,
-					"orientation":		rotx90
+                                    """
+                        player:   {   coordinates:     (5,10,5),
+                                        nostatus:         0,
+     orientation:  rotx90
 
 				    },
-                        "exits":    [
+                        exits:    [
                                         {
-                                            "name":         "exit",
-                                            "active":       1,
-                                            "position":     (0,0,-1),
+                                            name:         "exit",
+                                            active:       1,
+                                            position:     (0,0,-1),
                                         },
 				    ],
-			 "create": func_pool,
+    create: func_pool,
 			}
 
 # .................................................................................................................

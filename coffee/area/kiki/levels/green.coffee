@@ -1,9 +1,9 @@
 module.exports =
     name:   "green"
-                        "scheme":   "green_scheme",
-                        "size":     (13,5,13),    
-                        "intro":    "green", 
-                        "help":     ( 
+                        scheme:   "green_scheme",
+                        size:     (13,5,13),
+                        intro:    "green",
+                        help:     """
                                         "$scale(1.5)mission:\nactivate the exit!\n\n" + \
                                         "place a powered\n" \
                                         "wire stone next to it.",  
@@ -13,17 +13,17 @@ module.exports =
                                         "another powered wirestone.",
                                         "this one is hard,\nreally hard,\nbut it's possible.\n\n" \
                                         "good luck!"
-                                    ),
-                        "player":   {   "position":         [1,1,1],
+                                    """
+                        player:   {   position:         [1,1,1],
                                     },
-                        "exits":    [
+                        exits:    [
                                         {
-                                            "name":         "exit",
-                                            "active":       0,
-                                            "position":     [0,0,4],
+                                            name:         "exit",
+                                            active:       0,
+                                            position:     [0,0,4],
                                         },
                                     ],
-                        "create": ->
+                        create: ->
 # 
 sx, sy, sz = 13,5,13
             

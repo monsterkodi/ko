@@ -28,23 +28,23 @@ def func_electro():
   world.addObjectAtPos(KikiGenerator (KikiFace.X) , KikiPos(0,2,2))
 	
     name:   "machine"
-                        "scheme":   "tron_scheme",
-                        "size":     [5,5,9],
-                        "intro":    "machine",    
-                        "help":     ( 
+                        scheme:   "tron_scheme",
+                        size:     [5,5,9],
+                        intro:    "machine",
+                        help:     """
                         				"$scale(1.5)mission:\nactivate the exit!",
-                                    ),
-                        "player":   {   "position":     [0,0,0],
-                                        "orientation":   roty270,
+                                    """
+                        player:   {   position:     [0,0,0],
+                                        orientation:   roty270,
                                     },
-                        "exits":    [
+                        exits:    [
                                         {
-                                            "name":         "exit",
-                                            "active":       0,
-                                            "coordinates":  [1,2,8],
+                                            name:         "exit",
+                                            active:       0,
+                                            coordinates:  [1,2,8],
                                         },
 				    ],
-			 "create": func_electro,
+    create: func_electro,
 			}
 
 # .................................................................................................................

@@ -2,30 +2,30 @@
 
 module.exports =
     name:   "invisimaze"
-                        "scheme":   "yellow_scheme",
-                        "size":     [9,5,5],
-                        "intro":    "invisimaze", 
-                        "help":     ( 
+                        scheme:   "yellow_scheme",
+                        size:     [9,5,5],
+                        intro:    "invisimaze",
+                        help:     """
                                         "blindly fumbling through the maze\n\n" + \
                                         "the switches move every time you play" + \
                                         "there is only one way out!",
-                                    ),
-                        "player":   {   "position":         [0,1,0],
+                                    """
+                        player:   {   position:         [0,1,0],
                                        },
-                        "exits":    [
+                        exits:    [
                                         {
-                                            "name":         "exit1",
-                                            "active":       0,
-                                            "position":     (-4,0,0),
+                                            name:         "exit1",
+                                            active:       0,
+                                            position:     (-4,0,0),
                                         },
                                         {
-                                            "name":         "exit2",
-                                            "active":       0,
-                                            "position":     [4,0,0],
-                                            "world":       lambda: outro(),
+                                            name:         "exit2",
+                                            active:       0,
+                                            position:     [4,0,0],
+                                            world:       ()->: outro(),
                                         },
                                     ],
-                        "create": ->
+                        create: ->
 # 
 s = world.getSize()
 
@@ -52,23 +52,23 @@ i4 = tup_array[4]
 i5 = tup_array[5]
 
 exit_switch = KikiSwitch()
-exit_switch.getEventWithName ("switched").addAction (continuous (lambda : switchBoth()))
+exit_switch.getEventWithName ("switched").addAction (continuous (()-> : switchBoth()))
 world.addObjectAtPos(exit_switch, world.decenter(i0) )
 
 exit2_switch = KikiSwitch()
-exit2_switch.getEventWithName ("switched").addAction (continuous (lambda : world.toggle("exit2")))
+exit2_switch.getEventWithName ("switched").addAction (continuous (()-> : world.toggle("exit2")))
 world.addObjectAtPos(exit2_switch, world.decenter(i1))
 
 exit3_switch = KikiSwitch()
-exit3_switch.getEventWithName ("switched").addAction (continuous (lambda : world.toggle("exit1")))
+exit3_switch.getEventWithName ("switched").addAction (continuous (()-> : world.toggle("exit1")))
 world.addObjectAtPos(exit3_switch, world.decenter(i2))
 
 exit4_switch = KikiSwitch()
-exit4_switch.getEventWithName ("switched").addAction (continuous (lambda : world.toggle("exit1")))
+exit4_switch.getEventWithName ("switched").addAction (continuous (()-> : world.toggle("exit1")))
 world.addObjectAtPos(exit4_switch, world.decenter(i3))
 
 exit5_switch = KikiSwitch()
-exit5_switch.getEventWithName ("switched").addAction (continuous (lambda : world.toggle("exit1")))
+exit5_switch.getEventWithName ("switched").addAction (continuous (()-> : world.toggle("exit1")))
 world.addObjectAtPos(exit5_switch, world.decenter(i4))
 
 

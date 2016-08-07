@@ -2,20 +2,20 @@
 
 module.exports = 
     name:   "edge"
-    "scheme":   "candy_scheme",
-    "size":     [7,7,7],
-    "intro":    "edge",    
-    "help":     "$scale(1.5)mission:\nget to the exit!"
-    "player":      
-        "coordinates":  [3,0,0],
-        "nostatus":     0,
-        "orientation":  rot0
-    "exits":    [
-        "name":         "exit",
-        "active":       1,
-        "position":     [0,0,0],
+    scheme:   "candy_scheme",
+    size:     [7,7,7],
+    intro:    "edge",
+    help:     "$scale(1.5)mission:\nget to the exit!"
+    player:
+        coordinates:  [3,0,0],
+        nostatus:     0,
+        orientation:  rot0
+    exits:    [
+        name:         "exit",
+        active:       1,
+        position:     [0,0,0],
     ]
-    "create": ->
+    create: ->
         s=world.getSize()
         
         for (i,j,l) in [ (m,n,o) for m in range(3) for n in range(3) for o in range(3)]:

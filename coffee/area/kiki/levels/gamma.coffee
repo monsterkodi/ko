@@ -29,10 +29,10 @@ def func_gamma():
 	eswitch = KikiSwitch()
 	
 	aswitch.getEventWithName("switched").addAction ( continuous ( aswitched ))
- 	bswitch.getEventWithName("switched").addAction ( continuous (lambda s= bswitch :  switched(s) ))
- 	cswitch.getEventWithName("switched").addAction ( continuous (lambda s= cswitch :  switched(s) ))
- 	dswitch.getEventWithName("switched").addAction ( continuous (lambda s= dswitch :  switched(s) ))
- 	eswitch.getEventWithName("switched").addAction ( continuous (lambda s= eswitch :  switched(s) ))
+  bswitch.getEventWithName("switched").addAction ( continuous (()-> s= bswitch :  switched(s) ))
+  cswitch.getEventWithName("switched").addAction ( continuous (()-> s= cswitch :  switched(s) ))
+  dswitch.getEventWithName("switched").addAction ( continuous (()-> s= dswitch :  switched(s) ))
+  eswitch.getEventWithName("switched").addAction ( continuous (()-> s= eswitch :  switched(s) ))
  
  world.addObjectAtPos(aswitch , KikiPos  (s.x-1,0,0))
  world.addObjectAtPos(bswitch , KikiPos  (0,0,0))
@@ -58,24 +58,24 @@ def func_gamma():
  world.addObjectAtPos(eswitch , KikiPos  (4,s.y-3,6))
 	
     name:   "gamma"
-                        "scheme":   "tron_scheme",
-                        "size":     (10,10,10),
-                        "intro":    "gamma",    
-                        "help":     ( 
+                        scheme:   "tron_scheme",
+                        size:     (10,10,10),
+                        intro:    "gamma",
+                        help:     """
                                         "$scale(1.5)mission:\nactivate the exit!\n\n" + \
                                         "shoot at the 3 switches to activate the exit",
-                                    ),
-                        "player":   {   "coordinates":     [0,5,0],
-                                        "nostatus":         0,
+                                    """
+                        player:   {   coordinates:     [0,5,0],
+                                        nostatus:         0,
                                     },
-                        "exits":    [
+                        exits:    [
                                         {
-                                            "name":         "exit",
-                                            "active":       0,
-                                            "coordinates":     [2,7,4], #absolute coord
+                                            name:         "exit",
+                                            active:       0,
+                                            coordinates:     [2,7,4], #absolute coord
                                         },
 				    ],
-			 "create": func_gamma,
+    create: func_gamma,
 			}
 
 # .................................................................................................................

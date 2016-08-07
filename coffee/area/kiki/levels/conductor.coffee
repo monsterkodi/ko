@@ -2,10 +2,10 @@
     
 module.exports =
     name:       "conductor"
-    "scheme":   "default_scheme",
-    "size":     (11,9,11),
-    "intro":    "conductor",    
-    "help":     """
+    scheme:   "default_scheme",
+    size:     (11,9,11),
+    intro:    "conductor",
+    help:     """
                 $scale(1.5)mission:
                 activate the exit!
                 
@@ -18,15 +18,15 @@ module.exports =
                 and place a powered wirestone
                 next to the exit
                 """
-    "player":   
-        "coordinates":  [3,0,3]
-        "nostatus":     0
-    "exits":    [
-        "name":         "exit",
-        "active":       0,
-        "position":     [0,0,4],
+    player:
+        coordinates:  [3,0,3]
+        nostatus:     0
+    exits:    [
+        name:         "exit",
+        active:       0,
+        position:     [0,0,4],
     ],
-    "create": ->
+    create: ->
         
         KikiWireWall = (c , p) ->
             if world.isUnoccupiedPos(KikiPos(p.x,p.y,p.z))

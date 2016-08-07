@@ -1,22 +1,22 @@
 module.exports =
     name:   "love"
-                        "scheme":   "red_scheme",
-                        "size":     (13,13,13),    
-                        "intro":    "love", 
-                        "help":     ( 
+                        scheme:   "red_scheme",
+                        size:     (13,13,13),
+                        intro:    "love",
+                        help:     """
                                         "$scale(1.5)mission:\nget to the exit!",
-                                    ),
-                        "player":   {   "position":         (0,1,-4),
-                                        "orientation":      rot0,
+                                    """
+                        player:   {   position:         (0,1,-4),
+                                        orientation:      rot0,
                                     },
-                        "exits":    [
+                        exits:    [
                                         {
-                                            "name":         "peace",
-                                            "active":       1,
-                                            "position":     [0,0,4],
+                                            name:         "peace",
+                                            active:       1,
+                                            position:     [0,0,4],
                                         },
                                     ],
-                        "create": ->
+                        create: ->
 # 
 heart = [[0,0], [ 1,1], [ 2,1], [ 3,0], [ 3,-1], [ 2,-2], [ 1,-3], [0,-4],
                 [-1,1], [-2,1], [-3,0], [-3,-1], [-2,-2], [-1,-3]]

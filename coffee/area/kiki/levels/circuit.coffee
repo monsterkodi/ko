@@ -3,26 +3,26 @@
 module.exports =
     
     name:   "circuit"
-    "scheme":   "tron_scheme",
-    "size":     [9,9,9],
-    "intro":    "circuit",    
-    "help":     """
+    scheme:   "tron_scheme",
+    size:     [9,9,9],
+    intro:    "circuit",
+    help:     """
                 $scale(1.5)mission:
                 activate the exit!
                 
                 to activate the exit
                 feed it with electricity
                 """
-    "player":   
-        "coordinates":     [4,6,4],
-        "nostatus":         0,
-        "orientation":      rot0
-    "exits": [
-        "name":         "exit",
-        "active":       0,
-        "coordinates":  [8,8,8],
+    player:
+        coordinates:     [4,6,4]
+        nostatus:         0
+        orientation:      rot0
+    exits: [
+        name:         "exit"
+        active:       0
+        coordinates:  [8,8,8]
     ]
-    "create": ->
+    create: ->
         s=world.getSize()
         mx=s.x/2
         my=s.y/2
@@ -40,11 +40,11 @@ module.exports =
             [KikiPos(mx+1,sy,my),KikiPos(sx,sy,mz),KikiPos(sx,sy,sz), KikiFace.NY, KikiFace.NY],
             ]
         for k in p:            
-            stone=lambda:KikiWire(k[3], 15)
+            stone= () -> KikiWire(k[3], 15)
             world.addObjectLine(stone,k[0],k[1])
             world.addObjectAtPos(KikiWire(k[3], 15), k[1]) # correct the last missing stone of the line
             
-            stone=lambda:KikiWire(k[4], 15)
+            stone= () ->KikiWire(k[4], 15)
             world.addObjectLine(stone,k[1],k[2])
             
         world.addObjectAtPos(KikiWireStone(), world.decenter(1,0,0))

@@ -1,9 +1,9 @@
 module.exports =
     name:   "church"
-    "scheme":   "yellow_scheme",
-    "size":     [5,7,5],
-    "intro":    "church", 
-    "help":     """
+    scheme:   "yellow_scheme",
+    size:     [5,7,5],
+    intro:    "church",
+    help:     """
                 $scale(1.5)mission:
                 activate the exit!
                 
@@ -16,13 +16,13 @@ module.exports =
                 place a wire stone
                 next to the exit
                 """
-    "player":   "position": [1,0,0]
-    "exits":    [
-        "name":     "exit",
-        "active":   0,
-        "position": [0,-1,0]
+    player:   position: [1,0,0]
+    exits:    [
+        name:     "exit",
+        active:   0,
+        position: [0,-1,0]
     ],
-    "create": ->
+    create: ->
         s = world.getSize()
         
         world.addObjectLine ("KikiWireStone()", KikiPos(0, 0, 0), KikiPos(0, s.y-2, 0))

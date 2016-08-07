@@ -29,22 +29,22 @@ def func_nice():
 	supercube(point=(5,5,5),size=3,obj=KikiStone)
 	
     name:   "nice"
-                        "scheme":   "tron_scheme",
-                        "size":     (11,11,11),
-                        "intro":    "nice",    
-                        "help":     ( 
+                        scheme:   "tron_scheme",
+                        size:     (11,11,11),
+                        intro:    "nice",
+                        help:     """
                                         "$scale(1.5)mission:\nget to the exit!",
-                                    ),
-                        "player":   {   "position":     (2,-1,0),
+                                    """
+                        player:   {   position:     (2,-1,0),
                                     },
-                        "exits":    [
+                        exits:    [
                                         {
-                                            "name":         "exit",
-                                            "active":       1,
-                                            "position":     [0,0,0],
+                                            name:         "exit",
+                                            active:       1,
+                                            position:     [0,0,0],
                                         },
 				    ],
-			 "create": func_nice,
+    create: func_nice,
 			}
 
 # .................................................................................................................

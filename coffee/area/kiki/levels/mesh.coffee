@@ -19,23 +19,23 @@ def func_mesh():
  
 	
     name:   "mesh"
-                        "scheme":   "default_scheme",
-                        "size":     (11,11,11),
-                        "intro":    "mesh",    
-                        "help":     ( 
+                        scheme:   "default_scheme",
+                        size:     (11,11,11),
+                        intro:    "mesh",
+                        help:     """
                                         "$scale(1.5)mission:\nget to the exit!",
-                                    ),
-                        "player":   {   "coordinates":     [0,0,5],
-                                        "nostatus":         0,
+                                    """
+                        player:   {   coordinates:     [0,0,5],
+                                        nostatus:         0,
                                     },
-                        "exits":    [
+                        exits:    [
                                         {
-                                            "name":         "exit",
-                                            "active":       1,
-                                            "position":     [0,0,0],
+                                            name:         "exit",
+                                            active:       1,
+                                            position:     [0,0,0],
                                         },
 				    ],
-			 "create": func_mesh,
+    create: func_mesh,
 			}
 
 # .................................................................................................................
