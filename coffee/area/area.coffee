@@ -7,8 +7,9 @@
 sw,
 $} = require '../tools/tools'
 log = require '../tools/log'
+event = require 'events'
 
-class Area
+class Area extends event
     
     constructor: (viewElem) ->
         @view = $(viewElem)
@@ -25,5 +26,6 @@ class Area
         vw = sw()-12
         @view.style.height = "#{vh}px"
         @view.style.width  = "#{vw}px"
+        @emit 'resized', vw, vh
 
 module.exports = Area

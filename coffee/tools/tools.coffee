@@ -61,7 +61,9 @@ module.exports =
             when v > 999999 then "#{Math.floor v/1000000}M"
             when v > 999    then "#{Math.floor v/1000}k"
             else                 "#{v}"
-        
+       
+    rad2deg: (r) -> 180 * r / Math.PI
+    
     # 00000000    0000000   000000000  000   000
     # 000   000  000   000     000     000   000
     # 00000000   000000000     000     000000000
