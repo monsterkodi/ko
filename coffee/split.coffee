@@ -104,6 +104,7 @@ class Split extends event
     applySplit: (s) ->
         for i in [0...s.length]
             s[i] = clamp (i and s[i-1] or -@handleHeight), @elemHeight(), s[i]
+            
         @handles[0].style.height = "#{clamp 0, @handleHeight, @handleHeight+s[0]}px"
             
         if not @logVisible
@@ -195,9 +196,9 @@ class Split extends event
                     
         switch what
             when 'editor'   then return @moveCommandLineBy -delta
-            when 'terminal', 'area' 
+            when 'terminal', 'area'
                 @raise what
-                return @moveCommandLineBy  delta
+                return @moveCommandLineBy delta
                 
         alert "split.do warning! unhandled do command? #{sentence}?"
         throw new Error
@@ -240,7 +241,6 @@ class Split extends event
                 log "split.show warning! unhandled #{n}!"
 
     raise: (n) ->
-        # log "Split.raise n:#{n}"
         switch n
             when 'terminal'
                 if @panes[0] != @terminal

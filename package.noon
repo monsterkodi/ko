@@ -74,6 +74,7 @@ dependencies
                 performance-now  ^0.2.0
                 pty.js          ^0.3.1
                 sprintf-js      ^1.0.3
+                three           ^0.79.0
                 underscore.string  ^3.3.4
                 walkdir         0.0.11
                 write-file-atomic  ^1.1.4
