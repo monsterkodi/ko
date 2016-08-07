@@ -1,48 +1,22 @@
 
-#000   000  00000000  000000000
-#0000  000  000          000   
-#000 0 000  0000000      000   
-#000  0000  000          000   
-#000   000  00000000     000   
+# 000   000   0000000   00000000    0000000   000   000   0000000   000
+# 000   000  000   000  000   000  000   000  0000  000  000   000  000
+#  000 000   000   000  0000000    000   000  000 0 000  000   000  000
+#    000     000   000  000   000  000   000  000  0000  000   000  000
+#     0       0000000   000   000   0000000   000   000   0000000   000
 {
 rad2deg,
 $} = require '../../tools/tools'
 log = require '../../tools/log'
-Snap = require '../../../snap.svg'
-Voronoi = require './voronoi'
+Snap = require '../../snap.svg'
+Stage = require '../stage'
+vorono = require './voronoinet'
 
-polygonCoordinatesForCell = (c) ->
-    el = []
-    for e in c.halfedges
-        el.push [[e.edge.va.x, e.edge.va.y], [e.edge.vb.x, e.edge.vb.y]]
-    if el.length <= 0
-        return []
-    cl = []
-    wc = 0
-    cw = el.length*el.length
-    eps = 0.00001
-    [cv, ov] = el.shift()
-    cl.push cv[0], cv[1]
-    while el.length
-        for e in el
-            if (Math.abs(e[0][0] - cv[0]) < eps) and (Math.abs(e[0][1] - cv[1]) < eps)
-                [ov, cv] = el.splice(el.indexOf(e), 1)[0]
-                cl.push cv[0], cv[1]
-                break
-            else if (Math.abs(e[1][0] - cv[0]) < eps) and (Math.abs(e[1][1] - cv[1]) < eps)
-                [cv, ov] = el.splice(el.indexOf(e), 1)[0]
-                cl.push cv[0], cv[1]
-                break
-            else 
-                wc += 1
-                if wc > cw
-                    log 'wtf'
-                    return []
-    cl
-
-class Net
-
+class Voronoi extends Stage
+    
     constructor: (@view) ->
+        super @view
+        
         @s = new Snap()
         @view.appendChild @s.node
         @s.attr
@@ -64,8 +38,8 @@ class Net
         @poly = @s.group()            
         @dots = @s.group()
         
-        @voronoi = new Voronoi()
-        @layout @view.clientWidth, @view.clientHeight
+        @voronoi = new vorono()
+        @resized @view.clientWidth, @view.clientHeight
                 
         @net = []
         for i in [0...100]
@@ -105,6 +79,43 @@ class Net
                 opacity: 0.8
             pol.drag @onDrag, @onDragStart, @onDragEnd
             @poly.add pol
+            
+        @animate()
+        
+    #   00000000    0000000   000      000   000   0000000    0000000   000   000
+    #   000   000  000   000  000       000 000   000        000   000  0000  000
+    #   00000000   000   000  000        00000    000  0000  000   000  000 0 000
+    #   000        000   000  000         000     000   000  000   000  000  0000
+    #   000         0000000   0000000     000      0000000    0000000   000   000
+    
+    polygonCoordinatesForCell: (c) ->
+        el = []
+        for e in c.halfedges
+            el.push [[e.edge.va.x, e.edge.va.y], [e.edge.vb.x, e.edge.vb.y]]
+        if el.length <= 0
+            return []
+        cl = []
+        wc = 0
+        cw = el.length*el.length
+        eps = 0.00001
+        [cv, ov] = el.shift()
+        cl.push cv[0], cv[1]
+        while el.length
+            for e in el
+                if (Math.abs(e[0][0] - cv[0]) < eps) and (Math.abs(e[0][1] - cv[1]) < eps)
+                    [ov, cv] = el.splice(el.indexOf(e), 1)[0]
+                    cl.push cv[0], cv[1]
+                    break
+                else if (Math.abs(e[1][0] - cv[0]) < eps) and (Math.abs(e[1][1] - cv[1]) < eps)
+                    [cv, ov] = el.splice(el.indexOf(e), 1)[0]
+                    cl.push cv[0], cv[1]
+                    break
+                else 
+                    wc += 1
+                    if wc > cw
+                        log 'wtf'
+                        return []
+        cl
             
     #0000000    00000000    0000000    0000000 
     #000   000  000   000  000   000  000      
@@ -159,7 +170,7 @@ class Net
             
         for i in [0...diagram.cells.length]
             c = diagram.cells[i]
-            cl = polygonCoordinatesForCell c
+            cl = @polygonCoordinatesForCell c
             p = @poly[i]
             p.attr 
                 points: cl
@@ -171,7 +182,7 @@ class Net
     #000      000   000     000     000   000  000   000     000   
     #0000000  000   000     000      0000000    0000000      000   
 
-    layout: (w, h) =>
+    resized: (w, h) =>
         @needsRedraw = true
         @bbox = 
             xl: -100 * w / h
@@ -185,10 +196,18 @@ class Net
     #     000     000     000       000      
     #0000000      000     00000000  000      
     
-    step: () =>
+    animationStep: (step) -> 
         @stepID += 1
         if (@stepID % 4) == 0
             @calc()
-                
-module.exports = Net
-
+    
+    reset: ->
+        @s.node.style.display = 'initial'
+        @resume()
+        
+    stop: ->
+        @s.node.style.display = 'none'
+        @pause()
+        
+module.exports = Voronoi
+    
