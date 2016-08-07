@@ -12,13 +12,19 @@ Net   = require './net'
 class Main extends Stage
     
     constructor: (@view) ->
-        log "VoronoiMain.animationStep"
         super @view
         @net = new Net @view
         @animate()
 
     animationStep: (step) -> @net.step step 
     resized: (w,h) -> @net.layout w,h
+    reset: ->
+        @net.s.node.style.display = 'initial'
+        @resume()
+        
+    stop: ->
+        @net.s.node.style.display = 'none'
+        @pause()
         
 module.exports = Main
     

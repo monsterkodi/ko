@@ -4,13 +4,12 @@
 #000 0 000  0000000      000   
 #000  0000  000          000   
 #000   000  00000000     000   
-
 {
 rad2deg,
 $} = require '../../tools/tools'
 log = require '../../tools/log'
 Snap = require '../../../build/snap.svg.js'
-Voronoi = require './voronoi'
+Voronoi = require '../../../coffee/area/voronoi/voronoi'
 
 polygonCoordinatesForCell = (c) ->
     el = []
@@ -120,6 +119,7 @@ class Net
             @setPos i, m.x(x,y), m.y(x,y)
         
     setPos: (i, x, y) =>
+        @needsRedraw = true
         @net[i].x = x
         @net[i].y = y
         @dots[i].attr
@@ -142,6 +142,9 @@ class Net
             r = n.x*n.x+n.y*n.y
             if r > @bgCircle.attr('r') * @bgCircle.attr('r')
                 @setPos @net.indexOf(n), n.x * 0.95, n.y * 0.95
+    
+        return if not @needsRedraw
+        @needsRedraw = false
         
         diagram = @voronoi.compute @net, @bbox
 
@@ -169,11 +172,12 @@ class Net
     #0000000  000   000     000      0000000    0000000      000   
 
     layout: (w, h) =>
+        @needsRedraw = true
         @bbox = 
             xl: -100 * w / h
-            xr: 100 * w / h
+            xr:  100 * w / h
             yt: -100
-            yb: 100
+            yb:  100
                 
     # 0000000  000000000  00000000  00000000 
     #000          000     000       000   000
@@ -181,13 +185,10 @@ class Net
     #     000     000     000       000      
     #0000000      000     00000000  000      
     
-    step: (time) =>
-        
+    step: () =>
         @stepID += 1
-        start = Date.now()
-        if (@stepID % 10) == 0
+        if (@stepID % 4) == 0
             @calc()
-        delta = Date.now() - start
                 
 module.exports = Net
 

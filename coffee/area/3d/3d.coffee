@@ -13,7 +13,6 @@ class Three extends Stage
     constructor: (@view) -> super @view
     
     start: -> 
-        log "Three.start"
         @elem = document.createElement 'div'
         @elem.className = 'three'
         @elem.id = 'three'
@@ -75,7 +74,6 @@ class Three extends Stage
         @pause()
         
     resized: (w,h) -> 
-        log "Three.resized #{w}x#{h}"
         @aspect = w/h
         @camera?.aspect = @aspect
         @camera.updateProjectionMatrix()

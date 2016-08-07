@@ -28,7 +28,6 @@ class Build extends Command
     # 0000000      000     000   000  000   000     000   
     
     start: (combo) ->
-        log "Build.start combo:#{combo}"
         super combo
         text:   @last()
         select: true
