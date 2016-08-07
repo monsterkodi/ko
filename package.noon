@@ -1,17 +1,13 @@
 name            ko-editor
 productName     ko
-version         0.9.14
+version         0.9.15
 description     an editor for macOS
 main            js/main.js
 preferGlobal    true
 bin
                 ko  ./bin/ko
 scripts
-                dist      npm run clean && npm run compile && npm run initapp && build
-                kill      fish -c "killall Electron" -c "killall Electron" -c "echo killed"
-                clean     rm -rf dist app/js app/img app/css app/bin app/syntax app/*.html app/node_modules
-                compile   cp -r js css img bin syntax *.html app
-                initapp   cd app && npm install
+                dist  ./bin/build.sh && build
 repository
                 type  git
                 url   git+https://github.com/monsterkodi/ko.git
@@ -37,7 +33,7 @@ build
                 app-category-type  public.app-category.utilities
                 asar            false
                 productName     ko
-                osx
+                mac
                   background  build/background.png
                   target
                     dmg

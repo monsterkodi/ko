@@ -1,6 +1,6 @@
 name          ko
 productName   ko
-version       0.9.14
+version       0.9.15
 description   an editor for macOS
 main          js/main.js
 bin
@@ -29,6 +29,7 @@ dependencies
               dmg             ^0.1.0
               download        ^5.0.2
               entities        ^1.1.1
+              eve             ^0.5.0
               fs-extra        ^0.30.0
               fuzzy           ^0.1.1
               html-entities   ^1.2.0
@@ -41,6 +42,7 @@ dependencies
               performance-now  ^0.2.0
               pty.js          ^0.3.1
               sprintf-js      ^1.0.3
+              three           ^0.79.0
               underscore.string  ^3.3.4
               walkdir         0.0.11
               write-file-atomic  ^1.1.4

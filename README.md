@@ -340,29 +340,16 @@ shortcuts:
 - **^⇧right**              align all cursors vertically with right-most cursor while moving text to the right
 - **⌘delete**              delete backwards over line boundaries
 
-<!---
-#   000   000  000  000   000  0000000     0000000   000   000   0000000
-#   000 0 000  000  0000  000  000   000  000   000  000 0 000  000     
-#   000000000  000  000 0 000  000   000  000   000  000000000  0000000 
-#   000   000  000  000  0000  000   000  000   000  000   000       000
-#   00     00  000  000   000  0000000     0000000   00     00  0000000 
---->
-## windows
+## bracket and string matching
 
-ko is a multi window application. 
-it compensates a lacking tabbing feature by autoalignment of tiled windows and fast switching to recent files.
+matching brackets and string borders are highlighted automatically for the main cursor:
+
+![matching](img/matching.png)
 
 shortcuts:
-- **⌘⌥A** switch between tiled and stacked windows
-- **^W** close file in active window
-- **⌘W** close active window
-- **⌘⇧W** close all windows except active window
-- **⌘`** activate next window
-- **⌘⇧`** activate previous window
-- **⌥`** open window list
-- **⌥[1-9]** activate window with id
-- **⌘⇧N** clone current file in new window
-- **⌘⌥Q** close all windows (they won't restore on next start) and quit
+- **⌘G** jumps to the closing bracket or the end of the string
+- **⌘⇧G** jumps to the opening bracket or the start of the string
+- the find result highlighting overrides bracket and string highlighting
 
 <!---
 #    0000000    0000000   0000000  000  000          000   000  00000000   0000000   0000000    00000000  00000000    0000000
@@ -386,16 +373,29 @@ in ascii-header mode ...
     
 the mode deactivates itself automatically in most circumstances. you can force the deactivation any time with **esc**
 
-## bracket and string matching
+<!---
+#   000   000  000  000   000  0000000     0000000   000   000   0000000
+#   000 0 000  000  0000  000  000   000  000   000  000 0 000  000     
+#   000000000  000  000 0 000  000   000  000   000  000000000  0000000 
+#   000   000  000  000  0000  000   000  000   000  000   000       000
+#   00     00  000  000   000  0000000     0000000   00     00  0000000 
+--->
+## windows
 
-matching brackets and string borders are highlighted automatically for the main cursor.
-- the find result highlighting overrides bracket and string highlighting.
-
-![matching](img/matching.png)
+ko is a multi window application. 
+it compensates a lacking tabbing feature by autoalignment of tiled windows and fast switching to recent files.
 
 shortcuts:
-- **⌘G** jumps to the closing bracket or the end of the string
-- **⌘⇧G** jumps to the opening bracket or the start of the string
+- **⌘⌥A** switch between tiled and stacked windows
+- **^W** close file in active window
+- **⌘W** close active window
+- **⌘⇧W** close all windows except active window
+- **⌘`** activate next window
+- **⌘⇧`** activate previous window
+- **⌥`** open window list
+- **⌥[1-9]** activate window with id
+- **⌘⇧N** clone current file in new window
+- **⌘⌥Q** close all windows (they won't restore on next start) and quit
 
 <!---
 #   000  000   000  00000000   0000000 

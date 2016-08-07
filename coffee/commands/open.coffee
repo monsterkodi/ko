@@ -154,7 +154,7 @@ class Open extends Command
             when '.js', '.json', '.html' then -10
             else 0 
         extensionBonus -= 400 if b[0] == '.'
-        extensionBonus += 0x00ffffff if item.text == '..'
+        extensionBonus += 0x00ffffff if item.text == '..' if @navigating
         
         directoryBonus = item.line == '▸' and 500 or 0
                         

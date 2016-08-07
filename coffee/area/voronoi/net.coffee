@@ -8,8 +8,8 @@
 rad2deg,
 $} = require '../../tools/tools'
 log = require '../../tools/log'
-Snap = require '../../../build/snap.svg.js'
-Voronoi = require '../../../coffee/area/voronoi/voronoi'
+Snap = require '../../../snap.svg'
+Voronoi = require './voronoi'
 
 polygonCoordinatesForCell = (c) ->
     el = []
