@@ -35,6 +35,7 @@ class Split extends event
         @editHandle  = $('.handle.edit')
         @logHandle   = $('.handle.log' )
         @terminal    = $('.terminal'   )
+        @area        = $('.area'       )
         @commandline = $('.commandline')
         @editor      = $('.editor'     )
         @logview     = $('.logview'    )
@@ -166,7 +167,7 @@ class Split extends event
     hideEditor:     -> @splitAt 1, @elemHeight()
     
     commandlineVisible: -> @splitPosY(1)     > 0
-    terminalVisible:    -> @terminalHeight() > 0
+    terminalVisible:    -> @terminalHeight() > 0 and @terminal.style.display != 'none'
     editorVisible:      -> @editorHeight()   > 0
 
     # 0000000     0000000 
@@ -191,9 +192,13 @@ class Split extends event
                 else
                     fh = @terminalHeight() + @commandlineHeight + @editorHeight()
                     delta = parseInt 0.25 * fh
+                    
         switch what
             when 'editor'   then return @moveCommandLineBy -delta
-            when 'terminal' then return @moveCommandLineBy  delta                    
+            when 'terminal', 'area' 
+                @raise what
+                return @moveCommandLineBy  delta
+                
         alert "split.do warning! unhandled do command? #{sentence}?"
         throw new Error
         
@@ -225,13 +230,31 @@ class Split extends event
     
     show: (n) ->
         switch n
-            when 'terminal' then @splitAt 0, 0.5*@splitPosY 2 if @paneHeight(0) < 100
+            when 'terminal', 'area'                                
+                                 @raise n
+                                 @splitAt 0, 0.5*@splitPosY 2 if @paneHeight(0) < 100
             when 'editor'   then @splitAt 1, 0.5*@splitPosY 2 if @paneHeight(2) < 100
             when 'command'  then @splitAt 0, 0                if @paneHeight(1) < @commandlineHeight
             when 'logview'  then @showLog()
             else
                 log "split.show warning! unhandled #{n}!"
 
+    raise: (n) ->
+        # log "Split.raise n:#{n}"
+        switch n
+            when 'terminal'
+                if @panes[0] != @terminal
+                    @terminal.style.height  = @area.style.height                    
+                    @area.style.display     = 'none'
+                    @terminal.style.display = 'block'
+                    @panes[0] = @terminal
+            when 'area'
+                if @panes[0] != @area
+                    @area.style.height      = @terminal.style.height
+                    @terminal.style.display = 'none'
+                    @area.style.display     = 'block'
+                    @panes[0] = @area
+    
     # 000       0000000    0000000 
     # 000      000   000  000      
     # 000      000   000  000  0000

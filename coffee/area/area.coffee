@@ -1,0 +1,30 @@
+#  0000000   00000000   00000000   0000000 
+# 000   000  000   000  000       000   000
+# 000000000  0000000    0000000   000000000
+# 000   000  000   000  000       000   000
+# 000   000  000   000  00000000  000   000
+{
+sw,
+$} = require '../tools/tools'
+log = require '../tools/log'
+
+class Area
+    
+    constructor: (viewElem) ->
+        @view = $(viewElem)
+        @view.style.display = 'none'
+        
+    # 00000000   00000000   0000000  000  0000000  00000000
+    # 000   000  000       000       000     000   000     
+    # 0000000    0000000   0000000   000    000    0000000 
+    # 000   000  000            000  000   000     000     
+    # 000   000  00000000  0000000   000  0000000  00000000
+
+    resized: -> 
+        vh = parseInt split.splitPosY 1
+        vw = sw()
+        # log "area.resized #{vw}x#{vh}"
+        @view.style.height = "#{vh}px"
+        @view.style.width  = "#{vw}px"
+
+module.exports = Area

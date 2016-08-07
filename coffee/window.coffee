@@ -12,6 +12,7 @@ del,clamp,
 resolve}    = require './tools/tools'
 Split       = require './split'
 View        = require './editor/view'
+Area        = require './area/area'
 Commandline = require './commandline/commandline'
 Terminal    = require './terminal/terminal'
 LogView     = require './logview/logview'
@@ -270,6 +271,7 @@ navigate = window.navigate = new Navigate
 
 split = window.split = new Split()
 split.on 'split', =>
+    area.resized()
     terminal.resized()
     commandline.resized()
     editor.resized()
@@ -284,6 +286,14 @@ split.on 'split', =>
 terminal = window.terminal = new Terminal '.terminal'
 terminal.on 'fileLineChange', (file, lineChange) =>
     ipc.send 'winFileLinesChanged', -1, file, [lineChange]
+
+#  0000000   00000000   00000000   0000000 
+# 000   000  000   000  000       000   000
+# 000000000  0000000    0000000   000000000
+# 000   000  000   000  000       000   000
+# 000   000  000   000  00000000  000   000
+
+area = window.area = new Area '.area'
 
 # 00000000  0000000    000  000000000   0000000   00000000 
 # 000       000   000  000     000     000   000  000   000
