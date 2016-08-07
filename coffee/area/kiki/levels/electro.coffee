@@ -1,9 +1,9 @@
 module.exports =
-    name:   "electro"
-    scheme:   "metal_scheme"
-    size:     [9,7,9]
-    intro:    "electro"
-    help:     """
+    name:       "electro"
+    scheme:     "metal_scheme"
+    size:       [9,7,9]
+    intro:      "electro"
+    help:       """
                 $scale(1.5)mission:
                 activate the exit!
                 

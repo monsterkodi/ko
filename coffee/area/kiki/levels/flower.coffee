@@ -4,7 +4,7 @@ module.exports =
     
     name:       "flower"
     scheme:     "metal_scheme"
-    size:       (7,7,11)
+    size:       [7,7,11]
     intro:      "flower"
     help:       """
                 $scale(1.5)mission:

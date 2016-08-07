@@ -9,7 +9,7 @@ module.exports =
     help:       """
                 $scale(1.5)mission:
                 get to the exit!
-                but don't get confused :) !
+                but don't get confused :)
                 """
     player:   
         coordinates:     [3,0,0]
@@ -71,7 +71,7 @@ module.exports =
         world.addObjectAtPos(KikiWall(), KikiPos(2,2,3))
         world.addObjectAtPos(KikiWall(), KikiPos(1,3,3))
            
-        world.addObjectAtPos(KikiLight (), KikiPos(3,0,0))
+        world.addObjectAtPos(KikiLight(), KikiPos(3,0,0))
             
         world.setCameraMode(world.CAMERA_INSIDE)
         

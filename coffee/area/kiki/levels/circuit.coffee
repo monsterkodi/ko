@@ -2,11 +2,11 @@
 
 module.exports =
     
-    name:   "circuit"
-    scheme:   "tron_scheme",
-    size:     [9,9,9],
-    intro:    "circuit",
-    help:     """
+    name:       "circuit"
+    scheme:     "tron_scheme"
+    size:       [9,9,9]
+    intro:      "circuit"
+    help:       """
                 $scale(1.5)mission:
                 activate the exit!
                 
@@ -17,7 +17,7 @@ module.exports =
         coordinates:     [4,6,4]
         nostatus:         0
         orientation:      rot0
-    exits: [
+    exits:  [
         name:         "exit"
         active:       0
         coordinates:  [8,8,8]
@@ -39,7 +39,7 @@ module.exports =
             [KikiPos(mx,my+1, 0),KikiPos(mx,sy, 0),KikiPos(mx,sy,my), KikiFace.Z,  KikiFace.NY],
             [KikiPos(mx+1,sy,my),KikiPos(sx,sy,mz),KikiPos(sx,sy,sz), KikiFace.NY, KikiFace.NY],
             ]
-        for k in p:            
+        for k in p            
             stone= () -> KikiWire(k[3], 15)
             world.addObjectLine(stone,k[0],k[1])
             world.addObjectAtPos(KikiWire(k[3], 15), k[1]) # correct the last missing stone of the line

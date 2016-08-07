@@ -2,10 +2,10 @@
     
 module.exports =
     name:       "conductor"
-    scheme:   "default_scheme",
-    size:     (11,9,11),
-    intro:    "conductor",
-    help:     """
+    scheme:     "default_scheme"
+    size:       (11,9,11)
+    intro:      "conductor"
+    help:       """
                 $scale(1.5)mission:
                 activate the exit!
                 
@@ -22,9 +22,9 @@ module.exports =
         coordinates:  [3,0,3]
         nostatus:     0
     exits:    [
-        name:         "exit",
-        active:       0,
-        position:     [0,0,4],
+        name:         "exit"
+        active:       0
+        position:     [0,0,4]
     ],
     create: ->
         
@@ -38,7 +38,7 @@ module.exports =
                 world.addObjectAtPos(KikiWire (KikiFace.Z,  c ), KikiPos(p.x  ,p.y  ,p.z+1))
                 world.addObjectAtPos(KikiWire (KikiFace.NZ, c ), KikiPos(p.x  ,p.y  ,p.z-1))
             
-        for h in [2,4,6]:
+        for h in [2,4,6]
             world.addObjectLine (KikiWall, KikiPos(5,2,h), KikiPos(5,6,h) )
             world.addObjectAtPos(KikiWireStone(), KikiPos(5,1,h))
             world.addObjectAtPos(KikiWireStone(), KikiPos(5,6,h))

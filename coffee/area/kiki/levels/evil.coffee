@@ -20,11 +20,11 @@ module.exports =
                 
                 good luck!
                 """
-    player:     position:         [1,1,1]
+    player:     position: [1,1,1]
     exits:    [
-        name:         "exit"
-        active:       0
-        position:     [0,0,4]
+        name:       "exit"
+        active:     0
+        position:   [0,0,4]
     ],
     create: ->
 

@@ -2,9 +2,9 @@
 
 module.exports =
     name:       "random"
-    scheme:     "default_scheme",
-    size:       (21,21,21),
-    intro:      "random",
+    scheme:     "default_scheme"
+    size:       [21,21,21]
+    intro:      "random"
     help:       """
                 $scale(1.5)mission:
                 get to the exit!

@@ -20,13 +20,12 @@ module.exports =
                 the bomb will detonate if you shoot it
                 """
     player:
-        coordinates:     [3, 4,3]
-        nostatus:         0
-                
+        coordinates:   [3, 4,3]
+        nostatus:       0
     exits:    [
-        name:         "exit"
-        active:       0
-        position:     [-1,0,0]
+        name:           "exit"
+        active:         0
+        position:       [-1,0,0]
     ]
     create: ->
         s = world.getSize ()

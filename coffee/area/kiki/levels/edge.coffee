@@ -1,19 +1,19 @@
 # level design by Michael Abel
 
 module.exports = 
-    name:   "edge"
-    scheme:   "candy_scheme",
-    size:     [7,7,7],
-    intro:    "edge",
-    help:     "$scale(1.5)mission:\nget to the exit!"
+    name:       "edge"
+    scheme:     "candy_scheme"
+    size:       [7,7,7]
+    intro:      "edge"
+    help:       "$scale(1.5)mission:\nget to the exit!"
     player:
-        coordinates:  [3,0,0],
-        nostatus:     0,
+        coordinates:  [3,0,0]
+        nostatus:     0
         orientation:  rot0
     exits:    [
-        name:         "exit",
-        active:       1,
-        position:     [0,0,0],
+        name:         "exit"
+        active:       1
+        position:     [0,0,0]
     ]
     create: ->
         s=world.getSize()

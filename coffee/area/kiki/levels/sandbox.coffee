@@ -1,9 +1,9 @@
 # level design by Michael Abel
 module.exports =    
     name:       "sandbox"
-    scheme:     "bronze_scheme",
-    size:       [9,9,6],
-    intro:      "sandbox",
+    scheme:     "bronze_scheme"
+    size:       [9,9,6]
+    intro:      "sandbox"
     help:       """
                 $scale(1.5)mission:
                 activate the exit!

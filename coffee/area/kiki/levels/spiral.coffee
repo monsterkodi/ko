@@ -2,8 +2,8 @@
 
 module.exports =
     name:       "spiral"
-    scheme:     "zen_scheme",
-    intro:      "spiral",
+    scheme:     "zen_scheme"
+    intro:      "spiral"
     size:       [5,25,5]
     help:       "Down the Rabbit Hole"
     player:     

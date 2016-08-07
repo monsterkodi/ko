@@ -1,10 +1,10 @@
 
 module.exports = 
-    name: 'bronze'
-    scheme:   "bronze_scheme"
-    size:     [9,6,9]
-    intro:    "bronze"
-    help:     """
+    name:       'bronze'
+    scheme:     "bronze_scheme"
+    size:       [9,6,9]
+    intro:      "bronze"
+    help:       """
                 $scale(1.5)mission:
                 activate the exit!
                 
@@ -16,9 +16,9 @@ module.exports =
                 and close the circuit
                 with the wire stones"
                 """
-    player:   position: [0,1,0]
+    player:     position: [0,1,0]
                 
-    exits:    [
+    exits:      [
         name:         "exit"
         active:       0
         position:     [0,0,0]
