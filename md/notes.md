@@ -4,8 +4,6 @@
 - fix commandlist switching sides when other side is smaller
 
 #### build
-- command+b
-- pane
 - load 
 
 #### terminal
