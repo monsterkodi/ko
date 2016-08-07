@@ -1,6 +1,6 @@
 # level design by Michael Abel
 
-# .................................................................................................................
+module.exports =
 def func_walls():
 	s=world.getSize()
 
@@ -15,11 +15,11 @@ def func_walls():
 		
 	for (i,j,l) in [ (m,n,o) for m in range(s.x) for n in range(s.y) for o in range(s.z)]:
 	  if i==s.x/2 or i==s.x/2-2 or i==s.x/2+2:
-	    world.addObjectAtPos (KikiStone(KColor(0.1*i,0.1*j,0.1*l,0.6) , False)	, KikiPos (i,j,l))
+     world.addObjectAtPos(KikiStone(KColor(0.1*i,0.1*j,0.1*l,0.6) , False) , KikiPos(i,j,l))
 	
-level_dict["walls"] = {   
+    name:   "walls"
                         "scheme":   "default_scheme",
-                        "size":     (7,5,5),
+                        "size":     [7,5,5],
                         "intro":    "walls",    
                         "help":     ( 
                         				"$scale(1.5)mission:\nget to the exit!\n\n" + \
@@ -27,14 +27,14 @@ level_dict["walls"] = {
                                         "in the middle of\n" + \
 										"the central wall",
                                     ),
-                        "player":   {   "coordinates":     (0,0,2),
+                        "player":   {   "coordinates":     [0,0,2],
                                         "nostatus":         0,
                                     },
                         "exits":    [
                                         {
                                             "name":         "exit",
                                             "active":       1,
-                                            "position":     (0,0,0),
+                                            "position":     [0,0,0],
                                         },
 				    ],
 			 "create": func_walls,

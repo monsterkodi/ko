@@ -16,7 +16,7 @@ def supercube(point=(5,5,5),size=2,obj=KikiWall):
 					KikiPos(p[0],p[1]-s,p[2]-s),
 					KikiPos(p[0],p[1]-s,p[2]+s) ])
 
-# .................................................................................................................
+module.exports =
 
 def func_nice():
 	s = world.getSize()
@@ -24,11 +24,11 @@ def func_nice():
 	world.addObjectLine(KikiWall, KikiPos(1,1,9) , KikiPos(9,9,1) )
 	world.addObjectLine(KikiWall, KikiPos(1,9,1) , KikiPos(9,1,9) )
 	world.addObjectLine(KikiWall, KikiPos(9,1,1) , KikiPos(1,9,9) )
-	world.deleteObject (world.getOccupantAtPos (world.decenter (0,0,0)))
+ world.deleteObject (world.getOccupantAtPos (world.decenter(0,0,0)))
 	supercube(point=(5,5,5),size=5,obj=KikiWall)
 	supercube(point=(5,5,5),size=3,obj=KikiStone)
 	
-level_dict["nice"] = {   
+    name:   "nice"
                         "scheme":   "tron_scheme",
                         "size":     (11,11,11),
                         "intro":    "nice",    
@@ -41,7 +41,7 @@ level_dict["nice"] = {
                                         {
                                             "name":         "exit",
                                             "active":       1,
-                                            "position":     (0,0,0),
+                                            "position":     [0,0,0],
                                         },
 				    ],
 			 "create": func_nice,

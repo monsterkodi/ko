@@ -1,7 +1,7 @@
-# .................................................................................................................
-level_dict["switch"] = {   
+module.exports =
+    name:   "switch"
                         "scheme":   "yellow_scheme",
-                        "size":     (7,7,7),
+                        "size":     [7,7,7],
                         "intro":    "switch",    
                         "help":     ( 
                                         "$scale(1.5)mission:\nactivate the exit!\n\n" + \
@@ -11,7 +11,7 @@ level_dict["switch"] = {
                                         "to move the center stone,\n\nuse the bomb.\n\n" + \
                                         "the bomb will detonate if you shoot it"
                                     ),
-                        "player":   {   "coordinates":     (3,0,3),
+                        "player":   {   "coordinates":     [3,0,3],
                                         "nostatus":         0,
                                     },
                         "exits":    [
@@ -21,38 +21,38 @@ level_dict["switch"] = {
                                             "position":     (0,-1,0),
                                         },
                                     ],
-                        "create":
-"""
+                        "create": ->
+# 
 s = world.getSize ()
 h = 0
 # bomb and stones
 
-world.addObjectAtPos (KikiStone(), KikiPos (s.x/2, s.y/2, s.z/2))
-world.addObjectAtPos (KikiStone(), KikiPos (s.x/2, s.y-2, s.z/2))
+world.addObjectAtPos(KikiStone(), KikiPos(s.x/2, s.y/2, s.z/2))
+world.addObjectAtPos(KikiStone(), KikiPos(s.x/2, s.y-2, s.z/2))
 
-world.addObjectAtPos (KikiBomb(), KikiPos (s.x/2, 1, s.z/2))
+world.addObjectAtPos(KikiBomb(), KikiPos(s.x/2, 1, s.z/2))
 
 # stone frames for switches
 
-world.addObjectAtPos (KikiWall(), world.decenter ( 0,  h-1, s.z/2))
-world.addObjectAtPos (KikiWall(), world.decenter ( 0,  h+1, s.z/2))
-world.addObjectAtPos (KikiWall(), world.decenter ( 1,  h, s.z/2))
-world.addObjectAtPos (KikiWall(), world.decenter (-1,  h, s.z/2))
+world.addObjectAtPos(KikiWall(), world.decenter( 0,  h-1, s.z/2))
+world.addObjectAtPos(KikiWall(), world.decenter( 0,  h+1, s.z/2))
+world.addObjectAtPos(KikiWall(), world.decenter( 1,  h, s.z/2))
+world.addObjectAtPos(KikiWall(), world.decenter(-1,  h, s.z/2))
 
-world.addObjectAtPos (KikiWall(), world.decenter (s.x/2, h-1, 0))
-world.addObjectAtPos (KikiWall(), world.decenter (s.x/2, h+1, 0))
-world.addObjectAtPos (KikiWall(), world.decenter (s.x/2, h,  1))
-world.addObjectAtPos (KikiWall(), world.decenter (s.x/2, h, -1))
+world.addObjectAtPos(KikiWall(), world.decenter(s.x/2, h-1, 0))
+world.addObjectAtPos(KikiWall(), world.decenter(s.x/2, h+1, 0))
+world.addObjectAtPos(KikiWall(), world.decenter(s.x/2, h,  1))
+world.addObjectAtPos(KikiWall(), world.decenter(s.x/2, h, -1))
 
-world.addObjectAtPos (KikiWall(), world.decenter ( 0,  h-1, -s.z/2+1))
-world.addObjectAtPos (KikiWall(), world.decenter ( 0,  h+1, -s.z/2+1))
-world.addObjectAtPos (KikiWall(), world.decenter ( 1,  h, -s.z/2+1))
-world.addObjectAtPos (KikiWall(), world.decenter (-1,  h, -s.z/2+1))
+world.addObjectAtPos(KikiWall(), world.decenter( 0,  h-1, -s.z/2+1))
+world.addObjectAtPos(KikiWall(), world.decenter( 0,  h+1, -s.z/2+1))
+world.addObjectAtPos(KikiWall(), world.decenter( 1,  h, -s.z/2+1))
+world.addObjectAtPos(KikiWall(), world.decenter(-1,  h, -s.z/2+1))
 
-world.addObjectAtPos (KikiWall(), world.decenter (-s.x/2+1, h-1, 0))
-world.addObjectAtPos (KikiWall(), world.decenter (-s.x/2+1, h+1, 0))
-world.addObjectAtPos (KikiWall(), world.decenter (-s.x/2+1, h,  1))
-world.addObjectAtPos (KikiWall(), world.decenter (-s.x/2+1, h, -1))
+world.addObjectAtPos(KikiWall(), world.decenter(-s.x/2+1, h-1, 0))
+world.addObjectAtPos(KikiWall(), world.decenter(-s.x/2+1, h+1, 0))
+world.addObjectAtPos(KikiWall(), world.decenter(-s.x/2+1, h,  1))
+world.addObjectAtPos(KikiWall(), world.decenter(-s.x/2+1, h, -1))
 
 # switches
 
@@ -72,9 +72,9 @@ switch3.getEventWithName("switched").addAction (continuous (lambda s=switch3: sw
 switch4 = KikiSwitch()
 switch4.getEventWithName("switched").addAction (continuous (lambda s=switch4: switched(s)))
 
-world.addObjectAtPos (switch1, world.decenter (-s.x/2+1, 0, 0))
-world.addObjectAtPos (switch2, world.decenter ( s.x/2, 0, 0))
-world.addObjectAtPos (switch3, world.decenter (0, 0, -s.z/2+1))
-world.addObjectAtPos (switch4, world.decenter (0, 0,  s.z/2))
-""",                                 
+world.addObjectAtPos(switch1, world.decenter(-s.x/2+1, 0, 0))
+world.addObjectAtPos(switch2, world.decenter( s.x/2, 0, 0))
+world.addObjectAtPos(switch3, world.decenter(0, 0, -s.z/2+1))
+world.addObjectAtPos(switch4, world.decenter(0, 0,  s.z/2))
+# 
 }

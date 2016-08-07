@@ -1,7 +1,7 @@
-# .................................................................................................................
-level_dict["mutants"] = {   
+module.exports =
+    name:   "mutants"
                         "scheme":   "blue_scheme",
-                        "size":     (9,9,9),    
+                        "size":     [9,9,9],
                         "intro":    "mutants", 
                         "help":     ( 
                                         "$scale(1.5)mission:\ndeactivate the mutants!\n\n" + \
@@ -14,12 +14,12 @@ level_dict["mutants"] = {
                                         {
                                             "name":         "exit",
                                             "active":       0,
-                                            "position":     (0,0,0),
+                                            "position":     [0,0,0],
                                             "world":       lambda: outro(),
                                         },
                                     ],
-                        "create":
-"""
+                        "create": ->
+# 
 s = world.getSize()
 
 world.addObjectLine (KikiWall, (2, 2, 2), (s.x - 3, 2, 2))
@@ -41,5 +41,5 @@ for i in range (world.num_mutants):
     mutant = KikiMutant()
     mutant.getEventWithName ("died").addAction (once (botDied))
     world.setObjectRandom (mutant)
-""",                                 
+# 
 }

@@ -1,16 +1,16 @@
 # level design by Michael Abel
 
-# .................................................................................................................
+module.exports =
 def func_slick():
 	s=world.getSize()
 	for b in range(1,4):
 	  for (k,l) in [ (i,j) for i in range(b+1,s.x-b-1) for j in range(b+1,s.y-b-1) ]:
-	    world.addObjectAtPos (KikiStone(KColor(0,1,0,0.5), True), KikiPos(k,l,b*3))
+     world.addObjectAtPos(KikiStone(KColor(0,1,0,0.5), True), KikiPos(k,l,b*3))
 
 	world.addObjectAtPos( KikiWall(), KikiPos(s.x/2,s.y/2,0))
-	world.addObjectAtPos (KikiStone(KColor(0,1,0,0.5), True), KikiPos(s.x/2,s.y/2,2))
+ world.addObjectAtPos(KikiStone(KColor(0,1,0,0.5), True), KikiPos(s.x/2,s.y/2,2))
 	
-level_dict["slick"] = {   
+    name:   "slick"
                         "scheme":   "tron_scheme",
                         "size":     (9,11,15),
                         "intro":    "slick",    
@@ -27,7 +27,7 @@ level_dict["slick"] = {
                                         {
                                             "name":         "exit",
                                             "active":       1,
-                                            "position":     (0,0,4),
+                                            "position":     [0,0,4],
                  			    
                                         },
 				    ],

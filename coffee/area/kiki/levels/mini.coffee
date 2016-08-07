@@ -1,6 +1,6 @@
 # level design by Michael Abel
 
-# .................................................................................................................
+module.exports =
 def func_mini():
 	
 	world.addObjectAtPos( KikiWall(), KikiPos(1,1,0))
@@ -24,14 +24,14 @@ def func_mini():
 	
  
 	
-level_dict["mini"] = {   
+    name:   "mini"
                         "scheme":   "tron_scheme",
-                        "size":     (5,5,7),
+                        "size":     [5,5,7],
                         "intro":    "mini",    
                         "help":     ( 
                                         "$scale(1.5)mission:\nget to the exit!",
                                     ),
-                        "player":   {   "coordinates":     (2,4,4),
+                        "player":   {   "coordinates":     [2,4,4],
                                         "nostatus":         0,
 					"orientation"	:	rotx90
 
@@ -40,7 +40,7 @@ level_dict["mini"] = {
                                         {
                                             "name":         "exit",
                                             "active":       1,
-                                            "position":     (0,0,1),
+                                            "position":     [0,0,1],
                                         },
 				    ],
 			 "create": func_mini,

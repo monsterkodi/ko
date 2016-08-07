@@ -1,7 +1,7 @@
 # level design by Owen Hay
 
-# .................................................................................................................
-level_dict["spiral"] = {   
+module.exports =
+    name:   "spiral"
                         "scheme":   "zen_scheme",
                         "intro":    "spiral",
                         "size":     (5,25,5),    
@@ -9,7 +9,7 @@ level_dict["spiral"] = {
                                         "Down the Rabbit Hole \n\n" + \
                                         "",
                                     ),
-                        "player":   {   "coordinates":     (3,1,3),
+                        "player":   {   "coordinates":     [3,1,3],
                                         "nostatus":         0,
                                     },
                         "exits":    [
@@ -19,42 +19,42 @@ level_dict["spiral"] = {
                                             "position":     (0,11,0),
                                         },
                                     ],
-                        "create":
-"""
+                        "create": ->
+# 
 s = world.getSize ()
 
 for y in [ -7, -3, 1, 5]:
     x = 1
-    world.addObjectPoly (KikiStone, [world.decenter (-x, y, -x), world.decenter(-x, y, x), \
-                                     world.decenter (x, y, x), ])
+    world.addObjectPoly (KikiStone, [world.decenter(-x, y, -x), world.decenter(-x, y, x), \
+                                     world.decenter(x, y, x), ])
 
 for y in [-9, -5, -1, 3,]:
     x = 1
-    world.addObjectPoly (KikiStone, [world.decenter (x, y, x), world.decenter(x, y, -x), \
-                                     world.decenter (-x, y, -x), ])
+    world.addObjectPoly (KikiStone, [world.decenter(x, y, x), world.decenter(x, y, -x), \
+                                     world.decenter(-x, y, -x), ])
 
 for y in [12, 11, ]:
     x = 2
-    world.addObjectPoly (KikiWireStone, [world.decenter (-x, y, -x), world.decenter(-x, y, x), \
-                                     world.decenter (x, y, x), world.decenter(x, y, -x)])
+    world.addObjectPoly (KikiWireStone, [world.decenter(-x, y, -x), world.decenter(-x, y, x), \
+                                     world.decenter(x, y, x), world.decenter(x, y, -x)])
 # KEY GEAR
-world.addObjectAtPos (KikiGear (KikiFace.NY),    world.decenter(0, -10, 0))
+world.addObjectAtPos(KikiGear (KikiFace.NY),    world.decenter(0, -10, 0))
 
 
 # LOCK MECHANISM
-world.addObjectAtPos (KikiGenerator (KikiFace.NY),      world.decenter(-1, 12, 0))
-world.addObjectAtPos (KikiGenerator (KikiFace.NY),      world.decenter(-1, 11, 0))
+world.addObjectAtPos(KikiGenerator (KikiFace.NY),      world.decenter(-1, 12, 0))
+world.addObjectAtPos(KikiGenerator (KikiFace.NY),      world.decenter(-1, 11, 0))
 
-world.addObjectAtPos (KikiMotorCylinder (KikiFace.NY),  world.decenter(1, 11, 0))
-world.addObjectAtPos (KikiMotorGear (KikiFace.NY),  world.decenter(1, 12, 0))
+world.addObjectAtPos(KikiMotorCylinder (KikiFace.NY),  world.decenter(1, 11, 0))
+world.addObjectAtPos(KikiMotorGear (KikiFace.NY),  world.decenter(1, 12, 0))
 
-world.addObjectAtPos (KikiWireStone(),  world.decenter(0, 11, 1))
-world.addObjectAtPos (KikiWireStone(),   world.decenter(0, 12, 1))
+world.addObjectAtPos(KikiWireStone(),  world.decenter(0, 11, 1))
+world.addObjectAtPos(KikiWireStone(),   world.decenter(0, 12, 1))
 
-world.addObjectAtPos (KikiWireStone(),  world.decenter(0, 11, -1))
-world.addObjectAtPos (KikiWireStone(),   world.decenter(0, 12, -1))
+world.addObjectAtPos(KikiWireStone(),  world.decenter(0, 11, -1))
+world.addObjectAtPos(KikiWireStone(),   world.decenter(0, 12, -1))
 
-""",                                 
+# 
 }
 
 

@@ -1,5 +1,5 @@
 # level design by Michael Abel
-# .................................................................................................................
+module.exports =
 def func_sand():
 	sys.stdout = KConsole
 	sys.stderr = KConsole
@@ -16,7 +16,7 @@ def func_sand():
 	switch = KikiSwitch()
 	switch.getEventWithName("switched").addAction ( continuous ( switched ))
    	
-	world.addObjectAtPos (switch , KikiPos  (0,5,0))	
+ world.addObjectAtPos(switch , KikiPos  (0,5,0))
 	
 	world.addObjectPoly(KikiWall, [ KikiPos(2,2,0),KikiPos(2,6,0),KikiPos(6,6,0),KikiPos(6,2,0)], 1)
 	
@@ -36,9 +36,9 @@ def func_sand():
 	world.addObjectAtPos(KikiStone() , KikiPos(5,1,0))
 	world.addObjectAtPos(KikiStone() , KikiPos(1,7,0))
 	
-level_dict["sandbox"] = {
+    name:   "sandbox"
                         "scheme":   "bronze_scheme",
-                        "size":     (9,9,6),
+                        "size":     [9,9,6],
                         "intro":    "sandbox",    
                         "help":     ( 
                         				"$scale(1.5)mission:\nactivate the exit!\n\n" + \
@@ -47,14 +47,14 @@ level_dict["sandbox"] = {
                                         "into the sandbox\n" + \
                                         "and shoot at the switch", 
                                     ),
-                        "player":   {   "coordinates":     (4,6,2),
+                        "player":   {   "coordinates":     [4,6,2],
 					"orientation":		rotx90
                                     },
                         "exits":    [
                                         {
                                             "name":         "exit",
                                             "active":       0,
-                                            "position":     (0,0,0),
+                                            "position":     [0,0,0],
                                         },
 				    ],
 			 "create": func_sand,

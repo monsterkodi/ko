@@ -1,5 +1,5 @@
 # level design by Michael Abel
-# .................................................................................................................
+module.exports =
 def func_mesh():
 	s=world.getSize()
 
@@ -14,25 +14,25 @@ def func_mesh():
 		
 	for (i,j,l) in [ (m,n,o) for m in range(s.x) for n in range(s.y) for o in range(s.z)]:
 	  if (i+1)%2 and (j+1)%2 and (l+1)%2:
-	    world.addObjectAtPos (KikiStone(KColor(0.1*i,0.1*j,0.1*l,middlemin(i,j,l)) , True)	, KikiPos (i,j,l))
+     world.addObjectAtPos(KikiStone(KColor(0.1*i,0.1*j,0.1*l,middlemin(i,j,l)) , True) , KikiPos(i,j,l))
 
  
 	
-level_dict["mesh"] = {   
+    name:   "mesh"
                         "scheme":   "default_scheme",
                         "size":     (11,11,11),
                         "intro":    "mesh",    
                         "help":     ( 
                                         "$scale(1.5)mission:\nget to the exit!",
                                     ),
-                        "player":   {   "coordinates":     (0,0,5),
+                        "player":   {   "coordinates":     [0,0,5],
                                         "nostatus":         0,
                                     },
                         "exits":    [
                                         {
                                             "name":         "exit",
                                             "active":       1,
-                                            "position":     (0,0,0),
+                                            "position":     [0,0,0],
                                         },
 				    ],
 			 "create": func_mesh,

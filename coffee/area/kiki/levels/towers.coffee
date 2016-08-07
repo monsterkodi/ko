@@ -2,7 +2,7 @@
 
 # Should take not more than 90 moves.  
 #----------------------------------------------------- 
-level_dict["towers"] = {  
+    name:   "towers"
 "scheme": "metal_scheme", 
 "size": (9,9,15), 
 "intro": "towers", 
@@ -19,15 +19,15 @@ level_dict["towers"] = {
 "position": (0,0,-3), 
 }, 
 ], 
-"create": 
-""" 
+"create": ->
+# 
 s = world.getSize()
-world.addObjectAtPos (KikiStone(), KikiPos (s.x/2-1, s.y/2+1, 0)) 
-world.addObjectAtPos (KikiStone(), KikiPos (s.x/2-1, s.y/2+1, 1)) 
-world.addObjectAtPos (KikiStone(), KikiPos (s.x/2-1, s.y/2+1, 2)) 
-world.addObjectAtPos (KikiStone(), KikiPos (s.x/2+1, s.y/2+1, 0)) 
-world.addObjectAtPos (KikiStone(), KikiPos (s.x/2+1, s.y/2+1, 1)) 
-world.addObjectAtPos (KikiStone(), KikiPos (s.x/2+1, s.y/2+1, 2)) 
-world.addObjectAtPos (KikiStone(), KikiPos (s.x/2+1, s.y/2+1, 3))
-""",  
+world.addObjectAtPos(KikiStone(), KikiPos(s.x/2-1, s.y/2+1, 0))
+world.addObjectAtPos(KikiStone(), KikiPos(s.x/2-1, s.y/2+1, 1))
+world.addObjectAtPos(KikiStone(), KikiPos(s.x/2-1, s.y/2+1, 2))
+world.addObjectAtPos(KikiStone(), KikiPos(s.x/2+1, s.y/2+1, 0))
+world.addObjectAtPos(KikiStone(), KikiPos(s.x/2+1, s.y/2+1, 1))
+world.addObjectAtPos(KikiStone(), KikiPos(s.x/2+1, s.y/2+1, 2))
+world.addObjectAtPos(KikiStone(), KikiPos(s.x/2+1, s.y/2+1, 3))
+# 
 } 

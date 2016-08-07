@@ -1,5 +1,5 @@
-# .................................................................................................................
-level_dict["gold"] = {   
+module.exports =
+    name:   "gold"
                         "scheme":   "yellow_scheme",
                         "size":     (3,11,3),    
                         "intro":    "gold", 
@@ -13,16 +13,16 @@ level_dict["gold"] = {
                                         {
                                             "name":         "exit",
                                             "active":       1,
-                                            "position":     (0,4,0),
+                                            "position":     [0,4,0],
                                         },
                                     ],
-                        "create":
-"""
+                        "create": ->
+# 
 s = world.getSize()
 
 for y in range (-s.y/2+3, s.y/2, 2):
     for x in range (-s.x/2+1, s.x/2+1):
         for z in range (-s.z/2+1, s.z/2+1):
-            world.addObjectAtPos (KikiStone (), world.decenter (x, y, z))
-""",                                 
+            world.addObjectAtPos(KikiStone (), world.decenter(x, y, z))
+# 
 }
