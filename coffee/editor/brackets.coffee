@@ -105,25 +105,20 @@ class Brackets
         line = @editor.lines[li]
         rngs = matchr.ranges @config, line     
     
-        if rngs.length # remove escaped
-            for i in [rngs.length-1..0]
-                if rngs[i].start > 0 and line[rngs[i].start-1] == '\\'
-                    rngs.splice i, 1
+        i = rngs.length-1
+        while i >= 0 # remove escaped
+            if rngs[i].start > 0 and line[rngs[i].start-1] == '\\'
+                rngs.splice i, 1
+            i -= 1
                     
-        if rngs.length > 1 #remove trivial: (), {}, []
-            i = rngs.length-1
-            while i > 0
-                # log "i --- #{i}"
-                if rngs[i-1].value == 'open' and rngs[i].value == 'close' and
-                    @close[rngs[i-1].match] == rngs[i].match and 
-                        rngs[i-1].start == rngs[i].start - 1
-                            # log "splice #{i} #{rngs.length}"
-                            rngs.splice i-1, 2
-                            # log "splice #{i} #{rngs.length}"
-                            i -= 1
-                            # log "splice i-1 #{i}"
-                # log "i-1 #{i}"
-                i -= 1
+        i = rngs.length-1 
+        while i > 0 #remove trivial: (), {}, []
+            if rngs[i-1].value == 'open' and rngs[i].value == 'close' and
+                @close[rngs[i-1].match] == rngs[i].match and 
+                    rngs[i-1].start == rngs[i].start - 1
+                        rngs.splice i-1, 2
+                        i -= 1
+            i -= 1
                             
         if rngs.length
             r.line = li for r in rngs
