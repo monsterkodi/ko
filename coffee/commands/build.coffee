@@ -5,7 +5,8 @@
 # 0000000     0000000   000  0000000  0000000  
 {
 fileExists,
-dirExists
+dirExists,
+resolve
 }        = require '../tools/tools'
 log      = require '../tools/log'
 Command  = require '../commandline/command'
@@ -54,6 +55,9 @@ class Build extends Command
                     file = "#{__dirname}/../area/#{command}/#{command}.js"
             else if fileExists "#{__dirname}/../area/#{command}.js"
                 file = "#{__dirname}/../area/#{command}.js"
+            else if dirExists resolve command
+                if fileExists "#{resolve command}/main.js"
+                    file = "#{resolve command}/main.js"
                 
             if file?
                 mod = require file
