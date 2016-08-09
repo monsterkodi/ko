@@ -196,32 +196,10 @@ class ViewBase extends Editor
   
     changed: (changeInfo, action) ->
         
-        # log "ViewBase.changed", changeInfo if @name == 'editor'
-        
         changes = _.cloneDeep action.lines
         
         oldScrollLines = @scroll.numLines
         
-        changes.sort (a,b) -> # what a mess :(
-            [oa, na, ca] = [a.oldIndex,a.newIndex,a.change]
-            [ob, nb, cb] = [b.oldIndex,b.newIndex,b.change]
-            if ca in ['deleted', 'changed'] and cb in ['deleted', 'changed']
-                if na == nb
-                    if ob==oa
-                        order = ['deleted', 'changed'] # delete first then change
-                        return order.indexOf(cb) - order.indexOf(ca)
-                    else
-                        return ob-oa # delete|change later lines first
-                else
-                    return nb-na # delete|change later lines first
-            if oa == ob
-                if na==nb
-                    order = ['inserted', 'deleted', 'changed']
-                    return order.indexOf(ca) - order.indexOf(cb)
-                return nb-na # insert later lines first
-            else
-                return ob-oa
-                        
         for change in changes
             [oi,li,ch] = [change.oldIndex, change.newIndex, change.change]
             switch ch
@@ -230,6 +208,7 @@ class ViewBase extends Editor
                 when 'inserted' then @syntax.diss.splice oi, 0, @syntax.dissForLineIndex li
 
         # if changes.length and @name == 'editor'
+            # log "ViewBase.changed", changeInfo
             # log "ViewBase.changed lines:", @lines
             # log "ViewBase.changed changes:", changes
             # log "ViewBase.changed syntax.diss:", @syntax.diss

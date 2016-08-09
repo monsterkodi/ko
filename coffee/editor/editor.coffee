@@ -197,6 +197,7 @@ class Editor extends Buffer
     # 0000000   000   000  0000000     000     00000000  000   000
                                 
     startSalter: (opt) ->
+        # log "Editor.startSalter", opt
         cp = @cursorPos()
         if not opt?.word and rgs = @salterRangesAtPos() # edit existing header
             cols = @columnsInSalt (@textInRange r for r in rgs)
@@ -228,6 +229,7 @@ class Editor extends Buffer
             @do.selections []
             @do.end()
         @setSalterMode true
+        # log "Editor.startSalter started"
         
     insertSalterCharacter: (ch) ->
         if ch == ' '
@@ -413,8 +415,16 @@ class Editor extends Buffer
         @do.selections newSelections
         @do.end()        
 
-    selectNone:     => @do.selections []
-    selectAll:      => @do.selections @rangesForAllLines()
+    selectNone: => 
+        @do.start()
+        @do.selections []
+        @do.end()
+        
+    selectAll: => 
+        @do.start()
+        @do.selections @rangesForAllLines()
+        @do.end()
+        
     selectInverted: => 
         invertedRanges = []        
         sc = @selectedAndCursorLineIndices()
@@ -668,6 +678,7 @@ class Editor extends Buffer
             @do.cursors newCursors, closestMain: true        
            
     addMainCursor: (dir='down') ->
+        @do.start()
         @mainCursorMove = 0
         d = switch dir
             when 'up'    then -1
@@ -679,8 +690,10 @@ class Editor extends Buffer
         else
             @mainCursor = @cursorAtPos [@mainCursor[0], @mainCursor[1]+d]
         @do.cursors newCursors
+        @do.end()
                     
     addCursors: (dir='down') ->
+        @do.start()
         @mainCursorMove = 0
         return if @cursors.length >= 999
         d = switch dir
@@ -696,6 +709,7 @@ class Editor extends Buffer
             when 'up'    then @mainCursor = first newCursors
             when 'down'  then @mainCursor = last  newCursors
         @do.cursors newCursors
+        @do.end()
 
     alignCursorsAndText: ->
         @do.start()
@@ -729,15 +743,17 @@ class Editor extends Buffer
         @do.end()
         
     clampCursors: ->
+        @do.start()
         newCursors = _.cloneDeep @cursors
         for c in @cursors
             @oldCursorSet newCursors, c, @clampPos c
         @do.cursors newCursors
+        @do.end()
     
     setCursorsAtSelectionBoundary: (leftOrRight='right') ->
+        @do.start()
         @mainCursorMove = 0
         i = leftOrRight == 'right' and 1 or 0
-        @do.start()
         newCursors = []
         main = false
         for s in @selections
@@ -770,15 +786,19 @@ class Editor extends Buffer
         @do.cursors newCursors 
         
     clearCursors: () -> 
+        @do.start()
         @mainCursorMove = 0
         @do.cursors [@mainCursor] 
+        @do.end()
 
     clearCursorsAndHighlights: () ->
         @clearCursors()
         @clearHighlights()
         
     clearSelections: () ->
+        @do.start()
         @do.selections []
+        @do.end()
 
     # 000   000  00000000  000   000          0000000  000   000  00000000    0000000   0000000   00000000 
     # 0000  000  000       000 0 000         000       000   000  000   000  000       000   000  000   000

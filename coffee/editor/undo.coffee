@@ -64,10 +64,12 @@ class Undo
         @changeInfo.deleted = true
         
     changeInfoCursor: ->
+        # log "Undo.changeInfoCursor" if @dbg
         @getChangeInfo()
         @changeInfo.cursors = true
 
     changeInfoSelection: ->
+        # log "Undo.changeInfoSelection" if @dbg
         @getChangeInfo()
         @changeInfo.selection = true
             
@@ -88,7 +90,7 @@ class Undo
             @redoCursor action
             @redoSelection action
             @actions.push action
-            
+            # log "REDO"
             @editor.changed @changeInfo, action
             @delChangeInfo()
 
@@ -145,7 +147,7 @@ class Undo
             @undoCursor action
             @undoSelection action
             @futures.unshift action
-
+            # log "UNDO"
             @editor.changed @changeInfo, lines: undoLines
             @delChangeInfo()
                                                 
@@ -171,6 +173,7 @@ class Undo
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
     
     selections: (newSelections) -> 
+        
         if newSelections.length
             newSelections = @editor.cleanRanges newSelections
             @lastAction().selAfter = _.cloneDeep newSelections
@@ -180,7 +183,6 @@ class Undo
             @changeInfoSelection()
             @editor.selections = []
             @lastAction().selAfter = []
-        @check()
         
     #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
     # 000       000   000  000   000  000       000   000  000   000  000     
@@ -189,7 +191,7 @@ class Undo
     #  0000000   0000000   000   000  0000000    0000000   000   000  0000000 
 
     cursors: (newCursors, opt) ->
-        
+        return if not @actions.length
         if not newCursors? or newCursors.length < 1
             alert 'warning! empty cursors?'
             throw new Error
@@ -207,15 +209,13 @@ class Undo
         if not opt?.keepInitial or newCursors.length != @editor.cursors.length
             @editor.initialCursors = _.cloneDeep newCursors
         @changeInfoCursor()
-        if not @actions.length
-            @lastAction().curBefore  = _.cloneDeep newCursors 
-            @lastAction().mainBefore = newCursors.indexOf @editor.mainCursor
+        # if not @actions.length
+            # @lastAction().curBefore  = _.cloneDeep newCursors 
+            # @lastAction().mainBefore = newCursors.indexOf @editor.mainCursor
         @lastAction().curAfter  = _.cloneDeep newCursors        
         @lastAction().mainAfter = newCursors.indexOf @editor.mainCursor
         @editor.cursors = newCursors
         @changeInfoCursor()
-        
-        @check()
 
     # 000       0000000    0000000  000000000
     # 000      000   000  000          000   
@@ -268,15 +268,18 @@ class Undo
     modify: (change) ->
         lines = @lastAction().lines
         if lines.length and last(lines).oldIndex == change.oldIndex and change.before?
-            last(lines).after = change.after
-            if not change.after?
+            # change on same line or same line deleted as last change ...
+            last(lines).after = change.after # add this change to last line change
+            if change.change == 'deleted'
                 @moveLinesAfter change.oldIndex, -1
         else
             change.newIndex = change.oldIndex
-            if not change.after?
+            if change.change == 'deleted'
                 @moveLinesAfter change.oldIndex, -1
-            else if not change.before?
+            else if change.change == 'inserted'
                 @moveLinesAfter change.oldIndex,  1
+                for l in lines # subtract previous insertions from oldIndex of this insert
+                    change.oldIndex -= 1 if (l.change == 'inserted') and (l.oldIndex < change.oldIndex)
             lines.push change
     
     change: (index, text) ->
@@ -288,7 +291,6 @@ class Undo
             oldIndex:  index
         @editor.lines[index] = text
         @changeInfoLineChange()
-        @check()
         
     insert: (index, text) ->
         @modify
@@ -297,7 +299,6 @@ class Undo
             oldIndex:   index
         @editor.lines.splice index, 0, text
         @changeInfoLineInsert()
-        @check()
         
     delete: (index) ->
         if @editor.lines.length > 1
@@ -308,7 +309,6 @@ class Undo
             @editor.emit 'willDeleteLine', index, @editor.lines[index]
             @editor.lines.splice index, 1
             @changeInfoLineDelete()
-            @check()
         else
             alert 'warning! last line deleted?'
             throw new Error
@@ -323,19 +323,12 @@ class Undo
         if opt?.foreign
             @changeInfo?.foreign = opt.foreign
         @groupCount -= 1
-        @check()
 
-    #  0000000  000   000  00000000   0000000  000   000
-    # 000       000   000  000       000       000  000 
-    # 000       000000000  0000000   000       0000000  
-    # 000       000   000  000       000       000  000 
-    #  0000000  000   000  00000000   0000000  000   000
-
-    check: ->
         @futures = []
         if @groupCount == 0
             @merge()
             if @changeInfo?
+                # log "changed #{@actions.length}" if @dbg
                 @editor.changed @changeInfo, last @actions
                 @delChangeInfo()
         
