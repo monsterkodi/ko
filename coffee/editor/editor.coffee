@@ -654,7 +654,11 @@ class Editor extends Buffer
         @mainCursorMove = 0
         l = clamp 0, @lines.length-1, l
         c = clamp 0, @lines[l].length, c
-        @do.cursors [[c,l]]
+        return if @cursors.length == 1 and @isSamePos @cursors[0], [c,l]
+        @do.start()
+        @mainCursor = [c,l]
+        @do.cursors [@mainCursor]
+        @do.end()
         
     toggleCursorAtPos: (p) ->
         if @cursorAtPos p
@@ -663,19 +667,23 @@ class Editor extends Buffer
             @addCursorAtPos p
         
     addCursorAtPos: (p) ->
+        @do.start()
         @mainCursorMove = 0
         newCursors = _.cloneDeep @cursors
         newCursors.push p
         @mainCursor = p
-        @do.cursors newCursors        
+        @do.cursors newCursors
+        @do.end()
         
     delCursorAtPos: (p) ->
         @mainCursorMove = 0
         c = @cursorAtPos p
         if c and @cursors.length > 1
+            @do.start()
             newCursors = _.cloneDeep @cursors
             newCursors.splice @indexOfCursor(c), 1
-            @do.cursors newCursors, closestMain: true        
+            @do.cursors newCursors, closestMain: true   
+            @do.end()
            
     addMainCursor: (dir='down') ->
         @do.start()
