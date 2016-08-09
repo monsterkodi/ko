@@ -7,26 +7,24 @@
 {
 first,
 last
-}      = require '../tools/tools'
-log    = require '../tools/log'
-matchr = require '../tools/matchr'
+}       = require '../tools/tools'
+log     = require '../tools/log'
+matchr  = require '../tools/matchr'
+_       = require 'lodash'
 
 class Brackets
     
     constructor: (@editor) ->
         
-        @editor.on 'cursor', @onCursor
-        @close = 
-            '[': ']'
-            '{': '}'
-            '(': ')'
-        @open = 
-            ']': '['
-            '}': '{'
-            ')': '('
-        @config = matchr.config 
-            "[\\{\\[\\(]":   'open'
-            "[\\}\\]\\)]":   'close'
+        @editor.on 'cursor',          @onCursor
+        @editor.on 'fileTypeChanged', @setupConfig
+        
+        @setupConfig()
+            
+    setupConfig: => 
+
+        @open   = @editor.bracketCharacters.open
+        @config = @editor.bracketCharacters.regexps
         
     onCursor: => 
         if @editor.highlights.length # don't highlight brackets when other highlights exist
@@ -54,11 +52,11 @@ class Brackets
                 prev = before.pop()
                 if prev.value == 'open'
                     if stack.length
-                        if @open[last(stack).match] == prev.match
+                        if @open[prev.match] == last(stack).match
                             stack.pop()                            
                             continue
                         else
-                            log "brackets stack mismatch at #{pp[0]} #{pp[1]} stack: #{last(stack).match} <> prev: #{prev.match}"
+                            log "brackets stack mismatch at #{pp[0]} #{pp[1]} stack: #{last(stack).match} != prev: #{prev.match}"
                             return # stack mismatch
                     lastOpen = prev
                     break
@@ -79,11 +77,11 @@ class Brackets
                 next = after.shift()
                 if next.value == 'close'
                     if stack.length
-                        if @close[last(stack).match] == next.match
+                        if @open[last(stack).match] == next.match
                             stack.pop()                            
                             continue
                         else
-                            log "brackets stack mismatch at #{pp[0]} #{pp[1]} stack: #{last(stack).match} <> next: #{next.match}"
+                            log "brackets stack mismatch at #{pp[0]} #{pp[1]} stack: #{last(stack).match} != next: #{next.match}"
                             return # stack mismatch
                     firstClose = next
                     break
@@ -96,7 +94,7 @@ class Brackets
         
         return if not firstClose?
         
-        if @close[lastOpen.match] == firstClose.match
+        if @open[lastOpen.match] == firstClose.match
             @highlight lastOpen, firstClose
             true
     
@@ -104,7 +102,7 @@ class Brackets
         [cp, li] = pos
         line = @editor.lines[li]
         rngs = matchr.ranges @config, line     
-    
+        
         i = rngs.length-1
         while i >= 0 # remove escaped
             if rngs[i].start > 0 and line[rngs[i].start-1] == '\\'
@@ -114,7 +112,7 @@ class Brackets
         i = rngs.length-1 
         while i > 0 #remove trivial: (), {}, []
             if rngs[i-1].value == 'open' and rngs[i].value == 'close' and
-                @close[rngs[i-1].match] == rngs[i].match and 
+                @open[rngs[i-1].match] == rngs[i].match and 
                     rngs[i-1].start == rngs[i].start - 1
                         rngs.splice i-1, 2
                         i -= 1

@@ -202,6 +202,8 @@ class ViewBase extends Editor
         
         oldScrollLines = @scroll.numLines
         
+        log "ViewBase.changed changes", changes if @name == 'editor'
+        
         changes.sort (a,b) ->
             [na,oa] = [a[0],a[2]]
             [nb,ob] = [b[0],b[2]]
@@ -216,9 +218,9 @@ class ViewBase extends Editor
                     return order.indexOf(a[1]) - order.indexOf(b[1])
                 return nb-na # insert later lines first
             else
-                return oa-ob
+                return ob-oa
         
-        # log "ViewBase.changed changes", changes if @name == 'editor'
+        log "ViewBase.changed changes", changes if @name == 'editor'
         
         while (change = changes.shift())
             [li,ch,oi] = change
@@ -356,6 +358,8 @@ class ViewBase extends Editor
         if @highlights.length
             $('.highlights', @layers).innerHTML = ''
             super
+   
+    hasWordHighlights: () -> @highlights.find (h) -> not h[2]?
     
     # 00000000   00000000  000   000  0000000    00000000  00000000 
     # 000   000  000       0000  000  000   000  000       000   000
@@ -364,7 +368,6 @@ class ViewBase extends Editor
     # 000   000  00000000  000   000  0000000    00000000  000   000
 
     divForLineAtIndex: (li) ->
-        # log "divForLineAtIndex #{li}" if @name == 'editor'
         div = render.lineDiv (li-@scroll.exposeTop) * @size.lineHeight, @syntax.getDiss(li), @size
         div.lineIndex = li
         if @showInvisibles
@@ -718,7 +721,7 @@ class ViewBase extends Editor
             when 'esc'
                 if @salterMode
                     return @setSalterMode false
-                if @highlights.length
+                if @hasWordHighlights()
                     return @clearHighlights()
                 if @cursors.length > 1
                     return @clearCursors()
@@ -806,7 +809,6 @@ class ViewBase extends Editor
         
         switch key
             
-            when 'esc'       then return @clearCursorsAndHighlights()
             when 'home'      then return @singleCursorAtPos [0, 0],              event.shiftKey
             when 'end'       then return @singleCursorAtPos [0,@lines.length-1], event.shiftKey
             when 'backspace' then return

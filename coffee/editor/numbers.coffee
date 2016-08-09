@@ -25,6 +25,7 @@ class Numbers extends event
         @editor.on 'fontSizeChanged',  @onFontSizeChange
         @editor.on 'highlight',        @updateColors
         @editor.on 'changed',          @updateColors
+        @editor.on 'linesSet',         @updateColors
         @onFontSizeChange()
 
     setOpacity: (o) -> @elem.style.background = "rgba(0,0,0,#{o})"
@@ -36,6 +37,7 @@ class Numbers extends event
     #  0000000   0000000   0000000   0000000   000   000
     
     updateColor: (li) =>
+        # log "Numbers.updateColor li:#{li}" if @editor.name == 'editor'
         si = (s[0] for s in @editor.rangesFromTopToBotInRanges li, li, @editor.selections)
         hi = (s[0] for s in @editor.rangesFromTopToBotInRanges li, li, @editor.highlights)
         ci = (s[0] for s in @editor.rangesFromTopToBotInRanges li, li, @editor.rangesForCursors())
@@ -53,8 +55,9 @@ class Numbers extends event
         child.className = 'linenumber ' + cls
        
     updateColors: =>
-        for li in [@editor.scroll.exposeTop..@editor.scroll.exposeBot]
-            @updateColor li
+        if @editor.scroll.exposeBot > @editor.scroll.exposeTop
+            for li in [@editor.scroll.exposeTop..@editor.scroll.exposeBot]
+                @updateColor li
     
     # 00000000   0000000   000   000  000000000
     # 000       000   000  0000  000     000   

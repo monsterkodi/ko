@@ -95,6 +95,8 @@ class Editor extends Buffer
             ext = extName @currentFile
             if ext in Syntax.syntaxNames
                 @fileType = ext
+                
+        # _______________________________________________________________ strings
         
         @stringCharacters =
             "'":  'single'
@@ -102,6 +104,30 @@ class Editor extends Buffer
         switch @fileType
             when 'md' then @stringCharacters['*'] = 'bold'
             when 'noon' then @stringCharacters['|'] = 'pipe'
+
+        # _______________________________________________________________ brackets
+        
+        @bracketCharacters = 
+            open:
+                '[': ']'
+                '{': '}'
+                '(': ')'
+            close: {} # reverse map, not needed?
+            regexps: []
+                
+        switch @fileType
+            when 'html' then @bracketCharacters.open['<'] = '>'
+
+        for k,v of @bracketCharacters.open
+            @bracketCharacters.close[v] = k
+        
+        @bracketCharacters.regexp = []
+        for key in ['open', 'close']
+            cstr = _.keys(@bracketCharacters[key]).join ''
+            reg = new RegExp "[#{_.escapeRegExp cstr}]"
+            @bracketCharacters.regexps.push [reg, key]
+        
+        # _______________________________________________________________ surround
         
         @surroundPairs = 
             '[': ['[', ']']
@@ -124,7 +150,9 @@ class Editor extends Buffer
             when 'md'     
                 @surroundCharacters = @surroundCharacters.concat '*<'.split ''
                 @surroundPairs['<'] = ['<!---', '--->']
-             
+            
+        # _______________________________________________________________ indent
+        
         @indentNewLineMore = null
         @indentNewLineLess = null
         @insertIndentedEmptyLineBetween = '{}'
@@ -138,6 +166,8 @@ class Editor extends Buffer
                 @indentNewLineLess = 
                     beforeRegExp: /^s+return/
                 
+        # _______________________________________________________________ comment
+        
         @lineComment = switch @fileType
             when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug' then '//'
             else '#'  

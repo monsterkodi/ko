@@ -1,11 +1,7 @@
 # todo/ideas
 
 - **fix multicursors insert newline changes**
-- *fix changing file permissions*
 - fix commandlist switching sides when other side is smaller
-
-#### build
-- load 
 
 #### terminal
 - autocomplete dirs and files

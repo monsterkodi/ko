@@ -133,11 +133,7 @@ class View extends ViewBase
             delta = (s.scroll ? @scroll.scroll) - @scroll.scroll
             @scrollBy delta if delta
             @updateLayers()
-            
-            @numbers.updateColor c[1] for c in @cursors
-            @numbers.updateColor s[0] for s in @selections
-            @numbers.updateColor h[0] for h in @highlights
-            
+            @numbers.updateColors()                
             @emit 'cursor'
             @emit 'selection'
 

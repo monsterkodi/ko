@@ -143,6 +143,7 @@ class Undo
             action = @actions.pop()
             undoLines = []
             if action.lines.length
+                log "undo action.lines", action.lines
                 for i in [action.lines.length-1..0]
                     @undoLine action.lines[i]
                     undoLines.push 

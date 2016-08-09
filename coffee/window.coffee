@@ -130,7 +130,14 @@ saveFile = (file) =>
         saveFileAs()
         return
     editor.stopWatcher()
-    atomicFile file, editor.text(), encoding: 'utf8', (err) =>
+    
+    if fileExists file
+        stat = fs.statSync file
+        mode = stat.mode
+    else
+        mode = 438
+        
+    atomicFile file, editor.text(), { encoding: 'utf8', mode: mode }, (err) =>
         editor.setCurrentFile null, keepUndo: true # to store scroll
         if err?
             alert err

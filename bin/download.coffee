@@ -40,7 +40,7 @@ unpack = () ->
                             log err 
                         else                            
                             open()
-    
+
 if not fs.existsSync app
     log 'app not found ...'
     if not fs.existsSync dmg        
@@ -54,4 +54,3 @@ if not fs.existsSync app
 else
     open()
     
-
