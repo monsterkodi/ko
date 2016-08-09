@@ -1,5 +1,6 @@
 # todo/ideas
 
+- fix terminal resize|redraw when switching from build
 - fix comment toggling (use status of main cursor line instead of toggling all lines individually)
 - fix commandlist switching sides when other side is smaller
 

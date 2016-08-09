@@ -211,6 +211,7 @@ class ViewBase extends Editor
             # log "ViewBase.changed", changeInfo
             # log "ViewBase.changed lines:", @lines
             # log "ViewBase.changed changes:", changes
+            # log "ViewBase.changed undo:", @do.actions
             # log "ViewBase.changed syntax.diss:", @syntax.diss
             # log "ViewBase.changed action.lines:", action.lines
         
@@ -221,10 +222,8 @@ class ViewBase extends Editor
                     @updateLine li, oi
                     @emit 'lineChanged', li
                 when 'deleted'  
-                    @syntax.diss.splice oi, 1
                     @deleteLine li, oi
                 when 'inserted'
-                    @diss.splice oi, 0, @syntax.dissForLineIndex li
                     @insertLine li, oi                    
         
         if changeInfo.inserted or changeInfo.deleted           

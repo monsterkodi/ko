@@ -920,7 +920,9 @@ class Editor extends Buffer
     moveCursorsDown: (e, n=1) ->
         if e and @selections.length == 0 # selecting lines down
             if 0 == _.max (c[0] for c in @cursors) # all cursors in first column
+                @do.start()
                 @do.selections @rangesForCursorLines() # select lines without moving cursors
+                @do.end()
                 return
         else if e and @stickySelection and @cursors.length == 1
             if @mainCursor[0] == 0 and not @isSelectedLineAtIndex @mainCursor[1]
@@ -1091,7 +1093,6 @@ class Editor extends Buffer
                         nc[0] += 1
 
         @do.cursors newCursors
-            
         @do.end()
         @emitEdit 'insert'
     
@@ -1102,9 +1103,11 @@ class Editor extends Buffer
             @fillVirtualSpaces()        
     
     fillVirtualSpaces: () -> # fill spaces between line ends and cursors
+        @do.start()
         for c in @cursors 
             if c[0] > @lines[c[1]].length
                 @do.change c[1], @lines[c[1]].splice c[0], 0, _.padStart '', c[0]-@lines[c[1]].length
+        @do.end()
 
     insertTab: ->
         if @selections.length

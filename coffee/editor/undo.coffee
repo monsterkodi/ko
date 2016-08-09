@@ -209,9 +209,6 @@ class Undo
         if not opt?.keepInitial or newCursors.length != @editor.cursors.length
             @editor.initialCursors = _.cloneDeep newCursors
         @changeInfoCursor()
-        # if not @actions.length
-            # @lastAction().curBefore  = _.cloneDeep newCursors 
-            # @lastAction().mainBefore = newCursors.indexOf @editor.mainCursor
         @lastAction().curAfter  = _.cloneDeep newCursors        
         @lastAction().mainAfter = newCursors.indexOf @editor.mainCursor
         @editor.cursors = newCursors
@@ -267,20 +264,24 @@ class Undo
     
     modify: (change) ->
         lines = @lastAction().lines
-        if lines.length and last(lines).oldIndex == change.oldIndex and change.before?
-            # change on same line or same line deleted as last change ...
-            last(lines).after = change.after # add this change to last line change
-            if change.change == 'deleted'
-                @moveLinesAfter change.oldIndex, -1
-        else
-            change.newIndex = change.oldIndex
-            if change.change == 'deleted'
-                @moveLinesAfter change.oldIndex, -1
-            else if change.change == 'inserted'
-                @moveLinesAfter change.oldIndex,  1
-                for l in lines # subtract previous insertions from oldIndex of this insert
-                    change.oldIndex -= 1 if (l.change == 'inserted') and (l.oldIndex < change.oldIndex)
-            lines.push change
+        if change.change == 'changed'
+            for line in lines
+                if line.oldIndex == change.oldIndex
+                    if line.change == 'changed'
+                        line.after = change.after # add this change to previous change 
+                        return
+                
+        change.newIndex = change.oldIndex
+        if change.change == 'deleted'
+            @moveLinesAfter change.oldIndex, -1
+        else if change.change == 'inserted'
+            @moveLinesAfter change.oldIndex,  1
+            for l in lines # subtract previous insertions from oldIndex of this insert
+                change.oldIndex -= 1 if (l.change == 'inserted') and (l.oldIndex < change.oldIndex)
+        else if change.change == 'changed'
+            for l in lines # add previous deletions to oldIndex of this change
+                change.oldIndex += 1 if (l.change == 'deleted') and (l.oldIndex < change.oldIndex)
+        lines.push change
     
     change: (index, text) ->
         return if @editor.lines[index] == text
