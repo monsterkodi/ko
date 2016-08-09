@@ -118,7 +118,6 @@ class Scroll extends events
         oldBot = @bot
         @top = top
         @bot = Math.min @top+@viewLines, @numLines-1
-        # console.log "scroll.setTop #{@top}!=#{oldTop} #{@bot}!=#{oldBot}" if @dbg
         return if oldTop == @top and oldBot == @bot and @exposeBot >= @bot
                             
         if (@top >= @exposeBot) or (@bot <= @exposeTop) # new range outside, start from scratch
@@ -151,8 +150,6 @@ class Scroll extends events
                 n = clamp 0, @exposeBot-@bot, num
                 @exposeBot -= n
                 @emit 'vanishLines', bot: n
-        # else
-            # console.log "scroll.setTop nothing to vanish" if @dbg
                     
     # 000  000   000   0000000  00000000  00000000   000000000
     # 000  0000  000  000       000       000   000     000   
@@ -177,9 +174,6 @@ class Scroll extends events
     deleteLine: (li,oi) =>
         @exposeBot -= 1 if @lineIndexIsInExpose(oi) or @numLines < @exposeNum
         @bot       -= 1 if @lineIndexIsInView oi
-        # @numLines  -= 1
-        # @fullHeight = @numLines * @lineHeight
-        # @calc()
     
     lineIndexIsInView: (li) -> 
         return true if @top <= li <= @bot
@@ -208,7 +202,6 @@ class Scroll extends events
     # 000   000   0000000   000   000  0000000  000  000   000  00000000  0000000 
         
     setNumLines: (n) =>
-        # console.log "scroll.setNumLines #{n}" if @dbg
         if @numLines != n
             @numLines = n
             @fullHeight = @numLines * @lineHeight            
