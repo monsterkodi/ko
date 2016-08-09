@@ -48,27 +48,27 @@ class Undo
             @newChangeInfo()
         @changeInfo
         
-    changeInfoLineChange: (i) ->
+    changeInfoLineChange: (i,l) ->
         @getChangeInfo()
         if @changeInfo.changed.indexOf(i) < 0
             @changeInfo.changed.push i
-            @changeInfo.sorted.push [i, 'changed', i]
+            @changeInfo.sorted.push [l ? i, 'changed', i]
 
-    changeInfoLineInsert: (i) ->
+    changeInfoLineInsert: (i,l) ->
         @getChangeInfo()
         @changeInfo.inserted.push i
         for c in @changeInfo.sorted
             if c[0] >= i
                 c[0] += 1
-        @changeInfo.sorted.push [i, 'inserted', i]
+        @changeInfo.sorted.push [l ? i, 'inserted', i]
 
-    changeInfoLineDelete: (i) ->
+    changeInfoLineDelete: (i,l) ->
         @getChangeInfo()
         @changeInfo.deleted.push i
         for c in @changeInfo.sorted
             if c[0] > i
                 c[0] -= 1
-        @changeInfo.sorted.push [i, 'deleted', i]        
+        @changeInfo.sorted.push [l ? i, 'deleted', i]        
         
     changeInfoCursor: ->
         @getChangeInfo()
@@ -108,13 +108,13 @@ class Undo
         if line.after?
             if line.before?
                 @editor.lines[line.index] = line.after
-                @changeInfoLineChange line.index
+                @changeInfoLineChange line.index, line.line
             else
                 @editor.lines.splice line.index, 0, line.after
-                @changeInfoLineInsert line.index
+                @changeInfoLineInsert line.index, line.line
         else if line.before?
             @editor.lines.splice line.index, 1
-            @changeInfoLineDelete line.index
+            @changeInfoLineDelete line.index, line.line
 
     redoSelection: (action) ->
         if action.selAfter.length
@@ -143,13 +143,14 @@ class Undo
             action = @actions.pop()
             undoLines = []
             if action.lines.length
-                log "undo action.lines", action.lines
                 for i in [action.lines.length-1..0]
                     @undoLine action.lines[i]
                     undoLines.push 
-                        before: action.lines[i].after
-                        after:  action.lines[i].before
                         index:  action.lines[i].index
+                        line:   action.lines[i].line
+                    lastLine = last undoLines
+                    lastLine.before = action.lines[i].after  if action.lines[i].after?
+                    lastLine.after  = action.lines[i].before if action.lines[i].before?
                         
             @undoCursor action
             @undoSelection action
@@ -163,13 +164,13 @@ class Undo
         if line.before?
             if line.after?
                 @editor.lines[line.index] = line.before
-                @changeInfoLineChange line.index
+                @changeInfoLineChange line.line, line.index
             else
                 @editor.lines.splice line.index, 0, line.before
-                @changeInfoLineInsert line.index
+                @changeInfoLineInsert line.line, line.index
         else if line.after?
             @editor.lines.splice line.index, 1
-            @changeInfoLineDelete line.index
+            @changeInfoLineDelete line.line, line.index
             
     undoSelection: (action) ->
         if action.selBefore.length
@@ -282,27 +283,39 @@ class Undo
     # 000 0 000  000   000  000   000  000  000          000   
     # 000   000   0000000   0000000    000  000          000   
     
+    moveLinesAfter: (index, dy) ->
+        for change in @lastAction().lines
+            if change.index >= index
+                change.line += dy
+    
     modify: (change) ->
         lines = @lastAction().lines
         if lines.length and last(lines).index == change.index and change.before?
             last(lines).after = change.after
+            if not change.after?
+                @moveLinesAfter change.index, -1
         else
+            change.line = change.index
+            if not change.after?
+                @moveLinesAfter change.index, -1
+            else if not change.before?
+                @moveLinesAfter change.index,  1
             lines.push change
     
     change: (index, text) ->
         return if @editor.lines[index] == text
         @modify
-            index:  index
             before: @editor.lines[index]
             after:  text
+            index:  index
         @editor.lines[index] = text
         @changeInfoLineChange index
         @check()
         
     insert: (index, text) ->
         @modify
+            after:  text 
             index:  index
-            after:  text        
         @editor.lines.splice index, 0, text
         @changeInfoLineInsert index
         @check()
@@ -310,8 +323,8 @@ class Undo
     delete: (index) ->
         if @editor.lines.length > 1
             @modify
+                before:  @editor.lines[index] 
                 index:   index
-                before:  @editor.lines[index]        
             @editor.emit 'willDeleteLine', index, @editor.lines[index]
             @editor.lines.splice index, 1
             @changeInfoLineDelete index

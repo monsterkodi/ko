@@ -195,23 +195,25 @@ class ViewBase extends Editor
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
   
     changed: (changeInfo, action) ->
-        @syntax.changed changeInfo
-    
-        numChanges = 0   
+            
         changes = _.cloneDeep changeInfo.sorted
         
         oldScrollLines = @scroll.numLines
         
-        log "ViewBase.changed changes", changes if @name == 'editor'
+        # log "ViewBase.changed changes", changes if @name == 'editor'
         
-        changes.sort (a,b) ->
+        changes.sort (a,b) -> # what a mess :(
             [na,oa] = [a[0],a[2]]
             [nb,ob] = [b[0],b[2]]
             if a[1] in ['deleted', 'changed'] and b[1] in ['deleted', 'changed']
                 if na == nb
-                    return ob-oa # delete later lines first
+                    if ob==oa
+                        order = ['deleted', 'changed'] # delete first then change
+                        return order.indexOf(b[1]) - order.indexOf(a[1])
+                    else
+                        return ob-oa # delete|change later lines first
                 else
-                    return nb-na # delete later lines first
+                    return nb-na # delete|change later lines first
             if oa == ob
                 if na==nb
                     order = ['inserted', 'deleted', 'changed']
@@ -220,8 +222,14 @@ class ViewBase extends Editor
             else
                 return ob-oa
         
-        log "ViewBase.changed changes", changes if @name == 'editor'
+        @syntax.changed changes
         
+        # if changes.length and @name == 'editor'
+            # log "ViewBase.changed syntax.diss", @syntax.diss
+            # log "ViewBase.changed action.lines", action.lines
+            # log "ViewBase.changed changes", changes
+        
+        numChanges = 0   
         while (change = changes.shift())
             [li,ch,oi] = change
             switch ch
@@ -261,6 +269,14 @@ class ViewBase extends Editor
     # 0000000   000   000  000     000   
     # 000       000   000  000     000   
     # 00000000  0000000    000     000   
+
+    updateLine: (li, oi) ->
+        oi = li if not oi?
+        return if oi > @scroll.exposeBot
+        return if oi < @scroll.exposeTop
+        if (oi-@scroll.exposeTop) < @elem.children.length
+            div = @divForLineAtIndex li
+            @elem.replaceChild div, @elem.children[oi - @scroll.exposeTop]
     
     deleteLine: (li, oi) ->
         return if oi > @scroll.exposeBot
@@ -271,7 +287,6 @@ class ViewBase extends Editor
         
     insertLine: (li, oi) -> 
         return if not @scroll.lineIndexIsInExpose oi
-        # log "ViewBase.insertLine li:#{li} oi:#{oi}" if @name == 'editor'
         div = @divForLineAtIndex li
         @elem.insertBefore div, @elem.children[oi - @scroll.exposeTop]
         @scroll.insertLine li, oi
@@ -344,15 +359,9 @@ class ViewBase extends Editor
             c.style.transform = "translate(#{@size.offsetX}px,#{y}px)"
             y += @size.lineHeight
                 
-    updateLine: (li, oi) ->
-        if @scroll.exposeTop <= li < @lines.length
-            if (oi - @scroll.exposeTop) < @elem.children.length
-                div = @divForLineAtIndex li
-                @elem.replaceChild div, @elem.children[oi - @scroll.exposeTop]
-
     updateLines: () ->
         for li in [@scroll.exposeTop..@scroll.exposeBot]
-            @updateLine li, li
+            @updateLine li
 
     clearHighlights: () ->
         if @highlights.length

@@ -1,6 +1,6 @@
 # todo/ideas
 
-- **fix multicursors insert newline changes**
+- fix comment toggling (use status of main cursor line instead of toggling all lines individually)
 - fix commandlist switching sides when other side is smaller
 
 #### terminal
