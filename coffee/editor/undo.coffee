@@ -95,14 +95,14 @@ class Undo
     redoLine: (line) ->
         if line.after?
             if line.before?
-                @editor.lines[line.index] = line.after
-                @changeInfoLineChange line.index, line.line
+                @editor.lines[line.oldIndex] = line.after
+                @changeInfoLineChange()
             else
-                @editor.lines.splice line.index, 0, line.after
-                @changeInfoLineInsert line.index, line.line
+                @editor.lines.splice line.oldIndex, 0, line.after
+                @changeInfoLineInsert()
         else if line.before?
-            @editor.lines.splice line.index, 1
-            @changeInfoLineDelete line.index, line.line
+            @editor.lines.splice line.oldIndex, 1
+            @changeInfoLineDelete()
 
     redoSelection: (action) ->
         if action.selAfter.length
@@ -134,9 +134,12 @@ class Undo
                 undoLines.push 
                     oldIndex:  line.newIndex
                     newIndex:  line.oldIndex
+                    change:    line.change
                 lastLine = last undoLines
                 lastLine.before = line.after  if line.after?
                 lastLine.after  = line.before if line.before?
+                if line.change == 'deleted'  then lastLine.change = 'inserted'
+                if line.change == 'inserted' then lastLine.change = 'deleted'
                 @redoLine lastLine
 
             @undoCursor action
@@ -284,7 +287,7 @@ class Undo
             after:  text
             oldIndex:  index
         @editor.lines[index] = text
-        @changeInfoLineChange index
+        @changeInfoLineChange()
         @check()
         
     insert: (index, text) ->
@@ -293,7 +296,7 @@ class Undo
             after:      text 
             oldIndex:   index
         @editor.lines.splice index, 0, text
-        @changeInfoLineInsert index
+        @changeInfoLineInsert()
         @check()
         
     delete: (index) ->
@@ -304,7 +307,7 @@ class Undo
                 oldIndex:   index
             @editor.emit 'willDeleteLine', index, @editor.lines[index]
             @editor.lines.splice index, 1
-            @changeInfoLineDelete index
+            @changeInfoLineDelete()
             @check()
         else
             alert 'warning! last line deleted?'
