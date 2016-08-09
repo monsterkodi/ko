@@ -339,7 +339,7 @@ editor.view.focus()
 
 editor.on 'changed', (changeInfo, action) =>
     return if changeInfo.foreign
-    if changeInfo.sorted.length and action.lines.length
+    if changeInfo.lines
         ipc.send 'winFileLinesChanged', winID, editor.currentFile, action.lines
         navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
 

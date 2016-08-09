@@ -38,17 +38,13 @@ class Meta
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
     onChanged: (changeInfo, action) =>
-        return if not changeInfo.changed.length
-        for li in changeInfo.changed
+        return if not changeInfo.changed
+        for lineChange in action.lines
+            li = lineChange.oldIndex
             for meta in @metasAtLineIndex li
                 if meta[2].clss == "searchResult"
-                    [file, line] = meta[2].href.split(':')
+                    [file, line] = meta[2].href.split ':' 
                     line -= 1
-                    change = (a for a in action.lines when a.index == li)[0]
-                    lineChange = 
-                        before: change.before
-                        after: change.after
-                        index: line
                     @editor.emit 'fileLineChange', file, lineChange
                     meta[2].state = 'unsaved'
                     if meta[2].span?

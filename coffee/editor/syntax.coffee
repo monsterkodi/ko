@@ -23,20 +23,6 @@ class Syntax
         @diss = []
         @colors = {}
 
-    #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
-    # 000       000   000  000   000  0000  000  000        000       000   000
-    # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
-    # 000       000   000  000   000  000  0000  000   000  000       000   000
-    #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
-    
-    changed: (sorted) ->
-        if sorted.length
-            for [li, ch, oi] in sorted
-                switch ch
-                    when 'deleted'  then @diss.splice oi, 1
-                    when 'inserted' then @diss.splice oi, 0, @dissForLineIndex li
-                    when 'changed'  then @diss[oi] = @dissForLineIndex li
-
     #  0000000  000      00000000   0000000   00000000 
     # 000       000      000       000   000  000   000
     # 000       000      0000000   000000000  0000000  

@@ -311,10 +311,12 @@ class Editor extends Buffer
             @initialCursors = _.cloneDeep [@initialCursors[0]]
         else if not e
             @initialCursors = _.cloneDeep [p]
+        @do.start()
         @startSelection e
         @mainCursor = [p[0], p[1]]
         @do.cursors [@mainCursor], keepInitial: true
         @endSelection e
+        @do.end()
         
     selectSingleRange: (r, opt) ->
         if not r?
@@ -322,10 +324,12 @@ class Editor extends Buffer
             return
         @cursors = [[r[1][0], r[0]]]
         @initialCursors = null
+        @do.start()
         @startSelection true
         @mainCursor = [opt?.before and r[1][0] or r[1][1], r[0]]
         @do.cursors [@mainCursor], keepInitial: true     
         @endSelection true
+        @do.end()
             
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000
@@ -808,6 +812,7 @@ class Editor extends Buffer
     # 000   000   0000000       0      00000000
 
     moveAllCursors: (f, opt={}) ->        
+        @do.start()
         @mainCursorMove = 0
         @startSelection opt.extend
         newCursors = _.cloneDeep @cursors
@@ -827,6 +832,7 @@ class Editor extends Buffer
         @mainCursor = last  @positionsInLineAtIndexInPositions mainLine, newCursors if opt.main == 'right'
         @do.cursors newCursors, keepInitial: opt.extend
         @endSelection opt.extend
+        @do.end()
         true
 
     moveMainCursor: (dir='down') ->
@@ -844,7 +850,9 @@ class Editor extends Buffer
             @mainCursor = last newCursors
         else
             @mainCursor = @cursorAtPos [@mainCursor[0]+dx, @mainCursor[1]+dy], newCursors
+        @do.start()
         @do.cursors newCursors
+        @do.end()
         
     moveCursorsToLineBoundary: (leftOrRight, e) ->
         @mainCursorMove = 0

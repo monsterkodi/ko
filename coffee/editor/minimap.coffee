@@ -178,24 +178,22 @@ class Minimap
     # 000       000   000  000   000  000  0000  000   000  000     
     #  0000000  000   000  000   000  000   000   0000000   00000000
     
-    onChanged: (changeInfo) =>
-        @drawSelections() if changeInfo.selection.length
-        @drawCursors()    if changeInfo.cursors.length
+    onChanged: (changeInfo, action) =>
         
-        return if not changeInfo.sorted.length
+        @drawSelections() if changeInfo.selection
+        @drawCursors()    if changeInfo.cursors
+        
+        return if not changeInfo.lines
          
         @scroll.setNumLines @editor.lines.length
          
-        firstInserted = first(changeInfo.inserted) ? @scroll.exposeBot+1
-        firstDeleted  = first(changeInfo.deleted)  ? @scroll.exposeBot+1
-        redraw = Math.min firstInserted, firstDeleted
+        for change in action.lines
+            li = change.oldIndex
+            break if not change.change in ['deleted', 'inserted']
+            @drawLines li, li
              
-        for c in changeInfo.changed
-            break if c >= redraw
-            @drawLines c, c
-             
-        if redraw <= @scroll.exposeBot            
-            @drawLines redraw, @scroll.exposeBot
+        if li <= @scroll.exposeBot            
+            @drawLines li, @scroll.exposeBot
         
     # 00     00   0000000   000   000   0000000  00000000
     # 000   000  000   000  000   000  000       000     

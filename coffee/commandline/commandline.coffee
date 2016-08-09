@@ -89,7 +89,7 @@ class Commandline extends ViewBase
     changed: (changeInfo, action) ->
         @hideList()
         super changeInfo, action
-        if changeInfo.sorted.length
+        if changeInfo.lines
             @cmmd.className = "commandline-command active #{@command?.prefsID}"
             @command?.changed @lines[0]
         
@@ -264,7 +264,9 @@ class Commandline extends ViewBase
                     if @command?.complete()
                         return stop event
                     if @selections.length
+                        @do.start()
                         @do.selections []
+                        @do.end()
                     return stop event
         
         return 'unhandled'

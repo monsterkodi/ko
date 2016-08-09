@@ -37,7 +37,7 @@ class View extends ViewBase
     
     changed: (changeInfo, action) ->        
         super changeInfo, action
-        if changeInfo.sorted.length
+        if changeInfo.lines
             @dirty = true # set dirty flag
             @updateTitlebar() 
 

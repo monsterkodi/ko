@@ -196,20 +196,24 @@ class ViewBase extends Editor
   
     changed: (changeInfo, action) ->
             
-        changes = _.cloneDeep changeInfo.sorted
+        changes = _.cloneDeep action.lines
+        # @syntax.changed changes
+        # when 'deleted'  then @diss.splice oi, 1
+        # when 'inserted' then @diss.splice oi, 0, @dissForLineIndex li
+        # when 'changed'  then @diss[oi] = @dissForLineIndex li
         
         oldScrollLines = @scroll.numLines
         
         # log "ViewBase.changed changes", changes if @name == 'editor'
         
         changes.sort (a,b) -> # what a mess :(
-            [na,oa] = [a[0],a[2]]
-            [nb,ob] = [b[0],b[2]]
-            if a[1] in ['deleted', 'changed'] and b[1] in ['deleted', 'changed']
+            [oa, na, ca] = [a.oldIndex,a.newIndex,a.change]
+            [ob, nb, cb] = [b.oldIndex,b.newIndex,b.change]
+            if ca in ['deleted', 'changed'] and cb in ['deleted', 'changed']
                 if na == nb
                     if ob==oa
                         order = ['deleted', 'changed'] # delete first then change
-                        return order.indexOf(b[1]) - order.indexOf(a[1])
+                        return order.indexOf(cb) - order.indexOf(ca)
                     else
                         return ob-oa # delete|change later lines first
                 else
@@ -217,49 +221,54 @@ class ViewBase extends Editor
             if oa == ob
                 if na==nb
                     order = ['inserted', 'deleted', 'changed']
-                    return order.indexOf(a[1]) - order.indexOf(b[1])
+                    return order.indexOf(ca) - order.indexOf(cb)
                 return nb-na # insert later lines first
             else
                 return ob-oa
-        
-        @syntax.changed changes
-        
-        # if changes.length and @name == 'editor'
-            # log "ViewBase.changed syntax.diss", @syntax.diss
-            # log "ViewBase.changed action.lines", action.lines
-            # log "ViewBase.changed changes", changes
-        
-        numChanges = 0   
-        while (change = changes.shift())
-            [li,ch,oi] = change
+                        
+        for change in changes
+            [oi,li,ch] = [change.oldIndex, change.newIndex, change.change]
             switch ch
-                when 'changed' 
+                when 'changed'  then @syntax.diss[oi] = @syntax.dissForLineIndex li
+                when 'deleted'  then @syntax.diss.splice oi, 1
+                when 'inserted' then @syntax.diss.splice oi, 0, @syntax.dissForLineIndex li
+
+        if changes.length and @name == 'editor'
+            log "ViewBase.changed changes:", changes
+            # log "ViewBase.changed syntax.diss:", @syntax.diss
+            # log "ViewBase.changed lines:", @lines
+            # log "ViewBase.changed action.lines:", action.lines
+        
+        while (change = changes.shift())
+            [oi,li,ch] = [change.oldIndex, change.newIndex, change.change]
+            switch ch
+                when 'changed'
                     @updateLine li, oi
                     @emit 'lineChanged', li
                 when 'deleted'  
-                    numChanges -= 1 
+                    @syntax.diss.splice oi, 1
                     @deleteLine li, oi
-                when 'inserted' 
-                    numChanges += 1
+                when 'inserted'
+                    @diss.splice oi, 0, @syntax.dissForLineIndex li
                     @insertLine li, oi                    
         
-        if changeInfo.inserted.length or changeInfo.deleted.length            
+        if changeInfo.inserted or changeInfo.deleted           
             @scroll.setNumLines @lines.length
             @updateScrollOffset()
             @updateLinePositions()
             @layersWidth = @layers.offsetWidth
 
-        if changeInfo.sorted.length
+        if changeInfo.lines
             @clearHighlights()
         
-        if changeInfo.cursors.length
+        if changeInfo.cursors
             @renderCursors()
             @scrollCursorIntoView()
             @updateScrollOffset()
             @updateCursorOffset()
             @emit 'cursor'
             
-        if changeInfo.selection.length
+        if changeInfo.selection
             @renderSelection()   
             @emit 'selection'
         @emit 'changed', changeInfo, action
