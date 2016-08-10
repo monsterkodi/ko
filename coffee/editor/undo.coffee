@@ -331,8 +331,8 @@ class Undo
         if @groupCount == 0
             @merge()
             if @changeInfo?
-                # log "changed #{@actions.length}" if @dbg
-                @sortLines last @actions.lines
+                @sortLines last(@actions).lines
+                # log "changed #{@actions.length}", last(@actions).lines if @dbg
                 @editor.changed @changeInfo, last @actions
                 @delChangeInfo()
 
@@ -343,7 +343,7 @@ class Undo
     # 0000000    0000000   000   000     000   
     
     sortLines: (lines) ->
-        return if not lines?
+        return if not lines?.length
         lines.sort (a,b) ->
             switch a.change
                 when 'inserted'
@@ -359,13 +359,17 @@ class Undo
                         else b.oldIndex - a.oldIndex
                     else 
                         Math.max(b.oldIndex, b.newIndex) - Math.max(a.oldIndex, a.newIndex)
-        # log 'lines sorted:', lines
+        # log 'lines sorted:', lines if @editor.name == 'editor'
     
     # 00     00  00000000  00000000    0000000   00000000
     # 000   000  000       000   000  000        000     
     # 000000000  0000000   0000000    000  0000  0000000 
     # 000 0 000  000       000   000  000   000  000     
     # 000   000  00000000  000   000   0000000   00000000
+    
+    # looks at last two actions and merges them 
+    #       when they contain no line changes
+    #       when they contain only changes of the same set of lines
     
     merge: ->        
         while @actions.length >= 2
@@ -379,12 +383,11 @@ class Undo
             else if a.lines.length == b.lines.length
                 sameLines = true
                 for i in [0...a.lines.length]
-                    if a.lines[i].index != b.lines[i].index or 
-                        not a.lines[i].after or
-                            not b.lines[i].after or
+                    if a.lines[i].oldIndex != b.lines[i].oldIndex or 
+                        a.lines[i].change != b.lines[i].change or a.lines[i].change != 'changed' or
+                            not a.lines[i].after or not b.lines[i].after or
                                 Math.abs(a.lines[i].after.length - b.lines[i].after.length) > 1
-                                    sameLines = false
-                                    break                    
+                                    return
                 if sameLines
                     @actions.pop()
                     b.selAfter  = a.selAfter
@@ -392,9 +395,7 @@ class Undo
                     b.mainAfter = a.mainAfter
                     for i in [0...a.lines.length]
                         b.lines[i].after = a.lines[i].after
-                else
-                    break
-            else
-                break
+                else return
+            else return
         
 module.exports = Undo

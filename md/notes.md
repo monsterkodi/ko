@@ -13,6 +13,7 @@
 - shared recent files of stacked windows
 
 #### editing
+- *dont delete multiple spaces backwards in multicursor mode if it breaks cursor column*
 - *improve bracket inserting (evaluate brackets in line)*
 - select between cursors shortcut?
 - select continuous, rectangular ranges with command+shift+M 

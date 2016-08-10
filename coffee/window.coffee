@@ -292,6 +292,8 @@ split.on 'split', =>
 
 terminal = window.terminal = new Terminal '.terminal'
 terminal.on 'fileLineChange', (file, lineChange) =>
+    log "file:#{file} lineChange:#{lineChange}"
+    log 
     ipc.send 'winFileLinesChanged', -1, file, [lineChange]
 
 #  0000000   00000000   00000000   0000000 
