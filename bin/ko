@@ -13,8 +13,10 @@ done
 if [ $_DEV ]; then
     killall Electron 2> /dev/null
     killall Electron 2> /dev/null
+    _DIR=$(pwd)
     cd ~/s/ko
-    ./node_modules/electron-prebuilt/cli.js ./js/main.js "$@" &
+    echo "$(pwd)/./node_modules/electron-prebuilt/cli.js ./js/main.js $_DIR"
+    ./node_modules/electron-prebuilt/cli.js ./js/main.js "$_DIR" "$@" &
     exit 0
 elif [ -x "/Applications/$_NAME" ]; then
     _PATH="/Applications"

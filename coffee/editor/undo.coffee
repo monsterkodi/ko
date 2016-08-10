@@ -132,7 +132,7 @@ class Undo
             @newChangeInfo()
             action = @actions.pop()
             undoLines = []
-            for line in action.lines 
+            for line in action.lines
                 undoLines.push 
                     oldIndex:  line.newIndex
                     newIndex:  line.oldIndex
@@ -142,8 +142,11 @@ class Undo
                 lastLine.after  = line.before if line.before?
                 if line.change == 'deleted'  then lastLine.change = 'inserted'
                 if line.change == 'inserted' then lastLine.change = 'deleted'
-                @redoLine lastLine
 
+            @sortLines undoLines
+            for line in undoLines
+                @redoLine line
+            
             @undoCursor action
             @undoSelection action
             @futures.unshift action
@@ -324,15 +327,40 @@ class Undo
         if opt?.foreign
             @changeInfo?.foreign = opt.foreign
         @groupCount -= 1
-
         @futures = []
         if @groupCount == 0
             @merge()
             if @changeInfo?
                 # log "changed #{@actions.length}" if @dbg
+                @sortLines last @actions.lines
                 @editor.changed @changeInfo, last @actions
                 @delChangeInfo()
-        
+
+    #  0000000   0000000   00000000   000000000
+    # 000       000   000  000   000     000   
+    # 0000000   000   000  0000000       000   
+    #      000  000   000  000   000     000   
+    # 0000000    0000000   000   000     000   
+    
+    sortLines: (lines) ->
+        return if not lines?
+        lines.sort (a,b) ->
+            switch a.change
+                when 'inserted'
+                    switch b.change
+                        when 'inserted' 
+                            if a.oldIndex == b.oldIndex then b.newIndex - a.newIndex
+                            else b.oldIndex - a.oldIndex
+                        else
+                            Math.max(a.oldIndex, a.newIndex) - Math.max(b.oldIndex, b.newIndex)
+                when 'changed', 'deleted'
+                    if b.change == 'inserted'
+                        if a.oldIndex == b.oldIndex then b.newIndex - a.newIndex
+                        else b.oldIndex - a.oldIndex
+                    else 
+                        Math.max(b.oldIndex, b.newIndex) - Math.max(a.oldIndex, a.newIndex)
+        # log 'lines sorted:', lines
+    
     # 00     00  00000000  00000000    0000000   00000000
     # 000   000  000       000   000  000        000     
     # 000000000  0000000   0000000    000  0000  0000000 

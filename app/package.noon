@@ -1,6 +1,6 @@
 name          ko
 productName   ko
-version       0.9.16
+version       0.9.17
 description   an editor for macOS
 main          js/main.js
 bin

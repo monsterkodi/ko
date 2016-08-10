@@ -1023,16 +1023,21 @@ class Editor extends Buffer
             for c in @cursorsInLineAtIndex i
                 @oldCursorDelta newCursors, c, d
                 
+        mainCursorLine = @lines[@mainCursor[1]]
+        cs = mainCursorLine.indexOf @lineComment
+        uncomment = cs >= 0 and mainCursorLine.substr(0,cs).trim().length == 0
+        
         for i in @selectedAndCursorLineIndices()
             cs = @lines[i].indexOf @lineComment
-            if cs >= 0 and @lines[i].substr(0,cs).trim().length == 0
-                # remove comment
-                @do.change i, @lines[i].splice cs, @lineComment.length
-                moveInLine i, -@lineComment.length
-                si = @indentationAtLineIndex i
-                if si % @indentString.length == 1 # remove space after indent
-                    @do.change i, @lines[i].splice si-1, 1
-                    moveInLine i, -1
+            if uncomment 
+                if cs >= 0 and @lines[i].substr(0,cs).trim().length == 0
+                    # remove comment
+                    @do.change i, @lines[i].splice cs, @lineComment.length
+                    moveInLine i, -@lineComment.length
+                    si = @indentationAtLineIndex i
+                    if si % @indentString.length == 1 # remove space after indent
+                        @do.change i, @lines[i].splice si-1, 1
+                        moveInLine i, -1
             else # insert comment
                 si = @indentationAtLineIndex i
                 if @lines[i].length > si

@@ -7,7 +7,7 @@ app/js
 app/index.html
 app/syntax
 bin/*.js
-test
+./test
 dist
 js
 css
