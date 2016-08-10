@@ -249,14 +249,14 @@ class Split extends event
                     @area.style.display     = 'none'
                     @terminal.style.display = 'block'
                     @panes[0] = @terminal
-                    @emit 'split'
+                    @emit 'split', @splitPos
             when 'area'
                 if @panes[0] != @area
                     @area.style.height      = @terminal.style.height
                     @terminal.style.display = 'none'
                     @area.style.display     = 'block'
                     @panes[0] = @area
-                    @emit 'split'
+                    @emit 'split', @splitPos
     
     # 000       0000000    0000000 
     # 000      000   000  000      
