@@ -45,8 +45,11 @@ class Meta
                 if meta[2].clss == "searchResult"
                     [file, line] = meta[2].href.split ':' 
                     line -= 1
-                    # log "Meta.onChanged 'fileLineChange' at li:#{li}", file, lineChange
-                    @editor.emit 'fileLineChange', file, lineChange
+                    localChange = _.cloneDeep lineChange
+                    localChange.oldIndex = line
+                    localChange.newIndex = line
+                    log "Meta.onChanged 'fileLineChange' at li:#{li} line:#{line}", file, localChange
+                    @editor.emit 'fileLineChange', file, localChange
                     meta[2].state = 'unsaved'
                     if meta[2].span?
                         button = @saveButton li

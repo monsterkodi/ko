@@ -64,12 +64,10 @@ class Undo
         @changeInfo.deleted = true
         
     changeInfoCursor: ->
-        # log "Undo.changeInfoCursor" if @dbg
         @getChangeInfo()
         @changeInfo.cursors = true
 
     changeInfoSelection: ->
-        # log "Undo.changeInfoSelection" if @dbg
         @getChangeInfo()
         @changeInfo.selection = true
             
@@ -90,7 +88,6 @@ class Undo
             @redoCursor action
             @redoSelection action
             @actions.push action
-            # log "REDO"
             @editor.changed @changeInfo, action
             @delChangeInfo()
 
@@ -150,7 +147,6 @@ class Undo
             @undoCursor action
             @undoSelection action
             @futures.unshift action
-            # log "UNDO"
             @editor.changed @changeInfo, lines: undoLines
             @delChangeInfo()
                                                 
@@ -332,7 +328,6 @@ class Undo
             @merge()
             if @changeInfo?
                 @sortLines last(@actions).lines
-                # log "changed #{@actions.length}", last(@actions).lines if @dbg
                 @editor.changed @changeInfo, last @actions
                 @delChangeInfo()
 

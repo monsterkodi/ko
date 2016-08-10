@@ -43,14 +43,15 @@ class Editor extends Buffer
     # 000   000  000        000        0000000     000   
     
     applyForeignLineChanges: (lineChanges) =>
+        log "Editor.applyForeignLineChanges", lineChanges
         @do.start()
         for change in lineChanges
             if change.before? and change.after?
-                @do.change change.index, change.after
+                @do.change change.oldIndex, change.after
             else if change.before?
-                @do.delete change.index
+                @do.delete change.oldIndex
             else if change.after?
-                @do.insert change.index, change.after
+                @do.insert change.oldIndex, change.after
             else
                 log "editor.applyForeignLineChanges wtf?"
         @do.end foreign: true

@@ -110,6 +110,7 @@ ipc.on 'setWinID', (event, id) =>
     
 ipc.on 'fileLinesChanged', (event, file, lineChanges) =>
     if file == editor.currentFile
+        log "ipc.on 'fileLinesChanged' file:#{file} applyForeignLineChanges:", lineChanges
         editor.applyForeignLineChanges lineChanges
                  
 # 00000000  000  000      00000000
@@ -292,8 +293,7 @@ split.on 'split', =>
 
 terminal = window.terminal = new Terminal '.terminal'
 terminal.on 'fileLineChange', (file, lineChange) =>
-    log "file:#{file} lineChange:#{lineChange}"
-    log 
+    log "file:#{file} lineChange:", lineChange
     ipc.send 'winFileLinesChanged', -1, file, [lineChange]
 
 #  0000000   00000000   00000000   0000000 

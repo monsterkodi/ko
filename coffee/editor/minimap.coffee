@@ -56,7 +56,7 @@ class Minimap
         @cursors.width     = @width
         @elem.appendChild @cursors
 
-        @editor.view.appendChild @elem
+        @editor.view.appendChild    @elem
         @editor.on 'viewHeight',    @onEditorViewHeight
         @editor.on 'numLines',      @onEditorNumLines
         @editor.on 'changed',       @onChanged
