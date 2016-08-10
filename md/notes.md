@@ -1,8 +1,6 @@
 # todo/ideas
 
-- fix terminal resize|redraw when switching from build
 - fix commandlist switching sides when other side is smaller
-- dont indent deeper when at start of indent
 
 #### terminal
 - autocomplete dirs and files

@@ -1056,7 +1056,6 @@ class Editor extends Buffer
     # 000  000   000  0000000   00000000  000   000     000   
         
     insertUserCharacter: (ch) ->
-        
         return if @salterMode and @insertSalterCharacter ch
         
         @do.start()
@@ -1068,7 +1067,9 @@ class Editor extends Buffer
                 return
 
         if ch == '\n'
-            @insertNewline indent:true
+            doIndent = not @isCursorInIndent()
+            log "Editor.insertUserCharacter doIndent:#{doIndent}"
+            @insertNewline indent:doIndent
             @do.end()
             return
     
@@ -1192,7 +1193,7 @@ class Editor extends Buffer
                 il = Math.max il, @indentationAtLineIndex c[1]+1
                 indent = _.padStart "", il
             else
-                indent = ''
+                indent = _.padStart "", @indentationAtLineIndex c[1] # keep indentation
 
             bl = c[0]
             

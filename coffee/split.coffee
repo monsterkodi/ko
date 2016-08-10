@@ -178,6 +178,7 @@ class Split extends event
     # 0000000     0000000 
     
     do: (sentence) ->
+        # log "Split.do sentence:#{sentence}"
         sentence = sentence.trim()
         return if not sentence.length
         words = sentence.split /\s+/
@@ -248,12 +249,14 @@ class Split extends event
                     @area.style.display     = 'none'
                     @terminal.style.display = 'block'
                     @panes[0] = @terminal
+                    @emit 'split'
             when 'area'
                 if @panes[0] != @area
                     @area.style.height      = @terminal.style.height
                     @terminal.style.display = 'none'
                     @area.style.display     = 'block'
                     @panes[0] = @area
+                    @emit 'split'
     
     # 000       0000000    0000000 
     # 000      000   000  000      
