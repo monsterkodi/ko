@@ -14,3 +14,4 @@ css
 Icon?
 *.html
 npm-debug.log
+./md/test.md

@@ -765,7 +765,10 @@ class ViewBase extends Editor
             when 'command+z'                then return @do.undo()
             when 'command+shift+z'          then return @do.redo()
             when 'delete', 'ctrl+backspace' then return @deleteForward()
-            when 'backspace', 'command+backspace' then return @deleteBackward ignoreLineBoundary: combo == 'command+backspace'
+            when 'backspace'                then return @deleteBackward()
+            when 'command+backspace'        then return @deleteBackward ignoreLineBoundary: true
+            when 'alt+backspace'            then return @deleteBackward ignoreTabBoundary:  true
+            when 'shift+backspace'          then return @deleteBackward singleCharacter:    true
             when 'command+v'                then return @paste clipboard.readText()
             when 'command+x'   
                 @do.start()

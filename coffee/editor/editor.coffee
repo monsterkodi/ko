@@ -1510,12 +1510,12 @@ class Editor extends Buffer
                     if prv != so or nxt != sc
                         @surroundStack = []
                         break
-                if @surroundStack.length
-                    for i in [0...so.length]
-                        @deleteCharacterBackward opt
-                    for i in [0...sc.length]
-                        @deleteForward()
-                    @surroundStack.pop()
+                if @surroundStack.length                
+                    for i in [0...so.length]            
+                        @deleteCharacterBackward opt    
+                    for i in [0...sc.length]            
+                        @deleteForward()                
+                    @surroundStack.pop()                
                     @do.end()
                     return
             
@@ -1523,9 +1523,26 @@ class Editor extends Buffer
         @do.end()
 
     deleteCharacterBackward: (opt) ->
-        newCursors = _.cloneDeep @cursors        
+        newCursors = _.cloneDeep @cursors
+        
+        removeNum = switch
+            when opt?.singleCharacter    then 1
+            when opt?.ignoreLineBoundary then -1 # delete spaces to line start or line end
+            when opt?.ignoreTabBoundary # delete space columns
+                Math.max 1, _.min @cursors.map (c) => 
+                    t = @textInRange [c[1], [0, c[0]]]
+                    n = t.length - t.trimRight().length
+                    n += c[0] - @lines[c[1]].length if @isCursorVirtual c
+                    Math.max 1, n
+            else # delete spaces to previous tab column
+                Math.max 1, _.min @cursors.map (c) =>                       
+                    n = (c[0] % @indentString.length) or @indentString.length  
+                    t = @textInRange [c[1], [Math.max(0, c[0]-n), c[0]]]  
+                    n -= t.trimRight().length
+                    Math.max 1, n
+            
         for c in @reversedCursors()
-            if c[0] == 0        # cursor at start of line
+            if c[0] == 0 # cursor at start of line
                 if opt?.ignoreLineBoundary or @cursors.length == 1
                     if c[1] > 0 # cursor not in first line
                         ll = @lines[c[1]-1].length
@@ -1538,10 +1555,13 @@ class Editor extends Buffer
                         for nc in @positionsBelowLineIndexInPositions c[1], newCursors
                             @newCursorDelta newCursors, nc, 0, -1
             else
-                n = (c[0] % @indentString.length) or @indentString.length
-                t = @textInRange [c[1], [Math.max(0, c[0]-n-1), c[0]]]
-                if t.trim().length != 0
-                    n = 1
+                if removeNum < 1 # delete spaces to line start or line end
+                    t = @textInRange [c[1], [0, c[0]]]
+                    n = t.length - t.trimRight().length
+                    n += c[0] - @lines[c[1]].length if @isCursorVirtual c
+                    n = Math.max 1, n
+                else
+                    n = removeNum
                 @do.change c[1], @lines[c[1]].splice c[0]-n, n
                 for nc in @positionsInLineAtIndexInPositions c[1], newCursors
                     if nc[0] >= c[0]

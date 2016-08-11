@@ -340,20 +340,11 @@ class Undo
     sortLines: (lines) ->
         return if not lines?.length
         lines.sort (a,b) ->
-            switch a.change
-                when 'inserted'
-                    switch b.change
-                        when 'inserted' 
-                            if a.oldIndex == b.oldIndex then b.newIndex - a.newIndex
-                            else b.oldIndex - a.oldIndex
-                        else
-                            Math.max(a.oldIndex, a.newIndex) - Math.max(b.oldIndex, b.newIndex)
-                when 'changed', 'deleted'
-                    if b.change == 'inserted'
-                        if a.oldIndex == b.oldIndex then b.newIndex - a.newIndex
-                        else b.oldIndex - a.oldIndex
-                    else 
-                        Math.max(b.oldIndex, b.newIndex) - Math.max(a.oldIndex, a.newIndex)
+            if a.change == 'inserted' or 'b.change' == 'inserted'
+                if a.oldIndex == b.oldIndex then b.newIndex - a.newIndex
+                else b.oldIndex - a.oldIndex
+            else                
+                Math.max(b.oldIndex, b.newIndex) - Math.max(a.oldIndex, a.newIndex)
         # log 'lines sorted:', lines if @editor.name == 'editor'
     
     # 00     00  00000000  00000000    0000000   00000000
