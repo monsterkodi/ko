@@ -36,6 +36,18 @@ class Indexer
         @walker  = null
         @queue   = []
 
+    @testWord: (word) ->
+        switch
+            when word.length < 3 then false # exclude when too short
+            when word[0] in ['-', "#"] then false
+            when word[word.length-1] == '-' then false 
+            when word[0] == '_' and word.length < 4 then false # exclude when starts with underscore and is short
+            when /^[0\_\-\@\#]+$/.test word then false # exlude when consist of special characters only
+            when /\d/.test word then false # exlude when word contains number
+            # when /^[\-]?\d/.test word then false # exlude when starts with number
+            # when word.length < 4 and /[a-fA-F](\d[a-fA-F]|[a-fA-F]\d|\d\d)/.test word then false # exclude short hex numbers
+            else true
+
     collectBins: ->
         @bins = []
         for dir in ['/bin', '/usr/bin', '/usr/local/bin']
@@ -205,15 +217,9 @@ class Indexer
 
                 words = line.split Indexer.splitRegExp
                 for word in words
-
-                    switch
-                        when word.length < 3 then # exclude when too short
-                        when word[0] in ['-', "#", '_'] and word.length < 4 then # exclude when starts with special and is short
-                        when /^[0\_\-\@\#]+$/.test word then # exlude when consist of special characters only
-                        when /^[\-]?\d/.test word then # exlude when starts with number
-                        when word.length < 4 and /[a-fA-F](\d[a-fA-F]|[a-fA-F]\d|\d\d)/.test word then # exclude short hex numbers
-                        else
-                            _.update @words, "#{word}.count", (n) -> (n ? 0) + 1
+                    
+                    if Indexer.testWord word
+                        _.update @words, "#{word}.count", (n) -> (n ? 0) + 1
 
                     switch word
 
