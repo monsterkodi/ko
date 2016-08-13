@@ -196,7 +196,7 @@ class Editor extends Buffer
     # 0000000   000000000  000         000     0000000   0000000  
     #      000  000   000  000         000     000       000   000
     # 0000000   000   000  0000000     000     00000000  000   000
-                                
+    
     startSalter: (opt) ->
         # log "Editor.startSalter", opt
         cp = @cursorPos()
@@ -213,8 +213,10 @@ class Editor extends Buffer
             @do.end()
         else # create new header
             word = opt?.word ? @selectionTextOrWordAtCursor().trim()
-            # indt = _.padStart '', @indentationAtLineIndex cp[1]
-            indt = @indentStringForLineAtIndex cp[1]
+            if @textInRange(@rangeForLineAtIndex cp[1]).trim().length
+                indt = _.padStart '', @indentationAtLineIndex cp[1]
+            else
+                indt = @indentStringForLineAtIndex cp[1]
             stxt = word.length and salt(word).split('\n') or ['', '', '', '', '']
             stxt = ("#{indt}#{@lineComment} #{s}" for s in stxt)
             @do.start()

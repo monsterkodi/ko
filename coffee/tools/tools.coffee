@@ -55,6 +55,9 @@ module.exports =
         v = Math.min(v, r2) if r2?
         v
         
+    absMax: (a,b) -> if Math.abs(a) >= Math.abs(b) then a else b
+    absMin: (a,b) -> if Math.abs(a)  < Math.abs(b) then a else b
+        
     shortCount: (v) ->
         v = parseInt v
         switch

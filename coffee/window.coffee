@@ -403,6 +403,7 @@ window.onfocus = (event) ->
 
 document.onkeydown = (event) ->
     {mod, key, combo} = keyinfo.forEvent event
+    # log "window.document.onkeydown mod:#{mod} key:#{key} combo:#{combo}"
 
     return if not combo
     return if 'unhandled' != window.titlebar   .globalModKeyComboEvent mod, key, combo, event

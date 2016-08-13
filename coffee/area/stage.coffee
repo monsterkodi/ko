@@ -4,18 +4,19 @@
 #      000     000     000   000  000   000  000     
 # 0000000      000     000   000   0000000   00000000
 
+log     = require '../tools/log'
+keyinfo = require '../tools/keyinfo'
+
 class Stage
     
     constructor: (@view) -> 
         @paused = false
+        @view.onkeydown = @onKeyDown
+        @view.onkeyup   = @onKeyUp
     
     start: => @animate()
-    
-    pause: =>
-        @paused = true
-        
-    resume: =>
-        @paused = false
+    pause: => @paused = true
+    resume: => @paused = false
     
     animate: =>
         requestAnimationFrame @animate
@@ -25,5 +26,18 @@ class Stage
                 delta: secs*1000
                 dsecs: secs
             @animationStep step
+
+    onKeyDown: (event) =>
+        {mod, key, combo} = keyinfo.forEvent event
+        return if not combo
+        return if key == 'right click' # weird right command key
+        if not @modKeyComboEventDown? mod, key, combo, event
+            log "stage.onKeyDown #{combo}"
+   
+    onKeyUp: (event) =>
+        {mod, key, combo} = keyinfo.forEvent event        
+        return if not combo
+        return if key == 'right click' # weird right command key
+        @modKeyComboEventUp? mod, key, combo, event
         
 module.exports = Stage
