@@ -31,8 +31,7 @@ class Stage
         {mod, key, combo} = keyinfo.forEvent event
         return if not combo
         return if key == 'right click' # weird right command key
-        if not @modKeyComboEventDown? mod, key, combo, event
-            log "stage.onKeyDown #{combo}"
+        @modKeyComboEventDown? mod, key, combo, event
    
     onKeyUp: (event) =>
         {mod, key, combo} = keyinfo.forEvent event        

@@ -1377,6 +1377,15 @@ class Editor extends Buffer
             if not @isCursorInLastLine c
                 before = @lines[c[1]].trimRight() + " "
                 after  = @lines[c[1]+1].trimLeft()
+                
+                if @fileType == 'coffee' 
+                    if /(when|if)/.test before 
+                        bt = before.trim()
+                        if not bt.endsWith 'then' and
+                            not bt.endsWith 'and' and not bt.endsWith 'or' and
+                                not after.trim().startsWith 'then'
+                                    after = 'then ' + after
+                            
                 @do.change c[1], before + after
                 @do.delete c[1]+1
                 newCursors.push [before.length, c[1]]
