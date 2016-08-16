@@ -185,13 +185,13 @@ class Open extends Command
             if @history.length
                 bonus = 0x000fffff
                 for f in @history
-                    if f.length and (f != @file) and fileExists f
+                    if f.length and fileExists(f) #and (f != @file)
                         item = Object.create null
                         item.text = relative f, @dir
                         item.file = f
                         item.bonus = bonus if not opt?.flat
                         items.push item
-                        @lastFileIndex = items.length-1
+                        @lastFileIndex = items.length-2
                         bonus -= 1
                     else
                         _.pullAll @history, f
