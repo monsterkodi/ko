@@ -1070,7 +1070,6 @@ class Editor extends Buffer
 
         if ch == '\n'
             doIndent = not @isCursorInIndent()
-            log "Editor.insertUserCharacter doIndent:#{doIndent}"
             @insertNewline indent:doIndent
             @do.end()
             return
@@ -1194,8 +1193,13 @@ class Editor extends Buffer
                 
                 il = Math.max il, @indentationAtLineIndex c[1]+1
                 indent = _.padStart "", il
-            else
+            else if opt?.keepIndent
                 indent = _.padStart "", @indentationAtLineIndex c[1] # keep indentation
+            else
+                if @isCursorInIndent c
+                    indent = @lines[c[1]].slice 0,c[0]
+                else
+                    indent = ''
 
             bl = c[0]
             
