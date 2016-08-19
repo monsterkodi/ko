@@ -1249,6 +1249,7 @@ class Editor extends Buffer
             # log "insert.paste: paste #{l.length} lines into single cursor"
             cp = @cursorPos()
             li = cp[1]
+            newSelections = []
             if not @isCursorAtStartOfLine()
                 rest   = @lines[li].substr(@cursorPos()[0]).trimLeft()
                 indt   = _.padStart "", @indentationAtLineIndex cp[1] 
@@ -1265,9 +1266,11 @@ class Editor extends Buffer
                 @mainCursor = null
             for line in l
                 @do.insert li, line
+                newSelections.push [li, [0,line.length]]
                 li += 1
-            @mainCursor = [0, li] if not @mainCursor?           
+            @mainCursor = [0, li] if not @mainCursor?  
             newCursors = [@mainCursor]
+            @do.selections newSelections if newSelections.length > 1
                 
         @do.cursors newCursors
         @do.end()
