@@ -32,11 +32,12 @@ fs          = require 'fs'
 path        = require 'path'
 electron    = require 'electron'
 atomicFile  = require 'write-file-atomic'
-pkg         = require "../package.json"
+pkg         = require '../package.json'
 
 ipc         = electron.ipcRenderer
 remote      = electron.remote
 dialog      = remote.dialog
+BrowserWindow = remote.BrowserWindow
 winID       = null
 editor      = null
 logview     = null
@@ -110,7 +111,7 @@ ipc.on 'setWinID', (event, id) =>
     
 ipc.on 'fileLinesChanged', (event, file, lineChanges) =>
     if file == editor.currentFile
-        log "ipc.on 'fileLinesChanged' file:#{file} applyForeignLineChanges:", lineChanges
+        # log "ipc.on 'fileLinesChanged' file:#{file} applyForeignLineChanges:", lineChanges
         editor.applyForeignLineChanges lineChanges
                  
 #  0000000   0000000   000   000  00000000
@@ -329,6 +330,20 @@ window.onload = =>
     
 window.onunload = => editor.setCurrentFile null, noSaveScroll: true # to stop watcher
 
+# 0000000   0000000  00000000   00000000  00000000  000   000   0000000  000   000   0000000   000000000
+#000       000       000   000  000       000       0000  000  000       000   000  000   000     000   
+#0000000   000       0000000    0000000   0000000   000 0 000  0000000   000000000  000   000     000   
+#     000  000       000   000  000       000       000  0000       000  000   000  000   000     000   
+#0000000    0000000  000   000  00000000  00000000  000   000  0000000   000   000   0000000      000   
+
+screenShot = ->
+    win = BrowserWindow.fromId winID 
+    win.capturePage (img) ->
+        file = 'screenShot.png'
+        remote.require('fs').writeFile file, img.toPng(), (err) -> 
+            log 'saving screenshot failed', err if err?
+            log "screenshot saved to #{file}"
+
 #  0000000  00000000  000   000  000000000  00000000  00000000       000000000  00000000  000   000  000000000
 # 000       000       0000  000     000     000       000   000         000     000        000 000      000   
 # 000       0000000   000 0 000     000     0000000   0000000           000     0000000     00000       000   
@@ -403,7 +418,6 @@ window.onfocus = (event) ->
 
 document.onkeydown = (event) ->
     {mod, key, combo} = keyinfo.forEvent event
-    # log "window.document.onkeydown mod:#{mod} key:#{key} combo:#{combo}"
 
     return if not combo
     return if 'unhandled' != window.titlebar   .globalModKeyComboEvent mod, key, combo, event
@@ -418,6 +432,7 @@ document.onkeydown = (event) ->
             ipc.send 'activateWindow', i
             return stop event
     
+    # log "window.document.onkeydown mod:#{mod} key:#{key} combo:#{combo}"
     switch combo
         when 'command+alt+i'     then return ipc.send 'toggleDevTools', winID
         when 'ctrl+w' # close current file  
@@ -425,6 +440,7 @@ document.onkeydown = (event) ->
             editor.setText ''
             ipc.send 'fileLoaded', '', winID
             return
+        when 'f3'                 then return screenShot()
         when 'command+\\'         then return toggleCenterText()
         when 'command+k'          then return commandline.clear()
         when 'command+alt+k'      then return split.toggleLog()

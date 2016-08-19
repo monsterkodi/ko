@@ -48,15 +48,15 @@ class Meta
                     localChange = _.cloneDeep lineChange
                     localChange.oldIndex = line
                     localChange.newIndex = line
-                    log "Meta.onChanged 'fileLineChange' at li:#{li} line:#{line}", file, localChange
+                    # log "Meta.onChanged 'fileLineChange' at li:#{li} line:#{line}", file, localChange
                     @editor.emit 'fileLineChange', file, localChange
                     meta[2].state = 'unsaved'
                     if meta[2].span?
                         button = @saveButton li
                         if not meta[2].span.innerHTML.startsWith "<span"
                             meta[2].span.innerHTML = button
-                    else 
-                        log "no span?"
+                    # else 
+                        # log "no span?"
          
     #  0000000   0000000   000   000  00000000
     # 000       000   000  000   000  000     
@@ -66,20 +66,20 @@ class Meta
          
     saveFileLineMetas: (file, lineMetas) ->
         # log "Meta.saveFileLineMetas file:#{file} lineMetas:", lineMetas
-        log "Meta.saveFileLineMetas file:#{file}"
+        # log "Meta.saveFileLineMetas file:#{file}"
         fs.readFile file, encoding: 'utf8', (err, data) =>
             if err?
-                log "Meta.saveFileLineMetas readFile err:#{err}"
+                log "Meta.saveFileLineMetas [ERROR] readFile err:#{err}"
                 return
             lines = data.split /\r?\n/
-            log "Meta.saveFileLineMetas 1 lines:", lines
+            # log "Meta.saveFileLineMetas 1 lines:", lines
             for lineMeta in lineMetas
                 lines[lineMeta[0]] = lineMeta[1]
-            log "Meta.saveFileLineMetas 2 lines:", lines
+            # log "Meta.saveFileLineMetas 2 lines:", lines
             data = lines.join '\n'
             fs.writeFile file, data, encoding: 'utf8', (err) =>
                 if err?
-                    log "Meta.saveFileLineMetas writeFile err:#{err}"
+                    log "Meta.saveFileLineMetas [ERROR] writeFile err:#{err}"
                     return
                 for lineMeta in lineMetas
                     meta = lineMeta[2]

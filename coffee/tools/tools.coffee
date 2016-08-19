@@ -58,6 +58,8 @@ module.exports =
     absMax: (a,b) -> if Math.abs(a) >= Math.abs(b) then a else b
     absMin: (a,b) -> if Math.abs(a)  < Math.abs(b) then a else b
         
+    randInt: (r) -> Math.floor Math.random() * r
+        
     shortCount: (v) ->
         v = parseInt v
         switch
