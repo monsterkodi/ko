@@ -640,6 +640,12 @@ class ViewBase extends Editor
                 winID: window.winID
                 select: opt?.select
         
+        classes = ipc.sendSync 'indexer', 'classes'
+        for clss, info of classes
+            if clss.toLowerCase() == find
+                jumpToFileLine info.file, info.line
+                return true
+                
         funcs = ipc.sendSync 'indexer', 'funcs'
         for func, infos of funcs
             if func.toLowerCase() == find
@@ -649,12 +655,6 @@ class ViewBase extends Editor
                         info = i
                 if infos.length > 1 and not opt?.dontList
                     window.commandline.commands.term.execute "funcs ^#{word}$"
-                jumpToFileLine info.file, info.line
-                return true
-        
-        classes = ipc.sendSync 'indexer', 'classes'
-        for clss, info of classes
-            if clss.toLowerCase() == find
                 jumpToFileLine info.file, info.line
                 return true
 
