@@ -30,7 +30,7 @@ class Navigate
     # 000   000   0000000     000     000   0000000   000   000
 
     action: (opt) =>
-        # log "action #{opt.action} @currentIndex #{@currentIndex} #{@navigating}", ("#{f.file}:#{f.pos[1]}" for f in @filePositions), opt
+        # log "navigate.action #{opt.action} @currentIndex #{@currentIndex} #{@navigating}", ("#{f.file}:#{f.pos[1]}" for f in @filePositions), opt
         switch opt.action
 
             when 'backward'
@@ -47,6 +47,7 @@ class Navigate
                                 
             when 'addFilePos'
                 return if not opt?.file?.length
+                # log "navigate.action addFilePos @currentIndex #{@currentIndex} #{@navigating}", opt
                 hasFile = _.find @filePositions, (v) -> v.file == opt.file
                 if opt?.for in ['edit', 'goto'] or not @navigating or not hasFile
                     @navigating = false if opt?.for in ['edit', 'goto']
@@ -60,6 +61,8 @@ class Navigate
                     @currentIndex = @filePositions.length-1
                     if opt?.for == 'goto'
                         @navigateToFilePos @filePositions[@currentIndex], opt
+                    else
+                        @currentIndex = @filePositions.length
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000
     # 0000  000  000   000  000   000  000  000        000   000     000     000     

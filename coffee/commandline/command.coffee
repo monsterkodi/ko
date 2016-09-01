@@ -225,6 +225,10 @@ class Command
         @history = []
         @selected = -1
         @setState @historyKey(), @history
+   
+    setHistory: (history) ->
+        @history = history
+        @setState @historyKey(), @history
     
     setCurrent: (command) ->
         @loadState() if not @history?
