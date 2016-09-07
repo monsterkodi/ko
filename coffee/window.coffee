@@ -210,7 +210,7 @@ openFiles = (ofiles, options) => # called from file dialog and open command
                 detail: "Are you sure you want to open that many files?"
             return if answer != 1
         if files.length == 0
-            log 'window.openFiles.warning: no files for?', ofiles
+            log 'window.openFiles.warning: no files for:', ofiles
             return []
         setState 'openFilePath', path.dirname files[0]                    
         if not options?.newWindow

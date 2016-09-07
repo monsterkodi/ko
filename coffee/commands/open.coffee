@@ -75,7 +75,7 @@ class Open extends Command
         items = @listItems flat: true, navigating: @navigating, currentText: @getText().trim()    
         if command.length
             fuzzied = fuzzy.filter command, items, extract: (o) -> o.text            
-            items = (f.original for f in _.sortBy fuzzied, (o) -> o.index)
+            items = (f.original for f in _.sortBy fuzzied, (o) => @weight o.original).reversed()
                     
         if items.length
             @showItems items
@@ -350,8 +350,11 @@ class Open extends Command
         @showItems @listItems includeThis: false
         @grabFocus()
         @select @lastFileIndex
-        if not @navigating
-            @setAndSelectText @commandList.lines[@selected]
+        if not @navigating 
+            if @getText() == ''
+                @setAndSelectText @commandList.lines[@selected]
+            else if @getText() != @commandList.lines[@selected]
+                @changed @getText()
         else if @getText() == '.'
             @setText @dir
                     
