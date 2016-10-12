@@ -1,0 +1,52 @@
+#   00000000  000   0000000  000   000
+#   000       000  000       000   000
+#   000000    000  0000000   000000000
+#   000       000       000  000   000
+#   000       000  0000000   000   000
+
+ko
+    extnames                 . fish
+
+\S+                            text
+
+[\<\>\+\-\=\/\*]               syntax.math
+
+# braces
+
+[\(\)\{\}\[\]]                 syntax.bracket
+
+# bool
+
+true                           value.bool.true
+false                          value.bool.false 
+
+function\s+(\w+)               function
+set\s+(\w+)                    property
+
+\s(\-)(\w+)                  . keyword.marker . keyword
+
+# punctuation
+
+[\,\.\:\;\#\$\^\?\|\~]         syntax.punctuation
+
+\b(if|else|end|then|echo|exit|while|case|for|in|set|alias|test|function|source|return|set_color)\b  keyword
+
+
+#number
+
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
+    syntax.value.number.float.sign
+    value.number.float
+
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
+    syntax.value.number.int.sign
+    value.number.int
+
+# strings
+
+(')([^'\\]*)(')    . string.marker.single . value.string.single . string.marker.single
+(")([^"\\]*)(")    . string.marker.double . value.string.double . string.marker.double
+
+# comments
+
+(?:^|[^\$\#]+)(\#+)(.*)           . comment.marker . comment
