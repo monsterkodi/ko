@@ -321,6 +321,7 @@ class Command
     # 000   000  00000000     000   
     
     handleModKeyComboEvent: (mod, key, combo, event) -> 
+        # log "command.coffee handleModKeyComboEvent #{key}"
         switch combo
             when 'page up', 'page down'
                 if @commandList?

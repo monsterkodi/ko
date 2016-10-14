@@ -782,6 +782,12 @@ class ViewBase extends Editor
             when 'command+alt+up'             then return @jumpToCounterpart()
             when 'ctrl+a',     'ctrl+shift+a' then return @moveCursorsToLineBoundary 'left',  event.shiftKey
             when 'ctrl+e',     'ctrl+shift+e' then return @moveCursorsToLineBoundary 'right', event.shiftKey
+            when 'ctrl+k'
+                @do.start()
+                @moveCursorsToLineBoundary 'right', true
+                @deleteSelection()
+                @do.end()
+                return 
             when 'ctrl+shift+right'           then return @alignCursorsAndText()
                 
             when 'command+left', 'command+right'   

@@ -5,7 +5,9 @@
 #    000     00000000  000   000  000   000
 {
 fileExists,
+dirExists,
 unresolve,
+resolve,
 clamp,
 last
 }        = require '../tools/tools'
@@ -17,7 +19,9 @@ _        = require 'lodash'
 electron = require 'electron'
 path     = require 'path'
 noon     = require 'noon'
+fs       = require 'fs'
 ipc      = electron.ipcRenderer
+remote   = electron.remote
 
 class Term extends Command
 
@@ -29,13 +33,103 @@ class Term extends Command
         super @commandline
         @maxHistory = 99
         @cmdID      = 0
+        @pwdID      = -1
         @bins       = ipc.sendSync 'indexer', 'bins'
         
-    onShellCommandData: (cmdData)  => 
-        terminal = window.terminal
-        terminal.output cmdData.data
-        terminal.scrollCursorToTop 5
+    onShellCommandData: (cmdData) => 
+        if cmdData.cmd == @pwdID
+            if cmdData.data != "pwd"
+                @completeDir cmdData.data
+        else
+            terminal = window.terminal
+            terminal.output cmdData.data
+            terminal.scrollCursorToTop 5
 
+    #  0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
+    # 000       000   000  000   000  000   000  000      000          000     000     
+    # 000       000   000  000000000  00000000   000      0000000      000     0000000 
+    # 000       000   000  000 0 000  000        000      000          000     000     
+    #  0000000   0000000   000   000  000        0000000  00000000     000     00000000
+        
+    complete: =>
+        word = last @getText().split ' '
+        
+        if word.indexOf("$") >= 0
+            list = []
+            for k,v of process.env
+                if k.startsWith word.slice word.indexOf("$")+1
+                    list.push word.slice(0, word.indexOf("$")) + "$" + k
+            if list.length
+                @completeList list
+                return
+
+        @pwdID = @cmdID
+        ipc.send 'shellCommand', winID: window.winID, cmdID: @cmdID, command: "pwd"
+        @cmdID += 1
+        
+    resolveDir: (dir) =>
+        i = dir.indexOf '$'
+        if i >= 0
+            for k,v of process.env
+                if k == dir.slice i+1, i+1+k.length
+                    dir = dir.slice(0, i) + v + dir.slice(i+k.length+1)
+        resolve dir
+    
+    resolveDirWord: (dir, word) =>
+        start = ''
+        rest  = word
+        split = word.split '/'
+        
+        if split.length > 1
+            rest = last split
+            split.pop()
+            start = split.join('/') + '/'
+            if dirExists @resolveDir start
+                dir = start
+            else
+                dir = dir + '/' + start
+        else
+            if dirExists @resolveDir word
+                dir = word
+                start = word + '/'
+                rest = ''
+        [dir, start, rest]
+    
+    completeDir: (dir) =>
+        [dir, start, rest] = @resolveDirWord dir, last @getText().split ' ' 
+        files = fs.readdirSync @resolveDir dir
+        list = []
+        
+        for f in files
+            if rest == '' or f.startsWith rest
+                if dirExists start + f
+                    list.push start + f + '/'
+                else
+                    list.push start + f
+        if list.length
+            @completeList list
+            return
+
+    completeList: (list) =>
+        ss = @getText().length
+        split = @getText().split ' ' 
+        split.pop()
+        items = []
+        for l in list
+            p = ''
+            p = split.join(' ') + ' ' if split.length
+            items.push p + l
+        if last(items[0]) != '/'
+            if dirExists @resolveDir last items[0].split ' '   
+                items[0] +=  '/'
+        @setText items[0]
+        if items.length > 1
+            @showItems items
+            @select 0
+            
+        se = items[0].length        
+        @commandline.selectSingleRange [0, [ss,se]]
+        
     # 000      000   0000000  000000000
     # 000      000  000          000   
     # 000      000  0000000      000   
@@ -350,5 +444,18 @@ class Term extends Command
         terminal.scrollCursorToTop 5
         text:    ''
         do:      (@name == 'Term' and 'maximize' or 'reveal') + ' terminal'
+        
+    # 000   000  00000000  000   000
+    # 000  000   000        000 000 
+    # 0000000    0000000     00000  
+    # 000  000   000          000   
+    # 000   000  00000000     000   
+    
+    handleModKeyComboEvent: (mod, key, combo, event) -> 
+        switch combo
+            when 'tab'
+                @complete()
+                return
+        super mod, key, combo, event
         
 module.exports = Term

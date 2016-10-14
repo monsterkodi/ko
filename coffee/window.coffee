@@ -86,6 +86,7 @@ delState = window.delState = (key) ->
 # 000  000         0000000
 
 ipc.on 'shellCommandData',  (event, cmdData) => commandline.commands['term'].onShellCommandData cmdData
+ipc.on 'shellCallbackData', (event, cmdData) => commandline.commands['term'].onShellCallbackData cmdData
 ipc.on 'singleCursorAtPos', (event, pos, extend) => 
     editor.singleCursorAtPos pos, extend
     editor.scrollCursorToTop()

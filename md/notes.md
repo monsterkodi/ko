@@ -6,9 +6,6 @@
 - term: auto cd to pkg dir when file loaded?
 - list project|pkg dirs?
 
-#### terminal
-- autocomplete dirs and files
-
 #### open
 - *automatically start konrad in pkg dir*
 - resolve environment variables
@@ -28,7 +25,6 @@
 #### editor
 - fix horizontal scrolling
 - save and restore scrollX/Left
-- check undo (merges too much?)
 - jump to file (include|path)
 
 #### commands
