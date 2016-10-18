@@ -75,7 +75,7 @@ def\s+(\w+)\s*(\()[^\)]*(\))\s*:    . function . function.bracket . function.bra
 
 # keywords
 
-(?:^|\s)(else:|try:|range|print|of|in|not|or|and|return|import|break|continue|global)(?:\s|$)   keyword 
+(?:^|\s)(else:|try:|except|range|print|pass|of|in|not|or|and|return|import|break|continue|global)(?:\s|$)   keyword 
 (?:^|\s)(def|if|elif|for|while|except)\s.*(:)\s*(?:$|#.*$)      . keyword . keyword
     
 __name__|__class__  keyword
