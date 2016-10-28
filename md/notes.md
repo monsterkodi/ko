@@ -8,8 +8,7 @@
 
 #### open
 - *automatically start konrad in pkg dir*
-- resolve environment variables
-- shared recent files of stacked windows
+- shared recent files of stacked windows?
 
 #### editing
 - *improve bracket inserting (evaluate brackets in line)*
