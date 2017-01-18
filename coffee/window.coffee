@@ -161,8 +161,9 @@ loadFile = (file, opt={}) =>
     return if not file? or not file.length
     [file,line,column] = file.split ':'
     if file != editor.currentFile or opt?.reload
-        return if not fileExists file
-        # log "window.loadFile #{file}"
+        if not fileExists file
+            log "[WARNING] window.loadFile -- no such file:", file
+            return
         if editor.currentFile? and not opt?.dontSave and editor.do.hasLineChanges() and fileExists editor.currentFile
             atomicFile editor.currentFile, _.clone(editor.text()), encoding: 'utf8', (err) =>
                     if err?
