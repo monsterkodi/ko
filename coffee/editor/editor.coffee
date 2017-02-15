@@ -1281,7 +1281,21 @@ class Editor extends Buffer
     #      000  000   000  000   000  000   000  000   000  000   000  000  0000  000   000
     # 0000000    0000000   000   000  000   000   0000000    0000000   000   000  0000000  
         
+    isUnbalancedSurroundCharacter: (ch) ->
+        [cl,cr] = @surroundPairs[ch]
+        for cursor in @cursors
+            count = 0
+            for c in @lines[cursor[1]]
+                if c == cl
+                    count += 1
+                else if c == cr
+                    count -= 1
+            return true if cl == cr and (count % 2) or count
+        return false
+        
     insertSurroundCharacter: (ch) ->        
+
+        return false if @isUnbalancedSurroundCharacter ch
         
         if @surroundStack.length
             if last(@surroundStack)[1] == ch
