@@ -1290,7 +1290,7 @@ class Editor extends Buffer
                     count += 1
                 else if c == cr
                     count -= 1
-            return true if cl == cr and (count % 2) or count
+            return true if ((cl == cr) and (count % 2)) or ((cl != cr) and count)
         return false
         
     insertSurroundCharacter: (ch) ->        

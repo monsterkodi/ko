@@ -22,17 +22,6 @@ path    = require 'path'
 fuzzy   = require 'fuzzy'
 fs      = require 'fs'
 _       = require 'lodash'
-
-fileTypes = [
-    'coffee', 'js', 
-    'styl', 'css'
-    'pug', 'jade', 'html', 
-    'md', 'txt',
-    'noon', 'json', 
-    'cpp', 'h',
-    'sh', 'py'
-    ]
-fileExtensions = (".#{e}" for e in fileTypes)    
     
 class Open extends Command
 
