@@ -45,7 +45,7 @@ class Build extends Command
         command = command.trim()
         return if not command.length
         
-        if @instance?.name == command
+        if @instance?.name == command and @instance.reset?
             @instance.reset?()
         else
             if dirExists "#{__dirname}/../area/#{command}"
@@ -62,6 +62,7 @@ class Build extends Command
             if file?
                 mod = require file
                 @instance?.stop?()
+                @area.view.removeChild @area.view.firstChild while @area.view.firstChild
                 @instance = new mod @area.view
                 @instance.name = command
                 @instance.start()

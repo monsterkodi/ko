@@ -188,12 +188,19 @@ class Split extends event
             when 'focus'    then return @focus what
             when 'reveal'   then return @show what
             when 'maximize' then delta = @elemHeight()
+            when 'minimize' then delta = -@elemHeight()
             when 'enlarge'
                 if words[2] == 'by'
                     delta = parseInt words[3]
                 else
                     fh = @terminalHeight() + @commandlineHeight + @editorHeight()
                     delta = parseInt 0.25 * fh
+            when 'reduce'
+                if words[2] == 'by'
+                    delta = - parseInt words[3]
+                else
+                    fh = @terminalHeight() + @commandlineHeight + @editorHeight()
+                    delta = - parseInt 0.25 * fh
                     
         switch what
             when 'editor'   then return @moveCommandLineBy -delta
@@ -242,6 +249,7 @@ class Split extends event
                 log "split.show warning! unhandled #{n}!"
 
     raise: (n) ->
+        # log "Split.raise", n
         switch n
             when 'terminal'
                 if @panes[0] != @terminal

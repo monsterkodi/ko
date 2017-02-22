@@ -777,6 +777,7 @@ class ViewBase extends Editor
                 @do.end()
                 return
                 
+            when 'alt+shift+up', 'alt+shift+down' then return @duplicateLines  key
             when 'alt+up',     'alt+down'     then return @moveLines  key
             when 'command+up', 'command+down' then return @addCursors key
             when 'command+alt+up'             then return @jumpToCounterpart()

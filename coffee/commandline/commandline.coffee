@@ -252,14 +252,14 @@ class Commandline extends ViewBase
             when 'down'                 then return @setAndSelectText @command?.next()
             when 'esc'                  then return @cancel()
             when 'command+k'            then return @clear()
-            when 'tab', 'shift+tab'     then return
+            when 'shift+tab'            then return 
             when 'home', 'command+up'   then return split.do 'maximize editor'
-            when 'end', 'command+down'  then return split.do 'maximize terminal'
+            when 'end', 'command+down'  then return split.do 'minimize editor'
             when 'alt+up'               then return split.do 'enlarge editor'
             when 'ctrl+up'              then return split.do 'enlarge editor by 20'
-            when 'alt+down'             then return split.do 'enlarge terminal'
-            when 'ctrl+down'            then return split.do 'enlarge terminal by 20'
-            when 'right'
+            when 'alt+down'             then return split.do 'reduce editor'
+            when 'ctrl+down'            then return split.do 'reduce editor by 20'
+            when 'right', 'tab' 
                 if @isCursorAtEndOfLine()
                     if @command?.complete()
                         return stop event
@@ -268,6 +268,8 @@ class Commandline extends ViewBase
                         @do.selections []
                         @do.end()
                     return stop event
+                else if combo == 'tab'
+                    return
         
         return 'unhandled'
     
