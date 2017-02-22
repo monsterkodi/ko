@@ -435,7 +435,6 @@ document.onkeydown = (event) ->
             ipc.send 'activateWindow', i
             return stop event
     
-    # log "window.document.onkeydown mod:#{mod} key:#{key} combo:#{combo}"
     switch combo
         when 'command+alt+i'     then return ipc.send 'toggleDevTools', winID
         when 'ctrl+w' # close current file  
@@ -457,4 +456,9 @@ document.onkeydown = (event) ->
         when 'alt+`'              then return titlebar.showList()
         when 'command+ctrl+left'  then return stop event, navigate.backward()
         when 'command+ctrl+right' then return stop event, navigate.forward()
+        when 'command+shift+y'    
+            split.focus 'editor'
+            split.hideCommandline() if split.isCommandlineVisible()
+            split.hideLog() if split.logVisible
+            return
         
