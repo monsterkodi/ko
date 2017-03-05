@@ -25,14 +25,12 @@ maintainers
 bugs
                 url  https://github.com/monsterkodi/ko/issues
 build
-                appId           net.monsterkodi.ko
-                app-category-type  public.app-category.utilities
-                asar            false
-                productName     ko
+                appId         net.monsterkodi.ko
+                asar          false
+                productName   ko
                 mac
-                  background  build/background.png
-                  target
-                    dmg
+                  category  public.app-category.utilities
+                dmg
                   contents
                     .
                       x     100
