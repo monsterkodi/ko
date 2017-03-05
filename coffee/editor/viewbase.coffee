@@ -207,14 +207,6 @@ class ViewBase extends Editor
                 when 'deleted'  then @syntax.diss.splice oi, 1
                 when 'inserted' then @syntax.diss.splice oi, 0, @syntax.dissForLineIndex li
 
-        # if changes.length and @name == 'editor'
-            # log "ViewBase.changed", changeInfo
-            # log "ViewBase.changed lines:", @lines
-            # log "ViewBase.changed changes:", changes
-            # log "ViewBase.changed undo:", @do.actions
-            # log "ViewBase.changed syntax.diss:", @syntax.diss
-            # log "ViewBase.changed action.lines:", action.lines
-        
         while (change = changes.shift())
             [oi,li,ch] = [change.oldIndex, change.newIndex, change.change]
             switch ch
@@ -352,6 +344,7 @@ class ViewBase extends Editor
             super
    
     hasWordHighlights: () -> @highlights.find (h) -> not h[2]?
+    hasHighlights: () -> @highlights.length > 0
     
     # 00000000   00000000  000   000  0000000    00000000  00000000 
     # 000   000  000       0000  000  000   000  000       000   000
@@ -713,7 +706,7 @@ class ViewBase extends Editor
             when 'esc'
                 if @salterMode
                     return @setSalterMode false
-                if @hasWordHighlights()
+                if @hasHighlights()
                     return @clearHighlights()
                 if @cursors.length > 1
                     return @clearCursors()

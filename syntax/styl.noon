@@ -12,9 +12,9 @@
 
 # tags
 
-\b(html|body|section|header|footer|ul|li|a|b|br|p|center|table|title|link|nav|tr|th|td|div|span|img|h\d|dt|blockquote|pre|hr|svg|path|absolute|bold|hidden|none|pointer)\b   keyword
-\b(color|opacity|max-|min-|box-?|sizing|width|decoration|align|position|pointer-events|radius|height|width|outline|overflow|family|weight|cursor|display|background|size|content|white-space|transition|transform|z-index)\b  keyword
-\b(overflow-?[xy]?|border-?|bottom|left|right|top|font|text|margin|padding)(-?)\b  . keyword . keyword.marker
+\b(html|body|section|header|footer|ul|li|a|b|br|p|center|table|title|link|nav|tr|th|td|div|span|img|h\d|dt|blockquote|pre|hr|svg|path|absolute|relative|fixed|scroll|bold|hidden|none|pointer)\b   keyword
+\b(color|opacity|max-|min-|box-?|inline-|block|no-|drag|solid|static|transparent|auto|nowrap|sizing|width|decoration|align|position|pointer-events|radius|height|width|outline|overflow|family|weight|cursor|display|background|size|content|white-space|transition|transform|z-index)\b  keyword
+\b(overflow-?[xy]?|border-?|vertical-|bottom|left|right|top|font|text|margin|padding)(-?)\b  . keyword . keyword.marker
 (-webkit-[\w\-]+)  keyword
 
 # none

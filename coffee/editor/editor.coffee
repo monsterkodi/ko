@@ -176,11 +176,11 @@ class Editor extends Buffer
         if oldType != @fileType
             @emit 'fileTypeChanged', @fileType
                 
-    #  0000000  00000000  000000000         000      000  000   000  00000000   0000000
-    # 000       000          000            000      000  0000  000  000       000     
-    # 0000000   0000000      000            000      000  000 0 000  0000000   0000000 
-    #      000  000          000            000      000  000  0000  000            000
-    # 0000000   00000000     000            0000000  000  000   000  00000000  0000000 
+    #  0000000  00000000  000000000         000      000  000   000  00000000   0000000  
+    # 000       000          000            000      000  0000  000  000       000       
+    # 0000000   0000000      000            000      000  000 0 000  0000000   0000000   
+    #      000  000          000            000      000  000  0000  000            000  
+    # 0000000   00000000     000            0000000  000  000   000  00000000  0000000   
 
     setText: (text="") -> 
         rgx = new RegExp '\t', 'g'
@@ -191,14 +191,13 @@ class Editor extends Buffer
         super lines
         @emit 'linesSet', @lines
         
-    #  0000000   0000000   000      000000000  00000000  00000000 
-    # 000       000   000  000         000     000       000   000
-    # 0000000   000000000  000         000     0000000   0000000  
-    #      000  000   000  000         000     000       000   000
-    # 0000000   000   000  0000000     000     00000000  000   000
+    #  0000000   0000000   000      000000000  00000000  00000000   
+    # 000       000   000  000         000     000       000   000  
+    # 0000000   000000000  000         000     0000000   0000000    
+    #      000  000   000  000         000     000       000   000  
+    # 0000000   000   000  0000000     000     00000000  000   000  
     
     startSalter: (opt) ->
-        # log "Editor.startSalter", opt
         cp = @cursorPos()
         if not opt?.word and rgs = @salterRangesAtPos() # edit existing header
             cols = @columnsInSalt (@textInRange r for r in rgs)
@@ -218,7 +217,7 @@ class Editor extends Buffer
             else
                 indt = @indentStringForLineAtIndex cp[1]
             stxt = word.length and salt(word).split('\n') or ['', '', '', '', '']
-            stxt = ("#{indt}#{@lineComment} #{s}" for s in stxt)
+            stxt = ("#{indt}#{@lineComment} #{s}  " for s in stxt)
             @do.start()
             newCursors = []
             @do.insert cp[1], indt
@@ -232,19 +231,18 @@ class Editor extends Buffer
             @do.selections []
             @do.end()
         @setSalterMode true
-        # log "Editor.startSalter started"
-        
+    
     insertSalterCharacter: (ch) ->
         if ch == ' '
             char = ['    ', '    ', '    ', '    ', '    ']
         else
             char = salt(ch).split '\n'
         if char.length == 5
-            @paste ("  #{s}" for s in char).join '\n'
+            @paste ("#{s}  " for s in char).join '\n'
         else
             @setSalterMode false
         true
-
+    
     deleteSalterCharacter: ->
         return if not @salterMode
         cp = @cursorPos()
@@ -258,8 +256,9 @@ class Editor extends Buffer
                 for r in rgs
                     @do.change r[0], @lines[r[0]].splice cols[ci-1], length
                 @do.cursors ([cols[ci-1], r[0]] for r in rgs)
-                
+    
     checkSalterMode: ->        
+        
         return if not @salterMode
         @setSalterMode false
         return if @cursors.length != 5
@@ -273,15 +272,15 @@ class Editor extends Buffer
         cols = @columnsInSalt (@textInRange r for r in rgs)
         return if @cursors[0][0] < cols[0]
         @setSalterMode true
-                                    
+    
     columnsInSalt: (salt) ->
-        max = _.max (s.length for s in salt)
         min = _.min (s.search /0/ for s in salt)
+        max = _.max (s.length for s in salt)
         cols = [min]
         for col in [min..max]
             s = 0
             for i in [0...5]
-                s += 1 if salt[i].slice(col, col+2) == '  '
+                s += 1 if salt[i].slice(col-2, col) in ['  ', '# ']
             cols.push col if s == 5
         cols.push max
         cols
