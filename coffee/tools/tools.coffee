@@ -136,10 +136,10 @@ module.exports =
         split = file.split ':'
         line = parseInt split[1] if split.length > 1
         clmn = parseInt split[2] if split.length > 2
-        pos = [0, 0]
-        pos[0] = clmn     if Number.isInteger clmn
-        pos[1] = line - 1 if Number.isInteger line
-        [split[0], pos]
+        p = [0, 0]
+        p[0] = clmn     if Number.isInteger clmn
+        p[1] = line - 1 if Number.isInteger line
+        [split[0], p]
                     
     #  0000000   0000000   0000000
     # 000       000       000     

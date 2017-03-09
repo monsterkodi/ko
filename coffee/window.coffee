@@ -6,6 +6,7 @@
 {
 last,
 sw,sh,$,
+resolve,
 fileList,
 fileExists,
 splitFilePos,
@@ -89,7 +90,6 @@ delState = window.delState = (key) ->
 ipc.on 'shellCommandData',  (event, cmdData) => commandline.commands['term'].onShellCommandData cmdData
 ipc.on 'shellCallbackData', (event, cmdData) => commandline.commands['term'].onShellCallbackData cmdData
 ipc.on 'singleCursorAtPos', (event, pos, extend) => 
-    log "singleCursorAtPos #{pos}"
     editor.singleCursorAtPos pos, extend
     editor.scrollCursorToTop()
 ipc.on 'openFile',          (event, options) => openFile options
@@ -115,7 +115,6 @@ ipc.on 'setWinID', (event, id) =>
     
 ipc.on 'fileLinesChanged', (event, file, lineChanges) =>
     if file == editor.currentFile
-        # log "ipc.on 'fileLinesChanged' file:#{file} applyForeignLineChanges:", lineChanges
         editor.applyForeignLineChanges lineChanges
                  
 #  0000000   0000000   000   000  00000000
@@ -162,6 +161,7 @@ reloadFile = =>
 loadFile = (file, opt={}) =>
     return if not file? or not file.length
     [file,pos] = splitFilePos file
+    file = resolve file
     if file != editor.currentFile or opt?.reload
         if not fileExists file
             log "[WARNING] window.loadFile -- no such file:", file
