@@ -18,13 +18,13 @@ if [ $_DEV ]; then
     echo "$(pwd)/./node_modules/electron/cli.js ./js/main.js $_DIR"
     ./node_modules/electron/cli.js ./js/main.js "$_DIR" "$@" &
     exit 0
+elif [ -x "$HOME/s/ko/ko-darwin-x64/$_NAME" ]; then
+    _PATH="$HOME/s/ko/ko-darwin-x64"
+    echo "using dev build $_PATH"
 elif [ -x "/Applications/$_NAME" ]; then
     _PATH="/Applications"
 elif [ -x "$HOME/Applications/$_NAME" ]; then
     _PATH="$HOME/Applications"
-elif [ -x "$HOME/s/ko/ko-darwin-x64/$_NAME" ]; then
-    _PATH="$HOME/s/ko/ko-darwin-x64"
-    echo "using dev build $_PATH"
 else
     _PATH="$(mdfind \"kMDItemCFBundleIdentifier == 'net.monsterkodi.ko'\" | grep -v ShipIt | head -1 | xargs -0 dirname)"
     if [ ! -x "$_PATH/$_NAME" ]; then
