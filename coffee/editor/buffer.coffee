@@ -275,7 +275,7 @@ class Buffer extends event
         
     clampPos: (p) ->        
         if not p? or not p[0]? or not p[1]?
-            alert "no p? #{p}"
+            alert "clampPos :: broken pos? #{p}"
             throw new Error
             return
         if not @lines.length

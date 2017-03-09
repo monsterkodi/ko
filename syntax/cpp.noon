@@ -5,7 +5,7 @@
 #  0000000  000        000              000   000
 
 ko
-    extnames                 . cpp . cc . hpp . h
+    extnames                 . cpp . cxx . cc . c . hpp . h
 
 \S+                            text
 

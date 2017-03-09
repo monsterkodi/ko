@@ -83,9 +83,9 @@ module.exports =
     fileList: (paths, opt={ignoreHidden: true, logError: true}) ->
         files = []
         paths = [paths] if typeof paths == 'string'
-        for p in paths
+        for pth in paths
             try
-                [p,l] = p.split ':'
+                [p,l,c] = pth.split ':'
                 stat = fs.statSync p
                 if stat.isDirectory()
                     dirfiles = fs.readdirSync p
@@ -94,15 +94,12 @@ module.exports =
                     if opt.ignoreHidden
                         dirfiles = dirfiles.filter (f) -> not path.basename(f).startsWith '.'
                     files = files.concat dirfiles
-                    
                 else if stat.isFile()
                     if opt.ignoreHidden and path.basename(p).startsWith '.'
                         continue
-                    p += ":#{l}" if l?
-                    files.push p
+                    files.push pth
             catch err
-                if opt.logError
-                    log 'tools.fileList.error:', err
+                if opt.logError then log 'tools.fileList.error:', err
         files
         
     fileExists: (file) ->

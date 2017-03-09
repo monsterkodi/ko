@@ -88,6 +88,7 @@ delState = window.delState = (key) ->
 ipc.on 'shellCommandData',  (event, cmdData) => commandline.commands['term'].onShellCommandData cmdData
 ipc.on 'shellCallbackData', (event, cmdData) => commandline.commands['term'].onShellCallbackData cmdData
 ipc.on 'singleCursorAtPos', (event, pos, extend) => 
+    log "singleCursorAtPos #{pos}"
     editor.singleCursorAtPos pos, extend
     editor.scrollCursorToTop()
 ipc.on 'openFile',          (event, options) => openFile options

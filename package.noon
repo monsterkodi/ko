@@ -1,13 +1,14 @@
 name            ko-editor
 productName     ko
-version         0.9.19
+version         0.9.20
 description     an editor for macOS
 main            js/main.js
 preferGlobal    true
 bin
                 ko  ./bin/ko
 scripts
-                dist  ./bin/build.sh && build
+                build   ./bin/build.sh
+                dmg     ./bin/dmg.sh
 repository
                 type  git
                 url   git+https://github.com/monsterkodi/ko.git
@@ -24,27 +25,6 @@ maintainers
                   email   monsterkodi@gmx.net
 bugs
                 url  https://github.com/monsterkodi/ko/issues
-build
-                appId         net.monsterkodi.ko
-                asar          false
-                productName   ko
-                mac
-                  category  public.app-category.utilities
-                dmg
-                  contents
-                    .
-                      x     100
-                      y     180
-                      type  link
-                      path  /Applications
-                    .
-                      x     100
-                      y     70
-                      type  file
-devDependencies
-                electron-builder  ^14.5.3
-                electron-prebuilt  ^1.4.13
-                electron-rebuild  ^1.5.7
 dependencies
                 ansi-keycode    0.0.0
                 chokidar        ^1.6.1
@@ -70,3 +50,8 @@ dependencies
                 underscore.string  ^3.3.4
                 walkdir         0.0.11
                 write-file-atomic  ^1.3.1
+devDependencies
+                appdmg          ^0.4.5
+                electron        ^1.6.2
+                electron-packager  ^8.5.2
+                electron-rebuild  ^1.5.7

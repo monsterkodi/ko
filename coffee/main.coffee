@@ -95,6 +95,15 @@ if args.prefs
 
 mostRecentFile = -> first prefs.get 'recentFiles'
 
+splitFilePos = (file) ->
+    split = file.split ':'
+    line = parseInt split[1] if split.length > 1
+    clmn = parseInt split[2] if split.length > 2
+    pos = [0, 0]
+    pos[0] = clmn     if Number.isInteger clmn
+    pos[1] = line - 1 if Number.isInteger line
+    [split[0], pos]
+
 # 000   000  000  000   000   0000000
 # 000 0 000  000  0000  000  000     
 # 000000000  000  000 0 000  0000000 
@@ -192,14 +201,14 @@ class Main
                                 
         electron.globalShortcut.register prefs.get('shortcut'), @toggleWindows
             
-        @restoreWindows() if not args.noprefs and not openFiles.length
-        
         if not openFiles.length and args.filelist.length
             openFiles = fileList args.filelist
             
         if openFiles.length
             for file in openFiles
                 @createWindow file            
+        else
+            @restoreWindows() if not args.noprefs
 
         if not wins().length
             if args.show
@@ -291,9 +300,11 @@ class Main
         w.focus()
 
     activateWindowWithFile: (file) =>
+        [file, pos] = splitFilePos file
         for w in wins()
             if w.currentFile == file
                 @activateWindowWithID w.id
+                w.webContents.send 'singleCursorAtPos', pos if pos?
                 return w.id
         null
 
@@ -432,9 +443,9 @@ class Main
     # 000       000   000  000       000   000     000     000     
     #  0000000  000   000  00000000  000   000     000     00000000
        
-    newWindowWithFile: (file, pos) -> @createWindow(file, pos).id
+    newWindowWithFile: (file) -> @createWindow(file).id
             
-    createWindow: (openFile, pos) ->
+    createWindow: (openFile) ->
         
         {width, height} = @screenSize()
         ww = height + 122
@@ -465,7 +476,6 @@ class Main
             if openFile?
                 win.currentFile = openFile
                 win.webContents.send 'loadFile', openFile
-                win.webContents.send 'singleCursorAtPos', pos if pos?
                 openFile = null
                 win.showInactive()
                 win.focus()
@@ -526,13 +536,15 @@ class Main
     otherInstanceStarted: (args, dir) =>
         if not visibleWins().length
             @toggleWindows()
-            
+
         for arg in args.slice(2)
             continue if arg.startsWith '-'
             file = arg
             if not arg.startsWith '/'
-                file = resolve dir + '/' + arg
-            continue if not fileExists file
+                file = path.join resolve(dir), arg
+            [fpath, pos] = splitFilePos file
+            if not fileExists fpath
+                continue
             w = @activateWindowWithFile file
             w = @createWindow file if not w?
             

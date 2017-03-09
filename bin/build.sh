@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
+cd `dirname $0`/..
 
-rm -rf dist app/js app/img app/css app/bin app/syntax app/*.html app/node_modules
-cp -r js css img bin syntax *.html app
-cp build/snap.svg.js js
-cp build/snap.svg.js app/js
-cp coffee/area/voronoi/voronoinet.js js/area/voronoi
-cp coffee/area/voronoi/voronoinet.js app/js/area/voronoi
-cd app && npm install
-cd ..
+killall ko
+konrad --run
+
+node_modules/.bin/electron-rebuild
+node_modules/electron-packager/cli.js . --overwrite --icon=img/ko.icns
+
+rm ko-darwin-x64/LICENSE*
+rm ko-darwin-x64/version
+
+open ko-darwin-x64/ko.app
