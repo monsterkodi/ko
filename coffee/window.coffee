@@ -8,6 +8,7 @@ last,
 sw,sh,$,
 fileList,
 fileExists,
+splitFilePos,
 del,clamp,
 resolve}    = require './tools/tools'
 Split       = require './split'
@@ -160,7 +161,7 @@ reloadFile = =>
 
 loadFile = (file, opt={}) =>
     return if not file? or not file.length
-    [file,line,column] = file.split ':'
+    [file,pos] = splitFilePos file
     if file != editor.currentFile or opt?.reload
         if not fileExists file
             log "[WARNING] window.loadFile -- no such file:", file
@@ -187,8 +188,8 @@ loadFile = (file, opt={}) =>
     
     window.split.reveal 'editor'
         
-    if line?
-        editor.singleCursorAtPos [column? and parseInt(column) or 0, parseInt(line)-1] 
+    if pos != [0,0]
+        editor.singleCursorAtPos pos
         editor.scrollCursorToTop()        
   
 openFile = loadFile  

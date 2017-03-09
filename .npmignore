@@ -1,8 +1,8 @@
 node_modules
 .git
-app
-dist
-build
+.gitignore
+.konrad.noon
+ko-darwin-x64
 coffee
 syntax
 test
@@ -11,4 +11,7 @@ pug
 css
 js
 md
-package.noonimg/*.pxm
+package.noon
+*.html
+*.dmg
+img/*.pxm

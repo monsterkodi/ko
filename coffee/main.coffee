@@ -7,6 +7,7 @@
 first,
 fileList,
 dirExists,
+splitFilePos,
 fileExists,
 resolve}      = require './tools/tools'
 prefs         = require './tools/prefs'
@@ -94,15 +95,6 @@ if args.prefs
         log noon.stringify noon.load(prefs.path), colors:true
 
 mostRecentFile = -> first prefs.get 'recentFiles'
-
-splitFilePos = (file) ->
-    split = file.split ':'
-    line = parseInt split[1] if split.length > 1
-    clmn = parseInt split[2] if split.length > 2
-    pos = [0, 0]
-    pos[0] = clmn     if Number.isInteger clmn
-    pos[1] = line - 1 if Number.isInteger line
-    [split[0], pos]
 
 # 000   000  000  000   000   0000000
 # 000 0 000  000  0000  000  000     
@@ -297,7 +289,8 @@ class Main
         return if not w?
         if not w.isVisible() 
             w.show()
-        w.focus()
+        else
+            w.focus()
 
     activateWindowWithFile: (file) =>
         [file, pos] = splitFilePos file
@@ -474,10 +467,10 @@ class Main
                         
         winLoaded = =>
             if openFile?
-                win.currentFile = openFile
+                win.currentFile = splitFilePos(openFile)[0]
                 win.webContents.send 'loadFile', openFile
                 openFile = null
-                win.showInactive()
+                win.show()
                 win.focus()
             else
                 file = prefs.get "windows:#{win.id}:file"
@@ -537,6 +530,9 @@ class Main
         if not visibleWins().length
             @toggleWindows()
 
+        if !activeWin()
+            visibleWins()[0]?.focus()
+
         for arg in args.slice(2)
             continue if arg.startsWith '-'
             file = arg
@@ -547,10 +543,7 @@ class Main
                 continue
             w = @activateWindowWithFile file
             w = @createWindow file if not w?
-            
-        if !activeWin()
-            visibleWins()[0]?.focus()
-        
+                    
     quit: => 
         prefs.save (ok) =>
             app.exit 0

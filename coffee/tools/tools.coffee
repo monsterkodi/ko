@@ -131,7 +131,16 @@ module.exports =
         r
         
     swapExt: (p, ext) -> path.join(path.dirname(p), path.basename(p, path.extname(p))) + ext
-            
+
+    splitFilePos: (file) -> # file.txt:22:33 --> ['file.txt', [33, 22]]
+        split = file.split ':'
+        line = parseInt split[1] if split.length > 1
+        clmn = parseInt split[2] if split.length > 2
+        pos = [0, 0]
+        pos[0] = clmn     if Number.isInteger clmn
+        pos[1] = line - 1 if Number.isInteger line
+        [split[0], pos]
+                    
     #  0000000   0000000   0000000
     # 000       000       000     
     # 000       0000000   0000000 
