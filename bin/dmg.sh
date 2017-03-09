@@ -2,8 +2,10 @@
 cd `dirname $0`/..
 
 npm rebuild
-rm ko.dmg
+rm -f ko-*.dmg
 
-./node_modules/.bin/appdmg ./bin/dmg.json ko.dmg
+VERSION=`sds -rp version`
 
-open ko.dmg
+./node_modules/.bin/appdmg ./bin/dmg.json ko-$VERSION.dmg
+
+open ko-$VERSION.dmg

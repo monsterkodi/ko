@@ -1,6 +1,6 @@
 title  ko
 icon   ../img/ko.icns
-background  ../img/background.png
+background  background.png
 contents
     .
         x   100

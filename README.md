@@ -1,5 +1,5 @@
-![ko](img/banner.png)
-![readme](img/readme.png)
+![ko](md/banner.png)
+![readme](md/readme.png)
 <!---
 #   00000000  00000000   0000000   000000000  000   000  00000000   00000000   0000000
 #   000       000       000   000     000     000   000  000   000  000       000     
@@ -85,7 +85,7 @@ each mode keeps it's own history
 
 clicking on the command name lists all modes and their shortcuts:
     
-![commandline](img/commandline.png)
+![commandline](md/commandline.png)
 
 while the commandline has focus:
 - **^up|down** move command input up|down
@@ -117,7 +117,7 @@ the list content depends on the file currently opened in the editor
 - files in surrounding project directories are included
 - switching projects is simple: just open a file in the new project
 
-![open](img/open.png)
+![open](md/open.png)
 
 <!---
 #   00000000  000  000   000  0000000  
@@ -165,7 +165,7 @@ editing search result lines will ...
 - this is a very powerful feature but not tested thoroughly yet and probably not working correctly in all cases!
 - use at your own risk! backup your files!
 
-![search](img/search.png)
+![search](md/search.png)
 
 <!---
 #    0000000    0000000   000000000   0000000 
@@ -180,7 +180,7 @@ editing search result lines will ...
 - **positive number** jump to line
 - **negative number** jump to line relative to end of file
 
-![goto](img/goto.png)
+![goto](md/goto.png)
 
 in editor:
 - **⌥enter** goto word under main cursor
@@ -225,7 +225,7 @@ classes, funcs, files and words results can be filtered by adding arguments
 all other commands are passed to a child process running bash
 - only works for commands that terminate!
 
-![terminal](img/terminal.png)
+![terminal](md/terminal.png)
 
 <!---
 #    0000000   0000000   00000000  00000000  00000000  00000000
@@ -245,7 +245,7 @@ evaluates coffee-script code in the main process and prints results in terminal
 - the commandline input is nice to do quick math calculations or other single line tasks
 - you can evaluate complex code too, just press **^enter** in the editor to evaluate its whole text
 
-![coffee](img/coffee.png)
+![coffee](md/coffee.png)
 
 shortcuts
 - **⌘.** to activate coffee input
@@ -268,7 +268,7 @@ three examples are included:
 - **voronoi** interactive voronoi mesh rendered with snap.svg and gorhill/Javascript-Voronoi
 - **3d** renders and animates a cube with three.js
 
-![build](img/build.png)
+![build](md/build.png)
 
 <!---
 #   00     00   0000000    0000000  00000000    0000000 
@@ -307,7 +307,7 @@ coffee-script macros
 - **⌘** while dragging to turn off cursor placement
 - **⇧** while dragging/clicking to select lines
 
-![minimap](img/minimap.png)
+![minimap](md/minimap.png)
 
 <!---
 #   00     00  000   000  000      000000000  000   0000000  000   000  00000000    0000000   0000000   00000000    0000000
@@ -329,7 +329,7 @@ ko differs a bit from common implementations of multicursors:
     - the orange/yellow position shows where text will be inserted
     - missing spaces are added automatically in multicursor mode
 
-![cursors](img/cursors.png)
+![cursors](md/cursors.png)
 
 shortcuts:
 - **⌘click**               add or remove single cursor
@@ -344,7 +344,7 @@ shortcuts:
 
 matching brackets and string borders are highlighted automatically for the main cursor:
 
-![matching](img/matching.png)
+![matching](md/matching.png)
 
 shortcuts:
 - **⌘G** jumps to the closing bracket or the end of the string
@@ -364,7 +364,7 @@ the ascii-header mode lets you insert or edit ascii-headers
 - **⌘3** activates the ascii-header mode
     - if the cursor is not in a header already, one will be generated for the word at the main cursor
     
-![salt](img/salt.png)
+![salt](md/salt.png)
 
 in ascii-header mode ...
 - cursors are green
@@ -407,7 +407,7 @@ shortcuts:
 ## info
 at the right end of the commandline (above the editor minimap) some useful numbers are displayed:
 
-![info](img/info.png)
+![info](md/info.png)
 - top row:
     - cursor column
     - [cursors]
