@@ -146,10 +146,10 @@ class Editor extends Buffer
         
         @surroundCharacters = "{}[]()\"'".split ''
         switch @fileType
-            when 'html'   then @surroundCharacters = @surroundCharacters.concat '<>'.split ''
-            when 'coffee' then @surroundCharacters = @surroundCharacters.concat '#'.split ''
+            when 'html'   then @surroundCharacters = @surroundCharacters.concat ['<','>']
+            when 'coffee' then @surroundCharacters.push '#'
             when 'md'     
-                @surroundCharacters = @surroundCharacters.concat '*<'.split ''
+                @surroundCharacters = @surroundCharacters.concat ['*','<']
                 @surroundPairs['<'] = ['<!---', '--->']
             
         # _______________________________________________________________ indent
@@ -1310,7 +1310,9 @@ class Editor extends Buffer
     # 0000000    0000000   000   000  000   000   0000000    0000000   000   000  0000000  
         
     isUnbalancedSurroundCharacter: (ch) ->
+        return false if ch in ["#"]
         [cl,cr] = @surroundPairs[ch]
+        return false if cl.length > 1
         for cursor in @cursors
             count = 0
             for c in @lines[cursor[1]]
@@ -1318,12 +1320,15 @@ class Editor extends Buffer
                     count += 1
                 else if c == cr
                     count -= 1
-            return true if ((cl == cr) and (count % 2)) or ((cl != cr) and count)
+            if ((cl == cr) and (count % 2)) or ((cl != cr) and count)
+                log "isUnbalancedSurroundCharacter #{ch}"
+                return true
         return false
         
-    insertSurroundCharacter: (ch) ->        
+    insertSurroundCharacter: (ch) ->
 
-        return false if @isUnbalancedSurroundCharacter ch
+        if @isUnbalancedSurroundCharacter ch
+            return false 
         
         if @surroundStack.length
             if last(@surroundStack)[1] == ch
@@ -1337,6 +1342,7 @@ class Editor extends Buffer
                     @deleteForward()
                     @do.end()
                     @surroundStack.pop()
+                    log 'insertSurroundCharacter @surroundStack.pop() false'
                     return false
         
         if ch == '#' and @fileType == 'coffee' # check if any cursor or selection is inside a string
@@ -1351,6 +1357,7 @@ class Editor extends Buffer
                     if @isRangeInString @rangeForPos c
                         found = true
                         break
+            log 'insertSurroundCharacter cursor or selection NOT in string' if not found
             return false if not found
             
         if ch == "'" and not @selections.length # check if any alpabetical character is before any cursor
