@@ -313,11 +313,7 @@ class Main
         for w in wins()
             @closeWindow w
         hideDock()
-            
-    closeWindowsAndQuit: => 
-        @closeWindows()
-        @quit()
-      
+                  
     #  0000000  000000000   0000000    0000000  000   000
     # 000          000     000   000  000       000  000 
     # 0000000      000     000000000  000       0000000  
@@ -547,7 +543,7 @@ class Main
                     
     quit: => 
         prefs.save (ok) =>
-            app.exit 0
+            app.exit     0
             process.exit 0
     
     #  0000000   000      000   0000000    0000000
@@ -576,13 +572,14 @@ class Main
         w = new BrowserWindow
             dir:             cwd
             preloadWindow:   true
-            resizable:       true
-            frame:           true
-            show:            true
+            resizable:       false
+            frame:           false
+            show:            false
             center:          true
-            backgroundColor: '#333'            
+            backgroundColor: '#222'            
             width:           400
-            height:          420
+            height:          400
+        w.on 'ready-to-show', -> w.show()
         w.loadURL "file://#{cwd}/../about.html"
         w.on 'openFileDialog', @createWindow
 

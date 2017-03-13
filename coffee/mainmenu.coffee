@@ -54,7 +54,7 @@ class MainMenu
             ,
                 label:       "Hide #{pkg.productName}"
                 accelerator: 'Command+H'
-                click:       main.hideWindows
+                role:        'hideothers'
             ,
                 label:       'Hide Others'
                 accelerator: 'Command+Alt+H'
@@ -65,10 +65,6 @@ class MainMenu
                 label:       'Quit'
                 accelerator: 'Command+Q'
                 click:       main.quit
-            ,
-                label:       'Close All Windows And Quit'
-                accelerator: 'Command+Alt+Q'
-                click:       main.closeWindowsAndQuit
             ]
         ,
             # 00000000  000  000      00000000
