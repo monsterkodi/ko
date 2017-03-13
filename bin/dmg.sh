@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 cd `dirname $0`/..
 
-npm rebuild
-rm -f ko-*.dmg
-
+NAME=`sds -rp productName`
 VERSION=`sds -rp version`
 
-./node_modules/.bin/appdmg ./bin/dmg.json ko-$VERSION.dmg
+npm rebuild
+rm -f $NAME-*.dmg
 
-open ko-$VERSION.dmg
+./node_modules/.bin/appdmg ./bin/dmg.json $NAME-$VERSION.dmg
+
+open $NAME-$VERSION.dmg
