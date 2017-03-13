@@ -1321,7 +1321,6 @@ class Editor extends Buffer
                 else if c == cr
                     count -= 1
             if ((cl == cr) and (count % 2)) or ((cl != cr) and count)
-                log "isUnbalancedSurroundCharacter #{ch}"
                 return true
         return false
         
@@ -1342,7 +1341,6 @@ class Editor extends Buffer
                     @deleteForward()
                     @do.end()
                     @surroundStack.pop()
-                    log 'insertSurroundCharacter @surroundStack.pop() false'
                     return false
         
         if ch == '#' and @fileType == 'coffee' # check if any cursor or selection is inside a string
@@ -1357,7 +1355,6 @@ class Editor extends Buffer
                     if @isRangeInString @rangeForPos c
                         found = true
                         break
-            log 'insertSurroundCharacter cursor or selection NOT in string' if not found
             return false if not found
             
         if ch == "'" and not @selections.length # check if any alpabetical character is before any cursor
