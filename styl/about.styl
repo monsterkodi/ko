@@ -4,30 +4,12 @@
 // 000   000  000   000  000   000  000   000     000   
 // 000   000  0000000     0000000    0000000      000   
 
-clr                  = {} 
-clr.black            = #000000
-clr.gray-most-dark   = #181818
-clr.gray-dark        = #333
-clr.gray-medium      = #666666
-clr.gray             = #888888
-clr.white            = #ffffff
-clr.yellow           = #ffff00
-clr.orange           = #ff8800
-clr.red              = #ff0000
-clr.green            = #00aa00
-clr.blue-medium      = #6666ff
-clr.blue-bright      = #8888ff
-clr.blue-very-bright = #aaaaff
-
-clr.background       = clr.gray-dark
-
 body
     font-family         Verdana
-    background-color:   clr.background
-    color:              clr.white
+    background-color    #222
     
 ::selection
-    color:              clr.yellow
+    color               #ff0
 
 body
     margin              0px
@@ -35,9 +17,8 @@ body
     
 a
     text-decoration     none
-    color:              clr.blue-medium
     &:hover  
-        color:          clr.orange
+        color           #f80
                 
 #stage
     position            absolute
@@ -51,14 +32,9 @@ a
     margin-bottom       10px
     padding-left        30px
     cursor              pointer
-
-#name
-    font-weight         bold
-    font-size           60px
-    display             none
     
 #version
-    font-size           20px
-    color:              clr.gray-medium
+    font-size           14px
+    color               #333
     &:hover 
-        color:          clr.blue-medium
+        color           #66f

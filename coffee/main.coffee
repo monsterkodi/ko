@@ -69,6 +69,7 @@ version  #{pkg.version}
 
 app.exit 0 if not args?
 
+process.chdir resolve '~'
 while args.filelist.length and dirExists first args.filelist
     process.chdir args.filelist.shift()
     
