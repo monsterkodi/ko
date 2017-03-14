@@ -1,21 +1,17 @@
 #!/usr/bin/env bash
 cd `dirname $0`/..
 
-killall ko
-rm -f ko-*.dmg
+NAME=`sds productName`
+
+2>/dev/null 1>/dev/null killall $NAME
+2>/dev/null 1>/dev/null killall $NAME
+
 konrad --run
-
 node_modules/.bin/electron-rebuild
-node_modules/electron-packager/cli.js . --overwrite --icon=img/ko.icns
 
-rm -f ko-darwin-x64/LICENSE*
-rm -f ko-darwin-x64/version
-rm -rf ko-darwin-x64/ko.app/Contents/Resources/app/bin
-rm -rf ko-darwin-x64/ko.app/Contents/Resources/app/coffee
-rm -rf ko-darwin-x64/ko.app/Contents/Resources/app/md
-rm -rf ko-darwin-x64/ko.app/Contents/Resources/app/pug
-rm -rf ko-darwin-x64/ko.app/Contents/Resources/app/styl
-rm -f  ko-darwin-x64/ko.app/Contents/Resources/app/package.noon
-rm -f  ko-darwin-x64/ko.app/Contents/Resources/app/README.md
+IGNORE="/(.*\.dmg$|Icon$|coffee$|.*md$|pug$|styl$|package\.noon$|.*\.lock$|three/examples)"
+node_modules/electron-packager/cli.js . --overwrite --icon=img/$NAME.icns --ignore $IGNORE
 
-# open ko-darwin-x64/ko.app
+rm $NAME-darwin-x64/LICENSE*
+rm $NAME-darwin-x64/version
+
