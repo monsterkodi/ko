@@ -18,4 +18,4 @@ rm -rf ko-darwin-x64/ko.app/Contents/Resources/app/styl
 rm -f  ko-darwin-x64/ko.app/Contents/Resources/app/package.noon
 rm -f  ko-darwin-x64/ko.app/Contents/Resources/app/README.md
 
-open ko-darwin-x64/ko.app
+# open ko-darwin-x64/ko.app

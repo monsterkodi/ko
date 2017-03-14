@@ -54,7 +54,7 @@ class MainMenu
             ,
                 label:       "Hide #{pkg.productName}"
                 accelerator: 'Command+H'
-                role:        'hideothers'
+                role:        'hide'
             ,
                 label:       'Hide Others'
                 accelerator: 'Command+Alt+H'

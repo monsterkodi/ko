@@ -48,8 +48,6 @@ process.env.NODE_ENV = 'production'
 # 000   000  000   000  000   000       000
 # 000   000  000   000   0000000   0000000 
 
-# childp.execSync "syslog -s -l error \"argv: #{process.argv.join ' '}\""
-
 args  = require('karg') """
 
 #{pkg.productName}
@@ -69,7 +67,8 @@ version  #{pkg.version}
 
 app.exit 0 if not args?
 
-process.chdir resolve '~'
+if process.cwd() == '/'
+    process.chdir resolve '~'
 while args.filelist.length and dirExists first args.filelist
     process.chdir args.filelist.shift()
     
