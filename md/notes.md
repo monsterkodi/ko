@@ -1,7 +1,8 @@
 # todo/ideas
 
+- handle unsaved changes somehow when closing windows
+- fix restore cursor pos
 - fix commandlist switching sides when other side is smaller
-- fix /find/ starting with ^
 - limit size of range for bracket matching 
 - term: auto cd to pkg dir when file loaded?
 - list project|pkg dirs?

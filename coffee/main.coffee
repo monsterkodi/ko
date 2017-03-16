@@ -582,6 +582,25 @@ class Main
         w.loadURL "file://#{cwd}/../about.html"
         w.on 'openFileDialog', @createWindow
 
+    # 00000000   000   000  000      00000000  00000000   
+    # 000   000  000   000  000      000       000   000  
+    # 0000000    000   000  000      0000000   0000000    
+    # 000   000  000   000  000      000       000   000  
+    # 000   000   0000000   0000000  00000000  000   000  
+    
+    showRuler: =>    
+        w = new BrowserWindow
+            preloadWindow:   true
+            resizable:       true
+            frame:           false
+            show:            false
+            center:          true
+            backgroundColor: '#222'            
+            width:           600
+            height:          60
+        w.loadURL "file://#{__dirname}/../ruler.html"
+        w.on 'ready-to-show', -> w.show()
+
     log: -> log (str(s) for s in [].slice.call arguments, 0).join " " if args.verbose
     dbg: -> log (str(s) for s in [].slice.call arguments, 0).join " " if args.debug
             

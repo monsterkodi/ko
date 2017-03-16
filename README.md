@@ -16,7 +16,7 @@
     - includes many shortcuts and advanced editing features
 
 **commandline**
-- a single, non-intrusive input field to ...
+- a single input field to ...
     - navigate the file system and open files quickly
     - find in text and search in files
     - input terminal-, script- and macro-commands
@@ -40,10 +40,10 @@
 
 **minimap**
 - shows cursors, highlights and selections
-- also for terminal-, search- and script-results!
+- the terminal has a minimap, too
 - can be used to select large portions of text
 - sets cursor by default when dragging/clicking
-- includes a special mode to insert or edit ascii-headers that show up nicely in the minimap
+- easy to insert ascii-headers that show up nicely in the minimap
 
 **autocomplete**
 - completes words from visited files and project files
@@ -324,7 +324,7 @@ ko differs a bit from common implementations of multicursors:
     - main cursor can be moved independently from other cursors
 - in most cases cursors are kept in their respective lines
     - no weird cursor chaos when some cursors cross line boundaries and some don't
-- in ko, cursors can be positioned after the end of lines
+- cursors can be positioned after the end of lines
     - cursors after the end of line have two representations: blue and orange/yellow
     - the orange/yellow position shows where text will be inserted
     - missing spaces are added automatically in multicursor mode

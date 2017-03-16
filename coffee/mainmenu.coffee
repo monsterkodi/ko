@@ -50,6 +50,10 @@ class MainMenu
                 label:       "About #{pkg.productName}"
                 click:        main.showAbout
             ,
+                label:       "Show Ruler"
+                click:        main.showRuler
+                accelerator: 'Alt+R'
+            ,
                 type: 'separator'
             ,
                 label:       "Hide #{pkg.productName}"

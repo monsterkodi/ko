@@ -27,7 +27,7 @@ class View extends ViewBase
         @fontSizeDefault = 16
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Autocomplete', 'Brackets', 'Strings']        
         # @scroll.dbg = true
-        @do.dbg = true
+        # @do.dbg = true
         @setText ''
                     
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
@@ -49,8 +49,8 @@ class View extends ViewBase
     # 000       000  0000000  00000000
 
     setCurrentFile: (file, opt) ->
-        
-        @saveScrollCursorsAndSelections opt if not file and not opt?.noSaveScroll
+        log "setCurrentFile #{file}", opt
+        @saveScrollCursorsAndSelections(opt) if not file and not opt?.noSaveScroll
         @dirty = false
         @syntax.name = 'txt'
         if file?

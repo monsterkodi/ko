@@ -35,6 +35,25 @@ fill-abs()
 
 pre 
     margin              0
+
+// 0000000     0000000   0000000    000   000
+// 000   000  000   000  000   000   000 000 
+// 0000000    000   000  000   000    00000  
+// 000   000  000   000  000   000     000   
+// 0000000     0000000   0000000       000   
+
+*
+    outline-width       0
+    
+body
+    fill-abs()
+    margin              0
+    background          #000
+    color               #fff
+    overflow            hidden
+    font-family         font
+    -webkit-user-select none
+    -webkit-app-region  no-drag
     
 //  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
 // 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
@@ -104,7 +123,6 @@ span.ko
     background          #000
     font-family         font
     fill-abs()
-    // right               minimapWidth
     overflow-x          auto
     overflow-y          hidden
 
@@ -118,8 +136,6 @@ span.ko
     position            absolute
     left                0
     overflow            hidden
-    // overflow-x          hidden
-    // overflow-y          auto
     width               500px
     background          #1a1a1a
 
@@ -319,25 +335,6 @@ infoPadding = 6px
         background  #55b
         color       #ff0
 
-// 0000000     0000000   0000000    000   000
-// 000   000  000   000  000   000   000 000 
-// 0000000    000   000  000   000    00000  
-// 000   000  000   000  000   000     000   
-// 0000000     0000000   0000000       000   
-
-*
-    outline-width       0
-    
-body
-    fill-abs()
-    margin              0
-    background          #000
-    color               #fff
-    overflow            hidden
-    font-family         font
-    -webkit-user-select none
-    -webkit-app-region  no-drag
-    
 // 000000000  000  000000000  000      00000000  0000000     0000000   00000000 
 //    000     000     000     000      000       000   000  000   000  000   000
 //    000     000     000     000      0000000   0000000    000000000  0000000  
@@ -398,13 +395,6 @@ body
 .titlebar .dot.dirty
     color               #aaf
 
-// .titlebar .separator
-//    opacity             1
-//    background          frameColor
-//    height              100%
-//    width               2px
-//    display             inline-block
-        
 //  0000000   0000000  00000000    0000000   000      000      0000000     0000000   00000000 
 // 000       000       000   000  000   000  000      000      000   000  000   000  000   000
 // 0000000   000       0000000    000   000  000      000      0000000    000000000  0000000  
@@ -477,7 +467,6 @@ body
 .log
     bottom              0
 
-
 //  0000000   00000000   00000000   0000000 
 // 000   000  000   000  000       000   000
 // 000000000  0000000    0000000   000000000
@@ -489,7 +478,6 @@ body
     overflow            hidden
     background          #181818
     pointer-events      auto
-    // border              1px solid red
 
 // 00000000  0000000    000  000000000   0000000   00000000 
 // 000       000   000  000     000     000   000  000   000

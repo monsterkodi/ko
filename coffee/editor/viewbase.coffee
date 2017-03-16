@@ -127,9 +127,7 @@ class ViewBase extends Editor
         if @scroll.viewHeight != @viewHeight()
             @scroll.setViewHeight @viewHeight()
             @emit 'viewHeight', @viewHeight()
-        # log "viewbase.setLines #{@lines.length}" if @name == 'editor'
         @scroll.setNumLines @lines.length
-        # log "viewbase.setLines #{@lines.length} #{@scroll.exposeTop} #{@scroll.exposeBot}" if @name == 'editor'
         @layers.scrollLeft = 0
         @layersWidth  = @layers.offsetWidth
         @layersHeight = @layers.offsetHeight
@@ -177,7 +175,11 @@ class ViewBase extends Editor
     # 000       000       000  0000     000     000       000   000
     #  0000000  00000000  000   000     000     00000000  000   000
     
-    centerText: (center) ->
+    centerText: (center, animate=300) ->
+
+        @size.centerText = center
+        @updateLayers()
+        
         if center
             @size.offsetX = Math.floor @size.charWidth/2 + @size.numbersWidth
             @size.offsetX = Math.max @size.offsetX, (@screenSize().width - @screenSize().height) / 2 
@@ -185,8 +187,30 @@ class ViewBase extends Editor
         else
             @size.offsetX = Math.floor @size.charWidth/2 + @size.numbersWidth
             @size.centerText = false
-        @updateLinePositions()
-        @updateLayers()
+            
+        @updateLinePositions animate
+
+        if animate
+            layers = ['.selections', '.highlights', '.cursors']
+            transi = ['.selection',  '.highlight',  '.cursor' ].concat layers
+            resetTrans = =>
+                setStyle '.editor .layers '+l, 'transform', "translateX(0)" for l in layers
+                setStyle '.editor .layers '+t, 'transition', "initial" for t in transi
+                @updateLayers()
+            
+            if center
+                offsetX = @size.offsetX - @size.numbersWidth - @size.charWidth/2
+            else
+                offsetX = Math.floor @size.charWidth/2 + @size.numbersWidth
+                offsetX = Math.max offsetX, (@screenSize().width - @screenSize().height) / 2 
+                offsetX -= @size.numbersWidth + @size.charWidth/2
+                offsetX *= -1
+                
+            setStyle '.editor .layers '+l, 'transform', "translateX(#{offsetX}px)" for l in layers
+            setStyle '.editor .layers '+t, 'transition', "all #{animate/1000}s" for t in transi
+            setTimeout resetTrans, animate
+        else
+            @updateLayers()
     
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000
@@ -328,11 +352,18 @@ class ViewBase extends Editor
     # 000   000  000        000   000  000   000     000     000     
     #  0000000   000        0000000    000   000     000     00000000
 
-    updateLinePositions: () ->
+    updateLinePositions: (animate=0) ->
         y = 0
         for c in @elem.children
             c.style.transform = "translate(#{@size.offsetX}px,#{y}px)"
+            c.style.transition = "all #{animate/1000}s" if animate
             y += @size.lineHeight
+            
+        if animate
+            resetTrans = =>
+                for c in @elem.children
+                    c.style.transition = 'initial'                            
+            setTimeout resetTrans, animate
                 
     updateLines: () ->
         for li in [@scroll.exposeTop..@scroll.exposeBot]
@@ -457,13 +488,11 @@ class ViewBase extends Editor
     scrollLines: (delta) -> @scrollBy delta * @size.lineHeight
 
     scrollBy: (delta, x=0) ->        
-        # log "scrollBy #{delta}" if @name == 'editor'
         @scroll.by delta if delta
         @layers.scrollLeft += x/2 if x
         @updateScrollOffset()
         
     scrollTo: (p) ->
-        # log "scrollTo #{p}" if @name == 'editor'
         @scroll.to p
         @updateScrollOffset()
 

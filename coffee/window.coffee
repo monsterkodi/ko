@@ -109,7 +109,7 @@ ipc.on 'setWinID', (event, id) =>
     
     if getState 'centerText'
         screenWidth = screenSize().width
-        editor.centerText sw() == screenWidth, screenWidth
+        editor.centerText sw() == screenWidth, 0
         
     fps.toggle() if getState 'fps'
     
@@ -291,6 +291,7 @@ info        = window.info        = new Info editor
 
 editor.setText editorText if editorText?
 editor.view.focus()
+log 'yes'
 
 editor.on 'changed', (changeInfo, action) =>
     return if changeInfo.foreign
@@ -327,7 +328,7 @@ window.onresize = ->
     ipc.send 'saveBounds', winID if winID?
     if getState 'centerText', false
         screenWidth = screenSize().width
-        editor.centerText sw() == screenWidth, screenWidth
+        editor.centerText sw() == screenWidth, 0
 
 window.onload = => 
     info.reload()

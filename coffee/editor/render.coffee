@@ -117,7 +117,7 @@ class Render
         tx = size.charWidth *  sel[1][0] + size.offsetX
         ty = size.lineHeight * sel[0]
         lh = size.lineHeight
-        # log 'clss', clss
+
         if clss.startsWith 'stringmatch'
             lh /= 2 if clss.endsWith 'single'
             lh /= 2 if clss.endsWith 'double'

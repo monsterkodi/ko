@@ -49,13 +49,13 @@ class Split extends event
             target: @topHandle
             cursor: 'ns-resize'
             onStop: (drag) => @snap()
-            onMove: (drag) => @splitAt 0, drag.pos.y - @elemTop() - @handleHeight/2
+            onMove: (drag) => @splitAt 0, drag.pos.y - @elemTop() - @handleHeight/2, animate:0
         
         @dragBot = new drag
             target: @editHandle
             cursor: 'ns-resize'
             onStop: (drag) => @snap()
-            onMove: (drag) => @splitAt 1, drag.pos.y - @elemTop() - @handleHeight/2
+            onMove: (drag) => @splitAt 1, drag.pos.y - @elemTop() - @handleHeight/2, animate:0
             
         @dragLog = new drag
             target: @logHandle
@@ -63,10 +63,10 @@ class Split extends event
             onStop: (drag) => @snap()
             onMove: (drag) => 
                 if @splitPosY(2)-@splitPosY(1) < 10
-                    @splitAt 1, drag.pos.y - @elemTop() - @handleHeight/2
-                    @splitAt 2, drag.pos.y - @elemTop() - @handleHeight/2
+                    @splitAt 1, drag.pos.y - @elemTop() - @handleHeight/2, animate:0
+                    @splitAt 2, drag.pos.y - @elemTop() - @handleHeight/2, animate:0
                 else
-                    @splitAt 2, drag.pos.y - @elemTop() - @handleHeight/2
+                    @splitAt 2, drag.pos.y - @elemTop() - @handleHeight/2, animate:0
 
     setWinID: (@winID) ->
         s = @getState 'split', [-@handleHeight,0,@elemHeight()]        
@@ -82,7 +82,7 @@ class Split extends event
     #      000  000        000      000     000   
     # 0000000   000        0000000  000     000   
     
-    splitAt: (i, y) -> 
+    splitAt: (i, y, opt) -> 
         s = []
         for h in [0...@handles.length]
             if h == i
@@ -93,7 +93,7 @@ class Split extends event
         if i == 0 then s[1] = s[0] + @commandlineHeight + @handleHeight
         if i == 1 then s[0] = s[1] - @commandlineHeight - @handleHeight
                 
-        @applySplit s
+        @applySplit s, opt ? animate:300
     
     #  0000000   00000000   00000000   000      000   000
     # 000   000  000   000  000   000  000       000 000 
@@ -101,7 +101,19 @@ class Split extends event
     # 000   000  000        000        000         000   
     # 000   000  000        000        0000000     000   
         
-    applySplit: (s) ->
+    applySplit: (s, opt) ->
+        
+        if opt?.animate
+            emitSplit = => 
+                @emit 'split', s
+                @emitSplitFrame = window.requestAnimationFrame emitSplit
+            @emitSplitFrame = window.requestAnimationFrame emitSplit
+            resetTrans = => 
+                p.style.transition = 'initial' for p in @panes
+                @emit 'split', s
+                window.cancelAnimationFrame @emitSplitFrame
+            setTimeout resetTrans, opt.animate
+        
         for i in [0...s.length]
             s[i] = clamp (i and s[i-1] or -@handleHeight), @elemHeight(), s[i]
             
@@ -118,12 +130,15 @@ class Split extends event
                 when h is s.length then @logVisible and @elemHeight()-last(s)-@handleHeight or 0
                 else s[h]-s[h-1]-@handleHeight
                     
-            @panes[h].style.height = "#{newHeight}px"
+            @panes[h].style.transition = "height #{opt.animate/1000}s" if opt?.animate
+            @panes[h].style.height = "#{newHeight}px" 
+            
             if h == 3
                 if newHeight > 0
                     @setState 'logHeight', newHeight
                 else
                     @setLogVisible false if @logVisible
+                    
         @elem.scrollTop = 0
         @setState 'split', s
         @emit     'split', s
@@ -178,7 +193,6 @@ class Split extends event
     # 0000000     0000000 
     
     do: (sentence) ->
-        # log "Split.do sentence:#{sentence}"
         sentence = sentence.trim()
         return if not sentence.length
         words = sentence.split /\s+/
@@ -203,53 +217,30 @@ class Split extends event
                     delta = - parseInt 0.25 * fh
                     
         switch what
-            when 'editor'   then return @moveCommandLineBy -delta
+            when 'editor' then return @moveCommandLineBy -delta
             when 'terminal', 'area'
                 @raise what
                 return @moveCommandLineBy delta
                 
         alert "split.do warning! unhandled do command? #{sentence}?"
         throw new Error
-        
-    # 00     00   0000000   000   000  00000000   0000000  00     00  0000000  
-    # 000   000  000   000  000   000  000       000       000   000  000   000
-    # 000000000  000   000   000 000   0000000   000       000000000  000   000
-    # 000 0 000  000   000     000     000       000       000 0 000  000   000
-    # 000   000   0000000       0      00000000   0000000  000   000  0000000  
-    
-    moveCommandLineBy: (delta) ->
-        @splitAt 0, clamp 0, @elemHeight() - @commandlineHeight - @handleHeight, delta + @splitPosY 0       
-        
-    #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
-    # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
-    # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 
-    # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
-    #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
-    
-    isCommandlineVisible: -> @splitPosY(1) > @commandlineHeight 
-    
-    hideCommandline: -> 
-        @splitAt 1, 0
-        @emit 'commandline', 'hidden'
-        
-    showCommandline: -> 
-        if 0 >= @splitPosY 1
-            @splitAt 0, 0
-            @emit 'commandline', 'shown'
-    
+
+    #  0000000  000   000   0000000   000   000  
+    # 000       000   000  000   000  000 0 000  
+    # 0000000   000000000  000   000  000000000  
+    #      000  000   000  000   000  000   000  
+    # 0000000   000   000   0000000   00     00  
+
+    reveal: (n) -> @show n    
     show: (n) ->
         switch n
-            when 'terminal', 'area'                                
-                                 @raise n
-                                 @splitAt 0, 0.5*@splitPosY 2 if @paneHeight(0) < 100
-            when 'editor'   then @splitAt 1, 0.5*@splitPosY 2 if @paneHeight(2) < 100
-            when 'command'  then @splitAt 0, 0                if @paneHeight(1) < @commandlineHeight
-            when 'logview'  then @showLog()
-            else
-                log "split.show warning! unhandled #{n}!"
+            when 'terminal', 'area' then @do "#{@paneHeight(0) < 100 and 'enlarge' or 'raise'} #{n}"
+            when 'editor'           then @splitAt 1, 0.5*@splitPosY 2 if @paneHeight(2) < 100
+            when 'command'          then @splitAt 0, 0                if @paneHeight(1) < @commandlineHeight
+            when 'logview'          then @showLog()
+            else log "split.show warning! unhandled #{n}!"
 
     raise: (n) ->
-        # log "Split.raise", n
         switch n
             when 'terminal'
                 if @panes[0] != @terminal
@@ -257,15 +248,33 @@ class Split extends event
                     @area.style.display     = 'none'
                     @terminal.style.display = 'block'
                     @panes[0] = @terminal
-                    @emit 'split', @splitPos
             when 'area'
                 if @panes[0] != @area
                     @area.style.height      = @terminal.style.height
                     @terminal.style.display = 'none'
                     @area.style.display     = 'block'
                     @panes[0] = @area
-                    @emit 'split', @splitPos
+
+    #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
+    # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
+    # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 
+    # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
+    #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
     
+    moveCommandLineBy: (delta) ->
+        @splitAt 0, clamp 0, @elemHeight() - @commandlineHeight - @handleHeight, delta + @splitPosY 0       
+        
+    isCommandlineVisible: -> @splitPosY(1) > @commandlineHeight 
+    
+    hideCommandline: -> 
+        @splitAt 1, 0, animate:0
+        @emit 'commandline', 'hidden'
+        
+    showCommandline: -> 
+        if 0 >= @splitPosY 1
+            @splitAt 0, 0, animate:0
+            @emit 'commandline', 'shown'
+
     # 000       0000000    0000000 
     # 000      000   000  000      
     # 000      000   000  000  0000
@@ -329,7 +338,6 @@ class Split extends event
             n  = n == 'commandline' and '.commandline-editor' or '.' + n
         $(n)?.focus()
             
-    reveal: (n) -> @show n
     focusAnything: ->
         return @focus '.editor'   if @editorVisible()
         return @focus '.terminal' if @terminalVisible()
