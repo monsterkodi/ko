@@ -364,17 +364,15 @@ class Term extends Command
                     char = ''
                     for func in Object.keys(funcs).sort()
                         infos = funcs[func]
-                        funcn = func
-                        funcn = "@#{func}" if infos[0].static 
-                        continue if args.length and not filterRegExp(args).test funcn
+                        continue if args.length and not filterRegExp(args).test func
                         i = 0
                         for info in infos
                             if func[0] != char
                                 char = func[0]
                                 terminal.queueMeta clss: 'salt', text: char                        
-                            classOrFile = info.class? and "● #{info.class}" or "◼ #{path.basename info.file}"
+                            classOrFile = info.class? and "#{info.static and '◆' or '●'} #{info.class}" or "◼ #{path.basename info.file}"
                             if i == 0
-                                diss = Syntax.dissForTextAndSyntax "▸ #{funcn} #{classOrFile}", 'ko'
+                                diss = Syntax.dissForTextAndSyntax "▸ #{func} #{classOrFile}", 'ko'
                             else
                                 spcs = _.padStart '', "▸ #{func}".length
                                 diss = Syntax.dissForTextAndSyntax "#{spcs} #{classOrFile}", 'ko'
@@ -407,7 +405,7 @@ class Term extends Command
                         
                         for mthd, minfo of info.methods
                             meta =
-                                diss: Syntax.dissForTextAndSyntax "    ▸ #{mthd}", 'ko'
+                                diss: Syntax.dissForTextAndSyntax "    #{minfo.static and '◆' or '▸'} #{mthd}", 'ko'
                                 href: "#{minfo.file}:#{minfo.line+1}"
                                 clss: 'termResult'
                             terminal.queueMeta meta

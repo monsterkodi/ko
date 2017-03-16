@@ -94,28 +94,34 @@ class Indexer
             else
                 log "warning! file #{p} too large? #{stat.size}. skipping indexing!"
 
-    #  0000000   0000000    0000000          00     00  00000000  000000000  000   000   0000000   0000000
-    # 000   000  000   000  000   000        000   000  000          000     000   000  000   000  000   000
-    # 000000000  000   000  000   000        000000000  0000000      000     000000000  000   000  000   000
-    # 000   000  000   000  000   000        000 0 000  000          000     000   000  000   000  000   000
-    # 000   000  0000000    0000000          000   000  00000000     000     000   000   0000000   0000000
+    #  0000000   0000000    0000000        00000000  000   000  000   000   0000000  
+    # 000   000  000   000  000   000      000       000   000  0000  000  000       
+    # 000000000  000   000  000   000      000000    000   000  000 0 000  000       
+    # 000   000  000   000  000   000      000       000   000  000  0000  000       
+    # 000   000  0000000    0000000        000        0000000   000   000   0000000  
+
+    addFuncInfo: (funcName, funcInfo) ->
+        if funcName.startsWith '@'
+            funcName = funcName.slice 1
+            funcInfo.static = true
+            
+        funcInfo.name = funcName
+        
+        funcInfos = @funcs[funcName] ? []
+        funcInfos.push funcInfo
+        @funcs[funcName] = funcInfos
+        
+        funcInfo
 
     addMethod: (className, funcName, file, li) ->
 
-        funcInfo =
+        funcInfo = @addFuncInfo funcName,
             line:  li
             file:  file
             class: className
 
-        if funcName.startsWith '@'
-            funcName = funcName.slice 1
-            funcInfo.static = true
+        _.set @classes, "#{className}.methods.#{funcInfo.name}", funcInfo
 
-        _.set @classes, "#{className}.methods.#{funcName}", funcInfo
-
-        funcInfos = @funcs[funcName] ? []
-        funcInfos.push funcInfo
-        @funcs[funcName] = funcInfos
         funcInfo
 
     # 00000000   00000000  00     00   0000000   000   000  00000000        00000000  000  000      00000000
@@ -145,7 +151,7 @@ class Indexer
         return @shiftQueue() if @files[file]?
 
         isCpp = path.extname(file) in ['.cpp', '.cc']
-        isHpp = path.extname(file) in ['.hpp', '.h']
+        isHpp = path.extname(file) in ['.hpp', '.h' ]
 
         fs.readFile file, 'utf8', (err, data) =>
             return if err?
@@ -179,7 +185,7 @@ class Indexer
                         if m?[1]?
                             funcName = m[1]
                             funcInfo = @addMethod currentClass, funcName, file, li
-                            funcStack.push [indent, funcInfo, funcName]
+                            funcStack.push [indent, funcInfo, funcInfo.name]
                             funcAdded = true
                     else
 
@@ -190,7 +196,7 @@ class Indexer
                                 className = m[1]
                                 funcName  = m[3]
                                 funcInfo = @addMethod className, funcName, file, li
-                                funcStack.push [indent, funcInfo, funcName]
+                                funcStack.push [indent, funcInfo, funcInfo.name]
                                 funcAdded = true
                                 continue
 
@@ -204,15 +210,11 @@ class Indexer
                         m = line.match Indexer.funcRegExp
                         if m?[1]?
 
-                            funcInfo =
+                            funcInfo = @addFuncInfo m[1],
                                 line: li
                                 file: file
 
-                            funcInfos = @funcs[m[1]] ? []
-                            funcInfos.push funcInfo
-                            @funcs[m[1]] = funcInfos
-
-                            funcStack.push [indent, funcInfo, m[1]]
+                            funcStack.push [indent, funcInfo, funcInfo.name]
                             funcAdded = true
 
                 words = line.split Indexer.splitRegExp
@@ -260,7 +262,7 @@ class Indexer
                         # 00000000  000  000  0000  000       000      000   000  000   000  000
                         #  00  00   000  000   000   0000000  0000000   0000000   0000000    00000000
                         
-                        when "#include"
+                        when '#include'
                             m = line.match Indexer.includeRegExp
                             if m?[1]?
                                 r = fileInfo.require ? []

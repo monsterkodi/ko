@@ -7,11 +7,9 @@
 - list project|pkg dirs?
 
 #### open
-- *automatically start konrad in pkg dir*
 - shared recent files of stacked windows?
 
 #### editing
-- *improve bracket inserting (evaluate brackets in line)*
 - select between cursors shortcut?
 - select continuous, rectangular ranges with command+shift+M 
 - remove from selection when alt/ctrl is down?
