@@ -52,7 +52,7 @@ class MainMenu
             ,
                 label:       "Show Ruler"
                 click:        main.showRuler
-                accelerator: 'Alt+R'
+                accelerator: 'Alt+E'
             ,
                 type: 'separator'
             ,

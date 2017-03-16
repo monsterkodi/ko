@@ -5,7 +5,7 @@
 //      000     000        000     000    
 // 0000000      000        000     0000000
 
-font                  = "Menlo", "Cousine", "Liberation Mono", "Andale Mono", monospace
+font = "Menlo", "Cousine", "Liberation Mono", "Andale Mono", monospace
 
 fill-abs()
     position            absolute
@@ -27,8 +27,87 @@ body
     fill-abs()
     margin              0
     background          #222
-    color               #fff
+    color               #bbb
     overflow            hidden
     font-family         font
+    font-size           10px
     -webkit-user-select none
     -webkit-app-region  drag
+    cursor              pointer      
+
+#ruler
+    fill-abs()
+    cursor              pointer      
+
+// 000      000  000   000  00000000  
+// 000      000  0000  000  000       
+// 000      000  000 0 000  0000000   
+// 000      000  000  0000  000       
+// 0000000  000  000   000  00000000  
+
+.line
+    background          #444
+    position            absolute
+    overflow            visible
+
+.line.vertical
+    width               1px
+    height              5px
+    &._10
+        height          10px
+    &._50
+        height          15px
+    &._100
+        height          15px
+
+.line.horizontal
+    height              1px
+    width               5px
+    &._10
+        width           10px
+    &._50
+        width           15px
+    &._100
+        width           15px
+
+.line._10
+    background          #888
+.line._50
+    background          #888
+    & .num
+        color           #444
+.line._100
+    background          #fff
+
+.num    
+    text-align          center
+    margin-top          17px
+    width               100px
+    margin-left         -50px
+    
+
+// 000   000   0000000   000   000  0000000    000      00000000  
+// 000   000  000   000  0000  000  000   000  000      000       
+// 000000000  000000000  000 0 000  000   000  000      0000000   
+// 000   000  000   000  000  0000  000   000  000      000       
+// 000   000  000   000  000   000  0000000    0000000  00000000  
+
+.handle
+    position            absolute
+    
+#left
+    left                0
+    
+#right
+    right               0
+    
+.dot
+    width               1px
+    height              15px
+    
+.white
+    background          white
+.black
+    background          black
+    
+    

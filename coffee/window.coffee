@@ -188,7 +188,7 @@ loadFile = (file, opt={}) =>
     
     window.split.reveal 'editor'
         
-    if pos != [0,0]
+    if pos[0] or pos[1] 
         editor.singleCursorAtPos pos
         editor.scrollCursorToTop()        
   
@@ -291,7 +291,6 @@ info        = window.info        = new Info editor
 
 editor.setText editorText if editorText?
 editor.view.focus()
-log 'yes'
 
 editor.on 'changed', (changeInfo, action) =>
     return if changeInfo.foreign

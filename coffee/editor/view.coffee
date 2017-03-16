@@ -26,8 +26,6 @@ class View extends ViewBase
         window.split.on 'commandline', @onCommandline
         @fontSizeDefault = 16
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Autocomplete', 'Brackets', 'Strings']        
-        # @scroll.dbg = true
-        # @do.dbg = true
         @setText ''
                     
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
@@ -49,7 +47,7 @@ class View extends ViewBase
     # 000       000  0000000  00000000
 
     setCurrentFile: (file, opt) ->
-        log "setCurrentFile #{file}", opt
+        # log "View.setCurrentFile setCurrentFile #{file} opt:", opt
         @saveScrollCursorsAndSelections(opt) if not file and not opt?.noSaveScroll
         @dirty = false
         @syntax.name = 'txt'
@@ -108,7 +106,7 @@ class View extends ViewBase
             s.selections = _.cloneDeep @selections if @selections.length
             s.highlights = _.cloneDeep @highlights if @highlights.length
             
-        s.scroll     = @scroll.scroll if @scroll.scroll
+        s.scroll = @scroll.scroll if @scroll.scroll
                 
         filePositions = window.getState 'filePositions', Object.create null
         if not _.isPlainObject filePositions
@@ -126,7 +124,7 @@ class View extends ViewBase
         return if not @currentFile
         filePositions = window.getState 'filePositions', {}
         if filePositions[@currentFile]? 
-            s = filePositions[@currentFile]            
+            s = filePositions[@currentFile] 
             @cursors    = s.cursors    ? [[0,0]]
             @selections = s.selections ? []
             @highlights = s.highlights ? []

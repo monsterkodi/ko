@@ -4,8 +4,8 @@
 # 000   000  000   000  000   000  000   000     000   
 # 000   000  0000000     0000000    0000000      000   
 
-{$} = require './js/tools/tools'
-pkg = require "#{__dirname}/package.json"
+{$} = require './tools/tools'
+pkg = require "../package.json"
 
 window.openRepoURL = () -> 
     url = pkg.repository.url

@@ -453,7 +453,7 @@ class Main
             backgroundColor: '#000'
             titleBarStyle:   'hidden'
 
-        win.loadURL "file://#{__dirname}/../index.html"
+        win.loadURL "file://#{__dirname}/index.html"
         app.dock.show()
         win.on 'close',  @onCloseWin
         win.on 'move',   @onMoveWin
@@ -569,7 +569,6 @@ class Main
     showAbout: =>    
         cwd = __dirname
         w = new BrowserWindow
-            dir:             cwd
             preloadWindow:   true
             resizable:       false
             frame:           false
@@ -579,7 +578,7 @@ class Main
             width:           400
             height:          400
         w.on 'ready-to-show', -> w.show()
-        w.loadURL "file://#{cwd}/../about.html"
+        w.loadURL "file://#{cwd}/about.html"
         w.on 'openFileDialog', @createWindow
 
     # 00000000   000   000  000      00000000  00000000   
@@ -588,18 +587,24 @@ class Main
     # 000   000  000   000  000      000       000   000  
     # 000   000   0000000   0000000  00000000  000   000  
     
-    showRuler: =>    
+    showRuler: =>  
+        cwd = __dirname
         w = new BrowserWindow
             preloadWindow:   true
             resizable:       true
+            center:          true
             frame:           false
             show:            false
-            center:          true
-            backgroundColor: '#222'            
+            backgroundColor: '#111'
+            fullscreenable:  false
+            hasShadow:       false
             width:           600
-            height:          60
-        w.loadURL "file://#{__dirname}/../ruler.html"
-        w.on 'ready-to-show', -> w.show()
+            minWidth:        100        
+            height:          30
+            maxHeight:       30
+            minHeight:       30
+        w.loadURL "file://#{cwd}/ruler.html"
+        w.on 'ready-to-show', -> w.show(); w.webContents.send 'setWinID', w.id
 
     log: -> log (str(s) for s in [].slice.call arguments, 0).join " " if args.verbose
     dbg: -> log (str(s) for s in [].slice.call arguments, 0).join " " if args.debug
@@ -609,9 +614,6 @@ class Main
 # 000000000  00000000   00000000        000   000  000 0 000
 # 000   000  000        000        000  000   000  000  0000
 # 000   000  000        000        000   0000000   000   000
-
-app.on 'activate', (event, hasVisibleWindows) => #log "app.on activate #{hasVisibleWindows}"
-app.on 'browser-window-focus', (event, win)   => #log "app.on browser-window-focus #{win.id}"
 
 app.on 'open-file', (event, path) => 
     if not main?
