@@ -36,6 +36,7 @@ dependencies
                 eve             ^0.5.3
                 fs-extra        ^2.0.0
                 fuzzy           ^0.1.3
+                heterarchy      ^1.0.7
                 html-entities   ^1.2.0
                 karg            >=1.0.9
                 keycode         ^2.1.8

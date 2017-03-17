@@ -1,7 +1,7 @@
 # todo/ideas
 
+- cheat sheet
 - handle unsaved changes somehow when closing windows
-- fix restore cursor pos
 - fix commandlist switching sides when other side is smaller
 - limit size of range for bracket matching 
 - term: auto cd to pkg dir when file loaded?
