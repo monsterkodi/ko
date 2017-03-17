@@ -598,7 +598,7 @@ class Main
             backgroundColor: '#111'
             fullscreenable:  false
             hasShadow:       false
-            width:           600
+            width:           1000
             minWidth:        100        
             height:          30
             maxHeight:       30

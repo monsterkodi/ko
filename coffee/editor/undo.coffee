@@ -345,7 +345,6 @@ class Undo
                 else b.oldIndex - a.oldIndex
             else                
                 Math.max(b.oldIndex, b.newIndex) - Math.max(a.oldIndex, a.newIndex)
-        # log 'lines sorted:', lines if @editor.name == 'editor'
     
     # 00     00  00000000  00000000    0000000   00000000
     # 000   000  000       000   000  000        000     

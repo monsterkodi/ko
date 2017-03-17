@@ -610,13 +610,34 @@ class Editor extends Buffer
             @highlights = []
             @emit 'highlight'
 
+    highlightsSurroundingCursor: ->
+        b = @rangeBeforePosInRanges @cursorPos(), @highlights
+        b ?= first @highlights
+        a = @rangeAfterPosInRanges  @cursorPos(), @highlights
+        a ?= last @highlights
+        [a, b] if a? and b?
+
+    selectBetweenSurround: ->
+        if surr = @highlightsSurroundingCursor()
+            @do.start()
+            s = @rangeBetween surr[0], surr[1]
+            if s
+                @do.selections [s]
+                if @selections.length
+                    @do.cursors [@rangeEndPos(s)], closestMain: true
+            @do.end()
+            
+    selectSurround: ->
+        if surr = @highlightsSurroundingCursor()
+            @do.start()
+            @do.selections surr
+            if @selections.length
+                @do.cursors (@rangeEndPos(r) for r in @selections), closestMain: true
+            @do.end()
+
     selectAllHighlights: ->
         @do.start()
-        if not @posInHighlights @cursorPos()
-            @highlightTextOfSelectionOrWordAtCursor()
-        @do.selections _.cloneDeep @highlights
-        if @selections.length
-            @do.cursors (@rangeEndPos(r) for r in @selections), closestMain: true
+        @highlightTextOfSelectionOrWordAtCursor()
         @do.end()
     
     selectNextHighlight: -> # command+g

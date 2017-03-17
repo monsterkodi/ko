@@ -779,6 +779,8 @@ class ViewBase extends Editor
             when 'command+d'                then return @highlightWordAndAddToSelection()
             when 'command+shift+d'          then return @removeSelectedHighlight()
             when 'command+alt+d'            then return @selectAllHighlights()
+            when 'command+alt+b'            then return @selectSurround()
+            when 'command+alt+ctrl+b'       then return @selectBetweenSurround()
             when 'command+g'                then return @selectNextHighlight()
             when 'command+shift+g'          then return @selectPrevHighlight()
             when 'command+l'                then return @selectMoreLines()

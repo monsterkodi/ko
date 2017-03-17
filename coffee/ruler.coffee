@@ -56,6 +56,8 @@ resize = ->
                     line.appendChild elem class:'num', text: x*5
                 break
         ruler.appendChild line
+    b = win?.getBounds()
+    $('size').textContent = b.width
 
 # 00     00   0000000   000   000  00000000  
 # 000   000  000   000  000   000  000       
@@ -90,6 +92,8 @@ move = (key, mod) ->
     else
         b.x += x
         b.y += y
+        
+    $('size').textContent = b.width
     win?.setBounds b
 
 # 000   000  00000000  000   000

@@ -327,6 +327,15 @@ class Buffer extends event
     rangeForLineAtIndex: (i) -> 
         throw new Error() if i >= @lines.length
         [i, [0, @lines[i].length]] 
+    isPos: (p) -> p?.length == 2 and _.isNumber(p[0]) and _.isNumber(p[1])
+    isRange: (r) -> r?.length >= 2 and _.isNumber(r[0]) and r[1]?.length >= 2 and _.isNumber(r[1][0]) and _.isNumber(r[1][1])
+    rangeBetween: (a,b) -> 
+        if @isPos(a) and @isPos(b) 
+            [Math.min(a[1], b[1]), [Math.min(a[0], b[0]), Math.max(a[0], b[0])]]
+        else if @isRange(a) and @isRange(b)
+            r = [a,b]
+            @sortRanges r
+            @rangeBetween @rangeEndPos(r[0]), @rangeStartPos(r[1])
 
     isSameRange: (a,b) -> a[0]==b[0] and a[1][0]==b[1][0] and a[1][1]==b[1][1]
     isRangeInString: (r) -> @rangeOfStringSurroundingRange(r)?
