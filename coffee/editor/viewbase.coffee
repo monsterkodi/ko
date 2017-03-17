@@ -5,10 +5,7 @@
 #     0      000  00000000  00     00  0000000    000   000  0000000   00000000
 {
 title
-fileExists,
-fileName,
 setStyle,
-swapExt,
 clamp,
 last,
 sw,
@@ -16,6 +13,7 @@ $}        = require '../tools/tools'
 prefs     = require '../tools/prefs'
 drag      = require '../tools/drag'
 keyinfo   = require '../tools/keyinfo'
+post      = require '../tools/post'
 log       = require '../tools/log'
 str       = require '../tools/str'
 render    = require './render'
@@ -168,49 +166,6 @@ class ViewBase extends Editor
         setStyle '.comment.header', 'border-radius', "#{parseInt fontSize/3}px", 1
         
         @emit 'fontSizeChanged'
-
-    #  0000000  00000000  000   000  000000000  00000000  00000000 
-    # 000       000       0000  000     000     000       000   000
-    # 000       0000000   000 0 000     000     0000000   0000000  
-    # 000       000       000  0000     000     000       000   000
-    #  0000000  00000000  000   000     000     00000000  000   000
-    
-    centerText: (center, animate=300) ->
-
-        @size.centerText = center
-        @updateLayers()
-        
-        if center
-            @size.offsetX = Math.floor @size.charWidth/2 + @size.numbersWidth
-            @size.offsetX = Math.max @size.offsetX, (@screenSize().width - @screenSize().height) / 2 
-            @size.centerText = true
-        else
-            @size.offsetX = Math.floor @size.charWidth/2 + @size.numbersWidth
-            @size.centerText = false
-            
-        @updateLinePositions animate
-
-        if animate
-            layers = ['.selections', '.highlights', '.cursors']
-            transi = ['.selection',  '.highlight',  '.cursor' ].concat layers
-            resetTrans = =>
-                setStyle '.editor .layers '+l, 'transform', "translateX(0)" for l in layers
-                setStyle '.editor .layers '+t, 'transition', "initial" for t in transi
-                @updateLayers()
-            
-            if center
-                offsetX = @size.offsetX - @size.numbersWidth - @size.charWidth/2
-            else
-                offsetX = Math.floor @size.charWidth/2 + @size.numbersWidth
-                offsetX = Math.max offsetX, (@screenSize().width - @screenSize().height) / 2 
-                offsetX -= @size.numbersWidth + @size.charWidth/2
-                offsetX *= -1
-                
-            setStyle '.editor .layers '+l, 'transform', "translateX(#{offsetX}px)" for l in layers
-            setStyle '.editor .layers '+t, 'transition', "all #{animate/1000}s" for t in transi
-            setTimeout resetTrans, animate
-        else
-            @updateLayers()
     
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000
@@ -619,7 +574,7 @@ class ViewBase extends Editor
                 
                 p = @posForEvent event
                 if event.altKey
-                    @jumpTo @wordAtCursor p
+                    post.emit 'jumpTo', @wordAtCursor p
                 else if event.metaKey
                     @toggleCursorAtPos p
                 else
@@ -641,80 +596,7 @@ class ViewBase extends Editor
         @clickCount  = 0
         @clickTimer  = null
         @clickPos    = null
-       
-    #       000  000   000  00     00  00000000 
-    #       000  000   000  000   000  000   000
-    #       000  000   000  000000000  00000000 
-    # 000   000  000   000  000 0 000  000      
-    #  0000000    0000000   000   000  000      
-    
-    jumpTo: (word, opt) ->
-        
-        find = word.toLowerCase()
-        find = find.slice 1 if find[0] == '@'
-        jumpToFileLine = (file, line) =>
-            window.navigate.addFilePos
-                file: @currentFile
-                pos:  @cursorPos()
-            window.navigate.gotoFilePos
-                file: file
-                pos:  [0, line]
-                winID: window.winID
-                select: opt?.select
-        
-        classes = ipc.sendSync 'indexer', 'classes'
-        for clss, info of classes
-            if clss.toLowerCase() == find
-                jumpToFileLine info.file, info.line
-                return true
-                
-        funcs = ipc.sendSync 'indexer', 'funcs'
-        for func, infos of funcs
-            if func.toLowerCase() == find
-                info = infos[0]
-                for i in infos
-                    if i.file == @currentFile
-                        info = i
-                if infos.length > 1 and not opt?.dontList
-                    window.commandline.commands.term.execute "funcs ^#{word}$"
-                jumpToFileLine info.file, info.line
-                return true
-
-        files = ipc.sendSync 'indexer', 'files'
-        for file, info of files
-            if fileName(file).toLowerCase() == find and file != @currentFile
-                jumpToFileLine file, 6
-                return true
-        false
-    
-    jumpToCounterpart: () ->
-        
-        counterparts = 
-            '.cpp':     ['.hpp', '.h']
-            '.cc':      ['.hpp', '.h']
-            '.h':       ['.cpp', '.c']
-            '.hpp':     ['.cpp', '.c']
-            '.coffee':  ['.js']
-            '.js':      ['.coffee']
-            '.pug':     ['.html']
-            '.html':    ['.pug']
-            '.css':     ['.styl']
-            '.styl':    ['.css']
-            
-        for ext in (counterparts[path.extname @currentFile] ? [])
-            if fileExists swapExt @currentFile, ext
-                window.loadFile swapExt @currentFile, ext
-                return
-
-        for ext in (counterparts[path.extname @currentFile] ? [])
-            counter = swapExt @currentFile, ext
-            counter = counter.replace "/#{path.extname(@currentFile).slice 1}/", "/#{ext.slice 1}/"
-            if fileExists counter
-                window.loadFile counter
-                return true
-            
-        false
-    
+           
     funcInfoAtLineIndex: (li) ->
         files = ipc.sendSync 'indexer', 'files'
         fileInfo = files[@currentFile]
@@ -767,7 +649,7 @@ class ViewBase extends Editor
             when 'shift+tab'                then return stop event, @deleteTab()
             when 'enter'                    then return @insertUserCharacter '\n'
             when 'command+enter'            then return @moveCursorsToLineBoundary('right') and @insertNewline indent: true
-            when 'alt+enter'                then return @jumpTo @wordAtCursor()
+            when 'alt+enter'                then return post.emit 'jumpTo', @wordAtCursor()
             when 'command+]'                then return @indent()
             when 'command+['                then return @deIndent()
             when 'command+j'                then return @joinLines()
@@ -804,7 +686,6 @@ class ViewBase extends Editor
             when 'alt+shift+up', 'alt+shift+down' then return @duplicateLines  key
             when 'alt+up',     'alt+down'     then return @moveLines  key
             when 'command+up', 'command+down' then return @addCursors key
-            when 'command+alt+up'             then return @jumpToCounterpart()
             when 'ctrl+a',     'ctrl+shift+a' then return @moveCursorsToLineBoundary 'left',  event.shiftKey
             when 'ctrl+e',     'ctrl+shift+e' then return @moveCursorsToLineBoundary 'right', event.shiftKey
             when 'ctrl+k'
