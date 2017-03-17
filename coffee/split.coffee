@@ -83,6 +83,7 @@ class Split extends event
     # 0000000   000        0000000  000     000   
     
     splitAt: (i, y, opt) -> 
+        # log "Split.splitAt i:#{i} y:#{y}"
         s = []
         for h in [0...@handles.length]
             if h == i
@@ -102,7 +103,7 @@ class Split extends event
     # 000   000  000        000        0000000     000   
         
     applySplit: (s, opt) ->
-        
+        # log "Split.applySplit s:#{s} opt:#{opt}"
         if opt?.animate
             emitSplit = => 
                 @emit 'split', s
@@ -186,6 +187,8 @@ class Split extends event
     terminalVisible:    -> @terminalHeight() > 0 and @terminal.style.display != 'none'
     editorVisible:      -> @editorHeight()   > 0
 
+    termEditHeight: -> @terminalHeight() + @commandlineHeight + @editorHeight()
+
     # 0000000     0000000 
     # 000   000  000   000
     # 000   000  000   000
@@ -193,6 +196,7 @@ class Split extends event
     # 0000000     0000000 
     
     do: (sentence) ->
+        # log "do #{sentence}"
         sentence = sentence.trim()
         return if not sentence.length
         words = sentence.split /\s+/
@@ -200,27 +204,27 @@ class Split extends event
         what = words[1]
         switch action
             when 'focus'    then return @focus what
-            when 'reveal'   then return @show what
+            when 'reveal'   then return @reveal what
+            when 'half'     then delta = @elemHeight()/2 - @splitPosY(0) - @handleHeight - 2
             when 'maximize' then delta = @elemHeight()
             when 'minimize' then delta = -@elemHeight()
             when 'enlarge'
                 if words[2] == 'by'
                     delta = parseInt words[3]
                 else
-                    fh = @terminalHeight() + @commandlineHeight + @editorHeight()
-                    delta = parseInt 0.25 * fh
+                    delta = parseInt 0.25 * @termEditHeight()
             when 'reduce'
                 if words[2] == 'by'
                     delta = - parseInt words[3]
                 else
-                    fh = @terminalHeight() + @commandlineHeight + @editorHeight()
-                    delta = - parseInt 0.25 * fh
+                    delta = - parseInt 0.25 * @termEditHeight()
                     
         switch what
             when 'editor' then return @moveCommandLineBy -delta
             when 'terminal', 'area'
                 @raise what
-                return @moveCommandLineBy delta
+                @moveCommandLineBy delta if delta?
+                return 
                 
         alert "split.do warning! unhandled do command? #{sentence}?"
         throw new Error
@@ -234,7 +238,7 @@ class Split extends event
     reveal: (n) -> @show n    
     show: (n) ->
         switch n
-            when 'terminal', 'area' then @do "#{@paneHeight(0) < 100 and 'enlarge' or 'raise'} #{n}"
+            when 'terminal', 'area' then @do "#{@paneHeight(0) < @termEditHeight()/2 and 'half' or 'raise'} #{n}"
             when 'editor'           then @splitAt 1, 0.5*@splitPosY 2 if @paneHeight(2) < 100
             when 'command'          then @splitAt 0, 0                if @paneHeight(1) < @commandlineHeight
             when 'logview'          then @showLog()

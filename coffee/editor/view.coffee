@@ -7,6 +7,7 @@
 fileName,
 unresolve,
 fileExists,
+setStyle,
 swapExt,
 clamp,
 $}        = require '../tools/tools'
