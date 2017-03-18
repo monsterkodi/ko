@@ -450,6 +450,8 @@ class Main
             fullscreenable:  true
             show:            true
             hasShadow:       false
+            webPreferences:
+                scrollBounce:    true
             backgroundColor: '#000'
             titleBarStyle:   'hidden'
 
@@ -580,31 +582,6 @@ class Main
         w.on 'ready-to-show', -> w.show()
         w.loadURL "file://#{cwd}/about.html"
         w.on 'openFileDialog', @createWindow
-
-    # 00000000   000   000  000      00000000  00000000   
-    # 000   000  000   000  000      000       000   000  
-    # 0000000    000   000  000      0000000   0000000    
-    # 000   000  000   000  000      000       000   000  
-    # 000   000   0000000   0000000  00000000  000   000  
-    
-    showRuler: =>  
-        cwd = __dirname
-        w = new BrowserWindow
-            preloadWindow:   true
-            resizable:       true
-            center:          true
-            frame:           false
-            show:            false
-            backgroundColor: '#111'
-            fullscreenable:  false
-            hasShadow:       false
-            width:           1000
-            minWidth:        100        
-            height:          30
-            maxHeight:       30
-            minHeight:       30
-        w.loadURL "file://#{cwd}/ruler.html"
-        w.on 'ready-to-show', -> w.show(); w.webContents.send 'setWinID', w.id
 
     log: -> log (str(s) for s in [].slice.call arguments, 0).join " " if args.verbose
     dbg: -> log (str(s) for s in [].slice.call arguments, 0).join " " if args.debug
