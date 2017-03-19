@@ -11,6 +11,7 @@ splitFilePos,
 fileExists,
 resolve}      = require './tools/tools'
 prefs         = require './tools/prefs'
+about         = require './tools/about'
 log           = require './tools/log'
 str           = require './tools/str'
 pkg           = require '../package.json'
@@ -568,20 +569,20 @@ class Main
     # 000   000  000   000  000   000  000   000     000   
     # 000   000  0000000     0000000    0000000      000   
     
-    showAbout: =>    
-        cwd = __dirname
-        w = new BrowserWindow
-            preloadWindow:   true
-            resizable:       false
-            frame:           false
-            show:            false
-            center:          true
-            backgroundColor: '#222'            
-            width:           400
-            height:          400
-        w.on 'ready-to-show', -> w.show()
-        w.loadURL "file://#{cwd}/about.html"
-        w.on 'openFileDialog', @createWindow
+    showAbout: => about img: "#{__dirname}/../img/about.png"   
+        # cwd = __dirname
+        # w = new BrowserWindow
+            # preloadWindow:   true
+            # resizable:       false
+            # frame:           false
+            # show:            false
+            # center:          true
+            # backgroundColor: '#222'            
+            # width:           400
+            # height:          400
+        # w.on 'ready-to-show', -> w.show()
+        # w.loadURL "file://#{cwd}/about.html"
+        # w.on 'openFileDialog', @createWindow
 
     log: -> log (str(s) for s in [].slice.call arguments, 0).join " " if args.verbose
     dbg: -> log (str(s) for s in [].slice.call arguments, 0).join " " if args.debug
