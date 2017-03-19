@@ -6,6 +6,7 @@
 {
 fileExists,
 dirExists,
+unresolve,
 relative,
 resolve,
 clamp,
@@ -64,7 +65,7 @@ class Open extends Command
         items = @listItems flat: true, navigating: @navigating, currentText: @getText().trim()    
         if command.length
             fuzzied = fuzzy.filter command, items, extract: (o) -> o.text            
-            items = (f.original for f in _.sortBy fuzzied, (o) => @weight o.original).reversed()
+            items = (f.original for f in fuzzied)
                     
         if items.length
             @showItems items
@@ -148,14 +149,17 @@ class Open extends Command
         directoryBonus = item.line == '▸' and 500 or 0
                         
         lengthPenalty = path.dirname(f).length
-        
+                
         if opt?.flat
             w = extensionBonus + relBonus + baseBonus - lengthPenalty
+            # log "flat: #{w} = #{extensionBonus} + #{relBonus} + #{baseBonus} - #{lengthPenalty} #{f} #{r} #{opt?.currentText}"
         else
             w = localBonus + relBonus + baseBonus + directoryBonus + extensionBonus - lengthPenalty
+            # log "local: #{w} = #{localBonus} + #{relBonus} + #{baseBonus} + #{directoryBonus} + #{extensionBonus} - #{lengthPenalty} #{f} #{r} #{opt?.currentText}"
         w
 
     weightedItems: (items, opt) -> 
+        # log "weightedItems #{items.length}", opt
         _.sortBy items, (o) => 0xffffffff - @weight o, opt
     
     # 000      000   0000000  000000000
@@ -170,15 +174,17 @@ class Open extends Command
         @lastFileIndex = 0
         @dir = resolve '~' if not @dir?
 
-        if not @navigating
+        if not @navigating and not opt?.currentText
             if @history.length
                 bonus = 0x000fffff
                 for f in @history
-                    if f.length and fileExists(f) #and (f != @file)
+                    if f.length and fileExists(f)
                         item = Object.create null
                         item.text = relative f, @dir
                         item.file = f
-                        item.bonus = bonus if not opt?.flat
+                        if not opt?.flat
+                            # log "bonus: #{bonus}", item.text, item.file
+                            item.bonus = bonus 
                         items.push item
                         @lastFileIndex = items.length-2
                         bonus -= 1
@@ -211,7 +217,7 @@ class Open extends Command
                 item.text = rel
                 item.file = file[0]
                 items.push item
-        
+
         items = @weightedItems items, opt
         items = _.uniqBy items, (o) -> o.text
         items
@@ -372,7 +378,7 @@ class Open extends Command
                 @loadDir
                     navigating: true
                     dir:        resolved
-                return text: @dir, select: true
+                return text: @dir+'/', select: false
 
         @hideList()
 
