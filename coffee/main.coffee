@@ -132,6 +132,7 @@ ipc.on 'newWindowWithFile',      (event, file)   => main.newWindowWithFile file
 ipc.on 'activateWindowWithFile', (event, file)   => event.returnValue = main.activateWindowWithFile file
 ipc.on 'toggleDevTools',         (event)         => event.sender.toggleDevTools()
 ipc.on 'execute',                (event, arg)    => event.sender.send 'executeResult', coffeeExecute.execute arg
+ipc.on 'restartShell',           (event, cfg)    => winShells[cfg.winID].restartShell()
 ipc.on 'executeCoffee',          (event, cfg)    => coffeeExecute.executeCoffee cfg
 ipc.on 'maximizeWindow',         (event, winID)  => main.toggleMaximize winWithID winID
 ipc.on 'activateWindow',         (event, winID)  => main.activateWindowWithID winID

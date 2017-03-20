@@ -43,10 +43,10 @@ dependencies
                 keycode         ^2.1.8
                 lodash          ^4.17.4
                 nconf           ^0.8.4
+                node-pty        ^0.6.3
                 noon            >=1.0.13
                 opener          ^1.4.3
                 performance-now  ^2.1.0
-                pty.js          ^0.3.1
                 sprintf-js      ^1.0.3
                 three           ^0.84.0
                 underscore.string  ^3.3.4

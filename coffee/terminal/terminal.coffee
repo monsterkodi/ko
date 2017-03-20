@@ -91,7 +91,6 @@ class Terminal extends ViewBase
             @appendLineDiss meta.cmmd
         else
             @appendLineDiss ''
-        # @scrollCursorToTop 5
         
     queueMeta: (meta) ->
         @metaQueue.push meta

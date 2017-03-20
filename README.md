@@ -24,7 +24,7 @@
 
 **terminal**
 - alias, history
-- echos commands as ascii-headers
+- can echo commands as ascii-headers
 - output of commands editable/searchable
 
 **file search**

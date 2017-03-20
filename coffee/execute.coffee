@@ -11,7 +11,7 @@ noon     = require 'noon'
 colors   = require 'colors'
 coffee   = require 'coffee-script'
 electron = require 'electron'
-pty      = require 'pty.js'
+pty      = require 'node-pty'
 
 class Execute
         
@@ -79,11 +79,12 @@ class Execute
     #      000  000   000  000       000      000    
     # 0000000   000   000  00000000  0000000  0000000
     
-    shell: (command) =>
+    shell: () =>
         @childp = pty.spawn '/usr/local/bin/bash', ['--init-file', "#{__dirname}/../bin/bash.sh"],
             name: 'xterm-color'
             cwd: @cwd
             env: process.env
+            cols: 1000
         @childp.on 'data', @onShellData
       
     term: (cfg) =>
@@ -91,6 +92,10 @@ class Execute
         @cmdID = cfg?.cmdID
         @childp.write cfg.command + '\n'
         @childp.write "echo ko_term_done #{@cmdID}\n"
+        
+    restartShell: =>
+        @childp.destroy()
+        @shell()
                 
     onShellData: (data) =>
         oRest = @rest

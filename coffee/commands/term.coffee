@@ -309,7 +309,16 @@ class Term extends Command
                 continue
                                 
             switch cmd
-                when 'clear' then terminal.clear()
+                when 'clear'   then terminal.clear()
+                when 'stop' 
+                    ipc.send 'restartShell', winID: window.winID
+                    for meta in terminal.meta.metas.reversed()
+                        if meta[2].cmdID?
+                            meta[2].span?.innerHTML = "■"
+                    terminal.appendMeta 
+                        line: "■"
+                        clss: 'termCommand'
+                        diss: Syntax.dissForTextAndSyntax "stop ◼", 'ko'
                 
                 # 000   000  00000000   0000000   0000000    00000000  00000000    0000000  
                 # 000   000  000       000   000  000   000  000       000   000  000       
