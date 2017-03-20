@@ -143,7 +143,7 @@ class ViewBase extends Editor
         if @scroll.viewHeight != @viewHeight()
             @scroll.setViewHeight @viewHeight()        
         @scroll.setNumLines @lines.length
-        @emit  'linesAppended', ts
+        @emit 'linesAppended', ts
         @emit 'numLines', @lines.length
 
     # 00000000   0000000   000   000  000000000

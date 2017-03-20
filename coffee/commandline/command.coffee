@@ -256,7 +256,7 @@ class Command
     #    000     000        000 000      000   
     #    000     00000000  000   000     000   
     
-    setText:          (t) -> 
+    setText: (t) -> 
         @currentText = t
         @commandline.setText t
         

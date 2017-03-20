@@ -32,10 +32,16 @@ class Term extends Command
         @names      = ['term', 'Term']
         super @commandline
         @maxHistory = 99
-        @headers    = true
+        @headers    = false
         @cmdID      = 0
         @pwdID      = -1
         @bins       = ipc.sendSync 'indexer', 'bins'
+    
+    #  0000000   000   000        0000000     0000000   000000000   0000000   
+    # 000   000  0000  000        000   000  000   000     000     000   000  
+    # 000   000  000 0 000        000   000  000000000     000     000000000  
+    # 000   000  000  0000        000   000  000   000     000     000   000  
+    #  0000000   000   000        0000000    000   000     000     000   000  
         
     onShellCommandData: (cmdData) => 
         if cmdData.cmd == @pwdID
@@ -44,7 +50,7 @@ class Term extends Command
         else
             terminal = window.terminal
             terminal.output cmdData.data
-            terminal.scrollCursorToTop 5
+            terminal.scrollCursorToTop @headers and 7 or 1
 
     #  0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
     # 000       000   000  000   000  000   000  000      000          000     000     
@@ -288,10 +294,11 @@ class Term extends Command
                 super command # @setCurrent command -> moves items in @history
                 
         for cmmd in cmds
-            if @headers then terminal.appendMeta clss: 'salt', text: cmmd.slice 0, 32
-            terminal.singleCursorAtPos [0, terminal.lines.length-2]
-            terminal.scrollCursorToTop 5
-                
+            
+            if @headers 
+                terminal.appendMeta clss: 'salt', text: cmmd.slice 0, 32
+                terminal.singleCursorAtPos [0, terminal.lines.length-1]
+
             args = cmmd.split ' '
             cmd  = args.shift()
               
@@ -450,12 +457,27 @@ class Term extends Command
                         terminal.queueMeta meta
                             
                 else
+                    
+                    #  0000000  000   000  00000000  000      000      
+                    # 000       000   000  000       000      000      
+                    # 0000000   000000000  0000000   000      000      
+                    #      000  000   000  000       000      000      
+                    # 0000000   000   000  00000000  0000000  0000000  
+                    
                     ipc.send 'shellCommand', winID: window.winID, cmdID: @cmdID, command: cmmd
+                    
+                    terminal.appendMeta 
+                        line: "▶"
+                        cmmd:  cmmd
+                        cmdID: @cmdID
+                        clss: 'termCommand'
+                        
+                    terminal.singleCursorAtPos [0, terminal.lines.length-1]
+                        
                     @cmdID += 1
                     
-        terminal.scrollCursorToTop 5
-        text:    ''
-        do:      (@name == 'Term' and 'maximize' or 'reveal') + ' terminal'
+        text: ''
+        do:   (@name == 'Term' and 'maximize' or 'reveal') + ' terminal'
         
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

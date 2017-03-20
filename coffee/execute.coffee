@@ -80,16 +80,17 @@ class Execute
     # 0000000   000   000  00000000  0000000  0000000
     
     shell: (command) =>
-        @childp = pty.spawn '/usr/local/bin/bash', ['-i'], 
+        @childp = pty.spawn '/usr/local/bin/bash', ['--init-file', "#{__dirname}/../bin/bash.sh"],
             name: 'xterm-color'
             cwd: @cwd
             env: process.env
         @childp.on 'data', @onShellData
       
     term: (cfg) =>
-        @rest    = ''
-        @cmdID   = cfg?.cmdID
+        @rest  = ''
+        @cmdID = cfg?.cmdID
         @childp.write cfg.command + '\n'
+        @childp.write "echo ko_term_done #{@cmdID}\n"
                 
     onShellData: (data) =>
         oRest = @rest

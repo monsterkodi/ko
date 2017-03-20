@@ -3,12 +3,14 @@
 #    000     0000000   0000000    000000000  000  000 0 000  000000000  000    
 #    000     000       000   000  000 0 000  000  000  0000  000   000  000    
 #    000     00000000  000   000  000   000  000  000   000  000   000  0000000
-
+{
+last
+}         = require '../tools/tools'
+salt      = require '../tools/salt'
+log       = require '../tools/log'
 ViewBase  = require '../editor/viewbase'
 syntax    = require '../editor/syntax'
 ansiDiss  = require '../tools/ansidiss'
-salt      = require '../tools/salt'
-log       = require '../tools/log'
 
 class Terminal extends ViewBase
 
@@ -19,7 +21,7 @@ class Terminal extends ViewBase
         
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Meta']
 
-        @ansidiss  = new ansiDiss()    
+        @ansidiss = new ansiDiss()    
         
         @setLines @lines
 
@@ -29,8 +31,24 @@ class Terminal extends ViewBase
     # 000   000  000   000     000     000        000   000     000   
     #  0000000    0000000      000     000         0000000      000   
 
-    output: (s) -> 
+    output: (s) ->
         for l in s.split '\n'
+            l = l.trim()
+            if /ko_term_done/.test l
+                if /^ko_term_done\s\d+$/.test l
+                    cid = parseInt last l.split ' '
+                    for meta in @meta.metas.reversed()
+                        if meta[2].cmdID == cid
+                            meta[2].span?.innerHTML = "■"
+                            break
+                continue
+            skip = false
+            for meta in @meta.metas.reversed()
+                if meta[2].cmmd == l
+                    meta[2].span?.innerHTML = '<i class="fa fa-cog fa-spin fa-1x fa-fw"></i>'
+                    skip = true
+                    break
+            continue if skip
             [text,diss] = @ansidiss.dissect l
             @syntax.setDiss @lines.length, diss if diss?.length
             @appendText text
@@ -69,9 +87,11 @@ class Terminal extends ViewBase
             for l in salt(meta.text).split '\n'
                 @appendMeta clss: 'spacer', diss: syntax.dissForTextAndSyntax l, 'ko'
             @appendMeta clss: 'spacer'
+        else if meta.clss == 'termCommand'
+            @appendLineDiss meta.cmmd
         else
             @appendLineDiss ''
-        @scrollCursorToTop 5
+        # @scrollCursorToTop 5
         
     queueMeta: (meta) ->
         @metaQueue.push meta
