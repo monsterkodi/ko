@@ -13,7 +13,6 @@
 - shared recent files of stacked windows?
 
 #### editing
-- select between cursors shortcut?
 - select continuous, rectangular ranges with command+shift+M 
 - remove from selection when alt/ctrl is down?
 - don't scroll when no new range added with command+d
@@ -24,7 +23,6 @@
 
 #### editor
 - fix horizontal scrolling
-- save and restore scrollX/Left
 - jump to file (include|path)
 
 #### commands
@@ -37,7 +35,6 @@
 - fix broken syntax highlighting when editing
 
 #### tool
-- measure
 - color
 
 #### nice to have
