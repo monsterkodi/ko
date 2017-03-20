@@ -32,6 +32,7 @@ class Term extends Command
         @names      = ['term', 'Term']
         super @commandline
         @maxHistory = 99
+        @headers    = true
         @cmdID      = 0
         @pwdID      = -1
         @bins       = ipc.sendSync 'indexer', 'bins'
@@ -274,6 +275,7 @@ class Term extends Command
         terminal = window.terminal
         cmds = @splitAlias command
         command = cmds.join ' '
+        
         switch
             when command[0] == '!'            then
             when command == 'clear'           then
@@ -284,8 +286,9 @@ class Term extends Command
                 @setState 'commandIDs', @commandIDs
                 @setState 'idCommands', @idCommands
                 super command # @setCurrent command -> moves items in @history
+                
         for cmmd in cmds
-            terminal.appendMeta clss: 'salt', text: cmmd.slice 0, 32
+            if @headers then terminal.appendMeta clss: 'salt', text: cmmd.slice 0, 32
             terminal.singleCursorAtPos [0, terminal.lines.length-2]
             terminal.scrollCursorToTop 5
                 
@@ -300,6 +303,17 @@ class Term extends Command
                                 
             switch cmd
                 when 'clear' then terminal.clear()
+                
+                # 000   000  00000000   0000000   0000000    00000000  00000000    0000000  
+                # 000   000  000       000   000  000   000  000       000   000  000       
+                # 000000000  0000000   000000000  000   000  0000000   0000000    0000000   
+                # 000   000  000       000   000  000   000  000       000   000       000  
+                # 000   000  00000000  000   000  0000000    00000000  000   000  0000000   
+                
+                when 'headers' 
+                    if args.length 
+                        if args[0] in ['on', 'true', '1'] then   @headers = true
+                        if args[0] in ['off', 'false', '0'] then @headers = false
                 
                 when 'history' 
                     

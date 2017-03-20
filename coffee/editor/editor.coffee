@@ -43,7 +43,7 @@ class Editor extends Buffer
     # 000   000  000        000        0000000     000   
     
     applyForeignLineChanges: (lineChanges) =>
-        # log "Editor.applyForeignLineChanges", lineChanges
+
         @do.start()
         for change in lineChanges
             if change.before? and change.after?
@@ -940,10 +940,7 @@ class Editor extends Buffer
             when 'right' then (c) => [@lines[c[1]].length, c[1]]
             when 'left'  then (c) => 
                 if @lines[c[1]].slice(0,c[0]).trim().length == 0
-                    if c[0] == 0 and @lines[c[1]].trimLeft().length < @lines[c[1]].length
-                        [@lines[c[1]].length-@lines[c[1]].trimLeft().length, c[1]]
-                    else
-                        [0, c[1]]
+                    [0, c[1]]
                 else
                     d = @lines[c[1]].length - @lines[c[1]].trimLeft().length
                     [d, c[1]]
@@ -958,7 +955,7 @@ class Editor extends Buffer
         @moveAllCursors f, extend:e, keepLine:true
         true
     
-    moveCursorsUp:   (e, n=1) ->                 
+    moveCursorsUp: (e, n=1) ->                 
         @moveAllCursors ((n)->(c)->[c[0],c[1]-n])(n), extend:e, main: 'top'
                         
     moveCursorsRight: (e, n=1) ->

@@ -3,7 +3,6 @@
 - search word on alt click and not a func or class
 - cheat sheet
 - handle unsaved changes somehow when closing windows
-- fix command-left switching multiple cursors from 0 to first word and vice versa (lines with only spaces are inverted)
 - fix commandlist switching sides when other side is smaller
 - limit size of range for bracket matching 
 - term: auto cd to pkg dir when file loaded?
@@ -33,9 +32,6 @@
 
 #### terminal
 - fix broken syntax highlighting when editing
-
-#### tool
-- color
 
 #### nice to have
 - git status in numbers

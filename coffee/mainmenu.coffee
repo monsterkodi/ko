@@ -48,6 +48,7 @@ class MainMenu
             label: pkg.name   
             submenu: [     
                 label:       "About #{pkg.productName}"
+                accelerator: 'Alt+.'
                 click:        main.showAbout
             ,
                 type: 'separator'
