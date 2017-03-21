@@ -33,10 +33,10 @@ class Terminal extends ViewBase
 
     output: (s) ->
         for l in s.split '\n'
-            l = l.trim()
-            if /ko_term_done/.test l
-                if /^ko_term_done\s\d+$/.test l
-                    cid = parseInt last l.split ' '
+            t = l.trim()
+            if /ko_term_done/.test t
+                if /^ko_term_done\s\d+$/.test t
+                    cid = parseInt last t.split ' '
                     for meta in @meta.metas.reversed()
                         if meta[2].cmdID == cid
                             meta[2].span?.innerHTML = "■"
@@ -44,7 +44,7 @@ class Terminal extends ViewBase
                 continue
             skip = false
             for meta in @meta.metas.reversed()
-                if meta[2].cmmd == l
+                if meta[2].cmmd == t
                     meta[2].span?.innerHTML = '<i class="fa fa-cog fa-spin fa-1x fa-fw"></i>'
                     skip = true
                     break

@@ -147,9 +147,8 @@ class Term extends Command
         items = _.concat @history.reversed(), _.intersection @bins, [
             'cat', 'colorcat', 
             'ls', 'color-ls',
-            'konrad', 'noon', 'sds', 'strudl',
-            'atom', 'subl', 'code',
-            'git', 'ksdiff', 'diff',
+            'konrad', 'noon', 'sds', 
+            'git', 'diff',
             'coffee', 'node', 'python'
             'apropos', 'which',
             'ag', 'grep', 'find',
@@ -287,7 +286,8 @@ class Term extends Command
             when command == 'clear'           then
             when command.startsWith 'history' then
             else 
-                @commandIDs[command] = Object.keys(@commandIDs).length+1 if not @commandIDs[command]?
+                if not @commandIDs[command]?
+                    @commandIDs[command] = Object.keys(@commandIDs).length+1 
                 @idCommands[@commandIDs[command]] = command
                 @setState 'commandIDs', @commandIDs
                 @setState 'idCommands', @idCommands
