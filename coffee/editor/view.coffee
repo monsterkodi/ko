@@ -141,6 +141,8 @@ class View extends ViewBase
             @numbers.updateColors()                
             @emit 'cursor'
             @emit 'selection'
+        else
+            editor.singleCursorAtPos [0,0]
 
     #       000  000   000  00     00  00000000 
     #       000  000   000  000   000  000   000

@@ -40,7 +40,7 @@ pkg         = require '../package.json'
 ipc         = electron.ipcRenderer
 remote      = electron.remote
 dialog      = remote.dialog
-BrowserWindow = remote.BrowserWindow
+Browser     = remote.BrowserWindow
 winID       = null
 editor      = null
 logview     = null
@@ -343,7 +343,7 @@ window.onunload = => editor.setCurrentFile null, noSaveScroll: true # to stop wa
 #0000000    0000000  000   000  00000000  00000000  000   000  0000000   000   000   0000000      000   
 
 screenShot = ->
-    win = BrowserWindow.fromId winID 
+    win = Browser.fromId winID 
     win.capturePage (img) ->
         file = 'screenShot.png'
         remote.require('fs').writeFile file, img.toPng(), (err) -> 
