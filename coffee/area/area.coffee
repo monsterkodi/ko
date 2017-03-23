@@ -5,7 +5,7 @@
 # 000   000  000   000  00000000  000   000
 {
 sw,
-$} = require '../tools/tools'
+$} = require 'kxk'
 log = require '../tools/log'
 event = require 'events'
 

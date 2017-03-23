@@ -6,7 +6,7 @@
 {
 unresolve,
 first
-}        = require '../tools/tools'
+}        = require 'kxk'
 log      = require '../tools/log'
 walker   = require '../tools/walker'
 matchr   = require '../tools/matchr'

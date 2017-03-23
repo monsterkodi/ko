@@ -8,7 +8,7 @@ extName,
 clamp,
 first,
 last,
-$}      = require '../tools/tools'
+$}      = require 'kxk'
 log     = require '../tools/log'
 salt    = require '../tools/salt'
 watcher = require './watcher'

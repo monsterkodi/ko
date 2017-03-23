@@ -4,14 +4,20 @@
 # 000   000  000  000  0000  000   000  000   000  000   000
 # 00     00  000  000   000  0000000     0000000   00     00
 {
-last,
-sw,sh,$,
-resolve,
-fileList,
-fileExists,
 splitFilePos,
-del,clamp,
-resolve}    = require './tools/tools'
+fileExists,
+fileList,
+resolve,
+keyinfo,
+clamp,
+sw,sh,
+prefs,
+last,
+drag,
+pos,
+str,
+resolve,
+$}          = require 'kxk'
 Split       = require './split'
 View        = require './editor/view'
 Area        = require './area/area'
@@ -22,12 +28,7 @@ Titlebar    = require './titlebar'
 Navigate    = require './navigate'
 FPS         = require './tools/fps'
 Info        = require './editor/info'
-prefs       = require './tools/prefs'
-keyinfo     = require './tools/keyinfo'
-drag        = require './tools/drag'
-pos         = require './tools/pos'
 log         = require './tools/log'
-str         = require './tools/str'
 encode      = require './tools/encode'
 _           = require 'lodash'
 fs          = require 'fs'
@@ -55,7 +56,7 @@ commandline = null
 prefs.init()
 addToRecent = (file) ->
     recent = prefs.get 'recentFiles', []
-    del recent, file
+    _.pull recent, file
     recent.unshift file
     while recent.length > prefs.get 'recentFilesLength', 10
         recent.pop()

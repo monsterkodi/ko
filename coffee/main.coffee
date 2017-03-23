@@ -4,16 +4,17 @@
 # 000 0 000  000   000  000  000  0000
 # 000   000  000   000  000  000   000
 {
-first,
-fileList,
-dirExists,
 splitFilePos,
 fileExists,
-resolve}      = require './tools/tools'
-prefs         = require './tools/prefs'
-about         = require './tools/about'
+dirExists,
+fileList,
+resolve,
+about,
+first,
+prefs,
+str
+}             = require 'kxk'
 log           = require './tools/log'
-str           = require './tools/str'
 pkg           = require '../package.json'
 Execute       = require './execute'
 Navigate      = require './navigate'
@@ -88,12 +89,11 @@ if args.verbose
 # 000        000   000  000       000            000
 # 000        000   000  00000000  000       0000000 
 
-prefs.init "#{app.getPath('appData')}/#{pkg.productName}/ko.noon", shortcut: 'F2'
+prefs.init shortcut: 'F2'
 
 if args.prefs
     log colors.yellow.bold 'prefs'
-    if fileExists prefs.path
-        log noon.stringify noon.load(prefs.path), colors:true
+    log noon.stringify prefs.store, colors:true
 
 mostRecentFile = -> first prefs.get 'recentFiles'
 
@@ -570,7 +570,7 @@ class Main
     # 000   000  000   000  000   000  000   000     000   
     # 000   000  0000000     0000000    0000000      000   
     
-    showAbout: => about img: "#{__dirname}/../img/about.png"   
+    showAbout: => about img: "#{__dirname}/../img/about.png", pkg: pkg   
 
     log: -> log (str(s) for s in [].slice.call arguments, 0).join " " if args.verbose
     dbg: -> log (str(s) for s in [].slice.call arguments, 0).join " " if args.debug

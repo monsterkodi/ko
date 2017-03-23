@@ -9,11 +9,11 @@ dirExists,
 unresolve,
 relative,
 resolve,
+prefs,
 clamp,
 last,
-$}      = require '../tools/tools'
+$}      = require 'kxk'
 log     = require '../tools/log'
-prefs   = require '../tools/prefs'
 profile = require '../tools/profile'
 Walker  = require '../tools/walker'
 Command = require '../commandline/command'

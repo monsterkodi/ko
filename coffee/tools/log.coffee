@@ -4,7 +4,7 @@
 #000      000   000  000   000
 #0000000   0000000    0000000 
 
-str = require './str'
+{str} = require 'kxk'
 
 log = -> 
     console.log (str(s) for s in [].slice.call arguments, 0).join " "

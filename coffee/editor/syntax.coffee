@@ -5,7 +5,7 @@
 # 0000000      000     000   000     000     000   000  000   000
 {
 last,
-$}     = require '../tools/tools'
+$}     = require 'kxk'
 matchr = require '../tools/matchr'
 log    = require '../tools/log'
 _      = require 'lodash'

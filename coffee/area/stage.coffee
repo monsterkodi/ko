@@ -3,9 +3,9 @@
 # 0000000      000     000000000  000  0000  0000000 
 #      000     000     000   000  000   000  000     
 # 0000000      000     000   000   0000000   00000000
-
-log     = require '../tools/log'
-keyinfo = require '../tools/keyinfo'
+{
+keyinfo
+} = require 'kxk'
 
 class Stage
     

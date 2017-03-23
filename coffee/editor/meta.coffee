@@ -6,9 +6,9 @@
 {
 first,
 last,
-$}  = require '../tools/tools'
+str,
+$}  = require 'kxk'
 log = require '../tools/log'
-str = require '../tools/str'
 _   = require 'lodash'
 fs  = require 'fs'
 

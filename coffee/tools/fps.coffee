@@ -8,7 +8,7 @@
 clamp,
 first,
 last,
-$}  = require '../tools/tools'
+$}  = require 'kxk'
 log = require '../tools/log'
 now = require 'performance-now'
 

@@ -5,15 +5,15 @@
 # 000   000  000   000   0000000  000   000   0000000 
 {
 fileExists,
-last}      = require '../tools/tools'
+last}      = require 'kxk'
+indexer    = require '../indexer'
 log        = require '../tools/log'
 salt       = require '../tools/salt'
-indexer    = require '../indexer'
 Command    = require '../commandline/command'
 _          = require 'lodash'
-atomicFile = require 'write-file-atomic'
 path       = require 'path'
 electron   = require 'electron'
+atomicFile = require 'write-file-atomic'
 
 ipc        = electron.ipcRenderer
 

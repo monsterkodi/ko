@@ -5,7 +5,7 @@
 # 0000000    0000000  000   000   0000000   0000000  0000000
 {
 clamp
-}      = require '../tools/tools'
+}      = require 'kxk'
 events = require 'events'
 
 class Scroll extends events

@@ -6,7 +6,7 @@
 {
 unresolve,
 clamp,
-$}       = require './tools/tools'
+$}       = require 'kxk'
 log      = require './tools/log'
 render   = require './editor/render'
 syntax   = require './editor/syntax'

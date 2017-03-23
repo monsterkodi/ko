@@ -5,14 +5,14 @@
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 {
 fileList,
+keyinfo,
 clamp,
-$}        = require '../tools/tools'
+$}        = require 'kxk'
 ViewBase  = require '../editor/viewbase'
 log       = require '../tools/log'
-keyinfo   = require '../tools/keyinfo'
-split     = require '../split'
 render    = require '../editor/render'
 syntax    = require '../editor/syntax'
+split     = require '../split'
 path      = require 'path'
 
 class Commandline extends ViewBase

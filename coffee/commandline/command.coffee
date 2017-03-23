@@ -4,10 +4,10 @@
 # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
 {
-clamp
-}           = require '../tools/tools'
+clamp,
+prefs
+}           = require 'kxk'
 log         = require '../tools/log'
-prefs       = require '../tools/prefs'
 Syntax      = require '../editor/syntax'
 CommandList = require './commandlist'
 _           = require 'lodash'

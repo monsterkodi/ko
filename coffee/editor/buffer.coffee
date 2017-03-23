@@ -5,17 +5,18 @@
 # 0000000     0000000   000       000       00000000  000   000
 {
 clamp,
-startOf,
-endOf,
 first,
 last
-}       = require "../tools/tools"
+}       = require "kxk"
 ranges  = require '../tools/ranges'
 log     = require '../tools/log'
 fuzzy   = require 'fuzzy'
 event   = require 'events'
 {multi} = require 'heterarchy'
 _       = require 'lodash'
+
+startOf = (r) -> r[0]
+endOf   = (r) -> r[0] + Math.max 1, r[1]-r[0]
 
 class Buffer extends multi event, ranges
     

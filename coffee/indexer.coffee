@@ -7,7 +7,7 @@
 fileExists,
 resolve,
 last
-}        = require './tools/tools'
+}        = require 'kxk'
 log      = require './tools/log'
 Walker   = require './tools/walker'
 _        = require 'lodash'

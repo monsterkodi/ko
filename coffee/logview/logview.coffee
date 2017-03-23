@@ -4,7 +4,7 @@
 # 000      000   000  000   000     000     000  000       000   000
 # 0000000   0000000    0000000       0      000  00000000  00     00
 {
-$}        = require '../tools/tools'
+$}        = require 'kxk'
 ViewBase  = require '../editor/viewbase'
 log       = require '../tools/log'
 

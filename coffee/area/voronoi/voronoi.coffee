@@ -6,7 +6,7 @@
 #     0       0000000   000   000   0000000   000   000   0000000   000
 {
 rad2deg,
-$} = require '../../tools/tools'
+$} = require 'kxk'
 log = require '../../tools/log'
 Snap = require '../../snap.svg'
 Stage = require '../stage'

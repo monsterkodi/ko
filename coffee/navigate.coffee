@@ -6,7 +6,7 @@
 {
 clamp,
 last
-}        = require './tools/tools'
+}        = require 'kxk'
 log      = require './tools/log'
 _        = require 'lodash'
 electron = require 'electron'

@@ -9,12 +9,12 @@ unresolve,
 fileExists,
 setStyle,
 swapExt,
+keyinfo,
 clamp,
-$}        = require '../tools/tools'
+drag,
+post,
+$}        = require 'kxk'
 log       = require '../tools/log'
-drag      = require '../tools/drag'
-post      = require '../tools/post'
-keyinfo   = require '../tools/keyinfo'
 split     = require '../split'
 ViewBase  = require './viewbase'
 syntax    = require './syntax'

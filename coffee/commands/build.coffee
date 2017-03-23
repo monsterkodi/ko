@@ -7,7 +7,7 @@
 fileExists,
 dirExists,
 resolve
-}        = require '../tools/tools'
+}        = require 'kxk'
 log      = require '../tools/log'
 Command  = require '../commandline/command'
 

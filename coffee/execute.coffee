@@ -3,9 +3,10 @@
 #0000000     00000    0000000   000       000   000     000     0000000 
 #000        000 000   000       000       000   000     000     000     
 #00000000  000   000  00000000   0000000   0000000      000     00000000
-
+{
+str
+}        = require 'kxk'
 log      = require './tools/log'
-str      = require './tools/str'
 _        = require 'lodash'
 noon     = require 'noon'
 colors   = require 'colors'
@@ -44,7 +45,7 @@ class Execute
                 str    = require './tools/str' 
                 _      = require 'lodash'
                 coffee = require 'coffee-script'
-                {clamp,last,first,fileExists,dirExists} = require './tools/tools'
+                {clamp,last,first,fileExists,dirExists} = require 'kxk'
                 {max,min,abs,round,ceil,floor,sqrt,pow,exp,log10,sin,cos,tan,acos,asin,atan,PI,E} = Math
                 (global[r] = require r for r in ['path', 'fs', 'noon', 'colors', 'electron'])                    
                 ipc           = electron.ipcMain

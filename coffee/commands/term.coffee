@@ -10,10 +10,10 @@ unresolve,
 resolve,
 clamp,
 last
-}        = require '../tools/tools'
+}        = require 'kxk'
 log      = require '../tools/log'
-Syntax   = require '../editor/syntax'
 Walker   = require '../tools/walker'
+Syntax   = require '../editor/syntax'
 Command  = require '../commandline/command'
 _        = require 'lodash'
 electron = require 'electron'

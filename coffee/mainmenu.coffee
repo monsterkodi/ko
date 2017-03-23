@@ -4,9 +4,9 @@
 # 000 0 000  000   000  000  000  0000  000 0 000  000       000  0000  000   000
 # 000   000  000   000  000  000   000  000   000  00000000  000   000   0000000 
 {
-unresolve
-}     = require './tools/tools'
-prefs = require './tools/prefs'
+unresolve,
+prefs
+}     = require 'kxk'
 log   = require './tools/log'
 pkg   = require '../package.json'
 fs    = require 'fs'

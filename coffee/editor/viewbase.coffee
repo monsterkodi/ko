@@ -6,16 +6,16 @@
 {
 title
 setStyle,
+keyinfo,
+prefs,
 clamp,
+drag,
+post,
 last,
+str,
 sw,
-$}        = require '../tools/tools'
-prefs     = require '../tools/prefs'
-drag      = require '../tools/drag'
-keyinfo   = require '../tools/keyinfo'
-post      = require '../tools/post'
+$}        = require 'kxk'
 log       = require '../tools/log'
-str       = require '../tools/str'
 render    = require './render'
 syntax    = require './syntax'
 scroll    = require './scroll'

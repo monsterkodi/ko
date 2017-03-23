@@ -5,7 +5,7 @@
 #    000     00000000  000   000  000   000  000  000   000  000   000  0000000
 {
 last
-}         = require '../tools/tools'
+}         = require 'kxk'
 salt      = require '../tools/salt'
 log       = require '../tools/log'
 ViewBase  = require '../editor/viewbase'

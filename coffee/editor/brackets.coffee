@@ -7,7 +7,7 @@
 {
 first,
 last
-}       = require '../tools/tools'
+}       = require 'kxk'
 log     = require '../tools/log'
 matchr  = require '../tools/matchr'
 _       = require 'lodash'

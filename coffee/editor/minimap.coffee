@@ -7,10 +7,10 @@
 getStyle,
 clamp,
 first,
-last}   = require '../tools/tools'
+last,
+drag,
+str}    = require 'kxk'
 log     = require '../tools/log'
-str     = require '../tools/str'
-drag    = require '../tools/drag'
 profile = require '../tools/profile'
 scroll  = require './scroll'
 

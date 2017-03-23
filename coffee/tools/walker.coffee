@@ -7,7 +7,7 @@
 fileExists,
 dirExists,
 relative,
-resolve} = require './tools'
+resolve} = require 'kxk'
 log      = require './log'
 walkdir  = require 'walkdir'
 path     = require 'path'
