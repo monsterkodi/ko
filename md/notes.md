@@ -1,5 +1,9 @@
 # todo/ideas
 
+- fix term path completion
+- req macro: 
+    - localize if local file exists
+    - childp
 - search word on alt click and not a func or class
 - cheat sheet
 - handle unsaved changes somehow when closing windows
