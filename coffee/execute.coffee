@@ -92,7 +92,8 @@ class Execute
         @rest  = ''
         @cmdID = cfg?.cmdID
         @childp.write cfg.command + '\n'
-        @childp.write "echo ko_term_done #{@cmdID}\n"
+        if cfg.command != 'pwd'
+            @childp.write "echo ko_term_done #{@cmdID}\n"
         
     restartShell: =>
         @childp.destroy()

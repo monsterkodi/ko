@@ -1,9 +1,10 @@
 # todo/ideas
 
-- fix term path completion
+- shotcut to switch projects in open and term
+    - term: cd to .project
+    - open: open .project/coffee
 - req macro: 
     - localize if local file exists
-    - childp
 - search word on alt click and not a func or class
 - cheat sheet
 - handle unsaved changes somehow when closing windows
@@ -11,6 +12,7 @@
 - limit size of range for bracket matching 
 - term: auto cd to pkg dir when file loaded?
 - list project|pkg dirs?
+- set breakpoint in electron?
 
 #### open
 - shared recent files of stacked windows?

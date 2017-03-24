@@ -97,17 +97,20 @@ class Macro extends Command
                 lastIndex = 0
                 texts = []
                 for word in words
-                    val = {lodash: '_'}[word]   ? word
-                    pth = {'_': 'lodash'}[word] ? word.toLowerCase()
+                    map = 
+                        _:      'lodash'
+                        childp: 'child_process'
+                        pkg:    '../package.json'
+                    pth = map[word] ? word.toLowerCase()
                     # todo search project for path
                     for li in [Math.min(editor.lines.length-1, 100)..0]
                         m = editor.lines[li].match indexer.requireRegExp
                         if m?[1]? and m?[2]?
-                            break if m[1] == val and m[2] == pth
+                            break if m[1] == word and m[2] == pth
                             if editor.lines[li].trim().length and editor.lines[li].search(/^\s*\#/) != 0
                                 lastIndex = Math.max lastIndex, li+1
                     if li <= 0
-                        texts.push "#{val} = require '#{pth}'"
+                        texts.push "#{word} = require '#{pth}'"
                         
                 if texts.length
                     editor.do.start()

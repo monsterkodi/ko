@@ -102,6 +102,12 @@ class Term extends Command
                 rest = ''
         [dir, start, rest]
     
+    # 0000000    000  00000000   
+    # 000   000  000  000   000  
+    # 000   000  000  0000000    
+    # 000   000  000  000   000  
+    # 0000000    000  000   000  
+    
     completeDir: (dir) =>
         [dir, start, rest] = @resolveDirWord dir, last @getText().split ' ' 
         files = fs.readdirSync @resolveDir dir

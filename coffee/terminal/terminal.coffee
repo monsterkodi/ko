@@ -44,7 +44,7 @@ class Terminal extends ViewBase
                 continue
             skip = false
             for meta in @meta.metas.reversed()
-                if meta[2].cmmd == t
+                if meta[2].cmmd == t and t != 'pwd'
                     meta[2].span?.innerHTML = '<i class="fa fa-cog fa-spin fa-1x fa-fw"></i>'
                     skip = true
                     break
