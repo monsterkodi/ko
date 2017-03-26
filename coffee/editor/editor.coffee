@@ -835,13 +835,15 @@ class Editor extends Buffer
                 for c in @reversedCursors()                    
                     if @cursorAtPos([c[0], c[1]-1]) and not @cursorAtPos [c[0], c[1]+1]
                         ci = @indexOfCursor c
-                        @mainCursor = @cursorAtPos([c[0], c[1]-1], newCursors) if newCursors[ci] == @mainCursor
+                        if newCursors[ci] == @mainCursor
+                            @mainCursor = @cursorAtPos([c[0], c[1]-1], newCursors) 
                         newCursors.splice ci, 1
             when 'down' 
                 for c in @reversedCursors()
                     if @cursorAtPos([c[0], c[1]+1]) and not @cursorAtPos [c[0], c[1]-1]
                         ci = @indexOfCursor c
-                        @mainCursor = @cursorAtPos([c[0], c[1]+1], newCursors) if newCursors[ci] == @mainCursor
+                        if newCursors[ci] == @mainCursor
+                            @mainCursor = @cursorAtPos([c[0], c[1]+1], newCursors) 
                         newCursors.splice ci, 1
         @do.cursors newCursors 
         

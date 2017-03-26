@@ -135,7 +135,7 @@ class Split extends event
             @panes[h].style.height = "#{newHeight}px" 
             
             if h == 3
-                if newHeight > 0
+                if newHeight > 0 
                     @setState 'logHeight', newHeight
                 else
                     @setLogVisible false if @logVisible
