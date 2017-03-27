@@ -7,9 +7,9 @@
 fileList,
 keyinfo,
 clamp,
+log,
 $}        = require 'kxk'
 ViewBase  = require '../editor/viewbase'
-log       = require '../tools/log'
 render    = require '../editor/render'
 syntax    = require '../editor/syntax'
 split     = require '../split'

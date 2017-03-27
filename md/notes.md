@@ -5,6 +5,7 @@
     - open: open .project/coffee
 - req macro: 
     - localize if local file exists
+- select multiple lines on ctrl+alt+command+b
 - search word on alt click and not a func or class
 - cheat sheet
 - handle unsaved changes somehow when closing windows

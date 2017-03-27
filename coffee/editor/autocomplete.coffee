@@ -6,8 +6,8 @@
 {
 clamp,
 last,
+log,
 $}       = require 'kxk'
-log      = require '../tools/log'
 Indexer  = require '../indexer'
 _        = require 'lodash'
 event    = require 'events'

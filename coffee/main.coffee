@@ -12,9 +12,9 @@ resolve,
 about,
 first,
 prefs,
-str
+str,
+log
 }             = require 'kxk'
-log           = require './tools/log'
 pkg           = require '../package.json'
 Execute       = require './execute'
 Navigate      = require './navigate'
@@ -446,7 +446,7 @@ class Main
             show:            false
             hasShadow:       false
             webPreferences:
-                scrollBounce:    true
+                scrollBounce: true
             backgroundColor: '#000'
             titleBarStyle:   'hidden'
 
@@ -469,7 +469,6 @@ class Main
                     win.webContents.send 'loadFile', file
                             
         win.webContents.on 'did-finish-load', winLoaded
-        win.on 'ready-to-show', -> win.show()
         win 
      
     # 00000000   00000000   0000000  000  0000000  00000000

@@ -1,6 +1,6 @@
 # based on code from https://github.com/rburns/ansi-to-html
-
-log      = require './log'
+{
+log}     = require 'kxk'
 entities = require 'entities'
 _        = require 'lodash'
 

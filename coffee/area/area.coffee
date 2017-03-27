@@ -4,9 +4,9 @@
 # 000   000  000   000  000       000   000
 # 000   000  000   000  00000000  000   000
 {
+log,
 sw,
 $} = require 'kxk'
-log = require '../tools/log'
 event = require 'events'
 
 class Area extends event

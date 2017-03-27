@@ -5,9 +5,9 @@
 # 0000000    0000000  000   000   0000000   0000000  0000000  0000000    000   000  000   000
 {
 clamp,
-drag
-}    = require 'kxk'
-log  = require '../tools/log'
+drag,
+log
+} = require 'kxk'
 
 class Scrollbar
 

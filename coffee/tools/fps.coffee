@@ -8,8 +8,8 @@
 clamp,
 first,
 last,
+log,
 $}  = require 'kxk'
-log = require '../tools/log'
 now = require 'performance-now'
 
 class FPS

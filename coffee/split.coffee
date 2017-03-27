@@ -5,13 +5,13 @@
 # 0000000   000        0000000  000     000   
 {
 clamp,
-sh,sw,
+sh,sw, 
 prefs,
 drag, 
 last,
-pos,  
+pos,
+log,
 $}    = require 'kxk'
-log   = require './tools/log'
 _     = require 'lodash'
 event = require 'events'
 
@@ -68,9 +68,21 @@ class Split extends event
                 else
                     @splitAt 2, drag.pos.y - @elemTop() - @handleHeight/2, animate:0
 
+    #  0000000  00000000  000000000  000   000  000  000   000  000  0000000    
+    # 000       000          000     000 0 000  000  0000  000  000  000   000  
+    # 0000000   0000000      000     000000000  000  000 0 000  000  000   000  
+    #      000  000          000     000   000  000  000  0000  000  000   000  
+    # 0000000   00000000     000     00     00  000  000   000  000  0000000    
+    
     setWinID: (@winID) ->
         # log 'setWinID', @winID
-        s = @getState 'split', [-@handleHeight,0,@elemHeight()]        
+        @logVisible = false
+        height = sh()-@titlebar.getBoundingClientRect().height
+        @editor.style.height = "#{height}px"
+        log '@editorHeight', @editorHeight()
+        @splitPos = [-@handleHeight,0,height]
+        @resized()
+        s = @getState 'split', @splitPos
         @logVisible = s[2] < @elemHeight()
         display = @logVisible and 'inherit' or 'none'
         @logview.style.display = display
@@ -84,6 +96,7 @@ class Split extends event
     # 0000000   000        0000000  000     000   
     
     splitAt: (i, y, opt) -> 
+        return if not @winID
         # log "Split.splitAt i:#{i} y:#{y}"
         s = []
         for h in [0...@handles.length]
@@ -104,6 +117,7 @@ class Split extends event
     # 000   000  000        000        0000000     000   
         
     applySplit: (s, opt) ->
+        return if not @winID
         # log "Split.applySplit s:#{s} opt:#{opt}"
         if opt?.animate
             emitSplit = => 
@@ -118,7 +132,7 @@ class Split extends event
         
         for i in [0...s.length]
             s[i] = clamp (i and s[i-1] or -@handleHeight), @elemHeight(), s[i]
-            
+
         @handles[0].style.height = "#{clamp 0, @handleHeight, @handleHeight+s[0]}px"
             
         if not @logVisible
@@ -131,8 +145,12 @@ class Split extends event
                 when h is 0 then s[0]
                 when h is s.length then @logVisible and @elemHeight()-last(s)-@handleHeight or 0
                 else s[h]-s[h-1]-@handleHeight
-                    
-            @panes[h].style.transition = "height #{opt.animate/1000}s" if opt?.animate
+
+            if opt?.animate
+                @panes[h].style.transition = "height #{opt.animate/1000}s" 
+            else
+                @panes[h].style.transition = "" 
+                
             @panes[h].style.height = "#{newHeight}px" 
             
             if h == 3
@@ -151,13 +169,15 @@ class Split extends event
     # 000   000  000            000  000   000     000       000   000
     # 000   000  00000000  0000000   000  0000000  00000000  0000000  
     
-    resized: =>
+    resized: => 
+        return if not @winID
         height = sh()-@titlebar.getBoundingClientRect().height
         width  = sw()
         @elem.style.height = "#{height}px"
         @elem.style.width  = "#{width}px"
         s = []
         e = @editorHeight()
+        log 'resized', width, height, @elemHeight(), e
         for h in [0...@handles.length]
             s.push clamp -@handleHeight, @elemHeight(), @splitPosY h
         if e == 0 and not @logVisible # keep editor closed

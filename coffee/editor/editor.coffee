@@ -8,8 +8,8 @@ extName,
 clamp,
 first,
 last,
+log,
 $}      = require 'kxk'
-log     = require '../tools/log'
 salt    = require '../tools/salt'
 watcher = require './watcher'
 Buffer  = require './buffer'

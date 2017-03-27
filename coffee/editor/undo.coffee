@@ -5,9 +5,9 @@
 #  0000000   000   000  0000000     0000000 
 {
 first, 
-last}  = require 'kxk'
-log    = require '../tools/log'
-_      = require 'lodash'
+last,
+log}  = require 'kxk'
+_     = require 'lodash'
 
 class Undo
     

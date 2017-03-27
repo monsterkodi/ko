@@ -6,9 +6,9 @@
 {
 fileExists,
 dirExists,
-resolve
+resolve,
+log
 }        = require 'kxk'
-log      = require '../tools/log'
 Command  = require '../commandline/command'
 
 class Build extends Command

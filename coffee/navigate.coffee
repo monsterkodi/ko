@@ -5,9 +5,9 @@
 # 000   000  000   000      0      000   0000000   000   000     000     00000000
 {
 clamp,
-last
+last,
+log
 }        = require 'kxk'
-log      = require './tools/log'
 _        = require 'lodash'
 electron = require 'electron'
 

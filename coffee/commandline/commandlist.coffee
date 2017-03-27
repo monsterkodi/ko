@@ -3,12 +3,12 @@
 #   000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  0000000      000   
 #   000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000       000     000   
 #    0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  0000000      000   
-
+{
+log}     = require 'kxk'
 ViewBase = require '../editor/viewbase'
 Syntax   = require '../editor/syntax'
 matchr   = require '../tools/matchr'
 salt     = require '../tools/salt'
-log      = require '../tools/log'
 
 class CommandList extends ViewBase
 

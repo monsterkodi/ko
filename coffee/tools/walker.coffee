@@ -7,11 +7,11 @@
 fileExists,
 dirExists,
 relative,
-resolve} = require 'kxk'
-log      = require './log'
-walkdir  = require 'walkdir'
-path     = require 'path'
-fs       = require 'fs'
+resolve,
+log}    = require 'kxk'
+walkdir = require 'walkdir'
+path    = require 'path'
+fs      = require 'fs'
 
 class Walker
 

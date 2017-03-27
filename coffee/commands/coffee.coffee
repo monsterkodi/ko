@@ -3,9 +3,10 @@
 # 000       000   000  000000    000000    0000000   0000000 
 # 000       000   000  000       000       000       000     
 #  0000000   0000000   000       000       00000000  00000000
-
-log      = require '../tools/log'
-str      = require '../tools/str'
+{
+log,
+str
+}        = require 'kxk'
 Syntax   = require '../editor/syntax'
 Command  = require '../commandline/command'
 electron = require 'electron'

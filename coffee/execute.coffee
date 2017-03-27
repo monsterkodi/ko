@@ -4,9 +4,9 @@
 #000        000 000   000       000       000   000     000     000     
 #00000000  000   000  00000000   0000000   0000000      000     00000000
 {
-str
+str,
+log
 }        = require 'kxk'
-log      = require './tools/log'
 _        = require 'lodash'
 noon     = require 'noon'
 colors   = require 'colors'

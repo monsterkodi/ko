@@ -4,10 +4,10 @@
 #    000     000       000   000  000 0 000  000  000  0000  000   000  000    
 #    000     00000000  000   000  000   000  000  000   000  000   000  0000000
 {
-last
+last,
+log
 }         = require 'kxk'
 salt      = require '../tools/salt'
-log       = require '../tools/log'
 ViewBase  = require '../editor/viewbase'
 syntax    = require '../editor/syntax'
 ansiDiss  = require '../tools/ansidiss'

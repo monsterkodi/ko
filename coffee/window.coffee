@@ -16,7 +16,7 @@ last,
 drag,
 pos,
 str,
-resolve,
+log,
 $}          = require 'kxk'
 Split       = require './split'
 View        = require './editor/view'
@@ -28,7 +28,6 @@ Titlebar    = require './titlebar'
 Navigate    = require './navigate'
 FPS         = require './tools/fps'
 Info        = require './editor/info'
-log         = require './tools/log'
 encode      = require './tools/encode'
 _           = require 'lodash'
 fs          = require 'fs'
@@ -101,7 +100,6 @@ ipc.on 'loadFile', (event, file) => loadFile file
 
 winMain = -> 
     window.winID = winID
-    # window.split?.setWinID winID 
     editor.updateTitlebar()
     
     s = getState 'fontSize'
@@ -322,20 +320,25 @@ fps = window.fps = new FPS()
 
 screenSize = => electron.screen.getPrimaryDisplay().workAreaSize
 
-win.on 'move', -> setState 'bounds', win.getBounds()
-
-window.onresize = ->
+initSplit = -> 
     if not split.winID?
         split.setWinID winID 
     else
         split.resized()
+    
+win.on 'move', -> setState 'bounds', win.getBounds()
+win.on 'show', -> log 'winshow'; initSplit()
+window.onresize = ->
+    log 'onresize'
+    initSplit()
     setState 'bounds', win.getBounds()
     if getState 'centerText', false
         screenWidth = screenSize().width
         editor.centerText sw() == screenWidth, 0
 
 window.onload = => 
-    split.resized()
+    log 'onload'
+    initSplit()
     info.reload()
     
 window.onunload = => editor.setCurrentFile null, noSaveScroll: true # to stop watcher

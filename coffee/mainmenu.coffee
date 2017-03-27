@@ -5,9 +5,9 @@
 # 000   000  000   000  000  000   000  000   000  00000000  000   000   0000000 
 {
 unresolve,
-prefs
+prefs,
+log
 }     = require 'kxk'
-log   = require './tools/log'
 pkg   = require '../package.json'
 fs    = require 'fs'
 path  = require 'path'

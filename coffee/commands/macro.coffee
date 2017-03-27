@@ -5,9 +5,9 @@
 # 000   000  000   000   0000000  000   000   0000000 
 {
 fileExists,
-last}      = require 'kxk'
+last,
+log}       = require 'kxk'
 indexer    = require '../indexer'
-log        = require '../tools/log'
 salt       = require '../tools/salt'
 Command    = require '../commandline/command'
 _          = require 'lodash'

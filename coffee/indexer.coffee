@@ -6,9 +6,9 @@
 {
 fileExists,
 resolve,
-last
+last,
+log
 }        = require 'kxk'
-log      = require './tools/log'
 Walker   = require './tools/walker'
 _        = require 'lodash'
 fs       = require 'fs'

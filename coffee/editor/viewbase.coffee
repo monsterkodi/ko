@@ -13,9 +13,9 @@ drag,
 post,
 last,
 str,
+log,
 sw,
 $}        = require 'kxk'
-log       = require '../tools/log'
 render    = require './render'
 syntax    = require './syntax'
 scroll    = require './scroll'

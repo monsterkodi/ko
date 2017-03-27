@@ -5,8 +5,8 @@
 # 000  000   000  000        0000000 
 {
 shortCount,
+log,
 $}       = require 'kxk'
-log      = require '../tools/log'
 _        = require 'lodash'
 electron = require 'electron'
 ipc      = electron.ipcRenderer

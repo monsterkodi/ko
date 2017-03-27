@@ -7,8 +7,8 @@
 first,
 last,
 str,
+log,
 $}  = require 'kxk'
-log = require '../tools/log'
 _   = require 'lodash'
 fs  = require 'fs'
 

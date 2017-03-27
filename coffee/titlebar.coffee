@@ -6,8 +6,9 @@
 {
 unresolve,
 clamp,
+log,
 $}       = require 'kxk'
-log      = require './tools/log'
+walker   = require './tools/walker'
 render   = require './editor/render'
 syntax   = require './editor/syntax'
 path     = require 'path'
@@ -24,16 +25,24 @@ class Titlebar
         $('.body').addEventListener 'focusin',  @closeList
 
     update: (info) ->
-        if info.file?
-            title   = path.basename info.file
-            tooltip = unresolve info.file
-        else
-            title = ''
+        
         ic  = info.focus and " focus" or ""
-        id  = "<span class='clickarea'><span class=\"winid #{ic}\">#{info.winID}</span>"
         dc  = info.dirty and " dirty" or "clean"
         dot = info.sticky and "○" or "●"
         db  = "<span class=\"dot #{dc}#{ic}\">#{dot}</span>"
+        
+        if info.file?
+            diss = syntax.dissForTextAndSyntax(path.basename(info.file), 'ko', join: true)
+            title = render.line diss, charWidth:0
+            
+            if pkgPath = walker.packagePath info.file
+                title = path.basename(pkgPath) + "<span class='#{ic}'> ▸ </span>" + title
+            
+            tooltip = unresolve info.file
+        else
+            title = ''
+        
+        id  = "<span class='clickarea'><span class=\"winid #{ic}\">#{info.winID}</span>"
         da  = info.dirty and dot or ""
         txt = id + db 
         if title.length

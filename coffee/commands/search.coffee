@@ -5,9 +5,9 @@
 # 0000000   00000000  000   000  000   000   0000000  000   000
 {
 unresolve,
-first
+first,
+log
 }        = require 'kxk'
-log      = require '../tools/log'
 walker   = require '../tools/walker'
 matchr   = require '../tools/matchr'
 syntax   = require '../editor/syntax'

@@ -6,10 +6,10 @@
 {
 clamp,
 first,
-last
+last,
+log
 }       = require "kxk"
 ranges  = require '../tools/ranges'
-log     = require '../tools/log'
 fuzzy   = require 'fuzzy'
 event   = require 'events'
 {multi} = require 'heterarchy'

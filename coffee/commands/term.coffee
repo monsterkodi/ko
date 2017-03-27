@@ -9,9 +9,9 @@ dirExists,
 unresolve,
 resolve,
 clamp,
-last
+last,
+log
 }        = require 'kxk'
-log      = require '../tools/log'
 Walker   = require '../tools/walker'
 Syntax   = require '../editor/syntax'
 Command  = require '../commandline/command'

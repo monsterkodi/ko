@@ -9,8 +9,8 @@ clamp,
 first,
 last,
 drag,
+log,
 str}    = require 'kxk'
-log     = require '../tools/log'
 profile = require '../tools/profile'
 scroll  = require './scroll'
 

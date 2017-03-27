@@ -12,8 +12,8 @@ resolve,
 prefs,
 clamp,
 last,
+log,
 $}      = require 'kxk'
-log     = require '../tools/log'
 profile = require '../tools/profile'
 Walker  = require '../tools/walker'
 Command = require '../commandline/command'

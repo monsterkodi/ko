@@ -13,8 +13,8 @@ keyinfo,
 clamp,
 drag,
 post,
+log,
 $}        = require 'kxk'
-log       = require '../tools/log'
 split     = require '../split'
 ViewBase  = require './viewbase'
 syntax    = require './syntax'
