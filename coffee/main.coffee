@@ -410,7 +410,6 @@ class Main
             if w.file
                 i += 1
                 sequenced[i] = w
-        # prefs.set 'windows', sequenced
         for k, w of sequenced
             @restoreWin w
                 

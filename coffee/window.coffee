@@ -327,9 +327,7 @@ initSplit = ->
         split.resized()
     
 win.on 'move', -> setState 'bounds', win.getBounds()
-win.on 'show', -> log 'winshow'; initSplit()
 window.onresize = ->
-    log 'onresize'
     initSplit()
     setState 'bounds', win.getBounds()
     if getState 'centerText', false
@@ -337,11 +335,11 @@ window.onresize = ->
         editor.centerText sw() == screenWidth, 0
 
 window.onload = => 
-    log 'onload'
     initSplit()
     info.reload()
     
-window.onunload = => editor.setCurrentFile null, noSaveScroll: true # to stop watcher
+window.onunload = => 
+    editor.setCurrentFile null, noSaveScroll: true # to stop watcher
 
 # 0000000   0000000  00000000   00000000  00000000  000   000   0000000  000   000   0000000   000000000
 #000       000       000   000  000       000       0000  000  000       000   000  000   000     000   

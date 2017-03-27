@@ -79,7 +79,7 @@ class Split extends event
         @logVisible = false
         height = sh()-@titlebar.getBoundingClientRect().height
         @editor.style.height = "#{height}px"
-        log '@editorHeight', @editorHeight()
+        # log '@editorHeight', @editorHeight()
         @splitPos = [-@handleHeight,0,height]
         @resized()
         s = @getState 'split', @splitPos
@@ -177,7 +177,7 @@ class Split extends event
         @elem.style.width  = "#{width}px"
         s = []
         e = @editorHeight()
-        log 'resized', width, height, @elemHeight(), e
+        # log 'resized', width, height, @elemHeight(), e
         for h in [0...@handles.length]
             s.push clamp -@handleHeight, @elemHeight(), @splitPosY h
         if e == 0 and not @logVisible # keep editor closed
