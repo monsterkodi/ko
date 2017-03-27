@@ -466,7 +466,7 @@ or download the release dmg from github and create a symlink:
     
 ### settings (windows, command histories and other stuff) are saved to
 
-    ~/Library/Application\ Support/ko/ko.noon
+    ~/Library/Application\ Support/ko/prefs.noon
    
 terminal aliases are stored in
 

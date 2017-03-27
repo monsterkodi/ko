@@ -41,7 +41,8 @@ ipc         = electron.ipcRenderer
 remote      = electron.remote
 dialog      = remote.dialog
 Browser     = remote.BrowserWindow
-winID       = null
+win         = remote.getCurrentWindow()
+winID       = win.id
 editor      = null
 logview     = null
 terminal    = null
@@ -69,18 +70,9 @@ addToRecent = (file) ->
 #      000     000     000   000     000     000     
 # 0000000      000     000   000     000     00000000
    
-setState = window.setState = (key, value) ->
-    return if not winID
-    if winID
-        prefs.set "windows:#{winID}:#{key}", value
-    
-getState = window.getState = (key, value) ->
-    return value if not winID
-    prefs.get "windows:#{winID}:#{key}", value
-    
-delState = window.delState = (key) ->
-    return if not winID
-    prefs.del "windows:#{winID}:#{key}"
+setState = window.setState = (key, value) -> prefs.set "windows:#{winID}:#{key}", value
+getState = window.getState = (key, value) -> prefs.get "windows:#{winID}:#{key}", value
+delState = window.delState = (key)        -> prefs.del "windows:#{winID}:#{key}"
 
 # 000  00000000    0000000
 # 000  000   000  000     
@@ -100,9 +92,16 @@ ipc.on 'reloadFile', => reloadFile()
 ipc.on 'saveFileAs', => saveFileAs()
 ipc.on 'saveFile',   => saveFile()
 ipc.on 'loadFile', (event, file) => loadFile file
-ipc.on 'setWinID', (event, id) => 
-    winID = window.winID = id
-    window.split?.setWinID id 
+
+# 000   000  000  000   000  00     00   0000000   000  000   000  
+# 000 0 000  000  0000  000  000   000  000   000  000  0000  000  
+# 000000000  000  000 0 000  000000000  000000000  000  000 0 000  
+# 000   000  000  000  0000  000 0 000  000   000  000  000  0000  
+# 00     00  000  000   000  000   000  000   000  000  000   000  
+
+winMain = -> 
+    window.winID = winID
+    # window.split?.setWinID winID 
     editor.updateTitlebar()
     
     s = getState 'fontSize'
@@ -323,16 +322,21 @@ fps = window.fps = new FPS()
 
 screenSize = => electron.screen.getPrimaryDisplay().workAreaSize
 
+win.on 'move', -> setState 'bounds', win.getBounds()
+
 window.onresize = ->
-    split.resized()
-    ipc.send 'saveBounds', winID if winID?
+    if not split.winID?
+        split.setWinID winID 
+    else
+        split.resized()
+    setState 'bounds', win.getBounds()
     if getState 'centerText', false
         screenWidth = screenSize().width
         editor.centerText sw() == screenWidth, 0
 
 window.onload = => 
-    info.reload()
     split.resized()
+    info.reload()
     
 window.onunload = => editor.setCurrentFile null, noSaveScroll: true # to stop watcher
 
@@ -343,7 +347,6 @@ window.onunload = => editor.setCurrentFile null, noSaveScroll: true # to stop wa
 #0000000    0000000  000   000  00000000  00000000  000   000  0000000   000   000   0000000      000   
 
 screenShot = ->
-    win = Browser.fromId winID 
     win.capturePage (img) ->
         file = 'screenShot.png'
         remote.require('fs').writeFile file, img.toPng(), (err) -> 
@@ -464,4 +467,5 @@ document.onkeydown = (event) ->
             split.hideCommandline() if split.isCommandlineVisible()
             split.hideLog() if split.logVisible
             return
-        
+
+winMain()

@@ -69,6 +69,7 @@ class Split extends event
                     @splitAt 2, drag.pos.y - @elemTop() - @handleHeight/2, animate:0
 
     setWinID: (@winID) ->
+        # log 'setWinID', @winID
         s = @getState 'split', [-@handleHeight,0,@elemHeight()]        
         @logVisible = s[2] < @elemHeight()
         display = @logVisible and 'inherit' or 'none'
@@ -94,7 +95,7 @@ class Split extends event
         if i == 0 then s[1] = s[0] + @commandlineHeight + @handleHeight
         if i == 1 then s[0] = s[1] - @commandlineHeight - @handleHeight
                 
-        @applySplit s, opt ? animate:300
+        @applySplit s, opt ? animate:200
     
     #  0000000   00000000   00000000   000      000   000
     # 000   000  000   000  000   000  000       000 000 

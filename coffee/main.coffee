@@ -136,11 +136,7 @@ ipc.on 'restartShell',           (event, cfg)    => winShells[cfg.winID].restart
 ipc.on 'executeCoffee',          (event, cfg)    => coffeeExecute.executeCoffee cfg
 ipc.on 'maximizeWindow',         (event, winID)  => main.toggleMaximize winWithID winID
 ipc.on 'activateWindow',         (event, winID)  => main.activateWindowWithID winID
-ipc.on 'saveBounds',             (event, winID)  => main.saveWinBounds winWithID winID
 ipc.on 'reloadWindow',           (event, winID)  => main.reloadWin winWithID winID
-ipc.on 'prefSet',                (event, k, v)   => prefs.set k, v
-ipc.on 'prefGet',                (event, k, d)   => event.returnValue = prefs.get k, d
-ipc.on 'reloadMenu',             ()              => main.reloadMenu() # still in use?
 ipc.on 'navigate',               (event, action) => event.returnValue = navigate.action action
 ipc.on 'indexer',                (event, item)   => event.returnValue = main.indexer[item]
 ipc.on 'winInfos',               (event)         => 
@@ -185,6 +181,8 @@ class Main
             app.exit 0
             return
 
+        MainMenu.init @
+
         @indexer      = new Indexer
         coffeeExecute = new Execute main: @
 
@@ -225,9 +223,7 @@ class Main
     winWithID:   winWithID
     activeWin:   activeWin
     visibleWins: visibleWins
-    
-    reloadMenu: => MainMenu.init @
-        
+            
     reloadWin: (win) ->
         if win?
             dev = win.webContents.isDevToolsOpened()
@@ -244,9 +240,6 @@ class Main
         else
             win.maximize()
         disableSnap = false
-
-    saveWinBounds: (win) ->
-        prefs.set "windows:#{win.id}:bounds",win.getBounds()
     
     toggleWindows: =>
         if wins().length
@@ -417,7 +410,7 @@ class Main
             if w.file
                 i += 1
                 sequenced[i] = w
-        prefs.set 'windows', sequenced
+        # prefs.set 'windows', sequenced
         for k, w of sequenced
             @restoreWin w
                 
@@ -450,7 +443,7 @@ class Main
             minHeight:       130
             useContentSize:  true
             fullscreenable:  true
-            show:            true
+            show:            false
             hasShadow:       false
             webPreferences:
                 scrollBounce:    true
@@ -460,11 +453,8 @@ class Main
         win.loadURL "file://#{__dirname}/index.html"
         app.dock.show()
         win.on 'close',  @onCloseWin
-        win.on 'move',   @onMoveWin
         win.on 'resize', @onResizeWin
-                
-        winReady = => win.webContents.send 'setWinID', win.id
-                        
+                                        
         winLoaded = =>
             if openFile?
                 win.currentFile = splitFilePos(openFile)[0]
@@ -477,19 +467,11 @@ class Main
                 if file?
                     win.currentFile = file
                     win.webContents.send 'loadFile', file
-                    
-            saveState = =>                 
-                @saveWinBounds win
-                @reloadMenu()
-                    
-            setTimeout saveState, 1000
-        
-        win.webContents.on 'dom-ready',       winReady
+                            
         win.webContents.on 'did-finish-load', winLoaded
+        win.on 'ready-to-show', -> win.show()
         win 
-    
-    onMoveWin: (event) => @saveWinBounds event.sender
-    
+     
     # 00000000   00000000   0000000  000  0000000  00000000
     # 000   000  000       000       000     000   000     
     # 0000000    0000000   0000000   000    000    0000000 
@@ -545,9 +527,8 @@ class Main
             w = @createWindow file if not w?
                     
     quit: => 
-        prefs.save (ok) =>
-            app.exit     0
-            process.exit 0
+        app.exit     0
+        process.exit 0
     
     #  0000000   000      000   0000000    0000000
     # 000   000  000      000  000   000  000     
@@ -556,7 +537,7 @@ class Main
     # 000   000  0000000  000  000   000  0000000 
     
     alias: (event, dict) =>
-        aliasFile = "#{app.getPath('appData')}/#{pkg.productName}/alias.noon"
+        aliasFile = "#{app.getPath('userData')}/alias.noon"
         if dict?
             noon.save aliasFile, dict
         if fileExists aliasFile
@@ -571,9 +552,6 @@ class Main
     # 000   000  0000000     0000000    0000000      000   
     
     showAbout: => about img: "#{__dirname}/../img/about.png", pkg: pkg   
-
-    log: -> log (str(s) for s in [].slice.call arguments, 0).join " " if args.verbose
-    dbg: -> log (str(s) for s in [].slice.call arguments, 0).join " " if args.debug
             
 #  0000000   00000000   00000000         0000000   000   000
 # 000   000  000   000  000   000       000   000  0000  000
@@ -581,14 +559,14 @@ class Main
 # 000   000  000        000        000  000   000  000  0000
 # 000   000  000        000        000   0000000   000   000
 
-app.on 'open-file', (event, path) => 
+app.on 'open-file', (event, path) -> 
     if not main?
         openFiles.push path
     else
         main.createWindow path
     event.preventDefault()
 
-app.on 'ready', => 
+app.on 'ready', -> 
     main     = new Main openFiles
     navigate = new Navigate main
     
