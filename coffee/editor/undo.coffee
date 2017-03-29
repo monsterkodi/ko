@@ -6,6 +6,7 @@
 {
 first, 
 last,
+str,
 log}  = require 'kxk'
 _     = require 'lodash'
 
@@ -124,11 +125,24 @@ class Undo
     # 000   000  000  0000  000   000  000   000
     #  0000000   000   000  0000000     0000000 
     
+    undoLine: (line) ->
+        switch line.change
+            when 'deleted'
+                @editor.lines.splice line.oldIndex, 1
+                @changeInfoLineDelete()
+            when 'inserted'
+                @editor.lines.splice line.newIndex, 0, line.after
+                @changeInfoLineInsert()
+            when 'changed'
+                @editor.lines[line.newIndex] = line.after
+                @changeInfoLineChange()
+                
     undo: ->
         if @actions.length
             @newChangeInfo()
             action = @actions.pop()
             undoLines = []
+            # log 'action.lines', action.lines
             for line in action.lines
                 undoLines.push 
                     oldIndex:  line.newIndex
@@ -141,23 +155,30 @@ class Undo
                 if line.change == 'inserted' then lastLine.change = 'deleted'
             
             undoLines.reverse()
-            for lineIndex in [0...undoLines.length]
-                line = undoLines[lineIndex]
-                if line.change == 'inserted'
-                    for restIndex in [lineIndex+1...undoLines.length]
-                        restLine = undoLines[restIndex]
-                        if restLine.oldIndex >= line.oldIndex
-                            restLine.oldIndex += 1
-                            # restLine.newIndex += 1
-                            
-            log 'undoLines', undoLines
+            
+            # log 'undoLines', undoLines
+            
             for line in undoLines
-                @redoLine line
+                @undoLine line
+            
+            # log 'lines after redo', @editor.lines
+                        
+            sortedLines = []
+            while line = undoLines.shift()
+                if line.change == 'inserted'
+                    for l in sortedLines
+                        if l.newIndex >= line.newIndex
+                            l.newIndex += 1
+                    for l in undoLines
+                        if l.newIndex > line.newIndex
+                            l.oldIndex += 1
+                sortedLines.push line
+            log 'sortedLines', sortedLines
             
             @undoCursor action
             @undoSelection action
             @futures.unshift action
-            @editor.changed @changeInfo, lines: undoLines
+            @editor.changed @changeInfo, lines: sortedLines
             @delChangeInfo()
                                                 
     undoSelection: (action) ->
@@ -174,7 +195,22 @@ class Undo
             @editor.cursors = action.curBefore 
             @editor.mainCursor = @editor.cursors[action.mainBefore]
         @changeInfoCursor()
-        
+
+    #  0000000   0000000   00000000   000000000
+    # 000       000   000  000   000     000   
+    # 0000000   000   000  0000000       000   
+    #      000  000   000  000   000     000   
+    # 0000000    0000000   000   000     000   
+    
+    sortLines: (lines) ->
+        return if not lines?.length
+        lines.sort (a,b) ->
+            if a.change == 'inserted' or 'b.change' == 'inserted'
+                if a.oldIndex == b.oldIndex then b.newIndex - a.newIndex
+                else b.oldIndex - a.oldIndex
+            else                
+                Math.max(b.oldIndex, b.newIndex) - Math.max(a.oldIndex, a.newIndex)
+                        
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000
     # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
@@ -337,9 +373,9 @@ class Undo
         if @groupCount == 0
             @merge()
             if @changeInfo?
-                if last(@actions).lines.length
-                    log 'undo.end', last(@actions).lines
-                @editor.changed @changeInfo, last @actions
+                lines = _.clone last(@actions).lines
+                console.log 'end', str @editor.lines
+                @editor.changed @changeInfo, lines: lines
                 @delChangeInfo()
 
     # 00     00  00000000  00000000    0000000   00000000
