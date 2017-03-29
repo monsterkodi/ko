@@ -46,10 +46,12 @@ class Terminal extends ViewBase
             for meta in @meta.metas.reversed()
                 if meta[2].cmmd == t 
                     if t != 'pwd'
-                        meta[2].span?.innerHTML = '<i class="fa fa-cog fa-spin fa-1x fa-fw"></i>'
+                        spinningCog = '<i class="fa fa-cog fa-spin fa-1x fa-fw"></i>'
+                        meta[2].span?.innerHTML = spinningCog
                         stopSpin = ->
-                            meta[2].span?.innerHTML = '<i class="fa fa-cog fa-1x fa-fw"></i>'
-                        setTimeout stopSpin, 2000
+                            if meta[2].span?.innerHTML == spinningCog
+                                meta[2].span?.innerHTML = '<i class="fa fa-cog fa-1x fa-fw"></i>'
+                        setTimeout stopSpin, 3000
                     skip = true
                     break
             continue if skip
