@@ -468,7 +468,7 @@ document.onkeydown = (event) ->
         when 'command+ctrl+right' then return stop event, navigate.forward()
         when 'command+shift+y'    
             split.focus 'editor'
-            split.hideCommandline() if split.isCommandlineVisible()
+            split.hideCommandline() if split.commandlineVisible()
             split.hideLog() if split.logVisible
             return
 

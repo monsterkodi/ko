@@ -204,7 +204,7 @@ class Split extends event
     hideTerminal:   -> @splitAt 0, 0
     hideEditor:     -> @splitAt 1, @elemHeight()
     
-    commandlineVisible: -> @splitPosY(1)     > 0
+    commandlineVisible: -> @splitPosY(1)     > 0 # @splitPosY(1) > @commandlineHeight 
     terminalVisible:    -> @terminalHeight() > 0 and @terminal.style.display != 'none'
     editorVisible:      -> @editorHeight()   > 0
 
@@ -289,8 +289,6 @@ class Split extends event
     moveCommandLineBy: (delta) ->
         @splitAt 0, clamp 0, @elemHeight() - @commandlineHeight - @handleHeight, delta + @splitPosY 0       
         
-    isCommandlineVisible: -> @splitPosY(1) > @commandlineHeight 
-    
     hideCommandline: -> 
         @splitAt 1, 0, animate:0
         @emit 'commandline', 'hidden'

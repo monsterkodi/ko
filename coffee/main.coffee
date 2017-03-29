@@ -466,6 +466,8 @@ class Main
                 if file?
                     win.currentFile = file
                     win.webContents.send 'loadFile', file
+                else
+                    win.show()
                             
         win.webContents.on 'did-finish-load', winLoaded
         win 

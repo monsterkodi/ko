@@ -248,6 +248,7 @@ class Commandline extends ViewBase
         switch combo
             when 'enter'                then return @execute()
             when 'command+enter'        then return @execute() + window.split.do "focus #{@command?.focus}"
+            when 'command+shift+enter'  then return window.split.do "focus terminal"
             when 'up'                   then return @setAndSelectText @command?.prev()
             when 'down'                 then return @setAndSelectText @command?.next()
             when 'esc'                  then return @cancel()
