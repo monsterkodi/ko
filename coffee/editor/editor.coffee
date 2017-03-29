@@ -615,16 +615,20 @@ class Editor extends Buffer
         b ?= first @highlights
         a = @rangeAfterPosInRanges  @cursorPos(), @highlights
         a ?= last @highlights
-        [a, b] if a? and b?
+        if a? and b?
+            @sortRanges [a, b] 
 
     selectBetweenSurround: ->
         if surr = @highlightsSurroundingCursor()
             @do.start()
-            s = @rangeBetween surr[0], surr[1]
-            if s
-                @do.selections [s]
+            start = @rangeEndPos surr[0] 
+            end = @rangeStartPos surr[1]
+            s = @rangesBetweenPositions start, end
+            s = @cleanRanges s
+            if s.length
+                @do.selections s
                 if @selections.length
-                    @do.cursors [@rangeEndPos(s)], closestMain: true
+                    @do.cursors [@rangeEndPos(last s)], closestMain: true
             @do.end()
             
     selectSurround: ->
