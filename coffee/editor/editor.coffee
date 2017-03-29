@@ -599,10 +599,14 @@ class Editor extends Buffer
             @highlights = @rangesForText text, max:9999
             @renderHighlights()
             @emit 'highlight'
-            window.commandline.startCommand 'find' if window.commandline.command?.prefsID not in ['search', 'find']
+            
+            # this should be done somewhere else (commandline or find/search commands)
+            if window.split.commandlineVisible()
+                window.commandline.startCommand 'find' if window.commandline.command?.prefsID not in ['search', 'find']
             window.commandline.commands.find.currentText = text
             window.commandline.commands.search.currentText = text
             window.commandline.setText text
+            
             @focus()
 
     clearHighlights: ->
@@ -641,7 +645,11 @@ class Editor extends Buffer
 
     selectAllHighlights: ->
         @do.start()
-        @highlightTextOfSelectionOrWordAtCursor()
+        if not @highlights.length
+            @highlightTextOfSelectionOrWordAtCursor()
+        @do.selections @highlights
+        if @selections.length
+            @do.cursors (@rangeEndPos(r) for r in @selections), closestMain: true
         @do.end()
     
     selectNextHighlight: -> # command+g
