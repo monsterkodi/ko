@@ -42,6 +42,8 @@ module.exports = class Ranges
     positionsBelowLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] > li)
     positionsAfterLineColInPositions: (li,col,pl) -> (p for p in pl when p[1] == li and p[0]>=col)
     positionsNotInRanges: (pss, rgs) -> _.filter pss, (p) => not @isPosInRanges p, rgs
+    positionsBetweenPositionsInPositions: (p1,p2,pl) -> 
+        (r for r in pl when ( (r[1] > p1[1] or (r[1] == p1[1]) and (r[0] >= p1[0])) and (r[1] < p2[1] or (r[1] == p2[1]) and (r[0] >= p2[0])))) 
     manhattanDistance: (a,b) -> Math.abs(a[1]-b[1])+Math.abs(a[0]-b[0])
         
     posClosestToPosInPositions: (p,pl) -> 

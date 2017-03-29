@@ -9,6 +9,7 @@ clamp,
 first,
 last,
 log,
+str,
 $}      = require 'kxk'
 salt    = require '../tools/salt'
 watcher = require './watcher'
@@ -1499,10 +1500,11 @@ class Editor extends Buffer
             csel = @continuousSelectionAtPos c
             if csel?
                 [sp, ep] = csel
-                @oldCursorSet newCursors, c, sp[0], sp[1]
+                for nc in @positionsBetweenPositionsInPositions sp, ep, newCursors
+                    @newCursorSet newCursors, nc, sp[0], sp[1]
                 if sp[1] < ep[1] and sp[0] > 0 and ep[0] < @lines[ep[1]].length 
                     joinLines.push sp[1] # selection spans multiple lines and first and last line are cut
-
+                    
         for s in @reversedSelections()
             continue if s[0] >= @lines.length
             lineSelected = s[1][0] == 0 and s[1][1] == @lines[s[0]].length
@@ -1516,9 +1518,11 @@ class Editor extends Buffer
                 for nc in @positionsFromPosInPositions [s[1][1], s[0]], @positionsInLineAtIndexInPositions s[0], newCursors
                     @newCursorDelta newCursors, nc, -(s[1][1]-s[1][0])
 
-            if s[0] in joinLines # == last joinLines?
+            if s[0] in joinLines
                 @do.change s[0], @lines[s[0]] + @lines[s[0]+1]
                 @do.delete s[0]+1
+                for nc in @positionsBelowLineIndexInPositions s[0], newCursors
+                    @newCursorDelta newCursors, nc, 0, -1 # move cursors below deleted line up                
                 _.pull joinLines, s[0]
         
         @do.selections []

@@ -156,23 +156,45 @@ class Undo
             
             undoLines.reverse()
             
+            # log 'lines before redo', @editor.lines
             # log 'undoLines', undoLines
             
-            for line in undoLines
+            sortedLines = []
+            cloneLines = _.cloneDeep undoLines
+            while line = cloneLines.shift()
+                if line.change == 'deleted'
+                    for l in cloneLines
+                        if l.newIndex > line.newIndex
+                            l.oldIndex -= 1
+                sortedLines.push line
+            
+            for line in sortedLines
                 @undoLine line
             
-            # log 'lines after redo', @editor.lines
-                        
-            sortedLines = []
-            while line = undoLines.shift()
-                if line.change == 'inserted'
-                    for l in sortedLines
-                        if l.newIndex >= line.newIndex
-                            l.newIndex += 1
-                    for l in undoLines
-                        if l.newIndex > line.newIndex
-                            l.oldIndex += 1
-                sortedLines.push line
+            log 'lines after redo', @editor.lines
+            
+            # cloneLines = _.cloneDeep sortedLines
+            # sortedLines = []
+            # while line = cloneLines.shift()
+                # if line.change == 'inserted'
+                    # for l in sortedLines
+                        # if l.newIndex >= line.newIndex
+                            # l.newIndex += 1
+                    # for l in cloneLines
+                        # if l.newIndex > line.newIndex
+                            # l.oldIndex += 1
+                        # else if l.newIndex == line.newIndex
+                            # l.oldIndex = line.oldIndex
+                # else if line.change == 'deleted'
+                    # # for l in sortedLines
+                        # # if l.newIndex > line.newIndex
+                            # # l.newIndex -= 1
+                    # for l in cloneLines
+                        # if l.newIndex > line.newIndex and l.change != 'deleted'
+                            # l.oldIndex += 1
+                # sortedLines.push line
+                
+            @sortLines sortedLines
             log 'sortedLines', sortedLines
             
             @undoCursor action
@@ -205,9 +227,13 @@ class Undo
     sortLines: (lines) ->
         return if not lines?.length
         lines.sort (a,b) ->
-            if a.change == 'inserted' or 'b.change' == 'inserted'
+            if a.change == 'inserted' or b.change == 'inserted'
                 if a.oldIndex == b.oldIndex then b.newIndex - a.newIndex
                 else b.oldIndex - a.oldIndex
+            else if (a.change == 'deleted' or b.change == 'deleted') and a.change != b.change
+                a.change == 'deleted' and 1 or -1
+            else if a.change == b.change == 'deleted'
+                a.oldIndex - b.oldIndex
             else                
                 Math.max(b.oldIndex, b.newIndex) - Math.max(a.oldIndex, a.newIndex)
                         
@@ -374,8 +400,17 @@ class Undo
             @merge()
             if @changeInfo?
                 lines = _.clone last(@actions).lines
-                console.log 'end', str @editor.lines
-                @editor.changed @changeInfo, lines: lines
+                # console.log 'end', str @editor.lines
+                # console.log 'end', str lines
+                sortedLines = []
+                while line = lines.shift()
+                    if line.change == 'deleted'
+                        for l in lines
+                            if l.newIndex > line.newIndex
+                                l.oldIndex -= 1
+                    sortedLines.push line
+                # console.log 'end sortedLines', str sortedLines 
+                @editor.changed @changeInfo, lines: sortedLines
                 @delChangeInfo()
 
     # 00     00  00000000  00000000    0000000   00000000
