@@ -71,11 +71,15 @@ class Find extends Command
     
     handleModKeyComboEvent: (mod, key, combo, event) -> 
         switch combo
-            when 'shift+enter'
+            when 'shift+enter', 'command+shift+g'
                 if editor = window.editorWithClassName @focus
                     editor.highlightText @getText(),
                         type: @type
                         select: 'before'
+                    return
+            when 'command+g' 
+                if editor = window.editorWithClassName @focus
+                    @execute @getText()    
                     return
             when 'tab'
                 if editor = window.editorWithClassName @focus
