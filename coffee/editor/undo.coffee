@@ -139,8 +139,15 @@ class Undo
                 lastLine.after  = line.before if line.before?
                 if line.change == 'deleted'  then lastLine.change = 'inserted'
                 if line.change == 'inserted' then lastLine.change = 'deleted'
-
-            @sortLines undoLines
+            
+            inserted = 0
+            for line in undoLines
+                if line.change == 'inserted'
+                    inserted += 1
+                else if line.change == 'changed'
+                    line.oldIndex += inserted
+                    line.newIndex += inserted
+            
             for line in undoLines
                 @redoLine line
             
@@ -327,25 +334,11 @@ class Undo
         if @groupCount == 0
             @merge()
             if @changeInfo?
-                @sortLines last(@actions).lines
+                # if last(@actions).lines.length
+                    # log 'undo.end', last(@actions).lines
                 @editor.changed @changeInfo, last @actions
                 @delChangeInfo()
 
-    #  0000000   0000000   00000000   000000000
-    # 000       000   000  000   000     000   
-    # 0000000   000   000  0000000       000   
-    #      000  000   000  000   000     000   
-    # 0000000    0000000   000   000     000   
-    
-    sortLines: (lines) ->
-        return if not lines?.length
-        lines.sort (a,b) ->
-            if a.change == 'inserted' or 'b.change' == 'inserted'
-                if a.oldIndex == b.oldIndex then b.newIndex - a.newIndex
-                else b.oldIndex - a.oldIndex
-            else                
-                Math.max(b.oldIndex, b.newIndex) - Math.max(a.oldIndex, a.newIndex)
-    
     # 00     00  00000000  00000000    0000000   00000000
     # 000   000  000       000   000  000        000     
     # 000000000  0000000   0000000    000  0000  0000000 
@@ -356,7 +349,7 @@ class Undo
     #       when they contain no line changes
     #       when they contain only changes of the same set of lines
     
-    merge: ->        
+    merge: ->
         while @actions.length >= 2
             b = @actions[@actions.length-2]
             a = last @actions
