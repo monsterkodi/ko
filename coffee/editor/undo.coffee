@@ -140,14 +140,17 @@ class Undo
                 if line.change == 'deleted'  then lastLine.change = 'inserted'
                 if line.change == 'inserted' then lastLine.change = 'deleted'
             
-            inserted = 0
-            for line in undoLines
+            undoLines.reverse()
+            for lineIndex in [0...undoLines.length]
+                line = undoLines[lineIndex]
                 if line.change == 'inserted'
-                    inserted += 1
-                else if line.change == 'changed'
-                    line.oldIndex += inserted
-                    line.newIndex += inserted
-            
+                    for restIndex in [lineIndex+1...undoLines.length]
+                        restLine = undoLines[restIndex]
+                        if restLine.oldIndex >= line.oldIndex
+                            restLine.oldIndex += 1
+                            # restLine.newIndex += 1
+                            
+            log 'undoLines', undoLines
             for line in undoLines
                 @redoLine line
             
@@ -265,7 +268,7 @@ class Undo
     
     moveLinesAfter: (index, dy) ->
         for change in @lastAction().lines
-            if change.oldIndex >= index
+            if change.oldIndex > index
                 change.newIndex += dy
     
     modify: (change) ->
@@ -281,7 +284,7 @@ class Undo
         if change.change == 'deleted'
             @moveLinesAfter change.oldIndex, -1
         else if change.change == 'inserted'
-            @moveLinesAfter change.oldIndex,  1
+            @moveLinesAfter change.oldIndex-1,  1
             for l in lines # subtract previous insertions from oldIndex of this insert
                 change.oldIndex -= 1 if (l.change == 'inserted') and (l.oldIndex < change.oldIndex)
         else if change.change == 'changed'
@@ -334,8 +337,8 @@ class Undo
         if @groupCount == 0
             @merge()
             if @changeInfo?
-                # if last(@actions).lines.length
-                    # log 'undo.end', last(@actions).lines
+                if last(@actions).lines.length
+                    log 'undo.end', last(@actions).lines
                 @editor.changed @changeInfo, last @actions
                 @delChangeInfo()
 

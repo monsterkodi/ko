@@ -20,7 +20,7 @@ BrowserWindow = electron.BrowserWindow
 class Indexer
 
     @requireRegExp = /^\s*([\w\{\}]+)\s+=\s+require\s+[\'\"]([\.\/\w]+)[\'\"]/
-    @classRegExp   = /^\s*class\s+(\w+)(\s+extends\s\w+|\s*:\s*[\w\,\s\<\>]+)?\s*$/
+    @classRegExp   = /^\s*class\s+(\w+)(\s+extends\s\w+.*|\s*:\s*[\w\,\s\<\>]+)?\s*$/
     @includeRegExp = /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
     @methodRegExp  = /^\s+([\@]?\w+)\s*\:\s*(\([^\)]*\))?\s*[=-]\>/
     @funcRegExp    = /^\s*([\w\.]+)\s*[\:\=]\s*(\([^\)]*\))?\s*[=-]\>/
@@ -42,9 +42,9 @@ class Indexer
             when word[0] in ['-', "#"] then false
             when word[word.length-1] == '-' then false 
             when word[0] == '_' and word.length < 4 then false # exclude when starts with underscore and is short
-            when /^[0\_\-\@\#]+$/.test word then false # exlude when consist of special characters only
-            when /\d/.test word then false # exlude when word contains number
-            # when /^[\-]?\d/.test word then false # exlude when starts with number
+            when /^[0\_\-\@\#]+$/.test word then false # exclude when consist of special characters only
+            when /\d/.test word then false # exclude when word contains number
+            # when /^[\-]?\d/.test word then false # exclude when starts with number
             # when word.length < 4 and /[a-fA-F](\d[a-fA-F]|[a-fA-F]\d|\d\d)/.test word then false # exclude short hex numbers
             else true
 

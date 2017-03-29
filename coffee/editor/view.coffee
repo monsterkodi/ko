@@ -29,7 +29,7 @@ class View extends ViewBase
     constructor: (viewElem) -> 
         
         window.split.on 'commandline', @onCommandline
-        post.on 'jumpTo', @jumpTo
+        post.on 'jumpTo', @jumpTo # is this used?
         @fontSizeDefault = 16
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Autocomplete', 'Brackets', 'Strings']        
         @setText ''
@@ -187,7 +187,13 @@ class View extends ViewBase
             if fileName(file).toLowerCase() == find and file != @currentFile
                 jumpToFileLine file, 6
                 return true
-        false
+
+        log "search for #{word}", window.commandline.commands.search?
+        
+        window.commandline.commands.search.start "command+shift+f"    
+        window.commandline.commands.search.execute word
+        window.split.do 'reveal terminal'
+        true
     
     jumpToCounterpart: () ->
         
