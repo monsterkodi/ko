@@ -8,7 +8,6 @@
 - select multiple lines on ctrl+alt+command+b
 - search word on alt click and not a func or class
 - cheat sheet
-- handle unsaved changes somehow when closing windows
 - fix commandlist switching sides when other side is smaller
 - limit size of range for bracket matching 
 - term: auto cd to pkg dir when file loaded?

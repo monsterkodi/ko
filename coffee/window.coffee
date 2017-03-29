@@ -143,6 +143,11 @@ saveFile = (file) =>
             ipc.send 'fileSaved', file, winID
             setState 'file', file
 
+saveChanges = ->
+    if editor.currentFile? and editor.do.hasLineChanges() and fileExists editor.currentFile
+        atomicFile editor.currentFile, _.clone(editor.text()), encoding: 'utf8', (err) =>
+                if err? then log "saving changes to #{file} failed", err
+
 # 000       0000000    0000000   0000000  
 # 000      000   000  000   000  000   000
 # 000      000   000  000000000  000   000
@@ -164,11 +169,8 @@ loadFile = (file, opt={}) =>
         if not fileExists file
             log "[WARNING] window.loadFile -- no such file:", file
             return
-        if editor.currentFile? and not opt?.dontSave and editor.do.hasLineChanges() and fileExists editor.currentFile
-            atomicFile editor.currentFile, _.clone(editor.text()), encoding: 'utf8', (err) =>
-                    if err?
-                        log "saving changes to #{file} failed", err
-                        return
+            
+        if not opt?.dontSave then saveChanges()            
             
         addToRecent file
         ipc.send 'navigate', 
@@ -339,6 +341,7 @@ window.onload = =>
     info.reload()
     
 window.onunload = => 
+    saveChanges()
     editor.setCurrentFile null, noSaveScroll: true # to stop watcher
 
 # 0000000   0000000  00000000   00000000  00000000  000   000   0000000  000   000   0000000   000000000
