@@ -11,6 +11,7 @@ relative,
 resolve,
 prefs,
 clamp,
+post,
 last,
 log,
 $}      = require 'kxk'
@@ -37,7 +38,7 @@ class Open extends Command
         @combo      = null
         @selected   = 0
         @navigating = false
-        
+                
         super @commandline
         @maxHistory   = 10
                     
@@ -174,22 +175,14 @@ class Open extends Command
         @lastFileIndex = 0
         @dir = resolve '~' if not @dir?
 
-        if not @navigating and not opt?.currentText
-            if @history.length
-                bonus = 0x000fffff
-                for f in @history
-                    if f.length and fileExists(f)
-                        item = Object.create null
-                        item.text = relative f, @dir
-                        item.file = f
-                        if not opt?.flat
-                            # log "bonus: #{bonus}", item.text, item.file
-                            item.bonus = bonus 
-                        items.push item
-                        @lastFileIndex = items.length-2
-                        bonus -= 1
-                    else
-                        _.pullAll @history, f
+        if not @navigating and not opt?.currentText and @history.length > 1
+            f = @history[@history.length-2]
+            item = Object.create null
+            item.text = relative f, @dir
+            item.file = f
+            item.bonus = 0x000fffff
+            items.push item
+            @lastFileIndex = 0
 
         if @navigating and opt?.includeThis
             item = Object.create null
@@ -221,6 +214,37 @@ class Open extends Command
         items = @weightedItems items, opt
         items = _.uniqBy items, (o) -> o.text
         items
+    
+    # 000   000  000   0000000  000000000   0000000   00000000   000   000  
+    # 000   000  000  000          000     000   000  000   000   000 000   
+    # 000000000  000  0000000      000     000   000  0000000      00000    
+    # 000   000  000       000     000     000   000  000   000     000     
+    # 000   000  000  0000000      000      0000000   000   000     000     
+    
+    showHistory: () ->
+        if @history.length > 1 and (@selected < 0 or not @navigating and @selected == 0)
+            items = []
+            bonus = 0x000fffff
+            for f in @history
+                item = Object.create null
+                item.text = relative f, @dir
+                item.file = f
+                item.bonus = bonus
+                items.push item
+                bonus -= 1 
+            items.pop()
+            @showItems items
+            @select items.length-1
+            @setAndSelectText items[@selected].text
+        else
+            'unhandled'
+
+    showFirst: () ->
+        if @commandList and @selected == @commandList.meta.metas.length - 1
+            @showItems @listItems includeThis: false
+            @select 0
+        else
+            'unhandled'
                 
     #  0000000   0000000   000   000   0000000  00000000  000    
     # 000       000   000  0000  000  000       000       000    
@@ -433,6 +457,8 @@ class Open extends Command
     
     handleModKeyComboEvent: (mod, key, combo, event) -> 
         switch combo
+            when 'up'   then return @showHistory()
+            when 'down' then return @showFirst()
             when 'backspace'
                 if not @getText().length and @commandList?.lines[@selected] == '..'
                     @loadDir
