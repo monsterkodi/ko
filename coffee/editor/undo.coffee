@@ -156,45 +156,60 @@ class Undo
             
             undoLines.reverse()
             
-            # log 'lines before redo', @editor.lines
-            # log 'undoLines', undoLines
+            log 'lines before redo', @editor.lines
+            log 'undoLines', undoLines
             
             sortedLines = []
             cloneLines = _.cloneDeep undoLines
             while line = cloneLines.shift()
                 if line.change == 'deleted'
                     for l in cloneLines
-                        if l.newIndex > line.newIndex
+                        if l.newIndex >= line.newIndex
                             l.oldIndex -= 1
                 sortedLines.push line
             
+            log 'undoLines sorted', sortedLines
+            changes = insertions: [], deletions: [], changes: []
+            
             for line in sortedLines
                 @undoLine line
+                
+                switch line.change
+                    when 'inserted'
+                        inserted = false
+                        line.oldIndex = line.newIndex
+                        for i in [0...changes.insertions.length]
+                            if changes.insertions[i].newIndex >= line.newIndex
+                                changes.insertions.splice i, 0, line
+                                for j in [i+1...changes.insertions.length]
+                                    changes.insertions[j].oldIndex += 1
+                                    changes.insertions[j].newIndex += 1
+                                inserted = true
+                                break
+                        if not inserted
+                            changes.insertions.push line
+                            
+                        for change in changes.changes
+                            if change.oldIndex >= line.oldIndex
+                                change.oldIndex += 1
+                                change.newIndex += 1
+                            
+                    when 'deleted'  
+                        line.oldIndex = line.newIndex
+                        changes.deletions.push line
+                        
+                    when 'changed'
+                        line.oldIndex = line.newIndex
+                        for insertion in changes.insertions
+                            if insertion.newIndex == line.newIndex
+                                line.oldIndex = insertion.oldIndex
+                        changes.changes.push line
             
             log 'lines after redo', @editor.lines
-            
-            # cloneLines = _.cloneDeep sortedLines
-            # sortedLines = []
-            # while line = cloneLines.shift()
-                # if line.change == 'inserted'
-                    # for l in sortedLines
-                        # if l.newIndex >= line.newIndex
-                            # l.newIndex += 1
-                    # for l in cloneLines
-                        # if l.newIndex > line.newIndex
-                            # l.oldIndex += 1
-                        # else if l.newIndex == line.newIndex
-                            # l.oldIndex = line.oldIndex
-                # else if line.change == 'deleted'
-                    # # for l in sortedLines
-                        # # if l.newIndex > line.newIndex
-                            # # l.newIndex -= 1
-                    # for l in cloneLines
-                        # if l.newIndex > line.newIndex and l.change != 'deleted'
-                            # l.oldIndex += 1
-                # sortedLines.push line
-                
-            @sortLines sortedLines
+            log changes
+                            
+            sortedLines = changes.insertions.concat changes.deletions, changes.changes
+                        
             log 'sortedLines', sortedLines
             
             @undoCursor action
@@ -217,25 +232,6 @@ class Undo
             @editor.cursors = action.curBefore 
             @editor.mainCursor = @editor.cursors[action.mainBefore]
         @changeInfoCursor()
-
-    #  0000000   0000000   00000000   000000000
-    # 000       000   000  000   000     000   
-    # 0000000   000   000  0000000       000   
-    #      000  000   000  000   000     000   
-    # 0000000    0000000   000   000     000   
-    
-    sortLines: (lines) ->
-        return if not lines?.length
-        lines.sort (a,b) ->
-            if a.change == 'inserted' or b.change == 'inserted'
-                if a.oldIndex == b.oldIndex then b.newIndex - a.newIndex
-                else b.oldIndex - a.oldIndex
-            else if (a.change == 'deleted' or b.change == 'deleted') and a.change != b.change
-                a.change == 'deleted' and 1 or -1
-            else if a.change == b.change == 'deleted'
-                a.oldIndex - b.oldIndex
-            else                
-                Math.max(b.oldIndex, b.newIndex) - Math.max(a.oldIndex, a.newIndex)
                         
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000
@@ -400,16 +396,17 @@ class Undo
             @merge()
             if @changeInfo?
                 lines = _.clone last(@actions).lines
-                # console.log 'end', str @editor.lines
-                # console.log 'end', str lines
+                # if lines.length
+                    # log 'end', str @editor.lines
                 sortedLines = []
                 while line = lines.shift()
                     if line.change == 'deleted'
                         for l in lines
-                            if l.newIndex > line.newIndex
+                            if l.oldIndex > line.oldIndex
                                 l.oldIndex -= 1
                     sortedLines.push line
-                # console.log 'end sortedLines', str sortedLines 
+                # if sortedLines.length
+                    # log 'end sortedLines', str sortedLines 
                 @editor.changed @changeInfo, lines: sortedLines
                 @delChangeInfo()
 
