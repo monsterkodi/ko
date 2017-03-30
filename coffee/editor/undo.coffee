@@ -89,7 +89,7 @@ class Undo
             @redoCursor action
             @redoSelection action
             @actions.push action
-            @editor.changed @changeInfo, action
+            @editor.changed? @changeInfo, action
             @delChangeInfo()
 
     redoLine: (line) ->
@@ -156,8 +156,8 @@ class Undo
             
             undoLines.reverse()
             
-            log 'lines before redo', @editor.lines
-            log 'undoLines', undoLines
+            # log 'lines before redo', @editor.lines
+            # log 'undoLines', undoLines
             
             sortedLines = []
             cloneLines = _.cloneDeep undoLines
@@ -168,7 +168,7 @@ class Undo
                             l.oldIndex -= 1
                 sortedLines.push line
             
-            log 'undoLines sorted', sortedLines
+            # log 'undoLines sorted', sortedLines
             changes = insertions: [], deletions: [], changes: []
             
             for line in sortedLines
@@ -205,17 +205,17 @@ class Undo
                                 line.oldIndex = insertion.oldIndex
                         changes.changes.push line
             
-            log 'lines after redo', @editor.lines
-            log changes
+            # log 'lines after redo', @editor.lines
+            # log changes
                             
             sortedLines = changes.insertions.concat changes.deletions, changes.changes
                         
-            log 'sortedLines', sortedLines
+            # log 'sortedLines', sortedLines
             
             @undoCursor action
             @undoSelection action
             @futures.unshift action
-            @editor.changed @changeInfo, lines: sortedLines
+            @editor.changed? @changeInfo, lines: sortedLines
             @delChangeInfo()
                                                 
     undoSelection: (action) ->
@@ -407,7 +407,7 @@ class Undo
                     sortedLines.push line
                 # if sortedLines.length
                     # log 'end sortedLines', str sortedLines 
-                @editor.changed @changeInfo, lines: sortedLines
+                @editor.changed? @changeInfo, lines: sortedLines
                 @delChangeInfo()
 
     # 00     00  00000000  00000000    0000000   00000000

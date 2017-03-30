@@ -195,8 +195,10 @@ class Autocomplete extends event
         cursorWord = @cursorWord()
         for l in lines
             if not l?.split?
-                alert "autocomplete.parseLines: warning! line has no split? #{l} #{lines?}"
-                throw new Error
+                log "[ERROR] Autocomplete.parseLines : line has no split? action: #{opt.action} line: #{l}"
+                return
+                # alert "autocomplete.parseLines: warning! line has no split? #{l} #{lines?}"
+                # throw new Error
             words = l.split @splitRegExp
             words = words.filter (w) => 
                 return false if not Indexer.testWord w

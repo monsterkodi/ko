@@ -5,11 +5,11 @@
 #      000  000   000  000         000   
 # 0000000   000   000  0000000     000   
 
-font = require './font.json'
 _    = require 'lodash'
 
 salt = (text) ->
     
+    font = require './font.json'
     s = text.toLowerCase().trim()
     
     cs = []

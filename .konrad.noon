@@ -1,7 +1,4 @@
 ignore      
-    /ko-darwin-x64/
     /syntax/
     
 noon    . ext json . replace .. coffee/  js/
-styl    . ext css  . replace .. /styl/   /js/css/
-pug     . ext html . replace .. pug/     js/

@@ -385,6 +385,9 @@ class Editor extends Buffer
 
     textOfSelectionForClipboard: -> 
         @selectMoreLines() if @selections.length == 0
+        @textOfSelection()
+        
+    textOfSelection: ->
         t = []
         for s in @selections
             t.push @textInRange s
