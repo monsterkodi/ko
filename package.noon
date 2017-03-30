@@ -1,14 +1,13 @@
 name            ko-editor
 productName     ko
-version         0.9.32
+version         0.9.33
 description     an editor for macOS
 main            js/main.js
 preferGlobal    true
 bin
                 ko  ./bin/ko
 scripts
-                build   ./bin/build.sh
-                dmg     ./bin/dmg.sh
+                test  mocha -R dot --compilers coffee:coffee-script/register
 repository
                 type  git
                 url   git+https://github.com/monsterkodi/ko.git
@@ -55,6 +54,9 @@ dependencies
                 write-file-atomic  ^1.3.1
 devDependencies
                 appdmg          ^0.4.5
+                assert          ^1.4.1
+                chai            ^3.5.0
                 electron        ^1.6.2
                 electron-packager  ^8.5.2
                 electron-rebuild  ^1.5.7
+                mocha           ^3.2.0
