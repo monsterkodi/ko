@@ -1503,7 +1503,7 @@ class Editor extends Buffer
             csel = @continuousSelectionAtPos c
             if csel?
                 [sp, ep] = csel
-                for nc in @positionsBetweenPositionsInPositions sp, ep, newCursors
+                for nc in @positionsBetweenPosAndPosInPositions sp, ep, newCursors
                     @newCursorSet newCursors, nc, sp[0], sp[1]
                 if sp[1] < ep[1] and sp[0] > 0 and ep[0] < @lines[ep[1]].length 
                     joinLines.push sp[1] # selection spans multiple lines and first and last line are cut

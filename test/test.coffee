@@ -256,68 +256,44 @@ describe 'complex', ->
                 editor.deleteBackward ignoreLineBoundary: true
                 expect(editor.lines) .to.eql lines
 
-    describe 'selection', ->
+    describe 'selection insert', ->
         
-        describe 'column', ->
-            
-            text = '0000\n1111\n2222\n3333'
-            lines = text.split '\n'
-            
-            before -> 
-                editor.setText text
-                editor.cursors = [[1,1], [1,2]]
-                editor.mainCursor = last editor.cursors
-                editor.selections = [[1, [1,2]], [2, [1,3]]]
-                undo.reset()
+        afterEach undoRedo
+        
+        it "row", ->
+            editor.setText '0123456789'
+            editor.cursors = [[1,0], [6,0]]
+            editor.mainCursor = last editor.cursors
+            editor.selections = [[0, [1,4]], [0, [6,9]]]
+            undo.reset()
+            editor.insertUserCharacter '-'
+            expect editor.text()
+            .to.eql '0-45-9'
+        
+        it "column", ->
+            editor.setText '0000\n1111\n2222\n3333'
+            editor.cursors = [[1,1], [1,2]]
+            editor.mainCursor = last editor.cursors
+            editor.selections = [[1, [1,2]], [2, [1,3]]]
+            undo.reset()
+            editor.insertUserCharacter '-'
+            expect editor.lines 
+            .to.eql [
+                '0000', '1-11', '2-2', '3333'
+            ]
                 
-            afterEach undoRedo
+        it "row & column", ->
+            editor.setText '0000\n1111\n2222\n3333'
+            editor.cursors = [[1,1], [3,1], [1,2]]
+            editor.mainCursor = last editor.cursors
+            editor.selections = [[1, [1,2]], [1, [3,4]], [2, [1,3]]]
+            undo.reset()
             
-            it "insert", ->
-                editor.insertUserCharacter '-'
-                expect editor.lines 
-                .to.eql [
-                    '0000', '1-11', '2-2', '3333'
-                ]
-    
-        describe 'row', ->
-            
-            text = '0123456789'
-            lines = text.split '\n'
-            
-            before -> 
-                editor.setText text
-                editor.cursors = [[1,0], [3,0]]
-                editor.mainCursor = last editor.cursors
-                editor.selections = [[0, [1,2]], [0, [3,5]]]
-                undo.reset()
-                
-            afterEach undoRedo
-            
-            it "insert", ->
-                editor.insertUserCharacter '-'
-                expect editor.text()
-                .to.eql '0-2-56789'
-    
-        describe 'row & column ', ->
-            
-            text = '0000\n1111\n2222\n3333'
-            lines = text.split '\n'
-            
-            before -> 
-                editor.setText text
-                editor.cursors = [[1,1], [3,1], [1,2]]
-                editor.mainCursor = last editor.cursors
-                editor.selections = [[1, [1,2]], [1, [3,4]], [2, [1,3]]]
-                undo.reset()
-                
-            afterEach undoRedo
-            
-            it "insert", ->
-                editor.insertUserCharacter '-'
-                expect editor.lines 
-                .to.eql [
-                    '0000', '1-1-', '2-2', '3333'
-                ]
+            editor.insertUserCharacter '-'
+            expect editor.lines 
+            .to.eql [
+                '0000', '1-1-', '2-2', '3333'
+            ]
     
     
     
