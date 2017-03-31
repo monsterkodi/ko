@@ -168,5 +168,111 @@ describe 'medium', ->
             expect editor.text()
             .to.eql 'hel-rld'
         
+#  0000000   0000000   00     00  00000000   000      00000000  000   000  
+# 000       000   000  000   000  000   000  000      000        000 000   
+# 000       000   000  000000000  00000000   000      0000000     00000    
+# 000       000   000  000 0 000  000        000      000        000 000   
+#  0000000   0000000   000   000  000        0000000  00000000  000   000  
+
+undoRedo = ->
+    before = editor.text()
+    undo.undo()
+    undo.redo()
+    after = editor.text()
+    expect(before) .to.eql after
+
+describe 'complex', -> 
+    describe 'column break', ->
         
+        text = '0000\n1111\n2222\n3333\n4444\n5555'
+        lines = text.split '\n'
+        
+        before -> 
+            editor.setText text
+            editor.cursors = [[2,1], [2,2], [2,3], [2,4]]
+            editor.mainCursor = last editor.cursors
+            undo.reset()
             
+        afterEach undoRedo
+        
+        it "should break lines", ->
+            editor.insertUserCharacter '\n'
+            expect editor.lines 
+            .to.eql [
+                '0000', '11', '11', '22', '22', '33', '33', '44', '44', '5555'
+            ]
+
+        it "should join lines", ->
+            editor.deleteBackward ignoreLineBoundary: true
+            expect(editor.lines) .to.eql lines
+
+    describe 'row break', ->
+        
+        text = '0000\n1111\n2222'
+        lines = text.split '\n'
+        
+        before -> 
+            editor.setText text
+            editor.cursors = [[1,1], [2,1], [3,1]]
+            editor.mainCursor = last editor.cursors
+            undo.reset()
+            
+        afterEach undoRedo
+        
+        it "should break lines", ->
+            editor.insertUserCharacter '\n'
+            expect editor.lines 
+            .to.eql [
+                '0000', '1', '1', '1', '1', '2222'
+            ]
+
+        it "should join lines", ->
+            editor.deleteBackward ignoreLineBoundary: true
+            expect(editor.lines) .to.eql lines
+
+    describe 'row column break', ->
+        
+        text = '0000\n1111\n2222\n3333\n4444\n5555'
+        lines = text.split '\n'
+        
+        before -> 
+            editor.setText text
+            editor.cursors = [[1,1], [3,1], [1,2], [3,2], [1,4], [3,4], [1,5], [3,5]]
+            editor.mainCursor = last editor.cursors
+            undo.reset()
+            
+        afterEach undoRedo
+        
+        it "should break lines", ->
+            editor.insertUserCharacter '\n'
+            expect editor.lines 
+            .to.eql [
+                '0000', '1', '11', '1', '2', '22', '2', '3333', '4', '44', '4', '5', '55', '5'
+            ]
+
+        it "should join lines", ->
+            editor.deleteBackward ignoreLineBoundary: true
+            expect(editor.lines) .to.eql lines
+
+    describe 'multi selection insert', ->
+        
+        text = '0000\n1111\n2222\n3333'
+        lines = text.split '\n'
+        
+        before -> 
+            editor.setText text
+            editor.cursors = [[1,1], [3,1], [1,2]]
+            editor.mainCursor = last editor.cursors
+            editor.selections = [[1, [1,2]], [1, [3,4]], [2, [1,3]]]
+            undo.reset()
+            
+        afterEach undoRedo
+        
+        it "should insert", ->
+            editor.insertUserCharacter '-'
+            expect editor.lines 
+            .to.eql [
+                '0000', '1-1-', '2-2', '3333'
+            ]
+
+
