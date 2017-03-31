@@ -192,7 +192,7 @@ describe 'complex', ->
             before -> 
                 editor.setText text
                 editor.cursors = [[2,1], [2,2], [2,3], [2,4]]
-                editor.mainCursor = last editor.cursors
+                editor.mainCursor = [2,4]
                 undo.reset()
                 
             afterEach undoRedo
@@ -216,7 +216,7 @@ describe 'complex', ->
             before -> 
                 editor.setText text
                 editor.cursors = [[1,1], [2,1], [3,1]]
-                editor.mainCursor = last editor.cursors
+                editor.mainCursor = [3,1]
                 undo.reset()
                 
             afterEach undoRedo
@@ -240,7 +240,7 @@ describe 'complex', ->
             before -> 
                 editor.setText text
                 editor.cursors = [[1,1], [3,1], [1,2], [3,2], [1,4], [3,4], [1,5], [3,5]]
-                editor.mainCursor = last editor.cursors
+                editor.mainCursor = [3,5]
                 undo.reset()
                 
             afterEach undoRedo
@@ -263,7 +263,7 @@ describe 'complex', ->
         it "row", ->
             editor.setText '0123456789'
             editor.cursors = [[1,0], [6,0]]
-            editor.mainCursor = last editor.cursors
+            editor.mainCursor = [6,0]
             editor.selections = [[0, [1,4]], [0, [6,9]]]
             undo.reset()
             editor.insertUserCharacter '-'
@@ -273,7 +273,7 @@ describe 'complex', ->
         it "column", ->
             editor.setText '0000\n1111\n2222\n3333'
             editor.cursors = [[1,1], [1,2]]
-            editor.mainCursor = last editor.cursors
+            editor.mainCursor = [1,2]
             editor.selections = [[1, [1,2]], [2, [1,3]]]
             undo.reset()
             editor.insertUserCharacter '-'
@@ -285,7 +285,7 @@ describe 'complex', ->
         it "row & column", ->
             editor.setText '0000\n1111\n2222\n3333'
             editor.cursors = [[1,1], [3,1], [1,2]]
-            editor.mainCursor = last editor.cursors
+            editor.mainCursor = [1,2]
             editor.selections = [[1, [1,2]], [1, [3,4]], [2, [1,3]]]
             undo.reset()
             
@@ -295,5 +295,25 @@ describe 'complex', ->
                 '0000', '1-1-', '2-2', '3333'
             ]
     
+        it "multirow", ->
+            editor.setText '0000\n1111\n2222\n3333'
+            editor.singleCursorAtPos [2,0]
+            editor.singleCursorAtPos [2,3], true
+            undo.reset()
+            
+            editor.insertUserCharacter '-'
+            expect editor.text()
+            .to.eql '00-33'
+
+        it "multi multirow", ->
+            editor.setText '0000\n1111\n2222\n3333\n4444\n5555'
+            editor.singleCursorAtPos [2,1]
+            editor.moveMainCursor 'down'
+            editor.moveMainCursor 'down'
+            editor.moveCursors 'down', true
+            undo.reset()
+            editor.insertUserCharacter '-'
+            expect editor.text()
+            .to.eql '0000\n11-22\n33-44\n5555'
     
     

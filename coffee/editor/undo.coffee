@@ -10,6 +10,8 @@ str,
 log}  = require 'kxk'
 _     = require 'lodash'
 
+dbg = false
+
 class Undo
     
     constructor: (@editor) -> @reset()
@@ -80,29 +82,38 @@ class Undo
     # 000   000  000       000   000  000   000
     # 000   000  00000000  0000000     0000000 
 
+    redoLine: (line) ->
+        switch line.change
+            when 'deleted'
+                @editor.lines.splice line.oldIndex, 1
+                @changeInfoLineDelete()
+            when 'inserted'
+                @editor.lines.splice line.oldIndex, 0, line.after
+                @changeInfoLineInsert()
+            when 'changed'
+                @editor.lines[line.oldIndex] = line.after
+                @changeInfoLineChange()
+
     redo: ->
         if @futures.length
             @newChangeInfo()
             action = @futures.shift()
+            
+            if dbg 
+                log 'lines before redo', @editor.lines
+                log 'action.lines', action.lines
+                        
             for line in action.lines
                 @redoLine line
+            
+            if dbg    
+                log 'lines after redo', @editor.lines
+                
             @redoCursor action
             @redoSelection action
             @actions.push action
             @editor.changed? @changeInfo, action
             @delChangeInfo()
-
-    redoLine: (line) ->
-        if line.after?
-            if line.before?
-                @editor.lines[line.oldIndex] = line.after
-                @changeInfoLineChange()
-            else
-                @editor.lines.splice line.oldIndex, 0, line.after
-                @changeInfoLineInsert()
-        else if line.before?
-            @editor.lines.splice line.oldIndex, 1
-            @changeInfoLineDelete()
 
     redoSelection: (action) ->
         if action.selAfter.length
@@ -142,7 +153,10 @@ class Undo
             @newChangeInfo()
             action = @actions.pop()
             undoLines = []
-            # log 'action.lines', action.lines
+            
+            if dbg
+                log 'action.lines', action.lines
+                
             for line in action.lines
                 undoLines.push 
                     oldIndex:  line.newIndex
@@ -156,8 +170,9 @@ class Undo
             
             undoLines.reverse()
             
-            # log 'lines before redo', @editor.lines
-            # log 'undoLines', undoLines
+            if dbg
+                log 'lines before redo', @editor.lines
+                log 'undoLines', undoLines
             
             sortedLines = []
             cloneLines = _.cloneDeep undoLines
@@ -168,7 +183,9 @@ class Undo
                             l.oldIndex -= 1
                 sortedLines.push line
             
-            # log 'undoLines sorted', sortedLines
+            if dbg
+                log 'undoLines sorted', sortedLines
+            
             changes = insertions: [], deletions: [], changes: []
             
             for line in sortedLines
@@ -205,7 +222,7 @@ class Undo
                                 line.oldIndex = insertion.oldIndex
                         changes.changes.push line
             
-            # log 'lines after redo', @editor.lines
+            # log 'lines after undo', @editor.lines
             # log changes
                             
             sortedLines = changes.insertions.concat changes.deletions, changes.changes
@@ -215,6 +232,9 @@ class Undo
             @undoCursor action
             @undoSelection action
             @futures.unshift action
+            
+            # log 'futures', @futures
+            
             @editor.changed? @changeInfo, lines: sortedLines
             @delChangeInfo()
                                                 
@@ -330,50 +350,43 @@ class Undo
                 change.newIndex += dy
     
     modify: (change) ->
+        
         lines = @lastAction().lines
-        if change.change == 'changed'
-            for line in lines
-                if line.oldIndex == change.oldIndex
-                    if line.change == 'changed'
-                        line.after = change.after # add this change to previous change 
-                        return
-                
+                        
         change.newIndex = change.oldIndex
         if change.change == 'deleted'
             @moveLinesAfter change.oldIndex, -1
         else if change.change == 'inserted'
             @moveLinesAfter change.oldIndex-1,  1
-            for l in lines # subtract previous insertions from oldIndex of this insert
-                change.oldIndex -= 1 if (l.change == 'inserted') and (l.oldIndex < change.oldIndex)
-        else if change.change == 'changed'
-            for l in lines # add previous deletions to oldIndex of this change
-                change.oldIndex += 1 if (l.change == 'deleted') and (l.oldIndex < change.oldIndex)
         lines.push change
+        
+        if dbg 
+            console.log 'modify', str lines
     
     change: (index, text) ->
         return if @editor.lines[index] == text
         @modify
-            change: 'changed'
-            before: @editor.lines[index]
-            after:  text
-            oldIndex:  index
+            change:   'changed'
+            before:   @editor.lines[index]
+            after:    text
+            oldIndex: index
         @editor.lines[index] = text
         @changeInfoLineChange()
         
     insert: (index, text) ->
         @modify
-            change:     'inserted'
-            after:      text 
-            oldIndex:   index
+            change:   'inserted'
+            after:    text 
+            oldIndex: index
         @editor.lines.splice index, 0, text
         @changeInfoLineInsert()
         
     delete: (index) ->
         if @editor.lines.length > 1
             @modify
-                change:     'deleted'
-                before:     @editor.lines[index] 
-                oldIndex:   index
+                change:   'deleted'
+                before:   @editor.lines[index] 
+                oldIndex: index
             @editor.emit 'willDeleteLine', index, @editor.lines[index]
             @editor.lines.splice index, 1
             @changeInfoLineDelete()
@@ -387,17 +400,31 @@ class Undo
     # 000       000  0000  000   000
     # 00000000  000   000  0000000  
 
-    end: (opt) ->
+    end: (opt) -> # no log here!
+        
         if opt?.foreign
             @changeInfo?.foreign = opt.foreign
         @groupCount -= 1
         @futures = []
+        
+        if dbg and last(@actions).lines
+            console.log "end group #{@groupCount}", str last(@actions).lines
+    
         if @groupCount == 0
+
+            if dbg 
+                for a in @actions
+                    if a.lines.length
+                        console.log "action before merge", str a.lines
+            
             @merge()
+            
+            if dbg and last(@actions).lines
+                console.log 'end', str last(@actions).lines
+            
             if @changeInfo?
                 lines = _.clone last(@actions).lines
-                # if lines.length
-                    # log 'end', str @editor.lines
+
                 sortedLines = []
                 while line = lines.shift()
                     if line.change == 'deleted'
@@ -405,8 +432,7 @@ class Undo
                             if l.oldIndex > line.oldIndex
                                 l.oldIndex -= 1
                     sortedLines.push line
-                # if sortedLines.length
-                    # log 'end sortedLines', str sortedLines 
+
                 @editor.changed? @changeInfo, lines: sortedLines
                 @delChangeInfo()
 
