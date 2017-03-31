@@ -20,9 +20,9 @@ undo   = null
 
 describe 'editor', ->
     
-    it "should exist", -> _.isObject Editor
-    it "should instantiate", -> _.isObject editor = new Editor
-    it "should accept text", -> 
+    it "exists", -> _.isObject Editor
+    it "instantiates", -> _.isObject editor = new Editor
+    it "accepts text", -> 
         editor.setText "hello\nworld"
         expect editor.lines 
         .to.eql ['hello', 'world']
@@ -31,13 +31,14 @@ describe 'editor', ->
 
 describe 'undo', ->
 
-    it "should exist", -> _.isObject undo = editor.do
+    it "exists", -> _.isObject undo = editor.do
     
-    for name in ['start', 'change', 'insert', 'delete', 'end', 'undo', 'redo']
-        it "should implement #{name}", ->
-            _.isFunction(undo[name]).should.be.true
+    describe 'implements', ->
+        for name in ['start', 'change', 'insert', 'delete', 'end', 'undo', 'redo']
+            it "#{name}", ->
+                _.isFunction(undo[name]).should.be.true
 
-    it 'should noop', -> 
+    it 'noop', -> 
         t = 'bla\nblub'
         editor.setText t
         undo.start()
@@ -56,19 +57,19 @@ describe 'basic', ->
 
         beforeEach -> undo.start()
     
-        it 'should change a line', ->
+        it 'change', ->
             undo.change 0, 'hello world'
             undo.end()
             expect editor.lines 
             .to.eql ['hello world', 'blub']
        
-        it 'should insert a line', ->
+        it 'insert', ->
             undo.insert 1, 'inserted'
             undo.end()
             expect editor.lines 
             .to.eql ['hello world', 'inserted', 'blub']
        
-        it 'should delete a line', ->
+        it 'delete', ->
             undo.delete 1
             undo.end()
             expect editor.lines 
@@ -77,30 +78,30 @@ describe 'basic', ->
     describe 'undo', ->
         beforeEach -> undo.undo()
         
-        it 'should undo the delete', ->
+        it 'delete', ->
             expect editor.lines 
             .to.eql ['hello world', 'inserted', 'blub']
     
-        it 'should undo the insert', ->
+        it 'insert', ->
             expect editor.lines 
             .to.eql ['hello world', 'blub']
     
-        it 'should undo the change', ->
+        it 'change', ->
             expect editor.lines 
             .to.eql ['bla', 'blub']
 
     describe 'redo', ->
         beforeEach -> undo.redo()
 
-        it 'should redo the change', ->
+        it 'change', ->
             expect editor.lines 
             .to.eql ['hello world', 'blub']
 
-        it 'should redo the insert', ->
+        it 'insert', ->
             expect editor.lines 
             .to.eql ['hello world', 'inserted', 'blub']
         
-        it 'should redo the delete', ->
+        it 'delete', ->
             expect editor.lines 
             .to.eql ['hello world', 'blub']
     
@@ -117,7 +118,7 @@ describe 'medium', ->
             editor.setText 'hello\nworld'
             undo.reset()
         
-        it "should accept a single cursor", ->
+        it "single cursor", ->
             editor.singleCursorAtPos [2,1]
             expect editor.mainCursor
             .to.eql [2,1]
@@ -126,7 +127,7 @@ describe 'medium', ->
             expect editor.selections
             .to.eql []
             
-        it "should select text", ->
+        it "select text", ->
             editor.singleCursorAtPos [3,0], true
             expect editor.mainCursor
             .to.eql [3,0]
@@ -135,11 +136,11 @@ describe 'medium', ->
             expect editor.selections
             .to.eql [[0, [3,5]], [1, [0,2]]]
             
-        it "should provide a clipboard text", ->
+        it "text of selection", ->
             expect editor.textOfSelection()
             .to.eql 'lo\nwo'
         
-        it "should replace the selection on input", ->
+        it "replace selection on input", ->
             editor.insertUserCharacter '-'
             expect editor.text()
             .to.eql 'hel-rld'
@@ -147,24 +148,24 @@ describe 'medium', ->
     describe 'undo', ->
         beforeEach -> undo.undo()
         
-        it "should undo the input", ->
+        it "input", ->
             expect editor.text()
             .to.eql 'hello\nworld'
             expect editor.textOfSelection()
             .to.eql 'lo\nwo'            
 
-        it "should undo the selection", ->
+        it "selection", ->
             expect editor.selections
             .to.eql []
             
     describe 'redo', ->
         beforeEach -> undo.redo()
         
-        it "should redo the selection", ->
+        it "selection", ->
             expect editor.textOfSelection()
             .to.eql 'lo\nwo'            
 
-        it "should redo the input", ->
+        it "input", ->
             expect editor.text()
             .to.eql 'hel-rld'
         
@@ -182,97 +183,141 @@ undoRedo = ->
     expect(before) .to.eql after
 
 describe 'complex', -> 
-    describe 'column break', ->
+    describe 'break', ->
+        describe 'column', ->
         
-        text = '0000\n1111\n2222\n3333\n4444\n5555'
-        lines = text.split '\n'
-        
-        before -> 
-            editor.setText text
-            editor.cursors = [[2,1], [2,2], [2,3], [2,4]]
-            editor.mainCursor = last editor.cursors
-            undo.reset()
+            text = '0000\n1111\n2222\n3333\n4444\n5555'
+            lines = text.split '\n'
             
-        afterEach undoRedo
-        
-        it "should break lines", ->
-            editor.insertUserCharacter '\n'
-            expect editor.lines 
-            .to.eql [
-                '0000', '11', '11', '22', '22', '33', '33', '44', '44', '5555'
-            ]
-
-        it "should join lines", ->
-            editor.deleteBackward ignoreLineBoundary: true
-            expect(editor.lines) .to.eql lines
-
-    describe 'row break', ->
-        
-        text = '0000\n1111\n2222'
-        lines = text.split '\n'
-        
-        before -> 
-            editor.setText text
-            editor.cursors = [[1,1], [2,1], [3,1]]
-            editor.mainCursor = last editor.cursors
-            undo.reset()
+            before -> 
+                editor.setText text
+                editor.cursors = [[2,1], [2,2], [2,3], [2,4]]
+                editor.mainCursor = last editor.cursors
+                undo.reset()
+                
+            afterEach undoRedo
             
-        afterEach undoRedo
-        
-        it "should break lines", ->
-            editor.insertUserCharacter '\n'
-            expect editor.lines 
-            .to.eql [
-                '0000', '1', '1', '1', '1', '2222'
-            ]
-
-        it "should join lines", ->
-            editor.deleteBackward ignoreLineBoundary: true
-            expect(editor.lines) .to.eql lines
-
-    describe 'row column break', ->
-        
-        text = '0000\n1111\n2222\n3333\n4444\n5555'
-        lines = text.split '\n'
-        
-        before -> 
-            editor.setText text
-            editor.cursors = [[1,1], [3,1], [1,2], [3,2], [1,4], [3,4], [1,5], [3,5]]
-            editor.mainCursor = last editor.cursors
-            undo.reset()
+            it "break lines", ->
+                editor.insertUserCharacter '\n'
+                expect editor.lines 
+                .to.eql [
+                    '0000', '11', '11', '22', '22', '33', '33', '44', '44', '5555'
+                ]
+    
+            it "join lines", ->
+                editor.deleteBackward ignoreLineBoundary: true
+                expect(editor.lines) .to.eql lines
+    
+        describe 'row', ->
             
-        afterEach undoRedo
-        
-        it "should break lines", ->
-            editor.insertUserCharacter '\n'
-            expect editor.lines 
-            .to.eql [
-                '0000', '1', '11', '1', '2', '22', '2', '3333', '4', '44', '4', '5', '55', '5'
-            ]
-
-        it "should join lines", ->
-            editor.deleteBackward ignoreLineBoundary: true
-            expect(editor.lines) .to.eql lines
-
-    describe 'multi selection insert', ->
-        
-        text = '0000\n1111\n2222\n3333'
-        lines = text.split '\n'
-        
-        before -> 
-            editor.setText text
-            editor.cursors = [[1,1], [3,1], [1,2]]
-            editor.mainCursor = last editor.cursors
-            editor.selections = [[1, [1,2]], [1, [3,4]], [2, [1,3]]]
-            undo.reset()
+            text = '0000\n1111\n2222'
+            lines = text.split '\n'
             
-        afterEach undoRedo
+            before -> 
+                editor.setText text
+                editor.cursors = [[1,1], [2,1], [3,1]]
+                editor.mainCursor = last editor.cursors
+                undo.reset()
+                
+            afterEach undoRedo
+            
+            it "break lines", ->
+                editor.insertUserCharacter '\n'
+                expect editor.lines 
+                .to.eql [
+                    '0000', '1', '1', '1', '1', '2222'
+                ]
+    
+            it "join lines", ->
+                editor.deleteBackward ignoreLineBoundary: true
+                expect(editor.lines) .to.eql lines
+    
+        describe 'row & column', ->
+            
+            text = '0000\n1111\n2222\n3333\n4444\n5555'
+            lines = text.split '\n'
+            
+            before -> 
+                editor.setText text
+                editor.cursors = [[1,1], [3,1], [1,2], [3,2], [1,4], [3,4], [1,5], [3,5]]
+                editor.mainCursor = last editor.cursors
+                undo.reset()
+                
+            afterEach undoRedo
+            
+            it "break lines", ->
+                editor.insertUserCharacter '\n'
+                expect editor.lines 
+                .to.eql [
+                    '0000', '1', '11', '1', '2', '22', '2', '3333', '4', '44', '4', '5', '55', '5'
+                ]
+    
+            it "join lines", ->
+                editor.deleteBackward ignoreLineBoundary: true
+                expect(editor.lines) .to.eql lines
+
+    describe 'selection', ->
         
-        it "should insert", ->
-            editor.insertUserCharacter '-'
-            expect editor.lines 
-            .to.eql [
-                '0000', '1-1-', '2-2', '3333'
-            ]
-
-
+        describe 'column', ->
+            
+            text = '0000\n1111\n2222\n3333'
+            lines = text.split '\n'
+            
+            before -> 
+                editor.setText text
+                editor.cursors = [[1,1], [1,2]]
+                editor.mainCursor = last editor.cursors
+                editor.selections = [[1, [1,2]], [2, [1,3]]]
+                undo.reset()
+                
+            afterEach undoRedo
+            
+            it "insert", ->
+                editor.insertUserCharacter '-'
+                expect editor.lines 
+                .to.eql [
+                    '0000', '1-11', '2-2', '3333'
+                ]
+    
+        describe 'row', ->
+            
+            text = '0123456789'
+            lines = text.split '\n'
+            
+            before -> 
+                editor.setText text
+                editor.cursors = [[1,0], [3,0]]
+                editor.mainCursor = last editor.cursors
+                editor.selections = [[0, [1,2]], [0, [3,5]]]
+                undo.reset()
+                
+            afterEach undoRedo
+            
+            it "insert", ->
+                editor.insertUserCharacter '-'
+                expect editor.text()
+                .to.eql '0-2-56789'
+    
+        describe 'row & column ', ->
+            
+            text = '0000\n1111\n2222\n3333'
+            lines = text.split '\n'
+            
+            before -> 
+                editor.setText text
+                editor.cursors = [[1,1], [3,1], [1,2]]
+                editor.mainCursor = last editor.cursors
+                editor.selections = [[1, [1,2]], [1, [3,4]], [2, [1,3]]]
+                undo.reset()
+                
+            afterEach undoRedo
+            
+            it "insert", ->
+                editor.insertUserCharacter '-'
+                expect editor.lines 
+                .to.eql [
+                    '0000', '1-1-', '2-2', '3333'
+                ]
+    
+    
+    
