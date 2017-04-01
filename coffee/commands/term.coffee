@@ -4,6 +4,7 @@
 #    000     000       000   000  000 0 000
 #    000     00000000  000   000  000   000
 {
+packagePath,
 fileExists,
 dirExists,
 unresolve,
@@ -33,6 +34,7 @@ class Term extends Command
         super @commandline
         @maxHistory = 99
         @headers    = false
+        @autocd     = true
         @cmdID      = 0
         @pwdID      = -1
         @bins       = ipc.sendSync 'indexer', 'bins'
@@ -46,11 +48,23 @@ class Term extends Command
     onShellCommandData: (cmdData) => 
         if cmdData.cmd == @pwdID
             if cmdData.data != "pwd"
-                @completeDir cmdData.data
+                cwd = cmdData.data
+                switch @pwdTag
+                    when 'autocd'
+                        pkgPath = packagePath window.editor.currentFile
+                        if not cwd.startsWith pkgPath
+                            @execute "cd #{pkgPath}"
+                    when 'complete'
+                        @completeDir cwd
         else
             terminal = window.terminal
             terminal.output cmdData.data
             terminal.scrollCursorToTop @headers and 7 or 1
+
+    getPWD: (@pwdTag) ->
+        @pwdID = @cmdID
+        ipc.send 'shellCommand', winID: window.winID, cmdID: @cmdID, command: "pwd"
+        @cmdID += 1
 
     #  0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
     # 000       000   000  000   000  000   000  000      000          000     000     
@@ -69,10 +83,8 @@ class Term extends Command
             if list.length
                 @completeList list
                 return
-
-        @pwdID = @cmdID
-        ipc.send 'shellCommand', winID: window.winID, cmdID: @cmdID, command: "pwd"
-        @cmdID += 1
+        
+        @getPWD 'complete'
         
     resolveDir: (dir) =>
         i = dir.indexOf '$'
@@ -270,6 +282,9 @@ class Term extends Command
     # 0000000      000     000   000  000   000     000   
     
     start: (combo) ->
+        
+        @getPWD 'autocd' if @autocd
+        
         super combo
         text:   @last()
         select: true
@@ -325,17 +340,34 @@ class Term extends Command
                         line: "■"
                         clss: 'termCommand'
                         diss: Syntax.dissForTextAndSyntax "stop ◼", 'ko'
-                
-                # 000   000  00000000   0000000   0000000    00000000  00000000    0000000  
-                # 000   000  000       000   000  000   000  000       000   000  000       
-                # 000000000  0000000   000000000  000   000  0000000   0000000    0000000   
-                # 000   000  000       000   000  000   000  000       000   000       000  
-                # 000   000  00000000  000   000  0000000    00000000  000   000  0000000   
-                
+                                
                 when 'headers' 
+                    
+                    # 000   000  00000000   0000000   0000000    00000000  00000000    0000000  
+                    # 000   000  000       000   000  000   000  000       000   000  000       
+                    # 000000000  0000000   000000000  000   000  0000000   0000000    0000000   
+                    # 000   000  000       000   000  000   000  000       000   000       000  
+                    # 000   000  00000000  000   000  0000000    00000000  000   000  0000000   
+                    
                     if args.length 
                         if args[0] in ['on', 'true', '1'] then   @headers = true
                         if args[0] in ['off', 'false', '0'] then @headers = false
+
+                    terminal.appendMeta 
+                        line: "■"
+                        clss: 'termCommand'
+                        diss: Syntax.dissForTextAndSyntax "headers are #{@headers and 'on' or 'off'}", 'ko'
+                
+                when 'autocd'
+                    
+                    if args.length 
+                        if args[0] in ['on', 'true', '1'] then   @autocd = true
+                        if args[0] in ['off', 'false', '0'] then @autocd = false
+
+                    terminal.appendMeta 
+                        line: "■"
+                        clss: 'termCommand'
+                        diss: Syntax.dissForTextAndSyntax "autocd is #{@autocd and 'on' or 'off'}", 'ko'
                 
                 when 'history' 
                     
