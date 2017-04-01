@@ -4,7 +4,12 @@
 # 000 0 000  000   000  000       000   000  000   000
 # 000   000  000   000   0000000  000   000   0000000 
 {
+packagePath,
 fileExists,
+fileName,
+fileList,
+relative,
+splitExt,
 last,
 log}       = require 'kxk'
 indexer    = require '../indexer'
@@ -96,13 +101,27 @@ class Macro extends Command
                 words = wordsInArgsOrCursorsOrSelection args
                 lastIndex = 0
                 texts = []
+                
+                # search project for path build open search term
+                pkgPath = packagePath editor.currentFile
+                if pkgPath
+                    projectFiles = fileList pkgPath, depth: 4, matchExt: editor.currentFile
+                else
+                    projectFiles = []
+                
                 for word in words
                     map = 
                         _:      'lodash'
                         childp: 'child_process'
                         pkg:    '../package.json'
                     pth = map[word] ? word.toLowerCase()
-                    # todo search project for path
+                    
+                    for f in projectFiles
+                        if pth == fileName f 
+                            pth = splitExt relative f, path.dirname editor.currentFile
+                            pth = './' + pth if not pth.startsWith '../'
+                            break
+                        
                     for li in [Math.min(editor.lines.length-1, 100)..0]
                         m = editor.lines[li].match indexer.requireRegExp
                         if m?[1]? and m?[2]?

@@ -4,11 +4,11 @@
 #    000     000     000     000      000       000   000  000   000  000   000
 #    000     000     000     0000000  00000000  0000000    000   000  000   000
 {
+packagePath,
 unresolve,
 clamp,
 log,
 $}       = require 'kxk'
-walker   = require './tools/walker'
 render   = require './editor/render'
 syntax   = require './editor/syntax'
 path     = require 'path'
@@ -35,7 +35,7 @@ class Titlebar
             diss = syntax.dissForTextAndSyntax(path.basename(info.file), 'ko', join: true)
             title = render.line diss, charWidth:0
             
-            if pkgPath = walker.packagePath info.file
+            if pkgPath = packagePath info.file
                 title = path.basename(pkgPath) + "<span class='#{ic}'> ▸ </span>" + title
             
             tooltip = unresolve info.file

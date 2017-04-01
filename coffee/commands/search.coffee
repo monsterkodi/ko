@@ -4,6 +4,7 @@
 #      000  000       000   000  000   000  000       000   000
 # 0000000   00000000  000   000  000   000   0000000  000   000
 {
+packagePath,
 unresolve,
 first,
 log
@@ -75,7 +76,7 @@ class Search extends Command
         terminal.appendMeta diss: syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'
         terminal.appendMeta clss: 'spacer'
         terminal.singleCursorAtPos [0, terminal.lines.length-2]
-        dir = walker.packagePath path.dirname opt.file
+        dir = packagePath path.dirname opt.file
         dir ?= path.dirname opt.file
         @walker = new walker
             root:        dir

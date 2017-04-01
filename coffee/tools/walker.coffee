@@ -26,9 +26,8 @@ class Walker
         @cfg.ignore      ?= ['node_modules', 'app', 'img', 'dist', 'build', 'Library', 'Applications']
         @cfg.include     ?= ['.konrad.noon', '.gitignore', '.npmignore']
         @cfg.ignoreExt   ?= ['.app']
-        @cfg.includeExt  ?= ['.coffee', '.js', '.styl', '.css', '.pug', '.jade', '.html', 
+        @cfg.includeExt  ?= ['.coffee', '.js', '.styl', '.css', '.pug', '.html', 
                             '.md', '.txt', '.noon', '.json', '.cpp', '.cc', '.c', '.h', '.hpp', '.sh', '.py']
-        # log "walker", @cfg
       
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -98,21 +97,4 @@ class Walker
         @walker?.end()
         @walker = null
     
-    # 00000000    0000000    0000000  000   000   0000000    0000000   00000000
-    # 000   000  000   000  000       000  000   000   000  000        000     
-    # 00000000   000000000  000       0000000    000000000  000  0000  0000000 
-    # 000        000   000  000       000  000   000   000  000   000  000     
-    # 000        000   000   0000000  000   000  000   000   0000000   00000000
-    
-    @packagePath: (p) ->
-        while p.length and p not in ['.', '/']            
-            if fs.existsSync path.join p, 'package.noon'
-                return resolve p
-            if fs.existsSync path.join p, 'package.json'
-                return resolve p
-            if fs.existsSync path.join p, '.git'
-                return resolve p
-            p = path.dirname p
-        null
-
 module.exports = Walker

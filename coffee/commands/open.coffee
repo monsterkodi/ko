@@ -4,6 +4,7 @@
 # 000   000  000        000       000  0000
 #  0000000   000        00000000  000   000
 {
+packagePath,
 fileExists,
 dirExists,
 unresolve,
@@ -315,7 +316,7 @@ class Open extends Command
         return false if newdir == @dir and not opt.reload
         
         @dir        = newdir
-        @pkg        = opt.noPkg and @dir or Walker.packagePath(@dir) or @dir
+        @pkg        = opt.noPkg and @dir or packagePath(@dir) or @dir
         @file       = opt.file
         @files      = []
         @selected   = 0

@@ -1,10 +1,8 @@
 # todo/ideas
 
-- shotcut to switch projects in open and term
+- shortcut to switch projects in open and term
     - term: cd to .project
     - open: open .project/coffee
-- req macro: 
-    - localize if local file exists
 - cheat sheet
 - limit size of range for bracket matching 
 - term: auto cd to pkg dir when file loaded?

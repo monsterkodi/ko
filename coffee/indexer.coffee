@@ -4,6 +4,7 @@
 # 000  000  0000  000   000  000        000 000   000       000   000
 # 000  000   000  0000000    00000000  000   000  00000000  000   000
 {
+packagePath,
 fileExists,
 resolve,
 last,
@@ -290,7 +291,7 @@ class Indexer
                 win.webContents.send 'filesCount', _.size @files
 
             @indexDir path.dirname file
-            @indexDir Walker.packagePath file
+            @indexDir packagePath file
 
             @shiftQueue()
 
