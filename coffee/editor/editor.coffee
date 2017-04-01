@@ -1290,7 +1290,7 @@ class Editor extends Buffer
     # 000        000   000       000     000     000     
     # 000        000   000  0000000      000     00000000
         
-    paste: (text) -> 
+    paste: (text) ->
         
         @deleteSelection()
         @do.start()        
@@ -1302,7 +1302,6 @@ class Editor extends Buffer
         
         if @cursors.length > 1 or l.length == 1 and not @isCursorAtStartOfLine()
             newCursors = _.cloneDeep @cursors
-            # log "insert.paste: paste #{l.length} lines into #{@cursors.length} cursors"
             for ci in [@cursors.length-1..0]
                 c = @cursors[ci]
                 insert = l[ci % l.length]
@@ -1310,7 +1309,6 @@ class Editor extends Buffer
                 for c in @positionsAfterLineColInPositions c[1], c[0], @cursors
                     @oldCursorDelta newCursors, c, insert.length
         else
-            # log "insert.paste: paste #{l.length} lines into single cursor"
             cp = @cursorPos()
             li = cp[1]
             newSelections = []

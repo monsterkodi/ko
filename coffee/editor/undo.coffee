@@ -157,7 +157,7 @@ class Undo
             if dbg
                 log 'action.lines', action.lines
                 
-            for line in action.lines
+            for line in action.lines.reversed()
                 undoLines.push 
                     oldIndex:  line.newIndex
                     newIndex:  line.oldIndex
@@ -168,10 +168,8 @@ class Undo
                 if line.change == 'deleted'  then lastLine.change = 'inserted'
                 if line.change == 'inserted' then lastLine.change = 'deleted'
             
-            undoLines.reverse()
-            
             if dbg
-                log 'lines before redo', @editor.lines
+                log 'lines before undo', @editor.lines
                 log 'undoLines', undoLines
             
             sortedLines = []
@@ -222,8 +220,8 @@ class Undo
                                 line.oldIndex = insertion.oldIndex
                         changes.changes.push line
             
-            # log 'lines after undo', @editor.lines
-            # log changes
+            if dbg
+                log 'lines after undo', @editor.lines
                             
             sortedLines = changes.insertions.concat changes.deletions, changes.changes
                         
@@ -407,15 +405,18 @@ class Undo
         @groupCount -= 1
         @futures = []
         
-        if dbg and last(@actions).lines
-            console.log "end group #{@groupCount}", str last(@actions).lines
+        if dbg
+            console.log "end", @editor.text()
+            
+        # if dbg and last(@actions).lines
+            # console.log "end group #{@groupCount}", str last(@actions).lines
     
         if @groupCount == 0
 
-            if dbg 
-                for a in @actions
-                    if a.lines.length
-                        console.log "action before merge", str a.lines
+            # if dbg 
+                # for a in @actions
+                    # if a.lines.length
+                        # console.log "action before merge", str a.lines
             
             @merge()
             
@@ -423,17 +424,7 @@ class Undo
                 console.log 'end', str last(@actions).lines
             
             if @changeInfo?
-                lines = _.clone last(@actions).lines
-
-                sortedLines = []
-                while line = lines.shift()
-                    if line.change == 'deleted'
-                        for l in lines
-                            if l.oldIndex > line.oldIndex
-                                l.oldIndex -= 1
-                    sortedLines.push line
-
-                @editor.changed? @changeInfo, lines: sortedLines
+                @editor.changed? @changeInfo, lines: last(@actions).lines
                 @delChangeInfo()
 
     # 00     00  00000000  00000000    0000000   00000000

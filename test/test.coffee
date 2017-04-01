@@ -305,7 +305,7 @@ describe 'complex', ->
             expect editor.text()
             .to.eql '00-33'
 
-        it "multi multirow", ->
+        it "double multirow", ->
             editor.setText '0000\n1111\n2222\n3333\n4444\n5555'
             editor.singleCursorAtPos [2,1]
             editor.moveMainCursor 'down'
@@ -315,5 +315,18 @@ describe 'complex', ->
             editor.insertUserCharacter '-'
             expect editor.text()
             .to.eql '0000\n11-22\n33-44\n5555'
+
+        it "triple multirow", ->
+            editor.setText '0000\n1111\n2222\n3333\n4444\n5555\n6666\n7777'
+            editor.singleCursorAtPos [2,1]
+            editor.moveMainCursor 'down'
+            editor.moveMainCursor 'down'
+            editor.moveMainCursor 'down'
+            editor.moveCursors 'down', true
+            editor.moveCursors 'down', true
+            undo.reset()
+            editor.insertUserCharacter '-'
+            expect editor.text()
+            .to.eql '0000\n11-33\n44-66\n7777'
     
     
