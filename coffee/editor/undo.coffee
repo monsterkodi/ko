@@ -175,10 +175,10 @@ class Undo
             sortedLines = []
             cloneLines = _.cloneDeep undoLines
             while line = cloneLines.shift()
-                if line.change == 'deleted'
+                if line.change != 'changed'
                     for l in cloneLines
                         if l.newIndex >= line.newIndex
-                            l.oldIndex -= 1
+                            l.oldIndex += line.change == 'deleted' and -1 or 1
                 sortedLines.push line
             
             if dbg
@@ -189,10 +189,10 @@ class Undo
             for line in sortedLines
                 @undoLine line
                 
+                line.oldIndex = line.newIndex
                 switch line.change
                     when 'inserted'
                         inserted = false
-                        line.oldIndex = line.newIndex
                         for i in [0...changes.insertions.length]
                             if changes.insertions[i].newIndex >= line.newIndex
                                 changes.insertions.splice i, 0, line
@@ -210,11 +210,9 @@ class Undo
                                 change.newIndex += 1
                             
                     when 'deleted'  
-                        line.oldIndex = line.newIndex
                         changes.deletions.push line
                         
                     when 'changed'
-                        line.oldIndex = line.newIndex
                         for insertion in changes.insertions
                             if insertion.newIndex == line.newIndex
                                 line.oldIndex = insertion.oldIndex

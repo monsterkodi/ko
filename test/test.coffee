@@ -295,7 +295,9 @@ describe 'complex', ->
                 '0000', '1-1-', '2-2', '3333'
             ]
     
-        it "multirow", ->
+    describe 'multirow', ->
+        
+        it "single", ->
             editor.setText '0000\n1111\n2222\n3333'
             editor.singleCursorAtPos [2,0]
             editor.singleCursorAtPos [2,3], true
@@ -304,21 +306,43 @@ describe 'complex', ->
             editor.insertUserCharacter '-'
             expect editor.text()
             .to.eql '00-33'
+            
+        it "single undo", ->
+            undo.undo()
+            expect editor.text()
+            .to.eql '0000\n1111\n2222\n3333'
 
-        it "double multirow", ->
+        it "single redo", ->
+            undo.redo()
+            expect editor.text()
+            .to.eql '00-33'
+
+        it "double", ->
             editor.setText '0000\n1111\n2222\n3333\n4444\n5555'
             editor.singleCursorAtPos [2,1]
             editor.moveMainCursor 'down'
             editor.moveMainCursor 'down'
             editor.moveCursors 'down', true
             undo.reset()
+            
             editor.insertUserCharacter '-'
             expect editor.text()
             .to.eql '0000\n11-22\n33-44\n5555'
 
-        it "triple multirow", ->
-            editor.setText '0000\n1111\n2222\n3333\n4444\n5555\n6666\n7777'
+        it "double undo", ->
+            undo.undo()
+            expect editor.text()
+            .to.eql '0000\n1111\n2222\n3333\n4444\n5555'
+
+        it "double redo", ->
+            undo.redo()
+            expect editor.text()
+            .to.eql '0000\n11-22\n33-44\n5555'
+
+        it "triple", ->
+            editor.setText '0000\n1111\n2222\n3333\n4444\n5555\n6666\n7777\n8888'
             editor.singleCursorAtPos [2,1]
+            editor.moveMainCursor 'down'
             editor.moveMainCursor 'down'
             editor.moveMainCursor 'down'
             editor.moveMainCursor 'down'
@@ -327,6 +351,16 @@ describe 'complex', ->
             undo.reset()
             editor.insertUserCharacter '-'
             expect editor.text()
-            .to.eql '0000\n11-33\n44-66\n7777'
+            .to.eql '0000\n11-33\n4444\n55-77\n8888'
+            
+        it "triple undo", ->
+            undo.undo()
+            expect editor.text()
+            .to.eql '0000\n1111\n2222\n3333\n4444\n5555\n6666\n7777\n8888'
+
+        it "triple redo", ->
+            undo.redo()
+            expect editor.text()
+            .to.eql '0000\n11-33\n4444\n55-77\n8888'
     
     
