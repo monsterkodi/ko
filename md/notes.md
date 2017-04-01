@@ -6,7 +6,6 @@
 - req macro: 
     - localize if local file exists
 - cheat sheet
-- fix commandlist switching sides when other side is smaller
 - limit size of range for bracket matching 
 - term: auto cd to pkg dir when file loaded?
 - list project|pkg dirs?

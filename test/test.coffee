@@ -15,18 +15,47 @@ chai.should()
 Editor = require '../coffee/editor/editor'
 Undo   = require '../coffee/editor/undo'
 
-editor = null
-undo   = null
+# 000   000  000  00000000  000   000  
+# 000   000  000  000       000 0 000  
+#  000 000   000  0000000   000000000  
+#    000     000  000       000   000  
+#     0      000  00000000  00     00  
+
+class FakeView
+    
+    constructor: (@editor) ->
+        @divs = []
+        @editor.changed = @changed     
+        @editor.on 'linesSet', (lines) => @divs = _.clone lines
+        
+    changed: (changeInfo, action) =>
+        
+        changes = _.cloneDeep action.lines
+        while change = changes.shift()
+            [oi,li,ch] = [change.oldIndex, change.newIndex, change.change]
+            switch ch
+                when 'changed'  then @divs[oi ? li] = @editor.lines[li]
+                when 'deleted'  then @divs.splice oi, 1
+                when 'inserted' then @divs.splice oi, 0, @editor.lines[li]
+    
+    text: -> @divs.join '\n'
+
+editor   = null
+undo     = null
+fakeview = null
 
 describe 'editor', ->
     
     it "exists", -> _.isObject Editor
     it "instantiates", -> _.isObject editor = new Editor
+    it "fakeview", -> fakeview = new FakeView editor
     it "accepts text", -> 
         editor.setText "hello\nworld"
         expect editor.lines 
         .to.eql ['hello', 'world']
         expect editor.text()
+        .to.eql 'hello\nworld'
+        expect fakeview.text()
         .to.eql 'hello\nworld'
 
 describe 'undo', ->
@@ -46,6 +75,10 @@ describe 'undo', ->
         expect editor.lines
         .to.eql t.split '\n'
 
+compareFakeView = ->
+    # log fakeview.text()
+    expect(fakeview.text()) .to.eql editor.text()
+
 # 0000000     0000000    0000000  000   0000000  
 # 000   000  000   000  000       000  000       
 # 0000000    000000000  0000000   000  000       
@@ -53,6 +86,7 @@ describe 'undo', ->
 # 0000000    000   000  0000000   000   0000000  
 
 describe 'basic', ->
+    afterEach -> compareFakeView()
     describe 'edit', ->
 
         beforeEach -> undo.start()
@@ -112,6 +146,7 @@ describe 'basic', ->
 # 000   000  00000000  0000000    000   0000000   000   000  
 
 describe 'medium', -> 
+    afterEach -> compareFakeView()
     describe 'edit', ->
         
         before -> 
@@ -183,6 +218,14 @@ undoRedo = ->
     expect(before) .to.eql after
 
 describe 'complex', -> 
+    afterEach -> compareFakeView()
+    
+    # 0000000    00000000   00000000   0000000   000   000  
+    # 000   000  000   000  000       000   000  000  000   
+    # 0000000    0000000    0000000   000000000  0000000    
+    # 000   000  000   000  000       000   000  000  000   
+    # 0000000    000   000  00000000  000   000  000   000  
+    
     describe 'break', ->
         describe 'column', ->
         
@@ -256,6 +299,12 @@ describe 'complex', ->
                 editor.deleteBackward ignoreLineBoundary: true
                 expect(editor.lines) .to.eql lines
 
+    # 000  000   000   0000000  00000000  00000000   000000000  
+    # 000  0000  000  000       000       000   000     000     
+    # 000  000 0 000  0000000   0000000   0000000       000     
+    # 000  000  0000       000  000       000   000     000     
+    # 000  000   000  0000000   00000000  000   000     000   
+    
     describe 'selection insert', ->
         
         afterEach undoRedo
@@ -294,6 +343,12 @@ describe 'complex', ->
             .to.eql [
                 '0000', '1-1-', '2-2', '3333'
             ]
+    
+    # 00     00  000   000  000      000000000  000  00000000    0000000   000   000  
+    # 000   000  000   000  000         000     000  000   000  000   000  000 0 000  
+    # 000000000  000   000  000         000     000  0000000    000   000  000000000  
+    # 000 0 000  000   000  000         000     000  000   000  000   000  000   000  
+    # 000   000   0000000   0000000     000     000  000   000   0000000   00     00  
     
     describe 'multirow', ->
         
@@ -363,4 +418,102 @@ describe 'complex', ->
             expect editor.text()
             .to.eql '0000\n11-33\n4444\n55-77\n8888'
     
+    # 00     00  000   000  000      000000000  000   0000000   0000000   000      
+    # 000   000  000   000  000         000     000  000       000   000  000      
+    # 000000000  000   000  000         000     000  000       000   000  000      
+    # 000 0 000  000   000  000         000     000  000       000   000  000      
+    # 000   000   0000000   0000000     000     000   0000000   0000000   0000000  
     
+    describe 'multicol', ->
+                
+        it 'single row', ->
+            editor.setText '000011112222333344445555'
+            editor.cursors = [[4,0], [8,0], [12,0], [16,0], [20,0]]
+            editor.mainCursor = [20, 0]
+            undo.reset()
+            editor.insertUserCharacter '-'
+            expect editor.cursors
+            .to.eql [[5,0], [10,0], [15,0], [20,0], [25,0]]
+            editor.insertUserCharacter '+'
+            expect editor.text()
+            .to.eql '0000-+1111-+2222-+3333-+4444-+5555'
+
+        it "single row undo", ->
+            undo.undo()
+            expect editor.text()
+            .to.eql '0000-1111-2222-3333-4444-5555'
+            undo.undo()
+            expect editor.text()
+            .to.eql '000011112222333344445555'
+
+        it "single row redo", ->
+            undo.redo()
+            expect editor.text()
+            .to.eql '0000-1111-2222-3333-4444-5555'
+            undo.redo()
+            expect editor.text()
+            .to.eql '0000-+1111-+2222-+3333-+4444-+5555'
+        
+        it 'mixed', ->
+            editor.setText '0000\n1111\n2222'
+            editor.singleCursorAtPos [2,0]
+            editor.singleCursorAtPos [2,1], true
+            editor.cursors.push [2,2]
+            editor.mainCursor = [2,2]
+            undo.reset()
+            editor.insertUserCharacter '-'
+            expect editor.text()
+            .to.eql '00-11\n22-22'
+            
+        it "mixed undo", ->
+            undo.undo()
+            expect editor.text()
+            .to.eql '0000\n1111\n2222'
+
+        it "mixed redo", ->
+            undo.redo()
+            expect editor.text()
+            .to.eql '00-11\n22-22'
+
+        it "delete selection", ->
+            editor.setText '0000\n1111'
+            editor.singleCursorAtPos [2,0]
+            editor.singleCursorAtPos [2,1], true
+            editor.cursors.push [3,1]
+            undo.reset()
+            editor.deleteSelection()
+            expect editor.cursors
+            .to.eql [[2,0], [3,0]]
+
+        it "delete multiple selections", ->
+            editor.setText '0000\n1111'
+            editor.selections = [[0,[2,4]], [1, [0,2]], [1, [3,4]]]
+            editor.cursors = [[2,1], [4,1]]
+            editor.mainCursor = [4,1]
+            undo.reset()
+            editor.deleteSelection()
+            expect editor.cursors
+            .to.eql [[2,0], [3,0]]
+            expect editor.text()
+            .to.eql '001'
+
+        it 'mix', ->
+            editor.setText '0000\n1111'
+            editor.singleCursorAtPos [2,0]
+            editor.singleCursorAtPos [2,1], true
+            editor.cursors.push [3,1]
+            undo.reset()
+            editor.insertUserCharacter '-'
+            expect editor.text()
+            .to.eql '00-1-1'
+            
+        it "mix undo", ->
+            undo.undo()
+            expect editor.text()
+            .to.eql '0000\n1111'
+
+        it "mix redo", ->
+            undo.redo()
+            expect editor.text()
+            .to.eql '00-1-1'
+            

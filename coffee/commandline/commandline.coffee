@@ -209,8 +209,10 @@ class Commandline extends ViewBase
         split = window.split
         listTop = split.splitPosY 1
         listHeight = @list.getBoundingClientRect().height
-        if (split.elemHeight() - listTop) < listHeight
-            listTop = split.splitPosY(0) - listHeight
+        spaceBelow = split.elemHeight() - listTop
+        spaceAbove = split.splitPosY 0
+        if spaceBelow < listHeight and spaceAbove > spaceBelow
+            listTop = spaceAbove - listHeight
         @list?.style.top = "#{listTop}px"        
     
     resized: -> 

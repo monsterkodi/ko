@@ -193,14 +193,14 @@ class Undo
                 switch line.change
                     when 'inserted'
                         inserted = false
-                        for i in [0...changes.insertions.length]
-                            if changes.insertions[i].newIndex >= line.newIndex
-                                changes.insertions.splice i, 0, line
-                                for j in [i+1...changes.insertions.length]
-                                    changes.insertions[j].oldIndex += 1
-                                    changes.insertions[j].newIndex += 1
-                                inserted = true
-                                break
+                        # for i in [0...changes.insertions.length]
+                            # if changes.insertions[i].newIndex >= line.newIndex
+                                # changes.insertions.splice i, 0, line
+                                # for j in [i+1...changes.insertions.length]
+                                    # changes.insertions[j].oldIndex += 1
+                                    # changes.insertions[j].newIndex += 1
+                                # inserted = true
+                                # break
                         if not inserted
                             changes.insertions.push line
                             
@@ -213,9 +213,9 @@ class Undo
                         changes.deletions.push line
                         
                     when 'changed'
-                        for insertion in changes.insertions
-                            if insertion.newIndex == line.newIndex
-                                line.oldIndex = insertion.oldIndex
+                        # for insertion in changes.insertions
+                            # if insertion.newIndex == line.newIndex
+                                # line.oldIndex = insertion.oldIndex
                         changes.changes.push line
             
             if dbg
@@ -223,13 +223,12 @@ class Undo
                             
             sortedLines = changes.insertions.concat changes.deletions, changes.changes
                         
-            # log 'sortedLines', sortedLines
+            if dbg
+                log 'sortedLines', sortedLines
             
             @undoCursor action
             @undoSelection action
             @futures.unshift action
-            
-            # log 'futures', @futures
             
             @editor.changed? @changeInfo, lines: sortedLines
             @delChangeInfo()

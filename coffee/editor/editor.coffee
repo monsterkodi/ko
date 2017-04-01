@@ -1153,16 +1153,14 @@ class Editor extends Buffer
         newCursors = _.cloneDeep @cursors
         
         for c in @cursors # this looks weird
-            oc = newCursors[@indexOfCursor c]
-            if oc.length < 2 or oc[1] >= @lines.length
+            cc = newCursors[@indexOfCursor c]
+            if cc.length < 2 or cc[1] >= @lines.length
                 alert "wtf?"
                 throw new Error
-            @do.change oc[1], @lines[oc[1]].splice oc[0], 0, ch
-            for nc in @positionsInLineAtIndexInPositions oc[1], newCursors
-                if nc[0] >= oc[0]
+            @do.change cc[1], @lines[cc[1]].splice cc[0], 0, ch
+            for nc in @positionsInLineAtIndexInPositions cc[1], newCursors
+                if nc[0] >= cc[0]
                     nc[0] += 1
-                    if @isMainCursor nc
-                        nc[0] += 1
 
         @do.cursors newCursors
         @do.end()
@@ -1497,15 +1495,19 @@ class Editor extends Buffer
         @do.start()
         newCursors = _.cloneDeep @cursors
         joinLines = []
-        for c in @cursors
+        for c in @cursors.reversed()
             csel = @continuousSelectionAtPos c
             if csel?
                 [sp, ep] = csel
                 for nc in @positionsBetweenPosAndPosInPositions sp, ep, newCursors
                     @newCursorSet newCursors, nc, sp[0], sp[1]
                 if sp[1] < ep[1] and sp[0] > 0 and ep[0] < @lines[ep[1]].length 
-                    joinLines.push sp[1] # selection spans multiple lines and first and last line are cut
-                    
+                    # selection spans multiple lines and first and last line are cut
+                    joinLines.push sp[1] 
+                    for nc in @positionsAfterLineColInPositions ep[1], ep[0], newCursors
+                        # set cursors after selection in last joined line
+                        @newCursorSet newCursors, nc, sp[0]+nc[0]-ep[0], sp[1] 
+                        
         for s in @reversedSelections()
             continue if s[0] >= @lines.length
             lineSelected = s[1][0] == 0 and s[1][1] == @lines[s[0]].length
@@ -1516,8 +1518,8 @@ class Editor extends Buffer
             else
                 continue if s[0] >= @lines.length
                 @do.change s[0], @lines[s[0]].splice s[1][0], s[1][1]-s[1][0]
-                for nc in @positionsFromPosInPositions [s[1][1], s[0]], @positionsInLineAtIndexInPositions s[0], newCursors
-                    @newCursorDelta newCursors, nc, -(s[1][1]-s[1][0])
+                for nc in @positionsAfterLineColInPositions s[0], s[1][1], newCursors
+                    @newCursorDelta newCursors, nc, -(s[1][1]-s[1][0]) # move cursors after deletion in same line left
 
             if s[0] in joinLines
                 @do.change s[0], @lines[s[0]] + @lines[s[0]+1]

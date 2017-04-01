@@ -132,14 +132,15 @@ class Command
         split = window.split
         listTop = 6+split.splitPosY 1
         listHeight = @commandList.view.getBoundingClientRect().height
-        if (split.elemHeight() - listTop) < listHeight
-            if split.splitPosY(0) > split.splitPosY(1) - split.splitPosY(1)
+        spaceBelow = split.elemHeight() - listTop
+        if spaceBelow < listHeight
+            if split.splitPosY(0) > spaceBelow
                 listTop = split.splitPosY(0) - listHeight
                 if listTop < 0
                     @commandList.view.style.height = "#{listHeight+listTop}px"
                     listTop = 0
             else
-                @commandList.view.style.height = "#{split.elemHeight() - listTop}px"
+                @commandList.view.style.height = "#{spaceBelow}px"
         @commandList?.view.style.top = "#{listTop}px"
 
     #  0000000  00000000  000      00000000   0000000  000000000
