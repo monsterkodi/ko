@@ -9,7 +9,7 @@ NAME=`sds productName`
 konrad --run
 node_modules/.bin/electron-rebuild
 
-IGNORE="/(.*\.dmg$|Icon$|coffee$|.*md$|pug$|styl$|package\.noon$|.*\.lock$|three/examples)"
+IGNORE="/(.*\.dmg$|Icon$|coffee$|.*md$|pug$|styl$|test$|package\.noon$|.*\.lock$|three/examples)"
 node_modules/electron-packager/cli.js . --overwrite --icon=img/$NAME.icns --ignore $IGNORE
 
 rm $NAME-darwin-x64/LICENSE*
