@@ -311,6 +311,10 @@ class Editor extends Buffer
     # 0000000   000  000   000   0000000   0000000  00000000
     
     singleCursorAtPos: (p, e) ->
+        if @lines.length == 0
+            @do.start()
+            @do.insert 0, ''
+            @do.end()
         p = @clampPos p
         if e and @initialCursors?.length > 1
             @initialCursors = _.cloneDeep [@initialCursors[0]]

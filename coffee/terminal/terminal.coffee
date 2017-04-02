@@ -115,6 +115,7 @@ class Terminal extends ViewBase
     clear: ->
         @meta.clear()
         super
+        @singleCursorAtPos [0,0]
             
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

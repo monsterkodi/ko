@@ -93,6 +93,7 @@ class Open extends Command
 
     complete: -> 
         return if not @commandList? 
+        log 'open complete', @getText() #, @commandList.lines
         if @commandList.lines[@selected].startsWith(path.basename @getText()) and not @getText().trim().endsWith('/')
             @setText path.join(path.dirname(@getText()), @commandList.lines[@selected])
             if dirExists resolve @getText()
@@ -104,6 +105,7 @@ class Open extends Command
             @changed @getText()
             true            
         else
+            log 'complete projects?'
             super
     
     # 000   000  00000000  000   0000000   000   000  000000000

@@ -219,6 +219,11 @@ class Commandline extends ViewBase
         @list?.resized()
         @command?.commandList?.resized()
         super
+
+    focusTerminal: ->
+        if window.terminal.lines.length == 0
+            window.terminal.singleCursorAtPos [0,0]
+        window.split.do "focus terminal"
         
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
@@ -250,7 +255,7 @@ class Commandline extends ViewBase
         switch combo
             when 'enter'                then return @execute()
             when 'command+enter'        then return @execute() + window.split.do "focus #{@command?.focus}"
-            when 'command+shift+enter'  then return window.split.do "focus terminal"
+            when 'command+shift+enter'  then return @focusTerminal()
             when 'up'                   then return @setAndSelectText @command?.prev()
             when 'down'                 then return @setAndSelectText @command?.next()
             when 'esc'                  then return @cancel()

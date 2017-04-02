@@ -41,6 +41,7 @@ class Meta
         return if not changeInfo.lines
         for lineChange in action.lines
             li = lineChange.oldIndex            
+            continue if lineChange.change == 'deleted'
             for meta in @metasAtLineIndex li
                 if meta[2].clss == "searchResult"
                     [file, line] = meta[2].href.split ':' 
@@ -55,8 +56,6 @@ class Meta
                         button = @saveButton li
                         if not meta[2].span.innerHTML.startsWith "<span"
                             meta[2].span.innerHTML = button
-                    # else 
-                        # log "no span?"
          
     #  0000000   0000000   000   000  00000000
     # 000       000   000  000   000  000     

@@ -1,7 +1,6 @@
 # todo/ideas
 
 - shortcut to switch projects in open and term
-    - term: cd to .project
     - open: open .project/coffee
 - cheat sheet
 - limit size of range for bracket matching 
