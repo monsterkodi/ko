@@ -10,8 +10,6 @@ str,
 log}  = require 'kxk'
 _     = require 'lodash'
 
-dbg = false
-
 class Undo
     
     constructor: (@editor) -> @reset()
@@ -99,16 +97,9 @@ class Undo
             @newChangeInfo()
             action = @futures.shift()
             
-            if dbg 
-                log 'lines before redo', @editor.lines
-                log 'action.lines', action.lines
-                        
             for line in action.lines
                 @redoLine line
             
-            if dbg    
-                log 'lines after redo', @editor.lines
-                
             @redoCursor action
             @redoSelection action
             @actions.push action
@@ -154,9 +145,6 @@ class Undo
             action = @actions.pop()
             undoLines = []
             
-            if dbg
-                log 'action.lines', action.lines
-                
             for line in action.lines.reversed()
                 undoLines.push 
                     oldIndex:  line.newIndex
@@ -168,10 +156,6 @@ class Undo
                 if line.change == 'deleted'  then lastLine.change = 'inserted'
                 if line.change == 'inserted' then lastLine.change = 'deleted'
             
-            if dbg
-                log 'lines before undo', @editor.lines
-                log 'undoLines', undoLines
-            
             sortedLines = []
             cloneLines = _.cloneDeep undoLines
             while line = cloneLines.shift()
@@ -181,9 +165,6 @@ class Undo
                             l.oldIndex += line.change == 'deleted' and -1 or 1
                 sortedLines.push line
             
-            if dbg
-                log 'undoLines sorted', sortedLines
-            
             changes = insertions: [], deletions: [], changes: []
             
             for line in sortedLines
@@ -192,17 +173,7 @@ class Undo
                 line.oldIndex = line.newIndex
                 switch line.change
                     when 'inserted'
-                        inserted = false
-                        # for i in [0...changes.insertions.length]
-                            # if changes.insertions[i].newIndex >= line.newIndex
-                                # changes.insertions.splice i, 0, line
-                                # for j in [i+1...changes.insertions.length]
-                                    # changes.insertions[j].oldIndex += 1
-                                    # changes.insertions[j].newIndex += 1
-                                # inserted = true
-                                # break
-                        if not inserted
-                            changes.insertions.push line
+                        changes.insertions.push line
                             
                         for change in changes.changes
                             if change.oldIndex >= line.oldIndex
@@ -213,19 +184,10 @@ class Undo
                         changes.deletions.push line
                         
                     when 'changed'
-                        # for insertion in changes.insertions
-                            # if insertion.newIndex == line.newIndex
-                                # line.oldIndex = insertion.oldIndex
                         changes.changes.push line
             
-            if dbg
-                log 'lines after undo', @editor.lines
-                            
             sortedLines = changes.insertions.concat changes.deletions, changes.changes
                         
-            if dbg
-                log 'sortedLines', sortedLines
-            
             @undoCursor action
             @undoSelection action
             @futures.unshift action
@@ -277,8 +239,9 @@ class Undo
         if not newCursors? or newCursors.length < 1
             alert 'warning! empty cursors?'
             throw new Error
-            
-        @editor.mainCursor = @editor.posClosestToPosInPositions(@editor.mainCursor, newCursors) if opt?.closestMain
+        
+        if opt?.closestMain    
+            @editor.mainCursor = @editor.posClosestToPosInPositions(@editor.mainCursor, newCursors) 
         
         if newCursors.indexOf(@editor.mainCursor) < 0
             if @editor.indexOfCursor(@editor.mainCursor) >= 0
@@ -355,9 +318,6 @@ class Undo
             @moveLinesAfter change.oldIndex-1,  1
         lines.push change
         
-        if dbg 
-            console.log 'modify', str lines
-    
     change: (index, text) ->
         return if @editor.lines[index] == text
         @modify
@@ -402,23 +362,9 @@ class Undo
         @groupCount -= 1
         @futures = []
         
-        if dbg
-            console.log "end", @editor.text()
-            
-        # if dbg and last(@actions).lines
-            # console.log "end group #{@groupCount}", str last(@actions).lines
-    
         if @groupCount == 0
 
-            # if dbg 
-                # for a in @actions
-                    # if a.lines.length
-                        # console.log "action before merge", str a.lines
-            
             @merge()
-            
-            if dbg and last(@actions).lines
-                console.log 'end', str last(@actions).lines
             
             if @changeInfo?
                 @editor.changed? @changeInfo, lines: last(@actions).lines

@@ -56,10 +56,7 @@ class Buffer extends multi event, ranges
     indexOfCursor: (c) -> @cursors.indexOf c
     isMainCursor: (c) -> @isSamePos c, @mainCursor
 
-    reversedCursors: ->
-        cs = _.clone @cursors
-        cs.reverse()
-        cs
+    reversedCursors: -> @cursors.reversed()
 
     cursorsInLineAtIndex: (li) ->
         cs = []
