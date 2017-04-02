@@ -17,6 +17,7 @@ salt       = require '../tools/salt'
 Command    = require '../commandline/command'
 _          = require 'lodash'
 path       = require 'path'
+colors     = require 'colors'
 noon       = require 'noon'
 electron   = require 'electron'
 atomicFile = require 'write-file-atomic'
@@ -100,7 +101,24 @@ class Macro extends Command
             
             when 'help'
                 terminal = window.terminal
-                terminal.output noon.stringify noon.load("#{__dirname}/../../md/cheet.noon"), colors: true
+                terminal.output noon.stringify noon.load("#{__dirname}/../../bin/cheet.noon"),
+                    colors:   true
+                    align:    true
+                    maxalign: 20
+                    colors:
+                        url:     colors.yellow
+                        key:     colors.white
+                        null:    colors.blue
+                        true:    colors.blue.bold
+                        false:   colors.gray.dim
+                        path:    colors.green
+                        value:   colors.green
+                        string:  colors.white.dim
+                        semver:  colors.red
+                        number:  colors.magenta
+                        visited: colors.red
+                        dim:     '^>=.:/-'
+                    
                 terminal.scrollCursorToTop 1
                 window.split.do 'reveal terminal'
             
