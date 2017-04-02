@@ -136,6 +136,13 @@ module.exports = class Ranges
             
     rangesNotEmptyInRanges: (ranges) -> _.filter ranges, (r) -> r[1][1]-r[1][0]
 
+    areSameRanges: (ra, rb) -> 
+        if ra.length == rb.length
+            for i in [0...ra.length]
+                return false if not @isSameRange ra[i], rb[i]
+            return true
+        false
+
     #  0000000  000      00000000   0000000   000   000  
     # 000       000      000       000   000  0000  000  
     # 000       000      0000000   000000000  000 0 000  

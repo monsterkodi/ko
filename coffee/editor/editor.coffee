@@ -623,12 +623,15 @@ class Editor extends Buffer
             @emit 'highlight'
 
     highlightsSurroundingCursor: ->
-        b = @rangeBeforePosInRanges @cursorPos(), @highlights
-        b ?= first @highlights
-        a = @rangeAfterPosInRanges  @cursorPos(), @highlights
-        a ?= last @highlights
-        if a? and b?
-            @sortRanges [a, b] 
+        if @highlights.length % 2 == 0
+            @sortRanges @highlights
+            if @highlights.length == 2
+                return @highlights
+            else if @highlights.length == 4
+                if @areSameRanges [@highlights[1], @highlights[2]], @selections
+                    return [@highlights[0], @highlights[3]]
+                else
+                    return [@highlights[1], @highlights[2]]
 
     selectBetweenSurround: ->
         if surr = @highlightsSurroundingCursor()
