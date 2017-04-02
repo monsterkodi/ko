@@ -20,6 +20,7 @@ path       = require 'path'
 colors     = require 'colors'
 noon       = require 'noon'
 electron   = require 'electron'
+process    = require 'process'
 atomicFile = require 'write-file-atomic'
 
 ipc        = electron.ipcRenderer
@@ -207,7 +208,8 @@ class Macro extends Command
             when 'class'
                 clss = args.length and args[0] or last editor.textsInRanges(editor.selections)
                 clss ?= 'Class'
-                file = path.join path.dirname(editor.currentFile), clss.toLowerCase() + '.coffee'
+                dir = editor.currentFile? and path.dirname(editor.currentFile) or process.cwd()
+                file = path.join dir, clss.toLowerCase() + '.coffee'
                 if fileExists file
                     return text: "file #{file} exists!"
                 text = ("# "+s for s in salt(clss).split '\n').join '\n'
