@@ -1,0 +1,54 @@
+shortcuts
+        selection
+            ⌘E          highlight occurences of selected word
+            ⌘G          select next highlight
+            ⌘D          add next highlighted word to selection
+            ⌥⌘D         select all highlighted words 
+            ⌘⇧D         deselects last selected word
+            ⌘L          select more lines 
+            ⌘⇧L         select less lines
+            ⌘I          invert selection: select lines without a cursor or a selection
+        cursors
+            ^cursor     move main cursor independently
+            ⌘up|down    extend all cursors vertically
+            ^⇧up|down   extend only main cursor vertically
+            ⌘right      move cursors to end of lines
+            ⌘left       move cursor to first-non-space|start of line
+        editing
+            ⌘/          toggle comment on selected lines
+            ⌥up|down    move selected lines up|down
+            ⌥⇧up|down   duplicate selected lines above|below
+            ^⇧right     align text after cursors
+            ⌘return     insert empty line below cursor and move cursor down
+        display
+            ⌘-          decrease font size
+            ⌘=          increase font size
+            ⌘0          reset font size
+            ⌘\          toggle left text offset when window is as wide as screen
+        commandline
+            ⌘up|down    move commandline to top|bottom
+            ⌥up|down    move commandline up|down by a quarter of window height
+            ^up|down    move commandline up|down
+        misc
+            F2          global shortcut to activate ko
+            ⌘R          discard changes and reload current file
+            ⌥⌘up        jump to counterpart file
+term
+    alias [alias command]   set alias
+    files [regexp]      list files
+    class [regexp]      list classes
+    funcs [regexp]      list functions
+    words [regexp]      list indexer words
+    history             show command history
+    clear               clear terminal ⌘K
+    stop                terminate running process and restart shell
+    autocd [on|off]     set autocd mode
+    headers [on|off]    set headers mode
+
+macro
+    req     insert require statements for words at cursors
+    dbg     insert log statement for variables at cursors
+    inv     toggle display of invisibles
+    fps     toggle fps display
+    class   create a new file with class template
+    help    prints this text in the terminal

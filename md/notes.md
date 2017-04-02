@@ -5,7 +5,6 @@
     - open: open .project/coffee
 - cheat sheet
 - limit size of range for bracket matching 
-- term: auto cd to pkg dir when file loaded?
 - list project|pkg dirs?
 - set breakpoint in electron?
 
@@ -42,6 +41,5 @@
 - shortcut for renaming file
 - clean empty buffers on open file
 - save window positions as layouts
-- help (shortcuts)
 - tail -f mode
     

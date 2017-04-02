@@ -17,6 +17,7 @@ salt       = require '../tools/salt'
 Command    = require '../commandline/command'
 _          = require 'lodash'
 path       = require 'path'
+noon       = require 'noon'
 electron   = require 'electron'
 atomicFile = require 'write-file-atomic'
 
@@ -90,6 +91,18 @@ class Macro extends Command
 
             when 'fps' 
                 window.fps?.toggle()
+                
+            # 000   000  00000000  000      00000000   
+            # 000   000  000       000      000   000  
+            # 000000000  0000000   000      00000000   
+            # 000   000  000       000      000        
+            # 000   000  00000000  0000000  000        
+            
+            when 'help'
+                terminal = window.terminal
+                terminal.output noon.stringify noon.load("#{__dirname}/../../md/cheet.noon"), colors: true
+                terminal.scrollCursorToTop 1
+                window.split.do 'reveal terminal'
             
             # 00000000   00000000   0000000 
             # 000   000  000       000   000

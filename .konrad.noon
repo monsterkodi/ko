@@ -1,4 +1,6 @@
 ignore      
     /syntax/
-    
+    /md/
+
+# move ./tools/font.noon into js    
 noon    . ext json . replace .. coffee/  js/

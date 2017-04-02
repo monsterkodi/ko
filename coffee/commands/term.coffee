@@ -451,7 +451,7 @@ class Term extends Command
                             terminal.queueMeta meta
                             i += 1
                         
-                when 'classes'
+                when 'classes', 'class'
                     
                     #  0000000  000       0000000    0000000   0000000  00000000   0000000
                     # 000       000      000   000  000       000       000       000     
