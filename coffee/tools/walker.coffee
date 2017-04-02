@@ -78,12 +78,14 @@ class Walker
                 if stat.isDirectory()
                     if cfg.includeDirs
                         cfg.dir? p, stat
+                    if cfg.skipDir? p
+                        @ignore p
                 else
                     if path.extname(p) in cfg.includeExt or path.basename(p) in cfg.include or cfg.includeExt.indexOf('') >= 0
                         cfg.file? p, stat
                         
                 if cfg.files.length > cfg.maxFiles
-                    # log 'max files reached', @end?
+                    # log "max files reached: #{cfg.files.length}"
                     @end()
             
             @walker.on 'path', onWalkerPath @cfg

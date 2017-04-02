@@ -15,16 +15,18 @@ clamp,
 post,
 last,
 log,
-$}      = require 'kxk'
-profile = require '../tools/profile'
-Walker  = require '../tools/walker'
-Command = require '../commandline/command'
-render  = require '../editor/render'
-syntax  = require '../editor/syntax'
-path    = require 'path'
-fuzzy   = require 'fuzzy'
-fs      = require 'fs'
-_       = require 'lodash'
+$}       = require 'kxk'
+profile  = require '../tools/profile'
+Walker   = require '../tools/walker'
+Command  = require '../commandline/command'
+render   = require '../editor/render'
+syntax   = require '../editor/syntax'
+path     = require 'path'
+fuzzy    = require 'fuzzy'
+fs       = require 'fs'
+_        = require 'lodash'
+electron = require 'electron'
+ipc      = electron.ipcRenderer
     
 class Open extends Command
 
@@ -93,7 +95,6 @@ class Open extends Command
 
     complete: -> 
         return if not @commandList? 
-        log 'open complete', @getText() #, @commandList.lines
         if @commandList.lines[@selected].startsWith(path.basename @getText()) and not @getText().trim().endsWith('/')
             @setText path.join(path.dirname(@getText()), @commandList.lines[@selected])
             if dirExists resolve @getText()
@@ -105,7 +106,12 @@ class Open extends Command
             @changed @getText()
             true            
         else
-            log 'complete projects?'
+            projects = ipc.sendSync 'indexer', 'projects'
+            for p in Object.keys(projects).sort()
+                if p.startsWith @getText()
+                    @setText projects[p].dir + '/'
+                    @changed @getText()
+                    return true
             super
     
     # 000   000  00000000  000   0000000   000   000  000000000

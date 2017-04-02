@@ -6,6 +6,8 @@
 {
 packagePath,
 fileExists,
+unresolve,
+fileName,
 resolve,
 last,
 log
@@ -29,6 +31,7 @@ class Indexer
 
     constructor: () ->
         @collectBins()
+        @collectProjects()
         @dirs    = Object.create null
         @files   = Object.create null
         @classes = Object.create null
@@ -45,19 +48,32 @@ class Indexer
             when word[0] == '_' and word.length < 4 then false # exclude when starts with underscore and is short
             when /^[0\_\-\@\#]+$/.test word then false # exclude when consist of special characters only
             when /\d/.test word then false # exclude when word contains number
-            # when /^[\-]?\d/.test word then false # exclude when starts with number
-            # when word.length < 4 and /[a-fA-F](\d[a-fA-F]|[a-fA-F]\d|\d\d)/.test word then false # exclude short hex numbers
             else true
 
     collectBins: ->
         @bins = []
         for dir in ['/bin', '/usr/bin', '/usr/local/bin']
-            @walker = new Walker
+            w = new Walker
+                maxFiles:    1000
                 root:        dir
                 includeDirs: false
                 includeExt:  [''] # report files without extension
                 file:        (p) => @bins.push path.basename p
-            @walker.start()
+            w.start()
+
+    collectProjects: ->
+        @projects = {}
+        w = new Walker
+            maxFiles:    5000
+            maxDepth:    3
+            root:        resolve '~'
+            include:     ['.git']
+            ignore:      ['node_modules', 'img', 'bin', 'js', 'Library']
+            skipDir:     (p) -> path.basename(p) == '.git'
+            filter:      (p) -> path.extname(p) not in ['.noon', '.json', '.git', '']
+            dir:         (p) => if path.basename(p) == '.git' then @projects[path.basename path.dirname p] = dir: unresolve path.dirname p
+            file:        (p) => if fileName(p) == 'package' then @projects[path.basename path.dirname p] = dir: unresolve path.dirname p
+        w.start()
 
     # 000  000   000  0000000    00000000  000   000        0000000    000  00000000
     # 000  0000  000  000   000  000        000 000         000   000  000  000   000
