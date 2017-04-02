@@ -1,8 +1,5 @@
 # todo/ideas
 
-- shortcut to switch projects in open and term
-    - open: open .project/coffee
-- cheat sheet
 - limit size of range for bracket matching 
 - list project|pkg dirs?
 - set breakpoint in electron?

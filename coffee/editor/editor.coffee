@@ -1359,12 +1359,22 @@ class Editor extends Buffer
             if ((cl == cr) and (count % 2)) or ((cl != cr) and count)
                 return true
         return false
+    
+    selectionContainsOnlyQuotes: ->
+        for c in @textOfSelection()
+            continue if c == '\n'
+            if c not in ['"', "'"]
+                return false
+        true
         
     insertSurroundCharacter: (ch) ->
 
         if @isUnbalancedSurroundCharacter ch
             return false 
         
+        if @selections.length and ch in ['"', "'"] and @selectionContainsOnlyQuotes()
+            return false
+                
         if @surroundStack.length
             if last(@surroundStack)[1] == ch
                 for c in @cursors 
