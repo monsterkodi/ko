@@ -16,14 +16,16 @@ cursors
     ⌘up|down    extend all cursors vertically
     ^⇧up|down   extend only main cursor vertically
     ⌘right      move cursors to end of lines
-    ⌘left       move cursor to first-non-space|start of line
+    ⌘left       move cursors to first-non-space|start of line
     
 editing
-    ⌘/          toggle comment on selected lines
-    ⌥up|down    move selected lines up|down
-    ⌥⇧up|down   duplicate selected lines above|below
+    ⌘/          toggle comment
+    ⌘J          join lines
+    ⌥up|down    move lines up|down
+    ⌥⇧up|down   duplicate lines above|below
     ^⇧right     align text after cursors
-    ⌘return     insert empty line below cursor
+    ⌘return     insert line below cursor
+    ⌘3          ascii header mode
     
 display
     ⌘-          decrease font size
@@ -47,11 +49,13 @@ term
     class [regexp]      list classes
     funcs [regexp]      list functions
     words [regexp]      list indexer words
-    history             show command history
     clear               clear terminal ⌘K
     stop                terminate process and restart shell
     autocd [on|off]     set autocd mode
     headers [on|off]    set headers mode
+    history [regexp]    show command history
+    !n                  repeat history command at index n
+    !!                  repeat last history command
 
 macro
     req     insert require statements for words at cursors

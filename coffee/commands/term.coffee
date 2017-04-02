@@ -225,6 +225,13 @@ class Term extends Command
         else if aliasList.length > 1
             alias[aliasList[0]] = aliasList.slice(1).join ' '
         ipc.send 'alias', alias if aliasList.length
+        
+        cmmd = 'alias ' + aliasList.join(' ')
+        terminal.appendMeta 
+            line: "■"
+            cmmd:  cmmd.trim()
+            clss: 'termCommand'
+        
         li = 0
         for key,cmd of alias
             li += 1
@@ -339,7 +346,7 @@ class Term extends Command
                     terminal.appendMeta 
                         line: "■"
                         clss: 'termCommand'
-                        diss: Syntax.dissForTextAndSyntax "stop ◼", 'ko'
+                        cmmd: "stop"
                                 
                 when 'headers' 
                     
@@ -356,7 +363,7 @@ class Term extends Command
                     terminal.appendMeta 
                         line: "■"
                         clss: 'termCommand'
-                        diss: Syntax.dissForTextAndSyntax "headers are #{@headers and 'on' or 'off'}", 'ko'
+                        cmmd: "headers #{@headers and 'on' or 'off'}" 
                 
                 when 'autocd'
                     
@@ -367,7 +374,7 @@ class Term extends Command
                     terminal.appendMeta 
                         line: "■"
                         clss: 'termCommand'
-                        diss: Syntax.dissForTextAndSyntax "autocd is #{@autocd and 'on' or 'off'}", 'ko'
+                        cmmd: "autocd #{@autocd and 'on' or 'off'}"
                 
                 when 'history' 
                     
@@ -376,7 +383,12 @@ class Term extends Command
                     # 000000000  000  0000000      000     000   000  0000000      00000  
                     # 000   000  000       000     000     000   000  000   000     000   
                     # 000   000  000  0000000      000      0000000   000   000     000   
-                    
+
+                    terminal.appendMeta 
+                        line: "■"
+                        clss: 'termCommand'
+                        cmmd: cmmd
+                
                     if args.length == 1 and args[0] == 'clear'
                         @clearHistory()
                         return

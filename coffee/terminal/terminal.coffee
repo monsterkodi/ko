@@ -94,7 +94,7 @@ class Terminal extends ViewBase
                 @appendMeta clss: 'spacer', diss: syntax.dissForTextAndSyntax l, 'ko'
             @appendMeta clss: 'spacer'
         else if meta.clss == 'termCommand'
-            @appendLineDiss meta.cmmd
+            @appendLineDiss meta.cmmd, syntax.dissForTextAndSyntax meta.cmmd, 'term'
         else
             @appendLineDiss ''
         
