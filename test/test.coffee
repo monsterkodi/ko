@@ -4,11 +4,13 @@
 #    000     000            000     000     
 #    000     00000000  0000000      000     
 {
+first,
 last,
 log}   = require 'kxk'
 _      = require 'lodash'
 assert = require 'assert'
 chai   = require 'chai'
+{Map,List} = require 'immutable'
 expect = chai.expect
 chai.should()
 
@@ -22,22 +24,20 @@ Undo   = require '../coffee/editor/undo'
 #     0      000  00000000  00     00  
 
 class FakeView
-    
+     
     constructor: (@editor) ->
         @divs = []
         @editor.changed = @changed     
         @editor.on 'linesSet', (lines) => @divs = _.clone lines
-        
-    changed: (changeInfo, action) =>
-        
-        changes = _.cloneDeep action.lines
-        while change = changes.shift()
-            [oi,li,ch] = [change.oldIndex, change.newIndex, change.change]
+         
+    changed: (changeInfo) =>
+        for change in changeInfo.changes
+            [di,li,ch] = [change.doIndex, change.newIndex, change.change]
             switch ch
-                when 'changed'  then @divs[oi ? li] = @editor.lines[li]
-                when 'deleted'  then @divs.splice oi, 1
-                when 'inserted' then @divs.splice oi, 0, @editor.lines[li]
-    
+                when 'changed'  then @divs[di] = @editor.state.line(li)
+                when 'deleted'  then @divs.splice di, 1
+                when 'inserted' then @divs.splice di, 0, @editor.state.line(li)
+     
     text: -> @divs.join '\n'
 
 editor   = null
@@ -62,10 +62,11 @@ describe 'undo', ->
 
     it "exists", -> _.isObject undo = editor.do
     
+    it "isObject", -> _.isObject editor
+    
     describe 'implements', ->
         for name in ['start', 'change', 'insert', 'delete', 'end', 'undo', 'redo']
-            it "#{name}", ->
-                _.isFunction(undo[name]).should.be.true
+            it "#{name}", -> _.isFunction(undo[name]).should.be.true
 
     it 'noop', -> 
         t = 'bla\nblub'
@@ -75,8 +76,84 @@ describe 'undo', ->
         expect editor.lines
         .to.eql t.split '\n'
 
+    describe 'calculate', ->
+        
+        it 'changes', ->
+            oldState = Map lines: List ['a','b']
+            changes  = editor.do.calculateChanges oldState, Map lines: List ['a', 'c']
+            expect(changes.deletes).to.eql.false
+            expect(changes.inserts).to.eql.false
+            expect(changes.changes).to.include oldIndex:1, doIndex:1, newIndex:1, change:'changed'
+            
+            changes  = editor.do.calculateChanges oldState, Map lines: List ['c', 'b']
+            expect(changes.deletes).to.eql.false
+            expect(changes.inserts).to.eql.false
+            expect(changes.changes).to.include oldIndex:0, doIndex:0, newIndex:0, change:'changed'
+            
+            changes  = editor.do.calculateChanges oldState, Map lines: List ['c', 'd']
+            expect(changes.deletes).to.eql.false
+            expect(changes.inserts).to.eql.false
+            expect(changes.changes).to.include oldIndex:0, doIndex:0, newIndex:0, change:'changed'
+            expect(changes.changes).to.include oldIndex:1, doIndex:1, newIndex:1, change:'changed'
+
+        it 'deletions', ->
+            oldState = Map lines: List ['a','b']
+            changes  = editor.do.calculateChanges oldState, Map lines: List ['a']
+            expect(changes.deletes).to.eql 1
+            expect(changes.inserts).to.eql.false
+            expect(changes.changes).to.include oldIndex:1, doIndex: 1, change:'deleted'
+            
+            changes  = editor.do.calculateChanges oldState, Map lines: List ['b']
+            expect(changes.deletes).to.eql 1
+            expect(changes.inserts).to.eql.false
+            expect(changes.changes).to.include oldIndex:0, doIndex:0, change:'deleted'
+    
+            changes  = editor.do.calculateChanges oldState, Map lines: List ['c']
+            expect(changes.deletes).to.eql 1
+            expect(changes.inserts).to.eql.false
+            expect(changes.changes).to.include oldIndex:0, doIndex:0, newIndex:0, change:'changed'
+            expect(changes.changes).to.include oldIndex:1, doIndex:1, change:'deleted'
+
+            oldState = Map lines: List ['a', 'b', 'c']
+            changes  = editor.do.calculateChanges oldState, Map lines: List ['a']
+            expect(changes.deletes).to.eql 2
+            expect(changes.inserts).to.eql.false
+            expect(changes.changes).to.include oldIndex:1, doIndex:1, change:'deleted'
+            expect(changes.changes).to.include oldIndex:2, doIndex:1, change:'deleted'
+
+            changes  = editor.do.calculateChanges oldState, Map lines: List ['b']
+            expect(changes.deletes).to.eql 2
+            expect(changes.inserts).to.eql.false
+            expect(changes.changes).to.include oldIndex:0, doIndex:0, change:'deleted'
+            expect(changes.changes).to.include oldIndex:2, doIndex:1, change:'deleted'
+
+        it 'insertions', ->
+            oldState = Map lines: List ['a']
+            changes  = editor.do.calculateChanges oldState, Map lines: List ['a', 'c']
+            expect(changes.deletes).to.eql.false
+            expect(changes.inserts).to.eql 1
+            expect(changes.changes).to.include doIndex:1, newIndex:1, change:'inserted'
+            
+            changes  = editor.do.calculateChanges oldState, Map lines: List ['c', 'a']
+            expect(changes.deletes).to.eql.false
+            expect(changes.inserts).to.eql 1
+            expect(changes.changes).to.include doIndex:0, newIndex:0, change:'inserted'
+
+            changes  = editor.do.calculateChanges oldState, Map lines: List ['c', 'a', 'd']
+            expect(changes.deletes).to.eql.false
+            expect(changes.inserts).to.eql 2
+            expect(changes.changes).to.include doIndex:0, newIndex:0, change:'inserted'
+            expect(changes.changes).to.include doIndex:2, newIndex:2, change:'inserted'
+
+            changes  = editor.do.calculateChanges oldState, Map lines: List ['c', 'a', '1', '2', '3']
+            expect(changes.deletes).to.eql.false
+            expect(changes.inserts).to.eql 4
+            expect(changes.changes).to.include doIndex:0, newIndex:0, change:'inserted'
+            expect(changes.changes).to.include doIndex:2, newIndex:2, change:'inserted'
+            expect(changes.changes).to.include doIndex:3, newIndex:3, change:'inserted'
+            expect(changes.changes).to.include doIndex:4, newIndex:4, change:'inserted'
+
 compareFakeView = ->
-    # log fakeview.text()
     expect(fakeview.text()) .to.eql editor.text()
 
 # 0000000     0000000    0000000  000   0000000  
@@ -88,9 +165,8 @@ compareFakeView = ->
 describe 'basic', ->
     afterEach -> compareFakeView()
     describe 'edit', ->
-
         beforeEach -> undo.start()
-    
+
         it 'change', ->
             undo.change 0, 'hello world'
             undo.end()
@@ -155,7 +231,7 @@ describe 'medium', ->
         
         it "single cursor", ->
             editor.singleCursorAtPos [2,1]
-            expect editor.mainCursor
+            expect editor.mainCursor()
             .to.eql [2,1]
             expect editor.cursors
             .to.eql [[2,1]]
@@ -163,15 +239,13 @@ describe 'medium', ->
             .to.eql []
             
         it "select text", ->
-            editor.singleCursorAtPos [3,0], true
-            expect editor.mainCursor
+            editor.singleCursorAtPos [3,0], extend:true
+            expect editor.mainCursor()
             .to.eql [3,0]
             expect editor.cursors
             .to.eql [[3,0]]
             expect editor.selections
             .to.eql [[0, [3,5]], [1, [0,2]]]
-            
-        it "text of selection", ->
             expect editor.textOfSelection()
             .to.eql 'lo\nwo'
         
@@ -187,10 +261,10 @@ describe 'medium', ->
             expect editor.text()
             .to.eql 'hello\nworld'
             expect editor.textOfSelection()
-            .to.eql 'lo\nwo'            
+            .to.eql 'lo\nwo'
 
         it "selection", ->
-            expect editor.selections
+            expect editor.state.selections()
             .to.eql []
             
     describe 'redo', ->
@@ -230,12 +304,11 @@ describe 'complex', ->
         describe 'column', ->
         
             text = '0000\n1111\n2222\n3333\n4444\n5555'
-            lines = text.split '\n'
             
             before -> 
                 editor.setText text
-                editor.cursors = [[2,1], [2,2], [2,3], [2,4]]
-                editor.mainCursor = [2,4]
+                editor.setCursors [[2,1], [2,2], [2,3], [2,4]]
+                editor.setMain 3
                 undo.reset()
                 
             afterEach undoRedo
@@ -249,55 +322,53 @@ describe 'complex', ->
     
             it "join lines", ->
                 editor.deleteBackward ignoreLineBoundary: true
-                expect(editor.lines) .to.eql lines
+                expect(editor.text()) .to.eql text
     
         describe 'row', ->
             
             text = '0000\n1111\n2222'
-            lines = text.split '\n'
             
             before -> 
                 editor.setText text
-                editor.cursors = [[1,1], [2,1], [3,1]]
-                editor.mainCursor = [3,1]
+                editor.setCursors [[1,1], [2,1], [3,1]]
+                editor.setMain 2
                 undo.reset()
                 
             afterEach undoRedo
             
-            it "break lines", ->
+            it "break line", ->
                 editor.insertUserCharacter '\n'
                 expect editor.lines 
                 .to.eql [
                     '0000', '1', '1', '1', '1', '2222'
                 ]
     
-            it "join lines", ->
+            it "join line", ->
                 editor.deleteBackward ignoreLineBoundary: true
-                expect(editor.lines) .to.eql lines
+                expect(editor.text()) .to.eql text
     
         describe 'row & column', ->
             
             text = '0000\n1111\n2222\n3333\n4444\n5555'
-            lines = text.split '\n'
             
             before -> 
                 editor.setText text
-                editor.cursors = [[1,1], [3,1], [1,2], [3,2], [1,4], [3,4], [1,5], [3,5]]
-                editor.mainCursor = [3,5]
+                editor.setCursors [[1,1], [3,1], [1,2], [3,2], [1,4], [3,4], [1,5], [3,5]]
+                editor.setMain 7
                 undo.reset()
                 
             afterEach undoRedo
             
-            it "break lines", ->
+            it "break mixed", ->
                 editor.insertUserCharacter '\n'
                 expect editor.lines 
                 .to.eql [
                     '0000', '1', '11', '1', '2', '22', '2', '3333', '4', '44', '4', '5', '55', '5'
                 ]
     
-            it "join lines", ->
+            it "join mixed", ->
                 editor.deleteBackward ignoreLineBoundary: true
-                expect(editor.lines) .to.eql lines
+                expect(editor.lines) .to.eql text.split '\n'
 
     # 000  000   000   0000000  00000000  00000000   000000000  
     # 000  0000  000  000       000       000   000     000     
@@ -306,14 +377,13 @@ describe 'complex', ->
     # 000  000   000  0000000   00000000  000   000     000   
     
     describe 'selection insert', ->
-        
         afterEach undoRedo
         
         it "row", ->
             editor.setText '0123456789'
-            editor.cursors = [[1,0], [6,0]]
-            editor.mainCursor = [6,0]
-            editor.selections = [[0, [1,4]], [0, [6,9]]]
+            editor.setCursors    [[1,0], [6,0]]
+            editor.setMain       1
+            editor.setSelections [[0, [1,4]], [0, [6,9]]]
             undo.reset()
             editor.insertUserCharacter '-'
             expect editor.text()
@@ -321,9 +391,9 @@ describe 'complex', ->
         
         it "column", ->
             editor.setText '0000\n1111\n2222\n3333'
-            editor.cursors = [[1,1], [1,2]]
-            editor.mainCursor = [1,2]
-            editor.selections = [[1, [1,2]], [2, [1,3]]]
+            editor.setCursors    [[1,1], [1,2]]
+            editor.setMain       1
+            editor.setSelections [[1, [1,2]], [2, [1,3]]]
             undo.reset()
             editor.insertUserCharacter '-'
             expect editor.lines 
@@ -333,9 +403,9 @@ describe 'complex', ->
                 
         it "row & column", ->
             editor.setText '0000\n1111\n2222\n3333'
-            editor.cursors = [[1,1], [3,1], [1,2]]
-            editor.mainCursor = [1,2]
-            editor.selections = [[1, [1,2]], [1, [3,4]], [2, [1,3]]]
+            editor.setCursors    [[1,1], [3,1], [1,2]]
+            editor.setMain       2
+            editor.setSelections [[1, [1,2]], [1, [3,4]], [2, [1,3]]]
             undo.reset()
             
             editor.insertUserCharacter '-'
@@ -355,7 +425,7 @@ describe 'complex', ->
         it "single", ->
             editor.setText '0000\n1111\n2222\n3333'
             editor.singleCursorAtPos [2,0]
-            editor.singleCursorAtPos [2,3], true
+            editor.singleCursorAtPos [2,3], extend:true
             undo.reset()
             
             editor.insertUserCharacter '-'
@@ -375,11 +445,10 @@ describe 'complex', ->
         it "double", ->
             editor.setText '0000\n1111\n2222\n3333\n4444\n5555'
             editor.singleCursorAtPos [2,1]
-            editor.moveMainCursor 'down'
-            editor.moveMainCursor 'down'
+            editor.moveMainCursor 'down', erase:false
+            editor.moveMainCursor 'down', erase:true
             editor.moveCursors 'down', true
             undo.reset()
-            
             editor.insertUserCharacter '-'
             expect editor.text()
             .to.eql '0000\n11-22\n33-44\n5555'
@@ -397,10 +466,10 @@ describe 'complex', ->
         it "triple", ->
             editor.setText '0000\n1111\n2222\n3333\n4444\n5555\n6666\n7777\n8888'
             editor.singleCursorAtPos [2,1]
-            editor.moveMainCursor 'down'
-            editor.moveMainCursor 'down'
-            editor.moveMainCursor 'down'
-            editor.moveMainCursor 'down'
+            editor.moveMainCursor 'down', erase:false
+            editor.moveMainCursor 'down', erase:true
+            editor.moveMainCursor 'down', erase:true
+            editor.moveMainCursor 'down', erase:true
             editor.moveCursors 'down', true
             editor.moveCursors 'down', true
             undo.reset()
@@ -428,8 +497,8 @@ describe 'complex', ->
                 
         it 'single row', ->
             editor.setText '000011112222333344445555'
-            editor.cursors = [[4,0], [8,0], [12,0], [16,0], [20,0]]
-            editor.mainCursor = [20, 0]
+            editor.setCursors [[4,0], [8,0], [12,0], [16,0], [20,0]]
+            editor.setMain 4
             undo.reset()
             editor.insertUserCharacter '-'
             expect editor.cursors
@@ -457,9 +526,8 @@ describe 'complex', ->
         it 'mixed', ->
             editor.setText '0000\n1111\n2222'
             editor.singleCursorAtPos [2,0]
-            editor.singleCursorAtPos [2,1], true
-            editor.cursors.push [2,2]
-            editor.mainCursor = [2,2]
+            editor.singleCursorAtPos [2,1], extend:true
+            editor.addCursorAtPos [2,2]
             undo.reset()
             editor.insertUserCharacter '-'
             expect editor.text()
@@ -478,8 +546,8 @@ describe 'complex', ->
         it "delete selection", ->
             editor.setText '0000\n1111'
             editor.singleCursorAtPos [2,0]
-            editor.singleCursorAtPos [2,1], true
-            editor.cursors.push [3,1]
+            editor.singleCursorAtPos [2,1], extend:true
+            editor.addCursorAtPos [3,1]
             undo.reset()
             editor.deleteSelection()
             expect editor.cursors
@@ -487,9 +555,9 @@ describe 'complex', ->
 
         it "delete multiple selections", ->
             editor.setText '0000\n1111'
-            editor.selections = [[0,[2,4]], [1, [0,2]], [1, [3,4]]]
-            editor.cursors = [[2,1], [4,1]]
-            editor.mainCursor = [4,1]
+            editor.setSelections [[0,[2,4]], [1, [0,2]], [1, [3,4]]]
+            editor.setCursors [[2,1], [4,1]]
+            editor.setMain 1
             undo.reset()
             editor.deleteSelection()
             expect editor.cursors
@@ -500,8 +568,8 @@ describe 'complex', ->
         it 'mix', ->
             editor.setText '0000\n1111'
             editor.singleCursorAtPos [2,0]
-            editor.singleCursorAtPos [2,1], true
-            editor.cursors.push [3,1]
+            editor.singleCursorAtPos [2,1], extend:true
+            editor.addCursorAtPos [3,1]
             undo.reset()
             editor.insertUserCharacter '-'
             expect editor.text()

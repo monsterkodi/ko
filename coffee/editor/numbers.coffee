@@ -40,7 +40,7 @@ class Numbers extends event
         # log "Numbers.updateColor li:#{li}" if @editor.name == 'editor'
         si = (s[0] for s in @editor.rangesFromTopToBotInRanges li, li, @editor.selections)
         hi = (s[0] for s in @editor.rangesFromTopToBotInRanges li, li, @editor.highlights)
-        ci = (s[0] for s in @editor.rangesFromTopToBotInRanges li, li, @editor.rangesForCursors())
+        ci = (s[0] for s in @editor.rangesFromTopToBotInRanges li, li, @editor.rangesFromPositions @editor.state.cursors())
         child = @elem.children[li-@editor.scroll.exposeTop]
         return if not child?
         cls = ''

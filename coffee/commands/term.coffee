@@ -182,7 +182,7 @@ class Term extends Command
     #  0000000  0000000  00000000  000   000  000   000
     
     clear: ->
-        if window.terminal.lines.length > 0
+        if window.terminal.numLines() > 0
             window.terminal.clear()
         else
             text: ''
@@ -325,7 +325,7 @@ class Term extends Command
             
             if @headers 
                 terminal.appendMeta clss: 'salt', text: cmmd.slice 0, 32
-                terminal.singleCursorAtPos [0, terminal.lines.length-1]
+                terminal.singleCursorAtPos [0, terminal.numLines()-1]
 
             args = cmmd.split ' '
             cmd  = args.shift()
@@ -531,7 +531,7 @@ class Term extends Command
                         cmdID: @cmdID
                         clss: 'termCommand'
                         
-                    terminal.singleCursorAtPos [0, terminal.lines.length-1]
+                    terminal.singleCursorAtPos [0, terminal.numLines()-1]
                         
                     @cmdID += 1
                     

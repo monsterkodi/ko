@@ -125,7 +125,7 @@ class ViewBase extends Editor
         if @scroll.viewHeight != @viewHeight()
             @scroll.setViewHeight @viewHeight()
             @emit 'viewHeight', @viewHeight()
-        @scroll.setNumLines @lines.length
+        @scroll.setNumLines @numLines()
         @layers.scrollLeft = 0
         @layersWidth  = @layers.offsetWidth
         @layersHeight = @layers.offsetHeight
@@ -133,18 +133,20 @@ class ViewBase extends Editor
         @updateLayers()
 
     appendText: (text) ->
-        
-        ts = text?.split /\n/
-        for t in ts
-            @lines.push t
+        # console.log "appendText #{text} lines:", str @state.lines()
+        ls = text?.split /\n/
+        for l in ls
+            @state = @state.appendLine l
+            # console.log 'appendText lines:', str @state.get('lines').toJS()
+            @lines.push l # SUCKS
             @emit 'lineAppended', 
-                lineIndex: @lines.length-1
-                text: t
+                lineIndex: @numLines()-1
+                text:      l
         if @scroll.viewHeight != @viewHeight()
             @scroll.setViewHeight @viewHeight()        
-        @scroll.setNumLines @lines.length
-        @emit 'linesAppended', ts
-        @emit 'numLines', @lines.length
+        @scroll.setNumLines @numLines()
+        @emit 'linesAppended', ls
+        @emit 'numLines', @numLines()
 
     # 00000000   0000000   000   000  000000000
     # 000       000   000  0000  000     000   
@@ -173,37 +175,33 @@ class ViewBase extends Editor
     # 000       000   000  000   000  000  0000  000   000  000       000   000
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
   
-    changed: (changeInfo, action) ->
-        
-        changes = _.cloneDeep action.lines
-        
-        oldScrollLines = @scroll.numLines
-        
-        for change in changes
-            [oi,li,ch] = [change.oldIndex, change.newIndex, change.change]
+    changed: (changeInfo) ->
+                
+        for change in changeInfo.changes
+            [di,li,ch] = [change.doIndex, change.newIndex, change.change]
             switch ch
-                when 'changed'  then @syntax.diss[oi] = @syntax.dissForLineIndex li
-                when 'deleted'  then @syntax.diss.splice oi, 1
-                when 'inserted' then @syntax.diss.splice oi, 0, @syntax.dissForLineIndex li
+                when 'changed'  then @syntax.diss[di] = @syntax.dissForLineIndex li
+                when 'deleted'  then @syntax.diss.splice di, 1
+                when 'inserted' then @syntax.diss.splice di, 0, @syntax.dissForLineIndex li
 
-        while (change = changes.shift())
-            [oi,li,ch] = [change.oldIndex, change.newIndex, change.change]
+        for change in changeInfo.changes
+            [di,li,ch] = [change.doIndex, change.newIndex, change.change]
             switch ch
                 when 'changed'
-                    @updateLine li, oi
+                    @updateLine li, di
                     @emit 'lineChanged', li
                 when 'deleted'  
-                    @deleteLine li, oi
+                    @deleteLine li, di
                 when 'inserted'
-                    @insertLine li, oi                    
+                    @insertLine li, di                    
         
-        if changeInfo.inserted or changeInfo.deleted           
-            @scroll.setNumLines @lines.length
+        if changeInfo.inserts or changeInfo.deletes           
+            @scroll.setNumLines @numLines()
             @updateScrollOffset()
             @updateLinePositions()
             @layersWidth = @layers.offsetWidth
 
-        if changeInfo.lines
+        if changeInfo.changes.length
             @clearHighlights()
         
         if changeInfo.cursors
@@ -213,10 +211,11 @@ class ViewBase extends Editor
             @updateCursorOffset()
             @emit 'cursor'
             
-        if changeInfo.selection
+        if changeInfo.selects
             @renderSelection()   
             @emit 'selection'
-        @emit 'changed', changeInfo, action
+            
+        @emit 'changed', changeInfo
 
     # 00000000  0000000    000  000000000
     # 000       000   000  000     000   
@@ -260,7 +259,7 @@ class ViewBase extends Editor
             lineIndex: li
             lineDiv: div
             
-        @renderCursors() if @cursorsInLineAtIndex(li).length
+        @renderCursors() if @positionsForLineIndexInPositions(li, @cursors).length
         @renderSelection() if @rangesForLineIndexInRanges(li, @selections).length
         @renderHighlights() if @rangesForLineIndexInRanges(li, @highlights).length
         
@@ -325,7 +324,7 @@ class ViewBase extends Editor
             @updateLine li
 
     clearHighlights: () ->
-        if @highlights.length
+        if @numHighlights()
             $('.highlights', @layers).innerHTML = ''
             super
    
@@ -359,22 +358,30 @@ class ViewBase extends Editor
         for c in @cursors
             if c[1] >= @scroll.exposeTop and c[1] <= @scroll.exposeBot
                 cs.push [c[0], c[1] - @scroll.exposeTop]
-        
-        if @cursors.length == 1
+
+        if @numCursors() == 1
             if cs.length == 1
-                ri = @mainCursor[1]-@scroll.exposeTop
-                if @mainCursor[0] > @lines[@mainCursor[1]].length
+                
+                if @mainCursor()[1] > @numLines()-1
+                    if @name == 'editor'
+                        console.log "#{@name}.renderCursors mainCursor DAFUK?", @numLines(), str @mainCursor()
+                    return
+                    
+                ri = @mainCursor()[1]-@scroll.exposeTop
+                cursorLine = @state.line(@mainCursor()[1])
+                if @mainCursor()[0] > cursorLine.length
                     cs[0][2] = 'virtual'
-                    cs.push [@lines[@mainCursor[1]].length, ri, 'main off']
+                    cs.push [cursorLine.length, ri, 'main off']
                 else
                     cs[0][2] = 'main off'
-        else if @cursors.length > 1
+        else if @numCursors() > 1
             vc = [] # virtual cursors
             for c in cs
-                if @isMainCursor [c[0], c[1] + @scroll.exposeTop]
+                if @isSamePos @mainCursor(), [c[0], c[1] + @scroll.exposeTop]
                     c[2] = 'main'
-                if c[0] > @lines[@scroll.exposeTop+c[1]].length
-                    vc.push [@lines[@scroll.exposeTop+c[1]].length, c[1], 'virtual']
+                line = @lines[@scroll.exposeTop+c[1]]
+                if c[0] > line.length
+                    vc.push [line.length, c[1], 'virtual']
             cs = cs.concat vc
         html = render.cursors cs, @size
         @layerDict.cursors.innerHTML = html
@@ -416,21 +423,21 @@ class ViewBase extends Editor
         if cl < @scroll.top + 2
             topdelta = Math.max(0, cl - 2) - @scroll.top
         else if cl > @scroll.bot - 4
-            topdelta = Math.min(@lines.length+1, cl + 4) - @scroll.bot
+            topdelta = Math.min(@numLines()+1, cl + 4) - @scroll.bot
         
         botdelta = 0
         cl = last(@cursors)[1]
         if cl < @scroll.top + 2
             botdelta = Math.max(0, cl - 2) - @scroll.top
         else if cl > @scroll.bot - 4
-            botdelta = Math.min(@lines.length+1, cl + 4) - @scroll.bot
+            botdelta = Math.min(@numLines()+1, cl + 4) - @scroll.bot
             
         maindelta = 0
-        cl = @mainCursor[1]
+        cl = @mainCursor()[1]
         if cl < @scroll.top + 2
             maindelta = Math.max(0, cl - 2) - @scroll.top
         else if cl > @scroll.bot - 4
-            maindelta = Math.min(@lines.length+1, cl + 4) - @scroll.bot
+            maindelta = Math.min(@numLines()+1, cl + 4) - @scroll.bot
             
         maindelta
 
@@ -471,7 +478,7 @@ class ViewBase extends Editor
             @scrollOffsetTop = @scroll.offsetTop
 
     updateCursorOffset: ->
-        cx = @mainCursor[0]*@size.charWidth+@size.offsetX
+        cx = @mainCursor()[0]*@size.charWidth+@size.offsetX
         if cx-@layers.scrollLeft > @layersWidth
             @scroll.offsetLeft = Math.max 0, cx - @layersWidth + @size.charWidth
             @layers.scrollLeft = @scroll.offsetLeft
@@ -494,7 +501,7 @@ class ViewBase extends Editor
         ly = clamp 0, @layers.offsetHeight, y - br.top
         px = parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth))
         py = parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @scroll.exposeTop
-        p = [px, Math.min(@lines.length-1, py)]
+        p = [px, Math.min(@numLines()-1, py)]
         p
         
     posForEvent: (event) -> @posAtXY event.clientX, event.clientY
@@ -578,14 +585,14 @@ class ViewBase extends Editor
                 else if event.metaKey
                     @toggleCursorAtPos p
                 else
-                    @singleCursorAtPos p, event.shiftKey
+                    @singleCursorAtPos p, extend:event.shiftKey
             
             onMove: (drag, event) => 
                 p = @posForEvent event
                 if event.metaKey
-                    @addCursorAtPos [@mainCursor[0], p[1]]
+                    @addCursorAtPos [@mainCursor()[0], p[1]]
                 else
-                    @singleCursorAtPos p, true
+                    @singleCursorAtPos p, extend:true
                 
     startClickTimer: =>
         clearTimeout @clickTimer
@@ -619,11 +626,11 @@ class ViewBase extends Editor
                     return @setSalterMode false
                 if @hasHighlights()
                     return @clearHighlights()
-                if @cursors.length > 1
+                if @numCursors() > 1
                     return @clearCursors()
                 if @stickySelection
                     return @endStickySelection()
-                if @selections.length
+                if @numSelections()
                     return @selectNone()
         'unhandled'
 
@@ -684,40 +691,41 @@ class ViewBase extends Editor
                 return
                 
             when 'alt+shift+up', 'alt+shift+down' then return @duplicateLines  key
-            when 'alt+up',     'alt+down'     then return @moveLines  key
-            when 'command+up', 'command+down' then return @addCursors key
-            when 'ctrl+a',     'ctrl+shift+a' then return @moveCursorsToLineBoundary 'left',  event.shiftKey
-            when 'ctrl+e',     'ctrl+shift+e' then return @moveCursorsToLineBoundary 'right', event.shiftKey
+            when 'alt+up',       'alt+down'       then return @moveLines  key
+            when 'command+up',   'command+down'   then return @addCursors key
+            when 'ctrl+a',       'ctrl+shift+a'   then return @moveCursorsToLineBoundary 'left',  event.shiftKey
+            when 'ctrl+e',       'ctrl+shift+e'   then return @moveCursorsToLineBoundary 'right', event.shiftKey
             when 'ctrl+k'
                 @do.start()
                 @moveCursorsToLineBoundary 'right', true
                 @deleteSelection()
                 @do.end()
                 return 
-            when 'ctrl+shift+right'           then return @alignCursorsAndText()
                 
             when 'command+left', 'command+right'   
-                if @selections.length > 1 and @cursors.length == 1
+                if @numSelections() > 1 and @numCursors() == 1
                     return @setCursorsAtSelectionBoundary key
                 else
                     return @moveCursorsToLineBoundary key
                         
             when 'command+shift+left', 'command+shift+right' then return @moveCursorsToLineBoundary key, true
             when 'command+shift+up',   'command+shift+down'  then return @delCursors    key
-            when 'ctrl+shift+up',      'ctrl+shift+down'     then return @addMainCursor key
-            when 'alt+ctrl+up', 'alt+ctrl+down', 'alt+ctrl+left', 'alt+ctrl+right'   then return @alignCursors  key
-            when 'ctrl+up',     'ctrl+down',     'ctrl+left',      'ctrl+right'      then return @moveMainCursor key
-            when 'alt+left',    'alt+right',     'alt+shift+left', 'alt+shift+right' then return @moveCursorsToWordBoundary key, event.shiftKey
+            when 'alt+ctrl+shift+right'                      then return @alignCursorsAndText()
+            when 'alt+ctrl+up',   'alt+ctrl+down',   'alt+ctrl+left',   'alt+ctrl+right'        then return @alignCursors  key
+            when 'ctrl+up',       'ctrl+down',       'ctrl+left',       'ctrl+right'            then return @moveMainCursor key
+            when 'ctrl+shift+up', 'ctrl+shift+down', 'ctrl+shift+left', 'ctrl+shift+right'      then return @moveMainCursor key, erase: true
+            when 'alt+left',       'alt+right',      'alt+shift+left',  'alt+shift+right'       then return @moveCursorsToWordBoundary key, event.shiftKey
             when 'down', 'right', 'up', 'left', 'shift+down', 'shift+right', 'shift+up', 'shift+left' 
                 @moveCursors key, event.shiftKey
                 stop event
-                
+        
+        # log 'combo', combo
         return if mod and not key?.length
         
         switch key
             
-            when 'home'      then return @singleCursorAtPos [0, 0],              event.shiftKey
-            when 'end'       then return @singleCursorAtPos [0,@lines.length-1], event.shiftKey
+            when 'home'      then return @singleCursorAtPos [0, 0],            event.shiftKey
+            when 'end'       then return @singleCursorAtPos [0,@numLines()-1], event.shiftKey
             when 'backspace' then return
             when 'page up'
                 @moveCursorsUp event.shiftKey, @numFullLines()-3

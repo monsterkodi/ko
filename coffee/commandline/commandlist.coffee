@@ -65,7 +65,7 @@ class CommandList extends ViewBase
     # 000   000  000        000        00000000  000   000  0000000  
                 
     appendLineDiss: (text, diss=[]) ->
-        @syntax.setDiss @lines.length, diss if diss?.length
+        @syntax.setDiss @numLines(), diss if diss?.length
         @appendText text
             
     # 00     00  00000000  000000000   0000000 

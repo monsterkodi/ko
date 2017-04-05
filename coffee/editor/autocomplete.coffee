@@ -54,7 +54,7 @@ class Autocomplete extends event
         @word = last info.before.split @splitRegExp
         switch info.action
             
-            when 'delete'            
+            when 'delete' # ever happening?           
                 if @wordinfo[@word]?.temp and @wordinfo[@word]?.count <= 0
                     _.pull @wordlist, @word
                     delete @wordinfo[@word]

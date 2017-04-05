@@ -42,7 +42,7 @@ class Command
         
     execute: (command) ->
         if @commandList? 
-            if 0 <= @selected < @commandList.lines.length
+            if 0 <= @selected < @commandList.numLines()
                 command = @commandList?.lines[@selected]
             @hideList()
         command = command.trim()
@@ -150,7 +150,7 @@ class Command
     # 0000000   00000000  0000000  00000000   0000000     000   
         
     select: (i) -> 
-        @selected = clamp -1, @commandList?.lines.length-1, i
+        @selected = clamp -1, @commandList?.numLines()-1, i
         if @selected >= 0
             @commandList?.selectSingleRange @commandList.rangeForLineAtIndex @selected
             @commandList.do.cursors [[0, @selected]]
@@ -165,7 +165,7 @@ class Command
             
     prev: -> 
         if @commandList?
-            @select clamp -1, @commandList.lines.length-1, @selected-1
+            @select clamp -1, @commandList.numLines()-1, @selected-1
             if @selected < 0
                 @hideList() 
             else
@@ -189,7 +189,7 @@ class Command
             @showItems @listItems() 
             @select -1
         if @commandList? 
-            @select clamp 0, @commandList.lines.length-1, @selected+1
+            @select clamp 0, @commandList.numLines()-1, @selected+1
             return @commandList.lines[@selected]
         else if @history.length
             @selected = clamp 0, @history.length-1, @selected+1
@@ -244,7 +244,7 @@ class Command
         
     last: ->
         if @commandList?
-            @selected = @commandList.lines.length-1
+            @selected = @commandList.numLines()-1
             @commandList.lines[@selected]
         else            
             @selected = @history.length-1
@@ -326,7 +326,7 @@ class Command
         switch combo
             when 'page up', 'page down'
                 if @commandList?
-                    return @select clamp 0, @commandList.lines.length, @selected+@commandList.maxLines*(combo=='page up' and -1 or 1)
+                    return @select clamp 0, @commandList.numLines(), @selected+@commandList.maxLines*(combo=='page up' and -1 or 1)
         'unhandled'
 
 module.exports = Command

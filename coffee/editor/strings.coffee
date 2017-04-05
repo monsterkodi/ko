@@ -23,7 +23,7 @@ class Strings
         @config = ( [new RegExp(_.escapeRegExp(p)), a] for p,a of @editor.stringCharacters )
         
     onCursor: =>
-        if @editor.highlights.length # don't highlight strings when other highlights exist
+        if @editor.numHighlights() # don't highlight strings when other highlights exist
             for h in @editor.highlights
                 return if not h[2]?
                 
@@ -77,11 +77,11 @@ class Strings
         [opn,cls] = pair
         pair[0].clss = "stringmatch #{@editor.stringCharacters[opn.match]}"
         pair[1].clss = "stringmatch #{@editor.stringCharacters[cls.match]}"
-        @editor.highlights.push [li, [opn.start, opn.start+opn.match.length], pair[0]]
-        @editor.highlights.push [li, [cls.start, cls.start+cls.match.length], pair[1]]
+        @editor.addHighlight [li, [opn.start, opn.start+opn.match.length], pair[0]]
+        @editor.addHighlight [li, [cls.start, cls.start+cls.match.length], pair[1]]
         @editor.renderHighlights()
         
     clear: ->
-        @editor.highlights = @editor.highlights.filter (h) -> not h[2]?.clss.startsWith 'stringmatch'
+        @editor.setHighlights @editor.highlights.filter (h) -> not h[2]?.clss?.startsWith 'stringmatch'
 
 module.exports = Strings

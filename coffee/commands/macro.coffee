@@ -154,7 +154,7 @@ class Macro extends Command
                             pth = './' + pth if not pth.startsWith '../'
                             break
                         
-                    for li in [Math.min(editor.lines.length-1, 100)..0]
+                    for li in [Math.min(editor.numLines()-1, 100)..0]
                         m = editor.lines[li].match indexer.requireRegExp
                         if m?[1]? and m?[2]?
                             break if m[1] == word and m[2] == pth

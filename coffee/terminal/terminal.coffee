@@ -56,7 +56,7 @@ class Terminal extends ViewBase
                     break
             continue if skip
             [text,diss] = @ansidiss.dissect l
-            @syntax.setDiss @lines.length, diss if diss?.length
+            @syntax.setDiss @numLines(), diss if diss?.length
             @appendText text
                 
     #  0000000   00000000   00000000   00000000  000   000  0000000  
@@ -66,11 +66,11 @@ class Terminal extends ViewBase
     # 000   000  000        000        00000000  000   000  0000000  
                 
     appendLineDiss: (text, diss=[]) ->
-        @syntax.setDiss @lines.length, diss if diss?.length
-        tail = @cursorPos()[1] == @lines.length-1 and @cursors.length == 1
+        @syntax.setDiss @numLines(), diss if diss?.length
+        tail = @cursorPos()[1] == @numLines()-1 and @numCursors() == 1
         @appendText text
         if tail
-            @singleCursorAtPos [0, @lines.length-1] 
+            @singleCursorAtPos [0, @numLines()-1] 
             @scrollTo @scroll.fullHeight
             
     appendDiss: (diss) -> @appendLineDiss syntax.lineForDiss(diss), diss        

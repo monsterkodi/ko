@@ -36,7 +36,7 @@ class Search extends Command
     #  0000000  0000000  00000000  000   000  000   000
     
     clear: ->
-        if window.terminal.lines.length > 1
+        if window.terminal.numLines() > 1
             window.terminal.clear()
         else
             text: ''
@@ -75,7 +75,7 @@ class Search extends Command
         terminal.appendMeta clss: 'salt', text: opt.text.slice 0, 14
         terminal.appendMeta diss: syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'
         terminal.appendMeta clss: 'spacer'
-        terminal.singleCursorAtPos [0, terminal.lines.length-2]
+        terminal.singleCursorAtPos [0, terminal.numLines()-2]
         dir = packagePath path.dirname opt.file
         dir ?= path.dirname opt.file
         @walker = new walker

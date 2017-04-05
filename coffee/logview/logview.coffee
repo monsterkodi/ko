@@ -14,7 +14,7 @@ class LogView extends ViewBase
         @fontSizeDefault = 12
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap']
         @setLines @lines
-        post.on 'log', @appendText
+        # post.on 'log', @appendText
                 
     #  0000000   00000000   00000000   00000000  000   000  0000000  
     # 000   000  000   000  000   000  000       0000  000  000   000
@@ -24,10 +24,10 @@ class LogView extends ViewBase
                 
     appendText: (text) =>
         
-        tail = @cursorPos()[1] == @lines.length-1 and @cursors.length == 1
+        tail = @cursorPos()[1] == @numLines()-1 and @numCursors() == 1
         super text
         if tail
-            @singleCursorAtPos [0, @lines.length-1] 
+            @singleCursorAtPos [0, @numLines()-1] 
             @scrollTo @scroll.fullHeight
             
 module.exports = LogView

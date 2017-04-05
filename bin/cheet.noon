@@ -12,7 +12,9 @@ selection
     ⌘I          invert selection
     
 cursors
-    ^cursor     move main cursor independently
+    ^cursor     move and add main cursor independently
+    ^⌥cursor    move and erase main cursor independently
+    ^⇧cursor    align cursors
     ⌘up|down    extend all cursors vertically
     ^⇧up|down   extend only main cursor vertically
     ⌘right      move cursors to end of lines
@@ -23,7 +25,7 @@ editing
     ⌘J          join lines
     ⌥up|down    move lines up|down
     ⌥⇧up|down   duplicate lines above|below
-    ^⇧right     align text after cursors
+    ^⌥⇧right    align text after cursors
     ⌘return     insert line below cursor
     ⌘3          ascii header mode
     
@@ -32,16 +34,17 @@ display
     ⌘=          increase font size
     ⌘0          reset font size
     ⌘\          toggle text offset when window is as wide as screen
+    ⌘⇧Y         close terminal and commandline
     
 commandline
     ⌘up|down    move commandline to top|bottom
     ⌥up|down    move commandline up|down by a quarter of window
     ^up|down    move commandline up|down
-    
 misc
     F2          global shortcut to activate ko
     ⌘R          discard changes and reload current file
     ⌥⌘up        jump to counterpart file
+    ^⌘left|right  jump to previous|next editing location
             
 term
     alias [alias command]   set alias

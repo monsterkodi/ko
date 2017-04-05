@@ -46,7 +46,6 @@ class Navigate
                                 
             when 'addFilePos'
                 return if not opt?.file?.length
-                # log "navigate.action addFilePos @currentIndex #{@currentIndex} #{@navigating}", opt
                 hasFile = _.find @filePositions, (v) -> v.file == opt.file
                 if opt?.for in ['edit', 'goto'] or not @navigating or not hasFile
                     @navigating = false if opt?.for in ['edit', 'goto']
@@ -72,7 +71,7 @@ class Navigate
     navigateToFilePos: (filePos, opt) ->
         id = @main.activateWindowWithFile filePos.file
         if id?
-            @main.winWithID(id).webContents.send 'singleCursorAtPos', filePos.pos, opt.select
+            @main.winWithID(id).webContents.send 'singleCursorAtPos', filePos.pos, extend:opt.extend
         else
             if opt?.newWindow
                 @main.loadFile "#{filePos.file}:#{filePos.pos[1]+1}:#{filePos.pos[0]}"

@@ -71,7 +71,7 @@ class Brackets
         
         stack = []
         pp = pos
-        while pp[1] <= @editor.lines.length # @editor.scroll.bot # find first close bracket after
+        while pp[1] <= @editor.numLines() # @editor.scroll.bot # find first close bracket after
             [before, after] = @beforeAfterForPos pp
             while after.length
                 next = after.shift()
@@ -89,7 +89,7 @@ class Brackets
                     stack.push next
                 
             break if firstClose?
-            return if pp[1] >= @editor.lines.length-1
+            return if pp[1] >= @editor.numLines()-1
             pp = [0, pp[1]+1]
         
         return if not firstClose?
@@ -133,11 +133,11 @@ class Brackets
         @clear()
         opn.clss = 'bracketmatch'
         cls.clss = 'bracketmatch'
-        @editor.highlights.push [opn.line, [opn.start, opn.start+opn.match.length], opn]
-        @editor.highlights.push [cls.line, [cls.start, cls.start+cls.match.length], cls]
+        @editor.addHighlight [opn.line, [opn.start, opn.start+opn.match.length], opn]
+        @editor.addHighlight [cls.line, [cls.start, cls.start+cls.match.length], cls]
         @editor.renderHighlights()
 
     clear: ->
-        @editor.highlights = @editor.highlights.filter (h) -> h[2]?.clss != 'bracketmatch'
+        @editor.setHighlights @editor.highlights.filter (h) -> h[2]?.clss != 'bracketmatch'
 
 module.exports = Brackets

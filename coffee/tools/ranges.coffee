@@ -7,9 +7,24 @@
 _ = require 'lodash'
 
 module.exports = class Ranges
+
+    cursorDelta: (c, dx, dy=0) ->
+        c[0] += dx
+        c[1] += dy
+        
+    cursorSet: (c, x, y) ->    
+        [x,y] = x if not y? and x.length >=2
+        c[0] = x
+        c[1] = y
+
+    indentationInLine: (l) ->
+        s = 0
+        if l? and l.length > 0
+            l = l.trimRight()
+            s += 1 while l[s] == ' '
+        s
     
     rangeForPos:   (p)   -> [p[1], [p[0], p[0]]]
-
     rangeBetween: (a,b) -> 
         if @isPos(a) and @isPos(b) 
             [Math.min(a[1], b[1]), [Math.min(a[0], b[0]), Math.max(a[0], b[0])]]
@@ -18,18 +33,19 @@ module.exports = class Ranges
             @sortRanges r
             @rangeBetween @rangeEndPos(r[0]), @rangeStartPos(r[1])
             
-    isPos: (p) -> p?.length == 2 and _.isNumber(p[0]) and _.isNumber(p[1])
-    isRange: (r) -> r?.length >= 2 and _.isNumber(r[0]) and r[1]?.length >= 2 and _.isNumber(r[1][0]) and _.isNumber(r[1][1])
-    isSameRange: (a,b) -> a[0]==b[0] and a[1][0]==b[1][0] and a[1][1]==b[1][1]
-    isSamePos: (a,b) -> a[1]==b[1] and a[0]==b[0]
-    isPosInRange: (p, r) -> (p[1] == r[0]) and (r[1][0] <= p[0] <= r[1][1])
-    isPosInRanges: (p, rgs) -> @rangeAtPosInRanges(p, rgs)?
+    isPos:         (p)       -> p?.length == 2 and _.isNumber(p[0]) and _.isNumber(p[1])
+    isRange:       (r)       -> r?.length >= 2 and _.isNumber(r[0]) and r[1]?.length >= 2 and _.isNumber(r[1][0]) and _.isNumber(r[1][1])
+    isSameRange:   (a,b)     -> a[0]==b[0] and a[1][0]==b[1][0] and a[1][1]==b[1][1]
+    isSamePos:     (a,b)     -> a[1]==b[1] and a[0]==b[0]
+    isPosInRange:  (p, r)    -> (p[1] == r[0]) and (r[1][0] <= p[0] <= r[1][1])
+    isPosInRanges: (p, rgs)  -> @rangeAtPosInRanges(p, rgs)?
+    isPosInPositions: (p,ps) -> @posInPositions(p,ps)?
 
-    rangeEndPos:   (r)   -> [r[1][1], r[0]]
-    rangeStartPos: (r)   -> [r[1][0], r[0]]
-    lengthOfRange: (r) -> r[1][1] - r[1][0]
-    rangeIndexPos: (r,i) -> [r[1][i], r[0]]
-    rangeGrownBy:  (r,delta) -> [r[0], [r[1][0]-delta, r[1][1]+delta]]
+    rangeEndPos:   (r)       -> [r[1][1], r[0]]
+    rangeStartPos: (r)       -> [r[1][0], r[0]]
+    lengthOfRange: (r)       -> r[1][1] - r[1][0]
+    rangeIndexPos: (r,i)     -> [r[1][i], r[0]]
+    rangeGrownBy:  (r,d)     -> [r[0], [r[1][0]-d, r[1][1]+d]]
 
     # 00000000    0000000    0000000  000  000000000  000   0000000   000   000   0000000  
     # 000   000  000   000  000       000     000     000  000   000  0000  000  000       
@@ -38,7 +54,7 @@ module.exports = class Ranges
     # 000         0000000   0000000   000     000     000   0000000   000   000  0000000   
 
     positionsFromPosInPositions: (p, pl) -> (r for r in pl when ((r[1] > p[1]) or ((r[1] == p[1]) and (r[0] >= p[0]))))
-    positionsInLineAtIndexInPositions: (li,pl) -> (p for p in pl when p[1] == li)
+    positionsForLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] == li)
     positionsBelowLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] > li)
     positionsAfterLineColInPositions: (li,col,pl) -> (p for p in pl when p[1] == li and p[0]>=col)
     positionsNotInRanges: (pss, rgs) -> _.filter pss, (p) => not @isPosInRanges p, rgs
@@ -48,6 +64,10 @@ module.exports = class Ranges
             
     manhattanDistance: (a,b) -> Math.abs(a[1]-b[1])+Math.abs(a[0]-b[0])
         
+    posInPositions: (p,pl) ->
+        for c in pl
+            return c if @isSamePos p, c
+
     posClosestToPosInPositions: (p,pl) -> 
         minDist = 999999        
         for ps in pl
@@ -62,7 +82,8 @@ module.exports = class Ranges
     # 0000000    000000000  000 0 000  000  0000  0000000   0000000   
     # 000   000  000   000  000  0000  000   000  000            000  
     # 000   000  000   000  000   000   0000000   00000000  0000000   
-      
+    
+    rangesFromPositions: (pl) -> ([p[1], [p[0], p[0]]] for p in pl)  
     rangesForLineIndexInRanges: (li, ranges) -> (r for r in ranges when r[0]==li)
     rangesAfterLineColInRanges: (li,col,ranges) -> (r for r in ranges when r[0]==li and r[1][0] >= col)
     
@@ -157,7 +178,7 @@ module.exports = class Ranges
                 p = ranges[ri-1]
                 if r[0] == p[0] # on same line
                     if r[1][0] <= p[1][1] # starts before previous ends
-                        p[1][1] = Math.max(p[1][1], r[1][1])
+                        p[1][1] = Math.max p[1][1], r[1][1] 
                         ranges.splice ri, 1
         ranges
     

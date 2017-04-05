@@ -29,7 +29,7 @@ class View extends ViewBase
     constructor: (viewElem) -> 
         
         window.split.on 'commandline', @onCommandline
-        post.on 'jumpTo', @jumpTo # is this used?
+        post.on 'jumpTo', @jumpTo
         @fontSizeDefault = 16
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Autocomplete', 'Brackets', 'Strings']        
         @setText ''
@@ -42,7 +42,7 @@ class View extends ViewBase
     
     changed: (changeInfo, action) ->        
         super changeInfo, action
-        if changeInfo.lines
+        if changeInfo.changes.length
             @dirty = true # set dirty flag
             @updateTitlebar() 
 
@@ -53,7 +53,6 @@ class View extends ViewBase
     # 000       000  0000000  00000000
 
     setCurrentFile: (file, opt) ->
-        # log "View.setCurrentFile setCurrentFile #{file} opt:", opt
         @saveScrollCursorsAndSelections(opt) if not file and not opt?.noSaveScroll
         @dirty = false
         @syntax.name = 'txt'
@@ -105,12 +104,12 @@ class View extends ViewBase
         
         if opt?.dontSaveCursors
             s.main       = 0
-            s.cursors    = [@mainCursor] 
+            s.cursors    = [@cursorPos()] 
         else        
-            s.main       = @indexOfCursor(@mainCursor) if @indexOfCursor(@mainCursor) > 0
-            s.cursors    = _.cloneDeep @cursors if @cursors.length > 1 or @cursors[0][0] or @cursors[0][1]
-            s.selections = _.cloneDeep @selections if @selections.length
-            s.highlights = _.cloneDeep @highlights if @highlights.length
+            s.main       = @state.get 'main'
+            s.cursors    = @state.cursors()    if @numCursors() > 1 or @cursorPos()[0] or @cursorPos()[1]
+            s.selections = @state.selections() if @numSelections()
+            s.highlights = @state.highlights() if @numHighlights()
             
         s.scroll = @scroll.scroll if @scroll.scroll
                 
@@ -131,10 +130,11 @@ class View extends ViewBase
         filePositions = window.getState 'filePositions', {}
         if filePositions[@currentFile]? 
             s = filePositions[@currentFile] 
-            @cursors    = s.cursors    ? [[0,0]]
-            @selections = s.selections ? []
-            @highlights = s.highlights ? []
-            @mainCursor = @cursors[Math.min @cursors.length-1, s.main ? 0]            
+            @setCursors    s.cursors ? [[0,0]]
+            @setSelections s.selections ? []
+            @setHighlights s.highlights ? []
+            @setMain       s.main ? 0
+            @setState @state
             delta = (s.scroll ? @scroll.scroll) - @scroll.scroll
             @scrollBy delta if delta
             @updateLayers()
@@ -162,7 +162,7 @@ class View extends ViewBase
                 file: file
                 pos:  [0, line]
                 winID: window.winID
-                select: opt?.select
+                extend: opt?.extend
         
         classes = ipc.sendSync 'indexer', 'classes'
         for clss, info of classes

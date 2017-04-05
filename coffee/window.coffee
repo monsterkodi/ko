@@ -81,8 +81,8 @@ delState = window.delState = (key)        -> prefs.del "windows:#{winID}:#{key}"
 
 ipc.on 'shellCommandData',  (event, cmdData) => commandline.commands['term'].onShellCommandData cmdData
 ipc.on 'shellCallbackData', (event, cmdData) => commandline.commands['term'].onShellCallbackData cmdData
-ipc.on 'singleCursorAtPos', (event, pos, extend) => 
-    editor.singleCursorAtPos pos, extend
+ipc.on 'singleCursorAtPos', (event, pos, opt) => 
+    editor.singleCursorAtPos pos, opt
     editor.scrollCursorToTop()
 ipc.on 'openFile',          (event, options) => openFile options
 ipc.on 'focusEditor',       (event) => split.focus '.editor'
@@ -292,10 +292,10 @@ info        = window.info        = new Info editor
 editor.setText editorText if editorText?
 editor.view.focus()
 
-editor.on 'changed', (changeInfo, action) =>
+editor.on 'changed', (changeInfo) =>
     return if changeInfo.foreign
-    if changeInfo.lines
-        ipc.send 'winFileLinesChanged', winID, editor.currentFile, action.lines
+    if changeInfo.changes.length
+        ipc.send 'winFileLinesChanged', winID, editor.currentFile, changeInfo.changes
         navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
 
 window.editorWithName = (n) ->

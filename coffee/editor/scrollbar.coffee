@@ -96,12 +96,12 @@ class Scrollbar
     #  0000000   000        0000000    000   000     000     00000000
 
     update: =>
-        if @editor.lines.length * @editor.size.lineHeight < @editor.viewHeight()
+        if @editor.numLines() * @editor.size.lineHeight < @editor.viewHeight()
             @handle.style.top     = "0"
             @handle.style.height  = "0"
             @handle.style.width   = "0"
         else
-            bh           = @editor.lines.length * @editor.size.lineHeight
+            bh           = @editor.numLines() * @editor.size.lineHeight
             vh           = Math.min (@editor.scroll.viewLines * @editor.scroll.lineHeight), @editor.viewHeight()
             scrollTop    = parseInt (@editor.scroll.scroll / bh) * vh
             scrollHeight = parseInt ((@editor.scroll.viewLines * @editor.scroll.lineHeight) / bh) * vh

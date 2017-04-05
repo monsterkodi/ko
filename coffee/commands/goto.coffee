@@ -62,16 +62,16 @@ class Goto extends Command
             line = parseInt command
             editor = window.editorWithClassName @focus
             if line < 0
-                line = editor.lines.length + line
+                line = editor.numLines() + line
             else 
                 line -= 1
-            line = clamp 0, editor.lines.length-1, line
-            editor.singleCursorAtPos [0,line], @name == 'selecto'
+            line = clamp 0, editor.numLines()-1, line
+            editor.singleCursorAtPos [0,line], extend: @name == 'selecto'
             editor.scrollCursorToTop()
             focus: @focus
             do: "reveal #{editor.name}"
         else if command.length
-            window.editor.jumpTo command, dontList: true, select: @name == 'selecto'
+            window.editor.jumpTo command, dontList: true, extend: @name == 'selecto'
             focus: '.editor'
             do: "reveal editor"
         else

@@ -45,15 +45,15 @@ class Info
         @cursors.onclick = => @editor.focus() + @editor.clearCursors()
         @topline.appendChild @cursors
         
-        @selections = document.createElement 'span'
-        @selections.className = "info-selections"
-        @selections.onclick = => @editor.focus() + @editor.clearSelections()
-        @topline.appendChild @selections
+        @selecti = document.createElement 'span'
+        @selecti.className = "info-selections"
+        @selecti.onclick = => @editor.focus() + @editor.clearSelections()
+        @topline.appendChild @selecti
 
-        @highlights = document.createElement 'span'
-        @highlights.className = "info-highlights"
-        @highlights.onclick = => @editor.focus() + @editor.clearHighlights()
-        @topline.appendChild @highlights
+        @highlig = document.createElement 'span'
+        @highlig.className = "info-highlights"
+        @highlig.onclick = => @editor.focus() + @editor.clearHighlights()
+        @topline.appendChild @highlig
         
         @classes = document.createElement 'span'
         @classes.className = "info-classes empty"
@@ -85,7 +85,7 @@ class Info
         
         @lines = document.createElement 'span'
         @lines.className = "info-lines"
-        @lines.onclick = => @editor.focus() + @editor.singleCursorAtPos [0, @editor.lines.length]
+        @lines.onclick = => @editor.focus() + @editor.singleCursorAtPos [0, @editor.numLines()]
         @botline.appendChild @lines
 
         @files = document.createElement 'span'
@@ -135,7 +135,7 @@ class Info
         @editor.on 'highlight',    @onHighlight
         @editor.on 'cursor',       @onCursor
         
-        @onNumLines @editor.lines.length
+        @onNumLines @editor.numLines()
 
     # 00000000   00000000  000       0000000    0000000   0000000  
     # 000   000  000       000      000   000  000   000  000   000
@@ -174,21 +174,21 @@ class Info
         @files.classList.toggle 'empty', fc == 0
     
     onCursor: => 
-        @cursorLine.textContent = @editor.mainCursor[1]+1
-        @cursorColumn.textContent = @editor.mainCursor[0]
-        @cursors.textContent = @editor.cursors.length
+        @cursorLine.textContent = @editor.mainCursor()[1]+1
+        @cursorColumn.textContent = @editor.mainCursor()[0]
+        @cursors.textContent = @editor.numCursors()
         @cursorColumn.classList.toggle 'virtual', @editor.isCursorVirtual()
-        @cursors.classList.toggle 'empty', @editor.cursors.length == 1
+        @cursors.classList.toggle 'empty', @editor.numCursors() == 1
         @sticky.classList.toggle 'empty', not @editor.stickySelection
         
     onSelection: =>
-        @selections.textContent = @editor.selections?.length
-        @selections.classList.toggle 'empty', @editor.selections?.length == 0
+        @selecti.textContent = @editor.numSelections()
+        @selecti.classList.toggle 'empty', @editor.numSelections() == 0
         @sticky.classList.toggle 'empty', not @editor.stickySelection
         
     onHighlight: =>
-        @highlights.textContent = @editor.highlights?.length
-        @highlights.classList.toggle 'empty', @editor.highlights?.length == 0
+        @highlig.textContent = @editor.numHighlights()
+        @highlig.classList.toggle 'empty', @editor.numHighlights() == 0
     
 module.exports = Info
 

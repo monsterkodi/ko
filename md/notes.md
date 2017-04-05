@@ -1,5 +1,8 @@
 # todo/ideas
 
+- if no highlights
+    - alt+command+b : set cursors at selection boundaries 
+    - ctrl+alt+command+b : select between cursors
 - limit size of range for bracket matching 
 - list project|pkg dirs?
 - set breakpoint in electron?

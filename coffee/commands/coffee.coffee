@@ -74,7 +74,7 @@ class Coffee extends Command
                 line: "#{@cmdID} ●"
                 diss: Syntax.dissForTextAndSyntax l, 'coffee'
                 clss: 'coffeeCommand'
-        terminal.singleCursorAtPos [0, terminal.lines.length-1]
+        terminal.singleCursorAtPos [0, terminal.numLines()-1]
         ipc.send 'executeCoffee', winID: window.winID, cmdID: @cmdID, command: command        
         @hideList()
         do: (@name == 'Coffee' and 'maximize' or 'reveal') + ' terminal'
@@ -88,7 +88,7 @@ class Coffee extends Command
     #  0000000  0000000  00000000  000   000  000   000
     
     clear: ->
-        if window.terminal.lines.length > 1
+        if window.terminal.numLines() > 1
             window.terminal.clear()
         else
             text: ''
