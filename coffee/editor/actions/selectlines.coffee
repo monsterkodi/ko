@@ -40,7 +40,7 @@ module.exports =
                 selectCursorLineAtIndex c, c[1]+1 if c[1] < @numLines()-1
                 
         @do.select newSelections
-        @do.cursor newCursors
+        @do.setCursors newCursors
         @do.end()       
 
     selectLessLines: -> 
@@ -49,13 +49,13 @@ module.exports =
         newSelections = @do.selections()
         
         for c in newCursors.reversed()
-            thisSel = @selectionsInLineAtIndex(c[1])
+            thisSel = @rangesForLineIndexInRanges c[1], newSelections
             if thisSel.length
                 if @isSelectedLineAtIndex c[1]-1
-                    s = @selectionsInLineAtIndex(c[1]-1)[0]
+                    s = first @rangesForLineIndexInRanges c[1]-1, newSelections
                     @cursorSet c, s[1][1], s[0]
-                newSelections.splice @indexOfSelection(thisSel[0]), 1
+                newSelections.splice newSelections.indexOf(thisSel[0]), 1
 
         @do.select newSelections
-        @do.cursor newCursors
+        @do.setCursors newCursors
         @do.end()  

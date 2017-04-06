@@ -175,7 +175,7 @@ class Editor extends Buffer
                                                 
     textOfSelection: ->
         t = []
-        for s in @selections
+        for s in @selections()
             t.push @textInRange s
         t.join '\n'
             

@@ -256,10 +256,11 @@ class TextEditor extends Editor
         @emit 'lineExposed',
             lineIndex: li
             lineDiv: div
-            
-        @renderCursors() if @positionsForLineIndexInPositions(li, @cursors).length
-        @renderSelection() if @rangesForLineIndexInRanges(li, @selections).length
-        @renderHighlights() if @rangesForLineIndexInRanges(li, @highlights).length
+          
+        # this is crap! render only cursors at line! don't get native arrays!  
+        @renderCursors() if @positionsForLineIndexInPositions(li, @cursors()).length
+        @renderSelection() if @rangesForLineIndexInRanges(li, @selections()).length
+        @renderHighlights() if @rangesForLineIndexInRanges(li, @highlights()).length
         
     exposeLines: (e) =>
         before = @elem.firstChild
@@ -353,7 +354,7 @@ class TextEditor extends Editor
     
     renderCursors: ->
         cs = []
-        for c in @cursors
+        for c in @cursors()
             if c[1] >= @scroll.exposeTop and c[1] <= @scroll.exposeBot
                 cs.push [c[0], c[1] - @scroll.exposeTop]
 
@@ -417,14 +418,15 @@ class TextEditor extends Editor
     
     deltaToEnsureCursorsAreVisible: ->
         topdelta = 0
-        cl = @cursors[0][1]
+        cs = @cursors()
+        cl = @cs[0][1]
         if cl < @scroll.top + 2
             topdelta = Math.max(0, cl - 2) - @scroll.top
         else if cl > @scroll.bot - 4
             topdelta = Math.min(@numLines()+1, cl + 4) - @scroll.bot
         
         botdelta = 0
-        cl = last(@cursors)[1]
+        cl = last(cs)[1]
         if cl < @scroll.top + 2
             botdelta = Math.max(0, cl - 2) - @scroll.top
         else if cl > @scroll.bot - 4

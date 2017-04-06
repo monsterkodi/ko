@@ -34,12 +34,18 @@ class State extends StateR
     
     # read only:
         
-    selections:    -> @get('selections').map((s) -> [s.get('l'), [s.get('s'), s.get('e')]]).toArray()
-    highlights:    -> @get('highlights').map((s) -> [s.get('l'), [s.get('s'), s.get('e')], s.get('o')]).toArray()
-    cursors:       -> @get('cursors').map((c) -> [c.get('x'), c.get('y')]).toArray()
     lines:         -> @get('lines').toArray().map (l) -> l.get 'text'
-    line:      (l) -> @getIn ['lines', l, 'text']
+    cursors:       -> @get('cursors').map((c) -> [c.get('x'), c.get('y')]).toArray()
+    highlights:    -> @get('highlights').map((s) -> [s.get('l'), [s.get('s'), s.get('e')], s.get('o')]).toArray()
+    selections:    -> @get('selections').map((s) -> [s.get('l'), [s.get('s'), s.get('e')]]).toArray()
+    
+    line:      (i) -> @getIn ['lines', i, 'text']
+    cursor:    (i) -> c = @getIn ['cursors', i]; [c.get('x'), c.get('y')]
+    selection: (i) -> s = @getIn ['selections', i]; [s.get('l'), [s.get('s'), s.get('e')]]
+    highlight: (i) -> s = @getIn ['highlights', i]; [s.get('l'), [s.get('s'), s.get('e')], s.get('o')]
+    
     mainCursor:    -> @getIn ['cursors', @get 'main']
+    
     numLines:      -> @get('lines').size
     numCursors:    -> @get('cursors').size
     numSelections: -> @get('selections').size
@@ -52,6 +58,8 @@ class State extends StateR
     setCursors:    (c) -> @set 'cursors',    List c.map (t) -> Cursor x:t[0], y:t[1]
     setLines:      (l) -> @set 'lines',      List l.map (t) -> Line text:t
     setMain:       (m) -> @set 'main', m
+
+    addHighlight:  (h) -> @set 'highlights', @get('highlights').push Highlt s:r[1][0], e:r[1][1], l:r[0], o:r[2]
     
     insertLine: (i,t) -> @update 'lines', (l) -> l.splice i, 0, Line text:t
     changeLine: (i,t) -> @setIn ['lines', i, 'text'], t

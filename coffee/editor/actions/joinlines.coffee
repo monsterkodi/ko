@@ -9,7 +9,7 @@ module.exports =
     joinLines: ->
         @do.start()
         newCursors = []
-        for c in @cursors.reversed()
+        for c in @do.cursors().reversed()
             if not @isCursorInLastLine c
                 before = @do.line(c[1]).trimRight() + " "
                 after  = @do.line(c[1]+1).trimLeft()
@@ -29,5 +29,5 @@ module.exports =
                     @cursorDelta nc, before.length, -1
                 for nc in @positionsBelowLineIndexInPositions c[1], newCursors 
                     @cursorDelta nc, 0, -1
-        @do.cursor newCursors, main: 0
+        @do.setCursors newCursors, main: 0
         @do.end()

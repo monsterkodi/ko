@@ -47,20 +47,20 @@ module.exports =
                 if nc[0] >= cc[0]
                     nc[0] += 1
         
-        @do.cursor newCursors
+        @do.setCursors newCursors
         @do.end()
         @emitEdit 'insert'
 
     clampCursorOrFillVirtualSpaces: ->
         @do.start()
         if @do.numCursors() == 1
-            cursor = @do.state.cursors()[0]
+            cursor = @do.cursor 0
             y = clamp 0, @do.numLines()-1, cursor[1]
             lineLength = @do.numLines() and @do.line(cursor[1]).length or 0
             x = clamp 0, lineLength, cursor[0]
-            @do.cursor [[x,y]]
+            @do.setCursors [[x,y]]
         else # fill spaces between line ends and cursors
-            for c in @cursors 
+            for c in @do.cursors()
                 if c[0] > @do.line(c[1]).length
                     @do.change c[1], @do.line(c[1]).splice c[0], 0, _.padStart '', c[0]-@do.line(c[1]).length
         @do.end()
@@ -76,5 +76,5 @@ module.exports =
                 n = 4-(c[0]%il)
                 @do.change c[1], @do.line(c[1]).splice c[0], 0, _.padStart "", n
                 @cursorDelta c, n
-            @do.cursor newCursors
+            @do.setCursors newCursors
             @do.end()   

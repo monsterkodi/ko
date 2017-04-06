@@ -13,9 +13,9 @@ module.exports =
         newSelections = @do.selections()
         
         moveInLine = (i, d) => 
-            for s in @selectionsInLineAtIndex i
-                newSelections[@selections.indexOf s][1][0] += d
-                newSelections[@selections.indexOf s][1][1] += d
+            for s in @rangesForLineIndexInRanges i, newSelections
+                s[1][0] += d
+                s[1][1] += d
             for c in @positionsForLineIndexInPositions i, newCursors
                 @cursorDelta c, d
                 
@@ -41,5 +41,5 @@ module.exports =
                     @do.change i, @do.line(i).splice si, 0, @lineComment + " "
                     moveInLine i, l
         @do.select newSelections
-        @do.cursor newCursors
+        @do.setCursors newCursors
         @do.end()

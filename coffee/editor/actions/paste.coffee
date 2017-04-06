@@ -65,5 +65,5 @@ module.exports =
             newCursors = [[0, li]] if not newCursors?
             @do.select newSelections if newSelections.length > 1
                 
-        @do.cursor newCursors
+        @do.setCursors newCursors
         @do.end()

@@ -25,5 +25,5 @@ module.exports =
                     if t.trim().length == 0
                         @do.change c[1], @do.line(c[1]).splice c[0]-n, n
                         @cursorDelta c, -n
-            @do.cursor newCursors
+            @do.setCursors newCursors
             @do.end()

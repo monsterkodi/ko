@@ -39,7 +39,7 @@ module.exports =
             log "[WARNING] editor.#{name}.selectSingleRange -- undefined range!"
             return
         @do.start()
-        @do.cursor [[opt?.before and r[1][0] or r[1][1], r[0]]]
+        @do.setCursors [[opt?.before and r[1][0] or r[1][1], r[0]]]
         @do.select [r]
         @do.end()
 
@@ -95,18 +95,17 @@ module.exports =
         newSelections = @do.selections()
         newSelections.push range
         newCursors = (@rangeEndPos(r) for r in newSelections)
-        @do.cursor newCursors, main:'last'
+        @do.setCursors newCursors, main:'last'
         @do.select newSelections
         @do.end()
 
-    removeFromSelection: (sel) ->
+    removeSelectionAtIndex: (si) ->
         @do.start()
-        si = @selections.indexOf sel
         newSelections = @do.selections()
         newSelections.splice si, 1
         if newSelections.length
             newCursors = (@rangeEndPos(r) for r in newSelections)
-            @do.cursor newCursors, main:(newCursors.length+si-1) % newCursors.length
+            @do.setCursors newCursors, main:(newCursors.length+si-1) % newCursors.length
         @do.select newSelections
         @do.end()        
 
@@ -128,7 +127,7 @@ module.exports =
                 invertedRanges.push @rangeForLineAtIndex li
         if invertedRanges.length
             @do.start()
-            @do.cursor [@rangeStartPos first invertedRanges]
+            @do.setCursors [@rangeStartPos first invertedRanges]
             @do.select invertedRanges
             @do.end()     
 
@@ -144,7 +143,7 @@ module.exports =
             @highlightTextOfSelectionOrWordAtCursor()
         @do.select @do.highlights()
         if @do.numSelections()
-            @do.cursor (@rangeEndPos(r) for r in @do.selections()), main: 'closest'
+            @do.setCursors (@rangeEndPos(r) for r in @do.selections()), main: 'closest'
         @do.end()
     
     selectNextHighlight: -> # command+g

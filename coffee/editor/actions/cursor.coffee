@@ -27,13 +27,13 @@ module.exports =
         p = @clampPos p
         @do.start()
         @startSelection opt
-        @do.cursor [[p[0], p[1]]]
+        @do.setCursors [[p[0], p[1]]]
         @endSelection opt
         @do.end()
     
     setCursor: (c,l) ->
         @do.start()
-        @do.cursor [c,l]
+        @do.setCursors [[c,l]]
         @do.end()
         
     toggleCursorAtPos: (p) ->
@@ -46,7 +46,7 @@ module.exports =
         @do.start()
         newCursors = @do.cursors()
         newCursors.push p
-        @do.cursor newCursors, main:'last'
+        @do.setCursors newCursors, main:'last'
         @do.end()
         
     delCursorAtPos: (p) ->
@@ -56,7 +56,7 @@ module.exports =
             @do.start()
             newCursors = @do.cursors()
             newCursors.splice oldCursors.indexOf(c), 1
-            @do.cursor newCursors, main:'closest'
+            @do.setCursors newCursors, main:'closest'
             @do.end()
            
     addCursors: (dir='down') ->
@@ -75,7 +75,7 @@ module.exports =
         main = switch dir
             when 'up'    then 'first'
             when 'down'  then 'last'
-        @do.cursor newCursors, main:main
+        @do.setCursors newCursors, main:main
         @do.end()
 
     alignCursorsAndText: ->
@@ -88,7 +88,7 @@ module.exports =
             @cursorSet nc, newX, c[1]
         for li, cx of lines
             @do.change li, @do.line(li).slice(0, cx) + _.padStart('', newX-cx) + @do.line(li).slice(cx)
-        @do.cursor newCursors
+        @do.setCursors newCursors
         @do.end()
 
     alignCursors: (dir='down') ->
@@ -104,7 +104,7 @@ module.exports =
         main = switch dir
             when 'up'    then 'first'
             when 'down'  then 'last'
-        @do.cursor newCursors, main:main
+        @do.setCursors newCursors, main:main
         @do.end()
         
     delCursors: (dir='up') ->
@@ -127,12 +127,12 @@ module.exports =
                         if @isSamePos @do.mainCursor(), newCursors[ci]
                             main = @posInPositions [c[0], c[1]+1], newCursors  
                         newCursors.splice ci, 1
-        @do.cursor newCursors, main:main
+        @do.setCursors newCursors, main:main
         @do.end()
         
     clearCursors: () -> 
         @do.start()
-        @do.cursor [@mainCursor()]
+        @do.setCursors [@mainCursor()]
         @do.end()
 
     clearCursorsAndHighlights: () ->

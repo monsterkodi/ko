@@ -18,7 +18,7 @@ module.exports =
                 ns[1][0] += @indentString.length
                 ns[1][1] += @indentString.length
         @do.select newSelections
-        @do.cursor newCursors
+        @do.setCursors newCursors
         @do.end()
 
     deIndent: -> 
@@ -35,5 +35,5 @@ module.exports =
                     ns[1][0] -= @indentString.length
                     ns[1][1] -= @indentString.length
         @do.select newSelections
-        @do.cursor newCursors
+        @do.setCursors newCursors
         @do.end()

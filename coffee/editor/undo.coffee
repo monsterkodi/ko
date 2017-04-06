@@ -78,7 +78,7 @@ class Do
             @editor.setState @state
             @editor.changed? changes
         else
-            @editor.setState @state
+            @editor.setState @state # < this should be gone, shouldn't it?
 
     # 000   000  000   000  0000000     0000000 
     # 000   000  0000  000  000   000  000   000
@@ -141,7 +141,7 @@ class Do
     # 000       000   000  000   000       000  000   000  000   000  
     #  0000000   0000000   000   000  0000000    0000000   000   000  
 
-    cursor: (newCursors, opt) ->
+    setCursors: (newCursors, opt) ->
 
         if not newCursors? or newCursors.length < 1
             alert 'warning!! empty cursors?'
@@ -299,8 +299,16 @@ class Do
     #      000     000     000   000     000     000       
     # 0000000      000     000   000     000     00000000  
         
-    line:       (li) -> @state.line li 
+    line:        (i) -> @state.line i 
+    cursor:      (i) -> @state.cursor i
+    highlight:   (i) -> @state.highlight i
+    selection:   (i) -> @state.selection i
+
     lines:           -> @state.lines()
+    cursors:         -> @state.cursors()
+    highlights:      -> @state.highlights()
+    selections:      -> @state.selections()
+
     numLines:        -> @state.numLines()
     textInRange: (r) -> @state.line(r[0]).slice? r[1][0], r[1][1]
     

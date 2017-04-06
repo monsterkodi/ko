@@ -31,36 +31,38 @@ class Buffer extends multi event, ranges
         @emit 'numLines', @numLines()
 
     setState: (@state) ->
-        @selections = @state.selections()
-        @highlights = @state.highlights()
-        @cursors    = @state.cursors()
-                    
-        if @name == 'editor'
-            if @mainCursor()[1] < 0 and @numLines()
-                log "DAFUK mainCursor"
-        for s in @selections
-            if s[0] == undefined
-                log "DAFUK selections #{@name}"
+        # if @name == 'editor'
+            # if @mainCursor()[1] < 0 and @numLines()
+                # log "DAFUK mainCursor"
+        # for s in @selections()
+            # if s[0] == undefined
+                # log "DAFUK selections #{@name}"
     
     mainCursor: -> 
         mc = @state.mainCursor()
         [mc?.get?('x') ? 0, mc?.get?('y') ? -1]
 
-    line:     (li) -> @state.line li
+    line:      (i) -> @state.line i
+    cursor:    (i) -> @state.cursor i
+    highlight: (i) -> @state.highlight i
+    selection: (i) -> @state.selection i
+    
     lines:         -> @state.lines()
+    cursors:       -> @state.cursors()
+    highlights:    -> @state.highlights()
+    selections:    -> @state.selections()
+    
     numLines:      -> @state.numLines()
     numCursors:    -> @state.numCursors()
     numSelections: -> @state.numSelections()
     numHighlights: -> @state.numHighlights()
 
-    setCursors:    (c) -> @state = @state.setCursors(c);    @cursors    = @state.cursors()
-    setSelections: (s) -> @state = @state.setSelections(s); @selections = @state.selections()
-    setHighlights: (h) -> @state = @state.setHighlights(h); @highlights = @state.highlights()
-    setMain:       (m) -> @state = @state.setMain(m)
-    
-    addHighlight:  (h) -> 
-        @highlights.push h
-        @setHighlights @highlights
+    # these are used from tests and restore
+    setCursors:    (c) -> @state = @state.setCursors c     
+    setSelections: (s) -> @state = @state.setSelections s  
+    setHighlights: (h) -> @state = @state.setHighlights h  
+    setMain:       (m) -> @state = @state.setMain m     
+    addHighlight:  (h) -> @state = @state.addHighlight h
     
     #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
     # 000       000   000  000   000  000       000   000  000   000  000     
@@ -83,11 +85,11 @@ class Buffer extends multi event, ranges
     # 00     00   0000000   000   000  0000000  
 
     wordAtCursor: (c=@mainCursor(), opt) -> @textInRange @rangeForWordAtPos c, opt
-    wordsAtCursors: (cs=@cursors, opt) -> (@textInRange @rangeForWordAtPos(c, opt) for c in cs)
+    wordsAtCursors: (cs=@cursors(), opt) -> (@textInRange @rangeForWordAtPos(c, opt) for c in cs)
 
     selectionTextOrWordAtCursor: () ->
         if @numSelections() == 1 
-            @textInRange @selections[0]
+            @textInRange @selection 0
         else
             @wordAtCursor()
     
@@ -133,19 +135,10 @@ class Buffer extends multi event, ranges
             ([s[0]-relIndex, [s[1][0], s[1][1]]] for s in sl)
     
     selectionsInLineIndexRange: (lineIndexRange) ->
-        sl = []
-        for s in @selections
-            if s[0] >= lineIndexRange[0] and s[0] <= lineIndexRange[1]
-                sl.push _.clone s
-        sl
+        @selections().filter (s) -> s[0] >= lineIndexRange[0] and s[0] <= lineIndexRange[1]
         
-    reversedSelections: ->
-        sl = _.clone @selections
-        sl.reverse()
-        sl
-
-    selectedLineIndices: -> _.uniq (s[0] for s in @selections)
-    cursorLineIndices:   -> _.uniq (c[1] for c in @cursors)
+    selectedLineIndices: -> _.uniq (s[0] for s in @selections())
+    cursorLineIndices:   -> _.uniq (c[1] for c in @cursors())
 
     selectedAndCursorLineIndices: ->
         _.uniq @selectedLineIndices().concat @cursorLineIndices()
@@ -164,27 +157,19 @@ class Buffer extends multi event, ranges
     isSelectedLineAtIndex: (li) ->
         il = @selectedLineIndices()
         if li in il
-            s = @selections[il.indexOf li]
+            s = @selection(il.indexOf li)
             if s[1][0] == 0 and s[1][1] == @line(li).length
                 return true
         false
         
-    selectionsInLineAtIndex: (li) ->
-        sl = []
-        for s in @selections
-            if s[0] == li
-                sl.push s
-        sl
-        
-    indexOfSelection: (s) -> @selections.indexOf s
-    
     continuousSelectionAtPos: (p) -> # used by deleteSelection to calculate cursor positions
-        r = @rangeAtPosInRanges p, @selections
+        sel = @selections()
+        r = @rangeAtPosInRanges p, sel
         if r
             sp = @rangeStartPos r
             while (sp[0] == 0) and (sp[1] > 0)
                 plr = @rangeForLineAtIndex sp[1]-1
-                sil = @selectionsInLineAtIndex sp[1]-1
+                sil = @rangesForLineIndexInRanges sp[1]-1, sel
                 if sil.length == 1 and @isSameRange sil[0], plr
                     sp = @rangeStartPos plr
                 else if sil.length and last(sil)[1][1] == plr[1][1]
@@ -194,7 +179,7 @@ class Buffer extends multi event, ranges
             ep = @rangeEndPos r
             while (ep[0] == @line(ep[1]).length) and (ep[1] < @numLines()-1)
                 nlr = @rangeForLineAtIndex ep[1]+1
-                sil = @selectionsInLineAtIndex ep[1]+1
+                sil = @rangesForLineIndexInRanges ep[1]+1, sel
                 if sil.length == 1 and @isSameRange sil[0], nlr
                     ep = @rangeEndPos nlr
                 else if sil.length and first(sil)[1][0] == 0
@@ -205,7 +190,7 @@ class Buffer extends multi event, ranges
         
     onlyFullLinesSelected: -> 
         return false if not @numSelections()
-        for s in @selections
+        for s in @selections()
             return false if not @isSameRange s, @rangeForLineAtIndex s[0]
         true
 
@@ -237,8 +222,8 @@ class Buffer extends multi event, ranges
     #    000     000        000 000      000   
     #    000     00000000  000   000     000   
 
-    text:            -> @state.lines().join '\n'
-    textInRange: (r) -> @state.line(r[0]).slice? r[1][0], r[1][1]
+    text:            -> @lines().join '\n'
+    textInRange: (r) -> @line(r[0]).slice? r[1][0], r[1][1]
     textsInRanges: (rgs) -> (@textInRange(r) for r in rgs)
         
     # 000  000   000  0000000    00000000  000   000  000000000
@@ -310,7 +295,7 @@ class Buffer extends multi event, ranges
     # 000   000  000   000  000  0000  000   000  000            000
     # 000   000  000   000  000   000   0000000   00000000  0000000 
         
-    rangesForCursorLines: (cs=@cursors) -> (@rangeForLineAtIndex c[1] for c in cs)  
+    rangesForCursorLines: (cs=@cursors()) -> (@rangeForLineAtIndex c[1] for c in cs)  
     rangesForAllLines: -> @rangesForLinesFromTopToBot 0, @numLines()
 
     rangesBetweenPositions: (a, b, extend=false) ->

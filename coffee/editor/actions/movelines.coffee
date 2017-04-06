@@ -43,5 +43,5 @@ module.exports =
             @cursorDelta nc, 0, d
                 
         @do.select newSelections
-        @do.cursor newCursors
+        @do.setCursors newCursors
         @do.end()       

@@ -26,7 +26,7 @@ module.exports =
             if @surroundStack.length
                 so = last(@surroundStack)[0]
                 sc = last(@surroundStack)[1]
-                for c in @cursors
+                for c in @do.cursors()
                     prv = ''
                     prv = @do.line(c[1]).slice c[0]-so.length, c[0] if c[0] >= so.length
                     nxt = @do.line(c[1]).slice c[0], c[0]+sc.length
@@ -52,13 +52,13 @@ module.exports =
             when opt?.singleCharacter    then 1
             when opt?.ignoreLineBoundary then -1 # delete spaces to line start or line end
             when opt?.ignoreTabBoundary # delete space columns
-                Math.max 1, _.min @cursors.map (c) => 
+                Math.max 1, _.min newCursors.map (c) => 
                     t = @do.textInRange [c[1], [0, c[0]]]
                     n = t.length - t.trimRight().length
                     n += c[0] - @do.line(c[1]).length if @isCursorVirtual c
                     Math.max 1, n
             else # delete spaces to previous tab column
-                Math.max 1, _.min @cursors.map (c) =>                       
+                Math.max 1, _.min newCursors.map (c) =>                       
                     n = (c[0] % @indentString.length) or @indentString.length  
                     t = @do.textInRange [c[1], [Math.max(0, c[0]-n), c[0]]]  
                     n -= t.trimRight().length
@@ -89,4 +89,4 @@ module.exports =
                 for nc in @positionsForLineIndexInPositions c[1], newCursors
                     if nc[0] >= c[0]
                         @cursorDelta nc, -n
-        @do.cursor newCursors
+        @do.setCursors newCursors

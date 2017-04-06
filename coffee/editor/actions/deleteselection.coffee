@@ -13,7 +13,7 @@ module.exports =
         @do.start()
         newCursors = @do.cursors()
         joinLines = []
-        for c in @cursors.reversed()
+        for c in @do.cursors().reversed()
             csel = @continuousSelectionAtPos c
             if csel?
                 [sp, ep] = csel
@@ -26,7 +26,7 @@ module.exports =
                         # set cursors after selection in last joined line
                         @cursorSet nc, sp[0]+nc[0]-ep[0], sp[1]
                         
-        for s in @reversedSelections()
+        for s in @do.selections().reversed()
             continue if s[0] >= @do.numLines()
             lineSelected = s[1][0] == 0 and s[1][1] == @do.line(s[0]).length
             if lineSelected and @do.numLines() > 1
@@ -47,6 +47,6 @@ module.exports =
                 _.pull joinLines, s[0]
         
         @do.select []
-        @do.cursor newCursors
+        @do.setCursors newCursors
         @do.end()
         @checkSalterMode()

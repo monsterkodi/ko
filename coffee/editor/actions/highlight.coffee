@@ -41,12 +41,12 @@ module.exports =
             @highlightTextOfSelectionOrWordAtCursor() # this also selects
         else
             @do.start()
-            sr = @rangeAtPosInRanges cp, @selections
+            sr = @rangeAtPosInRanges cp, @do.selections()
             if sr # cursor in selection -> select next highlight
-                r = @rangeAfterPosInRanges cp, @highlights
+                r = @rangeAfterPosInRanges cp, @do.highlights()
             else # select current highlight first
-                r = @rangeAtPosInRanges cp, @highlights
-            r ?= first @highlights
+                r = @rangeAtPosInRanges cp, @do.highlights()
+            r ?= @do.highlight(0)
             @addRangeToSelection r
             @scrollCursorToTop()
             @do.end()
@@ -56,17 +56,18 @@ module.exports =
         if @numSelections() == 0
             srange = @rangeForWordAtPos @cursorPos()
             @selectSingleRange srange
-            
-        text = @textInRange @selections[0]
+        
+        sel = @selection 0     
+        text = @textInRange sel
         if text.length
             
             if @numHighlights()
                 if text == @textInRange first @highlights # see if we can grow the current selection
-                    largerRange = [@selections[0][0], [@selections[0][1][0]-1, @selections[0][1][1]]]
+                    largerRange = [sel[0], [sel[1][0]-1, sel[1][1]]]
                     largerText = @textInRange largerRange
                     if largerText[0] in "@#$%&*+-!?:.'\"/" or /[A-Za-z]/.test largerText[0]
                         if largerText[0] in "'\"" # grow strings in both directions
-                            nr = [@selections[0][0], [@selections[0][1][0]-1, @selections[0][1][1]+1]] 
+                            nr = [sel[0], [sel[1][0]-1, sel[1][1]+1]] 
                             nt = @textInRange nr
                             if nt[nt.length-1] == largerText[0]
                                 largerText = nt
@@ -98,6 +99,8 @@ module.exports =
             
     removeSelectedHighlight: -> # command+shift+d
         cp = @cursorPos()
-        sr = @rangeAtPosInRanges cp, @selections
-        hr = @rangeAtPosInRanges cp, @highlights        
-        @removeFromSelection sr if sr and hr
+        sel = @selections()
+        sr = @rangeAtPosInRanges cp, sel
+        hr = @rangeAtPosInRanges cp, @highlights()        
+        if sr and hr
+            @removeSelectionAtIndex sel.indexOf sr 

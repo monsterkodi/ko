@@ -52,12 +52,12 @@ module.exports =
         i = leftOrRight == 'right' and 1 or 0
         newCursors = []
         main = 'last'
-        for s in @selections
+        for s in @do.selections()
             p = @rangeIndexPos s,i
             newCursors.push p
             if @isCursorInRange s
                 main = newCursors.indexOf p
-        @do.cursor newCursors, main:main
+        @do.setCursors newCursors, main:main
         @do.end()       
     
     moveAllCursors: (func, opt = extend:false, keepLine:true) ->        
@@ -81,7 +81,7 @@ module.exports =
             when 'left'  then newCursors.indexOf first @positionsForLineIndexInPositions mainLine, newCursors
             when 'right' then newCursors.indexOf last  @positionsForLineIndexInPositions mainLine, newCursors
             
-        @do.cursor newCursors, main:main
+        @do.setCursors newCursors, main:main
         @endSelection opt
         @do.end()
 
@@ -101,7 +101,7 @@ module.exports =
             else
                 @isSamePos(c, newMain) 
         newCursors.push newMain
-        @do.cursor newCursors, main:newMain
+        @do.setCursors newCursors, main:newMain
         @do.end()
         
     moveCursorsToLineBoundary: (leftOrRight, e) ->
@@ -136,7 +136,7 @@ module.exports =
         
     moveCursorsDown: (e, n=1) ->
         if e and @numSelections() == 0 # selecting lines down
-            if 0 == _.max (c[0] for c in @cursors) # all cursors in first column
+            if 0 == _.max (c[0] for c in @cursors()) # all cursors in first column
                 @do.start()
                 @do.select @rangesForCursorLines() # select lines without moving cursors
                 @do.end()

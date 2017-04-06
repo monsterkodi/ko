@@ -32,5 +32,5 @@ module.exports =
                         @cursorDelta nc, 0, ls.length # move cursors in inserted lines down
 
         @do.select []
-        @do.cursor newCursors
+        @do.setCursors newCursors
         @do.end()       

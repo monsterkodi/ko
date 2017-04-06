@@ -51,5 +51,5 @@ module.exports =
                         if nc[0] > c[0]
                             @cursorDelta nc, -1
 
-            @do.cursor newCursors
+            @do.setCursors newCursors
             @do.end()

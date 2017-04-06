@@ -40,7 +40,7 @@ describe 'actions', ->
             'moveCursorsToLineBoundary', 'moveCursorsToWordBoundary'
             'selectSingleRange', 'selectNone', 'selectAll', 'selectInverted'
             'startSelection', 'endSelection', 'startStickySelection', 'endStickySelection'
-            'addRangeToSelection', 'removeFromSelection'
+            'addRangeToSelection'
             ]
             it "#{name}", -> _.isFunction(editor[name]).should.be.true
 

@@ -13,7 +13,7 @@ module.exports =
         return false if ch in ["#"]
         [cl,cr] = @surroundPairs[ch]
         return false if cl.length > 1
-        for cursor in @cursors
+        for cursor in @cursors()
             count = 0
             for c in @line(cursor[1])
                 if c == cl
@@ -57,7 +57,7 @@ module.exports =
         
         if ch == '#' and @fileType == 'coffee' # check if any cursor or selection is inside a string
             found = false
-            for s in @selections
+            for s in @do.selections()
                 if @isRangeInString s
                     found = true
                     break
@@ -124,7 +124,7 @@ module.exports =
                 os[1][1] += cl.length
             
         @do.select @rangesNotEmptyInRanges newSelections
-        @do.cursor newCursors
+        @do.setCursors newCursors
         @do.end()
         return true
 
@@ -144,7 +144,7 @@ module.exports =
             if s.length
                 @do.select s
                 if @do.numSelections()
-                    @do.cursor [@rangeEndPos(last s)], Main: 'closest'
+                    @do.setCursors [@rangeEndPos(last s)], Main: 'closest'
             @do.end()
             
     selectSurround: ->
@@ -152,17 +152,18 @@ module.exports =
             @do.start()
             @do.select surr
             if @do.numSelections()
-                @do.cursor (@rangeEndPos(r) for r in @do.selections()), main: 'closest'
+                @do.setCursors (@rangeEndPos(r) for r in @do.selections()), main: 'closest'
             @do.end()
             
     highlightsSurroundingCursor: ->
         if @numHighlights() % 2 == 0
-            @sortRanges @highlights
+            hs = @highlights()
+            @sortRanges hs # necessary?
             if @numHighlights() == 2
-                return @highlights
+                return hs
             else if @numHighlights() == 4
-                if @areSameRanges [@highlights[1], @highlights[2]], @selections
-                    return [@highlights[0], @highlights[3]]
+                if @areSameRanges [hs[1], hs[2]], @selections()
+                    return [hs[0], hs[3]]
                 else
-                    return [@highlights[1], @highlights[2]]
+                    return [hs[1], hs[2]]
 

@@ -20,7 +20,7 @@ module.exports =
         else
             newCursors = @do.cursors()
         
-        for c in @cursors.reversed()
+        for c in @do.cursors().reversed()
         
             after  = @do.line(c[1]).substr c[0]
             after  = after.trimLeft() if opt?.indent
@@ -88,5 +88,5 @@ module.exports =
             for nc in @positionsFromPosInPositions c, newCursors
                 @cursorDelta nc, nc[1] == c[1] and indent.length - bl or 0, 1
         
-        @do.cursor newCursors
+        @do.setCursors newCursors
         @do.end()

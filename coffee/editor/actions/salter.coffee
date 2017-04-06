@@ -27,7 +27,7 @@ module.exports =
             col = cols[ci]
             @do.start()
             newCursors = ([col, r[0]] for r in rgs)
-            @do.cursor newCursors, main: 'last'
+            @do.setCursors newCursors, main: 'last'
             @do.end()
         else # create new header
             word = opt?.word ? @selectionTextOrWordAtCursor().trim()
@@ -45,7 +45,7 @@ module.exports =
                 @do.insert li, s
                 newCursors.push [s.length, li]
                 li += 1
-            @do.cursor newCursors, main: 'last'
+            @do.setCursors newCursors, main: 'last'
             @do.select []
             @do.end()
         @setSalterMode true
@@ -73,21 +73,22 @@ module.exports =
                 length = cols[ci]-cols[ci-1]
                 for r in rgs
                     @do.change r[0], @do.line(r[0]).splice cols[ci-1], length
-                @do.cursor ([cols[ci-1], r[0]] for r in rgs)
+                @do.setCursors ([cols[ci-1], r[0]] for r in rgs)
     
     checkSalterMode: ->        
         return if not @salterMode
         @setSalterMode false
         return if @numCursors() != 5
-        cp = @cursors[0]
-        for c in @cursors.slice 1
+        cs = @cursors()
+        cp = @cs[0]
+        for c in cs.slice 1
             return if c[0] != cp[0]
             return if c[1] != cp[1]+1
             cp = c
         rgs = @salterRangesAtPos()
-        return if not rgs? or rgs[0][0] != @cursors[0][1]
+        return if not rgs? or rgs[0][0] != @cs[0][1]
         cols = @columnsInSalt (@textInRange r for r in rgs)
-        return if @cursors[0][0] < cols[0]
+        return if @cs[0][0] < cols[0]
         @setSalterMode true
     
     columnsInSalt: (salt) ->
