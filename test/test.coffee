@@ -233,18 +233,18 @@ describe 'medium', ->
             editor.singleCursorAtPos [2,1]
             expect editor.mainCursor()
             .to.eql [2,1]
-            expect editor.cursors
+            expect editor.cursors()
             .to.eql [[2,1]]
-            expect editor.selections
+            expect editor.selections()
             .to.eql []
             
         it "select text", ->
             editor.singleCursorAtPos [3,0], extend:true
             expect editor.mainCursor()
             .to.eql [3,0]
-            expect editor.cursors
+            expect editor.cursors()
             .to.eql [[3,0]]
-            expect editor.selections
+            expect editor.selections()
             .to.eql [[0, [3,5]], [1, [0,2]]]
             expect editor.textOfSelection()
             .to.eql 'lo\nwo'
@@ -501,7 +501,7 @@ describe 'complex', ->
             editor.setMain 4
             undo.reset()
             editor.insertCharacter '-'
-            expect editor.cursors
+            expect editor.cursors()
             .to.eql [[5,0], [10,0], [15,0], [20,0], [25,0]]
             editor.insertCharacter '+'
             expect editor.text()
@@ -550,7 +550,7 @@ describe 'complex', ->
             editor.addCursorAtPos [3,1]
             undo.reset()
             editor.deleteSelection()
-            expect editor.cursors
+            expect editor.cursors()
             .to.eql [[2,0], [3,0]]
 
         it "delete multiple selections", ->
@@ -560,7 +560,7 @@ describe 'complex', ->
             editor.setMain 1
             undo.reset()
             editor.deleteSelection()
-            expect editor.cursors
+            expect editor.cursors()
             .to.eql [[2,0], [3,0]]
             expect editor.text()
             .to.eql '001'
