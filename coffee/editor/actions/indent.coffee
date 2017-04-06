@@ -1,0 +1,39 @@
+# 000  000   000  0000000    00000000  000   000  000000000
+# 000  0000  000  000   000  000       0000  000     000   
+# 000  000 0 000  000   000  0000000   000 0 000     000   
+# 000  000  0000  000   000  000       000  0000     000   
+# 000  000   000  0000000    00000000  000   000     000   
+
+module.exports =
+        
+    indent: ->
+        @do.start()
+        newSelections = @do.selections()
+        newCursors    = @do.cursors()
+        for i in @selectedAndCursorLineIndices()
+            @do.change i, @indentString + @lines[i]
+            for nc in @positionsForLineIndexInPositions i, newCursors
+                @cursorDelta nc, @indentString.length
+            for ns in @rangesForLineIndexInRanges i, newSelections
+                ns[1][0] += @indentString.length
+                ns[1][1] += @indentString.length
+        @do.select newSelections
+        @do.cursor newCursors
+        @do.end()
+
+    deIndent: -> 
+        @do.start()
+        newSelections = @do.selections()
+        newCursors    = @do.cursors()
+        for i in @selectedAndCursorLineIndices()
+            if @lines[i].startsWith @indentString
+                @do.change i, @lines[i].substr @indentString.length
+                lineCursors = @positionsForLineIndexInPositions i, newCursors 
+                for nc in lineCursors
+                    @cursorDelta nc, -@indentString.length
+                for ns in @rangesForLineIndexInRanges i, newSelections
+                    ns[1][0] -= @indentString.length
+                    ns[1][1] -= @indentString.length
+        @do.select newSelections
+        @do.cursor newCursors
+        @do.end()

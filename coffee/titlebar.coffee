@@ -19,7 +19,7 @@ class Titlebar
     
     constructor: () ->
         @elem =$ '.titlebar' 
-        @elem.ondblclick = (event) => ipc.send 'maximizeWindow', window.winID
+        @elem.ondblclick = (event) -> ipc.send 'maximizeWindow', window.winID
         @selected = -1
         $('.body').addEventListener 'focusout', @closeList
         $('.body').addEventListener 'focusin',  @closeList

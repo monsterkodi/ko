@@ -86,7 +86,7 @@ class Term extends Command
         
         @getPWD 'complete'
         
-    resolveDir: (dir) =>
+    resolveDir: (dir) ->
         i = dir.indexOf '$'
         if i >= 0
             for k,v of process.env

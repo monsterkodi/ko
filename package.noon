@@ -1,6 +1,6 @@
 name            ko-editor
 productName     ko
-version         0.9.36
+version         0.10.0
 description     an editor for macOS
 main            js/main.js
 preferGlobal    true
@@ -61,3 +61,15 @@ devDependencies
                 electron-packager  ^8.5.2
                 electron-rebuild  ^1.5.7
                 mocha           ^3.2.0
+coffeelintConfig
+                no_trailing_whitespace
+                  level           ignore
+                  allowed_in_comments  true
+                  allowed_in_empty_lines  true
+                max_line_length
+                  value           150
+                  level           warn
+                  limitComments   false
+                indentation
+                  value   4
+                  level   warn

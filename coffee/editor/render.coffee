@@ -16,7 +16,7 @@ class Render
     # 000      000  000  0000  000     
     # 0000000  000  000   000  00000000
     
-    @line: (diss, size={charWidth:0}) =>
+    @line: (diss, size={charWidth:0}) ->
         l = ""
         if diss?.length
             for di in [diss.length-1..0]
@@ -27,7 +27,7 @@ class Render
                 l = clrzd + l
         l
         
-    @lineDiv: (y, diss, size) =>
+    @lineDiv: (y, diss, size) ->
         
         div = document.createElement 'div'
         div.className = 'line'
@@ -53,7 +53,7 @@ class Render
     # 000       000   000  000   000       000  000   000  000   000       000
     #  0000000   0000000   000   000  0000000    0000000   000   000  0000000 
     
-    @cursors: (cs, size) => # cs: [ [charIndex, lineIndex] ... ]  (lineIndex relative to view)
+    @cursors: (cs, size) -> # cs: [ [charIndex, lineIndex] ... ]  (lineIndex relative to view)
         i = 0
         h = ""
         cw = size.charWidth
@@ -85,7 +85,7 @@ class Render
             p = s
         h
         
-    @selectionSpan: (prev, sel, next, size, clss) =>
+    @selectionSpan: (prev, sel, next, size, clss) ->
                                                                 
         # 0000000     0000000   00000000   0000000    00000000  00000000 
         # 000   000  000   000  000   000  000   000  000       000   000

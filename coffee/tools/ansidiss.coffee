@@ -115,7 +115,7 @@ class AnsiDiss
                     return STYLES["f#{8+i}"]
             c
         
-        ansiCode = (m, c) =>
+        ansiCode = (m, c) ->
             ansiMatch = true
             c = '0' if c.trim().length is 0            
             cs = c.trimRight(';').split(';')            

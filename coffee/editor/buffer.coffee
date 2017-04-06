@@ -55,7 +55,7 @@ class Buffer extends multi event, ranges
     setCursors:    (c) -> @state = @state.setCursors(c);    @cursors    = @state.cursors()
     setSelections: (s) -> @state = @state.setSelections(s); @selections = @state.selections()
     setHighlights: (h) -> @state = @state.setHighlights(h); @highlights = @state.highlights()
-    setMain:       (m) -> @state = @state.setMain(m);
+    setMain:       (m) -> @state = @state.setMain(m)
     
     addHighlight:  (h) -> 
         @highlights.push h

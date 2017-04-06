@@ -162,15 +162,11 @@ class Open extends Command
                 
         if opt?.flat
             w = extensionBonus + relBonus + baseBonus - lengthPenalty
-            # log "flat: #{w} = #{extensionBonus} + #{relBonus} + #{baseBonus} - #{lengthPenalty} #{f} #{r} #{opt?.currentText}"
         else
             w = localBonus + relBonus + baseBonus + directoryBonus + extensionBonus - lengthPenalty
-            # log "local: #{w} = #{localBonus} + #{relBonus} + #{baseBonus} + #{directoryBonus} + #{extensionBonus} - #{lengthPenalty} #{f} #{r} #{opt?.currentText}"
         w
 
-    weightedItems: (items, opt) -> 
-        # log "weightedItems #{items.length}", opt
-        _.sortBy items, (o) => 0xffffffff - @weight o, opt
+    weightedItems: (items, opt) -> _.sortBy items, (o) => 0xffffffff - @weight o, opt
     
     # 000      000   0000000  000000000
     # 000      000  000          000   

@@ -69,7 +69,7 @@ class Command
             @select 0
             @positionList()
 
-    weight: (item, opt) =>
+    weight: (item, opt) ->
         w = 0
         w += item.text.startsWith(opt.currentText) and 0x0000ffff * (opt.currentText.length/item.text.length) or 0 
         w

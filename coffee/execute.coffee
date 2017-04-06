@@ -57,7 +57,7 @@ class Execute
             console.log 'wtf?'
             console.error colors.red.bold '[ERROR]', colors.red e
     
-    execute: (code) =>
+    execute: (code) ->
         try
             coffee.eval code
         catch e

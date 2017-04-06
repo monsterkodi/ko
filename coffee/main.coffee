@@ -127,19 +127,19 @@ hideDock = ->
 # 000  000        000     
 # 000  000         0000000
 
-ipc.on 'alias',                  (event, dict)   => main.alias event, dict
-ipc.on 'newWindowWithFile',      (event, file)   => main.newWindowWithFile file
-ipc.on 'activateWindowWithFile', (event, file)   => event.returnValue = main.activateWindowWithFile file
-ipc.on 'toggleDevTools',         (event)         => event.sender.toggleDevTools()
-ipc.on 'execute',                (event, arg)    => event.sender.send 'executeResult', coffeeExecute.execute arg
-ipc.on 'restartShell',           (event, cfg)    => winShells[cfg.winID].restartShell()
-ipc.on 'executeCoffee',          (event, cfg)    => coffeeExecute.executeCoffee cfg
-ipc.on 'maximizeWindow',         (event, winID)  => main.toggleMaximize winWithID winID
-ipc.on 'activateWindow',         (event, winID)  => main.activateWindowWithID winID
-ipc.on 'reloadWindow',           (event, winID)  => main.reloadWin winWithID winID
-ipc.on 'navigate',               (event, action) => event.returnValue = navigate.action action
-ipc.on 'indexer',                (event, item)   => event.returnValue = main.indexer[item]
-ipc.on 'winInfos',               (event)         => 
+ipc.on 'alias',                  (event, dict)   -> main.alias event, dict
+ipc.on 'newWindowWithFile',      (event, file)   -> main.newWindowWithFile file
+ipc.on 'activateWindowWithFile', (event, file)   -> event.returnValue = main.activateWindowWithFile file
+ipc.on 'toggleDevTools',         (event)         -> event.sender.toggleDevTools()
+ipc.on 'execute',                (event, arg)    -> event.sender.send 'executeResult', coffeeExecute.execute arg
+ipc.on 'restartShell',           (event, cfg)    -> winShells[cfg.winID].restartShell()
+ipc.on 'executeCoffee',          (event, cfg)    -> coffeeExecute.executeCoffee cfg
+ipc.on 'maximizeWindow',         (event, winID)  -> main.toggleMaximize winWithID winID
+ipc.on 'activateWindow',         (event, winID)  -> main.activateWindowWithID winID
+ipc.on 'reloadWindow',           (event, winID)  -> main.reloadWin winWithID winID
+ipc.on 'navigate',               (event, action) -> event.returnValue = navigate.action action
+ipc.on 'indexer',                (event, item)   -> event.returnValue = main.indexer[item]
+ipc.on 'winInfos',               (event)         -> 
     infos = []
     for w in wins()
         infos.push 
@@ -147,13 +147,13 @@ ipc.on 'winInfos',               (event)         =>
             file: w.currentFile            
     event.returnValue = infos
 
-ipc.on 'fileLoaded', (event, file, winID) => 
+ipc.on 'fileLoaded', (event, file, winID) -> 
     winWithID(winID).currentFile = file 
     main.indexer.indexFile file
 
-ipc.on 'fileSaved', (event, file, winID) => main.indexer.indexFile file, refresh: true
+ipc.on 'fileSaved', (event, file, winID) -> main.indexer.indexFile file, refresh: true
 
-ipc.on 'winFileLinesChanged', (event, winID, file, lineChanges) => 
+ipc.on 'winFileLinesChanged', (event, winID, file, lineChanges) -> 
     return if not winID
     for w in wins()
         if w.id != winID
@@ -161,7 +161,7 @@ ipc.on 'winFileLinesChanged', (event, winID, file, lineChanges) =>
             
 winShells = {}
 
-ipc.on 'shellCommand', (event, cfg) => 
+ipc.on 'shellCommand', (event, cfg) -> 
     if winShells[cfg.winID]?
         winShells[cfg.winID].term cfg
     else
@@ -246,24 +246,24 @@ class Main
         else
             @createWindow()
 
-    hideWindows: =>
+    hideWindows: ->
         for w in wins()
             w.hide()
             hideDock()
             
-    showWindows: =>
+    showWindows: ->
         for w in wins()
             w.show()
             app.dock.show()
             
-    raiseWindows: =>
+    raiseWindows: ->
         if visibleWins().length
             for w in visibleWins()
                 w.showInactive()
             visibleWins()[0].showInactive()
             visibleWins()[0].focus()
 
-    activateNextWindow: (win) =>
+    activateNextWindow: (win) ->
         allWindows = wins()
         for w in allWindows
             if w == win
@@ -272,7 +272,7 @@ class Main
                 @activateWindowWithID allWindows[i].id
                 return
 
-    activateWindowWithID: (wid) =>
+    activateWindowWithID: (wid) ->
         w = winWithID wid
         return if not w?
         if not w.isVisible() 
@@ -280,7 +280,7 @@ class Main
         else
             w.focus()
 
-    activateWindowWithFile: (file) =>
+    activateWindowWithFile: (file) ->
         [file, pos] = splitFilePos file
         for w in wins()
             if w.currentFile == file
@@ -294,7 +294,7 @@ class Main
             if w != activeWin()
                 @closeWindow w
     
-    closeWindow: (w) => w?.close()
+    closeWindow: (w) -> w?.close()
     
     closeWindows: =>
         for w in wins()
@@ -447,7 +447,7 @@ class Main
         win.on 'close',  @onCloseWin
         win.on 'resize', @onResizeWin
                                         
-        winLoaded = =>
+        winLoaded = ->
             if openFile?
                 win.currentFile = splitFilePos(openFile)[0]
                 win.webContents.send 'loadFile', openFile
@@ -471,7 +471,7 @@ class Main
     # 000   000  000            000  000   000     000     
     # 000   000  00000000  0000000   000  0000000  00000000
     
-    onResizeWin: (event) => 
+    onResizeWin: (event) -> 
         return if disableSnap
         frameSize = 6
         wb = event.sender.getBounds()
@@ -496,7 +496,7 @@ class Main
                             width:  b.x+b.width - (wb.x+wb.width-frameSize)
                             height: b.height
     
-    onCloseWin: (event) =>
+    onCloseWin: (event) ->
         prefs.del "windows:#{event.sender.id}"
         if visibleWins().length == 1
             hideDock()
@@ -519,7 +519,7 @@ class Main
             w = @activateWindowWithFile file
             w = @createWindow file if not w?
                     
-    quit: => 
+    quit: -> 
         app.exit     0
         process.exit 0
     
@@ -529,7 +529,7 @@ class Main
     # 000   000  000      000  000   000       000
     # 000   000  0000000  000  000   000  0000000 
     
-    alias: (event, dict) =>
+    alias: (event, dict) ->
         aliasFile = "#{app.getPath('userData')}/alias.noon"
         if dict?
             noon.save aliasFile, dict
@@ -544,7 +544,7 @@ class Main
     # 000   000  000   000  000   000  000   000     000   
     # 000   000  0000000     0000000    0000000      000   
     
-    showAbout: => about img: "#{__dirname}/../img/about.png", pkg: pkg   
+    showAbout: -> about img: "#{__dirname}/../img/about.png", pkg: pkg   
             
 #  0000000   00000000   00000000         0000000   000   000
 # 000   000  000   000  000   000       000   000  0000  000

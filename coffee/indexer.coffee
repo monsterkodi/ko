@@ -150,7 +150,7 @@ class Indexer
     removeFile: (file) ->
         return if not @files[file]?
         for name,infos of @funcs
-            _.remove infos, (v) => v.file == file
+            _.remove infos, (v) -> v.file == file
             delete @funcs[name] if not infos.length
         @classes = _.omitBy @classes, (v) -> v.file == file
         delete @files[file]
@@ -188,7 +188,12 @@ class Indexer
                     while funcStack.length and indent <= last(funcStack)[0]
                         last(funcStack)[1].last = li - 1
                         funcInfo = funcStack.pop()
-                        fileInfo.funcs.push [funcInfo[1].line, funcInfo[1].last, funcInfo[2], funcInfo[1].class ? path.basename file, path.extname file]
+                        fileInfo.funcs.push [
+                            funcInfo[1].line
+                            funcInfo[1].last
+                            funcInfo[2]
+                            funcInfo[1].class ? path.basename file, path.extname file
+                        ]
 
                     if currentClass? and indent == 4
 

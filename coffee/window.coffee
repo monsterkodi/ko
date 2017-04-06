@@ -79,18 +79,18 @@ delState = window.delState = (key)        -> prefs.del "windows:#{winID}:#{key}"
 # 000  000        000     
 # 000  000         0000000
 
-ipc.on 'shellCommandData',  (event, cmdData) => commandline.commands['term'].onShellCommandData cmdData
-ipc.on 'shellCallbackData', (event, cmdData) => commandline.commands['term'].onShellCallbackData cmdData
-ipc.on 'singleCursorAtPos', (event, pos, opt) => 
+ipc.on 'shellCommandData',  (event, cmdData) -> commandline.commands['term'].onShellCommandData cmdData
+ipc.on 'shellCallbackData', (event, cmdData) -> commandline.commands['term'].onShellCallbackData cmdData
+ipc.on 'singleCursorAtPos', (event, pos, opt) -> 
     editor.singleCursorAtPos pos, opt
     editor.scrollCursorToTop()
-ipc.on 'openFile',          (event, options) => openFile options
-ipc.on 'focusEditor',       (event) => split.focus '.editor'
-ipc.on 'cloneFile',  => ipc.send 'newWindowWithFile', editor.currentFile
-ipc.on 'reloadFile', => reloadFile()
-ipc.on 'saveFileAs', => saveFileAs()
-ipc.on 'saveFile',   => saveFile()
-ipc.on 'loadFile', (event, file) => loadFile file
+ipc.on 'openFile',          (event, options) -> openFile options
+ipc.on 'focusEditor',       (event) -> split.focus '.editor'
+ipc.on 'cloneFile',  -> ipc.send 'newWindowWithFile', editor.currentFile
+ipc.on 'reloadFile', -> reloadFile()
+ipc.on 'saveFileAs', -> saveFileAs()
+ipc.on 'saveFile',   -> saveFile()
+ipc.on 'loadFile', (event, file) -> loadFile file
 
 # 000   000  000  000   000  00     00   0000000   000  000   000  
 # 000 0 000  000  0000  000  000   000  000   000  000  0000  000  
@@ -111,7 +111,7 @@ winMain = ->
         
     fps.toggle() if getState 'fps'
     
-ipc.on 'fileLinesChanged', (event, file, lineChanges) =>
+ipc.on 'fileLinesChanged', (event, file, lineChanges) ->
     if file == editor.currentFile
         editor.applyForeignLineChanges lineChanges
                  
@@ -121,7 +121,7 @@ ipc.on 'fileLinesChanged', (event, file, lineChanges) =>
 #      000  000   000     000     000     
 # 0000000   000   000      0      00000000
 
-saveFile = (file) =>
+saveFile = (file) ->
     file ?= editor.currentFile
     if not file?
         saveFileAs()
@@ -134,7 +134,7 @@ saveFile = (file) =>
     else
         mode = 438
         
-    atomicFile file, editor.text(), { encoding: 'utf8', mode: mode }, (err) =>
+    atomicFile file, editor.text(), { encoding: 'utf8', mode: mode }, (err) ->
         editor.setCurrentFile null, keepUndo: true # to store scroll
         if err?
             alert err
@@ -145,8 +145,8 @@ saveFile = (file) =>
 
 saveChanges = ->
     if editor.currentFile? and editor.do.hasLineChanges() and fileExists editor.currentFile
-        atomicFile editor.currentFile, _.clone(editor.text()), encoding: 'utf8', (err) =>
-                if err? then log "saving changes to #{file} failed", err
+        atomicFile editor.currentFile, _.clone(editor.text()), encoding: 'utf8', (err) ->
+            if err? then log "saving changes to #{file} failed", err
 
 # 000       0000000    0000000   0000000  
 # 000      000   000  000   000  000   000
@@ -154,14 +154,14 @@ saveChanges = ->
 # 000      000   000  000   000  000   000
 # 0000000   0000000   000   000  0000000  
 
-reloadFile = =>
+reloadFile = ->
     loadFile editor.currentFile, 
         reload:          true
         dontSave:        true
         dontSaveCursors: true
         keepUndo:        false
 
-loadFile = (file, opt={}) =>
+loadFile = (file, opt={}) ->
     return if not file? or not file.length
     [file,pos] = splitFilePos file
     file = resolve file
@@ -200,7 +200,7 @@ openFile = loadFile
 # 000   000  000        000       000  0000        000       000  000      000            000
 #  0000000   000        00000000  000   000        000       000  0000000  00000000  0000000 
 
-openFiles = (ofiles, options) => # called from file dialog and open command
+openFiles = (ofiles, options) -> # called from file dialog and open command
     if ofiles?.length
         files = fileList ofiles, ignoreHidden: false
         if files.length >= 10
@@ -235,7 +235,7 @@ window.loadFile  = loadFile
 # 000   000  000  000   000  000      000   000  000   000
 # 0000000    000  000   000  0000000   0000000    0000000 
 
-openFile = (options) =>
+openFile = (options) ->
     dir = path.dirname editor.currentFile if editor.currentFile
     dir ?= resolve '.'
     dialog.showOpenDialog 
@@ -244,20 +244,22 @@ openFile = (options) =>
         properties: ['openFile', 'openDirectory', 'multiSelections']
         filters: [
             name: 'Coffee-Script', extensions: ['coffee']
+        ,
             name: 'All Files', extensions: ['*']
         ]
-        , (files) => openFiles files, options
+        , (files) -> openFiles files, options
 
-saveFileAs = =>
+saveFileAs = ->
     dialog.showSaveDialog 
         title: "Save File As"
         defaultPath: editor.currentFile
         properties: ['openFile', 'createDirectory']
         filters: [
             name: 'Coffee-Script', extensions: ['coffee']
+        ,
             name: 'All Files', extensions: ['*']
         ]
-        , (file) => 
+        , (file) -> 
             if file
                 addToRecent file
                 saveFile file
@@ -272,7 +274,7 @@ navigate = window.navigate = new Navigate
 # 0000000   000        0000000  000     000   
 
 split = window.split = new Split()
-split.on 'split', =>
+split.on 'split', ->
     area.resized()
     terminal.resized()
     commandline.resized()
@@ -280,7 +282,7 @@ split.on 'split', =>
     logview.resized()
 
 terminal = window.terminal = new Terminal '.terminal'
-terminal.on 'fileLineChange', (file, lineChange) =>
+terminal.on 'fileLineChange', (file, lineChange) ->
     ipc.send 'winFileLinesChanged', -1, file, [lineChange]
 
 area        = window.area        = new Area '.area'
@@ -292,7 +294,7 @@ info        = window.info        = new Info editor
 editor.setText editorText if editorText?
 editor.view.focus()
 
-editor.on 'changed', (changeInfo) =>
+editor.on 'changed', (changeInfo) ->
     return if changeInfo.foreign
     if changeInfo.changes.length
         ipc.send 'winFileLinesChanged', winID, editor.currentFile, changeInfo.changes
@@ -320,7 +322,7 @@ fps = window.fps = new FPS()
 # 000   000  000            000  000   000     000     
 # 000   000  00000000  0000000   000  0000000  00000000
 
-screenSize = => electron.screen.getPrimaryDisplay().workAreaSize
+screenSize = -> electron.screen.getPrimaryDisplay().workAreaSize
 
 initSplit = -> 
     if not split.winID?
@@ -336,11 +338,11 @@ window.onresize = ->
         screenWidth = screenSize().width
         editor.centerText sw() == screenWidth, 0
 
-window.onload = => 
+window.onload = -> 
     initSplit()
     info.reload()
     
-window.onunload = => 
+window.onunload = -> 
     saveChanges()
     editor.setCurrentFile null, noSaveScroll: true # to stop watcher
 
@@ -363,7 +365,7 @@ screenShot = ->
 # 000       000       000  0000     000     000       000   000         000     000        000 000      000   
 #  0000000  00000000  000   000     000     00000000  000   000         000     00000000  000   000     000   
 
-toggleCenterText = =>
+toggleCenterText = ->
     if not getState 'centerText', false
         setState 'centerText', true
         editor.centerText sw() == screenSize().width
@@ -377,15 +379,15 @@ toggleCenterText = =>
 # 000       000   000  000  0000     000             000  000   000     000     
 # 000        0000000   000   000     000        0000000   000  0000000  00000000
     
-setFontSize = (s) => 
+setFontSize = (s) -> 
     s = clamp 8, 80, s
     setState "fontSize", s
     editor.setFontSize s
     loadFile editor.currentFile, reload:true if editor.currentFile?
     
-changeFontSize = (d) => setFontSize editor.size.fontSize + d
+changeFontSize = (d) -> setFontSize editor.size.fontSize + d
     
-resetFontSize = => 
+resetFontSize = -> 
     delState 'fontSize'
     setFontSize editor.fontSizeDefault
 

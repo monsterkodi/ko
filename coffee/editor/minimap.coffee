@@ -153,7 +153,9 @@ class Minimap
     drawTopBot: =>
         lh = @scroll.lineHeight/2
         tb = (@editor.scroll.bot-@editor.scroll.top+1)*lh
-        ty = @editor.scroll.scrollMax and (Math.min(0.5*@scroll.viewHeight, @scroll.numLines*2)-tb) * (@editor.scroll.scroll / @editor.scroll.scrollMax) or 0
+        ty = 0
+        if @editor.scroll.scrollMax
+            ty = (Math.min(0.5*@scroll.viewHeight, @scroll.numLines*2)-tb) * @editor.scroll.scroll / @editor.scroll.scrollMax
         @topbot.style.height = "#{tb}px"
         @topbot.style.top    = "#{ty}px"
        

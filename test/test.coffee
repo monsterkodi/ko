@@ -250,7 +250,7 @@ describe 'medium', ->
             .to.eql 'lo\nwo'
         
         it "replace selection on input", ->
-            editor.insertUserCharacter '-'
+            editor.insertCharacter '-'
             expect editor.text()
             .to.eql 'hel-rld'
 
@@ -314,7 +314,7 @@ describe 'complex', ->
             afterEach undoRedo
             
             it "break lines", ->
-                editor.insertUserCharacter '\n'
+                editor.insertCharacter '\n'
                 expect editor.lines 
                 .to.eql [
                     '0000', '11', '11', '22', '22', '33', '33', '44', '44', '5555'
@@ -337,7 +337,7 @@ describe 'complex', ->
             afterEach undoRedo
             
             it "break line", ->
-                editor.insertUserCharacter '\n'
+                editor.insertCharacter '\n'
                 expect editor.lines 
                 .to.eql [
                     '0000', '1', '1', '1', '1', '2222'
@@ -360,7 +360,7 @@ describe 'complex', ->
             afterEach undoRedo
             
             it "break mixed", ->
-                editor.insertUserCharacter '\n'
+                editor.insertCharacter '\n'
                 expect editor.lines 
                 .to.eql [
                     '0000', '1', '11', '1', '2', '22', '2', '3333', '4', '44', '4', '5', '55', '5'
@@ -385,7 +385,7 @@ describe 'complex', ->
             editor.setMain       1
             editor.setSelections [[0, [1,4]], [0, [6,9]]]
             undo.reset()
-            editor.insertUserCharacter '-'
+            editor.insertCharacter '-'
             expect editor.text()
             .to.eql '0-45-9'
         
@@ -395,7 +395,7 @@ describe 'complex', ->
             editor.setMain       1
             editor.setSelections [[1, [1,2]], [2, [1,3]]]
             undo.reset()
-            editor.insertUserCharacter '-'
+            editor.insertCharacter '-'
             expect editor.lines 
             .to.eql [
                 '0000', '1-11', '2-2', '3333'
@@ -408,7 +408,7 @@ describe 'complex', ->
             editor.setSelections [[1, [1,2]], [1, [3,4]], [2, [1,3]]]
             undo.reset()
             
-            editor.insertUserCharacter '-'
+            editor.insertCharacter '-'
             expect editor.lines 
             .to.eql [
                 '0000', '1-1-', '2-2', '3333'
@@ -428,7 +428,7 @@ describe 'complex', ->
             editor.singleCursorAtPos [2,3], extend:true
             undo.reset()
             
-            editor.insertUserCharacter '-'
+            editor.insertCharacter '-'
             expect editor.text()
             .to.eql '00-33'
             
@@ -449,7 +449,7 @@ describe 'complex', ->
             editor.moveMainCursor 'down', erase:true
             editor.moveCursors 'down', true
             undo.reset()
-            editor.insertUserCharacter '-'
+            editor.insertCharacter '-'
             expect editor.text()
             .to.eql '0000\n11-22\n33-44\n5555'
 
@@ -473,7 +473,7 @@ describe 'complex', ->
             editor.moveCursors 'down', true
             editor.moveCursors 'down', true
             undo.reset()
-            editor.insertUserCharacter '-'
+            editor.insertCharacter '-'
             expect editor.text()
             .to.eql '0000\n11-33\n4444\n55-77\n8888'
             
@@ -500,10 +500,10 @@ describe 'complex', ->
             editor.setCursors [[4,0], [8,0], [12,0], [16,0], [20,0]]
             editor.setMain 4
             undo.reset()
-            editor.insertUserCharacter '-'
+            editor.insertCharacter '-'
             expect editor.cursors
             .to.eql [[5,0], [10,0], [15,0], [20,0], [25,0]]
-            editor.insertUserCharacter '+'
+            editor.insertCharacter '+'
             expect editor.text()
             .to.eql '0000-+1111-+2222-+3333-+4444-+5555'
 
@@ -529,7 +529,7 @@ describe 'complex', ->
             editor.singleCursorAtPos [2,1], extend:true
             editor.addCursorAtPos [2,2]
             undo.reset()
-            editor.insertUserCharacter '-'
+            editor.insertCharacter '-'
             expect editor.text()
             .to.eql '00-11\n22-22'
             
@@ -571,7 +571,7 @@ describe 'complex', ->
             editor.singleCursorAtPos [2,1], extend:true
             editor.addCursorAtPos [3,1]
             undo.reset()
-            editor.insertUserCharacter '-'
+            editor.insertCharacter '-'
             expect editor.text()
             .to.eql '00-1-1'
             

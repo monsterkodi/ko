@@ -654,7 +654,7 @@ class ViewBase extends Editor
             when 'command+esc'              then return @startStickySelection()
             when 'tab'                      then return stop event, @insertTab()
             when 'shift+tab'                then return stop event, @deleteTab()
-            when 'enter'                    then return @insertUserCharacter '\n'
+            when 'enter'                    then return @insertCharacter '\n'
             when 'command+enter'            then return @moveCursorsToLineBoundary('right') and @insertNewline indent: true
             when 'alt+enter'                then return post.emit 'jumpTo', @wordAtCursor()
             when 'command+]'                then return @indent()
@@ -711,10 +711,10 @@ class ViewBase extends Editor
             when 'command+shift+left', 'command+shift+right' then return @moveCursorsToLineBoundary key, true
             when 'command+shift+up',   'command+shift+down'  then return @delCursors    key
             when 'alt+ctrl+shift+right'                      then return @alignCursorsAndText()
-            when 'alt+ctrl+up',   'alt+ctrl+down',   'alt+ctrl+left',   'alt+ctrl+right'        then return @alignCursors  key
-            when 'ctrl+up',       'ctrl+down',       'ctrl+left',       'ctrl+right'            then return @moveMainCursor key
-            when 'ctrl+shift+up', 'ctrl+shift+down', 'ctrl+shift+left', 'ctrl+shift+right'      then return @moveMainCursor key, erase: true
-            when 'alt+left',       'alt+right',      'alt+shift+left',  'alt+shift+right'       then return @moveCursorsToWordBoundary key, event.shiftKey
+            when 'alt+ctrl+up',   'alt+ctrl+down',   'alt+ctrl+left',   'alt+ctrl+right'   then return @alignCursors  key
+            when 'ctrl+up',       'ctrl+down',       'ctrl+left',       'ctrl+right'       then return @moveMainCursor key
+            when 'ctrl+shift+up', 'ctrl+shift+down', 'ctrl+shift+left', 'ctrl+shift+right' then return @moveMainCursor key, erase: true
+            when 'alt+left',       'alt+right',      'alt+shift+left',  'alt+shift+right'  then return @moveCursorsToWordBoundary key, event.shiftKey
             when 'down', 'right', 'up', 'left', 'shift+down', 'shift+right', 'shift+up', 'shift+left' 
                 @moveCursors key, event.shiftKey
                 stop event
@@ -736,6 +736,6 @@ class ViewBase extends Editor
             
         ansiKeycode = require 'ansi-keycode'
         if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
-            @insertUserCharacter ansiKeycode event
+            @insertCharacter ansiKeycode event
 
 module.exports = ViewBase

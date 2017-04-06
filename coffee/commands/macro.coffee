@@ -103,7 +103,6 @@ class Macro extends Command
             when 'help'
                 terminal = window.terminal
                 terminal.output noon.stringify noon.load("#{__dirname}/../../bin/cheet.noon"),
-                    colors:   true
                     align:    true
                     maxalign: 20
                     colors:
@@ -224,7 +223,7 @@ class Macro extends Command
                 module.exports = #{clss}
                 
                 """
-                atomicFile file, text, encoding: 'utf8', (err) =>
+                atomicFile file, text, encoding: 'utf8', (err) ->
                     if err?
                         log 'writing class skeleton failed', err
                         return

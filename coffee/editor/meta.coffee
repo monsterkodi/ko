@@ -64,7 +64,7 @@ class Meta
     saveFileLineMetas: (file, lineMetas) ->
         # log "Meta.saveFileLineMetas file:#{file} lineMetas:", lineMetas
         # log "Meta.saveFileLineMetas file:#{file}"
-        fs.readFile file, encoding: 'utf8', (err, data) =>
+        fs.readFile file, encoding: 'utf8', (err, data) ->
             if err?
                 log "Meta.saveFileLineMetas [ERROR] readFile err:#{err}"
                 return
@@ -74,7 +74,7 @@ class Meta
                 lines[lineMeta[0]] = lineMeta[1]
             # log "Meta.saveFileLineMetas 2 lines:", lines
             data = lines.join '\n'
-            fs.writeFile file, data, encoding: 'utf8', (err) =>
+            fs.writeFile file, data, encoding: 'utf8', (err) ->
                 if err?
                     log "Meta.saveFileLineMetas [ERROR] writeFile err:#{err}"
                     return
@@ -167,7 +167,7 @@ class Meta
     # 000       000      000  000       000  000 
     #  0000000  0000000  000   0000000  000   000
     
-    onClick: (event) =>
+    onClick: (event) ->
         if not event.altKey
             if event.target.href?
                 split = event.target.href.split ':'

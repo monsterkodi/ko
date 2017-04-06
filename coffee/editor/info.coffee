@@ -47,7 +47,7 @@ class Info
         
         @selecti = document.createElement 'span'
         @selecti.className = "info-selections"
-        @selecti.onclick = => @editor.focus() + @editor.clearSelections()
+        @selecti.onclick = => @editor.focus() + @editor.selectNone()
         @topline.appendChild @selecti
 
         @highlig = document.createElement 'span'

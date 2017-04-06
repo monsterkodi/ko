@@ -15,16 +15,16 @@ Menu  = require('electron').Menu
 
 class MainMenu
     
-    @init: (main) -> 
+    @init: (main) ->
         
-        fileLabel = (f) -> 
+        fileLabel = (f) ->
             return path.basename(f) + ' - ' + unresolve path.dirname(f) if f?
             "untitled"
     
         recent = []
         for f in prefs.get 'recentFiles', []
             if fs.existsSync f
-                recent.unshift 
+                recent.unshift
                     label: fileLabel f
                     path: f
                     click: (i) -> main.createWindow i.path
@@ -33,7 +33,7 @@ class MainMenu
                 type: 'separator'
             recent.push
                 label: 'Clear List'
-                click: (i) -> 
+                click: (i) ->
                     prefs.set 'recentFiles', []
                     MainMenu.init main
 
@@ -79,37 +79,37 @@ class MainMenu
             submenu: [
                 label:       'New File'
                 accelerator: 'Command+N'
-                click:       => main.createWindow()
+                click:       -> main.createWindow()
             ,
                 label:       'New Window'
                 accelerator: 'Command+Shift+N'
-                click:       (i,win) => win?.webContents.send "cloneFile"
+                click:       (i,win) -> win?.webContents.send "cloneFile"
             ,
                 label:       'Open...'
                 accelerator: 'CmdOrCtrl+O'
-                click:       (i,win) => win?.webContents.send "openFile"
+                click:       (i,win) -> win?.webContents.send "openFile"
             ,
                 label:       'Open In New Window...'
                 accelerator: 'CmdOrCtrl+Shift+O'
-                click:       (i,win) => win?.webContents.send "openFile", newWindow: true
+                click:       (i,win) -> win?.webContents.send "openFile", newWindow: true
             ,
                 label:       'Open Recent'
                 submenu:     recent
             ,
                 label:       'Save'
                 accelerator: 'Command+S'
-                click:       (i,win) => win?.webContents.send 'saveFile'
+                click:       (i,win) -> win?.webContents.send 'saveFile'
             ,            
                 label:       'Save As ...'
                 accelerator: 'Command+Shift+S'
-                click:       (i,win) => win?.webContents.send 'saveFileAs'
+                click:       (i,win) -> win?.webContents.send 'saveFileAs'
             ,
             
                 type: 'separator'
             ,
                 label:       'Reload'
                 accelerator: 'CmdOrCtrl+R'
-                click:       (i,win) => win?.webContents.send "reloadFile"
+                click:       (i,win) -> win?.webContents.send "reloadFile"
             ,
                 label:       'Close Window'
                 accelerator: 'Command+W'
