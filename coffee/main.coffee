@@ -224,14 +224,7 @@ class Main
     activeWin:   activeWin
     visibleWins: visibleWins
             
-    reloadWin: (win) ->
-        if win?
-            dev = win.webContents.isDevToolsOpened()
-            if dev
-                win.webContents.closeDevTools()
-                setTimeout win.webContents.reloadIgnoringCache, 100
-            else
-                win.webContents.reloadIgnoringCache()
+    reloadWin: (win) -> win?.webContents.reloadIgnoringCache()
 
     toggleMaximize: (win) ->
         disableSnap = true

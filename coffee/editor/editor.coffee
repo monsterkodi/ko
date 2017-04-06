@@ -4,6 +4,7 @@
 # 000       000   000  000     000     000   000  000   000
 # 00000000  0000000    000     000      0000000   000   000
 {
+fileList,
 extName,
 clamp,
 first,
@@ -22,7 +23,12 @@ _       = require 'lodash'
 
 class Editor extends Buffer
 
+    @actions = null
+
     constructor: () ->
+
+        Editor.initActions() if not Editor.actions?
+            
         @surroundStack      = []
         @surroundCharacters = []
         @surroundPairs      = Object.create null
@@ -34,6 +40,21 @@ class Editor extends Buffer
         super
         @do                 = new undo @
         @setupFileType()
+
+    @initActions: ->
+        @actions = []
+        for actionFile in fileList path.join __dirname, 'actions'
+            actions = require actionFile
+            for key,value of actions
+                if _.isFunction value
+                    @prototype[key] = value
+                else if key == 'info'
+                    @actions.push value
+                else if key == 'infos'
+                    for k,v of value
+                       @actions.push v
+                    
+        log @actions
 
     #  0000000   00000000   00000000   000      000   000
     # 000   000  000   000  000   000  000       000 000 
@@ -430,54 +451,7 @@ class Editor extends Buffer
             @do.start()
             @do.cursor [@rangeStartPos first invertedRanges]
             @do.select invertedRanges
-            @do.end()
-    
-    # 00000000  000   000  000      000            000      000  000   000  00000000   0000000
-    # 000       000   000  000      000            000      000  0000  000  000       000     
-    # 000000    000   000  000      000            000      000  000 0 000  0000000   0000000 
-    # 000       000   000  000      000            000      000  000  0000  000            000
-    # 000        0000000   0000000  0000000        0000000  000  000   000  00000000  0000000 
-
-    selectMoreLines: ->
-        @do.start()
-        newCursors    = @do.cursors()
-        newSelections = @do.selections()
-        
-        selectCursorLineAtIndex = (c,i) =>
-            range = [i, [0, @do.line(i).length]] 
-            newSelections.push range
-            @cursorSet c, @rangeEndPos range
-            
-        start = false
-        for c in newCursors
-            if not @isSelectedLineAtIndex c[1]
-                selectCursorLineAtIndex c, c[1]
-                start = true
-                
-        if not start
-            for c in newCursors
-                selectCursorLineAtIndex c, c[1]+1 if c[1] < @numLines()-1
-                
-        @do.select newSelections
-        @do.cursor newCursors
-        @do.end()       
-
-    selectLessLines: -> 
-        @do.start()
-        newCursors    = @do.cursors()
-        newSelections = @do.selections()
-        
-        for c in newCursors.reversed()
-            thisSel = @selectionsInLineAtIndex(c[1])
-            if thisSel.length
-                if @isSelectedLineAtIndex c[1]-1
-                    s = @selectionsInLineAtIndex(c[1]-1)[0]
-                    @cursorSet c, s[1][1], s[0]
-                newSelections.splice @indexOfSelection(thisSel[0]), 1
-
-        @do.select newSelections
-        @do.cursor newCursors
-        @do.end()       
+            @do.end()     
 
     moveLines: (dir='down') ->
         
@@ -1470,144 +1444,5 @@ class Editor extends Buffer
         @do.cursor newCursors
         @do.end()
         @checkSalterMode()
-        
-    deleteTab: ->
-        if @numSelections()
-            @deIndent()
-        else
-            @do.start()
-            newCursors = @do.cursors()
-            for c in newCursors
-                if c[0]
-                    n = (c[0] % @indentString.length) or @indentString.length
-                    t = @do.textInRange [c[1], [c[0]-n, c[0]]]
-                    if t.trim().length == 0
-                        @do.change c[1], @do.line(c[1]).splice c[0]-n, n
-                        @cursorDelta c, -n
-            @do.cursor newCursors
-            @do.end()
-    
-    # 00000000   0000000   00000000   000   000   0000000   00000000   0000000  
-    # 000       000   000  000   000  000 0 000  000   000  000   000  000   000
-    # 000000    000   000  0000000    000000000  000000000  0000000    000   000
-    # 000       000   000  000   000  000   000  000   000  000   000  000   000
-    # 000        0000000   000   000  00     00  000   000  000   000  0000000  
-    
-    deleteForward: ->
-        if @numSelections()
-            @deleteSelection()
-        else
-            @do.start()
-            newCursors = @do.cursors()
-            for c in newCursors.reversed()
-            
-                if @isCursorAtEndOfLine c # cursor at end of line
-                    if not @isCursorInLastLine c # cursor not in first line
-                    
-                        ll = @lines[c[1]].length
-                    
-                        @do.change c[1], @lines[c[1]] + @lines[c[1]+1]
-                        @do.delete c[1]+1
-                                    
-                        # move cursors in joined line
-                        for nc in @positionsForLineIndexInPositions c[1]+1, newCursors
-                            @cursorDelta nc, ll, -1
-                        # move cursors below deleted line up
-                        for nc in @positionsBelowLineIndexInPositions c[1]+1, newCursors
-                            @cursorDelta nc, 0, -1
-                else
-                    @do.change c[1], @lines[c[1]].splice c[0], 1
-                    for nc in @positionsForLineIndexInPositions c[1], newCursors
-                        if nc[0] > c[0]
-                            @cursorDelta nc, -1
-
-            @do.cursor newCursors
-            @do.end()
-     
-    # 0000000     0000000    0000000  000   000  000   000   0000000   00000000   0000000  
-    # 000   000  000   000  000       000  000   000 0 000  000   000  000   000  000   000
-    # 0000000    000000000  000       0000000    000000000  000000000  0000000    000   000
-    # 000   000  000   000  000       000  000   000   000  000   000  000   000  000   000
-    # 0000000    000   000   0000000  000   000  00     00  000   000  000   000  0000000  
-    
-    deleteBackward: (opt) ->
-        
-        @do.start()
-        if @do.numSelections()
-            @deleteSelection()
-        else if @do.numCursors() == 1 and not @isSamePos @do.mainCursor(), @cursorPos()
-            log "[???WTF???] editor.#{@name}.deleteBackward -- what is this doing ???"
-            @do.cursor [@cursorPos()]
-        else if @salterMode
-            @deleteSalterCharacter()
-        else            
-            if @surroundStack.length
-                so = last(@surroundStack)[0]
-                sc = last(@surroundStack)[1]
-                for c in @cursors
-                    prv = ''
-                    prv = @do.line(c[1]).slice c[0]-so.length, c[0] if c[0] >= so.length
-                    nxt = @do.line(c[1]).slice c[0], c[0]+sc.length
-                    if prv != so or nxt != sc
-                        @surroundStack = []
-                        break
-                if @surroundStack.length                
-                    for i in [0...so.length]            
-                        @deleteCharacterBackward opt    
-                    for i in [0...sc.length]            
-                        @deleteForward()                
-                    @surroundStack.pop()                
-                    @do.end()
-                    return
-            
-            @deleteCharacterBackward opt
-        @do.end()
-
-    deleteCharacterBackward: (opt) ->
-        newCursors = @do.cursors()
-        
-        removeNum = switch
-            when opt?.singleCharacter    then 1
-            when opt?.ignoreLineBoundary then -1 # delete spaces to line start or line end
-            when opt?.ignoreTabBoundary # delete space columns
-                Math.max 1, _.min @cursors.map (c) => 
-                    t = @do.textInRange [c[1], [0, c[0]]]
-                    n = t.length - t.trimRight().length
-                    n += c[0] - @do.line(c[1]).length if @isCursorVirtual c
-                    Math.max 1, n
-            else # delete spaces to previous tab column
-                Math.max 1, _.min @cursors.map (c) =>                       
-                    n = (c[0] % @indentString.length) or @indentString.length  
-                    t = @do.textInRange [c[1], [Math.max(0, c[0]-n), c[0]]]  
-                    n -= t.trimRight().length
-                    Math.max 1, n
-            
-        for c in newCursors.reversed()
-            if c[0] == 0 # cursor at start of line
-                if opt?.ignoreLineBoundary or @do.numCursors() == 1
-                    if c[1] > 0 # cursor not in first line
-                        ll = @do.line(c[1]-1).length
-                        @do.change c[1]-1, @do.line(c[1]-1) + @do.line(c[1])
-                        @do.delete c[1]
-                        # move cursors in joined line
-                        for nc in @positionsForLineIndexInPositions c[1], newCursors
-                            @cursorDelta nc, ll, -1
-                        # move cursors below deleted line up
-                        for nc in @positionsBelowLineIndexInPositions c[1], newCursors
-                            @cursorDelta nc, 0, -1
-            else
-                if removeNum < 1 # delete spaces to line start or line end
-                    t = @do.textInRange [c[1], [0, c[0]]]
-                    n = t.length - t.trimRight().length
-                    n += c[0] - @do.line(c[1]).length if @isCursorVirtual c
-                    n = Math.max 1, n
-                else
-                    n = removeNum
-                @do.change c[1], @do.line(c[1]).splice c[0]-n, n
-                for nc in @positionsForLineIndexInPositions c[1], newCursors
-                    if nc[0] >= c[0]
-                        @cursorDelta nc, -n
-        @do.cursors newCursors
-        @do.cursor newCursors
-        
+                         
 module.exports = Editor
