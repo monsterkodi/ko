@@ -67,7 +67,7 @@ class Editor extends Buffer
     setupFileType: ->
         oldType   = @fileType
         @fileType = 'txt'
-        @fileType = Syntax.shebang @lines[0] if @numLines()
+        @fileType = Syntax.shebang @line(0) if @numLines()
         if @fileType == 'txt' and @currentFile?
             ext = extName @currentFile
             if ext in Syntax.syntaxNames
@@ -165,7 +165,7 @@ class Editor extends Buffer
 
     setLines: (lines) ->
         super lines
-        @emit 'linesSet', @lines
+        @emit 'linesSet', lines
 
     #  0000000   00000000  000000000        000000000  00000000  000   000  000000000  
     # 000        000          000              000     000        000 000      000     
@@ -191,11 +191,12 @@ class Editor extends Buffer
 
     emitEdit: (action) ->
         mc = @mainCursor()
+        line = @line mc[1] 
         @emit 'edit',
             action: action
-            line:   @lines[mc[1]]
-            before: @lines[mc[1]].slice 0, mc[0]
-            after:  @lines[mc[1]].slice mc[0]
+            line:   line
+            before: line.slice 0, mc[0]
+            after:  line.slice mc[0]
             cursor: mc
     
     # 000  000   000  0000000    00000000  000   000  000000000   0000000  000000000  00000000   
@@ -213,11 +214,11 @@ class Editor extends Buffer
             if @indentNewLineMore?
                 if @indentNewLineMore.lineEndsWith?.length
                     for e in @indentNewLineMore.lineEndsWith
-                        if @lines[li].endsWith e
+                        if @line(li).endsWith e
                             il = thisIndent + indentLength
                             break
                 if il == 0
-                    if @indentNewLineMore.lineRegExp? and @indentNewLineMore.lineRegExp.test @lines[li]
+                    if @indentNewLineMore.lineRegExp? and @indentNewLineMore.lineRegExp.test @line(li)
                         il = thisIndent + indentLength
                         
             il = thisIndent if il == 0

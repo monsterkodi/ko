@@ -43,7 +43,7 @@ class Command
     execute: (command) ->
         if @commandList? 
             if 0 <= @selected < @commandList.numLines()
-                command = @commandList?.lines[@selected]
+                command = @commandList?.line(@selected)
             @hideList()
         command = command.trim()
         @setCurrent command
@@ -117,7 +117,7 @@ class Command
     
     listClick: (index) => 
         @selected = index
-        @execute @commandList.lines[index]
+        @execute @commandList.line(index)
     
     onBot: (bot) => 
         cl = window.split.commandlineHeight + window.split.handleHeight
@@ -169,7 +169,7 @@ class Command
             if @selected < 0
                 @hideList() 
             else
-                return @commandList.lines[@selected]
+                return @commandList.line(@selected)
         else            
             if @selected < 0
                 @selected = @history.length-1 
@@ -190,7 +190,7 @@ class Command
             @select -1
         if @commandList? 
             @select clamp 0, @commandList.numLines()-1, @selected+1
-            return @commandList.lines[@selected]
+            return @commandList.line(@selected)
         else if @history.length
             @selected = clamp 0, @history.length-1, @selected+1
             return new @history[@selected]
@@ -245,7 +245,7 @@ class Command
     last: ->
         if @commandList?
             @selected = @commandList.numLines()-1
-            @commandList.lines[@selected]
+            @commandList.line(@selected)
         else            
             @selected = @history.length-1
             return @history[@selected] if @selected >= 0
@@ -265,7 +265,7 @@ class Command
         @currentText = t
         @commandline.setAndSelectText t
         
-    getText: -> @commandline.lines[0]
+    getText: -> @commandline.line(0)
         
     setName: (n) ->
         @name = n
@@ -273,8 +273,8 @@ class Command
 
     complete: -> 
         return if not @commandList? 
-        if @commandList.lines[@selected] != @getText() and @commandList.lines[@selected].startsWith @getText()
-            @setText @commandList.lines[@selected]
+        if @commandList.line(@selected) != @getText() and @commandList.line(@selected).startsWith @getText()
+            @setText @commandList.line(@selected)
             true
     
     # 00000000   0000000    0000000  000   000   0000000

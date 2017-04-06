@@ -34,7 +34,6 @@ class Buffer extends multi event, ranges
         @selections = @state.selections()
         @highlights = @state.highlights()
         @cursors    = @state.cursors()
-        @lines      = @state.lines()
                     
         if @name == 'editor'
             if @mainCursor()[1] < 0 and @numLines()
@@ -48,6 +47,7 @@ class Buffer extends multi event, ranges
         [mc?.get?('x') ? 0, mc?.get?('y') ? -1]
 
     line:     (li) -> @state.line li
+    lines:         -> @state.lines()
     numLines:      -> @state.numLines()
     numCursors:    -> @state.numCursors()
     numSelections: -> @state.numSelections()
@@ -68,10 +68,10 @@ class Buffer extends multi event, ranges
     # 000       000   000  000   000       000  000   000  000   000       000
     #  0000000   0000000   000   000  0000000    0000000   000   000  0000000 
             
-    isCursorVirtual:       (c=@mainCursor()) -> @numLines() and c[1] < @numLines() and c[0] > @lines[c[1]].length
-    isCursorAtEndOfLine:   (c=@mainCursor()) -> @numLines() and c[1] < @numLines() and c[0] >= @lines[c[1]].length
+    isCursorVirtual:       (c=@mainCursor()) -> @numLines() and c[1] < @numLines() and c[0] > @line(c[1]).length
+    isCursorAtEndOfLine:   (c=@mainCursor()) -> @numLines() and c[1] < @numLines() and c[0] >= @line(c[1]).length
     isCursorAtStartOfLine: (c=@mainCursor()) -> c[0] == 0
-    isCursorInIndent:      (c=@mainCursor()) -> @numLines() and @lines[c[1]].slice(0, c[0]).trim().length == 0
+    isCursorInIndent:      (c=@mainCursor()) -> @numLines() and @line(c[1]).slice(0, c[0]).trim().length == 0
     isCursorInLastLine:    (c=@mainCursor()) -> c[1] == @numLines()-1
     isCursorInFirstLine:   (c=@mainCursor()) -> c[1] == 0
     isCursorInRange:     (r,c=@mainCursor()) -> @isPosInRange c, r
@@ -107,7 +107,7 @@ class Buffer extends multi event, ranges
     startOfWordAtCursor: (c=@mainCursor()) =>
         if @isCursorAtStartOfLine c
             return c if @isCursorInFirstLine c
-            r = @rangeForWordAtPos [@lines[c[1]-1].length, c[1]-1]
+            r = @rangeForWordAtPos [@line(c[1]-1).length, c[1]-1]
         else 
             r = @rangeForWordAtPos c
             if r[1][0] == c[0]
@@ -117,7 +117,7 @@ class Buffer extends multi event, ranges
     wordRangesInLineAtIndex: (li, opt={regExp:@wordRegExp}) ->
         opt.regExp = new RegExp "(\\s+|[\\w#{opt.include}]+|[^\\s])", 'g' if opt?.include?.length
         r = []
-        while (mtch = opt.regExp.exec(@lines[li])) != null
+        while (mtch = opt.regExp.exec(@line(li))) != null
             r.push [li, [mtch.index, opt.regExp.lastIndex]]
         r.length and r or [[li, [0,0]]]
 
@@ -165,7 +165,7 @@ class Buffer extends multi event, ranges
         il = @selectedLineIndices()
         if li in il
             s = @selections[il.indexOf li]
-            if s[1][0] == 0 and s[1][1] == @lines[li].length
+            if s[1][0] == 0 and s[1][1] == @line(li).length
                 return true
         false
         
@@ -192,7 +192,7 @@ class Buffer extends multi event, ranges
                 else
                     break
             ep = @rangeEndPos r
-            while (ep[0] == @lines[ep[1]].length) and (ep[1] < @numLines()-1)
+            while (ep[0] == @line(ep[1]).length) and (ep[1] < @numLines()-1)
                 nlr = @rangeForLineAtIndex ep[1]+1
                 sil = @selectionsInLineAtIndex ep[1]+1
                 if sil.length == 1 and @isSameRange sil[0], nlr
@@ -250,7 +250,7 @@ class Buffer extends multi event, ranges
     indentationAtLineIndex: (li) ->
         s = 0
         return s if li >= @numLines()
-        l = @lines[li].trimRight()
+        l = @line(li).trimRight()
         while l[s] == ' '
             s += 1
         s
@@ -263,20 +263,20 @@ class Buffer extends multi event, ranges
     
     lastPos: () -> 
         lli = @numLines()-1
-        [@lines[lli].length, lli]
+        [@line(lli).length, lli]
 
     cursorPos: -> @clampPos @mainCursor()
         
     clampPos: (p) ->        
         if not @numLines() then return [0,-1]
         l = clamp 0, @numLines()-1,  p[1]
-        c = clamp 0, @state.line(l).length, p[0]
+        c = clamp 0, @line(l).length, p[0]
         [ c, l ]
         
     wordStartPosAfterPos: (p=@cursorPos()) ->
-        return p if p[0] < @lines[p[1]].length and @lines[p[1]][p[0]] != ' '
-        while p[0] < @lines[p[1]].length-1
-            return [p[0]+1, p[1]] if @lines[p[1]][p[0]+1] != ' '
+        return p if p[0] < @line(p[1]).length and @line(p[1])[p[0]] != ' '
+        while p[0] < @line(p[1]).length-1
+            return [p[0]+1, p[1]] if @line(p[1])[p[0]+1] != ' '
             p[0] += 1
         if p[1] < @numLines()-1
             @wordStartPosAfterPos [0, p[1]+1]
@@ -291,7 +291,7 @@ class Buffer extends multi event, ranges
 
     rangeForLineAtIndex: (i) -> 
         throw new Error() if i >= @numLines()
-        [i, [0, @lines[i].length]] 
+        [i, [0, @line(i).length]] 
         
     isRangeInString: (r) -> @rangeOfStringSurroundingRange(r)?
    
@@ -347,8 +347,8 @@ class Buffer extends multi event, ranges
         switch type
             when 'fuzzy'
                 re = new RegExp "\\w+", 'g'            
-                while (mtch = re.exec(@lines[i])) != null
-                    r.push [i, [mtch.index, re.lastIndex]] if fuzzy.test t, @lines[i].slice mtch.index, re.lastIndex
+                while (mtch = re.exec(@line(i))) != null
+                    r.push [i, [mtch.index, re.lastIndex]] if fuzzy.test t, @line(i).slice mtch.index, re.lastIndex
             else
                 t = _.escapeRegExp t if type in ['str', 'Str', 'glob']
                 switch type
@@ -358,12 +358,12 @@ class Buffer extends multi event, ranges
                     t = t.replace new RegExp("\\*", 'g'), "\w*"
                     return r if not t.length
                 re = new RegExp t, s            
-                while (mtch = re.exec(@lines[i])) != null
+                while (mtch = re.exec(@line(i))) != null
                     r.push [i, [mtch.index, re.lastIndex]]
         r
                     
     rangesOfStringsInLineAtIndex: (li) -> # todo: handle #{}
-        t = @lines[li]
+        t = @line(li)
         r = []
         ss = -1
         cc = null

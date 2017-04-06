@@ -78,7 +78,7 @@ class Commandline extends TextEditor
 
     setText: (t) ->
         @setLines [t ? '']
-        @singleCursorAtPos [@lines[0].length, 0]
+        @singleCursorAtPos [@line(0).length, 0]
     
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000
@@ -91,7 +91,7 @@ class Commandline extends TextEditor
         super changeInfo
         if changeInfo.changes.length
             @cmmd.className = "commandline-command active #{@command?.prefsID}"
-            @command?.changed @lines[0]
+            @command?.changed @line(0)
         
     onSplit: (s) => 
         @command?.onBot? s[1]
@@ -145,7 +145,7 @@ class Commandline extends TextEditor
     # 000        000 000   000       000       000   000     000     000     
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
     
-    execute: -> @results @command?.execute @lines[0]
+    execute: -> @results @command?.execute @line(0)
         
     results: (r) ->
         @setText r.text if r?.text?

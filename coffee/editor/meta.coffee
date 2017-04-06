@@ -87,7 +87,7 @@ class Meta
         for meta in @metasAtLineIndex li
             if meta[2].state == 'unsaved'
                 [file, line] = meta[2].href.split(':')
-                @saveFileLineMetas file, [[line-1, @editor.lines[meta[0]], meta]]
+                @saveFileLineMetas file, [[line-1, @editor.line(meta[0]), meta]]
 
     saveChanges: ->
         fileLineMetas = {}
@@ -95,7 +95,7 @@ class Meta
             if meta[2].state == 'unsaved'
                 [file, line] = meta[2].href.split(':')
                 fileLineMetas[file] = [] if not fileLineMetas[file]?
-                fileLineMetas[file].push [line-1, @editor.lines[meta[0]], meta]
+                fileLineMetas[file].push [line-1, @editor.line(meta[0]), meta]
 
         for file, lineMetas of fileLineMetas
             @saveFileLineMetas file, lineMetas

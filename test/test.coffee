@@ -51,7 +51,7 @@ describe 'editor', ->
     it "fakeview", -> fakeview = new FakeView editor
     it "accepts text", -> 
         editor.setText "hello\nworld"
-        expect editor.lines 
+        expect editor.lines() 
         .to.eql ['hello', 'world']
         expect editor.text()
         .to.eql 'hello\nworld'
@@ -73,7 +73,7 @@ describe 'undo', ->
         editor.setText t
         undo.start()
         undo.end()
-        expect editor.lines
+        expect editor.lines()
         .to.eql t.split '\n'
 
     describe 'calculate', ->
@@ -170,49 +170,49 @@ describe 'basic', ->
         it 'change', ->
             undo.change 0, 'hello world'
             undo.end()
-            expect editor.lines 
+            expect editor.lines() 
             .to.eql ['hello world', 'blub']
        
         it 'insert', ->
             undo.insert 1, 'inserted'
             undo.end()
-            expect editor.lines 
+            expect editor.lines() 
             .to.eql ['hello world', 'inserted', 'blub']
        
         it 'delete', ->
             undo.delete 1
             undo.end()
-            expect editor.lines 
+            expect editor.lines() 
             .to.eql ['hello world', 'blub']
             
     describe 'undo', ->
         beforeEach -> undo.undo()
         
         it 'delete', ->
-            expect editor.lines 
+            expect editor.lines() 
             .to.eql ['hello world', 'inserted', 'blub']
     
         it 'insert', ->
-            expect editor.lines 
+            expect editor.lines() 
             .to.eql ['hello world', 'blub']
     
         it 'change', ->
-            expect editor.lines 
+            expect editor.lines() 
             .to.eql ['bla', 'blub']
 
     describe 'redo', ->
         beforeEach -> undo.redo()
 
         it 'change', ->
-            expect editor.lines 
+            expect editor.lines() 
             .to.eql ['hello world', 'blub']
 
         it 'insert', ->
-            expect editor.lines 
+            expect editor.lines() 
             .to.eql ['hello world', 'inserted', 'blub']
         
         it 'delete', ->
-            expect editor.lines 
+            expect editor.lines() 
             .to.eql ['hello world', 'blub']
     
 # 00     00  00000000  0000000    000  000   000  00     00  
@@ -315,7 +315,7 @@ describe 'complex', ->
             
             it "break lines", ->
                 editor.insertCharacter '\n'
-                expect editor.lines 
+                expect editor.lines() 
                 .to.eql [
                     '0000', '11', '11', '22', '22', '33', '33', '44', '44', '5555'
                 ]
@@ -338,7 +338,7 @@ describe 'complex', ->
             
             it "break line", ->
                 editor.insertCharacter '\n'
-                expect editor.lines 
+                expect editor.lines() 
                 .to.eql [
                     '0000', '1', '1', '1', '1', '2222'
                 ]
@@ -361,14 +361,14 @@ describe 'complex', ->
             
             it "break mixed", ->
                 editor.insertCharacter '\n'
-                expect editor.lines 
+                expect editor.lines() 
                 .to.eql [
                     '0000', '1', '11', '1', '2', '22', '2', '3333', '4', '44', '4', '5', '55', '5'
                 ]
     
             it "join mixed", ->
                 editor.deleteBackward ignoreLineBoundary: true
-                expect(editor.lines) .to.eql text.split '\n'
+                expect(editor.lines()) .to.eql text.split '\n'
 
     # 000  000   000   0000000  00000000  00000000   000000000  
     # 000  0000  000  000       000       000   000     000     
@@ -396,7 +396,7 @@ describe 'complex', ->
             editor.setSelections [[1, [1,2]], [2, [1,3]]]
             undo.reset()
             editor.insertCharacter '-'
-            expect editor.lines 
+            expect editor.lines() 
             .to.eql [
                 '0000', '1-11', '2-2', '3333'
             ]
@@ -409,7 +409,7 @@ describe 'complex', ->
             undo.reset()
             
             editor.insertCharacter '-'
-            expect editor.lines 
+            expect editor.lines() 
             .to.eql [
                 '0000', '1-1-', '2-2', '3333'
             ]

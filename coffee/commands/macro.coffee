@@ -154,10 +154,10 @@ class Macro extends Command
                             break
                         
                     for li in [Math.min(editor.numLines()-1, 100)..0]
-                        m = editor.lines[li].match indexer.requireRegExp
+                        m = editor.line(li).match indexer.requireRegExp
                         if m?[1]? and m?[2]?
                             break if m[1] == word and m[2] == pth
-                            if editor.lines[li].trim().length and editor.lines[li].search(/^\s*\#/) != 0
+                            if editor.line(li).trim().length and editor.line(li).search(/^\s*\#/) != 0
                                 lastIndex = Math.max lastIndex, li+1
                     if li <= 0
                         texts.push "#{word} = require '#{pth}'"
@@ -194,7 +194,7 @@ class Macro extends Command
                     insert += (", #{words[ti]}" for ti in [words.length - lst...words.length]).join ''
                 editor.do.start()
                 editor.do.insert li, insert
-                editor.singleCursorAtPos [editor.lines[li].length, li]
+                editor.singleCursorAtPos [editor.line(li).length, li]
                 editor.do.end()
                 focus: '.'+editor.name
 

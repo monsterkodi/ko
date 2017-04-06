@@ -23,7 +23,7 @@ class Terminal extends TextEditor
 
         @ansidiss = new ansiDiss()    
         
-        @setLines @lines
+        @setLines ['']
 
     #  0000000   000   000  000000000  00000000   000   000  000000000
     # 000   000  000   000     000     000   000  000   000     000   

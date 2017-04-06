@@ -38,7 +38,7 @@ class Syntax
     # 0000000    000  0000000   0000000 
 
     dissForLineIndex: (lineIndex) -> 
-        Syntax.dissForTextAndSyntax @editor.lines[lineIndex], @name
+        Syntax.dissForTextAndSyntax @editor.line(lineIndex), @name
 
     @rangesForTextAndSyntax: (line, n) ->
         matchr.ranges Syntax.matchrConfigs[n], line
@@ -48,7 +48,7 @@ class Syntax
 
     getDiss: (li, opt) ->
         if not @diss[li]?
-            rgs = matchr.ranges Syntax.matchrConfigs[@name], @editor.lines[li]
+            rgs = matchr.ranges Syntax.matchrConfigs[@name], @editor.line(li)
             diss = matchr.dissect rgs, opt
             @diss[li] = diss
         @diss[li]

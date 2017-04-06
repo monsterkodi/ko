@@ -95,8 +95,8 @@ class Open extends Command
 
     complete: -> 
         return if not @commandList? 
-        if @commandList.lines[@selected].startsWith(path.basename @getText()) and not @getText().trim().endsWith('/')
-            @setText path.join(path.dirname(@getText()), @commandList.lines[@selected])
+        if @commandList.line(@selected).startsWith(path.basename @getText()) and not @getText().trim().endsWith('/')
+            @setText path.join(path.dirname(@getText()), @commandList.line(@selected))
             if dirExists resolve @getText()
                 @setText @getText() + '/'
                 @changed @getText()
@@ -376,8 +376,8 @@ class Open extends Command
         @select @lastFileIndex
         if not @navigating 
             if @getText() == ''
-                @setAndSelectText @commandList.lines[@selected]
-            else if @getText() != @commandList.lines[@selected]
+                @setAndSelectText @commandList.line(@selected)
+            else if @getText() != @commandList.line(@selected)
                 @changed @getText()
         else if @getText() == '.'
             @setText @dir
@@ -390,7 +390,7 @@ class Open extends Command
         
     execute: (command) ->
         
-        listValue = @commandList?.lines[@selected] if @selected >= 0
+        listValue = @commandList?.line(@selected) if @selected >= 0
 
         if command in ['.', '..', '/', '~']
             @loadDir
@@ -465,7 +465,7 @@ class Open extends Command
             when 'up'   then return @showHistory()
             when 'down' then return @showFirst()
             when 'backspace'
-                if not @getText().length and @commandList?.lines[@selected] == '..'
+                if not @getText().length and @commandList?.line(@selected) == '..'
                     @loadDir
                         navigating: true
                         dir:        path.dirname @dir

@@ -33,7 +33,7 @@ class Goto extends Command
         @showItems @listItems() 
         @select 0
         @positionList()
-        text: @commandList.lines[0]
+        text: @commandList.line(0)
         select: true
      
     # 000      000   0000000  000000000  000  000000000  00000000  00     00   0000000

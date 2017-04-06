@@ -51,7 +51,7 @@ class Do
     # 000   000   0000000   0000000    000  000          000   
             
     change: (index, text) ->
-        return if @editor.lines[index] == text
+        return if @editor.line(index) == text
         @state = @state.changeLine index, text 
         
     insert: (index, text) ->
@@ -59,7 +59,7 @@ class Do
         
     delete: (index) ->
         if @editor.numLines() > 1
-            @editor.emit 'willDeleteLine', index, @editor.lines[index]
+            @editor.emit 'willDeleteLine', index, @editor.line(index)
             @state = @state.deleteLine index
 
     # 00000000  000   000  0000000  

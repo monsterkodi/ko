@@ -65,7 +65,7 @@ class Brackets
             
             break if lastOpen?
             return if pp[1] < 1
-            pp = [@editor.lines[pp[1]-1].length, pp[1]-1]
+            pp = [@editor.line(pp[1]-1).length, pp[1]-1]
         
         return if not lastOpen?
         
@@ -100,7 +100,7 @@ class Brackets
     
     beforeAfterForPos: (pos) ->
         [cp, li] = pos
-        line = @editor.lines[li]
+        line = @editor.line(li)
         rngs = matchr.ranges @config, line     
         
         i = rngs.length-1

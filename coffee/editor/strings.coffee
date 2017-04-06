@@ -37,7 +37,7 @@ class Strings
         pairs = []
         pair  = null
         [cp, li] = pos
-        line = @editor.lines[li]
+        line = @editor.line(li)
         rngs = matchr.ranges @config, line       
         return if not rngs.length
         for i in [0...rngs.length]

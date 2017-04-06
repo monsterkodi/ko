@@ -137,7 +137,6 @@ class TextEditor extends Editor
         for l in ls
             @state = @state.appendLine l
             # console.log 'appendText lines:', str @state.get('lines').toJS()
-            @lines.push l # SUCKS
             @emit 'lineAppended', 
                 lineIndex: @numLines()-1
                 text:      l
@@ -340,7 +339,7 @@ class TextEditor extends Editor
         div = render.lineDiv (li-@scroll.exposeTop) * @size.lineHeight, @syntax.getDiss(li), @size
         div.lineIndex = li
         if @showInvisibles
-            tx = @lines[li].length * @size.charWidth + 1
+            tx = @line(li).length * @size.charWidth + 1
             span = document.createElement 'span'
             span.className = "invisible newline"
             span.style.transform = "translate(#{tx}px, -1.5px)"
@@ -378,7 +377,7 @@ class TextEditor extends Editor
             for c in cs
                 if @isSamePos @mainCursor(), [c[0], c[1] + @scroll.exposeTop]
                     c[2] = 'main'
-                line = @lines[@scroll.exposeTop+c[1]]
+                line = @line(@scroll.exposeTop+c[1])
                 if c[0] > line.length
                     vc.push [line.length, c[1], 'virtual']
             cs = cs.concat vc
