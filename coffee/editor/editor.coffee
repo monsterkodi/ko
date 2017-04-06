@@ -12,8 +12,6 @@ last,
 log,
 str,
 $}      = require 'kxk'
-salt    = require '../tools/salt'
-watcher = require './watcher'
 Buffer  = require './buffer'
 Syntax  = require './syntax'
 undo    = require './undo'
@@ -32,15 +30,19 @@ class Editor extends Buffer
         @surroundStack      = []
         @surroundCharacters = []
         @surroundPairs      = Object.create null
-        @currentFile        = null
         @indentString       = _.padStart "", 4
         @stickySelection    = false
-        @watch              = null
         @dbg                = false
         super
         @do                 = new undo @
         @setupFileType()
 
+    # 000  000   000  000  000000000       0000000    0000000  000000000  000   0000000   000   000   0000000  
+    # 000  0000  000  000     000         000   000  000          000     000  000   000  0000  000  000       
+    # 000  000 0 000  000     000         000000000  000          000     000  000   000  000 0 000  0000000   
+    # 000  000  0000  000     000         000   000  000          000     000  000   000  000  0000       000  
+    # 000  000   000  000     000         000   000   0000000     000     000   0000000   000   000  0000000   
+    
     @initActions: ->
         @actions = []
         for actionFile in fileList path.join __dirname, 'actions'
@@ -55,50 +57,6 @@ class Editor extends Buffer
                         @actions.push v
                     
         # log @actions
-
-    #  0000000   00000000   00000000   000      000   000
-    # 000   000  000   000  000   000  000       000 000 
-    # 000000000  00000000   00000000   000        00000  
-    # 000   000  000        000        000         000   
-    # 000   000  000        000        0000000     000   
-    
-    applyForeignLineChanges: (lineChanges) =>
-
-        @do.start()
-        for change in lineChanges
-            switch change.change
-                when 'changed'  then @do.change change.doIndex, change.after
-                when 'inserted' then @do.insert change.doIndex, change.after
-                when 'deleted'  then @do.delete change.doIndex
-                else
-                    log "[WARNING] editor.applyForeignLineChanges wtf?"
-        @do.end foreign: true
-
-    # 00000000  000  000      00000000
-    # 000       000  000      000     
-    # 000000    000  000      0000000 
-    # 000       000  000      000     
-    # 000       000  0000000  00000000
-
-    stopWatcher: ->
-        if @watch?
-            @watch?.stop()
-            @watch = null
-
-    setCurrentFile: (file, opt) ->
-        @setSalterMode false
-        @stopWatcher()
-        @currentFile = file
-        if not opt?.keepUndo? or opt.keepUndo == false
-            @do.reset()
-        @updateTitlebar()
-        if file?
-            @watch = new watcher @
-            @setText fs.readFileSync file, encoding: 'utf8'
-        else
-            @watch = null
-            @setLines []
-        @setupFileType()
 
     # 000000000  000   000  00000000   00000000
     #    000      000 000   000   000  000     
@@ -215,101 +173,16 @@ class Editor extends Buffer
     # 000   000  000          000              000     000        000 000      000     
     #  0000000   00000000     000              000     00000000  000   000     000     
                                                 
-    textOfSelectionForClipboard: -> 
-        @selectMoreLines() if @numSelections() == 0
-        @textOfSelection()
-        
     textOfSelection: ->
         t = []
         for s in @selections
             t.push @textInRange s
         t.join '\n'
             
-    # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000
-    # 000   000  000  000        000   000  000      000  000        000   000     000   
-    # 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000   
-    # 000   000  000  000   000  000   000  000      000  000   000  000   000     000   
-    # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000   
-
-    highlightText: (text, opt) -> # called from find command
-        hls = @rangesForText text, opt
-        if hls.length
-            switch opt?.select
-                when 'after'  then @selectSingleRange @rangeAfterPosInRanges(@cursorPos(), hls) ? first hls
-                when 'before' then @selectSingleRange @rangeBeforePosInRanges(@cursorPos(), hls) ? first hls
-                when 'first'  then @selectSingleRange first hls
-            @scrollCursorToTop() if not opt?.noScroll
-        @setHighlights hls
-        @renderHighlights()
-        @emit 'highlight'
-
-    highlightTextOfSelectionOrWordAtCursor: -> # command+e       
-            
-        if @numSelections() == 0
-            srange = @rangeForWordAtPos @cursorPos()
-            @selectSingleRange srange
-            
-        text = @textInRange @selections[0]
-        if text.length
-            
-            if @numHighlights()
-                if text == @textInRange first @highlights # see if we can grow the current selection
-                    largerRange = [@selections[0][0], [@selections[0][1][0]-1, @selections[0][1][1]]]
-                    largerText = @textInRange largerRange
-                    if largerText[0] in "@#$%&*+-!?:.'\"/" or /[A-Za-z]/.test largerText[0]
-                        if largerText[0] in "'\"" # grow strings in both directions
-                            nr = [@selections[0][0], [@selections[0][1][0]-1, @selections[0][1][1]+1]] 
-                            nt = @textInRange nr
-                            if nt[nt.length-1] == largerText[0]
-                                largerText = nt
-                                largerRange = nr
-                        else if /[A-Za-z]/.test largerText[0] # grow whole words
-                            while largerRange[1][0] > 0 and /[A-Za-z]/.test @lines[largerRange[0]][largerRange[1][0]-1]
-                                largerRange[1][0] -= 1
-                                largerText = @textInRange largerRange
-                        text = largerText                        
-                        @selectSingleRange largerRange if @numSelections() == 1
-            
-            @setHighlights @rangesForText text, max:9999
-            @renderHighlights()
-            @emit 'highlight'
-            
-            # this should be done somewhere else (commandline or find/search commands)
-            if window.split.commandlineVisible()
-                window.commandline.startCommand 'find' if window.commandline.command?.prefsID not in ['search', 'find']
-            window.commandline.commands.find.currentText = text
-            window.commandline.commands.search.currentText = text
-            window.commandline.setText text
-            
-            @focus()
-
-    clearHighlights: ->
-        if @numHighlights()
-            @setHighlights []
-            @emit 'highlight'
-
-    highlightWordAndAddToSelection: -> # command+d
-        cp = @cursorPos()
-        if not @posInHighlights cp
-            @highlightTextOfSelectionOrWordAtCursor() # this also selects
-        else
-            @do.start()
-            sr = @rangeAtPosInRanges cp, @selections
-            if sr # cursor in selection -> select next highlight
-                r = @rangeAfterPosInRanges cp, @highlights
-            else # select current highlight first
-                r = @rangeAtPosInRanges cp, @highlights
-            r ?= first @highlights
-            @addRangeToSelection r
-            @scrollCursorToTop()
-            @do.end()
-            
-    removeSelectedHighlight: -> # command+shift+d
-        cp = @cursorPos()
-        sr = @rangeAtPosInRanges cp, @selections
-        hr = @rangeAtPosInRanges cp, @highlights        
-        @removeFromSelection sr if sr and hr
-
+    textOfSelectionForClipboard: -> 
+        @selectMoreLines() if @numSelections() == 0
+        @textOfSelection()
+        
     # 00000000  00     00  000  000000000       00000000  0000000    000  000000000
     # 000       000   000  000     000          000       000   000  000     000   
     # 0000000   000000000  000     000          0000000   000   000  000     000   
@@ -324,7 +197,13 @@ class Editor extends Buffer
             before: @lines[mc[1]].slice 0, mc[0]
             after:  @lines[mc[1]].slice mc[0]
             cursor: mc
-                    
+    
+    # 000  000   000  0000000    00000000  000   000  000000000   0000000  000000000  00000000   
+    # 000  0000  000  000   000  000       0000  000     000     000          000     000   000  
+    # 000  000 0 000  000   000  0000000   000 0 000     000     0000000      000     0000000    
+    # 000  000  0000  000   000  000       000  0000     000          000     000     000   000  
+    # 000  000   000  0000000    00000000  000   000     000     0000000      000     000   000  
+    
     indentStringForLineAtIndex: (li) -> 
         if li < @numLines()
             il = 0

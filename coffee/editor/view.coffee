@@ -16,6 +16,7 @@ post,
 log,
 $}        = require 'kxk'
 split     = require '../split'
+watcher   = require './watcher'
 ViewBase  = require './viewbase'
 syntax    = require './syntax'
 _         = require 'lodash'
@@ -27,6 +28,9 @@ webframe  = electron.webFrame
 class View extends ViewBase
 
     constructor: (viewElem) -> 
+        
+        @currentFile        = null
+        @watch              = null
         
         window.split.on 'commandline', @onCommandline
         post.on 'jumpTo', @jumpTo
@@ -46,21 +50,59 @@ class View extends ViewBase
             @dirty = true # set dirty flag
             @updateTitlebar() 
 
+    # 00000000   0000000   00000000   00000000  000   0000000   000   000  
+    # 000       000   000  000   000  000       000  000        0000  000  
+    # 000000    000   000  0000000    0000000   000  000  0000  000 0 000  
+    # 000       000   000  000   000  000       000  000   000  000  0000  
+    # 000        0000000   000   000  00000000  000   0000000   000   000  
+    
+    applyForeignLineChanges: (lineChanges) =>
+
+        @do.start()
+        for change in lineChanges
+            switch change.change
+                when 'changed'  then @do.change change.doIndex, change.after
+                when 'inserted' then @do.insert change.doIndex, change.after
+                when 'deleted'  then @do.delete change.doIndex
+                else
+                    log "[WARNING] editor.applyForeignLineChanges wtf?"
+        @do.end foreign: true
+
     # 00000000  000  000      00000000
     # 000       000  000      000     
     # 000000    000  000      0000000 
     # 000       000  000      000     
     # 000       000  0000000  00000000
 
-    setCurrentFile: (file, opt) ->
+    stopWatcher: ->
+        if @watch?
+            @watch?.stop()
+            @watch = null
+
+    setCurrentFile: (file, opt) -> 
+        
         @saveScrollCursorsAndSelections(opt) if not file and not opt?.noSaveScroll
+        
         @dirty = false
         @syntax.name = 'txt'
         if file?
             name = path.extname(file).substr(1)
             if name in syntax.syntaxNames
                 @syntax.name = name            
-        super file, opt # -> setText -> setLines
+                
+        @setSalterMode false
+        @stopWatcher()
+        @currentFile = file
+        if not opt?.keepUndo? or opt.keepUndo == false
+            @do.reset()
+        @updateTitlebar()
+        if file?
+            @watch = new watcher @
+            @setText fs.readFileSync file, encoding: 'utf8'
+        else
+            @watch = null
+            @setLines []
+        @setupFileType()
 
         @restoreScrollCursorsAndSelections() if file
                     
