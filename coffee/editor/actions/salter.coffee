@@ -9,6 +9,14 @@ _    = require 'lodash'
 
 module.exports =
     
+    info:
+        name: 'ascii-header mode'
+        text: """if cursor is not in ascii-header: 
+            insert ascii-header of text in selection or word at cursor.
+            switch to ascii-header mode in any case.
+            """
+        combo: 'command+3'
+
     startSalter: (opt) ->
         cp = @cursorPos()
         if not opt?.word and rgs = @salterRangesAtPos() # edit existing header

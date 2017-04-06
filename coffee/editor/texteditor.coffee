@@ -1,8 +1,8 @@
-# 000   000  000  00000000  000   000  0000000     0000000    0000000  00000000
-# 000   000  000  000       000 0 000  000   000  000   000  000       000     
-#  000 000   000  0000000   000000000  0000000    000000000  0000000   0000000 
-#    000     000  000       000   000  000   000  000   000       000  000     
-#     0      000  00000000  00     00  0000000    000   000  0000000   00000000
+# 000000000  00000000  000   000  000000000        00000000  0000000    000  000000000   0000000   00000000   
+#    000     000        000 000      000           000       000   000  000     000     000   000  000   000  
+#    000     0000000     00000       000           0000000   000   000  000     000     000   000  0000000    
+#    000     000        000 000      000           000       000   000  000     000     000   000  000   000  
+#    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000  
 {
 title
 setStyle,
@@ -23,10 +23,9 @@ Editor    = require './editor'
 _         = require 'lodash'
 path      = require 'path'
 electron  = require 'electron'
-clipboard = electron.clipboard
 ipc       = electron.ipcRenderer
 
-class ViewBase extends Editor
+class TextEditor extends Editor
 
     constructor: (viewElem, @config) ->
         
@@ -674,7 +673,6 @@ class ViewBase extends Editor
             when 'command+shift+g'          then return @selectPrevHighlight()
             when 'command+l'                then return @selectMoreLines()
             when 'command+shift+l'          then return @selectLessLines()
-            when 'command+c'                then return clipboard.writeText @textOfSelectionForClipboard()
             when 'command+z'                then return @do.undo()
             when 'command+shift+z'          then return @do.redo()
             when 'delete', 'ctrl+backspace' then return @deleteForward()
@@ -682,31 +680,17 @@ class ViewBase extends Editor
             when 'command+backspace'        then return @deleteBackward ignoreLineBoundary: true
             when 'alt+backspace'            then return @deleteBackward ignoreTabBoundary:  true
             when 'shift+backspace'          then return @deleteBackward singleCharacter:    true
-            when 'command+v'                then return @paste clipboard.readText()
-            when 'command+x'   
-                @do.start()
-                clipboard.writeText @textOfSelectionForClipboard()
-                @deleteSelection()
-                @do.end()
-                return
+            when 'command+x'                then return @cut()
+            when 'command+c'                then return @copy()
+            when 'command+v'                then return @paste()
                 
             when 'alt+shift+up', 'alt+shift+down' then return @duplicateLines  key
             when 'alt+up',       'alt+down'       then return @moveLines  key
             when 'command+up',   'command+down'   then return @addCursors key
             when 'ctrl+a',       'ctrl+shift+a'   then return @moveCursorsToLineBoundary 'left',  event.shiftKey
             when 'ctrl+e',       'ctrl+shift+e'   then return @moveCursorsToLineBoundary 'right', event.shiftKey
-            when 'ctrl+k'
-                @do.start()
-                @moveCursorsToLineBoundary 'right', true
-                @deleteSelection()
-                @do.end()
-                return 
-                
-            when 'command+left', 'command+right'   
-                if @numSelections() > 1 and @numCursors() == 1
-                    return @setCursorsAtSelectionBoundary key
-                else
-                    return @moveCursorsToLineBoundary key
+            when 'ctrl+k'                         then return @deleteToEndOfLine()                
+            when 'command+left', 'command+right'  then return @setOrMoveCursorsAtBoundary key
                         
             when 'command+shift+left', 'command+shift+right' then return @moveCursorsToLineBoundary key, true
             when 'command+shift+up',   'command+shift+down'  then return @delCursors    key
@@ -720,6 +704,7 @@ class ViewBase extends Editor
                 stop event
         
         # log 'combo', combo
+        
         return if mod and not key?.length
         
         switch key
@@ -738,4 +723,4 @@ class ViewBase extends Editor
         if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
             @insertCharacter ansiKeycode event
 
-module.exports = ViewBase
+module.exports = TextEditor

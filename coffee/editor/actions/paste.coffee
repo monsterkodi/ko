@@ -3,10 +3,24 @@
 # 00000000   000000000  0000000      000     0000000 
 # 000        000   000       000     000     000     
 # 000        000   000  0000000      000     00000000
+
+electron = require 'electron'
+clipboard = electron.clipboard
         
 module.exports = 
-    
+
+    cut: ->
+        @do.start()
+        @copy()
+        @deleteSelection()
+        @do.end()
+
+    copy: ->
+        clipboard.writeText @textOfSelectionForClipboard()
+        
     paste: (text) ->
+        
+        text ?= clipboard.readText()
         
         @deleteSelection()
         @do.start()        

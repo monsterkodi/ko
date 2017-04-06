@@ -6,9 +6,9 @@
 {
 post,
 $}        = require 'kxk'
-ViewBase  = require '../editor/viewbase'
+TextEditor  = require '../editor/texteditor'
 
-class LogView extends ViewBase
+class LogView extends TextEditor
 
     constructor: (viewElem) ->
         @fontSizeDefault = 12

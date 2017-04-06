@@ -8,6 +8,17 @@ _ = require 'lodash'
 
 module.exports =
 
+    infos:
+        alignCursors:
+            name: 'align cursors'
+            text: 'align cursors vertically with (top|bottom|left|right)-most cursor'
+            combos: ['alt+ctrl+up', 'alt+ctrl+down', 'alt+ctrl+left', 'alt+ctrl+right']
+            
+        alignCursorsAndText:
+            name: 'align cursors and text'
+            text: 'align text to the right of cursors by inserting spaces'
+            combo: 'alt+ctrl+shift+right'
+        
     singleCursorAtPos: (p, opt = extend:false) ->
         if @numLines() == 0
             @do.start()
@@ -96,19 +107,6 @@ module.exports =
         @do.cursor newCursors, main:main
         @do.end()
         
-    setCursorsAtSelectionBoundary: (leftOrRight='right') ->
-        @do.start()
-        i = leftOrRight == 'right' and 1 or 0
-        newCursors = []
-        main = 'last'
-        for s in @selections
-            p = @rangeIndexPos s,i
-            newCursors.push p
-            if @isCursorInRange s
-                main = newCursors.indexOf p
-        @do.cursor newCursors, main:main
-        @do.end()       
-
     delCursors: (dir='up') ->
         @do.start()
         oldCursors = @state.cursors()

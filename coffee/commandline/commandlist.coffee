@@ -5,12 +5,12 @@
 #    0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  0000000      000   
 {
 log}     = require 'kxk'
-ViewBase = require '../editor/viewbase'
+TextEditor = require '../editor/texteditor'
 Syntax   = require '../editor/syntax'
 matchr   = require '../tools/matchr'
 salt     = require '../tools/salt'
 
-class CommandList extends ViewBase
+class CommandList extends TextEditor
 
     constructor: (viewElem, opt) ->
         

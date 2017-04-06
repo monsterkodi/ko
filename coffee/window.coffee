@@ -19,7 +19,7 @@ str,
 log,
 $}          = require 'kxk'
 Split       = require './split'
-View        = require './editor/view'
+FileEditor  = require './editor/fileeditor'
 Area        = require './area/area'
 Commandline = require './commandline/commandline'
 Terminal    = require './terminal/terminal'
@@ -286,7 +286,7 @@ terminal.on 'fileLineChange', (file, lineChange) ->
     ipc.send 'winFileLinesChanged', -1, file, [lineChange]
 
 area        = window.area        = new Area '.area'
-editor      = window.editor      = new View '.editor'
+editor      = window.editor      = new FileEditor '.editor'
 commandline = window.commandline = new Commandline '.commandline-editor'
 logview     = window.logview     = new LogView '.logview'
 info        = window.info        = new Info editor

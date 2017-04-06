@@ -6,10 +6,22 @@
     
 module.exports = 
     
-    info:
-        name:   'delte forward'
-        combos: ['delete', 'ctrl+backspace']
-        text:   'delete character to the right'
+    infos:
+        deleteToEndOfLine:
+            name:   'delte to end of line'
+            combo:  'ctrl+k'
+            text:   'delete characters from cursor to the end of line'
+            
+        deleteForward:
+            name:   'delte forward'
+            combos: ['delete', 'ctrl+backspace']
+            text:   'delete character to the right'
+
+    deleteToEndOfLine: ->
+        @do.start()
+        @moveCursorsToLineBoundary 'right', true
+        @deleteSelection()
+        @do.end()
 
     deleteForward: ->
         if @numSelections()

@@ -30,7 +30,7 @@ class State extends StateR
         lines = opt?.lines ? []
         super 
             lines:   List lines.map (l) -> Line text:l
-            cursors: List [Cursor y:lines.length-1]
+            cursors: List [Cursor y:0]
     
     # read only:
         

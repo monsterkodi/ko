@@ -16,7 +16,6 @@ Buffer  = require './buffer'
 Syntax  = require './syntax'
 undo    = require './undo'
 path    = require 'path'
-fs      = require 'fs'
 _       = require 'lodash'
 
 class Editor extends Buffer

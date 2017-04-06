@@ -6,13 +6,13 @@
 {
 last,
 log
-}         = require 'kxk'
-salt      = require '../tools/salt'
-ViewBase  = require '../editor/viewbase'
-syntax    = require '../editor/syntax'
-ansiDiss  = require '../tools/ansidiss'
+}          = require 'kxk'
+salt       = require '../tools/salt'
+TextEditor = require '../editor/texteditor'
+syntax     = require '../editor/syntax'
+ansiDiss   = require '../tools/ansidiss'
 
-class Terminal extends ViewBase
+class Terminal extends TextEditor
 
     constructor: (viewElem) ->
         

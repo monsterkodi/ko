@@ -10,6 +10,55 @@ last
 _ = require 'lodash'
 
 module.exports = 
+
+    infos:
+        setOrMoveCursorsAtBoundary:
+            name:   'set cursors at selections or move to line boundaries'
+            text:   """sets cursors at selection boundaries, if multiple selections exist but only one cursor.
+                otherwise moves cursors to line boundaries."""
+            combos: ['command+left', 'command+right']
+
+        moveMainCursor:
+            name:   'move main cursor'
+            text:   """move main cursor independently of other cursors.
+                erases other cursors if shift is pressed. 
+                sets new cursors otherwise."""
+            combos: ['ctrl+up', 'ctrl+down', 'ctrl+left', 'ctrl+right', 
+                'ctrl+shift+up', 'ctrl+shift+down', 'ctrl+shift+left', 'ctrl+shift+right']
+    
+        moveCursorsToWordBoundary:
+            name:   'move cursors to word boundaries'
+            text:   'moves cursors to word boundaries. extends selections, if shift is pressed.'            
+            combos: ['alt+left',       'alt+right',      'alt+shift+left',  'alt+shift+right']
+
+        moveCursorsToLineBoundary:
+            name:   'move cursors to line boundaries'
+            text:   'moves cursors to line boundaries. extends selections, if shift is pressed.'
+            combos: ['command+shift+left', 'command+shift+right', 'ctrl+e', 'ctrl+shift+e', 'ctrl+a', 'ctrl+shift+a']
+
+        moveCursors:
+            name:  'move cursors'
+            text:   'move all cursors simultaneously'
+            combos: ['left', 'right', 'up', 'down']
+
+    setOrMoveCursorsAtBoundary: (key) ->
+        if @numSelections() > 1 and @numCursors() == 1
+            @setCursorsAtSelectionBoundary key
+        else
+            @moveCursorsToLineBoundary key
+
+    setCursorsAtSelectionBoundary: (leftOrRight='right') ->
+        @do.start()
+        i = leftOrRight == 'right' and 1 or 0
+        newCursors = []
+        main = 'last'
+        for s in @selections
+            p = @rangeIndexPos s,i
+            newCursors.push p
+            if @isCursorInRange s
+                main = newCursors.indexOf p
+        @do.cursor newCursors, main:main
+        @do.end()       
     
     moveAllCursors: (func, opt = extend:false, keepLine:true) ->        
         @do.start()

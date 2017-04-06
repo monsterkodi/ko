@@ -1,8 +1,8 @@
-# 000   000  000  00000000  000   000
-# 000   000  000  000       000 0 000
-#  000 000   000  0000000   000000000
-#    000     000  000       000   000
-#     0      000  00000000  00     00
+# 00000000  000  000      00000000        00000000  0000000    000  000000000   0000000   00000000   
+# 000       000  000      000             000       000   000  000     000     000   000  000   000  
+# 000000    000  000      0000000         0000000   000   000  000     000     000   000  0000000    
+# 000       000  000      000             000       000   000  000     000     000   000  000   000  
+# 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000  
 {
 fileName,
 unresolve,
@@ -14,23 +14,24 @@ clamp,
 drag,
 post,
 log,
-$}        = require 'kxk'
-split     = require '../split'
-watcher   = require './watcher'
-ViewBase  = require './viewbase'
-syntax    = require './syntax'
-_         = require 'lodash'
-path      = require 'path'
-electron  = require 'electron'
-ipc       = electron.ipcRenderer
-webframe  = electron.webFrame
+$}         = require 'kxk'
+split      = require '../split'
+watcher    = require './watcher'
+TextEditor = require './texteditor'
+syntax     = require './syntax'
+_          = require 'lodash'
+fs         = require 'fs'
+path       = require 'path'
+electron   = require 'electron'
+ipc        = electron.ipcRenderer
+webframe   = electron.webFrame
 
-class View extends ViewBase
+class FileEditor extends TextEditor
 
     constructor: (viewElem) -> 
         
-        @currentFile        = null
-        @watch              = null
+        @currentFile = null
+        @watch       = null
         
         window.split.on 'commandline', @onCommandline
         post.on 'jumpTo', @jumpTo
@@ -328,4 +329,4 @@ class View extends ViewBase
                 return
         'unhandled'
         
-module.exports = View
+module.exports = FileEditor

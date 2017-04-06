@@ -11,6 +11,29 @@ log
 
 module.exports =
     
+    infos:
+        startStickySelection:
+            name:  'sticky selection mode'
+            text:  'current selection is not removed when adding new selections'
+            combo: 'command+esc'
+        selectAll:
+            name:  'select all lines'
+            combo: 'command+a'
+        selecNone:
+            name:  'deselect'
+            text:  'clears all selections'
+            combo: 'command+d'
+        selectInverted:
+            name:  'invert selection'
+            text:  'selects all lines that have no cursors and no selections'
+            combo: 'command+i'
+        selectNextHighlight:
+            name:  'select next highlight'
+            combo: 'command+g'
+        selectPrevHighlight:
+            name:  'select previous highlight'
+            combo: 'command+shift+g'
+
     selectSingleRange: (r, opt) ->
         if not r?
             log "[WARNING] editor.#{name}.selectSingleRange -- undefined range!"

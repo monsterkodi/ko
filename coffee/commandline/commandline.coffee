@@ -9,13 +9,13 @@ keyinfo,
 clamp,
 log,
 $}        = require 'kxk'
-ViewBase  = require '../editor/viewbase'
+TextEditor  = require '../editor/texteditor'
 render    = require '../editor/render'
 syntax    = require '../editor/syntax'
 split     = require '../split'
 path      = require 'path'
 
-class Commandline extends ViewBase
+class Commandline extends TextEditor
     
     constructor: (viewElem) ->
             
