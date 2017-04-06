@@ -4,6 +4,8 @@
 #      000  000       000      000       000          000     000  000   000  000  0000
 # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
 {
+first,
+last,
 log
 } = require 'kxk'
 
@@ -82,17 +84,17 @@ module.exports =
         @do.select newSelections
         @do.end()        
 
-    selectNone: => 
+    selectNone: -> 
         @do.start()
         @do.select []
         @do.end()
         
-    selectAll: => 
+    selectAll: -> 
         @do.start()
         @do.select @rangesForAllLines()
         @do.end()
         
-    selectInverted: => 
+    selectInverted: -> 
         invertedRanges = []        
         sc = @selectedAndCursorLineIndices()
         for li in [0...@numLines()]

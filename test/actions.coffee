@@ -10,7 +10,9 @@ log}   = require 'kxk'
 _      = require 'lodash'
 assert = require 'assert'
 chai   = require 'chai'
-{Map,List} = require 'immutable'
+{
+Map,List
+} = require 'immutable'
 expect = chai.expect
 chai.should()
 

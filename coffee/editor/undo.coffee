@@ -299,21 +299,20 @@ class Do
     #      000     000     000   000     000     000       
     # 0000000      000     000   000     000     00000000  
         
-    line: (lineIndex) -> @state.line(lineIndex)
-    lines: -> @state.lines()
-    numLines: -> @state.numLines()
+    line:       (li) -> @state.line li 
+    lines:           -> @state.lines()
+    numLines:        -> @state.numLines()
     textInRange: (r) -> @state.line(r[0]).slice? r[1][0], r[1][1]
     
-    selections: -> @state.selections()
-    numSelections: -> @state.numSelections()
+    selections:      -> @state.selections()
+    numSelections:   -> @state.numSelections()
+    highlights:      -> @state.highlights()
+    numHighlights:   -> @state.numHighlights()
     
-    cursors: -> @state.cursors()
-    numCursors: -> @state.numCursors()
-    mainCursor: -> 
+    cursors:         -> @state.cursors()
+    numCursors:      -> @state.numCursors()
+    mainCursor:      -> 
         mc = @state.mainCursor()
         [mc?.get?('x') ? 0, mc?.get?('y') ? -1]
-        
-    highlights: -> @state.highlights()
-    numHighlights: -> @state.numHighlights()
             
 module.exports = Do

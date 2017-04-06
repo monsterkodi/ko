@@ -9,7 +9,7 @@ module.exports =
     info:
         name:   'delte forward'
         combos: ['delete', 'ctrl+backspace']
-        text:   'delete character to the right of cursors'
+        text:   'delete character to the right'
 
     deleteForward: ->
         if @numSelections()

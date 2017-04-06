@@ -11,7 +11,7 @@ module.exports =
     info:
         name:  'delete backward'
         combo: 'backspace'
-        text:  'delete characters to the left of cursors'
+        text:  'delete character to the left'
 
     deleteBackward: (opt) ->
         
