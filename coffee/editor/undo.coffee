@@ -27,9 +27,9 @@ class Do
         @redos   = []
         @state   = null
                 
-    hasLineChanges: -> 
+    hasLineChanges: ->
         return false if @history.length == 0
-        return last(@history).get('lines') != @editor.state.get('lines')
+        return not first(@history).get('lines').equals @editor.state.get('lines')
                                                                         
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   

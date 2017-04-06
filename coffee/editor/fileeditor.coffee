@@ -10,6 +10,7 @@ fileExists,
 setStyle,
 swapExt,
 keyinfo,
+first,
 clamp,
 drag,
 post,
@@ -45,11 +46,12 @@ class FileEditor extends TextEditor
     # 000       000   000  000   000  000  0000  000   000  000       000   000
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
-    changed: (changeInfo, action) ->        
-        super changeInfo, action
-        if changeInfo.changes.length
-            @dirty = true # set dirty flag
-            @updateTitlebar() 
+    changed: (changeInfo) ->        
+        super changeInfo
+        dirty = @do.hasLineChanges()
+        if @dirty != dirty
+            @dirty = dirty
+            @updateTitlebar()
 
     # 00000000   0000000   00000000   00000000  000   0000000   000   000  
     # 000       000   000  000   000  000       000  000        0000  000  
@@ -58,7 +60,7 @@ class FileEditor extends TextEditor
     # 000        0000000   000   000  00000000  000   0000000   000   000  
     
     applyForeignLineChanges: (lineChanges) =>
-
+        log 'applyForeignLineChanges', lineChanges
         @do.start()
         for change in lineChanges
             switch change.change
@@ -81,9 +83,7 @@ class FileEditor extends TextEditor
             @watch = null
 
     setCurrentFile: (file, opt) -> 
-        
-        @saveScrollCursorsAndSelections(opt) if not file and not opt?.noSaveScroll
-        
+                
         @dirty = false
         @syntax.name = 'txt'
         if file?
@@ -94,8 +94,7 @@ class FileEditor extends TextEditor
         @setSalterMode false
         @stopWatcher()
         @currentFile = file
-        if not opt?.keepUndo? or opt.keepUndo == false
-            @do.reset()
+        @do.reset()
         @updateTitlebar()
         if file?
             @watch = new watcher @

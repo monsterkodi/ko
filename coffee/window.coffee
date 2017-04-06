@@ -135,11 +135,11 @@ saveFile = (file) ->
         mode = 438
         
     atomicFile file, editor.text(), { encoding: 'utf8', mode: mode }, (err) ->
-        editor.setCurrentFile null, keepUndo: true # to store scroll
+        editor.saveScrollCursorsAndSelections()
         if err?
             alert err
         else
-            editor.setCurrentFile file, keepUndo: true
+            editor.setCurrentFile file
             ipc.send 'fileSaved', file, winID
             setState 'file', file
 
@@ -159,7 +159,6 @@ reloadFile = ->
         reload:          true
         dontSave:        true
         dontSaveCursors: true
-        keepUndo:        false
 
 loadFile = (file, opt={}) ->
     return if not file? or not file.length
@@ -179,7 +178,6 @@ loadFile = (file, opt={}) ->
             pos:  editor.cursorPos()
             for: 'load'
         
-        opt.keepUndo = file == editor.currentFile if not opt.keepUndo?
         editor.setCurrentFile null, opt  # to stop watcher and reset scroll
         editor.setCurrentFile file, opt
         ipc.send 'fileLoaded', file, winID
