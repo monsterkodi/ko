@@ -37,16 +37,21 @@ module.exports =
     
     highlightWordAndAddToSelection: -> # command+d
         cp = @cursorPos()
-        if not @posInHighlights cp
+        
+        wordHighlights = @highlights().filter (h) -> not h[2]?.clss?.startsWith('stringmatch') and not h[2]?.clss?.startsWith('bracketmatch')
+        
+        cursorInWordHighlight = wordHighlights.length and @rangeAtPosInRanges cp, wordHighlights
+        
+        if not cursorInWordHighlight
             @highlightTextOfSelectionOrWordAtCursor() # this also selects
         else
             @do.start()
             sr = @rangeAtPosInRanges cp, @do.selections()
             if sr # cursor in selection -> select next highlight
-                r = @rangeAfterPosInRanges cp, @do.highlights()
+                r = @rangeAfterPosInRanges cp, wordHighlights
             else # select current highlight first
-                r = @rangeAtPosInRanges cp, @do.highlights()
-            r ?= @do.highlight(0)
+                r = @rangeAtPosInRanges cp, wordHighlights
+            r ?= wordHighlights[0]
             @addRangeToSelection r
             @scrollCursorToTop()
             @do.end()
@@ -62,7 +67,7 @@ module.exports =
         if text.length
             
             if @numHighlights()
-                if text == @textInRange first @highlights # see if we can grow the current selection
+                if text == @textInRange @highlight 0 # see if we can grow the current selection
                     largerRange = [sel[0], [sel[1][0]-1, sel[1][1]]]
                     largerText = @textInRange largerRange
                     if largerText[0] in "@#$%&*+-!?:.'\"/" or /[A-Za-z]/.test largerText[0]

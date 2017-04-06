@@ -43,13 +43,13 @@ class State extends StateR
     cursor:    (i) -> c = @getIn ['cursors', i]; [c.get('x'), c.get('y')]
     selection: (i) -> s = @getIn ['selections', i]; [s.get('l'), [s.get('s'), s.get('e')]]
     highlight: (i) -> s = @getIn ['highlights', i]; [s.get('l'), [s.get('s'), s.get('e')], s.get('o')]
-    
-    mainCursor:    -> @getIn ['cursors', @get 'main']
-    
+        
     numLines:      -> @get('lines').size
     numCursors:    -> @get('cursors').size
     numSelections: -> @get('selections').size
     numHighlights: -> @get('highlights').size
+
+    mainCursor:    -> mc = @getIn ['cursors', @get 'main']; [mc?.get?('x') ? 0, mc?.get?('y') ? -1]
 
     # modify:
 
@@ -59,7 +59,7 @@ class State extends StateR
     setLines:      (l) -> @set 'lines',      List l.map (t) -> Line text:t
     setMain:       (m) -> @set 'main', m
 
-    addHighlight:  (h) -> @set 'highlights', @get('highlights').push Highlt s:r[1][0], e:r[1][1], l:r[0], o:r[2]
+    addHighlight:  (h) -> @set 'highlights', @get('highlights').push Highlt s:h[1][0], e:h[1][1], l:h[0], o:h[2]
     
     insertLine: (i,t) -> @update 'lines', (l) -> l.splice i, 0, Line text:t
     changeLine: (i,t) -> @setIn ['lines', i, 'text'], t

@@ -38,10 +38,7 @@ class Buffer extends multi event, ranges
             # if s[0] == undefined
                 # log "DAFUK selections #{@name}"
     
-    mainCursor: -> 
-        mc = @state.mainCursor()
-        [mc?.get?('x') ? 0, mc?.get?('y') ? -1]
-
+    mainCursor:    -> @state.mainCursor()
     line:      (i) -> @state.line i
     cursor:    (i) -> @state.cursor i
     highlight: (i) -> @state.highlight i
@@ -123,6 +120,20 @@ class Buffer extends multi event, ranges
             r.push [li, [mtch.index, opt.regExp.lastIndex]]
         r.length and r or [[li, [0,0]]]
 
+    # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000   0000000
+    # 000   000  000  000        000   000  000      000  000        000   000     000     000     
+    # 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000     0000000 
+    # 000   000  000  000   000  000   000  000      000  000   000  000   000     000          000
+    # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     0000000 
+
+    highlightsInLineIndexRangeRelativeToLineIndex: (lineIndexRange, relIndex) ->
+        hl = @highlightsInLineIndexRange lineIndexRange
+        if hl
+            ([s[0]-relIndex, [s[1][0], s[1][1]], s[2]] for s in hl)
+    
+    highlightsInLineIndexRange: (lineIndexRange) ->
+        @highlights().filter (s) -> s[0] >= lineIndexRange[0] and s[0] <= lineIndexRange[1]
+
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000   0000000
     # 000       000       000      000       000          000     000  000   000  0000  000  000     
     # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000  0000000 
@@ -193,29 +204,7 @@ class Buffer extends multi event, ranges
         for s in @selections()
             return false if not @isSameRange s, @rangeForLineAtIndex s[0]
         true
-
-    # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000   0000000
-    # 000   000  000  000        000   000  000      000  000        000   000     000     000     
-    # 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000     0000000 
-    # 000   000  000  000   000  000   000  000      000  000   000  000   000     000          000
-    # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     0000000 
-
-    highlightsInLineIndexRangeRelativeToLineIndex: (lineIndexRange, relIndex) ->
-        hl = @highlightsInLineIndexRange lineIndexRange
-        if hl
-            ([s[0]-relIndex, [s[1][0], s[1][1]], s[2]] for s in hl)
-    
-    highlightsInLineIndexRange: (lineIndexRange) ->
-        hl = []
-        for s in @highlights
-            if s[0] >= lineIndexRange[0] and s[0] <= lineIndexRange[1]
-                hl.push _.clone s
-        hl
         
-    reversedHighlights: -> @highlights.reversed()
-        
-    posInHighlights: (p) -> @numHighlights() and @rangeAtPosInRanges p, @highlights
-                    
     # 000000000  00000000  000   000  000000000
     #    000     000        000 000      000   
     #    000     0000000     00000       000   

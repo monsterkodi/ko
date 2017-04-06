@@ -319,8 +319,6 @@ class Do
     
     cursors:         -> @state.cursors()
     numCursors:      -> @state.numCursors()
-    mainCursor:      -> 
-        mc = @state.mainCursor()
-        [mc?.get?('x') ? 0, mc?.get?('y') ? -1]
+    mainCursor:      -> @state.mainCursor()
             
 module.exports = Do

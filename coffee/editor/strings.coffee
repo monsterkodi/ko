@@ -24,7 +24,7 @@ class Strings
         
     onCursor: =>
         if @editor.numHighlights() # don't highlight strings when other highlights exist
-            for h in @editor.highlights
+            for h in @editor.highlights()
                 return if not h[2]?
                 
         return if @highlightInside @editor.cursorPos()
@@ -82,6 +82,6 @@ class Strings
         @editor.renderHighlights()
         
     clear: ->
-        @editor.setHighlights @editor.highlights.filter (h) -> not h[2]?.clss?.startsWith 'stringmatch'
+        @editor.setHighlights @editor.highlights().filter (h) -> not h[2]?.clss?.startsWith 'stringmatch'
 
 module.exports = Strings

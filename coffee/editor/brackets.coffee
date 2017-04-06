@@ -27,8 +27,8 @@ class Brackets
         @config = @editor.bracketCharacters.regexps
         
     onCursor: => 
-        if @editor.highlights.length # don't highlight brackets when other highlights exist
-            for h in @editor.highlights
+        if @editor.numHighlights() # don't highlight brackets when other highlights exist
+            for h in @editor.highlights()
                 return if not h[2]?
                 
         cp = @editor.cursorPos()
@@ -138,6 +138,6 @@ class Brackets
         @editor.renderHighlights()
 
     clear: ->
-        @editor.setHighlights @editor.highlights.filter (h) -> h[2]?.clss != 'bracketmatch'
+        @editor.setHighlights @editor.highlights().filter (h) -> h[2]?.clss != 'bracketmatch'
 
 module.exports = Brackets

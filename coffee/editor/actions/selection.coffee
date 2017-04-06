@@ -151,8 +151,8 @@ module.exports =
             searchText = window.commandline.commands.find?.currentText
             @highlightText searchText if searchText?.length
         return if not @numHighlights()
-        r = @rangeAfterPosInRanges @cursorPos(), @highlights
-        r ?= first @highlights
+        r = @rangeAfterPosInRanges @cursorPos(), @highlights()
+        r ?= @highlight 0
         if r?
             @selectSingleRange r, before: r[2]?.value == 'close'
             @scrollCursorIntoView()
@@ -162,7 +162,8 @@ module.exports =
             searchText = window.commandline.commands.find?.currentText
             @highlightText searchText if searchText?.length
         return if not @numHighlights()
-        r = @rangeBeforePosInRanges @cursorPos(), @highlights
-        r ?= last @highlights
+        hs = @highlights()
+        r = @rangeBeforePosInRanges @cursorPos(), hs
+        r ?= last hs
         @selectSingleRange r if r?
 

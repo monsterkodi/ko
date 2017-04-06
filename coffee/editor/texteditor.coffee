@@ -326,10 +326,7 @@ class TextEditor extends Editor
         if @numHighlights()
             $('.highlights', @layers).innerHTML = ''
             super
-   
-    hasWordHighlights: () -> @highlights.find (h) -> not h[2]?
-    hasHighlights: () -> @highlights.length > 0
-    
+       
     # 00000000   00000000  000   000  0000000    00000000  00000000 
     # 000   000  000       0000  000  000   000  000       000   000
     # 0000000    0000000   000 0 000  000   000  0000000   0000000  
@@ -419,7 +416,7 @@ class TextEditor extends Editor
     deltaToEnsureCursorsAreVisible: ->
         topdelta = 0
         cs = @cursors()
-        cl = @cs[0][1]
+        cl = cs[0][1]
         if cl < @scroll.top + 2
             topdelta = Math.max(0, cl - 2) - @scroll.top
         else if cl > @scroll.bot - 4
@@ -624,7 +621,7 @@ class TextEditor extends Editor
             when 'esc'
                 if @salterMode
                     return @setSalterMode false
-                if @hasHighlights()
+                if @numHighlights()
                     return @clearHighlights()
                 if @numCursors() > 1
                     return @clearCursors()

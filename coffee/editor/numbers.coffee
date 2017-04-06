@@ -46,7 +46,7 @@ class Numbers extends event
         cls = ''
         if li in ci
             cls += ' cursored'
-        if li == @editor.mainCursor[1]
+        if li == @editor.mainCursor()[1]
             cls += ' main'
         if li in si
             cls += ' selected'
