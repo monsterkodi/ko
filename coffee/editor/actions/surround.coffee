@@ -15,7 +15,7 @@ module.exports =
         return false if cl.length > 1
         for cursor in @cursors
             count = 0
-            for c in @lines[cursor[1]]
+            for c in @line(cursor[1])
                 if c == cl
                     count += 1
                 else if c == cr

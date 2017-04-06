@@ -87,7 +87,7 @@ module.exports =
             lines[nc[1]] = nc[0]
             @cursorSet nc, newX, c[1]
         for li, cx of lines
-            @do.change li, @lines[li].slice(0, cx) + _.padStart('', newX-cx) + @lines[li].slice(cx)
+            @do.change li, @do.line(li).slice(0, cx) + _.padStart('', newX-cx) + @do.line(li).slice(cx)
         @do.cursor newCursors
         @do.end()
 

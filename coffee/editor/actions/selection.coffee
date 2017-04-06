@@ -70,9 +70,9 @@ module.exports =
                 @selectNone()
             @startSelectionCursors = null
         else
-            oldCursors = @startSelectionCursors ? @state.cursors()
+            oldCursors   = @startSelectionCursors ? @state.cursors()
             newSelection = @stickySelection and @do.selections() or []            
-            newCursors = @do.cursors()
+            newCursors   = @do.cursors()
             
             if oldCursors.length != newCursors.length
                 log "[WARNING] editor.#{@name}.endSelection -- oldCursors.size != newCursors.size", oldCursors.length, newCursors.length
@@ -80,8 +80,11 @@ module.exports =
             for ci in [0...@do.numCursors()]
                 oc = oldCursors[ci]
                 nc = newCursors[ci]
-                ranges = @rangesBetweenPositions oc, nc, true #< extend to full lines if cursor at start of line                
-                newSelection = newSelection.concat ranges
+                if not oc? or not nc?
+                    log "[WARNING] editor.#{@name}.endSelection -- invalid cursors", oc, nc
+                else
+                    ranges = @rangesBetweenPositions oc, nc, true #< extend to full lines if cursor at start of line                
+                    newSelection = newSelection.concat ranges
 
             @do.select newSelection
             

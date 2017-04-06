@@ -36,7 +36,7 @@ module.exports =
             for ci in [newCursors.length-1..0]
                 c = newCursors[ci]
                 insert = l[ci % l.length]
-                @do.change c[1], @lines[c[1]].splice c[0], 0, insert
+                @do.change c[1], @do.line(c[1]).splice c[0], 0, insert
                 for c in @positionsAfterLineColInPositions c[1], c[0], newCursors
                     @cursorDelta c, insert.length
         else

@@ -34,9 +34,9 @@ module.exports =
                 if @isCursorAtEndOfLine c # cursor at end of line
                     if not @isCursorInLastLine c # cursor not in first line
                     
-                        ll = @lines[c[1]].length
+                        ll = @line(c[1]).length
                     
-                        @do.change c[1], @lines[c[1]] + @lines[c[1]+1]
+                        @do.change c[1], @do.line(c[1]) + @do.line(c[1]+1)
                         @do.delete c[1]+1
                                     
                         # move cursors in joined line
@@ -46,7 +46,7 @@ module.exports =
                         for nc in @positionsBelowLineIndexInPositions c[1]+1, newCursors
                             @cursorDelta nc, 0, -1
                 else
-                    @do.change c[1], @lines[c[1]].splice c[0], 1
+                    @do.change c[1], @do.line(c[1]).splice c[0], 1
                     for nc in @positionsForLineIndexInPositions c[1], newCursors
                         if nc[0] > c[0]
                             @cursorDelta nc, -1

@@ -84,7 +84,6 @@ module.exports =
         @do.cursor newCursors, main:main
         @endSelection opt
         @do.end()
-        true
 
     moveMainCursor: (dir='down', opt = erase:false) ->
         @do.start()
@@ -106,15 +105,15 @@ module.exports =
         @do.end()
         
     moveCursorsToLineBoundary: (leftOrRight, e) ->
-        f = switch leftOrRight
-            when 'right' then (c) => [@lines[c[1]].length, c[1]]
+        func = switch leftOrRight
+            when 'right' then (c) => [@do.line(c[1]).length, c[1]]
             when 'left'  then (c) => 
-                if @lines[c[1]].slice(0,c[0]).trim().length == 0
+                if @line(c[1]).slice(0,c[0]).trim().length == 0
                     [0, c[1]]
                 else
-                    d = @lines[c[1]].length - @lines[c[1]].trimLeft().length
+                    d = @do.line(c[1]).length - @do.line(c[1]).trimLeft().length
                     [d, c[1]]
-        @moveAllCursors f, extend:e, keepLine:true
+        @moveAllCursors func, extend:e, keepLine:true
         true
     
     moveCursorsToWordBoundary: (leftOrRight, e) ->

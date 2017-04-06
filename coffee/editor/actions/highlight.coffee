@@ -72,7 +72,7 @@ module.exports =
                                 largerText = nt
                                 largerRange = nr
                         else if /[A-Za-z]/.test largerText[0] # grow whole words
-                            while largerRange[1][0] > 0 and /[A-Za-z]/.test @lines[largerRange[0]][largerRange[1][0]-1]
+                            while largerRange[1][0] > 0 and /[A-Za-z]/.test @line(largerRange[0])[largerRange[1][0]-1]
                                 largerRange[1][0] -= 1
                                 largerText = @textInRange largerRange
                         text = largerText                        

@@ -72,7 +72,7 @@ module.exports =
             if ci > 0
                 length = cols[ci]-cols[ci-1]
                 for r in rgs
-                    @do.change r[0], @lines[r[0]].splice cols[ci-1], length
+                    @do.change r[0], @do.line(r[0]).splice cols[ci-1], length
                 @do.cursor ([cols[ci-1], r[0]] for r in rgs)
     
     checkSalterMode: ->        
@@ -106,12 +106,12 @@ module.exports =
         salterRegExp = new RegExp("^\\s*#{@lineComment}[0\\s]+$")
         rgs = []
         li = p[1]
-        while rgs.length < 5 and li < @numLines() and salterRegExp.test @lines[li]
+        while rgs.length < 5 and li < @numLines() and salterRegExp.test @line(li)
             rgs.push @rangeForLineAtIndex li
             li += 1
         return if not rgs.length
         li = p[1]-1
-        while rgs.length < 5 and li >= 0 and salterRegExp.test @lines[li]
+        while rgs.length < 5 and li >= 0 and salterRegExp.test @line(li)
             rgs.unshift @rangeForLineAtIndex li
             li -= 1
         return rgs if rgs.length == 5
