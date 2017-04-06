@@ -558,7 +558,7 @@ class TextEditor extends Editor
                         @clickCount += 1
                         if @clickCount == 2
                             range = @rangeForWordAtPos eventPos
-                            if event.metaKey
+                            if event.metaKey or @stickySelection
                                 @addRangeToSelection range
                             else
                                 @selectSingleRange range
