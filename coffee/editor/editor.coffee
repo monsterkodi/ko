@@ -42,7 +42,7 @@ class Editor extends Buffer
     # 000  000  0000  000     000         000   000  000          000     000  000   000  000  0000       000  
     # 000  000   000  000     000         000   000   0000000     000     000   0000000   000   000  0000000   
     
-    @initActions: ->
+    @initActions: -> 
         @actions = []
         for actionFile in fileList path.join __dirname, 'actions'
             actions = require actionFile
@@ -54,8 +54,9 @@ class Editor extends Buffer
                 else if key == 'infos'
                     for k,v of value
                         @actions.push v
-                    
-        # log @actions
+                        
+        # too early for log here!            
+        # console.log str @actions
 
     # 000000000  000   000  00000000   00000000
     #    000      000 000   000   000  000     

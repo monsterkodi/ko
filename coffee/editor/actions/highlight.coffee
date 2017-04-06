@@ -9,6 +9,20 @@ first
 
 module.exports = 
 
+    infos:
+        highlightWordAndAddToSelection:
+            name: 'highlight and select word'
+            text: 'highlights all occurrences of text in selection or word at cursor and selects the first|next highlight.'
+            combo: 'command+d'
+        removeSelectedHighlight:
+            name: 'remove highlighted word from the selection'
+            text: "does the inverse of 'highlight and select' word"
+            combo: 'command+shift+d'
+        highlightTextOfSelectionOrWordAtCursor:
+            name: 'highlight and select word'
+            text: 'highlights all occurrences of text in selection or word at cursor and selects it. expands to the left if already selected.'
+            combo: 'command+e'
+
     highlightText: (text, opt) -> # called from find command
         hls = @rangesForText text, opt
         if hls.length

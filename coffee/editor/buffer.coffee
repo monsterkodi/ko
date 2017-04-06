@@ -47,6 +47,7 @@ class Buffer extends multi event, ranges
         mc = @state.mainCursor()
         [mc?.get?('x') ? 0, mc?.get?('y') ? -1]
 
+    line:     (li) -> @state.line li
     numLines:      -> @state.numLines()
     numCursors:    -> @state.numCursors()
     numSelections: -> @state.numSelections()
@@ -318,11 +319,11 @@ class Buffer extends multi event, ranges
         if a[1] == b[1]
             r.push [a[1], [a[0], b[0]]]
         else
-            r.push [a[1], [a[0], @lines[a[1]].length]]
+            r.push [a[1], [a[0], @line(a[1]).length]]
             if b[1] - a[1] > 1
                 for i in [a[1]+1...b[1]]
-                    r.push [i, [0,@lines[i].length]]
-            r.push [b[1], [0, extend and b[0] == 0 and @lines[b[1]].length or b[0]]]
+                    r.push [i, [0,@line(i).length]]
+            r.push [b[1], [0, extend and b[0] == 0 and @line(b[1]).length or b[0]]]
         r
     
     rangesForLinesFromTopToBot: (top,bot) -> 

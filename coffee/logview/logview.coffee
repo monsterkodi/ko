@@ -5,8 +5,8 @@
 # 0000000   0000000    0000000       0      000  00000000  00     00
 {
 post,
-$}        = require 'kxk'
-TextEditor  = require '../editor/texteditor'
+$}         = require 'kxk'
+TextEditor = require '../editor/texteditor'
 
 class LogView extends TextEditor
 
