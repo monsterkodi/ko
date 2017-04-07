@@ -19,10 +19,6 @@ module.exports =
         selectAll:
             name:  'select all lines'
             combo: 'command+a'
-        selecNone:
-            name:  'deselect'
-            text:  'clears all selections'
-            combo: 'command+d'
         selectInverted:
             name:  'invert selection'
             text:  'selects all lines that have no cursors and no selections'
@@ -87,7 +83,6 @@ module.exports =
                     newSelection = newSelection.concat ranges
 
             @do.select newSelection
-            
         @checkSalterMode()      
 
     addRangeToSelection: (range) ->
@@ -147,7 +142,7 @@ module.exports =
         @do.end()
     
     selectNextHighlight: -> # command+g
-        if not @numHighlights()
+        if not @numHighlights() and window? # < this sucks
             searchText = window.commandline.commands.find?.currentText
             @highlightText searchText if searchText?.length
         return if not @numHighlights()
@@ -155,10 +150,10 @@ module.exports =
         r ?= @highlight 0
         if r?
             @selectSingleRange r, before: r[2]?.value == 'close'
-            @scrollCursorIntoView()
+            @scrollCursorIntoView?() # < this also sucks
 
     selectPrevHighlight: -> # command+shift+g
-        if not @numHighlights()
+        if not @numHighlights() and window? # < this sucks
             searchText = window.commandline.commands.find?.currentText
             @highlightText searchText if searchText?.length
         return if not @numHighlights()

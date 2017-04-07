@@ -696,7 +696,7 @@ class TextEditor extends Editor
             when 'alt+ctrl+up',   'alt+ctrl+down',   'alt+ctrl+left',   'alt+ctrl+right'   then return @alignCursors  key
             when 'ctrl+up',       'ctrl+down',       'ctrl+left',       'ctrl+right'       then return @moveMainCursor key
             when 'ctrl+shift+up', 'ctrl+shift+down', 'ctrl+shift+left', 'ctrl+shift+right' then return @moveMainCursor key, erase: true
-            when 'alt+left',       'alt+right',      'alt+shift+left',  'alt+shift+right'  then return @moveCursorsToWordBoundary key, event.shiftKey
+            when 'alt+left',      'alt+right',       'alt+shift+left',  'alt+shift+right'  then return @moveCursorsToWordBoundary key, event.shiftKey
             when 'down', 'right', 'up', 'left', 'shift+down', 'shift+right', 'shift+up', 'shift+left' 
                 @moveCursors key, event.shiftKey
                 stop event

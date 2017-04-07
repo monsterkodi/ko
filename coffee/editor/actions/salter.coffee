@@ -3,9 +3,10 @@
 # 0000000   000000000  000         000     0000000   0000000    
 #      000  000   000  000         000     000       000   000  
 # 0000000   000   000  0000000     000     00000000  000   000  
-  
-salt = require '../../tools/salt'  
-_    = require 'lodash'
+
+{log} = require 'kxk'  
+salt  = require '../../tools/salt'  
+_     = require 'lodash'
 
 module.exports =
     
@@ -19,7 +20,7 @@ module.exports =
 
     startSalter: (opt) ->
         cp = @cursorPos()
-        if not opt?.word and rgs = @salterRangesAtPos() # edit existing header
+        if not opt?.word and rgs = @salterRangesAtPos cp # edit existing header
             cols = @columnsInSalt (@textInRange r for r in rgs)
             ci = 0
             while ci < cols.length and cp[0] > cols[ci]
@@ -35,20 +36,28 @@ module.exports =
                 indt = _.padStart '', @indentationAtLineIndex cp[1]
             else
                 indt = @indentStringForLineAtIndex cp[1]
+                
             stxt = word.length and salt(word).split('\n') or ['', '', '', '', '']
             stxt = ("#{indt}#{@lineComment} #{s}  " for s in stxt)
             @do.start()
             newCursors = []
-            @do.insert cp[1], indt
-            li = cp[1]+1
+            li = cp[1]
             for s in stxt
                 @do.insert li, s
-                newCursors.push [s.length, li]
+                if s.endsWith "#{@lineComment}   "
+                    newCursors.push [s.length-2, li]
+                else
+                    newCursors.push [s.length, li]
                 li += 1
             @do.setCursors newCursors, main: 'last'
             @do.select []
             @do.end()
         @setSalterMode true
+
+    endSalter: -> @setSalterMode false
+    setSalterMode: (active=true) ->
+        @salterMode = active
+        @layerDict?['cursors']?.classList.toggle "salterMode", active
     
     insertSalterCharacter: (ch) ->
         if ch == ' '
@@ -56,15 +65,16 @@ module.exports =
         else
             char = salt(ch).split '\n'
         if char.length == 5
-            @paste ("#{s}  " for s in char).join '\n'
+            salted = ("#{s}  " for s in char).join '\n'
+            @paste salted
         else
             @setSalterMode false
         true
     
     deleteSalterCharacter: ->
         return if not @salterMode
-        cp = @cursorPos()
-        if rgs = @salterRangesAtPos()
+        cp = @do.mainCursor()
+        if rgs = @salterRangesAtPos cp
             cols = @columnsInSalt (@do.textInRange r for r in rgs)
             ci = cols.length-1
             while ci > 0 and cols[ci-1] >= cp[0]
@@ -78,17 +88,17 @@ module.exports =
     checkSalterMode: ->        
         return if not @salterMode
         @setSalterMode false
-        return if @numCursors() != 5
-        cs = @cursors()
-        cp = @cs[0]
+        return if @do.numCursors() != 5
+        cs = @do.cursors()
+        cp = cs[0]
         for c in cs.slice 1
             return if c[0] != cp[0]
             return if c[1] != cp[1]+1
             cp = c
-        rgs = @salterRangesAtPos()
-        return if not rgs? or rgs[0][0] != @cs[0][1]
-        cols = @columnsInSalt (@textInRange r for r in rgs)
-        return if @cs[0][0] < cols[0]
+        rgs = @salterRangesAtPos @do.mainCursor()
+        return if not rgs? or rgs[0][0] != cs[0][1]
+        cols = @columnsInSalt (@do.textInRange(r) for r in rgs)
+        return if cs[0][0] < cols[0]
         @setSalterMode true
     
     columnsInSalt: (salt) ->
@@ -103,7 +113,7 @@ module.exports =
         cols.push max
         cols
     
-    salterRangesAtPos: (p=@cursorPos()) ->
+    salterRangesAtPos: (p) ->
         salterRegExp = new RegExp("^\\s*#{@lineComment}[0\\s]+$")
         rgs = []
         li = p[1]
@@ -117,6 +127,3 @@ module.exports =
             li -= 1
         return rgs if rgs.length == 5
       
-    setSalterMode: (active=true) ->
-        @salterMode = active
-        @layerDict?['cursors']?.classList.toggle "salterMode", active

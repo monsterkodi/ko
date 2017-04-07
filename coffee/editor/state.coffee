@@ -36,7 +36,7 @@ class State extends StateR
         
     lines:         -> @get('lines').toArray().map (l) -> l.get 'text'
     cursors:       -> @get('cursors').map((c) -> [c.get('x'), c.get('y')]).toArray()
-    highlights:    -> @get('highlights').map((s) -> [s.get('l'), [s.get('s'), s.get('e')], s.get('o')]).toArray()
+    highlights:    -> @get('highlights').map((s) -> l=[s.get('l'), [s.get('s'), s.get('e')]]; l.push(s.get('o')) if s.get('o')?; l).toArray()
     selections:    -> @get('selections').map((s) -> [s.get('l'), [s.get('s'), s.get('e')]]).toArray()
     
     line:      (i) -> @getIn ['lines', i, 'text']

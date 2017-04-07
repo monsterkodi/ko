@@ -48,5 +48,5 @@ module.exports =
         
         @do.select []
         @do.setCursors newCursors
-        @do.end()
         @checkSalterMode()
+        @do.end()

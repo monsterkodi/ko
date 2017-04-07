@@ -4,6 +4,7 @@
 # 000        000   000       000     000     000     
 # 000        000   000  0000000      000     00000000
 
+_ = require 'lodash'
 electron = require 'electron'
 clipboard = electron.clipboard
         
@@ -16,11 +17,11 @@ module.exports =
         @do.end()
 
     copy: ->
-        clipboard.writeText @textOfSelectionForClipboard()
+        clipboard?.writeText @textOfSelectionForClipboard()
         
     paste: (text) ->
         
-        text ?= clipboard.readText()
+        text ?= clipboard?.readText()
         
         @deleteSelection()
         @do.start()        

@@ -30,7 +30,7 @@ module.exports =
                 when 'after'  then @selectSingleRange @rangeAfterPosInRanges(@cursorPos(), hls) ? first hls
                 when 'before' then @selectSingleRange @rangeBeforePosInRanges(@cursorPos(), hls) ? first hls
                 when 'first'  then @selectSingleRange first hls
-            @scrollCursorToTop() if not opt?.noScroll
+            @scrollCursorToTop() if not opt?.noScroll # < sucks!
         @setHighlights hls
         @renderHighlights()
         @emit 'highlight'
@@ -53,7 +53,7 @@ module.exports =
                 r = @rangeAtPosInRanges cp, wordHighlights
             r ?= wordHighlights[0]
             @addRangeToSelection r
-            @scrollCursorToTop()
+            @scrollCursorToTop?() # < sucks!
             @do.end()
 
     highlightTextOfSelectionOrWordAtCursor: -> # command+e       
@@ -85,10 +85,12 @@ module.exports =
                         @selectSingleRange largerRange if @numSelections() == 1
             
             @setHighlights @rangesForText text, max:9999
-            @renderHighlights()
-            @emit 'highlight'
             
             # this should be done somewhere else (commandline or find/search commands)
+            return if not window?
+            @renderHighlights?()
+            @emit 'highlight'
+            
             if window.split.commandlineVisible()
                 window.commandline.startCommand 'find' if window.commandline.command?.prefsID not in ['search', 'find']
             window.commandline.commands.find.currentText = text
