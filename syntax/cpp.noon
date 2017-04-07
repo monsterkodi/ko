@@ -65,14 +65,14 @@ new\s+(\w+)                    class.callee
 
 # keywords
 this                           keyword.this
-(^|\s)(if|else|then|for|using|namespace|while|do|return|break|continue|new|switch|case|const_cast|static_cast|dynamic_cast|reinterpret_cast|public:?|protected:?|private:?)([\;\s]|$)  . none . keyword . none
+(^|\s)(if|else|then|for|using|namespace|while|do|return|break|continue|new|switch|case|static|const_cast|static_cast|dynamic_cast|reinterpret_cast|public:?|protected:?|private:?)([\;\s]|$)  . none . keyword . none
     
 \b(uint32_t|void|bool|int|uint|auto|float|double|long|unsigned|virtual|typedef|const|default)\b   keyword
 
 # macros
 
-(\#)(else|endif)                             . macro.marker . macro.define
-(\#)(define|pragma|ifdef|ifndef|if)(\s.*|$)  . macro.marker . macro.define . macro
+(\#)(else|endif)                                  . macro.marker . macro.define
+(\#)(define|pragma|ifdef|ifndef|if|elif)(\s.*|$)  . macro.marker . macro.define . macro
 \b[A-Z0-9\_]+\b                                macro
     
 #number
