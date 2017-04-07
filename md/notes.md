@@ -1,7 +1,7 @@
 # todo/ideas
 
-- restore cursors, etc after reload
-- fix command+d selecting bracket|string (highlight)
+- other windows in titlebar
+- set restore cursors before reload
 - if no highlights
     - alt+command+b : set cursors at selection boundaries 
     - ctrl+alt+command+b : select between cursors

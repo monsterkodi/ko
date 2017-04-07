@@ -2,33 +2,35 @@
 <dict>
     <key>CFBundleDocumentTypes</key>
     <array>
-    <dict>
-        <key>CFBundleTypeName</key>
-        <string>Text</string>
-        <key>LSHandlerRank</key>
-        <string>Alternate</string>
-        <key>LSItemContentTypes</key>
-        <array>
-            <string>public.text</string>
-            <string>public.plain-text</string>
-            <string>public.utf8-plain-text</string>
-            <string>public.utf16-external-plain-​text</string>
-            <string>public.utf16-plain-text</string>
-            <string>com.apple.traditional-mac-​plain-text</string>
-            <string>public.source-code</string>
-            <string>public.c-source</string>
-            <string>public.objective-c-source</string>
-            <string>public.c-plus-plus-source</string>
-            <string>public.objective-c-plus-​plus-source</string>
-            <string>public.c-header</string>
-            <string>public.c-plus-plus-header</string>
-            <string>com.sun.java-source</string>
-            <string>public.script</string>
-            <string>public.shell-script</string>
-        </array>
-        <key>CFBundleTypeIconFile</key>
-        <string>file.icns</string>
-    </dict>
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>Text</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>public.text</string>
+                <string>public.plain-text</string>
+                <string>public.utf8-plain-text</string>
+                <string>public.utf16-external-plain-​text</string>
+                <string>public.utf16-plain-text</string>
+                <string>com.apple.traditional-mac-​plain-text</string>
+                <string>public.source-code</string>
+                <string>public.c-source</string>
+                <string>public.objective-c-source</string>
+                <string>public.c-plus-plus-source</string>
+                <string>public.objective-c-plus-​plus-source</string>
+                <string>public.c-header</string>
+                <string>public.c-plus-plus-header</string>
+                <string>com.sun.java-source</string>
+                <string>public.script</string>
+                <string>public.shell-script</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+        </dict>
         <dict>
             <key>CFBundleTypeRole</key>
             <string>Editor</string>
@@ -42,6 +44,8 @@
             </array>
             <key>CFBundleTypeIconFile</key>
             <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
         </dict>        
         <dict>
             <key>CFBundleTypeRole</key>
@@ -68,6 +72,8 @@
             </array>
             <key>CFBundleTypeIconFile</key>
             <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
         </dict>
         <dict>
             <key>CFBundleTypeRole</key>
@@ -83,6 +89,8 @@
             </array>
             <key>CFBundleTypeIconFile</key>
             <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
         </dict>
         <dict>
             <key>CFBundleTypeRole</key>
@@ -96,6 +104,8 @@
             </array>
             <key>CFBundleTypeIconFile</key>
             <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
         </dict>
         <dict>
             <key>CFBundleTypeRole</key>
@@ -108,6 +118,8 @@
             </array>
             <key>CFBundleTypeIconFile</key>
             <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
         </dict>
         <dict>
             <key>CFBundleTypeRole</key>
@@ -121,6 +133,8 @@
             </array>
             <key>CFBundleTypeIconFile</key>
             <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
         </dict>
         <dict>
             <key>CFBundleTypeRole</key>
@@ -133,6 +147,8 @@
             </array>
             <key>CFBundleTypeIconFile</key>
             <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
         </dict>
         <dict>
             <key>CFBundleTypeRole</key>
@@ -145,6 +161,8 @@
             </array>
             <key>CFBundleTypeIconFile</key>
             <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
         </dict>
         <dict>
             <key>CFBundleTypeRole</key>
@@ -157,6 +175,8 @@
             </array>
             <key>CFBundleTypeIconFile</key>
             <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
         </dict>
         <dict>
             <key>CFBundleTypeRole</key>
@@ -170,6 +190,8 @@
             </array>
             <key>CFBundleTypeIconFile</key>
             <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
         </dict>
         <dict>
             <key>CFBundleTypeRole</key>
@@ -182,6 +204,8 @@
             </array>
             <key>CFBundleTypeIconFile</key>
             <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
         </dict>
         <dict>
             <key>CFBundleTypeRole</key>
@@ -195,6 +219,8 @@
             </array>
             <key>CFBundleTypeIconFile</key>
             <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
         </dict>
         <dict>
             <key>CFBundleTypeRole</key>
@@ -208,6 +234,8 @@
             </array>
             <key>CFBundleTypeIconFile</key>
             <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
         </dict>
         <dict>
             <key>CFBundleTypeRole</key>
@@ -220,6 +248,8 @@
             </array>
             <key>CFBundleTypeIconFile</key>
             <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
         </dict>
         <dict>
             <key>CFBundleTypeRole</key>
@@ -234,6 +264,8 @@
             </array>
             <key>CFBundleTypeIconFile</key>
             <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
         </dict>
         <dict>
             <key>CFBundleTypeRole</key>
@@ -250,6 +282,8 @@
             </array>
             <key>CFBundleTypeIconFile</key>
             <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
         </dict>
         <dict>
             <key>CFBundleTypeRole</key>
@@ -262,6 +296,8 @@
             </array>
             <key>CFBundleTypeIconFile</key>
             <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
         </dict>
         <dict>
             <key>CFBundleTypeRole</key>
@@ -275,8 +311,52 @@
             </array>
             <key>CFBundleTypeIconFile</key>
             <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
         </dict>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleTypeName</key>
+            <string>Document</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+                <string>****</string>
+            </array>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>noon</string>
+                <string>coffee</string>
+                <string>md</string>
+            </array>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>public.data</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>file.icns</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+        </dict>
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>ko</string>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+                <string>****</string>
+            </array>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>noon</string>
+                <string>coffee</string>
+                <string>md</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>file.icns</string>
+        </dict>
+        
     </array>
-
 </dict>
 </plist>
