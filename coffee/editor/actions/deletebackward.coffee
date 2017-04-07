@@ -10,11 +10,12 @@ _ = require 'lodash'
 
 module.exports =
     
-    info:
-        name:  'delete backward'
-        combo: 'backspace'
-        text:  'delete character to the left'
-
+    actions:
+        deleteBackward:
+            name:  'delete backward'
+            combo: 'backspace'
+            text:  'delete character to the left'
+    
     deleteBackward: (opt) ->
         
         @do.start()

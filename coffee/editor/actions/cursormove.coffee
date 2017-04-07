@@ -11,7 +11,7 @@ _ = require 'lodash'
 
 module.exports = 
 
-    infos:
+    actions:
         setOrMoveCursorsAtBoundary:
             name:   'set cursors at selections or move to line boundaries'
             text:   """sets cursors at selection boundaries, if multiple selections exist but only one cursor.

@@ -49,10 +49,9 @@ class Editor extends Buffer
             for key,value of actions
                 if _.isFunction value
                     @prototype[key] = value
-                else if key == 'info'
-                    @actions.push value
                 else if key == 'infos'
                     for k,v of value
+                        v.key = k if not v.key?
                         @actions.push v
                         
         # too early for log here!            

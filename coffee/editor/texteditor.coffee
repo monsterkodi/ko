@@ -646,6 +646,10 @@ class TextEditor extends Editor
         if @handleModKeyComboEvent?
             return stop event if 'unhandled' != @handleModKeyComboEvent mod, key, combo, event
             
+        for action in Editor.actions
+            if action.combo == combo
+                log 'action', action.key
+    
         switch combo
             when 'command+3'                then return @startSalter()
             when 'command+esc'              then return @startStickySelection()

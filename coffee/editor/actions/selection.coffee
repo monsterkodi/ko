@@ -11,7 +11,7 @@ log
 
 module.exports =
     
-    infos:
+    actions:
         startStickySelection:
             name:  'sticky selection mode'
             text:  'current selection is not removed when adding new selections'
@@ -29,6 +29,13 @@ module.exports =
         selectPrevHighlight:
             name:  'select previous highlight'
             combo: 'command+shift+g'
+        selectTextBetweenCursorsOrSurround:
+            name: 'select between cursors|brackets|quotes'
+            text: """
+                select text between even cursors, if at least two cursors exist. 
+                select text between highlighted brackets or quotes otherwise.
+                """
+            combo: 'command+alt+ctrl+b'
 
     selectSingleRange: (r, opt) ->
         if not r?
@@ -39,6 +46,12 @@ module.exports =
         @do.select [r]
         @do.end()
 
+    #  0000000  000000000  000   0000000  000   000  000   000  
+    # 000          000     000  000       000  000    000 000   
+    # 0000000      000     000  000       0000000      00000    
+    #      000     000     000  000       000  000      000     
+    # 0000000      000     000   0000000  000   000     000     
+    
     startStickySelection: () -> 
         @stickySelection = true
         @updateTitlebar?()
@@ -49,6 +62,12 @@ module.exports =
         @updateTitlebar?()
         @emit 'selection'
 
+    #  0000000  000000000   0000000   00000000   000000000          00000000  000   000  0000000    
+    # 000          000     000   000  000   000     000             000       0000  000  000   000  
+    # 0000000      000     000000000  0000000       000     000000  0000000   000 0 000  000   000  
+    #      000     000     000   000  000   000     000             000       000  0000  000   000  
+    # 0000000      000     000   000  000   000     000             00000000  000   000  0000000    
+    
     startSelection: (opt = extend:false) ->
         if opt?.extend 
             if not @startSelectionCursors
@@ -85,6 +104,12 @@ module.exports =
             @do.select newSelection
         @checkSalterMode()      
 
+    #  0000000   0000000    0000000    
+    # 000   000  000   000  000   000  
+    # 000000000  000   000  000   000  
+    # 000   000  000   000  000   000  
+    # 000   000  0000000    0000000    
+    
     addRangeToSelection: (range) ->
         @do.start()
         newSelections = @do.selections()
@@ -114,6 +139,12 @@ module.exports =
         @do.select @rangesForAllLines()
         @do.end()
         
+    # 000  000   000  000   000  00000000  00000000   000000000  
+    # 000  0000  000  000   000  000       000   000     000     
+    # 000  000 0 000   000 000   0000000   0000000       000     
+    # 000  000  0000     000     000       000   000     000     
+    # 000  000   000      0      00000000  000   000     000     
+    
     selectInverted: -> 
         invertedRanges = []        
         sc = @selectedAndCursorLineIndices()
@@ -125,6 +156,50 @@ module.exports =
             @do.setCursors [@rangeStartPos first invertedRanges]
             @do.select invertedRanges
             @do.end()     
+
+    # 0000000    00000000  000000000  000   000  00000000  00000000  000   000  
+    # 000   000  000          000     000 0 000  000       000       0000  000  
+    # 0000000    0000000      000     000000000  0000000   0000000   000 0 000  
+    # 000   000  000          000     000   000  000       000       000  0000  
+    # 0000000    00000000     000     00     00  00000000  00000000  000   000  
+    
+    selectTextBetweenCursorsOrSurround: ->
+        #  [(test)]
+        if @numCursors() and @numCursors() % 2 == 0  
+            @do.start()
+            newSelections = []
+            newCursors = []
+            oldCursors = @do.cursors()
+            for i in [0...oldCursors.length] by 2
+                c0 = oldCursors[i]
+                c1 = oldCursors[i+1]
+                newSelections = newSelections.concat @rangesBetweenPositions c0, c1
+                newCursors.push c1
+            @do.setCursors newCursors
+            @do.select newSelections
+            @do.end()
+        else @selectBetweenSurround()
+
+    selectBetweenSurround: ->
+        if surr = @highlightsSurroundingCursor()
+            @do.start()
+            start = @rangeEndPos surr[0] 
+            end = @rangeStartPos surr[1]
+            s = @rangesBetweenPositions start, end
+            s = @cleanRanges s
+            if s.length
+                @do.select s
+                if @do.numSelections()
+                    @do.setCursors [@rangeEndPos(last s)], Main: 'closest'
+            @do.end()
+            
+    selectSurround: ->
+        if surr = @highlightsSurroundingCursor()
+            @do.start()
+            @do.select surr
+            if @do.numSelections()
+                @do.setCursors (@rangeEndPos(r) for r in @do.selections()), main: 'closest'
+            @do.end()
 
     # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000   0000000  
     # 000   000  000  000        000   000  000      000  000        000   000     000     000       

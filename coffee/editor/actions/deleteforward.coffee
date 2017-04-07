@@ -6,7 +6,7 @@
     
 module.exports = 
     
-    infos:
+    actions:
         deleteToEndOfLine:
             name:   'delte to end of line'
             combo:  'ctrl+k'

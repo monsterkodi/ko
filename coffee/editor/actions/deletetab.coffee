@@ -7,10 +7,11 @@
 
 module.exports = 
     
-    info:
-        name:  'delete tab'
-        combo: 'shift+tab'
-        text:  'delete tab-width spaces before cursors'
+    actions:
+        deleteTab:
+            name:  'delete tab'
+            combo: 'shift+tab'
+            text:  'delete tab-width spaces before cursors'
 
     deleteTab: ->
         if @numSelections()

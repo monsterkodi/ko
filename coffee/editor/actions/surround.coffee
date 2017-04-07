@@ -8,7 +8,7 @@ last
 } = require 'kxk'
 
 module.exports =
-    
+                
     isUnbalancedSurroundCharacter: (ch) ->
         return false if ch in ["#"]
         [cl,cr] = @surroundPairs[ch]
@@ -31,6 +31,12 @@ module.exports =
                 return false
         true
         
+    # 000  000   000   0000000  00000000  00000000   000000000  
+    # 000  0000  000  000       000       000   000     000     
+    # 000  000 0 000  0000000   0000000   0000000       000     
+    # 000  000  0000       000  000       000   000     000     
+    # 000  000   000  0000000   00000000  000   000     000     
+    
     insertSurroundCharacter: (ch) ->
 
         if @isUnbalancedSurroundCharacter ch
@@ -127,34 +133,13 @@ module.exports =
         @do.setCursors newCursors
         @do.end()
         return true
-
-    #  0000000  00000000  000      00000000   0000000  000000000  
-    # 000       000       000      000       000          000     
-    # 0000000   0000000   000      0000000   000          000     
-    #      000  000       000      000       000          000     
-    # 0000000   00000000  0000000  00000000   0000000     000     
+            
+    # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000   0000000  
+    # 000   000  000  000        000   000  000      000  000        000   000     000     000       
+    # 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000     0000000   
+    # 000   000  000  000   000  000   000  000      000  000   000  000   000     000          000  
+    # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     0000000   
     
-    selectBetweenSurround: ->
-        if surr = @highlightsSurroundingCursor()
-            @do.start()
-            start = @rangeEndPos surr[0] 
-            end = @rangeStartPos surr[1]
-            s = @rangesBetweenPositions start, end
-            s = @cleanRanges s
-            if s.length
-                @do.select s
-                if @do.numSelections()
-                    @do.setCursors [@rangeEndPos(last s)], Main: 'closest'
-            @do.end()
-            
-    selectSurround: ->
-        if surr = @highlightsSurroundingCursor()
-            @do.start()
-            @do.select surr
-            if @do.numSelections()
-                @do.setCursors (@rangeEndPos(r) for r in @do.selections()), main: 'closest'
-            @do.end()
-            
     highlightsSurroundingCursor: ->
         if @numHighlights() % 2 == 0
             hs = @highlights()

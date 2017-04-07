@@ -1,7 +1,10 @@
 # todo/ideas
 
+- fix command+return in salter mode
+- fix triple quote input|delete
 - other windows in titlebar
 - set restore cursors before reload
+- set and restore cursors when search saves
 - if no highlights
     - alt+command+b : set cursors at selection boundaries 
     - ctrl+alt+command+b : select between cursors

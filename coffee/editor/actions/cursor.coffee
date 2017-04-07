@@ -8,7 +8,7 @@ _ = require 'lodash'
 
 module.exports =
 
-    infos:
+    actions:
         alignCursors:
             name: 'align cursors'
             text: 'align cursors vertically with (top|bottom|left|right)-most cursor'
@@ -18,7 +18,21 @@ module.exports =
             name: 'align cursors and text'
             text: 'align text to the right of cursors by inserting spaces'
             combo: 'alt+ctrl+shift+right'
+
+        setCursorsAtSelectionBoundariesOrSelectSurround:
+            name: 'set cursors at selection boundaries or select brackets|quotes'
+            text: """
+                set cursors at selection boundaries, if a selection exists.
+                select brackets or quotes otherwise.
+                """
+            combo: 'command+alt+b'
         
+    #  0000000  00000000  000000000  
+    # 000       000          000     
+    # 0000000   0000000      000     
+    #      000  000          000     
+    # 0000000   00000000     000     
+    
     singleCursorAtPos: (p, opt = extend:false) ->
         if @numLines() == 0
             @do.start()
@@ -35,7 +49,26 @@ module.exports =
         @do.start()
         @do.setCursors [[c,l]]
         @do.end()
+
+    setCursorsAtSelectionBoundariesOrSelectSurround: ->
+        if @numSelections()
+            @do.start()
+            newCursors = []
+            for s in @do.selections()
+                newCursors.push @rangeStartPos s
+                newCursors.push @rangeEndPos s
+            @do.select []
+            @do.setCursors newCursors
+            @do.end()
+        else
+            @selectSurround()
         
+    #  0000000   0000000    0000000    
+    # 000   000  000   000  000   000  
+    # 000000000  000   000  000   000  
+    # 000   000  000   000  000   000  
+    # 000   000  0000000    0000000    
+    
     toggleCursorAtPos: (p) ->
         if @isPosInPositions p, @state.cursors()
             @delCursorAtPos p
@@ -48,17 +81,7 @@ module.exports =
         newCursors.push p
         @do.setCursors newCursors, main:'last'
         @do.end()
-        
-    delCursorAtPos: (p) ->
-        oldCursors = @state.cursors()
-        c = @posInPositions p, oldCursors
-        if c and @numCursors() > 1
-            @do.start()
-            newCursors = @do.cursors()
-            newCursors.splice oldCursors.indexOf(c), 1
-            @do.setCursors newCursors, main:'closest'
-            @do.end()
-           
+                   
     addCursors: (dir='down') ->
         return if @numCursors() >= 999
         @do.start()
@@ -78,6 +101,12 @@ module.exports =
         @do.setCursors newCursors, main:main
         @do.end()
 
+    #  0000000   000      000   0000000   000   000  
+    # 000   000  000      000  000        0000  000  
+    # 000000000  000      000  000  0000  000 0 000  
+    # 000   000  000      000  000   000  000  0000  
+    # 000   000  0000000  000   0000000   000   000  
+    
     alignCursorsAndText: ->
         @do.start()
         newCursors = @do.cursors()
@@ -107,6 +136,22 @@ module.exports =
         @do.setCursors newCursors, main:main
         @do.end()
         
+    # 0000000    00000000  000      
+    # 000   000  000       000      
+    # 000   000  0000000   000      
+    # 000   000  000       000      
+    # 0000000    00000000  0000000  
+
+    delCursorAtPos: (p) ->
+        oldCursors = @state.cursors()
+        c = @posInPositions p, oldCursors
+        if c and @numCursors() > 1
+            @do.start()
+            newCursors = @do.cursors()
+            newCursors.splice oldCursors.indexOf(c), 1
+            @do.setCursors newCursors, main:'closest'
+            @do.end()
+
     delCursors: (dir='up') ->
         @do.start()
         oldCursors = @state.cursors()
@@ -130,6 +175,12 @@ module.exports =
         @do.setCursors newCursors, main:main
         @do.end()
         
+    #  0000000  000      00000000   0000000   00000000   
+    # 000       000      000       000   000  000   000  
+    # 000       000      0000000   000000000  0000000    
+    # 000       000      000       000   000  000   000  
+    #  0000000  0000000  00000000  000   000  000   000  
+    
     clearCursors: () -> 
         @do.start()
         @do.setCursors [@mainCursor()]

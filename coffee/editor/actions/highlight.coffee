@@ -9,7 +9,7 @@ first
 
 module.exports = 
 
-    infos:
+    actions:
         highlightWordAndAddToSelection:
             name: 'highlight and select word'
             text: 'highlights all occurrences of text in selection or word at cursor and selects the first|next highlight.'

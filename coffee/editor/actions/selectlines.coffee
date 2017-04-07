@@ -10,7 +10,7 @@ first
 
 module.exports =
 
-    infos: 
+    actions:
         
         selectMoreLines:
             name:  'select more lines'
