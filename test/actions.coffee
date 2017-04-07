@@ -37,7 +37,7 @@ describe 'actions', ->
             'toggleComment'
             'setCursor', 'toggleCursorAtPos', 'addCursorAtPos', 'addCursors'
             'alignCursorsAndText', 'alignCursors', 'setCursorsAtSelectionBoundary'
-            'delCursors', 'delCursorAtPos', 'clearCursors', 'clearCursorsAndHighlights'
+            'delCursors', 'clearCursors', 'clearCursorsAndHighlights'
             'moveAllCursors', 'moveMainCursor', 'moveCursors'
             'moveCursorsToLineBoundary', 'moveCursorsToWordBoundary'
             'selectSingleRange', 'selectNone', 'selectAll', 'selectInverted'

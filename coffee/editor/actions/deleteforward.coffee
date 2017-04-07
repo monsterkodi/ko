@@ -19,7 +19,7 @@ module.exports =
 
     deleteToEndOfLine: ->
         @do.start()
-        @moveCursorsToLineBoundary 'right', true
+        @moveCursorsToLineBoundary 'right', extend:false
         @deleteSelection()
         @do.end()
 

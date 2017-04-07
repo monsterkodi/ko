@@ -1,8 +1,8 @@
-# 00     00   0000000   000   000  00000000
-# 000   000  000   000  000   000  000     
-# 000000000  000   000   000 000   0000000 
-# 000 0 000  000   000     000     000     
-# 000   000   0000000       0      00000000
+# 00     00   0000000   000   000  00000000       0000000  000   000  00000000    0000000   0000000   00000000    0000000  
+# 000   000  000   000  000   000  000           000       000   000  000   000  000       000   000  000   000  000       
+# 000000000  000   000   000 000   0000000       000       000   000  0000000    0000000   000   000  0000000    0000000   
+# 000 0 000  000   000     000     000           000       000   000  000   000       000  000   000  000   000       000  
+# 000   000   0000000       0      00000000       0000000   0000000   000   000  0000000    0000000   000   000  0000000   
 {
 first,
 last,
@@ -36,7 +36,7 @@ module.exports =
             name:   'move cursors to line boundaries'
             text:   'moves cursors to line boundaries. extends selections, if shift is pressed.'
             combos: ['command+shift+left', 'command+shift+right', 'ctrl+e', 'ctrl+shift+e', 'ctrl+a', 'ctrl+shift+a']
-
+        
         moveCursors:
             name:  'move cursors'
             combos: ['left', 'right', 'up', 'down', 'shift+down', 'shift+right', 'shift+up', 'shift+left']
@@ -47,6 +47,56 @@ module.exports =
         else
             @moveCursorsToLineBoundary key
 
+    moveMainCursor: (key, info) ->
+        dir = key 
+        opt = erase: info.mod.indexOf('shift') >= 0
+        @do.start()
+        [dx, dy] = switch dir
+            when 'up'    then [0,-1]
+            when 'down'  then [0,+1]
+            when 'left'  then [-1,0]
+            when 'right' then [+1,0]
+        newCursors = @do.cursors()
+        oldMain = @mainCursor()
+        newMain = [oldMain[0]+dx, oldMain[1]+dy]
+        _.remove newCursors, (c) => 
+            if opt?.erase
+                @isSamePos(c, oldMain) or @isSamePos(c, newMain) 
+            else
+                @isSamePos(c, newMain) 
+        newCursors.push newMain
+        @do.setCursors newCursors, main:newMain
+        @do.end()
+
+    moveCursorsToWordBoundary: (leftOrRight, info) ->
+        extend = info.extend ? 0 <= info.mod.indexOf 'shift'
+        f = switch leftOrRight
+            when 'right' then @endOfWordAtCursor
+            when 'left'  then @startOfWordAtCursor
+        @moveAllCursors f, extend:extend, keepLine:true
+        true
+
+    moveCursorsToLineBoundary: (key, info = extend:false) ->
+        extend = info.extend ? 0 <= info.mod.indexOf 'shift'
+        func = switch key
+            when 'right', 'e' then (c) => [@do.line(c[1]).length, c[1]]
+            when 'left', 'a'  then (c) => 
+                if @line(c[1]).slice(0,c[0]).trim().length == 0
+                    [0, c[1]]
+                else
+                    d = @do.line(c[1]).length - @do.line(c[1]).trimLeft().length
+                    [d, c[1]]
+        @moveAllCursors func, extend:extend, keepLine:true
+        true
+
+    moveCursors: (key, info = extend:false) ->
+        extend = info.extend ? 'shift' == info.mod
+        switch key
+            when 'left'  then @moveCursorsLeft  extend
+            when 'right' then @moveCursorsRight extend
+            when 'up'    then @moveCursorsUp    extend
+            when 'down'  then @moveCursorsDown  extend
+        
     setCursorsAtSelectionBoundary: (leftOrRight='right') ->
         @do.start()
         i = leftOrRight == 'right' and 1 or 0
@@ -84,49 +134,7 @@ module.exports =
         @do.setCursors newCursors, main:main
         @endSelection opt
         @do.end()
-
-    moveMainCursor: (key, info) ->
-        dir = key 
-        opt = erase: info.mod.indexOf('shift') >= 0
-        @do.start()
-        [dx, dy] = switch dir
-            when 'up'    then [0,-1]
-            when 'down'  then [0,+1]
-            when 'left'  then [-1,0]
-            when 'right' then [+1,0]
-        newCursors = @do.cursors()
-        oldMain = @mainCursor()
-        newMain = [oldMain[0]+dx, oldMain[1]+dy]
-        _.remove newCursors, (c) => 
-            if opt?.erase
-                @isSamePos(c, oldMain) or @isSamePos(c, newMain) 
-            else
-                @isSamePos(c, newMain) 
-        newCursors.push newMain
-        @do.setCursors newCursors, main:newMain
-        @do.end()
         
-    moveCursorsToLineBoundary: (leftOrRight, info) ->
-        extend = info.extend ? 0 <= info.mod.indexOf 'shift'
-        func = switch leftOrRight
-            when 'right' then (c) => [@do.line(c[1]).length, c[1]]
-            when 'left'  then (c) => 
-                if @line(c[1]).slice(0,c[0]).trim().length == 0
-                    [0, c[1]]
-                else
-                    d = @do.line(c[1]).length - @do.line(c[1]).trimLeft().length
-                    [d, c[1]]
-        @moveAllCursors func, extend:extend, keepLine:true
-        true
-    
-    moveCursorsToWordBoundary: (leftOrRight, info) ->
-        extend = info.extend ? 0 <= info.mod.indexOf 'shift'
-        f = switch leftOrRight
-            when 'right' then @endOfWordAtCursor
-            when 'left'  then @startOfWordAtCursor
-        @moveAllCursors f, extend:extend, keepLine:true
-        true
-    
     moveCursorsUp: (e, n=1) ->                 
         @moveAllCursors ((n)->(c)->[c[0],c[1]-n])(n), extend:e, main: 'top'
                         
@@ -156,10 +164,3 @@ module.exports =
             
         @moveAllCursors ((n)->(c)->[c[0],c[1]+n])(n), extend:e, main: 'bot'
         
-    moveCursors: (key, info) ->
-        extend = info.extend ? 'shift' == info.mod
-        switch key
-            when 'left'  then @moveCursorsLeft  extend
-            when 'right' then @moveCursorsRight extend
-            when 'up'    then @moveCursorsUp    extend
-            when 'down'  then @moveCursorsDown  extend

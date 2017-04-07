@@ -26,6 +26,14 @@ module.exports =
                 select brackets or quotes otherwise.
                 """
             combo: 'command+alt+b'
+            
+        addCursors: 
+            name: 'add cursors up|down'
+            combos: ['command+up', 'command+down']
+        
+        delCursors:
+            name: 'remove cursors up|down'
+            combos: ['command+shift+up', 'command+shift+down']
         
     #  0000000  00000000  000000000  
     # 000       000          000     
@@ -82,7 +90,8 @@ module.exports =
         @do.setCursors newCursors, main:'last'
         @do.end()
                    
-    addCursors: (dir='down') ->
+    addCursors: (key) ->
+        dir = key
         return if @numCursors() >= 999
         @do.start()
         d = switch dir
@@ -152,27 +161,22 @@ module.exports =
             @do.setCursors newCursors, main:'closest'
             @do.end()
 
-    delCursors: (dir='up') ->
+    delCursors: (key, info) ->
+        dir = key
         @do.start()
-        oldCursors = @state.cursors()
         newCursors = @do.cursors()
-        main = null
         d = switch dir
             when 'up' 
-                for c in oldCursors.reversed()
-                    if @isPosInPositions([c[0], c[1]-1], oldCursors) and not @isPosInPositions [c[0], c[1]+1], oldCursors
-                        ci = oldCursors.indexOf c
-                        if @isSamePos @do.mainCursor(), newCursors[ci]
-                            main = @posInPositions [c[0], c[1]-1], newCursors  
+                for c in @do.cursors()
+                    if @isPosInPositions([c[0], c[1]-1], newCursors) and not @isPosInPositions [c[0], c[1]+1], newCursors
+                        ci = newCursors.indexOf c
                         newCursors.splice ci, 1
             when 'down' 
-                for c in oldCursors.reversed()
-                    if @isPosInPositions([c[0], c[1]+1], oldCursors) and not @isPosInPositions [c[0], c[1]-1], oldCursors
-                        ci = oldCursors.indexOf c
-                        if @isSamePos @do.mainCursor(), newCursors[ci]
-                            main = @posInPositions [c[0], c[1]+1], newCursors  
+                for c in newCursors.reversed()
+                    if @isPosInPositions([c[0], c[1]+1], newCursors) and not @isPosInPositions [c[0], c[1]-1], newCursors
+                        ci = newCursors.indexOf c
                         newCursors.splice ci, 1
-        @do.setCursors newCursors, main:main
+        @do.setCursors newCursors, main:'closest'
         @do.end()
         
     #  0000000  000      00000000   0000000   00000000   

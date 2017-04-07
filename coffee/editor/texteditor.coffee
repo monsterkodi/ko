@@ -666,16 +666,6 @@ class TextEditor extends Editor
             when 'command+z'                then return @do.undo()
             when 'command+shift+z'          then return @do.redo()
                 
-            when 'command+up',   'command+down'   then return @addCursors key
-            when 'ctrl+a',       'ctrl+shift+a'   then return @moveCursorsToLineBoundary 'left',  event.shiftKey
-            when 'ctrl+e',       'ctrl+shift+e'   then return @moveCursorsToLineBoundary 'right', event.shiftKey
-            when 'ctrl+k'                         then return @deleteToEndOfLine()                
-            when 'command+left', 'command+right'  then return @setOrMoveCursorsAtBoundary key
-                        
-            when 'command+shift+left', 'command+shift+right' then return @moveCursorsToLineBoundary key, true
-            when 'command+shift+up',   'command+shift+down'  then return @delCursors    key
-            when 'alt+ctrl+shift+right'                      then return @alignCursorsAndText()
-        
         # log 'combo', combo
         
         return if mod and not key?.length
