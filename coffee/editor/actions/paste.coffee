@@ -10,18 +10,28 @@ clipboard = electron.clipboard
         
 module.exports = 
 
+    actions:
+        cut:
+            name: 'cut'
+            combo: 'command+x'
+        copy:
+            name: 'copy'
+            combo: 'command+c'
+        paste:
+            name: 'paste'
+            combo: 'command+v'
+    
     cut: ->
         @do.start()
         @copy()
         @deleteSelection()
         @do.end()
 
-    copy: ->
-        clipboard?.writeText @textOfSelectionForClipboard()
+    copy: -> clipboard?.writeText @textOfSelectionForClipboard()
         
-    paste: (text) ->
+    paste: -> @pasteText clipboard?.readText()
         
-        text ?= clipboard?.readText()
+    pasteText: (text) ->
         
         @deleteSelection()
         @do.start()        

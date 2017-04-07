@@ -447,7 +447,7 @@ describe 'complex', ->
             editor.singleCursorAtPos [2,1]
             editor.moveMainCursor 'down', erase:false
             editor.moveMainCursor 'down', erase:true
-            editor.moveCursors 'down', true
+            editor.moveCursors 'down', extend:true
             undo.reset()
             editor.insertCharacter '-'
             expect editor.text()
@@ -470,8 +470,8 @@ describe 'complex', ->
             editor.moveMainCursor 'down', erase:true
             editor.moveMainCursor 'down', erase:true
             editor.moveMainCursor 'down', erase:true
-            editor.moveCursors 'down', true
-            editor.moveCursors 'down', true
+            editor.moveCursors 'down', extend:true
+            editor.moveCursors 'down', extend:true
             undo.reset()
             editor.insertCharacter '-'
             expect editor.text()

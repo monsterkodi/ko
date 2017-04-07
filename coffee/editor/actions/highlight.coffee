@@ -14,6 +14,9 @@ module.exports =
             name: 'highlight and select word'
             text: 'highlights all occurrences of text in selection or word at cursor and selects the first|next highlight.'
             combo: 'command+d'
+        selectAllWords:
+            name:  'select all words'
+            combo: 'command+alt+d'
         removeSelectedHighlight:
             name: 'remove highlighted word from the selection'
             text: "does the inverse of 'highlight and select' word"
@@ -35,13 +38,12 @@ module.exports =
         @renderHighlights()
         @emit 'highlight'
     
+    wordHighlights: -> @highlights().filter (h) -> not h[2]?.clss?.startsWith('stringmatch') and not h[2]?.clss?.startsWith('bracketmatch')
+
     highlightWordAndAddToSelection: -> # command+d
         cp = @cursorPos()
-        
-        wordHighlights = @highlights().filter (h) -> not h[2]?.clss?.startsWith('stringmatch') and not h[2]?.clss?.startsWith('bracketmatch')
-        
+        wordHighlights = @wordHighlights()
         cursorInWordHighlight = wordHighlights.length and @rangeAtPosInRanges cp, wordHighlights
-        
         if not cursorInWordHighlight
             @highlightTextOfSelectionOrWordAtCursor() # this also selects
         else
@@ -55,6 +57,14 @@ module.exports =
             @addRangeToSelection r
             @scrollCursorToTop?() # < sucks!
             @do.end()
+
+    selectAllWords: -> # command+alt+d
+        @highlightWordAndAddToSelection()
+        @do.start()
+        @do.select @do.highlights()
+        if @do.numSelections()
+            @do.setCursors (@rangeEndPos(r) for r in @do.selections()), main: 'closest'
+        @do.end()
 
     highlightTextOfSelectionOrWordAtCursor: -> # command+e       
             

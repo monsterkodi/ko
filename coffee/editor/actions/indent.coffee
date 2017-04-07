@@ -5,7 +5,15 @@
 # 000  000   000  0000000    00000000  000   000     000   
 
 module.exports =
-        
+      
+    actions: 
+        indent:
+            name:  'indent'
+            combo: 'command+]'
+        deIndent:
+            name:  'de-indent'
+            combo: 'command+['
+            
     indent: ->
         @do.start()
         newSelections = @do.selections()

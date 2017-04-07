@@ -6,8 +6,13 @@
 
 module.exports = 
     
-    duplicateLines: (dir='down') ->
-        
+    actions:
+        duplicateLines:
+            name: 'duplicate lines'
+            combos: ['alt+shift+up', 'alt+shift+down']
+
+    duplicateLines: (key, info) ->
+        dir = key
         csr = @continuousCursorAndSelectedLineIndexRanges()
         
         return if not csr.length

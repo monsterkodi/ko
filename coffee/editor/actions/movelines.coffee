@@ -10,8 +10,13 @@ last
 
 module.exports =
     
-    moveLines: (dir='down') ->
-        
+    actions:
+        moveLines:
+            name: 'move lines'
+            combos: ['alt+up', 'alt+down']
+    
+    moveLines: (key, info) ->
+        dir = key
         csr = @continuousCursorAndSelectedLineIndexRanges()
         
         return if not csr.length

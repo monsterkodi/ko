@@ -645,49 +645,27 @@ class TextEditor extends Editor
         
         if @handleModKeyComboEvent?
             return stop event if 'unhandled' != @handleModKeyComboEvent mod, key, combo, event
-            
+         
         for action in Editor.actions
-            if action.combo == combo
-                log 'action', action.key
+            if action.combos?
+                combos = action.combos
+            else combos = [action.combo]
+            for actionCombo in combos
+                if combo == actionCombo
+                    if action.key? and _.isFunction @[action.key]
+                        log "activate action #{action.key}"
+                        @[action.key] key, combo: combo, mod: mod, event: event
+                        return
     
         switch combo
-            when 'command+3'                then return @startSalter()
-            when 'command+esc'              then return @startStickySelection()
             when 'tab'                      then return stop event, @insertTab()
             when 'shift+tab'                then return stop event, @deleteTab()
             when 'enter'                    then return @insertCharacter '\n'
             when 'command+enter'            then return @moveCursorsToLineBoundary('right') and @insertNewline indent: true
             when 'alt+enter'                then return post.emit 'jumpTo', @wordAtCursor()
-            when 'command+]'                then return @indent()
-            when 'command+['                then return @deIndent()
-            when 'command+j'                then return @joinLines()
-            when 'command+/'                then return @toggleComment()
-            when 'command+a'                then return @selectAll()
-            when 'command+i'                then return @selectInverted()
-            when 'command+shift+a'          then return @selectNone()
-            when 'command+e'                then return @highlightTextOfSelectionOrWordAtCursor()
-            when 'command+d'                then return @highlightWordAndAddToSelection()
-            when 'command+shift+d'          then return @removeSelectedHighlight()
-            when 'command+alt+d'            then return @selectAllHighlights()
-            when 'command+alt+b'            then return @selectSurround()
-            when 'command+alt+ctrl+b'       then return @selectBetweenSurround()
-            when 'command+g'                then return @selectNextHighlight()
-            when 'command+shift+g'          then return @selectPrevHighlight()
-            when 'command+l'                then return @selectMoreLines()
-            when 'command+shift+l'          then return @selectLessLines()
             when 'command+z'                then return @do.undo()
             when 'command+shift+z'          then return @do.redo()
-            when 'delete', 'ctrl+backspace' then return @deleteForward()
-            when 'backspace'                then return @deleteBackward()
-            when 'command+backspace'        then return @deleteBackward ignoreLineBoundary: true
-            when 'alt+backspace'            then return @deleteBackward ignoreTabBoundary:  true
-            when 'shift+backspace'          then return @deleteBackward singleCharacter:    true
-            when 'command+x'                then return @cut()
-            when 'command+c'                then return @copy()
-            when 'command+v'                then return @paste()
                 
-            when 'alt+shift+up', 'alt+shift+down' then return @duplicateLines  key
-            when 'alt+up',       'alt+down'       then return @moveLines  key
             when 'command+up',   'command+down'   then return @addCursors key
             when 'ctrl+a',       'ctrl+shift+a'   then return @moveCursorsToLineBoundary 'left',  event.shiftKey
             when 'ctrl+e',       'ctrl+shift+e'   then return @moveCursorsToLineBoundary 'right', event.shiftKey
@@ -697,13 +675,6 @@ class TextEditor extends Editor
             when 'command+shift+left', 'command+shift+right' then return @moveCursorsToLineBoundary key, true
             when 'command+shift+up',   'command+shift+down'  then return @delCursors    key
             when 'alt+ctrl+shift+right'                      then return @alignCursorsAndText()
-            when 'alt+ctrl+up',   'alt+ctrl+down',   'alt+ctrl+left',   'alt+ctrl+right'   then return @alignCursors  key
-            when 'ctrl+up',       'ctrl+down',       'ctrl+left',       'ctrl+right'       then return @moveMainCursor key
-            when 'ctrl+shift+up', 'ctrl+shift+down', 'ctrl+shift+left', 'ctrl+shift+right' then return @moveMainCursor key, erase: true
-            when 'alt+left',      'alt+right',       'alt+shift+left',  'alt+shift+right'  then return @moveCursorsToWordBoundary key, event.shiftKey
-            when 'down', 'right', 'up', 'left', 'shift+down', 'shift+right', 'shift+up', 'shift+left' 
-                @moveCursors key, event.shiftKey
-                stop event
         
         # log 'combo', combo
         

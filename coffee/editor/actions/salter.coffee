@@ -67,7 +67,7 @@ module.exports =
             char = salt(ch).split '\n'
         if char.length == 5
             salted = ("#{s}  " for s in char).join '\n'
-            @paste salted
+            @pasteText salted
         else
             @setSalterMode false
         true

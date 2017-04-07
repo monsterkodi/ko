@@ -19,6 +19,9 @@ module.exports =
         selectAll:
             name:  'select all lines'
             combo: 'command+a'
+        selectNone:
+            name:  'deselect'
+            combo: 'command+shift+a'
         selectInverted:
             name:  'invert selection'
             text:  'selects all lines that have no cursors and no selections'
@@ -29,6 +32,9 @@ module.exports =
         selectPrevHighlight:
             name:  'select previous highlight'
             combo: 'command+shift+g'
+        selectAllHighlights:
+            name:  'select all highlights'
+            combo: 'command+alt+d'
         selectTextBetweenCursorsOrSurround:
             name: 'select between cursors|brackets|quotes'
             text: """
@@ -206,16 +212,7 @@ module.exports =
     # 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000     0000000   
     # 000   000  000  000   000  000   000  000      000  000   000  000   000     000          000  
     # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     0000000   
-    
-    selectAllHighlights: ->
-        @do.start()
-        if not @numHighlights()
-            @highlightTextOfSelectionOrWordAtCursor()
-        @do.select @do.highlights()
-        if @do.numSelections()
-            @do.setCursors (@rangeEndPos(r) for r in @do.selections()), main: 'closest'
-        @do.end()
-    
+        
     selectNextHighlight: -> # command+g
         if not @numHighlights() and window? # < this sucks
             searchText = window.commandline.commands.find?.currentText

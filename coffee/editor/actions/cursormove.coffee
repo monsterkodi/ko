@@ -5,7 +5,8 @@
 # 000   000   0000000       0      00000000
 {
 first,
-last
+last,
+log
 } = require 'kxk'
 _ = require 'lodash'
 
@@ -29,7 +30,7 @@ module.exports =
         moveCursorsToWordBoundary:
             name:   'move cursors to word boundaries'
             text:   'moves cursors to word boundaries. extends selections, if shift is pressed.'            
-            combos: ['alt+left',       'alt+right',      'alt+shift+left',  'alt+shift+right']
+            combos: ['alt+left', 'alt+right', 'alt+shift+left', 'alt+shift+right']
 
         moveCursorsToLineBoundary:
             name:   'move cursors to line boundaries'
@@ -38,8 +39,7 @@ module.exports =
 
         moveCursors:
             name:  'move cursors'
-            text:   'move all cursors simultaneously'
-            combos: ['left', 'right', 'up', 'down']
+            combos: ['left', 'right', 'up', 'down', 'shift+down', 'shift+right', 'shift+up', 'shift+left']
 
     setOrMoveCursorsAtBoundary: (key) ->
         if @numSelections() > 1 and @numCursors() == 1
@@ -85,7 +85,9 @@ module.exports =
         @endSelection opt
         @do.end()
 
-    moveMainCursor: (dir='down', opt = erase:false) ->
+    moveMainCursor: (key, info) ->
+        dir = key 
+        opt = erase: info.mod.indexOf('shift') >= 0
         @do.start()
         [dx, dy] = switch dir
             when 'up'    then [0,-1]
@@ -104,7 +106,8 @@ module.exports =
         @do.setCursors newCursors, main:newMain
         @do.end()
         
-    moveCursorsToLineBoundary: (leftOrRight, e) ->
+    moveCursorsToLineBoundary: (leftOrRight, info) ->
+        extend = info.extend ? 0 <= info.mod.indexOf 'shift'
         func = switch leftOrRight
             when 'right' then (c) => [@do.line(c[1]).length, c[1]]
             when 'left'  then (c) => 
@@ -113,14 +116,15 @@ module.exports =
                 else
                     d = @do.line(c[1]).length - @do.line(c[1]).trimLeft().length
                     [d, c[1]]
-        @moveAllCursors func, extend:e, keepLine:true
+        @moveAllCursors func, extend:extend, keepLine:true
         true
     
-    moveCursorsToWordBoundary: (leftOrRight, e) ->
+    moveCursorsToWordBoundary: (leftOrRight, info) ->
+        extend = info.extend ? 0 <= info.mod.indexOf 'shift'
         f = switch leftOrRight
             when 'right' then @endOfWordAtCursor
             when 'left'  then @startOfWordAtCursor
-        @moveAllCursors f, extend:e, keepLine:true
+        @moveAllCursors f, extend:extend, keepLine:true
         true
     
     moveCursorsUp: (e, n=1) ->                 
@@ -152,9 +156,10 @@ module.exports =
             
         @moveAllCursors ((n)->(c)->[c[0],c[1]+n])(n), extend:e, main: 'bot'
         
-    moveCursors: (direction, e) ->
-        switch direction
-            when 'left'  then @moveCursorsLeft  e
-            when 'right' then @moveCursorsRight e
-            when 'up'    then @moveCursorsUp    e
-            when 'down'  then @moveCursorsDown  e
+    moveCursors: (key, info) ->
+        extend = info.extend ? 'shift' == info.mod
+        switch key
+            when 'left'  then @moveCursorsLeft  extend
+            when 'right' then @moveCursorsRight extend
+            when 'up'    then @moveCursorsUp    extend
+            when 'down'  then @moveCursorsDown  extend

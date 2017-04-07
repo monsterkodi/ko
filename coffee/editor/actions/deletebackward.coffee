@@ -13,10 +13,16 @@ module.exports =
     actions:
         deleteBackward:
             name:  'delete backward'
-            combo: 'backspace'
             text:  'delete character to the left'
+            combos: ['backspace']
     
-    deleteBackward: (opt) ->
+    deleteBackward: (key, info) ->
+        
+        opt = {}
+        switch info.combo
+            when 'command+backspace' then opt.ignoreLineBoundary = true
+            when 'alt+backspace'     then opt.ignoreTabBoundary  = true
+            when 'shift+backspace'   then opt.singleCharacter    = true
         
         @do.start()
         if @do.numSelections()

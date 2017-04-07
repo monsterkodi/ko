@@ -44,6 +44,8 @@ class Do
             @startState = @state = @editor.state
             @history.push @state
 
+    isDoing: -> @groupCount > 0
+
     # 00     00   0000000   0000000    000  00000000  000   000
     # 000   000  000   000  000   000  000  000        000 000 
     # 000000000  000   000  000   000  000  000000      00000  

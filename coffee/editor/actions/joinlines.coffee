@@ -6,6 +6,11 @@
 
 module.exports = 
     
+    actions:
+        joinLines:
+            name: 'join lines'
+            combo: 'command+j'
+            
     joinLines: ->
         @do.start()
         newCursors = []

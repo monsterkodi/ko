@@ -6,6 +6,11 @@
 
 module.exports =
     
+    actions:
+        toggleComment:
+            name: 'toggle comment'
+            combo: 'command+/'
+
     toggleComment: ->
         
         @do.start()

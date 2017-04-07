@@ -137,7 +137,7 @@ describe 'basic editing', ->
     it 'cut copy paste', ->
         editor.cut()
         textIs "ab\n        cd"
-        editor.paste "cd\n    cd"
+        editor.pasteText "cd\n    cd"
         textIs "ab\ncd\n    cd\n        cd"
         
     it 'salter', ->
