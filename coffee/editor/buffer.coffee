@@ -30,13 +30,7 @@ class Buffer extends multi event, ranges
         @setState new State lines:lines
         @emit 'numLines', @numLines()
 
-    setState: (@state) ->
-        # if @name == 'editor'
-            # if @mainCursor()[1] < 0 and @numLines()
-                # log "DAFUK mainCursor"
-        # for s in @selections()
-            # if s[0] == undefined
-                # log "DAFUK selections #{@name}"
+    setState: (state) -> @state = state
     
     mainCursor:    -> @state.mainCursor()
     line:      (i) -> @state.line i

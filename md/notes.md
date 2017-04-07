@@ -1,9 +1,11 @@
 # todo/ideas
 
+- restore cursors, etc after reload
 - fix command+d selecting bracket|string (highlight)
 - if no highlights
     - alt+command+b : set cursors at selection boundaries 
     - ctrl+alt+command+b : select between cursors
+
 - source maps (konrad?)
 - limit size of range for bracket matching 
 - list project|pkg dirs?
