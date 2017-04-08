@@ -49,7 +49,8 @@ module.exports =
 
     moveMainCursor: (key, info) ->
         dir = key 
-        opt = erase: info.mod.indexOf('shift') >= 0
+        hrz = key in ['left', 'right']
+        opt = erase: info.mod.indexOf('shift') >= 0 or hrz
         @do.start()
         [dx, dy] = switch dir
             when 'up'    then [0,-1]

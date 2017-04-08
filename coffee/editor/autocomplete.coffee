@@ -279,7 +279,7 @@ class Autocomplete extends event
     # 000   000  000 0 000
     # 000   000  000  0000
     #  0000000   000   000
-            
+    
     onLinesAppended:  (lines)    => @parseLines lines, action: 'append'
     onLineInserted:   (li)       => @parseLines [@editor.line(li)], action: 'insert'
     onLineChanged:    (li)       => @parseLines [@editor.line(li)], action: 'change', count: 0
@@ -297,7 +297,7 @@ class Autocomplete extends event
         
         switch combo
             when 'enter'                
-                @editor.paste @selectedCompletion()
+                @editor.pasteText @selectedCompletion()
                 @close()
                 return
             

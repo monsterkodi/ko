@@ -4,8 +4,9 @@
 #    000     000000000  0000000    
 #    000     000   000  000   000  
 #    000     000   000  0000000    
-
-{stopEvent} = 'kxk'
+{
+stopEvent
+} = require 'kxk'
 _ = require 'lodash'
 
 module.exports = 

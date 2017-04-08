@@ -3,8 +3,10 @@
 # 000 0 000  0000000   000000000  000      000  000 0 000  0000000 
 # 000  0000  000       000   000  000      000  000  0000  000     
 # 000   000  00000000  00     00  0000000  000  000   000  00000000
-    
-_ = require 'lodash'
+{
+last,
+log} = require 'kxk'    
+_    = require 'lodash'
 
 module.exports = 
     
@@ -20,7 +22,8 @@ module.exports =
             @singleCursorAtPos last @cursors()
             return
         
-        doIndent = info.indent ? not @isCursorInIndent()
+        doIndent = info?.indent ? not @isCursorInIndent()
+        log 'doIndent', doIndent
                     
         @surroundStack = []
         @deleteSelection()

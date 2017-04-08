@@ -158,10 +158,10 @@ reloadFile = ->
     loadFile editor.currentFile, 
         reload:          true
         dontSave:        true
-        dontSaveCursors: true
 
 loadFile = (file, opt={}) ->
     return if not file? or not file.length
+    editor.saveScrollCursorsAndSelections() if opt.reload
     [file,pos] = splitFilePos file
     file = resolve file
     if file != editor.currentFile or opt?.reload

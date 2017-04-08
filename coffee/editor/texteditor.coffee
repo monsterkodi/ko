@@ -4,7 +4,7 @@
 #    000     000        000 000      000           000       000   000  000     000     000   000  000   000  
 #    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000  
 {
-title
+stopEvent,
 setStyle,
 keyinfo,
 prefs,
@@ -22,6 +22,7 @@ scroll    = require './scroll'
 Editor    = require './editor'
 _         = require 'lodash'
 path      = require 'path'
+ansiKey   = require 'ansi-keycode'
 electron  = require 'electron'
 ipc       = electron.ipcRenderer
 
@@ -636,15 +637,11 @@ class TextEditor extends Editor
         return if not combo
         return if key == 'right click' # weird right command key
 
-        stop = (event) ->
-            event.preventDefault()
-            event.stopPropagation()
-
         if @autocomplete?
-            return stop event if 'unhandled' != @autocomplete.handleModKeyComboEvent mod, key, combo, event
+            return stopEvent(event) if 'unhandled' != @autocomplete.handleModKeyComboEvent mod, key, combo, event
         
         if @handleModKeyComboEvent?
-            return stop event if 'unhandled' != @handleModKeyComboEvent mod, key, combo, event
+            return stopEvent(event) if 'unhandled' != @handleModKeyComboEvent mod, key, combo, event
          
         for action in Editor.actions
             if action.combos?
@@ -658,19 +655,18 @@ class TextEditor extends Editor
                         return
     
         switch combo
-            when 'alt+enter'                then return post.emit 'jumpTo', @wordAtCursor()
-            when 'command+z'                then return @do.undo()
-            when 'command+shift+z'          then return @do.redo()
+            when 'alt+enter'       then return post.emit 'jumpTo', @wordAtCursor()
+            when 'command+z'       then return @do.undo()
+            when 'command+shift+z' then return @do.redo()
                 
         # log 'combo', combo
         
         return if mod and not key?.length
         
-        switch key            
-            when 'backspace' then return
+        # switch key            
+            # when 'backspace' then return
             
-        ansiKeycode = require 'ansi-keycode'
-        if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
-            @insertCharacter ansiKeycode event
+        if ansiKey(event)?.length == 1 and mod in ["shift", ""]
+            @insertCharacter ansiKey event
 
 module.exports = TextEditor

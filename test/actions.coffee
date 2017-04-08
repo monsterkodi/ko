@@ -36,7 +36,7 @@ describe 'actions', ->
             'insertTab', 'deleteTab'
             'selectMoreLines', 'selectLessLines'
             'moveLines', 'joinLines', 'duplicateLines'
-            'deleteBackward', 'deleteForward', 'deleteSelection'
+            'deleteBackward', 'deleteForward', 'deleteSelection', 'deleteToEndOfLine'
             'setCursor', 'toggleCursorAtPos', 'addCursorAtPos', 'addCursors'
             'alignCursorsAndText', 'alignCursors', 'setCursorsAtSelectionBoundary'
             'delCursors', 'clearCursors', 'clearCursorsAndHighlights'
@@ -77,7 +77,11 @@ describe 'basic editing', ->
         mainIs [2,0]
         
     it 'newline', ->
+        log editor.text()
+        log editor.cursors()
         editor.newline()
+        log editor.text()
+        log editor.cursors()
         textIs 'ab\n cd'
         mainIs [0,1]
 
@@ -265,4 +269,14 @@ describe 'basic editing', ->
             23467
             013456780"""
         
-    
+    it 'deleteToEndOfLine', ->
+        editor.setText "123456\n123456\n123456"
+        editor.singleCursorAtPos [3,1]
+        editor.deleteToEndOfLine()
+        textIs "123456\n123\n123456"
+        editor.singleCursorAtPos [0,1]
+        textIs "123456\n\n123456"
+        editor.setCursors [[3,0], [0,1], [3,2]]
+        textIs "123\n\n123"
+        
+        

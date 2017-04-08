@@ -1,16 +1,13 @@
 # todo/ideas
 
-- fix broken paste!
-
 - highlights:
     - unhighlight words when cursor moves outside word highlights
     - highlight selection when single selection is set
 
-- fix command+return in salter mode
+- fix command+enter 
 - fix triple quote input|delete
 - other windows in titlebar?
 - make stickySelection mode more visible (show commandline?)
-- set restore cursors before reload
 - set and restore cursors when search saves
 - source maps (konrad?)
 
