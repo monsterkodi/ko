@@ -3,10 +3,14 @@
 # 000000    000   000  0000000    000000000  000000000  0000000    000   000
 # 000       000   000  000   000  000   000  000   000  000   000  000   000
 # 000        0000000   000   000  00     00  000   000  000   000  0000000  
-    
+{
+log
+} = require 'kxk'   
+
 module.exports = 
     
     actions:
+        
         deleteForward:
             name:   'delte forward'
             combos: ['delete', 'ctrl+backspace']
@@ -14,13 +18,49 @@ module.exports =
 
         deleteToEndOfLine:
             name:   'delte to end of line'
-            combo:  'ctrl+k'
-            text:   'delete characters from cursor to the end of line'
+            combo:  'ctrl+shift+k'
+            text:   'delete characters to the end of line'
             
+        deleteToEndOfLineOrWholeLine:
+            name:   'delte to end of line or delete whole line'
+            combo:  'ctrl+k'
+            text:   """delete characters to the end of line, if cursor is not at end of line.
+                delete whole line otherwise.
+                """
+        test:
+            a: 'he'
+            b: 'world'
+            c: 'wordHighlights'
+
     deleteToEndOfLine: ->
         @do.start()
         @moveCursorsToLineBoundary 'right', extend:true
-        @deleteSelection()
+        @deleteSelection deleteLines:false
+        @do.end()
+        
+    deleteToEndOfLineOrWholeLine: ->
+        @do.start()
+        @moveCursorsToLineBoundary 'right', extend:true
+        
+        for s in @do.selections()
+            if @lengthOfRange s
+                @deleteToEndOfLine()
+                @do.end()
+                return
+                
+        @deleteSelection deleteLines:true      
+        # if @do.numLines() > 1
+            # newCursors = []
+            # for nc in @do.cursors().reversed()
+                # @do.delete nc[1]
+                # if nc[1] < @do.numLines()
+                    # for cb in newCursors
+                        # cb[1] -= 1
+                    # newCursors.push [0,nc[1]]                    
+
+        # else newCursors = [[0,0]]
+        # @do.select []
+        # @do.setCursors newCursors
         @do.end()
 
     deleteForward: ->

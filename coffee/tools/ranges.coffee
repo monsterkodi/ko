@@ -3,10 +3,12 @@
 # 0000000    000000000  000 0 000  000  0000  0000000   0000000 
 # 000   000  000   000  000  0000  000   000  000            000
 # 000   000  000   000  000   000   0000000   00000000  0000000 
-
+{
+Set
+} = require 'immutable'
 _ = require 'lodash'
 
-module.exports = class Ranges
+class Ranges
 
     cursorDelta: (c, dx, dy=0) ->
         c[0] += dx
@@ -77,6 +79,11 @@ module.exports = class Ranges
                 minPos = ps
         minPos ? last pl
     
+    lineIndicesInPositions: (pl) ->
+        li = new Set
+        li = li.add p[1] for p in pl
+        li.toArray().sort()
+
     # 00000000    0000000   000   000   0000000   00000000   0000000  
     # 000   000  000   000  0000  000  000        000       000       
     # 0000000    000000000  000 0 000  000  0000  0000000   0000000   
@@ -85,6 +92,7 @@ module.exports = class Ranges
     
     rangesFromPositions: (pl) -> ([p[1], [p[0], p[0]]] for p in pl)  
     rangesForLineIndexInRanges: (li, ranges) -> (r for r in ranges when r[0]==li)
+    rangesForLineIndicesInRanges: (lis, ranges) -> (r for r in ranges when r[0] in lis)
     rangesAfterLineColInRanges: (li,col,ranges) -> (r for r in ranges when r[0]==li and r[1][0] >= col)
     
     rangeAtPosInRanges: (pos, ranges) ->
@@ -205,3 +213,4 @@ module.exports = class Ranges
             else
                 a[0]-b[0]
     
+module.exports = Ranges

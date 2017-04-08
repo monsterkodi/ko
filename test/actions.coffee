@@ -36,13 +36,14 @@ describe 'actions', ->
             'newline', 'newlineAtEnd'
             'selectMoreLines', 'selectLessLines'
             'moveLines', 'joinLines', 'duplicateLines'
-            'deleteBackward', 'deleteForward', 'deleteSelection', 'deleteToEndOfLine'
+            'deleteBackward', 'deleteForward', 'deleteSelection', 
+            'deleteToEndOfLine', 'deleteToEndOfLineOrWholeLine'
             'setCursor', 'toggleCursorAtPos', 'addCursorAtPos', 'addCursors'
             'alignCursorsAndText', 'alignCursors', 'setCursorsAtSelectionBoundary'
             'delCursors', 'clearCursors', 'clearCursorsAndHighlights'
             'moveAllCursors', 'moveMainCursor', 'moveCursors'
             'moveCursorsToLineBoundary', 'moveCursorsToWordBoundary'
-            'selectSingleRange', 'selectNone', 'selectAll', 'selectInverted'
+            'selectSingleRange', 'selectNone', 'selectAll', 'selectInverted', 'selectAllWords'
             'startSelection', 'endSelection', 'startStickySelection', 'endStickySelection'
             'selectAllHighlights', 'selectNextHighlight', 'selectPrevHighlight'
             'highlightWordAndAddToSelection', 'removeSelectedHighlight', 'highlightTextOfSelectionOrWordAtCursor'
@@ -258,7 +259,7 @@ describe 'basic editing', ->
             0 1 345678 0"""
         editor.singleCursorAtPos [1,2]
         editor.highlightTextOfSelectionOrWordAtCursor()
-        editor.selectAllHighlights()
+        editor.selectAllWords()
         editor.deleteSelection()
         textIs """
             0123567
@@ -266,14 +267,31 @@ describe 'basic editing', ->
             013456780"""
         
     it 'deleteToEndOfLine', ->
-        editor.setText "123456\n123456\n123456"
+        editor.setText "x2345a\ny2345b\nz2345c"
         editor.singleCursorAtPos [3,1]
         editor.deleteToEndOfLine()
-        textIs "123456\n123\n123456"
+        textIs "x2345a\ny23\nz2345c"
         editor.singleCursorAtPos [0,1]
-        textIs "123456\n\n123456"
+        editor.deleteToEndOfLine()
+        textIs "x2345a\n\nz2345c"
         editor.setCursors [[3,0], [0,1], [3,2]]
-        textIs "123\n\n123"
+        log 'before', editor.cursors()
+        log 'main', editor.mainCursor()
+        log 'sels', editor.selections()
+        editor.deleteToEndOfLine()
+        textIs "x23\n\nz23"
+
+    it 'deleteToEndOfLineOrWholeLine', ->
+        editor.setText "x2345a\ny2345b\nz2345c"
+        editor.singleCursorAtPos [3,1]
+        editor.deleteToEndOfLineOrWholeLine()
+        textIs "x2345a\ny23\nz2345c"
+        editor.deleteToEndOfLineOrWholeLine()
+        textIs "x2345a\nz2345c"
+        editor.deleteToEndOfLineOrWholeLine()
+        textIs "x2345a\n"
+        editor.deleteToEndOfLineOrWholeLine()
+        textIs ""
         
     it 'newlineAtEnd', ->
         editor.setText "123456\n123456\n123456"

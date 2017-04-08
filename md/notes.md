@@ -1,10 +1,15 @@
 # todo/ideas
 
+- fix delete to end of line
+- fix cut
+- fix selection line editing
+- refactor ranges
+
 - highlights:
     - unhighlight words when cursor moves outside word highlights
     - highlight selection when single selection is set
 
-- fix command+enter 
+- fix command+enter in salter mode
 - fix triple quote input|delete
 - other windows in titlebar?
 - make stickySelection mode more visible (show commandline?)

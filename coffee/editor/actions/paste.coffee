@@ -24,7 +24,7 @@ module.exports =
     cut: ->
         @do.start()
         @copy()
-        @deleteSelection()
+        @deleteSelectionOrCursorLines()
         @do.end()
 
     copy: -> clipboard?.writeText @textOfSelectionForClipboard()

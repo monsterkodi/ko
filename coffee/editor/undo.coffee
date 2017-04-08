@@ -312,15 +312,11 @@ class Do
     selections:      -> @state.selections()
 
     numLines:        -> @state.numLines()
-    textInRange: (r) -> @state.line(r[0]).slice? r[1][0], r[1][1]
-    
-    selections:      -> @state.selections()
+    numCursors:      -> @state.numCursors()
     numSelections:   -> @state.numSelections()
-    highlights:      -> @state.highlights()
     numHighlights:   -> @state.numHighlights()
     
-    cursors:         -> @state.cursors()
-    numCursors:      -> @state.numCursors()
+    textInRange: (r) -> @state.line(r[0]).slice? r[1][0], r[1][1]
     mainCursor:      -> @state.mainCursor()
             
 module.exports = Do

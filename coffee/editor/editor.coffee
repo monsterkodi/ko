@@ -165,23 +165,13 @@ class Editor extends Buffer
     setLines: (lines) ->
         super lines
         @emit 'linesSet', lines
-
-    #  0000000   00000000  000000000        000000000  00000000  000   000  000000000  
-    # 000        000          000              000     000        000 000      000     
-    # 000  0000  0000000      000              000     0000000     00000       000     
-    # 000   000  000          000              000     000        000 000      000     
-    #  0000000   00000000     000              000     00000000  000   000     000     
-                                                
-    textOfSelection: ->
-        t = []
-        for s in @selections()
-            t.push @textInRange s
-        t.join '\n'
-            
-    textOfSelectionForClipboard: -> 
-        @selectMoreLines() if @numSelections() == 0
-        @textOfSelection()
         
+    textOfSelectionForClipboard: -> 
+        if @numSelections()
+            @textOfSelection()
+        else
+            @textInRanges @rangesForCursorLines()
+                
     # 00000000  00     00  000  000000000       00000000  0000000    000  000000000
     # 000       000   000  000     000          000       000   000  000     000   
     # 0000000   000000000  000     000          0000000   000   000  000     000   

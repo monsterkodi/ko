@@ -14,12 +14,12 @@ module.exports =
         deleteBackward:
             name:  'delete backward'
             text:  'delete character to the left'
-            combos: ['backspace']
+            combos: ['backspace', 'command+backspace', 'alt+backspace', 'shift+backspace']
     
     deleteBackward: (key, info) ->
-        
+        info = key if not info? and _.isObject key
         opt = {}
-        switch info.combo
+        switch info?.combo
             when 'command+backspace' then opt.ignoreLineBoundary = true
             when 'alt+backspace'     then opt.ignoreTabBoundary  = true
             when 'shift+backspace'   then opt.singleCharacter    = true

@@ -194,12 +194,6 @@ class Buffer extends multi event, ranges
                     break                    
             [sp, ep]
         
-    onlyFullLinesSelected: -> 
-        return false if not @numSelections()
-        for s in @selections()
-            return false if not @isSameRange s, @rangeForLineAtIndex s[0]
-        true
-        
     # 000000000  00000000  000   000  000000000
     #    000     000        000 000      000   
     #    000     0000000     00000       000   
@@ -209,7 +203,9 @@ class Buffer extends multi event, ranges
     text:            -> @lines().join '\n'
     textInRange: (r) -> @line(r[0]).slice? r[1][0], r[1][1]
     textsInRanges: (rgs) -> (@textInRange(r) for r in rgs)
-        
+    textInRanges:  (rgs) -> @textsInRanges(rgs).join '\n'
+    textOfSelection:     -> @textInRanges @selections()
+            
     # 000  000   000  0000000    00000000  000   000  000000000
     # 000  0000  000  000   000  000       0000  000     000   
     # 000  000 0 000  000   000  0000000   000 0 000     000   

@@ -3,13 +3,23 @@
 # 000   000  0000000   000            0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
 # 000   000  000       000                 000  000       000      000       000          000     000  000   000  000  0000
 # 0000000    00000000  0000000        0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
- 
+{
+log
+} = require 'kxk' 
 _ = require 'lodash'
 
 module.exports =
     
-    deleteSelection: ->
+    deleteSelectionOrCursorLines: ->
+        @do.start()
+        if not @do.numSelections()
+            @selectMoreLines()
+        @deleteSelection()
+        @do.end()
+
+    deleteSelection: (opt = deleteLines:true) ->
         return if not @numSelections()
+        log 'deleteSelection selections:', @selections()
         @do.start()
         newCursors = @do.cursors()
         joinLines = []
@@ -25,11 +35,12 @@ module.exports =
                     for nc in @positionsAfterLineColInPositions ep[1], ep[0], newCursors
                         # set cursors after selection in last joined line
                         @cursorSet nc, sp[0]+nc[0]-ep[0], sp[1]
-                        
+        log 'deleteSelection', joinLines.length, @do.selections()
         for s in @do.selections().reversed()
             continue if s[0] >= @do.numLines()
             lineSelected = s[1][0] == 0 and s[1][1] == @do.line(s[0]).length
-            if lineSelected and @do.numLines() > 1
+            if lineSelected and opt.deleteLines and @do.numLines() > 1
+                log 'deleteSelection del line', s[0], lineSelected, s[1][0], s[1][1]
                 @do.delete s[0]
                 for nc in @positionsBelowLineIndexInPositions s[0], newCursors
                     @cursorDelta nc, 0, -1 # move cursors below deleted line up
