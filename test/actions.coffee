@@ -28,12 +28,12 @@ describe 'actions', ->
     
     describe 'implements', ->
         for name in [
-            'newline'
             'toggleComment'
             'insertCharacter', 
             'indent', 'deIndent'
             'cut', 'copy', 'paste'
             'insertTab', 'deleteTab'
+            'newline', 'newlineAtEnd'
             'selectMoreLines', 'selectLessLines'
             'moveLines', 'joinLines', 'duplicateLines'
             'deleteBackward', 'deleteForward', 'deleteSelection', 'deleteToEndOfLine'
@@ -77,11 +77,7 @@ describe 'basic editing', ->
         mainIs [2,0]
         
     it 'newline', ->
-        log editor.text()
-        log editor.cursors()
-        editor.newline()
-        log editor.text()
-        log editor.cursors()
+        editor.newline indent:false
         textIs 'ab\n cd'
         mainIs [0,1]
 
@@ -279,4 +275,9 @@ describe 'basic editing', ->
         editor.setCursors [[3,0], [0,1], [3,2]]
         textIs "123\n\n123"
         
+    it 'newlineAtEnd', ->
+        editor.setText "123456\n123456\n123456"
+        editor.singleCursorAtPos [3,1]
+        editor.newlineAtEnd()
+        textIs "123456\n123456\n\n123456"
         

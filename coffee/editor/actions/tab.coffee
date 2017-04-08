@@ -20,7 +20,7 @@ module.exports =
             combo: 'shift+tab'
 
     insertTab: (key, info) ->
-        stopEvent info.event
+        stopEvent info?.event
         if @numSelections()
             @indent()
         else
@@ -35,7 +35,7 @@ module.exports =
             @do.end()   
 
     deleteTab: (key, info) ->
-        stopEvent info.event
+        stopEvent info?.event
         if @numSelections()
             @deIndent()
         else

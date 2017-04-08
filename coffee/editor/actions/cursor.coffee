@@ -73,20 +73,20 @@ module.exports =
         @do.end()
 
     cursorHome: (key, info) ->
-        extend = info.extend ? 0 <= info.mod.indexOf 'shift'
+        extend = info?.extend ? 0 <= info?.mod.indexOf 'shift'
         @singleCursorAtPos [0, 0], extend: extend
             
     cursorEnd: (key, info) ->
-        extend = info.extend ? 0 <= info.mod.indexOf 'shift'
+        extend = info?.extend ? 0 <= info?.mod.indexOf 'shift'
         @singleCursorAtPos [0,@numLines()-1], extend: extend
 
     cursorPageUp: (key, info) ->
-        stopEvent info.event
+        stopEvent info?.event
         extend = info.extend ? 0 <= info.mod.indexOf 'shift'
         @moveCursorsUp extend, @numFullLines()-3
                 
     cursorPageDown: (key, info) ->
-        stopEvent info.event
+        stopEvent info?.event
         extend = info.extend ? 0 <= info.mod.indexOf 'shift'
         @moveCursorsDown extend, @numFullLines()-3
 

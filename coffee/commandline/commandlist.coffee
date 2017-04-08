@@ -4,11 +4,12 @@
 #   000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000       000     000   
 #    0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  0000000      000   
 {
-log}     = require 'kxk'
+error,
+log}       = require 'kxk'
 TextEditor = require '../editor/texteditor'
-Syntax   = require '../editor/syntax'
-matchr   = require '../tools/matchr'
-salt     = require '../tools/salt'
+Syntax     = require '../editor/syntax'
+matchr     = require '../tools/matchr'
+salt       = require '../tools/salt'
 
 class CommandList extends TextEditor
 
@@ -76,8 +77,7 @@ class CommandList extends TextEditor
     
     appendMeta: (meta) ->
         if not meta?
-            alert('no meta?')
-            throw new Error
+            return error 'CommandList.appendMeta -- no meta?' 
         @meta.append meta
         if meta.diss?
             @appendLineDiss Syntax.lineForDiss(meta.diss), meta.diss 

@@ -5,6 +5,7 @@
 #00000000  000   000  00000000   0000000   0000000      000     00000000
 {
 str,
+error,
 log
 }        = require 'kxk'
 _        = require 'lodash'
@@ -53,16 +54,15 @@ class Execute
                 log = -> BrowserWindow.fromId(winID).webContents.send 'executeResult', [].slice.call(arguments, 0), cmdID
                 """
             process.chdir restoreCWD
-        catch e
-            console.log 'wtf?'
-            console.error colors.red.bold '[ERROR]', colors.red e
+        catch err
+            error "Execute.initCoffee -- #{err}"
     
     execute: (code) ->
         try
             coffee.eval code
-        catch e
-            console.error colors.red.bold '[ERROR]', colors.red e
-            error: e.toString()
+        catch err
+            error "Execute.execute -- #{err}"
+            error: err.toString()
             
     executeCoffee: (cfg) => 
         coffee.eval "winID = #{cfg.winID}"

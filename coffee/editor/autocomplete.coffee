@@ -6,6 +6,7 @@
 {
 clamp,
 last,
+error,
 log,
 $}       = require 'kxk'
 Indexer  = require '../indexer'
@@ -84,7 +85,7 @@ class Autocomplete extends event
     open: (info) ->
         cursor = $('.main', @editor.view)
         if not cursor?
-            log "warning! no cursor?"
+            error "Autocomplete.open -- no cursor?"
             return
 
         @span = document.createElement 'span'
@@ -195,7 +196,7 @@ class Autocomplete extends event
         cursorWord = @cursorWord()
         for l in lines
             if not l?.split?
-                log "[ERROR] Autocomplete.parseLines : line has no split? action: #{opt.action} line: #{l}"
+                error "Autocomplete.parseLines -- line has no split? action: #{opt.action} line: #{l}"
                 return
                 # alert "autocomplete.parseLines: warning! line has no split? #{l} #{lines?}"
                 # throw new Error

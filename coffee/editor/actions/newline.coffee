@@ -14,8 +14,19 @@ module.exports =
         newline:
             name: 'insert newline'
             combo: 'enter'
+            
+        newlineAtEnd:
+            name:  'insert newline at line end'
+            combo: 'command+enter'
+
+    newlineAtEnd: (key, info) ->
+        @moveCursorsToLineBoundary 'right'  
+        @newline indent: true
 
     newline: (key, info) ->
+
+        if not info? and _.isObject key
+            info = key
 
         if @salterMode 
             @endSalter()
@@ -23,7 +34,6 @@ module.exports =
             return
         
         doIndent = info?.indent ? not @isCursorInIndent()
-        log 'doIndent', doIndent
                     
         @surroundStack = []
         @deleteSelection()

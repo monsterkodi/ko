@@ -7,6 +7,7 @@
 first,
 last,
 str,
+error,
 log,
 $}    = require 'kxk'
 _     = require 'lodash'
@@ -94,8 +95,7 @@ class Numbers extends event
             for i in [oi-top...@elem.children.length]
                 div = @elem.children[i]
                 if not div?.firstChild?
-                    alert "no div child? #{li} #{i} #{li-top} #{@elem.children.length}"
-                    throw new Error
+                    return error "Numbers.onLineInserted -- no div child? #{li} #{i} #{li-top} #{@elem.children.length}"
                 div.firstChild.textContent = "#{top+i+1}"
                 @emit 'numberChanged', 
                     numberDiv:  div

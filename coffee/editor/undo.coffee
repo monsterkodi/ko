@@ -8,6 +8,7 @@ clamp,
 first, 
 last,
 str,
+error,
 log}  = require 'kxk'
 _     = require 'lodash'
 
@@ -146,8 +147,7 @@ class Do
     setCursors: (newCursors, opt) ->
 
         if not newCursors? or newCursors.length < 1
-            alert 'warning!! empty cursors?'
-            throw new Error
+            return error "Do.setCursors -- empty cursors?"
                         
         if opt?.main 
             switch opt.main

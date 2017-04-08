@@ -7,6 +7,7 @@
 first,
 last,
 str,
+error,
 log,
 $}  = require 'kxk'
 _   = require 'lodash'
@@ -66,7 +67,7 @@ class Meta
         # log "Meta.saveFileLineMetas file:#{file}"
         fs.readFile file, encoding: 'utf8', (err, data) ->
             if err?
-                log "Meta.saveFileLineMetas [ERROR] readFile err:#{err}"
+                error "Meta.saveFileLineMetas -- readFile err:#{err}"
                 return
             lines = data.split /\r?\n/
             # log "Meta.saveFileLineMetas 1 lines:", lines
@@ -76,7 +77,7 @@ class Meta
             data = lines.join '\n'
             fs.writeFile file, data, encoding: 'utf8', (err) ->
                 if err?
-                    log "Meta.saveFileLineMetas [ERROR] writeFile err:#{err}"
+                    error "Meta.saveFileLineMetas -- writeFile err:#{err}"
                     return
                 for lineMeta in lineMetas
                     meta = lineMeta[2]

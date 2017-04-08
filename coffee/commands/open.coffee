@@ -14,6 +14,7 @@ prefs,
 clamp,
 post,
 last,
+error,
 log,
 $}       = require 'kxk'
 profile  = require '../tools/profile'
@@ -311,9 +312,7 @@ class Open extends Command
                 if not dirExists opt.dir
                     opt.dir = resolve '~'
                     if not dirExists opt.dir
-                        alert 'wtf?'
-                        throw new Error
-                        return
+                        return error "Open.loadDir -- dir #{opt.dir} doesn't exist"
                         
         @dir = resolve '.' if not @dir?
         newdir = @resolvedPath(opt.dir) ? @dir

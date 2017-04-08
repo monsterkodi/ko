@@ -10,6 +10,7 @@ prefs,
 drag, 
 last,
 pos,
+error,
 log,
 $}    = require 'kxk'
 _     = require 'lodash'
@@ -247,8 +248,7 @@ class Split extends event
                 @moveCommandLineBy delta if delta?
                 return 
                 
-        alert "split.do warning! unhandled do command? #{sentence}?"
-        throw new Error
+        error "Split.do -- unhandled do command? #{sentence}?"
 
     #  0000000  000   000   0000000   000   000  
     # 000       000   000  000   000  000 0 000  

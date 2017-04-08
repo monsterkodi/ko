@@ -8,6 +8,7 @@ fileExists,
 dirExists,
 relative,
 resolve,
+error,
 log}    = require 'kxk'
 walkdir = require 'walkdir'
 path    = require 'path'
@@ -92,8 +93,7 @@ class Walker
             @walker.on 'end', => @cfg.done? @cfg.files, @cfg.stats
                 
         catch err
-            log "walker.start.error: #{err} dir: #{dir}"
-            log "#{err.stack}"
+            error "Walker.start -- #{err} dir: #{dir} stack:", err.stack
 
     stop: -> 
         @walker?.end()

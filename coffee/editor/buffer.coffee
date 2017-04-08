@@ -7,6 +7,7 @@
 clamp,
 first,
 last,
+error,
 log,
 str
 }       = require "kxk"
@@ -258,7 +259,7 @@ class Buffer extends multi event, ranges
     # 000   000  000   000  000   000   0000000   00000000
 
     rangeForLineAtIndex: (i) -> 
-        throw new Error() if i >= @numLines()
+        return error "Buffer.rangeForLineAtIndex -- index #{i} >= #{@numLines()}" if i >= @numLines()
         [i, [0, @line(i).length]] 
         
     isRangeInString: (r) -> @rangeOfStringSurroundingRange(r)?
