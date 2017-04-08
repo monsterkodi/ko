@@ -94,7 +94,7 @@ if args.prefs
     log colors.yellow.bold 'prefs'
     log noon.stringify prefs.store, colors:true
 
-mostRecentFile = -> first prefs.get 'recentFiles'
+mostRecentFile = -> _.first prefs.get 'recentFiles'
 
 # 000   000  000  000   000   0000000
 # 000 0 000  000  0000  000  000     

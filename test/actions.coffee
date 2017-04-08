@@ -41,7 +41,8 @@ describe 'actions', ->
             'startSelection', 'endSelection', 'startStickySelection', 'endStickySelection'
             'selectAllHighlights', 'selectNextHighlight', 'selectPrevHighlight'
             'highlightWordAndAddToSelection', 'removeSelectedHighlight', 'highlightTextOfSelectionOrWordAtCursor'
-            'insertSalterCharacter', 'startSalter'
+            'insertSalterCharacter', 'startSalter',
+            'insertSurroundCharacter'
             ]
             it "#{name}", -> _.isFunction(editor[name]).should.be.true
             
@@ -317,4 +318,5 @@ describe 'basic editing', ->
         editor.singleCursorAtPos [3,1]
         editor.newlineAtEnd()
         textIs "123456\n123456\n\n123456"
+        
         

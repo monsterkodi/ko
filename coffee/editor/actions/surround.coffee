@@ -3,9 +3,9 @@
 # 0000000   000   000  0000000    0000000    000   000  000   000  000 0 000  000   000
 #      000  000   000  000   000  000   000  000   000  000   000  000  0000  000   000
 # 0000000    0000000   000   000  000   000   0000000    0000000   000   000  0000000  
-{
-last
-} = require 'kxk'
+
+{log} = require 'kxk'
+_ = require 'lodash'
 
 module.exports =
                 
@@ -48,12 +48,13 @@ module.exports =
         newCursors = @do.cursors()
         
         if @surroundStack.length
-            if last(@surroundStack)[1] == ch
+            if _.last(@surroundStack)[1] == ch
                 for c in newCursors
                     if @do.line(c[1])[c[0]] != ch
                         @surroundStack = []
                         break
-                if @surroundStack.length and last(@surroundStack)[1] == ch
+                if @surroundStack.length and _.last(@surroundStack)[1] == ch
+                    log 'pop surround', @surroundStack
                     @do.start()
                     @selectNone()
                     @deleteForward()

@@ -12,7 +12,7 @@ log,
 $}      = require 'kxk'
 Buffer  = require './buffer'
 Syntax  = require './syntax'
-undo    = require './undo'
+Do      = require './do'
 path    = require 'path'
 _       = require 'lodash'
 
@@ -31,7 +31,7 @@ class Editor extends Buffer
         @stickySelection    = false
         @dbg                = false
         super
-        @do                 = new undo @
+        @do                 = new Do @
         @setupFileType()
 
     # 000  000   000  000  000000000       0000000    0000000  000000000  000   0000000   000   000   0000000  

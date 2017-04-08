@@ -51,12 +51,9 @@ class Do
     # 000 0 000  000   000  000   000  000  000          000   
     # 000   000   0000000   0000000    000  000          000   
             
-    change: (index, text) ->
-        return if @editor.line(index) == text
-        @state = @state.changeLine index, text 
+    change: (index, text) -> @state = @state.changeLine index, text 
         
-    insert: (index, text) ->
-        @state = @state.insertLine index, text
+    insert: (index, text) -> @state = @state.insertLine index, text
         
     delete: (index) ->
         if @editor.numLines() > 1
@@ -69,17 +66,23 @@ class Do
     # 000       000  0000  000   000
     # 00000000  000   000  0000000  
 
-    end: (opt) -> # no log here!
+    end: (opt) -> 
+        nologhere = log # !!! NO log HERE !!!
+
         # if opt?.foreign
+        
         @redos = []
         @groupCount -= 1
         if @groupCount == 0
             @merge()
             changes = @calculateChanges @startState, @state
+            console.log 'before set state', @state.text()
             @editor.setState @state
             @editor.changed? changes
         # else
             # @editor.setState @state # < this should be gone, shouldn't it?
+            
+        log = nologhere
 
     # 000   000  000   000  0000000     0000000 
     # 000   000  0000  000  000   000  000   000
@@ -298,7 +301,8 @@ class Do
     # 0000000      000     000000000     000     0000000   
     #      000     000     000   000     000     000       
     # 0000000      000     000   000     000     00000000  
-        
+      
+    text:            -> @state.text() 
     line:        (i) -> @state.line i 
     cursor:      (i) -> @state.cursor i
     highlight:   (i) -> @state.highlight i

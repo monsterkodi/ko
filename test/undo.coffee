@@ -11,7 +11,7 @@ assert     = require 'assert'
 _          = require 'lodash'
 
 Editor = require '../coffee/editor/editor'
-Undo   = require '../coffee/editor/undo'
+Do     = require '../coffee/editor/do'
 
 # 000   000  000  00000000  000   000  
 # 000   000  000  000       000 0 000  

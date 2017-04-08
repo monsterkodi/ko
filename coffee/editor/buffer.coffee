@@ -172,7 +172,7 @@ class Buffer extends multi event, ranges
     #    000     000        000 000      000   
     #    000     00000000  000   000     000   
 
-    text:            -> @lines().join '\n'
+    text:            -> @state.text()
     textInRange: (r) -> @line(r[0]).slice? r[1][0], r[1][1]
     textsInRanges: (rgs) -> (@textInRange(r) for r in rgs)
     textInRanges:  (rgs) -> @textsInRanges(rgs).join '\n'

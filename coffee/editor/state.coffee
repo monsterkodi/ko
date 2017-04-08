@@ -33,7 +33,8 @@ class State extends StateR
             cursors: List [Cursor y:0]
     
     # read only:
-        
+    
+    text:          -> @lines().join '\n'    
     lines:         -> @get('lines').toArray().map (l) -> l.get 'text'
     cursors:       -> @get('cursors').map((c) -> [c.get('x'), c.get('y')]).toArray()
     highlights:    -> @get('highlights').map((s) -> l=[s.get('l'), [s.get('s'), s.get('e')]]; l.push(s.get('o')) if s.get('o')?; l).toArray()

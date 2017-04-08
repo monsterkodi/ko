@@ -54,7 +54,7 @@ module.exports =
             cp = newCursors[0]
             li = cp[1]
             newSelections = []
-            newCursors = []
+            newCursors = null
             if cp[0] > 0
                 rest   = @do.line(li).substr(cp[0]).trimLeft()
                 indt   = _.padStart "", @indentationInLine @do.line cp[1] 
@@ -73,7 +73,7 @@ module.exports =
                 @do.insert li, line
                 newSelections.push [li, [0,line.length]]
                 li += 1
-            newCursors = [[0, li]] if not newCursors?
+            newCursors = [[0, li]] if not newCursors? or _.isEmpty newCursors
             @do.select newSelections if newSelections.length > 1
                 
         @do.setCursors newCursors
