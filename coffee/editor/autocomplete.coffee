@@ -5,7 +5,6 @@
 # 000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
 {
 clamp,
-last,
 error,
 log,
 $}       = require 'kxk'
@@ -52,7 +51,7 @@ class Autocomplete extends event
 
     onEdit: (info) =>
         @close()
-        @word = last info.before.split @splitRegExp
+        @word = _.last info.before.split @splitRegExp
         switch info.action
             
             when 'delete' # ever happening?           

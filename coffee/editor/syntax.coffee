@@ -4,7 +4,6 @@
 #      000     000     000  0000     000     000   000   000 000 
 # 0000000      000     000   000     000     000   000  000   000
 {
-last,
 log,
 $}     = require 'kxk'
 matchr = require '../tools/matchr'
@@ -96,7 +95,7 @@ class Syntax
     
     @shebang: (line) ->
         if line.startsWith "#!"
-            lastWord = last line.split /[\s\/]/
+            lastWord = _.last line.split /[\s\/]/
             switch lastWord
                 when 'python' then return 'py'
                 when 'node'   then return 'js'

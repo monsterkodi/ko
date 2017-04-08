@@ -5,8 +5,6 @@
 # 0000000     0000000   000       000       00000000  000   000
 {
 clamp,
-first,
-last,
 error,
 log,
 str
@@ -154,8 +152,8 @@ class Buffer extends multi event, ranges
         csr = []
         if il.length
             for li in il
-                if csr.length and last(csr)[1] == li-1
-                    last(csr)[1] = li
+                if csr.length and _.last(csr)[1] == li-1
+                    _.last(csr)[1] = li
                 else
                     csr.push [li,li]
         csr

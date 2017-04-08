@@ -4,10 +4,10 @@
 #    000     000       000   000  000 0 000  000  000  0000  000   000  000    
 #    000     00000000  000   000  000   000  000  000   000  000   000  0000000
 {
-last,
 error,
 log
 }          = require 'kxk'
+_          = require 'lodash'
 salt       = require '../tools/salt'
 TextEditor = require '../editor/texteditor'
 syntax     = require '../editor/syntax'
@@ -37,7 +37,7 @@ class Terminal extends TextEditor
             t = l.trim()
             if /ko_term_done/.test t
                 if /^ko_term_done\s\d+$/.test t
-                    cid = parseInt last t.split ' '
+                    cid = parseInt _.last t.split ' '
                     for meta in @meta.metas.reversed()
                         if meta[2].cmdID == cid
                             meta[2].span?.innerHTML = "■"

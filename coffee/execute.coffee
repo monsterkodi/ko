@@ -43,10 +43,11 @@ class Execute
             restoreCWD = process.cwd()
             process.chdir __dirname
             coffee.eval """                
-                str    = require './tools/str' 
                 _      = require 'lodash'
+                path   = require 'path'
+                fs     = require 'fs'
                 coffee = require 'coffee-script'
-                {clamp,last,first,fileExists,dirExists} = require 'kxk'
+                {str,clamp,fileExists,dirExists} = require 'kxk'
                 {max,min,abs,round,ceil,floor,sqrt,pow,exp,log10,sin,cos,tan,acos,asin,atan,PI,E} = Math
                 (global[r] = require r for r in ['path', 'fs', 'noon', 'colors', 'electron'])                    
                 ipc           = electron.ipcMain

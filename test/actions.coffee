@@ -3,21 +3,15 @@
 # 000000000  000          000     000  000   000  000 0 000  0000000   
 # 000   000  000          000     000  000   000  000  0000       000  
 # 000   000   0000000     000     000   0000000   000   000  0000000   
-{
-first,
-last,
-log}   = require 'kxk'
-_      = require 'lodash'
-assert = require 'assert'
-chai   = require 'chai'
-{
-Map,List
-} = require 'immutable'
-expect = chai.expect
-chai.should()
+
+{log}           = require 'kxk'
+{expect,should} = require 'chai'
+{Map,List}      = require 'immutable'
+assert          = require 'assert'
+_               = require 'lodash'
+should()
 
 Editor = require '../coffee/editor/editor'
-
 editor = null
 
 describe 'actions', ->

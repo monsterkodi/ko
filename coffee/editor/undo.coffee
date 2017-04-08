@@ -5,8 +5,6 @@
 # 0000000     0000000 
 {
 clamp,
-first, 
-last,
 str,
 error,
 log}  = require 'kxk'
@@ -30,7 +28,7 @@ class Do
                 
     hasLineChanges: ->
         return false if @history.length == 0
-        return not first(@history).get('lines').equals @editor.state.get('lines')
+        return not _.first(@history).get('lines').equals @editor.state.get('lines')
                                                                         
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -116,7 +114,7 @@ class Do
             if @redos.length > 1
                 @history.push @redos.shift()
                 
-            @state = first @redos
+            @state = _.first @redos
             if @redos.length == 1
                 @redos = []
                 
@@ -255,7 +253,7 @@ class Do
         
         while @history.length > 1
             b = @history[@history.length-2]
-            a = last @history
+            a = _.last @history
             if a.get('lines') == b.get('lines')
                 if @history.length > 2
                     @history.splice @history.length-2, 1

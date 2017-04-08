@@ -10,7 +10,6 @@ fileName,
 fileList,
 relative,
 splitExt,
-last,
 log}       = require 'kxk'
 indexer    = require '../indexer'
 salt       = require '../tools/salt'
@@ -205,7 +204,7 @@ class Macro extends Command
             #  0000000  0000000  000   000  0000000   0000000 
             
             when 'class'
-                clss = args.length and args[0] or last editor.textsInRanges(editor.selections)
+                clss = args.length and args[0] or _.last editor.textsInRanges(editor.selections)
                 clss ?= 'Class'
                 dir = editor.currentFile? and path.dirname(editor.currentFile) or process.cwd()
                 file = path.join dir, clss.toLowerCase() + '.coffee'

@@ -3,10 +3,8 @@
 # 000000000  000   000   000 000   0000000   000      000  000 0 000  0000000   0000000   
 # 000 0 000  000   000     000     000       000      000  000  0000  000            000  
 # 000   000   0000000       0      00000000  0000000  000  000   000  00000000  0000000   
-{
-first,
-last
-} = require 'kxk'
+
+_ = require 'lodash'
 
 module.exports =
     
@@ -20,8 +18,8 @@ module.exports =
         csr = @continuousCursorAndSelectedLineIndexRanges()
         
         return if not csr.length
-        return if dir == 'up' and first(csr)[0] == 0
-        return if dir == 'down' and last(csr)[1] == @numLines()-1
+        return if dir == 'up' and _.first(csr)[0] == 0
+        return if dir == 'down' and _.last(csr)[1] == @numLines()-1
         
         d = dir == 'up' and -1 or 1
         

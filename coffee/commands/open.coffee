@@ -13,7 +13,6 @@ resolve,
 prefs,
 clamp,
 post,
-last,
 error,
 log,
 $}       = require 'kxk'

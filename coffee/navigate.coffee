@@ -5,7 +5,6 @@
 # 000   000  000   000      0      000   0000000   000   000     000     00000000
 {
 clamp,
-last,
 log
 }        = require 'kxk'
 _        = require 'lodash'

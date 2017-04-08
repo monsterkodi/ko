@@ -4,8 +4,6 @@
 # 000   000  000       000                 000  000       000      000       000          000     000  000   000  000  0000
 # 0000000    00000000  0000000        0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
 {
-first,
-last,
 log
 } = require 'kxk' 
 _ = require 'lodash'
@@ -92,8 +90,8 @@ module.exports =
                 sil = @rangesForLineIndexInRanges sp[1]-1, sel
                 if sil.length == 1 and @isSameRange sil[0], plr
                     sp = @rangeStartPos plr
-                else if sil.length and last(sil)[1][1] == plr[1][1]
-                    sp = @rangeStartPos last sil
+                else if sil.length and _.last(sil)[1][1] == plr[1][1]
+                    sp = @rangeStartPos _.last sil
                 else
                     break
             ep = @rangeEndPos r
@@ -102,8 +100,8 @@ module.exports =
                 sil = @rangesForLineIndexInRanges ep[1]+1, sel
                 if sil.length == 1 and @isSameRange sil[0], nlr
                     ep = @rangeEndPos nlr
-                else if sil.length and first(sil)[1][0] == 0
-                    ep = @rangeEndPos first sil
+                else if sil.length and _.first(sil)[1][0] == 0
+                    ep = @rangeEndPos _.first sil
                 else
                     break                    
             [sp, ep]

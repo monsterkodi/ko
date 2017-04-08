@@ -6,8 +6,6 @@
 {
 getStyle,
 clamp,
-first,
-last,
 drag,
 log,
 str}    = require 'kxk'

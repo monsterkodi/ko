@@ -10,7 +10,6 @@ dirExists,
 unresolve,
 resolve,
 clamp,
-last,
 log
 }        = require 'kxk'
 Walker   = require '../tools/walker'
@@ -73,7 +72,7 @@ class Term extends Command
     #  0000000   0000000   000   000  000        0000000  00000000     000     00000000
         
     complete: =>
-        word = last @getText().split ' '
+        word = _.last @getText().split ' '
         
         if word.indexOf("$") >= 0
             list = []
@@ -100,7 +99,7 @@ class Term extends Command
         split = word.split '/'
         
         if split.length > 1
-            rest = last split
+            rest = _.last split
             split.pop()
             start = split.join('/') + '/'
             if dirExists @resolveDir start
@@ -121,7 +120,7 @@ class Term extends Command
     # 0000000    000  000   000  
     
     completeDir: (dir) =>
-        [dir, start, rest] = @resolveDirWord dir, last @getText().split ' ' 
+        [dir, start, rest] = @resolveDirWord dir, _.last @getText().split ' ' 
         files = fs.readdirSync @resolveDir dir
         list = []
         
@@ -144,8 +143,8 @@ class Term extends Command
             p = ''
             p = split.join(' ') + ' ' if split.length
             items.push p + l
-        if last(items[0]) != '/'
-            if dirExists @resolveDir last items[0].split ' '   
+        if _.last(items[0]) != '/'
+            if dirExists @resolveDir _.last items[0].split ' '   
                 items[0] +=  '/'
         @setText items[0]
         if items.length > 1
@@ -264,10 +263,10 @@ class Term extends Command
                     return ['history']
                 else if split[0][1] == '!'
                     if split[0][2] == '~'
-                        @deleteCommandWithID @commandIDs[last @history]
+                        @deleteCommandWithID @commandIDs[_.last @history]
                         return ['history']
                     else
-                        split.splice 0, 1, last @history
+                        split.splice 0, 1, _.last @history
                 else if split[0][1] == '~'
                     if split[0].length > 2
                         @deleteCommandWithID split[0].slice 2

@@ -6,8 +6,6 @@
 #   000       000        0000000 
 {
 clamp,
-first,
-last,
 log,
 $}  = require 'kxk'
 now = require 'performance-now'

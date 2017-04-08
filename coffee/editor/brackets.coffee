@@ -5,9 +5,7 @@
 # 000   000  000   000  000   000  000       000  000   000          000          000
 # 0000000    000   000  000   000   0000000  000   000  00000000     000     0000000 
 {
-first,
-last,
-log,
+log
 }       = require 'kxk'
 matchr  = require '../tools/matchr'
 _       = require 'lodash'
@@ -35,8 +33,8 @@ class Brackets
         [before, after] = @beforeAfterForPos cp
 
         if after.length or before.length
-            if after.length and first(after).start == cp[0] and first(after).value == 'open' then cp[0] += 1
-            if before.length and last(before).start == cp[0]-1 and last(before).value == 'close' then cp[0] -= 1
+            if after.length and _.first(after).start == cp[0] and _.first(after).value == 'open' then cp[0] += 1
+            if before.length and _.last(before).start == cp[0]-1 and _.last(before).value == 'close' then cp[0] -= 1
 
         return if @highlightInside cp
                 
@@ -52,11 +50,11 @@ class Brackets
                 prev = before.pop()
                 if prev.value == 'open'
                     if stack.length
-                        if @open[prev.match] == last(stack).match
+                        if @open[prev.match] == _.last(stack).match
                             stack.pop()                            
                             continue
                         else
-                            log "brackets stack mismatch at #{pp[0]} #{pp[1]} stack: #{last(stack).match} != prev: #{prev.match}"
+                            log "brackets stack mismatch at #{pp[0]} #{pp[1]} stack: #{_.last(stack).match} != prev: #{prev.match}"
                             return # stack mismatch
                     lastOpen = prev
                     break
@@ -77,11 +75,11 @@ class Brackets
                 next = after.shift()
                 if next.value == 'close'
                     if stack.length
-                        if @open[last(stack).match] == next.match
+                        if @open[_.last(stack).match] == next.match
                             stack.pop()                            
                             continue
                         else
-                            log "brackets stack mismatch at #{pp[0]} #{pp[1]} stack: #{last(stack).match} != next: #{next.match}"
+                            log "brackets stack mismatch at #{pp[0]} #{pp[1]} stack: #{_.last(stack).match} != next: #{next.match}"
                             return # stack mismatch
                     firstClose = next
                     break
@@ -120,8 +118,8 @@ class Brackets
                             
         if rngs.length
             r.line = li for r in rngs
-            lst = last rngs
-            fst = first rngs
+            lst = _.last rngs
+            fst = _.first rngs
             for firstAfterIndex in [0...rngs.length]
                 break if rngs[firstAfterIndex].start >= cp
             before = rngs.slice 0, firstAfterIndex

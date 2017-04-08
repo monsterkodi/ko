@@ -11,6 +11,7 @@ _ = require 'lodash'
 module.exports =
     
     insertCharacter: (ch) ->
+        return @newline() if ch == '\n'
         return if @salterMode and @insertSalterCharacter ch
         
         @do.start()

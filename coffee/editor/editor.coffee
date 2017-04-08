@@ -7,10 +7,8 @@
 fileList,
 extName,
 clamp,
-first,
-last,
-log,
 str,
+log,
 $}      = require 'kxk'
 Buffer  = require './buffer'
 Syntax  = require './syntax'

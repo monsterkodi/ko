@@ -10,7 +10,6 @@ dirExists,
 fileList,
 resolve,
 about,
-first,
 prefs,
 str,
 log
@@ -71,7 +70,7 @@ app.exit 0 if not args?
 
 if process.cwd() == '/'
     process.chdir resolve '~'
-while args.filelist.length and dirExists first args.filelist
+while args.filelist.length and dirExists _.first args.filelist
     process.chdir args.filelist.shift()
     
 if args.verbose

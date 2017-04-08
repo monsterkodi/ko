@@ -4,8 +4,6 @@
 # 000 0 000  000   000     000     000           000       000   000  000   000       000  000   000  000   000       000  
 # 000   000   0000000       0      00000000       0000000   0000000   000   000  0000000    0000000   000   000  0000000   
 {
-first,
-last,
 log
 } = require 'kxk'
 _ = require 'lodash'
@@ -50,7 +48,8 @@ module.exports =
     moveMainCursor: (key, info) ->
         dir = key 
         hrz = key in ['left', 'right']
-        opt = erase: info.mod.indexOf('shift') >= 0 or hrz
+        opt = _.clone info
+        opt.erase ?= info.mod?.indexOf('shift') >= 0 or hrz
         @do.start()
         [dx, dy] = switch dir
             when 'up'    then [0,-1]
@@ -132,8 +131,8 @@ module.exports =
         main = switch opt.main
             when 'top'   then 'first'
             when 'bot'   then 'last'
-            when 'left'  then newCursors.indexOf first @positionsForLineIndexInPositions mainLine, newCursors
-            when 'right' then newCursors.indexOf last  @positionsForLineIndexInPositions mainLine, newCursors
+            when 'left'  then newCursors.indexOf _.first @positionsForLineIndexInPositions mainLine, newCursors
+            when 'right' then newCursors.indexOf _.last  @positionsForLineIndexInPositions mainLine, newCursors
             
         @do.setCursors newCursors, main:main
         @endSelection opt

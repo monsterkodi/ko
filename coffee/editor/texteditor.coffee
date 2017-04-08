@@ -11,7 +11,6 @@ prefs,
 clamp,
 drag,
 post,
-last,
 str,
 log,
 sw,
@@ -424,7 +423,7 @@ class TextEditor extends Editor
             topdelta = Math.min(@numLines()+1, cl + 4) - @scroll.bot
         
         botdelta = 0
-        cl = last(cs)[1]
+        cl = _.last(cs)[1]
         if cl < @scroll.top + 2
             botdelta = Math.max(0, cl - 2) - @scroll.top
         else if cl > @scroll.bot - 4

@@ -4,8 +4,6 @@
 #      000     000     000   000  000  000  0000  000   000       000
 # 0000000      000     000   000  000  000   000   0000000   0000000 
 {
-first,
-last,
 log
 }      = require 'kxk'
 matchr = require '../tools/matchr'
@@ -47,23 +45,23 @@ class Strings
                 if ths.start-1 <= 0 or line[ths.start-2] != '\\'
                     continue # ignore escaped
                 
-            if last(stack)?.match == "'" == ths.match and last(stack).start == ths.start-1
+            if _.last(stack)?.match == "'" == ths.match and _.last(stack).start == ths.start-1
                 stack.pop() # remove ''
                 continue
                 
-            if last(stack)?.match == ths.match
+            if _.last(stack)?.match == ths.match
                 pairs.push [stack.pop(), ths]
                 if not pair? 
-                    if last(pairs)[0].start <= cp <= ths.start+1
-                        pair = last pairs
+                    if _.last(pairs)[0].start <= cp <= ths.start+1
+                        pair = _.last pairs
                 continue
 
             if stack.length > 1 and stack[stack.length-2].match == ths.match
                 stack.pop()
                 pairs.push [stack.pop(), ths]
                 if not pair? 
-                    if last(pairs)[0].start <= cp <= ths.start+1
-                        pair = last pairs
+                    if _.last(pairs)[0].start <= cp <= ths.start+1
+                        pair = _.last pairs
                 continue
             
             stack.push ths

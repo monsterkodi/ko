@@ -4,11 +4,10 @@
 #      000  000       000      000       000          000     000  000   000  000  0000
 # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
 {
-first,
-last,
 error,
 log
 } = require 'kxk'
+_ = require 'lodash'
 
 module.exports =
     
@@ -161,7 +160,7 @@ module.exports =
                 invertedRanges.push @rangeForLineAtIndex li
         if invertedRanges.length
             @do.start()
-            @do.setCursors [@rangeStartPos first invertedRanges]
+            @do.setCursors [@rangeStartPos _.first invertedRanges]
             @do.select invertedRanges
             @do.end()     
 
@@ -198,7 +197,7 @@ module.exports =
             if s.length
                 @do.select s
                 if @do.numSelections()
-                    @do.setCursors [@rangeEndPos(last s)], Main: 'closest'
+                    @do.setCursors [@rangeEndPos(_.last s)], Main: 'closest'
             @do.end()
             
     selectSurround: ->
@@ -233,6 +232,6 @@ module.exports =
         return if not @numHighlights()
         hs = @highlights()
         r = @rangeBeforePosInRanges @cursorPos(), hs
-        r ?= last hs
+        r ?= _.last hs
         @selectSingleRange r if r?
 

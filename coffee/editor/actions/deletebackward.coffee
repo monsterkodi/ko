@@ -3,9 +3,7 @@
 # 0000000    000000000  000       0000000    000000000  000000000  0000000    000   000
 # 000   000  000   000  000       000  000   000   000  000   000  000   000  000   000
 # 0000000    000   000   0000000  000   000  00     00  000   000  000   000  0000000  
-{
-last
-} = require 'kxk' 
+
 _ = require 'lodash'
 
 module.exports =
@@ -18,7 +16,7 @@ module.exports =
     
     deleteBackward: (key, info) ->
         info = key if not info? and _.isObject key
-        opt = {}
+        opt = _.clone info
         switch info?.combo
             when 'command+backspace' then opt.ignoreLineBoundary = true
             when 'alt+backspace'     then opt.ignoreTabBoundary  = true
@@ -31,8 +29,8 @@ module.exports =
             @deleteSalterCharacter()
         else            
             if @surroundStack.length
-                so = last(@surroundStack)[0]
-                sc = last(@surroundStack)[1]
+                so = _.last(@surroundStack)[0]
+                sc = _.last(@surroundStack)[1]
                 for c in @do.cursors()
                     prv = ''
                     prv = @do.line(c[1]).slice c[0]-so.length, c[0] if c[0] >= so.length

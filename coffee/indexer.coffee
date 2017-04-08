@@ -9,7 +9,6 @@ fileExists,
 unresolve,
 fileName,
 resolve,
-last,
 log
 }        = require 'kxk'
 Walker   = require './tools/walker'
@@ -185,8 +184,8 @@ class Indexer
                 if line.trim().length # ignoring empty lines
                     indent = line.search /\S/
 
-                    while funcStack.length and indent <= last(funcStack)[0]
-                        last(funcStack)[1].last = li - 1
+                    while funcStack.length and indent <= _.last(funcStack)[0]
+                        _.last(funcStack)[1].last = li - 1
                         funcInfo = funcStack.pop()
                         fileInfo.funcs.push [
                             funcInfo[1].line
@@ -298,7 +297,7 @@ class Indexer
             if funcAdded
 
                 while funcStack.length
-                    last(funcStack)[1].last = li - 1
+                    _.last(funcStack)[1].last = li - 1
                     funcInfo = funcStack.pop()
                     fileInfo.funcs.push [funcInfo[1].line, funcInfo[1].last, funcInfo[2], funcInfo[1].class ? path.basename file, path.extname file]
 

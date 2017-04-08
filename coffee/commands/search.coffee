@@ -6,7 +6,6 @@
 {
 packagePath,
 unresolve,
-first,
 log
 }        = require 'kxk'
 walker   = require '../tools/walker'
@@ -53,7 +52,7 @@ class Search extends Command
             when '/search/', '/Search/'
                 return if command in ['^', '$', '.']
         command = super command
-        file = window.editor.currentFile ? first _.keys(ipc.sendSync('indexer', 'files'))
+        file = window.editor.currentFile ? _.first _.keys(ipc.sendSync('indexer', 'files'))
         return if not file?
         @startSearchInFiles 
             text: command
@@ -80,7 +79,7 @@ class Search extends Command
         dir ?= path.dirname opt.file
         @walker = new walker
             root:        dir
-            maxDepth:    5
+            maxDepth:    6
             includeDirs: false
             file:        (f,stat) => @searchInFile opt, f
         @walker.cfg.ignore.push 'js'

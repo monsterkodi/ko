@@ -3,9 +3,8 @@
 # 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000     
 # 000   000  000  000   000  000   000  000      000  000   000  000   000     000     
 # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     
-{
-first
-} = require 'kxk'
+
+_ = require 'lodash'
 
 module.exports = 
 
@@ -30,9 +29,9 @@ module.exports =
         hls = @rangesForText text, opt
         if hls.length
             switch opt?.select
-                when 'after'  then @selectSingleRange @rangeAfterPosInRanges(@cursorPos(), hls) ? first hls
-                when 'before' then @selectSingleRange @rangeBeforePosInRanges(@cursorPos(), hls) ? first hls
-                when 'first'  then @selectSingleRange first hls
+                when 'after'  then @selectSingleRange @rangeAfterPosInRanges(@cursorPos(), hls) ? _.first hls
+                when 'before' then @selectSingleRange @rangeBeforePosInRanges(@cursorPos(), hls) ? _.first hls
+                when 'first'  then @selectSingleRange _.first hls
             @scrollCursorToTop() if not opt?.noScroll # < sucks!
         @setHighlights hls
         @renderHighlights()

@@ -4,9 +4,8 @@
 # 0000000   0000000   000      0000000   000          000           000      000  000 0 000  0000000   0000000   
 #      000  000       000      000       000          000           000      000  000  0000  000            000  
 # 0000000   00000000  0000000  00000000   0000000     000           0000000  000  000   000  00000000  0000000   
-{
-first
-} = require 'kxk'
+
+_ = require 'lodash'
 
 module.exports =
 
@@ -55,7 +54,7 @@ module.exports =
             thisSel = @rangesForLineIndexInRanges c[1], newSelections
             if thisSel.length
                 if @isSelectedLineAtIndex c[1]-1
-                    s = first @rangesForLineIndexInRanges c[1]-1, newSelections
+                    s = _.first @rangesForLineIndexInRanges c[1]-1, newSelections
                     @cursorSet c, s[1][1], s[0]
                 newSelections.splice newSelections.indexOf(thisSel[0]), 1
 

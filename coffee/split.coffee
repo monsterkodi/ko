@@ -8,7 +8,6 @@ clamp,
 sh,sw, 
 prefs,
 drag, 
-last,
 pos,
 error,
 log,
@@ -144,7 +143,7 @@ class Split extends event
         for h in [0...@panes.length]
             newHeight = Math.max 0, switch
                 when h is 0 then s[0]
-                when h is s.length then @logVisible and @elemHeight()-last(s)-@handleHeight or 0
+                when h is s.length then @logVisible and @elemHeight()-_.last(s)-@handleHeight or 0
                 else s[h]-s[h-1]-@handleHeight
 
             if opt?.animate

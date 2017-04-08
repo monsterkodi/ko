@@ -3,16 +3,12 @@
 #    000     0000000   0000000      000     
 #    000     000            000     000     
 #    000     00000000  0000000      000     
-{
-first,
-last,
-log}   = require 'kxk'
-_      = require 'lodash'
-assert = require 'assert'
-chai   = require 'chai'
+
+{log}      = require 'kxk'
+{expect}   = require 'chai'
 {Map,List} = require 'immutable'
-expect = chai.expect
-chai.should()
+assert     = require 'assert'
+_          = require 'lodash'
 
 Editor = require '../coffee/editor/editor'
 Undo   = require '../coffee/editor/undo'
@@ -319,6 +315,8 @@ describe 'complex', ->
                 .to.eql [
                     '0000', '11', '11', '22', '22', '33', '33', '44', '44', '5555'
                 ]
+                expect editor.cursors()
+                .to.eql [[0,2], [0,4], [0,6], [0,8]]
     
             it "join lines", ->
                 editor.deleteBackward ignoreLineBoundary: true
