@@ -20,12 +20,6 @@ module.exports =
             if @insertSurroundCharacter ch
                 @do.end()
                 return
-
-        if ch == '\n'
-            doIndent = not @isCursorInIndent()
-            @insertNewline indent:doIndent
-            @do.end()
-            return
     
         if ch == '>' and @numCursors() == 1 and @lineComment?
             cp = @cursorPos()
@@ -64,17 +58,3 @@ module.exports =
                 if c[0] > @do.line(c[1]).length
                     @do.change c[1], @do.line(c[1]).splice c[0], 0, _.padStart '', c[0]-@do.line(c[1]).length
         @do.end()
-
-    insertTab: ->
-        if @numSelections()
-            @indent()
-        else
-            @do.start()
-            newCursors = @do.cursors()
-            il = @indentString.length
-            for c in newCursors
-                n = 4-(c[0]%il)
-                @do.change c[1], @do.line(c[1]).splice c[0], 0, _.padStart "", n
-                @cursorDelta c, n
-            @do.setCursors newCursors
-            @do.end()   

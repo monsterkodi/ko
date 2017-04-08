@@ -8,7 +8,19 @@ _ = require 'lodash'
 
 module.exports = 
     
-    insertNewline: (opt) ->
+    actions:
+        newline:
+            name: 'insert newline'
+            combo: 'enter'
+
+    newline: (key, info) ->
+
+        if @salterMode 
+            @endSalter()
+            @singleCursorAtPos last @cursors()
+            return
+        
+        doIndent = info.indent ? not @isCursorInIndent()
                     
         @surroundStack = []
         @deleteSelection()
@@ -23,10 +35,10 @@ module.exports =
         for c in @do.cursors().reversed()
         
             after  = @do.line(c[1]).substr c[0]
-            after  = after.trimLeft() if opt?.indent
+            after  = after.trimLeft() if doIndent
             before = @do.line(c[1]).substr 0, c[0]
         
-            if opt?.indent
+            if doIndent
                 line = before.trimRight()
                 il = 0
                 thisIndent = @indentationInLine @do.line(c[1])
@@ -63,8 +75,8 @@ module.exports =
                 
                 il = Math.max il, @indentationInLine @do.line c[1]+1
                 indent = _.padStart "", il
-            else if opt?.keepIndent
-                indent = _.padStart "", @indentationInLine @do.line c[1] # keep indentation
+            # else if opt?.keepIndent
+                # indent = _.padStart "", @indentationInLine @do.line c[1] # keep indentation
             else
                 if c[0] <= @indentationInLine @do.line c[1]
                     indent = @do.line(c[1]).slice 0,c[0]

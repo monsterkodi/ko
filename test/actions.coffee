@@ -28,13 +28,15 @@ describe 'actions', ->
     
     describe 'implements', ->
         for name in [
-            'insertCharacter', 'insertNewline', 'insertSalterCharacter', 'insertTab'
-            'deleteBackward', 'deleteForward', 'deleteSelection', 'deleteTab'
+            'newline'
+            'toggleComment'
+            'insertCharacter', 
+            'indent', 'deIndent'
+            'cut', 'copy', 'paste'
+            'insertTab', 'deleteTab'
             'selectMoreLines', 'selectLessLines'
             'moveLines', 'joinLines', 'duplicateLines'
-            'indent', 'deIndent'
-            'paste'
-            'toggleComment'
+            'deleteBackward', 'deleteForward', 'deleteSelection'
             'setCursor', 'toggleCursorAtPos', 'addCursorAtPos', 'addCursors'
             'alignCursorsAndText', 'alignCursors', 'setCursorsAtSelectionBoundary'
             'delCursors', 'clearCursors', 'clearCursorsAndHighlights'
@@ -44,7 +46,7 @@ describe 'actions', ->
             'startSelection', 'endSelection', 'startStickySelection', 'endStickySelection'
             'selectAllHighlights', 'selectNextHighlight', 'selectPrevHighlight'
             'highlightWordAndAddToSelection', 'removeSelectedHighlight', 'highlightTextOfSelectionOrWordAtCursor'
-            'addRangeToSelection'
+            'insertSalterCharacter', 'startSalter'
             ]
             it "#{name}", -> _.isFunction(editor[name]).should.be.true
             
@@ -74,8 +76,8 @@ describe 'basic editing', ->
         editor.moveCursorsToWordBoundary 'left'
         mainIs [2,0]
         
-    it 'insertNewline', ->
-        editor.insertNewline()
+    it 'newline', ->
+        editor.newline()
         textIs 'ab\n cd'
         mainIs [0,1]
 

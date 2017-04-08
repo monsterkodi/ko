@@ -658,10 +658,6 @@ class TextEditor extends Editor
                         return
     
         switch combo
-            when 'tab'                      then return stop event, @insertTab()
-            when 'shift+tab'                then return stop event, @deleteTab()
-            when 'enter'                    then return @insertCharacter '\n'
-            when 'command+enter'            then return @moveCursorsToLineBoundary('right') and @insertNewline indent: true
             when 'alt+enter'                then return post.emit 'jumpTo', @wordAtCursor()
             when 'command+z'                then return @do.undo()
             when 'command+shift+z'          then return @do.redo()

@@ -68,7 +68,7 @@ module.exports =
         @do.setCursors newCursors, main:newMain
         @do.end()
 
-    moveCursorsToWordBoundary: (leftOrRight, info) ->
+    moveCursorsToWordBoundary: (leftOrRight, info = extend:false) ->
         extend = info.extend ? 0 <= info.mod.indexOf 'shift'
         f = switch leftOrRight
             when 'right' then @endOfWordAtCursor
