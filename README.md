@@ -12,8 +12,8 @@
 **fast**
 - loads large files
 - keyboard centric 
-    - nothing you can do with the mouse only
-    - includes many shortcuts and advanced editing features
+- advanced editing features
+- fuzzy file opener
 
 **commandline**
 - a single input field to ...
@@ -21,15 +21,16 @@
     - find in text and search in files
     - input terminal-, script- and macro-commands
     - goto lines or class/method/function-definitions
+- seperate histories for each command type
 
 **terminal**
+- has a minimap
 - alias, history
 - can echo commands as ascii-headers
 - output of commands editable/searchable
 
 **file search**
-- search for strings/regexp in project files
-- automatic determination of project files
+- search for strings/regexp/glob in project files
 - search results are editable
     - edits can be saved back to files
     - more powerful than conventional search and replace
@@ -40,16 +41,14 @@
 
 **minimap**
 - shows cursors, highlights and selections
-- the terminal has a minimap, too
 - can be used to select large portions of text
 - sets cursor by default when dragging/clicking
 - easy to insert ascii-headers that show up nicely in the minimap
+- it's so nice, that event the log view has a minimap :)
 
 **autocomplete**
 - completes words from visited files and project files
-- automatic determination of project files:
-    - indexes files below directory containing .git or package.json
-    - ignores node_modules, .git, etc.
+- some rudimentary file completion in the commandline
 
 **syntax highlighting**
 - for coffee, cpp, h, html, js, json, md, noon, pug, py, sh, styl       
@@ -106,8 +105,7 @@ opens files quickly via fuzzy matching
 - **⌘⇧P** open file quickly in new window
 
 on activation, it ...
-- lists recent files on top 
-- the most recent file is selected by default
+- puts the most recent file on top and selects it so that **⌘P** **⌘P** always opens the previous file
     
 while the list is open:
 - **.** list current directory without previous files
@@ -474,11 +472,9 @@ terminal aliases are stored in
 
 ## missing features
 
-- plugin system
 - customization
 - git integration
-- regression tests
-- correct highlighting of multiline- and complex strings
+- correct highlighting of multiline- and complex strings (string interpolation)
 
 ## final note
 

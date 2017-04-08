@@ -5,6 +5,7 @@
 # 0000000   000   000  0000000     000     00000000  000   000  
 
 {log} = require 'kxk'  
+{Set} = require 'immutable'
 salt  = require '../../tools/salt'  
 _     = require 'lodash'
 
@@ -74,9 +75,11 @@ module.exports =
     
     deleteSalterCharacter: ->
         return if not @salterMode
+        @do.start()
         cp = @do.mainCursor()
         if rgs = @salterRangesAtPos cp
-            cols = @columnsInSalt (@do.textInRange r for r in rgs)
+            slt = (@do.textInRange r for r in rgs)
+            cols = @columnsInSalt slt
             ci = cols.length-1
             while ci > 0 and cols[ci-1] >= cp[0]
                 ci -= 1
@@ -85,6 +88,7 @@ module.exports =
                 for r in rgs
                     @do.change r[0], @do.line(r[0]).splice cols[ci-1], length
                 @do.setCursors ([cols[ci-1], r[0]] for r in rgs)
+        @do.end()
     
     checkSalterMode: ->        
         return if not @salterMode
@@ -101,30 +105,31 @@ module.exports =
         cols = @columnsInSalt (@do.textInRange(r) for r in rgs)
         return if cs[0][0] < cols[0]
         @setSalterMode true
-    
-    columnsInSalt: (salt) ->
-        min = _.min (s.search /0/ for s in salt)
-        max = _.max (s.length for s in salt)
-        cols = [min]
-        for col in [min..max]
-            s = 0
-            for i in [0...5]
-                s += 1 if salt[i].slice(col-2, col) in ['  ', '# ']
-            cols.push col if s == 5
-        cols.push max
-        cols
-    
+        
     salterRangesAtPos: (p) ->
         salterRegExp = new RegExp("^\\s*#{@lineComment}[0\\s]+$")
         rgs = []
         li = p[1]
-        while rgs.length < 5 and li < @numLines() and salterRegExp.test @line(li)
-            rgs.push @rangeForLineAtIndex li
+        while rgs.length < 5 and li < @do.numLines() and salterRegExp.test @do.line(li)
+            rgs.push @do.rangeForLineAtIndex li
             li += 1
         return if not rgs.length
         li = p[1]-1
-        while rgs.length < 5 and li >= 0 and salterRegExp.test @line(li)
-            rgs.unshift @rangeForLineAtIndex li
+        while rgs.length < 5 and li >= 0 and salterRegExp.test @do.line(li)
+            rgs.unshift @do.rangeForLineAtIndex li
             li -= 1
         return rgs if rgs.length == 5
       
+    columnsInSalt: (slt) ->
+        min = _.min (s.search /0/ for s in slt)
+        if min < 0
+            min = _.min (s.search(/#/)+1 for s in slt)
+            return [min]
+        max = _.max (s.length for s in slt)
+        cols = new Set [min, max]
+        for col in [min..max]
+            s = 0
+            for i in [0...5]
+                s += 1 if slt[i].substr(col-2, 2) in ['  ', '# ']
+            cols = cols.add col if s == 5
+        _.sortBy cols.toArray()

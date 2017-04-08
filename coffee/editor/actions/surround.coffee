@@ -54,7 +54,6 @@ module.exports =
                         @surroundStack = []
                         break
                 if @surroundStack.length and _.last(@surroundStack)[1] == ch
-                    log 'pop surround', @surroundStack
                     @do.start()
                     @selectNone()
                     @deleteForward()
@@ -115,12 +114,9 @@ module.exports =
             @do.change ns[0], @do.line(ns[0]).splice ns[1][1], 0, cr
             @do.change ns[0], @do.line(ns[0]).splice ns[1][0], 0, cl
             
-            for c in @positionsAfterLineColInPositions ns[0], ns[1][0], newCursors
+            for c in @positionsInLineAfterColInPositions ns[0], ns[1][0]-1, newCursors
                 @cursorDelta c, cl.length
                 
-            for c in @positionsAfterLineColInPositions ns[0], ns[1][1], newCursors
-                if c[0] > ns[1][1]+1
-                    @cursorDelta c, cr.length
             
             for os in @rangesAfterLineColInRanges ns[0], ns[1][1], newSelections
                 os[1][0] += cr.length
@@ -130,6 +126,13 @@ module.exports =
                 os[1][0] += cl.length
                 os[1][1] += cl.length
             
+            # log 'before positionsAfterLineColInPositions ns', ns
+            # log 'before positionsAfterLineColInPositions newCursors', newCursors
+
+            for c in @positionsInLineAfterColInPositions ns[0], ns[1][1], newCursors
+                @cursorDelta c, cr.length
+                # log 'after cursor delta2', c
+                
         @do.select @rangesNotEmptyInRanges newSelections
         @do.setCursors newCursors
         @do.end()

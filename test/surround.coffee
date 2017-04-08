@@ -20,6 +20,47 @@ cursIs = (c) -> expect(editor.cursors()).to.eql c
 selsIs = (c) -> expect(editor.selections()).to.eql c
 hlgtIs = (h) -> expect(editor.highlights()).to.eql h
 
+describe 'cursor pos', ->
+    beforeEach -> editor.setText ''
+    
+    it 'brackets', ->
+        editor.insertCharacter '{'
+        mainIs [1,0]
+        editor.insertCharacter '['
+        mainIs [2,0]
+        editor.insertCharacter '('
+        mainIs [3,0]
+        editor.insertCharacter ')'
+        mainIs [4,0]
+        editor.insertCharacter ']'
+        mainIs [5,0]
+        editor.insertCharacter '}'
+        mainIs [6,0]
+        
+    it 'quotes', ->
+        editor.insertCharacter '"'
+        mainIs [1,0]
+        editor.insertCharacter "'"
+        mainIs [2,0]
+        editor.insertCharacter '"'
+        mainIs [3,0]
+        editor.insertCharacter "'"
+        mainIs [4,0]
+        editor.insertCharacter '"'
+        mainIs [5,0]
+        editor.insertCharacter "'"
+        mainIs [6,0]
+        editor.insertCharacter '"'
+        mainIs [7,0]
+        editor.insertCharacter "'"
+        mainIs [8,0]
+        
+    it 'interpolation', ->
+        editor.insertCharacter '"'
+        editor.insertSurroundCharacter "#"
+        textIs '"#{}"'
+        mainIs [3,0]
+
 describe 'insert surround character', ->
     beforeEach -> editor.setText ''
     
@@ -55,10 +96,18 @@ describe 'insert surround character', ->
         editor.insertCharacter '}'
         textIs '{}'
         
+describe 'string interpolation', ->
+
+    it 'convert single quote', ->
+        editor.setText "a = ''"
+        editor.singleCursorAtPos [5,0]
+        editor.insertSurroundCharacter "#"
+        textIs 'a = "#{}"'
+
 describe 'stacking', ->
-    beforeEach -> editor.setText '' 
-    "'"
-    it 'push pop', ->
+    
+    it 'push & pop', ->
+        editor.setText '' 
         editor.insertCharacter '['
         editor.insertCharacter '('
         textIs '[()]'
@@ -80,9 +129,4 @@ describe 'stacking', ->
         editor.insertCharacter ']'
         textIs '[({"\'\'"})]'
         
-describe 'string interpolation', ->
-    it 'convert single quote', ->
-        editor.setText "a = ''"
-        editor.singleCursorAtPos [5,0]
-        editor.insertSurroundCharacter "#"
-        textIs 'a = "#{}"'
+    

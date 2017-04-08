@@ -17,6 +17,19 @@ describe 'ranges', ->
     it "exists", -> _.isObject Ranges
     it "instantiates", -> _.isObject ranges = new Ranges
 
+    it 'positionsInLineAfterColInPositions', ->
+        pl = [[0,0], [2,0], [3,0], [4,0], [6,0], [4,1], [10,1], [3,2], [3,3]]
+        expect ranges.positionsInLineAfterColInPositions 3, 0, pl
+        .to.eql [[3,3]]
+        expect ranges.positionsInLineAfterColInPositions 2, 0, pl
+        .to.eql [[3,2]]
+        expect ranges.positionsInLineAfterColInPositions 1, 10, pl
+        .to.eql []
+        expect ranges.positionsInLineAfterColInPositions 1, 4, pl
+        .to.eql [[10,1]]
+        expect ranges.positionsInLineAfterColInPositions 1, 3, pl
+        .to.eql [[4,1],[10,1]]
+
     it 'positionsBetweenPosAndPosInPositions', ->
         pl = [[0,0], [2,0], [3,0], [4,0], [6,0], [4,1], [10,1], [3,2], [3,3]]
         expect ranges.positionsBetweenPosAndPosInPositions [3,0], [5,0], pl

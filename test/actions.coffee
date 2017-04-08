@@ -14,6 +14,12 @@ should()
 Editor = require '../coffee/editor/editor'
 editor = null
 
+textIs = (t) -> expect(editor.text()).to.eql t
+mainIs = (m) -> expect(editor.mainCursor()).to.eql m
+cursIs = (c) -> expect(editor.cursors()).to.eql c
+selsIs = (c) -> expect(editor.selections()).to.eql c
+hlgtIs = (h) -> expect(editor.highlights()).to.eql h
+
 describe 'actions', ->
     
     before -> 
@@ -46,12 +52,6 @@ describe 'actions', ->
             ]
             it "#{name}", -> _.isFunction(editor[name]).should.be.true
             
-textIs = (t) -> expect(editor.text()).to.eql t
-mainIs = (m) -> expect(editor.mainCursor()).to.eql m
-cursIs = (c) -> expect(editor.cursors()).to.eql c
-selsIs = (c) -> expect(editor.selections()).to.eql c
-hlgtIs = (h) -> expect(editor.highlights()).to.eql h
-
 describe 'basic editing', ->
     it 'insertCharacter', ->
         editor.insertCharacter 'a'
@@ -138,75 +138,8 @@ describe 'basic editing', ->
         editor.pasteText "cd\n    cd"
         textIs "ab\ncd\n    cd\n        cd"
         
-    it 'salter', ->
-        editor.insertSalterCharacter 'o'
-        textIs """ab
-             0000000   
-            000   000  
-            000   000  
-            000   000  
-             0000000   
-                    cd"""
-        editor.startSalter()
-        editor.insertCharacter 'I'
-        editor.insertCharacter 'X'
-        editor.endSalter()
-        editor.insertCharacter '|'
-        textIs """ab
-             0000000   
-            000   000  
-            000   000  
-            000   000  
-             0000000   
-                    # 000  000   000  |  
-                    # 000   000 000   |  
-                    # 000    00000    |  
-                    # 000   000 000   |  
-                    # 000  000   000  |  
-                    cd"""
-        editor.deleteBackward()
-        editor.clearCursors()
-        editor.startSalter()
-        editor.deleteBackward()
-        editor.deleteBackward()
-        textIs """ab
-             0000000   
-            000   000  
-            000   000  
-            000   000  
-             0000000   
-                    #   
-                    #   
-                    #   
-                    #   
-                    #   
-                    cd"""
-        editor.deleteBackward()
-        editor.endSalter()
-        textIs """ab
-             0000000   
-            000   000  
-            000   000  
-            000   000  
-             0000000   
-                      
-                      
-                      
-                      
-                      
-                    cd"""
-
-    it 'cut lines', ->
-        editor.joinLines()
-        editor.selectMoreLines()
-        editor.deleteSelection()
-        textIs """ab
-             0000000   
-            000   000  
-            000   000  
-            000   000  
-             0000000   """
-             
+describe 'misc editing', ->
+    
     it 'indent', ->
         editor.setText '123'
         editor.singleCursorAtPos [2,0]
@@ -318,5 +251,3 @@ describe 'basic editing', ->
         editor.singleCursorAtPos [3,1]
         editor.newlineAtEnd()
         textIs "123456\n123456\n\n123456"
-        
-        

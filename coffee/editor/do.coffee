@@ -76,7 +76,6 @@ class Do
         if @groupCount == 0
             @merge()
             changes = @calculateChanges @startState, @state
-            console.log 'before set state', @state.text()
             @editor.setState @state
             @editor.changed? changes
         # else
@@ -320,5 +319,6 @@ class Do
     
     textInRange: (r) -> @state.line(r[0]).slice? r[1][0], r[1][1]
     mainCursor:      -> @state.mainCursor()
+    rangeForLineAtIndex: (i) -> [i, [0, @line(i).length]]
             
 module.exports = Do

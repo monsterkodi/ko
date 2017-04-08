@@ -58,7 +58,7 @@ class Ranges
     positionsFromPosInPositions: (p, pl) -> (r for r in pl when ((r[1] > p[1]) or ((r[1] == p[1]) and (r[0] >= p[0]))))
     positionsForLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] == li)
     positionsBelowLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] > li)
-    positionsAfterLineColInPositions: (li,col,pl) -> (p for p in pl when p[1] == li and p[0]>=col)
+    positionsInLineAfterColInPositions: (li,col,pl) -> (p for p in pl when p[1] == li and p[0]>col)
     positionsNotInRanges: (pss, rgs) -> _.filter pss, (p) => not @isPosInRanges p, rgs
     positionsBetweenPosAndPosInPositions: (p1,p2,pl) -> 
         [a,b] = @sortPositions [p1, p2]
