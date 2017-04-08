@@ -2,6 +2,7 @@
 
 - fix delete to end of line
 - fix cut
+- fix cursor pos after #{}
 - fix selection line editing
 - refactor ranges
 

@@ -271,27 +271,52 @@ describe 'basic editing', ->
         editor.singleCursorAtPos [3,1]
         editor.deleteToEndOfLine()
         textIs "x2345a\ny23\nz2345c"
+        cursIs [[3,1]]
+        selsIs []
         editor.singleCursorAtPos [0,1]
         editor.deleteToEndOfLine()
         textIs "x2345a\n\nz2345c"
+        cursIs [[0,1]]
+        selsIs []
         editor.setCursors [[3,0], [0,1], [3,2]]
-        log 'before', editor.cursors()
-        log 'main', editor.mainCursor()
-        log 'sels', editor.selections()
         editor.deleteToEndOfLine()
         textIs "x23\n\nz23"
+        cursIs [[3,0], [0,1], [3,2]]
+        selsIs []
 
     it 'deleteToEndOfLineOrWholeLine', ->
         editor.setText "x2345a\ny2345b\nz2345c"
         editor.singleCursorAtPos [3,1]
         editor.deleteToEndOfLineOrWholeLine()
         textIs "x2345a\ny23\nz2345c"
+        cursIs [[3,1]]
+        mainIs [3,1]
+        selsIs []
         editor.deleteToEndOfLineOrWholeLine()
         textIs "x2345a\nz2345c"
+        cursIs [[0,1]]
+        mainIs [0,1]
+        selsIs []
         editor.deleteToEndOfLineOrWholeLine()
         textIs "x2345a\n"
+        cursIs [[0,1]]
+        mainIs [0,1]
+        selsIs []
+        editor.deleteToEndOfLineOrWholeLine()
+        textIs "x2345a"
+        cursIs [[0,0]]
+        mainIs [0,0]
+        selsIs []
         editor.deleteToEndOfLineOrWholeLine()
         textIs ""
+        cursIs [[0,0]]
+        mainIs [0,0]
+        selsIs []
+        editor.deleteToEndOfLineOrWholeLine()
+        textIs ""
+        cursIs [[0,0]]
+        mainIs [0,0]
+        selsIs []
         
     it 'newlineAtEnd', ->
         editor.setText "123456\n123456\n123456"

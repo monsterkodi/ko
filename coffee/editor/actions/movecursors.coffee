@@ -78,17 +78,18 @@ module.exports =
         true
 
     moveCursorsToLineBoundary: (key, info = extend:false) ->
+        @do.start()
         extend = info.extend ? 0 <= info.mod.indexOf 'shift'
         func = switch key
             when 'right', 'e' then (c) => [@do.line(c[1]).length, c[1]]
             when 'left', 'a'  then (c) => 
-                if @line(c[1]).slice(0,c[0]).trim().length == 0
+                if @do.line(c[1]).slice(0,c[0]).trim().length == 0
                     [0, c[1]]
                 else
                     d = @do.line(c[1]).length - @do.line(c[1]).trimLeft().length
                     [d, c[1]]
         @moveAllCursors func, extend:extend, keepLine:true
-        true
+        @do.end()
 
     moveCursors: (key, info = extend:false) ->
         extend = info.extend ? 'shift' == info.mod
@@ -115,8 +116,9 @@ module.exports =
         @do.start()
         @startSelection opt
         newCursors = @do.cursors()
-        oldMain = @mainCursor()
+        oldMain = @do.mainCursor()
         mainLine = oldMain[1]
+        
         if newCursors.length > 1
             for c in newCursors
                 newPos = func c 
@@ -126,6 +128,7 @@ module.exports =
         else
             @cursorSet newCursors[0], func newCursors[0] 
             mainLine = newCursors[0][1]
+            
         main = switch opt.main
             when 'top'   then 'first'
             when 'bot'   then 'last'

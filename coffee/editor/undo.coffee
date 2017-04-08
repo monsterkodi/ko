@@ -80,8 +80,8 @@ class Do
             changes = @calculateChanges @startState, @state
             @editor.setState @state
             @editor.changed? changes
-        else
-            @editor.setState @state # < this should be gone, shouldn't it?
+        # else
+            # @editor.setState @state # < this should be gone, shouldn't it?
 
     # 000   000  000   000  0000000     0000000 
     # 000   000  0000  000  000   000  000   000

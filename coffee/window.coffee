@@ -16,6 +16,7 @@ last,
 drag,
 pos,
 str,
+error,
 log,
 $}          = require 'kxk'
 Split       = require './split'
@@ -166,7 +167,7 @@ loadFile = (file, opt={}) ->
     file = resolve file
     if file != editor.currentFile or opt?.reload
         if not fileExists file
-            log "[WARNING] window.loadFile -- no such file:", file
+            error "window.loadFile -- no such file:", file
             return
             
         if not opt?.dontSave then saveChanges()            

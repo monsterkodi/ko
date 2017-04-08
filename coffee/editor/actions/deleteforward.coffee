@@ -45,22 +45,9 @@ module.exports =
         for s in @do.selections()
             if @lengthOfRange s
                 @deleteToEndOfLine()
-                @do.end()
-                return
-                
+                return @do.end()
+        @selectMoreLines()
         @deleteSelection deleteLines:true      
-        # if @do.numLines() > 1
-            # newCursors = []
-            # for nc in @do.cursors().reversed()
-                # @do.delete nc[1]
-                # if nc[1] < @do.numLines()
-                    # for cb in newCursors
-                        # cb[1] -= 1
-                    # newCursors.push [0,nc[1]]                    
-
-        # else newCursors = [[0,0]]
-        # @do.select []
-        # @do.setCursors newCursors
         @do.end()
 
     deleteForward: ->

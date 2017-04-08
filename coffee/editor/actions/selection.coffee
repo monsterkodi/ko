@@ -6,6 +6,7 @@
 {
 first,
 last,
+error,
 log
 } = require 'kxk'
 
@@ -43,10 +44,10 @@ module.exports =
                 """
             combo: 'command+alt+ctrl+b'
 
-    selectSingleRange: (r, opt) ->
+    selectSingleRange: (r, opt = extend:false) ->
+        @startSelectionCursors = null if not opt.extend
         if not r?
-            log "[WARNING] editor.#{name}.selectSingleRange -- undefined range!"
-            return
+            return error "Editor.#{name}.selectSingleRange -- undefined range!"
         @do.start()
         @do.setCursors [[opt?.before and r[1][0] or r[1][1], r[0]]]
         @do.select [r]
@@ -75,7 +76,7 @@ module.exports =
     # 0000000      000     000   000  000   000     000             00000000  000   000  0000000    
     
     startSelection: (opt = extend:false) ->
-        if opt?.extend 
+        if opt?.extend
             if not @startSelectionCursors
                 @startSelectionCursors = @do.cursors()
                 if not @stickySelection
@@ -91,18 +92,19 @@ module.exports =
                 @selectNone()
             @startSelectionCursors = null
         else
-            oldCursors   = @startSelectionCursors ? @state.cursors()
+            oldCursors   = @startSelectionCursors ? @do.cursors()
             newSelection = @stickySelection and @do.selections() or []            
             newCursors   = @do.cursors()
             
             if oldCursors.length != newCursors.length
-                log "[WARNING] editor.#{@name}.endSelection -- oldCursors.size != newCursors.size", oldCursors.length, newCursors.length
+                log 'startSelectionCursors', @startSelectionCursors?.length
+                return error "Editor.#{@name}.endSelection -- oldCursors.size != newCursors.size", oldCursors.length, newCursors.length
             
             for ci in [0...@do.numCursors()]
                 oc = oldCursors[ci]
                 nc = newCursors[ci]
                 if not oc? or not nc?
-                    log "[WARNING] editor.#{@name}.endSelection -- invalid cursors", oc, nc
+                    return error "Editor.#{@name}.endSelection -- invalid cursors", oc, nc
                 else
                     ranges = @rangesBetweenPositions oc, nc, true #< extend to full lines if cursor at start of line                
                     newSelection = newSelection.concat ranges

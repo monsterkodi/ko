@@ -14,6 +14,7 @@ first,
 clamp,
 drag,
 post,
+error,
 log,
 $}         = require 'kxk'
 split      = require '../split'
@@ -68,7 +69,7 @@ class FileEditor extends TextEditor
                 when 'inserted' then @do.insert change.doIndex, change.after
                 when 'deleted'  then @do.delete change.doIndex
                 else
-                    log "[WARNING] editor.applyForeignLineChanges wtf?"
+                    error "Editor.applyForeignLineChanges -- unknown change #{change.change}"
         @do.end foreign: true
 
     # 00000000  000  000      00000000

@@ -50,8 +50,8 @@ class Buffer extends multi event, ranges
     numHighlights: -> @state.numHighlights()
 
     # these are used from tests and restore
-    setCursors:    (c) -> @state = @state.setCursors c     
-    setSelections: (s) -> @state = @state.setSelections s  
+    setCursors:    (c) -> @state = @state.setCursors(c); @startSelectionCursors = null
+    setSelections: (s) -> @state = @state.setSelections(s); @startSelectionCursors = null  
     setHighlights: (h) -> @state = @state.setHighlights h  
     setMain:       (m) -> @state = @state.setMain m     
     addHighlight:  (h) -> @state = @state.addHighlight h
@@ -167,33 +167,7 @@ class Buffer extends multi event, ranges
             if s[1][0] == 0 and s[1][1] == @line(li).length
                 return true
         false
-        
-    continuousSelectionAtPos: (p) -> # used by deleteSelection to calculate cursor positions
-        sel = @selections()
-        r = @rangeAtPosInRanges p, sel
-        if r
-            sp = @rangeStartPos r
-            while (sp[0] == 0) and (sp[1] > 0)
-                plr = @rangeForLineAtIndex sp[1]-1
-                sil = @rangesForLineIndexInRanges sp[1]-1, sel
-                if sil.length == 1 and @isSameRange sil[0], plr
-                    sp = @rangeStartPos plr
-                else if sil.length and last(sil)[1][1] == plr[1][1]
-                    sp = @rangeStartPos last sil
-                else
-                    break
-            ep = @rangeEndPos r
-            while (ep[0] == @line(ep[1]).length) and (ep[1] < @numLines()-1)
-                nlr = @rangeForLineAtIndex ep[1]+1
-                sil = @rangesForLineIndexInRanges ep[1]+1, sel
-                if sil.length == 1 and @isSameRange sil[0], nlr
-                    ep = @rangeEndPos nlr
-                else if sil.length and first(sil)[1][0] == 0
-                    ep = @rangeEndPos first sil
-                else
-                    break                    
-            [sp, ep]
-        
+                
     # 000000000  00000000  000   000  000000000
     #    000     000        000 000      000   
     #    000     0000000     00000       000   
