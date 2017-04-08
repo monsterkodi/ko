@@ -4,7 +4,9 @@
 # 000       000   000  000   000       000  000   000  000   000
 #  0000000   0000000   000   000  0000000    0000000   000   000
 
+{stopEvent} = require 'kxk'
 _ = require 'lodash'
+
 
 module.exports =
 
@@ -34,6 +36,18 @@ module.exports =
         delCursors:
             name: 'remove cursors up|down'
             combos: ['command+shift+up', 'command+shift+down']
+            
+        cursorHome:
+            combo: 'home'
+            
+        cursorEnd:
+            combo: 'end'
+            
+        cursorPageUp:
+            combo: 'page up'
+
+        cursorPageDown:
+            combo: 'page down'
         
     #  0000000  00000000  000000000  
     # 000       000          000     
@@ -57,6 +71,24 @@ module.exports =
         @do.start()
         @do.setCursors [[c,l]]
         @do.end()
+
+    cursorHome: (key, info) ->
+        extend = info.extend ? 0 <= info.mod.indexOf 'shift'
+        @singleCursorAtPos [0, 0], extend: extend
+            
+    cursorEnd: (key, info) ->
+        extend = info.extend ? 0 <= info.mod.indexOf 'shift'
+        @singleCursorAtPos [0,@numLines()-1], extend: extend
+
+    cursorPageUp: (key, info) ->
+        stopEvent info.event
+        extend = info.extend ? 0 <= info.mod.indexOf 'shift'
+        @moveCursorsUp extend, @numFullLines()-3
+                
+    cursorPageDown: (key, info) ->
+        stopEvent info.event
+        extend = info.extend ? 0 <= info.mod.indexOf 'shift'
+        @moveCursorsDown extend, @numFullLines()-3
 
     setCursorsAtSelectionBoundariesOrSelectSurround: ->
         if @numSelections()

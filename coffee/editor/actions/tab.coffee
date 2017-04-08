@@ -5,6 +5,7 @@
 #    000     000   000  000   000  
 #    000     000   000  0000000    
 
+{stopEvent} = 'kxk'
 _ = require 'lodash'
 
 module.exports = 
@@ -18,7 +19,7 @@ module.exports =
             combo: 'shift+tab'
 
     insertTab: (key, info) ->
-        @stop info.event
+        stopEvent info.event
         if @numSelections()
             @indent()
         else
@@ -33,7 +34,7 @@ module.exports =
             @do.end()   
 
     deleteTab: (key, info) ->
-        @stop info.event
+        stopEvent info.event
         if @numSelections()
             @deIndent()
         else
@@ -49,6 +50,3 @@ module.exports =
             @do.setCursors newCursors
             @do.end()
 
-    stop: (event) ->
-        event.preventDefault()
-        event.stopPropagation()

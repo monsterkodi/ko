@@ -666,17 +666,8 @@ class TextEditor extends Editor
         
         return if mod and not key?.length
         
-        switch key
-            
-            when 'home'      then return @singleCursorAtPos [0, 0],            event.shiftKey
-            when 'end'       then return @singleCursorAtPos [0,@numLines()-1], event.shiftKey
+        switch key            
             when 'backspace' then return
-            when 'page up'
-                @moveCursorsUp event.shiftKey, @numFullLines()-3
-                return stop event
-            when 'page down'
-                @moveCursorsDown event.shiftKey, @numFullLines()-3
-                return stop event
             
         ansiKeycode = require 'ansi-keycode'
         if ansiKeycode(event)?.length == 1 and mod in ["shift", ""]
