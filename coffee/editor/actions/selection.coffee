@@ -160,7 +160,7 @@ module.exports =
                 invertedRanges.push @rangeForLineAtIndex li
         if invertedRanges.length
             @do.start()
-            @do.setCursors [@rangeStartPos _.first invertedRanges]
+            @do.setCursors [rangeStartPos _.first invertedRanges]
             @do.select invertedRanges
             @do.end()     
 
@@ -191,7 +191,7 @@ module.exports =
         if surr = @highlightsSurroundingCursor()
             @do.start()
             start = @rangeEndPos surr[0] 
-            end = @rangeStartPos surr[1]
+            end = rangeStartPos surr[1]
             s = @rangesBetweenPositions start, end
             s = @cleanRanges s
             if s.length

@@ -97,7 +97,7 @@ module.exports =
             @do.start()
             newCursors = []
             for s in @do.selections()
-                newCursors.push @rangeStartPos s
+                newCursors.push rangeStartPos s
                 newCursors.push @rangeEndPos s
             @do.select []
             @do.setCursors newCursors
@@ -187,7 +187,7 @@ module.exports =
 
     delCursorAtPos: (p) ->
         oldCursors = @state.cursors()
-        c = @posInPositions p, oldCursors
+        c = posInPositions p, oldCursors
         if c and @numCursors() > 1
             @do.start()
             newCursors = @do.cursors()

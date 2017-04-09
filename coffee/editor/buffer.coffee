@@ -67,7 +67,7 @@ class Buffer extends multi event, require '../tools/ranges'
     isCursorInIndent:      (c=@mainCursor()) -> @numLines() and @line(c[1]).slice(0, c[0]).trim().length == 0
     isCursorInLastLine:    (c=@mainCursor()) -> c[1] == @numLines()-1
     isCursorInFirstLine:   (c=@mainCursor()) -> c[1] == 0
-    isCursorInRange:       (r,c=@mainCursor()) -> @isPosInRange c, r
+    isCursorInRange:       (r,c=@mainCursor()) -> isPosInRange c, r
 
     # 000   000   0000000   00000000   0000000  
     # 000 0 000  000   000  000   000  000   000

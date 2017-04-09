@@ -34,7 +34,7 @@ module.exports =
             else
                 rg = rangeAtPosInRanges c, oldSelections
                 if rg?
-                    csel = [@rangeStartPos(rg), @rangeEndPos(rg)]
+                    csel = [rangeStartPos(rg), @rangeEndPos(rg)]
                     # log 'csel', csel
             if csel?
                 [sp, ep] = csel
@@ -84,14 +84,14 @@ module.exports =
     continuousSelectionAtPosInRanges: (p, sel) -> 
         r = rangeAtPosInRanges p, sel
         if r and @lengthOfRange r
-            sp = @rangeStartPos r
+            sp = rangeStartPos r
             while (sp[0] == 0) and (sp[1] > 0)
                 plr = @rangeForLineAtIndex sp[1]-1
                 sil = @rangesForLineIndexInRanges sp[1]-1, sel
                 if sil.length == 1 and @isSameRange sil[0], plr
-                    sp = @rangeStartPos plr
+                    sp = rangeStartPos plr
                 else if sil.length and _.last(sil)[1][1] == plr[1][1]
-                    sp = @rangeStartPos _.last sil
+                    sp = rangeStartPos _.last sil
                 else
                     break
             ep = @rangeEndPos r

@@ -39,7 +39,7 @@ class Ranges
         else if @isRange(a) and @isRange(b)
             r = [a,b]
             @sortRanges r
-            @rangeBetween @rangeEndPos(r[0]), @rangeStartPos(r[1])
+            @rangeBetween @rangeEndPos(r[0]), rangeStartPos(r[1])
             
     isPos:         (p)       -> p?.length == 2 and _.isNumber(p[0]) and _.isNumber(p[1])
     isRange:       (r)       -> r?.length >= 2 and _.isNumber(r[0]) and r[1]?.length >= 2 and _.isNumber(r[1][0]) and _.isNumber(r[1][1])
@@ -65,7 +65,7 @@ class Ranges
     positionsForLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] == li)
     positionsBelowLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] > li)
     positionsInLineAfterColInPositions: (li,col,pl) -> (p for p in pl when p[1] == li and p[0]>col)
-    positionsNotInRanges: (pss, rgs) -> _.filter pss, (p) => not @isPosInRanges p, rgs
+    positionsNotInRanges: (pss, rgs) -> _.filter pss, (p) => not isPosInRanges p, rgs
     positionsBetweenPosAndPosInPositions: (p1,p2,pl) -> 
         [a,b] = sortPositions [p1, p2]
         (r for r in pl when ( (r[1] > a[1] or (r[1] == a[1]) and (r[0] >= a[0])) and (r[1] < b[1] or (r[1] == b[1]) and (r[0] <= b[0])))) 
@@ -163,7 +163,7 @@ class Ranges
         (r for r in ranges when top <= r[0] <= bot)
         
     rangeContainingRangeInRanges: (r, ranges) ->
-        if cr = rangeAtPosInRanges @rangeStartPos(r), ranges
+        if cr = rangeAtPosInRanges rangeStartPos(r), ranges
             return cr if cr[1][1] >= r[1][1]
         
     rangesShrunkenBy: (ranges, delta) ->
