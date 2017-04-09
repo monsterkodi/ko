@@ -154,7 +154,7 @@ class Do
                 when 'first' then mainIndex = 0
                 when 'last'  then mainIndex = newCursors.length-1
                 when 'closest'
-                    mainIndex = newCursors.indexOf @editor.posClosestToPosInPositions @editor.mainCursor(), newCursors 
+                    mainIndex = newCursors.indexOf posClosestToPosInPositions @editor.mainCursor(), newCursors 
                 else 
                     mainIndex = newCursors.indexOf opt.main
                     mainIndex = parseInt opt.main if mainIndex < 0
@@ -163,7 +163,7 @@ class Do
     
         mainCursor = newCursors[mainIndex]
         @cleanCursors newCursors
-        mainIndex = newCursors.indexOf @editor.posClosestToPosInPositions mainCursor, newCursors 
+        mainIndex = newCursors.indexOf posClosestToPosInPositions mainCursor, newCursors 
     
         @state = @state.set 'main', mainIndex
         @state = @state.setCursors newCursors
@@ -285,7 +285,7 @@ class Do
             p[0] = Math.max p[0], 0
             p[1] = clamp 0, @state.numLines()-1, p[1]
             
-        @editor.sortPositions cs
+        sortPositions cs
         
         if cs.length > 1
             for ci in [cs.length-1...0]

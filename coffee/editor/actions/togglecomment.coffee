@@ -21,7 +21,7 @@ module.exports =
             for s in @rangesForLineIndexInRanges i, newSelections
                 s[1][0] += d
                 s[1][1] += d
-            for c in @positionsForLineIndexInPositions i, newCursors
+            for c in positionsForLineIndexInPositions i, newCursors
                 @cursorDelta c, d
                 
         mainCursorLine = @do.line @mainCursor()[1]

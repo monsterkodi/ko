@@ -67,7 +67,7 @@ class Ranges
     positionsInLineAfterColInPositions: (li,col,pl) -> (p for p in pl when p[1] == li and p[0]>col)
     positionsNotInRanges: (pss, rgs) -> _.filter pss, (p) => not @isPosInRanges p, rgs
     positionsBetweenPosAndPosInPositions: (p1,p2,pl) -> 
-        [a,b] = @sortPositions [p1, p2]
+        [a,b] = sortPositions [p1, p2]
         (r for r in pl when ( (r[1] > a[1] or (r[1] == a[1]) and (r[0] >= a[0])) and (r[1] < b[1] or (r[1] == b[1]) and (r[0] <= b[0])))) 
             
     manhattanDistance: (a,b) -> Math.abs(a[1]-b[1])+Math.abs(a[0]-b[0])

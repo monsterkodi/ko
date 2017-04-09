@@ -67,16 +67,16 @@ module.exports =
                         @do.delete c[1]+1
                                     
                         # move cursors in joined line
-                        for nc in @positionsForLineIndexInPositions c[1]+1, newCursors
-                            @cursorDelta nc, ll, -1
+                        for nc in positionsForLineIndexInPositions c[1]+1, newCursors
+                            cursorDelta nc, ll, -1
                         # move cursors below deleted line up
-                        for nc in @positionsBelowLineIndexInPositions c[1]+1, newCursors
-                            @cursorDelta nc, 0, -1
+                        for nc in positionsBelowLineIndexInPositions c[1]+1, newCursors
+                            cursorDelta nc, 0, -1
                 else
                     @do.change c[1], @do.line(c[1]).splice c[0], 1
-                    for nc in @positionsForLineIndexInPositions c[1], newCursors
+                    for nc in positionsForLineIndexInPositions c[1], newCursors
                         if nc[0] > c[0]
-                            @cursorDelta nc, -1
+                            cursorDelta nc, -1
 
             @do.setCursors newCursors
             @do.end()

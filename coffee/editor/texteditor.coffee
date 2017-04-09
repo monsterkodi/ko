@@ -258,9 +258,9 @@ class TextEditor extends Editor
             lineDiv: div
           
         # this is crap! render only cursors at line! don't get native arrays!  
-        @renderCursors() if @positionsForLineIndexInPositions(li, @cursors()).length
-        @renderSelection() if @rangesForLineIndexInRanges(li, @selections()).length
-        @renderHighlights() if @rangesForLineIndexInRanges(li, @highlights()).length
+        @renderCursors() if positionsForLineIndexInPositions(li, @cursors()).length
+        @renderSelection() if rangesForLineIndexInRanges(li, @selections()).length
+        @renderHighlights() if rangesForLineIndexInRanges(li, @highlights()).length
         
     exposeLines: (e) =>
         before = @elem.firstChild

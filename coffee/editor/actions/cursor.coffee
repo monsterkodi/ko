@@ -137,7 +137,7 @@ module.exports =
             if not @isPosInPositions [c[0], c[1]+d], oldCursors               
                 newCursors.push [c[0], c[1]+d]
                 break if newCursors.length >= 999
-        @sortPositions newCursors
+        sortPositions newCursors
         main = switch dir
             when 'up'    then 'first'
             when 'down'  then 'last'

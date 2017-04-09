@@ -20,7 +20,7 @@ module.exports =
         newCursors    = @do.cursors()
         for i in @selectedAndCursorLineIndices()
             @do.change i, @indentString + @do.line(i)
-            for nc in @positionsForLineIndexInPositions i, newCursors
+            for nc in positionsForLineIndexInPositions i, newCursors
                 @cursorDelta nc, @indentString.length
             for ns in @rangesForLineIndexInRanges i, newSelections
                 ns[1][0] += @indentString.length
@@ -36,7 +36,7 @@ module.exports =
         for i in @selectedAndCursorLineIndices()
             if @do.line(i).startsWith @indentString
                 @do.change i, @do.line(i).substr @indentString.length
-                lineCursors = @positionsForLineIndexInPositions i, newCursors 
+                lineCursors = positionsForLineIndexInPositions i, newCursors
                 for nc in lineCursors
                     @cursorDelta nc, -@indentString.length
                 for ns in @rangesForLineIndexInRanges i, newSelections

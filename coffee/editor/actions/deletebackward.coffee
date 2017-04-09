@@ -20,7 +20,7 @@ module.exports =
         switch info?.combo
             when 'command+backspace' then opt.ignoreLineBoundary = true
             when 'alt+backspace'     then opt.ignoreTabBoundary  = true
-            when 'shift+backspace'   then opt.singleCharacter    = true
+
         
         @do.start()
         if @do.numSelections()
@@ -77,10 +77,10 @@ module.exports =
                         @do.change c[1]-1, @do.line(c[1]-1) + @do.line(c[1])
                         @do.delete c[1]
                         # move cursors in joined line
-                        for nc in @positionsForLineIndexInPositions c[1], newCursors
+                        for nc in positionsForLineIndexInPositions c[1], newCursors
                             @cursorDelta nc, ll, -1
                         # move cursors below deleted line up
-                        for nc in @positionsBelowLineIndexInPositions c[1], newCursors
+                        for nc in positionsBelowLineIndexInPositions c[1], newCursors
                             @cursorDelta nc, 0, -1
             else
                 if removeNum < 1 # delete spaces to line start or line end

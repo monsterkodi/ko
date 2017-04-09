@@ -19,7 +19,8 @@ _       = require 'lodash'
 startOf = (r) -> r[0]
 endOf   = (r) -> r[0] + Math.max 1, r[1]-r[0]
 
-class Buffer extends multi event, ranges
+# class Buffer extends multi event, ranges
+class Buffer extends event
     
     constructor: () -> 
         @wordRegExp = new RegExp "(\\s+|\\w+|[^\\s])", 'g'
@@ -252,7 +253,7 @@ class Buffer extends multi event, ranges
 
     rangesBetweenPositions: (a, b, extend=false) ->
         r = []
-        [a,b] = @sortPositions [a,b]
+        [a,b] = sortPositions [a,b]
         if a[1] == b[1]
             r.push [a[1], [a[0], b[0]]]
         else
