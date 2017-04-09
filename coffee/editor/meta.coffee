@@ -4,10 +4,10 @@
 # 000 0 000  000          000     000   000
 # 000   000  00000000     000     000   000
 {
-str,
 error,
 log,
 $}  = require 'kxk'
+ranges = require '../tools/ranges'
 _   = require 'lodash'
 fs  = require 'fs'
 
@@ -193,7 +193,7 @@ class Meta
         for meta in @metasAtLineIndex e.lineIndex
             meta[1][1] = e.text.length if meta[1][1] is 0
                 
-    metasAtLineIndex: (li) -> @editor.rangesForLineIndexInRanges li, @metas
+    metasAtLineIndex: (li) -> rangesForLineIndexInRanges li, @metas
     hrefAtLineIndex:  (li) -> 
         for meta in @metasAtLineIndex li
             return meta[2].href if meta[2].href?
@@ -215,13 +215,13 @@ class Meta
         
     updatePositionsBelowLineIndex: (li) ->     
         size = @editor.size
-        for meta in @editor.rangesFromTopToBotInRanges li, @editor.scroll.exposeBot, @metas
+        for meta in rangesFromTopToBotInRanges li, @editor.scroll.exposeBot, @metas
             tx = size.charWidth *  meta[1][0] + size.offsetX
             ty = size.lineHeight * (meta[0] - @editor.scroll.exposeTop)
             meta[2].div?.style.transform = "translate(#{tx}px,#{ty}px)"        
         
     onLineInserted: (li) => 
-        for meta in @editor.rangesFromTopToBotInRanges li+1, @editor.numLines(), @metas
+        for meta in rangesFromTopToBotInRanges li+1, @editor.numLines(), @metas
             meta[0] += 1
         @updatePositionsBelowLineIndex li
         
@@ -240,7 +240,7 @@ class Meta
         
         _.pullAll @metas, @metasAtLineIndex li
         
-        for meta in @editor.rangesFromTopToBotInRanges li+1, @editor.numLines(), @metas
+        for meta in rangesFromTopToBotInRanges li+1, @editor.numLines(), @metas
             meta[0] -= 1
             
         @updatePositionsBelowLineIndex li

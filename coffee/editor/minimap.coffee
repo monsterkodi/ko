@@ -94,7 +94,7 @@ class Minimap
         ctx = @selecti.getContext '2d'
 
         ctx.fillStyle = '#444' 
-        for r in @editor.rangesFromTopToBotInRanges @scroll.exposeTop, @scroll.exposeBot, @editor.selections()
+        for r in rangesFromTopToBotInRanges @scroll.exposeTop, @scroll.exposeBot, @editor.selections()
             y = (r[0]-@scroll.exposeTop)*@scroll.lineHeight
             if 2*r[1][0] < @width
                 offset = r[1][0] and @offsetLeft or 0
@@ -122,7 +122,7 @@ class Minimap
         ctx = @highlig.getContext '2d'
 
         ctx.fillStyle = 'rgba(255,0,255,0.5)'
-        for r in @editor.rangesFromTopToBotInRanges @scroll.exposeTop, @scroll.exposeBot, @editor.highlights()
+        for r in rangesFromTopToBotInRanges @scroll.exposeTop, @scroll.exposeBot, @editor.highlights()
             y = (r[0]-@scroll.exposeTop)*@scroll.lineHeight
             if 2*r[1][0] < @width                
                 ctx.fillRect @offsetLeft+2*r[1][0], y, 2*(r[1][1]-r[1][0]), @scroll.lineHeight
@@ -133,7 +133,7 @@ class Minimap
         @cursors.width = @width
         ctx = @cursors.getContext '2d'
         
-        for r in @editor.rangesFromTopToBotInRanges @scroll.exposeTop, @scroll.exposeBot, @editor.rangesFromPositions @editor.state.cursors()
+        for r in rangesFromTopToBotInRanges @scroll.exposeTop, @scroll.exposeBot, rangesFromPositions @editor.state.cursors()
             y = (r[0]-@scroll.exposeTop)*@scroll.lineHeight
             if 2*r[1][0] < @width
                 ctx.fillStyle = '#f80'

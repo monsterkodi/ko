@@ -246,7 +246,7 @@ class Autocomplete extends event
     cursorWords: -> 
         cp = @editor.cursorPos()
         words = @editor.wordRangesInLineAtIndex cp[1], regExp: @specialWordRegExp        
-        [befor, cursr, after] = @editor.rangesSplitAtPosInRanges cp, words
+        [befor, cursr, after] = rangesSplitAtPosInRanges cp, words
         [@editor.textsInRanges(befor), @editor.textInRange(cursr), @editor.textsInRanges(after)]
         
     cursorWord: -> @cursorWords()[1]
