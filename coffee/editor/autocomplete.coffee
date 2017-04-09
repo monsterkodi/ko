@@ -196,6 +196,7 @@ class Autocomplete extends event
         for l in lines
             if not l?.split?
                 error "Autocomplete.parseLines -- line has no split? action: #{opt.action} line: #{l}"
+                error "Autocomplete.parseLines -- lines", lines
                 return
                 # alert "autocomplete.parseLines: warning! line has no split? #{l} #{lines?}"
                 # throw new Error

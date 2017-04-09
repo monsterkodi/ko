@@ -61,21 +61,16 @@ class Meta
     # 0000000   000   000      0      00000000
          
     saveFileLineMetas: (file, lineMetas) ->
-        # log "Meta.saveFileLineMetas file:#{file} lineMetas:", lineMetas
         log "Meta.saveFileLineMetas file:#{file} numChanges: #{lineMetas.length}"
         fs.readFile file, encoding: 'utf8', (err, data) ->
-            if err?
-                error "Meta.saveFileLineMetas -- readFile err:#{err}"
-                return
+            if err? then return error "Meta.saveFileLineMetas -- readFile err:#{err}"
             lines = data.split /\r?\n/
             for lineMeta in lineMetas
-                log "saveFileLineMetas -- changing line at index #{lineMeta[0]} to: #{lineMeta[1]}"
+                log "saveFileLineMetas -- changing line at index #{lineMeta[0]} in #{file} from: #{lines[lineMeta[0]]} to: #{lineMeta[1]}"
                 lines[lineMeta[0]] = lineMeta[1]
             data = lines.join '\n'
             fs.writeFile file, data, encoding: 'utf8', (err) ->
-                if err?
-                    error "Meta.saveFileLineMetas -- writeFile err:#{err}"
-                    return
+                if err? then return error "Meta.saveFileLineMetas -- writeFile err:#{err}"
                 for lineMeta in lineMetas
                     meta = lineMeta[2]
                     delete meta[2].state
