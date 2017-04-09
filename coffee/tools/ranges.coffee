@@ -34,12 +34,12 @@ class Ranges
     
     rangeForPos:   (p)   -> [p[1], [p[0], p[0]]]
     rangeBetween: (a,b) -> 
-        if @isPos(a) and @isPos(b) 
+        if isPos(a) and isPos(b) 
             [Math.min(a[1], b[1]), [Math.min(a[0], b[0]), Math.max(a[0], b[0])]]
-        else if @isRange(a) and @isRange(b)
+        else if isRange(a) and isRange(b)
             r = [a,b]
-            @sortRanges r
-            @rangeBetween @rangeEndPos(r[0]), rangeStartPos(r[1])
+            sortRanges r
+            rangeBetween rangeEndPos(r[0]), rangeStartPos(r[1])
             
     isPos:         (p)       -> p?.length == 2 and _.isNumber(p[0]) and _.isNumber(p[1])
     isRange:       (r)       -> r?.length >= 2 and _.isNumber(r[0]) and r[1]?.length >= 2 and _.isNumber(r[1][0]) and _.isNumber(r[1][1])
@@ -47,7 +47,7 @@ class Ranges
     isSamePos:     (a,b)     -> a[1]==b[1] and a[0]==b[0]
     isPosInRange:  (p, r)    -> (p[1] == r[0]) and (r[1][0] <= p[0] <= r[1][1])
     isPosInRanges: (p, rgs)  -> rangeAtPosInRanges(p, rgs)?
-    isPosInPositions: (p,ps) -> @posInPositions(p,ps)?
+    isPosInPositions: (p,ps) -> posInPositions(p,ps)?
 
     rangeEndPos:   (r)       -> [r[1][1], r[0]]
     rangeStartPos: (r)       -> [r[1][0], r[0]]
@@ -74,7 +74,7 @@ class Ranges
         
     posInPositions: (p,pl) ->
         for c in pl
-            return c if @isSamePos p, c
+            return c if isSamePos p, c
 
     posClosestToPosInPositions: (p,pl) -> 
         minDist = 999999        
@@ -174,7 +174,7 @@ class Ranges
     areSameRanges: (ra, rb) -> 
         if ra.length == rb.length
             for i in [0...ra.length]
-                return false if not @isSameRange ra[i], rb[i]
+                return false if not isSameRange ra[i], rb[i]
             return true
         false
 
@@ -185,7 +185,7 @@ class Ranges
     #  0000000  0000000  00000000  000   000  000   000  
     
     cleanRanges: (ranges) ->
-        @sortRanges ranges 
+        sortRanges ranges 
         if ranges.length > 1
             for ri in [ranges.length-1...0]
                 r = ranges[ri]
