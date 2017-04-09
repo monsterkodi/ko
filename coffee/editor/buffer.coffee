@@ -13,7 +13,6 @@ State   = require './state'
 
 fuzzy   = require 'fuzzy'
 event   = require 'events'
-{multi} = require 'heterarchy'
 _       = require 'lodash'
 
 startOf = (r) -> r[0]
