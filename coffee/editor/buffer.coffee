@@ -10,7 +10,7 @@ log,
 str
 }       = require "kxk"
 State   = require './state' 
-ranges  = require '../tools/ranges'
+
 fuzzy   = require 'fuzzy'
 event   = require 'events'
 {multi} = require 'heterarchy'

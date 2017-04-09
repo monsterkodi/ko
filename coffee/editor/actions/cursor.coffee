@@ -157,7 +157,7 @@ module.exports =
         lines = {}
         for nc in newCursors
             lines[nc[1]] = nc[0]
-            @cursorSet nc, newX, c[1]
+            cursorSet nc, newX, c[1]
         for li, cx of lines
             @do.change li, @do.line(li).slice(0, cx) + _.padStart('', newX-cx) + @do.line(li).slice(cx)
         @do.setCursors newCursors
@@ -172,7 +172,7 @@ module.exports =
             when 'left'  then _.min (c[0] for c in newCursors)
             when 'right' then _.max (c[0] for c in newCursors)
         for c in newCursors
-            @cursorSet c, charPos, c[1]
+            cursorSet c, charPos, c[1]
         main = switch dir
             when 'up'    then 'first'
             when 'down'  then 'last'

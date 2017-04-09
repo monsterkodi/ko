@@ -42,16 +42,16 @@ module.exports =
     highlightWordAndAddToSelection: -> # command+d
         cp = @cursorPos()
         wordHighlights = @wordHighlights()
-        cursorInWordHighlight = wordHighlights.length and @rangeAtPosInRanges cp, wordHighlights
+        cursorInWordHighlight = wordHighlights.length and rangeAtPosInRanges cp, wordHighlights
         if not cursorInWordHighlight
             @highlightTextOfSelectionOrWordAtCursor() # this also selects
         else
             @do.start()
-            sr = @rangeAtPosInRanges cp, @do.selections()
+            sr = rangeAtPosInRanges cp, @do.selections()
             if sr # cursor in selection -> select next highlight
                 r = @rangeAfterPosInRanges cp, wordHighlights
             else # select current highlight first
-                r = @rangeAtPosInRanges cp, wordHighlights
+                r = rangeAtPosInRanges cp, wordHighlights
             r ?= wordHighlights[0]
             @addRangeToSelection r
             @scrollCursorToTop?() # < sucks!
@@ -116,7 +116,7 @@ module.exports =
     removeSelectedHighlight: -> # command+shift+d
         cp = @cursorPos()
         sel = @selections()
-        sr = @rangeAtPosInRanges cp, sel
-        hr = @rangeAtPosInRanges cp, @highlights()        
+        sr = rangeAtPosInRanges cp, sel
+        hr = rangeAtPosInRanges cp, @highlights()
         if sr and hr
             @removeSelectionAtIndex sel.indexOf sr 

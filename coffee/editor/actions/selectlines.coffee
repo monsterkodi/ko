@@ -29,7 +29,7 @@ module.exports =
         selectCursorLineAtIndex = (c,i) =>
             range = [i, [0, @do.line(i).length]] 
             newSelections.push range
-            @cursorSet c, @rangeEndPos range
+            cursorSet c, @rangeEndPos range
             
         start = false
         for c in newCursors
@@ -55,7 +55,7 @@ module.exports =
             if thisSel.length
                 if @isSelectedLineAtIndex c[1]-1
                     s = _.first @rangesForLineIndexInRanges c[1]-1, newSelections
-                    @cursorSet c, s[1][1], s[0]
+                    cursorSet c, s[1][1], s[0]
                 newSelections.splice newSelections.indexOf(thisSel[0]), 1
 
         @do.select newSelections

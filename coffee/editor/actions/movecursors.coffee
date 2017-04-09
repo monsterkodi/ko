@@ -123,9 +123,9 @@ module.exports =
                 newPos = func c 
                 if newPos[1] == c[1] or not opt.keepLine
                     mainLine = newPos[1] if @isSamePos oldMain, c
-                    @cursorSet c, newPos
+                    cursorSet c, newPos
         else
-            @cursorSet newCursors[0], func newCursors[0] 
+            cursorSet newCursors[0], func newCursors[0]
             mainLine = newCursors[0][1]
             
         main = switch opt.main

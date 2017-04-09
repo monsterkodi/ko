@@ -32,7 +32,7 @@ module.exports =
             if opt.deleteLines
                 csel = @continuousSelectionAtPosInRanges c, oldSelections
             else
-                rg = @rangeAtPosInRanges c, oldSelections
+                rg = rangeAtPosInRanges c, oldSelections
                 if rg?
                     csel = [@rangeStartPos(rg), @rangeEndPos(rg)]
                     # log 'csel', csel
@@ -40,13 +40,13 @@ module.exports =
                 [sp, ep] = csel
                 # log 'sp,ep', sp,ep, c
                 for nc in @positionsBetweenPosAndPosInPositions sp, ep, newCursors
-                    @cursorSet nc, sp
+                    cursorSet nc, sp
                 if sp[1] < ep[1] and sp[0] > 0 and ep[0] < @do.line(ep[1]).length 
                     # selection spans multiple lines and first and last line are cut
                     joinLines.push sp[1]
                     for nc in @positionsInLineAfterColInPositions ep[1], ep[0], newCursors
                         # set cursors after selection in last joined line
-                        @cursorSet nc, sp[0]+nc[0]-ep[0], sp[1]
+                        cursorSet nc, sp[0]+nc[0]-ep[0], sp[1]
                         
         for s in @do.selections().reversed()
             continue if s[0] >= @do.numLines()
@@ -82,7 +82,7 @@ module.exports =
     # returns start and end positions of ranges that have either no characters or just a single newline between them
 
     continuousSelectionAtPosInRanges: (p, sel) -> 
-        r = @rangeAtPosInRanges p, sel
+        r = rangeAtPosInRanges p, sel
         if r and @lengthOfRange r
             sp = @rangeStartPos r
             while (sp[0] == 0) and (sp[1] > 0)

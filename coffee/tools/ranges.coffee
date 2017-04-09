@@ -46,7 +46,7 @@ class Ranges
     isSameRange:   (a,b)     -> a[0]==b[0] and a[1][0]==b[1][0] and a[1][1]==b[1][1]
     isSamePos:     (a,b)     -> a[1]==b[1] and a[0]==b[0]
     isPosInRange:  (p, r)    -> (p[1] == r[0]) and (r[1][0] <= p[0] <= r[1][1])
-    isPosInRanges: (p, rgs)  -> @rangeAtPosInRanges(p, rgs)?
+    isPosInRanges: (p, rgs)  -> rangeAtPosInRanges(p, rgs)?
     isPosInPositions: (p,ps) -> @posInPositions(p,ps)?
 
     rangeEndPos:   (r)       -> [r[1][1], r[0]]
@@ -163,7 +163,7 @@ class Ranges
         (r for r in ranges when top <= r[0] <= bot)
         
     rangeContainingRangeInRanges: (r, ranges) ->
-        if cr = @rangeAtPosInRanges @rangeStartPos(r), ranges
+        if cr = rangeAtPosInRanges @rangeStartPos(r), ranges
             return cr if cr[1][1] >= r[1][1]
         
     rangesShrunkenBy: (ranges, delta) ->
