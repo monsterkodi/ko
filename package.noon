@@ -1,6 +1,6 @@
 name            ko-editor
 productName     ko
-version         0.12.2
+version         0.13.0
 description     an editor for macOS
 main            js/main.js
 preferGlobal    true
@@ -40,7 +40,7 @@ dependencies
                 immutable       ^3.8.1
                 karg            >=1.0.9
                 keycode         ^2.1.8
-                kxk             ^0.7.1
+                kxk             ^0.8.0
                 lodash          ^4.17.4
                 nconf           ^0.8.4
                 node-pty        ^0.6.3
