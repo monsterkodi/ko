@@ -79,7 +79,7 @@ class Ranges
     posClosestToPosInPositions: (p,pl) -> 
         minDist = 999999        
         for ps in pl
-            mDist = @manhattanDistance ps, p
+            mDist = manhattanDistance ps, p
             if mDist < minDist
                 minDist = mDist
                 minPos = ps

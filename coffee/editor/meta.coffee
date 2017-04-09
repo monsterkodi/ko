@@ -62,16 +62,15 @@ class Meta
          
     saveFileLineMetas: (file, lineMetas) ->
         # log "Meta.saveFileLineMetas file:#{file} lineMetas:", lineMetas
-        # log "Meta.saveFileLineMetas file:#{file}"
+        log "Meta.saveFileLineMetas file:#{file} numChanges: #{lineMetas.length}"
         fs.readFile file, encoding: 'utf8', (err, data) ->
             if err?
                 error "Meta.saveFileLineMetas -- readFile err:#{err}"
                 return
             lines = data.split /\r?\n/
-            # log "Meta.saveFileLineMetas 1 lines:", lines
             for lineMeta in lineMetas
+                log "saveFileLineMetas -- changing line at index #{lineMeta[0]} to: #{lineMeta[1]}"
                 lines[lineMeta[0]] = lineMeta[1]
-            # log "Meta.saveFileLineMetas 2 lines:", lines
             data = lines.join '\n'
             fs.writeFile file, data, encoding: 'utf8', (err) ->
                 if err?

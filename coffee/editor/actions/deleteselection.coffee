@@ -44,7 +44,7 @@ module.exports =
                 if sp[1] < ep[1] and sp[0] > 0 and ep[0] < @do.line(ep[1]).length 
                     # selection spans multiple lines and first and last line are cut
                     joinLines.push sp[1]
-                    for nc in @positionsInLineAfterColInPositions ep[1], ep[0], newCursors
+                    for nc in positionsInLineAfterColInPositions ep[1], ep[0], newCursors
                         # set cursors after selection in last joined line
                         cursorSet nc, sp[0]+nc[0]-ep[0], sp[1]
                         

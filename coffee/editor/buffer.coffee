@@ -19,8 +19,8 @@ _       = require 'lodash'
 startOf = (r) -> r[0]
 endOf   = (r) -> r[0] + Math.max 1, r[1]-r[0]
 
-# class Buffer extends multi event, require '../tools/ranges'
-class Buffer extends event
+class Buffer extends multi event, require '../tools/ranges'
+# class Buffer extends event
     
     constructor: () -> 
         @wordRegExp = new RegExp "(\\s+|\\w+|[^\\s])", 'g'
