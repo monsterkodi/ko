@@ -19,7 +19,7 @@ _       = require 'lodash'
 startOf = (r) -> r[0]
 endOf   = (r) -> r[0] + Math.max 1, r[1]-r[0]
 
-# class Buffer extends multi event, ranges
+# class Buffer extends multi event, require '../tools/ranges'
 class Buffer extends event
     
     constructor: () -> 
@@ -87,7 +87,7 @@ class Buffer extends event
     rangeForWordAtPos: (pos, opt) ->
         p = @clampPos pos
         wr = @wordRangesInLineAtIndex p[1], opt
-        r = @rangeAtPosInRanges p, wr
+        r = rangeAtPosInRanges p, wr
         r
 
     endOfWordAtCursor: (c=@mainCursor()) =>

@@ -57,7 +57,7 @@ module.exports =
             newCursors = null
             if cp[0] > 0
                 rest   = @do.line(li).substr(cp[0]).trimLeft()
-                indt   = _.padStart "", @indentationInLine @do.line cp[1] 
+                indt   = _.padStart "", indentationInLine @do.line cp[1]
                 before = @do.line(cp[1]).substr 0, cp[0]
                 if before.trim().length
                     @do.change li, before

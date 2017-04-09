@@ -35,12 +35,12 @@ module.exports =
                     # remove comment
                     @do.change i, @do.line(i).splice cs, @lineComment.length
                     moveInLine i, -@lineComment.length
-                    si = @indentationInLine @do.line(i)
+                    si = indentationInLine @do.line(i)
                     if si % @indentString.length == 1 # remove space after indent
                         @do.change i, @do.line(i).splice si-1, 1
                         moveInLine i, -1
             else # insert comment
-                si = @indentationInLine @do.line(i)
+                si = indentationInLine @do.line(i)
                 if @do.line(i).length > si
                     l = (@lineComment + " ").length
                     @do.change i, @do.line(i).splice si, 0, @lineComment + " "

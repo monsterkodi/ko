@@ -54,7 +54,7 @@ module.exports =
             if doIndent
                 line = before.trimRight()
                 il = 0
-                thisIndent = @indentationInLine @do.line(c[1])
+                thisIndent = indentationInLine @do.line(c[1])
                 indentLength = @indentString.length
                 
                 if @indentNewLineMore?
@@ -86,12 +86,12 @@ module.exports =
                             before = before.trimRight()
                             before = before.slice 0, before.length-4 # remove then                            
                 
-                il = Math.max il, @indentationInLine @do.line c[1]+1
+                il = Math.max il, indentationInLine @do.line c[1]+1
                 indent = _.padStart "", il
             # else if opt?.keepIndent
-                # indent = _.padStart "", @indentationInLine @do.line c[1] # keep indentation
+                # indent = _.padStart "", indentationInLine @do.line c[1] # keep indentation
             else
-                if c[0] <= @indentationInLine @do.line c[1]
+                if c[0] <= indentationInLine @do.line c[1]
                     indent = @do.line(c[1]).slice 0,c[0]
                 else
                     indent = ''
@@ -110,7 +110,7 @@ module.exports =
                 @do.change c[1], before
 
             # move cursors in and below inserted line down
-            for nc in @positionsFromPosInPositions c, newCursors
+            for nc in positionsFromPosInPositions c, newCursors
                 @cursorDelta nc, nc[1] == c[1] and indent.length - bl or 0, 1
         
         @do.setCursors newCursors
