@@ -433,7 +433,7 @@ class Open extends Command
                 super selected
                 
             text:  (path.basename(f) for f in opened).join ' '
-            focus: '.editor'
+            focus:  'editor'
             reveal: 'editor'
             status: 'ok'
         else

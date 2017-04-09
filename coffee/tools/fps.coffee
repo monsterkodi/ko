@@ -32,7 +32,7 @@ class FPS
         @history = []
         @last = now()
             
-        $('.commandline-span').appendChild @elem
+        $('commandline-span').appendChild @elem
         window.requestAnimationFrame @draw
             
     # 0000000    00000000    0000000   000   000

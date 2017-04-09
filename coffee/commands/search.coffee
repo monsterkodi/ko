@@ -58,7 +58,7 @@ class Search extends Command
             text: command
             name: @name
             file: file
-        focus: '.terminal'
+        focus:  'terminal'
         reveal: 'terminal'
         text:   command
         select: true

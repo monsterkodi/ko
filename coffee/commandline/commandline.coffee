@@ -29,7 +29,7 @@ class Commandline extends TextEditor
         @scroll?.setLineHeight @size.lineHeight
         @setText ""
                 
-        @cmmd =$ '.commandline-command' 
+        @cmmd =$ 'commandline-command' 
         @cmmd.classList.add 'empty'
         @cmmd.addEventListener 'mousedown', @onCmmdClick
         

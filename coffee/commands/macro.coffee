@@ -73,7 +73,7 @@ class Macro extends Command
             if args.length
                 return args
             else
-                cw = editor.wordsAtCursors editor.positionsNotInRanges(editor.cursors, editor.selections), opt
+                cw = editor.wordsAtCursors positionsNotInRanges(editor.cursors, editor.selections), opt
                 sw = editor.textsInRanges editor.selections
                 ws = _.uniq cw.concat sw
                 ws.filter (w) -> w.trim().length
@@ -195,7 +195,7 @@ class Macro extends Command
                 editor.do.insert li, insert
                 editor.singleCursorAtPos [editor.line(li).length, li]
                 editor.do.end()
-                focus: '.'+editor.name
+                focus: editor.name
 
             #  0000000  000       0000000    0000000   0000000
             # 000       000      000   000  000       000     
@@ -227,7 +227,7 @@ class Macro extends Command
                         log 'writing class skeleton failed', err
                         return
                     ipc.send 'newWindowWithFile', file
-                return focus: '.'+editor.name
+                return focus: editor.name
             
         text: ''
                     

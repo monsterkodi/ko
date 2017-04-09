@@ -287,8 +287,8 @@ class Command
     
     grabFocus: -> @commandline.focus()
     setFocus: (focus) -> 
-        return if focus == '.body'
-        @focus = focus ? '.editor'
+        return if focus == 'body'
+        @focus = focus ? 'editor'
 
     #  0000000  000000000   0000000   000000000  00000000
     # 000          000     000   000     000     000     

@@ -6,7 +6,7 @@
 {
 log,
 sw,
-$} = require 'kxk'
+$}    = require 'kxk'
 event = require 'events'
 
 class Area extends event

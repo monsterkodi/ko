@@ -72,7 +72,7 @@ class Goto extends Command
             do: "reveal #{editor.name}"
         else if command.length
             window.editor.jumpTo command, dontList: true, extend: @name == 'selecto'
-            focus: '.editor'
+            focus: 'editor'
             do: "reveal editor"
         else
             text: ''

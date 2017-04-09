@@ -19,7 +19,7 @@ class Info
         window.logview.on  'focus', @setEditor
         window.terminal.on 'focus', @setEditor
                 
-        @elem = $('.info')
+        @elem =$ 'info' 
         
         # 000000000   0000000   00000000 
         #    000     000   000  000   000

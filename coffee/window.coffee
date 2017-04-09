@@ -279,14 +279,14 @@ split.on 'split', ->
     editor.resized()
     logview.resized()
 
-terminal = window.terminal = new Terminal '.terminal'
+terminal = window.terminal = new Terminal 'terminal'
 terminal.on 'fileLineChange', (file, lineChange) ->
     ipc.send 'winFileLinesChanged', -1, file, [lineChange]
 
-area        = window.area        = new Area '.area'
-editor      = window.editor      = new FileEditor '.editor'
-commandline = window.commandline = new Commandline '.commandline-editor'
-logview     = window.logview     = new LogView '.logview'
+area        = window.area        = new Area 'area'
+editor      = window.editor      = new FileEditor 'editor'
+commandline = window.commandline = new Commandline 'commandline-editor'
+logview     = window.logview     = new LogView 'logview'
 info        = window.info        = new Info editor
 
 editor.setText editorText if editorText?
@@ -307,10 +307,10 @@ window.editorWithName = (n) ->
         
 window.editorWithClassName = (n) ->
     switch n
-        when '.editor'      then editor
-        when '.commandline' then commandline
-        when '.terminal'    then terminal
-        when '.logview'     then logview    
+        when 'editor'      then editor
+        when 'commandline' then commandline
+        when 'terminal'    then terminal
+        when 'logview'     then logview    
 
 fps = window.fps = new FPS()
 
