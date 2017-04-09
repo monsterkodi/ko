@@ -70,7 +70,7 @@ module.exports =
                     
             if not found
                 for c in newCursors
-                    if @isRangeInString @rangeForPos c
+                    if @isRangeInString rangeForPos c
                         found = true
                         break
             return false if not found
@@ -114,7 +114,7 @@ module.exports =
             @do.change ns[0], @do.line(ns[0]).splice ns[1][1], 0, cr
             @do.change ns[0], @do.line(ns[0]).splice ns[1][0], 0, cl
             
-            for c in @positionsInLineAfterColInPositions ns[0], ns[1][0]-1, newCursors
+            for c in positionsInLineAfterColInPositions ns[0], ns[1][0]-1, newCursors
                 cursorDelta c, cl.length
                 
             
@@ -126,12 +126,8 @@ module.exports =
                 os[1][0] += cl.length
                 os[1][1] += cl.length
             
-            # log 'before positionsAfterLineColInPositions ns', ns
-            # log 'before positionsAfterLineColInPositions newCursors', newCursors
-
-            for c in @positionsInLineAfterColInPositions ns[0], ns[1][1], newCursors
+            for c in positionsInLineAfterColInPositions ns[0], ns[1][1], newCursors
                 cursorDelta c, cr.length
-                # log 'after cursor delta2', c
                 
         @do.select @rangesNotEmptyInRanges newSelections
         @do.setCursors newCursors
@@ -147,7 +143,7 @@ module.exports =
     highlightsSurroundingCursor: ->
         if @numHighlights() % 2 == 0
             hs = @highlights()
-            @sortRanges hs # necessary?
+            # sortRanges hs # necessary?
             if @numHighlights() == 2
                 return hs
             else if @numHighlights() == 4

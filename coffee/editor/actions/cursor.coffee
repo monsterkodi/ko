@@ -112,7 +112,7 @@ module.exports =
     # 000   000  0000000    0000000    
     
     toggleCursorAtPos: (p) ->
-        if @isPosInPositions p, @state.cursors()
+        if isPosInPositions p, @state.cursors()
             @delCursorAtPos p
         else
             @addCursorAtPos p
@@ -134,7 +134,7 @@ module.exports =
         oldCursors = @state.cursors()
         newCursors = @do.cursors()
         for c in oldCursors
-            if not @isPosInPositions [c[0], c[1]+d], oldCursors               
+            if not isPosInPositions [c[0], c[1]+d], oldCursors
                 newCursors.push [c[0], c[1]+d]
                 break if newCursors.length >= 999
         sortPositions newCursors
@@ -202,12 +202,12 @@ module.exports =
         d = switch dir
             when 'up' 
                 for c in @do.cursors()
-                    if @isPosInPositions([c[0], c[1]-1], newCursors) and not @isPosInPositions [c[0], c[1]+1], newCursors
+                    if isPosInPositions([c[0], c[1]-1], newCursors) and not isPosInPositions [c[0], c[1]+1], newCursors
                         ci = newCursors.indexOf c
                         newCursors.splice ci, 1
             when 'down' 
                 for c in newCursors.reversed()
-                    if @isPosInPositions([c[0], c[1]+1], newCursors) and not @isPosInPositions [c[0], c[1]-1], newCursors
+                    if isPosInPositions([c[0], c[1]+1], newCursors) and not isPosInPositions [c[0], c[1]-1], newCursors
                         ci = newCursors.indexOf c
                         newCursors.splice ci, 1
         @do.setCursors newCursors, main:'closest'

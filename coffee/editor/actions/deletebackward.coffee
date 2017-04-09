@@ -91,7 +91,7 @@ module.exports =
                 else
                     n = removeNum
                 @do.change c[1], @do.line(c[1]).splice c[0]-n, n
-                for nc in @positionsForLineIndexInPositions c[1], newCursors
+                for nc in positionsForLineIndexInPositions c[1], newCursors
                     if nc[0] >= c[0]
                         cursorDelta nc, -n
         @do.setCursors newCursors

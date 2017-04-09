@@ -39,7 +39,7 @@ module.exports =
             if csel?
                 [sp, ep] = csel
                 # log 'sp,ep', sp,ep, c
-                for nc in @positionsBetweenPosAndPosInPositions sp, ep, newCursors
+                for nc in positionsBetweenPosAndPosInPositions sp, ep, newCursors
                     cursorSet nc, sp
                 if sp[1] < ep[1] and sp[0] > 0 and ep[0] < @do.line(ep[1]).length 
                     # selection spans multiple lines and first and last line are cut
@@ -53,18 +53,18 @@ module.exports =
             lineSelected = s[1][0] == 0 and s[1][1] == @do.line(s[0]).length
             if lineSelected and opt.deleteLines and @do.numLines() > 1
                 @do.delete s[0]
-                for nc in @positionsBelowLineIndexInPositions s[0], newCursors
+                for nc in positionsBelowLineIndexInPositions s[0], newCursors
                     cursorDelta nc, 0, -1 # move cursors below deleted line up
             else
                 continue if s[0] >= @do.numLines()
                 @do.change s[0], @do.line(s[0]).splice s[1][0], s[1][1]-s[1][0]
-                for nc in @positionsInLineAfterColInPositions s[0], s[1][1], newCursors
+                for nc in positionsInLineAfterColInPositions s[0], s[1][1], newCursors
                     cursorDelta nc, -(s[1][1]-s[1][0]) # move cursors after deletion in same line left
 
             if s[0] in joinLines
                 @do.change s[0], @do.line(s[0]) + @do.line(s[0]+1)
                 @do.delete s[0]+1
-                for nc in @positionsBelowLineIndexInPositions s[0], newCursors
+                for nc in positionsBelowLineIndexInPositions s[0], newCursors
                     cursorDelta nc, 0, -1 # move cursors below deleted line up
                 _.pull joinLines, s[0]
         

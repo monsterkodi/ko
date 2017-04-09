@@ -28,7 +28,7 @@ module.exports =
             for i in [0...ls.length]
                 @do.insert r[1]+1+i, ls[i]
                 
-            for nc in @positionsBelowLineIndexInPositions r[1]+1, newCursors
+            for nc in positionsBelowLineIndexInPositions r[1]+1, newCursors
                 cursorDelta nc, 0, ls.length # move cursors below inserted lines down
                 
             if dir == 'down'
