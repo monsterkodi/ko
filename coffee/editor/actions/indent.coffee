@@ -22,7 +22,7 @@ module.exports =
             @do.change i, @indentString + @do.line(i)
             for nc in positionsForLineIndexInPositions i, newCursors
                 cursorDelta nc, @indentString.length
-            for ns in @rangesForLineIndexInRanges i, newSelections
+            for ns in rangesForLineIndexInRanges i, newSelections
                 ns[1][0] += @indentString.length
                 ns[1][1] += @indentString.length
         @do.select newSelections
@@ -39,7 +39,7 @@ module.exports =
                 lineCursors = positionsForLineIndexInPositions i, newCursors
                 for nc in lineCursors
                     cursorDelta nc, -@indentString.length
-                for ns in @rangesForLineIndexInRanges i, newSelections
+                for ns in rangesForLineIndexInRanges i, newSelections
                     ns[1][0] -= @indentString.length
                     ns[1][1] -= @indentString.length
         @do.select newSelections

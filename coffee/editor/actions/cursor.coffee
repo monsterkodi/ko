@@ -98,7 +98,7 @@ module.exports =
             newCursors = []
             for s in @do.selections()
                 newCursors.push rangeStartPos s
-                newCursors.push @rangeEndPos s
+                newCursors.push rangeEndPos s
             @do.select []
             @do.setCursors newCursors
             @do.end()

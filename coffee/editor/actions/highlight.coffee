@@ -62,7 +62,7 @@ module.exports =
         @do.start()
         @do.select @do.highlights()
         if @do.numSelections()
-            @do.setCursors (@rangeEndPos(r) for r in @do.selections()), main: 'closest'
+            @do.setCursors (rangeEndPos(r) for r in @do.selections()), main: 'closest'
         @do.end()
 
     highlightTextOfSelectionOrWordAtCursor: -> # command+e       

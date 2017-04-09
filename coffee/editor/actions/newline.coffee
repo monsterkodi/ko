@@ -40,7 +40,7 @@ module.exports =
         @do.start()
         
         if @salterMode
-            newCursors = [@rangeEndPos @rangeForLineAtIndex @mainCursor()[1]]
+            newCursors = [rangeEndPos @rangeForLineAtIndex @mainCursor()[1]]
             @setSalterMode false
         else
             newCursors = @do.cursors()

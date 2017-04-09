@@ -121,7 +121,7 @@ module.exports =
         @do.start()
         newSelections = @do.selections()
         newSelections.push range
-        newCursors = (@rangeEndPos(r) for r in newSelections)
+        newCursors = (rangeEndPos(r) for r in newSelections)
         @do.setCursors newCursors, main:'last'
         @do.select newSelections
         @do.end()
@@ -131,7 +131,7 @@ module.exports =
         newSelections = @do.selections()
         newSelections.splice si, 1
         if newSelections.length
-            newCursors = (@rangeEndPos(r) for r in newSelections)
+            newCursors = (rangeEndPos(r) for r in newSelections)
             @do.setCursors newCursors, main:(newCursors.length+si-1) % newCursors.length
         @do.select newSelections
         @do.end()        
@@ -190,14 +190,14 @@ module.exports =
     selectBetweenSurround: ->
         if surr = @highlightsSurroundingCursor()
             @do.start()
-            start = @rangeEndPos surr[0] 
+            start = rangeEndPos surr[0]
             end = rangeStartPos surr[1]
             s = @rangesBetweenPositions start, end
             s = @cleanRanges s
             if s.length
                 @do.select s
                 if @do.numSelections()
-                    @do.setCursors [@rangeEndPos(_.last s)], Main: 'closest'
+                    @do.setCursors [rangeEndPos(_.last s)], Main: 'closest'
             @do.end()
             
     selectSurround: ->
@@ -205,7 +205,7 @@ module.exports =
             @do.start()
             @do.select surr
             if @do.numSelections()
-                @do.setCursors (@rangeEndPos(r) for r in @do.selections()), main: 'closest'
+                @do.setCursors (rangeEndPos(r) for r in @do.selections()), main: 'closest'
             @do.end()
 
     # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000   0000000  
