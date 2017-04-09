@@ -30,7 +30,7 @@ module.exports =
         if hls.length
             switch opt?.select
                 when 'after'  then @selectSingleRange rangeAfterPosInRanges(@cursorPos(), hls) ? _.first hls
-                when 'before' then @selectSingleRange @rangeBeforePosInRanges(@cursorPos(), hls) ? _.first hls
+                when 'before' then @selectSingleRange rangeBeforePosInRanges(@cursorPos(), hls) ? _.first hls
                 when 'first'  then @selectSingleRange _.first hls
             @scrollCursorToTop() if not opt?.noScroll # < sucks!
         @setHighlights hls

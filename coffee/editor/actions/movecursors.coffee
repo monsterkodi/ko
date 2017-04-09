@@ -61,9 +61,9 @@ module.exports =
         newMain = [oldMain[0]+dx, oldMain[1]+dy]
         _.remove newCursors, (c) => 
             if opt?.erase
-                @isSamePos(c, oldMain) or @isSamePos(c, newMain) 
+                isSamePos(c, oldMain) or isSamePos(c, newMain)
             else
-                @isSamePos(c, newMain) 
+                isSamePos(c, newMain)
         newCursors.push newMain
         @do.setCursors newCursors, main:newMain
         @do.end()
@@ -122,7 +122,7 @@ module.exports =
             for c in newCursors
                 newPos = func c 
                 if newPos[1] == c[1] or not opt.keepLine
-                    mainLine = newPos[1] if @isSamePos oldMain, c
+                    mainLine = newPos[1] if isSamePos oldMain, c
                     cursorSet c, newPos
         else
             cursorSet newCursors[0], func newCursors[0]

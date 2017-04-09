@@ -235,12 +235,12 @@ class Buffer extends event
    
     rangeOfInnerStringSurroundingRange: (r) ->
         rgs = @rangesOfStringsInLineAtIndex r[0]
-        rgs = @rangesShrunkenBy rgs, 1
-        @rangeContainingRangeInRanges r, rgs
+        rgs = rangesShrunkenBy rgs, 1
+        rangeContainingRangeInRanges r, rgs
         
     rangeOfStringSurroundingRange: (r) ->
         if ir = @rangeOfInnerStringSurroundingRange r
-            @rangeGrownBy ir, 1
+            rangeGrownBy ir, 1
             
     # 00000000    0000000   000   000   0000000   00000000   0000000
     # 000   000  000   000  0000  000  000        000       000     

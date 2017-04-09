@@ -373,7 +373,7 @@ class TextEditor extends Editor
         else if @numCursors() > 1
             vc = [] # virtual cursors
             for c in cs
-                if @isSamePos @mainCursor(), [c[0], c[1] + @scroll.exposeTop]
+                if isSamePos @mainCursor(), [c[0], c[1] + @scroll.exposeTop]
                     c[2] = 'main'
                 line = @line(@scroll.exposeTop+c[1])
                 if c[0] > line.length
@@ -553,7 +553,7 @@ class TextEditor extends Editor
                 eventPos = @posForEvent event
                 
                 if @clickCount
-                    if @isSamePos eventPos, @clickPos
+                    if isSamePos eventPos, @clickPos
                         @startClickTimer()
                         @clickCount += 1
                         if @clickCount == 2

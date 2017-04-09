@@ -82,7 +82,7 @@ module.exports =
         
         @do.start()
         if @do.numSelections() == 0
-            newSelections = @rangesFromPositions newCursors
+            newSelections = rangesFromPositions newCursors
         else
             newSelections = @do.selections()
             
@@ -118,18 +118,18 @@ module.exports =
                 cursorDelta c, cl.length
                 
             
-            for os in @rangesAfterLineColInRanges ns[0], ns[1][1], newSelections
+            for os in rangesAfterLineColInRanges ns[0], ns[1][1], newSelections
                 os[1][0] += cr.length
                 os[1][1] += cr.length
                 
-            for os in @rangesAfterLineColInRanges ns[0], ns[1][0], newSelections
+            for os in rangesAfterLineColInRanges ns[0], ns[1][0], newSelections
                 os[1][0] += cl.length
                 os[1][1] += cl.length
             
             for c in positionsInLineAfterColInPositions ns[0], ns[1][1], newCursors
                 cursorDelta c, cr.length
                 
-        @do.select @rangesNotEmptyInRanges newSelections
+        @do.select rangesNotEmptyInRanges newSelections
         @do.setCursors newCursors
         @do.end()
         return true

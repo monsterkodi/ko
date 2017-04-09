@@ -79,7 +79,7 @@ module.exports =
             if not @startSelectionCursors
                 @startSelectionCursors = @do.cursors()
                 if not @stickySelection
-                    @do.select @rangesFromPositions @startSelectionCursors
+                    @do.select rangesFromPositions @startSelectionCursors
         else
             @startSelectionCursors = null
             if not @stickySelection
@@ -231,7 +231,7 @@ module.exports =
             @highlightText searchText if searchText?.length
         return if not @numHighlights()
         hs = @highlights()
-        r = @rangeBeforePosInRanges @cursorPos(), hs
+        r = rangeBeforePosInRanges @cursorPos(), hs
         r ?= _.last hs
         @selectSingleRange r if r?
 
