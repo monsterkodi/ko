@@ -133,7 +133,7 @@ class Do
     select: (newSelections) -> 
         
         if newSelections.length
-            newSelections = @editor.cleanRanges newSelections
+            newSelections = cleanRanges newSelections
             @state = @state.setSelections newSelections
         else
             @state = @state.setSelections []

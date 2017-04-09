@@ -29,7 +29,7 @@ module.exports =
         hls = @rangesForText text, opt
         if hls.length
             switch opt?.select
-                when 'after'  then @selectSingleRange @rangeAfterPosInRanges(@cursorPos(), hls) ? _.first hls
+                when 'after'  then @selectSingleRange rangeAfterPosInRanges(@cursorPos(), hls) ? _.first hls
                 when 'before' then @selectSingleRange @rangeBeforePosInRanges(@cursorPos(), hls) ? _.first hls
                 when 'first'  then @selectSingleRange _.first hls
             @scrollCursorToTop() if not opt?.noScroll # < sucks!
@@ -49,7 +49,7 @@ module.exports =
             @do.start()
             sr = rangeAtPosInRanges cp, @do.selections()
             if sr # cursor in selection -> select next highlight
-                r = @rangeAfterPosInRanges cp, wordHighlights
+                r = rangeAfterPosInRanges cp, wordHighlights
             else # select current highlight first
                 r = rangeAtPosInRanges cp, wordHighlights
             r ?= wordHighlights[0]

@@ -99,7 +99,7 @@ module.exports =
                     if @do.line(sr[0])[sr[1][1]-1] == "'"
                         @do.change ns[0], @do.line(ns[0]).splice sr[1][1]-1, 1, '"'
                         
-            else if @fileType == 'coffee' and cl == '(' and @lengthOfRange(ns) > 0 # remove space after callee
+            else if @fileType == 'coffee' and cl == '(' and lengthOfRange(ns) > 0 # remove space after callee
                 before = @do.line(ns[0]).slice 0, ns[1][0]
                 after  = @do.line(ns[0]).slice ns[1][0]
                 trimmed = before.trimRight()

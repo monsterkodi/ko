@@ -43,7 +43,7 @@ module.exports =
         @moveCursorsToLineBoundary 'right', extend:true
         
         for s in @do.selections()
-            if @lengthOfRange s
+            if lengthOfRange s
                 @deleteToEndOfLine()
                 return @do.end()
         @selectMoreLines()
