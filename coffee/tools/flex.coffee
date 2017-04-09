@@ -26,7 +26,7 @@ class Handle
         @div.className = @flex.handleClass
         @div.style.cursor = @flex.cursor
         @div.style.flexBasis = "#{@flex.handleSize}px"
-        @flex.parent.insertBefore @div, @b
+        @flex.parent.insertBefore @div, @paneb.div
         
         @drag = new drag
             target:  @div
@@ -36,25 +36,12 @@ class Handle
             cursor:  @flex.cursor
 
     onStart: =>
-        
-        @flex.calculateSizes @
+        @start = @panea.div.getBoundingClientRect()[@flex.position]
         @flex.onDragStart?()
         
     onDrag: (d, e) =>
-        
-        offset = e[@flex.clientAxis] - @start
-        snapOffset = @flex.snapOffset
-        
-        if offset <= @aMin + snapOffset + @ahandleSize
-            offset = @aMin + @ahandleSize
-        else if offset >= @size - (@bMin +  snapOffset + @bhandleSize)
-            offset = @size - (@bMin + @bhandleSize)
-             
-        offset = offset - 0.5
-
-        log "drag offset: #{offset}"
-         
-        @flex.adjust @, offset
+        log 'onDrag', d.delta
+        @flex.moveHandle @, d.delta[@flex.axis]
         @flex.onDrag?()
         
     onEnd: => @flex.onDragEnd?()
@@ -67,12 +54,21 @@ class Handle
 
 class Flex 
     
-    constructor: (ids, opt) ->
+    constructor: (opt) ->
         
-        @panes   = ids.map (i) -> $ i
+        @panes   = opt.panes
         @handles = []
+
+        numPanes = @panes.length
         
-        @parent  = @panes[0].parentNode
+        for p in @panes
+            p.minSize ?= p.fixed ? 0
+            p.size    ?= p.fixed 
+            p.id      ?= p.div.id ? "pane#{@panes.indexOf p}"
+            
+        log "Flex.constructor numPanes:#{numPanes} panes:", @panes
+        
+        @parent  = @panes[0].div.parentNode
         @parent.style.display = 'flex'
 
         @handleSize  = opt.handleSize ? 6
@@ -82,109 +78,99 @@ class Flex
         @onDragEnd   = opt.onDragEnd
         @onDrag      = opt.onDrag
     
-        if @direction == 'horizontal'
-            @dimension        = 'width'
-            @clientDimension  = 'clientWidth'
-            @clientAxis       = 'clientX'
-            @position         = 'left'
-            @handleClass      = 'split-handle split-handle-horizontal'
-            @paddingA         = 'paddingLeft'
-            @paddingB         = 'paddingRight'
-            @cursor  = opt.cursor ? 'ew-resize'
-            @parent.style.flexDirection = 'row'
-            
-        if @direction == 'vertical'
-            @dimension        = 'height'
-            @clientDimension  = 'clientHeight'
-            @clientAxis       = 'clientY'
-            @position         = 'top'
-            @handleClass      = 'split-handle split-handle-vertical'
-            @paddingA         = 'paddingTop'
-            @paddingB         = 'paddingBottom'
-            @cursor  = opt.cursor ? 'ns-resize'
-            @parent.style.flexDirection = 'column'
-    
-        if not _.isArray @sizes = opt.sizes
-            percent = 100 / @panes.length
-            @sizes = []
-            for i in [0...@panes.length]
-                @sizes.push percent
-    
-        if not _.isArray @minSize = opt.minSize
-            @minSize  = []
-            for i in [0...@panes.length]
-                @minSize.push 0
-            
-        for i in [0...@panes.length]
+        horz = @direction == 'horizontal'
 
-            isFirst    = i == 1
-            isLast     = i == @panes.length - 1
+        @dimension   = horz and 'width' or 'height'
+        @clientDim   = horz and 'clientWidth' or 'clientHeight'
+        @clientAxis  = horz and 'clientX' or 'clientY'
+        @axis        = horz and 'x' or 'y'
+        @position    = horz and 'left' or 'top'
+        @handleClass = horz and 'split-handle split-handle-horizontal' or 'split-handle split-handle-vertical'
+        @paddingA    = horz and 'paddingLeft' or 'paddingTop'
+        @paddingB    = horz and 'paddingRight' or 'paddingBottom'
+        @cursor = opt.cursor ? horz and 'ew-resize' or 'ns-resize'
+        @parent.style.flexDirection = horz and 'row' or 'column'
             
-            size       = @sizes[i]
-            handleSize = @handleSize
-            
-            @panes[i].style.display = 'flex'
-            @panes[i].style.flex    = "1 1 auto"
-            # flex                0 0 commandlineHeight
+        for i in [0...numPanes]
+
+            @panes[i].div.style.display = 'flex'
+            @panes[i].div.style.flex = @panes[i].fixed? and "0 0 #{@panes[i].fixed}px" or "1 1 auto"
 
             if i > 0
                 handle = new Handle
-                    flex:        @
-                    a:           @panes[i - 1] 
-                    b:           @panes[i]
-                    aMin:        @minSize[i - 1]
-                    bMin:        @minSize[i]
-                    isFirst:     isFirst
-                    isLast:      isLast
-                    ahandleSize: isFirst and handleSize / 2 or handleSize
-                    bhandleSize: isLast  and handleSize / 2 or handleSize
+                    flex:  @
+                    index: i-1
+                    panea: @panes[i-1]
+                    paneb: @panes[i]
     
                 @handles.push handle
+            
+            @setPaneSize @panes[i], @panes[i].size ? 0
+          
+        @calculateSizes()
+
+    resized: -> @calculateSizes()
+    calculateSizes: ->
+        visPanes  = @panes.filter (p) -> not p.collapsed
+        flexPanes = visPanes.filter (p) -> not p.fixed
+        
+        log "calculateSizes vis: #{visPanes.length} flex: #{flexPanes.length}"
+        
+        avail = @parentSize() - (visPanes.length-1) * @handleSize
+        
+        for p in @panes
+            avail -= p.size
+            
+        diff = avail / flexPanes.length
+        log "calculateSizes avail:#{@parentSize()} left: #{avail} diff: #{diff}"
+        
+        for p in flexPanes
+            p.size += diff
+            
+        for p in @panes            
+            @setPaneSize p, p.size
+
+    parentSize: ->
+        cs = window.getComputedStyle @parent 
+        @parent[@clientDim] - parseFloat(cs[@paddingA]) - parseFloat(cs[@paddingB])
+
+    prevVisFlex: (handle) -> not handle.panea.collapsed and not handle.panea.fixed and handle.panea or handle.index > 0 and @prevVisFlex(@handles[handle.index-1]) or null
+    nextVisFlex: (handle) -> not handle.paneb.collapsed and not handle.paneb.fixed and handle.paneb or handle.index < @handles.length-1 and @nextVisFlex(@handles[handle.index+1]) or null
+    prevFlex:    (handle) -> not handle.panea.fixed and handle.panea or handle.index > 0 and @prevFlex(@handles[handle.index-1]) or null
+    nextFlex:    (handle) -> not handle.paneb.fixed and handle.paneb or handle.index < @handles.length-1 and @nextFlex(@handles[handle.index+1]) or null
     
-            @setElementSize @panes[i], size, (i == 0 or i == @panes.length - 1) and handleSize / 2 or handleSize
-                
-    adjust: (handle, offset) ->
-        @setElementSize handle.a, offset / handle.size * handle.percentage, handle.ahandleSize
-        @setElementSize handle.b, handle.percentage - (offset / handle.size * handle.percentage), handle.bhandleSize
+    moveHandle: (handle, offset=0) ->
+        prev  = @prevVisFlex handle
+        prev ?= @prevFlex handle
+        next  = @nextVisFlex handle  
+        next ?= @nextFlex handle
+        prev.collapsed = false
+        next.collapsed = false
+        prevSize = prev.size + offset
+        nextSize = next.size - offset
+        if prevSize < @snapOffset
+            if prevSize < 0 or offset < 0
+                prevSize = 0
+                nextSize = next.size + prev.size
+                prev.collapsed = true
+        else if nextSize < @snapOffset
+            if nextSize < 0 or offset > 0
+                prevSize = prev.size + next.size
+                nextSize = 0
+                next.collapsed = true
+        @setPaneSize prev, prevSize
+        @setPaneSize next, nextSize
 
-    setElementSize: (el, size, handleSize) -> el.style.flexBasis = "calc(#{size}% - #{handleSize}px)"
+    setPaneSize: (pane, size) -> 
+        pane.size = size
+        pane.div.style.flexBasis = "#{size}px"
+        log "Flex.setPaneSize pane:", pane
+    
+    posAtIndex: (i) -> @panes[i+1].div.getBoundingClientRect()[@position]
+    getSizes: -> ( p.div.getBoundingClientRect()[@dimension] for p in @panes )
         
-    calculateSizes: (handle) ->
-
-        parentStyle = window.getComputedStyle @parent 
-        parentSize  = @parent[@clientDimension] - parseFloat(parentStyle[@paddingA]) - parseFloat(parentStyle[@paddingB])
-        
-        handle.size       = handle.a.getBoundingClientRect()[@dimension] + handle.b.getBoundingClientRect()[@dimension] + handle.ahandleSize + handle.bhandleSize
-        handle.percentage = Math.min(handle.size / parentSize * 100, 100)
-        handle.start      = handle.a.getBoundingClientRect()[@position]
-        log 'calculateSizes', handle
-        
-    setSizes: (sizes) ->
-        for i in [1...sizes.length]
-            handle = @handles[i - 1]
-            @setElementSize handle.a, sizes[i - 1], handle.ahandleSize
-            @setElementSize handle.b, sizes[i],     handle.bhandleSize
-                
-    getSizes: ->
-        sizes = []
-        for i in [0...@handles.length]
-            handle = @handles[i]
-            parentStyle = window.getComputedStyle @parent 
-            parentSize = @parent[@clientDimension] - parseFloat(parentStyle[@paddingA]) - parseFloat(parentStyle[@paddingB])
-            sizes.push (handle.a.getBoundingClientRect()[@dimension] + handle.ahandleSize) / parentSize * 100
-            if i == @handles.length - 1
-                sizes.push (handle.b.getBoundingClientRect()[@dimension] + handle.bhandleSize) / parentSize * 100
-        # log 'getSizes', sizes
-        sizes
-        
-    collapse: (i) ->
-        if i == @handles.length
-            handle = @handles[i - 1]
-            @calculateSizes handle
-            @adjust handle, handle.size - handle.bhandleSize
-        else
-            handle = @handles[i]
-            @calculateSizes handle
-            @adjust handle, handle.ahandleSize
+    collapse: (i) -> 
+        @panes[i].collapsed = true
+        @calculateSizes()
 
 module.exports = Flex

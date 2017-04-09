@@ -40,16 +40,24 @@ class Split extends event
 
         @panes       = [@terminal, @commandline, @editor, @logview]
 
-        @split = new Flex @panes, 
-            sizes:      [40, 10, 50, 0]
-            minSize:    [0, @commandlineHeight, 0, 0]
-            # maxSize:    [0, @commandlineHeight, 0, 0]
-            # cursor:     'row-resize'
+        @flex = new Flex
+            panes: [
+                    div:        @terminal
+                    collapsed:  true
+                ,
+                    div:        @commandline
+                    fixed:      @commandlineHeight
+                ,
+                    div:        @editor
+                ,
+                    div:        @logview
+                    collapsed:  true
+            ]
             direction:  'vertical'
             handleSize: @handleHeight
             onDragEnd:  @onDragEnd
             onDrag:     @onDrag
-         
+        
     onDragEnd: => @onDrag()
 
     onDrag: =>
@@ -60,30 +68,6 @@ class Split extends event
         # @setState 'split', s
         @emit     'split', s
                 
-
-        # @dragTop = new drag
-            # target: @topHandle
-            # cursor: 'ns-resize'
-            # onStop: (drag) => @snap()
-            # onMove: (drag) => @splitAt 0, drag.pos.y - @elemTop() - @handleHeight/2, animate:0
-#         
-        # @dragBot = new drag
-            # target: @editHandle
-            # cursor: 'ns-resize'
-            # onStop: (drag) => @snap()
-            # onMove: (drag) => @splitAt 1, drag.pos.y - @elemTop() - @handleHeight/2, animate:0
-#             
-        # @dragLog = new drag
-            # target: @logHandle
-            # cursor: 'ns-resize'
-            # onStop: (drag) => @snap()
-            # onMove: (drag) => 
-                # if @splitPosY(2)-@splitPosY(1) < 10
-                    # @splitAt 1, drag.pos.y - @elemTop() - @handleHeight/2, animate:0
-                    # @splitAt 2, drag.pos.y - @elemTop() - @handleHeight/2, animate:0
-                # else
-                    # @splitAt 2, drag.pos.y - @elemTop() - @handleHeight/2, animate:0
-
     #  0000000  00000000  000000000  000   000  000  000   000  000  0000000    
     # 000       000          000     000 0 000  000  0000  000  000  000   000  
     # 0000000   0000000      000     000000000  000  000 0 000  000  000   000  
@@ -186,8 +170,9 @@ class Split extends event
     # 000   000  00000000  0000000   000  0000000  00000000  0000000  
     
     resized: => 
+        @flex.resized()
         return if not @winID
-        log "Split.resized #{@winID}"
+        log "Split.resized #{@winID}"        
         # height = sh()-@titlebar.getBoundingClientRect().height
         # width  = sw()
         # @elem.style.height = "#{height}px"
@@ -212,11 +197,7 @@ class Split extends event
     elemHeight: -> @elem.getBoundingClientRect().height - @handleHeight
     
     paneHeight: (i) -> @panes[i].getBoundingClientRect().height
-    splitPosY:  (i) -> 
-        #if i < @splitPos.length then @splitPos[i] else @elemHeight()
-        posY = Math.round @elemHeight() * @split.getSizes()[i]/100  
-        # log "Split.splitPosY i:#{i} posY:#{posY}"
-        posY
+    splitPosY:  (i) -> @flex.posAtIndex i
         
     terminalHeight: -> @paneHeight 0
     editorHeight:   -> @paneHeight 2
@@ -278,7 +259,7 @@ class Split extends event
 
     reveal: (n) -> @show n    
     show: (n) ->
-        log "Split.show #{n}"
+        # log "Split.show #{n}"
         # switch n
             # when 'terminal', 'area' then @do "#{@paneHeight(0) < @termEditHeight()/2 and 'half' or 'raise'} #{n}"
             # when 'editor'           then @splitAt 1, 0.5*@splitPosY 2 if @paneHeight(2) < 100
