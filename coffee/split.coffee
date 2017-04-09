@@ -217,13 +217,14 @@ class Split extends event
     # 0000000     0000000 
     
     do: (sentence) ->
-        # log "do #{sentence}"
+        log "do #{sentence}"
         sentence = sentence.trim()
         return if not sentence.length
         words = sentence.split /\s+/
         action = words[0]
         what = words[1]
         switch action
+            when 'show'     then return @show what
             when 'focus'    then return @focus what
             when 'reveal'   then return @reveal what
             when 'half'     then delta = @elemHeight()/2 - @splitPosY(0) - @handleHeight - 2

@@ -649,7 +649,7 @@ class TextEditor extends Editor
             for actionCombo in combos
                 if combo == actionCombo
                     if action.key? and _.isFunction @[action.key]
-                        log "activate action #{action.key}"
+                        # log "activate action #{action.key}"
                         @[action.key] key, combo: combo, mod: mod, event: event
                         return
     

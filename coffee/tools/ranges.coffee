@@ -3,12 +3,18 @@
 # 0000000    000000000  000 0 000  000  0000  0000000   0000000 
 # 000   000  000   000  000  0000  000   000  000            000
 # 000   000  000   000  000   000   0000000   00000000  0000000 
-{
-Set
-} = require 'immutable'
-_ = require 'lodash'
+
+{log} = require 'kxk'
+{Set} = require 'immutable' 
+_     = require 'lodash'
 
 class Ranges
+    
+    @pollute: ->
+        for member in Object.getOwnPropertyNames Ranges.prototype 
+            continue if member in ['constructor']
+            global[member] = Ranges.prototype[member]
+        Ranges
 
     cursorDelta: (c, dx, dy=0) ->
         c[0] += dx
@@ -213,4 +219,4 @@ class Ranges
             else
                 a[0]-b[0]
     
-module.exports = Ranges
+module.exports = Ranges.pollute()

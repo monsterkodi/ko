@@ -30,6 +30,7 @@ module.exports =
         if @salterMode 
             @endSalter()
             @singleCursorAtPos _.last @cursors()
+            @newlineAtEnd()
             return
         
         doIndent = info?.indent ? not @isCursorInIndent()

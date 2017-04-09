@@ -6,6 +6,7 @@
 {
 clamp,
 prefs,
+error,
 log
 }           = require 'kxk'
 Syntax      = require '../editor/syntax'
@@ -233,6 +234,7 @@ class Command
     
     setCurrent: (command) ->
         @loadState() if not @history?
+        error 'Command.setCurrent -- @history not an array?', typeof @history if not _.isArray @history
         _.pull @history, command
         @history.push command if command.trim().length
         while @history.length > @maxHistory
