@@ -49,7 +49,7 @@ module.exports =
                 insert = l[ci % l.length]
                 @do.change c[1], @do.line(c[1]).splice c[0], 0, insert
                 for c in @positionsInLineAfterColInPositions c[1], c[0]-1, newCursors
-                    @cursorDelta c, insert.length # move cursors after insertion
+                    cursorDelta c, insert.length # move cursors after insertion
         else
             cp = newCursors[0]
             li = cp[1]

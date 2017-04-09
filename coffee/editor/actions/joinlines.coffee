@@ -31,8 +31,8 @@ module.exports =
                 @do.delete c[1]+1
                 newCursors.push [before.length, c[1]]
                 for nc in positionsForLineIndexInPositions c[1]+1, newCursors
-                    @cursorDelta nc, before.length, -1
+                    cursorDelta nc, before.length, -1
                 for nc in @positionsBelowLineIndexInPositions c[1], newCursors 
-                    @cursorDelta nc, 0, -1
+                    cursorDelta nc, 0, -1
         @do.setCursors newCursors, main: 0
         @do.end()

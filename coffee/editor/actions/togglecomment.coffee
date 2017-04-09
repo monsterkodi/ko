@@ -22,7 +22,7 @@ module.exports =
                 s[1][0] += d
                 s[1][1] += d
             for c in positionsForLineIndexInPositions i, newCursors
-                @cursorDelta c, d
+                cursorDelta c, d
                 
         mainCursorLine = @do.line @mainCursor()[1]
         cs = mainCursorLine.indexOf @lineComment

@@ -21,7 +21,7 @@ module.exports =
         for i in @selectedAndCursorLineIndices()
             @do.change i, @indentString + @do.line(i)
             for nc in positionsForLineIndexInPositions i, newCursors
-                @cursorDelta nc, @indentString.length
+                cursorDelta nc, @indentString.length
             for ns in @rangesForLineIndexInRanges i, newSelections
                 ns[1][0] += @indentString.length
                 ns[1][1] += @indentString.length
@@ -38,7 +38,7 @@ module.exports =
                 @do.change i, @do.line(i).substr @indentString.length
                 lineCursors = positionsForLineIndexInPositions i, newCursors
                 for nc in lineCursors
-                    @cursorDelta nc, -@indentString.length
+                    cursorDelta nc, -@indentString.length
                 for ns in @rangesForLineIndexInRanges i, newSelections
                     ns[1][0] -= @indentString.length
                     ns[1][1] -= @indentString.length

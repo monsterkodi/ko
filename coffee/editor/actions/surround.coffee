@@ -115,7 +115,7 @@ module.exports =
             @do.change ns[0], @do.line(ns[0]).splice ns[1][0], 0, cl
             
             for c in @positionsInLineAfterColInPositions ns[0], ns[1][0]-1, newCursors
-                @cursorDelta c, cl.length
+                cursorDelta c, cl.length
                 
             
             for os in @rangesAfterLineColInRanges ns[0], ns[1][1], newSelections
@@ -130,7 +130,7 @@ module.exports =
             # log 'before positionsAfterLineColInPositions newCursors', newCursors
 
             for c in @positionsInLineAfterColInPositions ns[0], ns[1][1], newCursors
-                @cursorDelta c, cr.length
+                cursorDelta c, cr.length
                 # log 'after cursor delta2', c
                 
         @do.select @rangesNotEmptyInRanges newSelections
@@ -151,7 +151,7 @@ module.exports =
             if @numHighlights() == 2
                 return hs
             else if @numHighlights() == 4
-                if @areSameRanges [hs[1], hs[2]], @selections()
+                if areSameRanges [hs[1], hs[2]], @selections()
                     return [hs[0], hs[3]]
                 else
                     return [hs[1], hs[2]]

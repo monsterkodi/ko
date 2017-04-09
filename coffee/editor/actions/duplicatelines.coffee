@@ -29,12 +29,12 @@ module.exports =
                 @do.insert r[1]+1+i, ls[i]
                 
             for nc in @positionsBelowLineIndexInPositions r[1]+1, newCursors
-                @cursorDelta nc, 0, ls.length # move cursors below inserted lines down
+                cursorDelta nc, 0, ls.length # move cursors below inserted lines down
                 
             if dir == 'down'
                 for i in [0...ls.length]
                     for nc in positionsForLineIndexInPositions r[0]+i, newCursors
-                        @cursorDelta nc, 0, ls.length # move cursors in inserted lines down
+                        cursorDelta nc, 0, ls.length # move cursors in inserted lines down
 
         @do.select []
         @do.setCursors newCursors

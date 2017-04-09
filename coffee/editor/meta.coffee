@@ -47,6 +47,11 @@ class Meta
                     localChange = _.cloneDeep change
                     localChange.oldIndex = line
                     localChange.newIndex = line
+                    localChange.doIndex  = line
+                    log "editor.name #{@editor.name} meta line:", @editor.line(meta[0])
+                    localChange.after    = @editor.line(meta[0])
+                    log 'meta.onChanged file:', file
+                    log 'meta.onChanged localChange:', localChange
                     @editor.emit 'fileLineChange', file, localChange
                     meta[2].state = 'unsaved'
                     if meta[2].span?
@@ -127,7 +132,6 @@ class Meta
     # 0000000    000      0    
 
     addDiv: (meta) ->
-        # log "addDiv", meta
         size = @editor.size
         sw = size.charWidth * (meta[1][1]-meta[1][0])
         tx = size.charWidth *  meta[1][0] + size.offsetX

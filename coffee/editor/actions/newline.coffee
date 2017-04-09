@@ -111,7 +111,7 @@ module.exports =
 
             # move cursors in and below inserted line down
             for nc in positionsFromPosInPositions c, newCursors
-                @cursorDelta nc, nc[1] == c[1] and indent.length - bl or 0, 1
+                cursorDelta nc, nc[1] == c[1] and indent.length - bl or 0, 1
         
         @do.setCursors newCursors
         @do.end()

@@ -217,7 +217,7 @@ class Split extends event
     # 0000000     0000000 
     
     do: (sentence) ->
-        log "do #{sentence}"
+        # log "Split.do #{sentence}"
         sentence = sentence.trim()
         return if not sentence.length
         words = sentence.split /\s+/

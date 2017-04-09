@@ -78,10 +78,10 @@ module.exports =
                         @do.delete c[1]
                         # move cursors in joined line
                         for nc in positionsForLineIndexInPositions c[1], newCursors
-                            @cursorDelta nc, ll, -1
+                            cursorDelta nc, ll, -1
                         # move cursors below deleted line up
                         for nc in positionsBelowLineIndexInPositions c[1], newCursors
-                            @cursorDelta nc, 0, -1
+                            cursorDelta nc, 0, -1
             else
                 if removeNum < 1 # delete spaces to line start or line end
                     t = @do.textInRange [c[1], [0, c[0]]]
@@ -93,5 +93,5 @@ module.exports =
                 @do.change c[1], @do.line(c[1]).splice c[0]-n, n
                 for nc in @positionsForLineIndexInPositions c[1], newCursors
                     if nc[0] >= c[0]
-                        @cursorDelta nc, -n
+                        cursorDelta nc, -n
         @do.setCursors newCursors

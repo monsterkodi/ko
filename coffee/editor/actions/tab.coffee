@@ -30,7 +30,7 @@ module.exports =
             for c in newCursors
                 n = 4-(c[0]%il)
                 @do.change c[1], @do.line(c[1]).splice c[0], 0, _.padStart "", n
-                @cursorDelta c, n
+                cursorDelta c, n
             @do.setCursors newCursors
             @do.end()   
 
@@ -47,7 +47,7 @@ module.exports =
                     t = @do.textInRange [c[1], [c[0]-n, c[0]]]
                     if t.trim().length == 0
                         @do.change c[1], @do.line(c[1]).splice c[0]-n, n
-                        @cursorDelta c, -n
+                        cursorDelta c, -n
             @do.setCursors newCursors
             @do.end()
 

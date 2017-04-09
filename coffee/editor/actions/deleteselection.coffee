@@ -54,18 +54,18 @@ module.exports =
             if lineSelected and opt.deleteLines and @do.numLines() > 1
                 @do.delete s[0]
                 for nc in @positionsBelowLineIndexInPositions s[0], newCursors
-                    @cursorDelta nc, 0, -1 # move cursors below deleted line up
+                    cursorDelta nc, 0, -1 # move cursors below deleted line up
             else
                 continue if s[0] >= @do.numLines()
                 @do.change s[0], @do.line(s[0]).splice s[1][0], s[1][1]-s[1][0]
                 for nc in @positionsInLineAfterColInPositions s[0], s[1][1], newCursors
-                    @cursorDelta nc, -(s[1][1]-s[1][0]) # move cursors after deletion in same line left
+                    cursorDelta nc, -(s[1][1]-s[1][0]) # move cursors after deletion in same line left
 
             if s[0] in joinLines
                 @do.change s[0], @do.line(s[0]) + @do.line(s[0]+1)
                 @do.delete s[0]+1
                 for nc in @positionsBelowLineIndexInPositions s[0], newCursors
-                    @cursorDelta nc, 0, -1 # move cursors below deleted line up
+                    cursorDelta nc, 0, -1 # move cursors below deleted line up
                 _.pull joinLines, s[0]
         
         @do.select []

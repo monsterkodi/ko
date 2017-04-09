@@ -43,7 +43,7 @@ module.exports =
             ns[0] += d
             
         for nc in newCursors
-            @cursorDelta nc, 0, d
+            cursorDelta nc, 0, d
                 
         @do.select newSelections
         @do.setCursors newCursors

@@ -63,6 +63,9 @@ class FileEditor extends TextEditor
         log 'applyForeignLineChanges', lineChanges
         @do.start()
         for change in lineChanges
+            if change.change != 'deleted' and not change.after?
+                error "FileEditor.applyForeignLineChanges -- no after? #{change}" 
+                continue
             switch change.change
                 when 'changed'  then @do.change change.doIndex, change.after
                 when 'inserted' then @do.insert change.doIndex, change.after
