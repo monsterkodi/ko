@@ -13,6 +13,6 @@ class Column
         @div = elem class: 'browserColumn'
         @div.style.border = '1px sold white'
         @browser.cols.appendChild @div
-        log '@div.parentNode', @div.parentNode.id
+        # log '@div.parentNode', @div.parentNode.id
         
 module.exports = Column

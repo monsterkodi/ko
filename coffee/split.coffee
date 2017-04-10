@@ -52,10 +52,7 @@ class Split extends event
             onPaneSize: @onDrag
         @onDrag()
         
-    onDrag: =>
-        if @flex?
-            s = @flex.panePositions()
-            @emit 'split', s
+    onDrag: => if @flex? then @emit 'split', @flex.panePositions()
                 
     # 0000000     0000000 
     # 000   000  000   000
@@ -64,7 +61,7 @@ class Split extends event
     # 0000000     0000000 
     
     do: (sentence) ->
-        log "Split.do #{sentence}"
+        # log "Split.do #{sentence}"
         sentence = sentence.trim()
         return if not sentence.length
         words = sentence.split /\s+/
@@ -114,7 +111,7 @@ class Split extends event
             when 'editor'           then @flex.expand 'editor'
             when 'command'          then @flex.expand 'commandline'
             when 'logview'          then @showLog()
-            else log "split.show warning! unhandled #{n}!"
+            else error "split.show -- unhandled: #{n}!"
 
     # 00000000    0000000   000   0000000  00000000  
     # 000   000  000   000  000  000       000       
@@ -123,13 +120,15 @@ class Split extends event
     # 000   000  000   000  000  0000000   00000000  
     
     raise: (n) ->
-        log "Split.raise #{n}"
+        # log "Split.raise #{n}"
         swap = (old, nju) =>
                 if @flex.panes[0].div != nju
-                    nju.style.height   = @flex.sizeOfPane 0
+                    nju.style.height   = "#{@flex.sizeOfPane 0}px"
+                    nju.style.width    = old.style.width
                     old.style.display  = 'none'
                     nju.style.display  = 'block'
                     @flex.panes[0].div = nju
+                    @flex.calculate()
         switch n
             when 'terminal' then swap @area, @terminal
             when 'area'     then swap @terminal, @area
