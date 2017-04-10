@@ -73,10 +73,8 @@ body
     overflow            hidden
     border-left         frameBorder
     border-right        frameBorder
-    // border-bottom       frameBorder
     box-sizing          border-box
     width               100%
-    height              100%
 
 .split-handle    
     background          #222
@@ -257,11 +255,10 @@ infoPadding = 6px
     color               #aaa
     font-size           titlebarFontSize
     padding-left        70px
-    padding-right       70px
     white-space         nowrap
-    -webkit-app-region  drag
-    position            static
+    // position            static
     display             block
+    -webkit-app-region  drag
 
 #titlebar .title
 #titlebar .dot
@@ -330,6 +327,9 @@ infoPadding = 6px
     background          #000
     color               #ddd 
     font-family         font
+    
+#logview
+    border-bottom       frameBorder
     
 .layers
     fill-abs()

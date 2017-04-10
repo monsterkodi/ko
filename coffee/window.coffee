@@ -103,7 +103,6 @@ ipc.on 'fileLinesChanged', (event, file, lineChanges) ->
 
 winMain = -> 
     window.winID = winID
-    split.setWinID winID
     editor.updateTitlebar()
     
     s = getState 'fontSize'
@@ -291,8 +290,8 @@ commandline = window.commandline = new Commandline 'commandline-editor'
 logview     = window.logview     = new LogView 'logview'
 info        = window.info        = new Info editor
 
-editor.setText editorText if editorText?
-editor.view.focus()
+# editor.setText editorText if editorText?
+# editor.view.focus()
 
 editor.on 'changed', (changeInfo) ->
     return if changeInfo.foreign

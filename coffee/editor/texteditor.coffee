@@ -195,9 +195,9 @@ class TextEditor extends Editor
         
         if changeInfo.inserts or changeInfo.deletes           
             @scroll.setNumLines @numLines()
+            @layersWidth = @layers.offsetWidth
             @updateScrollOffset()
             @updateLinePositions()
-            @layersWidth = @layers.offsetWidth
 
         if changeInfo.changes.length
             @clearHighlights()
@@ -408,6 +408,7 @@ class TextEditor extends Editor
         @numbers?.elem.style.height = "#{@scroll.exposeNum * @scroll.lineHeight}px"
         @layers.style.width = "#{sw()-@view.getBoundingClientRect().left-130-6}px"
         @layers.style.height = "#{vh}px"
+        @layersWidth = @layers.offsetWidth
         @updateScrollOffset()
         @emit 'viewHeight', vh
 
@@ -448,7 +449,7 @@ class TextEditor extends Editor
 
     scrollBy: (delta, x=0) ->        
         @scroll.by delta if delta
-        @layers.scrollLeft += x/2 if x
+        # @layers.scrollLeft += x/2 if x
         @updateScrollOffset()
         
     scrollTo: (p) ->

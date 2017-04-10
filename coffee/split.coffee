@@ -80,10 +80,8 @@ class Split extends event
     
     resized: =>
         main =$ 'main'
-        @elem.style.width = "#{sw()}px"
+        @elem.style.width = "#{main.clientWidth}px"
         @elem.style.height = "#{main.clientHeight}px"
-        # log "Split.resized width #{@elem.style.width} height #{@elem.style.height}"
-        @elem.scrollTop = 0
         @flex.resized()
         @emit 'split', @flex.getPositions()
     
