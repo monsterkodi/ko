@@ -7,7 +7,8 @@
 fileExists,
 dirExists,
 resolve,
-log
+log,
+_
 }        = require 'kxk'
 Command  = require '../commandline/command'
 
@@ -44,9 +45,9 @@ class Build extends Command
         @cmdID += 1
         command = command.trim()
         return if not command.length
-        
         if @instance?.name == command and @instance.reset?
-            @instance.reset?()
+            log "reset #{command} #{@instance?.name} #{@instance.reset?}", _.isFunction @instance.reset
+            @instance.reset()
         else
             if dirExists "#{__dirname}/../area/#{command}"
                 if fileExists "#{__dirname}/../area/#{command}/main.js"

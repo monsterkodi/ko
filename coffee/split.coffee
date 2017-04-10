@@ -110,7 +110,7 @@ class Split extends event
 
     show: (n) ->
         switch n
-            when 'terminal', 'area' then @do "#{@flex.sizeOfPane(0) < @termEditHeight()/2 and 'half' or 'raise'} #{n}"
+            when 'terminal', 'area' then @raise n
             when 'editor'           then @flex.expand 'editor'
             when 'command'          then @flex.expand 'commandline'
             when 'logview'          then @showLog()
@@ -124,19 +124,16 @@ class Split extends event
     
     raise: (n) ->
         log "Split.raise #{n}"
+        swap = (old, nju) =>
+                if @flex.panes[0].div != nju
+                    nju.style.height   = @flex.sizeOfPane 0
+                    old.style.display  = 'none'
+                    nju.style.display  = 'block'
+                    @flex.panes[0].div = nju
         switch n
-            when 'terminal'
-                if @flex.panes[0].div != @terminal
-                    @terminal.style.height  = @area.style.height                    
-                    @area.style.display     = 'none'
-                    @terminal.style.display = 'block'
-                    @flex.panes[0].div = @terminal
-            when 'area'
-                if @flex.panes[0].div != @area
-                    @area.style.height      = @terminal.style.height
-                    @terminal.style.display = 'none'
-                    @area.style.display     = 'block'
-                    @flex.panes[0].div = @area
+            when 'terminal' then swap @area, @terminal
+            when 'area'     then swap @terminal, @area
+            
         @flex.expand 'terminal'
 
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
@@ -146,7 +143,7 @@ class Split extends event
     #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
     
     moveCommandLineBy: (delta) ->
-        @flex.moveHandle index:1, pos:@flex.panes[0].size + delta
+        @flex.moveHandle index:1, pos:@flex.posOfHandle(1) + delta
         
     hideCommandline: -> 
         @flex.collapse 'terminal'
@@ -219,11 +216,10 @@ class Split extends event
     
     elemHeight: -> @elem.getBoundingClientRect().height - @handleHeight
     
-    splitPosY:  (i) -> @flex.positionOfHandleAtIndex i
-        
-    terminalHeight: -> @flex.sizeOfPane(0) 
-    editorHeight:   -> @flex.sizeOfPane(2) 
-    logviewHeight:  -> @flex.sizeOfPane(3) 
+    splitPosY:  (i) -> @flex.posOfHandle i
+    terminalHeight: -> @flex.sizeOfPane 0
+    editorHeight:   -> @flex.sizeOfPane 2
+    logviewHeight:  -> @flex.sizeOfPane 3
     termEditHeight: -> @terminalHeight() + @commandlineHeight + @editorHeight()
     
     hideTerminal:   -> @flex.collapse 'terminal'

@@ -5,30 +5,32 @@
 # 000   000  000   000  000   000  000   000       000  000       000   000  
 # 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 
-{log} = require 'kxk'
-Stage = require '../area/stage'
+{elem, log} = require 'kxk'
+flex   = require '../tools/flex'
+Stage  = require '../area/stage'
+Column = require './column'
 
 class Browser extends Stage
     
-    constructor: (@view) ->
-        log 'Browser.constructor'
-        super @view
+    constructor: (@view) -> super @view
         
-    start: ->
-        @view.style.background = "#000"
-        @view.style.color = "#fff"
-        @elem = document.createElement 'div'
-        @elem.style.fontSize = "30px"
-        @elem.style.position = 'absolute'
-        @elem.style.textAlign = 'center'
-        @elem.style.bottom = '50%'
-        @elem.style.right = '20%'
-        @elem.style.left = '20%'
-        @elem.style.top = '40%'
-        @elem.textContent = 'hello browser!'
-        @view.appendChild @elem
+    reset: -> @initColumns()
+    stop:  -> @cols.remove(); @cols = null
+    start: -> @initColumns()
     
-    reset: -> @elem.style.display = 'block'
-    stop:  -> @elem.style.display = 'none'
+    initColumns: ->
+        @cols?.remove()
+        @cols = elem class: 'browser', id: 'columns'
+        @view.appendChild @cols
+        
+        @columns = []
+        for i in [0...3]
+            col = new Column @
+            col.index = i
+            col.div.id = "column#{i}"
+            @columns.push col
+            
+        panes = @columns.map (c) -> div: c.div, column: c, min: 20
+        @flex = new flex panes: panes
 
 module.exports = Browser

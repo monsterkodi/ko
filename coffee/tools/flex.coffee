@@ -36,7 +36,8 @@ class Handle
             cursor:  @flex.cursor
 
     size: -> @isVisible() and @flex.handleSize or 0
-    update: -> @div.style.flexBasis = "#{@size()}px"
+    pos: -> @flex.posOfPane(@index+1) - @flex.handleSize
+    update: -> @div.style.flex = "0 0 #{@size()}px"
     isVisible: -> not (@panea.collapsed and @paneb.collapsed)
 
     onStart: =>
@@ -57,9 +58,8 @@ class Pane
     
     constructor: (opt) ->
         @[k] = v for k,v of opt
-            
-        @size    ?= @fixed 
-        @id      ?= @div.id ? "pane"
+        @size ?= @fixed ? @min
+        @id   ?= @div.id ? "pane"
     
     update: -> 
         @size = Math.max 0, @size
@@ -68,19 +68,17 @@ class Pane
         else
             delete @collapsed
         @div.style.display = @isVisible() and 'flex' or 'none'
-        @div.style.flex = @fixed and "0 0 #{@fixed}px" or @size and "1 1 #{@size}px" or "1 1 auto"
+        @div.style.flex = @fixed and "0 0 #{@fixed}px" or @size? and "1 1 #{@size}px" or "1 1 auto"
 
-    setSize: (size) ->
-        @size = Math.max 0, size
-        @update()
-    
+    setSize: (@size) -> @update()
     collapse:  -> @size = 0; @update()
     expand:    -> @size = @fixed ? 1; @update()
     isVisible: -> not @collapsed
     pos: -> 
-        p = @div.parentNode.getBoundingClientRect()[@flex.position]
+        @div.style.display = 'flex'
         r = @div.getBoundingClientRect()[@flex.position]
-        r - p
+        @div.style.display = @isVisible() and 'flex' or 'none'
+        r - @flex.pos()
 
 # 00000000  000      00000000  000   000  
 # 000       000      000        000 000   
@@ -92,14 +90,15 @@ class Flex
     
     constructor: (opt) ->
         
-        @panes   = ( new Pane def p, flex:@ for p in opt.panes )
+        @panes = ( new Pane(_.defaults(p, flex:@, index:opt.panes.indexOf(p))) for p in opt.panes )
+
         @handles = []
         
-        @view  = @panes[0].div.parentNode
+        @view = @panes[0].div.parentNode
         @view.style.display = 'flex'
 
         @handleSize  = opt.handleSize ? 6
-        @snapOffset  = opt.snapOffset ? 30
+        @snapOffset  = opt.snapOffset ? 20
         @direction   = opt.direction ? 'horizontal'
         @onDragStart = opt.onDragStart
         @onDragEnd   = opt.onDragEnd
@@ -110,7 +109,6 @@ class Flex
 
         @dimension   = horz and 'width' or 'height'
         @clientDim   = horz and 'clientWidth' or 'clientHeight'
-        @clientAxis  = horz and 'clientX' or 'clientY'
         @axis        = horz and 'x' or 'y'
         @position    = horz and 'left' or 'top'
         @handleClass = horz and 'split-handle split-handle-horizontal' or 'split-handle split-handle-vertical'
@@ -120,7 +118,6 @@ class Flex
         @view.style.flexDirection = horz and 'row' or 'column'
             
         for p in @panes
-            p.index = @panes.indexOf p
             if p.index < @panes.length-1
                 @handles.push new Handle
                     flex:  @
@@ -138,14 +135,10 @@ class Flex
     # 000       000   000  000      000       
     #  0000000  000   000  0000000   0000000  
     
-    resized: -> 
-        @update()
-        @calculate()
-        
     calculate: ->
         visPanes  = @panes.filter (p) -> not p.collapsed
         flexPanes = visPanes.filter (p) -> not p.fixed
-        avail     = @height()
+        avail     = @size()
         
         for h in @handles
             h.update() 
@@ -162,12 +155,14 @@ class Flex
         for p in @panes            
             @setPaneSize p, p.size
     
-    moveHandle: (opt) ->
-        
-
-    handleDrag: (handle, drag) ->
-        offset = drag.delta[@axis]
-        
+    # 00     00   0000000   000   000  00000000  
+    # 000   000  000   000  000   000  000       
+    # 000000000  000   000   000 000   0000000   
+    # 000 0 000  000   000     000     000       
+    # 000   000   0000000       0      00000000  
+    
+    moveHandleToPos: (handle, pos) ->
+        offset = pos - handle.pos()
         prev  = @prevAllInv(handle) ? @prevVisFlex(handle) ? @prevFlex handle
         next  = @nextAllInv(handle) ? @nextVisFlex(handle) ? @nextFlex handle
         delete prev.collapsed
@@ -175,38 +170,41 @@ class Flex
         prevSize = prev.size + offset
         nextSize = next.size - offset
         if prevSize < @snapOffset
-            if prevSize < 0 or offset < 0
+            if prevSize < 0 or offset < @snapOffset
                 prevSize = 0
                 nextSize = next.size + prev.size
         else if nextSize < @snapOffset
-            if nextSize < 0 or offset > 0
-                prevSize = prev.size + next.size
+            if nextSize <= 0 or -offset < @snapOffset
                 nextSize = 0
+                prevSize = prev.size + next.size
         @setPaneSize prev, prevSize
         @setPaneSize next, nextSize
         @update()
+
+    setPaneSize: (pane, size) -> 
+        pane.setSize size
+        @onPaneSize? pane.id
+    
+    moveHandle: (opt) ->
+        handle = @handles[opt.index]
+        @moveHandleToPos handle, opt.pos        
+
+    handleDrag: (handle, drag) ->
+        @moveHandleToPos handle, drag.pos[@axis] - @pos() - 4
         @onDrag?()
 
     handleEnd: () ->
         @update()
         @onDragEnd?()
 
-    update: () -> 
-        @updatePanes()
-        @updateHandles()
-        
+    resized: -> 
+        @update()
+        @calculate()
+
+    update: () -> @updatePanes(); @updateHandles()
     updatePanes:   -> p.update() for p in @panes
     updateHandles: -> h.update() for h in @handles
 
-    setPaneSize: (pane, size) -> 
-        pane.setSize size
-        @onPaneSize? pane.id
-    
-    positionOfHandleAtIndex: (i) -> 
-        p = @view.getBoundingClientRect()[@position]
-        r = @panes[i+1].div.getBoundingClientRect()[@position]
-        r - p - @handleSize
-        
     #  0000000   00000000  000000000  
     # 000        000          000     
     # 000  0000  0000000      000     
@@ -217,7 +215,7 @@ class Flex
     paneSizes:     -> ( p.size for p in @panes )
     sizeOfPane:  (i) -> @panes[@paneIndex i].size
     posOfPane:   (i) -> @panes[@paneIndex i].pos()
-    posOfHandle: (i) -> @panes[i+1].pos() - @handleSize
+    posOfHandle: (i) -> @handles[i].pos()
         
     paneIndex: (i) -> 
         if _.isNumber i
@@ -225,9 +223,11 @@ class Flex
         else
             @panes.indexOf _.find @panes, (p) -> p.id == i
 
-    height: () ->
+    size: ->
         cs = window.getComputedStyle @view 
         @view[@clientDim] - parseFloat(cs[@paddingA]) - parseFloat(cs[@paddingB])
+
+    pos: -> @view.getBoundingClientRect()[@position]
                            
     #  0000000   0000000   000      000       0000000   00000000    0000000  00000000  
     # 000       000   000  000      000      000   000  000   000  000       000       

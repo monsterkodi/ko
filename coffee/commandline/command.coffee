@@ -133,7 +133,7 @@ class Command
         flex = window.split.flex
         listTop = flex.posOfPane 2
         listHeight = @commandList.view.getBoundingClientRect().height
-        spaceBelow = flex.height() - listTop
+        spaceBelow = flex.size() - listTop
         if spaceBelow < listHeight
             if flex.sizeOfPane(0) > spaceBelow
                 listTop = flex.posOfHandle(0) - listHeight

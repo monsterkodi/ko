@@ -215,7 +215,7 @@ class Commandline extends TextEditor
         listHeight = @list.getBoundingClientRect().height
         flex = window.split.flex
         listTop = flex.posOfPane 2
-        spaceBelow = flex.height() - listTop
+        spaceBelow = flex.size() - listTop
         spaceAbove = flex.sizeOfPane 0
         if spaceBelow < listHeight and spaceAbove > spaceBelow
             listTop = spaceAbove - listHeight
