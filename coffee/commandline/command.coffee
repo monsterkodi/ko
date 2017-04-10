@@ -130,14 +130,13 @@ class Command
     
     positionList: ->
         return if not @commandList?
-        split = window.split
-        listTop = 6+split.splitPosY 1
+        flex = window.split.flex
+        listTop = flex.posOfPane 2
         listHeight = @commandList.view.getBoundingClientRect().height
-        spaceBelow = split.elemHeight() - listTop
-        log "command.positionList spaceBelow #{spaceBelow}", split.splitPosY 1
+        spaceBelow = flex.height() - listTop
         if spaceBelow < listHeight
-            if split.splitPosY(0) > spaceBelow
-                listTop = split.splitPosY(0) - listHeight
+            if flex.sizeOfPane(0) > spaceBelow
+                listTop = flex.posOfHandle(0) - listHeight
                 if listTop < 0
                     @commandList.view.style.height = "#{listHeight+listTop}px"
                     listTop = 0

@@ -1,5 +1,10 @@
 # todo/ideas
 
+- browser
+    - term command
+    - dirs, files, funcs, object (window)
+- coffee command in window process
+
 - fix|test search result editing
 - refactor ranges
 

@@ -4,14 +4,9 @@
 #      000  000        000      000     000   
 # 0000000   000        0000000  000     000   
 {
-clamp,
-sh,sw, 
-prefs,
-drag, 
-pos,
-error,
-log,
-$}    = require 'kxk'
+clamp, sh,sw, prefs, drag, pos,
+error, log, $
+}     = require 'kxk'
 _     = require 'lodash'
 event = require 'events'
 Flex  = require './tools/flex'
@@ -59,19 +54,9 @@ class Split extends event
         
     onDrag: =>
         if @flex?
-            s = @flex.getPositions()
+            s = @flex.panePositions()
             @emit 'split', s
                 
-    #  0000000  00000000   000      000  000000000
-    # 000       000   000  000      000     000   
-    # 0000000   00000000   000      000     000   
-    #      000  000        000      000     000   
-    # 0000000   000        0000000  000     000   
-    
-    splitAt: (i, y, opt) -> 
-        return if not @winID
-        log "Split.splitAt i:#{i} y:#{y}"
-    
     # 00000000   00000000   0000000  000  0000000  00000000  0000000  
     # 000   000  000       000       000     000   000       000   000
     # 0000000    0000000   0000000   000    000    0000000   000   000
@@ -83,7 +68,7 @@ class Split extends event
         @elem.style.width = "#{main.clientWidth}px"
         @elem.style.height = "#{main.clientHeight}px"
         @flex.resized()
-        @emit 'split', @flex.getPositions()
+        @emit 'split', @flex.panePositions()
     
     # 00000000    0000000    0000000          0000000  000  0000000  00000000
     # 000   000  000   000  000         0    000       000     000   000     
@@ -93,12 +78,11 @@ class Split extends event
     
     elemHeight: -> @elem.getBoundingClientRect().height - @handleHeight
     
-    paneHeight: (i) -> @flex.getSizes()[i]
     splitPosY:  (i) -> @flex.positionOfHandleAtIndex i
         
-    terminalHeight: -> @paneHeight 0
-    editorHeight:   -> @paneHeight 2
-    logviewHeight:  -> @paneHeight 3
+    terminalHeight: -> @flex.sizeOfPane(0) 
+    editorHeight:   -> @flex.sizeOfPane(2) 
+    logviewHeight:  -> @flex.sizeOfPane(3) 
     termEditHeight: -> @terminalHeight() + @commandlineHeight + @editorHeight()
     
     hideTerminal:   -> @flex.collapse 'terminal'
@@ -124,7 +108,7 @@ class Split extends event
         switch action
             when 'show'     then return @show what
             when 'focus'    then return @focus what
-            when 'half'     then delta = @elemHeight()/2 - @splitPosY(0) - @handleHeight - 2
+            when 'half'     then delta = @elemHeight()/2 - @flex.posOfHandle(0) - @handleHeight - 2
             when 'maximize' then delta = @elemHeight()
             when 'minimize' then delta = -@elemHeight()
             when 'enlarge'
@@ -160,9 +144,8 @@ class Split extends event
     # 0000000   000   000   0000000   00     00  
 
     show: (n) ->
-        log "Split.show #{n}"
         switch n
-            when 'terminal', 'area' then @do "#{@paneHeight(0) < @termEditHeight()/2 and 'half' or 'raise'} #{n}"
+            when 'terminal', 'area' then @do "#{@flex.sizeOfPane(0) < @termEditHeight()/2 and 'half' or 'raise'} #{n}"
             when 'editor'           then @flex.expand 'editor'
             when 'command'          then @flex.expand 'commandline'
             when 'logview'          then @showLog()
@@ -234,10 +217,10 @@ class Split extends event
     # 000        0000000    0000000   0000000   0000000 
     
     focus: (n) -> 
-        log "Split.focus #{n}"
-        # if n[0] != '.'
-        n = n == 'commandline' and 'commandline-editor' or n
-        $(n)?.focus() if n != '.'
+        n = 'commandline-editor' if n == 'commandline'
+        if n == '.' or not $(n)
+            return error "Split.focus -- can't find element '#{n}'"
+        $(n)?.focus()
             
     focusAnything: ->
         return @focus 'editor'   if @editorVisible()

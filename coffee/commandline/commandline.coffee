@@ -213,12 +213,10 @@ class Commandline extends TextEditor
     positionList: ->
         return if not @list?
         listHeight = @list.getBoundingClientRect().height
-        split = window.split
-        plist = split.flex.getPositions()
-        listTop = split.splitPosY 1
-        spaceBelow = split.elemHeight() - listTop
-        spaceAbove = split.splitPosY 0
-        log "Commandline.positionList top #{listTop} above #{spaceAbove}"
+        flex = window.split.flex
+        listTop = flex.posOfPane 2
+        spaceBelow = flex.height() - listTop
+        spaceAbove = flex.sizeOfPane 0
         if spaceBelow < listHeight and spaceAbove > spaceBelow
             listTop = spaceAbove - listHeight
         @list?.style.top = "#{listTop}px"        

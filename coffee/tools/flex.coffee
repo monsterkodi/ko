@@ -217,8 +217,11 @@ class Flex
     # 000   000  000          000     
     #  0000000   00000000     000     
     
-    getPositions: -> ( p.pos() for p in @panes )
-    getSizes:     -> ( p.size for p in @panes )
+    panePositions: -> ( p.pos() for p in @panes )
+    paneSizes:     -> ( p.size for p in @panes )
+    sizeOfPane:  (i) -> @panes[@paneIndex i].size
+    posOfPane:   (i) -> @panes[@paneIndex i].pos()
+    posOfHandle: (i) -> @panes[i+1].pos() - @flex.handleSize
         
     paneIndex: (i) -> 
         if _.isNumber i
