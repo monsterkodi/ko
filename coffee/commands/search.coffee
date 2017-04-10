@@ -59,7 +59,7 @@ class Search extends Command
             name: @name
             file: file
         focus:  'terminal'
-        reveal: 'terminal'
+        show:   'terminal'
         text:   command
         select: true
       

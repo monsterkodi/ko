@@ -153,7 +153,7 @@ class Commandline extends TextEditor
         if r?.select then @selectAll()
         else @selectNone()
         window.split.focus  r.focus  if r?.focus?
-        window.split.reveal r.reveal if r?.reveal?
+        window.split.show   r.show   if r?.show?
         window.split.do     r.do     if r?.do?
         
     cancel: -> @results @command?.cancel()
@@ -212,9 +212,10 @@ class Commandline extends TextEditor
     
     positionList: ->
         return if not @list?
-        split = window.split
-        listTop = split.splitPosY 1
         listHeight = @list.getBoundingClientRect().height
+        split = window.split
+        plist = split.flex.getPositions()
+        listTop = split.splitPosY 1
         spaceBelow = split.elemHeight() - listTop
         spaceAbove = split.splitPosY 0
         log "Commandline.positionList top #{listTop} above #{spaceAbove}"

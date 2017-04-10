@@ -43,6 +43,7 @@ class Split extends event
                 ,
                     div:        @commandline
                     fixed:      @commandlineHeight
+                    collapsed:  true
                 ,
                     div:        @editor
                 ,
@@ -58,18 +59,9 @@ class Split extends event
         
     onDrag: =>
         if @flex?
-            s = @flex.handlePositions()
-            @setState 'split', s
+            s = @flex.getPositions()
             @emit 'split', s
                 
-    #  0000000  00000000  000000000  000   000  000  000   000  000  0000000    
-    # 000       000          000     000 0 000  000  0000  000  000  000   000  
-    # 0000000   0000000      000     000000000  000  000 0 000  000  000   000  
-    #      000  000          000     000   000  000  000  0000  000  000   000  
-    # 0000000   00000000     000     00     00  000  000   000  000  0000000    
-    
-    setWinID: (@winID) -> log 'setWinID', @winID
-
     #  0000000  00000000   000      000  000000000
     # 000       000   000  000      000     000   
     # 0000000   00000000   000      000     000   
@@ -90,12 +82,10 @@ class Split extends event
         main =$ 'main'
         @elem.style.width = "#{sw()}px"
         @elem.style.height = "#{main.clientHeight}px"
-        log "elem width #{@elem.style.width} height #{@elem.style.height}"
+        # log "Split.resized width #{@elem.style.width} height #{@elem.style.height}"
         @elem.scrollTop = 0
         @flex.resized()
-        s = @flex.handlePositions()
-        @setState 'split', s
-        @emit 'split', s
+        @emit 'split', @flex.getPositions()
     
     # 00000000    0000000    0000000          0000000  000  0000000  00000000
     # 000   000  000   000  000         0    000       000     000   000     
@@ -103,7 +93,6 @@ class Split extends event
     # 000        000   000       000    0         000  000   000     000     
     # 000         0000000   0000000          0000000   000  0000000  00000000
     
-    elemTop:    -> @elem.getBoundingClientRect().top
     elemHeight: -> @elem.getBoundingClientRect().height - @handleHeight
     
     paneHeight: (i) -> @flex.getSizes()[i]
@@ -128,7 +117,7 @@ class Split extends event
     # 0000000     0000000 
     
     do: (sentence) ->
-        # log "Split.do #{sentence}"
+        log "Split.do #{sentence}"
         sentence = sentence.trim()
         return if not sentence.length
         words = sentence.split /\s+/
@@ -137,7 +126,6 @@ class Split extends event
         switch action
             when 'show'     then return @show what
             when 'focus'    then return @focus what
-            when 'reveal'   then return @reveal what
             when 'half'     then delta = @elemHeight()/2 - @splitPosY(0) - @handleHeight - 2
             when 'maximize' then delta = @elemHeight()
             when 'minimize' then delta = -@elemHeight()
@@ -161,13 +149,18 @@ class Split extends event
                 
         error "Split.do -- unhandled do command? #{sentence}?"
 
+    maximizeEditor: -> 
+        @focus 'editor'
+        @hideLog()
+        @hideCommandline()
+        @flex.resized()
+
     #  0000000  000   000   0000000   000   000  
     # 000       000   000  000   000  000 0 000  
     # 0000000   000000000  000   000  000000000  
     #      000  000   000  000   000  000   000  
     # 0000000   000   000   0000000   00     00  
 
-    reveal: (n) -> @show n    
     show: (n) ->
         log "Split.show #{n}"
         switch n
@@ -201,9 +194,7 @@ class Split extends event
     #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
     
     moveCommandLineBy: (delta) ->
-        @flex.panes[0].size += delta
-        @flex.panes[2].size -= delta
-        @flex.calculateSizes()
+        @flex.moveHandle index:1, pos:@flex.panes[0].size + delta
         
     hideCommandline: -> 
         @flex.collapse 'terminal'
@@ -245,29 +236,14 @@ class Split extends event
     # 000        0000000    0000000   0000000   0000000 
     
     focus: (n) -> 
-        if n[0] != '.'
-            n = n == 'commandline' and 'commandline-editor' or n
+        log "Split.focus #{n}"
+        # if n[0] != '.'
+        n = n == 'commandline' and 'commandline-editor' or n
         $(n)?.focus() if n != '.'
             
     focusAnything: ->
         return @focus 'editor'   if @editorVisible()
         return @focus 'terminal' if @terminalVisible()
-        @focus '.commandline-editor'
+        @focus 'commandline-editor'
         
-    #  0000000  000000000   0000000   000000000  00000000
-    # 000          000     000   000     000     000     
-    # 0000000      000     000000000     000     0000000 
-    #      000     000     000   000     000     000     
-    # 0000000      000     000   000     000     00000000
-            
-    setState: (key, value) ->
-        if @winID
-            prefs.set "windows:#{@winID}:#{key}", value
-        
-    getState: (key, value) ->
-        if @winID
-            prefs.get "windows:#{@winID}:#{key}", value
-        else
-            value
-
 module.exports = Split

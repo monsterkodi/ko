@@ -434,7 +434,7 @@ class Open extends Command
                 
             text:  (path.basename(f) for f in opened).join ' '
             focus:  'editor'
-            reveal: 'editor'
+            show:   'editor'
             status: 'ok'
         else
             status: 'failed'

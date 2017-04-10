@@ -249,7 +249,7 @@ class Buffer extends event
     rangesForCursorLines: (cs=@cursors()) -> (@rangeForLineAtIndex c[1] for c in cs)  
     rangesForAllLines: -> @rangesForLinesFromTopToBot 0, @numLines()
 
-    rangesBetweenPositions: (a, b, extend=false) ->
+    rangesForLinesBetweenPositions: (a, b, extend=false) ->
         r = []
         [a,b] = sortPositions [a,b]
         if a[1] == b[1]

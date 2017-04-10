@@ -32,7 +32,7 @@ class Build extends Command
         super combo
         text:   @last()
         select: true
-        do:     'reveal area'
+        do:     'show area'
     
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
@@ -70,7 +70,7 @@ class Build extends Command
             
         @hideList()
         
-        do: (@name == 'Build' and 'maximize' or 'reveal') + ' area'
+        do: (@name == 'Build' and 'maximize' or 'show') + ' area'
       
     onAreaResized: (w, h) =>
         @instance?.resized? w,h

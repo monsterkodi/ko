@@ -237,7 +237,7 @@ class FileEditor extends TextEditor
         
         window.commandline.commands.search.start "command+shift+f"    
         window.commandline.commands.search.execute word
-        window.split.do 'reveal terminal'
+        window.split.do 'show terminal'
         true
     
     jumpToCounterpart: () ->

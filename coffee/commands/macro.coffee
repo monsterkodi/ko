@@ -119,7 +119,7 @@ class Macro extends Command
                         dim:     '^>=.:/-'
                     
                 terminal.scrollCursorToTop 1
-                window.split.do 'reveal terminal'
+                window.split.do 'show terminal'
             
             # 00000000   00000000   0000000 
             # 000   000  000       000   000

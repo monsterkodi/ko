@@ -85,12 +85,15 @@ ipc.on 'singleCursorAtPos', (event, pos, opt) ->
     editor.singleCursorAtPos pos, opt
     editor.scrollCursorToTop()
 ipc.on 'openFile',          (event, options) -> openFile options
-ipc.on 'focusEditor',       (event) -> split.focus '.editor'
+ipc.on 'focusEditor',       (event) -> split.focus 'editor'
 ipc.on 'cloneFile',  -> ipc.send 'newWindowWithFile', editor.currentFile
 ipc.on 'reloadFile', -> reloadFile()
 ipc.on 'saveFileAs', -> saveFileAs()
 ipc.on 'saveFile',   -> saveFile()
 ipc.on 'loadFile', (event, file) -> loadFile file
+ipc.on 'fileLinesChanged', (event, file, lineChanges) ->
+    if file == editor.currentFile
+        editor.applyForeignLineChanges lineChanges
 
 # 000   000  000  000   000  00     00   0000000   000  000   000  
 # 000 0 000  000  0000  000  000   000  000   000  000  0000  000  
@@ -100,6 +103,7 @@ ipc.on 'loadFile', (event, file) -> loadFile file
 
 winMain = -> 
     window.winID = winID
+    split.setWinID winID
     editor.updateTitlebar()
     
     s = getState 'fontSize'
@@ -110,11 +114,7 @@ winMain = ->
         editor.centerText sw() == screenWidth, 0
         
     fps.toggle() if getState 'fps'
-    
-ipc.on 'fileLinesChanged', (event, file, lineChanges) ->
-    if file == editor.currentFile
-        editor.applyForeignLineChanges lineChanges
-                 
+                     
 #  0000000   0000000   000   000  00000000
 # 000       000   000  000   000  000     
 # 0000000   000000000   000 000   0000000 
@@ -184,7 +184,8 @@ loadFile = (file, opt={}) ->
         setState 'file', file
         commandline.fileLoaded file
     
-    window.split.reveal 'editor'
+    window.split.show 'editor'
+    window.split.focus 'editor'
         
     if pos[0] or pos[1] 
         editor.singleCursorAtPos pos
@@ -272,12 +273,13 @@ navigate = window.navigate = new Navigate
 # 0000000   000        0000000  000     000   
 
 split = window.split = new Split()
-split.on 'split', ->
+split.on 'split', (s) ->
     area.resized()
     terminal.resized()
     commandline.resized()
     editor.resized()
     logview.resized()
+    setState 'split', s
 
 terminal = window.terminal = new Terminal 'terminal'
 terminal.on 'fileLineChange', (file, lineChange) ->
@@ -321,23 +323,17 @@ fps = window.fps = new FPS()
 # 000   000  00000000  0000000   000  0000000  00000000
 
 screenSize = -> electron.screen.getPrimaryDisplay().workAreaSize
-
-initSplit = -> 
-    if not split.winID?
-        split.setWinID winID 
-    else
-        split.resized()
     
 win.on 'move', -> setState 'bounds', win.getBounds()
 window.onresize = ->
-    initSplit()
+    split.resized()
     setState 'bounds', win.getBounds()
     if getState 'centerText', false
         screenWidth = screenSize().width
         editor.centerText sw() == screenWidth, 0
 
 window.onload = -> 
-    initSplit()
+    split.resized()
     info.reload()
     
 window.onunload = -> 
@@ -466,10 +462,6 @@ document.onkeydown = (event) ->
         when 'alt+`'              then return titlebar.showList()
         when 'command+ctrl+left'  then return stop event, navigate.backward()
         when 'command+ctrl+right' then return stop event, navigate.forward()
-        when 'command+shift+y'    
-            split.focus 'editor'
-            split.hideCommandline() if split.commandlineVisible()
-            split.hideLog() if split.logVisible
-            return
+        when 'command+shift+y'    then return split.maximizeEditor()
 
 winMain()

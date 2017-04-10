@@ -240,7 +240,7 @@ class Term extends Command
                 clss: 'termResult'
             terminal.appendMeta meta
             
-        return text: '', reveal: 'terminal'
+        return text: '', show: 'terminal'
     
     #  0000000  00000000   000      000  000000000         0000000   000      000   0000000    0000000
     # 000       000   000  000      000     000           000   000  000      000  000   000  000     
@@ -294,7 +294,7 @@ class Term extends Command
         super combo
         text:   @last()
         select: true
-        do:     'reveal terminal'
+        do:     'show terminal'
                 
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
@@ -410,7 +410,7 @@ class Term extends Command
                     # 000       000  000      000            000
                     # 000       000  0000000  00000000  0000000 
                     
-                    window.split.reveal 'terminal'
+                    window.split.show 'terminal'
                     files = ipc.sendSync 'indexer', 'files'
                     lastDir = ''
                     li = 1
@@ -438,7 +438,7 @@ class Term extends Command
                     # 000       000   000  000  0000  000            000
                     # 000        0000000   000   000   0000000  0000000 
                     
-                    window.split.reveal 'terminal'
+                    window.split.show 'terminal'
                     funcs = ipc.sendSync 'indexer', 'funcs'
                     char = ''
                     for func in Object.keys(funcs).sort()
@@ -470,7 +470,7 @@ class Term extends Command
                     # 000       000      000   000       000       000  000            000
                     #  0000000  0000000  000   000  0000000   0000000   00000000  0000000 
                     
-                    window.split.reveal 'terminal'
+                    window.split.show 'terminal'
                     classes = ipc.sendSync 'indexer', 'classes'
                     for clss in Object.keys(classes).sort()
                         continue if args.length and not filterRegExp(args).test clss
@@ -497,7 +497,7 @@ class Term extends Command
                     # 000   000  000   000  000   000  000   000       000
                     # 00     00   0000000   000   000  0000000    0000000 
                     
-                    window.split.reveal 'terminal'
+                    window.split.show 'terminal'
                     words = ipc.sendSync 'indexer', 'words'
                     char = ''
                     for word in Object.keys(words).sort()
@@ -535,7 +535,7 @@ class Term extends Command
                     @cmdID += 1
                     
         text: ''
-        do:   (@name == 'Term' and 'maximize' or 'reveal') + ' terminal'
+        do:   (@name == 'Term' and 'maximize' or 'show') + ' terminal'
         
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

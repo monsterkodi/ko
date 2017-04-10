@@ -88,7 +88,7 @@ class Command
         @hideList()        
         text: ''
         focus: @focus
-        reveal: 'editor'
+        show: 'editor'
         
     clear: ->
         text: ''

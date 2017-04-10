@@ -105,7 +105,7 @@ class Info
         @setEditor editor        
 
     termCommand: (cmmd) ->
-        window.split.do 'reveal terminal'
+        window.split.do 'show terminal'
         window.commandline.commands.term.execute cmmd
 
     #  0000000  00000000  000000000        00000000  0000000    000  000000000   0000000   00000000 
