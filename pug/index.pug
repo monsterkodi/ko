@@ -7,17 +7,18 @@ html(lang="en")
         link(rel='stylesheet' href='css/syntax.css' type='text/css')
         link(rel='stylesheet' href='../node_modules/font-awesome/css/font-awesome.css' type='text/css')
         script(src='../node_modules/three/build/three.js')
-    body
+    body#body
         #titlebar
-        #split
-            #area(tabindex="3")
-            #terminal(tabindex="2")
-            #commandline
-                span#commandline-command
-                span#commandline-span
-                    #commandline-editor(tabindex="1")
-                    #info
-            #editor(tabindex="0")
-            #logview(tabindex="4")
+        #main
+            #split
+                #area(tabindex="3")
+                #terminal(tabindex="2")
+                #commandline
+                    span#commandline-command
+                    span#commandline-span
+                        #commandline-editor(tabindex="1")
+                        #info
+                #editor(tabindex="0")
+                #logview(tabindex="4")
     script.
         require('./window.js')

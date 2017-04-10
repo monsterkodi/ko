@@ -28,17 +28,13 @@ class Split extends event
 
         @commandlineHeight = 30
         @handleHeight      = 6
-        @logVisible        = undefined
         
         @elem        =$ 'split'      
-        @titlebar    =$ 'titlebar'   
         @terminal    =$ 'terminal'   
         @area        =$ 'area'       
         @commandline =$ 'commandline'
         @editor      =$ 'editor'     
         @logview     =$ 'logview'    
-
-        @panes       = [@terminal, @commandline, @editor, @logview]
 
         @flex = new Flex
             panes: [
@@ -55,18 +51,16 @@ class Split extends event
             ]
             direction:  'vertical'
             handleSize: @handleHeight
-            onDragEnd:  @onDragEnd
             onDrag:     @onDrag
+            onDragEnd:  @onDrag
+            onPaneSize: @onDrag
+        @onDrag()
         
-    onDragEnd: => @onDrag()
-
     onDrag: =>
-        @logVisible = @logviewHeight() > 0
-        # log "onDrag logVisible #{@logVisible}"
-        s = [@splitPosY(0), @splitPosY(1), @splitPosY(2)]
-        # log 'onDrag', s
-        # @setState 'split', s
-        @emit     'split', s
+        if @flex?
+            s = @flex.handlePositions()
+            @setState 'split', s
+            @emit 'split', s
                 
     #  0000000  00000000  000000000  000   000  000  000   000  000  0000000    
     # 000       000          000     000 0 000  000  0000  000  000  000   000  
@@ -74,20 +68,7 @@ class Split extends event
     #      000  000          000     000   000  000  000  0000  000  000   000  
     # 0000000   00000000     000     00     00  000  000   000  000  0000000    
     
-    setWinID: (@winID) ->
-        log 'setWinID', @winID
-        # @logVisible = false
-        # height = sh()-@titlebar.getBoundingClientRect().height
-        # @editor.style.height = "#{height}px"
-        # # log '@editorHeight', @editorHeight()
-        # @splitPos = [-@handleHeight,0,height]
-        # @resized()
-        # s = @getState 'split', @splitPos
-        # @logVisible = s[2] < @elemHeight()
-        # display = @logVisible and 'inherit' or 'none'
-        # @logview.style.display = display
-        # @logHandle.style.display = display        
-        # @applySplit s
+    setWinID: (@winID) -> log 'setWinID', @winID
 
     #  0000000  00000000   000      000  000000000
     # 000       000   000  000      000     000   
@@ -98,94 +79,23 @@ class Split extends event
     splitAt: (i, y, opt) -> 
         return if not @winID
         log "Split.splitAt i:#{i} y:#{y}"
-        # s = []
-        # for h in [0...@handles.length]
-            # if h == i
-                # s.push y
-            # else
-                # s.push @splitPosY h
-#         
-        # if i == 0 then s[1] = s[0] + @commandlineHeight + @handleHeight
-        # if i == 1 then s[0] = s[1] - @commandlineHeight - @handleHeight
-#                 
-        # @applySplit s, opt ? animate:200
     
-    #  0000000   00000000   00000000   000      000   000
-    # 000   000  000   000  000   000  000       000 000 
-    # 000000000  00000000   00000000   000        00000  
-    # 000   000  000        000        000         000   
-    # 000   000  000        000        0000000     000   
-        
-    applySplit: (s, opt) ->
-        # return if not @winID
-        # # log "Split.applySplit s:#{s} opt:#{opt}"
-        # if opt?.animate
-            # emitSplit = => 
-                # @emit 'split', s
-                # @emitSplitFrame = window.requestAnimationFrame emitSplit
-            # @emitSplitFrame = window.requestAnimationFrame emitSplit
-            # resetTrans = => 
-                # p.style.transition = 'initial' for p in @panes
-                # @emit 'split', s
-                # window.cancelAnimationFrame @emitSplitFrame
-            # setTimeout resetTrans, opt.animate
-#         
-        # for i in [0...s.length]
-            # s[i] = clamp (i and s[i-1] or -@handleHeight), @elemHeight(), s[i]
-
-        # @handles[0].style.height = "#{clamp 0, @handleHeight, @handleHeight+s[0]}px"
-#             
-        # if not @logVisible
-            # s[2] = @elemHeight()
-#             
-        # @splitPos = _.clone s
-#         
-        # for h in [0...@panes.length]
-            # newHeight = Math.max 0, switch
-                # when h is 0 then s[0]
-                # when h is s.length then @logVisible and @elemHeight()-_.last(s)-@handleHeight or 0
-                # else s[h]-s[h-1]-@handleHeight
-
-            # if opt?.animate
-                # @panes[h].style.transition = "height #{opt.animate/1000}s" 
-            # else
-                # @panes[h].style.transition = "" 
-#                 
-            # @panes[h].style.height = "#{newHeight}px" 
-#             
-            # if h == 3
-                # if newHeight > 0 
-                    # @setState 'logHeight', newHeight
-                # else
-                    # @setLogVisible false if @logVisible
-#                     
-        # @elem.scrollTop = 0
-        # @setState 'split', s
-        # @emit     'split', s
-        
     # 00000000   00000000   0000000  000  0000000  00000000  0000000  
     # 000   000  000       000       000     000   000       000   000
     # 0000000    0000000   0000000   000    000    0000000   000   000
     # 000   000  000            000  000   000     000       000   000
     # 000   000  00000000  0000000   000  0000000  00000000  0000000  
     
-    resized: => 
+    resized: =>
+        main =$ 'main'
+        @elem.style.width = "#{sw()}px"
+        @elem.style.height = "#{main.clientHeight}px"
+        log "elem width #{@elem.style.width} height #{@elem.style.height}"
+        @elem.scrollTop = 0
         @flex.resized()
-        return if not @winID
-        log "Split.resized #{@winID}"        
-        # height = sh()-@titlebar.getBoundingClientRect().height
-        # width  = sw()
-        # @elem.style.height = "#{height}px"
-        # @elem.style.width  = "#{width}px"
-        # s = []
-        # e = @editorHeight()
-        # # log 'resized', width, height, @elemHeight(), e
-        # for h in [0...@handles.length]
-            # s.push clamp -@handleHeight, @elemHeight(), @splitPosY h
-        # if e == 0 and not @logVisible # keep editor closed
-            # s[1] = s[2] = @elemHeight()  
-            # s[0] = s[1] - @commandlineHeight - @handleHeight
-        # @applySplit s
+        s = @flex.handlePositions()
+        @setState 'split', s
+        @emit 'split', s
     
     # 00000000    0000000    0000000          0000000  000  0000000  00000000
     # 000   000  000   000  000         0    000       000     000   000     
@@ -196,20 +106,20 @@ class Split extends event
     elemTop:    -> @elem.getBoundingClientRect().top
     elemHeight: -> @elem.getBoundingClientRect().height - @handleHeight
     
-    paneHeight: (i) -> @panes[i].getBoundingClientRect().height
-    splitPosY:  (i) -> @flex.posAtIndex i
+    paneHeight: (i) -> @flex.getSizes()[i]
+    splitPosY:  (i) -> @flex.positionOfHandleAtIndex i
         
     terminalHeight: -> @paneHeight 0
     editorHeight:   -> @paneHeight 2
     logviewHeight:  -> @paneHeight 3
     termEditHeight: -> @terminalHeight() + @commandlineHeight + @editorHeight()
     
-    hideTerminal:   -> @splitAt 0, 0
-    hideEditor:     -> @splitAt 1, @elemHeight()
+    hideTerminal:   -> @flex.collapse 'terminal'
+    hideEditor:     -> @flex.collapse 'editor'
     
-    commandlineVisible: -> @splitPosY(1)     > 0 # @splitPosY(1) > @commandlineHeight 
-    terminalVisible:    -> @terminalHeight() > 0 and @terminal.style.display != 'none'
-    editorVisible:      -> @editorHeight()   > 0
+    commandlineVisible: -> not @flex.isCollapsed 'commandline'
+    terminalVisible:    -> not @flex.isCollapsed 'terminal'
+    editorVisible:      -> not @flex.isCollapsed 'editor'
 
     # 0000000     0000000 
     # 000   000  000   000
@@ -259,29 +169,30 @@ class Split extends event
 
     reveal: (n) -> @show n    
     show: (n) ->
-        # log "Split.show #{n}"
-        # switch n
-            # when 'terminal', 'area' then @do "#{@paneHeight(0) < @termEditHeight()/2 and 'half' or 'raise'} #{n}"
-            # when 'editor'           then @splitAt 1, 0.5*@splitPosY 2 if @paneHeight(2) < 100
-            # when 'command'          then @splitAt 0, 0                if @paneHeight(1) < @commandlineHeight
-            # when 'logview'          then @showLog()
-            # else log "split.show warning! unhandled #{n}!"
+        log "Split.show #{n}"
+        switch n
+            when 'terminal', 'area' then @do "#{@paneHeight(0) < @termEditHeight()/2 and 'half' or 'raise'} #{n}"
+            when 'editor'           then @flex.expand 'editor'
+            when 'command'          then @flex.expand 'commandline'
+            when 'logview'          then @showLog()
+            else log "split.show warning! unhandled #{n}!"
 
     raise: (n) ->
         log "Split.raise #{n}"
-        # switch n
-            # when 'terminal'
-                # if @panes[0] != @terminal
-                    # @terminal.style.height  = @area.style.height                    
-                    # @area.style.display     = 'none'
-                    # @terminal.style.display = 'block'
-                    # @panes[0] = @terminal
-            # when 'area'
-                # if @panes[0] != @area
-                    # @area.style.height      = @terminal.style.height
-                    # @terminal.style.display = 'none'
-                    # @area.style.display     = 'block'
-                    # @panes[0] = @area
+        switch n
+            when 'terminal'
+                if @flex.panes[0].div != @terminal
+                    @terminal.style.height  = @area.style.height                    
+                    @area.style.display     = 'none'
+                    @terminal.style.display = 'block'
+                    @flex.panes[0].div = @terminal
+            when 'area'
+                if @flex.panes[0].div != @area
+                    @area.style.height      = @terminal.style.height
+                    @terminal.style.display = 'none'
+                    @area.style.display     = 'block'
+                    @flex.panes[0].div = @area
+        @flex.expand n
 
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
     # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
@@ -290,16 +201,18 @@ class Split extends event
     #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
     
     moveCommandLineBy: (delta) ->
-        # @splitAt 0, clamp 0, @elemHeight() - @commandlineHeight - @handleHeight, delta + @splitPosY 0       
+        @flex.panes[0].size += delta
+        @flex.panes[2].size -= delta
+        @flex.calculateSizes()
         
     hideCommandline: -> 
-        # @splitAt 1, 0, animate:0
-        # @emit 'commandline', 'hidden'
+        @flex.collapse 'terminal'
+        @flex.collapse 'commandline'
+        @emit 'commandline', 'hidden'
         
     showCommandline: -> 
-        # if 0 >= @splitPosY 1
-            # @splitAt 0, 0, animate:0
-            # @emit 'commandline', 'shown'
+        @flex.expand 'commandline'
+        @emit 'commandline', 'shown'
 
     # 000       0000000    0000000 
     # 000      000   000  000      
@@ -309,22 +222,18 @@ class Split extends event
     
     showLog:   -> @setLogVisible true
     hideLog:   -> @setLogVisible false
-    toggleLog: -> @setLogVisible not @logVisible
+    toggleLog: -> @setLogVisible not @isLogVisible()
+    isLogVisible: -> not @flex.isCollapsed 'logview'
     setLogVisible: (v) ->
-        # if @logVisible != v
-            # @logVisible = v
-            # if v and @logviewHeight() <= 0
-                # @splitAt 2, @elemHeight() - Math.max(100, @getState('logHeight', 200))-@handleHeight
-            # else if @logviewHeight() > 0 and not v
-                # @splitAt 2, @elemHeight()
-            # display = v and 'inherit' or 'none'
-            # @logview.style.display   = display
-            # @logHandle.style.display = display            
-            # window.logview.resized()
+        if @isLogVisible() != v
+            if not v
+                @flex.collapse 'logview'
+            else
+                @flex.expand 'logview'
             
     clearLog: -> window.logview.setText ""
     showOrClearLog: -> 
-        if @logVisible
+        if @isLogVisible()
             @clearLog()
         else
             @showLog()
@@ -337,8 +246,8 @@ class Split extends event
     
     focus: (n) -> 
         if n[0] != '.'
-            n  = n == 'commandline' and 'commandline-editor' or n
-        $(n)?.focus()
+            n = n == 'commandline' and 'commandline-editor' or n
+        $(n)?.focus() if n != '.'
             
     focusAnything: ->
         return @focus 'editor'   if @editorVisible()

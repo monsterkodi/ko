@@ -131,8 +131,8 @@ class Commandline extends TextEditor
             return
         window.split.showCommandline()
         @command = @commands[name]
-        activeClass = "."+document.activeElement.className
-        @command.setFocus activeClass != '.commandline-editor' and activeClass or null
+        activeID = document.activeElement.id
+        @command.setFocus activeID != 'commandline-editor' and activeID or null
         @view.focus()
         @setName name
         combo = @command.shortcuts[0] if not combo?
@@ -204,6 +204,12 @@ class Commandline extends TextEditor
         @list?.remove()
         @list = null
         
+    # 00000000    0000000    0000000  000  000000000  000   0000000   000   000  
+    # 000   000  000   000  000       000     000     000  000   000  0000  000  
+    # 00000000   000   000  0000000   000     000     000  000   000  000 0 000  
+    # 000        000   000       000  000     000     000  000   000  000  0000  
+    # 000         0000000   0000000   000     000     000   0000000   000   000  
+    
     positionList: ->
         return if not @list?
         split = window.split
@@ -211,12 +217,13 @@ class Commandline extends TextEditor
         listHeight = @list.getBoundingClientRect().height
         spaceBelow = split.elemHeight() - listTop
         spaceAbove = split.splitPosY 0
+        log "Commandline.positionList top #{listTop} above #{spaceAbove}"
         if spaceBelow < listHeight and spaceAbove > spaceBelow
             listTop = spaceAbove - listHeight
         @list?.style.top = "#{listTop}px"        
     
     resized: -> 
-        @list?.resized()
+        @list?.resized?()
         @command?.commandList?.resized()
         super
 

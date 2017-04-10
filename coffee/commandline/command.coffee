@@ -134,6 +134,7 @@ class Command
         listTop = 6+split.splitPosY 1
         listHeight = @commandList.view.getBoundingClientRect().height
         spaceBelow = split.elemHeight() - listTop
+        log "command.positionList spaceBelow #{spaceBelow}", split.splitPosY 1
         if spaceBelow < listHeight
             if split.splitPosY(0) > spaceBelow
                 listTop = split.splitPosY(0) - listHeight

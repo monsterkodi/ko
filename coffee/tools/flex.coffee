@@ -4,7 +4,9 @@
 # 000       000      000        000 000     
 # 000       0000000  00000000  000   000    
 {
+clamp,
 drag,
+error,
 log,
 $} = require 'kxk'
 _  = require 'lodash'
@@ -19,8 +21,7 @@ class Handle
     
     constructor: (opt) ->
         
-        for k,v of opt
-            @[k] = v
+        @[k] = v for k,v of opt
         
         @div = document.createElement 'div' 
         @div.className = @flex.handleClass
@@ -39,12 +40,9 @@ class Handle
         @start = @panea.div.getBoundingClientRect()[@flex.position]
         @flex.onDragStart?()
         
-    onDrag: (d, e) =>
-        log 'onDrag', d.delta
-        @flex.moveHandle @, d.delta[@flex.axis]
-        @flex.onDrag?()
+    onDrag: (d, e) => @flex.moveHandle @, d.delta[@flex.axis]
         
-    onEnd: => @flex.onDragEnd?()
+    onEnd: => @flex.handleEnd @
 
 # 00000000  000      00000000  000   000  
 # 000       000      000        000 000   
@@ -77,6 +75,7 @@ class Flex
         @onDragStart = opt.onDragStart
         @onDragEnd   = opt.onDragEnd
         @onDrag      = opt.onDrag
+        @onPaneSize  = opt.onPaneSize
     
         horz = @direction == 'horizontal'
 
@@ -105,7 +104,7 @@ class Flex
     
                 @handles.push handle
             
-            @setPaneSize @panes[i], @panes[i].size ? 0
+            @setPaneSize @panes[i], @panes[i].size ? 0 
           
         @calculateSizes()
 
@@ -113,16 +112,12 @@ class Flex
     calculateSizes: ->
         visPanes  = @panes.filter (p) -> not p.collapsed
         flexPanes = visPanes.filter (p) -> not p.fixed
-        
-        log "calculateSizes vis: #{visPanes.length} flex: #{flexPanes.length}"
-        
-        avail = @parentSize() - (visPanes.length-1) * @handleSize
+        avail     = @parentSize() - (visPanes.length-1) * @handleSize
         
         for p in @panes
             avail -= p.size
             
         diff = avail / flexPanes.length
-        log "calculateSizes avail:#{@parentSize()} left: #{avail} diff: #{diff}"
         
         for p in flexPanes
             p.size += diff
@@ -134,43 +129,99 @@ class Flex
         cs = window.getComputedStyle @parent 
         @parent[@clientDim] - parseFloat(cs[@paddingA]) - parseFloat(cs[@paddingB])
 
-    prevVisFlex: (handle) -> not handle.panea.collapsed and not handle.panea.fixed and handle.panea or handle.index > 0 and @prevVisFlex(@handles[handle.index-1]) or null
-    nextVisFlex: (handle) -> not handle.paneb.collapsed and not handle.paneb.fixed and handle.paneb or handle.index < @handles.length-1 and @nextVisFlex(@handles[handle.index+1]) or null
-    prevFlex:    (handle) -> not handle.panea.fixed and handle.panea or handle.index > 0 and @prevFlex(@handles[handle.index-1]) or null
-    nextFlex:    (handle) -> not handle.paneb.fixed and handle.paneb or handle.index < @handles.length-1 and @nextFlex(@handles[handle.index+1]) or null
+    prevVisFlex: (h) -> not h.panea.collapsed and not h.panea.fixed and h.panea or h.index > 0 and @prevVisFlex(@handles[h.index-1]) or null
+    nextVisFlex: (h) -> not h.paneb.collapsed and not h.paneb.fixed and h.paneb or h.index < @handles.length-1 and @nextVisFlex(@handles[h.index+1]) or null
+    prevFlex:    (h) -> not h.panea.fixed and h.panea or h.index > 0 and @prevFlex(@handles[h.index-1]) or null
+    nextFlex:    (h) -> not h.paneb.fixed and h.paneb or h.index < @handles.length-1 and @nextFlex(@handles[h.index+1]) or null
     
     moveHandle: (handle, offset=0) ->
-        prev  = @prevVisFlex handle
-        prev ?= @prevFlex handle
-        next  = @nextVisFlex handle  
-        next ?= @nextFlex handle
-        prev.collapsed = false
-        next.collapsed = false
+        prev  = @prevVisFlex(handle) ? @prevFlex handle
+        next  = @nextVisFlex(handle) ? @nextFlex handle
+        delete prev.collapsed
+        delete next.collapsed
         prevSize = prev.size + offset
         nextSize = next.size - offset
         if prevSize < @snapOffset
             if prevSize < 0 or offset < 0
                 prevSize = 0
                 nextSize = next.size + prev.size
-                prev.collapsed = true
         else if nextSize < @snapOffset
             if nextSize < 0 or offset > 0
                 prevSize = prev.size + next.size
                 nextSize = 0
-                next.collapsed = true
         @setPaneSize prev, prevSize
         @setPaneSize next, nextSize
+        @onDrag?()
+
+    handleEnd: (handle) ->
+        for p in @panes
+            if p.size <= 0
+                p.collapsed = true
+            else
+                delete p.collapsed
+        @onDragEnd?()
 
     setPaneSize: (pane, size) -> 
-        pane.size = size
+        pane.size = Math.max 0, size
         pane.div.style.flexBasis = "#{size}px"
-        log "Flex.setPaneSize pane:", pane
+        @onPaneSize? pane.id
     
-    posAtIndex: (i) -> @panes[i+1].div.getBoundingClientRect()[@position]
+    handlePositions: -> ( @positionOfHandleAtIndex(i) for i in [0...@handles.length] )
+    positionOfHandleAtIndex: (i) -> 
+        p = @parent.getBoundingClientRect()[@position]
+        r = @panes[i+1].div.getBoundingClientRect()[@position]
+        r - p - @handleSize
+        
     getSizes: -> ( p.div.getBoundingClientRect()[@dimension] for p in @panes )
         
+    paneIndex: (i) -> 
+        if _.isNumber i
+            clamp 0, @panes.length-1, i
+        else
+            @panes.indexOf _.find @panes, (p) -> p.id == i
+                           
+    #  0000000   0000000   000      000       0000000   00000000    0000000  00000000  
+    # 000       000   000  000      000      000   000  000   000  000       000       
+    # 000       000   000  000      000      000000000  00000000   0000000   0000000   
+    # 000       000   000  000      000      000   000  000             000  000       
+    #  0000000   0000000   0000000  0000000  000   000  000        0000000   00000000  
+    
+    isCollapsed: (i) -> @panes[@paneIndex i].collapsed
     collapse: (i) -> 
-        @panes[i].collapsed = true
-        @calculateSizes()
+        pane = @panes[@paneIndex i]
+        if not pane.collapsed
+            pane.collapsed = true
+            pane.size = 0
+            @calculateSizes()
+        
+    expand: (i) ->
+        i = @paneIndex i
+        pane = @panes[i]
+        if pane.collapsed
+            delete pane.collapsed
+            flex = @closestVisFlex pane
+            if flex
+                use = pane.fixed ? flex.size / 2
+                flex.size -= use
+                pane.size = use
+                @calculateSizes()
+            else
+                error 'NO EXPAND PANE?'
 
+    closestVisFlex: (p) ->
+        d = 1
+        pi = @panes.indexOf p
+        
+        isVisFlexPane = (i) =>
+            if i >= 0 and i < @panes.length
+                if not @panes[i].collapsed and not @panes[i].fixed
+                    return true 
+            
+        while d < @panes.length-1
+            if isVisFlexPane pi + d
+                return @panes[pi + d]
+            else if isVisFlexPane pi - d
+                return @panes[pi - d]
+            d++
+        
 module.exports = Flex
