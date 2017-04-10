@@ -25,7 +25,7 @@ class Handle
         @div.className = @flex.handleClass
         @div.style.cursor = @flex.cursor
         @div.style.display = 'flex'
-        @flex.parent.insertBefore @div, @paneb.div
+        @flex.view.insertBefore @div, @paneb.div
         @update()
         
         @drag = new drag
@@ -95,8 +95,8 @@ class Flex
         @panes   = ( new Pane def p, flex:@ for p in opt.panes )
         @handles = []
         
-        @parent  = @panes[0].div.parentNode
-        @parent.style.display = 'flex'
+        @view  = @panes[0].div.parentNode
+        @view.style.display = 'flex'
 
         @handleSize  = opt.handleSize ? 6
         @snapOffset  = opt.snapOffset ? 30
@@ -117,7 +117,7 @@ class Flex
         @paddingA    = horz and 'paddingLeft' or 'paddingTop'
         @paddingB    = horz and 'paddingRight' or 'paddingBottom'
         @cursor = opt.cursor ? horz and 'ew-resize' or 'ns-resize'
-        @parent.style.flexDirection = horz and 'row' or 'column'
+        @view.style.flexDirection = horz and 'row' or 'column'
             
         for p in @panes
             p.index = @panes.indexOf p
@@ -145,7 +145,7 @@ class Flex
     calculate: ->
         visPanes  = @panes.filter (p) -> not p.collapsed
         flexPanes = visPanes.filter (p) -> not p.fixed
-        avail     = @parentSize()
+        avail     = @height()
         
         for h in @handles
             h.update() 
@@ -161,10 +161,6 @@ class Flex
             
         for p in @panes            
             @setPaneSize p, p.size
-
-    parentSize: ->
-        cs = window.getComputedStyle @parent 
-        @parent[@clientDim] - parseFloat(cs[@paddingA]) - parseFloat(cs[@paddingB])
     
     moveHandle: (opt) ->
         
@@ -207,7 +203,7 @@ class Flex
         @onPaneSize? pane.id
     
     positionOfHandleAtIndex: (i) -> 
-        p = @parent.getBoundingClientRect()[@position]
+        p = @view.getBoundingClientRect()[@position]
         r = @panes[i+1].div.getBoundingClientRect()[@position]
         r - p - @handleSize
         
@@ -221,13 +217,17 @@ class Flex
     paneSizes:     -> ( p.size for p in @panes )
     sizeOfPane:  (i) -> @panes[@paneIndex i].size
     posOfPane:   (i) -> @panes[@paneIndex i].pos()
-    posOfHandle: (i) -> @panes[i+1].pos() - @flex.handleSize
+    posOfHandle: (i) -> @panes[i+1].pos() - @handleSize
         
     paneIndex: (i) -> 
         if _.isNumber i
             clamp 0, @panes.length-1, i
         else
             @panes.indexOf _.find @panes, (p) -> p.id == i
+
+    height: () ->
+        cs = window.getComputedStyle @view 
+        @view[@clientDim] - parseFloat(cs[@paddingA]) - parseFloat(cs[@paddingB])
                            
     #  0000000   0000000   000      000       0000000   00000000    0000000  00000000  
     # 000       000   000  000      000      000   000  000   000  000       000       

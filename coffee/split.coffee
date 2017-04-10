@@ -57,41 +57,6 @@ class Split extends event
             s = @flex.panePositions()
             @emit 'split', s
                 
-    # 00000000   00000000   0000000  000  0000000  00000000  0000000  
-    # 000   000  000       000       000     000   000       000   000
-    # 0000000    0000000   0000000   000    000    0000000   000   000
-    # 000   000  000            000  000   000     000       000   000
-    # 000   000  00000000  0000000   000  0000000  00000000  0000000  
-    
-    resized: =>
-        main =$ 'main'
-        @elem.style.width = "#{main.clientWidth}px"
-        @elem.style.height = "#{main.clientHeight}px"
-        @flex.resized()
-        @emit 'split', @flex.panePositions()
-    
-    # 00000000    0000000    0000000          0000000  000  0000000  00000000
-    # 000   000  000   000  000         0    000       000     000   000     
-    # 00000000   000   000  0000000   00000  0000000   000    000    0000000 
-    # 000        000   000       000    0         000  000   000     000     
-    # 000         0000000   0000000          0000000   000  0000000  00000000
-    
-    elemHeight: -> @elem.getBoundingClientRect().height - @handleHeight
-    
-    splitPosY:  (i) -> @flex.positionOfHandleAtIndex i
-        
-    terminalHeight: -> @flex.sizeOfPane(0) 
-    editorHeight:   -> @flex.sizeOfPane(2) 
-    logviewHeight:  -> @flex.sizeOfPane(3) 
-    termEditHeight: -> @terminalHeight() + @commandlineHeight + @editorHeight()
-    
-    hideTerminal:   -> @flex.collapse 'terminal'
-    hideEditor:     -> @flex.collapse 'editor'
-    
-    commandlineVisible: -> not @flex.isCollapsed 'commandline'
-    terminalVisible:    -> not @flex.isCollapsed 'terminal'
-    editorVisible:      -> not @flex.isCollapsed 'editor'
-
     # 0000000     0000000 
     # 000   000  000   000
     # 000   000  000   000
@@ -151,6 +116,12 @@ class Split extends event
             when 'logview'          then @showLog()
             else log "split.show warning! unhandled #{n}!"
 
+    # 00000000    0000000   000   0000000  00000000  
+    # 000   000  000   000  000  000       000       
+    # 0000000    000000000  000  0000000   0000000   
+    # 000   000  000   000  000       000  000       
+    # 000   000  000   000  000  0000000   00000000  
+    
     raise: (n) ->
         log "Split.raise #{n}"
         switch n
@@ -166,7 +137,7 @@ class Split extends event
                     @terminal.style.display = 'none'
                     @area.style.display     = 'block'
                     @flex.panes[0].div = @area
-        @flex.expand n
+        @flex.expand 'terminal'
 
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
     # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
@@ -226,5 +197,40 @@ class Split extends event
         return @focus 'editor'   if @editorVisible()
         return @focus 'terminal' if @terminalVisible()
         @focus 'commandline-editor'
+
+    # 00000000   00000000   0000000  000  0000000  00000000  0000000  
+    # 000   000  000       000       000     000   000       000   000
+    # 0000000    0000000   0000000   000    000    0000000   000   000
+    # 000   000  000            000  000   000     000       000   000
+    # 000   000  00000000  0000000   000  0000000  00000000  0000000  
+    
+    resized: =>
+        main =$ 'main'
+        @elem.style.width = "#{main.clientWidth}px"
+        @elem.style.height = "#{main.clientHeight}px"
+        @flex.resized()
+        @emit 'split', @flex.panePositions()
+    
+    # 00000000    0000000    0000000          0000000  000  0000000  00000000
+    # 000   000  000   000  000         0    000       000     000   000     
+    # 00000000   000   000  0000000   00000  0000000   000    000    0000000 
+    # 000        000   000       000    0         000  000   000     000     
+    # 000         0000000   0000000          0000000   000  0000000  00000000
+    
+    elemHeight: -> @elem.getBoundingClientRect().height - @handleHeight
+    
+    splitPosY:  (i) -> @flex.positionOfHandleAtIndex i
+        
+    terminalHeight: -> @flex.sizeOfPane(0) 
+    editorHeight:   -> @flex.sizeOfPane(2) 
+    logviewHeight:  -> @flex.sizeOfPane(3) 
+    termEditHeight: -> @terminalHeight() + @commandlineHeight + @editorHeight()
+    
+    hideTerminal:   -> @flex.collapse 'terminal'
+    hideEditor:     -> @flex.collapse 'editor'
+    
+    commandlineVisible: -> not @flex.isCollapsed 'commandline'
+    terminalVisible:    -> not @flex.isCollapsed 'terminal'
+    editorVisible:      -> not @flex.isCollapsed 'editor'
         
 module.exports = Split

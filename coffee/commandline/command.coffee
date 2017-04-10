@@ -154,7 +154,7 @@ class Command
         @selected = clamp -1, @commandList?.numLines()-1, i
         if @selected >= 0
             @commandList?.selectSingleRange @commandList.rangeForLineAtIndex @selected
-            @commandList.do.cursors [[0, @selected]]
+            @commandList?.do.cursors [[0, @selected]]
         else
             @commandList?.singleCursorAtPos [0,0] 
                 

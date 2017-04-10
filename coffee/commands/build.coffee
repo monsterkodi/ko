@@ -53,8 +53,8 @@ class Build extends Command
                     file = "#{__dirname}/../area/#{command}/main.js"
                 else if fileExists "#{__dirname}/../area/#{command}/#{command}.js"
                     file = "#{__dirname}/../area/#{command}/#{command}.js"
-            else if fileExists "#{__dirname}/../area/#{command}.js"
-                file = "#{__dirname}/../area/#{command}.js"
+            else if fileExists "#{__dirname}/../#{command}/#{command}.js"
+                file = "#{__dirname}/../#{command}/#{command}.js"
             else if dirExists resolve command
                 if fileExists "#{resolve command}/main.js"
                     file = "#{resolve command}/main.js"
