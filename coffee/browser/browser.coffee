@@ -27,7 +27,7 @@ class Browser extends Stage
     
     loadDir: (dir, opt) -> dirlist dir, opt, (err, items) => 
         if err? then return error "can't load dir #{dir}: #{err}"
-        @loadItems items
+        @loadItems items, opt
 
     loadItems: (items, opt) ->
         col = @emptyColumn opt?.column

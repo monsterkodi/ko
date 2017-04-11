@@ -3,18 +3,20 @@
 - browser
     - term command
     - dirs, files, funcs, object (window)
-- make jumpTo work over project boundaries
-- coffee command in window process
 
 - fix|test search result editing
 - fix foreign edits
 - fix horizontal scrolling
+- fix prefs for split
+- fix triple quote input|delete
+
+- make jumpTo work over project boundaries
+- coffee command in window process
 
 - other windows in titlebar?
 - add javascript methods to indexer at startup (eg. getOwnPropertyNames, Object, Array, etc)
-- fix triple quote input|delete
 
-- macro pref(s) to show prefs
+- macro to show prefs
 - fix broken history in prefs
 - make prefs work over ipc instead of file lock
 

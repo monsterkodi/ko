@@ -610,12 +610,10 @@ class TextEditor extends Editor
             diss   = matchr.dissect ranges, join:false
             for d in diss
                 if d.start <= p[0] <= d.start+d.match.length
-                    log 'clicked on match', d.match
                     [file, pos] = splitFilePos d.match
                     if fileExists resolve file
                         post.emit 'jumpTo', file:file, line:pos[1], col:pos[0]
                         return
-        log 'no match!'
         post.emit 'jumpTo', @wordAtCursor p
 
     # 000   000  00000000  000   000

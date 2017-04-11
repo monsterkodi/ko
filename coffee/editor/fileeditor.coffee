@@ -3,26 +3,14 @@
 # 000000    000  000      0000000         0000000   000   000  000     000     000   000  0000000    
 # 000       000  000      000             000       000   000  000     000     000   000  000   000  
 # 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000  
-{
-fileName,
-unresolve,
-fileExists,
-setStyle,
-swapExt,
-keyinfo,
-clamp,
-drag,
-post,
-error,
-log,
-$}         = require 'kxk'
+
+{fileName, unresolve, fileExists, setStyle, swapExt, keyinfo,
+clamp, drag, post, error, log, $, _, fs, path
+}          = require 'kxk'
 split      = require '../split'
 watcher    = require './watcher'
 TextEditor = require './texteditor'
 syntax     = require './syntax'
-_          = require 'lodash'
-fs         = require 'fs'
-path       = require 'path'
 electron   = require 'electron'
 ipc        = electron.ipcRenderer
 webframe   = electron.webFrame
@@ -221,7 +209,6 @@ class FileEditor extends TextEditor
         opt ?= {}
         
         if opt.file?
-            log 'jumpToFile', opt
             @jumpToFile opt
             return true
 

@@ -122,7 +122,6 @@ winMain = ->
 
 saveFile = (file) ->
     file ?= editor.currentFile
-    log "#{file}"
     if not file?
         saveFileAs()
         return
