@@ -4,7 +4,7 @@
 # 000   000  000   000  000  0000  000   000  000      000     
 # 000   000  000   000  000   000  0000000    0000000  00000000
 
-{ clamp, elem, drag, def, error, log, $, _} = require 'kxk'
+{ getStyle, clamp, elem, drag, def, error, log, $, _} = require 'kxk'
 
 class Handle
     
@@ -14,8 +14,7 @@ class Handle
         
         @div = elem class: @flex.handleClass
         @div.style.cursor = @flex.cursor
-        @div.style.display = 'flex'
-        log "Handle #{@flex.view?} #{@paneb.div?}"
+        @div.style.display = 'block'
         @flex.view.insertBefore @div, @paneb.div
         @update()
         
@@ -45,8 +44,13 @@ class Pane
     
     constructor: (opt) ->
         @[k] = v for k,v of opt
-        @size ?= @fixed ? @min
-        @id   ?= @div.id ? "pane"
+        @size    ?= @fixed ? @min
+        @id      ?= @div.id ? "pane"
+        @display ?= @div.style.display if @div.style.display.length
+        @display ?= getStyle "##{@div.id}", 'display' if @div.id?
+        @display ?= getStyle ' .'+@div.className.split(' ').join ' .' if @div.className.length
+        @display ?= 'initial'
+        # log "@display #{@id} style:#{@div.style.display}", @display
     
     update: -> 
         @size = Math.max 0, @size
@@ -54,7 +58,7 @@ class Pane
             @collapsed = true
         else
             delete @collapsed
-        @div.style.display = @isVisible() and 'flex' or 'none'
+        @div.style.display = @isVisible() and @display or 'none'
         @div.style.flex = @fixed and "0 0 #{@fixed}px" or @size? and "1 1 #{@size}px" or "1 1 auto"
 
     setSize: (@size) -> @update()
@@ -62,9 +66,9 @@ class Pane
     expand:    -> @size = @fixed ? 1; @update()
     isVisible: -> not @collapsed
     pos: -> 
-        @div.style.display = 'flex'
+        @div.style.display = @display
         r = @div.getBoundingClientRect()[@flex.position]
-        @div.style.display = @isVisible() and 'flex' or 'none'
+        @div.style.display = @isVisible() and @display or 'none'
         r - @flex.pos()
 
 # 00000000  000      00000000  000   000  
@@ -117,7 +121,7 @@ class Flex
     # 000   000  0000000    0000000    
     
     addPane: (p) ->
-        log 'flex.addPane', p
+
         newPane = new Pane _.defaults p, 
             flex:   @ 
             index:  @panes.length

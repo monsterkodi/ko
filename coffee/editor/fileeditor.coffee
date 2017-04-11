@@ -195,7 +195,12 @@ class FileEditor extends TextEditor
     # 000   000  000   000  000 0 000  000      
     #  0000000    0000000   000   000  000      
 
-    jumpToFileLine: (file, line) =>
+    jumpToFile: (file, line=0, col=0) =>
+        
+        if _.isObject file
+            col  = file.col  ? col
+            line = file.line ? line
+            file = file.file
         
         window.navigate.addFilePos
             file: @currentFile
@@ -203,27 +208,32 @@ class FileEditor extends TextEditor
             
         window.navigate.gotoFilePos
             file: file
-            pos:  [0, line]
+            pos:  [col, line]
             winID: window.winID
             extend: opt?.extend
 
     jumpTo: (word, opt) =>
         
-        if _.isObject word and not opt?
+        if _.isObject(word) and not opt?
             opt = word
             word = opt.word
-            
+        
+        opt ?= {}
+        
         if opt.file?
-            @jumpToFileLine @opt.file, @opt.line
+            log 'jumpToFile', opt
+            @jumpToFile opt
             return true
 
-        find = word.toLowerCase()
+        find = word.toLowerCase().trim()
         find = find.slice 1 if find[0] == '@'
+
+        return error 'FileEditor.jumpTo -- nothing to find?' if _.isEmpty find
         
         classes = ipc.sendSync 'indexer', 'classes'
         for clss, info of classes
             if clss.toLowerCase() == find
-                @jumpToFileLine info.file, info.line
+                @jumpToFile info
                 return true
                 
         funcs = ipc.sendSync 'indexer', 'funcs'
@@ -235,7 +245,7 @@ class FileEditor extends TextEditor
                         info = i
                 if infos.length > 1 and not opt?.dontList
                     window.commandline.commands.term.execute "funcs ^#{word}$"
-                @jumpToFileLine info.file, info.line
+                @jumpToFile info
                 return true
 
         files = ipc.sendSync 'indexer', 'files'
@@ -244,7 +254,7 @@ class FileEditor extends TextEditor
                 @jumpToFileLine file, 6
                 return true
 
-        log "search for #{word}", window.commandline.commands.search?
+        # log "search for #{word}", window.commandline.commands.search?
         
         window.commandline.commands.search.start "command+shift+f"    
         window.commandline.commands.search.execute word

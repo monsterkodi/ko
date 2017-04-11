@@ -3,19 +3,21 @@
 - browser
     - term command
     - dirs, files, funcs, object (window)
+- make jumpTo work over project boundaries
 - coffee command in window process
 
 - fix|test search result editing
-- refactor ranges
+- fix foreign edits
+- fix horizontal scrolling
 
-- other windows in titlebar
+- other windows in titlebar?
 - add javascript methods to indexer at startup (eg. getOwnPropertyNames, Object, Array, etc)
 - fix triple quote input|delete
 
 - macro pref(s) to show prefs
 - fix broken history in prefs
+- make prefs work over ipc instead of file lock
 
-- source maps (konrad?)
 - set breakpoints in electron
 
 - fix shift click whith multiple selections 
@@ -23,7 +25,7 @@
     - unhighlight words when cursor moves outside word highlights
     - highlight selection when single selection is set
 
-- list actions in help macro
+- list actions instead of cheet.md in help macro
 - check large file performance
 - make stickySelection mode more visible (show commandline?)
 - set and restore cursors when search saves
@@ -41,14 +43,8 @@
 - multicursors and indent when pasting multiple lines at single cursor in col > 0
 - update cursor positions on foreign changes
 
-#### editor
-- fix horizontal scrolling
-- jump to file (include|path)
-
 #### commands
 - ls (color-ls + meta?)
-- tree?
-- tabs?
 - cat images?
 
 #### terminal

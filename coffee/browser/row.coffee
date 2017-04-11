@@ -6,13 +6,14 @@
 
 { elem, log, $, _ } = require 'kxk'
 
+syntax = require '../editor/syntax'
+
 class Row
     
-    constructor: (@column) ->
-        
-        @div = elem class: 'browserRow'
-        @div.style.border = '1px sold white'
+    constructor: (@column, @item) ->
+        text = @item.text ? @item.rel
+        @div = elem class: 'browserRow', html: syntax.spanForText text
+        @div.classList.add @item.type
         @column.div.appendChild @div
-        
         
 module.exports = Row

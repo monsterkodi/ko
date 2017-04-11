@@ -5,18 +5,39 @@
 # 000   000  000   000  000   000  000   000       000  000       000   000  
 # 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 
-{elem, log} = require 'kxk'
-flex   = require '../tools/flex'
-Stage  = require '../area/stage'
-Column = require './column'
+{ elem, error, log, _
+}       = require 'kxk'
+flex    = require '../tools/flex'
+dirlist = require '../tools/dirlist'
+Stage   = require '../area/stage'
+Column  = require './column'
+process = require 'process'
 
 class Browser extends Stage
     
-    constructor: (@view) -> super @view
+    constructor: (@view) -> 
+        super @view
+        @loadDir process.cwd()
   
+    # 000       0000000    0000000   0000000    
+    # 000      000   000  000   000  000   000  
+    # 000      000   000  000000000  000   000  
+    # 000      000   000  000   000  000   000  
+    # 0000000   0000000   000   000  0000000    
+    
+    loadDir: (dir, opt) -> dirlist dir, opt, (err, items) => 
+        if err? then return error "can't load dir #{dir}: #{err}"
+        @loadItems items
+
     loadItems: (items, opt) ->
         col = @emptyColumn opt?.column
         col.setItems items
+    
+    # 00000000  00     00  00000000   000000000  000   000  
+    # 000       000   000  000   000     000      000 000   
+    # 0000000   000000000  00000000      000       00000    
+    # 000       000 0 000  000           000        000     
+    # 00000000  000   000  000           000        000     
     
     emptyColumn: (colIndex) ->
         
@@ -31,16 +52,24 @@ class Browser extends Stage
         @flex.addPane div:col.div, min:20, column:col
         col
 
+    #  0000000   0000000    0000000     0000000   0000000   000      
+    # 000   000  000   000  000   000  000       000   000  000      
+    # 000000000  000   000  000   000  000       000   000  000      
+    # 000   000  000   000  000   000  000       000   000  000      
+    # 000   000  0000000    0000000     0000000   0000000   0000000  
+    
     addColumn: ->
         col = new Column @
         col.index = @columns.length
         col.div.id = "column#{col.index}"
         @columns.push col
         col
-  
-    reset: -> @initColumns()
-    stop:  -> @cols.remove(); @cols = null
-    start: -> @initColumns()
+      
+    # 000  000   000  000  000000000   0000000   0000000   000       0000000  
+    # 000  0000  000  000     000     000       000   000  000      000       
+    # 000  000 0 000  000     000     000       000   000  000      0000000   
+    # 000  000  0000  000     000     000       000   000  000           000  
+    # 000  000   000  000     000      0000000   0000000   0000000  0000000   
     
     initColumns: ->
         @cols?.remove()
@@ -53,5 +82,9 @@ class Browser extends Stage
             
         panes = @columns.map (c) -> div:c.div, column:c, min:20
         @flex = new flex panes: panes
+
+    reset: -> @initColumns()
+    stop:  -> @cols.remove(); @cols = null
+    start: -> @initColumns()
 
 module.exports = Browser

@@ -109,7 +109,9 @@ class Open extends Command
             projects = ipc.sendSync 'indexer', 'projects'
             for p in Object.keys(projects).sort()
                 if p.startsWith @getText()
-                    @setText projects[p].dir + '/'
+                    pdir = projects[p].dir
+                    pdir = path.join(pdir, 'coffee') if dirExists resolve path.join pdir, 'coffee'
+                    @setText pdir + '/'
                     @changed @getText()
                     return true
             super
