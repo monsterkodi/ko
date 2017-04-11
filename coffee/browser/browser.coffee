@@ -13,7 +13,31 @@ Column = require './column'
 class Browser extends Stage
     
     constructor: (@view) -> super @view
+  
+    loadItems: (items, opt) ->
+        col = @emptyColumn opt?.column
+        col.setItems items
+    
+    emptyColumn: (colIndex) ->
         
+        if colIndex?
+            for coi in [colIndex...@columns.length]
+                @columns[coi].clear()
+                
+        for col in @columns
+            return col if col.isEmpty()
+            
+        col = @addColumn()
+        @flex.addPane div:col.div, min:20, column:col
+        col
+
+    addColumn: ->
+        col = new Column @
+        col.index = @columns.length
+        col.div.id = "column#{col.index}"
+        @columns.push col
+        col
+  
     reset: -> @initColumns()
     stop:  -> @cols.remove(); @cols = null
     start: -> @initColumns()
@@ -24,13 +48,10 @@ class Browser extends Stage
         @view.appendChild @cols
         
         @columns = []
-        for i in [0...3]
-            col = new Column @
-            col.index = i
-            col.div.id = "column#{i}"
-            @columns.push col
+        for i in [0...4]
+            @addColumn()
             
-        panes = @columns.map (c) -> div: c.div, column: c, min: 20
+        panes = @columns.map (c) -> div:c.div, column:c, min:20
         @flex = new flex panes: panes
 
 module.exports = Browser

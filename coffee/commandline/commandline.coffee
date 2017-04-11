@@ -4,16 +4,13 @@
 # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 {
-fileList,
-keyinfo,
-clamp,
-log,
-$}        = require 'kxk'
-TextEditor  = require '../editor/texteditor'
-render    = require '../editor/render'
-syntax    = require '../editor/syntax'
-split     = require '../split'
-path      = require 'path'
+fileList, keyinfo, clamp, log, $, _
+}          = require 'kxk'
+TextEditor = require '../editor/texteditor'
+render     = require '../editor/render'
+syntax     = require '../editor/syntax'
+split      = require '../split'
+path       = require 'path'
 
 class Commandline extends TextEditor
     
@@ -58,10 +55,14 @@ class Commandline extends TextEditor
     loadCommands: ->
         files = fileList "#{__dirname}/../commands"
         for file in files
-            commandClass = require file
-            command = new commandClass @
-            command.setPrefsID commandClass.name.toLowerCase()
-            @commands[command.prefsID] = command
+            continue if path.extname(file) != '.js'
+            try
+                commandClass = require file
+                command = new commandClass @
+                command.setPrefsID commandClass.name.toLowerCase()
+                @commands[command.prefsID] = command
+            catch err
+                if err then error "can't load command form '#{file}': #{err}"
             
     setName: (name) -> 
         @cmmd.innerHTML = name

@@ -4,17 +4,12 @@
 # 000 0 000  000   000  000       000   000  000   000
 # 000   000  000   000   0000000  000   000   0000000 
 {
-packagePath,
-fileExists,
-fileName,
-fileList,
-relative,
-splitExt,
-log}       = require 'kxk'
+packagePath, fileExists, fileName, fileList, relative, splitExt,
+error, log, _
+}          = require 'kxk'
 indexer    = require '../indexer'
 salt       = require '../tools/salt'
 Command    = require '../commandline/command'
-_          = require 'lodash'
 path       = require 'path'
 colors     = require 'colors'
 noon       = require 'noon'
@@ -73,8 +68,8 @@ class Macro extends Command
             if args.length
                 return args
             else
-                cw = editor.wordsAtCursors positionsNotInRanges(editor.cursors, editor.selections), opt
-                sw = editor.textsInRanges editor.selections
+                cw = editor.wordsAtCursors positionsNotInRanges(editor.cursors(), editor.selections()), opt
+                sw = editor.textsInRanges editor.selections()
                 ws = _.uniq cw.concat sw
                 ws.filter (w) -> w.trim().length
         
@@ -128,10 +123,10 @@ class Macro extends Command
             # 000   000  00000000   00000 00
             
             when 'req'
+                log 'req', args
                 words = wordsInArgsOrCursorsOrSelection args
                 lastIndex = 0
                 texts = []
-                
                 # search project for path build open search term
                 pkgPath = packagePath editor.currentFile
                 if pkgPath
@@ -139,6 +134,7 @@ class Macro extends Command
                 else
                     projectFiles = []
                 
+                if _.isEmpty words then return error 'no words for req?'
                 for word in words
                     map = 
                         _:      'lodash'

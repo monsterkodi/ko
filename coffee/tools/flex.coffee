@@ -1,19 +1,10 @@
-# 00000000  000      00000000  000   000
-# 000       000      000        000 000 
-# 000000    000      0000000     00000  
-# 000       000      000        000 000 
-# 000       0000000  00000000  000   000
-{
-clamp, drag, def,
-error, log,
-$} = require 'kxk'
-_  = require 'lodash'
-
 # 000   000   0000000   000   000  0000000    000      00000000
 # 000   000  000   000  0000  000  000   000  000      000     
 # 000000000  000000000  000 0 000  000   000  000      0000000 
 # 000   000  000   000  000  0000  000   000  000      000     
 # 000   000  000   000  000   000  0000000    0000000  00000000
+
+{ clamp, elem, drag, def, error, log, $, _} = require 'kxk'
 
 class Handle
     
@@ -21,10 +12,10 @@ class Handle
         
         @[k] = v for k,v of opt
         
-        @div = document.createElement 'div' 
-        @div.className = @flex.handleClass
+        @div = elem class: @flex.handleClass
         @div.style.cursor = @flex.cursor
         @div.style.display = 'flex'
+        log "Handle #{@flex.view?} #{@paneb.div?}"
         @flex.view.insertBefore @div, @paneb.div
         @update()
         
@@ -35,18 +26,14 @@ class Handle
             onStop:  @onStop
             cursor:  @flex.cursor
 
-    size: -> @isVisible() and @flex.handleSize or 0
-    pos: -> @flex.posOfPane(@index+1) - @flex.handleSize
-    update: -> @div.style.flex = "0 0 #{@size()}px"
+    size:      -> @isVisible() and @flex.handleSize or 0
+    pos:       -> @flex.posOfPane(@index+1) - @flex.handleSize
+    update:    -> @div.style.flex = "0 0 #{@size()}px"
     isVisible: -> not (@panea.collapsed and @paneb.collapsed)
 
-    onStart: =>
-        @start = @panea.div.getBoundingClientRect()[@flex.position]
-        @flex.onDragStart?()
-        
-    onDrag: (d, e) => @flex.handleDrag @, d
-        
-    onStop: => @flex.handleEnd @
+    onStart:    => @flex.handleStart @
+    onDrag: (d) => @flex.handleDrag @, d
+    onStop:     => @flex.handleEnd @
 
 # 00000000    0000000   000   000  00000000
 # 000   000  000   000  0000  000  000     
@@ -90,23 +77,15 @@ class Flex
     
     constructor: (opt) ->
         
-        @panes = ( new Pane(_.defaults(p, flex:@, index:opt.panes.indexOf(p))) for p in opt.panes )
-
-        @handles = []
-        
-        @view = @panes[0].div.parentNode
-        @view.style.display = 'flex'
-
         @handleSize  = opt.handleSize ? 6
         @snapOffset  = opt.snapOffset ? 20
         @direction   = opt.direction ? 'horizontal'
-        @onDragStart = opt.onDragStart
-        @onDragEnd   = opt.onDragEnd
-        @onDrag      = opt.onDrag
         @onPaneSize  = opt.onPaneSize
+        @onDragStart = opt.onDragStart
+        @onDrag      = opt.onDrag
+        @onDragEnd   = opt.onDragEnd
     
-        horz = @direction == 'horizontal'
-
+        horz         = @direction == 'horizontal'
         @dimension   = horz and 'width' or 'height'
         @clientDim   = horz and 'clientWidth' or 'clientHeight'
         @axis        = horz and 'x' or 'y'
@@ -115,19 +94,42 @@ class Flex
         @paddingA    = horz and 'paddingLeft' or 'paddingTop'
         @paddingB    = horz and 'paddingRight' or 'paddingBottom'
         @cursor = opt.cursor ? horz and 'ew-resize' or 'ns-resize'
+        
+        @panes   = []
+        @handles = []
+
+        @view = opt.panes[0].div.parentNode
+        @view.style.display = 'flex'
         @view.style.flexDirection = horz and 'row' or 'column'
-            
+        
+        @addPane p for p in opt.panes
+                    
         for p in @panes
-            if p.index < @panes.length-1
-                @handles.push new Handle
-                    flex:  @
-                    index: p.index
-                    panea: p
-                    paneb: @panes[p.index+1]
             @setPaneSize p, p.fixed ? p.size ? 0
           
         @calculate()
         @updatePanes()
+
+    #  0000000   0000000    0000000    
+    # 000   000  000   000  000   000  
+    # 000000000  000   000  000   000  
+    # 000   000  000   000  000   000  
+    # 000   000  0000000    0000000    
+    
+    addPane: (p) ->
+        log 'flex.addPane', p
+        newPane = new Pane _.defaults p, 
+            flex:   @ 
+            index:  @panes.length
+            
+        if lastPane = _.last @panes
+            @handles.push new Handle
+                flex:  @
+                index: lastPane.index
+                panea: lastPane
+                paneb: newPane
+            
+        @panes.push newPane
 
     #  0000000   0000000   000       0000000  
     # 000       000   000  000      000       
@@ -160,6 +162,10 @@ class Flex
     # 000000000  000   000   000 000   0000000   
     # 000 0 000  000   000     000     000       
     # 000   000   0000000       0      00000000  
+
+    moveHandle: (opt) -> 
+        handle = @handles[opt.index]
+        @moveHandleToPos handle, opt.pos        
     
     moveHandleToPos: (handle, pos) ->
         offset = pos - handle.pos()
@@ -185,25 +191,21 @@ class Flex
         pane.setSize size
         @onPaneSize? pane.id
     
-    moveHandle: (opt) ->
-        handle = @handles[opt.index]
-        @moveHandleToPos handle, opt.pos        
+    resized: -> @update(); @calculate()
 
-    handleDrag: (handle, drag) ->
+    update:        -> @updatePanes(); @updateHandles()
+    updatePanes:   -> p.update() for p in @panes
+    updateHandles: -> h.update() for h in @handles
+
+    # handle drag callbacks
+    
+    handleStart: (handle) -> @onDragStart?()
+    handleDrag:  (handle, drag) ->
         @moveHandleToPos handle, drag.pos[@axis] - @pos() - 4
         @onDrag?()
-
     handleEnd: () ->
         @update()
         @onDragEnd?()
-
-    resized: -> 
-        @update()
-        @calculate()
-
-    update: () -> @updatePanes(); @updateHandles()
-    updatePanes:   -> p.update() for p in @panes
-    updateHandles: -> h.update() for h in @handles
 
     #  0000000   00000000  000000000  
     # 000        000          000     
@@ -242,13 +244,13 @@ class Flex
             pane.collapse()
             @calculate()
         
-    expand: (i) ->
+    expand: (i, factor=0.5) ->
         i = @paneIndex i
         pane = @panes[i]
         if pane.collapsed
             pane.expand()
             if flex = @closestVisFlex pane
-                use = pane.fixed ? flex.size / 2
+                use = pane.fixed ? flex.size * factor
                 flex.size -= use
                 pane.size = use
             @calculate()

@@ -11,8 +11,7 @@ class Column
     constructor: (@browser) ->
         
         @div = elem class: 'browserColumn'
-        @div.style.border = '1px sold white'
+        # @div.style.border = '1px solid white'
         @browser.cols.appendChild @div
-        # log '@div.parentNode', @div.parentNode.id
         
 module.exports = Column

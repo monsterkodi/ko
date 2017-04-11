@@ -3,13 +3,10 @@
 # 000000000  000   000     000     000   000  000       000   000  000000000  00000000   000      0000000      000     0000000 
 # 000   000  000   000     000     000   000  000       000   000  000 0 000  000        000      000          000     000     
 # 000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
-{
-clamp,
-error,
-log,
-$}       = require 'kxk'
+
+{clamp, error, log, $, _} = require 'kxk'
+
 Indexer  = require '../indexer'
-_        = require 'lodash'
 event    = require 'events'
 electron = require 'electron'
 ipc      = electron.ipcRenderer

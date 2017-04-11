@@ -3,11 +3,9 @@
 # 0000000   00000000   000      000     000   
 #      000  000        000      000     000   
 # 0000000   000        0000000  000     000   
-{
-clamp, sh,sw, prefs, drag, pos,
-error, log, $
+
+{ prefs, error, log, $, _
 }     = require 'kxk'
-_     = require 'lodash'
 event = require 'events'
 Flex  = require './tools/flex'
 
@@ -70,7 +68,7 @@ class Split extends event
         switch action
             when 'show'     then return @show what
             when 'focus'    then return @focus what
-            when 'half'     then delta = @elemHeight()/2 - @flex.posOfHandle(0) - @handleHeight - 2
+            # when 'half'     then delta = @elemHeight()/2 - @flex.posOfHandle(0) - @handleHeight - 2
             when 'maximize' then delta = @elemHeight()
             when 'minimize' then delta = -@elemHeight()
             when 'enlarge'
@@ -83,6 +81,7 @@ class Split extends event
                     delta = - parseInt words[3]
                 else
                     delta = - parseInt 0.25 * @termEditHeight()
+            else return error "Split.do -- unknown action '#{action}'"
                     
         switch what
             when 'editor' then return @moveCommandLineBy -delta
@@ -120,20 +119,21 @@ class Split extends event
     # 000   000  000   000  000  0000000   00000000  
     
     raise: (n) ->
-        # log "Split.raise #{n}"
+
         swap = (old, nju) =>
-                if @flex.panes[0].div != nju
-                    nju.style.height   = "#{@flex.sizeOfPane 0}px"
-                    nju.style.width    = old.style.width
-                    old.style.display  = 'none'
-                    nju.style.display  = 'block'
-                    @flex.panes[0].div = nju
-                    @flex.calculate()
+            if @flex.panes[0].div != nju
+                nju.style.height   = "#{@flex.sizeOfPane 0}px"
+                nju.style.width    = old.style.width
+                old.style.display  = 'none'
+                nju.style.display  = 'block'
+                @flex.panes[0].div = nju
+                @flex.calculate()
+                
         switch n
             when 'terminal' then swap @area, @terminal
             when 'area'     then swap @terminal, @area
             
-        @flex.expand 'terminal'
+        @flex.expand 'terminal', 0.33
 
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
     # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     

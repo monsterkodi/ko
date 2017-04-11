@@ -12,7 +12,8 @@ _               = require 'lodash'
 should()
 
 Editor = require '../coffee/editor/editor'
-editor = null
+editor = new Editor
+editor.setText ''
 
 textIs = (t) -> expect(editor.text()).to.eql t
 mainIs = (m) -> expect(editor.mainCursor()).to.eql m
@@ -21,11 +22,12 @@ selsIs = (c) -> expect(editor.selections()).to.eql c
 hlgtIs = (h) -> expect(editor.highlights()).to.eql h
 
 describe 'actions', ->
-    
-    before -> 
-        editor = new Editor
-        editor.setText ''
-    
+        
+    it 'exists', -> 
+        editor .should.not.be.null
+        editor['toggleComment'] .should.not.be.null
+        
+        
     describe 'implements', ->
         for name in [
             'toggleComment'

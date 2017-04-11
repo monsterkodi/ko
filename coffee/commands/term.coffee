@@ -3,19 +3,12 @@
 #    000     0000000   0000000    000000000
 #    000     000       000   000  000 0 000
 #    000     00000000  000   000  000   000
-{
-packagePath,
-fileExists,
-dirExists,
-unresolve,
-resolve,
-clamp,
-log
+
+{ packagePath, dirExists, unresolve, resolve, clamp, log, _
 }        = require 'kxk'
 Walker   = require '../tools/walker'
 Syntax   = require '../editor/syntax'
 Command  = require '../commandline/command'
-_        = require 'lodash'
 electron = require 'electron'
 path     = require 'path'
 noon     = require 'noon'

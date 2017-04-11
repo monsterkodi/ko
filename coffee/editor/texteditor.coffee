@@ -579,7 +579,7 @@ class TextEditor extends Editor
                 
                 p = @posForEvent event
                 if event.altKey
-                    post.emit 'jumpTo', @wordAtCursor p
+                    @emitJumpToForPos p                                    
                 else if event.metaKey
                     @toggleCursorAtPos p
                 else
@@ -610,6 +610,9 @@ class TextEditor extends Editor
                 return func[3] + '.' + func[2] + ' '
         ''
         
+    emitJumpToForPos: (p) ->
+        post.emit 'jumpTo', @wordAtCursor p
+
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
     # 0000000    0000000     00000  
@@ -655,7 +658,7 @@ class TextEditor extends Editor
                         return
     
         switch combo
-            when 'alt+enter'       then return post.emit 'jumpTo', @wordAtCursor()
+            when 'alt+enter'       then return @emitJumpToForPos @cursorPos()
             when 'command+z'       then return @do.undo()
             when 'command+shift+z' then return @do.redo()
                 

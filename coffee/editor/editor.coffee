@@ -43,6 +43,8 @@ class Editor extends Buffer
     @initActions: -> 
         @actions = []
         for actionFile in fileList path.join __dirname, 'actions'
+            #continue if path.extname(actionFile) != '.js' and path.extname(actionFile) != '.coffee'
+            continue if path.extname(actionFile) not in ['.js', '.coffee']
             actions = require actionFile
             for key,value of actions
                 if _.isFunction value

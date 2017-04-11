@@ -61,18 +61,18 @@ class FileEditor extends TextEditor
     
     applyForeignLineChanges: (lineChanges) =>
         log 'applyForeignLineChanges', lineChanges
-        @do.start()
-        for change in lineChanges
-            if change.change != 'deleted' and not change.after?
-                error "FileEditor.applyForeignLineChanges -- no after? #{change}" 
-                continue
-            switch change.change
-                when 'changed'  then @do.change change.doIndex, change.after
-                when 'inserted' then @do.insert change.doIndex, change.after
-                when 'deleted'  then @do.delete change.doIndex
-                else
-                    error "Editor.applyForeignLineChanges -- unknown change #{change.change}"
-        @do.end foreign: true
+        # @do.start()
+        # for change in lineChanges
+            # if change.change != 'deleted' and not change.after?
+                # error "FileEditor.applyForeignLineChanges -- no after? #{change}" 
+                # continue
+            # switch change.change
+                # when 'changed'  then @do.change change.doIndex, change.after
+                # when 'inserted' then @do.insert change.doIndex, change.after
+                # when 'deleted'  then @do.delete change.doIndex
+                # else
+                    # error "Editor.applyForeignLineChanges -- unknown change #{change.change}"
+        # @do.end foreign: true
 
     # 00000000  000  000      00000000
     # 000       000  000      000     
@@ -194,25 +194,36 @@ class FileEditor extends TextEditor
     #       000  000   000  000000000  00000000 
     # 000   000  000   000  000 0 000  000      
     #  0000000    0000000   000   000  000      
-    
+
+    jumpToFileLine: (file, line) =>
+        
+        window.navigate.addFilePos
+            file: @currentFile
+            pos:  @cursorPos()
+            
+        window.navigate.gotoFilePos
+            file: file
+            pos:  [0, line]
+            winID: window.winID
+            extend: opt?.extend
+
     jumpTo: (word, opt) =>
         
+        if _.isObject word and not opt?
+            opt = word
+            word = opt.word
+            
+        if opt.file?
+            @jumpToFileLine @opt.file, @opt.line
+            return true
+
         find = word.toLowerCase()
         find = find.slice 1 if find[0] == '@'
-        jumpToFileLine = (file, line) =>
-            window.navigate.addFilePos
-                file: @currentFile
-                pos:  @cursorPos()
-            window.navigate.gotoFilePos
-                file: file
-                pos:  [0, line]
-                winID: window.winID
-                extend: opt?.extend
         
         classes = ipc.sendSync 'indexer', 'classes'
         for clss, info of classes
             if clss.toLowerCase() == find
-                jumpToFileLine info.file, info.line
+                @jumpToFileLine info.file, info.line
                 return true
                 
         funcs = ipc.sendSync 'indexer', 'funcs'
@@ -224,13 +235,13 @@ class FileEditor extends TextEditor
                         info = i
                 if infos.length > 1 and not opt?.dontList
                     window.commandline.commands.term.execute "funcs ^#{word}$"
-                jumpToFileLine info.file, info.line
+                @jumpToFileLine info.file, info.line
                 return true
 
         files = ipc.sendSync 'indexer', 'files'
         for file, info of files
             if fileName(file).toLowerCase() == find and file != @currentFile
-                jumpToFileLine file, 6
+                @jumpToFileLine file, 6
                 return true
 
         log "search for #{word}", window.commandline.commands.search?

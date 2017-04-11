@@ -22,8 +22,8 @@ Split       = require './split'
 FileEditor  = require './editor/fileeditor'
 Area        = require './area/area'
 Commandline = require './commandline/commandline'
-Terminal    = require './terminal/terminal'
-LogView     = require './logview/logview'
+Terminal    = require './terminal'
+LogView     = require './logview'
 Titlebar    = require './titlebar'
 Navigate    = require './navigate'
 FPS         = require './tools/fps'
@@ -122,6 +122,7 @@ winMain = ->
 
 saveFile = (file) ->
     file ?= editor.currentFile
+    log "#{file}"
     if not file?
         saveFileAs()
         return

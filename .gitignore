@@ -3,6 +3,7 @@ package.json
 ko-darwin-x64
 bin/download.js
 bin/*.json
+bin/*.js.map
 ./test
 js
 css

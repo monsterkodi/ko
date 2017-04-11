@@ -3,12 +3,10 @@
 # 000   000  000   000
 # 000   000  000   000
 # 0000000     0000000 
-{
-clamp,
-str,
-error,
-log}  = require 'kxk'
-_     = require 'lodash'
+
+{ clamp, str, error, log, _} = require 'kxk'
+
+require '../tools/ranges'
 
 class Do
     
