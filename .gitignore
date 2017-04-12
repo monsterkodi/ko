@@ -1,4 +1,5 @@
 node_modules
+wiki
 package.json
 ko-darwin-x64
 bin/download.js

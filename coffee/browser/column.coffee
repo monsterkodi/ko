@@ -52,15 +52,29 @@ class Column
         log 'navigateTo target:', target, 'parent:', @parent.abs
         log 'relative', relpath = relative target, @parent.abs
         log 'first', relitem = _.first relpath.split path.sep
+        @activateRow(@rowWithName relitem)?.column.navigateTo?(opt)
 
     setActiveRow: (row) ->
         row = @rows[row] if _.isNumber row
         log 'row.setActive?', row.setActive?
         row?.setActive?()
+        row
+
+    activateRow: (row) ->
+        row = @rows[row] if _.isNumber row
+        log 'row.activate?', row.activate?
+        row?.activate?()
+        row
        
     activeRow: -> 
         for r in @rows
             return r if r.isActive()
+        null
+    
+    rowWithName: (name) ->
+        for r in @rows
+            return r if r.item.name == name
+        null
         
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       

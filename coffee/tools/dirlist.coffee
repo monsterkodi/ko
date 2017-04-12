@@ -14,6 +14,7 @@ textmap = _.reduce textext, (map, ext) ->
         map
     , {}
 textmap['.noon'] = 'noon'
+textmap['.pug']  = 'pug'
 
 #   directory list
 #

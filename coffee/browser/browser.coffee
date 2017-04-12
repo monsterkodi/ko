@@ -70,11 +70,13 @@ class Browser extends Stage
             opt.parent ?= item
             @loadItems items, opt
         else
-            if path.extname in ['.gif', '.png', '.jpg']
+            if path.extname(file) in ['.gif', '.png', '.jpg']
                 log 'load image?', file
+            else
+                log 'load icon?', file
             
         if item.textFile
-            log 'jump to text file', item
+            # log 'jump to text file', item
             post.emit 'jumpTo', file:file
 
 
@@ -87,9 +89,7 @@ class Browser extends Stage
         
         col.setItems items, prt
         
-        if opt.row? 
-            col.focus()
-            # col.setActiveRow opt.row
+        if opt.row? then col.focus()
             
         if opt?.file
             @navigateTo opt 
@@ -108,7 +108,6 @@ class Browser extends Stage
             when 'left'  then -1
             when 'right' then +1
         index = clamp 0, @numCols()-1, index
-        log index, @columns[index]?, @columns[index].focus?
         @columns[index].focus().activeRow().activate()
           
     # 00000000   0000000    0000000  000   000   0000000  
