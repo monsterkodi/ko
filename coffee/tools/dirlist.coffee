@@ -4,10 +4,8 @@
 # 000   000  000  000   000  000      000       000     000     
 # 0000000    000  000   000  0000000  000  0000000      000     
 
-{ resolve, relative, error, log, _  
+{ resolve, relative, fs, path, error, log, _  
 }       = require 'kxk'
-fs      = require 'fs'
-path    = require 'path'
 walkdir = require 'walkdir'
 
 #   directory list
@@ -47,10 +45,11 @@ dirList = (dirPath, opt, cb) ->
         false
     
     try
+        fileSort = (a,b) -> a.rel.localeCompare b.rel
         walker = walkdir.walk dirPath, no_recurse: true
         walker.on 'directory', (d) -> if not filter(d) then dirs.push  type: 'dir',  abs: d, rel: relative d, dirPath 
         walker.on 'file',      (f) -> if not filter(f) then files.push type: 'file', abs: f, rel: relative f, dirPath 
-        walker.on 'end',         -> cb null, dirs.concat files
+        walker.on 'end',         -> cb null, dirs.sort(fileSort).concat files.sort(fileSort)
         walker.on 'error', (err) -> cb err
         
     catch err

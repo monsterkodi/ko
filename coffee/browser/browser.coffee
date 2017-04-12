@@ -17,7 +17,6 @@ class Browser extends Stage
     
     constructor: (@view) -> 
         super @view
-        @loadDir process.cwd()
   
     # 000       0000000    0000000   0000000    
     # 000      000   000  000   000  000   000  
@@ -25,9 +24,10 @@ class Browser extends Stage
     # 000      000   000  000   000  000   000  
     # 0000000   0000000   000   000  0000000    
     
-    loadDir: (dir, opt) -> dirlist dir, opt, (err, items) => 
-        if err? then return error "can't load dir #{dir}: #{err}"
-        @loadItems items, opt
+    loadDir: (dir, opt) -> 
+        dirlist dir, opt, (err, items) => 
+            if err? then return error "can't load dir #{dir}: #{err}"
+            @loadItems items, opt
 
     loadItems: (items, opt) ->
         col = @emptyColumn opt?.column
@@ -77,11 +77,12 @@ class Browser extends Stage
         @view.appendChild @cols
         
         @columns = []
-        for i in [0...4]
+        for i in [0...3]
             @addColumn()
             
         panes = @columns.map (c) -> div:c.div, column:c, min:20
         @flex = new flex panes: panes
+        @loadDir process.cwd()
 
     reset: -> @initColumns()
     stop:  -> @cols.remove(); @cols = null
