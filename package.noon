@@ -49,6 +49,7 @@ dependencies
                 opener          ^1.4.3
                 performance-now  ^2.1.0
                 sprintf-js      ^1.0.3
+                textextensions  ^2.0.1
                 three           ^0.84.0
                 traceback       ^0.3.1
                 underscore.string  ^3.3.4

@@ -184,7 +184,7 @@ loadFile = (file, opt={}) ->
         commandline.fileLoaded file
     
     window.split.show 'editor'
-    window.split.focus 'editor'
+    # window.split.focus 'editor'
         
     if pos[0] or pos[1] 
         editor.singleCursorAtPos pos

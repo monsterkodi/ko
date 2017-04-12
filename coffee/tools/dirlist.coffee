@@ -7,6 +7,10 @@
 { resolve, relative, fs, path, error, log, _  
 }       = require 'kxk'
 walkdir = require 'walkdir'
+textext = require 'textextensions'
+textmap = _.reduce textext, (map, ext) ->
+        map[".#{ext}"] = ext
+        map
 
 #   directory list
 #
@@ -36,6 +40,8 @@ dirList = (dirPath, opt, cb) ->
     files   = []
     dirPath = resolve dirPath
     
+    isTextFile = (f) -> textmap[path.extname f]?
+
     filter = (p) ->
         if opt.ignoreHidden and path.basename(p).startsWith '.'
             return true
@@ -44,11 +50,22 @@ dirList = (dirPath, opt, cb) ->
                 return true
         false
     
+    onDir = (d) -> 
+        if not filter(d) 
+            dir = type: 'dir',  abs: d, name: path.basename d # relative d, dirPath 
+            dirs.push  dir
+            
+    onFile = (f) -> 
+        if not filter(f) 
+            file = type: 'file', abs: f, name: path.basename f # relative f, dirPath
+            file.textFile = true if isTextFile
+            files.push file
+
     try
-        fileSort = (a,b) -> a.rel.localeCompare b.rel
+        fileSort = (a,b) -> a.name.localeCompare b.name
         walker = walkdir.walk dirPath, no_recurse: true
-        walker.on 'directory', (d) -> if not filter(d) then dirs.push  type: 'dir',  abs: d, rel: relative d, dirPath 
-        walker.on 'file',      (f) -> if not filter(f) then files.push type: 'file', abs: f, rel: relative f, dirPath 
+        walker.on 'directory', onDir
+        walker.on 'file',      onFile
         walker.on 'end',         -> cb null, dirs.sort(fileSort).concat files.sort(fileSort)
         walker.on 'error', (err) -> cb err
         

@@ -4,7 +4,7 @@
 #      000  000        000      000     000   
 # 0000000   000        0000000  000     000   
 
-{ prefs, error, log, $, _
+{ post, prefs, error, log, $, _
 }     = require 'kxk'
 event = require 'events'
 Flex  = require './tools/flex'
@@ -28,6 +28,8 @@ class Split extends event
         @commandline =$ 'commandline'
         @editor      =$ 'editor'     
         @logview     =$ 'logview'    
+
+        post.on 'focus', @focus
 
         @flex = new Flex
             panes: [
@@ -94,6 +96,7 @@ class Split extends event
 
     maximizeEditor: -> 
         @focus 'editor'
+        @flex.expand 'editor'
         @hideLog()
         @hideCommandline()
         @flex.resized()

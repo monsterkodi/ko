@@ -44,7 +44,8 @@ class Pane
     
     constructor: (opt) ->
         @[k] = v for k,v of opt
-        @size    ?= @fixed ? @min
+        @size    ?= @fixed ? @min ? 0
+        @size     = -1 if @collapsed
         @id      ?= @div.id ? "pane"
         @display ?= @div.style.display if @div.style.display.length
         @display ?= getStyle "##{@div.id}", 'display' if @div.id?
@@ -53,8 +54,8 @@ class Pane
         # log "@display #{@id} style:#{@div.style.display}", @display
     
     update: -> 
-        @size = Math.max 0, @size
-        if @size == 0
+        @size = Math.max -1, @size
+        if @size < 0
             @collapsed = true
         else
             delete @collapsed
@@ -62,8 +63,8 @@ class Pane
         @div.style.flex = @fixed and "0 0 #{@fixed}px" or @size? and "1 1 #{@size}px" or "1 1 auto"
 
     setSize: (@size) -> @update()
-    collapse:  -> @size = 0; @update()
-    expand:    -> @size = @fixed ? 1; @update()
+    collapse:  -> @size = -1; @update()
+    expand:    -> @size = @fixed ? 0; @update()
     isVisible: -> not @collapsed
     pos: -> 
         @div.style.display = @display
@@ -108,11 +109,11 @@ class Flex
         
         @addPane p for p in opt.panes
                     
-        for p in @panes
-            @setPaneSize p, p.fixed ? p.size ? 0
+        # for p in @panes
+            # @setPaneSize p, p.fixed ? p.size ? 0
           
-        @calculate()
         @updatePanes()
+        @calculate()
 
     #  0000000   0000000    0000000    
     # 000   000  000   000  000   000  
@@ -134,6 +135,12 @@ class Flex
                 paneb: newPane
             
         @panes.push newPane
+
+    relax: ->
+        log 'relax'
+        for p in @panes
+            if p.isVisible()
+                p.div.style.flex = "1 1 auto"
 
     #  0000000   0000000   000       0000000  
     # 000       000   000  000      000       
@@ -159,7 +166,8 @@ class Flex
             p.size += diff
             
         for p in @panes            
-            @setPaneSize p, p.size
+            p.setSize p.size
+        @onPaneSize?()
     
     # 00     00   0000000   000   000  00000000  
     # 000   000  000   000  000   000  000       
@@ -180,21 +188,35 @@ class Flex
         prevSize = prev.size + offset
         nextSize = next.size - offset
         if prevSize < @snapOffset
-            if prevSize < 0 or offset < @snapOffset
-                prevSize = 0
-                nextSize = next.size + prev.size
+            if not @prevVisPane prev
+                if prevSize <= 0 or offset < @snapOffset # collapse panea
+                    prevSize = -1
+                    nextSize = next.size + prev.size
+            else
+                if prevSize < 0
+                    prevSize = 0
+                    nextSize = next.size + prev.size
         else if nextSize < @snapOffset
-            if nextSize <= 0 or -offset < @snapOffset
-                nextSize = 0
-                prevSize = prev.size + next.size
-        @setPaneSize prev, prevSize
-        @setPaneSize next, nextSize
+            if not @nextVisPane next
+                if nextSize <= 0 or -offset < @snapOffset # collapse paneb
+                    nextSize = -1
+                    prevSize = prev.size + next.size
+            else
+                if nextSize < 0
+                    nextSize = 0
+                    prevSize = prev.size + next.size
+                    
+        prev.setSize prevSize
+        next.setSize nextSize
         @update()
+        @onPaneSize?()
 
-    setPaneSize: (pane, size) -> 
-        pane.setSize size
-        @onPaneSize? pane.id
-    
+    #  0000000  000  0000000  00000000  
+    # 000       000     000   000       
+    # 0000000   000    000    0000000   
+    #      000  000   000     000       
+    # 0000000   000  0000000  00000000  
+        
     resized: -> @update(); @calculate()
 
     update:        -> @updatePanes(); @updateHandles()
@@ -249,8 +271,7 @@ class Flex
             @calculate()
         
     expand: (i, factor=0.5) ->
-        i = @paneIndex i
-        pane = @panes[i]
+        pane = @panes[@paneIndex i]
         if pane.collapsed
             pane.expand()
             if flex = @closestVisFlex pane
@@ -265,6 +286,20 @@ class Flex
     #    000     000       000  000       000      000        000 000   
     #     0      000  0000000   000       0000000  00000000  000   000  
     
+    nextVisPane: (p) ->
+        pi = @panes.indexOf p
+        return null if pi >= @panes.length-1
+        next = @panes[pi+1]
+        return next if next.isVisible()
+        @nextVisPane next
+        
+    prevVisPane: (p) ->
+        pi = @panes.indexOf p
+        return null if pi <= 0
+        prev = @panes[pi-1]
+        return prev if prev.isVisible()
+        @prevVisPane prev
+
     closestVisFlex: (p) ->
         d = 1
         pi = @panes.indexOf p

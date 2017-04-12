@@ -18,7 +18,7 @@ class Coffee extends Command
     constructor: (@commandline) ->
         @cmdID      = 0
         @commands   = Object.create null
-        @shortcuts  = ['command+.', 'command+shift+.']
+        @shortcuts  = ['alt+c', 'alt+shift+c']
         @names      = ["coffee", "Coffee"]
         super @commandline
         @syntaxName = 'coffee'

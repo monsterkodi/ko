@@ -3,28 +3,16 @@
 # 000   000  00000000   0000000   000 0 000
 # 000   000  000        000       000  0000
 #  0000000   000        00000000  000   000
-{
-packagePath,
-fileExists,
-dirExists,
-unresolve,
-relative,
-resolve,
-prefs,
-clamp,
-post,
-error,
-log,
-$}       = require 'kxk'
+{ 
+packagePath, fileExists, dirExists, unresolve, relative, resolve,
+prefs, clamp, post, error, log, $, path, fs, _
+}        = require 'kxk'
 profile  = require '../tools/profile'
 Walker   = require '../tools/walker'
 Command  = require '../commandline/command'
 render   = require '../editor/render'
 syntax   = require '../editor/syntax'
-path     = require 'path'
 fuzzy    = require 'fuzzy'
-fs       = require 'fs'
-_        = require 'lodash'
 electron = require 'electron'
 ipc      = electron.ipcRenderer
     
