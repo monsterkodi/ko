@@ -15,6 +15,7 @@ class Row
         @div = elem class: 'browserRow', html: syntax.spanForText @item.name
         @div.classList.add @item.type
         @div.addEventListener 'click', @onClick
+        @div.addEventListener 'dblclick', => @column.navigateRows 'enter'
         @column.div.appendChild @div
    
     index: -> @column.rows.indexOf @
@@ -33,8 +34,7 @@ class Row
     # 000   000  000          000     000     000     000       
     # 000   000   0000000     000     000      0      00000000  
 
-    isActive: ->
-        @div.classList.contains 'active'
+    isActive: -> @div.classList.contains 'active'
     
     setActive: ->
         
@@ -44,6 +44,7 @@ class Row
         switch @item.type
             when 'dir'  then @column.browser.loadDir     @item.abs, column: @column.index+1, parent: @item
             when 'file' then @column.browser.loadContent @item,     column: @column.index+1
+            else post.emit 'jumpTo', @item.name, @item
         
     clearActive: ->
         @div.classList.remove 'active'

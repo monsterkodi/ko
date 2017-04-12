@@ -217,35 +217,42 @@ class FileEditor extends TextEditor
 
         return error 'FileEditor.jumpTo -- nothing to find?' if _.isEmpty find
         
-        classes = ipc.sendSync 'indexer', 'classes'
-        for clss, info of classes
-            if clss.toLowerCase() == find
-                @jumpToFile info
-                return true
-                
-        funcs = ipc.sendSync 'indexer', 'funcs'
-        for func, infos of funcs
-            if func.toLowerCase() == find
-                info = infos[0]
-                for i in infos
-                    if i.file == @currentFile
-                        info = i
-                if infos.length > 1 and not opt?.dontList
-                    window.commandline.commands.term.execute "funcs ^#{word}$"
-                @jumpToFile info
-                return true
+        type = opt?.type
+        if not type or type == 'class'
+            classes = ipc.sendSync 'indexer', 'classes'
+            for clss, info of classes
+                if clss.toLowerCase() == find
+                    @jumpToFile info
+                    return true
 
-        files = ipc.sendSync 'indexer', 'files'
-        for file, info of files
-            if fileName(file).toLowerCase() == find and file != @currentFile
-                @jumpToFileLine file, 6
-                return true
+        if not type or type == 'func'                
+            funcs = ipc.sendSync 'indexer', 'funcs'
+            for func, infos of funcs
+                if func.toLowerCase() == find
+                    info = infos[0]
+                    for i in infos
+                        if i.file == @currentFile
+                            info = i
+                    if infos.length > 1 and not opt?.dontList
+                        window.commandline.commands.term.execute "funcs ^#{word}$"
+                    @jumpToFile info
+                    return true
+    
+        if not type or type == 'file'
+            files = ipc.sendSync 'indexer', 'files'
+            for file, info of files
+                if fileName(file).toLowerCase() == find and file != @currentFile
+                    @jumpToFileLine file, 6
+                    return true
 
         # log "search for #{word}", window.commandline.commands.search?
         
-        window.commandline.commands.search.start "command+shift+f"    
-        window.commandline.commands.search.execute word
+        if not type or type == 'word'
+            window.commandline.commands.search.start "command+shift+f"    
+            window.commandline.commands.search.execute word
+            
         window.split.do 'show terminal'
+        
         true
     
     jumpToCounterpart: () ->

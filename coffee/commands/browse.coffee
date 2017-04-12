@@ -56,7 +56,7 @@ class Browse extends Command
         if command.length 
             log "execute browse #{command}"
             if dirExists command
-                @browser.loadDir command
+                @browser.browse command
         @browser.focus()
     
     onAreaResized: (w, h) => @browser.resized? w,h

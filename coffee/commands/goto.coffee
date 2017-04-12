@@ -43,12 +43,24 @@ class Goto extends Command
     # 0000000  000  0000000      000     000     000     00000000  000   000  0000000 
     
     listItems: () -> 
+        
+        items = []
+        @types = {}
+        
         files = ipc.sendSync 'indexer', 'files'
         funcs = files[window.editor.currentFile].funcs
-        funcNames = ({text: info[2], line:'▸', clss:'method'} for info in funcs)
+        for info in funcs
+            name  = info[2]
+            items.push text: name, line:'▸', clss:'method'
+            @types[name] = 'func'
+            
         clsss = ipc.sendSync 'indexer', 'classes'
-        @clssNames = ({text: k, line:'●', clss:'class'} for k in _.keys clsss)
-        funcNames.concat @clssNames
+        for k in _.keys clsss
+            name = k
+            items.push text: k, line:'●', clss:'class'
+            @types[name] = 'class'
+            
+        items
 
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
@@ -58,7 +70,7 @@ class Goto extends Command
         
     execute: (command) ->
         command = super command
-        if /^\-?\d+$/.test command
+        if /^\-?\d+$/.test command # goto line number
             line = parseInt command
             editor = window.editorWithClassName @focus
             if line < 0
@@ -71,7 +83,8 @@ class Goto extends Command
             focus: @focus
             do: "show #{editor.name}"
         else if command.length
-            window.editor.jumpTo command, dontList: true, extend: @name == 'selecto'
+            type = @types[command] ? 'func'
+            window.editor.jumpTo command, type:type, dontList: true, extend: @name == 'selecto'
             focus: 'editor'
             do: "show editor"
         else

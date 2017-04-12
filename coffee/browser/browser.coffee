@@ -28,14 +28,17 @@ class Browser extends Stage
         dir = packagePath file
         @loadDir dir, file: file
 
+    browse: (dir) -> @loadDir dir, column:0, row: 0
+
     loadDir: (dir, opt) -> 
         dirlist dir, opt, (err, items) => 
             if err? then return error "can't load dir #{dir}: #{err}"
+            opt ?= {}
             opt.parent ?=
                 type: 'dir'
                 abs: dir
                 name: path.basename dir
-            if not opt?.column
+            if not opt?.column or @columns[0].activeRow().item.name == '..'
                 items.unshift 
                     name: '..'
                     type: 'dir'
@@ -75,6 +78,7 @@ class Browser extends Stage
         prt = opt?.parent
         error "no parent? opt:", opt if not prt?
         col.setItems items, prt
+        if opt.row? then col.activateRow opt.row
         @navigateTo(opt) if opt?.file
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
@@ -112,7 +116,7 @@ class Browser extends Stage
     # 00000000  000   000  000           000        000     
     
     emptyColumn: (colIndex) ->
-        log colIndex
+        # log colIndex
         if colIndex?
             for coi in [colIndex...@columns.length]
                 @columns[coi].clear()
