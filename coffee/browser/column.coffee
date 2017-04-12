@@ -13,7 +13,7 @@ class Column
     constructor: (@browser) ->
         
         @index = @browser.columns.length
-        log "Column #{@index}"
+        # log "Column #{@index}"
 
         @rows = []
         @div = elem class: 'browserColumn', tabIndex: @index, id: "column#{@index}"
@@ -21,7 +21,7 @@ class Column
         
         @div.addEventListener 'focus',   @onFocus
         @div.addEventListener 'blur',    @onBlur
-        @div.addEventListener 'keydown', @onKeyDown
+        @div.addEventListener 'keydown', @onKey
         
     #  0000000  00000000  000000000  000  000000000  00000000  00     00   0000000  
     # 000       000          000     000     000     000       000   000  000       
@@ -30,7 +30,7 @@ class Column
     # 0000000   00000000     000     000     000     00000000  000   000  0000000   
     
     setItems: (@items, @parent) ->
-        log @items, @parent
+        # log @items, @parent
         @clear()
         for item in @items
             @rows.push new Row @, item
@@ -109,9 +109,9 @@ class Column
     # 000  000   000          000     
     # 000   000  00000000     000     
     
-    onKeyDown: (event) =>
+    onKey: (event) =>
         {mod,key,combo} = keyinfo.forEvent event
-        log "#{@index} #{combo}"
+        # log "#{@index} #{combo}"
         switch combo
             when 'up', 'down', 'page up', 'page down', 'home', 'end' then @activate key
             when 'right', 'left' then @navigate key

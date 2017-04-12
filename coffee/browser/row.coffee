@@ -43,7 +43,7 @@ class Row
         
         switch @item.type
             when 'dir'  then @column.browser.loadDir     @item.abs, column: @column.index+1, parent: @item
-            when 'file' then @column.browser.loadContent @item.abs, column: @column.index+1, parent: @item
+            when 'file' then @column.browser.loadContent @item,     column: @column.index+1
         
     clearActive: ->
         @div.classList.remove 'active'

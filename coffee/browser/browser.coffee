@@ -5,7 +5,7 @@
 # 000   000  000   000  000   000  000   000       000  000       000   000  
 # 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 
-{ packagePath, elem, post, clamp, error, log, process, path, _
+{ packagePath, fileName, resolve, elem, post, clamp, error, log, process, path, _
 }        = require 'kxk'
 flex     = require '../tools/flex'
 dirlist  = require '../tools/dirlist'
@@ -26,7 +26,6 @@ class Browser extends Stage
     
     loadFile: (file, opt) ->
         dir = packagePath file
-        # log 'dir:', dir
         @loadDir dir, file: file
 
     loadDir: (dir, opt) -> 
@@ -36,35 +35,40 @@ class Browser extends Stage
                 type: 'dir'
                 abs: dir
                 name: path.basename dir
+            if not opt?.column
+                items.unshift 
+                    name: '..'
+                    type: 'dir'
+                    abs:  resolve path.join dir, '..'
             @loadItems items, opt
 
-    loadContent: (file, opt) ->
+    loadContent: (item, opt) ->
         
-        files = ipc.sendSync 'indexer', 'files'
-        # log files
-        # funcs = files[file].funcs        
-        # funcNames = ({name: '▸  '+info[2], type:'method'} for info in funcs)
-        # log funcNames
-        clsss = ipc.sendSync 'indexer', 'classes'
-        # log clsss
-        log file
-        clsss = _.pickBy clsss, (obj, key) -> obj.file == file
-        log clsss
         items = []
+        file = item.abs
+        name = fileName file
+        
+        clsss = ipc.sendSync 'indexer', 'classes'
+        clsss = _.pickBy clsss, (obj, key) -> obj.file == file
         for clss,clsso of clsss
             items.push name: '●'+clss, type:'class'
             for mthd,mthdo of clsso.methods
                 items.push name: '▸'+mthd, type:'method'
 
+        files = ipc.sendSync 'indexer', 'files'
+        funcs = files[file].funcs        
+        for f in funcs
+            if f[3] == name
+                items.push name: '▸'+f[2], type: 'func'
+
         if items.length
-            opt.parent ?=
-                type: 'file'
-                abs: file
-                name: path.basename file
+            opt.parent ?= item
             @loadItems items, opt
-            post.emit 'jumpTo', file:file
         else
             log 'load image', file
+            
+        if item.textFile
+            post.emit 'jumpTo', file:file
 
     loadItems: (items, opt) ->
         col = @emptyColumn opt?.column
@@ -89,6 +93,14 @@ class Browser extends Stage
         clamp 0, @columns.length-1, index
         col = @columns[index].focus()
           
+    # 00000000   0000000    0000000  000   000   0000000  
+    # 000       000   000  000       000   000  000       
+    # 000000    000   000  000       000   000  0000000   
+    # 000       000   000  000       000   000       000  
+    # 000        0000000    0000000   0000000   0000000   
+    
+    focus: -> @lastUsedColumn()?.focus()
+    
     focusColumn: -> 
         for c in @columns
             return c if c.hasFocus()
@@ -100,7 +112,7 @@ class Browser extends Stage
     # 00000000  000   000  000           000        000     
     
     emptyColumn: (colIndex) ->
-        
+        log colIndex
         if colIndex?
             for coi in [colIndex...@columns.length]
                 @columns[coi].clear()
@@ -108,10 +120,15 @@ class Browser extends Stage
         for col in @columns
             return col if col.isEmpty()
             
-        col = @addColumn()
-        @flex.addPane div:col.div, min:0
-        @flex.relax()
-        col
+        @addColumn()
+
+    lastUsedColumn: ->
+        used = null
+        for col in @columns
+            if not col.isEmpty()
+                used = col 
+            else break
+        used
 
     #  0000000   0000000    0000000     0000000   0000000   000      
     # 000   000  000   000  000   000  000       000   000  000      
@@ -119,11 +136,17 @@ class Browser extends Stage
     # 000   000  000   000  000   000  000       000   000  000      
     # 000   000  0000000    0000000     0000000   0000000   0000000  
     
-    addColumn: ->
+    newColumn: ->
         col = new Column @
         @columns.push col
         col
       
+    addColumn: ->
+        col = @newColumn()
+        @flex.addPane div:col.div, size:50
+        @flex.relax()
+        col
+        
     # 000  000   000  000  000000000   0000000   0000000   000       0000000  
     # 000  0000  000  000     000     000       000   000  000      000       
     # 000  000 0 000  000     000     000       000   000  000      0000000   
@@ -137,7 +160,7 @@ class Browser extends Stage
         
         @columns = []
         for i in [0...3]
-            @addColumn()
+            @newColumn()
             
         panes = @columns.map (c) -> div:c.div, min:20
         @flex = new flex panes: panes

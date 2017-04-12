@@ -4,7 +4,7 @@
 # 000   000  000   000  000   000  000   000       000  000       
 # 0000000    000   000   0000000   00     00  0000000   00000000  
 
-{ process, log, str
+{ dirExists, process, log, str
 }        = require 'kxk'
 Command  = require '../commandline/command'
 Browser  = require '../browser/browser'
@@ -34,18 +34,31 @@ class Browse extends Command
         @browser.start()
         
         if window.editor.currentFile?
-            log 'load file', window.editor.currentFile
             @browser.loadFile window.editor.currentFile 
         else 
-            log 'load dir', process.cwd()
             @browser.loadDir process.cwd()
 
         super combo
-        
+        log 'start'
         text:   @last()
         select: true
         do:     'show area'
 
+    # 00000000  000   000  00000000   0000000  000   000  000000000  00000000  
+    # 000        000 000   000       000       000   000     000     000       
+    # 0000000     00000    0000000   000       000   000     000     0000000   
+    # 000        000 000   000       000       000   000     000     000       
+    # 00000000  000   000  00000000   0000000   0000000      000     00000000  
+    
+    execute: (command) ->
+        @cmdID += 1
+        command = command.trim()
+        if command.length 
+            log "execute browse #{command}"
+            if dirExists command
+                @browser.loadDir command
+        @browser.focus()
+    
     onAreaResized: (w, h) => @browser.resized? w,h
                 
 module.exports = Browse
