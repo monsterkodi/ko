@@ -53,9 +53,10 @@ class Column
         log 'relative', relpath = relative target, @parent.abs
         log 'first', relitem = _.first relpath.split path.sep
 
-    activateRow: (row) ->
-        row = @rows[row] if not row in @rows
-        row.activate()
+    setActiveRow: (row) ->
+        row = @rows[row] if _.isNumber row
+        log 'row.setActive?', row.setActive?
+        row?.setActive?()
        
     activeRow: -> 
         for r in @rows
@@ -68,19 +69,23 @@ class Column
     # 000   000  000   000      0      000   0000000   000   000     000     00000000  
 
     navigateRows: (key) ->
+        # log 'key', key, @numRows()
+        return error "no rows in column #{@index}?" if not @numRows()
         index = @activeRow()?.index() ? -1
-        error "no index from activeRow? #{index}?", @activeRow() if Number.isNaN index
+        error "no index from activeRow? #{index}?", @activeRow() if not index? or Number.isNaN index
         index = switch key
-            when 'up'        then (@numRows() + index-1) % @numRows() 
+            when 'up'        then index-1 #(@numRows() + index-1) % @numRows() 
             when 'down'      then index+1
             when 'home'      then 0
             when 'end'       then @numRows()-1
             when 'page up'   then index-@numVisible()
             when 'page down' then index+@numVisible()
-        error "no index #{index}?" if Number.isNaN index        
+            else index
+        error "no index #{index}? #{@numVisible()}" if not index? or Number.isNaN index        
+        # log 'clamp index', index, @numRows()
         index = clamp 0, @numRows()-1, index
-        error "no row at index #{index}/#{@numRows()-1}?", @rows if not @rows[index]?.setActive?
-        @rows[index].setActive()
+        error "no row at index #{index}/#{@numRows()-1}?", @numRows() if not @rows[index]?.activate?
+        @rows[index].activate()
     
     navigateCols: (key) ->
         item = @activeRow()?.item
@@ -94,7 +99,7 @@ class Column
                 else
                     post.emit 'focus', 'editor'
 
-    numRows: -> @rows.length           
+    numRows: -> @rows.length ? 0         
     numVisible: -> 20 # TODO
     
     # 00000000   0000000    0000000  000   000   0000000  
@@ -106,10 +111,10 @@ class Column
     hasFocus: -> @div.classList.contains 'focus'
 
     focus: ->
-        # log "focus #{@index}"
-        if not @activeRow() and @rows.length
+        if not @activeRow() and @numRows()
             @rows[0].setActive()
         @div.focus()
+        @
         
     onFocus: => @div.classList.add 'focus'
     onBlur:  => @div.classList.remove 'focus'

@@ -3,21 +3,10 @@
 # 000000000  000  000 0 000  000   000  000   000  000000000
 # 000   000  000  000  0000  000   000  000   000  000   000
 # 00     00  000  000   000  0000000     0000000   00     00
-{
-splitFilePos,
-fileExists,
-fileList,
-resolve,
-keyinfo,
-clamp,
-sw,sh,
-prefs,
-drag,
-pos,
-str,
-error,
-log,
-$}          = require 'kxk'
+
+{ splitFilePos, fileExists, fileList, resolve, keyinfo, clamp,
+sw,sh, prefs, drag, pos, str, os, fs, post, path, error, log, $, _
+}           = require 'kxk'
 Split       = require './split'
 FileEditor  = require './editor/fileeditor'
 Area        = require './area/area'
@@ -29,9 +18,6 @@ Navigate    = require './navigate'
 FPS         = require './tools/fps'
 Info        = require './editor/info'
 encode      = require './tools/encode'
-_           = require 'lodash'
-fs          = require 'fs'
-path        = require 'path'
 electron    = require 'electron'
 atomicFile  = require 'write-file-atomic'
 pkg         = require '../package.json'
@@ -47,6 +33,16 @@ logview     = null
 terminal    = null
 commandline = null
 
+domain = require('domain').create()
+domain.on 'error', (err) -> error "unhandled error: #{err}"
+window.onerror = (event, source, line, col, err) -> 
+    
+    l = require('sorcery').loadSync(source.replace /coffee/g, 'js').trace(line)
+    s = "▲ #{l.source}:#{l.line} ▲ [ERROR] #{err}"
+    post.emit 'error', s
+    post.emit 'slog', s
+    console.log s
+    
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000     
 # 00000000   0000000    0000000   000000    0000000 

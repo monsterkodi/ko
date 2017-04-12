@@ -38,7 +38,7 @@ class Browser extends Stage
                 type: 'dir'
                 abs: dir
                 name: path.basename dir
-            if not opt?.column or @columns[0].activeRow().item.name == '..'
+            if not opt?.column or @columns[0]?.activeRow()?.item.name == '..'
                 items.unshift 
                     name: '..'
                     type: 'dir'
@@ -54,32 +54,45 @@ class Browser extends Stage
         clsss = ipc.sendSync 'indexer', 'classes'
         clsss = _.pickBy clsss, (obj, key) -> obj.file == file
         for clss,clsso of clsss
-            items.push name: '●'+clss, type:'class'
+            items.push name: clss, text: '●'+clss, type:'class', file: file, line: clsso.line
             for mthd,mthdo of clsso.methods
-                items.push name: '▸'+mthd, type:'method'
+                items.push name: mthd, text: '▸'+mthd, type:'method', file: file, line: mthdo.line
 
         files = ipc.sendSync 'indexer', 'files'
-        funcs = files[file].funcs        
+        funcs = files[file]?.funcs ? []
         for f in funcs
             if f[3] == name
-                items.push name: '▸'+f[2], type: 'func'
+                items.push name: f[2], text:'▸'+f[2], type: 'func', file: file, line: f[0]
+
+        @clearColumnsFrom opt.column
 
         if items.length
             opt.parent ?= item
             @loadItems items, opt
         else
-            log 'load image', file
+            if path.extname in ['.gif', '.png', '.jpg']
+                log 'load image?', file
             
         if item.textFile
+            log 'jump to text file', item
             post.emit 'jumpTo', file:file
 
+
     loadItems: (items, opt) ->
+        
         col = @emptyColumn opt?.column
         prt = opt?.parent
+        
         error "no parent? opt:", opt if not prt?
+        
         col.setItems items, prt
-        if opt.row? then col.activateRow opt.row
-        @navigateTo(opt) if opt?.file
+        
+        if opt.row? 
+            col.focus()
+            # col.setActiveRow opt.row
+            
+        if opt?.file
+            @navigateTo opt 
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       
@@ -94,8 +107,9 @@ class Browser extends Stage
         index += switch key
             when 'left'  then -1
             when 'right' then +1
-        clamp 0, @columns.length-1, index
-        col = @columns[index].focus()
+        index = clamp 0, @numCols()-1, index
+        log index, @columns[index]?, @columns[index].focus?
+        @columns[index].focus().activeRow().activate()
           
     # 00000000   0000000    0000000  000   000   0000000  
     # 000       000   000  000       000   000  000       
@@ -103,7 +117,9 @@ class Browser extends Stage
     # 000       000   000  000       000   000       000  
     # 000        0000000    0000000   0000000   0000000   
     
-    focus: -> @lastUsedColumn()?.focus()
+    focus: -> 
+        @lastUsedColumn()?.focus()
+        @
     
     focusColumn: -> 
         for c in @columns
@@ -118,7 +134,7 @@ class Browser extends Stage
     emptyColumn: (colIndex) ->
         # log colIndex
         if colIndex?
-            for coi in [colIndex...@columns.length]
+            for coi in [colIndex...@numCols()]
                 @columns[coi].clear()
                 
         for col in @columns
@@ -150,7 +166,13 @@ class Browser extends Stage
         @flex.addPane div:col.div, size:50
         @flex.relax()
         col
-        
+
+    numCols: -> @columns.length 
+     
+    clearColumnsFrom: (c) ->
+        while c < @numCols()
+            @columns[c++].clear()
+       
     # 000  000   000  000  000000000   0000000   0000000   000       0000000  
     # 000  0000  000  000     000     000       000   000  000      000       
     # 000  000 0 000  000     000     000       000   000  000      0000000   
@@ -168,7 +190,7 @@ class Browser extends Stage
             
         panes = @columns.map (c) -> div:c.div, min:20
         @flex = new flex panes: panes
-
+    
     reset: -> @initColumns()
     stop:  -> @cols.remove(); @cols = null
     start: -> @initColumns()

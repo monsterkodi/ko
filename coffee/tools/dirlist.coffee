@@ -8,9 +8,12 @@
 }       = require 'kxk'
 walkdir = require 'walkdir'
 textext = require 'textextensions'
+
 textmap = _.reduce textext, (map, ext) ->
         map[".#{ext}"] = ext
         map
+    , {}
+textmap['.noon'] = 'noon'
 
 #   directory list
 #
@@ -40,7 +43,7 @@ dirList = (dirPath, opt, cb) ->
     files   = []
     dirPath = resolve dirPath
     
-    isTextFile = (f) -> textmap[path.extname f]?
+    isTextFile = (f) -> path.extname(f) and textmap[path.extname f]?
 
     filter = (p) ->
         if opt.ignoreHidden and path.basename(p).startsWith '.'
@@ -58,7 +61,7 @@ dirList = (dirPath, opt, cb) ->
     onFile = (f) -> 
         if not filter(f) 
             file = type: 'file', abs: f, name: path.basename f # relative f, dirPath
-            file.textFile = true if isTextFile
+            file.textFile = true if isTextFile f
             files.push file
 
     try

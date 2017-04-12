@@ -218,6 +218,9 @@ class FileEditor extends TextEditor
         return error 'FileEditor.jumpTo -- nothing to find?' if _.isEmpty find
         
         type = opt?.type
+
+        log "jumpTo type:#{type} word:#{word}"
+
         if not type or type == 'class'
             classes = ipc.sendSync 'indexer', 'classes'
             for clss, info of classes
