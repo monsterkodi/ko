@@ -4,7 +4,7 @@
 # 000       000   000  000      000   000  000 0 000  000  0000
 #  0000000   0000000   0000000   0000000   000   000  000   000
 
-{ relative, keyinfo, path, post, elem, clamp, error, log, $, _ 
+{ packagePath, relative, resolve, keyinfo, path, post, elem, clamp, error, log, $, _ 
 }   = require 'kxk'
 Row = require './row'
 
@@ -84,6 +84,26 @@ class Column
             
     nextColumn: -> @browser.column(@index+1)
         
+    numRows: -> @rows.length ? 0         
+    numVisible: -> 20 # TODO
+    
+    # 00000000   0000000    0000000  000   000   0000000  
+    # 000       000   000  000       000   000  000       
+    # 000000    000   000  000       000   000  0000000   
+    # 000       000   000  000       000   000       000  
+    # 000        0000000    0000000   0000000   0000000   
+    
+    hasFocus: -> @div.classList.contains 'focus'
+
+    focus: ->
+        if not @activeRow() and @numRows()
+            @rows[0].setActive()
+        @div.focus()
+        @
+        
+    onFocus: => @div.classList.add 'focus'
+    onBlur:  => @div.classList.remove 'focus'
+    
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       
     # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000   
@@ -104,7 +124,6 @@ class Column
             when 'page down' then index+@numVisible()
             else index
         error "no index #{index}? #{@numVisible()}" if not index? or Number.isNaN index        
-        # log 'clamp index', index, @numRows()
         index = clamp 0, @numRows()-1, index
         error "no row at index #{index}/#{@numRows()-1}?", @numRows() if not @rows[index]?.activate?
         @rows[index].activate()
@@ -121,25 +140,12 @@ class Column
                 else if item?.textFile
                     post.emit 'focus', 'editor'
 
-    numRows: -> @rows.length ? 0         
-    numVisible: -> 20 # TODO
-    
-    # 00000000   0000000    0000000  000   000   0000000  
-    # 000       000   000  000       000   000  000       
-    # 000000    000   000  000       000   000  0000000   
-    # 000       000   000  000       000   000       000  
-    # 000        0000000    0000000   0000000   0000000   
-    
-    hasFocus: -> @div.classList.contains 'focus'
-
-    focus: ->
-        if not @activeRow() and @numRows()
-            @rows[0].setActive()
-        @div.focus()
-        @
-        
-    onFocus: => @div.classList.add 'focus'
-    onBlur:  => @div.classList.remove 'focus'
+    navigateRoot: (key) ->
+        @browser.browse switch key
+            when 'left'  then path.dirname @parent.abs
+            when 'up'    then @parent.abs
+            when 'right' then @activeRow().item.abs
+            when 'down'  then packagePath @parent.abs
         
     # 000   000  00000000  000   000  
     # 000  000   000        000 000   
@@ -153,5 +159,6 @@ class Column
         switch combo
             when 'up', 'down', 'page up', 'page down', 'home', 'end' then @navigateRows key
             when 'right', 'left', 'enter' then @navigateCols key
+            when 'command+left', 'command+up', 'command+right', 'command+down' then @navigateRoot key
         
 module.exports = Column

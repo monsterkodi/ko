@@ -71,8 +71,8 @@ module.exports =
     moveCursorsToWordBoundary: (leftOrRight, info = extend:false) ->
         extend = info.extend ? 0 <= info.mod.indexOf 'shift'
         f = switch leftOrRight
-            when 'right' then @endOfWordAtCursor
-            when 'left'  then @startOfWordAtCursor
+            when 'right' then @endOfWordAtPos
+            when 'left'  then @startOfWordAtPos
         @moveAllCursors f, extend:extend, keepLine:true
         true
 

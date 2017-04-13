@@ -603,8 +603,10 @@ class TextEditor extends Editor
         ''
         
     emitJumpToForPos: (p) ->
+        
         text = @line p[1]
-        rgx = /([\~\/\w\.]+\/[\w\.]+\w[:\d]*)/
+        
+        rgx = /([\~\/\w\.]+\/[\w\.]+\w[:\d]*)/ # look for files in line
         if rgx.test text
             ranges = matchr.ranges rgx, text
             diss   = matchr.dissect ranges, join:false
@@ -614,7 +616,11 @@ class TextEditor extends Editor
                     if fileExists resolve file
                         post.emit 'jumpTo', file:file, line:pos[1], col:pos[0]
                         return
-        post.emit 'jumpTo', @wordAtCursor p
+                        
+        word = @wordAtPos p
+        range = @rangeForWordAtPos p
+        type = 'func'
+        post.emit 'jumpTo', word, type:type
 
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
