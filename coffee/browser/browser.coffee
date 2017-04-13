@@ -85,6 +85,7 @@ class Browser extends Stage
     loadItems: (items, opt) ->
         
         col = @emptyColumn opt?.column
+        @clearColumnsFrom col.index
 
         if opt?.file
             @navigateTargetFile = opt.file
@@ -92,6 +93,7 @@ class Browser extends Stage
         col.setItems items, opt
         
         if opt.row? then col.focus()
+        
       
     navigateTarget: -> @navigateTargetFile
       

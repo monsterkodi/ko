@@ -111,15 +111,15 @@ class Column
         @rows[index].activate()
     
     navigateCols: (key) ->
-        item = @activeRow()?.item
-        type = item.type
         switch key
             when 'left'  then @browser.navigate 'left'
             when 'right' then @browser.navigate 'right'
             when 'enter'
+                item = @activeRow()?.item
+                type = item?.type
                 if type == 'dir'
                     @browser.browse item.abs
-                else
+                else if item?.textFile
                     post.emit 'focus', 'editor'
 
     numRows: -> @rows.length ? 0         

@@ -25,7 +25,7 @@ class Handle
             onStop:  @onStop
             cursor:  @flex.cursor
             
-    del: @div?.remove(); delete @div
+    del:       -> @div?.remove(); delete @div
     size:      -> @isVisible() and @flex.handleSize or 0
     pos:       -> @flex.posOfPane(@index+1) - @flex.handleSize
     update:    -> @div.style.flex = "0 0 #{@size()}px"
@@ -62,8 +62,9 @@ class Pane
         @div.style.display = @isVisible() and @display or 'none'
         @div.style.flex = @fixed and "0 0 #{@fixed}px" or @size? and "1 1 #{@size}px" or "1 1 auto"
 
-    del: @div?.remove(); delete @div
     setSize: (@size) -> @update()
+    
+    del:       -> @div?.remove(); delete @div
     collapse:  -> @size = -1; @update()
     expand:    -> @size = @fixed ? 0; @update()
     isVisible: -> not @collapsed
@@ -141,6 +142,7 @@ class Flex
     # 000         0000000   000        
     
     popPane: ->
+        log "popPane #{@panes.length}"
         if @panes.length > 1 # > 2?
             @panes.pop().del()
             @handles.pop().del()
