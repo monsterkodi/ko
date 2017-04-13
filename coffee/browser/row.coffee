@@ -12,6 +12,7 @@ syntax = require '../editor/syntax'
 class Row
     
     constructor: (@column, @item) ->
+
         @div = elem class: 'browserRow', html: syntax.spanForText @item.text ? @item.name
         @div.classList.add @item.type
         @div.addEventListener 'click', @activate
@@ -25,7 +26,6 @@ class Row
     # 000000000  000          000     000   000 000   000000000     000     0000000   
     # 000   000  000          000     000     000     000   000     000     000       
     # 000   000   0000000     000     000      0      000   000     000     00000000  
-    #
     
     activate: =>
         @setActive()
@@ -33,14 +33,17 @@ class Row
             when 'dir'  then @column.browser.loadDir     @item.abs, column: @column.index+1, parent: @item
             when 'file' then @column.browser.loadContent @item,     column: @column.index+1
             else post.emit 'jumpTo', file: @item.file, line: @item.line
+        @
     
     isActive: -> @div.classList.contains 'active'
     
     setActive: ->
         @column.activeRow()?.clearActive()
         @div.classList.add 'active'
+        @
                 
     clearActive: ->
         @div.classList.remove 'active'
+        @
 
 module.exports = Row

@@ -26,7 +26,7 @@ class Browser extends Stage
     
     loadFile: (file, opt) ->
         dir = packagePath file
-        @loadDir dir, file: file
+        @loadDir dir, file: file, column:0
 
     browse: (dir) -> @loadDir dir, column:0, row: 0
 
@@ -39,10 +39,12 @@ class Browser extends Stage
                 abs: dir
                 name: path.basename dir
             if not opt?.column or @columns[0]?.activeRow()?.item.name == '..'
-                items.unshift 
-                    name: '..'
-                    type: 'dir'
-                    abs:  resolve path.join dir, '..'
+                updir = resolve path.join dir, '..'
+                if not (updir == dir == '/')
+                    items.unshift 
+                        name: '..'
+                        type: 'dir'
+                        abs:  updir
             @loadItems items, opt
 
     loadContent: (item, opt) ->
@@ -71,9 +73,9 @@ class Browser extends Stage
             @loadItems items, opt
         else
             if path.extname(file) in ['.gif', '.png', '.jpg']
-                log 'load image?', file
+                error 'load image?', file
             else
-                log 'load icon?', file
+                log 'load finder icon?', file
             
         if item.textFile
             # log 'jump to text file', item
@@ -83,17 +85,16 @@ class Browser extends Stage
     loadItems: (items, opt) ->
         
         col = @emptyColumn opt?.column
-        prt = opt?.parent
+
+        if opt?.file
+            @navigateTargetFile = opt.file
         
-        error "no parent? opt:", opt if not prt?
-        
-        col.setItems items, prt
+        col.setItems items, opt
         
         if opt.row? then col.focus()
-            
-        if opt?.file
-            @navigateTo opt 
-
+      
+    navigateTarget: -> @navigateTargetFile
+      
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       
     # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000   
@@ -131,7 +132,6 @@ class Browser extends Stage
     # 00000000  000   000  000           000        000     
     
     emptyColumn: (colIndex) ->
-        # log colIndex
         if colIndex?
             for coi in [colIndex...@numCols()]
                 @columns[coi].clear()
@@ -141,6 +141,12 @@ class Browser extends Stage
             
         @addColumn()
 
+    #  0000000   00000000  000000000    
+    # 000        000          000       
+    # 000  0000  0000000      000       
+    # 000   000  000          000       
+    #  0000000   00000000     000       
+    
     lastUsedColumn: ->
         used = null
         for col in @columns
@@ -148,6 +154,9 @@ class Browser extends Stage
                 used = col 
             else break
         used
+
+    numCols: -> @columns.length 
+    column: (i) -> @columns[i] if i >= 0 and i < @numCols()
 
     #  0000000   0000000    0000000     0000000   0000000   000      
     # 000   000  000   000  000   000  000       000   000  000      
@@ -165,12 +174,22 @@ class Browser extends Stage
         @flex.addPane div:col.div, size:50
         @flex.relax()
         col
-
-    numCols: -> @columns.length 
+    
+    # 0000000    00000000  000        
+    # 000   000  000       000        
+    # 000   000  0000000   000        
+    # 000   000  000       000        
+    # 0000000    00000000  0000000    
+    
+    popColumn: ->
+        @flex.popPane()
+        @columns.pop()
      
     clearColumnsFrom: (c) ->
-        while c < @numCols()
-            @columns[c++].clear()
+        if c < @numCols()
+            @columns[c].clear()
+        while c+1 < @numCols()
+            @popColumn()
        
     # 000  000   000  000  000000000   0000000   0000000   000       0000000  
     # 000  0000  000  000     000     000       000   000  000      000       

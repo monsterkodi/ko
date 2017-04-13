@@ -3,14 +3,13 @@
 # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 
 # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
-{
-fileList, keyinfo, clamp, log, $, _
+
+{ fileList, keyinfo, clamp, path, log, $, _
 }          = require 'kxk'
 TextEditor = require '../editor/texteditor'
 render     = require '../editor/render'
 syntax     = require '../editor/syntax'
 split      = require '../split'
-path       = require 'path'
 
 class Commandline extends TextEditor
     

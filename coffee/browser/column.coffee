@@ -29,11 +29,14 @@ class Column
     #      000  000          000     000     000     000       000 0 000       000  
     # 0000000   00000000     000     000     000     00000000  000   000  0000000   
     
-    setItems: (@items, @parent) ->
-        # log @items, @parent
+    setItems: (@items, opt) ->
+        @parent = opt.parent
+        error "no parent item?" if not @parent?
         @clear()
         for item in @items
             @rows.push new Row @, item
+        if @browser.navigateTarget()
+            @navigateTo @browser.navigateTarget()
         @
         
     isEmpty: -> _.isEmpty @rows
@@ -47,24 +50,22 @@ class Column
     # 000   000  000          000     000     000     000       
     # 000   000   0000000     000     000      0      00000000  
    
-    navigateTo: (opt) ->
-        target = _.isString(opt) and opt or opt?.file
-        log 'navigateTo target:', target, 'parent:', @parent.abs
-        log 'relative', relpath = relative target, @parent.abs
-        log 'first', relitem = _.first relpath.split path.sep
-        @activateRow(@rowWithName relitem)?.column.navigateTo?(opt)
+    navigateTo: (target) ->
+        target = _.isString(target) and target or target?.file
+        if not @parent
+            error 'no parent?'
+        # log 'navigateTo target:', target, 'parent:', @parent.abs
+        relpath = relative target, @parent.abs
+        log 'activate rowWithName', relitem = _.first relpath.split path.sep
+        row = @rowWithName relitem
+        if row
+            @activateRow row
+        else
+            log 'end file navigation'
+            @browser.navigateTargetFile = null
 
-    setActiveRow: (row) ->
-        row = @rows[row] if _.isNumber row
-        log 'row.setActive?', row.setActive?
-        row?.setActive?()
-        row
-
-    activateRow: (row) ->
-        row = @rows[row] if _.isNumber row
-        log 'row.activate?', row.activate?
-        row?.activate?()
-        row
+    setActiveRow: (row) -> @row(row)?.setActive()
+    activateRow:  (row) -> @row(row)?.activate()
        
     activeRow: -> 
         for r in @rows
@@ -75,6 +76,14 @@ class Column
         for r in @rows
             return r if r.item.name == name
         null
+
+    row: (row) -> # accepts row or index
+        if _.isNumber(row) and row >= 0 and row < @numRows() 
+            @rows[row] 
+        else
+            row
+            
+    nextColumn: -> @browser.column(@index+1)
         
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       

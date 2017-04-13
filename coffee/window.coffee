@@ -36,9 +36,12 @@ commandline = null
 domain = require('domain').create()
 domain.on 'error', (err) -> error "unhandled error: #{err}"
 window.onerror = (event, source, line, col, err) -> 
-    
-    l = require('sorcery').loadSync(source.replace /coffee/g, 'js').trace(line)
-    s = "▲ #{l.source}:#{l.line} ▲ [ERROR] #{err}"
+    f = require('sorcery').loadSync(source.replace /coffee/g, 'js')
+    if f?
+        l = f.trace(line)
+        s = "▲ #{l.source}:#{l.line} ▲ [ERROR] #{err}"
+    else
+        s = "▲ [ERROR] #{err}"
     post.emit 'error', s
     post.emit 'slog', s
     console.log s

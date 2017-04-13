@@ -24,7 +24,8 @@ class Handle
             onMove:  @onDrag
             onStop:  @onStop
             cursor:  @flex.cursor
-
+            
+    del: @div?.remove(); delete @div
     size:      -> @isVisible() and @flex.handleSize or 0
     pos:       -> @flex.posOfPane(@index+1) - @flex.handleSize
     update:    -> @div.style.flex = "0 0 #{@size()}px"
@@ -51,7 +52,6 @@ class Pane
         @display ?= getStyle "##{@div.id}", 'display' if @div.id?
         @display ?= getStyle ' .'+@div.className.split(' ').join ' .' if @div.className.length
         @display ?= 'initial'
-        # log "@display #{@id} style:#{@div.style.display}", @display
     
     update: -> 
         @size = Math.max -1, @size
@@ -62,6 +62,7 @@ class Pane
         @div.style.display = @isVisible() and @display or 'none'
         @div.style.flex = @fixed and "0 0 #{@fixed}px" or @size? and "1 1 #{@size}px" or "1 1 auto"
 
+    del: @div?.remove(); delete @div
     setSize: (@size) -> @update()
     collapse:  -> @size = -1; @update()
     expand:    -> @size = @fixed ? 0; @update()
@@ -109,9 +110,6 @@ class Flex
         
         @addPane p for p in opt.panes
                     
-        # for p in @panes
-            # @setPaneSize p, p.fixed ? p.size ? 0
-          
         @updatePanes()
         @calculate()
 
@@ -136,6 +134,23 @@ class Flex
             
         @panes.push newPane
 
+    # 00000000    0000000   00000000   
+    # 000   000  000   000  000   000  
+    # 00000000   000   000  00000000   
+    # 000        000   000  000        
+    # 000         0000000   000        
+    
+    popPane: ->
+        if @panes.length > 1 # > 2?
+            @panes.pop().del()
+            @handles.pop().del()
+
+    # 00000000   00000000  000       0000000   000   000  
+    # 000   000  000       000      000   000   000 000   
+    # 0000000    0000000   000      000000000    00000    
+    # 000   000  000       000      000   000   000 000   
+    # 000   000  00000000  0000000  000   000  000   000  
+    
     relax: ->
         log 'relax'
         for p in @panes
