@@ -7,7 +7,7 @@
 { post, prefs, error, log, $, _
 }     = require 'kxk'
 event = require 'events'
-Flex  = require './tools/flex'
+Flex  = require './flex/flex'
 
 class Split extends event
     
@@ -50,6 +50,8 @@ class Split extends event
             onDrag:     @onDrag
             onDragEnd:  @onDrag
             onPaneSize: @onDrag
+            snapFirst:  20
+            snapLast:   100
         @onDrag()
         
     onDrag: => if @flex? then @emit 'split', @flex.panePositions()
@@ -190,7 +192,7 @@ class Split extends event
         n = 'commandline-editor' if n == 'commandline'
         if n == '.' or not $(n)?
             return error "Split.focus -- can't find element '#{n}'"
-        $(n)?.focus()
+        $(n)?.focus?()
             
     focusAnything: ->
         return @focus 'editor'   if @editorVisible()

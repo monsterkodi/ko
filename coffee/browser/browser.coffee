@@ -7,10 +7,10 @@
 
 { packagePath, fileName, resolve, elem, post, clamp, error, log, process, path, _
 }        = require 'kxk'
-flex     = require '../tools/flex'
-dirlist  = require '../tools/dirlist'
-Stage    = require '../area/stage'
 Column   = require './column'
+Stage    = require '../area/stage'
+dirlist  = require '../tools/dirlist'
+flex     = require '../flex/flex'
 electron = require 'electron'
 ipc = electron.ipcRenderer
 
@@ -18,18 +18,30 @@ class Browser extends Stage
     
     constructor: (@view) -> super @view
   
-    # 000       0000000    0000000   0000000    
-    # 000      000   000  000   000  000   000  
-    # 000      000   000  000000000  000   000  
-    # 000      000   000  000   000  000   000  
-    # 0000000   0000000   000   000  0000000    
+    # 000       0000000    0000000   0000000    00000000  000  000      00000000  
+    # 000      000   000  000   000  000   000  000       000  000      000       
+    # 000      000   000  000000000  000   000  000000    000  000      0000000   
+    # 000      000   000  000   000  000   000  000       000  000      000       
+    # 0000000   0000000   000   000  0000000    000       000  0000000  00000000  
     
     loadFile: (file, opt) ->
         dir = packagePath file
         @loadDir dir, file: file, column:0
 
+    # 0000000    00000000    0000000   000   000   0000000  00000000  
+    # 000   000  000   000  000   000  000 0 000  000       000       
+    # 0000000    0000000    000   000  000000000  0000000   0000000   
+    # 000   000  000   000  000   000  000   000       000  000       
+    # 0000000    000   000   0000000   00     00  0000000   00000000  
+    
     browse: (dir) -> @loadDir dir, column:0, row: 0
 
+    # 000       0000000    0000000   0000000    0000000    000  00000000   
+    # 000      000   000  000   000  000   000  000   000  000  000   000  
+    # 000      000   000  000000000  000   000  000   000  000  0000000    
+    # 000      000   000  000   000  000   000  000   000  000  000   000  
+    # 0000000   0000000   000   000  0000000    0000000    000  000   000  
+    
     loadDir: (dir, opt) -> 
         dirlist dir, opt, (err, items) => 
             if err? then return error "can't load dir #{dir}: #{err}"
@@ -40,13 +52,20 @@ class Browser extends Stage
                 name: path.basename dir
             if not opt?.column or @columns[0]?.activeRow()?.item.name == '..'
                 updir = resolve path.join dir, '..'
-                if not (updir == dir == '/')
+                log 'updir', updir, dir, @columns[0].parent?.abs
+                if not (updir == dir == '/') and (not @columns[0].parent? or @columns[0].parent.abs.startsWith dir) 
                     items.unshift 
                         name: '..'
                         type: 'dir'
                         abs:  updir
             @loadItems items, opt
 
+    # 000       0000000    0000000   0000000     0000000   0000000   000   000  000000000  00000000  000   000  000000000  
+    # 000      000   000  000   000  000   000  000       000   000  0000  000     000     000       0000  000     000     
+    # 000      000   000  000000000  000   000  000       000   000  000 0 000     000     0000000   000 0 000     000     
+    # 000      000   000  000   000  000   000  000       000   000  000  0000     000     000       000  0000     000     
+    # 0000000   0000000   000   000  0000000     0000000   0000000   000   000     000     00000000  000   000     000     
+    
     loadContent: (item, opt) ->
         
         items = []
@@ -74,14 +93,19 @@ class Browser extends Stage
         else
             if path.extname(file) in ['.gif', '.png', '.jpg']
                 error 'load image?', file
-            else
-                log 'load finder icon?', file
+            # else
+                # log 'load finder icon?', file
             
         if item.textFile
             # log 'jump to text file', item
             post.emit 'jumpTo', file:file
 
-
+    # 000       0000000    0000000   0000000    000  000000000  00000000  00     00   0000000  
+    # 000      000   000  000   000  000   000  000     000     000       000   000  000       
+    # 000      000   000  000000000  000   000  000     000     0000000   000000000  0000000   
+    # 000      000   000  000   000  000   000  000     000     000       000 0 000       000  
+    # 0000000   0000000   000   000  0000000    000     000     00000000  000   000  0000000   
+    
     loadItems: (items, opt) ->
         
         col = @emptyColumn opt?.column
@@ -93,15 +117,14 @@ class Browser extends Stage
         col.setItems items, opt
         
         if opt.row? then col.focus()
-        
-      
-    navigateTarget: -> @navigateTargetFile
       
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       
     # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000   
     # 000  0000  000   000     000     000  000   000  000   000     000     000       
     # 000   000  000   000      0      000   0000000   000   000     000     00000000  
+    
+    navigateTarget: -> @navigateTargetFile
     
     navigateTo: (opt) -> @columns[0].navigateTo opt
 
@@ -111,7 +134,9 @@ class Browser extends Stage
             when 'left'  then -1
             when 'right' then +1
         index = clamp 0, @numCols()-1, index
-        @columns[index].focus().activeRow().activate()
+        if @columns[index].numRows()
+            @columns[index].focus().activeRow().activate()
+        @
           
     # 00000000   0000000    0000000  000   000   0000000  
     # 000       000   000  000       000   000  000       
@@ -174,7 +199,6 @@ class Browser extends Stage
     addColumn: ->
         col = @newColumn()
         @flex.addPane div:col.div, size:50
-        @flex.relax()
         col
     
     # 0000000    00000000  000        

@@ -9,8 +9,7 @@
 assert     = require 'assert'
 noon       = require 'noon'
 {Map,List} = require 'immutable'
-
-matchr = require '../coffee/tools/matchr'
+matchr     = require '../coffee/tools/matchr'
 
 describe 'ranges', ->
     rgx = /([\~\/\w\.]+\/[\w\.]+\w[:\d]*)/
@@ -123,34 +122,5 @@ describe 'dissect', ->
                 clss: '?'
                 cls: ['?']
             ]
-        
-        # it 'fails?', ->
-            # testRanges = noon.parse """
-                # .
-                    # start   0
-                    # match   ~/s/ko/coffee/logview.coffee:19
-                    # value   ?
-                    # index   0
-                # .
-                    # start   30
-                    # match   ~/s/ko/coffee/logview.coffee
-                    # value   ?
-                    # index   0
-                # .
-                    # start   58
-                    # match   :19
-                    # value   ?
-                    # index   0
-            # """
-            # log testRanges
-            # diss = matchr.dissect testRanges, log:log
-            # log diss
-            # expect(diss) .to.eql [
-                # match:   '~/s/ko/coffee/logview.coffee:19'
-                # start: 0
-                # cid: 0
-                # clss: '?'
-                # cls: ['?']
-            # ]
                 
                  

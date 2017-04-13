@@ -1,96 +1,26 @@
-# 000   000   0000000   000   000  0000000    000      00000000
-# 000   000  000   000  0000  000  000   000  000      000     
-# 000000000  000000000  000 0 000  000   000  000      0000000 
-# 000   000  000   000  000  0000  000   000  000      000     
-# 000   000  000   000  000   000  0000000    0000000  00000000
-
-{ getStyle, clamp, elem, drag, def, error, log, $, _} = require 'kxk'
-
-class Handle
-    
-    constructor: (opt) ->
-        
-        @[k] = v for k,v of opt
-        
-        @div = elem class: @flex.handleClass
-        @div.style.cursor = @flex.cursor
-        @div.style.display = 'block'
-        @flex.view.insertBefore @div, @paneb.div
-        @update()
-        
-        @drag = new drag
-            target:  @div
-            onStart: @onStart
-            onMove:  @onDrag
-            onStop:  @onStop
-            cursor:  @flex.cursor
-            
-    del:       -> @div?.remove(); delete @div
-    size:      -> @isVisible() and @flex.handleSize or 0
-    pos:       -> @flex.posOfPane(@index+1) - @flex.handleSize
-    update:    -> @div.style.flex = "0 0 #{@size()}px"
-    isVisible: -> not (@panea.collapsed and @paneb.collapsed)
-
-    onStart:    => @flex.handleStart @
-    onDrag: (d) => @flex.handleDrag @, d
-    onStop:     => @flex.handleEnd @
-
-# 00000000    0000000   000   000  00000000
-# 000   000  000   000  0000  000  000     
-# 00000000   000000000  000 0 000  0000000 
-# 000        000   000  000  0000  000     
-# 000        000   000  000   000  00000000
-
-class Pane
-    
-    constructor: (opt) ->
-        @[k] = v for k,v of opt
-        @size    ?= @fixed ? @min ? 0
-        @size     = -1 if @collapsed
-        @id      ?= @div.id ? "pane"
-        @display ?= @div.style.display if @div.style.display.length
-        @display ?= getStyle "##{@div.id}", 'display' if @div.id?
-        @display ?= getStyle ' .'+@div.className.split(' ').join ' .' if @div.className.length
-        @display ?= 'initial'
-    
-    update: -> 
-        @size = Math.max -1, @size
-        if @size < 0
-            @collapsed = true
-        else
-            delete @collapsed
-        @div.style.display = @isVisible() and @display or 'none'
-        @div.style.flex = @fixed and "0 0 #{@fixed}px" or @size? and "1 1 #{@size}px" or "1 1 auto"
-
-    setSize: (@size) -> @update()
-    
-    del:       -> @div?.remove(); delete @div
-    collapse:  -> @size = -1; @update()
-    expand:    -> @size = @fixed ? 0; @update()
-    isVisible: -> not @collapsed
-    pos: -> 
-        @div.style.display = @display
-        r = @div.getBoundingClientRect()[@flex.position]
-        @div.style.display = @isVisible() and @display or 'none'
-        r - @flex.pos()
-
 # 00000000  000      00000000  000   000  
 # 000       000      000        000 000   
 # 000000    000      0000000     00000    
 # 000       000      000        000 000   
 # 000       0000000  00000000  000   000  
 
+Pane   = require './pane'
+Handle = require './handle'
+
+{ getStyle, clamp, elem, drag, def, error, log, $, _} = require 'kxk'
+
 class Flex 
     
     constructor: (opt) ->
         
-        @handleSize  = opt.handleSize ? 6
-        @snapOffset  = opt.snapOffset ? 20
-        @direction   = opt.direction ? 'horizontal'
-        @onPaneSize  = opt.onPaneSize
-        @onDragStart = opt.onDragStart
-        @onDrag      = opt.onDrag
-        @onDragEnd   = opt.onDragEnd
+        @handleSize    = opt.handleSize ? 6
+        @direction     = opt.direction ? 'horizontal'
+        @snapFirst     = opt.snapFirst
+        @snapLast      = opt.snapLast
+        @onPaneSize    = opt.onPaneSize
+        @onDragStart   = opt.onDragStart
+        @onDrag        = opt.onDrag
+        @onDragEnd     = opt.onDragEnd
     
         horz         = @direction == 'horizontal'
         @dimension   = horz and 'width' or 'height'
@@ -134,6 +64,7 @@ class Flex
                 paneb: newPane
             
         @panes.push newPane
+        @relax()
 
     # 00000000    0000000   00000000   
     # 000   000  000   000  000   000  
@@ -142,10 +73,10 @@ class Flex
     # 000         0000000   000        
     
     popPane: ->
-        log "popPane #{@panes.length}"
-        if @panes.length > 1 # > 2?
+        if @panes.length > 1
             @panes.pop().del()
             @handles.pop().del()
+        @relax()    
 
     # 00000000   00000000  000       0000000   000   000  
     # 000   000  000       000      000   000   000 000   
@@ -154,10 +85,16 @@ class Flex
     # 000   000  00000000  0000000  000   000  000   000  
     
     relax: ->
-        log 'relax'
-        for p in @panes
-            if p.isVisible()
-                p.div.style.flex = "1 1 auto"
+        @relaxed = true
+        for p in @visiblePanes()
+            p.div.style.flex = "1 1 0"
+            p.size = 0
+
+    unrelax: ->
+        log 'unrelax'
+        @relaxed = false
+        for p in @visiblePanes()
+            p.size = p.actualSize()
 
     #  0000000   0000000   000       0000000  
     # 000       000   000  000      000       
@@ -197,6 +134,8 @@ class Flex
         @moveHandleToPos handle, opt.pos        
     
     moveHandleToPos: (handle, pos) ->
+    
+        if @relaxed then @unrelax()
         offset = pos - handle.pos()
         prev  = @prevAllInv(handle) ? @prevVisFlex(handle) ? @prevFlex handle
         next  = @nextAllInv(handle) ? @nextVisFlex(handle) ? @nextFlex handle
@@ -204,18 +143,18 @@ class Flex
         delete next.collapsed
         prevSize = prev.size + offset
         nextSize = next.size - offset
-        if prevSize < @snapOffset
+        if @snapFirst? and prevSize < @snapFirst
             if not @prevVisPane prev
-                if prevSize <= 0 or offset < @snapOffset # collapse panea
+                if prevSize <= 0 or offset < @snapFirst # collapse panea
                     prevSize = -1
                     nextSize = next.size + prev.size
             else
                 if prevSize < 0
                     prevSize = 0
                     nextSize = next.size + prev.size
-        else if nextSize < @snapOffset
+        else if @snapLast? and nextSize < @snapLast
             if not @nextVisPane next
-                if nextSize <= 0 or -offset < @snapOffset # collapse paneb
+                if nextSize <= 0 or -offset < @snapLast # collapse paneb
                     nextSize = -1
                     prevSize = prev.size + next.size
             else
@@ -256,6 +195,8 @@ class Flex
     # 000   000  000          000     
     #  0000000   00000000     000     
     
+    numPanes:      -> @panes.length
+    visiblePanes:  -> @panes.filter (p) -> p.isVisible()
     panePositions: -> ( p.pos() for p in @panes )
     paneSizes:     -> ( p.size for p in @panes )
     sizeOfPane:  (i) -> @panes[@paneIndex i].size

@@ -13,7 +13,6 @@ class Column
     constructor: (@browser) ->
         
         @index = @browser.columns.length
-        # log "Column #{@index}"
 
         @rows = []
         @div = elem class: 'browserColumn', tabIndex: @index, id: "column#{@index}"
@@ -52,16 +51,16 @@ class Column
    
     navigateTo: (target) ->
         target = _.isString(target) and target or target?.file
-        if not @parent
-            error 'no parent?'
+        if not @parent then return error 'no parent?'
         # log 'navigateTo target:', target, 'parent:', @parent.abs
         relpath = relative target, @parent.abs
-        log 'activate rowWithName', relitem = _.first relpath.split path.sep
+        relitem = _.first relpath.split path.sep
+        # log 'activate rowWithName', relitem
         row = @rowWithName relitem
         if row
             @activateRow row
         else
-            log 'end file navigation'
+            # log 'end file navigation'
             @browser.navigateTargetFile = null
 
     setActiveRow: (row) -> @row(row)?.setActive()

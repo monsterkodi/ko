@@ -2,4 +2,4 @@ ignore
     /syntax/
     /md/
     /bin/cheet.noon
-coffee  . map inline 
+coffee  . map file 
