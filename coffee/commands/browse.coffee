@@ -4,7 +4,7 @@
 # 000   000  000   000  000   000  000   000       000  000       
 # 0000000    000   000   0000000   00     00  0000000   00000000  
 
-{ dirExists, process, log, str
+{ dirExists, process, resolve, post, log, str
 }        = require 'kxk'
 Command  = require '../commandline/command'
 Browser  = require '../browser/browser'
@@ -19,7 +19,10 @@ class Browse extends Command
         @commands   = Object.create null
         @shortcuts  = ['command+.', 'command+shift+.']
         @names      = ["browse", "Browse"]
+        
         @area.on 'resized', @onAreaResized
+        
+        post.on 'browser-item-activated', @onItemActivated
         
         super @commandline
 
@@ -57,8 +60,13 @@ class Browse extends Command
             log "execute browse #{command}"
             if dirExists command
                 @browser.browse command
-        @browser.focus()
     
+    onItemActivated: (item) =>
+        if item.abs 
+            resolved = resolve item.abs 
+            if item.type == 'dir' then resolved += '/'
+            @commandline.setText resolved
+            
     onAreaResized: (w, h) => @browser.resized? w,h
                 
 module.exports = Browse

@@ -4,8 +4,7 @@
 # 000   000  000   000  000   000
 # 000   000   0000000   00     00
 
-{ elem, post, error, log, $, _ 
-} = require 'kxk'
+{ elem, post, error, log, $, _ } = require 'kxk'
 
 syntax = require '../editor/syntax'
 
@@ -28,7 +27,7 @@ class Row
     # 000   000   0000000     000     000      0      000   000     000     00000000  
     
     activate: =>
-        @setActive()
+        @setActive emit:true
         switch @item.type
             when 'dir'  then @column.browser.loadDir     @item.abs, column: @column.index+1, parent: @item
             when 'file' then @column.browser.loadContent @item,     column: @column.index+1
@@ -37,9 +36,10 @@ class Row
     
     isActive: -> @div.classList.contains 'active'
     
-    setActive: ->
+    setActive: (opt = emit:false) ->
         @column.activeRow()?.clearActive()
         @div.classList.add 'active'
+        post.emit 'browser-item-activated', @item if opt?.emit
         @
                 
     clearActive: ->

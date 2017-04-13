@@ -25,7 +25,7 @@ class Browser extends Stage
     
     loadFile: (file, opt) ->
         dir = packagePath file
-        @loadDir dir, file: file, column:0
+        @loadDir dir, file: file, column:0, focus: true
 
     # 0000000    00000000    0000000   000   000   0000000  00000000  
     # 000   000  000   000  000   000  000 0 000  000       000       
@@ -35,7 +35,7 @@ class Browser extends Stage
     
     browse: (dir) -> 
         return error "no dir?" if not dir?
-        @loadDir dir, column:0, row: 0
+        @loadDir dir, column:0, row: 0, focus:true
 
     # 000       0000000    0000000   0000000    0000000    000  00000000   
     # 000      000   000  000   000  000   000  000   000  000  000   000  
@@ -53,7 +53,7 @@ class Browser extends Stage
                 name: path.basename dir
             if not opt?.column or @columns[0]?.activeRow()?.item.name == '..'
                 updir = resolve path.join dir, '..'
-                log 'updir', updir, dir, @columns[0].parent?.abs
+                # log 'updir', updir, dir, @columns[0].parent?.abs
                 if not (updir == dir == '/') and (not @columns[0].parent? or @columns[0].parent.abs.startsWith dir) 
                     items.unshift 
                         name: '..'
@@ -116,8 +116,14 @@ class Browser extends Stage
             @navigateTargetFile = opt.file
         
         col.setItems items, opt
-        
+                
         if opt.row? then col.focus()
+        if opt.focus? then @focus()
+
+    endNavigateToTarget: ->
+        delete @navigateTargetFile
+        log 'navigation ended'
+        @focus()
       
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       

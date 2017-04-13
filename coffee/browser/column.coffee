@@ -52,18 +52,14 @@ class Column
     navigateTo: (target) ->
         target = _.isString(target) and target or target?.file
         if not @parent then return error 'no parent?'
-        # log 'navigateTo target:', target, 'parent:', @parent.abs
         relpath = relative target, @parent.abs
         relitem = _.first relpath.split path.sep
-        # log 'activate rowWithName', relitem
         row = @rowWithName relitem
         if row
             @activateRow row
-        else
-            # log 'end file navigation'
-            @browser.navigateTargetFile = null
-
-    setActiveRow: (row) -> @row(row)?.setActive()
+        else            
+            @browser.endNavigateToTarget()
+            
     activateRow:  (row) -> @row(row)?.activate()
        
     activeRow: -> 
@@ -97,7 +93,7 @@ class Column
 
     focus: ->
         if not @activeRow() and @numRows()
-            @rows[0].setActive()
+            @rows[0].setActive emit:true
         @div.focus()
         @
         
@@ -133,12 +129,14 @@ class Column
             when 'left'  then @browser.navigate 'left'
             when 'right' then @browser.navigate 'right'
             when 'enter'
-                item = @activeRow()?.item
-                type = item?.type
-                if type == 'dir'
-                    @browser.browse item.abs
-                else if item?.textFile
-                    post.emit 'focus', 'editor'
+                if item = @activeRow()?.item
+                    type = item.type
+                    if type == 'dir'
+                        @browser.browse item.abs
+                    else if type == 'file' and item.textFile
+                        post.emit 'focus', 'editor'
+                    else if item.file
+                        post.emit 'focus', 'editor'
 
     navigateRoot: (key) ->
         @browser.browse switch key
