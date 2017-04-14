@@ -3,25 +3,15 @@
 # 000000000  000000000  000  000 0 000
 # 000 0 000  000   000  000  000  0000
 # 000   000  000   000  000  000   000
-{
-splitFilePos,
-fileExists,
-dirExists,
-fileList,
-resolve,
-about,
-prefs,
-str,
-log
+
+{ splitFilePos, fileExists, dirExists, fileList, resolve,
+about, prefs, noon, fs, str, log, _
 }             = require 'kxk'
 pkg           = require '../package.json'
 Execute       = require './execute'
 Navigate      = require './navigate'
 Indexer       = require './indexer'
 MainMenu      = require './mainmenu'
-_             = require 'lodash'
-fs            = require 'fs'
-noon          = require 'noon'
 colors        = require 'colors'
 electron      = require 'electron'
 childp        = require 'child_process'

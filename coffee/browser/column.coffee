@@ -4,16 +4,20 @@
 # 000       000   000  000      000   000  000 0 000  000  0000
 #  0000000   0000000   0000000   0000000   000   000  000   000
 
-{ packagePath, relative, resolve, keyinfo, path, post, elem, clamp, error, log, $, _ 
+{ packagePath, stopEvent, relative, resolve, keyinfo, 
+  path, post, elem, clamp, error, log, $, _ 
 }   = require 'kxk'
 Row = require './row'
+fuzzaldrin = require 'fuzzaldrin'
+fuzzy      = require 'fuzzy'
 
 class Column
     
     constructor: (@browser) ->
         
         @index = @browser.columns.length
-
+        @search = ''
+        @searchTimer = null
         @rows = []
         @div = elem class: 'browserColumn', tabIndex: @index, id: "column#{@index}"
         @browser.cols.appendChild @div
@@ -107,12 +111,12 @@ class Column
     # 000   000  000   000      0      000   0000000   000   000     000     00000000  
 
     navigateRows: (key) ->
-        # log 'key', key, @numRows()
+
         return error "no rows in column #{@index}?" if not @numRows()
         index = @activeRow()?.index() ? -1
         error "no index from activeRow? #{index}?", @activeRow() if not index? or Number.isNaN index
         index = switch key
-            when 'up'        then index-1 #(@numRows() + index-1) % @numRows() 
+            when 'up'        then index-1
             when 'down'      then index+1
             when 'home'      then 0
             when 'end'       then @numRows()-1
@@ -144,6 +148,36 @@ class Column
             when 'up'    then @parent.abs
             when 'right' then @activeRow().item.abs
             when 'down'  then packagePath @parent.abs
+            when ','     then '~'
+            when '/'     then '/'
+            
+    #  0000000  00000000   0000000   00000000    0000000  000   000    
+    # 000       000       000   000  000   000  000       000   000    
+    # 0000000   0000000   000000000  0000000    000       000000000    
+    #      000  000       000   000  000   000  000       000   000    
+    # 0000000   00000000  000   000  000   000   0000000  000   000    
+    
+    doSearch: (char) ->
+
+        clearTimeout @searchTimer
+        @searchTimer = setTimeout @clearSearch, 2000
+        @search += char
+        
+        if not @searchDiv
+            @searchDiv = elem class: 'browserSearch'
+        @searchDiv.textContent = @search
+
+        fuzzied = fuzzy.filter @search, @rows, extract: (r) -> r.item.name
+        if fuzzied.length
+            fuzzied = _.sortBy fuzzied, (o) -> 2 - fuzzaldrin.score o.string, @search
+            item = fuzzied[0].original
+            item.activate()
+            item.div.appendChild @searchDiv
+    
+    clearSearch: =>
+        @search = ''
+        @searchDiv?.remove()
+        delete @searchDiv
         
     # 000   000  00000000  000   000  
     # 000  000   000        000 000   
@@ -152,11 +186,19 @@ class Column
     # 000   000  00000000     000     
     
     onKey: (event) =>
-        {mod,key,combo} = keyinfo.forEvent event
-        # log "#{@index} #{combo}"
+        
+        {mod, key, combo, char} = keyinfo.forEvent event
+
         switch combo
-            when 'up', 'down', 'page up', 'page down', 'home', 'end' then @navigateRows key
-            when 'right', 'left', 'enter' then @navigateCols key
-            when 'command+left', 'command+up', 'command+right', 'command+down' then @navigateRoot key
+            when 'up', 'down', 'page up', 'page down', 'home', 'end'          then @navigateRows key
+            when 'right', 'left', 'enter'                                     then @navigateCols key
+            when 'command+left', 'command+up','command+right', 'command+down', 'command+,', 'command+/' then @navigateRoot key
+            when 'backspace' then @clearSearch()
+            when 'esc'
+                if @search.length then @clearSearch()
+                else window.split.focus 'commandline-editor'
+                stopEvent event
+
+        if char then @doSearch char
         
 module.exports = Column

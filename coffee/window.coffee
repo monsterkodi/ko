@@ -301,17 +301,11 @@ editor.on 'changed', (changeInfo) ->
 window.editorWithName = (n) ->
     switch n
         when 'editor'   then editor
-        when 'command'  then commandline
+        when 'command', 'commandline' then commandline
         when 'terminal' then terminal
         when 'logview'  then logview
+        else editor
         
-window.editorWithClassName = (n) ->
-    switch n
-        when 'editor'      then editor
-        when 'commandline' then commandline
-        when 'terminal'    then terminal
-        when 'logview'     then logview    
-
 fps = window.fps = new FPS()
 
 # 00000000   00000000   0000000  000  0000000  00000000
@@ -413,9 +407,9 @@ window.onfocus = (event) ->
     window.editor.updateTitlebar()
     if document.activeElement.className == 'body'
         if split.editorVisible()
-            split.focus '.editor'
+            split.focus 'editor'
         else
-            split.focus '.commandline-editor'
+            split.focus 'commandline-editor'
               
 # 000   000  00000000  000   000
 # 000  000   000        000 000 

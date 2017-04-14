@@ -15,7 +15,7 @@ class Row
         @div = elem class: 'browserRow', html: syntax.spanForText @item.text ? @item.name
         @div.classList.add @item.type
         @div.addEventListener 'click', @activate
-        @div.addEventListener 'dblclick', => @column.navigateRows 'enter'
+        @div.addEventListener 'dblclick', => @column.navigateCols 'enter'
         @column.div.appendChild @div
    
     index: -> @column.rows.indexOf @

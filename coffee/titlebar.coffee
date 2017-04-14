@@ -6,6 +6,7 @@
 {
 packagePath,
 unresolve,
+stopEvent,
 clamp,
 log,
 $}       = require 'kxk'
@@ -129,8 +130,9 @@ class Titlebar
                 when 'esc', 'alt+`' then return @closeList()
                 when 'up', 'down'   then return @navigate key
                 when 'enter'      
-                    event.stopPropagation()
-                    event.preventDefault()
+                    stopEvent event
+                    # event.stopPropagation()
+                    # event.preventDefault()
                     return @loadSelected()
         
         return 'unhandled'

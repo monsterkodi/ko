@@ -25,7 +25,6 @@ maintainers
 bugs
                 url  https://github.com/monsterkodi/ko/issues
 dependencies
-                ansi-keycode    0.0.0
                 chokidar        ^1.6.1
                 coffee-script   ^1.12.4
                 colors          ^1.1.2
@@ -41,7 +40,7 @@ dependencies
                 immutable       ^3.8.1
                 karg            >=1.0.9
                 keycode         ^2.1.8
-                kxk             ^0.9.0
+                kxk             ^0.10.2
                 lodash          ^4.17.4
                 nconf           ^0.8.4
                 node-pty        ^0.6.3

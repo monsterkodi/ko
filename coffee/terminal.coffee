@@ -139,7 +139,7 @@ class Terminal extends TextEditor
                 return if @meta.saveChanges()
             when 'esc'
                 split = window.split
-                split.focus '.commandline-editor'
+                split.focus 'commandline-editor'
                 split.do    'enlarge editor'
                 return
                 

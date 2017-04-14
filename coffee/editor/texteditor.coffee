@@ -13,7 +13,6 @@ syntax    = require './syntax'
 scroll    = require './scroll'
 Editor    = require './editor'
 path      = require 'path'
-ansiKey   = require 'ansi-keycode'
 electron  = require 'electron'
 ipc       = electron.ipcRenderer
 
@@ -645,7 +644,7 @@ class TextEditor extends Editor
         'unhandled'
 
     onKeyDown: (event) =>
-        {mod, key, combo} = keyinfo.forEvent event
+        {mod, key, combo, char} = keyinfo.forEvent event
         return if not combo
         return if key == 'right click' # weird right command key
 
@@ -678,7 +677,7 @@ class TextEditor extends Editor
         # switch key            
             # when 'backspace' then return
             
-        if ansiKey(event)?.length == 1 and mod in ["shift", ""]
-            @insertCharacter ansiKey event
+        if char and mod in ["shift", ""]
+            @insertCharacter char
 
 module.exports = TextEditor

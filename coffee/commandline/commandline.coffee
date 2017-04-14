@@ -145,15 +145,14 @@ class Commandline extends TextEditor
     # 000        000 000   000       000       000   000     000     000     
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
     
-    execute: -> @results @command?.execute @line(0)
+    execute: -> @results @command?.execute @line 0 
         
     results: (r) ->
         @setText r.text if r?.text?
         @setName r.name if r?.name?
-        if r?.select then @selectAll()
-        else @selectNone()
-        window.split.focus  r.focus  if r?.focus?
+        if r?.select then @selectAll() else @selectNone()
         window.split.show   r.show   if r?.show?
+        window.split.focus  r.focus  if r?.focus?
         window.split.do     r.do     if r?.do?
         
     cancel: -> @results @command?.cancel()

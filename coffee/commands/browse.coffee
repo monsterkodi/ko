@@ -4,7 +4,7 @@
 # 000   000  000   000  000   000  000   000       000  000       
 # 0000000    000   000   0000000   00     00  0000000   00000000  
 
-{ dirExists, process, resolve, post, log, str
+{ dirExists, process, unresolve, resolve, post, log, str
 }        = require 'kxk'
 Command  = require '../commandline/command'
 Browser  = require '../browser/browser'
@@ -23,6 +23,7 @@ class Browse extends Command
         @area.on 'resized', @onAreaResized
         
         post.on 'browser-item-activated', @onItemActivated
+        post.on 'browser-match',          @onBrowserMatch
         
         super @commandline
 
@@ -55,17 +56,19 @@ class Browse extends Command
     
     execute: (command) ->
         @cmdID += 1
-        command = command.trim()
-        if command.length 
-            log "execute browse #{command}"
-            if dirExists command
-                @browser.browse command
+        cmd = command.trim()
+        if cmd.length 
+            if dirExists cmd
+                @browser.browse cmd
     
     onItemActivated: (item) =>
         if item.abs 
-            resolved = resolve item.abs 
-            if item.type == 'dir' then resolved += '/'
-            @commandline.setText resolved
+            pth = unresolve item.abs 
+            if item.type == 'dir' then pth += '/'
+            @commandline.setText pth
+
+    onBrowserMatch: (match) =>
+        log match
             
     onAreaResized: (w, h) => @browser.resized? w,h
                 

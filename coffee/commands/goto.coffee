@@ -72,7 +72,8 @@ class Goto extends Command
         command = super command
         if /^\-?\d+$/.test command # goto line number
             line = parseInt command
-            editor = window.editorWithClassName @focus
+            editor = window.editorWithName @focus
+            return error "no editor? focus: #{@focus}" if not editor?
             if line < 0
                 line = editor.numLines() + line
             else 
