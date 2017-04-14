@@ -4,8 +4,10 @@
 # 000   000  000   000  000   000  000   000       000  000       000   000  
 # 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 
-{ packagePath, fileName, resolve, elem, post, clamp, error, log, process, path, _
+{ packagePath, encodePath, fileName, swapExt, resolve, elem, post, clamp, 
+  error, log, process, path, fs, os, _
 }        = require 'kxk'
+childp   = require 'child_process'
 Column   = require './column'
 Stage    = require '../area/stage'
 dirlist  = require '../tools/dirlist'
@@ -67,11 +69,11 @@ class Browser extends Stage
     # 000      000   000  000   000  000   000  000       000   000  000  0000     000     000       000  0000     000     
     # 0000000   0000000   000   000  0000000     0000000   0000000   000   000     000     00000000  000   000     000     
     
-    loadContent: (item, opt) ->
-        
+    loadContent: (row, opt) ->
+        item  = row.item
         items = []
-        file = item.abs
-        name = fileName file
+        file  = item.abs
+        name  = fileName file
         
         clsss = ipc.sendSync 'indexer', 'classes'
         clsss = _.pickBy clsss, (obj, key) -> obj.file == file
@@ -92,14 +94,58 @@ class Browser extends Stage
             opt.parent ?= item
             @loadItems items, opt
         else
-            if path.extname(file) in ['.gif', '.png', '.jpg']
-                error 'load image?', file
+            ext = path.extname file  
+            if ext in ['.gif', '.png', '.jpg']
+                @loadImage row, file
+            else if ext in ['.icns', '.tiff', '.tif']
+                @convertImage row
+            else if ext in ['.pxm']
+                @convertPXM row
             # else
                 # log 'load finder icon?', file
             
         if item.textFile
             # log 'jump to text file', item
             post.emit 'jumpTo', file:file
+
+    # 000  00     00   0000000    0000000   00000000  
+    # 000  000   000  000   000  000        000       
+    # 000  000000000  000000000  000  0000  0000000   
+    # 000  000 0 000  000   000  000   000  000       
+    # 000  000   000  000   000   0000000   00000000  
+    
+    convertPXM: (row) ->
+        item = row.item
+        file = item.abs
+        tmpPXM = path.join os.tmpdir(), "ko-#{fileName file}.pxm"
+        tmpPNG = swapExt tmpPXM, '.png'
+
+        fs.copy file, tmpPXM, (err) =>
+            return error "can't copy pxm image #{file} to #{tmpPXM}: #{err}" if err?
+            childp.exec "open #{__dirname}/../../bin/pxm2png.app --args #{tmpPXM}", (err) =>
+                return error "can't convert pxm image #{tmpPXM} to #{tmpPNG}: #{err}" if err?
+                loadDelayed = => @loadImage row, tmpPNG
+                setTimeout loadDelayed, 300
+
+    convertImage: (row) ->
+        item = row.item
+        file = item.abs
+        tmpImage = path.join os.tmpdir(), "ko-#{path.basename file}.png"
+        
+        childp.exec "/usr/bin/sips -s format png \"#{file}\" --out \"#{tmpImage}\"", (err) =>
+            return error "can't convert image #{file}: #{err}" if err?
+            @loadImage row, tmpImage
+
+    loadImage: (row, file) ->
+        return if not row.isActive()
+        item = row.item
+        # log "loadImage #{file}"        
+
+        col = @emptyColumn opt?.column
+        @clearColumnsFrom col.index
+        cnt = elem class: 'browserImageContainer', child: 
+            elem 'img', class: 'browserImage', src: "file://#{encodePath file}"
+        col.div.appendChild cnt
 
     # 000       0000000    0000000   0000000    000  000000000  00000000  00     00   0000000  
     # 000      000   000  000   000  000   000  000     000     000       000   000  000       
