@@ -20,6 +20,9 @@ class Row
    
     index: -> @column.rows.indexOf @
     
+    onMouseOut: -> @div.classList.remove 'hover'
+    onMouseOver: -> @div.classList.add 'hover'
+
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
     # 000   000  000          000     000  000   000  000   000     000     000       
     # 000000000  000          000     000   000 000   000000000     000     0000000   
@@ -27,6 +30,7 @@ class Row
     # 000   000   0000000     000     000      0      000   000     000     00000000  
     
     activate: =>
+        $('.hover')?.classList.remove 'hover'
         @setActive emit:true
         switch @item.type
             when 'dir'  then @column.browser.loadDir     @item.abs, column: @column.index+1, parent: @item

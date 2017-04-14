@@ -26,6 +26,9 @@ class Column
         @div.addEventListener 'blur',    @onBlur
         @div.addEventListener 'keydown', @onKey
         
+        @div.addEventListener 'mouseover', @onMouseOver
+        @div.addEventListener 'mouseout',  @onMouseOut
+        
     #  0000000  00000000  000000000  000  000000000  00000000  00     00   0000000  
     # 000       000          000     000     000     000       000   000  000       
     # 0000000   0000000      000     000     000     0000000   000000000  0000000   
@@ -76,9 +79,12 @@ class Column
             return r if r.item.name == name
         null
 
-    row: (row) -> # accepts row or index
+    row: (row) -> # accepts element, index or row
         if _.isNumber(row) and row >= 0 and row < @numRows() 
             @rows[row] 
+        else if _.isElement row 
+            for r in @rows
+                if r.div.contains row then return r
         else
             row
             
@@ -103,6 +109,9 @@ class Column
         
     onFocus: => @div.classList.add 'focus'
     onBlur:  => @div.classList.remove 'focus'
+    
+    onMouseOver: (event) => @row(event.target)?.onMouseOver()
+    onMouseOut:  (event) => @row(event.target)?.onMouseOut()
     
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       

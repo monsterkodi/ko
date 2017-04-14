@@ -16,8 +16,8 @@ class Commandline extends TextEditor
     constructor: (viewElem) ->
             
         @fontSizeDefault = 24
-        @mainCommands = ['open', 'search', 'find', 'goto', 'term', 'coffee', 'build', 'macro']
-        @hideCommands = ['selecto', 'Term', 'Build', 'Coffee']
+        @mainCommands = ['open', 'search', 'find', 'goto', 'term', 'browse', 'coffee', 'build', 'macro']
+        @hideCommands = ['selecto', 'Term', 'Build', 'Coffee', 'Browse']
 
         super viewElem, features: []
         
@@ -132,6 +132,7 @@ class Commandline extends TextEditor
         window.split.showCommandline()
         @command = @commands[name]
         activeID = document.activeElement.id
+        if activeID.startsWith 'column' then activeID = 'editor'
         @command.setFocus activeID != 'commandline-editor' and activeID or null
         @view.focus()
         @setName name

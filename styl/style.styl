@@ -104,15 +104,19 @@ body
     white-space         nowrap
     cursor              pointer
     color               #88f
-    &:hover             
-        color           #fff
+
+    &.hover   
+        background      #111
         
     &.active
         background      #222
 
+    &.hover             
+        color           #fff
+
 .browserColumn.focus .browserRow.active
     background          #333
-
+    
 .browserSearch
     padding-right       12px
     float               right
@@ -162,6 +166,8 @@ span.ko
         color       #8f0
     &.goto
         color       #66f
+    &.browse
+        color       #ff0
     &.find
         color       #f5f
     &.search

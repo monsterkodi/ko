@@ -43,10 +43,10 @@ class Browse extends Command
             @browser.loadDir process.cwd()
 
         super combo
-        log 'start'
+        
         text:   @last()
         select: true
-        do:     'show area'
+        do:     @name == 'Browse' and 'half area' or 'quart area'
 
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000  
     # 000        000 000   000       000       000   000     000     000       

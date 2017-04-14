@@ -72,9 +72,11 @@ class Split extends event
         switch action
             when 'show'     then return @show what
             when 'focus'    then return @focus what
-            # when 'half'     then delta = @elemHeight()/2 - @flex.posOfHandle(0) - @handleHeight - 2
-            when 'maximize' then delta = @elemHeight()
-            when 'minimize' then delta = -@elemHeight()
+            when 'half'     then pos = @flex.size()/2
+            when 'third'    then pos = @flex.size()/3
+            when 'quart'    then pos = @flex.size()/4
+            when 'maximize' then delta = @flex.size()
+            when 'minimize' then delta = -@flex.size()
             when 'enlarge'
                 if words[2] == 'by'
                     delta = parseInt words[3]
@@ -91,7 +93,8 @@ class Split extends event
             when 'editor' then return @moveCommandLineBy -delta
             when 'terminal', 'area'
                 @raise what
-                @moveCommandLineBy delta if delta?
+                if delta? then @moveCommandLineBy delta
+                if pos? then @flex.moveHandleToPos @flex.handles[0], pos
                 return 
                 
         error "Split.do -- unhandled do command? #{sentence}?"
