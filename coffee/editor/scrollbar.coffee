@@ -3,10 +3,8 @@
 # 0000000   000       0000000    000   000  000      000      0000000    000000000  0000000
 #      000  000       000   000  000   000  000      000      000   000  000   000  000   000
 # 0000000    0000000  000   000   0000000   0000000  0000000  0000000    000   000  000   000
-{
-clamp,
-drag,
-log
+
+{ stopEvent, clamp, drag, log
 } = require 'kxk'
 
 class Scrollbar
@@ -76,9 +74,8 @@ class Scrollbar
             @scrollX += event.deltaX
         else
             @scrollY += event.deltaY * scrollFactor()
-            
-        event.preventDefault()
-        event.stopPropagation()
+        
+        stopEvent event    
         
     scrollAnim: =>
         if @scrollX or @scrollY

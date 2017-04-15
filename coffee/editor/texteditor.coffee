@@ -440,7 +440,7 @@ class TextEditor extends Editor
 
     scrollBy: (delta, x=0) ->        
         @scroll.by delta if delta
-        # @layers.scrollLeft += x/2 if x
+        @layers.scrollLeft += x if x
         @updateScrollOffset()
         
     scrollTo: (p) ->
