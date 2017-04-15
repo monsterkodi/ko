@@ -16,7 +16,7 @@ class Row
         @div.classList.add @item.type
         @div.addEventListener 'click', @activate
         @div.addEventListener 'dblclick', => @column.navigateCols 'enter'
-        @column.div.appendChild @div
+        @column.table.appendChild @div
    
     index: -> @column.rows.indexOf @
     

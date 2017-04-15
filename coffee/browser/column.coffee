@@ -20,6 +20,8 @@ class Column
         @searchTimer = null
         @rows = []
         @div = elem class: 'browserColumn', tabIndex: @index, id: "column#{@index}"
+        @table = elem class: 'browserColumnTable'
+        @div.appendChild @table
         @browser.cols.appendChild @div
         
         @div.addEventListener 'focus',   @onFocus
@@ -49,7 +51,7 @@ class Column
         
     isEmpty: -> _.isEmpty @rows
     clear:   -> 
-        @div.innerHTML = ''
+        @table.innerHTML = ''
         @rows = []
         
     #  0000000    0000000  000000000  000  000   000  00000000  
@@ -211,9 +213,15 @@ class Column
         {mod, key, combo, char} = keyinfo.forEvent event
 
         switch combo
-            when 'up', 'down', 'page up', 'page down', 'home', 'end'          then @navigateRows key
-            when 'right', 'left', 'enter'                                     then @navigateCols key
-            when 'command+left', 'command+up','command+right', 'command+down', 'command+,', 'command+/' then @navigateRoot key
+            when 'up', 'down', 'page up', 'page down', 'home', 'end' 
+                @navigateRows key
+            when 'right', 'left', 'enter'                            
+                stopEvent event 
+                @navigateCols key
+            when 'command+left', 'command+up','command+right', 'command+down'
+                @navigateRoot key
+            when 'command+,', 'command+/'
+                @navigateRoot key
             when 'backspace' then @clearSearch()
             when 'esc'
                 if @search.length then @clearSearch()
