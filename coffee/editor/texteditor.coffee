@@ -613,13 +613,13 @@ class TextEditor extends Editor
                 if d.start <= p[0] <= d.start+d.match.length
                     [file, pos] = splitFilePos d.match
                     if fileExists resolve file
-                        post.emit 'jumpTo', file:file, line:pos[1], col:pos[0]
+                        post.toWin 'jumpTo', file:file, line:pos[1], col:pos[0]
                         return
                         
         word = @wordAtPos p
         range = @rangeForWordAtPos p
         type = 'func'
-        post.emit 'jumpTo', word, type:type
+        post.toWin 'jumpTo', word, type:type
 
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

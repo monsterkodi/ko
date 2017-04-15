@@ -101,12 +101,9 @@ class Browser extends Stage
                 @convertImage row
             else if ext in ['.pxm']
                 @convertPXM row
-            # else
-                # log 'load finder icon?', file
             
         if item.textFile
-            # log 'jump to text file', item
-            post.emit 'jumpTo', file:file
+            post.toWin 'jumpTo', file:file
 
     # 000  00     00   0000000    0000000   00000000  
     # 000  000   000  000   000  000        000       

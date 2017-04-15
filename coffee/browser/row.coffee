@@ -35,7 +35,7 @@ class Row
         switch @item.type
             when 'dir'  then @column.browser.loadDir     @item.abs, column: @column.index+1, parent: @item
             when 'file' then @column.browser.loadContent @,         column: @column.index+1
-            else post.emit 'jumpTo', file: @item.file, line: @item.line
+            else post.toWin 'jumpTo', file: @item.file, line: @item.line
         @
     
     isActive: -> @div.classList.contains 'active'
@@ -43,7 +43,7 @@ class Row
     setActive: (opt = emit:false) ->
         @column.activeRow()?.clearActive()
         @div.classList.add 'active'
-        post.emit 'browser-item-activated', @item if opt?.emit
+        post.toWin 'browser-item-activated', @item if opt?.emit
         @
                 
     clearActive: ->

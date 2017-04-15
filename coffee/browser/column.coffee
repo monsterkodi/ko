@@ -147,9 +147,9 @@ class Column
                     if type == 'dir'
                         @browser.browse item.abs
                     else if type == 'file' and item.textFile
-                        post.emit 'focus', 'editor'
+                        post.toWin 'focus', 'editor'
                     else if item.file
-                        post.emit 'focus', 'editor'
+                        post.toWin 'focus', 'editor'
 
     navigateRoot: (key) ->
         @browser.browse switch key

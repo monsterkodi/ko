@@ -7,14 +7,17 @@
 { resolve, relative, fs, path, error, log, _  
 }       = require 'kxk'
 walkdir = require 'walkdir'
-textext = require 'textextensions'
-
-textmap = _.reduce textext, (map, ext) ->
+textext = _.reduce require('textextensions'), (map, ext) ->
         map[".#{ext}"] = ext
         map
     , {}
-textmap['.noon'] = 'noon'
-textmap['.pug']  = 'pug'
+textext['.noon']    = 'noon'
+textext['.pug']     = 'pug'
+textext['.bashrc']  = 'bashrc'
+textext['.bashrc']  = 'markdown'
+textbase = 
+    profile:1
+    license:1
 
 #   directory list
 #
@@ -44,7 +47,7 @@ dirList = (dirPath, opt, cb) ->
     files   = []
     dirPath = resolve dirPath
     
-    isTextFile = (f) -> path.extname(f) and textmap[path.extname f]?
+    isTextFile = (f) -> path.extname(f) and textext[path.extname f]? or textbase[path.basename(f).toLowerCase()]
 
     filter = (p) ->
         if opt.ignoreHidden and path.basename(p).startsWith '.'

@@ -42,8 +42,8 @@ window.onerror = (event, source, line, col, err) ->
         s = "▲ #{l.source}:#{l.line} ▲ [ERROR] #{err}"
     else
         s = "▲ [ERROR] #{err}"
-    post.emit 'error', s
-    post.emit 'slog', s
+    post.toWin 'error', s
+    post.toWin 'slog', s
     console.log s
     
 # 00000000   00000000   00000000  00000000   0000000
