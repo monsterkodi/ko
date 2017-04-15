@@ -4,15 +4,13 @@
 #    000     000       000   000  000 0 000
 #    000     00000000  000   000  000   000
 
-{ packagePath, dirExists, unresolve, resolve, clamp, log, _
+{ packagePath, dirExists, unresolve, resolve, path, fs, 
+  noon, store, clamp, log, _
 }        = require 'kxk'
 Walker   = require '../tools/walker'
 Syntax   = require '../editor/syntax'
 Command  = require '../commandline/command'
 electron = require 'electron'
-path     = require 'path'
-noon     = require 'noon'
-fs       = require 'fs'
 ipc      = electron.ipcRenderer
 remote   = electron.remote
 
@@ -23,6 +21,8 @@ class Term extends Command
         @commandIDs = Object.create null
         @shortcuts  = ['command+t', 'command+shift+t']
         @names      = ['term', 'Term']
+        log 'create alias store'
+        @alias      = new store 'alias'
         super @commandline
         @maxHistory = 99
         @headers    = false
@@ -210,22 +210,37 @@ class Term extends Command
     # 000   000  0000000  000  000   000  0000000 
     
     aliasCmd: (aliasList) ->
-        terminal = window.terminal
-        alias = ipc.sendSync 'alias'
-        if aliasList.length == 1
-            delete alias[aliasList[0]]
-        else if aliasList.length > 1
-            alias[aliasList[0]] = aliasList.slice(1).join ' '
-        ipc.send 'alias', alias if aliasList.length
         
-        cmmd = 'alias ' + aliasList.join(' ')
+        terminal = window.terminal
+        
+        log 'aliasCmd', aliasList
+
+        cmmd = 'alias ' + aliasList.join ' ' 
         terminal.appendMeta 
             line: "■"
             cmmd:  cmmd.trim()
             clss: 'termCommand'
+
+        if aliasList.length == 1 # show single alias
+            key = aliasList[0]
+            cmd = @alias.get key
+            meta =
+                diss: Syntax.dissForTextAndSyntax "#{_.padEnd key, 10} #{cmd}" , 'noon'
+                line: 0
+                clss: 'termResult'
+            terminal.appendMeta meta
+            return
         
+        if aliasList.length == 2 and aliasList[0] == 'del'
+            
+            @alias.del aliasList[1]
+            
+        else if aliasList.length >= 2 # set alias
+            
+            @alias.set aliasList[0], aliasList.slice(1).join ' '
+                
         li = 0
-        for key,cmd of alias
+        for key,cmd of @alias.data
             li += 1
             meta =
                 diss: Syntax.dissForTextAndSyntax "#{_.padEnd key, 10} #{cmd}" , 'noon'
@@ -249,7 +264,6 @@ class Term extends Command
                 cmds = cmds.concat @splitAlias cmd.trim()
             cmds
         else            
-            alias = ipc.sendSync 'alias'
             split = command.trim().split ' '
             if /^[!]+\d*/.test split[0]
                 if split[0] == '!'
@@ -269,8 +283,8 @@ class Term extends Command
                 else if @idCommands[parseInt(split[0].slice(1))]?
                     split.splice 0, 1, @idCommands[parseInt(split[0].slice(1))]                
             
-            if alias[split[0]]?
-                @splitAlias (alias[split[0]] + ' ' + split.slice(1).join ' ').trim()
+            if @alias.get split[0]
+                @splitAlias (@alias.get(split[0]) + ' ' + split.slice(1).join ' ').trim()
             else
                 [split.join ' ']
                 

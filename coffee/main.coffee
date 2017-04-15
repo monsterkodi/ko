@@ -5,7 +5,7 @@
 # 000   000  000   000  000  000   000
 
 { splitFilePos, fileExists, dirExists, fileList, resolve,
-about, prefs, noon, fs, str, log, _
+about, prefs, store, noon, fs, str, log, _
 }             = require 'kxk'
 pkg           = require '../package.json'
 Execute       = require './execute'
@@ -79,6 +79,7 @@ if args.verbose
 # 000        000   000  00000000  000       0000000 
 
 prefs.init shortcut: 'F2'
+alias = new store 'alias'
 
 if args.prefs
     log colors.yellow.bold 'prefs'
@@ -116,7 +117,6 @@ hideDock = ->
 # 000  000        000     
 # 000  000         0000000
 
-ipc.on 'alias',                  (event, dict)   -> main.alias event, dict
 ipc.on 'newWindowWithFile',      (event, file)   -> main.newWindowWithFile file
 ipc.on 'activateWindowWithFile', (event, file)   -> event.returnValue = main.activateWindowWithFile file
 ipc.on 'toggleDevTools',         (event)         -> event.sender.toggleDevTools()
@@ -511,22 +511,7 @@ class Main
     quit: -> 
         app.exit     0
         process.exit 0
-    
-    #  0000000   000      000   0000000    0000000
-    # 000   000  000      000  000   000  000     
-    # 000000000  000      000  000000000  0000000 
-    # 000   000  000      000  000   000       000
-    # 000   000  0000000  000  000   000  0000000 
-    
-    alias: (event, dict) ->
-        aliasFile = "#{app.getPath('userData')}/alias.noon"
-        if dict?
-            noon.save aliasFile, dict
-        if fileExists aliasFile
-            event.returnValue = noon.load aliasFile
-        else
-            event.returnValue = {}
-    
+        
     #  0000000   0000000     0000000   000   000  000000000
     # 000   000  000   000  000   000  000   000     000   
     # 000000000  0000000    000   000  000   000     000   
