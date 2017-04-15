@@ -165,7 +165,6 @@ class Browser extends Stage
 
     endNavigateToTarget: ->
         delete @navigateTargetFile
-        log 'navigation ended'
         @focus()
       
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  

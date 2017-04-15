@@ -91,7 +91,6 @@ class Flex
             p.size = 0
 
     unrelax: ->
-        log 'unrelax'
         @relaxed = false
         for p in @visiblePanes()
             p.size = p.actualSize()

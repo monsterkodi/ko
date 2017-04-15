@@ -4,7 +4,7 @@
 # 000   000  000   000  000   000
 # 000   000   0000000   00     00
 
-{ elem, post, error, log, $, _ } = require 'kxk'
+{ elem, clamp, post, error, log, $, _ } = require 'kxk'
 
 syntax = require '../editor/syntax'
 
@@ -40,10 +40,23 @@ class Row
     
     isActive: -> @div.classList.contains 'active'
     
+    fixScroll: ->
+        colHeight = @column.div.offsetHeight
+        activeTop = @div.offsetTop
+        rowHeight = @div.clientHeight
+        scrollTop = @column.div.scrollTop
+        if activeTop + rowHeight <= colHeight # no need to scroll
+            return 0
+        return clamp activeTop, activeTop - colHeight + rowHeight, scrollTop
+        
+    clearFixScroll: => delete @column.fixScroll
+        
     setActive: (opt = emit:false) ->
+        @column.fixScroll = @fixScroll()
         @column.activeRow()?.clearActive()
         @div.classList.add 'active'
         post.toWin 'browser-item-activated', @item if opt?.emit
+        setTimeout @clearFixScroll, 100
         @
                 
     clearActive: ->

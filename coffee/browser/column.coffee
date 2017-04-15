@@ -29,6 +29,8 @@ class Column
         @div.addEventListener 'mouseover', @onMouseOver
         @div.addEventListener 'mouseout',  @onMouseOut
         
+        @div.addEventListener 'scroll', @onScroll
+        
     #  0000000  00000000  000000000  000  000000000  00000000  00     00   0000000  
     # 000       000          000     000     000     000       000   000  000       
     # 0000000   0000000      000     000     000     0000000   000000000  0000000   
@@ -113,6 +115,16 @@ class Column
     onMouseOver: (event) => @row(event.target)?.onMouseOver()
     onMouseOut:  (event) => @row(event.target)?.onMouseOut()
     
+    #  0000000   0000000  00000000    0000000   000      000      
+    # 000       000       000   000  000   000  000      000      
+    # 0000000   000       0000000    000   000  000      000      
+    #      000  000       000   000  000   000  000      000      
+    # 0000000    0000000  000   000   0000000   0000000  0000000  
+    
+    onScroll: (event) =>
+        if @fixScroll?
+            @div.scrollTop = @fixScroll
+
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       
     # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000   
