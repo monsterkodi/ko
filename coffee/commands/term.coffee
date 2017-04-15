@@ -21,7 +21,6 @@ class Term extends Command
         @commandIDs = Object.create null
         @shortcuts  = ['command+t', 'command+shift+t']
         @names      = ['term', 'Term']
-        log 'create alias store'
         @alias      = new store 'alias'
         super @commandline
         @maxHistory = 99
@@ -234,10 +233,12 @@ class Term extends Command
         if aliasList.length == 2 and aliasList[0] == 'del'
             
             @alias.del aliasList[1]
+            return
             
         else if aliasList.length >= 2 # set alias
             
             @alias.set aliasList[0], aliasList.slice(1).join ' '
+            return
                 
         li = 0
         for key,cmd of @alias.data
@@ -354,13 +355,13 @@ class Term extends Command
                         clss: 'termCommand'
                         cmmd: "stop"
                                 
-                when 'headers' 
+                when 'header' 
                     
-                    # 000   000  00000000   0000000   0000000    00000000  00000000    0000000  
-                    # 000   000  000       000   000  000   000  000       000   000  000       
-                    # 000000000  0000000   000000000  000   000  0000000   0000000    0000000   
-                    # 000   000  000       000   000  000   000  000       000   000       000  
-                    # 000   000  00000000  000   000  0000000    00000000  000   000  0000000   
+                    # 000   000  00000000   0000000   0000000    00000000  00000000 
+                    # 000   000  000       000   000  000   000  000       000   000
+                    # 000000000  0000000   000000000  000   000  0000000   0000000  
+                    # 000   000  000       000   000  000   000  000       000   000
+                    # 000   000  00000000  000   000  0000000    00000000  000   000
                     
                     if args.length 
                         if args[0] in ['on', 'true', '1'] then   @headers = true
@@ -409,13 +410,13 @@ class Term extends Command
                             clss: 'termResult'
                         terminal.appendMeta meta
                                             
-                when 'files'
+                when 'file'
                     
-                    # 00000000  000  000      00000000   0000000
-                    # 000       000  000      000       000     
-                    # 000000    000  000      0000000   0000000 
-                    # 000       000  000      000            000
-                    # 000       000  0000000  00000000  0000000 
+                    # 00000000  000  000      00000000
+                    # 000       000  000      000     
+                    # 000000    000  000      0000000 
+                    # 000       000  000      000     
+                    # 000       000  0000000  00000000
                     
                     window.split.show 'terminal'
                     files = ipc.sendSync 'indexer', 'files'
@@ -437,13 +438,13 @@ class Term extends Command
                         terminal.queueMeta meta
                         li += 1
                         
-                when 'funcs'
+                when 'func'
                     
-                    # 00000000  000   000  000   000   0000000   0000000
-                    # 000       000   000  0000  000  000       000     
-                    # 000000    000   000  000 0 000  000       0000000 
-                    # 000       000   000  000  0000  000            000
-                    # 000        0000000   000   000   0000000  0000000 
+                    # 00000000  000   000  000   000   0000000
+                    # 000       000   000  0000  000  000     
+                    # 000000    000   000  000 0 000  000     
+                    # 000       000   000  000  0000  000     
+                    # 000        0000000   000   000   0000000
                     
                     window.split.show 'terminal'
                     funcs = ipc.sendSync 'indexer', 'funcs'
@@ -469,13 +470,13 @@ class Term extends Command
                             terminal.queueMeta meta
                             i += 1
                         
-                when 'classes', 'class'
+                when 'class'
                     
-                    #  0000000  000       0000000    0000000   0000000  00000000   0000000
-                    # 000       000      000   000  000       000       000       000     
-                    # 000       000      000000000  0000000   0000000   0000000   0000000 
-                    # 000       000      000   000       000       000  000            000
-                    #  0000000  0000000  000   000  0000000   0000000   00000000  0000000 
+                    #  0000000  000       0000000    0000000   0000000
+                    # 000       000      000   000  000       000     
+                    # 000       000      000000000  0000000   0000000 
+                    # 000       000      000   000       000       000
+                    #  0000000  0000000  000   000  0000000   0000000 
                     
                     window.split.show 'terminal'
                     classes = ipc.sendSync 'indexer', 'classes'
@@ -496,13 +497,13 @@ class Term extends Command
                                 clss: 'termResult'
                             terminal.queueMeta meta
                             
-                when 'words'
+                when 'word'
                     
-                    # 000   000   0000000   00000000   0000000     0000000
-                    # 000 0 000  000   000  000   000  000   000  000     
-                    # 000000000  000   000  0000000    000   000  0000000 
-                    # 000   000  000   000  000   000  000   000       000
-                    # 00     00   0000000   000   000  0000000    0000000 
+                    # 000   000   0000000   00000000   0000000  
+                    # 000 0 000  000   000  000   000  000   000
+                    # 000000000  000   000  0000000    000   000
+                    # 000   000  000   000  000   000  000   000
+                    # 00     00   0000000   000   000  0000000  
                     
                     window.split.show 'terminal'
                     words = ipc.sendSync 'indexer', 'words'
