@@ -53,10 +53,10 @@ class Row
     clearFixScroll: => delete @column.fixScroll
         
     setActive: (opt = emit:false) ->
-        @column.fixScroll = @fixScroll()
+        @column.div.scrollTop = @column.fixScroll = @fixScroll()
         @column.activeRow()?.clearActive()
         @div.classList.add 'active'
-        post.toWin 'browser-item-activated', @item if opt?.emit
+        post.toWin 'browser-item-activated', @item if opt?.emit # sets commandline text
         setTimeout @clearFixScroll, 100
         @
                 
