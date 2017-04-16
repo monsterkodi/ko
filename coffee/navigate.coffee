@@ -25,7 +25,7 @@ class Navigate
     # 000   000   0000000     000     000   0000000   000   000
 
     action: (opt) =>
-        log 'navigate.action', opt, @filePositions
+        
         switch opt.action
 
             when 'backward'

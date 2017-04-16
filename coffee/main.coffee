@@ -116,9 +116,7 @@ hideDock = ->
 # 000  000        000     
 # 000  000         0000000
 
-post.onGet 'activateWindowWithFile', (file) -> 
-    log 'activateWindowWithFile', file
-    main.activateWindowWithFile file
+post.onGet 'activateWindowWithFile', (file) -> main.activateWindowWithFile file
     
 post.onGet 'winInfos', -> 
     infos = []
@@ -273,9 +271,7 @@ class Main
             if w.currentFile == file
                 @activateWindowWithID w.id
                 post.toWin w.id, 'singleCursorAtPos', pos if pos?
-                log 'activateWindowWithFile', file, w.id
                 return w.id
-        log 'activateWindowWithFile -- no win with file', file
         null
 
     closeOtherWindows:=>

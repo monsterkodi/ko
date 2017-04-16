@@ -1,7 +1,14 @@
 ![ko](img/banner.png)
+
 ![readme](img/readme.png)
 
-your can find some rudimentary documentation in the [github wiki](https://github.com/monsterkodi/ko/wiki/about)
+<br><br><br>
+
+![shot](img/shot.png)
+
+<br><br>
 
 **ko** is in active development, use at your own risk!
+
+[documentation](https://github.com/monsterkodi/ko/wiki/about)
 
