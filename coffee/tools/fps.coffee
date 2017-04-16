@@ -4,10 +4,9 @@
 #   000000    00000000   0000000 
 #   000       000             000
 #   000       000        0000000 
-{
-clamp,
-log,
-$}  = require 'kxk'
+
+{ clamp, log, $
+}   = require 'kxk'
 now = require 'performance-now'
 
 class FPS
@@ -32,7 +31,7 @@ class FPS
         @history = []
         @last = now()
             
-        $('.commandline-span').appendChild @elem
+        $('commandline-span').appendChild @elem
         window.requestAnimationFrame @draw
             
     # 0000000    00000000    0000000   000   000

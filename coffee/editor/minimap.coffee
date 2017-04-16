@@ -3,12 +3,9 @@
 # 000000000  000  000 0 000  000  000000000  000000000  00000000 
 # 000 0 000  000  000  0000  000  000 0 000  000   000  000      
 # 000   000  000  000   000  000  000   000  000   000  000      
-{
-getStyle,
-clamp,
-drag,
-log,
-str}    = require 'kxk'
+
+{ getStyle, clamp, drag, log, str
+}       = require 'kxk'
 profile = require '../tools/profile'
 scroll  = require './scroll'
 

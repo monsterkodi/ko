@@ -3,15 +3,9 @@
 # 0000000      000     000000000     000     0000000 
 #      000     000     000   000     000     000     
 # 0000000      000     000   000     000     00000000
-{
-log,
-str
-}      = require 'kxk'
-{
-Record, 
-List, 
-Map
-}      = require 'immutable' 
+
+{ log, str }          = require 'kxk'
+{ Record, List, Map } = require 'immutable' 
 
 Select = Record s:0, e:0, l:-1
 Highlt = Record s:0, e:0, l:-1, o:{}

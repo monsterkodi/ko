@@ -3,26 +3,20 @@
 #    000     000     000     000      0000000   0000000    000000000  0000000  
 #    000     000     000     000      000       000   000  000   000  000   000
 #    000     000     000     0000000  00000000  0000000    000   000  000   000
-{
-packagePath,
-unresolve,
-clamp,
-log,
-$}       = require 'kxk'
+
+{ packagePath, unresolve, stopEvent, clamp, post, path, log, $
+}        = require 'kxk'
 render   = require './editor/render'
 syntax   = require './editor/syntax'
-path     = require 'path'
-electron = require 'electron'
-ipc      = electron.ipcRenderer
 
 class Titlebar
     
     constructor: () ->
-        @elem =$ '.titlebar' 
-        @elem.ondblclick = (event) -> ipc.send 'maximizeWindow', window.winID
+        @elem =$ 'titlebar' 
+        @elem.ondblclick = (event) -> post.toMain 'maximizeWindow', window.winID
         @selected = -1
-        $('.body').addEventListener 'focusout', @closeList
-        $('.body').addEventListener 'focusin',  @closeList
+        document.body.addEventListener 'focusout', @closeList
+        document.body.addEventListener 'focusin',  @closeList
 
     update: (info) ->
         ic  = info.focus and " focus" or ""
@@ -58,7 +52,7 @@ class Titlebar
     
     showList: (event) => 
         return if @list?
-        winInfos = ipc.sendSync 'winInfos'
+        winInfos = post.get 'winInfos'
         return if winInfos.length < 2
         document.activeElement.blur()
         @selected = -1
@@ -67,8 +61,7 @@ class Titlebar
         @list.style.top = 0
         window.split.elem.appendChild @list             
         @listWinInfos winInfos
-        event?.preventDefault()
-        event?.stopPropagation()
+        stopEvent event
 
     closeList: =>
         if @list?
@@ -94,14 +87,13 @@ class Titlebar
             div.innerHTML = id + dot + fileSpan
             activateWindow = (id) => (event) => 
                 @loadWindowWithID id
-                event.stopPropagation()
-                event.preventDefault()
+                stopEvent event
             div.addEventListener 'mousedown', activateWindow info.id
             @list.appendChild div
 
     loadWindowWithID: (id) ->
         @closeList()
-        ipc.send 'activateWindow', id
+        post.toMain 'activateWindow', id
         
     loadSelected: -> 
         return @closeList() if @selected < 0
@@ -129,8 +121,7 @@ class Titlebar
                 when 'esc', 'alt+`' then return @closeList()
                 when 'up', 'down'   then return @navigate key
                 when 'enter'      
-                    event.stopPropagation()
-                    event.preventDefault()
+                    stopEvent event
                     return @loadSelected()
         
         return 'unhandled'

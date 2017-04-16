@@ -3,6 +3,7 @@
 # 000000    000  000 0 000  000   000
 # 000       000  000  0000  000   000
 # 000       000  000   000  0000000  
+
 {
 log}    = require 'kxk'
 Command = require '../commandline/command'
@@ -35,7 +36,7 @@ class Find extends Command
 
     changed: (command) ->
         super command
-        if editor = window.editorWithClassName @focus
+        if editor = window.editorWithName @focus
             if command.length
                 if @type in ['reg', 'Reg'] and command.trim() in ['^', '$', '^$']
                     editor.clearHighlights()
@@ -54,7 +55,7 @@ class Find extends Command
     
     execute: (command) ->
         command = super command
-        if editor = window.editorWithClassName @focus
+        if editor = window.editorWithName @focus
             editor.highlightText command, 
                 type: @type
                 select: 'after'
@@ -72,17 +73,17 @@ class Find extends Command
     handleModKeyComboEvent: (mod, key, combo, event) -> 
         switch combo
             when 'shift+enter', 'command+shift+g'
-                if editor = window.editorWithClassName @focus
+                if editor = window.editorWithName @focus
                     editor.highlightText @getText(),
                         type: @type
                         select: 'before'
                     return
             when 'command+g' 
-                if editor = window.editorWithClassName @focus
+                if editor = window.editorWithName @focus
                     @execute @getText()    
                     return
             when 'tab'
-                if editor = window.editorWithClassName @focus
+                if editor = window.editorWithName @focus
                     editor.focus()
                     return
         super mod, key, combo, event

@@ -3,14 +3,10 @@
 # 000000000  000000000  000  000 0 000  000000000  0000000   000 0 000  000   000
 # 000 0 000  000   000  000  000  0000  000 0 000  000       000  0000  000   000
 # 000   000  000   000  000  000   000  000   000  00000000  000   000   0000000 
-{
-unresolve,
-prefs,
-log
+
+{ unresolve, prefs, fs, post, path, log
 }     = require 'kxk'
 pkg   = require '../package.json'
-fs    = require 'fs'
-path  = require 'path'
 Menu  = require('electron').Menu
 
 class MainMenu
@@ -19,7 +15,7 @@ class MainMenu
         
         fileLabel = (f) ->
             return path.basename(f) + ' - ' + unresolve path.dirname(f) if f?
-            "untitled"
+            'untitled'
     
         recent = []
         for f in prefs.get 'recentFiles', []
@@ -83,33 +79,33 @@ class MainMenu
             ,
                 label:       'New Window'
                 accelerator: 'Command+Shift+N'
-                click:       (i,win) -> win?.webContents.send "cloneFile"
+                click:       (i,win) -> post.toWin win.id, "cloneFile"
             ,
                 label:       'Open...'
                 accelerator: 'CmdOrCtrl+O'
-                click:       (i,win) -> win?.webContents.send "openFile"
+                click:       (i,win) -> post.toWin win.id, "openFile"
             ,
                 label:       'Open In New Window...'
                 accelerator: 'CmdOrCtrl+Shift+O'
-                click:       (i,win) -> win?.webContents.send "openFile", newWindow: true
+                click:       (i,win) -> post.toWin win.id, "openFile", newWindow: true
             ,
                 label:       'Open Recent'
                 submenu:     recent
             ,
                 label:       'Save'
                 accelerator: 'Command+S'
-                click:       (i,win) -> win?.webContents.send 'saveFile'
+                click:       (i,win) -> post.toWin win.id, 'saveFile'
             ,            
                 label:       'Save As ...'
                 accelerator: 'Command+Shift+S'
-                click:       (i,win) -> win?.webContents.send 'saveFileAs'
+                click:       (i,win) -> post.toWin win.id, 'saveFileAs'
             ,
             
                 type: 'separator'
             ,
                 label:       'Reload'
                 accelerator: 'CmdOrCtrl+R'
-                click:       (i,win) -> win?.webContents.send "reloadFile"
+                click:       (i,win) -> post.toWin win.id, 'reloadFile'
             ,
                 label:       'Close Window'
                 accelerator: 'Command+W'

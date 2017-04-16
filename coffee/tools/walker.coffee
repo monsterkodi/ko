@@ -3,16 +3,10 @@
 # 000000000  000000000  000      0000000    0000000   0000000  
 # 000   000  000   000  000      000  000   000       000   000
 # 00     00  000   000  0000000  000   000  00000000  000   000
-{
-fileExists,
-dirExists,
-relative,
-resolve,
-error,
-log}    = require 'kxk'
+
+{ fileExists, dirExists, relative, resolve, path, fs, error, log
+}       = require 'kxk'
 walkdir = require 'walkdir'
-path    = require 'path'
-fs      = require 'fs'
 
 class Walker
 

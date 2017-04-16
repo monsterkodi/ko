@@ -3,17 +3,12 @@
 # 0000000    000   000  000000    000000    0000000   0000000  
 # 000   000  000   000  000       000       000       000   000
 # 0000000     0000000   000       000       00000000  000   000
-{
-clamp,
-error,
-log,
-str
-}       = require "kxk"
-State   = require './state' 
 
+{ clamp, error, log, str, _
+}       = require 'kxk'
+State   = require './state' 
 fuzzy   = require 'fuzzy'
 event   = require 'events'
-_       = require 'lodash'
 
 startOf = (r) -> r[0]
 endOf   = (r) -> r[0] + Math.max 1, r[1]-r[0]
@@ -73,7 +68,8 @@ class Buffer extends event
     # 000   000  000   000  000   000  000   000
     # 00     00   0000000   000   000  0000000  
 
-    wordAtCursor: (c=@mainCursor(), opt) -> @textInRange @rangeForWordAtPos c, opt
+    wordAtCursor: -> @wordAtPos @mainCursor()
+    wordAtPos: (c) -> @textInRange @rangeForWordAtPos c
     wordsAtCursors: (cs=@cursors(), opt) -> (@textInRange @rangeForWordAtPos(c, opt) for c in cs)
 
     selectionTextOrWordAtCursor: () ->
@@ -88,14 +84,14 @@ class Buffer extends event
         r = rangeAtPosInRanges p, wr
         r
 
-    endOfWordAtCursor: (c=@mainCursor()) =>
+    endOfWordAtPos: (c) =>
         r = @rangeForWordAtPos c
         if @isCursorAtEndOfLine c
             return c if @isCursorInLastLine c
             r = @rangeForWordAtPos [0, c[1]+1]
         [r[1][1], r[0]]
 
-    startOfWordAtCursor: (c=@mainCursor()) =>
+    startOfWordAtPos: (c) =>
         if @isCursorAtStartOfLine c
             return c if @isCursorInFirstLine c
             r = @rangeForWordAtPos [@line(c[1]-1).length, c[1]-1]
@@ -249,7 +245,7 @@ class Buffer extends event
     rangesForCursorLines: (cs=@cursors()) -> (@rangeForLineAtIndex c[1] for c in cs)  
     rangesForAllLines: -> @rangesForLinesFromTopToBot 0, @numLines()
 
-    rangesBetweenPositions: (a, b, extend=false) ->
+    rangesForLinesBetweenPositions: (a, b, extend=false) ->
         r = []
         [a,b] = sortPositions [a,b]
         if a[1] == b[1]

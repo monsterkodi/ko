@@ -3,15 +3,10 @@
 # 000  0000  000   000     000     000   000
 # 000   000  000   000     000     000   000
 #  0000000    0000000      000      0000000 
-{
-clamp,
-log
+
+{ clamp, log, _
 }        = require 'kxk'
 Command  = require '../commandline/command'
-_        = require 'lodash'
-electron = require 'electron'
-
-ipc = electron.ipcRenderer
 
 class Goto extends Command
 
@@ -43,12 +38,24 @@ class Goto extends Command
     # 0000000  000  0000000      000     000     000     00000000  000   000  0000000 
     
     listItems: () -> 
-        files = ipc.sendSync 'indexer', 'files'
+        
+        items = []
+        @types = {}
+        
+        files = post.get 'indexer', 'files'
         funcs = files[window.editor.currentFile].funcs
-        funcNames = ({text: info[2], line:'▸', clss:'method'} for info in funcs)
-        clsss = ipc.sendSync 'indexer', 'classes'
-        @clssNames = ({text: k, line:'●', clss:'class'} for k in _.keys clsss)
-        funcNames.concat @clssNames
+        for info in funcs
+            name  = info[2]
+            items.push text: name, line:'▸', clss:'method'
+            @types[name] = 'func'
+            
+        clsss = post.get 'indexer', 'classes'
+        for k in _.keys clsss
+            name = k
+            items.push text: k, line:'●', clss:'class'
+            @types[name] = 'class'
+            
+        items
 
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
@@ -58,9 +65,10 @@ class Goto extends Command
         
     execute: (command) ->
         command = super command
-        if /^\-?\d+$/.test command
+        if /^\-?\d+$/.test command # goto line number
             line = parseInt command
-            editor = window.editorWithClassName @focus
+            editor = window.editorWithName @focus
+            return error "no editor? focus: #{@focus}" if not editor?
             if line < 0
                 line = editor.numLines() + line
             else 
@@ -69,11 +77,12 @@ class Goto extends Command
             editor.singleCursorAtPos [0,line], extend: @name == 'selecto'
             editor.scrollCursorToTop()
             focus: @focus
-            do: "reveal #{editor.name}"
+            do: "show #{editor.name}"
         else if command.length
-            window.editor.jumpTo command, dontList: true, extend: @name == 'selecto'
-            focus: '.editor'
-            do: "reveal editor"
+            type = @types[command] ? 'func'
+            window.editor.jumpTo command, type:type, dontList: true, extend: @name == 'selecto'
+            focus: 'editor'
+            do: "show editor"
         else
             text: ''
                     

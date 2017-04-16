@@ -3,40 +3,30 @@
 #    000     0000000   0000000    000000000
 #    000     000       000   000  000 0 000
 #    000     00000000  000   000  000   000
-{
-packagePath,
-fileExists,
-dirExists,
-unresolve,
-resolve,
-clamp,
-log
+
+{ packagePath, dirExists, unresolve, resolve, path, fs, 
+  post, noon, store, clamp, log, _
 }        = require 'kxk'
 Walker   = require '../tools/walker'
 Syntax   = require '../editor/syntax'
 Command  = require '../commandline/command'
-_        = require 'lodash'
-electron = require 'electron'
-path     = require 'path'
-noon     = require 'noon'
-fs       = require 'fs'
-ipc      = electron.ipcRenderer
-remote   = electron.remote
 
 class Term extends Command
 
     constructor: (@commandline) ->
+        post.on 'shellCommandData', @onShellCommandData
         @idCommands = Object.create null
         @commandIDs = Object.create null
         @shortcuts  = ['command+t', 'command+shift+t']
         @names      = ['term', 'Term']
+        @alias      = new store 'alias'
         super @commandline
         @maxHistory = 99
         @headers    = false
         @autocd     = true
         @cmdID      = 0
         @pwdID      = -1
-        @bins       = ipc.sendSync 'indexer', 'bins'
+        @bins       = post.get 'indexer', 'bins'
     
     #  0000000   000   000        0000000     0000000   000000000   0000000   
     # 000   000  0000  000        000   000  000   000     000     000   000  
@@ -62,7 +52,7 @@ class Term extends Command
 
     getPWD: (@pwdTag) ->
         @pwdID = @cmdID
-        ipc.send 'shellCommand', winID: window.winID, cmdID: @cmdID, command: "pwd"
+        post.toMain 'shellCommand', winID: window.winID, cmdID: @cmdID, command: "pwd"
         @cmdID += 1
 
     #  0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
@@ -217,22 +207,39 @@ class Term extends Command
     # 000   000  0000000  000  000   000  0000000 
     
     aliasCmd: (aliasList) ->
-        terminal = window.terminal
-        alias = ipc.sendSync 'alias'
-        if aliasList.length == 1
-            delete alias[aliasList[0]]
-        else if aliasList.length > 1
-            alias[aliasList[0]] = aliasList.slice(1).join ' '
-        ipc.send 'alias', alias if aliasList.length
         
-        cmmd = 'alias ' + aliasList.join(' ')
+        terminal = window.terminal
+        
+        log 'aliasCmd', aliasList
+
+        cmmd = 'alias ' + aliasList.join ' ' 
         terminal.appendMeta 
             line: "■"
             cmmd:  cmmd.trim()
             clss: 'termCommand'
+
+        if aliasList.length == 1 # show single alias
+            key = aliasList[0]
+            cmd = @alias.get key
+            meta =
+                diss: Syntax.dissForTextAndSyntax "#{_.padEnd key, 10} #{cmd}" , 'noon'
+                line: 0
+                clss: 'termResult'
+            terminal.appendMeta meta
+            return
         
+        if aliasList.length == 2 and aliasList[0] == 'del'
+            
+            @alias.del aliasList[1]
+            return
+            
+        else if aliasList.length >= 2 # set alias
+            
+            @alias.set aliasList[0], aliasList.slice(1).join ' '
+            return
+                
         li = 0
-        for key,cmd of alias
+        for key,cmd of @alias.data
             li += 1
             meta =
                 diss: Syntax.dissForTextAndSyntax "#{_.padEnd key, 10} #{cmd}" , 'noon'
@@ -240,7 +247,7 @@ class Term extends Command
                 clss: 'termResult'
             terminal.appendMeta meta
             
-        return text: '', reveal: 'terminal'
+        return text: '', show: 'terminal'
     
     #  0000000  00000000   000      000  000000000         0000000   000      000   0000000    0000000
     # 000       000   000  000      000     000           000   000  000      000  000   000  000     
@@ -256,7 +263,6 @@ class Term extends Command
                 cmds = cmds.concat @splitAlias cmd.trim()
             cmds
         else            
-            alias = ipc.sendSync 'alias'
             split = command.trim().split ' '
             if /^[!]+\d*/.test split[0]
                 if split[0] == '!'
@@ -276,8 +282,8 @@ class Term extends Command
                 else if @idCommands[parseInt(split[0].slice(1))]?
                     split.splice 0, 1, @idCommands[parseInt(split[0].slice(1))]                
             
-            if alias[split[0]]?
-                @splitAlias (alias[split[0]] + ' ' + split.slice(1).join ' ').trim()
+            if @alias.get split[0]
+                @splitAlias (@alias.get(split[0]) + ' ' + split.slice(1).join ' ').trim()
             else
                 [split.join ' ']
                 
@@ -294,7 +300,7 @@ class Term extends Command
         super combo
         text:   @last()
         select: true
-        do:     'reveal terminal'
+        do:     'show terminal'
                 
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
@@ -338,7 +344,7 @@ class Term extends Command
             switch cmd
                 when 'clear'   then terminal.clear()
                 when 'stop' 
-                    ipc.send 'restartShell', winID: window.winID
+                    post.toMain 'restartShell', winID: window.winID
                     for meta in terminal.meta.metas.reversed()
                         if meta[2].cmdID?
                             meta[2].span?.innerHTML = "■"
@@ -347,13 +353,13 @@ class Term extends Command
                         clss: 'termCommand'
                         cmmd: "stop"
                                 
-                when 'headers' 
+                when 'header' 
                     
-                    # 000   000  00000000   0000000   0000000    00000000  00000000    0000000  
-                    # 000   000  000       000   000  000   000  000       000   000  000       
-                    # 000000000  0000000   000000000  000   000  0000000   0000000    0000000   
-                    # 000   000  000       000   000  000   000  000       000   000       000  
-                    # 000   000  00000000  000   000  0000000    00000000  000   000  0000000   
+                    # 000   000  00000000   0000000   0000000    00000000  00000000 
+                    # 000   000  000       000   000  000   000  000       000   000
+                    # 000000000  0000000   000000000  000   000  0000000   0000000  
+                    # 000   000  000       000   000  000   000  000       000   000
+                    # 000   000  00000000  000   000  0000000    00000000  000   000
                     
                     if args.length 
                         if args[0] in ['on', 'true', '1'] then   @headers = true
@@ -402,16 +408,16 @@ class Term extends Command
                             clss: 'termResult'
                         terminal.appendMeta meta
                                             
-                when 'files'
+                when 'file'
                     
-                    # 00000000  000  000      00000000   0000000
-                    # 000       000  000      000       000     
-                    # 000000    000  000      0000000   0000000 
-                    # 000       000  000      000            000
-                    # 000       000  0000000  00000000  0000000 
+                    # 00000000  000  000      00000000
+                    # 000       000  000      000     
+                    # 000000    000  000      0000000 
+                    # 000       000  000      000     
+                    # 000       000  0000000  00000000
                     
-                    window.split.reveal 'terminal'
-                    files = ipc.sendSync 'indexer', 'files'
+                    window.split.show 'terminal'
+                    files = post.get 'indexer', 'files'
                     lastDir = ''
                     li = 1
                     for file in Object.keys(files).sort()
@@ -430,16 +436,16 @@ class Term extends Command
                         terminal.queueMeta meta
                         li += 1
                         
-                when 'funcs'
+                when 'func'
                     
-                    # 00000000  000   000  000   000   0000000   0000000
-                    # 000       000   000  0000  000  000       000     
-                    # 000000    000   000  000 0 000  000       0000000 
-                    # 000       000   000  000  0000  000            000
-                    # 000        0000000   000   000   0000000  0000000 
+                    # 00000000  000   000  000   000   0000000
+                    # 000       000   000  0000  000  000     
+                    # 000000    000   000  000 0 000  000     
+                    # 000       000   000  000  0000  000     
+                    # 000        0000000   000   000   0000000
                     
-                    window.split.reveal 'terminal'
-                    funcs = ipc.sendSync 'indexer', 'funcs'
+                    window.split.show 'terminal'
+                    funcs = post.get 'indexer', 'funcs'
                     char = ''
                     for func in Object.keys(funcs).sort()
                         infos = funcs[func]
@@ -462,16 +468,16 @@ class Term extends Command
                             terminal.queueMeta meta
                             i += 1
                         
-                when 'classes', 'class'
+                when 'class'
                     
-                    #  0000000  000       0000000    0000000   0000000  00000000   0000000
-                    # 000       000      000   000  000       000       000       000     
-                    # 000       000      000000000  0000000   0000000   0000000   0000000 
-                    # 000       000      000   000       000       000  000            000
-                    #  0000000  0000000  000   000  0000000   0000000   00000000  0000000 
+                    #  0000000  000       0000000    0000000   0000000
+                    # 000       000      000   000  000       000     
+                    # 000       000      000000000  0000000   0000000 
+                    # 000       000      000   000       000       000
+                    #  0000000  0000000  000   000  0000000   0000000 
                     
-                    window.split.reveal 'terminal'
-                    classes = ipc.sendSync 'indexer', 'classes'
+                    window.split.show 'terminal'
+                    classes = post.get 'indexer', 'classes'
                     for clss in Object.keys(classes).sort()
                         continue if args.length and not filterRegExp(args).test clss
                         info = classes[clss]
@@ -489,16 +495,16 @@ class Term extends Command
                                 clss: 'termResult'
                             terminal.queueMeta meta
                             
-                when 'words'
+                when 'word'
                     
-                    # 000   000   0000000   00000000   0000000     0000000
-                    # 000 0 000  000   000  000   000  000   000  000     
-                    # 000000000  000   000  0000000    000   000  0000000 
-                    # 000   000  000   000  000   000  000   000       000
-                    # 00     00   0000000   000   000  0000000    0000000 
+                    # 000   000   0000000   00000000   0000000  
+                    # 000 0 000  000   000  000   000  000   000
+                    # 000000000  000   000  0000000    000   000
+                    # 000   000  000   000  000   000  000   000
+                    # 00     00   0000000   000   000  0000000  
                     
-                    window.split.reveal 'terminal'
-                    words = ipc.sendSync 'indexer', 'words'
+                    window.split.show 'terminal'
+                    words = post.get 'indexer', 'words'
                     char = ''
                     for word in Object.keys(words).sort()
                         continue if args.length and not filterRegExp(args).test word
@@ -522,7 +528,7 @@ class Term extends Command
                     #      000  000   000  000       000      000      
                     # 0000000   000   000  00000000  0000000  0000000  
                     
-                    ipc.send 'shellCommand', winID: window.winID, cmdID: @cmdID, command: cmmd
+                    post.toMain 'shellCommand', winID: window.winID, cmdID: @cmdID, command: cmmd
                     
                     terminal.appendMeta 
                         line: "▶"
@@ -535,7 +541,7 @@ class Term extends Command
                     @cmdID += 1
                     
         text: ''
-        do:   (@name == 'Term' and 'maximize' or 'reveal') + ' terminal'
+        do:   (@name == 'Term' and 'maximize' or 'show') + ' terminal'
         
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

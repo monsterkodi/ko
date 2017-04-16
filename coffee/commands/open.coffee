@@ -3,30 +3,17 @@
 # 000   000  00000000   0000000   000 0 000
 # 000   000  000        000       000  0000
 #  0000000   000        00000000  000   000
-{
-packagePath,
-fileExists,
-dirExists,
-unresolve,
-relative,
-resolve,
-prefs,
-clamp,
-post,
-error,
-log,
-$}       = require 'kxk'
+
+{ 
+packagePath, fileExists, dirExists, unresolve, relative, resolve,
+prefs, clamp, post, error, log, $, path, fs, _
+}        = require 'kxk'
 profile  = require '../tools/profile'
 Walker   = require '../tools/walker'
 Command  = require '../commandline/command'
 render   = require '../editor/render'
 syntax   = require '../editor/syntax'
-path     = require 'path'
 fuzzy    = require 'fuzzy'
-fs       = require 'fs'
-_        = require 'lodash'
-electron = require 'electron'
-ipc      = electron.ipcRenderer
     
 class Open extends Command
 
@@ -106,10 +93,12 @@ class Open extends Command
             @changed @getText()
             true            
         else
-            projects = ipc.sendSync 'indexer', 'projects'
+            projects = post.get 'indexer', 'projects'
             for p in Object.keys(projects).sort()
                 if p.startsWith @getText()
-                    @setText projects[p].dir + '/'
+                    pdir = projects[p].dir
+                    pdir = path.join(pdir, 'coffee') if dirExists resolve path.join pdir, 'coffee'
+                    @setText pdir + '/'
                     @changed @getText()
                     return true
             super
@@ -433,8 +422,8 @@ class Open extends Command
                 super selected
                 
             text:  (path.basename(f) for f in opened).join ' '
-            focus: '.editor'
-            reveal: 'editor'
+            focus:  'editor'
+            show:   'editor'
             status: 'ok'
         else
             status: 'failed'

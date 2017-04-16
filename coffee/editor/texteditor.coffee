@@ -3,27 +3,16 @@
 #    000     0000000     00000       000           0000000   000   000  000     000     000   000  0000000    
 #    000     000        000 000      000           000       000   000  000     000     000   000  000   000  
 #    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000  
-{
-stopEvent,
-setStyle,
-keyinfo,
-prefs,
-clamp,
-drag,
-post,
-str,
-log,
-sw,
-$}        = require 'kxk'
+
+{splitFilePos, fileExists, resolve, keyinfo, stopEvent, setStyle, 
+prefs, drag, path, post, clamp, str, log, sw, $, _
+}         = require 'kxk'
+matchr    = require '../tools/matchr'
 render    = require './render'
 syntax    = require './syntax'
 scroll    = require './scroll'
 Editor    = require './editor'
-_         = require 'lodash'
-path      = require 'path'
-ansiKey   = require 'ansi-keycode'
 electron  = require 'electron'
-ipc       = electron.ipcRenderer
 
 class TextEditor extends Editor
 
@@ -195,9 +184,9 @@ class TextEditor extends Editor
         
         if changeInfo.inserts or changeInfo.deletes           
             @scroll.setNumLines @numLines()
+            @layersWidth = @layers.offsetWidth
             @updateScrollOffset()
             @updateLinePositions()
-            @layersWidth = @layers.offsetWidth
 
         if changeInfo.changes.length
             @clearHighlights()
@@ -408,6 +397,7 @@ class TextEditor extends Editor
         @numbers?.elem.style.height = "#{@scroll.exposeNum * @scroll.lineHeight}px"
         @layers.style.width = "#{sw()-@view.getBoundingClientRect().left-130-6}px"
         @layers.style.height = "#{vh}px"
+        @layersWidth = @layers.offsetWidth
         @updateScrollOffset()
         @emit 'viewHeight', vh
 
@@ -448,7 +438,7 @@ class TextEditor extends Editor
 
     scrollBy: (delta, x=0) ->        
         @scroll.by delta if delta
-        @layers.scrollLeft += x/2 if x
+        @layers.scrollLeft += x if x
         @updateScrollOffset()
         
     scrollTo: (p) ->
@@ -578,7 +568,7 @@ class TextEditor extends Editor
                 
                 p = @posForEvent event
                 if event.altKey
-                    post.emit 'jumpTo', @wordAtCursor p
+                    @emitJumpToForPos p                                    
                 else if event.metaKey
                     @toggleCursorAtPos p
                 else
@@ -602,13 +592,33 @@ class TextEditor extends Editor
         @clickPos    = null
            
     funcInfoAtLineIndex: (li) ->
-        files = ipc.sendSync 'indexer', 'files'
+        files = post.get 'indexer', 'files'
         fileInfo = files[@currentFile]
         for func in fileInfo.funcs
             if func[0] <= li <= func[1]
                 return func[3] + '.' + func[2] + ' '
         ''
         
+    emitJumpToForPos: (p) ->
+        
+        text = @line p[1]
+        
+        rgx = /([\~\/\w\.]+\/[\w\.]+\w[:\d]*)/ # look for files in line
+        if rgx.test text
+            ranges = matchr.ranges rgx, text
+            diss   = matchr.dissect ranges, join:false
+            for d in diss
+                if d.start <= p[0] <= d.start+d.match.length
+                    [file, pos] = splitFilePos d.match
+                    if fileExists resolve file
+                        post.toWin 'jumpTo', file:file, line:pos[1], col:pos[0]
+                        return
+                        
+        word = @wordAtPos p
+        range = @rangeForWordAtPos p
+        type = 'func'
+        post.toWin 'jumpTo', word, type:type
+
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
     # 0000000    0000000     00000  
@@ -632,7 +642,7 @@ class TextEditor extends Editor
         'unhandled'
 
     onKeyDown: (event) =>
-        {mod, key, combo} = keyinfo.forEvent event
+        {mod, key, combo, char} = keyinfo.forEvent event
         return if not combo
         return if key == 'right click' # weird right command key
 
@@ -654,7 +664,7 @@ class TextEditor extends Editor
                         return
     
         switch combo
-            when 'alt+enter'       then return post.emit 'jumpTo', @wordAtCursor()
+            when 'alt+enter'       then return @emitJumpToForPos @cursorPos()
             when 'command+z'       then return @do.undo()
             when 'command+shift+z' then return @do.redo()
                 
@@ -665,7 +675,7 @@ class TextEditor extends Editor
         # switch key            
             # when 'backspace' then return
             
-        if ansiKey(event)?.length == 1 and mod in ["shift", ""]
-            @insertCharacter ansiKey event
+        if char and mod in ["shift", ""]
+            @insertCharacter char
 
 module.exports = TextEditor

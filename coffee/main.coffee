@@ -3,25 +3,15 @@
 # 000000000  000000000  000  000 0 000
 # 000 0 000  000   000  000  000  0000
 # 000   000  000   000  000  000   000
-{
-splitFilePos,
-fileExists,
-dirExists,
-fileList,
-resolve,
-about,
-prefs,
-str,
-log
+
+{ splitFilePos, fileExists, dirExists, fileList, resolve,
+about, prefs, store, noon, post, fs, str, log, _
 }             = require 'kxk'
 pkg           = require '../package.json'
 Execute       = require './execute'
 Navigate      = require './navigate'
 Indexer       = require './indexer'
 MainMenu      = require './mainmenu'
-_             = require 'lodash'
-fs            = require 'fs'
-noon          = require 'noon'
 colors        = require 'colors'
 electron      = require 'electron'
 childp        = require 'child_process'
@@ -30,7 +20,6 @@ BrowserWindow = electron.BrowserWindow
 Tray          = electron.Tray
 Menu          = electron.Menu
 clipboard     = electron.clipboard
-ipc           = electron.ipcMain
 dialog        = electron.dialog
 disableSnap   = false
 main          = undefined # < created in app.on 'ready'
@@ -89,6 +78,7 @@ if args.verbose
 # 000        000   000  00000000  000       0000000 
 
 prefs.init shortcut: 'F2'
+alias = new store 'alias'
 
 if args.prefs
     log colors.yellow.bold 'prefs'
@@ -126,41 +116,34 @@ hideDock = ->
 # 000  000        000     
 # 000  000         0000000
 
-ipc.on 'alias',                  (event, dict)   -> main.alias event, dict
-ipc.on 'newWindowWithFile',      (event, file)   -> main.newWindowWithFile file
-ipc.on 'activateWindowWithFile', (event, file)   -> event.returnValue = main.activateWindowWithFile file
-ipc.on 'toggleDevTools',         (event)         -> event.sender.toggleDevTools()
-ipc.on 'execute',                (event, arg)    -> event.sender.send 'executeResult', coffeeExecute.execute arg
-ipc.on 'restartShell',           (event, cfg)    -> winShells[cfg.winID].restartShell()
-ipc.on 'executeCoffee',          (event, cfg)    -> coffeeExecute.executeCoffee cfg
-ipc.on 'maximizeWindow',         (event, winID)  -> main.toggleMaximize winWithID winID
-ipc.on 'activateWindow',         (event, winID)  -> main.activateWindowWithID winID
-ipc.on 'reloadWindow',           (event, winID)  -> main.reloadWin winWithID winID
-ipc.on 'navigate',               (event, action) -> event.returnValue = navigate.action action
-ipc.on 'indexer',                (event, item)   -> event.returnValue = main.indexer[item]
-ipc.on 'winInfos',               (event)         -> 
+post.onGet 'activateWindowWithFile', (file) -> 
+    log 'activateWindowWithFile', file
+    main.activateWindowWithFile file
+    
+post.onGet 'winInfos', -> 
     infos = []
     for w in wins()
         infos.push 
             id: w.id
             file: w.currentFile            
-    event.returnValue = infos
+    infos
 
-ipc.on 'fileLoaded', (event, file, winID) -> 
+post.on 'newWindowWithFile',      (file)   -> main.createWindow file
+post.on 'toggleDevTools',         (winID)  -> winWithID(winID).toggleDevTools()
+post.on 'restartShell',           (cfg)    -> winShells[cfg.winID].restartShell()
+post.on 'maximizeWindow',         (winID)  -> main.toggleMaximize winWithID winID
+post.on 'activateWindow',         (winID)  -> main.activateWindowWithID winID
+post.on 'reloadWindow',           (winID)  -> main.reloadWin winWithID winID
+
+post.on 'fileLoaded', (file, winID) -> 
     winWithID(winID).currentFile = file 
     main.indexer.indexFile file
 
-ipc.on 'fileSaved', (event, file, winID) -> main.indexer.indexFile file, refresh: true
-
-ipc.on 'winFileLinesChanged', (event, winID, file, lineChanges) -> 
-    return if not winID
-    for w in wins()
-        if w.id != winID
-            w.webContents.send 'fileLinesChanged', file, lineChanges
+post.on 'fileSaved', (file, winID) -> main.indexer.indexFile file, refresh: true
             
 winShells = {}
 
-ipc.on 'shellCommand', (event, cfg) -> 
+post.on 'shellCommand', (cfg) -> 
     if winShells[cfg.winID]?
         winShells[cfg.winID].term cfg
     else
@@ -249,11 +232,13 @@ class Main
         for w in wins()
             w.hide()
             hideDock()
+        @
             
     showWindows: ->
         for w in wins()
             w.show()
             app.dock.show()
+        @
             
     raiseWindows: ->
         if visibleWins().length
@@ -261,6 +246,7 @@ class Main
                 w.showInactive()
             visibleWins()[0].showInactive()
             visibleWins()[0].focus()
+        @
 
     activateNextWindow: (win) ->
         allWindows = wins()
@@ -269,7 +255,8 @@ class Main
                 i = 1 + allWindows.indexOf w
                 i = 0 if i >= allWindows.length
                 @activateWindowWithID allWindows[i].id
-                return
+                return w
+        null
 
     activateWindowWithID: (wid) ->
         w = winWithID wid
@@ -278,14 +265,17 @@ class Main
             w.show()
         else
             w.focus()
+        w
 
     activateWindowWithFile: (file) ->
         [file, pos] = splitFilePos file
         for w in wins()
             if w.currentFile == file
                 @activateWindowWithID w.id
-                w.webContents.send 'singleCursorAtPos', pos if pos?
+                post.toWin w.id, 'singleCursorAtPos', pos if pos?
+                log 'activateWindowWithFile', file, w.id
                 return w.id
+        log 'activateWindowWithFile -- no win with file', file
         null
 
     closeOtherWindows:=>
@@ -418,8 +408,6 @@ class Main
     # 000       000   000  000       000   000     000     000     
     #  0000000  000   000  00000000  000   000     000     00000000
        
-    newWindowWithFile: (file) -> @createWindow(file).id
-            
     createWindow: (openFile) ->
         
         {width, height} = @screenSize()
@@ -449,7 +437,7 @@ class Main
         winLoaded = ->
             if openFile?
                 win.currentFile = splitFilePos(openFile)[0]
-                win.webContents.send 'loadFile', openFile
+                post.toWin win.id, 'loadFile', openFile
                 openFile = null
                 win.show()
                 win.focus()
@@ -457,7 +445,7 @@ class Main
                 file = prefs.get "windows:#{win.id}:file"
                 if file?
                     win.currentFile = file
-                    win.webContents.send 'loadFile', file
+                    post.toWin win.id, 'loadFile', file
                 else
                     win.show()
                             
@@ -515,28 +503,13 @@ class Main
             [fpath, pos] = splitFilePos file
             if not fileExists fpath
                 continue
-            w = @activateWindowWithFile file
+            w = winWithID @activateWindowWithFile file
             w = @createWindow file if not w?
                     
     quit: -> 
         app.exit     0
         process.exit 0
-    
-    #  0000000   000      000   0000000    0000000
-    # 000   000  000      000  000   000  000     
-    # 000000000  000      000  000000000  0000000 
-    # 000   000  000      000  000   000       000
-    # 000   000  0000000  000  000   000  0000000 
-    
-    alias: (event, dict) ->
-        aliasFile = "#{app.getPath('userData')}/alias.noon"
-        if dict?
-            noon.save aliasFile, dict
-        if fileExists aliasFile
-            event.returnValue = noon.load aliasFile
-        else
-            event.returnValue = {}
-    
+        
     #  0000000   0000000     0000000   000   000  000000000
     # 000   000  000   000  000   000  000   000     000   
     # 000000000  0000000    000   000  000   000     000   

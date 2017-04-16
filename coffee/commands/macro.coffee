@@ -3,26 +3,17 @@
 # 000000000  000000000  000       0000000    000   000
 # 000 0 000  000   000  000       000   000  000   000
 # 000   000  000   000   0000000  000   000   0000000 
+
 {
-packagePath,
-fileExists,
-fileName,
-fileList,
-relative,
-splitExt,
-log}       = require 'kxk'
+packagePath, fileExists, fileName, fileList, relative, splitExt,
+noon, path, error, log, _
+}          = require 'kxk'
 indexer    = require '../indexer'
 salt       = require '../tools/salt'
 Command    = require '../commandline/command'
-_          = require 'lodash'
-path       = require 'path'
 colors     = require 'colors'
-noon       = require 'noon'
-electron   = require 'electron'
 process    = require 'process'
 atomicFile = require 'write-file-atomic'
-
-ipc        = electron.ipcRenderer
 
 class Macro extends Command
 
@@ -73,8 +64,8 @@ class Macro extends Command
             if args.length
                 return args
             else
-                cw = editor.wordsAtCursors editor.positionsNotInRanges(editor.cursors, editor.selections), opt
-                sw = editor.textsInRanges editor.selections
+                cw = editor.wordsAtCursors positionsNotInRanges(editor.cursors(), editor.selections()), opt
+                sw = editor.textsInRanges editor.selections()
                 ws = _.uniq cw.concat sw
                 ws.filter (w) -> w.trim().length
         
@@ -119,7 +110,7 @@ class Macro extends Command
                         dim:     '^>=.:/-'
                     
                 terminal.scrollCursorToTop 1
-                window.split.do 'reveal terminal'
+                window.split.do 'show terminal'
             
             # 00000000   00000000   0000000 
             # 000   000  000       000   000
@@ -128,10 +119,10 @@ class Macro extends Command
             # 000   000  00000000   00000 00
             
             when 'req'
+                log 'req', args
                 words = wordsInArgsOrCursorsOrSelection args
                 lastIndex = 0
                 texts = []
-                
                 # search project for path build open search term
                 pkgPath = packagePath editor.currentFile
                 if pkgPath
@@ -139,6 +130,7 @@ class Macro extends Command
                 else
                     projectFiles = []
                 
+                if _.isEmpty words then return error 'no words for req?'
                 for word in words
                     map = 
                         _:      'lodash'
@@ -195,7 +187,7 @@ class Macro extends Command
                 editor.do.insert li, insert
                 editor.singleCursorAtPos [editor.line(li).length, li]
                 editor.do.end()
-                focus: '.'+editor.name
+                focus: editor.name
 
             #  0000000  000       0000000    0000000   0000000
             # 000       000      000   000  000       000     
@@ -226,8 +218,8 @@ class Macro extends Command
                     if err?
                         log 'writing class skeleton failed', err
                         return
-                    ipc.send 'newWindowWithFile', file
-                return focus: '.'+editor.name
+                    post.toMain 'newWindowWithFile', file
+                return focus: editor.name
             
         text: ''
                     

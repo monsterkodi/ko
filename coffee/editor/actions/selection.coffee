@@ -3,11 +3,9 @@
 # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
 #      000  000       000      000       000          000     000  000   000  000  0000
 # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
-{
-error,
-log
+
+{ error, log, _
 } = require 'kxk'
-_ = require 'lodash'
 
 module.exports =
     
@@ -105,7 +103,7 @@ module.exports =
                 if not oc? or not nc?
                     return error "Editor.#{@name}.endSelection -- invalid cursors", oc, nc
                 else
-                    ranges = @rangesBetweenPositions oc, nc, true #< extend to full lines if cursor at start of line                
+                    ranges = @rangesForLinesBetweenPositions oc, nc, true #< extend to full lines if cursor at start of line                
                     newSelection = newSelection.concat ranges
 
             @do.select newSelection
@@ -180,7 +178,7 @@ module.exports =
             for i in [0...oldCursors.length] by 2
                 c0 = oldCursors[i]
                 c1 = oldCursors[i+1]
-                newSelections = newSelections.concat @rangesBetweenPositions c0, c1
+                newSelections = newSelections.concat @rangesForLinesBetweenPositions c0, c1
                 newCursors.push c1
             @do.setCursors newCursors
             @do.select newSelections
@@ -192,8 +190,8 @@ module.exports =
             @do.start()
             start = rangeEndPos surr[0]
             end = rangeStartPos surr[1]
-            s = @rangesBetweenPositions start, end
-            s = @cleanRanges s
+            s = @rangesForLinesBetweenPositions start, end
+            s = cleanRanges s
             if s.length
                 @do.select s
                 if @do.numSelections()

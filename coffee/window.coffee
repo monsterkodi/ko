@@ -3,40 +3,25 @@
 # 000000000  000  000 0 000  000   000  000   000  000000000
 # 000   000  000  000  0000  000   000  000   000  000   000
 # 00     00  000  000   000  0000000     0000000   00     00
-{
-splitFilePos,
-fileExists,
-fileList,
-resolve,
-keyinfo,
-clamp,
-sw,sh,
-prefs,
-drag,
-pos,
-str,
-error,
-log,
-$}          = require 'kxk'
+
+{ splitFilePos, stopEvent, fileExists, fileList, resolve, keyinfo, clamp,
+sw,sh, prefs, drag, pos, str, os, fs, post, path, error, log, $, _
+}           = require 'kxk'
 Split       = require './split'
 FileEditor  = require './editor/fileeditor'
 Area        = require './area/area'
 Commandline = require './commandline/commandline'
-Terminal    = require './terminal/terminal'
-LogView     = require './logview/logview'
+Terminal    = require './terminal'
+LogView     = require './logview'
 Titlebar    = require './titlebar'
 Navigate    = require './navigate'
 FPS         = require './tools/fps'
 Info        = require './editor/info'
 encode      = require './tools/encode'
-_           = require 'lodash'
-fs          = require 'fs'
-path        = require 'path'
 electron    = require 'electron'
 atomicFile  = require 'write-file-atomic'
 pkg         = require '../package.json'
 
-ipc         = electron.ipcRenderer
 remote      = electron.remote
 dialog      = remote.dialog
 Browser     = remote.BrowserWindow
@@ -47,6 +32,19 @@ logview     = null
 terminal    = null
 commandline = null
 
+domain = require('domain').create()
+domain.on 'error', (err) -> error "unhandled error: #{err}"
+window.onerror = (event, source, line, col, err) -> 
+    f = require('sorcery').loadSync(source.replace /coffee/g, 'js')
+    if f?
+        l = f.trace(line)
+        s = "▲ #{l.source}:#{l.line} ▲ [ERROR] #{err}"
+    else
+        s = "▲ [ERROR] #{err}"
+    post.toWin 'error', s
+    post.toWin 'slog', s
+    console.log s
+    
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000     
 # 00000000   0000000    0000000   000000    0000000 
@@ -79,18 +77,21 @@ delState = window.delState = (key)        -> prefs.del "windows:#{winID}:#{key}"
 # 000  000        000     
 # 000  000         0000000
 
-ipc.on 'shellCommandData',  (event, cmdData) -> commandline.commands['term'].onShellCommandData cmdData
-ipc.on 'shellCallbackData', (event, cmdData) -> commandline.commands['term'].onShellCallbackData cmdData
-ipc.on 'singleCursorAtPos', (event, pos, opt) -> 
+post.on 'shellCallbackData', (cmdData) -> commandline.commands['term'].onShellCallbackData cmdData
+post.on 'singleCursorAtPos', (pos, opt) -> 
     editor.singleCursorAtPos pos, opt
     editor.scrollCursorToTop()
-ipc.on 'openFile',          (event, options) -> openFile options
-ipc.on 'focusEditor',       (event) -> split.focus '.editor'
-ipc.on 'cloneFile',  -> ipc.send 'newWindowWithFile', editor.currentFile
-ipc.on 'reloadFile', -> reloadFile()
-ipc.on 'saveFileAs', -> saveFileAs()
-ipc.on 'saveFile',   -> saveFile()
-ipc.on 'loadFile', (event, file) -> loadFile file
+post.on 'openFile',          (options) -> openFile options
+post.on 'focusEditor', -> split.focus 'editor'
+post.on 'cloneFile',   -> post.toMain 'newWindowWithFile', editor.currentFile
+post.on 'reloadFile',  -> reloadFile()
+post.on 'saveFileAs',  -> saveFileAs()
+post.on 'saveFile',    -> saveFile()
+post.on 'loadFile', (file) -> loadFile file
+post.on 'fileLinesChanged', (file, lineChanges) ->
+    if file == editor.currentFile
+        log 'window.on fileLinesChanged', file, lineChanges
+        editor.applyForeignLineChanges lineChanges
 
 # 000   000  000  000   000  00     00   0000000   000  000   000  
 # 000 0 000  000  0000  000  000   000  000   000  000  0000  000  
@@ -110,11 +111,7 @@ winMain = ->
         editor.centerText sw() == screenWidth, 0
         
     fps.toggle() if getState 'fps'
-    
-ipc.on 'fileLinesChanged', (event, file, lineChanges) ->
-    if file == editor.currentFile
-        editor.applyForeignLineChanges lineChanges
-                 
+                     
 #  0000000   0000000   000   000  00000000
 # 000       000   000  000   000  000     
 # 0000000   000000000   000 000   0000000 
@@ -140,7 +137,7 @@ saveFile = (file) ->
             alert err
         else
             editor.setCurrentFile file
-            ipc.send 'fileSaved', file, winID
+            post.toMain 'fileSaved', file, winID
             setState 'file', file
 
 saveChanges = ->
@@ -172,7 +169,7 @@ loadFile = (file, opt={}) ->
         if not opt?.dontSave then saveChanges()            
             
         addToRecent file
-        ipc.send 'navigate', 
+        post.toMain 'navigate', 
             action: 'addFilePos'
             file: editor.currentFile
             pos:  editor.cursorPos()
@@ -180,11 +177,11 @@ loadFile = (file, opt={}) ->
         
         editor.setCurrentFile null, opt  # to stop watcher and reset scroll
         editor.setCurrentFile file, opt
-        ipc.send 'fileLoaded', file, winID
+        post.toMain 'fileLoaded', file, winID
         setState 'file', file
         commandline.fileLoaded file
     
-    window.split.reveal 'editor'
+    window.split.show 'editor'
         
     if pos[0] or pos[1] 
         editor.singleCursorAtPos pos
@@ -217,10 +214,10 @@ openFiles = (ofiles, options) -> # called from file dialog and open command
         setState 'openFilePath', path.dirname files[0]                    
         if not options?.newWindow
             file = resolve files.shift()
-            if not ipc.sendSync 'activateWindowWithFile', file
+            if not post.get 'activateWindowWithFile', file
                 loadFile file
         for file in files
-            ipc.send 'newWindowWithFile', file
+            post.toMain 'newWindowWithFile', file
         return ofiles
 
 window.openFiles = openFiles
@@ -272,46 +269,39 @@ navigate = window.navigate = new Navigate
 # 0000000   000        0000000  000     000   
 
 split = window.split = new Split()
-split.on 'split', ->
+split.on 'split', (s) ->
     area.resized()
     terminal.resized()
     commandline.resized()
     editor.resized()
     logview.resized()
+    setState 'split', s
 
-terminal = window.terminal = new Terminal '.terminal'
-terminal.on 'fileLineChange', (file, lineChange) ->
-    ipc.send 'winFileLinesChanged', -1, file, [lineChange]
+terminal = window.terminal = new Terminal 'terminal'
 
-area        = window.area        = new Area '.area'
-editor      = window.editor      = new FileEditor '.editor'
-commandline = window.commandline = new Commandline '.commandline-editor'
-logview     = window.logview     = new LogView '.logview'
+terminal.on 'fileLineChange', (file, lineChange) -> # sends changes to all windows
+    post.toAllWins 'fileLinesChanged', file, [lineChange]
+
+area        = window.area        = new Area 'area'
+editor      = window.editor      = new FileEditor 'editor'
+commandline = window.commandline = new Commandline 'commandline-editor'
+logview     = window.logview     = new LogView 'logview'
 info        = window.info        = new Info editor
-
-editor.setText editorText if editorText?
-editor.view.focus()
 
 editor.on 'changed', (changeInfo) ->
     return if changeInfo.foreign
     if changeInfo.changes.length
-        ipc.send 'winFileLinesChanged', winID, editor.currentFile, changeInfo.changes
+        post.toOtherWins 'fileLinesChanged', editor.currentFile, changeInfo.changes
         navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
 
 window.editorWithName = (n) ->
     switch n
         when 'editor'   then editor
-        when 'command'  then commandline
+        when 'command', 'commandline' then commandline
         when 'terminal' then terminal
         when 'logview'  then logview
+        else editor
         
-window.editorWithClassName = (n) ->
-    switch n
-        when '.editor'      then editor
-        when '.commandline' then commandline
-        when '.terminal'    then terminal
-        when '.logview'     then logview    
-
 fps = window.fps = new FPS()
 
 # 00000000   00000000   0000000  000  0000000  00000000
@@ -321,23 +311,17 @@ fps = window.fps = new FPS()
 # 000   000  00000000  0000000   000  0000000  00000000
 
 screenSize = -> electron.screen.getPrimaryDisplay().workAreaSize
-
-initSplit = -> 
-    if not split.winID?
-        split.setWinID winID 
-    else
-        split.resized()
     
 win.on 'move', -> setState 'bounds', win.getBounds()
 window.onresize = ->
-    initSplit()
+    split.resized()
     setState 'bounds', win.getBounds()
     if getState 'centerText', false
         screenWidth = screenSize().width
         editor.centerText sw() == screenWidth, 0
 
 window.onload = -> 
-    initSplit()
+    split.resized()
     info.reload()
     
 window.onunload = -> 
@@ -419,9 +403,9 @@ window.onfocus = (event) ->
     window.editor.updateTitlebar()
     if document.activeElement.className == 'body'
         if split.editorVisible()
-            split.focus '.editor'
+            split.focus 'editor'
         else
-            split.focus '.commandline-editor'
+            split.focus 'commandline-editor'
               
 # 000   000  00000000  000   000
 # 000  000   000        000 000 
@@ -436,21 +420,17 @@ document.onkeydown = (event) ->
     return if 'unhandled' != window.titlebar   .globalModKeyComboEvent mod, key, combo, event
     return if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
 
-    stop = (event) ->
-        event.preventDefault()
-        event.stopPropagation()        
-
     for i in [1..9]
         if combo is "alt+#{i}"
-            ipc.send 'activateWindow', i
-            return stop event
+            post.toMain 'activateWindow', i
+            return stopEvent event
     
     switch combo
-        when 'command+alt+i'     then return ipc.send 'toggleDevTools', winID
+        when 'command+alt+i'     then return post.toMain 'toggleDevTools', winID
         when 'ctrl+w' # close current file  
             editor.setCurrentFile null
             editor.setText ''
-            ipc.send 'fileLoaded', '', winID
+            post.toMain 'fileLoaded', '', winID
             return
         when 'f3'                 then return screenShot()
         when 'command+\\'         then return toggleCenterText()
@@ -464,12 +444,8 @@ document.onkeydown = (event) ->
         when 'command+shift+-'    then return @changeZoom -1
         when 'command+shift+0'    then return @resetZoom()
         when 'alt+`'              then return titlebar.showList()
-        when 'command+ctrl+left'  then return stop event, navigate.backward()
-        when 'command+ctrl+right' then return stop event, navigate.forward()
-        when 'command+shift+y'    
-            split.focus 'editor'
-            split.hideCommandline() if split.commandlineVisible()
-            split.hideLog() if split.logVisible
-            return
+        when 'command+ctrl+left'  then return stopEvent event, navigate.backward()
+        when 'command+ctrl+right' then return stopEvent event, navigate.forward()
+        when 'command+shift+y'    then return split.maximizeEditor()
 
 winMain()

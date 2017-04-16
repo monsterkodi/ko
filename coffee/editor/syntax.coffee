@@ -3,19 +3,48 @@
 # 0000000     00000    000 0 000     000     000000000    00000  
 #      000     000     000  0000     000     000   000   000 000 
 # 0000000      000     000   000     000     000   000  000   000
-{
-log,
-$}     = require 'kxk'
+
+{log, $, fs, noon, path, _
+}      = require 'kxk'
+encode = require '../tools/encode'
 matchr = require '../tools/matchr'
-_      = require 'lodash'
-path   = require 'path'
-noon   = require 'noon'
-fs     = require 'fs'
 
 class Syntax
     
     @matchrConfigs = {}
     @syntaxNames = []
+    
+    @spanForText: (text) -> @spanForTextAndSyntax text, 'ko'
+    @spanForTextAndSyntax: (text, n) -> 
+        
+        l = ""
+        diss = @dissForTextAndSyntax text, n
+        if diss?.length
+            last = 0
+            for di in [0...diss.length]
+                d = diss[di]
+                style = d.styl? and d.styl.length and " style=\"#{d.styl}\"" or ''
+                spc = ''
+                for sp in [last...d.start]
+                    spc += '&nbsp;'
+                last  = d.start + d.match.length
+                clss  = d.clss? and d.clss.length and " class=\"#{d.clss}\"" or ''
+                clrzd = "<span#{style}#{clss}>#{spc}#{encode d.match}</span>"
+                l += clrzd
+        l
+
+    @rangesForTextAndSyntax: (line, n) ->
+        matchr.ranges Syntax.matchrConfigs[n], line
+
+    @dissForTextAndSyntax: (line, n, opt) ->
+        matchr.dissect matchr.ranges(Syntax.matchrConfigs[n], line), opt
+
+    @lineForDiss: (dss) -> 
+        l = ""
+        for d in dss
+            l = _.padEnd l, d.start
+            l += d.match
+        l
 
     constructor: (@editor) ->
         @name ='txt'
@@ -39,12 +68,6 @@ class Syntax
     dissForLineIndex: (lineIndex) -> 
         Syntax.dissForTextAndSyntax @editor.line(lineIndex), @name
 
-    @rangesForTextAndSyntax: (line, n) ->
-        matchr.ranges Syntax.matchrConfigs[n], line
-
-    @dissForTextAndSyntax: (line, n, opt) ->
-        matchr.dissect matchr.ranges(Syntax.matchrConfigs[n], line), opt
-
     getDiss: (li, opt) ->
         if not @diss[li]?
             rgs = matchr.ranges Syntax.matchrConfigs[@name], @editor.line(li)
@@ -55,14 +78,7 @@ class Syntax
     setDiss: (li, dss) ->
         @diss[li] = dss
         @diss[li]
-    
-    @lineForDiss: (dss) -> 
-        l = ""
-        for d in dss
-            l = _.padEnd l, d.start
-            l += d.match
-        l
-        
+            
     #  0000000   0000000   000       0000000   00000000 
     # 000       000   000  000      000   000  000   000
     # 000       000   000  000      000   000  0000000  

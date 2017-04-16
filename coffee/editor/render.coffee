@@ -3,9 +3,9 @@
 # 0000000    0000000   000 0 000  000   000  0000000   0000000  
 # 000   000  000       000  0000  000   000  000       000   000
 # 000   000  00000000  000   000  0000000    00000000  000   000
-{
-log,
-str}   = require 'kxk'
+
+{str, log,
+}      = require 'kxk'
 encode = require '../tools/encode'
 
 class Render 

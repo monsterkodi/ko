@@ -3,29 +3,14 @@
 # 000000    000  000      0000000         0000000   000   000  000     000     000   000  0000000    
 # 000       000  000      000             000       000   000  000     000     000   000  000   000  
 # 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000  
-{
-fileName,
-unresolve,
-fileExists,
-setStyle,
-swapExt,
-keyinfo,
-clamp,
-drag,
-post,
-error,
-log,
-$}         = require 'kxk'
+
+{fileName, unresolve, fileExists, setStyle, swapExt, keyinfo,
+clamp, drag, post, error, log, $, _, fs, path
+}          = require 'kxk'
 split      = require '../split'
 watcher    = require './watcher'
 TextEditor = require './texteditor'
 syntax     = require './syntax'
-_          = require 'lodash'
-fs         = require 'fs'
-path       = require 'path'
-electron   = require 'electron'
-ipc        = electron.ipcRenderer
-webframe   = electron.webFrame
 
 class FileEditor extends TextEditor
 
@@ -61,18 +46,18 @@ class FileEditor extends TextEditor
     
     applyForeignLineChanges: (lineChanges) =>
         log 'applyForeignLineChanges', lineChanges
-        @do.start()
-        for change in lineChanges
-            if change.change != 'deleted' and not change.after?
-                error "FileEditor.applyForeignLineChanges -- no after? #{change}" 
-                continue
-            switch change.change
-                when 'changed'  then @do.change change.doIndex, change.after
-                when 'inserted' then @do.insert change.doIndex, change.after
-                when 'deleted'  then @do.delete change.doIndex
-                else
-                    error "Editor.applyForeignLineChanges -- unknown change #{change.change}"
-        @do.end foreign: true
+        # @do.start()
+        # for change in lineChanges
+            # if change.change != 'deleted' and not change.after?
+                # error "FileEditor.applyForeignLineChanges -- no after? #{change}" 
+                # continue
+            # switch change.change
+                # when 'changed'  then @do.change change.doIndex, change.after
+                # when 'inserted' then @do.insert change.doIndex, change.after
+                # when 'deleted'  then @do.delete change.doIndex
+                # else
+                    # error "Editor.applyForeignLineChanges -- unknown change #{change.change}"
+        # @do.end foreign: true
 
     # 00000000  000  000      00000000
     # 000       000  000      000     
@@ -194,50 +179,80 @@ class FileEditor extends TextEditor
     #       000  000   000  000000000  00000000 
     # 000   000  000   000  000 0 000  000      
     #  0000000    0000000   000   000  000      
-    
+
+    jumpToFile: (file, line=0, col=0) =>
+        
+        if _.isObject file
+            col  = file.col  ? col
+            line = file.line ? line
+            file = file.file
+        
+        window.navigate.addFilePos
+            file: @currentFile
+            pos:  @cursorPos()
+            
+        window.navigate.gotoFilePos
+            file: file
+            pos:  [col, line]
+            winID: window.winID
+            extend: opt?.extend
+
     jumpTo: (word, opt) =>
         
-        find = word.toLowerCase()
+        if _.isObject(word) and not opt?
+            opt = word
+            word = opt.word
+        
+        opt ?= {}
+        
+        if opt.file?
+            @jumpToFile opt
+            return true
+
+        find = word.toLowerCase().trim()
         find = find.slice 1 if find[0] == '@'
-        jumpToFileLine = (file, line) =>
-            window.navigate.addFilePos
-                file: @currentFile
-                pos:  @cursorPos()
-            window.navigate.gotoFilePos
-                file: file
-                pos:  [0, line]
-                winID: window.winID
-                extend: opt?.extend
-        
-        classes = ipc.sendSync 'indexer', 'classes'
-        for clss, info of classes
-            if clss.toLowerCase() == find
-                jumpToFileLine info.file, info.line
-                return true
-                
-        funcs = ipc.sendSync 'indexer', 'funcs'
-        for func, infos of funcs
-            if func.toLowerCase() == find
-                info = infos[0]
-                for i in infos
-                    if i.file == @currentFile
-                        info = i
-                if infos.length > 1 and not opt?.dontList
-                    window.commandline.commands.term.execute "funcs ^#{word}$"
-                jumpToFileLine info.file, info.line
-                return true
 
-        files = ipc.sendSync 'indexer', 'files'
-        for file, info of files
-            if fileName(file).toLowerCase() == find and file != @currentFile
-                jumpToFileLine file, 6
-                return true
-
-        log "search for #{word}", window.commandline.commands.search?
+        return error 'FileEditor.jumpTo -- nothing to find?' if _.isEmpty find
         
-        window.commandline.commands.search.start "command+shift+f"    
-        window.commandline.commands.search.execute word
-        window.split.do 'reveal terminal'
+        type = opt?.type
+
+        log "jumpTo type:#{type} word:#{word}"
+
+        if not type or type == 'class'
+            classes = post.get 'indexer', 'classes'
+            for clss, info of classes
+                if clss.toLowerCase() == find
+                    @jumpToFile info
+                    return true
+
+        if not type or type == 'func'                
+            funcs = post.get 'indexer', 'funcs'
+            for func, infos of funcs
+                if func.toLowerCase() == find
+                    info = infos[0]
+                    for i in infos
+                        if i.file == @currentFile
+                            info = i
+                    if infos.length > 1 and not opt?.dontList
+                        window.commandline.commands.term.execute "funcs ^#{word}$"
+                    @jumpToFile info
+                    return true
+    
+        if not type or type == 'file'
+            files = post.get 'indexer', 'files'
+            for file, info of files
+                if fileName(file).toLowerCase() == find and file != @currentFile
+                    @jumpToFileLine file, 6
+                    return true
+
+        # log "search for #{word}", window.commandline.commands.search?
+        
+        if not type or type == 'word'
+            window.commandline.commands.search.start "command+shift+f"    
+            window.commandline.commands.search.execute word
+            
+        window.split.do 'show terminal'
+        
         true
     
     jumpToCounterpart: () ->

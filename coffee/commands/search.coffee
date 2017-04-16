@@ -3,21 +3,14 @@
 # 0000000   0000000   000000000  0000000    000       000000000
 #      000  000       000   000  000   000  000       000   000
 # 0000000   00000000  000   000  000   000   0000000  000   000
-{
-packagePath,
-unresolve,
-log
+
+{ packagePath, unresolve, path, fs, log, _
 }        = require 'kxk'
 walker   = require '../tools/walker'
 matchr   = require '../tools/matchr'
 syntax   = require '../editor/syntax'
 Command  = require '../commandline/command'
-_        = require 'lodash'
 stream   = require 'stream'
-path     = require 'path'
-fs       = require 'fs'
-electron = require 'electron'
-ipc      = electron.ipcRenderer
 
 class Search extends Command
 
@@ -52,14 +45,14 @@ class Search extends Command
             when '/search/', '/Search/'
                 return if command in ['^', '$', '.']
         command = super command
-        file = window.editor.currentFile ? _.first _.keys(ipc.sendSync('indexer', 'files'))
+        file = window.editor.currentFile ? _.first _.keys(post.get('indexer', 'files'))
         return if not file?
         @startSearchInFiles 
             text: command
             name: @name
             file: file
-        focus: '.terminal'
-        reveal: 'terminal'
+        focus:  'terminal'
+        show:   'terminal'
         text:   command
         select: true
       

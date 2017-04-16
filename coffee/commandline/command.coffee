@@ -3,15 +3,11 @@
 # 000       000   000  000000000  000000000  000000000  000 0 000  000   000
 # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
-{
-clamp,
-prefs,
-error,
-log
+
+{ clamp, prefs, error, log, _
 }           = require 'kxk'
 Syntax      = require '../editor/syntax'
 CommandList = require './commandlist'
-_           = require 'lodash'
 fuzzy       = require 'fuzzy'
 
 class Command
@@ -88,7 +84,7 @@ class Command
         @hideList()        
         text: ''
         focus: @focus
-        reveal: 'editor'
+        show: 'editor'
         
     clear: ->
         text: ''
@@ -130,13 +126,13 @@ class Command
     
     positionList: ->
         return if not @commandList?
-        split = window.split
-        listTop = 6+split.splitPosY 1
+        flex = window.split.flex
+        listTop = flex.posOfPane 2
         listHeight = @commandList.view.getBoundingClientRect().height
-        spaceBelow = split.elemHeight() - listTop
+        spaceBelow = flex.size() - listTop
         if spaceBelow < listHeight
-            if split.splitPosY(0) > spaceBelow
-                listTop = split.splitPosY(0) - listHeight
+            if flex.sizeOfPane(0) > spaceBelow
+                listTop = flex.posOfHandle(0) - listHeight
                 if listTop < 0
                     @commandList.view.style.height = "#{listHeight+listTop}px"
                     listTop = 0
@@ -154,7 +150,7 @@ class Command
         @selected = clamp -1, @commandList?.numLines()-1, i
         if @selected >= 0
             @commandList?.selectSingleRange @commandList.rangeForLineAtIndex @selected
-            @commandList.do.cursors [[0, @selected]]
+            @commandList?.do.cursors [[0, @selected]]
         else
             @commandList?.singleCursorAtPos [0,0] 
                 
@@ -287,8 +283,9 @@ class Command
     
     grabFocus: -> @commandline.focus()
     setFocus: (focus) -> 
-        return if focus == '.body'
-        @focus = focus ? '.editor'
+        return if focus == 'body'
+        log 'setFocus', focus
+        @focus = focus ? 'editor'
 
     #  0000000  000000000   0000000   000000000  00000000
     # 000          000     000   000     000     000     

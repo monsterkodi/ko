@@ -3,25 +3,21 @@
 # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 
 # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
-{
-fileList,
-keyinfo,
-clamp,
-log,
-$}        = require 'kxk'
-TextEditor  = require '../editor/texteditor'
-render    = require '../editor/render'
-syntax    = require '../editor/syntax'
-split     = require '../split'
-path      = require 'path'
+
+{ fileList, keyinfo, clamp, path, log, $, _
+}          = require 'kxk'
+TextEditor = require '../editor/texteditor'
+render     = require '../editor/render'
+syntax     = require '../editor/syntax'
+split      = require '../split'
 
 class Commandline extends TextEditor
     
     constructor: (viewElem) ->
             
         @fontSizeDefault = 24
-        @mainCommands = ['open', 'search', 'find', 'goto', 'term', 'coffee', 'build', 'macro']
-        @hideCommands = ['selecto', 'Term', 'Build', 'Coffee']
+        @mainCommands = ['open', 'search', 'find', 'goto', 'term', 'browse', 'coffee', 'build', 'macro']
+        @hideCommands = ['selecto', 'Term', 'Build', 'Coffee', 'Browse']
 
         super viewElem, features: []
         
@@ -29,7 +25,7 @@ class Commandline extends TextEditor
         @scroll?.setLineHeight @size.lineHeight
         @setText ""
                 
-        @cmmd =$ '.commandline-command' 
+        @cmmd =$ 'commandline-command' 
         @cmmd.classList.add 'empty'
         @cmmd.addEventListener 'mousedown', @onCmmdClick
         
@@ -58,10 +54,14 @@ class Commandline extends TextEditor
     loadCommands: ->
         files = fileList "#{__dirname}/../commands"
         for file in files
-            commandClass = require file
-            command = new commandClass @
-            command.setPrefsID commandClass.name.toLowerCase()
-            @commands[command.prefsID] = command
+            continue if path.extname(file) != '.js'
+            try
+                commandClass = require file
+                command = new commandClass @
+                command.setPrefsID commandClass.name.toLowerCase()
+                @commands[command.prefsID] = command
+            catch err
+                if err then error "can't load command form '#{file}': #{err}"
             
     setName: (name) -> 
         @cmmd.innerHTML = name
@@ -131,8 +131,9 @@ class Commandline extends TextEditor
             return
         window.split.showCommandline()
         @command = @commands[name]
-        activeClass = "."+document.activeElement.className
-        @command.setFocus activeClass != '.commandline-editor' and activeClass or null
+        activeID = document.activeElement.id
+        if activeID.startsWith 'column' then activeID = 'editor'
+        @command.setFocus activeID != 'commandline-editor' and activeID or null
         @view.focus()
         @setName name
         combo = @command.shortcuts[0] if not combo?
@@ -145,15 +146,14 @@ class Commandline extends TextEditor
     # 000        000 000   000       000       000   000     000     000     
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
     
-    execute: -> @results @command?.execute @line(0)
+    execute: -> @results @command?.execute @line 0 
         
     results: (r) ->
         @setText r.text if r?.text?
         @setName r.name if r?.name?
-        if r?.select then @selectAll()
-        else @selectNone()
+        if r?.select then @selectAll() else @selectNone()
+        window.split.show   r.show   if r?.show?
         window.split.focus  r.focus  if r?.focus?
-        window.split.reveal r.reveal if r?.reveal?
         window.split.do     r.do     if r?.do?
         
     cancel: -> @results @command?.cancel()
@@ -204,19 +204,25 @@ class Commandline extends TextEditor
         @list?.remove()
         @list = null
         
+    # 00000000    0000000    0000000  000  000000000  000   0000000   000   000  
+    # 000   000  000   000  000       000     000     000  000   000  0000  000  
+    # 00000000   000   000  0000000   000     000     000  000   000  000 0 000  
+    # 000        000   000       000  000     000     000  000   000  000  0000  
+    # 000         0000000   0000000   000     000     000   0000000   000   000  
+    
     positionList: ->
         return if not @list?
-        split = window.split
-        listTop = split.splitPosY 1
         listHeight = @list.getBoundingClientRect().height
-        spaceBelow = split.elemHeight() - listTop
-        spaceAbove = split.splitPosY 0
+        flex = window.split.flex
+        listTop = flex.posOfPane 2
+        spaceBelow = flex.size() - listTop
+        spaceAbove = flex.sizeOfPane 0
         if spaceBelow < listHeight and spaceAbove > spaceBelow
             listTop = spaceAbove - listHeight
         @list?.style.top = "#{listTop}px"        
     
     resized: -> 
-        @list?.resized()
+        @list?.resized?()
         @command?.commandList?.resized()
         super
 

@@ -54,20 +54,99 @@ body
     font-family         font
     -webkit-user-select none
     -webkit-app-region  no-drag
+
+#main
+    position            absolute
+    top                 titlebarHeight
+    left                0
+    right               0
+    bottom              0
+
+//  0000000  00000000   000      000  000000000
+// 000       000   000  000      000     000   
+// 0000000   00000000   000      000     000   
+//      000  000        000      000     000   
+// 0000000   000        0000000  000     000   
+        
+#split
+    position            relative
+    overflow            hidden
+    border-left         frameBorder
+    border-right        frameBorder
+    box-sizing          border-box
+    width               100%
+
+.split-handle    
+    background          #222
+
+// 0000000    00000000    0000000   000   000   0000000  00000000  00000000   
+// 000   000  000   000  000   000  000 0 000  000       000       000   000  
+// 0000000    0000000    000   000  000000000  0000000   0000000   0000000    
+// 000   000  000   000  000   000  000   000       000  000       000   000  
+// 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
+
+.browser
+    background          #000
+    color               #fff
+    position            absolute
+    bottom              0
+    right               0
+    left                0
+    top                 0
+
+.browserColumn
+    overflow            auto
+
+.browserColumnTable
+    display             table    
+    width               100%
+
+.browserRow
+    display             block
+    padding-left        6px
+    padding-right       6px
+    white-space         nowrap
+    cursor              pointer
+    color               #88f
+
+    &.hover   
+        background      #111
+        
+    &.active
+        background      #222
+
+    &.hover             
+        color           #fff
+
+.browserColumn.focus .browserRow.active
+    background          #333
     
+.browserSearch
+    padding-right       12px
+    float               right
+
+.browserImageContainer
+    position            relative
+    padding-left        frameWidth
+
+.browserImage
+    max-width           600px
+    max-height          600px
+    border              1px solid frameColor
+
 //  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
 // 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
 // 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 
 // 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
 //  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 
-.commandline
+#commandline
     padding             0
     margin              0
-    display             flex
     white-space         nowrap 
+    display             flex
 
-.commandline-command
+#commandline-command
     font-family         font
     font-size           24px
     padding-top         0px
@@ -86,11 +165,13 @@ body
         background      #333
         
 span.ko
-.commandline-command.active
+#commandline-command.active
     &.open
         color       #8f0
     &.goto
         color       #66f
+    &.browse
+        color       #ff0
     &.find
         color       #f5f
     &.search
@@ -104,8 +185,8 @@ span.ko
     &.macro
         color       #888
 
-.commandline-command.macro
-.commandline-command.coffee
+#commandline-command.macro
+#commandline-command.coffee
     color           #aaa 
         
 .ko.shortcut
@@ -113,44 +194,18 @@ span.ko
 .ko.command
     font-weight     bold
         
-.commandline-span
+#commandline-span
     position            relative
     flex-grow           1
     white-space         nowrap 
             
-.commandline-editor
+#commandline-editor
     color               #fff
     background          #000
     font-family         font
     fill-abs()
     overflow-x          auto
     overflow-y          hidden
-
-//  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000   0000000  000000000
-// 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  000          000   
-// 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  0000000      000   
-// 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000       000     000   
-//  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  0000000      000   
-
-.commandlist
-    position            absolute
-    left                0
-    overflow            hidden
-    width               500px
-    background          #1a1a1a
-
-.commandlist.coffee
-    width               800px
-
-.commandlist.open
-    width               600px
-
-.commandlist.open .linenumber.selected span    
-    color               #aaf
-.commandlist.goto .linenumber.selected span    
-    color               #66f
-.commandlist.term .linenumber.selected span    
-    color               #f80
 
 //   00000000  00000000    0000000
 //   000       000   000  000     
@@ -175,7 +230,7 @@ span.ko
 // 000  000  0000  000       000   000
 // 000  000   000  000        0000000 
     
-.info
+#info
     overflow            hidden
     width               minimapWidth
     position            absolute
@@ -245,123 +300,32 @@ infoPadding = 6px
 .info-highlights
     color               rgb(103,103,171)
 
-// 000      000   0000000  000000000
-// 000      000  000          000   
-// 000      000  0000000      000   
-// 000      000       000     000   
-// 0000000  000  0000000      000   
-
-.list
-    position            absolute
-    left                0
-    overflow-x          hidden
-    overflow-y          auto
-    width               500px
-    max-height          460px
-    background          #222
-
-.list.commands
-    width               200px
-    
-.list-item
-    width               100%
-    height              20px
-    font-family         font
-    font-size           16px
-    padding-left        5px
-    padding-top         2px
-    padding-bottom      2px
-    overflow-x          auto
-    overflow-y          hidden
-    cursor              pointer
-    white-space         nowrap
-    -webkit-user-select none
-    &::-webkit-scrollbar    
-        height          1px
-    &.selected
-        background      #333
-
-.list.windows
-    min-width           200px
-    & .list-item
-        font-size       titlebarFontSize    
-    & .dot
-        padding-left    10px
-        padding-right   10px
-        color           #006600
-    & .winid    
-        color           #008815
-        padding-left    62px
-
-//  0000000   000   000  000000000   0000000    0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
-// 000   000  000   000     000     000   000  000       000   000  000   000  000   000  000      000          000     000     
-// 000000000  000   000     000     000   000  000       000   000  000000000  00000000   000      0000000      000     0000000 
-// 000   000  000   000     000     000   000  000       000   000  000 0 000  000        000      000          000     000     
-// 000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
-
-.autocomplete-span
-    background          #22a
-    opacity             1  
-    color               #ff0
-    &.selected
-        color           #fff
-    
-.autocomplete-list 
-    position            absolute
-    width               auto
-    overflow-x          hidden
-    overflow-y          auto
-    left                0
-    top                 100%
-    background          #222
-    &::-webkit-scrollbar
-        width            4px
-        background-color #333
-    &::-webkit-scrollbar-thumb
-        width            2px
-        background-color #55b
-    
-.autocomplete-item
-    white-space         nowrap
-    width               100%
-    color               #ccc
-    display             block
-    padding-left        5px
-    padding-right       10px
-    overflow            hidden
-    cursor              pointer
-    -webkit-user-select none    
-    &.selected
-        background  #55b
-        color       #ff0
-
 // 000000000  000  000000000  000      00000000  0000000     0000000   00000000 
 //    000     000     000     000      000       000   000  000   000  000   000
 //    000     000     000     000      0000000   0000000    000000000  0000000  
 //    000     000     000     000      000       000   000  000   000  000   000
 //    000     000     000     0000000  00000000  0000000    000   000  000   000
 
-.titlebar
+#titlebar
     height              titlebarHeight
     box-sizing          border-box
     background          #333
     color               #aaa
     font-size           titlebarFontSize
     padding-left        70px
-    padding-right       70px
     white-space         nowrap
-    -webkit-app-region  drag
-    position            static
+    // position            static
     display             block
+    -webkit-app-region  drag
 
-.titlebar .title
-.titlebar .dot
+#titlebar .title
+#titlebar .dot
     display             inline-block
     vertical-align      top
     padding-left        10px
     padding-top         3px 
         
-.titlebar .title::before
+#titlebar .title::before
     content             attr(data-tip)
     position            absolute
     z-index             999
@@ -371,11 +335,11 @@ infoPadding = 6px
     top                 9999px
     transition          opacity 0.2s ease-out 
      
-.titlebar .title:hover::before
+#titlebar .title:hover::before
     opacity             1
     top                 3px
 
-.titlebar .winid
+#titlebar .winid
     color               #555
     &.focus
         color           #008815
@@ -384,88 +348,16 @@ infoPadding = 6px
     padding-left        3px
     padding-top         3px
 
-.titlebar .dot.clean
+#titlebar .dot.clean
     color               #444
     &.focus
         color           #006600
 
-.titlebar .title.focus
+#titlebar .title.focus
     color               #34C749
-.titlebar .title.dirty
-.titlebar .dot.dirty
+#titlebar .title.dirty
+#titlebar .dot.dirty
     color               #aaf
-
-//  0000000   0000000  00000000    0000000   000      000      0000000     0000000   00000000 
-// 000       000       000   000  000   000  000      000      000   000  000   000  000   000
-// 0000000   000       0000000    000   000  000      000      0000000    000000000  0000000  
-//      000  000       000   000  000   000  000      000      000   000  000   000  000   000
-// 0000000    0000000  000   000   0000000   0000000  0000000  0000000    000   000  000   000
-
-::-webkit-scrollbar
-    width                   scrollhandleWidth
-    height                  scrollhandleWidth  
-    background-color        transparent
-
-::-webkit-scrollbar-corner
-    background-color        #222
-
-::-webkit-scrollbar-thumb
-    background-color        #333
-
-::-webkit-scrollbar-track
-    background-color        transparent
-    
-::-webkit-scrollbar-thumb
-    background-color        #333
-    
-::-webkit-scrollbar-thumb:hover
-    background-color        #b00
-
-.scrollbar
-    position            absolute
-    top                 0
-    bottom              0
-        
-    &.left
-        left            0
-        width           scrollbarWidth
-    &.right
-        right           0
-        width           scrollbarWidth
-
-.scrollhandle
-    background          #88f
-    position            absolute
-    width               scrollhandleWidth
-    top                 0
-    &.left
-        left            0
-    &.right
-        right           0    
-
-//  0000000  00000000   000      000  000000000
-// 000       000   000  000      000     000   
-// 0000000   00000000   000      000     000   
-//      000  000        000      000     000   
-// 0000000   000        0000000  000     000   
-        
-.split
-    overflow            hidden
-    position            relative
-    border-left         frameBorder
-    border-right        frameBorder
-    border-bottom       frameBorder
-    box-sizing          border-box
-    
-.handle
-    background          #222
-    height              splithandleHeight
-    overflow            hidden
-    position            relative
-    cursor              ns-resize
-    
-.log
-    bottom              0
 
 //  0000000   00000000   00000000   0000000 
 // 000   000  000   000  000       000   000
@@ -473,7 +365,7 @@ infoPadding = 6px
 // 000   000  000   000  000       000   000
 // 000   000  000   000  00000000  000   000
 
-.area
+#area
     position            relative
     overflow            hidden
     background          #181818
@@ -485,26 +377,29 @@ infoPadding = 6px
 // 000       000   000  000     000     000   000  000   000
 // 00000000  0000000    000     000      0000000   000   000
 
-.terminal
-.logview
-.editor
+#terminal
+#logview
+#editor
     position            relative
     overflow            hidden
-
     background          #000
     color               #ddd 
-    
     font-family         font
     
+#logview
+    border-bottom       frameBorder
+    
 .layers
-    position            relative 
+    fill-abs()
     overflow-x          visible
     overflow-y          hidden
     &::-webkit-scrollbar
         height          2px
         
-.commandline-editor .layers
+#commandline-editor .layers
     min-height          commandlineHeight
+    &::-webkit-scrollbar
+        height          2px
 
 // 000      000  000   000  00000000   0000000
 // 000      000  0000  000  000       000     
@@ -774,3 +669,168 @@ infoPadding = 6px
     margin-right        0
     padding-left        0
     margin-left         0
+
+//  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000   0000000  000000000
+// 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  000          000   
+// 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  0000000      000   
+// 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000       000     000   
+//  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  0000000      000   
+
+.commandlist
+    position            absolute
+    left                0
+    overflow            hidden
+    width               500px
+    background          #1a1a1a
+
+.commandlist.coffee
+    width               800px
+
+.commandlist.open
+    width               600px
+
+.commandlist.open .linenumber.selected span    
+    color               #aaf
+.commandlist.goto .linenumber.selected span    
+    color               #66f
+.commandlist.term .linenumber.selected span    
+    color               #f80
+
+// 000      000   0000000  000000000
+// 000      000  000          000   
+// 000      000  0000000      000   
+// 000      000       000     000   
+// 0000000  000  0000000      000   
+
+.list
+    position            absolute
+    left                0
+    overflow-x          hidden
+    overflow-y          auto
+    width               500px
+    max-height          460px
+    background          #222
+
+.list.commands
+    width               200px
+    
+.list-item
+    width               100%
+    height              20px
+    font-family         font
+    font-size           16px
+    padding-left        5px
+    padding-top         2px
+    padding-bottom      2px
+    overflow-x          auto
+    overflow-y          hidden
+    cursor              pointer
+    white-space         nowrap
+    -webkit-user-select none
+    &::-webkit-scrollbar    
+        height          1px
+    &.selected
+        background      #333
+
+.list.windows
+    min-width           200px
+    & .list-item
+        font-size       titlebarFontSize    
+    & .dot
+        padding-left    10px
+        padding-right   10px
+        color           #006600
+    & .winid    
+        color           #008815
+        padding-left    62px
+
+//  0000000   000   000  000000000   0000000    0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
+// 000   000  000   000     000     000   000  000       000   000  000   000  000   000  000      000          000     000     
+// 000000000  000   000     000     000   000  000       000   000  000000000  00000000   000      0000000      000     0000000 
+// 000   000  000   000     000     000   000  000       000   000  000 0 000  000        000      000          000     000     
+// 000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
+
+.autocomplete-span
+    background          #22a
+    opacity             1  
+    color               #ff0
+    &.selected
+        color           #fff
+    
+.autocomplete-list 
+    position            absolute
+    width               auto
+    overflow-x          hidden
+    overflow-y          auto
+    left                0
+    top                 100%
+    background          #222
+    &::-webkit-scrollbar
+        width            4px
+        background-color #333
+    &::-webkit-scrollbar-thumb
+        width            2px
+        background-color #55b
+    
+.autocomplete-item
+    white-space         nowrap
+    width               100%
+    color               #ccc
+    display             block
+    padding-left        5px
+    padding-right       10px
+    overflow            hidden
+    cursor              pointer
+    -webkit-user-select none    
+    &.selected
+        background  #55b
+        color       #ff0
+
+//  0000000   0000000  00000000    0000000   000      000      0000000     0000000   00000000 
+// 000       000       000   000  000   000  000      000      000   000  000   000  000   000
+// 0000000   000       0000000    000   000  000      000      0000000    000000000  0000000  
+//      000  000       000   000  000   000  000      000      000   000  000   000  000   000
+// 0000000    0000000  000   000   0000000   0000000  0000000  0000000    000   000  000   000
+
+::-webkit-scrollbar
+    width                   scrollhandleWidth
+    height                  scrollhandleWidth  
+    background-color        transparent
+
+::-webkit-scrollbar-corner
+    background-color        #222
+
+::-webkit-scrollbar-thumb
+    background-color        #333
+
+::-webkit-scrollbar-track
+    background-color        transparent
+    
+::-webkit-scrollbar-thumb
+    background-color        #333
+    
+::-webkit-scrollbar-thumb:hover
+    background-color        #b00
+
+.scrollbar
+    position            absolute
+    top                 0
+    bottom              0
+        
+    &.left
+        left            0
+        width           scrollbarWidth
+    &.right
+        right           0
+        width           scrollbarWidth
+
+.scrollhandle
+    background          #88f
+    position            absolute
+    width               scrollhandleWidth
+    top                 0
+    &.left
+        left            0
+    &.right
+        right           0    
+    

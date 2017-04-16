@@ -3,10 +3,8 @@
 # 000000000  000000000     000     000       000000000  0000000  
 # 000 0 000  000   000     000     000       000   000  000   000
 # 000   000  000   000     000      0000000  000   000  000   000
-{
-last
-} = require 'kxk'
-_ = require 'lodash'
+
+{last, str, _} = require 'kxk'
 
 #  0000000   0000000   000   000  00000000  000   0000000 
 # 000       000   000  0000  000  000       000  000      
@@ -49,15 +47,20 @@ sortRanges = (rgs) ->
 #             the nth item of values(s) if value(s) is an array
 #             the nth [key, value] pair if value(s) is an object
 
-ranges = (regexes, str) ->
+ranges = (regexes, text) ->
     
+    if not _.isArray regexes
+        regexes = [[regexes, '?']]
+    else if not _.isArray regexes[0]
+        regexes = [regexes]
+    # console.log str regexes
     rgs = []
-    return rgs if not str?
+    return rgs if not text?
     for r in [0...regexes.length]
         reg = regexes[r][0]
         arg = regexes[r][1]
         i = 0
-        s = str
+        s = text
         while s.length
             match = reg.exec s
             break if not match?
@@ -68,7 +71,7 @@ ranges = (regexes, str) ->
                     value: arg
                     index: r
                 i += match.index + match[0].length
-                s = str.slice i
+                s = text.slice i
             else
                 gs = 0
                 for j in [0..match.length-2]
@@ -76,15 +79,16 @@ ranges = (regexes, str) ->
                     if _.isArray(value) and j < value.length then value = value[j]
                     else if _.isObject(value) and j < _.size(value) 
                         value = [_.keys(value)[j], value[_.keys(value)[j]]]
+                    break if not match[j+1]?
                     gi = match[0].slice(gs).indexOf match[j+1]
                     rgs.push
                         start: match.index + i + gs + gi
                         match: match[j+1]
                         value: value
                         index: r
-                    gs += match[j+1].length
+                    gs += match[j+1]?.length
                 i += match.index + match[0].length
-                s = str.slice i
+                s = text.slice i
     sortRanges rgs        
 
 # 0000000    000   0000000   0000000  00000000   0000000  000000000
@@ -103,7 +107,10 @@ ranges = (regexes, str) ->
      
 #     with none of the [start, start+match.length] ranges overlapping
 
-dissect = (ranges, opt={join:false}) -> 
+dissect = (ranges, opt = join:false) -> 
+    
+    log = opt?.log ? ->
+        
     return [] if not ranges.length
     # console.log "dissect -- #{JSON.stringify ranges}"
     di = []
@@ -133,7 +140,7 @@ dissect = (ranges, opt={join:false}) ->
             p += 1 
         pn = p
         while d[pn].start < rg.start+rg.match.length
-            if  (d[pn].cid < rg.index or opt.join) and rg.value?
+            if (d[pn].cid <= rg.index or opt.join) and rg.value?
                 if not rg.value.split?
                     for r in rg.value
                         continue if not r.split?
@@ -153,16 +160,17 @@ dissect = (ranges, opt={join:false}) ->
                 break
                 
     d = d.filter (i) -> i.match?.trim().length
+    
     for i in d
         i.clss = i.cls.join ' '
+        
     if d.length > 1
+        log 'join', d
         for i in [d.length-2..0]
             if d[i].start + d[i].match.length == d[i+1].start
                 if d[i].clss == d[i+1].clss
                     d[i].match += d[i+1].match
                     d.splice i+1, 1
-        
-    # console.log "dissect ==", JSON.stringify d
     d
 
 module.exports = 

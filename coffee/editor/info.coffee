@@ -3,13 +3,9 @@
 # 000  000 0 000  000000    000   000
 # 000  000  0000  000       000   000
 # 000  000   000  000        0000000 
-{
-shortCount,
-log,
-$}       = require 'kxk'
-_        = require 'lodash'
-electron = require 'electron'
-ipc      = electron.ipcRenderer
+
+{ shortCount, post, log, $, _
+} = require 'kxk'
 
 class Info
     
@@ -19,7 +15,7 @@ class Info
         window.logview.on  'focus', @setEditor
         window.terminal.on 'focus', @setEditor
                 
-        @elem = $('.info')
+        @elem =$ 'info' 
         
         # 000000000   0000000   00000000 
         #    000     000   000  000   000
@@ -57,15 +53,15 @@ class Info
         
         @classes = document.createElement 'span'
         @classes.className = "info-classes empty"
-        @classes.onclick = => @termCommand 'classes'
+        @classes.onclick = => @termCommand 'class'
         @topline.appendChild @classes
-        ipc.on 'classesCount', (event, count) => @onClassesCount count
+        post.on 'classesCount', (count) => @onClassesCount count
 
         @funcs = document.createElement 'span'
         @funcs.className = "info-funcs empty"
-        @funcs.onclick = => @termCommand 'funcs'
+        @funcs.onclick = => @termCommand 'func'
         @topline.appendChild @funcs
-        ipc.on 'funcsCount', (event, count) => @onFuncsCount count
+        post.on 'funcsCount', (count) => @onFuncsCount count
 
         @elem.appendChild @topline
 
@@ -90,22 +86,22 @@ class Info
 
         @files = document.createElement 'span'
         @files.className = "info-files"
-        @files.onclick = => @termCommand 'files'
+        @files.onclick = => @termCommand 'file'
         @botline.appendChild @files
-        ipc.on 'filesCount', (event, count) => @onFilesCount count
+        post.on 'filesCount', (count) => @onFilesCount count
         
         @words = document.createElement 'span'
         @words.className = "info-words empty"
-        @words.onclick = => @termCommand 'words'
+        @words.onclick = => @termCommand 'word'
         @botline.appendChild @words
-        window.editor.autocomplete.on 'wordCount', @onWordCount
+        window.editor.autocomplete.on 'wordCount', @onWordCount # use post
 
         @elem.appendChild @botline
         
         @setEditor editor        
 
     termCommand: (cmmd) ->
-        window.split.do 'reveal terminal'
+        window.split.do 'show terminal'
         window.commandline.commands.term.execute cmmd
 
     #  0000000  00000000  000000000        00000000  0000000    000  000000000   0000000   00000000 
@@ -144,9 +140,9 @@ class Info
     # 000   000  00000000  0000000   0000000   000   000  0000000  
     
     reload: =>
-        @onClassesCount _.size ipc.sendSync 'indexer', 'classes'
-        @onFuncsCount   _.size ipc.sendSync 'indexer', 'funcs'
-        @onFilesCount   _.size ipc.sendSync 'indexer', 'files'
+        @onClassesCount _.size post.get 'indexer', 'classes'
+        @onFuncsCount   _.size post.get 'indexer', 'funcs'
+        @onFilesCount   _.size post.get 'indexer', 'files'
 
     #  0000000   000   000                     
     # 000   000  0000  000                     

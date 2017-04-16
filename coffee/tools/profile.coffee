@@ -3,9 +3,9 @@
 # 00000000   0000000    000   000  000000    000  000      0000000 
 # 000        000   000  000   000  000       000  000      000     
 # 000        000   000   0000000   000       000  0000000  00000000
-{
-log} = require 'kxk'
-now  = require 'performance-now'
+
+{log} = require 'kxk'
+now   = require 'performance-now'
 
 start = undefined
 s_msg = undefined

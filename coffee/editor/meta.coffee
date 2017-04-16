@@ -3,13 +3,10 @@
 # 000000000  0000000      000     000000000
 # 000 0 000  000          000     000   000
 # 000   000  00000000     000     000   000
-{
-error,
-log,
-$}  = require 'kxk'
+
+{ error, log, fs, $, _
+}      = require 'kxk'
 ranges = require '../tools/ranges'
-_   = require 'lodash'
-fs  = require 'fs'
 
 class Meta 
     

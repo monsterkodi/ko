@@ -1,6 +1,6 @@
 name            ko-editor
 productName     ko
-version         0.13.0
+version         0.14.0
 description     an editor for macOS
 main            js/main.js
 preferGlobal    true
@@ -25,7 +25,6 @@ maintainers
 bugs
                 url  https://github.com/monsterkodi/ko/issues
 dependencies
-                ansi-keycode    0.0.0
                 chokidar        ^1.6.1
                 coffee-script   ^1.12.4
                 colors          ^1.1.2
@@ -34,13 +33,14 @@ dependencies
                 entities        ^1.1.1
                 eve             ^0.5.3
                 font-awesome    ^4.7.0
+                fork-func       0.0.6
                 fs-extra        ^2.0.0
                 fuzzy           ^0.1.3
                 html-entities   ^1.2.0
                 immutable       ^3.8.1
                 karg            >=1.0.9
                 keycode         ^2.1.8
-                kxk             ^0.8.0
+                kxk             ^0.10.2
                 lodash          ^4.17.4
                 nconf           ^0.8.4
                 node-pty        ^0.6.3
@@ -48,7 +48,9 @@ dependencies
                 opener          ^1.4.3
                 performance-now  ^2.1.0
                 sprintf-js      ^1.0.3
+                textextensions  ^2.0.1
                 three           ^0.84.0
+                traceback       ^0.3.1
                 underscore.string  ^3.3.4
                 walkdir         0.0.11
                 write-file-atomic  ^1.3.1

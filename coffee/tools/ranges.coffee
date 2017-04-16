@@ -83,7 +83,7 @@ class Ranges
             if mDist < minDist
                 minDist = mDist
                 minPos = ps
-        minPos ? last pl
+        minPos ? _.last pl
     
     lineIndicesInPositions: (pl) ->
         li = new Set
