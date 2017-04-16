@@ -78,15 +78,15 @@ class Browser extends Stage
         clsss = ipc.sendSync 'indexer', 'classes'
         clsss = _.pickBy clsss, (obj, key) -> obj.file == file
         for clss,clsso of clsss
-            items.push name: clss, text: '●'+clss, type:'class', file: file, line: clsso.line
+            items.push name: clss, text: '● '+clss, type:'class', file: file, line: clsso.line
             for mthd,mthdo of clsso.methods
-                items.push name: mthd, text: '▸'+mthd, type:'method', file: file, line: mthdo.line
+                items.push name: mthd, text: '  ▸ '+mthd, type:'method', file: file, line: mthdo.line
 
         files = ipc.sendSync 'indexer', 'files'
         funcs = files[file]?.funcs ? []
         for f in funcs
             if f[3] == name
-                items.push name: f[2], text:'▸'+f[2], type: 'func', file: file, line: f[0]
+                items.push name: f[2], text:'  ▸ '+f[2], type: 'func', file: file, line: f[0]
 
         @clearColumnsFrom opt.column
 

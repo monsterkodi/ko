@@ -20,14 +20,17 @@ class Syntax
         l = ""
         diss = @dissForTextAndSyntax text, n
         if diss?.length
-            for di in [diss.length-1..0]
+            last = 0
+            for di in [0...diss.length]
                 d = diss[di]
-                tx = d.start * 13
-                # style = d.styl? and d.styl.length and " style=\"#{d.styl}\"" or ''
-                style = " style=\"transform:translatex(#{tx}px);#{d.styl}\""
+                style = d.styl? and d.styl.length and " style=\"#{d.styl}\"" or ''
+                spc = ''
+                for sp in [last...d.start]
+                    spc += '&nbsp;'
+                last  = d.start + d.match.length
                 clss  = d.clss? and d.clss.length and " class=\"#{d.clss}\"" or ''
-                clrzd = "<span#{style}#{clss}>#{encode d.match}</span>"
-                l = clrzd + l
+                clrzd = "<span#{style}#{clss}>#{spc}#{encode d.match}</span>"
+                l += clrzd
         l
 
     @rangesForTextAndSyntax: (line, n) ->
