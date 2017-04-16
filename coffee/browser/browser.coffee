@@ -12,8 +12,6 @@ Column   = require './column'
 Stage    = require '../area/stage'
 dirlist  = require '../tools/dirlist'
 flex     = require '../flex/flex'
-electron = require 'electron'
-ipc = electron.ipcRenderer
 
 class Browser extends Stage
     

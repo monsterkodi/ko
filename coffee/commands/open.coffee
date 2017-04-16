@@ -14,8 +14,6 @@ Command  = require '../commandline/command'
 render   = require '../editor/render'
 syntax   = require '../editor/syntax'
 fuzzy    = require 'fuzzy'
-electron = require 'electron'
-ipc      = electron.ipcRenderer
     
 class Open extends Command
 

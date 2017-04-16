@@ -12,11 +12,8 @@ indexer    = require '../indexer'
 salt       = require '../tools/salt'
 Command    = require '../commandline/command'
 colors     = require 'colors'
-electron   = require 'electron'
 process    = require 'process'
 atomicFile = require 'write-file-atomic'
-
-ipc        = electron.ipcRenderer
 
 class Macro extends Command
 
@@ -221,7 +218,7 @@ class Macro extends Command
                     if err?
                         log 'writing class skeleton failed', err
                         return
-                    ipc.send 'newWindowWithFile', file
+                    post.toMain 'newWindowWithFile', file
                 return focus: editor.name
             
         text: ''

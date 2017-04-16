@@ -11,9 +11,6 @@ split      = require '../split'
 watcher    = require './watcher'
 TextEditor = require './texteditor'
 syntax     = require './syntax'
-electron   = require 'electron'
-ipc        = electron.ipcRenderer
-webframe   = electron.webFrame
 
 class FileEditor extends TextEditor
 

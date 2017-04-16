@@ -7,9 +7,6 @@
 { clamp, log, _
 }        = require 'kxk'
 Command  = require '../commandline/command'
-electron = require 'electron'
-
-ipc = electron.ipcRenderer
 
 class Goto extends Command
 

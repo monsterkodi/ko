@@ -4,18 +4,16 @@
 #    000     000     000     000      000       000   000  000   000  000   000
 #    000     000     000     0000000  00000000  0000000    000   000  000   000
 
-{ packagePath, unresolve, stopEvent, clamp, path, log, $
-}       = require 'kxk'
+{ packagePath, unresolve, stopEvent, clamp, post, path, log, $
+}        = require 'kxk'
 render   = require './editor/render'
 syntax   = require './editor/syntax'
-electron = require 'electron'
-ipc      = electron.ipcRenderer
 
 class Titlebar
     
     constructor: () ->
         @elem =$ 'titlebar' 
-        @elem.ondblclick = (event) -> ipc.send 'maximizeWindow', window.winID
+        @elem.ondblclick = (event) -> post.toMain 'maximizeWindow', window.winID
         @selected = -1
         document.body.addEventListener 'focusout', @closeList
         document.body.addEventListener 'focusin',  @closeList
@@ -54,7 +52,7 @@ class Titlebar
     
     showList: (event) => 
         return if @list?
-        winInfos = ipc.sendSync 'winInfos'
+        winInfos = post.get 'winInfos'
         return if winInfos.length < 2
         document.activeElement.blur()
         @selected = -1
@@ -63,8 +61,7 @@ class Titlebar
         @list.style.top = 0
         window.split.elem.appendChild @list             
         @listWinInfos winInfos
-        event?.preventDefault()
-        event?.stopPropagation()
+        stopEvent event
 
     closeList: =>
         if @list?
@@ -90,14 +87,13 @@ class Titlebar
             div.innerHTML = id + dot + fileSpan
             activateWindow = (id) => (event) => 
                 @loadWindowWithID id
-                event.stopPropagation()
-                event.preventDefault()
+                stopEvent event
             div.addEventListener 'mousedown', activateWindow info.id
             @list.appendChild div
 
     loadWindowWithID: (id) ->
         @closeList()
-        ipc.send 'activateWindow', id
+        post.toMain 'activateWindow', id
         
     loadSelected: -> 
         return @closeList() if @selected < 0
@@ -126,8 +122,6 @@ class Titlebar
                 when 'up', 'down'   then return @navigate key
                 when 'enter'      
                     stopEvent event
-                    # event.stopPropagation()
-                    # event.preventDefault()
                     return @loadSelected()
         
         return 'unhandled'

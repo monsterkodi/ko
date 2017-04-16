@@ -13,7 +13,6 @@ syntax    = require './syntax'
 scroll    = require './scroll'
 Editor    = require './editor'
 electron  = require 'electron'
-ipc       = electron.ipcRenderer
 
 class TextEditor extends Editor
 

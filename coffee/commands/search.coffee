@@ -11,8 +11,6 @@ matchr   = require '../tools/matchr'
 syntax   = require '../editor/syntax'
 Command  = require '../commandline/command'
 stream   = require 'stream'
-electron = require 'electron'
-ipc      = electron.ipcRenderer
 
 class Search extends Command
 
