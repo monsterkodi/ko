@@ -53,13 +53,13 @@ class Commandline extends TextEditor
     saveState: ->
         if @command?
             state = @command.state()
-            log 'saveState', state
+            # log 'saveState', state
         window.setState 'commandline', state
 
     restoreState: ->
         
         state = window.getState 'commandline'
-        log 'restoreState', state
+        log 'commandline restoreState', state
         @setText state?.text ? ""
         if state?.name
             @startCommand state.name, state.combo

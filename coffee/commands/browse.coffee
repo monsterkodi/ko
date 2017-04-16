@@ -28,8 +28,9 @@ class Browse extends Command
         super @commandline
 
     restoreState: (state) -> 
+        # log 'restoreState', state
         super state
-        @execute()
+        @browser.loadFile state.text, focus:false, dontJump:true
     
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -48,7 +49,8 @@ class Browse extends Command
 
         super @combo
         
-        text:   @last()
+        # text:   @last()
+        # select: true
         select: true
         do:     @name == 'Browse' and 'half area' or 'quart area'
 
@@ -59,6 +61,7 @@ class Browse extends Command
     # 00000000  000   000  00000000   0000000   0000000      000     00000000  
     
     execute: (command) ->
+        return error if not command?
         @cmdID += 1
         cmd = command.trim()
         if cmd.length 

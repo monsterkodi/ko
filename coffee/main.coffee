@@ -5,7 +5,7 @@
 # 000   000  000   000  000  000   000
 
 { splitFilePos, fileExists, dirExists, fileList, resolve,
-about, prefs, store, noon, post, fs, str, log, _
+  childp, about, prefs, store, noon, post, fs, str, log, _
 }             = require 'kxk'
 pkg           = require '../package.json'
 Execute       = require './execute'
@@ -14,13 +14,9 @@ Indexer       = require './indexer'
 MainMenu      = require './mainmenu'
 colors        = require 'colors'
 electron      = require 'electron'
-childp        = require 'child_process'
-app           = electron.app
-BrowserWindow = electron.BrowserWindow
-Tray          = electron.Tray
-Menu          = electron.Menu
-clipboard     = electron.clipboard
-dialog        = electron.dialog
+
+{ BrowserWindow, Tray, Menu, app, clipboard, dialog        
+}             = electron
 disableSnap   = false
 main          = undefined # < created in app.on 'ready'
 navigate      = undefined # <
@@ -108,34 +104,23 @@ hideDock = ->
     return if prefs.get 'trayOnly', false
     app.dock.hide() if app.dock
 
-# 000  00000000    0000000
-# 000  000   000  000     
-# 000  00000000   000     
-# 000  000        000     
-# 000  000         0000000
+# 00000000    0000000    0000000  000000000  
+# 000   000  000   000  000          000     
+# 00000000   000   000  0000000      000     
+# 000        000   000       000     000     
+# 000         0000000   0000000      000     
 
 post.onGet 'activateWindowWithFile', (file) -> main.activateWindowWithFile file
-    
-post.onGet 'winInfos', -> 
-    infos = []
-    for w in wins()
-        infos.push 
-            id: w.id
-            file: w.currentFile            
-    infos
+post.onGet 'winInfos', -> (id: w.id, file: w.currentFile for w in wins())
 
-post.on 'newWindowWithFile',      (file)   -> main.createWindow file
-post.on 'toggleDevTools',         (winID)  -> winWithID(winID).toggleDevTools()
-post.on 'restartShell',           (cfg)    -> winShells[cfg.winID].restartShell()
-post.on 'maximizeWindow',         (winID)  -> main.toggleMaximize winWithID winID
-post.on 'activateWindow',         (winID)  -> main.activateWindowWithID winID
-post.on 'reloadWindow',           (winID)  -> main.reloadWin winWithID winID
-
-post.on 'fileLoaded', (file, winID) -> 
-    winWithID(winID).currentFile = file 
-    main.indexer.indexFile file
-
-post.on 'fileSaved', (file, winID) -> main.indexer.indexFile file, refresh: true
+post.on 'newWindowWithFile', (file)  -> main.createWindow file
+post.on 'toggleDevTools',    (winID) -> winWithID(winID).toggleDevTools()
+post.on 'restartShell',      (cfg)   -> winShells[cfg.winID].restartShell()
+post.on 'maximizeWindow',    (winID) -> main.toggleMaximize winWithID winID
+post.on 'activateWindow',    (winID) -> main.activateWindowWithID winID
+post.on 'reloadWindow',      (winID) -> main.reloadWin winWithID winID
+post.on 'fileSaved',   (file, winID) -> main.indexer.indexFile file, refresh: true
+post.on 'fileLoaded',  (file, winID) -> main.indexer.indexFile winWithID(winID).currentFile = file
             
 winShells = {}
 
@@ -500,9 +485,24 @@ class Main
             w = winWithID @activateWindowWithFile file
             w = @createWindow file if not w?
                     
-    quit: -> 
-        app.exit     0
-        process.exit 0
+    quit: ->
+        toSave = wins().length
+        if toSave
+            log "quit: save #{toSave} states"
+            post.toWins 'saveState'
+            post.on 'stateSaved', ->
+                toSave -= 1
+                if toSave == 0
+                    log 'quit: save prefs'
+                    prefs.save()
+                    app.exit     0
+                    process.exit 0
+            return
+        else
+            prefs.save()
+            log 'quit: prefs saved'
+            app.exit     0
+            process.exit 0
         
     #  0000000   0000000     0000000   000   000  000000000
     # 000   000  000   000  000   000  000   000     000   

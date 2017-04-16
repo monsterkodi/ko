@@ -52,10 +52,11 @@ class Split extends event
             snapFirst:  20
             snapLast:   100
             
-        @flex.restoreState window.getState 'split'
-        @onDrag()
-        
     onDrag: => if @flex? then @emitSplit()
+    
+    restoreState: -> 
+        @flex.restoreState window.getState 'split'
+        @emitSplit()
     
     emitSplit: =>         
         @emit 'split', @flex.panePositions() 

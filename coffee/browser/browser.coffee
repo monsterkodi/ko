@@ -23,9 +23,15 @@ class Browser extends Stage
     # 000      000   000  000   000  000   000  000       000  000      000       
     # 0000000   0000000   000   000  0000000    000       000  0000000  00000000  
     
-    loadFile: (file, opt) ->
+    loadFile: (file, opt = focus:true, column:0) ->
+        # log 'loadFile', file, opt
         dir = packagePath file
-        @loadDir dir, file: file, column:0, focus: true
+        if dir?
+            opt.file = file
+            @skipJump = opt.dontJump
+            @loadDir dir, opt
+        else
+            error 'no packagePath?', dir, file
 
     # 0000000    00000000    0000000   000   000   0000000  00000000  
     # 000   000  000   000  000   000  000 0 000  000       000       
@@ -44,6 +50,7 @@ class Browser extends Stage
     # 0000000   0000000   000   000  0000000    0000000    000  000   000  
     
     loadDir: (dir, opt) -> 
+        # log "loadDir #{dir}", opt
         dirlist dir, opt, (err, items) => 
             if err? then return error "can't load dir #{dir}: #{err}"
             opt ?= {}
@@ -100,8 +107,9 @@ class Browser extends Stage
             else if ext in ['.pxm']
                 @convertPXM row
             
-        if item.textFile
+        if item.textFile and not @skipJump
             post.toWin 'jumpTo', file:file
+        delete @skipJump
 
     # 000  00     00   0000000    0000000   00000000  
     # 000  000   000  000   000  000        000       
@@ -149,7 +157,6 @@ class Browser extends Stage
     # 0000000   0000000   000   000  0000000    000     000     00000000  000   000  0000000   
     
     loadItems: (items, opt) ->
-        
         col = @emptyColumn opt?.column
         @clearColumnsFrom col.index
 

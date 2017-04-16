@@ -17,12 +17,7 @@ class Find extends Command
         super @commandline
        
     historyKey: -> @name
-    
-    restoreState: (state) -> 
-        super state
-        log 'find.command.restore state - execute', state
-        @execute state.text
-    
+        
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
     # 0000000      000     000000000  0000000       000   

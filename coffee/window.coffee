@@ -77,6 +77,10 @@ window.setState = setState
 window.getState = getState
 window.delState = delState
 
+saveState = -> 
+    editor.saveScrollCursorsAndSelections()
+    post.toMain 'stateSaved'
+
 # 00000000    0000000    0000000  000000000  
 # 000   000  000   000  000          000     
 # 00000000   000   000  0000000      000     
@@ -93,6 +97,7 @@ post.on 'cloneFile',   -> post.toMain 'newWindowWithFile', editor.currentFile
 post.on 'reloadFile',  -> reloadFile()
 post.on 'saveFileAs',  -> saveFileAs()
 post.on 'saveFile',    -> saveFile()
+post.on 'saveState',   -> saveState()
 post.on 'loadFile', (file) -> loadFile file
 post.on 'fileLinesChanged', (file, lineChanges) ->
     if file == editor.currentFile
@@ -153,9 +158,8 @@ winMain = ->
         
     fps.toggle() if getState 'fps'
     
-    # restoreCommand = ->
     commandline.restoreState()
-        # post.toWin
+    split.restoreState()
 
 # 00000000  0000000    000  000000000   0000000   00000000 
 # 000       000   000  000     000     000   000  000   000
@@ -340,7 +344,7 @@ window.onload = ->
     
 window.onunload = -> 
     saveChanges()
-    editor.setCurrentFile null, noSaveScroll: true # to stop watcher
+    editor.setCurrentFile null # to stop watcher
 
 # 0000000   0000000  00000000   00000000  00000000  000   000   0000000  000   000   0000000   000000000
 #000       000       000   000  000       000       0000  000  000       000   000  000   000     000   
