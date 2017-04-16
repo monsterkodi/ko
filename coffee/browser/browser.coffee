@@ -159,7 +159,10 @@ class Browser extends Stage
         col.setItems items, opt
                 
         if opt.row? then col.focus()
-        if opt.focus? then @focus()
+        if opt.focus? 
+            @focus()
+            @lastUsedColumn().activeRow().setActive()
+            @lastUsedColumn().onScroll()
 
     endNavigateToTarget: ->
         delete @navigateTargetFile

@@ -10,6 +10,7 @@ class Pane
     
     constructor: (opt) ->
         @[k] = v for k,v of opt
+        @pos      = 0
         @size    ?= @fixed ? @min ? 0
         @size     = -1 if @collapsed
         @id      ?= @div.id ? "pane"

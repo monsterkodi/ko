@@ -27,13 +27,17 @@ class Browse extends Command
         
         super @commandline
 
+    restoreState: (state) -> 
+        super state
+        @execute()
+    
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
     # 0000000      000     000000000  0000000       000   
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
     
-    start: (combo) ->
+    start: (@combo) ->
         
         @browser.start()
         
@@ -42,7 +46,7 @@ class Browse extends Command
         else 
             @browser.loadDir process.cwd()
 
-        super combo
+        super @combo
         
         text:   @last()
         select: true

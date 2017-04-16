@@ -4,7 +4,7 @@
 # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 
-{ fileList, keyinfo, clamp, path, error, log, $, _
+{ fileList, stopEvent, keyinfo, clamp, path, error, log, str, $, _
 }          = require 'kxk'
 TextEditor = require '../editor/texteditor'
 render     = require '../editor/render'
@@ -23,8 +23,7 @@ class Commandline extends TextEditor
         
         @size.lineHeight = 30
         @scroll?.setLineHeight @size.lineHeight
-        @setText ""
-                
+                        
         @cmmd =$ 'commandline-command' 
         @cmmd.classList.add 'empty'
         @cmmd.addEventListener 'mousedown', @onCmmdClick
@@ -45,6 +44,27 @@ class Commandline extends TextEditor
         @view.onfocus = () =>
             @cmmd.className = "commandline-command active #{@command?.prefsID}"
 
+    #  0000000  000000000   0000000   000000000  00000000  
+    # 000          000     000   000     000     000       
+    # 0000000      000     000000000     000     0000000   
+    #      000     000     000   000     000     000       
+    # 0000000      000     000   000     000     00000000  
+    
+    saveState: ->
+        if @command?
+            state = @command.state()
+            log 'saveState', state
+        window.setState 'commandline', state
+
+    restoreState: ->
+        
+        state = window.getState 'commandline'
+        log 'restoreState', state
+        @setText state?.text ? ""
+        if state?.name
+            @startCommand state.name, state.combo
+            @command?.restoreState? state
+            
     # 000       0000000    0000000   0000000  
     # 000      000   000  000   000  000   000
     # 000      000   000  000000000  000   000
@@ -79,6 +99,7 @@ class Commandline extends TextEditor
     setText: (t) ->
         @setLines [t ? '']
         @singleCursorAtPos [@line(0).length, 0]
+        @saveState()
     
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000
@@ -122,9 +143,9 @@ class Commandline extends TextEditor
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
     
-    startCommand: (name, combo, event) ->        
-        event?.preventDefault()
-        event?.stopPropagation()
+    startCommand: (name, combo, event) ->  
+        stopEvent event
+
         r = @command?.cancel combo
         if r?.status == 'ok'
             @results r
@@ -148,9 +169,15 @@ class Commandline extends TextEditor
     
     execute: -> @results @command?.execute @line 0 
         
+    # 00000000   00000000   0000000  000   000  000      000000000   0000000  
+    # 000   000  000       000       000   000  000         000     000       
+    # 0000000    0000000   0000000   000   000  000         000     0000000   
+    # 000   000  000            000  000   000  000         000          000  
+    # 000   000  00000000  0000000    0000000   0000000     000     0000000   
+    
     results: (r) ->
-        @setText r.text if r?.text?
         @setName r.name if r?.name?
+        @setText r.text if r?.text?
         if r?.select then @selectAll() else @selectNone()
         window.split.show   r.show   if r?.show?
         window.split.focus  r.focus  if r?.focus?

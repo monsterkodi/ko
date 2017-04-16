@@ -1,6 +1,6 @@
 name            ko-editor
 productName     ko
-version         0.15.0
+version         0.15.1
 description     an editor for macOS
 main            js/main.js
 preferGlobal    true

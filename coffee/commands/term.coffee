@@ -293,11 +293,11 @@ class Term extends Command
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
     
-    start: (combo) ->
+    start: (@combo) ->
         
         @getPWD 'autocd' if @autocd
         
-        super combo
+        super @combo
         text:   @last()
         select: true
         do:     'show terminal'

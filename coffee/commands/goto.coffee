@@ -4,7 +4,7 @@
 # 000   000  000   000     000     000   000
 #  0000000    0000000      000      0000000 
 
-{ clamp, log, _
+{ clamp, post, log, _
 }        = require 'kxk'
 Command  = require '../commandline/command'
 

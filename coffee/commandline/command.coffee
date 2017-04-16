@@ -15,6 +15,21 @@ class Command
     constructor: (@commandline) ->
         @syntaxName   = 'ko'
         @maxHistory   = 20
+
+    #  0000000  000000000   0000000   000000000  00000000  
+    # 000          000     000   000     000     000       
+    # 0000000      000     000000000     000     0000000   
+    #      000     000     000   000     000     000       
+    # 0000000      000     000   000     000     00000000  
+    
+    state: ->    
+        text:  @getText()
+        name:  @names[0]
+        combo: @combo
+        
+    restoreState: (state) ->
+        @combo = state.combo
+        @name  = state.name
         
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -22,8 +37,8 @@ class Command
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
     
-    start: (combo) ->
-        index = @shortcuts.indexOf combo
+    start: (@combo) ->
+        index = @shortcuts.indexOf @combo
         @setName @names[index]
         @loadState()
         text = @getText()
@@ -210,6 +225,8 @@ class Command
     hideList: ->
         @commandList?.view.remove()
         @commandList = null
+
+    cancelList: -> @hideList()
                 
     # 000   000  000   0000000  000000000   0000000   00000000   000   000
     # 000   000  000  000          000     000   000  000   000   000 000 

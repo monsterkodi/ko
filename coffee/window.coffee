@@ -67,15 +67,21 @@ addToRecent = (file) ->
 #      000     000     000   000     000     000     
 # 0000000      000     000   000     000     00000000
    
-setState = window.setState = (key, value) -> prefs.set "windows:#{winID}:#{key}", value
-getState = window.getState = (key, value) -> prefs.get "windows:#{winID}:#{key}", value
-delState = window.delState = (key)        -> prefs.del "windows:#{winID}:#{key}"
+getState = (key, value) -> prefs.get "windows:#{winID}:#{key}", value
+delState = (key)        -> prefs.del "windows:#{winID}:#{key}"
+setState = (key, value) -> 
+    # log "window.setState key:#{key}", value
+    prefs.set "windows:#{winID}:#{key}", value
 
-# 000  00000000    0000000
-# 000  000   000  000     
-# 000  00000000   000     
-# 000  000        000     
-# 000  000         0000000
+window.setState = setState
+window.getState = getState
+window.delState = delState
+
+# 00000000    0000000    0000000  000000000  
+# 000   000  000   000  000          000     
+# 00000000   000   000  0000000      000     
+# 000        000   000       000     000     
+# 000         0000000   0000000      000     
 
 post.on 'shellCallbackData', (cmdData) -> commandline.commands['term'].onShellCallbackData cmdData
 post.on 'singleCursorAtPos', (pos, opt) -> 
@@ -100,7 +106,42 @@ post.on 'fileLinesChanged', (file, lineChanges) ->
 # 00     00  000  000   000  000   000  000   000  000  000   000  
 
 winMain = -> 
+    
     window.winID = winID
+
+    # 000  000   000  000  000000000  
+    # 000  0000  000  000     000     
+    # 000  000 0 000  000     000     
+    # 000  000  0000  000     000     
+    # 000  000   000  000     000     
+
+    titlebar    = window.titlebar    = new Titlebar
+    navigate    = window.navigate    = new Navigate
+    split       = window.split       = new Split()
+    terminal    = window.terminal    = new Terminal 'terminal'
+    area        = window.area        = new Area 'area'
+    editor      = window.editor      = new FileEditor 'editor'
+    commandline = window.commandline = new Commandline 'commandline-editor'
+    logview     = window.logview     = new LogView 'logview'
+    info        = window.info        = new Info editor
+    fps         = window.fps         = new FPS()
+
+    split.on 'split', (s) ->
+        area.resized()
+        terminal.resized()
+        commandline.resized()
+        editor.resized()
+        logview.resized()
+    
+    terminal.on 'fileLineChange', (file, lineChange) -> # sends changes to all windows
+        post.toAllWins 'fileLinesChanged', file, [lineChange]
+    
+    editor.on 'changed', (changeInfo) ->
+        return if changeInfo.foreign
+        if changeInfo.changes.length
+            post.toOtherWins 'fileLinesChanged', editor.currentFile, changeInfo.changes
+            navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
+
     editor.updateTitlebar()
     
     s = getState 'fontSize'
@@ -111,7 +152,25 @@ winMain = ->
         editor.centerText sw() == screenWidth, 0
         
     fps.toggle() if getState 'fps'
-                     
+    
+    # restoreCommand = ->
+    commandline.restoreState()
+        # post.toWin
+
+# 00000000  0000000    000  000000000   0000000   00000000 
+# 000       000   000  000     000     000   000  000   000
+# 0000000   000   000  000     000     000   000  0000000  
+# 000       000   000  000     000     000   000  000   000
+# 00000000  0000000    000     000      0000000   000   000
+
+window.editorWithName = (n) ->
+    switch n
+        when 'editor'   then editor
+        when 'command', 'commandline' then commandline
+        when 'terminal' then terminal
+        when 'logview'  then logview
+        else editor
+                 
 #  0000000   0000000   000   000  00000000
 # 000       000   000  000   000  000     
 # 0000000   000000000   000 000   0000000 
@@ -258,50 +317,6 @@ saveFileAs = ->
             if file
                 addToRecent file
                 saveFile file
-
-titlebar = window.titlebar = new Titlebar
-navigate = window.navigate = new Navigate
-
-#  0000000  00000000   000      000  000000000
-# 000       000   000  000      000     000   
-# 0000000   00000000   000      000     000   
-#      000  000        000      000     000   
-# 0000000   000        0000000  000     000   
-
-split = window.split = new Split()
-split.on 'split', (s) ->
-    area.resized()
-    terminal.resized()
-    commandline.resized()
-    editor.resized()
-    logview.resized()
-
-terminal = window.terminal = new Terminal 'terminal'
-
-terminal.on 'fileLineChange', (file, lineChange) -> # sends changes to all windows
-    post.toAllWins 'fileLinesChanged', file, [lineChange]
-
-area        = window.area        = new Area 'area'
-editor      = window.editor      = new FileEditor 'editor'
-commandline = window.commandline = new Commandline 'commandline-editor'
-logview     = window.logview     = new LogView 'logview'
-info        = window.info        = new Info editor
-
-editor.on 'changed', (changeInfo) ->
-    return if changeInfo.foreign
-    if changeInfo.changes.length
-        post.toOtherWins 'fileLinesChanged', editor.currentFile, changeInfo.changes
-        navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
-
-window.editorWithName = (n) ->
-    switch n
-        when 'editor'   then editor
-        when 'command', 'commandline' then commandline
-        when 'terminal' then terminal
-        when 'logview'  then logview
-        else editor
-        
-fps = window.fps = new FPS()
 
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000     

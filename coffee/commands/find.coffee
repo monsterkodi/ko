@@ -18,6 +18,11 @@ class Find extends Command
        
     historyKey: -> @name
     
+    restoreState: (state) -> 
+        super state
+        log 'find.command.restore state - execute', state
+        @execute state.text
+    
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
     # 0000000      000     000000000  0000000       000   
@@ -56,11 +61,12 @@ class Find extends Command
     execute: (command) ->
         command = super command
         if editor = window.editorWithName @focus
+            log "highlightText in #{editor.name} #{command} #{@type}"
             editor.highlightText command, 
                 type: @type
                 select: 'after'
         else
-            log "find.execute warning! no editor for @focus #{@focus}?"
+            error "no editor for @focus #{@focus}?"
         text:   command
         select: true
         
