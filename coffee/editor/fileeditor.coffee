@@ -222,14 +222,14 @@ class FileEditor extends TextEditor
         log "jumpTo type:#{type} word:#{word}"
 
         if not type or type == 'class'
-            classes = ipc.sendSync 'indexer', 'classes'
+            classes = post.get 'indexer', 'classes'
             for clss, info of classes
                 if clss.toLowerCase() == find
                     @jumpToFile info
                     return true
 
         if not type or type == 'func'                
-            funcs = ipc.sendSync 'indexer', 'funcs'
+            funcs = post.get 'indexer', 'funcs'
             for func, infos of funcs
                 if func.toLowerCase() == find
                     info = infos[0]
@@ -242,7 +242,7 @@ class FileEditor extends TextEditor
                     return true
     
         if not type or type == 'file'
-            files = ipc.sendSync 'indexer', 'files'
+            files = post.get 'indexer', 'files'
             for file, info of files
                 if fileName(file).toLowerCase() == find and file != @currentFile
                     @jumpToFileLine file, 6

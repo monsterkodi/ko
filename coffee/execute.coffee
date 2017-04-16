@@ -4,7 +4,7 @@
 #000        000 000   000       000       000   000     000     000     
 #00000000  000   000  00000000   0000000   0000000      000     00000000
 
-{ noon, str, error, log, _
+{ noon, str, post, error, log, _
 }        = require 'kxk'
 colors   = require 'colors'
 coffee   = require 'coffee-script'
@@ -35,20 +35,16 @@ class Execute
     
     initCoffee: =>
         try
+            post.on 'executeCoffee', @executeCoffee
             global.main = @main
             restoreCWD = process.cwd()
             process.chdir __dirname
             coffee.eval """                
-                _      = require 'lodash'
-                path   = require 'path'
-                fs     = require 'fs'
+                {str,clamp,fileExists,dirExists,post,path,fs,_} = require 'kxk'
                 coffee = require 'coffee-script'
-                {str,clamp,fileExists,dirExists} = require 'kxk'
                 {max,min,abs,round,ceil,floor,sqrt,pow,exp,log10,sin,cos,tan,acos,asin,atan,PI,E} = Math
                 (global[r] = require r for r in ['path', 'fs', 'noon', 'colors', 'electron'])                    
-                ipc           = electron.ipcMain
-                BrowserWindow = electron.BrowserWindow
-                log = -> BrowserWindow.fromId(winID).webContents.send 'executeResult', [].slice.call(arguments, 0), cmdID
+                log = -> post.toWin winID, 'executeResult', [].slice.call(arguments, 0), cmdID
                 """
             process.chdir restoreCWD
         catch err
@@ -69,7 +65,7 @@ class Execute
             result = 'undefined'
         else if typeof(result) != 'object' or not result.error? and _.size(result) == 1
             result = str result
-        @main.winWithID(cfg.winID).webContents.send 'executeResult', result, cfg.cmdID
+        post.toWin cfg.winID, 'executeResult', result, cfg.cmdID
 
     #  0000000  000   000  00000000  000      000    
     # 000       000   000  000       000      000    
@@ -109,6 +105,6 @@ class Execute
         else 
             data = data.slice 0,data.length-2
         data = oRest+data    
-        electron.BrowserWindow.fromId(@winID).webContents.send 'shellCommandData', cmd: @cmdID, data: data
+        post.toWin @winID, 'shellCommandData', cmd: @cmdID, data: data
 
 module.exports = Execute

@@ -4,10 +4,8 @@
 # 000  000  0000  000       000   000
 # 000  000   000  000        0000000 
 
-{ shortCount, log, $, _
-}        = require 'kxk'
-electron = require 'electron'
-ipc      = electron.ipcRenderer
+{ shortCount, post, log, $, _
+} = require 'kxk'
 
 class Info
     
@@ -57,13 +55,13 @@ class Info
         @classes.className = "info-classes empty"
         @classes.onclick = => @termCommand 'classes'
         @topline.appendChild @classes
-        ipc.on 'classesCount', (event, count) => @onClassesCount count
+        post.on 'classesCount', (event, count) => @onClassesCount count
 
         @funcs = document.createElement 'span'
         @funcs.className = "info-funcs empty"
         @funcs.onclick = => @termCommand 'funcs'
         @topline.appendChild @funcs
-        ipc.on 'funcsCount', (event, count) => @onFuncsCount count
+        post.on 'funcsCount', (event, count) => @onFuncsCount count
 
         @elem.appendChild @topline
 
@@ -90,7 +88,7 @@ class Info
         @files.className = "info-files"
         @files.onclick = => @termCommand 'files'
         @botline.appendChild @files
-        ipc.on 'filesCount', (event, count) => @onFilesCount count
+        post.on 'filesCount', (event, count) => @onFilesCount count
         
         @words = document.createElement 'span'
         @words.className = "info-words empty"
@@ -142,9 +140,9 @@ class Info
     # 000   000  00000000  0000000   0000000   000   000  0000000  
     
     reload: =>
-        @onClassesCount _.size ipc.sendSync 'indexer', 'classes'
-        @onFuncsCount   _.size ipc.sendSync 'indexer', 'funcs'
-        @onFilesCount   _.size ipc.sendSync 'indexer', 'files'
+        @onClassesCount _.size post.get 'indexer', 'classes'
+        @onFuncsCount   _.size post.get 'indexer', 'funcs'
+        @onFilesCount   _.size post.get 'indexer', 'files'
 
     #  0000000   000   000                     
     # 000   000  0000  000                     

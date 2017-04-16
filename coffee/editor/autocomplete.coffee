@@ -4,12 +4,10 @@
 # 000   000  000   000     000     000   000  000       000   000  000 0 000  000        000      000          000     000     
 # 000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
 
-{clamp, error, log, $, _} = require 'kxk'
+{clamp, post, error, log, $, _} = require 'kxk'
 
 Indexer  = require '../indexer'
 event    = require 'events'
-electron = require 'electron'
-ipc      = electron.ipcRenderer
 
 class Autocomplete extends event
 
@@ -38,7 +36,7 @@ class Autocomplete extends event
         @editor.on 'linesAppended',  @onLinesAppended
         @editor.on 'cursor',         @close
         @editor.on 'blur',           @close
-        ipc.on 'funcsCount',         @onFuncsCount
+        post.on 'funcsCount',        @onFuncsCount
 
     #  0000000   000   000  00000000  0000000    000  000000000
     # 000   000  0000  000  000       000   000  000     000   
@@ -227,7 +225,7 @@ class Autocomplete extends event
         @emit 'wordCount', @wordlist.length
          
     onFuncsCount: =>
-        funcs = ipc.sendSync 'indexer', 'funcs'
+        funcs = post.get 'indexer', 'funcs'
         for func,info of funcs
             info  = @wordinfo[func] ? {}
             info.count = Math.max 20, info.count ? 1

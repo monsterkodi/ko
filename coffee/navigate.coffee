@@ -4,18 +4,15 @@
 # 000  0000  000   000     000     000  000   000  000   000     000     000     
 # 000   000  000   000      0      000   0000000   000   000     000     00000000
 
-{ clamp, log, _
-}        = require 'kxk'
-electron = require 'electron'
-
-ipc           = electron.ipcRenderer
-BrowserWindow = electron.BrowserWindow
+{ clamp, post, log, _
+} = require 'kxk'
 
 class Navigate
     
     constructor: (@main) ->
         
         return if not @main?
+        post.on 'navigate', @action
         @filePositions = []
         @currentIndex = -1
         @navigating = false
@@ -68,13 +65,12 @@ class Navigate
     navigateToFilePos: (filePos, opt) ->
         id = @main.activateWindowWithFile filePos.file
         if id?
-            @main.winWithID(id).webContents.send 'singleCursorAtPos', filePos.pos, extend:opt.extend
+            post.toWin id, 'singleCursorAtPos', filePos.pos, extend:opt.extend
         else
             if opt?.newWindow
                 @main.loadFile "#{filePos.file}:#{filePos.pos[1]+1}:#{filePos.pos[0]}"
             else if opt?.winID?
-                win = @main.winWithID opt.winID
-                win?.webContents.send 'loadFile', "#{filePos.file}:#{filePos.pos[1]+1}:#{filePos.pos[0]}"
+                post.toWin opt.winID, 'loadFile', "#{filePos.file}:#{filePos.pos[1]+1}:#{filePos.pos[0]}"
         filePos
     
     #  0000000   0000000    0000000          00000000  000  000      00000000        00000000    0000000    0000000
@@ -86,14 +82,14 @@ class Navigate
     addFilePos: (opt) -> # called from window on editing
         opt.action = 'addFilePos'
         opt.for = 'edit'
-        ipc.send 'navigate', opt
+        post.toMain 'navigate', opt
         
     gotoFilePos: (opt) -> # called from window jumpTo
         opt.action = 'addFilePos'
         opt.for = 'goto'
-        ipc.send 'navigate', opt
+        post.toMain 'navigate', opt
 
-    backward: () -> ipc.send 'navigate', action: 'backward', winID: window.winID
-    forward:  () -> ipc.send 'navigate', action: 'forward' , winID: window.winID
+    backward: () -> post.toMain 'navigate', action: 'backward', winID: window.winID
+    forward:  () -> post.toMain 'navigate', action: 'forward' , winID: window.winID
                 
 module.exports = Navigate

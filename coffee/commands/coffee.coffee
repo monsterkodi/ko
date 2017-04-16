@@ -4,13 +4,10 @@
 # 000       000   000  000       000       000       000     
 #  0000000   0000000   000       000       00000000  00000000
 
-{ log, str
+{ log, str, post
 }        = require 'kxk'
 Syntax   = require '../editor/syntax'
 Command  = require '../commandline/command'
-electron = require 'electron'
-
-ipc = electron.ipcRenderer
 
 class Coffee extends Command
     
@@ -21,7 +18,7 @@ class Coffee extends Command
         @names      = ["coffee", "Coffee"]
         super @commandline
         @syntaxName = 'coffee'
-        ipc.on 'executeResult', @onResult
+        post.on 'executeResult', @onResult
     
     #  0000000   000   000        00000000   00000000   0000000  000   000  000      000000000
     # 000   000  0000  000        000   000  000       000       000   000  000         000   
@@ -29,7 +26,7 @@ class Coffee extends Command
     # 000   000  000  0000        000   000  000            000  000   000  000         000   
     #  0000000   000   000        000   000  00000000  0000000    0000000   0000000     000  
     
-    onResult: (event,result,cmdID) =>
+    onResult: (result,cmdID) =>
         terminal = window.terminal
         if result.error?
             terminal.appendMeta 
@@ -74,7 +71,7 @@ class Coffee extends Command
                 diss: Syntax.dissForTextAndSyntax l, 'coffee'
                 clss: 'coffeeCommand'
         terminal.singleCursorAtPos [0, terminal.numLines()-1]
-        ipc.send 'executeCoffee', winID: window.winID, cmdID: @cmdID, command: command        
+        post.toMain 'executeCoffee', winID: window.winID, cmdID: @cmdID, command: command        
         @hideList()
         do: (@name == 'Coffee' and 'maximize' or 'show') + ' terminal'
     

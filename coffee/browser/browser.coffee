@@ -75,14 +75,14 @@ class Browser extends Stage
         file  = item.abs
         name  = fileName file
         
-        clsss = ipc.sendSync 'indexer', 'classes'
+        clsss = post.get 'indexer', 'classes'
         clsss = _.pickBy clsss, (obj, key) -> obj.file == file
         for clss,clsso of clsss
             items.push name: clss, text: '● '+clss, type:'class', file: file, line: clsso.line
             for mthd,mthdo of clsso.methods
                 items.push name: mthd, text: '  ▸ '+mthd, type:'method', file: file, line: mthdo.line
 
-        files = ipc.sendSync 'indexer', 'files'
+        files = post.get 'indexer', 'files'
         funcs = files[file]?.funcs ? []
         for f in funcs
             if f[3] == name

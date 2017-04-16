@@ -4,7 +4,7 @@
 # 000  000  0000  000   000  000        000 000   000       000   000
 # 000  000   000  0000000    00000000  000   000  00000000  000   000
 
-{ packagePath, fileExists, unresolve, fileName, resolve, path, fs, log, _
+{ packagePath, fileExists, unresolve, fileName, resolve, post, path, fs, log, _
 }        = require 'kxk'
 Walker   = require './tools/walker'
 electron = require 'electron'
@@ -21,6 +21,7 @@ class Indexer
     @splitRegExp   = new RegExp "[^\\w\\d\\_]+", 'g'
 
     constructor: () ->
+        post.onGet 'indexer', (key) => @[key]
         @collectBins()
         @collectProjects()
         @dirs    = Object.create null
@@ -293,14 +294,12 @@ class Indexer
                     funcInfo = funcStack.pop()
                     fileInfo.funcs.push [funcInfo[1].line, funcInfo[1].last, funcInfo[2], funcInfo[1].class ? path.basename file, path.extname file]
 
-                for win in BrowserWindow.getAllWindows()
-                    win.webContents.send 'classesCount', _.size @classes
-                    win.webContents.send 'funcsCount',   _.size @funcs
+                post.toWins 'classesCount', _.size @classes
+                post.toWins 'funcsCount',   _.size @funcs
 
             @files[file] = fileInfo
 
-            for win in BrowserWindow.getAllWindows()
-                win.webContents.send 'filesCount', _.size @files
+            post.toWins 'filesCount', _.size @files
 
             @indexDir path.dirname file
             @indexDir packagePath file

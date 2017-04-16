@@ -45,14 +45,14 @@ class Goto extends Command
         items = []
         @types = {}
         
-        files = ipc.sendSync 'indexer', 'files'
+        files = post.get 'indexer', 'files'
         funcs = files[window.editor.currentFile].funcs
         for info in funcs
             name  = info[2]
             items.push text: name, line:'▸', clss:'method'
             @types[name] = 'func'
             
-        clsss = ipc.sendSync 'indexer', 'classes'
+        clsss = post.get 'indexer', 'classes'
         for k in _.keys clsss
             name = k
             items.push text: k, line:'●', clss:'class'

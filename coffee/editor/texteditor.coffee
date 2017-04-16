@@ -593,7 +593,7 @@ class TextEditor extends Editor
         @clickPos    = null
            
     funcInfoAtLineIndex: (li) ->
-        files = ipc.sendSync 'indexer', 'files'
+        files = post.get 'indexer', 'files'
         fileInfo = files[@currentFile]
         for func in fileInfo.funcs
             if func[0] <= li <= func[1]

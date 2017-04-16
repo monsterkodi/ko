@@ -78,7 +78,6 @@ delState = window.delState = (key)        -> prefs.del "windows:#{winID}:#{key}"
 # 000  000        000     
 # 000  000         0000000
 
-ipc.on 'shellCommandData',  (event, cmdData) -> commandline.commands['term'].onShellCommandData cmdData
 ipc.on 'shellCallbackData', (event, cmdData) -> commandline.commands['term'].onShellCallbackData cmdData
 ipc.on 'singleCursorAtPos', (event, pos, opt) -> 
     editor.singleCursorAtPos pos, opt
@@ -170,7 +169,7 @@ loadFile = (file, opt={}) ->
         if not opt?.dontSave then saveChanges()            
             
         addToRecent file
-        ipc.send 'navigate', 
+        post.toMain 'navigate', 
             action: 'addFilePos'
             file: editor.currentFile
             pos:  editor.cursorPos()
@@ -183,7 +182,6 @@ loadFile = (file, opt={}) ->
         commandline.fileLoaded file
     
     window.split.show 'editor'
-    # window.split.focus 'editor'
         
     if pos[0] or pos[1] 
         editor.singleCursorAtPos pos

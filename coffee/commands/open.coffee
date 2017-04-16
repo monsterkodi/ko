@@ -95,7 +95,7 @@ class Open extends Command
             @changed @getText()
             true            
         else
-            projects = ipc.sendSync 'indexer', 'projects'
+            projects = post.get 'indexer', 'projects'
             for p in Object.keys(projects).sort()
                 if p.startsWith @getText()
                     pdir = projects[p].dir

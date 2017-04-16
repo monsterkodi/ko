@@ -47,7 +47,7 @@ class Search extends Command
             when '/search/', '/Search/'
                 return if command in ['^', '$', '.']
         command = super command
-        file = window.editor.currentFile ? _.first _.keys(ipc.sendSync('indexer', 'files'))
+        file = window.editor.currentFile ? _.first _.keys(post.get('indexer', 'files'))
         return if not file?
         @startSearchInFiles 
             text: command

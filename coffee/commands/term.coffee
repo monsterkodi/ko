@@ -5,18 +5,16 @@
 #    000     00000000  000   000  000   000
 
 { packagePath, dirExists, unresolve, resolve, path, fs, 
-  noon, store, clamp, log, _
+  post, noon, store, clamp, log, _
 }        = require 'kxk'
 Walker   = require '../tools/walker'
 Syntax   = require '../editor/syntax'
 Command  = require '../commandline/command'
-electron = require 'electron'
-ipc      = electron.ipcRenderer
-remote   = electron.remote
 
 class Term extends Command
 
     constructor: (@commandline) ->
+        post.on 'shellCommandData', @onShellCommandData
         @idCommands = Object.create null
         @commandIDs = Object.create null
         @shortcuts  = ['command+t', 'command+shift+t']
@@ -28,7 +26,7 @@ class Term extends Command
         @autocd     = true
         @cmdID      = 0
         @pwdID      = -1
-        @bins       = ipc.sendSync 'indexer', 'bins'
+        @bins       = post.get 'indexer', 'bins'
     
     #  0000000   000   000        0000000     0000000   000000000   0000000   
     # 000   000  0000  000        000   000  000   000     000     000   000  
@@ -54,7 +52,7 @@ class Term extends Command
 
     getPWD: (@pwdTag) ->
         @pwdID = @cmdID
-        ipc.send 'shellCommand', winID: window.winID, cmdID: @cmdID, command: "pwd"
+        post.toMain 'shellCommand', winID: window.winID, cmdID: @cmdID, command: "pwd"
         @cmdID += 1
 
     #  0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
@@ -346,7 +344,7 @@ class Term extends Command
             switch cmd
                 when 'clear'   then terminal.clear()
                 when 'stop' 
-                    ipc.send 'restartShell', winID: window.winID
+                    post.toMain 'restartShell', winID: window.winID
                     for meta in terminal.meta.metas.reversed()
                         if meta[2].cmdID?
                             meta[2].span?.innerHTML = "■"
@@ -419,7 +417,7 @@ class Term extends Command
                     # 000       000  0000000  00000000
                     
                     window.split.show 'terminal'
-                    files = ipc.sendSync 'indexer', 'files'
+                    files = post.get 'indexer', 'files'
                     lastDir = ''
                     li = 1
                     for file in Object.keys(files).sort()
@@ -447,7 +445,7 @@ class Term extends Command
                     # 000        0000000   000   000   0000000
                     
                     window.split.show 'terminal'
-                    funcs = ipc.sendSync 'indexer', 'funcs'
+                    funcs = post.get 'indexer', 'funcs'
                     char = ''
                     for func in Object.keys(funcs).sort()
                         infos = funcs[func]
@@ -479,7 +477,7 @@ class Term extends Command
                     #  0000000  0000000  000   000  0000000   0000000 
                     
                     window.split.show 'terminal'
-                    classes = ipc.sendSync 'indexer', 'classes'
+                    classes = post.get 'indexer', 'classes'
                     for clss in Object.keys(classes).sort()
                         continue if args.length and not filterRegExp(args).test clss
                         info = classes[clss]
@@ -506,7 +504,7 @@ class Term extends Command
                     # 00     00   0000000   000   000  0000000  
                     
                     window.split.show 'terminal'
-                    words = ipc.sendSync 'indexer', 'words'
+                    words = post.get 'indexer', 'words'
                     char = ''
                     for word in Object.keys(words).sort()
                         continue if args.length and not filterRegExp(args).test word
@@ -530,7 +528,7 @@ class Term extends Command
                     #      000  000   000  000       000      000      
                     # 0000000   000   000  00000000  0000000  0000000  
                     
-                    ipc.send 'shellCommand', winID: window.winID, cmdID: @cmdID, command: cmmd
+                    post.toMain 'shellCommand', winID: window.winID, cmdID: @cmdID, command: cmmd
                     
                     terminal.appendMeta 
                         line: "▶"

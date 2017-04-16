@@ -5,7 +5,7 @@
 # 000   000  000   000  000  000   000
 
 { splitFilePos, fileExists, dirExists, fileList, resolve,
-about, prefs, store, noon, fs, str, log, _
+about, prefs, store, noon, post, fs, str, log, _
 }             = require 'kxk'
 pkg           = require '../package.json'
 Execute       = require './execute'
@@ -122,12 +122,9 @@ ipc.on 'activateWindowWithFile', (event, file)   -> event.returnValue = main.act
 ipc.on 'toggleDevTools',         (event)         -> event.sender.toggleDevTools()
 ipc.on 'execute',                (event, arg)    -> event.sender.send 'executeResult', coffeeExecute.execute arg
 ipc.on 'restartShell',           (event, cfg)    -> winShells[cfg.winID].restartShell()
-ipc.on 'executeCoffee',          (event, cfg)    -> coffeeExecute.executeCoffee cfg
 ipc.on 'maximizeWindow',         (event, winID)  -> main.toggleMaximize winWithID winID
 ipc.on 'activateWindow',         (event, winID)  -> main.activateWindowWithID winID
 ipc.on 'reloadWindow',           (event, winID)  -> main.reloadWin winWithID winID
-ipc.on 'navigate',               (event, action) -> event.returnValue = navigate.action action
-ipc.on 'indexer',                (event, item)   -> event.returnValue = main.indexer[item]
 ipc.on 'winInfos',               (event)         -> 
     infos = []
     for w in wins()
@@ -150,7 +147,7 @@ ipc.on 'winFileLinesChanged', (event, winID, file, lineChanges) ->
             
 winShells = {}
 
-ipc.on 'shellCommand', (event, cfg) -> 
+post.on 'shellCommand', (cfg) -> 
     if winShells[cfg.winID]?
         winShells[cfg.winID].term cfg
     else
