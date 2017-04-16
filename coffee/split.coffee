@@ -131,22 +131,22 @@ class Split extends event
     # 0000000    000000000  000  0000000   0000000   
     # 000   000  000   000  000       000  000       
     # 000   000  000   000  000  0000000   00000000  
-    
-    raise: (n) ->
 
-        swap = (old, nju) =>
-            if @flex.panes[0].div != nju
-                nju.style.height   = "#{@flex.sizeOfPane 0}px"
-                nju.style.width    = old.style.width
-                old.style.display  = 'none'
-                nju.style.display  = 'block'
-                @flex.panes[0].div = nju
-                @flex.calculate()
+    swap: (old, nju) ->
+        if @flex.panes[0].div != nju
+            nju.style.height   = "#{@flex.sizeOfPane 0}px"
+            nju.style.width    = old.style.width
+            old.style.display  = 'none'
+            nju.style.display  = 'block'
+            @flex.panes[0].div = nju
+
+    raise: (n) ->
                 
         switch n
-            when 'terminal' then swap @area, @terminal
-            when 'area'     then swap @terminal, @area
+            when 'terminal' then @swap @area, @terminal
+            when 'area'     then @swap @terminal, @area
             
+        @flex.calculate()
         @flex.expand 'terminal', 0.33
 
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000

@@ -62,8 +62,14 @@ class Commandline extends TextEditor
         log 'commandline restoreState', state
         @setText state?.text ? ""
         if state?.name
-            @startCommand state.name, state.combo
-            @command?.restoreState? state
+            name = state.name
+            @command = @commands[name]
+            activeID = document.activeElement.id
+            if activeID.startsWith 'column' then activeID = 'editor'
+            @command.setFocus activeID != 'commandline-editor' and activeID or null
+            @setName name
+            @cmmd.className = "commandline-command active #{@command.prefsID}"
+            @commands[name]?.restoreState? state
             
     # 000       0000000    0000000   0000000  
     # 000      000   000  000   000  000   000

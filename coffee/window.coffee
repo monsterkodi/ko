@@ -29,6 +29,7 @@ win         = remote.getCurrentWindow()
 winID       = win.id
 editor      = null
 logview     = null
+area        = null
 terminal    = null
 commandline = null
 

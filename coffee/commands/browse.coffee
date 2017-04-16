@@ -4,7 +4,7 @@
 # 000   000  000   000  000   000  000   000       000  000       
 # 0000000    000   000   0000000   00     00  0000000   00000000  
 
-{ dirExists, process, unresolve, resolve, post, log, str
+{ dirExists, process, unresolve, resolve, post, log, str, $
 }        = require 'kxk'
 Command  = require '../commandline/command'
 Browser  = require '../browser/browser'
@@ -28,9 +28,10 @@ class Browse extends Command
         super @commandline
 
     restoreState: (state) -> 
-        # log 'restoreState', state
         super state
+        @browser.start()
         @browser.loadFile state.text, focus:false, dontJump:true
+        window.split.swap $('terminal'), $('area')
     
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -49,8 +50,6 @@ class Browse extends Command
 
         super @combo
         
-        # text:   @last()
-        # select: true
         select: true
         do:     @name == 'Browse' and 'half area' or 'quart area'
 
