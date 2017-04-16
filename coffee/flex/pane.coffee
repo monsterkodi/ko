@@ -18,26 +18,29 @@ class Pane
         @display ?= getStyle ' .'+@div.className.split(' ').join ' .' if @div.className.length
         @display ?= 'initial'
     
-    update: -> 
-        @size = Math.max @size, @collapsed and -1 or 0
+    update: ->
+        @size = parseInt @collapsed and -1 or Math.max @size, 0
+        @pos  = @flex.pane(@index-1).pos + Math.max(0, @flex.pane(@index-1).size) + @flex.handleSize if @index
         @div.style.display = @collapsed and 'none' or @display
         @div.style.flex = @fixed and "0 0 #{@fixed}px" or @size and "1 1 #{@size}px" or "1 1 0"
+        @div.style[@flex.dimension] = "#{@fixed}px" if @fixed
 
     setSize: (@size) -> @update()
+    setPos:  (@pos)  -> 
     
     del:       -> @div?.remove() ; delete @div
     collapse:  -> @collapsed = true; @setSize -1
     expand:    -> delete @collapsed; @setSize @fixed ? 0
     isVisible: -> not @collapsed
     
-    pos: -> 
+    actualPos: -> 
         @div.style.display = @display
         r = @div.getBoundingClientRect()[@flex.position]
         @div.style.display = @isVisible() and @display or 'none'
-        r - @flex.pos()
+        parseInt r - @flex.pos()
 
     actualSize: ->
         if @collapsed then return -1
-        @div.getBoundingClientRect()[@flex.dimension]
+        parseInt @div.getBoundingClientRect()[@flex.dimension]
         
 module.exports = Pane

@@ -275,7 +275,6 @@ split.on 'split', (s) ->
     commandline.resized()
     editor.resized()
     logview.resized()
-    setState 'split', s
 
 terminal = window.terminal = new Terminal 'terminal'
 

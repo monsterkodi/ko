@@ -9,7 +9,6 @@
 Pane   = require './pane'
 Handle = require './handle'
 
-
 class Flex 
     
     constructor: (opt) ->
@@ -42,8 +41,8 @@ class Flex
         
         @addPane p for p in opt.panes
                     
-        @updatePanes()
-        @calculate()
+        # @updatePanes()
+        # @calculate()
 
     #  0000000   0000000    0000000    
     # 000   000  000   000  000   000  
@@ -103,6 +102,7 @@ class Flex
     #  0000000  000   000  0000000   0000000  
     
     calculate: ->
+        
         visPanes  = @panes.filter (p) -> not p.collapsed
         flexPanes = visPanes.filter (p) -> not p.fixed
         avail     = @size()
@@ -121,6 +121,10 @@ class Flex
             
         for p in @panes            
             p.setSize p.size
+
+        for p in @panes            
+            p.setPos p.actualPos()
+            
         @onPaneSize?()
     
     # 00     00   0000000   000   000  00000000  
@@ -167,17 +171,46 @@ class Flex
         @update()
         @onPaneSize?()
 
+    #  0000000  000000000   0000000   000000000  00000000  
+    # 000          000     000   000     000     000       
+    # 0000000      000     000000000     000     0000000   
+    #      000     000     000   000     000     000       
+    # 0000000      000     000   000     000     00000000  
+    
+    restoreState: (state) ->
+        return if not state?.length
+        for si in [0...state.length]
+            s = state[si]
+            # log 'restore pane from state', s
+            pane = @pane si
+            delete pane.collapsed
+            pane.collapse()      if s.size < 0
+            pane.setSize(s.size) if s.size >= 0
+
+        @updateHandles()
+        @onPaneSize?()
+        
+    getState: () ->
+        state = []
+        for p in @panes
+            state.push
+                id:    p.id
+                size:  p.size
+                pos:   p.pos
+        # log 'getState', state
+        state
+
     #  0000000  000  0000000  00000000  
     # 000       000     000   000       
     # 0000000   000    000    0000000   
     #      000  000   000     000       
     # 0000000   000  0000000  00000000  
         
-    resized: -> @update(); @calculate()
+    resized:       -> @update().calculate()
 
-    update:        -> @updatePanes(); @updateHandles()
-    updatePanes:   -> p.update() for p in @panes
-    updateHandles: -> h.update() for h in @handles
+    update:        -> @updatePanes().updateHandles()
+    updatePanes:   -> p.update() for p in @panes   ; @
+    updateHandles: -> h.update() for h in @handles ; @
 
     # handle drag callbacks
     
@@ -195,19 +228,15 @@ class Flex
     # 000   000  000          000     
     #  0000000   00000000     000     
     
-    numPanes:      -> @panes.length
-    visiblePanes:  -> @panes.filter (p) -> p.isVisible()
-    panePositions: -> ( p.pos() for p in @panes )
-    paneSizes:     -> ( p.size for p in @panes )
-    sizeOfPane:  (i) -> @panes[@paneIndex i].size
-    posOfPane:   (i) -> @panes[@paneIndex i].pos()
-    posOfHandle: (i) -> @handles[i].pos()
-        
-    paneIndex: (i) -> 
-        if _.isNumber i
-            clamp 0, @panes.length-1, i
-        else
-            @panes.indexOf _.find @panes, (p) -> p.id == i
+    numPanes:        -> @panes.length
+    visiblePanes:    -> @panes.filter (p) -> p.isVisible()
+    panePositions:   -> ( p.pos  for p in @panes )
+    paneSizes:       -> ( p.size for p in @panes )
+    sizeOfPane:  (i) -> @pane(i).size
+    posOfPane:   (i) -> @pane(i).pos
+    posOfHandle: (i) -> @handle(i).pos()
+    pane:        (i) -> _.isNumber(i) and @panes[i]   or _.isString(i) and _.find(@panes, (p) -> p.id == i) or i
+    handle:      (i) -> _.isNumber(i) and @handles[i] or i
 
     size: ->
         cs = window.getComputedStyle @view 
@@ -221,15 +250,15 @@ class Flex
     # 000       000   000  000      000      000   000  000             000  000       
     #  0000000   0000000   0000000  0000000  000   000  000        0000000   00000000  
     
-    isCollapsed: (i) -> @panes[@paneIndex i].collapsed
+    isCollapsed: (i) -> @pane(i).collapsed
     collapse: (i) -> 
-        pane = @panes[@paneIndex i]
+        pane = @pane i
         if not pane.collapsed
             pane.collapse()
             @calculate()
         
     expand: (i, factor=0.5) ->
-        pane = @panes[@paneIndex i]
+        pane = @pane i
         if pane.collapsed
             pane.expand()
             if flex = @closestVisFlex pane

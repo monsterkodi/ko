@@ -4,7 +4,7 @@
 #      000  000        000      000     000   
 # 0000000   000        0000000  000     000   
 
-{ post, prefs, error, log, $, _
+{ post, error, log, $, _
 }     = require 'kxk'
 event = require 'events'
 Flex  = require './flex/flex'
@@ -38,7 +38,6 @@ class Split extends event
                 ,
                     div:        @commandline
                     fixed:      @commandlineHeight
-                    collapsed:  true
                 ,
                     div:        @editor
                 ,
@@ -52,9 +51,15 @@ class Split extends event
             onPaneSize: @onDrag
             snapFirst:  20
             snapLast:   100
+            
+        @flex.restoreState window.getState 'split'
         @onDrag()
         
-    onDrag: => if @flex? then @emit 'split', @flex.panePositions()
+    onDrag: => if @flex? then @emitSplit()
+    
+    emitSplit: =>         
+        @emit 'split', @flex.panePositions() 
+        window.setState 'split', @flex.getState() 
                 
     # 0000000     0000000 
     # 000   000  000   000
@@ -213,7 +218,7 @@ class Split extends event
         @elem.style.width = "#{main.clientWidth}px"
         @elem.style.height = "#{main.clientHeight}px"
         @flex.resized()
-        @emit 'split', @flex.panePositions()
+        @emitSplit()
     
     # 00000000    0000000    0000000          0000000  000  0000000  00000000
     # 000   000  000   000  000         0    000       000     000   000     
