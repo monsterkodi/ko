@@ -3,6 +3,8 @@
     <key>CFBundleDocumentTypes</key>
     <array>
         <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
             <key>CFBundleTypeName</key>
             <string>Text</string>
             <key>LSHandlerRank</key>
@@ -339,10 +341,10 @@
             <string>Alternate</string>
         </dict>
         <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
             <key>CFBundleTypeName</key>
             <string>ko</string>
-            <key>CFBundleTypeRole</key>
-            <string>Viewer</string>
             <key>CFBundleTypeOSTypes</key>
             <array>
                 <string>****</string>

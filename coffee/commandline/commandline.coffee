@@ -4,7 +4,7 @@
 # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 
-{ fileList, keyinfo, clamp, path, log, $, _
+{ fileList, keyinfo, clamp, path, error, log, $, _
 }          = require 'kxk'
 TextEditor = require '../editor/texteditor'
 render     = require '../editor/render'
@@ -61,7 +61,7 @@ class Commandline extends TextEditor
                 command.setPrefsID commandClass.name.toLowerCase()
                 @commands[command.prefsID] = command
             catch err
-                if err then error "can't load command form '#{file}': #{err}"
+                if err then error "can't load command from file '#{file}': #{err}"
             
     setName: (name) -> 
         @cmmd.innerHTML = name

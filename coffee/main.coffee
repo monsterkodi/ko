@@ -64,10 +64,8 @@ while args.filelist.length and dirExists _.first args.filelist
     
 if args.verbose
     log colors.white.bold "\nko", colors.gray "v#{pkg.version}\n"
-    log colors.yellow.bold 'process'
-    p = cwd: process.cwd()
-    log noon.stringify p, colors:true
-    log colors.yellow.bold 'args'
+    log noon.stringify {cwd: process.cwd()}, colors:true 
+    log colors.yellow.bold '\nargs'
     log noon.stringify args, colors:true
     log ''
 
@@ -512,7 +510,7 @@ class Main
     # 000   000  000   000  000   000  000   000     000   
     # 000   000  0000000     0000000    0000000      000   
     
-    showAbout: -> about img: "#{__dirname}/../img/about.png", pkg: pkg   
+    showAbout: -> about img: "#{__dirname}/../img/about.png", pkg: pkg, color: "#fff"   
             
 #  0000000   00000000   00000000         0000000   000   000
 # 000   000  000   000  000   000       000   000  0000  000

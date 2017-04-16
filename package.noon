@@ -1,6 +1,6 @@
 name            ko-editor
 productName     ko
-version         0.14.0
+version         0.15.0
 description     an editor for macOS
 main            js/main.js
 preferGlobal    true
@@ -35,6 +35,7 @@ dependencies
                 font-awesome    ^4.7.0
                 fork-func       0.0.6
                 fs-extra        ^2.0.0
+                fuzzaldrin      ^2.1.0
                 fuzzy           ^0.1.3
                 html-entities   ^1.2.0
                 immutable       ^3.8.1
