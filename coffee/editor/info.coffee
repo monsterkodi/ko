@@ -53,15 +53,15 @@ class Info
         
         @classes = document.createElement 'span'
         @classes.className = "info-classes empty"
-        @classes.onclick = => @termCommand 'classes'
+        @classes.onclick = => @termCommand 'class'
         @topline.appendChild @classes
-        post.on 'classesCount', (event, count) => @onClassesCount count
+        post.on 'classesCount', (count) => @onClassesCount count
 
         @funcs = document.createElement 'span'
         @funcs.className = "info-funcs empty"
-        @funcs.onclick = => @termCommand 'funcs'
+        @funcs.onclick = => @termCommand 'func'
         @topline.appendChild @funcs
-        post.on 'funcsCount', (event, count) => @onFuncsCount count
+        post.on 'funcsCount', (count) => @onFuncsCount count
 
         @elem.appendChild @topline
 
@@ -86,15 +86,15 @@ class Info
 
         @files = document.createElement 'span'
         @files.className = "info-files"
-        @files.onclick = => @termCommand 'files'
+        @files.onclick = => @termCommand 'file'
         @botline.appendChild @files
-        post.on 'filesCount', (event, count) => @onFilesCount count
+        post.on 'filesCount', (count) => @onFilesCount count
         
         @words = document.createElement 'span'
         @words.className = "info-words empty"
-        @words.onclick = => @termCommand 'words'
+        @words.onclick = => @termCommand 'word'
         @botline.appendChild @words
-        window.editor.autocomplete.on 'wordCount', @onWordCount
+        window.editor.autocomplete.on 'wordCount', @onWordCount # use post
 
         @elem.appendChild @botline
         

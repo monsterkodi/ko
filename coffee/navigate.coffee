@@ -11,7 +11,8 @@ class Navigate
     
     constructor: (@main) ->
         
-        return if not @main?
+        return if not @main? # this is not very obvious
+        
         post.on 'navigate', @action
         @filePositions = []
         @currentIndex = -1
@@ -24,6 +25,7 @@ class Navigate
     # 000   000   0000000     000     000   0000000   000   000
 
     action: (opt) =>
+        log 'navigate.action', opt, @filePositions
         switch opt.action
 
             when 'backward'
@@ -64,6 +66,7 @@ class Navigate
     
     navigateToFilePos: (filePos, opt) ->
         id = @main.activateWindowWithFile filePos.file
+        log 'navigateToFilePos', filePos, id, opt
         if id?
             post.toWin id, 'singleCursorAtPos', filePos.pos, extend:opt.extend
         else
