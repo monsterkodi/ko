@@ -121,6 +121,7 @@ post.on 'activateWindow',    (winID) -> main.activateWindowWithID winID
 post.on 'reloadWindow',      (winID) -> main.reloadWin winWithID winID
 post.on 'fileSaved',   (file, winID) -> main.indexer.indexFile file, refresh: true
 post.on 'fileLoaded',  (file, winID) -> main.indexer.indexFile winWithID(winID).currentFile = file
+post.on 'error',                     -> error 'error in window:', arguments
             
 winShells = {}
 

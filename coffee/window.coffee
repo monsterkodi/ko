@@ -222,10 +222,13 @@ reloadFile = ->
 
 loadFile = (file, opt={}) ->
     return if not file? or not file.length
-    editor.saveScrollCursorsAndSelections() #if opt.reload
+    editor.saveScrollCursorsAndSelections()
     [file,pos] = splitFilePos file
     file = resolve file
     if file != editor.currentFile or opt?.reload
+        
+        # log 'loadFile', file, editor.currentFile, opt
+        
         if not fileExists file
             error "window.loadFile -- no such file:", file
             return

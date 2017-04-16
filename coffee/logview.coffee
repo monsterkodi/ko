@@ -14,7 +14,9 @@ class LogView extends TextEditor
         @fontSizeDefault = 12
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap']
         @setLines ['']
-        post.on 'error', (text) -> window.split.do 'show logview'
+        post.on 'error', (text) -> 
+            window.split.do 'show logview'
+            post.toMain 'error', text
         post.on 'slog', @appendText
         log 'happy logging!'
                 
