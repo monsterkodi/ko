@@ -3,17 +3,12 @@
 # 0000000    000   000  000000    000000    0000000   0000000  
 # 000   000  000   000  000       000       000       000   000
 # 0000000     0000000   000       000       00000000  000   000
-{
-clamp,
-error,
-log,
-str
-}       = require "kxk"
-State   = require './state' 
 
+{ clamp, error, log, str, _
+}       = require 'kxk'
+State   = require './state' 
 fuzzy   = require 'fuzzy'
 event   = require 'events'
-_       = require 'lodash'
 
 startOf = (r) -> r[0]
 endOf   = (r) -> r[0] + Math.max 1, r[1]-r[0]

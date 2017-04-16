@@ -4,10 +4,10 @@
 #      000  000   000  000         000     000       000   000  
 # 0000000   000   000  0000000     000     00000000  000   000  
 
-{log} = require 'kxk'  
+{log,_
+}     = require 'kxk'  
 {Set} = require 'immutable'
 salt  = require '../../tools/salt'  
-_     = require 'lodash'
 
 module.exports =
     

@@ -5,7 +5,7 @@
 #       000  000   000
 #   000000   0000000  
 
-log = require '../../tools/log'
+log   = require 'kxk'
 Stage = require '../stage'
 
 class Three extends Stage

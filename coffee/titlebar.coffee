@@ -3,16 +3,11 @@
 #    000     000     000     000      0000000   0000000    000000000  0000000  
 #    000     000     000     000      000       000   000  000   000  000   000
 #    000     000     000     0000000  00000000  0000000    000   000  000   000
-{
-packagePath,
-unresolve,
-stopEvent,
-clamp,
-log,
-$}       = require 'kxk'
+
+{ packagePath, unresolve, stopEvent, clamp, path, log, $
+}       = require 'kxk'
 render   = require './editor/render'
 syntax   = require './editor/syntax'
-path     = require 'path'
 electron = require 'electron'
 ipc      = electron.ipcRenderer
 

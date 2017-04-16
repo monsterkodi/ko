@@ -3,12 +3,9 @@
 # 000 0 000  000   000  000000000  0000000    0000000   0000000    0000000 
 # 000  0000  000   000  000 0 000  000   000  000       000   000       000
 # 000   000   0000000   000   000  0000000    00000000  000   000  0000000 
-{
-str,
-error,
-log,
-$}    = require 'kxk'
-_     = require 'lodash'
+
+{ str, error, log, $, _
+}     = require 'kxk'
 event = require 'events'
 
 class Numbers extends event

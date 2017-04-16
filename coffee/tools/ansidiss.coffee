@@ -1,8 +1,7 @@
 # based on code from https://github.com/rburns/ansi-to-html
-{
-log}     = require 'kxk'
+{ log, _
+}        = require 'kxk'
 entities = require 'entities'
-_        = require 'lodash'
 
 STYLES =
     f0:  'color:#000' # normal intensity

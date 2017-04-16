@@ -3,16 +3,15 @@
 # 000000000  000000000  000       0000000    000   000
 # 000 0 000  000   000  000       000   000  000   000
 # 000   000  000   000   0000000  000   000   0000000 
+
 {
 packagePath, fileExists, fileName, fileList, relative, splitExt,
-error, log, _
+noon, path, error, log, _
 }          = require 'kxk'
 indexer    = require '../indexer'
 salt       = require '../tools/salt'
 Command    = require '../commandline/command'
-path       = require 'path'
 colors     = require 'colors'
-noon       = require 'noon'
 electron   = require 'electron'
 process    = require 'process'
 atomicFile = require 'write-file-atomic'

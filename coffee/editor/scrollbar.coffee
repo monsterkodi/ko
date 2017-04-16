@@ -28,7 +28,6 @@ class Scrollbar
 
         @elem.addEventListener 'wheel', @onWheel
         @editor.view.addEventListener 'wheel',  @onWheel
-        # @editor.layers.addEventListener 'scroll', @onScroll
         
         @scrollX = @scrollY = 0
         window.requestAnimationFrame @scrollAnim

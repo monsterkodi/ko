@@ -3,11 +3,9 @@
 #    000     0000000   0000000    000000000  000  000 0 000  000000000  000    
 #    000     000       000   000  000 0 000  000  000  0000  000   000  000    
 #    000     00000000  000   000  000   000  000  000   000  000   000  0000000
-{
-error,
-log
+
+{ error, log, _
 }          = require 'kxk'
-_          = require 'lodash'
 salt       = require './tools/salt'
 TextEditor = require './editor/texteditor'
 syntax     = require './editor/syntax'

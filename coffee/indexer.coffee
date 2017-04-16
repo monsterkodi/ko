@@ -3,18 +3,10 @@
 # 000  000 0 000  000   000  0000000     00000    0000000   0000000
 # 000  000  0000  000   000  000        000 000   000       000   000
 # 000  000   000  0000000    00000000  000   000  00000000  000   000
-{
-packagePath,
-fileExists,
-unresolve,
-fileName,
-resolve,
-log
+
+{ packagePath, fileExists, unresolve, fileName, resolve, path, fs, log, _
 }        = require 'kxk'
 Walker   = require './tools/walker'
-_        = require 'lodash'
-fs       = require 'fs'
-path     = require 'path'
 electron = require 'electron'
 
 BrowserWindow = electron.BrowserWindow

@@ -5,14 +5,13 @@
 #    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000  
 
 {splitFilePos, fileExists, resolve, keyinfo, stopEvent, setStyle, 
-prefs, drag, post, clamp, str, log, sw, $, _
+prefs, drag, path, post, clamp, str, log, sw, $, _
 }         = require 'kxk'
 matchr    = require '../tools/matchr'
 render    = require './render'
 syntax    = require './syntax'
 scroll    = require './scroll'
 Editor    = require './editor'
-path      = require 'path'
 electron  = require 'electron'
 ipc       = electron.ipcRenderer
 

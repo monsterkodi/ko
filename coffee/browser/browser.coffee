@@ -142,7 +142,7 @@ class Browser extends Stage
         @clearColumnsFrom col.index
         cnt = elem class: 'browserImageContainer', child: 
             elem 'img', class: 'browserImage', src: "file://#{encodePath file}"
-        col.div.appendChild cnt
+        col.table.appendChild cnt
 
     # 000       0000000    0000000   0000000    000  000000000  00000000  00     00   0000000  
     # 000      000   000  000   000  000   000  000     000     000       000   000  000       

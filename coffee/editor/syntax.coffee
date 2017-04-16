@@ -4,13 +4,10 @@
 #      000     000     000  0000     000     000   000   000 000 
 # 0000000      000     000   000     000     000   000  000   000
 
-{log, $, _
+{log, $, fs, noon, path, _
 }      = require 'kxk'
 encode = require '../tools/encode'
 matchr = require '../tools/matchr'
-path   = require 'path'
-noon   = require 'noon'
-fs     = require 'fs'
 
 class Syntax
     
@@ -25,7 +22,9 @@ class Syntax
         if diss?.length
             for di in [diss.length-1..0]
                 d = diss[di]
-                style = d.styl? and d.styl.length and " style=\"#{d.styl}\"" or ''
+                tx = d.start * 13
+                # style = d.styl? and d.styl.length and " style=\"#{d.styl}\"" or ''
+                style = " style=\"transform:translatex(#{tx}px);#{d.styl}\""
                 clss  = d.clss? and d.clss.length and " class=\"#{d.clss}\"" or ''
                 clrzd = "<span#{style}#{clss}>#{encode d.match}</span>"
                 l = clrzd + l
