@@ -116,7 +116,10 @@ hideDock = ->
 # 000  000        000     
 # 000  000         0000000
 
-post.onGet 'activateWindowWithFile', (file) -> main.activateWindowWithFile file
+post.onGet 'activateWindowWithFile', (file) -> 
+    log 'activateWindowWithFile', file
+    main.activateWindowWithFile file
+    
 post.onGet 'winInfos', -> 
     infos = []
     for w in wins()
@@ -137,12 +140,6 @@ post.on 'fileLoaded', (file, winID) ->
     main.indexer.indexFile file
 
 post.on 'fileSaved', (file, winID) -> main.indexer.indexFile file, refresh: true
-
-post.on 'winFileLinesChanged', (winID, file, lineChanges) -> # use post to otherWins instead
-    return if not winID
-    for w in wins()
-        if w.id != winID
-            post.toWin w.id, 'fileLinesChanged', file, lineChanges
             
 winShells = {}
 
@@ -235,11 +232,13 @@ class Main
         for w in wins()
             w.hide()
             hideDock()
+        @
             
     showWindows: ->
         for w in wins()
             w.show()
             app.dock.show()
+        @
             
     raiseWindows: ->
         if visibleWins().length
@@ -247,6 +246,7 @@ class Main
                 w.showInactive()
             visibleWins()[0].showInactive()
             visibleWins()[0].focus()
+        @
 
     activateNextWindow: (win) ->
         allWindows = wins()
@@ -255,7 +255,8 @@ class Main
                 i = 1 + allWindows.indexOf w
                 i = 0 if i >= allWindows.length
                 @activateWindowWithID allWindows[i].id
-                return
+                return w
+        null
 
     activateWindowWithID: (wid) ->
         w = winWithID wid
@@ -264,6 +265,7 @@ class Main
             w.show()
         else
             w.focus()
+        w
 
     activateWindowWithFile: (file) ->
         [file, pos] = splitFilePos file
@@ -271,7 +273,9 @@ class Main
             if w.currentFile == file
                 @activateWindowWithID w.id
                 post.toWin w.id, 'singleCursorAtPos', pos if pos?
+                log 'activateWindowWithFile', file, w.id
                 return w.id
+        log 'activateWindowWithFile -- no win with file', file
         null
 
     closeOtherWindows:=>
@@ -499,7 +503,7 @@ class Main
             [fpath, pos] = splitFilePos file
             if not fileExists fpath
                 continue
-            w = @activateWindowWithFile file
+            w = winWithID @activateWindowWithFile file
             w = @createWindow file if not w?
                     
     quit: -> 

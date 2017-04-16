@@ -90,6 +90,7 @@ post.on 'saveFile',    -> saveFile()
 post.on 'loadFile', (file) -> loadFile file
 post.on 'fileLinesChanged', (file, lineChanges) ->
     if file == editor.currentFile
+        log 'window.on fileLinesChanged', file, lineChanges
         editor.applyForeignLineChanges lineChanges
 
 # 000   000  000  000   000  00     00   0000000   000  000   000  
@@ -279,7 +280,7 @@ split.on 'split', (s) ->
 terminal = window.terminal = new Terminal 'terminal'
 
 terminal.on 'fileLineChange', (file, lineChange) -> # sends changes to all windows
-    post.toAllWins 'winFileLinesChanged', -1, file, [lineChange]
+    post.toAllWins 'fileLinesChanged', file, [lineChange]
 
 area        = window.area        = new Area 'area'
 editor      = window.editor      = new FileEditor 'editor'
@@ -290,7 +291,7 @@ info        = window.info        = new Info editor
 editor.on 'changed', (changeInfo) ->
     return if changeInfo.foreign
     if changeInfo.changes.length
-        post.toOtherWins 'winFileLinesChanged', winID, editor.currentFile, changeInfo.changes
+        post.toOtherWins 'fileLinesChanged', editor.currentFile, changeInfo.changes
         navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
 
 window.editorWithName = (n) ->
