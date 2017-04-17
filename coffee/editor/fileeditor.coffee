@@ -46,18 +46,7 @@ class FileEditor extends TextEditor
     
     applyForeignLineChanges: (lineChanges) =>
         log 'applyForeignLineChanges', lineChanges
-        # @do.start()
-        # for change in lineChanges
-            # if change.change != 'deleted' and not change.after?
-                # error "FileEditor.applyForeignLineChanges -- no after? #{change}" 
-                # continue
-            # switch change.change
-                # when 'changed'  then @do.change change.doIndex, change.after
-                # when 'inserted' then @do.insert change.doIndex, change.after
-                # when 'deleted'  then @do.delete change.doIndex
-                # else
-                    # error "Editor.applyForeignLineChanges -- unknown change #{change.change}"
-        # @do.end foreign: true
+        @do.foreignChanges lineChanges
 
     # 00000000  000  000      00000000
     # 000       000  000      000     
@@ -234,7 +223,7 @@ class FileEditor extends TextEditor
                         if i.file == @currentFile
                             info = i
                     if infos.length > 1 and not opt?.dontList
-                        window.commandline.commands.term.execute "funcs ^#{word}$"
+                        window.commandline.commands.term.execute "func ^#{word}$"
                     @jumpToFile info
                     return true
     

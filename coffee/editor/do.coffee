@@ -4,13 +4,28 @@
 # 000   000  000   000
 # 0000000     0000000 
 
-{ clamp, str, error, log, _} = require 'kxk'
+{ clamp, str, error, log, _
+} = require 'kxk'
 
 require '../tools/ranges'
 
 class Do
     
     constructor: (@editor) -> @reset()
+
+    foreignChanges: (lineChanges) ->
+        @start()
+        for change in lineChanges
+            if change.change != 'deleted' and not change.after?
+                error "Do.foreignChanges -- no after? #{change}" 
+                continue
+            switch change.change
+                when 'changed'  then @change change.doIndex, change.after
+                when 'inserted' then @insert change.doIndex, change.after
+                when 'deleted'  then @delete change.doIndex
+                else
+                    error "Do.foreignChanges -- unknown change #{change.change}"
+        @end foreign: true
 
     # 00000000   00000000   0000000  00000000  000000000
     # 000   000  000       000       000          000   
@@ -67,17 +82,14 @@ class Do
     end: (opt) -> 
         nologhere = log # !!! NO log HERE !!!
 
-        # if opt?.foreign
-        
         @redos = []
         @groupCount -= 1
         if @groupCount == 0
             @merge()
             changes = @calculateChanges @startState, @state
+            changes.foreign = opt?.foreign
             @editor.setState @state
             @editor.changed? changes
-        # else
-            # @editor.setState @state # < this should be gone, shouldn't it?
             
         log = nologhere
 
@@ -189,7 +201,7 @@ class Do
         
             ol = oldLines.get oi
             nl = newLines.get ni
-                
+            
             while oi < oldLines.size
                 if not nl? # new state has not enough lines, mark remaining lines in oldState as deleted
                     deletions += 1
@@ -205,7 +217,7 @@ class Do
                     
                 else if 0 < (inserts = newLines.slice(ni).findIndex (v) -> v==ol) # insertion
                     while inserts
-                        changes.push change: 'inserted', newIndex: ni, doIndex: oi+dd
+                        changes.push change: 'inserted', newIndex: ni, doIndex: oi+dd, after: nl.get 'text'
                         ni += 1
                         dd += 1
                         inserts -= 1
@@ -222,7 +234,7 @@ class Do
                     ol = oldLines.get oi
                     
                 else # change
-                    changes.push change: 'changed', oldIndex: oi, newIndex: ni, doIndex: oi+dd
+                    changes.push change: 'changed', oldIndex: oi, newIndex: ni, doIndex: oi+dd, after: nl.get 'text'
                     oi += 1
                     ol = oldLines.get oi
                     ni += 1
@@ -230,8 +242,9 @@ class Do
                             
             while ni < newLines.size # mark remaing lines in newState as inserted
                 insertions += 1
-                changes.push change: 'inserted', newIndex: ni, doIndex: ni
+                changes.push change: 'inserted', newIndex: ni, doIndex: ni, after: nl.get 'text'
                 ni += 1
+                nl = newLines.get ni
            
         changes: changes
         inserts: insertions

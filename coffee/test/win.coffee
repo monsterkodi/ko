@@ -48,7 +48,7 @@ describe 'win', ->
                         done err
             post.on 'editorState', onEditorState
             post.toWins 'postEditorState'
-        post.toMain 'newWindowWithFile', tmpFile
+        post.emit 'newWindowWithFile', tmpFile
         
     it 'loadFile', ->
         window.loadFile tmpFile
@@ -56,25 +56,49 @@ describe 'win', ->
         expect(editor.currentFile) .to.eql tmpFile
         expect(editor.text()) .to.eql text
             
-    it 'edit', ->
+    it 'insert', ->
         editor.singleCursorAtPos [0,0]
         editor.newlineAtEnd()
         expect(editor.dirty) .to.be.true
-        log editor.lines()
         expect(editor.lines()) .to.eql ["a='hello'", '', "b='world'"]
 
-    it 'foreign', (done) ->
+    it 'change', ->
+        editor.insertCharacter 'c'
+        editor.insertCharacter '='
+        editor.insertCharacter '1'
+        expect(editor.lines()) .to.eql ["a='hello'", 'c=1', "b='world'"]
+
+    it 'foreign after change', (done) ->
         onEditorState = (wid, state) -> 
             if wid == otherWin.id
                 post.removeListener 'editorState', onEditorState
                 try
-                    expect(state.lines) .to.eql ["a='hello'", '', "b='world'"]
+                    expect(state.lines) .to.eql ["a='hello'", 'c=1', "b='world'"]
                     done()
                 catch err
                     done err
         post.on 'editorState', onEditorState
         post.toWins 'postEditorState'
 
+    it 'undo', ->
+        editor.do.undo()
+        editor.do.undo()
+        expect(editor.lines()) .to.eql ["a='hello'", '', "b='world'"]
+        editor.do.undo()
+        expect(editor.lines()) .to.eql ["a='hello'", "b='world'"]
+
+    it 'foreign after undo', (done) ->
+        onEditorState = (wid, state) -> 
+            if wid == otherWin.id
+                post.removeListener 'editorState', onEditorState
+                try
+                    expect(state.lines) .to.eql ["a='hello'", "b='world'"]
+                    done()
+                catch err
+                    done err
+        post.on 'editorState', onEditorState
+        post.toWins 'postEditorState'
+        
     it 'close other window', (done) ->
         otherWinID = otherWin.id
         post.once 'winClosed', (wid) -> 

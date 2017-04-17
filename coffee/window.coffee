@@ -42,8 +42,8 @@ window.onerror = (event, source, line, col, err) ->
         s = "▲ #{l.source}:#{l.line} ▲ [ERROR] #{err}"
     else
         s = "▲ [ERROR] #{err}"
-    post.toWin 'error', s
-    post.toWin 'slog', s
+    post.emit 'error', s
+    post.emit 'slog', s
     console.log s
     
 # 00000000   00000000   00000000  00000000   0000000
@@ -102,7 +102,6 @@ post.on 'saveState',   -> saveState()
 post.on 'loadFile', (file) -> loadFile file
 post.on 'fileLinesChanged', (file, lineChanges) ->
     if file == editor.currentFile
-        # log 'window.on fileLinesChanged', file, lineChanges
         editor.applyForeignLineChanges lineChanges
         
 post.on 'postEditorState', -> 
@@ -149,6 +148,7 @@ winMain = ->
     editor.on 'changed', (changeInfo) ->
         return if changeInfo.foreign
         if changeInfo.changes.length
+            log "post To others from #{winID}"
             post.toOtherWins 'fileLinesChanged', editor.currentFile, changeInfo.changes
             navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
 
@@ -166,6 +166,10 @@ winMain = ->
     commandline.restoreState()
     split.restoreState()
 
+window.onload = -> 
+    split.resized()
+    info.reload()
+    
 # 00000000  0000000    000  000000000   0000000   00000000 
 # 000       000   000  000     000     000   000  000   000
 # 0000000   000   000  000     000     000   000  0000000  
@@ -209,9 +213,27 @@ saveFile = (file) ->
             setState 'file', file
 
 saveChanges = ->
+    
     if editor.currentFile? and editor.do.hasLineChanges() and fileExists editor.currentFile
-        atomicFile editor.currentFile, _.clone(editor.text()), encoding: 'utf8', (err) ->
-            if err? then log "saving changes to #{file} failed", err
+        stat = fs.statSync editor.currentFile
+        atomicFile editor.currentFile, editor.text(), { encoding: 'utf8', mode: stat.mode }, (err) ->            
+            return error "window.saveChanges failed #{err}" if err
+            log "wrote changes to file #{editor.currentFile}"
+    else
+        log "no need to saveChanges #{editor.currentFile} #{editor.do.hasLineChanges()} #{editor.dirty}"
+
+# 000   000  000   000  000       0000000    0000000   0000000    
+# 000   000  0000  000  000      000   000  000   000  000   000  
+# 000   000  000 0 000  000      000   000  000000000  000   000  
+# 000   000  000  0000  000      000   000  000   000  000   000  
+#  0000000   000   000  0000000   0000000   000   000  0000000    
+
+window.onunload = ->
+    log "onunload #{winID} #{editor.currentFile}"
+    saveChanges()
+    editor.setText ''
+    post.toMain 'fileLoaded', '', winID # to clear prefs?
+    editor.setCurrentFile null # to stop watcher
 
 # 000       0000000    0000000   0000000  
 # 000      000   000  000   000  000   000
@@ -346,14 +368,6 @@ window.onresize = ->
         screenWidth = screenSize().width
         editor.centerText sw() == screenWidth, 0
 
-window.onload = -> 
-    split.resized()
-    info.reload()
-    
-window.onunload = -> 
-    saveChanges()
-    editor.setCurrentFile null # to stop watcher
-
 # 0000000   0000000  00000000   00000000  00000000  000   000   0000000  000   000   0000000   000000000
 #000       000       000   000  000       000       0000  000  000       000   000  000   000     000   
 #0000000   000       0000000    0000000   0000000   000 0 000  0000000   000000000  000   000     000   
@@ -452,12 +466,8 @@ document.onkeydown = (event) ->
             return stopEvent event
     
     switch combo
-        when 'command+alt+i'     then return post.toMain 'toggleDevTools', winID
-        when 'ctrl+w' # close current file  
-            editor.setCurrentFile null
-            editor.setText ''
-            post.toMain 'fileLoaded', '', winID
-            return
+        when 'command+alt+i'      then return post.toMain 'toggleDevTools', winID
+        when 'ctrl+w'             then return win.close()
         when 'f3'                 then return screenShot()
         when 'command+\\'         then return toggleCenterText()
         when 'command+k'          then return commandline.clear()

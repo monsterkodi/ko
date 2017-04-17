@@ -36,7 +36,7 @@ class Row
         switch @item.type
             when 'dir'  then @column.browser.loadDir     @item.abs, column: @column.index+1, parent: @item
             when 'file' then @column.browser.loadContent @,         column: @column.index+1
-            else post.toWin 'jumpTo', file: @item.file, line: @item.line
+            else post.emit 'jumpTo', file: @item.file, line: @item.line
         @
     
     isActive: -> @div.classList.contains 'active'
@@ -56,7 +56,7 @@ class Row
         @column.div.scrollTop = @column.fixScroll = @fixScroll()
         @column.activeRow()?.clearActive()
         @div.classList.add 'active'
-        post.toWin 'browser-item-activated', @item if opt?.emit # sets commandline text
+        post.emit 'browser-item-activated', @item if opt?.emit # sets commandline text
         setTimeout @clearFixScroll, 100
         @
                 
