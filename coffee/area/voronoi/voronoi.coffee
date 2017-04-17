@@ -5,11 +5,10 @@
 #    000     000   000  000   000  000   000  000  0000  000   000  000
 #     0       0000000   000   000   0000000   000   000   0000000   000
 
-{ rad2deg, $
+{ rad2deg, log, $
 }      = require 'kxk'
-log    = require '../../tools/log'
-Snap   = require '../../snap.svg'
 Stage  = require '../stage'
+snap   = require './snap.svg'
 vorono = require './voronoinet'
 
 class Voronoi extends Stage
@@ -17,7 +16,7 @@ class Voronoi extends Stage
     constructor: (@view) ->
         super @view
         
-        @s = new Snap()
+        @s = new snap()
         @view.appendChild @s.node
         @s.attr
             id:       'net'
