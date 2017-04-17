@@ -38,9 +38,9 @@ class Find extends Command
         super command
         if editor = window.editorWithName @focus
             if command.length
-                if @type in ['reg', 'Reg'] and command.trim() in ['^', '$', '^$']
+                if @type in ['reg', 'Reg'] and command.trim() in ['^', '$', '^$', '.', '?']
                     editor.clearHighlights()
-                else
+                else if not command.trim().startsWith('|') and not command.trim().endsWith('|')
                     editor.highlightText command, 
                         type:   @type
                         select: 'keep'

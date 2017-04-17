@@ -13,13 +13,41 @@ matchr     = require '../coffee/tools/matchr'
 
 describe 'ranges', ->
     rgx = /([\~\/\w\.]+\/[\w\.]+\w[:\d]*)/
-    it 'parses', ->
+    it 'regexp', ->
         ranges = matchr.ranges rgx, '~/path/line:666'
         expect(ranges) .to.eql [
             index: 0
             start: 0
             match: '~/path/line:666'
-            value: '?'
+            value: 'found'
+        ]
+
+    it 'string', ->
+        ranges = matchr.ranges 'o..', 'module.exports = bla'
+        expect(ranges) .to.eql [
+            index: 0
+            start: 1
+            match: 'odu'
+            value: 'found'
+        ,
+            index: 0
+            start: 10
+            match: 'ort'
+            value: 'found'            
+        ]
+
+    it 'string|string', ->
+        ranges = matchr.ranges 'mod|exp', 'module.exports = bla'
+        expect(ranges) .to.eql [
+            index: 0
+            start: 0
+            match: 'mod'
+            value: 'found'
+        ,
+            index: 1
+            start: 7
+            match: 'exp'
+            value: 'found'            
         ]
     
 describe 'dissect', ->

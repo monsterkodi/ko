@@ -6,6 +6,7 @@
 
 { clamp, error, log, str, _
 }       = require 'kxk'
+matchr  = require '../tools/matchr'
 State   = require './state' 
 fuzzy   = require 'fuzzy'
 event   = require 'events'
@@ -283,15 +284,13 @@ class Buffer extends event
                     r.push [i, [mtch.index, re.lastIndex]] if fuzzy.test t, @line(i).slice mtch.index, re.lastIndex
             else
                 t = _.escapeRegExp t if type in ['str', 'Str', 'glob']
-                switch type
-                    when 'str', 'reg', 'glob' then s = 'gi'
-                    when 'Str', 'Reg'         then s = 'g'
                 if type is 'glob'
                     t = t.replace new RegExp("\\*", 'g'), "\w*"
                     return r if not t.length
-                re = new RegExp t, s            
-                while (mtch = re.exec(@line(i))) != null
-                    r.push [i, [mtch.index, re.lastIndex]]
+
+                rngs = matchr.ranges t, @line(i), type in ['str', 'reg', 'glob'] and 'i' or ''
+                for rng in rngs
+                    r.push [i, [rng.start, rng.start + rng.match.length]]
         r
                     
     rangesOfStringsInLineAtIndex: (li) -> # todo: handle #{}
