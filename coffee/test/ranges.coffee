@@ -9,7 +9,7 @@
 assert   = require 'assert'
 _        = require 'lodash'
 
-Ranges = require '../coffee/tools/ranges'
+Ranges = require '../tools/ranges'
 
 describe 'ranges', ->
     

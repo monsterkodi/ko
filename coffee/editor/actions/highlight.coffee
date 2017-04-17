@@ -96,17 +96,17 @@ module.exports =
             @setHighlights @rangesForText text, max:9999
             
             # this should be done somewhere else (commandline or find/search commands)
-            return if not window?
-            @renderHighlights?()
-            @emit 'highlight'
-            
-            if window.split.commandlineVisible()
-                window.commandline.startCommand 'find' if window.commandline.command?.prefsID not in ['search', 'find']
-            window.commandline.commands.find.currentText = text
-            window.commandline.commands.search.currentText = text
-            window.commandline.setText text
-            
-            @focus()
+            if @renderHighlights?
+                @renderHighlights()
+                @emit 'highlight'
+                
+                if window.split.commandlineVisible()
+                    window.commandline.startCommand 'find' if window.commandline.command?.prefsID not in ['search', 'find']
+                window.commandline.commands.find.currentText = text
+                window.commandline.commands.search.currentText = text
+                window.commandline.setText text
+                
+                @focus()
 
     clearHighlights: ->
         if @numHighlights()

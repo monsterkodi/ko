@@ -10,8 +10,8 @@
 assert     = require 'assert'
 _          = require 'lodash'
 
-Editor = require '../coffee/editor/editor'
-Do     = require '../coffee/editor/do'
+Editor = require '../editor/editor'
+Do     = require '../editor/do'
 
 # 000   000  000  00000000  000   000  
 # 000   000  000  000       000 0 000  

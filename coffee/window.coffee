@@ -102,7 +102,7 @@ post.on 'saveState',   -> saveState()
 post.on 'loadFile', (file) -> loadFile file
 post.on 'fileLinesChanged', (file, lineChanges) ->
     if file == editor.currentFile
-        log 'window.on fileLinesChanged', file, lineChanges
+        # log 'window.on fileLinesChanged', file, lineChanges
         editor.applyForeignLineChanges lineChanges
 
 # 000   000  000  000   000  00     00   0000000   000  000   000  

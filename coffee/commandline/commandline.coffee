@@ -59,7 +59,7 @@ class Commandline extends TextEditor
     restoreState: ->
         
         state = window.getState 'commandline'
-        log 'commandline restoreState', state
+        # log 'commandline restoreState', state
         @setText state?.text ? ""
         if state?.name
             name = state.name

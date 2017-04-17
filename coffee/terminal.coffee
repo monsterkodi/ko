@@ -114,6 +114,7 @@ class Terminal extends TextEditor
         @meta.clear()
         super
         @singleCursorAtPos [0,0]
+        @
             
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
