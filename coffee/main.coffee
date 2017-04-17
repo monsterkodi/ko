@@ -5,7 +5,7 @@
 # 000   000  000   000  000  000   000
 
 { splitFilePos, fileExists, dirExists, fileList, resolve,
-  childp, about, prefs, store, noon, post, fs, str, log, _
+  childp, about, prefs, store, noon, post, fs, str, error, log, _
 }             = require 'kxk'
 pkg           = require '../package.json'
 Execute       = require './execute'
@@ -121,7 +121,7 @@ post.on 'activateWindow',    (winID) -> main.activateWindowWithID winID
 post.on 'reloadWindow',      (winID) -> main.reloadWin winWithID winID
 post.on 'fileSaved',   (file, winID) -> main.indexer.indexFile file, refresh: true
 post.on 'fileLoaded',  (file, winID) -> main.indexer.indexFile winWithID(winID).currentFile = file
-post.on 'error',                     -> error 'error in window:', arguments
+post.on 'winlog',      (winID, text) -> console.log "win#{winID} ", text
             
 winShells = {}
 
