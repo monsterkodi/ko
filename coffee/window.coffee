@@ -143,7 +143,7 @@ winMain = ->
         logview.resized()
     
     terminal.on 'fileLineChange', (file, lineChange) -> # sends changes to all windows
-        post.toAllWins 'fileLinesChanged', file, [lineChange]
+        post.toWins 'fileLinesChanged', file, [lineChange]
     
     editor.on 'changed', (changeInfo) ->
         return if changeInfo.foreign

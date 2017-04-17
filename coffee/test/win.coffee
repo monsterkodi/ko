@@ -18,13 +18,16 @@ catch
 winID    = 0
 thisID   = window.winID
 editor   = window.editor
-thisFile = editor.currentFile
+thisFile = null
 otherWin = null
 tmpFile  = resolve '$TMPDIR/ko/test.coffee'
 text     = "a='hello'\nb='world'"
-fs.outputFileSync tmpFile, text
         
 describe 'win', ->
+    
+    before -> 
+        fs.outputFileSync tmpFile, text
+        thisFile = editor.currentFile
     
     it 'new window', (done) ->
         post.once 'winLoaded', (wid) -> winID = wid; done()
@@ -35,22 +38,24 @@ describe 'win', ->
         BrowserWindow.fromId(winID).close()
 
     it 'new window with file', (done) ->
-        post.once 'fileLoaded', (file, wid) -> 
-            expect(file) .to.eql tmpFile
+        post.once 'fileLoaded', (file, wid) ->
+            try
+                expect(file) .to.eql tmpFile
+            catch err
+                done err
+                            
             otherWin = BrowserWindow.fromId wid 
-            onEditorState = (wid, state) -> 
-                if wid == otherWin.id
-                    post.removeListener 'editorState', onEditorState
-                    try
-                        expect(state.lines) .to.eql ["a='hello'", "b='world'"]
-                        done()
-                    catch err
-                        done err
-            post.on 'editorState', onEditorState
-            post.toWins 'postEditorState'
-        post.emit 'newWindowWithFile', tmpFile
+            post.once 'editorState', (wid, state) -> 
+                try
+                    expect(wid) .to.eql otherWin.id
+                    expect(state.lines) .to.eql ["a='hello'", "b='world'"]
+                    done()
+                catch err
+                    done err
+            post.toWin otherWin.id, 'postEditorState'
+        post.toMain 'newWindowWithFile', tmpFile
         
-    it 'loadFile', ->
+    it 'load file', ->
         window.loadFile tmpFile
         expect(editor.dirty) .to.be.false
         expect(editor.currentFile) .to.eql tmpFile
@@ -69,16 +74,14 @@ describe 'win', ->
         expect(editor.lines()) .to.eql ["a='hello'", 'c=1', "b='world'"]
 
     it 'foreign after change', (done) ->
-        onEditorState = (wid, state) -> 
-            if wid == otherWin.id
-                post.removeListener 'editorState', onEditorState
-                try
-                    expect(state.lines) .to.eql ["a='hello'", 'c=1', "b='world'"]
-                    done()
-                catch err
-                    done err
-        post.on 'editorState', onEditorState
-        post.toWins 'postEditorState'
+        post.once 'editorState', (wid, state) -> 
+            try
+                expect(wid) .to.eql otherWin.id
+                expect(state.lines) .to.eql ["a='hello'", 'c=1', "b='world'"]
+                done()
+            catch err
+                done err
+        post.toWin otherWin.id, 'postEditorState'
 
     it 'undo', ->
         editor.do.undo()
@@ -88,16 +91,14 @@ describe 'win', ->
         expect(editor.lines()) .to.eql ["a='hello'", "b='world'"]
 
     it 'foreign after undo', (done) ->
-        onEditorState = (wid, state) -> 
-            if wid == otherWin.id
-                post.removeListener 'editorState', onEditorState
-                try
-                    expect(state.lines) .to.eql ["a='hello'", "b='world'"]
-                    done()
-                catch err
-                    done err
-        post.on 'editorState', onEditorState
-        post.toWins 'postEditorState'
+        post.once 'editorState', (wid, state) -> 
+            try
+                expect(wid) .to.eql otherWin.id
+                expect(state.lines) .to.eql ["a='hello'", "b='world'"]
+                done()
+            catch err
+                done err
+        post.toWin otherWin.id, 'postEditorState'
         
     it 'close other window', (done) ->
         otherWinID = otherWin.id
@@ -109,4 +110,5 @@ describe 'win', ->
     it 'restore file', ->
         window.loadFile thisFile
         expect(editor.currentFile) .to.eql thisFile    
-            
+
+          

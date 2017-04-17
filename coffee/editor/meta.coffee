@@ -4,7 +4,7 @@
 # 000 0 000  000          000     000   000
 # 000   000  00000000     000     000   000
 
-{ error, log, fs, $, _
+{ error, log, post, fs, $, _
 }      = require 'kxk'
 ranges = require '../tools/ranges'
 
@@ -77,6 +77,7 @@ class Meta
                     meta = lineMeta[2]
                     delete meta[2].state
                     meta[2].span.innerHTML = lineMeta[0]+1
+                post.emit 'search-saved', file
                     
     saveLine: (li) -> 
         for meta in @metasAtLineIndex li

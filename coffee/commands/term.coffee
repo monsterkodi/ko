@@ -164,18 +164,6 @@ class Term extends Command
         ]
         ({text: i, line: i in @bins and '●' or '▸', type: 'sh'} for i in items)
 
-    #  0000000  000      00000000   0000000   00000000 
-    # 000       000      000       000   000  000   000
-    # 000       000      0000000   000000000  0000000  
-    # 000       000      000       000   000  000   000
-    #  0000000  0000000  00000000  000   000  000   000
-    
-    clear: ->
-        if window.terminal.numLines() > 0
-            window.terminal.clear()
-        else
-            text: ''
-            
     loadState: ->
         @idCommands = @getState 'idCommands', Object.create null
         @commandIDs = @getState 'commandIDs', Object.create null
