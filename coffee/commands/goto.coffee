@@ -4,7 +4,7 @@
 # 000   000  000   000     000     000   000
 #  0000000    0000000      000      0000000 
 
-{ clamp, log, _
+{ clamp, post, log, _
 }        = require 'kxk'
 Command  = require '../commandline/command'
 
@@ -43,7 +43,8 @@ class Goto extends Command
         @types = {}
         
         files = post.get 'indexer', 'files'
-        funcs = files[window.editor.currentFile].funcs
+        funcs = files[window.editor.currentFile]?.funcs
+        
         for info in funcs
             name  = info[2]
             items.push text: name, line:'▸', clss:'method'

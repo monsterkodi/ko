@@ -4,7 +4,7 @@
 #      000  000        000      000     000   
 # 0000000   000        0000000  000     000   
 
-{ post, prefs, error, log, $, _
+{ post, error, log, $, _
 }     = require 'kxk'
 event = require 'events'
 Flex  = require './flex/flex'
@@ -38,7 +38,6 @@ class Split extends event
                 ,
                     div:        @commandline
                     fixed:      @commandlineHeight
-                    collapsed:  true
                 ,
                     div:        @editor
                 ,
@@ -52,9 +51,16 @@ class Split extends event
             onPaneSize: @onDrag
             snapFirst:  20
             snapLast:   100
-        @onDrag()
-        
-    onDrag: => if @flex? then @emit 'split', @flex.panePositions()
+            
+    onDrag: => if @flex? then @emitSplit()
+    
+    restoreState: -> 
+        @flex.restoreState window.getState 'split'
+        @emitSplit()
+    
+    emitSplit: =>         
+        @emit 'split', @flex.panePositions() 
+        window.setState 'split', @flex.getState() 
                 
     # 0000000     0000000 
     # 000   000  000   000
@@ -125,22 +131,22 @@ class Split extends event
     # 0000000    000000000  000  0000000   0000000   
     # 000   000  000   000  000       000  000       
     # 000   000  000   000  000  0000000   00000000  
-    
-    raise: (n) ->
 
-        swap = (old, nju) =>
-            if @flex.panes[0].div != nju
-                nju.style.height   = "#{@flex.sizeOfPane 0}px"
-                nju.style.width    = old.style.width
-                old.style.display  = 'none'
-                nju.style.display  = 'block'
-                @flex.panes[0].div = nju
-                @flex.calculate()
+    swap: (old, nju) ->
+        if @flex.panes[0].div != nju
+            nju.style.height   = "#{@flex.sizeOfPane 0}px"
+            nju.style.width    = old.style.width
+            old.style.display  = 'none'
+            nju.style.display  = 'block'
+            @flex.panes[0].div = nju
+
+    raise: (n) ->
                 
         switch n
-            when 'terminal' then swap @area, @terminal
-            when 'area'     then swap @terminal, @area
+            when 'terminal' then @swap @area, @terminal
+            when 'area'     then @swap @terminal, @area
             
+        @flex.calculate()
         @flex.expand 'terminal', 0.33
 
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
@@ -213,7 +219,7 @@ class Split extends event
         @elem.style.width = "#{main.clientWidth}px"
         @elem.style.height = "#{main.clientHeight}px"
         @flex.resized()
-        @emit 'split', @flex.panePositions()
+        @emitSplit()
     
     # 00000000    0000000    0000000          0000000  000  0000000  00000000
     # 000   000  000   000  000         0    000       000     000   000     

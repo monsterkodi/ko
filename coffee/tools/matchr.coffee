@@ -47,13 +47,19 @@ sortRanges = (rgs) ->
 #             the nth item of values(s) if value(s) is an array
 #             the nth [key, value] pair if value(s) is an object
 
-ranges = (regexes, text) ->
+ranges = (regexes, text, flags) ->
     
     if not _.isArray regexes
-        regexes = [[regexes, '?']]
+        if _.isString regexes
+            if regexes.indexOf('|') >= 0
+                regexes = ([new RegExp(r, flags), 'found'] for r in regexes.split('|'))
+            else
+                regexes = [[new RegExp(regexes, flags), 'found']]
+        else
+            regexes = [[regexes, 'found']]
     else if not _.isArray regexes[0]
         regexes = [regexes]
-    # console.log str regexes
+
     rgs = []
     return rgs if not text?
     for r in [0...regexes.length]

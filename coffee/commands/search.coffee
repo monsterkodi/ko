@@ -92,12 +92,18 @@ class FileSearcher extends stream.Writable
     
     constructor: (@opt, @file) ->
         @line = 0
-        [txt, ropt] = switch @opt.name
-            when 'search'   then [_.escapeRegExp(@opt.text), 'i']
-            when 'Search'   then [_.escapeRegExp(@opt.text), '']
-            when '/search/' then [@opt.text, 'i']
-            when '/Search/' then [@opt.text, '']
-        @patterns = [[new RegExp(txt, ropt), 'found']]
+        # [txt, ropt] = switch @opt.name
+            # when 'search'   then [_.escapeRegExp(@opt.text), 'i']
+            # when 'Search'   then [_.escapeRegExp(@opt.text), '']
+            # when '/search/' then [@opt.text, 'i']
+            # when '/Search/' then [@opt.text, '']
+        # @patterns = [[new RegExp(txt, ropt), 'found']]
+        @flags = ''
+        @patterns = switch @opt.name
+            when 'search'   then [[new RegExp(_.escapeRegExp(@opt.text), 'i'), 'found']]
+            when 'Search'   then [[new RegExp(_.escapeRegExp(@opt.text)),      'found']]
+            when '/search/' then @flags='i'; @opt.text
+            when '/Search/' then @opt.text
         @found = []
         extn = path.extname(@file).slice 1
         if extn in syntax.syntaxNames
@@ -111,7 +117,7 @@ class FileSearcher extends stream.Writable
         @syntaxName = syntax.shebang lines[0] if not @syntaxName?
         for l in lines
             @line += 1            
-            rngs = matchr.ranges @patterns, l
+            rngs = matchr.ranges @patterns, l, @flags
             if rngs.length
                 @found.push [@line, l, rngs]
         true

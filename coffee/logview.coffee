@@ -4,7 +4,7 @@
 # 000      000   000  000   000     000     000  000       000   000
 # 0000000   0000000    0000000       0      000  00000000  00     00
 
-{post, log, $
+{ post, log, $
 }          = require 'kxk'
 TextEditor = require './editor/texteditor'
 
@@ -14,8 +14,11 @@ class LogView extends TextEditor
         @fontSizeDefault = 12
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap']
         @setLines ['']
-        post.on 'error', (text) -> window.split.do 'show logview'
-        post.on 'slog', @appendText
+        post.on 'error', (text) -> 
+            window.split.do 'show logview'
+        post.on 'slog', (text) =>
+            @appendText text
+            post.toMain 'winlog', window.winID, text
         log 'happy logging!'
                 
     #  0000000   00000000   00000000   00000000  000   000  0000000  

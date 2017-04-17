@@ -34,14 +34,14 @@ class Term extends Command
     # 000   000  000  0000        000   000  000   000     000     000   000  
     #  0000000   000   000        0000000    000   000     000     000   000  
         
-    onShellCommandData: (cmdData) => 
+    onShellCommandData: (cmdData) =>
         if cmdData.cmd == @pwdID
             if cmdData.data != "pwd"
                 cwd = cmdData.data
                 switch @pwdTag
                     when 'autocd'
                         pkgPath = packagePath window.editor.currentFile
-                        if not cwd.startsWith pkgPath
+                        if pkgPath? and not cwd.startsWith pkgPath
                             @execute "cd #{pkgPath}"
                     when 'complete'
                         @completeDir cwd
@@ -293,11 +293,11 @@ class Term extends Command
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
     
-    start: (combo) ->
+    start: (@combo) ->
         
         @getPWD 'autocd' if @autocd
         
-        super combo
+        super @combo
         text:   @last()
         select: true
         do:     'show terminal'

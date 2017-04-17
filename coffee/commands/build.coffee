@@ -4,7 +4,7 @@
 # 000   000  000   000  000  000      000   000
 # 0000000     0000000   000  0000000  0000000  
 
-{ fileExists, dirExists, resolve, log, _
+{ fileExists, dirExists, resolve, log, $, _
 }        = require 'kxk'
 Command  = require '../commandline/command'
 
@@ -18,6 +18,11 @@ class Build extends Command
         @names      = ["build", 'Build']
         @area.on 'resized', @onAreaResized
         super @commandline
+
+    restoreState: (state) -> 
+        super state
+        window.split.swap $('terminal'), $('area')
+        @execute state.text
     
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -25,8 +30,8 @@ class Build extends Command
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
     
-    start: (combo) ->
-        super combo
+    start: (@combo) ->
+        super @combo
         text:   @last()
         select: true
         do:     'show area'
