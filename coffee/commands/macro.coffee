@@ -93,7 +93,7 @@ class Macro extends Command
             #    000     00000000  0000000      000     
             
             when 'test'
-                mocha = new Mocha reporter: Report.forRunner
+                mocha = new Mocha reporter: Report.forRunner, timeout: 4000
                 if _.isEmpty args
                     files = fileList path.join(__dirname, '..', 'test'), matchExt:['.js', '.coffee']
                 else

@@ -428,6 +428,7 @@ class Main
                     post.toWin win.id, 'loadFile', file
                 else
                     win.show()
+            post.toWins 'winLoaded', win.id
                             
         win.webContents.on 'did-finish-load', winLoaded
         win 
@@ -464,9 +465,11 @@ class Main
                             height: b.height
     
     onCloseWin: (event) ->
-        prefs.del "windows:#{event.sender.id}"
+        wid = event.sender.id
+        prefs.del "windows:#{wid}"
         if visibleWins().length == 1
             hideDock()
+        post.toWins 'winClosed', wid
         
     otherInstanceStarted: (args, dir) =>
         if not visibleWins().length

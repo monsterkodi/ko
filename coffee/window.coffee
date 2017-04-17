@@ -104,6 +104,10 @@ post.on 'fileLinesChanged', (file, lineChanges) ->
     if file == editor.currentFile
         # log 'window.on fileLinesChanged', file, lineChanges
         editor.applyForeignLineChanges lineChanges
+        
+post.on 'postEditorState', -> 
+    log 'postState'
+    post.toAll 'editorState', winID, lines:editor.lines(), cursors:editor.cursors(), main:editor.mainCursor(), selections:editor.selections(), highlights:editor.highlights()
 
 # 000   000  000  000   000  00     00   0000000   000  000   000  
 # 000 0 000  000  0000  000  000   000  000   000  000  0000  000  
@@ -244,7 +248,7 @@ loadFile = (file, opt={}) ->
         
         editor.setCurrentFile null, opt  # to stop watcher and reset scroll
         editor.setCurrentFile file, opt
-        post.toMain 'fileLoaded', file, winID
+        post.toOthers 'fileLoaded', file, winID
         setState 'file', file
         commandline.fileLoaded file
     

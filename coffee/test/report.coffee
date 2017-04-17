@@ -48,7 +48,7 @@ class Report
         else
             log '■ ok'
 
-    indent: -> Array(@indents).join '  '
+    indent: -> Array(Math.max 0, @indents).join '  '
     
     @forRunner: (runner) -> new Report runner
 
