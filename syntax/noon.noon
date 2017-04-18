@@ -9,49 +9,44 @@
 
 # comments
 
-(?:^|\s+)(#+)([^\{].*|$)             
-                            comment.marker
-                            comment
+(?:^|\s+)(#+)([^\{].*|$)    . comment.marker . comment
+                            
 # top level
 
-^\w+                        class
+^([^#\s]+(?:\s\S+)*)        class
 
 # property
 
-(^\s+[\w-]+\s\s)\s*[^\s\.]+    property
-(^\s+[\w-]+$)                  property
+^\s+([^#\s]+(?:\s\S+)*)(?:\s*$|\s{2,}\S.*)   property
 
-# keypath / semver
+# semver
 
-(\S+\.\S*)                  keypath
+(\S+\.\d+\.\S+)             keypath
 
 # path
 
-(?:^|\s\s+)(\s*[\/\S]*)(\/)(\S+)
-                            string.single
-                            string.double 
+(?:^|\s\s+)(\s*[\/\S]*)(\/)(\S+)  . string.single . string.double 
+
 # float
 
-(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
-                            syntax.value.number.float.sign
-                            value.number.float
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   . number.float.sign . number.float
 # int 
 
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
-                            syntax.value.number.int.sign
-                            value.number.int
+                            number.int.sign
+                            number.int
 # bool
 
-(?:^|\s+)(true)\s*$         value.bool.true
-(?:^|\s+)(false)\s*$        value.bool.false
+(?:^|\s+)(true)\s*$         bool.true
+(?:^|\s+)(false)\s*$        bool.false
 
 # regexp
 
-^s*([\(\[\^]\S+)            string
+^\s*([\(\[\^\\]\S+)         string
 
 # dim
 
 [\>\<\=\^\$\.\:\/\|\-]      marker
 
 # salter headers
-^\s*\#\s+([0\s]+)$        . comment.header
+^(\s*\#\s+)([0\s]+)$        . comment.marker . comment.header

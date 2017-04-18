@@ -8,7 +8,6 @@
 }        = require 'kxk'
 colors   = require 'colors'
 coffee   = require 'coffee-script'
-electron = require 'electron'
 pty      = require 'node-pty'
 
 class Execute

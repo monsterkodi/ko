@@ -409,6 +409,7 @@ class Main
             backgroundColor: '#000'
             titleBarStyle:   'hidden'
 
+        #win.webContents.openDevTools()
         win.loadURL "file://#{__dirname}/index.html"
         app.dock.show()
         win.on 'close',  @onCloseWin

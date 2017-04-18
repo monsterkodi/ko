@@ -24,14 +24,11 @@ class Browser extends Stage
     # 0000000   0000000   000   000  0000000    000       000  0000000  00000000  
     
     loadFile: (file, opt = focus:true, column:0) ->
-        # log 'loadFile', file, opt
-        dir = packagePath file
-        if dir?
-            opt.file = file
-            @skipJump = opt.dontJump
-            @loadDir dir, opt
-        else
-            error 'no packagePath?', dir, file
+        dir  = packagePath file
+        dir ?= path.dirname file
+        opt.file = file
+        @skipJump = opt.dontJump
+        @loadDir dir, opt
 
     # 0000000    00000000    0000000   000   000   0000000  00000000  
     # 000   000  000   000  000   000  000 0 000  000       000       

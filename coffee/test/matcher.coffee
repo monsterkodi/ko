@@ -12,7 +12,28 @@ noon       = require 'noon'
 matchr     = require '../tools/matchr'
 
 describe 'ranges', ->
+    
     rgx = /([\~\/\w\.]+\/[\w\.]+\w[:\d]*)/
+    
+    it 'noon', ->
+        ranges = matchr.ranges /^\s+([^#\s]+(?:\s\S+)*)/g, '  some key  value'
+        expect(ranges) .to.eql [
+            index: 0
+            start: 2
+            match: 'some key'
+            value: 'found'
+        ]
+        
+    it 'noon config', ->
+        cfg = matchr.config noon.parse("^\\s+([^#\\s]+(?:\\s\\S+)*)  noon"), 'g'
+        ranges = matchr.ranges cfg, '  some key  value'
+        expect(ranges) .to.eql [
+            index: 0
+            start: 2
+            match: 'some key'
+            value: 'noon'
+        ]
+
     it 'regexp', ->
         ranges = matchr.ranges rgx, '~/path/line:666'
         expect(ranges) .to.eql [

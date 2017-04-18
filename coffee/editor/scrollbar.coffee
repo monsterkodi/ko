@@ -30,7 +30,7 @@ class Scrollbar
         @editor.view.addEventListener 'wheel',  @onWheel
         
         @scrollX = @scrollY = 0
-        window.requestAnimationFrame @scrollAnim
+        # window.requestAnimationFrame @scrollAnim
 
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000
@@ -73,6 +73,11 @@ class Scrollbar
             @scrollX += event.deltaX
         else
             @scrollY += event.deltaY * scrollFactor()
+
+        if @scrollX or @scrollY
+            @editor.scrollBy @scrollY, @scrollX
+            @scrollX  = 0
+            @scrollY  = 0
         
         stopEvent event    
         

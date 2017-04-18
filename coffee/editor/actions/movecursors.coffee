@@ -103,7 +103,7 @@ module.exports =
         newCursors = []
         main = 'last'
         for s in @do.selections()
-            p = @rangeIndexPos s,i
+            p = rangeIndexPos s,i
             newCursors.push p
             if @isCursorInRange s
                 main = newCursors.indexOf p

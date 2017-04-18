@@ -4,7 +4,7 @@
 # 000   000  000       000        000   000  000   000     000     
 # 000   000  00000000  000         0000000   000   000     000     
 
-{str, _} = require 'kxk'
+{str, noon, _} = require 'kxk'
 syntax = require '../editor/syntax'
 
 log = ->
@@ -36,9 +36,20 @@ class Report
 
         runner.on 'fail', (test, err) =>
             log @indent(), '  ✘', test.title
-            console.log err.stack
+            # console.log err
             for stack in (err.stack ? err.message).split '\n    at '
                 log @indent(), '    ▲', stack
+            if err.actual? and err.expected?
+                log @indent(), ''
+                log @indent(), '    ▶ expected:'
+                e = str err.expected
+                for l in e.split('\n').slice 1
+                    log @indent(), '     ', l
+                log @indent(), ''
+                log @indent(), '    ▷ actual:'
+                e = str err.actual
+                for l in e.split('\n').slice 1
+                    log @indent(), '     ', l
 
         runner.on 'end', => # log ''
      

@@ -4,10 +4,11 @@
 # 000       000   000  000       000       000       000     
 #  0000000   0000000   000       000       00000000  00000000
 
-{ log, str, post
+{ post, str, error, log
 }        = require 'kxk'
 Syntax   = require '../editor/syntax'
 Command  = require '../commandline/command'
+coffee   = require 'coffee-script'
 
 class Coffee extends Command
     
@@ -57,6 +58,32 @@ class Coffee extends Command
     # 0000000     00000    0000000   000       000   000     000     0000000 
     # 000        000 000   000       000       000   000     000     000     
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
+
+    executeCoffee: (cfg) => 
+        coffee.eval "cmdID = #{cfg.cmdID}"
+        
+        if not coffee.eval 'post?'
+            restoreCWD = process.cwd()
+            process.chdir __dirname
+            coffee.eval """                
+                {str,clamp,fileExists,dirExists,post,path,noon,fs,_,$} = require 'kxk'
+                {max,min,abs,round,ceil,floor,sqrt,pow,exp,log10,sin,cos,tan,acos,asin,atan,PI,E} = Math
+                (global[r] = require r for r in ['colors', 'electron'])                    
+                log = -> post.emit 'executeResult', [].slice.call(arguments, 0), cmdID
+                """
+            process.chdir restoreCWD
+        
+        try
+            result = coffee.eval cfg.command
+        catch err
+            error "Coffee.executeCoffee -- #{err}"
+            result error: err.toString()
+
+        if not result?
+            result = 'undefined'
+        # else if typeof(result) != 'object' or not result.error? and _.size(result) == 1
+            # result = str result
+        @onResult result, cfg.cmdID   
         
     execute: (command) ->
         @cmdID += 1
@@ -71,10 +98,14 @@ class Coffee extends Command
                 diss: Syntax.dissForTextAndSyntax l, 'coffee'
                 clss: 'coffeeCommand'
         terminal.singleCursorAtPos [0, terminal.numLines()-1]
-        post.toMain 'executeCoffee', winID: window.winID, cmdID: @cmdID, command: command        
+        if @name == 'Coffee'
+            post.toMain 'executeCoffee', winID: window.winID, cmdID: @cmdID, command: command
+        else
+            @executeCoffee command: command, cmdID: @cmdID
         @hideList()
-        do: (@name == 'Coffee' and 'maximize' or 'show') + ' terminal'
+        do: 'show terminal'
     
-    executeText: (text) -> @execute text
+    executeText:       (text) -> @name = 'coffee'; @execute text
+    executeTextInMain: (text) -> @name = 'Coffee'; @execute text
     
 module.exports = Coffee

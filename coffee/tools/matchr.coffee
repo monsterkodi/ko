@@ -14,7 +14,7 @@
 
 # convert the patterns object to a list of [RegExp(key), value] pairs
 
-config = (patterns) -> ( [new RegExp(p), a] for p,a of patterns )
+config = (patterns, flags) -> ( [new RegExp(p, flags), a] for p,a of patterns )
 
 sortRanges = (rgs) ->
     rgs.sort (a,b) -> 
