@@ -33,9 +33,13 @@ class Row
         $('.hover')?.classList.remove 'hover'
         @setActive emit:true
         switch @item.type
-            when 'dir'  then @column.browser.loadDir     @item.abs, column: @column.index+1, parent: @item
-            when 'file' then @column.browser.loadContent @,         column: @column.index+1
-            else post.emit 'jumpTo', file: @item.file, line: @item.line
+            when 'dir'   then @column.browser.loadDir     @item.abs, column: @column.index+1, parent: @item
+            when 'file'  then @column.browser.loadContent @,         column: @column.index+1
+            else
+                if @item.file?
+                    post.emit 'jumpTo', file: @item.file, line: @item.line
+                else if @item.obj?
+                    @column.browser.loadObjectItem  @item, column: @column.index+1
         @
     
     isActive: -> @div.classList.contains 'active'

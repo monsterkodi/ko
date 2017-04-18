@@ -98,7 +98,6 @@ class Column
     nextColumn: -> @browser.column(@index+1)
         
     numRows:    -> @rows.length ? 0   
-    # rowHeight:  -> @rows[0]?.div.getBoundingClientRect().height ? 0
     rowHeight:  -> @rows[0]?.div.clientHeight ? 0
     numVisible: -> @browser.height() / @rowHeight()
     

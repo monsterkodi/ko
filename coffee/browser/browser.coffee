@@ -18,7 +18,95 @@ class Browser extends Stage
     constructor: (@view) -> 
         @columns = []
         super @view
+
+    # 000       0000000    0000000   0000000     0000000   0000000          000  
+    # 000      000   000  000   000  000   000  000   000  000   000        000  
+    # 000      000   000  000000000  000   000  000   000  0000000          000  
+    # 000      000   000  000   000  000   000  000   000  000   000  000   000  
+    # 0000000   0000000   000   000  0000000     0000000   0000000     0000000   
+    
+    loadObject: (obj, opt = focus:true, column:0) =>
+        
+        @initColumns() if _.isEmpty @columns
+        
+        if @columns[0].parent?.type != 'obj'
+            @clearColumnsFrom 1
+            rootObj = {}
+            @columns[0].setItems [], parent: type: 'obj', obj:rootObj, name: 'root'
+        else 
+            rootObj = @columns[0].parent.obj
+    
+        objName = opt.name ? obj.constructor?.name
+        objText = opt.text ? objName
+        
+        log 'objName', objName
+        log 'objText', objText
+
+        itemForKeyValue = (key, value) ->
+            item =             
+                if _.isArray value
+                    type: 'array'
+                    obj:  value
+                else if _.isRegExp value
+                    type: 'regexp'
+                    obj: value.source
+                else if _.isFunction value
+                    type: 'func'
+                    obj:  value.toString().split '\n'
+                else if _.isString value 
+                    type: 'string'
+                    obj: value
+                else if _.isNumber value 
+                    type: 'number'
+                    obj: str value
+                else if _.isPlainObject value
+                    type: 'obj'
+                    obj:  value
+                else
+                    type: 'value'
+                    obj:  str value
+            item.name = key
+            item
+
+        if opt.column == 0
+            newItem = 
+                type: 'obj'
+                name: objName
+                text: objText
+                obj:  obj
+            if row = @columns[0].rowWithName objName
+                @columns[0].items[row.index()] = newItem
+            else
+                @columns[0].items.push newItem
+            items = @columns[0].items
+            opt.parent = @columns[0].parent
+        else
+            items = []
+            if _.isPlainObject obj
+                for key,value of obj
+                    items.push itemForKeyValue key, value
+            else
+                for own index,value of obj
+                    if _.isObject value
+                        key = index
+                    else
+                        key = value
+                    items.push itemForKeyValue index, value
+                    
+        @loadItems items, opt
   
+    loadObjectItem: (item, opt) ->
+        opt.parent = item
+        switch item.type
+            when 'obj', 'array' 
+                @loadObject item.obj, opt
+            else
+                item = 
+                    type: item.type
+                    name: str item.obj
+                @loadItems [item], opt
+        
+    
     # 000       0000000    0000000   0000000    00000000  000  000      00000000  
     # 000      000   000  000   000  000   000  000       000  000      000       
     # 000      000   000  000000000  000   000  000000    000  000      0000000   
@@ -285,7 +373,7 @@ class Browser extends Stage
         @view.appendChild @cols
         
         @columns = []
-        for i in [0...3]
+        for i in [0...2]
             @newColumn()
             
         panes = @columns.map (c) -> div:c.div, min:20
