@@ -5,7 +5,7 @@
 #  0000000   000        00000000  000   000
 
 { 
-packagePath, fileExists, dirExists, unresolve, relative, resolve,
+packagePath, splitFilePos, joinFilePos, fileExists, dirExists, unresolve, relative, resolve,
 prefs, clamp, post, error, log, $, path, fs, _
 }        = require 'kxk'
 profile  = require '../tools/profile'
@@ -52,10 +52,11 @@ class Open extends Command
         
         if command in ['.', '/', '~'] or command.endsWith '/'
             return @navigateDir command
-            
-        items = @listItems flat: true, navigating: @navigating, currentText: @getText().trim()    
+
+        [file, pos] = splitFilePos command #@getText().trim()
+        items = @listItems flat: true, navigating: @navigating, currentText: file    
         if command.length
-            fuzzied = fuzzy.filter command, items, extract: (o) -> o.text            
+            fuzzied = fuzzy.filter path.basename(file), items, extract: (o) -> o.text            
             items = (f.original for f in fuzzied)
                     
         if items.length
@@ -286,7 +287,7 @@ class Open extends Command
             dir: dir
             noPkg: true
             navigating: true
-        if r
+        if true # r
             @hideList()
             @select -1                
     
@@ -382,7 +383,6 @@ class Open extends Command
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
         
     execute: (command) ->
-        
         listValue = @commandList?.line(@selected) if @selected >= 0
 
         if command in ['.', '..', '/', '~']
@@ -396,6 +396,7 @@ class Open extends Command
                     resolved = @resolvedPath listValue
             else if dirExists @resolvedPath command
                 resolved = @resolvedPath command
+                
             if resolved? 
                 @loadDir
                     navigating: true
@@ -404,18 +405,23 @@ class Open extends Command
 
         @hideList()
 
+
         if listValue
-            files = [@resolvedPath listValue]
+            [file, pos] = splitFilePos command
+            file = @resolvedPath listValue
+            file = joinFilePos file, pos
+            files = [file]
         else
             files = _.words command, new RegExp "[^, ]+", 'g'
-                    
             for i in [0...files.length]
                 file = files[i]
+                [file, pos] = splitFilePos file
                 file = @resolvedPath file
                 if not fileExists file
                     if '' == path.extname file
                         if fileExists file + '.coffee'
                             file += '.coffee'
+                file = joinFilePos file, pos
                 files.splice i, 1, file
             
         options = newWindow: @name == "new window"
