@@ -63,7 +63,7 @@ class Meta
     # 0000000   000   000      0      00000000
          
     saveFileLineMetas: (file, lineMetas) ->
-        log "Meta.saveFileLineMetas file:#{file} numChanges: #{lineMetas.length}"
+        # log "Meta.saveFileLineMetas file:#{file} numChanges: #{lineMetas.length}"
         fs.readFile file, encoding: 'utf8', (err, data) ->
             if err? then return error "Meta.saveFileLineMetas -- readFile err:#{err}"
             lines = data.split /\r?\n/

@@ -467,6 +467,7 @@ class Main
     onCloseWin: (event) ->
         wid = event.sender.id
         prefs.del "windows:#{wid}"
+        log "del window #{wid} from prefs"
         if visibleWins().length == 1
             hideDock()
         post.toWins 'winClosed', wid
@@ -492,19 +493,16 @@ class Main
     quit: ->
         toSave = wins().length
         if toSave
-            log "quit: save #{toSave} states"
             post.toWins 'saveState'
             post.on 'stateSaved', ->
                 toSave -= 1
                 if toSave == 0
-                    log 'quit: save prefs'
                     prefs.save()
                     app.exit     0
                     process.exit 0
             return
         else
             prefs.save()
-            log 'quit: prefs saved'
             app.exit     0
             process.exit 0
         

@@ -66,7 +66,7 @@ class Navigate
     
     navigateToFilePos: (filePos, opt) ->
         id = @main.activateWindowWithFile filePos.file
-        log 'navigateToFilePos', filePos, id, opt
+        # log 'navigateToFilePos', filePos, id, opt
         if id?
             post.toWin id, 'singleCursorAtPos', filePos.pos, extend:opt.extend
         else

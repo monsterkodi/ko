@@ -148,7 +148,6 @@ winMain = ->
     editor.on 'changed', (changeInfo) ->
         return if changeInfo.foreign
         if changeInfo.changes.length
-            log "post To others from #{winID}"
             post.toOtherWins 'fileLinesChanged', editor.currentFile, changeInfo.changes
             navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
 
@@ -218,9 +217,6 @@ saveChanges = ->
         stat = fs.statSync editor.currentFile
         atomicFile editor.currentFile, editor.text(), { encoding: 'utf8', mode: stat.mode }, (err) ->            
             return error "window.saveChanges failed #{err}" if err
-            log "wrote changes to file #{editor.currentFile}"
-    else
-        log "no need to saveChanges #{editor.currentFile} #{editor.do.hasLineChanges()} #{editor.dirty}"
 
 # 000   000  000   000  000       0000000    0000000   0000000    
 # 000   000  0000  000  000      000   000  000   000  000   000  
@@ -229,7 +225,6 @@ saveChanges = ->
 #  0000000   000   000  0000000   0000000   000   000  0000000    
 
 window.onunload = ->
-    log "onunload #{winID} #{editor.currentFile}"
     saveChanges()
     editor.setText ''
     post.toMain 'fileLoaded', '', winID # to clear prefs?
