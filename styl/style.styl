@@ -95,10 +95,11 @@ body
     top                 0
 
 .browserColumn
-    overflow            auto
+    overflow            hidden
+    position            relative
 
 .browserColumnTable
-    display             table    
+    display             table
     width               100%
 
 .browserRow
@@ -815,14 +816,16 @@ infoPadding = 6px
 .scrollbar
     position            absolute
     top                 0
-    bottom              0
         
     &.left
+        bottom          0
         left            0
         width           scrollbarWidth
     &.right
+        cursor          ns-resize
         right           0
-        width           scrollbarWidth
+        width           10%
+        height          100%
 
 .scrollhandle
     background          #88f

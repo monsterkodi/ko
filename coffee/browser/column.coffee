@@ -8,6 +8,7 @@
   path, post, elem, clamp, error, log, $, _ 
 }   = require 'kxk'
 Row = require './row'
+Scrollbar  = require './scrollbar'
 fuzzaldrin = require 'fuzzaldrin'
 fuzzy      = require 'fuzzy'
 
@@ -31,7 +32,7 @@ class Column
         @div.addEventListener 'mouseover', @onMouseOver
         @div.addEventListener 'mouseout',  @onMouseOut
         
-        @div.addEventListener 'scroll', @onScroll
+        @scroll = new Scrollbar @
         
     #  0000000  00000000  000000000  000  000000000  00000000  00     00   0000000  
     # 000       000          000     000     000     000       000   000  000       
@@ -47,10 +48,12 @@ class Column
             @rows.push new Row @, item
         if @browser.navigateTarget()
             @navigateTo @browser.navigateTarget()
+        @scroll.update()
         @
         
     isEmpty: -> _.isEmpty @rows
     clear:   -> 
+        @div.scrollTop = 0
         @table.innerHTML = ''
         @rows = []
         
@@ -94,8 +97,10 @@ class Column
             
     nextColumn: -> @browser.column(@index+1)
         
-    numRows: -> @rows.length ? 0         
-    numVisible: -> 20 # TODO
+    numRows:    -> @rows.length ? 0   
+    # rowHeight:  -> @rows[0]?.div.getBoundingClientRect().height ? 0
+    rowHeight:  -> @rows[0]?.div.clientHeight ? 0
+    numVisible: -> @browser.height() / @rowHeight()
     
     # 00000000   0000000    0000000  000   000   0000000  
     # 000       000   000  000       000   000  000       
@@ -117,16 +122,6 @@ class Column
     onMouseOver: (event) => @row(event.target)?.onMouseOver()
     onMouseOut:  (event) => @row(event.target)?.onMouseOut()
     
-    #  0000000   0000000  00000000    0000000   000      000      
-    # 000       000       000   000  000   000  000      000      
-    # 0000000   000       0000000    000   000  000      000      
-    #      000  000       000   000  000   000  000      000      
-    # 0000000    0000000  000   000   0000000   0000000  0000000  
-    
-    onScroll: (event) =>
-        if @fixScroll?
-            @div.scrollTop = @fixScroll
-
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       
     # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000   

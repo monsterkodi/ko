@@ -19,9 +19,8 @@ class Row
         @div.addEventListener 'dblclick', => @column.navigateCols 'enter'
         @column.table.appendChild @div
    
-    index: -> @column.rows.indexOf @
-    
-    onMouseOut: -> @div.classList.remove 'hover'
+    index:       -> @column.rows.indexOf @    
+    onMouseOut:  -> @div.classList.remove 'hover'
     onMouseOver: -> @div.classList.add 'hover'
 
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
@@ -41,23 +40,11 @@ class Row
     
     isActive: -> @div.classList.contains 'active'
     
-    fixScroll: ->
-        colHeight = @column.div.offsetHeight
-        activeTop = @div.offsetTop
-        rowHeight = @div.clientHeight
-        scrollTop = @column.div.scrollTop
-        if activeTop + rowHeight <= colHeight # no need to scroll
-            return 0
-        return clamp activeTop, activeTop - colHeight + rowHeight, scrollTop
-        
-    clearFixScroll: => delete @column.fixScroll
-        
     setActive: (opt = emit:false) ->
-        @column.div.scrollTop = @column.fixScroll = @fixScroll()
         @column.activeRow()?.clearActive()
         @div.classList.add 'active'
+        @column.scroll.toIndex @index()  
         post.emit 'browser-item-activated', @item if opt?.emit # sets commandline text
-        setTimeout @clearFixScroll, 100
         @
                 
     clearActive: ->

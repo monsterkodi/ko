@@ -15,7 +15,9 @@ flex     = require '../flex/flex'
 
 class Browser extends Stage
     
-    constructor: (@view) -> super @view
+    constructor: (@view) -> 
+        @columns = []
+        super @view
   
     # 000       0000000    0000000   0000000    00000000  000  000      00000000  
     # 000      000   000  000   000  000   000  000       000  000      000       
@@ -166,7 +168,6 @@ class Browser extends Stage
         if opt.focus? 
             @focus()
             @lastUsedColumn().activeRow().setActive()
-            @lastUsedColumn().onScroll()
 
     endNavigateToTarget: ->
         delete @navigateTargetFile
@@ -236,6 +237,7 @@ class Browser extends Stage
             else break
         used
 
+    height: -> @flex.height()
     numCols: -> @columns.length 
     column: (i) -> @columns[i] if i >= 0 and i < @numCols()
 
@@ -287,8 +289,16 @@ class Browser extends Stage
             @newColumn()
             
         panes = @columns.map (c) -> div:c.div, min:20
-        @flex = new flex panes: panes
+        @flex = new flex 
+            panes: panes
+            onPaneSize: @updateColumnScrolls
+
+    resized: (w,h) -> @updateColumnScrolls()
     
+    updateColumnScrolls: =>
+        for c in @columns
+            c.scroll.update()
+
     reset: -> @initColumns()
     stop:  -> @cols.remove(); @cols = null
     start: -> @initColumns()

@@ -41,9 +41,6 @@ class Flex
         
         @addPane p for p in opt.panes
                     
-        # @updatePanes()
-        # @calculate()
-
     #  0000000   0000000    0000000    
     # 000   000  000   000  000   000  
     # 000000000  000   000  000   000  
@@ -239,6 +236,7 @@ class Flex
     pane:        (i) -> _.isNumber(i) and @panes[i]   or _.isString(i) and _.find(@panes, (p) -> p.id == i) or i
     handle:      (i) -> _.isNumber(i) and @handles[i] or i
 
+    height: -> @view.getBoundingClientRect().height
     size: ->
         cs = window.getComputedStyle @view 
         @view[@clientDim] - parseFloat(cs[@paddingA]) - parseFloat(cs[@paddingB])
