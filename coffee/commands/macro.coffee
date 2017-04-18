@@ -14,6 +14,8 @@ Command    = require '../commandline/command'
 colors     = require 'colors'
 process    = require 'process'
 atomicFile = require 'write-file-atomic'
+Mocha      = require 'mocha'
+Report     = require '../test/report'
 
 class Macro extends Command
 
@@ -84,6 +86,24 @@ class Macro extends Command
             when 'fps' 
                 window.fps?.toggle()
                 
+            # 000000000  00000000   0000000  000000000  
+            #    000     000       000          000     
+            #    000     0000000   0000000      000     
+            #    000     000            000     000     
+            #    000     00000000  0000000      000     
+            
+            when 'test'
+                mocha = new Mocha reporter: Report.forRunner, timeout: 4000
+                if _.isEmpty args
+                    files = fileList path.join(__dirname, '..', 'test'), matchExt:['.js', '.coffee']
+                else
+                    files = (path.join(__dirname, '..', 'test', f + '.js') for f in args)
+                for file in files
+                    delete require.cache[file] # mocha listens only on initial compile
+                    mocha.addFile file
+                mocha.run()
+                window.split.do 'show terminal'
+                
             # 000   000  00000000  000      00000000   
             # 000   000  000       000      000   000  
             # 000000000  0000000   000      00000000   
@@ -119,7 +139,6 @@ class Macro extends Command
             # 000   000  00000000   00000 00
             
             when 'req'
-                log 'req', args
                 words = wordsInArgsOrCursorsOrSelection args
                 lastIndex = 0
                 texts = []

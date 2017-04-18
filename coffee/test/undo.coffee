@@ -10,8 +10,8 @@
 assert     = require 'assert'
 _          = require 'lodash'
 
-Editor = require '../coffee/editor/editor'
-Do     = require '../coffee/editor/do'
+Editor = require '../editor/editor'
+Do     = require '../editor/do'
 
 # 000   000  000  00000000  000   000  
 # 000   000  000  000       000 0 000  
@@ -75,79 +75,102 @@ describe 'undo', ->
     describe 'calculate', ->
         
         it 'changes', ->
-            oldState = Map lines: List ['a','b']
-            changes  = editor.do.calculateChanges oldState, Map lines: List ['a', 'c']
+            oldState = Map lines: List [Map(text:'a'), Map(text:'b')]
+            changes  = editor.do.calculateChanges oldState, Map lines: List [Map(text:'a'), Map(text:'c')]
             expect(changes.deletes).to.eql.false
             expect(changes.inserts).to.eql.false
-            expect(changes.changes).to.include oldIndex:1, doIndex:1, newIndex:1, change:'changed'
+            expect(changes.changes).to.include oldIndex:1, doIndex:1, newIndex:1, change:'changed', after: 'c'
             
-            changes  = editor.do.calculateChanges oldState, Map lines: List ['c', 'b']
+            changes  = editor.do.calculateChanges oldState, Map lines: List [Map(text:'c'), Map(text:'b')]
             expect(changes.deletes).to.eql.false
             expect(changes.inserts).to.eql.false
-            expect(changes.changes).to.include oldIndex:0, doIndex:0, newIndex:0, change:'changed'
+            expect(changes.changes).to.include oldIndex:0, doIndex:0, newIndex:0, change:'changed', after: 'c'
             
-            changes  = editor.do.calculateChanges oldState, Map lines: List ['c', 'd']
+            changes  = editor.do.calculateChanges oldState, Map lines: List [Map(text:'c'), Map(text:'d')]
             expect(changes.deletes).to.eql.false
             expect(changes.inserts).to.eql.false
-            expect(changes.changes).to.include oldIndex:0, doIndex:0, newIndex:0, change:'changed'
-            expect(changes.changes).to.include oldIndex:1, doIndex:1, newIndex:1, change:'changed'
+            expect(changes.changes).to.include oldIndex:0, doIndex:0, newIndex:0, change:'changed', after: 'c'
+            expect(changes.changes).to.include oldIndex:1, doIndex:1, newIndex:1, change:'changed', after: 'd'
 
-        it 'deletions', ->
-            oldState = Map lines: List ['a','b']
-            changes  = editor.do.calculateChanges oldState, Map lines: List ['a']
+        it 'deletion 1', ->
+            oldState = Map lines: List [Map(text:'a'), Map(text:'b')]
+            newState = oldState.deleteIn ['lines', 1]
+            changes  = editor.do.calculateChanges oldState, newState
             expect(changes.deletes).to.eql 1
             expect(changes.inserts).to.eql.false
             expect(changes.changes).to.include oldIndex:1, doIndex: 1, change:'deleted'
             
-            changes  = editor.do.calculateChanges oldState, Map lines: List ['b']
+        it 'deletion 2', ->
+            oldState = Map lines: List [Map(text:'a'), Map(text:'b')]
+            newState = oldState.deleteIn ['lines', 0]
+            changes  = editor.do.calculateChanges oldState, newState
             expect(changes.deletes).to.eql 1
             expect(changes.inserts).to.eql.false
             expect(changes.changes).to.include oldIndex:0, doIndex:0, change:'deleted'
     
-            changes  = editor.do.calculateChanges oldState, Map lines: List ['c']
+        it 'deletion 3', ->
+            oldState = Map lines: List [Map(text:'a'), Map(text:'b')]
+            changes  = editor.do.calculateChanges oldState, Map lines: List [Map(text:'c')]
             expect(changes.deletes).to.eql 1
             expect(changes.inserts).to.eql.false
-            expect(changes.changes).to.include oldIndex:0, doIndex:0, newIndex:0, change:'changed'
+            expect(changes.changes).to.include oldIndex:0, doIndex:0, newIndex:0, change:'changed', after: 'c'
             expect(changes.changes).to.include oldIndex:1, doIndex:1, change:'deleted'
 
-            oldState = Map lines: List ['a', 'b', 'c']
-            changes  = editor.do.calculateChanges oldState, Map lines: List ['a']
+        it 'deletion 4', ->
+            oldState = Map lines: List [Map(text:'a'), Map(text:'b'), Map(text:'c')]
+            newState = oldState.deleteIn ['lines', 1]
+            newState = newState.deleteIn ['lines', 1]
+            changes  = editor.do.calculateChanges oldState, newState
             expect(changes.deletes).to.eql 2
             expect(changes.inserts).to.eql.false
             expect(changes.changes).to.include oldIndex:1, doIndex:1, change:'deleted'
             expect(changes.changes).to.include oldIndex:2, doIndex:1, change:'deleted'
 
-            changes  = editor.do.calculateChanges oldState, Map lines: List ['b']
+        it 'deletion 5', ->
+            oldState = Map lines: List [Map(text:'a'), Map(text:'b'), Map(text:'c')]
+            newState = oldState.deleteIn ['lines', 0]
+            newState = newState.deleteIn ['lines', 1]
+            changes  = editor.do.calculateChanges oldState, newState
             expect(changes.deletes).to.eql 2
             expect(changes.inserts).to.eql.false
             expect(changes.changes).to.include oldIndex:0, doIndex:0, change:'deleted'
             expect(changes.changes).to.include oldIndex:2, doIndex:1, change:'deleted'
 
-        it 'insertions', ->
-            oldState = Map lines: List ['a']
-            changes  = editor.do.calculateChanges oldState, Map lines: List ['a', 'c']
+        it 'insertion 1', ->
+            oldState = Map lines: List [Map(text:'a')]
+            newState = oldState.setIn ['lines', 1], Map(text:'c')
+            changes  = editor.do.calculateChanges oldState, newState
             expect(changes.deletes).to.eql.false
             expect(changes.inserts).to.eql 1
-            expect(changes.changes).to.include doIndex:1, newIndex:1, change:'inserted'
-            
-            changes  = editor.do.calculateChanges oldState, Map lines: List ['c', 'a']
-            expect(changes.deletes).to.eql.false
-            expect(changes.inserts).to.eql 1
-            expect(changes.changes).to.include doIndex:0, newIndex:0, change:'inserted'
+            expect(changes.changes).to.include doIndex:1, newIndex:1, change:'inserted', after: 'c'
 
-            changes  = editor.do.calculateChanges oldState, Map lines: List ['c', 'a', 'd']
+        it 'insertion 2', ->
+            oldState = Map lines: List [Map(text:'a')]
+            lines = oldState.get 'lines'
+            lines = lines.unshift Map(text:'c')
+            lines = lines.push Map(text:'d')
+            newState = oldState.set 'lines', lines
+            changes  = editor.do.calculateChanges oldState, newState
             expect(changes.deletes).to.eql.false
             expect(changes.inserts).to.eql 2
-            expect(changes.changes).to.include doIndex:0, newIndex:0, change:'inserted'
-            expect(changes.changes).to.include doIndex:2, newIndex:2, change:'inserted'
+            expect(changes.changes).to.include doIndex:0, newIndex:0, change:'inserted', after: 'c'
+            expect(changes.changes).to.include doIndex:2, newIndex:2, change:'inserted', after: 'd'
 
-            changes  = editor.do.calculateChanges oldState, Map lines: List ['c', 'a', '1', '2', '3']
+        it 'insertion 3', ->
+            oldState = Map lines: List [Map(text:'a')]
+            lines = oldState.get 'lines'
+            lines = lines.unshift Map(text:'c')
+            lines = lines.push Map(text:'1')
+            lines = lines.push Map(text:'2')
+            lines = lines.push Map(text:'3')
+            newState = oldState.set 'lines', lines
+            changes  = editor.do.calculateChanges oldState, newState
             expect(changes.deletes).to.eql.false
             expect(changes.inserts).to.eql 4
-            expect(changes.changes).to.include doIndex:0, newIndex:0, change:'inserted'
-            expect(changes.changes).to.include doIndex:2, newIndex:2, change:'inserted'
-            expect(changes.changes).to.include doIndex:3, newIndex:3, change:'inserted'
-            expect(changes.changes).to.include doIndex:4, newIndex:4, change:'inserted'
+            expect(changes.changes).to.include doIndex:0, newIndex:0, change:'inserted', after: 'c'
+            expect(changes.changes).to.include doIndex:2, newIndex:2, change:'inserted', after: '1'
+            expect(changes.changes).to.include doIndex:3, newIndex:3, change:'inserted', after: '2'
+            expect(changes.changes).to.include doIndex:4, newIndex:4, change:'inserted', after: '3'
 
 compareFakeView = ->
     expect(fakeview.text()) .to.eql editor.text()

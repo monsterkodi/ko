@@ -18,7 +18,7 @@ module.exports =
             name:  'insert newline at line end'
             combo: 'command+enter'
 
-    newlineAtEnd: (key, info) ->
+    newlineAtEnd: () ->
         @moveCursorsToLineBoundary 'right'  
         @newline indent: true
 

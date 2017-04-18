@@ -11,7 +11,7 @@ assert          = require 'assert'
 _               = require 'lodash'
 should()
 
-Editor = require '../coffee/editor/editor'
+Editor = require '../editor/editor'
 editor = new Editor
 
 textIs = (t) -> expect(editor.text()).to.eql t

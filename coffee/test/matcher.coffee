@@ -9,7 +9,7 @@
 assert     = require 'assert'
 noon       = require 'noon'
 {Map,List} = require 'immutable'
-matchr     = require '../coffee/tools/matchr'
+matchr     = require '../tools/matchr'
 
 describe 'ranges', ->
     rgx = /([\~\/\w\.]+\/[\w\.]+\w[:\d]*)/

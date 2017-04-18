@@ -10,7 +10,7 @@ assert         = require 'assert'
 noon           = require 'noon'
 {Map,List}     = require 'immutable'
 
-dirList = require '../coffee/tools/dirlist'
+dirList = require '../tools/dirlist'
 
 describe 'dirList', ->
     

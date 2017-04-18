@@ -178,7 +178,7 @@ class Flex
     # 0000000      000     000   000     000     00000000  
     
     restoreState: (state) ->
-        log 'flex restoreState', state
+        # log 'flex restoreState', state
         return if not state?.length
         for si in [0...state.length]
             s = state[si]

@@ -77,16 +77,4 @@ class Coffee extends Command
     
     executeText: (text) -> @execute text
     
-    #  0000000  000      00000000   0000000   00000000 
-    # 000       000      000       000   000  000   000
-    # 000       000      0000000   000000000  0000000  
-    # 000       000      000       000   000  000   000
-    #  0000000  0000000  00000000  000   000  000   000
-    
-    clear: ->
-        if window.terminal.numLines() > 1
-            window.terminal.clear()
-        else
-            text: ''
-            
 module.exports = Coffee

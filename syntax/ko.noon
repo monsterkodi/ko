@@ -12,6 +12,8 @@
 (● )(\w+)                 . class.marker . class
 (◆ )(\w+)                 . static.class.marker . static.class
 (▸ )([\w\.]+)             . method.marker . method
+(✔ )([\&\w\s]+)           . static.class.marker . static.class
+(✘ )([\&\w\s]+)           . method.marker . method
 
 (?:^|\s\s+)([◼●]?\s*\~?[\/\S]*\/)(\S+)
                             dirname

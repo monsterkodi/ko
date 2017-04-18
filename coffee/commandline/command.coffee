@@ -103,8 +103,11 @@ class Command
         show: 'editor'
         
     clear: ->
-        text: ''
-        focus: @focus
+        if window.terminal.numLines() > 0
+            window.terminal.clear()
+            {}
+        else
+            text: ''
     
     # 000      000   0000000  000000000
     # 000      000  000          000   

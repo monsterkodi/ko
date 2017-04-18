@@ -428,6 +428,7 @@ class Main
                     post.toWin win.id, 'loadFile', file
                 else
                     win.show()
+            post.toWins 'winLoaded', win.id
                             
         win.webContents.on 'did-finish-load', winLoaded
         win 
@@ -464,9 +465,12 @@ class Main
                             height: b.height
     
     onCloseWin: (event) ->
-        prefs.del "windows:#{event.sender.id}"
+        wid = event.sender.id
+        prefs.del "windows:#{wid}"
+        log "del window #{wid} from prefs"
         if visibleWins().length == 1
             hideDock()
+        post.toWins 'winClosed', wid
         
     otherInstanceStarted: (args, dir) =>
         if not visibleWins().length
@@ -489,19 +493,16 @@ class Main
     quit: ->
         toSave = wins().length
         if toSave
-            log "quit: save #{toSave} states"
             post.toWins 'saveState'
             post.on 'stateSaved', ->
                 toSave -= 1
                 if toSave == 0
-                    log 'quit: save prefs'
                     prefs.save()
                     app.exit     0
                     process.exit 0
             return
         else
             prefs.save()
-            log 'quit: prefs saved'
             app.exit     0
             process.exit 0
         

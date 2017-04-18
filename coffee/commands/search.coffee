@@ -4,7 +4,7 @@
 #      000  000       000   000  000   000  000       000   000
 # 0000000   00000000  000   000  000   000   0000000  000   000
 
-{ packagePath, unresolve, path, fs, log, _
+{ packagePath, unresolve, path, post, fs, log, _
 }        = require 'kxk'
 walker   = require '../tools/walker'
 matchr   = require '../tools/matchr'
@@ -20,19 +20,7 @@ class Search extends Command
         super @commandline
      
     historyKey: -> @name
-            
-    #  0000000  000      00000000   0000000   00000000 
-    # 000       000      000       000   000  000   000
-    # 000       000      0000000   000000000  0000000  
-    # 000       000      000       000   000  000   000
-    #  0000000  0000000  00000000  000   000  000   000
-    
-    clear: ->
-        if window.terminal.numLines() > 1
-            window.terminal.clear()
-        else
-            text: ''
-    
+                
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
     # 0000000     00000    0000000   000       000   000     000     0000000 
@@ -92,12 +80,6 @@ class FileSearcher extends stream.Writable
     
     constructor: (@opt, @file) ->
         @line = 0
-        # [txt, ropt] = switch @opt.name
-            # when 'search'   then [_.escapeRegExp(@opt.text), 'i']
-            # when 'Search'   then [_.escapeRegExp(@opt.text), '']
-            # when '/search/' then [@opt.text, 'i']
-            # when '/Search/' then [@opt.text, '']
-        # @patterns = [[new RegExp(txt, ropt), 'found']]
         @flags = ''
         @patterns = switch @opt.name
             when 'search'   then [[new RegExp(_.escapeRegExp(@opt.text), 'i'), 'found']]
@@ -143,6 +125,7 @@ class FileSearcher extends stream.Writable
                 if fi and @found[fi-1][0] != f[0]-1
                     terminal.appendMeta clss: 'spacer'
                 terminal.appendMeta meta
+                post.emit 'search-result', meta
                 
             terminal.appendMeta clss: 'spacer'
             terminal.scrollCursorToTop()

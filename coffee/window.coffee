@@ -42,8 +42,8 @@ window.onerror = (event, source, line, col, err) ->
         s = "▲ #{l.source}:#{l.line} ▲ [ERROR] #{err}"
     else
         s = "▲ [ERROR] #{err}"
-    post.toWin 'error', s
-    post.toWin 'slog', s
+    post.emit 'error', s
+    post.emit 'slog', s
     console.log s
     
 # 00000000   00000000   00000000  00000000   0000000
@@ -102,8 +102,11 @@ post.on 'saveState',   -> saveState()
 post.on 'loadFile', (file) -> loadFile file
 post.on 'fileLinesChanged', (file, lineChanges) ->
     if file == editor.currentFile
-        log 'window.on fileLinesChanged', file, lineChanges
         editor.applyForeignLineChanges lineChanges
+        
+post.on 'postEditorState', -> 
+    log 'postState'
+    post.toAll 'editorState', winID, lines:editor.lines(), cursors:editor.cursors(), main:editor.mainCursor(), selections:editor.selections(), highlights:editor.highlights()
 
 # 000   000  000  000   000  00     00   0000000   000  000   000  
 # 000 0 000  000  0000  000  000   000  000   000  000  0000  000  
@@ -140,7 +143,7 @@ winMain = ->
         logview.resized()
     
     terminal.on 'fileLineChange', (file, lineChange) -> # sends changes to all windows
-        post.toAllWins 'fileLinesChanged', file, [lineChange]
+        post.toWins 'fileLinesChanged', file, [lineChange]
     
     editor.on 'changed', (changeInfo) ->
         return if changeInfo.foreign
@@ -162,6 +165,10 @@ winMain = ->
     commandline.restoreState()
     split.restoreState()
 
+window.onload = -> 
+    split.resized()
+    info.reload()
+    
 # 00000000  0000000    000  000000000   0000000   00000000 
 # 000       000   000  000     000     000   000  000   000
 # 0000000   000   000  000     000     000   000  0000000  
@@ -205,9 +212,23 @@ saveFile = (file) ->
             setState 'file', file
 
 saveChanges = ->
+    
     if editor.currentFile? and editor.do.hasLineChanges() and fileExists editor.currentFile
-        atomicFile editor.currentFile, _.clone(editor.text()), encoding: 'utf8', (err) ->
-            if err? then log "saving changes to #{file} failed", err
+        stat = fs.statSync editor.currentFile
+        atomicFile editor.currentFile, editor.text(), { encoding: 'utf8', mode: stat.mode }, (err) ->            
+            return error "window.saveChanges failed #{err}" if err
+
+# 000   000  000   000  000       0000000    0000000   0000000    
+# 000   000  0000  000  000      000   000  000   000  000   000  
+# 000   000  000 0 000  000      000   000  000000000  000   000  
+# 000   000  000  0000  000      000   000  000   000  000   000  
+#  0000000   000   000  0000000   0000000   000   000  0000000    
+
+window.onunload = ->
+    saveChanges()
+    editor.setText ''
+    post.toMain 'fileLoaded', '', winID # to clear prefs?
+    editor.setCurrentFile null # to stop watcher
 
 # 000       0000000    0000000   0000000  
 # 000      000   000  000   000  000   000
@@ -244,7 +265,7 @@ loadFile = (file, opt={}) ->
         
         editor.setCurrentFile null, opt  # to stop watcher and reset scroll
         editor.setCurrentFile file, opt
-        post.toMain 'fileLoaded', file, winID
+        post.toOthers 'fileLoaded', file, winID
         setState 'file', file
         commandline.fileLoaded file
     
@@ -341,14 +362,6 @@ window.onresize = ->
     if getState 'centerText', false
         screenWidth = screenSize().width
         editor.centerText sw() == screenWidth, 0
-
-window.onload = -> 
-    split.resized()
-    info.reload()
-    
-window.onunload = -> 
-    saveChanges()
-    editor.setCurrentFile null # to stop watcher
 
 # 0000000   0000000  00000000   00000000  00000000  000   000   0000000  000   000   0000000   000000000
 #000       000       000   000  000       000       0000  000  000       000   000  000   000     000   
@@ -448,12 +461,8 @@ document.onkeydown = (event) ->
             return stopEvent event
     
     switch combo
-        when 'command+alt+i'     then return post.toMain 'toggleDevTools', winID
-        when 'ctrl+w' # close current file  
-            editor.setCurrentFile null
-            editor.setText ''
-            post.toMain 'fileLoaded', '', winID
-            return
+        when 'command+alt+i'      then return post.toMain 'toggleDevTools', winID
+        when 'ctrl+w'             then return win.close()
         when 'f3'                 then return screenShot()
         when 'command+\\'         then return toggleCenterText()
         when 'command+k'          then return commandline.clear()
