@@ -53,7 +53,7 @@ class Open extends Command
         if command in ['.', '/', '~'] or command.endsWith '/'
             return @navigateDir command
 
-        [file, pos] = splitFilePos command #@getText().trim()
+        [file, pos] = splitFilePos command ? @getText().trim()
         items = @listItems flat: true, navigating: @navigating, currentText: file    
         if command.length
             fuzzied = fuzzy.filter path.basename(file), items, extract: (o) -> o.text            
@@ -383,6 +383,7 @@ class Open extends Command
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
         
     execute: (command) ->
+        
         listValue = @commandList?.line(@selected) if @selected >= 0
 
         if command in ['.', '..', '/', '~']
@@ -405,9 +406,8 @@ class Open extends Command
 
         @hideList()
 
-
         if listValue
-            [file, pos] = splitFilePos command
+            [file, pos] = splitFilePos listValue
             file = @resolvedPath listValue
             file = joinFilePos file, pos
             files = [file]

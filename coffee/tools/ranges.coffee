@@ -31,6 +31,11 @@ class Ranges
             l = l.trimRight()
             s += 1 while l[s] == ' '
         s
+        
+    lastWordInLine: (l) -> 
+        l = l.trim()
+        i = l.lastIndexOf ' '
+        l.slice i+1
     
     rangeForPos:   (p)   -> [p[1], [p[0], p[0]]]
     rangeBetween: (a,b) -> 
