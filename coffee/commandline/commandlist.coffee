@@ -39,8 +39,8 @@ class CommandList extends TextEditor
         index = 0
         for item in items
             continue if not item? 
-            text = (item.text ? item)?.trim()
-            continue if not text.length
+            text = (item.text ? item).trim?()
+            continue if not text?.length
             rngs = item.rngs ? []
             if item.clss?
                 rngs.push 

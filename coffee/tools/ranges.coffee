@@ -65,7 +65,7 @@ class Ranges
     positionsForLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] == li)
     positionsBelowLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] > li)
     positionsInLineAfterColInPositions: (li,col,pl) -> (p for p in pl when p[1] == li and p[0]>col)
-    positionsNotInRanges: (pss, rgs) -> _.filter pss, (p) => not isPosInRanges p, rgs
+    positionsNotInRanges: (pss, rgs) -> _.filter pss, (p) -> not isPosInRanges p, rgs
     positionsBetweenPosAndPosInPositions: (p1,p2,pl) -> 
         [a,b] = sortPositions [p1, p2]
         (r for r in pl when ( (r[1] > a[1] or (r[1] == a[1]) and (r[0] >= a[0])) and (r[1] < b[1] or (r[1] == b[1]) and (r[0] <= b[0])))) 
@@ -87,7 +87,8 @@ class Ranges
     
     lineIndicesInPositions: (pl) ->
         li = new Set
-        li = li.add p[1] for p in pl
+        for p in pl
+            li = li.add p[1] 
         li.toArray().sort()
 
     # 00000000    0000000   000   000   0000000   00000000   0000000  

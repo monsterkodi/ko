@@ -8,9 +8,9 @@
 }       = require 'kxk'
 walkdir = require 'walkdir'
 textext = _.reduce require('textextensions'), (map, ext) ->
-        map[".#{ext}"] = ext
-        map
-    , {}
+    map[".#{ext}"] = ext
+    map
+, {}
 textext['.crypt']   = 'crypt'
 textext['.noon']    = 'noon'
 textext['.pug']     = 'pug'

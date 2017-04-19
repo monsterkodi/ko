@@ -105,8 +105,12 @@ post.on 'fileLinesChanged', (file, lineChanges) ->
         editor.applyForeignLineChanges lineChanges
         
 post.on 'postEditorState', -> 
-    log 'postState'
-    post.toAll 'editorState', winID, lines:editor.lines(), cursors:editor.cursors(), main:editor.mainCursor(), selections:editor.selections(), highlights:editor.highlights()
+    post.toAll 'editorState', winID, 
+        lines:      editor.lines() 
+        cursors:    editor.cursors() 
+        main:       editor.mainCursor()
+        selections: editor.selections()
+        highlights: editor.highlights()
 
 # 000   000  000  000   000  00     00   0000000   000  000   000  
 # 000 0 000  000  0000  000  000   000  000   000  000  0000  000  

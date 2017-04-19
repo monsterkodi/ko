@@ -25,87 +25,89 @@ class Browser extends Stage
     # 000      000   000  000   000  000   000  000   000  000   000  000   000  
     # 0000000   0000000   000   000  0000000     0000000   0000000     0000000   
     
-    loadObject: (obj, opt = focus:true, column:0) =>
+    valueType: (value) ->
+        if _.isNil      value then return 'nil'
+        if _.isInteger  value then return 'int'
+        if _.isBoolean  value then return 'bool'
+        if _.isNumber   value then return 'float'
+        if _.isString   value then return 'string'
+        if _.isRegExp   value then return 'regexp'
+        if _.isArray    value then return 'array'
+        if _.isElement  value then return 'elem'
+        if _.isFunction value then return 'func'
+        if _.isObject   value then return 'obj'
+        error "unknown value type: #{value}"
+        'value'
+
+    loadObject: (obj, opt) =>
         
+        opt ?= {}
+        opt.column ?= 0
+        opt.focus  ?= opt.column == 0
+
         @initColumns() if _.isEmpty @columns
         
         if @columns[0].parent?.type != 'obj'
-            @clearColumnsFrom 1
+            @clearColumnsFrom 2
             rootObj = {}
             @columns[0].setItems [], parent: type: 'obj', obj:rootObj, name: 'root'
         else 
             rootObj = @columns[0].parent.obj
     
         objName = opt.name ? obj.constructor?.name
-        objText = opt.text ? objName
         
-        log 'objName', objName
-        log 'objText', objText
-
-        itemForKeyValue = (key, value) ->
-            item =             
-                if _.isArray value
-                    type: 'array'
-                    obj:  value
-                else if _.isRegExp value
-                    type: 'regexp'
-                    obj: value.source
-                else if _.isFunction value
-                    type: 'func'
-                    obj:  value.toString().split '\n'
-                else if _.isString value 
-                    type: 'string'
-                    obj: value
-                else if _.isNumber value 
-                    type: 'number'
-                    obj: str value
-                else if _.isPlainObject value
-                    type: 'obj'
-                    obj:  value
-                else
-                    type: 'value'
-                    obj:  str value
-            item.name = key
-            item
+        itemForKeyValue = (key, value) =>
+            type: @valueType value 
+            obj:  value
+            name: key
 
         if opt.column == 0
-            newItem = 
-                type: 'obj'
-                name: objName
-                text: objText
-                obj:  obj
+            newItem = itemForKeyValue objName, obj
             if row = @columns[0].rowWithName objName
                 @columns[0].items[row.index()] = newItem
+                opt.activate = row.index()
             else
                 @columns[0].items.push newItem
+                opt.activate = @columns[0].items.length-1
             items = @columns[0].items
             opt.parent = @columns[0].parent
         else
             items = []
-            if _.isPlainObject obj
-                for key,value of obj
-                    items.push itemForKeyValue key, value
-            else
-                for own index,value of obj
-                    if _.isObject value
-                        key = index
-                    else
-                        key = value
-                    items.push itemForKeyValue index, value
+            for own key,value of obj
+                items.push itemForKeyValue key, value
+
+        @loadItems items, opt
+        true
+  
+    loadArray: (arry, opt) ->
+        items = []
+        for own index,value of arry
+            item = 
+                type: @valueType value
+                obj:  value
+            index = "#{index} ▫ "
+            switch item.type
+                when 'regexp' then item.name = index+value.source
+                when 'string' then item.name = index+value
+                when 'number', 'float', 'value', 'bool', 'nil' then item.name = index+str value
+                else  item.name = index+'▶'
+            items.push item
                     
         @loadItems items, opt
-  
+        
     loadObjectItem: (item, opt) ->
         opt.parent = item
+        log 'loadObjectItem', item.name, item.type, opt.column, item.obj?
         switch item.type
-            when 'obj', 'array' 
-                @loadObject item.obj, opt
+            when 'obj'   then @loadObject item.obj, opt
+            when 'func'  then @loadArray  item.obj.toString().split('\n'), opt
+            when 'elem'  then @loadArray  item.obj.outerHTML.split('\n'), opt
+            when 'array' then @loadArray  item.obj, opt
             else
                 item = 
                     type: item.type
                     name: str item.obj
                 @loadItems [item], opt
-        
     
     # 000       0000000    0000000   0000000    00000000  000  000      00000000  
     # 000      000   000  000   000  000   000  000       000  000      000       
@@ -137,7 +139,6 @@ class Browser extends Stage
     # 0000000   0000000   000   000  0000000    0000000    000  000   000  
     
     loadDir: (dir, opt) -> 
-        # log "loadDir #{dir}", opt
         dirlist dir, opt, (err, items) => 
             if err? then return error "can't load dir #{dir}: #{err}"
             opt ?= {}
@@ -147,13 +148,62 @@ class Browser extends Stage
                 name: path.basename dir
             if not opt?.column or @columns[0]?.activeRow()?.item.name == '..'
                 updir = resolve path.join dir, '..'
-                # log 'updir', updir, dir, @columns[0].parent?.abs
                 if not (updir == dir == '/') and (not @columns[0].parent? or @columns[0].parent.abs.startsWith dir) 
                     items.unshift 
                         name: '..'
                         type: 'dir'
                         abs:  updir
             @loadItems items, opt
+
+    # 000       0000000    0000000   0000000    000  000000000  00000000  00     00   0000000  
+    # 000      000   000  000   000  000   000  000     000     000       000   000  000       
+    # 000      000   000  000000000  000   000  000     000     0000000   000000000  0000000   
+    # 000      000   000  000   000  000   000  000     000     000       000 0 000       000  
+    # 0000000   0000000   000   000  0000000    000     000     00000000  000   000  0000000   
+    
+    loadItems: (items, opt) ->
+        col = @emptyColumn opt?.column
+        @clearColumnsFrom col.index
+
+        if opt?.file
+            @navigateTargetFile = opt.file
+        
+        col.setItems items, opt
+
+        if opt.activate?
+            col.rows[opt.activate]?.activate()
+                
+        if opt.row?
+            col.focus()
+            
+        if opt.focus
+            @focus()
+            @lastUsedColumn().activeRow().setActive()            
+        @
+
+    endNavigateToTarget: ->
+        delete @navigateTargetFile
+        @focus()
+      
+    # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
+    # 0000  000  000   000  000   000  000  000        000   000     000     000       
+    # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000   
+    # 000  0000  000   000     000     000  000   000  000   000     000     000       
+    # 000   000  000   000      0      000   0000000   000   000     000     00000000  
+    
+    navigateTarget: -> @navigateTargetFile
+    
+    navigateTo: (opt) -> @columns[0].navigateTo opt
+
+    navigate: (key) ->
+        index = @focusColumn()?.index ? 0
+        index += switch key
+            when 'left'  then -1
+            when 'right' then +1
+        index = clamp 0, @numCols()-1, index
+        if @columns[index].numRows()
+            @columns[index].focus().activeRow().activate()
+        @
 
     # 000       0000000    0000000   0000000     0000000   0000000   000   000  000000000  00000000  000   000  000000000  
     # 000      000   000  000   000  000   000  000       000   000  0000  000     000     000       0000  000     000     
@@ -229,57 +279,12 @@ class Browser extends Stage
     loadImage: (row, file) ->
         return if not row.isActive()
         item = row.item
-        # log "loadImage #{file}"        
 
         col = @emptyColumn opt?.column
         @clearColumnsFrom col.index
         cnt = elem class: 'browserImageContainer', child: 
             elem 'img', class: 'browserImage', src: "file://#{encodePath file}"
         col.table.appendChild cnt
-
-    # 000       0000000    0000000   0000000    000  000000000  00000000  00     00   0000000  
-    # 000      000   000  000   000  000   000  000     000     000       000   000  000       
-    # 000      000   000  000000000  000   000  000     000     0000000   000000000  0000000   
-    # 000      000   000  000   000  000   000  000     000     000       000 0 000       000  
-    # 0000000   0000000   000   000  0000000    000     000     00000000  000   000  0000000   
-    
-    loadItems: (items, opt) ->
-        col = @emptyColumn opt?.column
-        @clearColumnsFrom col.index
-
-        if opt?.file
-            @navigateTargetFile = opt.file
-        
-        col.setItems items, opt
-                
-        if opt.row? then col.focus()
-        if opt.focus? 
-            @focus()
-            @lastUsedColumn().activeRow().setActive()
-
-    endNavigateToTarget: ->
-        delete @navigateTargetFile
-        @focus()
-      
-    # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
-    # 0000  000  000   000  000   000  000  000        000   000     000     000       
-    # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000   
-    # 000  0000  000   000     000     000  000   000  000   000     000     000       
-    # 000   000  000   000      0      000   0000000   000   000     000     00000000  
-    
-    navigateTarget: -> @navigateTargetFile
-    
-    navigateTo: (opt) -> @columns[0].navigateTo opt
-
-    navigate: (key) ->
-        index = @focusColumn()?.index ? 0
-        index += switch key
-            when 'left'  then -1
-            when 'right' then +1
-        index = clamp 0, @numCols()-1, index
-        if @columns[index].numRows()
-            @columns[index].focus().activeRow().activate()
-        @
           
     # 00000000   0000000    0000000  000   000   0000000  
     # 000       000   000  000       000   000  000       
@@ -317,6 +322,11 @@ class Browser extends Stage
     # 000   000  000          000       
     #  0000000   00000000     000       
     
+    activeColumnID: ->
+        for col in @columns
+            if col.hasFocus() then return col.div.id
+        'column0'
+
     lastUsedColumn: ->
         used = null
         for col in @columns

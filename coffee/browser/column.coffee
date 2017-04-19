@@ -99,7 +99,7 @@ class Column
         
     numRows:    -> @rows.length ? 0   
     rowHeight:  -> @rows[0]?.div.clientHeight ? 0
-    numVisible: -> @browser.height() / @rowHeight()
+    numVisible: -> @rowHeight() and parseInt(@browser.height() / @rowHeight()) or 0
     
     # 00000000   0000000    0000000  000   000   0000000  
     # 000       000   000  000       000   000  000       
@@ -195,7 +195,17 @@ class Column
         @search = ''
         @searchDiv?.remove()
         delete @searchDiv
+      
+    sortByName: -> 
+        @rows.sort (a,b) -> a.item.name.localeCompare b.item.name
+        for row in @rows
+            @table.appendChild row.div
         
+    sortByType: ->
+        @rows.sort (a,b) -> (a.item.type + a.item.name).localeCompare b.item.type + b.item.name
+        for row in @rows
+            @table.appendChild row.div
+  
     # 000   000  00000000  000   000  
     # 000  000   000        000 000   
     # 0000000    0000000     00000    
@@ -217,6 +227,8 @@ class Column
             when 'command+,', 'command+/'
                 @navigateRoot key
             when 'backspace' then @clearSearch()
+            when 'ctrl+t' then @sortByType()
+            when 'ctrl+n' then @sortByName()
             when 'esc'
                 if @search.length then @clearSearch()
                 else window.split.focus 'commandline-editor'

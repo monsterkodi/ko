@@ -101,10 +101,13 @@ class Coffee extends Command
         if @name == 'Coffee'
             post.toMain 'executeCoffee', winID: window.winID, cmdID: @cmdID, command: command
         else
+            if command.startsWith 'browse'
+                window.split.raise 'area' # need to do this before command execution to allow setting focus
             @executeCoffee command: command, cmdID: @cmdID
         @hideList()
         if command.startsWith 'browse'
-            do: 'show area'
+            do:    'show area'
+            focus: @commandline.commands.browse.browser.activeColumnID()
         else
             do: 'show terminal'
     

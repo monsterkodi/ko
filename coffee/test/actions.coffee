@@ -50,8 +50,7 @@ describe 'actions', ->
             'selectAllHighlights', 'selectNextHighlight', 'selectPrevHighlight'
             'highlightWordAndAddToSelection', 'removeSelectedHighlight', 'highlightTextOfSelectionOrWordAtCursor'
             'insertSalterCharacter', 'startSalter',
-            'insertSurroundCharacter'
-            ]
+            'insertSurroundCharacter']
             it "#{name}", -> _.isFunction(editor[name]).should.be.true
             
     describe 'basic editing', ->

@@ -73,7 +73,7 @@ class Browse extends Command
             if item.type == 'dir' then pth += '/'
             @commandline.setText pth
 
-    onBrowserMatch: (match) =>
+    onBrowserMatch: (match) ->
         log match
             
     onAreaResized: (w, h) => @browser.resized? w,h

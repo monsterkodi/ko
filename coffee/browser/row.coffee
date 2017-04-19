@@ -13,7 +13,7 @@ class Row
     
     constructor: (@column, @item) ->
 
-        @div = elem class: 'browserRow', html: syntax.spanForText @item.text ? @item.name
+        @div = elem class: 'browserRow', html: syntax.spanForTextAndSyntax @item.text ? @item.name, 'browser'
         @div.classList.add @item.type
         @div.addEventListener 'click', @activate
         @div.addEventListener 'dblclick', => @column.navigateCols 'enter'
@@ -40,6 +40,8 @@ class Row
                     post.emit 'jumpTo', file: @item.file, line: @item.line
                 else if @item.obj?
                     @column.browser.loadObjectItem  @item, column: @column.index+1
+                else
+                    @column.browser.clearColumnsFrom @column.index+1
         @
     
     isActive: -> @div.classList.contains 'active'
