@@ -18,6 +18,7 @@ class Coffee extends Command
         @shortcuts  = ['alt+c', 'alt+shift+c']
         @names      = ["coffee", "Coffee"]
         super @commandline
+        @maxHistory = 99
         @syntaxName = 'coffee'
         post.on 'executeResult', @onResult
     
@@ -35,6 +36,7 @@ class Coffee extends Command
                 diss: Syntax.dissForTextAndSyntax str(result.error), 'coffee'
                 clss: 'coffeeResult'
         else
+            log cmdID, result
             @setCurrent @commands[cmdID] if @commands[cmdID]?
             terminal.appendMeta 
                 line: "#{cmdID} ▶"
@@ -97,7 +99,6 @@ class Coffee extends Command
 
         @commands[@cmdID] = command
         terminal = window.terminal
-        terminal.appendMeta clss: 'spacer'
         for l in command.split '\n'
             continue if not l.trim().length
             terminal.appendMeta 

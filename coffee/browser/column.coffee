@@ -195,7 +195,16 @@ class Column
         @search = ''
         @searchDiv?.remove()
         delete @searchDiv
-      
+        @
+    
+    removeObject: ->
+        if @index == 0 and row = @activeRow()
+            delete @parent.obj[row.item.name]
+            nextOrPrev = row.next() ? row.prev()
+            row.div.remove()
+            @rows.splice row.index(), 1
+            nextOrPrev?.activate()
+  
     sortByName: -> 
         @rows.sort (a,b) -> a.item.name.localeCompare b.item.name
         for row in @rows
@@ -226,7 +235,7 @@ class Column
                 @navigateRoot key
             when 'command+,', 'command+/'
                 @navigateRoot key
-            when 'backspace' then @clearSearch()
+            when 'backspace' then @clearSearch().removeObject()
             when 'ctrl+t' then @sortByType()
             when 'ctrl+n' then @sortByName()
             when 'esc'

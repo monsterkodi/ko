@@ -616,8 +616,26 @@ class TextEditor extends Editor
                         
         word = @wordAtPos p
         range = @rangeForWordAtPos p
-        type = 'func'
-        post.emit 'jumpTo', word, type:type
+        opt = {}
+        line = @line range[0] 
+
+        if range[1][0] > 0 
+            if line[range[1][0]-1] == '.'
+                opt.type = 'func'
+                
+        if not opt.type and range[1][1] < line.length
+            rest = line.slice range[1][1]
+            index = rest.search /\S/ 
+            if index >= 0
+                nextChar = rest[index]
+                log "next: #{nextChar}"
+                type = switch nextChar 
+                    when '.'      then 'class' 
+                    when '('      then 'func'
+                    when ':', '=' then 'word'
+                opt.type = type if type?
+                
+        post.emit 'jumpTo', word, opt
 
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

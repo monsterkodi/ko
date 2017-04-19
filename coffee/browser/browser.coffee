@@ -20,16 +20,10 @@ class Browser extends Stage
         @columns = []
         super @view
 
-    # 000       0000000    0000000   0000000     0000000   0000000          000  
-    # 000      000   000  000   000  000   000  000   000  000   000        000  
-    # 000      000   000  000000000  000   000  000   000  0000000          000  
-    # 000      000   000  000   000  000   000  000   000  000   000  000   000  
-    # 0000000   0000000   000   000  0000000     0000000   0000000     0000000   
-    
     valueType: (value) ->
         if _.isNil      value then return 'nil'
-        if _.isInteger  value then return 'int'
         if _.isBoolean  value then return 'bool'
+        if _.isInteger  value then return 'int'
         if _.isNumber   value then return 'float'
         if _.isString   value then return 'string'
         if _.isRegExp   value then return 'regexp'
@@ -45,8 +39,15 @@ class Browser extends Stage
         s.split('\n')
     
     sortByType: (items) ->
-        items.sort (a,b) -> (a.type + a.name).localeCompare b.type + b.name      
+        type = (i) -> {obj:'a', array:'b', elem:'c', regexp:'d', string:'e', int:'f', float:'g', bool:'h', nil:'i', func:'z'}[i.type]
+        items.sort (a,b) -> (type(a) + a.name).localeCompare type(b) + b.name      
 
+    #  0000000   0000000          000  00000000   0000000  000000000  
+    # 000   000  000   000        000  000       000          000     
+    # 000   000  0000000          000  0000000   000          000     
+    # 000   000  000   000  000   000  000       000          000     
+    #  0000000   0000000     0000000   00000000   0000000     000     
+    
     loadObject: (obj, opt) =>
         
         opt ?= {}
@@ -81,13 +82,19 @@ class Browser extends Stage
             opt.parent = @columns[0].parent
         else
             items = []
-            for own key,value of obj
+            for key,value of obj # own?
                 items.push itemForKeyValue key, value
 
         @sortByType(items) if @valueType(obj) not in ['func', 'array']
         @loadItems items, opt
         true
   
+    #  0000000   00000000   00000000    0000000   000   000  
+    # 000   000  000   000  000   000  000   000   000 000   
+    # 000000000  0000000    0000000    000000000    00000    
+    # 000   000  000   000  000   000  000   000     000     
+    # 000   000  000   000  000   000  000   000     000     
+    
     loadArray: (arry, opt) ->
         items   = []
         padSize = 1+Math.floor Math.log10 arry.length
@@ -105,6 +112,12 @@ class Browser extends Stage
                     
         @loadItems items, opt
         
+    # 000  000000000  00000000  00     00  
+    # 000     000     000       000   000  
+    # 000     000     0000000   000000000  
+    # 000     000     000       000 0 000  
+    # 000     000     00000000  000   000  
+    
     loadObjectItem: (item, opt) ->
         opt.parent = item
         switch item.type
@@ -113,16 +126,17 @@ class Browser extends Stage
             when 'elem'  then @loadArray  @htmlLines(item.obj), opt
             when 'array' then @loadArray  item.obj, opt
             else
-                item = 
+                oi = 
                     type: item.type
                     name: str item.obj
-                @loadItems [item], opt
+                log 'loadObjectItem', item.obj?, oi
+                @loadItems [oi], opt
     
-    # 000       0000000    0000000   0000000    00000000  000  000      00000000  
-    # 000      000   000  000   000  000   000  000       000  000      000       
-    # 000      000   000  000000000  000   000  000000    000  000      0000000   
-    # 000      000   000  000   000  000   000  000       000  000      000       
-    # 0000000   0000000   000   000  0000000    000       000  0000000  00000000  
+    # 00000000  000  000      00000000  
+    # 000       000  000      000       
+    # 000000    000  000      0000000   
+    # 000       000  000      000       
+    # 000       000  0000000  00000000  
     
     loadFile: (file, opt = focus:true, column:0) ->
         dir  = packagePath file
@@ -141,11 +155,11 @@ class Browser extends Stage
         return error "no dir?" if not dir?
         @loadDir dir, column:0, row: 0, focus:true
 
-    # 000       0000000    0000000   0000000    0000000    000  00000000   
-    # 000      000   000  000   000  000   000  000   000  000  000   000  
-    # 000      000   000  000000000  000   000  000   000  000  0000000    
-    # 000      000   000  000   000  000   000  000   000  000  000   000  
-    # 0000000   0000000   000   000  0000000    0000000    000  000   000  
+    # 0000000    000  00000000   
+    # 000   000  000  000   000  
+    # 000   000  000  0000000    
+    # 000   000  000  000   000  
+    # 0000000    000  000   000  
     
     loadDir: (dir, opt) -> 
         dirlist dir, opt, (err, items) => 
@@ -164,11 +178,11 @@ class Browser extends Stage
                         abs:  updir
             @loadItems items, opt
 
-    # 000       0000000    0000000   0000000    000  000000000  00000000  00     00   0000000  
-    # 000      000   000  000   000  000   000  000     000     000       000   000  000       
-    # 000      000   000  000000000  000   000  000     000     0000000   000000000  0000000   
-    # 000      000   000  000   000  000   000  000     000     000       000 0 000       000  
-    # 0000000   0000000   000   000  0000000    000     000     00000000  000   000  0000000   
+    # 000       0000000    0000000   0000000         000  000000000  00000000  00     00   0000000  
+    # 000      000   000  000   000  000   000       000     000     000       000   000  000       
+    # 000      000   000  000000000  000   000       000     000     0000000   000000000  0000000   
+    # 000      000   000  000   000  000   000       000     000     000       000 0 000       000  
+    # 0000000   0000000   000   000  0000000         000     000     00000000  000   000  0000000   
     
     loadItems: (items, opt) ->
         col = @emptyColumn opt?.column
@@ -214,11 +228,11 @@ class Browser extends Stage
             @columns[index].focus().activeRow().activate()
         @
 
-    # 000       0000000    0000000   0000000     0000000   0000000   000   000  000000000  00000000  000   000  000000000  
-    # 000      000   000  000   000  000   000  000       000   000  0000  000     000     000       0000  000     000     
-    # 000      000   000  000000000  000   000  000       000   000  000 0 000     000     0000000   000 0 000     000     
-    # 000      000   000  000   000  000   000  000       000   000  000  0000     000     000       000  0000     000     
-    # 0000000   0000000   000   000  0000000     0000000   0000000   000   000     000     00000000  000   000     000     
+    #  0000000   0000000   000   000  000000000  00000000  000   000  000000000  
+    # 000       000   000  0000  000     000     000       0000  000     000     
+    # 000       000   000  000 0 000     000     0000000   000 0 000     000     
+    # 000       000   000  000  0000     000     000       000  0000     000     
+    #  0000000   0000000   000   000     000     00000000  000   000     000     
     
     loadContent: (row, opt) ->
         item  = row.item
@@ -237,7 +251,7 @@ class Browser extends Stage
         funcs = files[file]?.funcs ? []
         for f in funcs
             if f[3] == name
-                items.push name: f[2], text:'  ▸ '+f[2], type: 'func', file: file, line: f[0]
+                items.push name: f[2], text:'  ▸ '+f[2], type:'func', file: file, line: f[0]
 
         @clearColumnsFrom opt.column
 
@@ -380,11 +394,11 @@ class Browser extends Stage
         while c+1 < @numCols()
             @popColumn()
        
-    # 000  000   000  000  000000000   0000000   0000000   000       0000000  
-    # 000  0000  000  000     000     000       000   000  000      000       
-    # 000  000 0 000  000     000     000       000   000  000      0000000   
-    # 000  000  0000  000     000     000       000   000  000           000  
-    # 000  000   000  000     000      0000000   0000000   0000000  0000000   
+    # 000  000   000  000  000000000       0000000   0000000   000       0000000  
+    # 000  0000  000  000     000         000       000   000  000      000       
+    # 000  000 0 000  000     000         000       000   000  000      0000000   
+    # 000  000  0000  000     000         000       000   000  000           000  
+    # 000  000   000  000     000          0000000   0000000   0000000  0000000   
     
     initColumns: ->
         @cols?.remove()
