@@ -28,6 +28,7 @@ class Handle
     del:       -> @div?.remove(); delete @div
     size:      -> @isVisible() and @flex.handleSize or 0
     pos:       -> parseInt @flex.posOfPane(@index+1) - @flex.handleSize
+    actualPos: -> @flex.pane(@index+1).actualPos() - @flex.handleSize
     update:    -> @div.style.flex = "0 0 #{@size()}px"
     isVisible: -> not (@panea.collapsed and @paneb.collapsed)
 

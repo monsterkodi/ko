@@ -53,6 +53,8 @@ window.onerror = (event, source, line, col, err) ->
 # 000        000   000  00000000  000       0000000 
 
 prefs.init()
+window.prefs = prefs
+
 addToRecent = (file) ->
     recent = prefs.get 'recentFiles', []
     _.pull recent, file
