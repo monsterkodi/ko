@@ -1,0 +1,33 @@
+# 0000000    00000000    0000000   000   000   0000000  00000000  00000000   
+# 000   000  000   000  000   000  000 0 000  000       000       000   000  
+# 0000000    0000000    000   000  000000000  0000000   0000000   0000000    
+# 000   000  000   000  000   000  000   000       000  000       000   000  
+# 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
+
+\S+                       text
+
+(● )(\w+)                 . class.marker . class
+(◆ )(\w+)                 . static.class.marker . static.class
+(▸ )(\w+)                 . method.marker . method
+(✔ )(\w+)                 . bool.marker . bool
+(\d+\s+)(▫\s)             . arrayIndex . arrayDot
+
+(?:^\s*|\/)(\.[\-\_\w][\.\-\_\w]*)(?:\s|$)  dotfile
+([\.\-\_\w]+\.coffee\b)   coffee
+([\.\-\_\w]+\.noon\b)     noon
+([\.\-\_\w]+\.json\b)     json
+([\.\-\_\w]+\.styl\b)     styl
+([\.\-\_\w]+\.html\b)     html
+([\.\-\_\w]+\.jade\b)     jade
+([\.\-\_\w]+\.pug\b)      pug
+([\.\-\_\w]+\.css\b)      css
+([\.\-\_\w]+\.cp?p?\b)    cpp
+([\.\-\_\w]+\.cc\b)       cpp
+([\.\-\_\w]+\.hp?p?\b)    hpp
+([\.\-\_\w]+\.js\b)       js
+([\.\-\_\w]+\.py\b)       py
+([\.\-\_\w]+\.sh\b)       sh
+([\.\-\_\w]+\.md\b)       md
+
+\.[\-\_\w]+\s*$             extname
+[\/]                        separator

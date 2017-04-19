@@ -17,7 +17,7 @@ class Report
         
         @indents = 0
 
-        runner.on 'start', => 
+        runner.on 'start', -> 
 
         runner.on 'suite',  (suite) =>
             return if not suite.title.length
@@ -51,7 +51,7 @@ class Report
                 for l in e.split('\n').slice 1
                     log @indent(), '     ', l
 
-        runner.on 'end', => # log ''
+        runner.on 'end', -> # log ''
      
     done: (failures) -> 
         if failures

@@ -17,7 +17,7 @@ module.exports =
         newCursors    = @do.cursors()
         newSelections = @do.selections()
         
-        moveInLine = (i, d) => 
+        moveInLine = (i, d) -> 
             for s in rangesForLineIndexInRanges i, newSelections
                 s[1][0] += d
                 s[1][1] += d

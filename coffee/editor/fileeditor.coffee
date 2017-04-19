@@ -203,7 +203,7 @@ class FileEditor extends TextEditor
         
         type = opt?.type
 
-        log "jumpTo type:#{type} word:#{word}"
+        # log "jumpTo type:#{type} word:#{word}"
 
         if not type or type == 'class'
             classes = post.get 'indexer', 'classes'
@@ -234,7 +234,7 @@ class FileEditor extends TextEditor
 
         # log "search for #{word}", window.commandline.commands.search?
         
-        if not type or type == 'word'
+        if true #not type or type == 'word'
             window.commandline.commands.search.start "command+shift+f"    
             window.commandline.commands.search.execute word
             

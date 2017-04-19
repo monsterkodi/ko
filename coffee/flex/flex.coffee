@@ -137,7 +137,7 @@ class Flex
     moveHandleToPos: (handle, pos) ->
     
         if @relaxed then @unrelax()
-        offset = pos - handle.pos()
+        offset = pos - handle.actualPos()
         prev  = @prevAllInv(handle) ? @prevVisFlex(handle) ? @prevFlex handle
         next  = @nextAllInv(handle) ? @nextVisFlex(handle) ? @nextFlex handle
         delete prev.collapsed

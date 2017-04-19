@@ -18,6 +18,7 @@ class Coffee extends Command
         @shortcuts  = ['alt+c', 'alt+shift+c']
         @names      = ["coffee", "Coffee"]
         super @commandline
+        @maxHistory = 99
         @syntaxName = 'coffee'
         post.on 'executeResult', @onResult
     
@@ -35,6 +36,7 @@ class Coffee extends Command
                 diss: Syntax.dissForTextAndSyntax str(result.error), 'coffee'
                 clss: 'coffeeResult'
         else
+            log cmdID, result
             @setCurrent @commands[cmdID] if @commands[cmdID]?
             terminal.appendMeta 
                 line: "#{cmdID} ▶"
@@ -70,6 +72,7 @@ class Coffee extends Command
                 {max,min,abs,round,ceil,floor,sqrt,pow,exp,log10,sin,cos,tan,acos,asin,atan,PI,E} = Math
                 (global[r] = require r for r in ['colors', 'electron'])                    
                 log = -> post.emit 'executeResult', [].slice.call(arguments, 0), cmdID
+                browse = window.commandline.commands.browse.browser.loadObject
                 """
             process.chdir restoreCWD
         
@@ -77,20 +80,25 @@ class Coffee extends Command
             result = coffee.eval cfg.command
         catch err
             error "Coffee.executeCoffee -- #{err}"
-            result error: err.toString()
+            result = error: err.toString()
 
         if not result?
             result = 'undefined'
-        # else if typeof(result) != 'object' or not result.error? and _.size(result) == 1
-            # result = str result
+
         @onResult result, cfg.cmdID   
         
     execute: (command) ->
         @cmdID += 1
         command = command.trim()
+        
+        if command == '.'          then command = 'browse window'
+        if command.startsWith '.'  then command = 'browse ' + command.slice 1
+        if command.startsWith 'browse '
+            if command.split(' ').length == 2
+                command += ', name:"' + command.split(' ')[1] + '"'
+
         @commands[@cmdID] = command
         terminal = window.terminal
-        terminal.appendMeta clss: 'spacer'
         for l in command.split '\n'
             continue if not l.trim().length
             terminal.appendMeta 
@@ -101,9 +109,15 @@ class Coffee extends Command
         if @name == 'Coffee'
             post.toMain 'executeCoffee', winID: window.winID, cmdID: @cmdID, command: command
         else
+            if command.startsWith 'browse'
+                window.split.raise 'area' # need to do this before command execution to allow setting focus
             @executeCoffee command: command, cmdID: @cmdID
         @hideList()
-        do: 'show terminal'
+        if command.startsWith 'browse'
+            do:    'show area'
+            focus: @commandline.commands.browse.browser.activeColumnID()
+        else
+            do: 'show terminal'
     
     executeText:       (text) -> @name = 'coffee'; @execute text
     executeTextInMain: (text) -> @name = 'Coffee'; @execute text

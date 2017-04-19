@@ -98,9 +98,8 @@ class Column
     nextColumn: -> @browser.column(@index+1)
         
     numRows:    -> @rows.length ? 0   
-    # rowHeight:  -> @rows[0]?.div.getBoundingClientRect().height ? 0
     rowHeight:  -> @rows[0]?.div.clientHeight ? 0
-    numVisible: -> @browser.height() / @rowHeight()
+    numVisible: -> @rowHeight() and parseInt(@browser.height() / @rowHeight()) or 0
     
     # 00000000   0000000    0000000  000   000   0000000  
     # 000       000   000  000       000   000  000       
@@ -196,7 +195,26 @@ class Column
         @search = ''
         @searchDiv?.remove()
         delete @searchDiv
+        @
+    
+    removeObject: ->
+        if @index == 0 and row = @activeRow()
+            delete @parent.obj[row.item.name]
+            nextOrPrev = row.next() ? row.prev()
+            row.div.remove()
+            @rows.splice row.index(), 1
+            nextOrPrev?.activate()
+  
+    sortByName: -> 
+        @rows.sort (a,b) -> a.item.name.localeCompare b.item.name
+        for row in @rows
+            @table.appendChild row.div
         
+    sortByType: ->
+        @rows.sort (a,b) -> (a.item.type + a.item.name).localeCompare b.item.type + b.item.name
+        for row in @rows
+            @table.appendChild row.div
+  
     # 000   000  00000000  000   000  
     # 000  000   000        000 000   
     # 0000000    0000000     00000    
@@ -217,7 +235,9 @@ class Column
                 @navigateRoot key
             when 'command+,', 'command+/'
                 @navigateRoot key
-            when 'backspace' then @clearSearch()
+            when 'backspace' then @clearSearch().removeObject()
+            when 'ctrl+t' then @sortByType()
+            when 'ctrl+n' then @sortByName()
             when 'esc'
                 if @search.length then @clearSearch()
                 else window.split.focus 'commandline-editor'

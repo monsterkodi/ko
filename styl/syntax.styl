@@ -6,20 +6,34 @@
 
 .syntax
     color           #666
-    
+
+.browserRow.array    
+    color           #aaa
+.browserRow .arrayIndex
+    color           #444
+    font-size       12px
+.browserRow .arrayDot
+    color           #333
+
 .invisible
     color           #888
     opacity         0.5
-    
-.bool           
+
+.bool
+.true    
     color           #88f
-    &.false      
-        color       #44f
-    
+.false      
+    color       #44f
+
 .number
+.int    
     color           #66f
-    &.float   
-        color       #f88
+.float   
+    color           #f88
+
+.nil
+.value
+    color           #808
 
 // 000000000  00000000   0000000  000000000  
 //    000     000       000          000     
@@ -44,6 +58,7 @@
 .array
     color           #00f
 
+.obj
 .owner
 .callee
 .class
@@ -51,7 +66,7 @@
             
 .variable
     color           #a0a
-    
+
 .range
     color           #80f
     
@@ -71,11 +86,13 @@
     opacity         0.8
     color           #fd8
 
+.elem
 .namespace
     color           #48a
     &.member
         color       #f80
-    
+
+.func    
 .function
     color           #f80
     &.call          
