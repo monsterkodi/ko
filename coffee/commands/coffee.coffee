@@ -88,6 +88,13 @@ class Coffee extends Command
     execute: (command) ->
         @cmdID += 1
         command = command.trim()
+        
+        if command == '.'          then command = 'browse window'
+        if command.startsWith '.'  then command = 'browse ' + command.slice 1
+        if command.startsWith 'browse '
+            if command.split(' ').length == 2
+                command += ', name:"' + command.split(' ')[1] + '"'
+
         @commands[@cmdID] = command
         terminal = window.terminal
         terminal.appendMeta clss: 'spacer'

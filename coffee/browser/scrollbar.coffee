@@ -115,4 +115,6 @@ class Scrollbar
             cs = "rgb(#{parseInt 47+cf*80},#{parseInt 47+cf*80},#{parseInt 47+cf*208})"
             @handle.style.backgroundColor = cs
 
+        @handle.style.right = "-#{@target.scrollLeft}px"
+
 module.exports = Scrollbar

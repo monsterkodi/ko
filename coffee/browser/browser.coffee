@@ -8,6 +8,7 @@
   error, log, process, path, fs, os, _
 }        = require 'kxk'
 childp   = require 'child_process'
+jsbeauty = require 'js-beautify'
 Column   = require './column'
 Stage    = require '../area/stage'
 dirlist  = require '../tools/dirlist'
@@ -38,6 +39,13 @@ class Browser extends Stage
         if _.isObject   value then return 'obj'
         error "unknown value type: #{value}"
         'value'
+
+    htmlLines: (e) -> 
+        s = jsbeauty.html_beautify e.outerHTML, indent_size:2 , preserve_newlines:false, wrap_line_length:1024*1024, unformatted: []
+        s.split('\n')
+    
+    sortByType: (items) ->
+        items.sort (a,b) -> (a.type + a.name).localeCompare b.type + b.name      
 
     loadObject: (obj, opt) =>
         
@@ -76,16 +84,18 @@ class Browser extends Stage
             for own key,value of obj
                 items.push itemForKeyValue key, value
 
+        @sortByType(items) if @valueType(obj) not in ['func', 'array']
         @loadItems items, opt
         true
   
     loadArray: (arry, opt) ->
-        items = []
+        items   = []
+        padSize = 1+Math.floor Math.log10 arry.length
         for own index,value of arry
             item = 
                 type: @valueType value
                 obj:  value
-            index = "#{index} ▫ "
+            index = "#{_.padEnd str(index), padSize} ▫ "
             switch item.type
                 when 'regexp' then item.name = index+value.source
                 when 'string' then item.name = index+value
@@ -97,11 +107,10 @@ class Browser extends Stage
         
     loadObjectItem: (item, opt) ->
         opt.parent = item
-        log 'loadObjectItem', item.name, item.type, opt.column, item.obj?
         switch item.type
             when 'obj'   then @loadObject item.obj, opt
             when 'func'  then @loadArray  item.obj.toString().split('\n'), opt
-            when 'elem'  then @loadArray  item.obj.outerHTML.split('\n'), opt
+            when 'elem'  then @loadArray  @htmlLines(item.obj), opt
             when 'array' then @loadArray  item.obj, opt
             else
                 item = 

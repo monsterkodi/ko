@@ -41,6 +41,7 @@ dependencies
                 fuzzy           ^0.1.3
                 html-entities   ^1.2.0
                 immutable       ^3.8.1
+                js-beautify     ^1.6.12
                 karg            >=1.0.10
                 keycode         ^2.1.8
                 kxk             ^0.13.0

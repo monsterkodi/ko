@@ -10,6 +10,7 @@
 (◆ )(\w+)                 . static.class.marker . static.class
 (▸ )(\w+)                 . method.marker . method
 (✔ )(\w+)                 . bool.marker . bool
+(\d+\s+)(▫\s)             . arrayIndex . arrayDot
 
 (?:^\s*|\/)(\.[\-\_\w][\.\-\_\w]*)(?:\s|$)  dotfile
 ([\.\-\_\w]+\.coffee\b)   coffee
