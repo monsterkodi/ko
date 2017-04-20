@@ -29,7 +29,9 @@ class Coffee extends Command
     #  0000000   000   000        000   000  00000000  0000000    0000000   0000000     000  
     
     onResult: (result,cmdID) =>
+        
         terminal = window.terminal
+        
         if result.error?
             terminal.appendMeta 
                 line: "#{cmdID} ⚡"
@@ -75,8 +77,8 @@ class Coffee extends Command
                 browse = window.commandline.commands.browse.browser.loadObject
                 """
             process.chdir restoreCWD
-        
         try
+            coffee.eval "cmdID = #{@cmdID}"
             result = coffee.eval cfg.command
         catch err
             error "Coffee.executeCoffee -- #{err}"

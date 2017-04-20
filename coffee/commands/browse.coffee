@@ -26,7 +26,8 @@ class Browse extends Command
         post.on 'browser-match',          @onBrowserMatch
         
         super @commandline
-
+        @syntaxName = 'browser'
+        
     restoreState: (state) -> 
         super state
         @browser.start()

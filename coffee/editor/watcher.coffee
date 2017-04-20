@@ -11,8 +11,7 @@ chokidar = require 'chokidar'
 class Watcher
 
     constructor: (@editor) ->
-        @w = chokidar.watch @editor.currentFile, 
-            ignoreInitial: true
+        @w = chokidar.watch @editor.currentFile, ignoreInitial: true
         @w.on 'change', (p) => 
             window.loadFile @editor.currentFile, reload: true, dontSave: true
         @w.on 'unlink', (p) => @editor.setText ""

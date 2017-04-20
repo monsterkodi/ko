@@ -468,7 +468,7 @@ document.onkeydown = (event) ->
     
     switch combo
         when 'command+alt+i'      then return post.toMain 'toggleDevTools', winID
-        when 'ctrl+w'             then return win.close()
+        when 'ctrl+w'             then return loadFile ''
         when 'f3'                 then return screenShot()
         when 'command+\\'         then return toggleCenterText()
         when 'command+k'          then return commandline.clear()
