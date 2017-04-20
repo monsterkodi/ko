@@ -208,8 +208,7 @@ class Commandline extends TextEditor
         @listCommands()
         @focus()
         @positionList()
-        event.preventDefault()
-        event.stopPropagation()
+        stopEvent event
 
     listCommands: ->
         @list.innerHTML = ""        
@@ -228,8 +227,7 @@ class Commandline extends TextEditor
                 start = (name,combo) => (event) => 
                     @hideList()
                     @startCommand name, combo
-                    event.stopPropagation()
-                    event.preventDefault()
+                    stopEvent event
                 div.addEventListener 'mousedown', start name, combo
                 @list.appendChild div
 
@@ -285,10 +283,6 @@ class Commandline extends TextEditor
         if @command?
             return if @command.handleModKeyComboEvent(mod, key, combo, event) != 'unhandled'
 
-        stop = (event) ->
-            event.preventDefault()
-            event.stopPropagation()        
-        
         return if 'unhandled' != super mod, key, combo, event
         split = window.split
         switch combo
@@ -309,12 +303,12 @@ class Commandline extends TextEditor
             when 'right', 'tab' 
                 if @isCursorAtEndOfLine()
                     if @command?.complete()
-                        return stop event
+                        return stopEvent event
                     if @numSelections()
                         @do.start()
                         @do.select []
                         @do.end()
-                    return stop event
+                    return stopEvent event
                 else if combo == 'tab'
                     return
         

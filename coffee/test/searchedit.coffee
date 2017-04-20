@@ -71,7 +71,6 @@ describe 'search edit', ->
         count = 2
         onSearchSaved = (file) ->
             count--
-            log count, file
             if count == 0
                 post.removeListener 'search-saved', onSearchSaved
                 done()
@@ -81,8 +80,6 @@ describe 'search edit', ->
     it 'saved', ->
         fileA = fs.readFileSync txtFile, 'utf8'
         fileB = fs.readFileSync tmpFile, 'utf8'
-        log fileA
-        log fileB
         expect(fileA) .to.eql "hellon earth"      
         expect(fileB) .to.eql "a='shello'\nb='world'"  
     

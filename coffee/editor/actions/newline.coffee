@@ -47,9 +47,8 @@ module.exports =
         
         for c in @do.cursors().reversed()
         
-            after  = @do.line(c[1]).substr c[0]
+            [before, after] = @splitStateLineAtPos @do, c
             after  = after.trimLeft() if doIndent
-            before = @do.line(c[1]).substr 0, c[0]
         
             if doIndent
                 line = before.trimRight()

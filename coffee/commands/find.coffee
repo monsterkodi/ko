@@ -56,7 +56,6 @@ class Find extends Command
     execute: (command) ->
         command = super command
         if editor = window.editorWithName @focus
-            log "highlightText in #{editor.name} #{command} #{@type}"
             editor.highlightText command, 
                 type: @type
                 select: 'after'

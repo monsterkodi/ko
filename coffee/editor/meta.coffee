@@ -45,10 +45,7 @@ class Meta
                     localChange.oldIndex = line
                     localChange.newIndex = line
                     localChange.doIndex  = line
-                    log "editor.name #{@editor.name} meta line:", @editor.line(meta[0])
                     localChange.after    = @editor.line(meta[0])
-                    log 'meta.onChanged file:', file
-                    log 'meta.onChanged localChange:', localChange
                     @editor.emit 'fileLineChange', file, localChange
                     meta[2].state = 'unsaved'
                     if meta[2].span?
@@ -68,7 +65,6 @@ class Meta
             if err? then return error "Meta.saveFileLineMetas -- readFile err:#{err}"
             lines = data.split /\r?\n/
             for lineMeta in lineMetas
-                log "saveFileLineMetas -- changing line at index #{lineMeta[0]} in #{file} from: #{lines[lineMeta[0]]} to: #{lineMeta[1]}"
                 lines[lineMeta[0]] = lineMeta[1]
             data = lines.join '\n'
             fs.writeFile file, data, encoding: 'utf8', (err) ->

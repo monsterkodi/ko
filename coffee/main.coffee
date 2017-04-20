@@ -289,7 +289,6 @@ class Main
     postDelayedNumWins: ->
         clearTimeout @postDelayedNumWinsTimer
         postNumWins = -> 
-            log 'postDelayedNumWins', wins().length
             post.toWins 'numWins', wins().length
         @postDelayedNumWinsTimer = setTimeout postNumWins, 300
                   
@@ -492,7 +491,6 @@ class Main
     onCloseWin: (event) =>
         wid = event.sender.id
         prefs.del "windows:#{wid}"
-        log "del window #{wid} from prefs"
         if visibleWins().length == 1
             hideDock()
         post.toWins 'winClosed', wid

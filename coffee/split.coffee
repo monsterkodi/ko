@@ -135,7 +135,6 @@ class Split extends event
     swap: (old, nju) ->
         if @flex.panes[0].div != nju
             nju.style.height   = "#{@flex.sizeOfPane 0}px"
-            nju.style.width    = old.style.width
             old.style.display  = 'none'
             nju.style.display  = 'block'
             @flex.panes[0].div = nju

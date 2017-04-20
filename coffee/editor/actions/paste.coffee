@@ -56,14 +56,15 @@ module.exports =
             newSelections = []
             newCursors = null
             if cp[0] > 0
-                rest   = @do.line(li).substr(cp[0]).trimLeft()
+                [before, after] = @splitStateLineAtPos @do, cp
+                after = after.trimLeft()
+                
                 indt   = _.padStart "", indentationInLine @do.line cp[1]
-                before = @do.line(cp[1]).substr 0, cp[0]
                 if before.trim().length
                     @do.change li, before
                     li += 1
-                    if (indt + rest).trim().length
-                        l.push indt + rest
+                    if (indt + after).trim().length
+                        l.push indt + after
                         newCursors = [[0,li+l.length-1]]
                     else
                         newCursors = null
