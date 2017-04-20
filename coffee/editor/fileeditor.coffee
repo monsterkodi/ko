@@ -167,13 +167,13 @@ class FileEditor extends TextEditor
     # 000   000  000   000  000 0 000  000      
     #  0000000    0000000   000   000  000      
 
-    jumpToFile: (file, line=0, col=0) =>
-        
-        if _.isObject file
-            col  = file.col  ? col
-            line = file.line ? line
-            file = file.file
-        
+    jumpToFile: (opt) =>
+
+        opt ?= {}
+        col  = opt.col  ? col
+        line = opt.line ? line
+        file = opt.file
+    
         window.navigate.addFilePos
             file: @currentFile
             pos:  @cursorPos()
@@ -182,14 +182,15 @@ class FileEditor extends TextEditor
             file: file
             pos:  [col, line]
             winID: window.winID
-            extend: opt?.extend
+            extend: opt.extend
+            sameWindow: opt.sameWindow
 
     jumpTo: (word, opt) =>
-        
+
         if _.isObject(word) and not opt?
-            opt = word
+            opt  = word
             word = opt.word
-        
+
         opt ?= {}
         
         if opt.file?
@@ -229,7 +230,7 @@ class FileEditor extends TextEditor
             files = post.get 'indexer', 'files'
             for file, info of files
                 if fileName(file).toLowerCase() == find and file != @currentFile
-                    @jumpToFileLine file, 6
+                    @jumpToFile file:file, line:6
                     return true
 
         # log "search for #{word}", window.commandline.commands.search?

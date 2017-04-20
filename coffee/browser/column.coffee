@@ -8,7 +8,7 @@
   path, post, elem, clamp, error, log, $, _ 
 }   = require 'kxk'
 Row = require './row'
-Scrollbar  = require './scrollbar'
+Scroller   = require './scroller'
 fuzzaldrin = require 'fuzzaldrin'
 fuzzy      = require 'fuzzy'
 
@@ -32,7 +32,7 @@ class Column
         @div.addEventListener 'mouseover', @onMouseOver
         @div.addEventListener 'mouseout',  @onMouseOut
         
-        @scroll = new Scrollbar @
+        @scroll = new Scroller @
         
     #  0000000  00000000  000000000  000  000000000  00000000  00     00   0000000  
     # 000       000          000     000     000     000       000   000  000       
@@ -168,6 +168,11 @@ class Column
             when ','     then '~'
             when '/'     then '/'
             
+    openFileInNewWindow: ->        
+        if item = @activeRow()?.item
+            if item.type == 'file' and item.textFile
+                window.openFiles [item.abs], newWindow: true
+
     #  0000000  00000000   0000000   00000000    0000000  000   000    
     # 000       000       000   000  000   000  000       000   000    
     # 0000000   0000000   000000000  0000000    000       000000000    
@@ -227,17 +232,17 @@ class Column
 
         switch combo
             when 'up', 'down', 'page up', 'page down', 'home', 'end' 
-                @navigateRows key
+                stopEvent event, @navigateRows key
             when 'right', 'left', 'enter'                            
-                stopEvent event 
-                @navigateCols key
+                stopEvent event, @navigateCols key
+            when 'command+enter' then @openFileInNewWindow()
             when 'command+left', 'command+up','command+right', 'command+down'
-                @navigateRoot key
+                stopEvent event, @navigateRoot key
             when 'command+,', 'command+/'
-                @navigateRoot key
-            when 'backspace' then @clearSearch().removeObject()
-            when 'ctrl+t' then @sortByType()
-            when 'ctrl+n' then @sortByName()
+                stopEvent event, @navigateRoot key
+            when 'backspace' then stopEvent event, @clearSearch().removeObject()
+            when 'ctrl+t' then stopEvent event, @sortByType()
+            when 'ctrl+n' then stopEvent event, @sortByName()
             when 'esc'
                 if @search.length then @clearSearch()
                 else window.split.focus 'commandline-editor'

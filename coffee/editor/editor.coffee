@@ -18,9 +18,6 @@ class Editor extends Buffer
 
         Editor.initActions() if not Editor.actions?
             
-        @surroundStack      = []
-        @surroundCharacters = []
-        @surroundPairs      = Object.create null
         @indentString       = _.padStart "", 4
         @stickySelection    = false
         @dbg                = false
@@ -98,28 +95,8 @@ class Editor extends Buffer
         
         # _______________________________________________________________ surround
         
-        @surroundPairs = 
-            '[': ['[', ']']
-            ']': ['[', ']']
-            '{': ['{', '}']
-            '}': ['{', '}']
-            '(': ['(', ')']
-            ')': ['(', ')']
-            '<': ['<', '>']
-            '>': ['<', '>']
-            '#': ['#{', '}']
-            "'": ["'", "'"]
-            '"': ['"', '"']
-            '*': ['*', '*']                    
+        @initSurround()
         
-        @surroundCharacters = "{}[]()\"'".split ''
-        switch @fileType
-            when 'html'   then @surroundCharacters = @surroundCharacters.concat ['<','>']
-            when 'coffee' then @surroundCharacters.push '#'
-            when 'md'     
-                @surroundCharacters = @surroundCharacters.concat ['*','<']
-                @surroundPairs['<'] = ['<!---', '--->']
-            
         # _______________________________________________________________ indent
         
         @indentNewLineMore = null
@@ -164,6 +141,10 @@ class Editor extends Buffer
             @textOfSelection()
         else
             @textInRanges @rangesForCursorLines()
+
+    splitStateLineAtPos: (state, pos) ->
+        l = state.line pos[1] 
+        [l.slice(0, pos[0]), l.slice(pos[0])]
                 
     # 00000000  00     00  000  000000000       00000000  0000000    000  000000000
     # 000       000   000  000     000          000       000   000  000     000   

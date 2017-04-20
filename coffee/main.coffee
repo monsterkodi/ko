@@ -118,6 +118,8 @@ post.on 'toggleDevTools',    (winID) -> winWithID(winID).toggleDevTools()
 post.on 'restartShell',      (cfg)   -> winShells[cfg.winID].restartShell()
 post.on 'maximizeWindow',    (winID) -> main.toggleMaximize winWithID winID
 post.on 'activateWindow',    (winID) -> main.activateWindowWithID winID
+post.on 'activateNextWindow', (winID) -> main.activateNextWindow winID
+post.on 'activatePrevWindow', (winID) -> main.activatePrevWindow winID
 post.on 'reloadWindow',      (winID) -> main.reloadWin winWithID winID
 post.on 'fileSaved',   (file, winID) -> main.indexer.indexFile file, refresh: true
 post.on 'fileLoaded',  (file, winID) -> main.indexer.indexFile winWithID(winID).currentFile = file
@@ -231,11 +233,25 @@ class Main
         @
 
     activateNextWindow: (win) ->
+        if _.isNumber win then win = winWithID win
         allWindows = wins()
         for w in allWindows
             if w == win
                 i = 1 + allWindows.indexOf w
                 i = 0 if i >= allWindows.length
+                log 'activateWindowWithID', i
+                @activateWindowWithID allWindows[i].id
+                return w
+        null
+
+    activatePrevWindow: (win) ->
+        if _.isNumber win then win = winWithID win
+        allWindows = wins()
+        for w in allWindows
+            if w == win
+                i = -1 + allWindows.indexOf w
+                i = allWindows.length-1 if i < 0
+                log 'activateWindowWithID', i
                 @activateWindowWithID allWindows[i].id
                 return w
         null

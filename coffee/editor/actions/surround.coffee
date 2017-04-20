@@ -7,6 +7,33 @@
 {log, _} = require 'kxk'
 
 module.exports =
+
+    initSurround: ->
+        
+        @surroundStack = []
+
+        @surroundPairs = 
+            '[': ['[', ']']
+            ']': ['[', ']']
+            '{': ['{', '}']
+            '}': ['{', '}']
+            '(': ['(', ')']
+            ')': ['(', ')']
+            '<': ['<', '>']
+            '>': ['<', '>']
+            '#': ['#{', '}']
+            "'": ["'", "'"]
+            '"': ['"', '"']
+            '*': ['*', '*']                    
+        
+        @surroundCharacters = "{}[]()\"'".split ''
+        
+        switch @fileType
+            when 'html'   then @surroundCharacters = @surroundCharacters.concat ['<','>']
+            when 'coffee' then @surroundCharacters.push '#'
+            when 'md'     
+                @surroundCharacters = @surroundCharacters.concat ['*','<']
+                @surroundPairs['<'] = ['<!---', '--->']
                 
     isUnbalancedSurroundCharacter: (ch) ->
         return false if ch in ["#"]
@@ -29,7 +56,21 @@ module.exports =
             if c not in ['"', "'"]
                 return false
         true
-        
+    
+    insertTripleQuotes: ->
+        return false if @numCursors() > 1
+        return false if @numSelections()
+        p = @cursorPos()
+        [before, after] = @splitStateLineAtPos @state, p
+        return false if not before.endsWith '""'
+        return false if before.length > 2 and before[before.length-3] == '"'
+        return false if after.startsWith '"'
+        @do.start()
+        @do.change p[1], before + '""""' + after
+        @do.setCursors [[p[0]+1, p[1]]]
+        @do.end()
+        true
+    
     # 000  000   000   0000000  00000000  00000000   000000000  
     # 000  0000  000  000       000       000   000     000     
     # 000  000 0 000  0000000   0000000   0000000       000     
@@ -37,6 +78,9 @@ module.exports =
     # 000  000   000  0000000   00000000  000   000     000     
     
     insertSurroundCharacter: (ch) ->
+
+        if ch == '"' and @fileType == 'coffee' and @insertTripleQuotes()
+            return true
 
         if @isUnbalancedSurroundCharacter ch
             return false 
@@ -99,8 +143,7 @@ module.exports =
                         @do.change ns[0], @do.line(ns[0]).splice sr[1][1]-1, 1, '"'
                         
             else if @fileType == 'coffee' and cl == '(' and lengthOfRange(ns) > 0 # remove space after callee
-                before = @do.line(ns[0]).slice 0, ns[1][0]
-                after  = @do.line(ns[0]).slice ns[1][0]
+                [before, after] = @splitStateLineAtPos @do, ns
                 trimmed = before.trimRight()
                 beforeGood = /\w$/.test(trimmed) and not /(if|when|in|and|or|is|not|else|return)$/.test trimmed
                 afterGood = after.trim().length and not after.startsWith ' '

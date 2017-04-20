@@ -289,7 +289,7 @@ openFile = loadFile
 # 000   000  000        000       000  0000        000       000  000      000            000
 #  0000000   000        00000000  000   000        000       000  0000000  00000000  0000000 
 
-openFiles = (ofiles, options) -> # called from file dialog and open command
+openFiles = (ofiles, options) -> # called from file dialog and open command and browser
     if ofiles?.length
         files = fileList ofiles, ignoreHidden: false
         if files.length >= 10
@@ -308,8 +308,8 @@ openFiles = (ofiles, options) -> # called from file dialog and open command
         setState 'openFilePath', path.dirname files[0]                    
         if not options?.newWindow
             file = resolve files.shift()
-            if not post.get 'activateWindowWithFile', file
-                loadFile file
+            # if not post.get 'activateWindowWithFile', file
+            loadFile file
         for file in files
             post.toMain 'newWindowWithFile', file
         return ofiles
@@ -473,6 +473,8 @@ document.onkeydown = (event) ->
         when 'command+\\'         then return toggleCenterText()
         when 'command+k'          then return commandline.clear()
         when 'command+alt+k'      then return split.toggleLog()
+        when 'command+alt+left'   then return stopEvent event, post.toMain 'activatePrevWindow', winID
+        when 'command+alt+right'  then return stopEvent event, post.toMain 'activateNextWindow', winID
         when 'command+alt+ctrl+k' then return split.showOrClearLog()
         when 'command+='          then return changeFontSize +1
         when 'command+-'          then return changeFontSize -1

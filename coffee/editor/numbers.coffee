@@ -84,9 +84,10 @@ class Numbers extends event
         @updateColor e.lineIndex
 
     onLineInserted: (li, oi) =>
-        # log "numbers.onLineInserted #{li}" if @editor.name == 'editor'
+        # log "numbers.onLineInserted #{li} #{oi}" if @editor.name == 'editor'
         top = @editor.scroll.exposeTop
-        if top <= oi
+        bot = @editor.scroll.exposeBot
+        if top <= oi <= bot
             for i in [oi-top...@elem.children.length]
                 div = @elem.children[i]
                 if not div?.firstChild?
@@ -100,6 +101,8 @@ class Numbers extends event
             i = top+@elem.children.length
             @elem.appendChild @addLine i
             @updateColor i
+        # else 
+            # log 'line outside top bot', top, oi, bot
                     
     # 000   000   0000000   000   000  000   0000000  000   000
     # 000   000  000   000  0000  000  000  000       000   000

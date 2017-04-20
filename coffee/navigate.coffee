@@ -11,20 +11,20 @@ class Navigate
     
     constructor: (@main) ->
         
-        return if not @main? # this is not very obvious
+        return if not @main? # not very obvious: this is instantiated in main and window processes
         
-        post.on 'navigate', @action
+        post.on 'navigate', @navigate
         @filePositions = []
         @currentIndex = -1
         @navigating = false
+        
+    # 00     00   0000000   000  000   000    
+    # 000   000  000   000  000  0000  000    
+    # 000000000  000000000  000  000 0 000    
+    # 000 0 000  000   000  000  000  0000    
+    # 000   000  000   000  000  000   000    
  
-    #  0000000    0000000  000000000  000   0000000   000   000
-    # 000   000  000          000     000  000   000  0000  000
-    # 000000000  000          000     000  000   000  000 0 000
-    # 000   000  000          000     000  000   000  000  0000
-    # 000   000   0000000     000     000   0000000   000   000
-
-    action: (opt) =>
+    navigate: (opt) =>
         
         switch opt.action
 
@@ -32,13 +32,13 @@ class Navigate
                 return if not @filePositions.length
                 @currentIndex = clamp 0, @filePositions.length-1, (@filePositions.length + @currentIndex-1) % @filePositions.length
                 @navigating = true
-                @navigateToFilePos @filePositions[@currentIndex], opt
+                @loadFilePos @filePositions[@currentIndex], opt
                 
             when 'forward'
                 return if not @filePositions.length
                 @currentIndex = clamp 0, @filePositions.length-1, (@currentIndex+1) % @filePositions.length
                 @navigating = true
-                @navigateToFilePos @filePositions[@currentIndex], opt
+                @loadFilePos @filePositions[@currentIndex], opt
                                 
             when 'addFilePos'
                 return if not opt?.file?.length
@@ -58,15 +58,10 @@ class Navigate
                     else
                         @currentIndex = @filePositions.length
 
-    # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000
-    # 0000  000  000   000  000   000  000  000        000   000     000     000     
-    # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000 
-    # 000  0000  000   000     000     000  000   000  000   000     000     000     
-    # 000   000  000   000      0      000   0000000   000   000     000     00000000
-    
-    navigateToFilePos: (filePos, opt) ->
-        id = @main.activateWindowWithFile filePos.file
-        # log 'navigateToFilePos', filePos, id, opt
+    loadFilePos: (filePos, opt) ->
+
+        if not opt.sameWindow
+            id = @main.activateWindowWithFile filePos.file
         if id?
             post.toWin id, 'singleCursorAtPos', filePos.pos, extend:opt.extend
         else
@@ -75,13 +70,15 @@ class Navigate
             else if opt?.winID?
                 post.toWin opt.winID, 'loadFile', "#{filePos.file}:#{filePos.pos[1]+1}:#{filePos.pos[0]}"
         filePos
-    
-    #  0000000   0000000    0000000          00000000  000  000      00000000        00000000    0000000    0000000
-    # 000   000  000   000  000   000        000       000  000      000             000   000  000   000  000     
-    # 000000000  000   000  000   000        000000    000  000      0000000         00000000   000   000  0000000 
-    # 000   000  000   000  000   000        000       000  000      000             000        000   000       000
-    # 000   000  0000000    0000000          000       000  0000000  00000000        000         0000000   0000000 
-    
+
+    # 000   000  000  000   000    
+    # 000 0 000  000  0000  000    
+    # 000000000  000  000 0 000    
+    # 000   000  000  000  0000    
+    # 00     00  000  000   000    
+        
+    # these are called in window process
+
     addFilePos: (opt) -> # called from window on editing
         opt.action = 'addFilePos'
         opt.for = 'edit'

@@ -39,7 +39,7 @@ class Row
             when 'file'  then @column.browser.loadContent @,         column: @column.index+1
             else
                 if @item.file?
-                    post.emit 'jumpTo', file: @item.file, line: @item.line
+                    post.emit 'jumpTo', file:@item.file, line:@item.line, sameWindow:true
                 else if @column.parent.obj?
                     @column.browser.loadObjectItem  @item, column: @column.index+1
                 else

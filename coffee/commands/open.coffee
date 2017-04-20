@@ -30,7 +30,6 @@ class Open extends Command
         @navigating = false
                 
         super @commandline
-        # @maxHistory   = 10
                     
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000

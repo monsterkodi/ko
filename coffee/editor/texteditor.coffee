@@ -7,7 +7,6 @@
 {splitFilePos, fileExists, resolve, keyinfo, stopEvent, setStyle, 
 prefs, drag, path, post, clamp, str, log, sw, $, _
 }         = require 'kxk'
-matchr    = require '../tools/matchr'
 render    = require './render'
 syntax    = require './syntax'
 scroll    = require './scroll'
@@ -99,11 +98,13 @@ class TextEditor extends Editor
     #    000     00000000  000   000     000   
     
     setText: (text) ->
+        
         if @syntax.name == 'txt'
             @syntax.name = syntax.shebang text.slice 0, text.search /\r?\n/
         super text
                 
     setLines: (lines) ->
+        
         if lines.length == 0
             @scroll.reset() 
         
@@ -121,11 +122,10 @@ class TextEditor extends Editor
         @updateLayers()
 
     appendText: (text) ->
-        # console.log "appendText #{text} lines:", str @state.lines()
+
         ls = text?.split /\n/
         for l in ls
             @state = @state.appendLine l
-            # console.log 'appendText lines:', str @state.get('lines').toJS()
             @emit 'lineAppended', 
                 lineIndex: @numLines()-1
                 text:      l
@@ -142,6 +142,7 @@ class TextEditor extends Editor
     # 000        0000000   000   000     000   
 
     setFontSize: (fontSize) =>
+        
         @view.style.fontSize = "#{fontSize}px"
         @size.numbersWidth = 'Numbers' in @config.features and 50 or 0
         @size.fontSize     = fontSize
@@ -211,6 +212,7 @@ class TextEditor extends Editor
     # 00000000  0000000    000     000   
 
     updateLine: (li, oi) ->
+        
         oi = li if not oi?
         return if oi > @scroll.exposeBot
         return if oi < @scroll.exposeTop
@@ -219,6 +221,7 @@ class TextEditor extends Editor
             @elem.replaceChild div, @elem.children[oi - @scroll.exposeTop]
     
     deleteLine: (li, oi) ->
+        
         return if oi > @scroll.exposeBot
         return if oi < @scroll.exposeTop
         @elem.children[oi - @scroll.exposeTop]?.remove()
@@ -226,6 +229,7 @@ class TextEditor extends Editor
         @emit 'lineDeleted', oi
         
     insertLine: (li, oi) -> 
+        
         return if not @scroll.lineIndexIsInExpose oi
         div = @divForLineAtIndex li
         @elem.insertBefore div, @elem.children[oi - @scroll.exposeTop]
@@ -568,7 +572,7 @@ class TextEditor extends Editor
                 
                 p = @posForEvent event
                 if event.altKey
-                    @emitJumpToForPos p                                    
+                    @jumpToWord p                                    
                 else if event.metaKey
                     @toggleCursorAtPos p
                 else
@@ -599,44 +603,6 @@ class TextEditor extends Editor
                 return func[3] + '.' + func[2] + ' '
         ''
         
-    emitJumpToForPos: (p) ->
-        
-        text = @line p[1]
-        
-        rgx = /([\~\/\w\.]+\/[\w\.]+\w[:\d]*)/ # look for files in line
-        if rgx.test text
-            ranges = matchr.ranges rgx, text
-            diss   = matchr.dissect ranges, join:false
-            for d in diss
-                if d.start <= p[0] <= d.start+d.match.length
-                    [file, pos] = splitFilePos d.match
-                    if fileExists resolve file
-                        post.emit 'jumpTo', file:file, line:pos[1], col:pos[0]
-                        return
-                        
-        word = @wordAtPos p
-        range = @rangeForWordAtPos p
-        opt = {}
-        line = @line range[0] 
-
-        if range[1][0] > 0 
-            if line[range[1][0]-1] == '.'
-                opt.type = 'func'
-                
-        if not opt.type and range[1][1] < line.length
-            rest = line.slice range[1][1]
-            index = rest.search /\S/ 
-            if index >= 0
-                nextChar = rest[index]
-                log "next: #{nextChar}"
-                type = switch nextChar 
-                    when '.'      then 'class' 
-                    when '('      then 'func'
-                    when ':', '=' then 'word'
-                opt.type = type if type?
-                
-        post.emit 'jumpTo', word, opt
-
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
     # 0000000    0000000     00000  
@@ -682,7 +648,6 @@ class TextEditor extends Editor
                         return
     
         switch combo
-            when 'alt+enter'       then return @emitJumpToForPos @cursorPos()
             when 'command+z'       then return @do.undo()
             when 'command+shift+z' then return @do.redo()
                 
