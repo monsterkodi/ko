@@ -54,7 +54,7 @@ class Navigate
                         pos:  opt.pos  
                     @currentIndex = @filePositions.length-1
                     if opt?.for == 'goto'
-                        @navigateToFilePos @filePositions[@currentIndex], opt
+                        @loadFilePos @filePositions[@currentIndex], opt
                     else
                         @currentIndex = @filePositions.length
 

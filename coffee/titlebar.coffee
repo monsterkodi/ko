@@ -17,30 +17,35 @@ class Titlebar
         @selected = -1
         document.body.addEventListener 'focusout', @closeList
         document.body.addEventListener 'focusin',  @closeList
+        @numWins = 1        
+        post.on 'numWins', @onNumWins
 
-    update: (info) ->
-        ic  = info.focus and " focus" or ""
-        dc  = info.dirty and " dirty" or "clean"
-        dot = info.sticky and "○" or "●"
+    onNumWins: (numWins) => @numWins = numWins; @update @info
+    
+    update: (@info) ->
+        ic  = @info.focus and " focus" or ""
+        dc  = @info.dirty and " dirty" or "clean"
+        dot = @info.sticky and "○" or "●"
         db  = "<span class=\"dot #{dc}#{ic}\">#{dot}</span>"
         
-        if info.file?
-            diss = syntax.dissForTextAndSyntax(path.basename(info.file), 'ko', join: true)
+        if @info.file?
+            diss = syntax.dissForTextAndSyntax(path.basename(@info.file), 'ko', join: true)
             title = render.line diss, charWidth:0
             
-            if pkgPath = packagePath info.file
+            if pkgPath = packagePath @info.file
                 title = path.basename(pkgPath) + "<span class='#{ic}'> ▸ </span>" + title
             
-            tooltip = unresolve info.file
+            tooltip = unresolve @info.file
         else
             title = ''
         
-        id  = "<span class='clickarea'><span class=\"winid #{ic}\">#{info.winID}</span>"
-        da  = info.dirty and dot or ""
+        nm  = @numWins > 1 and "<span class=\"winnum #{ic}\">#{@numWins}</span>" or ''
+        id  = "<span class='clickarea'><span class=\"winid #{ic}\">#{@info.winID}</span>"
+        da  = @info.dirty and dot or ""
         txt = id + db 
         if title.length
             txt += "<span class=\"title #{dc}#{ic}\" data-tip=\"#{tooltip}\">#{title} #{da}</span>"
-        txt += "</span>"
+        txt += "</span>" + nm
         @elem.innerHTML = txt
         $('.clickarea', @elem)?.addEventListener 'click', @showList
        

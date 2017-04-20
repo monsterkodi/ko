@@ -274,7 +274,7 @@ class Main
                 return w.id
         null
 
-    closeOtherWindows:=>
+    closeOtherWindows: =>
         for w in wins()
             if w != activeWin()
                 @closeWindow w
@@ -285,6 +285,13 @@ class Main
         for w in wins()
             @closeWindow w
         hideDock()
+
+    postDelayedNumWins: ->
+        clearTimeout @postDelayedNumWinsTimer
+        postNumWins = -> 
+            log 'postDelayedNumWins', wins().length
+            post.toWins 'numWins', wins().length
+        @postDelayedNumWinsTimer = setTimeout postNumWins, 300
                   
     #  0000000  000000000   0000000    0000000  000   000
     # 000          000     000   000  000       000  000 
@@ -446,6 +453,7 @@ class Main
                 else
                     win.show()
             post.toWins 'winLoaded', win.id
+            post.toWins 'numWins', wins().length
                             
         win.webContents.on 'did-finish-load', winLoaded
         win 
@@ -481,13 +489,14 @@ class Main
                             width:  b.x+b.width - (wb.x+wb.width-frameSize)
                             height: b.height
     
-    onCloseWin: (event) ->
+    onCloseWin: (event) =>
         wid = event.sender.id
         prefs.del "windows:#{wid}"
         log "del window #{wid} from prefs"
         if visibleWins().length == 1
             hideDock()
         post.toWins 'winClosed', wid
+        @postDelayedNumWins()
         
     otherInstanceStarted: (args, dir) =>
         if not visibleWins().length
