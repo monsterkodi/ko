@@ -9,7 +9,6 @@
 TextEditor = require '../editor/texteditor'
 render     = require '../editor/render'
 syntax     = require '../editor/syntax'
-split      = require '../split'
 
 class Commandline extends TextEditor
     

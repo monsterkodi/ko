@@ -5,7 +5,8 @@
 #  0000000   000     000     0000000    000  000       000         
 
 { escapePath, childp, path, str, log, _
-}        = require 'kxk'
+}      = require 'kxk'
+colors = require 'colors'
 
 module.exports = (file) ->
     
@@ -18,21 +19,22 @@ module.exports = (file) ->
         # log str result
         # log "----------"
     catch err
+        log "error #{err}"
         return error: err
     
     info  = changes:[]
-    lines = result.split '\n'
+    lines = (colors.strip l for l in result.split '\n')
     
     while line = lines.shift()
+
         if line.startsWith '@@'
-            
             [x, before, after] = line.split ' ' 
             afterSplit = after.split ','
             
-            numOld = parseInt before.split(',')[1]
-            numNew = parseInt afterSplit[1]
-            change = line: parseInt afterSplit[0]
-            
+            numOld = parseInt(before.split(',')[1] ? 1)
+            numNew = parseInt(afterSplit[1] ? 1)
+            change = line: parseInt(afterSplit[0]) 
+
             oldLines = []
             for i in [0...numOld]
                 oldLines.push lines.shift().slice 1

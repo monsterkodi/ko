@@ -8,7 +8,7 @@
 packagePath, fileExists, fileName, fileList, relative, splitExt,
 noon, path, error, log, _
 }          = require 'kxk'
-indexer    = require '../indexer'
+indexer    = require '../main/indexer'
 salt       = require '../tools/salt'
 Command    = require '../commandline/command'
 colors     = require 'colors'

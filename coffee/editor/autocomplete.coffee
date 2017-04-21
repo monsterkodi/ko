@@ -6,7 +6,7 @@
 
 {clamp, post, error, log, $, _} = require 'kxk'
 
-Indexer  = require '../indexer'
+Indexer  = require '../main/indexer'
 event    = require 'events'
 
 class Autocomplete extends event

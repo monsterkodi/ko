@@ -7,7 +7,6 @@
 { fileName, unresolve, fileExists, setStyle, swapExt, keyinfo,
   clamp, drag, post, elem, error, log, str, $, _, fs, path
 }          = require 'kxk'
-split      = require '../split'
 watcher    = require './watcher'
 TextEditor = require './texteditor'
 syntax     = require './syntax'

@@ -20,7 +20,7 @@ FPS         = require '../tools/fps'
 encode      = require '../tools/encode'
 electron    = require 'electron'
 atomicFile  = require 'write-file-atomic'
-pkg         = require '../package.json'
+pkg         = require '../../package.json'
 
 remote      = electron.remote
 dialog      = remote.dialog
