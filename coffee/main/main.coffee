@@ -536,7 +536,7 @@ class Main
     # 000   000  000   000  000   000  000   000     000   
     # 000   000  0000000     0000000    0000000      000   
     
-    showAbout: -> about img: "#{__dirname}/../img/about.png", pkg: pkg, color: "#fff"   
+    showAbout: -> about img: "#{__dirname}/../../img/about.png", pkg: pkg, color: "#fff"   
             
 #  0000000   00000000   00000000         0000000   000   000
 # 000   000  000   000  000   000       000   000  0000  000

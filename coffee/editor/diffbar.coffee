@@ -15,16 +15,15 @@ class Diffbar
         @elem = elem 'canvas', class: 'gitdiff'
         @elem.style.position = 'absolute'
         @elem.style.left = '0'
-        @elem.style.top = '0'
+        @elem.style.top  = '0'
         @editor.view.appendChild @elem
         
         @editor.on 'viewHeight', @paint
-        @editor.on 'changed',    @update
         @editor.on 'file',       @update
+        @editor.on 'save',       @update
     
     update: =>
         if @editor.currentFile
-            # log '@editor.currentFile', @editor.currentFile
             forkfunc '../tools/gitdiff', @editor.currentFile, (err, @changes) =>
                 error "gitdiff failed: #{str err}" if err
                 @paint()

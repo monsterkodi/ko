@@ -213,6 +213,7 @@ saveFile = (file) ->
         if err?
             alert err
         else
+            editor.emit 'save'
             editor.setCurrentFile file
             post.toMain 'fileSaved', file, winID
             setState 'file', file

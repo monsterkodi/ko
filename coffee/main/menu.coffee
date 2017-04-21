@@ -81,6 +81,8 @@ class Menu
                 accelerator: 'Command+Shift+N'
                 click:       (i,win) -> post.toWin win.id, "cloneFile"
             ,
+                type: 'separator'
+            ,
                 label:       'Open...'
                 accelerator: 'CmdOrCtrl+O'
                 click:       (i,win) -> post.toWin win.id, "openFile"
@@ -92,6 +94,8 @@ class Menu
                 label:       'Open Recent'
                 submenu:     recent
             ,
+                type: 'separator'
+            ,
                 label:       'Save'
                 accelerator: 'Command+S'
                 click:       (i,win) -> post.toWin win.id, 'saveFile'
@@ -100,7 +104,6 @@ class Menu
                 accelerator: 'Command+Shift+S'
                 click:       (i,win) -> post.toWin win.id, 'saveFileAs'
             ,
-            
                 type: 'separator'
             ,
                 label:       'Reload'
