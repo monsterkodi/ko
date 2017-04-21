@@ -12,7 +12,7 @@ class Diffbar
 
     constructor: (@editor) ->
 
-        @elem = elem 'canvas', class: 'gitdiff'
+        @elem = elem 'canvas', class: 'diffbar'
         @elem.style.position = 'absolute'
         @elem.style.left = '0'
         @elem.style.top  = '0'
@@ -66,8 +66,7 @@ class Diffbar
         
         @updateMetas()
         
-        x  = 2
-        w  = 4
+        w  = 2
         h  = Math.min @editor.scroll.fullHeight, @editor.view.clientHeight
         lh = h / @editor.numLines()
 
@@ -86,17 +85,17 @@ class Diffbar
                 if change.mod?
                     o = change.mod.length
                     ctx.fillStyle = "rgba(0,255,0,#{alpha o})"
-                    ctx.fillRect x, li * lh, w, o * lh
+                    ctx.fillRect 0, li * lh, w, o * lh
                     li += o
                     
                 if change.del?
                     o = change.del.length
                     ctx.fillStyle = "rgba(255,0,0,#{alpha o})"
-                    ctx.fillRect x, li * lh, w, o * lh
+                    ctx.fillRect 0, li * lh, w, o * lh
                     
                 if change.add?
                     o = change.add.length
                     ctx.fillStyle = "rgba(128,128,255,#{alpha o})"
-                    ctx.fillRect x, li * lh, w, o * lh
+                    ctx.fillRect 0, li * lh, w, o * lh
         
 module.exports = Diffbar
