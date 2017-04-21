@@ -4,7 +4,7 @@
 # 000  000  0000  000       000   000
 # 000  000   000  000        0000000 
 
-{ shortCount, post, log, $, _
+{ shortCount, post, elem, log, $, _
 } = require 'kxk'
 
 class Info
@@ -23,42 +23,34 @@ class Info
         #    000     000   000  000      
         #    000      0000000   000      
         
-        @topline = document.createElement 'div'
-        @topline.className = "info-line top"
+        @topline = elem class: "info-line top"
         
-        @cursorColumn = document.createElement 'span'
-        @cursorColumn.className = "info-cursor-column"
+        @cursorColumn = elem 'span', class: "info-cursor-column"
         @cursorColumn.onclick = => @editor.focus() + @editor.singleCursorAtPos [0, @editor.cursorPos()[1]]
         @topline.appendChild @cursorColumn
 
-        @sticky = document.createElement 'span'
-        @sticky.className = "info-sticky empty"
+        @sticky = elem 'span', class: "info-sticky empty"
         @sticky.innerHTML = '○'
         @topline.appendChild @sticky
 
-        @cursors = document.createElement 'span'
-        @cursors.className = "info-cursors"
+        @cursors = elem 'span', class: "info-cursors"
         @cursors.onclick = => @editor.focus() + @editor.clearCursors()
         @topline.appendChild @cursors
         
-        @selecti = document.createElement 'span'
-        @selecti.className = "info-selections"
+        @selecti = elem 'span', class: "info-selections"
         @selecti.onclick = => @editor.focus() + @editor.selectNone()
         @topline.appendChild @selecti
 
-        @highlig = document.createElement 'span'
-        @highlig.className = "info-highlights"
+        @highlig = elem 'span', class: "info-highlights"
         @highlig.onclick = => @editor.focus() + @editor.clearHighlights()
         @topline.appendChild @highlig
         
-        @classes = document.createElement 'span'
-        @classes.className = "info-classes empty"
+        @classes = elem 'span', class: "info-classes empty"
         @classes.onclick = => @termCommand 'class'
         @topline.appendChild @classes
         post.on 'classesCount', (count) => @onClassesCount count
 
-        @funcs = document.createElement 'span'
-        @funcs.className = "info-funcs empty"
+        @funcs = elem 'span', class: "info-funcs empty"
         @funcs.onclick = => @termCommand 'func'
         @topline.appendChild @funcs
         post.on 'funcsCount', (count) => @onFuncsCount count
@@ -71,27 +63,22 @@ class Info
         # 000   000  000   000     000   
         # 0000000     0000000      000   
         
-        @botline = document.createElement 'div'
-        @botline.className = "info-line bot"
+        @botline = elem class: "info-line bot"
         
-        @cursorLine = document.createElement 'span'
-        @cursorLine.className = "info-cursor-line"
+        @cursorLine = elem 'span', class: "info-cursor-line"
         @cursorLine.onclick = => @editor.focus() + @editor.singleCursorAtPos [0, 0]
         @botline.appendChild @cursorLine
         
-        @lines = document.createElement 'span'
-        @lines.className = "info-lines"
+        @lines = elem 'span', class: "info-lines"
         @lines.onclick = => @editor.focus() + @editor.singleCursorAtPos [0, @editor.numLines()]
         @botline.appendChild @lines
 
-        @files = document.createElement 'span'
-        @files.className = "info-files"
+        @files = elem 'span', class: "info-files"
         @files.onclick = => @termCommand 'file'
         @botline.appendChild @files
         post.on 'filesCount', (count) => @onFilesCount count
         
-        @words = document.createElement 'span'
-        @words.className = "info-words empty"
+        @words = elem 'span', class: "info-words empty"
         @words.onclick = => @termCommand 'word'
         @botline.appendChild @words
         window.editor.autocomplete.on 'wordCount', @onWordCount # use post

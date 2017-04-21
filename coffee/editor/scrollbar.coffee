@@ -4,7 +4,7 @@
 #      000  000       000   000  000   000  000      000      000   000  000   000  000   000
 # 0000000    0000000  000   000   0000000   0000000  0000000  0000000    000   000  000   000
 
-{ stopEvent, clamp, drag, log
+{ stopEvent, elem, clamp, drag, log
 } = require 'kxk'
 
 class Scrollbar
@@ -12,12 +12,10 @@ class Scrollbar
     constructor: (@editor) ->
         @editor.scroll.on 'scroll', @update
 
-        @elem = document.createElement 'div'
-        @elem.className = 'scrollbar left'
+        @elem = elem class: 'scrollbar left'
         @editor.view.appendChild @elem
 
-        @handle = document.createElement 'div'
-        @handle.className = 'scrollhandle left'
+        @handle = elem class: 'scrollhandle left'
         @elem.appendChild @handle
 
         @drag = new drag

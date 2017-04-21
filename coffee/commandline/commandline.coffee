@@ -4,7 +4,7 @@
 # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 
-{ fileList, stopEvent, keyinfo, clamp, path, error, log, str, $, _
+{ fileList, stopEvent, elem, keyinfo, clamp, path, error, log, str, $, _
 }          = require 'kxk'
 TextEditor = require '../editor/texteditor'
 render     = require '../editor/render'
@@ -199,8 +199,7 @@ class Commandline extends TextEditor
     
     onCmmdClick: (event) =>
         if not @list?
-            @list = document.createElement 'div' 
-            @list.className = 'list commands'
+            @list = elem class: 'list commands'
             @positionList()
             window.split.elem.appendChild @list 
         @command?.hideList?()
@@ -218,8 +217,7 @@ class Commandline extends TextEditor
                 combo = cmmd.shortcuts[ci]
                 cname = cmmd.names[ci]
                 continue if cname in @hideCommands
-                div = document.createElement 'div'
-                div.className = "list-item"
+                div = elem class: "list-item"
                 namespan = "<span class=\"ko command #{cmmd.prefsID}\" style=\"position:absolute; left: #{ci > 0 and 40 or 6}px\">#{cname}</span>" 
                 shortcut = "<span class=\"ko shortcut #{cmmd.prefsID}\"style=\"position:absolute; right: 6px;\">#{keyinfo.short combo}</span>" 
                 div.innerHTML = namespan + shortcut

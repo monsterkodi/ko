@@ -4,7 +4,7 @@
 # 000  0000  000   000  000 0 000  000   000  000       000   000       000
 # 000   000   0000000   000   000  0000000    00000000  000   000  0000000 
 
-{ str, error, log, $, _
+{ str, elem, error, log, $, _
 }     = require 'kxk'
 event = require 'events'
 
@@ -73,18 +73,16 @@ class Numbers extends event
     # 00000000  000   000  000         0000000   0000000   00000000
         
     onLineExposed: (e) =>
-        # log "numbers.onLineExposed #{e.lineIndex}" if @editor.name == 'editor'
+        console.log 'onLineExposed', str e
         if e.lineIndex < @elem.firstChild?.lineIndex
             @elem.insertBefore @addLine(e.lineIndex), @elem.firstChild
         else if e.lineIndex > @elem.lastChild?.lineIndex or not @elem.lastChild?
             @elem.appendChild @addLine e.lineIndex
         else
-            # log "skip expose #{e.lineIndex}" if @editor.name == 'editor'
             return
         @updateColor e.lineIndex
 
     onLineInserted: (li, oi) =>
-        # log "numbers.onLineInserted #{li} #{oi}" if @editor.name == 'editor'
         top = @editor.scroll.exposeTop
         bot = @editor.scroll.exposeBot
         if top <= oi <= bot
@@ -101,8 +99,6 @@ class Numbers extends event
             i = top+@elem.children.length
             @elem.appendChild @addLine i
             @updateColor i
-        # else 
-            # log 'line outside top bot', top, oi, bot
                     
     # 000   000   0000000   000   000  000   0000000  000   000
     # 000   000  000   000  0000  000  000  000       000   000
@@ -117,8 +113,6 @@ class Numbers extends event
             @elem.firstChild.remove()
         else if @elem.lastChild?.lineIndex >= e.lineIndex
             @elem.lastChild.remove()
-        # else
-            # log "vanish? #{@editor.name} #{e.lineIndex} #{@elem.firstChild.lineIndex} #{@elem.lastChild.lineIndex}" if @editor.name != 'logview'
     
     onLineDeleted: (li) =>
         top = @editor.scroll.exposeTop
@@ -139,16 +133,13 @@ class Numbers extends event
     # 000   000  000   000  000   000  000      000  000  0000  000     
     # 000   000  0000000    0000000    0000000  000  000   000  00000000
     
-    divForLine: (li) ->
-        div = document.createElement "div"
-        div.className = "linenumber"        
+    divForLine: (li) ->        
+        div = elem class: "linenumber", child: elem "span", text: "#{li+1}"
         div.lineIndex = li
-        pre = document.createElement "span"
-        pre.textContent = "#{li+1}"
-        div.appendChild pre
-        div        
-    
+        div
+        
     addLine: (li) ->
+        console.log 'addLine', li
         div = @divForLine li
         @emit 'numberAdded', 
             numberDiv:  div 

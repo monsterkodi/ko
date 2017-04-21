@@ -4,8 +4,8 @@
 # 000   000  000   000     000     000   000  000       000   000  000 0 000  000        000      000          000     000     
 # 000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
 
-{clamp, post, error, log, $, _} = require 'kxk'
-
+{clamp, post, elem, error, log, $, _
+}        = require 'kxk'
 Indexer  = require '../main/indexer'
 event    = require 'events'
 
@@ -82,8 +82,7 @@ class Autocomplete extends event
             error "Autocomplete.open -- no cursor?"
             return
 
-        @span = document.createElement 'span'
-        @span.className = 'autocomplete-span'
+        @span = elem 'span', class: 'autocomplete-span'
         @span.textContent = @completion
         @span.style.opacity    = 1
         @span.style.background = "#44a"
@@ -122,11 +121,9 @@ class Autocomplete extends event
             log "warning! no sp? #{cr.left} #{cr.top}"
         
         if @matchList.length
-            @list = document.createElement 'div'
-            @list.className = 'autocomplete-list'
+            @list = elem class: 'autocomplete-list'
             for m in @matchList
-                item = document.createElement 'div'
-                item.className = 'autocomplete-item'
+                item = elem class: 'autocomplete-item'
                 item.textContent = m
                 @list.appendChild item
             cursor.appendChild @list

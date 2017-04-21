@@ -4,7 +4,7 @@
 # 000   000  000  000       000       000   000  000   000  000   000
 # 0000000    000  000       000       0000000    000   000  000   000
 
-{ elem, elem, str, error, log, 
+{ elem, str, error, log, 
 }        = require 'kxk'
 forkfunc = require 'fork-func'
 

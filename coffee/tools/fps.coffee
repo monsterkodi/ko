@@ -5,7 +5,7 @@
 #   000       000             000
 #   000       000        0000000 
 
-{ clamp, log, $
+{ clamp, elem, log, $
 }   = require 'kxk'
 now = require 'performance-now'
 
@@ -13,14 +13,10 @@ class FPS
 
     constructor: () ->
                     
-        @elem = document.createElement 'div'
-        @elem.className = 'fps'
+        @elem = elem class: 'fps'
         @elem.style.display = 'none'
 
-        @canvas = document.createElement 'canvas'
-        @canvas.className = "fpsCanvas"
-        @canvas.height = 30*2
-        @canvas.width = 130*2
+        @canvas = elem 'canvas', class: "fpsCanvas", width: 30*2, height: 130*2 
         @elem.appendChild @canvas
 
         y = parseInt  -30/2

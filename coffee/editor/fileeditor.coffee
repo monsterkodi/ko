@@ -5,7 +5,7 @@
 # 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000  
 
 { fileName, unresolve, fileExists, setStyle, swapExt, keyinfo,
-  clamp, drag, post, elem, error, log, str, $, _, fs, path
+  clamp, drag, post, error, log, str, $, _, fs, path
 }          = require 'kxk'
 watcher    = require './watcher'
 TextEditor = require './texteditor'

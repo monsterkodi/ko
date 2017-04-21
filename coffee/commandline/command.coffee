@@ -4,7 +4,7 @@
 # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
 
-{ clamp, prefs, error, log, _
+{ clamp, prefs, elem, error, log, _
 }           = require 'kxk'
 Syntax      = require '../editor/syntax'
 CommandList = require './commandlist'
@@ -117,8 +117,7 @@ class Command
 
     showList: ->
         if not @commandList?
-            listView = document.createElement 'div' 
-            listView.className = "commandlist #{@prefsID}"
+            listView = elem class: "commandlist #{@prefsID}"
             window.split.elem.appendChild listView
             @commandList = new CommandList '.commandlist', syntax: @syntaxName
     

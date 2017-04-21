@@ -4,7 +4,7 @@
 # 000   000  000       000  0000  000   000  000       000   000
 # 000   000  00000000  000   000  0000000    00000000  000   000
 
-{str, log,
+{str, elem, log,
 }      = require 'kxk'
 encode = require '../tools/encode'
 
@@ -29,14 +29,13 @@ class Render
         
     @lineDiv: (y, diss, size) ->
         
-        div = document.createElement 'div'
-        div.className = 'line'
+        div = elem class: 'line'
         div.style.height = "#{size.lineHeight}px"
         div.style.transform = "translate(#{size.offsetX}px,#{y}px)"
         
         if diss?.length
             for d in diss
-                span = document.createElement 'span'
+                span = elem 'span'
                 span.style.transform = "translatex(#{d.start * size.charWidth}px)"
                 span.className = d.clss if d.clss?
                 span.textContent = d.match
