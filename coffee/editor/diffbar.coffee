@@ -22,6 +22,25 @@ class Diffbar
         @editor.on 'file',       @update
         @editor.on 'save',       @update
     
+    updateMetas: ->
+        @editor.meta.clear()
+        return if not @changes
+        log @changes
+        for change in @changes.changes
+            li = change.line-1
+            if change.new
+                for line in change.new
+                    meta = 
+                        line: li
+                        clss: 'git mod'
+                    @editor.meta.addDiffMeta meta
+                    li++
+            else
+                meta = 
+                    line: li
+                    clss: 'git del'
+                @editor.meta.addDiffMeta meta            
+
     update: =>
         if @editor.currentFile
             forkfunc '../tools/gitdiff', @editor.currentFile, (err, @changes) =>
@@ -32,6 +51,7 @@ class Diffbar
             @paint()
             
     paint: =>
+        @updateMetas()
         x = 2
         w = 4
         h = Math.min @editor.scroll.fullHeight, @editor.view.clientHeight

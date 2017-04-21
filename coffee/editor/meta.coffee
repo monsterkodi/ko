@@ -120,6 +120,12 @@ class Meta
                     e.numberSpan.innerHTML = num
                 else
                     e.numberSpan.innerHTML = '&nbsp;'
+                    
+    setMetaPos: (meta, tx, ty) ->
+        if meta[2].diff
+            meta[2].div?.style.transform = "translateY(#{ty}px)"        
+        else
+            meta[2].div?.style.transform = "translate(#{tx}px,#{ty}px)"        
 
     # 0000000    000  000   000
     # 000   000  000  000   000
@@ -128,7 +134,7 @@ class Meta
     # 0000000    000      0    
 
     addDiv: (meta) ->
-        
+        # console.log 'addDiv', meta
         size = @editor.size
         sw = size.charWidth * (meta[1][1]-meta[1][0])
         tx = size.charWidth *  meta[1][0] + size.offsetX
@@ -136,24 +142,40 @@ class Meta
         lh = size.lineHeight
         
         div = elem class: "meta #{meta[2].clss ? ''}"
-        div.style.transform = "translate(#{tx}px,#{ty}px)"
-        div.style.width = "#{sw}px"
-        div.style.height = "#{lh}px"
-        if meta[2].href?
-            div.addEventListener 'mousedown', @onClick
-            div.href = meta[2].href
-            div.classList.add 'href'
-        else if meta[2].cmmd?
-            div.addEventListener 'mousedown', @onClick
-            div.cmmd = meta[2].cmmd
-            div.classList.add 'cmmd'
-        else if meta[2].list?
-            div.addEventListener 'mousedown', @onClick
-            div.list = meta[2].list
-            div.classList.add 'cmmd'
-        @elem.appendChild div
         meta[2].div = div
+        div.style.height = "#{lh}px"  
+        
+        @setMetaPos meta, tx, ty
+
+        if not meta[2].diff
+            div.style.width = "#{sw}px"
+            if meta[2].href?
+                div.addEventListener 'mousedown', @onClick
+                div.href = meta[2].href
+                div.classList.add 'href'
+            else if meta[2].cmmd?
+                div.addEventListener 'mousedown', @onClick
+                div.cmmd = meta[2].cmmd
+                div.classList.add 'cmmd'
+            else if meta[2].list?
+                div.addEventListener 'mousedown', @onClick
+                div.list = meta[2].list
+                div.classList.add 'cmmd'
+            
+        @elem.appendChild div
     
+    # 0000000    000  00000000  00000000  
+    # 000   000  000  000       000       
+    # 000   000  000  000000    000000    
+    # 000   000  000  000       000       
+    # 0000000    000  000       000       
+    
+    addDiffMeta: (meta) ->
+        meta.diff = true
+        lineMeta = [meta.line, [0, 0], meta]
+        @metas.push lineMeta
+        @addDiv lineMeta
+
     #  0000000  000      000   0000000  000   000
     # 000       000      000  000       000  000 
     # 000       000      000  000       0000000  
@@ -216,7 +238,7 @@ class Meta
         for meta in rangesFromTopToBotInRanges li, @editor.scroll.exposeBot, @metas
             tx = size.charWidth *  meta[1][0] + size.offsetX
             ty = size.lineHeight * (meta[0] - @editor.scroll.exposeTop)
-            meta[2].div?.style.transform = "translate(#{tx}px,#{ty}px)"        
+            @setMetaPos meta, tx, ty
         
     onLineInserted: (li) => 
         

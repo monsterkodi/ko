@@ -21,7 +21,7 @@ class FileEditor extends TextEditor
         window.split.on 'commandline', @onCommandline
         post.on 'jumpTo', @jumpTo
         @fontSizeDefault = 16
-        super viewElem, features: ['Diffbar', 'Scrollbar', 'Numbers', 'Minimap', 'Autocomplete', 'Brackets', 'Strings']        
+        super viewElem, features: ['Diffbar', 'Scrollbar', 'Numbers', 'Minimap', 'Meta', 'Autocomplete', 'Brackets', 'Strings']        
         @setText ''
                     
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  

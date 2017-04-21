@@ -73,7 +73,6 @@ class Numbers extends event
     # 00000000  000   000  000         0000000   0000000   00000000
         
     onLineExposed: (e) =>
-        console.log 'onLineExposed', str e
         if e.lineIndex < @elem.firstChild?.lineIndex
             @elem.insertBefore @addLine(e.lineIndex), @elem.firstChild
         else if e.lineIndex > @elem.lastChild?.lineIndex or not @elem.lastChild?
@@ -139,7 +138,6 @@ class Numbers extends event
         div
         
     addLine: (li) ->
-        console.log 'addLine', li
         div = @divForLine li
         @emit 'numberAdded', 
             numberDiv:  div 
