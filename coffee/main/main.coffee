@@ -239,7 +239,6 @@ class Main
             if w == win
                 i = 1 + allWindows.indexOf w
                 i = 0 if i >= allWindows.length
-                log 'activateWindowWithID', i
                 @activateWindowWithID allWindows[i].id
                 return w
         null
@@ -251,7 +250,6 @@ class Main
             if w == win
                 i = -1 + allWindows.indexOf w
                 i = allWindows.length-1 if i < 0
-                log 'activateWindowWithID', i
                 @activateWindowWithID allWindows[i].id
                 return w
         null

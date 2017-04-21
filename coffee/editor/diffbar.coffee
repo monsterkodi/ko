@@ -25,17 +25,29 @@ class Diffbar
     updateMetas: ->
         @editor.meta.clear()
         return if not @changes
-        log @changes
+        log @changes.length, @changes
+        
         for change in @changes.changes
+            
             li = change.line-1
-            if change.new
-                for line in change.new
+            
+            if change.mod?
+                for mod in change.mod
                     meta = 
                         line: li
                         clss: 'git mod'
                     @editor.meta.addDiffMeta meta
                     li++
-            else
+                    
+            if change.add?
+                for add in change.add
+                    meta = 
+                        line: li
+                        clss: 'git add'
+                    @editor.meta.addDiffMeta meta            
+                    li++
+                    
+            else if change.del?
                 meta = 
                     line: li
                     clss: 'git del'
@@ -51,27 +63,40 @@ class Diffbar
             @paint()
             
     paint: =>
+        
         @updateMetas()
-        x = 2
-        w = 4
-        h = Math.min @editor.scroll.fullHeight, @editor.view.clientHeight
+        
+        x  = 2
+        w  = 4
+        h  = Math.min @editor.scroll.fullHeight, @editor.view.clientHeight
         lh = h / @editor.numLines()
 
         ctx = @elem.getContext '2d'
-        @elem.width = w
+        @elem.width  = w
         @elem.height = h
-        return if not @changes
-        # log 'paint', @changes, w, h
-        for change in @changes.changes
-            li = change.line - 1
-            if change.new?
-                if change.old?
-                    ctx.fillStyle = 'rgba(100,100,200,1)'
-                else
-                    ctx.fillStyle = 'rgba(0,100,0,1)'
-                ctx.fillRect x, li * lh, w, change.new.length * lh
-            else
-                ctx.fillStyle = 'rgba(255,155,0,1)'
-                ctx.fillRect x, li * lh, w, lh                    
+        
+        alpha = (o) -> 0.2 + Math.max 0, (16-o*lh)*(0.8/16)
+
+        if @changes
+
+            for change in @changes.changes
+                
+                li = change.line - 1
+                
+                if change.mod?
+                    o = change.mod.length
+                    ctx.fillStyle = "rgba(0,255,0,#{alpha o})"
+                    ctx.fillRect x, li * lh, w, o * lh
+                    li += o
+                    
+                if change.del?
+                    o = change.del.length
+                    ctx.fillStyle = "rgba(255,0,0,#{alpha o})"
+                    ctx.fillRect x, li * lh, w, o * lh
+                    
+                if change.add?
+                    o = change.add.length
+                    ctx.fillStyle = "rgba(128,128,255,#{alpha o})"
+                    ctx.fillRect x, li * lh, w, o * lh
         
 module.exports = Diffbar
