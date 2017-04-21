@@ -4,7 +4,7 @@
 #      000     000     000  0000     000     000   000   000 000 
 # 0000000      000     000   000     000     000   000  000   000
 
-{log, elem, fs, noon, path, $, _
+{ log, elem, fs, noon, path, $, _
 }      = require 'kxk'
 encode = require '../tools/encode'
 matchr = require '../tools/matchr'

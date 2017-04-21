@@ -22,7 +22,7 @@ module.exports = (file) ->
         log "error #{err}"
         return error: err
     
-    info  = changes:[]
+    info  = file:file, changes:[]
     lines = (chalk.stripColor l for l in result.split '\n')
 
     while line = lines.shift()

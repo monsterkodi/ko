@@ -56,9 +56,11 @@ class Diffbar
     update: =>
         
         if @editor.currentFile
-            forkfunc '../tools/gitdiff', @editor.currentFile, (err, @changes) =>
+            forkfunc '../tools/gitdiff', @editor.currentFile, (err, changes) =>
                 error "gitdiff failed: #{str err}" if err
-                @paint()
+                if changes.file == @editor.currentFile
+                    @changes = changes
+                    @paint()
         else
             @changes = null
             @paint()
