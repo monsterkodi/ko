@@ -1,15 +1,15 @@
-# 00     00   0000000   000  000   000  00     00  00000000  000   000  000   000
-# 000   000  000   000  000  0000  000  000   000  000       0000  000  000   000
-# 000000000  000000000  000  000 0 000  000000000  0000000   000 0 000  000   000
-# 000 0 000  000   000  000  000  0000  000 0 000  000       000  0000  000   000
-# 000   000  000   000  000  000   000  000   000  00000000  000   000   0000000 
+# 00     00  00000000  000   000  000   000
+# 000   000  000       0000  000  000   000
+# 000000000  0000000   000 0 000  000   000
+# 000 0 000  000       000  0000  000   000
+# 000   000  00000000  000   000   0000000 
 
 { unresolve, prefs, fs, post, path, log
 }     = require 'kxk'
-pkg   = require '../package.json'
-Menu  = require('electron').Menu
+pkg   = require '../../package.json'
+AppMenu = require('electron').Menu
 
-class MainMenu
+class Menu
     
     @init: (main) ->
         
@@ -31,9 +31,9 @@ class MainMenu
                 label: 'Clear List'
                 click: (i) ->
                     prefs.set 'recentFiles', []
-                    MainMenu.init main
+                    Menu.init main
 
-        Menu.setApplicationMenu Menu.buildFromTemplate [
+        AppMenu.setApplicationMenu AppMenu.buildFromTemplate [
             
             # 000   000   0000000 
             # 000  000   000   000
@@ -174,4 +174,4 @@ class MainMenu
             submenu: []            
         ]
 
-module.exports = MainMenu
+module.exports = Menu

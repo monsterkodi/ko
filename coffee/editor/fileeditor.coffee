@@ -4,8 +4,8 @@
 # 000       000  000      000             000       000   000  000     000     000   000  000   000  
 # 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000  
 
-{fileName, unresolve, fileExists, setStyle, swapExt, keyinfo,
-clamp, drag, post, error, log, $, _, fs, path
+{ fileName, unresolve, fileExists, setStyle, swapExt, keyinfo,
+  clamp, drag, post, elem, error, log, str, $, _, fs, path
 }          = require 'kxk'
 split      = require '../split'
 watcher    = require './watcher'
@@ -22,7 +22,7 @@ class FileEditor extends TextEditor
         window.split.on 'commandline', @onCommandline
         post.on 'jumpTo', @jumpTo
         @fontSizeDefault = 16
-        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Autocomplete', 'Brackets', 'Strings']        
+        super viewElem, features: ['Diffbar', 'Scrollbar', 'Numbers', 'Minimap', 'Autocomplete', 'Brackets', 'Strings']        
         @setText ''
                     
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
@@ -52,11 +52,6 @@ class FileEditor extends TextEditor
     # 000       000  000      000     
     # 000       000  0000000  00000000
 
-    stopWatcher: ->
-        if @watch?
-            @watch?.stop()
-            @watch = null
-
     setCurrentFile: (file, opt) -> 
                 
         @dirty = false
@@ -71,15 +66,22 @@ class FileEditor extends TextEditor
         @currentFile = file
         @do.reset()
         @updateTitlebar()
+        @setupFileType()
+        
         if file?
             @watch = new watcher @
             @setText fs.readFileSync file, encoding: 'utf8'
+            @restoreScrollCursorsAndSelections()
         else
             @watch = null
             @setLines []
-        @setupFileType()
+            
+        @emit 'file', @currentFile
 
-        @restoreScrollCursorsAndSelections() if file
+    stopWatcher: ->
+        if @watch?
+            @watch?.stop()
+            @watch = null
                     
     # 000000000  000  000000000  000      00000000  0000000     0000000   00000000 
     #    000     000     000     000      000       000   000  000   000  000   000

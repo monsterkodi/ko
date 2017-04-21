@@ -4,7 +4,7 @@
 # 000 0 000  000  000  0000  000  000 0 000  000   000  000      
 # 000   000  000  000   000  000  000   000  000   000  000      
 
-{ getStyle, clamp, drag, log, str
+{ getStyle, clamp, elem, drag, log, str
 }       = require 'kxk'
 profile = require '../tools/profile'
 scroll  = require './scroll'
@@ -18,39 +18,25 @@ class Minimap
         @height = 8192
         @offsetLeft = 6
             
-        @elem = document.createElement 'div'
-        @elem.className = 'minimap'
+        @elem = elem class: 'minimap'
 
-        @topbot = document.createElement 'div'
-        @topbot.className = "topbot"
+        @topbot = elem class: 'topbot'
         @elem.appendChild @topbot
 
-        @selecti = document.createElement 'canvas'
-        @selecti.className = "minimapSelections"
-        @selecti.height    = @height
-        @selecti.width     = @width
+        @selecti = elem 'canvas', class: 'minimapSelections', width: @width, height: @height
         @elem.appendChild @selecti
 
-        @lines = document.createElement 'canvas'
-        @lines.className = "minimapLines"
-        @lines.height    = @height
-        @lines.width     = @width
-            
-        @elem.addEventListener 'wheel', @editor.scrollbar?.onWheel
+        @lines = elem 'canvas', class: 'minimapLines', width: @width, height: @height
         @elem.appendChild @lines
 
-        @highlig = document.createElement 'canvas'
-        @highlig.className = "minimapHighlights"
-        @highlig.height    = @height
-        @highlig.width     = @width
+        @highlig = elem 'canvas', class: 'minimapHighlights', width: @width, height: @height
         @elem.appendChild @highlig
 
-        @cursors = document.createElement 'canvas'
-        @cursors.className = "minimapCursors"
-        @cursors.height    = @height
-        @cursors.width     = @width
+        @cursors = elem 'canvas', class: 'minimapCursors', width: @width, height: @height
         @elem.appendChild @cursors
 
+        @elem.addEventListener 'wheel', @editor.scrollbar?.onWheel
+        
         @editor.view.appendChild    @elem
         @editor.on 'viewHeight',    @onEditorViewHeight
         @editor.on 'numLines',      @onEditorNumLines

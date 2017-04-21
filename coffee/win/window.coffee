@@ -8,16 +8,16 @@
 sw,sh, prefs, drag, pos, str, os, fs, post, path, error, log, $, _
 }           = require 'kxk'
 Split       = require './split'
-FileEditor  = require './editor/fileeditor'
-Area        = require './area/area'
-Commandline = require './commandline/commandline'
 Terminal    = require './terminal'
-LogView     = require './logview'
 Titlebar    = require './titlebar'
-Navigate    = require './navigate'
-FPS         = require './tools/fps'
-Info        = require './editor/info'
-encode      = require './tools/encode'
+LogView     = require './logview'
+Area        = require '../area/area'
+Info        = require '../editor/info'
+FileEditor  = require '../editor/fileeditor'
+Commandline = require '../commandline/commandline'
+Navigate    = require '../main/navigate'
+FPS         = require '../tools/fps'
+encode      = require '../tools/encode'
 electron    = require 'electron'
 atomicFile  = require 'write-file-atomic'
 pkg         = require '../package.json'
@@ -257,8 +257,7 @@ loadFile = (file, opt={}) ->
         # log 'loadFile', file, editor.currentFile, opt
         
         if not fileExists file
-            error "window.loadFile -- no such file:", file
-            return
+            return error "window.loadFile -- no such file:", file
             
         if not opt?.dontSave then saveChanges()            
             

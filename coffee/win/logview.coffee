@@ -6,7 +6,7 @@
 
 { post, log, $
 }          = require 'kxk'
-TextEditor = require './editor/texteditor'
+TextEditor = require '../editor/texteditor'
 
 class LogView extends TextEditor
 

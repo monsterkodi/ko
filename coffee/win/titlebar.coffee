@@ -6,8 +6,8 @@
 
 { packagePath, unresolve, stopEvent, clamp, post, path, log, $
 }        = require 'kxk'
-render   = require './editor/render'
-syntax   = require './editor/syntax'
+render   = require '../editor/render'
+syntax   = require '../editor/syntax'
 
 class Titlebar
     

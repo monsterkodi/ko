@@ -6,7 +6,7 @@
 
 { packagePath, fileExists, unresolve, fileName, resolve, post, path, fs, log, _
 }        = require 'kxk'
-Walker   = require './tools/walker'
+Walker   = require '../tools/walker'
 electron = require 'electron'
 
 BrowserWindow = electron.BrowserWindow

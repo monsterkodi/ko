@@ -143,7 +143,7 @@ module.exports =
                         @do.change ns[0], @do.line(ns[0]).splice sr[1][1]-1, 1, '"'
                         
             else if @fileType == 'coffee' and cl == '(' and lengthOfRange(ns) > 0 # remove space after callee
-                [before, after] = @splitStateLineAtPos @do, ns
+                [before, after] = @splitStateLineAtPos @do, rangeStartPos ns
                 trimmed = before.trimRight()
                 beforeGood = /\w$/.test(trimmed) and not /(if|when|in|and|or|is|not|else|return)$/.test trimmed
                 afterGood = after.trim().length and not after.startsWith ' '

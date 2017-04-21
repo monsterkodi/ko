@@ -7,15 +7,15 @@
 { splitFilePos, fileExists, dirExists, fileList, resolve,
   childp, about, prefs, store, noon, post, fs, str, error, log, _
 }             = require 'kxk'
-pkg           = require '../package.json'
+pkg           = require '../../package.json'
 Execute       = require './execute'
 Navigate      = require './navigate'
 Indexer       = require './indexer'
-MainMenu      = require './mainmenu'
+Menu          = require './menu'
 colors        = require 'colors'
 electron      = require 'electron'
 
-{ BrowserWindow, Tray, Menu, app, clipboard, dialog        
+{ BrowserWindow, Tray, app, clipboard, dialog        
 }             = electron
 disableSnap   = false
 main          = undefined # < created in app.on 'ready'
@@ -147,12 +147,12 @@ class Main
             app.exit 0
             return
 
-        MainMenu.init @
+        # Menu.init @
 
         @indexer      = new Indexer
         coffeeExecute = new Execute main: @
 
-        tray = new Tray "#{__dirname}/../img/menu.png"
+        tray = new Tray "#{__dirname}/../../img/menu.png"
         tray.on 'click', @toggleWindows
                                 
         app.setName pkg.productName
@@ -175,7 +175,7 @@ class Main
         if args.DevTools
             wins()?[0]?.webContents.openDevTools()
 
-        MainMenu.init @
+        Menu.init @
 
         setTimeout @showWindows, 10
         
@@ -432,7 +432,7 @@ class Main
             titleBarStyle:   'hidden'
 
         #win.webContents.openDevTools()
-        win.loadURL "file://#{__dirname}/index.html"
+        win.loadURL "file://#{__dirname}/../index.html"
         app.dock.show()
         win.on 'close',  @onCloseWin
         win.on 'resize', @onResizeWin

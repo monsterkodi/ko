@@ -4,7 +4,7 @@
 # 000       000   000  000     000     000   000  000   000
 # 00000000  0000000    000     000      0000000   000   000
 
-{ fileList, extName, clamp, path, str, log, $, _
+{ fileList, extName, clamp, path, str, error, log, $, _
 }       = require 'kxk'
 Buffer  = require './buffer'
 Syntax  = require './syntax'
@@ -143,7 +143,9 @@ class Editor extends Buffer
             @textInRanges @rangesForCursorLines()
 
     splitStateLineAtPos: (state, pos) ->
-        l = state.line pos[1] 
+        l = state.line pos[1]
+        error "no line at pos #{pos}?" if not l?
+        return ['',''] if not l?
         [l.slice(0, pos[0]), l.slice(pos[0])]
                 
     # 00000000  00     00  000  000000000       00000000  0000000    000  000000000

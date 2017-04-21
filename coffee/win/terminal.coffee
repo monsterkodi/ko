@@ -6,10 +6,10 @@
 
 { error, log, _
 }          = require 'kxk'
-salt       = require './tools/salt'
-TextEditor = require './editor/texteditor'
-syntax     = require './editor/syntax'
-ansiDiss   = require './tools/ansidiss'
+salt       = require '../tools/salt'
+TextEditor = require '../editor/texteditor'
+syntax     = require '../editor/syntax'
+ansiDiss   = require '../tools/ansidiss'
 
 class Terminal extends TextEditor
 
