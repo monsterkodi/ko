@@ -135,11 +135,6 @@ class Command
         @execute @commandList.line(index)
     
     onBot: (bot) => 
-        cl = window.split.commandlineHeight + window.split.handleHeight
-        if bot < cl
-            @commandList?.view.style.opacity = "#{clamp 0, 1, bot/cl}"
-        else
-            @commandList?.view.style.opacity = "1"
         @positionList()
     
     positionList: ->

@@ -50,6 +50,7 @@ class Commandline extends TextEditor
     # 0000000      000     000   000     000     00000000  
     
     saveState: ->
+        
         if @command?
             state = @command.state()
             # log 'saveState', state
@@ -77,6 +78,7 @@ class Commandline extends TextEditor
     # 0000000   0000000   000   000  0000000  
     
     loadCommands: ->
+        
         files = fileList "#{__dirname}/../commands"
         for file in files
             continue if path.extname(file) != '.js'
@@ -89,19 +91,23 @@ class Commandline extends TextEditor
                 if err then error "can't load command from file '#{file}': #{err}"
             
     setName: (name) -> 
+        
         @cmmd.innerHTML = name
         @layers.style.width = @view.style.width
                 
     setLines: (l) ->
+        
         @scroll.reset()
         super l
     
     setAndSelectText: (t) ->
+        
         @setLines [t ? '']
         @selectAll()
         @selectSingleRange @rangeForLineAtIndex 0
 
     setText: (t) ->
+        
         @setLines [t ? '']
         @singleCursorAtPos [@line(0).length, 0]
         @saveState()
@@ -113,6 +119,7 @@ class Commandline extends TextEditor
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
 
     changed: (changeInfo) ->
+        
         @hideList()
         super changeInfo
         if changeInfo.changes.length
@@ -120,14 +127,8 @@ class Commandline extends TextEditor
             @command?.changed @line(0)
         
     onSplit: (s) => 
+        
         @command?.onBot? s[1]
-        
-        cl = window.split.commandlineHeight + window.split.handleHeight
-        if s[1] < cl
-            @list?.style.opacity = "#{clamp 0, 1, s[1]/cl}"
-        else
-            @list?.style.opacity = "1"
-        
         @positionList()
     
     # 00000000  000  000      00000000        000       0000000    0000000   0000000    00000000  0000000  
@@ -137,6 +138,7 @@ class Commandline extends TextEditor
     # 000       000  0000000  00000000        0000000   0000000   000   000  0000000    00000000  0000000  
     
     fileLoaded: (file) ->
+        
         if not @command?
             @command = @commands['open']
             @command.loadState()
@@ -148,7 +150,8 @@ class Commandline extends TextEditor
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
     
-    startCommand: (name, combo, event) ->  
+    startCommand: (name, combo, event) -> 
+        
         stopEvent event
 
         r = @command?.cancel combo
@@ -181,6 +184,7 @@ class Commandline extends TextEditor
     # 000   000  00000000  0000000    0000000   0000000     000     0000000   
     
     results: (r) ->
+        
         @setName r.name if r?.name?
         @setText r.text if r?.text?
         if r?.select then @selectAll() else @selectNone()
@@ -198,6 +202,7 @@ class Commandline extends TextEditor
     # 0000000  000  0000000      000   
     
     onCmmdClick: (event) =>
+        
         if not @list?
             @list = elem class: 'list commands'
             @positionList()
@@ -209,6 +214,7 @@ class Commandline extends TextEditor
         stopEvent event
 
     listCommands: ->
+        
         @list.innerHTML = ""        
         @list.style.display = 'unset'
         for name in @mainCommands
@@ -229,6 +235,7 @@ class Commandline extends TextEditor
                 @list.appendChild div
 
     hideList: ->
+        
         @list?.remove()
         @list = null
         
@@ -239,6 +246,7 @@ class Commandline extends TextEditor
     # 000         0000000   0000000   000     000     000   0000000   000   000  
     
     positionList: ->
+        
         return if not @list?
         listHeight = @list.getBoundingClientRect().height
         flex = window.split.flex
@@ -250,11 +258,13 @@ class Commandline extends TextEditor
         @list?.style.top = "#{listTop}px"        
     
     resized: -> 
+        
         @list?.resized?()
         @command?.commandList?.resized()
         super
 
     focusTerminal: ->
+        
         if window.terminal.numLines() == 0
             window.terminal.singleCursorAtPos [0,0]
         window.split.do "focus terminal"
@@ -266,6 +276,7 @@ class Commandline extends TextEditor
     # 000   000  00000000     000   
 
     globalModKeyComboEvent: (mod, key, combo, event) ->
+        
         for n,c of @commands            
             if combo == 'esc'
                 if document.activeElement == @view
@@ -276,7 +287,7 @@ class Commandline extends TextEditor
         return 'unhandled'            
 
     handleModKeyComboEvent: (mod, key, combo, event) ->
-        # log "Commandline.handleModKeyComboEvent mod:#{mod} key:#{key} combo:#{combo}"
+        
         if @command?
             return if @command.handleModKeyComboEvent(mod, key, combo, event) != 'unhandled'
 

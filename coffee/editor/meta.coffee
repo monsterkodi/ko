@@ -119,7 +119,10 @@ class Meta
                     num = '?' if not num 
                     e.numberSpan.innerHTML = num
                 else
-                    e.numberSpan.innerHTML = '&nbsp;'
+                    if meta[2].diff
+                        e.numberSpan.innerHTML = meta[2].line
+                    else
+                        e.numberSpan.innerHTML = '&nbsp;'
                     
     setMetaPos: (meta, tx, ty) ->
         if meta[2].diff
@@ -134,7 +137,7 @@ class Meta
     # 0000000    000      0    
 
     addDiv: (meta) ->
-        # console.log 'addDiv', meta
+        
         size = @editor.size
         sw = size.charWidth * (meta[1][1]-meta[1][0])
         tx = size.charWidth *  meta[1][0] + size.offsetX
@@ -228,6 +231,7 @@ class Meta
             @addDiv meta
         
     onLinesExposed: (e) => 
+        
         @updatePositionsBelowLineIndex e.top
         
     onExposeTopChanged: (e) => @updatePositionsBelowLineIndex e.new
@@ -270,6 +274,7 @@ class Meta
         for meta in @metasAtLineIndex e.lineIndex
             meta[2].div?.remove()
             meta[2].div = null
+            
         @updatePositionsBelowLineIndex e.lineIndex
     
     #  0000000  000      00000000   0000000   00000000 

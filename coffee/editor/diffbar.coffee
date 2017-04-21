@@ -23,9 +23,9 @@ class Diffbar
         @editor.on 'save',       @update
     
     updateMetas: ->
+        
         @editor.meta.clear()
         return if not @changes
-        log @changes.length, @changes
         
         for change in @changes.changes
             
@@ -54,6 +54,7 @@ class Diffbar
                 @editor.meta.addDiffMeta meta            
 
     update: =>
+        
         if @editor.currentFile
             forkfunc '../tools/gitdiff', @editor.currentFile, (err, @changes) =>
                 error "gitdiff failed: #{str err}" if err
@@ -74,7 +75,7 @@ class Diffbar
         @elem.width  = w
         @elem.height = h
         
-        alpha = (o) -> 0.2 + Math.max 0, (16-o*lh)*(0.8/16)
+        alpha = (o) -> 0.5 + Math.max 0, (16-o*lh)*(0.5/16)
 
         if @changes
 
@@ -95,7 +96,7 @@ class Diffbar
                     
                 if change.add?
                     o = change.add.length
-                    ctx.fillStyle = "rgba(128,128,255,#{alpha o})"
+                    ctx.fillStyle = "rgba(160,160,255,#{alpha o})"
                     ctx.fillRect 0, li * lh, w, o * lh
         
 module.exports = Diffbar

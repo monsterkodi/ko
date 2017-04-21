@@ -31,7 +31,15 @@ class Row
     # 000   000  000          000     000     000     000   000     000     000       
     # 000   000   0000000     000     000      0      000   000     000     00000000  
     
-    activate: =>
+    activate: (event) =>
+        
+        if event?.altKey
+            if @item.type == 'file' and @item.textFile
+                post.emit 'jumpTo', file:@item.abs, sameWindow:true
+            else
+                post.emit 'jumpTo', word:@item.name
+            return
+            
         $('.hover')?.classList.remove 'hover'
         @setActive emit:true
         switch @item.type
