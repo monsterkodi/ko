@@ -4,10 +4,11 @@
 #    000     000   000  000   000
 #    000     000   000  0000000  
 
-{ packagePath, elem, post, path, log
+{ packagePath, unresolve, elem, post, path, log
 }      = require 'kxk'
 render = require '../editor/render'
 syntax = require '../editor/syntax'
+Tooltip = require '../tools/tooltip'
 
 class Tab
     
@@ -33,7 +34,7 @@ class Tab
         
         @div.innerHTML = ''
         @div.classList.toggle 'dirty', @info.dirty
-                
+                        
         @div.appendChild elem 'span', class:'dot', text:'●'
         
         if info.pkgPath and info.pkgPath != @prev()?.info.pkgPath
@@ -42,8 +43,15 @@ class Tab
         file = @info.file and path.basename(info.file) or 'untitled'
         
         diss = syntax.dissForTextAndSyntax(file, 'ko', join: true)
-        name = elem 'span', html:render.line(diss, charWidth:0), dataTip: info.file ? ''
+        name = elem 'span', html:render.line(diss, charWidth:0)
         @div.appendChild name
+
+        if info.file?
+            file = unresolve info.file 
+            diss = syntax.dissForTextAndSyntax(file, 'ko', join: true)
+            html = render.line(diss, charWidth:0)
+            new Tooltip elem:name, html:html, x:0
+        @
 
     close: -> @div.remove() 
     index: -> @tabs.tabs.indexOf @

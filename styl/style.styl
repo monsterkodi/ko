@@ -17,7 +17,7 @@ numbersWidth          = 50px
 editorPadding         = (8px + numbersWidth)
 bottomCornerRadius    = 4px
 frameColor            = #222
-frameWidth            = scrollhandleWidth
+frameWidth            = 6px
 frameBorder           = frameWidth solid frameColor
 commandlineHeight     = 30px
 titlebarHeight        = 22px
@@ -325,20 +325,6 @@ infoPadding = 6px
     &:hover
         color          #f40
         
-// #titlebar .title::before
-    // content             attr(data-tip)
-    // position            absolute
-    // z-index             999
-    // white-space         nowrap
-    // background          #333
-    // opacity             0  
-    // top                 9999px
-    // transition          opacity 0.2s ease-out 
-//      
-// #titlebar .title:hover::before
-    // opacity             1
-    // top                 3px
-
 #titlebar .winid
     flex                0 0 0
     color               #555
@@ -359,6 +345,28 @@ infoPadding = 6px
     padding-right       12px
     padding-left        12px
     padding-top         3px
+
+// 000000000   0000000    0000000   000      000000000  000  00000000   
+//    000     000   000  000   000  000         000     000  000   000  
+//    000     000   000  000   000  000         000     000  00000000   
+//    000     000   000  000   000  000         000     000  000        
+//    000      0000000    0000000   0000000     000     000  000        
+
+.tooltip
+    white-space         nowrap
+    background          #222
+    padding             3px
+    padding-left        frameWidth
+    padding-right       frameWidth
+    border-bottom-left-radius  frameWidth
+    border-bottom-right-radius frameWidth
+    position            absolute
+    top                 titlebarHeight
+    font-size           titlebarFontSize
+    opacity             0
+    transform           scaleY(0)
+    transition          transform 0.2s ease-in, opacity 0.2s ease-in
+    overflow            hidden
     
 // 000000000   0000000   0000000     0000000    
 //    000     000   000  000   000  000         
