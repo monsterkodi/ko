@@ -22,7 +22,7 @@ class Tabs
         @tabs.push new Tab @
         @tabs[0].setActive()
         
-        post.on 'newTabWithFile', @onNewTabWithFile
+        post.on 'newTabWithFile',   @onNewTabWithFile
         post.on 'closeTabOrWindow', @onCloseTabOrWindow
 
     #  0000000  000      000   0000000  000   000  
@@ -42,6 +42,7 @@ class Tabs
                     @closeTab tab
             else
                 tab.activate()
+        true
 
     # 000000000   0000000   0000000    
     #    000     000   000  000   000  
@@ -67,6 +68,8 @@ class Tabs
     closeTab: (tab = @activeTab()) ->
         tab.nextOrPrev().activate()
         tab.close()
+        _.pull @tabs, tab
+        @
   
     onCloseTabOrWindow: =>
         if @numTabs() == 1
@@ -114,10 +117,10 @@ class Tabs
             when 'right' then +1
         index = (@numTabs() + index) % @numTabs()
         @tabs[index].activate()
+        true
         
     updateSingle: ->
-        
-        # @div.classList.toggle 'single', @tabs.length <= 1 
         @div.style.webkitAppRegion = @tabs.length <= 1 and 'drag' or 'no-drag'
+        @
         
 module.exports = Tabs

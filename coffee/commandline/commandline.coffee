@@ -282,8 +282,10 @@ class Commandline extends TextEditor
                 if document.activeElement == @view
                     @cancel()
                     return 
+                    
             for sc in c.shortcuts
                 if sc == combo then return @startCommand n, combo, event
+                
         return 'unhandled'            
 
     handleModKeyComboEvent: (mod, key, combo, event) ->
