@@ -357,16 +357,7 @@ infoPadding = 6px
     padding-right       12px
     padding-left        12px
     padding-top         3px
-
-#titlebar .dot.clean
-    color               #444
-    &.focus
-        color           #006600
     
-.tab.dirty
-#titlebar .dot.dirty
-    color               #aaf
-
 // 000000000   0000000   0000000     0000000    
 //    000     000   000  000   000  000         
 //    000     000000000  0000000    0000000     
@@ -388,6 +379,16 @@ infoPadding = 6px
 
 #titlebar.focus .tabs
     color               #34C749
+
+.tabs .tab.dirty 
+.tabs .tab.dirty .dot
+    // #titlebar .tab.dirty .dot
+    color               #aaf
+
+.tabs .tab.clean .dot
+    color               #444
+    &.focus
+        color           #006600
     
 .tab
     flex                1 1 0

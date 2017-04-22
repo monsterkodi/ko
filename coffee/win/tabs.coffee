@@ -55,6 +55,7 @@ class Tabs
         keep = _.pullAt @tabs, @activeTab().index()
         while @numTabs()
             @tabs.pop().close()
+        @tabs = keep
         
         
 module.exports = Tabs

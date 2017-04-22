@@ -5,7 +5,7 @@
 #    000     000   000  0000000  
 
 { packagePath, elem, path, log
-} = require 'kxk'
+}      = require 'kxk'
 render = require '../editor/render'
 syntax = require '../editor/syntax'
 
@@ -19,15 +19,14 @@ class Tab
     update: (@info) ->
         
         title = 'untitled'
+        @div.classList.toggle 'dirty', @info.dirty
         if @info.file
-            diss  = syntax.dissForTextAndSyntax(path.basename(@info.file), 'ko', join: true)
-            title = render.line diss, charWidth:0
-            ic    = @info.focus and " focus" or ""
-            dc    = @info.dirty and " dirty" or "clean"
-            db    = "<span class=\"dot #{dc}#{ic}\">●</span>"
+            diss = syntax.dissForTextAndSyntax(path.basename(@info.file), 'ko', join: true)
+            file = render.line diss, charWidth:0
+            dot  = "<span class=\"dot\">●</span>"
                 
             if pkgPath = packagePath @info.file
-                title = db + path.basename(pkgPath) + "<span class='#{ic}'> ▸ </span>" + title
+                title = dot+ path.basename(pkgPath) + " ▸ " + file
 
         @div.innerHTML = title
        

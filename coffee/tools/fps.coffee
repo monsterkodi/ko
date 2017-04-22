@@ -16,19 +16,17 @@ class FPS
         @elem = elem class: 'fps'
         @elem.style.display = 'none'
 
-        @canvas = elem 'canvas', class: "fpsCanvas", width: 30*2, height: 130*2 
+        @canvas = elem 'canvas', class: "fpsCanvas", width: 130*2, height: 30*2
         @elem.appendChild @canvas
 
         y = parseInt  -30/2
         x = parseInt -130/2
-        t = "translate3d(#{x}px, #{y}px, 0px) scale3d(0.5, 0.5, 1)"
-        @canvas.style.transform = t
+        @canvas.style.transform = "translate3d(#{x}px, #{y}px, 0px) scale3d(0.5, 0.5, 1)"
         
         @history = []
         @last = now()
             
         $('commandline-span').appendChild @elem
-        window.requestAnimationFrame @draw
             
     # 0000000    00000000    0000000   000   000
     # 000   000  000   000  000   000  000 0 000
@@ -50,12 +48,15 @@ class FPS
             h = Math.min ms, 60
             ctx.fillRect 260-@history.length+i, 60-h, 2, h
         @last = time
-        window.requestAnimationFrame @draw
+        if @elem.style.display != 'none'
+            window.requestAnimationFrame @draw
 
     toggle: -> 
         @elem.style.display = @elem.style.display == 'none' and 'unset' or 'none'       
         @history.push 49
         window.setState 'fps', @elem.style.display != 'none' 
+        if @elem.style.display != 'none'
+            window.requestAnimationFrame @draw
 
 module.exports = FPS
 
