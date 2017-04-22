@@ -16,7 +16,7 @@ module.exports = (file) ->
         result = childp.execSync gitCommand, 
             cwd:        path.dirname file
             encoding:   'utf8' 
-        # log str result ; log "----------"
+
     catch err
         console.log 'err:', err
         log "error #{err}"
