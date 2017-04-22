@@ -19,14 +19,14 @@ class Tabs
         
         @div.addEventListener 'click', @onClick
         
-        @newTab()
+        @tabs.push new Tab @
         @tabs[0].setActive()
         log 'tab is active', @tabs[0].isActive()
         log 'get it', @activeTab()?
 
     onClick: (event) =>
         if tab = @tab event.target
-            tab.setActive()
+            tab.activate()
         else
             log 'click on tabs'
 
@@ -39,7 +39,9 @@ class Tabs
     activeTab: -> _.find @tabs, (t) -> t.isActive()
     numTabs: -> @tabs.length
         
-    newTab: -> @tabs.push new Tab @
+    newTab: -> 
+        @tabs.push new Tab @
+        _.last(@tabs).activate()
 
     navigate: (key) -> 
         
@@ -48,7 +50,7 @@ class Tabs
             when 'left' then -1
             when 'right' then +1
         index = (@numTabs() + index) % @numTabs()
-        @tabs[index].setActive()
+        @tabs[index].activate()
         
     closeOthers: -> 
         

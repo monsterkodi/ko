@@ -4,7 +4,7 @@
 #    000     000   000  000   000
 #    000     000   000  0000000  
 
-{ packagePath, elem, path, log
+{ packagePath, elem, post, path, log
 }      = require 'kxk'
 render = require '../editor/render'
 syntax = require '../editor/syntax'
@@ -32,6 +32,11 @@ class Tab
        
     close:    -> @div.remove() 
     index:    -> @tabs.tabs.indexOf @
+    
+    activate: -> 
+        @setActive()    
+        window.loadFile @info?.file
+
     isActive: -> @div.classList.contains 'active'
     
     setActive: -> 

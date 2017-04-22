@@ -251,20 +251,23 @@ reloadFile = ->
         dontSave:        true
 
 loadFile = (file, opt={}) ->
-    return if not file? or not file.length
+    # return if not file? or not file.length
     editor.saveScrollCursorsAndSelections()
-    [file,pos] = splitFilePos file
-    file = resolve file
+    
+    if file?
+        [file, pos] = splitFilePos file
+        file = resolve file
+        
     if file != editor.currentFile or opt?.reload
         
         # log 'loadFile', file, editor.currentFile, opt
         
-        if not fileExists file
-            return error "window.loadFile -- no such file:", file
+        if file? and not fileExists file
+            # return error "window.loadFile -- no such file:", file
+            file = null
             
-        if not opt?.dontSave then saveChanges()            
+        if not opt?.dontSave then saveChanges()
             
-        addToRecent file
         post.toMain 'navigate', 
             action: 'addFilePos'
             file: editor.currentFile
@@ -272,14 +275,18 @@ loadFile = (file, opt={}) ->
             for: 'load'
         
         editor.setCurrentFile null, opt  # to stop watcher and reset scroll
-        editor.setCurrentFile file, opt
-        post.toOthers 'fileLoaded', file, winID
+        
+        if file?
+            addToRecent file if file?
+            editor.setCurrentFile file, opt
+            post.toOthers 'fileLoaded', file, winID
+            commandline.fileLoaded file
+            
         setState 'file', file
-        commandline.fileLoaded file
     
     window.split.show 'editor'
         
-    if pos[0] or pos[1] 
+    if pos? and pos[0] or pos[1] 
         editor.singleCursorAtPos pos
         editor.scrollCursorToTop()        
   
