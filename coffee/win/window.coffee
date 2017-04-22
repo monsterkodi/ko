@@ -475,8 +475,8 @@ document.onkeydown = (event) ->
         when 'command+\\'         then return toggleCenterText()
         when 'command+k'          then return commandline.clear()
         when 'command+alt+k'      then return split.toggleLog()
-        when 'command+alt+left'   then return stopEvent event, post.toMain 'activatePrevWindow', winID
-        when 'command+alt+right'  then return stopEvent event, post.toMain 'activateNextWindow', winID
+        when 'alt+ctrl+left'      then return stopEvent event, post.toMain 'activatePrevWindow', winID
+        when 'alt+ctrl+right'     then return stopEvent event, post.toMain 'activateNextWindow', winID
         when 'command+alt+ctrl+k' then return split.showOrClearLog()
         when 'command+='          then return changeFontSize +1
         when 'command+-'          then return changeFontSize -1

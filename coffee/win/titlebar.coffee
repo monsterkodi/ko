@@ -12,7 +12,8 @@ syntax   = require '../editor/syntax'
 class Titlebar
     
     constructor: () ->
-        @elem =$ 'titlebar' 
+        @tabs = []
+        @elem =$ 'titlebar'
         @elem.ondblclick = (event) -> post.toMain 'maximizeWindow', window.winID
         @selected = -1
         document.body.addEventListener 'focusout', @closeList
@@ -21,6 +22,22 @@ class Titlebar
         post.on 'numWins', @onNumWins
 
     onNumWins: (numWins) => @numWins = numWins; @update @info
+    
+    # 000000000   0000000   0000000     0000000    
+    #    000     000   000  000   000  000         
+    #    000     000000000  0000000    0000000     
+    #    000     000   000  000   000       000    
+    #    000     000   000  0000000    0000000     
+    
+    newTab: -> log 'newTab'
+    navigateTab: (key) -> log 'navigateTab', key
+    closeOtherTabs: (key) -> log 'closeOtherTabs'
+    
+    # 000   000  00000000   0000000     0000000   000000000  00000000  
+    # 000   000  000   000  000   000  000   000     000     000       
+    # 000   000  00000000   000   000  000000000     000     0000000   
+    # 000   000  000        000   000  000   000     000     000       
+    #  0000000   000        0000000    000   000     000     00000000  
     
     update: (@info) ->
         ic  = @info.focus and " focus" or ""
@@ -119,11 +136,17 @@ class Titlebar
     # 000   000  00000000     000   
     
     globalModKeyComboEvent: (mod, key, combo, event) ->
-        if @list? 
+
+        switch combo
+            when 'command+t'           then return @newTab()
+            when 'command+shift+t'     then return @closeOtherTabs()
+            when 'command+alt+left', 'command+alt+right' then return @navigateTab key
+
+        if @list?
             switch combo
-                when 'esc', 'alt+`' then return @closeList()
-                when 'up', 'down'   then return @navigate key
-                when 'enter'      
+                when 'esc', 'alt+`'    then return @closeList()
+                when 'up', 'down'      then return @navigate key
+                when 'enter'
                     stopEvent event
                     return @loadSelected()
         
