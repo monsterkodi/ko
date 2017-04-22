@@ -16,7 +16,7 @@ try
 catch
     return
     
-otherID  = 0
+otherID  = -1
 thisID   = window.winID
 otherWin = null
 payloadA = { a: 1, b: 'hello'}

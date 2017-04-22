@@ -36,6 +36,7 @@ class Diffbar
                     meta = 
                         line: li
                         clss: 'git mod'
+                        change: mod
                     @editor.meta.addDiffMeta meta
                     li++
                     
@@ -44,6 +45,7 @@ class Diffbar
                     meta = 
                         line: li
                         clss: 'git add'
+                        change: add
                     @editor.meta.addDiffMeta meta            
                     li++
                     
@@ -51,6 +53,7 @@ class Diffbar
                 meta = 
                     line: li
                     clss: 'git del'
+                    change: change.del
                 @editor.meta.addDiffMeta meta            
 
     update: =>

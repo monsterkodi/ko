@@ -11,8 +11,9 @@ ranges = require '../tools/ranges'
 class Meta 
     
     constructor: (@editor) ->
+
+        @metas = [] # [  lineIndex, [start, end], {href: ...}  ]
         
-        @metas = [] # [lineIndex, [start, end], {href: ...}]
         @elem = $(".meta", @editor.view)
         @editor.on 'changed',          @onChanged
         @editor.on 'lineAppended',     @onLineAppended
