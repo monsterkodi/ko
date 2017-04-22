@@ -23,7 +23,7 @@ class Menu
                 recent.unshift
                     label: fileLabel f
                     path: f
-                    click: (i) -> main.createWindow i.path
+                    click: (i) -> main.createWindow file:i.path
         if recent.length
             recent.push
                 type: 'separator'

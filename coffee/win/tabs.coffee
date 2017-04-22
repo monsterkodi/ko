@@ -24,6 +24,7 @@ class Tabs
         
         post.on 'newTabWithFile',   @onNewTabWithFile
         post.on 'closeTabOrWindow', @onCloseTabOrWindow
+        post.on 'restore',          @onRestore
 
     #  0000000  000      000   0000000  000   000  
     # 000       000      000  000       000  000   
@@ -69,6 +70,7 @@ class Tabs
         tab.nextOrPrev().activate()
         tab.close()
         _.pull @tabs, tab
+        @update()
         @
   
     onCloseTabOrWindow: =>
@@ -83,25 +85,22 @@ class Tabs
         while @numTabs()
             @tabs.pop().close()
         @tabs = keep
-        @updateSingle()
+        @update()
     
-    # 000   000  00000000  000   000      000000000   0000000   0000000    
-    # 0000  000  000       000 0 000         000     000   000  000   000  
-    # 000 0 000  0000000   000000000         000     000000000  0000000    
-    # 000  0000  000       000   000         000     000   000  000   000  
-    # 000   000  00000000  00     00         000     000   000  0000000    
+    #  0000000   0000000    0000000          000000000   0000000   0000000    
+    # 000   000  000   000  000   000           000     000   000  000   000  
+    # 000000000  000   000  000   000           000     000000000  0000000    
+    # 000   000  000   000  000   000           000     000   000  000   000  
+    # 000   000  0000000    0000000             000     000   000  0000000    
     
-    newTab: -> 
-        @tabs.push new Tab @
-        _.last(@tabs).activate()
-        @updateSingle()
-    
-    onNewTabWithFile: (file) =>
+    addTab: (file) ->
         tab = new Tab @
         tab.update file:file
         @tabs.push tab
-        tab.activate()
-        @updateSingle()
+        @update()
+        tab
+
+    onNewTabWithFile: (file) => @addTab(file).activate()
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       
@@ -118,9 +117,35 @@ class Tabs
         index = (@numTabs() + index) % @numTabs()
         @tabs[index].activate()
         true
+
+    # 00000000   00000000   0000000  000000000   0000000   00000000   00000000  
+    # 000   000  000       000          000     000   000  000   000  000       
+    # 0000000    0000000   0000000      000     000   000  0000000    0000000   
+    # 000   000  000            000     000     000   000  000   000  000       
+    # 000   000  00000000  0000000      000      0000000   000   000  00000000  
+    
+    onRestore: (state) =>
+
+        files = state.tabs?.files ? [state.file]
+        @tabs[0].update file: files.shift()
+        while files.length
+            @addTab files.shift()
+        if state.tabs?.active?
+            @tabs[state.tabs?.active].activate()
+        else
+            @tabs[0].activate()
         
-    updateSingle: ->
+    # 000   000  00000000   0000000     0000000   000000000  00000000    
+    # 000   000  000   000  000   000  000   000     000     000         
+    # 000   000  00000000   000   000  000000000     000     0000000     
+    # 000   000  000        000   000  000   000     000     000         
+    #  0000000   000        0000000    000   000     000     00000000    
+    
+    update: ->
         @div.style.webkitAppRegion = @tabs.length <= 1 and 'drag' or 'no-drag'
+        window.setState 'tabs', 
+            files:  ( t.file() for t in @tabs )
+            active: @activeTab().index()
         @
         
 module.exports = Tabs

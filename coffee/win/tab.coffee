@@ -33,26 +33,24 @@ class Tab
         @info = info
         
         @div.innerHTML = ''
-        @div.classList.toggle 'dirty', @info.dirty
+        @div.classList.toggle 'dirty', info.dirty ? false
                         
         @div.appendChild elem 'span', class:'dot', text:'●'
         
         if info.pkgPath and info.pkgPath != @prev()?.info.pkgPath
             @div.appendChild elem 'span', text:info.pkgPath + " ▸ "
             
-        file = @info.file and path.basename(info.file) or 'untitled'
-        
-        diss = syntax.dissForTextAndSyntax(file, 'ko', join: true)
+        diss = syntax.dissForTextAndSyntax(path.basename(@file()), 'ko', join: true)
         name = elem 'span', html:render.line(diss, charWidth:0)
         @div.appendChild name
 
         if info.file?
-            file = unresolve info.file 
-            diss = syntax.dissForTextAndSyntax(file, 'ko', join: true)
+            diss = syntax.dissForTextAndSyntax(unresolve(@file()), 'ko', join: true)
             html = render.line(diss, charWidth:0)
             new Tooltip elem:name, html:html, x:0
         @
 
+    file:  -> @info?.file ? 'untitled' 
     close: -> @div.remove() 
     index: -> @tabs.tabs.indexOf @
     prev:  -> @tabs.tab @index()-1 if @index() > 0
@@ -68,6 +66,7 @@ class Tab
     activate: -> 
         @setActive()    
         window.loadFile @info?.file
+        @tabs.update()
 
     isActive: -> @div.classList.contains 'active'
     

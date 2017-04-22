@@ -72,9 +72,7 @@ addToRecent = (file) ->
    
 getState = (key, value) -> prefs.get "windows:#{winID}:#{key}", value
 delState = (key)        -> prefs.del "windows:#{winID}:#{key}"
-setState = (key, value) -> 
-    # log "window.setState key:#{key}", value
-    prefs.set "windows:#{winID}:#{key}", value
+setState = (key, value) -> prefs.set "windows:#{winID}:#{key}", value
 
 window.setState = setState
 window.getState = getState
@@ -95,12 +93,12 @@ post.on 'singleCursorAtPos', (pos, opt) ->
     editor.singleCursorAtPos pos, opt
     editor.scrollCursorToTop()
 post.on 'openFile',          (options) -> openFile options
-post.on 'focusEditor', -> split.focus 'editor'
-post.on 'cloneFile',   -> post.toMain 'newWindowWithFile', editor.currentFile
-post.on 'reloadFile',  -> reloadFile()
-post.on 'saveFileAs',  -> saveFileAs()
-post.on 'saveFile',    -> saveFile()
-post.on 'saveState',   -> saveState()
+post.on 'focusEditor',  -> split.focus 'editor'
+post.on 'cloneFile',    -> post.toMain 'newWindowWithFile', editor.currentFile
+post.on 'reloadFile',   -> reloadFile()
+post.on 'saveFileAs',   -> saveFileAs()
+post.on 'saveFile',     -> saveFile()
+post.on 'saveState',    -> saveState()
 post.on 'loadFile', (file) -> loadFile file
 post.on 'fileLinesChanged', (file, lineChanges) ->
     if file == editor.currentFile
