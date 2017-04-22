@@ -59,15 +59,15 @@ class Navigate
                         @currentIndex = @filePositions.length
 
     loadFilePos: (filePos, opt) ->
-
-        if not opt.sameWindow
-            id = @main.activateWindowWithFile filePos.file
-        if id?
-            post.toWin id, 'singleCursorAtPos', filePos.pos, extend:opt.extend
+        log 'loadFilePos', opt
+        if opt?.newWindow
+            post.toMain 'newWindowWithFile', "#{filePos.file}:#{filePos.pos[1]+1}:#{filePos.pos[0]}"
         else
-            if opt?.newWindow
-                @main.loadFile "#{filePos.file}:#{filePos.pos[1]+1}:#{filePos.pos[0]}"
-            else if opt?.winID?
+            if not opt.sameWindow                
+                if id = @main.activateWindowWithFile filePos.file
+                    post.toWin id, 'singleCursorAtPos', filePos.pos, extend:opt.extend
+                    return filePos
+            if opt?.winID?
                 post.toWin opt.winID, 'loadFile', "#{filePos.file}:#{filePos.pos[1]+1}:#{filePos.pos[0]}"
         filePos
 
@@ -79,12 +79,12 @@ class Navigate
         
     # these are called in window process
 
-    addFilePos: (opt) -> # called from window on editing
+    addFilePos: (opt) -> # called on editing
         opt.action = 'addFilePos'
         opt.for = 'edit'
         post.toMain 'navigate', opt
         
-    gotoFilePos: (opt) -> # called from window jumpTo
+    gotoFilePos: (opt) -> # called on jumpTo
         opt.action = 'addFilePos'
         opt.for = 'goto'
         post.toMain 'navigate', opt

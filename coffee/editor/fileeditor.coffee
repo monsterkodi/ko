@@ -170,21 +170,15 @@ class FileEditor extends TextEditor
 
     jumpToFile: (opt) =>
 
-        opt ?= {}
-        col  = opt.col  ? col
-        line = opt.line ? line
-        file = opt.file
-    
         window.navigate.addFilePos
             file: @currentFile
             pos:  @cursorPos()
-            
-        window.navigate.gotoFilePos
-            file: file
-            pos:  [col, line]
-            winID: window.winID
-            extend: opt.extend
-            sameWindow: opt.sameWindow
+
+        opt.pos = [opt.col ? 0, opt.line ? 0]
+        opt.winID = window.winID
+        
+        # log "FileEditor.jumpToFile gotoFilePos", opt
+        window.navigate.gotoFilePos opt
 
     jumpTo: (word, opt) =>
 

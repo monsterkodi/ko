@@ -4,7 +4,7 @@
 # 000   000  000   000  000   000
 # 000   000   0000000   00     00
 
-{ elem, clamp, post, error, log, $, _ 
+{ elem, keyinfo, clamp, post, error, log, $, _ 
 } = require 'kxk'
 
 syntax = require '../editor/syntax'
@@ -32,13 +32,16 @@ class Row
     # 000   000   0000000     000     000      0      000   000     000     00000000  
     
     activate: (event) =>
-        
-        if event?.altKey
-            if @item.type == 'file' and @item.textFile
-                post.emit 'jumpTo', file:@item.abs, sameWindow:true
-            else
-                post.emit 'jumpTo', word:@item.name
-            return
+        if event?
+            {mod} = keyinfo.forEvent event
+            log mod
+            switch mod
+                when 'alt', 'command+alt'
+                    if @item.type == 'file' and @item.textFile
+                        post.emit 'jumpTo', file:@item.abs, newWindow:mod!='alt', sameWindow:mod=='alt'
+                    else
+                        post.emit 'jumpTo', word:@item.name
+                    return
             
         $('.hover')?.classList.remove 'hover'
         @setActive emit:true

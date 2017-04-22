@@ -65,6 +65,6 @@ module.exports = (file) ->
     
             info.changes.push change
 
-    log info       
+    # log info       
     return info
     
