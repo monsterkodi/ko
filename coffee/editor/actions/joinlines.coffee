@@ -26,7 +26,7 @@ module.exports =
         @do.start()
         
         newCursors = []
-        for c in @do.cursors().reversed()
+        for c in @do.cursors().reverse()
             
             if not @isCursorInLastLine c
                 before = @do.line(c[1]).trimRight() + " "

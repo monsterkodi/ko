@@ -27,7 +27,7 @@ module.exports =
         oldSelections = @do.selections()
         joinLines = []
         
-        for c in @do.cursors().reversed()
+        for c in @do.cursors().reverse()
             if opt.deleteLines
                 csel = @continuousSelectionAtPosInRanges c, oldSelections
             else
@@ -47,7 +47,7 @@ module.exports =
                         # set cursors after selection in last joined line
                         cursorSet nc, sp[0]+nc[0]-ep[0], sp[1]
                         
-        for s in @do.selections().reversed()
+        for s in @do.selections().reverse()
             continue if s[0] >= @do.numLines()
             lineSelected = s[1][0] == 0 and s[1][1] == @do.line(s[0]).length
             if lineSelected and opt.deleteLines and @do.numLines() > 1

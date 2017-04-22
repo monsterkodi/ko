@@ -62,7 +62,7 @@ addToRecent = (file) ->
     while recent.length > prefs.get 'recentFilesLength', 10
         recent.pop()
     prefs.set 'recentFiles', recent
-    commandline.commands.open.setHistory recent.reversed()
+    commandline.commands.open.setHistory recent.reverse()
     
 #  0000000  000000000   0000000   000000000  00000000
 # 000          000     000   000     000     000     
@@ -113,6 +113,8 @@ post.on 'postEditorState', ->
         main:       editor.mainCursor()
         selections: editor.selections()
         highlights: editor.highlights()
+
+post.on 'ping', (wID, argA, argB) -> post.toWin wID, 'pong', winID, argA, argB
 
 # 000   000  000  000   000  00     00   0000000   000  000   000  
 # 000 0 000  000  0000  000  000   000  000   000  000  0000  000  

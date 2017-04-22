@@ -4,7 +4,7 @@
 # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
 
-{ clamp, prefs, elem, error, log, _
+{ reversed, clamp, prefs, elem, error, log, _
 }           = require 'kxk'
 Syntax      = require '../editor/syntax'
 CommandList = require './commandlist'
@@ -121,7 +121,7 @@ class Command
             window.split.elem.appendChild listView
             @commandList = new CommandList '.commandlist', syntax: @syntaxName
     
-    listItems: () -> @history.reversed()
+    listItems: () -> reversed @history
 
     showItems: (items) ->
         return if not @commandList? and not items.length

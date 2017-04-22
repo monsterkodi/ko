@@ -4,7 +4,7 @@
 #    000     000       000   000  000 0 000  000  000  0000  000   000  000    
 #    000     00000000  000   000  000   000  000  000   000  000   000  0000000
 
-{ error, log, _
+{ reversed, error, log, _
 }          = require 'kxk'
 salt       = require '../tools/salt'
 TextEditor = require '../editor/texteditor'
@@ -36,13 +36,13 @@ class Terminal extends TextEditor
             if /ko_term_done/.test t
                 if /^ko_term_done\s\d+$/.test t
                     cid = parseInt _.last t.split ' '
-                    for meta in @meta.metas.reversed()
+                    for meta in reversed @meta.metas
                         if meta[2].cmdID == cid
                             meta[2].span?.innerHTML = "■"
                             break
                 continue
             skip = false
-            for meta in @meta.metas.reversed()
+            for meta in reversed @meta.metas
                 if meta[2].cmmd == t 
                     if t != 'pwd'
                         spinningCog = '<i class="fa fa-cog fa-spin fa-1x fa-fw"></i>'

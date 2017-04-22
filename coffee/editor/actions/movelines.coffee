@@ -27,7 +27,7 @@ module.exports =
         newCursors    = @do.cursors()
         newSelections = @do.selections()
 
-        for r in csr.reversed()
+        for r in csr.reverse()
             ls = []
             for li in [r[0]..r[1]]
                 ls.push @do.line(li)

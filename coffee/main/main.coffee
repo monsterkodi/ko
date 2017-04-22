@@ -124,6 +124,8 @@ post.on 'reloadWindow',      (winID) -> main.reloadWin winWithID winID
 post.on 'fileSaved',   (file, winID) -> main.indexer.indexFile file, refresh: true
 post.on 'fileLoaded',  (file, winID) -> main.indexer.indexFile winWithID(winID).currentFile = file
 post.on 'winlog',      (winID, text) -> console.log "win#{winID} ", text
+
+post.on 'ping', (winID, argA, argB) -> post.toWin winID, 'pong', 'main', argA, argB
             
 winShells = {}
 

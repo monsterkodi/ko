@@ -4,7 +4,8 @@
 # 000       000   000  000   000  000   000  000   000  000   000  000   000
 # 000        0000000   000   000  00     00  000   000  000   000  0000000  
 
-{ log } = require 'kxk' 
+{ reversed, log 
+} = require 'kxk' 
 
 module.exports = 
     
@@ -55,7 +56,7 @@ module.exports =
         else
             @do.start()
             newCursors = @do.cursors()
-            for c in newCursors.reversed()
+            for c in reversed newCursors
             
                 if @isCursorAtEndOfLine c # cursor at end of line
                     if not @isCursorInLastLine c # cursor not in first line

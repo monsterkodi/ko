@@ -59,7 +59,7 @@ class Navigate
                         @currentIndex = @filePositions.length
 
     loadFilePos: (filePos, opt) ->
-        log 'loadFilePos', opt
+        # log 'loadFilePos', opt
         if opt?.newWindow
             post.toMain 'newWindowWithFile', "#{filePos.file}:#{filePos.pos[1]+1}:#{filePos.pos[0]}"
         else
