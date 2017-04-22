@@ -17,12 +17,39 @@ class Tabs
         @div = elem class: 'tabs'
         view.appendChild @div
         
-    newTab: -> 
+        @div.addEventListener 'click', @onClick
         
-        log 'new tab'
-        @tabs.push new Tab @
+        @newTab()
+        @tabs[0].setActive()
+        log 'tab is active', @tabs[0].isActive()
+        log 'get it', @activeTab()?
 
-    navigate: (key) -> log 'navigate', key
+    onClick: (event) =>
+        if tab = @tab event.target
+            tab.setActive()
+        else
+            log 'click on tabs'
+
+    tab: (id) ->
+        if _.isElement id
+            _.find @tabs, (t) -> t.div.contains id
+        else if _.isNumber id
+            tabs[id]
+
+    activeTab: -> _.find @tabs, (t) -> t.isActive()
+    numTabs: -> @tabs.length
+        
+    newTab: -> @tabs.push new Tab @
+
+    navigate: (key) -> 
+        
+        index = @activeTab().index()
+        index += switch key
+            when 'left' then -1
+            when 'right' then +1
+        index = (@numTabs() + index) % @numTabs()
+        @tabs[index].setActive()
+        
     closeOthers: -> log 'closeOthers'
         
         

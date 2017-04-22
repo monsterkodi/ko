@@ -38,11 +38,11 @@ class Titlebar
     #  0000000   000        0000000    000   000     000     00000000  
     
     update: (@info) ->
-        log 'update', @info
         s = @info.sticky and "○" or ''
         @winid.innerHTML = "#{s}#{@info.winID}#{s}"
         @winid.classList.toggle 'focus', @info.focus
         @winnum.innerHTML = @numWins > 1 and "#{@numWins}" or ''
+        @tabs.activeTab()?.update @info
         return
         ic  = @info.focus and " focus" or ""
         dc  = @info.dirty and " dirty" or "clean"
