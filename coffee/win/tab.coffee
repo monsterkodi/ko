@@ -16,23 +16,32 @@ class Tab
         @div = elem class: 'tab', text: 'untitled'
         @tabs.div.appendChild @div
     
-    update: (@info) ->
+    update: (info) ->
         
+        if info.file != @info?.file
+            if info.file?
+                info.pkgPath = packagePath info.file
+                info.pkgPath = path.basename info.pkgPath if info.pkgPath?
+                
+        @info = info
         title = 'untitled'
         @div.classList.toggle 'dirty', @info.dirty
         if @info.file
-            diss = syntax.dissForTextAndSyntax(path.basename(@info.file), 'ko', join: true)
-            file = render.line diss, charWidth:0
-            dot  = "<span class=\"dot\">●</span>"
                 
-            if pkgPath = packagePath @info.file
-                title = dot+ path.basename(pkgPath) + " ▸ " + file
+            title = "<span class=\"dot\">●</span>"
+            
+            if info.pkgPath and info.pkgPath != @prevTab()?.info.pkgPath
+                title += info.pkgPath + " ▸ "
+                
+            diss = syntax.dissForTextAndSyntax(path.basename(@info.file), 'ko', join: true)
+            title += render.line diss, charWidth:0
 
         @div.innerHTML = title
        
     close:    -> @div.remove() 
     index:    -> @tabs.tabs.indexOf @
     
+    prevTab: -> @tabs.tab @index()-1 if @index() > 0
     activate: -> 
         @setActive()    
         window.loadFile @info?.file

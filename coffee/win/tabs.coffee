@@ -4,7 +4,7 @@
 #    000     000   000  000   000       000
 #    000     000   000  0000000    0000000 
 
-{ elem, log, _
+{ post, elem, log, _
 } = require 'kxk'
 
 Tab = require './tab'
@@ -21,20 +21,20 @@ class Tabs
         
         @tabs.push new Tab @
         @tabs[0].setActive()
-        log 'tab is active', @tabs[0].isActive()
-        log 'get it', @activeTab()?
+        
+        post.on 'newTabWithFile', @onNewTabWithFile
+
 
     onClick: (event) =>
+        
         if tab = @tab event.target
             tab.activate()
-        else
-            log 'click on tabs'
 
     tab: (id) ->
         if _.isElement id
             _.find @tabs, (t) -> t.div.contains id
         else if _.isNumber id
-            tabs[id]
+            @tabs[id]
 
     activeTab: -> _.find @tabs, (t) -> t.isActive()
     numTabs: -> @tabs.length
@@ -42,6 +42,14 @@ class Tabs
     newTab: -> 
         @tabs.push new Tab @
         _.last(@tabs).activate()
+        @updateSingle()
+        
+    onNewTabWithFile: (file) =>
+        tab = new Tab @
+        tab.update file:file
+        @tabs.push tab
+        tab.activate()
+        @updateSingle()
 
     navigate: (key) -> 
         
@@ -58,6 +66,11 @@ class Tabs
         while @numTabs()
             @tabs.pop().close()
         @tabs = keep
+        @updateSingle()
         
+    updateSingle: ->
+        
+        # @div.classList.toggle 'single', @tabs.length <= 1 
+        @div.style.webkitAppRegion = @tabs.length <= 1 and 'drag' or 'no-drag'
         
 module.exports = Tabs

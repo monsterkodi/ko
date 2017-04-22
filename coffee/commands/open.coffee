@@ -19,8 +19,8 @@ class Open extends Command
 
     constructor: (@commandline) ->
         
-        @shortcuts  = ['command+p', 'command+shift+p']
-        @names      = ["open", "new window"]
+        @shortcuts  = ['command+p', 'command+shift+p', 'command+alt+p']
+        @names      = ["open", "new tab", "new window"]
         @files      = null
         @file       = null
         @dir        = null
@@ -423,9 +423,12 @@ class Open extends Command
                 file = joinFilePos file, pos
                 files.splice i, 1, file
             
-        options = newWindow: @name == "new window"
+        options = {}
+        options.newWindow = true if @name == "new window"
+        options.newTab    = true if @name == "new tab"
         
         opened = window.openFiles files, options
+        
         if opened?.length
             if opened.length == 1
                 super opened[0]

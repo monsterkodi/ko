@@ -373,7 +373,10 @@ infoPadding = 6px
     background          #333
     color               #aaa
     
-    -webkit-app-region  no-drag
+    -webkit-app-region  drag
+    // -webkit-app-region  no-drag
+    // &.single
+        
     &::-webkit-scrollbar
         height          2px
 
@@ -382,7 +385,6 @@ infoPadding = 6px
 
 .tabs .tab.dirty 
 .tabs .tab.dirty .dot
-    // #titlebar .tab.dirty .dot
     color               #aaf
 
 .tabs .tab.clean .dot
@@ -401,7 +403,6 @@ infoPadding = 6px
     margin-right        3px
     &.active
         background      #222
-        // color           #fff
     
 //  0000000   00000000   00000000   0000000 
 // 000   000  000   000  000       000   000
@@ -414,6 +415,10 @@ infoPadding = 6px
     overflow            hidden
     background          #181818
     pointer-events      auto
+    
+#area
+#terminal
+    border-top          frameBorder
 
 // 00000000  0000000    000  000000000   0000000   00000000 
 // 000       000   000  000     000     000   000  000   000

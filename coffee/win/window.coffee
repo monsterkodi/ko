@@ -299,8 +299,11 @@ openFile = loadFile
 #  0000000   000        00000000  000   000        000       000  0000000  00000000  0000000 
 
 openFiles = (ofiles, options) -> # called from file dialog and open command and browser
+    
     if ofiles?.length
+        
         files = fileList ofiles, ignoreHidden: false
+        
         if files.length >= 10
             answer = dialog.showMessageBox
                 type: 'warning'
@@ -311,16 +314,23 @@ openFiles = (ofiles, options) -> # called from file dialog and open command and 
                 message: "You have selected #{files.length} files."
                 detail: "Are you sure you want to open that many files?"
             return if answer != 1
+            
         if files.length == 0
             log 'window.openFiles.warning: no files for:', ofiles
             return []
-        setState 'openFilePath', path.dirname files[0]                    
-        if not options?.newWindow
+            
+        setState 'openFilePath', path.dirname files[0]
+        
+        if not options?.newWindow and not options?.newTab
             file = resolve files.shift()
-            # if not post.get 'activateWindowWithFile', file
             loadFile file
+            
         for file in files
-            post.toMain 'newWindowWithFile', file
+            if options?.newWindow
+                post.toMain 'newWindowWithFile', file
+            else
+                post.emit 'newTabWithFile', file
+            
         return ofiles
 
 window.openFiles = openFiles

@@ -13,6 +13,7 @@ Tabs   = require './tabs'
 class Titlebar
     
     constructor: () ->
+        
         @elem =$ 'titlebar'
         @elem.ondblclick = (event) -> post.toMain 'maximizeWindow', window.winID
         @selected = -1
