@@ -5,16 +5,17 @@
 #    000     000     000     0000000  00000000  0000000    000   000  000   000
 
 { packagePath, unresolve, stopEvent, clamp, elem, post, path, log, $
-}        = require 'kxk'
-render   = require '../editor/render'
-syntax   = require '../editor/syntax'
+}      = require 'kxk'
+render = require '../editor/render'
+syntax = require '../editor/syntax'
+Tabs   = require './tabs'
 
 class Titlebar
     
     constructor: () ->
-        @tabs = []
         @elem =$ 'titlebar'
         @elem.ondblclick = (event) -> post.toMain 'maximizeWindow', window.winID
+        @tabs = new Tabs @elem
         @selected = -1
         document.body.addEventListener 'focusout', @closeList
         document.body.addEventListener 'focusin',  @closeList
@@ -22,16 +23,6 @@ class Titlebar
         post.on 'numWins', @onNumWins
 
     onNumWins: (numWins) => @numWins = numWins; @update @info
-    
-    # 000000000   0000000   0000000     0000000    
-    #    000     000   000  000   000  000         
-    #    000     000000000  0000000    0000000     
-    #    000     000   000  000   000       000    
-    #    000     000   000  0000000    0000000     
-    
-    newTab: -> log 'newTab'
-    navigateTab: (key) -> log 'navigateTab', key
-    closeOtherTabs: (key) -> log 'closeOtherTabs'
     
     # 000   000  00000000   0000000     0000000   000000000  00000000  
     # 000   000  000   000  000   000  000   000     000     000       
@@ -138,9 +129,9 @@ class Titlebar
     globalModKeyComboEvent: (mod, key, combo, event) ->
 
         switch combo
-            when 'command+t'           then return @newTab()
-            when 'command+shift+t'     then return @closeOtherTabs()
-            when 'command+alt+left', 'command+alt+right' then return @navigateTab key
+            when 'command+t'           then return @tabs.newTab()
+            when 'command+shift+t'     then return @tabs.closeOthers()
+            when 'command+alt+left', 'command+alt+right' then return @tabs.navigate key
 
         if @list?
             switch combo
