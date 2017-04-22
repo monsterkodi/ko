@@ -50,7 +50,11 @@ class Tabs
         index = (@numTabs() + index) % @numTabs()
         @tabs[index].setActive()
         
-    closeOthers: -> log 'closeOthers'
+    closeOthers: -> 
+        
+        keep = _.pullAt @tabs, @activeTab().index()
+        while @numTabs()
+            @tabs.pop().close()
         
         
 module.exports = Tabs

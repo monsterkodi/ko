@@ -316,26 +316,26 @@ infoPadding = 6px
     white-space         nowrap
     -webkit-app-region  drag
 
-#titlebar .title
+// #titlebar .title
 #titlebar .dot
     display             inline-block
     vertical-align      top
-    padding-left        10px
-    padding-top         3px 
+    padding-left        6px
+    padding-right       6px
         
-#titlebar .title::before
-    content             attr(data-tip)
-    position            absolute
-    z-index             999
-    white-space         nowrap
-    background          #333
-    opacity             0  
-    top                 9999px
-    transition          opacity 0.2s ease-out 
-     
-#titlebar .title:hover::before
-    opacity             1
-    top                 3px
+// #titlebar .title::before
+    // content             attr(data-tip)
+    // position            absolute
+    // z-index             999
+    // white-space         nowrap
+    // background          #333
+    // opacity             0  
+    // top                 9999px
+    // transition          opacity 0.2s ease-out 
+//      
+// #titlebar .title:hover::before
+    // opacity             1
+    // top                 3px
 
 #titlebar .winid
     flex                0 0 0
@@ -362,10 +362,8 @@ infoPadding = 6px
     color               #444
     &.focus
         color           #006600
-
-#titlebar .title.focus
-    color               #34C749
-#titlebar .title.dirty
+    
+.tab.dirty
 #titlebar .dot.dirty
     color               #aaf
 
@@ -383,8 +381,13 @@ infoPadding = 6px
     overflow-y          hidden
     background          #333
     color               #aaa
+    
+    -webkit-app-region  no-drag
     &::-webkit-scrollbar
         height          2px
+
+#titlebar.focus .tabs
+    color               #34C749
     
 .tab
     flex                1 1 0
@@ -397,7 +400,7 @@ infoPadding = 6px
     margin-right        3px
     &.active
         background      #222
-        color           #fff
+        // color           #fff
     
 //  0000000   00000000   00000000   0000000 
 // 000   000  000   000  000       000   000
