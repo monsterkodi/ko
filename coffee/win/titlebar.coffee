@@ -15,12 +15,19 @@ class Titlebar
     constructor: () ->
         @elem =$ 'titlebar'
         @elem.ondblclick = (event) -> post.toMain 'maximizeWindow', window.winID
-        @tabs = new Tabs @elem
         @selected = -1
         document.body.addEventListener 'focusout', @closeList
         document.body.addEventListener 'focusin',  @closeList
         @numWins = 1        
         post.on 'numWins', @onNumWins
+        
+        @winid = elem class: 'winid'
+        @elem.appendChild @winid
+        
+        @tabs = new Tabs @elem
+        
+        @winnum = elem class: 'winnum'
+        @elem.appendChild @winnum
 
     onNumWins: (numWins) => @numWins = numWins; @update @info
     
@@ -31,6 +38,12 @@ class Titlebar
     #  0000000   000        0000000    000   000     000     00000000  
     
     update: (@info) ->
+        log 'update', @info
+        s = @info.sticky and "○" or ''
+        @winid.innerHTML = "#{s}#{@info.winID}#{s}"
+        @winid.classList.toggle 'focus', @info.focus
+        @winnum.innerHTML = @numWins > 1 and "#{@numWins}" or ''
+        return
         ic  = @info.focus and " focus" or ""
         dc  = @info.dirty and " dirty" or "clean"
         dot = @info.sticky and "○" or "●"
