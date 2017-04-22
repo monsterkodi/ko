@@ -25,8 +25,8 @@ pkg         = require '../../package.json'
 remote      = electron.remote
 dialog      = remote.dialog
 Browser     = remote.BrowserWindow
-win         = remote.getCurrentWindow()
-winID       = win.id
+win         = window.win   = remote.getCurrentWindow()
+winID       = window.winID = win.id
 editor      = null
 logview     = null
 area        = null
@@ -124,8 +124,6 @@ post.on 'ping', (wID, argA, argB) -> post.toWin wID, 'pong', winID, argA, argB
 
 winMain = -> 
     
-    window.winID = winID
-
     # 000  000   000  000  000000000  
     # 000  0000  000  000     000     
     # 000  000 0 000  000     000     

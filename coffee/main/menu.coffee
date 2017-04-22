@@ -73,9 +73,9 @@ class Menu
             label: 'File'
             role: 'file'
             submenu: [
-                label:       'New File'
+                label:       'New Tab'
                 accelerator: 'Command+N'
-                click:       -> main.createWindow()
+                click:       (i,win) -> post.toWin win.id, "newTabWithFile"
             ,
                 label:       'New Window'
                 accelerator: 'Command+Shift+N'
@@ -110,9 +110,10 @@ class Menu
                 accelerator: 'CmdOrCtrl+R'
                 click:       (i,win) -> post.toWin win.id, 'reloadFile'
             ,
-                label:       'Close Window'
+                label:       'Close Tab or Window'
                 accelerator: 'Command+W'
-                click:       (i,win) -> main.closeWindow win
+                click:       (i,win) -> post.toWin win.id, 'closeTabOrWindow'
+                # main.closeWindow win
             ]
         ,        
             # 000   000  000  000   000  0000000     0000000   000   000

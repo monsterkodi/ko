@@ -47,32 +47,9 @@ class Titlebar
         @winid.classList.toggle 'focus', @info.focus
         @winnum.innerHTML = @numWins > 1 and "#{@numWins}" or ''
         @tabs.activeTab()?.update @info
-        return
-        ic  = @info.focus and " focus" or ""
-        dc  = @info.dirty and " dirty" or "clean"
-        dot = @info.sticky and "○" or "●"
-        db  = "<span class=\"dot #{dc}#{ic}\">#{dot}</span>"
-        
-        if @info.file?
-            diss = syntax.dissForTextAndSyntax(path.basename(@info.file), 'ko', join: true)
-            title = render.line diss, charWidth:0
-            
-            if pkgPath = packagePath @info.file
-                title = path.basename(pkgPath) + "<span class='#{ic}'> ▸ </span>" + title
-            
-            tooltip = unresolve @info.file
-        else
-            title = ''
-        
-        nm  = @numWins > 1 and "<span class=\"winnum #{ic}\">#{@numWins}</span>" or ''
-        id  = "<span class='clickarea'><span class=\"winid #{ic}\">#{@info.winID}</span>"
-        da  = @info.dirty and dot or ""
-        txt = id + db 
-        if title.length
-            txt += "<span class=\"title #{dc}#{ic}\" data-tip=\"#{tooltip}\">#{title} #{da}</span>"
-        txt += "</span>" + nm
-        @elem.innerHTML = txt
-        $('.clickarea', @elem)?.addEventListener 'click', @showList
+
+        # tooltip = unresolve @info.file
+        # "<span data-tip=\"#{tooltip}\"></span>"
        
     # 000      000   0000000  000000000
     # 000      000  000          000   

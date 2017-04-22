@@ -316,12 +316,14 @@ infoPadding = 6px
     white-space         nowrap
     -webkit-app-region  drag
 
-// #titlebar .title
 #titlebar .dot
     display             inline-block
     vertical-align      top
     padding-left        6px
-    padding-right       6px
+    padding-right       9px
+    margin-top          -1px
+    &:hover
+        color          #f40
         
 // #titlebar .title::before
     // content             attr(data-tip)
@@ -374,8 +376,6 @@ infoPadding = 6px
     color               #aaa
     
     -webkit-app-region  drag
-    // -webkit-app-region  no-drag
-    // &.single
         
     &::-webkit-scrollbar
         height          2px

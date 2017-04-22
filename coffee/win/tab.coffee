@@ -16,6 +16,12 @@ class Tab
         @div = elem class: 'tab', text: 'untitled'
         @tabs.div.appendChild @div
     
+    # 000   000  00000000   0000000     0000000   000000000  00000000  
+    # 000   000  000   000  000   000  000   000     000     000       
+    # 000   000  00000000   000   000  000000000     000     0000000   
+    # 000   000  000        000   000  000   000     000     000       
+    #  0000000   000        0000000    000   000     000     00000000  
+    
     update: (info) ->
         
         if info.file != @info?.file
@@ -24,24 +30,33 @@ class Tab
                 info.pkgPath = path.basename info.pkgPath if info.pkgPath?
                 
         @info = info
-        title = 'untitled'
+        
+        @div.innerHTML = ''
         @div.classList.toggle 'dirty', @info.dirty
-        if @info.file
                 
-            title = "<span class=\"dot\">●</span>"
+        @div.appendChild elem 'span', class:'dot', text:'●'
+        
+        if info.pkgPath and info.pkgPath != @prev()?.info.pkgPath
+            @div.appendChild elem 'span', text:info.pkgPath + " ▸ "
             
-            if info.pkgPath and info.pkgPath != @prevTab()?.info.pkgPath
-                title += info.pkgPath + " ▸ "
-                
-            diss = syntax.dissForTextAndSyntax(path.basename(@info.file), 'ko', join: true)
-            title += render.line diss, charWidth:0
+        file = @info.file and path.basename(info.file) or 'untitled'
+        
+        diss = syntax.dissForTextAndSyntax(file, 'ko', join: true)
+        name = elem 'span', html:render.line(diss, charWidth:0), dataTip: info.file ? ''
+        @div.appendChild name
 
-        @div.innerHTML = title
-       
-    close:    -> @div.remove() 
-    index:    -> @tabs.tabs.indexOf @
+    close: -> @div.remove() 
+    index: -> @tabs.tabs.indexOf @
+    prev:  -> @tabs.tab @index()-1 if @index() > 0
+    next:  -> @tabs.tab @index()+1 if @index() < @tabs.numTabs()-1
+    nextOrPrev: -> @next() ? @prev()
     
-    prevTab: -> @tabs.tab @index()-1 if @index() > 0
+    #  0000000    0000000  000000000  000  000   000  00000000  
+    # 000   000  000          000     000  000   000  000       
+    # 000000000  000          000     000   000 000   0000000   
+    # 000   000  000          000     000     000     000       
+    # 000   000   0000000     000     000      0      00000000  
+    
     activate: -> 
         @setActive()    
         window.loadFile @info?.file
