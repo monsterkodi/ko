@@ -6,25 +6,25 @@
 
 { escapePath, childp, path, str, log, _
 }      = require 'kxk'
-colors = require 'colors'
+chalk  = require 'chalk'
 
 module.exports = (file) ->
-    
+
     gitCommand = "git --no-pager diff -U0 \"#{escapePath file}\""
 
     try    
         result = childp.execSync gitCommand, 
             cwd:        path.dirname file
             encoding:   'utf8' 
-        # log str result
-        # log "----------"
+
     catch err
+        console.log 'err:', err
         log "error #{err}"
         return error: err
     
-    info  = changes:[]
-    lines = (colors.strip l for l in result.split '\n')
-    
+    info  = file:file, changes:[]
+    lines = (chalk.stripColor l for l in result.split '\n')
+
     while line = lines.shift()
 
         if line.startsWith '@@'
@@ -33,7 +33,7 @@ module.exports = (file) ->
             
             numOld = parseInt(before.split(',')[1] ? 1)
             numNew = parseInt(afterSplit[1] ? 1)
-            change = line: parseInt(afterSplit[0]) 
+            change = line: parseInt(afterSplit[0])
 
             oldLines = []
             for i in [0...numOld]
@@ -47,9 +47,24 @@ module.exports = (file) ->
 
             change.old = oldLines if oldLines.length
             change.new = newLines if newLines.length
+            
+            if numOld and numNew
+                change.mod = []
+                for i in [0...Math.min numOld, numNew]
+                    change.mod.push old:change.old[i], new:change.new[i]
+                
+            if numOld > numNew
+                change.del = [] 
+                for i in [numNew...numOld]
+                    change.del.push old:change.old[i]
+                    
+            else if numNew > numOld
+                change.add = []
+                for i in [numOld...numNew]
+                    change.add.push new:change.new[i]
     
             info.changes.push change
 
-    # log info        
+    # log info       
     return info
     

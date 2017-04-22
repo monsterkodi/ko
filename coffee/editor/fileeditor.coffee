@@ -5,7 +5,7 @@
 # 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000  
 
 { fileName, unresolve, fileExists, setStyle, swapExt, keyinfo,
-  clamp, drag, post, elem, error, log, str, $, _, fs, path
+  clamp, drag, post, error, log, str, $, _, fs, path
 }          = require 'kxk'
 watcher    = require './watcher'
 TextEditor = require './texteditor'
@@ -21,7 +21,7 @@ class FileEditor extends TextEditor
         window.split.on 'commandline', @onCommandline
         post.on 'jumpTo', @jumpTo
         @fontSizeDefault = 16
-        super viewElem, features: ['Diffbar', 'Scrollbar', 'Numbers', 'Minimap', 'Autocomplete', 'Brackets', 'Strings']        
+        super viewElem, features: ['Diffbar', 'Scrollbar', 'Numbers', 'Minimap', 'Meta', 'Autocomplete', 'Brackets', 'Strings']        
         @setText ''
                     
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
@@ -170,21 +170,15 @@ class FileEditor extends TextEditor
 
     jumpToFile: (opt) =>
 
-        opt ?= {}
-        col  = opt.col  ? col
-        line = opt.line ? line
-        file = opt.file
-    
         window.navigate.addFilePos
             file: @currentFile
             pos:  @cursorPos()
-            
-        window.navigate.gotoFilePos
-            file: file
-            pos:  [col, line]
-            winID: window.winID
-            extend: opt.extend
-            sameWindow: opt.sameWindow
+
+        opt.pos = [opt.col ? 0, opt.line ? 0]
+        opt.winID = window.winID
+        
+        # log "FileEditor.jumpToFile gotoFilePos", opt
+        window.navigate.gotoFilePos opt
 
     jumpTo: (word, opt) =>
 

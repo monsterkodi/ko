@@ -5,7 +5,8 @@
 #       000  000   000
 #   000000   0000000  
 
-log   = require 'kxk'
+{ elem, log
+}     = require 'kxk'
 Stage = require '../stage'
 
 class Three extends Stage
@@ -13,7 +14,7 @@ class Three extends Stage
     constructor: (@view) -> super @view
     
     start: -> 
-        @elem = document.createElement 'div'
+        @elem = elem 'div'
         @elem.style.position = 'absolute'
         @elem.style.top = '0'
         @elem.style.left = '0'

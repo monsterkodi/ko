@@ -4,7 +4,8 @@
 # 000   000  000   000  000       000  000   000   000  000   000  000   000  000   000
 # 0000000    000   000   0000000  000   000  00     00  000   000  000   000  0000000  
 
-_ = require 'lodash'
+{ reversed, _
+} = require 'kxk'
 
 module.exports =
     
@@ -69,7 +70,7 @@ module.exports =
                     n -= t.trimRight().length
                     Math.max 1, n
             
-        for c in newCursors.reversed()
+        for c in reversed newCursors
             if c[0] == 0 # cursor at start of line
                 if opt?.ignoreLineBoundary or @do.numCursors() == 1
                     if c[1] > 0 # cursor not in first line

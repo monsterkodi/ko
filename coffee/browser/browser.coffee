@@ -129,7 +129,6 @@ class Browser extends Stage
                 oi = 
                     type: item.type
                     name: str item.obj
-                log 'loadObjectItem', item.obj?, oi
                 @loadItems [oi], opt
     
     # 00000000  000  000      00000000  

@@ -4,7 +4,7 @@
 #    000     000     000     000      000       000   000  000   000  000   000
 #    000     000     000     0000000  00000000  0000000    000   000  000   000
 
-{ packagePath, unresolve, stopEvent, clamp, post, path, log, $
+{ packagePath, unresolve, stopEvent, clamp, elem, post, path, log, $
 }        = require 'kxk'
 render   = require '../editor/render'
 syntax   = require '../editor/syntax'
@@ -61,8 +61,7 @@ class Titlebar
         return if winInfos.length < 2
         document.activeElement.blur()
         @selected = -1
-        @list = document.createElement 'div' 
-        @list.className = 'list windows'
+        @list = elem class: 'list windows'
         @list.style.top = 0
         window.split.elem.appendChild @list             
         @listWinInfos winInfos
@@ -80,9 +79,8 @@ class Titlebar
         @list.style.display = 'unset'
         for info in winInfos
             continue if info.id == window.winID
-            div = document.createElement 'div'
-            div.className = "list-item"
-            div.winID     = info.id
+            div = elem class: "list-item"
+            div.winID = info.id
             file = unresolve info.file ? ''
             diss = syntax.dissForTextAndSyntax(file, 'ko', join: true)
             fileSpan = render.line diss, charWidth:0

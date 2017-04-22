@@ -5,7 +5,7 @@
 #    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000  
 
 {splitFilePos, fileExists, resolve, keyinfo, stopEvent, setStyle, 
-prefs, drag, path, post, clamp, str, log, sw, $, _
+prefs, drag, elem, path, post, clamp, str, log, sw, $, _
 }         = require 'kxk'
 render    = require './render'
 syntax    = require './syntax'
@@ -23,8 +23,7 @@ class TextEditor extends Editor
         @name = @name.slice 1 if @name[0] == '.'
         @view = $(viewElem)  
         
-        @layers = document.createElement 'div'
-        @layers.className = "layers"
+        @layers = elem class: "layers"
         @view.appendChild @layers
         
         @view.onpaste = (event) => log "view on paste #{@name}", event
@@ -81,8 +80,7 @@ class TextEditor extends Editor
             @layerDict[cls] = @addLayer cls
         
     addLayer: (cls) ->
-        div = document.createElement 'div'
-        div.className = cls
+        div = elem class: cls
         @layers.appendChild div
         div
         
@@ -331,10 +329,8 @@ class TextEditor extends Editor
         div.lineIndex = li
         if @showInvisibles
             tx = @line(li).length * @size.charWidth + 1
-            span = document.createElement 'span'
-            span.className = "invisible newline"
+            span = elem 'span', class: "invisible newline", html: '&#9687'
             span.style.transform = "translate(#{tx}px, -1.5px)"
-            span.innerHTML = '&#9687;'
             div.appendChild span
         div
     

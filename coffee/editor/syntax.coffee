@@ -4,7 +4,7 @@
 #      000     000     000  0000     000     000   000   000 000 
 # 0000000      000     000   000     000     000   000  000   000
 
-{log, $, fs, noon, path, _
+{ log, elem, fs, noon, path, $, _
 }      = require 'kxk'
 encode = require '../tools/encode'
 matchr = require '../tools/matchr'
@@ -87,8 +87,7 @@ class Syntax
     
     colorForClassnames: (clss) ->
         if not @colors[clss]?
-            div = document.createElement 'div'
-            div.className = clss
+            div = elem class: clss
             document.body.appendChild div
             @colors[clss] = window.getComputedStyle(div).color
             div.remove()
@@ -96,7 +95,7 @@ class Syntax
 
     colorForStyle: (styl) ->
         if not @colors[styl]?
-            div = document.createElement 'div'
+            div = elem 'div'
             div.style = styl
             document.body.appendChild div
             @colors[styl] = window.getComputedStyle(div).color

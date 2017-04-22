@@ -4,15 +4,16 @@
 # 000 0 000  000          000     000   000
 # 000   000  00000000     000     000   000
 
-{ error, log, post, fs, $, _
+{ error, log, elem, post, fs, $, _
 }      = require 'kxk'
 ranges = require '../tools/ranges'
 
 class Meta 
     
     constructor: (@editor) ->
+
+        @metas = [] # [  lineIndex, [start, end], {href: ...}  ]
         
-        @metas = [] # [lineIndex, [start, end], {href: ...}]
         @elem = $(".meta", @editor.view)
         @editor.on 'changed',          @onChanged
         @editor.on 'lineAppended',     @onLineAppended
@@ -34,6 +35,7 @@ class Meta
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
     onChanged: (changeInfo) =>
+        
         for change in changeInfo.changes
             li = change.oldIndex            
             continue if change.change == 'deleted'
@@ -60,7 +62,7 @@ class Meta
     # 0000000   000   000      0      00000000
          
     saveFileLineMetas: (file, lineMetas) ->
-        # log "Meta.saveFileLineMetas file:#{file} numChanges: #{lineMetas.length}"
+        
         fs.readFile file, encoding: 'utf8', (err, data) ->
             if err? then return error "Meta.saveFileLineMetas -- readFile err:#{err}"
             lines = data.split /\r?\n/
@@ -76,12 +78,14 @@ class Meta
                 post.emit 'search-saved', file
                     
     saveLine: (li) -> 
+        
         for meta in @metasAtLineIndex li
             if meta[2].state == 'unsaved'
                 [file, line] = meta[2].href.split(':')
                 @saveFileLineMetas file, [[line-1, @editor.line(meta[0]), meta]]
 
     saveChanges: ->
+        
         fileLineMetas = {}
         for meta in @metas
             if meta[2].state == 'unsaved'
@@ -104,20 +108,28 @@ class Meta
     # 000   000   0000000   000   000  0000000    00000000  000   000
     
     onNumber: (e) =>
+        
         metas = @metasAtLineIndex e.lineIndex
         for meta in metas
             meta[2].span = e.numberSpan
-            # log "onNumber #{e.lineIndex} #{e.numberDiv.lineIndex} #{meta[2].clss}"
             switch meta[2].clss
                 when 'searchResult', 'termCommand', 'termResult', 'coffeeCommand', 'coffeeResult'
                     num = meta[2].state == 'unsaved' and @saveButton(meta[0]) 
                     num = meta[2].line? and meta[2].line if not num
                     num = meta[2].href?.split(':')[1] if not num
                     num = '?' if not num 
-                    # log "num #{num}"
                     e.numberSpan.innerHTML = num
                 else
-                    e.numberSpan.innerHTML = '&nbsp;'
+                    if meta[2].diff
+                        e.numberSpan.innerHTML = meta[2].line
+                    else
+                        e.numberSpan.innerHTML = '&nbsp;'
+                    
+    setMetaPos: (meta, tx, ty) ->
+        if meta[2].diff
+            meta[2].div?.style.transform = "translateY(#{ty}px)"        
+        else
+            meta[2].div?.style.transform = "translate(#{tx}px,#{ty}px)"        
 
     # 0000000    000  000   000
     # 000   000  000  000   000
@@ -126,32 +138,48 @@ class Meta
     # 0000000    000      0    
 
     addDiv: (meta) ->
+        
         size = @editor.size
         sw = size.charWidth * (meta[1][1]-meta[1][0])
         tx = size.charWidth *  meta[1][0] + size.offsetX
         ty = size.lineHeight * (meta[0] - @editor.scroll.exposeTop)
         lh = size.lineHeight
         
-        div = document.createElement 'div'
-        div.className = "meta #{meta[2].clss ? ''}"
-        div.style.transform = "translate(#{tx}px,#{ty}px)"
-        div.style.width = "#{sw}px"
-        div.style.height = "#{lh}px"
-        if meta[2].href?
-            div.addEventListener 'mousedown', @onClick
-            div.href = meta[2].href
-            div.classList.add 'href'
-        else if meta[2].cmmd?
-            div.addEventListener 'mousedown', @onClick
-            div.cmmd = meta[2].cmmd
-            div.classList.add 'cmmd'
-        else if meta[2].list?
-            div.addEventListener 'mousedown', @onClick
-            div.list = meta[2].list
-            div.classList.add 'cmmd'
-        @elem.appendChild div
+        div = elem class: "meta #{meta[2].clss ? ''}"
         meta[2].div = div
+        div.style.height = "#{lh}px"  
+        
+        @setMetaPos meta, tx, ty
+
+        if not meta[2].diff
+            div.style.width = "#{sw}px"
+            if meta[2].href?
+                div.addEventListener 'mousedown', @onClick
+                div.href = meta[2].href
+                div.classList.add 'href'
+            else if meta[2].cmmd?
+                div.addEventListener 'mousedown', @onClick
+                div.cmmd = meta[2].cmmd
+                div.classList.add 'cmmd'
+            else if meta[2].list?
+                div.addEventListener 'mousedown', @onClick
+                div.list = meta[2].list
+                div.classList.add 'cmmd'
+            
+        @elem.appendChild div
     
+    # 0000000    000  00000000  00000000  
+    # 000   000  000  000       000       
+    # 000   000  000  000000    000000    
+    # 000   000  000  000       000       
+    # 0000000    000  000       000       
+    
+    addDiffMeta: (meta) ->
+        meta.diff = true
+        lineMeta = [meta.line, [0, 0], meta]
+        @metas.push lineMeta
+        @addDiv lineMeta
+
     #  0000000  000      000   0000000  000   000
     # 000       000      000  000       000  000 
     # 000       000      000  000       0000000  
@@ -159,6 +187,7 @@ class Meta
     #  0000000  0000000  000   0000000  000   000
     
     onClick: (event) ->
+        
         if not event.altKey
             if event.target.href?
                 split = event.target.href.split ':'
@@ -203,18 +232,21 @@ class Meta
             @addDiv meta
         
     onLinesExposed: (e) => 
+        
         @updatePositionsBelowLineIndex e.top
         
     onExposeTopChanged: (e) => @updatePositionsBelowLineIndex e.new
         
-    updatePositionsBelowLineIndex: (li) ->     
+    updatePositionsBelowLineIndex: (li) ->   
+        
         size = @editor.size
         for meta in rangesFromTopToBotInRanges li, @editor.scroll.exposeBot, @metas
             tx = size.charWidth *  meta[1][0] + size.offsetX
             ty = size.lineHeight * (meta[0] - @editor.scroll.exposeTop)
-            meta[2].div?.style.transform = "translate(#{tx}px,#{ty}px)"        
+            @setMetaPos meta, tx, ty
         
     onLineInserted: (li) => 
+        
         for meta in rangesFromTopToBotInRanges li+1, @editor.numLines(), @metas
             meta[0] += 1
         @updatePositionsBelowLineIndex li
@@ -226,7 +258,6 @@ class Meta
     #     0      000   000  000   000  000  0000000   000   000
 
     onWillDeleteLine: (li) => 
-        # log "Meta.onWillDeleteLine li:#{li}"
         
         for meta in @metasAtLineIndex li
             meta[2].div?.remove()
@@ -240,9 +271,11 @@ class Meta
         @updatePositionsBelowLineIndex li
     
     onLineVanished: (e) => 
+        
         for meta in @metasAtLineIndex e.lineIndex
             meta[2].div?.remove()
             meta[2].div = null
+            
         @updatePositionsBelowLineIndex e.lineIndex
     
     #  0000000  000      00000000   0000000   00000000 

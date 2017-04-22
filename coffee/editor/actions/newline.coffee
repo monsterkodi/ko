@@ -45,7 +45,7 @@ module.exports =
         else
             newCursors = @do.cursors()
         
-        for c in @do.cursors().reversed()
+        for c in @do.cursors().reverse()
         
             [before, after] = @splitStateLineAtPos @do, c
             after  = after.trimLeft() if doIndent

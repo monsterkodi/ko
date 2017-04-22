@@ -174,7 +174,7 @@ class Macro extends Command
                         
                 if texts.length
                     editor.do.start()
-                    for text in texts.reversed()
+                    for text in texts.reverse()
                         editor.do.insert lastIndex, text
                     editor.moveCursorsDown false, texts.length
                     editor.do.end()

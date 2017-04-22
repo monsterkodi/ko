@@ -38,7 +38,7 @@ class Coffee extends Command
                 diss: Syntax.dissForTextAndSyntax str(result.error), 'coffee'
                 clss: 'coffeeResult'
         else
-            log cmdID, result
+            # log cmdID, result
             @setCurrent @commands[cmdID] if @commands[cmdID]?
             terminal.appendMeta 
                 line: "#{cmdID} ▶"

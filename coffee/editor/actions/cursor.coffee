@@ -4,7 +4,7 @@
 # 000       000   000  000   000       000  000   000  000   000
 #  0000000   0000000   000   000  0000000    0000000   000   000
 
-{ stopEvent, _
+{ reversed, stopEvent, _
 } = require 'kxk'
 
 module.exports =
@@ -205,7 +205,7 @@ module.exports =
                         ci = newCursors.indexOf c
                         newCursors.splice ci, 1
             when 'down' 
-                for c in newCursors.reversed()
+                for c in reversed newCursors
                     if isPosInPositions([c[0], c[1]+1], newCursors) and not isPosInPositions [c[0], c[1]-1], newCursors
                         ci = newCursors.indexOf c
                         newCursors.splice ci, 1

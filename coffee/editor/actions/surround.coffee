@@ -4,7 +4,8 @@
 #      000  000   000  000   000  000   000  000   000  000   000  000  0000  000   000
 # 0000000    0000000   000   000  000   000   0000000    0000000   000   000  0000000  
 
-{log, _} = require 'kxk'
+{ reversed, log, _
+} = require 'kxk'
 
 module.exports =
 
@@ -133,7 +134,7 @@ module.exports =
             
         @surroundStack.push [cl,cr]
 
-        for ns in newSelections.reversed()
+        for ns in reversed newSelections
                                     
             if cl == '#{' # convert single string to double string
                 if sr = @rangeOfStringSurroundingRange ns

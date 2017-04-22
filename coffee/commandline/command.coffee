@@ -4,7 +4,7 @@
 # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
 
-{ clamp, prefs, error, log, _
+{ reversed, clamp, prefs, elem, error, log, _
 }           = require 'kxk'
 Syntax      = require '../editor/syntax'
 CommandList = require './commandlist'
@@ -117,12 +117,11 @@ class Command
 
     showList: ->
         if not @commandList?
-            listView = document.createElement 'div' 
-            listView.className = "commandlist #{@prefsID}"
+            listView = elem class: "commandlist #{@prefsID}"
             window.split.elem.appendChild listView
             @commandList = new CommandList '.commandlist', syntax: @syntaxName
     
-    listItems: () -> @history.reversed()
+    listItems: () -> reversed @history
 
     showItems: (items) ->
         return if not @commandList? and not items.length
@@ -136,11 +135,6 @@ class Command
         @execute @commandList.line(index)
     
     onBot: (bot) => 
-        cl = window.split.commandlineHeight + window.split.handleHeight
-        if bot < cl
-            @commandList?.view.style.opacity = "#{clamp 0, 1, bot/cl}"
-        else
-            @commandList?.view.style.opacity = "1"
         @positionList()
     
     positionList: ->

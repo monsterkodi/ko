@@ -4,7 +4,7 @@
 #    000     000       000   000  000 0 000
 #    000     00000000  000   000  000   000
 
-{ packagePath, dirExists, unresolve, resolve, path, fs, 
+{ packagePath, dirExists, reversed, unresolve, resolve, path, fs, 
   post, noon, store, clamp, log, _
 }        = require 'kxk'
 Walker   = require '../tools/walker'
@@ -151,7 +151,7 @@ class Term extends Command
     # 0000000  000  0000000      000   
     
     listItems: () -> 
-        items = _.concat @history.reversed(), _.intersection @bins, [
+        items = _.concat reversed(@history), _.intersection @bins, [
             'cat', 'colorcat', 
             'ls', 'color-ls',
             'konrad', 'noon', 'sds', 
@@ -333,7 +333,7 @@ class Term extends Command
                 when 'clear'   then terminal.clear()
                 when 'stop' 
                     post.toMain 'restartShell', winID: window.winID
-                    for meta in terminal.meta.metas.reversed()
+                    for meta in reversed terminal.meta.metas
                         if meta[2].cmdID?
                             meta[2].span?.innerHTML = "■"
                     terminal.appendMeta 

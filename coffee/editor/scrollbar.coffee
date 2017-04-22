@@ -4,20 +4,19 @@
 #      000  000       000   000  000   000  000      000      000   000  000   000  000   000
 # 0000000    0000000  000   000   0000000   0000000  0000000  0000000    000   000  000   000
 
-{ stopEvent, clamp, drag, log
+{ stopEvent, elem, clamp, drag, log
 } = require 'kxk'
 
 class Scrollbar
 
     constructor: (@editor) ->
         @editor.scroll.on 'scroll', @update
+        @editor.on 'viewHeight', @update
 
-        @elem = document.createElement 'div'
-        @elem.className = 'scrollbar left'
+        @elem = elem class: 'scrollbar left'
         @editor.view.appendChild @elem
 
-        @handle = document.createElement 'div'
-        @handle.className = 'scrollhandle left'
+        @handle = elem class: 'scrollhandle left'
         @elem.appendChild @handle
 
         @drag = new drag
@@ -113,8 +112,11 @@ class Scrollbar
             @handle.style.top     = "#{scrollTop}px"
             @handle.style.height  = "#{scrollHeight}px"
             @handle.style.width   = "2px"
-            cf = 1 - clamp 0, 1, (scrollHeight-10)/200
-            cs = "rgb(#{parseInt 47+cf*80},#{parseInt 47+cf*80},#{parseInt 47+cf*208})"
-            @handle.style.backgroundColor = cs
+            
+            f = 1 - clamp 0, 1, (scrollHeight-10)/200
+            g = 64
+            c = "rgb(#{g + parseInt f*100},#{g + parseInt f*100},#{parseInt g+f*(255-g)})"
+            
+            @handle.style.backgroundColor = c
 
 module.exports = Scrollbar

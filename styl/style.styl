@@ -350,7 +350,7 @@ infoPadding = 6px
     float               right
     display             inline-block
     vertical-align      top
-    padding-right       6px
+    padding-right       12px
     padding-top         3px
 
 #titlebar .dot.clean
@@ -489,7 +489,7 @@ infoPadding = 6px
         width           (numbersWidth - 8px)
         text-align      right
         color           #333        
-        
+
     &.highligd span 
         color           rgba(155,155,255, 0.6)
     &.selected span 
@@ -543,6 +543,20 @@ infoPadding = 6px
     &.termCommand
         cursor          pointer
 
+    &.git
+        background         #0f0
+        opacity            0.4
+        border-radius      0
+        padding            0
+        margin             0
+        width              numbersWidth
+        &.del
+            background         #f00
+        &.mod
+            background         #0f0
+        &.add
+            background         #88f
+            
 .linenumber span .saveButton    
     pointer-events      auto
     cursor              pointer
@@ -820,6 +834,7 @@ infoPadding = 6px
 .scrollbar
     position            absolute
     top                 0
+    cursor              pointer
         
     &.left
         bottom          0
