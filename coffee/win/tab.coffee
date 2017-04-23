@@ -49,7 +49,7 @@ class Tab
         @div.appendChild @pkg
             
         diss = syntax.dissForTextAndSyntax(path.basename(@file()), 'ko', join: true)
-        name = elem 'span', html:render.line(diss, charWidth:0)
+        name = elem 'span', class:'name', html:render.line(diss, charWidth:0)
         @div.appendChild name
 
         if @info.file?

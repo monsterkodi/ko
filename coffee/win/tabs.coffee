@@ -4,7 +4,7 @@
 #    000     000   000  000   000       000
 #    000     000   000  0000000    0000000 
 
-{ post, elem, error, log, _
+{ post, elem, drag, error, log, _
 } = require 'kxk'
 
 Tab = require './tab'
@@ -21,6 +21,12 @@ class Tabs
         
         @tabs.push new Tab @
         @tabs[0].setActive()
+        
+        @drag = new drag
+            target: @div
+            onStart: log 'start'
+            onMove: log 'move'
+            onEnd: log 'end'
         
         post.on 'newTabWithFile',   @onNewTabWithFile
         post.on 'closeTabOrWindow', @onCloseTabOrWindow
@@ -143,7 +149,7 @@ class Tabs
     # 000   000  00000000  0000000      000      0000000   000   000  00000000  
 
     stash: => 
-        # log 'stash', @activeTab().index()
+
         window.stash.set 'tabs', 
             files:  ( t.file() for t in @tabs )
             active: @activeTab().index()
@@ -170,7 +176,7 @@ class Tabs
     #  0000000   000        0000000    000   000     000     00000000    
     
     update: ->
-        @div.style.webkitAppRegion = @tabs.length <= 1 and 'drag' or 'no-drag'
+
         @stash()
 
         pkg = @tabs[0].info.pkg

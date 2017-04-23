@@ -416,18 +416,19 @@ class Main
         ww = height + 122
         
         win = new BrowserWindow
-            x:               parseInt (width-ww)/2
-            y:               0
-            width:           ww
-            height:          height
-            minWidth:        140
-            minHeight:       130
-            useContentSize:  true
-            fullscreenable:  true
-            show:            false
-            hasShadow:       false
-            backgroundColor: '#000'
-            titleBarStyle:   'hidden'
+            x:                parseInt (width-ww)/2
+            y:                0
+            width:            ww
+            height:           height
+            minWidth:         140
+            minHeight:        130
+            useContentSize:   true
+            fullscreenable:   true
+            acceptFirstMouse: true
+            show:             false
+            hasShadow:        false
+            backgroundColor:  '#000'
+            titleBarStyle:    'hidden'
 
         if opt.restore?
             newStash = path.join app.getPath('userData'), 'win', "#{win.id}.noon"
