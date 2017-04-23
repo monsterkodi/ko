@@ -113,7 +113,6 @@ class Menu
                 label:       'Close Tab or Window'
                 accelerator: 'Command+W'
                 click:       (i,win) -> post.toWin win.id, 'closeTabOrWindow'
-                # main.closeWindow win
             ]
         ,        
             # 000   000  000  000   000  0000000     0000000   000   000
@@ -160,7 +159,7 @@ class Menu
             ,   
                 label:       'Reload Window'
                 accelerator: 'Ctrl+Alt+Cmd+L'
-                click:       (i,win) -> main.reloadWin win
+                click:       (i,win) -> post.toWin win.id, 'reloadWin'
             ,                
                 label:       'Toggle FullScreen'
                 accelerator: 'Ctrl+Command+Alt+F'

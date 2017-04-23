@@ -198,7 +198,7 @@ class Term extends Command
         
         terminal = window.terminal
         
-        log 'aliasCmd', aliasList
+        # log 'aliasCmd', aliasList
 
         cmmd = 'alias ' + aliasList.join ' ' 
         terminal.appendMeta 

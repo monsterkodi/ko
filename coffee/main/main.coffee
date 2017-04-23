@@ -113,19 +113,20 @@ hideDock = ->
 # 000        000   000       000     000     
 # 000         0000000   0000000      000     
 
-post.onGet 'activateWindowWithFile', (file) -> main.activateWindowWithFile file
-post.onGet 'winInfos', -> (id: w.id, file: w.currentFile for w in wins())
+post.onGet 'winInfos', -> (id: w.id for w in wins())
+post.onGet 'logSync',  -> 
+    console.log.apply console, [].slice.call(arguments, 0)
+    return true
 
 post.on 'restartShell',       (cfg)   -> winShells[cfg.winID].restartShell()
 post.on 'newWindowWithFile',  (file)  -> main.createWindow file:file
-post.on 'toggleDevTools',     (winID) -> winWithID(winID).toggleDevTools()
+# post.on 'toggleDevTools',     (winID) -> winWithID(winID).toggleDevTools()
 post.on 'maximizeWindow',     (winID) -> main.toggleMaximize winWithID winID
 post.on 'activateWindow',     (winID) -> main.activateWindowWithID winID
 post.on 'activateNextWindow', (winID) -> main.activateNextWindow winID
 post.on 'activatePrevWindow', (winID) -> main.activatePrevWindow winID
-post.on 'reloadWindow',       (winID) -> main.reloadWin winWithID winID
 post.on 'fileSaved',    (file, winID) -> main.indexer.indexFile file, refresh: true
-post.on 'fileLoaded',   (file, winID) -> main.indexer.indexFile winWithID(winID).currentFile = file
+post.on 'fileLoaded',   (file, winID) -> main.indexer.indexFile file
 post.on 'winlog',       (winID, text) -> console.log "win#{winID} ", text
 
 post.on 'ping', (winID, argA, argB) -> post.toWin winID, 'pong', 'main', argA, argB
@@ -152,8 +153,6 @@ class Main
             app.exit 0
             return
 
-        # Menu.init @
-
         @indexer      = new Indexer
         coffeeExecute = new Execute main: @
 
@@ -167,6 +166,8 @@ class Main
         if not openFiles.length and args.filelist.length
             openFiles = fileList args.filelist
             
+        @moveWindowStashes()
+        
         if openFiles.length
             for file in openFiles
                 @createWindow file:file            
@@ -182,8 +183,6 @@ class Main
 
         Menu.init @
 
-        setTimeout @showWindows, 10
-        
     # 000   000  000  000   000  0000000     0000000   000   000   0000000
     # 000 0 000  000  0000  000  000   000  000   000  000 0 000  000     
     # 000000000  000  000 0 000  000   000  000   000  000000000  0000000 
@@ -195,8 +194,6 @@ class Main
     activeWin:   activeWin
     visibleWins: visibleWins
             
-    reloadWin: (win) -> win?.webContents.reloadIgnoringCache()
-
     toggleMaximize: (win) ->
         
         disableSnap = true
@@ -275,16 +272,6 @@ class Main
         else
             w.focus()
         w
-
-    activateWindowWithFile: (file) ->
-        
-        [file, pos] = splitFilePos file
-        for w in wins()
-            if w.currentFile == file
-                @activateWindowWithID w.id
-                post.toWin w.id, 'singleCursorAtPos', pos if pos?
-                return w.id
-        null
 
     closeOtherWindows: =>
         
@@ -401,24 +388,17 @@ class Main
     # 000   000  000            000     000     000   000  000   000  000     
     # 000   000  00000000  0000000      000      0000000   000   000  00000000
     
+    moveWindowStashes: ->
+        userData = app.getPath 'userData' 
+        stashDir = path.join(userData, 'win')
+        if dirExists stashDir
+            fs.moveSync stashDir, path.join(userData, 'old'), overwrite: true
+
     restoreWindows: ->
-        windows = prefs.get 'windows', {}
-        prefs.del 'windows'
-        sequenced = {}
-        i = 0
-        for k, w of windows
-            if w.file
-                i += 1
-                sequenced[i] = w
-        for k, w of sequenced
-            @restoreWin w
-                
-    restoreWin: (state) ->
-        w = @createWindow restore:state
-        w.setBounds state.bounds if state.bounds?
-        w.webContents.openDevTools() if state.devTools
-        w.showInactive()
-        w.focus()
+        userData = app.getPath 'userData'
+        stashFiles = fileList path.join(userData, 'old'), matchExt: ['.noon']
+        for file in stashFiles
+            @createWindow restore:file
                 
     #  0000000  00000000   00000000   0000000   000000000  00000000
     # 000       000   000  000       000   000     000     000     
@@ -434,34 +414,36 @@ class Main
         ww = height + 122
         
         win = new BrowserWindow
-            x:               parseInt (width-ww)/2
-            y:               0
-            width:           ww
-            height:          height
-            minWidth:        140
-            minHeight:       130
-            useContentSize:  true
-            fullscreenable:  true
-            show:            false
-            hasShadow:       false
-            webPreferences:
-                scrollBounce: true
-            backgroundColor: '#000'
-            titleBarStyle:   'hidden'
+            x:                parseInt (width-ww)/2
+            y:                0
+            width:            ww
+            height:           height
+            minWidth:         140
+            minHeight:        130
+            useContentSize:   true
+            fullscreenable:   true
+            acceptFirstMouse: true
+            show:             false
+            hasShadow:        false
+            backgroundColor:  '#000'
+            titleBarStyle:    'hidden'
 
+        if opt.restore?
+            newStash = path.join app.getPath('userData'), 'win', "#{win.id}.noon"
+            fs.copySync opt.restore, newStash
+            
         #win.webContents.openDevTools()
         win.loadURL "file://#{__dirname}/../index.html"
         app.dock.show()
         win.on 'close',  @onCloseWin
         win.on 'resize', @onResizeWin
-                                        
+        
         winLoaded = ->
-            if opt.restore
-                post.toWin win.id, 'restore', opt.restore if opt.restore
+            if opt.files?
+                post.toWin win.id, 'loadFiles', opt.files
             else if opt.file?
-                win.currentFile = splitFilePos(opt.file)[0] # ????
                 post.toWin win.id, 'loadFile', opt.file
-            win.show()
+            
             post.toWins 'winLoaded', win.id
             post.toWins 'numWins', wins().length
                             
@@ -503,7 +485,6 @@ class Main
     onCloseWin: (event) =>
         
         wid = event.sender.id
-        prefs.del "windows:#{wid}"
         if visibleWins().length == 1
             hideDock()
         post.toWins 'winClosed', wid
@@ -514,26 +495,27 @@ class Main
         if not visibleWins().length
             @toggleWindows()
 
-        if !activeWin()
+        if not activeWin()
             visibleWins()[0]?.focus()
 
+        files = []
         for arg in args.slice(2)
             continue if arg.startsWith '-'
             file = arg
             if not arg.startsWith '/'
                 file = path.join resolve(dir), arg
             [fpath, pos] = splitFilePos file
-            if not fileExists fpath
-                continue
-            w = winWithID @activateWindowWithFile file
-            w = @createWindow file:file if not w?
+            if fileExists fpath
+                files.push file
+        log 'createWindow', files
+        @createWindow files:files
                     
     quit: ->
         
         toSave = wins().length
         if toSave
-            post.toWins 'saveState'
-            post.on 'stateSaved', ->
+            post.toWins 'saveStash'
+            post.on 'stashSaved', ->
                 toSave -= 1
                 if toSave == 0
                     prefs.save()

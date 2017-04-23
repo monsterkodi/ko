@@ -15,8 +15,6 @@ class Row
 
         @div = elem class: 'browserRow', html: syntax.spanForTextAndSyntax @item.text ? @item.name, 'browser'
         @div.classList.add @item.type
-        @div.addEventListener 'click', @activate
-        @div.addEventListener 'dblclick', => @column.navigateCols 'enter'
         @column.table.appendChild @div
    
     next:        -> @index() < @column.numRows()-1 and @column.rows[@index()+1] or null
@@ -32,12 +30,18 @@ class Row
     # 000   000   0000000     000     000      0      000   000     000     00000000  
     
     activate: (event) =>
+        
         if event?
             {mod} = keyinfo.forEvent event
             switch mod
-                when 'alt', 'command+alt'
+                when 'alt', 'command', 'command+alt'
                     if @item.type == 'file' and @item.textFile
-                        post.emit 'jumpTo', file:@item.abs, newWindow:mod!='alt', sameWindow:mod=='alt'
+                        opt = file:@item.abs 
+                        if mod == 'command+alt'
+                            opt.newWindow = true
+                        else
+                            opt.newTab = true 
+                        post.emit 'jumpTo', opt
                     else
                         post.emit 'jumpTo', word:@item.name
                     return
@@ -49,7 +53,7 @@ class Row
             when 'file'  then @column.browser.loadContent @,         column: @column.index+1
             else
                 if @item.file?
-                    post.emit 'jumpTo', file:@item.file, line:@item.line, sameWindow:true
+                    post.emit 'jumpTo', file:@item.file, line:@item.line
                 else if @column.parent.obj?
                     @column.browser.loadObjectItem  @item, column: @column.index+1
                 else
@@ -61,7 +65,7 @@ class Row
     setActive: (opt = emit:false) ->
         @column.activeRow()?.clearActive()
         @div.classList.add 'active'
-        @column.scroll.toIndex @index()  
+        @column.scroll.toIndex @index() 
         post.emit 'browser-item-activated', @item if opt?.emit # sets commandline text
         @
                 

@@ -316,7 +316,8 @@ infoPadding = 6px
     white-space         nowrap
     -webkit-app-region  drag
 
-#titlebar .dot
+// #titlebar .dot
+.dot
     display             inline-block
     vertical-align      top
     padding-left        6px
@@ -338,7 +339,7 @@ infoPadding = 6px
 
 #titlebar .winnum
     flex                0 0 0
-    color               #555
+    color               #333
     float               right
     display             inline-block
     vertical-align      top
@@ -346,6 +347,9 @@ infoPadding = 6px
     padding-left        12px
     padding-top         3px
 
+#titlebar.focus .winnum
+    color               #555
+    
 // 000000000   0000000    0000000   000      000000000  000  00000000   
 //    000     000   000  000   000  000         000     000  000   000  
 //    000     000   000  000   000  000         000     000  00000000   
@@ -388,14 +392,23 @@ infoPadding = 6px
     &::-webkit-scrollbar
         height          2px
 
+.tabs .name
+    -webkit-app-region  no-drag
+
 #titlebar.focus .tabs
     color               #34C749
 
-.tabs .tab.dirty 
-.tabs .tab.dirty .dot
+// 000000000   0000000   0000000    
+//    000     000   000  000   000  
+//    000     000000000  0000000    
+//    000     000   000  000   000  
+//    000     000   000  0000000    
+
+.tab.dirty 
+.tab.dirty .dot
     color               #aaf
 
-.tabs .tab.clean .dot
+.tab.clean .dot
     color               #444
     &.focus
         color           #006600
@@ -404,11 +417,11 @@ infoPadding = 6px
     flex                1 1 0
     border-top-left-radius  6px
     border-top-right-radius 6px
+    font-size           titlebarFontSize
     background          #333
     padding-left        6px
     padding-right       6px
     padding-top         3px
-    margin-right        3px
     &.active
         background      #222
     

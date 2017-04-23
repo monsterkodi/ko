@@ -31,6 +31,9 @@ class Column
         
         @div.addEventListener 'mouseover', @onMouseOver
         @div.addEventListener 'mouseout',  @onMouseOut
+
+        @div.addEventListener 'click',    @onClick
+        @div.addEventListener 'dblclick', @onDblClick
         
         @scroll = new Scroller @
         
@@ -56,24 +59,13 @@ class Column
         @div.scrollTop = 0
         @table.innerHTML = ''
         @rows = []
-        
+                    
     #  0000000    0000000  000000000  000  000   000  00000000  
     # 000   000  000          000     000  000   000  000       
     # 000000000  000          000     000   000 000   0000000   
     # 000   000  000          000     000     000     000       
     # 000   000   0000000     000     000      0      00000000  
    
-    navigateTo: (target) ->
-        target = _.isString(target) and target or target?.file
-        if not @parent then return error 'no parent?'
-        relpath = relative target, @parent.abs
-        relitem = _.first relpath.split path.sep
-        row = @rowWithName relitem
-        if row
-            @activateRow row
-        else            
-            @browser.endNavigateToTarget()
-            
     activateRow:  (row) -> @row(row)?.activate()
        
     activeRow: -> 
@@ -118,14 +110,34 @@ class Column
     onFocus: => @div.classList.add 'focus'
     onBlur:  => @div.classList.remove 'focus'
     
+    # 00     00   0000000   000   000   0000000  00000000  
+    # 000   000  000   000  000   000  000       000       
+    # 000000000  000   000  000   000  0000000   0000000   
+    # 000 0 000  000   000  000   000       000  000       
+    # 000   000   0000000    0000000   0000000   00000000  
+    
     onMouseOver: (event) => @row(event.target)?.onMouseOver()
     onMouseOut:  (event) => @row(event.target)?.onMouseOut()
-    
+    onClick:     (event) => @row(event.target)?.activate event
+    onDblClick:  (event) => @navigateCols 'enter'
+
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       
     # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000   
     # 000  0000  000   000     000     000  000   000  000   000     000     000       
     # 000   000  000   000      0      000   0000000   000   000     000     00000000  
+
+    navigateTo: (target) ->
+        
+        target = _.isString(target) and target or target?.file
+        if not @parent then return error 'no parent?'
+        relpath = relative target, @parent.abs
+        relitem = _.first relpath.split path.sep
+        row = @rowWithName relitem
+        if row
+            @activateRow row
+        else            
+            @browser.endNavigateToTarget()
 
     navigateRows: (key) ->
 

@@ -4,7 +4,7 @@
 #      000  000       000      000       000          000     000  000   000  000  0000
 # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
 
-{ error, log, _
+{ post, error, log, _
 } = require 'kxk'
 
 module.exports =
@@ -58,12 +58,12 @@ module.exports =
     
     startStickySelection: () -> 
         @stickySelection = true
-        @updateTitlebar?()
+        post.emit 'sticky', true
         @emit 'selection'
 
     endStickySelection: () ->
         @stickySelection = false
-        @updateTitlebar?()
+        post.emit 'sticky', false
         @emit 'selection'
 
     #  0000000  000000000   0000000   00000000   000000000          00000000  000   000  0000000    

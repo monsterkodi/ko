@@ -1,11 +1,15 @@
+
 # 000   000  000  000   000  0000000     0000000   000   000
 # 000 0 000  000  0000  000  000   000  000   000  000 0 000
 # 000000000  000  000 0 000  000   000  000   000  000000000
 # 000   000  000  000  0000  000   000  000   000  000   000
 # 00     00  000  000   000  0000000     0000000   00     00
 
-{ splitFilePos, stopEvent, fileExists, fileList, resolve, keyinfo, clamp,
-sw,sh, prefs, drag, pos, str, os, fs, post, path, error, log, $, _
+{ splitFilePos, stopEvent, fileExists, fileList, resolve, keyinfo, 
+  prefs, stash, drag, noon, post, path, clamp, error, 
+  pos, str, log, 
+  sw, sh, os, fs, 
+  $, _
 }           = require 'kxk'
 Split       = require './split'
 Terminal    = require './terminal'
@@ -32,9 +36,9 @@ logview     = null
 area        = null
 terminal    = null
 commandline = null
+titlebar    = null
+tabs        = null
 
-domain = require('domain').create()
-domain.on 'error', (err) -> error "unhandled error: #{err}"
 window.onerror = (event, source, line, col, err) -> 
     f = require('sorcery').loadSync(source.replace /coffee/g, 'js')
     if f?
@@ -54,8 +58,10 @@ window.onerror = (event, source, line, col, err) ->
 
 prefs.init()
 window.prefs = prefs
+window.stash = new stash "win/#{winID}"
 
 addToRecent = (file) ->
+    
     recent = prefs.get 'recentFiles', []
     _.pull recent, file
     recent.unshift file
@@ -64,24 +70,20 @@ addToRecent = (file) ->
     prefs.set 'recentFiles', recent
     commandline.commands.open.setHistory recent.reverse()
     
-#  0000000  000000000   0000000   000000000  00000000
-# 000          000     000   000     000     000     
-# 0000000      000     000000000     000     0000000 
-#      000     000     000   000     000     000     
-# 0000000      000     000   000     000     00000000
-   
-getState = (key, value) -> prefs.get "windows:#{winID}:#{key}", value
-delState = (key)        -> prefs.del "windows:#{winID}:#{key}"
-setState = (key, value) -> prefs.set "windows:#{winID}:#{key}", value
-
-window.setState = setState
-window.getState = getState
-window.delState = delState
-
-saveState = -> 
+saveStash = -> 
+    
+    post.emit 'stash'
     editor.saveScrollCursorsAndSelections()
-    post.toMain 'stateSaved'
+    window.stash.save()
+    post.toMain 'stashSaved'
 
+restoreWin = ->
+    
+    if bounds = window.stash.get 'bounds'
+        win.setBounds bounds
+    if window.stash.get 'devTools'
+        win.webContents.openDevTools()
+    
 # 00000000    0000000    0000000  000000000  
 # 000   000  000   000  000          000     
 # 00000000   000   000  0000000      000     
@@ -92,14 +94,17 @@ post.on 'shellCallbackData', (cmdData) -> commandline.commands['term'].onShellCa
 post.on 'singleCursorAtPos', (pos, opt) -> 
     editor.singleCursorAtPos pos, opt
     editor.scrollCursorToTop()
-post.on 'openFile',          (options) -> openFile options
-post.on 'focusEditor',  -> split.focus 'editor'
-post.on 'cloneFile',    -> post.toMain 'newWindowWithFile', editor.currentFile
-post.on 'reloadFile',   -> reloadFile()
-post.on 'saveFileAs',   -> saveFileAs()
-post.on 'saveFile',     -> saveFile()
-post.on 'saveState',    -> saveState()
-post.on 'loadFile', (file) -> loadFile file
+post.on 'focusEditor',       -> split.focus 'editor'
+post.on 'cloneFile',         -> post.toMain 'newWindowWithFile', editor.currentFile
+post.on 'reloadFile',        -> reloadFile()
+post.on 'reloadWin',         -> reloadWin()
+post.on 'saveFileAs',        -> saveFileAs()
+post.on 'saveFile',          -> saveFile()
+post.on 'saveStash',         -> saveStash()
+post.on 'openFile',   (opt)  -> openFile opt
+post.on 'reloadTab', (file)  -> reloadTab file 
+post.on 'loadFile',  (file)  -> loadFile file
+post.on 'loadFiles', (files) -> openFiles files
 post.on 'fileLinesChanged', (file, lineChanges) ->
     if file == editor.currentFile
         editor.applyForeignLineChanges lineChanges
@@ -129,6 +134,7 @@ winMain = ->
     # 000  000   000  000     000     
 
     titlebar    = window.titlebar    = new Titlebar
+    tabs        = window.tabs        = titlebar.tabs
     navigate    = window.navigate    = new Navigate
     split       = window.split       = new Split()
     terminal    = window.terminal    = new Terminal 'terminal'
@@ -139,6 +145,8 @@ winMain = ->
     info        = window.info        = new Info editor
     fps         = window.fps         = new FPS()
 
+    restoreWin()
+    
     split.on 'split', (s) ->
         area.resized()
         terminal.resized()
@@ -155,24 +163,16 @@ winMain = ->
             post.toOtherWins 'fileLinesChanged', editor.currentFile, changeInfo.changes
             navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
 
-    editor.updateTitlebar()
-    
-    s = getState 'fontSize'
+    s = window.stash.get 'fontSize'
     editor.setFontSize s if s
     
-    if getState 'centerText'
+    if window.stash.get 'centerText'
         screenWidth = screenSize().width
         editor.centerText sw() == screenWidth, 0
         
-    fps.toggle() if getState 'fps'
-    
-    commandline.restoreState()
-    split.restoreState()
-
-window.onload = -> 
-    split.resized()
-    info.reload()
-    
+    post.emit 'restore'
+    win.show()
+        
 # 00000000  0000000    000  000000000   0000000   00000000 
 # 000       000   000  000     000     000   000  000   000
 # 0000000   000   000  000     000     000   000  0000000  
@@ -198,6 +198,7 @@ saveFile = (file) ->
     if not file?
         saveFileAs()
         return
+        
     editor.stopWatcher()
     
     if fileExists file
@@ -207,14 +208,15 @@ saveFile = (file) ->
         mode = 438
         
     atomicFile file, editor.text(), { encoding: 'utf8', mode: mode }, (err) ->
+        
         editor.saveScrollCursorsAndSelections()
+        
         if err?
             alert err
         else
             editor.emit 'save'
             editor.setCurrentFile file
             post.toMain 'fileSaved', file, winID
-            setState 'file', file
 
 saveChanges = ->
     
@@ -223,17 +225,56 @@ saveChanges = ->
         atomicFile editor.currentFile, editor.text(), { encoding: 'utf8', mode: stat.mode }, (err) ->            
             return error "window.saveChanges failed #{err}" if err
 
-# 000   000  000   000  000       0000000    0000000   0000000    
+#  0000000   000   000   0000000  000       0000000    0000000  00000000  
+# 000   000  0000  000  000       000      000   000  000       000       
+# 000   000  000 0 000  000       000      000   000  0000000   0000000   
+# 000   000  000  0000  000       000      000   000       000  000       
+#  0000000   000   000   0000000  0000000   0000000   0000000   00000000  
+
+onMove  = -> window.stash.set 'bounds', win.getBounds()
+
+removeListeners = ->
+    
+    win.removeListener 'close', onClose
+    win.removeListener 'move',  onMove
+    win.webContents.removeAllListeners 'devtools-opened'
+    win.webContents.removeAllListeners 'devtools-closed'
+
+onClose = ->
+    
+    saveChanges()
+    editor.setText ''
+    editor.stopWatcher()
+    window.stash.clear()
+    removeListeners()
+
+#  0000000   000   000  000       0000000    0000000   0000000    
 # 000   000  0000  000  000      000   000  000   000  000   000  
 # 000   000  000 0 000  000      000   000  000000000  000   000  
 # 000   000  000  0000  000      000   000  000   000  000   000  
 #  0000000   000   000  0000000   0000000   000   000  0000000    
 
-window.onunload = ->
-    saveChanges()
-    editor.setText ''
-    post.toMain 'fileLoaded', '', winID # to clear prefs?
-    editor.setCurrentFile null # to stop watcher
+window.onload = -> 
+    
+    split.resized()
+    info.reload()
+    win.on 'close', onClose
+    win.on 'move',  onMove
+    # post.get 'logSync', 'window.onload'
+    win.webContents.on 'devtools-opened', -> window.stash.set 'devTools', true
+    
+# 00000000   00000000  000       0000000    0000000   0000000    
+# 000   000  000       000      000   000  000   000  000   000  
+# 0000000    0000000   000      000   000  000000000  000   000  
+# 000   000  000       000      000   000  000   000  000   000  
+# 000   000  00000000  0000000   0000000   000   000  0000000    
+
+reloadWin = ->
+    
+    saveStash()
+    removeListeners()
+    editor.stopWatcher()
+    win.webContents.reloadIgnoringCache()
 
 # 000       0000000    0000000   0000000  
 # 000      000   000  000   000  000   000
@@ -242,12 +283,26 @@ window.onunload = ->
 # 0000000   0000000   000   000  0000000  
 
 reloadFile = ->
+    
     loadFile editor.currentFile, 
-        reload:          true
-        dontSave:        true
+        reload:   true
+        dontSave: true
+        
+    if editor.currentFile?
+        post.toOtherWins 'reloadTab', editor.currentFile
+
+reloadTab = (file) ->
+    if file == editor.currentFile
+        loadFile editor.currentFile, 
+            reload:   true
+            dontSave: true
+    else 
+        post.emit 'revertFile', file
 
 loadFile = (file, opt={}) ->
-    # return if not file? or not file.length
+    
+    # log "window.loadFile", file, opt
+
     editor.saveScrollCursorsAndSelections()
     
     if file?
@@ -256,10 +311,9 @@ loadFile = (file, opt={}) ->
         
     if file != editor.currentFile or opt?.reload
         
-        # log 'loadFile', file, editor.currentFile, opt
+        # log "window.loadFile", file, opt
         
         if file? and not fileExists file
-            # return error "window.loadFile -- no such file:", file
             file = null
             
         if not opt?.dontSave then saveChanges()
@@ -270,16 +324,20 @@ loadFile = (file, opt={}) ->
             pos:  editor.cursorPos()
             for: 'load'
         
-        editor.setCurrentFile null, opt  # to stop watcher and reset scroll
-        
+        editor.clear()
+
         if file?
-            addToRecent file if file?
+            addToRecent file
+            
+            if tab = tabs.tab file
+                tab.setActive()
+
+            # log "editor.setCurrentFile", file, opt
             editor.setCurrentFile file, opt
+            
             post.toOthers 'fileLoaded', file, winID
             commandline.fileLoaded file
             
-        setState 'file', file
-    
     window.split.show 'editor'
         
     if pos? and pos[0] or pos[1] 
@@ -294,7 +352,7 @@ openFile = loadFile
 # 000   000  000        000       000  0000        000       000  000      000            000
 #  0000000   000        00000000  000   000        000       000  0000000  00000000  0000000 
 
-openFiles = (ofiles, options) -> # called from file dialog and open command and browser
+openFiles = (ofiles, options) -> # called from file dialog, open command and browser
     
     if ofiles?.length
         
@@ -315,7 +373,7 @@ openFiles = (ofiles, options) -> # called from file dialog and open command and 
             log 'window.openFiles.warning: no files for:', ofiles
             return []
             
-        setState 'openFilePath', path.dirname files[0]
+        window.stash.set 'openFilePath', path.dirname files[0]
         
         if not options?.newWindow and not options?.newTab
             file = resolve files.shift()
@@ -344,7 +402,7 @@ openFile = (options) ->
     dir ?= resolve '.'
     dialog.showOpenDialog 
         title: "Open File"
-        defaultPath: getState 'openFilePath',  dir
+        defaultPath: window.stash.get 'openFilePath',  dir
         properties: ['openFile', 'openDirectory', 'multiSelections']
         filters: [
             name: 'Coffee-Script', extensions: ['coffee']
@@ -376,11 +434,10 @@ saveFileAs = ->
 
 screenSize = -> electron.screen.getPrimaryDisplay().workAreaSize
     
-win.on 'move', -> setState 'bounds', win.getBounds()
 window.onresize = ->
     split.resized()
-    setState 'bounds', win.getBounds()
-    if getState 'centerText', false
+    window.stash.set 'bounds', win.getBounds()
+    if window.stash.get 'centerText', false
         screenWidth = screenSize().width
         editor.centerText sw() == screenWidth, 0
 
@@ -404,11 +461,11 @@ screenShot = ->
 #  0000000  00000000  000   000     000     00000000  000   000         000     00000000  000   000     000   
 
 toggleCenterText = ->
-    if not getState 'centerText', false
-        setState 'centerText', true
+    if not window.stash.get 'centerText', false
+        window.stash.set 'centerText', true
         editor.centerText sw() == screenSize().width
     else
-        setState 'centerText', false
+        window.stash.set 'centerText', false
         editor.centerText false
 
 # 00000000   0000000   000   000  000000000      0000000  000  0000000  00000000
@@ -419,14 +476,14 @@ toggleCenterText = ->
     
 setFontSize = (s) -> 
     s = clamp 8, 80, s
-    setState "fontSize", s
+    window.stash.set "fontSize", s
     editor.setFontSize s
     loadFile editor.currentFile, reload:true if editor.currentFile?
     
 changeFontSize = (d) -> setFontSize editor.size.fontSize + d
     
 resetFontSize = -> 
-    delState 'fontSize'
+    window.stash.set 'fontSize'
     setFontSize editor.fontSizeDefault
 
 # 0000000   0000000    0000000   00     00
@@ -454,9 +511,9 @@ changeZoom: (d) ->
 # 000       000   000  000       000   000       000
 # 000        0000000    0000000   0000000   0000000 
 
-window.onblur  = (event) -> window.editor.updateTitlebar()
+window.onblur  = (event) -> post.emit 'winFocus', false
 window.onfocus = (event) -> 
-    window.editor.updateTitlebar()
+    post.emit 'winFocus', true
     if document.activeElement.className == 'body'
         if split.editorVisible()
             split.focus 'editor'
@@ -470,6 +527,7 @@ window.onfocus = (event) ->
 # 000   000  00000000     000   
 
 document.onkeydown = (event) ->
+    
     {mod, key, combo} = keyinfo.forEvent event
 
     return if not combo
@@ -482,7 +540,7 @@ document.onkeydown = (event) ->
             return stopEvent event
     
     switch combo
-        when 'command+alt+i'      then return post.toMain 'toggleDevTools', winID
+        when 'command+alt+i'      then return win.webContents.toggleDevTools()
         when 'ctrl+w'             then return loadFile ''
         when 'f3'                 then return screenShot()
         when 'command+\\'         then return toggleCenterText()

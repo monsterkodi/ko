@@ -29,7 +29,9 @@ class Split extends event
         @editor      =$ 'editor'     
         @logview     =$ 'logview'    
 
-        post.on 'focus', @focus
+        post.on 'focus',   @focus
+        post.on 'stash',   @stash
+        post.on 'restore', @restore
 
         @flex = new Flex
             panes: [
@@ -53,14 +55,12 @@ class Split extends event
             snapLast:   100
             
     onDrag: => if @flex? then @emitSplit()
+    emitSplit: => @emit 'split', @flex.panePositions() 
     
-    restoreState: -> 
-        @flex.restoreState window.getState 'split'
-        @emitSplit()
-    
-    emitSplit: =>         
-        @emit 'split', @flex.panePositions() 
-        window.setState 'split', @flex.getState() 
+    stash: => window.stash.set 'split', @flex.getState()
+    restore: => 
+        @flex.restoreState window.stash.get 'split'
+        @emitSplit()    
                 
     # 0000000     0000000 
     # 000   000  000   000

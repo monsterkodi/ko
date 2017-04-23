@@ -4,7 +4,7 @@
 #    000     000   000  000   000       000
 #    000     000   000  0000000    0000000 
 
-{ post, elem, log, _
+{ post, elem, drag, error, log, _
 } = require 'kxk'
 
 Tab = require './tab'
@@ -17,14 +17,22 @@ class Tabs
         @div = elem class: 'tabs'
         view.appendChild @div
         
-        @div.addEventListener 'click', @onClick
+        @div.addEventListener 'click',     @onClick
         
         @tabs.push new Tab @
         @tabs[0].setActive()
         
+        @drag = new drag
+            target: @div
+            onStart: @onDragStart
+            onMove:  @onDragMove
+            onStop:  @onDragStop
+        
         post.on 'newTabWithFile',   @onNewTabWithFile
         post.on 'closeTabOrWindow', @onCloseTabOrWindow
-        post.on 'restore',          @onRestore
+        post.on 'stash',            @stash
+        post.on 'restore',          @restore
+        post.on 'revertFile',       @revertFile
 
     #  0000000  000      000   0000000  000   000  
     # 000       000      000  000       000  000   
@@ -45,6 +53,39 @@ class Tabs
                 tab.activate()
         true
 
+    # 0000000    00000000    0000000    0000000   
+    # 000   000  000   000  000   000  000        
+    # 000   000  0000000    000000000  000  0000  
+    # 000   000  000   000  000   000  000   000  
+    # 0000000    000   000  000   000   0000000   
+    
+    onDragStart: (d, e) => 
+        
+        @dragTab = @tab e.target
+        @dragDiv = @dragTab.div.cloneNode true
+        @dragTab.div.style.opacity = '0'
+        br = @dragTab.div.getBoundingClientRect()
+        @dragDiv.style.position = 'absolute'
+        @dragDiv.style.top  = "#{br.top}px"
+        @dragDiv.style.left = "#{br.left}px"
+        @dragDiv.style.width = "#{br.width-12}px"
+        @dragDiv.style.height = "#{br.height-3}px"
+        @dragDiv.style.flex = 'unset'
+        @dragDiv.style.pointerEvents = 'none'
+        body.appendChild @dragDiv
+
+    onDragMove: (d,e) =>
+        
+        @dragDiv.style.transform = "translateX(#{d.deltaSum.x}px)"
+        if tab = @tabAtX d.pos.x
+            if tab.index() != @dragTab.index()
+                @swap tab, @dragTab
+        
+    onDragStop: (d,e) =>
+        
+        @dragTab.div.style.opacity = '1'
+        @dragDiv.remove()
+
     # 000000000   0000000   0000000    
     #    000     000   000  000   000  
     #    000     000000000  0000000    
@@ -56,10 +97,16 @@ class Tabs
             _.find @tabs, (t) -> t.div.contains id
         else if _.isNumber id
             @tabs[id]
+        else if _.isString id
+            _.find @tabs, (t) -> t.info.file == id
 
     activeTab: -> _.find @tabs, (t) -> t.isActive()
     numTabs:   -> @tabs.length
-        
+    
+    tabAtX: (x) -> _.find @tabs, (t) -> 
+        br = t.div.getBoundingClientRect()
+        br.left <= x <= br.left + br.width
+    
     #  0000000  000       0000000    0000000  00000000  
     # 000       000      000   000  000       000       
     # 000       000      000   000  0000000   0000000   
@@ -100,7 +147,12 @@ class Tabs
         @update()
         tab
 
-    onNewTabWithFile: (file) => @addTab(file).activate()
+    onNewTabWithFile: (file) => 
+        log 'addTabWithFile', file
+        if tab = @tab file
+            tab.activate()
+        else
+            @addTab(file).activate()
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       
@@ -116,7 +168,6 @@ class Tabs
             when 'right' then +1
         index = (@numTabs() + index) % @numTabs()
         @tabs[index].activate()
-        true
 
     swap: (ta, tb) ->
         return if not ta? or not tb?
@@ -124,6 +175,7 @@ class Tabs
         @tabs[ta.index()]   = tb
         @tabs[tb.index()+1] = ta
         @div.insertBefore tb.div, ta.div
+        @update()
     
     move: (key) ->
         
@@ -137,17 +189,27 @@ class Tabs
     # 0000000    0000000   0000000      000     000   000  0000000    0000000   
     # 000   000  000            000     000     000   000  000   000  000       
     # 000   000  00000000  0000000      000      0000000   000   000  00000000  
-    
-    onRestore: (state) =>
 
-        files = state.tabs?.files ? [state.file]
+    stash: => 
+
+        window.stash.set 'tabs', 
+            files:  ( t.file() for t in @tabs )
+            active: @activeTab().index()
+    
+    restore: =>
+        active = window.stash.get 'tabs:active', 0
+        files  = window.stash.get 'tabs:files'
+        return if _.isEmpty files # happens when first window opens
+        
         @tabs[0].update file: files.shift()
         while files.length
             @addTab files.shift()
-        if state.tabs?.active?
-            @tabs[state.tabs?.active].activate()
-        else
-            @tabs[0].activate()
+        
+        @tabs[active].activate()
+            
+        @update()
+
+    revertFile: (file) => @tab(file)?.revert()
         
     # 000   000  00000000   0000000     0000000   000000000  00000000    
     # 000   000  000   000  000   000  000   000     000     000         
@@ -156,10 +218,17 @@ class Tabs
     #  0000000   000        0000000    000   000     000     00000000    
     
     update: ->
-        @div.style.webkitAppRegion = @tabs.length <= 1 and 'drag' or 'no-drag'
-        window.setState 'tabs', 
-            files:  ( t.file() for t in @tabs )
-            active: @activeTab().index()
+
+        @stash()
+
+        pkg = @tabs[0].info.pkg
+        @tabs[0].showPkg()
+        for tab in @tabs.slice 1
+            if tab.info.pkg == pkg
+                tab.hidePkg()
+            else
+                pkg = tab.info.pkg
+                tab.showPkg()
         @
         
 module.exports = Tabs

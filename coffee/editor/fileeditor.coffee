@@ -1,11 +1,12 @@
+
 # 00000000  000  000      00000000        00000000  0000000    000  000000000   0000000   00000000   
 # 000       000  000      000             000       000   000  000     000     000   000  000   000  
 # 000000    000  000      0000000         0000000   000   000  000     000     000   000  0000000    
 # 000       000  000      000             000       000   000  000     000     000   000  000   000  
 # 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000  
 
-{ fileName, unresolve, fileExists, setStyle, swapExt, keyinfo,
-  clamp, drag, post, error, log, str, $, _, fs, path
+{ fileName, unresolve, fileExists, swapExt, path, fs,
+  setStyle, keyinfo, clamp, drag, post, error, log, str, $, _
 }          = require 'kxk'
 watcher    = require './watcher'
 TextEditor = require './texteditor'
@@ -35,7 +36,7 @@ class FileEditor extends TextEditor
         dirty = @do.hasLineChanges()
         if @dirty != dirty
             @dirty = dirty
-            @updateTitlebar()
+            post.emit 'dirty', @dirty
 
     # 00000000   0000000   00000000   00000000  000   0000000   000   000  
     # 000       000   000  000   000  000       000  000        0000  000  
@@ -51,9 +52,13 @@ class FileEditor extends TextEditor
     # 000       000  000      000     
     # 000       000  0000000  00000000
 
+    clear: -> @setCurrentFile()
+    
     setCurrentFile: (file, opt) -> 
-                
+        
         @dirty = false
+        post.emit 'dirty', false
+        
         @syntax.name = 'txt'
         if file?
             name = path.extname(file).substr(1)
@@ -64,38 +69,25 @@ class FileEditor extends TextEditor
         @stopWatcher()
         @currentFile = file
         @do.reset()
-        @updateTitlebar()
+        
         @setupFileType()
         
-        if file?
+        if @currentFile?
             @watch = new watcher @
-            @setText fs.readFileSync file, encoding: 'utf8'
+            @setText fs.readFileSync @currentFile, encoding: 'utf8'
+            # log 'setText', @lines().slice 0, 6
             @restoreScrollCursorsAndSelections()
+            post.emit 'file', @currentFile # titlebar -> tabs -> tab
         else
-            @watch = null
             @setLines []
             
-        @emit 'file', @currentFile
+        @emit 'file', @currentFile # diffbar
 
     stopWatcher: ->
         if @watch?
             @watch?.stop()
             @watch = null
-                    
-    # 000000000  000  000000000  000      00000000  0000000     0000000   00000000 
-    #    000     000     000     000      000       000   000  000   000  000   000
-    #    000     000     000     000      0000000   0000000    000000000  0000000  
-    #    000     000     000     000      000       000   000  000   000  000   000
-    #    000     000     000     0000000  00000000  0000000    000   000  000   000
-        
-    updateTitlebar: ->
-        window.titlebar.update
-            winID:  window.winID
-            focus:  document.hasFocus()
-            dirty:  @dirty ? false
-            file:   @currentFile
-            sticky: @stickySelection            
-        
+                            
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
     # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
     # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 
@@ -131,11 +123,11 @@ class FileEditor extends TextEditor
             
         s.scroll = @scroll.scroll if @scroll.scroll
                 
-        filePositions = window.getState 'filePositions', Object.create null
+        filePositions = window.stash.get 'filePositions', Object.create null
         if not _.isPlainObject filePositions
             filePositions = Object.create null
         filePositions[@currentFile] = s
-        window.setState 'filePositions', filePositions       
+        window.stash.set 'filePositions', filePositions       
         
     # 00000000   00000000   0000000  000000000   0000000   00000000   00000000
     # 000   000  000       000          000     000   000  000   000  000     
@@ -145,7 +137,7 @@ class FileEditor extends TextEditor
     
     restoreScrollCursorsAndSelections: ->
         return if not @currentFile
-        filePositions = window.getState 'filePositions', {}
+        filePositions = window.stash.get 'filePositions', {}
         if filePositions[@currentFile]? 
             s = filePositions[@currentFile] 
             @setCursors    s.cursors ? [[0,0]]
@@ -177,8 +169,11 @@ class FileEditor extends TextEditor
         opt.pos = [opt.col ? 0, opt.line ? 0]
         opt.winID = window.winID
         
+        if opt.newTab
+            post.emit 'newTabWithFile', opt.file
+        else
         # log "FileEditor.jumpToFile gotoFilePos", opt
-        window.navigate.gotoFilePos opt
+            window.navigate.gotoFilePos opt
 
     jumpTo: (word, opt) =>
 

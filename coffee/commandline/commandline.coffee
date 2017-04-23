@@ -4,7 +4,7 @@
 # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 
-{ fileList, stopEvent, elem, keyinfo, clamp, path, error, log, str, $, _
+{ fileList, stopEvent, elem, keyinfo, clamp, post, path, error, log, str, $, _
 }          = require 'kxk'
 TextEditor = require '../editor/texteditor'
 render     = require '../editor/render'
@@ -34,6 +34,9 @@ class Commandline extends TextEditor
         
         window.split.on 'split', @onSplit
         
+        post.on 'restore', @restore
+        post.on 'stash',   @stash
+        
         @view.onblur = () => 
             @cmmd.classList.remove 'active'
             @list?.remove()
@@ -49,17 +52,12 @@ class Commandline extends TextEditor
     #      000     000     000   000     000     000       
     # 0000000      000     000   000     000     00000000  
     
-    saveState: ->
-        
-        if @command?
-            state = @command.state()
-            # log 'saveState', state
-        window.setState 'commandline', state
+    stash: => if @command? then window.stash.set 'commandline', @command.state()
 
-    restoreState: ->
+    restore: =>
         
-        state = window.getState 'commandline'
-        # log 'commandline restoreState', state
+        state = window.stash.get 'commandline'
+        # log 'commandline restore', state
         @setText state?.text ? ""
         if state?.name
             name = state.name
@@ -110,7 +108,6 @@ class Commandline extends TextEditor
         
         @setLines [t ? '']
         @singleCursorAtPos [@line(0).length, 0]
-        @saveState()
     
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000

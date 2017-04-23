@@ -1,3 +1,4 @@
+
 # 00     00  000  000   000  000  00     00   0000000   00000000 
 # 000   000  000  0000  000  000  000   000  000   000  000   000
 # 000000000  000  000 0 000  000  000000000  000000000  00000000 
@@ -218,6 +219,7 @@ class Minimap
     #  0000000   000   000        00000000  0000000    000     000      0000000   000   000
     
     onEditorScroll: =>
+        
         if @scroll.fullHeight > @scroll.viewHeight
             pc = @editor.scroll.scroll / @editor.scroll.scrollMax
             tp = parseInt pc * @scroll.scrollMax
@@ -225,10 +227,12 @@ class Minimap
         @drawTopBot()
     
     onEditorNumLines: (n) => 
+        
         @onEditorViewHeight @editor.viewHeight() if n and @lines.height <= @scroll.lineHeight
         @scroll.setNumLines n
             
     onEditorViewHeight: (h) => 
+        
         @scroll.setViewHeight 2*@editor.viewHeight()
         @onScroll()
         @onEditorScroll()

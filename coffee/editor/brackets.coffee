@@ -5,8 +5,9 @@
 # 000   000  000   000  000   000  000       000  000   000          000          000
 # 0000000    000   000  000   000   0000000  000   000  00000000     000     0000000 
 
-{log, _} = require 'kxk'
-matchr   = require '../tools/matchr'
+{log, _
+}      = require 'kxk'
+matchr = require '../tools/matchr'
 
 class Brackets
     

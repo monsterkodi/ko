@@ -5,7 +5,7 @@
 #   000       000             000
 #   000       000        0000000 
 
-{ clamp, elem, log, $
+{ clamp, post, elem, log, $
 }   = require 'kxk'
 now = require 'performance-now'
 
@@ -25,8 +25,11 @@ class FPS
         
         @history = []
         @last = now()
-            
+        
         $('commandline-span').appendChild @elem
+        
+        post.on 'stash',   @stash
+        post.on 'restore', @restore
             
     # 0000000    00000000    0000000   000   000
     # 000   000  000   000  000   000  000 0 000
@@ -51,12 +54,17 @@ class FPS
         if @elem.style.display != 'none'
             window.requestAnimationFrame @draw
 
+    visible: -> @elem.style.display != 'none'
+
+    restore: => @toggle() if window.stash.get 'fps'
+    stash: => if @visible() then window.stash.set('fps', true) else window.stash.set 'fps'
+
     toggle: -> 
-        @elem.style.display = @elem.style.display == 'none' and 'unset' or 'none'       
+        @elem.style.display = @visible() and 'none' or 'unset'       
         @history.push 49
-        window.setState 'fps', @elem.style.display != 'none' 
-        if @elem.style.display != 'none'
+        if @visible()
             window.requestAnimationFrame @draw
+        @stash()
 
 module.exports = FPS
 
