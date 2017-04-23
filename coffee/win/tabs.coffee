@@ -118,6 +118,20 @@ class Tabs
         @tabs[index].activate()
         true
 
+    swap: (ta, tb) ->
+        return if not ta? or not tb?
+        [ta, tb] = [tb, ta] if ta.index() > tb.index()
+        @tabs[ta.index()]   = tb
+        @tabs[tb.index()+1] = ta
+        @div.insertBefore tb.div, ta.div
+    
+    move: (key) ->
+        
+        tab = @activeTab()
+        switch key
+            when 'left'  then @swap tab, tab.prev() 
+            when 'right' then @swap tab, tab.next()
+
     # 00000000   00000000   0000000  000000000   0000000   00000000   00000000  
     # 000   000  000       000          000     000   000  000   000  000       
     # 0000000    0000000   0000000      000     000   000  0000000    0000000   

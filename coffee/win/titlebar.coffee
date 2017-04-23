@@ -48,9 +48,6 @@ class Titlebar
         @winnum.innerHTML = @numWins > 1 and "#{@numWins}" or ''
         @tabs.activeTab()?.update @info
 
-        # tooltip = unresolve @info.file
-        # "<span data-tip=\"#{tooltip}\"></span>"
-       
     # 000      000   0000000  000000000
     # 000      000  000          000   
     # 000      000  0000000      000   
@@ -58,6 +55,7 @@ class Titlebar
     # 0000000  000  0000000      000   
     
     showList: (event) => 
+        
         return if @list?
         winInfos = post.get 'winInfos'
         return if winInfos.length < 2
@@ -70,6 +68,7 @@ class Titlebar
         stopEvent event
 
     closeList: =>
+        
         if @list?
             window.split.focusAnything()
             @selected = -1
@@ -77,6 +76,7 @@ class Titlebar
             @list = null
 
     listWinInfos: (winInfos) ->
+        
         @list.innerHTML = ""        
         @list.style.display = 'unset'
         for info in winInfos
@@ -97,14 +97,17 @@ class Titlebar
             @list.appendChild div
 
     loadWindowWithID: (id) ->
+        
         @closeList()
         post.toMain 'activateWindow', id
         
     loadSelected: -> 
+        
         return @closeList() if @selected < 0
         @loadWindowWithID @list.children[@selected].winID
     
     navigate: (dir = 'down') ->
+        
         return if not @list
         @list.children[@selected]?.classList.remove 'selected'
         @selected += switch dir
@@ -113,7 +116,7 @@ class Titlebar
         @selected = @list.children.length-1 if @selected < -1
         @selected = -1 if @selected >= @list.children.length
         @list.children[@selected].classList.add 'selected' if @selected > -1
-        
+    
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
     # 0000000    0000000     00000  
@@ -125,6 +128,7 @@ class Titlebar
         switch combo
             when 'command+shift+t'     then return @tabs.closeOthers()
             when 'command+alt+left', 'command+alt+right' then return @tabs.navigate key
+            when 'command+alt+shift+left', 'command+alt+shift+right' then return @tabs.move key
 
         if @list?
             switch combo

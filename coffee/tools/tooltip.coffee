@@ -26,22 +26,25 @@ class Tooltip
         @elem.addEventListener 'DOMNodeRemoved', @del
 
     del: => 
+        
         return if not @elem?
         delete @elem.tooltip
         @onLeave()
-        @elem.removeEventListener 'mousemove',  @onHover
+        @elem.removeEventListener  'mousemove',  @onHover
         @elem.removeEventListener  'mouseleave', @onLeave
         @elem.removeEventListener  'mousedown',  @onLeave
         @elem.removeEventListener  'DOMNodeRemoved', @del
         @elem = null
 
     onHover: (event) =>
+        
         return if not @elem?
         return if @div?
         clearTimeout @timer
         @timer = setTimeout @popup, @opt.delay
 
     popup: (event) =>
+        
         return if not @elem?
         return if @div?
         @div = elem id:'tooltip', class:'tooltip', html: @opt.html
@@ -53,6 +56,7 @@ class Tooltip
         @div.style.top = "#{br.top + @opt.x}px" if @opt.y?
         
     onLeave: (event, e) =>
+        
         return if not @elem?
         clearTimeout @timer
         @timer = null
