@@ -48,6 +48,8 @@ class Tab
             diss = syntax.dissForTextAndSyntax(unresolve(@file()), 'ko', join: true)
             html = render.line(diss, charWidth:0)
             new Tooltip elem:name, html:html, x:0
+            
+        @div.appendChild elem 'span', class:'dot', text:'●' if info.dirty
         @
 
     file:  -> @info?.file ? 'untitled' 

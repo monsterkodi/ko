@@ -11,6 +11,7 @@ Syntax     = require '../editor/syntax'
 matchr     = require '../tools/matchr'
 salt       = require '../tools/salt'
 
+
 class CommandList extends TextEditor
 
     constructor: (viewElem, opt) ->

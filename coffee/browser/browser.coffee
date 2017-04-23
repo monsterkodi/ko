@@ -12,7 +12,7 @@ jsbeauty = require 'js-beautify'
 Column   = require './column'
 Stage    = require '../area/stage'
 dirlist  = require '../tools/dirlist'
-flex     = require '../flex/flex'
+flex     = require '../win/flex/flex'
 
 class Browser extends Stage
     
