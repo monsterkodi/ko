@@ -4,8 +4,8 @@
 # 000       000  000      000             000       000   000  000     000     000   000  000   000  
 # 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000  
 
-{ fileName, unresolve, fileExists, setStyle, swapExt, keyinfo,
-  clamp, drag, post, error, log, str, $, _, fs, path
+{ fileName, unresolve, fileExists, swapExt, path, fs,
+  setStyle, keyinfo, clamp, drag, post, error, log, str, $, _
 }          = require 'kxk'
 watcher    = require './watcher'
 TextEditor = require './texteditor'
@@ -35,7 +35,7 @@ class FileEditor extends TextEditor
         dirty = @do.hasLineChanges()
         if @dirty != dirty
             @dirty = dirty
-            @updateTitlebar()
+            post.emit 'dirty', @dirty
 
     # 00000000   0000000   00000000   00000000  000   0000000   000   000  
     # 000       000   000  000   000  000       000  000        0000  000  
@@ -52,8 +52,10 @@ class FileEditor extends TextEditor
     # 000       000  0000000  00000000
 
     setCurrentFile: (file, opt) -> 
-                
+        
         @dirty = false
+        post.emit 'dirty', false
+        
         @syntax.name = 'txt'
         if file?
             name = path.extname(file).substr(1)
@@ -64,38 +66,25 @@ class FileEditor extends TextEditor
         @stopWatcher()
         @currentFile = file
         @do.reset()
-        @updateTitlebar()
+        
         @setupFileType()
         
-        if file?
+        if @currentFile?
             @watch = new watcher @
-            @setText fs.readFileSync file, encoding: 'utf8'
+            @setText fs.readFileSync @currentFile, encoding: 'utf8'
             @restoreScrollCursorsAndSelections()
+            post.emit 'file', @currentFile # titlebar -> tabs -> tab
         else
             @watch = null
             @setLines []
             
-        @emit 'file', @currentFile
+        @emit 'file', @currentFile # diffbar
 
     stopWatcher: ->
         if @watch?
             @watch?.stop()
             @watch = null
-                    
-    # 000000000  000  000000000  000      00000000  0000000     0000000   00000000 
-    #    000     000     000     000      000       000   000  000   000  000   000
-    #    000     000     000     000      0000000   0000000    000000000  0000000  
-    #    000     000     000     000      000       000   000  000   000  000   000
-    #    000     000     000     0000000  00000000  0000000    000   000  000   000
-        
-    updateTitlebar: ->
-        window.titlebar.update
-            winID:  window.winID
-            focus:  document.hasFocus()
-            dirty:  @dirty ? false
-            file:   @currentFile
-            sticky: @stickySelection            
-        
+                            
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
     # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
     # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 

@@ -1,3 +1,4 @@
+
 # 0000000     0000000 
 # 000   000  000   000
 # 000   000  000   000
@@ -14,6 +15,7 @@ class Do
     constructor: (@editor) -> @reset()
 
     foreignChanges: (lineChanges) ->
+        
         @start()
         for change in lineChanges
             if change.change != 'deleted' and not change.after?
@@ -34,12 +36,14 @@ class Do
     # 000   000  00000000  0000000   00000000     000   
         
     reset: ->
+        
         @groupCount = 0
         @history = []
         @redos   = []
         @state   = null
                 
     hasLineChanges: ->
+        
         return false if @history.length == 0
         return not _.first(@history).get('lines').equals @editor.state.get('lines')
                                                                         
@@ -69,6 +73,7 @@ class Do
     insert: (index, text) -> @state = @state.insertLine index, text
         
     delete: (index) ->
+        
         if @editor.numLines() > 1
             @editor.emit 'willDeleteLine', index, @editor.line(index)
             @state = @state.deleteLine index
@@ -79,7 +84,8 @@ class Do
     # 000       000  0000  000   000
     # 00000000  000   000  0000000  
 
-    end: (opt) -> 
+    end: (opt) ->
+        
         nologhere = log # !!! NO log HERE !!!
 
         @redos = []

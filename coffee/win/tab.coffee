@@ -4,7 +4,7 @@
 #    000     000   000  000   000
 #    000     000   000  0000000  
 
-{ packagePath, unresolve, elem, post, path, log
+{ packagePath, unresolve, elem, post, path, log, _
 }       = require 'kxk'
 render  = require '../editor/render'
 syntax  = require '../editor/syntax'
@@ -14,6 +14,7 @@ class Tab
     
     constructor: (@tabs) ->
         
+        @info = file: null
         @div = elem class: 'tab', text: 'untitled'
         @tabs.div.appendChild @div
     
@@ -25,17 +26,20 @@ class Tab
     
     update: (info) ->
         
-        if info.file != @info?.file
-            if info.file?
-                info.pkg = packagePath info.file
-                info.pkg = path.basename info.pkg if info.pkg?
-            else
-                delete info.pkg
-        else
-            info.pkg = @info.pkg
-                
-        @info = info
+        oldFile = @info?.file
+        oldPkg  = @info?.pkg
         
+        @info = _.clone info
+        
+        if @info.file != oldFile
+            if @info.file?
+                @info.pkg = packagePath @info.file
+                @info.pkg = path.basename @info.pkg if @info.pkg?
+            else
+                delete @info.pkg
+        else
+            @info.pkg = oldPkg
+                        
         @div.innerHTML = ''
         @div.classList.toggle 'dirty', info.dirty ? false
                         
@@ -77,8 +81,8 @@ class Tab
     # 000   000  000          000     000     000     000       
     # 000   000   0000000     000     000      0      00000000  
     
-    activate: -> 
-        @setActive()    
+    activate: ->
+        @setActive()
         window.loadFile @info?.file
         @tabs.update()
 

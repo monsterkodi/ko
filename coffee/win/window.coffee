@@ -32,6 +32,8 @@ logview     = null
 area        = null
 terminal    = null
 commandline = null
+titlebar    = null
+tabs        = null
 
 domain = require('domain').create()
 domain.on 'error', (err) -> error "unhandled error: #{err}"
@@ -128,6 +130,7 @@ winMain = ->
     # 000  000   000  000     000     
 
     titlebar    = window.titlebar    = new Titlebar
+    tabs        = window.tabs        = titlebar.tabs
     navigate    = window.navigate    = new Navigate
     split       = window.split       = new Split()
     terminal    = window.terminal    = new Terminal 'terminal'
@@ -191,6 +194,7 @@ saveFile = (file) ->
     if not file?
         saveFileAs()
         return
+        
     editor.stopWatcher()
     
     if fileExists file
@@ -200,7 +204,9 @@ saveFile = (file) ->
         mode = 438
         
     atomicFile file, editor.text(), { encoding: 'utf8', mode: mode }, (err) ->
+        
         editor.saveScrollCursorsAndSelections()
+        
         if err?
             alert err
         else
@@ -215,31 +221,48 @@ saveChanges = ->
         atomicFile editor.currentFile, editor.text(), { encoding: 'utf8', mode: stat.mode }, (err) ->            
             return error "window.saveChanges failed #{err}" if err
 
-# 000   000  000   000  000       0000000    0000000   0000000    
+#  0000000   000   000   0000000  000       0000000    0000000  00000000  
+# 000   000  0000  000  000       000      000   000  000       000       
+# 000   000  000 0 000  000       000      000   000  0000000   0000000   
+# 000   000  000  0000  000       000      000   000       000  000       
+#  0000000   000   000   0000000  0000000   0000000   0000000   00000000  
+
+onClose = ->
+    
+    # post.get 'logSync', 'onClose'
+    saveChanges()
+    editor.setText ''
+    editor.stopWatcher()
+    window.stash.clear()
+    win.webContents.removeAllListeners 'devtools-opened'
+    win.webContents.removeAllListeners 'devtools-closed'
+
+#  0000000   000   000  000       0000000    0000000   0000000    
 # 000   000  0000  000  000      000   000  000   000  000   000  
 # 000   000  000 0 000  000      000   000  000000000  000   000  
 # 000   000  000  0000  000      000   000  000   000  000   000  
 #  0000000   000   000  0000000   0000000   000   000  0000000    
 
 window.onload = -> 
+    
     split.resized()
     info.reload()
-    window.onunload = onWindowUnload
+    win.on 'close', onClose
+    # post.get 'logSync', 'window.onload'
     win.webContents.on 'devtools-opened', -> window.stash.set 'devTools', true
     win.webContents.on 'devtools-closed', -> window.stash.set 'devTools'
 
-onWindowUnload = ->
-    saveChanges()
-    editor.setText ''
-    editor.setCurrentFile null # to stop watcher
-    window.stash.clear()
-    win.webContents.removeAllListeners 'devtools-opened'
-    win.webContents.removeAllListeners 'devtools-closed'
+# 00000000   00000000  000       0000000    0000000   0000000    
+# 000   000  000       000      000   000  000   000  000   000  
+# 0000000    0000000   000      000   000  000000000  000   000  
+# 000   000  000       000      000   000  000   000  000   000  
+# 000   000  00000000  0000000   0000000   000   000  0000000    
 
 reloadWin = ->
+    
     saveStash()
-    window.onunload = ->
-    editor.setCurrentFile null # to stop watcher
+    win.removeListener 'close', onClose # to prevent stash from getting cleared
+    editor.stopWatcher()
     win.webContents.reloadIgnoringCache()
 
 # 000       0000000    0000000   0000000  
@@ -266,6 +289,8 @@ reloadTab = (file) ->
         post.emit 'revertFile', file
 
 loadFile = (file, opt={}) ->
+    
+    # log "window.loadFile", file, opt
 
     editor.saveScrollCursorsAndSelections()
     
@@ -286,13 +311,18 @@ loadFile = (file, opt={}) ->
             pos:  editor.cursorPos()
             for: 'load'
         
-        editor.setCurrentFile null, opt  # to stop watcher and reset scroll
-        
         if file?
-            addToRecent file if file?
+            addToRecent file
+            
+            if tab = tabs.tab file
+                tab.setActive()
+
             editor.setCurrentFile file, opt
+            
             post.toOthers 'fileLoaded', file, winID
             commandline.fileLoaded file
+        else
+            editor.stopWatcher() 
             
     window.split.show 'editor'
         
@@ -308,7 +338,7 @@ openFile = loadFile
 # 000   000  000        000       000  0000        000       000  000      000            000
 #  0000000   000        00000000  000   000        000       000  0000000  00000000  0000000 
 
-openFiles = (ofiles, options) -> # called from file dialog and open command and browser
+openFiles = (ofiles, options) -> # called from file dialog, open command and browser
     
     if ofiles?.length
         
@@ -468,9 +498,9 @@ changeZoom: (d) ->
 # 000       000   000  000       000   000       000
 # 000        0000000    0000000   0000000   0000000 
 
-window.onblur  = (event) -> window.editor.updateTitlebar()
+window.onblur  = (event) -> post.emit 'winFocus', false
 window.onfocus = (event) -> 
-    window.editor.updateTitlebar()
+    post.emit 'winFocus', true
     if document.activeElement.className == 'body'
         if split.editorVisible()
             split.focus 'editor'
@@ -484,6 +514,7 @@ window.onfocus = (event) ->
 # 000   000  00000000     000   
 
 document.onkeydown = (event) ->
+    
     {mod, key, combo} = keyinfo.forEvent event
 
     return if not combo

@@ -17,10 +17,22 @@ class Titlebar
         @elem =$ 'titlebar'
         @elem.ondblclick = (event) -> post.toMain 'maximizeWindow', window.winID
         @selected = -1
+        
         document.body.addEventListener 'focusout', @closeList
         document.body.addEventListener 'focusin',  @closeList
-        @numWins = 1        
-        post.on 'numWins', @onNumWins
+        
+        @info = 
+            numWins: 1  
+            dirty:   false
+            sticky:  false
+            focus:   true
+            file:    'untitled'
+        
+        post.on 'numWins',  @onNumWins
+        post.on 'winFocus', @onWinFocus
+        post.on 'sticky',   @onSticky
+        post.on 'dirty',    @onDirty
+        post.on 'file',     @onFile
         
         @winid = elem class: 'winid'
         @elem.appendChild @winid
@@ -33,8 +45,29 @@ class Titlebar
         @winnum.addEventListener 'click', @showList
 
     onNumWins: (numWins) => 
-        @numWins = numWins
-        @update @info if @info?
+        if @info.numWins != numWins
+            @info.numWins = numWins
+            @update()
+    
+    onSticky: (sticky) =>
+        if @info.sticky != sticky
+            @info.sticky = sticky
+            @update()
+
+    onDirty: (dirty) =>
+        if @info.dirty != dirty
+            @info.dirty = dirty
+            @update()
+            
+    onWinFocus: (focus) =>
+        if @info.focus != focus
+            @info.focus = focus
+            @update()
+        
+    onFile: (file) =>
+        if @info.file != file
+            @info.file = file ? 'untitled'
+            @update()
     
     # 000   000  00000000   0000000     0000000   000000000  00000000  
     # 000   000  000   000  000   000  000   000     000     000       
@@ -42,13 +75,13 @@ class Titlebar
     # 000   000  000        000   000  000   000     000     000       
     #  0000000   000        0000000    000   000     000     00000000  
     
-    update: (@info) ->
+    update: ->
         # log 'titlebar update', @info
         s = @info.sticky and "○" or ''
-        @winid.innerHTML = "#{s}#{@info.winID}#{s}"
+        @winid.innerHTML = "#{s}#{window.winID}#{s}"
         @elem.classList.toggle 'focus', @info.focus
         @winid.classList.toggle 'focus', @info.focus
-        @winnum.innerHTML = @numWins > 1 and "#{@numWins}" or ''
+        @winnum.innerHTML = @info.numWins > 1 and "#{@info.numWins}" or ''
         @tabs.activeTab()?.update @info
         @tabs.update()
 

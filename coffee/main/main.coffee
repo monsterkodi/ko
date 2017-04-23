@@ -114,6 +114,9 @@ hideDock = ->
 # 000         0000000   0000000      000     
 
 post.onGet 'winInfos', -> (id: w.id for w in wins())
+post.onGet 'logSync',  -> 
+    console.log.apply console, [].slice.call(arguments, 0)
+    return true
 
 post.on 'restartShell',       (cfg)   -> winShells[cfg.winID].restartShell()
 post.on 'newWindowWithFile',  (file)  -> main.createWindow file:file
