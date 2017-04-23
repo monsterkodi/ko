@@ -5,7 +5,7 @@
 # 00     00  000  000   000  0000000     0000000   00     00
 
 { splitFilePos, stopEvent, fileExists, fileList, resolve, keyinfo, clamp,
-sw,sh, prefs, drag, pos, str, os, fs, post, path, error, log, $, _
+sw,sh, prefs, stash, drag, pos, str, os, fs, noon, post, path, error, log, $, _
 }           = require 'kxk'
 Split       = require './split'
 Terminal    = require './terminal'
@@ -54,6 +54,7 @@ window.onerror = (event, source, line, col, err) ->
 
 prefs.init()
 window.prefs = prefs
+window.stash = new stash "win/#{winID}"
 
 addToRecent = (file) ->
     recent = prefs.get 'recentFiles', []
@@ -64,20 +65,6 @@ addToRecent = (file) ->
     prefs.set 'recentFiles', recent
     commandline.commands.open.setHistory recent.reverse()
     
-#  0000000  000000000   0000000   000000000  00000000
-# 000          000     000   000     000     000     
-# 0000000      000     000000000     000     0000000 
-#      000     000     000   000     000     000     
-# 0000000      000     000   000     000     00000000
-   
-getState = (key, value) -> prefs.get "windows:#{winID}:#{key}", value
-delState = (key)        -> prefs.del "windows:#{winID}:#{key}"
-setState = (key, value) -> prefs.set "windows:#{winID}:#{key}", value
-
-window.setState = setState
-window.getState = getState
-window.delState = delState
-
 saveState = -> 
     editor.saveScrollCursorsAndSelections()
     post.toMain 'stateSaved'
@@ -157,14 +144,14 @@ winMain = ->
 
     editor.updateTitlebar()
     
-    s = getState 'fontSize'
+    s = window.stash.get 'fontSize'
     editor.setFontSize s if s
     
-    if getState 'centerText'
+    if window.stash.get 'centerText'
         screenWidth = screenSize().width
         editor.centerText sw() == screenWidth, 0
         
-    fps.toggle() if getState 'fps'
+    fps.toggle() if window.stash.get 'fps'
     
     commandline.restoreState()
     split.restoreState()
@@ -214,7 +201,7 @@ saveFile = (file) ->
             editor.emit 'save'
             editor.setCurrentFile file
             post.toMain 'fileSaved', file, winID
-            setState 'file', file
+            window.stash.set 'file', file
 
 saveChanges = ->
     
@@ -247,7 +234,7 @@ reloadFile = ->
         dontSave:        true
 
 loadFile = (file, opt={}) ->
-    # return if not file? or not file.length
+
     editor.saveScrollCursorsAndSelections()
     
     if file?
@@ -256,10 +243,7 @@ loadFile = (file, opt={}) ->
         
     if file != editor.currentFile or opt?.reload
         
-        # log 'loadFile', file, editor.currentFile, opt
-        
         if file? and not fileExists file
-            # return error "window.loadFile -- no such file:", file
             file = null
             
         if not opt?.dontSave then saveChanges()
@@ -278,7 +262,7 @@ loadFile = (file, opt={}) ->
             post.toOthers 'fileLoaded', file, winID
             commandline.fileLoaded file
             
-        setState 'file', file
+        window.stash.set 'file', file
     
     window.split.show 'editor'
         
@@ -315,7 +299,7 @@ openFiles = (ofiles, options) -> # called from file dialog and open command and 
             log 'window.openFiles.warning: no files for:', ofiles
             return []
             
-        setState 'openFilePath', path.dirname files[0]
+        window.stash.set 'openFilePath', path.dirname files[0]
         
         if not options?.newWindow and not options?.newTab
             file = resolve files.shift()
@@ -344,7 +328,7 @@ openFile = (options) ->
     dir ?= resolve '.'
     dialog.showOpenDialog 
         title: "Open File"
-        defaultPath: getState 'openFilePath',  dir
+        defaultPath: window.stash.get 'openFilePath',  dir
         properties: ['openFile', 'openDirectory', 'multiSelections']
         filters: [
             name: 'Coffee-Script', extensions: ['coffee']
@@ -376,11 +360,11 @@ saveFileAs = ->
 
 screenSize = -> electron.screen.getPrimaryDisplay().workAreaSize
     
-win.on 'move', -> setState 'bounds', win.getBounds()
+win.on 'move', -> window.stash.set 'bounds', win.getBounds()
 window.onresize = ->
     split.resized()
-    setState 'bounds', win.getBounds()
-    if getState 'centerText', false
+    window.stash.set 'bounds', win.getBounds()
+    if window.stash.get 'centerText', false
         screenWidth = screenSize().width
         editor.centerText sw() == screenWidth, 0
 
@@ -404,11 +388,11 @@ screenShot = ->
 #  0000000  00000000  000   000     000     00000000  000   000         000     00000000  000   000     000   
 
 toggleCenterText = ->
-    if not getState 'centerText', false
-        setState 'centerText', true
+    if not window.stash.get 'centerText', false
+        window.stash.set 'centerText', true
         editor.centerText sw() == screenSize().width
     else
-        setState 'centerText', false
+        window.stash.set 'centerText', false
         editor.centerText false
 
 # 00000000   0000000   000   000  000000000      0000000  000  0000000  00000000
@@ -419,14 +403,14 @@ toggleCenterText = ->
     
 setFontSize = (s) -> 
     s = clamp 8, 80, s
-    setState "fontSize", s
+    window.stash.set "fontSize", s
     editor.setFontSize s
     loadFile editor.currentFile, reload:true if editor.currentFile?
     
 changeFontSize = (d) -> setFontSize editor.size.fontSize + d
     
 resetFontSize = -> 
-    delState 'fontSize'
+    window.stash.set 'fontSize'
     setFontSize editor.fontSizeDefault
 
 # 0000000   0000000    0000000   00     00

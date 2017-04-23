@@ -138,14 +138,19 @@ class Tabs
     # 000   000  000            000     000     000   000  000   000  000       
     # 000   000  00000000  0000000      000      0000000   000   000  00000000  
     
-    onRestore: (state) =>
-
-        files = state.tabs?.files ? [state.file]
+    onRestore: =>
+        
+        files  =  window.stash.get 'tabs:files' 
+        files ?= [window.stash.get 'file']
+        
+        log 'tabs.onRestore', files
+        
         @tabs[0].update file: files.shift()
         while files.length
             @addTab files.shift()
-        if state.tabs?.active?
-            @tabs[state.tabs?.active].activate()
+            
+        if active = window.stash.get 'tabs:active', 0
+            @tabs[active].activate()
         else
             @tabs[0].activate()
         
@@ -157,7 +162,7 @@ class Tabs
     
     update: ->
         @div.style.webkitAppRegion = @tabs.length <= 1 and 'drag' or 'no-drag'
-        window.setState 'tabs', 
+        window.stash.set 'tabs', 
             files:  ( t.file() for t in @tabs )
             active: @activeTab().index()
         @

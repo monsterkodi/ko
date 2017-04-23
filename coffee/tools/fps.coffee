@@ -54,7 +54,7 @@ class FPS
     toggle: -> 
         @elem.style.display = @elem.style.display == 'none' and 'unset' or 'none'       
         @history.push 49
-        window.setState 'fps', @elem.style.display != 'none' 
+        window.stash.set 'fps', @elem.style.display != 'none' 
         if @elem.style.display != 'none'
             window.requestAnimationFrame @draw
 

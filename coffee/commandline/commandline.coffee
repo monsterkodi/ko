@@ -53,13 +53,11 @@ class Commandline extends TextEditor
         
         if @command?
             state = @command.state()
-            # log 'saveState', state
-        window.setState 'commandline', state
+        window.stash.set 'commandline', state
 
     restoreState: ->
         
-        state = window.getState 'commandline'
-        # log 'commandline restoreState', state
+        state = window.stash.get 'commandline'
         @setText state?.text ? ""
         if state?.name
             name = state.name

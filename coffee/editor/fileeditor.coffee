@@ -131,11 +131,11 @@ class FileEditor extends TextEditor
             
         s.scroll = @scroll.scroll if @scroll.scroll
                 
-        filePositions = window.getState 'filePositions', Object.create null
+        filePositions = window.stash.get 'filePositions', Object.create null
         if not _.isPlainObject filePositions
             filePositions = Object.create null
         filePositions[@currentFile] = s
-        window.setState 'filePositions', filePositions       
+        window.stash.set 'filePositions', filePositions       
         
     # 00000000   00000000   0000000  000000000   0000000   00000000   00000000
     # 000   000  000       000          000     000   000  000   000  000     
@@ -145,7 +145,7 @@ class FileEditor extends TextEditor
     
     restoreScrollCursorsAndSelections: ->
         return if not @currentFile
-        filePositions = window.getState 'filePositions', {}
+        filePositions = window.stash.get 'filePositions', {}
         if filePositions[@currentFile]? 
             s = filePositions[@currentFile] 
             @setCursors    s.cursors ? [[0,0]]
