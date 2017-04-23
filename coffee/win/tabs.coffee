@@ -143,8 +143,6 @@ class Tabs
         files  =  window.stash.get 'tabs:files' 
         files ?= [window.stash.get 'file']
         
-        log 'tabs.onRestore', files
-        
         @tabs[0].update file: files.shift()
         while files.length
             @addTab files.shift()

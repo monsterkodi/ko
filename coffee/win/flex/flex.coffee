@@ -13,14 +13,14 @@ class Flex
     
     constructor: (opt) ->
         
-        @handleSize    = opt.handleSize ? 6
-        @direction     = opt.direction ? 'horizontal'
-        @snapFirst     = opt.snapFirst
-        @snapLast      = opt.snapLast
-        @onPaneSize    = opt.onPaneSize
-        @onDragStart   = opt.onDragStart
-        @onDrag        = opt.onDrag
-        @onDragEnd     = opt.onDragEnd
+        @handleSize  = opt.handleSize ? 6
+        @direction   = opt.direction ? 'horizontal'
+        @snapFirst   = opt.snapFirst
+        @snapLast    = opt.snapLast
+        @onPaneSize  = opt.onPaneSize
+        @onDragStart = opt.onDragStart
+        @onDrag      = opt.onDrag
+        @onDragEnd   = opt.onDragEnd
     
         horz         = @direction == 'horizontal'
         @dimension   = horz and 'width' or 'height'

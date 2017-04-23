@@ -57,6 +57,7 @@ window.prefs = prefs
 window.stash = new stash "win/#{winID}"
 
 addToRecent = (file) ->
+    
     recent = prefs.get 'recentFiles', []
     _.pull recent, file
     recent.unshift file
@@ -65,10 +66,21 @@ addToRecent = (file) ->
     prefs.set 'recentFiles', recent
     commandline.commands.open.setHistory recent.reverse()
     
-saveState = -> 
+saveStash = -> 
     editor.saveScrollCursorsAndSelections()
-    post.toMain 'stateSaved'
+    window.stash.save()
+    post.toMain 'stashSaved'
 
+restoreWin = ->
+    
+    if bounds = window.stash.get 'bounds'
+        win.setBounds bounds
+    if window.stash.get 'devTools'
+        win.webContents.openDevTools()
+
+win.webContents.on 'devtools-opened', -> window.stash.set 'devTools', true
+win.webContents.on 'devtools-closed', -> window.stash.set 'devTools'
+    
 # 00000000    0000000    0000000  000000000  
 # 000   000  000   000  000          000     
 # 00000000   000   000  0000000      000     
@@ -85,7 +97,8 @@ post.on 'cloneFile',    -> post.toMain 'newWindowWithFile', editor.currentFile
 post.on 'reloadFile',   -> reloadFile()
 post.on 'saveFileAs',   -> saveFileAs()
 post.on 'saveFile',     -> saveFile()
-post.on 'saveState',    -> saveState()
+post.on 'saveStash',    -> saveStash()
+post.on 'restore',      -> restoreWin()
 post.on 'loadFile', (file) -> loadFile file
 post.on 'fileLinesChanged', (file, lineChanges) ->
     if file == editor.currentFile
@@ -466,7 +479,7 @@ document.onkeydown = (event) ->
             return stopEvent event
     
     switch combo
-        when 'command+alt+i'      then return post.toMain 'toggleDevTools', winID
+        when 'command+alt+i'      then return win.webContents.toggleDevTools()
         when 'ctrl+w'             then return loadFile ''
         when 'f3'                 then return screenShot()
         when 'command+\\'         then return toggleCenterText()

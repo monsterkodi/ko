@@ -117,7 +117,7 @@ post.onGet 'winInfos', -> (id: w.id for w in wins())
 
 post.on 'restartShell',       (cfg)   -> winShells[cfg.winID].restartShell()
 post.on 'newWindowWithFile',  (file)  -> main.createWindow file:file
-post.on 'toggleDevTools',     (winID) -> winWithID(winID).toggleDevTools()
+# post.on 'toggleDevTools',     (winID) -> winWithID(winID).toggleDevTools()
 post.on 'maximizeWindow',     (winID) -> main.toggleMaximize winWithID winID
 post.on 'activateWindow',     (winID) -> main.activateWindowWithID winID
 post.on 'activateNextWindow', (winID) -> main.activateNextWindow winID
@@ -402,9 +402,6 @@ class Main
         for file in stashFiles
             w = @createWindow restore:file
             w.showInactive()
-            # w.setBounds state.bounds if state.bounds?
-            # w.webContents.openDevTools() if state.devTools
-            # w.focus()                
                 
     #  0000000  00000000   00000000   0000000   000000000  00000000
     # 000       000   000  000       000   000     000     000     
@@ -524,8 +521,8 @@ class Main
         
         toSave = wins().length
         if toSave
-            post.toWins 'saveState'
-            post.on 'stateSaved', ->
+            post.toWins 'saveStash'
+            post.on 'stashSaved', ->
                 toSave -= 1
                 if toSave == 0
                     prefs.save()
