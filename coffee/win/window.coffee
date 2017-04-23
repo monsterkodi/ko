@@ -301,8 +301,8 @@ reloadTab = (file) ->
 
 loadFile = (file, opt={}) ->
     
-    # log "window.loadFile", file, opt
-
+    file = null if file? and file.length <= 0
+    
     editor.saveScrollCursorsAndSelections()
     
     if file?
@@ -310,8 +310,6 @@ loadFile = (file, opt={}) ->
         file = resolve file
         
     if file != editor.currentFile or opt?.reload
-        
-        # log "window.loadFile", file, opt
         
         if file? and not fileExists file
             file = null
@@ -332,7 +330,6 @@ loadFile = (file, opt={}) ->
             if tab = tabs.tab file
                 tab.setActive()
 
-            # log "editor.setCurrentFile", file, opt
             editor.setCurrentFile file, opt
             
             post.toOthers 'fileLoaded', file, winID
@@ -541,7 +538,7 @@ document.onkeydown = (event) ->
     
     switch combo
         when 'command+alt+i'      then return win.webContents.toggleDevTools()
-        when 'ctrl+w'             then return loadFile ''
+        when 'ctrl+w'             then return loadFile()
         when 'f3'                 then return screenShot()
         when 'command+\\'         then return toggleCenterText()
         when 'command+k'          then return commandline.clear()

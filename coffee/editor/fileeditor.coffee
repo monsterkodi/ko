@@ -75,13 +75,13 @@ class FileEditor extends TextEditor
         if @currentFile?
             @watch = new watcher @
             @setText fs.readFileSync @currentFile, encoding: 'utf8'
-            # log 'setText', @lines().slice 0, 6
             @restoreScrollCursorsAndSelections()
-            post.emit 'file', @currentFile # titlebar -> tabs -> tab
         else
-            @setLines []
+            @setLines []   # little hack to update stuff ...
+            @setLines [''] # ... that listens on line numbers only
             
-        @emit 'file', @currentFile # diffbar
+        post.emit 'file', @currentFile # titlebar -> tabs -> tab
+        @emit     'file', @currentFile # diffbar
 
     stopWatcher: ->
         if @watch?
