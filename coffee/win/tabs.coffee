@@ -17,16 +17,16 @@ class Tabs
         @div = elem class: 'tabs'
         view.appendChild @div
         
-        @div.addEventListener 'click', @onClick
+        @div.addEventListener 'click',     @onClick
         
         @tabs.push new Tab @
         @tabs[0].setActive()
         
         @drag = new drag
             target: @div
-            onStart: log 'start'
-            onMove: log 'move'
-            onEnd: log 'end'
+            onStart: @onDragStart
+            onMove:  @onDragMove
+            onStop:  @onDragStop
         
         post.on 'newTabWithFile',   @onNewTabWithFile
         post.on 'closeTabOrWindow', @onCloseTabOrWindow
@@ -53,6 +53,39 @@ class Tabs
                 tab.activate()
         true
 
+    # 0000000    00000000    0000000    0000000   
+    # 000   000  000   000  000   000  000        
+    # 000   000  0000000    000000000  000  0000  
+    # 000   000  000   000  000   000  000   000  
+    # 0000000    000   000  000   000   0000000   
+    
+    onDragStart: (d, e) => 
+        
+        @dragTab = @tab e.target
+        @dragDiv = @dragTab.div.cloneNode true
+        @dragTab.div.style.opacity = '0'
+        br = @dragTab.div.getBoundingClientRect()
+        @dragDiv.style.position = 'absolute'
+        @dragDiv.style.top  = "#{br.top}px"
+        @dragDiv.style.left = "#{br.left}px"
+        @dragDiv.style.width = "#{br.width-12}px"
+        @dragDiv.style.height = "#{br.height-3}px"
+        @dragDiv.style.flex = 'unset'
+        @dragDiv.style.pointerEvents = 'none'
+        body.appendChild @dragDiv
+
+    onDragMove: (d,e) =>
+        
+        @dragDiv.style.transform = "translateX(#{d.deltaSum.x}px)"
+        if tab = @tabAtX d.pos.x
+            if tab.index() != @dragTab.index()
+                @swap tab, @dragTab
+        
+    onDragStop: (d,e) =>
+        
+        @dragTab.div.style.opacity = '1'
+        @dragDiv.remove()
+
     # 000000000   0000000   0000000    
     #    000     000   000  000   000  
     #    000     000000000  0000000    
@@ -69,7 +102,11 @@ class Tabs
 
     activeTab: -> _.find @tabs, (t) -> t.isActive()
     numTabs:   -> @tabs.length
-        
+    
+    tabAtX: (x) -> _.find @tabs, (t) -> 
+        br = t.div.getBoundingClientRect()
+        br.left <= x <= br.left + br.width
+    
     #  0000000  000       0000000    0000000  00000000  
     # 000       000      000   000  000       000       
     # 000       000      000   000  0000000   0000000   

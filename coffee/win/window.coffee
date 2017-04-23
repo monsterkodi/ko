@@ -230,15 +230,22 @@ saveChanges = ->
 # 000   000  000  0000  000       000      000   000       000  000       
 #  0000000   000   000   0000000  0000000   0000000   0000000   00000000  
 
+onMove  = -> window.stash.set 'bounds', win.getBounds()
+
+removeListeners = ->
+    
+    win.removeListener 'close', onClose
+    win.removeListener 'move',  onMove
+    win.webContents.removeAllListeners 'devtools-opened'
+    win.webContents.removeAllListeners 'devtools-closed'
+
 onClose = ->
     
-    # post.get 'logSync', 'onClose'
     saveChanges()
     editor.setText ''
     editor.stopWatcher()
     window.stash.clear()
-    win.webContents.removeAllListeners 'devtools-opened'
-    win.webContents.removeAllListeners 'devtools-closed'
+    removeListeners()
 
 #  0000000   000   000  000       0000000    0000000   0000000    
 # 000   000  0000  000  000      000   000  000   000  000   000  
@@ -251,10 +258,10 @@ window.onload = ->
     split.resized()
     info.reload()
     win.on 'close', onClose
+    win.on 'move',  onMove
     # post.get 'logSync', 'window.onload'
     win.webContents.on 'devtools-opened', -> window.stash.set 'devTools', true
-    win.webContents.on 'devtools-closed', -> window.stash.set 'devTools'
-
+    
 # 00000000   00000000  000       0000000    0000000   0000000    
 # 000   000  000       000      000   000  000   000  000   000  
 # 0000000    0000000   000      000   000  000000000  000   000  
@@ -264,7 +271,7 @@ window.onload = ->
 reloadWin = ->
     
     saveStash()
-    win.removeListener 'close', onClose # to prevent stash from getting cleared
+    removeListeners()
     editor.stopWatcher()
     win.webContents.reloadIgnoringCache()
 
@@ -426,7 +433,6 @@ saveFileAs = ->
 
 screenSize = -> electron.screen.getPrimaryDisplay().workAreaSize
     
-win.on 'move', -> window.stash.set 'bounds', win.getBounds()
 window.onresize = ->
     split.resized()
     window.stash.set 'bounds', win.getBounds()
