@@ -155,7 +155,7 @@ winMain = ->
             post.toOtherWins 'fileLinesChanged', editor.currentFile, changeInfo.changes
             navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
 
-    editor.updateTitlebar()
+    # editor.updateTitlebar()
     
     s = window.stash.get 'fontSize'
     editor.setFontSize s if s
@@ -214,7 +214,6 @@ saveFile = (file) ->
             editor.emit 'save'
             editor.setCurrentFile file
             post.toMain 'fileSaved', file, winID
-            window.stash.set 'file', file
 
 saveChanges = ->
     
@@ -232,8 +231,8 @@ saveChanges = ->
 window.onunload = ->
     saveChanges()
     editor.setText ''
-    post.toMain 'fileLoaded', '', winID # to clear prefs?
     editor.setCurrentFile null # to stop watcher
+    window.stash.clear()
 
 # 000       0000000    0000000   0000000  
 # 000      000   000  000   000  000   000
@@ -275,8 +274,6 @@ loadFile = (file, opt={}) ->
             post.toOthers 'fileLoaded', file, winID
             commandline.fileLoaded file
             
-        window.stash.set 'file', file
-    
     window.split.show 'editor'
         
     if pos? and pos[0] or pos[1] 

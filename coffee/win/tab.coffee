@@ -5,9 +5,9 @@
 #    000     000   000  0000000  
 
 { packagePath, unresolve, elem, post, path, log
-}      = require 'kxk'
-render = require '../editor/render'
-syntax = require '../editor/syntax'
+}       = require 'kxk'
+render  = require '../editor/render'
+syntax  = require '../editor/syntax'
 Tooltip = require '../tools/tooltip'
 
 class Tab
@@ -27,8 +27,12 @@ class Tab
         
         if info.file != @info?.file
             if info.file?
-                info.pkgPath = packagePath info.file
-                info.pkgPath = path.basename info.pkgPath if info.pkgPath?
+                info.pkg = packagePath info.file
+                info.pkg = path.basename info.pkg if info.pkg?
+            else
+                delete info.pkg
+        else
+            info.pkg = @info.pkg
                 
         @info = info
         
@@ -37,8 +41,8 @@ class Tab
                         
         @div.appendChild elem 'span', class:'dot', text:'●'
         
-        if info.pkgPath and info.pkgPath != @prev()?.info.pkgPath
-            @div.appendChild elem 'span', text:info.pkgPath + " ▸ "
+        @pkg = elem 'span', class:'pkg', text: info.pkg and (info.pkg + " ▸ ") or ''
+        @div.appendChild @pkg
             
         diss = syntax.dissForTextAndSyntax(path.basename(@file()), 'ko', join: true)
         name = elem 'span', html:render.line(diss, charWidth:0)
@@ -59,6 +63,9 @@ class Tab
     next:  -> @tabs.tab @index()+1 if @index() < @tabs.numTabs()-1
     nextOrPrev: -> @next() ? @prev()
     
+    hidePkg: -> @pkg.style.display = 'none'
+    showPkg: -> @pkg.style.display = 'initial'
+
     #  0000000    0000000  000000000  000  000   000  00000000  
     # 000   000  000          000     000  000   000  000       
     # 000000000  000          000     000   000 000   0000000   

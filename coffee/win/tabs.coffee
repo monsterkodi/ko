@@ -116,7 +116,6 @@ class Tabs
             when 'right' then +1
         index = (@numTabs() + index) % @numTabs()
         @tabs[index].activate()
-        true
 
     swap: (ta, tb) ->
         return if not ta? or not tb?
@@ -124,6 +123,7 @@ class Tabs
         @tabs[ta.index()]   = tb
         @tabs[tb.index()+1] = ta
         @div.insertBefore tb.div, ta.div
+        @update()
     
     move: (key) ->
         
@@ -140,8 +140,8 @@ class Tabs
     
     onRestore: =>
         
-        files  =  window.stash.get 'tabs:files' 
-        files ?= [window.stash.get 'file']
+        files =  window.stash.get 'tabs:files'
+        return error "no tabs:files in stash?" if _.isEmpty files
         
         @tabs[0].update file: files.shift()
         while files.length
@@ -151,6 +151,8 @@ class Tabs
             @tabs[active].activate()
         else
             @tabs[0].activate()
+            
+        @update()
         
     # 000   000  00000000   0000000     0000000   000000000  00000000    
     # 000   000  000   000  000   000  000   000     000     000         
@@ -163,6 +165,15 @@ class Tabs
         window.stash.set 'tabs', 
             files:  ( t.file() for t in @tabs )
             active: @activeTab().index()
+        # log 'tabs update', window.stash.get 'tabs'
+        pkg = @tabs[0].info.pkg
+        @tabs[0].showPkg()
+        for tab in @tabs.slice 1
+            if tab.info.pkg == pkg
+                tab.hidePkg()
+            else
+                pkg = tab.info.pkg
+                tab.showPkg()
         @
         
 module.exports = Tabs

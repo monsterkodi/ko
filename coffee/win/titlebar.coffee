@@ -32,7 +32,9 @@ class Titlebar
         @elem.appendChild @winnum
         @winnum.addEventListener 'click', @showList
 
-    onNumWins: (numWins) => @numWins = numWins; @update @info
+    onNumWins: (numWins) => 
+        @numWins = numWins
+        @update @info if @info?
     
     # 000   000  00000000   0000000     0000000   000000000  00000000  
     # 000   000  000   000  000   000  000   000     000     000       
@@ -41,12 +43,14 @@ class Titlebar
     #  0000000   000        0000000    000   000     000     00000000  
     
     update: (@info) ->
+        log 'titlebar update', @info
         s = @info.sticky and "○" or ''
         @winid.innerHTML = "#{s}#{@info.winID}#{s}"
         @elem.classList.toggle 'focus', @info.focus
         @winid.classList.toggle 'focus', @info.focus
         @winnum.innerHTML = @numWins > 1 and "#{@numWins}" or ''
         @tabs.activeTab()?.update @info
+        @tabs.update()
 
     # 000      000   0000000  000000000
     # 000      000  000          000   
