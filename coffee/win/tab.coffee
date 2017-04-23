@@ -41,23 +41,23 @@ class Tab
             @info.pkg = oldPkg
                         
         @div.innerHTML = ''
-        @div.classList.toggle 'dirty', info.dirty ? false
+        @div.classList.toggle 'dirty', @info.dirty ? false
                         
         @div.appendChild elem 'span', class:'dot', text:'●'
         
-        @pkg = elem 'span', class:'pkg', text: info.pkg and (info.pkg + " ▸ ") or ''
+        @pkg = elem 'span', class:'pkg', text: @info.pkg and (@info.pkg + " ▸ ") or ''
         @div.appendChild @pkg
             
         diss = syntax.dissForTextAndSyntax(path.basename(@file()), 'ko', join: true)
         name = elem 'span', html:render.line(diss, charWidth:0)
         @div.appendChild name
 
-        if info.file?
+        if @info.file?
             diss = syntax.dissForTextAndSyntax(unresolve(@file()), 'ko', join: true)
             html = render.line(diss, charWidth:0)
             new Tooltip elem:name, html:html, x:0
             
-        @div.appendChild elem 'span', class:'dot', text:'●' if info.dirty
+        @div.appendChild elem 'span', class:'dot', text:'●' if @info.dirty
         @
 
     file:  -> @info?.file ? 'untitled' 

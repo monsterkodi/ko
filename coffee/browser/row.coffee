@@ -61,7 +61,7 @@ class Row
     setActive: (opt = emit:false) ->
         @column.activeRow()?.clearActive()
         @div.classList.add 'active'
-        @column.scroll.toIndex @index()  
+        @column.scroll.toIndex @index() 
         post.emit 'browser-item-activated', @item if opt?.emit # sets commandline text
         @
                 

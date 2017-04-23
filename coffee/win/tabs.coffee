@@ -142,23 +142,22 @@ class Tabs
     # 000   000  000            000     000     000   000  000   000  000       
     # 000   000  00000000  0000000      000      0000000   000   000  00000000  
 
-    stash: => window.stash.set 'tabs', 
-        files:  ( t.file() for t in @tabs )
-        active: @activeTab().index()
+    stash: => 
+        # log 'stash', @activeTab().index()
+        window.stash.set 'tabs', 
+            files:  ( t.file() for t in @tabs )
+            active: @activeTab().index()
     
     restore: =>
-        
-        files =  window.stash.get 'tabs:files'
+        active = window.stash.get 'tabs:active', 0
+        files  = window.stash.get 'tabs:files'
         return if _.isEmpty files # happens when first window opens
         
         @tabs[0].update file: files.shift()
         while files.length
             @addTab files.shift()
-            
-        if active = window.stash.get 'tabs:active', 0
-            @tabs[active].activate()
-        else
-            @tabs[0].activate()
+        
+        @tabs[active].activate()
             
         @update()
 
@@ -171,7 +170,6 @@ class Tabs
     #  0000000   000        0000000    000   000     000     00000000    
     
     update: ->
-        
         @div.style.webkitAppRegion = @tabs.length <= 1 and 'drag' or 'no-drag'
         @stash()
 
