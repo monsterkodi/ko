@@ -183,8 +183,6 @@ class Main
 
         Menu.init @
 
-        # setTimeout @showWindows, 10
-        
     # 000   000  000  000   000  0000000     0000000   000   000   0000000
     # 000 0 000  000  0000  000  000   000  000   000  000 0 000  000     
     # 000000000  000  000 0 000  000   000  000   000  000000000  0000000 
@@ -497,7 +495,7 @@ class Main
         if not visibleWins().length
             @toggleWindows()
 
-        if !activeWin()
+        if not activeWin()
             visibleWins()[0]?.focus()
 
         files = []
@@ -509,6 +507,7 @@ class Main
             [fpath, pos] = splitFilePos file
             if fileExists fpath
                 files.push file
+        log 'createWindow', files
         @createWindow files:files
                     
     quit: ->

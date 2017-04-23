@@ -63,10 +63,6 @@ class Navigate
         if opt?.newWindow
             post.toMain 'newWindowWithFile', "#{filePos.file}:#{filePos.pos[1]+1}:#{filePos.pos[0]}"
         else
-            # if not opt.sameWindow                
-                # if id = @main.activateWindowWithFile filePos.file
-                    # post.toWin id, 'singleCursorAtPos', filePos.pos, extend:opt.extend
-                    # return filePos
             error 'no winID?' if not opt?.winID?
             post.toWin opt.winID, 'loadFile', "#{filePos.file}:#{filePos.pos[1]+1}:#{filePos.pos[0]}"
         filePos

@@ -169,8 +169,11 @@ class FileEditor extends TextEditor
         opt.pos = [opt.col ? 0, opt.line ? 0]
         opt.winID = window.winID
         
+        if opt.newTab
+            post.emit 'newTabWithFile', opt.file
+        else
         # log "FileEditor.jumpToFile gotoFilePos", opt
-        window.navigate.gotoFilePos opt
+            window.navigate.gotoFilePos opt
 
     jumpTo: (word, opt) =>
 

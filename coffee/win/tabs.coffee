@@ -147,7 +147,12 @@ class Tabs
         @update()
         tab
 
-    onNewTabWithFile: (file) => @addTab(file).activate()
+    onNewTabWithFile: (file) => 
+        log 'addTabWithFile', file
+        if tab = @tab file
+            tab.activate()
+        else
+            @addTab(file).activate()
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       

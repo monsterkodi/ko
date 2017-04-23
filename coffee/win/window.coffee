@@ -94,16 +94,17 @@ post.on 'shellCallbackData', (cmdData) -> commandline.commands['term'].onShellCa
 post.on 'singleCursorAtPos', (pos, opt) -> 
     editor.singleCursorAtPos pos, opt
     editor.scrollCursorToTop()
-post.on 'focusEditor',      -> split.focus 'editor'
-post.on 'cloneFile',        -> post.toMain 'newWindowWithFile', editor.currentFile
-post.on 'reloadFile',       -> reloadFile()
-post.on 'reloadWin',        -> reloadWin()
-post.on 'saveFileAs',       -> saveFileAs()
-post.on 'saveFile',         -> saveFile()
-post.on 'saveStash',        -> saveStash()
-post.on 'openFile',   (opt) -> openFile opt
-post.on 'reloadTab', (file) -> reloadTab file 
-post.on 'loadFile',  (file) -> loadFile file
+post.on 'focusEditor',       -> split.focus 'editor'
+post.on 'cloneFile',         -> post.toMain 'newWindowWithFile', editor.currentFile
+post.on 'reloadFile',        -> reloadFile()
+post.on 'reloadWin',         -> reloadWin()
+post.on 'saveFileAs',        -> saveFileAs()
+post.on 'saveFile',          -> saveFile()
+post.on 'saveStash',         -> saveStash()
+post.on 'openFile',   (opt)  -> openFile opt
+post.on 'reloadTab', (file)  -> reloadTab file 
+post.on 'loadFile',  (file)  -> loadFile file
+post.on 'loadFiles', (files) -> openFiles files
 post.on 'fileLinesChanged', (file, lineChanges) ->
     if file == editor.currentFile
         editor.applyForeignLineChanges lineChanges

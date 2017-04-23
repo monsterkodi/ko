@@ -267,7 +267,7 @@ class Browser extends Stage
                 @convertPXM row
             
         if item.textFile and not @skipJump
-            post.emit 'jumpTo', file:file, sameWindow:true
+            post.emit 'jumpTo', file:file
         delete @skipJump
 
     # 000  00     00   0000000    0000000   00000000  
