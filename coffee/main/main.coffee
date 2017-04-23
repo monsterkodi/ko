@@ -122,7 +122,6 @@ post.on 'maximizeWindow',     (winID) -> main.toggleMaximize winWithID winID
 post.on 'activateWindow',     (winID) -> main.activateWindowWithID winID
 post.on 'activateNextWindow', (winID) -> main.activateNextWindow winID
 post.on 'activatePrevWindow', (winID) -> main.activatePrevWindow winID
-post.on 'reloadWindow',       (winID) -> main.reloadWin winWithID winID
 post.on 'fileSaved',    (file, winID) -> main.indexer.indexFile file, refresh: true
 post.on 'fileLoaded',   (file, winID) -> main.indexer.indexFile file
 post.on 'winlog',       (winID, text) -> console.log "win#{winID} ", text
@@ -194,8 +193,6 @@ class Main
     activeWin:   activeWin
     visibleWins: visibleWins
             
-    reloadWin: (win) -> win?.webContents.reloadIgnoringCache()
-
     toggleMaximize: (win) ->
         
         disableSnap = true
@@ -434,7 +431,6 @@ class Main
 
         if opt.restore?
             newStash = path.join app.getPath('userData'), 'win', "#{win.id}.noon"
-            log "copy stash from old #{opt.restore} to new #{newStash}"
             fs.copySync opt.restore, newStash
             
         #win.webContents.openDevTools()
@@ -444,9 +440,7 @@ class Main
         win.on 'resize', @onResizeWin
         
         winLoaded = ->
-            if opt.restore
-                post.toWin win.id, 'restore'
-            else if opt.files?
+            if opt.files?
                 post.toWin win.id, 'loadFiles', opt.files
             else if opt.file?
                 post.toWin win.id, 'loadFile', opt.file

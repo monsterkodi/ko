@@ -4,7 +4,7 @@
 #    000     000   000  000   000       000
 #    000     000   000  0000000    0000000 
 
-{ post, elem, log, _
+{ post, elem, error, log, _
 } = require 'kxk'
 
 Tab = require './tab'
@@ -24,7 +24,8 @@ class Tabs
         
         post.on 'newTabWithFile',   @onNewTabWithFile
         post.on 'closeTabOrWindow', @onCloseTabOrWindow
-        post.on 'restore',          @onRestore
+        post.on 'stash',            @stash
+        post.on 'restore',          @restore
 
     #  0000000  000      000   0000000  000   000  
     # 000       000      000  000       000  000   
@@ -137,8 +138,14 @@ class Tabs
     # 0000000    0000000   0000000      000     000   000  0000000    0000000   
     # 000   000  000            000     000     000   000  000   000  000       
     # 000   000  00000000  0000000      000      0000000   000   000  00000000  
+
+    stash: =>
+        
+        window.stash.set 'tabs', 
+            files:  ( t.file() for t in @tabs )
+            active: @activeTab().index()
     
-    onRestore: =>
+    restore: =>
         
         files =  window.stash.get 'tabs:files'
         return error "no tabs:files in stash?" if _.isEmpty files
@@ -161,11 +168,10 @@ class Tabs
     #  0000000   000        0000000    000   000     000     00000000    
     
     update: ->
+        
         @div.style.webkitAppRegion = @tabs.length <= 1 and 'drag' or 'no-drag'
-        window.stash.set 'tabs', 
-            files:  ( t.file() for t in @tabs )
-            active: @activeTab().index()
-        # log 'tabs update', window.stash.get 'tabs'
+        @stash()
+
         pkg = @tabs[0].info.pkg
         @tabs[0].showPkg()
         for tab in @tabs.slice 1

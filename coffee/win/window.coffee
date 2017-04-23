@@ -67,6 +67,7 @@ addToRecent = (file) ->
     commandline.commands.open.setHistory recent.reverse()
     
 saveStash = -> 
+    post.emit 'stash'
     editor.saveScrollCursorsAndSelections()
     window.stash.save()
     post.toMain 'stashSaved'
@@ -77,9 +78,6 @@ restoreWin = ->
         win.setBounds bounds
     if window.stash.get 'devTools'
         win.webContents.openDevTools()
-
-win.webContents.on 'devtools-opened', -> window.stash.set 'devTools', true
-win.webContents.on 'devtools-closed', -> window.stash.set 'devTools'
     
 # 00000000    0000000    0000000  000000000  
 # 000   000  000   000  000          000     
@@ -95,10 +93,11 @@ post.on 'openFile',          (options) -> openFile options
 post.on 'focusEditor',  -> split.focus 'editor'
 post.on 'cloneFile',    -> post.toMain 'newWindowWithFile', editor.currentFile
 post.on 'reloadFile',   -> reloadFile()
+post.on 'reloadWin',    -> reloadWin()
 post.on 'saveFileAs',   -> saveFileAs()
 post.on 'saveFile',     -> saveFile()
 post.on 'saveStash',    -> saveStash()
-post.on 'restore',      -> restoreWin()
+# post.on 'restore',      -> restoreWin()
 post.on 'loadFile', (file) -> loadFile file
 post.on 'fileLinesChanged', (file, lineChanges) ->
     if file == editor.currentFile
@@ -155,8 +154,6 @@ winMain = ->
             post.toOtherWins 'fileLinesChanged', editor.currentFile, changeInfo.changes
             navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
 
-    # editor.updateTitlebar()
-    
     s = window.stash.get 'fontSize'
     editor.setFontSize s if s
     
@@ -165,14 +162,11 @@ winMain = ->
         editor.centerText sw() == screenWidth, 0
         
     fps.toggle() if window.stash.get 'fps'
-    
-    commandline.restoreState()
-    split.restoreState()
 
-window.onload = -> 
-    split.resized()
-    info.reload()
-    
+    post.emit 'restore'
+    # commandline.restoreState()
+    split.restoreState()
+        
 # 00000000  0000000    000  000000000   0000000   00000000 
 # 000       000   000  000     000     000   000  000   000
 # 0000000   000   000  000     000     000   000  0000000  
@@ -228,11 +222,26 @@ saveChanges = ->
 # 000   000  000  0000  000      000   000  000   000  000   000  
 #  0000000   000   000  0000000   0000000   000   000  0000000    
 
-window.onunload = ->
+window.onload = -> 
+    split.resized()
+    info.reload()
+    window.onunload = onWindowUnload
+    win.webContents.on 'devtools-opened', -> window.stash.set 'devTools', true
+    win.webContents.on 'devtools-closed', -> window.stash.set 'devTools'
+
+onWindowUnload = ->
     saveChanges()
     editor.setText ''
     editor.setCurrentFile null # to stop watcher
     window.stash.clear()
+    win.webContents.removeAllListeners 'devtools-opened'
+    win.webContents.removeAllListeners 'devtools-closed'
+
+reloadWin = ->
+    saveStash()
+    window.onunload = ->
+    editor.setCurrentFile null # to stop watcher
+    win.webContents.reloadIgnoringCache()
 
 # 000       0000000    0000000   0000000  
 # 000      000   000  000   000  000   000

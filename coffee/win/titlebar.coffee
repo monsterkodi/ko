@@ -43,7 +43,7 @@ class Titlebar
     #  0000000   000        0000000    000   000     000     00000000  
     
     update: (@info) ->
-        log 'titlebar update', @info
+        # log 'titlebar update', @info
         s = @info.sticky and "○" or ''
         @winid.innerHTML = "#{s}#{@info.winID}#{s}"
         @elem.classList.toggle 'focus', @info.focus
