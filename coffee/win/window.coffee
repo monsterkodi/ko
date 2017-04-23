@@ -25,8 +25,8 @@ pkg         = require '../../package.json'
 remote      = electron.remote
 dialog      = remote.dialog
 Browser     = remote.BrowserWindow
-win         = remote.getCurrentWindow()
-winID       = win.id
+win         = window.win   = remote.getCurrentWindow()
+winID       = window.winID = win.id
 editor      = null
 logview     = null
 area        = null
@@ -72,9 +72,7 @@ addToRecent = (file) ->
    
 getState = (key, value) -> prefs.get "windows:#{winID}:#{key}", value
 delState = (key)        -> prefs.del "windows:#{winID}:#{key}"
-setState = (key, value) -> 
-    # log "window.setState key:#{key}", value
-    prefs.set "windows:#{winID}:#{key}", value
+setState = (key, value) -> prefs.set "windows:#{winID}:#{key}", value
 
 window.setState = setState
 window.getState = getState
@@ -95,12 +93,12 @@ post.on 'singleCursorAtPos', (pos, opt) ->
     editor.singleCursorAtPos pos, opt
     editor.scrollCursorToTop()
 post.on 'openFile',          (options) -> openFile options
-post.on 'focusEditor', -> split.focus 'editor'
-post.on 'cloneFile',   -> post.toMain 'newWindowWithFile', editor.currentFile
-post.on 'reloadFile',  -> reloadFile()
-post.on 'saveFileAs',  -> saveFileAs()
-post.on 'saveFile',    -> saveFile()
-post.on 'saveState',   -> saveState()
+post.on 'focusEditor',  -> split.focus 'editor'
+post.on 'cloneFile',    -> post.toMain 'newWindowWithFile', editor.currentFile
+post.on 'reloadFile',   -> reloadFile()
+post.on 'saveFileAs',   -> saveFileAs()
+post.on 'saveFile',     -> saveFile()
+post.on 'saveState',    -> saveState()
 post.on 'loadFile', (file) -> loadFile file
 post.on 'fileLinesChanged', (file, lineChanges) ->
     if file == editor.currentFile
@@ -124,8 +122,6 @@ post.on 'ping', (wID, argA, argB) -> post.toWin wID, 'pong', winID, argA, argB
 
 winMain = -> 
     
-    window.winID = winID
-
     # 000  000   000  000  000000000  
     # 000  0000  000  000     000     
     # 000  000 0 000  000     000     
@@ -251,20 +247,23 @@ reloadFile = ->
         dontSave:        true
 
 loadFile = (file, opt={}) ->
-    return if not file? or not file.length
+    # return if not file? or not file.length
     editor.saveScrollCursorsAndSelections()
-    [file,pos] = splitFilePos file
-    file = resolve file
+    
+    if file?
+        [file, pos] = splitFilePos file
+        file = resolve file
+        
     if file != editor.currentFile or opt?.reload
         
         # log 'loadFile', file, editor.currentFile, opt
         
-        if not fileExists file
-            return error "window.loadFile -- no such file:", file
+        if file? and not fileExists file
+            # return error "window.loadFile -- no such file:", file
+            file = null
             
-        if not opt?.dontSave then saveChanges()            
+        if not opt?.dontSave then saveChanges()
             
-        addToRecent file
         post.toMain 'navigate', 
             action: 'addFilePos'
             file: editor.currentFile
@@ -272,14 +271,18 @@ loadFile = (file, opt={}) ->
             for: 'load'
         
         editor.setCurrentFile null, opt  # to stop watcher and reset scroll
-        editor.setCurrentFile file, opt
-        post.toOthers 'fileLoaded', file, winID
+        
+        if file?
+            addToRecent file if file?
+            editor.setCurrentFile file, opt
+            post.toOthers 'fileLoaded', file, winID
+            commandline.fileLoaded file
+            
         setState 'file', file
-        commandline.fileLoaded file
     
     window.split.show 'editor'
         
-    if pos[0] or pos[1] 
+    if pos? and pos[0] or pos[1] 
         editor.singleCursorAtPos pos
         editor.scrollCursorToTop()        
   
@@ -292,8 +295,11 @@ openFile = loadFile
 #  0000000   000        00000000  000   000        000       000  0000000  00000000  0000000 
 
 openFiles = (ofiles, options) -> # called from file dialog and open command and browser
+    
     if ofiles?.length
+        
         files = fileList ofiles, ignoreHidden: false
+        
         if files.length >= 10
             answer = dialog.showMessageBox
                 type: 'warning'
@@ -304,16 +310,23 @@ openFiles = (ofiles, options) -> # called from file dialog and open command and 
                 message: "You have selected #{files.length} files."
                 detail: "Are you sure you want to open that many files?"
             return if answer != 1
+            
         if files.length == 0
             log 'window.openFiles.warning: no files for:', ofiles
             return []
-        setState 'openFilePath', path.dirname files[0]                    
-        if not options?.newWindow
+            
+        setState 'openFilePath', path.dirname files[0]
+        
+        if not options?.newWindow and not options?.newTab
             file = resolve files.shift()
-            # if not post.get 'activateWindowWithFile', file
             loadFile file
+            
         for file in files
-            post.toMain 'newWindowWithFile', file
+            if options?.newWindow
+                post.toMain 'newWindowWithFile', file
+            else
+                post.emit 'newTabWithFile', file
+            
         return ofiles
 
 window.openFiles = openFiles
@@ -475,8 +488,8 @@ document.onkeydown = (event) ->
         when 'command+\\'         then return toggleCenterText()
         when 'command+k'          then return commandline.clear()
         when 'command+alt+k'      then return split.toggleLog()
-        when 'command+alt+left'   then return stopEvent event, post.toMain 'activatePrevWindow', winID
-        when 'command+alt+right'  then return stopEvent event, post.toMain 'activateNextWindow', winID
+        when 'alt+ctrl+left'      then return stopEvent event, post.toMain 'activatePrevWindow', winID
+        when 'alt+ctrl+right'     then return stopEvent event, post.toMain 'activateNextWindow', winID
         when 'command+alt+ctrl+k' then return split.showOrClearLog()
         when 'command+='          then return changeFontSize +1
         when 'command+-'          then return changeFontSize -1

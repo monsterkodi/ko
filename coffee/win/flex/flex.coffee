@@ -175,11 +175,9 @@ class Flex
     # 0000000      000     000   000     000     00000000  
     
     restoreState: (state) ->
-        # log 'flex restoreState', state
         return if not state?.length
         for si in [0...state.length]
             s = state[si]
-            # log 'restore pane from state', s
             pane = @pane si
             delete pane.collapsed
             pane.collapse()      if s.size < 0
@@ -195,7 +193,6 @@ class Flex
                 id:    p.id
                 size:  p.size
                 pos:   p.pos
-        # log 'getState', state
         state
 
     #  0000000  000  0000000  00000000  

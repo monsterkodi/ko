@@ -4,9 +4,8 @@
 # 000 0 000  000   000  000       000   000  000   000
 # 000   000  000   000   0000000  000   000   0000000 
 
-{
-packagePath, fileExists, fileName, fileList, relative, splitExt,
-noon, path, error, log, _
+{ packagePath, fileExists, fileName, fileList, relative, splitExt,
+  post, noon, path, error, log, _
 }          = require 'kxk'
 indexer    = require '../main/indexer'
 salt       = require '../tools/salt'

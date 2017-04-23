@@ -17,7 +17,7 @@ numbersWidth          = 50px
 editorPadding         = (8px + numbersWidth)
 bottomCornerRadius    = 4px
 frameColor            = #222
-frameWidth            = scrollhandleWidth
+frameWidth            = 6px
 frameBorder           = frameWidth solid frameColor
 commandlineHeight     = 30px
 titlebarHeight        = 22px
@@ -305,6 +305,8 @@ infoPadding = 6px
 //    000     000     000     0000000  00000000  0000000    000   000  000   000
 
 #titlebar
+    display             flex
+    flex-direction      row
     height              titlebarHeight
     box-sizing          border-box
     background          #333
@@ -312,31 +314,19 @@ infoPadding = 6px
     font-size           titlebarFontSize
     padding-left        70px
     white-space         nowrap
-    display             block
     -webkit-app-region  drag
 
-#titlebar .title
 #titlebar .dot
     display             inline-block
     vertical-align      top
-    padding-left        10px
-    padding-top         3px 
+    padding-left        6px
+    padding-right       9px
+    margin-top          -1px
+    &:hover
+        color          #f40
         
-#titlebar .title::before
-    content             attr(data-tip)
-    position            absolute
-    z-index             999
-    white-space         nowrap
-    background          #333
-    opacity             0  
-    top                 9999px
-    transition          opacity 0.2s ease-out 
-     
-#titlebar .title:hover::before
-    opacity             1
-    top                 3px
-
 #titlebar .winid
+    flex                0 0 0
     color               #555
     &.focus
         color           #008815
@@ -344,26 +334,84 @@ infoPadding = 6px
     vertical-align      top
     padding-left        3px
     padding-top         3px
+    padding-right       12px
 
 #titlebar .winnum
+    flex                0 0 0
     color               #555
     float               right
     display             inline-block
     vertical-align      top
     padding-right       12px
+    padding-left        12px
     padding-top         3px
 
-#titlebar .dot.clean
+// 000000000   0000000    0000000   000      000000000  000  00000000   
+//    000     000   000  000   000  000         000     000  000   000  
+//    000     000   000  000   000  000         000     000  00000000   
+//    000     000   000  000   000  000         000     000  000        
+//    000      0000000    0000000   0000000     000     000  000        
+
+.tooltip
+    white-space         nowrap
+    background          #222
+    padding             3px
+    padding-left        frameWidth
+    padding-right       frameWidth
+    border-bottom-left-radius  frameWidth
+    border-bottom-right-radius frameWidth
+    position            absolute
+    top                 titlebarHeight
+    font-size           titlebarFontSize
+    opacity             0
+    transform           scaleY(0)
+    transition          transform 0.2s ease-in, opacity 0.2s ease-in
+    overflow            hidden
+    
+// 000000000   0000000   0000000     0000000    
+//    000     000   000  000   000  000         
+//    000     000000000  0000000    0000000     
+//    000     000   000  000   000       000    
+//    000     000   000  0000000    0000000     
+
+.tabs
+    flex                1 1 0
+    display             flex
+    flex-direction      row
+    overflow-x          auto
+    overflow-y          hidden
+    background          #333
+    color               #aaa
+    
+    -webkit-app-region  drag
+        
+    &::-webkit-scrollbar
+        height          2px
+
+#titlebar.focus .tabs
+    color               #34C749
+
+.tabs .tab.dirty 
+.tabs .tab.dirty .dot
+    color               #aaf
+
+.tabs .tab.clean .dot
     color               #444
     &.focus
         color           #006600
-
-#titlebar .title.focus
-    color               #34C749
-#titlebar .title.dirty
-#titlebar .dot.dirty
-    color               #aaf
-
+    
+.tab
+    flex                1 1 0
+    border-top-left-radius  6px
+    border-top-right-radius 6px
+    background          #333
+    padding-left        6px
+    padding-right       6px
+    padding-top         3px
+    margin-right        3px
+    &.active
+        background      #222
+    
 //  0000000   00000000   00000000   0000000 
 // 000   000  000   000  000       000   000
 // 000000000  0000000    0000000   000000000
@@ -375,6 +423,10 @@ infoPadding = 6px
     overflow            hidden
     background          #181818
     pointer-events      auto
+    
+#area
+#terminal
+    border-top          frameBorder
 
 // 00000000  0000000    000  000000000   0000000   00000000 
 // 000       000   000  000     000     000   000  000   000

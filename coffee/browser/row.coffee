@@ -34,7 +34,6 @@ class Row
     activate: (event) =>
         if event?
             {mod} = keyinfo.forEvent event
-            log mod
             switch mod
                 when 'alt', 'command+alt'
                     if @item.type == 'file' and @item.textFile

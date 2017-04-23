@@ -4,7 +4,8 @@
 # 000        000   000  000  0000  000     
 # 000        000   000  000   000  00000000
 
-{ getStyle, log } = require 'kxk'
+{ getStyle, log 
+} = require 'kxk'
 
 class Pane
     

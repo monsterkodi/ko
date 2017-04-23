@@ -89,7 +89,9 @@ mostRecentFile = -> _.first prefs.get 'recentFiles'
 wins        = -> BrowserWindow.getAllWindows().sort (a,b) -> a.id - b.id 
 activeWin   = -> BrowserWindow.getFocusedWindow()
 visibleWins = -> (w for w in wins() when w?.isVisible() and not w?.isMinimized())
+    
 winWithID   = (winID) ->
+    
     wid = parseInt winID
     for w in wins()
         return w if w.id == wid
@@ -101,6 +103,7 @@ winWithID   = (winID) ->
 # 0000000     0000000    0000000  000   000
 
 hideDock = ->
+    
     return if prefs.get 'trayOnly', false
     app.dock.hide() if app.dock
 
@@ -113,17 +116,17 @@ hideDock = ->
 post.onGet 'activateWindowWithFile', (file) -> main.activateWindowWithFile file
 post.onGet 'winInfos', -> (id: w.id, file: w.currentFile for w in wins())
 
-post.on 'newWindowWithFile', (file)  -> main.createWindow file
-post.on 'toggleDevTools',    (winID) -> winWithID(winID).toggleDevTools()
-post.on 'restartShell',      (cfg)   -> winShells[cfg.winID].restartShell()
-post.on 'maximizeWindow',    (winID) -> main.toggleMaximize winWithID winID
-post.on 'activateWindow',    (winID) -> main.activateWindowWithID winID
+post.on 'restartShell',       (cfg)   -> winShells[cfg.winID].restartShell()
+post.on 'newWindowWithFile',  (file)  -> main.createWindow file:file
+post.on 'toggleDevTools',     (winID) -> winWithID(winID).toggleDevTools()
+post.on 'maximizeWindow',     (winID) -> main.toggleMaximize winWithID winID
+post.on 'activateWindow',     (winID) -> main.activateWindowWithID winID
 post.on 'activateNextWindow', (winID) -> main.activateNextWindow winID
 post.on 'activatePrevWindow', (winID) -> main.activatePrevWindow winID
-post.on 'reloadWindow',      (winID) -> main.reloadWin winWithID winID
-post.on 'fileSaved',   (file, winID) -> main.indexer.indexFile file, refresh: true
-post.on 'fileLoaded',  (file, winID) -> main.indexer.indexFile winWithID(winID).currentFile = file
-post.on 'winlog',      (winID, text) -> console.log "win#{winID} ", text
+post.on 'reloadWindow',       (winID) -> main.reloadWin winWithID winID
+post.on 'fileSaved',    (file, winID) -> main.indexer.indexFile file, refresh: true
+post.on 'fileLoaded',   (file, winID) -> main.indexer.indexFile winWithID(winID).currentFile = file
+post.on 'winlog',       (winID, text) -> console.log "win#{winID} ", text
 
 post.on 'ping', (winID, argA, argB) -> post.toWin winID, 'pong', 'main', argA, argB
             
@@ -166,13 +169,13 @@ class Main
             
         if openFiles.length
             for file in openFiles
-                @createWindow file            
+                @createWindow file:file            
         else
             @restoreWindows() if not args.noprefs
 
         if not wins().length
             if args.show
-                w = @createWindow mostRecentFile()
+                w = @createWindow file:mostRecentFile()
         
         if args.DevTools
             wins()?[0]?.webContents.openDevTools()
@@ -195,6 +198,7 @@ class Main
     reloadWin: (win) -> win?.webContents.reloadIgnoringCache()
 
     toggleMaximize: (win) ->
+        
         disableSnap = true
         if win.isMaximized()
             win.unmaximize() 
@@ -203,6 +207,7 @@ class Main
         disableSnap = false
     
     toggleWindows: =>
+        
         if wins().length
             if visibleWins().length
                 if activeWin()
@@ -215,18 +220,21 @@ class Main
             @createWindow()
 
     hideWindows: ->
+        
         for w in wins()
             w.hide()
             hideDock()
         @
             
     showWindows: ->
+        
         for w in wins()
             w.show()
             app.dock.show()
         @
             
     raiseWindows: ->
+        
         if visibleWins().length
             for w in visibleWins()
                 w.showInactive()
@@ -235,6 +243,7 @@ class Main
         @
 
     activateNextWindow: (win) ->
+        
         if _.isNumber win then win = winWithID win
         allWindows = wins()
         for w in allWindows
@@ -246,6 +255,7 @@ class Main
         null
 
     activatePrevWindow: (win) ->
+        
         if _.isNumber win then win = winWithID win
         allWindows = wins()
         for w in allWindows
@@ -257,6 +267,7 @@ class Main
         null
 
     activateWindowWithID: (wid) ->
+        
         w = winWithID wid
         return if not w?
         if not w.isVisible() 
@@ -266,6 +277,7 @@ class Main
         w
 
     activateWindowWithFile: (file) ->
+        
         [file, pos] = splitFilePos file
         for w in wins()
             if w.currentFile == file
@@ -275,6 +287,7 @@ class Main
         null
 
     closeOtherWindows: =>
+        
         for w in wins()
             if w != activeWin()
                 @closeWindow w
@@ -282,11 +295,13 @@ class Main
     closeWindow: (w) -> w?.close()
     
     closeWindows: =>
+        
         for w in wins()
             @closeWindow w
         hideDock()
 
     postDelayedNumWins: ->
+        
         clearTimeout @postDelayedNumWinsTimer
         postNumWins = -> 
             post.toWins 'numWins', wins().length
@@ -388,6 +403,7 @@ class Main
     
     restoreWindows: ->
         windows = prefs.get 'windows', {}
+        prefs.del 'windows'
         sequenced = {}
         i = 0
         for k, w of windows
@@ -398,7 +414,7 @@ class Main
             @restoreWin w
                 
     restoreWin: (state) ->
-        w = @createWindow state.file
+        w = @createWindow restore:state
         w.setBounds state.bounds if state.bounds?
         w.webContents.openDevTools() if state.devTools
         w.showInactive()
@@ -410,7 +426,9 @@ class Main
     # 000       000   000  000       000   000     000     000     
     #  0000000  000   000  00000000  000   000     000     00000000
        
-    createWindow: (openFile) ->
+    createWindow: (opt) ->
+        
+        opt ?= {}
         
         {width, height} = @screenSize()
         ww = height + 122
@@ -438,19 +456,12 @@ class Main
         win.on 'resize', @onResizeWin
                                         
         winLoaded = ->
-            if openFile?
-                win.currentFile = splitFilePos(openFile)[0]
-                post.toWin win.id, 'loadFile', openFile
-                openFile = null
-                win.show()
-                win.focus()
-            else
-                file = prefs.get "windows:#{win.id}:file"
-                if file?
-                    win.currentFile = file
-                    post.toWin win.id, 'loadFile', file
-                else
-                    win.show()
+            if opt.restore
+                post.toWin win.id, 'restore', opt.restore if opt.restore
+            else if opt.file?
+                win.currentFile = splitFilePos(opt.file)[0] # ????
+                post.toWin win.id, 'loadFile', opt.file
+            win.show()
             post.toWins 'winLoaded', win.id
             post.toWins 'numWins', wins().length
                             
@@ -463,7 +474,8 @@ class Main
     # 000   000  000            000  000   000     000     
     # 000   000  00000000  0000000   000  0000000  00000000
     
-    onResizeWin: (event) -> 
+    onResizeWin: (event) ->
+        
         return if disableSnap
         frameSize = 6
         wb = event.sender.getBounds()
@@ -489,6 +501,7 @@ class Main
                             height: b.height
     
     onCloseWin: (event) =>
+        
         wid = event.sender.id
         prefs.del "windows:#{wid}"
         if visibleWins().length == 1
@@ -497,6 +510,7 @@ class Main
         @postDelayedNumWins()
         
     otherInstanceStarted: (args, dir) =>
+        
         if not visibleWins().length
             @toggleWindows()
 
@@ -512,9 +526,10 @@ class Main
             if not fileExists fpath
                 continue
             w = winWithID @activateWindowWithFile file
-            w = @createWindow file if not w?
+            w = @createWindow file:file if not w?
                     
     quit: ->
+        
         toSave = wins().length
         if toSave
             post.toWins 'saveState'
@@ -545,13 +560,15 @@ class Main
 # 000   000  000        000        000   0000000   000   000
 
 app.on 'open-file', (event, path) -> 
+    
     if not main?
         openFiles.push path
     else
-        main.createWindow path
+        main.createWindow file:path
     event.preventDefault()
 
 app.on 'ready', -> 
+    
     main     = new Main openFiles
     navigate = new Navigate main
     
