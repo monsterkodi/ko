@@ -1,11 +1,15 @@
+
 # 000   000  000  000   000  0000000     0000000   000   000
 # 000 0 000  000  0000  000  000   000  000   000  000 0 000
 # 000000000  000  000 0 000  000   000  000   000  000000000
 # 000   000  000  000  0000  000   000  000   000  000   000
 # 00     00  000  000   000  0000000     0000000   00     00
 
-{ splitFilePos, stopEvent, fileExists, fileList, resolve, keyinfo, clamp,
-sw,sh, prefs, stash, drag, pos, str, os, fs, noon, post, path, error, log, $, _
+{ splitFilePos, stopEvent, fileExists, fileList, resolve, keyinfo, 
+  prefs, stash, drag, noon, post, path, clamp, error, 
+  pos, str, log, 
+  sw, sh, os, fs, 
+  $, _
 }           = require 'kxk'
 Split       = require './split'
 Terminal    = require './terminal'
@@ -35,8 +39,6 @@ commandline = null
 titlebar    = null
 tabs        = null
 
-domain = require('domain').create()
-domain.on 'error', (err) -> error "unhandled error: #{err}"
 window.onerror = (event, source, line, col, err) -> 
     f = require('sorcery').loadSync(source.replace /coffee/g, 'js')
     if f?
@@ -69,6 +71,7 @@ addToRecent = (file) ->
     commandline.commands.open.setHistory recent.reverse()
     
 saveStash = -> 
+    
     post.emit 'stash'
     editor.saveScrollCursorsAndSelections()
     window.stash.save()
@@ -300,6 +303,8 @@ loadFile = (file, opt={}) ->
         
     if file != editor.currentFile or opt?.reload
         
+        # log "window.loadFile", file, opt
+        
         if file? and not fileExists file
             file = null
             
@@ -311,18 +316,19 @@ loadFile = (file, opt={}) ->
             pos:  editor.cursorPos()
             for: 'load'
         
+        editor.clear()
+
         if file?
             addToRecent file
             
             if tab = tabs.tab file
                 tab.setActive()
 
+            # log "editor.setCurrentFile", file, opt
             editor.setCurrentFile file, opt
             
             post.toOthers 'fileLoaded', file, winID
             commandline.fileLoaded file
-        else
-            editor.stopWatcher() 
             
     window.split.show 'editor'
         

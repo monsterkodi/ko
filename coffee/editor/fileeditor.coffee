@@ -1,3 +1,4 @@
+
 # 00000000  000  000      00000000        00000000  0000000    000  000000000   0000000   00000000   
 # 000       000  000      000             000       000   000  000     000     000   000  000   000  
 # 000000    000  000      0000000         0000000   000   000  000     000     000   000  0000000    
@@ -51,6 +52,8 @@ class FileEditor extends TextEditor
     # 000       000  000      000     
     # 000       000  0000000  00000000
 
+    clear: -> @setCurrentFile()
+    
     setCurrentFile: (file, opt) -> 
         
         @dirty = false
@@ -72,10 +75,10 @@ class FileEditor extends TextEditor
         if @currentFile?
             @watch = new watcher @
             @setText fs.readFileSync @currentFile, encoding: 'utf8'
+            # log 'setText', @lines().slice 0, 6
             @restoreScrollCursorsAndSelections()
             post.emit 'file', @currentFile # titlebar -> tabs -> tab
         else
-            @watch = null
             @setLines []
             
         @emit 'file', @currentFile # diffbar

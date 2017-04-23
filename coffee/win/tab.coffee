@@ -83,7 +83,7 @@ class Tab
     
     activate: ->
         @setActive()
-        window.loadFile @info?.file
+        window.loadFile @info.file
         @tabs.update()
 
     isActive: -> @div.classList.contains 'active'
