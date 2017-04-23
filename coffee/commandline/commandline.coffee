@@ -52,10 +52,7 @@ class Commandline extends TextEditor
     #      000     000     000   000     000     000       
     # 0000000      000     000   000     000     00000000  
     
-    stash: =>
-        
-        if @command?
-            window.stash.set 'commandline', @command.state()
+    stash: => if @command? then window.stash.set 'commandline', @command.state()
 
     restore: =>
         

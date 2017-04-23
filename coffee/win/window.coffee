@@ -89,16 +89,16 @@ post.on 'shellCallbackData', (cmdData) -> commandline.commands['term'].onShellCa
 post.on 'singleCursorAtPos', (pos, opt) -> 
     editor.singleCursorAtPos pos, opt
     editor.scrollCursorToTop()
-post.on 'openFile',          (options) -> openFile options
-post.on 'focusEditor',  -> split.focus 'editor'
-post.on 'cloneFile',    -> post.toMain 'newWindowWithFile', editor.currentFile
-post.on 'reloadFile',   -> reloadFile()
-post.on 'reloadWin',    -> reloadWin()
-post.on 'saveFileAs',   -> saveFileAs()
-post.on 'saveFile',     -> saveFile()
-post.on 'saveStash',    -> saveStash()
-# post.on 'restore',      -> restoreWin()
-post.on 'loadFile', (file) -> loadFile file
+post.on 'focusEditor',      -> split.focus 'editor'
+post.on 'cloneFile',        -> post.toMain 'newWindowWithFile', editor.currentFile
+post.on 'reloadFile',       -> reloadFile()
+post.on 'reloadWin',        -> reloadWin()
+post.on 'saveFileAs',       -> saveFileAs()
+post.on 'saveFile',         -> saveFile()
+post.on 'saveStash',        -> saveStash()
+post.on 'openFile',   (opt) -> openFile opt
+post.on 'reloadTab', (file) -> reloadTab file 
+post.on 'loadFile',  (file) -> loadFile file
 post.on 'fileLinesChanged', (file, lineChanges) ->
     if file == editor.currentFile
         editor.applyForeignLineChanges lineChanges
@@ -138,6 +138,8 @@ winMain = ->
     info        = window.info        = new Info editor
     fps         = window.fps         = new FPS()
 
+    restoreWin()
+    
     split.on 'split', (s) ->
         area.resized()
         terminal.resized()
@@ -161,11 +163,8 @@ winMain = ->
         screenWidth = screenSize().width
         editor.centerText sw() == screenWidth, 0
         
-    fps.toggle() if window.stash.get 'fps'
-
     post.emit 'restore'
-    # commandline.restoreState()
-    split.restoreState()
+    win.show()
         
 # 00000000  0000000    000  000000000   0000000   00000000 
 # 000       000   000  000     000     000   000  000   000
@@ -250,9 +249,21 @@ reloadWin = ->
 # 0000000   0000000   000   000  0000000  
 
 reloadFile = ->
+    
     loadFile editor.currentFile, 
-        reload:          true
-        dontSave:        true
+        reload:   true
+        dontSave: true
+        
+    if editor.currentFile?
+        post.toOtherWins 'reloadTab', editor.currentFile
+
+reloadTab = (file) ->
+    if file == editor.currentFile
+        loadFile editor.currentFile, 
+            reload:   true
+            dontSave: true
+    else 
+        post.emit 'revertFile', file
 
 loadFile = (file, opt={}) ->
 

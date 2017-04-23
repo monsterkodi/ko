@@ -180,7 +180,7 @@ class Main
 
         Menu.init @
 
-        setTimeout @showWindows, 10
+        # setTimeout @showWindows, 10
         
     # 000   000  000  000   000  0000000     0000000   000   000   0000000
     # 000 0 000  000  0000  000  000   000  000   000  000 0 000  000     
@@ -397,8 +397,7 @@ class Main
         userData = app.getPath 'userData'
         stashFiles = fileList path.join(userData, 'old'), matchExt: ['.noon']
         for file in stashFiles
-            w = @createWindow restore:file
-            w.showInactive()
+            @createWindow restore:file
                 
     #  0000000  00000000   00000000   0000000   000000000  00000000
     # 000       000   000  000       000   000     000     000     
@@ -424,8 +423,6 @@ class Main
             fullscreenable:  true
             show:            false
             hasShadow:       false
-            webPreferences:
-                scrollBounce: true
             backgroundColor: '#000'
             titleBarStyle:   'hidden'
 
@@ -444,7 +441,7 @@ class Main
                 post.toWin win.id, 'loadFiles', opt.files
             else if opt.file?
                 post.toWin win.id, 'loadFile', opt.file
-            win.show()
+            
             post.toWins 'winLoaded', win.id
             post.toWins 'numWins', wins().length
                             

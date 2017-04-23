@@ -26,6 +26,7 @@ class Tabs
         post.on 'closeTabOrWindow', @onCloseTabOrWindow
         post.on 'stash',            @stash
         post.on 'restore',          @restore
+        post.on 'revertFile',       @revertFile
 
     #  0000000  000      000   0000000  000   000  
     # 000       000      000  000       000  000   
@@ -57,6 +58,8 @@ class Tabs
             _.find @tabs, (t) -> t.div.contains id
         else if _.isNumber id
             @tabs[id]
+        else if _.isString id
+            _.find @tabs, (t) -> t.info.file == id
 
     activeTab: -> _.find @tabs, (t) -> t.isActive()
     numTabs:   -> @tabs.length
@@ -139,16 +142,14 @@ class Tabs
     # 000   000  000            000     000     000   000  000   000  000       
     # 000   000  00000000  0000000      000      0000000   000   000  00000000  
 
-    stash: =>
-        
-        window.stash.set 'tabs', 
-            files:  ( t.file() for t in @tabs )
-            active: @activeTab().index()
+    stash: => window.stash.set 'tabs', 
+        files:  ( t.file() for t in @tabs )
+        active: @activeTab().index()
     
     restore: =>
         
         files =  window.stash.get 'tabs:files'
-        return error "no tabs:files in stash?" if _.isEmpty files
+        return if _.isEmpty files # happens when first window opens
         
         @tabs[0].update file: files.shift()
         while files.length
@@ -160,6 +161,8 @@ class Tabs
             @tabs[0].activate()
             
         @update()
+
+    revertFile: (file) => @tab(file)?.revert()
         
     # 000   000  00000000   0000000     0000000   000000000  00000000    
     # 000   000  000   000  000   000  000   000     000     000         

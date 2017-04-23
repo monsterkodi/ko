@@ -65,6 +65,11 @@ class Tab
     
     hidePkg: -> @pkg.style.display = 'none'
     showPkg: -> @pkg.style.display = 'initial'
+    
+    revert: -> 
+        delete @info.dirty
+        @update @info
+        @tabs.update()
 
     #  0000000    0000000  000000000  000  000   000  00000000  
     # 000   000  000          000     000  000   000  000       
