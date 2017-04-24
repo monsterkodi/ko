@@ -60,7 +60,8 @@ class Diffbar
         
         if @editor.currentFile
             forkfunc '../tools/gitdiff', @editor.currentFile, (err, changes) =>
-                return error "gitdiff failed:", err if err
+                # return error "gitdiff failed:", err if err
+                return if err
                 if changes.file == @editor.currentFile
                     @changes = changes
                     @paint()
@@ -69,7 +70,7 @@ class Diffbar
             @paint()
             
     paint: =>
-        
+
         @updateMetas()
         
         w  = 2

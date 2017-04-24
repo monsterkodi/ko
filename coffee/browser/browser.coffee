@@ -17,6 +17,7 @@ flex     = require '../win/flex/flex'
 class Browser extends Stage
     
     constructor: (@view) -> 
+                
         @columns = []
         super @view
 

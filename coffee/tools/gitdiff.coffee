@@ -18,9 +18,8 @@ module.exports = (file) ->
             encoding:   'utf8' 
 
     catch err
-        console.log 'err:', err
-        log "error #{err}"
-        return error: err
+        # console.log 'err:', err
+        throw err
     
     info  = file:file, changes:[]
     lines = (chalk.stripColor l for l in result.split '\n')

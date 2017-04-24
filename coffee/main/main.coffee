@@ -10,6 +10,7 @@
 pkg           = require '../../package.json'
 Execute       = require './execute'
 Navigate      = require './navigate'
+Debugger      = require '../debugger/debugger'
 Indexer       = require './indexer'
 Menu          = require './menu'
 colors        = require 'colors'
@@ -123,7 +124,6 @@ post.onGet 'logSync',  ->
 
 post.on 'restartShell',       (cfg)   -> winShells[cfg.winID].restartShell()
 post.on 'newWindowWithFile',  (file)  -> main.createWindow file:file
-# post.on 'toggleDevTools',     (winID) -> winWithID(winID).toggleDevTools()
 post.on 'maximizeWindow',     (winID) -> main.toggleMaximize winWithID winID
 post.on 'activateWindow',     (winID) -> main.activateWindowWithID winID
 post.on 'activateNextWindow', (winID) -> main.activateNextWindow winID
@@ -156,6 +156,7 @@ class Main
             app.exit 0
             return
 
+        @debugger     = new Debugger
         @indexer      = new Indexer
         coffeeExecute = new Execute main: @
 
@@ -449,6 +450,10 @@ class Main
             
             post.toWins 'winLoaded', win.id
             post.toWins 'numWins', wins().length
+            
+            if win.id == 1
+                post.toMain 'breakpoint', win.id, '/Users/kodi/s/ko/js/win/tabs.js', 64
+                # post.toMain 'breakpoint', window.winID, '/Users/kodi/s/ko/coffee/browser/browser.coffee', 23
                             
         win.webContents.on 'did-finish-load', winLoaded
         win 

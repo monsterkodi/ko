@@ -653,7 +653,7 @@ class TextEditor extends Editor
         
         # switch key            
             # when 'backspace' then return
-            
+        
         if char and mod in ["shift", ""]
             @insertCharacter char
 
