@@ -39,11 +39,18 @@ class Execute
             restoreCWD = process.cwd()
             process.chdir __dirname
             coffee.eval """                
-                {str,clamp,fileExists,dirExists,post,path,fs,_} = require 'kxk'
+                {str,clamp,fileExists,dirExists,resolve,unresolve,post,path,fs,_} = require 'kxk'
                 coffee = require 'coffee-script'
+                cri = require 'chrome-remote-interface'
                 {max,min,abs,round,ceil,floor,sqrt,pow,exp,log10,sin,cos,tan,acos,asin,atan,PI,E} = Math
                 (global[r] = require r for r in ['path', 'fs', 'noon', 'colors', 'electron'])                    
-                log = -> post.toWin winID, 'executeResult', [].slice.call(arguments, 0), cmdID
+                log = -> 
+                    console.log.apply console, [].slice.call(arguments, 0)
+                    if winID? then post.toWin winID, 'executeResult', [].slice.call(arguments, 0), cmdID
+                error = -> 
+                    console.log.apply console, ['[ERROR]'].concat [].slice.call(arguments, 0)
+                    if winID? then post.toWin winID, 'executeResult', ['[ERROR]'].concat([].slice.call(arguments, 0)), cmdID
+                log 'coffee in main process'
                 """
             process.chdir restoreCWD
         catch err

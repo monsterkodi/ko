@@ -71,10 +71,12 @@ class Coffee extends Command
             process.chdir __dirname
             coffee.eval """                
                 {str,clamp,fileExists,dirExists,post,path,noon,fs,_,$} = require 'kxk'
+                cri = require 'chrome-remote-interface'
                 {max,min,abs,round,ceil,floor,sqrt,pow,exp,log10,sin,cos,tan,acos,asin,atan,PI,E} = Math
                 (global[r] = require r for r in ['colors', 'electron'])                    
                 log = -> post.emit 'executeResult', [].slice.call(arguments, 0), cmdID
                 browse = window.commandline.commands.browse.browser.loadObject
+                
                 """
             process.chdir restoreCWD
         try

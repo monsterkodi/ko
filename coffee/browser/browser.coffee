@@ -162,7 +162,7 @@ class Browser extends Stage
     # 0000000    000  000   000  
     
     loadDir: (dir, opt) -> 
-        
+
         dirlist dir, opt, (err, items) => 
             
             if err? then return error "can't load dir #{dir}: #{err}"

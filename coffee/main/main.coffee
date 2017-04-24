@@ -65,6 +65,9 @@ if args.verbose
     log noon.stringify args, colors:true
     log ''
 
+app.commandLine.appendSwitch('headless')
+app.commandLine.appendSwitch('remote-debugging-port', '9222')
+
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000     
 # 00000000   0000000    0000000   000000    0000000 
