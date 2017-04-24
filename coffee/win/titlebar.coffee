@@ -13,7 +13,10 @@ Tabs   = require './tabs'
 class Titlebar
     
     constructor: () ->
-        
+
+        log 'Titlebar', window.winID
+        post.toMain 'breakpoint', window.winID, '/Users/kodi/s/ko/coffee/win/titlebar.coffee', 99
+
         @elem =$ 'titlebar'
         @elem.ondblclick = (event) -> post.toMain 'maximizeWindow', window.winID
         @selected = -1

@@ -317,7 +317,7 @@ class FileEditor extends TextEditor
         return if path.extname(@currentFile) not in ['.js', '.coffee']
         cp = @cursorPos()
         @meta.addDbgMeta line:cp[1], clss:'dbg breakpoint'
-        post.toMain 'breakpoint', winID, @currentFile, cp[1]
+        post.toMain 'breakpoint', winID, @currentFile, cp[1]+1
         
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

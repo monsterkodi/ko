@@ -14,7 +14,6 @@ mapSrc   = require './srcmap'
 class WinDbg 
     
     constructor: (@wid) ->
-        
         @scriptMap = {}
         
         @dbg = electron.BrowserWindow.fromId(@wid).webContents.debugger
@@ -83,13 +82,13 @@ class WinDbg
 class Debugger
     
     constructor: ->
+        log 'Debugger'
         post.on 'breakpoint', @onBreakpoint
         @winDbg = {}
         
     onBreakpoint: (wid, file, line) =>
-        return error 'wrong file type' if path.extname(file) not in ['.js', '.coffee']
-        line += 1
         log 'onBreakpoint', wid, file, line
+        return error 'wrong file type' if path.extname(file) not in ['.js', '.coffee']
         @winDbg[wid] ?= new WinDbg wid
         @winDbg[wid].setBreakpoint file, line
     
