@@ -52,12 +52,13 @@ class FileEditor extends TextEditor
     # 000       000  000      000     
     # 000       000  0000000  00000000
 
-    clear: -> @setCurrentFile()
+    clear: (opt = skip:false) -> @setCurrentFile null, opt 
     
     setCurrentFile: (file, opt) -> 
         
         @dirty = false
-        post.emit 'dirty', false
+        if not opt?.skip
+            post.emit 'dirty', false
         
         @syntax.name = 'txt'
         if file?
@@ -76,12 +77,14 @@ class FileEditor extends TextEditor
             @watch = new watcher @
             @setText fs.readFileSync @currentFile, encoding: 'utf8'
             @restoreScrollCursorsAndSelections()
+            post.emit 'file', @currentFile # titlebar -> tabs -> tab
         else
             @setLines []   # little hack to update stuff ...
             @setLines [''] # ... that listens on line numbers only
             
-        post.emit 'file', @currentFile # titlebar -> tabs -> tab
-        @emit     'file', @currentFile # diffbar
+        if not opt?.skip
+            post.emit 'file', @currentFile # titlebar -> tabs -> tab
+            @emit 'file', @currentFile # diffbar
 
     stopWatcher: ->
         if @watch?

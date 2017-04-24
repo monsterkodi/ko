@@ -322,7 +322,7 @@ loadFile = (file, opt={}) ->
             pos:  editor.cursorPos()
             for: 'load'
         
-        editor.clear()
+        editor.clear skip:file? 
 
         if file?
             addToRecent file

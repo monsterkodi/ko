@@ -93,19 +93,19 @@ class Tabs
     #    000     000   000  0000000    
     
     tab: (id) ->
-        if _.isElement id
-            _.find @tabs, (t) -> t.div.contains id
-        else if _.isNumber id
-            @tabs[id]
-        else if _.isString id
-            _.find @tabs, (t) -> t.info.file == id
+        
+        if _.isNumber  id then return @tabs[id]
+        if _.isElement id then return _.find @tabs, (t) -> t.div.contains id
+        if _.isString  id then return _.find @tabs, (t) -> t.info.file == id
 
     activeTab: -> _.find @tabs, (t) -> t.isActive()
     numTabs:   -> @tabs.length
     
-    tabAtX: (x) -> _.find @tabs, (t) -> 
-        br = t.div.getBoundingClientRect()
-        br.left <= x <= br.left + br.width
+    tabAtX: (x) -> 
+        
+        _.find @tabs, (t) -> 
+            br = t.div.getBoundingClientRect()
+            br.left <= x <= br.left + br.width
     
     #  0000000  000       0000000    0000000  00000000  
     # 000       000      000   000  000       000       
@@ -114,6 +114,7 @@ class Tabs
     #  0000000  0000000   0000000   0000000   00000000  
     
     closeTab: (tab = @activeTab()) ->
+        
         tab.nextOrPrev().activate()
         tab.close()
         _.pull @tabs, tab
@@ -121,6 +122,7 @@ class Tabs
         @
   
     onCloseTabOrWindow: =>
+        
         if @numTabs() == 1
             window.win.close()
         else
@@ -141,6 +143,7 @@ class Tabs
     # 000   000  0000000    0000000             000     000   000  0000000    
     
     addTab: (file) ->
+
         tab = new Tab @
         tab.update file:file
         @tabs.push tab
@@ -148,7 +151,7 @@ class Tabs
         tab
 
     onNewTabWithFile: (file) => 
-        log 'addTabWithFile', file
+
         if tab = @tab file
             tab.activate()
         else
@@ -197,6 +200,7 @@ class Tabs
             active: @activeTab().index()
     
     restore: =>
+        
         active = window.stash.get 'tabs:active', 0
         files  = window.stash.get 'tabs:files'
         return if _.isEmpty files # happens when first window opens

@@ -57,7 +57,7 @@ class Browser extends Stage
         @initColumns() if _.isEmpty @columns
         
         if @columns[0].parent?.type != 'obj'
-            @clearColumnsFrom 2
+            @clearColumnsFrom 2, pop:true
             rootObj = {}
             @columns[0].setItems [], parent: type: 'obj', obj:rootObj, name: 'root'
         else 
@@ -152,6 +152,7 @@ class Browser extends Stage
     
     browse: (dir) -> 
         return error "no dir?" if not dir?
+        @clearColumnsFrom 1, pop:true
         @loadDir dir, column:0, row: 0, focus:true
 
     # 0000000    000  00000000   
@@ -161,20 +162,27 @@ class Browser extends Stage
     # 0000000    000  000   000  
     
     loadDir: (dir, opt) -> 
+        
         dirlist dir, opt, (err, items) => 
+            
             if err? then return error "can't load dir #{dir}: #{err}"
+            
             opt ?= {}
             opt.parent ?=
                 type: 'dir'
                 abs: dir
                 name: path.basename dir
+                
             if not opt?.column or @columns[0]?.activeRow()?.item.name == '..'
+                
                 updir = resolve path.join dir, '..'
+                
                 if not (updir == dir == '/') and (not @columns[0].parent? or @columns[0].parent.abs.startsWith dir) 
                     items.unshift 
                         name: '..'
                         type: 'dir'
                         abs:  updir
+                        
             @loadItems items, opt
 
     # 000       0000000    0000000   0000000         000  000000000  00000000  00     00   0000000  
@@ -184,6 +192,7 @@ class Browser extends Stage
     # 0000000   0000000   000   000  0000000         000     000     00000000  000   000  0000000   
     
     loadItems: (items, opt) ->
+        
         col = @emptyColumn opt?.column
         @clearColumnsFrom col.index
 
@@ -252,19 +261,23 @@ class Browser extends Stage
             if f[3] == name
                 items.push name: f[2], text:'  ▸ '+f[2], type:'func', file: file, line: f[0]
 
-        @clearColumnsFrom opt.column
-
         if items.length
             opt.parent ?= item
+            @clearColumnsFrom opt.column, pop:true
             @loadItems items, opt
         else
             ext = path.extname file  
             if ext in ['.gif', '.png', '.jpg']
+                @clearColumnsFrom opt.column, pop:true
                 @loadImage row, file
             else if ext in ['.icns', '.tiff', '.tif']
+                @clearColumnsFrom opt.column, pop:true
                 @convertImage row
             else if ext in ['.pxm']
+                @clearColumnsFrom opt.column, pop:true
                 @convertPXM row
+            else
+                @clearColumnsFrom opt.column
             
         if item.textFile and not @skipJump
             post.emit 'jumpTo', file:file
@@ -387,12 +400,19 @@ class Browser extends Stage
         @flex.popPane()
         @columns.pop()
      
-    clearColumnsFrom: (c) ->
+    clearColumnsFrom: (c, opt=pop:false) ->
+        
         return error "clearColumnsFrom #{c}?" if not c? or c < 0
+        
         if c < @numCols()
-            @columns[c].clear()
-        while c+1 < @numCols()
-            @popColumn()
+            @columns[c++].clear()
+            
+        if opt.pop
+            while c < @numCols()
+                @popColumn()
+        else
+            while c < @numCols()
+                @columns[c++].clear()
        
     # 000  000   000  000  000000000       0000000   0000000   000       0000000  
     # 000  0000  000  000     000         000       000   000  000      000       
