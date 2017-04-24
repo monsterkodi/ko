@@ -17,7 +17,7 @@ toCoffee  = (jsFile, jsLine) ->
     consumer = new sourceMap.SourceMapConsumer mapData 
     pos = consumer.originalPositionFor line:jsLine, column:0, bias: sourceMap.SourceMapConsumer.LEAST_UPPER_BOUND
     coffeeLine = pos.line
-    log "toCoffee #{jsFile}:#{jsLine} -> #{coffeeFile}:#{coffeeLine}"
+    # log "toCoffee #{jsFile}:#{jsLine} -> #{coffeeFile}:#{coffeeLine}"
     [coffeeFile, coffeeLine]
 
 toJs = (coffeeFile, coffeeLine) ->
@@ -28,15 +28,14 @@ toJs = (coffeeFile, coffeeLine) ->
     mapData = fs.readFileSync mapFile, 'utf8'
     consumer = new sourceMap.SourceMapConsumer mapData 
     srcFile = 'coffee/' + coffeeFile.split('/coffee/')[1]
-    pos = consumer.generatedPositionFor source:srcFile, line:coffeeLine, column:0
-    jsLine = pos.line
-    log "toJs #{coffeeFile}:#{coffeeLine} -> #{jsFile}:#{jsLine}"
-    
-    toCoffee jsFile, jsLine
-    
+    poss = consumer.allGeneratedPositionsFor source:srcFile, line:coffeeLine, column:0
+    # log 'ppos:', poss
+    jsLine = poss[0].line
+    # log "toJs #{coffeeFile}:#{coffeeLine} -> #{jsFile}:#{jsLine}"
     [jsFile, jsLine]
         
 module.exports =
+    
     toJs:     toJs
     toCoffee: toCoffee
     

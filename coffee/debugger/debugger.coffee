@@ -9,7 +9,7 @@
 } = require 'kxk'
 
 electron = require 'electron'
-mapSrc   = require './mapsrc'
+mapSrc   = require './srcmap'
 
 class WinDbg 
     
@@ -19,8 +19,6 @@ class WinDbg
         
         @dbg = electron.BrowserWindow.fromId(@wid).webContents.debugger
 
-        # log "debugger for win #{wid} #{d?} attached #{d.isAttached()}"
-            
         if not @dbg.isAttached()
             try
                 @dbg.attach '1.2'
@@ -37,6 +35,12 @@ class WinDbg
                 while bp = @breakpoints.shift()
                     @setBreakpoint bp[0], bp[1]
                 
+    # 0000000    00000000   00000000   0000000   000   000  
+    # 000   000  000   000  000       000   000  000  000   
+    # 0000000    0000000    0000000   000000000  0000000    
+    # 000   000  000   000  000       000   000  000  000   
+    # 0000000    000   000  00000000  000   000  000   000  
+    
     setBreakpoint: (file, line) ->
         
         if not @enabled
@@ -61,29 +65,29 @@ class WinDbg
                 @scriptMap[params.scriptId] = params
             when 'Debugger.breakpointResolved' then log 'breakpoint: '+ params
             when 'Debugger.paused' 
-                log 'BREAKPOINT'
+                log 'STACKTRACE'
                 for frame in params.callFrames
-                    log "    #{frame.functionName}" #, frame.location
+                    log "    #{frame.functionName}" if frame.functionName?.length #, frame.location
                 filePos = params.hitBreakpoints[0]
-                log 'BREAK AT', filePos
+                log 'BREAK', filePos
                 [file, pos] = splitFilePos filePos
                 [coffeeSource, coffeeLine] = mapSrc.toCoffee file, pos[1]+1
                 if coffeeLine
                     filePos = joinFilePos coffeeSource, [0,coffeeLine-1]
-                    log 'mapped:', [coffeeSource, coffeeLine], filePos
+                    # log 'mapped:', [coffeeSource, coffeeLine], filePos
                 main.createWindow file:filePos, debugger:true
-                log 'resuming...'
-                @dbg.sendCommand 'Debugger.resume'
+                # log 'resuming...'
+                # @dbg.sendCommand 'Debugger.resume'
             else log "method: #{method}"
 
 class Debugger
     
     constructor: ->
-        log 'debugger'
         post.on 'breakpoint', @onBreakpoint
         @winDbg = {}
         
     onBreakpoint: (wid, file, line) =>
+        return error 'wrong file type' if path.extname(file) not in ['.js', '.coffee']
         line += 1
         log 'onBreakpoint', wid, file, line
         @winDbg[wid] ?= new WinDbg wid

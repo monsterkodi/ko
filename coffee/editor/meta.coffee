@@ -120,13 +120,14 @@ class Meta
                     num = '?' if not num 
                     e.numberSpan.innerHTML = num
                 else
-                    if meta[2].diff
+                    if meta[2].no_x
                         e.numberSpan.innerHTML = meta[2].line
                     else
                         e.numberSpan.innerHTML = '&nbsp;'
                     
     setMetaPos: (meta, tx, ty) ->
-        if meta[2].diff
+        
+        if meta[2].no_x
             meta[2].div?.style.transform = "translateY(#{ty}px)"        
         else
             meta[2].div?.style.transform = "translate(#{tx}px,#{ty}px)"        
@@ -147,11 +148,13 @@ class Meta
         
         div = elem class: "meta #{meta[2].clss ? ''}"
         meta[2].div = div
-        div.style.height = "#{lh}px"  
+        
+        if not meta[2].no_h
+            div.style.height = "#{lh}px"  
         
         @setMetaPos meta, tx, ty
 
-        if not meta[2].diff
+        if not meta[2].no_x
             div.style.width = "#{sw}px"
             if meta[2].href?
                 div.addEventListener 'mousedown', @onClick
@@ -176,7 +179,22 @@ class Meta
     
     addDiffMeta: (meta) ->
         meta.diff = true
+        meta.no_x = true
         lineMeta = [meta.line, [0, 0], meta]
+        @metas.push lineMeta
+        @addDiv lineMeta
+
+    # 0000000    0000000     0000000   
+    # 000   000  000   000  000        
+    # 000   000  0000000    000  0000  
+    # 000   000  000   000  000   000  
+    # 0000000    0000000     0000000   
+    
+    addDbgMeta: (meta) ->
+        meta.dbg  = true
+        meta.no_x = true
+        meta.no_h = true
+        lineMeta  = [meta.line, [0, 0], meta]
         @metas.push lineMeta
         @addDiv lineMeta
 

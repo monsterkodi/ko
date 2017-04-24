@@ -307,6 +307,18 @@ class FileEditor extends TextEditor
         else
             @updateLayers()
 
+    # 0000000    00000000   00000000   0000000   000   000  00000000    0000000   000  000   000  000000000  
+    # 000   000  000   000  000       000   000  000  000   000   000  000   000  000  0000  000     000     
+    # 0000000    0000000    0000000   000000000  0000000    00000000   000   000  000  000 0 000     000     
+    # 000   000  000   000  000       000   000  000  000   000        000   000  000  000  0000     000     
+    # 0000000    000   000  00000000  000   000  000   000  000         0000000   000  000   000     000     
+    
+    toggleBreakpoint: ->
+        return if path.extname(@currentFile) not in ['.js', '.coffee']
+        cp = @cursorPos()
+        @meta.addDbgMeta line:cp[1], clss:'dbg breakpoint'
+        post.toMain 'breakpoint', winID, @currentFile, cp[1]
+        
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
     # 0000000    0000000     00000  
@@ -319,7 +331,7 @@ class FileEditor extends TextEditor
             when 'ctrl+enter'       then return window.commandline.commands.coffee.executeText @text()
             when 'ctrl+shift+enter' then return window.commandline.commands.coffee.executeTextInMain @text()
             when 'command+alt+up'   then return @jumpToCounterpart()
-            when 'f9'               then return post.toMain 'breakpoint', winID, @currentFile, @cursorPos()[1]
+            when 'f9'               then return @toggleBreakpoint()
             when 'esc'
                 split = window.split
                 if split.terminalVisible()

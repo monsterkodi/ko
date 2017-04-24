@@ -81,6 +81,7 @@ restoreWin = ->
     
     if bounds = window.stash.get 'bounds'
         win.setBounds bounds
+        
     if window.stash.get 'devTools'
         win.webContents.openDevTools()
     
@@ -260,8 +261,8 @@ window.onload = ->
     info.reload()
     win.on 'close', onClose
     win.on 'move',  onMove
-    # post.get 'logSync', 'window.onload'
     win.webContents.on 'devtools-opened', -> window.stash.set 'devTools', true
+    win.webContents.on 'devtools-closed', -> window.stash.set 'devTools'
     
 # 00000000   00000000  000       0000000    0000000   0000000    
 # 000   000  000       000      000   000  000   000  000   000  

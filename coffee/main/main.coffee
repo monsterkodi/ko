@@ -451,10 +451,6 @@ class Main
             post.toWins 'winLoaded', win.id
             post.toWins 'numWins', wins().length
             
-            if win.id == 1
-                post.toMain 'breakpoint', win.id, '/Users/kodi/s/ko/js/win/tabs.js', 64
-                # post.toMain 'breakpoint', window.winID, '/Users/kodi/s/ko/coffee/browser/browser.coffee', 23
-                            
         win.webContents.on 'did-finish-load', winLoaded
         win 
      
