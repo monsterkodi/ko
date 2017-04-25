@@ -38,6 +38,10 @@ class ObjectBrowser extends Browser
         type = (i) -> {obj:'a', array:'b', elem:'c', regexp:'d', string:'e', int:'f', float:'g', bool:'h', nil:'i', func:'z'}[i.type]
         items.sort (a,b) -> (type(a) + a.name).localeCompare type(b) + b.name      
 
+    clear: ->
+        delete @columns[0].parent
+        super
+
     #  0000000   0000000          000  00000000   0000000  000000000  
     # 000   000  000   000        000  000       000          000     
     # 000   000  0000000          000  0000000   000          000     

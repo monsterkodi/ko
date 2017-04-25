@@ -15,8 +15,8 @@ class Titlebar
     
     constructor: () ->
 
-        log 'Titlebar', window.winID
-        post.toMain 'breakpoint', window.winID, resolve('~/s/ko/coffee/win/titlebar.coffee'), 100
+        # log 'Titlebar', window.winID
+        # post.toMain 'breakpoint', window.winID, resolve('~/s/ko/coffee/win/titlebar.coffee'), 100
 
         @elem =$ 'titlebar'
         @elem.ondblclick = (event) -> post.toMain 'maximizeWindow', window.winID

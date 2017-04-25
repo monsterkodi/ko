@@ -23,7 +23,8 @@ class Debug extends Command
         @shortcuts  = ['alt+d']
         @names      = ["debug"]
         
-        post.on 'debug', @onDebug        
+        post.on 'debugFileLine',   @onDebugFileLine
+        post.on 'debuggerChanged', @onDebuggerChanged
         
         @browser.on 'itemActivated', @onItemActivated
         @area.on 'resized', @onAreaResized
@@ -36,7 +37,17 @@ class Debug extends Command
         super state
         window.split.swap $('terminal'), $('area')
     
-    onDebug: (@debugInfo) =>
+    onDebuggerChanged: =>
+        activeItemName = @activeItem()?.name
+        if @commandline.command == @
+            @browser.clear()
+            for k,v of post.get 'dbgInfo'
+                @browser.loadObject v, name:k
+        r  = @browser.column(0)?.row activeItemName
+        r ?= 0
+        @browser.column(0)?.row(r)?.activate()
+
+    onDebugFileLine: (@debugInfo) =>
         
         log "onDebug", @debugInfo.winID, @debugInfo.fileLine
         if @commandline.command != @
@@ -46,9 +57,9 @@ class Debug extends Command
             post.emit 'jumpToFile', file:@debugInfo.fileLine
         @debugCtrl.setPlayState @state()
 
-    activeItem: -> @browser.column(0).activeRow().item
-    activeWid:  -> parseInt @activeItem().name
-    state:      -> @activeItem().obj['running']? and 'running' or 'paused'
+    activeItem: -> @browser.column(0)?.activeRow()?.item
+    activeWid:  -> parseInt @activeItem()?.name ? window.winID
+    state:      -> @activeItem()?.obj['paused']? and 'paused' or 'running'
     isPaused:   -> @state() == 'paused'
     
     #  0000000  000000000   0000000   00000000   000000000
@@ -65,7 +76,7 @@ class Debug extends Command
         for k,v of post.get 'dbgInfo'
             @browser.loadObject v, name:k
             
-        @browser.column(0).row(0).activate()
+        @browser.column(0).row(0)?.activate()
         @debugCtrl.setPlayState @state()
         
         super @combo

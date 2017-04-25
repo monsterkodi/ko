@@ -35,6 +35,7 @@ class DebugCtrl
     setPlayState: (state) ->
         
         play =$ 'play'
+        return if not play
         play.firstChild.remove()
         icon = state == 'paused' and 'play' or 'pause'
         play.appendChild elem 'span', class: "fa fa-#{icon}"
@@ -42,7 +43,6 @@ class DebugCtrl
     ctrl: (id, opt) ->
         
         bttn = elem id: id, class: "ctrl"
-        log 'ctrl bttn id', bttn.id
         if opt.icon
             bttn.appendChild elem 'span', class: "fa fa-#{opt.icon}"
         @div.appendChild bttn

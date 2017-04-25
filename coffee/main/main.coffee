@@ -449,8 +449,8 @@ class Main
             else if opt.file?
                 post.toWin win.id, 'loadFile', opt.file
                 
-            if opt.debug?
-                post.toWin win.id, 'debug', opt.debug
+            if opt.debugFileLine?
+                post.toWin win.id, 'debugFileLine', opt.debugFileLine
                 
             post.toWins 'winLoaded', win.id
             post.toWins 'numWins', wins().length
@@ -495,7 +495,7 @@ class Main
         wid = event.sender.id
         if visibleWins().length == 1
             hideDock()
-        post.toWins 'winClosed', wid
+        post.toAll 'winClosed', wid
         @postDelayedNumWins()
         
     otherInstanceStarted: (args, dir) =>

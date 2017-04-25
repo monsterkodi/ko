@@ -140,13 +140,15 @@ class Browser extends Stage
     popColumn: ->
         @flex.popPane()
         @columns.pop()
-     
+    
+    clear: -> @clearColumnsFrom 0, pop:true 
     clearColumnsFrom: (c, opt=pop:false) ->
         
         return error "clearColumnsFrom #{c}?" if not c? or c < 0
         
         if c < @numCols()
-            @columns[c++].clear()
+            @columns[c].clear()
+            c++
             
         if opt.pop
             while c < @numCols()

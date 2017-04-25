@@ -73,6 +73,7 @@ class Minimap
     # 0000000    000   000  000   000  00     00
 
     drawSelections: =>
+        
         @selecti.height = @height
         @selecti.width = @width
         ctx = @selecti.getContext '2d'
@@ -85,6 +86,7 @@ class Minimap
                 ctx.fillRect offset+2*r[1][0], y, 2*(r[1][1]-r[1][0]), @scroll.lineHeight
                 
     drawLines: (top=@scroll.exposeTop, bot=@scroll.exposeBot) =>
+        
         ctx = @lines.getContext '2d'
         y = parseInt((top-@scroll.exposeTop)*@scroll.lineHeight)
         ctx.clearRect 0, y, @width, ((bot-@scroll.exposeTop)-(top-@scroll.exposeTop)+1)*@scroll.lineHeight        
@@ -101,6 +103,7 @@ class Minimap
                     ctx.fillRect @offsetLeft+2*r.start, y, 2*r.match.length, @scroll.lineHeight
 
     drawHighlights: =>
+        
         @highlig.height = @height
         @highlig.width = @width
         ctx = @highlig.getContext '2d'
@@ -113,6 +116,7 @@ class Minimap
             ctx.fillRect 0, y, @offsetLeft, @scroll.lineHeight
 
     drawCursors: =>
+        
         @cursors.height = @height
         @cursors.width = @width
         ctx = @cursors.getContext '2d'
@@ -133,6 +137,7 @@ class Minimap
         ctx.fillRect @offsetLeft-4, y, @offsetLeft-2, @scroll.lineHeight
 
     drawTopBot: =>
+        
         lh = @scroll.lineHeight/2
         tb = (@editor.scroll.bot-@editor.scroll.top+1)*lh
         ty = 0
