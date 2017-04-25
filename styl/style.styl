@@ -143,49 +143,6 @@ body
     white-space         nowrap 
     display             flex
 
-#commandline-command
-    font-family         font
-    font-size           24px
-    padding-top         0px
-    padding-left        9px
-    padding-right       9px
-    cursor              pointer
-    color               #aaa 
-    background          #222   
-    min-width           (numbersWidth + 1px)
-    box-sizing          border-box
-    white-space         nowrap 
-    &.empty
-        border-right    thinBorder
-        background      #000
-    &.active
-        background      #333
-        
-span.ko
-#commandline-command.active
-    &.open
-        color       #8f0
-    &.goto
-        color       #66f
-    &.browse
-        color       #ff0
-    &.find
-        color       #f5f
-    &.search
-        color       #0a0
-    &.term
-        color       #f80
-    &.coffee
-        color       #f00
-    &.build
-        color       #aaa
-    &.macro
-        color       #888
-
-#commandline-command.macro
-#commandline-command.coffee
-    color           #aaa 
-        
 .ko.shortcut
     opacity         0.5
 .ko.command
@@ -205,6 +162,55 @@ span.ko
     overflow-x          auto
     overflow-y          hidden
 
+// 0000000    000   000  000000000  000000000   0000000   000   000  
+// 000   000  000   000     000        000     000   000  0000  000  
+// 0000000    000   000     000        000     000   000  000 0 000  
+// 000   000  000   000     000        000     000   000  000  0000  
+// 0000000     0000000      000        000      0000000   000   000  
+
+#commandline-button
+    font-family         font
+    font-size           24px
+    padding-top         0px
+    padding-left        9px
+    padding-right       9px
+    cursor              pointer
+    color               #aaa 
+    background          #222   
+    min-width           (numbersWidth + 1px)
+    box-sizing          border-box
+    white-space         nowrap 
+    &.empty
+        border-right    thinBorder
+        background      #000
+    &.active
+        background      #333
+        
+span.ko
+#commandline-button.active
+    &.open
+        color       #8f0
+    &.goto
+        color       #66f
+    &.browse
+        color       #ff0
+    &.find
+        color       #f5f
+    &.search
+        color       #0a0
+    &.term
+        color       #f80
+    &.coffee
+        color       #f00
+    &.build
+        color       #aaa
+    &.macro
+        color       #888
+
+#commandline-button.macro
+#commandline-button.coffee
+    color           #aaa 
+        
 //   00000000  00000000    0000000
 //   000       000   000  000     
 //   000000    00000000   0000000 
@@ -221,6 +227,28 @@ span.ko
 
 .fpsCanvas
     background-color transparent
+
+//  0000000  000000000  00000000   000      
+// 000          000     000   000  000      
+// 000          000     0000000    000      
+// 000          000     000   000  000      
+//  0000000     000     000   000  0000000  
+
+#debugCtrl
+    fill-abs()
+    background #000
+    
+.ctrl
+    display inline-block
+    font-size  22px
+    padding-top 3px
+    padding-left 10px
+    padding-right 6px
+    color #888
+    &:hover
+        color #fff
+    &:active
+        color #ff0
     
 // 000  000   000  00000000   0000000 
 // 000  0000  000  000       000   000

@@ -220,7 +220,8 @@ class Macro extends Command
                 file = path.join dir, clss.toLowerCase() + '.coffee'
                 if fileExists file
                     return text: "file #{file} exists!"
-                text = ("# "+s for s in salt(clss).split '\n').join '\n'
+                text = '\n'
+                text += ("# "+s for s in salt(clss).split '\n').join '\n'
                 text += '\n'
                 text += """
                 

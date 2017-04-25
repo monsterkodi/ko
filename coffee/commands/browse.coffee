@@ -23,7 +23,7 @@ class Browse extends Command
         
         @area.on 'resized', @onAreaResized
         
-        post.on 'browserItemActivated', @onItemActivated
+        @browser.on 'itemActivated', @onItemActivated
         
         super @commandline
         @syntaxName = 'browser'

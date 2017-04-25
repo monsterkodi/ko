@@ -9,7 +9,7 @@
 } = require 'kxk'
 
 electron = require 'electron'
-srcmap   = require './srcmap'
+srcmap   = require '../tools/srcmap'
 
 # 000   000  000  000   000  0000000    0000000     0000000   
 # 000 0 000  000  0000  000  000   000  000   000  000        
@@ -70,7 +70,7 @@ class WinDbg
             scripts:     @scripts 
             winID:       @wid
         
-        info.file = unresolve @fileLine if @fileLine
+        info.fileLine = unresolve @fileLine if @fileLine
         info[@status] = @status
         info
         
@@ -135,14 +135,20 @@ class WinDbg
             when 'Debugger.breakpointResolved' then log 'breakpoint: '+ params # never happens?
             when 'Debugger.paused' 
 
+                log 'debugger.paused', params.reason
+                
                 @buildStackTrace params.callFrames
                     
-                @fileLine = params.hitBreakpoints[0]
-                [file, line] = splitFileLine @fileLine
-                
-                [coffeeSource, coffeeLine] = srcmap.toCoffee file, line
-                if coffeeLine
-                    @fileLine = joinFileLine coffeeSource, coffeeLine
+                if params.hitBreakpoints[0]
+                    @fileLine = params.hitBreakpoints[0]
+                    [file, line] = splitFileLine @fileLine
+                    [coffeeSource, coffeeLine] = srcmap.toCoffee file, line
+                    if coffeeLine
+                        @fileLine = joinFileLine coffeeSource, coffeeLine
+                        log 'hit', @fileLine, @fileLocation params.callFrames[0].location 
+                else
+                    @fileLine = @fileLocation params.callFrames[0].location
+                    log 'fileLine', @fileLine
                     
                 @status = 'paused'
                 @sendInfo()                
@@ -171,7 +177,13 @@ class WinDbg
 
     fileLocation: (location) ->
         if @scriptMap[location?.scriptId]?
-            return "#{@scriptMap[location.scriptId].url}:#{location.lineNumber}:#{location.columnNumber}"
+            jsFile = @scriptMap[location.scriptId].url
+            jsLine = location.lineNumber
+            [coffeeSource, coffeeLine] = srcmap.toCoffee jsFile, jsLine
+            if coffeeLine
+                return unresolve joinFileLine coffeeSource, coffeeLine
+            else
+                return unresolve joinFileLine jsFile, jsLine
         null
         
     debugCommand: (command) ->
@@ -217,10 +229,8 @@ class Debugger
         
     onDebugCommand: (wid, cmd) =>
         log 'onDebugCommand', wid, cmd
-        for w,dbg of @winDbg
-            if dbg.win?.id == wid
-                dbg.debugCommand cmd
-                return
+        @winDbg[wid] ?= new WinDbg wid
+        @winDbg[wid].debugCommand cmd
         
 module.exports = Debugger
     

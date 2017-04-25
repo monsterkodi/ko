@@ -15,7 +15,7 @@ class Commandline extends TextEditor
     constructor: (viewElem) ->
             
         @fontSizeDefault = 24
-        @mainCommands = ['open', 'search', 'find', 'goto', 'term', 'browse', 'build', 'coffee', 'debug', 'macro']
+        @mainCommands = ['open', 'search', 'find', 'goto', 'term', 'browse', 'coffee', 'debug', 'build', 'macro']
         @hideCommands = ['selecto', 'Term', 'Build', 'Coffee', 'Browse']
 
         super viewElem, features: []
@@ -23,9 +23,9 @@ class Commandline extends TextEditor
         @size.lineHeight = 30
         @scroll?.setLineHeight @size.lineHeight
                         
-        @cmmd =$ 'commandline-command' 
-        @cmmd.classList.add 'empty'
-        @cmmd.addEventListener 'mousedown', @onCmmdClick
+        @button =$ 'commandline-button'
+        @button.classList.add 'empty'
+        @button.addEventListener 'mousedown', @onCmmdClick
         
         @commands = {}
         @command = null
@@ -38,13 +38,13 @@ class Commandline extends TextEditor
         post.on 'stash',   @stash
         
         @view.onblur = () => 
-            @cmmd.classList.remove 'active'
+            @button.classList.remove 'active'
             @list?.remove()
             @list = null
             @command?.onBlur()
             
         @view.onfocus = () =>
-            @cmmd.className = "commandline-command active #{@command?.prefsID}"
+            @button.className = "commandline-button active #{@command?.prefsID}"
 
     #  0000000  000000000   0000000   000000000  00000000  
     # 000          000     000   000     000     000       
@@ -66,7 +66,7 @@ class Commandline extends TextEditor
             if activeID.startsWith 'column' then activeID = 'editor'
             @command.setFocus activeID != 'commandline-editor' and activeID or null
             @setName name
-            @cmmd.className = "commandline-command active #{@command.prefsID}"
+            @button.className = "commandline-button active #{@command.prefsID}"
             @commands[name]?.restoreState? state
             
     # 000       0000000    0000000   0000000  
@@ -90,7 +90,7 @@ class Commandline extends TextEditor
             
     setName: (name) -> 
         
-        @cmmd.innerHTML = name
+        @button.innerHTML = name
         @layers.style.width = @view.style.width
                 
     setLines: (l) ->
@@ -120,7 +120,7 @@ class Commandline extends TextEditor
         @hideList()
         super changeInfo
         if changeInfo.changes.length
-            @cmmd.className = "commandline-command active #{@command?.prefsID}"
+            @button.className = "commandline-button active #{@command?.prefsID}"
             @command?.changed @line(0)
         
     onSplit: (s) => 
@@ -164,7 +164,7 @@ class Commandline extends TextEditor
         @setName name
         combo = @command.shortcuts[0] if not combo?
         @results @command.start combo # <-- command start
-        @cmmd.className = "commandline-command active #{@command.prefsID}"
+        @button.className = "commandline-button active #{@command.prefsID}"
                 
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     

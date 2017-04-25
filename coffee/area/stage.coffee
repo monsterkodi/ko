@@ -6,9 +6,10 @@
 # 0000000      000     000   000   0000000   00000000
 
 { keyinfo
-} = require 'kxk'
+}     = require 'kxk'
+event = require 'events'
 
-class Stage
+class Stage extends event
     
     constructor: (@view) -> 
         

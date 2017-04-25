@@ -5,7 +5,7 @@
 # 000       000  000      000             000       000   000  000     000     000   000  000   000  
 # 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000  
 
-{ fileName, unresolve, fileExists, swapExt, path, fs,
+{ fileName, unresolve, fileExists, swapExt, path, empty, fs,
   setStyle, keyinfo, clamp, drag, post, error, log, str, $, _
 }          = require 'kxk'
 watcher    = require './watcher'
@@ -193,10 +193,12 @@ class FileEditor extends TextEditor
             @jumpToFile opt
             return true
 
+        return error 'nothing to jump to?' if empty word
+
         find = word.toLowerCase().trim()
         find = find.slice 1 if find[0] == '@'
 
-        return error 'FileEditor.jumpTo -- nothing to find?' if _.isEmpty find
+        return error 'FileEditor.jumpTo -- nothing to find?' if empty find
         
         type = opt?.type
 

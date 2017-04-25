@@ -13,7 +13,8 @@ syntax = require '../editor/syntax'
 class Row
     
     constructor: (@column, @item) ->
-
+        
+        @browser = @column.browser
         @div = elem class: 'browserRow', html: syntax.spanForTextAndSyntax @item.text ? @item.name, 'browser'
         @div.classList.add @item.type
         @column.table.appendChild @div
@@ -50,15 +51,15 @@ class Row
         $('.hover')?.classList.remove 'hover'
         @setActive emit:true
         switch @item.type
-            when 'dir'   then @column.browser.loadDir     @item.abs, column: @column.index+1, parent: @item
-            when 'file'  then @column.browser.loadContent @,         column: @column.index+1
+            when 'dir'   then @browser.loadDir     @item.abs, column: @column.index+1, parent: @item
+            when 'file'  then @browser.loadContent @,         column: @column.index+1
             else
                 if @item.file?
                     post.emit 'jumpTo', file:@item.file, line:@item.line
                 else if @column.parent.obj?
-                    @column.browser.loadObjectItem  @item, column: @column.index+1
+                    @browser.loadObjectItem  @item, column: @column.index+1
                 else
-                    @column.browser.clearColumnsFrom @column.index+1
+                    @browser.clearColumnsFrom @column.index+1
         @
     
     isActive: -> @div.classList.contains 'active'
@@ -68,7 +69,8 @@ class Row
         @column.activeRow()?.clearActive()
         @div.classList.add 'active'
         @column.scroll.toIndex @index() 
-        post.emit 'browserItemActivated', @item if opt?.emit # sets commandline text
+        
+        if opt?.emit then @browser.emit 'itemActivated', @item
         @
                 
     clearActive: ->
