@@ -1,3 +1,4 @@
+
 # 00000000    0000000   000   000
 # 000   000  000   000  000 0 000
 # 0000000    000   000  000000000
@@ -63,10 +64,11 @@ class Row
     isActive: -> @div.classList.contains 'active'
     
     setActive: (opt = emit:false) ->
+        
         @column.activeRow()?.clearActive()
         @div.classList.add 'active'
         @column.scroll.toIndex @index() 
-        post.emit 'browser-item-activated', @item if opt?.emit # sets commandline text
+        post.emit 'browserItemActivated', @item if opt?.emit # sets commandline text
         @
                 
     clearActive: ->

@@ -20,7 +20,10 @@ class FileEditor extends TextEditor
         @watch       = null
         
         window.split.on 'commandline', @onCommandline
-        post.on 'jumpTo', @jumpTo
+        
+        post.on 'jumpTo',        @jumpTo
+        post.on 'setBreakpoint', @onSetBreakpoint
+        
         @fontSizeDefault = 16
         super viewElem, features: ['Diffbar', 'Scrollbar', 'Numbers', 'Minimap', 'Meta', 'Autocomplete', 'Brackets', 'Strings']        
         @setText ''
@@ -316,9 +319,18 @@ class FileEditor extends TextEditor
     toggleBreakpoint: ->
         return if path.extname(@currentFile) not in ['.js', '.coffee']
         cp = @cursorPos()
-        @meta.addDbgMeta line:cp[1], clss:'dbg breakpoint'
-        post.toMain 'breakpoint', winID, @currentFile, cp[1]+1
+        return if not @line(cp[1]).trim().length
+        post.toMain 'breakpoint', window.winID, @currentFile, cp[1]+1
         
+    onSetBreakpoint: (breakpoint) =>
+        log 'onSetBreakpoint', breakpoint
+        return if breakpoint.file != @currentFile
+        line = breakpoint.line
+        switch breakpoint.status
+            when 'active'   then @meta.addDbgMeta line:line-1, clss:'dbg breakpoint'
+            when 'inactive' then @meta.addDbgMeta line:line-1, clss:'dbg breakpoint inactive'
+            when 'remove'   then @meta.delDbgMeta line:line-1
+
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
     # 0000000    0000000     00000  

@@ -1,3 +1,4 @@
+
 #  0000000  000000000   0000000    0000000   00000000
 # 000          000     000   000  000        000     
 # 0000000      000     000000000  000  0000  0000000 
@@ -10,6 +11,7 @@
 class Stage
     
     constructor: (@view) -> 
+        
         @paused = false
         @view.onkeydown = @onKeyDown
         @view.onkeyup   = @onKeyUp
@@ -19,6 +21,7 @@ class Stage
     resume: => @paused = false
     
     animate: =>
+        
         requestAnimationFrame @animate
         secs  = 1.0/60.0
         if not @paused
@@ -28,12 +31,14 @@ class Stage
             @animationStep step
 
     onKeyDown: (event) =>
+        
         {mod, key, combo} = keyinfo.forEvent event
         return if not combo
         return if key == 'right click' # weird right command key
         @modKeyComboEventDown? mod, key, combo, event
    
     onKeyUp: (event) =>
+        
         {mod, key, combo} = keyinfo.forEvent event        
         return if not combo
         return if key == 'right click' # weird right command key

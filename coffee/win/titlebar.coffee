@@ -1,10 +1,11 @@
+
 # 000000000  000  000000000  000      00000000  0000000     0000000   00000000 
 #    000     000     000     000      000       000   000  000   000  000   000
 #    000     000     000     000      0000000   0000000    000000000  0000000  
 #    000     000     000     000      000       000   000  000   000  000   000
 #    000     000     000     0000000  00000000  0000000    000   000  000   000
 
-{ packagePath, unresolve, stopEvent, clamp, elem, post, path, log, $
+{ packagePath, resolve, unresolve, stopEvent, clamp, elem, post, path, log, $
 }      = require 'kxk'
 render = require '../editor/render'
 syntax = require '../editor/syntax'
@@ -15,7 +16,7 @@ class Titlebar
     constructor: () ->
 
         log 'Titlebar', window.winID
-        post.toMain 'breakpoint', window.winID, '/Users/kodi/s/ko/coffee/win/titlebar.coffee', 99
+        post.toMain 'breakpoint', window.winID, resolve('~/s/ko/coffee/win/titlebar.coffee'), 100
 
         @elem =$ 'titlebar'
         @elem.ondblclick = (event) -> post.toMain 'maximizeWindow', window.winID

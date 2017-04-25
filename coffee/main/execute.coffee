@@ -50,7 +50,6 @@ class Execute
                 error = -> 
                     console.log.apply console, ['[ERROR]'].concat [].slice.call(arguments, 0)
                     if winID? then post.toWin winID, 'executeResult', ['[ERROR]'].concat([].slice.call(arguments, 0)), cmdID
-                log 'coffee in main process'
                 """
             process.chdir restoreCWD
         catch err

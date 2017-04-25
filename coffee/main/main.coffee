@@ -443,11 +443,15 @@ class Main
         win.on 'resize', @onResizeWin
         
         winLoaded = ->
+            
             if opt.files?
                 post.toWin win.id, 'loadFiles', opt.files
             else if opt.file?
                 post.toWin win.id, 'loadFile', opt.file
-            
+                
+            if opt.debug?
+                post.toWin win.id, 'debug', opt.debug
+                
             post.toWins 'winLoaded', win.id
             post.toWins 'numWins', wins().length
             

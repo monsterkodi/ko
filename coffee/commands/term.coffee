@@ -17,8 +17,8 @@ class Term extends Command
         post.on 'shellCommandData', @onShellCommandData
         @idCommands = Object.create null
         @commandIDs = Object.create null
-        @shortcuts  = ['command+t', 'command+,', 'command+shift+,']
-        @names      = ['term', 'term', 'Term']
+        @shortcuts  = ['command+,', 'command+shift+,']
+        @names      = ['term', 'Term']
         @alias      = new store 'alias'
         super @commandline
         @maxHistory = 99

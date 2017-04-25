@@ -1,3 +1,4 @@
+
 #  0000000   0000000   000      000   000  00     00  000   000
 # 000       000   000  000      000   000  000   000  0000  000
 # 000       000   000  000      000   000  000000000  000 0 000
@@ -44,14 +45,17 @@ class Column
     # 0000000   00000000     000     000     000     00000000  000   000  0000000   
     
     setItems: (@items, opt) ->
+        
         @parent = opt.parent
         error "no parent item?" if not @parent?
         @clear()
+        
         for item in @items
             @rows.push new Row @, item
-        if @browser.navigateTarget()
-            @navigateTo @browser.navigateTarget()
+        
         @scroll.update()
+        
+        post.emit 'browserColumnItemsSet', @ # for filebrowser target navigation
         @
         
     isEmpty: -> _.isEmpty @rows
@@ -68,24 +72,13 @@ class Column
    
     activateRow:  (row) -> @row(row)?.activate()
        
-    activeRow: -> 
-        for r in @rows
-            return r if r.isActive()
-        null
+    activeRow: -> _.find @rows, (r) -> r.isActive()
     
-    rowWithName: (name) ->
-        for r in @rows
-            return r if r.item.name == name
-        null
-
-    row: (row) -> # accepts element, index or row
-        if _.isNumber(row) and row >= 0 and row < @numRows() 
-            @rows[row] 
-        else if _.isElement row 
-            for r in @rows
-                if r.div.contains row then return r
-        else
-            row
+    row: (row) -> # accepts element, index, string or row
+        if      _.isNumber  row then return 0 <= row < @numRows() and @rows[row] or null
+        else if _.isElement row then return _.find @rows, (r) -> r.div.contains row
+        else if _.isString  row then return _.find @rows, (r) -> r.item.name == row
+        else return row
             
     nextColumn: -> @browser.column(@index+1)
         
@@ -133,7 +126,7 @@ class Column
         if not @parent then return error 'no parent?'
         relpath = relative target, @parent.abs
         relitem = _.first relpath.split path.sep
-        row = @rowWithName relitem
+        row = @row relitem
         if row
             @activateRow row
         else            

@@ -96,7 +96,7 @@ class Diffbar
                     li += o
                     
                 if change.del?
-                    o = change.del.length
+                    o = 1 # change.del.length
                     ctx.fillStyle = "rgba(255,0,0,#{alpha o})"
                     ctx.fillRect 0, li * lh, w, o * lh
                     

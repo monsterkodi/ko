@@ -198,6 +198,13 @@ class Meta
         @metas.push lineMeta
         @addDiv lineMeta
 
+    delDbgMeta: (meta) ->
+        li = meta.line
+        for meta in @metasAtLineIndex li
+            meta[2].div?.remove()
+            meta[2].div = null
+            _.pull @metas, meta
+        
     #  0000000  000      000   0000000  000   000
     # 000       000      000  000       000  000 
     # 000       000      000  000       0000000  
