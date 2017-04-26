@@ -196,7 +196,9 @@ window.editorWithName = (n) ->
 # 0000000   000   000      0      00000000
 
 saveFile = (file) ->
+    
     file ?= editor.currentFile
+    
     if not file?
         saveFileAs()
         return
@@ -216,7 +218,6 @@ saveFile = (file) ->
         if err?
             alert err
         else
-            editor.emit 'save'
             editor.setCurrentFile file
             post.toMain 'fileSaved', file, winID
 

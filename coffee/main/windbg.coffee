@@ -5,7 +5,7 @@
 # 000   000  000  000  0000  000   000  000   000  000   000  
 # 00     00  000  000   000  0000000    0000000     0000000   
 
-{ joinFileLine, splitFileLine, unresolve, post, path, empty, log, _
+{ joinFileLine, samePath, splitFileLine, unresolve, post, path, empty, log, _
 }        = require 'kxk'
 electron = require 'electron'
 srcmap   = require '../tools/srcmap'
@@ -141,7 +141,7 @@ class WinDbg
         
         bpts = []
         for k,v of @breakpoints
-            if resolve(v.file) == resolve(file)
+            if samePath v.file, file
                 bpts.push v
         bpts        
 

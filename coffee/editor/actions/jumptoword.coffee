@@ -28,7 +28,7 @@ module.exports =
             for d in diss
                 if d.start <= p[0] <= d.start+d.match.length
                     [file, pos] = splitFilePos d.match
-                    if fileExists resolve file
+                    if fileExists file
                         post.emit 'jumpTo', file:file, line:pos[1], col:pos[0]
                         return
                         

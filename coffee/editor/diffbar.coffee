@@ -21,11 +21,11 @@ class Diffbar
         
         @editor.on 'viewHeight', @paint
         @editor.on 'file',       @update
-        @editor.on 'save',       @update
     
     updateMetas: ->
         
-        @editor.meta.clear()
+        @clearMetas()
+        
         return if not @changes
         
         for change in @changes.changes
@@ -61,7 +61,6 @@ class Diffbar
         
         if @editor.currentFile
             forkfunc '../tools/gitdiff', @editor.currentFile, (err, changes) =>
-                # return error "gitdiff failed:", err if err
                 return if err
                 if changes.file == @editor.currentFile
                     @changes = changes
@@ -105,5 +104,15 @@ class Diffbar
                     o = change.add.length
                     ctx.fillStyle = "rgba(160,160,255,#{alpha o})"
                     ctx.fillRect 0, li * lh, w, o * lh
+
+    clear: -> 
         
+        @clearMetas()
+        @elem.width = 2
+        
+    clearMetas: ->
+        
+        for meta in @editor.meta.metas # beautiful :)
+            @editor.meta.delMeta meta if meta?[2].diff 
+
 module.exports = Diffbar

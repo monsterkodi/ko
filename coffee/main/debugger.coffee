@@ -5,10 +5,9 @@
 # 000   000  000       000   000  000   000  000   000  000   000  000       000   000  
 # 0000000    00000000  0000000     0000000    0000000    0000000   00000000  000   000  
 
-{ unresolve, post, path, log, _
-}        = require 'kxk'
-electron = require 'electron'
-srcmap   = require '../tools/srcmap'
+{ post, path, log, _
+}       = require 'kxk'
+WinDbg  = require './windbg'
 
 class Debugger
     

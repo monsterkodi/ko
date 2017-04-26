@@ -5,7 +5,7 @@
 # 000       000  000      000             000       000   000  000     000     000   000  000   000  
 # 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000  
 
-{ fileName, unresolve, joinFileLine, splitFilePos, fileExists, swapExt, path, empty, fs,
+{ fileName, unresolve, samePath, joinFileLine, splitFilePos, fileExists, swapExt, path, empty, fs,
   setStyle, keyinfo, clamp, drag, post, error, log, str, $, _
 }          = require 'kxk'
 srcmap     = require '../tools/srcmap'
@@ -75,8 +75,12 @@ class FileEditor extends TextEditor
                 
         @setSalterMode false
         @stopWatcher()
-        @currentFile = file
+        
+        @diffbar.clear()
+        @meta.clear()
         @do.reset()
+
+        @currentFile = file
         
         @setupFileType()
         
@@ -352,8 +356,8 @@ class FileEditor extends TextEditor
             post.toMain 'setBreakpoint', window.winID, @currentFile, cp[1]+1, cp[0]
         
     onSetBreakpoint: (breakpoint) =>
-        # log 'onSetBreakpoint', breakpoint
-        return if breakpoint.file != @currentFile
+        log 'onSetBreakpoint', breakpoint, @currentFile
+        return if not samePath breakpoint.file, @currentFile
         line = breakpoint.line
         switch breakpoint.status
             when 'active'   then @meta.addDbgMeta line:line-1, clss:'dbg breakpoint'

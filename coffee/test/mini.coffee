@@ -1,5 +1,5 @@
 a = (s) ->
-    if 5 < s < 15 
+    if 5 < s < 15
         x = 0
         b = 2
         console.log "5< #{s} <15"

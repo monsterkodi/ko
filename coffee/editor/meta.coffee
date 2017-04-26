@@ -9,11 +9,11 @@
 }      = require 'kxk'
 ranges = require '../tools/ranges'
 
-class Meta 
+class Meta
     
     constructor: (@editor) ->
 
-        @metas = [] # [  lineIndex, [start, end], {href: ...}  ]
+        @metas = [] # [ [lineIndex, [start, end], {href: ...}], ... ]
         
         @elem = $(".meta", @editor.view)
         @editor.on 'changed',          @onChanged
@@ -202,9 +202,7 @@ class Meta
     delDbgMeta: (meta) ->
         li = meta.line
         for meta in @metasAtLineIndex li
-            meta[2].div?.remove()
-            meta[2].div = null
-            _.pull @metas, meta
+            @delMeta meta
         
     #  0000000  000      000   0000000  000   000
     # 000       000      000  000       000  000 
@@ -286,10 +284,7 @@ class Meta
     onWillDeleteLine: (li) => 
         
         for meta in @metasAtLineIndex li
-            meta[2].div?.remove()
-            meta[2].div = null
-        
-        _.pullAll @metas, @metasAtLineIndex li
+            @delMeta meta
         
         for meta in rangesFromTopToBotInRanges li+1, @editor.numLines(), @metas
             meta[0] -= 1
@@ -299,8 +294,7 @@ class Meta
     onLineVanished: (e) => 
         
         for meta in @metasAtLineIndex e.lineIndex
-            meta[2].div?.remove()
-            meta[2].div = null
+            @delMetaDiv meta
             
         @updatePositionsBelowLineIndex e.lineIndex
     
@@ -310,13 +304,19 @@ class Meta
     # 000       000      000       000   000  000   000
     #  0000000  0000000  00000000  000   000  000   000
           
+    onClearLines: => @clear()
     clear: => 
         @elem.innerHTML = ""
         @metas = []
+
+    delMetaDiv: (meta) ->
         
-    onClearLines: => 
-        @elem.innerHTML = ""
-        for meta in @metas
-            meta[2].div = null
+        meta[2].div?.remove()
+        meta[2].div = null
+
+    delMeta: (meta) ->
+        
+        _.pull @metas, meta
+        @delMetaDiv meta
     
 module.exports = Meta
