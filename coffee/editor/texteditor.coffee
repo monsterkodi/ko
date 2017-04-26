@@ -106,7 +106,6 @@ class TextEditor extends Editor
     setLines: (lines) ->
                 
         lines ?= []
-        # log "setLines ------- #{lines.length}" if @name == 'editor'
 
         @syntax.clear() 
         @scroll.reset()
@@ -396,13 +395,18 @@ class TextEditor extends Editor
     # 000   000  000            000  000   000     000     
     # 000   000  00000000  0000000   000  0000000  00000000
 
-    resized: -> 
+    resized: ->
+        
         vh = @view.clientHeight
+        
+        return if vh == @scroll.viewHeight
+        
         @scroll.setViewHeight vh
         @numbers?.elem.style.height = "#{@scroll.exposeNum * @scroll.lineHeight}px"
         @layers.style.width = "#{sw()-@view.getBoundingClientRect().left-130-6}px"
         @layers.style.height = "#{vh}px"
         @layersWidth = @layers.offsetWidth
+        
         @updateScrollOffset()
         @emit 'viewHeight', vh
 
@@ -441,12 +445,16 @@ class TextEditor extends Editor
 
     scrollLines: (delta) -> @scrollBy delta * @size.lineHeight
 
-    scrollBy: (delta, x=0) ->        
+    scrollBy: (delta, x=0) -> 
+        console.log 'scrollBy', delta, x        
+
         @scroll.by delta if delta
         @layers.scrollLeft += x if x
         @updateScrollOffset()
         
     scrollTo: (p) ->
+        console.log 'scrollTo', p
+        
         @scroll.to p
         @updateScrollOffset()
 
@@ -461,15 +469,18 @@ class TextEditor extends Editor
                 @scrollBy delta
 
     scrollCursorIntoView: (topDist=7) ->
+        
         if delta = @deltaToEnsureCursorsAreVisible()
             @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth 
     
     updateScrollOffset: ->        
+        
         if @scroll.offsetTop != @scrollOffsetTop
             @layers.scrollTop = @scroll.offsetTop 
             @scrollOffsetTop = @scroll.offsetTop
 
     updateCursorOffset: ->
+        
         cx = @mainCursor()[0]*@size.charWidth+@size.offsetX
         if cx-@layers.scrollLeft > @layersWidth
             @scroll.offsetLeft = Math.max 0, cx - @layersWidth + @size.charWidth

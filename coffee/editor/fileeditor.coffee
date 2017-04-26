@@ -110,6 +110,7 @@ class FileEditor extends TextEditor
     #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
     
     onCommandline: (e) =>
+        
         switch e
             when 'hidden', 'shown'
                 d = window.split.commandlineHeight + window.split.handleHeight

@@ -155,7 +155,9 @@ class Commandline extends TextEditor
         if r?.status == 'ok'
             @results r
             return
+            
         window.split.showCommandline()
+        
         @command = @commands[name]
         activeID = document.activeElement.id
         if activeID.startsWith 'column' then activeID = 'editor'
