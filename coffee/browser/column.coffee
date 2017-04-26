@@ -174,7 +174,7 @@ class Column
             when 'up'    then @parent.abs
             when 'right' then @activeRow().item.abs
             when 'down'  then packagePath @parent.abs
-            when ','     then '~'
+            when '~'     then '~'
             when '/'     then '/'
             
     openFileInNewWindow: ->        
@@ -239,6 +239,8 @@ class Column
         
         {mod, key, combo, char} = keyinfo.forEvent event
 
+        # log mod, key, combo, char
+
         switch combo
             when 'up', 'down', 'page up', 'page down', 'home', 'end' 
                 stopEvent event, @navigateRows key
@@ -246,8 +248,6 @@ class Column
                 stopEvent event, @navigateCols key
             when 'command+enter' then @openFileInNewWindow()
             when 'command+left', 'command+up','command+right', 'command+down'
-                stopEvent event, @navigateRoot key
-            when 'command+,', 'command+/'
                 stopEvent event, @navigateRoot key
             when 'backspace' then stopEvent event, @clearSearch().removeObject()
             when 'ctrl+t' then stopEvent event, @sortByType()
@@ -257,6 +257,9 @@ class Column
                 else window.split.focus 'commandline-editor'
                 stopEvent event
 
-        if char then @doSearch char
+        switch char
+            when '~', '/' then stopEvent event, @navigateRoot char
+            
+        if mod in ['shift', ''] and char then @doSearch char
         
 module.exports = Column

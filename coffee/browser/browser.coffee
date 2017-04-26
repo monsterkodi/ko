@@ -39,7 +39,6 @@ class Browser extends Stage
         if opt.focus
             @focus()
             @lastUsedColumn()?.activeRow()?.setActive()            
-            
         @
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
