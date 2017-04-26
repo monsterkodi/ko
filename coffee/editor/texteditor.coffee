@@ -6,7 +6,7 @@
 #    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000  
 
 {splitFilePos, fileExists, resolve, keyinfo, stopEvent, setStyle, 
-prefs, drag, elem, path, post, clamp, str, log, sw, $, _
+prefs, drag, elem, path, post, clamp, pos, str, log, sw, $, _
 }         = require 'kxk'
 render    = require './render'
 syntax    = require './syntax'
@@ -575,7 +575,11 @@ class TextEditor extends Editor
                 if event.altKey
                     @jumpToWord p                                    
                 else if event.metaKey
-                    @toggleCursorAtPos p
+                    if pos(event).x <= @size.numbersWidth and @toggleBreakpoint?
+                        @singleCursorAtPos p
+                        @toggleBreakpoint()
+                    else
+                        @toggleCursorAtPos p
                 else
                     @singleCursorAtPos p, extend:event.shiftKey
             

@@ -109,7 +109,7 @@ class Meta
     # 000   000   0000000   000   000  0000000    00000000  000   000
     
     onNumber: (e) =>
-        
+
         metas = @metasAtLineIndex e.lineIndex
         for meta in metas
             meta[2].span = e.numberSpan
@@ -140,7 +140,7 @@ class Meta
     # 0000000    000      0    
 
     addDiv: (meta) ->
-
+        # log "+#{meta[0]}"
         size = @editor.size
         sw = size.charWidth * (meta[1][1]-meta[1][0])
         tx = size.charWidth *  meta[1][0] + size.offsetX
@@ -173,7 +173,7 @@ class Meta
         @elem.appendChild div
 
     delDiv: (meta) ->
-        
+        # log "-#{meta[0]}"
         meta[2].div?.remove()
         meta[2].div = null
     
@@ -298,7 +298,7 @@ class Meta
         @updatePositionsBelowLineIndex li
     
     onLineVanished: (e) => 
-        
+        # log 'vanished', e.lineIndex
         for meta in @metasAtLineIndex e.lineIndex
             @delDiv meta
             

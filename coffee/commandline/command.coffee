@@ -39,6 +39,7 @@ class Command
     # 0000000      000     000   000  000   000     000   
     
     start: (@combo) ->
+        
         index = @shortcuts.indexOf @combo
         @setName @names[index]
         @loadState()

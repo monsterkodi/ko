@@ -26,17 +26,9 @@ class Browser extends Stage
     
     loadItems: (items, opt) ->
 
-        if col = @column opt?.column
-            if _.isEqual items, col.items
-                log "same items! #{col.index}", opt
-                keep = true
-        
-        if keep
-            post.emit 'browserColumnItemsSet', col
-        else
-            col = @emptyColumn opt?.column
-            @clearColumnsFrom col.index
-            col.setItems items, opt
+        col = @emptyColumn opt?.column
+        @clearColumnsFrom col.index
+        col.setItems items, opt
 
         if opt.activate?
             col.rows[opt.activate]?.activate()
@@ -46,7 +38,7 @@ class Browser extends Stage
             
         if opt.focus
             @focus()
-            @lastUsedColumn().activeRow().setActive()            
+            @lastUsedColumn()?.activeRow()?.setActive()            
             
         @
 

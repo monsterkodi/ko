@@ -132,20 +132,33 @@ class Flex
     # 000   000   0000000       0      00000000  
 
     moveHandle: (opt) -> 
+        
         handle = @handles[opt.index]
         @moveHandleToPos handle, opt.pos        
     
     moveHandleToPos: (handle, pos) ->
-    
+        
+        pos = parseInt pos
+        
         if @relaxed then @unrelax()
+        
         offset = pos - handle.actualPos()
+        
+        # log "Flex.moveHandleToPos", pos, offset
+        
+        return if Math.abs(offset) < 1
+        
         prev  = @prevAllInv(handle) ? @prevVisFlex(handle) ? @prevFlex handle
         next  = @nextAllInv(handle) ? @nextVisFlex(handle) ? @nextFlex handle
+        
         delete prev.collapsed
         delete next.collapsed
+        
         prevSize = prev.size + offset
         nextSize = next.size - offset
+        
         if @snapFirst? and prevSize < @snapFirst
+            
             if not @prevVisPane prev
                 if prevSize <= 0 or offset < @snapFirst # collapse panea
                     prevSize = -1
@@ -154,7 +167,9 @@ class Flex
                 if prevSize < 0
                     prevSize = 0
                     nextSize = next.size + prev.size
+                    
         else if @snapLast? and nextSize < @snapLast
+            
             if not @nextVisPane next
                 if nextSize <= 0 or -offset < @snapLast # collapse paneb
                     nextSize = -1

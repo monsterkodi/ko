@@ -19,7 +19,6 @@ class Diffbar
         @elem.style.top  = '0'
         @editor.view.appendChild @elem
         
-        @editor.on 'viewHeight', @paint
         @editor.on 'file',       @update
     
     updateMetas: ->

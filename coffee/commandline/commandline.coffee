@@ -163,7 +163,9 @@ class Commandline extends TextEditor
         @view.focus()
         @setName name
         combo = @command.shortcuts[0] if not combo?
+        
         @results @command.start combo # <-- command start
+        
         @button.className = "commandline-button active #{@command.prefsID}"
                 
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
