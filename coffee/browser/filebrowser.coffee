@@ -26,6 +26,7 @@ class FileBrowser extends Browser
     # 000       000  0000000  00000000  
     
     loadFile: (file, opt = focus:true, column:0) ->
+        
         dir  = packagePath file
         dir ?= path.dirname file
         opt.file = file

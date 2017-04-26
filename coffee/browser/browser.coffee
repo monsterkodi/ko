@@ -25,11 +25,18 @@ class Browser extends Stage
     # 0000000   0000000   000   000  0000000         000     000     00000000  000   000  0000000   
     
     loadItems: (items, opt) ->
+
+        if col = @column opt?.column
+            if _.isEqual items, col.items
+                log "same items! #{col.index}", opt
+                keep = true
         
-        col = @emptyColumn opt?.column
-        @clearColumnsFrom col.index
-        
-        col.setItems items, opt
+        if keep
+            post.emit 'browserColumnItemsSet', col
+        else
+            col = @emptyColumn opt?.column
+            @clearColumnsFrom col.index
+            col.setItems items, opt
 
         if opt.activate?
             col.rows[opt.activate]?.activate()
@@ -40,6 +47,7 @@ class Browser extends Stage
         if opt.focus
             @focus()
             @lastUsedColumn().activeRow().setActive()            
+            
         @
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
@@ -177,7 +185,8 @@ class Browser extends Stage
     
     initColumns: ->
         
-        @cols?.remove()
+        if @cols? then return
+        
         @cols = elem class: 'browser', id: 'columns'
         @view.appendChild @cols
         
@@ -197,7 +206,7 @@ class Browser extends Stage
         for c in @columns
             c.scroll.update()
 
-    reset: -> @initColumns()
+    reset: -> delete @cols; @initColumns()
     stop:  -> @cols.remove(); @cols = null
     start: -> @initColumns()
 

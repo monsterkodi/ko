@@ -140,7 +140,7 @@ class Meta
     # 0000000    000      0    
 
     addDiv: (meta) ->
-        
+
         size = @editor.size
         sw = size.charWidth * (meta[1][1]-meta[1][0])
         tx = size.charWidth *  meta[1][0] + size.offsetX
@@ -171,6 +171,11 @@ class Meta
                 div.classList.add 'cmmd'
             
         @elem.appendChild div
+
+    delDiv: (meta) ->
+        
+        meta[2].div?.remove()
+        meta[2].div = null
     
     # 0000000    000  00000000  00000000  
     # 000   000  000  000       000       
@@ -252,6 +257,7 @@ class Meta
     # 00000000  000   000  000         0000000   0000000   00000000
         
     onLineExposed: (e) =>
+        # log 'exposed', e.lineIndex
         for meta in @metasAtLineIndex e.lineIndex
             @addDiv meta
         
@@ -294,7 +300,7 @@ class Meta
     onLineVanished: (e) => 
         
         for meta in @metasAtLineIndex e.lineIndex
-            @delMetaDiv meta
+            @delDiv meta
             
         @updatePositionsBelowLineIndex e.lineIndex
     
@@ -304,19 +310,17 @@ class Meta
     # 000       000      000       000   000  000   000
     #  0000000  0000000  00000000  000   000  000   000
           
-    onClearLines: => @clear()
+    onClearLines: => 
+        for meta in @metas
+            @delDiv meta
+        @elem.innerHTML = ""
+        
     clear: => 
         @elem.innerHTML = ""
         @metas = []
 
-    delMetaDiv: (meta) ->
-        
-        meta[2].div?.remove()
-        meta[2].div = null
-
     delMeta: (meta) ->
-        
         _.pull @metas, meta
-        @delMetaDiv meta
+        @delDiv meta
     
 module.exports = Meta
