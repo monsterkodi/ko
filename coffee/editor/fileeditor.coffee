@@ -85,6 +85,7 @@ class FileEditor extends TextEditor
             @setText fs.readFileSync @currentFile, encoding: 'utf8'
             @restoreScrollCursorsAndSelections()
             post.emit 'file', @currentFile # titlebar -> tabs -> tab
+            post.toMain 'getBreakpoints', window.winID, @currentFile, window.winID
         else
             if not opt?.skip
                 @setLines ['']
@@ -346,9 +347,9 @@ class FileEditor extends TextEditor
     
     toggleBreakpoint: ->
         return if path.extname(@currentFile) not in ['.js', '.coffee']
-        cp = @cursorPos()
-        return if not @line(cp[1]).trim().length
-        post.toMain 'breakpoint', window.winID, @currentFile, cp[1]+1, cp[0]
+        for cp in @cursors()
+            continue if not @line(cp[1]).trim().length
+            post.toMain 'setBreakpoint', window.winID, @currentFile, cp[1]+1, cp[0]
         
     onSetBreakpoint: (breakpoint) =>
         # log 'onSetBreakpoint', breakpoint
