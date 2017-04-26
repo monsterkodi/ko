@@ -5,9 +5,10 @@
 # 000       000  000      000             000       000   000  000     000     000   000  000   000  
 # 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000  
 
-{ fileName, unresolve, splitFilePos, fileExists, swapExt, path, empty, fs,
+{ fileName, unresolve, joinFileLine, splitFilePos, fileExists, swapExt, path, empty, fs,
   setStyle, keyinfo, clamp, drag, post, error, log, str, $, _
 }          = require 'kxk'
+srcmap     = require '../tools/srcmap'
 watcher    = require './watcher'
 TextEditor = require './texteditor'
 syntax     = require './syntax'
@@ -29,7 +30,6 @@ class FileEditor extends TextEditor
         
         super viewElem, features: ['Diffbar', 'Scrollbar', 'Numbers', 'Minimap', 'Meta', 'Autocomplete', 'Brackets', 'Strings']        
         
-        @setLines []
         @setText ''
                     
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
@@ -86,8 +86,8 @@ class FileEditor extends TextEditor
             @restoreScrollCursorsAndSelections()
             post.emit 'file', @currentFile # titlebar -> tabs -> tab
         else
-            @setLines []   # little hack to update stuff ...
-            @setLines [''] # ... that listens on line numbers only
+            if not opt?.skip
+                @setLines ['']
             
         if not opt?.skip
             post.emit 'file', @currentFile # titlebar -> tabs -> tab
@@ -181,7 +181,7 @@ class FileEditor extends TextEditor
         opt.pos[0] = opt.col if opt.col
         opt.pos[1] = opt.line if opt.line
         opt.winID = window.winID
-        log 'jumpToFile', opt
+        # log 'jumpToFile', opt
         if opt.newTab
             post.emit 'newTabWithFile', opt.file
         else
@@ -247,8 +247,29 @@ class FileEditor extends TextEditor
         
         true
     
+    #  0000000   0000000   000   000  000   000  000000000  00000000  00000000   00000000    0000000   00000000   000000000  
+    # 000       000   000  000   000  0000  000     000     000       000   000  000   000  000   000  000   000     000     
+    # 000       000   000  000   000  000 0 000     000     0000000   0000000    00000000   000000000  0000000       000     
+    # 000       000   000  000   000  000  0000     000     000       000   000  000        000   000  000   000     000     
+    #  0000000   0000000    0000000   000   000     000     00000000  000   000  000        000   000  000   000     000     
+    
     jumpToCounterpart: () ->
         
+        cp = @cursorPos()
+        currext = path.extname @currentFile
+        
+        switch currext 
+            when '.coffee'
+                [file,line,col] = srcmap.toJs @currentFile, cp[1]+1, cp[0]
+                if file? 
+                    window.loadFile joinFileLine file,line,col
+                    return true
+            when '.js'
+                [file,line,col] = srcmap.toCoffee @currentFile, cp[1]+1, cp[0]
+                if file? 
+                    window.loadFile joinFileLine file,line,col
+                    return true
+
         counterparts = 
             '.cpp':     ['.hpp', '.h']
             '.cc':      ['.hpp', '.h']
@@ -261,18 +282,17 @@ class FileEditor extends TextEditor
             '.css':     ['.styl']
             '.styl':    ['.css']
             
-        for ext in (counterparts[path.extname @currentFile] ? [])
+        for ext in (counterparts[currext] ? [])
             if fileExists swapExt @currentFile, ext
                 window.loadFile swapExt @currentFile, ext
-                return
+                return true
 
-        for ext in (counterparts[path.extname @currentFile] ? [])
+        for ext in (counterparts[currext] ? [])
             counter = swapExt @currentFile, ext
-            counter = counter.replace "/#{path.extname(@currentFile).slice 1}/", "/#{ext.slice 1}/"
+            counter = counter.replace "/#{currext.slice 1}/", "/#{ext.slice 1}/"
             if fileExists counter
                 window.loadFile counter
                 return true
-            
         false
 
     #  0000000  00000000  000   000  000000000  00000000  00000000 
@@ -328,10 +348,10 @@ class FileEditor extends TextEditor
         return if path.extname(@currentFile) not in ['.js', '.coffee']
         cp = @cursorPos()
         return if not @line(cp[1]).trim().length
-        post.toMain 'breakpoint', window.winID, @currentFile, cp[1]+1
+        post.toMain 'breakpoint', window.winID, @currentFile, cp[1]+1, cp[0]
         
     onSetBreakpoint: (breakpoint) =>
-        log 'onSetBreakpoint', breakpoint
+        # log 'onSetBreakpoint', breakpoint
         return if breakpoint.file != @currentFile
         line = breakpoint.line
         switch breakpoint.status

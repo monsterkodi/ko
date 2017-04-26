@@ -10,13 +10,11 @@
 render = require '../editor/render'
 syntax = require '../editor/syntax'
 Tabs   = require './tabs'
+mini   = require '../test/mini'
 
 class Titlebar
     
     constructor: () ->
-
-        # log 'Titlebar', window.winID
-        # post.toMain 'breakpoint', window.winID, resolve('~/s/ko/coffee/win/titlebar.coffee'), 100
 
         @elem =$ 'titlebar'
         @elem.ondblclick = (event) -> post.toMain 'maximizeWindow', window.winID
@@ -80,7 +78,7 @@ class Titlebar
     #  0000000   000        0000000    000   000     000     00000000  
     
     update: ->
-        # log 'titlebar update', @info
+
         s = @info.sticky and "○" or ''
         @winid.innerHTML = "#{s}#{window.winID}#{s}"
         @elem.classList.toggle 'focus', @info.focus
@@ -97,6 +95,10 @@ class Titlebar
     
     showList: (event) => 
         
+        mini(0)
+        mini(10)
+        mini(100)
+        
         return if @list?
         winInfos = post.get 'winInfos'
         return if winInfos.length < 2
@@ -104,7 +106,7 @@ class Titlebar
         @selected = -1
         @list = elem class: 'list windows'
         @list.style.top = 0
-        window.split.elem.appendChild @list             
+        window.split.elem.appendChild @list
         @listWinInfos winInfos
         stopEvent event
 
@@ -136,6 +138,7 @@ class Titlebar
                 stopEvent event
             div.addEventListener 'mousedown', activateWindow info.id
             @list.appendChild div
+        @
 
     loadWindowWithID: (id) ->
         
@@ -178,7 +181,6 @@ class Titlebar
                 when 'enter'
                     stopEvent event
                     return @loadSelected()
-        
-        return 'unhandled'
+        'unhandled'
         
 module.exports = Titlebar

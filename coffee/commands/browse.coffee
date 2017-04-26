@@ -34,6 +34,10 @@ class Browse extends Command
         @browser.start()
         @browser.loadFile state.text, focus:false, dontJump:true
         window.split.swap $('terminal'), $('area')
+
+    clear: ->
+        return if @browser.cleanUp()
+        super
     
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   

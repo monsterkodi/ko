@@ -111,6 +111,8 @@ class Browser extends Stage
             else break
         used
 
+    hasEmptyColumns: -> _.last(@columns).isEmpty()
+
     height: -> @flex.height()
     numCols: -> @columns.length 
     column: (i) -> @columns[i] if 0 <= i < @numCols()
@@ -140,6 +142,8 @@ class Browser extends Stage
     popColumn: ->
         @flex.popPane()
         @columns.pop()
+        
+    popEmptyColumns: -> @popColumn() while @hasEmptyColumns()
     
     clear: -> @clearColumnsFrom 0, pop:true 
     clearColumnsFrom: (c, opt=pop:false) ->
@@ -156,7 +160,15 @@ class Browser extends Stage
         else
             while c < @numCols()
                 @columns[c++].clear()
-       
+
+    isMessy: -> not @flex.relaxed or @hasEmptyColumns()
+    cleanUp: -> 
+        
+        return false if not @isMessy()
+        @popEmptyColumns()
+        @flex.relax()
+        true
+
     # 000  000   000  000  000000000       0000000   0000000   000       0000000  
     # 000  0000  000  000     000         000       000   000  000      000       
     # 000  000 0 000  000     000         000       000   000  000      0000000   

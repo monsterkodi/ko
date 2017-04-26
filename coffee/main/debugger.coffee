@@ -89,31 +89,36 @@ class WinDbg
     # 000   000  000   000  000       000   000  000  000   
     # 0000000    000   000  00000000  000   000  000   000  
     
-    setBreakpoint: (file, line, status) ->
+    setBreakpoint: (file, line, col, status) ->
         
         if not @enabled
             @breakdelay ?= []
-            @breakdelay.push [file, line, status]
+            @breakdelay.push [file, line, col, status]
             return
             
         if path.extname(file) == '.coffee'
-            [jsSource, jsLine] = srcmap.toJs file, line
-            if not jsSource
-                return error "no js source line for #{file}:#{line}"
+            [jsFile, jsLine, jsCol] = srcmap.toJs file, line, col
+            if not jsFile
+                return error "no js source line for #{file}:#{line}:#{col}"
+                    
+            [backFile, backLine] = srcmap.toCoffee jsFile, jsLine, jsCol
+            return error "can't remap fileLine #{backFile}<>#{file} #{backLine}<>#{line}" if backFile != file or backLine != line
+            log "#{backFile}>#{backLine} #{jsFile}>#{jsLine}"
         else
-            [jsSource, jsLine] = [file, line]
+            [jsFile, jsLine] = [file, line]
         
-        jsSource = unresolve jsSource
-        breakpoint = @breakpoints["#{jsSource}:#{jsLine}"]
+        jsFile = unresolve jsFile
+        breakKey = joinFileLine jsFile, jsLine, jsCol
+        breakpoint = @breakpoints[breakKey]
         
         if breakpoint and status in ['toggle', 'inactive']
 
             if status == 'toggle'
                 breakpoint.status = 'remove'
-                delete @breakpoints["#{jsSource}:#{jsLine}"]
+                delete @breakpoints[breakKey]
 
             @dbg.sendCommand "Debugger.removeBreakpoint", {breakpointId:breakpoint.id}, (err,result) => 
-                return error "unable to remove breakpoint #{jsSource}:#{jsLine}", err if not _.isEmpty(err)
+                return error "unable to remove breakpoint #{breakKey}", err if not _.isEmpty(err)
                 post.toWin @wid, 'setBreakpoint', breakpoint
             
         else
@@ -121,16 +126,16 @@ class WinDbg
             if status == 'toggle'
                 status = 'active'
 
-            @dbg.sendCommand "Debugger.setBreakpointByUrl", {url:resolve(jsSource), lineNumber:jsLine}, (err,result) => 
-                return error "unable to set breakpoint #{jsSource}:#{jsLine}", err if not _.isEmpty(err)
+            @dbg.sendCommand "Debugger.setBreakpointByUrl", {url:resolve(jsFile), lineNumber:jsLine, columnNumber:jsCol}, (err,result) => 
+                return error "unable to set breakpoint #{breakKey}", err if not _.isEmpty(err)
                 if result.locations.length
-                    breakpoint = file:file, line:line, status:status, id:result.breakpointId
-                    @breakpoints["#{jsSource}:#{jsLine}"] = breakpoint
-                    log "breakpoint", @breakpoints["#{jsSource}:#{jsLine}"]
+                    breakpoint = file:file, line:line, col: col, status:status, id:result.breakpointId
+                    @breakpoints[breakKey] = breakpoint
+                    log "breakpoint", @breakpoints[breakKey]
                     post.toWin @wid, 'setBreakpoint', breakpoint
                     post.toWins 'debuggerChanged'
                 else
-                    log "no location for #{jsSource}:#{jsLine}?"
+                    log "no location for #{breakKey}?"
 
     # 00     00  00000000   0000000   0000000   0000000    0000000   00000000  
     # 000   000  000       000       000       000   000  000        000       
@@ -139,7 +144,7 @@ class WinDbg
     # 000   000  00000000  0000000   0000000   000   000   0000000   00000000  
     
     onMessage: (event, method, params) =>
-        log "method: #{method}"
+        # log "method: #{method}"
         switch method 
             
             when 'Debugger.scriptParsed' then @scriptMap[params.scriptId] = params
@@ -152,16 +157,15 @@ class WinDbg
                     
                 if params.hitBreakpoints[0]
                     log 'BREAK', params.hitBreakpoints[0]
-                    # @fileLine = params.hitBreakpoints[0]
-                    # [file, line] = splitFileLine @fileLine
-                    # [coffeeSource, coffeeLine] = srcmap.toCoffee file, line
-                    # if coffeeLine
-                        # @fileLine = joinFileLine coffeeSource, coffeeLine
-                        # log 'hit', @fileLine, @fileLocation params.callFrames[0].location 
-                # else
-                
-                fileLine = @fileLocation params.callFrames[0].location
-                [file, line] = splitFileLine fileLine
+                    [file,line,col] = splitFileLine params.hitBreakpoints[0]
+                    fileLine = joinFileLine.apply joinFileLine, srcmap.toCoffee file, line, col
+                    
+                    wtf = @fileLocation params.callFrames[0].location
+                    if wtf != fileLine then error 'breakpoint and stacktrace differ?', wtf, fileLine
+                else
+                    fileLine = @fileLocation params.callFrames[0].location
+                    
+                [file, line, col] = splitFileLine fileLine
                 if path.extname(file) != '.coffee'
                     log 'step', fileLine
                     @debugCommand 'step'
@@ -198,26 +202,26 @@ class WinDbg
         if @scriptMap[location?.scriptId]?
             jsFile = @scriptMap[location.scriptId].url
             jsLine = location.lineNumber
-            [coffeeFile, coffeeLine] = srcmap.toCoffee jsFile, jsLine
+            jsCol  = location.columnNumber
+            [coffeeFile, coffeeLine, coffeeCol] = srcmap.toCoffee jsFile, jsLine, jsCol
             if coffeeLine
-                return unresolve joinFileLine coffeeFile, coffeeLine
+                return unresolve joinFileLine coffeeFile, coffeeLine, coffeeCol
             else
-                return unresolve joinFileLine jsFile, jsLine
+                return unresolve joinFileLine jsFile, jsLine, jsCol
         null
         
     debugCommand: (command) ->
         
         map = 
-            step: 'stepOver'
-            in:   'stepInto'
-            out:  'stepOut'
-            cont: 'resume'
-            pause:'pause'
+            step:  'stepOver'
+            into:  'stepInto'
+            out:   'stepOut'
+            cont:  'resume'
+            pause: 'pause'
             
         if map[command]?
             log "send #{map[command]}"
             @dbg.sendCommand "Debugger.#{map[command]}"
-            
 
 # 0000000    00000000  0000000    000   000   0000000    0000000   00000000  00000000   
 # 000   000  000       000   000  000   000  000        000        000       000   000  
@@ -228,7 +232,7 @@ class WinDbg
 class Debugger
     
     constructor: ->
-        # log 'Debugger'
+
         post.onGet 'dbgInfo',   @onDbgInfo
         post.on 'breakpoint',   @onBreakpoint
         post.on 'debugCommand', @onDebugCommand
@@ -246,11 +250,11 @@ class Debugger
             info[wid] = dbg.info()
         info
         
-    onBreakpoint: (wid, file, line, status='toggle') =>
+    onBreakpoint: (wid, file, line, col=0, status='toggle') =>
         return error 'wrong file type' if path.extname(file) not in ['.js', '.coffee']
-        # log 'onBreakpoint', wid, file, line
+        # log 'onBreakpoint', wid, file, line, col
         @winDbg[wid] ?= new WinDbg wid
-        @winDbg[wid].setBreakpoint file, line, status
+        @winDbg[wid].setBreakpoint file, line, col, status
         
     onDebugCommand: (wid, cmd) =>
         log 'onDebugCommand', wid, cmd

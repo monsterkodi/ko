@@ -63,6 +63,7 @@ class Column
         @div.scrollTop = 0
         @table.innerHTML = ''
         @rows = []
+        @scroll.update()
                     
     #  0000000    0000000  000000000  000  000   000  00000000  
     # 000   000  000          000     000  000   000  000       
@@ -150,7 +151,8 @@ class Column
         error "no row at index #{index}/#{@numRows()-1}?", @numRows() if not @rows[index]?.activate?
         @rows[index].activate()
     
-    navigateCols: (key) ->
+    navigateCols: (key) -> # move to file browser?
+        
         switch key
             when 'left'  then @browser.navigate 'left'
             when 'right' then @browser.navigate 'right'
@@ -158,13 +160,15 @@ class Column
                 if item = @activeRow()?.item
                     type = item.type
                     if type == 'dir'
-                        @browser.browse item.abs
+                        @browser.browse? item.abs
                     else if type == 'file' and item.textFile
                         post.emit 'focus', 'editor'
                     else if item.file
                         post.emit 'focus', 'editor'
 
-    navigateRoot: (key) ->
+    navigateRoot: (key) -> # move to file browser?
+        
+        return if not @browser.browse?
         @browser.browse switch key
             when 'left'  then path.dirname @parent.abs
             when 'up'    then @parent.abs

@@ -35,37 +35,37 @@ dependencies
                 dmg             ^0.1.0
                 download        ^5.0.3
                 entities        ^1.1.1
-                eve             ^0.5.3
+                eve             ^0.5.4
                 font-awesome    ^4.7.0
                 fork-func       ^0.1.0
                 fs-extra        ^2.1.2
                 fuzzaldrin      ^2.1.0
                 fuzzy           ^0.1.3
-                html-entities   ^1.2.0
+                html-entities   ^1.2.1
                 immutable       ^3.8.1
                 js-beautify     ^1.6.12
                 karg            >=1.0.10
                 keycode         ^2.1.8
-                kxk             ^0.14.0
+                kxk             ^0.15.0
                 lodash          ^4.17.4
-                mocha           ^3.2.0
+                mocha           ^3.3.0
                 nconf           ^0.8.4
-                node-pty        ^0.6.3
-                noon            >=1.0.14
+                node-pty        ^0.6.4
+                noon            >=1.1.0
                 opener          ^1.4.3
                 performance-now  ^2.1.0
                 source-map      ^0.5.6
                 sprintf-js      ^1.0.3
-                textextensions  ^2.0.1
-                three           ^0.84.0
+                textextensions  ^2.1.0
+                three           ^0.85.2
                 traceback       ^0.3.1
                 underscore.string  ^3.3.4
                 walkdir         0.0.11
-                write-file-atomic  ^1.3.1
+                write-file-atomic  ^1.3.3
 devDependencies
                 appdmg          ^0.4.5
                 devtron         ^1.4.0
-                electron        ^1.6.2
+                electron        ^1.6.6
                 electron-packager  ^8.6.0
                 electron-rebuild  ^1.5.7
 coffeelintConfig

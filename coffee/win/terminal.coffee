@@ -22,7 +22,6 @@ class Terminal extends TextEditor
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Meta']
 
         @ansidiss = new ansiDiss()    
-        @setLines []
         @setLines ['']
 
     #  0000000   000   000  000000000  00000000   000   000  000000000

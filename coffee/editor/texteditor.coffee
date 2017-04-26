@@ -53,6 +53,7 @@ class TextEditor extends Editor
             lineHeight: @size.lineHeight
             viewHeight: @viewHeight()
             exposeMax: -5
+        @scroll.name = @name
             
         @scroll.on 'clearLines',  @clearLines
         @scroll.on 'exposeLines', @exposeLines
@@ -103,16 +104,19 @@ class TextEditor extends Editor
         super text
                 
     setLines: (lines) ->
-        
-        if lines.length == 0
-            @scroll.reset() 
-        
+                
         lines ?= []
-        super lines
-        @syntax.clear()      
+        # log "setLines ------- #{lines.length}" if @name == 'editor'
+
+        @syntax.clear() 
+        @scroll.reset()
+        
+        super lines        
+        
         if @scroll.viewHeight != @viewHeight()
             @scroll.setViewHeight @viewHeight()
             @emit 'viewHeight', @viewHeight()
+            
         @scroll.setNumLines @numLines()
         @layers.scrollLeft = 0
         @layersWidth  = @layers.offsetWidth

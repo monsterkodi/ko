@@ -93,6 +93,10 @@ class Debug extends Command
     cancel: ->
         @debugCtrl.cancel()
         super
+        
+    clear: ->
+        return if @browser.cleanUp()
+        super
 
     onItemActivated: (item) => @debugCtrl.setPlayState @state()
 

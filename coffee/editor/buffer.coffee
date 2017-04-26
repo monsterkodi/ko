@@ -1,3 +1,4 @@
+
 # 0000000    000   000  00000000  00000000  00000000  00000000 
 # 000   000  000   000  000       000       000       000   000
 # 0000000    000   000  000000    000000    0000000   0000000  
@@ -21,6 +22,7 @@ class Buffer extends event
         @setState     new State()
 
     setLines: (lines) ->
+        @emit 'numLines', 0 # give listeners a chance to clear their stuff
         @setState new State lines:lines
         @emit 'numLines', @numLines()
 
