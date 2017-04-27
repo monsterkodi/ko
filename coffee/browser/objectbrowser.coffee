@@ -5,7 +5,7 @@
 # 000   000  000   000  000   000  000       000          000           000   000  000   000  000   000  000   000       000  000       000   000  
 #  0000000   0000000     0000000   00000000   0000000     000           0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 
-{ str, error, log, _
+{ empty, post, str, error, log, _
 }        = require 'kxk'
 jsbeauty = require 'js-beautify'
 Browser  = require './browser'
@@ -15,6 +15,7 @@ class ObjectBrowser extends Browser
     constructor: (@view) -> 
                 
         super @view
+        @name = 'ObjectBrowser'
 
     valueType: (value) ->
         if _.isNil      value then return 'nil'
@@ -54,16 +55,14 @@ class ObjectBrowser extends Browser
         opt.column ?= 0
         opt.focus  ?= opt.column == 0
 
-        @initColumns() if _.isEmpty @columns
+        @initColumns()
         
         if @columns[0].parent?.type != 'obj'
             @clearColumnsFrom 2, pop:true
-            rootObj = {}
-            @columns[0].setItems [], parent: type: 'obj', obj:rootObj, name: 'root'
-        else 
-            rootObj = @columns[0].parent.obj
+            parent = type: 'obj', obj:{}, name: 'root'
+            @columns[0].setItems [], parent:parent 
     
-        objName = opt.name ? obj.constructor?.name
+        objName = (opt.text ? opt.name) ? obj.constructor?.name
         
         itemForKeyValue = (key, value) =>
             type: @valueType value 
@@ -81,13 +80,40 @@ class ObjectBrowser extends Browser
             items = @columns[0].items
             opt.parent = @columns[0].parent
         else
-            items = []
-            for key,value of obj # own?
-                items.push itemForKeyValue key, value
+            if obj._browse_items_?
+                items = obj._browse_items_
+                dontSort = true
+            else
+                items = []
+                for key,value of obj # own?
+                    items.push itemForKeyValue key, value
 
-        @sortByType(items) if @valueType(obj) not in ['func', 'array']
+        if @valueType(obj) not in ['func', 'array'] and not dontSort
+            @sortByType items  
+            
         @loadItems items, opt
         true
+
+    #  0000000  000       0000000    0000000   0000000  00000000   0000000  
+    # 000       000      000   000  000       000       000       000       
+    # 000       000      000000000  0000000   0000000   0000000   0000000   
+    # 000       000      000   000       000       000  000            000  
+    #  0000000  0000000  000   000  0000000   0000000   00000000  0000000   
+    
+    loadClasses: () ->
+        
+        log 'loadClasses', arguments
+        
+        classes = {}
+        clsss = post.get 'indexer', 'classes'
+        for clss,clsso of clsss
+            key = '● '+clss
+            items = [name: clss, text: '● '+clss, type:'class', file: clsso.file, line: clsso.line]
+            for mthd,mthdo of clsso.methods
+                items.push name: mthd, text: '  ▸ '+mthd, type:'method', file: mthdo.file, line: mthdo.line
+            classes[key] = _browse_items_:items          
+        # log 'classes', classes
+        @loadObject classes, name:'classes', column: 0
   
     #  0000000   00000000   00000000    0000000   000   000  
     # 000   000  000   000  000   000  000   000   000 000   
@@ -96,6 +122,7 @@ class ObjectBrowser extends Browser
     # 000   000  000   000  000   000  000   000     000     
     
     loadArray: (arry, opt) ->
+        
         items   = []
         padSize = 1+Math.floor Math.log10 arry.length
         for own index,value of arry
@@ -107,11 +134,48 @@ class ObjectBrowser extends Browser
                 when 'regexp' then item.name = index+value.source
                 when 'string' then item.name = index+value
                 when 'number', 'float', 'value', 'bool', 'nil' then item.name = index+str value
-                else  item.name = index+'▶'
+                else
+                    if value.text? or value.name?
+                        item.name = value.text ? value.name
+                    else
+                        item.name = index+'▶'
             items.push item
-                    
+        
         @loadItems items, opt
         
+    # 00000000  000   000  000   000   0000000   0000000  
+    # 000       000   000  0000  000  000       000       
+    # 000000    000   000  000 0 000  000       0000000   
+    # 000       000   000  000  0000  000            000  
+    # 000        0000000   000   000   0000000  0000000   
+    
+    loadFuncs: ->
+        
+        funcs = post.get 'indexer', 'funcs'
+        @loadObject funcs, name:'funcs'
+
+    # 000   000   0000000   00000000   0000000     0000000  
+    # 000 0 000  000   000  000   000  000   000  000       
+    # 000000000  000   000  0000000    000   000  0000000   
+    # 000   000  000   000  000   000  000   000       000  
+    # 00     00   0000000   000   000  0000000    0000000   
+    
+    loadWords: ->
+        
+        words = post.get 'indexer', 'words'
+        @loadObject words, name:'words'
+    
+    # 00000000  000  000      00000000   0000000  
+    # 000       000  000      000       000       
+    # 000000    000  000      0000000   0000000   
+    # 000       000  000      000            000  
+    # 000       000  0000000  00000000  0000000   
+    
+    loadFiles: ->
+        
+        files = post.get 'indexer', 'files'
+        @loadObject words, name:'files'
+
     # 000  000000000  00000000  00     00  
     # 000     000     000       000   000  
     # 000     000     0000000   000000000  
@@ -119,6 +183,7 @@ class ObjectBrowser extends Browser
     # 000     000     00000000  000   000  
     
     loadObjectItem: (item, opt) ->
+        
         opt.parent = item
         switch item.type
             when 'obj'   then @loadObject item.obj, opt

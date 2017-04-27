@@ -176,8 +176,14 @@ class Browser extends Stage
     
     initColumns: ->
         
-        if @cols? then return
+        return if @cols? and @cols.parentNode == @view
         
+        @view.innerHTML = ''
+        
+        if @cols?
+            @view.appendChild @cols
+            return
+            
         @cols = elem class: 'browser', id: 'columns'
         @view.appendChild @cols
         

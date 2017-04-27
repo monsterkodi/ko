@@ -34,6 +34,13 @@ class Tabs
         post.on 'stash',            @stash
         post.on 'restore',          @restore
         post.on 'revertFile',       @revertFile
+        post.on 'sendTabs', @onSendTabs
+
+    onSendTabs: (winID) =>
+        t = ''
+        for tab in @tabs
+            t += tab.div.innerHTML
+        post.toWin winID, 'winTabs', window.winID, t
 
     #  0000000  000      000   0000000  000   000  
     # 000       000      000  000       000  000   

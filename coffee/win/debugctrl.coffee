@@ -22,11 +22,9 @@ class DebugCtrl
         @div.addEventListener 'click', @onClick
 
     onClick: (event) => 
-        log event.target.className
+        
         id = event.target.id
-        log "id:#{id}:", empty id
         id = upAttr event.target, 'id' if empty id
-        log "id:#{id}:"
         if id == 'play'
             id = @debugCommand.isPaused() and 'cont' or 'pause'
 
@@ -36,6 +34,7 @@ class DebugCtrl
         
         play =$ 'play'
         return if not play
+        @div.classList.toggle 'running', state == 'running'
         play.firstChild.remove()
         icon = state == 'paused' and 'play' or 'pause'
         play.appendChild elem 'span', class: "fa fa-#{icon}"

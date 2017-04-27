@@ -16,7 +16,7 @@ class FileBrowser extends Browser
     constructor: (@view) -> 
                 
         super @view
-        
+        @name = 'FileBrowser'
         post.on 'browserColumnItemsSet', @onColumnItemsSet
     
     # 00000000  000  000      00000000  
@@ -96,14 +96,24 @@ class FileBrowser extends Browser
     # 000   000  000   000      0      000   0000000   000   000     000     00000000  
     
     onColumnItemsSet: (column) => 
+        
         if @navigateTargetFile
             column.navigateTo @navigateTargetFile
     
     navigateTo: (opt) -> @columns[0].navigateTo opt
     
     endNavigateToTarget: ->
-        delete @navigateTargetFile
-        @focus()
+        
+        if @navigateTargetFile
+            
+            delete @navigateTargetFile
+            
+            col = @lastUsedColumn()
+            
+            if col.parent.type == 'file'
+                @column(col.index-1)?.focus()
+            else
+                col.focus()
 
     #  0000000   0000000   000   000  000000000  00000000  000   000  000000000  
     # 000       000   000  0000  000     000     000       0000  000     000     
@@ -112,6 +122,7 @@ class FileBrowser extends Browser
     #  0000000   0000000   000   000     000     00000000  000   000     000     
     
     loadContent: (row, opt) ->
+        
         item  = row.item
         items = []
         file  = item.abs
@@ -147,9 +158,11 @@ class FileBrowser extends Browser
                 @convertPXM row
             else
                 @clearColumnsFrom opt.column
+            @endNavigateToTarget()
             
         if item.textFile and not @skipJump
             post.emit 'jumpTo', file:file
+            
         delete @skipJump
 
     # 000  00     00   0000000    0000000   00000000  
@@ -159,6 +172,7 @@ class FileBrowser extends Browser
     # 000  000   000  000   000   0000000   00000000  
     
     convertPXM: (row) ->
+        
         item = row.item
         file = item.abs
         tmpPXM = path.join os.tmpdir(), "ko-#{fileName file}.pxm"
@@ -172,6 +186,7 @@ class FileBrowser extends Browser
                 setTimeout loadDelayed, 300
 
     convertImage: (row) ->
+        
         item = row.item
         file = item.abs
         tmpImage = path.join os.tmpdir(), "ko-#{path.basename file}.png"
@@ -181,6 +196,7 @@ class FileBrowser extends Browser
             @loadImage row, tmpImage
 
     loadImage: (row, file) ->
+        
         return if not row.isActive()
         item = row.item
 

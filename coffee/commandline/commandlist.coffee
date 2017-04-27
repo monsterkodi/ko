@@ -1,3 +1,4 @@
+
 #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000   0000000  000000000
 # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  000          000   
 # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  0000000      000   
@@ -10,7 +11,6 @@ TextEditor = require '../editor/texteditor'
 Syntax     = require '../editor/syntax'
 matchr     = require '../tools/matchr'
 salt       = require '../tools/salt'
-
 
 class CommandList extends TextEditor
 
@@ -36,6 +36,7 @@ class CommandList extends TextEditor
     # 000   000  0000000    0000000    000     000     00000000  000   000  0000000 
     
     addItems: (items) ->
+        
         @clear()
         index = 0
         for item in items
@@ -77,6 +78,7 @@ class CommandList extends TextEditor
     # 000   000  00000000     000     000   000
     
     appendMeta: (meta) ->
+        
         if not meta?
             return error 'CommandList.appendMeta -- no meta?' 
         @meta.append meta
@@ -93,11 +95,13 @@ class CommandList extends TextEditor
             @appendLineDiss ''
         
     queueMeta: (meta) ->
+        
         @metaQueue.push meta
         clearTimeout @metaTimer
         @metaTimer = setTimeout @dequeueMeta, 0
         
     dequeueMeta: =>
+        
         count = 0
         while meta = @metaQueue.shift()
             @appendMeta meta

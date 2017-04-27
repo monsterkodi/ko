@@ -18,7 +18,7 @@ class WinDbg
         @scripts     = {}
         @scriptMap   = {}
         @breakpoints = {}
-        @stacktrace  = {}
+        @stacktrace  = []
         
         @dbg = electron.BrowserWindow.fromId(@wid).webContents.debugger
 
@@ -49,6 +49,12 @@ class WinDbg
                         s.file = unresolve coffeeSrc
                 @scripts[s.file] = s
     
+    # 0000000    00000000  000      
+    # 000   000  000       000      
+    # 000   000  0000000   000      
+    # 000   000  000       000      
+    # 0000000    00000000  0000000  
+    
     del: ->
         
         if @dbg
@@ -66,13 +72,12 @@ class WinDbg
                     
         info =
             breakpoints: @breakpoints
-            stacktrace:  @stacktrace
-            scriptMap:   @scriptMap
-            scripts:     @scripts 
-            winID:       @wid
+            # scripts:     @scripts 
+            # scriptMap:   @scriptMap
         
-        info.fileLine = unresolve @fileLine if @fileLine
-        info[@status] = @status
+        info.stacktrace = @stacktrace if @status == 'paused'
+        # info.file = unresolve @fileLine if @fileLine
+        info[@status] = @status == 'paused' and unresolve(@fileLine) or true
         info
         
     # 0000000    00000000   00000000   0000000   000   000  
@@ -112,7 +117,7 @@ class WinDbg
                 delete @breakpoints[breakKey]
 
             @dbg.sendCommand "Debugger.removeBreakpoint", {breakpointId:breakpoint.id}, (err,result) => 
-                return error "unable to remove breakpoint #{breakKey}", err if not _.isEmpty(err)
+                return error "unable to remove breakpoint #{breakKey}", err if not empty err
                 post.toWin @wid, 'setBreakpoint', breakpoint
             
         else
@@ -126,7 +131,7 @@ class WinDbg
                 
             @dbg.sendCommand "Debugger.setBreakpointByUrl", breakLoc, (err,result) => 
                 
-                return error "unable to set breakpoint #{breakKey}", err if not _.isEmpty(err)
+                return error "unable to set breakpoint #{breakKey}", err if not empty err
                 
                 if result.locations.length
                     breakpoint = file:file, line:line, col: col, status:status, id:result.breakpointId
@@ -175,11 +180,11 @@ class WinDbg
                     
                 [file, line, col] = splitFileLine fileLine
                 if path.extname(file) != '.coffee'
-                    log 'step', fileLine
+                    # log 'step', fileLine
                     @debugCommand 'step'
                 else
                     @fileLine = fileLine
-                    log 'fileLine', @fileLine
+                    # log 'fileLine', @fileLine
                     @status = 'paused'
                     @sendFileLine()                
                     
@@ -191,15 +196,31 @@ class WinDbg
 
     sendFileLine: -> @debugger.sendFileLine winID: @wid, fileLine:@fileLine
 
+    #  0000000  000000000   0000000    0000000  000   000  000000000  00000000    0000000    0000000  00000000  
+    # 000          000     000   000  000       000  000      000     000   000  000   000  000       000       
+    # 0000000      000     000000000  000       0000000       000     0000000    000000000  000       0000000   
+    #      000     000     000   000  000       000  000      000     000   000  000   000  000       000       
+    # 0000000      000     000   000   0000000  000   000     000     000   000  000   000   0000000  00000000  
+    
     buildStackTrace: (frames) ->
         
-        @stacktrace = {}
+        @stacktrace = []
         i = 0
         for frame in frames
+            frame.name = empty(frame.functionName.trim()) and "▶" or "▶ "+frame.functionName
             frame.file = @fileLocation frame.location
             frame.functionFile = @fileLocation frame.functionLocation
-            @stacktrace["#{i++}: #{frame.functionName}"] = frame
+            @stacktrace.push frame 
+            i++
+            
+        log @stacktrace
 
+    # 000       0000000    0000000   0000000   000000000  000   0000000   000   000  
+    # 000      000   000  000       000   000     000     000  000   000  0000  000  
+    # 000      000   000  000       000000000     000     000  000   000  000 0 000  
+    # 000      000   000  000       000   000     000     000  000   000  000  0000  
+    # 0000000   0000000    0000000  000   000     000     000   0000000   000   000  
+    
     fileLocation: (location) ->
         if @scriptMap[location?.scriptId]?
             jsFile = @scriptMap[location.scriptId].url
@@ -212,6 +233,12 @@ class WinDbg
                 return unresolve joinFileLine jsFile, jsLine, jsCol
         null
         
+    #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    
+    # 000       000   000  000   000  000   000  000   000  0000  000  000   000  
+    # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  
+    # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  
+    #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    
+    
     debugCommand: (command) ->
         
         map = 

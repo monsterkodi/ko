@@ -49,7 +49,11 @@ class Row
                     return
             
         $('.hover')?.classList.remove 'hover'
+        
         @setActive emit:true
+        
+        log 'activate', @item
+
         switch @item.type
             when 'dir'   then @browser.loadDir     @item.abs, column: @column.index+1, parent: @item
             when 'file'  then @browser.loadContent @,         column: @column.index+1

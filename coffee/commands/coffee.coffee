@@ -16,7 +16,7 @@ class Coffee extends Command
     
     constructor: (@commandline) ->
         @cmdID      = 0
-        @browser    = null
+        @browser    = new ObjectBrowser window.area.view
         @commands   = Object.create null
         @shortcuts  = ['alt+c', 'alt+shift+c']
         @names      = ["coffee", "Coffee"]
@@ -41,7 +41,6 @@ class Coffee extends Command
                 diss: Syntax.dissForTextAndSyntax str(result.error), 'coffee'
                 clss: 'coffeeResult'
         else
-            # log cmdID, result
             @setCurrent @commands[cmdID] if @commands[cmdID]?
             terminal.appendMeta 
                 line: "#{cmdID} ▶"
@@ -68,41 +67,47 @@ class Coffee extends Command
     
     browseObject: (obj, opt) =>
         
-        log 'coffee browse'
-        if not @browser
-            @browser = new ObjectBrowser window.area.view
-            @browser.start()
-            
+        @browser.start()
+        
+        if _.isString obj
+            switch obj
+                when 'class' then return @browser.loadClasses opt
+                when 'func'  then return @browser.loadFuncs   opt
+                when 'word'  then return @browser.loadWords   opt
+                when 'file'  then return @browser.loadFiles   opt
+        
         @browser.loadObject obj, opt
 
     clear: ->
         return if @browser.cleanUp()
         super
                 
-    # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
-    # 000        000 000   000       000       000   000     000     000     
-    # 0000000     00000    0000000   000       000   000     000     0000000 
-    # 000        000 000   000       000       000   000     000     000     
-    # 00000000  000   000  00000000   0000000   0000000      000     00000000
-
+    #  0000000   0000000   00000000  00000000  00000000  00000000  
+    # 000       000   000  000       000       000       000       
+    # 000       000   000  000000    000000    0000000   0000000   
+    # 000       000   000  000       000       000       000       
+    #  0000000   0000000   000       000       00000000  00000000  
+    
     executeCoffee: (cfg) => 
         
-        coffee.eval "cmdID = #{cfg.cmdID}"
+        coffee.eval "cmdID = #{cfg.cmdID}" # ???
         
         if not coffee.eval 'post?'
             restoreCWD = process.cwd()
             process.chdir __dirname
             coffee.eval """                
                 {str,clamp,fileExists,dirExists,post,path,noon,fs,_,$} = require 'kxk'
-                cri = require 'chrome-remote-interface'
                 {max,min,abs,round,ceil,floor,sqrt,pow,exp,log10,sin,cos,tan,acos,asin,atan,PI,E} = Math
                 (global[r] = require r for r in ['colors', 'electron'])                    
                 log = -> post.emit 'executeResult', [].slice.call(arguments, 0), cmdID
-                browse = window.commandline.commands.coffee.browseObject
+                coffee  = window.commandline.commands.coffee
+                browse  = coffee.browseObject
+                browser = coffee.browser
                 """
             process.chdir restoreCWD
+            
         try
-            coffee.eval "cmdID = #{@cmdID}"
+            coffee.eval "cmdID = #{@cmdID}" # ???
             result = coffee.eval cfg.command
         catch err
             error "Coffee.executeCoffee -- #{err}"
@@ -112,14 +117,30 @@ class Coffee extends Command
             result = 'undefined'
 
         @onResult result, cfg.cmdID   
+
+    # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
+    # 000        000 000   000       000       000   000     000     000     
+    # 0000000     00000    0000000   000       000   000     000     0000000 
+    # 000        000 000   000       000       000   000     000     000     
+    # 00000000  000   000  00000000   0000000   0000000      000     00000000
+
         
     execute: (command) ->
         
         @cmdID += 1
         command = command.trim()
         
-        if command == '.'          then command = 'browse window'
-        if command.startsWith '.'  then command = 'browse ' + command.slice 1
+        if command == '.'         then command = 'browse window'
+        if command.startsWith '.' then command = 'browse ' + command.slice 1
+        
+        for w in ['class', 'func', 'word', 'file']
+            if command.startsWith "#{w}" 
+                args = command.split ' '
+                args = args.map (a) -> "'#{a}'"
+                args = args.join ', '
+                command = "browse #{args}"
+                log 'browse command:', command
+
         if command.startsWith 'browse '
             if command.split(' ').length == 2
                 command += ', name:"' + command.split(' ')[1] + '"'
@@ -141,11 +162,12 @@ class Coffee extends Command
         else
             if command.startsWith 'browse'
                 window.split.raise 'area' # need to do this before command execution to allow setting focus
+                
             @executeCoffee command: command, cmdID: @cmdID
             
         @hideList()
         
-        if command.startsWith 'browse'
+        if command.startsWith 'browse '
             do:    'show area'
             focus: @browser.activeColumnID()
         else

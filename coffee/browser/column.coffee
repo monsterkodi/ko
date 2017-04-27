@@ -6,9 +6,9 @@
 #  0000000   0000000   0000000   0000000   000   000  000   000
 
 { packagePath, stopEvent, relative, resolve, keyinfo, 
-  path, post, elem, clamp, error, log, $, _ 
-}   = require 'kxk'
-Row = require './row'
+  path, post, elem, clamp, empty, error, log, $, _ 
+}          = require 'kxk'
+Row        = require './row'
 Scroller   = require './scroller'
 fuzzaldrin = require 'fuzzaldrin'
 fuzzy      = require 'fuzzy'
@@ -46,9 +46,9 @@ class Column
     
     setItems: (@items, opt) ->
         
+        @clear()
         @parent = opt.parent
         error "no parent item?" if not @parent?
-        @clear()
         
         for item in @items
             @rows.push new Row @, item
@@ -58,8 +58,10 @@ class Column
         post.emit 'browserColumnItemsSet', @ # for filebrowser target navigation
         @
         
-    isEmpty: -> _.isEmpty @rows
-    clear:   -> 
+    isEmpty: -> empty @rows
+    clear:   ->
+        @clearSearch()
+        delete @parent
         @div.scrollTop = 0
         @table.innerHTML = ''
         @rows = []
@@ -81,7 +83,7 @@ class Column
         else if _.isString  row then return _.find @rows, (r) -> r.item.name == row
         else return row
             
-    nextColumn: -> @browser.column(@index+1)
+    nextColumn: -> @browser.column @index+1
         
     numRows:    -> @rows.length ? 0   
     rowHeight:  -> @rows[0]?.div.clientHeight ? 0
@@ -122,9 +124,9 @@ class Column
     # 000   000  000   000      0      000   0000000   000   000     000     00000000  
 
     navigateTo: (target) ->
-        
+
         target = _.isString(target) and target or target?.file
-        if not @parent then return error 'no parent?'
+        if not @parent then return error "no parent? #{@index}"
         relpath = relative target, @parent.abs
         relitem = _.first relpath.split path.sep
         row = @row relitem
@@ -138,6 +140,7 @@ class Column
         return error "no rows in column #{@index}?" if not @numRows()
         index = @activeRow()?.index() ? -1
         error "no index from activeRow? #{index}?", @activeRow() if not index? or Number.isNaN index
+        
         index = switch key
             when 'up'        then index-1
             when 'down'      then index+1
@@ -146,8 +149,10 @@ class Column
             when 'page up'   then index-@numVisible()
             when 'page down' then index+@numVisible()
             else index
+            
         error "no index #{index}? #{@numVisible()}" if not index? or Number.isNaN index        
         index = clamp 0, @numRows()-1, index
+        
         error "no row at index #{index}/#{@numRows()-1}?", @numRows() if not @rows[index]?.activate?
         @rows[index].activate()
     
@@ -165,6 +170,7 @@ class Column
                         post.emit 'focus', 'editor'
                     else if item.file
                         post.emit 'focus', 'editor'
+        @
 
     navigateRoot: (key) -> # move to file browser?
         
@@ -176,11 +182,14 @@ class Column
             when 'down'  then packagePath @parent.abs
             when '~'     then '~'
             when '/'     then '/'
+        @
             
-    openFileInNewWindow: ->        
+    openFileInNewWindow: ->  
+        
         if item = @activeRow()?.item
             if item.type == 'file' and item.textFile
                 window.openFiles [item.abs], newWindow: true
+        @
 
     #  0000000  00000000   0000000   00000000    0000000  000   000    
     # 000       000       000   000  000   000  000       000   000    
@@ -189,45 +198,64 @@ class Column
     # 0000000   00000000  000   000  000   000   0000000  000   000    
     
     doSearch: (char) ->
-
+        
+        return if not @numRows()
+        
         clearTimeout @searchTimer
         @searchTimer = setTimeout @clearSearch, 2000
         @search += char
         
         if not @searchDiv
             @searchDiv = elem class: 'browserSearch'
+            
         @searchDiv.textContent = @search
 
         fuzzied = fuzzy.filter @search, @rows, extract: (r) -> r.item.name
         if fuzzied.length
             fuzzied = _.sortBy fuzzied, (o) -> 2 - fuzzaldrin.score o.string, @search
-            item = fuzzied[0].original
-            item.activate()
-            item.div.appendChild @searchDiv
+            row = fuzzied[0].original
+            
+            autoNavi = row.item.name == @search and @browser.endNavigateToTarget? # smelly
+            if autoNavi
+                @browser.navigateTargetFile = row.item.abs 
+                @clearSearch()    
+            else
+                row.div.appendChild @searchDiv
+
+            row.activate()
+        @
     
     clearSearch: =>
+        
         @search = ''
         @searchDiv?.remove()
         delete @searchDiv
         @
     
     removeObject: ->
+        
         if @index == 0 and row = @activeRow()
-            delete @parent.obj[row.item.name]
+            # delete @parent.obj[row.item.name]
             nextOrPrev = row.next() ? row.prev()
             row.div.remove()
+            @items.splice row.index(), 1
             @rows.splice row.index(), 1
             nextOrPrev?.activate()
+        @
   
     sortByName: -> 
+        
         @rows.sort (a,b) -> a.item.name.localeCompare b.item.name
         for row in @rows
             @table.appendChild row.div
+        @
         
     sortByType: ->
+        
         @rows.sort (a,b) -> (a.item.type + a.item.name).localeCompare b.item.type + b.item.name
         for row in @rows
             @table.appendChild row.div
+        @
   
     # 000   000  00000000  000   000  
     # 000  000   000        000 000   

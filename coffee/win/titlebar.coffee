@@ -32,6 +32,7 @@ class Titlebar
         
         post.on 'numWins',  @onNumWins
         post.on 'winFocus', @onWinFocus
+        post.on 'winTabs',  @onWinTabs
         post.on 'sticky',   @onSticky
         post.on 'dirty',    @onDirty
         post.on 'file',     @onFile
@@ -95,13 +96,13 @@ class Titlebar
     
     showList: (event) => 
         
-        mini(0)
-        mini(10)
-        mini(100)
+        mini 0
+        mini 10
+        mini 100
         
         return if @list?
         winInfos = post.get 'winInfos'
-        return if winInfos.length < 2
+        return if winInfos.length <= 1
         document.activeElement.blur()
         @selected = -1
         @list = elem class: 'list windows'
@@ -118,27 +119,45 @@ class Titlebar
             @list?.remove()
             @list = null
 
+    # 000   000  000  000   000  000  000   000  00000000   0000000    0000000  
+    # 000 0 000  000  0000  000  000  0000  000  000       000   000  000       
+    # 000000000  000  000 0 000  000  000 0 000  000000    000   000  0000000   
+    # 000   000  000  000  0000  000  000  0000  000       000   000       000  
+    # 00     00  000  000   000  000  000   000  000        0000000   0000000   
+    
     listWinInfos: (winInfos) ->
         
         @list.innerHTML = ""        
         @list.style.display = 'unset'
+        
         for info in winInfos
+            
             continue if info.id == window.winID
-            div = elem class: "list-item"
+            
+            div = elem class: "list-item", children: [
+                elem 'span', class: 'winid', text: info.id
+                elem 'span', class: 'wintabs', text: '●'
+            ]
             div.winID = info.id
-            file = unresolve info.file ? ''
-            diss = syntax.dissForTextAndSyntax(file, 'ko', join: true)
-            fileSpan = render.line diss, charWidth:0
-            id  = "<span class=\"winid\">#{info.id}</span>"
-            dc  = info.dirty and " dirty" or "clean"
-            dot = "<span class=\"dot #{dc}\">●</span>"
-            div.innerHTML = id + dot + fileSpan
+            
             activateWindow = (id) => (event) => 
                 @loadWindowWithID id
                 stopEvent event
+                
             div.addEventListener 'mousedown', activateWindow info.id
             @list.appendChild div
+            
+        post.toOtherWins 'sendTabs', window.winID
         @
+
+    onWinTabs: (winID, tabs) =>
+        
+        log winID, tabs
+        
+        for div in @list.children
+            if div.winID == winID
+                $('.wintabs', div)?.innerHTML = tabs
+                break
 
     loadWindowWithID: (id) ->
         

@@ -22,7 +22,7 @@ class TextEditor extends Editor
         
         @name = viewElem
         @name = @name.slice 1 if @name[0] == '.'
-        @view = $(viewElem)  
+        @view =$ viewElem   
         
         @layers = elem class: "layers"
         @view.appendChild @layers
@@ -397,13 +397,14 @@ class TextEditor extends Editor
 
     resized: ->
         
+        @layers.style.width = "#{sw()-@view.getBoundingClientRect().left-130-6}px"
+        
         vh = @view.clientHeight
         
         return if vh == @scroll.viewHeight
         
         @scroll.setViewHeight vh
         @numbers?.elem.style.height = "#{@scroll.exposeNum * @scroll.lineHeight}px"
-        @layers.style.width = "#{sw()-@view.getBoundingClientRect().left-130-6}px"
         @layers.style.height = "#{vh}px"
         @layersWidth = @layers.offsetWidth
         
@@ -446,19 +447,18 @@ class TextEditor extends Editor
     scrollLines: (delta) -> @scrollBy delta * @size.lineHeight
 
     scrollBy: (delta, x=0) -> 
-        console.log 'scrollBy', delta, x        
 
         @scroll.by delta if delta
         @layers.scrollLeft += x if x
         @updateScrollOffset()
         
     scrollTo: (p) ->
-        console.log 'scrollTo', p
         
         @scroll.to p
         @updateScrollOffset()
 
     scrollCursorToTop: (topDist=7) ->
+        
         cp = @cursorPos()
         if cp[1] - @scroll.top > topDist
             rg = [@scroll.top, Math.max 0, cp[1]-1]

@@ -26,6 +26,7 @@ class Debug extends Command
         post.on 'debugFileLine',   @onDebugFileLine
         post.on 'debuggerChanged', @onDebuggerChanged
         
+        @browser.name = 'DebugBrowser'
         @browser.on 'itemActivated', @onItemActivated
         @area.on 'resized', @onAreaResized
                 
@@ -40,9 +41,7 @@ class Debug extends Command
     onDebuggerChanged: =>
         activeItemName = @activeItem()?.name
         if @commandline.command == @
-            @browser.clear()
-            for k,v of post.get 'dbgInfo'
-                @browser.loadObject v, name:k
+            @loadDbgInfo()
         r  = @browser.column(0)?.row activeItemName
         r ?= 0
         @browser.column(0)?.row(r)?.activate()
@@ -50,11 +49,16 @@ class Debug extends Command
     onDebugFileLine: (@debugInfo) =>
         
         log "onDebug", @debugInfo.winID, @debugInfo.fileLine
+        
         if @commandline.command != @
             @commandline.startCommand 'debug'
+        
+        @loadDbgInfo()    
         @browser.column(0)?.row("#{@debugInfo.winID}")?.activate()
+        
         if @debugInfo.fileLine
             post.emit 'jumpToFile', file:@debugInfo.fileLine
+            
         @debugCtrl.setPlayState @state()
 
     activeItem: -> @browser.column(0)?.activeRow()?.item
@@ -72,9 +76,7 @@ class Debug extends Command
         
         @browser.start()
         @debugCtrl.start()
-        
-        for k,v of post.get 'dbgInfo'
-            @browser.loadObject v, name:k
+        @loadDbgInfo()
             
         @browser.column(0).row(0)?.activate()
         @debugCtrl.setPlayState @state()
@@ -83,6 +85,11 @@ class Debug extends Command
         
         select: true
         do:     @name == 'Browse' and 'half area' or 'quart area'
+
+    loadDbgInfo: ->
+        @browser.clear()
+        for k,v of post.get 'dbgInfo'
+            @browser.loadObject v, name:k
         
     #  0000000   0000000   000   000   0000000  00000000  000    
     # 000       000   000  0000  000  000       000       000    
