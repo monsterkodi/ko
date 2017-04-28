@@ -53,7 +53,7 @@ class Search extends Command
     startSearchInFiles: (opt) ->
         terminal = window.terminal
         terminal.appendMeta clss: 'salt', text: opt.text.slice 0, 14
-        terminal.appendMeta diss: syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'
+        terminal.appendMeta clss: 'searchHeader', diss: syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'
         terminal.appendMeta clss: 'spacer'
         terminal.singleCursorAtPos [0, terminal.numLines()-2]
         dir = packagePath path.dirname opt.file

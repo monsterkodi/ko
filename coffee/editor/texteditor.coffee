@@ -651,7 +651,7 @@ class TextEditor extends Editor
         
         if @handleModKeyComboEvent?
             return stopEvent(event) if 'unhandled' != @handleModKeyComboEvent mod, key, combo, event
-         
+        # log combo 
         for action in Editor.actions
             if action.combos?
                 combos = action.combos

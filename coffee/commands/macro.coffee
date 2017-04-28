@@ -21,7 +21,7 @@ class Macro extends Command
     constructor: (@commandline) ->
         
         @shortcuts = ['command+m']
-        @macros    = ['dbg', 'class', 'inv', 'req']
+        @macros    = ['dbg', 'class', 'inv', 'req', 'color']
         @names     = ['macro']
         super @commandline
 
@@ -82,6 +82,9 @@ class Macro extends Command
                 editor.showInvisibles = !editor.showInvisibles
                 editor.updateLines()
 
+            when 'color' 
+                editor.pigments()
+                
             when 'fps' 
                 window.fps?.toggle()
                 

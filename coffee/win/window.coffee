@@ -331,6 +331,7 @@ loadFile = (file, opt={}) ->
         editor.clear skip:file? 
 
         if file?
+            
             addToRecent file
             
             if tab = tabs.tab file

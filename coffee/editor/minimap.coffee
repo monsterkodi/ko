@@ -84,8 +84,6 @@ class Minimap
                 
     drawLines: (top=@scroll.exposeTop, bot=@scroll.exposeBot) =>
         
-        # log "top:#{top} bot:#{bot}" if @editor.name == 'editor'
-        
         ctx = @lines.getContext '2d'
         y = parseInt((top-@scroll.exposeTop)*@scroll.lineHeight)
         ctx.clearRect 0, y, @width, ((bot-@scroll.exposeTop)-(top-@scroll.exposeTop)+1)*@scroll.lineHeight        

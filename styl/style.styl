@@ -451,12 +451,17 @@ infoPadding = 6px
     position            absolute
     pointer-events      auto
     
-    padding-right             metaRadius
-    margin-right            - metaRadius
-    margin-left             - editorPadding
-    padding-left              editorPadding
-    border-top-right-radius   metaRadius
-    border-bottom-right-radius   metaRadius
+    &.coffeeResult
+    &.searchResult
+    &.termResult
+    &.termCommand
+    &.href
+        padding-right                metaRadius
+        margin-right               - metaRadius
+        margin-left                - editorPadding
+        padding-left                 editorPadding
+        border-top-right-radius      metaRadius
+        border-bottom-right-radius   metaRadius
     
     &.href
         cursor              pointer
@@ -465,22 +470,17 @@ infoPadding = 6px
     &.searchResult
     &.termResult
     &.spacer
-        border-top-right-radius 0
+        border-top-right-radius    0
         border-bottom-right-radius 0
         
     &.termCommand
         cursor          pointer
 
     &.git
-        border-radius       0
-        padding             0
-        margin              0
         width               numbersWidth
             
     &.dbg        
         border-radius       6px
-        padding             0
-        margin              0
         margin-top          3px
         margin-left         4px
         width               12px
@@ -495,6 +495,15 @@ infoPadding = 6px
     padding-left        4px
     padding-right       4px
     border-radius       4px
+
+.pigment
+    border-radius       4px
+    margin-top         -2px
+    padding-top         2px
+    padding-bottom      2px
+    margin-left        -4px
+    padding-left        4px
+    padding-right       4px
         
 // 00     00  000  000   000  000  00     00   0000000   00000000 
 // 000   000  000  0000  000  000  000   000  000   000  000   000

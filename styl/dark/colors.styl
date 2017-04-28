@@ -13,7 +13,7 @@ body
     background          backColor
     color               #fff
 
-.split-handle    
+.split-handle
     background          frameColor
 
 // 0000000    00000000    0000000   000   000   0000000  00000000  00000000   
@@ -240,7 +240,7 @@ span.ko
 #logview
 #editor
     background          backColor
-    color               #ddd 
+    color               #ddd
     border-color        frameColor
     
 #split
@@ -254,21 +254,21 @@ span.ko
 //  0000000   0000000   000   000  0000000    0000000   000   000
         
 *:focus .cursor         // focus colors
-    background          #f80 
+    background          #f80
     &.virtual
         background      #008
     &.main
         background      #ff0
 
 .cursors.salterMode .cursor
-    background          #040 
+    background          #040
     &.main
         background      #080
         
 .cursor                 // blur colors
     background          #444
     &.main
-        background      #666 
+        background      #666
     &.virtual
         background      #111
         
@@ -311,8 +311,7 @@ span.ko
 // 000   000  00000000     000     000   000
 
 .meta
-    background              titleColor
-    opacity                 0.8
+    background              backColor
     
     &.href
         background-color    titleColor
@@ -321,12 +320,13 @@ span.ko
     &.searchResult
     &.termResult
     &.spacer
+        opacity             0.8        
         background          backColor
 
     &.searchResult
     &.coffeeResult
     &.termResult
-        background      transparent
+        background          transparent
         
     &.git
         opacity             0.4
@@ -343,7 +343,10 @@ span.ko
         background          #f00
         &.breakpoint
             background      #f80
-            
+     
+    &.pigment
+        background          #ff0
+       
 .linenumber span .saveButton    
     background              #f80
         
@@ -388,7 +391,8 @@ span.ko
         background          #444 // focus
         
 .selection
-    background              #282828 // no focus
+    background  
+    background              #282828 // no focus #ff0 #f00 #aaf
 
 // 000      000   0000000  000000000
 // 000      000  000          000   
