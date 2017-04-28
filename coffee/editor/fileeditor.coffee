@@ -177,7 +177,9 @@ class FileEditor extends TextEditor
     #  0000000    0000000   000   000  000      
 
     jumpToFile: (opt) =>
-
+        
+        # log 'jumpToFile opt.file', opt
+        
         window.navigate.addFilePos
             file: @currentFile
             pos:  @cursorPos()

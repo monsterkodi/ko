@@ -28,6 +28,7 @@ class Tooltip
 
     del: => 
         
+        return if @opt.keep
         return if not @elem?
         delete @elem.tooltip
         @onLeave()
@@ -38,7 +39,7 @@ class Tooltip
         @elem = null
 
     onHover: (event) =>
-        
+
         return if not @elem?
         return if @div?
         clearTimeout @timer
@@ -53,8 +54,9 @@ class Tooltip
         br = @elem.getBoundingClientRect()
         @div.style.transform = "scaleY(1)"
         @div.style.opacity = '1'
+        @div.style.fontSize = "#{@opt.textSize}px" if @opt.textSize?
         @div.style.left = "#{br.left + @opt.x}px" if @opt.x?
-        @div.style.top = "#{br.top + @opt.x}px" if @opt.y?
+        @div.style.top = "#{br.bottom + @opt.y}px" if @opt.y?
         
     onLeave: (event, e) =>
         

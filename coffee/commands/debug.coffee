@@ -16,8 +16,7 @@ class Debug extends Command
     constructor: (@commandline) ->
         
         @cmdID      = 0
-        @area       = window.area
-        @browser    = new ObjectBrowser @area.view
+        @browser    = new ObjectBrowser window.area.view
         @debugCtrl  = new DebugCtrl @
         @commands   = Object.create null
         @shortcuts  = ['alt+d']
@@ -28,7 +27,7 @@ class Debug extends Command
         
         @browser.name = 'DebugBrowser'
         @browser.on 'itemActivated', @onItemActivated
-        @area.on 'resized', @onAreaResized
+        window.area.on 'resized', @onAreaResized
                 
         super @commandline
         @syntaxName = 'browser'
@@ -48,7 +47,7 @@ class Debug extends Command
 
     onDebugFileLine: (@debugInfo) =>
         
-        log "onDebug", @debugInfo.winID, @debugInfo.fileLine
+        # log "onDebug", @debugInfo.winID, @debugInfo.fileLine
         
         if @commandline.command != @
             @commandline.startCommand 'debug'

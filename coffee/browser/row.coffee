@@ -5,7 +5,7 @@
 # 000   000  000   000  000   000
 # 000   000   0000000   00     00
 
-{ elem, keyinfo, clamp, post, error, log, $, _ 
+{ elem, keyinfo, clamp, empty, post, error, log, $, _ 
 } = require 'kxk'
 
 syntax = require '../editor/syntax'
@@ -13,9 +13,14 @@ syntax = require '../editor/syntax'
 class Row
     
     constructor: (@column, @item) ->
-        
+
         @browser = @column.browser
-        @div = elem class: 'browserRow', html: syntax.spanForTextAndSyntax @item.text ? @item.name, 'browser'
+        text = @item.text ? @item.name
+        if empty text.trim()
+            html = '&nbsp;'
+        else
+            html = syntax.spanForTextAndSyntax text, 'browser'
+        @div = elem class: 'browserRow', html: html
         @div.classList.add @item.type
         @column.table.appendChild @div
    
@@ -38,7 +43,7 @@ class Row
             switch mod
                 when 'alt', 'command', 'command+alt'
                     if @item.type == 'file' and @item.textFile
-                        opt = file:@item.abs 
+                        opt = file:@item.file
                         if mod == 'command+alt'
                             opt.newWindow = true
                         else
@@ -52,16 +57,16 @@ class Row
         
         @setActive emit:true
         
-        log 'activate', @item
-
         switch @item.type
-            when 'dir'   then @browser.loadDir     @item.abs, column: @column.index+1, parent: @item
-            when 'file'  then @browser.loadContent @,         column: @column.index+1
+            when 'dir'   then @browser.loadDir     @item.file, column: @column.index+1, parent: @item
+            when 'file'  then @browser.loadContent @,          column: @column.index+1
             else
                 if @item.file?
                     post.emit 'jumpTo', file:@item.file, line:@item.line
                 else if @column.parent.obj?
-                    @browser.loadObjectItem  @item, column: @column.index+1
+                    @browser.loadObjectItem  @item, column:@column.index+1
+                    if @item.type == 'obj'
+                        @browser.previewObjectItem  @item, column:@column.index+2
                 else
                     @browser.clearColumnsFrom @column.index+1
         @

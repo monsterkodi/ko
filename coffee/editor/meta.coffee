@@ -184,6 +184,7 @@ class Meta
     # 0000000    000  000       000       
     
     addDiffMeta: (meta) ->
+        
         meta.diff = true
         meta.no_x = true
         lineMeta = [meta.line, [0, 0], meta]
@@ -197,6 +198,7 @@ class Meta
     # 0000000    0000000     0000000   
     
     addDbgMeta: (meta) ->
+        
         meta.dbg  = true
         meta.no_x = true
         meta.no_h = true
@@ -205,6 +207,7 @@ class Meta
         @addDiv lineMeta
 
     delDbgMeta: (meta) ->
+        
         li = meta.line
         for meta in @metasAtLineIndex li
             @delMeta meta

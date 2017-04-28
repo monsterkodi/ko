@@ -11,15 +11,16 @@ Command  = require '../commandline/command'
 class Build extends Command
     
     constructor: (@commandline) ->
-        @area       = window.area
+        
         @cmdID      = 0
         @commands   = Object.create null
         @shortcuts  = ['command+b', 'command+shift+b']
         @names      = ["build", 'Build']
-        @area.on 'resized', @onAreaResized
+        window.area.on 'resized', @onAreaResized
         super @commandline
 
     restoreState: (state) -> 
+        
         super state
         window.split.swap $('terminal'), $('area')
         @execute state.text
@@ -64,8 +65,9 @@ class Build extends Command
             if file?
                 mod = require file
                 @instance?.stop?()
-                @area.view.removeChild @area.view.firstChild while @area.view.firstChild
-                @instance = new mod @area.view
+                view = window.area.view
+                view.removeChild view.firstChild while view.firstChild
+                @instance = new mod view
                 @instance.name = command
                 @instance.start()
                 command = super command

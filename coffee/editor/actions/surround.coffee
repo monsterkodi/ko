@@ -34,8 +34,9 @@ module.exports =
             when 'html'   then @surroundCharacters = @surroundCharacters.concat ['<','>']
             when 'coffee' then @surroundCharacters.push '#'
             when 'md'     
-                @surroundCharacters = @surroundCharacters.concat ['*','<']
+                @surroundCharacters = @surroundCharacters.concat ['*','<', '`']
                 @surroundPairs['<'] = ['<!---', '--->']
+                @surroundPairs['`'] = ['`', '`']
                 
     isUnbalancedSurroundCharacter: (ch) ->
         return false if ch in ["#"]

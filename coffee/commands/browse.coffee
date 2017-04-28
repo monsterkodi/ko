@@ -14,14 +14,13 @@ class Browse extends Command
     
     constructor: (@commandline) ->
         
-        @cmdID      = 0
-        @area       = window.area
-        @browser    = new FileBrowser @area.view
-        @commands   = Object.create null
-        @shortcuts  = ['command+.', 'command+shift+.']
-        @names      = ["browse", "Browse"]
+        @cmdID     = 0
+        @browser   = new FileBrowser window.area.view
+        @commands  = Object.create null
+        @shortcuts = ['command+.', 'command+shift+.']
+        @names     = ["browse", "Browse"]
         
-        @area.on 'resized', @onAreaResized
+        window.area.on 'resized', @onAreaResized
         
         @browser.on 'itemActivated', @onItemActivated
         
@@ -77,8 +76,8 @@ class Browse extends Command
     
     onItemActivated: (item) =>
         
-        if item.abs 
-            pth = unresolve item.abs 
+        if item.file 
+            pth = unresolve item.file
             if item.type == 'dir' then pth += '/'
             @commandline.setText pth
 

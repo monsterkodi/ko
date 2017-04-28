@@ -659,20 +659,15 @@ class TextEditor extends Editor
             for actionCombo in combos
                 if combo == actionCombo
                     if action.key? and _.isFunction @[action.key]
-                        # log "activate action #{action.key}"
                         @[action.key] key, combo: combo, mod: mod, event: event
                         return
     
         switch combo
             when 'command+z'       then return @do.undo()
             when 'command+shift+z' then return @do.redo()
+            when 'command+t'       then return post.emit 'newTabWithFile'
                 
-        # log 'combo', combo
-        
         return if mod and not key?.length
-        
-        # switch key            
-            # when 'backspace' then return
         
         if char and mod in ["shift", ""]
             @insertCharacter char

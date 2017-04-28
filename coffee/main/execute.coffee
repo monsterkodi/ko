@@ -44,13 +44,16 @@ class Execute
                 coffee = require 'coffee-script'
                 cri = require 'chrome-remote-interface'
                 {max,min,abs,round,ceil,floor,sqrt,pow,exp,log10,sin,cos,tan,acos,asin,atan,PI,E} = Math
-                (global[r] = require r for r in ['path', 'fs', 'noon', 'colors', 'electron'])                    
+                {str,clamp,fileExists,dirExists,post,path,noon,fs,_,$} = require 'kxk'
+                (global[r] = require r for r in ['colors', 'electron'])                    
                 log = -> 
                     console.log.apply console, [].slice.call(arguments, 0)
                     if winID? then post.toWin winID, 'executeResult', [].slice.call(arguments, 0), cmdID
                 error = -> 
                     console.log.apply console, ['[ERROR]'].concat [].slice.call(arguments, 0)
                     if winID? then post.toWin winID, 'executeResult', ['[ERROR]'].concat([].slice.call(arguments, 0)), cmdID
+                browse = ->
+                    if winID? then post.toWin.apply post, [winID, 'browseResult'].concat [].slice.call arguments, 0
                 """
             process.chdir restoreCWD
         catch err
@@ -63,10 +66,16 @@ class Execute
             error "Execute.execute -- #{err}"
             error: err.toString()
             
-    executeCoffee: (cfg) => 
+    executeCoffee: (cfg) =>
+        
         coffee.eval "winID = #{cfg.winID}"
         coffee.eval "cmdID = #{cfg.cmdID}"
-        result = @execute cfg.command
+        try
+            result = @execute cfg.command
+        catch err
+            errMsg = "[ERROR] coffee command '#{cfg.command}' failed:" + str err
+            log errMsg
+            result = error:errMsg
         if not result?
             result = 'undefined'
         else if typeof(result) != 'object' or not result.error? and _.size(result) == 1

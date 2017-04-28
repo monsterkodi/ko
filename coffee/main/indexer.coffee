@@ -25,6 +25,9 @@ class Indexer
         post.onGet 'indexer', (key) => @[key]
         @collectBins()
         @collectProjects()
+    
+        @imageExtensions = ['.png', '.jpg', '.gif', '.tiff', '.pxm']        
+
         @dirs    = Object.create null
         @files   = Object.create null
         @classes = Object.create null
@@ -90,6 +93,7 @@ class Indexer
 
         @walker = new Walker wopt
         @walker.cfg.ignore.push 'js'
+        @walker.cfg.include =  @walker.cfg.include.concat @imageExtensions
         @walker.start()
 
     onWalkerDir: (p, stat) =>
@@ -141,11 +145,15 @@ class Indexer
     # 000   000  00000000  000   000   0000000       0      00000000        000       000  0000000  00000000
 
     removeFile: (file) ->
+        
         return if not @files[file]?
+        
         for name,infos of @funcs
             _.remove infos, (v) -> v.file == file
             delete @funcs[name] if not infos.length
+                    
         @classes = _.omitBy @classes, (v) -> v.file == file
+        
         delete @files[file]
 
     # 000  000   000  0000000    00000000  000   000        00000000  000  000      00000000
@@ -160,11 +168,19 @@ class Indexer
 
         return @shiftQueue() if @files[file]?
 
-        isCpp = path.extname(file) in ['.cpp', '.cc']
-        isHpp = path.extname(file) in ['.hpp', '.h' ]
+        fileExt = path.extname file 
+
+        if fileExt in @imageExtensions
+            @files[file] = {}
+            return
+
+        isCpp = fileExt in ['.cpp', '.cc']
+        isHpp = fileExt in ['.hpp', '.h' ]
 
         fs.readFile file, 'utf8', (err, data) =>
-            return if err?
+            if err?
+                log "error indexing #{file}", err
+                return
             lines = data.split /\r?\n/
             fileInfo =
                 lines: lines.length
@@ -185,7 +201,7 @@ class Indexer
                             funcInfo[1].line
                             funcInfo[1].last
                             funcInfo[2]
-                            funcInfo[1].class ? path.basename file, path.extname file
+                            funcInfo[1].class ? fileName file
                         ]
 
                     if currentClass? and indent == 4
@@ -293,7 +309,7 @@ class Indexer
                 while funcStack.length
                     _.last(funcStack)[1].last = li - 1
                     funcInfo = funcStack.pop()
-                    fileInfo.funcs.push [funcInfo[1].line, funcInfo[1].last, funcInfo[2], funcInfo[1].class ? path.basename file, path.extname file]
+                    fileInfo.funcs.push [funcInfo[1].line, funcInfo[1].last, funcInfo[2], funcInfo[1].class ? fileName file]
 
                 post.toWins 'classesCount', _.size @classes
                 post.toWins 'funcsCount',   _.size @funcs

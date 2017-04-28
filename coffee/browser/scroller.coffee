@@ -96,11 +96,13 @@ class Scroller
     update: =>
         
         if @numRows() * @rowHeight() < @height()
+            
             @elem.style.display   = 'none'
             @elem.style.top       = "0"
             @handle.style.top     = "0"
             @handle.style.height  = "0"
             @handle.style.width   = "0"
+            
         else
             @elem.style.display   = 'block'
             bh           = @numRows() * @rowHeight()
@@ -121,6 +123,13 @@ class Scroller
             cs = "rgb(#{parseInt 47+cf*80},#{parseInt 47+cf*80},#{parseInt 47+cf*208})"
             @handle.style.backgroundColor = cs
 
+        if @column.parent?.type == 'preview'
+            if @column.prevColumn().div.scrollTop != @target.scrollTop
+                @column.prevColumn().div.scrollTop = @target.scrollTop
+        else if @column.nextColumn()?.parent?.type == 'preview'
+            if @column.nextColumn().div.scrollTop != @target.scrollTop
+                @column.nextColumn().div.scrollTop = @target.scrollTop
+            
         @handle.style.right = "-#{@target.scrollLeft}px"
 
 module.exports = Scroller

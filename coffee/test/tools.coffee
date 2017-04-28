@@ -23,6 +23,6 @@ describe 'dirList', ->
                 type:       'file'
                 textFile:   true
                 name:       path.basename __filename
-                abs:        __filename
+                file:       __filename
             done()
         

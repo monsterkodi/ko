@@ -84,6 +84,7 @@ class Column
         else return row
             
     nextColumn: -> @browser.column @index+1
+    prevColumn: -> @browser.column @index-1
         
     numRows:    -> @rows.length ? 0   
     rowHeight:  -> @rows[0]?.div.clientHeight ? 0
@@ -127,7 +128,7 @@ class Column
 
         target = _.isString(target) and target or target?.file
         if not @parent then return error "no parent? #{@index}"
-        relpath = relative target, @parent.abs
+        relpath = relative target, @parent.file
         relitem = _.first relpath.split path.sep
         row = @row relitem
         if row
@@ -165,7 +166,7 @@ class Column
                 if item = @activeRow()?.item
                     type = item.type
                     if type == 'dir'
-                        @browser.browse? item.abs
+                        @browser.browse? item.file
                     else if type == 'file' and item.textFile
                         post.emit 'focus', 'editor'
                     else if item.file
@@ -176,10 +177,10 @@ class Column
         
         return if not @browser.browse?
         @browser.browse switch key
-            when 'left'  then path.dirname @parent.abs
-            when 'up'    then @parent.abs
-            when 'right' then @activeRow().item.abs
-            when 'down'  then packagePath @parent.abs
+            when 'left'  then path.dirname @parent.file
+            when 'up'    then @parent.file
+            when 'right' then @activeRow().item.file
+            when 'down'  then packagePath @parent.file
             when '~'     then '~'
             when '/'     then '/'
         @
@@ -188,7 +189,7 @@ class Column
         
         if item = @activeRow()?.item
             if item.type == 'file' and item.textFile
-                window.openFiles [item.abs], newWindow: true
+                window.openFiles [item.file], newWindow: true
         @
 
     #  0000000  00000000   0000000   00000000    0000000  000   000    
@@ -217,7 +218,7 @@ class Column
             
             autoNavi = row.item.name == @search and @browser.endNavigateToTarget? # smelly
             if autoNavi
-                @browser.navigateTargetFile = row.item.abs 
+                @browser.navigateTargetFile = row.item.file
                 @clearSearch()    
             else
                 row.div.appendChild @searchDiv

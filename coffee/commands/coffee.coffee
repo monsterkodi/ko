@@ -5,7 +5,7 @@
 # 000       000   000  000       000       000       000     
 #  0000000   0000000   000       000       00000000  00000000
 
-{ post, str, error, log
+{ post, str, error, log, _
 }             = require 'kxk'
 Syntax        = require '../editor/syntax'
 Command       = require '../commandline/command'
@@ -15,6 +15,7 @@ coffee        = require 'coffee-script'
 class Coffee extends Command
     
     constructor: (@commandline) ->
+        
         @cmdID      = 0
         @browser    = new ObjectBrowser window.area.view
         @commands   = Object.create null
@@ -23,7 +24,10 @@ class Coffee extends Command
         super @commandline
         @maxHistory = 99
         @syntaxName = 'coffee'
-        post.on 'executeResult', @onResult
+        
+        window.area.on 'resized', @onAreaResized
+        post.on 'executeResult',  @onResult
+        post.on 'browseResult',   @onBrowseResult
     
     #  0000000   000   000        00000000   00000000   0000000  000   000  000      000000000
     # 000   000  0000  000        000   000  000       000       000   000  000         000   
@@ -36,6 +40,7 @@ class Coffee extends Command
         terminal = window.terminal
         
         if result.error?
+            window.split.raise 'terminal'        
             terminal.appendMeta 
                 line: "#{cmdID} ⚡"
                 diss: Syntax.dissForTextAndSyntax str(result.error), 'coffee'
@@ -65,18 +70,20 @@ class Coffee extends Command
     # 000   000  000   000  000   000  000   000       000  000       
     # 0000000    000   000   0000000   00     00  0000000   00000000  
     
-    browseObject: (obj, opt) =>
+    onBrowseResult: => @browseObject.apply @, [].slice.call arguments, 0
+
+    browseObject: (obj, args...) =>
         
         @browser.start()
         
         if _.isString obj
             switch obj
-                when 'class' then return @browser.loadClasses opt
-                when 'func'  then return @browser.loadFuncs   opt
-                when 'word'  then return @browser.loadWords   opt
-                when 'file'  then return @browser.loadFiles   opt
-        
-        @browser.loadObject obj, opt
+                when 'class' then return @browser.loadClasses args
+                when 'func'  then return @browser.loadFuncs   args
+                when 'word'  then return @browser.loadWords   args
+                when 'file'  then return @browser.loadFiles   args
+
+        @browser.loadObject.apply @browser, [obj].concat args
 
     clear: ->
         return if @browser.cleanUp()
@@ -130,18 +137,18 @@ class Coffee extends Command
         @cmdID += 1
         command = command.trim()
         
-        if command == '.'         then command = 'browse window'
+        if command == '.'         then command = 'browse ' + (@name == 'coffee' and 'window' or 'global')
         if command.startsWith '.' then command = 'browse ' + command.slice 1
-        
+                        
         for w in ['class', 'func', 'word', 'file']
             if command.startsWith "#{w}" 
-                args = command.split ' '
+                args = command.split /\s+/
                 args = args.map (a) -> "'#{a}'"
                 args = args.join ', '
                 command = "browse #{args}"
-                log 'browse command:', command
+                skipName = true
 
-        if command.startsWith 'browse '
+        if not skipName and command.startsWith 'browse '
             if command.split(' ').length == 2
                 command += ', name:"' + command.split(' ')[1] + '"'
 
@@ -175,5 +182,6 @@ class Coffee extends Command
     
     executeText:       (text) -> @name = 'coffee'; @execute text
     executeTextInMain: (text) -> @name = 'Coffee'; @execute text
-    
+    onAreaResized: (w, h) => @browser.resized? w,h
+
 module.exports = Coffee

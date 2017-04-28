@@ -6,28 +6,17 @@
 # 0000000    000  000   000  0000000  000  0000000      000     
 
 { resolve, relative, fs, path, error, log, _  
-}       = require 'kxk'
-walkdir = require 'walkdir'
-textext = _.reduce require('textextensions'), (map, ext) ->
-    map[".#{ext}"] = ext
-    map
-, {}
-textext['.crypt']   = 'crypt'
-textext['.noon']    = 'noon'
-textext['.pug']     = 'pug'
-textext['.bashrc']  = 'bashrc'
-textext['.bashrc']  = 'markdown'
-textbase = 
-    profile:1
-    license:1
+}          = require 'kxk'
+walkdir    = require 'walkdir'
+isTextFile = require './istextfile'
 
 #   directory list
 #
 #   callbacks with a list of objects for files and directories in dirPath
 #       [
 #           type: file|dir
-#           rel:  relative path
-#           abs:  absolute path
+#           name: basename
+#           file: absolute path
 #       ]
 #
 ###           
@@ -49,8 +38,6 @@ dirList = (dirPath, opt, cb) ->
     files   = []
     dirPath = resolve dirPath
     
-    isTextFile = (f) -> path.extname(f) and textext[path.extname f]? or textbase[path.basename(f).toLowerCase()]
-
     filter = (p) ->
         if opt.ignoreHidden and path.basename(p).startsWith '.'
             return true
@@ -61,12 +48,12 @@ dirList = (dirPath, opt, cb) ->
     
     onDir = (d) -> 
         if not filter(d) 
-            dir = type: 'dir',  abs: d, name: path.basename d # relative d, dirPath 
+            dir = type: 'dir', file: d, name: path.basename d # relative d, dirPath 
             dirs.push  dir
             
     onFile = (f) -> 
         if not filter(f) 
-            file = type: 'file', abs: f, name: path.basename f # relative f, dirPath
+            file = type: 'file', file: f, name: path.basename f # relative f, dirPath
             file.textFile = true if isTextFile f
             files.push file
 
