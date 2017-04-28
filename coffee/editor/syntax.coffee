@@ -5,13 +5,27 @@
 #      000     000     000  0000     000     000   000   000 000 
 # 0000000      000     000   000     000     000   000  000   000
 
-{ log, elem, fs, noon, path, $, _
+{ log, post, elem, fs, noon, path, $, _
 }      = require 'kxk'
 encode = require '../tools/encode'
 matchr = require '../tools/matchr'
 
 class Syntax
-    
+
+    constructor: (@editor) ->
+        
+        @name ='txt'
+        @diss = []
+        @colors = {}
+        
+        post.on 'schemeChanged', => @colors = {}
+
+    #  0000000  000000000   0000000   000000000  000   0000000    
+    # 000          000     000   000     000     000  000         
+    # 0000000      000     000000000     000     000  000         
+    #      000     000     000   000     000     000  000         
+    # 0000000      000     000   000     000     000   0000000    
+        
     @matchrConfigs = {}
     @syntaxNames = []
     
@@ -46,11 +60,6 @@ class Syntax
             l = _.padEnd l, d.start
             l += d.match
         l
-
-    constructor: (@editor) ->
-        @name ='txt'
-        @diss = []
-        @colors = {}
 
     #  0000000  000      00000000   0000000   00000000 
     # 000       000      000       000   000  000   000

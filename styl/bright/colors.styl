@@ -1,0 +1,474 @@
+
+// 0000000    00000000   000   0000000   000   000  000000000  
+// 000   000  000   000  000  000        000   000     000     
+// 0000000    0000000    000  000  0000  000000000     000     
+// 000   000  000   000  000  000   000  000   000     000     
+// 0000000    000   000  000   0000000   000   000     000     
+
+frameColor  = #eee
+titleColor  = #ddd
+backColor   = #fff
+textColor   = #000
+    
+body
+    background          backColor
+    color               textColor
+
+.split-handle    
+    background          frameColor
+
+// 0000000    00000000    0000000   000   000   0000000  00000000  00000000   
+// 000   000  000   000  000   000  000 0 000  000       000       000   000  
+// 0000000    0000000    000   000  000000000  0000000   0000000   0000000    
+// 000   000  000   000  000   000  000   000       000  000       000   000  
+// 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
+
+.browser
+    background          backColor
+    color               textColor
+
+.browserRow
+
+    &.hover   
+        background      #fafafa
+        
+    &.active
+        background      frameColor
+        
+.browserColumn.focus .browserRow.active
+    background          #ddf
+    
+.browserImage
+    border              1px solid frameColor
+
+//  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
+// 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
+// 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 
+// 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
+//  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
+
+#commandline-editor
+    color               textColor
+    background          backColor
+
+// 0000000    000   000  000000000  000000000   0000000   000   000  
+// 000   000  000   000     000        000     000   000  0000  000  
+// 0000000    000   000     000        000     000   000  000 0 000  
+// 000   000  000   000     000        000     000   000  000  0000  
+// 0000000     0000000      000        000      0000000   000   000  
+
+#commandline-button
+    color               #aaa 
+    background          frameColor  
+    &.empty
+        background      backColor
+        border-right-color frameColor
+    &.active
+        background      titleColor
+        
+span.ko
+#commandline-button.active
+    &.open
+        color           #8f0
+    &.goto
+        color           #66f
+    &.browse
+        color           #ff0
+    &.find
+        color           #f5f
+    &.search
+        color           #0a0
+    &.term
+        color           #f80
+    &.coffee
+        color           #f00
+    &.build
+        color           #aaa
+    &.macro
+        color           #888
+
+#commandline-button.macro
+#commandline-button.coffee
+    color               #aaa 
+        
+//  0000000  000000000  00000000   000      
+// 000          000     000   000  000      
+// 000          000     0000000    000      
+// 000          000     000   000  000      
+//  0000000     000     000   000  0000000  
+
+#debugCtrl
+    background          #000
+
+#debugCtrl.running #step
+#debugCtrl.running #into
+#debugCtrl.running #out
+    color               titleColor
+    
+.ctrl
+    color               #888
+    &:hover
+        color           backColor
+    &:active
+        color           #ff0
+    
+// 000  000   000  00000000   0000000 
+// 000  0000  000  000       000   000
+// 000  000 0 000  000000    000   000
+// 000  000  0000  000       000   000
+// 000  000   000  000        0000000 
+    
+#info
+    background          backColor
+    border-left-color   frameColor
+
+.info-cursor-line
+.info-cursor-column
+    color               #bbb
+    &.virtual           
+        color           #08f
+
+.info-lines
+    color               #555
+
+.info-words
+    color               #0a0
+
+.info-classes
+    color               #ff8
+
+.info-funcs
+    color               #f80
+
+.info-files
+    color               #44f
+
+.info-cursors
+    color               #f80
+
+.info-sticky
+    color               #88f
+
+.info-selections
+    color               #888
+
+.info-highlights
+    color               rgb(103,103,171)
+
+// 000000000  000  000000000  000      00000000  0000000     0000000   00000000 
+//    000     000     000     000      000       000   000  000   000  000   000
+//    000     000     000     000      0000000   0000000    000000000  0000000  
+//    000     000     000     000      000       000   000  000   000  000   000
+//    000     000     000     0000000  00000000  0000000    000   000  000   000
+
+#titlebar
+    background          titleColor
+    color               #333
+
+.dot:hover
+    color               #f40
+        
+#titlebar .winid
+    color               #555
+    &.focus
+        color           #008815
+
+#titlebar .winnum
+    color               titleColor
+
+#titlebar.focus .winnum
+    color               #555
+    
+// 000000000   0000000    0000000   000      000000000  000  00000000   
+//    000     000   000  000   000  000         000     000  000   000  
+//    000     000   000  000   000  000         000     000  00000000   
+//    000     000   000  000   000  000         000     000  000        
+//    000      0000000    0000000   0000000     000     000  000        
+
+.tooltip
+    background          frameColor
+    
+// 000000000   0000000   0000000     0000000    
+//    000     000   000  000   000  000         
+//    000     000000000  0000000    0000000     
+//    000     000   000  000   000       000    
+//    000     000   000  0000000    0000000     
+
+.tabs
+    background          titleColor
+    color               #333
+    
+#titlebar.focus .tabs
+    color               #34C749
+
+// 000000000   0000000   0000000    
+//    000     000   000  000   000  
+//    000     000000000  0000000    
+//    000     000   000  000   000  
+//    000     000   000  0000000    
+
+.tab.dirty 
+.tab.dirty .dot
+    color               #aaf
+
+.tab.clean .dot
+    color               #444
+    &.focus
+        color           #006600
+    
+.tab
+    background          titleColor
+    &.active
+        background      frameColor
+    
+//  0000000   00000000   00000000   0000000 
+// 000   000  000   000  000       000   000
+// 000000000  0000000    0000000   000000000
+// 000   000  000   000  000       000   000
+// 000   000  000   000  00000000  000   000
+
+#area
+    background          backColor
+    border-color        frameColor
+    
+// 00000000  0000000    000  000000000   0000000   00000000 
+// 000       000   000  000     000     000   000  000   000
+// 0000000   000   000  000     000     000   000  0000000  
+// 000       000   000  000     000     000   000  000   000
+// 00000000  0000000    000     000      0000000   000   000
+
+#terminal
+#logview
+#editor
+    background          backColor
+    color               #333 
+    border-color        frameColor
+    
+#split
+    border-left-color   frameColor    
+    border-right-color  frameColor    
+    
+//  0000000  000   000  00000000    0000000   0000000   00000000 
+// 000       000   000  000   000  000       000   000  000   000
+// 000       000   000  0000000    0000000   000   000  0000000  
+// 000       000   000  000   000       000  000   000  000   000
+//  0000000   0000000   000   000  0000000    0000000   000   000
+        
+*:focus .cursor         // focus colors
+    background          #888
+    &.virtual
+        background      frameColor
+    &.main
+        background      #000
+
+.cursors.salterMode .cursor
+    background          #040 
+    &.main
+        background      #080
+        
+.cursor                 // blur colors
+    background          #aaa
+    &.main
+        background      #888 
+    &.virtual
+        background      #fff
+        
+// 000   000  000   000  00     00  0000000    00000000  00000000    0000000
+// 0000  000  000   000  000   000  000   000  000       000   000  000     
+// 000 0 000  000   000  000000000  0000000    0000000   0000000    0000000 
+// 000  0000  000   000  000 0 000  000   000  000       000   000       000
+// 000   000   0000000   000   000  0000000    00000000  000   000  0000000 
+
+.numbers
+    background          rgba(255, 255, 255, 0.5) // this brightens selection
+
+.commandlist .layers .numbers
+    background          rgba(255, 255, 255, 0.1) // this brightens selection
+
+.linenumber
+    border-right-color  frameColor
+    & span
+        color           #ddd        
+
+    &.highligd span 
+        color           rgba(155,155,255, 0.6)
+    &.selected span 
+        color           #555
+    &.highligd.selected:not(.cursored) span
+        color           #bbf
+    &.cursored span 
+        color           #f20
+    &.cursored.selected span 
+        color           #f80
+    &.cursored.main span 
+        color           #fd0
+    &.cursored.main.selected span
+        color           #ff0
+
+// 00     00  00000000  000000000   0000000 
+// 000   000  000          000     000   000
+// 000000000  0000000      000     000000000
+// 000 0 000  000          000     000   000
+// 000   000  00000000     000     000   000
+
+.meta
+    background              #333
+    opacity                 0.8
+    
+    &.href
+        background-color    #333
+
+    &.coffeeResult
+    &.searchResult
+    &.termResult
+    &.spacer
+        background          #000
+
+    &.searchResult
+    &.coffeeResult
+    &.termResult
+        background      transparent
+        
+    &.git
+        opacity             0.4
+        background          #0f0
+        &.del
+            background      #f00
+        &.mod
+            background      #0f0
+        &.add
+            background      #88f
+            
+    &.dbg
+        opacity             0.8
+        background          #f00
+        &.breakpoint
+            background      #f80
+            
+.linenumber span .saveButton    
+    background              #f80
+        
+// 00     00  000  000   000  000  00     00   0000000   00000000 
+// 000   000  000  0000  000  000  000   000  000   000  000   000
+// 000000000  000  000 0 000  000  000000000  000000000  00000000 
+// 000 0 000  000  000  0000  000  000 0 000  000   000  000      
+// 000   000  000  000   000  000  000   000  000   000  000      
+
+.minimap
+    background              backColor
+    border-left-color       frameColor
+
+.topbot
+    background-color        frameColor
+
+.minimapTopBot
+    background-color        backColor
+    
+// 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000
+// 000   000  000  000        000   000  000      000  000        000   000     000   
+// 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000   
+// 000   000  000  000   000  000   000  000      000  000   000  000   000     000   
+// 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000   
+            
+.highlight
+    background          rgba(0,0,0, 0.1)
+
+.bracketmatch
+    background          rgba(0,0,0, 0.1)
+
+.stringmatch
+    background          rgba(0,255,0, 0.3)
+
+//  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
+// 000       000       000      000       000          000     000  000   000  0000  000
+// 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
+//      000  000       000      000       000          000     000  000   000  000  0000
+// 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
+    
+*:focus .selection
+        background          #ddf // focus
+        
+.selection
+    background              #eee // no focus
+
+// 000      000   0000000  000000000
+// 000      000  000          000   
+// 000      000  0000000      000   
+// 000      000       000     000   
+// 0000000  000  0000000      000   
+
+.list
+    background              frameColor
+
+.list-item.selected
+    background              titleColor
+
+.list.windows
+    & .dot
+        color               #006600
+    & .winid    
+        color               #008815
+
+//  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000   0000000  000000000
+// 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  000          000   
+// 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  0000000      000   
+// 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000       000     000   
+//  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  0000000      000   
+
+.commandlist
+    background              frameColor
+
+.commandlist.open .linenumber.selected span    
+    color                   #aaf
+.commandlist.goto .linenumber.selected span    
+    color                   #66f
+.commandlist.term .linenumber.selected span    
+    color                   #f80
+
+
+//  0000000   000   000  000000000   0000000    0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
+// 000   000  000   000     000     000   000  000       000   000  000   000  000   000  000      000          000     000     
+// 000000000  000   000     000     000   000  000       000   000  000000000  00000000   000      0000000      000     0000000 
+// 000   000  000   000     000     000   000  000       000   000  000 0 000  000        000      000          000     000     
+// 000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
+
+.autocomplete-span
+    background              #22a
+    color                   #ff0
+    &.selected
+        color               backColor
+    
+.autocomplete-list 
+    background              #222
+    &::-webkit-scrollbar
+        background-color    #333
+    &::-webkit-scrollbar-thumb
+        background-color    #55b
+    
+.autocomplete-item
+    color                   #ccc
+    &.selected
+        background          #55b
+        color               #ff0
+
+//  0000000   0000000  00000000    0000000   000      000      0000000     0000000   00000000 
+// 000       000       000   000  000   000  000      000      000   000  000   000  000   000
+// 0000000   000       0000000    000   000  000      000      0000000    000000000  0000000  
+//      000  000       000   000  000   000  000      000      000   000  000   000  000   000
+// 0000000    0000000  000   000   0000000   0000000  0000000  0000000    000   000  000   000
+
+::-webkit-scrollbar-corner
+    background-color        frameColor
+
+::-webkit-scrollbar-thumb
+    background-color        titleColor
+
+::-webkit-scrollbar-thumb
+    background-color        titleColor
+    
+::-webkit-scrollbar-thumb:hover
+    background-color        #b00
+
+.scrollhandle
+    background              #88f
+    

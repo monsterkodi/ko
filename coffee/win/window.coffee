@@ -22,6 +22,7 @@ Commandline = require '../commandline/commandline'
 Navigate    = require '../main/navigate'
 FPS         = require '../tools/fps'
 encode      = require '../tools/encode'
+scheme      = require '../tools/scheme'
 electron    = require 'electron'
 atomicFile  = require 'write-file-atomic'
 pkg         = require '../../package.json'
@@ -146,6 +147,8 @@ winMain = ->
     info        = window.info        = new Info editor
     fps         = window.fps         = new FPS()
 
+    scheme.set prefs.get 'scheme', 'dark'
+    
     restoreWin()
     
     split.on 'split', (s) ->
@@ -543,6 +546,7 @@ document.onkeydown = (event) ->
         when 'command+alt+i'      then return win.webContents.toggleDevTools()
         when 'ctrl+w'             then return loadFile()
         when 'f3'                 then return screenShot()
+        when 'alt+i'              then return scheme.toggle()
         when 'command+\\'         then return toggleCenterText()
         when 'command+k'          then return commandline.clear()
         when 'command+alt+k'      then return split.toggleLog()
