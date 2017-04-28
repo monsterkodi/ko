@@ -1,3 +1,4 @@
+
 # 000  000   000  00000000   0000000 
 # 000  0000  000  000       000   000
 # 000  000 0 000  000000    000   000
@@ -6,6 +7,7 @@
 
 { shortCount, post, elem, log, $, _
 } = require 'kxk'
+Tooltip = require '../tools/tooltip'
 
 class Info
     
@@ -14,6 +16,8 @@ class Info
         window.editor.on   'focus', @setEditor
         window.logview.on  'focus', @setEditor
         window.terminal.on 'focus', @setEditor
+
+        tooltip = (e,t) -> new Tooltip elem:e, text:t, x:0, y:1, textSize: 11, keep:true
                 
         @elem =$ 'info' 
         
@@ -28,6 +32,7 @@ class Info
         @cursorColumn = elem 'span', class: "info-cursor-column"
         @cursorColumn.onclick = => @editor.focus() + @editor.singleCursorAtPos [0, @editor.cursorPos()[1]]
         @topline.appendChild @cursorColumn
+        tooltip @cursorColumn, 'x'
 
         @sticky = elem 'span', class: "info-sticky empty"
         @sticky.innerHTML = '○'
@@ -36,23 +41,29 @@ class Info
         @cursors = elem 'span', class: "info-cursors"
         @cursors.onclick = => @editor.focus() + @editor.clearCursors()
         @topline.appendChild @cursors
+        tooltip @cursors, 'cursors'
         
         @selecti = elem 'span', class: "info-selections"
         @selecti.onclick = => @editor.focus() + @editor.selectNone()
         @topline.appendChild @selecti
+        tooltip @selecti, 'selections'
 
         @highlig = elem 'span', class: "info-highlights"
         @highlig.onclick = => @editor.focus() + @editor.clearHighlights()
         @topline.appendChild @highlig
+        tooltip @highlig, 'highlights'
         
         @classes = elem 'span', class: "info-classes empty"
-        @classes.onclick = => @termCommand 'class'
+        @classes.onclick = (e) => @onClick e, 'class'
         @topline.appendChild @classes
-        post.on 'classesCount', (count) => @onClassesCount count
+        tooltip @classes, 'classes'
 
         @funcs = elem 'span', class: "info-funcs empty"
-        @funcs.onclick = => @termCommand 'func'
+        @funcs.onclick = (e) => @onClick e, 'func'
         @topline.appendChild @funcs
+        tooltip @funcs, 'funcs'
+        
+        post.on 'classesCount', (count) => @onClassesCount count
         post.on 'funcsCount', (count) => @onFuncsCount count
 
         @elem.appendChild @topline
@@ -68,28 +79,35 @@ class Info
         @cursorLine = elem 'span', class: "info-cursor-line"
         @cursorLine.onclick = => @editor.focus() + @editor.singleCursorAtPos [0, 0]
         @botline.appendChild @cursorLine
+        tooltip @cursorLine, 'y'
         
         @lines = elem 'span', class: "info-lines"
         @lines.onclick = => @editor.focus() + @editor.singleCursorAtPos [0, @editor.numLines()]
         @botline.appendChild @lines
+        tooltip @lines, 'lines'
 
         @files = elem 'span', class: "info-files"
-        @files.onclick = => @termCommand 'file'
+        @files.onclick = (e) => @onClick e, 'file'
         @botline.appendChild @files
-        post.on 'filesCount', (count) => @onFilesCount count
+        tooltip @files, 'files'
         
         @words = elem 'span', class: "info-words empty"
-        @words.onclick = => @termCommand 'word'
+        @words.onclick = (e) => @onClick e, 'word'
         @botline.appendChild @words
+        tooltip @words, 'words'
+        
+        post.on 'filesCount', (count) => @onFilesCount count
         window.editor.autocomplete.on 'wordCount', @onWordCount # use post
 
         @elem.appendChild @botline
         
         @setEditor editor        
 
-    termCommand: (cmmd) ->
-        window.split.do 'show terminal'
-        window.commandline.commands.term.execute cmmd
+    onClick: (event, cmd) ->
+        if event.metaKey
+            window.commandline.commands.term.execute cmd
+        else
+            window.commandline.commands.coffee.execute cmd
 
     #  0000000  00000000  000000000        00000000  0000000    000  000000000   0000000   00000000 
     # 000       000          000           000       000   000  000     000     000   000  000   000

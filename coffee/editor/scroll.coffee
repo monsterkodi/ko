@@ -1,10 +1,11 @@
+
 #  0000000   0000000  00000000    0000000   000      000    
 # 000       000       000   000  000   000  000      000    
 # 0000000   000       0000000    000   000  000      000    
 #      000  000       000   000  000   000  000      000    
 # 0000000    0000000  000   000   0000000   0000000  0000000
 
-{ clamp
+{ clamp, log
 }      = require 'kxk'
 events = require 'events'
 
@@ -69,6 +70,7 @@ class Scroll extends events
     # 000   000  00000000  0000000   00000000     000   
     
     reset: =>
+        # log "scroll.reset #{@name}" if @name.startsWith 'editor'
         @emit 'clearLines'
         @init()
 
@@ -121,15 +123,19 @@ class Scroll extends events
         return if oldTop == @top and oldBot == @bot and @exposeBot >= @bot
                             
         if (@top >= @exposeBot) or (@bot <= @exposeTop) # new range outside, start from scratch
+            # log "#{@name} - range outside - top:#{@top} bot:#{@bot} exposeTop:#{@exposeTop} exposeBot:#{@exposeBot}" if @name.startsWith 'editor'
             @emit 'clearLines'
             @exposeTop = @top
             @exposeBot = @bot
             num = @bot - @top + 1
             if num > 0
+                # log "#{@name} - exposeLines top:#{@top}, bot:#{@bot}, num:#{num}" if @name.startsWith 'editor'
                 @emit 'exposeLines', top:@top, bot:@bot, num: num
+                # log "#{@name} - scroll:#{@scroll}, offsetTop:#{@offsetTop}" if @name.startsWith 'editor'
+                @emit 'scroll', @scroll, @offsetTop
             return
         
-        if (@top < @exposeTop)
+        if @top < @exposeTop
             oldTop = @exposeTop
             @exposeTop = Math.max 0, @top - (Math.min @viewLines, @exposeNum - @viewLines)
             num = oldTop - @exposeTop
@@ -202,13 +208,14 @@ class Scroll extends events
     # 000   000   0000000   000   000  0000000  000  000   000  00000000  0000000 
         
     setNumLines: (n) =>
+        # log "#{@name} - #{@numLines} -> #{n}" if @name.startsWith 'editor'
         if @numLines != n
             @numLines = n
             @fullHeight = @numLines * @lineHeight            
             if @numLines
                 @calc()
                 @by 0
-            else 
+            else
                 @init()
                 @emit 'clearLines'             
 

@@ -54,6 +54,13 @@ body
     font-family         font
     -webkit-user-select none
     -webkit-app-region  no-drag
+    animation           fadein 0.5s
+
+@keyframes fadein
+  from 
+    opacity 0
+  to
+    opacity 1
 
 #main
     position            absolute
@@ -143,49 +150,6 @@ body
     white-space         nowrap 
     display             flex
 
-#commandline-command
-    font-family         font
-    font-size           24px
-    padding-top         0px
-    padding-left        9px
-    padding-right       9px
-    cursor              pointer
-    color               #aaa 
-    background          #222   
-    min-width           (numbersWidth + 1px)
-    box-sizing          border-box
-    white-space         nowrap 
-    &.empty
-        border-right    thinBorder
-        background      #000
-    &.active
-        background      #333
-        
-span.ko
-#commandline-command.active
-    &.open
-        color       #8f0
-    &.goto
-        color       #66f
-    &.browse
-        color       #ff0
-    &.find
-        color       #f5f
-    &.search
-        color       #0a0
-    &.term
-        color       #f80
-    &.coffee
-        color       #f00
-    &.build
-        color       #aaa
-    &.macro
-        color       #888
-
-#commandline-command.macro
-#commandline-command.coffee
-    color           #aaa 
-        
 .ko.shortcut
     opacity         0.5
 .ko.command
@@ -205,6 +169,55 @@ span.ko
     overflow-x          auto
     overflow-y          hidden
 
+// 0000000    000   000  000000000  000000000   0000000   000   000  
+// 000   000  000   000     000        000     000   000  0000  000  
+// 0000000    000   000     000        000     000   000  000 0 000  
+// 000   000  000   000     000        000     000   000  000  0000  
+// 0000000     0000000      000        000      0000000   000   000  
+
+#commandline-button
+    font-family         font
+    font-size           24px
+    padding-top         0px
+    padding-left        9px
+    padding-right       9px
+    cursor              pointer
+    color               #aaa 
+    background          #222   
+    min-width           (numbersWidth + 1px)
+    box-sizing          border-box
+    white-space         nowrap 
+    &.empty
+        border-right    thinBorder
+        background      #000
+    &.active
+        background      #333
+        
+span.ko
+#commandline-button.active
+    &.open
+        color       #8f0
+    &.goto
+        color       #66f
+    &.browse
+        color       #ff0
+    &.find
+        color       #f5f
+    &.search
+        color       #0a0
+    &.term
+        color       #f80
+    &.coffee
+        color       #f00
+    &.build
+        color       #aaa
+    &.macro
+        color       #888
+
+#commandline-button.macro
+#commandline-button.coffee
+    color           #aaa 
+        
 //   00000000  00000000    0000000
 //   000       000   000  000     
 //   000000    00000000   0000000 
@@ -221,6 +234,34 @@ span.ko
 
 .fpsCanvas
     background-color transparent
+
+//  0000000  000000000  00000000   000      
+// 000          000     000   000  000      
+// 000          000     0000000    000      
+// 000          000     000   000  000      
+//  0000000     000     000   000  0000000  
+
+#debugCtrl
+    fill-abs()
+    background #000
+    padding-left 4px
+
+#debugCtrl.running #step
+#debugCtrl.running #into
+#debugCtrl.running #out
+    color #333
+    
+.ctrl
+    display inline-block
+    font-size  22px
+    padding-top 3px
+    padding-left 10px
+    padding-right 6px
+    color #888
+    &:hover
+        color #fff
+    &:active
+        color #ff0
     
 // 000  000   000  00000000   0000000 
 // 000  0000  000  000       000   000
@@ -247,7 +288,7 @@ infoPadding = 6px
     
 .info-cursor-line
 .info-cursor-column
-    color               #ff0
+    color               #bbb
     &.virtual           
         color           #08f
 
@@ -267,10 +308,6 @@ infoPadding = 6px
     &.empty
         display         none
 
-.info-cursor-line
-.info-cursor-column
-    padding-left        (infoPadding / 2)
-
 .info-lines
     color               #555
 
@@ -278,13 +315,13 @@ infoPadding = 6px
     color               #0a0
 
 .info-classes
-    color               #f00
+    color               #ff8
 
 .info-funcs
-    color               #80f
+    color               #f80
 
 .info-files
-    color               #fa0
+    color               #44f
 
 .info-cursors
     color               #f80
@@ -609,18 +646,31 @@ infoPadding = 6px
         cursor          pointer
 
     &.git
-        background         #0f0
-        opacity            0.4
-        border-radius      0
-        padding            0
-        margin             0
-        width              numbersWidth
+        background          #0f0
+        opacity             0.4
+        border-radius       0
+        padding             0
+        margin              0
+        width               numbersWidth
         &.del
-            background         #f00
+            background      #f00
         &.mod
-            background         #0f0
+            background      #0f0
         &.add
-            background         #88f
+            background      #88f
+            
+    &.dbg
+        background          #f00
+        opacity             0.8
+        border-radius       6px
+        padding             0
+        margin              0
+        margin-top          3px
+        margin-left         4px
+        width               12px
+        height              12px
+        &.breakpoint
+            background      #f80
             
 .linenumber span .saveButton    
     pointer-events      auto
@@ -797,6 +847,7 @@ infoPadding = 6px
 
 .list.commands
     width               200px
+    max-height          500px
     
 .list-item
     width               100%

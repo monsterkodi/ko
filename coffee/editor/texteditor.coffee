@@ -1,3 +1,4 @@
+
 # 000000000  00000000  000   000  000000000        00000000  0000000    000  000000000   0000000   00000000   
 #    000     000        000 000      000           000       000   000  000     000     000   000  000   000  
 #    000     0000000     00000       000           0000000   000   000  000     000     000   000  0000000    
@@ -5,7 +6,7 @@
 #    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000  
 
 {splitFilePos, fileExists, resolve, keyinfo, stopEvent, setStyle, 
-prefs, drag, elem, path, post, clamp, str, log, sw, $, _
+prefs, drag, elem, path, post, clamp, pos, str, log, sw, $, _
 }         = require 'kxk'
 render    = require './render'
 syntax    = require './syntax'
@@ -21,7 +22,7 @@ class TextEditor extends Editor
         
         @name = viewElem
         @name = @name.slice 1 if @name[0] == '.'
-        @view = $(viewElem)  
+        @view =$ viewElem   
         
         @layers = elem class: "layers"
         @view.appendChild @layers
@@ -52,6 +53,7 @@ class TextEditor extends Editor
             lineHeight: @size.lineHeight
             viewHeight: @viewHeight()
             exposeMax: -5
+        @scroll.name = @name
             
         @scroll.on 'clearLines',  @clearLines
         @scroll.on 'exposeLines', @exposeLines
@@ -102,16 +104,18 @@ class TextEditor extends Editor
         super text
                 
     setLines: (lines) ->
-        
-        if lines.length == 0
-            @scroll.reset() 
-        
+                
         lines ?= []
-        super lines
-        @syntax.clear()      
+
+        @syntax.clear() 
+        @scroll.reset()
+        
+        super lines        
+        
         if @scroll.viewHeight != @viewHeight()
             @scroll.setViewHeight @viewHeight()
             @emit 'viewHeight', @viewHeight()
+            
         @scroll.setNumLines @numLines()
         @layers.scrollLeft = 0
         @layersWidth  = @layers.offsetWidth
@@ -391,13 +395,19 @@ class TextEditor extends Editor
     # 000   000  000            000  000   000     000     
     # 000   000  00000000  0000000   000  0000000  00000000
 
-    resized: -> 
+    resized: ->
+        
+        @layers.style.width = "#{sw()-@view.getBoundingClientRect().left-130-6}px"
+        
         vh = @view.clientHeight
+        
+        return if vh == @scroll.viewHeight
+        
         @scroll.setViewHeight vh
         @numbers?.elem.style.height = "#{@scroll.exposeNum * @scroll.lineHeight}px"
-        @layers.style.width = "#{sw()-@view.getBoundingClientRect().left-130-6}px"
         @layers.style.height = "#{vh}px"
         @layersWidth = @layers.offsetWidth
+        
         @updateScrollOffset()
         @emit 'viewHeight', vh
 
@@ -436,16 +446,19 @@ class TextEditor extends Editor
 
     scrollLines: (delta) -> @scrollBy delta * @size.lineHeight
 
-    scrollBy: (delta, x=0) ->        
+    scrollBy: (delta, x=0) -> 
+
         @scroll.by delta if delta
         @layers.scrollLeft += x if x
         @updateScrollOffset()
         
     scrollTo: (p) ->
+        
         @scroll.to p
         @updateScrollOffset()
 
     scrollCursorToTop: (topDist=7) ->
+        
         cp = @cursorPos()
         if cp[1] - @scroll.top > topDist
             rg = [@scroll.top, Math.max 0, cp[1]-1]
@@ -456,15 +469,18 @@ class TextEditor extends Editor
                 @scrollBy delta
 
     scrollCursorIntoView: (topDist=7) ->
+        
         if delta = @deltaToEnsureCursorsAreVisible()
             @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth 
     
     updateScrollOffset: ->        
+        
         if @scroll.offsetTop != @scrollOffsetTop
             @layers.scrollTop = @scroll.offsetTop 
             @scrollOffsetTop = @scroll.offsetTop
 
     updateCursorOffset: ->
+        
         cx = @mainCursor()[0]*@size.charWidth+@size.offsetX
         if cx-@layers.scrollLeft > @layersWidth
             @scroll.offsetLeft = Math.max 0, cx - @layersWidth + @size.charWidth
@@ -570,7 +586,11 @@ class TextEditor extends Editor
                 if event.altKey
                     @jumpToWord p                                    
                 else if event.metaKey
-                    @toggleCursorAtPos p
+                    if pos(event).x <= @size.numbersWidth and @toggleBreakpoint?
+                        @singleCursorAtPos p
+                        @toggleBreakpoint()
+                    else
+                        @toggleCursorAtPos p
                 else
                     @singleCursorAtPos p, extend:event.shiftKey
             
@@ -639,21 +659,16 @@ class TextEditor extends Editor
             for actionCombo in combos
                 if combo == actionCombo
                     if action.key? and _.isFunction @[action.key]
-                        # log "activate action #{action.key}"
                         @[action.key] key, combo: combo, mod: mod, event: event
                         return
     
         switch combo
             when 'command+z'       then return @do.undo()
             when 'command+shift+z' then return @do.redo()
+            when 'command+t'       then return post.emit 'newTabWithFile'
                 
-        # log 'combo', combo
-        
         return if mod and not key?.length
         
-        # switch key            
-            # when 'backspace' then return
-            
         if char and mod in ["shift", ""]
             @insertCharacter char
 

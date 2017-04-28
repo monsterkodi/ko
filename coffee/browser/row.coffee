@@ -1,10 +1,11 @@
+
 # 00000000    0000000   000   000
 # 000   000  000   000  000 0 000
 # 0000000    000   000  000000000
 # 000   000  000   000  000   000
 # 000   000   0000000   00     00
 
-{ elem, keyinfo, clamp, post, error, log, $, _ 
+{ elem, keyinfo, clamp, empty, post, error, log, $, _ 
 } = require 'kxk'
 
 syntax = require '../editor/syntax'
@@ -13,7 +14,13 @@ class Row
     
     constructor: (@column, @item) ->
 
-        @div = elem class: 'browserRow', html: syntax.spanForTextAndSyntax @item.text ? @item.name, 'browser'
+        @browser = @column.browser
+        text = @item.text ? @item.name
+        if empty text.trim()
+            html = '&nbsp;'
+        else
+            html = syntax.spanForTextAndSyntax text, 'browser'
+        @div = elem class: 'browserRow', html: html
         @div.classList.add @item.type
         @column.table.appendChild @div
    
@@ -36,7 +43,7 @@ class Row
             switch mod
                 when 'alt', 'command', 'command+alt'
                     if @item.type == 'file' and @item.textFile
-                        opt = file:@item.abs 
+                        opt = file:@item.file
                         if mod == 'command+alt'
                             opt.newWindow = true
                         else
@@ -47,26 +54,32 @@ class Row
                     return
             
         $('.hover')?.classList.remove 'hover'
+        
         @setActive emit:true
+        
         switch @item.type
-            when 'dir'   then @column.browser.loadDir     @item.abs, column: @column.index+1, parent: @item
-            when 'file'  then @column.browser.loadContent @,         column: @column.index+1
+            when 'dir'   then @browser.loadDir     @item.file, column: @column.index+1, parent: @item
+            when 'file'  then @browser.loadContent @,          column: @column.index+1
             else
                 if @item.file?
                     post.emit 'jumpTo', file:@item.file, line:@item.line
                 else if @column.parent.obj?
-                    @column.browser.loadObjectItem  @item, column: @column.index+1
+                    @browser.loadObjectItem  @item, column:@column.index+1
+                    if @item.type == 'obj'
+                        @browser.previewObjectItem  @item, column:@column.index+2
                 else
-                    @column.browser.clearColumnsFrom @column.index+1
+                    @browser.clearColumnsFrom @column.index+1
         @
     
     isActive: -> @div.classList.contains 'active'
     
     setActive: (opt = emit:false) ->
+        
         @column.activeRow()?.clearActive()
         @div.classList.add 'active'
         @column.scroll.toIndex @index() 
-        post.emit 'browser-item-activated', @item if opt?.emit # sets commandline text
+        
+        if opt?.emit then @browser.emit 'itemActivated', @item
         @
                 
     clearActive: ->

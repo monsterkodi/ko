@@ -1,3 +1,4 @@
+
 #  0000000  00000000   000      000  000000000
 # 000       000   000  000      000     000   
 # 0000000   00000000   000      000     000   
@@ -155,16 +156,21 @@ class Split extends event
     #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
     
     moveCommandLineBy: (delta) ->
+        
         @flex.moveHandle index:1, pos:@flex.posOfHandle(1) + delta
         
     hideCommandline: -> 
-        @flex.collapse 'terminal'
-        @flex.collapse 'commandline'
-        @emit 'commandline', 'hidden'
         
-    showCommandline: -> 
-        @flex.expand 'commandline'
-        @emit 'commandline', 'shown'
+        if not @flex.isCollapsed 'commandline'
+            @flex.collapse 'terminal'
+            @flex.collapse 'commandline'
+            @emit 'commandline', 'hidden'
+        
+    showCommandline: ->
+        
+        if @flex.isCollapsed 'commandline'
+            @flex.expand 'commandline'
+            @emit 'commandline', 'shown'
 
     # 000       0000000    0000000 
     # 000      000   000  000      

@@ -15,8 +15,8 @@ Split       = require './split'
 Terminal    = require './terminal'
 Titlebar    = require './titlebar'
 LogView     = require './logview'
+Info        = require './info'
 Area        = require '../area/area'
-Info        = require '../editor/info'
 FileEditor  = require '../editor/fileeditor'
 Commandline = require '../commandline/commandline'
 Navigate    = require '../main/navigate'
@@ -81,6 +81,7 @@ restoreWin = ->
     
     if bounds = window.stash.get 'bounds'
         win.setBounds bounds
+        
     if window.stash.get 'devTools'
         win.webContents.openDevTools()
     
@@ -172,6 +173,7 @@ winMain = ->
         
     post.emit 'restore'
     win.show()
+    editor.focus()
         
 # 00000000  0000000    000  000000000   0000000   00000000 
 # 000       000   000  000     000     000   000  000   000
@@ -194,7 +196,9 @@ window.editorWithName = (n) ->
 # 0000000   000   000      0      00000000
 
 saveFile = (file) ->
+    
     file ?= editor.currentFile
+    
     if not file?
         saveFileAs()
         return
@@ -214,7 +218,6 @@ saveFile = (file) ->
         if err?
             alert err
         else
-            editor.emit 'save'
             editor.setCurrentFile file
             post.toMain 'fileSaved', file, winID
 
@@ -260,8 +263,8 @@ window.onload = ->
     info.reload()
     win.on 'close', onClose
     win.on 'move',  onMove
-    # post.get 'logSync', 'window.onload'
     win.webContents.on 'devtools-opened', -> window.stash.set 'devTools', true
+    win.webContents.on 'devtools-closed', -> window.stash.set 'devTools'
     
 # 00000000   00000000  000       0000000    0000000   0000000    
 # 000   000  000       000      000   000  000   000  000   000  

@@ -1,3 +1,4 @@
+
 #       000  000   000  00     00  00000000   000000000   0000000   000   000   0000000   00000000   0000000    
 #       000  000   000  000   000  000   000     000     000   000  000 0 000  000   000  000   000  000   000  
 #       000  000   000  000000000  00000000      000     000   000  000000000  000   000  0000000    000   000  
@@ -27,7 +28,7 @@ module.exports =
             for d in diss
                 if d.start <= p[0] <= d.start+d.match.length
                     [file, pos] = splitFilePos d.match
-                    if fileExists resolve file
+                    if fileExists file
                         post.emit 'jumpTo', file:file, line:pos[1], col:pos[0]
                         return
                         

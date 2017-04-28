@@ -11,24 +11,25 @@
 (▸ )(\w+)                 . method.marker . method
 (\d+\s+)(▫\s)             . arrayIndex . arrayDot
 
-(?:^\s*|\/)(\.[\-\_\w][\.\-\_\w]*)(?:\s|$)  dotfile
-([\.\-\_\w]+)(\.coffee\b)  . coffee . coffee.extname
-([\.\-\_\w]+)(\.noon\b)    . noon . noon.extname
-([\.\-\_\w]+)(\.json\b)    . json . json.extname
-([\.\-\_\w]+)(\.styl\b)    . styl . styl.extname
-([\.\-\_\w]+)(\.html\b)    . html . html.extname
-([\.@-_\w]+)(\.png|\.jpg|\.gif)   . image . image.extname
-([\.@-_\w]+)(\.pxm|\.tiff?|\.icns)   . pic . pic.extname
-([\.\-\_\w]+)(\.pug\b)     . pug . pug.extname
-([\.\-\_\w]+)(\.css\b)     . css . css.extname
-([\.\-\_\w]+)(\.cp?p?\b)   . cpp . cpp.extname
-([\.\-\_\w]+)(\.cc\b)      . cpp . cpp.extname
-([\.\-\_\w]+)(\.hp?p?\b)   . hpp . hpp.extname
-([\.\-\_\w]+)(\.js\b)      . js  . js.extname
-([\.\-\_\w]+)(\.py\b)      . py  . py.extname
-([\.\-\_\w]+)(\.sh\b)      . sh  . sh.extname
-([\.\-\_\w]+)(\.md\b)      . md  . md.extname
-([\.\-\_\w]+)(\.md\b)      . txt . txt.extname
+[~\/\.\-\_\w]+\/            dirname
 
-# \.[\-\_\w]+\s*$             extname
+(?:^\s*|\/)(\.[\-\_\w][\.\-\_\w]*)(?:\s|$)  dotfile
+([~\/\.\-\_\w]+)(\.coffee\b)  . coffee . coffee.extname
+([~\/\.\-\_\w]+)(\.noon\b)    . noon . noon.extname
+([~\/\.\-\_\w]+)(\.json\b)    . json . json.extname
+([~\/\.\-\_\w]+)(\.styl\b)    . styl . styl.extname
+([~\/\.\-\_\w]+)(\.html\b)    . html . html.extname
+([~\/\.@-_\w]+)(\.png|\.jpg|\.gif)   . image . image.extname
+([~\/\.@-_\w]+)(\.pxm|\.tiff?|\.icns)   . pic . pic.extname
+([~\/\.\-\_\w]+)(\.pug\b)     . pug . pug.extname
+([~\/\.\-\_\w]+)(\.css\b)     . css . css.extname
+([~\/\.\-\_\w]+)(\.cp?p?\b)   . cpp . cpp.extname
+([~\/\.\-\_\w]+)(\.cc\b)      . cpp . cpp.extname
+([~\/\.\-\_\w]+)(\.hp?p?\b)   . hpp . hpp.extname
+([~\/\.\-\_\w]+)(\.js\b)      . js  . js.extname
+([~\/\.\-\_\w]+)(\.py\b)      . py  . py.extname
+([~\/\.\-\_\w]+)(\.sh\b)      . sh  . sh.extname
+([~\/\.\-\_\w]+)(\.md\b)      . md  . md.extname
+([~\/\.\-\_\w]+)(\.md\b)      . txt . txt.extname
+
 [\/]                        separator

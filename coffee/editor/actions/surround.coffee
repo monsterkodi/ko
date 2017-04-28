@@ -1,3 +1,4 @@
+
 #  0000000  000   000  00000000   00000000    0000000   000   000  000   000  0000000  
 # 000       000   000  000   000  000   000  000   000  000   000  0000  000  000   000
 # 0000000   000   000  0000000    0000000    000   000  000   000  000 0 000  000   000
@@ -33,8 +34,9 @@ module.exports =
             when 'html'   then @surroundCharacters = @surroundCharacters.concat ['<','>']
             when 'coffee' then @surroundCharacters.push '#'
             when 'md'     
-                @surroundCharacters = @surroundCharacters.concat ['*','<']
+                @surroundCharacters = @surroundCharacters.concat ['*','<', '`']
                 @surroundPairs['<'] = ['<!---', '--->']
+                @surroundPairs['`'] = ['`', '`']
                 
     isUnbalancedSurroundCharacter: (ch) ->
         return false if ch in ["#"]

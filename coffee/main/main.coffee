@@ -1,3 +1,4 @@
+
 # 00     00   0000000   000  000   000
 # 000   000  000   000  000  0000  000
 # 000000000  000000000  000  000 0 000
@@ -10,6 +11,7 @@
 pkg           = require '../../package.json'
 Execute       = require './execute'
 Navigate      = require './navigate'
+Debugger      = require './debugger'
 Indexer       = require './indexer'
 Menu          = require './menu'
 colors        = require 'colors'
@@ -123,7 +125,6 @@ post.onGet 'logSync',  ->
 
 post.on 'restartShell',       (cfg)   -> winShells[cfg.winID].restartShell()
 post.on 'newWindowWithFile',  (file)  -> main.createWindow file:file
-# post.on 'toggleDevTools',     (winID) -> winWithID(winID).toggleDevTools()
 post.on 'maximizeWindow',     (winID) -> main.toggleMaximize winWithID winID
 post.on 'activateWindow',     (winID) -> main.activateWindowWithID winID
 post.on 'activateNextWindow', (winID) -> main.activateNextWindow winID
@@ -156,6 +157,7 @@ class Main
             app.exit 0
             return
 
+        @debugger     = new Debugger
         @indexer      = new Indexer
         coffeeExecute = new Execute main: @
 
@@ -183,7 +185,7 @@ class Main
         
         if args.DevTools
             wins()?[0]?.webContents.openDevTools()
-
+        
         Menu.init @
 
     # 000   000  000  000   000  0000000     0000000   000   000   0000000
@@ -442,14 +444,18 @@ class Main
         win.on 'resize', @onResizeWin
         
         winLoaded = ->
+            
             if opt.files?
                 post.toWin win.id, 'loadFiles', opt.files
             else if opt.file?
                 post.toWin win.id, 'loadFile', opt.file
-            
+                
+            if opt.debugFileLine?
+                post.toWin win.id, 'debugFileLine', opt.debugFileLine
+                
             post.toWins 'winLoaded', win.id
             post.toWins 'numWins', wins().length
-                            
+            
         win.webContents.on 'did-finish-load', winLoaded
         win 
      
@@ -490,7 +496,7 @@ class Main
         wid = event.sender.id
         if visibleWins().length == 1
             hideDock()
-        post.toWins 'winClosed', wid
+        post.toAll 'winClosed', wid
         @postDelayedNumWins()
         
     otherInstanceStarted: (args, dir) =>

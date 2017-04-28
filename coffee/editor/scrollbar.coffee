@@ -1,3 +1,4 @@
+
 #  0000000   0000000  00000000    0000000   000      000      0000000     0000000   00000000
 # 000       000       000   000  000   000  000      000      000   000  000   000  000   000
 # 0000000   000       0000000    000   000  000      000      0000000    000000000  0000000
@@ -29,7 +30,6 @@ class Scrollbar
         @editor.view.addEventListener 'wheel',  @onWheel
         
         @scrollX = @scrollY = 0
-        # window.requestAnimationFrame @scrollAnim
 
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000
@@ -80,13 +80,6 @@ class Scrollbar
         
         stopEvent event    
         
-    scrollAnim: =>
-        if @scrollX or @scrollY
-            @editor.scrollBy @scrollY, @scrollX
-            @scrollX  = 0
-            @scrollY  = 0
-        window.requestAnimationFrame @scrollAnim
-
     onScroll: (event) => @editor.updateScrollOffset()
 
     # 000   000  00000000   0000000     0000000   000000000  00000000

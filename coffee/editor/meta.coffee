@@ -1,3 +1,4 @@
+
 # 00     00  00000000  000000000   0000000 
 # 000   000  000          000     000   000
 # 000000000  0000000      000     000000000
@@ -8,11 +9,11 @@
 }      = require 'kxk'
 ranges = require '../tools/ranges'
 
-class Meta 
+class Meta
     
     constructor: (@editor) ->
 
-        @metas = [] # [  lineIndex, [start, end], {href: ...}  ]
+        @metas = [] # [ [lineIndex, [start, end], {href: ...}], ... ]
         
         @elem = $(".meta", @editor.view)
         @editor.on 'changed',          @onChanged
@@ -108,7 +109,7 @@ class Meta
     # 000   000   0000000   000   000  0000000    00000000  000   000
     
     onNumber: (e) =>
-        
+
         metas = @metasAtLineIndex e.lineIndex
         for meta in metas
             meta[2].span = e.numberSpan
@@ -120,13 +121,14 @@ class Meta
                     num = '?' if not num 
                     e.numberSpan.innerHTML = num
                 else
-                    if meta[2].diff
+                    if meta[2].no_x
                         e.numberSpan.innerHTML = meta[2].line
                     else
                         e.numberSpan.innerHTML = '&nbsp;'
                     
     setMetaPos: (meta, tx, ty) ->
-        if meta[2].diff
+        
+        if meta[2].no_x
             meta[2].div?.style.transform = "translateY(#{ty}px)"        
         else
             meta[2].div?.style.transform = "translate(#{tx}px,#{ty}px)"        
@@ -138,7 +140,7 @@ class Meta
     # 0000000    000      0    
 
     addDiv: (meta) ->
-        
+        # log "+#{meta[0]}"
         size = @editor.size
         sw = size.charWidth * (meta[1][1]-meta[1][0])
         tx = size.charWidth *  meta[1][0] + size.offsetX
@@ -147,11 +149,13 @@ class Meta
         
         div = elem class: "meta #{meta[2].clss ? ''}"
         meta[2].div = div
-        div.style.height = "#{lh}px"  
+        
+        if not meta[2].no_h
+            div.style.height = "#{lh}px"  
         
         @setMetaPos meta, tx, ty
 
-        if not meta[2].diff
+        if not meta[2].no_x
             div.style.width = "#{sw}px"
             if meta[2].href?
                 div.addEventListener 'mousedown', @onClick
@@ -167,6 +171,11 @@ class Meta
                 div.classList.add 'cmmd'
             
         @elem.appendChild div
+
+    delDiv: (meta) ->
+        # log "-#{meta[0]}"
+        meta[2].div?.remove()
+        meta[2].div = null
     
     # 0000000    000  00000000  00000000  
     # 000   000  000  000       000       
@@ -175,11 +184,34 @@ class Meta
     # 0000000    000  000       000       
     
     addDiffMeta: (meta) ->
+        
         meta.diff = true
+        meta.no_x = true
         lineMeta = [meta.line, [0, 0], meta]
         @metas.push lineMeta
         @addDiv lineMeta
 
+    # 0000000    0000000     0000000   
+    # 000   000  000   000  000        
+    # 000   000  0000000    000  0000  
+    # 000   000  000   000  000   000  
+    # 0000000    0000000     0000000   
+    
+    addDbgMeta: (meta) ->
+        
+        meta.dbg  = true
+        meta.no_x = true
+        meta.no_h = true
+        lineMeta  = [meta.line, [0, 0], meta]
+        @metas.push lineMeta
+        @addDiv lineMeta
+
+    delDbgMeta: (meta) ->
+        
+        li = meta.line
+        for meta in @metasAtLineIndex li
+            @delMeta meta
+        
     #  0000000  000      000   0000000  000   000
     # 000       000      000  000       000  000 
     # 000       000      000  000       0000000  
@@ -228,6 +260,7 @@ class Meta
     # 00000000  000   000  000         0000000   0000000   00000000
         
     onLineExposed: (e) =>
+        # log 'exposed', e.lineIndex
         for meta in @metasAtLineIndex e.lineIndex
             @addDiv meta
         
@@ -260,10 +293,7 @@ class Meta
     onWillDeleteLine: (li) => 
         
         for meta in @metasAtLineIndex li
-            meta[2].div?.remove()
-            meta[2].div = null
-        
-        _.pullAll @metas, @metasAtLineIndex li
+            @delMeta meta
         
         for meta in rangesFromTopToBotInRanges li+1, @editor.numLines(), @metas
             meta[0] -= 1
@@ -271,10 +301,9 @@ class Meta
         @updatePositionsBelowLineIndex li
     
     onLineVanished: (e) => 
-        
+        # log 'vanished', e.lineIndex
         for meta in @metasAtLineIndex e.lineIndex
-            meta[2].div?.remove()
-            meta[2].div = null
+            @delDiv meta
             
         @updatePositionsBelowLineIndex e.lineIndex
     
@@ -284,13 +313,17 @@ class Meta
     # 000       000      000       000   000  000   000
     #  0000000  0000000  00000000  000   000  000   000
           
+    onClearLines: => 
+        for meta in @metas
+            @delDiv meta
+        @elem.innerHTML = ""
+        
     clear: => 
         @elem.innerHTML = ""
         @metas = []
-        
-    onClearLines: => 
-        @elem.innerHTML = ""
-        for meta in @metas
-            meta[2].div = null
+
+    delMeta: (meta) ->
+        _.pull @metas, meta
+        @delDiv meta
     
 module.exports = Meta

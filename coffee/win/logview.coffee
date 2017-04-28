@@ -1,3 +1,4 @@
+
 # 000       0000000    0000000   000   000  000  00000000  000   000
 # 000      000   000  000        000   000  000  000       000 0 000
 # 000      000   000  000  0000   000 000   000  0000000   000000000
@@ -12,7 +13,9 @@ class LogView extends TextEditor
 
     constructor: (viewElem) ->
         @fontSizeDefault = 12
+        
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap']
+        
         @setLines ['']
         post.on 'error', (text) -> 
             window.split.do 'show logview'

@@ -1,3 +1,4 @@
+
 #  0000000   000   000  000000000   0000000    0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
 # 000   000  000   000     000     000   000  000       000   000  000   000  000   000  000      000          000     000     
 # 000000000  000   000     000     000   000  000       000   000  000000000  00000000   000      0000000      000     0000000 
@@ -36,8 +37,9 @@ class Autocomplete extends event
         @editor.on 'linesAppended',  @onLinesAppended
         @editor.on 'cursor',         @close
         @editor.on 'blur',           @close
+        
         post.on 'funcsCount',        @onFuncsCount
-
+        
     #  0000000   000   000  00000000  0000000    000  000000000
     # 000   000  0000  000  000       000   000  000     000   
     # 000   000  000 0 000  0000000   000   000  000     000   
@@ -45,6 +47,7 @@ class Autocomplete extends event
     #  0000000   000   000  00000000  0000000    000     000   
 
     onEdit: (info) =>
+        
         @close()
         @word = _.last info.before.split @splitRegExp
         switch info.action
@@ -77,6 +80,7 @@ class Autocomplete extends event
     #  0000000   000        00000000  000   000
     
     open: (info) ->
+        
         cursor = $('.main', @editor.view)
         if not cursor?
             error "Autocomplete.open -- no cursor?"
@@ -129,6 +133,7 @@ class Autocomplete extends event
             cursor.appendChild @list
             
     selectedCompletion: ->
+        
         if @selected >= 0
             @matchList[@selected].slice @word.length
         else
@@ -141,6 +146,7 @@ class Autocomplete extends event
     # 000   000  000   000      0      000   0000000   000   000     000     00000000
     
     navigate: (delta) ->
+        
         return if not @list
         @list.children[@selected]?.classList.remove 'selected'
         @selected = clamp -1, @matchList.length-1, @selected+delta
@@ -163,6 +169,7 @@ class Autocomplete extends event
     # 000   000   0000000       0      00000000   0000000  0000000   0000000   000   000  00000000  0000000 
 
     moveClonesBy: (numChars) ->
+        
         beforeLength = @clones[0].innerHTML.length
         for ci in [1...@clones.length]
             c = @clones[ci]
@@ -181,17 +188,17 @@ class Autocomplete extends event
     # 000        000   000  000   000  0000000   00000000
     
     parseLines:(lines, opt) ->
+        
         @close()
-        # log 'autocomplete.parseLines lines', lines
+
         return if not lines?
+        
         cursorWord = @cursorWord()
         for l in lines
             if not l?.split?
                 error "Autocomplete.parseLines -- line has no split? action: #{opt.action} line: #{l}"
                 error "Autocomplete.parseLines -- lines", lines
                 return
-                # alert "autocomplete.parseLines: warning! line has no split? #{l} #{lines?}"
-                # throw new Error
             words = l.split @splitRegExp
             words = words.filter (w) => 
                 return false if not Indexer.testWord w
@@ -212,21 +219,25 @@ class Autocomplete extends event
                 count += opt?.count ? 1
                 info.count = count
                 info.temp = true if opt.action is 'change'
-                @wordinfo[w] = info                
+                @wordinfo[w] = info 
+                
         @updateWordlist()
     
     updateWordlist: ->
+        
         weight = (wi) -> wi[1].count
         sorted = ([w,i] for w,i of @wordinfo).sort (a,b) -> weight(b) - weight(a)
         @wordlist = (s[0] for s in sorted)
         @emit 'wordCount', @wordlist.length
          
     onFuncsCount: =>
+        
         funcs = post.get 'indexer', 'funcs'
         for func,info of funcs
             info  = @wordinfo[func] ? {}
             info.count = Math.max 20, info.count ? 1
             @wordinfo[func] = info
+            
         @updateWordlist()
                 
     #  0000000  000   000  00000000    0000000   0000000   00000000   000   000   0000000   00000000   0000000  
@@ -236,6 +247,7 @@ class Autocomplete extends event
     #  0000000   0000000   000   000  0000000    0000000   000   000  00     00   0000000   000   000  0000000  
     
     cursorWords: -> 
+        
         cp = @editor.cursorPos()
         words = @editor.wordRangesInLineAtIndex cp[1], regExp: @specialWordRegExp        
         [befor, cursr, after] = rangesSplitAtPosInRanges cp, words
@@ -250,6 +262,7 @@ class Autocomplete extends event
     #  0000000  0000000   0000000   0000000   00000000
 
     close: =>
+        
         @list?.remove()
         @span?.remove()
         @selected   = -1
@@ -286,6 +299,7 @@ class Autocomplete extends event
     # 000   000  00000000     000   
 
     handleModKeyComboEvent: (mod, key, combo, event) ->
+        
         return 'unhandled' if not @span?
         
         switch combo
@@ -307,6 +321,6 @@ class Autocomplete extends event
                         @last()
                         return
         @close()   
-        return 'unhandled'
+        'unhandled'
         
 module.exports = Autocomplete

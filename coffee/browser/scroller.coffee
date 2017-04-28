@@ -1,3 +1,4 @@
+
 #  0000000   0000000  00000000    0000000   000      000      00000000  00000000
 # 000       000       000   000  000   000  000      000      000       000   000
 # 0000000   000       0000000    000   000  000      000      0000000   0000000
@@ -40,6 +41,7 @@ class Scroller
     # 0000000      000     000   000  000   000     000
 
     onStart: (drag, event) =>
+        
         br = @elem.getBoundingClientRect()
         sy = clamp 0, @height(), event.clientY - br.top
         ln = parseInt @numRows() * sy/@height()
@@ -53,6 +55,7 @@ class Scroller
     # 0000000    000   000  000   000   0000000
 
     onDrag: (drag) =>
+        
         delta = (drag.delta.y / (@visRows() * @rowHeight())) * @numRows() * @rowHeight()
         @target.scrollTop += delta
         @update()
@@ -64,6 +67,7 @@ class Scroller
     # 00     00  000   000  00000000  00000000  0000000
 
     onWheel: (event) =>
+        
         if Math.abs(event.deltaX) >= 2*Math.abs(event.deltaY) or Math.abs(event.deltaY) == 0
             @target.scrollLeft += event.deltaX
         else
@@ -79,6 +83,7 @@ class Scroller
     #  0000000   000        0000000    000   000     000     00000000
 
     toIndex: (i) ->
+        
         row = @column.rows[i].div
         newTop = @target.scrollTop
         if newTop < row.offsetTop + @rowHeight() - @height()
@@ -89,12 +94,15 @@ class Scroller
         @update()
 
     update: =>
+        
         if @numRows() * @rowHeight() < @height()
+            
             @elem.style.display   = 'none'
             @elem.style.top       = "0"
             @handle.style.top     = "0"
             @handle.style.height  = "0"
             @handle.style.width   = "0"
+            
         else
             @elem.style.display   = 'block'
             bh           = @numRows() * @rowHeight()
@@ -115,6 +123,13 @@ class Scroller
             cs = "rgb(#{parseInt 47+cf*80},#{parseInt 47+cf*80},#{parseInt 47+cf*208})"
             @handle.style.backgroundColor = cs
 
+        if @column.parent?.type == 'preview'
+            if @column.prevColumn().div.scrollTop != @target.scrollTop
+                @column.prevColumn().div.scrollTop = @target.scrollTop
+        else if @column.nextColumn()?.parent?.type == 'preview'
+            if @column.nextColumn().div.scrollTop != @target.scrollTop
+                @column.nextColumn().div.scrollTop = @target.scrollTop
+            
         @handle.style.right = "-#{@target.scrollLeft}px"
 
 module.exports = Scroller

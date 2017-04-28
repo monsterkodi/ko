@@ -1,3 +1,4 @@
+
 # 000   000   0000000   000      000   000  00000000  00000000 
 # 000 0 000  000   000  000      000  000   000       000   000
 # 000000000  000000000  000      0000000    0000000   0000000  
@@ -18,11 +19,12 @@ class Walker
         @cfg.dotFiles    ?= false
         @cfg.includeDirs ?= true
         @cfg.maxFiles    ?= 500
-        @cfg.ignore      ?= ['node_modules', 'app', 'img', 'dist', 'build', 'Library', 'Applications']
+        @cfg.ignore      ?= ['node_modules', 'app', 'dist', 'build', 'Library', 'Applications']
         @cfg.include     ?= ['.konrad.noon', '.gitignore', '.npmignore']
         @cfg.ignoreExt   ?= ['.app']
-        @cfg.includeExt  ?= ['.coffee', '.js', '.styl', '.css', '.pug', '.html', 
-                            '.md', '.txt', '.noon', '.json', '.cpp', '.cc', '.c', '.h', '.hpp', '.sh', '.py']
+        @cfg.includeExt  ?= ['.coffee', '.styl', '.pug', '.md', '.noon', # '.html', '.js', '.css',
+                            '.txt', '.json', '.sh', '.py',                            
+                            '.cpp', '.cc', '.c', '.h', '.hpp']
       
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   

@@ -81,14 +81,15 @@ class Open extends Command
     #  0000000   0000000   000   000  000        0000000  00000000     000     00000000
 
     complete: -> 
+        
         return if not @commandList? 
         if @commandList.line(@selected).startsWith(path.basename @getText()) and not @getText().trim().endsWith('/')
             @setText path.join(path.dirname(@getText()), @commandList.line(@selected))
-            if dirExists resolve @getText()
+            if dirExists @getText()
                 @setText @getText() + '/'
                 @changed @getText()
             true
-        else if not @getText().trim().endsWith('/') and dirExists resolve @getText()
+        else if not @getText().trim().endsWith('/') and dirExists @getText()
             @setText @getText() + '/'
             @changed @getText()
             true            
@@ -97,7 +98,7 @@ class Open extends Command
             for p in Object.keys(projects).sort()
                 if p.startsWith @getText()
                     pdir = projects[p].dir
-                    pdir = path.join(pdir, 'coffee') if dirExists resolve path.join pdir, 'coffee'
+                    pdir = path.join(pdir, 'coffee') if dirExists path.join pdir, 'coffee'
                     @setText pdir + '/'
                     @changed @getText()
                     return true

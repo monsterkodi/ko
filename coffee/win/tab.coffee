@@ -1,3 +1,4 @@
+
 # 000000000   0000000   0000000  
 #    000     000   000  000   000
 #    000     000000000  0000000  
@@ -55,13 +56,13 @@ class Tab
         if @info.file?
             diss = syntax.dissForTextAndSyntax(unresolve(@file()), 'ko', join: true)
             html = render.line(diss, charWidth:0)
-            new Tooltip elem:name, html:html, x:0
+            @tooltip = new Tooltip elem:name, html:html, x:0
             
         @div.appendChild elem 'span', class:'dot', text:'●' if @info.dirty
         @
 
     file:  -> @info?.file ? 'untitled' 
-    close: -> @div.remove() 
+    close: -> @div.remove(); @tooltip.del() 
     index: -> @tabs.tabs.indexOf @
     prev:  -> @tabs.tab @index()-1 if @index() > 0
     next:  -> @tabs.tab @index()+1 if @index() < @tabs.numTabs()-1
