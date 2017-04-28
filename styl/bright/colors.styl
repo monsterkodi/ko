@@ -241,7 +241,7 @@ span.ko
 #logview
 #editor
     background          backColor
-    color               #333 
+    color               #333
     border-color        frameColor
     
 #split
@@ -262,14 +262,14 @@ span.ko
         background      #000
 
 .cursors.salterMode .cursor
-    background          #040 
+    background          #040
     &.main
         background      #080
         
 .cursor                 // blur colors
     background          #aaa
     &.main
-        background      #888 
+        background      #888
     &.virtual
         background      #fff
         
@@ -288,22 +288,24 @@ span.ko
 .linenumber
     border-right-color  frameColor
     & span
-        color           #ddd        
-
-    &.highligd span 
-        color           rgba(155,155,255, 0.6)
-    &.selected span 
-        color           #555
-    &.highligd.selected:not(.cursored) span
-        color           #bbf
+        color           #ddd
+        
     &.cursored span 
-        color           #f20
-    &.cursored.selected span 
-        color           #f80
+        color           #888
     &.cursored.main span 
-        color           #fd0
+        color           #000
+
+    &.highligd span
+        color           #aaa
+    &.selected span
+        color           #88f
+    &.highligd.selected:not(.cursored) span
+        color           #00f
+
+    &.cursored.selected span
+        color           #44b
     &.cursored.main.selected span
-        color           #ff0
+        color           #008
 
 // 00     00  00000000  000000000   0000000 
 // 000   000  000          000     000   000
@@ -313,7 +315,6 @@ span.ko
 
 .meta
     background              #333
-    opacity                 0.8
     
     &.href
         background-color    #333
@@ -322,6 +323,7 @@ span.ko
     &.searchResult
     &.termResult
     &.spacer
+        opacity             0.8
         background          #000
 
     &.searchResult
