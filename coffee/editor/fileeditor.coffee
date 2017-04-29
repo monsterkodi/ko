@@ -96,7 +96,7 @@ class FileEditor extends TextEditor
             
         if not opt?.skip
             post.emit 'file', @currentFile # titlebar -> tabs -> tab
-            @emit 'file', @currentFile # diffbar
+            @emit 'file', @currentFile # diffbar, pigments, ...
 
     stopWatcher: ->
         if @watch?

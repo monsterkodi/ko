@@ -24,8 +24,6 @@ class Numbers extends event
         @editor.on 'changed',          @updateColors
         @editor.on 'linesSet',         @updateColors
         @onFontSizeChange()
-
-    setOpacity: (o) -> @elem.style.background = "rgba(0,0,0,#{o})"
     
     #  0000000   0000000   000       0000000   00000000 
     # 000       000   000  000      000   000  000   000
@@ -35,8 +33,8 @@ class Numbers extends event
     
     updateColor: (li) =>
         # log "Numbers.updateColor li:#{li}" if @editor.name == 'editor'
-        si = (s[0] for s in rangesFromTopToBotInRanges li, li, @editor.selections)
-        hi = (s[0] for s in rangesFromTopToBotInRanges li, li, @editor.highlights)
+        si = (s[0] for s in rangesFromTopToBotInRanges li, li, @editor.selections())
+        hi = (s[0] for s in rangesFromTopToBotInRanges li, li, @editor.highlights())
         ci = (s[0] for s in rangesFromTopToBotInRanges li, li, rangesFromPositions @editor.state.cursors())
         child = @elem.children[li-@editor.scroll.exposeTop]
         return if not child?

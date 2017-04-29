@@ -21,7 +21,7 @@ class Macro extends Command
     constructor: (@commandline) ->
         
         @shortcuts = ['command+m']
-        @macros    = ['dbg', 'class', 'inv', 'req']
+        @macros    = ['dbg', 'class', 'inv', 'req', 'color']
         @names     = ['macro']
         super @commandline
 
@@ -82,6 +82,9 @@ class Macro extends Command
                 editor.showInvisibles = !editor.showInvisibles
                 editor.updateLines()
 
+            when 'color' 
+                editor.pigments()
+                
             when 'fps' 
                 window.fps?.toggle()
                 
@@ -214,7 +217,7 @@ class Macro extends Command
             #  0000000  0000000  000   000  0000000   0000000 
             
             when 'class'
-                clss = args.length and args[0] or _.last editor.textsInRanges(editor.selections)
+                clss = args.length and args[0] or _.last editor.textsInRanges(editor.selections())
                 clss ?= 'Class'
                 dir = editor.currentFile? and path.dirname(editor.currentFile) or process.cwd()
                 file = path.join dir, clss.toLowerCase() + '.coffee'

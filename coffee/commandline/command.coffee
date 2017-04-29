@@ -223,6 +223,7 @@ class Command
             @skipBlur = null
             
     hideList: ->
+        # return
         @commandList?.view.remove()
         @commandList = null
 

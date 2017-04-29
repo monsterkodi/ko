@@ -61,7 +61,7 @@ class TextEditor extends Editor
         @scroll.on 'exposeLine',  @exposeLine
 
         @view.onkeydown = @onKeyDown
-        @initDrag()    
+        @initDrag()
         
         super
         
@@ -69,6 +69,12 @@ class TextEditor extends Editor
             featureName = feature.toLowerCase()
             featureClss = require "./#{featureName}"
             @[featureName] = new featureClss @                
+
+        if @minimap?            
+            post.on 'schemeChanged', =>
+                updateMinimap = => @minimap.drawLines()
+                setTimeout updateMinimap, 10
+
             
     # 000       0000000   000   000  00000000  00000000    0000000
     # 000      000   000   000 000   000       000   000  000     
@@ -651,7 +657,7 @@ class TextEditor extends Editor
         
         if @handleModKeyComboEvent?
             return stopEvent(event) if 'unhandled' != @handleModKeyComboEvent mod, key, combo, event
-         
+        # log combo 
         for action in Editor.actions
             if action.combos?
                 combos = action.combos

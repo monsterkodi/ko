@@ -58,7 +58,7 @@ class Minimap
         @scroll.on 'exposeLines', @onExposeLines
         @scroll.on 'vanishLines', @onVanishLines
         @scroll.on 'exposeLine',  @exposeLine
-
+        
         @onScroll()  
         @drawLines()
         @drawTopBot()
@@ -83,8 +83,6 @@ class Minimap
                 ctx.fillRect offset+2*r[1][0], y, 2*(r[1][1]-r[1][0]), @scroll.lineHeight
                 
     drawLines: (top=@scroll.exposeTop, bot=@scroll.exposeBot) =>
-        
-        # log "top:#{top} bot:#{bot}" if @editor.name == 'editor'
         
         ctx = @lines.getContext '2d'
         y = parseInt((top-@scroll.exposeTop)*@scroll.lineHeight)

@@ -6,16 +6,17 @@
 # 000   000  000   000  000  000   000
 
 { splitFilePos, fileExists, dirExists, fileList, resolve,
-  childp, about, prefs, store, noon, post, fs, str, error, log, _
-}             = require 'kxk'
-pkg           = require '../../package.json'
-Execute       = require './execute'
-Navigate      = require './navigate'
-Debugger      = require './debugger'
-Indexer       = require './indexer'
-Menu          = require './menu'
-colors        = require 'colors'
-electron      = require 'electron'
+  childp, about, prefs, store, noon, post, path, fs, str, error, log, _
+}        = require 'kxk'
+pkg      = require '../../package.json'
+Execute  = require './execute'
+Navigate = require './navigate'
+Debugger = require './debugger'
+Indexer  = require './indexer'
+Menu     = require './menu'
+pug      = require 'pug'
+colors   = require 'colors'
+electron = require 'electron'
 
 { BrowserWindow, Tray, app, clipboard, dialog        
 }             = electron
@@ -430,15 +431,21 @@ class Main
             acceptFirstMouse: true
             show:             false
             hasShadow:        false
-            backgroundColor:  '#000'
             titleBarStyle:    'hidden'
 
         if opt.restore?
             newStash = path.join app.getPath('userData'), 'win', "#{win.id}.noon"
             fs.copySync opt.restore, newStash
+        
+        scheme = prefs.get 'scheme', 'dark'
+        htmlFile  = resolve "#{__dirname}/../#{scheme}.html"
+        if not fileExists htmlFile
+            pugRender = pug.compileFile "#{__dirname}/../../pug/index.pug"
+            html = pugRender scheme: scheme
+            fs.writeFileSync htmlFile, html, 'utf8'
             
-        #win.webContents.openDevTools()
-        win.loadURL "file://#{__dirname}/../index.html"
+        win.loadURL "file://#{htmlFile}"
+        
         app.dock.show()
         win.on 'close',  @onCloseWin
         win.on 'resize', @onResizeWin

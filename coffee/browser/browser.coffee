@@ -5,7 +5,7 @@
 # 000   000  000   000  000   000  000   000       000  000       000   000  
 # 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 
-{ fileName, encodePath, swapExt, elem, post, clamp, childp, path, os, error, log,  _
+{ fileName, encodePath, swapExt, elem, post, clamp, childp, path, fs, os, error, log,  _
 }      = require 'kxk'
 Column = require './column'
 Stage  = require '../area/stage'

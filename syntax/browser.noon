@@ -30,6 +30,6 @@
 ([~\/\.\-\_\w]+)(\.py\b)      . py  . py.extname
 ([~\/\.\-\_\w]+)(\.sh\b)      . sh  . sh.extname
 ([~\/\.\-\_\w]+)(\.md\b)      . md  . md.extname
-([~\/\.\-\_\w]+)(\.md\b)      . txt . txt.extname
+([~\/\.\-\_\w]+)(\.txt\b)     . txt . txt.extname
 
 [\/]                        separator

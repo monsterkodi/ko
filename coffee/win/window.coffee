@@ -22,6 +22,7 @@ Commandline = require '../commandline/commandline'
 Navigate    = require '../main/navigate'
 FPS         = require '../tools/fps'
 encode      = require '../tools/encode'
+scheme      = require '../tools/scheme'
 electron    = require 'electron'
 atomicFile  = require 'write-file-atomic'
 pkg         = require '../../package.json'
@@ -145,7 +146,7 @@ winMain = ->
     logview     = window.logview     = new LogView 'logview'
     info        = window.info        = new Info editor
     fps         = window.fps         = new FPS()
-
+    
     restoreWin()
     
     split.on 'split', (s) ->
@@ -258,7 +259,7 @@ onClose = ->
 #  0000000   000   000  0000000   0000000   000   000  0000000    
 
 window.onload = -> 
-    
+
     split.resized()
     info.reload()
     win.on 'close', onClose
@@ -303,7 +304,7 @@ reloadTab = (file) ->
         post.emit 'revertFile', file
 
 loadFile = (file, opt={}) ->
-    
+
     file = null if file? and file.length <= 0
     
     editor.saveScrollCursorsAndSelections()
@@ -328,6 +329,7 @@ loadFile = (file, opt={}) ->
         editor.clear skip:file? 
 
         if file?
+            
             addToRecent file
             
             if tab = tabs.tab file
@@ -543,6 +545,7 @@ document.onkeydown = (event) ->
         when 'command+alt+i'      then return win.webContents.toggleDevTools()
         when 'ctrl+w'             then return loadFile()
         when 'f3'                 then return screenShot()
+        when 'alt+i'              then return scheme.toggle()
         when 'command+\\'         then return toggleCenterText()
         when 'command+k'          then return commandline.clear()
         when 'command+alt+k'      then return split.toggleLog()

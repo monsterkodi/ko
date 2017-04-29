@@ -1,6 +1,6 @@
 name            ko-editor
 productName     ko
-version         0.20.0
+version         0.21.0
 description     an editor for macOS
 main            js/main/main.js
 preferGlobal    true
@@ -54,6 +54,7 @@ dependencies
                 noon            >=1.1.0
                 opener          ^1.4.3
                 performance-now  ^2.1.0
+                pug             ^2.0.0-beta.12
                 source-map      ^0.5.6
                 sprintf-js      ^1.0.3
                 textextensions  ^2.1.0

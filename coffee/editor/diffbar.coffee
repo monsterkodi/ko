@@ -109,9 +109,6 @@ class Diffbar
         @clearMetas()
         @elem.width = 2
         
-    clearMetas: ->
-        
-        for meta in @editor.meta.metas # beautiful :)
-            @editor.meta.delMeta meta if meta?[2].diff 
+    clearMetas: -> @editor.meta.delClass 'git'
 
 module.exports = Diffbar

@@ -26,8 +26,6 @@ class CommandList extends TextEditor
             lineHeight: 1.4
 
         @numbers.elem.style.fontSize = "#{@fontSizeDefault}px"        
-        @numbers.opacity = 0.1
-        @numbers.setOpacity 0.1
     
     #  0000000   0000000    0000000    000  000000000  00000000  00     00   0000000
     # 000   000  000   000  000   000  000     000     000       000   000  000     

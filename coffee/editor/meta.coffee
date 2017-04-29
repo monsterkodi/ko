@@ -5,7 +5,7 @@
 # 000 0 000  000          000     000   000
 # 000   000  00000000     000     000   000
 
-{ error, log, elem, post, fs, $, _
+{ empty, elem, post, fs, error, log, $, _
 }      = require 'kxk'
 ranges = require '../tools/ranges'
 
@@ -120,11 +120,8 @@ class Meta
                     num = meta[2].href?.split(':')[1] if not num
                     num = '?' if not num 
                     e.numberSpan.innerHTML = num
-                else
-                    if meta[2].no_x
-                        e.numberSpan.innerHTML = meta[2].line
-                    else
-                        e.numberSpan.innerHTML = '&nbsp;'
+                when 'spacer'
+                    e.numberSpan.innerHTML = '&nbsp;'
                     
     setMetaPos: (meta, tx, ty) ->
         
@@ -140,23 +137,29 @@ class Meta
     # 0000000    000      0    
 
     addDiv: (meta) ->
-        # log "+#{meta[0]}"
+
         size = @editor.size
         sw = size.charWidth * (meta[1][1]-meta[1][0])
         tx = size.charWidth *  meta[1][0] + size.offsetX
         ty = size.lineHeight * (meta[0] - @editor.scroll.exposeTop)
         lh = size.lineHeight
-        
+
         div = elem class: "meta #{meta[2].clss ? ''}"
         meta[2].div = div
         
         if not meta[2].no_h
             div.style.height = "#{lh}px"  
         
+        if meta[2].style?
+            for k,v of meta[2].style
+                div.style[k] = v
+
         @setMetaPos meta, tx, ty
 
         if not meta[2].no_x
+            
             div.style.width = "#{sw}px"
+            
             if meta[2].href?
                 div.addEventListener 'mousedown', @onClick
                 div.href = meta[2].href
@@ -173,10 +176,22 @@ class Meta
         @elem.appendChild div
 
     delDiv: (meta) ->
-        # log "-#{meta[0]}"
+
         meta[2].div?.remove()
         meta[2].div = null
+
+    # 000000000  00000000  000   000  000000000  
+    #    000     000        000 000      000     
+    #    000     0000000     00000       000     
+    #    000     000        000 000      000     
+    #    000     00000000  000   000     000     
     
+    addLineMeta: (meta) ->
+        
+        lineMeta = [meta.line, [meta.start, meta.end], meta]
+        @metas.push lineMeta
+        @addDiv lineMeta
+        
     # 0000000    000  00000000  00000000  
     # 000   000  000  000       000       
     # 000   000  000  000000    000000    
@@ -186,10 +201,7 @@ class Meta
     addDiffMeta: (meta) ->
         
         meta.diff = true
-        meta.no_x = true
-        lineMeta = [meta.line, [0, 0], meta]
-        @metas.push lineMeta
-        @addDiv lineMeta
+        @addNumberMeta meta
 
     # 0000000    0000000     0000000   
     # 000   000  000   000  000        
@@ -200,18 +212,22 @@ class Meta
     addDbgMeta: (meta) ->
         
         meta.dbg  = true
-        meta.no_x = true
         meta.no_h = true
-        lineMeta  = [meta.line, [0, 0], meta]
-        @metas.push lineMeta
-        @addDiv lineMeta
+        @addNumberMeta meta
 
     delDbgMeta: (meta) ->
         
         li = meta.line
         for meta in @metasAtLineIndex li
             @delMeta meta
+
+    addNumberMeta: (meta) ->
         
+        meta.no_x = true
+        lineMeta = [meta.line, [0, 0], meta]
+        @metas.push lineMeta
+        @addDiv lineMeta
+                    
     #  0000000  000      000   0000000  000   000
     # 000       000      000  000       000  000 
     # 000       000      000  000       0000000  
@@ -260,27 +276,26 @@ class Meta
     # 00000000  000   000  000         0000000   0000000   00000000
         
     onLineExposed: (e) =>
-        # log 'exposed', e.lineIndex
+        # log 'on line exposed', e.lineIndex
         for meta in @metasAtLineIndex e.lineIndex
             @addDiv meta
         
     onLinesExposed: (e) => 
-        
+        # log 'on LINES exposed', e
         @updatePositionsBelowLineIndex e.top
         
     onExposeTopChanged: (e) => @updatePositionsBelowLineIndex e.new
         
     updatePositionsBelowLineIndex: (li) ->   
-        
         size = @editor.size
         for meta in rangesFromTopToBotInRanges li, @editor.scroll.exposeBot, @metas
             tx = size.charWidth *  meta[1][0] + size.offsetX
             ty = size.lineHeight * (meta[0] - @editor.scroll.exposeTop)
             @setMetaPos meta, tx, ty
         
-    onLineInserted: (li) => 
+    onLineInserted: (li) =>
         
-        for meta in rangesFromTopToBotInRanges li+1, @editor.numLines(), @metas
+        for meta in rangesFromTopToBotInRanges li-1, @editor.numLines(), @metas
             meta[0] += 1
         @updatePositionsBelowLineIndex li
         
@@ -295,13 +310,13 @@ class Meta
         for meta in @metasAtLineIndex li
             @delMeta meta
         
-        for meta in rangesFromTopToBotInRanges li+1, @editor.numLines(), @metas
+        for meta in rangesFromTopToBotInRanges li, @editor.numLines(), @metas
             meta[0] -= 1
             
         @updatePositionsBelowLineIndex li
     
     onLineVanished: (e) => 
-        # log 'vanished', e.lineIndex
+
         for meta in @metasAtLineIndex e.lineIndex
             @delDiv meta
             
@@ -325,5 +340,13 @@ class Meta
     delMeta: (meta) ->
         _.pull @metas, meta
         @delDiv meta
+        
+    delClass: (clss) ->
+        # log 'delClass', clss
+        for meta in _.clone @metas
+            clsss = meta?[2].clss?.split ' '
+            if not empty(clsss) and clss in clsss
+                # log 'del meta', meta
+                @delMeta meta 
     
 module.exports = Meta
