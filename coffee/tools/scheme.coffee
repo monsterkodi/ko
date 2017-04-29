@@ -21,8 +21,6 @@ class Scheme
     
     @set: (scheme) ->
         
-        prefs.set 'scheme', scheme
-        
         for link in document.querySelectorAll '.scheme-link'
             css = path.basename link.href
             newlink = elem 'link', 
@@ -33,6 +31,7 @@ class Scheme
                 
             link.parentNode.replaceChild newlink, link
             
+        prefs.set 'scheme', scheme    
         post.emit 'schemeChanged', scheme
         
 module.exports = Scheme

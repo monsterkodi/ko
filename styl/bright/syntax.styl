@@ -5,18 +5,18 @@
 // 0000000      000     000   000     000     000   000  000   000
 
 .syntax
-    color           #666
-
-.browserRow.array
-    color           #aaa
-.browserRow .arrayIndex
-    color           #444
-    font-size       12px
-.browserRow .arrayDot
     color           #333
 
+.browserRow.array
+    color           #666
+.browserRow .arrayIndex
+    color           #ddd
+    font-size       12px
+.browserRow .arrayDot
+    color           #eee
+
 .invisible
-    color           #888
+    color           #aaa
     opacity         0.5
 
 .bool
@@ -45,7 +45,7 @@
 .owner
 .callee
 .class
-    color           #600
+    color           #800
             
 .variable
     color           #a0a
@@ -83,9 +83,9 @@
 
 .func    
 .function
-    color           #f00
+    color           #c00
     &.call          
-        color       #f40
+        color       #f00
     &.marker
         color       #55f
         opacity     1
@@ -129,20 +129,20 @@
 
 .class
     &.variable
-        color       #48f
+        color       #a0a
     &.static
-        color       #88f
+        color       #c0c
 
 .static.class.marker
-    color           #88f
+    color           #ccf
     opacity         1
        
 .keypath
-    color           #f80
+    color           #c00
 
 .syntax.cond
 .keyword
-    color           #88f !important
+    color           #66f !important
     &.null    
         color       #a00 !important
 
@@ -162,7 +162,7 @@
         color       #a8a
 
 .interpolation.marker
-        color       #f83
+        color       #0d0
 
 .variable.err        
     color           #f08
@@ -171,9 +171,9 @@
     opacity         0.7
 
 .string
-    color           #0a0 !important
+    color           #090 !important
     &.double
-        color       #0f0 !important
+        color       #0b0 !important
         
 //  0000000   0000000   00     00  00     00  00000000  000   000  000000000  
 // 000       000   000  000   000  000   000  000       0000  000     000     
@@ -239,23 +239,24 @@
  
 .md
     &.h1
-        color       #008
+        color       #00c
     &.h2
-        color       #006
+        color       #00a
     &.h3
-        color       #004
+        color       #008
     &.h4
-        color       #002
+        color       #006
     &.h5
-        color       #333
+        color       #060
     &.li1
-        color       #8f8
-    &.li2
-        color       #4b4
-    &.li3
         color       #080
+    &.li2
+        color       #090
+    &.li3
+        color       #0a0
     &.bold
-        color       #000
+        color        #000
+        font-weight  bold
         
 .found
     text-decoration  underline

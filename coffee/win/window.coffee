@@ -146,8 +146,6 @@ winMain = ->
     logview     = window.logview     = new LogView 'logview'
     info        = window.info        = new Info editor
     fps         = window.fps         = new FPS()
-
-    scheme.set prefs.get 'scheme', 'dark'
     
     restoreWin()
     
@@ -261,7 +259,7 @@ onClose = ->
 #  0000000   000   000  0000000   0000000   000   000  0000000    
 
 window.onload = -> 
-    
+
     split.resized()
     info.reload()
     win.on 'close', onClose
@@ -306,7 +304,7 @@ reloadTab = (file) ->
         post.emit 'revertFile', file
 
 loadFile = (file, opt={}) ->
-    
+
     file = null if file? and file.length <= 0
     
     editor.saveScrollCursorsAndSelections()

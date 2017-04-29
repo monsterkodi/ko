@@ -24,8 +24,6 @@ class Numbers extends event
         @editor.on 'changed',          @updateColors
         @editor.on 'linesSet',         @updateColors
         @onFontSizeChange()
-
-    setOpacity: (o) -> @elem.style.background = "rgba(0,0,0,#{o})"
     
     #  0000000   0000000   000       0000000   00000000 
     # 000       000   000  000      000   000  000   000

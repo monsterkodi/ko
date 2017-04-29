@@ -9,6 +9,7 @@ frameColor  = #eee
 titleColor  = #ddd
 backColor   = #fff
 textColor   = #000
+brightColor = #fafafa
     
 body
     background          backColor
@@ -30,7 +31,7 @@ body
 .browserRow
 
     &.hover   
-        background      #fafafa
+        background      brightColor
         
     &.active
         background      frameColor
@@ -69,23 +70,25 @@ body
 span.ko
 #commandline-button.active
     &.open
-        color           #8f0
+        color           #000
     &.goto
-        color           #66f
+        color           #666
     &.browse
-        color           #ff0
+        color           #66f
     &.find
-        color           #f5f
+        color           #00a
     &.search
-        color           #0a0
+        color           #a00
     &.term
-        color           #f80
+        color           #0a0
     &.coffee
-        color           #f00
+        color           #800
+    &.debug
+        color           #888
     &.build
         color           #aaa
     &.macro
-        color           #888
+        color           #ccc
 
 #commandline-button.macro
 #commandline-button.coffee
@@ -98,7 +101,7 @@ span.ko
 //  0000000     000     000   000  0000000  
 
 #debugCtrl
-    background          #000
+    background          backColor
 
 #debugCtrl.running #step
 #debugCtrl.running #into
@@ -108,7 +111,7 @@ span.ko
 .ctrl
     color               #888
     &:hover
-        color           backColor
+        color           textColor
     &:active
         color           #ff0
     
@@ -135,10 +138,10 @@ span.ko
     color               #0a0
 
 .info-classes
-    color               #ff8
+    color               #f00
 
 .info-funcs
-    color               #f80
+    color               #f60
 
 .info-files
     color               #44f
@@ -162,7 +165,7 @@ span.ko
 //    000     000     000     0000000  00000000  0000000    000   000  000   000
 
 #titlebar
-    background          titleColor
+    background          backColor
     color               #333
 
 .dot:hover
@@ -174,10 +177,10 @@ span.ko
         color           #008815
 
 #titlebar .winnum
-    color               titleColor
+    color               backColor
 
 #titlebar.focus .winnum
-    color               #555
+    color               titleColor
     
 // 000000000   0000000    0000000   000      000000000  000  00000000   
 //    000     000   000  000   000  000         000     000  000   000  
@@ -195,7 +198,7 @@ span.ko
 //    000     000   000  0000000    0000000     
 
 .tabs
-    background          titleColor
+    background          backColor
     color               #333
     
 #titlebar.focus .tabs
@@ -217,7 +220,7 @@ span.ko
         color           #006600
     
 .tab
-    background          titleColor
+    background          backColor
     &.active
         background      frameColor
     
@@ -288,7 +291,7 @@ span.ko
 .linenumber
     border-right-color  frameColor
     & span
-        color           #ddd
+        color           #eee
         
     &.cursored span 
         color           #888
@@ -314,22 +317,22 @@ span.ko
 // 000   000  00000000     000     000   000
 
 .meta
-    background              #333
+    background              backColor
     
     &.href
-        background-color    #333
+        background-color    #aaf
 
     &.coffeeResult
     &.searchResult
     &.termResult
     &.spacer
         opacity             0.8
-        background          #000
+        background          #fff
 
     &.searchResult
     &.coffeeResult
     &.termResult
-        background      transparent
+        background          transparent
         
     &.git
         opacity             0.4
@@ -418,7 +421,7 @@ span.ko
 //  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  0000000      000   
 
 .commandlist
-    background              frameColor
+    background              brightColor
 
 .commandlist.open .linenumber.selected span    
     color                   #aaf
@@ -441,9 +444,9 @@ span.ko
         color               backColor
     
 .autocomplete-list 
-    background              #222
+    background              frameColor
     &::-webkit-scrollbar
-        background-color    #333
+        background-color    titleColor
     &::-webkit-scrollbar-thumb
         background-color    #55b
     

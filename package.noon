@@ -54,6 +54,7 @@ dependencies
                 noon            >=1.1.0
                 opener          ^1.4.3
                 performance-now  ^2.1.0
+                pug             ^2.0.0-beta.12
                 source-map      ^0.5.6
                 sprintf-js      ^1.0.3
                 textextensions  ^2.1.0

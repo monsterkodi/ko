@@ -101,20 +101,26 @@ class Syntax
     #  0000000   0000000   0000000   0000000   000   000
     
     colorForClassnames: (clss) ->
+        
         if not @colors[clss]?
+            
             div = elem class: clss
             document.body.appendChild div
-            @colors[clss] = window.getComputedStyle(div).color
+            color = window.getComputedStyle(div).color
+            @colors[clss] = color
             div.remove()
+            
         return @colors[clss]
 
     colorForStyle: (styl) ->
+
         if not @colors[styl]?
             div = elem 'div'
             div.style = styl
             document.body.appendChild div
             @colors[styl] = window.getComputedStyle(div).color
             div.remove()
+            
         return @colors[styl]
 
     #  0000000  000   000  00000000  0000000     0000000   000   000   0000000 

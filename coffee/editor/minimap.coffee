@@ -58,7 +58,7 @@ class Minimap
         @scroll.on 'exposeLines', @onExposeLines
         @scroll.on 'vanishLines', @onVanishLines
         @scroll.on 'exposeLine',  @exposeLine
-
+        
         @onScroll()  
         @drawLines()
         @drawTopBot()
