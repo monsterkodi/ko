@@ -78,10 +78,11 @@ class TextEditor extends Editor
         if @minimap?
             post.removeListener 'schemeChanged', @onSchemeChanged
             
+        @scrollbar?.del()    
+        
         @view.removeEventListener 'keydown', @onKeyDown
         @view.removeEventListener 'blur',    @onBlur
         @view.removeEventListener 'focus',   @onFocus
-        # @view.remove()
         @view.innerHTML = ''
     
     onBlur:  => @emit 'blur', @    

@@ -75,7 +75,7 @@ class Minimap
         @selecti.width = @width
         ctx = @selecti.getContext '2d'
 
-        ctx.fillStyle = '#444' 
+        ctx.fillStyle = @editor.syntax.colorForClassnames 'selection'
         for r in rangesFromTopToBotInRanges @scroll.exposeTop, @scroll.exposeBot, @editor.selections()
             y = (r[0]-@scroll.exposeTop)*@scroll.lineHeight
             if 2*r[1][0] < @width
@@ -105,7 +105,7 @@ class Minimap
         @highlig.width = @width
         ctx = @highlig.getContext '2d'
 
-        ctx.fillStyle = 'rgba(255,0,255,0.5)'
+        ctx.fillStyle = @editor.syntax.colorForClassnames 'highlight'
         for r in rangesFromTopToBotInRanges @scroll.exposeTop, @scroll.exposeBot, @editor.highlights()
             y = (r[0]-@scroll.exposeTop)*@scroll.lineHeight
             if 2*r[1][0] < @width                

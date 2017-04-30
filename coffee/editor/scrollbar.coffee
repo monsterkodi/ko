@@ -12,6 +12,7 @@ scheme = require '../tools/scheme'
 class Scrollbar
 
     constructor: (@editor) ->
+        
         @editor.scroll.on 'scroll', @update
         @editor.on 'viewHeight', @update
 
@@ -31,6 +32,10 @@ class Scrollbar
         @editor.view.addEventListener 'wheel',  @onWheel
         
         @scrollX = @scrollY = 0
+        
+    del: -> 
+        
+        @editor.view.removeEventListener 'wheel',  @onWheel
 
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000
