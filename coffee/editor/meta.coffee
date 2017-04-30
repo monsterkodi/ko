@@ -114,7 +114,7 @@ class Meta
         for meta in metas
             meta[2].span = e.numberSpan
             switch meta[2].clss
-                when 'searchResult', 'termCommand', 'termResult', 'coffeeCommand', 'coffeeResult'
+                when 'searchResult', 'termCommand', 'termResult', 'coffeeCommand', 'coffeeResult', 'commandlistItem'
                     num = meta[2].state == 'unsaved' and @saveButton(meta[0]) 
                     num = meta[2].line? and meta[2].line if not num
                     num = meta[2].href?.split(':')[1] if not num

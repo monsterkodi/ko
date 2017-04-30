@@ -5,7 +5,7 @@
 # 000   000  000  000       000       000   000  000   000  000   000
 # 0000000    000  000       000       0000000    000   000  000   000
 
-{ elem, str, error, log, 
+{ elem, str, empty, error, log, 
 }        = require 'kxk'
 forkfunc = require 'fork-func'
 
@@ -60,7 +60,10 @@ class Diffbar
         
         if @editor.currentFile
             forkfunc '../tools/gitdiff', @editor.currentFile, (err, changes) =>
-                return if err
+                if not empty err
+                    @changes = null
+                    # log 'ffunc err', err
+                    return 
                 if changes.file == @editor.currentFile
                     @changes = changes
                     @paint()

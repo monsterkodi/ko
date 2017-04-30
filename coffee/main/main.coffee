@@ -419,6 +419,8 @@ class Main
         {width, height} = @screenSize()
         ww = height + 122
         
+        scheme = prefs.get 'scheme', 'dark'
+        
         win = new BrowserWindow
             x:                parseInt (width-ww)/2
             y:                0
@@ -431,13 +433,13 @@ class Main
             acceptFirstMouse: true
             show:             false
             hasShadow:        false
+            backgroundColor:  scheme == 'bright' and "#fff" or '#000'
             titleBarStyle:    'hidden'
 
         if opt.restore?
             newStash = path.join app.getPath('userData'), 'win', "#{win.id}.noon"
             fs.copySync opt.restore, newStash
-        
-        scheme = prefs.get 'scheme', 'dark'
+                
         htmlFile  = resolve "#{__dirname}/../#{scheme}.html"
         if not fileExists htmlFile
             pugRender = pug.compileFile "#{__dirname}/../../pug/index.pug"

@@ -1,16 +1,18 @@
+
 # 00000000  000  000   000  0000000  
 # 000       000  0000  000  000   000
 # 000000    000  000 0 000  000   000
 # 000       000  000  0000  000   000
 # 000       000  000   000  0000000  
 
-{
-log}    = require 'kxk'
+{ log
+}       = require 'kxk'
 Command = require '../commandline/command'
 
 class Find extends Command
 
     constructor: (@commandline) ->
+        
         @shortcuts = ["command+f", "ctrl+f", "alt+f", "alt+ctrl+f", "command+alt+f", "command+ctrl+f"]
         @types     = ['str',  'Str',   'reg',    'Reg',    'fuzzy', 'glob']
         @names     = ['find', 'Find',  '/find/', '/Find/', 'fiZd',  'f*nd']
@@ -35,6 +37,7 @@ class Find extends Command
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
 
     changed: (command) ->
+        
         super command
         if editor = window.editorWithName @focus
             if command.length
@@ -54,6 +57,7 @@ class Find extends Command
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
     
     execute: (command) ->
+        
         command = super command
         if editor = window.editorWithName @focus
             editor.highlightText command, 
@@ -71,6 +75,7 @@ class Find extends Command
     # 000   000  00000000     000   
     
     handleModKeyComboEvent: (mod, key, combo, event) -> 
+        
         switch combo
             when 'shift+enter', 'command+shift+g'
                 if editor = window.editorWithName @focus

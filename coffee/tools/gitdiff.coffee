@@ -13,14 +13,9 @@ module.exports = (file) ->
 
     gitCommand = "git --no-pager diff -U0 \"#{escapePath file}\""
 
-    try    
-        result = childp.execSync gitCommand, 
-            cwd:        path.dirname file
-            encoding:   'utf8' 
-
-    catch err
-        # console.log 'err:', err
-        throw err
+    result = childp.execSync gitCommand, 
+        cwd: path.dirname file
+        encoding: 'utf8' 
     
     info  = file:file, changes:[]
     lines = (chalk.stripColor l for l in result.split '\n')
@@ -65,6 +60,5 @@ module.exports = (file) ->
     
             info.changes.push change
 
-    # log info       
     return info
     

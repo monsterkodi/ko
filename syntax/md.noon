@@ -42,3 +42,5 @@
 
 (\<!---|---\>)                            comment.marker
 
+# salter headers
+^(\s*\#\s+)([0\s]+)$        . comment.marker . comment.header

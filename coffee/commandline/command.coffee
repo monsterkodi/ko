@@ -197,6 +197,7 @@ class Command
     # 000   000  00000000  000   000     000   
     
     next: -> 
+        
         if not @commandList? and @listItems().length
             @showItems @listItems() 
             @select -1
@@ -217,14 +218,15 @@ class Command
     # 000   000  000  0000000    00000000
          
     onBlur: => 
+        
         if not @skipBlur
             @hideList()
         else
             @skipBlur = null
             
     hideList: ->
-        # return
-        @commandList?.view.remove()
+        
+        @commandList?.del()
         @commandList = null
 
     cancelList: -> @hideList()

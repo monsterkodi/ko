@@ -71,11 +71,19 @@ class TextEditor extends Editor
             @[featureName] = new featureClss @                
 
         if @minimap?            
-            post.on 'schemeChanged', =>
-                updateMinimap = => @minimap.drawLines()
-                setTimeout updateMinimap, 10
+            post.on 'schemeChanged', @onSchemeChanged
 
-            
+    del: ->
+        
+        if @minimap?
+            post.removeListeners 'schemeChanged', @onSchemeChanged
+        @view.remove()
+        
+    onSchemeChanged: =>
+        
+        updateMinimap = => @minimap.drawLines()
+        setTimeout updateMinimap, 10
+                
     # 000       0000000   000   000  00000000  00000000    0000000
     # 000      000   000   000 000   000       000   000  000     
     # 000      000000000    00000    0000000   0000000    0000000 

@@ -53,7 +53,7 @@ class CommandList extends TextEditor
                 text: text
                 rngs: rngs
                 type: item.type ? @syntaxName
-                clss: 'searchResult'
+                clss: 'commandlistItem'
                 list: index
             index += 1
         @view.style.height = "#{@size.lineHeight * Math.min @maxLines, items.length}px"

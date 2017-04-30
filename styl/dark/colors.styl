@@ -8,6 +8,7 @@
 frameColor = #222
 titleColor = #333
 backColor  = #000
+darkColor  = #1a1a1a
     
 body
     background          backColor
@@ -49,6 +50,23 @@ body
 #commandline-editor
     color               #fff
     background          backColor
+
+//  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000   0000000  000000000
+// 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  000          000   
+// 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  0000000      000   
+// 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000       000     000   
+//  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  0000000      000   
+
+.commandlist
+    background              darkColor
+
+.commandlist.open .linenumber.selected span    
+    color                   #aaf
+.commandlist.goto .linenumber.selected span    
+    color                   #66f
+.commandlist.term .linenumber.selected span    
+    color                   #f80
+
 
 // 0000000    000   000  000000000  000000000   0000000   000   000  
 // 000   000  000   000     000        000     000   000  0000  000  
@@ -311,7 +329,7 @@ span.ko
 // 000   000  00000000     000     000   000
 
 .meta
-    background              backColor
+    //background              backColor
     
     &.href
         background-color    titleColor
@@ -323,11 +341,6 @@ span.ko
         opacity             0.8        
         background          backColor
 
-    &.searchResult
-    &.coffeeResult
-    &.termResult
-        background          transparent
-        
     &.git
         opacity             0.4
         background          #0f0
@@ -391,7 +404,6 @@ span.ko
         background          #444 // focus
         
 .selection
-    background  
     background              #282828 // no focus #ff0 #f00 #aaf
 
 // 000      000   0000000  000000000
@@ -411,23 +423,6 @@ span.ko
         color               #006600
     & .winid    
         color               #008815
-
-//  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000   0000000  000000000
-// 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  000          000   
-// 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  0000000      000   
-// 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000       000     000   
-//  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  0000000      000   
-
-.commandlist
-    background              #1a1a1a
-
-.commandlist.open .linenumber.selected span    
-    color                   #aaf
-.commandlist.goto .linenumber.selected span    
-    color                   #66f
-.commandlist.term .linenumber.selected span    
-    color                   #f80
-
 
 //  0000000   000   000  000000000   0000000    0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
 // 000   000  000   000     000     000   000  000       000   000  000   000  000   000  000      000          000     000     
