@@ -5,7 +5,7 @@
 # 000   000  000   000     000     000   000  000       000   000  000 0 000  000        000      000          000     000     
 # 000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
 
-{clamp, post, elem, error, log, $, _
+{ stopEvent, upAttr, clamp, post, empty, elem, error, log, $, _
 }        = require 'kxk'
 Indexer  = require '../main/indexer'
 event    = require 'events'
@@ -14,10 +14,11 @@ class Autocomplete extends event
 
     constructor: (@editor) -> 
         
-        @wordlist = []
-        @wordinfo = {}
-        @clones = []
-        @cloned = []
+        @wordinfo  = {}
+        @wordlist  = []
+        @matchList = []
+        @clones    = []
+        @cloned    = []
         
         @close()
         
@@ -125,13 +126,66 @@ class Autocomplete extends event
             log "warning! no sp? #{cr.left} #{cr.top}"
         
         if @matchList.length
+            
             @list = elem class: 'autocomplete-list'
+            @list.addEventListener 'wheel', @onWheel
+            @list.addEventListener 'mousedown', @onMouseDown
+            index = 0
             for m in @matchList
-                item = elem class: 'autocomplete-item'
+                item = elem class: 'autocomplete-item', index:index++
                 item.textContent = m
                 @list.appendChild item
             cursor.appendChild @list
+
+    #  0000000  000       0000000    0000000  00000000
+    # 000       000      000   000  000       000     
+    # 000       000      000   000  0000000   0000000 
+    # 000       000      000   000       000  000     
+    #  0000000  0000000   0000000   0000000   00000000
+
+    close: =>
+        
+        if @list?
+            @list.removeEventListener 'wheel', @onWheel
+            @list.removeEventListener 'click', @onClick
+            @list.remove()
             
+        @span?.remove()
+        @selected   = -1
+        @list       = null
+        @span       = null
+        @completion = null
+        @firstMatch = null
+        
+        for c in @clones
+            c.remove()
+
+        for c in @cloned
+            c.style.display = 'initial'
+        
+        @clones = []
+        @cloned = []
+        @matchList  = []
+        @
+
+    onWheel: (event) =>
+        
+        @list.scrollTop += event.deltaY
+        stopEvent event    
+    
+    onMouseDown: (event) =>
+        
+        index = upAttr event.target, 'index'
+        if index 
+            @select index
+            @onEnter()
+        stopEvent event
+
+    onEnter: ->  
+        
+        @editor.pasteText @selectedCompletion()
+        @close()
+
     selectedCompletion: ->
         
         if @selected >= 0
@@ -148,8 +202,11 @@ class Autocomplete extends event
     navigate: (delta) ->
         
         return if not @list
+        @select clamp -1, @matchList.length-1, @selected+delta
+        
+    select: (index) ->
         @list.children[@selected]?.classList.remove 'selected'
-        @selected = clamp -1, @matchList.length-1, @selected+delta
+        @selected = index
         if @selected >= 0
             @list.children[@selected]?.classList.add 'selected'
             @list.children[@selected]?.scrollIntoViewIfNeeded()
@@ -170,6 +227,7 @@ class Autocomplete extends event
 
     moveClonesBy: (numChars) ->
         
+        return if empty @clones
         beforeLength = @clones[0].innerHTML.length
         for ci in [1...@clones.length]
             c = @clones[ci]
@@ -255,31 +313,7 @@ class Autocomplete extends event
         
     cursorWord: -> @cursorWords()[1]
                 
-    #  0000000  000       0000000    0000000  00000000
-    # 000       000      000   000  000       000     
-    # 000       000      000   000  0000000   0000000 
-    # 000       000      000   000       000  000     
-    #  0000000  0000000   0000000   0000000   00000000
-
-    close: =>
-        
-        @list?.remove()
-        @span?.remove()
-        @selected   = -1
-        @list       = null
-        @span       = null
-        @completion = null
-        @firstMatch = null
-        
-        for c in @clones
-            c.remove()
-        for c in @cloned
-            c.style.display = 'initial'
-        
-        @clones = []
-        @cloned = []
-        @matchList  = []
-
+    
     #  0000000   000   000
     # 000   000  0000  000
     # 000   000  000 0 000
@@ -303,10 +337,7 @@ class Autocomplete extends event
         return 'unhandled' if not @span?
         
         switch combo
-            when 'enter'                
-                @editor.pasteText @selectedCompletion()
-                @close()
-                return
+            when 'enter' then return @onEnter()               
             
         if @list? 
             switch combo

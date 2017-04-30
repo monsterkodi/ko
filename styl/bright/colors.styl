@@ -9,6 +9,7 @@ frameColor  = #eee
 titleColor  = #ddd
 backColor   = #fff
 textColor   = #000
+focusColor  = #ddf
 brightColor = #fafafa
     
 body
@@ -37,7 +38,7 @@ body
         background      frameColor
         
 .browserColumn.focus .browserRow.active
-    background          #ddf
+    background          focusColor
     
 .browserImage
     border              1px solid frameColor
@@ -51,6 +52,22 @@ body
 #commandline-editor
     color               textColor
     background          backColor
+
+//  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000   0000000  000000000
+// 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  000          000   
+// 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  0000000      000   
+// 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000       000     000   
+//  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  0000000      000   
+
+.commandlist
+    background              brightColor
+
+.commandlist.open .linenumber.selected span    
+    color                   #aaf
+.commandlist.goto .linenumber.selected span    
+    color                   #66f
+.commandlist.term .linenumber.selected span    
+    color                   #f80
 
 // 0000000    000   000  000000000  000000000   0000000   000   000  
 // 000   000  000   000     000        000     000   000  0000  000  
@@ -416,34 +433,17 @@ span.ko
     & .winid    
         color               #008815
 
-//  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000   0000000  000000000
-// 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  000          000   
-// 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  0000000      000   
-// 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000       000     000   
-//  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  0000000      000   
-
-.commandlist
-    background              brightColor
-
-.commandlist.open .linenumber.selected span    
-    color                   #aaf
-.commandlist.goto .linenumber.selected span    
-    color                   #66f
-.commandlist.term .linenumber.selected span    
-    color                   #f80
-
-
 //  0000000   000   000  000000000   0000000    0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
 // 000   000  000   000     000     000   000  000       000   000  000   000  000   000  000      000          000     000     
 // 000000000  000   000     000     000   000  000       000   000  000000000  00000000   000      0000000      000     0000000 
 // 000   000  000   000     000     000   000  000       000   000  000 0 000  000        000      000          000     000     
 // 000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
 
-.autocomplete-span
-    background              #22a
-    color                   #ff0
-    &.selected
-        color               backColor
+// .autocomplete-span
+    // background              focusColor
+    // color                   #ff0
+    // &.selected
+        // color               backColor
     
 .autocomplete-list 
     background              frameColor
@@ -453,9 +453,9 @@ span.ko
         background-color    #55b
     
 .autocomplete-item
-    color                   #ccc
+    color                   textColor
     &.selected
-        background          #55b
+        background          #88f
         color               #ff0
 
 //  0000000   0000000  00000000    0000000   000      000      0000000     0000000   00000000 

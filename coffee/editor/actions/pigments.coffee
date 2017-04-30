@@ -48,14 +48,16 @@ module.exports =
         
         @pigmentsClear()
         
-        test = /#[a-fA-F0-9]{3}/
+        test = /#[a-fA-F0-9]{3}|rgba?/
         trio = /#[a-fA-F0-9]{3}(?![\w\d])/
         hexa = /#[a-fA-F0-9]{6}(?![\w\d])/
+        rgb  = /rgb\s*\(\s*\d+\s*\,\s*\d+\s*\,\s*\d+\s*\)/
+        rgba = /rgba\s*\(\s*\d+\s*\,\s*\d+\s*\,\s*\d+\s*\,\s*\d+\.?\d*\s*\)/
 
         for li in [0...@numLines()]
             line = @line li 
             if test.test line
-                rngs = matchr.ranges [[trio, 'trio'], [hexa, 'hexa']], line
+                rngs = matchr.ranges [[trio, 'trio'], [hexa, 'hexa'], [rgb, 'rgb'], [rgba, 'rgbaa']], line
                 ri = -1
                 for rng in rngs
                     ri++
