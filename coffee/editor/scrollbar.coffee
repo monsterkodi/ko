@@ -6,7 +6,8 @@
 # 0000000    0000000  000   000   0000000   0000000  0000000  0000000    000   000  000   000
 
 { stopEvent, elem, clamp, drag, log
-} = require 'kxk'
+}      = require 'kxk'
+scheme = require '../tools/scheme'
 
 class Scrollbar
 
@@ -106,10 +107,10 @@ class Scrollbar
             @handle.style.height  = "#{scrollHeight}px"
             @handle.style.width   = "2px"
             
-            f = 1 - clamp 0, 1, (scrollHeight-10)/200
-            g = 64
-            c = "rgb(#{g + parseInt f*100},#{g + parseInt f*100},#{parseInt g+f*(255-g)})"
-            
-            @handle.style.backgroundColor = c
+            cf = 1 - clamp 0, 1, (scrollHeight-10)/200
+            longColor  = scheme.colorForClass 'scrollbar long'
+            shortColor = scheme.colorForClass 'scrollbar short'
+            cs = scheme.fadeColor longColor, shortColor, cf
+            @handle.style.backgroundColor = cs
 
 module.exports = Scrollbar

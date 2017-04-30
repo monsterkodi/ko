@@ -7,6 +7,7 @@
 
 { stopEvent, clamp, drag, elem, log
 } = require 'kxk'
+scheme = require '../tools/scheme'
 
 class Scroller
 
@@ -119,8 +120,10 @@ class Scroller
             @handle.style.height  = "#{scrollHeight}px"
             @handle.style.width   = "2px"
             
+            longColor  = scheme.colorForClass 'scroller long'
+            shortColor = scheme.colorForClass 'scroller short'
             cf = 1 - clamp 0, 1, (scrollHeight-10)/200
-            cs = "rgb(#{parseInt 47+cf*80},#{parseInt 47+cf*80},#{parseInt 47+cf*208})"
+            cs = scheme.fadeColor longColor, shortColor, cf
             @handle.style.backgroundColor = cs
 
         if @column.parent?.type == 'preview'

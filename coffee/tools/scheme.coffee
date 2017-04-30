@@ -9,6 +9,8 @@
 
 class Scheme
     
+    @colors = {}
+    
     @toggle: (schemes = ['dark', 'bright']) ->
         
         link =$ '.scheme-link'
@@ -20,6 +22,8 @@ class Scheme
         Scheme.set nextScheme
     
     @set: (scheme) ->
+        
+        @colors = {}
         
         for link in document.querySelectorAll '.scheme-link'
             css = path.basename link.href
@@ -33,6 +37,34 @@ class Scheme
             
         prefs.set 'scheme', scheme    
         post.emit 'schemeChanged', scheme
+
+    @colorForClass: (clss) ->
         
+        if not @colors[clss]?
+            
+            div = elem class: clss
+            document.body.appendChild div
+            color = window.getComputedStyle(div).color
+            @colors[clss] = color
+            div.remove()
+            
+        return @colors[clss]
+        
+    @fadeColor: (a,b,f) ->
+        av = @parseColor a
+        bv = @parseColor b
+        fv = [0,0,0]
+        for i in [0...3]
+            fv[i] = Math.round (1-f) * av[i] + f * bv[i]
+        "rgb(#{fv[0]}, #{fv[1]}, #{fv[2]})"
+    
+    @parseColor: (c) ->
+        if _.isString(c) and c.startsWith 'rgb'
+            s = c.indexOf '('
+            e = c.indexOf ')'
+            c = c.slice s+1, e
+            v = c.split ','
+            return [parseInt(v[0]), parseInt(v[1]), parseInt(v[2])]
+    
 module.exports = Scheme
 
