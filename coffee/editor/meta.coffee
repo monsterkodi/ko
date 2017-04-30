@@ -153,7 +153,7 @@ class Meta
         if meta[2].style?
             for k,v of meta[2].style
                 div.style[k] = v
-
+        
         @setMetaPos meta, tx, ty
 
         if not meta[2].no_x
@@ -190,7 +190,8 @@ class Meta
         
         lineMeta = [meta.line, [meta.start, meta.end], meta]
         @metas.push lineMeta
-        @addDiv lineMeta
+        if @editor.scroll.exposeTop <= meta.line <= @editor.scroll.exposeBot
+            @addDiv lineMeta
         
     # 0000000    000  00000000  00000000  
     # 000   000  000  000       000       
@@ -226,7 +227,8 @@ class Meta
         meta.no_x = true
         lineMeta = [meta.line, [0, 0], meta]
         @metas.push lineMeta
-        @addDiv lineMeta
+        if @editor.scroll.exposeTop <= meta.line <= @editor.scroll.exposeBot
+            @addDiv lineMeta
                     
     #  0000000  000      000   0000000  000   000
     # 000       000      000  000       000  000 
@@ -276,17 +278,20 @@ class Meta
     # 00000000  000   000  000         0000000   0000000   00000000
         
     onLineExposed: (e) =>
-        # log 'on line exposed', e.lineIndex
+
         for meta in @metasAtLineIndex e.lineIndex
             @addDiv meta
         
-    onLinesExposed: (e) => 
-        # log 'on LINES exposed', e
+    onLinesExposed: (e) =>
+        
         @updatePositionsBelowLineIndex e.top
         
-    onExposeTopChanged: (e) => @updatePositionsBelowLineIndex e.new
+    onExposeTopChanged: (e) => 
+        
+        @updatePositionsBelowLineIndex e.new
         
     updatePositionsBelowLineIndex: (li) ->   
+        
         size = @editor.size
         for meta in rangesFromTopToBotInRanges li, @editor.scroll.exposeBot, @metas
             tx = size.charWidth *  meta[1][0] + size.offsetX

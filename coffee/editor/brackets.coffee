@@ -53,7 +53,7 @@ class Brackets
                             stack.pop()                            
                             continue
                         else
-                            log "brackets stack mismatch at #{pp[0]} #{pp[1]} stack: #{_.last(stack).match} != prev: #{prev.match}"
+                            # log "brackets stack mismatch at #{pp[0]} #{pp[1]} stack: #{_.last(stack).match} != prev: #{prev.match}"
                             return # stack mismatch
                     lastOpen = prev
                     break
