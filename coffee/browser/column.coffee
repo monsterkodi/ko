@@ -63,6 +63,7 @@ class Column
         @clearSearch()
         delete @parent
         @div.scrollTop = 0
+        @editor?.del()
         @table.innerHTML = ''
         @rows = []
         @scroll.update()

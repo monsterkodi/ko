@@ -5,7 +5,7 @@
 # 000   000  000   000  000   000  000       000          000           000   000  000   000  000   000  000   000       000  000       000   000  
 #  0000000   0000000     0000000   00000000   0000000     000           0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 
-{ fileName, empty, path, post, str, error, log, _
+{ fileName, empty, elem, path, post, str, error, log, _
 }          = require 'kxk'
 jsbeauty   = require 'js-beautify'
 Browser    = require './browser'
@@ -242,9 +242,8 @@ class ObjectBrowser extends Browser
     loadLines: (lines, opt) ->
         col = @emptyColumn opt?.column
         @clearColumnsFrom col.index, pop:true
-        editor = new ObjectEditor col.table, opt
-        editor.setLines lines
-        col.table.style.height = '100%'
+        col.editor = new ObjectEditor col.table, opt
+        col.editor.setLines lines
 
     # 000  000000000  00000000  00     00  
     # 000     000     000       000   000  

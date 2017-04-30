@@ -26,11 +26,7 @@ class TextEditor extends Editor
         
         @layers = elem class: "layers"
         @view.appendChild @layers
-        
-        @view.onpaste = (event) => log "view on paste #{@name}", event
-        @view.onblur  = (event) => @emit 'blur', @
-        @view.onfocus = (event) => @emit 'focus', @
-        
+                
         layer = []
         layer.push 'selections'
         layer.push 'highlights'
@@ -61,7 +57,10 @@ class TextEditor extends Editor
         @scroll.on 'vanishLines', @vanishLines
         @scroll.on 'exposeLine',  @exposeLine
 
-        @view.onkeydown = @onKeyDown
+        @view.addEventListener 'blur',    @onBlur
+        @view.addEventListener 'focus',   @onFocus
+        @view.addEventListener 'keydown', @onKeyDown
+        
         @initDrag()
         
         super
@@ -77,9 +76,16 @@ class TextEditor extends Editor
     del: ->
         
         if @minimap?
-            post.removeListeners 'schemeChanged', @onSchemeChanged
-        @view.remove()
-        
+            post.removeListener 'schemeChanged', @onSchemeChanged
+            
+        @view.removeEventListener 'keydown', @onKeyDown
+        @view.removeEventListener 'blur',    @onBlur
+        @view.removeEventListener 'focus',   @onFocus
+        # @view.remove()
+        @view.innerHTML = ''
+    
+    onBlur:  => @emit 'blur', @    
+    onFocus: => @emit 'focus', @    
     onSchemeChanged: =>
         
         updateMinimap = => @minimap.drawLines()

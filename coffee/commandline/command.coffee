@@ -227,6 +227,7 @@ class Command
     hideList: ->
         
         @commandList?.del()
+        @commandList?.view?.remove()
         @commandList = null
 
     cancelList: -> @hideList()
