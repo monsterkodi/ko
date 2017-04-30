@@ -14,7 +14,7 @@ class Syntax
 
     constructor: (@editor) ->
         
-        @name ='txt'
+        @name = @editor.syntaxName ? 'txt'
         @diss = []
         @colors = {}
         
@@ -67,9 +67,7 @@ class Syntax
     # 000       000      000       000   000  000   000
     #  0000000  0000000  00000000  000   000  000   000
 
-    clear: ->
-        # log 'syntax.clear' if @editor.name == 'editor'
-        @diss = []
+    clear: -> @diss = []
 
     # 0000000    000   0000000   0000000
     # 000   000  000  000       000     
@@ -82,15 +80,12 @@ class Syntax
 
     getDiss: (li, opt) ->
         if not @diss[li]?
-            # log "getDiss @diss[#{li}] = " + @editor.line(li) if @editor.name == 'editor'
             rgs  = matchr.ranges Syntax.matchrConfigs[@name], @editor.line(li)
             diss = matchr.dissect rgs, opt
             @diss[li] = diss
-        # log "getDiss #{li}:" + Syntax.lineForDiss(@diss[li]) if @editor.name == 'editor'
         @diss[li]
     
     setDiss: (li, dss) ->
-        # log "setDiss @diss[#{li}] = " + Syntax.lineForDiss(dss) if @editor.name == 'editor'
         @diss[li] = dss
         @diss[li]
             

@@ -63,7 +63,7 @@ class Row
             else
                 if @item.file?
                     post.emit 'jumpTo', file:@item.file, line:@item.line
-                else if @column.parent.obj?
+                else if @column.parent.obj? and @column.parent.type == 'obj'
                     @browser.loadObjectItem  @item, column:@column.index+1
                     if @item.type == 'obj'
                         @browser.previewObjectItem  @item, column:@column.index+2

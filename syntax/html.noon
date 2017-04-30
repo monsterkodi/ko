@@ -12,7 +12,7 @@
 
 # tags
 
-(<\/?)(html|body|section|header|footer|meta|script|style|head|ul|li|a|b|br|p|center|table|title|link|nav|tr|th|td|div|span|img|h\d|dt|blockquote|pre|hr|svg|path)(\/?>|\ )   . keyword.marker . keyword . keyword.marker
+(<\/?)(html|body|section|header|footer|meta|script|style|head|ul|li|a|b|br|p|center|table|title|link|nav|tr|th|td|div|span|img|h\d|dt|blockquote|pre|hr|canvas|svg|path)(\/?>|\ )   . keyword.marker . keyword . keyword.marker
 \>                             keyword.marker
 
 (<!DOCTYPE)(.*)              . class.marker . class

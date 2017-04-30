@@ -53,6 +53,7 @@ class TextEditor extends Editor
             lineHeight: @size.lineHeight
             viewHeight: @viewHeight()
             exposeMax: -5
+            
         @scroll.name = @name
             
         @scroll.on 'clearLines',  @clearLines
@@ -115,6 +116,7 @@ class TextEditor extends Editor
         
         if @syntax.name == 'txt'
             @syntax.name = syntax.shebang text.slice 0, text.search /\r?\n/
+            
         super text
                 
     setLines: (lines) ->

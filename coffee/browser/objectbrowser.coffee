@@ -11,6 +11,19 @@ jsbeauty   = require 'js-beautify'
 Browser    = require './browser'
 isTextFile = require '../tools/istextfile'
 
+TextEditor = require '../editor/texteditor'
+class ObjectEditor extends TextEditor
+
+    constructor: (viewElem, opt) ->
+        
+        @fontSizeDefault = 14
+        @syntaxName = opt?.syntax ? 'js'
+        log '@syntaxName', @syntaxName
+        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Brackets', 'Strings']
+
+        @numbers.elem.style.fontSize = "#{@fontSizeDefault}px"        
+
+
 class ObjectBrowser extends Browser
     
     constructor: (@view) -> 
@@ -65,7 +78,7 @@ class ObjectBrowser extends Browser
                 items = []
                 for key,value of obj # own?
                     items.push itemForKeyValue key, value
-                    _.last(items).preview = false if value.preview == false
+                    _.last(items).preview = false if value?.preview == false
 
         if @valueType(obj) not in ['func', 'array'] and not dontSort
             @sortByType items
@@ -223,6 +236,19 @@ class ObjectBrowser extends Browser
         
         @loadItems items, opt
 
+    # 000      000  000   000  00000000   0000000  
+    # 000      000  0000  000  000       000       
+    # 000      000  000 0 000  0000000   0000000   
+    # 000      000  000  0000  000            000  
+    # 0000000  000  000   000  00000000  0000000   
+    
+    loadLines: (lines, opt) ->
+        col = @emptyColumn opt?.column
+        @clearColumnsFrom col.index, pop:true
+        editor = new ObjectEditor col.table, opt
+        editor.setLines lines
+        col.table.style.height = '100%'
+
     # 000  000000000  00000000  00     00  
     # 000     000     000       000   000  
     # 000     000     0000000   000000000  
@@ -234,8 +260,8 @@ class ObjectBrowser extends Browser
         opt.parent = item
         switch item.type
             when 'obj'   then @loadObject item.obj, opt
-            when 'func'  then @loadArray  item.obj.toString().split('\n'), opt
-            when 'elem'  then @loadArray  @htmlLines(item.obj), opt
+            when 'func'  then @loadLines  item.obj.toString().split('\n'), _.defaults opt, syntax:'js'
+            when 'elem'  then @loadLines  @htmlLines(item.obj), _.defaults opt, syntax:'html'
             when 'array' then @loadArray  item.obj, opt
             else
                 oi = 
