@@ -15,7 +15,6 @@ class Autocomplete extends event
     constructor: (@editor) -> 
         
         @wordinfo  = {}
-        @wordlist  = []
         @matchList = []
         @clones    = []
         @cloned    = []
@@ -53,16 +52,21 @@ class Autocomplete extends event
         @word = _.last info.before.split @splitRegExp
         switch info.action
             
-            when 'delete' # ever happening?           
+            when 'delete' # ever happening?
+                log 'delete!!!!'
                 if @wordinfo[@word]?.temp and @wordinfo[@word]?.count <= 0
-                    _.pull @wordlist, @word
                     delete @wordinfo[@word]
                     
             when 'insert'
-                return if not @word?.length
-                return if not @wordlist?.length
                 
-                for w in @wordlist
+                return if not @word?.length
+                return if empty @wordinfo
+                
+                wordlist = _.keys @wordinfo
+                matches = _.filter wordlist, (w) => w.startsWith(@word) and w.length > @word.length            
+                matches.sort (a,b) -> a.localeCompare b
+                
+                for w in matches
                     if w.startsWith(@word) and w.length > @word.length
                         if not @firstMatch
                             @firstMatch = w 
@@ -176,7 +180,7 @@ class Autocomplete extends event
     onMouseDown: (event) =>
         
         index = upAttr event.target, 'index'
-        if index 
+        if index            
             @select index
             @onEnter()
         stopEvent event
@@ -279,15 +283,6 @@ class Autocomplete extends event
                 info.temp = true if opt.action is 'change'
                 @wordinfo[w] = info 
                 
-        @updateWordlist()
-    
-    updateWordlist: ->
-        
-        weight = (wi) -> wi[1].count
-        sorted = ([w,i] for w,i of @wordinfo).sort (a,b) -> weight(b) - weight(a)
-        @wordlist = (s[0] for s in sorted)
-        @emit 'wordCount', @wordlist.length
-         
     onFuncsCount: =>
         
         funcs = post.get 'indexer', 'funcs'
@@ -296,8 +291,6 @@ class Autocomplete extends event
             info.count = Math.max 20, info.count ? 1
             @wordinfo[func] = info
             
-        @updateWordlist()
-                
     #  0000000  000   000  00000000    0000000   0000000   00000000   000   000   0000000   00000000   0000000  
     # 000       000   000  000   000  000       000   000  000   000  000 0 000  000   000  000   000  000   000
     # 000       000   000  0000000    0000000   000   000  0000000    000000000  000   000  0000000    000   000
