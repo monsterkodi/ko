@@ -161,7 +161,7 @@ class TextEditor extends Editor
 
     setFontSize: (fontSize) =>
         
-        @view.style.fontSize = "#{fontSize}px"
+        @layers.style.fontSize = "#{fontSize}px"
         @size.numbersWidth = 'Numbers' in @config.features and 50 or 0
         @size.fontSize     = fontSize
         @size.lineHeight   = Math.floor fontSize * @config.lineHeight

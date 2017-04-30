@@ -18,11 +18,8 @@ class ObjectEditor extends TextEditor
         
         @fontSizeDefault = 14
         @syntaxName = opt?.syntax ? 'js'
-        log '@syntaxName', @syntaxName
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Brackets', 'Strings']
-
         @numbers.elem.style.fontSize = "#{@fontSizeDefault}px"        
-
 
 class ObjectBrowser extends Browser
     

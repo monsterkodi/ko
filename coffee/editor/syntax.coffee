@@ -108,7 +108,7 @@ class Syntax
         return @colors[clss]
 
     colorForStyle: (styl) ->
-        log 'syntax.colorForStyle', styl
+
         if not @colors[styl]?
             div = elem 'div'
             div.style = styl
