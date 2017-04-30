@@ -437,6 +437,7 @@ class TextEditor extends Editor
     screenSize: -> electron.screen.getPrimaryDisplay().workAreaSize
     
     deltaToEnsureCursorsAreVisible: ->
+        
         topdelta = 0
         cs = @cursors()
         cl = cs[0][1]
@@ -458,7 +459,7 @@ class TextEditor extends Editor
             maindelta = Math.max(0, cl - 2) - @scroll.top
         else if cl > @scroll.bot - 4
             maindelta = Math.min(@numLines()+1, cl + 4) - @scroll.bot
-            
+
         maindelta
 
     #  0000000   0000000  00000000    0000000   000      000    
@@ -470,7 +471,7 @@ class TextEditor extends Editor
     scrollLines: (delta) -> @scrollBy delta * @size.lineHeight
 
     scrollBy: (delta, x=0) -> 
-
+        
         @scroll.by delta if delta
         @layers.scrollLeft += x if x
         @updateScrollOffset()
@@ -492,7 +493,7 @@ class TextEditor extends Editor
                 @scrollBy delta
 
     scrollCursorIntoView: (topDist=7) ->
-        
+
         if delta = @deltaToEnsureCursorsAreVisible()
             @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth 
     
@@ -519,7 +520,6 @@ class TextEditor extends Editor
     # 000         0000000   0000000 
 
     posAtXY:(x,y) ->
-
         sl = @layers.scrollLeft
         st = @scroll.offsetTop
         br = @view.getBoundingClientRect()
@@ -572,6 +572,7 @@ class TextEditor extends Editor
     #   0000000    000   000  000   000   0000000 
     
     initDrag: ->
+        
         @drag = new drag
             target:  @layers
             cursor:  'default'

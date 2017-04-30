@@ -88,7 +88,7 @@ class Scroll extends events
     # 000   000     000   
     # 0000000       000   
         
-    by: (delta) => 
+    by: (delta) =>
         
         scroll = @scroll
         delta = 0 if Number.isNaN delta

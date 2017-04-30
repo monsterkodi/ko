@@ -152,7 +152,9 @@ class FileEditor extends TextEditor
     # 000   000  00000000  0000000      000      0000000   000   000  00000000
     
     restoreScrollCursorsAndSelections: ->
+        
         return if not @currentFile
+        
         filePositions = window.stash.get 'filePositions', {}
         if filePositions[@currentFile]? 
             s = filePositions[@currentFile] 
@@ -162,7 +164,8 @@ class FileEditor extends TextEditor
             @setMain       s.main ? 0
             @setState @state
             delta = (s.scroll ? @scroll.scroll) - @scroll.scroll
-            @scrollBy delta if delta
+            delta = @size.lineHeight * parseInt(delta / @size.lineHeight) # no idea why this is necessary
+            @scrollBy delta 
             @updateLayers()
             @numbers.updateColors()                
             @emit 'cursor'
@@ -178,8 +181,6 @@ class FileEditor extends TextEditor
 
     jumpToFile: (opt) =>
         
-        # log 'jumpToFile opt.file', opt
-        
         window.navigate.addFilePos
             file: @currentFile
             pos:  @cursorPos()
@@ -189,7 +190,6 @@ class FileEditor extends TextEditor
         opt.pos[0] = opt.col if opt.col
         opt.pos[1] = opt.line if opt.line
         opt.winID = window.winID
-        # log 'jumpToFile', opt
         if opt.newTab
             post.emit 'newTabWithFile', opt.file
         else
@@ -215,8 +215,6 @@ class FileEditor extends TextEditor
         return error 'FileEditor.jumpTo -- nothing to find?' if empty find
         
         type = opt?.type
-
-        # log "jumpTo type:#{type} word:#{word}"
 
         if not type or type == 'class'
             classes = post.get 'indexer', 'classes'
@@ -245,8 +243,6 @@ class FileEditor extends TextEditor
                     @jumpToFile file:file, line:6
                     return true
 
-        # log "search for #{word}", window.commandline.commands.search?
-        
         if true #not type or type == 'word'
             window.commandline.commands.search.start "command+shift+f"    
             window.commandline.commands.search.execute word
