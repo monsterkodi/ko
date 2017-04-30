@@ -46,6 +46,7 @@ class ObjectBrowser extends Browser
 
         if opt.column == 0
             newItem = itemForKeyValue objName, obj
+            newItem.preview = false if opt.preview == false
             
             if row = @columns[0].row objName
                 @columns[0].items[row.index()] = newItem
@@ -64,6 +65,7 @@ class ObjectBrowser extends Browser
                 items = []
                 for key,value of obj # own?
                     items.push itemForKeyValue key, value
+                    _.last(items).preview = false if value.preview == false
 
         if @valueType(obj) not in ['func', 'array'] and not dontSort
             @sortByType items
@@ -107,15 +109,22 @@ class ObjectBrowser extends Browser
             key = '● '+clss
             items = [name: clss, text: '● '+clss, type:'class', file: clsso.file, line: clsso.line]
             for mthd,mthdo of clsso.methods
-                items.push name: mthd, text: '  ▸ '+mthd, type:'method', file: mthdo.file, line: mthdo.line
+                items.push 
+                    name: mthd
+                    text: '  ▸ '+mthd
+                    type:'method'
+                    file: mthdo.file
+                    line: mthdo.line
                 
             classes[key] =
-                text: key
                 _browse_items_:items          
-                file: clsso.file, line: clsso.line
+                text: key
+                file: clsso.file
+                line: clsso.line
                 type:'class'
+                preview: false
 
-        @loadObject classes, name:'classes', focus:false
+        @loadObject classes, name:'classes', focus:false, preview:false
 
     # 00000000  000   000  000   000   0000000   0000000  
     # 000       000   000  0000  000  000       000       
@@ -133,14 +142,20 @@ class ObjectBrowser extends Browser
             items = []
             for funci in funcl
                 clss = funci.class ? path.basename funci.file
-                items.push name: clss, text: '● '+clss, type:'class', file: funci.file, line: funci.line
+                items.push 
+                    name: clss
+                    text: '● '+clss
+                    type:'class'
+                    file: funci.file
+                    line: funci.line
                 
             funcs[key] =
+                _browse_items_:items          
                 text: key
                 type:'func'
-                _browse_items_:items          
+                preview: false
         
-        @loadObject funcs, name:'funcs', focus:false
+        @loadObject funcs, name:'funcs', focus:false, preview:false
           
     # 00000000  000  000      00000000   0000000  
     # 000       000  000      000       000       
@@ -168,7 +183,7 @@ class ObjectBrowser extends Browser
                 
         files = _browse_items_:files
             
-        @loadObject files, name:'files', focus:false
+        @loadObject files, name:'files', focus:false, preview:false
 
     # 000   000   0000000   00000000   0000000     0000000  
     # 000 0 000  000   000  000   000  000   000  000       
@@ -178,7 +193,7 @@ class ObjectBrowser extends Browser
     
     loadWords: (names) ->
         words = @filter names, 'words'
-        @loadObject words, name:'words', focus:false
+        @loadObject words, name:'words', focus:false, preview:false
     
     #  0000000   00000000   00000000    0000000   000   000  
     # 000   000  000   000  000   000  000   000   000 000   
@@ -242,7 +257,8 @@ class ObjectBrowser extends Browser
         
         return error 'not an object item?' if not item.type == 'obj'
         return error 'no object in item?' if not item.obj?
-        
+        return if item.preview == false
+
         opt.parent = type:'preview'
             
         itemForKeyValue = (key, value) =>
@@ -258,7 +274,6 @@ class ObjectBrowser extends Browser
             obj:  ''
             
         items = []
-        # log 'opt', opt
         for row in @column(opt.column-1).rows
             items.push itemForKeyValue row.item.name, row.item.obj
 
