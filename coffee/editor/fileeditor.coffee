@@ -137,6 +137,7 @@ class FileEditor extends TextEditor
     # 0000000   000   000      0      00000000
         
     saveScrollCursorsAndSelections: (opt) ->
+        
         return if not @currentFile
         s = {}
         
@@ -144,7 +145,7 @@ class FileEditor extends TextEditor
             s.main       = 0
             s.cursors    = [@cursorPos()] 
         else        
-            s.main       = @state.get 'main'
+            s.main       = @state.main()
             s.cursors    = @state.cursors()    if @numCursors() > 1 or @cursorPos()[0] or @cursorPos()[1]
             s.selections = @state.selections() if @numSelections()
             s.highlights = @state.highlights() if @numHighlights()

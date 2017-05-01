@@ -101,6 +101,7 @@ class Coffee extends Command
                 {str,clamp,fileExists,dirExists,post,path,noon,fs,_,$} = require 'kxk'
                 {max,min,abs,round,ceil,floor,sqrt,pow,exp,log10,sin,cos,tan,acos,asin,atan,PI,E} = Math
                 (global[r] = require r for r in ['colors', 'electron'])                    
+                Immutable = require 'seamless-immutable'
                 log = -> post.emit 'executeResult', [].slice.call(arguments, 0), cmdID
                 coffee  = window.commandline.commands.coffee
                 browse  = coffee.browseObject
