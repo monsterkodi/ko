@@ -225,19 +225,45 @@ class Buffer extends event
     # 000   000  000   000  000   000   0000000   00000000
 
     rangeForLineAtIndex: (i) -> 
+        
         return error "Buffer.rangeForLineAtIndex -- index #{i} >= #{@numLines()}" if i >= @numLines()
         [i, [0, @line(i).length]] 
         
     isRangeInString: (r) -> @rangeOfStringSurroundingRange(r)?
    
     rangeOfInnerStringSurroundingRange: (r) ->
+        
         rgs = @rangesOfStringsInLineAtIndex r[0]
         rgs = rangesShrunkenBy rgs, 1
         rangeContainingRangeInRanges r, rgs
         
     rangeOfStringSurroundingRange: (r) ->
+        
         if ir = @rangeOfInnerStringSurroundingRange r
             rangeGrownBy ir, 1
+
+    # 0000000    000   0000000  000000000   0000000   000   000   0000000  00000000
+    # 000   000  000  000          000     000   000  0000  000  000       000     
+    # 000   000  000  0000000      000     000000000  000 0 000  000       0000000 
+    # 000   000  000       000     000     000   000  000  0000  000       000     
+    # 0000000    000  0000000      000     000   000  000   000   0000000  00000000
+    
+    distanceOfWord: (w, pos=@cursorPos()) ->
+        
+        return 0 if @line(pos[1]).indexOf(w) >= 0
+        d = 1
+        lb = pos[1]-d
+        la = pos[1]+d
+        while lb >= 0 or la < @numLines()
+            if lb >= 0
+                if @line(lb).indexOf(w) >= 0 then return d
+            if la < @numLines()
+                if @line(la).indexOf(w) >= 0 then return d
+            d++
+            lb = pos[1]-d
+            la = pos[1]+d
+            
+        Number.MAX_SAFE_INTEGER
             
     # 00000000    0000000   000   000   0000000   00000000   0000000
     # 000   000  000   000  0000  000  000        000       000     

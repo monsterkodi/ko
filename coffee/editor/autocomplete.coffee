@@ -53,7 +53,7 @@ class Autocomplete extends event
         switch info.action
             
             when 'delete' # ever happening?
-                log 'delete!!!!'
+                error 'delete!!!!'
                 if @wordinfo[@word]?.temp and @wordinfo[@word]?.count <= 0
                     delete @wordinfo[@word]
                     
@@ -62,16 +62,23 @@ class Autocomplete extends event
                 return if not @word?.length
                 return if empty @wordinfo
                 
-                wordlist = _.keys @wordinfo
-                matches = _.filter wordlist, (w) => w.startsWith(@word) and w.length > @word.length            
-                matches.sort (a,b) -> a.localeCompare b
-                
-                for w in matches
-                    if w.startsWith(@word) and w.length > @word.length
-                        if not @firstMatch
-                            @firstMatch = w 
-                        else
-                            @matchList.push w
+                matches = _.pickBy @wordinfo, (c,w) => w.startsWith(@word) and w.length > @word.length            
+                matches = _.toPairs matches
+                for m in matches
+                    d = @editor.distanceOfWord m[0]
+                    m[1].distance = 100 - Math.min d, 100
+                    
+                matches.sort (a,b) ->
+                    (b[1].distance+b[1].count+1/b[0].length) - (a[1].distance+a[1].count+1/a[0].length)
+                    
+                # log matches
+                    
+                words = matches.map (m) -> m[0]
+                for w in words
+                    if not @firstMatch
+                        @firstMatch = w 
+                    else
+                        @matchList.push w
                             
                 return if not @firstMatch?
                 @completion = @firstMatch.slice @word.length
@@ -281,7 +288,9 @@ class Autocomplete extends event
                 count += opt?.count ? 1
                 info.count = count
                 info.temp = true if opt.action is 'change'
-                @wordinfo[w] = info 
+                @wordinfo[w] = info
+                
+        @emit 'wordCount', _.size @wordinfo
                 
     onFuncsCount: =>
         
@@ -290,6 +299,8 @@ class Autocomplete extends event
             info  = @wordinfo[func] ? {}
             info.count = Math.max 20, info.count ? 1
             @wordinfo[func] = info
+            
+        @emit 'wordCount', _.size @wordinfo
             
     #  0000000  000   000  00000000    0000000   0000000   00000000   000   000   0000000   00000000   0000000  
     # 000       000   000  000   000  000       000   000  000   000  000 0 000  000   000  000   000  000   000
