@@ -5,7 +5,7 @@
 # 000       000   000  000     000     000   000  000   000
 # 00000000  0000000    000     000      0000000   000   000
 
-{ fileList, extName, clamp, path, str, error, log, _
+{ fileList, extName, clamp, empty, path, str, error, log, _
 }       = require 'kxk'
 Buffer  = require './buffer'
 Syntax  = require './syntax'
@@ -103,21 +103,18 @@ class Editor extends Buffer
         @indentNewLineMore = null
         @indentNewLineLess = null
         @insertIndentedEmptyLineBetween = '{}'
-        
+
         switch @fileType
             when 'coffee' 
                 @indentNewLineMore = 
                     lineEndsWith: ['->', '=>', ':', '=']
-                    beforeRegExp: /(^|\s)(else\s*$|switch\s|for\s|while\s|class\s)/
-                    lineRegExp:   /^(\s+when|\s*if|\s*else\s+if\s+)(?!.*\sthen\s)/
-                @indentNewLineLess = 
-                    beforeRegExp: /^s+return/
+                    lineRegExp:   /^(\s+when|\s*if|\s*else\s+if\s+)(?!.*\sthen\s)|(^|\s)(else\s*$|switch\s|for\s|while\s|class\s)/
                 
         # _______________________________________________________________ comment
         
         @lineComment = switch @fileType
             when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug' then '//'
-            else '#'  
+            else '#'
             
         if oldType != @fileType
             @emit 'fileTypeChanged', @fileType
@@ -129,21 +126,25 @@ class Editor extends Buffer
     # 0000000   00000000     000            0000000  000  000   000  00000000  0000000   
 
     setText: (text="") -> 
+        
         rgx = new RegExp '\t', 'g'
         indent = @indentString
         @setLines text.split(/\n/).map (l) -> l.replace rgx, indent
 
     setLines: (lines) ->
+        
         super lines
         @emit 'linesSet', lines
         
     textOfSelectionForClipboard: -> 
+        
         if @numSelections()
             @textOfSelection()
         else
             @textInRanges @rangesForCursorLines()
 
     splitStateLineAtPos: (state, pos) ->
+        
         l = state.line pos[1]
         error "no line at pos #{pos}?" if not l?
         return ['',''] if not l?
@@ -156,37 +157,45 @@ class Editor extends Buffer
     # 00000000  000   000  000     000          00000000  0000000    000     000   
 
     emitEdit: (action) ->
+        
         mc = @mainCursor()
         line = @line mc[1] 
+        
         @emit 'edit',
             action: action
             line:   line
             before: line.slice 0, mc[0]
             after:  line.slice mc[0]
             cursor: mc
-    
+        
     # 000  000   000  0000000    00000000  000   000  000000000   0000000  000000000  00000000   
     # 000  0000  000  000   000  000       0000  000     000     000          000     000   000  
     # 000  000 0 000  000   000  0000000   000 0 000     000     0000000      000     0000000    
     # 000  000  0000  000   000  000       000  0000     000          000     000     000   000  
     # 000  000   000  0000000    00000000  000   000     000     0000000      000     000   000  
     
-    indentStringForLineAtIndex: (li) -> 
-        if li < @numLines()
+    indentStringForLineAtIndex: (li) ->
+        
+        while empty(@line(li).trim()) and li > 0
+            li--
+        
+        if 0 <= li < @numLines()
+            
             il = 0
-            thisIndent = @indentationAtLineIndex li
+            line = @line li
+            thisIndent   = @indentationAtLineIndex li
             indentLength = @indentString.length
             
             if @indentNewLineMore?
                 if @indentNewLineMore.lineEndsWith?.length
                     for e in @indentNewLineMore.lineEndsWith
-                        if @line(li).endsWith e
+                        if line.trim().endsWith e
                             il = thisIndent + indentLength
-                            break
+                            break                            
                 if il == 0
-                    if @indentNewLineMore.lineRegExp? and @indentNewLineMore.lineRegExp.test @line(li)
+                    if @indentNewLineMore.lineRegExp? and @indentNewLineMore.lineRegExp.test line
                         il = thisIndent + indentLength
-                        
+
             il = thisIndent if il == 0
             il = Math.max il, @indentationAtLineIndex li+1
             

@@ -24,7 +24,7 @@ module.exports =
         @newline indent: true
 
     newline: (key, info) ->
-
+        
         if not info? and _.isObject key
             info = key
 
@@ -35,7 +35,7 @@ module.exports =
             return
         
         doIndent = info?.indent ? not @isCursorInIndent()
-                    
+        
         @surroundStack = []
         @deleteSelection()
         @do.start()
@@ -49,47 +49,21 @@ module.exports =
         for c in @do.cursors().reverse()
         
             [before, after] = @splitStateLineAtPos @do, c
-            after  = after.trimLeft() if doIndent
+            after = after.trimLeft() if doIndent
         
             if doIndent
-                line = before.trimRight()
-                il = 0
-                thisIndent = indentationInLine @do.line(c[1])
-                indentLength = @indentString.length
                 
-                if @indentNewLineMore?
-                    if @indentNewLineMore.lineEndsWith?.length
-                        for e in @indentNewLineMore.lineEndsWith
-                            if line.endsWith e
-                                il = thisIndent + indentLength
-                                break
-                    if il == 0
-                        if @indentNewLineMore.beforeRegExp? and @indentNewLineMore.beforeRegExp.test before
-                            il = thisIndent + indentLength
-                        else if @indentNewLineMore.lineRegExp? and @indentNewLineMore.lineRegExp.test line
-                            il = thisIndent + indentLength
-                            
-                if il == 0
-                    il = thisIndent
-                                
-                if il >= indentLength and @indentNewLineLess?
-                    if @indentNewLineLess.beforeRegExp? and @indentNewLineLess.beforeRegExp.test before
-                        il = -indentLength
-                    else if @indentNewLineLess.afterRegExp? and @indentNewLineLess.afterRegExp.test after
-                        il = -indentLength
-                                
+                indent = @indentStringForLineAtIndex c[1] 
                 if @fileType == 'coffee' 
                     if /(when|if)/.test before 
                         if after.startsWith 'then '
                             after = after.slice(4).trimLeft() # remove then
+                            indent += @indentString
                         else if before.trim().endsWith 'then'
                             before = before.trimRight()
                             before = before.slice 0, before.length-4 # remove then                            
-                
-                il = Math.max il, indentationInLine @do.line c[1]+1
-                indent = _.padStart "", il
-            # else if opt?.keepIndent
-                # indent = _.padStart "", indentationInLine @do.line c[1] # keep indentation
+                            indent += @indentString
+                 
             else
                 if c[0] <= indentationInLine @do.line c[1]
                     indent = @do.line(c[1]).slice 0,c[0]

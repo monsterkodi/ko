@@ -321,9 +321,9 @@ class ObjectBrowser extends Browser
         error "unknown value type: #{value}"
         'value'
 
-    htmlLines: (e) -> 
+    htmlLines: (e) ->
         s = jsbeauty.html_beautify e.outerHTML, indent_size:2 , preserve_newlines:false, wrap_line_length:1024*1024, unformatted: []
-        s.split('\n')
+        s.split '\n' 
     
     sortByType: (items) ->
         type = (i) -> {obj:'a', array:'b', elem:'c', regexp:'d', string:'e', int:'f', float:'g', bool:'h', nil:'i', func:'z'}[i.type]

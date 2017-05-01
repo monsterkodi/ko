@@ -5,7 +5,7 @@
 # 000   000  000   000  000       000       000       000   000
 # 0000000     0000000   000       000       00000000  000   000
 
-{ clamp, error, log, str, _
+{ clamp, empty, error, log, str, _
 }       = require 'kxk'
 matchr  = require '../tools/matchr'
 State   = require './state' 
@@ -60,11 +60,11 @@ class Buffer extends event
     isCursorVirtual:       (c=@mainCursor()) -> @numLines() and c[1] < @numLines() and c[0] > @line(c[1]).length
     isCursorAtEndOfLine:   (c=@mainCursor()) -> @numLines() and c[1] < @numLines() and c[0] >= @line(c[1]).length
     isCursorAtStartOfLine: (c=@mainCursor()) -> c[0] == 0
-    isCursorInIndent:      (c=@mainCursor()) -> @numLines() and @line(c[1]).slice(0, c[0]).trim().length == 0
+    isCursorInIndent:      (c=@mainCursor()) -> @numLines() and @line(c[1]).slice(0, c[0]).trim().length == 0 and @line(c[1]).slice(c[0]).trim().length
     isCursorInLastLine:    (c=@mainCursor()) -> c[1] == @numLines()-1
     isCursorInFirstLine:   (c=@mainCursor()) -> c[1] == 0
     isCursorInRange:       (r,c=@mainCursor()) -> isPosInRange c, r
-
+    
     # 000   000   0000000   00000000   0000000  
     # 000 0 000  000   000  000   000  000   000
     # 000000000  000   000  0000000    000   000
@@ -76,18 +76,21 @@ class Buffer extends event
     wordsAtCursors: (cs=@cursors(), opt) -> (@textInRange @rangeForWordAtPos(c, opt) for c in cs)
 
     selectionTextOrWordAtCursor: () ->
+        
         if @numSelections() == 1 
             @textInRange @selection 0
         else
             @wordAtCursor()
     
     rangeForWordAtPos: (pos, opt) ->
+        
         p = @clampPos pos
         wr = @wordRangesInLineAtIndex p[1], opt
         r = rangeAtPosInRanges p, wr
         r
 
     endOfWordAtPos: (c) =>
+        
         r = @rangeForWordAtPos c
         if @isCursorAtEndOfLine c
             return c if @isCursorInLastLine c
@@ -95,6 +98,7 @@ class Buffer extends event
         [r[1][1], r[0]]
 
     startOfWordAtPos: (c) =>
+        
         if @isCursorAtStartOfLine c
             return c if @isCursorInFirstLine c
             r = @rangeForWordAtPos [@line(c[1]-1).length, c[1]-1]
@@ -105,6 +109,7 @@ class Buffer extends event
         [r[1][0], r[0]]
         
     wordRangesInLineAtIndex: (li, opt={regExp:@wordRegExp}) ->
+        
         opt.regExp = new RegExp "(\\s+|[\\w#{opt.include}]+|[^\\s])", 'g' if opt?.include?.length
         r = []
         while (mtch = opt.regExp.exec(@line(li))) != null
@@ -118,11 +123,13 @@ class Buffer extends event
     # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     0000000 
 
     highlightsInLineIndexRangeRelativeToLineIndex: (lineIndexRange, relIndex) ->
+        
         hl = @highlightsInLineIndexRange lineIndexRange
         if hl
             ([s[0]-relIndex, [s[1][0], s[1][1]], s[2]] for s in hl)
     
     highlightsInLineIndexRange: (lineIndexRange) ->
+        
         @highlights().filter (s) -> s[0] >= lineIndexRange[0] and s[0] <= lineIndexRange[1]
 
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000   0000000
@@ -132,20 +139,24 @@ class Buffer extends event
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000  0000000 
 
     selectionsInLineIndexRangeRelativeToLineIndex: (lineIndexRange, relIndex) ->
+        
         sl = @selectionsInLineIndexRange lineIndexRange
         if sl
             ([s[0]-relIndex, [s[1][0], s[1][1]]] for s in sl)
     
     selectionsInLineIndexRange: (lineIndexRange) ->
+        
         @selections().filter (s) -> s[0] >= lineIndexRange[0] and s[0] <= lineIndexRange[1]
         
     selectedLineIndices: -> _.uniq (s[0] for s in @selections())
     cursorLineIndices:   -> _.uniq (c[1] for c in @cursors())
 
     selectedAndCursorLineIndices: ->
+        
         _.uniq @selectedLineIndices().concat @cursorLineIndices()
                 
     continuousCursorAndSelectedLineIndexRanges: ->
+        
         il = @selectedAndCursorLineIndices()
         csr = []
         if il.length
@@ -157,6 +168,7 @@ class Buffer extends event
         csr
                         
     isSelectedLineAtIndex: (li) ->
+        
         il = @selectedLineIndices()
         if li in il
             s = @selection(il.indexOf li)
@@ -175,7 +187,7 @@ class Buffer extends event
     textsInRanges: (rgs) -> (@textInRange(r) for r in rgs)
     textInRanges:  (rgs) -> @textsInRanges(rgs).join '\n'
     textOfSelection:     -> @textInRanges @selections()
-            
+
     # 000  000   000  0000000    00000000  000   000  000000000
     # 000  0000  000  000   000  000       0000  000     000   
     # 000  000 0 000  000   000  0000000   000 0 000     000   
@@ -183,12 +195,13 @@ class Buffer extends event
     # 000  000   000  0000000    00000000  000   000     000   
         
     indentationAtLineIndex: (li) ->
-        s = 0
-        return s if li >= @numLines()
-        l = @line(li).trimRight()
-        while l[s] == ' '
-            s += 1
-        s
+        
+        return 0 if li >= @numLines()
+        line = @line li
+        while empty(line.trim()) and li > 0
+            li--
+            line = @line li
+        indentationInLine line
             
     # 00000000    0000000    0000000
     # 000   000  000   000  000     
@@ -196,23 +209,28 @@ class Buffer extends event
     # 000        000   000       000
     # 000         0000000   0000000 
     
-    lastPos: () -> 
+    lastPos: () ->
+        
         lli = @numLines()-1
         [@line(lli).length, lli]
 
     cursorPos: -> @clampPos @mainCursor()
+    
+    clampPos: (p) ->
         
-    clampPos: (p) ->        
         if not @numLines() then return [0,-1]
         l = clamp 0, @numLines()-1,  p[1]
         c = clamp 0, @line(l).length, p[0]
         [ c, l ]
         
     wordStartPosAfterPos: (p=@cursorPos()) ->
+        
         return p if p[0] < @line(p[1]).length and @line(p[1])[p[0]] != ' '
+        
         while p[0] < @line(p[1]).length-1
             return [p[0]+1, p[1]] if @line(p[1])[p[0]+1] != ' '
             p[0] += 1
+            
         if p[1] < @numLines()-1
             @wordStartPosAfterPos [0, p[1]+1]
         else
