@@ -56,10 +56,12 @@ class Command
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
         
     execute: (command) ->
+        
         if @commandList? 
             if 0 <= @selected < @commandList.numLines()
-                command = @commandList?.line(@selected)
+                command = @commandList?.line @selected
             @hideList()
+            
         command = command.trim()
         @setCurrent command
         command
@@ -118,6 +120,7 @@ class Command
     # 0000000  000  0000000      000   
 
     showList: ->
+
         if not @commandList?
             listView = elem class: "commandlist #{@prefsID}"
             window.split.elem.appendChild listView
@@ -133,6 +136,7 @@ class Command
         @positionList()
     
     listClick: (index) =>
+        
         @selected = index
         @execute @commandList.line index 
     
@@ -142,7 +146,8 @@ class Command
     positionList: ->
         return if not @commandList?
         flex = window.split.flex
-        listTop = flex.posOfPane 2
+        flex.update()
+        listTop = flex.posOfPane 2 
         listHeight = @commandList.view.getBoundingClientRect().height
         spaceBelow = flex.size() - listTop
         if spaceBelow < listHeight
@@ -241,15 +246,18 @@ class Command
     historyKey: -> 'history'
     
     clearHistory: ->
+        
         @history = []
         @selected = -1
         @setState @historyKey(), @history
    
     setHistory: (history) ->
+        
         @history = history
         @setState @historyKey(), @history
     
     setCurrent: (command) ->
+        
         @loadState() if not @history?
         error 'Command.setCurrent -- @history not an array?', typeof @history if not _.isArray @history
         _.pull @history, command

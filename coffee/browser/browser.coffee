@@ -162,7 +162,7 @@ class Browser extends Stage
 
     isMessy: -> not @flex.relaxed or @hasEmptyColumns()
     cleanUp: -> 
-        # log 'cleanup'
+        return false if not @flex?
         return false if not @isMessy()
         @popEmptyColumns()
         @flex.relax()

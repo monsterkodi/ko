@@ -39,11 +39,17 @@ dirList = (dirPath, opt, cb) ->
     dirPath = resolve dirPath
     
     filter = (p) ->
-        if opt.ignoreHidden and path.basename(p).startsWith '.'
-            return true
+        
+        if path.basename(p).startsWith '.'
+            if opt.ignoreHidden
+                return true
+            if path.basename(p) in ['.DS_Store', '.git']
+                return true
         else if opt.matchExt? 
             if path.extname(p) != path.extname opt.matchExt
                 return true
+        if path.basename(p) == 'Icon\r'
+            return true
         false
     
     onDir = (d) -> 

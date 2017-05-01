@@ -53,7 +53,7 @@ class FileBrowser extends Browser
     # 0000000    000  000   000  
     
     loadDir: (dir, opt) -> 
-
+        opt.ignoreHidden = false
         dirlist dir, opt, (err, items) => 
             
             if err? then return error "can't load dir #{dir}: #{err}"

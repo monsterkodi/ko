@@ -10,8 +10,8 @@
 jsbeauty   = require 'js-beautify'
 Browser    = require './browser'
 isTextFile = require '../tools/istextfile'
-
 TextEditor = require '../editor/texteditor'
+
 class ObjectEditor extends TextEditor
 
     constructor: (viewElem, opt) ->

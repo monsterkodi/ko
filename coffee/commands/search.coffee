@@ -72,13 +72,21 @@ class Search extends Command
         stream = fs.createReadStream file, encoding: 'utf8'
         stream.pipe new FileSearcher @, opt, file
 
+    # 00     00  00000000  000000000   0000000    0000000  000      000   0000000  000   000  
+    # 000   000  000          000     000   000  000       000      000  000       000  000   
+    # 000000000  0000000      000     000000000  000       000      000  000       0000000    
+    # 000 0 000  000          000     000   000  000       000      000  000       000  000   
+    # 000   000  00000000     000     000   000   0000000  0000000  000   0000000  000   000  
+    
     onMetaClick: (meta) =>
 
         href = meta[2].href      
         split = href.split ':'
         if split.length == 1 or _.isFinite parseInt split[1]
+            window.split.show 'editor'
             window.loadFile href
         else
+            log 'search on meta click', href
             if window.commandline.commands[split[0]]?
                 command = window.commandline.commands[split[0]]
                 window.commandline.startCommand split[0], command.shortcuts[0]

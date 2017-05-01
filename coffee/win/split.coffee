@@ -122,7 +122,10 @@ class Split extends event
     show: (n) ->
         switch n
             when 'terminal', 'area' then @raise n
-            when 'editor'           then @flex.expand 'editor'
+            when 'editor'           
+                @flex.expand 'editor'
+                if @editorHeight() < @flex.size()/3
+                    @flex.moveHandleToPos @flex.handles[1], 2*@flex.size()/3
             when 'command'          then @flex.expand 'commandline'
             when 'logview'          then @showLog()
             else error "split.show -- unhandled: #{n}!"
@@ -148,6 +151,8 @@ class Split extends event
             
         @flex.calculate()
         @flex.expand 'terminal', 0.33
+        if @terminalHeight() < @flex.size()/3
+            @flex.moveHandleToPos @flex.handles[0], @flex.size()/3
 
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
     # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     

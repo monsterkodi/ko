@@ -64,7 +64,9 @@ class CommandList extends TextEditor
         @view.style.height = "#{@size.lineHeight * Math.min @maxLines, items.length}px"
         @resized()
 
-    onMetaClick: (meta) => @command.listClick meta[2].index
+    onMetaClick: (meta) => 
+
+        @command.listClick meta[2].index
         
     #  0000000   00000000   00000000   00000000  000   000  0000000  
     # 000   000  000   000  000   000  000       0000  000  000   000

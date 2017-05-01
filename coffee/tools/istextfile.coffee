@@ -22,6 +22,8 @@ textext['.bashrc'] = 'markdown'
 textbase = 
     profile:1
     license:1
+    '.gitignore':1
+    '.npmignore':1
 
 isTextFile = (f) -> path.extname(f) and textext[path.extname f]? or textbase[path.basename(f).toLowerCase()]
 

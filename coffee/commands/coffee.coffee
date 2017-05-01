@@ -120,17 +120,29 @@ class Coffee extends Command
 
         @onResult result, cfg.cmdID   
 
+    #  0000000  000000000   0000000   00000000   000000000  
+    # 000          000     000   000  000   000     000     
+    # 0000000      000     000000000  0000000       000     
+    #      000     000     000   000  000   000     000     
+    # 0000000      000     000   000  000   000     000     
+    
+    start: (@combo) ->
+        
+        super @combo
+        text:   @last()
+        select: true
+        do:     'show terminal'
+
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
     # 0000000     00000    0000000   000       000   000     000     0000000 
     # 000        000 000   000       000       000   000     000     000     
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
-
         
-    execute: (command) ->
+    execute: (rawCommand) ->
         
         @cmdID += 1
-        command = command.trim()
+        command = rawCommand.trim()
         
         if command == '.'         then command = 'browse ' + (@name == 'coffee' and 'window' or 'global')
         if command.startsWith '.' then command = 'browse ' + command.slice 1
@@ -147,7 +159,7 @@ class Coffee extends Command
             if command.split(' ').length == 2
                 command += ', name:"' + command.split(' ')[1] + '"'
 
-        @commands[@cmdID] = command
+        @commands[@cmdID] = rawCommand
         terminal = window.terminal
         
         for l in command.split '\n'

@@ -26,7 +26,7 @@ unpack = () ->
     log "mounting #{dmg} ..."
     mount.mount dmg, (err, dmgPath) ->
         if err
-            log err 
+            log err
         else
             src = path.join dmgPath, "ko.app"
             log "copy #{src} to #{app}"

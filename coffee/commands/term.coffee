@@ -1,3 +1,4 @@
+
 # 000000000  00000000  00000000   00     00
 #    000     000       000   000  000   000
 #    000     0000000   0000000    000000000
@@ -298,10 +299,12 @@ class Term extends Command
     # 000        000 000   000       000       000   000     000     000     
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
     
-    execute: (command) ->
-        return if not command.trim().length
+    execute: (rawCommand) ->
+        
+        return if not rawCommand.trim().length
+        
         terminal = window.terminal
-        cmds = @splitAlias command
+        cmds = @splitAlias rawCommand
         command = cmds.join ' '
         
         switch
@@ -314,8 +317,16 @@ class Term extends Command
                 @idCommands[@commandIDs[command]] = command
                 @setState 'commandIDs', @commandIDs
                 @setState 'idCommands', @idCommands
-                super command # @setCurrent command -> moves items in @history
-                
+                super rawCommand # @setCurrent command -> moves items in @history
+        
+        appendCommandMeta = (cmmd) =>
+            terminal.appendMeta 
+                line: "■"
+                command: cmmd
+                cmdID: @cmdID
+                clss: 'termCommand'
+                click: @onMetaClick
+
         for cmmd in cmds
             
             if @headers 
@@ -334,15 +345,15 @@ class Term extends Command
             switch cmd
                 when 'clear'   then terminal.clear()
                 when 'stop' 
+                    
+                    appendCommandMeta 'stop'
+
                     post.toMain 'restartShell', winID: window.winID
+                    
                     for meta in reversed terminal.meta.metas
                         if meta[2].cmdID?
                             meta[2].span?.innerHTML = "■"
-                    terminal.appendMeta 
-                        line: "■"
-                        clss: 'termCommand'
-                        cmmd: "stop"
-                                
+                            
                 when 'header' 
                     
                     # 000   000  00000000   0000000   0000000    00000000  00000000 
@@ -355,10 +366,7 @@ class Term extends Command
                         if args[0] in ['on', 'true', '1'] then   @headers = true
                         if args[0] in ['off', 'false', '0'] then @headers = false
 
-                    terminal.appendMeta 
-                        line: "■"
-                        clss: 'termCommand'
-                        cmmd: "headers #{@headers and 'on' or 'off'}" 
+                    appendCommandMeta "header #{@headers and 'on' or 'off'}"
                 
                 when 'autocd'
                     
@@ -366,10 +374,7 @@ class Term extends Command
                         if args[0] in ['on', 'true', '1'] then   @autocd = true
                         if args[0] in ['off', 'false', '0'] then @autocd = false
 
-                    terminal.appendMeta 
-                        line: "■"
-                        clss: 'termCommand'
-                        cmmd: "autocd #{@autocd and 'on' or 'off'}"
+                    appendCommandMeta "autocd #{@autocd and 'on' or 'off'}"
                 
                 when 'history' 
                     
@@ -379,10 +384,7 @@ class Term extends Command
                     # 000   000  000       000     000     000   000  000   000     000   
                     # 000   000  000  0000000      000      0000000   000   000     000   
 
-                    terminal.appendMeta 
-                        line: "■"
-                        clss: 'termCommand'
-                        cmmd: cmmd
+                    appendCommandMeta cmmd
                 
                     if args.length == 1 and args[0] == 'clear'
                         @clearHistory()
@@ -406,6 +408,8 @@ class Term extends Command
                     # 000       000  000      000     
                     # 000       000  0000000  00000000
                     
+                    appendCommandMeta cmmd
+                    
                     window.split.show 'terminal'
                     files = post.get 'indexer', 'files'
                     lastDir = ''
@@ -422,7 +426,8 @@ class Term extends Command
                             diss: Syntax.dissForTextAndSyntax "◼ #{pth}", 'ko'
                             href: "#{file}:1"
                             line: li
-                            clss: 'termResult'
+                            clss: 'searchResult'
+                            click: @onMetaClick
                         terminal.queueMeta meta
                         li += 1
                         
@@ -433,6 +438,8 @@ class Term extends Command
                     # 000000    000   000  000 0 000  000     
                     # 000       000   000  000  0000  000     
                     # 000        0000000   000   000   0000000
+                    
+                    appendCommandMeta cmmd
                     
                     window.split.show 'terminal'
                     funcs = post.get 'indexer', 'funcs'
@@ -454,7 +461,8 @@ class Term extends Command
                             meta =
                                 diss: diss
                                 href: "#{info.file}:#{info.line+1}"
-                                clss: 'termResult'
+                                clss: 'searchResult'
+                                click: @onMetaClick
                             terminal.queueMeta meta
                             i += 1
                         
@@ -466,6 +474,8 @@ class Term extends Command
                     # 000       000      000   000       000       000
                     #  0000000  0000000  000   000  0000000   0000000 
                     
+                    appendCommandMeta cmmd
+                    
                     window.split.show 'terminal'
                     classes = post.get 'indexer', 'classes'
                     for clss in Object.keys(classes).sort()
@@ -476,13 +486,15 @@ class Term extends Command
                             diss: Syntax.dissForTextAndSyntax "● #{clss}", 'ko'
                             href: "#{info.file}:#{info.line+1}"
                             clss: 'termResult'
+                            click: @onMetaClick
                         terminal.queueMeta meta
                         
                         for mthd, minfo of info.methods
                             meta =
                                 diss: Syntax.dissForTextAndSyntax "    #{minfo.static and '◆' or '▸'} #{mthd}", 'ko'
                                 href: "#{minfo.file}:#{minfo.line+1}"
-                                clss: 'termResult'
+                                clss: 'searchResult'
+                                click: @onMetaClick
                             terminal.queueMeta meta
                             
                 when 'word'
@@ -492,6 +504,8 @@ class Term extends Command
                     # 000000000  000   000  0000000    000   000
                     # 000   000  000   000  000   000  000   000
                     # 00     00   0000000   000   000  0000000  
+                    
+                    appendCommandMeta cmmd
                     
                     window.split.show 'terminal'
                     words = post.get 'indexer', 'words'
@@ -507,7 +521,8 @@ class Term extends Command
                             diss: diss
                             line: info.count
                             href: "search:#{word}"
-                            clss: 'termResult'
+                            clss: 'searchResult'
+                            click: @onMetaClick
                         terminal.queueMeta meta
                             
                 else
@@ -518,15 +533,10 @@ class Term extends Command
                     #      000  000   000  000       000      000      
                     # 0000000   000   000  00000000  0000000  0000000  
                     
+                    appendCommandMeta cmmd
+                    
                     post.toMain 'shellCommand', winID: window.winID, cmdID: @cmdID, command: cmmd
                     
-                    terminal.appendMeta 
-                        line: "▶"
-                        command: cmmd
-                        cmdID: @cmdID
-                        clss: 'termCommand'
-                        click: @onMetaClick
-                        
                     terminal.singleCursorAtPos [0, terminal.numLines()-1]
                         
                     @cmdID += 1
@@ -534,7 +544,11 @@ class Term extends Command
         text: ''
         do:   (@name == 'Term' and 'maximize' or 'show') + ' terminal'
 
-    onMetaClick: (meta) => @execute meta[2].command
+    onMetaClick: (meta) => 
+        if meta[2].command? then @execute meta[2].command
+        if meta[2].href?
+            window.split.show 'editor'
+            window.loadFile meta[2].href
         
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

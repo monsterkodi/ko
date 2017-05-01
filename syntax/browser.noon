@@ -26,6 +26,7 @@
 ([~\/\.\-\_\w]+)(\.cp?p?\b)   . cpp . cpp.extname
 ([~\/\.\-\_\w]+)(\.cc\b)      . cpp . cpp.extname
 ([~\/\.\-\_\w]+)(\.hp?p?\b)   . hpp . hpp.extname
+([~\/\.\-\_\w]+)(\.js.map\b)  . dotfile . dotfile.extname
 ([~\/\.\-\_\w]+)(\.js\b)      . js  . js.extname
 ([~\/\.\-\_\w]+)(\.py\b)      . py  . py.extname
 ([~\/\.\-\_\w]+)(\.sh\b)      . sh  . sh.extname

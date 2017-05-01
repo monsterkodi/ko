@@ -11,6 +11,7 @@
 class Pane
     
     constructor: (opt) ->
+        
         @[k] = v for k,v of opt
         @pos      = 0
         @size    ?= @fixed ? @min ? 0
@@ -22,8 +23,9 @@ class Pane
         @display ?= 'initial'
     
     update: ->
+        
         @size = parseInt @collapsed and -1 or Math.max @size, 0
-        @pos  = @flex.pane(@index-1).pos + Math.max(0, @flex.pane(@index-1).size) + @flex.handleSize if @index
+        @pos = @div.getBoundingClientRect()[@flex.position] - @div.parentNode.getBoundingClientRect()[@flex.position]
         @div.style.display = @collapsed and 'none' or @display
         @div.style.flex = @fixed and "0 0 #{@fixed}px" or @size and "1 1 #{@size}px" or "1 1 0"
         @div.style[@flex.dimension] = "#{@fixed}px" if @fixed
