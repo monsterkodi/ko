@@ -5,9 +5,10 @@
 # 000   000  000  000       000       000   000  000   000  000   000
 # 0000000    000  000       000       0000000    000   000  000   000
 
-{ elem, str, empty, error, log, 
+{ packagePath, fileExists, elem, str, empty, path, error, log, 
 }        = require 'kxk'
 forkfunc = require 'fork-func'
+chokidar = require 'chokidar'
 
 class Diffbar
 
@@ -17,9 +18,20 @@ class Diffbar
         @elem.style.position = 'absolute'
         @elem.style.left = '0'
         @elem.style.top  = '0'
-        @editor.view.appendChild @elem
+        @editor.view.appendChild @elem        
+        @editor.on 'file', @onEditorFile
+        @watch @editor.currentFile    
+
+    watch: (file) ->
         
-        @editor.on 'file',       @update
+        @watcher?.close()
+        delete @watcher
+        pkgPath = packagePath file
+        if pkgPath
+            gitFile = path.join pkgPath, '.git', 'HEAD'
+            if fileExists gitFile
+                @watcher = chokidar.watch gitFile, ignoreInitial: true
+                @watcher.on 'change', @update
     
     updateMetas: ->
         
@@ -56,14 +68,18 @@ class Diffbar
                     change: change.del
                 @editor.meta.addDiffMeta meta            
 
+    onEditorFile: =>
+        
+        @watch @editor.currentFile
+        @update()
+
     update: =>
         
         if @editor.currentFile
             forkfunc '../tools/gitdiff', @editor.currentFile, (err, changes) =>
                 if not empty err
                     @changes = null
-                    # log 'ffunc err', err
-                    return 
+                    return
                 if changes.file == @editor.currentFile
                     @changes = changes
                     @paint()
@@ -98,7 +114,7 @@ class Diffbar
                     li += o
                     
                 if change.del?
-                    o = 1 # change.del.length
+                    o = 1
                     ctx.fillStyle = "rgba(255,0,0,#{alpha o})"
                     ctx.fillRect 0, li * lh, w, o * lh
                     
