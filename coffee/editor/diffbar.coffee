@@ -5,7 +5,7 @@
 # 000   000  000  000       000       000   000  000   000  000   000
 # 0000000    000  000       000       0000000    000   000  000   000
 
-{ packagePath, fileExists, elem, str, empty, path, error, log, 
+{ packagePath, fileExists, elem, str, empty, path, fs, error, log, 
 }        = require 'kxk'
 forkfunc = require 'fork-func'
 chokidar = require 'chokidar'
@@ -30,6 +30,10 @@ class Diffbar
         if pkgPath
             gitFile = path.join pkgPath, '.git', 'HEAD'
             if fileExists gitFile
+                refPath = fs.readFileSync gitFile, 'utf8'
+                if refPath.startsWith 'ref: '
+                    gitFile = path.join pkgPath, '.git', refPath.slice 5
+                log 'watching', gitFile
                 @watcher = chokidar.watch gitFile, ignoreInitial: true
                 @watcher.on 'change', @update
     
