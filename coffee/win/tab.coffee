@@ -5,11 +5,12 @@
 #    000     000   000  000   000
 #    000     000   000  0000000  
 
-{ packagePath, unresolve, elem, post, path, log, _
+{ packagePath, unresolve, elem, post, path, fs, log, _
 }       = require 'kxk'
 render  = require '../editor/render'
 syntax  = require '../editor/syntax'
 Tooltip = require '../tools/tooltip'
+atomic  = require 'write-file-atomic'
 
 class Tab
     
@@ -18,15 +19,28 @@ class Tab
         @info = file: null
         @div = elem class: 'tab', text: 'untitled'
         @tabs.div.appendChild @div
+
+    saveChanges: ->
+        if @state
+            log 'save state changes', @state.file
+            stat = fs.statSync @state.file
+            atomic @state.file, @state.state.text(), { encoding: 'utf8', mode: stat.mode }, (err) ->            
+                return error "tab.saveChanges failed #{err}" if err
+            
+    #  0000000  000000000   0000000   000000000  00000000  
+    # 000          000     000   000     000     000       
+    # 0000000      000     000000000     000     0000000   
+    #      000     000     000   000     000     000       
+    # 0000000      000     000   000     000     00000000  
     
     storeState: ->
         
         @state = window.editor.do.tabState()
-        log 'tab.storeState', @info, @state
+        log 'tab.storeState', @state.file, @info
         
     restoreState: ->
         
-        log 'tab.restoreState', @info, @state
+        log 'tab.restoreState', @state.file, @info
         window.editor.do.setTabState @state
         delete @state
         

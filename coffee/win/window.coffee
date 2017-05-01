@@ -22,7 +22,7 @@ FPS         = require '../tools/fps'
 encode      = require '../tools/encode'
 scheme      = require '../tools/scheme'
 electron    = require 'electron'
-atomicFile  = require 'write-file-atomic'
+atomic      = require 'write-file-atomic'
 pkg         = require '../../package.json'
 
 remote      = electron.remote
@@ -210,7 +210,7 @@ saveFile = (file) ->
     else
         mode = 438
         
-    atomicFile file, editor.text(), { encoding: 'utf8', mode: mode }, (err) ->
+    atomic file, editor.text(), { encoding: 'utf8', mode: mode }, (err) ->
         
         editor.saveScrollCursorsAndSelections()
         
@@ -224,7 +224,7 @@ saveChanges = ->
     
     if editor.currentFile? and editor.do.hasLineChanges() and fileExists editor.currentFile
         stat = fs.statSync editor.currentFile
-        atomicFile editor.currentFile, editor.text(), { encoding: 'utf8', mode: stat.mode }, (err) ->            
+        atomic editor.currentFile, editor.text(), { encoding: 'utf8', mode: stat.mode }, (err) ->            
             return error "window.saveChanges failed #{err}" if err
 
 #  0000000   000   000   0000000  000       0000000    0000000  00000000  

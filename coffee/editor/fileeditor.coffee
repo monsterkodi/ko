@@ -87,9 +87,9 @@ class FileEditor extends TextEditor
         
         if @currentFile?
             @watch = new watcher @
-            if opt.restoreState
+            if opt?.restoreState
                 @setText opt.restoreState.text()
-                # @state = opt.restoreState
+                @state = opt.restoreState
             else
                 @setText fs.readFileSync @currentFile, encoding: 'utf8'
             @restoreScrollCursorsAndSelections()

@@ -29,6 +29,12 @@ class Do
                     error "Do.foreignChanges -- unknown change #{change.change}"
         @end foreign: true
 
+    # 000000000   0000000   0000000     0000000  000000000   0000000   000000000  00000000  
+    #    000     000   000  000   000  000          000     000   000     000     000       
+    #    000     000000000  0000000    0000000      000     000000000     000     0000000   
+    #    000     000   000  000   000       000     000     000   000     000     000       
+    #    000     000   000  0000000    0000000      000     000   000     000     00000000  
+    
     tabState: ->
         
         history: @history
@@ -37,13 +43,14 @@ class Do
         file:    @editor.currentFile
         
     setTabState: (state) ->
-        
+                
+        @editor.restoreFromTabState state
+
+        @groupCount = 0
         @history = state.history
         @redos   = state.redos
         @state   = state.state
         
-        @editor.restoreFromTabState state
-                
     # 00000000   00000000   0000000  00000000  000000000
     # 000   000  000       000       000          000   
     # 0000000    0000000   0000000   0000000      000   
