@@ -26,18 +26,20 @@ class Diffbar
         
         @watcher?.close()
         delete @watcher
+        
         pkgPath = packagePath file
         if pkgPath
+            
             gitFile = path.join pkgPath, '.git', 'HEAD'
+            
             if fileExists gitFile
+                
                 refPath = fs.readFileSync gitFile, 'utf8'
                 if refPath.startsWith 'ref: '
                     gitFile = path.join pkgPath, '.git', refPath.slice(5).trim()
-                # log 'watching', gitFile
+
                 @watcher = chokidar.watch gitFile
                 @watcher.on 'change', @update
-                return
-        log 'not watching'
     
     updateMetas: ->
         
