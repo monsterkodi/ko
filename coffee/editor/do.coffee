@@ -42,7 +42,7 @@ class Do
         @redos   = state.redos
         @state   = state.state
         
-        @editor.restoreFromTabState @state
+        @editor.restoreFromTabState state
                 
     # 00000000   00000000   0000000  00000000  000000000
     # 000   000  000       000       000          000   

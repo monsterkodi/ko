@@ -21,12 +21,12 @@ class Tab
     
     storeState: ->
         
-        log 'tab.storeState', @info
         @state = window.editor.do.tabState()
+        log 'tab.storeState', @info, @state
         
     restoreState: ->
         
-        log 'tab.restoreState', @info
+        log 'tab.restoreState', @info, @state
         window.editor.do.setTabState @state
         delete @state
         

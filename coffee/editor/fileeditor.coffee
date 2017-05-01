@@ -38,7 +38,8 @@ class FileEditor extends TextEditor
     # 000       000   000  000   000  000  0000  000   000  000       000   000
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
-    changed: (changeInfo) ->        
+    changed: (changeInfo) ->    
+        
         super changeInfo
         dirty = @do.hasLineChanges()
         if @dirty != dirty
@@ -86,7 +87,11 @@ class FileEditor extends TextEditor
         
         if @currentFile?
             @watch = new watcher @
-            @setText fs.readFileSync @currentFile, encoding: 'utf8'
+            if opt.restoreState
+                @setText opt.restoreState.text()
+                # @state = opt.restoreState
+            else
+                @setText fs.readFileSync @currentFile, encoding: 'utf8'
             @restoreScrollCursorsAndSelections()
             post.emit 'file', @currentFile # titlebar -> tabs -> tab
             post.toMain 'getBreakpoints', window.winID, @currentFile, window.winID
@@ -101,12 +106,9 @@ class FileEditor extends TextEditor
 
     restoreFromTabState: (tabsState) ->
         
+        log 'restoreFromTabState', tabsState.file
         @clear skip:true
-        @currentFile = tabsState.file
-        @setState @state
-        post.emit 'file', @currentFile
-        post.toMain 'getBreakpoints', window.winID, @currentFile, window.winID
-        @emit 'file', @currentFile
+        @setCurrentFile tabsState.file, restoreState:tabsState.state
             
     stopWatcher: ->
         if @watch?
