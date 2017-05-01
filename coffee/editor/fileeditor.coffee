@@ -95,9 +95,19 @@ class FileEditor extends TextEditor
                 @setLines ['']
             
         if not opt?.skip
-            post.emit 'file', @currentFile # titlebar -> tabs -> tab
+            if not @currentFile?
+                post.emit 'file', @currentFile # titlebar -> tabs -> tab
             @emit 'file', @currentFile # diffbar, pigments, ...
 
+    restoreFromTabState: (tabsState) ->
+        
+        @clear skip:true
+        @currentFile = tabsState.file
+        @setState @state
+        post.emit 'file', @currentFile
+        post.toMain 'getBreakpoints', window.winID, @currentFile, window.winID
+        @emit 'file', @currentFile
+            
     stopWatcher: ->
         if @watch?
             @watch?.stop()

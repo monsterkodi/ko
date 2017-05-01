@@ -5,7 +5,7 @@
 # 000   000  000   000
 # 0000000     0000000 
 
-{ clamp, str, error, log, _
+{ clamp, str, post, error, log, _
 } = require 'kxk'
 
 require '../tools/ranges'
@@ -34,6 +34,7 @@ class Do
         history: @history
         redos:   @redos
         state:   @state
+        file:    @editor.currentFile
         
     setTabState: (state) ->
         
@@ -41,12 +42,8 @@ class Do
         @redos   = state.redos
         @state   = state.state
         
-        @editor.setLines @state.lines()
-        @editor.setCursors @state.cursors()
-        @editor.setHistory @state.highlights()
-        @editor.setSelections @state.selections()
-        @editor.setState @state
-        
+        @editor.restoreFromTabState @state
+                
     # 00000000   00000000   0000000  00000000  000000000
     # 000   000  000       000       000          000   
     # 0000000    0000000   0000000   0000000      000   
