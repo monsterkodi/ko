@@ -156,6 +156,8 @@ class Coffee extends Command
                 line: "#{@cmdID} ■"
                 diss: Syntax.dissForTextAndSyntax l, 'coffee'
                 clss: 'coffeeCommand'
+                command: command
+                click: @onMetaClick
                 
         terminal.singleCursorAtPos [0, terminal.numLines()-1]
         
@@ -174,6 +176,8 @@ class Coffee extends Command
             focus: @browser.activeColumnID()
         else
             do: 'show terminal'
+
+    onMetaClick: (meta) => @execute meta[2].command
     
     executeText:       (text) -> @name = 'coffee'; @execute text
     executeTextInMain: (text) -> @name = 'Coffee'; @execute text

@@ -43,7 +43,7 @@ class Terminal extends TextEditor
                 continue
             skip = false
             for meta in reversed @meta.metas
-                if meta[2].cmmd == t 
+                if meta[2].command == t 
                     if t != 'pwd'
                         spinningCog = '<i class="fa fa-cog fa-spin fa-1x fa-fw"></i>'
                         meta[2].span?.innerHTML = spinningCog
@@ -92,7 +92,7 @@ class Terminal extends TextEditor
                 @appendMeta clss: 'spacer', diss: syntax.dissForTextAndSyntax l, 'ko'
             @appendMeta clss: 'spacer'
         else if meta.clss == 'termCommand'
-            @appendLineDiss meta.cmmd, syntax.dissForTextAndSyntax meta.cmmd, 'term'
+            @appendLineDiss meta.command, syntax.dissForTextAndSyntax meta.command, 'term'
         else
             @appendLineDiss ''
         

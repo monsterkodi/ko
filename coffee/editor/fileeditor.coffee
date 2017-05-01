@@ -355,7 +355,7 @@ class FileEditor extends TextEditor
             post.toMain 'setBreakpoint', window.winID, @currentFile, cp[1]+1, cp[0]
         
     onSetBreakpoint: (breakpoint) =>
-        log 'onSetBreakpoint', breakpoint, @currentFile
+        # log 'onSetBreakpoint', breakpoint, @currentFile
         return if not samePath breakpoint.file, @currentFile
         line = breakpoint.line
         switch breakpoint.status

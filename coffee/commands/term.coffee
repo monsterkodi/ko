@@ -522,9 +522,10 @@ class Term extends Command
                     
                     terminal.appendMeta 
                         line: "▶"
-                        cmmd:  cmmd
+                        command: cmmd
                         cmdID: @cmdID
                         clss: 'termCommand'
+                        click: @onMetaClick
                         
                     terminal.singleCursorAtPos [0, terminal.numLines()-1]
                         
@@ -532,6 +533,8 @@ class Term extends Command
                     
         text: ''
         do:   (@name == 'Term' and 'maximize' or 'show') + ' terminal'
+
+    onMetaClick: (meta) => @execute meta[2].command
         
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

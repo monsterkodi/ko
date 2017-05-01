@@ -121,7 +121,7 @@ class Command
         if not @commandList?
             listView = elem class: "commandlist #{@prefsID}"
             window.split.elem.appendChild listView
-            @commandList = new CommandList '.commandlist', syntax: @syntaxName
+            @commandList = new CommandList @, '.commandlist', syntax: @syntaxName
     
     listItems: () -> reversed @history
 
@@ -132,9 +132,9 @@ class Command
         @commandList.addItems items
         @positionList()
     
-    listClick: (index) => 
+    listClick: (index) =>
         @selected = index
-        @execute @commandList.line(index)
+        @execute @commandList.line index 
     
     onBot: (bot) => 
         @positionList()

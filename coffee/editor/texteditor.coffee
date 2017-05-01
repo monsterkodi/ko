@@ -6,7 +6,7 @@
 #    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000  
 
 {splitFilePos, fileExists, resolve, keyinfo, stopEvent, setStyle, 
-prefs, drag, elem, path, post, clamp, pos, str, log, sw, $, _
+prefs, drag, elem, path, post, clamp, pos, str, error, log, sw, $, _
 }         = require 'kxk'
 render    = require './render'
 syntax    = require './syntax'
@@ -148,15 +148,20 @@ class TextEditor extends Editor
 
     appendText: (text) ->
 
+        return error 'no text?' if not text?
+
         ls = text?.split /\n/
         for l in ls
             @state = @state.appendLine l
             @emit 'lineAppended', 
                 lineIndex: @numLines()-1
-                text:      l
+                text: l
+                
         if @scroll.viewHeight != @viewHeight()
-            @scroll.setViewHeight @viewHeight()        
+            @scroll.setViewHeight @viewHeight()
+            
         @scroll.setNumLines @numLines()
+        
         @emit 'linesAppended', ls
         @emit 'numLines', @numLines()
 

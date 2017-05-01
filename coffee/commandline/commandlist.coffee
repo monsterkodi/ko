@@ -14,7 +14,7 @@ salt       = require '../tools/salt'
 
 class CommandList extends TextEditor
 
-    constructor: (viewElem, opt) ->
+    constructor: (@command, viewElem, opt) ->
         
         @fontSizeDefault = 19
         @maxLines        = 17
@@ -37,27 +37,34 @@ class CommandList extends TextEditor
         
         @clear()
         index = 0
+        
         for item in items
             continue if not item? 
             text = (item.text ? item).trim?()
             continue if not text?.length
             rngs = item.rngs ? []
+            
             if item.clss?
                 rngs.push 
                     match: text
                     start: 0
                     value: item.clss
                     index: 0
+                    
             @appendMeta 
                 line: item.line ? ' '
                 text: text
                 rngs: rngs
                 type: item.type ? @syntaxName
                 clss: 'commandlistItem'
-                list: index
+                index: index
+                click: @onMetaClick
+                
             index += 1
         @view.style.height = "#{@size.lineHeight * Math.min @maxLines, items.length}px"
         @resized()
+
+    onMetaClick: (meta) => @command.listClick meta[2].index
         
     #  0000000   00000000   00000000   00000000  000   000  0000000  
     # 000   000  000   000  000   000  000       0000  000  000   000

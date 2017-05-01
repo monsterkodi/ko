@@ -15,7 +15,7 @@ class Meta
 
         @metas = [] # [ [lineIndex, [start, end], {href: ...}], ... ]
         
-        @elem = $(".meta", @editor.view)
+        @elem =$ ".meta", @editor.view
         @editor.on 'changed',          @onChanged
         @editor.on 'lineAppended',     @onLineAppended
         @editor.on 'clearLines',       @onClearLines
@@ -28,6 +28,8 @@ class Meta
         
         @editor.numbers.on 'numberAdded',   @onNumber
         @editor.numbers.on 'numberChanged', @onNumber
+        
+        @elem.addEventListener 'mousedown', @onMouseDown
 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000
@@ -146,6 +148,7 @@ class Meta
 
         div = elem class: "meta #{meta[2].clss ? ''}"
         meta[2].div = div
+        div.meta = meta
         
         if not meta[2].no_h
             div.style.height = "#{lh}px"  
@@ -157,24 +160,8 @@ class Meta
         @setMetaPos meta, tx, ty
 
         if not meta[2].no_x
-            
             div.style.width = "#{sw}px"
-            
-            # this sucks! >>>
-            if meta[2].href? 
-                div.addEventListener 'mousedown', @onClick
-                div.href = meta[2].href
-                div.classList.add 'href'
-            else if meta[2].cmmd?
-                div.addEventListener 'mousedown', @onClick
-                div.cmmd = meta[2].cmmd
-                div.classList.add 'cmmd'
-            else if meta[2].list?
-                div.addEventListener 'mousedown', @onClick
-                div.list = meta[2].list
-                div.classList.add 'cmmd'
-            # <<< this sucks!
-            
+                        
         @elem.appendChild div
 
     delDiv: (meta) ->
@@ -238,23 +225,8 @@ class Meta
     # 000       000      000  000       000  000 
     #  0000000  0000000  000   0000000  000   000
     
-    onClick: (event) -> 
-        # this sucks. use post instead and handle stuff where it should be handled
-        if not event.altKey
-            if event.target.href?
-                split = event.target.href.split ':'
-                if split.length == 1 or _.isFinite parseInt split[1]
-                    window.loadFile event.target.href
-                else
-                    if window.commandline.commands[split[0]]?
-                        command = window.commandline.commands[split[0]]
-                        window.commandline.startCommand split[0], command.shortcuts[0]
-                        window.commandline.setText split[1]
-                        command.execute split[1]
-            else if event.target.cmmd?
-                window.commandline.commands.term.execute event.target.cmmd
-            else if event.target.list?
-                window.commandline.command.listClick event.target.list
+    onMouseDown: (event) ->
+        event.target.meta?[2].click? event.target.meta
         
     #  0000000   00000000   00000000   00000000  000   000  0000000  
     # 000   000  000   000  000   000  000       0000  000  000   000
@@ -265,11 +237,13 @@ class Meta
     append: (meta) -> @metas.push [@editor.numLines(), [0, 0], meta]
     
     onLineAppended: (e) =>  
+        
         for meta in @metasAtLineIndex e.lineIndex
             meta[1][1] = e.text.length if meta[1][1] is 0
                 
     metasAtLineIndex: (li) -> rangesForLineIndexInRanges li, @metas
     hrefAtLineIndex:  (li) -> 
+        
         for meta in @metasAtLineIndex li
             return meta[2].href if meta[2].href?
 
@@ -336,24 +310,26 @@ class Meta
     #  0000000  0000000  00000000  000   000  000   000
           
     onClearLines: => 
+        
         for meta in @metas
             @delDiv meta
         @elem.innerHTML = ""
         
     clear: => 
+        
         @elem.innerHTML = ""
         @metas = []
 
     delMeta: (meta) ->
+        
         _.pull @metas, meta
         @delDiv meta
         
     delClass: (clss) ->
-        # log 'delClass', clss
+
         for meta in _.clone @metas
             clsss = meta?[2].clss?.split ' '
             if not empty(clsss) and clss in clsss
-                # log 'del meta', meta
                 @delMeta meta 
     
 module.exports = Meta
