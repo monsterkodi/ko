@@ -6,7 +6,7 @@
 
 { 
 packagePath, splitFilePos, joinFilePos, fileExists, dirExists, unresolve, relative, resolve,
-prefs, clamp, post, error, log, $, path, fs, _
+prefs, clamp, post, error, log, path, fs, _
 }        = require 'kxk'
 profile  = require '../tools/profile'
 Walker   = require '../tools/walker'

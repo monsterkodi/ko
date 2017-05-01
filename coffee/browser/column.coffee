@@ -6,7 +6,7 @@
 #  0000000   0000000   0000000   0000000   000   000  000   000
 
 { packagePath, stopEvent, relative, resolve, keyinfo, 
-  path, post, elem, clamp, empty, error, log, $, _ 
+  path, post, elem, clamp, empty, error, log, _ 
 }          = require 'kxk'
 Row        = require './row'
 Scroller   = require './scroller'

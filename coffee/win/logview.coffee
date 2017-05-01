@@ -5,7 +5,7 @@
 # 000      000   000  000   000     000     000  000       000   000
 # 0000000   0000000    0000000       0      000  00000000  00     00
 
-{ post, log, $
+{ post, log
 }          = require 'kxk'
 TextEditor = require '../editor/texteditor'
 

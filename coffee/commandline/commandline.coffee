@@ -14,7 +14,7 @@ syntax     = require '../editor/syntax'
 class Commandline extends TextEditor
     
     constructor: (viewElem) ->
-            
+                    
         @fontSizeDefault = 24
         @mainCommands = ['open', 'search', 'find', 'goto', 'term', 'browse', 'coffee', 'debug', 'build', 'macro']
         @hideCommands = ['selecto', 'Term', 'Build', 'Coffee', 'Browse']

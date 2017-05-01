@@ -11,7 +11,7 @@ event = require 'events'
 class Area extends event
     
     constructor: (viewElem) ->
-        @view = $(viewElem)
+        @view =$ viewElem 
         @view.style.display = 'none'
         
     # 00000000   00000000   0000000  000  0000000  00000000

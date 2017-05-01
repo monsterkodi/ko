@@ -7,9 +7,7 @@
 
 { splitFilePos, stopEvent, fileExists, fileList, resolve, keyinfo, 
   prefs, stash, drag, noon, post, path, clamp, error, 
-  pos, str, log, 
-  sw, sh, os, fs, 
-  $, _
+  pos, str, log, sw, sh, os, fs, _
 }           = require 'kxk'
 Split       = require './split'
 Terminal    = require './terminal'
