@@ -310,7 +310,6 @@ loadFile = (file, opt={}) ->
     if file?
         [file, pos] = splitFilePos file
         file = resolve file
-        log 'loadFile', file 
         
     if file != editor.currentFile or opt?.reload
         
@@ -318,10 +317,7 @@ loadFile = (file, opt={}) ->
             file = null
             
         if not opt?.dontSave 
-            log 'saving changes', editor.currentFile
             window.saveChanges()
-        else if editor.currentFile
-            log 'skip save', editor.currentFile
             
         post.toMain 'navigate', 
             action: 'addFilePos'

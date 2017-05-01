@@ -20,47 +20,6 @@ class Syntax
         
         post.on 'schemeChanged', => @colors = {}
 
-    #  0000000  000000000   0000000   000000000  000   0000000    
-    # 000          000     000   000     000     000  000         
-    # 0000000      000     000000000     000     000  000         
-    #      000     000     000   000     000     000  000         
-    # 0000000      000     000   000     000     000   0000000    
-        
-    @matchrConfigs = {}
-    @syntaxNames = []
-    
-    @spanForText: (text) -> @spanForTextAndSyntax text, 'ko'
-    @spanForTextAndSyntax: (text, n) -> 
-        
-        l = ""
-        diss = @dissForTextAndSyntax text, n
-        if diss?.length
-            last = 0
-            for di in [0...diss.length]
-                d = diss[di]
-                style = d.styl? and d.styl.length and " style=\"#{d.styl}\"" or ''
-                spc = ''
-                for sp in [last...d.start]
-                    spc += '&nbsp;'
-                last  = d.start + d.match.length
-                clss  = d.clss? and d.clss.length and " class=\"#{d.clss}\"" or ''
-                clrzd = "<span#{style}#{clss}>#{spc}#{encode d.match}</span>"
-                l += clrzd
-        l
-
-    @rangesForTextAndSyntax: (line, n) ->
-        matchr.ranges Syntax.matchrConfigs[n], line
-
-    @dissForTextAndSyntax: (line, n, opt) ->
-        matchr.dissect matchr.ranges(Syntax.matchrConfigs[n], line), opt
-
-    @lineForDiss: (dss) -> 
-        l = ""
-        for d in dss
-            l = _.padEnd l, d.start
-            l += d.match
-        l
-
     #  0000000  000      00000000   0000000   00000000 
     # 000       000      000       000   000  000   000
     # 000       000      0000000   000000000  0000000  
@@ -118,6 +77,47 @@ class Syntax
             
         return @colors[styl]
 
+    #  0000000  000000000   0000000   000000000  000   0000000    
+    # 000          000     000   000     000     000  000         
+    # 0000000      000     000000000     000     000  000         
+    #      000     000     000   000     000     000  000         
+    # 0000000      000     000   000     000     000   0000000    
+        
+    @matchrConfigs = {}
+    @syntaxNames = []
+    
+    @spanForText: (text) -> @spanForTextAndSyntax text, 'ko'
+    @spanForTextAndSyntax: (text, n) -> 
+        
+        l = ""
+        diss = @dissForTextAndSyntax text, n
+        if diss?.length
+            last = 0
+            for di in [0...diss.length]
+                d = diss[di]
+                style = d.styl? and d.styl.length and " style=\"#{d.styl}\"" or ''
+                spc = ''
+                for sp in [last...d.start]
+                    spc += '&nbsp;'
+                last  = d.start + d.match.length
+                clss  = d.clss? and d.clss.length and " class=\"#{d.clss}\"" or ''
+                clrzd = "<span#{style}#{clss}>#{spc}#{encode d.match}</span>"
+                l += clrzd
+        l
+
+    @rangesForTextAndSyntax: (line, n) ->
+        matchr.ranges Syntax.matchrConfigs[n], line
+
+    @dissForTextAndSyntax: (line, n, opt) ->
+        matchr.dissect matchr.ranges(Syntax.matchrConfigs[n], line), opt
+
+    @lineForDiss: (dss) -> 
+        l = ""
+        for d in dss
+            l = _.padEnd l, d.start
+            l += d.match
+        l
+        
     #  0000000  000   000  00000000  0000000     0000000   000   000   0000000 
     # 000       000   000  000       000   000  000   000  0000  000  000      
     # 0000000   000000000  0000000   0000000    000000000  000 0 000  000  0000

@@ -22,6 +22,29 @@ class Indexer
     @testRegExp    = /^\s*(describe|it)\s+[\'\"](.+)[\'\"]\s*[\,]\s*(\([^\)]*\))?\s*[=-]\>/
     @splitRegExp   = new RegExp "[^\\w\\d\\_]+", 'g'
 
+    # 000000000  00000000   0000000  000000000  000   000   0000000   00000000   0000000    
+    #    000     000       000          000     000 0 000  000   000  000   000  000   000  
+    #    000     0000000   0000000      000     000000000  000   000  0000000    000   000  
+    #    000     000            000     000     000   000  000   000  000   000  000   000  
+    #    000     00000000  0000000      000     00     00   0000000   000   000  0000000    
+    
+    @testWord: (word) ->
+        
+        switch
+            when word.length < 3 then false # exclude when too short
+            when word[0] in ['-', "#"] then false
+            when word[word.length-1] == '-' then false 
+            when word[0] == '_' and word.length < 4 then false # exclude when starts with underscore and is short
+            when /^[0\_\-\@\#]+$/.test word then false # exclude when consist of special characters only
+            when /\d/.test word then false # exclude when word contains number
+            else true
+    
+    #  0000000   0000000   000   000   0000000  000000000  00000000   000   000   0000000  000000000   0000000   00000000   
+    # 000       000   000  0000  000  000          000     000   000  000   000  000          000     000   000  000   000  
+    # 000       000   000  000 0 000  0000000      000     0000000    000   000  000          000     000   000  0000000    
+    # 000       000   000  000  0000       000     000     000   000  000   000  000          000     000   000  000   000  
+    #  0000000   0000000   000   000  0000000      000     000   000   0000000    0000000     000      0000000   000   000  
+    
     constructor: () ->
         
         post.onGet 'indexer', @onGet
@@ -38,6 +61,12 @@ class Indexer
         @walker  = null
         @queue   = []
 
+    #  0000000   000   000   0000000   00000000  000000000  
+    # 000   000  0000  000  000        000          000     
+    # 000   000  000 0 000  000  0000  0000000      000     
+    # 000   000  000  0000  000   000  000          000     
+    #  0000000   000   000   0000000   00000000     000     
+    
     onGet: (key, filter...) =>
 
         value = @[key]
@@ -51,17 +80,12 @@ class Indexer
                         return true
         value
         
-    @testWord: (word) ->
-        
-        switch
-            when word.length < 3 then false # exclude when too short
-            when word[0] in ['-', "#"] then false
-            when word[word.length-1] == '-' then false 
-            when word[0] == '_' and word.length < 4 then false # exclude when starts with underscore and is short
-            when /^[0\_\-\@\#]+$/.test word then false # exclude when consist of special characters only
-            when /\d/.test word then false # exclude when word contains number
-            else true
-
+    #  0000000   0000000   000      000      00000000   0000000  000000000  
+    # 000       000   000  000      000      000       000          000     
+    # 000       000   000  000      000      0000000   000          000     
+    # 000       000   000  000      000      000       000          000     
+    #  0000000   0000000   0000000  0000000  00000000   0000000     000     
+    
     collectBins: ->
         
         @bins = []

@@ -216,14 +216,12 @@ class Column
         activeIndex += 1 if (@search.length == 1) or (char == '')
         activeIndex  = 0 if activeIndex >= @numRows()
         
-        for rows in [@rows.slice(activeIndex), @rows.slice(0,activeIndex)]
+        for rows in [@rows.slice(activeIndex), @rows.slice(0,activeIndex+1)]
             fuzzied = fuzzy.filter @search, rows, extract: (r) -> r.item.name
             
             if fuzzied.length
-                fuzzied = _.sortBy fuzzied, (o) -> 2 - fuzzaldrin.score o.string, @search
                 row = fuzzied[0].original
-                
-                autoNavi = row.item.name == @search and @browser.endNavigateToTarget? # smelly
+                autoNavi = row.item.name == @search and @browser.endNavigateToTarget? and row.item.type in ['file', 'dir'] # smelly
                 if autoNavi
                     @browser.navigateTargetFile = row.item.file
                     @clearSearch()    

@@ -118,10 +118,17 @@ class ObjectBrowser extends Browser
             
             key = '● '+clss
             items = [name: clss, text: '● '+clss, type:'class', file: clsso.file, line: clsso.line]
+            
             for mthd,mthdo of clsso.methods
+                
+                if mthdo.static
+                    text = '  ◆ '+mthd
+                else
+                    text = '  ▸ '+mthd
+                        
                 items.push 
                     name: mthd
-                    text: '  ▸ '+mthd
+                    text: text
                     type:'method'
                     file: mthdo.file
                     line: mthdo.line
