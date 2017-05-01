@@ -36,7 +36,7 @@ class Diffbar
                 log 'watching', gitFile
                 @watcher = chokidar.watch gitFile, ignoreInitial: true
                 @watcher.on 'change', (p) =>
-                    log 'watcher change', p
+                    log 'watcher change:', p
                     @update()
     
     updateMetas: ->
