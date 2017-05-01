@@ -213,7 +213,7 @@ class Column
         @searchDiv.textContent = @search
 
         activeIndex  = @activeRow().index()
-        activeIndex += 1 if @search.length == 1
+        activeIndex += 1 if (@search.length == 1) or (char == '')
         activeIndex  = 0 if activeIndex >= @numRows()
         
         for rows in [@rows.slice(activeIndex), @rows.slice(0,activeIndex)]
@@ -289,6 +289,9 @@ class Column
             when 'backspace' then stopEvent event, @clearSearch().removeObject()
             when 'ctrl+t' then stopEvent event, @sortByType()
             when 'ctrl+n' then stopEvent event, @sortByName()
+            when 'tab'    
+                if @search.length then @doSearch ''
+                return stopEvent event
             when 'esc'
                 if @search.length then @clearSearch()
                 else window.split.focus 'commandline-editor'
