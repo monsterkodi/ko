@@ -212,19 +212,26 @@ class Column
             
         @searchDiv.textContent = @search
 
-        fuzzied = fuzzy.filter @search, @rows, extract: (r) -> r.item.name
-        if fuzzied.length
-            fuzzied = _.sortBy fuzzied, (o) -> 2 - fuzzaldrin.score o.string, @search
-            row = fuzzied[0].original
+        activeIndex  = @activeRow().index()
+        activeIndex += 1 if @search.length == 1
+        activeIndex  = 0 if activeIndex >= @numRows()
+        
+        for rows in [@rows.slice(activeIndex), @rows.slice(0,activeIndex)]
+            fuzzied = fuzzy.filter @search, rows, extract: (r) -> r.item.name
             
-            autoNavi = row.item.name == @search and @browser.endNavigateToTarget? # smelly
-            if autoNavi
-                @browser.navigateTargetFile = row.item.file
-                @clearSearch()    
-            else
-                row.div.appendChild @searchDiv
-
-            row.activate()
+            if fuzzied.length
+                fuzzied = _.sortBy fuzzied, (o) -> 2 - fuzzaldrin.score o.string, @search
+                row = fuzzied[0].original
+                
+                autoNavi = row.item.name == @search and @browser.endNavigateToTarget? # smelly
+                if autoNavi
+                    @browser.navigateTargetFile = row.item.file
+                    @clearSearch()    
+                else
+                    row.div.appendChild @searchDiv
+    
+                row.activate()
+                break
         @
     
     clearSearch: =>
