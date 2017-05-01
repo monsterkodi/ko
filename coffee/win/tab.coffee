@@ -21,11 +21,13 @@ class Tab
         @tabs.div.appendChild @div
 
     saveChanges: ->
+        
         if @state
-            log 'save state changes', @state.file
             stat = fs.statSync @state.file
             atomic @state.file, @state.state.text(), { encoding: 'utf8', mode: stat.mode }, (err) ->            
                 return error "tab.saveChanges failed #{err}" if err
+        else
+            window.saveChanges()
             
     #  0000000  000000000   0000000   000000000  00000000  
     # 000          000     000   000     000     000       

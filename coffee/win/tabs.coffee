@@ -141,6 +141,9 @@ class Tabs
         
         keep = _.pullAt @tabs, @activeTab().index()
         while @numTabs()
+            tab = _.last @tabs
+            if tab.dirty()
+                tab.saveChanges()
             @tabs.pop().close()
         @tabs = keep
         @update()

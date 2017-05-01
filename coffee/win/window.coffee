@@ -220,7 +220,7 @@ saveFile = (file) ->
             editor.setCurrentFile file
             post.toMain 'fileSaved', file, winID
 
-saveChanges = ->
+window.saveChanges = ->
     
     if editor.currentFile? and editor.do.hasLineChanges() and fileExists editor.currentFile
         stat = fs.statSync editor.currentFile
@@ -244,7 +244,7 @@ removeListeners = ->
 
 onClose = ->
     
-    saveChanges()
+    window.saveChanges()
     editor.setText ''
     editor.stopWatcher()
     window.stash.clear()
@@ -319,7 +319,7 @@ loadFile = (file, opt={}) ->
             
         if not opt?.dontSave 
             log 'saving changes', editor.currentFile
-            saveChanges()
+            window.saveChanges()
         else if editor.currentFile
             log 'skip save', editor.currentFile
             
