@@ -19,6 +19,17 @@ class Tab
         @div = elem class: 'tab', text: 'untitled'
         @tabs.div.appendChild @div
     
+    storeState: ->
+        
+        log 'tab.storeState', @info
+        @state = window.editor.do.tabState()
+        
+    restoreState: ->
+        
+        log 'tab.restoreState', @info
+        window.editor.do.setTabState @state
+        delete @state
+        
     # 000   000  00000000   0000000     0000000   000000000  00000000  
     # 000   000  000   000  000   000  000   000     000     000       
     # 000   000  00000000   000   000  000000000     000     0000000   
@@ -42,7 +53,7 @@ class Tab
             @info.pkg = oldPkg
                         
         @div.innerHTML = ''
-        @div.classList.toggle 'dirty', @info.dirty ? false
+        @div.classList.toggle 'dirty', @dirty()
                         
         @div.appendChild elem 'span', class:'dot', text:'●'
         
@@ -58,9 +69,10 @@ class Tab
             html = render.line(diss, charWidth:0)
             @tooltip = new Tooltip elem:name, html:html, x:0
             
-        @div.appendChild elem 'span', class:'dot', text:'●' if @info.dirty
+        @div.appendChild elem 'span', class:'dot', text:'●' if @dirty()
         @
 
+    dirty: -> @state? or @info?.dirty == true
     file:  -> @info?.file ? 'untitled' 
     close: -> @div.remove(); @tooltip.del() 
     index: -> @tabs.tabs.indexOf @
@@ -83,8 +95,19 @@ class Tab
     # 000   000   0000000     000     000      0      00000000  
     
     activate: ->
+        
+        if @tabs.activeTab().dirty()
+            log 'store active tab'
+            @tabs.activeTab().storeState()
+        
         @setActive()
-        window.loadFile @info.file
+        
+        if @state?
+            log 'have state'
+            @restoreState()
+        else
+            window.loadFile @info.file, dontSave:true
+            
         @tabs.update()
 
     isActive: -> @div.classList.contains 'active'

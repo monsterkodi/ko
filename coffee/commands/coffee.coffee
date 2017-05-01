@@ -127,9 +127,7 @@ class Coffee extends Command
     # 0000000      000     000   000  000   000     000     
     
     start: (@combo) ->
-        
         super @combo
-        text:   @last()
         select: true
         do:     'show terminal'
 

@@ -310,13 +310,18 @@ loadFile = (file, opt={}) ->
     if file?
         [file, pos] = splitFilePos file
         file = resolve file
+        log 'loadFile', file 
         
     if file != editor.currentFile or opt?.reload
         
         if file? and not fileExists file
             file = null
             
-        if not opt?.dontSave then saveChanges()
+        if not opt?.dontSave 
+            log 'saving changes', editor.currentFile
+            saveChanges()
+        else if editor.currentFile
+            log 'skip save', editor.currentFile
             
         post.toMain 'navigate', 
             action: 'addFilePos'
@@ -390,6 +395,7 @@ openFiles = (ofiles, options) -> # called from file dialog, open command and bro
 window.openFiles = openFiles
 window.openFile  = openFile
 window.loadFile  = loadFile
+
 
 # 0000000    000   0000000   000       0000000    0000000 
 # 000   000  000  000   000  000      000   000  000      

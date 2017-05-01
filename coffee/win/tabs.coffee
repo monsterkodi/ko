@@ -34,7 +34,7 @@ class Tabs
         post.on 'stash',            @stash
         post.on 'restore',          @restore
         post.on 'revertFile',       @revertFile
-        post.on 'sendTabs', @onSendTabs
+        post.on 'sendTabs',         @onSendTabs
 
     onSendTabs: (winID) =>
         t = ''
@@ -159,7 +159,7 @@ class Tabs
         tab
 
     onNewTabWithFile: (file) => 
-
+        
         if tab = @tab file
             tab.activate()
         else
@@ -171,7 +171,7 @@ class Tabs
     # 000  0000  000   000     000     000  000   000  000   000     000     000       
     # 000   000  000   000      0      000   0000000   000   000     000     00000000  
     
-    navigate: (key) -> 
+    navigate: (key) ->
         
         index = @activeTab().index()
         index += switch key
@@ -181,6 +181,7 @@ class Tabs
         @tabs[index].activate()
 
     swap: (ta, tb) ->
+        
         return if not ta? or not tb?
         [ta, tb] = [tb, ta] if ta.index() > tb.index()
         @tabs[ta.index()]   = tb
