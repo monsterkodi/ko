@@ -40,30 +40,25 @@ class Coffee extends Command
         terminal = window.terminal
         
         if result.error?
+            
             window.split.raise 'terminal'        
             terminal.appendMeta 
                 line: "#{cmdID} ⚡"
                 diss: Syntax.dissForTextAndSyntax str(result.error), 'coffee'
                 clss: 'coffeeResult'
         else
+            
             @setCurrent @commands[cmdID] if @commands[cmdID]?
-            terminal.appendMeta 
-                line: "#{cmdID} ▶"
-                diss: Syntax.dissForTextAndSyntax '', 'coffee'
-                clss: 'coffeeResult'
+            
             li = 0
             for l in str(result).split '\n'
                 continue if not l.trim().length and li == 0
                 li += 1
                 terminal.appendMeta 
-                    line: li
+                    line: "#{cmdID} ▶"
                     diss: Syntax.dissForTextAndSyntax l, 'coffee'
                     clss: 'coffeeResult'                    
-            terminal.appendMeta 
-                line: "#{cmdID} ◀"
-                diss: Syntax.dissForTextAndSyntax '', 'coffee'
-                clss: 'coffeeResult'
-
+                    
     # 0000000    00000000    0000000   000   000   0000000  00000000  
     # 000   000  000   000  000   000  000 0 000  000       000       
     # 0000000    0000000    000   000  000000000  0000000   0000000   
@@ -158,7 +153,7 @@ class Coffee extends Command
         for l in command.split '\n'
             continue if not l.trim().length
             terminal.appendMeta 
-                line: "#{@cmdID} ●"
+                line: "#{@cmdID} ■"
                 diss: Syntax.dissForTextAndSyntax l, 'coffee'
                 clss: 'coffeeCommand'
                 

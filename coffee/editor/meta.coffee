@@ -160,7 +160,8 @@ class Meta
             
             div.style.width = "#{sw}px"
             
-            if meta[2].href?
+            # this sucks! >>>
+            if meta[2].href? 
                 div.addEventListener 'mousedown', @onClick
                 div.href = meta[2].href
                 div.classList.add 'href'
@@ -172,6 +173,7 @@ class Meta
                 div.addEventListener 'mousedown', @onClick
                 div.list = meta[2].list
                 div.classList.add 'cmmd'
+            # <<< this sucks!
             
         @elem.appendChild div
 
@@ -236,8 +238,8 @@ class Meta
     # 000       000      000  000       000  000 
     #  0000000  0000000  000   0000000  000   000
     
-    onClick: (event) ->
-        
+    onClick: (event) -> 
+        # this sucks. use post instead and handle stuff where it should be handled
         if not event.altKey
             if event.target.href?
                 split = event.target.href.split ':'

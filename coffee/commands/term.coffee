@@ -150,7 +150,8 @@ class Term extends Command
     # 000      000       000     000   
     # 0000000  000  0000000      000   
     
-    listItems: () -> 
+    listItems: () ->
+        
         items = _.concat reversed(@history), _.intersection @bins, [
             'cat', 'colorcat', 
             'ls', 'color-ls',
@@ -165,11 +166,13 @@ class Term extends Command
         ({text: i, line: i in @bins and '●' or '▸', type: 'sh'} for i in items)
 
     loadState: ->
+        
         @idCommands = @getState 'idCommands', Object.create null
         @commandIDs = @getState 'commandIDs', Object.create null
         super
 
     clearHistory: ->
+        
         @idCommands = Object.create null
         @commandIDs = Object.create null
         @setState 'commandIDs', @commandIDs
@@ -177,6 +180,7 @@ class Term extends Command
         super 
 
     deleteCommandWithID: (id) ->
+        
         id = parseInt id
         if cmmd = @idCommands[id]
             _.pull @history, cmmd
@@ -198,8 +202,6 @@ class Term extends Command
         
         terminal = window.terminal
         
-        # log 'aliasCmd', aliasList
-
         cmmd = 'alias ' + aliasList.join ' ' 
         terminal.appendMeta 
             line: "■"
