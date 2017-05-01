@@ -5,7 +5,7 @@
 # 000  000  0000  000   000  000        000 000   000       000   000
 # 000  000   000  0000000    00000000  000   000  00000000  000   000
 
-{ packagePath, fileExists, unresolve, fileName, resolve, post, path, fs, log, _
+{ packagePath, fileExists, unresolve, fileName, resolve, empty, post, path, fs, log, _
 }        = require 'kxk'
 Walker   = require '../tools/walker'
 electron = require 'electron'
@@ -19,10 +19,12 @@ class Indexer
     @includeRegExp = /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
     @methodRegExp  = /^\s+([\@]?\w+)\s*\:\s*(\([^\)]*\))?\s*[=-]\>/
     @funcRegExp    = /^\s*([\w\.]+)\s*[\:\=]\s*(\([^\)]*\))?\s*[=-]\>/
+    @testRegExp    = /^\s*(describe|it)\s+[\'\"](.+)[\'\"]\s*[\,]\s*(\([^\)]*\))?\s*[=-]\>/
     @splitRegExp   = new RegExp "[^\\w\\d\\_]+", 'g'
 
     constructor: () ->
-        post.onGet 'indexer', (key) => @[key]
+        
+        post.onGet 'indexer', @onGet
         @collectBins()
         @collectProjects()
     
@@ -36,7 +38,21 @@ class Indexer
         @walker  = null
         @queue   = []
 
+    onGet: (key, filter...) =>
+
+        value = @[key]
+        if filter.length
+            names = filter.map (c) -> c.toLowerCase()
+            names = _.filter names, (c) -> not empty c
+            value = _.pickBy value, (value, key) ->
+                for cn in names
+                    lc = key.toLowerCase()
+                    if cn.length>1 and lc.indexOf(cn)>=0 or lc.startsWith(cn)
+                        return true
+        value
+        
     @testWord: (word) ->
+        
         switch
             when word.length < 3 then false # exclude when too short
             when word[0] in ['-', "#"] then false
@@ -47,6 +63,7 @@ class Indexer
             else true
 
     collectBins: ->
+        
         @bins = []
         for dir in ['/bin', '/usr/bin', '/usr/local/bin']
             w = new Walker
@@ -58,6 +75,7 @@ class Indexer
             w.start()
 
     collectProjects: ->
+        
         @projects = {}
         w = new Walker
             maxFiles:    5000
@@ -97,11 +115,13 @@ class Indexer
         @walker.start()
 
     onWalkerDir: (p, stat) =>
+        
         if not @dirs[p]?
             @dirs[p] =
                 name: path.basename p
 
     onWalkerFile: (p, stat) =>
+        
         if not @files[p]? and @queue.indexOf(p) < 0
             if stat.size < 654321 # obviously some arbitrary number :)
                 @queue.push p
@@ -115,6 +135,7 @@ class Indexer
     # 000   000  0000000    0000000        000        0000000   000   000   0000000  
 
     addFuncInfo: (funcName, funcInfo) ->
+        
         if funcName.startsWith '@'
             funcName = funcName.slice 1
             funcInfo.static = true
@@ -182,9 +203,12 @@ class Indexer
                 log "error indexing #{file}", err
                 return
             lines = data.split /\r?\n/
+            
             fileInfo =
                 lines: lines.length
                 funcs: []
+                classes: []
+                
             funcAdded = false
             funcStack = []
             currentClass = null
@@ -196,13 +220,9 @@ class Indexer
 
                     while funcStack.length and indent <= _.last(funcStack)[0]
                         _.last(funcStack)[1].last = li - 1
-                        funcInfo = funcStack.pop()
-                        fileInfo.funcs.push [
-                            funcInfo[1].line
-                            funcInfo[1].last
-                            funcInfo[2]
-                            funcInfo[1].class ? fileName file
-                        ]
+                        funcInfo = funcStack.pop()[1]
+                        funcInfo.class ?= fileName file
+                        fileInfo.funcs.push funcInfo 
 
                     if currentClass? and indent == 4
 
@@ -216,7 +236,7 @@ class Indexer
                         if m?[1]?
                             funcName = m[1]
                             funcInfo = @addMethod currentClass, funcName, file, li
-                            funcStack.push [indent, funcInfo, funcInfo.name]
+                            funcStack.push [indent, funcInfo]
                             funcAdded = true
                     else
 
@@ -227,7 +247,7 @@ class Indexer
                                 className = m[1]
                                 funcName  = m[3]
                                 funcInfo = @addMethod className, funcName, file, li
-                                funcStack.push [indent, funcInfo, funcInfo.name]
+                                funcStack.push [indent, funcInfo]
                                 funcAdded = true
                                 continue
 
@@ -245,7 +265,17 @@ class Indexer
                                 line: li
                                 file: file
 
-                            funcStack.push [indent, funcInfo, funcInfo.name]
+                            funcStack.push [indent, funcInfo]
+                            funcAdded = true
+                            
+                        m = line.match Indexer.testRegExp
+                        if m?[2]?
+                            funcInfo = @addFuncInfo m[2],
+                                line: li
+                                file: file
+                                test: m[1]
+
+                            funcStack.push [indent, funcInfo]
                             funcAdded = true
 
                 words = line.split Indexer.splitRegExp
@@ -263,11 +293,16 @@ class Indexer
                         #  0000000  0000000  000   000  0000000   0000000
                         
                         when 'class'
+                            
                             m = line.match Indexer.classRegExp
                             if m?[1]?
                                 currentClass = m[1]
                                 _.set @classes, "#{m[1]}.file", file
                                 _.set @classes, "#{m[1]}.line", li
+                                
+                                fileInfo.classes.push 
+                                    name: m[1]
+                                    line: li
 
                         # 00000000   00000000   0000000   000   000  000  00000000   00000000
                         # 000   000  000       000   000  000   000  000  000   000  000
@@ -308,14 +343,16 @@ class Indexer
 
                 while funcStack.length
                     _.last(funcStack)[1].last = li - 1
-                    funcInfo = funcStack.pop()
-                    fileInfo.funcs.push [funcInfo[1].line, funcInfo[1].last, funcInfo[2], funcInfo[1].class ? fileName file]
+                    funcInfo = funcStack.pop()[1]
+                    funcInfo.class ?= fileName funcInfo.file
+                    funcInfo.class ?= fileName file
+                    fileInfo.funcs.push funcInfo
 
                 post.toWins 'classesCount', _.size @classes
                 post.toWins 'funcsCount',   _.size @funcs
 
             @files[file] = fileInfo
-
+            
             post.toWins 'filesCount', _.size @files
 
             @indexDir path.dirname file

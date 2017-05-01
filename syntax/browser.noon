@@ -6,9 +6,9 @@
 
 \S+                       text
 
-(● )(\w+)                 . class.marker . class
-(◆ )(\w+)                 . static.class.marker . static.class
-(▸ )(\w+)                 . method.marker . method
+(● )(.+)                  . class.marker . class
+(◆ )(.+)                  . static.method.marker . static.method
+(▸ )(.+)                  . func.marker . func
 (\d+\s+)(▫\s)             . arrayIndex . arrayDot
 
 [~\/\.\-\_\w]+\/            dirname

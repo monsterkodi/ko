@@ -221,20 +221,25 @@ class Browser extends Stage
         file  = item.file
         name  = fileName file
         
-        clsss = post.get 'indexer', 'classes'
-        clsss = _.pickBy clsss, (obj, key) -> obj.file == file
-        for clss,clsso of clsss
-            items.push name: clss, text: '● '+clss, type:'class', file: file, line: clsso.line
-            for mthd,mthdo of clsso.methods
-                items.push name: mthd, text: '  ▸ '+mthd, type:'method', file: file, line: mthdo.line
+        files = post.get 'indexer', 'files', file
 
-        files = post.get 'indexer', 'files'
+        clsss = files[file]?.classes ? []
+        for clss in clsss
+            text = '● '+clss.name
+            items.push name: clss.name, text:text, type:'class', file: file, line: clss.line
+        
         funcs = files[file]?.funcs ? []
-        for f in funcs
-            if f[3] == name
-                items.push name: f[2], text:'  ▸ '+f[2], type:'func', file: file, line: f[0]
+        for func in funcs
+            if func.test == 'describe'
+                text = '● '+func.name
+            else if func.static
+                text = '  ◆ '+func.name
+            else
+                text = '  ▸ '+func.name
+            items.push name: func.name, text:text, type:'func', file: file, line: func.line
 
         if items.length
+            items.sort (a,b) -> a.line - b.line
             opt.parent ?= item
             @clearColumnsFrom opt.column, pop:true
             @loadItems items, opt

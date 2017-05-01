@@ -635,17 +635,19 @@ class TextEditor extends Editor
         @clickTimer = setTimeout @onClickTimeout, @stickySelection and 300 or 1000
     
     onClickTimeout: => 
+        
         clearTimeout @clickTimer
         @clickCount  = 0
         @clickTimer  = null
         @clickPos    = null
            
     funcInfoAtLineIndex: (li) ->
-        files = post.get 'indexer', 'files'
+        
+        files = post.get 'indexer', 'files', @currentFile
         fileInfo = files[@currentFile]
         for func in fileInfo.funcs
-            if func[0] <= li <= func[1]
-                return func[3] + '.' + func[2] + ' '
+            if func.start <= li <= func.end
+                return func.class + '.' + func.name + ' '
         ''
         
     # 000   000  00000000  000   000

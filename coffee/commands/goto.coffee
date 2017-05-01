@@ -45,10 +45,9 @@ class Goto extends Command
         files = post.get 'indexer', 'files'
         funcs = files[window.editor.currentFile]?.funcs
         
-        for info in funcs
-            name  = info[2]
-            items.push text: name, line:'▸', clss:'method'
-            @types[name] = 'func'
+        for func in funcs
+            items.push text: func.name, line:'▸', clss:'method'
+            @types[func.name] = 'func'
             
         clsss = post.get 'indexer', 'classes'
         for k in _.keys clsss
