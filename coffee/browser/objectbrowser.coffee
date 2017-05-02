@@ -50,10 +50,12 @@ class ObjectBrowser extends Browser
         objName = (opt.text ? opt.name) ? obj.constructor?.name
         
         itemForKeyValue = (key, value) =>
-            type: @valueType value 
+            type: @valueType value
             obj:  value
             name: key
 
+        sort = true
+            
         if opt.column == 0
             newItem = itemForKeyValue objName, obj
             newItem.preview = false if opt.preview == false
@@ -70,14 +72,14 @@ class ObjectBrowser extends Browser
         else
             if obj._browse_items_? and _.isArray obj._browse_items_
                 items = obj._browse_items_
-                dontSort = true
+                sort  = opt.sort ? false
             else
                 items = []
                 for key,value of obj # own?
                     items.push itemForKeyValue key, value
                     _.last(items).preview = false if value?.preview == false
 
-        if @valueType(obj) not in ['func', 'array'] and not dontSort
+        if @valueType(obj) not in ['func', 'array'] and sort
             @sortByType items
 
         @loadItems items, opt

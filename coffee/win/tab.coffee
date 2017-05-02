@@ -60,14 +60,12 @@ class Tab
     
     storeState: ->
         
-        return error 'no file in state?', @state if not @state.file?
+        return error 'no file in state?', @state if not @state?.file?
         @state = window.editor.do.tabState()
-        # log 'tab.storeState', @state.file, @info
         
     restoreState: ->
         
-        return error 'no file in state?', @state if not @state.file?
-        # log 'tab.restoreState', @state.file, @info
+        return error 'no file in state?', @state if not @state?.file?
         window.editor.do.setTabState @state
         delete @state
         

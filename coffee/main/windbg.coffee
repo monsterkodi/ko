@@ -5,7 +5,7 @@
 # 000   000  000  000  0000  000   000  000   000  000   000  
 # 00     00  000  000   000  0000000    0000000     0000000   
 
-{ joinFileLine, samePath, splitFileLine, unresolve, post, path, empty, log, _
+{ joinFileLine, samePath, splitFileLine, unresolve, post, path, empty, error, log, _
 }        = require 'kxk'
 electron = require 'electron'
 srcmap   = require '../tools/srcmap'
@@ -108,7 +108,7 @@ class WinDbg
                     
             [backFile, backLine] = srcmap.toCoffee jsFile, jsLine, jsCol
             return error "can't remap fileLine #{backFile}:#{backLine} #{file}:#{line}" if backFile != file or backLine != line
-            log "#{unresolve backFile}:#{backLine} #{unresolve jsFile}:#{jsLine}"
+            # log "#{unresolve backFile}:#{backLine} #{unresolve jsFile}:#{jsLine}"
         else
             [jsFile, jsLine] = [file, line]
         
@@ -125,6 +125,7 @@ class WinDbg
             @dbg.sendCommand "Debugger.removeBreakpoint", {breakpointId:breakpoint.id}, (err,result) => 
                 return error "unable to remove breakpoint #{breakKey}", err if not empty err
                 post.toWin @wid, 'setBreakpoint', breakpoint
+                post.toWins 'debuggerChanged'
             
         else
 
@@ -156,6 +157,35 @@ class WinDbg
                 bpts.push v
         bpts        
 
+    #  0000000   0000000          000  00000000   0000000  000000000  00000000   00000000    0000000   00000000    0000000  
+    # 000   000  000   000        000  000       000          000     000   000  000   000  000   000  000   000  000       
+    # 000   000  0000000          000  0000000   000          000     00000000   0000000    000   000  00000000   0000000   
+    # 000   000  000   000  000   000  000       000          000     000        000   000  000   000  000             000  
+    #  0000000   0000000     0000000   00000000   0000000     000     000        000   000   0000000   000        0000000   
+    
+    objectProps: (objectId, cb) ->
+        
+        @dbg.sendCommand "Runtime.getProperties", objectId: objectId, (err,result) => 
+            return error "unable to get object properties #{objectId}", err if not empty err            
+            prepItem = (p) ->
+                name = p.name
+                v = p.value
+                if not v? then return type: 'nil', name: name, obj: null 
+                if v.subtype? and v.subtype == 'null' 
+                    return type: 'nil', name: name, obj: null
+                switch v.type
+                    when 'number'    then type: 'float',  name:name, obj: v.value
+                    when 'boolean'   then type: 'bool',   name:name, obj: v.value
+                    when 'string'    then type: 'string', name:name, obj: v.value
+                    when 'function'  then type: 'func',   name:name, obj: v.description
+                    when 'object'    then type: 'obj',    name:name, obj: objectId: v.objectId
+                    when 'undefined' then type: 'nil',    name:name, obj: undefined
+                    else
+                        log "unhandled value type #{v.type}", v
+                        type: 'nil', name: name, obj: v.type
+            items = result.result.map (p) -> prepItem p
+            cb _browse_items_:items
+        
     # 00     00  00000000   0000000   0000000   0000000    0000000   00000000  
     # 000   000  000       000       000       000   000  000        000       
     # 000000000  0000000   0000000   0000000   000000000  000  0000  0000000   
@@ -186,11 +216,9 @@ class WinDbg
                     
                 [file, line, col] = splitFileLine fileLine
                 if path.extname(file) != '.coffee'
-                    # log 'step', fileLine
                     @debugCommand 'step'
                 else
                     @fileLine = fileLine
-                    # log 'fileLine', @fileLine
                     @status = 'paused'
                     @sendFileLine()                
                     
@@ -210,20 +238,46 @@ class WinDbg
     
     buildStackTrace: (frames) ->
         
-        @stacktrace = []
+        @stacktrace = {}
         i = 0
         for frame in frames
             file = @fileLocation frame.location
             name = frame.functionName
             name = path.basename file if not name?.length
-            frame.name = "⦿ " + name
-            frame.file = file
-            frame.functionFile = @fileLocation frame.functionLocation
-            @stacktrace.push frame 
+            name = "⦿ " + name
+            scope = @buildScope frame.scopeChain
+            local = scope.shift()
+            global = scope.pop()
+            @stacktrace[name] = 
+                file:   file
+                local:  objectId: local.obj.objectId
+                global: objectId: global.obj.objectId
+                scope:  _browse_items_: scope
+                this:   frame.this
             i++
             
-        log @stacktrace
+        # log @stacktrace
 
+    #  0000000   0000000   0000000   00000000   00000000  
+    # 000       000       000   000  000   000  000       
+    # 0000000   000       000   000  00000000   0000000   
+    #      000  000       000   000  000        000       
+    # 0000000    0000000   0000000   000        00000000  
+    
+    buildScope: (scopeChain) ->
+        
+        scopes = []
+        for s in scopeChain
+            name = s.name ? s.object.description
+            if name == 'Object'
+                [file] = splitFileLine @fileLocation s.startLocation  
+                name = path.basename file
+            scopes.push
+                type:   'obj'
+                obj:    objectId: s.object.objectId
+                name:   name
+        scopes
+        
     # 000       0000000    0000000   0000000   000000000  000   0000000   000   000  
     # 000      000   000  000       000   000     000     000  000   000  0000  000  
     # 000      000   000  000       000000000     000     000  000   000  000 0 000  
@@ -233,7 +287,7 @@ class WinDbg
     fileLocation: (location) ->
         if @scriptMap[location?.scriptId]?
             jsFile = @scriptMap[location.scriptId].url
-            jsLine = location.lineNumber
+            jsLine = Math.max location.lineNumber, 1
             jsCol  = location.columnNumber
             [coffeeFile, coffeeLine, coffeeCol] = srcmap.toCoffee jsFile, jsLine, jsCol
             if coffeeLine

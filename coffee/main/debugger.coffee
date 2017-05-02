@@ -19,6 +19,7 @@ class Debugger
         post.onGet 'dbgInfo',     @onDbgInfo
         post.on 'setBreakpoint',  @onSetBreakpoint
         post.on 'getBreakpoints', @onGetBreakpoints
+        post.on 'getObjectProps', @onGetObjectProps
         post.on 'debugCommand',   @onDebugCommand
         post.on 'winClosed',      @onWinClosed
 
@@ -42,7 +43,6 @@ class Debugger
     onSetBreakpoint: (wid, file, line, col=0, status='toggle') =>
         
         return error 'wrong file type' if path.extname(file) not in ['.js', '.coffee']
-        # log 'onBreakpoint', wid, file, line, col
         @winDbg[wid] ?= new WinDbg @, wid
         @winDbg[wid].setBreakpoint file, line, col, status
 
@@ -54,7 +54,14 @@ class Debugger
             for breakpoint in @winDbg[breakWin].breakpointsForFile file
                 log breakpoint.file
                 post.toWin sendToWin, 'setBreakpoint', breakpoint            
+
+    onGetObjectProps: (sendToWin, objectId, breakWin) =>
         
+        if @winDbg[breakWin]?
+            @winDbg[breakWin].objectProps objectId, (props) ->
+                # log 'objectProps', props
+                post.toWin sendToWin, 'objectProps', breakWin, objectId, props
+                
     onDebugCommand: (wid, cmd) =>
         
         # log 'onDebugCommand', wid, cmd

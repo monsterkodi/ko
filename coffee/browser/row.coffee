@@ -61,6 +61,8 @@ class Row
             when 'dir'   then @browser.loadDir     @item.file, column: @column.index+1, parent: @item
             when 'file'  then @browser.loadContent @,          column: @column.index+1
             else
+                log 'activate', @item
+                
                 if @item.file?
                     post.emit 'jumpToFile', file:@item.file, line:@item.line, col:@item.column
                 else if @column.parent.obj? and @column.parent.type == 'obj'
