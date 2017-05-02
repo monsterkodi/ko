@@ -40,12 +40,14 @@ module.exports =
             combos: ['left', 'right', 'up', 'down', 'shift+down', 'shift+right', 'shift+up', 'shift+left']
 
     setOrMoveCursorsAtBoundary: (key) ->
+        
         if @numSelections() > 1 and @numCursors() == 1
             @setCursorsAtSelectionBoundary key
         else
             @moveCursorsToLineBoundary key
 
     moveMainCursor: (key, info) ->
+        
         dir = key 
         hrz = key in ['left', 'right']
         opt = _.clone info
@@ -92,6 +94,7 @@ module.exports =
 
     moveCursors: (key, info = extend:false) ->
         extend = info.extend ? 'shift' == info.mod
+        log 'moveCursors', key, info, extend
         switch key
             when 'left'  then @moveCursorsLeft  extend
             when 'right' then @moveCursorsRight extend
@@ -111,7 +114,9 @@ module.exports =
         @do.setCursors newCursors, main:main
         @do.end()       
     
-    moveAllCursors: (func, opt = extend:false, keepLine:true) ->        
+    moveAllCursors: (func, opt = extend:false, keepLine:true) -> 
+        
+        log '------------- moveAllCursors', opt
         @do.start()
         @startSelection opt
         newCursors = @do.cursors()

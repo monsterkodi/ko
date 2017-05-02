@@ -5,9 +5,9 @@
 # 000   000  000   000
 # 0000000     0000000 
 
-{ clamp, str, post, error, log, _
-} = require 'kxk'
-
+{ clamp, str, post, empty, error, log, _
+}     = require 'kxk'
+State = require './state'
 require '../tools/ranges'
 
 class Do
@@ -75,12 +75,17 @@ class Do
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
         
-    start: -> 
+    start: ->
         
         @groupCount += 1
         if @groupCount == 1
-            @startState = @state = @editor.state
-            @history.push @state
+            @startState = @state = new State @editor.state.s
+            if empty(@history) or @state.s != _.last(@history).s
+                @history.push @state
+                console.log 'pushed-------', @history.length
+                console.log str (h.cursors() for h in @history)
+            else
+                console.log 'skip history push'
 
     isDoing: -> @groupCount > 0
 
@@ -134,8 +139,8 @@ class Do
     # 000   000  000  0000  000   000  000   000
     #  0000000   000   000  0000000     0000000 
                     
-    undo: -> 
-        
+    undo: ->
+        console.log 'history----', str (h.cursors() for h in @history)
         if @history.length
             
             if _.isEmpty @redos
@@ -210,8 +215,9 @@ class Do
         @cleanCursors newCursors
         mainIndex = newCursors.indexOf posClosestToPosInPositions mainCursor, newCursors 
     
-        @state = @state.setMain mainIndex
         @state = @state.setCursors newCursors
+        @state = @state.setMain mainIndex
+        console.log 'setCursors', str @state.cursors()
 
     #  0000000   0000000   000       0000000  000   000  000       0000000   000000000  00000000 
     # 000       000   000  000      000       000   000  000      000   000     000     000      
@@ -298,7 +304,7 @@ class Do
     #       when they contain only changes of the same set of lines
 
     merge: ->
-
+        
         while @history.length > 1
             b = @history[@history.length-2]
             a = _.last @history
@@ -348,7 +354,7 @@ class Do
     #      000     000     000   000     000     000       
     # 0000000      000     000   000     000     00000000  
       
-    text:            -> @state.text() 
+    text:            -> @state.text()
     line:        (i) -> @state.line i 
     cursor:      (i) -> @state.cursor i
     highlight:   (i) -> @state.highlight i
@@ -364,7 +370,7 @@ class Do
     numSelections:   -> @state.numSelections()
     numHighlights:   -> @state.numHighlights()
     
-    textInRange: (r) -> @state.line(r[0]).slice? r[1][0], r[1][1]
+    textInRange: (r) -> @state.line(r[0])?.slice r[1][0], r[1][1]
     mainCursor:      -> @state.mainCursor()
     rangeForLineAtIndex: (i) -> [i, [0, @line(i).length]]
             
