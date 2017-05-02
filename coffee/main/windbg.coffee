@@ -32,7 +32,6 @@ class WinDbg
 
         @dbg.sendCommand 'Debugger.enable', (err,result) => 
             return error "unable to enable debugger" if not empty err # or not result
-            log "winDbg #{@wid}"
             
             @enabled = true
             
@@ -108,7 +107,6 @@ class WinDbg
                     
             [backFile, backLine] = srcmap.toCoffee jsFile, jsLine, jsCol
             return error "can't remap fileLine #{backFile}:#{backLine} #{file}:#{line}" if backFile != file or backLine != line
-            # log "#{unresolve backFile}:#{backLine} #{unresolve jsFile}:#{jsLine}"
         else
             [jsFile, jsLine] = [file, line]
         
@@ -143,7 +141,6 @@ class WinDbg
                 if result.locations.length
                     breakpoint = file:file, line:line, column: col, status:status, id:result.breakpointId
                     @breakpoints[breakKey] = breakpoint
-                    # log 'breakpoint', @breakpoints[breakKey]
                     post.toWin @wid, 'setBreakpoint', breakpoint
                     post.toWins 'debuggerChanged'
                 else
@@ -193,15 +190,13 @@ class WinDbg
     # 000   000  00000000  0000000   0000000   000   000   0000000   00000000  
     
     onMessage: (event, method, params) =>
-        # log "method: #{method}"
+
         switch method 
             
             when 'Debugger.scriptParsed' then @scriptMap[params.scriptId] = params
             when 'Debugger.breakpointResolved' then log 'breakpoint: '+ params # never happens?
             when 'Debugger.paused' 
 
-                # log 'debugger.paused', params.reason
-                
                 @buildStackTrace params.callFrames
                     
                 if params.hitBreakpoints[0]
@@ -256,8 +251,6 @@ class WinDbg
                 this:   frame.this
             i++
             
-        # log @stacktrace
-
     #  0000000   0000000   0000000   00000000   00000000  
     # 000       000       000   000  000   000  000       
     # 0000000   000       000   000  00000000   0000000   
@@ -312,7 +305,7 @@ class WinDbg
             pause: 'pause'
             
         if map[command]?
-            # log "send #{map[command]}"
+
             @dbg.sendCommand "Debugger.#{map[command]}"
 
 module.exports = WinDbg

@@ -52,19 +52,16 @@ class Debugger
         
         if @winDbg[breakWin]?
             for breakpoint in @winDbg[breakWin].breakpointsForFile file
-                log breakpoint.file
                 post.toWin sendToWin, 'setBreakpoint', breakpoint            
 
     onGetObjectProps: (sendToWin, objectId, breakWin) =>
         
         if @winDbg[breakWin]?
             @winDbg[breakWin].objectProps objectId, (props) ->
-                # log 'objectProps', props
                 post.toWin sendToWin, 'objectProps', breakWin, objectId, props
                 
     onDebugCommand: (wid, cmd) =>
         
-        # log 'onDebugCommand', wid, cmd
         @winDbg[wid] ?= new WinDbg @, wid
         @winDbg[wid].debugCommand cmd
         
