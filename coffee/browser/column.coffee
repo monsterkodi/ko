@@ -241,7 +241,8 @@ class Column
     
     removeObject: ->
         
-        if @index == 0 and row = @activeRow()
+        # if @index == 0 and row = @activeRow()
+        if row = @activeRow()
             # delete @parent.obj[row.item.name]
             nextOrPrev = row.next() ? row.prev()
             row.div.remove()
