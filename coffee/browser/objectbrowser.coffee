@@ -274,7 +274,7 @@ class ObjectBrowser extends Browser
                 
         if opt.activate and _.isString item.obj?.file
             
-            post.emit 'jumpTo', file:item.obj.file, line:item.obj.line
+            post.emit 'jumpToFile', file:item.obj.file, line:item.obj.line, col:item.obj.column
 
     # 00000000   00000000   00000000  000   000  000  00000000  000   000  
     # 000   000  000   000  000       000   000  000  000       000 0 000  

@@ -69,15 +69,21 @@ class WinDbg
     # 000  000   000  000        0000000   
     
     info: ->
-                    
-        info =
-            breakpoints: @breakpoints
-            # scripts:     @scripts 
-            # scriptMap:   @scriptMap
+        
+        info = breakpoints: _.map @breakpoints, (v,k) -> 
+            name:  '⦿ '+path.basename joinFileLine v.file, v.line, v.column
+            file:   v.file
+            line:   v.line
+            column: v.column
+            status: v.status
         
         info.stacktrace = @stacktrace if @status == 'paused'
-        # info.file = unresolve @fileLine if @fileLine
-        info[@status] = @status == 'paused' and unresolve(@fileLine) or true
+        if @status == 'paused'
+            [file, line, col] = splitFileLine @fileLine
+            info[@status] = []
+            info[@status].push name:'⦿ '+path.basename(@fileLine), file:file, line:line, column:col
+        else 
+            info[@status] =  true
         info
         
     # 0000000    00000000   00000000   0000000   000   000  
@@ -134,9 +140,9 @@ class WinDbg
                 return error "unable to set breakpoint #{breakKey}", err if not empty err
                 
                 if result.locations.length
-                    breakpoint = file:file, line:line, col: col, status:status, id:result.breakpointId
+                    breakpoint = file:file, line:line, column: col, status:status, id:result.breakpointId
                     @breakpoints[breakKey] = breakpoint
-                    log 'breakpoint', @breakpoints[breakKey]
+                    # log 'breakpoint', @breakpoints[breakKey]
                     post.toWin @wid, 'setBreakpoint', breakpoint
                     post.toWins 'debuggerChanged'
                 else
@@ -207,8 +213,11 @@ class WinDbg
         @stacktrace = []
         i = 0
         for frame in frames
-            frame.name = empty(frame.functionName.trim()) and "▶" or "▶ "+frame.functionName
-            frame.file = @fileLocation frame.location
+            file = @fileLocation frame.location
+            name = frame.functionName
+            name = path.basename file if not name?.length
+            frame.name = "⦿ " + name
+            frame.file = file
             frame.functionFile = @fileLocation frame.functionLocation
             @stacktrace.push frame 
             i++
