@@ -29,21 +29,21 @@ class State
     
     text:          -> @s.lines.join '\n'    
     lines:         -> @s.lines
-    cursors:       -> @s.cursors.asMutable()
-    highlights:    -> @s.highlights.asMutable()
-    selections:    -> @s.selections.asMutable()
+    cursors:       -> @s.cursors.asMutable deep: true 
+    highlights:    -> @s.highlights.asMutable deep: true 
+    selections:    -> @s.selections.asMutable deep: true 
     main:          -> @s.main
     
     line:      (i) -> @s.lines[i]
-    cursor:    (i) -> @s.cursors[i].asMutable()
-    selection: (i) -> @s.selections[i].asMutable()
-    highlight: (i) -> @s.highlights[i].asMutable()
+    cursor:    (i) -> @s.cursors[i].asMutable deep: true 
+    selection: (i) -> @s.selections[i].asMutable deep: true 
+    highlight: (i) -> @s.highlights[i].asMutable deep: true 
         
     numLines:      -> @s.lines.length
     numCursors:    -> @s.cursors.length
     numSelections: -> @s.selections.length
     numHighlights: -> @s.highlights.length
-    mainCursor:    -> @s.cursors[@s.main]
+    mainCursor:    -> @s.cursors[@s.main].asMutable deep: true
 
     # modify:
 

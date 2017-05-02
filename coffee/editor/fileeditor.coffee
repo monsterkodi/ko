@@ -46,14 +46,6 @@ class FileEditor extends TextEditor
             @dirty = dirty
             post.emit 'dirty', @dirty
 
-    # 00000000   0000000   00000000   00000000  000   0000000   000   000  
-    # 000       000   000  000   000  000       000  000        0000  000  
-    # 000000    000   000  0000000    0000000   000  000  0000  000 0 000  
-    # 000       000   000  000   000  000       000  000   000  000  0000  
-    # 000        0000000   000   000  00000000  000   0000000   000   000  
-    
-    applyForeignLineChanges: (lineChanges) => @do.foreignChanges lineChanges
-
     # 00000000  000  000      00000000
     # 000       000  000      000     
     # 000000    000  000      0000000 
@@ -106,7 +98,8 @@ class FileEditor extends TextEditor
 
     restoreFromTabState: (tabsState) ->
         
-        log 'restoreFromTabState', tabsState.file
+        log 'restoreFromTabState', tabsState
+        return error "no tabsState.file?" if not tabsState.file?
         @clear skip:true
         @setCurrentFile tabsState.file, restoreState:tabsState.state
             

@@ -525,6 +525,7 @@ class TextEditor extends Editor
     # 000         0000000   0000000 
 
     posAtXY:(x,y) ->
+        
         sl = @layers.scrollLeft
         st = @scroll.offsetTop
         br = @view.getBoundingClientRect()
@@ -537,31 +538,34 @@ class TextEditor extends Editor
         
     posForEvent: (event) -> @posAtXY event.clientX, event.clientY
 
-    lineElemAtXY:(x,y) -> 
+    lineElemAtXY:(x,y) ->
+        
         p = @posAtXY x,y
         ci = p[1]-@scroll.exposeTop
         @layerDict['lines'].children[ci]
         
     lineSpanAtXY:(x,y) ->
+        
         lineElem = @lineElemAtXY x,y        
         if lineElem?
             lr = lineElem.getBoundingClientRect()
             for e in lineElem.children
                 br = e.getBoundingClientRect()
-                if br.left <= x and br.left+br.width >= x
+                if br.left <= x <= br.left+br.width
                     offset = x-br.left
                     info =  
                         span:       e
                         offsetLeft: offset
                         offsetChar: parseInt offset/@size.charWidth
                     return info
-        log "not found! #{x} #{y} line #{lineElem?}"
+        error "not found! #{x} #{y} line #{lineElem?}"
         null
 
     viewHeight:   -> @scroll?.viewHeight ? @view?.clientHeight 
     numFullLines: -> Math.floor(@viewHeight() / @size.lineHeight)
     
     clearLines: =>
+        
         while lastChild = @elem.lastChild 
             @elem.removeChild lastChild
         @emit 'clearLines'

@@ -7,7 +7,6 @@
 
 {log,_
 }     = require 'kxk'  
-{Set} = require 'immutable'
 salt  = require '../../tools/salt'  
 
 module.exports =
@@ -127,10 +126,10 @@ module.exports =
             min = _.min (s.search(/#/)+1 for s in slt)
             return [min]
         max = _.max (s.length for s in slt)
-        cols = new Set [min, max]
+        cols = [min, max]
         for col in [min..max]
             s = 0
             for i in [0...5]
                 s += 1 if slt[i].substr(col-2, 2) in ['  ', '# ']
-            cols = cols.add col if s == 5
-        _.sortBy cols.toArray()
+            cols.push(col) if s == 5
+        _.sortBy _.uniq cols

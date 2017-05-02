@@ -105,10 +105,10 @@ post.on 'openFile',   (opt)  -> openFile opt
 post.on 'reloadTab', (file)  -> reloadTab file 
 post.on 'loadFile',  (file)  -> loadFile file
 post.on 'loadFiles', (files) -> openFiles files
-post.on 'fileLinesChanged', (file, lineChanges) ->
-    if file == editor.currentFile
-        editor.applyForeignLineChanges lineChanges
-        
+
+# testing related ...
+
+post.on 'ping', (wID, argA, argB) -> post.toWin wID, 'pong', winID, argA, argB
 post.on 'postEditorState', -> 
     post.toAll 'editorState', winID, 
         lines:      editor.lines() 
@@ -116,8 +116,6 @@ post.on 'postEditorState', ->
         main:       editor.mainCursor()
         selections: editor.selections()
         highlights: editor.highlights()
-
-post.on 'ping', (wID, argA, argB) -> post.toWin wID, 'pong', winID, argA, argB
 
 # 000   000  000  000   000  00     00   0000000   000  000   000  
 # 000 0 000  000  0000  000  000   000  000   000  000  0000  000  
@@ -218,7 +216,7 @@ saveFile = (file) ->
             alert err
         else
             editor.setCurrentFile file
-            post.toMain 'fileSaved', file, winID
+            post.toOthers 'fileSaved', file, winID
 
 window.saveChanges = ->
     

@@ -28,7 +28,6 @@ class Buffer extends event
 
     setState: (state) ->
         @state = new State state.s
-        console.log str @state.cursors()
     
     mainCursor:    -> @state.mainCursor()
     line:      (i) -> @state.line i
@@ -47,8 +46,8 @@ class Buffer extends event
     numHighlights: -> @state.numHighlights()
 
     # these are used from tests and restore
-    setCursors:    (c) -> @state = @state.setCursors(c);    @startSelectionCursors = null; log '@startSelectionCursors setCursors'
-    setSelections: (s) -> @state = @state.setSelections(s); @startSelectionCursors = null; log '@startSelectionCursors setSelections'  
+    setCursors:    (c) -> @state = @state.setCursors(c);    @startSelectionCursors = null
+    setSelections: (s) -> @state = @state.setSelections(s); @startSelectionCursors = null  
     setHighlights: (h) -> @state = @state.setHighlights h  
     setMain:       (m) -> @state = @state.setMain m     
     addHighlight:  (h) -> @state = @state.addHighlight h

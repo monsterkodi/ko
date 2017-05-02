@@ -7,7 +7,6 @@
 
 {log}           = require 'kxk'
 {expect,should} = require 'chai'
-{Map,List}      = require 'immutable'
 assert          = require 'assert'
 _               = require 'lodash'
 should()
@@ -58,7 +57,6 @@ describe 'salter', ->
         editor.insertCharacter 'I'
         editor.insertCharacter 'X'
         editor.endSalter()
-        log editor.text()
         textIs """
              0000000   
             000   000  

@@ -61,7 +61,7 @@ module.exports =
         newCursors = @do.cursors()
         oldMain = @mainCursor()
         newMain = [oldMain[0]+dx, oldMain[1]+dy]
-        _.remove newCursors, (c) => 
+        _.remove newCursors, (c) -> 
             if opt?.erase
                 isSamePos(c, oldMain) or isSamePos(c, newMain)
             else
@@ -94,7 +94,6 @@ module.exports =
 
     moveCursors: (key, info = extend:false) ->
         extend = info.extend ? 'shift' == info.mod
-        log 'moveCursors', key, info, extend
         switch key
             when 'left'  then @moveCursorsLeft  extend
             when 'right' then @moveCursorsRight extend
@@ -116,7 +115,6 @@ module.exports =
     
     moveAllCursors: (func, opt = extend:false, keepLine:true) -> 
         
-        log '------------- moveAllCursors', opt
         @do.start()
         @startSelection opt
         newCursors = @do.cursors()

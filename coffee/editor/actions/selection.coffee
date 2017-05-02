@@ -44,7 +44,6 @@ module.exports =
 
     selectSingleRange: (r, opt = extend:false) ->
         if not opt.extend
-            log '@startSelectionCursors selectSingleRange'
             @startSelectionCursors = null 
         if not r?
             return error "Editor.#{name}.selectSingleRange -- undefined range!"
@@ -77,13 +76,11 @@ module.exports =
     
     startSelection: (opt = extend:false) ->
         if opt?.extend
-            log '----- startSelectionCursors ----- '
             if not @startSelectionCursors
                 @startSelectionCursors = @do.cursors()
                 if not @stickySelection
                     @do.select rangesFromPositions @startSelectionCursors
         else
-            log '@startSelectionCursors startSelection'
             @startSelectionCursors = null
             if not @stickySelection
                 @do.select []
@@ -92,7 +89,6 @@ module.exports =
         if not opt?.extend
             if @do.numSelections() and not @stickySelection
                 @selectNone()
-            log '@startSelectionCursors endSelection'
             @startSelectionCursors = null
         else
             oldCursors   = @startSelectionCursors ? @do.cursors()
@@ -105,7 +101,6 @@ module.exports =
             for ci in [0...@do.numCursors()]
                 oc = oldCursors[ci]
                 nc = newCursors[ci]
-                # log 'oc nc', oc, nc
                 if not oc? or not nc?
                     return error "Editor.#{@name}.endSelection -- invalid cursors", oc, nc
                 else

@@ -35,13 +35,30 @@ class Tabs
         post.on 'restore',          @restore
         post.on 'revertFile',       @revertFile
         post.on 'sendTabs',         @onSendTabs
-
+        post.on 'fileLinesChanged', @onFileLineChanges
+        post.on 'fileSaved',        @onFileSaved
+        
     onSendTabs: (winID) =>
+        
         t = ''
         for tab in @tabs
             t += tab.div.innerHTML
         post.toWin winID, 'winTabs', window.winID, t
 
+    onFileLineChanges: (file, lineChanges) =>
+        
+        tab = @tab file
+        if tab? and tab != @activeTab()
+            # log 'apply foreignChanges in inactive tab', file, tab.info
+            tab.foreignChanges lineChanges
+        
+    onFileSaved: (file, winID) =>
+        error 'fileSaved from this window?' if winID == window.winID
+        tab = @tab file
+        if tab? and tab != @activeTab()
+            log "reverting tab because foreign win saved #{file}", tab.info
+            tab.revert()
+            
     #  0000000  000      000   0000000  000   000  
     # 000       000      000  000       000  000   
     # 000       000      000  000       0000000    

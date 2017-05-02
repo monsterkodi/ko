@@ -9,7 +9,7 @@
 {expect}   = require 'chai'
 assert     = require 'assert'
 noon       = require 'noon'
-{Map,List} = require 'immutable'
+Immutable  = require 'seamless-immutable'
 matchr     = require '../tools/matchr'
 
 describe 'ranges', ->
@@ -74,14 +74,12 @@ describe 'ranges', ->
     
 describe 'dissect', ->
 
-    ranges = new List [
-        new Map 
+    ranges = Immutable [
             start: 0
             match: 'hello'
             value: 'world'
             index: 777
     ,
-        new Map
             start: 2
             match: 'll'
             value: 'world'
@@ -99,15 +97,15 @@ describe 'dissect', ->
     describe 'same', ->    
 
         it 'default', ->
-            diss = matchr.dissect ranges.toJS()
+            diss = matchr.dissect ranges.asMutable deep:true
             expect(diss) .to.eql sameResult
             
         it 'no join', ->
-            diss = matchr.dissect ranges.toJS(), join:false
+            diss = matchr.dissect ranges.asMutable(deep:true), join:false
             expect(diss) .to.eql sameResult
             
         it 'join', ->
-            diss = matchr.dissect ranges.toJS(), join:true
+            diss = matchr.dissect ranges.asMutable(deep:true), join:true
             expect(diss) .to.eql sameResult
 
     describe 'differ', ->    
@@ -115,15 +113,15 @@ describe 'dissect', ->
         differ = ranges.setIn [1, 'value'], 'ells'
         
         it 'default', ->
-            diss = matchr.dissect differ.toJS()
+            diss = matchr.dissect differ.asMutable deep:true
             expect(diss) .to.eql sameResult
             
         it 'no join', ->
-            diss = matchr.dissect differ.toJS(), join:false
+            diss = matchr.dissect differ.asMutable(deep:true), join:false
             expect(diss) .to.eql sameResult
              
         it 'join', ->
-            diss = matchr.dissect differ.toJS(), join:true
+            diss = matchr.dissect differ.asMutable(deep:true), join:true
             expect(diss) .to.eql [
                 start:   0
                 cid:     777

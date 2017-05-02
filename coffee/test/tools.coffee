@@ -8,8 +8,6 @@
 {log, path, _} = require 'kxk'
 {expect}       = require 'chai'
 assert         = require 'assert'
-noon           = require 'noon'
-{Map,List}     = require 'immutable'
 
 dirList = require '../tools/dirlist'
 

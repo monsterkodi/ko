@@ -20,12 +20,35 @@ class Tab
         @div = elem class: 'tab', text: 'untitled'
         @tabs.div.appendChild @div
 
+    foreignChanges: (lineChanges) ->
+        
+        @foreign ?= []
+        @foreign.push lineChanges
+        @update @info
+        @tabs.update()
+        
+    #  0000000   0000000   000   000  00000000
+    # 000       000   000  000   000  000     
+    # 0000000   000000000   000 000   0000000 
+    #      000  000   000     000     000     
+    # 0000000   000   000      0      00000000
+    
     saveChanges: ->
         
         if @state
+            
+            if @foreign?.length
+                for changes in @foreign
+                    for change in changes
+                        switch change.change
+                            when 'changed'  then @state.state = @state.state.changeLine change.doIndex, change.after
+                            when 'inserted' then @state.state = @state.state.insertLine change.doIndex, change.after
+                            when 'deleted'  then @state.state = @state.state.deleteLine change.doIndex
+            
             stat = fs.statSync @state.file
-            atomic @state.file, @state.state.text(), { encoding: 'utf8', mode: stat.mode }, (err) ->            
+            atomic @state.file, @state.state.text(), { encoding: 'utf8', mode: stat.mode }, (err) =>            
                 return error "tab.saveChanges failed #{err}" if err
+                @revert()
         else
             window.saveChanges()
             
@@ -37,12 +60,14 @@ class Tab
     
     storeState: ->
         
+        return error 'no file in state?', @state if not @state.file?
         @state = window.editor.do.tabState()
-        log 'tab.storeState', @state.file, @info
+        # log 'tab.storeState', @state.file, @info
         
     restoreState: ->
         
-        log 'tab.restoreState', @state.file, @info
+        return error 'no file in state?', @state if not @state.file?
+        # log 'tab.restoreState', @state.file, @info
         window.editor.do.setTabState @state
         delete @state
         
@@ -88,20 +113,52 @@ class Tab
         @div.appendChild elem 'span', class:'dot', text:'●' if @dirty()
         @
 
-    dirty: -> @state? or @info?.dirty == true
     file:  -> @info?.file ? 'untitled' 
     close: -> @div.remove(); @tooltip.del() 
     index: -> @tabs.tabs.indexOf @
     prev:  -> @tabs.tab @index()-1 if @index() > 0
     next:  -> @tabs.tab @index()+1 if @index() < @tabs.numTabs()-1
     nextOrPrev: -> @next() ? @prev()
+    dirty: -> 
+        return true if @state? 
+        return true if @foreign? and @foreign.length > 0 
+        return true if @info?.dirty == true
+        false
     
     hidePkg: -> @pkg.style.display = 'none'
     showPkg: -> @pkg.style.display = 'initial'
     
     revert: -> 
         delete @info.dirty
+        delete @foreign
+        delete @state
         @update @info
+        @tabs.update()
+
+    #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
+    # 000   000  000          000     000  000   000  000   000     000     000       
+    # 000000000  000          000     000   000 000   000000000     000     0000000   
+    # 000   000  000          000     000     000     000   000     000     000       
+    # 000   000   0000000     000     000      0      000   000     000     00000000  
+    
+    activate: ->
+        
+        activeTab = @tabs.activeTab()
+        if activeTab? and activeTab.dirty()
+            activeTab.storeState()
+        
+        @setActive()
+        
+        if @state?
+            @restoreState()
+        else
+            window.loadFile @info.file, dontSave:true
+            
+        if @foreign?.length
+            for changes in @foreign
+                window.editor.do.foreignChanges changes
+            delete @foreign
+            
         @tabs.update()
 
     #  0000000    0000000  000000000  000  000   000  00000000  
@@ -110,22 +167,6 @@ class Tab
     # 000   000  000          000     000     000     000       
     # 000   000   0000000     000     000      0      00000000  
     
-    activate: ->
-        
-        if @tabs.activeTab().dirty()
-            log 'store active tab'
-            @tabs.activeTab().storeState()
-        
-        @setActive()
-        
-        if @state?
-            log 'have state'
-            @restoreState()
-        else
-            window.loadFile @info.file, dontSave:true
-            
-        @tabs.update()
-
     isActive: -> @div.classList.contains 'active'
     
     setActive: -> 

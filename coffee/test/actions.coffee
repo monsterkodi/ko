@@ -7,7 +7,6 @@
 
 {log}           = require 'kxk'
 {expect,should} = require 'chai'
-{Map,List}      = require 'immutable'
 assert          = require 'assert'
 _               = require 'lodash'
 should()
