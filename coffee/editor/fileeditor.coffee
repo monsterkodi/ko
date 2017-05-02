@@ -38,20 +38,13 @@ class FileEditor extends TextEditor
     # 000       000   000  000   000  000  0000  000   000  000       000   000
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
-    changed: (changeInfo) ->        
+    changed: (changeInfo) ->    
+        
         super changeInfo
         dirty = @do.hasLineChanges()
         if @dirty != dirty
             @dirty = dirty
             post.emit 'dirty', @dirty
-
-    # 00000000   0000000   00000000   00000000  000   0000000   000   000  
-    # 000       000   000  000   000  000       000  000        0000  000  
-    # 000000    000   000  0000000    0000000   000  000  0000  000 0 000  
-    # 000       000   000  000   000  000       000  000   000  000  0000  
-    # 000        0000000   000   000  00000000  000   0000000   000   000  
-    
-    applyForeignLineChanges: (lineChanges) => @do.foreignChanges lineChanges
 
     # 00000000  000  000      00000000
     # 000       000  000      000     
@@ -86,7 +79,11 @@ class FileEditor extends TextEditor
         
         if @currentFile?
             @watch = new watcher @
-            @setText fs.readFileSync @currentFile, encoding: 'utf8'
+            if opt?.restoreState
+                @setText opt.restoreState.text()
+                @state = opt.restoreState
+            else
+                @setText fs.readFileSync @currentFile, encoding: 'utf8'
             @restoreScrollCursorsAndSelections()
             post.emit 'file', @currentFile # titlebar -> tabs -> tab
             post.toMain 'getBreakpoints', window.winID, @currentFile, window.winID
@@ -95,9 +92,17 @@ class FileEditor extends TextEditor
                 @setLines ['']
             
         if not opt?.skip
-            post.emit 'file', @currentFile # titlebar -> tabs -> tab
+            if not @currentFile?
+                post.emit 'file', @currentFile # titlebar -> tabs -> tab
             @emit 'file', @currentFile # diffbar, pigments, ...
 
+    restoreFromTabState: (tabsState) ->
+        
+        log 'restoreFromTabState', tabsState
+        return error "no tabsState.file?" if not tabsState.file?
+        @clear skip:true
+        @setCurrentFile tabsState.file, restoreState:tabsState.state
+            
     stopWatcher: ->
         if @watch?
             @watch?.stop()
@@ -125,6 +130,7 @@ class FileEditor extends TextEditor
     # 0000000   000   000      0      00000000
         
     saveScrollCursorsAndSelections: (opt) ->
+        
         return if not @currentFile
         s = {}
         
@@ -132,7 +138,7 @@ class FileEditor extends TextEditor
             s.main       = 0
             s.cursors    = [@cursorPos()] 
         else        
-            s.main       = @state.get 'main'
+            s.main       = @state.main()
             s.cursors    = @state.cursors()    if @numCursors() > 1 or @cursorPos()[0] or @cursorPos()[1]
             s.selections = @state.selections() if @numSelections()
             s.highlights = @state.highlights() if @numHighlights()
@@ -180,15 +186,15 @@ class FileEditor extends TextEditor
     #  0000000    0000000   000   000  000      
 
     jumpToFile: (opt) =>
-        
         window.navigate.addFilePos
             file: @currentFile
             pos:  @cursorPos()
-
+            
         [file, pos] = splitFilePos opt.file
         opt.pos = pos
         opt.pos[0] = opt.col if opt.col
-        opt.pos[1] = opt.line if opt.line
+        opt.pos[1] = opt.line-1 if opt.line
+        
         opt.winID = window.winID
         if opt.newTab
             post.emit 'newTabWithFile', opt.file

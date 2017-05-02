@@ -152,8 +152,6 @@ class Titlebar
 
     onWinTabs: (winID, tabs) =>
         
-        log winID, tabs
-        
         for div in @list.children
             if div.winID == winID
                 $('.wintabs', div)?.innerHTML = tabs

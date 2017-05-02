@@ -1,3 +1,4 @@
+
 # 00     00   0000000    0000000  00000000    0000000 
 # 000   000  000   000  000       000   000  000   000
 # 000000000  000000000  000       0000000    000   000
@@ -6,15 +7,15 @@
 
 { packagePath, fileExists, fileName, fileList, relative, splitExt,
   post, noon, path, error, log, _
-}          = require 'kxk'
-indexer    = require '../main/indexer'
-salt       = require '../tools/salt'
-Command    = require '../commandline/command'
-colors     = require 'colors'
-process    = require 'process'
-atomicFile = require 'write-file-atomic'
-Mocha      = require 'mocha'
-Report     = require '../test/report'
+}       = require 'kxk'
+indexer = require '../main/indexer'
+salt    = require '../tools/salt'
+Command = require '../commandline/command'
+colors  = require 'colors'
+process = require 'process'
+atomic  = require 'write-file-atomic'
+Mocha   = require 'mocha'
+Report  = require '../test/report'
 
 class Macro extends Command
 
@@ -237,7 +238,7 @@ class Macro extends Command
                 module.exports = #{clss}
                 
                 """
-                atomicFile file, text, encoding: 'utf8', (err) ->
+                atomic file, text, encoding: 'utf8', (err) ->
                     if err?
                         log 'writing class skeleton failed', err
                         return

@@ -34,14 +34,31 @@ class Tabs
         post.on 'stash',            @stash
         post.on 'restore',          @restore
         post.on 'revertFile',       @revertFile
-        post.on 'sendTabs', @onSendTabs
-
+        post.on 'sendTabs',         @onSendTabs
+        post.on 'fileLinesChanged', @onFileLineChanges
+        post.on 'fileSaved',        @onFileSaved
+        
     onSendTabs: (winID) =>
+        
         t = ''
         for tab in @tabs
             t += tab.div.innerHTML
         post.toWin winID, 'winTabs', window.winID, t
 
+    onFileLineChanges: (file, lineChanges) =>
+        
+        tab = @tab file
+        if tab? and tab != @activeTab()
+            # log 'apply foreignChanges in inactive tab', file, tab.info
+            tab.foreignChanges lineChanges
+        
+    onFileSaved: (file, winID) =>
+        error 'fileSaved from this window?' if winID == window.winID
+        tab = @tab file
+        if tab? and tab != @activeTab()
+            log "reverting tab because foreign win saved #{file}", tab.info
+            tab.revert()
+            
     #  0000000  000      000   0000000  000   000  
     # 000       000      000  000       000  000   
     # 000       000      000  000       0000000    
@@ -122,7 +139,8 @@ class Tabs
     #  0000000  0000000   0000000   0000000   00000000  
     
     closeTab: (tab = @activeTab()) ->
-        
+        if tab.dirty()
+            tab.saveChanges()
         tab.nextOrPrev().activate()
         tab.close()
         _.pull @tabs, tab
@@ -140,6 +158,9 @@ class Tabs
         
         keep = _.pullAt @tabs, @activeTab().index()
         while @numTabs()
+            tab = _.last @tabs
+            if tab.dirty()
+                tab.saveChanges()
             @tabs.pop().close()
         @tabs = keep
         @update()
@@ -159,7 +180,7 @@ class Tabs
         tab
 
     onNewTabWithFile: (file) => 
-
+        
         if tab = @tab file
             tab.activate()
         else
@@ -171,7 +192,7 @@ class Tabs
     # 000  0000  000   000     000     000  000   000  000   000     000     000       
     # 000   000  000   000      0      000   0000000   000   000     000     00000000  
     
-    navigate: (key) -> 
+    navigate: (key) ->
         
         index = @activeTab().index()
         index += switch key
@@ -181,6 +202,7 @@ class Tabs
         @tabs[index].activate()
 
     swap: (ta, tb) ->
+        
         return if not ta? or not tb?
         [ta, tb] = [tb, ta] if ta.index() > tb.index()
         @tabs[ta.index()]   = tb

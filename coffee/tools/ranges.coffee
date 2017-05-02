@@ -6,7 +6,6 @@
 # 000   000  000   000  000   000   0000000   00000000  0000000 
 
 {log} = require 'kxk'
-{Set} = require 'immutable' 
 _     = require 'lodash'
 
 class Ranges
@@ -92,10 +91,10 @@ class Ranges
         minPos ? _.last pl
     
     lineIndicesInPositions: (pl) ->
-        li = new Set
+        indices = []
         for p in pl
-            li = li.add p[1] 
-        li.toArray().sort()
+            indices.push p[1] 
+        _.uniq(indices).sort()
 
     # 00000000    0000000   000   000   0000000   00000000   0000000  
     # 000   000  000   000  0000  000  000        000       000       

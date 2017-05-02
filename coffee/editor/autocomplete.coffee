@@ -134,7 +134,7 @@ class Autocomplete extends event
                 
             @moveClonesBy @completion.length
         else
-            log "warning! no sp? #{cr.left} #{cr.top}"
+            error "no span for autocomplete? cursor topleft: #{parseInt cr.left} #{parseInt cr.top}", info
         
         if @matchList.length
             
@@ -265,9 +265,7 @@ class Autocomplete extends event
         cursorWord = @cursorWord()
         for l in lines
             if not l?.split?
-                error "Autocomplete.parseLines -- line has no split? action: #{opt.action} line: #{l}"
-                error "Autocomplete.parseLines -- lines", lines
-                return
+                return error "Autocomplete.parseLines -- line has no split? action: #{opt.action} line: #{l}", lines
             words = l.split @splitRegExp
             words = words.filter (w) => 
                 return false if not Indexer.testWord w

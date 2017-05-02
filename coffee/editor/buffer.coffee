@@ -19,14 +19,15 @@ class Buffer extends event
     
     constructor: () -> 
         @wordRegExp = new RegExp "(\\s+|\\w+|[^\\s])", 'g'
-        @setState     new State()
+        @setState new State()
 
     setLines: (lines) ->
         @emit 'numLines', 0 # give listeners a chance to clear their stuff
         @setState new State lines:lines
         @emit 'numLines', @numLines()
 
-    setState: (state) -> @state = state
+    setState: (state) ->
+        @state = new State state.s
     
     mainCursor:    -> @state.mainCursor()
     line:      (i) -> @state.line i
@@ -45,7 +46,7 @@ class Buffer extends event
     numHighlights: -> @state.numHighlights()
 
     # these are used from tests and restore
-    setCursors:    (c) -> @state = @state.setCursors(c); @startSelectionCursors = null
+    setCursors:    (c) -> @state = @state.setCursors(c);    @startSelectionCursors = null
     setSelections: (s) -> @state = @state.setSelections(s); @startSelectionCursors = null  
     setHighlights: (h) -> @state = @state.setHighlights h  
     setMain:       (m) -> @state = @state.setMain m     

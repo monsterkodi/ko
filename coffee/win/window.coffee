@@ -22,7 +22,7 @@ FPS         = require '../tools/fps'
 encode      = require '../tools/encode'
 scheme      = require '../tools/scheme'
 electron    = require 'electron'
-atomicFile  = require 'write-file-atomic'
+atomic      = require 'write-file-atomic'
 pkg         = require '../../package.json'
 
 remote      = electron.remote
@@ -105,10 +105,10 @@ post.on 'openFile',   (opt)  -> openFile opt
 post.on 'reloadTab', (file)  -> reloadTab file 
 post.on 'loadFile',  (file)  -> loadFile file
 post.on 'loadFiles', (files) -> openFiles files
-post.on 'fileLinesChanged', (file, lineChanges) ->
-    if file == editor.currentFile
-        editor.applyForeignLineChanges lineChanges
-        
+
+# testing related ...
+
+post.on 'ping', (wID, argA, argB) -> post.toWin wID, 'pong', winID, argA, argB
 post.on 'postEditorState', -> 
     post.toAll 'editorState', winID, 
         lines:      editor.lines() 
@@ -116,8 +116,6 @@ post.on 'postEditorState', ->
         main:       editor.mainCursor()
         selections: editor.selections()
         highlights: editor.highlights()
-
-post.on 'ping', (wID, argA, argB) -> post.toWin wID, 'pong', winID, argA, argB
 
 # 000   000  000  000   000  00     00   0000000   000  000   000  
 # 000 0 000  000  0000  000  000   000  000   000  000  0000  000  
@@ -210,7 +208,7 @@ saveFile = (file) ->
     else
         mode = 438
         
-    atomicFile file, editor.text(), { encoding: 'utf8', mode: mode }, (err) ->
+    atomic file, editor.text(), { encoding: 'utf8', mode: mode }, (err) ->
         
         editor.saveScrollCursorsAndSelections()
         
@@ -218,13 +216,13 @@ saveFile = (file) ->
             alert err
         else
             editor.setCurrentFile file
-            post.toMain 'fileSaved', file, winID
+            post.toOthers 'fileSaved', file, winID
 
-saveChanges = ->
+window.saveChanges = ->
     
     if editor.currentFile? and editor.do.hasLineChanges() and fileExists editor.currentFile
         stat = fs.statSync editor.currentFile
-        atomicFile editor.currentFile, editor.text(), { encoding: 'utf8', mode: stat.mode }, (err) ->            
+        atomic editor.currentFile, editor.text(), { encoding: 'utf8', mode: stat.mode }, (err) ->            
             return error "window.saveChanges failed #{err}" if err
 
 #  0000000   000   000   0000000  000       0000000    0000000  00000000  
@@ -244,7 +242,7 @@ removeListeners = ->
 
 onClose = ->
     
-    saveChanges()
+    window.saveChanges()
     editor.setText ''
     editor.stopWatcher()
     window.stash.clear()
@@ -316,7 +314,8 @@ loadFile = (file, opt={}) ->
         if file? and not fileExists file
             file = null
             
-        if not opt?.dontSave then saveChanges()
+        if not opt?.dontSave 
+            window.saveChanges()
             
         post.toMain 'navigate', 
             action: 'addFilePos'
@@ -344,8 +343,8 @@ loadFile = (file, opt={}) ->
         editor.singleCursorAtPos pos
         editor.scrollCursorToTop()        
   
-openFile = loadFile  
-  
+openFile = loadFile
+
 #  0000000   00000000   00000000  000   000        00000000  000  000      00000000   0000000
 # 000   000  000   000  000       0000  000        000       000  000      000       000     
 # 000   000  00000000   0000000   000 0 000        000000    000  000      0000000   0000000 
@@ -390,6 +389,7 @@ openFiles = (ofiles, options) -> # called from file dialog, open command and bro
 window.openFiles = openFiles
 window.openFile  = openFile
 window.loadFile  = loadFile
+
 
 # 0000000    000   0000000   000       0000000    0000000 
 # 000   000  000  000   000  000      000   000  000      

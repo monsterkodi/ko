@@ -53,6 +53,7 @@ module.exports =
         @do.end()
 
     deleteCharacterBackward: (opt) ->
+        
         newCursors = @do.cursors()
         
         removeNum = switch

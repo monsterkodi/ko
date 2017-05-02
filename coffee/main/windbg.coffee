@@ -5,7 +5,7 @@
 # 000   000  000  000  0000  000   000  000   000  000   000  
 # 00     00  000  000   000  0000000    0000000     0000000   
 
-{ joinFileLine, samePath, splitFileLine, unresolve, post, path, empty, log, _
+{ joinFileLine, samePath, splitFileLine, unresolve, post, path, empty, error, log, _
 }        = require 'kxk'
 electron = require 'electron'
 srcmap   = require '../tools/srcmap'
@@ -32,7 +32,6 @@ class WinDbg
 
         @dbg.sendCommand 'Debugger.enable', (err,result) => 
             return error "unable to enable debugger" if not empty err # or not result
-            log "winDbg #{@wid}"
             
             @enabled = true
             
@@ -69,15 +68,21 @@ class WinDbg
     # 000  000   000  000        0000000   
     
     info: ->
-                    
-        info =
-            breakpoints: @breakpoints
-            # scripts:     @scripts 
-            # scriptMap:   @scriptMap
+        
+        info = breakpoints: _.map @breakpoints, (v,k) -> 
+            name:  '⦿ '+path.basename joinFileLine v.file, v.line, v.column
+            file:   v.file
+            line:   v.line
+            column: v.column
+            status: v.status
         
         info.stacktrace = @stacktrace if @status == 'paused'
-        # info.file = unresolve @fileLine if @fileLine
-        info[@status] = @status == 'paused' and unresolve(@fileLine) or true
+        if @status == 'paused'
+            [file, line, col] = splitFileLine @fileLine
+            info[@status] = []
+            info[@status].push name:'⦿ '+path.basename(@fileLine), file:file, line:line, column:col
+        else 
+            info[@status] =  true
         info
         
     # 0000000    00000000   00000000   0000000   000   000  
@@ -102,7 +107,6 @@ class WinDbg
                     
             [backFile, backLine] = srcmap.toCoffee jsFile, jsLine, jsCol
             return error "can't remap fileLine #{backFile}:#{backLine} #{file}:#{line}" if backFile != file or backLine != line
-            log "#{unresolve backFile}:#{backLine} #{unresolve jsFile}:#{jsLine}"
         else
             [jsFile, jsLine] = [file, line]
         
@@ -119,6 +123,7 @@ class WinDbg
             @dbg.sendCommand "Debugger.removeBreakpoint", {breakpointId:breakpoint.id}, (err,result) => 
                 return error "unable to remove breakpoint #{breakKey}", err if not empty err
                 post.toWin @wid, 'setBreakpoint', breakpoint
+                post.toWins 'debuggerChanged'
             
         else
 
@@ -134,9 +139,8 @@ class WinDbg
                 return error "unable to set breakpoint #{breakKey}", err if not empty err
                 
                 if result.locations.length
-                    breakpoint = file:file, line:line, col: col, status:status, id:result.breakpointId
+                    breakpoint = file:file, line:line, column: col, status:status, id:result.breakpointId
                     @breakpoints[breakKey] = breakpoint
-                    log 'breakpoint', @breakpoints[breakKey]
                     post.toWin @wid, 'setBreakpoint', breakpoint
                     post.toWins 'debuggerChanged'
                 else
@@ -150,6 +154,35 @@ class WinDbg
                 bpts.push v
         bpts        
 
+    #  0000000   0000000          000  00000000   0000000  000000000  00000000   00000000    0000000   00000000    0000000  
+    # 000   000  000   000        000  000       000          000     000   000  000   000  000   000  000   000  000       
+    # 000   000  0000000          000  0000000   000          000     00000000   0000000    000   000  00000000   0000000   
+    # 000   000  000   000  000   000  000       000          000     000        000   000  000   000  000             000  
+    #  0000000   0000000     0000000   00000000   0000000     000     000        000   000   0000000   000        0000000   
+    
+    objectProps: (objectId, cb) ->
+        
+        @dbg.sendCommand "Runtime.getProperties", objectId: objectId, (err,result) => 
+            return error "unable to get object properties #{objectId}", err if not empty err            
+            prepItem = (p) ->
+                name = p.name
+                v = p.value
+                if not v? then return type: 'nil', name: name, obj: null 
+                if v.subtype? and v.subtype == 'null' 
+                    return type: 'nil', name: name, obj: null
+                switch v.type
+                    when 'number'    then type: 'float',  name:name, obj: v.value
+                    when 'boolean'   then type: 'bool',   name:name, obj: v.value
+                    when 'string'    then type: 'string', name:name, obj: v.value
+                    when 'function'  then type: 'func',   name:name, obj: v.description
+                    when 'object'    then type: 'obj',    name:name, obj: objectId: v.objectId
+                    when 'undefined' then type: 'nil',    name:name, obj: undefined
+                    else
+                        log "unhandled value type #{v.type}", v
+                        type: 'nil', name: name, obj: v.type
+            items = result.result.map (p) -> prepItem p
+            cb _browse_items_:items
+        
     # 00     00  00000000   0000000   0000000   0000000    0000000   00000000  
     # 000   000  000       000       000       000   000  000        000       
     # 000000000  0000000   0000000   0000000   000000000  000  0000  0000000   
@@ -157,15 +190,13 @@ class WinDbg
     # 000   000  00000000  0000000   0000000   000   000   0000000   00000000  
     
     onMessage: (event, method, params) =>
-        # log "method: #{method}"
+
         switch method 
             
             when 'Debugger.scriptParsed' then @scriptMap[params.scriptId] = params
             when 'Debugger.breakpointResolved' then log 'breakpoint: '+ params # never happens?
             when 'Debugger.paused' 
 
-                # log 'debugger.paused', params.reason
-                
                 @buildStackTrace params.callFrames
                     
                 if params.hitBreakpoints[0]
@@ -180,11 +211,9 @@ class WinDbg
                     
                 [file, line, col] = splitFileLine fileLine
                 if path.extname(file) != '.coffee'
-                    # log 'step', fileLine
                     @debugCommand 'step'
                 else
                     @fileLine = fileLine
-                    # log 'fileLine', @fileLine
                     @status = 'paused'
                     @sendFileLine()                
                     
@@ -204,17 +233,44 @@ class WinDbg
     
     buildStackTrace: (frames) ->
         
-        @stacktrace = []
+        @stacktrace = {}
         i = 0
         for frame in frames
-            frame.name = empty(frame.functionName.trim()) and "▶" or "▶ "+frame.functionName
-            frame.file = @fileLocation frame.location
-            frame.functionFile = @fileLocation frame.functionLocation
-            @stacktrace.push frame 
+            file = @fileLocation frame.location
+            name = frame.functionName
+            name = path.basename file if not name?.length
+            name = "⦿ " + name
+            scope = @buildScope frame.scopeChain
+            local = scope.shift()
+            global = scope.pop()
+            @stacktrace[name] = 
+                file:   file
+                local:  objectId: local.obj.objectId
+                global: objectId: global.obj.objectId
+                scope:  _browse_items_: scope
+                this:   frame.this
             i++
             
-        log @stacktrace
-
+    #  0000000   0000000   0000000   00000000   00000000  
+    # 000       000       000   000  000   000  000       
+    # 0000000   000       000   000  00000000   0000000   
+    #      000  000       000   000  000        000       
+    # 0000000    0000000   0000000   000        00000000  
+    
+    buildScope: (scopeChain) ->
+        
+        scopes = []
+        for s in scopeChain
+            name = s.name ? s.object.description
+            if name == 'Object'
+                [file] = splitFileLine @fileLocation s.startLocation  
+                name = path.basename file
+            scopes.push
+                type:   'obj'
+                obj:    objectId: s.object.objectId
+                name:   name
+        scopes
+        
     # 000       0000000    0000000   0000000   000000000  000   0000000   000   000  
     # 000      000   000  000       000   000     000     000  000   000  0000  000  
     # 000      000   000  000       000000000     000     000  000   000  000 0 000  
@@ -224,7 +280,7 @@ class WinDbg
     fileLocation: (location) ->
         if @scriptMap[location?.scriptId]?
             jsFile = @scriptMap[location.scriptId].url
-            jsLine = location.lineNumber
+            jsLine = Math.max location.lineNumber, 1
             jsCol  = location.columnNumber
             [coffeeFile, coffeeLine, coffeeCol] = srcmap.toCoffee jsFile, jsLine, jsCol
             if coffeeLine
@@ -249,7 +305,7 @@ class WinDbg
             pause: 'pause'
             
         if map[command]?
-            # log "send #{map[command]}"
+
             @dbg.sendCommand "Debugger.#{map[command]}"
 
 module.exports = WinDbg

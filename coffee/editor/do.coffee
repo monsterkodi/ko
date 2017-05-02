@@ -5,14 +5,20 @@
 # 000   000  000   000
 # 0000000     0000000 
 
-{ clamp, str, error, log, _
-} = require 'kxk'
-
+{ clamp, str, post, empty, error, log, _
+}     = require 'kxk'
+State = require './state'
 require '../tools/ranges'
 
 class Do
     
-    constructor: (@editor) -> @reset()
+    constructor: (@editor) -> 
+        
+        @reset()
+        
+        post.on 'fileLinesChanged', (file, lineChanges) =>
+            if file == @editor.currentFile
+                @foreignChanges lineChanges
 
     foreignChanges: (lineChanges) ->
         
@@ -29,6 +35,28 @@ class Do
                     error "Do.foreignChanges -- unknown change #{change.change}"
         @end foreign: true
 
+    # 000000000   0000000   0000000     0000000  000000000   0000000   000000000  00000000  
+    #    000     000   000  000   000  000          000     000   000     000     000       
+    #    000     000000000  0000000    0000000      000     000000000     000     0000000   
+    #    000     000   000  000   000       000     000     000   000     000     000       
+    #    000     000   000  0000000    0000000      000     000   000     000     00000000  
+    
+    tabState: ->
+        
+        history: @history
+        redos:   @redos
+        state:   @state
+        file:    @editor.currentFile
+        
+    setTabState: (state) ->
+                
+        @editor.restoreFromTabState state
+
+        @groupCount = 0
+        @history = state.history
+        @redos   = state.redos
+        @state   = state.state
+        
     # 00000000   00000000   0000000  00000000  000000000
     # 000   000  000       000       000          000   
     # 0000000    0000000   0000000   0000000      000   
@@ -45,7 +73,7 @@ class Do
     hasLineChanges: ->
         
         return false if @history.length == 0
-        return not _.first(@history).get('lines').equals @editor.state.get('lines')
+        return _.first(@history).lines() != @editor.lines()
                                                                         
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -53,12 +81,13 @@ class Do
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
         
-    start: -> 
+    start: ->
         
         @groupCount += 1
         if @groupCount == 1
-            @startState = @state = @editor.state
-            @history.push @state
+            @startState = @state = new State @editor.state.s
+            if empty(@history) or @state.s != _.last(@history).s
+                @history.push @state
 
     isDoing: -> @groupCount > 0
 
@@ -69,12 +98,9 @@ class Do
     # 000   000   0000000   0000000    000  000          000   
             
     change: (index, text) -> @state = @state.changeLine index, text 
-        
     insert: (index, text) -> @state = @state.insertLine index, text
-        
     delete: (index) ->
-        
-        if @editor.numLines() > 1
+        if @editor.numLines() > 1 and 0 <= index < @editor.numLines()
             @editor.emit 'willDeleteLine', index, @editor.line(index)
             @state = @state.deleteLine index
 
@@ -105,8 +131,7 @@ class Do
     # 000   000  000  0000  000   000  000   000
     #  0000000   000   000  0000000     0000000 
                     
-    undo: -> 
-        
+    undo: ->
         if @history.length
             
             if _.isEmpty @redos
@@ -181,8 +206,8 @@ class Do
         @cleanCursors newCursors
         mainIndex = newCursors.indexOf posClosestToPosInPositions mainCursor, newCursors 
     
-        @state = @state.set 'main', mainIndex
         @state = @state.setCursors newCursors
+        @state = @state.setMain mainIndex
 
     #  0000000   0000000   000       0000000  000   000  000       0000000   000000000  00000000 
     # 000       000   000  000      000       000   000  000      000   000     000     000      
@@ -197,18 +222,19 @@ class Do
         dd = 0 # delta for doIndex
         changes = []
             
-        oldLines = oldState.get 'lines'
-        newLines = newState.get 'lines'
+        oldLines = oldState.lines()
+        newLines = newState.lines()
 
         insertions = 0 # number of insertions
         deletions  = 0 # number of deletions
         
         if oldLines != newLines
         
-            ol = oldLines.get oi
-            nl = newLines.get ni
+            ol = oldLines[oi]
+            nl = newLines[ni]
             
-            while oi < oldLines.size
+            while oi < oldLines.length
+                
                 if not nl? # new state has not enough lines, mark remaining lines in oldState as deleted
                     deletions += 1
                     changes.push change: 'deleted', oldIndex: oi, doIndex: oi+dd
@@ -217,46 +243,53 @@ class Do
                     
                 else if ol == nl # same lines in old and new
                     oi += 1
-                    ol = oldLines.get oi
+                    ol = oldLines[oi]
                     ni += 1
-                    nl = newLines.get ni
+                    nl = newLines[ni]
                     
-                else if 0 < (inserts = newLines.slice(ni).findIndex (v) -> v==ol) # insertion
-                    while inserts
-                        changes.push change: 'inserted', newIndex: ni, doIndex: oi+dd, after: nl.get 'text'
-                        ni += 1
-                        dd += 1
-                        inserts -= 1
-                        insertions += 1
-                    nl = newLines.get ni
+                else 
+                    inserts = newLines.slice(ni).findIndex (v) -> v==ol # insertion
+                    deletes = oldLines.slice(oi).findIndex (v) -> v==nl # deletion
                     
-                else if 0 < (deletes = oldLines.slice(oi).findIndex (v) -> v==nl) # deletion
-                    while deletes
-                        changes.push change: 'deleted', oldIndex: oi, doIndex: oi+dd
+                    if inserts > 0 and (deletes <= 0 or inserts < deletes)
+                        
+                        while inserts
+                            changes.push change: 'inserted', newIndex: ni, doIndex: oi+dd, after: nl
+                            ni += 1
+                            dd += 1
+                            inserts -= 1
+                            insertions += 1
+                        nl = newLines[ni]
+                        
+                    else if deletes > 0 and (inserts <= 0 or deletes < inserts)                                    
+                        
+                        while deletes
+                            changes.push change: 'deleted', oldIndex: oi, doIndex: oi+dd
+                            oi += 1
+                            dd -= 1
+                            deletes -= 1
+                            deletions += 1
+                        ol = oldLines[oi]
+                    
+                    else # change
+                        
+                        changes.push change: 'changed', oldIndex: oi, newIndex: ni, doIndex: oi+dd, after: nl
                         oi += 1
-                        dd -= 1
-                        deletes -= 1
-                        deletions += 1
-                    ol = oldLines.get oi
-                    
-                else # change
-                    changes.push change: 'changed', oldIndex: oi, newIndex: ni, doIndex: oi+dd, after: nl.get 'text'
-                    oi += 1
-                    ol = oldLines.get oi
-                    ni += 1
-                    nl = newLines.get ni
+                        ol = oldLines[oi]
+                        ni += 1
+                        nl = newLines[ni]
                             
-            while ni < newLines.size # mark remaing lines in newState as inserted
+            while ni < newLines.length # mark remaing lines in newState as inserted
                 insertions += 1
-                changes.push change: 'inserted', newIndex: ni, doIndex: ni, after: nl.get 'text'
+                changes.push change: 'inserted', newIndex: ni, doIndex: ni, after: nl
                 ni += 1
-                nl = newLines.get ni
+                nl = newLines[ni]
            
         changes: changes
         inserts: insertions
         deletes: deletions
-        cursors: oldState.get('cursors')    != newState.get('cursors')
-        selects: oldState.get('selections') != newState.get('selections')
+        cursors: oldState.s.cursors    != newState.s.cursors
+        selects: oldState.s.selections != newState.s.selections
                     
     # 00     00  00000000  00000000    0000000   00000000
     # 000   000  000       000   000  000        000     
@@ -273,18 +306,18 @@ class Do
         while @history.length > 1
             b = @history[@history.length-2]
             a = _.last @history
-            if a.get('lines') == b.get('lines')
+            if a.lines() == b.lines()
                 if @history.length > 2
                     @history.splice @history.length-2, 1
                 else
                     return
             else if @history.length > 2 
                 c = @history[@history.length-3]
-                if a.get('lines').size == b.get('lines').size == c.get('lines').size 
-                    for li in [0...a.get('lines').size]
-                        la = a.getIn 'lines', li
-                        lb = b.getIn 'lines', li
-                        lc = c.getIn 'lines', li
+                if a.lines().length == b.lines().length == c.lines().length
+                    for li in [0...a.lines().length]
+                        la = a.line li
+                        lb = b.line li
+                        lc = c.line li
                         if la == lb and lc != lb or la != lb and lc == lb
                             return
                     @history.splice @history.length-2, 1
@@ -298,6 +331,7 @@ class Do
     #  0000000  0000000  00000000  000   000  000   000  
     
     cleanCursors: (cs) ->
+
         for p in cs
             p[0] = Math.max p[0], 0
             p[1] = clamp 0, @state.numLines()-1, p[1]
@@ -318,7 +352,7 @@ class Do
     #      000     000     000   000     000     000       
     # 0000000      000     000   000     000     00000000  
       
-    text:            -> @state.text() 
+    text:            -> @state.text()
     line:        (i) -> @state.line i 
     cursor:      (i) -> @state.cursor i
     highlight:   (i) -> @state.highlight i
@@ -334,7 +368,7 @@ class Do
     numSelections:   -> @state.numSelections()
     numHighlights:   -> @state.numHighlights()
     
-    textInRange: (r) -> @state.line(r[0]).slice? r[1][0], r[1][1]
+    textInRange: (r) -> @state.line(r[0])?.slice r[1][0], r[1][1]
     mainCursor:      -> @state.mainCursor()
     rangeForLineAtIndex: (i) -> [i, [0, @line(i).length]]
             

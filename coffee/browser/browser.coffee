@@ -58,6 +58,22 @@ class Browser extends Stage
             @columns[index].focus().activeRow().activate()
         @
 
+    navigatePath: (path) ->
+        
+        if _.isString path
+            path = path.split ':'
+        
+        log 'navigatePath', path    
+        
+        colIndex = 0
+        while (p = path.shift())?
+            row = @columns[colIndex].row p
+            log 'p', p, _.isNumber(p), colIndex, row?
+            break if not row?
+            log 'activate', row.item.name
+            row.activate()
+            colIndex++
+        
     # 00000000   0000000    0000000  000   000   0000000  
     # 000       000   000  000       000   000  000       
     # 000000    000   000  000       000   000  0000000   
@@ -95,6 +111,13 @@ class Browser extends Stage
     # 000   000  000          000       
     #  0000000   00000000     000       
     
+    activeColumn: -> @column @activeColumnIndex()
+    activeColumnIndex: -> 
+        
+        for col in @columns
+            if col.hasFocus() then return col.index
+        0
+        
     activeColumnID: ->
         
         for col in @columns
@@ -226,7 +249,7 @@ class Browser extends Stage
         clsss = files[file]?.classes ? []
         for clss in clsss
             text = '● '+clss.name
-            items.push name: clss.name, text:text, type:'class', file: file, line: clss.line
+            items.push name: clss.name, text:text, type:'class', file: file, line: clss.line+1
         
         funcs = files[file]?.funcs ? []
         for func in funcs
@@ -236,7 +259,7 @@ class Browser extends Stage
                 text = '  ◆ '+func.name
             else
                 text = '  ▸ '+func.name
-            items.push name: func.name, text:text, type:'func', file: file, line: func.line
+            items.push name: func.name, text:text, type:'func', file: file, line: func.line+1
 
         if items.length
             items.sort (a,b) -> a.line - b.line

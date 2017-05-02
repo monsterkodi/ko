@@ -287,7 +287,7 @@ class Meta
     #     0      000   000  000   000  000  0000000   000   000
 
     onWillDeleteLine: (li) => 
-        
+
         for meta in @metasAtLineIndex li
             @delMeta meta
         

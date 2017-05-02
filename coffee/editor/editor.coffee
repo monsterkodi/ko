@@ -15,17 +15,6 @@ class Editor extends Buffer
 
     @actions = null
 
-    constructor: () ->
-
-        Editor.initActions() if not Editor.actions?
-            
-        @indentString       = _.padStart "", 4
-        @stickySelection    = false
-        @dbg                = false
-        super
-        @do                 = new Do @
-        @setupFileType()
-
     # 000  000   000  000  000000000       0000000    0000000  000000000  000   0000000   000   000   0000000  
     # 000  0000  000  000     000         000   000  000          000     000  000   000  0000  000  000       
     # 000  000 0 000  000     000         000000000  000          000     000  000   000  000 0 000  0000000   
@@ -33,6 +22,7 @@ class Editor extends Buffer
     # 000  000   000  000     000         000   000   0000000     000     000   0000000   000   000  0000000   
     
     @initActions: -> 
+        
         @actions = []
         for actionFile in fileList path.join __dirname, 'actions'
             continue if path.extname(actionFile) not in ['.js', '.coffee']
@@ -47,6 +37,23 @@ class Editor extends Buffer
                         
         # too early for log here!            
         # console.log str @actions
+    
+    #  0000000   0000000   000   000   0000000  000000000  00000000   000   000   0000000  000000000   0000000   00000000   
+    # 000       000   000  0000  000  000          000     000   000  000   000  000          000     000   000  000   000  
+    # 000       000   000  000 0 000  0000000      000     0000000    000   000  000          000     000   000  0000000    
+    # 000       000   000  000  0000       000     000     000   000  000   000  000          000     000   000  000   000  
+    #  0000000   0000000   000   000  0000000      000     000   000   0000000    0000000     000      0000000   000   000  
+    
+    constructor: () ->
+
+        Editor.initActions() if not Editor.actions?
+            
+        @indentString       = _.padStart "", 4
+        @stickySelection    = false
+        @dbg                = false
+        super
+        @do                 = new Do @
+        @setupFileType()
 
     # 000000000  000   000  00000000   00000000
     #    000      000 000   000   000  000     

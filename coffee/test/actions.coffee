@@ -1,3 +1,4 @@
+
 #  0000000    0000000  000000000  000   0000000   000   000   0000000  
 # 000   000  000          000     000  000   000  0000  000  000       
 # 000000000  000          000     000  000   000  000 0 000  0000000   
@@ -6,7 +7,6 @@
 
 {log}           = require 'kxk'
 {expect,should} = require 'chai'
-{Map,List}      = require 'immutable'
 assert          = require 'assert'
 _               = require 'lodash'
 should()

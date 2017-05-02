@@ -5,61 +5,58 @@
 #      000     000     000   000     000     000     
 # 0000000      000     000   000     000     00000000
 
-{ log, str }          = require 'kxk'
-{ Record, List, Map } = require 'immutable' 
+{ log, str, _ 
+}         = require 'kxk'
+Immutable = require 'seamless-immutable'
 
-Select = Record s:0, e:0, l:-1
-Highlt = Record s:0, e:0, l:-1, o:{}
-Cursor = Record x:0, y:-1
-Line   = Record text:''
-StateR = Record 
-    lines:      List []
-    selections: List []
-    highlights: List []
-    cursors:    List [new Cursor()]
-    main:       0
-
-class State extends StateR
+class State
     
-    constructor: (opt) -> 
-        lines = opt?.lines ? []
-        super 
-            lines:   List lines.map (l) -> Line text:l
-            cursors: List [Cursor y:0]
+    constructor: (opt) ->
+        
+        if opt? and Immutable.isImmutable opt
+            @s = opt
+        else
+            lines = opt?.lines ? []
+            y = lines.length == 0 and -1 or 0
+            @s = Immutable
+                lines:      lines
+                cursors:    [[0,y]]
+                selections: []
+                highlights: []
+                main:       0
     
     # read only:
     
-    text:          -> @lines().join '\n'    
-    lines:         -> @get('lines').toArray().map (l) -> l.get 'text'
-    cursors:       -> @get('cursors').map((c) -> [c.get('x'), c.get('y')]).toArray()
-    highlights:    -> @get('highlights').map((s) -> l=[s.get('l'), [s.get('s'), s.get('e')]]; l.push(s.get('o')) if s.get('o')?; l).toArray()
-    selections:    -> @get('selections').map((s) -> [s.get('l'), [s.get('s'), s.get('e')]]).toArray()
+    text:          -> @s.lines.join '\n'    
+    lines:         -> @s.lines
+    cursors:       -> @s.cursors.asMutable deep: true 
+    highlights:    -> @s.highlights.asMutable deep: true 
+    selections:    -> @s.selections.asMutable deep: true 
+    main:          -> @s.main
     
-    line:      (i) -> @getIn ['lines', i, 'text']
-    cursor:    (i) -> c = @getIn ['cursors', i]; [c.get('x'), c.get('y')]
-    selection: (i) -> s = @getIn ['selections', i]; [s.get('l'), [s.get('s'), s.get('e')]]
-    highlight: (i) -> s = @getIn ['highlights', i]; [s.get('l'), [s.get('s'), s.get('e')], s.get('o')]
+    line:      (i) -> @s.lines[i]
+    cursor:    (i) -> @s.cursors[i].asMutable deep: true 
+    selection: (i) -> @s.selections[i].asMutable deep: true 
+    highlight: (i) -> @s.highlights[i].asMutable deep: true 
         
-    numLines:      -> @get('lines').size
-    numCursors:    -> @get('cursors').size
-    numSelections: -> @get('selections').size
-    numHighlights: -> @get('highlights').size
-
-    mainCursor:    -> mc = @getIn ['cursors', @get 'main']; [mc?.get?('x') ? 0, mc?.get?('y') ? -1]
+    numLines:      -> @s.lines.length
+    numCursors:    -> @s.cursors.length
+    numSelections: -> @s.selections.length
+    numHighlights: -> @s.highlights.length
+    mainCursor:    -> @s.cursors[@s.main].asMutable deep: true
 
     # modify:
 
-    setSelections: (s) -> @set 'selections', List s.map (r) -> Select s:r[1][0], e:r[1][1], l:r[0]
-    setHighlights: (h) -> @set 'highlights', List h.map (r) -> Highlt s:r[1][0], e:r[1][1], l:r[0], o:r[2]
-    setCursors:    (c) -> @set 'cursors',    List c.map (t) -> Cursor x:t[0], y:t[1]
-    setLines:      (l) -> @set 'lines',      List l.map (t) -> Line text:t
-    setMain:       (m) -> @set 'main', m
+    setSelections: (s) -> new State @s.set 'selections', s
+    setHighlights: (h) -> new State @s.set 'highlights', h
+    setCursors:    (c) -> new State @s.set 'cursors',    c
+    setLines:      (l) -> new State @s.set 'lines',      l
+    setMain:       (m) -> new State @s.set 'main',       m
 
-    addHighlight:  (h) -> @set 'highlights', @get('highlights').push Highlt s:h[1][0], e:h[1][1], l:h[0], o:h[2]
-    
-    insertLine: (i,t) -> @update 'lines', (l) -> l.splice i, 0, Line text:t
-    changeLine: (i,t) -> @setIn ['lines', i, 'text'], t
-    deleteLine: (i)   -> @update 'lines', (l) -> l.splice i, 1
-    appendLine: (t)   -> @set 'lines', @get('lines').push new Line text:t
+    changeLine: (i,t) -> new State @s.setIn ['lines', i], t
+    insertLine: (i,t) -> l = @s.lines.asMutable(); l.splice i, 0, t; new State @s.set 'lines', l
+    deleteLine: (i)   -> l = @s.lines.asMutable(); l.splice i, 1;    new State @s.set 'lines', l
+    appendLine:   (t) -> l = @s.lines.asMutable(); l.push t;         new State @s.set 'lines', l
+    addHighlight: (h) -> m = @s.highlights.asMutable(); m.push h;    new State @s.set 'highlights', m
     
 module.exports = State

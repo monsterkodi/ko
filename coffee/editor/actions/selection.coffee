@@ -43,7 +43,8 @@ module.exports =
             combo: 'command+alt+ctrl+b'
 
     selectSingleRange: (r, opt = extend:false) ->
-        @startSelectionCursors = null if not opt.extend
+        if not opt.extend
+            @startSelectionCursors = null 
         if not r?
             return error "Editor.#{name}.selectSingleRange -- undefined range!"
         @do.start()
@@ -95,7 +96,6 @@ module.exports =
             newCursors   = @do.cursors()
             
             if oldCursors.length != newCursors.length
-                log 'startSelectionCursors', @startSelectionCursors?.length
                 return error "Editor.#{@name}.endSelection -- oldCursors.size != newCursors.size", oldCursors.length, newCursors.length
             
             for ci in [0...@do.numCursors()]

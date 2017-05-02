@@ -49,10 +49,13 @@ class Navigate
                     if @currentIndex != @filePositions.length-1
                         @filePositions = @filePositions.slice(@currentIndex).concat @filePositions.slice 0, @currentIndex 
                         
-                    @filePositions = @filePositions.filter (filePos) -> not (filePos.file == opt.file and Math.abs(filePos.pos[1] - opt.pos[1]) < 2)
+                    @filePositions = @filePositions.filter (filePos) -> 
+                        not (filePos.file == opt.file and Math.abs(filePos.pos[1] - opt.pos[1]) < 2)
+                        
                     @filePositions.push 
                         file: opt.file
                         pos:  opt.pos  
+                        
                     @currentIndex = @filePositions.length-1
                     if opt?.for == 'goto'
                         @loadFilePos @filePositions[@currentIndex], opt

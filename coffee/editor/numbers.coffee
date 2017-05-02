@@ -35,7 +35,7 @@ class Numbers extends event
         # log "Numbers.updateColor li:#{li}" if @editor.name == 'editor'
         si = (s[0] for s in rangesFromTopToBotInRanges li, li, @editor.selections())
         hi = (s[0] for s in rangesFromTopToBotInRanges li, li, @editor.highlights())
-        ci = (s[0] for s in rangesFromTopToBotInRanges li, li, rangesFromPositions @editor.state.cursors())
+        ci = (s[0] for s in rangesFromTopToBotInRanges li, li, rangesFromPositions @editor.cursors())
         child = @elem.children[li-@editor.scroll.exposeTop]
         return if not child?
         cls = ''
@@ -107,16 +107,19 @@ class Numbers extends event
     onClearLines: =>  @elem.innerHTML = ""
         
     onLineVanished: (e) => 
+        
         if @elem.firstChild?.lineIndex == e.lineIndex
             @elem.firstChild.remove()
         else if @elem.lastChild?.lineIndex >= e.lineIndex
             @elem.lastChild.remove()
     
     onLineDeleted: (li) =>
+        
         top = @editor.scroll.exposeTop
         if top <= li
             for i in [li-top...@elem.children.length]
                 div = @elem.children[i]
+                error "no div for lineIndex #{li}? top: #{top} children:#{@elem.children.length}" if not div?
                 div.firstChild.textContent = "#{top+i+1}"
                 @updateColor top+i
                 @emit 'numberChanged', 

@@ -50,10 +50,12 @@ class ObjectBrowser extends Browser
         objName = (opt.text ? opt.name) ? obj.constructor?.name
         
         itemForKeyValue = (key, value) =>
-            type: @valueType value 
+            type: @valueType value
             obj:  value
             name: key
 
+        sort = true
+            
         if opt.column == 0
             newItem = itemForKeyValue objName, obj
             newItem.preview = false if opt.preview == false
@@ -70,14 +72,14 @@ class ObjectBrowser extends Browser
         else
             if obj._browse_items_? and _.isArray obj._browse_items_
                 items = obj._browse_items_
-                dontSort = true
+                sort  = opt.sort ? false
             else
                 items = []
                 for key,value of obj # own?
                     items.push itemForKeyValue key, value
                     _.last(items).preview = false if value?.preview == false
 
-        if @valueType(obj) not in ['func', 'array'] and not dontSort
+        if @valueType(obj) not in ['func', 'array'] and sort
             @sortByType items
 
         @loadItems items, opt
@@ -118,10 +120,17 @@ class ObjectBrowser extends Browser
             
             key = '● '+clss
             items = [name: clss, text: '● '+clss, type:'class', file: clsso.file, line: clsso.line]
+            
             for mthd,mthdo of clsso.methods
+                
+                if mthdo.static
+                    text = '  ◆ '+mthd
+                else
+                    text = '  ▸ '+mthd
+                        
                 items.push 
                     name: mthd
-                    text: '  ▸ '+mthd
+                    text: text
                     type:'method'
                     file: mthdo.file
                     line: mthdo.line
@@ -267,7 +276,7 @@ class ObjectBrowser extends Browser
                 
         if opt.activate and _.isString item.obj?.file
             
-            post.emit 'jumpTo', file:item.obj.file, line:item.obj.line
+            post.emit 'jumpToFile', file:item.obj.file, line:item.obj.line, col:item.obj.column
 
     # 00000000   00000000   00000000  000   000  000  00000000  000   000  
     # 000   000  000   000  000       000   000  000  000       000 0 000  

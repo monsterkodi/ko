@@ -1,3 +1,4 @@
+
 a = (s) ->
     if 5 < s < 15
         x = 0
@@ -12,4 +13,5 @@ a = (s) ->
         b = 4
         console.log "#{s}"
     0
+    
 module.exports = a
