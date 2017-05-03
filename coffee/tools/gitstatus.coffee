@@ -35,16 +35,24 @@ gitStatus = (fileOrDir) ->
         changed: []
         deleted: []
         added:   []
+        
+    dirSet = new Set
     
     while line = lines.shift()
+        rel    = line.slice 3
         file   = path.join gitDir, line.slice 3
+        while (rel = path.dirname rel) != '.'
+            dirSet.add rel
+            
         header = line.slice 0,2
         switch header
             when ' D' then info.deleted.push file
             when ' M' then info.changed.push file
             when '??' then info.added  .push file
+            
+    info.dirs = Array.from(dirSet).map (d) -> path.join gitDir, d
     
-    # log info
+    log info
     return info
 
 if module.parent

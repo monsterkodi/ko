@@ -5,11 +5,12 @@
 # 000       000  000      000             000   000  000   000  000   000  000   000       000  000       000   000  
 # 000       000  0000000  00000000        0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 
-{ packagePath, encodePath, fileName, swapExt, resolve, elem, post, clamp, 
-  error, log, process, childp, path, fs, os, _
+{ packagePath, encodePath, fileName, swapExt, resolve, empty, elem, post, clamp, 
+  error, log, process, childp, path, fs, os, $, _
 }        = require 'kxk'
 Browser  = require './browser'
 dirlist  = require '../tools/dirlist'
+forkfunc = require 'fork-func'
 
 class FileBrowser extends Browser
     
@@ -90,9 +91,37 @@ class FileBrowser extends Browser
 
         if opt?.file
             @navigateTargetFile = opt.file
+
+        @getGitStatus opt
             
         super items, opt
-      
+
+    #  0000000   000  000000000   0000000  000000000   0000000   000000000  000   000   0000000  
+    # 000        000     000     000          000     000   000     000     000   000  000       
+    # 000  0000  000     000     0000000      000     000000000     000     000   000  0000000   
+    # 000   000  000     000          000     000     000   000     000     000   000       000  
+    #  0000000   000     000     0000000      000     000   000     000      0000000   0000000   
+    
+    getGitStatus: (opt) ->
+            
+        forkfunc '../tools/gitstatus', opt.parent.file, (err, info) =>
+            if not empty err
+                log 'gitstatus failed', err
+                return
+            files = {}
+            for key in ['changed', 'added', 'dirs']
+                for file in info[key]
+                    files[file] = key
+
+            for row in @columns[opt.column]?.rows
+                return if row.item.type not in ['dir', 'file']
+                status = files[row.item.file]
+                if status?
+                    icon = {added:'plus', changed:'pencil', 'dirs':'pencil-square-o'}[status]
+                    $('.git', row.div)?.remove()
+                    row.div.appendChild elem 'span', 
+                        class:"git #{status} fa fa-#{icon} extname #{path.extname(row.item.file).slice 1}"
+        
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       
     # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000   

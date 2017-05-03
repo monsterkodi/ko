@@ -119,7 +119,9 @@ class Numbers extends event
         if top <= li
             for i in [li-top...@elem.children.length]
                 div = @elem.children[i]
-                error "no div for lineIndex #{li}? top: #{top} children:#{@elem.children.length}" if not div?
+                if not div?
+                    error "no div for lineIndex #{li}? top: #{top} children:#{@elem.children.length}" 
+                    continue
                 div.firstChild.textContent = "#{top+i+1}"
                 @updateColor top+i
                 @emit 'numberChanged', 
