@@ -289,6 +289,7 @@ class ObjectBrowser extends Browser
         return error 'not an object item?' if not item.type == 'obj'
         return error 'no object in item?' if not item.obj?
         return if item.preview == false
+        return if item.obj.objectId?
 
         opt.parent = type:'preview'
             
@@ -336,7 +337,10 @@ class ObjectBrowser extends Browser
     
     sortByType: (items) ->
         type = (i) -> {obj:'a', array:'b', elem:'c', regexp:'d', string:'e', int:'f', float:'g', bool:'h', nil:'i', func:'z'}[i.type]
-        items.sort (a,b) -> (type(a) + a.name).localeCompare type(b) + b.name      
+        items.sort (a,b) ->
+            if a.obj?.index? and b.obj?.index?
+                return a.obj.index - b.obj.index
+            (type(a) + a.name).localeCompare type(b) + b.name      
 
     clear: ->
         delete @columns[0].parent

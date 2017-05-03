@@ -23,7 +23,7 @@ class Command
     #      000     000     000   000     000     000       
     # 0000000      000     000   000     000     00000000  
     
-    state: ->    
+    state: ->
         text:  @getText()
         name:  @names[0]
         combo: @combo
@@ -342,6 +342,8 @@ class Command
         return if not @prefsID
         prefs.del "command:#{@prefsID}:#{key}"
 
+    isActive: -> @commandline.command == @
+        
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
     # 0000000    0000000     00000  

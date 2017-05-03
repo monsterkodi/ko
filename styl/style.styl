@@ -497,12 +497,24 @@ infoPadding = 6px
     &.git
         width               numbersWidth
             
-    &.dbg        
+    &.dbg  
+        z-index             1
         border-radius       6px
         margin-top          3px
         margin-left         4px
         width               12px
         height              12px
+        
+    &.dbg.pointer
+        z-index             2
+        width               0
+        height              0
+        border-radius       0
+        margin-left         10px
+        background          transparent
+        border-top          6px solid transparent
+        border-bottom       6px solid transparent       
+        border-left         6px solid
         
     &.pigment
         opacity             1

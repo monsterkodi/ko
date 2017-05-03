@@ -5,7 +5,7 @@
 # 000   000  000       000   000  000   000  000   000  
 # 0000000    00000000  0000000     0000000    0000000   
 
-{ dirExists, process, unresolve, resolve, post, str, error, log, $
+{ dirExists, samePath, process, unresolve, resolve, post, str, error, log, $
 }             = require 'kxk'
 Command       = require '../commandline/command'
 ObjectBrowser = require '../browser/objectbrowser'
@@ -23,7 +23,6 @@ class Debug extends Command
         @names      = ["debug"]
         
         post.on 'debugFileLine',   @onDebugFileLine
-        post.on 'debuggerChanged', @onDebuggerChanged
         post.on 'objectProps',     @onObjectProps
         
         @browser.name = 'DebugBrowser'
@@ -53,6 +52,7 @@ class Debug extends Command
         r  = @browser.column(0)?.row activeItemName
         r ?= 0
         @browser.column(0)?.row(r)?.activate()
+        @updateInstructionPointer()
 
     onDebugFileLine: (@debugInfo) =>
         
@@ -67,8 +67,30 @@ class Debug extends Command
             post.emit 'jumpToFile', file:@debugInfo.fileLine
             
         @debugCtrl.setPlayState @state()
+        @updateInstructionPointer()
+        
+    onEditorFile: (file) => 
+        log 'onEditorFile', file
+        @updateInstructionPointer()
+        
+    updateInstructionPointer: ->
+        
+        window.editor.meta.delClass 'dbg'
+        
+        file = window.editor.currentFile
+        return if not file?
+        
+        log 'updateInstructionPointer'
+        
+        return if not @dbgInfo?
+        
+        post.toMain 'getBreakpoints', window.winID, file, @activeWid()
+        
+        if @dbgInfo[@activeWid()]?.paused?
+            if samePath @dbgInfo[@activeWid()].paused[0].file, file
+                window.editor.meta.addDbgMeta line:@dbgInfo[@activeWid()].paused[0].line-1, clss:'dbg pointer'
 
-    activeItem: -> @browser.column(0)?.activeRow()?.item
+    activeItem: -> return null if not @isActive(); @browser.column(0)?.activeRow()?.item
     activeWid:  -> parseInt @activeItem()?.name ? window.winID
     state:      -> @activeItem()?.obj['paused']? and 'paused' or 'running'
     isPaused:   -> @state() == 'paused'
@@ -81,12 +103,18 @@ class Debug extends Command
     
     start: (@combo) ->
         
+        log 'start debug'
+        
+        window.editor.on 'file',   @onEditorFile
+        post.on 'debuggerChanged', @onDebuggerChanged
+                
         @browser.start()
         @debugCtrl.start()
         @loadDbgInfo()
             
         @browser.column(0).row(0)?.activate()
         @debugCtrl.setPlayState @state()
+        @updateInstructionPointer()
         
         super @combo
         
@@ -94,8 +122,10 @@ class Debug extends Command
         do:     @name == 'Browse' and 'half area' or 'quart area'
 
     loadDbgInfo: ->
+        
         @browser.clear()
-        for k,v of post.get 'dbgInfo'
+        @dbgInfo = post.get 'dbgInfo'
+        for k,v of @dbgInfo
             @browser.loadObject v, name:k
         
     #  0000000   0000000   000   000   0000000  00000000  000    
@@ -105,6 +135,13 @@ class Debug extends Command
     #  0000000  000   000  000   000   0000000  00000000  0000000
     
     cancel: ->
+        
+        log 'cancel debug'
+        
+        window.editor.meta.delClass 'dbg'
+        window.editor.removeListener 'file', @onEditorFile
+        post.removeListener 'debuggerChanged', @onDebuggerChanged
+        
         @debugCtrl.cancel()
         super
         
@@ -115,7 +152,6 @@ class Debug extends Command
     onItemActivated: (item) => 
         
         if item.obj?.objectId?
-            log 'onItemActivated', item
             post.toMain 'getObjectProps', window.winID, item.obj.objectId, @activeWid()
         
         @debugCtrl.setPlayState @state()
@@ -127,11 +163,11 @@ class Debug extends Command
     # 00000000  000   000  00000000   0000000   0000000      000     00000000  
     
     execute: (command) ->
+        
         return error "no command?" if not command?
         cmd = command.trim()
         return error "no cmd?" if not cmd.length
         wid = @activeWid()
-        log 'debug execute command', wid, cmd
         @cmdID += 1
         switch cmd
             when 'step', 'into', 'out', 'cont', 'pause' then post.toMain 'debugCommand', wid, cmd

@@ -28,7 +28,28 @@ class Coffee extends Command
         window.area.on 'resized', @onAreaResized
         post.on 'executeResult',  @onResult
         post.on 'browseResult',   @onBrowseResult
+
+    #  0000000  000000000   0000000   000000000  00000000  
+    # 000          000     000   000     000     000       
+    # 0000000      000     000000000     000     0000000   
+    #      000     000     000   000     000     000       
+    # 0000000      000     000   000     000     00000000  
     
+    state: -> 
+        s = super
+        s.browse = ( r.item.name for r in @browser.column(0).rows )
+        s
+        
+    restoreState: (state) ->
+        
+        super state
+        
+        if state.browse.length
+            @browser.start()
+            for name in state.browse
+                @executeCoffee command:"browse #{name}, name:'#{name}'"
+            window.split.swap $('terminal'), $('area')
+        
     #  0000000   000   000        00000000   00000000   0000000  000   000  000      000000000
     # 000   000  0000  000        000   000  000       000       000   000  000         000   
     # 000   000  000 0 000        0000000    0000000   0000000   000   000  000         000   
@@ -130,7 +151,7 @@ class Coffee extends Command
     start: (@combo) ->
         super @combo
         select: true
-        do:     'show terminal'
+        do:     'third commandline'
 
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     

@@ -53,7 +53,9 @@ toJs = (coffeeFile, coffeeLine, coffeeCol=0) ->
         consumer = new sourceMap.SourceMapConsumer mapData 
         srcFile = 'coffee/' + coffeeFile.split('/coffee/')[1]
         poss = consumer.allGeneratedPositionsFor source:srcFile, line:coffeeLine, column:coffeeCol
-        return [jsFile,null] if not poss.length
+        if not poss.length and coffeeCol
+            poss = consumer.allGeneratedPositionsFor source:srcFile, line:coffeeLine, column:0
+        return [jsFile,null,null] if not poss.length
         jsLine = poss[0].line
         jsCol  = poss[0].column
     else

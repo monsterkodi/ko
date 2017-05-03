@@ -5,7 +5,7 @@
 #    000     000   000  000   000
 #    000     000   000  0000000  
 
-{ packagePath, unresolve, elem, post, path, fs, log, _
+{ packagePath, unresolve, elem, post, path, fs, error, log, _
 }       = require 'kxk'
 render  = require '../editor/render'
 syntax  = require '../editor/syntax'

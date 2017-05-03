@@ -152,6 +152,8 @@ class Titlebar
 
     onWinTabs: (winID, tabs) =>
         
+        return if not @list?
+        return if winID != window.winID
         for div in @list.children
             if div.winID == winID
                 $('.wintabs', div)?.innerHTML = tabs

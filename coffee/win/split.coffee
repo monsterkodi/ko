@@ -98,8 +98,8 @@ class Split extends event
                     
         switch what
             when 'editor' then return @moveCommandLineBy -delta
-            when 'terminal', 'area'
-                @raise what
+            when 'terminal', 'area', 'commandline'
+                @raise what if what != 'commandline'
                 if delta? then @moveCommandLineBy delta
                 if pos? then @flex.moveHandleToPos @flex.handles[0], pos
                 return 

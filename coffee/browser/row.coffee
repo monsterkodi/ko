@@ -61,15 +61,14 @@ class Row
             when 'dir'   then @browser.loadDir     @item.file, column: @column.index+1, parent: @item
             when 'file'  then @browser.loadContent @,          column: @column.index+1
             else
-                log 'activate', @item
-                
+                # log 'activate', @item
                 if @item.file?
                     post.emit 'jumpToFile', file:@item.file, line:@item.line, col:@item.column
                 else if @column.parent.obj? and @column.parent.type == 'obj'
                     @browser.loadObjectItem  @item, column:@column.index+1
                     if @item.type == 'obj'
                         @browser.previewObjectItem  @item, column:@column.index+2
-                        if @item.obj.file? and @item.obj.line?
+                        if @item.obj.file?
                             post.emit 'jumpToFile', file:@item.obj.file, line:@item.obj.line, col:@item.obj.column
                 else if @item.obj?.file?
                     post.emit 'jumpToFile', file:@item.obj.file, line:@item.obj.line, col:@item.obj.column

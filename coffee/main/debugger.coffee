@@ -40,11 +40,11 @@ class Debugger
             info[wid] = dbg.info()
         info
         
-    onSetBreakpoint: (wid, file, line, col=0, status='toggle') =>
+    onSetBreakpoint: (wid, file, line, status='toggle') =>
         
         return error 'wrong file type' if path.extname(file) not in ['.js', '.coffee']
         @winDbg[wid] ?= new WinDbg @, wid
-        @winDbg[wid].setBreakpoint file, line, col, status
+        @winDbg[wid].setBreakpoint file, line, status
 
     onGetBreakpoints: (sendToWin, file, breakWin) =>
         

@@ -5,7 +5,7 @@
 # 000   000  000  000  0000  000   000  000   000  000   000  
 # 00     00  000  000   000  0000000    0000000     0000000   
 
-{ joinFileLine, samePath, splitFileLine, unresolve, post, path, empty, error, log, _
+{ joinFileLine, samePath, splitFileLine, unresolve, post, path, empty, log, _
 }        = require 'kxk'
 electron = require 'electron'
 srcmap   = require '../tools/srcmap'
@@ -18,7 +18,7 @@ class WinDbg
         @scripts     = {}
         @scriptMap   = {}
         @breakpoints = {}
-        @stacktrace  = []
+        @stacktrace  = {}
         
         @dbg = electron.BrowserWindow.fromId(@wid).webContents.debugger
 
@@ -26,12 +26,12 @@ class WinDbg
             try
                 @dbg.attach '1.2'
             catch err
-                error "can't attach!", err
+                log "can't attach debugger!", err
 
         @dbg.on 'message', @onMessage
 
         @dbg.sendCommand 'Debugger.enable', (err,result) => 
-            return error "unable to enable debugger" if not empty err # or not result
+            return log "can't enable debugger!" if not empty err # or not result
             
             @enabled = true
             
@@ -70,17 +70,16 @@ class WinDbg
     info: ->
         
         info = breakpoints: _.map @breakpoints, (v,k) -> 
-            name:  '⦿ '+path.basename joinFileLine v.file, v.line, v.column
+            name:  '⦿ '+path.basename joinFileLine v.file, v.line
             file:   v.file
             line:   v.line
-            column: v.column
             status: v.status
         
         info.stacktrace = @stacktrace if @status == 'paused'
         if @status == 'paused'
             [file, line, col] = splitFileLine @fileLine
             info[@status] = []
-            info[@status].push name:'⦿ '+path.basename(@fileLine), file:file, line:line, column:col
+            info[@status].push name:'⦿ '+path.basename(@fileLine), file:file, line:line
         else 
             info[@status] =  true
         info
@@ -91,22 +90,22 @@ class WinDbg
     # 000   000  000   000  000       000   000  000  000   
     # 0000000    000   000  00000000  000   000  000   000  
     
-    setBreakpoint: (file, line, col, status) ->
+    setBreakpoint: (file, line, status) ->
         
-        log "WinDbg.setBreakpoint file:#{file} line:#{line} col:#{col} status:#{status}"
+        log "WinDbg.setBreakpoint #{file}:#{line} status:#{status}"
         
         if not @enabled
             @breakdelay ?= []
-            @breakdelay.push [file, line, col, status]
+            @breakdelay.push [file, line, status]
             return
             
         if path.extname(file) == '.coffee'
-            [jsFile, jsLine, jsCol] = srcmap.toJs file, line, col
+            [jsFile, jsLine, jsCol] = srcmap.toJs file, line
             if not jsFile
-                return error "no js source line for #{file}:#{line}:#{col}"
+                return log "no js source line for #{file}:#{line}"
                     
-            [backFile, backLine] = srcmap.toCoffee jsFile, jsLine, jsCol
-            return error "can't remap fileLine #{backFile}:#{backLine} #{file}:#{line}" if backFile != file or backLine != line
+            [backFile, backLine, backCol] = srcmap.toCoffee jsFile, jsLine, jsCol
+            return log "can't remap fileLine #{backFile}:#{backLine}:#{backCol} - #{jsFile}:#{jsLine}:#{jsCol} - #{file}:#{line}" if backFile != file or backLine != line
         else
             [jsFile, jsLine] = [file, line]
         
@@ -121,7 +120,7 @@ class WinDbg
                 delete @breakpoints[breakKey]
 
             @dbg.sendCommand "Debugger.removeBreakpoint", {breakpointId:breakpoint.id}, (err,result) => 
-                return error "unable to remove breakpoint #{breakKey}", err if not empty err
+                return log "unable to remove breakpoint #{breakKey}", err if not empty err
                 post.toWin @wid, 'setBreakpoint', breakpoint
                 post.toWins 'debuggerChanged'
             
@@ -133,14 +132,15 @@ class WinDbg
                 url:  resolve jsFile 
                 lineNumber:   jsLine
                 columnNumber: jsCol
-                
+
             @dbg.sendCommand "Debugger.setBreakpointByUrl", breakLoc, (err,result) => 
                 
-                return error "unable to set breakpoint #{breakKey}", err if not empty err
+                return log "unable to set breakpoint #{breakKey}", err if not empty err
                 
                 if result.locations.length
-                    breakpoint = file:file, line:line, column: col, status:status, id:result.breakpointId
+                    breakpoint = file:file, line:line, status:status, id:result.breakpointId
                     @breakpoints[breakKey] = breakpoint
+                    log 'post', breakpoint
                     post.toWin @wid, 'setBreakpoint', breakpoint
                     post.toWins 'debuggerChanged'
                 else
@@ -163,7 +163,7 @@ class WinDbg
     objectProps: (objectId, cb) ->
         
         @dbg.sendCommand "Runtime.getProperties", objectId: objectId, (err,result) => 
-            return error "unable to get object properties #{objectId}", err if not empty err            
+            return log "unable to get object properties #{objectId}", err if not empty err            
             prepItem = (p) ->
                 name = p.name
                 v = p.value
@@ -205,7 +205,7 @@ class WinDbg
                     fileLine = joinFileLine.apply joinFileLine, srcmap.toCoffee file, line, col
                     
                     wtf = @fileLocation params.callFrames[0].location
-                    if wtf != unresolve fileLine then error 'breakpoint and stacktrace differ?', wtf, unresolve fileLine
+                    if wtf != unresolve fileLine then log 'breakpoint and stacktrace differ?', wtf, unresolve fileLine
                 else
                     fileLine = @fileLocation params.callFrames[0].location
                     
@@ -244,6 +244,7 @@ class WinDbg
             local = scope.shift()
             global = scope.pop()
             @stacktrace[name] = 
+                index:  i
                 file:   file
                 local:  objectId: local.obj.objectId
                 global: objectId: global.obj.objectId

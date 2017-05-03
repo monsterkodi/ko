@@ -205,11 +205,10 @@ class Meta
         meta.no_h = true
         @addNumberMeta meta
 
-    delDbgMeta: (meta) ->
+    delDbgMeta: (line) ->
         
-        li = meta.line
-        for meta in @metasAtLineIndex li
-            @delMeta meta
+        for meta in @metasAtLineIndex line
+            @delMeta meta if meta[2].dbg
 
     addNumberMeta: (meta) ->
         

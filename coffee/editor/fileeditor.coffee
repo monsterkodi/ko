@@ -249,9 +249,8 @@ class FileEditor extends TextEditor
                     @jumpToFile file:file, line:6
                     return true
 
-        if true #not type or type == 'word'
-            window.commandline.commands.search.start "command+shift+f"    
-            window.commandline.commands.search.execute word
+        window.commandline.commands.search.start "command+shift+f"    
+        window.commandline.commands.search.execute word
             
         window.split.do 'show terminal'
         
@@ -355,19 +354,22 @@ class FileEditor extends TextEditor
     # 0000000    000   000  00000000  000   000  000   000  000         0000000   000  000   000     000     
     
     toggleBreakpoint: ->
+        
         return if path.extname(@currentFile) not in ['.js', '.coffee']
         for cp in @cursors()
             continue if not @line(cp[1]).trim().length
-            post.toMain 'setBreakpoint', window.winID, @currentFile, cp[1]+1, cp[0]
+            wid = window.commandline.commands.debug.activeWid()
+            post.toMain 'setBreakpoint', wid, @currentFile, cp[1]+1
         
     onSetBreakpoint: (breakpoint) =>
-        # log 'onSetBreakpoint', breakpoint, @currentFile
+        
+        log 'onSetBreakpoint', breakpoint, @currentFile
         return if not samePath breakpoint.file, @currentFile
         line = breakpoint.line
         switch breakpoint.status
             when 'active'   then @meta.addDbgMeta line:line-1, clss:'dbg breakpoint'
             when 'inactive' then @meta.addDbgMeta line:line-1, clss:'dbg breakpoint inactive'
-            when 'remove'   then @meta.delDbgMeta line:line-1
+            when 'remove'   then @meta.delDbgMeta line-1
 
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
@@ -376,6 +378,7 @@ class FileEditor extends TextEditor
     # 000   000  00000000     000   
 
     handleModKeyComboEvent: (mod, key, combo, event) ->
+        
         return if 'unhandled' != super mod, key, combo, event
         switch combo
             when 'ctrl+enter'       then return window.commandline.commands.coffee.executeText @text()

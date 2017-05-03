@@ -212,7 +212,7 @@ class Column
             
         @searchDiv.textContent = @search
 
-        activeIndex  = @activeRow().index()
+        activeIndex  = @activeRow()?.index() ? 0
         activeIndex += 1 if (@search.length == 1) or (char == '')
         activeIndex  = 0 if activeIndex >= @numRows()
         
@@ -241,7 +241,6 @@ class Column
     
     removeObject: ->
         
-        # if @index == 0 and row = @activeRow()
         if row = @activeRow()
             # delete @parent.obj[row.item.name]
             nextOrPrev = row.next() ? row.prev()
@@ -252,19 +251,37 @@ class Column
         @
   
     sortByName: -> 
-        
-        @rows.sort (a,b) -> a.item.name.localeCompare b.item.name
+        log 'sortByName'
+        @rows.sort (a,b) -> 
+            a.item.name.localeCompare b.item.name
+            
+        @table.innerHTML = ''
         for row in @rows
             @table.appendChild row.div
         @
         
     sortByType: ->
-        
-        @rows.sort (a,b) -> (a.item.type + a.item.name).localeCompare b.item.type + b.item.name
+        # log 'sortByType'
+        @rows.sort (a,b) -> 
+            atype = a.item.type == 'file' and path.extname(a.item.name).slice(1) or a.item.type
+            btype = b.item.type == 'file' and path.extname(b.item.name).slice(1) or b.item.type
+            (atype + a.item.name).localeCompare btype + b.item.name
+            
+        @table.innerHTML = ''
         for row in @rows
             @table.appendChild row.div
         @
   
+    toggleDotFiles: ->
+
+        prefsKey = "browser:ignoreHidden:#{@parent.file}"
+        if @parent.type == 'dir'            
+            if prefs.get prefsKey
+                prefs.set prefsKey
+            else
+                prefs.set prefsKey, true
+            @browser.loadDir @parent.file, column:@index, focus:true
+        
     # 000   000  00000000  000   000  
     # 000  000   000        000 000   
     # 0000000    0000000     00000    
@@ -279,25 +296,26 @@ class Column
 
         switch combo
             when 'up', 'down', 'page up', 'page down', 'home', 'end' 
-                stopEvent event, @navigateRows key
+                return stopEvent event, @navigateRows key
             when 'right', 'left', 'enter'                            
-                stopEvent event, @navigateCols key
-            when 'command+enter' then @openFileInNewWindow()
+                return stopEvent event, @navigateCols key
+            when 'command+enter'       then return @openFileInNewWindow()
             when 'command+left', 'command+up','command+right', 'command+down'
-                stopEvent event, @navigateRoot key
-            when 'backspace' then stopEvent event, @clearSearch().removeObject()
-            when 'ctrl+t' then stopEvent event, @sortByType()
-            when 'ctrl+n' then stopEvent event, @sortByName()
+                return stopEvent event, @navigateRoot key
+            when 'backspace', 'delete' then return stopEvent event, @clearSearch().removeObject()
+            when 'ctrl+t'              then return stopEvent event, @sortByType()
+            when 'ctrl+n'              then return stopEvent event, @sortByName()
+            when 'command+i'           then return stopEvent event, @toggleDotFiles()
             when 'tab'    
                 if @search.length then @doSearch ''
                 return stopEvent event
             when 'esc'
                 if @search.length then @clearSearch()
                 else window.split.focus 'commandline-editor'
-                stopEvent event
+                return stopEvent event
 
         switch char
-            when '~', '/' then stopEvent event, @navigateRoot char
+            when '~', '/' then return stopEvent event, @navigateRoot char
             
         if mod in ['shift', ''] and char then @doSearch char
         

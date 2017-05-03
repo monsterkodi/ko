@@ -54,22 +54,25 @@ class FileBrowser extends Browser
     
     loadDir: (dir, opt) -> 
         
-        opt.ignoreHidden = false
+        opt ?= {}
+        opt.ignoreHidden ?= prefs.get "browser:ignoreHidden:#{dir}", false
+        
         dirlist dir, opt, (err, items) => 
             
             if err? then return error "can't load dir #{dir}: #{err}"
             
-            opt ?= {}
             opt.parent ?=
                 type: 'dir'
                 file: dir
                 name: path.basename dir
+
+            column = opt.column ? 0
                 
-            if not opt?.column or @columns[0]?.activeRow()?.item.name == '..'
+            if column == 0 or @columns[column-1].activeRow()?.item.name == '..'
                 
                 updir = resolve path.join dir, '..'
                 
-                if not (updir == dir == '/') and (not @columns[0].parent? or @columns[0].parent.file.startsWith dir) 
+                if not (updir == dir == '/')
                     items.unshift 
                         name: '..'
                         type: 'dir'

@@ -63,14 +63,10 @@ class Browser extends Stage
         if _.isString path
             path = path.split ':'
         
-        log 'navigatePath', path    
-        
         colIndex = 0
         while (p = path.shift())?
             row = @columns[colIndex].row p
-            log 'p', p, _.isNumber(p), colIndex, row?
             break if not row?
-            log 'activate', row.item.name
             row.activate()
             colIndex++
         
