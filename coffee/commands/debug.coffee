@@ -28,6 +28,7 @@ class Debug extends Command
         
         @browser.name = 'DebugBrowser'
         @browser.on 'itemActivated', @onItemActivated
+        @browser.on 'willRemoveRow', @onWillRemoveRow
         window.area.on 'resized', @onAreaResized
                 
         super @commandline
@@ -153,6 +154,14 @@ class Debug extends Command
             post.toMain 'getObjectProps', window.winID, item.obj.objectId, @activeWid()
         
         @debugCtrl.setPlayState @state()
+        
+    onWillRemoveRow: (row, column) =>
+        
+        log 'willRemoveRow', row.item
+        log 'willRemoveRow', column.index
+        if column.prevColumn().activeRow().item.name == 'breakpoints'
+            log 'willRemoveRow removeBreakpoint', row.item.obj.file
+            post.toMain 'setBreakpoint', @activeWid(), row.item.obj.file, row.item.obj.line, 'remove'
 
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000  
     # 000        000 000   000       000       000   000     000     000       

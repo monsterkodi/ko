@@ -134,7 +134,7 @@ class Coffee extends Command
             coffee.eval "cmdID = #{@cmdID}" # ???
             result = coffee.eval cfg.command
         catch err
-            error "Coffee.executeCoffee -- #{err}"
+            error "Coffee.executeCoffee --- #{err}", err.stack, err.toString()
             result = error: err.toString()
 
         if not result?
@@ -168,7 +168,7 @@ class Coffee extends Command
         if command.startsWith '.' then command = 'browse ' + command.slice 1
                         
         for w in ['class', 'func', 'word', 'file']
-            if command.startsWith "#{w}" 
+            if command.startsWith "#{w}"
                 args = command.split /\s+/
                 args = args.map (a) -> "'#{a}'"
                 args = args.join ', '

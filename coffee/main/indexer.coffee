@@ -70,14 +70,19 @@ class Indexer
     onGet: (key, filter...) =>
 
         value = @[key]
-        if filter.length
-            names = filter.map (c) -> c.toLowerCase()
-            names = _.filter names, (c) -> not empty c
-            value = _.pickBy value, (value, key) ->
-                for cn in names
-                    lc = key.toLowerCase()
-                    if cn.length>1 and lc.indexOf(cn)>=0 or lc.startsWith(cn)
-                        return true
+        if not empty filter
+            
+            names = _.filter filter, (c) -> not empty c
+            
+            if not empty names
+                
+                names = names.map (c) -> c?.toLowerCase()
+                
+                value = _.pickBy value, (value, key) ->
+                    for cn in names
+                        lc = key.toLowerCase()
+                        if cn.length>1 and lc.indexOf(cn)>=0 or lc.startsWith(cn)
+                            return true
         value
         
     #  0000000   0000000   000      000      00000000   0000000  000000000  
@@ -175,7 +180,7 @@ class Indexer
     addMethod: (className, funcName, file, li) ->
 
         funcInfo = @addFuncInfo funcName,
-            line:  li
+            line:  li+1
             file:  file
             class: className
 
@@ -286,7 +291,7 @@ class Indexer
                         if m?[1]?
 
                             funcInfo = @addFuncInfo m[1],
-                                line: li
+                                line: li+1
                                 file: file
 
                             funcStack.push [indent, funcInfo]
@@ -295,7 +300,7 @@ class Indexer
                         m = line.match Indexer.testRegExp
                         if m?[2]?
                             funcInfo = @addFuncInfo m[2],
-                                line: li
+                                line: li+1
                                 file: file
                                 test: m[1]
 
@@ -322,11 +327,11 @@ class Indexer
                             if m?[1]?
                                 currentClass = m[1]
                                 _.set @classes, "#{m[1]}.file", file
-                                _.set @classes, "#{m[1]}.line", li
+                                _.set @classes, "#{m[1]}.line", li+1
                                 
                                 fileInfo.classes.push 
                                     name: m[1]
-                                    line: li
+                                    line: li+1
 
                         # 00000000   00000000   0000000   000   000  000  00000000   00000000
                         # 000   000  000       000   000  000   000  000  000   000  000

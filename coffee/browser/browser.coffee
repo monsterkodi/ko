@@ -58,13 +58,13 @@ class Browser extends Stage
             @columns[index].focus().activeRow().activate()
         @
 
-    navigatePath: (path) ->
+    navigatePath: (pth) ->
         
-        if _.isString path
-            path = path.split ':'
+        if _.isString pth
+            pth = pth.split ':'
         
         colIndex = 0
-        while (p = path.shift())?
+        while (p = pth.shift())?
             row = @columns[colIndex].row p
             break if not row?
             row.activate()
@@ -245,7 +245,7 @@ class Browser extends Stage
         clsss = files[file]?.classes ? []
         for clss in clsss
             text = '● '+clss.name
-            items.push name: clss.name, text:text, type:'class', file: file, line: clss.line+1
+            items.push name: clss.name, text:text, type:'class', file: file, line: clss.line
         
         funcs = files[file]?.funcs ? []
         for func in funcs
@@ -255,7 +255,7 @@ class Browser extends Stage
                 text = '  ◆ '+func.name
             else
                 text = '  ▸ '+func.name
-            items.push name: func.name, text:text, type:'func', file: file, line: func.line+1
+            items.push name: func.name, text:text, type:'func', file: file, line: func.line
 
         if items.length
             items.sort (a,b) -> a.line - b.line

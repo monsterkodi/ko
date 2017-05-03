@@ -460,7 +460,7 @@ class Term extends Command
                                 diss = Syntax.dissForTextAndSyntax "#{spcs} #{classOrFile}", 'ko'
                             meta =
                                 diss: diss
-                                href: "#{info.file}:#{info.line+1}"
+                                href: "#{info.file}:#{info.line}"
                                 clss: 'searchResult'
                                 click: @onMetaClick
                             terminal.queueMeta meta
@@ -484,7 +484,7 @@ class Term extends Command
                         terminal.queueMeta clss: 'salt', text: clss
                         meta =
                             diss: Syntax.dissForTextAndSyntax "● #{clss}", 'ko'
-                            href: "#{info.file}:#{info.line+1}"
+                            href: "#{info.file}:#{info.line}"
                             clss: 'termResult'
                             click: @onMetaClick
                         terminal.queueMeta meta
@@ -492,7 +492,7 @@ class Term extends Command
                         for mthd, minfo of info.methods
                             meta =
                                 diss: Syntax.dissForTextAndSyntax "    #{minfo.static and '◆' or '▸'} #{mthd}", 'ko'
-                                href: "#{minfo.file}:#{minfo.line+1}"
+                                href: "#{minfo.file}:#{minfo.line}"
                                 clss: 'searchResult'
                                 click: @onMetaClick
                             terminal.queueMeta meta

@@ -92,12 +92,15 @@ class ObjectBrowser extends Browser
     # 000       000  0000000     000     00000000  000   000  
     
     filter: (names, indexerKey, filterFunc) ->
-        
+
         objs = post.get 'indexer', indexerKey
         
         if not empty names
-            names = names.map (c) -> c.toLowerCase()
             names = _.filter names, (c) -> not empty c
+            
+        if not empty names
+            names = names.map (c) -> c?.toLowerCase()
+            
             objs = _.pickBy objs, (value, key) ->
                 for cn in names
                     lc = key.toLowerCase()
@@ -211,6 +214,7 @@ class ObjectBrowser extends Browser
     # 00     00   0000000   000   000  0000000    0000000   
     
     loadWords: (names) ->
+        
         words = @filter names, 'words'
         @loadObject words, name:'words', focus:false, preview:false
     

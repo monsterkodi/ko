@@ -113,9 +113,9 @@ class WinDbg
         breakKey = joinFileLine jsFile, jsLine, jsCol
         breakpoint = @breakpoints[breakKey]
         
-        if breakpoint and status in ['toggle', 'inactive']
+        if breakpoint and status in ['toggle', 'inactive', 'remove']
 
-            if status == 'toggle'
+            if status in ['toggle', 'remove']
                 breakpoint.status = 'remove'
                 delete @breakpoints[breakKey]
 

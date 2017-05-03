@@ -243,6 +243,7 @@ class Column
         
         if row = @activeRow()
             # delete @parent.obj[row.item.name]
+            @browser.emit 'willRemoveRow', row, @
             nextOrPrev = row.next() ? row.prev()
             row.div.remove()
             @items.splice row.index(), 1
@@ -292,7 +293,7 @@ class Column
         
         {mod, key, combo, char} = keyinfo.forEvent event
 
-        log mod, key, combo, char
+        # log mod, key, combo, char
 
         switch combo
             when 'up', 'down', 'page up', 'page down', 'home', 'end' 
