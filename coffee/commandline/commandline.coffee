@@ -193,6 +193,7 @@ class Commandline extends TextEditor
         window.split.show   r.show   if r?.show?
         window.split.focus  r.focus  if r?.focus?
         window.split.do     r.do     if r?.do?
+        @
         
     cancel: -> @results @command?.cancel()
     clear:  -> @results @command?.clear()
@@ -279,16 +280,17 @@ class Commandline extends TextEditor
 
     globalModKeyComboEvent: (mod, key, combo, event) ->
         
+        if combo == 'esc'
+            if document.activeElement == @view then return @cancel()
+                
         for n,c of @commands            
-            if combo == 'esc'
-                if document.activeElement == @view
-                    @cancel()
-                    return 
                     
             for sc in c.shortcuts
                 if sc == combo then return @startCommand n, combo, event
+        
+        return if 'unhandled' != @command.globalModKeyComboEvent mod, key, combo, event
                 
-        return 'unhandled'            
+        'unhandled'            
 
     handleModKeyComboEvent: (mod, key, combo, event) ->
         

@@ -384,7 +384,7 @@ class FileEditor extends TextEditor
             when 'ctrl+enter'       then return window.commandline.commands.coffee.executeText @text()
             when 'ctrl+shift+enter' then return window.commandline.commands.coffee.executeTextInMain @text()
             when 'command+alt+up'   then return @jumpToCounterpart()
-            when 'f9'               then return @toggleBreakpoint()
+            when 'f7'               then return @toggleBreakpoint()
             when 'esc'
                 split = window.split
                 if split.terminalVisible()

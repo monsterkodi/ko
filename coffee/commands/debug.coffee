@@ -42,7 +42,10 @@ class Debug extends Command
         activeColumn = @browser.activeColumn()
         activeItem = activeColumn.activeRow().item
         if activeItem.obj.objectId == objectId and props?._browse_items_?.length
-            @browser.loadObject props, column:activeColumn.index + 1, parent:activeItem, sort:true
+            @browser.loadObject props, 
+                column: activeColumn.index + 1
+                parent: activeItem
+                sort:   true
         
     onDebuggerChanged: =>
         
@@ -69,9 +72,7 @@ class Debug extends Command
         @debugCtrl.setPlayState @state()
         @updateInstructionPointer()
         
-    onEditorFile: (file) => 
-        log 'onEditorFile', file
-        @updateInstructionPointer()
+    onEditorFile: (file) => @updateInstructionPointer()
         
     updateInstructionPointer: ->
         
@@ -80,15 +81,15 @@ class Debug extends Command
         file = window.editor.currentFile
         return if not file?
         
-        log 'updateInstructionPointer'
-        
         return if not @dbgInfo?
         
         post.toMain 'getBreakpoints', window.winID, file, @activeWid()
         
         if @dbgInfo[@activeWid()]?.paused?
             if samePath @dbgInfo[@activeWid()].paused[0].file, file
-                window.editor.meta.addDbgMeta line:@dbgInfo[@activeWid()].paused[0].line-1, clss:'dbg pointer'
+                window.editor.meta.addDbgMeta 
+                    line: @dbgInfo[@activeWid()].paused[0].line-1
+                    clss: 'dbg pointer'
 
     activeItem: -> return null if not @isActive(); @browser.column(0)?.activeRow()?.item
     activeWid:  -> parseInt @activeItem()?.name ? window.winID
@@ -102,8 +103,6 @@ class Debug extends Command
     # 0000000      000     000   000  000   000     000   
     
     start: (@combo) ->
-        
-        log 'start debug'
         
         window.editor.on 'file',   @onEditorFile
         post.on 'debuggerChanged', @onDebuggerChanged
@@ -135,8 +134,6 @@ class Debug extends Command
     #  0000000  000   000  000   000   0000000  00000000  0000000
     
     cancel: ->
-        
-        log 'cancel debug'
         
         window.editor.meta.delClass 'dbg'
         window.editor.removeListener 'file', @onEditorFile
@@ -171,7 +168,18 @@ class Debug extends Command
         @cmdID += 1
         switch cmd
             when 'step', 'into', 'out', 'cont', 'pause' then post.toMain 'debugCommand', wid, cmd
+        @
     
     onAreaResized: (w, h) => @browser.resized? w,h
+    
+    globalModKeyComboEvent: (mod, key, combo, event) -> 
+        
+        switch combo
+            when 'f8'  then return @execute 'step'
+            when 'f9'  then return @execute 'cont'
+            when 'f10' then return @execute 'into'
+            when 'f11' then return @execute 'out'
+        
+        super mod, key, combo, event
                 
 module.exports = Debug
