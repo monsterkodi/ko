@@ -51,7 +51,7 @@ class Indexer
         @collectBins()
         @collectProjects()
     
-        @imageExtensions = ['.png', '.jpg', '.gif', '.tiff', '.pxm']        
+        @imageExtensions = ['.png', '.jpg', '.gif', '.tiff', '.pxm', '.icns']        
 
         @dirs    = Object.create null
         @files   = Object.create null
@@ -140,7 +140,7 @@ class Indexer
 
         @walker = new Walker wopt
         @walker.cfg.ignore.push 'js'
-        @walker.cfg.include =  @walker.cfg.include.concat @imageExtensions
+        @walker.cfg.includeExt = @walker.cfg.includeExt.concat @imageExtensions
         @walker.start()
 
     onWalkerDir: (p, stat) =>

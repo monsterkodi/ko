@@ -52,7 +52,6 @@ gitStatus = (fileOrDir) ->
             
     info.dirs = Array.from(dirSet).map (d) -> path.join gitDir, d
     
-    log info
     return info
 
 if module.parent

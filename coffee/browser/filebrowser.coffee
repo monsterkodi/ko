@@ -105,15 +105,22 @@ class FileBrowser extends Browser
     getGitStatus: (opt) ->
             
         forkfunc '../tools/gitstatus', opt.parent.file, (err, info) =>
+            
             if not empty err
                 log 'gitstatus failed', err
                 return
+                
+            return if empty info
+                
             files = {}
             for key in ['changed', 'added', 'dirs']
                 for file in info[key]
                     files[file] = key
 
-            for row in @columns[opt.column]?.rows
+            rows = @columns[opt.column]?.rows
+            return if empty rows
+            
+            for row in rows
                 return if row.item.type not in ['dir', 'file']
                 status = files[row.item.file]
                 if status?
