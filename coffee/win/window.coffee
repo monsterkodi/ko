@@ -235,6 +235,7 @@ onMove  = -> window.stash.set 'bounds', win.getBounds()
 
 removeListeners = ->
     
+    document.removeEventListener 'keydown', onKeyDown
     win.removeListener 'close', onClose
     win.removeListener 'move',  onMove
     win.webContents.removeAllListeners 'devtools-opened'
@@ -255,7 +256,7 @@ onClose = ->
 #  0000000   000   000  0000000   0000000   000   000  0000000    
 
 window.onload = -> 
-
+        
     split.resized()
     info.reload()
     win.on 'close', onClose
@@ -526,39 +527,40 @@ window.onfocus = (event) ->
 # 000  000   000          000   
 # 000   000  00000000     000   
 
-document.onkeydown = (event) ->
+onKeyDown = (event) ->
     
     {mod, key, combo} = keyinfo.forEvent event
 
     return if not combo
-    return if 'unhandled' != window.titlebar   .globalModKeyComboEvent mod, key, combo, event
-    return if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
+    return stopEvent(event) if 'unhandled' != window.titlebar   .globalModKeyComboEvent mod, key, combo, event
+    return stopEvent(event) if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
 
     for i in [1..9]
         if combo is "alt+#{i}"
-            post.toMain 'activateWindow', i
-            return stopEvent event
+            return stopEvent event, post.toMain 'activateWindow', i
     
     switch combo
-        when 'command+alt+i'      then return win.webContents.toggleDevTools()
-        when 'ctrl+w'             then return loadFile()
-        when 'f3'                 then return screenShot()
-        when 'alt+i'              then return scheme.toggle()
-        when 'command+\\'         then return toggleCenterText()
-        when 'command+k'          then return commandline.clear()
-        when 'command+alt+k'      then return split.toggleLog()
+        when 'command+alt+i'      then return stopEvent event, win.webContents.toggleDevTools()
+        when 'ctrl+w'             then return stopEvent event, loadFile()
+        when 'f3'                 then return stopEvent event, screenShot()
+        when 'alt+i'              then return stopEvent event, scheme.toggle()
+        when 'command+\\'         then return stopEvent event, toggleCenterText()
+        when 'command+k'          then return stopEvent event, commandline.clear()
+        when 'command+alt+k'      then return stopEvent event, split.toggleLog()
         when 'alt+ctrl+left'      then return stopEvent event, post.toMain 'activatePrevWindow', winID
         when 'alt+ctrl+right'     then return stopEvent event, post.toMain 'activateNextWindow', winID
-        when 'command+alt+ctrl+k' then return split.showOrClearLog()
-        when 'command+='          then return changeFontSize +1
-        when 'command+-'          then return changeFontSize -1
-        when 'command+0'          then return resetFontSize()
-        when 'command+shift+='    then return @changeZoom +1
-        when 'command+shift+-'    then return @changeZoom -1
-        when 'command+shift+0'    then return @resetZoom()
-        when 'alt+`'              then return titlebar.showList()
+        when 'command+alt+ctrl+k' then return stopEvent event, split.showOrClearLog()
+        when 'command+='          then return stopEvent event, changeFontSize +1
+        when 'command+-'          then return stopEvent event, changeFontSize -1
+        when 'command+0'          then return stopEvent event, resetFontSize()
+        when 'command+shift+='    then return stopEvent event, @changeZoom +1
+        when 'command+shift+-'    then return stopEvent event, @changeZoom -1
+        when 'command+shift+0'    then return stopEvent event, @resetZoom()
+        when 'alt+`'              then return stopEvent event, titlebar.showList()
         when 'command+ctrl+left'  then return stopEvent event, navigate.backward()
         when 'command+ctrl+right' then return stopEvent event, navigate.forward()
-        when 'command+shift+y'    then return split.maximizeEditor()
+        when 'command+shift+y'    then return stopEvent event, split.maximizeEditor()
 
+document.addEventListener 'keydown', onKeyDown        
+        
 winMain()

@@ -363,7 +363,7 @@ class FileEditor extends TextEditor
         
     onSetBreakpoint: (breakpoint) =>
         
-        log 'onSetBreakpoint', breakpoint, @currentFile
+        # log 'onSetBreakpoint', breakpoint, @currentFile
         return if not samePath breakpoint.file, @currentFile
         line = breakpoint.line
         switch breakpoint.status

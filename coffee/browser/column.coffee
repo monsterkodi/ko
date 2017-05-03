@@ -26,15 +26,15 @@ class Column
         @div.appendChild @table
         @browser.cols.appendChild @div
         
-        @div.addEventListener 'focus',   @onFocus
-        @div.addEventListener 'blur',    @onBlur
-        @div.addEventListener 'keydown', @onKey
+        @div.addEventListener 'focus',     @onFocus
+        @div.addEventListener 'blur',      @onBlur
+        @div.addEventListener 'keydown',   @onKey
         
         @div.addEventListener 'mouseover', @onMouseOver
         @div.addEventListener 'mouseout',  @onMouseOut
 
-        @div.addEventListener 'click',    @onClick
-        @div.addEventListener 'dblclick', @onDblClick
+        @div.addEventListener 'click',     @onClick
+        @div.addEventListener 'dblclick',  @onDblClick
         
         @scroll = new Scroller @
         
@@ -292,7 +292,7 @@ class Column
         
         {mod, key, combo, char} = keyinfo.forEvent event
 
-        # log mod, key, combo, char
+        log mod, key, combo, char
 
         switch combo
             when 'up', 'down', 'page up', 'page down', 'home', 'end' 

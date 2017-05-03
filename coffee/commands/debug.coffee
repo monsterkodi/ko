@@ -5,7 +5,8 @@
 # 000   000  000       000   000  000   000  000   000  
 # 0000000    00000000  0000000     0000000    0000000   
 
-{ dirExists, samePath, process, unresolve, resolve, post, str, error, log, $
+{ dirExists, stopEvent, samePath, process, unresolve, resolve, 
+  post, str, error, log, $
 }             = require 'kxk'
 Command       = require '../commandline/command'
 ObjectBrowser = require '../browser/objectbrowser'
@@ -175,6 +176,7 @@ class Debug extends Command
     globalModKeyComboEvent: (mod, key, combo, event) -> 
         
         switch combo
+            when 'f7'  then return window.editor.toggleBreakpoint()
             when 'f8'  then return @execute 'step'
             when 'f9'  then return @execute 'cont'
             when 'f10' then return @execute 'into'

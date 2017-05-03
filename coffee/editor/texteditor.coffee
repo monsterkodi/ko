@@ -5,8 +5,8 @@
 #    000     000        000 000      000           000       000   000  000     000     000   000  000   000  
 #    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000  
 
-{splitFilePos, fileExists, resolve, keyinfo, stopEvent, setStyle, 
-prefs, drag, elem, path, post, clamp, pos, str, error, log, sw, $, _
+{ splitFilePos, fileExists, resolve, keyinfo, stopEvent, setStyle, 
+  prefs, drag, elem, path, post, clamp, pos, str, error, log, sw, $, _
 }         = require 'kxk'
 render    = require './render'
 syntax    = require './syntax'
@@ -57,9 +57,9 @@ class TextEditor extends Editor
         @scroll.on 'vanishLines', @vanishLines
         @scroll.on 'exposeLine',  @exposeLine
 
-        @view.addEventListener 'blur',    @onBlur
-        @view.addEventListener 'focus',   @onFocus
-        @view.addEventListener 'keydown', @onKeyDown
+        @view.addEventListener 'blur',     @onBlur
+        @view.addEventListener 'focus',    @onFocus
+        @view.addEventListener 'keydown',  @onKeyDown
         
         @initDrag()
         
@@ -677,7 +677,11 @@ class TextEditor extends Editor
         'unhandled'
 
     onKeyDown: (event) =>
+        
         {mod, key, combo, char} = keyinfo.forEvent event
+        
+        # log mod, key, combo, char
+        
         return if not combo
         return if key == 'right click' # weird right command key
 
@@ -695,16 +699,16 @@ class TextEditor extends Editor
                 if combo == actionCombo
                     if action.key? and _.isFunction @[action.key]
                         @[action.key] key, combo: combo, mod: mod, event: event
-                        return
+                        return stopEvent event
     
         switch combo
-            when 'command+z'       then return @do.undo()
-            when 'command+shift+z' then return @do.redo()
-            when 'command+t'       then return post.emit 'newTabWithFile'
+            when 'command+z'       then return stopEvent event, @do.undo()
+            when 'command+shift+z' then return stopEvent event, @do.redo()
+            when 'command+t'       then return stopEvent event, post.emit 'newTabWithFile'
                 
         return if mod and not key?.length
         
         if char and mod in ["shift", ""]
-            @insertCharacter char
+            return stopEvent event, @insertCharacter char
 
 module.exports = TextEditor
