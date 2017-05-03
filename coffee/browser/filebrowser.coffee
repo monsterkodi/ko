@@ -17,6 +17,7 @@ class FileBrowser extends Browser
     constructor: (@view) -> 
                 
         super @view
+        @loadID = 0
         @name = 'FileBrowser'
         post.on 'browserColumnItemsSet', @onColumnItemsSet
     
@@ -58,8 +59,12 @@ class FileBrowser extends Browser
         opt ?= {}
         opt.ignoreHidden ?= prefs.get "browser:ignoreHidden:#{dir}", false
         
+        @loadID++
+        opt.loadID = @loadID
+        
         dirlist dir, opt, (err, items) => 
             
+            return if opt.loadID != @loadID
             if err? then return error "can't load dir #{dir}: #{err}"
             
             opt.parent ?=

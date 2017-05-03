@@ -84,6 +84,7 @@ class Diffbar
     update: =>
         
         if @editor.currentFile
+
             forkfunc '../tools/gitdiff', @editor.currentFile, (err, changes) =>
                 if not empty err
                     @changes = null
@@ -91,6 +92,7 @@ class Diffbar
                 if changes.file == @editor.currentFile
                     @changes = changes
                     @paint()
+                        
         else
             @changes = null
             @paint()

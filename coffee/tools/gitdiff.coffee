@@ -16,7 +16,7 @@ module.exports = (file) ->
     result = childp.execSync gitCommand, 
         cwd: path.dirname file
         encoding: 'utf8' 
-    
+            
     info  = file:file, changes:[]
     lines = (chalk.stripColor l for l in result.split '\n')
 
