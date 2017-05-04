@@ -7,7 +7,7 @@ preferGlobal    true
 bin
                 ko  ./bin/ko
 scripts
-                test  mocha -R dot --compilers coffee:coffee-script/register
+                test  mocha -R dot --compilers coffee:coffee-script/register coffee/test
 repository
                 type  git
                 url   git+https://github.com/monsterkodi/ko.git

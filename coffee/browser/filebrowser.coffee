@@ -6,7 +6,7 @@
 # 000       000  0000000  00000000        0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 
 { packagePath, encodePath, fileName, swapExt, resolve, empty, elem, post, clamp, 
-  error, log, process, childp, path, fs, os, $, _
+  error, log, process, childp, prefs, path, fs, os, $, _
 }        = require 'kxk'
 Browser  = require './browser'
 dirlist  = require '../tools/dirlist'
@@ -58,7 +58,7 @@ class FileBrowser extends Browser
     loadDir: (dir, opt) -> 
         
         opt ?= {}
-        opt.ignoreHidden ?= prefs.get "browser:ignoreHidden:#{dir}", false
+        opt.ignoreHidden ?= prefs.get "browser:ignoreHidden:#{dir}", true
         
         @loadID++
         opt.loadID = @loadID
