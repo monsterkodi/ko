@@ -132,6 +132,13 @@ class Meta
         else
             meta[2].div?.style.transform = "translate(#{tx}px,#{ty}px)"        
 
+    moveMeta: (meta, ly) ->
+        
+        if meta[2].no_x
+            meta[0] += ly
+            ty = @editor.size.lineHeight * (meta[0] - @editor.scroll.exposeTop)
+            meta[2].div?.style.transform = "translateY(#{ty}px)"
+            
     # 0000000    000  000   000
     # 000   000  000  000   000
     # 000   000  000   000 000 
@@ -275,7 +282,7 @@ class Meta
         
     onLineInserted: (li) =>
         
-        for meta in rangesFromTopToBotInRanges li-1, @editor.numLines(), @metas
+        for meta in rangesFromTopToBotInRanges li, @editor.numLines(), @metas
             meta[0] += 1
         @updatePositionsBelowLineIndex li
         
