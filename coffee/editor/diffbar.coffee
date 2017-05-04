@@ -5,15 +5,14 @@
 # 000   000  000  000       000       000   000  000   000  000   000
 # 0000000    000  000       000       0000000    000   000  000   000
 
-{ packagePath, fileExists, elem, str, empty, path, fs, error, log, 
-}        = require 'kxk'
 forkfunc = require 'fork-func'
 chokidar = require 'chokidar'
 
+{ packagePath, fileExists, elem, str, empty, path, fs, log, error,  
+}        = require 'kxk'
+
 class Diffbar
-
     constructor: (@editor) ->
-
         @elem = elem 'canvas', class: 'diffbar'
         @elem.style.position = 'absolute'
         @elem.style.left = '0'
@@ -22,6 +21,16 @@ class Diffbar
         @editor.on 'file', @onEditorFile
         @watch @editor.currentFile    
 
+    onMetaClick: (meta) =>
+        # log 'diffbar meta click', meta[2].change
+        return if meta[2].change.new? and not meta[2].change.old?
+        if meta[2].change.new?
+            log 'line changed', meta[2].change.new
+        else
+            # log 'line(s) deleted', meta[2].change
+            for l in meta[2].change
+                log 'del', l.old
+        
     watch: (file) ->
         
         @watcher?.close()
@@ -83,10 +92,6 @@ class Diffbar
         
         @watch @editor.currentFile
         @update()
-
-    onMetaClick: (meta) =>
-        
-        log 'diffbar meta click', meta
         
     update: =>
         

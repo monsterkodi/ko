@@ -263,26 +263,13 @@ class Do
                         
                     else if deletes > 0 and (inserts <= 0 or deletes < inserts)                                    
                         
-                        if insertions >= deletes 
-                            for i in [1..deletes] # convert previous insertions to changes
-                                insertChange = changes[changes.length-i]
-                                if insertChange.change != 'inserted'
-                                    error 'something wrong here!'
-                                    break
-                                insertChange.oldIndex = insertChange.doIndex
-                                insertChange.doIndex  = insertChange.newIndex
-                                insertChange.change   = 'changed'
-                                insertions -= 1
-                                oi += 1
-                            ol = oldLines[oi]
-                        else
-                            while deletes
-                                changes.push change: 'deleted', oldIndex: oi, doIndex: oi+dd
-                                oi += 1
-                                dd -= 1
-                                deletes -= 1
-                                deletions += 1
-                            ol = oldLines[oi]
+                        while deletes
+                            changes.push change: 'deleted', oldIndex: oi, doIndex: oi+dd
+                            oi += 1
+                            dd -= 1
+                            deletes -= 1
+                            deletions += 1
+                        ol = oldLines[oi]
                     
                     else # change
                         
