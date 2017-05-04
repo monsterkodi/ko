@@ -5,13 +5,14 @@
 # 000   000  000  000       000       000   000  000   000  000   000
 # 0000000    000  000       000       0000000    000   000  000   000
 
+{ packagePath, fileExists, elem, str, empty, path, fs, log, error,  
+} = require 'kxk'
+
 forkfunc = require 'fork-func'
 chokidar = require 'chokidar'
 
-{ packagePath, fileExists, elem, str, empty, path, fs, log, error,  
-}        = require 'kxk'
-
 class Diffbar
+    
     constructor: (@editor) ->
         @elem = elem 'canvas', class: 'diffbar'
         @elem.style.position = 'absolute'
@@ -25,12 +26,33 @@ class Diffbar
         # log 'diffbar meta click', meta[2].change
         return if meta[2].change.new? and not meta[2].change.old?
         if meta[2].change.new?
-            log 'line changed', meta[2].change.new
         else
-            # log 'line(s) deleted', meta[2].change
-            for l in meta[2].change
-                log 'del', l.old
+            log 'line changed', meta[2].change.new
+            @editor.toggleGitChangesInLines @lineIndicesForBlockAtLine meta[0]
+
+    gitMetasAtLineIndex: (li) ->
         
+        @editor.meta.metasAtLineIndex(li).filter (m) -> m[2].clss.startsWith 'git'
+            
+    lineIndicesForBlockAtLine: (li) -> 
+        
+        lines = []
+        if not empty metas = @gitMetasAtLineIndex li
+            toggled = metas[0].toggled
+            lines.push li
+            bi = li-1
+            while not empty metas = @gitMetasAtLineIndex bi
+                break if metas[0].toggled != toggled
+                lines.unshift bi
+                bi--
+            ai = li+1
+            while not empty metas = @gitMetasAtLineIndex ai
+                break if metas[0].toggled != toggled
+                lines.push ai
+                ai++
+        # log 'li', li, lines
+        lines
+            
     watch: (file) ->
         
         @watcher?.close()

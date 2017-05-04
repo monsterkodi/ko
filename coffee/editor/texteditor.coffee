@@ -233,7 +233,7 @@ class TextEditor extends Editor
             @renderSelection()   
             @emit 'selection'
         
-        log 'emit changed', changeInfo if @name == 'editor' and changeInfo.changes.length
+        # log 'emit changed', changeInfo if @name == 'editor' and changeInfo.changes.length
         @emit 'changed', changeInfo
 
     # 00000000  0000000    000  000000000

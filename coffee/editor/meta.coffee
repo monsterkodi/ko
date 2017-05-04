@@ -5,7 +5,7 @@
 # 000 0 000  000          000     000   000
 # 000   000  00000000     000     000   000
 
-{ empty, elem, post, fs, error, log, $, _
+{ stopEvent, empty, elem, post, fs, error, log, $, _
 }      = require 'kxk'
 ranges = require '../tools/ranges'
 
@@ -232,7 +232,10 @@ class Meta
     #  0000000  0000000  000   0000000  000   000
     
     onMouseDown: (event) ->
-        event.target.meta?[2].click? event.target.meta
+        
+        if event.target.meta?[2].click?
+            event.target.meta?[2].click event.target.meta, event
+            stopEvent event
         
     #  0000000   00000000   00000000   00000000  000   000  0000000  
     # 000   000  000   000  000   000  000       0000  000  000   000

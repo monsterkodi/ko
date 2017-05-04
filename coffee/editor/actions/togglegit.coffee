@@ -17,10 +17,14 @@ module.exports =
 
     toggleGitChange: (key, info) ->
         
+        @toggleGitChangesInLines @selectedAndCursorLineIndices()
+                
+    toggleGitChangesInLines: (lineIndices) ->
+
         metas = []
-        
         untoggled = false
-        for li in @selectedAndCursorLineIndices().reverse()
+        
+        for li in lineIndices.reverse()
             for lineMeta in @meta.metasAtLineIndex(li).reverse()
                 lineMeta[2].li = li
                 lineMeta[0] = -1
@@ -39,7 +43,7 @@ module.exports =
                     @reverseGitChange lineMeta
             
             lineMeta[0] = lineMeta[2].li
-            @meta.moveMeta lineMeta, 0
+            # @meta.moveMeta lineMeta, 0 # needed?
             delete lineMeta[2].li
        
     # 00000000   00000000  000   000  00000000  00000000    0000000  00000000  
