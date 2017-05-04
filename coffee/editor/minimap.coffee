@@ -73,8 +73,8 @@ class Minimap
         
         @selecti.height = @height
         @selecti.width = @width
+        return if @scroll.exposeBot < 0
         ctx = @selecti.getContext '2d'
-
         ctx.fillStyle = @editor.syntax.colorForClassnames 'selection'
         for r in rangesFromTopToBotInRanges @scroll.exposeTop, @scroll.exposeBot, @editor.selections()
             y = (r[0]-@scroll.exposeTop)*@scroll.lineHeight
@@ -83,10 +83,11 @@ class Minimap
                 ctx.fillRect offset+2*r[1][0], y, 2*(r[1][1]-r[1][0]), @scroll.lineHeight
                 
     drawLines: (top=@scroll.exposeTop, bot=@scroll.exposeBot) =>
-        
         ctx = @lines.getContext '2d'
         y = parseInt((top-@scroll.exposeTop)*@scroll.lineHeight)
         ctx.clearRect 0, y, @width, ((bot-@scroll.exposeTop)-(top-@scroll.exposeTop)+1)*@scroll.lineHeight        
+        return if @scroll.exposeBot < 0
+        bot = Math.min bot, @editor.numLines()-1 
         for li in [top..bot]
             diss = @editor.syntax.getDiss li
             y = parseInt((li-@scroll.exposeTop)*@scroll.lineHeight)
@@ -103,8 +104,8 @@ class Minimap
         
         @highlig.height = @height
         @highlig.width = @width
+        return if @scroll.exposeBot < 0
         ctx = @highlig.getContext '2d'
-
         ctx.fillStyle = @editor.syntax.colorForClassnames 'highlight'
         for r in rangesFromTopToBotInRanges @scroll.exposeTop, @scroll.exposeBot, @editor.highlights()
             y = (r[0]-@scroll.exposeTop)*@scroll.lineHeight
@@ -116,8 +117,8 @@ class Minimap
         
         @cursors.height = @height
         @cursors.width = @width
+        return if @scroll.exposeBot < 0
         ctx = @cursors.getContext '2d'
-        
         for r in rangesFromTopToBotInRanges @scroll.exposeTop, @scroll.exposeBot, rangesFromPositions @editor.state.cursors()
             y = (r[0]-@scroll.exposeTop)*@scroll.lineHeight
             if 2*r[1][0] < @width
@@ -134,12 +135,13 @@ class Minimap
         ctx.fillRect @offsetLeft-4, y, @offsetLeft-2, @scroll.lineHeight
 
     drawTopBot: =>
+        
+        return if @scroll.exposeBot < 0        
         lh = @scroll.lineHeight/2
         th = (@editor.scroll.bot-@editor.scroll.top+1)*lh
         ty = 0
         if @editor.scroll.scrollMax
             ty = (Math.min(0.5*@scroll.viewHeight, @scroll.numLines*2)-th) * @editor.scroll.scroll / @editor.scroll.scrollMax
-        # log "#{ty} #{th}" if @editor.name == 'editor'
         @topbot.style.height = "#{th}px"
         @topbot.style.top    = "#{ty}px"
        
@@ -150,9 +152,7 @@ class Minimap
     # 00000000  000   000  000         0000000   0000000   00000000
     
     exposeLine:   (li) => @drawLines li, li
-    onExposeLines: (e) => 
-        # log "etop:#{@scroll.exposeTop} ebot:#{@scroll.exposeBot}", e if @editor.name == 'editor'
-        @drawLines @scroll.exposeTop, @scroll.exposeBot
+    onExposeLines: (e) => @drawLines @scroll.exposeTop, @scroll.exposeBot
         
     onVanishLines: (e) => 
         if e.top?
@@ -189,7 +189,8 @@ class Minimap
     # 000 0 000  000   000  000   000       000  000     
     # 000   000   0000000    0000000   0000000   00000000
 
-    onDrag: (drag, event) =>   
+    onDrag: (drag, event) =>  
+        
         if @scroll.fullHeight > @scroll.viewHeight
             br = @elem.getBoundingClientRect()
             ry = event.clientY - br.top
@@ -201,7 +202,8 @@ class Minimap
 
     onStart: (drag,event) => @jumpToLine @lineIndexForEvent(event), event
     
-    jumpToLine: (li, event) ->        
+    jumpToLine: (li, event) ->
+        
         @editor.scrollTo (li-5) * @editor.scroll.lineHeight
         if not event.metaKey
             @editor.singleCursorAtPos [0, li+5], extend:event.shiftKey
@@ -209,6 +211,7 @@ class Minimap
         @onEditorScroll()
 
     lineIndexForEvent: (event) ->
+        
         st = @elem.scrollTop
         br = @elem.getBoundingClientRect()
         ly = clamp 0, @elem.offsetHeight, event.clientY - br.top

@@ -73,7 +73,7 @@ class Do
     hasLineChanges: ->
         
         return false if @history.length == 0
-        return _.first(@history).lines() != @editor.lines()
+        return _.first(@history).s.lines != @editor.state.s.lines
                                                                         
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -222,8 +222,8 @@ class Do
         dd = 0 # delta for doIndex
         changes = []
             
-        oldLines = oldState.lines()
-        newLines = newState.lines()
+        oldLines = oldState.s.lines # we are working on raw 
+        newLines = newState.s.lines # immutables here!
 
         insertions = 0 # number of insertions
         deletions  = 0 # number of deletions
@@ -254,7 +254,7 @@ class Do
                     if inserts > 0 and (deletes <= 0 or inserts < deletes)
                         
                         while inserts
-                            changes.push change: 'inserted', newIndex: ni, doIndex: oi+dd, after: nl
+                            changes.push change: 'inserted', newIndex: ni, doIndex: oi+dd, after: nl.text
                             ni += 1
                             dd += 1
                             inserts -= 1
@@ -263,25 +263,39 @@ class Do
                         
                     else if deletes > 0 and (inserts <= 0 or deletes < inserts)                                    
                         
-                        while deletes
-                            changes.push change: 'deleted', oldIndex: oi, doIndex: oi+dd
-                            oi += 1
-                            dd -= 1
-                            deletes -= 1
-                            deletions += 1
-                        ol = oldLines[oi]
+                        if insertions >= deletes 
+                            for i in [1..deletes] # convert previous insertions to changes
+                                insertChange = changes[changes.length-i]
+                                if insertChange.change != 'inserted'
+                                    error 'something wrong here!'
+                                    break
+                                insertChange.oldIndex = insertChange.doIndex
+                                insertChange.doIndex  = insertChange.newIndex
+                                insertChange.change   = 'changed'
+                                insertions -= 1
+                                oi += 1
+                            ol = oldLines[oi]
+                        else
+                            while deletes
+                                changes.push change: 'deleted', oldIndex: oi, doIndex: oi+dd
+                                oi += 1
+                                dd -= 1
+                                deletes -= 1
+                                deletions += 1
+                            ol = oldLines[oi]
                     
                     else # change
                         
-                        changes.push change: 'changed', oldIndex: oi, newIndex: ni, doIndex: oi+dd, after: nl
+                        changes.push change: 'changed', oldIndex: oi, newIndex: ni, doIndex: oi+dd, after: nl.text
                         oi += 1
                         ol = oldLines[oi]
                         ni += 1
                         nl = newLines[ni]
                             
             while ni < newLines.length # mark remaing lines in newState as inserted
+                
                 insertions += 1
-                changes.push change: 'inserted', newIndex: ni, doIndex: ni, after: nl
+                changes.push change: 'inserted', newIndex: ni, doIndex: ni, after: nl.text
                 ni += 1
                 nl = newLines[ni]
            
@@ -306,18 +320,18 @@ class Do
         while @history.length > 1
             b = @history[@history.length-2]
             a = _.last @history
-            if a.lines() == b.lines()
+            if a.s.lines == b.s.lines
                 if @history.length > 2
                     @history.splice @history.length-2, 1
                 else
                     return
             else if @history.length > 2 
                 c = @history[@history.length-3]
-                if a.lines().length == b.lines().length == c.lines().length
-                    for li in [0...a.lines().length]
-                        la = a.line li
-                        lb = b.line li
-                        lc = c.line li
+                if a.numLines() == b.numLines() == c.numLines()
+                    for li in [0...a.numLines()]
+                        la = a.s.lines[li]
+                        lb = b.s.lines[li]
+                        lc = c.s.lines[li]
                         if la == lb and lc != lb or la != lb and lc == lb
                             return
                     @history.splice @history.length-2, 1

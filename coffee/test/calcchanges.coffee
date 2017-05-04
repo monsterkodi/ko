@@ -17,7 +17,25 @@ should()
 editor = new Editor
 
 describe 'calc', ->
-    
+
+    it 'change empty lines', ->
+        oldState = new State lines: ['abc', '', '', '', 'def']
+        newState = oldState.changeLine 1, 'a'
+        changes  = editor.do.calculateChanges oldState, newState
+        log 'change empty lines', changes
+        expect(changes.deletes).to.eql 0
+        expect(changes.inserts).to.eql 0
+        expect(changes.changes.length).to.eql 1
+        
+    it 'change same lines', ->
+        oldState = new State lines: ['abc', 'xyz', 'xyz', 'xyz', 'def']
+        newState = oldState.changeLine 1, 'a'
+        changes  = editor.do.calculateChanges oldState, newState
+        log 'change same lines', changes
+        expect(changes.deletes).to.eql 0
+        expect(changes.inserts).to.eql 0
+        expect(changes.changes.length).to.eql 1
+        
     it 'changes', ->
         oldState = new State lines: ['a', 'b']
         changes  = editor.do.calculateChanges oldState, new State lines: ['a', 'c']
@@ -76,7 +94,7 @@ describe 'calc', ->
         changes  = editor.do.calculateChanges oldState, newState
         expect(changes.deletes).to.eql 1
         expect(changes.inserts).to.eql.false
-        expect(changes.changes).to.include oldIndex:3, doIndex:3, change:'deleted'
+        expect(changes.changes).to.include oldIndex:2, doIndex:2, change:'deleted'
         
     it 'deletion 5', ->
         oldState = new State lines: ['a', 'b', 'c']
@@ -120,12 +138,5 @@ describe 'calc', ->
         expect(changes.changes).to.include doIndex:3, newIndex:3, change:'inserted', after: '2'
         expect(changes.changes).to.include doIndex:4, newIndex:4, change:'inserted', after: '3'
 
-    it 'empty change 1', ->
-        oldState = new State lines: ['abc', '', '', '', 'def']
-        newState = oldState.changeLine 1, 'a'
-        changes  = editor.do.calculateChanges oldState, newState
-        log 'empty change 1', changes
-        expect(changes.deletes).to.eql 0
-        expect(changes.inserts).to.eql 0
         
         
