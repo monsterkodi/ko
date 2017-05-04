@@ -11,11 +11,17 @@
 module.exports = 
     
     actions:
-        reverse:
+        toggleGitChange:
             name:  'toggle git changes at cursors'
             combo: 'command+u'
 
-    reverse: (key, info) ->
+    # 000000000   0000000    0000000    0000000   000      00000000  
+    #    000     000   000  000        000        000      000       
+    #    000     000   000  000  0000  000  0000  000      0000000   
+    #    000     000   000  000   000  000   000  000      000       
+    #    000      0000000    0000000    0000000   0000000  00000000  
+    
+    toggleGitChange: (key, info) ->
         
         metas = []
         
@@ -26,18 +32,22 @@ module.exports =
                 metas.push lineMeta
                 
         for lineMeta in metas    
-            @toggleGitChange lineMeta
+            
+            if lineMeta[2].toggled
+                @applyGitChange lineMeta
+            else
+                @reverseGitChange lineMeta
+            
             lineMeta[0] = lineMeta[2].li
             @meta.moveMeta lineMeta, 0
             delete lineMeta[2].li
        
-    toggleGitChange: (lineMeta) ->
-        
-        if lineMeta[2].toggled
-            @applyGitChange lineMeta
-        else
-            @reverseGitChange lineMeta
-
+    # 00000000   00000000  000   000  00000000  00000000    0000000  00000000  
+    # 000   000  000       000   000  000       000   000  000       000       
+    # 0000000    0000000    000 000   0000000   0000000    0000000   0000000   
+    # 000   000  000          000     000       000   000       000  000       
+    # 000   000  00000000      0      00000000  000   000  0000000   00000000  
+    
     reverseGitChange: (lineMeta) ->
         
         meta = lineMeta[2]
@@ -62,6 +72,12 @@ module.exports =
         meta.div?.classList.add 'toggled'
         meta.toggled = true
             
+    #  0000000   00000000   00000000   000      000   000  
+    # 000   000  000   000  000   000  000       000 000   
+    # 000000000  00000000   00000000   000        00000    
+    # 000   000  000        000        000         000     
+    # 000   000  000        000        0000000     000     
+    
     applyGitChange: (lineMeta) ->
         
         meta = lineMeta[2]
