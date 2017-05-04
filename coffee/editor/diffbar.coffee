@@ -22,12 +22,11 @@ class Diffbar
         @editor.on 'file', @onEditorFile
         @watch @editor.currentFile    
 
-    onMetaClick: (meta) =>
-        # log 'diffbar meta click', meta[2].change
-        return if meta[2].change.new? and not meta[2].change.old?
-        if meta[2].change.new?
+    onMetaClick: (meta, event) =>
+        
+        if event.ctrlKey
+            @editor.toggleGitChangesInLines [meta[0]]
         else
-            log 'line changed', meta[2].change.new
             @editor.toggleGitChangesInLines @lineIndicesForBlockAtLine meta[0]
 
     gitMetasAtLineIndex: (li) ->
@@ -38,19 +37,23 @@ class Diffbar
         
         lines = []
         if not empty metas = @gitMetasAtLineIndex li
+            
             toggled = metas[0].toggled
             lines.push li
+            
             bi = li-1
             while not empty metas = @gitMetasAtLineIndex bi
                 break if metas[0].toggled != toggled
                 lines.unshift bi
                 bi--
+                
             ai = li+1
             while not empty metas = @gitMetasAtLineIndex ai
                 break if metas[0].toggled != toggled
                 lines.push ai
                 ai++
-        # log 'li', li, lines
+                
+        log 'li', li, lines
         lines
             
     watch: (file) ->
