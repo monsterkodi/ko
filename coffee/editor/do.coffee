@@ -73,7 +73,8 @@ class Do
     hasLineChanges: ->
         
         return false if @history.length == 0
-        return _.first(@history).s.lines != @editor.state.s.lines
+        return false if _.first(@history).s.lines == @editor.state.s.lines
+        _.first(@history).text() != @editor.text()
                                                                         
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   

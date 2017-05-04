@@ -38,22 +38,23 @@ class Diffbar
         lines = []
         if not empty metas = @gitMetasAtLineIndex li
             
-            toggled = metas[0].toggled
+            toggled = metas[0][2].toggled
+            log 'toggled', 
             lines.push li
             
             bi = li-1
             while not empty metas = @gitMetasAtLineIndex bi
-                break if metas[0].toggled != toggled
+                break if metas[0][2].toggled != toggled
                 lines.unshift bi
                 bi--
                 
             ai = li+1
             while not empty metas = @gitMetasAtLineIndex ai
-                break if metas[0].toggled != toggled
+                break if metas[0][2].toggled != toggled
                 lines.push ai
                 ai++
                 
-        log 'li', li, lines
+        log 'li:', li, lines
         lines
             
     watch: (file) ->
