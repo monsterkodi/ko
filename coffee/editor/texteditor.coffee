@@ -148,7 +148,7 @@ class TextEditor extends Editor
 
     appendText: (text) ->
 
-        return error 'no text?' if not text?
+        return log 'no text?' if not text?
 
         ls = text?.split /\n/
         for l in ls
