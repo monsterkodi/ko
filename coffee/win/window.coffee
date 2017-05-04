@@ -5,7 +5,7 @@
 # 000   000  000  000  0000  000   000  000   000  000   000
 # 00     00  000  000   000  0000000     0000000   00     00
 
-{ splitFilePos, stopEvent, fileExists, fileList, resolve, keyinfo, 
+{ splitFilePos, stopEvent, fileExists, fileList, unresolve, resolve, keyinfo, 
   prefs, stash, drag, noon, post, path, clamp, error, 
   pos, str, log, sw, sh, os, fs, _
 }           = require 'kxk'
@@ -44,9 +44,9 @@ window.onerror = (event, source, line, col, err) ->
         l = f.trace(line)
         s = "▲ #{l.source}:#{l.line} ▲ [ERROR] #{err}"
     else
-        s = "▲ [ERROR] #{err}"
-    post.emit 'error', s
-    post.emit 'slog', s
+        s = "▲ [ERROR] #{err} #{unresolve source}:#{line}:#{col}"
+    # post.emit 'error', s
+    # post.emit 'slog', s 
     console.log s
     
 # 00000000   00000000   00000000  00000000   0000000
@@ -152,13 +152,13 @@ winMain = ->
         editor.resized()
         logview.resized()
     
-    terminal.on 'fileLineChange', (file, lineChange) -> # sends changes to all windows
-        post.toWins 'fileLinesChanged', file, [lineChange]
+    terminal.on 'fileSearchResultChange', (file, lineChange) -> # sends changes to all windows
+        post.toWins 'fileLineChanges', file, [lineChange]
     
     editor.on 'changed', (changeInfo) ->
         return if changeInfo.foreign
         if changeInfo.changes.length
-            post.toOtherWins 'fileLinesChanged', editor.currentFile, changeInfo.changes
+            post.toOtherWins 'fileLineChanges', editor.currentFile, changeInfo.changes
             navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
 
     s = window.stash.get 'fontSize'
@@ -215,8 +215,9 @@ saveFile = (file) ->
         if err?
             alert err
         else
-            editor.setCurrentFile file
+            editor.setCurrentFile      file
             post.toOthers 'fileSaved', file, winID
+            post.emit     'saved',     file
 
 window.saveChanges = ->
     
@@ -526,6 +527,7 @@ window.onfocus = (event) ->
 # 0000000    0000000     00000  
 # 000  000   000          000   
 # 000   000  00000000     000   
+
 
 onKeyDown = (event) ->
     

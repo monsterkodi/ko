@@ -76,7 +76,6 @@ describe 'calc', ->
         changes  = editor.do.calculateChanges oldState, newState
         expect(changes.deletes).to.eql 1
         expect(changes.inserts).to.eql.false
-        log changes.changes
         expect(changes.changes).to.include oldIndex:3, doIndex:3, change:'deleted'
         
     it 'deletion 5', ->
@@ -88,7 +87,7 @@ describe 'calc', ->
         expect(changes.inserts).to.eql.false
         expect(changes.changes).to.include oldIndex:0, doIndex:0, change:'deleted'
         expect(changes.changes).to.include oldIndex:2, doIndex:1, change:'deleted'
-
+        
     it 'insertion 1', ->
         oldState = new State lines: ['a']
         newState = oldState.insertLine 1, 'c'
@@ -120,4 +119,13 @@ describe 'calc', ->
         expect(changes.changes).to.include doIndex:2, newIndex:2, change:'inserted', after: '1'
         expect(changes.changes).to.include doIndex:3, newIndex:3, change:'inserted', after: '2'
         expect(changes.changes).to.include doIndex:4, newIndex:4, change:'inserted', after: '3'
-            
+
+    it 'empty change 1', ->
+        oldState = new State lines: ['abc', '', '', '', 'def']
+        newState = oldState.changeLine 1, 'a'
+        changes  = editor.do.calculateChanges oldState, newState
+        log 'empty change 1', changes
+        expect(changes.deletes).to.eql 0
+        expect(changes.inserts).to.eql 0
+        
+        

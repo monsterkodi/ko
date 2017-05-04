@@ -16,12 +16,12 @@ class Do
         
         @reset()
         
-        post.on 'fileLinesChanged', (file, lineChanges) =>
+        post.on 'fileLineChanges', (file, lineChanges) =>
             if file == @editor.currentFile
                 @foreignChanges lineChanges
 
     foreignChanges: (lineChanges) ->
-        
+        log 'do.foreignChanges', lineChanges
         @start()
         for change in lineChanges
             if change.change != 'deleted' and not change.after?

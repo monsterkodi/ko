@@ -20,6 +20,7 @@ class FileBrowser extends Browser
         @loadID = 0
         @name = 'FileBrowser'
         post.on 'browserColumnItemsSet', @onColumnItemsSet
+        post.on 'saved',                 @onSaved
     
     # 00000000  000  000      00000000  
     # 000       000  000      000       
@@ -109,7 +110,10 @@ class FileBrowser extends Browser
     
     getGitStatus: (opt) ->
             
-        forkfunc '../tools/gitstatus', opt.parent.file, (err, info) =>
+        file = opt.file ? opt.parent?.file
+        return if not file?
+        
+        forkfunc '../tools/gitstatus', file, (err, info) =>
             
             if not empty err
                 log 'gitstatus failed', err
@@ -122,18 +126,29 @@ class FileBrowser extends Browser
                 for file in info[key]
                     files[file] = key
 
-            rows = @columns[opt.column]?.rows
+            column = @columns[opt.column]
+            return if not column?
+            
+            rows = column.rows
             return if empty rows
             
+            while statusDiv = $('.git', column.div)
+                statusDiv.remove()
+                
             for row in rows
                 return if row.item.type not in ['dir', 'file']
                 status = files[row.item.file]
                 if status?
                     icon = {added:'plus', changed:'pencil', 'dirs':'pencil-square-o'}[status]
-                    $('.git', row.div)?.remove()
                     row.div.appendChild elem 'span', 
                         class:"git #{status} fa fa-#{icon} extname #{path.extname(row.item.file).slice 1}"
+
+    onSaved: (file) =>
         
+        if lastUsed = @lastUsedColumn()        
+            for c in [0..lastUsed.index]
+                @getGitStatus column:c, file:file
+                        
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       
     # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000   

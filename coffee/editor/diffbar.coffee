@@ -57,6 +57,7 @@ class Diffbar
                         line: li
                         clss: 'git mod'
                         change: mod
+                        click: @onMetaClick
                     @editor.meta.addDiffMeta meta
                     li++
                     
@@ -66,6 +67,7 @@ class Diffbar
                         line: li
                         clss: 'git add'
                         change: add
+                        click: @onMetaClick
                     @editor.meta.addDiffMeta meta            
                     li++
                     
@@ -74,6 +76,7 @@ class Diffbar
                     line: li
                     clss: 'git del'
                     change: change.del
+                    click: @onMetaClick
                 @editor.meta.addDiffMeta meta            
 
     onEditorFile: =>
@@ -81,6 +84,10 @@ class Diffbar
         @watch @editor.currentFile
         @update()
 
+    onMetaClick: (meta) =>
+        
+        log 'diffbar meta click', meta
+        
     update: =>
         
         if @editor.currentFile

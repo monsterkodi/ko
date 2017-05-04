@@ -12,6 +12,7 @@ TextEditor = require '../editor/texteditor'
 class LogView extends TextEditor
 
     constructor: (viewElem) ->
+        
         @fontSizeDefault = 12
         
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap']

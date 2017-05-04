@@ -51,7 +51,7 @@ class Meta
                     localChange.newIndex = line
                     localChange.doIndex  = line
                     localChange.after    = @editor.line(meta[0])
-                    @editor.emit 'fileLineChange', file, localChange
+                    @editor.emit 'fileSearchResultChange', file, localChange
                     meta[2].state = 'unsaved'
                     if meta[2].span?
                         button = @saveButton li

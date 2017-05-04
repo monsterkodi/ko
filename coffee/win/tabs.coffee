@@ -35,7 +35,7 @@ class Tabs
         post.on 'restore',          @restore
         post.on 'revertFile',       @revertFile
         post.on 'sendTabs',         @onSendTabs
-        post.on 'fileLinesChanged', @onFileLineChanges
+        post.on 'fileLineChanges',  @onFileLineChanges
         post.on 'fileSaved',        @onFileSaved
         
     onSendTabs: (winID) =>
