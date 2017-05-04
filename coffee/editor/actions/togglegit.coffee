@@ -19,18 +19,24 @@ module.exports =
         
         metas = []
         
-        for li in @cursorLineIndices().reverse()
+        untoggled = false
+        for li in @selectedAndCursorLineIndices().reverse()
             for lineMeta in @meta.metasAtLineIndex(li).reverse()
                 lineMeta[2].li = li
-                lineMeta[0] = 0 # -1?
+                lineMeta[0] = -1
+                if lineMeta[2].clss.startsWith('git') and not lineMeta[2].toggled
+                    untoggled = true
                 metas.push lineMeta
                 
         for lineMeta in metas    
-            
-            if lineMeta[2].toggled
-                @applyGitChange lineMeta
+            if untoggled
+                if not lineMeta[2].toggled
+                    @reverseGitChange lineMeta
             else
-                @reverseGitChange lineMeta
+                if lineMeta[2].toggled
+                    @applyGitChange lineMeta
+                else
+                    @reverseGitChange lineMeta
             
             lineMeta[0] = lineMeta[2].li
             @meta.moveMeta lineMeta, 0
