@@ -21,7 +21,7 @@ class Do
                 @foreignChanges lineChanges
 
     foreignChanges: (lineChanges) ->
-        log 'do.foreignChanges', lineChanges
+        # log 'do.foreignChanges', lineChanges
         @start()
         for change in lineChanges
             if change.change != 'deleted' and not change.after?

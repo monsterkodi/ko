@@ -20,7 +20,7 @@ class Diffbar
         @elem.style.top  = '0'
         @editor.view.appendChild @elem        
         @editor.on 'file', @onEditorFile
-        @watch @editor.currentFile    
+        @watch @editor.currentFile
 
     onMetaClick: (meta, event) =>
         
@@ -39,7 +39,6 @@ class Diffbar
         if not empty metas = @gitMetasAtLineIndex li
             
             toggled = metas[0][2].toggled
-            log 'toggled', 
             lines.push li
             
             bi = li-1
@@ -54,7 +53,7 @@ class Diffbar
                 lines.push ai
                 ai++
                 
-        log 'li:', li, lines
+        # log 'li:', li, lines
         lines
             
     watch: (file) ->

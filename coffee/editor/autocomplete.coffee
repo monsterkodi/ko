@@ -134,7 +134,7 @@ class Autocomplete extends event
                 
             @moveClonesBy @completion.length
         else
-            error "no span for autocomplete? cursor topleft: #{parseInt cr.left} #{parseInt cr.top}", info
+            log "no span for autocomplete? cursor topleft: #{parseInt cr.left} #{parseInt cr.top}", info
         
         if @matchList.length
             

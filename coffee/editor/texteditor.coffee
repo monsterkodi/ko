@@ -559,7 +559,7 @@ class TextEditor extends Editor
                         offsetLeft: offset
                         offsetChar: parseInt offset/@size.charWidth
                     return info
-        error "not found! #{x} #{y} line #{lineElem?}"
+        log "not found! #{x} #{y} line #{lineElem?}"
         null
 
     viewHeight:   -> @scroll?.viewHeight ? @view?.clientHeight 

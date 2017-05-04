@@ -22,7 +22,6 @@ describe 'calc', ->
         oldState = new State lines: ['abc', '', '', '', 'def']
         newState = oldState.changeLine 1, 'a'
         changes  = editor.do.calculateChanges oldState, newState
-        log 'change empty lines', changes
         expect(changes.deletes).to.eql 0
         expect(changes.inserts).to.eql 0
         expect(changes.changes.length).to.eql 1
@@ -31,7 +30,6 @@ describe 'calc', ->
         oldState = new State lines: ['abc', 'xyz', 'xyz', 'xyz', 'def']
         newState = oldState.changeLine 1, 'a'
         changes  = editor.do.calculateChanges oldState, newState
-        log 'change same lines', changes
         expect(changes.deletes).to.eql 0
         expect(changes.inserts).to.eql 0
         expect(changes.changes.length).to.eql 1
