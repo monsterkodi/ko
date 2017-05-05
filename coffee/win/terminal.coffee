@@ -81,19 +81,29 @@ class Terminal extends TextEditor
     # 000   000  00000000     000     000   000
     
     appendMeta: (meta) ->
+        
         if not meta?
             return error 'Terminal.appendMeta -- no meta?'
+            
         @meta.append meta
+        
         if meta.diss?
+            
             @appendLineDiss syntax.lineForDiss(meta.diss), meta.diss 
+            
         else if meta.clss == 'salt'
+            
             @appendMeta clss: 'spacer'
             for l in salt(meta.text).split '\n'
                 @appendMeta clss: 'spacer', diss: syntax.dissForTextAndSyntax l, 'ko'
             @appendMeta clss: 'spacer'
+            
         else if meta.clss == 'termCommand'
+            
             @appendLineDiss meta.command, syntax.dissForTextAndSyntax meta.command, 'term'
+            
         else
+            
             @appendLineDiss ''
         
     queueMeta: (meta) ->

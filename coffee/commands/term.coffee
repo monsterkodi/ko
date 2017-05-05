@@ -205,9 +205,9 @@ class Term extends Command
         
         cmmd = 'alias ' + aliasList.join ' ' 
         terminal.appendMeta 
-            line: "■"
-            cmmd:  cmmd.trim()
-            clss: 'termCommand'
+            line:    '■'
+            command: cmmd.trim()
+            clss:    'termCommand'
 
         if aliasList.length == 1 # show single alias
             key = aliasList[0]
