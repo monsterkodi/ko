@@ -16,8 +16,8 @@ class Commandline extends TextEditor
     constructor: (viewElem) ->
                     
         @fontSizeDefault = 24
-        @mainCommands = ['open', 'search', 'find', 'goto', 'term', 'browse', 'coffee', 'debug', 'build', 'macro']
-        @hideCommands = ['selecto', 'Term', 'Build', 'Coffee', 'Browse']
+        @mainCommands = ['open', 'search', 'find', 'coffee', 'goto', 'term', 'browse', 'debug', 'build', 'macro']
+        @hideCommands = ['selecto', 'Term', 'Build', 'Browse']
 
         super viewElem, features: []
         

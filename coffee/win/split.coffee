@@ -70,19 +70,21 @@ class Split extends event
     # 0000000     0000000 
     
     do: (sentence) ->
-        # log "Split.do #{sentence}"
+        
+        log "Split.do #{sentence}"
+        
         sentence = sentence.trim()
         return if not sentence.length
-        words = sentence.split /\s+/
+        words  = sentence.split /\s+/
         action = words[0]
-        what = words[1]
+        what   = words[1]
         switch action
             when 'show'     then return @show what
             when 'focus'    then return @focus what
-            when 'half'     then pos = @flex.size()/2
-            when 'third'    then pos = @flex.size()/3
-            when 'quart'    then pos = @flex.size()/4
-            when 'maximize' then delta = @flex.size()
+            when 'half'     then pos   =  @flex.size()/2
+            when 'third'    then pos   =  @flex.size()/3
+            when 'quart'    then pos   =  @flex.size()/4
+            when 'maximize' then delta =  @flex.size()
             when 'minimize' then delta = -@flex.size()
             when 'enlarge'
                 if words[2] == 'by'
@@ -107,6 +109,7 @@ class Split extends event
         error "Split.do -- unhandled do command? #{sentence}?"
 
     maximizeEditor: -> 
+        
         @focus 'editor'
         @flex.expand 'editor'
         @hideLog()
@@ -120,6 +123,7 @@ class Split extends event
     # 0000000   000   000   0000000   00     00  
 
     show: (n) ->
+        
         switch n
             when 'terminal', 'area' then @raise n
             when 'editor'           
@@ -137,6 +141,7 @@ class Split extends event
     # 000   000  000   000  000  0000000   00000000  
 
     swap: (old, nju) ->
+        
         if @flex.panes[0].div != nju
             nju.style.height   = "#{@flex.sizeOfPane 0}px"
             old.style.display  = 'none'

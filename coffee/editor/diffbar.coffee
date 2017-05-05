@@ -26,9 +26,14 @@ class Diffbar
     onMetaClick: (meta, event) =>
         return 'unhandled' if event.metaKey
         if event.ctrlKey
+            @editor.singleCursorAtPos rangeStartPos meta
             @editor.toggleGitChangesInLines [meta[0]]
         else
-            @editor.toggleGitChangesInLines @lineIndicesForBlockAtLine meta[0]
+            blockIndices = @lineIndicesForBlockAtLine meta[0]
+            @editor.do.start()
+            @editor.do.setCursors blockIndices.map (i) -> [0,i]
+            @editor.do.end()
+            @editor.toggleGitChangesInLines blockIndices
 
     gitMetasAtLineIndex: (li) ->
         
