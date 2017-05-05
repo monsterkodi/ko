@@ -277,11 +277,13 @@ class Column
 
         prefsKey = "browser:ignoreHidden:#{@parent.file}"
         if @parent.type == 'dir'            
-            if prefs.get prefsKey
-                prefs.set prefsKey
+            if prefs.get prefsKey, true
+                prefs.set prefsKey, false
             else
-                prefs.set prefsKey, true
+                prefs.set prefsKey
             @browser.loadDir @parent.file, column:@index, focus:true
+            log 'toggleDotFiles', prefsKey, prefs.get prefsKey
+        @
         
     # 000   000  00000000  000   000  
     # 000  000   000        000 000   

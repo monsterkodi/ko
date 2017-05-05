@@ -46,11 +46,11 @@ class Buffer extends event
     numHighlights: -> @state.numHighlights()
 
     # these are used from tests and restore
-    setCursors:    (c) -> @state = @state.setCursors(c);    @startSelectionCursors = null
-    setSelections: (s) -> @state = @state.setSelections(s); @startSelectionCursors = null  
+    setCursors:    (c) -> @state = @state.setCursors    c 
+    setSelections: (s) -> @state = @state.setSelections s 
     setHighlights: (h) -> @state = @state.setHighlights h  
-    setMain:       (m) -> @state = @state.setMain m     
-    addHighlight:  (h) -> @state = @state.addHighlight h
+    setMain:       (m) -> @state = @state.setMain       m     
+    addHighlight:  (h) -> @state = @state.addHighlight  h
     
     #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
     # 000       000   000  000   000  000       000   000  000   000  000     

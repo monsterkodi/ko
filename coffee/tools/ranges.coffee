@@ -67,7 +67,7 @@ class Ranges
     # 000         0000000   0000000   000     000     000   0000000   000   000  0000000   
 
     positionsFromPosInPositions: (p, pl) -> (r for r in pl when ((r[1] > p[1]) or ((r[1] == p[1]) and (r[0] >= p[0]))))
-    positionsForLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] == li)
+    positionsAtLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] == li)
     positionsBelowLineIndexInPositions: (li,pl) -> (p for p in pl when p[1] > li)
     positionsInLineAfterColInPositions: (li,col,pl) -> (p for p in pl when p[1] == li and p[0]>col)
     positionsNotInRanges: (pss, rgs) -> _.filter pss, (p) -> not isPosInRanges p, rgs
@@ -103,7 +103,7 @@ class Ranges
     # 000   000  000   000  000   000   0000000   00000000  0000000   
     
     rangesFromPositions: (pl) -> ([p[1], [p[0], p[0]]] for p in pl)  
-    rangesForLineIndexInRanges: (li, ranges) -> (r for r in ranges when r[0]==li)
+    rangesAtLineIndexInRanges: (li, ranges) -> (r for r in ranges when r[0]==li)
     rangesForLineIndicesInRanges: (lis, ranges) -> (r for r in ranges when r[0] in lis)
     rangesAfterLineColInRanges: (li,col,ranges) -> (r for r in ranges when r[0]==li and r[1][0] >= col)
     

@@ -52,8 +52,6 @@ class Diffbar
                 break if metas[0][2].toggled != toggled
                 lines.push ai
                 ai++
-                
-        # log 'li:', li, lines
         lines
             
     watch: (file) ->

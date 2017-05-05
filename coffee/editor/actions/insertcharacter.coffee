@@ -38,7 +38,7 @@ module.exports =
         newCursors = @do.cursors()
         for cc in newCursors
             @do.change cc[1], @do.line(cc[1]).splice cc[0], 0, ch
-            for nc in positionsForLineIndexInPositions cc[1], newCursors
+            for nc in positionsAtLineIndexInPositions cc[1], newCursors
                 if nc[0] >= cc[0]
                     nc[0] += 1
         

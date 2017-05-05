@@ -27,6 +27,7 @@ module.exports =
             combo: 'command+e'
 
     highlightText: (text, opt) -> # called from find command
+        
         hls = @rangesForText text, opt
         if hls.length
             switch opt?.select
@@ -41,6 +42,7 @@ module.exports =
     wordHighlights: -> @highlights().filter (h) -> not h[2]?.clss?.startsWith('stringmatch') and not h[2]?.clss?.startsWith('bracketmatch')
 
     highlightWordAndAddToSelection: -> # command+d
+        
         cp = @cursorPos()
         wordHighlights = @wordHighlights()
         cursorInWordHighlight = wordHighlights.length and rangeAtPosInRanges cp, wordHighlights
@@ -59,6 +61,7 @@ module.exports =
             @do.end()
 
     selectAllWords: -> # command+alt+d
+        
         @highlightWordAndAddToSelection()
         @do.start()
         @do.select @do.highlights()
@@ -110,11 +113,13 @@ module.exports =
                 @focus()
 
     clearHighlights: ->
+        
         if @numHighlights()
             @setHighlights []
             @emit 'highlight'
             
     removeSelectedHighlight: -> # command+shift+d
+        
         cp = @cursorPos()
         sel = @selections()
         sr = rangeAtPosInRanges cp, sel

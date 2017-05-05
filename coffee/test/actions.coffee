@@ -227,11 +227,6 @@ describe 'actions', ->
             mainIs [0,1]
             selsIs []
             editor.deleteToEndOfLineOrWholeLine()
-            textIs "x2345a\n"
-            cursIs [[0,1]]
-            mainIs [0,1]
-            selsIs []
-            editor.deleteToEndOfLineOrWholeLine()
             textIs "x2345a"
             cursIs [[0,0]]
             mainIs [0,0]

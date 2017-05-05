@@ -43,14 +43,15 @@ module.exports =
             combo: 'command+alt+ctrl+b'
 
     selectSingleRange: (r, opt = extend:false) ->
-        if not opt.extend
-            @startSelectionCursors = null 
+        
         if not r?
             return error "Editor.#{name}.selectSingleRange -- undefined range!"
+            
         @do.start()
         @do.setCursors [[opt?.before and r[1][0] or r[1][1], r[0]]]
         @do.select [r]
         @do.end()
+        @
 
     #  0000000  000000000  000   0000000  000   000  000   000  
     # 000          000     000  000       000  000    000 000   
@@ -75,39 +76,54 @@ module.exports =
     # 0000000      000     000   000  000   000     000             00000000  000   000  0000000    
     
     startSelection: (opt = extend:false) ->
-        if opt?.extend
-            if not @startSelectionCursors
-                @startSelectionCursors = @do.cursors()
-                if not @stickySelection
-                    @do.select rangesFromPositions @startSelectionCursors
-        else
+        
+        if not opt?.extend
             @startSelectionCursors = null
             if not @stickySelection
                 @do.select []
+            return
+
+        if not @startSelectionCursors or @numCursors() != @startSelectionCursors.length
+            @startSelectionCursors = @do.cursors()
+            
+            if @numSelections()
+                for c in @startSelectionCursors
+                    if sel = @continuousSelectionAtPosInRanges c, @do.selections()
+                        if isSamePos sel[1], c
+                            c[0] = sel[0][0]
+                            c[1] = sel[0][1]
+            
+            if not @stickySelection
+                @do.select rangesFromPositions @startSelectionCursors
                     
     endSelection: (opt = extend:false) ->
-        if not opt?.extend
-            if @do.numSelections() and not @stickySelection
-                @selectNone()
+        
+        if not opt?.extend 
             @startSelectionCursors = null
-        else
-            oldCursors   = @startSelectionCursors ? @do.cursors()
-            newSelection = @stickySelection and @do.selections() or []            
-            newCursors   = @do.cursors()
-            
-            if oldCursors.length != newCursors.length
-                return error "Editor.#{@name}.endSelection -- oldCursors.size != newCursors.size", oldCursors.length, newCursors.length
-            
-            for ci in [0...@do.numCursors()]
-                oc = oldCursors[ci]
-                nc = newCursors[ci]
-                if not oc? or not nc?
-                    return error "Editor.#{@name}.endSelection -- invalid cursors", oc, nc
-                else
-                    ranges = @rangesForLinesBetweenPositions oc, nc, true #< extend to full lines if cursor at start of line                
-                    newSelection = newSelection.concat ranges
+            if not @stickySelection # and @do.numSelections()
+                # @selectNone()
+                @do.select []
+            @checkSalterMode()
+            return
 
-            @do.select newSelection
+        oldCursors   = @startSelectionCursors ? @do.cursors()
+        newSelection = @stickySelection and @do.selections() or []            
+        newCursors   = @do.cursors()
+        
+        if oldCursors.length != newCursors.length
+            return error "Editor.#{@name}.endSelection -- oldCursors.size != newCursors.size", oldCursors.length, newCursors.length
+        
+        for ci in [0...@do.numCursors()]
+            oc = oldCursors[ci]
+            nc = newCursors[ci]
+            if not oc? or not nc?
+                return error "Editor.#{@name}.endSelection -- invalid cursors", oc, nc
+            else
+                ranges = @rangesForLinesBetweenPositions oc, nc, true #< extend to full lines if cursor at start of line                
+                newSelection = newSelection.concat ranges
+
+        @do.select newSelection
+            
         @checkSalterMode()      
 
     #  0000000   0000000    0000000    
@@ -117,15 +133,19 @@ module.exports =
     # 000   000  0000000    0000000    
     
     addRangeToSelection: (range) ->
+        
         @do.start()
         newSelections = @do.selections()
         newSelections.push range
+        
         newCursors = (rangeEndPos(r) for r in newSelections)
+            
         @do.setCursors newCursors, main:'last'
         @do.select newSelections
         @do.end()
 
     removeSelectionAtIndex: (si) ->
+        
         @do.start()
         newSelections = @do.selections()
         newSelections.splice si, 1
@@ -151,7 +171,8 @@ module.exports =
     # 000  000  0000     000     000       000   000     000     
     # 000  000   000      0      00000000  000   000     000     
     
-    selectInverted: -> 
+    selectInverted: ->
+        
         invertedRanges = []        
         sc = @selectedAndCursorLineIndices()
         for li in [0...@numLines()]
@@ -170,7 +191,7 @@ module.exports =
     # 0000000    00000000     000     00     00  00000000  00000000  000   000  
     
     selectTextBetweenCursorsOrSurround: ->
-        #  [(test)]
+
         if @numCursors() and @numCursors() % 2 == 0  
             @do.start()
             newSelections = []

@@ -34,24 +34,26 @@ module.exports =
             c: 'wordHighlights'
 
     deleteToEndOfLine: ->
+        
         @do.start()
         @moveCursorsToLineBoundary 'right', extend:true
         @deleteSelection deleteLines:false
         @do.end()
         
     deleteToEndOfLineOrWholeLine: ->
-        @do.start()
-        @moveCursorsToLineBoundary 'right', extend:true
         
-        for s in @do.selections()
-            if lengthOfRange s
-                @deleteToEndOfLine()
-                return @do.end()
+        cursors = @do.isDoing() and @do.cursors() or @cursors()
+        for c in cursors
+            if c[0] != 0 and not @isCursorAtEndOfLine(c)
+                return @deleteToEndOfLine()
+        
+        @do.start()
         @selectMoreLines()
         @deleteSelection deleteLines:true      
         @do.end()
 
     deleteForward: ->
+        
         if @numSelections()
             @deleteSelection()
         else
@@ -68,14 +70,14 @@ module.exports =
                         @do.delete c[1]+1
                                     
                         # move cursors in joined line
-                        for nc in positionsForLineIndexInPositions c[1]+1, newCursors
+                        for nc in positionsAtLineIndexInPositions c[1]+1, newCursors
                             cursorDelta nc, ll, -1
                         # move cursors below deleted line up
                         for nc in positionsBelowLineIndexInPositions c[1]+1, newCursors
                             cursorDelta nc, 0, -1
                 else
                     @do.change c[1], @do.line(c[1]).splice c[0], 1
-                    for nc in positionsForLineIndexInPositions c[1], newCursors
+                    for nc in positionsAtLineIndexInPositions c[1], newCursors
                         if nc[0] > c[0]
                             cursorDelta nc, -1
 

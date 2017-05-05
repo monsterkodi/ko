@@ -6,18 +6,8 @@
 #  0000000   000     000     0000000      000     000   000     000      0000000   0000000   
 
 { escapePath, childp, dirExists, process, path, str, log, _
-} = require 'kxk'
-
-gitRoot = (pth) ->
-    
-    try
-        cwd = dirExists(pth) and pth or path.dirname(pth)
-        r = childp.execSync 'git rev-parse --show-toplevel',
-            cwd: cwd
-            encoding: 'utf8'
-        return r.trim()
-    catch err
-        return null
+}       = require 'kxk'
+gitRoot = require './gitroot'
 
 gitStatus = (fileOrDir) ->
 

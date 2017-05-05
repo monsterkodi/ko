@@ -41,7 +41,7 @@ module.exports =
                 
                 newCursors.push [before.length, c[1]]
                 
-                for nc in positionsForLineIndexInPositions c[1]+1, newCursors
+                for nc in positionsAtLineIndexInPositions c[1]+1, newCursors
                     cursorDelta nc, before.length, -1
                 for nc in positionsBelowLineIndexInPositions c[1], newCursors
                     cursorDelta nc, 0, -1

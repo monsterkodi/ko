@@ -34,7 +34,7 @@ module.exports =
                 
             if dir == 'down'
                 for i in [0...ls.length]
-                    for nc in positionsForLineIndexInPositions r[0]+i, newCursors
+                    for nc in positionsAtLineIndexInPositions r[0]+i, newCursors
                         cursorDelta nc, 0, ls.length # move cursors in inserted lines down
 
         @do.select []

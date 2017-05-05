@@ -56,7 +56,7 @@ module.exports =
     # 0000000   00000000     000     
     
     singleCursorAtPos: (p, opt = extend:false) ->
-        @startSelectionCursors = null if not opt.extend
+        
         if @numLines() == 0
             @do.start()
             @do.insert 0, ''

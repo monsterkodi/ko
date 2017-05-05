@@ -11,6 +11,7 @@
 module.exports =
     
     deleteSelectionOrCursorLines: ->
+        
         @do.start()
         if not @do.numSelections()
             @selectMoreLines()
@@ -18,7 +19,7 @@ module.exports =
         @do.end()
 
     deleteSelection: (opt = deleteLines:true) ->
-        @startSelectionCursors = null
+
         @do.start()
         
         if not @do.numSelections()
@@ -82,12 +83,13 @@ module.exports =
     # returns start and end positions of ranges that have either no characters or just a single newline between them
 
     continuousSelectionAtPosInRanges: (p, sel) -> 
+        
         r = rangeAtPosInRanges p, sel
         if r and lengthOfRange r
             sp = rangeStartPos r
             while (sp[0] == 0) and (sp[1] > 0)
                 plr = @rangeForLineAtIndex sp[1]-1
-                sil = rangesForLineIndexInRanges sp[1]-1, sel
+                sil = rangesAtLineIndexInRanges sp[1]-1, sel
                 if sil.length == 1 and isSameRange sil[0], plr
                     sp = rangeStartPos plr
                 else if sil.length and _.last(sil)[1][1] == plr[1][1]
@@ -97,7 +99,7 @@ module.exports =
             ep = rangeEndPos r
             while (ep[0] == @line(ep[1]).length) and (ep[1] < @numLines()-1)
                 nlr = @rangeForLineAtIndex ep[1]+1
-                sil = rangesForLineIndexInRanges ep[1]+1, sel
+                sil = rangesAtLineIndexInRanges ep[1]+1, sel
                 if sil.length == 1 and isSameRange sil[0], nlr
                     ep = rangeEndPos nlr
                 else if sil.length and _.first(sil)[1][0] == 0

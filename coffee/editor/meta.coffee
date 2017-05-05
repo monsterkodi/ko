@@ -250,7 +250,7 @@ class Meta
         for meta in @metasAtLineIndex e.lineIndex
             meta[1][1] = e.text.length if meta[1][1] is 0
                 
-    metasAtLineIndex: (li) -> rangesForLineIndexInRanges li, @metas
+    metasAtLineIndex: (li) -> rangesAtLineIndexInRanges li, @metas
     hrefAtLineIndex:  (li) -> 
         
         for meta in @metasAtLineIndex li

@@ -23,6 +23,7 @@ module.exports =
             text:  'removes a line from each block of selected lines'
 
     selectMoreLines: ->
+        
         @do.start()
         newCursors    = @do.cursors()
         newSelections = @do.selections()
@@ -47,15 +48,16 @@ module.exports =
         @do.end()       
 
     selectLessLines: -> 
+        
         @do.start()
         newCursors    = @do.cursors()
         newSelections = @do.selections()
         
         for c in reversed newCursors
-            thisSel = rangesForLineIndexInRanges c[1], newSelections
+            thisSel = rangesAtLineIndexInRanges c[1], newSelections
             if thisSel.length
                 if @isSelectedLineAtIndex c[1]-1
-                    s = _.first rangesForLineIndexInRanges c[1]-1, newSelections
+                    s = _.first rangesAtLineIndexInRanges c[1]-1, newSelections
                     cursorSet c, s[1][1], s[0]
                 newSelections.splice newSelections.indexOf(thisSel[0]), 1
 

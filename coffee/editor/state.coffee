@@ -36,9 +36,7 @@ class State
     
     line:      (i) -> 
         if not @s.lines[i]?
-            a=1+1
             log 'dafuk?'
-            b=2+3
         @s.lines[i]?.text
     cursor:    (i) -> @s.cursors[i].asMutable deep: true 
     selection: (i) -> @s.selections[i].asMutable deep: true 

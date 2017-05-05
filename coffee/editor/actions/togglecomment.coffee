@@ -19,10 +19,10 @@ module.exports =
         newSelections = @do.selections()
         
         moveInLine = (i, d) -> 
-            for s in rangesForLineIndexInRanges i, newSelections
+            for s in rangesAtLineIndexInRanges i, newSelections
                 s[1][0] += d
                 s[1][1] += d
-            for c in positionsForLineIndexInPositions i, newCursors
+            for c in positionsAtLineIndexInPositions i, newCursors
                 cursorDelta c, d
                 
         mainCursorLine = @do.line @mainCursor()[1]
