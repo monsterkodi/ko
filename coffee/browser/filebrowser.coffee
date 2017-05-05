@@ -14,13 +14,14 @@ forkfunc = require 'fork-func'
 
 class FileBrowser extends Browser
     
-    constructor: (@view) -> 
+    constructor: (@view) ->
                 
         super @view
         @loadID = 0
         @name = 'FileBrowser'
         post.on 'browserColumnItemsSet', @onColumnItemsSet
         post.on 'saved',                 @onSaved
+        post.on 'gitRefChanged',         @onGitRefChanged
     
     # 00000000  000  000      00000000  
     # 000       000  000      000       
@@ -145,7 +146,13 @@ class FileBrowser extends Browser
 
     onSaved: (file) =>
         
-        if lastUsed = @lastUsedColumn()        
+        if lastUsed = @lastUsedColumn()
+            for c in [0..lastUsed.index]
+                @getGitStatus column:c, file:file
+                
+    onGitRefChanged: (gitDir, file) =>
+        
+        if lastUsed = @lastUsedColumn()
             for c in [0..lastUsed.index]
                 @getGitStatus column:c, file:file
                         

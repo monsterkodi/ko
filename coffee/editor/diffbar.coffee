@@ -5,11 +5,10 @@
 # 000   000  000  000       000       000   000  000   000  000   000
 # 0000000    000  000       000       0000000    000   000  000   000
 
-{ packagePath, fileExists, elem, str, empty, path, fs, log, error,  
+{ packagePath, fileExists, elem, str, empty, post, path, fs, log, error,  
 } = require 'kxk'
-
+gitWatch = require '../tools/gitwatch'
 forkfunc = require 'fork-func'
-chokidar = require 'chokidar'
 
 class Diffbar
     
@@ -20,7 +19,9 @@ class Diffbar
         @elem.style.top  = '0'
         @editor.view.appendChild @elem        
         @editor.on 'file', @onEditorFile
-        @watch @editor.currentFile
+        
+        gitWatch.watch @editor.currentFile
+        post.on 'gitRefChanged', @update
 
     onMetaClick: (meta, event) =>
         
@@ -53,26 +54,7 @@ class Diffbar
                 lines.push ai
                 ai++
         lines
-            
-    watch: (file) ->
-        
-        @watcher?.close()
-        delete @watcher
-        
-        pkgPath = packagePath file
-        if pkgPath
-            
-            gitFile = path.join pkgPath, '.git', 'HEAD'
-            
-            if fileExists gitFile
                 
-                refPath = fs.readFileSync gitFile, 'utf8'
-                if refPath.startsWith 'ref: '
-                    gitFile = path.join pkgPath, '.git', refPath.slice(5).trim()
-
-                @watcher = chokidar.watch gitFile
-                @watcher.on 'change', @update
-    
     updateMetas: ->
         
         @clearMetas()
@@ -113,7 +95,7 @@ class Diffbar
 
     onEditorFile: =>
         
-        @watch @editor.currentFile
+        gitWatch.watch @editor.currentFile
         @update()
         
     update: =>
