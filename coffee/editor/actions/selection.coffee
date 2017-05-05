@@ -67,12 +67,14 @@ module.exports =
     #      000     000     000  000       000  000      000     
     # 0000000      000     000   0000000  000   000     000     
     
-    startStickySelection: () -> 
+    startStickySelection: () ->
+        
         @stickySelection = true
         post.emit 'sticky', true
         @emit 'selection'
 
     endStickySelection: () ->
+        
         @stickySelection = false
         post.emit 'sticky', false
         @emit 'selection'
@@ -164,11 +166,13 @@ module.exports =
         @do.end()        
 
     selectNone: -> 
+        
         @do.start()
         @do.select []
         @do.end()
         
-    selectAll: -> 
+    selectAll: ->
+        
         @do.start()
         @do.select @rangesForAllLines()
         @do.end()
@@ -216,6 +220,7 @@ module.exports =
         else @selectBetweenSurround()
 
     selectBetweenSurround: ->
+        
         if surr = @highlightsSurroundingCursor()
             @do.start()
             start = rangeEndPos surr[0]
@@ -229,6 +234,7 @@ module.exports =
             @do.end()
             
     selectSurround: ->
+        
         if surr = @highlightsSurroundingCursor()
             @do.start()
             @do.select surr
@@ -243,6 +249,7 @@ module.exports =
     # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     0000000   
         
     selectNextHighlight: -> # command+g
+        
         if not @numHighlights() and window? # < this sucks
             searchText = window.commandline.commands.find?.currentText
             @highlightText searchText if searchText?.length
@@ -254,6 +261,7 @@ module.exports =
             @scrollCursorIntoView?() # < this also sucks
 
     selectPrevHighlight: -> # command+shift+g
+        
         if not @numHighlights() and window? # < this sucks
             searchText = window.commandline.commands.find?.currentText
             @highlightText searchText if searchText?.length

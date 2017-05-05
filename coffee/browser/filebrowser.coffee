@@ -19,9 +19,11 @@ class FileBrowser extends Browser
         super @view
         @loadID = 0
         @name = 'FileBrowser'
+        
         post.on 'browserColumnItemsSet', @onColumnItemsSet
         post.on 'saved',                 @updateGitStatus
         post.on 'gitRefChanged',         @updateGitStatus
+        post.on 'fileIndexed',           @onFileIndexed
     
     # 00000000  000  000      00000000  
     # 000       000  000      000       
@@ -149,7 +151,20 @@ class FileBrowser extends Browser
         if lastUsed = @lastUsedColumn()
             for c in [0..lastUsed.index]
                 @getGitStatus column:c, file:file
-                                        
+
+
+    # 000  000   000  0000000    00000000  000   000  00000000  0000000    
+    # 000  0000  000  000   000  000        000 000   000       000   000  
+    # 000  000 0 000  000   000  0000000     00000    0000000   000   000  
+    # 000  000  0000  000   000  000        000 000   000       000   000  
+    # 000  000   000  0000000    00000000  000   000  00000000  0000000    
+    
+    onFileIndexed: (file) =>
+        
+        return if file != @activeColumn()?.activeRow()?.item.file
+        log 'onFileIndexed', file, @activeColumn()?.activeRow()?.item.file
+        
+                
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       
     # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000   

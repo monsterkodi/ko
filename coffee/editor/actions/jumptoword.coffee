@@ -6,10 +6,10 @@
 #  0000000    0000000   000   000  000           000      0000000   00     00   0000000   000   000  0000000    
         
 { splitFileLine, fileExists, resolve, post, log
-} = require 'kxk'
+}      = require 'kxk'
 matchr = require '../../tools/matchr'
 
-jumpToWord =
+module.exports = 
     
     actions:
         jumpToWord:
@@ -17,7 +17,7 @@ jumpToWord =
             text:  'jump to word at cursor'
             combo: 'alt+enter'
     
-    jumpToWord: (p = @cursorPos()) ->
+    jumpToWord: (p=@cursorPos()) ->
         
         text = @line p[1]
         
@@ -54,5 +54,3 @@ jumpToWord =
                 opt.type = type if type?
                 
         post.emit 'jumpTo', word, opt
-
-module.exports = jumpToWord

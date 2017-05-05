@@ -17,8 +17,8 @@ class Indexer
     @requireRegExp = /^\s*([\w\{\}]+)\s+=\s+require\s+[\'\"]([\.\/\w]+)[\'\"]/
     @classRegExp   = /^\s*class\s+(\w+)(\s+extends\s\w+.*|\s*:\s*[\w\,\s\<\>]+)?\s*$/
     @includeRegExp = /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
-    @methodRegExp  = /^\s+([\@]?\w+)\s*\:\s*(\([^\)]*\))?\s*[=-]\>/
-    @funcRegExp    = /^\s*([\w\.]+)\s*[\:\=]\s*(\([^\)]*\))?\s*[=-]\>/
+    @methodRegExp  = /^\s+([\@]?\w+)\s*\:\s*(\(.*\))?\s*[=-]\>/
+    @funcRegExp    = /^\s*([\w\.]+)\s*[\:\=]\s*(\(.*\))?\s*[=-]\>/
     @testRegExp    = /^\s*(describe|it)\s+[\'\"](.+)[\'\"]\s*[\,]\s*(\([^\)]*\))?\s*[=-]\>/
     @splitRegExp   = new RegExp "[^\\w\\d\\_]+", 'g'
 
@@ -213,24 +213,25 @@ class Indexer
     # 000  000   000  0000000    00000000  000   000        000       000  0000000  00000000
 
     indexFile: (file, opt) ->
-
+        
         @removeFile file if opt?.refresh
 
-        return @shiftQueue() if @files[file]?
+        if @files[file]?
+            return @shiftQueue() 
 
         fileExt = path.extname file 
 
         if fileExt in @imageExtensions
             @files[file] = {}
-            return
+            return @shiftQueue()
 
         isCpp = fileExt in ['.cpp', '.cc']
         isHpp = fileExt in ['.hpp', '.h' ]
 
         fs.readFile file, 'utf8', (err, data) =>
-            if err?
-                log "error indexing #{file}", err
-                return
+            
+            return log "can't index #{file}", err if err?
+            
             lines = data.split /\r?\n/
             
             fileInfo =
@@ -308,6 +309,7 @@ class Indexer
                             funcAdded = true
 
                 words = line.split Indexer.splitRegExp
+                
                 for word in words
                     
                     if Indexer.testWord word
@@ -379,6 +381,7 @@ class Indexer
 
                 post.toWins 'classesCount', _.size @classes
                 post.toWins 'funcsCount',   _.size @funcs
+                post.toWins 'fileIndexed',  file
 
             @files[file] = fileInfo
             
@@ -388,8 +391,10 @@ class Indexer
             @indexDir packagePath file
 
             @shiftQueue()
+        @
 
     shiftQueue: =>
+        
         if @queue.length
             file = @queue.shift()
             @indexFile file
