@@ -31,7 +31,7 @@ class GitWatch
                     gitFile = path.join gitDir, '.git', refPath.slice(5).trim()
 
                 @watcher = chokidar.watch gitFile
-                @watcher.on 'change', (path) -> post.emit 'gitRefChanged', gitDir, gitFile
+                @watcher.on 'change', (path) -> post.emit 'gitRefChanged', file, gitDir
 
     unwatch: ->
         

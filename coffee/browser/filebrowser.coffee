@@ -20,8 +20,8 @@ class FileBrowser extends Browser
         @loadID = 0
         @name = 'FileBrowser'
         post.on 'browserColumnItemsSet', @onColumnItemsSet
-        post.on 'saved',                 @onSaved
-        post.on 'gitRefChanged',         @onGitRefChanged
+        post.on 'saved',                 @updateGitStatus
+        post.on 'gitRefChanged',         @updateGitStatus
     
     # 00000000  000  000      00000000  
     # 000       000  000      000       
@@ -144,20 +144,12 @@ class FileBrowser extends Browser
                     row.div.appendChild elem 'span', 
                         class:"git #{status} fa fa-#{icon} extname #{path.extname(row.item.file).slice 1}"
 
-    onSaved: (file) =>
+    updateGitStatus: (file) =>
         
         if lastUsed = @lastUsedColumn()
             for c in [0..lastUsed.index]
                 @getGitStatus column:c, file:file
-                
-    onGitRefChanged: (gitDir, file) =>
-        
-        log "gitDir:#{gitDir} file:#{file}"
-        
-        if lastUsed = @lastUsedColumn()
-            for c in [0..lastUsed.index]
-                @getGitStatus column:c, file:file
-                        
+                                        
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       
     # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000   
