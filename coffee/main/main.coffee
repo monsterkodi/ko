@@ -22,7 +22,6 @@ electron = require 'electron'
 }             = electron
 disableSnap   = false
 main          = undefined # < created in app.on 'ready'
-navigate      = undefined # <
 tray          = undefined # < created in Main.constructor
 coffeeExecute = undefined # <
 openFiles     = []
@@ -569,8 +568,8 @@ app.on 'open-file', (event, path) ->
 
 app.on 'ready', -> 
     
-    main     = new Main openFiles
-    navigate = new Navigate main
+    main          = new Main openFiles
+    main.navigate = new Navigate main
     
 app.on 'window-all-closed', ->
     
