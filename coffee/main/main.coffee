@@ -47,7 +47,6 @@ args  = require('karg') """
     verbose   . ? log more                . = false
     DevTools  . ? open developer tools    . = false
     debug     .                             = false
-    test      .                             = false
     
 version  #{pkg.version}
 
@@ -118,8 +117,9 @@ hideDock = ->
 # 000        000   000       000     000     
 # 000         0000000   0000000      000     
 
-post.onGet 'winInfos', -> (id: w.id for w in wins())
-post.onGet 'logSync',  -> 
+post.onGet 'debugMode', -> args.debug
+post.onGet 'winInfos',  -> (id: w.id for w in wins())
+post.onGet 'logSync',   -> 
     console.log.apply console, [].slice.call(arguments, 0)
     return true
 

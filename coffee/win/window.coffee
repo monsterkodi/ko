@@ -45,7 +45,7 @@ window.onerror = (event, source, line, col, err) ->
         s = "▲ #{l.source}:#{l.line} ▲ [ERROR] #{err}"
     else
         s = "▲ [ERROR] #{err} #{unresolve source}:#{line}:#{col}"
-    # post.emit 'error', s
+    post.emit 'error', s
     # post.emit 'slog', s 
     console.log s
     

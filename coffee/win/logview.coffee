@@ -18,8 +18,9 @@ class LogView extends TextEditor
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap']
         
         @setLines ['']
-        post.on 'error', (text) -> 
-            window.split.do 'show logview'
+        post.on 'error', (text) ->
+            if post.get 'debugMode'
+                window.split.do 'show logview'
         post.on 'slog', (text) =>
             @appendText text
             # post.toMain 'winlog', window.winID, text
