@@ -53,7 +53,7 @@ class Tabs
             tab.foreignChanges lineChanges
         
     onFileSaved: (file, winID) =>
-        error 'fileSaved from this window?' if winID == window.winID
+        return error "fileSaved from this window? #{file} #{winID}" if winID == window.winID
         tab = @tab file
         if tab? and tab != @activeTab()
             log "reverting tab because foreign win saved #{file}", tab.info

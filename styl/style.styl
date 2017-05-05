@@ -682,16 +682,36 @@ infoPadding = 6px
     &::-webkit-scrollbar    
         height          1px
 
-.list.windows
-    min-width           200px
-    & .list-item
-        font-size       titlebarFontSize    
+// 000   000  000  000   000  000      000   0000000  000000000  
+// 000 0 000  000  0000  000  000      000  000          000     
+// 000000000  000  000 0 000  000      000  0000000      000     
+// 000   000  000  000  0000  000      000       000     000     
+// 00     00  000  000   000  0000000  000  0000000      000     
+
+.winlist
+    position            absolute
+    min-width           100px
+    max-width           800px
+    z-index             99
+    overflow-x          auto
+    border-bottom-right-radius 6px
+    &::-webkit-scrollbar  
+        height          0px
     & .dot
         padding-left    10px
         padding-right   10px
     & .winid    
-        padding-left    62px
+        padding-left    73px
+        padding-right   14px
 
+.winlist-item
+    padding-top         4px
+    padding-right       13px
+    cursor              pointer
+    font-size           titlebarFontSize    
+    height              titlebarHeight // 20px
+    white-space         nowrap
+    
 //  0000000   000   000  000000000   0000000    0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
 // 000   000  000   000     000     000   000  000       000   000  000   000  000   000  000      000          000     000     
 // 000000000  000   000     000     000   000  000       000   000  000000000  00000000   000      0000000      000     0000000 

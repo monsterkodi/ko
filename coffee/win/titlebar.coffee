@@ -105,9 +105,10 @@ class Titlebar
         return if winInfos.length <= 1
         document.activeElement.blur()
         @selected = -1
-        @list = elem class: 'list windows'
-        @list.style.top = 0
-        window.split.elem.appendChild @list
+        @list = elem class: 'winlist'
+        # @list.style.top = 0
+        # window.split.elem.appendChild @list
+        @elem.parentNode.insertBefore @list, @elem.nextSibling
         @listWinInfos winInfos
         stopEvent event
 
@@ -128,15 +129,15 @@ class Titlebar
     listWinInfos: (winInfos) ->
         
         @list.innerHTML = ""        
-        @list.style.display = 'unset'
+        # @list.style.display = 'unset'
         
         for info in winInfos
             
             continue if info.id == window.winID
             
-            div = elem class: "list-item", children: [
+            div = elem class: "winlist-item", children: [
                 elem 'span', class: 'winid', text: info.id
-                elem 'span', class: 'wintabs', text: '●'
+                elem 'span', class: 'wintabs', text: ''
             ]
             div.winID = info.id
             
@@ -151,13 +152,18 @@ class Titlebar
         @
 
     onWinTabs: (winID, tabs) =>
-        
+
         return if not @list?
-        return if winID != window.winID
+        return if winID == window.winID
         for div in @list.children
             if div.winID == winID
                 $('.wintabs', div)?.innerHTML = tabs
+                width = div.getBoundingClientRect().width
                 break
+        # if width?
+            # w = Math.max width+10, @list.getBoundingClientRect().width
+            # @list.style.width = "#{w}px"
+        log 'onWinTabs', winID, @list.getBoundingClientRect().width
 
     loadWindowWithID: (id) ->
         

@@ -234,8 +234,8 @@ class Meta
     onMouseDown: (event) ->
         
         if event.target.meta?[2].click?
-            event.target.meta?[2].click event.target.meta, event
-            stopEvent event
+            result = event.target.meta?[2].click event.target.meta, event
+            stopEvent event if result != 'unhandled'
         
     #  0000000   00000000   00000000   00000000  000   000  0000000  
     # 000   000  000   000  000   000  000       0000  000  000   000

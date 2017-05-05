@@ -24,7 +24,7 @@ class Diffbar
         post.on 'gitRefChanged', @update
 
     onMetaClick: (meta, event) =>
-        
+        return 'unhandled' if event.metaKey
         if event.ctrlKey
             @editor.toggleGitChangesInLines [meta[0]]
         else

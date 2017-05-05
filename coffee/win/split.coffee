@@ -226,7 +226,7 @@ class Split extends event
     
     resized: =>
         main =$ 'main'
-        @elem.style.width = "#{main.clientWidth}px"
+        @elem.style.width  = "#{main.clientWidth}px"
         @elem.style.height = "#{main.clientHeight}px"
         @flex.resized()
         @emitSplit()

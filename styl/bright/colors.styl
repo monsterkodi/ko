@@ -420,13 +420,20 @@ span.ko
 // 000      000       000     000   
 // 0000000  000  0000000      000   
 
+.winlist
 .list
-    background              frameColor
+    background              brightColor
 
+.winlist-item.selected
 .list-item.selected
     background              titleColor
+    
+.winlist-item
+.list-item
+    &:hover
+        background          frameColor
 
-.list.windows
+.winlist
     & .dot
         color               #006600
     & .winid    
