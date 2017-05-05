@@ -117,7 +117,7 @@ class FileBrowser extends Browser
         forkfunc '../tools/gitstatus', file, (err, info) =>
             
             if not empty err
-                log 'gitstatus failed', err
+                log "gitstatus failed for #{file}", err
                 return
                 
             return if empty info
@@ -151,6 +151,8 @@ class FileBrowser extends Browser
                 @getGitStatus column:c, file:file
                 
     onGitRefChanged: (gitDir, file) =>
+        
+        log "gitDir:#{gitDir} file:#{file}"
         
         if lastUsed = @lastUsedColumn()
             for c in [0..lastUsed.index]
