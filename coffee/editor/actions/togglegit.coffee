@@ -85,7 +85,7 @@ module.exports =
                     for nc in positionsBelowLineIndexInPositions li+1, cursors
                         cursorDelta nc, 0, +1
                     
-        @do.setCursors cursors
+        @do.setCursors cursors, main:'closest'
         @do.select selections
         @do.end()
             
@@ -125,7 +125,7 @@ module.exports =
                     for nc in positionsBelowLineIndexInPositions li, cursors
                         cursorDelta nc, 0, -1
          
-        @do.setCursors cursors
+        @do.setCursors cursors, main:'closest'
         @do.select selections
         @do.end()
             

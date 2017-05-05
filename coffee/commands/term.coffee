@@ -15,6 +15,7 @@ Command  = require '../commandline/command'
 class Term extends Command
 
     constructor: (@commandline) ->
+        
         post.on 'shellCommandData', @onShellCommandData
         @idCommands = Object.create null
         @commandIDs = Object.create null
@@ -36,6 +37,7 @@ class Term extends Command
     #  0000000   000   000        0000000    000   000     000     000   000  
         
     onShellCommandData: (cmdData) =>
+        
         if cmdData.cmd == @pwdID
             if cmdData.data != "pwd"
                 cwd = cmdData.data
@@ -52,6 +54,7 @@ class Term extends Command
             terminal.scrollCursorToTop @headers and 7 or 1
 
     getPWD: (@pwdTag) ->
+        
         @pwdID = @cmdID
         post.toMain 'shellCommand', winID: window.winID, cmdID: @cmdID, command: "pwd"
         @cmdID += 1
@@ -63,6 +66,7 @@ class Term extends Command
     #  0000000   0000000   000   000  000        0000000  00000000     000     00000000
         
     complete: =>
+        
         word = _.last @getText().split ' '
         
         if word.indexOf("$") >= 0
@@ -77,6 +81,7 @@ class Term extends Command
         @getPWD 'complete'
         
     resolveDir: (dir) ->
+        
         i = dir.indexOf '$'
         if i >= 0
             for k,v of process.env
@@ -85,6 +90,7 @@ class Term extends Command
         resolve dir
     
     resolveDirWord: (dir, word) =>
+        
         start = ''
         rest  = word
         split = word.split '/'
@@ -111,6 +117,7 @@ class Term extends Command
     # 0000000    000  000   000  
     
     completeDir: (dir) =>
+        
         [dir, start, rest] = @resolveDirWord dir, _.last @getText().split ' ' 
         files = fs.readdirSync @resolveDir dir
         list = []
@@ -126,6 +133,7 @@ class Term extends Command
             return
 
     completeList: (list) =>
+        
         ss = @getText().length
         split = @getText().split ' ' 
         split.pop()
@@ -545,6 +553,7 @@ class Term extends Command
         do:   (@name == 'Term' and 'maximize' or 'show') + ' terminal'
 
     onMetaClick: (meta) => 
+        
         if meta[2].command? then @execute meta[2].command
         if meta[2].href?
             window.split.show 'editor'
@@ -557,6 +566,7 @@ class Term extends Command
     # 000   000  00000000     000   
     
     handleModKeyComboEvent: (mod, key, combo, event) -> 
+        
         switch combo
             when 'tab'
                 @complete()

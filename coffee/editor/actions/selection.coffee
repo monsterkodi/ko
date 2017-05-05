@@ -11,29 +11,37 @@
 module.exports =
     
     actions:
+        
         startStickySelection:
             name:  'sticky selection mode'
             text:  'current selection is not removed when adding new selections'
             combo: 'command+esc'
+            
         selectAll:
             name:  'select all lines'
             combo: 'command+a'
+            
         selectNone:
             name:  'deselect'
             combo: 'command+shift+a'
+            
         selectInverted:
             name:  'invert selection'
             text:  'selects all lines that have no cursors and no selections'
             combo: 'command+i'
+            
         selectNextHighlight:
             name:  'select next highlight'
             combo: 'command+g'
+            
         selectPrevHighlight:
             name:  'select previous highlight'
             combo: 'command+shift+g'
+            
         selectAllHighlights:
             name:  'select all highlights'
             combo: 'command+alt+d'
+            
         selectTextBetweenCursorsOrSurround:
             name: 'select between cursors|brackets|quotes'
             text: """

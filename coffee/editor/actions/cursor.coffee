@@ -48,7 +48,11 @@ module.exports =
 
         cursorPageDown:
             combo: 'page down'
-        
+
+        cursorInAllLines:
+            name:  'cursor in all lines'
+            combo: 'alt+a'
+            
     #  0000000  00000000  000000000  
     # 000       000          000     
     # 0000000   0000000      000     
@@ -112,12 +116,14 @@ module.exports =
     # 000   000  0000000    0000000    
     
     toggleCursorAtPos: (p) ->
+        
         if isPosInPositions p, @state.cursors()
             @delCursorAtPos p
         else
             @addCursorAtPos p
         
     addCursorAtPos: (p) ->
+        
         @do.start()
         newCursors = @do.cursors()
         newCursors.push p
@@ -125,6 +131,7 @@ module.exports =
         @do.end()
                    
     addCursors: (key) ->
+        
         dir = key
         return if @numCursors() >= 999
         @do.start()
@@ -144,6 +151,12 @@ module.exports =
         @do.setCursors newCursors, main:main
         @do.end()
 
+    cursorInAllLines: -> 
+        
+        @do.start()
+        @do.setCursors ([0,i] for i in [0...@numLines()]), main:'closest'
+        @do.end()
+        
     #  0000000   000      000   0000000   000   000  
     # 000   000  000      000  000        0000  000  
     # 000000000  000      000  000  0000  000 0 000  
