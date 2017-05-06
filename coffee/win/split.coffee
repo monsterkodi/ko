@@ -71,7 +71,7 @@ class Split extends event
     
     do: (sentence) ->
         
-        log "Split.do #{sentence}"
+        # log "Split.do #{sentence}"
         
         sentence = sentence.trim()
         return if not sentence.length

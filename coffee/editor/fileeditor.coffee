@@ -30,6 +30,7 @@ class FileEditor extends TextEditor
 
         super viewElem, features: ['Diffbar', 'Scrollbar', 'Numbers', 'Minimap', 'Meta', 'Autocomplete', 'Brackets', 'Strings']
 
+        @pigmentsInit()
         @setText ''
 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000

@@ -5,45 +5,44 @@
 # 000        000  000   000  000 0 000  000       000  0000     000          000
 # 000        000   0000000   000   000  00000000  000   000     000     0000000 
 
-{ log
+{ prefs, log
 }      = require 'kxk'
 matchr = require '../../tools/matchr'
 
 module.exports =
     
     actions:
-        pigments:
+        pigmentsToggle:
             name:  'pigments'
+            text:  'toggle pigments for current file'
             combo: 'command+alt+ctrl+p'
 
-    pigments: ->
+    pigmentsInit: -> @on 'file', @pigmentsFile
+
+    pigmentsFile: (file) ->
+
+        if prefs.get "pigments:#{file}"
+            @pigmentsPigmentize()
+            
+    pigmentsToggle: ->
         
-        if @pigmentsActive
+        if prefs.get "pigments:#{@currentFile}"
             @pigmentsDeactivate()
         else
             @pigmentsActivate()
-
-    pigmentsClear: -> editor.meta.delClass 'pigment'
-
-    pigmentsReactivate: (file) ->
-        
-        @pigmentsDeactivate()
-        @pigments()
    
     pigmentsDeactivate: ->
         
-        if @pigmentsActive
-            @pigmentsClear()
-            @pigmentsActive = false
-            @removeListener 'file', @pigmentsReactivate
+        prefs.set "pigments:#{@currentFile}"
+        @pigmentsClear()
             
     pigmentsActivate: ->
         
-        if not @pigmentsActive
-            @pigmentsActive = true
-            @on 'file', @pigmentsReactivate
-            @pigmentsPigmentize()
+        prefs.set "pigments:#{@currentFile}", true
+        @pigmentsPigmentize()
 
+    pigmentsClear: -> editor.meta.delClass 'pigment'
+    
     pigmentsPigmentize: ->
         
         @pigmentsClear()
