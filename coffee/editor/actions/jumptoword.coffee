@@ -17,12 +17,13 @@ module.exports =
             text:  'jump to word at cursor'
             combo: 'alt+enter'
     
-    jumpToWord: (p=@cursorPos()) ->
+    jumpToFileAtPos: (p=@cursorPos()) ->
         
         text = @line p[1]
-        
         rgx = /([\~\/\w\.]+\/[\w\.]+\w[:\d]*)/ # look for files in line
+            
         if rgx.test text
+            
             ranges = matchr.ranges rgx, text
             diss   = matchr.dissect ranges, join:false
             for d in diss
@@ -30,12 +31,18 @@ module.exports =
                     [file, line, col] = splitFileLine d.match
                     if fileExists file
                         post.emit 'jumpTo', file:file, line:line, col:col
-                        return
-                        
-        word = @wordAtPos p
+                        return true
+        false
+            
+    jumpToWord: (p=@cursorPos()) ->
+        
+        return if @jumpToFileAtPos p
+        
+        text  = @line p[1]
+        word  = @wordAtPos p
         range = @rangeForWordAtPos p
-        opt = {}
-        line = @line range[0] 
+        opt   = {}
+        line  = @line range[0] 
 
         if range[1][0] > 0 
             if line[range[1][0]-1] == '.'
@@ -46,7 +53,7 @@ module.exports =
             index = rest.search /\S/ 
             if index >= 0
                 nextChar = rest[index]
-                # log "next: #{nextChar}"
+
                 type = switch nextChar 
                     when '.'      then 'class' 
                     when '('      then 'func'

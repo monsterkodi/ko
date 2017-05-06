@@ -186,6 +186,7 @@ class FileEditor extends TextEditor
     #  0000000    0000000   000   000  000      
 
     jumpToFile: (opt) =>
+        
         window.navigate.addFilePos
             file: @currentFile
             pos:  @cursorPos()
@@ -347,12 +348,28 @@ class FileEditor extends TextEditor
         else
             @updateLayers()
 
+    #  0000000  000      000   0000000  000   000  
+    # 000       000      000  000       000  000   
+    # 000       000      000  000       0000000    
+    # 000       000      000  000       000  000   
+    #  0000000  0000000  000   0000000  000   000  
+    
+    clickAtPos: (p, event) ->
+        
+        if event.metaKey
+            if pos(event).x <= @size.numbersWidth
+                @singleCursorAtPos p
+                @toggleBreakpoint()
+                return
+                
+        super p, event
+            
     # 0000000    00000000   00000000   0000000   000   000  00000000    0000000   000  000   000  000000000  
     # 000   000  000   000  000       000   000  000  000   000   000  000   000  000  0000  000     000     
     # 0000000    0000000    0000000   000000000  0000000    00000000   000   000  000  000 0 000     000     
     # 000   000  000   000  000       000   000  000  000   000        000   000  000  000  0000     000     
     # 0000000    000   000  00000000  000   000  000   000  000         0000000   000  000   000     000     
-    
+            
     toggleBreakpoint: ->
         
         return if path.extname(@currentFile) not in ['.js', '.coffee']

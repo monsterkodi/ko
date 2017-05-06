@@ -40,5 +40,17 @@ class LogView extends TextEditor
         if tail
             @singleCursorAtPos [0, @numLines()-1] 
             @scrollTo @scroll.fullHeight
+
+    #  0000000  000      000   0000000  000   000  
+    # 000       000      000  000       000  000   
+    # 000       000      000  000       0000000    
+    # 000       000      000  000       000  000   
+    #  0000000  0000000  000   0000000  000   000  
+    
+    clickAtPos: (p, event) ->
+        
+        return if @jumpToFileAtPos p
+        
+        super p, event
             
 module.exports = LogView

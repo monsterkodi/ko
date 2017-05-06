@@ -23,12 +23,12 @@ class Split extends event
         @commandlineHeight = 30
         @handleHeight      = 6
         
-        @elem        =$ 'split'      
-        @terminal    =$ 'terminal'   
-        @area        =$ 'area'       
+        @elem        =$ 'split'
+        @terminal    =$ 'terminal'
+        @area        =$ 'area'
         @commandline =$ 'commandline'
-        @editor      =$ 'editor'     
-        @logview     =$ 'logview'    
+        @editor      =$ 'editor'
+        @logview     =$ 'logview'
 
         post.on 'focus',   @focus
         post.on 'stash',   @stash
@@ -192,7 +192,9 @@ class Split extends event
     hideLog:   -> @setLogVisible false
     toggleLog: -> @setLogVisible not @isLogVisible()
     isLogVisible: -> not @flex.isCollapsed 'logview'
+    
     setLogVisible: (v) ->
+        
         if @isLogVisible() != v
             if not v
                 @flex.collapse 'logview'
@@ -200,7 +202,9 @@ class Split extends event
                 @flex.expand 'logview'
             
     clearLog: -> window.logview.setText ""
+    
     showOrClearLog: -> 
+        
         if @isLogVisible()
             @clearLog()
         else
@@ -213,12 +217,14 @@ class Split extends event
     # 000        0000000    0000000   0000000   0000000 
     
     focus: (n) ->
+        
         n = 'commandline-editor' if n == 'commandline'
         if n == '.' or not $(n)?
             return log "[WARNING] Split.focus -- can't find element '#{n}'"
         $(n)?.focus?()
             
     focusAnything: ->
+        
         return @focus 'editor'   if @editorVisible()
         return @focus 'terminal' if @terminalVisible()
         @focus 'commandline-editor'
@@ -230,6 +236,7 @@ class Split extends event
     # 000   000  00000000  0000000   000  0000000  00000000  0000000  
     
     resized: =>
+        
         main =$ 'main'
         @elem.style.width  = "#{main.clientWidth}px"
         @elem.style.height = "#{main.clientHeight}px"

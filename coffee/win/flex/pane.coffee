@@ -38,13 +38,15 @@ class Pane
     expand:    -> delete @collapsed; @setSize @fixed ? 0
     isVisible: -> not @collapsed
     
-    actualPos: -> 
+    actualPos: ->
+        
         @div.style.display = @display
         r = @div.getBoundingClientRect()[@flex.position]
         @div.style.display = @isVisible() and @display or 'none'
         parseInt r - @flex.pos()
 
     actualSize: ->
+        
         if @collapsed then return -1
         parseInt @div.getBoundingClientRect()[@flex.dimension]
         

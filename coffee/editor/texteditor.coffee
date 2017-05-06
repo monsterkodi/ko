@@ -30,7 +30,7 @@ class TextEditor extends Editor
         layer = []
         layer.push 'selections'
         layer.push 'highlights'
-        layer.push 'meta'    if 'Meta'    in @config.features
+        layer.push 'meta'    if 'Meta' in @config.features
         layer.push 'lines' 
         layer.push 'cursors'
         layer.push 'numbers' if 'Numbers' in @config.features
@@ -99,16 +99,19 @@ class TextEditor extends Editor
     # 0000000  000   000     000     00000000  000   000  0000000 
     
     initLayers: (layerClasses) ->
+        
         @layerDict = {}
         for cls in layerClasses
             @layerDict[cls] = @addLayer cls
         
     addLayer: (cls) ->
+        
         div = elem class: cls
         @layers.appendChild div
         div
         
     updateLayers: () ->
+        
         @renderHighlights()
         @renderSelection()
         @renderCursors()
@@ -618,16 +621,7 @@ class TextEditor extends Editor
                 @startClickTimer()
                 
                 p = @posForEvent event
-                if event.altKey
-                    @jumpToWord p                                    
-                else if event.metaKey
-                    if pos(event).x <= @size.numbersWidth and @toggleBreakpoint?
-                        @singleCursorAtPos p
-                        @toggleBreakpoint()
-                    else
-                        @toggleCursorAtPos p
-                else
-                    @singleCursorAtPos p, extend:event.shiftKey
+                @clickAtPos p, event
             
             onMove: (drag, event) => 
                 p = @posForEvent event
@@ -637,6 +631,7 @@ class TextEditor extends Editor
                     @singleCursorAtPos p, extend:true
                 
     startClickTimer: =>
+        
         clearTimeout @clickTimer
         @clickTimer = setTimeout @onClickTimeout, @stickySelection and 300 or 1000
     
@@ -655,7 +650,22 @@ class TextEditor extends Editor
             if func.start <= li <= func.end
                 return func.class + '.' + func.name + ' '
         ''
+
+    #  0000000  000      000   0000000  000   000  
+    # 000       000      000  000       000  000   
+    # 000       000      000  000       0000000    
+    # 000       000      000  000       000  000   
+    #  0000000  0000000  000   0000000  000   000  
+    
+    clickAtPos: (p, event) ->
         
+        if event.altKey
+            @jumpToWord p
+        else if event.metaKey
+            @toggleCursorAtPos p
+        else
+            @singleCursorAtPos p, extend:event.shiftKey
+
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
     # 0000000    0000000     00000  
