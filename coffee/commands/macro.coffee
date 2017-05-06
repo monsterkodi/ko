@@ -259,7 +259,6 @@ class Macro extends Command
                     line = editor.line li
                     cleaned = line.trimRight()
                     if line != cleaned
-                        log "clean line #{li}", line, cleaned
                         editor.do.change li, cleaned
                 editor.do.end()
 
