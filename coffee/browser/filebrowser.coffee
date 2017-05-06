@@ -161,9 +161,8 @@ class FileBrowser extends Browser
     
     onFileIndexed: (file) =>
         
-        return if file != @activeColumn()?.activeRow()?.item.file
-        log 'onFileIndexed', file, @activeColumn()?.activeRow()?.item.file
-        
+        if file == @activeColumn()?.activeRow()?.item.file
+            @loadContent @activeColumn().activeRow(), column: @activeColumn().index+1
                 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       
