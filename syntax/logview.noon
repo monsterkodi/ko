@@ -7,11 +7,10 @@
 
 \S+                         text
 
-(● )(.+)                  . class.marker . class
-(◆ )(.+)                  . static.method.marker . static.method
-(▸ )(.+)                  . func.marker . func
+# (● )(.+)                  . class.marker . class
+# (◆ )(.+)                  . static.method.marker . static.method
+# (▸ )(.+)                  . func.marker . func
 (⦿ )([^▸]+)               . static.class.marker . static.class
-(\d+\s+)(▫\s)             . arrayIndex . arrayDot
 
 [~\/\.\-\_\w]+\/            dirname
 
