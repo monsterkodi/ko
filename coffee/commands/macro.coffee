@@ -1,9 +1,9 @@
 
-# 00     00   0000000    0000000  00000000    0000000 
+# 00     00   0000000    0000000  00000000    0000000
 # 000   000  000   000  000       000   000  000   000
 # 000000000  000000000  000       0000000    000   000
 # 000 0 000  000   000  000       000   000  000   000
-# 000   000  000   000   0000000  000   000   0000000 
+# 000   000  000   000   0000000  000   000   0000000
 
 { packagePath, fileExists, fileName, fileList, relative, splitExt,
   post, noon, path, error, log, _
@@ -20,18 +20,18 @@ Report  = require '../test/report'
 class Macro extends Command
 
     constructor: (@commandline) ->
-        
+
         @shortcuts = ['command+m']
         @macros    = ['dbg', 'class', 'inv', 'req', 'color']
         @names     = ['macro']
         super @commandline
 
     #  0000000  000000000   0000000   00000000   000000000
-    # 000          000     000   000  000   000     000   
-    # 0000000      000     000000000  0000000       000   
-    #      000     000     000   000  000   000     000   
-    # 0000000      000     000   000  000   000     000   
-        
+    # 000          000     000   000  000   000     000
+    # 0000000      000     000000000  0000000       000
+    #      000     000     000   000  000   000     000
+    # 0000000      000     000   000  000   000     000
+
     start: (@combo) ->
         super @combo
         text = @last()
@@ -40,28 +40,28 @@ class Macro extends Command
         select: true
 
     # 000      000   0000000  000000000
-    # 000      000  000          000   
-    # 000      000  0000000      000   
-    # 000      000       000     000   
-    # 0000000  000  0000000      000   
-    
+    # 000      000  000          000
+    # 000      000  0000000      000
+    # 000      000       000     000
+    # 0000000  000  0000000      000
+
     listItems: () -> @macros.concat super()
-        
+
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
-    # 000        000 000   000       000       000   000     000     000     
-    # 0000000     00000    0000000   000       000   000     000     0000000 
-    # 000        000 000   000       000       000   000     000     000     
+    # 000        000 000   000       000       000   000     000     000
+    # 0000000     00000    0000000   000       000   000     000     0000000
+    # 000        000 000   000       000       000   000     000     000
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
-        
+
     execute: (command) ->
-        
+
         command = super command
-        
+
         editor  = window.editor
         cp      = editor.cursorPos()
         args    = command.split /\s+/
         command = args.shift()
-        
+
         wordsInArgsOrCursorsOrSelection = (args, opt) ->
             if args.length
                 return args
@@ -70,31 +70,31 @@ class Macro extends Command
                 sw = editor.textsInRanges editor.selections()
                 ws = _.uniq cw.concat sw
                 ws.filter (w) -> w.trim().length
-        
+
         switch command
-            
+
             # 000  000   000  000   000
             # 000  0000  000  000   000
-            # 000  000 0 000   000 000 
-            # 000  000  0000     000   
-            # 000  000   000      0  
-            
-            when 'inv' 
+            # 000  000 0 000   000 000
+            # 000  000  0000     000
+            # 000  000   000      0
+
+            when 'inv'
                 editor.showInvisibles = !editor.showInvisibles
                 editor.updateLines()
 
-            when 'color' 
+            when 'color'
                 editor.pigments()
-                
-            when 'fps' 
+
+            when 'fps'
                 window.fps?.toggle()
-                
-            # 000000000  00000000   0000000  000000000  
-            #    000     000       000          000     
-            #    000     0000000   0000000      000     
-            #    000     000            000     000     
-            #    000     00000000  0000000      000     
-            
+
+            # 000000000  00000000   0000000  000000000
+            #    000     000       000          000
+            #    000     0000000   0000000      000
+            #    000     000            000     000
+            #    000     00000000  0000000      000
+
             when 'test'
                 mocha = new Mocha reporter: Report.forRunner, timeout: 4000
                 if _.isEmpty args
@@ -106,13 +106,13 @@ class Macro extends Command
                     mocha.addFile file
                 mocha.run()
                 window.split.do 'show terminal'
-                
-            # 000   000  00000000  000      00000000   
-            # 000   000  000       000      000   000  
-            # 000000000  0000000   000      00000000   
-            # 000   000  000       000      000        
-            # 000   000  00000000  0000000  000        
-            
+
+            # 000   000  00000000  000      00000000
+            # 000   000  000       000      000   000
+            # 000000000  0000000   000      00000000
+            # 000   000  000       000      000
+            # 000   000  00000000  0000000  000
+
             when 'help'
                 terminal = window.terminal
                 terminal.output noon.stringify noon.load("#{__dirname}/../../bin/cheet.noon"),
@@ -131,16 +131,16 @@ class Macro extends Command
                         number:  colors.magenta
                         visited: colors.red
                         dim:     '^>=.:/-'
-                    
+
                 terminal.scrollCursorToTop 1
                 window.split.do 'show terminal'
-            
-            # 00000000   00000000   0000000 
+
+            # 00000000   00000000   0000000
             # 000   000  000       000   000
             # 0000000    0000000   000 00 00
-            # 000   000  000       000 0000 
+            # 000   000  000       000 0000
             # 000   000  00000000   00000 00
-            
+
             when 'req'
                 words = wordsInArgsOrCursorsOrSelection args
                 lastIndex = 0
@@ -151,21 +151,21 @@ class Macro extends Command
                     projectFiles = fileList pkgPath, depth: 4, matchExt: editor.currentFile
                 else
                     projectFiles = []
-                
+
                 if _.isEmpty words then return error 'no words for req?'
                 for word in words
-                    map = 
+                    map =
                         _:      'lodash'
                         childp: 'child_process'
                         pkg:    '../package.json'
                     pth = map[word] ? word.toLowerCase()
-                    
+
                     for f in projectFiles
-                        if pth == fileName f 
+                        if pth == fileName f
                             pth = splitExt relative f, path.dirname editor.currentFile
                             pth = './' + pth if not pth.startsWith '../'
                             break
-                        
+
                     for li in [Math.min(editor.numLines()-1, 100)..0]
                         m = editor.line(li).match indexer.requireRegExp
                         if m?[1]? and m?[2]?
@@ -174,7 +174,7 @@ class Macro extends Command
                                 lastIndex = Math.max lastIndex, li+1
                     if li <= 0
                         texts.push "#{word} = require '#{pth}'"
-                        
+
                 if texts.length
                     editor.do.start()
                     for text in texts.reverse()
@@ -183,14 +183,14 @@ class Macro extends Command
                     editor.do.end()
                     return do: "focus editor"
 
-            # 0000000    0000000     0000000 
-            # 000   000  000   000  000      
+            # 0000000    0000000     0000000
+            # 000   000  000   000  000
             # 000   000  0000000    000  0000
             # 000   000  000   000  000   000
-            # 0000000    0000000     0000000 
-            
+            # 0000000    0000000     0000000
+
             when 'dbg'
-                
+
                 li = cp[1]
                 indent = editor.indentStringForLineAtIndex li
                 li += 1 if not editor.isCursorInIndent() and not editor.isCursorInLastLine()
@@ -213,12 +213,13 @@ class Macro extends Command
                 focus: editor.name
 
             #  0000000  000       0000000    0000000   0000000
-            # 000       000      000   000  000       000     
-            # 000       000      000000000  0000000   0000000 
+            # 000       000      000   000  000       000
+            # 000       000      000000000  0000000   0000000
             # 000       000      000   000       000       000
-            #  0000000  0000000  000   000  0000000   0000000 
-            
+            #  0000000  0000000  000   000  0000000   0000000
+
             when 'class'
+
                 clss = args.length and args[0] or _.last editor.textsInRanges(editor.selections())
                 clss ?= 'Class'
                 dir = editor.currentFile? and path.dirname(editor.currentFile) or process.cwd()
@@ -229,14 +230,14 @@ class Macro extends Command
                 text += ("# "+s for s in salt(clss).split '\n').join '\n'
                 text += '\n'
                 text += """
-                
+
                 class #{clss}
-                    
+
                     constructor: () ->
-                        
-                        
+
+
                 module.exports = #{clss}
-                
+
                 """
                 atomic file, text, encoding: 'utf8', (err) ->
                     if err?
@@ -244,7 +245,24 @@ class Macro extends Command
                         return
                     post.toMain 'newWindowWithFile', file
                 return focus: editor.name
-            
+
+            #  0000000  000      00000000   0000000   000   000
+            # 000       000      000       000   000  0000  000
+            # 000       000      0000000   000000000  000 0 000
+            # 000       000      000       000   000  000  0000
+            #  0000000  0000000  00000000  000   000  000   000
+
+            when 'clean'
+
+                editor.do.start()
+                for li in [0...editor.numLines()]
+                    line = editor.line li
+                    cleaned = line.trimRight()
+                    if line != cleaned
+                        log "clean line #{li}", line, cleaned
+                        editor.do.change li, cleaned
+                editor.do.end()
+
         text: ''
-                    
+
 module.exports = Macro
