@@ -195,7 +195,7 @@ class Titlebar
     globalModKeyComboEvent: (mod, key, combo, event) ->
 
         switch combo
-            when 'command+shift+t'     then return @tabs.closeOthers()
+            # when 'command+shift+t'     then return @tabs.closeOthers()
             when 'command+alt+left', 'command+alt+right' then return @tabs.navigate key
             when 'command+alt+shift+left', 'command+alt+shift+right' then return @tabs.move key
 

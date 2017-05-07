@@ -86,7 +86,12 @@ class TextEditor extends Editor
         @view.innerHTML = ''
     
     onBlur:  => @emit 'blur', @    
-    onFocus: => @emit 'focus', @    
+    
+    onFocus: => 
+        
+        @emit 'focus', @
+        post.emit 'editorFocus', @
+        
     onSchemeChanged: =>
         
         updateMinimap = => @minimap.drawLines()
@@ -672,7 +677,10 @@ class TextEditor extends Editor
     # 000  000   000          000   
     # 000   000  00000000     000   
 
-    handleModKeyComboEvent: (mod, key, combo, event) ->
+    handleModKeyComboCharEvent: (mod, key, combo, char, event) ->
+
+        if @autocomplete?
+            return if 'unhandled' != @autocomplete.handleModKeyComboEvent mod, key, combo, event
         
         switch combo
             when 'esc'
@@ -686,6 +694,28 @@ class TextEditor extends Editor
                     return @endStickySelection()
                 if @numSelections()
                     return @selectNone()
+                            
+        for action in Editor.actions
+            if action.combos?
+                combos = action.combos
+            else combos = [action.combo]
+            for actionCombo in combos
+                if combo == actionCombo
+                    if action.key? and _.isFunction @[action.key]
+                        # log 'execute action', action.key
+                        @[action.key] key, combo: combo, mod: mod, event: event
+                        return
+                        
+        switch combo
+            when 'command+z'       then return @do.undo()
+            when 'command+shift+z' then return @do.redo()
+            when 'command+t'       then return post.emit 'newTabWithFile'
+                
+        # return if mod and not key?.length
+        
+        if char and mod in ["shift", ""]
+            return @insertCharacter char
+                    
         'unhandled'
 
     onKeyDown: (event) =>
@@ -696,31 +726,10 @@ class TextEditor extends Editor
         
         return if not combo
         return if key == 'right click' # weird right command key
-
-        if @autocomplete?
-            return stopEvent(event) if 'unhandled' != @autocomplete.handleModKeyComboEvent mod, key, combo, event
         
-        if @handleModKeyComboEvent?
-            return stopEvent(event) if 'unhandled' != @handleModKeyComboEvent mod, key, combo, event
-        # log combo 
-        for action in Editor.actions
-            if action.combos?
-                combos = action.combos
-            else combos = [action.combo]
-            for actionCombo in combos
-                if combo == actionCombo
-                    if action.key? and _.isFunction @[action.key]
-                        @[action.key] key, combo: combo, mod: mod, event: event
-                        return stopEvent event
-    
-        switch combo
-            when 'command+z'       then return stopEvent event, @do.undo()
-            when 'command+shift+z' then return stopEvent event, @do.redo()
-            when 'command+t'       then return stopEvent event, post.emit 'newTabWithFile'
-                
-        return if mod and not key?.length
+        result = @handleModKeyComboCharEvent mod, key, combo, char, event
         
-        if char and mod in ["shift", ""]
-            return stopEvent event, @insertCharacter char
+        if 'unhandled' != result
+            stopEvent event
 
 module.exports = TextEditor

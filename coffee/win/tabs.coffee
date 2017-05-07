@@ -31,6 +31,7 @@ class Tabs
         
         post.on 'newTabWithFile',   @onNewTabWithFile
         post.on 'closeTabOrWindow', @onCloseTabOrWindow
+        post.on 'closeOtherTabs',   @onCloseOtherTabs
         post.on 'stash',            @stash
         post.on 'restore',          @restore
         post.on 'revertFile',       @revertFile
@@ -154,7 +155,7 @@ class Tabs
         else
             @closeTab()
 
-    closeOthers: -> 
+    onCloseOtherTabs: => 
         
         keep = _.pullAt @tabs, @activeTab().index()
         while @numTabs()

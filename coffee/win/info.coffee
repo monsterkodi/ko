@@ -13,9 +13,7 @@ class Info
     
     constructor: (editor) ->                  
         
-        window.editor.on   'focus', @setEditor
-        window.logview.on  'focus', @setEditor
-        window.terminal.on 'focus', @setEditor
+        post.on 'editorFocus', @setEditor
 
         tooltip = (e,t) -> new Tooltip elem:e, text:t, x:0, y:1, textSize: 11, keep:true
                 

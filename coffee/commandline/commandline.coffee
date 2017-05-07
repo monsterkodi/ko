@@ -292,12 +292,11 @@ class Commandline extends TextEditor
                 
         'unhandled'            
 
-    handleModKeyComboEvent: (mod, key, combo, event) ->
+    handleModKeyComboCharEvent: (mod, key, combo, char, event) ->
         
         if @command?
-            return if @command.handleModKeyComboEvent(mod, key, combo, event) != 'unhandled'
+            return if 'unhandled' != @command.handleModKeyComboEvent mod, key, combo, event 
 
-        return if 'unhandled' != super mod, key, combo, event
         split = window.split
         switch combo
             when 'enter'                then return @execute()
@@ -317,15 +316,15 @@ class Commandline extends TextEditor
             when 'right', 'tab' 
                 if @isCursorAtEndOfLine()
                     if @command?.complete()
-                        return stopEvent event
+                        return
                     if @numSelections()
                         @do.start()
                         @do.select []
                         @do.end()
-                    return stopEvent event
+                    return
                 else if combo == 'tab'
                     return
-        
-        return 'unhandled'
+                    
+        return super mod, key, combo, char, event        
     
 module.exports = Commandline

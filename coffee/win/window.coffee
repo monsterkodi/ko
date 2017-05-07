@@ -31,6 +31,7 @@ Browser     = remote.BrowserWindow
 win         = window.win   = remote.getCurrentWindow()
 winID       = window.winID = win.id
 editor      = null
+focusEditor = null
 logview     = null
 area        = null
 terminal    = null
@@ -102,10 +103,12 @@ post.on 'reloadWin',         -> reloadWin()
 post.on 'saveFileAs',        -> saveFileAs()
 post.on 'saveFile',          -> saveFile()
 post.on 'saveStash',         -> saveStash()
-post.on 'openFile',   (opt)  -> openFile opt
+post.on 'openFile',   (opt)  -> openFile  opt
 post.on 'reloadTab', (file)  -> reloadTab file 
-post.on 'loadFile',  (file)  -> loadFile file
+post.on 'loadFile',  (file)  -> loadFile  file
 post.on 'loadFiles', (files) -> openFiles files
+post.on 'editorFocus', (editor) -> focusEditor = editor
+post.on 'menuCombo', (combo) -> menuCombo combo
 
 # testing related ...
 
@@ -523,13 +526,20 @@ window.onfocus = (event) ->
             split.focus 'editor'
         else
             split.focus 'commandline-editor'
-              
+
+            
+            
 # 000   000  00000000  000   000
 # 000  000   000        000 000 
 # 0000000    0000000     00000  
 # 000  000   000          000   
 # 000   000  00000000     000   
 
+menuCombo = (combo) ->
+    
+    {mod, key, combo, char} = keyinfo.forCombo combo
+    log 'menuCombo', combo, focusEditor.name, mod, key, char
+    focusEditor.handleModKeyComboCharEvent mod, key, combo, char
 
 onKeyDown = (event) ->
     

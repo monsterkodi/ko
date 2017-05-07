@@ -166,12 +166,13 @@ class Open extends Command
     # 0000000  000  0000000      000   
 
     listItems: (opt) ->
+        
         items = []
         
         @lastFileIndex = 0
         @dir = resolve '~' if not @dir?
 
-        if not @navigating and not opt?.currentText and @history.length > 1
+        if @history? not @navigating and not opt?.currentText and @history.length > 1
             f = @history[@history.length-2]
             item = Object.create null
             item.text = relative f, @dir

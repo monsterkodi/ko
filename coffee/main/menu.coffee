@@ -6,9 +6,11 @@
 # 000   000  00000000  000   000   0000000 
 
 { unresolve, prefs, fs, post, path, log
-}     = require 'kxk'
-pkg   = require '../../package.json'
-AppMenu = require('electron').Menu
+}        = require 'kxk'
+pkg      = require '../../package.json'
+electron = require 'electron'
+AppMenu  = electron.Menu
+MenuItem = electron.MenuItem
 
 class Menu
     
@@ -34,7 +36,7 @@ class Menu
                     prefs.set 'recentFiles', []
                     Menu.init main
 
-        AppMenu.setApplicationMenu AppMenu.buildFromTemplate [
+        menu = AppMenu.buildFromTemplate [
             
             # 000   000   0000000 
             # 000  000   000   000
@@ -111,6 +113,12 @@ class Menu
                 accelerator: 'CmdOrCtrl+R'
                 click:       (i,win) -> post.toWin win.id, 'reloadFile'
             ,
+                type: 'separator'
+            ,
+                label:       'Close Other Tabs'
+                accelerator: 'CmdOrCtrl+Shift+T'
+                click:       (i,win) -> post.toWin win.id, 'closeOtherTabs'
+            ,
                 label:       'Close Tab or Window'
                 accelerator: 'Command+W'
                 click:       (i,win) -> post.toWin win.id, 'closeTabOrWindow'
@@ -177,5 +185,31 @@ class Menu
             role: 'help'
             submenu: []            
         ]
-
+    
+        menu.insert 2, new MenuItem label: 'Edit', role: '', submenu: [
+            label: 'Undo', 
+            click: (i,win) -> post.toWin win.id, 'menuCombo', 'command+z'
+            accelerator: 'Cmd+Z'
+        ,
+            label: 'Redo', 
+            click: (i,win) -> post.toWin win.id, 'menuCombo', 'command+shift+z'
+            accelerator: 'Cmd+Shift+Z'
+        ,
+            type: 'separator'
+        ,
+            label: 'Cut', 
+            click: (i,win) -> post.toWin win.id, 'menuCombo', 'command+x'
+            accelerator: 'Cmd+X'
+        ,
+            label: 'Copy', 
+            click: (i,win) -> post.toWin win.id, 'menuCombo', 'command+c'
+            accelerator: 'Cmd+C'
+        ,
+            label: 'Paste', 
+            click: (i,win) -> post.toWin win.id, 'menuCombo', 'command+v'
+            accelerator: 'Cmd+V'
+        ,
+        ]
+        AppMenu.setApplicationMenu menu
+        
 module.exports = Menu

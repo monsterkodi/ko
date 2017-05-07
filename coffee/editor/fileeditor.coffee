@@ -394,9 +394,9 @@ class FileEditor extends TextEditor
     # 000  000   000          000
     # 000   000  00000000     000
 
-    handleModKeyComboEvent: (mod, key, combo, event) ->
+    handleModKeyComboCharEvent: (mod, key, combo, char, event) ->
 
-        return if 'unhandled' != super mod, key, combo, event
+        return if 'unhandled' != super mod, key, combo, char, event
         switch combo
             when 'ctrl+enter'       then return window.commandline.commands.coffee.executeText @text()
             when 'ctrl+shift+enter' then return window.commandline.commands.coffee.executeTextInMain @text()
