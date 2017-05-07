@@ -26,7 +26,7 @@ class Menu
                 recent.unshift
                     label: fileLabel f
                     path: f
-                    click: (i) -> main.createWindow file:i.path
+                    click: (i, win) -> post.toWin win.id, 'newTabWithFile', i.path
         if recent.length
             recent.push
                 type: 'separator'
@@ -124,6 +124,117 @@ class Menu
                 click:       (i,win) -> post.toWin win.id, 'closeTabOrWindow'
             ]
         ,
+            #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    
+            # 000       000   000  000   000  000   000  000   000  0000  000  000   000  
+            # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  
+            # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  
+            #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    
+            
+            label: 'Command'
+            submenu: [
+                label:      'Open'
+                submenu:    [
+                        label:      'In Current Tab'
+                        accelerator: 'command+p'
+                        click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+p'
+                    ,
+                        label:      'In New Tab'
+                        accelerator: 'command+shift+p'
+                        click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+shift+p'
+                    ,
+                        label:      'In New Window'
+                        accelerator: 'command+alt+p'
+                        click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+alt+p'
+                ]
+            ,
+                label:      'Search'
+                submenu:    [
+                        label:      'Case Insensitive'
+                        accelerator: 'command+shift+f'
+                        click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+shift+f'
+                    ,
+                        label:      'Case Sensitive'
+                        accelerator: 'ctrl+shift+f'
+                        click:       (i,win) -> post.toWin win.id, 'menuCombo', 'ctrl+shift+f'
+                    ,
+                        label:      'Regexp Case Insensitive'
+                        accelerator: 'alt+shift+f'
+                        click:       (i,win) -> post.toWin win.id, 'menuCombo', 'alt+shift+f'
+                    ,
+                        label:      'Regexp Case Sensitive'
+                        accelerator: 'alt+shift+f'
+                        click:       (i,win) -> post.toWin win.id, 'menuCombo', 'alt+ctrl+shift+f'
+                ]
+            ,
+                label:      'Find'
+                submenu:    [
+                        label:      'Case Insensitive'
+                        accelerator: 'command+f'
+                        click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+f'
+                    ,
+                        label:      'Case Sensitive'
+                        accelerator: 'ctrl+f'
+                        click:       (i,win) -> post.toWin win.id, 'menuCombo', 'ctrl+f'
+                    ,
+                        label:      'Regexp Case Insensitive'
+                        accelerator: 'alt+f'
+                        click:       (i,win) -> post.toWin win.id, 'menuCombo', 'alt+f'
+                    ,
+                        label:      'Regexp Case Sensitive'
+                        accelerator: 'alt+ctrl+f'
+                        click:       (i,win) -> post.toWin win.id, 'menuCombo', 'alt+ctrl+f'
+                    ,
+                        label:      'Fuzzy'
+                        accelerator: 'command+alt+f'
+                        click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+alt+f'
+                    ,
+                        label:      'Glob'
+                        accelerator: 'command+ctrl+f'
+                        click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+ctrl+f'
+                ]
+            ,
+                label:      'Coffee'
+                submenu:    [
+                        label:      'In Window Process'
+                        accelerator: 'alt+c'
+                        click:       (i,win) -> post.toWin win.id, 'menuCombo', 'alt+c'
+                    ,
+                        label:      'In Main Process'
+                        accelerator: 'alt+shift+c'
+                        click:       (i,win) -> post.toWin win.id, 'menuCombo', 'alt+shift+c'
+                ]
+            ,
+                label:      'Goto'
+                accelerator: 'command+;'
+                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+;'
+            ,
+                label:      'Term'
+                accelerator: 'command+,'
+                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+,'
+            ,
+                label:      'Browse'
+                accelerator: 'command+.'
+                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+.'
+            ,
+                label:      'Debug'
+                accelerator: 'alt+d'
+                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'alt+d'
+            ,
+                label:      'Build'
+                accelerator: 'command+b'
+                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+b'
+            ,
+                label:      'Macro'
+                accelerator: 'command+m'
+                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+m'
+            ]   
+        ,
+            # 000   000  000  00000000  000   000  
+            # 000   000  000  000       000 0 000  
+            #  000 000   000  0000000   000000000  
+            #    000     000  000       000   000  
+            #     0      000  00000000  00     00  
+            
             label: 'View'
             submenu: [
                 label:      'Navigate Backward'
@@ -286,8 +397,6 @@ class Menu
                             if v.separator
                                 submenu[v.menu ? menuName].append new MenuItem type: 'separator'
                             submenu[v.menu ? menuName].append item
-                        else
-                            log k, v
                     submenu[menuName].append new MenuItem type: 'separator'
         
         editMenu = AppMenu.buildFromTemplate [
