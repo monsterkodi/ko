@@ -6,7 +6,7 @@
 # 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 
 { fileName, unresolve, samePath, joinFileLine, splitFilePos, fileExists, swapExt, path, empty, fs,
-  setStyle, keyinfo, clamp, drag, post, error, log, str, _
+  setStyle, keyinfo, clamp, drag, post, pos, error, log, str, _
 }          = require 'kxk'
 srcmap     = require '../tools/srcmap'
 watcher    = require './watcher'
@@ -192,8 +192,8 @@ class FileEditor extends TextEditor
             file: @currentFile
             pos:  @cursorPos()
 
-        [file, pos] = splitFilePos opt.file
-        opt.pos = pos
+        [file, fpos] = splitFilePos opt.file
+        opt.pos = fpos
         opt.pos[0] = opt.col if opt.col
         opt.pos[1] = opt.line-1 if opt.line
 

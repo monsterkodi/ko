@@ -93,6 +93,7 @@ class Search extends Command
                 window.commandline.startCommand split[0], command.shortcuts[0]
                 window.commandline.setText split[1]
                 command.execute split[1]
+        'unhandled'
 
 #  0000000  00000000   0000000   00000000    0000000  000   000  00000000  00000000 
 # 000       000       000   000  000   000  000       000   000  000       000   000

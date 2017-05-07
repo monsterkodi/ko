@@ -144,7 +144,6 @@ class Diffbar
             for c in change.del
                 return false if not empty c.old.trim()
 
-        log 'isBoring', JSON.stringify change
         true
 
     # 00000000  000  000      00000000
@@ -174,7 +173,6 @@ class Diffbar
                     return
                 if changes.file == @editor.currentFile
                     @changes = changes
-                    log 'update changes:', changes
                     @paint()
 
         else
