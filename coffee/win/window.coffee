@@ -46,8 +46,9 @@ window.onerror = (event, source, line, col, err) ->
     else
         s = "▲ [ERROR] #{err} #{unresolve source}:#{line}:#{col}"
     post.emit 'error', s
-    # post.emit 'slog', s 
+    post.emit 'slog', s 
     console.log s
+
     
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000     
@@ -179,6 +180,7 @@ winMain = ->
 # 00000000  0000000    000     000      0000000   000   000
 
 window.editorWithName = (n) ->
+    
     switch n
         when 'editor'   then editor
         when 'command', 'commandline' then commandline
