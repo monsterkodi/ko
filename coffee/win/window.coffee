@@ -539,12 +539,16 @@ menuCombo = (combo) ->
     
     {mod, key, combo, char} = keyinfo.forCombo combo
     log 'menuCombo', combo, focusEditor.name, mod, key, char
-    focusEditor.handleModKeyComboCharEvent mod, key, combo, char
+    return if 'unhandled' != focusEditor.handleModKeyComboCharEvent mod, key, combo, char
+    handleModKeyComboCharEvent mod, key, combo, char
 
 onKeyDown = (event) ->
     
-    {mod, key, combo} = keyinfo.forEvent event
+    {mod, key, combo, char} = keyinfo.forEvent event
+    handleModKeyComboCharEvent mod, key, combo, char, event
 
+handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
+    
     return if not combo
     return stopEvent(event) if 'unhandled' != window.titlebar   .globalModKeyComboEvent mod, key, combo, event
     return stopEvent(event) if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event

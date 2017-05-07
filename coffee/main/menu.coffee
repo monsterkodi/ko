@@ -123,7 +123,65 @@ class Menu
                 accelerator: 'Command+W'
                 click:       (i,win) -> post.toWin win.id, 'closeTabOrWindow'
             ]
-        ,        
+        ,
+            label: 'View'
+            submenu: [
+                label:      'Navigate Backward'
+                accelerator: 'command+ctrl+left'
+                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+ctrl+left'
+            ,
+                label:      'Navigate Forward'
+                accelerator: 'command+ctrl+right'
+                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+ctrl+right'
+            ,
+                type: 'separator'
+            ,
+                label:      'Maximize Editor'
+                accelerator: 'command+shift+y'
+                click:      (i,win) -> post.toWin win.id, 'menuCombo', 'command+shift+y'
+            ,
+                label:      'Toggle Center Text'
+                accelerator: 'command+\\'
+                click:      (i,win) -> post.toWin win.id, 'menuCombo', 'command+\\'
+            ,
+                type: 'separator'
+            ,
+                label:       'Activate Next Tab'
+                accelerator: 'command+alt+right'
+                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+alt+right'
+            , 
+                label:       'Activate Previous Tab'
+                accelerator: 'command+alt+left'
+                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+alt+left'
+            ,
+                type: 'separator'
+            ,
+                label:       'Move Tab Right'
+                accelerator: 'command+alt+shift+right'
+                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+alt+shift+right'
+            , 
+                label:       'Move Tab Left'
+                accelerator: 'command+alt+shift+left'
+                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+alt+shift+left'
+            ,
+                type: 'separator'
+            ,
+                label: 'Font Size'
+                submenu: [
+                    label:       'Increase'
+                    accelerator: 'command+='
+                    click:      (i,win) -> post.toWin win.id, 'menuCombo', 'command+='
+                ,
+                    label:       'Decrease'
+                    accelerator: 'command+-'
+                    click:      (i,win) -> post.toWin win.id, 'menuCombo', 'command+-'
+                ,
+                    label:       'Reset'
+                    accelerator: 'command+0'
+                    click:      (i,win) -> post.toWin win.id, 'menuCombo', 'command+0'
+                ]
+            ]
+        ,
             # 000   000  000  000   000  0000000     0000000   000   000
             # 000 0 000  000  0000  000  000   000  000   000  000 0 000
             # 000000000  000  000 0 000  000   000  000   000  000000000
@@ -132,6 +190,12 @@ class Menu
             
             label: 'Window'
             submenu: [
+                label:       'Toggle Scheme'
+                accelerator: 'alt+i'
+                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'alt+i'
+            ,
+                type: 'separator'
+            ,                            
                 label:       'Minimize'
                 accelerator: 'Alt+Cmd+M'
                 click:       (i,win) -> win?.minimize()
@@ -141,7 +205,7 @@ class Menu
                 click:       (i,win) -> main.toggleMaximize win
             ,
                 type: 'separator'
-            ,                            
+            ,
                 label:       'Close All Windows'
                 accelerator: 'Alt+Cmd+W'
                 click:       main.closeWindows
@@ -159,6 +223,12 @@ class Menu
                 label:       'Arrange'
                 accelerator: 'Alt+Cmd+A'
                 click:       main.arrangeWindows
+            ,                            
+                type: 'separator'
+            ,
+                label:       'Open Window List'
+                accelerator: 'alt+`'
+                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'alt+`'
             ,
                 label:       'Cycle Through Windows'
                 accelerator: 'CmdOrCtrl+`'

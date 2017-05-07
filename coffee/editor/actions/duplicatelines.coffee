@@ -8,9 +8,19 @@
 module.exports = 
     
     actions:
+        menu: 'Line'
+        
         duplicateLines:
             name: 'duplicate lines'
             combos: ['alt+shift+up', 'alt+shift+down']
+            
+        duplicateLinesUp:
+            name: 'Duplicate Lines Up'
+            combo: 'alt+shift+up'
+            
+        duplicateLinesDown:
+            name: 'Duplicate Lines Down'
+            combo: 'alt+shift+down'
 
     duplicateLines: (key, info) ->
         dir = key

@@ -106,8 +106,6 @@ class Titlebar
         document.activeElement.blur()
         @selected = -1
         @list = elem class: 'winlist'
-        # @list.style.top = 0
-        # window.split.elem.appendChild @list
         @elem.parentNode.insertBefore @list, @elem.nextSibling
         @listWinInfos winInfos
         stopEvent event
@@ -129,7 +127,6 @@ class Titlebar
     listWinInfos: (winInfos) ->
         
         @list.innerHTML = ""        
-        # @list.style.display = 'unset'
         
         for info in winInfos
             
@@ -160,17 +157,13 @@ class Titlebar
                 $('.wintabs', div)?.innerHTML = tabs
                 width = div.getBoundingClientRect().width
                 break
-        # if width?
-            # w = Math.max width+10, @list.getBoundingClientRect().width
-            # @list.style.width = "#{w}px"
-        log 'onWinTabs', winID, @list.getBoundingClientRect().width
 
     loadWindowWithID: (id) ->
         
         @closeList()
         post.toMain 'activateWindow', id
         
-    loadSelected: -> 
+    loadSelected: ->
         
         return @closeList() if @selected < 0
         @loadWindowWithID @list.children[@selected].winID
@@ -195,7 +188,6 @@ class Titlebar
     globalModKeyComboEvent: (mod, key, combo, event) ->
 
         switch combo
-            # when 'command+shift+t'     then return @tabs.closeOthers()
             when 'command+alt+left', 'command+alt+right' then return @tabs.navigate key
             when 'command+alt+shift+left', 'command+alt+shift+right' then return @tabs.move key
 
@@ -204,7 +196,6 @@ class Titlebar
                 when 'esc', 'alt+`'    then return @closeList()
                 when 'up', 'down'      then return @navigate key
                 when 'enter'
-                    stopEvent event
                     return @loadSelected()
         'unhandled'
         

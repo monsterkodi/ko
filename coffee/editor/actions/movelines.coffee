@@ -10,9 +10,19 @@ _ = require 'lodash'
 module.exports =
     
     actions:
+        menu: 'Line'
+        
         moveLines:
             name: 'move lines'
             combos: ['alt+up', 'alt+down']
+            
+        moveLinesUp:
+            name: 'Move Lines Up'
+            combo: 'alt+up'
+            
+        moveLinesDown:
+            name: 'Move Lines Down'
+            combo: 'alt+down'
     
     moveLines: (key, info) ->
         dir = key
