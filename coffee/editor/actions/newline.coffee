@@ -11,12 +11,14 @@
 module.exports = 
     
     actions:
+        menu: 'Insert'
+        
         newline:
-            name: 'insert newline'
+            name: 'Insert Newline'
             combo: 'enter'
             
         newlineAtEnd:
-            name:  'insert newline at line end'
+            name:  'Insert Newline at End'
             combo: 'command+enter'
 
     newlineAtEnd: () ->

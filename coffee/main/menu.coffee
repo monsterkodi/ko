@@ -5,7 +5,7 @@
 # 000 0 000  000       000  0000  000   000
 # 000   000  00000000  000   000   0000000 
 
-{ unresolve, prefs, fs, post, path, log
+{ fileList, unresolve, prefs, fs, post, path, log
 }        = require 'kxk'
 pkg      = require '../../package.json'
 electron = require 'electron'
@@ -185,8 +185,42 @@ class Menu
             role: 'help'
             submenu: []            
         ]
-    
-        menu.insert 2, new MenuItem label: 'Edit', role: '', submenu: [
+
+        # 00000000  0000000    000  000000000  
+        # 000       000   000  000     000     
+        # 0000000   000   000  000     000     
+        # 000       000   000  000     000     
+        # 00000000  0000000    000     000     
+        
+        submenu = 
+            Misc: new AppMenu
+            
+        for actionFile in fileList path.join __dirname, '../editor/actions'
+            continue if path.extname(actionFile) not in ['.js', '.coffee']
+            actions = require actionFile
+            for key,value of actions
+                menuName = 'Misc'
+                if key == 'actions'
+                    if value['menu']? 
+                        menuName = value['menu']
+                        submenu[menuName] ?= new AppMenu
+                    for k,v of value
+                        if v.name and v.combo
+                            menuCombo = (c) -> (i,win) -> post.toWin win.id, 'menuCombo', c
+                            item = new MenuItem 
+                                label:       v.name
+                                accelerator: v.combo
+                                click: menuCombo v.combo
+                            if v.menu?
+                                submenu[v.menu] ?= new AppMenu
+                            if v.separator
+                                submenu[v.menu ? menuName].append new MenuItem type: 'separator'
+                            submenu[v.menu ? menuName].append item
+                        else
+                            log k, v
+                    submenu[menuName].append new MenuItem type: 'separator'
+        
+        editMenu = AppMenu.buildFromTemplate [
             label: 'Undo', 
             click: (i,win) -> post.toWin win.id, 'menuCombo', 'command+z'
             accelerator: 'Cmd+Z'
@@ -209,7 +243,14 @@ class Menu
             click: (i,win) -> post.toWin win.id, 'menuCombo', 'command+v'
             accelerator: 'Cmd+V'
         ,
+            type: 'separator'
         ]
+        
+        for k,v of submenu
+            editMenu.append new MenuItem label: k, submenu: v
+        
+        menu.insert 2, new MenuItem label: 'Edit', submenu: editMenu
+                
         AppMenu.setApplicationMenu menu
         
 module.exports = Menu

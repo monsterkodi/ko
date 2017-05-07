@@ -13,13 +13,13 @@ module.exports =
 
     actions:
         cut:
-            name: 'cut'
+            # name: 'cut'
             combo: 'command+x'
         copy:
-            name: 'copy'
+            # name: 'copy'
             combo: 'command+c'
         paste:
-            name: 'paste'
+            # name: 'paste'
             combo: 'command+v'
     
     cut: ->

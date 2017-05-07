@@ -12,8 +12,9 @@ matchr = require '../../tools/matchr'
 module.exports = 
     
     actions:
+        
         jumpToWord:
-            name:  'jump to word'
+            name:  'Jump to Word'
             text:  'jump to word at cursor'
             combo: 'alt+enter'
     
@@ -33,8 +34,12 @@ module.exports =
                         post.emit 'jumpTo', file:file, line:line, col:col
                         return true
         false
-            
-    jumpToWord: (p=@cursorPos()) ->
+    
+    jumpToWord: -> @jumpToWordAtPos() 
+        
+    jumpToWordAtPos: (p=@cursorPos()) ->
+        
+        log 'jumpToWordAtPos', p
         
         return if @jumpToFileAtPos p
         

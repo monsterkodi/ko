@@ -11,11 +11,40 @@
 module.exports = 
 
     actions:
+        menu: 'Cursors'
+        
         setOrMoveCursorsAtBoundary:
             name:   'set cursors at selections or move to line boundaries'
             text:   """sets cursors at selection boundaries, if multiple selections exist but only one cursor.
                 otherwise moves cursors to line boundaries."""
             combos: ['command+left', 'command+right']
+
+        moveCursorsAtBoundaryLeft: 
+            name: 'Move Cursors to Indent or Start of Line'
+            combo: 'command+left'
+
+        moveCursorsAtBoundaryRight: 
+            name: 'Move Cursors to End of Line'
+            combo: 'command+right'
+                
+        moveCursorsToWordBoundary:
+            name:   'move cursors to word boundaries'
+            text:   'moves cursors to word boundaries. extends selections, if shift is pressed.'            
+            combos: ['alt+left', 'alt+right', 'alt+shift+left', 'alt+shift+right']
+        
+        moveCursorsToWordBoundaryLeft:
+            separator: true
+            name:   'Move Cursors to Start of Word'
+            combo:  'alt+left'
+
+        moveCursorsToWordBoundaryRight:
+            name:   'Move Cursors to End of Word'
+            combo:  'alt+right'
+            
+        moveCursorsToLineBoundary:
+            name:   'move cursors to line boundaries'
+            text:   'moves cursors to line boundaries. extends selections, if shift is pressed.'
+            combos: ['command+shift+left', 'command+shift+right', 'ctrl+e', 'ctrl+shift+e', 'ctrl+a', 'ctrl+shift+a']
 
         moveMainCursor:
             name:   'move main cursor'
@@ -24,17 +53,7 @@ module.exports =
                 sets new cursors otherwise."""
             combos: ['ctrl+up', 'ctrl+down', 'ctrl+left', 'ctrl+right', 
                 'ctrl+shift+up', 'ctrl+shift+down', 'ctrl+shift+left', 'ctrl+shift+right']
-    
-        moveCursorsToWordBoundary:
-            name:   'move cursors to word boundaries'
-            text:   'moves cursors to word boundaries. extends selections, if shift is pressed.'            
-            combos: ['alt+left', 'alt+right', 'alt+shift+left', 'alt+shift+right']
-
-        moveCursorsToLineBoundary:
-            name:   'move cursors to line boundaries'
-            text:   'moves cursors to line boundaries. extends selections, if shift is pressed.'
-            combos: ['command+shift+left', 'command+shift+right', 'ctrl+e', 'ctrl+shift+e', 'ctrl+a', 'ctrl+shift+a']
-        
+            
         moveCursors:
             name:  'move cursors'
             combos: ['left', 'right', 'up', 'down', 'shift+down', 'shift+right', 'shift+up', 'shift+left']

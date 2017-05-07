@@ -11,19 +11,21 @@
 module.exports = 
     
     actions:
+        menu: 'Delete'
         
         deleteForward:
-            name:   'delte forward'
+            name:   'Delete Forward'
             combos: ['delete', 'ctrl+backspace']
+            combo:  'delete'
             text:   'delete character to the right'
 
         deleteToEndOfLine:
-            name:   'delte to end of line'
+            name:   'Delete to End of Line'
             combo:  'ctrl+shift+k'
             text:   'delete characters to the end of line'
             
         deleteToEndOfLineOrWholeLine:
-            name:   'delte to end of line or delete whole line'
+            name:   'Delete to End of Line or Delete Whole Line'
             combo:  'ctrl+k'
             text:   """delete characters to the end of line, if cursor is not at end of line.
                 delete whole line otherwise.

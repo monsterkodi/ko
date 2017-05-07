@@ -8,11 +8,14 @@
 module.exports =
       
     actions: 
+        menu: 'Line'
+        
         indent:
-            name:  'indent'
+            name:  'Indent'
             combo: 'command+]'
+            
         deIndent:
-            name:  'de-indent'
+            name:  'Outdent'
             combo: 'command+['
             
     indent: ->

@@ -11,14 +11,15 @@
 module.exports =
 
     actions:
+        menu: 'Select'
         
         selectMoreLines:
-            name:  'select more lines'
+            name:  'Select More Lines'
             combo: 'command+l'
             text:  'selects line at cursor or next line if cursor line is selected already'
             
         selectLessLines:
-            name: 'select less lines'
+            name: 'Select Less Lines'
             combo: 'command+shift+l'
             text:  'removes a line from each block of selected lines'
 

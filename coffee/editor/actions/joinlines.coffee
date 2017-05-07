@@ -11,8 +11,10 @@
 module.exports = 
     
     actions:
+        menu: 'Line'
+        
         joinLines:
-            name: 'join lines'
+            name: 'Join Lines'
             combo: 'command+j'
 
     insertThen: (before, after) ->

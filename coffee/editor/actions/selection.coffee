@@ -11,45 +11,48 @@
 module.exports =
     
     actions:
-        
-        startStickySelection:
-            name:  'sticky selection mode'
-            text:  'current selection is not removed when adding new selections'
-            combo: 'command+esc'
-            
+        menu: 'Select'
+                    
         selectAll:
-            name:  'select all lines'
+            name:  'Select All'
             combo: 'command+a'
             
         selectNone:
-            name:  'deselect'
+            name:  'Deselect'
             combo: 'command+shift+a'
             
         selectInverted:
-            name:  'invert selection'
+            name:  'Invert Selection'
             text:  'selects all lines that have no cursors and no selections'
             combo: 'command+i'
             
         selectNextHighlight:
-            name:  'select next highlight'
+            separator: true
+            name:  'Select Next Highlight'
             combo: 'command+g'
             
         selectPrevHighlight:
-            name:  'select previous highlight'
+            name:  'Select Previous Highlight'
             combo: 'command+shift+g'
             
         selectAllHighlights:
-            name:  'select all highlights'
+            name:  'Select All Highlights'
             combo: 'command+alt+d'
             
         selectTextBetweenCursorsOrSurround:
-            name: 'select between cursors|brackets|quotes'
+            name: 'Select Between Cursors, Brackets or Quotes'
             text: """
                 select text between even cursors, if at least two cursors exist. 
                 select text between highlighted brackets or quotes otherwise.
                 """
             combo: 'command+alt+ctrl+b'
 
+        startStickySelection:
+            separator: true
+            name:  'Toggle Sticky Selection'
+            text:  'current selection is not removed when adding new selections'
+            combo: 'command+esc'
+            
     selectSingleRange: (r, opt = extend:false) ->
         
         if not r?

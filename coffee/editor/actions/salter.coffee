@@ -12,8 +12,9 @@ salt  = require '../../tools/salt'
 module.exports =
     
     actions:
+        
         startSalter:
-            name: 'ascii-header mode'
+            name: 'ASCII Header Mode'
             text: """if cursor is not in ascii-header: 
                 insert ascii-header of text in selection or word at cursor.
                 switch to ascii-header mode in any case.
@@ -21,6 +22,7 @@ module.exports =
             combo: 'command+3'
 
     startSalter: (opt) ->
+        
         cp = @cursorPos()
         if not opt?.word and rgs = @salterRangesAtPos cp # edit existing header
             cols = @columnsInSalt (@textInRange r for r in rgs)

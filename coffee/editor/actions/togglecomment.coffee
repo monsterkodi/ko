@@ -8,8 +8,10 @@
 module.exports =
     
     actions:
+        menu: 'Line'
+        
         toggleComment:
-            name: 'toggle comment'
+            name: 'Toggle Comment'
             combo: 'command+/'
 
     toggleComment: ->

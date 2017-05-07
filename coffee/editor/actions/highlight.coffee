@@ -10,19 +10,24 @@ _ = require 'lodash'
 module.exports = 
 
     actions:
+        menu: 'Select'
+        
         highlightWordAndAddToSelection:
-            name: 'highlight and select word'
+            name: 'Highlight and Select Word'
             text: 'highlights all occurrences of text in selection or word at cursor and selects the first|next highlight.'
             combo: 'command+d'
+            
         selectAllWords:
-            name:  'select all words'
+            name:  'Select All Words'
             combo: 'command+alt+d'
+            
         removeSelectedHighlight:
-            name: 'remove highlighted word from the selection'
+            name: 'Remove Highlighted Word from Selection'
             text: "does the inverse of 'highlight and select' word"
             combo: 'command+shift+d'
+            
         highlightTextOfSelectionOrWordAtCursor:
-            name: 'highlight and select word'
+            name: 'Highlight and Select Word'
             text: 'highlights all occurrences of text in selection or word at cursor and selects it. expands to the left if already selected.'
             combo: 'command+e'
 

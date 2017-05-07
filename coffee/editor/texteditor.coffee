@@ -665,7 +665,7 @@ class TextEditor extends Editor
     clickAtPos: (p, event) ->
         
         if event.altKey
-            @jumpToWord p
+            @jumpToWordAtPos p
         else if event.metaKey
             @toggleCursorAtPos p
         else

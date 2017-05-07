@@ -12,8 +12,9 @@ matchr = require '../../tools/matchr'
 module.exports =
     
     actions:
+        
         pigmentsToggle:
-            name:  'pigments'
+            name:  'Toggle Pigments'
             text:  'toggle pigments for current file'
             combo: 'command+alt+ctrl+p'
 

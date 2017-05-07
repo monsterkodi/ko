@@ -11,11 +11,15 @@
 module.exports = 
     
     actions:
+        
         insertTab:
-            name:  'insert tab'
+            menu:  'Insert'
+            name:  'Insert Tab'
             combo: 'tab'
+            
         deleteTab:
-            name:  'delete tab'
+            menu:  'Delete'
+            name:  'Delete Tab'
             combo: 'shift+tab'
 
     insertTab: (key, info) ->

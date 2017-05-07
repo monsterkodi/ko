@@ -11,31 +11,73 @@
 module.exports =
 
     actions:
-        alignCursors:
-            name: 'align cursors'
+        menu: 'Cursors'
+        
+        cursorInAllLines:
+            name:  'Cursor in All Lines'
+            combo: 'alt+a'
+        
+        alignCursors:            
+            name: 'Align Cursors'
             text: 'align cursors vertically with (top|bottom|left|right)-most cursor'
             combos: ['alt+ctrl+up', 'alt+ctrl+down', 'alt+ctrl+left', 'alt+ctrl+right']
+        
+        alignCursorsTop:
+            separator: true
+            name: 'Align Cursors with Top-most Cursor'
+            combo: 'alt+ctrl+up'
+            
+        alignCursorsBottom:
+            name: 'Align Cursors with Bottom-most Cursor'
+            combo: 'alt+ctrl+down'
+
+        alignCursorsLeft:
+            name: 'Align Cursors with Left-most Cursor'
+            combo: 'alt+ctrl+left'
+
+        alignCursorsRight:
+            name: 'Align Cursors with Right-most Cursor'
+            combo: 'alt+ctrl+right'
             
         alignCursorsAndText:
-            name: 'align cursors and text'
+            name: 'Align Cursors and Text'
             text: 'align text to the right of cursors by inserting spaces'
             combo: 'alt+ctrl+shift+right'
 
         setCursorsAtSelectionBoundariesOrSelectSurround:
-            name: 'set cursors at selection boundaries or select brackets|quotes'
+            separator: true
+            name: 'Cursors at Selection Boundaries or Select Brackets/Quotes'
             text: """
                 set cursors at selection boundaries, if a selection exists.
                 select brackets or quotes otherwise.
                 """
             combo: 'command+alt+b'
             
-        addCursors: 
-            name: 'add cursors up|down'
+        addCursors:
+            name: 'Add Cursors up|down'
             combos: ['command+up', 'command+down']
-        
+            
+        addCursorsUp:
+            separator: true
+            name: 'Add Cursors Up'
+            combo: 'command+up'
+
+        addCursorsDown:
+            name: 'Add Cursors Down'
+            combo: 'command+down'
+            
         delCursors:
-            name: 'remove cursors up|down'
+            name: 'Remove Cursors up|down'
             combos: ['command+shift+up', 'command+shift+down']
+
+        delCursorsUp:
+            separator: true
+            name: 'Remove Cursors Up'
+            combo: 'command+shift+up'
+
+        delCursorsDown:
+            name: 'Remove Cursors Down'
+            combo: 'command+shift+down'
             
         cursorHome:
             combo: 'home'
@@ -48,10 +90,6 @@ module.exports =
 
         cursorPageDown:
             combo: 'page down'
-
-        cursorInAllLines:
-            name:  'cursor in all lines'
-            combo: 'alt+a'
             
     #  0000000  00000000  000000000  
     # 000       000          000     
