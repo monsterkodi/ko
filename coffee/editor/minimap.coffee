@@ -119,15 +119,19 @@ class Minimap
         @cursors.width = @width
         return if @scroll.exposeBot < 0
         ctx = @cursors.getContext '2d'
-        for r in rangesFromTopToBotInRanges @scroll.exposeTop, @scroll.exposeBot, rangesFromPositions @editor.state.cursors()
+        for r in rangesFromTopToBotInRanges @scroll.exposeTop, @scroll.exposeBot, rangesFromPositions @editor.cursors()
             y = (r[0]-@scroll.exposeTop)*@scroll.lineHeight
             if 2*r[1][0] < @width
                 ctx.fillStyle = '#f80'
                 ctx.fillRect @offsetLeft+2*r[1][0], y, 2, @scroll.lineHeight
             ctx.fillStyle = 'rgba(255,128,0,0.5)'
             ctx.fillRect @offsetLeft-4, y, @offsetLeft-2, @scroll.lineHeight
-                
-        ctx.fillStyle = '#ff0'
+        @drawMainCursor()
+            
+    drawMainCursor: (blink) =>
+        
+        ctx = @cursors.getContext '2d'
+        ctx.fillStyle = blink and '#000' or '#ff0'
         mc = @editor.mainCursor()
         y = (mc[1]-@scroll.exposeTop)*@scroll.lineHeight
         if 2*mc[0] < @width

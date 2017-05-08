@@ -451,17 +451,23 @@ class TextEditor extends Editor
     # 0000000    0000000  000  000   000  000   000   
     
     suspendBlink: ->
+        
         $('.cursor.main').classList.toggle 'blink', false
         clearTimeout @suspendTimer
-        @suspendTimer = setTimeout @releaseBlink, 1600
+        @suspendTimer = setTimeout @releaseBlink, 600
         
     releaseBlink: =>
+        
         clearTimeout @suspendTimer
         delete @suspendTimer
     
-    toggleBlink: =>
+    toggleBlink: =>        
+        
         return if @suspendTimer?
-        $('.cursor.main', @layerDict['cursors']).classList.toggle 'blink'
+        @blink = not @blink
+        cursor = $('.cursor.main', @layerDict['cursors'])
+        cursor?.classList.toggle 'blink', @blink
+        @minimap?.drawMainCursor @blink
     
     startBlink: ->
         
