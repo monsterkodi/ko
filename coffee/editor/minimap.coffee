@@ -205,8 +205,10 @@ class Minimap
     jumpToLine: (li, event) ->
         
         @editor.scrollTo (li-5) * @editor.scroll.lineHeight
+        
         if not event.metaKey
             @editor.singleCursorAtPos [0, li+5], extend:event.shiftKey
+            
         @editor.focus()
         @onEditorScroll()
 
@@ -248,7 +250,6 @@ class Minimap
             pc = @editor.scroll.scroll / @editor.scroll.scrollMax
             tp = parseInt pc * @scroll.scrollMax
             @scroll.to tp
-        # log 'onEditorScroll' if @editor.name == 'editor'
         @drawTopBot()
             
     onScroll: =>
@@ -268,11 +269,12 @@ class Minimap
     #  0000000  0000000  00000000  000   000  000   000
     
     clearRange: (top, bot) -> 
+        
         ctx = @lines.getContext '2d'
         ctx.clearRect 0, (top-@scroll.exposeTop)*@scroll.lineHeight, 2*@width, (bot-top)*@scroll.lineHeight
         
     clearAll: =>
-        # log 'clearAll' if @editor.name == 'editor'
+
         @selecti.width = @selecti.width
         @highlig.width = @highlig.width
         @cursors.width = @cursors.width

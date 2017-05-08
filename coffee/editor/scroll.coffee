@@ -129,9 +129,7 @@ class Scroll extends events
             @exposeBot = @bot
             num = @bot - @top + 1
             if num > 0
-                # log "#{@name} - exposeLines top:#{@top}, bot:#{@bot}, num:#{num}" if @name.startsWith 'editor'
                 @emit 'exposeLines', top:@top, bot:@bot, num: num
-                # log "#{@name} - scroll:#{@scroll}, offsetTop:#{@offsetTop}" if @name.startsWith 'editor'
                 @emit 'scroll', @scroll, @offsetTop
             return
         
@@ -156,7 +154,7 @@ class Scroll extends events
                 n = clamp 0, @exposeBot-@bot, num
                 @exposeBot -= n
                 @emit 'vanishLines', bot: n
-                    
+                
     # 000  000   000   0000000  00000000  00000000   000000000
     # 000  0000  000  000       000       000   000     000   
     # 000  000 0 000  0000000   0000000   0000000       000   
@@ -208,7 +206,7 @@ class Scroll extends events
     # 000   000   0000000   000   000  0000000  000  000   000  00000000  0000000 
         
     setNumLines: (n) =>
-        # log "#{@name} - #{@numLines} -> #{n}" if @name.startsWith 'editor'
+
         if @numLines != n
             @numLines = n
             @fullHeight = @numLines * @lineHeight            

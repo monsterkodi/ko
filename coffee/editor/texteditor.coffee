@@ -334,6 +334,7 @@ class TextEditor extends Editor
             
         @updateLinePositions()
         @updateLayers()
+        @setScrollOffset()
     
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     
@@ -525,11 +526,14 @@ class TextEditor extends Editor
     
     updateScrollOffset: -> 
         
-        offsetTop = @scroll.offsetTop
-        if offsetTop != @scrollOffsetTop
-            @scrollOffsetTop = offsetTop
-            @layers.scrollTop = offsetTop
+        if @scroll.offsetTop != @scrollOffsetTop
+            @setScrollOffset()
 
+    setScrollOffset: ->
+        
+        @scrollOffsetTop = @scroll.offsetTop
+        @layers.scrollTop = @scroll.offsetTop
+            
     updateCursorOffset: ->
         
         cx = @mainCursor()[0]*@size.charWidth+@size.offsetX
