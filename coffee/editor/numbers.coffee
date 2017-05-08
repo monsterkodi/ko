@@ -32,11 +32,13 @@ class Numbers extends event
     #  0000000   0000000   0000000   0000000   000   000
     
     updateColor: (li) =>
+        
+        top = @elem.firstChild?.lineIndex ? @editor.scroll.exposeTop
         # log "Numbers.updateColor li:#{li}" if @editor.name == 'editor'
         si = (s[0] for s in rangesFromTopToBotInRanges li, li, @editor.selections())
         hi = (s[0] for s in rangesFromTopToBotInRanges li, li, @editor.highlights())
         ci = (s[0] for s in rangesFromTopToBotInRanges li, li, rangesFromPositions @editor.cursors())
-        child = @elem.children[li-@editor.scroll.exposeTop]
+        child = @elem.children[li-top]
         return if not child?
         cls = ''
         if li in ci
@@ -50,6 +52,7 @@ class Numbers extends event
         child.className = 'linenumber ' + cls
        
     updateColors: =>
+        
         if @editor.scroll.exposeBot > @editor.scroll.exposeTop
             for li in [@editor.scroll.exposeTop..@editor.scroll.exposeBot]
                 @updateColor li
@@ -72,15 +75,20 @@ class Numbers extends event
     # 00000000  000   000  000         0000000   0000000   00000000
         
     onLineExposed: (e) =>
+        
+        # if @editor.name == 'editor'
+            # log 'onLineExposed', e.lineIndex, @editor.scroll.exposeTop, @elem.firstChild?.lineIndex, @elem.lastChild?.lineIndex 
+        
         if e.lineIndex < @elem.firstChild?.lineIndex
             @elem.insertBefore @addLine(e.lineIndex), @elem.firstChild
         else if e.lineIndex > @elem.lastChild?.lineIndex or not @elem.lastChild?
             @elem.appendChild @addLine e.lineIndex
         else
-            return
+            return error "unhandled expose? #{e.lineIndex} #{@elem.firstChild?.lineIndex} #{@elem.lastChild?.lineIndex}"
         @updateColor e.lineIndex
 
     onLineInserted: (li, oi) =>
+        
         top = @editor.scroll.exposeTop
         bot = @editor.scroll.exposeBot
         if top <= oi <= bot
