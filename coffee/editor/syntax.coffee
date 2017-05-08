@@ -35,18 +35,22 @@ class Syntax
     # 0000000    000  0000000   0000000 
 
     dissForLineIndex: (lineIndex) -> 
+        
         Syntax.dissForTextAndSyntax @editor.line(lineIndex), @name
 
     getDiss: (li, opt) ->
+        
         if not @diss[li]?
             rgs  = matchr.ranges Syntax.matchrConfigs[@name], @editor.line(li)
             diss = matchr.dissect rgs, opt
             @diss[li] = diss
+            
         @diss[li]
     
     setDiss: (li, dss) ->
+        
         @diss[li] = dss
-        @diss[li]
+        dss
             
     #  0000000   0000000   000       0000000   00000000 
     # 000       000   000  000      000   000  000   000
@@ -106,12 +110,15 @@ class Syntax
         l
 
     @rangesForTextAndSyntax: (line, n) ->
+        
         matchr.ranges Syntax.matchrConfigs[n], line
 
     @dissForTextAndSyntax: (line, n, opt) ->
+        
         matchr.dissect matchr.ranges(Syntax.matchrConfigs[n], line), opt
 
     @lineForDiss: (dss) -> 
+        
         l = ""
         for d in dss
             l = _.padEnd l, d.start
@@ -125,6 +132,7 @@ class Syntax
     # 0000000   000   000  00000000  0000000    000   000  000   000   0000000 
     
     @shebang: (line) ->
+        
         if line.startsWith "#!"
             lastWord = _.last line.split /[\s\/]/
             switch lastWord

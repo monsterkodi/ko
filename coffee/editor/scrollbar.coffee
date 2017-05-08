@@ -22,6 +22,9 @@ class Scrollbar
         @handle = elem class: 'scrollhandle left'
         @elem.appendChild @handle
 
+        @scrollX  = 0
+        @scrollY  = 0
+        
         @drag = new drag
             target:  @elem
             onStart: @onStart
@@ -30,8 +33,6 @@ class Scrollbar
 
         @elem.addEventListener 'wheel', @onWheel
         @editor.view.addEventListener 'wheel',  @onWheel
-        
-        @scrollX = @scrollY = 0
         
     del: -> 
         
@@ -73,21 +74,23 @@ class Scrollbar
             f *= 1 + 1 * event.shiftKey
             f *= 1 + 3 * event.metaKey
             f *= 1 + 7 * event.altKey
-
+                    
         if Math.abs(event.deltaX) >= 2*Math.abs(event.deltaY) or Math.abs(event.deltaY) == 0
             @scrollX += event.deltaX
         else
             @scrollY += event.deltaY * scrollFactor()
 
         if @scrollX or @scrollY
-            @editor.scrollBy @scrollY, @scrollX
-            @scrollX  = 0
-            @scrollY  = 0
+            window.requestAnimationFrame @wheelScroll
         
         stopEvent event    
         
     onScroll: (event) => @editor.updateScrollOffset()
 
+    wheelScroll: =>
+        @editor.scrollBy @scrollY, @scrollX
+        @scrollX = @scrollY = 0
+    
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000
     # 000   000  00000000   000   000  000000000     000     0000000

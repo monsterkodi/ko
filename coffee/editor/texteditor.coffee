@@ -48,7 +48,7 @@ class TextEditor extends Editor
         @scroll = new scroll 
             lineHeight: @size.lineHeight
             viewHeight: @viewHeight()
-            exposeMax: -5
+            exposeMax: -3
             
         @scroll.name = @name
             
@@ -191,7 +191,7 @@ class TextEditor extends Editor
 
         @scroll?.setLineHeight @size.lineHeight
         
-        setStyle '.comment.header', 'border-radius', "#{parseInt fontSize/3}px", 1
+        # setStyle '.comment.header', 'border-radius', "#{parseInt fontSize/3}px", 1
         
         @emit 'fontSizeChanged'
     
@@ -296,6 +296,7 @@ class TextEditor extends Editor
         @renderHighlights() if rangesAtLineIndexInRanges(li, @highlights()).length
         
     exposeLines: (e) =>
+        
         before = @elem.firstChild
         for li in [e.top..e.bot]
             div = @divForLineAtIndex li
@@ -317,6 +318,7 @@ class TextEditor extends Editor
     #     0      000   000  000   000  000  0000000   000   000
     
     vanishLines: (e) =>
+        
         top = e.top ? 0
         while top
             li = @elem.firstChild.lineIndex
@@ -329,6 +331,7 @@ class TextEditor extends Editor
             @elem.lastChild.remove()
             @emit 'lineVanished', lineIndex: li
             bot -= 1
+            
         @updateLinePositions()
         @updateLayers()
     
@@ -339,6 +342,7 @@ class TextEditor extends Editor
     #  0000000   000        0000000    000   000     000     00000000
 
     updateLinePositions: (animate=0) ->
+        
         y = 0
         for c in @elem.children
             c.style.transform = "translate(#{@size.offsetX}px,#{y}px)"
@@ -352,10 +356,12 @@ class TextEditor extends Editor
             setTimeout resetTrans, animate
                 
     updateLines: () ->
+        
         for li in [@scroll.exposeTop..@scroll.exposeBot]
             @updateLine li
 
     clearHighlights: () ->
+        
         if @numHighlights()
             $('.highlights', @layers).innerHTML = ''
             super
@@ -367,6 +373,7 @@ class TextEditor extends Editor
     # 000   000  00000000  000   000  0000000    00000000  000   000
 
     divForLineAtIndex: (li) ->
+        
         div = render.lineDiv (li-@scroll.exposeTop) * @size.lineHeight, @syntax.getDiss(li), @size
         div.lineIndex = li
         if @showInvisibles
@@ -377,10 +384,12 @@ class TextEditor extends Editor
         div
     
     findDivForLineAtIndex: (li) ->
+        
         for i in [@elem.lines.length-1..0]
             return @elem.children[i] if @elem.children[i].lineIndex == li
     
     renderCursors: ->
+        
         cs = []
         for c in @cursors()
             if c[1] >= @scroll.exposeTop and c[1] <= @scroll.exposeBot
@@ -414,13 +423,15 @@ class TextEditor extends Editor
         @layerDict.cursors.innerHTML = html
             
     renderSelection: ->
+        
         h = ""
         s = @selectionsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
         if s
             h += render.selection s, @size
         @layerDict.selections.innerHTML = h
 
-    renderHighlights: ->        
+    renderHighlights: ->
+        
         h = ""
         s = @highlightsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
         if s
@@ -512,11 +523,12 @@ class TextEditor extends Editor
         if delta = @deltaToEnsureCursorsAreVisible()
             @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth 
     
-    updateScrollOffset: ->        
+    updateScrollOffset: -> 
         
-        if @scroll.offsetTop != @scrollOffsetTop
-            @layers.scrollTop = @scroll.offsetTop 
-            @scrollOffsetTop = @scroll.offsetTop
+        offsetTop = @scroll.offsetTop
+        if offsetTop != @scrollOffsetTop
+            @scrollOffsetTop = offsetTop
+            @layers.scrollTop = offsetTop
 
     updateCursorOffset: ->
         
