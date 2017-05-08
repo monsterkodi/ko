@@ -154,8 +154,8 @@ module.exports =
         main = switch opt.main
             when 'top'   then 'first'
             when 'bot'   then 'last'
-            when 'left'  then newCursors.indexOf _.first positionsAtLineIndexInPositions mainLine, newCursors
-            when 'right' then newCursors.indexOf _.last  positionsAtLineIndexInPositions mainLine, newCursors
+            when 'left'  then 'closest'
+            when 'right' then 'closest'
             
         @do.setCursors newCursors, main:main
         @endSelection opt

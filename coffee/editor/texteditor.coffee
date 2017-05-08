@@ -48,7 +48,7 @@ class TextEditor extends Editor
         @scroll = new scroll 
             lineHeight: @size.lineHeight
             viewHeight: @viewHeight()
-            exposeMax: -3
+            exposeMax: -2
             
         @scroll.name = @name
             
@@ -85,10 +85,14 @@ class TextEditor extends Editor
         @view.removeEventListener 'focus',   @onFocus
         @view.innerHTML = ''
     
-    onBlur:  => @emit 'blur', @    
+    onBlur: => 
+        
+        @stopBlink()
+        @emit 'blur', @    
     
     onFocus: => 
         
+        @startBlink()
         @emit 'focus', @
         post.emit 'editorFocus', @
         
@@ -191,7 +195,7 @@ class TextEditor extends Editor
 
         @scroll?.setLineHeight @size.lineHeight
         
-        # setStyle '.comment.header', 'border-radius', "#{parseInt fontSize/3}px", 1
+        setStyle '.comment.header', 'border-radius', "#{parseInt fontSize/3}px", 2
         
         @emit 'fontSizeChanged'
     
@@ -236,6 +240,7 @@ class TextEditor extends Editor
             @updateScrollOffset()
             @updateCursorOffset()
             @emit 'cursor'
+            @suspendBlink()
             
         if changeInfo.selects
             @renderSelection()   
@@ -439,6 +444,36 @@ class TextEditor extends Editor
             h += render.selection s, @size, "highlight"
         @layerDict.highlights.innerHTML = h
 
+    # 0000000    000      000  000   000  000   000    
+    # 000   000  000      000  0000  000  000  000     
+    # 0000000    000      000  000 0 000  0000000      
+    # 000   000  000      000  000  0000  000  000     
+    # 0000000    0000000  000  000   000  000   000   
+    
+    suspendBlink: ->
+        $('.cursor.main').classList.toggle 'blink', false
+        clearTimeout @suspendTimer
+        @suspendTimer = setTimeout @releaseBlink, 1600
+        
+    releaseBlink: =>
+        clearTimeout @suspendTimer
+        delete @suspendTimer
+    
+    toggleBlink: =>
+        return if @suspendTimer?
+        $('.cursor.main', @layerDict['cursors']).classList.toggle 'blink'
+    
+    startBlink: ->
+        
+        clearInterval @blinkTimer
+        @blinkTimer = setInterval @toggleBlink, 400
+        
+    stopBlink: ->
+        
+        $('.cursor.main').classList.toggle 'blink', false
+        clearInterval @blinkTimer
+        delete @blinkTimer
+        
     # 00000000   00000000   0000000  000  0000000  00000000
     # 000   000  000       000       000     000   000     
     # 0000000    0000000   0000000   000    000    0000000 
