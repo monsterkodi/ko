@@ -83,12 +83,14 @@ class Flex
     # 000   000  00000000  0000000  000   000  000   000  
     
     relax: ->
+        
         @relaxed = true
         for p in @visiblePanes()
             p.div.style.flex = "1 1 0"
             p.size = 0
 
     unrelax: ->
+        
         @relaxed = false
         for p in @visiblePanes()
             p.size = p.actualSize()
@@ -109,7 +111,7 @@ class Flex
             h.update() 
             avail -= h.size()
             
-        for p in @panes
+        for p in visPanes
             avail -= p.size
             
         diff = avail / flexPanes.length
@@ -117,12 +119,9 @@ class Flex
         for p in flexPanes
             p.size += diff
             
-        for p in @panes            
+        for p in visPanes
             p.setSize p.size
 
-        for p in @panes            
-            p.setPos p.actualPos()
-            
         @onPaneSize?()
     
     # 00     00   0000000   000   000  00000000  
@@ -139,12 +138,9 @@ class Flex
     moveHandleToPos: (handle, pos) ->
         
         pos = parseInt pos
-        
         if @relaxed then @unrelax()
         
         offset = pos - handle.actualPos()
-        
-        # log "Flex.moveHandleToPos", pos, offset
         
         return if Math.abs(offset) < 1
         
@@ -157,27 +153,29 @@ class Flex
         prevSize = prev.size + offset
         nextSize = next.size - offset
         
-        if @snapFirst? and prevSize < @snapFirst
+        # log 'moveHandleToPos', handle.index, pos, prevSize, nextSize
+        
+        if @snapFirst? and prevSize < @snapFirst and not @prevVisPane prev
             
-            if not @prevVisPane prev
-                if prevSize <= 0 or offset < @snapFirst # collapse panea
-                    prevSize = -1
-                    nextSize = next.size + prev.size
-            else
-                if prevSize < 0
-                    prevSize = 0
-                    nextSize = next.size + prev.size
+            if prevSize <= 0 or offset < @snapFirst # collapse panea
+                prevSize = -1
+                nextSize = next.size + prev.size + @handleSize
+        else
+            
+            if prevSize < 0
+                prevSize = 0
+                nextSize = next.size + prev.size
                     
-        else if @snapLast? and nextSize < @snapLast
+        if @snapLast? and nextSize < @snapLast and not @nextVisPane next
             
-            if not @nextVisPane next
-                if nextSize <= 0 or -offset < @snapLast # collapse paneb
-                    nextSize = -1
-                    prevSize = prev.size + next.size
-            else
-                if nextSize < 0
-                    nextSize = 0
-                    prevSize = prev.size + next.size
+            if nextSize <= 0 or -offset < @snapLast # collapse paneb
+                nextSize = -1
+                prevSize = prev.size + next.size + @handleSize
+        else
+            
+            if nextSize < 0
+                nextSize = 0
+                prevSize = prev.size + next.size
                     
         prev.setSize prevSize
         next.setSize nextSize
@@ -206,9 +204,9 @@ class Flex
         state = []
         for p in @panes
             state.push
-                id:    p.id
-                size:  p.size
-                pos:   p.pos
+                id:   p.id
+                size: p.size
+                pos:  p.pos
         state
 
     #  0000000  000  0000000  00000000  
@@ -244,15 +242,16 @@ class Flex
     panePositions:   -> ( p.pos  for p in @panes )
     paneSizes:       -> ( p.size for p in @panes )
     sizeOfPane:  (i) -> @pane(i).size
-    posOfPane:   (i) -> @pane(i).pos
+    posOfPane:   (i) -> @pane(i).pos()
     posOfHandle: (i) -> @handle(i).pos()
     pane:        (i) -> _.isNumber(i) and @panes[i]   or _.isString(i) and _.find(@panes, (p) -> p.id == i) or i
     handle:      (i) -> _.isNumber(i) and @handles[i] or i
 
     height: -> @view.getBoundingClientRect().height
     size: ->
-        cs = window.getComputedStyle @view 
-        @view[@clientDim] - parseFloat(cs[@paddingA]) - parseFloat(cs[@paddingB])
+        @view.getBoundingClientRect()[@dimension]
+        # cs = window.getComputedStyle @view 
+        # @view[@clientDim] - parseFloat(cs[@paddingA]) - parseFloat(cs[@paddingB])
 
     pos: -> @view.getBoundingClientRect()[@position]
                            
