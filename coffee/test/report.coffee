@@ -37,7 +37,7 @@ class Report
 
         runner.on 'fail', (test, err) =>
             log @indent(), '  ✘', test.title
-            # console.log err
+
             for stack in (err.stack ? err.message).split '\n    at '
                 log @indent(), '    ▲', stack
             if err.actual? and err.expected?

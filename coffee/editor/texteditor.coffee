@@ -72,7 +72,7 @@ class TextEditor extends Editor
 
         if @minimap?            
             post.on 'schemeChanged', @onSchemeChanged
-
+            
     del: ->
         
         if @minimap?
@@ -461,9 +461,15 @@ class TextEditor extends Editor
         clearTimeout @suspendTimer
         delete @suspendTimer
     
-    toggleBlink: =>        
+    toggleBlink: ->
         
-        return if @suspendTimer?
+        @stopBlink()
+        prefs.set 'blink', not prefs.get 'blink', true
+        @startBlink()
+        
+    doBlink: =>
+        
+        return if @suspendTimer? or not prefs.get 'blink'
         @blink = not @blink
         cursor = $('.cursor.main', @layerDict['cursors'])
         cursor?.classList.toggle 'blink', @blink
@@ -471,8 +477,9 @@ class TextEditor extends Editor
     
     startBlink: ->
         
+        return if not prefs.get 'blink'
         clearInterval @blinkTimer
-        @blinkTimer = setInterval @toggleBlink, 400
+        @blinkTimer = setInterval @doBlink, 400
         
     stopBlink: ->
         

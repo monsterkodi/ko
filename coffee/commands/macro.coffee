@@ -83,11 +83,31 @@ class Macro extends Command
                 editor.showInvisibles = !editor.showInvisibles
                 editor.updateLines()
 
-            when 'color'
-                editor.pigments()
-
-            when 'fps'
-                window.fps?.toggle()
+            # 0000000    000      000  000   000  000   000  
+            # 000   000  000      000  0000  000  000  000   
+            # 0000000    000      000  000 0 000  0000000    
+            # 000   000  000      000  000  0000  000  000   
+            # 0000000    0000000  000  000   000  000   000  
+            
+            when 'blink' 
+                editor.toggleBlink()
+                @commandline.startBlink()
+                
+            #  0000000   0000000   000       0000000   00000000   
+            # 000       000   000  000      000   000  000   000  
+            # 000       000   000  000      000   000  0000000    
+            # 000       000   000  000      000   000  000   000  
+            #  0000000   0000000   0000000   0000000   000   000  
+            
+            when 'color' then editor.pigments()
+            
+            # 00000000  00000000    0000000  
+            # 000       000   000  000       
+            # 000000    00000000   0000000   
+            # 000       000             000  
+            # 000       000        0000000   
+            
+            when 'fps'   then window.fps?.toggle()
 
             # 000000000  00000000   0000000  000000000
             #    000     000       000          000

@@ -79,20 +79,22 @@ class Search extends Command
     # 000 0 000  000          000     000   000  000       000      000  000       000  000   
     # 000   000  00000000     000     000   000   0000000  0000000  000   0000000  000   000  
     
-    onMetaClick: (meta) =>
+    onMetaClick: (meta, event) =>
 
         href = meta[2].href      
         split = href.split ':'
         if split.length == 1 or _.isFinite parseInt split[1]
             window.split.show 'editor'
-            window.loadFile href
+            file = href + ':' + window.terminal.posForEvent(event)[0]
+            log 'loadFile', file
+            window.loadFile file
         else
-            log 'search on meta click', href
             if window.commandline.commands[split[0]]?
                 command = window.commandline.commands[split[0]]
                 window.commandline.startCommand split[0], command.shortcuts[0]
                 window.commandline.setText split[1]
                 command.execute split[1]
+                
         'unhandled'
 
 #  0000000  00000000   0000000   00000000    0000000  000   000  00000000  00000000 
