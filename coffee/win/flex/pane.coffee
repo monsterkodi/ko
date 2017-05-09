@@ -13,7 +13,7 @@ class Pane
     constructor: (opt) ->
         
         @[k] = v for k,v of opt
-        @pos      = 0
+        @collapsed ?= false
         @size    ?= @fixed ? @min ? 0
         @size     = -1 if @collapsed
         @id      ?= @div.id ? "pane"
@@ -23,21 +23,30 @@ class Pane
         @display ?= 'initial'
     
     update: ->
-        
-        @size = parseInt @collapsed and -1 or Math.max @size, 0
-        @pos = @div.getBoundingClientRect()[@flex.position] - @div.parentNode.getBoundingClientRect()[@flex.position]
-        @div.style.display = @collapsed and 'none' or @display
-        @div.style.flex = @fixed and "0 0 #{@fixed}px" or @size and "1 1 #{@size}px" or "1 1 0"
-        @div.style[@flex.dimension] = "#{@fixed}px" if @fixed
 
-    setSize: (@size) -> @update()
-    setPos:  (@pos)  -> 
+        @size = parseInt @collapsed and -1 or Math.max @size, 0
+        @div.style.display = @collapsed and 'none' or @display
+        
+        if @fixed
+            @div.style[@flex.dimension] = "#{@fixed}px"
+            @div.style.flex = "0 0 #{@fixed}px"
+        else if @size > 0
+            @div.style.flex = "1 1 #{@size}px"
+        else if @size == 0
+            @div.style.flex = "0.01 0.01 0"
+        else
+            @div.style.flex = "0 0 0"
+
+    setSize: (@size) -> 
+
+        @collapsed = @size < 0
+        @update()
     
     del:       -> @div?.remove() ; delete @div
-    collapse:  -> @collapsed = true; @setSize -1
+    collapse:  -> @setSize -1
     expand:    -> delete @collapsed; @setSize @fixed ? 0
     isVisible: -> not @collapsed
-    
+    pos:       -> @actualPos()
     actualPos: ->
         
         @div.style.display = @display

@@ -39,7 +39,7 @@ module.exports =
         
     jumpToWordAtPos: (p=@cursorPos()) ->
         
-        log 'jumpToWordAtPos', p
+        # log 'jumpToWordAtPos', p
         
         return if @jumpToFileAtPos p
         
