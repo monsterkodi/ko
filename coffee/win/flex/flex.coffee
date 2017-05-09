@@ -224,7 +224,7 @@ class Flex
             state.push
                 id:   p.id
                 size: p.size
-                pos:  p.pos
+                pos:  p.pos()
         state
 
     #  0000000  000  0000000  00000000  
