@@ -23,7 +23,7 @@ class Pane
         @display ?= 'initial'
     
     update: ->
-        # log 'update', @index, @size, @collapsed    
+
         @size = parseInt @collapsed and -1 or Math.max @size, 0
         @div.style.display = @collapsed and 'none' or @display
         
@@ -33,11 +33,14 @@ class Pane
         else if @size > 0
             @div.style.flex = "1 1 #{@size}px"
         else if @size == 0
-            @div.style.flex = "1 1 0"
+            @div.style.flex = "0.01 0.01 0"
         else
             @div.style.flex = "0 0 0"
 
-    setSize: (@size) -> @collapsed = @size<0; @update()
+    setSize: (@size) -> 
+
+        @collapsed = @size < 0
+        @update()
     
     del:       -> @div?.remove() ; delete @div
     collapse:  -> @setSize -1

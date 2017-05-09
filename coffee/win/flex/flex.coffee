@@ -102,14 +102,14 @@ class Flex
     #  0000000  000   000  0000000   0000000  
     
     calculate: ->
-        
+
         visPanes  = @panes.filter (p) -> not p.collapsed
         flexPanes = visPanes.filter (p) -> not p.fixed
         avail     = @size()
         
         for h in @handles
             h.update() 
-            avail -= h.size()
+            avail -= h.size() if h.isVisible()
             
         for p in visPanes
             avail -= p.size
@@ -160,23 +160,41 @@ class Flex
             if prevSize <= 0 or offset < @snapFirst # collapse panea
                 prevSize = -1
                 nextSize = next.size + prev.size + @handleSize
-        else
-            
-            if prevSize < 0
-                prevSize = 0
-                nextSize = next.size + prev.size
+                
+        else if prevSize < 0
+                
+            leftOver = -prevSize
+            prevHandle = handle.prev()
+            while leftOver > 0 and prevHandle and prevVisFlex = @prevVisFlex prevHandle
+                deduct = Math.min leftOver, prevVisFlex.size
+                leftOver -= deduct
+                prevVisFlex.setSize prevVisFlex.size - deduct
+                prevHandle = prevHandle.prev()
+                
+            prevSize = 0
+            nextSize -= leftOver
                     
         if @snapLast? and nextSize < @snapLast and not @nextVisPane next
             
             if nextSize <= 0 or -offset < @snapLast # collapse paneb
                 nextSize = -1
                 prevSize = prev.size + next.size + @handleSize
-        else
-            
-            if nextSize < 0
-                nextSize = 0
-                prevSize = prev.size + next.size
-                    
+                
+        else if nextSize < 0
+                
+            leftOver = -nextSize
+            nextHandle = handle.next()
+            while leftOver > 0 and nextHandle and nextVisFlex = @nextVisFlex nextHandle
+                deduct = Math.min leftOver, nextVisFlex.size
+                leftOver -= deduct
+                nextVisFlex.setSize nextVisFlex.size - deduct
+                nextHandle = nextHandle.next()
+                
+            nextSize = 0
+            prevSize -= leftOver
+        
+        # log 'moveHandleToPos', handle.index, pos, prevSize, nextSize
+        
         prev.setSize prevSize
         next.setSize nextSize
         @update()
