@@ -25,8 +25,10 @@ class TextEditor extends Editor
         @name = @name.slice 1 if @name[0] == '.'
         @view =$ viewElem   
         
+        @layerScroll = elem class: "layerScroll"
         @layers = elem class: "layers"
-        @view.appendChild @layers
+        @layerScroll.appendChild @layers
+        @view.appendChild @layerScroll
                 
         layer = []
         layer.push 'selections'
@@ -42,7 +44,8 @@ class TextEditor extends Editor
         @size = {}
         @syntax = new syntax @
         
-        @divCache = []
+        @spanCache = [] # cache for rendered line spans
+        @lineDivs = {} #  maps line numbers to displayed divs
         
         @config.lineHeight ?= 1.2
         
@@ -56,12 +59,13 @@ class TextEditor extends Editor
 
         @scroll2 = new scroll2 @
             
-        @scroll.on 'clearLines',  @clearLines
-        @scroll.on 'exposeLines', @exposeLines
-        @scroll.on 'vanishLines', @vanishLines
-        @scroll.on 'exposeLine',  @exposeLine
+        # @scroll.on 'clearLines',  @clearLines
+        # @scroll.on 'exposeLines', @exposeLines
+        # @scroll.on 'vanishLines', @vanishLines
+        # @scroll.on 'exposeLine',  @exposeLine
         
         @scroll2.on 'shiftLines', @shiftLines
+        @scroll2.on 'showLines',  @showLines
 
         @view.addEventListener 'blur',     @onBlur
         @view.addEventListener 'focus',    @onFocus
@@ -103,7 +107,7 @@ class TextEditor extends Editor
         
     onSchemeChanged: =>
         
-        updateMinimap = => @minimap.drawLines()
+        updateMinimap = => @minimap?.drawLines()
         setTimeout updateMinimap, 10
                 
     # 000       0000000   000   000  00000000  00000000    0000000
@@ -147,7 +151,9 @@ class TextEditor extends Editor
                 
         lines ?= []
         
-        @divCache = []
+        @spanCache = []
+        @lineDivs = {}
+        
         @syntax.clear() 
         @scroll.reset()
         @scroll2.reset()
@@ -300,70 +306,58 @@ class TextEditor extends Editor
     #      000  000   000  000  000          000     000      000  000  0000  000            000  
     # 0000000   000   000  000  000          000     0000000  000  000   000  00000000  0000000   
     
-    shiftLines: (num) =>
-    showLines: (top, bot, num) =>
+    shiftLines: (top, bot, num) =>
         
-    # 00000000  000   000  00000000    0000000    0000000  00000000
-    # 000        000 000   000   000  000   000  000       000     
-    # 0000000     00000    00000000   000   000  0000000   0000000 
-    # 000        000 000   000        000   000       000  000     
-    # 00000000  000   000  000         0000000   0000000   00000000
-
-    exposeLine: (li) =>
+        #     old   up  down 
+        #     
+        # top 10     8  13
+        # bot 20    18  23
+        #     
+        #     num   -2   3
         
-        div = @cachedDiv li
-        @elem.appendChild div
+        oldTop = top - num
+        oldBot = bot - num
         
-        @emit 'lineExposed',
-            lineIndex: li
-            lineDiv: div
-          
-        # this is crap! render only cursors at line! don't get native arrays!  
-        @renderCursors() if positionsAtLineIndexInPositions(li, @cursors()).length
-        @renderSelection() if rangesAtLineIndexInRanges(li, @selections()).length
-        @renderHighlights() if rangesAtLineIndexInRanges(li, @highlights()).length
+        divInto = (li,lo) =>
+            return error "no divInto? #{lo} #{li}" if not @lineDivs[lo]
+            @lineDivs[li] = @lineDivs[lo]
+            delete @lineDivs[lo]
+            @lineDivs[li].replaceChild @cachedSpan(li), @lineDivs[li].firstChild
         
-    exposeLines: (e) =>
-        # console.log 'exposeLines', e.top, e.num
-        before = @elem.firstChild
-        for li in [e.top..e.bot]
-            div = @cachedDiv li
-            @elem.insertBefore div, before
-
-        for li in (before? and [e.bot..e.top] or [e.top..e.bot])
-            @emit 'lineExposed',
-                lineIndex: li
-                lineDiv: @elem.children[li-e.top]
-
+        if num > 0
+            while oldBot < bot
+                oldBot += 1
+                divInto oldBot, oldTop
+                oldTop += 1
+        else
+            while oldTop > top
+                oldTop -= 1
+                divInto oldTop, oldBot
+                oldBot -= 1
+       
         @updateLinePositions()
         @updateLayers()
-        @emit 'linesExposed', e
-
-    # 000   000   0000000   000   000  000   0000000  000   000
-    # 000   000  000   000  0000  000  000  000       000   000
-    #  000 000   000000000  000 0 000  000  0000000   000000000
-    #    000     000   000  000  0000  000       000  000   000
-    #     0      000   000  000   000  000  0000000   000   000
-    
-    vanishLines: (e) =>
-        
-        top = e.top ? 0
-        while top
-            li = @elem.firstChild.lineIndex
-            @elem.firstChild.remove()
-            @emit 'lineVanished', lineIndex: li
-            top -= 1
-        bot = e.bot ? 0
-        while bot
-            li = @elem.lastChild.lineIndex
-            @elem.lastChild.remove()
-            @emit 'lineVanished', lineIndex: li
-            bot -= 1
             
+    #  0000000  000   000   0000000   000   000  000      000  000   000  00000000   0000000  
+    # 000       000   000  000   000  000 0 000  000      000  0000  000  000       000       
+    # 0000000   000000000  000   000  000000000  000      000  000 0 000  0000000   0000000   
+    #      000  000   000  000   000  000   000  000      000  000  0000  000            000  
+    # 0000000   000   000   0000000   00     00  0000000  000  000   000  00000000  0000000   
+    
+    showLines: (top, bot, num) =>
+
+        @elem.innerHTML = ''
+        @lineDivs = {}
+        
+        for li in [top..bot]
+            @lineDivs[li] = elem class: 'line' 
+            @lineDivs[li].appendChild @cachedSpan li
+            @elem.appendChild @lineDivs[li]
+
         @updateLinePositions()
         @updateLayers()
-        @setScrollOffset()
-    
+        @emit 'linesExposed', top:top, bot:bot, num:num
+        
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     
     # 000   000  00000000   000   000  000000000     000     0000000 
@@ -371,12 +365,13 @@ class TextEditor extends Editor
     #  0000000   000        0000000    000   000     000     00000000
 
     updateLinePositions: (animate=0) ->
-        
-        y = 0
-        for c in @elem.children
-            c.style.transform = "translate(#{@size.offsetX}px,#{y}px)"
-            c.style.transition = "all #{animate/1000}s" if animate
-            y += @size.lineHeight
+        # console.log 'updateLinePositions', _.size @lineDivs
+        for li, div of @lineDivs
+            return error 'no div?' if not div?
+            y = @size.lineHeight * (li - @scroll2.top)
+            # console.log 'li', @scroll2.top, li, y
+            div.style.transform = "translate3d(#{@size.offsetX}px,#{y}px, 0)"
+            div.style.transition = "all #{animate/1000}s" if animate
             
         if animate
             resetTrans = =>
@@ -401,25 +396,20 @@ class TextEditor extends Editor
     # 000   000  000       000  0000  000   000  000       000   000
     # 000   000  00000000  000   000  0000000    00000000  000   000
 
-    cachedDiv: (li) -> @divCache[li] ? @updateDiv li
+    cachedSpan: (li) -> 
         
-    updateDiv: (li) ->
-        
-        div = @divForLineAtIndex li
-        @divCache[li] = div
-        div
-    
-    divForLineAtIndex: (li) ->
-        
-        div = render.lineDiv (li-@scroll.exposeTop) * @size.lineHeight, @syntax.getDiss(li), @size
-        div.lineIndex = li
-        if @showInvisibles
-            tx = @line(li).length * @size.charWidth + 1
-            span = elem 'span', class: "invisible newline", html: '&#9687'
-            span.style.transform = "translate(#{tx}px, -1.5px)"
-            div.appendChild span
-        div
-        
+        if not @spanCache[li]
+                        
+            # if @showInvisibles
+                # tx = @line(li).length * @size.charWidth + 1
+                # span = elem 'span', class: "invisible newline", html: '&#9687'
+                # span.style.transform = "translate(#{tx}px, -1.5px)"
+                # div.appendChild span
+            
+            @spanCache[li] = render.lineSpan @syntax.getDiss(li), @size
+                
+        @spanCache[li]    
+                    
     renderCursors: ->
         
         cs = []
@@ -610,7 +600,7 @@ class TextEditor extends Editor
     setScrollOffset: ->
         
         @scrollOffsetTop = @scroll.offsetTop
-        @layers.scrollTop = @scroll.offsetTop
+        @layerScroll.style.transform = "translate3d(0,-#{@scrollOffsetTop}px, 0)"
             
     updateCursorOffset: ->
         
@@ -825,4 +815,10 @@ class TextEditor extends Editor
         if 'unhandled' != result
             stopEvent event
 
+    log: ->
+        return if @name != 'editor'
+        log.slog.depth = 3
+        log.apply log, [].splice.call arguments, 0
+        log.slog.depth = 2
+            
 module.exports = TextEditor

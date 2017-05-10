@@ -28,11 +28,11 @@ class Render
                 l = clrzd + l
         l
         
-    @lineDiv: (y, diss, size) ->
+    @lineSpan: (diss, size) ->
         
-        div = elem class: 'line'
-        div.style.height = "#{size.lineHeight}px"
-        div.style.transform = "translate(#{size.offsetX}px,#{y}px)"
+        div = elem class: 'linespans'
+        # div.style.height = "#{size.lineHeight}px"
+        # div.style.transform = "translate(#{size.offsetX}px,#{y}px)"
         
         if diss?.length
             for d in diss
@@ -54,6 +54,7 @@ class Render
     #  0000000   0000000   000   000  0000000    0000000   000   000  0000000 
     
     @cursors: (cs, size) -> # cs: [ [charIndex, lineIndex] ... ]  (lineIndex relative to view)
+        
         i = 0
         h = ""
         cw = size.charWidth
@@ -74,6 +75,7 @@ class Render
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
                 
     @selection: (ss, size, clss='selection') => # ss: [ [lineIndex, [startIndex, endIndex]], ... ]  (lineIndex relative to view)
+        
         h = ""
         p = null
         n = null

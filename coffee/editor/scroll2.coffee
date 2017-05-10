@@ -16,15 +16,8 @@ class Scroll extends events
 
         @lineHeight = @editor.size.lineHeight ? 0
         @viewHeight = -1
-        # @viewHeight = @editor.viewHeight()
         @init()
 
-    log: ->
-        return if @editor.name != 'editor'
-        log.slog.depth = 3
-        log.apply log, [].splice.call arguments, 0
-        log.slog.depth = 2
-        
     # 000  000   000  000  000000000
     # 000  0000  000  000     000   
     # 000  000 0 000  000     000   
@@ -60,36 +53,6 @@ class Scroll extends events
         @viewLines   = Math.ceil(@viewHeight / @lineHeight)   # number of lines in view (including partials)
         @linesHeight = @viewLines * @lineHeight               # height of visible lines (pixels)
         # @log @info()
-
-    # 000  000   000  00000000   0000000 
-    # 000  0000  000  000       000   000
-    # 000  000 0 000  000000    000   000
-    # 000  000  0000  000       000   000
-    # 000  000   000  000        0000000 
-    
-    info: ->
-        
-        topbot: "#{@top} .. #{@bot} = #{@bot-@top} / #{@numLines} lines"
-        scroll: "#{@scroll} offsetTop #{@offsetTop} viewHeight #{@viewHeight} scrollMax #{@scrollMax} fullLines #{@fullLines} viewLines #{@viewLines}"
-        
-    # 00000000   00000000   0000000  00000000  000000000
-    # 000   000  000       000       000          000   
-    # 0000000    0000000   0000000   0000000      000   
-    # 000   000  000            000  000          000   
-    # 000   000  00000000  0000000   00000000     000   
-    
-    reset: =>
-        
-        @emit 'clearLines'
-        @init()
-
-    # 000000000   0000000 
-    #    000     000   000
-    #    000     000   000
-    #    000     000   000
-    #    000      0000000 
-    
-    to: (p) => @by p-@scroll
         
     # 0000000    000   000
     # 000   000   000 000 
@@ -97,6 +60,7 @@ class Scroll extends events
     # 000   000     000   
     # 0000000       000   
         
+    to: (p) => @by p-@scroll
     by: (delta) =>
         
         return if @viewLines < 0
@@ -125,7 +89,6 @@ class Scroll extends events
             
     setTop: (top) =>
         
-        # return if @bot < 0 and @numLines < 1
         oldTop = @top
         oldBot = @bot
         
@@ -139,7 +102,7 @@ class Scroll extends events
             num = @bot - @top + 1
             
             if num > 0
-                @log "showLines #{@top} #{@bot} num: #{num}"
+                # @log "-showLines #{@top+1} #{@bot+1} num: #{num}"
                 @emit 'showLines', @top, @bot, num
 
         else   
@@ -147,7 +110,7 @@ class Scroll extends events
             num = @top - oldTop
             
             if 0 < Math.abs num
-                @log "shiftLines #{@top} #{@bot} num:#{num}"
+                # @log "shiftLines #{@top+1} #{@bot+1} num:#{num}"
                 @emit 'shiftLines', @top, @bot, num
                 
     # 000  000   000   0000000  00000000  00000000   000000000
@@ -178,7 +141,18 @@ class Scroll extends events
         
         return true if @top <= li <= @bot
         return @bot-@top+1 < @fullLines
-            
+
+    # 00000000   00000000   0000000  00000000  000000000
+    # 000   000  000       000       000          000   
+    # 0000000    0000000   0000000   0000000      000   
+    # 000   000  000            000  000          000   
+    # 000   000  00000000  0000000   00000000     000   
+    
+    reset: =>
+        
+        @emit 'clearLines'
+        @init()
+        
     # 000   000  000  00000000  000   000  000   000  00000000  000   0000000   000   000  000000000
     # 000   000  000  000       000 0 000  000   000  000       000  000        000   000     000   
     #  000 000   000  0000000   000000000  000000000  0000000   000  000  0000  000000000     000   
@@ -227,4 +201,21 @@ class Scroll extends events
             @calc()
             @by 0
 
+    # 000  000   000  00000000   0000000 
+    # 000  0000  000  000       000   000
+    # 000  000 0 000  000000    000   000
+    # 000  000  0000  000       000   000
+    # 000  000   000  000        0000000 
+    
+    info: ->
+        
+        topbot: "#{@top} .. #{@bot} = #{@bot-@top} / #{@numLines} lines"
+        scroll: "#{@scroll} offsetTop #{@offsetTop} viewHeight #{@viewHeight} scrollMax #{@scrollMax} fullLines #{@fullLines} viewLines #{@viewLines}"
+        
+    log: ->
+        return if @editor.name != 'editor'
+        log.slog.depth = 3
+        log.apply log, [].splice.call arguments, 0
+        log.slog.depth = 2
+            
 module.exports = Scroll

@@ -392,13 +392,22 @@ infoPadding = 6px
     
 #logview
     border-bottom       frameBorder
-    
-.layers
+
+// 000       0000000   000   000  00000000  00000000   
+// 000      000   000   000 000   000       000   000  
+// 000      000000000    00000    0000000   0000000    
+// 000      000   000     000     000       000   000  
+// 0000000  000   000     000     00000000  000   000  
+
+.layerScroll
     fill-abs()
     overflow-x          visible
     overflow-y          hidden
     &::-webkit-scrollbar
         height          2px
+    
+.layers
+    position            relative
         
 #commandline-editor .layers
     min-height          commandlineHeight

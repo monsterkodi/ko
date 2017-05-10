@@ -28,7 +28,8 @@ class FileEditor extends TextEditor
 
         @fontSizeDefault = 16
 
-        super viewElem, features: ['Diffbar', 'Scrollbar', 'Numbers', 'Minimap', 'Meta', 'Autocomplete', 'Brackets', 'Strings']
+        # super viewElem, features: ['Diffbar', 'Scrollbar', 'Numbers', 'Minimap', 'Meta', 'Autocomplete', 'Brackets', 'Strings']
+        super viewElem, features: ['Scrollbar', 'Minimap', 'Autocomplete', 'Brackets', 'Strings']
 
         @pigmentsInit()
         @setText ''
@@ -70,8 +71,8 @@ class FileEditor extends TextEditor
         @setSalterMode false
         @stopWatcher()
 
-        @diffbar.clear()
-        @meta.clear()
+        @diffbar?.clear()
+        @meta?.clear()
         @do.reset()
 
         @currentFile = file
@@ -174,7 +175,7 @@ class FileEditor extends TextEditor
             delta = @size.lineHeight * parseInt(delta / @size.lineHeight) # no idea why this is necessary
             @scrollBy delta
             @updateLayers()
-            @numbers.updateColors()
+            @numbers?.updateColors()
             @emit 'cursor'
             @emit 'selection'
         else
