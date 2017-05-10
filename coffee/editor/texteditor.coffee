@@ -279,8 +279,11 @@ class TextEditor extends Editor
         return if oi > @scroll.exposeBot
         return if oi < @scroll.exposeTop
         if (oi-@scroll.exposeTop) < @elem.children.length
-            div = @updateDiv li
-            @elem.replaceChild div, @elem.children[oi - @scroll.exposeTop]
+            # div = @updateDiv li
+            # @elem.replaceChild div, @elem.children[oi - @scroll.exposeTop]
+            div = @elem.children[oi - @scroll.exposeTop]
+            @spanCache[li] = render.lineSpan @syntax.getDiss(li), @size
+            div.replaceChild @spanCache[li], div.firstChild
     
     deleteLine: (li, oi) ->
         
@@ -293,8 +296,9 @@ class TextEditor extends Editor
         
     insertLine: (li, oi) -> 
         
-        return if not @scroll.lineIndexIsInExpose oi
-        div = @updateDiv li
+        @spanCache[li] = render.lineSpan @syntax.getDiss(li), @size
+        return if not @scroll2.lineIndexIsInView oi
+        # div = @updateDiv li
         @elem.insertBefore div, @elem.children[oi - @scroll.exposeTop]
         @scroll.insertLine li, oi
         @scroll2.insertLine li, oi
@@ -335,6 +339,8 @@ class TextEditor extends Editor
                 divInto oldTop, oldBot
                 oldBot -= 1
        
+        @emit 'linesShifted', top, bot, num
+        
         @updateLinePositions()
         @updateLayers()
             
@@ -357,6 +363,7 @@ class TextEditor extends Editor
         @updateLinePositions()
         @updateLayers()
         @emit 'linesExposed', top:top, bot:bot, num:num
+        @emit 'linesShown', top, bot, num
         
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     
@@ -365,11 +372,10 @@ class TextEditor extends Editor
     #  0000000   000        0000000    000   000     000     00000000
 
     updateLinePositions: (animate=0) ->
-        # console.log 'updateLinePositions', _.size @lineDivs
+
         for li, div of @lineDivs
             return error 'no div?' if not div?
             y = @size.lineHeight * (li - @scroll2.top)
-            # console.log 'li', @scroll2.top, li, y
             div.style.transform = "translate3d(#{@size.offsetX}px,#{y}px, 0)"
             div.style.transition = "all #{animate/1000}s" if animate
             
