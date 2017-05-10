@@ -158,6 +158,7 @@ class Browser extends Stage
     # 0000000    00000000  0000000    
     
     popColumn: ->
+        
         @flex.popPane()
         @columns.pop()
         
@@ -260,7 +261,7 @@ class Browser extends Stage
         if items.length
             items.sort (a,b) -> a.line - b.line
             opt.parent ?= item
-            @clearColumnsFrom opt.column, pop:true
+            @clearColumnsFrom opt.column #, pop:true
             @loadItems items, opt
         else
             ext = path.extname file  

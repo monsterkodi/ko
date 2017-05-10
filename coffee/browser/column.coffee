@@ -309,6 +309,7 @@ class Column
             when 'ctrl+t'              then return stopEvent event, @sortByType()
             when 'ctrl+n'              then return stopEvent event, @sortByName()
             when 'command+i'           then return stopEvent event, @toggleDotFiles()
+            when 'command+k'           then return stopEvent event if @browser.cleanUp()
             when 'tab'    
                 if @search.length then @doSearch ''
                 return stopEvent event

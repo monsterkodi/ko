@@ -70,6 +70,9 @@ describe 'ppost', ->
 
     it 'toOthers', (done) ->
         pongIDs = [otherID, 'main']
+        onPing = (id, a, b) ->
+            expect(id) .to.not.eql thisID
+            assert(false)
         onPong = (id, a, b) ->
             try
                 expect(id) .to.not.eql thisID
@@ -78,14 +81,19 @@ describe 'ppost', ->
                 _.pull pongIDs, id
                 if _.isEmpty pongIDs
                     post.removeListener 'pong', onPong
+                    post.removeListener 'ping', onPing
                     done()
             catch err
                 done err
-        post.on 'pong', onPong                    
+        post.on 'pong', onPong
+        post.on 'ping', onPing
         post.toOthers 'ping', thisID, payloadA, payloadB
 
     it 'toOtherWins', (done) ->
         pongIDs = [otherID]
+        onPing = (id, a, b) ->
+            expect(id) .to.not.eql thisID
+            assert(false)
         onPong = (id, a, b) ->
             try
                 expect(id) .to.not.eql thisID
@@ -95,10 +103,12 @@ describe 'ppost', ->
                 _.pull pongIDs, id
                 if _.isEmpty pongIDs
                     post.removeListener 'pong', onPong
+                    post.removeListener 'ping', onPing
                     done()
             catch err
                 done err
-        post.on 'pong', onPong                    
+        post.on 'pong', onPong
+        post.on 'ping', onPing
         post.toOtherWins 'ping', thisID, payloadA, payloadB
 
     it 'toWins', (done) ->

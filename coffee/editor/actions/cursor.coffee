@@ -130,11 +130,13 @@ module.exports =
         @moveCursorsUp extend, @numFullLines()-3
                 
     cursorPageDown: (key, info) ->
+        
         stopEvent info?.event
         extend = info.extend ? 0 <= info.mod.indexOf 'shift'
         @moveCursorsDown extend, @numFullLines()-3
 
     setCursorsAtSelectionBoundariesOrSelectSurround: ->
+        
         if @numSelections()
             @do.start()
             newCursors = []

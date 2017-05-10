@@ -146,7 +146,7 @@ class ObjectBrowser extends Browser
                 type:'class'
                 preview: false
 
-        @loadObject classes, name:'classes', focus:false, preview:false
+        @loadObject classes, name:"classes #{names.join ' '}", focus:false, preview:false
 
     # 00000000  000   000  000   000   0000000   0000000  
     # 000       000   000  0000  000  000       000       
@@ -177,7 +177,7 @@ class ObjectBrowser extends Browser
                 type:'func'
                 preview: false
         
-        @loadObject funcs, name:'funcs', focus:false, preview:false
+        @loadObject funcs, name:"funcs #{names.join ' '}", focus:false, preview:false
           
     # 00000000  000  000      00000000   0000000  
     # 000       000  000      000       000       
@@ -205,7 +205,7 @@ class ObjectBrowser extends Browser
                 
         files = _browse_items_:files
             
-        @loadObject files, name:'files', focus:false, preview:false
+        @loadObject files, name:"files #{names.join ' '}", focus:false, preview:false
 
     # 000   000   0000000   00000000   0000000     0000000  
     # 000 0 000  000   000  000   000  000   000  000       
@@ -216,7 +216,7 @@ class ObjectBrowser extends Browser
     loadWords: (names) ->
         
         words = @filter names, 'words'
-        @loadObject words, name:'words', focus:false, preview:false
+        @loadObject words, name:"words #{names.join ' '}", focus:false, preview:false
     
     #  0000000   00000000   00000000    0000000   000   000  
     # 000   000  000   000  000   000  000   000   000 000   
@@ -253,6 +253,7 @@ class ObjectBrowser extends Browser
     # 0000000  000  000   000  00000000  0000000   
     
     loadLines: (lines, opt) ->
+        
         col = @emptyColumn opt?.column
         @clearColumnsFrom col.index, pop:true
         col.editor = new ObjectEditor col.table, opt

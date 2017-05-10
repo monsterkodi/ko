@@ -16,19 +16,19 @@ try
 catch
     return
     
-winID    = 0
-thisID   = window.winID
-editor   = window.editor
-terminal = window.terminal
+winID       = 0
+thisID      = window.winID
+editor      = window.editor
+terminal    = window.terminal
 commandline = window.commandline
-thisFile = null
-otherWin = null
+thisFile    = null
+otherWin    = null
 resultLines = null
-tmpFile  = resolve '$TMPDIR/ko/test.coffee'
-txtFile  = resolve '$TMPDIR/ko/test.txt'
-pkgFile  = resolve '$TMPDIR/ko/package.json'
-texta    = "a='hello'\nb='world'"
-textb    = "hell on earth"
+tmpFile     = resolve '$TMPDIR/ko/test.coffee'
+txtFile     = resolve '$TMPDIR/ko/test.txt'
+pkgFile     = resolve '$TMPDIR/ko/package.json'
+texta       = "a='hello'\nb='world'"
+textb       = "hell on earth"
 
 describe 'search edit', ->
     
@@ -53,7 +53,6 @@ describe 'search edit', ->
         count = 2
         onSearchResult = (meta) ->
             count--
-            # log count, terminal.numLines(), meta
             resultLines.push terminal.numLines()
             if count == 0
                 post.removeListener 'search-result', onSearchResult

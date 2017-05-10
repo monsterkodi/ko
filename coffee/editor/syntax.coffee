@@ -18,8 +18,12 @@ class Syntax
         @diss = []
         @colors = {}
         
-        post.on 'schemeChanged', => @colors = {}
+        post.on 'schemeChanged', @onSchemeChanged
 
+    del: -> post.removeListener 'schemeChanged', @onSchemeChanged
+
+    onSchemeChanged: => @colors = {}
+        
     #  0000000  000      00000000   0000000   00000000 
     # 000       000      000       000   000  000   000
     # 000       000      0000000   000000000  0000000  
@@ -151,6 +155,7 @@ class Syntax
     # 000  000   000  000     000   
     
     @init: ->
+        
         syntaxDir = "#{__dirname}/../../syntax/"
         for syntaxFile in fs.readdirSync syntaxDir
             syntaxName = path.basename syntaxFile, '.noon'

@@ -71,6 +71,7 @@ class Flex
     # 000         0000000   000        
     
     popPane: ->
+        
         if @panes.length > 1
             @panes.pop().del()
             @handles.pop().del()

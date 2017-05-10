@@ -129,4 +129,3 @@ describe 'stacking', ->
         editor.insertCharacter ']'
         textIs '[({"\'\'"})]'
         
-    

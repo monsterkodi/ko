@@ -39,6 +39,7 @@ module.exports =
                 @surroundPairs['`'] = ['`', '`']
                 
     isUnbalancedSurroundCharacter: (ch) ->
+        
         return false if ch in ["#"]
         [cl,cr] = @surroundPairs[ch]
         return false if cl.length > 1
@@ -54,6 +55,7 @@ module.exports =
         return false
     
     selectionContainsOnlyQuotes: ->
+        
         for c in @textOfSelection()
             continue if c == '\n'
             if c not in ['"', "'"]
@@ -61,6 +63,7 @@ module.exports =
         true
     
     insertTripleQuotes: ->
+        
         return false if @numCursors() > 1
         return false if @numSelections()
         p = @cursorPos()
@@ -186,9 +189,10 @@ module.exports =
     # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     0000000   
     
     highlightsSurroundingCursor: ->
+        
         if @numHighlights() % 2 == 0
             hs = @highlights()
-            # sortRanges hs # necessary?
+            sortRanges hs
             if @numHighlights() == 2
                 return hs
             else if @numHighlights() == 4

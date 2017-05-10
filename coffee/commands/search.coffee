@@ -86,7 +86,6 @@ class Search extends Command
         if split.length == 1 or _.isFinite parseInt split[1]
             window.split.show 'editor'
             file = href + ':' + window.terminal.posForEvent(event)[0]
-            log 'loadFile', file
             window.loadFile file
         else
             if window.commandline.commands[split[0]]?
@@ -94,7 +93,7 @@ class Search extends Command
                 window.commandline.startCommand split[0], command.shortcuts[0]
                 window.commandline.setText split[1]
                 command.execute split[1]
-                
+
         'unhandled'
 
 #  0000000  00000000   0000000   00000000    0000000  000   000  00000000  00000000 

@@ -41,6 +41,8 @@ class TextEditor extends Editor
         @size = {}
         @syntax = new syntax @
         
+        @divCache = []
+        
         @config.lineHeight ?= 1.2
         
         @setFontSize prefs.get "#{@name}FontSize", @fontSizeDefault
@@ -48,7 +50,7 @@ class TextEditor extends Editor
         @scroll = new scroll 
             lineHeight: @size.lineHeight
             viewHeight: @viewHeight()
-            exposeMax: -2
+            exposeMax: -1 #-2
             
         @scroll.name = @name
             
@@ -70,14 +72,13 @@ class TextEditor extends Editor
             featureClss = require "./#{featureName}"
             @[featureName] = new featureClss @                
 
-        if @minimap?            
-            post.on 'schemeChanged', @onSchemeChanged
+        if @minimap? then post.on 'schemeChanged', @onSchemeChanged
             
     del: ->
         
-        if @minimap?
-            post.removeListener 'schemeChanged', @onSchemeChanged
-            
+        if @minimap? then post.removeListener 'schemeChanged', @onSchemeChanged
+
+        @syntax.del()
         @scrollbar?.del()    
         
         @view.removeEventListener 'keydown', @onKeyDown
@@ -141,7 +142,8 @@ class TextEditor extends Editor
     setLines: (lines) ->
                 
         lines ?= []
-
+        
+        @divCache = []
         @syntax.clear() 
         @scroll.reset()
         
@@ -246,7 +248,6 @@ class TextEditor extends Editor
             @renderSelection()   
             @emit 'selection'
         
-        # log 'emit changed', changeInfo if @name == 'editor' and changeInfo.changes.length
         @emit 'changed', changeInfo
 
     # 00000000  0000000    000  000000000
@@ -261,7 +262,7 @@ class TextEditor extends Editor
         return if oi > @scroll.exposeBot
         return if oi < @scroll.exposeTop
         if (oi-@scroll.exposeTop) < @elem.children.length
-            div = @divForLineAtIndex li
+            div = @updateDiv li
             @elem.replaceChild div, @elem.children[oi - @scroll.exposeTop]
     
     deleteLine: (li, oi) ->
@@ -275,7 +276,7 @@ class TextEditor extends Editor
     insertLine: (li, oi) -> 
         
         return if not @scroll.lineIndexIsInExpose oi
-        div = @divForLineAtIndex li
+        div = @updateDiv li
         @elem.insertBefore div, @elem.children[oi - @scroll.exposeTop]
         @scroll.insertLine li, oi
         @emit 'lineInserted', li, oi
@@ -288,7 +289,7 @@ class TextEditor extends Editor
 
     exposeLine: (li) =>
         
-        div = @divForLineAtIndex li
+        div = @cachedDiv li
         @elem.appendChild div
         
         @emit 'lineExposed',
@@ -304,7 +305,7 @@ class TextEditor extends Editor
         
         before = @elem.firstChild
         for li in [e.top..e.bot]
-            div = @divForLineAtIndex li
+            div = @cachedDiv li
             @elem.insertBefore div, before
 
         for li in (before? and [e.bot..e.top] or [e.top..e.bot])
@@ -378,6 +379,14 @@ class TextEditor extends Editor
     # 000   000  000       000  0000  000   000  000       000   000
     # 000   000  00000000  000   000  0000000    00000000  000   000
 
+    cachedDiv: (li) -> @divCache[li] ? @updateDiv li
+        
+    updateDiv: (li) ->
+        
+        div = @divForLineAtIndex li
+        @divCache[li] = div
+        div
+    
     divForLineAtIndex: (li) ->
         
         div = render.lineDiv (li-@scroll.exposeTop) * @size.lineHeight, @syntax.getDiss(li), @size
@@ -388,12 +397,7 @@ class TextEditor extends Editor
             span.style.transform = "translate(#{tx}px, -1.5px)"
             div.appendChild span
         div
-    
-    findDivForLineAtIndex: (li) ->
         
-        for i in [@elem.lines.length-1..0]
-            return @elem.children[i] if @elem.children[i].lineIndex == li
-    
     renderCursors: ->
         
         cs = []
@@ -766,7 +770,6 @@ class TextEditor extends Editor
             for actionCombo in combos
                 if combo == actionCombo
                     if action.key? and _.isFunction @[action.key]
-                        # log 'execute action', action.key
                         @[action.key] key, combo: combo, mod: mod, event: event
                         return
                         

@@ -24,16 +24,16 @@
 .true    
     color           #88f
 .false      
-    color           #44f
+    color           #d00
 
 .number
 .int    
-    color           #66f
+    color           #88f
 .float   
     color           #f88
 
 .nil
-.value
+// .value
     color           #808
 
 .dictionary
@@ -78,9 +78,9 @@
 
 .func    
 .function
-    color           #f80
+    color           #fd0
     &.call          
-        color       #f40
+        color       #f80
     &.marker
         color       #55f
         opacity     1
@@ -95,9 +95,9 @@
 
 .class.function
 .method
-    color           #ff0
+    color           #ff4
     &.call          
-        color       #fa0
+        color       #ff2
     &.definition
     &.template
         color       #2aa
@@ -152,15 +152,23 @@
     &.double
         color       #0f0 !important
         
+//  0000000   0000000   00     00  00     00  00000000  000   000  000000000  
+// 000       000   000  000   000  000   000  000       0000  000     000     
+// 000       000   000  000000000  000000000  0000000   000 0 000     000     
+// 000       000   000  000 0 000  000 0 000  000       000  0000     000     
+//  0000000   0000000   000   000  000   000  00000000  000   000     000     
+
 .comment
 .comment.string
 .comment.string.double
     color           #4f4f4f !important
 
 .comment.header
-    color           #004f00 !important
-    background      #004a00  //rgba(0,128,0,0.5)
+    color           #040 !important
+    background      #040
     border-radius   5px
+    border-left     2px solid #060
+    border-bottom   2px solid #050
     
 .comment.header.minimap
     color           #0a0 !important
