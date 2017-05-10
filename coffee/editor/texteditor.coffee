@@ -10,6 +10,7 @@
 }         = require 'kxk'
 render    = require './render'
 syntax    = require './syntax'
+scroll2   = require './scroll2'
 scroll    = require './scroll'
 Editor    = require './editor'
 electron  = require 'electron'
@@ -50,14 +51,17 @@ class TextEditor extends Editor
         @scroll = new scroll 
             lineHeight: @size.lineHeight
             viewHeight: @viewHeight()
-            exposeMax: -1 #-2
-            
+            exposeMax: -1
         @scroll.name = @name
+
+        @scroll2 = new scroll2 @
             
         @scroll.on 'clearLines',  @clearLines
         @scroll.on 'exposeLines', @exposeLines
         @scroll.on 'vanishLines', @vanishLines
         @scroll.on 'exposeLine',  @exposeLine
+        
+        @scroll2.on 'shiftLines', @shiftLines
 
         @view.addEventListener 'blur',     @onBlur
         @view.addEventListener 'focus',    @onFocus
@@ -146,14 +150,17 @@ class TextEditor extends Editor
         @divCache = []
         @syntax.clear() 
         @scroll.reset()
+        @scroll2.reset()
         
         super lines        
         
         if @scroll.viewHeight != @viewHeight()
             @scroll.setViewHeight @viewHeight()
+            @scroll2.setViewHeight @viewHeight()
             @emit 'viewHeight', @viewHeight()
             
         @scroll.setNumLines @numLines()
+        @scroll2.setNumLines @numLines()
         @layers.scrollLeft = 0
         @layersWidth  = @layers.offsetWidth
         @layersHeight = @layers.offsetHeight
@@ -173,8 +180,10 @@ class TextEditor extends Editor
                 
         if @scroll.viewHeight != @viewHeight()
             @scroll.setViewHeight @viewHeight()
+            @scroll2.setViewHeight @viewHeight()
             
         @scroll.setNumLines @numLines()
+        @scroll2.setNumLines @numLines()
         
         @emit 'linesAppended', ls
         @emit 'numLines', @numLines()
@@ -196,6 +205,7 @@ class TextEditor extends Editor
         @size.offsetX      = Math.max @size.offsetX, (@screenSize().width - @screenSize().height) / 2 if @size.centerText
 
         @scroll?.setLineHeight @size.lineHeight
+        @scroll2?.setLineHeight @size.lineHeight
         
         setStyle '.comment.header', 'border-radius', "#{parseInt fontSize/3}px", 2
         
@@ -229,6 +239,7 @@ class TextEditor extends Editor
         
         if changeInfo.inserts or changeInfo.deletes           
             @scroll.setNumLines @numLines()
+            @scroll2.setNumLines @numLines()
             @layersWidth = @layers.offsetWidth
             @updateScrollOffset()
             @updateLinePositions()
@@ -271,6 +282,7 @@ class TextEditor extends Editor
         return if oi < @scroll.exposeTop
         @elem.children[oi - @scroll.exposeTop]?.remove()
         @scroll.deleteLine li, oi
+        @scroll2.deleteLine li, oi
         @emit 'lineDeleted', oi
         
     insertLine: (li, oi) -> 
@@ -279,7 +291,17 @@ class TextEditor extends Editor
         div = @updateDiv li
         @elem.insertBefore div, @elem.children[oi - @scroll.exposeTop]
         @scroll.insertLine li, oi
+        @scroll2.insertLine li, oi
         @emit 'lineInserted', li, oi
+
+    #  0000000  000   000  000  00000000  000000000  000      000  000   000  00000000   0000000  
+    # 000       000   000  000  000          000     000      000  0000  000  000       000       
+    # 0000000   000000000  000  000000       000     000      000  000 0 000  0000000   0000000   
+    #      000  000   000  000  000          000     000      000  000  0000  000            000  
+    # 0000000   000   000  000  000          000     0000000  000  000   000  00000000  0000000   
+    
+    shiftLines: (num) =>
+    showLines: (top, bot, num) =>
         
     # 00000000  000   000  00000000    0000000    0000000  00000000
     # 000        000 000   000   000  000   000  000       000     
@@ -302,7 +324,7 @@ class TextEditor extends Editor
         @renderHighlights() if rangesAtLineIndexInRanges(li, @highlights()).length
         
     exposeLines: (e) =>
-        
+        # console.log 'exposeLines', e.top, e.num
         before = @elem.firstChild
         for li in [e.top..e.bot]
             div = @cachedDiv li
@@ -506,6 +528,8 @@ class TextEditor extends Editor
         return if vh == @scroll.viewHeight
         
         @scroll.setViewHeight vh
+        @scroll2.setViewHeight vh
+        
         @numbers?.elem.style.height = "#{@scroll.exposeNum * @scroll.lineHeight}px"
         @layers.style.height = "#{vh}px"
         @layersWidth = @layers.offsetWidth
@@ -552,12 +576,14 @@ class TextEditor extends Editor
     scrollBy: (delta, x=0) -> 
         
         @scroll.by delta if delta
+        @scroll2.by delta if delta
         @layers.scrollLeft += x if x
         @updateScrollOffset()
         
     scrollTo: (p) ->
         
         @scroll.to p
+        @scroll2.to p
         @updateScrollOffset()
 
     scrollCursorToTop: (topDist=7) ->
