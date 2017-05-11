@@ -35,7 +35,6 @@ class EditorScroll extends events
         @viewLines    = -1 # number of lines in view (including partials)
         @scrollMax    = -1 # maximum scroll offset (pixels)
         @numLines     = -1 # total number of lines in buffer
-        @linesHeight  = -1 # height of visible lines (pixels)
         @top          = -1 # index of first visible line in view
         @bot          = -1 # index of last  visible line in view
 
@@ -49,10 +48,9 @@ class EditorScroll extends events
         
         if @viewHeight < 0
             return
-        @scrollMax   = Math.max(0,@fullHeight - @viewHeight)  # maximum scroll offset (pixels)
-        @fullLines   = Math.floor(@viewHeight / @lineHeight)  # number of lines in view (excluding partials)
-        @viewLines   = Math.ceil(@viewHeight / @lineHeight)   # number of lines in view (including partials)
-        @linesHeight = @viewLines * @lineHeight               # height of visible lines (pixels)
+        @scrollMax   = Math.max(0,@fullHeight - @viewHeight)   # maximum scroll offset (pixels)
+        @fullLines   = Math.floor(@viewHeight / @lineHeight)   # number of lines in view (excluding partials)
+        @viewLines   = Math.ceil(@viewHeight / @lineHeight)+1  # number of lines in view (including partials)
         # @log @info()
         
     # 0000000    000   000
@@ -62,9 +60,13 @@ class EditorScroll extends events
     # 0000000       000   
         
     to: (p) => @by p-@scroll
-    by: (delta) =>
+    by: (delta, x) =>
         
         return if @viewLines < 0
+        
+        @editor.layers.scrollLeft += x if x
+        
+        return if not delta
         
         scroll = @scroll
         delta = 0 if Number.isNaN delta
@@ -79,8 +81,11 @@ class EditorScroll extends events
         offset += (top - @top) * @lineHeight
         
         if offset != @offsetTop or scroll != @scroll
+                        
             @offsetTop = parseInt offset
+            @updateOffset()
             @emit 'scroll', @scroll, @offsetTop
+                        
 
     #  0000000  00000000  000000000  000000000   0000000   00000000 
     # 000       000          000        000     000   000  000   000
@@ -176,6 +181,71 @@ class EditorScroll extends events
             @calc()
             @by 0
 
+    #  0000000   00000000  00000000   0000000  00000000  000000000  
+    # 000   000  000       000       000       000          000     
+    # 000   000  000000    000000    0000000   0000000      000     
+    # 000   000  000       000            000  000          000     
+    #  0000000   000       000       0000000   00000000     000     
+    
+    updateOffset: -> 
+                
+        @editor.layerScroll.style.transform = "translate3d(0,-#{@offsetTop}px, 0)"
+            
+    #  0000000  000   000  00000000    0000000   0000000   00000000   
+    # 000       000   000  000   000  000       000   000  000   000  
+    # 000       000   000  0000000    0000000   000   000  0000000    
+    # 000       000   000  000   000       000  000   000  000   000  
+    #  0000000   0000000   000   000  0000000    0000000   000   000  
+            
+    scrollCursorToTop: (topDist=7) ->
+        
+        cp = @editor.cursorPos()
+        
+        if cp[1] - @top > topDist
+            
+            rg = [@top, Math.max 0, cp[1]-1]
+            
+            sl = @editor.selectionsInLineIndexRange rg
+            hl = @editor.highlightsInLineIndexRange rg
+            
+            if sl.length == 0 == hl.length
+                @by @lineHeight * (cp[1] - @top - topDist)
+
+    cursorIntoView: (topDist=7) ->
+
+        if delta = @deltaToEnsureMainCursorIsVisible()
+            
+            @by delta * @lineHeight - @offsetSmooth
+            @updateCursorOffset()
+
+    deltaToEnsureMainCursorIsVisible: ->
+        
+        maindelta = 0
+        cl = @editor.mainCursor()[1]
+        if cl < @top + 2
+            maindelta = Math.max(0, cl - 2) - @top
+        else if cl > @bot - 4
+            maindelta = Math.min(@numLines+1, cl + 4) - @bot
+
+        maindelta
+            
+    updateCursorOffset: ->
+        
+        offsetX     = @editor.size.offsetX
+        charWidth   = @editor.size.charWidth
+        layersWidth = @editor.layersWidth
+        scrollLeft  = @editor.layers.scrollLeft
+        
+        cx = @editor.mainCursor()[0]*charWidth+offsetX
+        
+        if cx-scrollLeft > layersWidth
+            
+            @editor.layers.scrollLeft = Math.max 0, cx - layersWidth + charWidth
+            
+        else if cx-offsetX-scrollLeft < 0
+            
+            @editor.layers.scrollLeft = Math.max 0, cx - offsetX
+            
     # 000  000   000  00000000   0000000 
     # 000  0000  000  000       000   000
     # 000  000 0 000  000000    000   000

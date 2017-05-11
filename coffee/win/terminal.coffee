@@ -70,7 +70,7 @@ class Terminal extends TextEditor
         @appendText text
         if tail
             @singleCursorAtPos [0, @numLines()-1] 
-            @scrollTo @scroll.fullHeight
+            @scroll.to @scroll.fullHeight
             
     appendDiss: (diss) -> @appendLineDiss syntax.lineForDiss(diss), diss        
     

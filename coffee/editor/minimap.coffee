@@ -209,7 +209,7 @@ class Minimap
     
     jumpToLine: (li, event) ->
         
-        @editor.scrollTo (li-5) * @editor.scroll.lineHeight
+        @editor.scroll.to (li-5) * @editor.scroll.lineHeight
         
         if not event.metaKey
             @editor.singleCursorAtPos [0, li+5], extend:event.shiftKey

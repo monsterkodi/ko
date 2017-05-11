@@ -39,7 +39,7 @@ class LogView extends TextEditor
         super text
         if tail
             @singleCursorAtPos [0, @numLines()-1] 
-            @scrollTo @scroll.fullHeight
+            @scroll.to @scroll.fullHeight
 
     #  0000000  000      000   0000000  000   000  
     # 000       000      000  000       000  000   

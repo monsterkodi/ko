@@ -154,7 +154,6 @@ class TextEditor extends Editor
         @layersWidth  = @layers.offsetWidth
         @layersHeight = @layers.offsetHeight
         
-        @updateScrollOffset()
         @updateLayers()
 
     appendText: (text) ->
@@ -232,9 +231,8 @@ class TextEditor extends Editor
                     @insertLine li, di                    
         
         if changeInfo.inserts or changeInfo.deletes           
-            @scroll.setNumLines @numLines()
             @layersWidth = @layers.offsetWidth
-            @updateScrollOffset()
+            @scroll.setNumLines @numLines()
             @updateLinePositions()
 
         if changeInfo.changes.length
@@ -242,9 +240,7 @@ class TextEditor extends Editor
         
         if changeInfo.cursors
             @renderCursors()
-            @scrollCursorIntoView()
-            @updateScrollOffset()
-            @updateCursorOffset()
+            @scroll.cursorIntoView()
             @emit 'cursor'
             @suspendBlink()
             
@@ -552,97 +548,22 @@ class TextEditor extends Editor
         
         return if vh == @scroll.viewHeight
         
-        @scroll.setViewHeight vh
-        
         @numbers?.elem.style.height = "#{@scroll.exposeNum * @scroll.lineHeight}px"
         @layers.style.height = "#{vh}px"
         @layersWidth = @layers.offsetWidth
         
-        @updateScrollOffset()
+        @scroll.setViewHeight vh
+        
         @emit 'viewHeight', vh
 
     screenSize: -> electron.screen.getPrimaryDisplay().workAreaSize
     
-    deltaToEnsureCursorsAreVisible: ->
-        
-        topdelta = 0
-        cs = @cursors()
-        cl = cs[0][1]
-        if cl < @scroll.top + 2
-            topdelta = Math.max(0, cl - 2) - @scroll.top
-        else if cl > @scroll.bot - 4
-            topdelta = Math.min(@numLines()+1, cl + 4) - @scroll.bot
-        
-        botdelta = 0
-        cl = _.last(cs)[1]
-        if cl < @scroll.top + 2
-            botdelta = Math.max(0, cl - 2) - @scroll.top
-        else if cl > @scroll.bot - 4
-            botdelta = Math.min(@numLines()+1, cl + 4) - @scroll.bot
-            
-        maindelta = 0
-        cl = @mainCursor()[1]
-        if cl < @scroll.top + 2
-            maindelta = Math.max(0, cl - 2) - @scroll.top
-        else if cl > @scroll.bot - 4
-            maindelta = Math.min(@numLines()+1, cl + 4) - @scroll.bot
-
-        maindelta
-
     #  0000000   0000000  00000000    0000000   000      000    
     # 000       000       000   000  000   000  000      000    
     # 0000000   000       0000000    000   000  000      000    
     #      000  000       000   000  000   000  000      000    
     # 0000000    0000000  000   000   0000000   0000000  0000000
 
-    scrollLines: (delta) -> @scrollBy delta * @size.lineHeight
-
-    scrollBy: (delta, x=0) -> 
-        
-        @scroll.by delta if delta
-        @layers.scrollLeft += x if x
-        @updateScrollOffset()
-        
-    scrollTo: (p) ->
-        
-        @scroll.to p
-        @updateScrollOffset()
-
-    scrollCursorToTop: (topDist=7) ->
-        
-        cp = @cursorPos()
-        if cp[1] - @scroll.top > topDist
-            rg = [@scroll.top, Math.max 0, cp[1]-1]
-            sl = @selectionsInLineIndexRange rg
-            hl = @highlightsInLineIndexRange rg
-            if sl.length == 0 == hl.length
-                delta = @scroll.lineHeight * (cp[1] - @scroll.top - topDist)
-                @scrollBy delta
-
-    scrollCursorIntoView: (topDist=7) ->
-
-        if delta = @deltaToEnsureCursorsAreVisible()
-            @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth
-    
-    updateScrollOffset: -> 
-        
-        if @scroll.offsetTop != @scrollOffsetTop
-            @setScrollOffset()
-
-    setScrollOffset: ->
-        
-        @scrollOffsetTop = @scroll.offsetTop
-        @layerScroll.style.transform = "translate3d(0,-#{@scrollOffsetTop}px, 0)"
-            
-    updateCursorOffset: ->
-        
-        cx = @mainCursor()[0]*@size.charWidth+@size.offsetX
-        if cx-@layers.scrollLeft > @layersWidth
-            @scroll.offsetLeft = Math.max 0, cx - @layersWidth + @size.charWidth
-            @layers.scrollLeft = @scroll.offsetLeft
-        else if cx-@size.offsetX-@layers.scrollLeft < 0
-            @scroll.offsetLeft = Math.max 0, cx - @size.offsetX
-            @layers.scrollLeft = @scroll.offsetLeft
     
     # 00000000    0000000    0000000
     # 000   000  000   000  000     

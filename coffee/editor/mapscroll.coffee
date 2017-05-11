@@ -197,7 +197,7 @@ class MapScroll extends events
         if @viewHeight != h
             @viewHeight = h
             @calc()
-            @by 0     
+            @by 0
             
     # 000   000  000   000  00     00  000      000  000   000  00000000   0000000
     # 0000  000  000   000  000   000  000      000  0000  000  000       000     

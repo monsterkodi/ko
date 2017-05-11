@@ -122,7 +122,7 @@ class FileEditor extends TextEditor
                 d = window.split.commandlineHeight + window.split.handleHeight
                 d = Math.min d, @scroll.scrollMax - @scroll.scroll
                 d *= -1 if e == 'hidden'
-                @scrollBy d
+                @scroll.by d
 
     #  0000000   0000000   000   000  00000000
     # 000       000   000  000   000  000
@@ -172,7 +172,7 @@ class FileEditor extends TextEditor
             @setState @state
             delta = (s.scroll ? @scroll.scroll) - @scroll.scroll
             delta = @size.lineHeight * parseInt(delta / @size.lineHeight) # no idea why this is necessary
-            @scrollBy delta
+            @scroll.by delta
             @updateLayers()
             @numbers?.updateColors()
             @emit 'cursor'

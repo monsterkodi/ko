@@ -50,7 +50,7 @@ class Scrollbar
         sy = clamp 0, @editor.scroll.viewHeight, event.clientY - br.top
         ln = parseInt @editor.scroll.numLines * sy/@editor.scroll.viewHeight
         ly = (ln - @editor.scroll.viewLines / 2) * @editor.scroll.lineHeight
-        @editor.scrollTo ly
+        @editor.scroll.to ly
 
     # 0000000    00000000    0000000    0000000
     # 000   000  000   000  000   000  000
@@ -61,7 +61,7 @@ class Scrollbar
     onDrag: (drag) =>
         
         delta = (drag.delta.y / (@editor.scroll.viewLines * @editor.scroll.lineHeight)) * @editor.scroll.fullHeight
-        @editor.scrollBy delta
+        @editor.scroll.by delta
 
     # 000   000  000   000  00000000  00000000  000
     # 000 0 000  000   000  000       000       000
@@ -91,7 +91,7 @@ class Scrollbar
 
     wheelScroll: =>
         
-        @editor.scrollBy @scrollY, @scrollX
+        @editor.scroll.by @scrollY, @scrollX
         @scrollX = @scrollY = 0
     
     # 000   000  00000000   0000000     0000000   000000000  00000000
