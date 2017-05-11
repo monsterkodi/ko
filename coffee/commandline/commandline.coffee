@@ -22,7 +22,7 @@ class Commandline extends TextEditor
         super viewElem, features: []
 
         @size.lineHeight = 30
-        @scroll?.setLineHeight @size.lineHeight
+        @scroll.setLineHeight @size.lineHeight
 
         @button =$ 'commandline-button'
         @button.classList.add 'empty'

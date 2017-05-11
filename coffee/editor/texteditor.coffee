@@ -7,13 +7,12 @@
 
 { fileExists, resolve, keyinfo, stopEvent, setStyle, 
   prefs, drag, elem, path, post, clamp, pos, str, error, log, sw, $, _
-}         = require 'kxk'
-render    = require './render'
-syntax    = require './syntax'
-scroll2   = require './scroll2'
-scroll    = require './scroll'
-Editor    = require './editor'
-electron  = require 'electron'
+}            = require 'kxk'
+render       = require './render'
+syntax       = require './syntax'
+EditorScroll = require './editorscroll'
+Editor       = require './editor'
+electron     = require 'electron'
 
 class TextEditor extends Editor
 
@@ -25,9 +24,8 @@ class TextEditor extends Editor
         @name = @name.slice 1 if @name[0] == '.'
         @view =$ viewElem   
         
-        @layerScroll = elem class: "layerScroll"
-        @layers = elem class: "layers"
-        @layerScroll.appendChild @layers
+        @layers      = elem class: "layers"
+        @layerScroll = elem class: "layerScroll", child: @layers
         @view.appendChild @layerScroll
                 
         layer = []
@@ -39,33 +37,20 @@ class TextEditor extends Editor
         layer.push 'numbers' if 'Numbers' in @config.features
         @initLayers layer
         
-        @elem = @layerDict.lines
-        @diss = []
-        @size = {}
+        @size   = {}
+        @elem   = @layerDict.lines
         @syntax = new syntax @
         
         @spanCache = [] # cache for rendered line spans
-        @lineDivs = {} #  maps line numbers to displayed divs
+        @lineDivs  = {} #  maps line numbers to displayed divs
         
         @config.lineHeight ?= 1.2
         
         @setFontSize prefs.get "#{@name}FontSize", @fontSizeDefault
 
-        @scroll = new scroll 
-            lineHeight: @size.lineHeight
-            viewHeight: @viewHeight()
-            exposeMax: -1
-        @scroll.name = @name
-
-        @scroll2 = new scroll2 @
-            
-        # @scroll.on 'clearLines',  @clearLines
-        # @scroll.on 'exposeLines', @exposeLines
-        # @scroll.on 'vanishLines', @vanishLines
-        # @scroll.on 'exposeLine',  @exposeLine
-        
-        @scroll2.on 'shiftLines', @shiftLines
-        @scroll2.on 'showLines',  @showLines
+        @scroll = new EditorScroll @
+        @scroll.on 'shiftLines', @shiftLines
+        @scroll.on 'showLines',  @showLines
 
         @view.addEventListener 'blur',     @onBlur
         @view.addEventListener 'focus',    @onFocus
@@ -156,20 +141,19 @@ class TextEditor extends Editor
         
         @syntax.clear() 
         @scroll.reset()
-        @scroll2.reset()
         
         super lines        
         
         if @scroll.viewHeight != @viewHeight()
             @scroll.setViewHeight @viewHeight()
-            @scroll2.setViewHeight @viewHeight()
             @emit 'viewHeight', @viewHeight()
             
         @scroll.setNumLines @numLines()
-        @scroll2.setNumLines @numLines()
+        
         @layers.scrollLeft = 0
         @layersWidth  = @layers.offsetWidth
         @layersHeight = @layers.offsetHeight
+        
         @updateScrollOffset()
         @updateLayers()
 
@@ -177,19 +161,22 @@ class TextEditor extends Editor
 
         return error 'no text?' if not text?
 
+        appended = []
         ls = text?.split /\n/
+        
         for l in ls
             @state = @state.appendLine l
-            @emit 'lineAppended', 
-                lineIndex: @numLines()-1
-                text: l
+            appended.push @numLines()-1
                 
         if @scroll.viewHeight != @viewHeight()
             @scroll.setViewHeight @viewHeight()
-            @scroll2.setViewHeight @viewHeight()
             
         @scroll.setNumLines @numLines()
-        @scroll2.setNumLines @numLines()
+
+        for li in appended
+            @emit 'lineAppended', 
+                lineIndex: li
+                text: @line li
         
         @emit 'linesAppended', ls
         @emit 'numLines', @numLines()
@@ -211,7 +198,6 @@ class TextEditor extends Editor
         @size.offsetX      = Math.max @size.offsetX, (@screenSize().width - @screenSize().height) / 2 if @size.centerText
 
         @scroll?.setLineHeight @size.lineHeight
-        @scroll2?.setLineHeight @size.lineHeight
         
         setStyle '.comment.header', 'border-radius', "#{parseInt fontSize/3}px", 2
         
@@ -239,13 +225,12 @@ class TextEditor extends Editor
                     @updateLine li, di
                     @emit 'lineChanged', li
                 when 'deleted'  
-                    @deleteLine li, di
+                    @deleteLine di
                 when 'inserted'
                     @insertLine li, di                    
         
         if changeInfo.inserts or changeInfo.deletes           
             @scroll.setNumLines @numLines()
-            @scroll2.setNumLines @numLines()
             @layersWidth = @layers.offsetWidth
             @updateScrollOffset()
             @updateLinePositions()
@@ -267,43 +252,105 @@ class TextEditor extends Editor
         
         @emit 'changed', changeInfo
 
-    # 00000000  0000000    000  000000000
-    # 000       000   000  000     000   
-    # 0000000   000   000  000     000   
-    # 000       000   000  000     000   
-    # 00000000  0000000    000     000   
+    # 000   000  00000000   0000000     0000000   000000000  00000000  
+    # 000   000  000   000  000   000  000   000     000     000       
+    # 000   000  00000000   000   000  000000000     000     0000000   
+    # 000   000  000        000   000  000   000     000     000       
+    #  0000000   000        0000000    000   000     000     00000000  
 
     updateLine: (li, oi) ->
         
         oi = li if not oi?
-        return if oi > @scroll.exposeBot
-        return if oi < @scroll.exposeTop
-        if (oi-@scroll.exposeTop) < @elem.children.length
-            # div = @updateDiv li
-            # @elem.replaceChild div, @elem.children[oi - @scroll.exposeTop]
-            div = @elem.children[oi - @scroll.exposeTop]
-            @spanCache[li] = render.lineSpan @syntax.getDiss(li), @size
-            div.replaceChild @spanCache[li], div.firstChild
-    
-    deleteLine: (li, oi) ->
-        
-        return if oi > @scroll.exposeBot
-        return if oi < @scroll.exposeTop
-        @elem.children[oi - @scroll.exposeTop]?.remove()
-        @scroll.deleteLine li, oi
-        @scroll2.deleteLine li, oi
-        @emit 'lineDeleted', oi
-        
-    insertLine: (li, oi) -> 
-        
+        return if li < @scroll.top
+        return if li > @scroll.bot
+        return error "updateLine - out of bounds? li #{li} oi #{oi}" if not @lineDivs[oi]
+        div = @lineDivs[oi]
         @spanCache[li] = render.lineSpan @syntax.getDiss(li), @size
-        return if not @scroll2.lineIndexIsInView oi
-        # div = @updateDiv li
-        @elem.insertBefore div, @elem.children[oi - @scroll.exposeTop]
-        @scroll.insertLine li, oi
-        @scroll2.insertLine li, oi
+        div.replaceChild @spanCache[li], div.firstChild
+    
+    # 0000000    00000000  000      00000000  000000000  00000000  
+    # 000   000  000       000      000          000     000       
+    # 000   000  0000000   000      0000000      000     0000000   
+    # 000   000  000       000      000          000     000       
+    # 0000000    00000000  0000000  00000000     000     00000000  
+    
+    deleteLine: (li) ->
+        
+        @log '---------- deleteLine', li
+        return if li < @scroll.top
+        return if li > @scroll.bot
+        return error "deleteLine - out of bounds? li #{li}" if not @lineDivs[li]
+        
+        @lineDivs[li].remove()
+        
+        for i in [li...@numLines()]
+            
+            if @spanCache[i+1]
+                console.log 'move cache', i
+                @spanCache[i] = @spanCache[i+1]
+            else
+                delete @spanCache[i]
+                
+            if @scroll.top <= i < @scroll.bot
+                @lineDivs[i] = @lineDivs[i+1]
+        
+        if @scroll.bot+1 < @numLines()
+            @lineDivs[@scroll.bot].replaceChild @cachedSpan(@scroll.bot+1), @lineDivs[@scroll.bot].firstChild
+        
+        @emit 'lineDeleted', li
+        
+    # 000  000   000   0000000  00000000  00000000   000000000  
+    # 000  0000  000  000       000       000   000     000     
+    # 000  000 0 000  0000000   0000000   0000000       000     
+    # 000  000  0000       000  000       000   000     000     
+    # 000  000   000  0000000   00000000  000   000     000     
+    
+    insertLine: (li, oi) ->
+        @log 'insertLine', li, oi
+                
+        for i in [@numLines()-1...oi]
+            
+            if @spanCache[i-1]
+                console.log 'move cache', i
+                @spanCache[i] = @spanCache[i-1]
+            else
+                delete @spanCache[i]
+                
+            if @scroll.top <= i <= @scroll.bot
+                console.log 'move div', i
+                @lineDivs[i] = @lineDivs[i-1]
+
+        @spanCache[li] = render.lineSpan @syntax.getDiss(li), @size
+        if @scroll.lineIndexIsInView li
+            @appendLine li
+                
         @emit 'lineInserted', li, oi
 
+    #  0000000  000   000   0000000   000   000  000      000  000   000  00000000   0000000  
+    # 000       000   000  000   000  000 0 000  000      000  0000  000  000       000       
+    # 0000000   000000000  000   000  000000000  000      000  000 0 000  0000000   0000000   
+    #      000  000   000  000   000  000   000  000      000  000  0000  000            000  
+    # 0000000   000   000   0000000   00     00  0000000  000  000   000  00000000  0000000   
+    
+    showLines: (top, bot, num) =>
+
+        @lineDivs = {}
+        @elem.innerHTML = ''
+        
+        for li in [top..bot]
+            @appendLine li
+
+        @updateLinePositions()
+        @updateLayers()
+        @emit 'linesExposed', top:top, bot:bot, num:num
+        @emit 'linesShown', top, bot, num
+
+    appendLine: (li) ->
+        
+        @lineDivs[li] = elem class: 'line' 
+        @lineDivs[li].appendChild @cachedSpan li
+        @elem.appendChild @lineDivs[li]
+        
     #  0000000  000   000  000  00000000  000000000  000      000  000   000  00000000   0000000  
     # 000       000   000  000  000          000     000      000  0000  000  000       000       
     # 0000000   000000000  000  000000       000     000      000  000 0 000  0000000   0000000   
@@ -312,22 +359,15 @@ class TextEditor extends Editor
     
     shiftLines: (top, bot, num) =>
         
-        #     old   up  down 
-        #     
-        # top 10     8  13
-        # bot 20    18  23
-        #     
-        #     num   -2   3
-        
         oldTop = top - num
         oldBot = bot - num
-        
+
         divInto = (li,lo) =>
-            return error "no divInto? #{lo} #{li}" if not @lineDivs[lo]
+            return error "divInto - no div? #{top} #{bot} #{num} old #{oldTop} #{oldBot} lo #{lo} li #{li}" if not @lineDivs[lo]
             @lineDivs[li] = @lineDivs[lo]
             delete @lineDivs[lo]
             @lineDivs[li].replaceChild @cachedSpan(li), @lineDivs[li].firstChild
-        
+            
         if num > 0
             while oldBot < bot
                 oldBot += 1
@@ -343,28 +383,7 @@ class TextEditor extends Editor
         
         @updateLinePositions()
         @updateLayers()
-            
-    #  0000000  000   000   0000000   000   000  000      000  000   000  00000000   0000000  
-    # 000       000   000  000   000  000 0 000  000      000  0000  000  000       000       
-    # 0000000   000000000  000   000  000000000  000      000  000 0 000  0000000   0000000   
-    #      000  000   000  000   000  000   000  000      000  000  0000  000            000  
-    # 0000000   000   000   0000000   00     00  0000000  000  000   000  00000000  0000000   
-    
-    showLines: (top, bot, num) =>
-
-        @elem.innerHTML = ''
-        @lineDivs = {}
-        
-        for li in [top..bot]
-            @lineDivs[li] = elem class: 'line' 
-            @lineDivs[li].appendChild @cachedSpan li
-            @elem.appendChild @lineDivs[li]
-
-        @updateLinePositions()
-        @updateLayers()
-        @emit 'linesExposed', top:top, bot:bot, num:num
-        @emit 'linesShown', top, bot, num
-        
+                    
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000     
     # 000   000  00000000   000   000  000000000     000     0000000 
@@ -375,7 +394,7 @@ class TextEditor extends Editor
 
         for li, div of @lineDivs
             return error 'no div?' if not div?
-            y = @size.lineHeight * (li - @scroll2.top)
+            y = @size.lineHeight * (li - @scroll.top)
             div.style.transform = "translate3d(#{@size.offsetX}px,#{y}px, 0)"
             div.style.transition = "all #{animate/1000}s" if animate
             
@@ -387,7 +406,7 @@ class TextEditor extends Editor
                 
     updateLines: () ->
         
-        for li in [@scroll.exposeTop..@scroll.exposeBot]
+        for li in [@scroll.top..@scroll.bot]
             @updateLine li
 
     clearHighlights: () ->
@@ -420,8 +439,8 @@ class TextEditor extends Editor
         
         cs = []
         for c in @cursors()
-            if c[1] >= @scroll.exposeTop and c[1] <= @scroll.exposeBot
-                cs.push [c[0], c[1] - @scroll.exposeTop]
+            if c[1] >= @scroll.top and c[1] <= @scroll.bot
+                cs.push [c[0], c[1] - @scroll.top]
 
         if @numCursors() == 1
             if cs.length == 1
@@ -431,7 +450,7 @@ class TextEditor extends Editor
                         console.log "#{@name}.renderCursors mainCursor DAFUK?", @numLines(), str @mainCursor()
                     return
                     
-                ri = @mainCursor()[1]-@scroll.exposeTop
+                ri = @mainCursor()[1]-@scroll.top
                 cursorLine = @state.line(@mainCursor()[1])
                 if @mainCursor()[0] > cursorLine.length
                     cs[0][2] = 'virtual'
@@ -441,9 +460,9 @@ class TextEditor extends Editor
         else if @numCursors() > 1
             vc = [] # virtual cursors
             for c in cs
-                if isSamePos @mainCursor(), [c[0], c[1] + @scroll.exposeTop]
+                if isSamePos @mainCursor(), [c[0], c[1] + @scroll.top]
                     c[2] = 'main'
-                line = @line(@scroll.exposeTop+c[1])
+                line = @line(@scroll.top+c[1])
                 if c[0] > line.length
                     vc.push [line.length, c[1], 'virtual']
             cs = cs.concat vc
@@ -453,7 +472,7 @@ class TextEditor extends Editor
     renderSelection: ->
         
         h = ""
-        s = @selectionsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
+        s = @selectionsInLineIndexRangeRelativeToLineIndex [@scroll.top, @scroll.bot], @scroll.top
         if s
             h += render.selection s, @size
         @layerDict.selections.innerHTML = h
@@ -461,7 +480,7 @@ class TextEditor extends Editor
     renderHighlights: ->
         
         h = ""
-        s = @highlightsInLineIndexRangeRelativeToLineIndex [@scroll.exposeTop, @scroll.exposeBot], @scroll.exposeTop
+        s = @highlightsInLineIndexRangeRelativeToLineIndex [@scroll.top, @scroll.bot], @scroll.top
         if s
             h += render.selection s, @size, "highlight"
         @layerDict.highlights.innerHTML = h
@@ -472,9 +491,11 @@ class TextEditor extends Editor
     # 000   000  000      000  000  0000  000  000     
     # 0000000    0000000  000  000   000  000   000   
     
+    cursorDiv: -> $ '.cursor.main', @layerDict['cursors']
+    
     suspendBlink: ->
         
-        $('.cursor.main').classList.toggle 'blink', false
+        @cursorDiv()?.classList.toggle 'blink', false
         clearTimeout @suspendTimer
         @suspendTimer = setTimeout @releaseBlink, 600
         
@@ -493,8 +514,7 @@ class TextEditor extends Editor
         
         return if @suspendTimer? or not prefs.get 'blink'
         @blink = not @blink
-        cursor = $('.cursor.main', @layerDict['cursors'])
-        cursor?.classList.toggle 'blink', @blink
+        @cursorDiv()?.classList.toggle 'blink', @blink
         @minimap?.drawMainCursor @blink
     
     startBlink: ->
@@ -505,7 +525,7 @@ class TextEditor extends Editor
         
     stopBlink: ->
         
-        $('.cursor.main').classList.toggle 'blink', false
+        @cursorDiv()?.classList.toggle 'blink', false
         clearInterval @blinkTimer
         delete @blinkTimer
         
@@ -524,7 +544,6 @@ class TextEditor extends Editor
         return if vh == @scroll.viewHeight
         
         @scroll.setViewHeight vh
-        @scroll2.setViewHeight vh
         
         @numbers?.elem.style.height = "#{@scroll.exposeNum * @scroll.lineHeight}px"
         @layers.style.height = "#{vh}px"
@@ -572,14 +591,12 @@ class TextEditor extends Editor
     scrollBy: (delta, x=0) -> 
         
         @scroll.by delta if delta
-        @scroll2.by delta if delta
         @layers.scrollLeft += x if x
         @updateScrollOffset()
         
     scrollTo: (p) ->
         
         @scroll.to p
-        @scroll2.to p
         @updateScrollOffset()
 
     scrollCursorToTop: (topDist=7) ->
@@ -596,7 +613,7 @@ class TextEditor extends Editor
     scrollCursorIntoView: (topDist=7) ->
 
         if delta = @deltaToEnsureCursorsAreVisible()
-            @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth 
+            @scrollBy delta * @size.lineHeight - @scroll.offsetSmooth
     
     updateScrollOffset: -> 
         
@@ -632,7 +649,7 @@ class TextEditor extends Editor
         lx = clamp 0, @layers.offsetWidth,  x - br.left - @size.offsetX + @size.charWidth/3
         ly = clamp 0, @layers.offsetHeight, y - br.top
         px = parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth))
-        py = parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @scroll.exposeTop
+        py = parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @scroll.top
         p = [px, Math.min(@numLines()-1, py)]
         p
         
@@ -641,7 +658,7 @@ class TextEditor extends Editor
     lineElemAtXY:(x,y) ->
         
         p = @posAtXY x,y
-        ci = p[1]-@scroll.exposeTop
+        ci = p[1]-@scroll.top
         @layerDict['lines'].children[ci]
         
     lineSpanAtXY:(x,y) ->
@@ -661,7 +678,7 @@ class TextEditor extends Editor
         log "not found! #{x} #{y} line #{lineElem?}"
         null
 
-    viewHeight:   -> @scroll?.viewHeight ? @view?.clientHeight 
+    viewHeight:   -> @scroll?.viewHeight ? @view?.clientHeight
     numFullLines: -> Math.floor(@viewHeight() / @size.lineHeight)
     
     clearLines: =>

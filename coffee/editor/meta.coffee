@@ -21,10 +21,7 @@ class Meta
         @editor.on 'clearLines',       @onClearLines
         @editor.on 'lineInserted',     @onLineInserted
         @editor.on 'willDeleteLine',   @onWillDeleteLine
-        @editor.on 'lineExposed',      @onLineExposed
-        @editor.on 'linesExposed',     @onLinesExposed
-        @editor.on 'lineVanished',     @onLineVanished
-        @editor.on 'exposeTopChanged', @onExposeTopChanged
+        @editor.on 'linesShifted',     @onLinesShifted
         
         @editor.numbers.on 'numberAdded',   @onNumber
         @editor.numbers.on 'numberChanged', @onNumber
@@ -125,32 +122,33 @@ class Meta
                 when 'spacer'
                     e.numberSpan.innerHTML = '&nbsp;'
                     
+    #  0000000  00000000  000000000        00000000    0000000    0000000  
+    # 000       000          000           000   000  000   000  000       
+    # 0000000   0000000      000           00000000   000   000  0000000   
+    #      000  000          000           000        000   000       000  
+    # 0000000   00000000     000           000         0000000   0000000   
+    
     setMetaPos: (meta, tx, ty) ->
         
         if meta[2].no_x
             meta[2].div?.style.transform = "translateY(#{ty}px)"        
         else
             meta[2].div?.style.transform = "translate(#{tx}px,#{ty}px)"        
-
-    moveMeta: (meta, ly) ->
-        
-        if meta[2].no_x
-            meta[0] += ly
-            ty = @editor.size.lineHeight * (meta[0] - @editor.scroll.exposeTop)
-            meta[2].div?.style.transform = "translateY(#{ty}px)"
             
-    # 0000000    000  000   000
-    # 000   000  000  000   000
-    # 000   000  000   000 000 
-    # 000   000  000     000   
-    # 0000000    000      0    
+    #  0000000   0000000    0000000          0000000    000  000   000
+    # 000   000  000   000  000   000        000   000  000  000   000
+    # 000000000  000   000  000   000        000   000  000   000 000 
+    # 000   000  000   000  000   000        000   000  000     000   
+    # 000   000  0000000    0000000          0000000    000      0    
 
     addDiv: (meta) ->
 
+        # console.log 'addDiv', meta[0]
+        
         size = @editor.size
         sw = size.charWidth * (meta[1][1]-meta[1][0])
         tx = size.charWidth *  meta[1][0] + size.offsetX
-        ty = size.lineHeight * (meta[0] - @editor.scroll.exposeTop)
+        ty = size.lineHeight * (meta[0] - @editor.scroll.top)
         lh = size.lineHeight
 
         div = elem class: "meta #{meta[2].clss ? ''}"
@@ -171,8 +169,15 @@ class Meta
                         
         @elem.appendChild div
 
+    # 0000000    00000000  000           0000000    000  000   000  
+    # 000   000  000       000           000   000  000  000   000  
+    # 000   000  0000000   000           000   000  000   000 000   
+    # 000   000  000       000           000   000  000     000     
+    # 0000000    00000000  0000000       0000000    000      0      
+    
     delDiv: (meta) ->
-
+        
+        # console.log 'delDiv', meta[0]
         meta[2].div?.remove()
         meta[2].div = null
 
@@ -186,7 +191,7 @@ class Meta
         
         lineMeta = [meta.line, [meta.start, meta.end], meta]
         @metas.push lineMeta
-        if @editor.scroll.exposeTop <= meta.line <= @editor.scroll.exposeBot
+        if @editor.scroll.top <= meta.line <= @editor.scroll.bot
             @addDiv lineMeta
         
     # 0000000    000  00000000  00000000  
@@ -222,7 +227,7 @@ class Meta
         meta.no_x = true
         lineMeta = [meta.line, [0, 0], meta]
         @metas.push lineMeta
-        if @editor.scroll.exposeTop <= meta.line <= @editor.scroll.exposeBot
+        if @editor.scroll.top <= meta.line <= @editor.scroll.bot
             @addDiv lineMeta
                     
     #  0000000  000      000   0000000  000   000
@@ -256,37 +261,44 @@ class Meta
         for meta in @metasAtLineIndex li
             return meta[2].href if meta[2].href?
 
-    # 00000000  000   000  00000000    0000000    0000000  00000000
-    # 000        000 000   000   000  000   000  000       000     
-    # 0000000     00000    00000000   000   000  0000000   0000000 
-    # 000        000 000   000        000   000       000  000     
-    # 00000000  000   000  000         0000000   0000000   00000000
+    # 000      000  000   000  00000000   0000000         0000000  000   000  000  00000000  000000000  00000000  0000000    
+    # 000      000  0000  000  000       000             000       000   000  000  000          000     000       000   000  
+    # 000      000  000 0 000  0000000   0000000         0000000   000000000  000  000000       000     0000000   000   000  
+    # 000      000  000  0000  000            000             000  000   000  000  000          000     000       000   000  
+    # 0000000  000  000   000  00000000  0000000         0000000   000   000  000  000          000     00000000  0000000    
+    
+    onLinesShifted: (top, bot, num) =>
         
-    onLineExposed: (e) =>
-
-        for meta in @metasAtLineIndex e.lineIndex
-            @addDiv meta
-        
-    onLinesExposed: (e) =>
-        
-        @updatePositionsBelowLineIndex e.top
-        
-    onExposeTopChanged: (e) => 
-        
-        @updatePositionsBelowLineIndex e.new
+        # log 'meta.linesShifted', top, bot, num
+        if num > 0
+            for meta in rangesFromTopToBotInRanges top-num, top-1, @metas
+                @delDiv meta
+            
+            for meta in rangesFromTopToBotInRanges bot-num+1, bot, @metas
+                @addDiv meta
+        else
+            
+            for meta in rangesFromTopToBotInRanges bot+1, bot-num, @metas
+                @delDiv meta
+            
+            for meta in rangesFromTopToBotInRanges top, top-num-1, @metas
+                @addDiv meta
+                
+        @updatePositionsBelowLineIndex top
         
     updatePositionsBelowLineIndex: (li) ->   
         
         size = @editor.size
-        for meta in rangesFromTopToBotInRanges li, @editor.scroll.exposeBot, @metas
+        for meta in rangesFromTopToBotInRanges li, @editor.scroll.bot, @metas
             tx = size.charWidth *  meta[1][0] + size.offsetX
-            ty = size.lineHeight * (meta[0] - @editor.scroll.exposeTop)
+            ty = size.lineHeight * (meta[0] - @editor.scroll.top)
             @setMetaPos meta, tx, ty
         
     onLineInserted: (li) =>
         
         for meta in rangesFromTopToBotInRanges li, @editor.numLines(), @metas
             meta[0] += 1
+            
         @updatePositionsBelowLineIndex li
         
     # 000   000   0000000   000   000  000   0000000  000   000
@@ -304,13 +316,6 @@ class Meta
             meta[0] -= 1
             
         @updatePositionsBelowLineIndex li
-    
-    onLineVanished: (e) => 
-
-        for meta in @metasAtLineIndex e.lineIndex
-            @delDiv meta
-            
-        @updatePositionsBelowLineIndex e.lineIndex
     
     #  0000000  000      00000000   0000000   00000000 
     # 000       000      000       000   000  000   000

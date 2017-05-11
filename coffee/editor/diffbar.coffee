@@ -19,6 +19,7 @@ class Diffbar
         @elem.style.position = 'absolute'
         @elem.style.left = '0'
         @elem.style.top  = '0'
+        
         @editor.view.appendChild @elem
         @editor.on 'file', @onEditorFile
 

@@ -45,6 +45,7 @@ class Scrollbar
     # 0000000      000     000   000  000   000     000
 
     onStart: (drag, event) =>
+        
         br = @elem.getBoundingClientRect()
         sy = clamp 0, @editor.scroll.viewHeight, event.clientY - br.top
         ln = parseInt @editor.scroll.numLines * sy/@editor.scroll.viewHeight
@@ -58,6 +59,7 @@ class Scrollbar
     # 0000000    000   000  000   000   0000000
 
     onDrag: (drag) =>
+        
         delta = (drag.delta.y / (@editor.scroll.viewLines * @editor.scroll.lineHeight)) * @editor.scroll.fullHeight
         @editor.scrollBy delta
 
@@ -88,6 +90,7 @@ class Scrollbar
     onScroll: (event) => @editor.updateScrollOffset()
 
     wheelScroll: =>
+        
         @editor.scrollBy @scrollY, @scrollX
         @scrollX = @scrollY = 0
     
@@ -98,6 +101,7 @@ class Scrollbar
     #  0000000   000        0000000    000   000     000     00000000
 
     update: =>
+        
         if @editor.numLines() * @editor.size.lineHeight < @editor.viewHeight()
             @handle.style.top     = "0"
             @handle.style.height  = "0"

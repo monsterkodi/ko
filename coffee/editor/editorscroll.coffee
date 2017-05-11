@@ -1,23 +1,23 @@
 
-#  0000000   0000000  00000000    0000000   000      000          00000   
-# 000       000       000   000  000   000  000      000             000  
-# 0000000   000       0000000    000   000  000      000            000   
-#      000  000       000   000  000   000  000      000           000    
-# 0000000    0000000  000   000   0000000   0000000  0000000      000000  
+# 00000000  0000000    000  000000000   0000000   00000000          0000000   0000000  00000000    0000000   000      000      
+# 000       000   000  000     000     000   000  000   000        000       000       000   000  000   000  000      000      
+# 0000000   000   000  000     000     000   000  0000000          0000000   000       0000000    000   000  000      000      
+# 000       000   000  000     000     000   000  000   000             000  000       000   000  000   000  000      000      
+# 00000000  0000000    000     000      0000000   000   000        0000000    0000000  000   000   0000000   0000000  0000000  
 
 { clamp, log
 }      = require 'kxk'
 events = require 'events'
 kxk    = require 'kxk'
 
-class Scroll extends events
+class EditorScroll extends events
 
     constructor: (@editor) ->
 
         @lineHeight = @editor.size.lineHeight ? 0
         @viewHeight = -1
         @init()
-
+        
     # 000  000   000  000  000000000
     # 000  0000  000  000     000   
     # 000  000 0 000  000     000   
@@ -25,7 +25,7 @@ class Scroll extends events
     # 000  000   000  000     000   
 
     init: ->
-        @log 'init ---------------------'        
+        
         @scroll       =  0 # current scroll value from document start (pixels)
         @offsetTop    =  0 # height of view above first visible line (pixels)
         @offsetSmooth =  0 # smooth scrolling offset / part of top line that is hidden (pixels)
@@ -46,6 +46,7 @@ class Scroll extends events
     #  0000000  000   000  0000000   0000000  
     
     calc: ->
+        
         if @viewHeight < 0
             return
         @scrollMax   = Math.max(0,@fullHeight - @viewHeight)  # maximum scroll offset (pixels)
@@ -92,8 +93,8 @@ class Scroll extends events
         oldTop = @top
         oldBot = @bot
         
-        @top = top
-        @bot = Math.min @top+@viewLines, @numLines-1
+        @bot = Math.min top+@viewLines, @numLines-1
+        @top = Math.max 0, @bot - @viewLines
         # @log 'top', oldTop, @top, 'bot', oldBot, @bot
         return if oldTop == @top and oldBot == @bot
             
@@ -102,7 +103,7 @@ class Scroll extends events
             num = @bot - @top + 1
             
             if num > 0
-                # @log "-showLines #{@top+1} #{@bot+1} num: #{num}"
+                # @log "-showLines #{@top} #{@bot} num: #{num}"
                 @emit 'showLines', @top, @bot, num
 
         else   
@@ -110,38 +111,11 @@ class Scroll extends events
             num = @top - oldTop
             
             if 0 < Math.abs num
-                # @log "shiftLines #{@top+1} #{@bot+1} num:#{num}"
+                # @log "shiftLines #{@top} #{@bot} num:#{num}"
                 @emit 'shiftLines', @top, @bot, num
                 
-    # 000  000   000   0000000  00000000  00000000   000000000
-    # 000  0000  000  000       000       000   000     000   
-    # 000  000 0 000  0000000   0000000   0000000       000   
-    # 000  000  0000       000  000       000   000     000   
-    # 000  000   000  0000000   00000000  000   000     000   
+    lineIndexIsInView: (li) -> @top <= li <= @bot
     
-    insertLine: (li,oi) =>
-        
-        @bot       += 1 if @lineIndexIsInView oi
-        @top       += 1 if oi < @top
-        @numLines  += 1
-        @fullHeight = @numLines * @lineHeight
-        @calc()
-        
-    # 0000000    00000000  000      00000000  000000000  00000000
-    # 000   000  000       000      000          000     000     
-    # 000   000  0000000   000      0000000      000     0000000 
-    # 000   000  000       000      000          000     000     
-    # 0000000    00000000  0000000  00000000     000     00000000
-
-    deleteLine: (li,oi) =>
-        
-        @bot       -= 1 if @lineIndexIsInView oi
-    
-    lineIndexIsInView: (li) -> 
-        
-        return true if @top <= li <= @bot
-        return @bot-@top+1 < @fullLines
-
     # 00000000   00000000   0000000  00000000  000000000
     # 000   000  000       000       000          000   
     # 0000000    0000000   0000000   0000000      000   
@@ -218,4 +192,4 @@ class Scroll extends events
         log.apply log, [].splice.call arguments, 0
         log.slog.depth = 2
             
-module.exports = Scroll
+module.exports = EditorScroll

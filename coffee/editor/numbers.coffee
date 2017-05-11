@@ -15,17 +15,13 @@ class Numbers extends event
         
         @lineDivs = {}
         
-        @opacity = 0.5
-        @elem = $(".numbers", @editor.view)
+        @elem =$ ".numbers", @editor.view
         
         @editor.on 'clearLines',       @onClearLines
         
         @editor.on 'linesShown',       @onLinesShown
         @editor.on 'linesShifted',     @onLinesShifted
-        
-        @editor.on 'lineDeleted',      @onLineDeleted
-        @editor.on 'lineInserted',     @onLineInserted
-        
+
         @editor.on 'fontSizeChanged',  @onFontSizeChange
         @editor.on 'highlight',        @updateColors
         @editor.on 'changed',          @updateColors
@@ -45,10 +41,8 @@ class Numbers extends event
         @lineDivs = {}
         
         for li in [top..bot]
-
-            div = elem class: "linenumber", child: elem "span", text: "#{li+1}"
-            @elem.appendChild div
-            @lineDivs[li] = div
+            
+            div = @addLine li
             
             @emit 'numberAdded', 
                 numberDiv:  div
@@ -70,12 +64,14 @@ class Numbers extends event
         oldTop = top - num
         oldBot = bot - num
 
-        log 'onLinesShifted', oldTop, top, 'bot', oldBot, bot, num
+        # log 'onLinesShifted', oldTop, top, 'bot', oldBot, bot, num
                 
         divInto = (li,lo) =>
+            return error "no number div? top #{top} bot #{bot} num #{num} lo #{lo} li #{li}" if not @lineDivs[lo]
             @lineDivs[li] = @lineDivs[lo]
             delete @lineDivs[lo]
             @lineDivs[li].firstChild.textContent = li+1
+            @updateColor li
         
         if num > 0
             while oldBot < bot
@@ -98,8 +94,8 @@ class Numbers extends event
     
     updateLinePositions: ->
 
-        for li, div in @lineDivs
-            y = @editor.size.lineHeight * (li - @editor.scroll2.top)
+        for li, div of @lineDivs
+            y = @editor.size.lineHeight * (li - @editor.scroll.top)
             div.style.transform = "translate3d(0, #{y}px, 0)"
         
     # 000  000   000   0000000  00000000  00000000   000000000  00000000  0000000    
@@ -108,32 +104,46 @@ class Numbers extends event
     # 000  000  0000       000  000       000   000     000     000       000   000  
     # 000  000   000  0000000   00000000  000   000     000     00000000  0000000    
     
-    onLineInserted: (li, oi) =>
+    # onLineInserted: (li, oi) =>
+#         
+        # top = @editor.scroll.top
+        # bot = @editor.scroll.bot
+#         
+        # if top <= oi <= bot
+#             
+            # for i in [oi..bot]
+#                 
+                # @updateColor i
+                   
+                # div.firstChild.textContent = "#{top+i+1}"
+                # @emit 'numberChanged', 
+                    # numberDiv:  div
+                    # numberSpan: div.firstChild
+                    # lineIndex:  top+i
+#                 
+            # i = top+@elem.children.length
+#             
+            # @elem.appendChild @addLine i
+            # @updateColor i
+
+    addLine: (li) ->
         
-        top = @editor.scroll.exposeTop
-        bot = @editor.scroll.exposeBot
-        if top <= oi <= bot
-            for i in [oi-top...@elem.children.length]
-                div = @elem.children[i]
-                if not div?.firstChild?
-                    return error "Numbers.onLineInserted -- no div child? #{li} #{i} #{li-top} #{@elem.children.length}"
-                div.firstChild.textContent = "#{top+i+1}"
-                @emit 'numberChanged', 
-                    numberDiv:  div
-                    numberSpan: div.firstChild
-                    lineIndex:  top+i
-                @updateColor top+i
-            i = top+@elem.children.length
-            @elem.appendChild @addLine i
-            @updateColor i
-                    
+        div = elem class: "linenumber", child: elem "span", text: "#{li+1}"
+        div.style.height = "#{@editor.size.lineHeight}px"
+        @lineDivs[li] = div
+        @elem.appendChild div
+        div
+            
     #  0000000  000      00000000   0000000   00000000   
     # 000       000      000       000   000  000   000  
     # 000       000      0000000   000000000  0000000    
     # 000       000      000       000   000  000   000  
     #  0000000  0000000  00000000  000   000  000   000  
     
-    onClearLines: =>  @elem.innerHTML = ""
+    onClearLines: =>  
+        
+        @lineDivs = {}
+        @elem.innerHTML = ""
             
     # 0000000    00000000  000      00000000  000000000  00000000  0000000    
     # 000   000  000       000      000          000     000       000   000  
@@ -141,22 +151,17 @@ class Numbers extends event
     # 000   000  000       000      000          000     000       000   000  
     # 0000000    00000000  0000000  00000000     000     00000000  0000000    
     
-    onLineDeleted: (li) =>
-        
-        top = @editor.scroll.exposeTop
-        if top <= li
-            for i in [li-top...@elem.children.length]
-                div = @elem.children[i]
-                if not div?
-                    error "no div for lineIndex #{li}? top: #{top} children:#{@elem.children.length}" 
-                    continue
-                div.firstChild.textContent = "#{top+i+1}"
-                @updateColor top+i
-                @emit 'numberChanged', 
-                    numberDiv:  div
-                    numberSpan: div.firstChild
-                    lineIndex:  top+i
-        @elem.lastChild?.remove()
+    # onLineDeleted: (li) =>
+#         
+        # top = @editor.scroll.top
+        # if li >= top
+            # for i in [li..@editor.scroll.bot]
+                # @updateColor li
+                # @emit 'numberChanged', 
+                    # numberDiv:  div
+                    # numberSpan: div.firstChild
+                    # lineIndex:  top+i
+        # @elem.lastChild?.remove()
                 
     # 00000000   0000000   000   000  000000000
     # 000       000   000  0000  000     000   
@@ -164,8 +169,8 @@ class Numbers extends event
     # 000       000   000  000  0000     000   
     # 000        0000000   000   000     000   
         
-    onFontSizeChange: => 
-        @elem.style.lineHeight = "#{@editor.size.lineHeight}px"        
+    onFontSizeChange: =>
+        
         if @editor.size.fontSize < 13
             @elem.style.fontSize = "#{@editor.size.fontSize}px"
 
@@ -177,19 +182,17 @@ class Numbers extends event
     
     updateColors: =>
         
-        if @editor.scroll.exposeBot > @editor.scroll.exposeTop
-            for li in [@editor.scroll.exposeTop..@editor.scroll.exposeBot]
+        if @editor.scroll.bot > @editor.scroll.top
+            for li in [@editor.scroll.top..@editor.scroll.bot]
                 @updateColor li
 
     updateColor: (li) =>
         
-        top = @elem.firstChild?.lineIndex ? @editor.scroll.exposeTop
-        # log "Numbers.updateColor li:#{li}" if @editor.name == 'editor'
         si = (s[0] for s in rangesFromTopToBotInRanges li, li, @editor.selections())
         hi = (s[0] for s in rangesFromTopToBotInRanges li, li, @editor.highlights())
         ci = (s[0] for s in rangesFromTopToBotInRanges li, li, rangesFromPositions @editor.cursors())
-        child = @elem.children[li-top]
-        return if not child?
+            
+        return error "updateColor no number div? #{li}" if not @lineDivs[li]?
         cls = ''
         if li in ci
             cls += ' cursored'
@@ -199,6 +202,9 @@ class Numbers extends event
             cls += ' selected'
         if li in hi
             cls += ' highligd'            
-        child.className = 'linenumber ' + cls
+            
+        # console.log "updateColor #{li}", cls, @lineDivs[li].firstChild.textContent
+#         
+        @lineDivs[li].className = 'linenumber' + cls
                 
 module.exports = Numbers

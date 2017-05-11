@@ -6,9 +6,9 @@
 # 000   000  000  000   000  000  000   000  000   000  000      
 
 { getStyle, clamp, elem, drag, log, str
-}       = require 'kxk'
-profile = require '../tools/profile'
-scroll  = require './scroll'
+}         = require 'kxk'
+profile   = require '../tools/profile'
+MapScroll = require './mapscroll'
 
 class Minimap
 
@@ -41,10 +41,11 @@ class Minimap
         @editor.on 'highlight',     @drawHighlights
         @editor.scroll.on 'scroll', @onEditorScroll
 
-        @scroll = new scroll
+        @scroll = new MapScroll
             exposeMax:  @height/4
             lineHeight: 4
             viewHeight: 2*@editor.viewHeight()
+            
         @scroll.name = "#{@editor.name}.minimap"
             
         @drag = new drag 

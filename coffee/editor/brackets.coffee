@@ -43,7 +43,7 @@ class Brackets
     highlightInside: (pos) ->
         stack = []
         pp = pos
-        while pp[1] >= 0 # @editor.scroll.top # find last open bracket before
+        while pp[1] >= 0 # find last open bracket before
             [before, after] = @beforeAfterForPos pp
             while before.length 
                 prev = before.pop()
@@ -68,7 +68,7 @@ class Brackets
         
         stack = []
         pp = pos
-        while pp[1] <= @editor.numLines() # @editor.scroll.bot # find first close bracket after
+        while pp[1] <= @editor.numLines() # find first close bracket after
             [before, after] = @beforeAfterForPos pp
             while after.length
                 next = after.shift()

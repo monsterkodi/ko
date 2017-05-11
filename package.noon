@@ -45,7 +45,7 @@ dependencies
                 js-beautify     ^1.6.12
                 karg            >=1.0.10
                 keycode         ^2.1.8
-                kxk             ^0.16.1
+                kxk             ^0.16.2
                 lodash          ^4.17.4
                 mocha           ^3.3.0
                 nconf           ^0.8.4

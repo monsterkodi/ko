@@ -1,15 +1,15 @@
 
-#  0000000   0000000  00000000    0000000   000      000    
-# 000       000       000   000  000   000  000      000    
-# 0000000   000       0000000    000   000  000      000    
-#      000  000       000   000  000   000  000      000    
-# 0000000    0000000  000   000   0000000   0000000  0000000
+# 00     00   0000000   00000000          0000000   0000000  00000000    0000000   000      000    
+# 000   000  000   000  000   000        000       000       000   000  000   000  000      000    
+# 000000000  000000000  00000000         0000000   000       0000000    000   000  000      000    
+# 000 0 000  000   000  000                   000  000       000   000  000   000  000      000    
+# 000   000  000   000  000              0000000    0000000  000   000   0000000   0000000  0000000
 
 { clamp, log
 }      = require 'kxk'
 events = require 'events'
 
-class Scroll extends events
+class MapScroll extends events
 
     constructor: (cfg) ->
 
@@ -26,15 +26,15 @@ class Scroll extends events
     # 000  000   000  000     000   
 
     init: ->
-        @scroll       = 0 # current scroll value from document start (pixels)
-        @offsetTop    = 0 # height of view above first visible line (pixels)
-        @offsetSmooth = 0 # smooth scrolling offset / part of top line that is hidden (pixels)
-        @fullHeight   = 0 # total height of buffer (pixels)
-        @numLines     = 0 # total number of lines in buffer
-        @top          = 0 # index of first visible line in view
-        @bot          = 0 # index of last  visible line in view
-        @exposed      = 0 # number of currently exposed lines
-        @exposeTop    = 0 # index of topmost line in view (always <= @top)
+        @scroll       =  0 # current scroll value from document start (pixels)
+        @offsetTop    =  0 # height of view above first visible line (pixels)
+        @offsetSmooth =  0 # smooth scrolling offset / part of top line that is hidden (pixels)
+        @fullHeight   =  0 # total height of buffer (pixels)
+        @numLines     =  0 # total number of lines in buffer
+        @top          =  0 # index of first visible line in view
+        @bot          =  0 # index of last  visible line in view
+        @exposed      =  0 # number of currently exposed lines
+        @exposeTop    =  0 # index of topmost line in view (always <= @top)
         @exposeBot    = -1 # index of bottom line in view (always >= @bot)
         @calc()
         @offsetTop    = -1 # hack to emit initial scroll
@@ -231,4 +231,4 @@ class Scroll extends events
             @calc()
             @by 0
 
-module.exports = Scroll
+module.exports = MapScroll
