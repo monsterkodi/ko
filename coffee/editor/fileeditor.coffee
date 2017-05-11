@@ -163,18 +163,21 @@ class FileEditor extends TextEditor
         return if not @currentFile
 
         filePositions = window.stash.get 'filePositions', {}
+        
         if filePositions[@currentFile]?
+            
             s = filePositions[@currentFile]
             @setCursors    s.cursors ? [[0,0]]
             @setSelections s.selections ? []
             @setHighlights s.highlights ? []
             @setMain       s.main ? 0
             @setState @state
-            if s.scroll
-                log 's.scroll', @currentFile, s.scroll, @cursors()
-                @scroll.to s.scroll
+            
+            @scroll.to s.scroll if s.scroll
             @scroll.cursorIntoView()
+            
         else
+            
             @singleCursorAtPos [0,0]
             @scroll.top = 0 if @mainCursor()[1] == 0
             @scroll.bot = @scroll.top-1
@@ -184,6 +187,7 @@ class FileEditor extends TextEditor
 
         @updateLayers()
         @numbers?.updateColors()
+        @minimap.onEditorScroll()
         @emit 'cursor'
         @emit 'selection'
         

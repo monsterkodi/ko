@@ -5,7 +5,7 @@
 # 000  0000  000   000  000 0 000  000   000  000       000   000       000
 # 000   000   0000000   000   000  0000000    00000000  000   000  0000000 
 
-{ str, elem, log, $, _
+{ str, setStyle, elem, log, $, _
 }     = require 'kxk'
 event = require 'events'
 
@@ -119,16 +119,17 @@ class Numbers extends event
         @lineDivs = {}
         @elem.innerHTML = ""
             
-    # 00000000   0000000   000   000  000000000
-    # 000       000   000  0000  000     000   
-    # 000000    000   000  000 0 000     000   
-    # 000       000   000  000  0000     000   
-    # 000        0000000   000   000     000   
+    # 00000000   0000000   000   000  000000000       0000000  000  0000000  00000000  
+    # 000       000   000  0000  000     000         000       000     000   000       
+    # 000000    000   000  000 0 000     000         0000000   000    000    0000000   
+    # 000       000   000  000  0000     000              000  000   000     000       
+    # 000        0000000   000   000     000         0000000   000  0000000  00000000  
         
     onFontSizeChange: =>
         
-        if @editor.size.fontSize < 13
-            @elem.style.fontSize = "#{@editor.size.fontSize}px"
+        fs = Math.min 22, @editor.size.fontSize-4
+        @elem.style.fontSize = "#{fs}px"
+        setStyle '.linenumber', 'padding-top', "#{parseInt @editor.size.fontSize/10}px"
 
     #  0000000   0000000   000       0000000   00000000    0000000  
     # 000       000   000  000      000   000  000   000  000       

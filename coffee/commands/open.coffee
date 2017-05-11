@@ -176,7 +176,7 @@ class Open extends Command
             f = @history[@history.length-2]
             item = Object.create null
             item.text = relative f, @dir
-            item.line = '○'
+            item.line = ' '
             item.file = f
             item.bonus = 0x000fffff
             items.push item
@@ -206,7 +206,7 @@ class Open extends Command
                     item.line = '▸'
                     item.clss = 'directory'
                 else
-                    item.line = '○'
+                    item.line = ' '
                 item.text = rel
                 item.file = file[0]
                 items.push item

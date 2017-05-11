@@ -141,7 +141,8 @@ class Minimap
 
     drawTopBot: =>
         
-        return if @scroll.exposeBot < 0        
+        return if @scroll.exposeBot < 0   
+        
         lh = @scroll.lineHeight/2
         th = (@editor.scroll.bot-@editor.scroll.top+1)*lh
         ty = 0

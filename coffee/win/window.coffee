@@ -346,7 +346,7 @@ loadFile = (file, opt={}) ->
             
     window.split.show 'editor'
         
-    if pos? and pos[0] or pos[1] 
+    if pos? and pos[0] or pos[1]
         editor.singleCursorAtPos pos
         editor.scroll.cursorToTop()        
   

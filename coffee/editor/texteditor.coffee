@@ -153,8 +153,8 @@ class TextEditor extends Editor
         @scroll.setNumLines @numLines()
         
         @layers.scrollLeft = 0
-        @layersWidth  = @layers.offsetWidth
-        @layersHeight = @layers.offsetHeight
+        @layersWidth  = @layerScroll.offsetWidth
+        @layersHeight = @layerScroll.offsetHeight
         
         @updateLayers()
 
@@ -233,7 +233,7 @@ class TextEditor extends Editor
                     @insertLine li, di                    
         
         if changeInfo.inserts or changeInfo.deletes           
-            @layersWidth = @layers.offsetWidth
+            @layersWidth = @layerScroll.offsetWidth
             @scroll.setNumLines @numLines()
             @updateLinePositions()
 
@@ -555,20 +555,13 @@ class TextEditor extends Editor
         
         @numbers?.elem.style.height = "#{@scroll.exposeNum * @scroll.lineHeight}px"
         @layers.style.height = "#{vh}px"
-        @layersWidth = @layers.offsetWidth
+        @layersWidth = @layerScroll.offsetWidth
         
         @scroll.setViewHeight vh
         
         @emit 'viewHeight', vh
 
     screenSize: -> electron.screen.getPrimaryDisplay().workAreaSize
-    
-    #  0000000   0000000  00000000    0000000   000      000    
-    # 000       000       000   000  000   000  000      000    
-    # 0000000   000       0000000    000   000  000      000    
-    #      000  000       000   000  000   000  000      000    
-    # 0000000    0000000  000   000   0000000   0000000  0000000
-
     
     # 00000000    0000000    0000000
     # 000   000  000   000  000     
@@ -578,7 +571,7 @@ class TextEditor extends Editor
 
     posAtXY:(x,y) ->
         
-        sl = @layers.scrollLeft
+        sl = @layerScroll.scrollLeft
         st = @scroll.offsetTop
         br = @view.getBoundingClientRect()
         lx = clamp 0, @layers.offsetWidth,  x - br.left - @size.offsetX + @size.charWidth/3

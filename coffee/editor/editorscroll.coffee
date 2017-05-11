@@ -60,11 +60,13 @@ class EditorScroll extends events
     # 0000000       000   
         
     to: (p) => @by p-@scroll
+    
     by: (delta, x) =>
+        
         
         return if @viewLines < 0
         
-        @editor.layers.scrollLeft += x if x
+        @editor.layerScroll.scrollLeft += x if x
         
         return if not delta and @top < @bot
         
@@ -216,9 +218,9 @@ class EditorScroll extends events
     cursorIntoView: (topDist=7) ->
 
         if delta = @deltaToEnsureMainCursorIsVisible()
-            
             @by delta * @lineHeight - @offsetSmooth
-            @updateCursorOffset()
+            
+        @updateCursorOffset()
 
     deltaToEnsureMainCursorIsVisible: ->
         
@@ -236,17 +238,17 @@ class EditorScroll extends events
         offsetX     = @editor.size.offsetX
         charWidth   = @editor.size.charWidth
         layersWidth = @editor.layersWidth
-        scrollLeft  = @editor.layers.scrollLeft
+        scrollLeft  = @editor.layerScroll.scrollLeft
         
         cx = @editor.mainCursor()[0]*charWidth+offsetX
         
         if cx-scrollLeft > layersWidth
             
-            @editor.layers.scrollLeft = Math.max 0, cx - layersWidth + charWidth
+            @editor.layerScroll.scrollLeft = Math.max 0, cx - layersWidth + charWidth
             
         else if cx-offsetX-scrollLeft < 0
             
-            @editor.layers.scrollLeft = Math.max 0, cx - offsetX
+            @editor.layerScroll.scrollLeft = Math.max 0, cx - offsetX
             
     # 000  000   000  00000000   0000000 
     # 000  0000  000  000       000   000
