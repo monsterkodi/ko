@@ -66,7 +66,7 @@ class EditorScroll extends events
         
         @editor.layers.scrollLeft += x if x
         
-        return if not delta
+        return if not delta and @top < @bot
         
         scroll = @scroll
         delta = 0 if Number.isNaN delta
@@ -141,10 +141,10 @@ class EditorScroll extends events
     setViewHeight: (h) =>
         
         if @viewHeight != h
-            # @log 'setViewHeight', @viewHeight, h
             @bot = @top-1 # emit showLines
             @viewHeight = h
             @calc()
+            # @log 'setViewHeight', @info()
             @by 0
             
     # 000   000  000   000  00     00  000      000  000   000  00000000   0000000
@@ -156,7 +156,7 @@ class EditorScroll extends events
     setNumLines: (n) =>
 
         if @numLines != n
-            # @log 'setNumLines', @numLines, n
+            @log 'setNumLines', @numLines, n
             @numLines = n
             @fullHeight = @numLines * @lineHeight            
             if @numLines

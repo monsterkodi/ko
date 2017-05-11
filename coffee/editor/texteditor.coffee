@@ -134,6 +134,8 @@ class TextEditor extends Editor
                 
     setLines: (lines) ->
                 
+        @clearLines()
+        
         lines ?= []
         
         @spanCache = []
@@ -327,7 +329,10 @@ class TextEditor extends Editor
     # 0000000   000   000   0000000   00     00  0000000  000  000   000  00000000  0000000   
     
     showLines: (top, bot, num) =>
-
+        
+        if @name == 'editor'
+            log "showLines #{@name} top: #{top} bot:#{bot} num:#{num}"
+        
         @lineDivs = {}
         @elem.innerHTML = ''
         
@@ -613,8 +618,9 @@ class TextEditor extends Editor
     
     clearLines: =>
         
-        while lastChild = @elem.lastChild 
-            @elem.removeChild lastChild
+        # while lastChild = @elem.lastChild 
+            # @elem.removeChild lastChild
+        @elem.innerHTML = ''
         @emit 'clearLines'
 
     clear: => @setLines []
