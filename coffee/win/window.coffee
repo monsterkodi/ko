@@ -95,7 +95,7 @@ restoreWin = ->
 post.on 'shellCallbackData', (cmdData) -> commandline.commands['term'].onShellCallbackData cmdData
 post.on 'singleCursorAtPos', (pos, opt) -> 
     editor.singleCursorAtPos pos, opt
-    editor.scrollCursorToTop()
+    editor.scroll.cursorToTop()
 post.on 'focusEditor',       -> split.focus 'editor'
 post.on 'cloneFile',         -> post.toMain 'newWindowWithFile', editor.currentFile
 post.on 'reloadFile',        -> reloadFile()
@@ -348,7 +348,7 @@ loadFile = (file, opt={}) ->
         
     if pos? and pos[0] or pos[1] 
         editor.singleCursorAtPos pos
-        editor.scrollCursorToTop()        
+        editor.scroll.cursorToTop()        
   
 openFile = loadFile
 

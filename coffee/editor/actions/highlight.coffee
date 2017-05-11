@@ -39,7 +39,7 @@ module.exports =
                 when 'after'  then @selectSingleRange rangeAfterPosInRanges(@cursorPos(), hls) ? _.first hls
                 when 'before' then @selectSingleRange rangeBeforePosInRanges(@cursorPos(), hls) ? _.first hls
                 when 'first'  then @selectSingleRange _.first hls
-            @scrollCursorToTop() if not opt?.noScroll # < sucks!
+            @scroll?.cursorToTop() if not opt?.noScroll # < sucks!
         @setHighlights hls
         @renderHighlights()
         @emit 'highlight'
@@ -62,7 +62,7 @@ module.exports =
                 r = rangeAtPosInRanges cp, wordHighlights
             r ?= wordHighlights[0]
             @addRangeToSelection r
-            @scrollCursorToTop?() # < sucks!
+            @scroll?.cursorToTop() # < sucks!
             @do.end()
 
     selectAllWords: -> # command+alt+d

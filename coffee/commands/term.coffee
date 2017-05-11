@@ -51,7 +51,7 @@ class Term extends Command
         else
             terminal = window.terminal
             terminal.output cmdData.data
-            terminal.scrollCursorToTop @headers and 7 or 1
+            terminal.scroll.cursorToTop @headers and 7 or 1
 
     getPWD: (@pwdTag) ->
         

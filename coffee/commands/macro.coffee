@@ -152,7 +152,7 @@ class Macro extends Command
                         visited: colors.red
                         dim:     '^>=.:/-'
 
-                terminal.scrollCursorToTop 1
+                terminal.scroll.cursorToTop 1
                 window.split.do 'show terminal'
 
             # 00000000   00000000   0000000

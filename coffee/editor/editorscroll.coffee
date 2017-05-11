@@ -142,7 +142,7 @@ class EditorScroll extends events
         
         if @viewHeight != h
             # @log 'setViewHeight', @viewHeight, h
-            @bot = @top-1
+            @bot = @top-1 # emit showLines
             @viewHeight = h
             @calc()
             @by 0
@@ -160,6 +160,7 @@ class EditorScroll extends events
             @numLines = n
             @fullHeight = @numLines * @lineHeight            
             if @numLines
+                @bot = @top-1 if @numLines <= @viewLines # emit showLines
                 @calc()
                 @by 0
             else
@@ -189,7 +190,7 @@ class EditorScroll extends events
     
     updateOffset: -> 
                 
-        @editor.layerScroll.style.transform = "translate3d(0,-#{@offsetTop}px, 0)"
+        @editor.layers.style.transform = "translate3d(0,-#{@offsetTop}px, 0)"
             
     #  0000000  000   000  00000000    0000000   0000000   00000000   
     # 000       000   000  000   000  000       000   000  000   000  
@@ -197,7 +198,7 @@ class EditorScroll extends events
     # 000       000   000  000   000       000  000   000  000   000  
     #  0000000   0000000   000   000  0000000    0000000   000   000  
             
-    scrollCursorToTop: (topDist=7) ->
+    cursorToTop: (topDist=7) ->
         
         cp = @editor.cursorPos()
         
