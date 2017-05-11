@@ -125,7 +125,6 @@ class CommandList extends TextEditor
         @metaTimer = setTimeout @dequeueMeta, 0 if @metaQueue.length
 
     clear: ->
-
         @meta.clear()
         super
 

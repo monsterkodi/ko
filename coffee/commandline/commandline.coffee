@@ -238,7 +238,7 @@ class Commandline extends TextEditor
                 @list.appendChild div
 
     hideList: ->
-
+        return
         @list?.remove()
         @list = null
 

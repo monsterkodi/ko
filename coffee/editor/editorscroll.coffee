@@ -239,7 +239,7 @@ class EditorScroll extends events
         charWidth   = @editor.size.charWidth
         layersWidth = @editor.layersWidth
         scrollLeft  = @editor.layerScroll.scrollLeft
-        
+        console.log 'updateCursorOffset', layersWidth
         cx = @editor.mainCursor()[0]*charWidth+offsetX
         
         if cx-scrollLeft > layersWidth
