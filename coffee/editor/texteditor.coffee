@@ -282,11 +282,10 @@ class TextEditor extends Editor
         return error "deleteLine - out of bounds? li #{li}" if not @lineDivs[li]
         
         @lineDivs[li].remove()
-        
+
         for i in [li...@numLines()]
             
             if @spanCache[i+1]
-                console.log 'move cache', i
                 @spanCache[i] = @spanCache[i+1]
             else
                 delete @spanCache[i]
@@ -294,8 +293,8 @@ class TextEditor extends Editor
             if @scroll.top <= i < @scroll.bot
                 @lineDivs[i] = @lineDivs[i+1]
         
-        if @scroll.bot+1 < @numLines()
-            @lineDivs[@scroll.bot].replaceChild @cachedSpan(@scroll.bot+1), @lineDivs[@scroll.bot].firstChild
+        if li <= @scroll.bot and @scroll.bot+1 < @numLines()
+            @appendLine @scroll.bot
         
         @emit 'lineDeleted', li
         
@@ -306,18 +305,15 @@ class TextEditor extends Editor
     # 000  000   000  0000000   00000000  000   000     000     
     
     insertLine: (li, oi) ->
-        @log 'insertLine', li, oi
-                
+        
         for i in [@numLines()-1...oi]
             
             if @spanCache[i-1]
-                console.log 'move cache', i
                 @spanCache[i] = @spanCache[i-1]
             else
                 delete @spanCache[i]
                 
             if @scroll.top <= i <= @scroll.bot
-                console.log 'move div', i
                 @lineDivs[i] = @lineDivs[i-1]
 
         @spanCache[li] = render.lineSpan @syntax.getDiss(li), @size
@@ -443,21 +439,27 @@ class TextEditor extends Editor
                 cs.push [c[0], c[1] - @scroll.top]
 
         if @numCursors() == 1
+            
             if cs.length == 1
                 
-                if @mainCursor()[1] > @numLines()-1
-                    if @name == 'editor'
-                        console.log "#{@name}.renderCursors mainCursor DAFUK?", @numLines(), str @mainCursor()
-                    return
+                mc = @mainCursor()
+                
+                return if mc[1] < 0
+                
+                if mc[1] > @numLines()-1
+                    return error "#{@name}.renderCursors mainCursor DAFUK?", @numLines(), str @mainCursor()
                     
-                ri = @mainCursor()[1]-@scroll.top
-                cursorLine = @state.line(@mainCursor()[1])
-                if @mainCursor()[0] > cursorLine.length
+                ri = mc[1]-@scroll.top
+                cursorLine = @state.line(mc[1])
+                return error 'no main cursor line?' if not cursorLine?
+                if mc[0] > cursorLine.length
                     cs[0][2] = 'virtual'
                     cs.push [cursorLine.length, ri, 'main off']
                 else
                     cs[0][2] = 'main off'
+                    
         else if @numCursors() > 1
+            
             vc = [] # virtual cursors
             for c in cs
                 if isSamePos @mainCursor(), [c[0], c[1] + @scroll.top]
@@ -466,6 +468,7 @@ class TextEditor extends Editor
                 if c[0] > line.length
                     vc.push [line.length, c[1], 'virtual']
             cs = cs.concat vc
+            
         html = render.cursors cs, @size
         @layerDict.cursors.innerHTML = html
             

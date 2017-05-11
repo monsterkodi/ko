@@ -29,7 +29,6 @@ class FileEditor extends TextEditor
         @fontSizeDefault = 16
 
         super viewElem, features: ['Diffbar', 'Scrollbar', 'Numbers', 'Minimap', 'Meta', 'Autocomplete', 'Brackets', 'Strings']
-        # super viewElem, features: ['Scrollbar', 'Minimap', 'Autocomplete', 'Brackets', 'Strings']
 
         @pigmentsInit()
         @setText ''
