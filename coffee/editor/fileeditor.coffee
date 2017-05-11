@@ -170,18 +170,18 @@ class FileEditor extends TextEditor
             @setHighlights s.highlights ? []
             @setMain       s.main ? 0
             @setState @state
-            delta = (s.scroll ? @scroll.scroll) - @scroll.scroll
-            delta = @size.lineHeight * parseInt(delta / @size.lineHeight) # no idea why this is necessary
+            if s.scroll
+                log 's.scroll', @currentFile, s.scroll, @cursors()
+                @scroll.to s.scroll
+            @scroll.cursorIntoView()
         else
-            delta = 0
-            editor.singleCursorAtPos [0,0]
-
-        log 'restoreScrollCursorsAndSelections', delta, @scroll.info()
-        if delta
-            @scroll.by delta
-        else
+            @singleCursorAtPos [0,0]
+            @scroll.top = 0 if @mainCursor()[1] == 0
             @scroll.bot = @scroll.top-1
-            @scroll.setNumLines @numLines()
+            @scroll.cursorIntoView()
+
+        # log 'restoreScrollCursorsAndSelections', @mainCursor(), @scroll.info()
+
         @updateLayers()
         @numbers?.updateColors()
         @emit 'cursor'

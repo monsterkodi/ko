@@ -95,7 +95,7 @@ class Autocomplete extends event
         
         cursor = $('.main', @editor.view)
         if not cursor?
-            error "Autocomplete.open -- no cursor?"
+            error "Autocomplete.open --- no cursor?"
             return
 
         @span = elem 'span', class: 'autocomplete-span'
@@ -106,6 +106,7 @@ class Autocomplete extends event
 
         cr = cursor.getBoundingClientRect()
         spanInfo = @editor.lineSpanAtXY cr.left, cr.top
+        
         if spanInfo?
             sp = spanInfo.span
             inner = sp.innerHTML
@@ -133,8 +134,8 @@ class Autocomplete extends event
                 @span.insertAdjacentElement 'afterend', c
                 
             @moveClonesBy @completion.length
-        else
-            log "no span for autocomplete? cursor topleft: #{parseInt cr.left} #{parseInt cr.top}", info
+        # else
+            # log "no span for autocomplete? cursor topleft: #{parseInt cr.left} #{parseInt cr.top}", info
         
         if @matchList.length
             

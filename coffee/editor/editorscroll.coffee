@@ -144,7 +144,7 @@ class EditorScroll extends events
             @bot = @top-1 # emit showLines
             @viewHeight = h
             @calc()
-            # @log 'setViewHeight', @info()
+            # @log 'setViewHeight', @viewHeight
             @by 0
             
     # 000   000  000   000  00     00  000      000  000   000  00000000   0000000
@@ -154,16 +154,17 @@ class EditorScroll extends events
     # 000   000   0000000   000   000  0000000  000  000   000  00000000  0000000 
         
     setNumLines: (n) =>
-
+        
         if @numLines != n
-            @log 'setNumLines', @numLines, n
             @numLines = n
-            @fullHeight = @numLines * @lineHeight            
+            @fullHeight = @numLines * @lineHeight
             if @numLines
                 @bot = @top-1 if @numLines <= @viewLines # emit showLines
                 @calc()
+                # @log 'setNumLines', @numLines, n
                 @by 0
             else
+                @log 'setNumLines init and clear'
                 @init()
                 @log 'clearLines'
                 @emit 'clearLines'             

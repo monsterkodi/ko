@@ -330,8 +330,8 @@ class TextEditor extends Editor
     
     showLines: (top, bot, num) =>
         
-        if @name == 'editor'
-            log "showLines #{@name} top: #{top} bot:#{bot} num:#{num}"
+        # if @name == 'editor'
+            # log "showLines #{@name} top: #{top} bot:#{bot} num:#{num}"
         
         @lineDivs = {}
         @elem.innerHTML = ''
@@ -610,7 +610,6 @@ class TextEditor extends Editor
                         offsetLeft: offset
                         offsetChar: parseInt offset/@size.charWidth
                     return info
-        log "not found! #{x} #{y} line #{lineElem?}"
         null
 
     viewHeight:   -> @scroll?.viewHeight ? @view?.clientHeight
@@ -618,8 +617,6 @@ class TextEditor extends Editor
     
     clearLines: =>
         
-        # while lastChild = @elem.lastChild 
-            # @elem.removeChild lastChild
         @elem.innerHTML = ''
         @emit 'clearLines'
 
