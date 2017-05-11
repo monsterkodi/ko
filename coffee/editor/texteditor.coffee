@@ -159,7 +159,9 @@ class TextEditor extends Editor
 
     appendText: (text) ->
 
-        return error 'no text?' if not text?
+        if not text?
+            console.log "#{@name}.appendText - no text?"
+            return
 
         appended = []
         ls = text?.split /\n/
@@ -359,7 +361,11 @@ class TextEditor extends Editor
         oldBot = bot - num
 
         divInto = (li,lo) =>
-            return error "divInto - no div? #{top} #{bot} #{num} old #{oldTop} #{oldBot} lo #{lo} li #{li}" if not @lineDivs[lo]
+            
+            if not @lineDivs[lo]
+                console.log "#{@name}.shiftLines.divInto - no div? #{top} #{bot} #{num} old #{oldTop} #{oldBot} lo #{lo} li #{li}" 
+                return 
+                
             @lineDivs[li] = @lineDivs[lo]
             delete @lineDivs[lo]
             @lineDivs[li].replaceChild @cachedSpan(li), @lineDivs[li].firstChild

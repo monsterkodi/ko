@@ -23,8 +23,9 @@ class Meta
         @editor.on 'willDeleteLine',   @onWillDeleteLine
         @editor.on 'linesShifted',     @onLinesShifted
         
-        @editor.numbers.on 'numberAdded',   @onNumber
-        @editor.numbers.on 'numberChanged', @onNumber
+        if @editor.numbers?
+            @editor.numbers.on 'numberAdded',   @onNumber
+            @editor.numbers.on 'numberChanged', @onNumber
         
         @elem.addEventListener 'mousedown', @onMouseDown
 

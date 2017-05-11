@@ -137,9 +137,10 @@ class EditorScroll extends events
         
         if @viewHeight != h
             # @log 'setViewHeight', @viewHeight, h
+            @bot = @top-1
             @viewHeight = h
             @calc()
-            @by 0     
+            @by 0
             
     # 000   000  000   000  00     00  000      000  000   000  00000000   0000000
     # 0000  000  000   000  000   000  000      000  0000  000  000       000     

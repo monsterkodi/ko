@@ -89,16 +89,22 @@ class CommandList extends TextEditor
 
         if not meta?
             return error 'CommandList.appendMeta -- no meta?'
+            
         @meta.append meta
+        
         if meta.diss?
+            
             @appendLineDiss Syntax.lineForDiss(meta.diss), meta.diss
+            
         else if meta.text? and meta.text.trim().length
+            
             r    = meta.rngs ? []
             text = meta.text.trim()
             rngs = r.concat Syntax.rangesForTextAndSyntax text, meta.type or 'ko'
             matchr.sortRanges rngs
             diss = matchr.dissect rngs, join:true
             @appendLineDiss text, diss
+            
         else
             @appendLineDiss ''
 
