@@ -5,6 +5,13 @@
 // 000   000  000   000  000   000  000  000
 // 0000000    000   000  000   000  000   000
 
+// #000 #111 #181818 #282828 #333 #444 #555 
+// #666 #888 #aaa #bbb #ccc #ddd #fff       
+// #008 #22a #44f #66f #88f #aaf #bbf       
+// #b00 #f00 #f40 #f80 #fd0 #ff0 #ff8       
+// #050 #060 #080 #0a0 #3c3 #0f0            
+// #08f #f5f                                
+
 frameColor = #181818
 titleColor = #333
 backColor  = #000
@@ -36,7 +43,7 @@ body
         background      frameColor
 
 .browserColumn.focus .browserRow.active
-    background          #227
+    background          #22a
 
 .browserImage
     border              1px solid frameColor
@@ -86,7 +93,7 @@ body
 span.ko
 #commandline-button.active
     &.open
-        color           #8f0
+        color           #0f0
     &.goto
         color           #66f
     &.browse
@@ -188,7 +195,7 @@ span.ko
 #titlebar .winid
     color               #555
     &.focus
-        color           #008815
+        color           #080
 
 #titlebar .winnum
     color               titleColor
@@ -216,7 +223,7 @@ span.ko
     color               #aaa
 
 #titlebar.focus .tabs
-    color               #34C749
+    color               #3c3
 
 // 000000000   0000000   0000000
 //    000     000   000  000   000
@@ -231,7 +238,7 @@ span.ko
 .tab.clean .dot
     color               #444
     &.focus
-        color           #006600
+        color           #060
 
 .tab
     background          titleColor
@@ -319,7 +326,7 @@ span.ko
     &.highligd.selected:not(.cursored) span
         color           #bbf
     &.cursored span
-        color           #f20
+        color           #f00
     &.cursored.selected span
         color           #f80
     &.cursored.main span
@@ -435,9 +442,9 @@ span.ko
 
 .winlist
     & .dot
-        color               #006600
+        color               #060
     & .winid
-        color               #008815
+        color               #080
 
 //  0000000   000   000  000000000   0000000    0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
 // 000   000  000   000     000     000   000  000       000   000  000   000  000   000  000      000          000     000
@@ -456,12 +463,12 @@ span.ko
     &::-webkit-scrollbar
         background-color    titleColor
     &::-webkit-scrollbar-thumb
-        background-color    #55b
+        background-color    #44f
 
 .autocomplete-item
     color                   #ccc
     &.selected
-        background          #55b
+        background          #44f
         color               #ff0
 
 //  0000000   0000000  00000000    0000000   000      000      0000000     0000000   00000000
