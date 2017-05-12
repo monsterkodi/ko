@@ -87,6 +87,7 @@ class Minimap
                 ctx.fillRect offset+2*r[1][0], y, 2*(r[1][1]-r[1][0]), @scroll.lineHeight
                 
     drawLines: (top=@scroll.exposeTop, bot=@scroll.exposeBot) =>
+        console.log 'drawLines', top, bot
         ctx = @lines.getContext '2d'
         y = parseInt((top-@scroll.exposeTop)*@scroll.lineHeight)
         ctx.clearRect 0, y, @width, ((bot-@scroll.exposeTop)-(top-@scroll.exposeTop)+1)*@scroll.lineHeight        

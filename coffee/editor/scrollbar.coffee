@@ -14,7 +14,7 @@ class Scrollbar
     constructor: (@editor) ->
 
         @editor.scroll.on 'scroll',     @update
-        @editor.scroll.on 'clearLines', @update
+        # @editor.scroll.on 'clearLines', @update
         @editor.on 'viewHeight',        @update
 
         @elem = elem class: 'scrollbar left'

@@ -154,10 +154,10 @@ class TextEditor extends Editor
 
         @spanCache = []
         @lineDivs  = {}
+        @syntax.clear()
 
         super lines
 
-        @syntax.clear()
         @scroll.reset()
 
         if @scroll.viewHeight != @viewHeight()
