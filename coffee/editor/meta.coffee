@@ -21,7 +21,7 @@ class Meta
         @editor.on 'lineAppended',     @onLineAppended
         @editor.on 'clearLines',       @onClearLines
         @editor.on 'lineInserted',     @onLineInserted
-        @editor.on 'willDeleteLine',   @onWillDeleteLine
+        @editor.on 'lineDeleted',      @onLineDeleted
 
         @editor.on 'linesShown',       @onLinesShown
         @editor.on 'linesShifted',     @onLinesShifted
@@ -116,8 +116,7 @@ class Meta
         metas = @metasAtLineIndex e.lineIndex
         for meta in metas
             meta[2].span = e.numberSpan
-            # if meta[2].clss == 'commandlistItem'
-                # console.log 'onNumber', e.lineIndex, meta[2]
+
             switch meta[2].clss
                 when 'searchResult', 'termCommand', 'termResult', 'coffeeCommand', 'coffeeResult', 'commandlistItem'                    
                     num = meta[2].state == 'unsaved' and @saveButton(meta[0])
@@ -273,11 +272,11 @@ class Meta
         for meta in @metasAtLineIndex li
             return meta[2].href if meta[2].href?
 
-    # 000      000  000   000  00000000   0000000         0000000  000   000   0000000   000   000  000   000
-    # 000      000  0000  000  000       000             000       000   000  000   000  000 0 000  0000  000
-    # 000      000  000 0 000  0000000   0000000         0000000   000000000  000   000  000000000  000 0 000
-    # 000      000  000  0000  000            000             000  000   000  000   000  000   000  000  0000
-    # 0000000  000  000   000  00000000  0000000         0000000   000   000   0000000   00     00  000   000
+    #  0000000  000   000   0000000   000   000  000   000
+    # 000       000   000  000   000  000 0 000  0000  000
+    # 0000000   000000000  000   000  000000000  000 0 000
+    #      000  000   000  000   000  000   000  000  0000
+    # 0000000   000   000   0000000   00     00  000   000
 
     onLinesShown: (top, bot, num) =>
 
@@ -286,11 +285,11 @@ class Meta
             if top <= meta[0] <= bot
                 @addDiv meta
 
-    # 000      000  000   000  00000000   0000000         0000000  000   000  000  00000000  000000000  00000000  0000000
-    # 000      000  0000  000  000       000             000       000   000  000  000          000     000       000   000
-    # 000      000  000 0 000  0000000   0000000         0000000   000000000  000  000000       000     0000000   000   000
-    # 000      000  000  0000  000            000             000  000   000  000  000          000     000       000   000
-    # 0000000  000  000   000  00000000  0000000         0000000   000   000  000  000          000     00000000  0000000
+    #  0000000  000   000  000  00000000  000000000  00000000  0000000
+    # 000       000   000  000  000          000     000       000   000
+    # 0000000   000000000  000  000000       000     0000000   000   000
+    #      000  000   000  000  000          000     000       000   000
+    # 0000000   000   000  000  000          000     00000000  0000000
 
     onLinesShifted: (top, bot, num) =>
 
@@ -326,13 +325,13 @@ class Meta
 
         @updatePositionsBelowLineIndex li
 
-    # 000   000   0000000   000   000  000   0000000  000   000
-    # 000   000  000   000  0000  000  000  000       000   000
-    #  000 000   000000000  000 0 000  000  0000000   000000000
-    #    000     000   000  000  0000  000       000  000   000
-    #     0      000   000  000   000  000  0000000   000   000
-
-    onWillDeleteLine: (li) =>
+    # 0000000    00000000  000      00000000  000000000  00000000  0000000    
+    # 000   000  000       000      000          000     000       000   000  
+    # 000   000  0000000   000      0000000      000     0000000   000   000  
+    # 000   000  000       000      000          000     000       000   000  
+    # 0000000    00000000  0000000  00000000     000     00000000  0000000    
+    
+    onLineDeleted: (li) =>
 
         for meta in @metasAtLineIndex li
             @delMeta meta
