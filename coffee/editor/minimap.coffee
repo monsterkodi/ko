@@ -15,6 +15,9 @@ class Minimap
     constructor: (@editor) ->
         
         minimapWidth = parseInt getStyle '.minimap', 'width'
+        
+        @editor.layerScroll.style.right = "#{minimapWidth}px"
+        
         @width = 2*minimapWidth
         @height = 8192
         @offsetLeft = 6

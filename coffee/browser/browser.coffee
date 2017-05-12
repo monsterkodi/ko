@@ -8,7 +8,7 @@
 { fileName, encodePath, swapExt, elem, post, clamp, childp, path, fs, os, error, log,  _
 }      = require 'kxk'
 Column = require './column'
-Stage  = require '../area/stage'
+Stage  = require '../stage/stage'
 flex   = require '../win/flex/flex'
 
 class Browser extends Stage

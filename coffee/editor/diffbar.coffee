@@ -9,7 +9,7 @@
 } = require 'kxk'
 gitWatch = require '../tools/gitwatch'
 lineDiff = require '../tools/linediff'
-forkfunc = require 'fork-func'
+forkfunc = require '../tools/forkfunc'
 
 class Diffbar
 

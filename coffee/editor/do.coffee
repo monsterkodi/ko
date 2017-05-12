@@ -16,10 +16,14 @@ class Do
         
         @reset()
         
-        post.on 'fileLineChanges', (file, lineChanges) =>
-            if file == @editor.currentFile
-                @foreignChanges lineChanges
+        post.on 'fileLineChanges', @onFileLineChanges
 
+    del: -> post.removeListener 'fileLineChanges', @onFileLineChanges
+    
+    onFileLineChanges: (file, lineChanges) =>
+        if file == @editor.currentFile
+            @foreignChanges lineChanges
+                
     foreignChanges: (lineChanges) ->
         # log 'do.foreignChanges', lineChanges
         @start()
@@ -133,6 +137,7 @@ class Do
     #  0000000   000   000  0000000     0000000 
                     
     undo: ->
+        
         if @history.length
             
             if _.isEmpty @redos

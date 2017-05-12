@@ -55,6 +55,10 @@ class Editor extends Buffer
         @do                 = new Do @
         @setupFileType()
 
+    del: ->
+        
+        @do.del()
+        
     # 000000000  000   000  00000000   00000000
     #    000      000 000   000   000  000     
     #    000       00000    00000000   0000000 
@@ -62,6 +66,7 @@ class Editor extends Buffer
     #    000        000     000        00000000
     
     setupFileType: ->
+        
         oldType   = @fileType
         @fileType = 'txt'
         @fileType = Syntax.shebang @line(0) if @numLines()

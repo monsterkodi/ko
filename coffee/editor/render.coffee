@@ -31,8 +31,6 @@ class Render
     @lineSpan: (diss, size) ->
         
         div = elem class: 'linespans'
-        # div.style.height = "#{size.lineHeight}px"
-        # div.style.transform = "translate(#{size.offsetX}px,#{y}px)"
         
         if diss?.length
             for d in diss
@@ -64,7 +62,7 @@ class Render
             ty = c[1] * lh
             cls = ""
             cls = c[2] if c.length > 2
-            h += "<span class=\"cursor #{cls}\" style=\"transform: translate(#{tx}px,#{ty}px); height:#{lh}px\"></span>"
+            h += "<span class=\"cursor #{cls}\" style=\"transform:translate3d(#{tx}px,#{ty}px,0); height:#{lh}px\"></span>"
             i += 1
         h
                 

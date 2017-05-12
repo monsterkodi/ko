@@ -30,7 +30,9 @@ class FileEditor extends TextEditor
 
         super viewElem, features: ['Diffbar', 'Scrollbar', 'Numbers', 'Minimap', 'Meta', 'Autocomplete', 'Brackets', 'Strings']
 
-        @pigmentsInit()
+        @initPigments()
+        @initInvisibles()
+        
         @setText ''
 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000
@@ -181,6 +183,7 @@ class FileEditor extends TextEditor
             @singleCursorAtPos [0,0]
             @scroll.top = 0 if @mainCursor()[1] == 0
             @scroll.bot = @scroll.top-1
+            @scroll.to 0
             @scroll.cursorIntoView()
 
         # log 'restoreScrollCursorsAndSelections', @mainCursor(), @scroll.info()

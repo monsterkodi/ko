@@ -400,11 +400,6 @@ infoPadding = 6px
 
 .layerScroll
     fill-abs()
-    // position            absolute
-    // bottom              0
-    // right               0
-    // top                 0
-    // right               minimapWidth
     overflow-x          visible
     overflow-y          hidden
     &::-webkit-scrollbar
@@ -412,6 +407,7 @@ infoPadding = 6px
     
 .layers
     position            relative
+    height              10000000px
         
 #commandline-editor .layers
     min-height          commandlineHeight
@@ -447,6 +443,8 @@ infoPadding = 6px
     width                2px
     margin-right        -1px
     margin-left         -1px
+    position            absolute
+    z-index             999999999
     display             inline-block
     &.main:not(.off)
         width            4px

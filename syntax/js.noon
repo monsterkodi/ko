@@ -13,7 +13,8 @@
 
 # keywords
 
-(:?^|\s)(if|else|then|for|in|var|return|try|catch)(:?\s|$)   keyword
+(:?^|\s)(if|else|then|for|in|var|try|catch|new|bind)(:?\s|$)   keyword
+(^|\s)(return|break|continue)([\s\;]|$)   . text . keyword . syntax.punctuation
 
 # globals
 
@@ -49,10 +50,11 @@ null|undefined                 keyword.null
 
 # functions
 
-(\b\S+)(\()[^\)]*(\))              . function
-(\w+)\s*=\s*function\([^\)]*\)\s*  . function
-(\w+)\s*=\s*function               . function
-function                             function
+# (\b\S+)(\()[^\)]*(\))              . function
+# (\w+)\s*=\s*function\([^\)]*\)\s*  . function
+# (\w+)\s*=\s*function               . function
+
+function                       function
 
 # require
 

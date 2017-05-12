@@ -14,7 +14,7 @@ Terminal    = require './terminal'
 Titlebar    = require './titlebar'
 LogView     = require './logview'
 Info        = require './info'
-Area        = require '../area/area'
+Area        = require '../stage/area'
 FileEditor  = require '../editor/fileeditor'
 Commandline = require '../commandline/commandline'
 Navigate    = require '../main/navigate'
@@ -239,7 +239,7 @@ window.saveChanges = ->
 
 onMove  = -> window.stash.set 'bounds', win.getBounds()
 
-removeListeners = ->
+clearListeners = ->
     
     document.removeEventListener 'keydown', onKeyDown
     win.removeListener 'close', onClose
@@ -253,7 +253,7 @@ onClose = ->
     editor.setText ''
     editor.stopWatcher()
     window.stash.clear()
-    removeListeners()
+    clearListeners()
 
 #  0000000   000   000  000       0000000    0000000   0000000    
 # 000   000  0000  000  000      000   000  000   000  000   000  
@@ -279,7 +279,7 @@ window.onload = ->
 reloadWin = ->
     
     saveStash()
-    removeListeners()
+    clearListeners()
     editor.stopWatcher()
     win.webContents.reloadIgnoringCache()
 

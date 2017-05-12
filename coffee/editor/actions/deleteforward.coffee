@@ -8,7 +8,7 @@
 { reversed, log 
 } = require 'kxk' 
 
-module.exports = 
+module.exports =
     
     actions:
         menu: 'Delete'
@@ -30,11 +30,7 @@ module.exports =
             text:   """delete characters to the end of line, if cursor is not at end of line.
                 delete whole line otherwise.
                 """
-        test:
-            a: 'he'
-            b: 'world'
-            c: 'wordHighlights'
-
+                
     deleteToEndOfLine: ->
         
         @do.start()

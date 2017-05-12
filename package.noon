@@ -37,7 +37,6 @@ dependencies
                 entities        ^1.1.1
                 eve             ^0.5.4
                 font-awesome    ^4.7.0
-                fork-func       ^0.1.1
                 fs-extra        ^2.1.2
                 fuzzaldrin      ^2.1.0
                 fuzzy           ^0.1.3

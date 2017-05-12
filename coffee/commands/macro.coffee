@@ -80,8 +80,9 @@ class Macro extends Command
             # 000  000   000      0
 
             when 'inv'
-                editor.showInvisibles = !editor.showInvisibles
-                editor.updateLines()
+                editor.invisiblesToggle()
+                # editor.showInvisibles = !editor.showInvisibles
+                # editor.updateLines()
 
             # 0000000    000      000  000   000  000   000  
             # 000   000  000      000  0000  000  000  000   
@@ -226,10 +227,12 @@ class Macro extends Command
                 insert += '"'
                 if lst
                     insert += (", #{words[ti]}" for ti in [words.length - lst...words.length]).join ''
+                        
                 editor.do.start()
                 editor.do.insert li, insert
                 editor.singleCursorAtPos [editor.line(li).length, li]
                 editor.do.end()
+                
                 focus: editor.name
 
             #  0000000  000       0000000    0000000   0000000
