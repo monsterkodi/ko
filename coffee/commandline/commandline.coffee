@@ -39,6 +39,7 @@ class Commandline extends TextEditor
         post.on 'stash',   @stash
 
         @view.onblur = () =>
+            # return
             @button.classList.remove 'active'
             @list?.remove()
             @list = null
@@ -238,7 +239,7 @@ class Commandline extends TextEditor
                 @list.appendChild div
 
     hideList: ->
-        return
+        # return
         @list?.remove()
         @list = null
 

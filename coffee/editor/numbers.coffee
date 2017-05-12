@@ -70,10 +70,16 @@ class Numbers extends event
                 console.log "#{@editor.name}.onLinesShifted.divInto -- no number div? top #{top} bot #{bot} num #{num} lo #{lo} li #{li}" 
                 return 
                 
-            @lineDivs[li] = @lineDivs[lo]
+            numberDiv = @lineDivs[li] = @lineDivs[lo]
             delete @lineDivs[lo]
-            @lineDivs[li].firstChild.textContent = li+1
+            
+            numberSpan = numberDiv.firstChild
+            numberSpan.textContent = li+1            
             @updateColor li
+            @emit 'numberChanged',
+                numberDiv:  numberDiv
+                numberSpan: numberSpan
+                lineIndex:  li
         
         if num > 0
             while oldBot < bot

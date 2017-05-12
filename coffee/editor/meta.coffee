@@ -116,8 +116,10 @@ class Meta
         metas = @metasAtLineIndex e.lineIndex
         for meta in metas
             meta[2].span = e.numberSpan
+            # if meta[2].clss == 'commandlistItem'
+                # console.log 'onNumber', e.lineIndex, meta[2]
             switch meta[2].clss
-                when 'searchResult', 'termCommand', 'termResult', 'coffeeCommand', 'coffeeResult', 'commandlistItem'
+                when 'searchResult', 'termCommand', 'termResult', 'coffeeCommand', 'coffeeResult', 'commandlistItem'                    
                     num = meta[2].state == 'unsaved' and @saveButton(meta[0])
                     num = meta[2].line? and meta[2].line if not num
                     num = meta[2].href?.split(':')[1] if not num
@@ -254,7 +256,11 @@ class Meta
     # 000   000  000        000        000       000  0000  000   000
     # 000   000  000        000        00000000  000   000  0000000
 
-    append: (meta) -> @metas.push [@editor.numLines(), [0, 0], meta]
+    append: (meta) ->
+        
+        lineMeta = [@editor.numLines(), [0, 0], meta]
+        @metas.push lineMeta
+        lineMeta
 
     onLineAppended: (e) =>
 
