@@ -100,7 +100,7 @@ class Macro extends Command
             # 000       000   000  000      000   000  000   000  
             #  0000000   0000000   0000000   0000000   000   000  
             
-            when 'color' then editor.pigments()
+            when 'color' then editor.togglePigments()
             
             # 00000000  00000000    0000000  
             # 000       000   000  000       

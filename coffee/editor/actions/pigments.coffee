@@ -57,12 +57,12 @@ class Pigments
             
     deactivate: ->
         
-        prefs.set "pigments:#{@currentFile}"
+        prefs.set "pigments:#{@editor.currentFile}"
         @clear()
             
     activate: ->
         
-        prefs.set "pigments:#{@currentFile}", true
+        prefs.set "pigments:#{@editor.currentFile}", true
         @pigmentize()
 
     clear: -> 
