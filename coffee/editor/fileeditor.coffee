@@ -32,7 +32,7 @@ class FileEditor extends TextEditor
 
         @initPigments()
         @initInvisibles()
-        
+
         @setText ''
 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000
@@ -165,21 +165,21 @@ class FileEditor extends TextEditor
         return if not @currentFile
 
         filePositions = window.stash.get 'filePositions', {}
-        
+
         if filePositions[@currentFile]?
-            
+
             s = filePositions[@currentFile]
             @setCursors    s.cursors ? [[0,0]]
             @setSelections s.selections ? []
             @setHighlights s.highlights ? []
             @setMain       s.main ? 0
             @setState @state
-            
+
             @scroll.to s.scroll if s.scroll
             @scroll.cursorIntoView()
-            
+
         else
-            
+
             @singleCursorAtPos [0,0]
             @scroll.top = 0 if @mainCursor()[1] == 0
             @scroll.bot = @scroll.top-1
@@ -193,7 +193,7 @@ class FileEditor extends TextEditor
         @minimap.onEditorScroll()
         @emit 'cursor'
         @emit 'selection'
-        
+
     #       000  000   000  00     00  00000000
     #       000  000   000  000   000  000   000
     #       000  000   000  000000000  00000000
