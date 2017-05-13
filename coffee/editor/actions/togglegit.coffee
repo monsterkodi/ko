@@ -25,9 +25,9 @@ module.exports =
         metas = []
         untoggled = false
 
-        for li in lineIndices #.reverse()
+        for li in lineIndices
 
-            for lineMeta in @meta.metasAtLineIndex(li) #.reverse()
+            for lineMeta in @meta.metasAtLineIndex(li)
 
                 if lineMeta[2].clss.startsWith 'git'
                     lineMeta[2].li = li
@@ -54,17 +54,8 @@ module.exports =
 
             if lineMeta not in @meta.metas
                 log 'dafuk?'
-                # lineMeta[0] = lineMeta[0] - 1
-                # log 'add offset', lineMeta[2].applyOffset
-                # @meta.addLineMeta lineMeta
+
             delete lineMeta[2].li
-                # @meta.addDiv lineMeta
-            # else
-                # @meta.updatePos lineMeta
-
-
-        # @log ([m[0],m[2].line,m[2].clss,m[2].change,m[2].toggled] for m in @meta.metas)
-        # @log ([m[0],m[2].toggled and 'toggled' or ''] for m in @meta.metas)
 
         # for k,v of @meta.lineMetas
             # @log k, ([m[0], m[2].clss, m[2].applyOffset, (m[2].toggled and 'toggled' or '')] for m in v)
