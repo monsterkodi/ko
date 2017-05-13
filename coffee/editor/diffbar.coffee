@@ -188,7 +188,7 @@ class Diffbar
         
         if @editor.currentFile
 
-            log 'diffbar.update', @editor.currentFile
+            # log 'diffbar.update', @editor.currentFile
             
             forkfunc '../tools/gitdiff', @editor.currentFile, (err, changes) =>
                 

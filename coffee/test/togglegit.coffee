@@ -5,16 +5,17 @@
 #    000     000   000  000   000  000   000  000      000             000   000  000     000       
 #    000      0000000    0000000    0000000   0000000  00000000         0000000   000     000       
 
-{ childp, path, empty, post, log
-}       = require 'kxk'
-gitRoot = require '../tools/gitroot'
-{ expect,should
-}       = require 'chai'
-assert  = require 'assert'
-_       = require 'lodash'
-should()
+{ childp, path, empty, post, log, _
+}        = require 'kxk'
+{expect} = require 'chai'
+gitRoot  = require '../tools/gitroot'
+assert   = require 'assert'
 
 return if not window?.editor
+
+test = (a, b) -> 
+    if b == undefined then b = true
+    expect(a).to.eql b
 
 editor   = window.editor
 testFile = path.join gitRoot(__dirname), 'coffee', 'test', 'dir', 'git.txt'
@@ -24,10 +25,10 @@ describe 'togglegit', ->
     it 'load', ->
         
         post.emit 'newTabWithFile', testFile
-        assert editor.dirty == false
-        assert editor.currentFile == testFile
-        assert editor.text() == 'abcdefghijklmnopqrstuvwxyz'.split('').join '\n'
-        assert editor.diffbar.changes == null
+        test editor.dirty, false
+        test editor.currentFile, testFile
+        test editor.text(), 'abcdefghijklmnopqrstuvwxyz'.split('').join '\n'
+        test editor.diffbar.changes, null
         
     it 'modify', ->
         
@@ -44,40 +45,68 @@ describe 'togglegit', ->
         editor.insertCharacter 'l'
         editor.insertCharacter 'l'
         editor.insertCharacter 'o'
-        assert empty editor.diffbar.changes
+        editor.setCursors [[0,5], [0,6], [0,10], [0,13], [0,14]]
+        editor.selectMoreLines()
+        editor.deleteSelection()
+        editor.singleCursorAtPos [0,11]
+        editor.newline()
+        editor.newline()
+        editor.insertCharacter '1'
+        editor.newline()
+        editor.insertCharacter '2'
+        editor.insertCharacter '3'
+        editor.singleCursorAtPos [0,16]
+        editor.insertCharacter '4'
+        editor.moveCursors 'down'
+        editor.insertCharacter '5'
+        editor.newline()
+        editor.insertCharacter '6'
+        editor.insertCharacter '7'
+        editor.newline()
+        editor.newline()
+        editor.insertCharacter '8'
+        editor.newline()
+        editor.moveCursors 'down'
+        editor.selectMoreLines()
+        editor.selectMoreLines()
+        editor.deleteSelection()
+        
+        test empty editor.diffbar.changes
         
     it 'save', (done) ->
         post.once 'saved', (file) ->
             try
-                assert file == testFile
+                test file, testFile
             catch err
                 return done err
             editor.once 'diffbarUpdated', ->
                 try
-                    assert not empty editor.diffbar.changes
+                    test not empty editor.diffbar.changes.changes
+                    log editor.diffbar.changes.changes
                 catch err
                     return done err
                 done()
         post.emit 'saveFile'
 
     it 'revert', (done) ->
+        return
         childp.execSync "git checkout -- #{testFile}"
         
         post.once 'file', (file) ->
             
             try
-                assert file == testFile
-                assert editor.dirty == false
-                assert editor.currentFile == testFile
-                assert editor.text() == 'abcdefghijklmnopqrstuvwxyz'.split('').join '\n'
+                test file, testFile
+                test editor.dirty, false
+                test editor.currentFile, testFile
+                test editor.text(), 'abcdefghijklmnopqrstuvwxyz'.split('').join '\n'
             catch err
                 return done err
                 
             editor.once 'diffbarUpdated', ->
                 try
-                    assert empty editor.diffbar.changes
+                    test empty editor.diffbar.changes
                 catch err
                     return done err
                 done()
             
-         
+        
