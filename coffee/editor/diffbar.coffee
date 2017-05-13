@@ -21,8 +21,9 @@ class Diffbar
         @elem.style.top  = '0'
         
         @editor.view.appendChild @elem
-        @editor.on 'file', @onEditorFile
-        
+        @editor.on 'file',       @onEditorFile
+        @editor.on 'undone',     @update
+        @editor.on 'redone',     @update
         @editor.on 'linesShown', @updateScroll
 
         gitWatch.watch @editor.currentFile
@@ -47,6 +48,7 @@ class Diffbar
             @editor.do.setCursors blockIndices.map (i) -> [0,i]
             @editor.do.end()
             @editor.toggleGitChangesInLines blockIndices
+        @
 
     gitMetasAtLineIndex: (li) ->
 
@@ -90,6 +92,8 @@ class Diffbar
         @clearMetas()
 
         return if not @changes
+        
+        # log "Diffbar.updateMetas", @changes
 
         for change in @changes.changes
 
@@ -182,6 +186,8 @@ class Diffbar
 
         if @editor.currentFile
 
+            log 'update', @editor.currentFile
+            
             forkfunc '../tools/gitdiff', @editor.currentFile, (err, changes) =>
                 if not empty err
                     @changes = null

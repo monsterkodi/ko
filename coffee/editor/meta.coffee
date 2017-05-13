@@ -140,6 +140,14 @@ class Meta
         else
             meta[2].div?.style.transform = "translate(#{tx}px,#{ty}px)"
 
+    updatePos: (meta) ->
+        
+        size = @editor.size
+        ty = size.lineHeight * (meta[0] - @editor.scroll.top)
+        tx = size.charWidth *  meta[1][0] + size.offsetX
+        # log "Meta.updatePos", meta[0], meta[2].div?, tx, ty
+        @setMetaPos meta, tx, ty
+            
     #  0000000   0000000    0000000          0000000    000  000   000
     # 000   000  000   000  000   000        000   000  000  000   000
     # 000000000  000   000  000   000        000   000  000   000 000
@@ -279,6 +287,8 @@ class Meta
     # 0000000   000   000   0000000   00     00  000   000
 
     onLinesShown: (top, bot, num) =>
+        
+        # @editor.log "Meta.onLinesShown", top, bot
 
         for meta in @metas
             @delDiv meta

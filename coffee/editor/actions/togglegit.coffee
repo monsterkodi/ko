@@ -31,7 +31,6 @@ module.exports =
 
                 if lineMeta[2].clss.startsWith 'git' 
                     lineMeta[2].li = li
-                    lineMeta[0] = -1
     
                     if not lineMeta[2].toggled
                         untoggled = true
@@ -39,19 +38,31 @@ module.exports =
                     metas.push lineMeta
 
         for lineMeta in metas
-
+            
+            oi = 0
             if untoggled
                 if not lineMeta[2].toggled
                     @reverseGitChange lineMeta
             else
                 if lineMeta[2].toggled
+                    oi = lineMeta[0] - lineMeta[2].li
                     @applyGitChange lineMeta
                 else
                     @reverseGitChange lineMeta
 
-            lineMeta[0] = lineMeta[2].li
-
+            # log 'restore li', lineMeta[0], lineMeta[2].li 
+            lineMeta[0] = lineMeta[2].li + oi
+            if lineMeta not in @meta.metas
+                # log 'reinsert', lineMeta[0]
+                @meta.metas.push lineMeta
+                @meta.addDiv lineMeta
+            else
+                @meta.updatePos lineMeta
+                
             delete lineMeta[2].li
+            
+        # log ([m[0],m[2].line,m[2].clss,m[2].change,m[2].toggled] for m in @meta.metas)
+        log ([m[0],m[2].toggled and 'toggled' or ''] for m in @meta.metas)
 
     # 00000000   00000000  000   000  00000000  00000000    0000000  00000000
     # 000   000  000       000   000  000       000   000  000       000
@@ -62,10 +73,12 @@ module.exports =
     reverseGitChange: (lineMeta) ->
 
         meta = lineMeta[2]
-        li   = meta.li
-
+        li   = lineMeta[0]
+        
+        # log "togglegit.reverseGitChange", lineMeta[0], lineMeta[2].li
+        
         @do.start()
-        cursors = @do.cursors()
+        cursors    = @do.cursors()
         selections = @do.selections()
 
         switch meta.clss
@@ -100,9 +113,11 @@ module.exports =
     # 000   000  000        000        0000000     000
 
     applyGitChange: (lineMeta) ->
+        
+        log "togglegit.applyGitChange", lineMeta[0], lineMeta[2].li
 
         meta = lineMeta[2]
-        li   = meta.li
+        li   = lineMeta[0]
 
         @do.start()
         cursors = @do.cursors()

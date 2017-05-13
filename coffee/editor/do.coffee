@@ -149,6 +149,7 @@ class Do
             changes = @calculateChanges @editor.state, @state
             @editor.setState @state
             @editor.changed? changes
+            @editor.emit 'undone'
 
     # 00000000   00000000  0000000     0000000 
     # 000   000  000       000   000  000   000
@@ -170,6 +171,7 @@ class Do
             changes = @calculateChanges @editor.state, @state
             @editor.setState @state
             @editor.changed? changes
+            @editor.emit 'redone'
 
     #  0000000  00000000  000      00000000   0000000  000000000  
     # 000       000       000      000       000          000     
