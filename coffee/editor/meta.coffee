@@ -192,6 +192,7 @@ class Meta
 
     delDiv: (meta) ->
 
+        return error 'no line meta?', meta if not meta?[2]?
         meta[2].div?.remove()
         meta[2].div = null
 
@@ -201,7 +202,7 @@ class Meta
     #    000     000        000 000      000
     #    000     00000000  000   000     000
 
-    addLineMeta: (meta) ->
+    add: (meta) ->
 
         lineMeta = @addLineMeta [meta.line, [meta.start, meta.end], meta]
 
@@ -269,6 +270,8 @@ class Meta
 
     addLineMeta: (lineMeta) ->
         
+        return error 'invalid line meta?', lineMeta if not lineMeta?[2]?
+        
         @lineMetas[lineMeta[0]] ?= []
         @lineMetas[lineMeta[0]].push lineMeta
         @metas.push lineMeta
@@ -276,7 +279,7 @@ class Meta
 
     moveLineMeta: (lineMeta, d) ->
         return error 'invalid move?', lineMeta, d if not lineMeta? or d == 0
-        log 'moveLineMeta', lineMeta[0], d
+        # log 'moveLineMeta', lineMeta[0], d
         _.pull @lineMetas[lineMeta[0]], lineMeta
         delete @lineMetas[lineMeta[0]] if empty @lineMetas[lineMeta[0]]
         lineMeta[0] += d
@@ -349,7 +352,6 @@ class Meta
 
         for meta in rangesFromTopToBotInRanges li, @editor.numLines(), @metas
             @moveLineMeta meta, 1
-            # meta[0] += 1
 
         @updatePositionsBelowLineIndex li
 
@@ -365,7 +367,6 @@ class Meta
             @delMeta meta
 
         for meta in rangesFromTopToBotInRanges li, @editor.numLines(), @metas
-            # meta[0] -= 1
             @moveLineMeta meta, -1
 
         @updatePositionsBelowLineIndex li
@@ -390,8 +391,7 @@ class Meta
 
     delMeta: (meta) ->
         if not meta?
-            a=1+1
-            return error 'del meta not meta?'
+            return error 'del no meta?'
         _.pull @lineMetas[meta[0]], meta
         _.pull @metas, meta
         @delDiv meta
@@ -399,7 +399,7 @@ class Meta
     delClass: (clss) ->
 
         for meta in _.clone @metas
-            clsss = meta?[2].clss?.split ' '
+            clsss = meta?[2]?.clss?.split ' '
             if not empty(clsss) and clss in clsss
                 @delMeta meta
 

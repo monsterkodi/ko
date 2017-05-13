@@ -224,7 +224,7 @@ class Diffbar
 
             for meta in @editor.meta.metas
                 
-                continue if not meta[2].git?
+                continue if not meta?[2]?.git?
                 
                 li     = meta[0]
                 length = meta[2].length

@@ -7,7 +7,7 @@
 
 { prefs, error, log
 } = require 'kxk'
-
+   
 class Invisibles
 
     constructor: (@editor) -> @editor.on 'file', @onFile
@@ -25,7 +25,7 @@ class Invisibles
 
         line = @editor.line li
         kind = line.endsWith(' ') and 'trailing' or 'newline'
-        @editor.meta.addLineMeta
+        @editor.meta.add
             line:  li
             html:  '&#9687'
             start: line.length
@@ -46,7 +46,7 @@ class Invisibles
 
     activate: ->
 
-        prefs.set "invisibles:#{@editor.currentFile}", true
+        prefs.set "invisibles:#{@editor.currentFile ? @editor.name}", true
         @show()
 
     clear: ->
@@ -76,7 +76,8 @@ module.exports =
 
     toggleInvisibles: ->
 
-        if prefs.get "invisibles:#{@currentFile}"
+        return if not @invisibles
+        if prefs.get "invisibles:#{@currentFile ? @name}"
             @invisibles.deactivate()
         else
             @invisibles.activate()

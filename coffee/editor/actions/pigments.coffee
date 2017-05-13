@@ -33,7 +33,7 @@ class Pigments
             ri = -1
             for rng in rngs
                 ri++
-                @editor.meta.addLineMeta 
+                @editor.meta.add
                     line:  li
                     start: line.length + 2 + ri * 3
                     end:   line.length + 2 + ri * 3 + 2
