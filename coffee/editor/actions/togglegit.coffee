@@ -1,9 +1,4 @@
 
-# 000000000   0000000    0000000    0000000   000      00000000         0000000   000  000000000
-#    000     000   000  000        000        000      000             000        000     000
-#    000     000   000  000  0000  000  0000  000      0000000         000  0000  000     000
-#    000     000   000  000   000  000   000  000      000             000   000  000     000
-#    000      0000000    0000000    0000000   0000000  00000000         0000000   000     000
 
 { reversed, empty, log, _
 } = require 'kxk'
@@ -81,6 +76,8 @@ module.exports =
         cursors    = @do.cursors()
         selections = @do.selections()
 
+        meta.toggled = true
+        
         switch meta.clss
 
             when 'git mod', 'git mod boring'
@@ -103,9 +100,6 @@ module.exports =
         @do.select selections
         @do.end()
 
-        meta.div?.classList.add 'toggled'
-        meta.toggled = true
-
     #  0000000   00000000   00000000   000      000   000
     # 000   000  000   000  000   000  000       000 000
     # 000000000  00000000   00000000   000        00000
@@ -123,6 +117,7 @@ module.exports =
         cursors = @do.cursors()
         selections = @do.selections()
 
+        delete meta.toggled
         switch meta.clss
 
             when 'git mod', 'git mod boring'
@@ -145,6 +140,3 @@ module.exports =
         @do.setCursors cursors, main:'closest'
         @do.select selections
         @do.end()
-
-        meta.div?.classList.remove 'toggled'
-        delete meta.toggled

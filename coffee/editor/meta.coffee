@@ -170,6 +170,8 @@ class Meta
         meta[2].div = div
         div.meta = meta
 
+        div.classList.add 'toggled' if meta[2].toggled # git change toggled
+        
         if not meta[2].no_h
             div.style.height = "#{lh}px"
 
