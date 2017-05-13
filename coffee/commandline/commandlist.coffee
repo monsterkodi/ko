@@ -37,6 +37,12 @@ class CommandList extends TextEditor
 
         @clear()
         index = 0
+        
+        viewHeight = @size.lineHeight * Math.min @maxLines, items.length
+        @view.style.height = "#{viewHeight}px"
+        if viewHeight != @scroll.viewHeight
+            @log 'addItems', viewHeight
+            @resized()
 
         for item in items
             continue if not item?
@@ -60,9 +66,7 @@ class CommandList extends TextEditor
                 index: index
                 click: @onMetaClick
 
-            index += 1
-        @view.style.height = "#{@size.lineHeight * Math.min @maxLines, items.length}px"
-        @resized()
+            index += 1            
 
     onMetaClick: (meta) =>
 
@@ -119,6 +123,7 @@ class CommandList extends TextEditor
         @metaTimer = setTimeout @dequeueMeta, 0 if @metaQueue.length
 
     clear: ->
+        
         @meta.clear()
         super
 

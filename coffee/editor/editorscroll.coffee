@@ -31,8 +31,8 @@ class EditorScroll extends events
         @offsetSmooth =  0 # smooth scrolling offset / part of top line that is hidden (pixels)
         
         @fullHeight   = -1 # total height of buffer (pixels)
-        @fullLines    = -1 # number of lines in view (excluding partials)
-        @viewLines    = -1 # number of lines in view (including partials)
+        @fullLines    = -1 # number of full lines fitting in view (excluding partials)
+        @viewLines    = -1 # number of lines fitting in view (including partials)
         @scrollMax    = -1 # maximum scroll offset (pixels)
         @numLines     = -1 # total number of lines in buffer
         @top          = -1 # index of first visible line in view
@@ -141,10 +141,9 @@ class EditorScroll extends events
     setViewHeight: (h) =>
         
         if @viewHeight != h
-            @bot = @top-1 # emit showLines
+            @bot = @top-1 # always emit showLines if height changes
             @viewHeight = h
             @calc()
-            # @log 'setViewHeight', @viewHeight
             @by 0
             
     # 000   000  000   000  00     00  000      000  000   000  00000000   0000000
@@ -153,16 +152,15 @@ class EditorScroll extends events
     # 000  0000  000   000  000 0 000  000      000  000  0000  000            000
     # 000   000   0000000   000   000  0000000  000  000   000  00000000  0000000 
         
-    setNumLines: (n) =>
+    setNumLines: (n, opt) =>
         
         if @numLines != n
             @fullHeight = n * @lineHeight
             if n
-                # @bot = @top-1 if n < @numLines # always emit showLines if lines deleted
-                @bot = @top-1 # always emit showLines if line number changes
+                if opt?.showLines != false
+                    @bot = @top-1 # always emit showLines if line number changes
                 @numLines = n
                 @calc()
-                # @log 'setNumLines', @numLines, n
                 @by 0
             else
                 @log 'setNumLines init and clear'

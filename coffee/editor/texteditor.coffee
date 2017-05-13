@@ -172,6 +172,12 @@ class TextEditor extends Editor
 
         @updateLayers()
 
+    #  0000000   00000000   00000000   00000000  000   000  0000000    
+    # 000   000  000   000  000   000  000       0000  000  000   000  
+    # 000000000  00000000   00000000   0000000   000 0 000  000   000  
+    # 000   000  000        000        000       000  0000  000   000  
+    # 000   000  000        000        00000000  000   000  0000000    
+    
     appendText: (text) ->
 
         if not text?
@@ -188,7 +194,9 @@ class TextEditor extends Editor
         if @scroll.viewHeight != @viewHeight()
             @scroll.setViewHeight @viewHeight()
 
-        @scroll.setNumLines @numLines()
+        showLines = (@scroll.bot < @scroll.top) or (@scroll.bot < @scroll.viewLines)
+        # @log 'appendText', showLines, @scroll.info()
+        @scroll.setNumLines @numLines(), showLines:showLines
 
         for li in appended
             @emit 'lineAppended',
@@ -735,5 +743,6 @@ class TextEditor extends Editor
         log.slog.depth = 3
         log.apply log, [].splice.call arguments, 0
         log.slog.depth = 2
+        # console.log.apply console, [].splice.call arguments, 0
 
 module.exports = TextEditor

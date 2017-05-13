@@ -80,7 +80,7 @@ module.exports =
         selections = @do.selections()
 
         meta.toggled = true
-        meta.div.classList.add 'toggled'
+        meta.div?.classList.add 'toggled'
         
         switch meta.clss
 
@@ -122,7 +122,7 @@ module.exports =
         selections = @do.selections()
 
         delete meta.toggled
-        meta.div.classList.remove 'toggled'
+        meta.div?.classList.remove 'toggled'
         
         switch meta.clss
 
