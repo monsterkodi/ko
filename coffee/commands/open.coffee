@@ -172,7 +172,7 @@ class Open extends Command
         @lastFileIndex = 0
         @dir = resolve '~' if not @dir?
 
-        if @history? not @navigating and not opt?.currentText and @history.length > 1
+        if @history? and not @navigating and not opt?.currentText and @history.length > 1
             f = @history[@history.length-2]
             item = Object.create null
             item.text = relative f, @dir
@@ -394,6 +394,12 @@ class Open extends Command
         else if @getText() == '.'
             
             @setText @dir
+            
+    stopWalkers: ->
+        
+        @thisWalker.stop()
+        @fastWalker.stop()
+        @walker.stop()
                     
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
@@ -422,7 +428,7 @@ class Open extends Command
                     navigating: true
                     dir:        resolved
                 return text: @dir+'/', select: false
-
+        
         @hideList()
 
         if listValue
@@ -450,6 +456,9 @@ class Open extends Command
         opened = window.openFiles files, options
         
         if opened?.length
+            
+            @stopWalkers()
+            
             if opened.length == 1
                 super opened[0]
             else
