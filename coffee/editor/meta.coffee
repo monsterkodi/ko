@@ -13,7 +13,8 @@ class Meta
 
     constructor: (@editor) ->
 
-        @metas = [] # [ [lineIndex, [start, end], {href: ...}], ... ]
+        @metas     = [] # [ [lineIndex, [start, end], {href: ...}], ... ]
+        @lineMetas = {} # { lineIndex: [ lineMeta, ... ], ... }
 
         @elem =$ ".meta", @editor.view
 
@@ -202,8 +203,8 @@ class Meta
 
     addLineMeta: (meta) ->
 
-        lineMeta = [meta.line, [meta.start, meta.end], meta]
-        @metas.push lineMeta
+        lineMeta = @addLineMeta [meta.line, [meta.start, meta.end], meta]
+
         if @editor.scroll.top <= meta.line <= @editor.scroll.bot
             @addDiv lineMeta
 
@@ -238,8 +239,8 @@ class Meta
     addNumberMeta: (meta) ->
 
         meta.no_x = true
-        lineMeta = [meta.line, [0, 0], meta]
-        @metas.push lineMeta
+        lineMeta = @addLineMeta [meta.line, [0, 0], meta]
+
         if @editor.scroll.top <= meta.line <= @editor.scroll.bot
             @addDiv lineMeta
 
@@ -263,16 +264,34 @@ class Meta
 
     append: (meta) ->
         
-        lineMeta = [@editor.numLines(), [0, 0], meta]
+        lineMeta = @addLineMeta [@editor.numLines(), [0, 0], meta]
+        lineMeta
+
+    addLineMeta: (lineMeta) ->
+        
+        @lineMetas[lineMeta[0]] ?= []
+        @lineMetas[lineMeta[0]].push lineMeta
         @metas.push lineMeta
         lineMeta
 
+    moveLineMeta: (lineMeta, d) ->
+        return error 'invalid move?', lineMeta, d if not lineMeta? or d == 0
+        log 'moveLineMeta', lineMeta[0], d
+        _.pull @lineMetas[lineMeta[0]], lineMeta
+        delete @lineMetas[lineMeta[0]] if empty @lineMetas[lineMeta[0]]
+        lineMeta[0] += d
+        @lineMetas[lineMeta[0]] ?= []
+        @lineMetas[lineMeta[0]].push lineMeta
+        @updatePos lineMeta
+        
     onLineAppended: (e) =>
 
         for meta in @metasAtLineIndex e.lineIndex
             meta[1][1] = e.text.length if meta[1][1] is 0
 
-    metasAtLineIndex: (li) -> rangesAtLineIndexInRanges li, @metas
+    # metasAtLineIndex: (li) -> rangesAtLineIndexInRanges li, @metas
+    metasAtLineIndex: (li) -> @lineMetas[li] ? []
+        
     hrefAtLineIndex:  (li) ->
 
         for meta in @metasAtLineIndex li
@@ -329,7 +348,8 @@ class Meta
     onLineInserted: (li) =>
 
         for meta in rangesFromTopToBotInRanges li, @editor.numLines(), @metas
-            meta[0] += 1
+            @moveLineMeta meta, 1
+            # meta[0] += 1
 
         @updatePositionsBelowLineIndex li
 
@@ -341,11 +361,12 @@ class Meta
     
     onLineDeleted: (li) =>
 
-        for meta in @metasAtLineIndex li
+        while meta = _.last @metasAtLineIndex li
             @delMeta meta
 
         for meta in rangesFromTopToBotInRanges li, @editor.numLines(), @metas
-            meta[0] -= 1
+            # meta[0] -= 1
+            @moveLineMeta meta, -1
 
         @updatePositionsBelowLineIndex li
 
@@ -365,9 +386,13 @@ class Meta
 
         @elem.innerHTML = ""
         @metas = []
+        @lineMetas = {}
 
     delMeta: (meta) ->
-
+        if not meta?
+            a=1+1
+            return error 'del meta not meta?'
+        _.pull @lineMetas[meta[0]], meta
         _.pull @metas, meta
         @delDiv meta
 
