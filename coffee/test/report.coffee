@@ -44,12 +44,12 @@ class Report
                 log @indent(), ''
                 log @indent(), '    ▶ expected:'
                 e = str err.expected
-                for l in e.split('\n').slice 1
+                for l in e.split('\n') #.slice 1
                     log @indent(), '     ', l
                 log @indent(), ''
                 log @indent(), '    ▷ actual:'
                 e = str err.actual
-                for l in e.split('\n').slice 1
+                for l in e.split('\n') #.slice 1
                     log @indent(), '     ', l
 
         runner.on 'end', -> # log ''

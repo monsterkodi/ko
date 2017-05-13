@@ -19,6 +19,7 @@ test = (a, b) ->
 
 editor   = window.editor
 testFile = path.join gitRoot(__dirname), 'coffee', 'test', 'dir', 'git.txt'
+original = 'abcdefghijklmnopqrstuvwxyz'.split('').join '\n'
 
 describe 'togglegit', ->
         
@@ -27,7 +28,7 @@ describe 'togglegit', ->
         post.emit 'newTabWithFile', testFile
         test editor.dirty, false
         test editor.currentFile, testFile
-        test editor.text(), 'abcdefghijklmnopqrstuvwxyz'.split('').join '\n'
+        test editor.text(), original
         test editor.diffbar.changes, null
         
     it 'modify', ->
@@ -60,6 +61,8 @@ describe 'togglegit', ->
         editor.moveCursors 'down'
         editor.insertCharacter '5'
         editor.newline()
+        editor.insertCharacter 'v'
+        editor.newline()
         editor.insertCharacter '6'
         editor.insertCharacter '7'
         editor.newline()
@@ -74,6 +77,7 @@ describe 'togglegit', ->
         test empty editor.diffbar.changes
         
     it 'save', (done) ->
+        
         post.once 'saved', (file) ->
             try
                 test file, testFile
@@ -88,8 +92,14 @@ describe 'togglegit', ->
                 done()
         post.emit 'saveFile'
 
+    it 'undo all', ->
+        
+        editor.cursorInAllLines()
+        editor.toggleGitChange()
+        test editor.text(), original
+        
     it 'revert', (done) ->
-        return
+        return done()
         childp.execSync "git checkout -- #{testFile}"
         
         post.once 'file', (file) ->
@@ -98,7 +108,7 @@ describe 'togglegit', ->
                 test file, testFile
                 test editor.dirty, false
                 test editor.currentFile, testFile
-                test editor.text(), 'abcdefghijklmnopqrstuvwxyz'.split('').join '\n'
+                test editor.text(), original
             catch err
                 return done err
                 
