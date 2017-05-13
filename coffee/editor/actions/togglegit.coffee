@@ -94,9 +94,10 @@ module.exports =
                     cursorDelta nc, 0, -1
 
             when 'git del'
+                li += 1
                 for line in reversed meta.change
-                    @do.insert li+1, line.old
-                    for nc in positionsBelowLineIndexInPositions li+1, cursors
+                    @do.insert li, line.old
+                    for nc in positionsBelowLineIndexInPositions li, cursors
                         cursorDelta nc, 0, +1
 
         @do.setCursors cursors, main:'closest'
@@ -143,8 +144,8 @@ module.exports =
 
             when 'git del'
 
+                li += 1
                 for line in reversed meta.change
-                    li += 1
                     @do.delete li
                     for nc in positionsBelowLineIndexInPositions li, cursors
                         cursorDelta nc, 0, -1

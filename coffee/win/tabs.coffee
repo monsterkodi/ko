@@ -140,10 +140,13 @@ class Tabs
     #  0000000  0000000   0000000   0000000   00000000  
     
     closeTab: (tab = @activeTab()) ->
+        
         if tab.dirty()
             tab.saveChanges()
+            
         tab.nextOrPrev().activate()
         tab.close()
+        
         _.pull @tabs, tab
         @update()
         @
@@ -180,7 +183,7 @@ class Tabs
         @update()
         tab
 
-    onNewTabWithFile: (file) => 
+    onNewTabWithFile: (file) =>
         
         if tab = @tab file
             tab.activate()

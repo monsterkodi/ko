@@ -36,8 +36,9 @@ class State
     
     line:      (i) -> 
         if not @s.lines[i]?
-            log 'dafuk?'
-        @s.lines[i]?.text
+            console.log 'dafuk?'
+            return null
+        @s.lines[i].text
     cursor:    (i) -> @s.cursors[i]   .asMutable deep: true 
     selection: (i) -> @s.selections[i].asMutable deep: true 
     highlight: (i) -> @s.highlights[i].asMutable deep: true 

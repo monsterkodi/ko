@@ -1,9 +1,9 @@
 
-# 000000000   0000000    0000000    0000000   000      00000000         0000000   000  000000000    
-#    000     000   000  000        000        000      000             000        000     000       
-#    000     000   000  000  0000  000  0000  000      0000000         000  0000  000     000       
-#    000     000   000  000   000  000   000  000      000             000   000  000     000       
-#    000      0000000    0000000    0000000   0000000  00000000         0000000   000     000       
+# 000000000   0000000    0000000    0000000   000      00000000         0000000   000  000000000
+#    000     000   000  000        000        000      000             000        000     000
+#    000     000   000  000  0000  000  0000  000      0000000         000  0000  000     000
+#    000     000   000  000   000  000   000  000      000             000   000  000     000
+#    000      0000000    0000000    0000000   0000000  00000000         0000000   000     000
 
 { childp, path, empty, post, log, _
 }        = require 'kxk'
@@ -13,7 +13,7 @@ assert   = require 'assert'
 
 return if not window?.editor
 
-test = (a, b) -> 
+test = (a, b) ->
     if b == undefined then b = true
     expect(a).to.eql b
 
@@ -23,29 +23,208 @@ simpleFile = path.join gitRoot(__dirname), 'coffee', 'test', 'dir', 'simple.txt'
 simpleText = '123456'.split('').join '\n'
 original   = 'abcdefghijklmnopqrstuvwxyz'.split('').join '\n'
 
-describe 'simple', ->
+# 000       0000000    0000000   0000000    
+# 000      000   000  000   000  000   000  
+# 000      000   000  000000000  000   000  
+# 000      000   000  000   000  000   000  
+# 0000000   0000000   000   000  0000000    
+
+loadFile = (file, text, done) ->
     
-    it 'load', ->
+    editor.once 'file', (f) ->
         
-        post.emit 'newTabWithFile', simpleFile
-        test editor.dirty, false
-        test editor.currentFile, simpleFile
+        try
+            test f, file
+            test editor.text(), text
+        catch err
+            return done err
+            
+        editor.once 'diffbarUpdated', (changes) ->
+            try
+                test changes.file, file
+                test empty changes.changes
+            catch err
+                return done err
+            done()
+        
+    post.emit 'newTabWithFile', file
+
+#  0000000   0000000   000   000  00000000
+# 000       000   000  000   000  000
+# 0000000   000000000   000 000   0000000
+#      000  000   000     000     000
+# 0000000   000   000      0      00000000
+
+saveFile = (file, done) ->
+
+    post.once 'saved', (f) ->
+        try
+            test f, file
+        catch err
+            return done err
+
+        editor.once 'diffbarUpdated', (changes) ->
+            try
+                test changes.file, file
+                test changes.error == undefined
+                test not empty changes.changes
+            catch err
+                return done err
+            done()
+
+    post.emit 'saveFile'
+
+# 00000000   00000000  000   000  00000000  00000000   000000000
+# 000   000  000       000   000  000       000   000     000
+# 0000000    0000000    000 000   0000000   0000000       000
+# 000   000  000          000     000       000   000     000
+# 000   000  00000000      0      00000000  000   000     000
+
+revertFile = (file, text, done) ->
+
+    editor.once 'file', (f) ->
+        try
+            test f, file
+            test editor.currentFile, file
+            test editor.text(), text
+        catch err
+            return done err
+
+        editor.once 'diffbarUpdated', (changes) ->
+
+            try
+                test changes.file, file
+                test changes.error == undefined
+                test empty changes?.changes
+            catch err
+                return done err
+
+            post.once 'tabClosed', (tf) ->
+                if tf == file
+                    done()
+                else
+                    done new Error "wrong tab closed? #{tf} != #{file}"
+                    
+            post.emit 'closeTabOrWindow'
+
+    try
+        childp.execSync "git checkout -- #{file}"
+    catch err
+        done err
+
+# 0000000    00000000  000      00000000  000000000  00000000
+# 000   000  000       000      000          000     000
+# 000   000  0000000   000      0000000      000     0000000
+# 000   000  000       000      000          000     000
+# 0000000    00000000  0000000  00000000     000     00000000
+
+describe 'delete', ->
+
+    it 'load', (done) -> loadFile simpleFile, simpleText, done
+
+    it 'modify', ->
+
+        editor.setCursors [[0,2], [0,3], [0,4]]
+        editor.selectMoreLines()
+        editor.deleteSelection()
+        test editor.text(), '126'.split('').join '\n'
+
+    it 'save', (done) -> saveFile simpleFile, done
+
+    it 'undo all', ->
+
+        editor.cursorInAllLines()
+        editor.toggleGitChange()
+
         test editor.text(), simpleText
-        test editor.diffbar.changes, null
-    
-    
+
+    it 'redo all', ->
+
+        editor.cursorInAllLines()
+        editor.toggleGitChange()
+
+        test editor.text(), '126'.split('').join '\n'
+
+    it 'undo again', ->
+
+        editor.cursorInAllLines()
+        editor.toggleGitChange()
+
+        test editor.text(), simpleText
+
+    it 'revert', (done) -> revertFile simpleFile, simpleText, done
+
+#  0000000  000  00     00  00000000   000      00000000
+# 000       000  000   000  000   000  000      000
+# 0000000   000  000000000  00000000   000      0000000
+#      000  000  000 0 000  000        000      000
+# 0000000   000  000   000  000        0000000  00000000
+
+describe 'simple', ->
+
+    it 'load', (done) -> loadFile simpleFile, simpleText, done
+
+    it 'modify', ->
+
+        editor.singleCursorAtPos [0,1]
+        editor.insertCharacter 'a'
+        editor.moveCursors 'down'
+        editor.insertCharacter 'b'
+        editor.newline()
+        editor.insertCharacter '5'
+        editor.newline()
+        editor.insertCharacter 'd'
+        editor.newline()
+        editor.moveCursors 'down'
+        editor.selectMoreLines()
+        editor.selectMoreLines()
+        editor.deleteSelection()
+        
+        test editor.text(), '1\na2\n3b\n5\nd\n\n6'
+
+    it 'save', (done) -> saveFile simpleFile, done
+
+    it 'undo all', ->
+
+        editor.cursorInAllLines()
+        editor.toggleGitChange()
+
+        test editor.text(), simpleText
+
+    it 'redo all', ->
+
+        editor.cursorInAllLines()
+        editor.toggleGitChange()
+
+        test editor.text(), '1\na2\n3b\n5\nd\n\n6'
+
+    it 'undo again', ->
+
+        editor.cursorInAllLines()
+        editor.toggleGitChange()
+
+        test editor.text(), simpleText
+        
+    it 'revert', (done) -> revertFile simpleFile, simpleText, done
+
+#  0000000   0000000   00     00  00000000   000      00000000  000   000
+# 000       000   000  000   000  000   000  000      000        000 000
+# 000       000   000  000000000  00000000   000      0000000     00000
+# 000       000   000  000 0 000  000        000      000        000 000
+#  0000000   0000000   000   000  000        0000000  00000000  000   000
+
 describe 'complex', ->
     return
     it 'load', ->
-        
+
         post.emit 'newTabWithFile', testFile
         test editor.dirty, false
         test editor.currentFile, testFile
         test editor.text(), original
         test editor.diffbar.changes, null
-        
+
     it 'modify', ->
-        
+
         editor.singleCursorAtPos [1,1]
         editor.insertCharacter 'a'
         editor.insertCharacter 'd'
@@ -77,20 +256,19 @@ describe 'complex', ->
         editor.insertCharacter 'v'
         editor.newline()
         editor.insertCharacter '6'
+        editor.newline()
+        editor.newline()
         editor.insertCharacter '7'
-        editor.newline()
-        editor.newline()
-        editor.insertCharacter '8'
         editor.newline()
         editor.moveCursors 'down'
         editor.selectMoreLines()
         editor.selectMoreLines()
         editor.deleteSelection()
-        
+
         test empty editor.diffbar.changes
-        
+
     it 'save', (done) ->
-        
+
         post.once 'saved', (file) ->
             try
                 test file, testFile
@@ -110,13 +288,13 @@ describe 'complex', ->
         editor.cursorInAllLines()
         editor.toggleGitChange()
         test editor.text(), original
-        
+
     it 'revert', (done) ->
         return done()
         childp.execSync "git checkout -- #{testFile}"
-        
+
         post.once 'file', (file) ->
-            
+
             try
                 test file, testFile
                 test editor.dirty, false
@@ -124,12 +302,11 @@ describe 'complex', ->
                 test editor.text(), original
             catch err
                 return done err
-                
+
             editor.once 'diffbarUpdated', ->
                 try
+                    test changes.error == undefined
                     test empty editor.diffbar.changes
                 catch err
                     return done err
                 done()
-            
-        
