@@ -17,12 +17,25 @@ test = (a, b) ->
     if b == undefined then b = true
     expect(a).to.eql b
 
-editor   = window.editor
-testFile = path.join gitRoot(__dirname), 'coffee', 'test', 'dir', 'git.txt'
-original = 'abcdefghijklmnopqrstuvwxyz'.split('').join '\n'
+editor     = window.editor
+testFile   = path.join gitRoot(__dirname), 'coffee', 'test', 'dir', 'git.txt'
+simpleFile = path.join gitRoot(__dirname), 'coffee', 'test', 'dir', 'simple.txt'
+simpleText = '123456'.split('').join '\n'
+original   = 'abcdefghijklmnopqrstuvwxyz'.split('').join '\n'
 
-describe 'togglegit', ->
+describe 'simple', ->
+    
+    it 'load', ->
         
+        post.emit 'newTabWithFile', simpleFile
+        test editor.dirty, false
+        test editor.currentFile, simpleFile
+        test editor.text(), simpleText
+        test editor.diffbar.changes, null
+    
+    
+describe 'complex', ->
+    return
     it 'load', ->
         
         post.emit 'newTabWithFile', testFile
@@ -93,7 +106,7 @@ describe 'togglegit', ->
         post.emit 'saveFile'
 
     it 'undo all', ->
-        
+        return
         editor.cursorInAllLines()
         editor.toggleGitChange()
         test editor.text(), original
