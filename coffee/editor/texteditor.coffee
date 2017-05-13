@@ -245,7 +245,6 @@ class TextEditor extends Editor
                     
                 when 'deleted'
                     @spanCache = @spanCache.slice 0, di
-                    @emit 'willDeleteLine', @line di 
                     @emit 'lineDeleted', di
                     
                 when 'inserted'

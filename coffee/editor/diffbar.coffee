@@ -22,6 +22,8 @@ class Diffbar
         
         @editor.view.appendChild @elem
         @editor.on 'file', @onEditorFile
+        
+        @editor.on 'linesShown', @updateScroll
 
         gitWatch.watch @editor.currentFile
         post.on 'gitRefChanged', @update
@@ -93,13 +95,19 @@ class Diffbar
 
             li = change.line-1
 
+            boring = @isBoring change 
+        
             if change.mod?
 
                 for mod in change.mod
+                    
                     meta =
                         line: li
-                        clss: 'git mod' + (@isBoring(change) and ' boring' or '')
+                        clss: 'git mod' + (boring and ' boring' or '')
+                        git:  'mod'
                         change: mod
+                        boring: boring 
+                        length: change.mod.length
                         click: @onMetaClick
                     @editor.meta.addDiffMeta meta
                     li++
@@ -109,8 +117,11 @@ class Diffbar
                 for add in change.add
                     meta =
                         line: li
-                        clss: 'git add' + (@isBoring(change) and ' boring' or '')
+                        clss: 'git add' + (boring and ' boring' or '')
+                        git:  'add'
                         change: add
+                        length: change.add.length
+                        boring: boring
                         click: @onMetaClick
 
                     @editor.meta.addDiffMeta meta
@@ -120,8 +131,11 @@ class Diffbar
 
                 meta =
                     line: li
-                    clss: 'git del' + (@isBoring(change) and ' boring' or '')
+                    clss: 'git del' + (boring and ' boring' or '')
+                    git:  'del'
                     change: change.del
+                    length: 1
+                    boring: boring                        
                     click: @onMetaClick
                 @editor.meta.addDiffMeta meta
 
@@ -174,22 +188,22 @@ class Diffbar
                     return
                 if changes.file == @editor.currentFile
                     @changes = changes
-                    @paint()
-
+                    @updateMetas()
+                    @updateScroll()
+            
         else
             @changes = null
-            @paint()
-
-    # 00000000    0000000   000  000   000  000000000
-    # 000   000  000   000  000  0000  000     000
-    # 00000000   000000000  000  000 0 000     000
-    # 000        000   000  000  000  0000     000
-    # 000        000   000  000  000   000     000
-
-    paint: =>
-
-        @updateMetas()
-
+            @updateMetas()
+            @updateScroll()
+            
+    #  0000000   0000000  00000000    0000000   000      000      
+    # 000       000       000   000  000   000  000      000      
+    # 0000000   000       0000000    000   000  000      000      
+    #      000  000       000   000  000   000  000      000      
+    # 0000000    0000000  000   000   0000000   0000000  0000000  
+    
+    updateScroll: =>
+        
         w  = 2
         h  = Math.min @editor.scroll.fullHeight, @editor.view.clientHeight
         lh = h / @editor.numLines()
@@ -202,26 +216,30 @@ class Diffbar
 
         if @changes
 
-            for change in @changes.changes
-
-                li = change.line - 1
-
-                if change.mod?
-                    o = change.mod.length
-                    ctx.fillStyle = @isBoring(change) and "rgba(50,50,50,#{alpha o})" or "rgba(0,255,0,#{alpha o})"
-                    ctx.fillRect 0, li * lh, w, o * lh
-                    li += o
-
-                if change.del?
-                    o = 1
-                    ctx.fillStyle = @isBoring(change) and "rgba(50,50,50,#{alpha o})" or "rgba(255,0,0,#{alpha o})"
-                    ctx.fillRect 0, li * lh, w, o * lh
-
-                if change.add?
-                    o = change.add.length
-                    ctx.fillStyle = @isBoring(change) and "rgba(50,50,50,#{alpha o})" or "rgba(160,160,255,#{alpha o})"
-                    ctx.fillRect 0, li * lh, w, o * lh
-
+            for meta in @editor.meta.metas
+                
+                continue if not meta[2].git?
+                
+                li     = meta[0]
+                length = meta[2].length
+                boring = meta[2].boring
+                
+                ctx.fillStyle = switch meta[2].git
+                    
+                    when 'mod'
+                        if boring then "rgba(50, 50,50,#{alpha length})"
+                        else           "rgba( 0,255, 0,#{alpha length})"
+                           
+                    when 'del'
+                        if boring then "rgba(50,50,50,#{alpha length})"
+                        else           "rgba(255,0,0,#{alpha length})"
+                        
+                    when 'add'
+                        if boring then "rgba(50,50,50,#{alpha length})"
+                        else           "rgba(160,160,255,#{alpha length})"
+                        
+                ctx.fillRect 0, li * lh, w, lh
+            
     #  0000000  000      00000000   0000000   00000000
     # 000       000      000       000   000  000   000
     # 000       000      0000000   000000000  0000000
