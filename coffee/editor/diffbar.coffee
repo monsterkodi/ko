@@ -184,23 +184,28 @@ class Diffbar
 
     update: =>
 
+        @changes = null
+        
         if @editor.currentFile
 
-            # log 'diffbar.update', @editor.currentFile
+            log 'diffbar.update', @editor.currentFile
             
             forkfunc '../tools/gitdiff', @editor.currentFile, (err, changes) =>
+                
                 if not empty err
-                    @changes = null
+                    @editor.emit 'diffbarUpdated'
                     return
+                    
                 if changes.file == @editor.currentFile
-                    @changes = changes
+                    @changes = changes if not empty changes.changes
                     @updateMetas()
                     @updateScroll()
-            
-        else
-            @changes = null
+                    
+                @editor.emit 'diffbarUpdated'
+        else            
             @updateMetas()
             @updateScroll()
+            @editor.emit 'diffbarUpdated'
             
     #  0000000   0000000  00000000    0000000   000      000      
     # 000       000       000   000  000   000  000      000      

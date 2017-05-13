@@ -101,7 +101,7 @@ class FileEditor extends TextEditor
 
     restoreFromTabState: (tabsState) ->
 
-        log 'restoreFromTabState', tabsState
+        # log 'restoreFromTabState', tabsState
         return error "no tabsState.file?" if not tabsState.file?
         @clear skip:true
         @setCurrentFile tabsState.file, restoreState:tabsState.state
