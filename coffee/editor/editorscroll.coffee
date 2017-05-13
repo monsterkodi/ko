@@ -63,7 +63,6 @@ class EditorScroll extends events
     
     by: (delta, x) =>
         
-        
         return if @viewLines < 0
         
         @editor.layerScroll.scrollLeft += x if x
@@ -102,15 +101,14 @@ class EditorScroll extends events
         
         @bot = Math.min top+@viewLines, @numLines-1
         @top = Math.max 0, @bot - @viewLines
-        # @log 'top', oldTop, @top, 'bot', oldBot, @bot
+
         return if oldTop == @top and oldBot == @bot
             
-        if (@top > oldBot) or (@bot < oldTop) # new range outside, start from scratch
-            
+        if (@top > oldBot) or (@bot < oldTop) or (oldBot < oldTop) 
+            # new range outside, start from scratch
             num = @bot - @top + 1
             
             if num > 0
-                # @log "-showLines #{@top} #{@bot} num: #{num}"
                 @emit 'showLines', @top, @bot, num
 
         else   
@@ -118,7 +116,6 @@ class EditorScroll extends events
             num = @top - oldTop
             
             if 0 < Math.abs num
-                # @log "shiftLines #{@top} #{@bot} num:#{num}"
                 @emit 'shiftLines', @top, @bot, num
                 
     lineIndexIsInView: (li) -> @top <= li <= @bot

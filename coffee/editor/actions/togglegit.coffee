@@ -1,4 +1,9 @@
 
+# 000000000   0000000    0000000    0000000   000      00000000         0000000   000  000000000  
+#    000     000   000  000        000        000      000             000        000     000     
+#    000     000   000  000  0000  000  0000  000      0000000         000  0000  000     000     
+#    000     000   000  000   000  000   000  000      000             000   000  000     000     
+#    000      0000000    0000000    0000000   0000000  00000000         0000000   000     000     
 
 { reversed, empty, log, _
 } = require 'kxk'
@@ -45,10 +50,8 @@ module.exports =
                 else
                     @reverseGitChange lineMeta
 
-            # log 'restore li', lineMeta[0], lineMeta[2].li 
             lineMeta[0] = lineMeta[2].li + oi
             if lineMeta not in @meta.metas
-                # log 'reinsert', lineMeta[0]
                 @meta.metas.push lineMeta
                 @meta.addDiv lineMeta
             else
@@ -56,8 +59,8 @@ module.exports =
                 
             delete lineMeta[2].li
             
-        # log ([m[0],m[2].line,m[2].clss,m[2].change,m[2].toggled] for m in @meta.metas)
-        log ([m[0],m[2].toggled and 'toggled' or ''] for m in @meta.metas)
+        # @log ([m[0],m[2].line,m[2].clss,m[2].change,m[2].toggled] for m in @meta.metas)
+        # @log ([m[0],m[2].toggled and 'toggled' or ''] for m in @meta.metas)
 
     # 00000000   00000000  000   000  00000000  00000000    0000000  00000000
     # 000   000  000       000   000  000       000   000  000       000
@@ -77,6 +80,7 @@ module.exports =
         selections = @do.selections()
 
         meta.toggled = true
+        meta.div.classList.add 'toggled'
         
         switch meta.clss
 
@@ -108,7 +112,7 @@ module.exports =
 
     applyGitChange: (lineMeta) ->
         
-        log "togglegit.applyGitChange", lineMeta[0], lineMeta[2].li
+        # log "togglegit.applyGitChange", lineMeta[0], lineMeta[2].li
 
         meta = lineMeta[2]
         li   = lineMeta[0]
@@ -118,6 +122,8 @@ module.exports =
         selections = @do.selections()
 
         delete meta.toggled
+        meta.div.classList.remove 'toggled'
+        
         switch meta.clss
 
             when 'git mod', 'git mod boring'

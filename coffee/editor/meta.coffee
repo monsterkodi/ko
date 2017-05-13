@@ -145,7 +145,6 @@ class Meta
         size = @editor.size
         ty = size.lineHeight * (meta[0] - @editor.scroll.top)
         tx = size.charWidth *  meta[1][0] + size.offsetX
-        # log "Meta.updatePos", meta[0], meta[2].div?, tx, ty
         @setMetaPos meta, tx, ty
             
     #  0000000   0000000    0000000          0000000    000  000   000
@@ -155,8 +154,6 @@ class Meta
     # 000   000  0000000    0000000          0000000    000      0
 
     addDiv: (meta) ->
-
-        # console.log 'addDiv', meta[0]
 
         size = @editor.size
         sw = size.charWidth * (meta[1][1]-meta[1][0])
@@ -194,7 +191,6 @@ class Meta
 
     delDiv: (meta) ->
 
-        # console.log 'delDiv', meta[0]
         meta[2].div?.remove()
         meta[2].div = null
 
