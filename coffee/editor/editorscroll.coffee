@@ -159,10 +159,11 @@ class EditorScroll extends events
     setNumLines: (n) =>
         
         if @numLines != n
-            @numLines = n
-            @fullHeight = @numLines * @lineHeight
-            if @numLines
-                @bot = @top-1 if @numLines <= @viewLines # emit showLines
+            @fullHeight = n * @lineHeight
+            if n
+                # @bot = @top-1 if n < @numLines # always emit showLines if lines deleted
+                @bot = @top-1 # always emit showLines if line number changes
+                @numLines = n
                 @calc()
                 # @log 'setNumLines', @numLines, n
                 @by 0

@@ -106,7 +106,7 @@ class Do
     insert: (index, text) -> @state = @state.insertLine index, text
     delete: (index) ->
         if @editor.numLines() > 1 and 0 <= index < @editor.numLines()
-            @editor.emit 'willDeleteLine', index, @editor.line(index)
+            @editor.emit 'willDeleteLine', @editor.line index 
             @state = @state.deleteLine index
 
     # 00000000  000   000  0000000  

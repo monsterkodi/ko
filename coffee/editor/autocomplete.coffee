@@ -326,7 +326,7 @@ class Autocomplete extends event
     onLinesAppended:  (lines)    => @parseLines lines, action: 'append'
     onLineInserted:   (li)       => @parseLines [@editor.line(li)], action: 'insert'
     onLineChanged:    (li)       => @parseLines [@editor.line(li)], action: 'change', count: 0
-    onWillDeleteLine: (li, line) => @parseLines [line], action: 'delete', count: -1
+    onWillDeleteLine: (line)     => @parseLines [line], action: 'delete', count: -1
     onLinesSet:       (lines)    => @parseLines lines, action: 'set' if lines.length
 
     # 000   000  00000000  000   000

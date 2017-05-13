@@ -42,7 +42,7 @@ class TextEditor extends Editor
         @syntax = new syntax @
 
         @spanCache = [] # cache for rendered line spans
-        @lineDivs  = {} #  maps line numbers to displayed divs
+        @lineDivs  = {} # maps line numbers to displayed divs
 
         @config.lineHeight ?= 1.2
 
@@ -238,13 +238,19 @@ class TextEditor extends Editor
         for change in changeInfo.changes
             [di,li,ch] = [change.doIndex, change.newIndex, change.change]
             switch ch
+                
                 when 'changed'
                     @updateLine li, di
                     @emit 'lineChanged', li
+                    
                 when 'deleted'
-                    @deleteLine di
+                    @spanCache = @spanCache.slice 0, di
+                    @emit 'willDeleteLine', @line di 
+                    @emit 'lineDeleted', di
+                    
                 when 'inserted'
-                    @insertLine li, di
+                    @spanCache = @spanCache.slice 0, di
+                    @emit 'lineInserted', li, di
 
         if changeInfo.inserts or changeInfo.deletes
             @layersWidth = @layerScroll.offsetWidth
@@ -284,64 +290,7 @@ class TextEditor extends Editor
 
         div = @lineDivs[oi]
         div.replaceChild @spanCache[li], div.firstChild
-
-    # 0000000    00000000  000      00000000  000000000  00000000
-    # 000   000  000       000      000          000     000
-    # 000   000  0000000   000      0000000      000     0000000
-    # 000   000  000       000      000          000     000
-    # 0000000    00000000  0000000  00000000     000     00000000
-
-    deleteLine: (li) ->
-
-        log "deleteLine li:#{li}"
-
-        return if li < @scroll.top
-        return if li > @scroll.bot
-        return error "deleteLine - out of bounds? li #{li}" if not @lineDivs[li]
-
-        @emit 'willDeleteLine', li, @line li
-
-        @lineDivs[li].remove()
-
-        for i in [li...@numLines()]
-
-            if @spanCache[i+1]
-                @spanCache[i] = @spanCache[i+1]
-            else
-                delete @spanCache[i]
-
-            if @scroll.top <= i < @scroll.bot
-                @lineDivs[i] = @lineDivs[i+1]
-
-        if li <= @scroll.bot and @scroll.bot+1 < @numLines()
-            @appendLine @scroll.bot
-
-        @emit 'lineDeleted', li
-
-    # 000  000   000   0000000  00000000  00000000   000000000
-    # 000  0000  000  000       000       000   000     000
-    # 000  000 0 000  0000000   0000000   0000000       000
-    # 000  000  0000       000  000       000   000     000
-    # 000  000   000  0000000   00000000  000   000     000
-
-    insertLine: (li, oi) ->
-
-        for i in [@numLines()-1...oi]
-
-            if @spanCache[i-1]
-                @spanCache[i] = @spanCache[i-1]
-            else
-                delete @spanCache[i]
-
-            if @scroll.top <= i <= @scroll.bot
-                @lineDivs[i] = @lineDivs[i-1]
-
-        @spanCache[li] = render.lineSpan @syntax.getDiss(li), @size
-        if @scroll.lineIndexIsInView li
-            @appendLine li
-
-        @emit 'lineInserted', li, oi
-
+        
     #  0000000  000   000   0000000   000   000  000      000  000   000  00000000   0000000
     # 000       000   000  000   000  000 0 000  000      000  0000  000  000       000
     # 0000000   000000000  000   000  000000000  000      000  000 0 000  0000000   0000000
@@ -349,7 +298,9 @@ class TextEditor extends Editor
     # 0000000   000   000   0000000   00     00  0000000  000  000   000  00000000  0000000
 
     showLines: (top, bot, num) =>
-
+        
+        # @log 'show lines', top, bot
+        
         @lineDivs = {}
         @elem.innerHTML = ''
 
@@ -374,7 +325,9 @@ class TextEditor extends Editor
     # 0000000   000   000  000  000          000     0000000  000  000   000  00000000  0000000
 
     shiftLines: (top, bot, num) =>
-
+        
+        # @log 'shiftlines', top, bot
+        
         oldTop = top - num
         oldBot = bot - num
 
@@ -417,7 +370,7 @@ class TextEditor extends Editor
     #  0000000   000        0000000    000   000     000     00000000
 
     updateLinePositions: (animate=0) ->
-
+        
         for li, div of @lineDivs
             return error 'no div?' if not div?
             y = @size.lineHeight * (li - @scroll.top)
