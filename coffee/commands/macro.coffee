@@ -82,7 +82,7 @@ class Macro extends Command
             # 000  000   000      0
 
             when 'inv'
-                editor.invisiblesToggle()
+                window.textEditor.toggleInvisibles()
 
             # 0000000    000      000  000   000  000   000  
             # 000   000  000      000  0000  000  000  000   
@@ -299,6 +299,7 @@ class Macro extends Command
                 editor.do.end()
                 
             else
+                
                 # 000000000  00000000    0000000   000   000   0000000  00000000   0000000   00000000   00     00    
                 #    000     000   000  000   000  0000  000  000       000       000   000  000   000  000   000    
                 #    000     0000000    000000000  000 0 000  0000000   000000    000   000  0000000    000000000    
@@ -306,7 +307,8 @@ class Macro extends Command
                 #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000    
                 
                 if command in editor.Transform.transformNames
-                    editor.Transform.do editor, command
+                    if window.textEditor?.Transform?
+                        window.textEditor.Transform.do window.textEditor, command
 
         text: ''
 

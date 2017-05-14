@@ -52,6 +52,12 @@ class Buffer extends event
     setMain:       (m) -> @state = @state.setMain       m     
     addHighlight:  (h) -> @state = @state.addHighlight  h
     
+    select: (s) -> 
+        
+        @do.start()
+        @do.select s
+        @do.end()
+    
     #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
     # 000       000   000  000   000  000       000   000  000   000  000     
     # 000       000   000  0000000    0000000   000   000  0000000    0000000 
@@ -74,8 +80,13 @@ class Buffer extends event
 
     wordAtCursor: -> @wordAtPos @mainCursor()
     wordAtPos: (c) -> @textInRange @rangeForWordAtPos c
-    wordsAtCursors: (cs=@cursors(), opt) -> (@textInRange @rangeForWordAtPos(c, opt) for c in cs)
+    # wordsAtCursors: (cs=@cursors(), opt) -> (@textInRange @rangeForWordAtPos(c, opt) for c in cs)
+    wordsAtCursors: (cs=@cursors(), opt) -> (@textInRange r for r in @rangesForWordsAtCursors cs, opt)
 
+    rangesForWordsAtCursors: (cs=@cursors(), opt) -> 
+        rngs = (@rangeForWordAtPos(c, opt) for c in cs)
+        rngs = cleanRanges rngs
+        
     selectionTextOrWordAtCursor: () ->
         
         if @numSelections() == 1 

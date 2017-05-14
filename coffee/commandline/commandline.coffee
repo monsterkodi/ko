@@ -319,9 +319,7 @@ class Commandline extends TextEditor
                     if @command?.complete()
                         return
                     if @numSelections()
-                        @do.start()
-                        @do.select []
-                        @do.end()
+                        @select []
                     return
                 else if combo == 'tab'
                     return

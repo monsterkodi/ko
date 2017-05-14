@@ -31,7 +31,6 @@ Browser     = remote.BrowserWindow
 win         = window.win   = remote.getCurrentWindow()
 winID       = window.winID = win.id
 editor      = null
-focusEditor = null
 logview     = null
 area        = null
 terminal    = null
@@ -107,8 +106,11 @@ post.on 'openFile',   (opt)  -> openFile  opt
 post.on 'reloadTab', (file)  -> reloadTab file 
 post.on 'loadFile',  (file)  -> loadFile  file
 post.on 'loadFiles', (files) -> openFiles files
-post.on 'editorFocus', (editor) -> focusEditor = editor
 post.on 'menuCombo', (combo) -> menuCombo combo
+post.on 'editorFocus', (editor) ->
+    log 'window editorFocus', editor.name
+    window.focusEditor = editor
+    window.textEditor = editor if editor.name != 'commandline-editor'
 
 # testing related ...
 
@@ -127,7 +129,7 @@ post.on 'postEditorState', ->
 # 000   000  000  000  0000  000 0 000  000   000  000  000  0000  
 # 00     00  000  000   000  000   000  000   000  000  000   000  
 
-winMain = -> 
+winMain = ->
     
     # 000  000   000  000  000000000  
     # 000  0000  000  000     000     
@@ -146,6 +148,8 @@ winMain = ->
     logview     = window.logview     = new LogView 'logview'
     info        = window.info        = new Info editor
     fps         = window.fps         = new FPS()
+    
+    window.textEditor  = window.focusEditor = editor
     
     restoreWin()
     
@@ -530,8 +534,6 @@ window.onfocus = (event) ->
         else
             split.focus 'commandline-editor'
 
-            
-            
 # 000   000  00000000  000   000
 # 000  000   000        000 000 
 # 0000000    0000000     00000  
@@ -541,8 +543,8 @@ window.onfocus = (event) ->
 menuCombo = (combo) ->
     
     {mod, key, combo, char} = keyinfo.forCombo combo
-    log 'menuCombo', combo, focusEditor.name, mod, key, char
-    return if 'unhandled' != focusEditor.handleModKeyComboCharEvent mod, key, combo, char
+    log 'menuCombo', combo, window.focusEditor.name, mod, key, char
+    return if 'unhandled' != window.focusEditor.handleModKeyComboCharEvent mod, key, combo, char
     handleModKeyComboCharEvent mod, key, combo, char
 
 onKeyDown = (event) ->
