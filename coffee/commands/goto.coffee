@@ -76,7 +76,7 @@ class Goto extends Command
                 line -= 1
             line = clamp 0, editor.numLines()-1, line
             editor.singleCursorAtPos [0,line], extend: @name == 'selecto'
-            editor.scrollCursorToTop()
+            editor.scroll.cursorToTop()
             focus: @focus
             do: "show #{editor.name}"
         else if command.length

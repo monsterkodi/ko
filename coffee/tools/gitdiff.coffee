@@ -5,11 +5,11 @@
 # 000   000  000     000     000   000  000  000       000         
 #  0000000   000     000     0000000    000  000       000         
 
-{ escapePath, childp, path, str, log, _
+{ escapePath, resolve, childp, path, str, log, _
 }      = require 'kxk'
 chalk  = require 'chalk'
 
-module.exports = (file) ->
+gitDiff = (file) ->
 
     gitCommand = "git --no-pager diff -U0 \"#{escapePath file}\""
 
@@ -60,5 +60,11 @@ module.exports = (file) ->
     
             info.changes.push change
 
+    log 'gitdiff', info
     return info
+
+if module.parent
+    module.exports = gitDiff
+else
+    log gitDiff resolve process.argv[2]
     

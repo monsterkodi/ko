@@ -37,6 +37,12 @@ class CommandList extends TextEditor
 
         @clear()
         index = 0
+        
+        viewHeight = @size.lineHeight * Math.min @maxLines, items.length
+        @view.style.height = "#{viewHeight}px"
+        if viewHeight != @scroll.viewHeight
+            @log 'addItems', viewHeight
+            @resized()
 
         for item in items
             continue if not item?
@@ -60,9 +66,7 @@ class CommandList extends TextEditor
                 index: index
                 click: @onMetaClick
 
-            index += 1
-        @view.style.height = "#{@size.lineHeight * Math.min @maxLines, items.length}px"
-        @resized()
+            index += 1            
 
     onMetaClick: (meta) =>
 
@@ -89,7 +93,9 @@ class CommandList extends TextEditor
 
         if not meta?
             return error 'CommandList.appendMeta -- no meta?'
-        @meta.append meta
+            
+        @meta.addDiv @meta.append meta
+
         if meta.diss?
             @appendLineDiss Syntax.lineForDiss(meta.diss), meta.diss
         else if meta.text? and meta.text.trim().length
@@ -98,9 +104,7 @@ class CommandList extends TextEditor
             rngs = r.concat Syntax.rangesForTextAndSyntax text, meta.type or 'ko'
             matchr.sortRanges rngs
             diss = matchr.dissect rngs, join:true
-            @appendLineDiss text, diss
-        else
-            @appendLineDiss ''
+            @appendLineDiss text, diss            
 
     queueMeta: (meta) ->
 
@@ -119,7 +123,7 @@ class CommandList extends TextEditor
         @metaTimer = setTimeout @dequeueMeta, 0 if @metaQueue.length
 
     clear: ->
-
+        
         @meta.clear()
         super
 

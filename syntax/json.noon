@@ -7,7 +7,7 @@
 
 \S+                             text
 
-"([^"]+)"                       string
+(")([^"]+)(")                   . string.marker.double . string.double . string.marker.double
 
 # keys
 

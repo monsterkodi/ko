@@ -54,6 +54,7 @@ class Tabs
             tab.foreignChanges lineChanges
         
     onFileSaved: (file, winID) =>
+        
         return error "fileSaved from this window? #{file} #{winID}" if winID == window.winID
         tab = @tab file
         if tab? and tab != @activeTab()
@@ -109,7 +110,7 @@ class Tabs
         
     onDragStop: (d,e) =>
         
-        @dragTab.div.style.opacity = '1'
+        @dragTab.div.style.opacity = ''
         @dragDiv.remove()
 
     # 000000000   0000000   0000000    
@@ -140,10 +141,13 @@ class Tabs
     #  0000000  0000000   0000000   0000000   00000000  
     
     closeTab: (tab = @activeTab()) ->
+        
         if tab.dirty()
             tab.saveChanges()
+            
         tab.nextOrPrev().activate()
         tab.close()
+        
         _.pull @tabs, tab
         @update()
         @
@@ -180,7 +184,7 @@ class Tabs
         @update()
         tab
 
-    onNewTabWithFile: (file) => 
+    onNewTabWithFile: (file) =>
         
         if tab = @tab file
             tab.activate()

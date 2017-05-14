@@ -25,7 +25,7 @@ class LogView extends TextEditor
         post.on 'slog', (text) =>
             @appendText text
             # post.toMain 'winlog', window.winID, text
-        log 'happy logging!'
+        # log 'happy logging!'
                 
     #  0000000   00000000   00000000   00000000  000   000  0000000    
     # 000   000  000   000  000   000  000       0000  000  000   000  
@@ -39,7 +39,7 @@ class LogView extends TextEditor
         super text
         if tail
             @singleCursorAtPos [0, @numLines()-1] 
-            @scrollTo @scroll.fullHeight
+            @scroll.to @scroll.fullHeight
 
     #  0000000  000      000   0000000  000   000  
     # 000       000      000  000       000  000   

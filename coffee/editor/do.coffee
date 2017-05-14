@@ -16,10 +16,14 @@ class Do
         
         @reset()
         
-        post.on 'fileLineChanges', (file, lineChanges) =>
-            if file == @editor.currentFile
-                @foreignChanges lineChanges
+        post.on 'fileLineChanges', @onFileLineChanges
 
+    del: -> post.removeListener 'fileLineChanges', @onFileLineChanges
+    
+    onFileLineChanges: (file, lineChanges) =>
+        if file == @editor.currentFile
+            @foreignChanges lineChanges
+                
     foreignChanges: (lineChanges) ->
         # log 'do.foreignChanges', lineChanges
         @start()
@@ -101,8 +105,8 @@ class Do
     change: (index, text) -> @state = @state.changeLine index, text 
     insert: (index, text) -> @state = @state.insertLine index, text
     delete: (index) ->
-        if @editor.numLines() > 1 and 0 <= index < @editor.numLines()
-            @editor.emit 'willDeleteLine', index, @editor.line(index)
+        if @numLines() >= 1 and 0 <= index < @numLines()
+            @editor.emit 'willDeleteLine', @line index 
             @state = @state.deleteLine index
 
     # 00000000  000   000  0000000  
@@ -133,6 +137,7 @@ class Do
     #  0000000   000   000  0000000     0000000 
                     
     undo: ->
+        
         if @history.length
             
             if _.isEmpty @redos
@@ -144,6 +149,7 @@ class Do
             changes = @calculateChanges @editor.state, @state
             @editor.setState @state
             @editor.changed? changes
+            @editor.emit 'undone'
 
     # 00000000   00000000  0000000     0000000 
     # 000   000  000       000   000  000   000
@@ -165,6 +171,7 @@ class Do
             changes = @calculateChanges @editor.state, @state
             @editor.setState @state
             @editor.changed? changes
+            @editor.emit 'redone'
 
     #  0000000  00000000  000      00000000   0000000  000000000  
     # 000       000       000      000       000          000     

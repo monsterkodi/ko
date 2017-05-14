@@ -22,7 +22,7 @@ class Commandline extends TextEditor
         super viewElem, features: []
 
         @size.lineHeight = 30
-        @scroll?.setLineHeight @size.lineHeight
+        @scroll.setLineHeight @size.lineHeight
 
         @button =$ 'commandline-button'
         @button.classList.add 'empty'
@@ -39,6 +39,7 @@ class Commandline extends TextEditor
         post.on 'stash',   @stash
 
         @view.onblur = () =>
+            # return
             @button.classList.remove 'active'
             @list?.remove()
             @list = null
@@ -238,7 +239,7 @@ class Commandline extends TextEditor
                 @list.appendChild div
 
     hideList: ->
-
+        # return
         @list?.remove()
         @list = null
 

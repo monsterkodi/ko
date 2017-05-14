@@ -29,17 +29,25 @@ class Search extends Command
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
     
     execute: (command) ->
+        
         return if not command.length
+        
         switch @name
             when '/search/', '/Search/'
                 return if command in ['^', '$', '.']
+                
         command = super command
         file = window.editor.currentFile ? _.first _.keys(post.get('indexer', 'files'))
+        
         return if not file?
+        
+        terminal.doAutoClear()
+        
         @startSearchInFiles 
             text: command
             name: @name
             file: file
+            
         focus:  'terminal'
         show:   'terminal'
         text:   command
@@ -164,6 +172,6 @@ class FileSearcher extends stream.Writable
                 post.emit 'search-result', meta
                 
             terminal.appendMeta clss: 'spacer'
-            terminal.scrollCursorToTop()
+            terminal.scroll.cursorToTop()
                 
 module.exports = Search

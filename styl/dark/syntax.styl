@@ -1,14 +1,27 @@
 
 //  0000000  000   000  000   000  000000000   0000000   000   000
-// 000        000 000   0000  000     000     000   000   000 000 
-// 0000000     00000    000 0 000     000     000000000    00000  
-//      000     000     000  0000     000     000   000   000 000 
+// 000        000 000   0000  000     000     000   000   000 000
+// 0000000     00000    000 0 000     000     000000000    00000
+//      000     000     000  0000     000     000   000   000 000
 // 0000000      000     000   000     000     000   000  000   000
+
+// 0000000     0000000   00000000   000   000
+// 000   000  000   000  000   000  000  000
+// 000   000  000000000  0000000    0000000
+// 000   000  000   000  000   000  000  000
+// 0000000    000   000  000   000  000   000
+
+// #181818 #222 #333 #444 #4f4f4f #666 #aaa
+// #f80 #fa0 #fd0 #ff0 #ff4 #ff8           
+//#00f #55f #66f #88f #aaf #ccf            
+// #040 #050 #060 #080 #0a0 #0f0           
+// #808 #a0a #c0c #f0f #f8f #fcf           
+// #a00 #d00 #f08 #48a                     
 
 .syntax
     color           #666
 
-.browserRow.array    
+.browserRow.array
     color           #aaa
 .browserRow .arrayIndex
     color           #444
@@ -17,27 +30,25 @@
     color           #333
 
 .invisible
-    color           #888
-    opacity         0.5
+    color           #181818
+    &.trailing
+        color       #d00
+    // opacity         0.5
 
 .bool
-.true    
+.true
     color           #88f
-.false      
+.false
     color           #d00
 
 .number
-.int    
+.int
     color           #88f
-.float   
-    color           #f88
+.float
+    color           #f08
 
 .nil
-// .value
     color           #808
-
-.dictionary
-    color           #ff6
 
 .array
     color           #00f
@@ -45,30 +56,31 @@
 .obj
 .owner
 .callee
+.dictionary
 .class
     color           #ff8
-            
+
 .variable
     color           #a0a
 
 .range
-    color           #80f
-    
-.require    
+    color           #66f
+
+.require
     color           #0f0
 
 .this
     opacity         0.6
-        
+
 .marker
     opacity         0.5
 
 .module
     color           #ff8
-        
+
 .property
     opacity         0.8
-    color           #fd8
+    color           #8d8
 
 .elem
 .namespace
@@ -76,10 +88,10 @@
     &.member
         color       #f80
 
-.func    
+.func
 .function
     color           #fd0
-    &.call          
+    &.call
         color       #f80
     &.marker
         color       #55f
@@ -95,16 +107,16 @@
 
 .class.function
 .method
-    color           #ff4
-    &.call          
-        color       #ff2
+    color           #ff8
+    &.call
+        color       #ff0
     &.definition
     &.template
-        color       #2aa
+        color       #48a
 
 .template
-    color           #2aa
-    
+    color           #48a
+
 .operator
     color           #fa0
     &.negate
@@ -112,51 +124,51 @@
 
 .class
     &.variable
-        color       #ecf
+        color       #fcf
     &.static
         color       #aaf
 
 .static.class.marker
     color           #88f
     opacity         1
-       
+
 .keypath
     color           #f80
 
 .syntax.cond
 .keyword
     color           #aaf !important
-    &.null    
+    &.null
         color       #a00 !important
 
 .macro
-    color           #c0f
+    color           #f0f
     &.define
-        color       #80c
+        color       #c0c
     &.call
         color       #f0f
     &.argument
         color       #f8f
 
 .interpolation.marker
-        color       #f83
+        color       #f80
 
-.variable.err        
+.variable.err
     color           #f08
 
-.syntax.exists     
+.syntax.exists
     opacity         0.7
 
 .string
     color           #0a0 !important
     &.double
         color       #0f0 !important
-        
-//  0000000   0000000   00     00  00     00  00000000  000   000  000000000  
-// 000       000   000  000   000  000   000  000       0000  000     000     
-// 000       000   000  000000000  000000000  0000000   000 0 000     000     
-// 000       000   000  000 0 000  000 0 000  000       000  0000     000     
-//  0000000   0000000   000   000  000   000  00000000  000   000     000     
+
+//  0000000   0000000   00     00  00     00  00000000  000   000  000000000
+// 000       000   000  000   000  000   000  000       0000  000     000
+// 000       000   000  000000000  000000000  0000000   000 0 000     000
+// 000       000   000  000 0 000  000 0 000  000       000  0000     000
+//  0000000   0000000   000   000  000   000  00000000  000   000     000
 
 .comment
 .comment.string
@@ -169,29 +181,29 @@
     border-radius   5px
     border-left     2px solid #060
     border-bottom   2px solid #050
-    
+
 .comment.header.minimap
     color           #0a0 !important
     opacity         1
-    
+
 .header.marker.minimap
     color           #222 !important
-            
+
 .require
     &.variable
-        color       #4f4
-    &.string 
+        color       #0f0
+    &.string
         color       #0a0
-    &.keyword.require 
+    &.keyword.require
         color       #666
     &.syntax
         opacity     0.5
 
-// 000000000  00000000   0000000  000000000  
-//    000     000       000          000     
-//    000     0000000   0000000      000     
-//    000     000            000     000     
-//    000     00000000  0000000      000     
+// 000000000  00000000   0000000  000000000
+//    000     000       000          000
+//    000     0000000   0000000      000
+//    000     000            000     000
+//    000     00000000  0000000      000
 
 .test
     color           #ccf
@@ -204,12 +216,12 @@
 .test-pass
     color           #0a0
 
-// 00     00  0000000  
+// 00     00  0000000
 // 000   000  000   000
 // 000000000  000   000
 // 000 0 000  000   000
-// 000   000  0000000  
- 
+// 000   000  0000000
+
 .md
     &.h1
         color       #ff0
@@ -222,13 +234,13 @@
     &.h5
         color       #88f
     &.li1
-        color       #8f8
+        color       #0f0
     &.li2
-        color       #4b4
+        color       #0a0
     &.li3
         color       #080
     &.bold
         color       #ff0
-        
+
 .found
     text-decoration  underline

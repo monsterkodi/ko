@@ -5,7 +5,7 @@
 #    000     000       000   000  000 0 000  000  000  0000  000   000  000    
 #    000     00000000  000   000  000   000  000  000   000  000   000  0000000
 
-{ reversed, error, log, _
+{ reversed, prefs, error, log, _
 }          = require 'kxk'
 salt       = require '../tools/salt'
 TextEditor = require '../editor/texteditor'
@@ -21,6 +21,7 @@ class Terminal extends TextEditor
         
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Meta']
 
+        @initInvisibles()
         @ansidiss = new ansiDiss()    
         @setLines ['']
 
@@ -31,6 +32,7 @@ class Terminal extends TextEditor
     #  0000000    0000000      000     000         0000000      000   
 
     output: (s) ->
+        
         for l in s.split '\n'
             t = l.trim()
             if /ko_term_done/.test t
@@ -70,7 +72,7 @@ class Terminal extends TextEditor
         @appendText text
         if tail
             @singleCursorAtPos [0, @numLines()-1] 
-            @scrollTo @scroll.fullHeight
+            @scroll.to @scroll.fullHeight
             
     appendDiss: (diss) -> @appendLineDiss syntax.lineForDiss(diss), diss        
     
@@ -120,11 +122,21 @@ class Terminal extends TextEditor
         clearTimeout @metaTimer
         @metaTimer = setTimeout @dequeueMeta, 0 if @metaQueue.length
            
+    #  0000000  000      00000000   0000000   00000000   
+    # 000       000      000       000   000  000   000  
+    # 000       000      0000000   000000000  0000000    
+    # 000       000      000       000   000  000   000  
+    #  0000000  0000000  00000000  000   000  000   000  
+    
     clear: ->
         @meta.clear()
         @singleCursorAtPos [0,0]
         super
-            
+
+    setAutoClear: (state) -> prefs.set 'terminal:autoclear', state
+    getAutoClear: -> prefs.get 'terminal:autoclear', false
+    doAutoClear: -> if @getAutoClear() then @clear()
+        
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
     # 0000000    0000000     00000  

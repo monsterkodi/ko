@@ -5,6 +5,11 @@
 // 000   000  000   000  000  000   000  000   000     000
 // 0000000    000   000  000   0000000   000   000     000
 
+// #333 #444 #555 #666 #888 #aaa #bbb #ccc #ddd #eee #fff
+// #008 #00a #00f #44f #66f #88f #aaf #ddf               
+// #800 #a00 #b00 #f00 #f60 #f80 #ff0                    
+// #040 #060 #080 #0a0 #3c3 #6f6                         
+
 frameColor  = #eee
 titleColor  = #ddd
 backColor   = #fff
@@ -146,7 +151,7 @@ span.ko
 .info-cursor-column
     color               #bbb
     &.virtual
-        color           #08f
+        color           #88f
 
 .info-lines
     color               #555
@@ -186,12 +191,12 @@ span.ko
     color               #333
 
 .dot:hover
-    color               #f40
+    color               #f00
 
 #titlebar .winid
     color               #555
     &.focus
-        color           #008815
+        color           #080
 
 #titlebar .winnum
     color               backColor
@@ -219,7 +224,7 @@ span.ko
     color               #333
 
 #titlebar.focus .tabs
-    color               #34C749
+    color               #3c3
 
 // 000000000   0000000   0000000
 //    000     000   000  000   000
@@ -234,7 +239,7 @@ span.ko
 .tab.clean .dot
     color               #444
     &.focus
-        color           #006600
+        color           #060
 
 .tab
     background          backColor
@@ -281,6 +286,10 @@ span.ko
         background      frameColor
     &.main
         background      #000
+    &.blink
+        background      #888
+    &.blink.off
+        background      transparent
 
 .cursors.salterMode .cursor
     background          #040
@@ -324,7 +333,7 @@ span.ko
         color           #00f
 
     &.cursored.selected span
-        color           #44b
+        color           #44f
     &.cursored.main.selected span
         color           #008
 
@@ -343,7 +352,7 @@ span.ko
     &.git
         opacity             0.4
         &.del
-            background      #f66
+            background      #f60
         &.mod
             background      #6f6
         &.add
@@ -426,9 +435,9 @@ span.ko
 
 .winlist
     & .dot
-        color               #006600
+        color               #060
     & .winid
-        color               #008815
+        color               #080
 
 //  0000000   000   000  000000000   0000000    0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
 // 000   000  000   000     000     000   000  000       000   000  000   000  000   000  000      000          000     000
@@ -441,7 +450,7 @@ span.ko
     &::-webkit-scrollbar
         background-color    titleColor
     &::-webkit-scrollbar-thumb
-        background-color    #55b
+        background-color    #44f
 
 .autocomplete-item
     color                   textColor

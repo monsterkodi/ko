@@ -92,6 +92,8 @@ class Walker
             error "Walker.start -- #{err} dir: #{dir} stack:", err.stack
 
     stop: -> 
+        
+        @walker?.pause()
         @walker?.end()
         @walker = null
     

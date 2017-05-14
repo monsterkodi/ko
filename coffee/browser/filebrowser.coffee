@@ -10,7 +10,7 @@
 }        = require 'kxk'
 Browser  = require './browser'
 dirlist  = require '../tools/dirlist'
-forkfunc = require 'fork-func'
+forkfunc = require '../tools/forkfunc'
 
 class FileBrowser extends Browser
     

@@ -30,7 +30,9 @@ class FileEditor extends TextEditor
 
         super viewElem, features: ['Diffbar', 'Scrollbar', 'Numbers', 'Minimap', 'Meta', 'Autocomplete', 'Brackets', 'Strings']
 
-        @pigmentsInit()
+        @initPigments()
+        @initInvisibles()
+
         @setText ''
 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000
@@ -70,8 +72,8 @@ class FileEditor extends TextEditor
         @setSalterMode false
         @stopWatcher()
 
-        @diffbar.clear()
-        @meta.clear()
+        @diffbar?.clear()
+        @meta?.clear()
         @do.reset()
 
         @currentFile = file
@@ -95,19 +97,20 @@ class FileEditor extends TextEditor
         if not opt?.skip
             if not @currentFile?
                 post.emit 'file', @currentFile # titlebar -> tabs -> tab
+            # log 'emit file', @currentFile
             @emit 'file', @currentFile # diffbar, pigments, ...
 
     restoreFromTabState: (tabsState) ->
 
-        log 'restoreFromTabState', tabsState
+        # log 'restoreFromTabState', tabsState
         return error "no tabsState.file?" if not tabsState.file?
         @clear skip:true
         @setCurrentFile tabsState.file, restoreState:tabsState.state
 
     stopWatcher: ->
-        if @watch?
-            @watch?.stop()
-            @watch = null
+        # log 'stopWatcher', @currentFile
+        @watch?.stop()
+        @watch = null
 
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
     # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000
@@ -122,7 +125,7 @@ class FileEditor extends TextEditor
                 d = window.split.commandlineHeight + window.split.handleHeight
                 d = Math.min d, @scroll.scrollMax - @scroll.scroll
                 d *= -1 if e == 'hidden'
-                @scrollBy d
+                @scroll.by d
 
     #  0000000   0000000   000   000  00000000
     # 000       000   000  000   000  000
@@ -163,22 +166,34 @@ class FileEditor extends TextEditor
         return if not @currentFile
 
         filePositions = window.stash.get 'filePositions', {}
+
         if filePositions[@currentFile]?
+
             s = filePositions[@currentFile]
             @setCursors    s.cursors ? [[0,0]]
             @setSelections s.selections ? []
             @setHighlights s.highlights ? []
             @setMain       s.main ? 0
             @setState @state
-            delta = (s.scroll ? @scroll.scroll) - @scroll.scroll
-            delta = @size.lineHeight * parseInt(delta / @size.lineHeight) # no idea why this is necessary
-            @scrollBy delta
-            @updateLayers()
-            @numbers.updateColors()
-            @emit 'cursor'
-            @emit 'selection'
+
+            @scroll.to s.scroll if s.scroll
+            @scroll.cursorIntoView()
+
         else
-            editor.singleCursorAtPos [0,0]
+
+            @singleCursorAtPos [0,0]
+            @scroll.top = 0 if @mainCursor()[1] == 0
+            @scroll.bot = @scroll.top-1
+            @scroll.to 0
+            @scroll.cursorIntoView()
+
+        # log 'restoreScrollCursorsAndSelections', @mainCursor(), @scroll.info()
+
+        @updateLayers()
+        @numbers?.updateColors()
+        @minimap.onEditorScroll()
+        @emit 'cursor'
+        @emit 'selection'
 
     #       000  000   000  00     00  00000000
     #       000  000   000  000   000  000   000

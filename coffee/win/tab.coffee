@@ -60,7 +60,7 @@ class Tab
     
     storeState: ->
         
-        return error 'no file in state?', @state if not @state?.file?
+        return error 'no editor file?' if not @editor.currentFile
         @state = window.editor.do.tabState()
         
     restoreState: ->
@@ -112,7 +112,6 @@ class Tab
         @
 
     file:  -> @info?.file ? 'untitled' 
-    close: -> @div.remove(); @tooltip.del() 
     index: -> @tabs.tabs.indexOf @
     prev:  -> @tabs.tab @index()-1 if @index() > 0
     next:  -> @tabs.tab @index()+1 if @index() < @tabs.numTabs()-1
@@ -122,6 +121,11 @@ class Tab
         return true if @foreign? and @foreign.length > 0 
         return true if @info?.dirty == true
         false
+        
+    close: ->
+        @div.remove()
+        @tooltip.del()
+        post.emit 'tabClosed', @info.file ? 'untitled'
     
     hidePkg: -> @pkg.style.display = 'none'
     showPkg: -> @pkg.style.display = 'initial'

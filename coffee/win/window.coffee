@@ -14,7 +14,7 @@ Terminal    = require './terminal'
 Titlebar    = require './titlebar'
 LogView     = require './logview'
 Info        = require './info'
-Area        = require '../area/area'
+Area        = require '../stage/area'
 FileEditor  = require '../editor/fileeditor'
 Commandline = require '../commandline/commandline'
 Navigate    = require '../main/navigate'
@@ -95,7 +95,7 @@ restoreWin = ->
 post.on 'shellCallbackData', (cmdData) -> commandline.commands['term'].onShellCallbackData cmdData
 post.on 'singleCursorAtPos', (pos, opt) -> 
     editor.singleCursorAtPos pos, opt
-    editor.scrollCursorToTop()
+    editor.scroll.cursorToTop()
 post.on 'focusEditor',       -> split.focus 'editor'
 post.on 'cloneFile',         -> post.toMain 'newWindowWithFile', editor.currentFile
 post.on 'reloadFile',        -> reloadFile()
@@ -204,7 +204,8 @@ saveFile = (file) ->
     if not file?
         saveFileAs()
         return
-        
+
+    # log 'win.saveFile', file
     editor.stopWatcher()
     
     if fileExists file
@@ -214,6 +215,8 @@ saveFile = (file) ->
         mode = 438
         
     atomic file, editor.text(), { encoding: 'utf8', mode: mode }, (err) ->
+        
+        # log "atomic saved #{err}"
         
         editor.saveScrollCursorsAndSelections()
         
@@ -239,7 +242,7 @@ window.saveChanges = ->
 
 onMove  = -> window.stash.set 'bounds', win.getBounds()
 
-removeListeners = ->
+clearListeners = ->
     
     document.removeEventListener 'keydown', onKeyDown
     win.removeListener 'close', onClose
@@ -253,7 +256,7 @@ onClose = ->
     editor.setText ''
     editor.stopWatcher()
     window.stash.clear()
-    removeListeners()
+    clearListeners()
 
 #  0000000   000   000  000       0000000    0000000   0000000    
 # 000   000  0000  000  000      000   000  000   000  000   000  
@@ -279,7 +282,7 @@ window.onload = ->
 reloadWin = ->
     
     saveStash()
-    removeListeners()
+    clearListeners()
     editor.stopWatcher()
     win.webContents.reloadIgnoringCache()
 
@@ -339,6 +342,7 @@ loadFile = (file, opt={}) ->
             if tab = tabs.tab file
                 tab.setActive()
 
+            # log 'window.loadFile', file, opt
             editor.setCurrentFile file, opt
             
             post.toOthers 'fileLoaded', file, winID
@@ -346,9 +350,9 @@ loadFile = (file, opt={}) ->
             
     window.split.show 'editor'
         
-    if pos? and pos[0] or pos[1] 
+    if pos? and pos[0] or pos[1]
         editor.singleCursorAtPos pos
-        editor.scrollCursorToTop()        
+        editor.scroll.cursorToTop()        
   
 openFile = loadFile
 

@@ -5,9 +5,8 @@
 # 000   000  000        000       000  0000
 #  0000000   000        00000000  000   000
 
-{ 
-packagePath, splitFilePos, joinFilePos, fileExists, dirExists, unresolve, relative, resolve,
-prefs, clamp, post, error, log, path, fs, _
+{ packagePath, splitFilePos, joinFilePos, fileExists, dirExists, unresolve, relative, resolve,
+  prefs, clamp, post, error, log, path, fs, _
 }        = require 'kxk'
 profile  = require '../tools/profile'
 Walker   = require '../tools/walker'
@@ -39,6 +38,7 @@ class Open extends Command
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
 
     changed: (command) ->
+        
         command = command.trim()
 
         if command == '.' and @navigating == false
@@ -172,10 +172,11 @@ class Open extends Command
         @lastFileIndex = 0
         @dir = resolve '~' if not @dir?
 
-        if @history? not @navigating and not opt?.currentText and @history.length > 1
+        if @history? and not @navigating and not opt?.currentText and @history.length > 1
             f = @history[@history.length-2]
             item = Object.create null
             item.text = relative f, @dir
+            item.line = ' '
             item.file = f
             item.bonus = 0x000fffff
             items.push item
@@ -204,6 +205,8 @@ class Open extends Command
                 if file[1].isDirectory()
                     item.line = '▸'
                     item.clss = 'directory'
+                else
+                    item.line = ' '
                 item.text = rel
                 item.file = file[0]
                 items.push item
@@ -219,6 +222,7 @@ class Open extends Command
     # 000   000  000  0000000      000      0000000   000   000     000     
     
     showHistory: () ->
+        
         if @history.length > 1 and (@selected < 0 or not @navigating and @selected == 0)
             items = []
             bonus = 0x000fffff
@@ -237,6 +241,7 @@ class Open extends Command
             'unhandled'
 
     showFirst: () ->
+        
         if @commandList and @selected == @commandList.meta.metas.length - 1
             @showItems @listItems includeThis: false
             @select 0
@@ -250,6 +255,7 @@ class Open extends Command
     #  0000000  000   000  000   000   0000000  00000000  0000000
     
     cancel: (combo) ->
+        
         if combo == @shortcuts[0]
             if not @navigating and @commandList? and @lastFileIndex == @selected
                 @walker.stop()
@@ -259,6 +265,7 @@ class Open extends Command
         super combo
     
     cancelList: ->
+        
         @walker.stop()
         @fastWalker.stop()
         @thisWalker.stop()
@@ -271,6 +278,7 @@ class Open extends Command
     # 0000000      000     000   000  000   000     000   
         
     start: (@combo) -> 
+        
         opt = reload: true
             
         if window.editor.currentFile?
@@ -285,10 +293,12 @@ class Open extends Command
         text: ''
        
     navigateDir: (dir) ->
+        
         r = @loadDir 
             dir: dir
             noPkg: true
             navigating: true
+            
         if true # r
             @hideList()
             @select -1                
@@ -363,20 +373,33 @@ class Open extends Command
     # 00     00  000   000  0000000  000   000  00000000  000   000
             
     walkerDone: (fileList, statList) =>
+        
         for i in [0...fileList.length]
             @files.push [fileList[i], statList[i]]
+            
         @files = _.sortBy @files, (o) => relative(o[0], @dir).replace(/\./g, 'z')
+        
         @showList()
         @showItems @listItems includeThis: false
         @grabFocus()
         @select @lastFileIndex
+        
         if not @navigating 
+            
             if @getText() == ''
                 @setAndSelectText @commandList.line(@selected)
             else if @getText() != @commandList.line(@selected)
                 @changed @getText()
+                
         else if @getText() == '.'
+            
             @setText @dir
+            
+    stopWalkers: ->
+        
+        @thisWalker.stop()
+        @fastWalker.stop()
+        @walker.stop()
                     
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
@@ -405,7 +428,7 @@ class Open extends Command
                     navigating: true
                     dir:        resolved
                 return text: @dir+'/', select: false
-
+        
         @hideList()
 
         if listValue
@@ -433,6 +456,9 @@ class Open extends Command
         opened = window.openFiles files, options
         
         if opened?.length
+            
+            @stopWalkers()
+            
             if opened.length == 1
                 super opened[0]
             else
@@ -452,6 +478,7 @@ class Open extends Command
     # 000   000  00000000  0000000    0000000   0000000      0      00000000  0000000  
     
     resolvedPath: (p, parent=@dir) ->
+        
         return (parent ? resolve '~') if not p?
         if p[0] in ['~', '/']
             resolve p
@@ -465,6 +492,7 @@ class Open extends Command
     # 000   000  00000000     000   
     
     handleModKeyComboEvent: (mod, key, combo, event) -> 
+        
         switch combo
             when 'up'   then return @showHistory()
             when 'down' then return @showFirst()
