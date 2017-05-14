@@ -56,13 +56,14 @@ module.exports =
                     if lineMeta[2].git == 'del'
                         log 'offset move del', lineMeta[2].li, lineMeta[0], offset
                         @meta.moveLineMeta lineMeta, offset
-                    else
+                    else if lineMeta in @meta.metas
                         log 'offset move ins/mod', lineMeta[2].li, lineMeta[0], offset, -1
                         @meta.moveLineMeta lineMeta, -1
+                    else
+                        log 'deleted offset', lineMeta[2].li, lineMeta[0], offset, lineMeta[2].toggled, lineMeta[2].git
+                        # lineMeta[0] += offset
                 else
                     log 'offset ??', lineMeta[2].li, lineMeta[0], offset
-                # lineMeta[2].applyOffset = lineMeta[2].li - lineMeta[0]
-                # log 'apply offset', lineMeta[2].li, lineMeta[0], lineMeta[2].applyOffset
 
         for lineMeta in metas
             
@@ -78,7 +79,7 @@ module.exports =
     dumpMetas: (title) ->
         @log title
         for k,v of @meta.lineMetas
-            @log k, ([m[0], m[2].clss, m[2].change, m[2].applyOffset, (m[2].toggled and 'toggled' or '')] for m in v)
+            @log k, ([m[0], m[2].clss, m[2].change, (m[2].toggled and 'toggled' or '')] for m in v)
 
     # 00000000   00000000  000   000  00000000  00000000    0000000  00000000
     # 000   000  000       000   000  000       000   000  000       000
@@ -117,7 +118,7 @@ module.exports =
                     cursorDelta nc, 0, -1
 
             when 'git del'
-                # li += 1
+
                 for line in reversed meta.change
                     log "reverseGitChange insert", li, line.old
                     log "\n"+ @do.text()
@@ -141,7 +142,7 @@ module.exports =
         meta = lineMeta[2]
         li   = lineMeta[0]
 
-        log "togglegit.applyGitChange", li, meta.clss, meta.applyOffset
+        log "togglegit.applyGitChange", li, meta.clss
 
         @do.start()
         cursors = @do.cursors()
@@ -158,9 +159,6 @@ module.exports =
 
             when 'git add', 'git add boring'
 
-                if meta.applyOffset?
-                    li += meta.applyOffset
-                    
                 log 'applyGitChange insert', li, meta.change.new
                 log "\n"+ @do.text()
                 @do.insert li, meta.change.new
@@ -174,7 +172,6 @@ module.exports =
 
             when 'git del'
 
-                # li += 1
                 for line in reversed meta.change
                     log 'applyGitChange delete', li, @do.line li
                     log "\n"+ @do.text()
