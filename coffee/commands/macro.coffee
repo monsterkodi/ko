@@ -117,7 +117,9 @@ class Macro extends Command
             #    000     00000000  0000000      000
 
             when 'test'
+                
                 mocha = new Mocha reporter: Report.forRunner, timeout: 4000
+                
                 if _.isEmpty args
                     files = fileList path.join(__dirname, '..', 'test'), matchExt:['.js', '.coffee']
                 else
@@ -125,7 +127,18 @@ class Macro extends Command
                 for file in files
                     delete require.cache[file] # mocha listens only on initial compile
                     mocha.addFile file
-                mocha.run()
+                
+                terminal = window.terminal
+                terminal.doAutoClear()
+                autoClear = terminal.getAutoClear()
+                terminal.setAutoClear false
+                
+                onTestsDone = ->
+                    terminal.setAutoClear autoClear
+                    post.removeListener 'testsDone', onTestsDone
+                post.on 'testsDone', onTestsDone
+                
+                mocha.run()                
                 window.split.do 'show terminal'
 
             # 000   000  00000000  000      00000000

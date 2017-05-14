@@ -5,7 +5,7 @@
 # 000   000  000       000        000   000  000   000     000     
 # 000   000  00000000  000         0000000   000   000     000     
 
-{str, noon, _} = require 'kxk'
+{str, post, noon, _} = require 'kxk'
 syntax = require '../editor/syntax'
 
 log = ->
@@ -55,10 +55,13 @@ class Report
         runner.on 'end', -> # log ''
      
     done: (failures) -> 
+        
         if failures
             log "▲ #{failures} failure#{failures > 1 and 's' or ''}"
         else
             log '■ ok'
+            
+        post.emit 'testsDone', failures
 
     indent: -> Array(Math.max 0, @indents).join '  '
     

@@ -60,6 +60,7 @@ gitDiff = (file) ->
     
             info.changes.push change
 
+    log 'gitdiff', info
     return info
 
 if module.parent
