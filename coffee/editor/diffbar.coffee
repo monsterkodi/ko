@@ -118,7 +118,8 @@ class Diffbar
 
             if change.add?
 
-                li = change.line-1
+                mods = change.mod? and change.mod.length or 0
+                li = change.line - 1 + mods
                 
                 for add in change.add
                     meta =

@@ -17,11 +17,9 @@ test = (a, b) ->
     if b == undefined then b = true
     expect(a).to.eql b
 
-editor     = window.editor
-testFile   = path.join gitRoot(__dirname), 'coffee', 'test', 'dir', 'git.txt'
-simpleFile = path.join gitRoot(__dirname), 'coffee', 'test', 'dir', 'simple.txt'
-simpleText = '123456'.split('').join '\n'
-original   = 'abcdefghijklmnopqrstuvwxyz'.split('').join '\n'
+editor          = window.editor
+simpleFile      = path.join gitRoot(__dirname), 'coffee', 'test', 'dir', 'simple.txt'
+simpleText      = '123456'.split('').join '\n'
 
 # 000       0000000    0000000   0000000    
 # 000      000   000  000   000  000   000  
@@ -34,21 +32,21 @@ loadFile = (file, text, done) ->
     onDiffbarUpdate = (changes) ->
         
         return if changes.file != file
-        
         editor.removeListener 'diffbarUpdated', onDiffbarUpdate
         
         try
             test changes.error == undefined
             test empty changes.changes
             test editor.text(), text
+            
         catch err
+            
             return done err
             
         done()
         
     editor.on 'diffbarUpdated', onDiffbarUpdate
     
-    # log 'newtab', file    
     post.emit 'newTabWithFile', file
 
 #  0000000   0000000   000   000  00000000
@@ -62,22 +60,20 @@ saveFile = (file, done) ->
     onDiffbarUpdate = (changes) ->
         
         return if changes.file != file
-        
         editor.removeListener 'diffbarUpdated', onDiffbarUpdate
         
         try
             test changes.error == undefined
-            if empty changes.changes
-                log 'dafuk?', file, changes, editor.text()
             test not empty changes.changes
+            
         catch err
+            
             return done err
             
         done()
 
     editor.on 'diffbarUpdated', onDiffbarUpdate
     
-    # log 'savefile', file        
     post.emit 'saveFile'
 
 # 00000000   00000000  000   000  00000000  00000000   000000000
@@ -89,17 +85,22 @@ saveFile = (file, done) ->
 revertFile = (file, text, done) ->
 
     onDiffbarUpdate = (changes) ->
+        
         return if changes.file != file
         editor.removeListener 'diffbarUpdated', onDiffbarUpdate
         
         try
+            
             test changes.error == undefined
             test empty changes?.changes
             test editor.text(), text
+            
         catch err
+            
             return done err
 
         post.once 'tabClosed', (tf) ->
+            
             if tf == file
                 done()
             else
@@ -109,7 +110,6 @@ revertFile = (file, text, done) ->
 
     editor.on 'diffbarUpdated', onDiffbarUpdate
         
-    # log 'revert', file
     try
         childp.execSync "git checkout -- #{file}"
     catch err
@@ -122,7 +122,7 @@ revertFile = (file, text, done) ->
 # 000  000   000  0000000   00000000  000   000     000     
 
 describe 'insert single', ->
-    # return
+
     it 'load', (done) -> loadFile simpleFile, simpleText, done
 
     it 'modify', ->
@@ -167,7 +167,7 @@ describe 'insert single', ->
 # 0000000     0000000    0000000   0000000    0000000  00000000  
 
 describe 'insert double', ->
-    # return
+
     it 'load', (done) -> loadFile simpleFile, simpleText, done
 
     it 'modify', ->
@@ -205,9 +205,6 @@ describe 'insert double', ->
         editor.cursorInAllLines()
         editor.toggleGitChange()
 
-        if empty editor.meta.metasAtLineIndex 2
-            log 'double undo again metas', editor.meta.metas
-        
         test not empty editor.meta.metasAtLineIndex 2
         test editor.text(), simpleText
 
@@ -220,7 +217,7 @@ describe 'insert double', ->
 # 0000000    00000000  0000000  00000000     000     00000000
 
 describe 'delete', ->
-    return
+
     it 'load', (done) -> loadFile simpleFile, simpleText, done
 
     it 'modify', ->
@@ -228,6 +225,7 @@ describe 'delete', ->
         editor.setCursors [[0,2], [0,3], [0,4]]
         editor.selectMoreLines()
         editor.deleteSelection()
+        
         test editor.text(), '126'.split('').join '\n'
 
     it 'save', (done) -> saveFile simpleFile, done
@@ -262,7 +260,7 @@ describe 'delete', ->
 # 000   000  000  000   000  00000000  0000000    
 
 describe 'mixed', ->
-    # return
+
     it 'load', (done) -> loadFile simpleFile, simpleText, done
 
     it 'modify', ->
@@ -293,14 +291,14 @@ describe 'mixed', ->
         test editor.text(), simpleText
 
     it 'redo all', ->
-        # return
+
         editor.cursorInAllLines()
         editor.toggleGitChange()
 
         test editor.text(), '1\na2\n3b\n5\nd\n\n6'
 
     it 'undo again', ->
-        # return
+
         editor.cursorInAllLines()
         editor.toggleGitChange()
 
@@ -315,8 +313,12 @@ describe 'mixed', ->
 #  0000000   0000000   000   000  000        0000000  00000000  000   000
 
 describe 'complex', ->
-    return
-    it 'load', (done) -> loadFile testFile, original, done
+
+    complexFile     = path.join gitRoot(__dirname), 'coffee', 'test', 'dir', 'git.txt'
+    complexText     = 'abcdefghijklmnopqrstuvwxyz'.split('').join '\n'
+    complexModified = 'a\nbad\ncool\nd\nhello\nh\ni\nj\nl\nm\np\n\n\n1\n23q\nr\n4s\nt5\nv\n6\n\n7\n\nw\nx\ny\nz'
+        
+    it 'load', (done) -> loadFile complexFile, complexText, done
 
     it 'modify', ->
 
@@ -360,14 +362,29 @@ describe 'complex', ->
         editor.selectMoreLines()
         editor.deleteSelection()
 
-        test empty editor.diffbar.changes
+        test editor.text(), complexModified
 
-    it 'save', (done) -> saveFile testFile, done
+    it 'save', (done) -> saveFile complexFile, done
 
     it 'undo all', ->
-        return
+         
         editor.cursorInAllLines()
         editor.toggleGitChange()
-        test editor.text(), original
+        
+        test editor.text(), complexText
+        
+    it 'redo all', ->
 
-    it 'revert', (done) -> revertFile testFile, original, done
+        editor.cursorInAllLines()
+        editor.toggleGitChange()
+
+        test editor.text(), complexModified
+
+    it 'undo again', ->
+
+        editor.cursorInAllLines()
+        editor.toggleGitChange()
+
+        test editor.text(), complexText
+
+    it 'revert', (done) -> revertFile complexFile, complexText, done
