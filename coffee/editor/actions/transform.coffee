@@ -5,7 +5,7 @@
 #    000     000   000  000   000  000  0000       000  000       000   000  000   000  000 0 000
 #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000
 
-{ error, log, _
+{ resolve, unresolve, path, error, log, _
 } = require 'kxk'
 matchr = require '../../tools/matchr'
 
@@ -14,8 +14,15 @@ class Transform
     constructor: (@editor) ->
         
         @editor.transform = @
-        @last      = null
-        @caseFuncs = ['upperCase', 'lowerCase', 'titleCase']
+        @last         = null
+        @caseFuncs    = ['upperCase', 'lowerCase', 'titleCase']
+        @resolveFuncs = ['resolve', 'unresolve']
+    
+    #  0000000   0000000    0000000  00000000  
+    # 000       000   000  000       000       
+    # 000       000000000  0000000   0000000   
+    # 000       000   000       000  000       
+    #  0000000  000   000  0000000   00000000  
     
     toggleCase: ->
 
@@ -24,7 +31,7 @@ class Transform
             
         nextIndex = (1 + @caseFuncs.indexOf @last) % @caseFuncs.length
         @do @caseFuncs[nextIndex]
-
+        
     upperCase: ->
         
         @apply (t) -> t.toUpperCase()
@@ -44,12 +51,50 @@ class Transform
             t
         'titleCase'
 
+    # 00000000   00000000   0000000   0000000   000      000   000  00000000  
+    # 000   000  000       000       000   000  000      000   000  000       
+    # 0000000    0000000   0000000   000   000  000       000 000   0000000   
+    # 000   000  000            000  000   000  000         000     000       
+    # 000   000  00000000  0000000    0000000   0000000      0      00000000  
+        
+    toggleResolve: ->
+        
+        if @last not in @resolveFuncs
+            @last = _.last @resolveFuncs
+            
+        nextIndex = (1+ @resolveFuncs.indexOf @last) % @resolveFuncs.length
+        @do @resolveFuncs[nextIndex]
+
+    resolve: ->
+        
+        cwd = process.cwd()
+        if @editor.currentFile?
+            process.chdir path.dirname @editor.currentFile
+        @apply (t) -> resolve t
+        process.chdir cwd
+        'resolve'
+        
+    unresolve: ->
+        
+        @apply (t) -> unresolve t
+        'unresolve'
+        
+    #  0000000   00000000   00000000   000      000   000  
+    # 000   000  000   000  000   000  000       000 000   
+    # 000000000  00000000   00000000   000        00000    
+    # 000   000  000        000        000         000     
+    # 000   000  000        000        0000000     000     
+    
     apply: (tfunc) ->
         
         selections = @editor.selections()
         tl = @editor.textsInRanges selections
         tl = tl.map tfunc
 
+        selections = _.zip(selections, tl).map (p) -> 
+            p[0][1][1] = p[0][1][0] + p[1].length
+            p[0]
+        
         @editor.do.start()
         @editor.pasteText tl.join '\n'
         @editor.do.select selections
@@ -85,5 +130,11 @@ module.exports =
             name:  'Toggle Case'
             text:  'toggles selected texts between lower- upper- and title-case'
             combo: 'command+alt+ctrl+u'
+            
+        toggleResolve:
+            name:  'Toggle Resolve'
+            text:  'toggles selected texts between resolved and unresolved paths'
+            combo: 'command+alt+ctrl+r'
 
-    toggleCase: -> Transform.do @, 'toggleCase'
+    toggleCase:    -> Transform.do @, 'toggleCase'
+    toggleResolve: -> Transform.do @, 'toggleResolve'
