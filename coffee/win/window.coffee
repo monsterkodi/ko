@@ -342,7 +342,6 @@ loadFile = (file, opt={}) ->
             if tab = tabs.tab file
                 tab.setActive()
 
-            # log 'window.loadFile', file, opt
             editor.setCurrentFile file, opt
             
             post.toOthers 'fileLoaded', file, winID

@@ -15,7 +15,7 @@ class Transform
         'upperCase', 'lowerCase', 'titleCase',
         'resolve', 'unresolve',
         'basename', 'dirname', 'extname', 'filename',
-        'reverse'
+        'reverse', 'sortUp', 'sortDown', 'sort'
     ]
 
     constructor: (@editor) ->
@@ -24,6 +24,7 @@ class Transform
         @last         = null
         @caseFuncs    = ['upperCase', 'lowerCase', 'titleCase']
         @resolveFuncs = ['resolve', 'unresolve']
+        @sortFuncs    = ['sortUp', 'sortDown']
 
     # 00000000   00000000  000   000  00000000  00000000    0000000  00000000  
     # 000   000  000       000   000  000       000   000  000       000       
@@ -34,6 +35,22 @@ class Transform
     reverse: ->
         @trans (l) -> reversed l
         'reverse'
+
+    #  0000000   0000000   00000000   000000000  
+    # 000       000   000  000   000     000     
+    # 0000000   000   000  0000000       000     
+    #      000  000   000  000   000     000     
+    # 0000000    0000000   000   000     000     
+    
+    sort: -> @toggle @sortFuncs
+    
+    sortUp: -> 
+        @trans (l) -> l.sort (a,b) -> a.localeCompare b
+        'sortUp'
+
+    sortDown: ->
+        @trans (l) -> reversed l.sort (a,b) -> a.localeCompare b
+        'sortDown'
         
     #  0000000   0000000    0000000  00000000
     # 000       000   000  000       000
@@ -41,13 +58,7 @@ class Transform
     # 000       000   000       000  000
     #  0000000  000   000  0000000   00000000
 
-    toggleCase: ->
-
-        if @last not in @caseFuncs
-            @last = _.last @caseFuncs
-
-        nextIndex = (1 + @caseFuncs.indexOf @last) % @caseFuncs.length
-        @do @caseFuncs[nextIndex]
+    toggleCase: -> @toggle @caseFuncs
 
     upperCase: ->
 
@@ -74,13 +85,7 @@ class Transform
     # 000   000  000            000  000   000  000         000     000
     # 000   000  00000000  0000000    0000000   0000000      0      00000000
 
-    toggleResolve: ->
-
-        if @last not in @resolveFuncs
-            @last = _.last @resolveFuncs
-
-        nextIndex = (1+ @resolveFuncs.indexOf @last) % @resolveFuncs.length
-        @do @resolveFuncs[nextIndex]
+    toggleResolve: -> @toggle @resolveFuncs
 
     resolve: ->
 
@@ -161,6 +166,20 @@ class Transform
         @editor.pasteText tl.join '\n'
         @editor.do.select selections
         @editor.do.end()
+
+    # 000000000   0000000    0000000    0000000   000      00000000  
+    #    000     000   000  000        000        000      000       
+    #    000     000   000  000  0000  000  0000  000      0000000   
+    #    000     000   000  000   000  000   000  000      000       
+    #    000      0000000    0000000    0000000   0000000  00000000  
+    
+    toggle: (funcList) ->
+        
+        if @last not in funcList
+            @last = _.last funcList
+
+        nextIndex = (1 + funcList.indexOf @last) % funcList.length
+        @do funcList[nextIndex]
         
     # 0000000     0000000
     # 000   000  000   000

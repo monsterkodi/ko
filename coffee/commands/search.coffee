@@ -91,11 +91,16 @@ class Search extends Command
 
         href = meta[2].href      
         split = href.split ':'
+        
         if split.length == 1 or _.isFinite parseInt split[1]
+            
             window.split.show 'editor'
             file = href + ':' + window.terminal.posForEvent(event)[0]
-            window.loadFile file
+            window.openFiles [file], newTab: event.metaKey
+            # window.loadFile file
+            
         else
+            
             if window.commandline.commands[split[0]]?
                 command = window.commandline.commands[split[0]]
                 window.commandline.startCommand split[0], command.shortcuts[0]
