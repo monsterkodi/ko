@@ -109,7 +109,7 @@ class Split extends event
         error "Split.do -- unhandled do command? #{sentence}?"
 
     maximizeEditor: -> 
-        
+        log "Split.maximizeEditor"
         @focus 'editor'
         @flex.expand 'editor'
         @hideLog()
@@ -123,13 +123,18 @@ class Split extends event
     # 0000000   000   000   0000000   00     00  
 
     show: (n) ->
-        
+        # log "Split.show #{n}"
         switch n
             when 'terminal', 'area' then @raise n
-            when 'editor'           
+            when 'editor'     
+                
                 @flex.expand 'editor'
                 if @editorHeight() < @flex.size()/3
-                    @flex.moveHandleToPos @flex.handles[1], 2*@flex.size()/3
+                    if @flex.handles[1].pos() > @flex.size()/3
+                        @flex.moveHandleToPos @flex.handles[1], @flex.size()/3
+                    if @flex.handles[2].pos() < 2*@flex.size()/3
+                        @flex.moveHandleToPos @flex.handles[2], 2*@flex.size()/3
+                        
             when 'command'          then @flex.expand 'commandline'
             when 'logview'          then @showLog()
             else error "split.show -- unhandled: #{n}!"
@@ -149,7 +154,7 @@ class Split extends event
             @flex.panes[0].div = nju
 
     raise: (n) ->
-                
+        # log "Split.raise #{n}"   
         switch n
             when 'terminal' then @swap @area, @terminal
             when 'area'     then @swap @terminal, @area

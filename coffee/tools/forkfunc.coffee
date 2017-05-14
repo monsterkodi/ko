@@ -1,3 +1,10 @@
+
+# 00000000   0000000   00000000   000   000  00000000  000   000  000   000   0000000    
+# 000       000   000  000   000  000  000   000       000   000  0000  000  000         
+# 000000    000   000  0000000    0000000    000000    000   000  000 0 000  000         
+# 000       000   000  000   000  000  000   000       000   000  000  0000  000         
+# 000        0000000   000   000  000   000  000        0000000   000   000   0000000    
+
 if module.parent
 
     # 00     00   0000000   000  000   000
@@ -6,66 +13,63 @@ if module.parent
     # 000 0 000  000   000  000  000  0000
     # 000   000  000   000  000  000   000
 
-    CP   = require 'child_process'
-    Path = require 'path'
+    { childp, path, log 
+    } = require 'kxk'
 
-    forkfunc = (path, args..., callback) ->
+    forkfunc = (file, args..., callback) ->
         
-        opts = parse path
-        call opts.path, opts.name, args, callback, false
+        opts = parse file
+        log 'forkfunc', file, args, opts
+        forkChild opts.file, opts.name, args, callback, false
 
-    forkfunc.async = (path, args..., callback) ->
+    forkfunc.async = (file, args..., callback) ->
         
-        opts = parse path
-        call opts.path, opts.name, args, callback, true
+        opts = parse file
+        forkChild opts.file, opts.name, args, callback, true
 
-    call = (path, name, args, callback, async) ->
+    forkChild = (file, name, args, callback, async) ->
         
         try
-
-            onMessage = (msg) ->
+            
+            cp = childp.fork __filename, stdio: ['pipe', 'pipe', 'pipe', 'ipc']
+            
+            onResult = (msg) -> 
+                result = JSON.parse msg
+                log 'forkfunc result', file, result
+                callback result.err, result.result
                 
-                if msg.error
-                    msg.error = JSON.parse msg.error
-
-                callback msg.error, msg.result
-
-            onError = (err) -> callback err
-
-            onExit = () ->
-                cp.removeListener 'message'     , onMessage
-                cp.removeListener 'error'       , onError
-                cp.removeListener 'exit'        , onExit
-
-            cp = CP.fork __filename, stdio: ['pipe', 'pipe', 'pipe', 'ipc']
-            cp.on 'message', onMessage
-            cp.on 'error'  , onError
-            cp.on 'exit'   , onExit
+            onExit = ->
+                cp.removeListener 'message', onResult
+                cp.removeListener 'exit',    onExit
+                
+            cp.on 'message', onResult
+            cp.on 'exit',    onExit
 
             cp.send
-                path:  path
+                file:  file
                 name:  name
                 args:  args
                 async: async
 
         catch err
+            
             callback err, null
             
         cp
 
-    parse = (path) ->
+    parse = (file) ->
         
-        if /^[.]?\.\//.test path
+        if /^[.]?\.\//.test file
             stack = new Error().stack.split /\r\n|\n/
-            path  = Path.join Path.dirname(/\((.*?):/.exec(stack[3])[1]), path
+            file  = path.join path.dirname(/\((.*?):/.exec(stack[3])[1]), file
 
         name = null
-        args = /(.*)::(.*)/.exec path
+        args = /(.*)::(.*)/.exec file
         if args and args.length
-            path = args[1]
+            file = args[1]
             name = args[2]
 
-        path: path
+        file: file
         name: name
 
     module.exports = forkfunc
@@ -78,31 +82,30 @@ else
     # 000       000   000  000  000      000   000
     #  0000000  000   000  000  0000000  0000000
 
-    call = (msg) ->
+    { log 
+    } = require 'kxk'
+    
+    sendResult = (err, result) ->
+        
+        log 'child result', err, result
+        process.removeListener 'message', callFunc
+        process.send JSON.stringify err:err, result:result
+        
+    callFunc = (msg) ->
         
         try
             
-            func = require msg.path
+            func = require msg.file
             func = func[msg.name] if msg.name
             msg.args.push ready if msg.async
-            result = func.apply null, msg.args
-            ready null, result if not msg.async
+            log 'callFunc', msg.args
+            result = func.apply func, msg.args
             
-        catch error
+        catch err
             
-            ready JSON.stringify
-                name:    error.name
-                message: error.message
-                stack:   error.stack
+            sendResult err
+            return
                 
-        null
+        sendResult null, result if not msg.async        
 
-    ready = (error, result) ->
-        
-        process.removeListener 'message', call
-        process.send
-            error:  error
-            result: result
-
-    process.on 'message', call
-
+    process.on 'message', callFunc

@@ -91,7 +91,7 @@ class Diffbar
 
         @clearMetas()
 
-        return if not @changes
+        return if not @changes?.changes?.length
         
         # log "Diffbar.updateMetas", @changes
 
@@ -178,6 +178,7 @@ class Diffbar
 
     onEditorFile: =>
 
+        log 'onEditorFile', @editor.currentFile
         gitWatch.watch @editor.currentFile
         @update()
 
@@ -189,25 +190,27 @@ class Diffbar
 
     update: =>
 
+        log 'diffbar update', @editor.currentFile
+        
         if @editor.currentFile
 
-            @changes = file:@editor.currentFile 
+            @changes = file:@editor.currentFile
             
             forkfunc '../tools/gitdiff', @editor.currentFile, (err, changes) =>
                 
                 if not empty err
+                    log 'git diff error!', err
                     @changes.error = err
-                    @editor.emit 'diffbarUpdated', @changes
-                    return
-                    
-                if changes.file == @editor.currentFile
+                else if changes.file == @editor.currentFile
                     @changes = changes
-                    @updateMetas()
-                    @updateScroll()
                     
+                log 'diffbar updated', @changes
+                @updateMetas()
+                @updateScroll()
                 @editor.emit 'diffbarUpdated', @changes
         else   
             @changes = null
+            log 'diffbar updated', @changes
             @updateMetas()
             @updateScroll()
             @editor.emit 'diffbarUpdated', @changes

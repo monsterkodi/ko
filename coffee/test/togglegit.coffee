@@ -1,9 +1,9 @@
 
-# 000000000   0000000    0000000    0000000   000      00000000         0000000   000  000000000
-#    000     000   000  000        000        000      000             000        000     000
-#    000     000   000  000  0000  000  0000  000      0000000         000  0000  000     000
-#    000     000   000  000   000  000   000  000      000             000   000  000     000
-#    000      0000000    0000000    0000000   0000000  00000000         0000000   000     000
+# 000000000   0000000    0000000    0000000   000      00000000         0000000   000  000000000    
+#    000     000   000  000        000        000      000             000        000     000       
+#    000     000   000  000  0000  000  0000  000      0000000         000  0000  000     000       
+#    000     000   000  000   000  000   000  000      000             000   000  000     000       
+#    000      0000000    0000000    0000000   0000000  00000000         0000000   000     000       
 
 { childp, path, empty, post, log, _
 }        = require 'kxk'
@@ -31,22 +31,24 @@ original   = 'abcdefghijklmnopqrstuvwxyz'.split('').join '\n'
 
 loadFile = (file, text, done) ->
     
-    editor.once 'file', (f) ->
+    onDiffbarUpdate = (changes) ->
+        
+        return if changes.file != file
+        
+        editor.removeListener 'diffbarUpdated', onDiffbarUpdate
         
         try
-            test f, file
+            test changes.error == undefined
+            test empty changes.changes
             test editor.text(), text
         catch err
             return done err
             
-        editor.once 'diffbarUpdated', (changes) ->
-            try
-                test changes.file, file
-                test empty changes.changes
-            catch err
-                return done err
-            done()
+        done()
         
+    editor.on 'diffbarUpdated', onDiffbarUpdate
+    
+    log 'newtab', file    
     post.emit 'newTabWithFile', file
 
 #  0000000   0000000   000   000  00000000
@@ -57,21 +59,25 @@ loadFile = (file, text, done) ->
 
 saveFile = (file, done) ->
 
-    post.once 'saved', (f) ->
+    onDiffbarUpdate = (changes) ->
+        
+        return if changes.file != file
+        
+        editor.removeListener 'diffbarUpdated', onDiffbarUpdate
+        
         try
-            test f, file
+            test changes.error == undefined
+            if empty changes.changes
+                log 'dafuk?', file, changes, editor.text()
+            test not empty changes.changes
         catch err
             return done err
+            
+        done()
 
-        editor.once 'diffbarUpdated', (changes) ->
-            try
-                test changes.file, file
-                test changes.error == undefined
-                test not empty changes.changes
-            catch err
-                return done err
-            done()
-
+    editor.on 'diffbarUpdated', onDiffbarUpdate
+    
+    log 'savefile', file        
     post.emit 'saveFile'
 
 # 00000000   00000000  000   000  00000000  00000000   000000000
@@ -82,31 +88,28 @@ saveFile = (file, done) ->
 
 revertFile = (file, text, done) ->
 
-    editor.once 'file', (f) ->
+    onDiffbarUpdate = (changes) ->
+        return if changes.file != file
+        editor.removeListener 'diffbarUpdated', onDiffbarUpdate
+        
         try
-            test f, file
-            test editor.currentFile, file
+            test changes.error == undefined
+            test empty changes?.changes
             test editor.text(), text
         catch err
             return done err
 
-        editor.once 'diffbarUpdated', (changes) ->
+        post.once 'tabClosed', (tf) ->
+            if tf == file
+                done()
+            else
+                done new Error "wrong tab closed? #{tf} != #{file}"
+                
+        post.emit 'closeTabOrWindow'
 
-            try
-                test changes.file, file
-                test changes.error == undefined
-                test empty changes?.changes
-            catch err
-                return done err
-
-            post.once 'tabClosed', (tf) ->
-                if tf == file
-                    done()
-                else
-                    done new Error "wrong tab closed? #{tf} != #{file}"
-                    
-            post.emit 'closeTabOrWindow'
-
+    editor.on 'diffbarUpdated', onDiffbarUpdate
+        
+    log 'revert', file
     try
         childp.execSync "git checkout -- #{file}"
     catch err
@@ -202,6 +205,9 @@ describe 'insert double', ->
         editor.cursorInAllLines()
         editor.toggleGitChange()
 
+        if empty editor.meta.metasAtLineIndex 2
+            log 'double undo again metas', editor.meta.metas
+        
         test not empty editor.meta.metasAtLineIndex 2
         test editor.text(), simpleText
 
@@ -214,7 +220,7 @@ describe 'insert double', ->
 # 0000000    00000000  0000000  00000000     000     00000000
 
 describe 'delete', ->
-    # return
+    return
     it 'load', (done) -> loadFile simpleFile, simpleText, done
 
     it 'modify', ->
@@ -310,13 +316,7 @@ describe 'mixed', ->
 
 describe 'complex', ->
     return
-    it 'load', ->
-
-        post.emit 'newTabWithFile', testFile
-        test editor.dirty, false
-        test editor.currentFile, testFile
-        test editor.text(), original
-        test editor.diffbar.changes, null
+    it 'load', (done) -> loadFile testFile, original, done
 
     it 'modify', ->
 
@@ -362,21 +362,7 @@ describe 'complex', ->
 
         test empty editor.diffbar.changes
 
-    it 'save', (done) ->
-
-        post.once 'saved', (file) ->
-            try
-                test file, testFile
-            catch err
-                return done err
-            editor.once 'diffbarUpdated', ->
-                try
-                    test not empty editor.diffbar.changes.changes
-                    log editor.diffbar.changes.changes
-                catch err
-                    return done err
-                done()
-        post.emit 'saveFile'
+    it 'save', (done) -> saveFile testFile, done
 
     it 'undo all', ->
         return
@@ -384,24 +370,4 @@ describe 'complex', ->
         editor.toggleGitChange()
         test editor.text(), original
 
-    it 'revert', (done) ->
-        return done()
-        childp.execSync "git checkout -- #{testFile}"
-
-        post.once 'file', (file) ->
-
-            try
-                test file, testFile
-                test editor.dirty, false
-                test editor.currentFile, testFile
-                test editor.text(), original
-            catch err
-                return done err
-
-            editor.once 'diffbarUpdated', ->
-                try
-                    test changes.error == undefined
-                    test empty editor.diffbar.changes
-                catch err
-                    return done err
-                done()
+    it 'revert', (done) -> revertFile testFile, original, done

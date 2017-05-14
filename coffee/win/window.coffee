@@ -204,7 +204,8 @@ saveFile = (file) ->
     if not file?
         saveFileAs()
         return
-        
+
+    log 'win.saveFile', file
     editor.stopWatcher()
     
     if fileExists file
@@ -215,6 +216,8 @@ saveFile = (file) ->
         
     atomic file, editor.text(), { encoding: 'utf8', mode: mode }, (err) ->
         
+        log "atomic saved #{err}"
+        
         editor.saveScrollCursorsAndSelections()
         
         if err?
@@ -223,6 +226,7 @@ saveFile = (file) ->
             editor.setCurrentFile      file
             post.toOthers 'fileSaved', file, winID
             post.emit     'saved',     file
+        log 'atomic done'
 
 window.saveChanges = ->
     
@@ -339,6 +343,7 @@ loadFile = (file, opt={}) ->
             if tab = tabs.tab file
                 tab.setActive()
 
+            log 'window.loadFile', file, opt
             editor.setCurrentFile file, opt
             
             post.toOthers 'fileLoaded', file, winID

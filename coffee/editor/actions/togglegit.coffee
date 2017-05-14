@@ -22,7 +22,7 @@ module.exports =
 
     toggleGitChangesInLines: (lineIndices) ->
 
-        @dumpMetas "before toggle #{lineIndices.join ', '}"
+        # @dumpMetas "before toggle #{lineIndices.join ', '}"
         
         metas = []
         untoggled = false
@@ -32,7 +32,6 @@ module.exports =
             for lineMeta in @meta.metasAtLineIndex(li)
 
                 if lineMeta[2].clss.startsWith 'git'
-                    lineMeta[2].li = li
 
                     if not lineMeta[2].toggled
                         untoggled = true
@@ -41,6 +40,8 @@ module.exports =
 
         for lineMeta in metas
 
+            oi = lineMeta[0]
+            
             if untoggled
                 if not lineMeta[2].toggled
                     @reverseGitChange lineMeta
@@ -50,31 +51,21 @@ module.exports =
                 else
                     @reverseGitChange lineMeta
 
-            if lineMeta[2].li != lineMeta[0]
-                offset = lineMeta[2].li - lineMeta[0]
+            if oi != lineMeta[0]
+                offset = oi - lineMeta[0]
+                # log 'offset', offset
                 if offset < 0
-                    if lineMeta[2].git == 'del'
-                        log 'offset move del', lineMeta[2].li, lineMeta[0], offset
-                        @meta.moveLineMeta lineMeta, offset
-                    else if lineMeta in @meta.metas
-                        log 'offset move ins/mod', lineMeta[2].li, lineMeta[0], offset, -1
-                        @meta.moveLineMeta lineMeta, -1
-                    else
-                        log 'deleted offset', lineMeta[2].li, lineMeta[0], offset, lineMeta[2].toggled, lineMeta[2].git
-                        # lineMeta[0] += offset
-                else
-                    log 'offset ??', lineMeta[2].li, lineMeta[0], offset
-
+                    # log 'offset move', oi, lineMeta[0], offset
+                    @meta.moveLineMeta lineMeta, offset
+            
         for lineMeta in metas
             
             if lineMeta not in @meta.metas
-                log 'reinsert', lineMeta
+                # log 'reinsert', lineMeta
                 @meta.addLineMeta lineMeta
                 @meta.addDiv lineMeta
 
-            delete lineMeta[2].li
-
-        @dumpMetas 'after toggle'
+        # @dumpMetas 'after toggle'
         
     dumpMetas: (title) ->
         @log title
@@ -92,7 +83,7 @@ module.exports =
         meta = lineMeta[2]
         li   = lineMeta[0]
 
-        log "togglegit.reverseGitChange", li, meta.clss
+        # log "togglegit.reverseGitChange", li, meta.clss
 
         @do.start()
         cursors    = @do.cursors()
@@ -110,20 +101,20 @@ module.exports =
                 if not empty lc = positionsAtLineIndexInPositions li, cursors
                     meta.cursors = lc
                 
-                log "reverseGitChange delete", li, @do.line(li)
-                log "\n"+ @do.text()
+                # log "reverseGitChange delete", li, @do.line(li)
+                # log "\n"+ @do.text()
                 @do.delete li
-                log "\n"+ @do.text()
+                # log "\n"+ @do.text()
                 for nc in positionsBelowLineIndexInPositions li, cursors
                     cursorDelta nc, 0, -1
 
             when 'git del'
 
                 for line in reversed meta.change
-                    log "reverseGitChange insert", li, line.old
-                    log "\n"+ @do.text()
+                    # log "reverseGitChange insert", li, line.old
+                    # log "\n"+ @do.text()
                     @do.insert li, line.old
-                    log "\n"+ @do.text()
+                    # log "\n"+ @do.text()
                     for nc in positionsBelowLineIndexInPositions li, cursors
                         cursorDelta nc, 0, +1
 
@@ -142,7 +133,7 @@ module.exports =
         meta = lineMeta[2]
         li   = lineMeta[0]
 
-        log "togglegit.applyGitChange", li, meta.clss
+        # log "togglegit.applyGitChange", li, meta.clss
 
         @do.start()
         cursors = @do.cursors()
@@ -159,10 +150,10 @@ module.exports =
 
             when 'git add', 'git add boring'
 
-                log 'applyGitChange insert', li, meta.change.new
-                log "\n"+ @do.text()
+                # log 'applyGitChange insert', li, meta.change.new
+                # log "\n"+ @do.text()
                 @do.insert li, meta.change.new
-                log "\n"+ @do.text()
+                # log "\n"+ @do.text()
                 
                 for nc in positionsBelowLineIndexInPositions li, cursors
                     cursorDelta nc, 0, +1
@@ -173,10 +164,10 @@ module.exports =
             when 'git del'
 
                 for line in reversed meta.change
-                    log 'applyGitChange delete', li, @do.line li
-                    log "\n"+ @do.text()
+                    # log 'applyGitChange delete', li, @do.line li
+                    # log "\n"+ @do.text()
                     @do.delete li
-                    log "\n"+ @do.text()
+                    # log "\n"+ @do.text()
                     for nc in positionsBelowLineIndexInPositions li, cursors
                         cursorDelta nc, 0, -1
 
