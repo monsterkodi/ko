@@ -12,12 +12,12 @@ chokidar = require 'chokidar'
 class Watcher
 
     constructor: (@editor) ->
-        log 'watcher start', @editor.currentFile
+        # log 'watcher start', @editor.currentFile
         @w = chokidar.watch @editor.currentFile, ignoreInitial: true
         
         @w.on 'change', (p) =>
             
-            log 'watcher change', p, @editor.currentFile
+            # log 'watcher change', p, @editor.currentFile
             window.loadFile @editor.currentFile, reload: true, dontSave: true
             
         @w.on 'unlink', (p) => @editor.setText ""

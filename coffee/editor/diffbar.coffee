@@ -178,7 +178,7 @@ class Diffbar
 
     onEditorFile: =>
 
-        log 'onEditorFile', @editor.currentFile
+        # log 'onEditorFile', @editor.currentFile
         gitWatch.watch @editor.currentFile
         @update()
 
@@ -190,7 +190,7 @@ class Diffbar
 
     update: =>
 
-        log 'diffbar update', @editor.currentFile
+        # log 'diffbar update', @editor.currentFile
         
         if @editor.currentFile
 
@@ -203,8 +203,10 @@ class Diffbar
                     @changes.error = err
                 else if changes.file == @editor.currentFile
                     @changes = changes
+                else
+                    return
                     
-                log 'diffbar updated', @changes
+                # log 'diffbar updated', @changes
                 @updateMetas()
                 @updateScroll()
                 @editor.emit 'diffbarUpdated', @changes

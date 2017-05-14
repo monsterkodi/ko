@@ -19,7 +19,7 @@ if module.parent
     forkfunc = (file, args..., callback) ->
         
         opts = parse file
-        log 'forkfunc', file, args, opts
+        # log 'forkfunc', file, args, opts
         forkChild opts.file, opts.name, args, callback, false
 
     forkfunc.async = (file, args..., callback) ->
@@ -30,17 +30,19 @@ if module.parent
     forkChild = (file, name, args, callback, async) ->
         
         try
-            
+            # log 'forkfunc fork', file
             cp = childp.fork __filename, stdio: ['pipe', 'pipe', 'pipe', 'ipc']
             
-            onResult = (msg) -> 
-                result = JSON.parse msg
-                log 'forkfunc result', file, result
-                callback result.err, result.result
                 
             onExit = ->
                 cp.removeListener 'message', onResult
                 cp.removeListener 'exit',    onExit
+                
+            onResult = (msg) -> 
+                result = JSON.parse msg
+                # log 'forkfunc result', file, result
+                callback result.err, result.result
+                onExit()
                 
             cp.on 'message', onResult
             cp.on 'exit',    onExit
@@ -87,7 +89,7 @@ else
     
     sendResult = (err, result) ->
         
-        log 'child result', err, result
+        # log 'child result', err, result
         process.removeListener 'message', callFunc
         process.send JSON.stringify err:err, result:result
         
@@ -98,7 +100,7 @@ else
             func = require msg.file
             func = func[msg.name] if msg.name
             msg.args.push ready if msg.async
-            log 'callFunc', msg.args
+            # log 'callFunc', msg.args
             result = func.apply func, msg.args
             
         catch err

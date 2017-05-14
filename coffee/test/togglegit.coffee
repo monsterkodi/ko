@@ -48,7 +48,7 @@ loadFile = (file, text, done) ->
         
     editor.on 'diffbarUpdated', onDiffbarUpdate
     
-    log 'newtab', file    
+    # log 'newtab', file    
     post.emit 'newTabWithFile', file
 
 #  0000000   0000000   000   000  00000000
@@ -77,7 +77,7 @@ saveFile = (file, done) ->
 
     editor.on 'diffbarUpdated', onDiffbarUpdate
     
-    log 'savefile', file        
+    # log 'savefile', file        
     post.emit 'saveFile'
 
 # 00000000   00000000  000   000  00000000  00000000   000000000
@@ -109,7 +109,7 @@ revertFile = (file, text, done) ->
 
     editor.on 'diffbarUpdated', onDiffbarUpdate
         
-    log 'revert', file
+    # log 'revert', file
     try
         childp.execSync "git checkout -- #{file}"
     catch err

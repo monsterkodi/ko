@@ -97,18 +97,18 @@ class FileEditor extends TextEditor
         if not opt?.skip
             if not @currentFile?
                 post.emit 'file', @currentFile # titlebar -> tabs -> tab
-            log 'emit file', @currentFile
+            # log 'emit file', @currentFile
             @emit 'file', @currentFile # diffbar, pigments, ...
 
     restoreFromTabState: (tabsState) ->
 
-        log 'restoreFromTabState', tabsState
+        # log 'restoreFromTabState', tabsState
         return error "no tabsState.file?" if not tabsState.file?
         @clear skip:true
         @setCurrentFile tabsState.file, restoreState:tabsState.state
 
     stopWatcher: ->
-        log 'stopWatcher', @currentFile
+        # log 'stopWatcher', @currentFile
         @watch?.stop()
         @watch = null
 
