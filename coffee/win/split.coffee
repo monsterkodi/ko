@@ -79,13 +79,17 @@ class Split extends event
         action = words[0]
         what   = words[1]
         switch action
-            when 'show'     then return @show what
+            when 'show'     then return @show  what
             when 'focus'    then return @focus what
             when 'half'     then pos   =  @flex.size()/2
             when 'third'    then pos   =  @flex.size()/3
             when 'quart'    then pos   =  @flex.size()/4
-            when 'maximize' then delta =  @flex.size()
-            when 'minimize' then delta = -@flex.size()
+            when 'maximize' 
+                if what == 'editor' then return @maximizeEditor()
+                delta =  @flex.size()
+            when 'minimize' 
+                if what == 'editor' then return @minimizeEditor()
+                delta = -@flex.size()
             when 'enlarge'
                 if words[2] == 'by'
                     delta = parseInt words[3]
@@ -109,6 +113,7 @@ class Split extends event
         error "Split.do -- unhandled do command? #{sentence}?"
 
     maximizeEditor: -> 
+        
         log "Split.maximizeEditor"
         @focus 'editor'
         @flex.expand 'editor'
@@ -116,6 +121,12 @@ class Split extends event
         @hideCommandline()
         @flex.resized()
 
+    minimizeEditor: ->
+        
+        @showCommandline()
+        @focus 'commandline'
+        @flex.moveHandleToPos @flex.handles[1], @flex.size()
+                
     #  0000000  000   000   0000000   000   000  
     # 000       000   000  000   000  000 0 000  
     # 0000000   000000000  000   000  000000000  

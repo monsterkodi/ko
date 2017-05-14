@@ -35,6 +35,8 @@ class Tab
     
     saveChanges: ->
         
+        log 'tab.saveChanges', @state
+        
         if @state
             
             if @foreign?.length
@@ -60,12 +62,16 @@ class Tab
     
     storeState: ->
         
-        return error 'no editor file?' if not @editor.currentFile
+        return error 'no editor file?' if not window.editor.currentFile
+        
+        # log 'storeState', @info
         @state = window.editor.do.tabState()
         
     restoreState: ->
         
         return error 'no file in state?', @state if not @state?.file?
+        
+        # log 'restoreState', @info
         window.editor.do.setTabState @state
         delete @state
         
@@ -76,7 +82,7 @@ class Tab
     #  0000000   000        0000000    000   000     000     00000000  
     
     update: (info) ->
-        
+                
         oldFile = @info?.file
         oldPkg  = @info?.pkg
         
@@ -116,13 +122,17 @@ class Tab
     prev:  -> @tabs.tab @index()-1 if @index() > 0
     next:  -> @tabs.tab @index()+1 if @index() < @tabs.numTabs()-1
     nextOrPrev: -> @next() ? @prev()
+    
     dirty: -> 
         return true if @state? 
         return true if @foreign? and @foreign.length > 0 
         return true if @info?.dirty == true
+        # return false even if editor has line changes:
+        # dirty is reset before changed file is saved
         false
         
     close: ->
+        
         @div.remove()
         @tooltip.del()
         post.emit 'tabClosed', @info.file ? 'untitled'
@@ -146,8 +156,11 @@ class Tab
     activate: ->
         
         activeTab = @tabs.activeTab()
+
         if activeTab? and activeTab.dirty()
             activeTab.storeState()
+        # else
+            # log 'skip store state', activeTab?, activeTab?.dirty()
         
         @setActive()
         

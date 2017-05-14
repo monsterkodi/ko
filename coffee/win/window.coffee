@@ -582,6 +582,7 @@ handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
         when 'command+ctrl+left'  then return stopEvent event, navigate.backward()
         when 'command+ctrl+right' then return stopEvent event, navigate.forward()
         when 'command+shift+y'    then return stopEvent event, split.maximizeEditor()
+        when 'command+alt+y'      then return stopEvent event, split.do 'minimize editor'
 
 document.addEventListener 'keydown', onKeyDown        
         
