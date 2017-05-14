@@ -19,6 +19,7 @@ class ObjectEditor extends TextEditor
         @fontSizeDefault = 14
         @syntaxName = opt?.syntax ? 'js'
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Brackets', 'Strings']
+        viewElem.setAttribute 'tabindex', 5
         @numbers.elem.style.fontSize = "#{@fontSizeDefault}px"        
 
 class ObjectBrowser extends Browser
@@ -257,6 +258,7 @@ class ObjectBrowser extends Browser
         col = @emptyColumn opt?.column
         @clearColumnsFrom col.index, pop:true
         col.editor = new ObjectEditor col.table, opt
+        col.editor.name = 'objecteditor'
         col.editor.setLines lines
 
     # 000  000000000  00000000  00     00  

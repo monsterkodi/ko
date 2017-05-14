@@ -146,6 +146,12 @@ class TextEditor extends Editor
 
         super text
 
+    # 000      000  000   000  00000000   0000000  
+    # 000      000  0000  000  000       000       
+    # 000      000  000 0 000  0000000   0000000   
+    # 000      000  000  0000  000            000  
+    # 0000000  000  000   000  00000000  0000000   
+    
     setLines: (lines) ->
 
         @clearLines()
@@ -160,9 +166,10 @@ class TextEditor extends Editor
 
         @scroll.reset()
 
-        if @scroll.viewHeight != @viewHeight()
-            @scroll.setViewHeight @viewHeight()
-            @emit 'viewHeight', @viewHeight()
+        viewHeight = @viewHeight()
+        if @scroll.viewHeight != viewHeight
+            @scroll.setViewHeight viewHeight
+            @emit 'viewHeight', viewHeight
 
         @scroll.setNumLines @numLines()
 
@@ -195,7 +202,7 @@ class TextEditor extends Editor
             @scroll.setViewHeight @viewHeight()
 
         showLines = (@scroll.bot < @scroll.top) or (@scroll.bot < @scroll.viewLines)
-        # @log 'appendText', showLines, @scroll.info()
+
         @scroll.setNumLines @numLines(), showLines:showLines
 
         for li in appended
@@ -305,8 +312,6 @@ class TextEditor extends Editor
     # 0000000   000   000   0000000   00     00  0000000  000  000   000  00000000  0000000
 
     showLines: (top, bot, num) =>
-        
-        # @log 'show lines', top, bot
         
         @lineDivs = {}
         @elem.innerHTML = ''
@@ -581,8 +586,11 @@ class TextEditor extends Editor
                     return info
         null
 
-    viewHeight:   -> @scroll?.viewHeight ? @view?.clientHeight
     numFullLines: -> Math.floor(@viewHeight() / @size.lineHeight)
+    
+    viewHeight:   -> 
+        if @scroll?.viewHeight >= 0 then return @scroll.viewHeight
+        @view?.clientHeight
 
     clearLines: =>
 
@@ -739,7 +747,7 @@ class TextEditor extends Editor
             stopEvent event
 
     log: ->
-        return if @name != 'editor'
+        return if @name != 'objecteditor'
         log.slog.depth = 3
         log.apply log, [].splice.call arguments, 0
         log.slog.depth = 2
