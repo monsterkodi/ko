@@ -101,6 +101,7 @@ class Command
     #  0000000  000   000  000   000   0000000  00000000  0000000
     
     cancel: ->
+        
         @hideList()        
         text: ''
         focus: @focus
@@ -129,6 +130,7 @@ class Command
     listItems: () -> reversed @history
 
     showItems: (items) ->
+        
         return if not @commandList? and not items.length
         return @hideList() if not items.length
         @showList() if not @commandList?
@@ -144,6 +146,7 @@ class Command
         @positionList()
     
     positionList: ->
+        
         return if not @commandList?
         flex = window.split.flex
         flex.update()
@@ -167,6 +170,7 @@ class Command
     # 0000000   00000000  0000000  00000000   0000000     000   
         
     select: (i) -> 
+        
         @selected = clamp -1, @commandList?.numLines()-1, i
         if @selected >= 0
             @commandList?.selectSingleRange @commandList.rangeForLineAtIndex @selected
@@ -181,6 +185,7 @@ class Command
     # 000        000   000  00000000      0    
             
     prev: -> 
+        
         if @commandList?
             @select clamp -1, @commandList.numLines()-1, @selected-1
             if @selected < 0

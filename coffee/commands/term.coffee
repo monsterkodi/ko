@@ -255,6 +255,7 @@ class Term extends Command
     # 0000000   000        0000000  000     000           000   000  0000000  000  000   000  0000000
 
     splitAlias: (command) ->
+        
         commands = command.trim().split ';'
         if commands.length > 1
             cmds = []

@@ -22,7 +22,7 @@ class Macro extends Command
     constructor: (@commandline) ->
 
         @shortcuts = ['command+m']
-        @macros    = ['dbg', 'class', 'inv', 'req', 'color', 'fps']
+        @macros    = ['clean', 'help', 'dbg', 'class', 'req', 'inv', 'blink', 'color', 'fps', 'test']
         @macros    = @macros.concat window.editor.Transform.transformNames
         @names     = ['macro']
         super @commandline

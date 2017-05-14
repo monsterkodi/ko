@@ -12,44 +12,44 @@ matchr = require '../../tools/matchr'
 class Transform
 
     @transformNames = [
-        'upperCase', 'lowerCase', 'titleCase', 
-        'resolve', 'unresolve', 
+        'upperCase', 'lowerCase', 'titleCase',
+        'resolve', 'unresolve',
         'basename', 'dirname', 'extname', 'filename'
     ]
-    
-    constructor: (@editor) -> 
-        
+
+    constructor: (@editor) ->
+
         @editor.transform = @
         @last         = null
         @caseFuncs    = ['upperCase', 'lowerCase', 'titleCase']
         @resolveFuncs = ['resolve', 'unresolve']
-    
-    #  0000000   0000000    0000000  00000000  
-    # 000       000   000  000       000       
-    # 000       000000000  0000000   0000000   
-    # 000       000   000       000  000       
-    #  0000000  000   000  0000000   00000000  
-    
+
+    #  0000000   0000000    0000000  00000000
+    # 000       000   000  000       000
+    # 000       000000000  0000000   0000000
+    # 000       000   000       000  000
+    #  0000000  000   000  0000000   00000000
+
     toggleCase: ->
 
         if @last not in @caseFuncs
-            @last = _.last @caseFuncs 
-            
+            @last = _.last @caseFuncs
+
         nextIndex = (1 + @caseFuncs.indexOf @last) % @caseFuncs.length
         @do @caseFuncs[nextIndex]
-        
+
     upperCase: ->
-        
+
         @apply (t) -> t.toUpperCase()
         'upperCase'
-        
+
     lowerCase: ->
-        
+
         @apply (t) -> t.toLowerCase()
         'lowerCase'
-        
+
     titleCase: ->
-        
+
         pattern = /\w+/
         @apply (t) ->
             for r in matchr.ranges /\w+/, t
@@ -57,113 +57,113 @@ class Transform
             t
         'titleCase'
 
-    # 00000000   00000000   0000000   0000000   000      000   000  00000000  
-    # 000   000  000       000       000   000  000      000   000  000       
-    # 0000000    0000000   0000000   000   000  000       000 000   0000000   
-    # 000   000  000            000  000   000  000         000     000       
-    # 000   000  00000000  0000000    0000000   0000000      0      00000000  
-        
+    # 00000000   00000000   0000000   0000000   000      000   000  00000000
+    # 000   000  000       000       000   000  000      000   000  000
+    # 0000000    0000000   0000000   000   000  000       000 000   0000000
+    # 000   000  000            000  000   000  000         000     000
+    # 000   000  00000000  0000000    0000000   0000000      0      00000000
+
     toggleResolve: ->
-        
+
         if @last not in @resolveFuncs
             @last = _.last @resolveFuncs
-            
+
         nextIndex = (1+ @resolveFuncs.indexOf @last) % @resolveFuncs.length
         @do @resolveFuncs[nextIndex]
 
     resolve: ->
-        
+
         cwd = process.cwd()
         if @editor.currentFile?
             process.chdir path.dirname @editor.currentFile
         @apply (t) -> resolve t
         process.chdir cwd
         'resolve'
-        
+
     unresolve: ->
-        
+
         @apply (t) -> unresolve t
         'unresolve'
 
-    # 00000000    0000000   000000000  000   000    
-    # 000   000  000   000     000     000   000    
-    # 00000000   000000000     000     000000000    
-    # 000        000   000     000     000   000    
-    # 000        000   000     000     000   000    
-    
-    basename: -> 
-        
+    # 00000000    0000000   000000000  000   000
+    # 000   000  000   000     000     000   000
+    # 00000000   000000000     000     000000000
+    # 000        000   000     000     000   000
+    # 000        000   000     000     000   000
+
+    basename: ->
+
         @apply (t) -> path.basename t
         'basename'
-        
-    dirname: -> 
-        
+
+    dirname: ->
+
         @apply (t) -> path.dirname t
         'dirname'
-        
-    extname: -> 
-        
+
+    extname: ->
+
         @apply (t) -> path.extname t
         'extname'
-        
-    filename: -> 
-        
+
+    filename: ->
+
         @apply (t) -> fileName t
         'filename'
-    
-        
-    #  0000000   00000000   00000000   000      000   000  
-    # 000   000  000   000  000   000  000       000 000   
-    # 000000000  00000000   00000000   000        00000    
-    # 000   000  000        000        000         000     
-    # 000   000  000        000        0000000     000     
-    
+
+
+    #  0000000   00000000   00000000   000      000   000
+    # 000   000  000   000  000   000  000       000 000
+    # 000000000  00000000   00000000   000        00000
+    # 000   000  000        000        000         000
+    # 000   000  000        000        0000000     000
+
     apply: (tfunc) ->
-        
+
         selections = @editor.selections()
         tl = @editor.textsInRanges selections
         tl = tl.map tfunc
 
-        selections = _.zip(selections, tl).map (p) -> 
+        selections = _.zip(selections, tl).map (p) ->
             p[0][1][1] = p[0][1][0] + p[1].length
             p[0]
-        
+
         @editor.do.start()
         @editor.pasteText tl.join '\n'
         @editor.do.select selections
         @editor.do.end()
-        
-    # 0000000     0000000   
-    # 000   000  000   000  
-    # 000   000  000   000  
-    # 000   000  000   000  
-    # 0000000     0000000   
-    
+
+    # 0000000     0000000
+    # 000   000  000   000
+    # 000   000  000   000
+    # 000   000  000   000
+    # 0000000     0000000
+
     do: (transName) ->
-        
+
         f = @[transName]
-        
+
         if f and _.isFunction f
             @last = f.call @
         else
             return error "unhandled transform #{transName}"
-            
+
         @last
-            
+
     @do: (editor, transName) ->
-        
+
         t = editor.transform ? new Transform editor
         t.do transName
 
 module.exports =
-    
+
     actions:
-        
+
         toggleCase:
             name:  'Toggle Case'
             text:  'toggles selected texts between lower- upper- and title-case'
             combo: 'command+alt+ctrl+u'
-            
+
         toggleResolve:
             name:  'Toggle Resolve'
             text:  'toggles selected texts between resolved and unresolved paths'
