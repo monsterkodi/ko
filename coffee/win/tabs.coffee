@@ -109,7 +109,7 @@ class Tabs
         
     onDragStop: (d,e) =>
         
-        @dragTab.div.style.opacity = '1'
+        @dragTab.div.style.opacity = ''
         @dragDiv.remove()
 
     # 000000000   0000000   0000000    

@@ -97,12 +97,12 @@ class Diffbar
 
         for change in @changes.changes
 
-            li = change.line-1
-
             boring = @isBoring change 
         
             if change.mod?
 
+                li = change.line-1
+                
                 for mod in change.mod
                     
                     meta =
@@ -118,6 +118,8 @@ class Diffbar
 
             if change.add?
 
+                li = change.line-1
+                
                 for add in change.add
                     meta =
                         line: li
@@ -133,6 +135,9 @@ class Diffbar
 
             else if change.del?
 
+                mods = change.mod? and change.mod.length or 1
+                li = change.line - 1 + mods
+                
                 meta =
                     line: li
                     clss: 'git del' + (boring and ' boring' or '')

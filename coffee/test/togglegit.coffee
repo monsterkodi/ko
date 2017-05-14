@@ -112,6 +112,101 @@ revertFile = (file, text, done) ->
     catch err
         done err
 
+# 000  000   000   0000000  00000000  00000000   000000000  
+# 000  0000  000  000       000       000   000     000     
+# 000  000 0 000  0000000   0000000   0000000       000     
+# 000  000  0000       000  000       000   000     000     
+# 000  000   000  0000000   00000000  000   000     000     
+
+describe 'insert single', ->
+    # return
+    it 'load', (done) -> loadFile simpleFile, simpleText, done
+
+    it 'modify', ->
+
+        editor.singleCursorAtPos [1,1]
+        editor.newline()
+        editor.insertCharacter 'x'
+        test editor.text(), '12x3456'.split('').join '\n'
+
+    it 'save', (done) -> saveFile simpleFile, done
+
+    it 'undo all', -> 
+
+        editor.cursorInAllLines()
+        editor.toggleGitChange()
+
+        test not empty editor.meta.metasAtLineIndex 2
+        test editor.text(), simpleText
+
+    it 'redo all', ->
+
+        editor.cursorInAllLines()
+        editor.toggleGitChange()
+
+        test not empty editor.meta.metasAtLineIndex 2
+        test editor.text(), '12x3456'.split('').join '\n'
+
+    it 'undo again', ->
+
+        editor.cursorInAllLines()
+        editor.toggleGitChange()
+
+        test not empty editor.meta.metasAtLineIndex 2
+        test editor.text(), simpleText
+
+    it 'revert', (done) -> revertFile simpleFile, simpleText, done
+
+# 0000000     0000000   000   000  0000000    000      00000000  
+# 000   000  000   000  000   000  000   000  000      000       
+# 000   000  000   000  000   000  0000000    000      0000000   
+# 000   000  000   000  000   000  000   000  000      000       
+# 0000000     0000000    0000000   0000000    0000000  00000000  
+
+describe 'insert double', ->
+    # return
+    it 'load', (done) -> loadFile simpleFile, simpleText, done
+
+    it 'modify', ->
+
+        editor.singleCursorAtPos [1,1]
+        editor.newline()
+        editor.insertCharacter 'x'
+        editor.newline()
+        editor.insertCharacter 'y'
+        
+        test editor.text(), '12xy3456'.split('').join '\n'
+
+    it 'save', (done) -> saveFile simpleFile, done
+
+    it 'undo all', -> 
+
+        editor.cursorInAllLines()
+        editor.toggleGitChange()
+
+        test not empty editor.meta.metasAtLineIndex 2
+        test editor.meta.metasAtLineIndex(2).length, 2
+        test editor.text(), simpleText
+
+    it 'redo all', ->
+
+        editor.cursorInAllLines()
+        editor.toggleGitChange()
+
+        test not empty editor.meta.metasAtLineIndex 2
+        test not empty editor.meta.metasAtLineIndex 3
+        test editor.text(), '12xy3456'.split('').join '\n'
+
+    it 'undo again', ->
+
+        editor.cursorInAllLines()
+        editor.toggleGitChange()
+
+        test not empty editor.meta.metasAtLineIndex 2
+        test editor.text(), simpleText
+
+    it 'revert', (done) -> revertFile simpleFile, simpleText, done
+    
 # 0000000    00000000  000      00000000  000000000  00000000
 # 000   000  000       000      000          000     000
 # 000   000  0000000   000      0000000      000     0000000
@@ -119,7 +214,7 @@ revertFile = (file, text, done) ->
 # 0000000    00000000  0000000  00000000     000     00000000
 
 describe 'delete', ->
-
+    # return
     it 'load', (done) -> loadFile simpleFile, simpleText, done
 
     it 'modify', ->
@@ -154,14 +249,14 @@ describe 'delete', ->
 
     it 'revert', (done) -> revertFile simpleFile, simpleText, done
 
-#  0000000  000  00     00  00000000   000      00000000
-# 000       000  000   000  000   000  000      000
-# 0000000   000  000000000  00000000   000      0000000
-#      000  000  000 0 000  000        000      000
-# 0000000   000  000   000  000        0000000  00000000
+# 00     00  000  000   000  00000000  0000000    
+# 000   000  000   000 000   000       000   000  
+# 000000000  000    00000    0000000   000   000  
+# 000 0 000  000   000 000   000       000   000  
+# 000   000  000  000   000  00000000  0000000    
 
-describe 'simple', ->
-
+describe 'mixed', ->
+    # return
     it 'load', (done) -> loadFile simpleFile, simpleText, done
 
     it 'modify', ->
@@ -192,14 +287,14 @@ describe 'simple', ->
         test editor.text(), simpleText
 
     it 'redo all', ->
-
+        # return
         editor.cursorInAllLines()
         editor.toggleGitChange()
 
         test editor.text(), '1\na2\n3b\n5\nd\n\n6'
 
     it 'undo again', ->
-
+        # return
         editor.cursorInAllLines()
         editor.toggleGitChange()
 
