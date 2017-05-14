@@ -31,6 +31,12 @@ module.exports =
             text: 'highlights all occurrences of text in selection or word at cursor and selects it. expands to the left if already selected.'
             combo: 'command+e'
 
+    # 000000000  00000000  000   000  000000000  
+    #    000     000        000 000      000     
+    #    000     0000000     00000       000     
+    #    000     000        000 000      000     
+    #    000     00000000  000   000     000     
+    
     highlightText: (text, opt) -> # called from find command
         
         hls = @rangesForText text, opt
@@ -44,6 +50,12 @@ module.exports =
         @renderHighlights()
         @emit 'highlight'
     
+    # 000   000   0000000   00000000   0000000     0000000  
+    # 000 0 000  000   000  000   000  000   000  000       
+    # 000000000  000   000  0000000    000   000  0000000   
+    # 000   000  000   000  000   000  000   000       000  
+    # 00     00   0000000   000   000  0000000    0000000   
+        
     wordHighlights: -> @highlights().filter (h) -> not h[2]?.clss?.startsWith('stringmatch') and not h[2]?.clss?.startsWith('bracketmatch')
 
     highlightWordAndAddToSelection: -> # command+d
@@ -74,6 +86,12 @@ module.exports =
             @do.setCursors (rangeEndPos(r) for r in @do.selections()), main: 'closest'
         @do.end()
 
+    #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000  
+    # 000       000       000      000       000          000     000  000   000  0000  000  
+    # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000  
+    #      000  000       000      000       000          000     000  000   000  000  0000  
+    # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000  
+    
     highlightTextOfSelectionOrWordAtCursor: -> # command+e       
             
         if @numSelections() == 0
@@ -117,12 +135,24 @@ module.exports =
                 
                 @focus()
 
+    #  0000000  000      00000000   0000000   00000000   
+    # 000       000      000       000   000  000   000  
+    # 000       000      0000000   000000000  0000000    
+    # 000       000      000       000   000  000   000  
+    #  0000000  0000000  00000000  000   000  000   000  
+    
     clearHighlights: ->
         
         if @numHighlights()
             @setHighlights []
             @emit 'highlight'
             
+    # 00000000   00000000  00     00   0000000   000   000  00000000  
+    # 000   000  000       000   000  000   000  000   000  000       
+    # 0000000    0000000   000000000  000   000   000 000   0000000   
+    # 000   000  000       000 0 000  000   000     000     000       
+    # 000   000  00000000  000   000   0000000       0      00000000  
+    
     removeSelectedHighlight: -> # command+shift+d
         
         cp = @cursorPos()

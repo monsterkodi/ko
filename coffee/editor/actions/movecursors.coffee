@@ -65,6 +65,12 @@ module.exports =
         else
             @moveCursorsToLineBoundary key
 
+    # 00     00   0000000   000  000   000  
+    # 000   000  000   000  000  0000  000  
+    # 000000000  000000000  000  000 0 000  
+    # 000 0 000  000   000  000  000  0000  
+    # 000   000  000   000  000  000   000  
+    
     moveMainCursor: (key, info) ->
         
         dir = key 
@@ -89,6 +95,12 @@ module.exports =
         @do.setCursors newCursors, main:newMain
         @do.end()
 
+    # 000   000   0000000   00000000   0000000    
+    # 000 0 000  000   000  000   000  000   000  
+    # 000000000  000   000  0000000    000   000  
+    # 000   000  000   000  000   000  000   000  
+    # 00     00   0000000   000   000  0000000    
+    
     moveCursorsToWordBoundary: (leftOrRight, info = extend:false) ->
         extend = info.extend ? 0 <= info.mod.indexOf 'shift'
         f = switch leftOrRight
@@ -97,7 +109,14 @@ module.exports =
         @moveAllCursors f, extend:extend, keepLine:true
         true
 
+    # 000      000  000   000  00000000  
+    # 000      000  0000  000  000       
+    # 000      000  000 0 000  0000000   
+    # 000      000  000  0000  000       
+    # 0000000  000  000   000  00000000  
+    
     moveCursorsToLineBoundary: (key, info = extend:false) ->
+        
         @do.start()
         extend = info.extend ? 0 <= info.mod.indexOf 'shift'
         func = switch key
@@ -112,6 +131,7 @@ module.exports =
         @do.end()
 
     moveCursors: (key, info = extend:false) ->
+        
         extend = info.extend ? 'shift' == info.mod
         switch key
             when 'left'  then @moveCursorsLeft  extend
@@ -120,6 +140,7 @@ module.exports =
             when 'down'  then @moveCursorsDown  extend
         
     setCursorsAtSelectionBoundary: (leftOrRight='right') ->
+        
         @do.start()
         i = leftOrRight == 'right' and 1 or 0
         newCursors = []
@@ -131,6 +152,12 @@ module.exports =
                 main = newCursors.indexOf p
         @do.setCursors newCursors, main:main
         @do.end()       
+    
+    #  0000000   000      000      
+    # 000   000  000      000      
+    # 000000000  000      000      
+    # 000   000  000      000      
+    # 000   000  0000000  0000000  
     
     moveAllCursors: (func, opt = extend:false, keepLine:true) -> 
         
@@ -161,18 +188,22 @@ module.exports =
         @endSelection opt
         @do.end()
         
-    moveCursorsUp: (e, n=1) ->                 
+    moveCursorsUp: (e, n=1) -> 
+        
         @moveAllCursors ((n)->(c)->[c[0],c[1]-n])(n), extend:e, main: 'top'
                         
     moveCursorsRight: (e, n=1) ->
+        
         moveRight = (n) -> (c) -> [c[0]+n, c[1]]
         @moveAllCursors moveRight(n), extend:e, keepLine:true, main: 'right'
     
     moveCursorsLeft: (e, n=1) ->
+        
         moveLeft = (n) -> (c) -> [Math.max(0,c[0]-n), c[1]]
         @moveAllCursors moveLeft(n), extend:e, keepLine:true, main: 'left'
         
     moveCursorsDown: (e, n=1) ->
+        
         if e and @numSelections() == 0 # selecting lines down
             if 0 == _.max (c[0] for c in @cursors()) # all cursors in first column
                 @do.start()

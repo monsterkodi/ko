@@ -21,6 +21,12 @@ class Invisibles
         else
             @clear()
 
+    # 000  000   000   0000000  00000000  00000000   000000000  
+    # 000  0000  000  000       000       000   000     000     
+    # 000  000 0 000  0000000   0000000   0000000       000     
+    # 000  000  0000       000  000       000   000     000     
+    # 000  000   000  0000000   00000000  000   000     000     
+    
     onLineInserted: (li) =>
 
         line = @editor.line li
@@ -32,6 +38,12 @@ class Invisibles
             end:   line.length
             clss:  'invisible ' + kind
 
+    #  0000000  000   000   0000000   000   000   0000000   00000000  
+    # 000       000   000  000   000  0000  000  000        000       
+    # 000       000000000  000000000  000 0 000  000  0000  0000000   
+    # 000       000   000  000   000  000  0000  000   000  000       
+    #  0000000  000   000  000   000  000   000   0000000   00000000  
+    
     onLineChanged: (li) =>
 
         metas = @editor.meta.metasAtLineIndex(li).filter (m) -> m[2].clss.startsWith 'invisible'
@@ -39,22 +51,41 @@ class Invisibles
         @editor.meta.delMeta metas[0]
         @onLineInserted li
 
+    #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
+    # 000   000  000          000     000  000   000  000   000     000     000       
+    # 000000000  000          000     000   000 000   000000000     000     0000000   
+    # 000   000  000          000     000     000     000   000     000     000       
+    # 000   000   0000000     000     000      0      000   000     000     00000000  
+    
+    activate: ->
+
+        prefs.set "invisibles:#{@editor.currentFile ? @editor.name}", true
+        @show()
+        
     deactivate: ->
 
         prefs.set "invisibles:#{@editor.currentFile}"
         @clear()
 
-    activate: ->
 
-        prefs.set "invisibles:#{@editor.currentFile ? @editor.name}", true
-        @show()
-
+    #  0000000  000      00000000   0000000   00000000   
+    # 000       000      000       000   000  000   000  
+    # 000       000      0000000   000000000  0000000    
+    # 000       000      000       000   000  000   000  
+    #  0000000  0000000  00000000  000   000  000   000  
+    
     clear: ->
 
         @editor.removeListener 'lineChanged',  @onLineChanged
         @editor.removeListener 'lineInserted', @onLineInserted
         @editor.meta.delClass 'invisible'
 
+    #  0000000  000   000   0000000   000   000  
+    # 000       000   000  000   000  000 0 000  
+    # 0000000   000000000  000   000  000000000  
+    #      000  000   000  000   000  000   000  
+    # 0000000   000   000   0000000   00     00  
+    
     show: ->
 
         @clear()

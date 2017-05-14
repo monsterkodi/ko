@@ -25,6 +25,12 @@ class Pigments
     
     del: -> @editor.removeListener 'file', @onFile
 
+    # 000  000   000   0000000  00000000  00000000   000000000  00000000  0000000    
+    # 000  0000  000  000       000       000   000     000     000       000   000  
+    # 000  000 0 000  0000000   0000000   0000000       000     0000000   000   000  
+    # 000  000  0000       000  000       000   000     000     000       000   000  
+    # 000  000   000  0000000   00000000  000   000     000     00000000  0000000    
+    
     onLineInserted: (li) =>
 
         line = @editor.line li 
@@ -41,6 +47,12 @@ class Pigments
                     style: 
                         backgroundColor: rng.match
 
+    #  0000000  000   000   0000000   000   000   0000000   00000000  0000000    
+    # 000       000   000  000   000  0000  000  000        000       000   000  
+    # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000  
+    # 000       000   000  000   000  000  0000  000   000  000       000   000  
+    #  0000000  000   000  000   000  000   000   0000000   00000000  0000000    
+    
     onLineChanged: (li) =>
 
         metas = @editor.meta.metasAtLineIndex(li).filter (m) -> m[2].clss == 'pigment'
@@ -55,21 +67,34 @@ class Pigments
         if prefs.get "pigments:#{file}"
             @pigmentize()
             
+    #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
+    # 000   000  000          000     000  000   000  000   000     000     000       
+    # 000000000  000          000     000   000 000   000000000     000     0000000   
+    # 000   000  000          000     000     000     000   000     000     000       
+    # 000   000   0000000     000     000      0      000   000     000     00000000  
+    
+    activate: ->
+        
+        prefs.set "pigments:#{@editor.currentFile}", true
+        @pigmentize()
+        
     deactivate: ->
         
         prefs.set "pigments:#{@editor.currentFile}"
         @clear()
             
-    activate: ->
-        
-        prefs.set "pigments:#{@editor.currentFile}", true
-        @pigmentize()
 
     clear: -> 
         
         @editor.removeListener 'lineChanged',  @onLineChanged
         @editor.removeListener 'lineInserted', @onLineInserted    
         @editor.meta.delClass 'pigment'
+    
+    # 00000000   000   0000000   00     00  00000000  000   000  000000000  000  0000000  00000000  
+    # 000   000  000  000        000   000  000       0000  000     000     000     000   000       
+    # 00000000   000  000  0000  000000000  0000000   000 0 000     000     000    000    0000000   
+    # 000        000  000   000  000 0 000  000       000  0000     000     000   000     000       
+    # 000        000   0000000   000   000  00000000  000   000     000     000  0000000  00000000  
     
     pigmentize: ->
         
