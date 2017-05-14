@@ -239,7 +239,7 @@ class Commandline extends TextEditor
                 @list.appendChild div
 
     hideList: ->
-        # return
+
         @list?.remove()
         @list = null
 
@@ -319,9 +319,7 @@ class Commandline extends TextEditor
                     if @command?.complete()
                         return
                     if @numSelections()
-                        @do.start()
-                        @do.select []
-                        @do.end()
+                        @select []
                     return
                 else if combo == 'tab'
                     return

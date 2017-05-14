@@ -43,6 +43,7 @@ class Diffbar
             @editor.singleCursorAtPos rangeStartPos meta
             @editor.toggleGitChangesInLines [meta[0]]
         else
+            if meta[2].boring then @editor.invisibles?.activate()
             blockIndices = @lineIndicesForBlockAtLine meta[0]
             @editor.do.start()
             @editor.do.setCursors blockIndices.map (i) -> [0,i]

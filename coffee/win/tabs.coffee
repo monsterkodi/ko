@@ -5,7 +5,7 @@
 #    000     000   000  000   000       000
 #    000     000   000  0000000    0000000 
 
-{ post, elem, drag, error, log, _
+{ post, elem, drag, splitFileLine, error, log, _
 } = require 'kxk'
 
 Tab = require './tab'
@@ -186,10 +186,15 @@ class Tabs
 
     onNewTabWithFile: (file) =>
         
+        [file, line, col] = splitFileLine file
+        
         if tab = @tab file
             tab.activate()
         else
             @addTab(file).activate()
+            
+        if line or col
+            post.emit 'singleCursorAtPos', [col, line-1]
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       

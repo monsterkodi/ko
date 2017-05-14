@@ -22,8 +22,6 @@ module.exports =
 
     toggleGitChangesInLines: (lineIndices) ->
 
-        # @dumpMetas "before toggle #{lineIndices.join ', '}"
-        
         metas = []
         untoggled = false
 
@@ -65,7 +63,6 @@ module.exports =
         for lineMeta in metas
             cursors.push [0,lineMeta[0]]
             if lineMeta not in @meta.metas
-                # log 'reinsert', lineMeta
                 @meta.addLineMeta lineMeta
                 @meta.addDiv lineMeta
 
@@ -73,8 +70,13 @@ module.exports =
         @do.setCursors cursors, main:'closest'
         @do.select []
         @do.end()
-        # @dumpMetas 'after toggle'
         
+    # 0000000    000   000  00     00  00000000   
+    # 000   000  000   000  000   000  000   000  
+    # 000   000  000   000  000000000  00000000   
+    # 000   000  000   000  000 0 000  000        
+    # 0000000     0000000   000   000  000        
+    
     dumpMetas: (title) ->
         
         @log title
@@ -92,8 +94,6 @@ module.exports =
         meta = lineMeta[2]
         li   = lineMeta[0]
 
-        # log "togglegit.reverseGitChange", li, meta.clss
-
         @do.start()
 
         meta.toggled = true
@@ -105,18 +105,12 @@ module.exports =
                 @do.change li, meta.change.old
 
             when 'git add', 'git add boring'                
-                # log "reverseGitChange delete", li, @do.line(li)
-                # log "\n"+ @do.text()
                 @do.delete li
-                # log "\n"+ @do.text()
 
             when 'git del'
 
                 for line in reversed meta.change
-                    # log "reverseGitChange insert", li, line.old
-                    # log "\n"+ @do.text()
                     @do.insert li, line.old
-                    # log "\n"+ @do.text()
 
         @do.end()
 
@@ -131,8 +125,6 @@ module.exports =
         meta = lineMeta[2]
         li   = lineMeta[0]
 
-        # log "togglegit.applyGitChange", li, meta.clss
-
         @do.start()
 
         delete meta.toggled
@@ -146,17 +138,11 @@ module.exports =
 
             when 'git add', 'git add boring'
 
-                # log 'applyGitChange insert', li, meta.change.new
-                # log "\n"+ @do.text()
                 @do.insert li, meta.change.new
-                # log "\n"+ @do.text()
                 
             when 'git del'
 
                 for line in reversed meta.change
-                    # log 'applyGitChange delete', li, @do.line li
-                    # log "\n"+ @do.text()
                     @do.delete li
-                    # log "\n"+ @do.text()
 
         @do.end()

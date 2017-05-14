@@ -31,7 +31,6 @@ Browser     = remote.BrowserWindow
 win         = window.win   = remote.getCurrentWindow()
 winID       = window.winID = win.id
 editor      = null
-focusEditor = null
 logview     = null
 area        = null
 terminal    = null
@@ -107,8 +106,11 @@ post.on 'openFile',   (opt)  -> openFile  opt
 post.on 'reloadTab', (file)  -> reloadTab file 
 post.on 'loadFile',  (file)  -> loadFile  file
 post.on 'loadFiles', (files) -> openFiles files
-post.on 'editorFocus', (editor) -> focusEditor = editor
 post.on 'menuCombo', (combo) -> menuCombo combo
+post.on 'editorFocus', (editor) ->
+    log 'window editorFocus', editor.name
+    window.focusEditor = editor
+    window.textEditor = editor if editor.name != 'commandline-editor'
 
 # testing related ...
 
@@ -127,7 +129,7 @@ post.on 'postEditorState', ->
 # 000   000  000  000  0000  000 0 000  000   000  000  000  0000  
 # 00     00  000  000   000  000   000  000   000  000  000   000  
 
-winMain = -> 
+winMain = ->
     
     # 000  000   000  000  000000000  
     # 000  0000  000  000     000     
@@ -146,6 +148,8 @@ winMain = ->
     logview     = window.logview     = new LogView 'logview'
     info        = window.info        = new Info editor
     fps         = window.fps         = new FPS()
+    
+    window.textEditor  = window.focusEditor = editor
     
     restoreWin()
     
@@ -342,7 +346,6 @@ loadFile = (file, opt={}) ->
             if tab = tabs.tab file
                 tab.setActive()
 
-            # log 'window.loadFile', file, opt
             editor.setCurrentFile file, opt
             
             post.toOthers 'fileLoaded', file, winID
@@ -531,8 +534,6 @@ window.onfocus = (event) ->
         else
             split.focus 'commandline-editor'
 
-            
-            
 # 000   000  00000000  000   000
 # 000  000   000        000 000 
 # 0000000    0000000     00000  
@@ -542,8 +543,8 @@ window.onfocus = (event) ->
 menuCombo = (combo) ->
     
     {mod, key, combo, char} = keyinfo.forCombo combo
-    log 'menuCombo', combo, focusEditor.name, mod, key, char
-    return if 'unhandled' != focusEditor.handleModKeyComboCharEvent mod, key, combo, char
+    log 'menuCombo', combo, window.focusEditor.name, mod, key, char
+    return if 'unhandled' != window.focusEditor.handleModKeyComboCharEvent mod, key, combo, char
     handleModKeyComboCharEvent mod, key, combo, char
 
 onKeyDown = (event) ->
@@ -582,6 +583,7 @@ handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
         when 'command+ctrl+left'  then return stopEvent event, navigate.backward()
         when 'command+ctrl+right' then return stopEvent event, navigate.forward()
         when 'command+shift+y'    then return stopEvent event, split.maximizeEditor()
+        when 'command+alt+y'      then return stopEvent event, split.do 'minimize editor'
 
 document.addEventListener 'keydown', onKeyDown        
         

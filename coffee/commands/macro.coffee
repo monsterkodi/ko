@@ -22,7 +22,8 @@ class Macro extends Command
     constructor: (@commandline) ->
 
         @shortcuts = ['command+m']
-        @macros    = ['dbg', 'class', 'inv', 'req', 'color']
+        @macros    = ['clean', 'help', 'dbg', 'class', 'req', 'inv', 'blink', 'color', 'fps', 'test']
+        @macros    = @macros.concat window.editor.Transform.transformNames
         @names     = ['macro']
         super @commandline
 
@@ -33,6 +34,7 @@ class Macro extends Command
     # 0000000      000     000   000  000   000     000
 
     start: (@combo) ->
+        
         super @combo
         text = @last()
         text = 'dbg' if not text?.length
@@ -80,9 +82,7 @@ class Macro extends Command
             # 000  000   000      0
 
             when 'inv'
-                editor.invisiblesToggle()
-                # editor.showInvisibles = !editor.showInvisibles
-                # editor.updateLines()
+                window.textEditor.toggleInvisibles()
 
             # 0000000    000      000  000   000  000   000  
             # 000   000  000      000  0000  000  000  000   
@@ -297,6 +297,18 @@ class Macro extends Command
                     if line != cleaned
                         editor.do.change li, cleaned
                 editor.do.end()
+                
+            else
+                
+                # 000000000  00000000    0000000   000   000   0000000  00000000   0000000   00000000   00     00    
+                #    000     000   000  000   000  0000  000  000       000       000   000  000   000  000   000    
+                #    000     0000000    000000000  000 0 000  0000000   000000    000   000  0000000    000000000    
+                #    000     000   000  000   000  000  0000       000  000       000   000  000   000  000 0 000    
+                #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000    
+                
+                if command in editor.Transform.transformNames
+                    if window.textEditor?.Transform?
+                        window.textEditor.Transform.do window.textEditor, command
 
         text: ''
 
