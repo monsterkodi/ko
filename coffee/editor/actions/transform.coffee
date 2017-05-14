@@ -5,13 +5,19 @@
 #    000     000   000  000   000  000  0000       000  000       000   000  000   000  000 0 000
 #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000
 
-{ resolve, unresolve, path, error, log, _
+{ resolve, unresolve, fileName, path, error, log, _
 } = require 'kxk'
 matchr = require '../../tools/matchr'
 
 class Transform
 
-    constructor: (@editor) ->
+    @transformNames = [
+        'upperCase', 'lowerCase', 'titleCase', 
+        'resolve', 'unresolve', 
+        'basename', 'dirname', 'extname', 'filename'
+    ]
+    
+    constructor: (@editor) -> 
         
         @editor.transform = @
         @last         = null
@@ -78,6 +84,33 @@ class Transform
         
         @apply (t) -> unresolve t
         'unresolve'
+
+    # 00000000    0000000   000000000  000   000    
+    # 000   000  000   000     000     000   000    
+    # 00000000   000000000     000     000000000    
+    # 000        000   000     000     000   000    
+    # 000        000   000     000     000   000    
+    
+    basename: -> 
+        
+        @apply (t) -> path.basename t
+        'basename'
+        
+    dirname: -> 
+        
+        @apply (t) -> path.dirname t
+        'dirname'
+        
+    extname: -> 
+        
+        @apply (t) -> path.extname t
+        'extname'
+        
+    filename: -> 
+        
+        @apply (t) -> fileName t
+        'filename'
+    
         
     #  0000000   00000000   00000000   000      000   000  
     # 000   000  000   000  000   000  000       000 000   
@@ -136,5 +169,6 @@ module.exports =
             text:  'toggles selected texts between resolved and unresolved paths'
             combo: 'command+alt+ctrl+r'
 
-    toggleCase:    -> Transform.do @, 'toggleCase'
-    toggleResolve: -> Transform.do @, 'toggleResolve'
+    toggleCase:     -> Transform.do @, 'toggleCase'
+    toggleResolve:  -> Transform.do @, 'toggleResolve'
+    Transform:         Transform
