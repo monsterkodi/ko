@@ -165,7 +165,6 @@ module.exports =
             for c in positionsInLineAfterColInPositions ns[0], ns[1][0]-1, newCursors
                 cursorDelta c, cl.length
                 
-            
             for os in rangesAfterLineColInRanges ns[0], ns[1][1], newSelections
                 os[1][0] += cr.length
                 os[1][1] += cr.length

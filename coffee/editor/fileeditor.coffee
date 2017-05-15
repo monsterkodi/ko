@@ -5,8 +5,8 @@
 # 000       000  000      000             000       000   000  000     000     000   000  000   000
 # 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 
-{ fileName, unresolve, samePath, joinFileLine, splitFilePos, fileExists, swapExt, path, empty, fs,
-  setStyle, keyinfo, clamp, drag, post, pos, error, log, str, _
+{ fileName, samePath, joinFileLine, splitFilePos, fileExists, swapExt, path, empty, fs,
+  setStyle, post, pos, error, log, str, _
 }          = require 'kxk'
 srcmap     = require '../tools/srcmap'
 watcher    = require './watcher'

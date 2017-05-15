@@ -76,15 +76,18 @@ module.exports =
     # 000  000   000  0000000   00000000  000   000     000     
     
     insertSalterCharacter: (ch) ->
+        
         if ch == ' '
             char = ['    ', '    ', '    ', '    ', '    ']
         else
             char = salt(ch).split '\n'
+            
         if char.length == 5
             salted = ("#{s}  " for s in char).join '\n'
             @pasteText salted
         else
             @setSalterMode false
+            
         true
     
     # 0000000    00000000  000      00000000  000000000  00000000  

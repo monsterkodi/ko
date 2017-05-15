@@ -5,7 +5,7 @@
 # 000       000   000  000      000   000  000 0 000  000  0000
 #  0000000   0000000   0000000   0000000   000   000  000   000
 
-{ packagePath, stopEvent, relative, resolve, keyinfo, 
+{ packagePath, stopEvent, relative, keyinfo, 
   path, post, elem, clamp, empty, error, log, _ 
 }          = require 'kxk'
 Row        = require './row'

@@ -165,6 +165,9 @@ class Transform
         tl = tl.map opt.apply if opt.apply?
         tl = opt.trans tl     if opt.trans?
 
+        log 'selections', selections
+        log 'tl', tl
+        
         selections = _.zip(selections, tl).map (p) ->
             p[0][1][1] = p[0][1][0] + p[1].length
             p[0]

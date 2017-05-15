@@ -35,7 +35,7 @@ class Tab
     
     saveChanges: ->
         
-        log 'tab.saveChanges', @state
+        # log 'tab.saveChanges', @state
         
         if @state
             
@@ -62,10 +62,9 @@ class Tab
     
     storeState: ->
         
-        return error 'no editor file?' if not window.editor.currentFile
-        
-        # log 'storeState', @info
-        @state = window.editor.do.tabState()
+        if window.editor.currentFile
+            # log 'storeState', @info
+            @state = window.editor.do.tabState()
         
     restoreState: ->
         

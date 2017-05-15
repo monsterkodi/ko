@@ -39,16 +39,16 @@ class Find extends Command
     changed: (command) ->
         
         super command
-        if editor = window.editorWithName @focus
-            if command.length
-                if @type in ['reg', 'Reg'] and command.trim() in ['^', '$', '^$', '.', '?']
-                    editor.clearHighlights()
-                else if not command.trim().startsWith('|') and not command.trim().endsWith('|')
-                    editor.highlightText command, 
-                        type:   @type
-                        select: 'keep'
-            else
-                editor.clearHighlights()
+        
+        if command.length
+            if @type in ['reg', 'Reg'] and command.trim() in ['^', '$', '^$', '.', '?', '\\', '\\b']
+                window.textEditor.clearHighlights()
+            else if not command.trim().startsWith('|') and not command.trim().endsWith('|')
+                window.textEditor.highlightText command, 
+                    type:   @type
+                    select: 'keep'
+        else
+            window.textEditor.clearHighlights()
     
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
@@ -59,12 +59,11 @@ class Find extends Command
     execute: (command) ->
         
         command = super command
-        if editor = window.editorWithName @focus
-            editor.highlightText command, 
-                type: @type
-                select: 'after'
-        else
-            error "no editor for @focus #{@focus}?"
+        
+        window.textEditor.highlightText command, 
+            type: @type
+            select: 'after'
+                
         text:   command
         select: true
         
@@ -77,20 +76,24 @@ class Find extends Command
     handleModKeyComboEvent: (mod, key, combo, event) -> 
         
         switch combo
+            
             when 'shift+enter', 'command+shift+g'
-                if editor = window.editorWithName @focus
-                    editor.highlightText @getText(),
-                        type: @type
-                        select: 'before'
-                    return
+                
+                window.textEditor.highlightText @getText(),
+                    type: @type
+                    select: 'before'
+                return
+                    
             when 'command+g' 
-                if editor = window.editorWithName @focus
-                    @execute @getText()    
-                    return
+                
+                @execute @getText()    
+                return
+                    
             when 'tab'
-                if editor = window.editorWithName @focus
-                    editor.focus()
-                    return
+                
+                window.textEditor.focus()
+                return
+                    
         super mod, key, combo, event
       
 module.exports = Find

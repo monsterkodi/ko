@@ -19,6 +19,8 @@ class GitWatch
     watch: (file) ->
         
         @unwatch()        
+
+        return if not file?
         
         if gitDir = gitRoot file
             

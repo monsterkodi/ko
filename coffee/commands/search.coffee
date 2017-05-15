@@ -148,6 +148,7 @@ class FileSearcher extends stream.Writable
     end: (chunk, encoding, cb) =>
         
         if @found.length
+            
             terminal = window.terminal
             
             meta = 

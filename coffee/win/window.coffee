@@ -108,7 +108,6 @@ post.on 'loadFile',  (file)  -> loadFile  file
 post.on 'loadFiles', (files) -> openFiles files
 post.on 'menuCombo', (combo) -> menuCombo combo
 post.on 'editorFocus', (editor) ->
-    log 'window editorFocus', editor.name
     window.focusEditor = editor
     window.textEditor = editor if editor.name != 'commandline-editor'
 

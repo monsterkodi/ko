@@ -5,14 +5,14 @@
 #      000  000   000  000         000     000       000   000  
 # 0000000   000   000  0000000     000     00000000  000   000  
 
-{log}           = require 'kxk'
-{expect,should} = require 'chai'
-assert          = require 'assert'
-_               = require 'lodash'
-should()
+{log,_}  = require 'kxk'
+{expect} = require 'chai'
+assert   = require 'assert'
 
 Editor = require '../editor/editor'
 editor = new Editor
+
+# !!! DON'T CLEAN THIS FILE !!!
 
 textIs = (t) -> expect(editor.text()).to.eql t
 
@@ -50,9 +50,10 @@ describe 'salter', ->
             000   000  
             000   000  
              0000000   
-            
             """
     it 'saltoix', ->
+        editor.singleCursorAtPos [0,4]
+        editor.newlineAtEnd()
         editor.startSalter()
         editor.insertCharacter 'I'
         editor.insertCharacter 'X'
@@ -68,7 +69,7 @@ describe 'salter', ->
              # 000    00000      
              # 000   000 000     
              # 000  000   000    
-            
+             
             """
             
     it 'del x', ->
@@ -85,7 +86,7 @@ describe 'salter', ->
              # 000    
              # 000    
              # 000    
-            
+             
             """
     it 'del i', ->
         editor.deleteBackward()
@@ -100,7 +101,7 @@ describe 'salter', ->
              #   
              #   
              #   
-            
+             
             """
             
     it "del #", ->
@@ -117,7 +118,7 @@ describe 'salter', ->
              #   
              #   
              #   
-            
+             
             """
     
     it 'cut lines', ->

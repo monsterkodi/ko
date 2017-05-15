@@ -5,7 +5,7 @@
 # 000   000  000   000  000 0 000  000           000     000   000  000   000  000   000  000   000  000   000  
 #  0000000    0000000   000   000  000           000      0000000   00     00   0000000   000   000  0000000    
         
-{ splitFileLine, fileExists, resolve, post, log
+{ splitFileLine, fileExists, post, log
 }      = require 'kxk'
 matchr = require '../../tools/matchr'
 

@@ -134,7 +134,7 @@ class Terminal extends TextEditor
         super
 
     setAutoClear: (state) -> prefs.set 'terminal:autoclear', state
-    getAutoClear: -> prefs.get 'terminal:autoclear', false
+    getAutoClear: -> prefs.get 'terminal:autoclear', true
     doAutoClear: -> if @getAutoClear() then @clear()
         
     # 000   000  00000000  000   000

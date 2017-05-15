@@ -5,8 +5,8 @@
 # 000   000  000       000   000  000   000  000   000  
 # 0000000    00000000  0000000     0000000    0000000   
 
-{ dirExists, stopEvent, samePath, process, unresolve, resolve, 
-  post, str, error, log, $
+{ dirExists, stopEvent, samePath, process, post, str, 
+  error, log, $
 }             = require 'kxk'
 Command       = require '../commandline/command'
 ObjectBrowser = require '../browser/objectbrowser'

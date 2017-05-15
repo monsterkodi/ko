@@ -214,7 +214,7 @@ class Diffbar
                 @editor.emit 'diffbarUpdated', @changes
         else   
             @changes = null
-            log 'diffbar updated', @changes
+            # log 'diffbar updated', @changes
             @updateMetas()
             @updateScroll()
             @editor.emit 'diffbarUpdated', @changes

@@ -5,7 +5,7 @@
 # 000        000        000   000       000     000     
 # 000        000         0000000   0000000      000     
 
-{ log, post, resolve, fs, _
+{ log, post, _
 } = require 'kxk'
 {expect,should} = require 'chai'
 should()
