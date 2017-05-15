@@ -15,7 +15,7 @@ class Transform
         'upper', 'lower', 'title', 'case'
         'resolve', 'unresolve'
         'basename', 'dirname', 'extname', 'filename'
-        'reverse', 'asc', 'desc', 'sort'
+        'reverse', 'up', 'down', 'sort'
     ]
 
     constructor: (@editor) ->
@@ -24,7 +24,7 @@ class Transform
         @last         = null
         @caseFuncs    = ['upper', 'lower', 'title']
         @resolveFuncs = ['resolve', 'unresolve']
-        @sortFuncs    = ['asc', 'desc']
+        @sortFuncs    = ['up', 'down']
 
     # 00000000   00000000  000   000  00000000  00000000    0000000  00000000
     # 000   000  000       000   000  000       000   000  000       000
@@ -44,11 +44,11 @@ class Transform
 
     sort: -> @toggle @sortFuncs
 
-    asc: ->
+    up: ->
         @trans (l) -> l.sort (a,b) -> a.localeCompare b
         'asc'
 
-    desc: ->
+    down: ->
         @trans (l) -> reversed l.sort (a,b) -> a.localeCompare b
         'desc'
 
