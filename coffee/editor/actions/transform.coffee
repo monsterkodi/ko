@@ -12,19 +12,19 @@ matchr = require '../../tools/matchr'
 class Transform
 
     @transformNames = [
-        'upperCase', 'lowerCase', 'titleCase',
+        'upper', 'lower', 'title',
         'resolve', 'unresolve',
         'basename', 'dirname', 'extname', 'filename',
-        'reverse', 'sortUp', 'sortDown', 'sort'
+        'reverse', 'asc', 'desc', 'sort'
     ]
 
     constructor: (@editor) ->
 
         @editor.transform = @
         @last         = null
-        @caseFuncs    = ['upperCase', 'lowerCase', 'titleCase']
+        @caseFuncs    = ['upper', 'lower', 'title']
         @resolveFuncs = ['resolve', 'unresolve']
-        @sortFuncs    = ['sortUp', 'sortDown']
+        @sortFuncs    = ['asc', 'desc']
 
     # 00000000   00000000  000   000  00000000  00000000    0000000  00000000
     # 000   000  000       000   000  000       000   000  000       000
@@ -44,13 +44,13 @@ class Transform
 
     sort: -> @toggle @sortFuncs
 
-    sortUp: ->
+    asc: ->
         @trans (l) -> l.sort (a,b) -> a.localeCompare b
-        'sortUp'
+        'asc'
 
-    sortDown: ->
+    desc: ->
         @trans (l) -> reversed l.sort (a,b) -> a.localeCompare b
-        'sortDown'
+        'desc'
 
     #  0000000   0000000    0000000  00000000
     # 000       000   000  000       000
@@ -60,24 +60,24 @@ class Transform
 
     toggleCase: -> @toggle @caseFuncs
 
-    upperCase: ->
+    upper: ->
 
         @apply (t) -> t.toUpperCase()
-        'upperCase'
+        'upper'
 
-    lowerCase: ->
+    lower: ->
 
         @apply (t) -> t.toLowerCase()
-        'lowerCase'
+        'lower'
 
-    titleCase: ->
+    title: ->
 
         pattern = /\w+/
         @apply (t) ->
             for r in matchr.ranges /\w+/, t
                 t = t.splice r.start, r.match.length, r.match.substr(0,1).toUpperCase() + r.match.slice(1).toLowerCase()
             t
-        'titleCase'
+        'title'
 
     # 00000000   00000000   0000000   0000000   000      000   000  00000000
     # 000   000  000       000       000   000  000      000   000  000

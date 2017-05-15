@@ -60,10 +60,10 @@ describe 'transform', ->
         editor.setLines unsorted
         editor.cursorInAllLines()
 
-        editor.transform.do 'sortUp'
+        editor.transform.do 'asc'
         test editor.lines(), sorted
 
-        editor.transform.do 'sortDown'
+        editor.transform.do 'desc'
         test editor.lines(), reversed sorted
         
         editor.transform.do 'sort'
@@ -79,33 +79,33 @@ describe 'transform', ->
         editor.select []
         editor.cursorInAllLines()
         
-        editor.transform.do 'titleCase'
+        editor.transform.do 'title'
         test editor.lines(), ['Hello', 'World!', '!@#&{$%^}', "What's.up?", "Xyz-abc"]
         
         editor.select []
         editor.cursorInAllLines()
-        editor.transform.do 'lowerCase'
+        editor.transform.do 'lower'
         test editor.lines(), ['hello', 'world!', '!@#&{$%^}', "what's.up?", "xyz-abc"]
         
         editor.select []
         editor.cursorInAllLines()
-        editor.transform.do 'upperCase'
+        editor.transform.do 'upper'
         test editor.lines(), ['HELLO', 'WORLD!', '!@#&{$%^}', "WHAT's.up?", "XYZ-abc"]
 
         editor.cursorInAllLines()
         editor.selectMoreLines()
 
-        editor.transform.do 'titleCase'
+        editor.transform.do 'title'
         test editor.lines(), ['Hello', 'World!', '!@#&{$%^}', "What'S.Up?", "Xyz-Abc"]
         
         editor.cursorInAllLines()
         editor.selectMoreLines()
-        editor.transform.do 'lowerCase'
+        editor.transform.do 'lower'
         test editor.lines(), ['hello', 'world!', '!@#&{$%^}', "what's.up?", "xyz-abc"]
         
         editor.cursorInAllLines()
         editor.selectMoreLines()
-        editor.transform.do 'upperCase'
+        editor.transform.do 'upper'
         test editor.lines(), ['HELLO', 'WORLD!', '!@#&{$%^}', "WHAT'S.UP?", "XYZ-ABC"]
     
     it 'inline', ->
@@ -118,9 +118,9 @@ describe 'transform', ->
         test editor.lines(), ['heLLo World!', "['1','23','666','42']", "what's up?"]
         editor.transform.do 'reverse'
         test editor.lines(), words
-        editor.transform.do 'sortUp'
+        editor.transform.do 'asc'
         test editor.lines(), ['heLLo World!', "['1','23','42','666']", "what's up?"]
-        editor.transform.do 'sortDown'
+        editor.transform.do 'desc'
         test editor.lines(), ['heLLo World!', "['666','42','23','1']", "what's up?"]
         
     it 'close tab', ->
