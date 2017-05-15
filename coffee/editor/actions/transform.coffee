@@ -14,10 +14,11 @@ class Transform
     @transformNames = [
         
         'upper', 'lower', 'title', 'case'
-        'down', 'reverse', 'sort', 'up'
+        'up', 'down', 'sort'
+        'reverse', 
         'resolve', 'unresolve'
-        'basename', 'dirname'
-        'extname', 'filename'
+        'dirname', 'basename',
+        'filename', 'extname'
         
     ]
 
