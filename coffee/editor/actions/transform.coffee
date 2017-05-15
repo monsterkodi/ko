@@ -12,10 +12,13 @@ matchr = require '../../tools/matchr'
 class Transform
 
     @transformNames = [
+        
         'upper', 'lower', 'title', 'case'
-        'resolve', 'unresolve'
-        'basename', 'dirname', 'extname', 'filename'
         'down', 'reverse', 'sort', 'up'
+        'resolve', 'unresolve'
+        'basename', 'dirname'
+        'extname', 'filename'
+        
     ]
 
     
