@@ -15,9 +15,15 @@ class Transform
         'upper', 'lower', 'title', 'case'
         'resolve', 'unresolve'
         'basename', 'dirname', 'extname', 'filename'
-        'reverse', 'up', 'down', 'sort'
+        'down', 'reverse', 'sort', 'up'
     ]
 
+    
+    
+    
+    
+    
+    
     constructor: (@editor) ->
 
         @editor.transform = @
@@ -46,11 +52,11 @@ class Transform
 
     up: ->
         @trans (l) -> l.sort (a,b) -> a.localeCompare b
-        'asc'
+        'up'
 
     down: ->
         @trans (l) -> reversed l.sort (a,b) -> a.localeCompare b
-        'desc'
+        'down'
 
     #  0000000   0000000    0000000  00000000
     # 000       000   000  000       000
