@@ -12,7 +12,7 @@ matchr = require '../../tools/matchr'
 class Transform
 
     @transformNames = [
-        'upper', 'lower', 'title',
+        'upper', 'lower', 'title', 'case'
         'resolve', 'unresolve',
         'basename', 'dirname', 'extname', 'filename',
         'reverse', 'asc', 'desc', 'sort'
@@ -58,7 +58,7 @@ class Transform
     # 000       000   000       000  000
     #  0000000  000   000  0000000   00000000
 
-    toggleCase: -> @toggle @caseFuncs
+    case: -> @toggle @caseFuncs
 
     upper: ->
 
