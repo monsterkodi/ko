@@ -107,35 +107,40 @@ class Autocomplete extends event
         cr = cursor.getBoundingClientRect()
         spanInfo = @editor.lineSpanAtXY cr.left, cr.top
         
-        if spanInfo?
-            sp = spanInfo.span
-            inner = sp.innerHTML
-            @clones.push sp.cloneNode true
-            @clones.push sp.cloneNode true
-            @cloned.push sp
+        if not spanInfo?
             
-            ws = @word.slice @word.search /\w/
-            wi = ws.length
-            
-            @clones[0].innerHTML = inner.slice 0, spanInfo.offsetChar + 1 
-            @clones[1].innerHTML = inner.slice    spanInfo.offsetChar + 1
-                        
-            sibling = sp
-            while sibling = sibling.nextSibling
-                @clones.push sibling.cloneNode true
-                @cloned.push sibling
-                
-            sp.parentElement.appendChild @span
-            
-            for c in @cloned
-                c.style.display = 'none'
+            p = @editor.posAtXY cr.left, cr.top
+            ci = p[1]-@editor.scroll.top
+            log 'p:', p, 'scroll.top', @editor.scroll.top, 'ci', ci, 'num children', @editor.layerDict['lines'].children.length
+            log @editor.lineElemAtXY(cr.left, cr.top)?
+            return error "no span for autocomplete? cursor topleft: #{parseInt cr.left} #{parseInt cr.top}", info
 
-            for c in @clones
-                @span.insertAdjacentElement 'afterend', c
-                
-            @moveClonesBy @completion.length
-        # else
-            # log "no span for autocomplete? cursor topleft: #{parseInt cr.left} #{parseInt cr.top}", info
+        sp = spanInfo.span
+        inner = sp.innerHTML
+        @clones.push sp.cloneNode true
+        @clones.push sp.cloneNode true
+        @cloned.push sp
+        
+        ws = @word.slice @word.search /\w/
+        wi = ws.length
+        
+        @clones[0].innerHTML = inner.slice 0, spanInfo.offsetChar + 1 
+        @clones[1].innerHTML = inner.slice    spanInfo.offsetChar + 1
+                    
+        sibling = sp
+        while sibling = sibling.nextSibling
+            @clones.push sibling.cloneNode true
+            @cloned.push sibling
+            
+        sp.parentElement.appendChild @span
+        
+        for c in @cloned
+            c.style.display = 'none'
+
+        for c in @clones
+            @span.insertAdjacentElement 'afterend', c
+            
+        @moveClonesBy @completion.length            
         
         if @matchList.length
             

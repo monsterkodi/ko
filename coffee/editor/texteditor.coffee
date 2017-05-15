@@ -338,8 +338,6 @@ class TextEditor extends Editor
 
     shiftLines: (top, bot, num) =>
         
-        # @log 'shiftlines', top, bot
-        
         oldTop = top - num
         oldBot = bot - num
 
@@ -551,7 +549,6 @@ class TextEditor extends Editor
 
     posAtXY:(x,y) ->
 
-
         sl = @layerScroll.scrollLeft
         st = @scroll.offsetTop
         br = @view.getBoundingClientRect()
@@ -572,23 +569,19 @@ class TextEditor extends Editor
 
     lineSpanAtXY:(x,y) ->
 
-        lineElem = @lineElemAtXY x,y
-        if lineElem?
+        if lineElem = @lineElemAtXY x,y
             lr = lineElem.getBoundingClientRect()
-            for e in lineElem.children
+            for e in lineElem.firstChild.children
                 br = e.getBoundingClientRect()
                 if br.left <= x <= br.left+br.width
                     offset = x-br.left
-                    info =
-                        span:       e
-                        offsetLeft: offset
-                        offsetChar: parseInt offset/@size.charWidth
-                    return info
+                    return span: e, offsetLeft: offset, offsetChar: parseInt offset/@size.charWidth
         null
 
     numFullLines: -> Math.floor(@viewHeight() / @size.lineHeight)
     
-    viewHeight:   -> 
+    viewHeight: -> 
+        
         if @scroll?.viewHeight >= 0 then return @scroll.viewHeight
         @view?.clientHeight
 
