@@ -17,7 +17,7 @@ class Transform
         'up', 'down', 'sort'
         'reverse', 
         'resolve', 'unresolve'
-        'dirname', 'basename',
+        'dirname', 'basename'
         'filename', 'extname'
         
     ]
