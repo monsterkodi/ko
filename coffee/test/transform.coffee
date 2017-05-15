@@ -110,19 +110,18 @@ describe 'transform', ->
     
     it 'inline', ->
         
-        words = ['heLLo World!', "['42','66','23','10']", "what's up?"]
+        words = ['heLLo World!', "['42','666','23','1']", "what's up?"]
         editor.setLines words
-        editor.setCursors [[2,1],[7,1],[12,1],[17,1]]
-        editor.moveCursors 'right', extend: true
-        editor.moveCursors 'right', extend: true
+        editor.setCursors [[2,1],[7,1],[13,1],[18,1]]
+        editor.moveCursorsToWordBoundary 'right', extend: true
         editor.transform.do 'reverse'
-        test editor.lines(), ['heLLo World!', "['10','23','66','42']", "what's up?"]
+        test editor.lines(), ['heLLo World!', "['1','23','666','42']", "what's up?"]
         editor.transform.do 'reverse'
         test editor.lines(), words
         editor.transform.do 'sortUp'
-        test editor.lines(), ['heLLo World!', "['10','23','42','66']", "what's up?"]
+        test editor.lines(), ['heLLo World!', "['1','23','42','666']", "what's up?"]
         editor.transform.do 'sortDown'
-        test editor.lines(), ['heLLo World!', "['66','42','23','10']", "what's up?"]
+        test editor.lines(), ['heLLo World!', "['666','42','23','1']", "what's up?"]
         
     it 'close tab', ->
         

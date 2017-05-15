@@ -310,6 +310,6 @@ class Macro extends Command
                     if window.textEditor?.Transform?
                         window.textEditor.Transform.do window.textEditor, command
 
-        text: ''
+        select: true
 
 module.exports = Macro

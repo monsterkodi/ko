@@ -36,29 +36,24 @@ module.exports =
     # 000   000  000       000        000      000   000  000       000       
     # 000   000  00000000  000        0000000  000   000   0000000  00000000  
     
-    replaceSelectedTexts: (lines) ->
-        
-        log 'replaceSelectedTexts', lines
+    replaceSelectedText: (lines) ->
         
         @do.start()
         newSelections = @do.selections()
         
         for ns in newSelections
             insert = lines.shift()
-            log ns, insert
             oldLength = ns[1][1]-ns[1][0]
             @do.change ns[0], @do.line(ns[0]).splice ns[1][0], oldLength, insert
             ldiff = insert.length - oldLength
-            ns[1][1] = ns[1][0] + insert.length
             for os in rangesAfterLineColInRanges ns[0], ns[1][1], newSelections
                 os[1][0] += ldiff
                 os[1][1] += ldiff
+            ns[1][1] += ldiff
         
         @do.select newSelections
         @do.setCursors (rangeEndPos(r) for r in newSelections)
         @do.end()
-        
-        @select []
     
     # 00000000    0000000    0000000  000000000  00000000  
     # 000   000  000   000  000          000     000       
@@ -70,15 +65,14 @@ module.exports =
         
         lines = text.split '\n'
         
-        if lines.length == @numSelections() # and @numCursors() != lines.length
-            @replaceSelectedTexts lines
+        if lines.length == @numSelections()
+            @replaceSelectedText lines
+            @select []
             return
         
         if (@numLines() == 1 and @text() == '') or areSameRanges @rangesForAllLines(), @selections() 
             removeLastLine = true # prevents trailing empty line
             
-        log "paste.pasteText lines.length:#{lines.length}", @numSelections(), removeLastLine
-        
         @deleteSelection()
         
         @do.start()        

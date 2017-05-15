@@ -165,16 +165,8 @@ class Transform
         tl = tl.map opt.apply if opt.apply?
         tl = opt.trans tl     if opt.trans?
 
-        log 'selections', selections
-        log 'tl', tl
-        
-        selections = _.zip(selections, tl).map (p) ->
-            p[0][1][1] = p[0][1][0] + p[1].length
-            p[0]
-
         @editor.do.start()
-        @editor.pasteText tl.join '\n'
-        @editor.do.select selections
+        @editor.replaceSelectedText tl
         @editor.do.end()
 
     # 000000000   0000000    0000000    0000000   000      00000000
