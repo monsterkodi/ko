@@ -148,6 +148,7 @@ class Diffbar
                     length: 1
                     boring: boring                        
                     click: @onMetaClick
+                    
                 @editor.meta.addDiffMeta meta
 
     # 0000000     0000000   00000000   000  000   000   0000000
@@ -192,8 +193,6 @@ class Diffbar
 
     update: =>
 
-        # log 'diffbar update', @editor.currentFile
-        
         if @editor.currentFile
 
             @changes = file:@editor.currentFile
@@ -201,6 +200,7 @@ class Diffbar
             forkfunc '../tools/gitdiff', @editor.currentFile, (err, changes) =>
                 
                 if not empty err
+                    return if 0 <= err.indexOf 'Not a git repository'
                     log 'git diff error!', err
                     @changes.error = err
                 else if changes.file == @editor.currentFile
@@ -208,13 +208,11 @@ class Diffbar
                 else
                     return
                     
-                # log 'diffbar updated', @changes
                 @updateMetas()
                 @updateScroll()
                 @editor.emit 'diffbarUpdated', @changes
         else   
             @changes = null
-            # log 'diffbar updated', @changes
             @updateMetas()
             @updateScroll()
             @editor.emit 'diffbarUpdated', @changes

@@ -12,22 +12,14 @@ matchr = require '../../tools/matchr'
 class Transform
 
     @transformNames = [
-        
         'upper', 'lower', 'title', 'case'
         'up', 'down', 'sort'
         'reverse', 
         'resolve', 'unresolve'
         'dirname', 'basename'
         'filename', 'extname'
-        
     ]
 
-    
-    
-    
-    
-    
-    
     constructor: (@editor) ->
 
         @editor.transform = @
