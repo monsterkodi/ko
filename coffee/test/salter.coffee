@@ -10,7 +10,8 @@
 assert   = require 'assert'
 
 Editor = require '../editor/editor'
-editor = new Editor
+editor = new Editor 'test_salter'
+after -> editor.del()
 
 # !!! DON'T CLEAN THIS FILE !!!
 

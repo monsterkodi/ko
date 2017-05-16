@@ -45,10 +45,12 @@ editor   = null
 undo     = null
 fakeview = null
 
+after -> editor.del()
+
 describe 'editor', ->
     
     it "exists", -> _.isObject Editor
-    it "instantiates", -> _.isObject editor = new Editor
+    it "instantiates", -> _.isObject editor = new Editor 'test_undo'
     it "fakeview", -> fakeview = new FakeView editor
     it "accepts text", -> 
         editor.setText "hello\nworld"

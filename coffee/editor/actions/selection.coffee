@@ -89,7 +89,7 @@ module.exports =
     # 0000000      000     000   000  000   000     000             00000000  000   000  0000000    
     
     startSelection: (opt = extend:false) ->
-        
+        # @log 'startSel', opt.extend
         if not opt?.extend
             @startSelectionCursors = null
             if not @stickySelection
@@ -110,32 +110,33 @@ module.exports =
                 @do.select rangesFromPositions @startSelectionCursors
                     
     endSelection: (opt = extend:false) ->
-        
+
         if not opt?.extend 
+            
             @startSelectionCursors = null
-            if not @stickySelection # and @do.numSelections()
-                # @selectNone()
+            if not @stickySelection
                 @do.select []
-            @checkSalterMode()
-            return
-
-        oldCursors   = @startSelectionCursors ? @do.cursors()
-        newSelection = @stickySelection and @do.selections() or []            
-        newCursors   = @do.cursors()
-        
-        if oldCursors.length != newCursors.length
-            return error "Editor.#{@name}.endSelection -- oldCursors.size != newCursors.size", oldCursors.length, newCursors.length
-        
-        for ci in [0...@do.numCursors()]
-            oc = oldCursors[ci]
-            nc = newCursors[ci]
-            if not oc? or not nc?
-                return error "Editor.#{@name}.endSelection -- invalid cursors", oc, nc
-            else
-                ranges = @rangesForLinesBetweenPositions oc, nc, true #< extend to full lines if cursor at start of line                
-                newSelection = newSelection.concat ranges
-
-        @do.select newSelection
+                
+        else
+            
+            oldCursors   = @startSelectionCursors ? @do.cursors()
+            newSelection = @stickySelection and @do.selections() or []            
+            newCursors   = @do.cursors()
+            
+            if oldCursors.length != newCursors.length
+                return error "Editor.#{@name}.endSelection -- oldCursors.size != newCursors.size", oldCursors.length, newCursors.length
+            
+            for ci in [0...@do.numCursors()]
+                oc = oldCursors[ci]
+                nc = newCursors[ci]
+                
+                if not oc? or not nc?
+                    return error "Editor.#{@name}.endSelection -- invalid cursors", oc, nc
+                else
+                    ranges = @rangesForLinesBetweenPositions oc, nc, true #< extend to full lines if cursor at start of line                
+                    newSelection = newSelection.concat ranges
+    
+            @do.select newSelection
             
         @checkSalterMode()      
 
@@ -151,9 +152,7 @@ module.exports =
         newSelections = @do.selections()
         newSelections.push range
         
-        newCursors = (rangeEndPos(r) for r in newSelections)
-            
-        @do.setCursors newCursors, main:'last'
+        @do.setCursors endPositionsFromRanges(newSelections), main:'last'
         @do.select newSelections
         @do.end()
 
@@ -163,7 +162,7 @@ module.exports =
         newSelections = @do.selections()
         newSelections.splice si, 1
         if newSelections.length
-            newCursors = (rangeEndPos(r) for r in newSelections)
+            newCursors = endPositionsFromRanges newSelections
             @do.setCursors newCursors, main:(newCursors.length+si-1) % newCursors.length
         @do.select newSelections
         @do.end()        

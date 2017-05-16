@@ -13,8 +13,8 @@ module.exports =
         menu: 'Select'
         
         highlightWordAndAddToSelection:
-            name: 'Highlight and Select Word'
-            text: 'highlights all occurrences of text in selection or word at cursor and selects the first|next highlight.'
+            name:  'Highlight and Select Word'
+            text:  'highlights all occurrences of text in selection or word at cursor and selects the first|next highlight.'
             combo: 'command+d'
             
         selectAllWords:
@@ -23,12 +23,12 @@ module.exports =
             
         removeSelectedHighlight:
             name: 'Remove Highlighted Word from Selection'
-            text: "does the inverse of 'highlight and select' word"
+            text:  "does the inverse of 'highlight and select' word"
             combo: 'command+shift+d'
             
         highlightTextOfSelectionOrWordAtCursor:
-            name: 'Highlight and Select Word'
-            text: 'highlights all occurrences of text in selection or word at cursor and selects it. expands to the left if already selected.'
+            name:  'Highlight and Select Word'
+            text:  'highlights all occurrences of text in selection or word at cursor and selects it. expands to the left if already selected.'
             combo: 'command+e'
 
     # 000000000  00000000  000   000  000000000  
@@ -83,7 +83,7 @@ module.exports =
         @do.start()
         @do.select @do.highlights()
         if @do.numSelections()
-            @do.setCursors (rangeEndPos(r) for r in @do.selections()), main: 'closest'
+            @do.setCursors endPositionsFromRanges(@do.selections()), main: 'closest'
         @do.end()
 
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000  

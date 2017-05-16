@@ -5,7 +5,7 @@
 # 000 0 000  000   000  000       000   000  000   000
 # 000   000  000   000   0000000  000   000   0000000
 
-{ packagePath, fileExists, fileName, fileList, relative, splitExt,
+{ packagePath, fileExists, fileName, fileList, reversed, relative, splitExt,
   post, noon, path, error, log, _
 }       = require 'kxk'
 indexer = require '../main/indexer'
@@ -47,7 +47,11 @@ class Macro extends Command
     # 000      000       000     000
     # 0000000  000  0000000      000
 
-    listItems: () -> @macros.concat super()
+    listItems: () -> 
+    
+        items = _.uniq _.concat reversed(@history), @macros
+
+        ({text: i, line: i in @macros and '◼' or '◆', type: 'macro'} for i in items)
 
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000
@@ -62,7 +66,7 @@ class Macro extends Command
         editor  = window.editor
         cp      = editor.cursorPos()
         args    = command.split /\s+/
-        command = args.shift()
+        cmmd    = args.shift()
 
         wordsInArgsOrCursorsOrSelection = (args, opt) ->
             if args.length
@@ -73,7 +77,7 @@ class Macro extends Command
                 ws = _.uniq cw.concat sw
                 ws.filter (w) -> w.trim().length
 
-        switch command
+        switch cmmd
 
             # 000  000   000  000   000
             # 000  0000  000  000   000
@@ -148,6 +152,7 @@ class Macro extends Command
             # 000   000  00000000  0000000  000
 
             when 'help'
+                
                 terminal = window.terminal
                 terminal.output noon.stringify noon.load("#{__dirname}/../../bin/cheet.noon"),
                     align:    true
@@ -176,6 +181,7 @@ class Macro extends Command
             # 000   000  00000000   00000 00
 
             when 'req'
+                
                 words = wordsInArgsOrCursorsOrSelection args
                 lastIndex = 0
                 texts = []
@@ -306,9 +312,11 @@ class Macro extends Command
                 #    000     000   000  000   000  000  0000       000  000       000   000  000   000  000 0 000    
                 #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000    
                 
-                if command in editor.Transform.transformNames
-                    if window.textEditor?.Transform?
-                        window.textEditor.Transform.do window.textEditor, command
+                if cmmd in editor.Transform.transformNames
+                    window.textEditor.Transform.do.apply null, [window.textEditor, cmmd].concat args
+                else
+                    if _.last(@history) == command.trim()
+                        @history.pop()
 
         select: true
 

@@ -18,20 +18,20 @@ describe 'ranges', ->
     it "instantiates", -> _.isObject new Ranges
     it "pollutes", -> 
         for key in Object.getOwnPropertyNames Ranges.prototype
-            expect global['positionsInLineAfterColInPositions']
+            expect global['positionsAfterLineColInPositions']
             .to.exist
 
-    it 'positionsInLineAfterColInPositions', ->
+    it 'positionsAfterLineColInPositions', ->
         pl = [[0,0], [2,0], [3,0], [4,0], [6,0], [4,1], [10,1], [3,2], [3,3]]
-        expect positionsInLineAfterColInPositions 3, 0, pl
+        expect positionsAfterLineColInPositions 3, 0, pl
         .to.eql [[3,3]]
-        expect positionsInLineAfterColInPositions 2, 0, pl
+        expect positionsAfterLineColInPositions 2, 0, pl
         .to.eql [[3,2]]
-        expect positionsInLineAfterColInPositions 1, 10, pl
+        expect positionsAfterLineColInPositions 1, 10, pl
         .to.eql []
-        expect positionsInLineAfterColInPositions 1, 4, pl
+        expect positionsAfterLineColInPositions 1, 4, pl
         .to.eql [[10,1]]
-        expect positionsInLineAfterColInPositions 1, 3, pl
+        expect positionsAfterLineColInPositions 1, 3, pl
         .to.eql [[4,1],[10,1]]
 
     it 'positionsBetweenPosAndPosInPositions', ->

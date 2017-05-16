@@ -296,8 +296,11 @@ class TextEditor extends Editor
 
         oi = li if not oi?
 
-        return if li < @scroll.top
-        return if li > @scroll.bot
+        if li < @scroll.top or li > @scroll.bot
+            error "dangling line div? #{li}", @lineDivs[li] if @lineDivs[li]?
+            delete @spanCache[li]
+            return
+            
         return error "updateLine - out of bounds? li #{li} oi #{oi}" if not @lineDivs[oi]
 
         @spanCache[li] = render.lineSpan @syntax.getDiss(li), @size
@@ -305,11 +308,11 @@ class TextEditor extends Editor
         div = @lineDivs[oi]
         div.replaceChild @spanCache[li], div.firstChild
         
-    #  0000000  000   000   0000000   000   000  000      000  000   000  00000000   0000000
-    # 000       000   000  000   000  000 0 000  000      000  0000  000  000       000
-    # 0000000   000000000  000   000  000000000  000      000  000 0 000  0000000   0000000
-    #      000  000   000  000   000  000   000  000      000  000  0000  000            000
-    # 0000000   000   000   0000000   00     00  0000000  000  000   000  00000000  0000000
+    #  0000000  000   000   0000000   000   000     000      000  000   000  00000000   0000000
+    # 000       000   000  000   000  000 0 000     000      000  0000  000  000       000
+    # 0000000   000000000  000   000  000000000     000      000  000 0 000  0000000   0000000
+    #      000  000   000  000   000  000   000     000      000  000  0000  000            000
+    # 0000000   000   000   0000000   00     00     0000000  000  000   000  00000000  0000000
 
     showLines: (top, bot, num) =>
         
@@ -330,11 +333,11 @@ class TextEditor extends Editor
         @lineDivs[li].appendChild @cachedSpan li
         @elem.appendChild @lineDivs[li]
 
-    #  0000000  000   000  000  00000000  000000000  000      000  000   000  00000000   0000000
-    # 000       000   000  000  000          000     000      000  0000  000  000       000
-    # 0000000   000000000  000  000000       000     000      000  000 0 000  0000000   0000000
-    #      000  000   000  000  000          000     000      000  000  0000  000            000
-    # 0000000   000   000  000  000          000     0000000  000  000   000  00000000  0000000
+    #  0000000  000   000  000  00000000  000000000     000      000  000   000  00000000   0000000
+    # 000       000   000  000  000          000        000      000  0000  000  000       000
+    # 0000000   000000000  000  000000       000        000      000  000 0 000  0000000   0000000
+    #      000  000   000  000  000          000        000      000  000  0000  000            000
+    # 0000000   000   000  000  000          000        0000000  000  000   000  00000000  0000000
 
     shiftLines: (top, bot, num) =>
         
@@ -740,7 +743,8 @@ class TextEditor extends Editor
             stopEvent event
 
     log: ->
-        return if @name != 'objecteditor'
+        # return if @name != 'objecteditor'
+        return if @name != 'editor'
         log.slog.depth = 3
         log.apply log, [].splice.call arguments, 0
         log.slog.depth = 2

@@ -9,7 +9,7 @@
 
 ([^']+')(.+)(':)          . class . class.marker . class . class.marker
 
-(▸ )([^']+')(.+)(':)       . class . class.marker . class . class.marker
+(▸ )([^']+')(.+)(':)      . class . class.marker . class . class.marker
 (● )(\w+)                 . class.marker . class
 (◆ )(\w+)                 . static.class.marker . static.class
 (▸ )([\w\.]+)             . method.marker . method

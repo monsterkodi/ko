@@ -52,7 +52,7 @@ module.exports =
             ns[1][1] += ldiff
         
         @do.select newSelections
-        @do.setCursors (rangeEndPos(r) for r in newSelections)
+        @do.setCursors endPositionsFromRanges newSelections
         @do.end()
     
     # 00000000    0000000    0000000  000000000  00000000  
@@ -92,7 +92,7 @@ module.exports =
                 c = newCursors[ci]
                 insert = lines[ci % lines.length]
                 @do.change c[1], @do.line(c[1]).splice c[0], 0, insert
-                for c in positionsInLineAfterColInPositions c[1], c[0]-1, newCursors
+                for c in positionsAfterLineColInPositions c[1], c[0]-1, newCursors
                     cursorDelta c, insert.length # move cursors after insertion
                     
         else # insert at single cursor

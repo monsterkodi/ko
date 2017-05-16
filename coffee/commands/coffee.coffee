@@ -37,14 +37,15 @@ class Coffee extends Command
     
     state: -> 
         s = super
-        s.browse = ( r.item.name for r in @browser.column(0).rows )
+        if @browser.column(0)
+            s.browse = ( r.item.name for r in @browser.column(0).rows )
         s
         
     restoreState: (state) ->
         
         super state
         
-        if state.browse.length
+        if state.browse?.length
             @browser.start()
             for name in state.browse
                 @executeCoffee command:"browse #{name}, name:'#{name}'"

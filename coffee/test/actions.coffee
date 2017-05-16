@@ -12,8 +12,9 @@ _               = require 'lodash'
 should()
 
 Editor = require '../editor/editor'
-editor = new Editor
+editor = new Editor 'test_actions'
 editor.setText ''
+after -> editor.del()
 
 textIs = (t) -> expect(editor.text()).to.eql t
 mainIs = (m) -> expect(editor.mainCursor()).to.eql m
@@ -27,15 +28,15 @@ describe 'actions', ->
         editor .should.not.be.null
         editor['toggleComment'] .should.not.be.null
         
-        
     describe 'implements', ->
+        return
         for name in [
             'toggleComment'
             'insertCharacter', 
             'indent', 'deIndent'
-            'cut', 'copy', 'paste'
             'insertTab', 'deleteTab'
             'newline', 'newlineAtEnd'
+            'cut', 'copy', 'paste', 'pasteText'
             'selectMoreLines', 'selectLessLines'
             'moveLines', 'joinLines', 'duplicateLines'
             'deleteBackward', 'deleteForward', 'deleteSelection', 
@@ -54,7 +55,9 @@ describe 'actions', ->
             it "#{name}", -> _.isFunction(editor[name]).should.be.true
             
     describe 'basic editing', ->
+        
         it 'insertCharacter', ->
+            
             editor.insertCharacter 'a'
             textIs 'a'
             editor.insertCharacter 'b'
@@ -66,6 +69,7 @@ describe 'actions', ->
             textIs 'ab cd'        
             
         it 'moveCursors', ->
+            
             editor.moveCursors 'left'
             cursIs [[4,0]]
             editor.moveCursors 'left'
@@ -74,11 +78,13 @@ describe 'actions', ->
             mainIs [2,0]
             
         it 'newline', ->
+            
             editor.newline indent:false
             textIs 'ab\n cd'
             mainIs [0,1]
     
-        it 'duplicateLines', ->        
+        it 'duplicateLines', -> 
+            
             editor.duplicateLines 'down'
             textIs 'ab\n cd\n cd'
             mainIs [0,2]        
@@ -86,7 +92,8 @@ describe 'actions', ->
             textIs 'ab\n cd\n cd\n cd'
             mainIs [0,2]        
     
-        it 'insertTab', ->                
+        it 'insertTab', ->  
+            
             editor.insertTab()
             textIs 'ab\n cd\n     cd\n cd'
             editor.moveCursors 'down'
@@ -101,6 +108,7 @@ describe 'actions', ->
             textIs 'ab\n cd\n     cd\n         cd'
             
         it 'deleteForward', ->
+            
             editor.deleteForward() 
             textIs 'ab\n cd\n     cd\n        cd'
             editor.moveCursorsToLineBoundary 'left'
@@ -112,12 +120,14 @@ describe 'actions', ->
             textIs 'ab\ncd\n    cd\n        cd'        
     
         it 'toggleComment', ->
+            
             editor.toggleComment()
             textIs "ab\n# cd\n    cd\n        cd"
             editor.toggleComment()
             textIs "ab\ncd\n    cd\n        cd"
             
         it 'selectMoreLines', ->
+            
             editor.selectMoreLines()
             selsIs [[1, [0,2]]]
             mainIs [2,1]
@@ -129,11 +139,13 @@ describe 'actions', ->
             mainIs [10,3]
             
         it 'selectLessLines', ->
+            
             editor.selectLessLines()
             selsIs [[1, [0,2]], [2, [0,6]]]
             mainIs [6,2]
             
         it 'cut copy paste', ->
+            
             editor.cut()
             textIs "ab\n        cd"
             editor.pasteText "cd\n    cd"
@@ -150,6 +162,7 @@ describe 'actions', ->
             textIs "123"
             
         it 'alignCursorsAndText', ->
+            
             editor.setText """
                 0123 567
                   234 67
@@ -170,6 +183,7 @@ describe 'actions', ->
                 0 1 345678 0"""
     
         it 'highlight', ->
+            
             editor.singleCursorAtPos [5,1]
             editor.highlightTextOfSelectionOrWordAtCursor()
             hlgtIs [[0,[6,11]], [1,[5,10]]]
@@ -196,6 +210,7 @@ describe 'actions', ->
                 013456780"""
             
         it 'deleteToEndOfLine', ->
+            
             editor.setText "x2345a\ny2345b\nz2345c"
             editor.singleCursorAtPos [3,1]
             editor.deleteToEndOfLine()
@@ -214,6 +229,7 @@ describe 'actions', ->
             selsIs []
     
         it 'deleteToEndOfLineOrWholeLine', ->
+            
             editor.setText "x2345a\ny2345b\nz2345c"
             editor.singleCursorAtPos [3,1]
             editor.deleteToEndOfLineOrWholeLine()
@@ -243,7 +259,29 @@ describe 'actions', ->
             selsIs []
             
         it 'newlineAtEnd', ->
+            
             editor.setText "123456\n123456\n123456"
             editor.singleCursorAtPos [3,1]
             editor.newlineAtEnd()
             textIs "123456\n123456\n\n123456"
+            
+        it 'extendSelection', ->
+            
+            editor.setText ""
+            editor.singleCursorAtPos [0,0]
+            editor.insertCharacter 'a'
+            editor.insertCharacter 'b'
+            editor.moveCursors 'left', extend:true
+            editor.insertCharacter 'c'
+            textIs "ac"
+            editor.insertCharacter 'd'
+            textIs "acd"
+            editor.insertCharacter 'c'
+            textIs "acdc"
+            editor.moveCursors 'left', extend:true
+            editor.moveCursors 'left', extend:true
+            editor.moveCursors 'left', extend:true
+            editor.insertCharacter 'b'
+            editor.insertCharacter 'c'
+            textIs 'abc'
+            

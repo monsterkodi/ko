@@ -14,7 +14,8 @@ Editor = require '../editor/editor'
 State  = require '../editor/state'
 should()
 
-editor = new Editor
+editor = new Editor 'test_calcchanges'
+after -> editor.del()
 
 describe 'calc', ->
 

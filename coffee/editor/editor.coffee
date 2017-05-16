@@ -44,19 +44,18 @@ class Editor extends Buffer
     # 000       000   000  000  0000       000     000     000   000  000   000  000          000     000   000  000   000  
     #  0000000   0000000   000   000  0000000      000     000   000   0000000    0000000     000      0000000   000   000  
     
-    constructor: () ->
+    constructor: (@name) ->
 
         Editor.initActions() if not Editor.actions?
             
-        @indentString       = _.padStart "", 4
-        @stickySelection    = false
-        @dbg                = false
+        @indentString    = _.padStart "", 4
+        @stickySelection = false
+        @dbg             = false
         super
-        @do                 = new Do @
+        @do              = new Do @
         @setupFileType()
 
     del: ->
-        
         @do.del()
         
     # 000000000  000   000  00000000   00000000

@@ -5,7 +5,7 @@
 #    000     000   000  000   000  000  0000       000  000       000   000  000   000  000 0 000
 #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000
 
-{ resolve, unresolve, reversed, fileName, path, error, log, _
+{ resolve, unresolve, reversed, fileName, path, str, error, log, _
 } = require 'kxk'
 matchr = require '../../tools/matchr'
 
@@ -13,6 +13,7 @@ class Transform
 
     @transformNames = [
         'upper', 'lower', 'title', 'case'
+        'count', 'add'
         'up', 'down', 'sort'
         'reverse', 
         'resolve', 'unresolve'
@@ -28,6 +29,27 @@ class Transform
         @resolveFuncs = ['resolve', 'unresolve']
         @sortFuncs    = ['up', 'down']
 
+    #  0000000   0000000   000   000  000   000  000000000  
+    # 000       000   000  000   000  0000  000     000     
+    # 000       000   000  000   000  000 0 000     000     
+    # 000       000   000  000   000  000  0000     000     
+    #  0000000   0000000    0000000   000   000     000     
+    
+    count: ->
+        
+        @editor.do.start()
+        cs = @editor.do.cursors()
+        @editor.do.select rangesFromPositions cs
+        numbers = ("#{_.padStart str(i), Math.floor(1 + Math.log10(cs.length)), '0'}" for i in [0...cs.length])
+        @editor.replaceSelectedText numbers
+        @editor.do.end()
+        'count'
+
+    add: (d=1) ->
+        
+        @apply (t) -> str(parseInt(t) + parseInt(d))
+        'add'
+        
     # 00000000   00000000  000   000  00000000  00000000    0000000  00000000
     # 000   000  000       000   000  000       000   000  000       000
     # 0000000    0000000    000 000   0000000   0000000    0000000   0000000
@@ -190,21 +212,21 @@ class Transform
     # 000   000  000   000
     # 0000000     0000000
 
-    do: (transName) ->
+    do: (transName, args...) ->
 
         f = @[transName]
 
         if f and _.isFunction f
-            @last = f.call @
+            @last = f.apply @, args
         else
             return error "unhandled transform #{transName}"
 
         @last
 
-    @do: (editor, transName) ->
+    @do: (editor, transName, args...) ->
 
         t = editor.transform ? new Transform editor
-        t.do transName
+        t.do.apply t, [transName].concat args
 
 module.exports =
 

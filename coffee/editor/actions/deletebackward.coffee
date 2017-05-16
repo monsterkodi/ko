@@ -1,24 +1,24 @@
 
-# 0000000     0000000    0000000  000   000  000   000   0000000   00000000   0000000  
+# 0000000     0000000    0000000  000   000  000   000   0000000   00000000   0000000
 # 000   000  000   000  000       000  000   000 0 000  000   000  000   000  000   000
 # 0000000    000000000  000       0000000    000000000  000000000  0000000    000   000
 # 000   000  000   000  000       000  000   000   000  000   000  000   000  000   000
-# 0000000    000   000   0000000  000   000  00     00  000   000  000   000  0000000  
+# 0000000    000   000   0000000  000   000  00     00  000   000  000   000  0000000
 
-{ reversed, _
+{ reversed, log, _
 } = require 'kxk'
 
 module.exports =
-    
+
     actions:
         menu: 'Delete'
-        
+
         deleteBackward:
             name:  'Delete Backward'
             text:  'delete character to the left'
             combos: ['backspace', 'command+backspace', 'alt+backspace', 'shift+backspace']
             combo: 'backspace'
-    
+
         deleteBackwardIgnoreLineBoundary:
             name:   'Delete Backward Over Line Boundaries'
             combo:  'command+backspace'
@@ -26,63 +26,44 @@ module.exports =
         deleteBackwardSwallowWhitespace:
             name:   'Delete Backward Over Whitespace'
             combo:  'alt+backspace'
-            
+
     deleteBackward: (key, info) ->
-        
+
         info = key if not info? and _.isObject key
         opt = _.clone info
         switch info?.combo
             when 'command+backspace' then opt.ignoreLineBoundary = true
             when 'alt+backspace'     then opt.ignoreTabBoundary  = true
-        
+
         @do.start()
         if @do.numSelections()
             @deleteSelection()
         else if @salterMode
             @deleteSalterCharacter()
-        else            
-            if @surroundStack.length
-                so = _.last(@surroundStack)[0]
-                sc = _.last(@surroundStack)[1]
-                for c in @do.cursors()
-                    prv = ''
-                    prv = @do.line(c[1]).slice c[0]-so.length, c[0] if c[0] >= so.length
-                    nxt = @do.line(c[1]).slice c[0], c[0]+sc.length
-                    if prv != so or nxt != sc
-                        @surroundStack = []
-                        break
-                if @surroundStack.length                
-                    for i in [0...so.length]            
-                        @deleteCharacterBackward opt    
-                    for i in [0...sc.length]            
-                        @deleteForward()                
-                    @surroundStack.pop()                
-                    @do.end()
-                    return
-            
+        else if not @deleteEmptySurrounds()
             @deleteCharacterBackward opt
         @do.end()
 
     deleteCharacterBackward: (opt) ->
-        
+
         newCursors = @do.cursors()
-        
+
         removeNum = switch
             when opt?.singleCharacter    then 1
             when opt?.ignoreLineBoundary then -1 # delete spaces to line start or line end
             when opt?.ignoreTabBoundary # delete space columns
-                Math.max 1, _.min newCursors.map (c) => 
+                Math.max 1, _.min newCursors.map (c) =>
                     t = @do.textInRange [c[1], [0, c[0]]]
                     n = t.length - t.trimRight().length
                     n += c[0] - @do.line(c[1]).length if @isCursorVirtual c
                     Math.max 1, n
             else # delete spaces to previous tab column
-                Math.max 1, _.min newCursors.map (c) =>                       
-                    n = (c[0] % @indentString.length) or @indentString.length  
-                    t = @do.textInRange [c[1], [Math.max(0, c[0]-n), c[0]]]  
+                Math.max 1, _.min newCursors.map (c) =>
+                    n = (c[0] % @indentString.length) or @indentString.length
+                    t = @do.textInRange [c[1], [Math.max(0, c[0]-n), c[0]]]
                     n -= t.trimRight().length
                     Math.max 1, n
-            
+
         for c in reversed newCursors
             if c[0] == 0 # cursor at start of line
                 if opt?.ignoreLineBoundary or @do.numCursors() == 1
@@ -108,4 +89,5 @@ module.exports =
                 for nc in positionsAtLineIndexInPositions c[1], newCursors
                     if nc[0] >= c[0]
                         cursorDelta nc, -n
+                        
         @do.setCursors newCursors

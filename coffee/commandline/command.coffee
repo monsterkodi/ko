@@ -142,8 +142,7 @@ class Command
         @selected = index
         @execute @commandList.line index 
     
-    onBot: (bot) => 
-        @positionList()
+    onBot: (bot) => @positionList()
     
     positionList: ->
         

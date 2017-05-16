@@ -60,10 +60,10 @@ describe 'transform', ->
         editor.setLines unsorted
         editor.cursorInAllLines()
 
-        editor.transform.do 'asc'
+        editor.transform.do 'up'
         test editor.lines(), sorted
 
-        editor.transform.do 'desc'
+        editor.transform.do 'down'
         test editor.lines(), reversed sorted
         
         editor.transform.do 'sort'
@@ -118,9 +118,9 @@ describe 'transform', ->
         test editor.lines(), ['heLLo World!', "['1','23','666','42']", "what's up?"]
         editor.transform.do 'reverse'
         test editor.lines(), words
-        editor.transform.do 'asc'
+        editor.transform.do 'up'
         test editor.lines(), ['heLLo World!', "['1','23','42','666']", "what's up?"]
-        editor.transform.do 'desc'
+        editor.transform.do 'down'
         test editor.lines(), ['heLLo World!', "['666','42','23','1']", "what's up?"]
         
     it 'close tab', ->

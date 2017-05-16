@@ -162,25 +162,68 @@ module.exports =
             @do.change ns[0], @do.line(ns[0]).splice ns[1][1], 0, cr
             @do.change ns[0], @do.line(ns[0]).splice ns[1][0], 0, cl
             
-            for c in positionsInLineAfterColInPositions ns[0], ns[1][0]-1, newCursors
+            for c in positionsAfterLineColInPositions ns[0], ns[1][0]-1, newCursors
                 cursorDelta c, cl.length
                 
-            for os in rangesAfterLineColInRanges ns[0], ns[1][1], newSelections
+            for os in rangesAfterLineColInRanges ns[0], ns[1][1]-1, newSelections
                 os[1][0] += cr.length
                 os[1][1] += cr.length
                 
-            for os in rangesAfterLineColInRanges ns[0], ns[1][0], newSelections
+            for os in rangesAfterLineColInRanges ns[0], ns[1][0]-1, newSelections
                 os[1][0] += cl.length
                 os[1][1] += cl.length
             
-            for c in positionsInLineAfterColInPositions ns[0], ns[1][1], newCursors
+            for c in positionsAfterLineColInPositions ns[0], ns[1][1], newCursors
                 cursorDelta c, cr.length
                 
         @do.select rangesNotEmptyInRanges newSelections
         @do.setCursors newCursors
         @do.end()
         return true
+
+    # 0000000    00000000  000      00000000  000000000  00000000  
+    # 000   000  000       000      000          000     000       
+    # 000   000  0000000   000      0000000      000     0000000   
+    # 000   000  000       000      000          000     000       
+    # 0000000    00000000  0000000  00000000     000     00000000  
+    
+    deleteEmptySurrounds: ->
             
+        cs = @do.cursors()
+
+        pairs = _.uniqWith _.values(@surroundPairs), _.isEqual
+
+        openClosePairs = []
+        
+        for c in cs
+            # check if all cursors are inside of empty surround pairs
+            for [so, sc] in pairs
+                before = @do.line(c[1]).slice c[0]-so.length, c[0]
+                after  = @do.line(c[1]).slice c[0], c[0]+sc.length
+                if so == before and sc == after
+                    openClosePairs.push [so,sc]
+                    break
+            return false if cs.length != openClosePairs.length
+
+        return false if cs.length != openClosePairs.length
+            
+        # all cursors in empty surround -> remove both surrounds
+        uniquePairs = _.uniqWith openClosePairs, _.isEqual
+        for c in cs
+            [so,sc] = openClosePairs.shift()
+            for i in [0...so.length]
+                @deleteCharacterBackward()
+            for i in [0...sc.length]
+                @deleteForward()
+        
+        if @surroundStack.length # pop or clean surround stack
+            if uniquePairs.length == 1 and _.isEqual uniquePairs[0], _.last @surroundStack 
+                @surroundStack.pop()
+            else
+                @surroundStack = []
+        
+        true    
+        
     # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000   0000000  
     # 000   000  000  000        000   000  000      000  000        000   000     000     000       
     # 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000     0000000   

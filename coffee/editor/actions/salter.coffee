@@ -119,21 +119,19 @@ module.exports =
     # 000       000   000  000       000       000  000   
     #  0000000  000   000  00000000   0000000  000   000  
     
-    checkSalterMode: ->        
-        return if not @salterMode
-        @setSalterMode false
-        return if @do.numCursors() != 5
-        cs = @do.cursors()
-        cp = cs[0]
-        for c in cs.slice 1
-            return if c[0] != cp[0]
-            return if c[1] != cp[1]+1
-            cp = c
-        rgs = @salterRangesAtPos @do.mainCursor()
-        return if not rgs? or rgs[0][0] != cs[0][1]
-        cols = @columnsInSalt (@do.textInRange(r) for r in rgs)
-        return if cs[0][0] < cols[0]
-        @setSalterMode true
+    checkSalterMode: -> 
+        
+        if @salterMode
+        
+            @setSalterMode false
+        
+            if @do.numCursors() == 5 and positionsInContinuousLine @do.cursors()
+                cs = @do.cursors()
+                rgs = @salterRangesAtPos @do.mainCursor()
+                return if not rgs? or rgs[0][0] != cs[0][1]
+                cols = @columnsInSalt (@do.textInRange(r) for r in rgs)
+                return if cs[0][0] < cols[0]
+                @setSalterMode true
         
     # 00000000    0000000   000   000   0000000   00000000   0000000  
     # 000   000  000   000  0000  000  000        000       000       
@@ -142,6 +140,7 @@ module.exports =
     # 000   000  000   000  000   000   0000000   00000000  0000000   
     
     salterRangesAtPos: (p) ->
+        
         salterRegExp = new RegExp("^\\s*#{@lineComment}[0\\s]+$")
         rgs = []
         li = p[1]
@@ -162,6 +161,7 @@ module.exports =
     #  0000000   0000000   0000000   0000000   000   000  000   000  0000000   
     
     columnsInSalt: (slt) ->
+        
         min = _.min (s.search /0/ for s in slt)
         if min < 0
             min = _.min (s.search(/#/)+1 for s in slt)
