@@ -32,9 +32,9 @@
 
 # special
 
-\blog\b                        function.log
+\blog\b                        function
 \berr\b                        variable.err
-\berror\b                      function.err
+\berror\b                      function.call
 
 # bool
 
@@ -94,7 +94,7 @@ new\s+(\w+)                    class.callee
 
 # lodash
 
-(_)\.(\w+)                   . lodash.marker . lodash.function
+# (_)\.(\w+)                   . lodash.marker . lodash.function
 
 # keywords
 
