@@ -41,12 +41,6 @@
 .false
     color           #d00
 
-.number
-.int
-    color           #88f
-.float
-    color           #f08
-
 .nil
     color           #808
 
@@ -58,6 +52,8 @@
     color           #fa0
     &.call
         color       #f80
+        &.class     
+            color   #fc0
     &.marker
         color       #55f
         opacity     1
@@ -78,9 +74,6 @@
 .class
     color           #ff8
 
-.variable
-    color           #a0a
-
 .range
     color           #66f
 
@@ -88,7 +81,8 @@
     color           #0f0
 
 .this
-    opacity         0.6
+    opacity         0.5
+    color           #88f
 
 .marker
     opacity         0.5
@@ -107,10 +101,7 @@
         color       #f80
 
 .member
-    color       #aaf
-    &.marker
-        // color           #88f
-        // opacity         1
+    color           #ccf
             
 .method
     color           #ff0
@@ -136,7 +127,7 @@
 .keyword
     color           #aaf !important
     &.null
-        color       #a00 !important
+        color       #a00 // !important
 
 .macro
     color           #f0f
@@ -161,6 +152,15 @@
     &.double
         color       #0f0 !important
 
+.number
+.int
+    color           #88f
+.float
+    color           #f08
+
+.keyword.return
+    color           #c0c !important
+    
 //  0000000   0000000   00     00  00     00  00000000  000   000  000000000
 // 000       000   000  000   000  000   000  000       0000  000     000
 // 000       000   000  000000000  000000000  0000000   000 0 000     000

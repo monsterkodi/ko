@@ -677,7 +677,7 @@ class TextEditor extends Editor
         else if event.metaKey
             @toggleCursorAtPos p
         else
-            @log jsbeauty.html_beautify @lineDivs[p[1]].firstChild.innerHTML
+            @log jsbeauty.html_beautify @lineDivs[p[1]].firstChild.innerHTML, indent_size:2 , preserve_newlines:false, wrap_line_length:200, unformatted: []
             @singleCursorAtPos p, extend:event.shiftKey
 
     # 000   000  00000000  000   000

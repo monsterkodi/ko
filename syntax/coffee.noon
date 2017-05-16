@@ -9,12 +9,12 @@
 
 [\<\>\+\-\=\/\*]               syntax.math
 
-@                              syntax.this
-\$                             syntax.this
+@                              this
+\$                             this
 \?                             syntax.cond
 !=                             syntax.math
-->                             syntax.function.marker
-=>                             syntax.function.marker.bound
+->                             function.marker
+=>                             function.marker.bound
 
 # braces
 
@@ -33,21 +33,18 @@
 # special
 
 \blog\b                        function
-\berr\b                        variable.err
+\berr\b                        err
 \berror\b                      function.call
 
 # bool
 
-true                           value.bool.true
-false                          value.bool.false 
+true                           bool.true
+false                          bool.false 
 
 # null
 
 null|undefined                 keyword.null
-
-# class members
-
-# (@\w+)(?=\s*[\?\!\+\-\=\,\.\<\>\*\/\]\)]|\[|\s+[\+\-]\s+|\s*$|\s+and|\s+or|\s+if|\s+then)    class.variable
+return                         keyword.return
 
 # .property
 
@@ -62,10 +59,7 @@ null|undefined                 keyword.null
 (@?\w+)\s*[:]\s*[-=]>               . method
 (\()[^\(\)]*(\)\s*)[-=]>            . function.bracket . function.bracket
 
-([a-zA-Z]\w*)(?!\s+or|\s+i[fs]|\s+and|\s+then)(?=\(|\s+[@\w\d\"\'\(\[\{])    function.call
-# (@[a-zA-Z]\w*)(?!\s+or|\s+i[fs]|\s+and|\s+then)(?=\(|\s+[@\w\d\"\'\(\[\{])   class.function.call
-# (@?[a-zA-Z]\w*)\s*(\.\s*\w+)\s*\([^\)]*\)       . class.callee . function.call
-# (@?[a-zA-Z]\w*)\s*(\.\s*\w+)\s+\w+              . class.callee . function.call
+(@?[a-zA-Z]\w*)(?!\s+or|\s+i[fs]|\s+and|\s+then)(?=\(|\s+[@\w\d\"\'\(\[\{])    function.call
 
 # class
 
@@ -92,10 +86,6 @@ new\s+(\w+)                    class.callee
 
 \S+(\?)                        syntax.exists
 
-# lodash
-
-# (_)\.(\w+)                   . lodash.marker . lodash.function
-
 # keywords
 
 (^|\s)(if|else|then|for|of|in|is|while|do|unless|not|or|and|try|catch|return|require|break|continue|new|switch|when|super|extends)(\s|$)  
@@ -108,21 +98,21 @@ __dirname|__filename  keyword
 #number
 
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
-    syntax.value.number.float.sign
-    value.number.float
+    number.float.sign
+    number.float
 
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
-    sign.number.int
-    value.number.int
+    number.int.sign
+    number.int
 
 (?:^|[^\.\"\'\w]|\.\.\.?)(0x)([\da-f]+)(?:$|[^\.\"\'\w]|\.\.\.?)   
-    marker.number.int
-    value.number.int
+    number.int.marker
+    number.int
 
 # strings
 
-(')([^\']*)(')                 . string.marker.single . value.string.single . string.marker.single
-(?:[^\"])(")([^\"]*)(")(?!")   . string.marker.double . value.string.double . string.marker.double
+(')([^\']*)(')                 . string.marker.single . string.single . string.marker.single
+(?:[^\"])(")([^\"]*)(")(?!")   . string.marker.double . string.double . string.marker.double
 """                            string.marker.triple
 
 |###|                          comment.marker
