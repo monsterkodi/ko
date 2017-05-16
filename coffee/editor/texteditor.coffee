@@ -12,6 +12,7 @@ render       = require './render'
 syntax       = require './syntax'
 EditorScroll = require './editorscroll'
 Editor       = require './editor'
+jsbeauty     = require 'js-beautify'
 electron     = require 'electron'
 
 class TextEditor extends Editor
@@ -676,6 +677,7 @@ class TextEditor extends Editor
         else if event.metaKey
             @toggleCursorAtPos p
         else
+            @log jsbeauty.html_beautify @lineDivs[p[1]].firstChild.innerHTML
             @singleCursorAtPos p, extend:event.shiftKey
 
     # 000   000  00000000  000   000

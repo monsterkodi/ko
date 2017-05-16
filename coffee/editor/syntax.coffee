@@ -53,7 +53,10 @@ class Syntax
     # 000   000  000       000       000
     # 0000000    000  0000000   0000000 
 
-    newDiss: (li) -> Syntax.dissForTextAndSyntax @editor.line(li), @name
+    newDiss: (li) -> 
+        
+        dss = Syntax.dissForTextAndSyntax @editor.line(li), @name
+        dss
     
     getDiss: (li) ->
         

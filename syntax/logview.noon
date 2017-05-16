@@ -10,7 +10,7 @@
 # (● )(.+)                  . class.marker . class
 # (◆ )(.+)                  . static.method.marker . static.method
 # (▸ )(.+)                  . func.marker . func
-(⦿ )([^▸]+)               . static.class.marker . static.class
+(⦿ )([^▸]+)               . class.member.marker . class.member
 
 [~\/\.\-\_\w]+\/            dirname
 

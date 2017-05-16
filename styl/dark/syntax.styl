@@ -53,10 +53,28 @@
 .array
     color           #00f
 
+.func
+.function
+    color           #fa0
+    &.call
+        color       #f80
+    &.marker
+        color       #55f
+        opacity     1
+        &.bound
+            color   #66f
+    &.bracket
+        color       #55f
+    &.argument
+        color       #aaf
+        &.punctuation
+            opacity  0.5
+    
 .obj
 .owner
 .callee
 .dictionary
+.class.object
 .class
     color           #ff8
 
@@ -88,28 +106,17 @@
     &.member
         color       #f80
 
-.func
-.function
-    color           #fd0
-    &.call
-        color       #f80
+.member
+    color       #aaf
     &.marker
-        color       #55f
-        opacity     1
-        &.bound
-            color   #66f
-    &.bracket
-        color       #55f
-    &.argument
-        color       #aaf
-        &.punctuation
-            opacity  0.5
-
-.class.function
+        // color           #88f
+        // opacity         1
+            
 .method
-    color           #ff8
+    color           #ff0
+    &.class
     &.call
-        color       #ff0
+        color       #ff8
     &.definition
     &.template
         color       #48a
@@ -121,16 +128,6 @@
     color           #fa0
     &.negate
         color       #ff0
-
-.class
-    &.variable
-        color       #fcf
-    &.static
-        color       #aaf
-
-.static.class.marker
-    color           #88f
-    opacity         1
 
 .keypath
     color           #f80
