@@ -165,3 +165,42 @@ describe 'surround', ->
             editor.deleteBackward()
             textIs ''
             
+        it 'multiple', ->
+            
+            editor.setText "[({\"\"})]\n[({''})]"
+            editor.singleCursorAtPos [4,0]
+            editor.addCursors 'down'
+            editor.deleteBackward()
+            textIs "[({})]\n[({})]"
+            editor.deleteBackward()
+            textIs "[()]\n[()]"
+            editor.deleteBackward()
+            textIs "[]\n[]"
+            editor.deleteBackward()
+            textIs "\n"
+            
+        it 'inline', ->
+            
+            editor.setText "[({\"\"})][({''})]"
+            editor.setCursors [[4,0], [12,0]]
+            editor.deleteBackward()
+            textIs "[({})][({})]"
+            editor.deleteBackward()
+            textIs "[()][()]"
+            editor.deleteBackward()
+            textIs "[][]"
+            editor.deleteBackward()
+            textIs ""
+         
+        it 'interpolation', ->
+            
+            editor.setText '"#{"#{}"}"'
+            editor.singleCursorAtPos [6,0]
+            editor.deleteBackward()
+            textIs '"#{""}"'
+            editor.deleteBackward()
+            textIs '"#{}"'
+            editor.deleteBackward()
+            textIs '""'
+            
+            

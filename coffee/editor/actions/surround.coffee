@@ -15,15 +15,15 @@ module.exports =
         @surroundStack = []
 
         @surroundPairs = 
+            '#': ['#{', '}'] # <- this has to come
+            '{': ['{', '}']  # <- before that
+            '}': ['{', '}']
             '[': ['[', ']']
             ']': ['[', ']']
-            '{': ['{', '}']
-            '}': ['{', '}']
             '(': ['(', ')']
             ')': ['(', ')']
             '<': ['<', '>']
             '>': ['<', '>']
-            '#': ['#{', '}']
             "'": ["'", "'"]
             '"': ['"', '"']
             '*': ['*', '*']                    
@@ -196,6 +196,7 @@ module.exports =
         openClosePairs = []
         
         for c in cs
+            numPairs = openClosePairs.length
             # check if all cursors are inside of empty surround pairs
             for [so, sc] in pairs
                 before = @do.line(c[1]).slice c[0]-so.length, c[0]
@@ -203,24 +204,33 @@ module.exports =
                 if so == before and sc == after
                     openClosePairs.push [so,sc]
                     break
-            return false if cs.length != openClosePairs.length
+            if numPairs == openClosePairs.length
+                return false 
 
-        return false if cs.length != openClosePairs.length
+        if cs.length != openClosePairs.length
+            return false 
             
         # all cursors in empty surround -> remove both surrounds
+        
+        # "#{}"
+        # "#{}"
+        
         uniquePairs = _.uniqWith openClosePairs, _.isEqual
         for c in cs
             [so,sc] = openClosePairs.shift()
-            for i in [0...so.length]
-                @deleteCharacterBackward()
-            for i in [0...sc.length]
-                @deleteForward()
+  
+            @do.change c[1], @do.line(c[1]).splice c[0]-so.length, so.length+sc.length
+            for nc in positionsAfterLineColInPositions c[1], c[0], cs
+                nc[0] -= sc.length + so.length 
+            c[0] -= so.length
         
         if @surroundStack.length # pop or clean surround stack
             if uniquePairs.length == 1 and _.isEqual uniquePairs[0], _.last @surroundStack 
                 @surroundStack.pop()
             else
                 @surroundStack = []
+                
+        @do.setCursors cs
         
         true    
         
