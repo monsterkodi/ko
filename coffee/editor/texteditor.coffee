@@ -243,12 +243,7 @@ class TextEditor extends Editor
 
     changed: (changeInfo) ->
 
-        for change in changeInfo.changes
-            [di,li,ch] = [change.doIndex, change.newIndex, change.change]
-            switch ch
-                when 'changed'  then @syntax.diss[di] = @syntax.dissForLineIndex li
-                when 'deleted'  then @syntax.diss.splice di, 1
-                when 'inserted' then @syntax.diss.splice di, 0, @syntax.dissForLineIndex li
+        @syntax.changed changeInfo
 
         for change in changeInfo.changes
             [di,li,ch] = [change.doIndex, change.newIndex, change.change]

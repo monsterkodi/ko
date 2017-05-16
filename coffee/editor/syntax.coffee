@@ -32,22 +32,33 @@ class Syntax
 
     clear: -> @diss = []
 
+    #  0000000  000   000   0000000   000   000   0000000   00000000  0000000    
+    # 000       000   000  000   000  0000  000  000        000       000   000  
+    # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000  
+    # 000       000   000  000   000  000  0000  000   000  000       000   000  
+    #  0000000  000   000  000   000  000   000   0000000   00000000  0000000    
+    
+    changed: (changeInfo) ->
+        
+        for change in changeInfo.changes
+            [di,li,ch] = [change.doIndex, change.newIndex, change.change]
+            switch change.change
+                when 'changed'  then @diss[change.doIndex] = @newDiss li
+                when 'deleted'  then @diss.splice change.doIndex, 1
+                when 'inserted' then @diss.splice change.doIndex, 0, @newDiss li
+        
     # 0000000    000   0000000   0000000
     # 000   000  000  000       000     
     # 000   000  000  0000000   0000000 
     # 000   000  000       000       000
     # 0000000    000  0000000   0000000 
 
-    dissForLineIndex: (lineIndex) -> 
-        
-        Syntax.dissForTextAndSyntax @editor.line(lineIndex), @name
-
-    getDiss: (li, opt) ->
+    newDiss: (li) -> Syntax.dissForTextAndSyntax @editor.line(li), @name
+    
+    getDiss: (li) ->
         
         if not @diss[li]?
-            rgs  = matchr.ranges Syntax.matchrConfigs[@name], @editor.line(li)
-            diss = matchr.dissect rgs, opt
-            @diss[li] = diss
+            @diss[li] = @newDiss li
             
         @diss[li]
     
