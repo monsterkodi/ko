@@ -567,11 +567,10 @@ class TextEditor extends Editor
     lineElemAtXY:(x,y) ->
 
         p = @posAtXY x,y
-        ci = p[1]-@scroll.top
-        @layerDict['lines'].children[ci]
+        @lineDivs[p[1]]
 
     lineSpanAtXY:(x,y) ->
-
+        
         if lineElem = @lineElemAtXY x,y
             lr = lineElem.getBoundingClientRect()
             for e in lineElem.firstChild.children

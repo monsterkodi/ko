@@ -181,7 +181,6 @@ class Diffbar
 
     onEditorFile: =>
 
-        # log 'onEditorFile', @editor.currentFile
         gitWatch.watch @editor.currentFile
         @update()
 
