@@ -22,11 +22,21 @@ describe 'syntax', ->
     it 'triple string', ->    
     
         dss = syntax.dissForTextAndSyntax 'log """txt"""', 'coffee'
-        console.log 'case1', dss
         test dss[1].clss, 'syntax string marker triple'
         test dss[2].clss, 'text string triple'
         test dss[3].clss, 'syntax string marker triple'
-            
+        
+        dss = syntax.dissForTextAndSyntax 'log """t\'t"""', 'coffee'
+        log 'case2', dss
+        test dss[1].clss, 'syntax string marker triple'
+        test dss[2].clss, 'text string triple'
+        test dss[3].clss, 'syntax string marker triple'
+
+        dss = syntax.dissForTextAndSyntax 'log """t"\'\'"t"""', 'coffee'
+        test dss[1].clss, 'syntax string marker triple'
+        test dss[2].clss, 'text string triple'
+        test dss[3].clss, 'syntax string marker triple'
+        
     it 'single strings', ->
         
         dss = syntax.dissForTextAndSyntax "'\"'", 'coffee'

@@ -160,7 +160,8 @@ class Syntax
         
         console.log 'stringDiss ---- ', text,  str dss        
         stack = []
-        for d in dss
+        result = []
+        while d = dss.shift()
             
             if d.clss == 'syntax string marker double' and d.match == '"""'
                 d.cls.pop()
@@ -175,25 +176,34 @@ class Syntax
                     if not stack.length
                         
                         stack.push diss:d, inner:[]
+                        result.push d
                         console.log 'pushed', str stack
                         continue
                         
                     else if _.first(stack).diss.clss == d.clss
-                        
+                        last = null
                         dissInner = stack.pop()
                         for inner in dissInner.inner
-                            inner.cls = ['text', 'string'].concat [_.last dissInner.diss.cls]
-                            inner.clss = inner.cls.join ' '
+                            if last? and last.start + last.match.length == inner.start
+                                last.match += inner.match
+                            else
+                                inner.cls = ['text', 'string'].concat [_.last dissInner.diss.cls]
+                                inner.clss = inner.cls.join ' '
+                                result.push inner
+                                last = inner
+                        result.push d
                         console.log 'popped', str dissInner
                         continue
                             
             if stack.length
                 _.first(stack).inner.push d
                 console.log 'inner', str stack
-            
+            else
+                result.push d
+                    
         console.log "result diss ---- '#{text}'", str dss
-        "1#{2}3"
-        dss
+        # "1#{2}3"
+        result
         
     #  0000000  000   000  00000000  0000000     0000000   000   000   0000000
     # 000       000   000  000       000   000  000   000  0000  000  000
