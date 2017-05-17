@@ -41,6 +41,7 @@ stringDiss = (text, dss) ->
         end = _.last result
         
         if d.clss == 'syntax string marker double' and d.match == '"""'
+            
             d.cls.pop()
             d.cls.push 'triple'
             d.clss = d.cls.join ' '
@@ -75,6 +76,7 @@ stringDiss = (text, dss) ->
             continue
 
         if top? and 'interpolation' in top.cls # interpolation end
+            
             if d.clss.endsWith 'bracket close'
                 log 'pop interpolation!', d
                 stack.pop()
@@ -88,6 +90,7 @@ stringDiss = (text, dss) ->
             when 'syntax string marker triple', 'syntax string marker double', 'syntax string marker single'
 
                 if d.clss != 'syntax string marker triple'
+                    
                     if d.match.length > 1 # split multiple string markers
                         log 'splice non triple'
                         dss.unshift
@@ -99,6 +102,7 @@ stringDiss = (text, dss) ->
                         d.match = d.match.slice 0, 1
 
                 if end? # escaped string markers ...
+                    
                     if end.match.endsWith '\\'
                         if numberOfCharsAtEnd(end.match, '\\') % 2
                             if end.start + end.match.length == d.start
@@ -121,10 +125,8 @@ stringDiss = (text, dss) ->
                     
                     addString d
 
-                else 
+                else # push string marker onto stack
                 
-                    # push string marker onto stack
-                    
                     result.push d
                     stack.push d
                     log 'pushed string stack:', stack
@@ -133,19 +135,19 @@ stringDiss = (text, dss) ->
                 continue
                 
         if top? 
+            
             if 'interpolation' in top.cls
                 addInterpolation d
             else 
                 addString d
         else
-            log 'push stray', d
+            
             result.push d
             log 'pushed stray result:', result         
 
-    while stack.length
+    if stack.length
         log 'unbalanced!', stack
-        stack.pop()
-
+        
     log "text -- #{text} -- result:", result
 
     result
