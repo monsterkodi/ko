@@ -36,7 +36,18 @@ class Ranges
         l = l.trim()
         i = l.lastIndexOf ' '
         l.slice i+1
-    
+
+    numberOfCharsAtEnd: (t, c) ->
+        s = 0
+        i = t.length-1
+        while i >= 0
+            if t[i] == c
+                s++
+                i--
+            else
+                break
+        s
+        
     rangeForPos:   (p)   -> [p[1], [p[0], p[0]]]
     rangeBetween: (a,b) -> 
         if isPos(a) and isPos(b) 

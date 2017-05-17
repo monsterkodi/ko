@@ -136,7 +136,7 @@ class Syntax
         matchr.ranges Syntax.matchrConfigs[n], line
 
     @dissForTextAndSyntax: (text, n, opt) ->
-
+        console.log text, n
         diss = matchr.dissect matchr.ranges(Syntax.matchrConfigs[n], text), opt
         if 0 <= text.indexOf '"'
             diss = Syntax.stringDiss text, diss
@@ -167,12 +167,37 @@ class Syntax
                 d.cls.pop()
                 d.cls.push 'triple'
                 d.clss = d.cls.join ' '
-            
+                console.log 'triple convert'
+                                
             switch d.clss
                 
                 when 'syntax string marker triple', 'syntax string marker double', 'syntax string marker single'
+
                     
+                    if d.clss != 'syntax string marker triple'
+                        if d.match.length > 1
+                            console.log 'splice non triple'
+                            dss.unshift
+                                match: d.match.slice 1
+                                start: d.start + 1
+                                clss:  d.clss
+                                cls:   _.clone d.cls
+                                cid:   d.cid # needed?
+                            d.match = d.match.slice 0, 1
+                    
+                    top = _.last stack
+                    if top? and top.inner.length 
+                        topInner = _.last top.inner 
+                        innerMatch = topInner.match
+                        if innerMatch.endsWith '\\' 
+                            if numberOfCharsAtEnd(innerMatch, '\\') % 2
+                                if topInner.start + innerMatch.length == d.start
+                                    console.log 'escaped', d.match
+                                    topInner.match += d.match
+                                    continue
+                                    
                     console.log d.match, ' -- ', d.clss
+                    
                     if not stack.length
                         
                         stack.push diss:d, inner:[]
@@ -197,11 +222,12 @@ class Syntax
                             
             if stack.length
                 _.first(stack).inner.push d
-                console.log 'inner', str stack
+                # console.log 'inner', str stack
+                console.log 'inner += ', d.match
             else
                 result.push d
                     
-        console.log "result diss ---- '#{text}'", str dss
+        console.log "result diss ---- '#{text}'", str result
         # "1#{2}3"
         result
         
