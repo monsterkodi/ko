@@ -16,9 +16,27 @@ test = (a, b) ->
 
 syntax = require '../editor/syntax'
 
-
 describe 'syntax', ->
 
+    it 'single strings', ->
+
+        dss = syntax.dissForTextAndSyntax "'\"'", 'coffee'
+        test dss[0].clss, 'syntax string marker single'
+        test dss[1].clss, 'text string single'
+        test dss[2].clss, 'syntax string marker single'
+        
+        dss = syntax.dissForTextAndSyntax "'\"\"'", 'coffee'
+        test dss[0].clss, 'syntax string marker single'
+        test dss[1].clss, 'text string single'
+        test dss[2].clss, 'syntax string marker single'
+
+        dss = syntax.dissForTextAndSyntax "'\"\"\"'", 'coffee'
+        test dss[0].clss, 'syntax string marker single'
+        test dss[1].clss, 'text string single'
+        test dss[2].clss, 'syntax string marker single'
+
+    # return
+            
     it 'escape', ->
 
         dss = syntax.dissForTextAndSyntax "'\\'\\\"\\''", 'coffee'
@@ -26,7 +44,7 @@ describe 'syntax', ->
         test dss[0].clss, 'syntax string marker single'
         test dss[1].clss, 'text string single'
         test dss[2].clss, 'syntax string marker single'
-        return
+
         dss = syntax.dissForTextAndSyntax '"\\"\\\'\\""', 'coffee'
         test dss[0].clss, 'syntax string marker double'
         test dss[1].clss, 'text string double'
@@ -36,9 +54,7 @@ describe 'syntax', ->
         test dss[0].clss, 'syntax string marker triple'
         test dss[1].clss, 'text string triple'
         test dss[2].clss, 'syntax string marker triple'
-        
-    return
-    
+            
     it 'unbalanced', ->
 
         dss = syntax.dissForTextAndSyntax "'\\'", 'coffee'
@@ -62,6 +78,18 @@ describe 'syntax', ->
         test dss[3].clss, 'syntax string interpolation close'
         test dss[4].clss, 'syntax string marker double'
         
+    it 'double strings', ->
+
+        dss = syntax.dissForTextAndSyntax "\"'\"", 'coffee'
+        test dss[0].clss, 'syntax string marker double'
+        test dss[1].clss, 'text string double'
+        test dss[2].clss, 'syntax string marker double'
+
+        dss = syntax.dissForTextAndSyntax "\"''\"", 'coffee'
+        test dss[0].clss, 'syntax string marker double'
+        test dss[1].clss, 'text string double'
+        test dss[2].clss, 'syntax string marker double'
+
     it 'triple string', ->
 
         dss = syntax.dissForTextAndSyntax 'log """txt"""', 'coffee'
@@ -78,36 +106,7 @@ describe 'syntax', ->
         test dss[1].clss, 'syntax string marker triple'
         test dss[2].clss, 'text string triple'
         test dss[3].clss, 'syntax string marker triple'
-
-    it 'single strings', ->
-
-        dss = syntax.dissForTextAndSyntax "'\"'", 'coffee'
-        test dss[0].clss, 'syntax string marker single'
-        test dss[1].clss, 'text string single'
-        test dss[2].clss, 'syntax string marker single'
-
-        dss = syntax.dissForTextAndSyntax "'\"\"'", 'coffee'
-        test dss[0].clss, 'syntax string marker single'
-        test dss[1].clss, 'text string single'
-        test dss[2].clss, 'syntax string marker single'
-
-        dss = syntax.dissForTextAndSyntax "'\"\"\"'", 'coffee'
-        test dss[0].clss, 'syntax string marker single'
-        test dss[1].clss, 'text string single'
-        test dss[2].clss, 'syntax string marker single'
-
-    it 'double strings', ->
-
-        dss = syntax.dissForTextAndSyntax "\"'\"", 'coffee'
-        test dss[0].clss, 'syntax string marker double'
-        test dss[1].clss, 'text string double'
-        test dss[2].clss, 'syntax string marker double'
-
-        dss = syntax.dissForTextAndSyntax "\"''\"", 'coffee'
-        test dss[0].clss, 'syntax string marker double'
-        test dss[1].clss, 'text string double'
-        test dss[2].clss, 'syntax string marker double'
-
+        
     it 'brackets', ->
 
         dss = syntax.dissForTextAndSyntax "{ }", 'coffee'

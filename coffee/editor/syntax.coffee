@@ -227,7 +227,7 @@ class Syntax
                 when 'syntax string marker triple', 'syntax string marker double', 'syntax string marker single'
 
                     if d.clss != 'syntax string marker triple'
-                        if d.match.length > 1
+                        if d.match.length > 1 # split multiple string markers
                             console.log 'splice non triple'
                             dss.unshift
                                 match: d.match.slice 1
@@ -251,14 +251,18 @@ class Syntax
                                     console.log 'escaped result:', str result
                                     continue
 
-                    console.log d.match, ' -- ', d.clss
-
                     if top? and top.clss == d.clss # pop matching string marker
                         
                         stack.pop()
                         result.push d
+                        
+                    else if top? and 'interpolation' not in top.cls
+                        
+                        addString d
 
-                    else # push string marker onto stack
+                    else 
+                    
+                        # push string marker onto stack
                         
                         result.push d
                         stack.push d
