@@ -156,6 +156,9 @@ module.exports =
                 if beforeGood and afterGood
                     spaces = before.length-trimmed.length
                     @do.change ns[0], @do.line(ns[0]).splice trimmed.length, spaces
+                    
+                    for c in positionsAfterLineColInPositions ns[0], ns[1][0]-1, newCursors
+                        c[0] -= spaces
                     ns[1][0] -= spaces
                     ns[1][1] -= spaces
                     
@@ -163,7 +166,7 @@ module.exports =
             @do.change ns[0], @do.line(ns[0]).splice ns[1][0], 0, cl
             
             for c in positionsAfterLineColInPositions ns[0], ns[1][0]-1, newCursors
-                cursorDelta c, cl.length
+                c[0] += cl.length
                 
             for os in rangesAfterLineColInRanges ns[0], ns[1][1]-1, newSelections
                 os[1][0] += cr.length
@@ -174,7 +177,7 @@ module.exports =
                 os[1][1] += cl.length
             
             for c in positionsAfterLineColInPositions ns[0], ns[1][1], newCursors
-                cursorDelta c, cr.length
+                c[0] += cr.length
                 
         @do.select rangesNotEmptyInRanges newSelections
         @do.setCursors newCursors
@@ -211,9 +214,6 @@ module.exports =
             return false 
             
         # all cursors in empty surround -> remove both surrounds
-        
-        # "#{}"
-        # "#{}"
         
         uniquePairs = _.uniqWith openClosePairs, _.isEqual
         for c in cs

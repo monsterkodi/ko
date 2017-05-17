@@ -9,7 +9,7 @@
   prefs, drag, elem, path, post, clamp, pos, str, error, log, sw, $, _
 }            = require 'kxk'
 render       = require './render'
-syntax       = require './syntax'
+Syntax       = require './syntax'
 EditorScroll = require './editorscroll'
 Editor       = require './editor'
 jsbeauty     = require 'js-beautify'
@@ -40,7 +40,7 @@ class TextEditor extends Editor
 
         @size   = {}
         @elem   = @layerDict.lines
-        @syntax = new syntax @
+        @syntax = new Syntax @
 
         @spanCache = [] # cache for rendered line spans
         @lineDivs  = {} # maps line numbers to displayed divs
@@ -143,7 +143,7 @@ class TextEditor extends Editor
     setText: (text) ->
 
         if @syntax.name == 'txt'
-            @syntax.name = syntax.shebang text.slice 0, text.search /\r?\n/
+            @syntax.name = Syntax.shebang text.slice 0, text.search /\r?\n/
 
         super text
 
@@ -677,7 +677,10 @@ class TextEditor extends Editor
         else if event.metaKey
             @toggleCursorAtPos p
         else
-            @log jsbeauty.html_beautify @lineDivs[p[1]].firstChild.innerHTML, indent_size:2 , preserve_newlines:false, wrap_line_length:200, unformatted: []
+            if event.ctrlKey
+                # @log jsbeauty.html_beautify @lineDivs[p[1]].firstChild.innerHTML, indent_size:2 , preserve_newlines:false, wrap_line_length:200, unformatted: []
+                # @log @line p[1]
+                @syntax.newDiss p[1]
             @singleCursorAtPos p, extend:event.shiftKey
 
     # 000   000  00000000  000   000

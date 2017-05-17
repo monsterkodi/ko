@@ -24,6 +24,7 @@ class Brackets
         @config = @editor.bracketCharacters.regexps
         
     onCursor: => 
+        
         if @editor.numHighlights() # don't highlight brackets when other highlights exist
             for h in @editor.highlights()
                 return if not h[2]?
@@ -41,6 +42,7 @@ class Brackets
         @editor.renderHighlights()
 
     highlightInside: (pos) ->
+        
         stack = []
         pp = pos
         while pp[1] >= 0 # find last open bracket before
@@ -96,6 +98,7 @@ class Brackets
             true
     
     beforeAfterForPos: (pos) ->
+        
         [cp, li] = pos
         line = @editor.line(li)
         rngs = matchr.ranges @config, line     
@@ -127,6 +130,7 @@ class Brackets
         [[],[]]
     
     highlight: (opn, cls) ->
+        
         @clear()
         opn.clss = 'bracketmatch'
         cls.clss = 'bracketmatch'
@@ -135,6 +139,7 @@ class Brackets
         @editor.renderHighlights()
 
     clear: ->
+        
         @editor.setHighlights @editor.highlights().filter (h) -> h[2]?.clss != 'bracketmatch'
 
 module.exports = Brackets

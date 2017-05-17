@@ -12,163 +12,235 @@ noon       = require 'noon'
 Immutable  = require 'seamless-immutable'
 matchr     = require '../tools/matchr'
 
-describe 'ranges', ->
+describe 'matchr', ->
     
-    rgx = /([\~\/\w\.]+\/[\w\.]+\w[:\d]*)/
+    # 00000000    0000000   000   000   0000000   00000000   0000000  
+    # 000   000  000   000  0000  000  000        000       000       
+    # 0000000    000000000  000 0 000  000  0000  0000000   0000000   
+    # 000   000  000   000  000  0000  000   000  000            000  
+    # 000   000  000   000  000   000   0000000   00000000  0000000   
     
-    it 'noon', ->
-        ranges = matchr.ranges /^\s+([^#\s]+(?:\s\S+)*)/g, '  some key  value'
-        expect(ranges) .to.eql [
-            index: 0
-            start: 2
-            match: 'some key'
-            value: 'found'
-        ]
+    describe 'ranges', ->
         
-    it 'noon config', ->
-        cfg = matchr.config noon.parse("^\\s+([^#\\s]+(?:\\s\\S+)*)  noon"), 'g'
-        ranges = matchr.ranges cfg, '  some key  value'
-        expect(ranges) .to.eql [
-            index: 0
-            start: 2
-            match: 'some key'
-            value: 'noon'
-        ]
-
-    it 'regexp', ->
-        ranges = matchr.ranges rgx, '~/path/line:666'
-        expect(ranges) .to.eql [
-            index: 0
-            start: 0
-            match: '~/path/line:666'
-            value: 'found'
-        ]
-
-    it 'string', ->
-        ranges = matchr.ranges 'o..', 'module.exports = bla'
-        expect(ranges) .to.eql [
-            index: 0
-            start: 1
-            match: 'odu'
-            value: 'found'
+        rgx = /([\~\/\w\.]+\/[\w\.]+\w[:\d]*)/
+        
+        it 'noon', ->
+            ranges = matchr.ranges /^\s+([^#\s]+(?:\s\S+)*)/g, '  some key  value'
+            expect(ranges) .to.eql [
+                index: 0
+                start: 2
+                match: 'some key'
+                value: 'found'
+            ]
+            
+        it 'noon config', ->
+            cfg = matchr.config noon.parse("^\\s+([^#\\s]+(?:\\s\\S+)*)  noon"), 'g'
+            ranges = matchr.ranges cfg, '  some key  value'
+            expect(ranges) .to.eql [
+                index: 0
+                start: 2
+                match: 'some key'
+                value: 'noon'
+            ]
+    
+        it 'regexp', ->
+            ranges = matchr.ranges rgx, '~/path/line:666'
+            expect(ranges) .to.eql [
+                index: 0
+                start: 0
+                match: '~/path/line:666'
+                value: 'found'
+            ]
+    
+        it 'string', ->
+            ranges = matchr.ranges 'o..', 'module.exports = bla'
+            expect(ranges) .to.eql [
+                index: 0
+                start: 1
+                match: 'odu'
+                value: 'found'
+            ,
+                index: 0
+                start: 10
+                match: 'ort'
+                value: 'found'            
+            ]
+    
+        it 'string|string', ->
+            ranges = matchr.ranges 'mod|exp', 'module.exports = bla'
+            expect(ranges) .to.eql [
+                index: 0
+                start: 0
+                match: 'mod'
+                value: 'found'
+            ,
+                index: 1
+                start: 7
+                match: 'exp'
+                value: 'found'            
+            ]
+            
+        it 'brackets', ->
+            config = matchr.config '[^\w\s]+': 'syntax', '[{]': 'bracket.open', '[}]': 'bracket.close'
+            ranges = matchr.ranges config, '{}'
+            # log 'ranges:', ranges
+            expect(ranges) .to.eql [
+                index: 0
+                start: 0
+                match: '{}'
+                value: 'syntax'
+            ,
+                index: 1
+                start: 0
+                match: '{'
+                value: 'bracket.open'
+            ,            
+                index: 2
+                start: 1
+                match: '}'
+                value: 'bracket.close'                        
+            ]
+        
+    # 0000000    000   0000000   0000000  00000000   0000000  000000000  
+    # 000   000  000  000       000       000       000          000     
+    # 000   000  000  0000000   0000000   0000000   000          000     
+    # 000   000  000       000       000  000       000          000     
+    # 0000000    000  0000000   0000000   00000000   0000000     000     
+    
+    describe 'dissect', ->
+        
+        ranges = Immutable [
+                start: 0
+                match: 'hello'
+                value: 'world'
+                index: 777
         ,
-            index: 0
-            start: 10
-            match: 'ort'
-            value: 'found'            
+                start: 2
+                match: 'll'
+                value: 'world'
+                index: 666            
         ]
-
-    it 'string|string', ->
-        ranges = matchr.ranges 'mod|exp', 'module.exports = bla'
-        expect(ranges) .to.eql [
+    
+        sameResult = [
+                start:  0
+                cid:    777
+                cls:  ['world']
+                match: 'hello'
+                clss:  'world'
+            ]
+                
+        describe 'same', ->    
+    
+            it 'default', ->
+                diss = matchr.dissect ranges.asMutable deep:true
+                expect(diss) .to.eql sameResult
+                
+            it 'no join', ->
+                diss = matchr.dissect ranges.asMutable(deep:true), join:false
+                expect(diss) .to.eql sameResult
+                
+            it 'join', ->
+                diss = matchr.dissect ranges.asMutable(deep:true), join:true
+                expect(diss) .to.eql sameResult
+    
+        describe 'differ', ->    
+            
+            differ = ranges.setIn [1, 'value'], 'ells'
+            
+            # it 'default', ->
+                # diss = matchr.dissect differ.asMutable deep:true
+                # expect(diss) .to.eql sameResult
+#                 
+            # it 'no join', ->
+                # diss = matchr.dissect differ.asMutable(deep:true), join:false
+                # expect(diss) .to.eql sameResult
+                 
+            it 'join', ->
+                diss = matchr.dissect differ.asMutable(deep:true), join:true
+                expect(diss) .to.eql [
+                    start:   0
+                    cid:     777
+                    cls:    ['world']
+                    match:   'he'
+                    clss:    'world'
+                ,
+                    start:   2
+                    cid:     666
+                    cls:     ['world', 'ells']
+                    match:   'll'
+                    clss:    'world ells'
+                ,
+                    start:   4
+                    cid:     777
+                    cls:     ['world']
+                    match:   'o'
+                    clss:    'world'
+                ]
+                    
+        describe 'test', ->
+            
+            it 'simple?', ->
+                testRanges = noon.parse """
+                    .
+                        start   0
+                        match   abcd
+                        value   ?
+                        index   0
+                    .
+                        start   4
+                        match   efg
+                        value   ?
+                        index   0
+                    .
+                        start   7
+                        match   hij
+                        value   ?
+                        index   0
+                """
+                diss = matchr.dissect testRanges
+                expect(diss) .to.eql [
+                    match:   'abcdefghij'
+                    start: 0
+                    cid: 0
+                    clss: '?'
+                    cls: ['?']
+                ]
+                
+    describe 'brackets', ->
+        
+        testRanges = [
             index: 0
             start: 0
-            match: 'mod'
-            value: 'found'
+            match: '{}'
+            value: 'syntax'
         ,
             index: 1
-            start: 7
-            match: 'exp'
-            value: 'found'            
+            start: 0
+            match: '{'
+            value: 'bracket.open'
+        ,            
+            index: 2
+            start: 1
+            match: '}'
+            value: 'bracket.close'
         ]
     
-describe 'dissect', ->
+        diss = matchr.dissect testRanges
 
-    ranges = Immutable [
+        
+        expect(diss) .to.eql [
             start: 0
-            match: 'hello'
-            value: 'world'
-            index: 777
-    ,
-            start: 2
-            match: 'll'
-            value: 'world'
-            index: 666            
-    ]
-
-    sameResult = [
-            start:  0
-            cid:    777
-            cls:  ['world']
-            match: 'hello'
-            clss:  'world'
+            cid: 1
+            match:   '{'
+            clss: 'syntax bracket open'
+            cls: ['syntax', 'bracket', 'open']
+        ,
+            start: 1
+            cid: 2
+            match:   '}'
+            clss: 'syntax bracket close'
+            cls: ['syntax', 'bracket', 'close']
         ]
-            
-    describe 'same', ->    
-
-        it 'default', ->
-            diss = matchr.dissect ranges.asMutable deep:true
-            expect(diss) .to.eql sameResult
-            
-        it 'no join', ->
-            diss = matchr.dissect ranges.asMutable(deep:true), join:false
-            expect(diss) .to.eql sameResult
-            
-        it 'join', ->
-            diss = matchr.dissect ranges.asMutable(deep:true), join:true
-            expect(diss) .to.eql sameResult
-
-    describe 'differ', ->    
         
-        differ = ranges.setIn [1, 'value'], 'ells'
-        
-        it 'default', ->
-            diss = matchr.dissect differ.asMutable deep:true
-            expect(diss) .to.eql sameResult
             
-        it 'no join', ->
-            diss = matchr.dissect differ.asMutable(deep:true), join:false
-            expect(diss) .to.eql sameResult
              
-        it 'join', ->
-            diss = matchr.dissect differ.asMutable(deep:true), join:true
-            expect(diss) .to.eql [
-                start:   0
-                cid:     777
-                cls:    ['world']
-                match:   'he'
-                clss:    'world'
-            ,
-                start:   2
-                cid:     666
-                cls:     ['world', 'ells']
-                match:   'll'
-                clss:    'world ells'
-            ,
-                start:   4
-                cid:     777
-                cls:     ['world']
-                match:   'o'
-                clss:    'world'
-            ]
-                
-    describe 'test', ->
-        
-        it 'simple?', ->
-            testRanges = noon.parse """
-                .
-                    start   0
-                    match   abcd
-                    value   ?
-                    index   0
-                .
-                    start   4
-                    match   efg
-                    value   ?
-                    index   0
-                .
-                    start   7
-                    match   hij
-                    value   ?
-                    index   0
-            """
-            diss = matchr.dissect testRanges
-            expect(diss) .to.eql [
-                match:   'abcdefghij'
-                start: 0
-                cid: 0
-                clss: '?'
-                cls: ['?']
-            ]
-                
-                 

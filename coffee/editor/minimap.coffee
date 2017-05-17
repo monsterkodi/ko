@@ -93,6 +93,7 @@ class Minimap
         ctx.clearRect 0, y, @width, ((bot-@scroll.exposeTop)-(top-@scroll.exposeTop)+1)*@scroll.lineHeight
         return if @scroll.exposeBot < 0
         bot = Math.min bot, @editor.numLines()-1
+        return if bot < top
         for li in [top..bot]
             diss = @editor.syntax.getDiss li
             y = parseInt((li-@scroll.exposeTop)*@scroll.lineHeight)

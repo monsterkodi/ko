@@ -1,30 +1,36 @@
 
 #   0000000   0000000   00000000  00000000  00000000  00000000
-#  000       000   000  000       000       000       000     
-#  000       000   000  000000    000000    0000000   0000000 
-#  000       000   000  000       000       000       000     
+#  000       000   000  000       000       000       000
+#  000       000   000  000000    000000    0000000   0000000
+#  000       000   000  000       000       000       000
 #   0000000   0000000   000       000       00000000  00000000
 
-\w+                            text
+\w+                                   text
+([^\w\s]+)                          . syntax
 
-[\<\>\+\-\=\/\*]               syntax.math
+[\<\>\+\-\=\/\*]                      math
 
-@                              this
-\$                             this
-\?                             syntax.cond
-!=                             syntax.math
-->                             function.marker
-=>                             function.marker.bound
+@                                     this
+\$                                    this
+\?                                    cond
+!=                                    math
+->                                    function.marker
+=>                                    function.marker.bound
+
+# punctuation
+
+[\,\;]                                punctuation
 
 # braces
 
-[\(\)\{\}\[\]]                 syntax.bracket
+[({\[]                              bracket.open
+[)}\]]                              bracket.close
 
 # require
 
 (\w+|\{[^\}]+\})\s*=\s*(require)\s+
     require.variable
-    keyword.require 
+    keyword.require
 
 # globals
 
@@ -32,93 +38,90 @@
 
 # special
 
-\blog\b                        function
-\berr\b                        err
-\berror\b                      function.call
+\blog\b                               function
+\berr\b                               err
+\berror\b                             function.call
 
 # bool
 
-true                           bool.true
-false                          bool.false 
+true                                  bool.true
+false                                 bool.false
 
 # null
 
-null|undefined                 keyword.null
-return                         keyword.return
+null|undefined                        keyword.null
+return                                keyword.return
 
 # .property
 
-(\s*\w+)\.                     owner
-\.(\s*\w+)                     property
+(\s*\w+)\.                            owner
+\.(\s*\w+)                            property
 
-# functions 
+# functions
 
 (\w+)\s*[=]\s*\([^\)]*\)\s*[-=]>    . function
 (\w+)\s*[=]\s*[-=]>                 . function
 (@?\w+)\s*[:]\s*\([^\)]*\)\s*[-=]>  . method
 (@?\w+)\s*[:]\s*[-=]>               . method
-(\()[^\(\)]*(\)\s*)[-=]>            . function.bracket . function.bracket
+# (\()[^\(\)]*(\)\s*)[-=]>            . function.bracket . function.bracket
 
 (@?[a-zA-Z]\w*)(?!\s+or|\s+i[fs]|\s+and|\s+then)(?=\(|\s+[@\w\d\"\'\(\[\{])    function.call
 
 # class
 
-(class|extends)\s+(\w+)        . class.keyword . class.object
-    
-new\s+(\w+)                    class.callee
-@[a-zA-Z]\w*                   class.member
+(class|extends)\s+(\w+)             . class.keyword . class.object
 
-(?:[^\.])([\.])(?:[^\.])       . marker
+new\s+(\w+)                           class.callee
+@[a-zA-Z]\w*                          class.member
+
+(?:[^\.])([\.])(?:[^\.])            . marker
 
 # range
 
-(\[).*[^\.](\.\.\.?)[^\.].*(\])  . range.bracket . range . range.bracket
-
-# punctuation
-
-[\,\;]                         syntax.punctuation
+(\[).*[^\.](\.\.\.?)[^\.].*(\])     . range.bracket . range . range.bracket
 
 # dictionary key
 
-(\S+)\s*(:)                  . dictionary.key . dictionary.key.marker
+(\S+)\s*(:)                         . dictionary.key . dictionary.key.marker
 
 # exists?
 
-\S+(\?)                        syntax.exists
+\S+(\?)                               exists
 
 # keywords
 
-(^|\s)(if|else|then|for|of|in|is|while|do|unless|not|or|and|try|catch|return|require|break|continue|new|switch|when|super|extends)(\s|$)  
-    none 
-    keyword 
+(^|\s)(if|else|then|for|of|in|is|while|do|unless|not|or|and|try|catch|return|require|break|continue|new|switch|when|super|extends)(\s|$)
     none
-    
-__dirname|__filename  keyword
+    keyword
+    none
+
+__dirname|__filename                  keyword
 
 #number
 
-(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)
     number.float.sign
     number.float
 
-(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)
     number.int.sign
     number.int
 
-(?:^|[^\.\"\'\w]|\.\.\.?)(0x)([\da-f]+)(?:$|[^\.\"\'\w]|\.\.\.?)   
+(?:^|[^\.\"\'\w]|\.\.\.?)(0x)([\da-f]+)(?:$|[^\.\"\'\w]|\.\.\.?)
     number.int.marker
     number.int
 
 # strings
+'                                     string.marker.single
+"                                     string.marker.double
+(')([^\'\"]+)(')                    . string.marker.single . string.single . string.marker.single
+(")([^\"\']+)(")                    . string.marker.double . string.double . string.marker.double
+\#\{                                  string.interpolation
 
-(')([^\']*)(')                 . string.marker.single . string.single . string.marker.single
-(?:[^\"])(")([^\"]*)(")(?!")   . string.marker.double . string.double . string.marker.double
-"""                            string.marker.triple
-
-|###|                          comment.marker
-(?:^|\s+)(#+)([^\{].*|$)     . comment.marker . comment
+|###|                                 comment.marker
+(?:^|\s+)(#+)([^\{].*|$)            . comment.marker . comment
 
 # salter headers
 
-^\s*(\#)([0\s]+)$            . comment.marker . comment.header
-^(\s*0[0\s]+)$                 comment.header
+^\s*(\#)([0\s]+)$                   . comment.marker . comment.header
+^(\s*0[0\s]+)$                        comment.header

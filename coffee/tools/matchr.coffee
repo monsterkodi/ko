@@ -18,12 +18,13 @@
 config = (patterns, flags) -> ( [new RegExp(p, flags), a] for p,a of patterns )
 
 sortRanges = (rgs) ->
-    rgs.sort (a,b) -> 
+    
+    rgs.sort (a,b) ->
         if a.start == b.start
-            if a.match.length == b.match.length
-                a.index - b.index
-            else
-                a.match.length - b.match.length
+            # if a.match.length == b.match.length
+            a.index - b.index
+            # else
+                # a.match.length - b.match.length
         else
             a.start - b.start
 
@@ -41,7 +42,7 @@ sortRanges = (rgs) ->
 #     value: the value for the match
 #     index: the index of the regexp 
       
-#     the objects are sorted by start, match.length and index
+#     the objects are sorted by start and index
       
 #     if the regexp has capture groups then 
 #         the value for the match of the nth group is
@@ -120,21 +121,24 @@ dissect = (ranges, opt = join:false) ->
         
     return [] if not ranges.length
     # console.log "dissect -- #{JSON.stringify ranges}"
-    di = []
-    for ri in [0...ranges.length]
-        rg = ranges[ri]
-        di.push [rg.start, ri]
-        di.push [rg.start + rg.match.length]
-    di.sort (a,b) -> 
+    
+    di = [] # collect a list of positions where a match starts or ends
+    for rg in ranges
+        di.push [rg.start, rg.index]
+        di.push [rg.start + rg.match.length, rg.index]
+        
+    di.sort (a,b) -> # sort the start/end positions by x or index
         if a[0]==b[0] 
             a[1]-b[1]
         else
             a[0]-b[0]
-    d = []
+            
+    d = [] 
     si = -1
-    for i in [0...di.length-1]
-        if di[i][0] > si
-            si = di[i][0]
+
+    for dps in di          # create a list of dummy ranges 
+        if dps[0] > si     # one range for each position
+            si = dps[0]
             d.push
                 start: si
                 cid:   0
@@ -147,7 +151,8 @@ dissect = (ranges, opt = join:false) ->
             p += 1 
         pn = p
         while d[pn].start < rg.start+rg.match.length
-            if (d[pn].cid <= rg.index or opt.join) and rg.value?
+            # if (d[pn].cid <= rg.index or opt.join) and rg.value?
+            if rg.value?
                 if not rg.value.split?
                     for r in rg.value
                         continue if not r.split?
