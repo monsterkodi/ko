@@ -19,13 +19,25 @@ syntax = require '../editor/syntax'
 
 describe 'syntax', ->
 
+    it 'unbalanced', ->
+
+        dss = syntax.dissForTextAndSyntax "'\\'", 'coffee'
+        test dss[0].clss, 'syntax string marker single'
+        test dss[1].clss, 'text string single'
+        test dss.length, 2
+        
+        dss = syntax.dissForTextAndSyntax '"\\"', 'coffee'
+        test dss[0].clss, 'syntax string marker double'
+        test dss[1].clss, 'text string double'
+        test dss.length, 2
+    
     it 'escape', ->
 
         dss = syntax.dissForTextAndSyntax "'\\'\\\"\\''", 'coffee'
         test dss[0].clss, 'syntax string marker single'
         test dss[1].clss, 'text string single'
         test dss[2].clss, 'syntax string marker single'
-
+        
         dss = syntax.dissForTextAndSyntax '"\\"\\\'\\""', 'coffee'
         test dss[0].clss, 'syntax string marker double'
         test dss[1].clss, 'text string double'
@@ -36,8 +48,6 @@ describe 'syntax', ->
         test dss[1].clss, 'text string triple'
         test dss[2].clss, 'syntax string marker triple'
         
-    # return
-    
     it 'triple string', ->
 
         dss = syntax.dissForTextAndSyntax 'log """txt"""', 'coffee'

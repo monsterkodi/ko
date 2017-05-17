@@ -138,7 +138,7 @@ class Syntax
     @dissForTextAndSyntax: (text, n, opt) ->
         console.log text, n
         diss = matchr.dissect matchr.ranges(Syntax.matchrConfigs[n], text), opt
-        if 0 <= text.indexOf '"'
+        if /[\'\"]/.test text
             diss = Syntax.stringDiss text, diss
         diss
 
@@ -158,22 +158,37 @@ class Syntax
     
     @stringDiss: (text, dss) ->
         
-        console.log 'stringDiss ---- ', text,  str dss        
+        # console.log 'stringDiss ---- ', text,  str dss        
         stack = []
         result = []
+        
+        popStack = ->
+            last = null
+            dissInner = stack.pop()
+            console.log 'pop', str dissInner
+            result.push dissInner.diss
+            while inner = dissInner.inner.shift()
+                if last? and last.start + last.match.length == inner.start
+                    last.match += inner.match
+                else
+                    inner.cls = ['text', 'string'].concat [_.last dissInner.diss.cls]
+                    inner.clss = inner.cls.join ' '
+                    result.push inner
+                    last = inner
+            console.log 'popped result:', str result
+        
         while d = dss.shift()
             
             if d.clss == 'syntax string marker double' and d.match == '"""'
                 d.cls.pop()
                 d.cls.push 'triple'
                 d.clss = d.cls.join ' '
-                console.log 'triple convert'
+                # console.log 'triple convert'
                                 
             switch d.clss
                 
                 when 'syntax string marker triple', 'syntax string marker double', 'syntax string marker single'
 
-                    
                     if d.clss != 'syntax string marker triple'
                         if d.match.length > 1
                             console.log 'splice non triple'
@@ -186,49 +201,52 @@ class Syntax
                             d.match = d.match.slice 0, 1
                     
                     top = _.last stack
-                    if top? and top.inner.length 
-                        topInner = _.last top.inner 
-                        innerMatch = topInner.match
-                        if innerMatch.endsWith '\\' 
-                            if numberOfCharsAtEnd(innerMatch, '\\') % 2
-                                if topInner.start + innerMatch.length == d.start
-                                    console.log 'escaped', d.match
-                                    topInner.match += d.match
+                    if top? 
+                        if top.inner.length 
+                            topDiss = _.last top.inner 
+                            topMatch = topDiss.match
+                            if topMatch.endsWith '\\' 
+                                if numberOfCharsAtEnd(topMatch, '\\') % 2
+                                    if topDiss.start + topMatch.length == d.start
+                                        console.log 'escaped', d.match
+                                        topDiss.match += d.match
+                                        continue
+                    else if topDiss = _.last stack
+                        topMatch = topDiss.match
+                        if topMatch.endsWith '\\'
+                            if numberOfCharsAtEnd(topMatch, '\\') % 2
+                                if topDiss.start + topMatch.length == d.start
+                                    console.log 'no stack escaped', d.match
+                                    result.push d
                                     continue
-                                    
+                                                        
                     console.log d.match, ' -- ', d.clss
                     
                     if not stack.length
                         
                         stack.push diss:d, inner:[]
-                        result.push d
-                        console.log 'pushed', str stack
+                        console.log 'pushed stack:', str stack
                         continue
                         
                     else if _.first(stack).diss.clss == d.clss
-                        last = null
-                        dissInner = stack.pop()
-                        for inner in dissInner.inner
-                            if last? and last.start + last.match.length == inner.start
-                                last.match += inner.match
-                            else
-                                inner.cls = ['text', 'string'].concat [_.last dissInner.diss.cls]
-                                inner.clss = inner.cls.join ' '
-                                result.push inner
-                                last = inner
+                        popStack()
                         result.push d
-                        console.log 'popped', str dissInner
                         continue
                             
             if stack.length
                 _.first(stack).inner.push d
-                # console.log 'inner', str stack
                 console.log 'inner += ', d.match
             else
                 result.push d
-                    
-        console.log "result diss ---- '#{text}'", str result
-        # "1#{2}3"
+        
+        while stack.length
+            console.log 'unbalanced!', str stack
+            console.log 'unbalanced!', str result
+            popStack()
+            console.log 'unbalanced!', str result
+                
+        console.log "text -- #{text} -- result:", str result
+
         result
         
     #  0000000  000   000  00000000  0000000     0000000   000   000   0000000
