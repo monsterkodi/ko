@@ -8,7 +8,7 @@
 { str, _
 } = require 'kxk'
 
-log = -> console.log.apply console, [].slice.call(arguments, 0).map (s) -> str s
+log = -> #console.log.apply console, [].slice.call(arguments, 0).map (s) -> str s
 
 stringDiss = (text, dss) ->
 
