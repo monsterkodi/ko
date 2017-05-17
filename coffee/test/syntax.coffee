@@ -19,16 +19,23 @@ syntax = require '../editor/syntax'
 
 describe 'syntax', ->
 
-    it 'interpolation', ->
-        
-        dss = syntax.dissForTextAndSyntax '"#{1}"', 'coffee'
+    it 'escape', ->
+
+        dss = syntax.dissForTextAndSyntax "'\\'\\\"\\''", 'coffee'
         log dss
+        test dss[0].clss, 'syntax string marker single'
+        test dss[1].clss, 'text string single'
+        test dss[2].clss, 'syntax string marker single'
+        return
+        dss = syntax.dissForTextAndSyntax '"\\"\\\'\\""', 'coffee'
         test dss[0].clss, 'syntax string marker double'
-        test dss[1].clss, 'syntax string interpolation open'
-        expect(dss[2].cls).to.include 'number'
-        expect(dss[2].cls).to.include 'int'
-        test dss[3].clss, 'syntax string interpolation close'
-        test dss[4].clss, 'syntax string marker double'
+        test dss[1].clss, 'text string double'
+        test dss[2].clss, 'syntax string marker double'
+
+        dss = syntax.dissForTextAndSyntax '"""\\"\\\'\\""""', 'coffee'
+        test dss[0].clss, 'syntax string marker triple'
+        test dss[1].clss, 'text string triple'
+        test dss[2].clss, 'syntax string marker triple'
         
     return
     
@@ -44,22 +51,16 @@ describe 'syntax', ->
         test dss[1].clss, 'text string double'
         test dss.length, 2
     
-    it 'escape', ->
-
-        dss = syntax.dissForTextAndSyntax "'\\'\\\"\\''", 'coffee'
-        test dss[0].clss, 'syntax string marker single'
-        test dss[1].clss, 'text string single'
-        test dss[2].clss, 'syntax string marker single'
+    it 'interpolation', ->
         
-        dss = syntax.dissForTextAndSyntax '"\\"\\\'\\""', 'coffee'
+        dss = syntax.dissForTextAndSyntax '"#{1}"', 'coffee'
+        log dss
         test dss[0].clss, 'syntax string marker double'
-        test dss[1].clss, 'text string double'
-        test dss[2].clss, 'syntax string marker double'
-
-        dss = syntax.dissForTextAndSyntax '"""\\"\\\'\\""""', 'coffee'
-        test dss[0].clss, 'syntax string marker triple'
-        test dss[1].clss, 'text string triple'
-        test dss[2].clss, 'syntax string marker triple'
+        test dss[1].clss, 'syntax string interpolation open'
+        expect(dss[2].cls).to.include 'number'
+        expect(dss[2].cls).to.include 'int'
+        test dss[3].clss, 'syntax string interpolation close'
+        test dss[4].clss, 'syntax string marker double'
         
     it 'triple string', ->
 

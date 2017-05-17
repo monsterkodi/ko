@@ -172,7 +172,7 @@ class Syntax
             else
                 strDiss.cls = ['text', 'string'].concat [_.last last.cls]
                 strDiss.clss = strDiss.cls.join ' '
-            result.push strDiss
+                result.push strDiss
             console.log 'add string result:', str result
 
         addInterpolation = (interDiss) ->
@@ -237,16 +237,18 @@ class Syntax
                                 cid:   d.cid # needed?
                             d.match = d.match.slice 0, 1
 
-                    if end? # escaped string marker outside string ...
+                    if end? # escaped string markers ...
                         if end.match.endsWith '\\'
                             if numberOfCharsAtEnd(end.match, '\\') % 2
                                 if end.start + end.match.length == d.start
-                                    if top? and not 'interpolation' in top.cls
+                                    console.log 'escaped top:', str top
+                                    if top? and 'interpolation' not in top.cls
                                         console.log 'inside escaped', d.match
                                         end.match += d.match
                                     else
                                         console.log 'outside escaped', d.match
                                         result.push d
+                                    console.log 'escaped result:', str result
                                     continue
 
                     console.log d.match, ' -- ', d.clss
