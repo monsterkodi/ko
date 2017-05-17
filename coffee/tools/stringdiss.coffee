@@ -5,16 +5,21 @@
 #      000     000     000   000  000  000  0000  000   000  000   000  000       000       000  
 # 0000000      000     000   000  000  000   000   0000000   0000000    000  0000000   0000000   
 
+{ str, _
+} = require 'kxk'
+
+log = -> #console.log.apply console, [].slice.call(arguments, 0).map (s) -> str s
+
 stringDiss = (text, dss) ->
 
-    console.log 'stringDiss ---- ', text,  str dss
+    log 'stringDiss ---- ', text,  str dss
 
     stack = []
     result = []
 
     addString = (strDiss) ->
         
-        console.log 'addString', str strDiss
+        log 'addString', strDiss
         last = _.last result
         if ('marker' not in end.cls) and last.start + last.match.length == strDiss.start
             last.match += strDiss.match
@@ -22,13 +27,13 @@ stringDiss = (text, dss) ->
             strDiss.cls = ['text', 'string'].concat [_.last last.cls]
             strDiss.clss = strDiss.cls.join ' '
             result.push strDiss
-        console.log 'add string result:', str result
+        log 'add string result:', result
 
     addInterpolation = (interDiss) ->
         
-        console.log 'addInterpolation', str interDiss
+        log 'addInterpolation', interDiss
         result.push interDiss
-        console.log 'add interpolation result:', str result
+        log 'add interpolation result:', result
         
     while d = dss.shift()
 
@@ -39,10 +44,10 @@ stringDiss = (text, dss) ->
             d.cls.pop()
             d.cls.push 'triple'
             d.clss = d.cls.join ' '
-            # console.log 'triple convert'
+            # log 'triple convert'
 
         if 'interpolation' in d.cls # interpolation start
-            console.log 'interpolation!', str d
+            log 'interpolation!', d
 
             if top?
                 if 'interpolation' in top.cls
@@ -51,20 +56,20 @@ stringDiss = (text, dss) ->
                         top.cls = d.clss.split ' '
                         top.match += d.match
                         result.push top
-                        console.log 'joined open interpolation', str result
+                        log 'joined open interpolation', result
                         continue
                     else
-                        console.log 'dafuk?'
+                        log 'dafuk?'
                         
             # push half open interpolation to stack
             
             stack.push d
-            console.log 'pushed interpolation stack:', str stack
+            log 'pushed interpolation stack:', stack
             continue
 
         if top? and 'interpolation' in top.cls # interpolation end
             if d.clss.endsWith 'bracket close'
-                console.log 'pop interpolation!', str d
+                log 'pop interpolation!', d
                 stack.pop()
                 d.clss = 'syntax string interpolation close'
                 d.cls = d.clss.split ' '
@@ -77,7 +82,7 @@ stringDiss = (text, dss) ->
 
                 if d.clss != 'syntax string marker triple'
                     if d.match.length > 1 # split multiple string markers
-                        console.log 'splice non triple'
+                        log 'splice non triple'
                         dss.unshift
                             match: d.match.slice 1
                             start: d.start + 1
@@ -90,14 +95,14 @@ stringDiss = (text, dss) ->
                     if end.match.endsWith '\\'
                         if numberOfCharsAtEnd(end.match, '\\') % 2
                             if end.start + end.match.length == d.start
-                                console.log 'escaped top:', str top
+                                log 'escaped top:', top
                                 if top? and 'interpolation' not in top.cls
-                                    console.log 'inside escaped', d.match
+                                    log 'inside escaped', d.match
                                     end.match += d.match
                                 else
-                                    console.log 'outside escaped', d.match
+                                    log 'outside escaped', d.match
                                     result.push d
-                                console.log 'escaped result:', str result
+                                log 'escaped result:', result
                                 continue
 
                 if top? and top.clss == d.clss # pop matching string marker
@@ -115,8 +120,8 @@ stringDiss = (text, dss) ->
                     
                     result.push d
                     stack.push d
-                    console.log 'pushed string stack:', str stack
-                    console.log 'pushed string result:', str result
+                    log 'pushed string stack:', stack
+                    log 'pushed string result:', result
                     
                 continue
                 
@@ -126,15 +131,15 @@ stringDiss = (text, dss) ->
             else 
                 addString d
         else
-            console.log 'push stray', str d
+            log 'push stray', d
             result.push d
-            console.log 'pushed stray result:', str result         
+            log 'pushed stray result:', result         
 
     while stack.length
-        console.log 'unbalanced!', str stack
+        log 'unbalanced!', stack
         stack.pop()
 
-    console.log "text -- #{text} -- result:", str result
+    log "text -- #{text} -- result:", result
 
     result
     

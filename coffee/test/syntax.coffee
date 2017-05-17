@@ -35,12 +35,9 @@ describe 'syntax', ->
         test dss[1].clss, 'text string single'
         test dss[2].clss, 'syntax string marker single'
 
-    # return
-            
     it 'escape', ->
 
         dss = syntax.dissForTextAndSyntax "'\\'\\\"\\''", 'coffee'
-        log dss
         test dss[0].clss, 'syntax string marker single'
         test dss[1].clss, 'text string single'
         test dss[2].clss, 'syntax string marker single'

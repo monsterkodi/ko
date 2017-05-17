@@ -138,7 +138,6 @@ class Syntax
 
     @dissForTextAndSyntax: (text, n, opt) ->
         
-        console.log text, n
         diss = matchr.dissect matchr.ranges(Syntax.matchrConfigs[n], text), opt
         if /[\'\"]/.test text
             diss = stringDiss text, diss
