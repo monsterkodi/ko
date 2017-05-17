@@ -18,6 +18,27 @@ syntax = require '../editor/syntax'
 
 describe 'syntax', ->
 
+    it 'fake interpolation', ->
+        
+        dss = syntax.dissForTextAndSyntax "'\\"#{1}\\"'", 'coffee'
+        log dss
+        test dss[0].clss, 'syntax string marker single'
+        test dss[1].clss, 'text string single'
+        test dss[2].clss, 'syntax string marker single'
+        
+    return
+    
+    it 'interpolation', ->
+        
+        dss = syntax.dissForTextAndSyntax '"#{1}"', 'coffee'
+        log dss
+        test dss[0].clss, 'syntax string marker double'
+        test dss[1].clss, 'syntax string interpolation open'
+        expect(dss[2].cls).to.include 'number'
+        expect(dss[2].cls).to.include 'int'
+        test dss[3].clss, 'syntax string interpolation close'
+        test dss[4].clss, 'syntax string marker double'
+
     it 'single strings', ->
 
         dss = syntax.dissForTextAndSyntax "'\"'", 'coffee'
@@ -64,17 +85,6 @@ describe 'syntax', ->
         test dss[1].clss, 'text string double'
         test dss.length, 2
     
-    it 'interpolation', ->
-        
-        dss = syntax.dissForTextAndSyntax '"#{1}"', 'coffee'
-        log dss
-        test dss[0].clss, 'syntax string marker double'
-        test dss[1].clss, 'syntax string interpolation open'
-        expect(dss[2].cls).to.include 'number'
-        expect(dss[2].cls).to.include 'int'
-        test dss[3].clss, 'syntax string interpolation close'
-        test dss[4].clss, 'syntax string marker double'
-        
     it 'double strings', ->
 
         dss = syntax.dissForTextAndSyntax "\"'\"", 'coffee'
@@ -157,5 +167,3 @@ describe 'syntax', ->
         test dss[1].start, 6
         test dss[1].clss,  'text'
         test dss[1].match, 'world'
-
-

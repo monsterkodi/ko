@@ -8,20 +8,20 @@
 { str, _
 } = require 'kxk'
 
-log = -> #console.log.apply console, [].slice.call(arguments, 0).map (s) -> str s
+log = -> console.log.apply console, [].slice.call(arguments, 0).map (s) -> str s
 
 stringDiss = (text, dss) ->
 
-    log 'stringDiss ---- ', text,  str dss
+    log "stringDiss -- #{text} -- ", dss
 
-    stack = []
+    stack  = []
     result = []
 
     addString = (strDiss) ->
         
         log 'addString', strDiss
         last = _.last result
-        if ('marker' not in end.cls) and last.start + last.match.length == strDiss.start
+        if ('marker' not in last.cls) and ('interpolation' not in last.cls) and last.start + last.match.length == strDiss.start
             last.match += strDiss.match
         else
             strDiss.cls = ['text', 'string'].concat [_.last last.cls]
@@ -44,7 +44,7 @@ stringDiss = (text, dss) ->
             d.cls.pop()
             d.cls.push 'triple'
             d.clss = d.cls.join ' '
-            # log 'triple convert'
+            log 'triple convert'
 
         if 'interpolation' in d.cls # interpolation start
             log 'interpolation!', d
@@ -60,6 +60,13 @@ stringDiss = (text, dss) ->
                         continue
                     else
                         log 'dafuk?'
+                else
+                    if 'single' == _.last top.cls
+                        addString d
+                        continue
+            else
+                result.push d
+                continue
                         
             # push half open interpolation to stack
             
