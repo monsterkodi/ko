@@ -19,8 +19,7 @@ foo:
 @call 'hello' and @call 'bla' or @fark
 
 a = 0.01
-b = 1.0
-c = 23
+b /= 23 % 12
 
 for i in [0...Math.max(2,1)]
     for i in [0...3]
