@@ -21,7 +21,7 @@ class Syntax
         post.on 'schemeChanged', @onSchemeChanged
 
     del: -> post.removeListener 'schemeChanged', @onSchemeChanged
-    
+
     # 0000000    000   0000000   0000000
     # 000   000  000  000       000
     # 000   000  000  0000000   0000000
@@ -63,7 +63,7 @@ class Syntax
                 when 'changed'  then @diss[change.doIndex] = @newDiss li
                 when 'deleted'  then @diss.splice change.doIndex, 1
                 when 'inserted' then @diss.splice change.doIndex, 0, @newDiss li
-        
+
     #  0000000  000      00000000   0000000   00000000
     # 000       000      000       000   000  000   000
     # 000       000      0000000   000000000  0000000
@@ -150,43 +150,80 @@ class Syntax
             l += d.match
         l
 
-    #  0000000  000000000  00000000   000  000   000   0000000   
-    # 000          000     000   000  000  0000  000  000        
-    # 0000000      000     0000000    000  000 0 000  000  0000  
-    #      000     000     000   000  000  000  0000  000   000  
-    # 0000000      000     000   000  000  000   000   0000000   
-    
+    #  0000000  000000000  00000000   000  000   000   0000000
+    # 000          000     000   000  000  0000  000  000
+    # 0000000      000     0000000    000  000 0 000  000  0000
+    #      000     000     000   000  000  000  0000  000   000
+    # 0000000      000     000   000  000  000   000   0000000
+
     @stringDiss: (text, dss) ->
-        
-        # console.log 'stringDiss ---- ', text,  str dss        
+
+        console.log 'stringDiss ---- ', text,  str dss
+
         stack = []
         result = []
-        
-        popStack = ->
-            last = null
-            dissInner = stack.pop()
-            console.log 'pop', str dissInner
-            result.push dissInner.diss
-            while inner = dissInner.inner.shift()
-                if last? and last.start + last.match.length == inner.start
-                    last.match += inner.match
-                else
-                    inner.cls = ['text', 'string'].concat [_.last dissInner.diss.cls]
-                    inner.clss = inner.cls.join ' '
-                    result.push inner
-                    last = inner
-            console.log 'popped result:', str result
-        
+
+        addString = (strDiss) ->
+            
+            console.log 'addString', str strDiss
+            last = _.last result
+            if ('marker' not in end.cls) and last.start + last.match.length == strDiss.start
+                last.match += strDiss.match
+            else
+                strDiss.cls = ['text', 'string'].concat [_.last last.cls]
+                strDiss.clss = strDiss.cls.join ' '
+            result.push strDiss
+            console.log 'add string result:', str result
+
+        addInterpolation = (interDiss) ->
+            
+            console.log 'addInterpolation', str interDiss
+            result.push interDiss
+            console.log 'add interpolation result:', str result
+            
         while d = dss.shift()
+
+            top = _.last stack
+            end = _.last result
             
             if d.clss == 'syntax string marker double' and d.match == '"""'
                 d.cls.pop()
                 d.cls.push 'triple'
                 d.clss = d.cls.join ' '
                 # console.log 'triple convert'
-                                
-            switch d.clss
+
+            if 'interpolation' in d.cls # interpolation start
+                console.log 'interpolation!', str d
+
+                if top?
+                    if 'interpolation' in top.cls
+                        if 'open' in d.cls
+                            top.clss = 'syntax string interpolation open'
+                            top.cls = d.clss.split ' '
+                            top.match += d.match
+                            result.push top
+                            console.log 'joined open interpolation', str result
+                            continue
+                        else
+                            console.log 'dafuk?'
+                            
+                # push half open interpolation to stack
                 
+                stack.push d
+                console.log 'pushed interpolation stack:', str stack
+                continue
+
+            if top? and 'interpolation' in top.cls # interpolation end
+                if d.clss.endsWith 'bracket close'
+                    console.log 'pop interpolation!', str d
+                    stack.pop()
+                    d.clss = 'syntax string interpolation close'
+                    d.cls = d.clss.split ' '
+                    result.push d
+                    continue
+                
+            switch d.clss
+
                 when 'syntax string marker triple', 'syntax string marker double', 'syntax string marker single'
 
                     if d.clss != 'syntax string marker triple'
@@ -199,56 +236,53 @@ class Syntax
                                 cls:   _.clone d.cls
                                 cid:   d.cid # needed?
                             d.match = d.match.slice 0, 1
-                    
-                    top = _.last stack
-                    if top? 
-                        if top.inner.length 
-                            topDiss = _.last top.inner 
-                            topMatch = topDiss.match
-                            if topMatch.endsWith '\\' 
-                                if numberOfCharsAtEnd(topMatch, '\\') % 2
-                                    if topDiss.start + topMatch.length == d.start
-                                        console.log 'escaped', d.match
-                                        topDiss.match += d.match
-                                        continue
-                    else if topDiss = _.last stack
-                        topMatch = topDiss.match
-                        if topMatch.endsWith '\\'
-                            if numberOfCharsAtEnd(topMatch, '\\') % 2
-                                if topDiss.start + topMatch.length == d.start
-                                    console.log 'no stack escaped', d.match
-                                    result.push d
+
+                    if end? # escaped string marker outside string ...
+                        if end.match.endsWith '\\'
+                            if numberOfCharsAtEnd(end.match, '\\') % 2
+                                if end.start + end.match.length == d.start
+                                    if top? and not 'interpolation' in top.cls
+                                        console.log 'inside escaped', d.match
+                                        end.match += d.match
+                                    else
+                                        console.log 'outside escaped', d.match
+                                        result.push d
                                     continue
-                                                        
+
                     console.log d.match, ' -- ', d.clss
-                    
-                    if not stack.length
+
+                    if top? and top.clss == d.clss # pop matching string marker
                         
-                        stack.push diss:d, inner:[]
-                        console.log 'pushed stack:', str stack
-                        continue
-                        
-                    else if _.first(stack).diss.clss == d.clss
-                        popStack()
+                        stack.pop()
                         result.push d
-                        continue
-                            
-            if stack.length
-                _.first(stack).inner.push d
-                console.log 'inner += ', d.match
+
+                    else # push string marker onto stack
+                        
+                        result.push d
+                        stack.push d
+                        console.log 'pushed string stack:', str stack
+                        console.log 'pushed string result:', str result
+                        
+                    continue
+                    
+            if top? 
+                if 'interpolation' in top.cls
+                    addInterpolation d
+                else 
+                    addString d
             else
+                console.log 'push stray', str d
                 result.push d
-        
+                console.log 'pushed stray result:', str result         
+
         while stack.length
             console.log 'unbalanced!', str stack
-            console.log 'unbalanced!', str result
-            popStack()
-            console.log 'unbalanced!', str result
-                
+            stack.pop()
+
         console.log "text -- #{text} -- result:", str result
 
         result
-        
+
     #  0000000  000   000  00000000  0000000     0000000   000   000   0000000
     # 000       000   000  000       000   000  000   000  0000  000  000
     # 0000000   000000000  0000000   0000000    000000000  000 0 000  000  0000
