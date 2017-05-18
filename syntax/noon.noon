@@ -27,7 +27,8 @@
 
 # float
 
-(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   . number.float.sign . number.float
+# (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   . number.float.sign . number.float
+
 # int 
 
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
@@ -40,11 +41,12 @@
 
 # regexp
 
-^\s*([\(\[\^\\]\S+)         regexp
+# ^\s*([\(\[\^\\]\S+)         regexp
+(\\[bwsdWSD]|\(\?:?|[\(\)\|\\])          regexp
 
 # dim
 
-[\>\<\=\^\$\.\:\/\|\-]      marker
+[\>\<\=\^\$\*\.\:\,\;\'\"\/\|\_\-\+\[\]\(\)\{\}\?\\]      marker
 
 # salter headers
-^(\s*\#\s+)([0\s]+)$        . comment.marker . comment.header
+^(\s*\#\s+)([0\s]+)$      . comment.marker . comment.header
