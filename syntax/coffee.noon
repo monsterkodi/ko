@@ -66,6 +66,7 @@ return                                keyword.return
 # (\()[^\(\)]*(\)\s*)[-=]>            . function.bracket . function.bracket
 
 (@?[a-zA-Z]\w*)(?!\s+or|\s+i[fs]|\s+and|\s+then)(?=\(|\s+[@\w\d\"\'\(\[\{])    function.call
+(_)(?:$|\.|\s)                        bool.false
 
 # class
 
