@@ -5,7 +5,7 @@
 #      000     000     000  0000     000     000   000   000 000
 # 0000000      000     000   000     000     000   000  000   000
 
-{ error, log, str, post, elem, fs, noon, path, _
+{ error, log, str, post, elem, empty, fs, noon, path, _
 }          = require 'kxk'
 encode     = require '../tools/encode'
 matchr     = require '../tools/matchr'
@@ -15,9 +15,10 @@ class Syntax
 
     constructor: (@editor) ->
 
-        @name = @editor.syntaxName ? 'txt'
-        @diss = []
-        @colors = {}
+        @name       = @editor.syntaxName ? 'txt'
+        @diss       = []
+        @colors     = {}
+        @unbalanced = []
 
         post.on 'schemeChanged', @onSchemeChanged
 
@@ -30,19 +31,29 @@ class Syntax
     # 0000000    000  0000000   0000000
 
     newDiss: (li) ->
-
+        
         text = @editor.line li
 
         if not text?
             return error "#{@editor.name} no line at index #{li}? #{@editor.numLines()}"
 
-        Syntax.dissForTextAndSyntax text, @name
+        unbalanced = {}
+                
+        diss = Syntax.dissForTextAndSyntax text, @name, unbalanced: unbalanced
+                    
+        if unbalanced.stack?
+            @unbalanced[li] = unbalanced.stack
+            _.each @unbalanced, (v,i) -> @editor.log "~#{i}",v if v
+        else
+            delete @unbalanced[li]
+        
+        diss
 
     getDiss: (li) ->
 
         if not @diss[li]?
             @diss[li] = @newDiss li
-
+                
         @diss[li]
 
     setDiss: (li, dss) ->
@@ -59,12 +70,29 @@ class Syntax
     changed: (changeInfo) ->
 
         for change in changeInfo.changes
+            
             [di,li,ch] = [change.doIndex, change.newIndex, change.change]
+            
             switch change.change
-                when 'changed'  then @diss[change.doIndex] = @newDiss li
-                when 'deleted'  then @diss.splice change.doIndex, 1
-                when 'inserted' then @diss.splice change.doIndex, 0, @newDiss li
-
+                
+                when 'changed'  
+                    
+                    @diss[di] = @newDiss di
+                        
+                when 'deleted'  
+                    
+                    @diss.splice di, 1
+                    
+                    @unbalanced.splice di, 1
+                    
+                when 'inserted' 
+                    
+                    @unbalanced.splice di, 0, null
+                    @diss.splice di, 0, @newDiss di
+                        
+        if not empty changeInfo.changes
+            _.each @unbalanced, (v,i) -> @editor.log "~#{i}" if v
+                        
     #  0000000  000      00000000   0000000   00000000
     # 000       000      000       000   000  000   000
     # 000       000      0000000   000000000  0000000
@@ -138,9 +166,10 @@ class Syntax
 
     @dissForTextAndSyntax: (text, n, opt) ->
         
+        return error "no syntax? #{n}" if not n? or not Syntax.matchrConfigs[n]?
         diss = matchr.dissect matchr.ranges(Syntax.matchrConfigs[n], text), opt
         if /[\'\"]/.test text
-            diss = stringDiss text, diss
+            diss = stringDiss diss, opt?.unbalanced ? {}
         diss
 
     @lineForDiss: (dss) ->

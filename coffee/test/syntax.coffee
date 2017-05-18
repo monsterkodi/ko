@@ -19,7 +19,7 @@ syntax = require '../editor/syntax'
 describe 'syntax', ->
           
     describe 'strings', ->
-    
+                
         it 'simple', ->
     
             dss = syntax.dissForTextAndSyntax 'log "txt"', 'coffee'
@@ -128,7 +128,15 @@ describe 'syntax', ->
             test dss[0].clss, 'syntax string marker single'
             test dss[1].clss, 'text string single'
             test dss[2].clss, 'syntax string marker single'
-        
+            
+        it 'dict', ->
+            
+            dss = syntax.dissForTextAndSyntax "'{a:100}'", 'coffee'
+            test dss[1].clss, 'text string single'
+            
+            dss = syntax.dissForTextAndSyntax "\"{a:100}\"", 'coffee'
+            test dss[1].clss, 'text string double'
+            
     it 'brackets', ->
 
         dss = syntax.dissForTextAndSyntax "{ }", 'coffee'

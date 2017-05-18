@@ -28,7 +28,12 @@ for i in [0...Math.max(2,1)]
                 log i
 
 # return "hello" 'hello'
-"""hello #{}\'\"\"' " world""" "\'"
+
+"""start
+ hello world #{1+'1'} 
+end"""
+
+"""hello #{}\'\"\"' " world""" "\'''\'"
 ''
 'a'
 ""
@@ -41,9 +46,9 @@ for i in [0...Math.max(2,1)]
 'a\'a'
 "'"
 "''"
+
 "a\"a"
-" ab #{1} ab "
-">#{ 1 + "hello #{1+a} cool #{ seems.to 'work' }" }<"
-{ a: 100 }; "{a:100}"
-
-
+" ab[#{1}] ab "
+">#{ 1 + "hello #{1+2} cool #{ seems.to 'work' }" }<"
+'{a:100}'
+"a"; '{a:100}'; "{a:100}"; '{a:100}';

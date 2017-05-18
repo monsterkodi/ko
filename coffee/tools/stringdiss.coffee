@@ -10,9 +10,9 @@
 
 log = -> #console.log.apply console, [].slice.call(arguments, 0).map (s) -> str s
 
-stringDiss = (text, dss) ->
+stringDiss = (dss, unbalanced) ->
 
-    log "stringDiss -- #{text} -- ", dss
+    log "stringDiss ---- ", dss, unbalanced
 
     stack  = []
     result = []
@@ -21,10 +21,11 @@ stringDiss = (text, dss) ->
         
         log 'addString', strDiss
         last = _.last result
-        if ('marker' not in last.cls) and ('interpolation' not in last.cls) and last.start + last.match.length == strDiss.start
+        top = _.last stack
+        if last.start + last.match.length == strDiss.start and last.clss.startsWith 'text string'
             last.match += strDiss.match
         else
-            strDiss.cls = ['text', 'string'].concat [_.last last.cls]
+            strDiss.cls = ['text', 'string'].concat [_.last top.cls]
             strDiss.clss = strDiss.cls.join ' '
             result.push strDiss
         log 'add string result:', result
@@ -34,13 +35,27 @@ stringDiss = (text, dss) ->
         log 'addInterpolation', interDiss
         result.push interDiss
         log 'add interpolation result:', result
+
+    stringMarkersMatch = (a,b) ->
+        for t in ['triple', 'double', 'single']
+            return true if t in a.cls and t in b.cls
+        false
+        
+    isStringMarker = (a, type) -> 
+        return false if not ('string' in d.cls and 'marker' in d.cls)
+        return false if type? and not type in d.cls 
+        true
         
     while d = dss.shift()
 
         top = _.last stack
         end = _.last result
         
-        if d.clss == 'syntax string marker double' and d.match == '"""'
+        if 'comment' in d.cls
+            result.push d
+            continue
+        
+        if isStringMarker(d, 'double') and d.match == '"""'
             
             d.cls.pop()
             d.cls.push 'triple'
@@ -85,54 +100,52 @@ stringDiss = (text, dss) ->
                 result.push d
                 continue
             
-        switch d.clss
+        if isStringMarker d 
 
-            when 'syntax string marker triple', 'syntax string marker double', 'syntax string marker single'
-
-                if d.clss != 'syntax string marker triple'
-                    
-                    if d.match.length > 1 # split multiple string markers
-                        log 'splice non triple'
-                        dss.unshift
-                            match: d.match.slice 1
-                            start: d.start + 1
-                            clss:  d.clss
-                            cls:   _.clone d.cls
-                            cid:   d.cid # needed?
-                        d.match = d.match.slice 0, 1
-
-                if end? # escaped string markers ...
-                    
-                    if end.match.endsWith '\\'
-                        if numberOfCharsAtEnd(end.match, '\\') % 2
-                            if end.start + end.match.length == d.start
-                                log 'escaped top:', top
-                                if top? and 'interpolation' not in top.cls
-                                    log 'inside escaped', d.match
-                                    end.match += d.match
-                                else
-                                    log 'outside escaped', d.match
-                                    result.push d
-                                log 'escaped result:', result
-                                continue
-
-                if top? and top.clss == d.clss # pop matching string marker
-                    
-                    stack.pop()
-                    result.push d
-                    
-                else if top? and 'interpolation' not in top.cls
-                    
-                    addString d
-
-                else # push string marker onto stack
+            if 'triple' not in d.cls
                 
-                    result.push d
-                    stack.push d
-                    log 'pushed string stack:', stack
-                    log 'pushed string result:', result
-                    
-                continue
+                if d.match.length > 1 # split multiple string markers
+                    log 'splice non triple'
+                    dss.unshift
+                        match: d.match.slice 1
+                        start: d.start + 1
+                        clss:  d.clss
+                        cls:   _.clone d.cls
+                        cid:   d.cid # needed?
+                    d.match = d.match.slice 0, 1
+
+            if end? # escaped string markers ...
+                
+                if end.match.endsWith '\\'
+                    if numberOfCharsAtEnd(end.match, '\\') % 2
+                        if end.start + end.match.length == d.start
+                            log 'escaped top:', top
+                            if top? and 'interpolation' not in top.cls
+                                log 'inside escaped', d.match
+                                end.match += d.match
+                            else
+                                log 'outside escaped', d.match
+                                result.push d
+                            log 'escaped result:', result
+                            continue
+
+            if top? and stringMarkersMatch top, d # pop matching string marker
+                
+                stack.pop()
+                result.push d
+                
+            else if top? and 'interpolation' not in top.cls
+                
+                addString d
+
+            else # push string marker onto stack
+            
+                result.push d
+                stack.push d
+                log 'pushed string stack:', stack
+                log 'pushed string result:', result
+                
+            continue
                 
         if top? 
             
@@ -146,9 +159,10 @@ stringDiss = (text, dss) ->
             log 'pushed stray result:', result         
 
     if stack.length
-        log 'unbalanced!', stack
+        log 'unbalanced! stack:',  stack
+        unbalanced.stack = stack
         
-    log "text -- #{text} -- result:", result
+    log "text -- result:", result, unbalanced
 
     result
     
