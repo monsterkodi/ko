@@ -114,7 +114,7 @@ class Split extends event
 
     maximizeEditor: -> 
         
-        log "Split.maximizeEditor"
+        # log "Split.maximizeEditor"
         @focus 'editor'
         @flex.expand 'editor'
         @hideLog()

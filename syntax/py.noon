@@ -5,20 +5,22 @@
 # 000           000   
 # 000           000   
 
-\S+                            text
+
+\w+                            text
+[^\w\s]+                       syntax
 
 [\<\>\+\-\=\/\*]               syntax.math
 
-@                              syntax.this
-\$                             syntax.this
-\?                             syntax.cond
-!=                             syntax.math
-->                             syntax.function.marker
-=>                             syntax.function.marker.bound
+@                              this
+\$                             this
+\?                             cond
+!=                             math
+->                             function.marker
+=>                             function.marker.bound
 
 # braces
 
-[\(\)\{\}\[\]]                 syntax.bracket
+[\(\)\{\}\[\]]                 bracket
 
 # require
 
@@ -60,7 +62,7 @@ None                           keyword.null
 
 # functions 
 
-(:\s*)($|#.*$)   keyword
+(:\s*)($|#.*$)                 keyword
 
 def\s+(\w+)\s*(\()[^\)]*(\))\s*:    . function . function.bracket . function.bracket
 
@@ -92,8 +94,8 @@ __name__|__class__  keyword
     value.number.int
 
 # strings
-(')([^'\\]*)(')              . string.marker.single . value.string.single . string.marker.single
-(")([^"\\]*)(")              . string.marker.double . value.string.double . string.marker.double
+'                              string.marker.single
+"                              string.marker.double
     
 # comments
 

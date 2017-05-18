@@ -8,18 +8,20 @@
 ko
     extnames                 . sh . bash
 
-\S+                            text
 
-[\<\>\+\-\=\/\*]               syntax.math
+\w+                            text
+[^\w\s]+                       syntax
+
+[\<\>\+\-\=\/\*]               math
 
 # braces
 
-[\(\)\{\}\[\]]                 syntax.bracket
+[\(\)\{\}\[\]]                 bracket
 
 # bool
 
-true                           value.bool.true
-false                          value.bool.false 
+true                           bool.true
+false                          bool.false 
 
 \`                             operator.execute
 
@@ -28,7 +30,7 @@ false                          value.bool.false
 
 # punctuation
 
-[\,\.\:\;\#\$\^\?\|\~]         syntax.punctuation
+[\,\.\:\;\#\$\^\?\|\~]         punctuation
 
 \b(if|elif|fi|then|else|echo|exit|while|case|esac|done|do|in|set)\b  keyword
 
@@ -45,9 +47,9 @@ false                          value.bool.false
 
 # strings
 
-(')([^'\\]*)(')    . string.marker.single . value.string.single . string.marker.single
-(")([^"\\]*)(")    . string.marker.double . value.string.double . string.marker.double
+'                              string.marker.single
+"                              string.marker.double
 
 # comments
 
-(?:^|[^\$\#]+)(\#+)(.*)           . comment.marker . comment
+(?:^|[^\$\#]+)(\#+)(.*)      . comment.marker . comment

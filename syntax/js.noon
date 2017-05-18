@@ -5,16 +5,17 @@
 #  000   000       000
 #   0000000   0000000 
 
-\S+                            text
+\w+                            text
+[^\w\s]+                       syntax
 
-\!                             syntax.punctuation
-[\[\]\<\>\+\-\=\?\:]           syntax.punctuation
-!=                             syntax.punctuation
+\!                             punctuation
+[\[\]\<\>\+\-\=\?\:]           punctuation
+!=                             punctuation
 
 # keywords
 
 (:?^|\s)(if|else|then|for|in|var|try|catch|new|bind)(:?\s|$)   keyword
-(^|\s)(return|break|continue)([\s\;]|$)   . text . keyword . syntax.punctuation
+(^|\s)(return|break|continue)([\s\;]|$)   . text . keyword . punctuation
 
 # globals
 
@@ -28,13 +29,13 @@
 
 # strings
 
-(')([^']*)(')                . string.marker.single . value.string.single . string.marker.single
-(")([^"\\]*)(")              . string.marker.double . value.string.double . string.marker.double
+'                              string.marker.single
+"                              string.marker.double
 
 # bool
 
-true                           value.bool.true
-false                          value.bool.false
+true                           bool.true
+false                          bool.false
 
 this                           this
 
@@ -44,15 +45,11 @@ null|undefined                 keyword.null
 
 # braces, semicolon
 
-[\(\)\{\}\;]                   syntax.punctuation
-[\{\}\;]                       syntax.punctuation
-([\)]);                        syntax.punctuation
+[\(\)\{\}\;]                   punctuation
+[\{\}\;]                       punctuation
+([\)]);                        punctuation
 
 # functions
-
-# (\b\S+)(\()[^\)]*(\))              . function
-# (\w+)\s*=\s*function\([^\)]*\)\s*  . function
-# (\w+)\s*=\s*function               . function
 
 function                       function
 
@@ -79,12 +76,12 @@ function                       function
 #number
 
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
-    syntax.value.number.float.sign
-    value.number.float
+    number.float.sign
+    number.float
 
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
-    syntax.value.number.int.sign
-    value.number.int
+    number.int.sign
+    number.int
 
 # comments
 

@@ -37,16 +37,12 @@ class Syntax
         if not text?
             return error "#{@editor.name} no line at index #{li}? #{@editor.numLines()}"
 
-        unbalanced = {}
+        unbalanced = @unbalancedForLine li
                 
         diss = Syntax.dissForTextAndSyntax text, @name, unbalanced: unbalanced
                     
-        if unbalanced.stack?
-            @unbalanced[li] = unbalanced.stack
-            _.each @unbalanced, (v,i) -> @editor.log "~#{i}",v if v
-        else
-            delete @unbalanced[li]
-        
+        @setUnbalanced li, unbalanced.stack
+            
         diss
 
     getDiss: (li) ->
@@ -81,25 +77,71 @@ class Syntax
                         
                 when 'deleted'  
                     
+                    @deleteUnbalanced di
                     @diss.splice di, 1
-                    
-                    @unbalanced.splice di, 1
                     
                 when 'inserted' 
                     
-                    @unbalanced.splice di, 0, null
+                    @insertUnbalanced di
                     @diss.splice di, 0, @newDiss di
-                        
-        if not empty changeInfo.changes
-            _.each @unbalanced, (v,i) -> @editor.log "~#{i}" if v
-                        
+                    
+    # 000   000  000   000  0000000     0000000   000       0000000   000   000   0000000  00000000  0000000    
+    # 000   000  0000  000  000   000  000   000  000      000   000  0000  000  000       000       000   000  
+    # 000   000  000 0 000  0000000    000000000  000      000000000  000 0 000  000       0000000   000   000  
+    # 000   000  000  0000  000   000  000   000  000      000   000  000  0000  000       000       000   000  
+    #  0000000   000   000  0000000    000   000  0000000  000   000  000   000   0000000  00000000  0000000    
+    
+    unbalancedForLine: (li) ->
+        open = null
+        for u in @unbalanced
+            if u.line < li
+                if open
+                    open = null
+                else
+                    open = u
+            if u.line >= li
+                if open
+                    console.log "unbalanced #{li} open", str(open.stack[0])
+                    return open: open.stack[0]
+                break
+        if open?
+            console.log "unbalanced #{li} open", str(open.stack[0])
+            open: open.stack[0]
+        else
+            {}
+    
+    setUnbalanced: (li, stack) ->
+        _.remove @unbalanced, (u) -> u.line == li
+        if stack?
+            @unbalanced.push line:li, stack:stack 
+            @unbalanced.sort (a,b) -> a.line - b.line
+            
+        @dumpUnbalanced()
+            
+    deleteUnbalanced: (li) ->
+        
+        _.remove @unbalanced, (u) -> u.line == li
+        _.each @unbalanced, (u) -> u.line -= 1 if u.line >= li
+        @dumpUnbalanced()
+        
+    insertUnbalanced: (li) ->
+        
+        _.each @unbalanced, (u) -> u.line += 1 if u.line >= li
+        @dumpUnbalanced()
+        
+    dumpUnbalanced: (li) ->
+        
+        # console.log str @unbalanced if not empty @unbalanced
+            
     #  0000000  000      00000000   0000000   00000000
     # 000       000      000       000   000  000   000
     # 000       000      0000000   000000000  0000000
     # 000       000      000       000   000  000   000
     #  0000000  0000000  00000000  000   000  000   000
 
-    clear: -> @diss = []
+    clear: -> 
+        @diss = []
+        @unbalanced = []
 
     #  0000000   0000000   000       0000000   00000000
     # 000       000   000  000      000   000  000   000
@@ -168,7 +210,7 @@ class Syntax
         
         return error "no syntax? #{n}" if not n? or not Syntax.matchrConfigs[n]?
         diss = matchr.dissect matchr.ranges(Syntax.matchrConfigs[n], text), opt
-        if /[\'\"]/.test text
+        if opt?.unbalanced?.open or /[\'\"]/.test text
             diss = stringDiss diss, opt?.unbalanced ? {}
         diss
 

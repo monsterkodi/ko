@@ -5,7 +5,9 @@
 #  000  0000  000   000  000   000  000  0000
 #  000   000   0000000    0000000   000   000
 
-\S+                         text
+
+\w+                         text
+[^\w\s]+                    syntax
 
 # comments
 
@@ -23,10 +25,6 @@
 
 (\S+\.\d+\.\S+)             keypath
 
-# path
-
-(?:^|\s\s+)(\s*[\/\S]*)(\/)(\S+)  . string.single . string.double 
-
 # float
 
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   . number.float.sign . number.float
@@ -42,7 +40,7 @@
 
 # regexp
 
-^\s*([\(\[\^\\]\S+)         string
+^\s*([\(\[\^\\]\S+)         regexp
 
 # dim
 

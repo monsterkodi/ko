@@ -65,7 +65,7 @@ addToRecent = (file) ->
     recent = prefs.get 'recentFiles', []
     _.pull recent, file
     recent.unshift file
-    while recent.length > prefs.get 'recentFilesLength', 10
+    while recent.length > prefs.get 'recentFilesLength', 20
         recent.pop()
     prefs.set 'recentFiles', recent
     commandline.commands.open.setHistory recent.reverse()

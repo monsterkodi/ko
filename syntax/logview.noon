@@ -5,11 +5,10 @@
 # 000      000   000  000   000     000     000  000       000   000  
 # 0000000   0000000    0000000       0      000  00000000  00     00  
 
-\S+                         text
 
-# (● )(.+)                  . class.marker . class
-# (◆ )(.+)                  . static.method.marker . static.method
-# (▸ )(.+)                  . func.marker . func
+\w+                         text
+[^\w\s]+                    syntax
+
 (⦿ )([^▸]+)               . class.member.marker . class.member
 
 [~\/\.\-\_\w]+\/            dirname
@@ -63,5 +62,5 @@ false                          value.bool.false
 
 # strings
 
-(')([^'\\]*)(')              . string.marker.single . value.string.single . string.marker.single
-(")([^"\\]*)(")              . string.marker.double . value.string.double . string.marker.double
+'                              string.marker.single
+"                              string.marker.double

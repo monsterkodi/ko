@@ -1,4 +1,11 @@
 
+args  = require  """
+    DevTools  . ? open developer tools    . = false
+    debug     .                             = false    
+"""
+
+app.exit 0 if not args?
+
 class Class extends Other
 
     constructor:-> @this
@@ -30,6 +37,7 @@ for i in [0...Math.max(2,1)]
 # return "hello" 'hello'
 
 """start
+ 
  hello world #{1+'1'} 
 end"""
 

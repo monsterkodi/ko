@@ -5,7 +5,9 @@
 # 000        000   000  000   000
 # 000         0000000    0000000 
 
-\S+                            text
+
+\w+                            text
+[^\w\s]+                       syntax
 
 # braces
 
@@ -34,14 +36,14 @@
 
 #number
 
-\-?\b\d+\b                     value.number.int
-(\b\d+\.\d+\b)                 value.number.float
-(\-?\d+)(px|%)               . value.number.int . value.number.marker                    
+\-?\b\d+\b                     number.int
+(\b\d+\.\d+\b)                 number.float
+(\-?\d+)(px|%)               . number.int . number.marker                    
 
 # strings
 
-(')([^']*)(')                . string.marker.single . value.string.single . string.marker.single
-(")([^"\\]*)(")              . string.marker.double . value.string.double . string.marker.double
+'                              string.marker.single
+"                              string.marker.double
 
 # colors
 

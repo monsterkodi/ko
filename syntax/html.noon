@@ -5,7 +5,9 @@
 # 000   000     000     000 0 000  000    
 # 000   000     000     000   000  0000000
 
-\S+                            text
+
+\w+                            text
+[^\w\s]+                       syntax
 
 # braces
 
@@ -42,8 +44,8 @@
 
 # strings
 
-(')([^']*)(')                . string.marker.single . value.string.single . string.marker.single
-(")([^"\\]*)(")              . string.marker.double . value.string.double . string.marker.double
+'                              string.marker.single
+"                              string.marker.double
 
 # colors
 

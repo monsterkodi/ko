@@ -6,7 +6,7 @@
 #   0000000   0000000   000       000       00000000  00000000
 
 \w+                                   text
-([^\w\s]+)                          . syntax
+[^\w\s]+                              syntax
 
 [\<\>\+\-\=\/\*]                      math
 
@@ -39,7 +39,7 @@
 # special
 
 \blog\b                               function
-\berr\b                               err
+\berr\b                               function.call
 \berror\b                             function.call
 
 # bool
@@ -55,7 +55,7 @@ return                                keyword.return
 # .property
 
 (\s*\w+)\.                            owner
-\.(\s*\w+)                            property
+(\.\s*\w+)                            property
 
 # functions
 
@@ -114,8 +114,6 @@ __dirname|__filename                  keyword
 # strings
 '                                     string.marker.single
 "                                     string.marker.double
-# (')([^\'\"]+)(')                    . string.marker.single . string.single . string.marker.single
-# (")([^\"\']+)(")                    . string.marker.double . string.double . string.marker.double
 \#\{                                  string.interpolation
 
 |###|                                 comment.marker

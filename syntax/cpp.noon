@@ -8,15 +8,17 @@
 ko
     extnames                 . cpp . cxx . cc . c . hpp . h
 
-\S+                            text
 
-[\<\>\+\-\=\/\*]               syntax.math
+\w+                            text
+[^\w\s]+                       syntax
 
-!=                             syntax.math
+[\<\>\+\-\=\/\*]               math
+
+!=                             math
 
 # braces
 
-[\(\)\{\}\[\]]                 syntax.bracket
+[\(\)\{\}\[\]]                 bracket
 
 # include
 
@@ -28,13 +30,13 @@ ko
 
 # bool
 
-true                           value.bool.true
-# false                          value.bool.false 
+true                           bool.true
+# false                        bool.false 
 ([\!])\w+                    . operator.negate
 
 # punctuation
 
-[\,\.\;\:\/\&\*]               syntax.punctuation
+[\,\.\;\:\/\&\*]               punctuation
 (\&\&|\|\|)                    keyword
 
 # null
@@ -87,8 +89,9 @@ this                           keyword.this
     value.number.int
 
 # strings
-(')([^']*)(')                . string.marker.single . value.string.single . string.marker.single
-(")([^"\\]*)(")              . string.marker.double . value.string.double . string.marker.double
+
+'                              string.marker.single
+"                              string.marker.double
     
 # comments
 

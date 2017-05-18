@@ -5,7 +5,9 @@
 # 000  000   000   000
 # 000   000   0000000 
 
-\S+                         text
+
+\w+                       text
+[^\w\s]+                  syntax
 
 ([^']+')(.+)(':)          . class . class.marker . class . class.marker
 

@@ -12,14 +12,22 @@ log = -> #console.log.apply console, [].slice.call(arguments, 0).map (s) -> str 
 
 stringDiss = (dss, unbalanced) ->
 
-    log "stringDiss ---- ", dss, unbalanced
+    # log "stringDiss ---- ", dss, unbalanced
 
     stack  = []
     result = []
 
+    if unbalanced.open
+        fakeOpen = _.clone unbalanced.open
+        fakeOpen.match = ''
+        fakeOpen.start = 0        
+        stack.push fakeOpen
+        result.push fakeOpen
+        # log "stringDiss fakeOpen stack:", stack
+    
     addString = (strDiss) ->
         
-        log 'addString', strDiss
+        # log 'addString', strDiss
         last = _.last result
         top = _.last stack
         if last.start + last.match.length == strDiss.start and last.clss.startsWith 'text string'
@@ -28,20 +36,22 @@ stringDiss = (dss, unbalanced) ->
             strDiss.cls = ['text', 'string'].concat [_.last top.cls]
             strDiss.clss = strDiss.cls.join ' '
             result.push strDiss
-        log 'add string result:', result
+        # log 'add string result:', result
 
     addInterpolation = (interDiss) ->
         
-        log 'addInterpolation', interDiss
+        # log 'addInterpolation', interDiss
         result.push interDiss
-        log 'add interpolation result:', result
+        # log 'add interpolation result:', result
 
     stringMarkersMatch = (a,b) ->
+
         for t in ['triple', 'double', 'single']
             return true if t in a.cls and t in b.cls
         false
         
-    isStringMarker = (a, type) -> 
+    isStringMarker = (d, type) -> 
+        
         return false if not ('string' in d.cls and 'marker' in d.cls)
         return false if type? and not type in d.cls 
         true
@@ -60,10 +70,10 @@ stringDiss = (dss, unbalanced) ->
             d.cls.pop()
             d.cls.push 'triple'
             d.clss = d.cls.join ' '
-            log 'triple convert'
+            # log 'triple convert'
 
         if 'interpolation' in d.cls # interpolation start
-            log 'interpolation!', d
+            # log 'interpolation!', d
 
             if top?
                 if 'interpolation' in top.cls
@@ -72,7 +82,7 @@ stringDiss = (dss, unbalanced) ->
                         top.cls = d.clss.split ' '
                         top.match += d.match
                         result.push top
-                        log 'joined open interpolation', result
+                        # log 'joined open interpolation', result
                         continue
                     else
                         log 'dafuk?'
@@ -87,13 +97,13 @@ stringDiss = (dss, unbalanced) ->
             # push half open interpolation to stack
             
             stack.push d
-            log 'pushed interpolation stack:', stack
+            # log 'pushed interpolation stack:', stack
             continue
 
         if top? and 'interpolation' in top.cls # interpolation end
             
             if d.clss.endsWith 'bracket close'
-                log 'pop interpolation!', d
+                # log 'pop interpolation!', d
                 stack.pop()
                 d.clss = 'syntax string interpolation close'
                 d.cls = d.clss.split ' '
@@ -105,7 +115,7 @@ stringDiss = (dss, unbalanced) ->
             if 'triple' not in d.cls
                 
                 if d.match.length > 1 # split multiple string markers
-                    log 'splice non triple'
+                    # log 'splice non triple'
                     dss.unshift
                         match: d.match.slice 1
                         start: d.start + 1
@@ -119,19 +129,21 @@ stringDiss = (dss, unbalanced) ->
                 if end.match.endsWith '\\'
                     if numberOfCharsAtEnd(end.match, '\\') % 2
                         if end.start + end.match.length == d.start
-                            log 'escaped top:', top
+                            # log 'escaped top:', top
                             if top? and 'interpolation' not in top.cls
-                                log 'inside escaped', d.match
+                                # log 'inside escaped', d.match
                                 end.match += d.match
                             else
-                                log 'outside escaped', d.match
+                                # log 'outside escaped', d.match
                                 result.push d
-                            log 'escaped result:', result
+                            # log 'escaped result:', result
                             continue
 
             if top? and stringMarkersMatch top, d # pop matching string marker
                 
-                stack.pop()
+                popped = stack.pop()
+                if popped.match == ''
+                    fakePopped = d
                 result.push d
                 
             else if top? and 'interpolation' not in top.cls
@@ -142,8 +154,8 @@ stringDiss = (dss, unbalanced) ->
             
                 result.push d
                 stack.push d
-                log 'pushed string stack:', stack
-                log 'pushed string result:', result
+                # log 'pushed string stack:', stack
+                # log 'pushed string result:', result
                 
             continue
                 
@@ -156,13 +168,17 @@ stringDiss = (dss, unbalanced) ->
         else
             
             result.push d
-            log 'pushed stray result:', result         
+            # log 'pushed stray result:', result         
 
+    _.remove stack, (s) -> s.match.length == 0 or 'triple' not in s.cls
+            
     if stack.length
-        log 'unbalanced! stack:',  stack
+        # log 'unbalanced! stack:',  stack
         unbalanced.stack = stack
+    else if fakePopped
+        unbalanced.stack = [fakePopped]
         
-    log "text -- result:", result, unbalanced
+    # log "text -- result:", result, unbalanced
 
     result
     
