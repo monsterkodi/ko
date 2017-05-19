@@ -16,10 +16,10 @@ class Balancer
         @editor = @syntax.editor
         @unbalanced = []
         @regions = 
+            regexp:        clss: 'regexp',         open: '/',   close: '/'
             singleString:  clss: 'string single',  open: "'",   close: "'"
             doubleString:  clss: 'string double',  open: '"',   close: '"'
             lineComment:   clss: 'comment',        open: "#",   close: null
-            regexp:        clss: 'regexp',         open: '/',   close: '/'
             multiString:   clss: 'string triple',  open: '"""', close: '"""', multi: true
             multiComment:  clss: 'comment triple', open: '###', close: '###', multi: true
             interpolation: clss: 'interpolation',  open: '#{',  close: '}',   multi: true
@@ -31,19 +31,19 @@ class Balancer
         if not text?
             return error "#{@editor.name} no line at index #{li}? #{@editor.numLines()}"
         
-        if @editor.name == 'editor'
-            regions = @parseText text
-            if not empty regions
-                # log 'regions:', regions
-                merged = @mergeRegions regions, text
-                # log 'merged:', merged
-            
-        unbalanced = @unbalancedForLine li        
-        
-        Syntax = require './syntax'
-        diss = Syntax.dissForTextAndSyntax text, @syntax.name, unbalanced: unbalanced
-        
-        @setUnbalanced li, unbalanced.stack
+        regions = @parseText text
+        diss = @mergeRegions regions, text
+        # if not empty regions
+            # log 'regions:', regions
+            # log 'merged:', merged
+        # else 
+#             
+            # unbalanced = @unbalancedForLine li        
+#             
+            # Syntax = require './syntax'
+            # diss = Syntax.dissForTextAndSyntax text, @syntax.name, unbalanced: unbalanced
+#             
+            # @setUnbalanced li, unbalanced.stack
         
         diss
 
@@ -61,8 +61,9 @@ class Balancer
         addDiss = (start, end) =>
             slice = text.slice start, end
             Syntax = require './syntax'
-            diss = Syntax.dissForTextAndSyntax slice, @syntax.name            
-            _.each diss, (d) -> d.start += start
+            diss = Syntax.dissForTextAndSyntax slice, @syntax.name
+            if start
+                _.each diss, (d) -> d.start += start
             merged = merged.concat diss
         
         while region = regions.shift()
@@ -94,13 +95,21 @@ class Balancer
             if  top = _.last stack
                 lr  = _.last result
                 le  = lr.start + lr.match.length
+                
                 if p-1 - le > 0 and le < text.length-1
+                    
                     top = _.cloneDeep top
                     top.start = le
                     top.match = text.slice le, p-1
                     top.clss  = top.region.clss
                     delete top.region
-                    result.push top
+                    
+                    while top.match.length and top.match[0] == ' '
+                        top.match = top.match.slice 1
+                        top.start += 1
+                        
+                    if top.match.length
+                        result.push top
         
         pushRegion = (region) ->
             
