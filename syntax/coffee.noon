@@ -23,8 +23,8 @@
 
 # braces
 
-[({\[]                              bracket.open
-[)}\]]                              bracket.close
+[({\[]                                bracket.open
+[)}\]]                                bracket.close
 
 # require
 

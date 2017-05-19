@@ -40,7 +40,7 @@ class Balancer
     # 000   000  00000000  000   000   0000000   00000000  
     
     mergeRegions: (regions, text) ->
-        
+        console.log str regions
         merged = []
         p = 0
         
@@ -176,7 +176,7 @@ class Balancer
             
             top = _.last stack
             
-            if rest.startsWith top?.region.close
+            if top? and rest.startsWith top.region.close
                 
                 pushTop()
                 stack.pop()
@@ -189,6 +189,12 @@ class Balancer
                 p += top.region.close.length-1
                 return top
             false
+            
+        # 000       0000000    0000000   00000000     
+        # 000      000   000  000   000  000   000    
+        # 000      000   000  000   000  00000000     
+        # 000      000   000  000   000  000          
+        # 0000000   0000000    0000000   000          
                 
         while p < text.length
             
@@ -203,7 +209,7 @@ class Balancer
             top  = _.last stack
             rest = text.slice p-1 
             
-            if not top or top.clss == 'interpolation'
+            if not top or top.region.clss == 'interpolation'
 
                 if popRegion rest
                     continue

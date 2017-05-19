@@ -149,13 +149,10 @@ class Syntax
 
         matchr.ranges Syntax.matchrConfigs[n], line
 
-    @dissForTextAndSyntax: (text, n, opt) ->
+    @dissForTextAndSyntax: (text, n) ->
         
         return error "no syntax? #{n}" if not n? or not Syntax.matchrConfigs[n]?
-        diss = matchr.dissect matchr.ranges(Syntax.matchrConfigs[n], text), opt
-        if opt?.unbalanced?.open or /[\'\"]/.test text
-            diss = stringDiss diss, opt?.unbalanced ? {}
-        diss
+        matchr.dissect matchr.ranges Syntax.matchrConfigs[n], text 
 
     @lineForDiss: (dss) ->
 
