@@ -15,26 +15,28 @@ class Balancer
         
         @editor = @syntax.editor
         @unbalanced = []
-        @info = 
-            stringChars:   ['"', "'"]
-            lineComment:   "#"
-            regexp:        '/'
-            multiString:   open: '"""', close: '"""'
-            multiComment:  open: '###', close: '###'
-            interpolation: open: '#{',  close: '}'
+        @regions = 
+            singleString:  clss: 'string single',  open: "'",   close: "'"
+            doubleString:  clss: 'string double',  open: '"',   close: '"'
+            lineComment:   clss: 'comment',        open: "#",   close: null
+            regexp:        clss: 'regexp',         open: '/',   close: '/'
+            multiString:   clss: 'string triple',  open: '"""', close: '"""', multi: true
+            multiComment:  clss: 'comment triple', open: '###', close: '###', multi: true
+            interpolation: clss: 'interpolation',  open: '#{',  close: '}',   multi: true
         
     dissForLine: (li) ->
 
         text = @editor.line li
 
         if not text?
-            return error "#{@editor.name} no line at index #{li}? #{@editor.numLines()}"  
+            return error "#{@editor.name} no line at index #{li}? #{@editor.numLines()}" 
         
         if @editor.name == 'editor'
             sections = @parseText text
             if not empty sections
-                merged = @mergeSections sections
-                log 'merged:', merged
+                log 'sections:', sections
+                # merged = @mergeSections sections
+                # log 'merged:', merged
             
         unbalanced = @unbalancedForLine li        
         
@@ -60,11 +62,13 @@ class Balancer
         
         for i in [0...sections.length]
             sect = sections[i]
-            next = sections[i+1] if i < sections.length-1
-            ss   = sect.start
-            sl   = sect.match.length
-            se   = ss + sl
-            ns   = next?.start ? se
+            if i < sections.length-1
+                next = sections[i+1] 
+            else next = null
+            ss = sect.start
+            sl = sect.match.length
+            se = ss + sl
+            ns = next?.start ? se
            
             if ns >= se
                 merged.push sect
@@ -73,6 +77,7 @@ class Balancer
                 slice.match = sect.match.slice 0, ns - ss
                 merged.push slice
                 stack.push sect
+                continue if stack.length == 1
                 
             while top = _.last stack
                 te = top.start + top.match.length
@@ -87,7 +92,7 @@ class Balancer
                     if te > ns
                         ts = top.start
                         slice = _.cloneDeep top
-                        slice.match = sect.match.slice se - ts, ns - ts
+                        slice.match = top.match.slice se - ts, ns - ts
                         slice.start = se
                         merged.push slice
                     break
@@ -104,46 +109,49 @@ class Balancer
         escapeCount = 0
         result = []
         p = 0
-        
-        pushSingle = (ch) ->
-            
-            if ch == @info.regexp
-                clss = 'regexp'
-            else
-                clss = 'string ' + (ch == "'" and 'single' or 'double')
-            
-            stack.push 
-                start: p
-                char:  ch
-                clss:  clss
-                
-        popSingle = (ch) ->
-            
-            top = _.last stack
-            if top?.char == ch
-                pop = stack.pop()
-                pop.match = text.slice pop.start, p-1
-                delete pop.char
-                result.push pop
-                return pop
-            false
-        
-        pushMulti = (multi, type) ->
-            
-            stack.push
-                start: p-1+multi.open.length
-                multi: multi
-                clss:  type
 
-        popMulti = (rest) ->
+        pushTop = ->
+            
+            if  top = _.last stack
+                lr  = _.last result
+                le  = lr.start + lr.match.length
+                if p-1 - le > 0 and le < text.length-1
+                    top = _.cloneDeep top
+                    top.start = le
+                    top.match = text.slice le, p-1
+                    top.clss  = top.region.clss
+                    delete top.region
+                    result.push top
+        
+        pushRegion = (region) ->
+            
+            pushTop()
+                
+            result.push
+                start: p-1
+                match: region.open
+                clss:  region.clss + ' marker'
+                
+            stack.push 
+                start:  p-1+region.open.length
+                region: region
+        
+        popRegion = (rest) ->
             
             top = _.last stack
-            if top?.multi?.open? and rest.startsWith top.multi.close
-                pop = stack.pop()
-                pop.match = text.slice pop.start, p-1
-                delete pop.multi
-                result.push pop
-                return pop
+            
+            if rest.startsWith top?.region.close
+                
+                pushTop()
+                stack.pop()
+                
+                result.push
+                    start: p-1
+                    clss:  top.region.clss + ' marker'
+                    match: top.region.close
+                    
+                p += top.region.close.length-1
+                return top
             false
                 
         while p < text.length
@@ -157,24 +165,35 @@ class Balancer
             
             if not top or top.clss == 'interpolation'
 
-                if popMulti rest
+                if popRegion rest
                     continue
                 
-                if rest.startsWith @info.multiComment.open
-                    pushMulti @info.multiComment, 'comment'
+                if rest.startsWith @regions.multiComment.open
+                    pushRegion @regions.multiComment
                     continue
                     
-                else if not top and rest.startsWith @info.lineComment
-                    start = p-1+@info.lineComment.length
-                    result.push 
+                else if not top and rest.startsWith @regions.lineComment.open
+                    start = p-1+@regions.lineComment.open.length
+
+                    result.push
+                        start: p-1
+                        match: @regions.lineComment.open
+                        clss:  @regions.lineComment.clss + ' marker'
+
+                    result.push
                         start: start
                         match: text.slice start
-                        clss:  'comment'
-                    # log 'comment to end of line', result
+                        clss:  @regions.lineComment.clss
                     return result
                     
-                if ch == @info.regexp or ch in @info.stringChars
-                    pushSingle ch
+                if ch == @regions.regexp.open
+                    pushRegion @regions.regexp
+                    continue
+                if ch == @regions.singleString.open 
+                    pushRegion @regions.singleString
+                    continue
+                if ch == @regions.doubleString.open
+                    pushRegion @regions.doubleString
                     continue
                     
             else # string interpolation or regexp
@@ -183,17 +202,13 @@ class Balancer
                 else if escapeCount > 0 and escapeCount % 2
                     continue
 
-                if popMulti rest
+                if top.region.open == '"' and rest.startsWith @regions.interpolation.open
+                    pushRegion @regions.interpolation
                     continue
                     
-                if top.char == '"' and rest.startsWith @info.interpolation.open
-                    pushMulti @info.interpolation, 'interpolation'
+                if popRegion rest
                     continue
-                    
-                if ch == @info.regexp or ch in @info.stringChars
-                    if popSingle ch
-                        continue
-                
+                                    
         # log "parse #{text} -- result:", result if not empty result
         result
         
