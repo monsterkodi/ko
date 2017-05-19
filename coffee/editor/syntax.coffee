@@ -10,6 +10,7 @@
 encode     = require '../tools/encode'
 matchr     = require '../tools/matchr'
 stringDiss = require '../tools/stringdiss'
+Balancer   = require './balancer' 
 
 class Syntax
 
@@ -18,7 +19,7 @@ class Syntax
         @name       = @editor.syntaxName ? 'txt'
         @diss       = []
         @colors     = {}
-        @unbalanced = []
+        @balancer   = new Balancer @
 
         post.on 'schemeChanged', @onSchemeChanged
 
@@ -32,17 +33,7 @@ class Syntax
 
     newDiss: (li) ->
         
-        text = @editor.line li
-
-        if not text?
-            return error "#{@editor.name} no line at index #{li}? #{@editor.numLines()}"
-
-        unbalanced = @unbalancedForLine li
-                
-        diss = Syntax.dissForTextAndSyntax text, @name, unbalanced: unbalanced
-                    
-        @setUnbalanced li, unbalanced.stack
-            
+        diss = @balancer.dissForLine li
         diss
 
     getDiss: (li) ->
@@ -77,62 +68,14 @@ class Syntax
                         
                 when 'deleted'  
                     
-                    @deleteUnbalanced di
+                    @balancer.deleteLine di
                     @diss.splice di, 1
                     
                 when 'inserted' 
                     
-                    @insertUnbalanced di
+                    @balancer.insertLine di
                     @diss.splice di, 0, @newDiss di
-                    
-    # 000   000  000   000  0000000     0000000   000       0000000   000   000   0000000  00000000  0000000    
-    # 000   000  0000  000  000   000  000   000  000      000   000  0000  000  000       000       000   000  
-    # 000   000  000 0 000  0000000    000000000  000      000000000  000 0 000  000       0000000   000   000  
-    # 000   000  000  0000  000   000  000   000  000      000   000  000  0000  000       000       000   000  
-    #  0000000   000   000  0000000    000   000  0000000  000   000  000   000   0000000  00000000  0000000    
-    
-    unbalancedForLine: (li) ->
-        open = null
-        for u in @unbalanced
-            if u.line < li
-                if open
-                    open = null
-                else
-                    open = u
-            if u.line >= li
-                if open
-                    console.log "unbalanced #{li} open", str(open.stack[0])
-                    return open: open.stack[0]
-                break
-        if open?
-            console.log "unbalanced #{li} open", str(open.stack[0])
-            open: open.stack[0]
-        else
-            {}
-    
-    setUnbalanced: (li, stack) ->
-        _.remove @unbalanced, (u) -> u.line == li
-        if stack?
-            @unbalanced.push line:li, stack:stack 
-            @unbalanced.sort (a,b) -> a.line - b.line
-            
-        @dumpUnbalanced()
-            
-    deleteUnbalanced: (li) ->
-        
-        _.remove @unbalanced, (u) -> u.line == li
-        _.each @unbalanced, (u) -> u.line -= 1 if u.line >= li
-        @dumpUnbalanced()
-        
-    insertUnbalanced: (li) ->
-        
-        _.each @unbalanced, (u) -> u.line += 1 if u.line >= li
-        @dumpUnbalanced()
-        
-    dumpUnbalanced: (li) ->
-        
-        # console.log str @unbalanced if not empty @unbalanced
-            
+                                
     #  0000000  000      00000000   0000000   00000000
     # 000       000      000       000   000  000   000
     # 000       000      0000000   000000000  0000000
@@ -141,7 +84,7 @@ class Syntax
 
     clear: -> 
         @diss = []
-        @unbalanced = []
+        @balancer.clear()
 
     #  0000000   0000000   000       0000000   00000000
     # 000       000   000  000      000   000  000   000

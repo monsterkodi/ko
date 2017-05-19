@@ -13,7 +13,7 @@ class Transform
 
     @transformNames = [
         'upper', 'lower', 'title', 'case'
-        'count', 'add'
+        'count', 'add', 'sub'
         'up', 'down', 'sort'
         'reverse', 
         'resolve', 'unresolve'
@@ -49,6 +49,11 @@ class Transform
         
         @apply (t) -> str(parseInt(t) + parseInt(d))
         'add'
+
+    sub: (d=1) ->
+        
+        @apply (t) -> str(parseInt(t) - parseInt(d))
+        'sub'
         
     # 00000000   00000000  000   000  00000000  00000000    0000000  00000000
     # 000   000  000       000   000  000       000   000  000       000

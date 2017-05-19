@@ -1,10 +1,8 @@
 
-args  = require  """
+args = require  """
     DevTools  . ? open developer tools    . = false
     debug     .                             = false    
 """
-
-app.exit 0 if not args?
 
 class Class extends Other
 
@@ -17,7 +15,7 @@ class Class extends Other
 
 func = -> return call()
 foo: bar: 0
-foo:
+fuu:
     bar:
         [0,'a', "b"]
 @
@@ -34,7 +32,41 @@ for i in [0...Math.max(2,1)]
             for i in [0.3]
                 log i
 
+l = [' # ', " # ", """ ### """]
+/#/
+/\#/
+\# hello
+'\#'; a='hello'
+'\#'; a='hello'
+'#'; a='hello'
+
+"""
+###
+#{
+    1+1
+    """
+    a
+    """
+}
+1+2
+###
+"""
+
 # return "hello" 'hello'
+
+###
+    """
+    hello world
+    """
+###
+
+###
+000   000  00000000  000      000       0000000     
+000   000  000       000      000      000   000    
+000000000  0000000   000      000      000   000    
+000   000  000       000      000      000   000    
+000   000  00000000  0000000  0000000   0000000     
+###
 
 """start
  

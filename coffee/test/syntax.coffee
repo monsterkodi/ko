@@ -17,7 +17,21 @@ test = (a, b) ->
 syntax = require '../editor/syntax'
 
 describe 'syntax', ->
-          
+
+    describe 'comments', ->
+        
+        it 'simple', ->
+            
+            dss = syntax.dissForTextAndSyntax "hello # comment", 'coffee'
+            test dss[0].clss, 'text'
+            test dss[1].clss, 'syntax comment marker'
+            test dss[2].clss, 'comment'
+
+        it 'simple fails', -> 
+            dss = syntax.dissForTextAndSyntax "# a comment", 'coffee'
+            test dss[0].clss, 'syntax comment marker'
+            test dss[1].clss, 'comment'
+            
     describe 'strings', ->
                 
         it 'simple', ->
