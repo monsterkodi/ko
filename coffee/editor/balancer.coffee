@@ -29,13 +29,13 @@ class Balancer
         text = @editor.line li
 
         if not text?
-            return error "#{@editor.name} no line at index #{li}? #{@editor.numLines()}" 
+            return error "#{@editor.name} no line at index #{li}? #{@editor.numLines()}"
         
         if @editor.name == 'editor'
-            sections = @parseText text
-            if not empty sections
-                log 'sections:', sections
-                # merged = @mergeSections sections
+            regions = @parseText text
+            if not empty regions
+                # log 'regions:', regions
+                merged = @mergeRegions regions, text
                 # log 'merged:', merged
             
         unbalanced = @unbalancedForLine li        
@@ -53,49 +53,28 @@ class Balancer
     # 000 0 000  000       000   000  000   000  000       
     # 000   000  00000000  000   000   0000000   00000000  
     
-    mergeSections: (sections) ->
-        
-        sections.sort (a,b) -> a.start - b.start
+    mergeRegions: (regions, text) ->
         
         merged = []
-        stack  = []
+        p = 0
         
-        for i in [0...sections.length]
-            sect = sections[i]
-            if i < sections.length-1
-                next = sections[i+1] 
-            else next = null
-            ss = sect.start
-            sl = sect.match.length
-            se = ss + sl
-            ns = next?.start ? se
-           
-            if ns >= se
-                merged.push sect
-            else
-                slice = _.cloneDeep sect
-                slice.match = sect.match.slice 0, ns - ss
-                merged.push slice
-                stack.push sect
-                continue if stack.length == 1
-                
-            while top = _.last stack
-                te = top.start + top.match.length
-                if te < ss
-                    pop = stack.pop()
-                    lm = _.last merged
-                    le = lm.start + lm.match.length
-                    pop.match = pop.match.slice le - pop.start
-                    pop.start = le
-                    merged.push pop
-                else 
-                    if te > ns
-                        ts = top.start
-                        slice = _.cloneDeep top
-                        slice.match = top.match.slice se - ts, ns - ts
-                        slice.start = se
-                        merged.push slice
-                    break
+        addDiss = (start, end) =>
+            slice = text.slice start, end
+            Syntax = require './syntax'
+            diss = Syntax.dissForTextAndSyntax slice, @syntax.name            
+            _.each diss, (d) -> d.start += start
+            merged = merged.concat diss
+        
+        while region = regions.shift()
+            
+            if region.start > p
+                addDiss p, region.start
+            merged.push region 
+            p = region.start + region.match.length
+          
+        if p < text.length
+            addDiss p, text.length
+            
         merged
         
     # 00000000    0000000   00000000    0000000  00000000  
