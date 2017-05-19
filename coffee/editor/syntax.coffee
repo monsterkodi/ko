@@ -1,26 +1,25 @@
-
-#  0000000  000   000  000   000  000000000   0000000   000   000
-# 000        000 000   0000  000     000     000   000   000 000
-# 0000000     00000    000 0 000     000     000000000    00000
-#      000     000     000  0000     000     000   000   000 000
-# 0000000      000     000   000     000     000   000  000   000
-
+###
+ 0000000  000   000  000   000  000000000   0000000   000   000
+000        000 000   0000  000     000     000   000   000 000
+0000000     00000    000 0 000     000     000000000    00000
+     000     000     000  0000     000     000   000   000 000
+0000000      000     000   000     000     000   000  000   000
+###
 { error, log, str, post, elem, empty, fs, noon, path, _
-}          = require 'kxk'
-encode     = require '../tools/encode'
-matchr     = require '../tools/matchr'
-stringDiss = require '../tools/stringdiss'
-Balancer   = require './balancer' 
+}        = require 'kxk'
+encode   = require '../tools/encode'
+matchr   = require '../tools/matchr'
+Balancer = require './balancer' 
 
 class Syntax
 
     constructor: (@editor) ->
 
-        @name       = @editor.syntaxName ? 'txt'
-        @diss       = []
-        @colors     = {}
-        @balancer   = new Balancer @
-
+        @name     = @editor.syntaxName ? 'txt'
+        @diss     = []
+        @colors   = {}
+        @balancer = new Balancer @
+ 
         post.on 'schemeChanged', @onSchemeChanged
 
     del: -> post.removeListener 'schemeChanged', @onSchemeChanged
@@ -117,12 +116,14 @@ class Syntax
 
     onSchemeChanged: => @colors = {}
 
-    #  0000000  000000000   0000000   000000000  000   0000000
-    # 000          000     000   000     000     000  000
-    # 0000000      000     000000000     000     000  000
-    #      000     000     000   000     000     000  000
-    # 0000000      000     000   000     000     000   0000000
-
+    ###
+     0000000  000000000   0000000   000000000  000   0000000
+    000          000     000   000     000     000  000
+    0000000      000     000000000     000     000  000
+         000     000     000   000     000     000  000
+    0000000      000     000   000     000     000   0000000
+    ###
+    
     @matchrConfigs = {}
     @syntaxNames = []
 

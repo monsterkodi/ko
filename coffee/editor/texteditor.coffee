@@ -555,7 +555,7 @@ class TextEditor extends Editor
         ly = clamp 0, @layers.offsetHeight, y - br.top
         px = parseInt(Math.floor((Math.max(0, sl + lx))/@size.charWidth))
         py = parseInt(Math.floor((Math.max(0, st + ly))/@size.lineHeight)) + @scroll.top
-        p = [px, Math.min(@numLines()-1, py)]
+        p  = [px, Math.min(@numLines()-1, py)]
         p
 
     posForEvent: (event) -> @posAtXY event.clientX, event.clientY

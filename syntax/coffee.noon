@@ -28,7 +28,7 @@
 
 # require
 
-(\w+|\{[^\}]+\})\s*=\s*(require)\s+
+([^\{\}]+)\s*=\s*(require)\s+
     require.variable
     keyword.require
 
@@ -63,7 +63,6 @@ return                                keyword.return
 (\w+)\s*[=]\s*[-=]>                 . function
 (@?\w+)\s*[:]\s*\([^\)]*\)\s*[-=]>  . method
 (@?\w+)\s*[:]\s*[-=]>               . method
-# (\()[^\(\)]*(\)\s*)[-=]>            . function.bracket . function.bracket
 
 (@?[a-zA-Z]\w*)(?!\s+or|\s+i[fs]|\s+and|\s+then)(?=\(|\s+[@\w\d\"\'\(\[\{])    function.call
 (_)(?:$|\.|\s)                        bool.false
@@ -113,14 +112,14 @@ __dirname|__filename                  keyword
     number.int
 
 # strings
-'                                     string.marker.single
-"                                     string.marker.double
-\#\{                                  string.interpolation
+# '                                     string.marker.single
+# "                                     string.marker.double
+# \#\{                                  string.interpolation
 
-|###|                                 comment.marker
-(?:^|\s+)(#+)([^\{].*|$)            . comment.marker . comment
+# |###|                                 comment.marker
+# (?:^|\s+)(#+)([^\{].*|$)            . comment.marker . comment
 
 # salter headers
 
-^\s*(\#)([0\s]+)$                   . comment.marker . comment.header
-^(\s*0[0\s]+)$                        comment.header
+# ^\s*(\#)([0\s]+)$                   . comment.marker . comment.header
+# ^(\s*0[0\s]+)$                        comment.header
