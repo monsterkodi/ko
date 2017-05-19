@@ -1,10 +1,10 @@
-
-# 0000000     0000000   000       0000000   000   000   0000000  00000000  00000000 
-# 000   000  000   000  000      000   000  0000  000  000       000       000   000
-# 0000000    000000000  000      000000000  000 0 000  000       0000000   0000000  
-# 000   000  000   000  000      000   000  000  0000  000       000       000   000
-# 0000000    000   000  0000000  000   000  000   000   0000000  00000000  000   000
-
+###
+  0000000     0000000   000       0000000   000   000   0000000  00000000  00000000 
+  000   000  000   000  000      000   000  0000  000  000       000       000   000
+  0000000    000000000  000      000000000  000 0 000  000       0000000   0000000  
+  000   000  000   000  000      000   000  000  0000  000       000       000   000
+  0000000    000   000  0000000  000   000  000   000   0000000  00000000  000   000
+###
 { empty, str, log, _
 }      = require 'kxk'
 matchr = require '../tools/matchr'
@@ -31,21 +31,7 @@ class Balancer
         if not text?
             return error "#{@editor.name} no line at index #{li}? #{@editor.numLines()}"
         
-        regions = @parseText text
-        diss = @mergeRegions regions, text
-        # if not empty regions
-            # log 'regions:', regions
-            # log 'merged:', merged
-        # else 
-#             
-            # unbalanced = @unbalancedForLine li        
-#             
-            # Syntax = require './syntax'
-            # diss = Syntax.dissForTextAndSyntax text, @syntax.name, unbalanced: unbalanced
-#             
-            # @setUnbalanced li, unbalanced.stack
-        
-        diss
+        @mergeRegions @parseText(text), text
 
     # 00     00  00000000  00000000    0000000   00000000  
     # 000   000  000       000   000  000        000       
@@ -70,7 +56,10 @@ class Balancer
             
             if region.start > p
                 addDiss p, region.start
-            merged.push region 
+            if region.clss == 'interpolation'
+                addDiss region.start, region.start+region.match.length
+            else
+                merged.push region 
             p = region.start + region.match.length
           
         if p < text.length
@@ -86,10 +75,57 @@ class Balancer
     
     parseText: (text, stack=[]) ->
  
-        escapeCount = 0
-        result = []
         p = 0
+        result = []
+        escapeCount = 0
 
+        #  0000000   0000000   00     00  00     00  00000000  000   000  000000000  
+        # 000       000   000  000   000  000   000  000       0000  000     000     
+        # 000       000   000  000000000  000000000  0000000   000 0 000     000     
+        # 000       000   000  000 0 000  000 0 000  000       000  0000     000     
+        #  0000000   0000000   000   000  000   000  00000000  000   000     000     
+        
+        pushComment = (comment) ->
+            
+            start = p-1+comment.open.length
+
+            result.push
+                start: p-1
+                match: comment.open
+                clss:  comment.clss + ' marker'
+            
+            commentText = text.slice start
+            if commentText.length
+                
+                if /^(\s*0[0\s]+)$/.test commentText
+                    clss = comment.clss + ' header'
+                else
+                    clss = comment.clss
+                    
+                m = ''
+                p = s = start
+                while p < text.length
+                    
+                    c = text[p++]
+                    
+                    if c != ' '
+                        s = p-1 if m == ''
+                        m += c
+                        continue if p < text.length
+
+                    if m != ''
+                        result.push
+                            start: s
+                            match: m
+                            clss:  clss
+                        m = ''                        
+        
+        # 00000000   000   000   0000000  000   000     000000000   0000000   00000000   
+        # 000   000  000   000  000       000   000        000     000   000  000   000  
+        # 00000000   000   000  0000000   000000000        000     000   000  00000000   
+        # 000        000   000       000  000   000        000     000   000  000        
+        # 000         0000000   0000000   000   000        000      0000000   000        
+        
         pushTop = ->
             
             if  top = _.last stack
@@ -111,6 +147,12 @@ class Balancer
                     if top.match.length
                         result.push top
         
+        # 00000000   00000000   0000000   000   0000000   000   000  
+        # 000   000  000       000        000  000   000  0000  000  
+        # 0000000    0000000   000  0000  000  000   000  000 0 000  
+        # 000   000  000       000   000  000  000   000  000  0000  
+        # 000   000  00000000   0000000   000   0000000   000   000  
+        
         pushRegion = (region) ->
             
             pushTop()
@@ -123,6 +165,12 @@ class Balancer
             stack.push 
                 start:  p-1+region.open.length
                 region: region
+        
+        # 00000000    0000000   00000000   
+        # 000   000  000   000  000   000  
+        # 00000000   000   000  00000000   
+        # 000        000   000  000        
+        # 000         0000000   000        
         
         popRegion = (rest) ->
             
@@ -145,7 +193,11 @@ class Balancer
         while p < text.length
             
             ch = text[p++]
-            if escapeCount and ch != '\\' then escapeCount = 0
+            if escapeCount and ch != '\\' 
+                if escapeCount > 0 and escapeCount % 2
+                    escapeCount = 0
+                    continue
+                escapeCount = 0
             if ch == ' ' then continue
             
             top  = _.last stack
@@ -159,21 +211,15 @@ class Balancer
                 if rest.startsWith @regions.multiComment.open
                     pushRegion @regions.multiComment
                     continue
+
+                else if rest.startsWith @regions.multiString.open
+                    pushRegion @regions.multiString
+                    continue
                     
                 else if not top and rest.startsWith @regions.lineComment.open
-                    start = p-1+@regions.lineComment.open.length
-
-                    result.push
-                        start: p-1
-                        match: @regions.lineComment.open
-                        clss:  @regions.lineComment.clss + ' marker'
-
-                    result.push
-                        start: start
-                        match: text.slice start
-                        clss:  @regions.lineComment.clss
+                    pushComment @regions.lineComment
                     return result
-                    
+                                    
                 if ch == @regions.regexp.open
                     pushRegion @regions.regexp
                     continue
@@ -184,15 +230,14 @@ class Balancer
                     pushRegion @regions.doubleString
                     continue
                     
-            else # string interpolation or regexp
+            else # string or regexp
                 
                 if ch == '\\' then escapeCount++
-                else if escapeCount > 0 and escapeCount % 2
-                    continue
 
-                if top.region.open == '"' and rest.startsWith @regions.interpolation.open
-                    pushRegion @regions.interpolation
-                    continue
+                if top.region.clss in ['string double', 'string triple'] 
+                    if rest.startsWith @regions.interpolation.open
+                        pushRegion @regions.interpolation
+                        continue
                     
                 if popRegion rest
                     continue
