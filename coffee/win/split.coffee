@@ -60,6 +60,7 @@ class Split extends event
     
     stash: => window.stash.set 'split', @flex.getState()
     restore: => 
+        console.log 'split.restore'
         @flex.restoreState window.stash.get 'split'
         @emitSplit()    
                 

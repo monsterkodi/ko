@@ -46,6 +46,12 @@ class Syntax
 
         @diss[li] = dss
         dss
+        
+    fillDiss: (bot) ->
+        
+        console.log 'fillDiss', bot
+        for li in [0..bot]
+            @getDiss li
 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000
     # 000       000   000  000   000  0000  000  000        000       000   000

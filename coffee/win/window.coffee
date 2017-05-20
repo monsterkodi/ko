@@ -6,8 +6,8 @@
 # 00     00  000  000   000  0000000     0000000   00     00
 
 { splitFilePos, stopEvent, fileExists, fileList, unresolve, resolve, keyinfo, 
-  prefs, stash, drag, noon, post, path, clamp, error, 
-  pos, str, log, sw, sh, os, fs, _
+  prefs, stash, drag, noon, post, path, clamp, 
+  pos, str, sw, sh, os, fs, log, error, _
 }           = require 'kxk'
 Split       = require './split'
 Terminal    = require './terminal'
@@ -80,6 +80,7 @@ saveStash = ->
 restoreWin = ->
     
     if bounds = window.stash.get 'bounds'
+        console.log 'set bounds', str bounds
         win.setBounds bounds
         
     if window.stash.get 'devTools'
@@ -148,7 +149,7 @@ winMain = ->
     info        = window.info        = new Info editor
     fps         = window.fps         = new FPS()
     
-    window.textEditor  = window.focusEditor = editor
+    window.textEditor = window.focusEditor = editor
     
     restoreWin()
     
@@ -267,8 +268,9 @@ onClose = ->
 # 000   000  000  0000  000      000   000  000   000  000   000  
 #  0000000   000   000  0000000   0000000   000   000  0000000    
 
-window.onload = -> 
-        
+window.onload = ->
+    console.log 'onload'
+    post.toMain 'windowLoaded', winID
     split.resized()
     info.reload()
     win.on 'close', onClose
@@ -323,7 +325,7 @@ loadFile = (file, opt={}) ->
         file = resolve file
         
     if file != editor.currentFile or opt?.reload
-        
+        console.log 'loadFile', file, str opt
         if file? and not fileExists file
             file = null
             
@@ -403,7 +405,6 @@ window.openFiles = openFiles
 window.openFile  = openFile
 window.loadFile  = loadFile
 
-
 # 0000000    000   0000000   000       0000000    0000000 
 # 000   000  000  000   000  000      000   000  000      
 # 000   000  000  000000000  000      000   000  000  0000
@@ -411,6 +412,7 @@ window.loadFile  = loadFile
 # 0000000    000  000   000  0000000   0000000    0000000 
 
 openFile = (options) ->
+    
     dir = path.dirname editor.currentFile if editor.currentFile
     dir ?= resolve '.'
     dialog.showOpenDialog 
@@ -425,6 +427,7 @@ openFile = (options) ->
         , (files) -> openFiles files, options
 
 saveFileAs = ->
+    
     dialog.showSaveDialog 
         title: "Save File As"
         defaultPath: editor.currentFile
@@ -448,6 +451,7 @@ saveFileAs = ->
 screenSize = -> electron.screen.getPrimaryDisplay().workAreaSize
     
 window.onresize = ->
+    console.log 'window.onresize'
     split.resized()
     window.stash.set 'bounds', win.getBounds()
     if window.stash.get 'centerText', false

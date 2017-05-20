@@ -132,7 +132,7 @@ post.on 'activatePrevWindow', (winID) -> main.activatePrevWindow winID
 post.on 'fileSaved',    (file, winID) -> main.indexer.indexFile file, refresh: true
 post.on 'fileLoaded',   (file, winID) -> main.indexer.indexFile file
 post.on 'winlog',       (winID, text) -> console.log "win#{winID} ", text
-
+post.on 'windowLoaded', (winID) -> console.log "windowLoaded #{winID}"
 post.on 'ping', (winID, argA, argB) -> post.toWin winID, 'pong', 'main', argA, argB
             
 winShells = {}
@@ -452,7 +452,7 @@ class Main
         win.on 'resize', @onResizeWin
         
         winLoaded = ->
-            
+            console.log "winLoaded #{win.id}"
             if opt.files?
                 post.toWin win.id, 'loadFiles', opt.files
             else if opt.file?

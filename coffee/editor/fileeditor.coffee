@@ -81,19 +81,19 @@ class FileEditor extends TextEditor
         @setupFileType()
 
         if @currentFile?
-            
+
             @watch = new watcher @
-            
+
             if opt?.restoreState
-                
+
                 @setText opt.restoreState.text()
                 @state = opt.restoreState
                 @dirty = true
                 post.emit 'dirty', true
-                
+
             else
                 @setText fs.readFileSync @currentFile, encoding: 'utf8'
-                
+
             @restoreScrollCursorsAndSelections()
             post.emit 'file', @currentFile # titlebar -> tabs -> tab
             post.toMain 'getBreakpoints', window.winID, @currentFile, window.winID
@@ -183,6 +183,8 @@ class FileEditor extends TextEditor
             @setMain       s.main ? 0
             @setState @state
 
+            @syntax.fillDiss @mainCursor()[1]
+            
             @scroll.to s.scroll if s.scroll
             @scroll.cursorIntoView()
 
