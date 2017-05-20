@@ -16,7 +16,7 @@ class Balancer
         @editor = @syntax.editor
         @unbalanced = []
         @regions =
-            regexp:        clss: 'regexp',         open: '/',   close: '/'
+            # regexp:        clss: 'regexp',         open: '/',   close: '/'
             singleString:  clss: 'string single',  open: "'",   close: "'"
             doubleString:  clss: 'string double',  open: '"',   close: '"'
             lineComment:   clss: 'comment',        open: "#",   close: null
@@ -31,7 +31,7 @@ class Balancer
         if not text?
             return error "#{@editor.name} no line at index #{li}? #{@editor.numLines()}"
 
-        @mergeRegions @parseText(text), text
+        @mergeRegions @parse(text, li), text, li
 
     # 00     00  00000000  00000000    0000000   00000000
     # 000   000  000       000   000  000        000
@@ -39,15 +39,23 @@ class Balancer
     # 000 0 000  000       000   000  000   000  000
     # 000   000  00000000  000   000   0000000   00000000
 
-    mergeRegions: (regions, text) ->
-        console.log str regions
+    mergeRegions: (regions, text, li) ->
+        # console.log str regions
+        
+        if u = @getUnbalanced li
+            unbalanced = u.clss
+            console.log "mergeRegions #{li}", unbalanced
+        
         merged = []
         p = 0
 
         addDiss = (start, end) =>
             slice = text.slice start, end
             Syntax = require './syntax'
-            diss = Syntax.dissForTextAndSyntax slice, @syntax.name
+            if unbalanced?
+                diss = @dissForClass slice, 0, unbalanced
+            else
+                diss = Syntax.dissForTextAndSyntax slice, @syntax.name
             if start
                 _.each diss, (d) -> d.start += start
             merged = merged.concat diss
@@ -66,6 +74,37 @@ class Balancer
             addDiss p, text.length
 
         merged
+
+    # 0000000    000   0000000   0000000
+    # 000   000  000  000       000     
+    # 000   000  000  0000000   0000000 
+    # 000   000  000       000       000
+    # 0000000    000  0000000   0000000 
+    
+    dissForClass: (text, start, clss) ->
+
+        if /^(\s*\#\s*)?(\s*0[0\s]+)$/.test text
+            clss += ' header'
+        
+        diss = []
+        m = ''
+        p = s = start
+        while p < text.length
+
+            c = text[p++]
+
+            if c != ' '
+                s = p-1 if m == ''
+                m += c
+                continue if p < text.length
+
+            if m != ''
+                diss.push
+                    start: s
+                    match: m
+                    clss:  clss
+                m = ''
+        diss
         
     ###
     00000000    0000000   00000000    0000000  00000000
@@ -75,19 +114,31 @@ class Balancer
     000        000   000  000   000  0000000   00000000
     ###
     
-    parseText: (text, stack=[]) ->
+    parse: (text, li) ->
 
-        p = 0
-        result = []
-        escapeCount = 0
+        p       = 0
+        escapes = 0
+        
+        stack   = []
+        result  = []
 
+        unbalanced     = null
+        keepUnbalanced = null
+        
+        if unbalanced = @getUnbalanced li            
+            console.log "parse #{li}", str unbalanced
+            stack.push 
+                start:  0
+                region: unbalanced
+                fake:   true
+        
         #  0000000   0000000   00     00  00     00  00000000  000   000  000000000
         # 000       000   000  000   000  000   000  000       0000  000     000
         # 000       000   000  000000000  000000000  0000000   000 0 000     000
         # 000       000   000  000 0 000  000 0 000  000       000  0000     000
         #  0000000   0000000   000   000  000   000  00000000  000   000     000
 
-        pushComment = (comment) ->
+        pushComment = (comment) =>
 
             start = p-1+comment.open.length
 
@@ -98,30 +149,8 @@ class Balancer
 
             commentText = text.slice start
             if commentText.length
-
-                if /^(\s*0[0\s]+)$/.test commentText
-                    clss = comment.clss + ' header'
-                else
-                    clss = comment.clss
-
-                m = ''
-                p = s = start
-                while p < text.length
-
-                    c = text[p++]
-
-                    if c != ' '
-                        s = p-1 if m == ''
-                        m += c
-                        continue if p < text.length
-
-                    if m != ''
-                        result.push
-                            start: s
-                            match: m
-                            clss:  clss
-                        m = ''
-
+                result = result.concat @dissForClass text, start, comment.clss
+                    
         # 00000000   000   000   0000000  000   000     000000000   0000000   00000000
         # 000   000  000   000  000       000   000        000     000   000  000   000
         # 00000000   000   000  0000000   000000000        000     000   000  00000000
@@ -132,7 +161,7 @@ class Balancer
 
             if  top = _.last stack
                 lr  = _.last result
-                le  = lr.start + lr.match.length
+                le  = lr? and lr.start + lr.match.length or 0
 
                 if p-1 - le > 0 and le < text.length-1
 
@@ -181,7 +210,11 @@ class Balancer
             if top? and rest.startsWith top.region.close
 
                 pushTop()
-                stack.pop()
+                popped = stack.pop()
+                if popped.fake
+                    keepUnbalanced = 
+                        start:  p-1
+                        region: top.region
 
                 result.push
                     start: p-1
@@ -201,11 +234,11 @@ class Balancer
         while p < text.length
 
             ch = text[p++]
-            if escapeCount and ch != '\\'
-                if escapeCount > 0 and escapeCount % 2
-                    escapeCount = 0
+            if escapes and ch != '\\'
+                if escapes > 0 and escapes % 2
+                    escapes = 0
                     continue
-                escapeCount = 0
+                escapes = 0
             if ch == ' ' then continue
 
             top  = _.last stack
@@ -228,7 +261,7 @@ class Balancer
                     pushComment @regions.lineComment
                     return result
 
-                if ch == @regions.regexp.open
+                if ch == @regions.regexp?.open
                     pushRegion @regions.regexp
                     continue
                 if ch == @regions.singleString.open
@@ -240,7 +273,7 @@ class Balancer
 
             else # string or regexp
 
-                if ch == '\\' then escapeCount++
+                if ch == '\\' then escapes++
 
                 if top.region.clss in ['string double', 'string triple']
                     if rest.startsWith @regions.interpolation.open
@@ -249,8 +282,15 @@ class Balancer
 
                 if popRegion rest
                     continue
-
-        # log "parse #{text} -- result:", result if not empty result
+             
+        stack.pop() if _.last(stack)?.fake
+        
+        if stack.length
+            # console.log "unbalanced? #{li}", str stack
+            @setUnbalanced li, _.last stack
+        else if keepUnbalanced
+            @setUnbalanced li, keepUnbalanced
+            
         result
 
     # 000   000  000   000  0000000     0000000   000       0000000   000   000   0000000  00000000  0000000
@@ -259,7 +299,8 @@ class Balancer
     # 000   000  000  0000  000   000  000   000  000      000   000  000  0000  000       000       000   000
     #  0000000   000   000  0000000    000   000  0000000  000   000  000   000   0000000  00000000  0000000
 
-    unbalancedForLine: (li) ->
+    getUnbalanced: (li) ->
+        
         open = null
         for u in @unbalanced
             if u.line < li
@@ -269,22 +310,26 @@ class Balancer
                     open = u
             if u.line >= li
                 if open
-                    # console.log "unbalanced #{li} open", str(open.stack[0])
-                    return open: open.stack[0]
+                    # console.log "unbalanced #{li} region", str(open.region)
+                    return open.region
                 break
+                
         if open?
-            # console.log "unbalanced #{li} open", str(open.stack[0])
-            open: open.stack[0]
-        else
-            {}
+            # console.log "unbalanced #{li} open", str(open.region)
+            return open.region
+            
+        null
 
-    setUnbalanced: (li, stack) ->
+    setUnbalanced: (li, startRegion) ->
+        
         _.remove @unbalanced, (u) -> u.line == li
-        if stack?
-            @unbalanced.push line:li, stack:stack
+        if startRegion?
+            @unbalanced.push 
+                line:  li
+                start: startRegion.start
+                region:startRegion.region
             @unbalanced.sort (a,b) -> a.line - b.line
-
-        @dumpUnbalanced()
+            @dumpUnbalanced()
 
     deleteLine: (li) ->
 
@@ -299,7 +344,7 @@ class Balancer
 
     dumpUnbalanced: ->
 
-        # console.log str @unbalanced if not empty @unbalanced
+        console.log '@unbalanced:', str @unbalanced if not empty @unbalanced
 
     clear: ->
 
