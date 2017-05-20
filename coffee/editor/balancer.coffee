@@ -124,7 +124,7 @@ class Balancer
         keepUnbalanced = null
         
         if unbalanced = @getUnbalanced li            
-            console.log "parse #{li}", str unbalanced
+            # console.log "parse #{li}", str unbalanced
             for lineStartRegion in unbalanced
                 stack.push 
                     start:  0
@@ -339,7 +339,7 @@ class Balancer
 
     dumpUnbalanced: ->
 
-        console.log '@unbalanced:', str @unbalanced if not empty @unbalanced
+        # console.log '@unbalanced:', str @unbalanced if not empty @unbalanced
 
     clear: ->
 
