@@ -6,9 +6,6 @@
 #  000   000  000   000  000   000  000   000  0000000     0000000   00     00  000   000
 
 
-\w+                                       text
-[^\w\s]+                                  syntax
-
 # header
 
 (^#\s+)(.+)                             . md.marker.h1   . md.h1
@@ -44,6 +41,3 @@
 (\*+)([^\*]+)(\*+)                      . md.bold.marker . md.bold . md.bold.marker
 
 (\<!---|---\>)                            comment.marker
-
-# salter headers
-^(\s*\#\s+)([0\s]+)$                    . comment.marker . comment.header

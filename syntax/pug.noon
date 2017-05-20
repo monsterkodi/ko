@@ -5,10 +5,6 @@
 # 000        000   000  000   000
 # 000         0000000    0000000 
 
-
-\w+                            text
-[^\w\s]+                       syntax
-
 # braces
 
 [\(\)\{\}]                     punctuation.marker
@@ -40,11 +36,6 @@
 (\b\d+\.\d+\b)                 number.float
 (\-?\d+)(px|%)               . number.int . number.marker                    
 
-# strings
-
-'                              string.marker.single
-"                              string.marker.double
-
 # colors
 
 (#)([a-fA-F0-9]{3})          . module.marker . module
@@ -54,10 +45,4 @@
 
 # comments
 
-(\/\/)(.*)                   . comment.marker . comment 
-
-# salt header
-
-^\s*\/\/\s+([0\s]+)$         . comment.header
-
-
+# (\/\/)(.*)                   . comment.marker . comment 

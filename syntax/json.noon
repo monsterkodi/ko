@@ -6,11 +6,6 @@
 #   0000000   0000000    0000000   000   000
 
 
-\w+                            text
-[^\w\s]+                       syntax
-
-"                              string.marker.double
-
 # keys
 
 ("[^"]*")\s*:                   class
@@ -32,9 +27,9 @@
 
 # url
 
-"(\S+://)(\S+)"
-                                string.marker.double
-                                string.value.double
+# "(\S+://)(\S+)"
+                                # string.marker.double
+                                # string.value.double
 
 # dim
 

@@ -8,10 +8,6 @@
 ko
     extnames                 . cpp . cxx . cc . c . hpp . h
 
-
-\w+                            text
-[^\w\s]+                       syntax
-
 [\<\>\+\-\=\/\*]               math
 
 !=                             math
@@ -87,18 +83,9 @@ this                           keyword.this
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
     syntax.value.number.int.sign
     value.number.int
-
-# strings
-
-'                              string.marker.single
-"                              string.marker.double
     
 # comments
 
-(\/\/+)\s*(.*)               . comment.marker . comment
-(\/\*)(.*)(\*\/)             . comment.marker . comment . comment.marker
-
-# salter headers
-^\s*(\/\/)([0\s]+)$          . header.comment.marker . comment.header
-^([0\s]+)$                     comment.header
+# (\/\/+)\s*(.*)               . comment.marker . comment
+# (\/\*)(.*)(\*\/)             . comment.marker . comment . comment.marker
 

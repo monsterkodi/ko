@@ -53,7 +53,12 @@ class Balancer
             if not force and unbalanced? and _.last(unbalanced).region.clss != 'interpolation'
                 diss = @dissForClass slice, 0, _.last(unbalanced).region.clss
             else
-                diss = @syntax.constructor.dissForTextAndSyntax slice, @syntax.name
+                if end < text.length-1
+                    slice += ' x' # little hack to get function call detection to work
+                    diss = @syntax.constructor.dissForTextAndSyntax slice, @syntax.name
+                    diss.pop()
+                else
+                    diss = @syntax.constructor.dissForTextAndSyntax slice, @syntax.name
             if start
                 _.each diss, (d) -> d.start += start
             merged = merged.concat diss

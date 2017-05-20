@@ -5,9 +5,6 @@
 #  000   000       000
 #   0000000   0000000 
 
-\w+                            text
-[^\w\s]+                       syntax
-
 \!                             punctuation
 [\[\]\<\>\+\-\=\?\:]           punctuation
 !=                             punctuation
@@ -26,11 +23,6 @@
 \blog\b                        function.log
 \berr\b                        variable.err
 \berror\b                      function.err
-
-# strings
-
-'                              string.marker.single
-"                              string.marker.double
 
 # bool
 
@@ -85,10 +77,5 @@ function                       function
 
 # comments
 
-\*/                            comment.marker
-(//|/\*|^\s+\*)(.*)          . comment.marker . comment
-
-# salt header
-
-^[0\s]+$                       comment.header
-
+# \*/                            comment.marker
+# (//|/\*|^\s+\*)(.*)          . comment.marker . comment

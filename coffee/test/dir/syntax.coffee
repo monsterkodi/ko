@@ -23,9 +23,14 @@ fuu:
         [0,'a', "b"]
 @
 @member+1
+@call
 @call()
-@call '' # <- should be function call colored, shouldn't it?
+@call ''
 @call 'hello' and @call 'bla' or @fark
+
+call
+call()
+call ''
 
 a = 0.01
 b /= 23 % 12

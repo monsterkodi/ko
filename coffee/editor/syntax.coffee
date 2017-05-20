@@ -197,12 +197,19 @@ class Syntax
     @init: ->
 
         syntaxDir = "#{__dirname}/../../syntax/"
+        
         for syntaxFile in fs.readdirSync syntaxDir
+            
             syntaxName = path.basename syntaxFile, '.noon'
             patterns = noon.load path.join syntaxDir, syntaxFile
+            
+            patterns['\\w+']       = 'text'   # this ensures that all ...
+            patterns['[^\\w\\s]+'] = 'syntax' # non-space characters match
+            
             if patterns.ko?.extnames?
                 extnames = patterns.ko.extnames
                 delete patterns.ko
+                
                 config = matchr.config patterns
                 for syntaxName in extnames
                     @syntaxNames.push syntaxName

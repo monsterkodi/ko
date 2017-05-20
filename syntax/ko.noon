@@ -6,9 +6,6 @@
 # 000   000   0000000 
 
 
-\w+                       text
-[^\w\s]+                  syntax
-
 ([^']+')(.+)(':)          . class . class.marker . class . class.marker
 
 (▸ )([^']+')(.+)(':)      . class . class.marker . class . class.marker
@@ -42,6 +39,3 @@
 
 \.[\-\_\w]+\s*$             extname
 [\/]                        separator
-
-# salter headers
-^([0\s]+)$                  comment.header

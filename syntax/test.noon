@@ -5,9 +5,6 @@
 #    000     000            000     000     
 #    000     00000000  0000000      000     
 
-\w+           text
-[^\w\s]+      syntax
-
 (■ )(.+)    . test.marker       . test
 (● )(.+)    . test-suite.marker . test-suite
 (✔ )(.+)    . test-pass.marker  . test-pass

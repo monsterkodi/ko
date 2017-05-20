@@ -6,9 +6,6 @@
 #  0000000      000        000     0000000
 
 
-\w+                            text
-[^\w\s]+                       syntax
-
 # braces
 
 [\(\)\{\}]                     punctuation.marker
@@ -49,7 +46,6 @@
 
 (::?)([^\s\:]+)              . function.marker . function 
 
-
 # colors
 
 (#)([a-fA-F0-9]{3})(?![\w\d])  . float.marker . float
@@ -67,7 +63,3 @@
 
 \/\*|\*\/                     comment
 (\/\/)(.*)                  . comment.marker . comment
-
-# salt header
-
-^\s*\/\/\s+([0\s]+)$        . comment.header

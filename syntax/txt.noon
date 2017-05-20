@@ -6,9 +6,6 @@
 #    000     000   000     000   
 
 
-\w+                            text
-[^\w\s]+                       syntax
-
 [\<\>\+\-\=\/\*]               math
 
 # braces
@@ -34,8 +31,3 @@ false                          bool.false
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
     number.int.sign
     number.int
-
-# strings
-
-'                              string.marker.single
-"                              string.marker.double

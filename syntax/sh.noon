@@ -8,10 +8,6 @@
 ko
     extnames                 . sh . bash
 
-
-\w+                            text
-[^\w\s]+                       syntax
-
 [\<\>\+\-\=\/\*]               math
 
 # braces
@@ -45,11 +41,6 @@ false                          bool.false
     syntax.value.number.int.sign
     value.number.int
 
-# strings
-
-'                              string.marker.single
-"                              string.marker.double
-
 # comments
 
-(?:^|[^\$\#]+)(\#+)(.*)      . comment.marker . comment
+# (?:^|[^\$\#]+)(\#+)(.*)      . comment.marker . comment

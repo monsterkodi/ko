@@ -5,10 +5,6 @@
 # 000            000       000
 #  0000000  0000000   0000000 
 
-
-\w+                            text
-[^\w\s]+                       syntax
-
 # braces
 
 [\(\)\{\}]                     punctuation.marker
@@ -45,10 +41,6 @@
 (rgba?\s*\()([^\)]+)(\))        . module.marker . module . module.marker
 \b(red|green|blue|yellow|magenta|cyan|black|gray|white|orange)\b   module
 
-# strings
-'                              string.marker.single
-"                              string.marker.double
-
 # punctuation
 [\,\.\;\&]                      marker
 
@@ -57,6 +49,3 @@
 \/\*|\*\/                     comment
 (\/\/)(.*)                  . comment.marker . comment
 
-# salt header
-
-^\s*\/\/\s+([0\s]+)$        . comment.header

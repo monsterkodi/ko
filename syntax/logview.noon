@@ -6,9 +6,6 @@
 # 0000000   0000000    0000000       0      000  00000000  00     00  
 
 
-\w+                         text
-[^\w\s]+                    syntax
-
 (⦿ )([^▸]+)               . class.member.marker . class.member
 
 [~\/\.\-\_\w]+\/            dirname
@@ -59,8 +56,3 @@ false                          value.bool.false
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
     syntax.value.number.int.sign
     value.number.int
-
-# strings
-
-'                              string.marker.single
-"                              string.marker.double

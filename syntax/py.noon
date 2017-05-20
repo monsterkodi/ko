@@ -5,10 +5,6 @@
 # 000           000   
 # 000           000   
 
-
-\w+                            text
-[^\w\s]+                       syntax
-
 [\<\>\+\-\=\/\*]               syntax.math
 
 @                              this
@@ -93,14 +89,6 @@ __name__|__class__  keyword
     syntax.value.number.int.sign
     value.number.int
 
-# strings
-'                              string.marker.single
-"                              string.marker.double
-    
 # comments
 
-(?:^|\s+)(#+)([^\{].*|$)     . comment.marker . comment
-
-# salter headers
-^\s*(\#)([0\s]+)$            . header.comment.marker . comment.header
-^([0\s]+)$                     comment.header
+# (?:^|\s+)(#+)([^\{].*|$)     . comment.marker . comment

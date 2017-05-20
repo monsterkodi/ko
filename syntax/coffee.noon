@@ -5,9 +5,6 @@
 #  000       000   000  000       000       000       000
 #   0000000   0000000   000       000       00000000  00000000
 
-\w+                                   text
-[^\w\s]+                              syntax
-
 [\<\>\+\-\=\/\*]                      math
 
 @                                     this
@@ -55,7 +52,7 @@ return                                keyword.return
 # .property
 
 (\s*\w+)\.                            owner
-(\.\s*\w+)                            property
+(?:[^\.])(\.\s*\w+)                   property
 
 # functions
 
@@ -110,16 +107,3 @@ __dirname|__filename                  keyword
 (?:^|[^\.\"\'\w]|\.\.\.?)(0x)([\da-f]+)(?:$|[^\.\"\'\w]|\.\.\.?)
     number.int.marker
     number.int
-
-# strings
-# '                                     string.marker.single
-# "                                     string.marker.double
-# \#\{                                  string.interpolation
-
-# |###|                                 comment.marker
-# (?:^|\s+)(#+)([^\{].*|$)            . comment.marker . comment
-
-# salter headers
-
-# ^\s*(\#)([0\s]+)$                   . comment.marker . comment.header
-# ^(\s*0[0\s]+)$                        comment.header

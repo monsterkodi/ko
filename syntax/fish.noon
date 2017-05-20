@@ -8,9 +8,6 @@
 ko
     extnames                 . fish
 
-\w+                            text
-[^\w\s]+                       syntax
-
 [\<\>\+\-\=\/\*]               syntax.math
 
 # braces
@@ -44,11 +41,6 @@ set\s+(\w+)                    property
     syntax.value.number.int.sign
     value.number.int
 
-# strings
+# # comments
 
-'                              string.marker.single
-"                              string.marker.double
-
-# comments
-
-(?:^|[^\$\#]+)(\#+)(.*)           . comment.marker . comment
+# (?:^|[^\$\#]+)(\#+)(.*)           . comment.marker . comment
