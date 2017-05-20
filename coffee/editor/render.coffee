@@ -62,7 +62,7 @@ class Render
             ty  = c[1] * lh
             cls = ""
             cls = c[2] if c.length > 2
-            zi  = cls != 'virtual' and 1 or 0
+            zi  = cls != 'virtual' and c[1]+1000 or 0
             h += "<span class=\"cursor #{cls}\" style=\"z-index:#{zi};transform:translate3d(#{tx}px,#{ty}px,0); height:#{lh}px\"></span>"
             i += 1
         h

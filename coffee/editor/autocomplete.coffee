@@ -143,7 +143,7 @@ class Autocomplete extends event
         @moveClonesBy @completion.length            
         
         if @matchList.length
-            
+            log 'matchList', @matchList
             @list = elem class: 'autocomplete-list'
             @list.addEventListener 'wheel', @onWheel
             @list.addEventListener 'mousedown', @onMouseDown

@@ -127,6 +127,7 @@ class Editor extends Buffer
             when 'coffee'                               then open: '###',  close: '###'
             else null
            
+        log @fileType, @lineComment
         @syntax.setFileType @fileType
             
         if oldType != @fileType

@@ -57,16 +57,13 @@ module.exports =
             @do.setCursors [[x,y]]
         else 
             @fillVirtualSpaces()
-            # for c in @do.cursors()
-                # if c[0] > @do.line(c[1]).length
-                    # @do.change c[1], @do.line(c[1]).splice c[0], 0, _.padStart '', c[0]-@do.line(c[1]).length
         @do.end()
 
-    fillVirtualSpaces: ->
-        
-        # fill spaces between line ends and cursors
+    fillVirtualSpaces: -> # fill spaces between line ends and cursors
+                
         @do.start() 
         for c in reversed @do.cursors()
             if c[0] > @do.line(c[1]).length
                 @do.change c[1], @do.line(c[1]).splice c[0], 0, _.padStart '', c[0]-@do.line(c[1]).length
         @do.end()
+        

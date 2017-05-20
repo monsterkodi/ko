@@ -25,7 +25,6 @@ class Balancer
     
     setFileType: (fileType) ->
         
-        log 'setFileType', fileType
         @regions =
             # regexp:        clss: 'regexp',         open: '/',   close: '/'
             singleString:  clss: 'string single',  open: "'",   close: "'"
@@ -110,7 +109,7 @@ class Balancer
     
     dissForClass: (text, start, clss) ->
 
-        if /^(\s*\#\s*)?(\s*0[0\s]+)$/.test text
+        if new RegExp("^(\\s*\\#{@regions.lineComment.open}\\s*)?(\\s*0[0\\s]+)$").test text
             clss += ' header'
         
         diss = []
