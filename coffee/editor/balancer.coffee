@@ -42,9 +42,7 @@ class Balancer
     mergeRegions: (regions, text, li) ->
         # console.log str regions
         
-        if u = @getUnbalanced li
-            unbalanced = u.clss
-            console.log "mergeRegions #{li}", unbalanced
+        unbalanced = @getUnbalanced li
         
         merged = []
         p = 0
@@ -53,7 +51,7 @@ class Balancer
             slice = text.slice start, end
             Syntax = require './syntax'
             if unbalanced?
-                diss = @dissForClass slice, 0, unbalanced
+                diss = @dissForClass slice, 0, _.last(unbalanced).region.clss
             else
                 diss = Syntax.dissForTextAndSyntax slice, @syntax.name
             if start
@@ -127,10 +125,11 @@ class Balancer
         
         if unbalanced = @getUnbalanced li            
             console.log "parse #{li}", str unbalanced
-            stack.push 
-                start:  0
-                region: unbalanced
-                fake:   true
+            for lineStartRegion in unbalanced
+                stack.push 
+                    start:  0
+                    region: lineStartRegion.region
+                    fake:   true
         
         #  0000000   0000000   00     00  00     00  00000000  000   000  000000000
         # 000       000   000  000   000  000   000  000       0000  000     000
@@ -283,7 +282,7 @@ class Balancer
                 if popRegion rest
                     continue
              
-        stack.pop() if _.last(stack)?.fake
+        stack = stack.filter (s) -> not s.fake
         
         if stack.length
             # console.log "unbalanced? #{li}", str stack
@@ -300,23 +299,19 @@ class Balancer
     #  0000000   000   000  0000000    000   000  0000000  000   000  000   000   0000000  00000000  0000000
 
     getUnbalanced: (li) ->
-        
-        open = null
+        stack = []
         for u in @unbalanced
             if u.line < li
-                if open
-                    open = null
+                if stack.length and _.last(stack).region.clss == u.region.clss
+                    stack.pop()
                 else
-                    open = u
+                    stack.push u
             if u.line >= li
-                if open
-                    # console.log "unbalanced #{li} region", str(open.region)
-                    return open.region
                 break
                 
-        if open?
-            # console.log "unbalanced #{li} open", str(open.region)
-            return open.region
+        if stack.length
+            # console.log "unbalanced #{li} stack", str(stack)
+            return stack
             
         null
 
