@@ -50,11 +50,10 @@ class Balancer
         addDiss = (start, end, force) =>
             
             slice = text.slice start, end
-            Syntax = require './syntax'
             if not force and unbalanced? and _.last(unbalanced).region.clss != 'interpolation'
                 diss = @dissForClass slice, 0, _.last(unbalanced).region.clss
             else
-                diss = Syntax.dissForTextAndSyntax slice, @syntax.name
+                diss = @syntax.constructor.dissForTextAndSyntax slice, @syntax.name
             if start
                 _.each diss, (d) -> d.start += start
             merged = merged.concat diss
