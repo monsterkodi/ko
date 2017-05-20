@@ -5,7 +5,7 @@
   000   000  000   000  000      000   000  000  0000  000       000       000   000
   0000000    000   000  0000000  000   000  000   000   0000000  00000000  000   000
 ###
-{ empty, str, log, _
+{ empty, str, log, error, _
 }      = require 'kxk'
 matchr = require '../tools/matchr'
 
@@ -15,14 +15,38 @@ class Balancer
 
         @editor = @syntax.editor
         @unbalanced = []
+        @setFileType 'txt'
+        
+    # 00000000  000  000      00000000  000000000  000   000  00000000   00000000  
+    # 000       000  000      000          000      000 000   000   000  000       
+    # 000000    000  000      0000000      000       00000    00000000   0000000   
+    # 000       000  000      000          000        000     000        000       
+    # 000       000  0000000  00000000     000        000     000        00000000  
+    
+    setFileType: (fileType) ->
+        
+        log 'setFileType', fileType
         @regions =
             # regexp:        clss: 'regexp',         open: '/',   close: '/'
             singleString:  clss: 'string single',  open: "'",   close: "'"
             doubleString:  clss: 'string double',  open: '"',   close: '"'
-            lineComment:   clss: 'comment',        open: "#",   close: null
-            multiString:   clss: 'string triple',  open: '"""', close: '"""', multi: true
-            multiComment:  clss: 'comment triple', open: '###', close: '###', multi: true
-            interpolation: clss: 'interpolation',  open: '#{',  close: '}',   multi: true
+            lineComment:   clss: 'comment',        open: @editor.lineComment, close: null
+
+        if @editor.multiComment
+            @regions.multiComment = 
+                clss:  'comment triple'
+                open:  @editor.multiComment.open
+                close: @editor.multiComment.close
+                multi: true
+                
+        switch fileType
+            
+            when 'coffee'
+                @regions.multiString   = clss: 'string triple',  open: '"""', close: '"""', multi: true
+                @regions.interpolation = clss: 'interpolation',  open: '#{',  close: '}',   multi: true
+                
+            when 'noon'
+                @regions.lineComment.solo = true # only spaces before comments allowed
 
     dissForLine: (li) ->
 
@@ -256,20 +280,20 @@ class Balancer
                 if popRegion rest
                     continue
 
-                if rest.startsWith @regions.multiComment.open
+                if  @regions.multiComment and rest.startsWith @regions.multiComment.open
                     pushRegion @regions.multiComment
                     continue
 
-                else if rest.startsWith @regions.multiString.open
+                else if @regions.multiString and rest.startsWith @regions.multiString.open
                     pushRegion @regions.multiString
                     continue
 
                 else if not top and rest.startsWith @regions.lineComment.open
-                    pushComment @regions.lineComment
-                    # return result
-                    break
+                    if not @regions.lineComment.solo or empty text.slice(0, p-1).trim()
+                        pushComment @regions.lineComment
+                        break
 
-                if ch == @regions.regexp?.open
+                if @regions.regexp and ch == @regions.regexp.open
                     pushRegion @regions.regexp
                     continue
                 if ch == @regions.singleString.open
@@ -282,7 +306,7 @@ class Balancer
             else # string or regexp
 
                 if top.region.clss in ['string double', 'string triple']
-                    if rest.startsWith @regions.interpolation.open
+                    if @regions.interpolation and rest.startsWith @regions.interpolation.open
                         pushRegion @regions.interpolation
                         continue
 

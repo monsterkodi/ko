@@ -35,12 +35,27 @@ class Transform
     # 000       000   000  000   000  000  0000     000     
     #  0000000   0000000    0000000   000   000     000     
     
-    count: ->
+    count: (typ='dec', offset=0, step=1) ->
+        
+        offset = parseInt offset
+        step   = parseInt step
         
         @editor.do.start()
+        @editor.fillVirtualSpaces()
         cs = @editor.do.cursors()
         @editor.do.select rangesFromPositions cs
-        numbers = ("#{_.padStart str(i), Math.floor(1 + Math.log10(cs.length)), '0'}" for i in [0...cs.length])
+        
+        switch typ
+            when 'hex'
+                base = 16
+            when 'bin'
+                base = 2
+            else
+                base = 10
+
+        pad = Number(step*(cs.length-1)+offset).toString(base).length
+        numbers = (_.padStart Number(step*i+offset).toString(base), pad, '0' for i in [0...cs.length])
+                    
         @editor.replaceSelectedText numbers
         @editor.do.end()
         'count'

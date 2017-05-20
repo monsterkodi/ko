@@ -314,6 +314,18 @@ class Macro extends Command
                 
                 editor.toggleHeader()
                 
+            when 'col'
+                    
+                num  = args.length > 0 and parseInt(args[0]) or 10
+                step = args.length > 1 and parseInt(args[1]) or 1
+                editor.cursorColumns num, step
+
+            when 'line'
+                    
+                num  = args.length > 0 and parseInt(args[0]) or 10
+                step = args.length > 1 and parseInt(args[1]) or 1
+                editor.cursorLines num, step
+                
             else
                 
                 # 000000000  00000000    0000000   000   000   0000000  00000000   0000000   00000000   00     00    

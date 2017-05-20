@@ -269,7 +269,6 @@ onClose = ->
 
 window.onload = ->
 
-    post.toMain 'windowLoaded', winID
     split.resized()
     info.reload()
     win.on 'close', onClose

@@ -5,7 +5,6 @@
 000       000  000      000             000       000   000  000     000     000   000  000   000
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
-
 { fileName, samePath, joinFileLine, splitFilePos, fileExists, swapExt, path, empty, fs,
   setStyle, post, pos, error, log, str, _
 }          = require 'kxk'
@@ -29,7 +28,16 @@ class FileEditor extends TextEditor
 
         @fontSizeDefault = 16
 
-        super viewElem, features: ['Diffbar', 'Scrollbar', 'Numbers', 'Minimap', 'Meta', 'Autocomplete', 'Brackets', 'Strings']
+        super viewElem, features: [
+            'Diffbar'
+            'Scrollbar'
+            'Numbers'
+            'Minimap'
+            'Meta'
+            'Autocomplete'
+            'Brackets'
+            'Strings'
+        ]
 
         @initPigments()
         @initInvisibles()
@@ -196,8 +204,6 @@ class FileEditor extends TextEditor
             @scroll.bot = @scroll.top-1
             @scroll.to 0
             @scroll.cursorIntoView()
-
-        # log 'restoreScrollCursorsAndSelections', @mainCursor(), @scroll.info()
 
         @updateLayers()
         @numbers?.updateColors()

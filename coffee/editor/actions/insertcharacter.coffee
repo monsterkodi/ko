@@ -5,7 +5,7 @@
 # 000  000  0000       000  000       000   000     000   
 # 000  000   000  0000000   00000000  000   000     000   
 
-{ clamp, _
+{ clamp, reversed, _
 } = require 'kxk'
 
 module.exports =
@@ -47,6 +47,7 @@ module.exports =
         @emitEdit 'insert'
 
     clampCursorOrFillVirtualSpaces: ->
+        
         @do.start()
         if @do.numCursors() == 1
             cursor = @do.cursor 0
@@ -54,8 +55,18 @@ module.exports =
             lineLength = @do.numLines() and @do.line(cursor[1]).length or 0
             x = clamp 0, lineLength, cursor[0]
             @do.setCursors [[x,y]]
-        else # fill spaces between line ends and cursors
-            for c in @do.cursors()
-                if c[0] > @do.line(c[1]).length
-                    @do.change c[1], @do.line(c[1]).splice c[0], 0, _.padStart '', c[0]-@do.line(c[1]).length
+        else 
+            @fillVirtualSpaces()
+            # for c in @do.cursors()
+                # if c[0] > @do.line(c[1]).length
+                    # @do.change c[1], @do.line(c[1]).splice c[0], 0, _.padStart '', c[0]-@do.line(c[1]).length
+        @do.end()
+
+    fillVirtualSpaces: ->
+        
+        # fill spaces between line ends and cursors
+        @do.start() 
+        for c in reversed @do.cursors()
+            if c[0] > @do.line(c[1]).length
+                @do.change c[1], @do.line(c[1]).splice c[0], 0, _.padStart '', c[0]-@do.line(c[1]).length
         @do.end()

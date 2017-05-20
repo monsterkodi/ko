@@ -1,10 +1,10 @@
-
-# 00000000  0000000    000  000000000   0000000   00000000 
-# 000       000   000  000     000     000   000  000   000
-# 0000000   000   000  000     000     000   000  0000000  
-# 000       000   000  000     000     000   000  000   000
-# 00000000  0000000    000     000      0000000   000   000
-
+###
+00000000  0000000    000  000000000   0000000   00000000 
+000       000   000  000     000     000   000  000   000
+0000000   000   000  000     000     000   000  0000000  
+000       000   000  000     000     000   000  000   000
+00000000  0000000    000     000      0000000   000   000
+###
 { fileList, extName, clamp, empty, path, str, error, log, _
 }       = require 'kxk'
 Buffer  = require './buffer'
@@ -15,11 +15,25 @@ class Editor extends Buffer
 
     @actions = null
 
-    # 000  000   000  000  000000000       0000000    0000000  000000000  000   0000000   000   000   0000000  
-    # 000  0000  000  000     000         000   000  000          000     000  000   000  0000  000  000       
-    # 000  000 0 000  000     000         000000000  000          000     000  000   000  000 0 000  0000000   
-    # 000  000  0000  000     000         000   000  000          000     000  000   000  000  0000       000  
-    # 000  000   000  000     000         000   000   0000000     000     000   0000000   000   000  0000000   
+    constructor: (@name) ->
+
+        Editor.initActions() if not Editor.actions?
+            
+        @indentString    = _.padStart "", 4
+        @stickySelection = false
+        @dbg             = false
+        super
+        @do              = new Do @
+        @setupFileType()
+
+    del: ->
+        @do.del()
+    
+    #  0000000    0000000  000000000  000   0000000   000   000   0000000  
+    # 000   000  000          000     000  000   000  0000  000  000       
+    # 000000000  000          000     000  000   000  000 0 000  0000000   
+    # 000   000  000          000     000  000   000  000  0000       000  
+    # 000   000   0000000     000     000   0000000   000   000  0000000   
     
     @initActions: -> 
         
@@ -37,27 +51,7 @@ class Editor extends Buffer
                         
         # too early for log here!            
         # console.log str @actions
-    
-    #  0000000   0000000   000   000   0000000  000000000  00000000   000   000   0000000  000000000   0000000   00000000   
-    # 000       000   000  0000  000  000          000     000   000  000   000  000          000     000   000  000   000  
-    # 000       000   000  000 0 000  0000000      000     0000000    000   000  000          000     000   000  0000000    
-    # 000       000   000  000  0000       000     000     000   000  000   000  000          000     000   000  000   000  
-    #  0000000   0000000   000   000  0000000      000     000   000   0000000    0000000     000      0000000   000   000  
-    
-    constructor: (@name) ->
-
-        Editor.initActions() if not Editor.actions?
             
-        @indentString    = _.padStart "", 4
-        @stickySelection = false
-        @dbg             = false
-        super
-        @do              = new Do @
-        @setupFileType()
-
-    del: ->
-        @do.del()
-        
     # 000000000  000   000  00000000   00000000
     #    000      000 000   000   000  000     
     #    000       00000    00000000   0000000 
@@ -80,7 +74,7 @@ class Editor extends Buffer
             "'":  'single'
             '"':  'double'
         switch @fileType
-            when 'md' then @stringCharacters['*'] = 'bold'
+            when 'md'   then @stringCharacters['*'] = 'bold'
             when 'noon' then @stringCharacters['|'] = 'pipe'
 
         # _______________________________________________________________ brackets
@@ -90,7 +84,7 @@ class Editor extends Buffer
                 '[': ']'
                 '{': '}'
                 '(': ')'
-            close: {} # reverse map, not needed?
+            close:   {}
             regexps: []
                 
         switch @fileType
@@ -130,7 +124,10 @@ class Editor extends Buffer
         @multiComment = switch @fileType
             when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug' then open: '/*',   close: '*/'
             when 'html'                                 then open: '<!--', close: '-->'
-            else                                             open: '###',  close: '###'
+            when 'coffee'                               then open: '###',  close: '###'
+            else null
+           
+        @syntax.setFileType @fileType
             
         if oldType != @fileType
             @emit 'fileTypeChanged', @fileType

@@ -58,11 +58,12 @@ class Render
         cw = size.charWidth
         lh = size.lineHeight
         for c in cs
-            tx = c[0] * cw + size.offsetX
-            ty = c[1] * lh
+            tx  = c[0] * cw + size.offsetX
+            ty  = c[1] * lh
             cls = ""
             cls = c[2] if c.length > 2
-            h += "<span class=\"cursor #{cls}\" style=\"transform:translate3d(#{tx}px,#{ty}px,0); height:#{lh}px\"></span>"
+            zi  = cls != 'virtual' and 1 or 0
+            h += "<span class=\"cursor #{cls}\" style=\"z-index:#{zi};transform:translate3d(#{tx}px,#{ty}px,0); height:#{lh}px\"></span>"
             i += 1
         h
                 
@@ -75,7 +76,7 @@ class Render
     @selection: (ss, size, clss='selection') => # ss: [ [lineIndex, [startIndex, endIndex]], ... ]  (lineIndex relative to view)
         
         h = ""
-        p = null
+        p = null      
         n = null
         for si in [0...ss.length]
             s = ss[si]
