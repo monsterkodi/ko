@@ -304,6 +304,12 @@ class TextEditor extends Editor
         div = @lineDivs[oi]
         div.replaceChild @spanCache[li], div.firstChild
         
+    refreshLines: (top, bot) ->
+        
+        for li in [top..bot]
+            @syntax.getDiss li, true
+            @updateLine li
+        
     #  0000000  000   000   0000000   000   000     000      000  000   000  00000000   0000000
     # 000       000   000  000   000  000 0 000     000      000  0000  000  000       000
     # 0000000   000000000  000   000  000000000     000      000  000 0 000  0000000   0000000

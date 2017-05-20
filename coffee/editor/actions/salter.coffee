@@ -1,9 +1,10 @@
-
-#  0000000   0000000   000      000000000  00000000  00000000   
-# 000       000   000  000         000     000       000   000  
-# 0000000   000000000  000         000     0000000   0000000    
-#      000  000   000  000         000     000       000   000  
-# 0000000   000   000  0000000     000     00000000  000   000  
+###
+ 0000000   0000000   000      000000000  00000000  00000000   
+000       000   000  000         000     000       000   000  
+0000000   000000000  000         000     0000000   0000000    
+     000  000   000  000         000     000       000   000  
+0000000   000   000  0000000     000     00000000  000   000  
+###
 
 {log,_
 }     = require 'kxk'  
@@ -30,7 +31,9 @@ module.exports =
     startSalter: (opt) ->
         
         cp = @cursorPos()
+        
         if not opt?.word and rgs = @salterRangesAtPos cp # edit existing header
+            
             cols = @columnsInSalt (@textInRange r for r in rgs)
             ci = 0
             while ci < cols.length and cp[0] > cols[ci]
@@ -40,7 +43,9 @@ module.exports =
             newCursors = ([col, r[0]] for r in rgs)
             @do.setCursors newCursors, main: 'last'
             @do.end()
+            
         else # create new header
+            
             word = opt?.word ? @selectionTextOrWordAtCursor().trim()
             if @textInRange(@rangeForLineAtIndex cp[1]).trim().length
                 indt = _.padStart '', @indentationAtLineIndex cp[1]
@@ -97,7 +102,9 @@ module.exports =
     # 0000000    00000000  0000000  00000000     000     00000000  
     
     deleteSalterCharacter: ->
+        
         return if not @salterMode
+        
         @do.start()
         cp = @do.mainCursor()
         if rgs = @salterRangesAtPos cp
@@ -141,7 +148,7 @@ module.exports =
     
     salterRangesAtPos: (p) ->
         
-        salterRegExp = new RegExp("^\\s*#{@lineComment}[0\\s]+$")
+        salterRegExp = new RegExp "^\\s*#{@lineComment}?\\s*0[0\\s]+$"
         rgs = []
         li = p[1]
         while rgs.length < 5 and li < @do.numLines() and salterRegExp.test @do.line(li)

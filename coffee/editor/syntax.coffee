@@ -49,7 +49,6 @@ class Syntax
         
     fillDiss: (bot) ->
         
-        console.log 'fillDiss', bot
         for li in [0..bot]
             @getDiss li
 
@@ -65,7 +64,7 @@ class Syntax
             
             [di,li,ch] = [change.doIndex, change.newIndex, change.change]
             
-            switch change.change
+            switch ch
                 
                 when 'changed'  
                     
@@ -80,7 +79,7 @@ class Syntax
                     
                     @balancer.insertLine di
                     @diss.splice di, 0, @newDiss di
-                                
+
     #  0000000  000      00000000   0000000   00000000
     # 000       000      000       000   000  000   000
     # 000       000      0000000   000000000  0000000

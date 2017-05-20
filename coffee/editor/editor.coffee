@@ -127,6 +127,11 @@ class Editor extends Buffer
             when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug' then '//'
             else '#'
             
+        @multiComment = switch @fileType
+            when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug' then open: '/*',   close: '*/'
+            when 'html'                                 then open: '<!--', close: '-->'
+            else                                             open: '###',  close: '###'
+            
         if oldType != @fileType
             @emit 'fileTypeChanged', @fileType
                 

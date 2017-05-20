@@ -237,14 +237,18 @@ class Balancer
         while p < text.length
 
             ch = text[p++]
-            if escapes and ch != '\\'
-                if escapes > 0 and escapes % 2
+            
+            top = _.last stack
+            
+            if ch == '\\' then escapes++
+            else
+                if ch == ' ' then continue
+                if escapes
+                    if escapes % 2 and (ch != "#" or top and top.region.clss != 'interpolation')
+                        escapes = 0 # character is escaped, 
+                        continue    # just continue to next
                     escapes = 0
-                    continue
-                escapes = 0
-            if ch == ' ' then continue
 
-            top  = _.last stack
             rest = text.slice p-1
 
             if not top or top.region.clss == 'interpolation'
@@ -262,7 +266,8 @@ class Balancer
 
                 else if not top and rest.startsWith @regions.lineComment.open
                     pushComment @regions.lineComment
-                    return result
+                    # return result
+                    break
 
                 if ch == @regions.regexp?.open
                     pushRegion @regions.regexp
@@ -275,8 +280,6 @@ class Balancer
                     continue
 
             else # string or regexp
-
-                if ch == '\\' then escapes++
 
                 if top.region.clss in ['string double', 'string triple']
                     if rest.startsWith @regions.interpolation.open
@@ -297,6 +300,8 @@ class Balancer
             @setUnbalanced li, keepUnbalanced
             if stack.length
                 result = result.concat @dissForClass text, _.last(result).start + _.last(result).match.length, _.last(stack).region.clss
+        else
+            @setUnbalanced li
         # else if result.length
             # console.log "clean? #{li} result", str(result)
             

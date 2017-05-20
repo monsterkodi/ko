@@ -80,7 +80,6 @@ saveStash = ->
 restoreWin = ->
     
     if bounds = window.stash.get 'bounds'
-        console.log 'set bounds', str bounds
         win.setBounds bounds
         
     if window.stash.get 'devTools'
@@ -269,7 +268,7 @@ onClose = ->
 #  0000000   000   000  0000000   0000000   000   000  0000000    
 
 window.onload = ->
-    console.log 'onload'
+
     post.toMain 'windowLoaded', winID
     split.resized()
     info.reload()
@@ -325,7 +324,6 @@ loadFile = (file, opt={}) ->
         file = resolve file
         
     if file != editor.currentFile or opt?.reload
-        console.log 'loadFile', file, str opt
         if file? and not fileExists file
             file = null
             
