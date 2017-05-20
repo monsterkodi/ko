@@ -47,11 +47,11 @@ class Balancer
         merged = []
         p = 0
 
-        addDiss = (start, end) =>
+        addDiss = (start, end, force) =>
             
             slice = text.slice start, end
             Syntax = require './syntax'
-            if unbalanced? and _.last(unbalanced).region.clss != 'interpolation'
+            if not force and unbalanced? and _.last(unbalanced).region.clss != 'interpolation'
                 diss = @dissForClass slice, 0, _.last(unbalanced).region.clss
             else
                 diss = Syntax.dissForTextAndSyntax slice, @syntax.name
@@ -64,7 +64,7 @@ class Balancer
             if region.start > p
                 addDiss p, region.start
             if region.clss == 'interpolation'
-                addDiss region.start, region.start+region.match.length
+                addDiss region.start, region.start+region.match.length, true
             else
                 merged.push region
             p = region.start + region.match.length
@@ -293,6 +293,8 @@ class Balancer
             @setUnbalanced li, keepUnbalanced
             if stack.length
                 result = result.concat @dissForClass text, _.last(result).start + _.last(result).match.length, _.last(stack).region.clss
+        # else if result.length
+            # console.log "clean? #{li} result", str(result)
             
         result
 
