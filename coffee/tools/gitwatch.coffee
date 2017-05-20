@@ -22,7 +22,7 @@ class GitWatch
 
         return if not file?
         
-        if gitDir = gitRoot file
+        gitRoot file, (gitDir) =>
             
             gitFile = path.join gitDir, '.git', 'HEAD'
             
