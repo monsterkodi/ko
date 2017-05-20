@@ -30,7 +30,7 @@
 ([~\/\.\-\_\w]+)(\.sh[\d\:]*\b)        . sh      . sh.extname
 ([~\/\.\-\_\w]+)(\.md[\d\:]*\b)        . md      . md.extname
 ([~\/\.\-\_\w]+)(\.txt[\d\:]*\b)       . txt     . txt.extname
-([~\/\.@-_\w]+)(\.png|\.jpg|\.gif)     . image . image.extname
-([~\/\.@-_\w]+)(\.pxm|\.tiff?|\.icns)  . pic . pic.extname
+([~\/\.@-_\w]+)(\.png|\.jpg)           . image . image.extname
+([~\/\.@-_\w]+)(\.pxm|\.tiff?|\.icns|\.gif)  . pic . pic.extname
 
 [\/\:]                                 separator
