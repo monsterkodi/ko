@@ -48,9 +48,10 @@ class Balancer
         p = 0
 
         addDiss = (start, end) =>
+            
             slice = text.slice start, end
             Syntax = require './syntax'
-            if unbalanced?
+            if unbalanced? and _.last(unbalanced).region.clss != 'interpolation'
                 diss = @dissForClass slice, 0, _.last(unbalanced).region.clss
             else
                 diss = Syntax.dissForTextAndSyntax slice, @syntax.name
@@ -121,10 +122,9 @@ class Balancer
         result  = []
 
         unbalanced     = null
-        keepUnbalanced = null
+        keepUnbalanced = []
         
         if unbalanced = @getUnbalanced li            
-            # console.log "parse #{li}", str unbalanced
             for lineStartRegion in unbalanced
                 stack.push 
                     start:  0
@@ -209,9 +209,9 @@ class Balancer
             if top? and rest.startsWith top.region.close
 
                 pushTop()
-                popped = stack.pop()
-                if popped.fake
-                    keepUnbalanced = 
+                stack.pop()
+                if top.fake
+                    keepUnbalanced.unshift
                         start:  p-1
                         region: top.region
 
@@ -282,13 +282,17 @@ class Balancer
                 if popRegion rest
                     continue
              
-        stack = stack.filter (s) -> not s.fake
+        realStack = stack.filter (s) -> not s.fake
         
-        if stack.length
-            # console.log "unbalanced? #{li}", str stack
-            @setUnbalanced li, _.last stack
-        else if keepUnbalanced
+        if realStack.length
+            # console.log "unbalanced #{li} stack:", str(realStack), '\nresult:', str(result)                
+            @setUnbalanced li, realStack
+            result = result.concat @dissForClass text, _.last(result).start + _.last(result).match.length, _.last(realStack).region.clss
+        else if keepUnbalanced.length
+            # console.log "keeper #{li} keepUnbalanced:", str(keepUnbalanced), '\nresult:', str(result)                
             @setUnbalanced li, keepUnbalanced
+            if stack.length
+                result = result.concat @dissForClass text, _.last(result).start + _.last(result).match.length, _.last(stack).region.clss
             
         result
 
@@ -299,6 +303,7 @@ class Balancer
     #  0000000   000   000  0000000    000   000  0000000  000   000  000   000   0000000  00000000  0000000
 
     getUnbalanced: (li) ->
+        
         stack = []
         for u in @unbalanced
             if u.line < li
@@ -315,15 +320,18 @@ class Balancer
             
         null
 
-    setUnbalanced: (li, startRegion) ->
+    setUnbalanced: (li, stack) ->
         
+        # console.log "setUnbalanced #{li} stack:", str(stack)
         _.remove @unbalanced, (u) -> u.line == li
-        if startRegion?
-            @unbalanced.push 
-                line:  li
-                start: startRegion.start
-                region:startRegion.region
-            @unbalanced.sort (a,b) -> a.line - b.line
+        if stack?
+            _.each stack, (s) -> s.line = li
+            @unbalanced = @unbalanced.concat stack
+            @unbalanced.sort (a,b) ->
+                if a.line == b.line
+                    a.start - b.start
+                else
+                    a.line - b.line
             @dumpUnbalanced()
 
     deleteLine: (li) ->
