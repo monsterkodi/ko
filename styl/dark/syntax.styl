@@ -126,10 +126,11 @@
     color           #f80
 
 .syntax.cond
+.keyword.function.call
 .keyword
-    color           #aaf // !important
+    color           #aaf
     &.null
-        color       #a00 // !important
+        color       #a00
 
 // 00     00   0000000    0000000  00000000    0000000   
 // 000   000  000   000  000       000   000  000   000  
@@ -187,7 +188,8 @@
     color           #f08
 
 .keyword.return
-    color           #c0c !important
+.keyword.return.function.call    
+    color           #c0c
     
 //  0000000   0000000   00     00  00     00  00000000  000   000  000000000
 // 000       000   000  000   000  000   000  000       0000  000     000
@@ -256,7 +258,7 @@
 // 000 0 000  000   000
 // 000   000  0000000
 
-.md
+.markdown
     &.h1
         color       #ff0
     &.h2
@@ -274,7 +276,8 @@
     &.li3
         color       #080
     &.bold
-        color       #ff0
+        // color       #ff0
+        font-weight    bold
 
 .found
     text-decoration  underline

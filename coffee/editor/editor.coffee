@@ -127,17 +127,12 @@ class Editor extends Buffer
                     lineRegExp:   /^(\s+when|\s*if|\s*else\s+if\s+)(?!.*\sthen\s)|(^|\s)(else\s*$|switch\s|for\s|while\s|class\s)/
                 
         # _______________________________________________________________ comment
+                   
+        @syntax.setFileType @fileType 
         
-        @lineComment = switch @fileType
-            when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug' then '//'
-            else '#'
-            
-        @multiComment = switch @fileType
-            when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug' then open: '/*',   close: '*/'
-            when 'html'                                 then open: '<!--', close: '-->'
-            else                                             open: '###',  close: '###'
-           
-        @syntax?.setFileType @fileType            
+        @lineComment = @syntax.balancer.regions.lineComment.open
+        @multiComment = @syntax.balancer.regions.multiComment
+        
                 
     #  0000000  00000000  000000000         000      000  000   000  00000000   0000000  
     # 000       000          000            000      000  0000  000  000       000       

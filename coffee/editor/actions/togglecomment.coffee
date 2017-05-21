@@ -48,6 +48,7 @@ module.exports =
                 @do.change r[0], @do.line(r[0]).splice il, @lineComment.length+1
             @do.insert _.last( rgs)[0]+1, indent + @multiComment.close
             @do.insert _.first(rgs)[0],   indent + @multiComment.open
+            log @syntax.name, @multiComment
             @moveCursorsDown()
             @moveCursorsLeft false, @lineComment.length+1
         @do.end()

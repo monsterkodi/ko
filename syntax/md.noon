@@ -8,11 +8,11 @@
 
 # header
 
-(^#\s+)(.+)                             . md.marker.h1   . md.h1
-(^##\s+)(.+)                            . md.marker.h2   . md.h2
-(^###\s+)(.+)                           . md.marker.h3   . md.h3
-(^####+\s+)(.+)                         . md.marker.h4   . md.h4
-(^#####+\s+)(.+)                        . md.marker.h5   . md.h5
+# (^#\s+)(.+)                             . md.marker.h1   . md.h1
+# (^##\s+)(.+)                            . md.marker.h2   . md.h2
+# (^###\s+)(.+)                           . md.marker.h3   . md.h3
+# (^####+\s+)(.+)                         . md.marker.h4   . md.h4
+# (^#####+\s+)(.+)                        . md.marker.h5   . md.h5
 
 # path
 
@@ -28,9 +28,9 @@
 
 # li
 
-(^[-\*]\s+)(.+)                         . md.li1.marker . md.li1
-(^\s{1,4}[-\*]\s)(.+)                   . md.li2.marker . md.li2
-(^\s{5,}[-\*]\s)(.+)                    . md.li3.marker . md.li3
+# (^[-\*]\s+)(.+)                         . md.li1.marker . md.li1
+# (^\s{1,4}[-\*]\s)(.+)                   . md.li2.marker . md.li2
+# (^\s{5,}[-\*]\s)(.+)                    . md.li3.marker . md.li3
 
 # pre
 
@@ -38,6 +38,4 @@
 
 # bold
 
-(\*+)([^\*]+)(\*+)                      . md.bold.marker . md.bold . md.bold.marker
-
-(\<!--|--\>)                              comment.marker
+(\*+)([^\*]+)(\*+)                      . markdown.bold.marker . markdown.bold . markdown.bold.marker

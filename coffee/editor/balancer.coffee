@@ -1,9 +1,9 @@
 ###
-  0000000     0000000   000       0000000   000   000   0000000  00000000  00000000
-  000   000  000   000  000      000   000  0000  000  000       000       000   000
-  0000000    000000000  000      000000000  000 0 000  000       0000000   0000000
-  000   000  000   000  000      000   000  000  0000  000       000       000   000
-  0000000    000   000  0000000  000   000  000   000   0000000  00000000  000   000
+0000000     0000000   000       0000000   000   000   0000000  00000000  00000000
+000   000  000   000  000      000   000  0000  000  000       000       000   000
+0000000    000000000  000      000000000  000 0 000  000       0000000   0000000
+000   000  000   000  000      000   000  000  0000  000       000       000   000
+0000000    000   000  0000000  000   000  000   000   0000000  00000000  000   000
 ###
 { empty, str, log, error, _
 }      = require 'kxk'
@@ -31,7 +31,7 @@ class Balancer
             
         multiComment = switch fileType
             when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug' then open: '/*',   close: '*/'
-            when 'html'                                 then open: '<!--', close: '-->'
+            when 'html', 'md'                           then open: '<!--', close: '-->'
             else                                             open: '###',  close: '###'
         
         @regions =
@@ -45,7 +45,9 @@ class Balancer
             open:  multiComment.open
             close: multiComment.close
             multi: true
-                
+
+        @headerRegExp = new RegExp("^(\\s*#{_.escapeRegExp @regions.lineComment.open}\\s*)?(\\s*0[0\\s]+)$")
+            
         switch fileType
             
             when 'coffee'
@@ -54,7 +56,18 @@ class Balancer
                 
             when 'noon'
                 @regions.lineComment.solo = true # only spaces before comments allowed
-
+                
+            when 'md'
+                @regions.header1 = clss: 'markdown h1', open: '#', close: null, solo: true 
+                @regions.header2 = clss: 'markdown h2', open: '##', close: null, solo: true 
+                @regions.header3 = clss: 'markdown h3', open: '###', close: null, solo: true 
+                @regions.header4 = clss: 'markdown h4', open: '####', close: null, solo: true 
+                @regions.header5 = clss: 'markdown h5', open: '#####', close: null, solo: true                     
+                
+                @regions.listitem1 = clss: 'markdown li1', open: '-', close: null, solo: true,         maxX:0
+                @regions.listitem2 = clss: 'markdown li2', open: '-', close: null, solo: true, minX:1, maxX:4 
+                @regions.listitem3 = clss: 'markdown li3', open: '-', close: null, solo: true, minX:5
+                    
     # 00     00  00000000  00000000    0000000   00000000
     # 000   000  000       000   000  000        000
     # 000000000  0000000   0000000    000  0000  0000000
@@ -117,7 +130,7 @@ class Balancer
     
     dissForClass: (text, start, clss) ->
 
-        if new RegExp("^(\\s*\\#{@regions.lineComment.open}\\s*)?(\\s*0[0\\s]+)$").test text
+        if @headerRegExp.test text
             clss += ' header'
         
         diss = []

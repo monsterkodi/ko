@@ -5,10 +5,9 @@
      000  000   000  000         000     000       000   000  
 0000000   000   000  0000000     000     00000000  000   000  
 ###
-
-{log,_
-}     = require 'kxk'  
-salt  = require '../../tools/salt'  
+{ log, _
+}    = require 'kxk'
+salt = require '../../tools/salt'
 
 module.exports =
     
@@ -148,16 +147,18 @@ module.exports =
     
     salterRangesAtPos: (p) ->
         
-        salterRegExp = new RegExp "^\\s*#{@lineComment}?\\s*0[0\\s]+$"
+        # salterRegExp = new RegExp "^(\\s*#{_.escapeRegExp @lineComment})?\\s*0[0\\s]+$"
+        salterRegExp = @syntax.balancer.headerRegExp
         rgs = []
         li = p[1]
-        while rgs.length < 5 and li < @do.numLines() and salterRegExp.test @do.line(li)
-            rgs.push @do.rangeForLineAtIndex li
+        state = @do.isDoing() and @do.state or @state
+        while rgs.length < 5 and li < state.numLines() and salterRegExp.test state.line(li)
+            rgs.push [li, [0, state.line(li).length]] 
             li += 1
         return if not rgs.length
         li = p[1]-1
-        while rgs.length < 5 and li >= 0 and salterRegExp.test @do.line(li)
-            rgs.unshift @do.rangeForLineAtIndex li
+        while rgs.length < 5 and li >= 0 and salterRegExp.test state.line(li)
+            rgs.unshift [li, [0, state.line(li).length]]
             li -= 1
         return rgs if rgs.length == 5
       

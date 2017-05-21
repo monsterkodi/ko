@@ -5,10 +5,10 @@
 # 000   000  000   000     000     000   000  000       000   000  000 0 000  000        000      000          000     000     
 # 000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
 
-{ stopEvent, upAttr, clamp, post, empty, elem, error, log, $, _
-}        = require 'kxk'
-Indexer  = require '../main/indexer'
-event    = require 'events'
+{ error, log, stopEvent, upAttr, clamp, post, empty, elem, $, _
+}       = require 'kxk'
+Indexer = require '../main/indexer'
+event   = require 'events'
 
 class Autocomplete extends event
 

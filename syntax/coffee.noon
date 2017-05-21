@@ -92,7 +92,7 @@ new\s+(\w+)                           class.callee
     keyword
     none
 
-__dirname|__filename                  keyword
+__dirname|__filename|\+\+|\-\-        keyword
 
 #number
 
