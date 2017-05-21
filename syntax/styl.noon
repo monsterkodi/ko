@@ -56,8 +56,3 @@
 
 (\b\d+\.\d+\b)                number.float
 (?:^|[^\.\"\'\w])([\+\-]?)(\d+)(px|%)?  . number.int.sign . number.int . number.marker                    
-
-# comments
-
-\/\*|\*\/                     comment
-(\/\/)(.*)                  . comment.marker . comment

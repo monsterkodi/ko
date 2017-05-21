@@ -27,7 +27,7 @@ ko
 # bool
 
 true                           bool.true
-# false                        bool.false 
+false                          bool.false 
 ([\!])\w+                    . operator.negate
 
 # punctuation
@@ -84,8 +84,3 @@ this                           keyword.this
     number.int.sign
     number.int
     
-# comments
-
-# (\/\/+)\s*(.*)               . comment.marker . comment
-# (\/\*)(.*)(\*\/)             . comment.marker . comment . comment.marker
-

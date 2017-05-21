@@ -5,7 +5,6 @@
 # 000   000     000     000 0 000  000    
 # 000   000     000     000   000  0000000
 
-
 # braces
 
 [\(\)\{\}]                     punctuation.marker
@@ -46,9 +45,4 @@
 (rgba?\s*\()([^\)]+)(\))     . module.marker . module . module.marker
 \s(red|green|blue|yellow|magenta|cyan|black|gray|white|orange)(?:\s|$)   module
 
-# comments
-
-<!--|-->                      comment.marker
-(<!--)(.*)                  . comment.marker . comment
-(.*)(-->)                   . comment . comment.marker
 

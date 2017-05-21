@@ -40,7 +40,3 @@ set\s+(\w+)                    property
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
     number.int.sign
     number.int
-
-# # comments
-
-# (?:^|[^\$\#]+)(\#+)(.*)           . comment.marker . comment

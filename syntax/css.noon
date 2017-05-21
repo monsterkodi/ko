@@ -44,8 +44,3 @@
 # punctuation
 [\,\.\;\&]                      marker
 
-# comments
-
-\/\*|\*\/                     comment
-(\/\/)(.*)                  . comment.marker . comment
-

@@ -88,7 +88,3 @@ __name__|__class__  keyword
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
     number.int.sign
     number.int
-
-# comments
-
-# (?:^|\s+)(#+)([^\{].*|$)     . comment.marker . comment

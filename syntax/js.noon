@@ -74,8 +74,3 @@ function                       function
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
     number.int.sign
     number.int
-
-# comments
-
-# \*/                            comment.marker
-# (//|/\*|^\s+\*)(.*)          . comment.marker . comment
