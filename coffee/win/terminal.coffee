@@ -92,17 +92,21 @@ class Terminal extends TextEditor
         if meta.diss?
             
             @appendLineDiss syntax.lineForDiss(meta.diss), meta.diss 
-            
+                        
         else if meta.clss == 'salt'
             
             @appendMeta clss: 'spacer'
             for l in salt(meta.text).split '\n'
-                @appendMeta clss: 'spacer', diss: syntax.dissForTextAndSyntax l, 'ko'
+                @appendMeta clss: 'spacer', text: '# '+l
             @appendMeta clss: 'spacer'
             
         else if meta.clss == 'termCommand'
             
             @appendLineDiss meta.command, syntax.dissForTextAndSyntax meta.command, 'term'
+
+        else if meta.text?
+            
+            @appendLineDiss meta.text
             
         else
             

@@ -557,12 +557,12 @@ class Main
 # 000   000  000        000        000  000   000  000  0000
 # 000   000  000        000        000   0000000   000   000
 
-app.on 'open-file', (event, path) -> 
+app.on 'open-file', (event, file) -> 
     
     if not main?
-        openFiles.push path
+        openFiles.push file
     else
-        main.createWindow file:path
+        main.createWindow file:file
     event.preventDefault()
 
 app.on 'ready', -> 

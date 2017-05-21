@@ -83,7 +83,6 @@ describe 'matchr', ->
         it 'brackets', ->
             config = matchr.config '[^\w\s]+': 'syntax', '[{]': 'bracket.open', '[}]': 'bracket.close'
             ranges = matchr.ranges config, '{}'
-            # log 'ranges:', ranges
             expect(ranges) .to.eql [
                 index: 0
                 start: 0
