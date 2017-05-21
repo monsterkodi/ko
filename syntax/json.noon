@@ -6,10 +6,6 @@
 #   0000000   0000000    0000000   000   000
 
 
-# keys
-
-("[^"]*")\s*:                   class
-
 # number
 
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
@@ -27,10 +23,6 @@
 
 # url
 
-# "(\S+://)(\S+)"
-                                # string.marker.double
-                                # string.value.double
-
-# dim
-
-[\:\,\{\}\[\]\>\<\=\^\.\/\|\"]  marker
+"(\S+://)(\S+)"
+                                directory.marker
+                                directory

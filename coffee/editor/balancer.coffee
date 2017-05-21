@@ -274,11 +274,18 @@ class Balancer
             if ch == '\\' then escapes++
             else
                 if ch == ' ' then continue
+                
                 if escapes
                     if escapes % 2 and (ch != "#" or top and top.region.clss != 'interpolation')
                         escapes = 0 # character is escaped, 
                         continue    # just continue to next
                     escapes = 0
+                    
+                if ch == ':' 
+                    if @syntax.name == 'json' # highlight json dictionary keys
+                        if _.last(result).clss == 'string double marker'
+                            if result.length > 1 and result[result.length-2].clss == 'string double'
+                                result[result.length-2].clss = 'string dictionary key'
 
             rest = text.slice p-1
 
@@ -333,8 +340,6 @@ class Balancer
                 result = result.concat @dissForClass text, _.last(result).start + _.last(result).match.length, _.last(stack).region.clss
         else
             @setUnbalanced li
-        # else if result.length
-            # console.log "clean? #{li} result", str(result)
             
         result
 
