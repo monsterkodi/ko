@@ -11,7 +11,7 @@
 
 # tags
 
-\b(doctype|html|body|section|header|footer|meta|script|style|head|ul|li|a|b|br|p|center|table|title|link|nav|tr|th|td|div|span|img|h\d|dt|blockquote|pre|hr|svg|path)\b   keyword
+(?:^|\s)(doctype|html|body|section|header|footer|meta|script|style|head|ul|li|a|b|br|p|center|table|title|link|nav|tr|th|td|div|span|img|h\d|dt|blockquote|require|pre|hr|svg|path)(?:[\s\#\(\.]|$)   keyword
 
 # punctuation
 
@@ -19,7 +19,7 @@
 
 # id
 
-(#)(\w\S*)                   . function.marker . function
+(#)([\w\_\-]+)               . keyword.null . function
 (\.)(\w\S*)                  . class.marker . class
 
 # attributes
@@ -42,7 +42,3 @@
 (#)([a-fA-F0-9]{6})          . module.marker . module
 (rgba?\s*\()([^\)]+)(\))     . module.marker . module . module.marker
 \s(red|green|blue|yellow|magenta|cyan|black|gray|white|orange)(?:\s|$)   module
-
-# comments
-
-# (\/\/)(.*)                   . comment.marker . comment 

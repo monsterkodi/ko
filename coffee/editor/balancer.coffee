@@ -286,7 +286,12 @@ class Balancer
                         if _.last(result).clss == 'string double marker'
                             if result.length > 1 and result[result.length-2].clss == 'string double'
                                 result[result.length-2].clss = 'string dictionary key'
-
+                                result.push
+                                    start: p-1
+                                    match: ch
+                                    clss:  'dictionary marker'
+                                continue
+                    
             rest = text.slice p-1
 
             if not top or top.region.clss == 'interpolation'
