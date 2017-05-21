@@ -8,24 +8,23 @@
 
 # braces
 
-[\(\)\{\}]                     punctuation.marker
+[\(\)\{\}]                     punctuation #.marker
 
 # tags
 
-\b(html|body|section|header|footer|ul|li|a|b|br|p|center|table|title|link|nav|tr|th|td|div|span|img|h\d|dt|blockquote|pre|hr|svg|path|absolute|relative|fixed|scroll|bold|hidden|none|pointer)\b   keyword
-\b(color|opacity|max-|min-|box-?|inline-|block|no-|drag|solid|static|transparent|auto|nowrap|sizing|width|decoration|align|position|pointer-events|radius|height|width|outline|overflow|family|weight|cursor|display|background|size|content|white-space|transition|transform|z-index)\b  keyword
-\b(overflow-?[xy]?|border-?|vertical-|bottom|left|right|top|font|text|margin|padding)(-?)\b  
-                               keyword
+(?:^|\s)(html|body|section|header|footer|ul|li|a|b|br|p|center|table|title|link|nav|tr|th|td|div|span|img|h\d|dt|blockquote|pre|hr|svg|path|absolute|relative|fixed|scroll|bold|underline|hidden|none|pointer)\b   keyword
+(?:^|\s)(bottom|right|left|top|color|block|opacity|drag|solid|static|transparent|auto|nowrap|sizing|position|pointer-events|width|height|width|outline|float|overflow||cursor|display|content|white-space|transition|transform|z-index|no-drag)(?:[\:\s]|$)  keyword
+(?:^|\s)(align|animation|background|border|box|break|column|flex|font|grid|line|list|margin|max|min|outline|overflow|vertical|padding|inline|text|transform|word|block|-webkit)(?:[\-\:\s]|$)   keyword
+
+(-)(x|y|align|left|right|top|bottom|delay|direction|duration|decoration|grow|flow|fill|blend|mode|timing|function|clip|color|style|family|weight|image|position|origin|repeat|height|width|size|sizing|radius|zoom|area|column|type|start|end|block|content|inline|user|select|app|region)(?=[\-\:\s]|$)
                                keyword.marker
-(-webkit-[\w\-]+)              keyword
+                               keyword
+                               
+!important                     method
 
 # none
 
 \b(none)\b                     null
-
-# array index
-
-\[(\d+)\]                      value.int
 
 # punctuation
 
@@ -34,7 +33,7 @@
 # id
 
 (#)(\D[\S]{3,})              . class.marker . class
-&                              marker
+&                              keyword.null
 
 ^\s*\S+\s*=                    variable
 
@@ -55,9 +54,8 @@
 
 #number
 
-# [^#]\-?\d+\b                   value.number.int
-(\b\d+\.\d+\b)                 number.float
-(\-?\d+)(px|%)?              . number.int . number.marker                    
+(\b\d+\.\d+\b)                number.float
+(?:^|[^\.\"\'\w])([\+\-]?)(\d+)(px|%)?  . number.int.sign . number.int . number.marker                    
 
 # comments
 
