@@ -124,8 +124,7 @@ class Editor extends Buffer
         @multiComment = switch @fileType
             when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug' then open: '/*',   close: '*/'
             when 'html'                                 then open: '<!--', close: '-->'
-            when 'coffee'                               then open: '###',  close: '###'
-            else null
+            else                                             open: '###',  close: '###'
            
         log @fileType, @lineComment
         @syntax.setFileType @fileType

@@ -42,7 +42,7 @@ module.exports =
             @do.delete _.last(rgs)[0]
             @moveCursorsUp()
             @moveCursorsRight false, @lineComment.length+1            
-        else
+        else if @multiComment
             # convert to multi comment
             for r in rgs
                 @do.change r[0], @do.line(r[0]).splice il, @lineComment.length+1
