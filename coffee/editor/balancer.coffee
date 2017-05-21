@@ -38,7 +38,7 @@ class Balancer
             # regexp:        clss: 'regexp',         open: '/',   close: '/'
             singleString:  clss: 'string single',  open: "'",   close: "'"
             doubleString:  clss: 'string double',  open: '"',   close: '"'
-            lineComment:   clss: 'comment',        open: lineComment, close: null
+            lineComment:   clss: 'comment',        open: lineComment, close: null, force: true
 
         @regions.multiComment = 
             clss:  'comment triple'
@@ -67,7 +67,9 @@ class Balancer
                 @regions.listitem1 = clss: 'markdown li1', open: '-', close: null, solo: true,         maxX:0
                 @regions.listitem2 = clss: 'markdown li2', open: '-', close: null, solo: true, minX:1, maxX:4 
                 @regions.listitem3 = clss: 'markdown li3', open: '-', close: null, solo: true, minX:5
-                    
+
+        @openRegions = _.filter @regions, (r) -> r.close == null
+                
     # 00     00  00000000  00000000    0000000   00000000
     # 000   000  000       000   000  000        000
     # 000000000  0000000   0000000    000  0000  0000000
@@ -179,25 +181,6 @@ class Balancer
                     region: lineStartRegion.region
                     fake:   true
         
-        #  0000000   0000000   00     00  00     00  00000000  000   000  000000000
-        # 000       000   000  000   000  000   000  000       0000  000     000
-        # 000       000   000  000000000  000000000  0000000   000 0 000     000
-        # 000       000   000  000 0 000  000 0 000  000       000  0000     000
-        #  0000000   0000000   000   000  000   000  00000000  000   000     000
-
-        pushComment = (comment) =>
-
-            start = p-1+comment.open.length
-
-            result.push
-                start: p-1
-                match: comment.open
-                clss:  comment.clss + ' marker'
-
-            commentText = text.slice start
-            if commentText.length
-                result = result.concat @dissForClass text, start, comment.clss
-                    
         # 00000000   000   000   0000000  000   000     000000000   0000000   00000000
         # 000   000  000   000  000       000   000        000     000   000  000   000
         # 00000000   000   000  0000000   000000000        000     000   000  00000000
@@ -225,6 +208,24 @@ class Balancer
                     if top.match.length
                         result.push top
 
+        # 00000000   0000000   00000000    0000000  00000000  
+        # 000       000   000  000   000  000       000       
+        # 000000    000   000  0000000    000       0000000   
+        # 000       000   000  000   000  000       000       
+        # 000        0000000   000   000   0000000  00000000  
+
+        pushForceRegion = (region) =>
+
+            start = p-1+region.open.length
+
+            result.push
+                start: p-1
+                match: region.open
+                clss:  region.clss + ' marker'
+
+            if start < text.length-1
+                result = result.concat @dissForClass text, start, region.clss
+                    
         # 00000000   00000000   0000000   000   0000000   000   000
         # 000   000  000       000        000  000   000  0000  000
         # 0000000    0000000   000  0000  000  000   000  000 0 000
@@ -254,7 +255,7 @@ class Balancer
 
             top = _.last stack
 
-            if top? and rest.startsWith top.region.close
+            if top?.region.close? and rest.startsWith top.region.close
 
                 pushTop()
                 stack.pop()
@@ -320,10 +321,23 @@ class Balancer
                     pushRegion @regions.multiString
                     continue
 
-                else if not top and rest.startsWith @regions.lineComment.open
-                    if not @regions.lineComment.solo or empty text.slice(0, p-1).trim()
-                        pushComment @regions.lineComment
-                        break
+                else if not top
+                    forced = false
+                    pushed = false
+                    for openRegion in @openRegions
+                        if rest.startsWith openRegion.open
+                            if openRegion.minX? and p-1 < openRegion.minX then continue
+                            if openRegion.maxX? and p-1 > openRegion.maxX then continue
+                            if not openRegion.solo or empty text.slice(0, p-1).trim()
+                                if openRegion.force
+                                    pushForceRegion openRegion
+                                    forced = true
+                                else
+                                    pushRegion openRegion
+                                    pushed = true
+                                break
+                    break if forced
+                    continue if pushed
 
                 if @regions.regexp and ch == @regions.regexp.open
                     pushRegion @regions.regexp
@@ -345,18 +359,24 @@ class Balancer
                 if popRegion rest
                     continue
              
-        realStack = stack.filter (s) -> not s.fake
+        realStack = stack.filter (s) -> not s.fake and s.region.close != null
         
+        closeStackItem = (stackItem) =>
+            result = result.concat @dissForClass text, _.last(result).start + _.last(result).match.length, stackItem.region.clss
+            
         if realStack.length
             # console.log "unbalanced #{li} stack:", str(realStack), '\nresult:', str(result)                
             @setUnbalanced li, realStack
-            result = result.concat @dissForClass text, _.last(result).start + _.last(result).match.length, _.last(realStack).region.clss
+            closeStackItem _.last realStack 
         else if keepUnbalanced.length
             # console.log "keeper #{li} keepUnbalanced:", str(keepUnbalanced), '\nresult:', str(result)                
             @setUnbalanced li, keepUnbalanced
             if stack.length
-                result = result.concat @dissForClass text, _.last(result).start + _.last(result).match.length, _.last(stack).region.clss
+                closeStackItem _.last stack 
         else
+            if stack.length and _.last(stack).region.close == null
+                closeStackItem _.last stack 
+            # console.log "balanced #{li}", text
             @setUnbalanced li
             
         result

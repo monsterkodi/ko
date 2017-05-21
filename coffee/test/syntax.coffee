@@ -23,9 +23,9 @@ text = (txt, typ='coffee') ->
     editor.setText txt
     
 diss = (li, di, clss, match) ->
+    
     dss = editor.syntax.getDiss li
     return dss if not di?
-    # log li, di, clss, dss
     cls = dss[di].clss.split /\s+/
     for c in clss.split /\s+/
         if c.startsWith '!'
