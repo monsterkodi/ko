@@ -270,14 +270,24 @@
     &.h5
         color       #88f
     &.li1
+    &.li1::before
         color       #0f0
     &.li2
-        color       #0a0
+        color       #000
+    &.li2::before
+        border-left-color  #0a0
     &.li3
+    &.li3::before
         color       #080
     &.bold
-        // color       #ff0
-        font-weight    bold
+        color       #ff8
+        font-weight bold
+        &.marker
+            opacity 0.3
+    &.code
+        color       #ccf
+    &.italic
+        font-style  italic
 
 .found
     text-decoration  underline

@@ -12,7 +12,7 @@
 
 # tags
 
-(?:^|\s)(html|body|section|header|footer|ul|li|a|b|br|p|center|table|title|link|nav|tr|th|td|div|span|img|h\d|dt|blockquote|pre|hr|svg|path|absolute|relative|fixed|scroll|bold|underline|hidden|none|pointer)\b   keyword
+(?:^|\s)(html|body|section|header|footer|ul|li|a|b|br|p|center|table|title|link|nav|tr|th|td|div|span|img|h\d|dt|blockquote|pre|hr|svg|path|absolute|relative|fixed|scroll|bold|italic|underline|hidden|none|pointer)\b   keyword
 (?:^|\s)(bottom|right|left|top|color|block|opacity|drag|solid|static|transparent|auto|nowrap|sizing|position|pointer-events|width|height|width|outline|float|overflow||cursor|display|content|white-space|transition|transform|z-index|no-drag)(?:[\:\s]|$)  keyword
 (?:^|\s)(align|animation|background|border|box|break|column|flex|font|grid|line|list|margin|max|min|outline|overflow|vertical|padding|inline|text|transform|word|block|-webkit)(?:[\-\:\s]|$)   keyword
 

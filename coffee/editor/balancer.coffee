@@ -26,7 +26,7 @@ class Balancer
     setFileType: (fileType) ->
 
         lineComment = switch fileType
-            when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug' then '//'
+            when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug', 'md' then '//'
             else '#'
             
         multiComment = switch fileType
@@ -58,15 +58,15 @@ class Balancer
                 @regions.lineComment.solo = true # only spaces before comments allowed
                 
             when 'md'
-                @regions.header1 = clss: 'markdown h1', open: '#', close: null, solo: true 
-                @regions.header2 = clss: 'markdown h2', open: '##', close: null, solo: true 
-                @regions.header3 = clss: 'markdown h3', open: '###', close: null, solo: true 
-                @regions.header4 = clss: 'markdown h4', open: '####', close: null, solo: true 
                 @regions.header5 = clss: 'markdown h5', open: '#####', close: null, solo: true                     
+                @regions.header4 = clss: 'markdown h4', open: '####', close: null, solo: true 
+                @regions.header3 = clss: 'markdown h3', open: '###', close: null, solo: true 
+                @regions.header2 = clss: 'markdown h2', open: '##', close: null, solo: true 
+                @regions.header1 = clss: 'markdown h1', open: '#', close: null, solo: true 
                 
-                @regions.listitem1 = clss: 'markdown li1', open: '-', close: null, solo: true,         maxX:0
-                @regions.listitem2 = clss: 'markdown li2', open: '-', close: null, solo: true, minX:1, maxX:4 
-                @regions.listitem3 = clss: 'markdown li3', open: '-', close: null, solo: true, minX:5
+                # @regions.listitem1 = clss: 'markdown li1', open: '-', close: null, solo: true,         maxX:0
+                # @regions.listitem2 = clss: 'markdown li2', open: '-', close: null, solo: true, minX:1, maxX:4 
+                # @regions.listitem3 = clss: 'markdown li3', open: '-', close: null, solo: true, minX:5
 
         @openRegions = _.filter @regions, (r) -> r.close == null
                 
@@ -359,7 +359,7 @@ class Balancer
                 if popRegion rest
                     continue
              
-        realStack = stack.filter (s) -> not s.fake and s.region.close != null
+        realStack = stack.filter (s) -> not s.fake and s.region.close != null and s.region.multi
         
         closeStackItem = (stackItem) =>
             result = result.concat @dissForClass text, _.last(result).start + _.last(result).match.length, stackItem.region.clss

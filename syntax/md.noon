@@ -5,18 +5,9 @@
 #  000 0 000  000   000  000   000  000  000   000   000  000   000  000   000  000  0000
 #  000   000  000   000  000   000  000   000  0000000     0000000   00     00  000   000
 
-
-# header
-
-# (^#\s+)(.+)                             . md.marker.h1   . md.h1
-# (^##\s+)(.+)                            . md.marker.h2   . md.h2
-# (^###\s+)(.+)                           . md.marker.h3   . md.h3
-# (^####+\s+)(.+)                         . md.marker.h4   . md.h4
-# (^#####+\s+)(.+)                        . md.marker.h5   . md.h5
-
 # path
 
-(\(\s*)(\S+\.[^\s\)\.\!\?]+)(\))        . dirname.txt . txt . dirname.txt
+# (\(\s*)(\S+\.[^\s\)\.\!\?]+)(\))        . dirname.txt . txt . dirname.txt
 
 # url
 
@@ -24,18 +15,24 @@
 
 # image
 
-(\!\[)(\S+)(\])                         . function.marker . function . function.marker    
+(\!\[)([^\]]+)(\])                      . function.marker . function . function.marker    
 
-# li
+# link
 
-# (^[-\*]\s+)(.+)                         . md.li1.marker . md.li1
-# (^\s{1,4}[-\*]\s)(.+)                   . md.li2.marker . md.li2
-# (^\s{5,}[-\*]\s)(.+)                    . md.li3.marker . md.li3
+(\[)([^\]]+)(\]\()([^\)]+)(\))          . marker . class . marker . dirname . marker   
 
 # pre
 
 ```\S*                                  . keyword
 
-# bold
+# bold, italic and code
 
-(\*+)([^\*]+)(\*+)                      . markdown.bold.marker . markdown.bold . markdown.bold.marker
+(?:^|[^\*])(\*)([^\*]+)(\*{1})(?!\*)    . markdown.italic.marker . markdown.italic . markdown.italic.marker
+(\*{2})([^\*]+)(\*{2})                  . markdown.bold.marker   . markdown.bold   . markdown.bold.marker
+(\`+)([^\`]+)(\`+)                      . markdown.code.marker   . markdown.code   . markdown.code.marker
+
+# list items
+
+^-                                        markdown.li1
+^\s{1,4}-                                 markdown.li2
+^\s{5,}-                                  markdown.li3
