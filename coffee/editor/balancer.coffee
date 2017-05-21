@@ -24,19 +24,27 @@ class Balancer
     # 000       000  0000000  00000000     000        000     000        00000000  
     
     setFileType: (fileType) ->
+
+        lineComment = switch fileType
+            when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug' then '//'
+            else '#'
+            
+        multiComment = switch fileType
+            when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug' then open: '/*',   close: '*/'
+            when 'html'                                 then open: '<!--', close: '-->'
+            else                                             open: '###',  close: '###'
         
         @regions =
             # regexp:        clss: 'regexp',         open: '/',   close: '/'
             singleString:  clss: 'string single',  open: "'",   close: "'"
             doubleString:  clss: 'string double',  open: '"',   close: '"'
-            lineComment:   clss: 'comment',        open: @editor.lineComment, close: null
+            lineComment:   clss: 'comment',        open: lineComment, close: null
 
-        if @editor.multiComment
-            @regions.multiComment = 
-                clss:  'comment triple'
-                open:  @editor.multiComment.open
-                close: @editor.multiComment.close
-                multi: true
+        @regions.multiComment = 
+            clss:  'comment triple'
+            open:  multiComment.open
+            close: multiComment.close
+            multi: true
                 
         switch fileType
             
@@ -46,15 +54,6 @@ class Balancer
                 
             when 'noon'
                 @regions.lineComment.solo = true # only spaces before comments allowed
-
-    dissForLine: (li) ->
-
-        text = @editor.line li
-
-        if not text?
-            return error "#{@editor.name} no line at index #{li}? #{@editor.numLines()}"
-
-        @mergeRegions @parse(text, li), text, li
 
     # 00     00  00000000  00000000    0000000   00000000
     # 000   000  000       000   000  000        000
@@ -106,6 +105,15 @@ class Balancer
     # 000   000  000  0000000   0000000 
     # 000   000  000       000       000
     # 0000000    000  0000000   0000000 
+
+    dissForLine: (li) ->
+
+        text = @editor.line li
+
+        if not text?
+            return error "#{@editor.name} no line at index #{li}? #{@editor.numLines()}"
+
+        @mergeRegions @parse(text, li), text, li
     
     dissForClass: (text, start, clss) ->
 

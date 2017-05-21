@@ -34,12 +34,12 @@ false                          bool.false
 #number
 
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
-    syntax.value.number.float.sign
-    value.number.float
+    number.float.sign
+    number.float
 
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
-    syntax.value.number.int.sign
-    value.number.int
+    number.int.sign
+    number.int
 
 # comments
 

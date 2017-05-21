@@ -175,9 +175,9 @@ dissect = (ranges, opt = join:false) ->
     
     for i in d
         i.clss = i.cls.join ' '
+        delete i.cls
         
     if d.length > 1
-        log 'join', d
         for i in [d.length-2..0]
             if d[i].start + d[i].match.length == d[i+1].start
                 if d[i].clss == d[i+1].clss

@@ -10,180 +10,192 @@
 { expect
 } = require 'chai'
 
+Editor = require '../editor/editor'
+editor = new Editor 'test_syntax'
+
 test = (a, b) ->
     if b == undefined then b = true
     expect(a).to.eql b
 
-syntax = require '../editor/syntax'
-
+text = (txt, typ='coffee') ->
+    
+    editor.setFileType typ
+    editor.setText txt
+    
+diss = (li, di, clss, match) ->
+    dss = editor.syntax.getDiss li
+    return dss if not di?
+    # log li, di, clss, dss
+    cls = dss[di].clss.split /\s+/
+    for c in clss.split /\s+/
+        if c.startsWith '!'
+            expect(cls).not.include c.slice 1
+        else
+            expect(cls).to.include c
+    if match?
+        test dss[di].match, match
+    
 describe 'syntax', ->
 
     describe 'comments', ->
         
         it 'simple', ->
             
-            dss = syntax.dissForTextAndSyntax "hello # comment", 'coffee'
-            test dss[0].clss, 'text'
-            test dss[1].clss, 'syntax comment marker'
-            test dss[2].clss, 'comment'
+            text "hello # comment"
+            diss 0, 0, 'text'
+            diss 0, 1, 'comment marker'
+            diss 0, 2, 'comment'
 
-        it 'simple fails', -> 
-            dss = syntax.dissForTextAndSyntax "# a comment", 'coffee'
-            test dss[0].clss, 'syntax comment marker'
-            test dss[1].clss, 'comment'
+        it 'solo', -> 
+            text "# a comment"
+            diss 0, 0, 'comment marker'
+            diss 0, 1, 'comment'
             
     describe 'strings', ->
-                
+        
         it 'simple', ->
     
-            dss = syntax.dissForTextAndSyntax 'log "txt"', 'coffee'
-            test dss[1].clss, 'syntax string marker double'
-            test dss[2].clss, 'text string double'
-            test dss[3].clss, 'syntax string marker double'
+            text 'log "txt"'
+            diss 0, 1, 'string marker double'
+            diss 0, 2, 'string double'
+            diss 0, 3, 'string marker double'
     
-            dss = syntax.dissForTextAndSyntax "log 'txt'", 'coffee'
-            test dss[1].clss, 'syntax string marker single'
-            test dss[2].clss, 'text string single'
-            test dss[3].clss, 'syntax string marker single'
+            text "log 'txt'"
+            diss 0, 1, 'string marker single'
+            diss 0, 2, 'string single'
+            diss 0, 3, 'string marker single'
     
-            dss = syntax.dissForTextAndSyntax '"txt"', 'coffee'
-            test dss[0].clss, 'syntax string marker double'
-            test dss[1].clss, 'text string double'
-            test dss[2].clss, 'syntax string marker double'
+            text '"txt"'
+            diss 0, 0, 'string marker double'
+            diss 0, 1, 'string double'
+            diss 0, 2, 'string marker double'
             
         it 'single', ->
     
-            dss = syntax.dissForTextAndSyntax "'\"'", 'coffee'
-            test dss[0].clss, 'syntax string marker single'
-            test dss[1].clss, 'text string single'
-            test dss[2].clss, 'syntax string marker single'
+            text "'\"'"
+            diss 0, 0, 'string marker single'
+            diss 0, 1, 'string single'
+            diss 0, 2, 'string marker single'
             
-            dss = syntax.dissForTextAndSyntax "'\"\"'", 'coffee'
-            test dss[0].clss, 'syntax string marker single'
-            test dss[1].clss, 'text string single'
-            test dss[2].clss, 'syntax string marker single'
+            text "'\"\"'"
+            diss 0, 0, 'string marker single'
+            diss 0, 1, 'string single'
+            diss 0, 2, 'string marker single'
     
-            dss = syntax.dissForTextAndSyntax "'\"\"\"'", 'coffee'
-            test dss[0].clss, 'syntax string marker single'
-            test dss[1].clss, 'text string single'
-            test dss[2].clss, 'syntax string marker single'
+            text "'\"\"\"'"
+            diss 0, 0, 'string marker single'
+            diss 0, 1, 'string single'
+            diss 0, 2, 'string marker single'
 
         it 'double', ->
     
-            dss = syntax.dissForTextAndSyntax "\"'\"", 'coffee'
-            test dss[0].clss, 'syntax string marker double'
-            test dss[1].clss, 'text string double'
-            test dss[2].clss, 'syntax string marker double'
+            text "\"'\""
+            diss 0, 0, 'string marker double'
+            diss 0, 1, 'string double'
+            diss 0, 2, 'string marker double'
     
-            dss = syntax.dissForTextAndSyntax "\"''\"", 'coffee'
-            test dss[0].clss, 'syntax string marker double'
-            test dss[1].clss, 'text string double'
-            test dss[2].clss, 'syntax string marker double'
+            text "\"''\""
+            diss 0, 0, 'string marker double'
+            diss 0, 1, 'string double'
+            diss 0, 2, 'string marker double'
     
         it 'triple', ->
     
-            dss = syntax.dissForTextAndSyntax 'log """txt"""', 'coffee'
-            test dss[1].clss, 'syntax string marker triple'
-            test dss[2].clss, 'text string triple'
-            test dss[3].clss, 'syntax string marker triple'
+            text 'log """txt"""'
+            diss 0, 1, 'string marker triple'
+            diss 0, 2, 'string triple'
+            diss 0, 3, 'string marker triple'
     
-            dss = syntax.dissForTextAndSyntax 'log """t\'t"""', 'coffee'
-            test dss[1].clss, 'syntax string marker triple'
-            test dss[2].clss, 'text string triple'
-            test dss[3].clss, 'syntax string marker triple'
+            text 'log """t\'t"""'
+            diss 0, 1, 'string marker triple'
+            diss 0, 2, 'string triple'
+            diss 0, 3, 'string marker triple'
     
-            dss = syntax.dissForTextAndSyntax 'log """t"\'\'"t"""', 'coffee'
-            test dss[1].clss, 'syntax string marker triple'
-            test dss[2].clss, 'text string triple'
-            test dss[3].clss, 'syntax string marker triple'
+            text 'log """t"\'\'"t"""'
+            diss 0, 1, 'string marker triple'
+            diss 0, 2, 'string triple'
+            diss 0, 3, 'string marker triple'
                 
         it 'escape', ->
     
-            dss = syntax.dissForTextAndSyntax "'\\'\\\"\\''", 'coffee'
-            test dss[0].clss, 'syntax string marker single'
-            test dss[1].clss, 'text string single'
-            test dss[2].clss, 'syntax string marker single'
+            text "'\\'\\\"\\''"
+            diss 0, 0, 'string marker single'
+            diss 0, 1, 'string single'
+            diss 0, 2, 'string marker single'
     
-            dss = syntax.dissForTextAndSyntax '"\\"\\\'\\""', 'coffee'
-            test dss[0].clss, 'syntax string marker double'
-            test dss[1].clss, 'text string double'
-            test dss[2].clss, 'syntax string marker double'
+            text '"\\"\\\'\\""'
+            diss 0, 0, 'string marker double'
+            diss 0, 1, 'string double'
+            diss 0, 2, 'string marker double'
     
-            dss = syntax.dissForTextAndSyntax '"""\\"\\\'\\""""', 'coffee'
-            test dss[0].clss, 'syntax string marker triple'
-            test dss[1].clss, 'text string triple'
-            test dss[2].clss, 'syntax string marker triple'
+            text '"""\\"\\\'\\""""'
+            diss 0, 0, 'string marker triple'
+            diss 0, 1, 'string triple'
+            diss 0, 2, 'string marker triple'
                 
         it 'unbalanced', ->
     
-            dss = syntax.dissForTextAndSyntax "'\\'", 'coffee'
-            test dss[0].clss, 'syntax string marker single'
-            test dss[1].clss, 'text string single'
-            test dss.length, 2
+            text "'\\'"
+            diss 0, 0, 'string marker single'
+            diss 0, 1, 'string single'
+            test diss(0).length, 2
             
-            dss = syntax.dissForTextAndSyntax '"\\"', 'coffee'
-            test dss[0].clss, 'syntax string marker double'
-            test dss[1].clss, 'text string double'
-            test dss.length, 2
+            text '"\\"'
+            diss 0, 0, 'string marker double'
+            diss 0, 1, 'string double'
+            test diss(0).length, 2
         
         it 'interpolation', ->
             
-            dss = syntax.dissForTextAndSyntax '"#{1}"', 'coffee'
-            test dss[0].clss, 'syntax string marker double'
-            test dss[1].clss, 'syntax string interpolation open'
-            expect(dss[2].cls).to.include 'number'
-            expect(dss[2].cls).to.include 'int'
-            test dss[3].clss, 'syntax string interpolation close'
-            test dss[4].clss, 'syntax string marker double'
+            text '"#{1}"'
+            diss 0, 0, 'string marker double'
+            diss 0, 1, 'interpolation marker'
+            diss 0, 2, 'number int'
+            diss 0, 3, 'interpolation marker'
+            diss 0, 4, 'string marker double'
     
         it 'fake interpolation', ->
             
-            dss = syntax.dissForTextAndSyntax '\'"#{1}"\'', 'coffee'
-            test dss[0].clss, 'syntax string marker single'
-            test dss[1].clss, 'text string single'
-            test dss[2].clss, 'syntax string marker single'
+            text '\'"#{1}"\''
+            diss 0, 0, 'string marker single'
+            diss 0, 1, 'string single'
+            diss 0, 2, 'string marker single'
             
         it 'dict', ->
             
-            dss = syntax.dissForTextAndSyntax "'{a:100}'", 'coffee'
-            test dss[1].clss, 'text string single'
+            text "'{a:100}'"
+            diss 0, 1, 'string single'
             
-            dss = syntax.dissForTextAndSyntax "\"{a:100}\"", 'coffee'
-            test dss[1].clss, 'text string double'
+            text "\"{a:100}\""
+            diss 0, 1, 'string double'
             
     it 'brackets', ->
+        
+        text "{ }"
+        diss 0, 0, 'bracket open'
+        diss 0, 1, 'bracket close'
+        test diss(0).length, 2
 
-        dss = syntax.dissForTextAndSyntax "{ }", 'coffee'
-        test dss[0].clss, 'syntax bracket open'
-        test dss[1].clss, 'syntax bracket close'
-        test dss.length, 2
-
-        dss = syntax.dissForTextAndSyntax "{}", 'coffee'
-        test dss[0].clss, 'syntax bracket open'
-        test dss[1].clss, 'syntax bracket close'
-        test dss.length, 2
+        text "{}"
+        diss 0, 0, 'bracket open'
+        diss 0, 1, 'bracket close'
+        test diss(0).length, 2
 
     it 'numbers', ->
+        
+        text "hel10 w0r1d 10 20.0 a66 66a a.66 66.a"
+        diss 0, 0, '!number'
+        diss 0, 1, '!number'
+        diss 0, 2, 'number int'
+        diss 0, 3, 'number float'
+        diss 0, 4, 'number float'
+        diss 0, 5, 'number float'
 
-        dss = syntax.dissForTextAndSyntax "hel10 w0r1d 10 20.0 a66 66a a.66 66.a", 'coffee'
-        expect(dss[2].cls).to.include 'number'
-        expect(dss[2].cls).to.include 'int'
-        expect(dss[3].cls).to.include 'number'
-        expect(dss[3].cls).to.include 'float'
-        expect(dss[4].cls).to.include 'float'
-        expect(dss[5].cls).to.include 'float'
-
-        expect(dss[0].cls).not.to.include 'number'
-        expect(dss[1].cls).not.to.include 'number'
         for i in [6..13]
-            expect(dss[i].cls).not.to.include 'number'
+            diss 0, i, '!number'
 
     it 'text', ->
 
-        dss = syntax.dissForTextAndSyntax "hello world", 'txt'
-        test dss[0].start, 0
-        test dss[0].clss,  'text'
-        test dss[0].match, 'hello'
-        test dss[1].start, 6
-        test dss[1].clss,  'text'
-        test dss[1].match, 'world'
+        text "hello world", 'txt'
+        diss 0, 0, 'text', 'hello'
+        diss 0, 1, 'text', 'world'

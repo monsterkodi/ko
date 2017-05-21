@@ -5,7 +5,7 @@
 # 000           000   
 # 000           000   
 
-[\<\>\+\-\=\/\*]               syntax.math
+[\<\>\+\-\=\/\*]               math
 
 @                              this
 \$                             this
@@ -40,8 +40,8 @@
 
 # bool
 
-True                           value.bool.true
-False                          value.bool.false 
+True                           bool.true
+False                          bool.false 
 
 # null
 
@@ -70,7 +70,7 @@ def\s+(\w+)\s*(\()[^\)]*(\))\s*:    . function . function.bracket . function.bra
 
 # punctuation
 
-[\,\.\;]                       syntax.punctuation
+[\,\.\;]                       punctuation
 
 # keywords
 
@@ -82,12 +82,12 @@ __name__|__class__  keyword
 #number
 
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
-    syntax.value.number.float.sign
-    value.number.float
+    number.float.sign
+    number.float
 
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
-    syntax.value.number.int.sign
-    value.number.int
+    number.int.sign
+    number.int
 
 # comments
 

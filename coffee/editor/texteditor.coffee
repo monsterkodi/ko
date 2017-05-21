@@ -9,7 +9,6 @@
   prefs, drag, elem, path, post, clamp, pos, str, sw, $, _
 }            = require 'kxk'
 render       = require './render'
-Syntax       = require './syntax'
 EditorScroll = require './editorscroll'
 Editor       = require './editor'
 jsbeauty     = require 'js-beautify'
@@ -40,7 +39,6 @@ class TextEditor extends Editor
 
         @size   = {}
         @elem   = @layerDict.lines
-        @syntax = new Syntax @
 
         @spanCache = [] # cache for rendered line spans
         @lineDivs  = {} # maps line numbers to displayed divs
@@ -77,8 +75,7 @@ class TextEditor extends Editor
     del: ->
 
         if @minimap? then post.removeListener 'schemeChanged', @onSchemeChanged
-
-        @syntax.del()
+        
         @scrollbar?.del()
 
         @view.removeEventListener 'keydown', @onKeyDown
@@ -134,19 +131,6 @@ class TextEditor extends Editor
         @renderSelection()
         @renderCursors()
 
-    # 000000000  00000000  000   000  000000000
-    #    000     000        000 000      000
-    #    000     0000000     00000       000
-    #    000     000        000 000      000
-    #    000     00000000  000   000     000
-
-    setText: (text) ->
-
-        if @syntax.name == 'txt'
-            @syntax.name = Syntax.shebang text.slice 0, text.search /\r?\n/
-
-        super text
-
     # 000      000  000   000  00000000   0000000  
     # 000      000  0000  000  000       000       
     # 000      000  000 0 000  0000000   0000000   
@@ -161,7 +145,6 @@ class TextEditor extends Editor
 
         @spanCache = []
         @lineDivs  = {}
-        @syntax.clear()
 
         super lines
 

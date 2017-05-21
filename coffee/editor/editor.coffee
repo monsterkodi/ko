@@ -22,11 +22,14 @@ class Editor extends Buffer
         @indentString    = _.padStart "", 4
         @stickySelection = false
         @dbg             = false
+        @syntax          = new Syntax @
+        
         super
         @do              = new Do @
         @setupFileType()
 
     del: ->
+        @syntax.del()
         @do.del()
     
     #  0000000    0000000  000000000  000   0000000   000   000   0000000  
@@ -67,12 +70,20 @@ class Editor extends Buffer
             ext = extName @currentFile
             if ext in Syntax.syntaxNames
                 @fileType = ext
-                
+
+        @setFileType @fileType
+        
+        if oldType != @fileType
+            @emit 'fileTypeChanged', @fileType
+            
+    setFileType: (@fileType) ->
+            
         # _______________________________________________________________ strings
         
         @stringCharacters =
             "'":  'single'
             '"':  'double'
+            
         switch @fileType
             when 'md'   then @stringCharacters['*'] = 'bold'
             when 'noon' then @stringCharacters['|'] = 'pipe'
@@ -126,11 +137,7 @@ class Editor extends Buffer
             when 'html'                                 then open: '<!--', close: '-->'
             else                                             open: '###',  close: '###'
            
-        log @fileType, @lineComment
-        @syntax.setFileType @fileType
-            
-        if oldType != @fileType
-            @emit 'fileTypeChanged', @fileType
+        @syntax?.setFileType @fileType            
                 
     #  0000000  00000000  000000000         000      000  000   000  00000000   0000000  
     # 000       000          000            000      000  0000  000  000       000       
@@ -139,6 +146,9 @@ class Editor extends Buffer
     # 0000000   00000000     000            0000000  000  000   000  00000000  0000000   
 
     setText: (text="") -> 
+
+        if @syntax.name == 'txt'
+            @syntax.name = Syntax.shebang text.slice 0, text.search /\r?\n/
         
         rgx = new RegExp '\t', 'g'
         indent = @indentString
@@ -146,6 +156,7 @@ class Editor extends Buffer
 
     setLines: (lines) ->
         
+        @syntax.clear()
         super lines
         @emit 'linesSet', lines
         

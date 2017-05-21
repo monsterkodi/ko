@@ -13,17 +13,17 @@
 # number
 
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
-    syntax.value.number.float.sign
-    value.number.float
+    number.float.sign
+    number.float
 
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)   
-    syntax.value.number.int.sign
-    value.number.int
+    number.int.sign
+    number.int
 
 # bool
 
-\strue\b                        bool.value.true
-\sfalse\b                       bool.value.false
+\strue\b                        bool.true
+\sfalse\b                       bool.false
 
 # url
 

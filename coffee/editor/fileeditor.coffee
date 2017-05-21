@@ -72,12 +72,6 @@ class FileEditor extends TextEditor
         if not opt?.skip
             post.emit 'dirty', false
 
-        @syntax.name = 'txt'
-        if file?
-            name = path.extname(file).substr(1)
-            if name in syntax.syntaxNames
-                @syntax.name = name
-
         @setSalterMode false
         @stopWatcher()
 
