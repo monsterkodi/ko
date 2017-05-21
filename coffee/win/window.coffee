@@ -448,6 +448,7 @@ saveFileAs = ->
 screenSize = -> electron.screen.getPrimaryDisplay().workAreaSize
     
 window.onresize = ->
+    
     console.log 'window.onresize'
     split.resized()
     window.stash.set 'bounds', win.getBounds()
@@ -462,6 +463,7 @@ window.onresize = ->
 #0000000    0000000  000   000  00000000  00000000  000   000  0000000   000   000   0000000      000   
 
 screenShot = ->
+    
     win.capturePage (img) ->
         file = 'screenShot.png'
         remote.require('fs').writeFile file, img.toPng(), (err) -> 
@@ -475,6 +477,7 @@ screenShot = ->
 #  0000000  00000000  000   000     000     00000000  000   000         000     00000000  000   000     000   
 
 toggleCenterText = ->
+    
     if not window.stash.get 'centerText', false
         window.stash.set 'centerText', true
         editor.centerText sw() == screenSize().width
@@ -507,11 +510,13 @@ resetFontSize = ->
 # 0000000   0000000    0000000   000   000
     
 resetZoom: -> 
+    
     webframe.setZoomFactor 1
     editor.resized()
     logview.resized()
     
 changeZoom: (d) -> 
+    
     z = webframe.getZoomFactor() 
     z *= 1+d/20
     z = clamp 0.36, 5.23, z

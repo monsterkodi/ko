@@ -5,11 +5,11 @@
 #      000     000     000   000     000     000       
 # 0000000      000     000   000     000     00000000  
 
-{log}      = require 'kxk'
-assert     = require 'assert'
-_          = require 'lodash'
+{ log, _
+}      = require 'kxk'
 { expect, should
 }      = require 'chai'
+assert = require 'assert'
 State  = require '../editor/state'
 should()
 

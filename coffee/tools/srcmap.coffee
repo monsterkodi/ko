@@ -32,7 +32,6 @@ toCoffee  = (jsFile, jsLine, jsCol=0) ->
         coffeeLine = null
         coffeeCol  = null
         
-    # log "toCoffee #{jsFile}:#{jsLine}:#{jsCol} -> #{coffeeFile}:#{coffeeLine}:#{coffeeCol}"
     [coffeeFile, coffeeLine, coffeeCol]
 
 toJs = (coffeeFile, coffeeLine, coffeeCol=0) ->
@@ -62,7 +61,6 @@ toJs = (coffeeFile, coffeeLine, coffeeCol=0) ->
         jsLine = null
         jsCol  = null
         
-    # log "toJs #{coffeeFile}:#{coffeeLine}:#{coffeeCol} -> #{jsFile}:#{jsLine}:#{jsCol}"
     [jsFile, jsLine, jsCol]
         
 module.exports =

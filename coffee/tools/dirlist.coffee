@@ -19,12 +19,10 @@ isTextFile = require './istextfile'
 #           file: absolute path
 #       ]
 #
-###           
-    opt:  
-          ignoreHidden: true # skip files that starts with a dot
-          logError:     true # print message to console.log if a path doesn't exits
-          matchExt:     null # only include files that match the extension of the option's value
-###
+#   opt:  
+#          ignoreHidden: true # skip files that starts with a dot
+#          logError:     true # print message to console.log if a path doesn't exits
+#          matchExt:     null # only include files that match the extension of the option's value
 
 dirList = (dirPath, opt, cb) ->
     

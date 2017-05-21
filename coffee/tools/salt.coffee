@@ -5,8 +5,8 @@
 #      000  000   000  000         000   
 # 0000000   000   000  0000000     000   
 
-_ = require 'lodash'
-noon = require 'noon'
+{ noon, _
+} = require 'kxk'
 
 font = noon.parse """
 0   
@@ -398,7 +398,7 @@ salt = (text) ->
         if font[c]?
             cs.push font[c]
 
-    zs = _.zip.apply(null, cs)
+    zs = _.zip.apply null, cs 
     rs = _.map(zs, (j) -> j.join('  '))
     
     rs.join '\n'

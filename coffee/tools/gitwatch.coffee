@@ -34,7 +34,6 @@ class GitWatch
 
                 @watcher = chokidar.watch gitFile
                 @watcher.on 'change', (path) -> 
-                    # log 'gitRefChanged', file, gitDir
                     post.emit 'gitRefChanged', file, gitDir
 
     unwatch: ->

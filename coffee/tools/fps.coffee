@@ -38,6 +38,7 @@ class FPS
     # 0000000    000   000  000   000  00     00
                 
     draw: =>
+        
         time = now()
         @history.push time-@last
         @history.shift() while @history.length > 260
@@ -57,9 +58,10 @@ class FPS
     visible: -> @elem.style.display != 'none'
 
     restore: => @toggle() if window.stash.get 'fps'
-    stash: => if @visible() then window.stash.set('fps', true) else window.stash.set 'fps'
+    stash:   => if @visible() then window.stash.set('fps', true) else window.stash.set 'fps'
 
     toggle: -> 
+        
         @elem.style.display = @visible() and 'none' or 'unset'       
         @history.push 49
         if @visible()

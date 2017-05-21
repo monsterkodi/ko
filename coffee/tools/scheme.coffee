@@ -52,6 +52,7 @@ class Scheme
         return @colors[clss]
         
     @fadeColor: (a,b,f) ->
+        
         av = @parseColor a
         bv = @parseColor b
         fv = [0,0,0]
@@ -60,6 +61,7 @@ class Scheme
         "rgb(#{fv[0]}, #{fv[1]}, #{fv[2]})"
     
     @parseColor: (c) ->
+        
         if _.isString(c) and c.startsWith 'rgb'
             s = c.indexOf '('
             e = c.indexOf ')'

@@ -35,8 +35,6 @@ class Tab
     
     saveChanges: ->
         
-        # log 'tab.saveChanges', @state
-        
         if @state
             
             if @foreign?.length
@@ -63,14 +61,12 @@ class Tab
     storeState: ->
         
         if window.editor.currentFile
-            # log 'storeState', @info
             @state = window.editor.do.tabState()
         
     restoreState: ->
         
         return error 'no file in state?', @state if not @state?.file?
         
-        # log 'restoreState', @info
         window.editor.do.setTabState @state
         delete @state
         
@@ -158,8 +154,6 @@ class Tab
 
         if activeTab? and activeTab.dirty()
             activeTab.storeState()
-        # else
-            # log 'skip store state', activeTab?, activeTab?.dirty()
         
         @setActive()
         

@@ -157,25 +157,25 @@ class Info
         @lines.textContent = shortCount lc ? 0
         
     onWordCount: (wc) =>
-        @words.textContent = shortCount wc
+        @words.textContent = shortCount  wc
         @words.classList.toggle 'empty', wc == 0
 
     onClassesCount: (cc) =>
-        @classes.textContent = shortCount cc
+        @classes.textContent = shortCount  cc
         @classes.classList.toggle 'empty', cc == 0
 
     onFuncsCount: (fc) =>
-        @funcs.textContent = shortCount fc
+        @funcs.textContent = shortCount  fc
         @funcs.classList.toggle 'empty', fc == 0
 
     onFilesCount: (fc) =>
-        @files.textContent = shortCount fc
+        @files.textContent = shortCount  fc
         @files.classList.toggle 'empty', fc == 0
     
     onCursor: => 
-        @cursorLine.textContent = @editor.mainCursor()[1]+1
+        @cursorLine.textContent   = @editor.mainCursor()[1]+1
         @cursorColumn.textContent = @editor.mainCursor()[0]
-        @cursors.textContent = @editor.numCursors()
+        @cursors.textContent      = @editor.numCursors()
         @cursorColumn.classList.toggle 'virtual', @editor.isCursorVirtual()
         @cursors.classList.toggle 'empty', @editor.numCursors() == 1
         @sticky.classList.toggle 'empty', not @editor.stickySelection
