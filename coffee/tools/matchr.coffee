@@ -40,8 +40,8 @@ sortRanges = (rgs) ->
 #     match: the matched substring
 #     start: position of match in str
 #     value: the value for the match
-#     index: the index of the regexp 
-      
+#     index: index of the regexp
+    
 #     the objects are sorted by start and index
       
 #     if the regexp has capture groups then 
@@ -110,7 +110,6 @@ ranges = (regexes, text, flags) ->
  
 #     match: the matched substring
 #     start: position of match in str
-#     cls:   list of classnames
 #     clss:  string of classnames joined with a space
      
 #     with none of the [start, start+match.length] ranges overlapping
@@ -141,7 +140,6 @@ dissect = (ranges, opt = join:false) ->
             si = dps[0]
             d.push
                 start: si
-                cid:   0
                 cls:   []
 
     p = 0
@@ -151,7 +149,6 @@ dissect = (ranges, opt = join:false) ->
             p += 1 
         pn = p
         while d[pn].start < rg.start+rg.match.length
-            # if (d[pn].cid <= rg.index or opt.join) and rg.value?
             if rg.value?
                 if not rg.value.split?
                     for r in rg.value
@@ -161,7 +158,6 @@ dissect = (ranges, opt = join:false) ->
                 else 
                     for c in rg.value.split '.' 
                         d[pn].cls.push c if d[pn].cls.indexOf(c) < 0
-                d[pn].cid = rg.index
             if pn+1 < d.length
                 if not d[pn].match
                     d[pn].match = rg.match.substr d[pn].start-rg.start, d[pn+1].start-d[pn].start

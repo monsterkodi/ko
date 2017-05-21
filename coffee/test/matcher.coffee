@@ -123,8 +123,6 @@ describe 'matchr', ->
     
         sameResult = [
                 start:  0
-                cid:    777
-                cls:  ['world']
                 match: 'hello'
                 clss:  'world'
             ]
@@ -147,32 +145,18 @@ describe 'matchr', ->
             
             differ = ranges.setIn [1, 'value'], 'ells'
             
-            # it 'default', ->
-                # diss = matchr.dissect differ.asMutable deep:true
-                # expect(diss) .to.eql sameResult
-#                 
-            # it 'no join', ->
-                # diss = matchr.dissect differ.asMutable(deep:true), join:false
-                # expect(diss) .to.eql sameResult
-                 
             it 'join', ->
                 diss = matchr.dissect differ.asMutable(deep:true), join:true
                 expect(diss) .to.eql [
                     start:   0
-                    cid:     777
-                    cls:    ['world']
                     match:   'he'
                     clss:    'world'
                 ,
                     start:   2
-                    cid:     666
-                    cls:     ['world', 'ells']
                     match:   'll'
                     clss:    'world ells'
                 ,
                     start:   4
-                    cid:     777
-                    cls:     ['world']
                     match:   'o'
                     clss:    'world'
                 ]
@@ -201,9 +185,7 @@ describe 'matchr', ->
                 expect(diss) .to.eql [
                     match:   'abcdefghij'
                     start: 0
-                    cid: 0
                     clss: '?'
-                    cls: ['?']
                 ]
                 
     describe 'brackets', ->
@@ -227,19 +209,14 @@ describe 'matchr', ->
     
         diss = matchr.dissect testRanges
 
-        
         expect(diss) .to.eql [
             start: 0
-            cid: 1
             match:   '{'
             clss: 'syntax bracket open'
-            cls: ['syntax', 'bracket', 'open']
         ,
             start: 1
-            cid: 2
             match:   '}'
             clss: 'syntax bracket close'
-            cls: ['syntax', 'bracket', 'close']
         ]
         
             
