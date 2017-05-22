@@ -15,9 +15,9 @@ Editor = require '../editor/editor'
 editor = new Editor 'test_surround'
 after -> editor.del()
 
-textIs = (t) -> expect(editor.text()).to.eql t
+textIs = (t) -> expect(editor.text())      .to.eql t
 mainIs = (m) -> expect(editor.mainCursor()).to.eql m
-cursIs = (c) -> expect(editor.cursors()).to.eql c
+cursIs = (c) -> expect(editor.cursors())   .to.eql c
 selsIs = (c) -> expect(editor.selections()).to.eql c
 hlgtIs = (h) -> expect(editor.highlights()).to.eql h
 

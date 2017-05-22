@@ -11,8 +11,8 @@
 \$                                    this
 \?                                    cond
 !=                                    math
-->                                    function.marker
-=>                                    function.marker.bound
+(-)(>)                              . function.marker.tail       . function.marker.head
+(=)(>)                              . function.marker.tail.bound . function.marker.head.bound
 
 # punctuation
 
@@ -20,8 +20,8 @@
 
 # braces
 
-[({\[]                                bracket.open
-[)}\]]                                bracket.close
+[\(\{\[]                              bracket.open
+[\)\}\]]                              bracket.close
 
 # require
 

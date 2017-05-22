@@ -50,11 +50,25 @@
         color       #f80
         &.class     
             color   #fc0
+
     &.marker
-        color       #55f
         opacity     1
-        &.bound
-            color   #66f
+        color       #55f
+        
+    &.marker.head
+    &.marker.tail
+        color       transparent
+        
+    &.marker.tail::before
+        border-color   #55f
+    &.marker.head::before
+        border-left-color   #55f
+        
+    &.marker.tail.bound::before
+        border-color        #f80
+    &.marker.head.bound::before
+        border-left-color   #f80
+            
     &.bracket
         color       #55f
     &.argument

@@ -38,14 +38,14 @@ class Commandline extends TextEditor
         post.on 'restore', @restore
         post.on 'stash',   @stash
 
-        @view.onblur = () =>
+        @view.onblur = ->
             # return
             @button.classList.remove 'active'
             @list?.remove()
             @list = null
             @command?.onBlur()
 
-        @view.onfocus = () =>
+        @view.onfocus = =>
             @button.className = "commandline-button active #{@command?.prefsID}"
 
     #  0000000  000000000   0000000   000000000  00000000
@@ -59,7 +59,6 @@ class Commandline extends TextEditor
     restore: =>
 
         state = window.stash.get 'commandline'
-        # log 'commandline restore', state
         @setText state?.text ? ""
         if state?.name
             name = state.name
