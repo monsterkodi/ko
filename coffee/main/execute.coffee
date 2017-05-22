@@ -99,10 +99,13 @@ class Execute
 
     shell: () =>
 
-        @childp = pty.spawn '/usr/local/bin/bash', ['--init-file', "#{__dirname}/../bin/bash.sh"],
+        env = process.env
+        env['PS1'] = '""'
+        
+        @childp = pty.spawn '/usr/local/bin/bash', [],
             name: 'xterm-color'
             cwd: @cwd
-            env: process.env
+            env: env
             cols: 1000
 
         @childp.on 'data', @onShellData
