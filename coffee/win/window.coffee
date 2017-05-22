@@ -492,7 +492,7 @@ toggleCenterText = ->
 # 000        0000000   000   000     000        0000000   000  0000000  00000000
     
 setFontSize = (s) -> 
-    s = clamp 8, 80, s
+    s = clamp 8, 88, s
     window.stash.set "fontSize", s
     editor.setFontSize s
     loadFile editor.currentFile, reload:true if editor.currentFile?
@@ -578,8 +578,8 @@ handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
         when 'alt+ctrl+left'      then return stopEvent event, post.toMain 'activatePrevWindow', winID
         when 'alt+ctrl+right'     then return stopEvent event, post.toMain 'activateNextWindow', winID
         when 'command+alt+ctrl+k' then return stopEvent event, split.showOrClearLog()
-        when 'command+='          then return stopEvent event, changeFontSize +1
-        when 'command+-'          then return stopEvent event, changeFontSize -1
+        when 'command+='          then return stopEvent event, changeFontSize +10
+        when 'command+-'          then return stopEvent event, changeFontSize -10
         when 'command+0'          then return stopEvent event, resetFontSize()
         when 'command+shift+='    then return stopEvent event, @changeZoom +1
         when 'command+shift+-'    then return stopEvent event, @changeZoom -1

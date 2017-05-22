@@ -38,7 +38,7 @@ class Commandline extends TextEditor
         post.on 'restore', @restore
         post.on 'stash',   @stash
 
-        @view.onblur = ->
+        @view.onblur = =>
             # return
             @button.classList.remove 'active'
             @list?.remove()

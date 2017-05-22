@@ -204,7 +204,7 @@ class TextEditor extends Editor
     # 000        0000000   000   000     000
 
     setFontSize: (fontSize) =>
-
+        log 'fontSize', fontSize
         @layers.style.fontSize = "#{fontSize}px"
         @size.numbersWidth = 'Numbers' in @config.features and 50 or 0
         @size.fontSize     = fontSize
