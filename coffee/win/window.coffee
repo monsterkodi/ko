@@ -492,7 +492,8 @@ toggleCenterText = ->
 # 000        0000000   000   000     000        0000000   000  0000000  00000000
     
 setFontSize = (s) -> 
-    s = clamp 8, 88, s
+    
+    s = clamp 8, 100, s
     window.stash.set "fontSize", s
     editor.setFontSize s
     loadFile editor.currentFile, reload:true if editor.currentFile?

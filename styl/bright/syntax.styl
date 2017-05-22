@@ -68,10 +68,8 @@
     color           #0f0
 
 .this
-    opacity         0.6
-
 .marker
-    opacity         0.5
+    opacity         0.6
 
 .module
     color           #a80
@@ -91,7 +89,11 @@
     color           #66f
 .float
     color           #606
-        
+     
+.dictionary.key.marker
+    color           #88f
+    opacity         1
+    
 // 00000000  000   000  000   000   0000000
 // 000       000   000  0000  000  000
 // 000000    000   000  000 0 000  000
@@ -100,14 +102,12 @@
 
 .func
 .function
-    color           #c00
+    color           #00c
     &.call
-        color       #f00
+        color       #d00
     &.marker
         color       #55f
         opacity     1
-        &.bound
-            color   #66f
     &.bracket
         color       #55f
     &.argument
@@ -115,6 +115,20 @@
         &.punctuation
             opacity  0.5
 
+    &.marker.head
+    &.marker.tail
+        color       transparent
+        
+    &.marker.tail::before
+        border-color        #88f
+    &.marker.head::before
+        border-left-color   #88f
+        
+    &.marker.tail.bound::before
+        border-color        #f40
+    &.marker.head.bound::before
+        border-left-color   #f40
+            
 // 00     00  00000000  000000000  000   000   0000000   0000000
 // 000   000  000          000     000   000  000   000  000   000
 // 000000000  0000000      000     000000000  000   000  000   000
@@ -123,9 +137,9 @@
 
 .class.function
 .method
-    color           #800
+    color           #008
     &.call
-        color       #a80
+        color       #d00
     &.definition
     &.template
         color       #2aa
@@ -178,19 +192,32 @@
     &.argument
         color       #a8a
 
-.interpolation.marker
-        color       #0d0
-
 .variable.err
     color           #f08
 
 .syntax.exists
     opacity         0.7
 
+//  0000000  000000000  00000000   000  000   000   0000000   
+// 000          000     000   000  000  0000  000  000        
+// 0000000      000     0000000    000  000 0 000  000  0000  
+//      000     000     000   000  000  000  0000  000   000  
+// 0000000      000     000   000  000  000   000   0000000   
+
 .string
-    color           #090 !important
-    &.double
+    &.single
         color       #0b0 !important
+    &.double
+    &.triple
+        color       #090 !important
+
+.interpolation.marker
+        color       #0d0
+
+.interpolation.marker
+.string.marker
+    opacity   0.7
+
 
 //  0000000   0000000   00     00  00     00  00000000  000   000  000000000
 // 000       000   000  000   000  000   000  000       0000  000     000
@@ -201,30 +228,29 @@
 .comment
 .comment.string
 .comment.string.double
-    color           #ccc !important
+    color               #ccc !important
 
 .comment.header
-    color           #ddd !important
-    background      #ddd
-    border-radius   5px
-    border-left     2px solid #ccc
-    border-bottom   2px solid #bbb
+    color               #ddd !important
+    background          #ddd
+    border-left-color   #ccc
+    border-bottom-color #bbb
 
 .comment.header.minimap
-    color           #999 !important
-    opacity         1
+    color               #999 !important
+    opacity             1
 
 .comment.triple.header
-    color           #ccf !important
-    background      #ccf
-    border-left     2px solid #aaf
-    border-bottom   2px solid #88f
+    color               #ccf !important
+    background          #ccf
+    border-left-color   #aaf
+    border-bottom-color #88f
 
 .comment.triple.header.minimap
-    color           #88f !important
+    color               #88f !important
     
 .header.marker.minimap
-    color           #222 !important
+    color               #222 !important
 
 // 00000000   00000000   0000000   000   000  000  00000000   00000000
 // 000   000  000       000   000  000   000  000  000   000  000
@@ -265,7 +291,7 @@
 // 000 0 000  000   000
 // 000   000  0000000
 
-.md
+.markdown
     &.h1
         color       #00c
     &.h2
@@ -277,14 +303,27 @@
     &.h5
         color       #060
     &.li1
+        color       transparent
+    &.li1::before
         color       #080
     &.li2
+        color       transparent
+    &.li2::before
         color       #090
     &.li3
+        color       transparent
+    &.li3::before
         color       #0a0
     &.bold
         color        #000
         font-weight  bold
+        &.marker
+            opacity 0.3
 
+    &.code
+        color       #88f
+    &.italic
+        font-style  italic
+        
 .found
     text-decoration  underline

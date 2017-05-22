@@ -1,14 +1,14 @@
+/*
+ 0000000  000000000  000   000  000    
+000          000      000 000   000    
+0000000      000       00000    000    
+     000     000        000     000    
+0000000      000        000     0000000
+*/
 
-//  0000000  000000000  000   000  000    
-// 000          000      000 000   000    
-// 0000000      000       00000    000    
-//      000     000        000     000    
-// 0000000      000        000     0000000
-
-editorFontSize        = 14px
-selectionRadius       = round(editorFontSize  / 3)
-selectionRadiusCursor = round(selectionRadius / 2)
-metaRadius            = ceil(editorFontSize   / 2)
+selectionRadius       = 0.3em
+selectionRadiusCursor = 0.15em
+metaRadius            = 0.15em
 
 minimapWidth          = 130px
 scrollbarWidth        = 12px // transparent scroll area
@@ -35,13 +35,11 @@ fill-abs()
 pre 
     margin              0
 
-/*
-0000000     0000000   0000000    000   000
-000   000  000   000  000   000   000 000 
-0000000    000   000  000   000    00000  
-000   000  000   000  000   000     000   
-0000000     0000000   0000000       000   
-*/
+// 0000000     0000000   0000000    000   000
+// 000   000  000   000  000   000   000 000 
+// 0000000    000   000  000   000    00000  
+// 000   000  000   000  000   000     000   
+// 0000000     0000000   0000000       000   
 
 *
     outline-width       0
@@ -647,7 +645,16 @@ infoPadding = 6px
     &.start
         padding-left    editorPadding
         margin-left     - editorPadding
-    
+
+.comment.header
+    border-radius       0.3em
+    border-width        0.15em 
+    border-left-style   solid
+    border-bottom-style solid
+    border-top-style    hidden
+    border-right-style  hidden
+    height 1.2em
+        
 .stringmatch
 .bracketmatch
 .selection
@@ -825,7 +832,7 @@ infoPadding = 6px
     border-top-left-radius      0.1em
     border-bottom-left-radius   0.1em
     height                      0.0em
-    width                       1.05ch
+    width                       1.08ch
     top                         0.5em
     
 .function.marker.tail.bound::before
@@ -838,7 +845,7 @@ infoPadding = 6px
     border-top-left-radius      0.1em
     border-bottom-left-radius   0.1em
     height                      0.1em
-    width                       1.05ch
+    width                       1.08ch
     top                         0.45em
     
 .function.marker.head::before
@@ -847,6 +854,7 @@ infoPadding = 6px
     height                      0.0em
     width                       0.0em
     top                         0.35em
+    border-radius               0.1em
     border-top                  0.3em solid transparent
     border-bottom               0.3em solid transparent
     border-left                 0.8em solid

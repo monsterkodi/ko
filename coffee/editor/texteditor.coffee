@@ -204,7 +204,7 @@ class TextEditor extends Editor
     # 000        0000000   000   000     000
 
     setFontSize: (fontSize) =>
-        log 'fontSize', fontSize
+        
         @layers.style.fontSize = "#{fontSize}px"
         @size.numbersWidth = 'Numbers' in @config.features and 50 or 0
         @size.fontSize     = fontSize
@@ -214,8 +214,6 @@ class TextEditor extends Editor
         @size.offsetX      = Math.max @size.offsetX, (@screenSize().width - @screenSize().height) / 2 if @size.centerText
 
         @scroll?.setLineHeight @size.lineHeight
-
-        setStyle '.comment.header', 'border-radius', "#{parseInt fontSize/3}px", 2
 
         @emit 'fontSizeChanged'
 
