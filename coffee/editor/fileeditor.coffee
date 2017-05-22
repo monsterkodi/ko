@@ -26,7 +26,7 @@ class FileEditor extends TextEditor
         post.on 'jumpToFile',    @jumpToFile
         post.on 'setBreakpoint', @onSetBreakpoint
 
-        @fontSizeDefault = 16
+        @fontSizeDefault = 18
 
         super viewElem, features: [
             'Diffbar'

@@ -497,7 +497,16 @@ setFontSize = (s) ->
     editor.setFontSize s
     loadFile editor.currentFile, reload:true if editor.currentFile?
     
-changeFontSize = (d) -> setFontSize editor.size.fontSize + d
+changeFontSize = (d) -> 
+    if      editor.size.fontSize >= 30
+        f = 4
+    else if editor.size.fontSize >= 50
+        f = 10
+    else if editor.size.fontSize >= 20
+        f = 2
+    else
+        f = 1
+    setFontSize editor.size.fontSize + f*d
     
 resetFontSize = -> 
     window.stash.set 'fontSize'
@@ -578,8 +587,8 @@ handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
         when 'alt+ctrl+left'      then return stopEvent event, post.toMain 'activatePrevWindow', winID
         when 'alt+ctrl+right'     then return stopEvent event, post.toMain 'activateNextWindow', winID
         when 'command+alt+ctrl+k' then return stopEvent event, split.showOrClearLog()
-        when 'command+='          then return stopEvent event, changeFontSize +10
-        when 'command+-'          then return stopEvent event, changeFontSize -10
+        when 'command+='          then return stopEvent event, changeFontSize +1
+        when 'command+-'          then return stopEvent event, changeFontSize -1
         when 'command+0'          then return stopEvent event, resetFontSize()
         when 'command+shift+='    then return stopEvent event, @changeZoom +1
         when 'command+shift+-'    then return stopEvent event, @changeZoom -1
