@@ -60,6 +60,8 @@ prefs.init()
 window.prefs = prefs
 window.stash = new stash "win/#{winID}"
 
+post.setMaxListeners 20
+
 addToRecent = (file) ->
     
     recent = prefs.get 'recentFiles', []

@@ -13,7 +13,6 @@ should()
 
 Editor = require '../editor/editor'
 editor = new Editor 'test_surround'
-after -> editor.del()
 
 textIs = (t) -> expect(editor.text())      .to.eql t
 mainIs = (m) -> expect(editor.mainCursor()).to.eql m
@@ -23,6 +22,8 @@ hlgtIs = (h) -> expect(editor.highlights()).to.eql h
 
 describe 'surround', ->
 
+    after -> editor.del()
+    
     describe 'cursor pos', ->
         
         beforeEach -> editor.setText ''

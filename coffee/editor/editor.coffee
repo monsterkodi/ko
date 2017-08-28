@@ -16,7 +16,7 @@ class Editor extends Buffer
     @actions = null
 
     constructor: (@name) ->
-
+        
         Editor.initActions() if not Editor.actions?
             
         @indentString    = _.padStart "", 4
@@ -29,6 +29,7 @@ class Editor extends Buffer
         @setupFileType()
 
     del: ->
+                
         @syntax.del()
         @do.del()
     

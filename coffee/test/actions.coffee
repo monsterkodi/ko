@@ -14,7 +14,6 @@ should()
 Editor = require '../editor/editor'
 editor = new Editor 'test_actions'
 editor.setText ''
-after -> editor.del()
 
 textIs = (t) -> expect(editor.text()).to.eql t
 mainIs = (m) -> expect(editor.mainCursor()).to.eql m
@@ -24,6 +23,8 @@ hlgtIs = (h) -> expect(editor.highlights()).to.eql h
 
 describe 'actions', ->
         
+    after -> editor.del()
+    
     it 'exists', -> 
         editor .should.not.be.null
         editor['toggleComment'] .should.not.be.null

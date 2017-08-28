@@ -12,6 +12,7 @@
 
 Editor = require '../editor/editor'
 editor = new Editor 'test_syntax'
+after -> editor.del()
 
 test = (a, b) ->
     if b == undefined then b = true
@@ -137,12 +138,12 @@ describe 'syntax', ->
     
             text "'\\'"
             diss 0, 0, 'string marker single'
-            diss 0, 1, 'string single'
+            diss 0, 1, 'syntax'
             test diss(0).length, 2
             
             text '"\\"'
             diss 0, 0, 'string marker double'
-            diss 0, 1, 'string double'
+            diss 0, 1, 'syntax'
             test diss(0).length, 2
         
         it 'interpolation', ->

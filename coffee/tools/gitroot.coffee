@@ -11,7 +11,9 @@
 gitRoot = (pth, cb) ->
 
     if cb?
+        
         return cb(null) if empty pth
+        
         fs.stat pth, (err, stat) ->
             return cb(null) if err
             if stat.isDirectory()

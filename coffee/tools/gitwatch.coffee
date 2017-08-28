@@ -24,6 +24,8 @@ class GitWatch
         
         gitRoot file, (gitDir) =>
             
+            return if not gitDir?
+            
             gitFile = path.join gitDir, '.git', 'HEAD'
             
             if fileExists gitFile

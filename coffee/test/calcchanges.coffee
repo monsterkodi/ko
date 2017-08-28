@@ -15,10 +15,11 @@ State  = require '../editor/state'
 should()
 
 editor = new Editor 'test_calcchanges'
-after -> editor.del()
 
 describe 'calc', ->
 
+    after -> editor.del()
+    
     it 'change empty lines', ->
         oldState = new State lines: ['abc', '', '', '', 'def']
         newState = oldState.changeLine 1, 'a'

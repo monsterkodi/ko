@@ -11,37 +11,38 @@ assert   = require 'assert'
 
 Editor = require '../editor/editor'
 editor = new Editor 'test_salter'
-after -> editor.del()
 
 # !!! DON'T CLEAN THIS FILE !!!
 
 textIs = (t) -> expect(editor.text()).to.eql t
 
-describe 'columnsInSalt', ->
+describe 'salter', ->
     
-    it 'i', ->
-        slt = ['# 000', '# 000', '# 000', '# 000', '# 000']
-        expect editor.columnsInSalt slt
-        .to.eql [2,5]
+    after -> editor.del()
 
-    it 'ix', ->
-        slt = """
-            # 000  000   000
-            # 000   000 000 
-            # 000    00000  
-            # 000   000 000 
-            # 000  000   000
-            """.split '\n'
-        expect editor.columnsInSalt slt
-        .to.eql [2,7,16]
+    describe 'columnsInSalt', ->
         
-    it 'empty', ->
-        slt = ['#   ', '#   ', '#   ', '#   ', '#   ']
-        expect editor.columnsInSalt slt
-        .to.eql [1]
-
-describe 'salter', ->     
+        it 'i', ->
+            slt = ['# 000', '# 000', '# 000', '# 000', '# 000']
+            expect editor.columnsInSalt slt
+            .to.eql [2,5]
     
+        it 'ix', ->
+            slt = """
+                # 000  000   000
+                # 000   000 000 
+                # 000    00000  
+                # 000   000 000 
+                # 000  000   000
+                """.split '\n'
+            expect editor.columnsInSalt slt
+            .to.eql [2,7,16]
+            
+        it 'empty', ->
+            slt = ['#   ', '#   ', '#   ', '#   ', '#   ']
+            expect editor.columnsInSalt slt
+            .to.eql [1]
+        
     it 'salto', ->
         editor.setText ''
         editor.insertSalterCharacter 'o'
