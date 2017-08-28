@@ -16,7 +16,7 @@
 (?:^|\s)(bottom|right|left|top|color|block|opacity|drag|solid|static|transparent|auto|nowrap|sizing|position|pointer-events|width|height|width|outline|float|overflow||cursor|display|content|white-space|transition|transform|z-index|no-drag)(?:[\:\s]|$)  keyword
 (?:^|\s)(align|animation|background|border|box|break|column|flex|font|grid|line|list|margin|max|min|outline|overflow|vertical|padding|inline|text|transform|word|block|-webkit)(?:[\-\:\s]|$)   keyword
 
-(-)(x|y|align|left|right|top|bottom|delay|direction|duration|decoration|grow|flow|fill|blend|mode|timing|function|clip|color|style|family|weight|image|position|origin|repeat|height|width|size|sizing|radius|zoom|area|column|type|start|end|block|content|inline|user|select|app|region)(?=[\-\:\s]|$)
+(-)(x|y|align|left|right|top|bottom|delay|direction|duration|decoration|grow|flow|fill|blend|mode|timing|function|clip|color|style|family|weight|image|position|origin|repeat|height|width|size|sizing|radius|zoom|area|column|type|start|before|after|end|block|content|inline|user|select|app|region)(?=[\-\:\s]|$)
                                keyword.marker
                                keyword
                                
