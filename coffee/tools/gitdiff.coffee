@@ -5,9 +5,8 @@
 # 000   000  000     000     000   000  000  000       000         
 #  0000000   000     000     0000000    000  000       000         
 
-{ escapePath, resolve, childp, path, str, log, _
-}      = require 'kxk'
-chalk  = require 'chalk'
+{ escapePath, resolve, childp, path, str, log, _ } = require 'kxk'
+stripAnsi = require 'strip-ansi'
 
 gitDiff = (file) ->
 
@@ -18,7 +17,7 @@ gitDiff = (file) ->
         encoding: 'utf8' 
             
     info  = file:file, changes:[]
-    lines = (chalk.stripColor l for l in result.split '\n')
+    lines = (stripAnsi l for l in result.split '\n')
 
     while line = lines.shift()
 
