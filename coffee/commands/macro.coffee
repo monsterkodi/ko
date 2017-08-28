@@ -6,7 +6,7 @@
 # 000   000  000   000   0000000  000   000   0000000
 
 { packagePath, fileExists, fileName, fileList, reversed, relative, splitExt,
-  post, noon, path, error, log, _
+  post, noon, path, fs, error, log, _
 }       = require 'kxk'
 indexer = require '../main/indexer'
 salt    = require '../tools/salt'
@@ -16,6 +16,7 @@ process = require 'process'
 atomic  = require 'write-file-atomic'
 Mocha   = require 'mocha'
 Report  = require '../test/report'
+syntax  = require '../editor/syntax'
 
 class Macro extends Command
 
@@ -154,22 +155,9 @@ class Macro extends Command
             when 'help'
                 
                 terminal = window.terminal
-                terminal.output noon.stringify noon.load("#{__dirname}/../../bin/cheet.noon"),
-                    align:    true
-                    maxalign: 20
-                    colors:
-                        url:     colors.yellow
-                        key:     colors.white
-                        null:    colors.blue
-                        true:    colors.blue.bold
-                        false:   colors.gray.dim
-                        path:    colors.green
-                        value:   colors.green
-                        string:  colors.white.dim
-                        semver:  colors.red
-                        number:  colors.magenta
-                        visited: colors.red
-                        dim:     '^>=.:/-'
+                text = fs.readFileSync "#{__dirname}/../../bin/cheet.noon", encoding: 'utf8'
+                for l in text.split '\n'
+                    terminal.appendLineDiss l, syntax.dissForTextAndSyntax l, 'noon'
 
                 terminal.scroll.cursorToTop 1
                 window.split.do 'show terminal'

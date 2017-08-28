@@ -67,6 +67,7 @@ class Terminal extends TextEditor
     # 000   000  000        000        00000000  000   000  0000000  
                 
     appendLineDiss: (text, diss=[]) ->
+        
         @syntax.setDiss @numLines(), diss if diss?.length
         tail = @cursorPos()[1] == @numLines()-1 and @numCursors() == 1
         @appendText text

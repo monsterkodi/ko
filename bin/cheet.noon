@@ -61,9 +61,33 @@ term
     !!                  repeat last history command
 
 macro
-    req     insert require statements for words at cursors
-    dbg     insert log statement for variables at cursors
-    inv     toggle display of invisibles
-    fps     toggle fps display
-    class   create a new file with class template
-    help    prints this text in the terminal
+    req             insert require statements for words at cursors
+    dbg             insert log statement for variables at cursors
+    inv             toggle display of invisibles
+    fps             toggle fps display
+    blink           toggle cursor blinking
+    color  ^⌥⌘p     toggle pigments 
+    
+    class           create a new file with class template
+    clean           remove trailing spaces
+    
+    test            run tests
+    help            prints this text in the terminal
+
+    upper           uppercase selected texts
+    lower           lowercase selected texts
+    title           titlecase selected texts
+    case    ⌘⌥^U    toggle between upper, lower and title 
+
+    up              sort selected texts ascending
+    down            sort selected texts descending
+    sort            toggle between up and down
+    reverse  ⌘⌥^R   reverse selected texts 
+    
+    col num delta                       duplicate main cursor horizontally
+    line num delta                      duplicate main cursor vertically
+    count dec|hex|bin offset delta      insert numbers at cursors
+    add num                             add to selected numbers
+    sub num                             subtract from selected numbers
+
+    
