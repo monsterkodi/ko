@@ -174,8 +174,8 @@ class Split extends event
             
         @flex.calculate()
         @flex.expand 'terminal', 0.33
-        if @terminalHeight() < @flex.size()/3
-            @flex.moveHandleToPos @flex.handles[0], @flex.size()/3
+        if @terminalHeight() < @flex.size()/2
+            @flex.moveHandleToPos @flex.handles[0], @flex.size()/2
 
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
     # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     

@@ -210,7 +210,6 @@ saveFile = (file) ->
         saveFileAs()
         return
 
-    # log 'win.saveFile', file
     editor.stopWatcher()
     
     if fileExists file
@@ -221,15 +220,13 @@ saveFile = (file) ->
         
     atomic file, editor.text(), { encoding: 'utf8', mode: mode }, (err) ->
         
-        # log "atomic saved #{err}"
-        
         editor.saveScrollCursorsAndSelections()
         
         if err?
             alert err
         else
             editor.setCurrentFile      file
-            post.toOthers 'fileSaved', file, winID
+            post.toOthers 'fileSaved', file, window.winID
             post.emit     'saved',     file
 
 window.saveChanges = ->
