@@ -451,7 +451,6 @@ screenSize = -> electron.screen.getPrimaryDisplay().workAreaSize
     
 window.onresize = ->
     
-    console.log 'window.onresize'
     split.resized()
     window.stash.set 'bounds', win.getBounds()
     if window.stash.get 'centerText', false

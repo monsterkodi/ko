@@ -80,7 +80,11 @@ class Command
         
         if items.length
             if command.length
-                fuzzied = fuzzy.filter command, items, extract: (o) -> o?.text ? ''            
+                fuzzied = fuzzy.filter command, items, extract: (o) -> 
+                    if o?
+                        return o if _.isString o
+                        return o.text if _.isString o.text
+                    ''            
                 items = (f.original for f in _.sortBy fuzzied, (o) -> o.index)
             @showItems @weightedItems items, currentText: command
             @select 0
