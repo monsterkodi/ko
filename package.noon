@@ -26,10 +26,10 @@ bugs
                 url  https://github.com/monsterkodi/ko/issues
 dependencies
                 assert          ^1.4.1
-                chai            ^4.1.1
+                chai            ^4.1.2
                 chalk           ^2.1.0
                 chokidar        ^1.7.0
-                chrome-remote-interface  ^0.24.4
+                chrome-remote-interface  ^0.24.5
                 coffee-script   ^1.12.7
                 colors          ^1.1.2
                 dmg             ^0.1.0
@@ -44,15 +44,16 @@ dependencies
                 js-beautify     ^1.6.14
                 karg            >=1.0.10
                 keycode         ^2.1.9
-                kxk             ^0.16.4
+                kxk             ^0.16.12
                 lodash          ^4.17.4
-                mocha           ^3.5.0
+                mocha           ^3.5.3
                 nconf           ^0.8.4
+                node-abi        ^2.1.1
                 node-pty        ^0.7.0
                 noon            >=1.1.0
                 opener          ^1.4.3
                 performance-now  ^2.1.0
-                pug             ^2.0.0-rc.3
+                pug             ^2.0.0-rc.4
                 seamless-immutable  ^7.1.2
                 sorcery         ^0.10.0
                 source-map      ^0.5.7
@@ -62,13 +63,13 @@ dependencies
                 three           ^0.87.1
                 traceback       ^0.3.1
                 underscore.string  ^3.3.4
-                walkdir         0.0.11
+                walkdir         0.0.12
                 write-file-atomic  ^2.3.0
 devDependencies
                 appdmg          ^0.4.5
                 devtron         ^1.4.0
-                electron        ^1.7.6
-                electron-packager  ^9.0.0
+                electron        ^1.8.0
+                electron-packager  ^9.0.1
                 electron-rebuild  ^1.6.0
 coffeelintConfig
                 no_trailing_whitespace
