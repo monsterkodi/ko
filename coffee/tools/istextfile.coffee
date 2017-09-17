@@ -18,6 +18,7 @@ textext['.noon']   = 'noon'
 textext['.pug']    = 'pug'
 textext['.bashrc'] = 'bashrc'
 textext['.bashrc'] = 'markdown'
+textext['.svg']    = 'html'
 
 textbase = 
     profile:1

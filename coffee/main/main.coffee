@@ -523,7 +523,7 @@ class Main
             [fpath, pos] = splitFilePos file
             if fileExists fpath
                 files.push file
-        log 'createWindow', files
+        # log 'createWindow', files
         @createWindow files:files
                     
     quit: ->
