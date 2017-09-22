@@ -223,7 +223,7 @@ saveFile = (file) ->
         editor.saveScrollCursorsAndSelections()
         
         if err?
-            alert err
+            log "error saving file #{file}:", err
         else
             editor.setCurrentFile      file
             post.toOthers 'fileSaved', file, window.winID
