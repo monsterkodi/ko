@@ -68,9 +68,9 @@ dependencies
 devDependencies
                 appdmg          ^0.4.5
                 devtron         ^1.4.0
-                electron        ^1.8.0
-                electron-packager  ^9.0.1
-                electron-rebuild  ^1.6.0
+                electron        ^1.6.6
+                electron-packager  ^8.6.0
+                electron-rebuild  ^1.5.7
 coffeelintConfig
                 no_trailing_whitespace
                   level           ignore
