@@ -5,8 +5,7 @@
 # 000 0 000  000   000     000     000       000   000  000   000
 # 000   000  000   000     000      0000000  000   000  000   000
 
-{ last, str, _
-} = require 'kxk'
+{ last, str, _ } = require 'kxk'
 
 #  0000000   0000000   000   000  00000000  000   0000000 
 # 000       000   000  0000  000  000       000  000      
@@ -22,10 +21,7 @@ sortRanges = (rgs) ->
     
     rgs.sort (a,b) ->
         if a.start == b.start
-            # if a.match.length == b.match.length
             a.index - b.index
-            # else
-                # a.match.length - b.match.length
         else
             a.start - b.start
 
@@ -70,34 +66,48 @@ ranges = (regexes, text, flags) ->
         arg = regexes[r][1]
         i = 0
         s = text
+
         while s.length
+            
             match = reg.exec s
+            
             break if not match?
+            
             if match.length == 1
-                rgs.push
-                    start: match.index + i
-                    match: match[0]
-                    value: arg
-                    index: r
-                i += match.index + match[0].length
+                
+                if match[0].length > 0
+                    rgs.push
+                        start: match.index + i
+                        match: match[0]
+                        value: arg
+                        index: r
+                    
+                i += match.index + Math.max 1, match[0].length
                 s = text.slice i
+                
             else
+                
                 gs = 0
+                
                 for j in [0..match.length-2]
                     value = arg
                     if _.isArray(value) and j < value.length then value = value[j]
                     else if _.isObject(value) and j < _.size(value) 
                         value = [_.keys(value)[j], value[_.keys(value)[j]]]
                     break if not match[j+1]?
+                    # break if match[j+1].length == 0
                     gi = match[0].slice(gs).indexOf match[j+1]
+                    
                     rgs.push
                         start: match.index + i + gs + gi
                         match: match[j+1]
                         value: value
                         index: r
-                    gs += match[j+1]?.length
+                        
+                    gs += match[j+1].length
                 i += match.index + match[0].length
                 s = text.slice i
+
     sortRanges rgs        
 
 # 0000000    000   0000000   0000000  00000000   0000000  000000000

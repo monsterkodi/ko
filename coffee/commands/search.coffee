@@ -34,7 +34,13 @@ class Search extends Command
         
         switch @name
             when '/search/', '/Search/'
-                return if command in ['^', '$', '.']
+                if command in ['^', '$', '.']
+                    log 'pattern would match anything!'
+                    return 
+                rngs = matchr.ranges command, '  '
+                if rngs.length == 2
+                    log 'pattern would match space!'
+                    return
                 
         command = super command
         file = window.editor.currentFile ? _.first _.keys(post.get('indexer', 'files'))

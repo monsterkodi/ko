@@ -5,7 +5,7 @@
 # 000 0 000  000   000     000     000       000   000  000       000   000  
 # 000   000  000   000     000      0000000  000   000  00000000  000   000  
 
-{log, _}   = require 'kxk'
+{ _ }      = require 'kxk'
 {expect}   = require 'chai'
 assert     = require 'assert'
 noon       = require 'noon'
@@ -23,6 +23,19 @@ describe 'matchr', ->
     describe 'ranges', ->
         
         rgx = /([\~\/\w\.]+\/[\w\.]+\w[:\d]*)/
+        
+        it 'handles empty matches', -> 
+            ranges = matchr.ranges "a*b*", 'some text', 'g'
+            expect(ranges) .to.eql []
+            ranges = matchr.ranges "a*b*", 'some text', 'gi'
+            expect(ranges) .to.eql []
+            ranges = matchr.ranges "a*b*", 'some book', 'g'
+            expect(ranges) .to.eql [
+                index: 0
+                start: 5
+                match: 'b'
+                value: 'found'
+            ]
         
         it 'noon', ->
             ranges = matchr.ranges /^\s+([^#\s]+(?:\s\S+)*)/g, '  some key  value'
