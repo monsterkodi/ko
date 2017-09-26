@@ -18,7 +18,7 @@ describe 'dirList', ->
         dirList __dirname, (err, list) ->
             if err then return done err
             expect(list.length) .to.be.above 1
-            expect(list) .to.include 
+            expect(list) .to.deep.include 
                 type:       'file'
                 textFile:   true
                 name:       path.basename __filename
