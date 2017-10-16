@@ -5,7 +5,7 @@
 # 000   000  000        000       000  0000
 #  0000000   000        00000000  000   000
 
-{ packagePath, splitFilePos, joinFilePos, fileExists, dirExists, 
+{ packagePath, splitFilePos, joinFilePos, fileExists, dirExists, valid, empty,
   unresolve, relative, resolve, prefs, clamp, post, error, log, path, fs, _ } = require 'kxk'
   
 profile  = require '../tools/profile'
@@ -222,7 +222,7 @@ class Open extends Command
     # 000   000  000  0000000      000      0000000   000   000     000     
     
     showHistory: () ->
-        
+
         if @history.length > 1 and (@selected < 0 or not @navigating and @selected == 0)
             items = []
             bonus = 0x000fffff
@@ -234,6 +234,7 @@ class Open extends Command
                 items.push item
                 bonus -= 1 
             items.pop()
+            @stopWalkers()
             @showItems items
             @select items.length-1
             @setAndSelectText items[@selected].text
@@ -258,17 +259,13 @@ class Open extends Command
         
         if combo == @shortcuts[0]
             if not @navigating and @commandList? and @lastFileIndex == @selected
-                @walker.stop()
-                @fastWalker.stop()
-                @thisWalker.stop()
+                @stopWalkers()
                 return @execute()                
         super combo
     
     cancelList: ->
         
-        @walker.stop()
-        @fastWalker.stop()
-        @thisWalker.stop()
+        @stopWalkers()
         super
 
     #  0000000  000000000   0000000   00000000   000000000
@@ -292,18 +289,22 @@ class Open extends Command
 
         super @combo
         
-        @selected = 0
+        @selected = null
         
         text: ''
        
     navigateDir: (dir) ->
+        
+        # log 'navigateDir', dir
         
         r = @loadDir 
             dir: dir
             noPkg: true
             navigating: true
             
-        if true # r
+        # log 'navigateDir result', r
+            
+        if r
             @hideList()
             @select -1                
     
@@ -314,28 +315,31 @@ class Open extends Command
     # 0000000   0000000   000   000  0000000          0000000    000  000   000
         
     loadDir: (opt) ->
-        
+                
         opt.dir = path.dirname opt.file if not opt.dir? and opt.file?
         if not dirExists opt.dir
             opt.dir = resolve opt.dir
             if not dirExists opt.dir
-                opt.dir = path.dirname resolve opt.dir
-                if not dirExists opt.dir
-                    opt.dir = resolve '~'
-                    if not dirExists opt.dir
-                        return error "Open.loadDir -- dir #{opt.dir} doesn't exist"
-                        
-        @dir = resolve '.' if not @dir?
+                return false
+
+        @dir ?= resolve '.'
         newdir = @resolvedPath(opt.dir) ? @dir
         return false if newdir == @dir and not opt.reload
         
-        @dir        = newdir
+        @dir = newdir
+        
         @pkg        = opt.noPkg and @dir or packagePath(@dir) or @dir
         @file       = opt.file
         @files      = []
-        @selected   = 0
+        @selected   = null
         @navigating = opt.navigating ? false
 
+        if @walker and not @walker.running and @walker.cfg.root == @pkg and valid @walker.cfg.files
+            setImmediate => @walkerDone @walker
+            return true
+        
+        @stopWalkers()
+                
         topt = 
             done:        @walkerDone
             root:        @dir
@@ -369,7 +373,7 @@ class Open extends Command
          
         @walker = new Walker wopt
         @walker.start()
-                
+                    
         true
         
     # 000   000   0000000   000      000   000  00000000  00000000 
@@ -378,25 +382,23 @@ class Open extends Command
     # 000   000  000   000  000      000  000   000       000   000
     # 00     00  000   000  0000000  000   000  00000000  000   000
             
-    walkerDone: (fileList, statList) =>
-        
-        log 'walkerDone', fileList.length, @navigating, @selected, @lastFileIndex
-        
-        for i in [0...fileList.length]
-            @files.push [fileList[i], statList[i]]
+    walkerDone: (walker) =>
+
+        for i in [0...walker.cfg.files.length]
+            @files.push [walker.cfg.files[i], walker.cfg.stats[i]]
             
         @files = _.sortBy @files, (o) => relative(o[0], @dir).replace(/\./g, 'z')
         
         @showList()
         @showItems @listItems includeThis: false
         @grabFocus()
-        @select @lastFileIndex
+        @select @selected ? @lastFileIndex
         
-        if not @navigating 
+        if not @navigating
             
             if @getText() == ''
-                @setAndSelectText @commandList.line(@selected)
-            else if @getText() != @commandList.line(@selected)
+                @setAndSelectText @commandList.line @selected
+            else if @getText() != @commandList.line @selected
                 @changed @getText()
                 
         else if @getText() == '.'
@@ -404,11 +406,16 @@ class Open extends Command
             @setText @dir
             
     stopWalkers: ->
+
+        @thisWalker?.stop()
+        @fastWalker?.stop()
+        @walker?.stop()
+
+    hideList: ->
+
+        @stopWalkers()
+        super
         
-        @thisWalker.stop()
-        @fastWalker.stop()
-        @walker.stop()
-                    
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
     # 0000000     00000    0000000   000       000   000     000     0000000 

@@ -5,8 +5,8 @@
 # 000   000  000   000  000      000  000   000       000   000
 # 00     00  000   000  0000000  000   000  00000000  000   000
 
-{ fileExists, dirExists, relative, path, fs, error, log
-}       = require 'kxk'
+{ fileExists, dirExists, relative, path, fs, error, log } = require 'kxk'
+
 walkdir = require 'walkdir'
 
 class Walker
@@ -35,6 +35,7 @@ class Walker
     start: ->           
         # profile 'walker start'
         try
+            @running = true
             dir = @cfg.root
             @walker = walkdir.walk dir, max_depth: @cfg.maxDepth
             onWalkerPath = (cfg) -> (p,stat) ->
@@ -85,17 +86,20 @@ class Walker
                     # log "max files reached: #{cfg.files.length}"
                     @end()
 
-                else if cfg.slowdown and (cfg.files.length % 20) == 19
+                else if cfg.slowdown and (cfg.files.length % 400) == 399
                     @pause()
-                    setTimeout @resume, 30
+                    setTimeout @resume, 10
                     
             @walker.on 'path', onWalkerPath @cfg
-            @walker.on 'end', => @cfg.done? @cfg.files, @cfg.stats
+            @walker.on 'end', => 
+                @running = false
+                @cfg.done? @
                 
         catch err
+            @running = false
             error "Walker.start -- #{err} dir: #{dir} stack:", err.stack
 
-    stop: -> 
+    stop: ->
         
         @walker?.pause()
         @walker?.end()

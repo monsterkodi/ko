@@ -5,8 +5,8 @@
 #    000     000       000   000  000 0 000  000  000  0000  000   000  000    
 #    000     00000000  000   000  000   000  000  000   000  000   000  0000000
 
-{ reversed, prefs, error, log, _
-}          = require 'kxk'
+{ reversed, prefs, error, log, _  } = require 'kxk'
+
 salt       = require '../tools/salt'
 TextEditor = require '../editor/texteditor'
 syntax     = require '../editor/syntax'

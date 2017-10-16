@@ -5,8 +5,8 @@
 # 000       000  000  0000  000   000
 # 000       000  000   000  0000000  
 
-{ log
-}       = require 'kxk'
+{ log } = require 'kxk'
+
 Command = require '../commandline/command'
 
 class Find extends Command

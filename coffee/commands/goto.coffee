@@ -5,9 +5,9 @@
 # 000   000  000   000     000     000   000
 #  0000000    0000000      000      0000000 
 
-{ clamp, post, log, _
-}        = require 'kxk'
-Command  = require '../commandline/command'
+{ clamp, post, log, _ } = require 'kxk'
+
+Command = require '../commandline/command'
 
 class Goto extends Command
 

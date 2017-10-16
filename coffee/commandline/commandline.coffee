@@ -106,7 +106,7 @@ class Commandline extends TextEditor
         @selectSingleRange @rangeForLineAtIndex 0
 
     setText: (t) ->
-
+        
         @setLines [t ? '']
         @singleCursorAtPos [@line(0).length, 0]
 

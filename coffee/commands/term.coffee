@@ -6,8 +6,8 @@
 #    000     00000000  000   000  000   000
 
 { packagePath, dirExists, reversed, unresolve, resolve, path, fs,
-  post, noon, store, clamp, log, _
-}        = require 'kxk'
+  post, noon, store, clamp, log, _ } = require 'kxk'
+  
 Walker   = require '../tools/walker'
 Syntax   = require '../editor/syntax'
 Command  = require '../commandline/command'
