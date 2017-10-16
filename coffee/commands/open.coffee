@@ -1,12 +1,13 @@
+###
+ 0000000   00000000   00000000  000   000
+000   000  000   000  000       0000  000
+000   000  00000000   0000000   000 0 000
+000   000  000        000       000  0000
+ 0000000   000        00000000  000   000
+###
 
-#  0000000   00000000   00000000  000   000
-# 000   000  000   000  000       0000  000
-# 000   000  00000000   0000000   000 0 000
-# 000   000  000        000       000  0000
-#  0000000   000        00000000  000   000
-
-{ packagePath, splitFilePos, joinFilePos, fileExists, dirExists, valid, empty,
-  unresolve, relative, resolve, prefs, clamp, post, error, log, path, fs, _ } = require 'kxk'
+{ packagePath, splitFilePos, joinFilePos, fileExists, fileName, dirExists, valid, empty,
+  unresolve, relative, resolve, prefs, clamp, post, path, fs, error, log, _ } = require 'kxk'
   
 profile  = require '../tools/profile'
 Walker   = require '../tools/walker'
@@ -112,30 +113,19 @@ class Open extends Command
     # 00     00  00000000  000   0000000   000   000     000   
 
     weight: (item, opt) =>            
-        
-        # local 
-        #    directories
-        #    files
-        # sub/directories
-        # parent
-        # sibling/directories
-        
+                
         return item.bonus if item.bonus?
         
         f = item.file
         r = item.text
         b = path.basename f
+        n = fileName f
                 
-        if f.startsWith @dir
-            localBonus = Math.max 0, (5-r.split('/').length) * 0x00000fff
-        else
-            localBonus = Math.max 0, (5-r.split('../').length) * 0x00000333
-
         relBonus = 0
-        baseBonus = 0
+        nameBonus = 0
         if opt?.currentText?.length
-            relBonus  = r.startsWith(opt.currentText) and 0x0000ffff * (opt.currentText.length/r.length) or 0 
-            baseBonus = b.startsWith(opt.currentText) and 0x00000888 or 0
+            relBonus  = r.startsWith(opt.currentText) and 65535 * (opt.currentText.length/r.length) or 0 
+            nameBonus = n.startsWith(opt.currentText) and 2184  * (opt.currentText.length/n.length) or 0
            
         extensionBonus = switch path.extname b
             when '.coffee'               then 100
@@ -145,19 +135,35 @@ class Open extends Command
             when '.js', '.json', '.html' then -10
             else 0 
         extensionBonus -= 400 if b[0] == '.'
-        extensionBonus += 0x00ffffff if item.text == '..' if @navigating
+        extensionBonus += 16777215 if item.text == '..' if @navigating
         
-        directoryBonus = item.line == '▸' and 500 or 0
-                        
         lengthPenalty = path.dirname(f).length
                 
         if opt?.flat
-            w = extensionBonus + relBonus + baseBonus - lengthPenalty
+            
+            updirPenalty = r.split('../').length * 819
+            
+            w = relBonus + nameBonus + extensionBonus - lengthPenalty - updirPenalty
+            
         else
-            w = localBonus + relBonus + baseBonus + directoryBonus + extensionBonus - lengthPenalty
+            
+            directoryBonus = item.line == '▸' and 500 or 0
+            
+            if f.startsWith @dir
+                localBonus = Math.max 0, (5-r.split('/').length) * 4095
+            else
+                localBonus = Math.max 0, (5-r.split('../').length) * 819
+            
+            w = localBonus + directoryBonus + relBonus + nameBonus + extensionBonus - lengthPenalty
+                        
         w
 
-    weightedItems: (items, opt) -> _.sortBy items, (o) => 0xffffffff - @weight o, opt
+    weightedItems: (items, opt) -> 
+        # log 'weightedItems', items.length, opt
+        items.sort (a,b) => @weight(b, opt) - @weight(a, opt)
+        # for item in items.slice 0, 10
+            # log @weight(item, opt), item.file, item.text, item.bonus ? ''
+        items
     
     # 000      000   0000000  000000000
     # 000      000  000          000   
@@ -178,7 +184,7 @@ class Open extends Command
             item.text = relative f, @dir
             item.line = ' '
             item.file = f
-            item.bonus = 0x000fffff
+            item.bonus = 1048575
             items.push item
             @lastFileIndex = 0
 
@@ -225,7 +231,7 @@ class Open extends Command
 
         if @history.length > 1 and (@selected < 0 or not @navigating and @selected == 0)
             items = []
-            bonus = 0x000fffff
+            bonus = 1048575
             for f in @history
                 item = Object.create null
                 item.text = relative f, @dir
@@ -295,14 +301,10 @@ class Open extends Command
        
     navigateDir: (dir) ->
         
-        # log 'navigateDir', dir
-        
         r = @loadDir 
             dir: dir
             noPkg: true
             navigating: true
-            
-        # log 'navigateDir result', r
             
         if r
             @hideList()
@@ -387,7 +389,7 @@ class Open extends Command
         for i in [0...walker.cfg.files.length]
             @files.push [walker.cfg.files[i], walker.cfg.stats[i]]
             
-        @files = _.sortBy @files, (o) => relative(o[0], @dir).replace(/\./g, 'z')
+        # @files = _.sortBy @files, (o) => relative(o[0], @dir).replace(/\./g, 'z')
         
         @showList()
         @showItems @listItems includeThis: false

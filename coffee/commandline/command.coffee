@@ -1,9 +1,10 @@
-
-#  0000000   0000000   00     00  00     00   0000000   000   000  0000000  
-# 000       000   000  000   000  000   000  000   000  0000  000  000   000
-# 000       000   000  000000000  000000000  000000000  000 0 000  000   000
-# 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
-#  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
+###
+ 0000000   0000000   00     00  00     00   0000000   000   000  0000000  
+000       000   000  000   000  000   000  000   000  0000  000  000   000
+000       000   000  000000000  000000000  000000000  000 0 000  000   000
+000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
+ 0000000   0000000   000   000  000   000  000   000  000   000  0000000  
+###
 
 { reversed, clamp, prefs, elem, error, log, _ } = require 'kxk'
 
@@ -92,11 +93,10 @@ class Command
 
     weight: (item, opt) ->
         w = 0
-        w += item.text.startsWith(opt.currentText) and 0x0000ffff * (opt.currentText.length/item.text.length) or 0 
+        w += item.text.startsWith(opt.currentText) and 65535 * (opt.currentText.length/item.text.length) or 0 
         w
     
-    weightedItems: (items, opt) -> 
-        _.sortBy items, (o) => 0xffffffff - @weight o, opt
+    weightedItems: (items, opt) -> items.sort (a,b) => @weight(b, opt) - @weight(a, opt)
     
     #  0000000   0000000   000   000   0000000  00000000  000    
     # 000       000   000  0000  000  000       000       000    
