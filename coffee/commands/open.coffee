@@ -59,6 +59,7 @@ class Open extends Command
         if command.length
             fuzzied = fuzzy.filter path.basename(file), items, extract: (o) -> o.text            
             items = (f.original for f in fuzzied)
+            items.sort (a,b) -> b.weight - a.weight
                     
         if items.length
             @showItems items
@@ -128,7 +129,7 @@ class Open extends Command
             nameBonus = n.startsWith(opt.currentText) and 2184  * (opt.currentText.length/n.length) or 0
            
         extensionBonus = switch path.extname b
-            when '.coffee'               then 100
+            when '.coffee'               then 1000
             when '.cpp', '.hpp', '.h'    then 90
             when '.md', '.styl', '.pug'  then 50
             when '.noon'                 then 25
@@ -143,7 +144,7 @@ class Open extends Command
             
             updirPenalty = r.split('../').length * 819
             
-            w = relBonus + nameBonus + extensionBonus - lengthPenalty - updirPenalty
+            item.weight = relBonus + nameBonus + extensionBonus - lengthPenalty - updirPenalty
             
         else
             
@@ -154,15 +155,15 @@ class Open extends Command
             else
                 localBonus = Math.max 0, (5-r.split('../').length) * 819
             
-            w = localBonus + directoryBonus + relBonus + nameBonus + extensionBonus - lengthPenalty
-                        
-        w
+            item.weight = localBonus + directoryBonus + relBonus + nameBonus + extensionBonus - lengthPenalty
+            
+        item.weight     
 
     weightedItems: (items, opt) -> 
         # log 'weightedItems', items.length, opt
         items.sort (a,b) => @weight(b, opt) - @weight(a, opt)
         # for item in items.slice 0, 10
-            # log @weight(item, opt), item.file, item.text, item.bonus ? ''
+            # log item.weight, item.file, item.text, item.bonus ? ''
         items
     
     # 000      000   0000000  000000000

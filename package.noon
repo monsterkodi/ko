@@ -27,7 +27,6 @@ bugs
 dependencies
                 assert          ^1.4.1
                 chai            ^4.1.2
-                chalk           ^2.1.0
                 chokidar        ^1.7.0
                 chrome-remote-interface  ^0.24.5
                 coffee-script   ^1.12.7
@@ -57,7 +56,6 @@ dependencies
                 seamless-immutable  ^7.1.2
                 sorcery         ^0.10.0
                 source-map      ^0.5.7
-                sprintf-js      ^1.1.1
                 strip-ansi      ^4.0.0
                 textextensions  ^2.1.0
                 three           ^0.87.1

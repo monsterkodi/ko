@@ -1,14 +1,14 @@
-
-# 000   000  000  000   000  0000000     0000000   000   000
-# 000 0 000  000  0000  000  000   000  000   000  000 0 000
-# 000000000  000  000 0 000  000   000  000   000  000000000
-# 000   000  000  000  0000  000   000  000   000  000   000
-# 00     00  000  000   000  0000000     0000000   00     00
+###
+000   000  000  000   000  0000000     0000000   000   000
+000 0 000  000  0000  000  000   000  000   000  000 0 000
+000000000  000  000 0 000  000   000  000   000  000000000
+000   000  000  000  0000  000   000  000   000  000   000
+00     00  000  000   000  0000000     0000000   00     00
+###
 
 { splitFilePos, stopEvent, fileExists, fileList, unresolve, resolve, keyinfo, 
-  prefs, stash, drag, noon, post, path, clamp, 
-  pos, str, sw, sh, os, fs, log, error, _
-}           = require 'kxk'
+  prefs, stash, drag, noon, post, path, clamp, pos, str, sw, sh, os, fs, log, error, _ } = require 'kxk' 
+
 Split       = require './split'
 Terminal    = require './terminal'
 Titlebar    = require './titlebar'

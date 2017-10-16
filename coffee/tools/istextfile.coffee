@@ -9,16 +9,14 @@ path = require 'path'
 _    = require 'lodash'
 
 textext = _.reduce require('textextensions'), (map, ext) ->
-    map[".#{ext}"] = ext
+    map[".#{ext}"] = true
     map
 , {}
 
-textext['.crypt']  = 'crypt'
-textext['.noon']   = 'noon'
-textext['.pug']    = 'pug'
-textext['.bashrc'] = 'bashrc'
-textext['.bashrc'] = 'markdown'
-textext['.svg']    = 'html'
+textext['.crypt']  = true
+textext['.bashrc'] = true
+textext['.svg']    = true
+textext['.csv']    = true
 
 textbase = 
     profile:1
