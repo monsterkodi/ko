@@ -1,6 +1,6 @@
 name            ko-editor
 productName     ko
-version         0.32.0
+version         0.33.0
 description     an editor for macOS
 main            js/main/main.js
 preferGlobal    true
@@ -44,7 +44,7 @@ dependencies
                 js-beautify     ^1.6.14
                 karg            >=1.0.10
                 keycode         ^2.1.9
-                kxk             ^0.17.8
+                kxk             >=0.17.8
                 lodash          ^4.17.4
                 mocha           ^3.5.3
                 nconf           ^0.8.4
