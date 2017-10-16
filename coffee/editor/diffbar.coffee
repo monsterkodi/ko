@@ -226,7 +226,8 @@ class Diffbar
     updateScroll: =>
         
         w  = 2
-        h  = Math.min @editor.scroll.fullHeight, @editor.view.clientHeight
+        # h  = Math.min @editor.scroll.fullHeight, @editor.view.clientHeight
+        h  = @editor.scroll.fullHeight
         lh = h / @editor.numLines()
 
         ctx = @elem.getContext '2d'

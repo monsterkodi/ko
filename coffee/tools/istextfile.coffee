@@ -5,8 +5,9 @@
 # 000       000     000     000        000 000      000     000       000  000      000       
 # 000  0000000      000     00000000  000   000     000     000       000  0000000  00000000  
 
-path = require 'path'
-_    = require 'lodash'
+{ path, _ } = require 'kxk'
+
+isBinary = require 'isbinaryfile'
 
 textext = _.reduce require('textextensions'), (map, ext) ->
     map[".#{ext}"] = true
@@ -24,6 +25,9 @@ textbase =
     '.gitignore':1
     '.npmignore':1
 
-isTextFile = (f) -> path.extname(f) and textext[path.extname f]? or textbase[path.basename(f).toLowerCase()]
+isTextFile = (f) -> 
+    return true if path.extname(f) and textext[path.extname f]? 
+    return true if textbase[path.basename(f).toLowerCase()]
+    return not isBinary.sync f
 
 module.exports = isTextFile
