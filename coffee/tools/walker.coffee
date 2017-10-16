@@ -80,11 +80,15 @@ class Walker
                 else
                     if path.extname(p) in cfg.includeExt or path.basename(p) in cfg.include or cfg.includeExt.indexOf('') >= 0
                         cfg.file? p, stat
-                        
+                                                
                 if cfg.files.length > cfg.maxFiles
                     # log "max files reached: #{cfg.files.length}"
                     @end()
-            
+
+                else if cfg.slowdown and (cfg.files.length % 20) == 19
+                    @pause()
+                    setTimeout @resume, 30
+                    
             @walker.on 'path', onWalkerPath @cfg
             @walker.on 'end', => @cfg.done? @cfg.files, @cfg.stats
                 

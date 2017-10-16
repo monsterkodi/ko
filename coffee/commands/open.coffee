@@ -5,9 +5,9 @@
 # 000   000  000        000       000  0000
 #  0000000   000        00000000  000   000
 
-{ packagePath, splitFilePos, joinFilePos, fileExists, dirExists, unresolve, relative, resolve,
-  prefs, clamp, post, error, log, path, fs, _
-}        = require 'kxk'
+{ packagePath, splitFilePos, joinFilePos, fileExists, dirExists, 
+  unresolve, relative, resolve, prefs, clamp, post, error, log, path, fs, _ } = require 'kxk'
+  
 profile  = require '../tools/profile'
 Walker   = require '../tools/walker'
 Command  = require '../commandline/command'
@@ -289,7 +289,11 @@ class Open extends Command
             opt.dir = @dir
             
         @loadDir opt
+
         super @combo
+        
+        @selected = 0
+        
         text: ''
        
     navigateDir: (dir) ->
@@ -350,7 +354,7 @@ class Open extends Command
             includeDirs: true
             maxFiles:    300
             maxDepth:    2
-        
+         
         @fastWalker = new Walker fopt
         @fastWalker.start()
 
@@ -361,9 +365,11 @@ class Open extends Command
             includeDirs: true
             maxFiles:    2000
             maxDepth:    5
-        
+            slowdown:    true
+         
         @walker = new Walker wopt
-        @walker.start()   
+        @walker.start()
+                
         true
         
     # 000   000   0000000   000      000   000  00000000  00000000 
@@ -373,6 +379,8 @@ class Open extends Command
     # 00     00  000   000  0000000  000   000  00000000  000   000
             
     walkerDone: (fileList, statList) =>
+        
+        log 'walkerDone', fileList.length, @navigating, @selected, @lastFileIndex
         
         for i in [0...fileList.length]
             @files.push [fileList[i], statList[i]]

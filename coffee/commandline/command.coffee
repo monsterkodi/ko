@@ -173,8 +173,8 @@ class Command
     # 0000000   00000000  0000000  00000000   0000000     000   
         
     select: (i) -> 
-        
         @selected = clamp -1, @commandList?.numLines()-1, i
+        log "select #{i}", @selected
         if @selected >= 0
             @commandList?.selectSingleRange @commandList.rangeForLineAtIndex @selected
             @commandList?.do.cursors [[0, @selected]]

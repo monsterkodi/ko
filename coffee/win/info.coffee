@@ -5,8 +5,8 @@
 # 000  000  0000  000       000   000
 # 000  000   000  000        0000000 
 
-{ shortCount, post, elem, log, $, _
-} = require 'kxk'
+{ shortCount, post, elem, log, $, _ } = require 'kxk'
+
 Tooltip = require '../tools/tooltip'
 
 class Info
