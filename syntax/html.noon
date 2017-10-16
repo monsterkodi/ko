@@ -5,13 +5,18 @@
 # 000   000     000     000 0 000  000    
 # 000   000     000     000   000  0000000
 
+
+ko
+    extnames                 . htm . html . xml . svg
+
 # braces
 
 [\(\)\{\}]                     punctuation.marker
 
 # tags
 
-(<\/?)(html|body|section|header|footer|meta|script|style|head|ul|li|a|b|br|p|center|table|title|link|nav|tr|th|td|div|span|img|h\d|dt|blockquote|pre|hr|canvas|svg|path)(\/?>|\ )   . keyword.marker . keyword . keyword.marker
+(<\/?)(html|body|section|header|footer|meta|script|style|head|ul|li|a|b|br|p|center|table|title|link|nav|tr|th|td|div|span|img|h\d|dt|blockquote|pre|hr|canvas)(\/?>|\ )   . keyword.marker . keyword . keyword.marker
+(<\/?)(svg|path|g|rect|defs|circle|ellipse|line|polygon|text|tspan|pattern|filter|radialGradient|linearGradient|stop)(\/?>|\ )   . keyword.marker . keyword . keyword.marker
 \>                             keyword.marker
 
 (<!DOCTYPE)(.*)              . class.marker . class
@@ -26,11 +31,15 @@
 
 # attributes
 
-(\s\w+\s*)(\=)               . property . property.marker
+([\w-]+\s*)(\=)              . property . property.marker
+
+# namespace
+
+(\w+:)                       . function.marker
 
 # attr
 
-(::?)([^\s\:]+)              . function.marker . function 
+(::)([^\s\:]+)               . function.marker . function 
 
 #number
 
