@@ -5,8 +5,7 @@
 #    000     000   000  000   000  000         000     000  000      
 #    000      0000000    0000000   0000000     000     000  000      
 
-{ elem, pos, error, log, $, _
-} = require 'kxk'
+{ elem, pos, error, log, $, _ } = require 'kxk'
 
 class Tooltip
     

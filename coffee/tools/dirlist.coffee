@@ -5,8 +5,8 @@
 # 000   000  000  000   000  000      000       000     000     
 # 0000000    000  000   000  0000000  000  0000000      000     
 
-{ resolve, relative, fs, path, error, log, _  
-}          = require 'kxk'
+{ resolve, relative, fs, path, error, log, _ } = require 'kxk'
+
 walkdir    = require 'walkdir'
 isTextFile = require './istextfile'
 

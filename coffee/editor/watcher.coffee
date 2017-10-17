@@ -5,8 +5,8 @@
 # 000   000  000   000     000     000       000   000  000       000   000
 # 00     00  000   000     000      0000000  000   000  00000000  000   000
 
-{ log, fs
-}        = require 'kxk'
+{ log, fs } = require 'kxk'
+
 chokidar = require 'chokidar'
 
 class Watcher

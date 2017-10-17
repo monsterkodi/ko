@@ -5,8 +5,8 @@
 # 000   000  000     000          000     000     000   000     000     000   000       000  
 #  0000000   000     000     0000000      000     000   000     000      0000000   0000000   
 
-{ escapePath, childp, dirExists, process, path, str, log, _
-}       = require 'kxk'
+{ escapePath, childp, dirExists, process, path, str, log, _ } = require 'kxk'
+
 gitRoot = require './gitroot'
 
 gitStatus = (fileOrDir) ->

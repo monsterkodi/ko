@@ -5,8 +5,8 @@
 # 000   000  000       000  0000  000   000  000       000   000
 # 000   000  00000000  000   000  0000000    00000000  000   000
 
-{str, elem, log,
-}      = require 'kxk'
+{ str, elem, log, } = require 'kxk'
+
 encode = require '../tools/encode'
 
 class Render

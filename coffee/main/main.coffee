@@ -6,8 +6,8 @@
 # 000   000  000   000  000  000   000
 
 { splitFilePos, fileExists, dirExists, fileList, resolve,
-  childp, about, prefs, store, noon, post, path, fs, str, error, log, _
-}        = require 'kxk'
+  childp, about, prefs, store, noon, post, path, fs, str, error, log, _ } = require 'kxk'
+  
 pkg      = require '../../package.json'
 Execute  = require './execute'
 Navigate = require './navigate'

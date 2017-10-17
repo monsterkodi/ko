@@ -5,8 +5,8 @@
 000       000   000  000     000     000   000  000   000
 00000000  0000000    000     000      0000000   000   000
 ###
-{ fileList, extName, clamp, empty, path, str, error, log, _
-}       = require 'kxk'
+{ fileList, extName, clamp, empty, path, str, error, log, _ } = require 'kxk'
+
 Buffer  = require './buffer'
 Syntax  = require './syntax'
 Do      = require './do'

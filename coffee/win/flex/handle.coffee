@@ -5,8 +5,7 @@
 # 000   000  000   000  000  0000  000   000  000      000     
 # 000   000  000   000  000   000  0000000    0000000  00000000
 
-{ elem, drag, log, _ 
-} = require 'kxk'
+{ elem, drag, log, _ } = require 'kxk'
 
 class Handle
     

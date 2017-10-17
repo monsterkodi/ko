@@ -5,8 +5,8 @@
 #      000  000       000   000  000   000  000       000   000
 # 0000000   00000000  000   000  000   000   0000000  000   000
 
-{ packagePath, unresolve, path, post, fs, log, _
-}        = require 'kxk'
+{ packagePath, unresolve, path, post, fs, log, _ } = require 'kxk'
+
 walker   = require '../tools/walker'
 matchr   = require '../tools/matchr'
 syntax   = require '../editor/syntax'

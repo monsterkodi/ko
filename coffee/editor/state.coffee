@@ -5,8 +5,8 @@
 #      000     000     000   000     000     000     
 # 0000000      000     000   000     000     00000000
 
-{ log, str, _ 
-}         = require 'kxk'
+{ log, str, _ } = require 'kxk'
+
 Immutable = require 'seamless-immutable'
 
 class State

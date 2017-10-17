@@ -5,8 +5,8 @@
 # 000   000  000       000   000  000   000  000   000  000   000  000       000   000  
 # 0000000    00000000  0000000     0000000    0000000    0000000   00000000  000   000  
 
-{ post, path, log, _
-}       = require 'kxk'
+{ post, path, log, _ } = require 'kxk'
+
 WinDbg  = require './windbg'
 
 class Debugger

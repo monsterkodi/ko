@@ -5,8 +5,7 @@
 #       000  000   000
 #   000000   0000000  
 
-{ elem, log
-}     = require 'kxk'
+{ elem, log } = require 'kxk'
 Stage = require '../stage'
 
 class Three extends Stage

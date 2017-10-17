@@ -6,8 +6,8 @@
 # 000   000  000   000   0000000  000   000   0000000
 
 { packagePath, fileExists, fileName, fileList, reversed, relative, splitExt,
-  post, noon, path, fs, error, log, _
-}       = require 'kxk'
+  post, noon, path, fs, error, log, _ } = require 'kxk'
+  
 indexer = require '../main/indexer'
 salt    = require '../tools/salt'
 Command = require '../commandline/command'

@@ -5,8 +5,8 @@
 #      000  000       000   000  000   000  000      000      000   000  000   000  000   000
 # 0000000    0000000  000   000   0000000   0000000  0000000  0000000    000   000  000   000
 
-{ stopEvent, elem, clamp, drag, log
-}      = require 'kxk'
+{ stopEvent, elem, clamp, drag, log } = require 'kxk'
+
 scheme = require '../tools/scheme'
 
 class Scrollbar

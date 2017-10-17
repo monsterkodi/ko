@@ -5,8 +5,8 @@
 # 000   000  000  000  0000  000   000  000   000  000   000  
 # 00     00  000  000   000  0000000    0000000     0000000   
 
-{ joinFileLine, samePath, splitFileLine, unresolve, post, path, empty, log, _
-}        = require 'kxk'
+{ joinFileLine, samePath, splitFileLine, unresolve, post, path, empty, log, _ } = require 'kxk'
+
 electron = require 'electron'
 srcmap   = require '../tools/srcmap'
 

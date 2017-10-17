@@ -5,8 +5,8 @@
 000   000  000   000
 0000000     0000000
 ###
-{ clamp, str, post, empty, error, log, _
-}     = require 'kxk'
+{ clamp, str, post, empty, error, log, _ } = require 'kxk'
+
 State = require './state'
 require '../tools/ranges'
 

@@ -5,8 +5,7 @@
 # 000   000  000     000     000   000  000   000  000   000     000     
 #  0000000   000     000     000   000   0000000    0000000      000     
 
-{ empty, dirExists, childp, path, fs
-} = require 'kxk'
+{ empty, dirExists, childp, path, fs } = require 'kxk'
 
 gitRoot = (pth, cb) ->
 

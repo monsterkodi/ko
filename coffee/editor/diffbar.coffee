@@ -6,8 +6,8 @@
 0000000    000  000       000       0000000    000   000  000   000
 ###
 
-{ log, error, packagePath, fileExists, elem, str, empty, post, path, fs, 
-}        = require 'kxk'
+{ log, error, packagePath, fileExists, elem, str, empty, post, path, fs, } = require 'kxk'
+
 gitWatch = require '../tools/gitwatch'
 lineDiff = require '../tools/linediff'
 forkfunc = require '../tools/forkfunc'

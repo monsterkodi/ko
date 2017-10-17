@@ -5,8 +5,8 @@
 # 000 0 000  000          000     000   000
 # 000   000  00000000     000     000   000
 
-{ stopEvent, empty, elem, post, fs, error, log, $, _
-}      = require 'kxk'
+{ stopEvent, empty, elem, post, fs, error, log, $, _ } = require 'kxk'
+
 ranges = require '../tools/ranges'
 
 class Meta

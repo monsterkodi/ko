@@ -6,8 +6,7 @@
 # 000   000  000   000  0000000   000  0000000    000  0000000   0000000 
 
 # based on code from https://github.com/rburns/ansi-to-html
-{ log, _
-}        = require 'kxk'
+{ log, _ } = require 'kxk'
 entities = require 'entities'
 
 STYLES =

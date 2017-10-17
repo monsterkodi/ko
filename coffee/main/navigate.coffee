@@ -5,8 +5,7 @@
 # 000  0000  000   000     000     000  000   000  000   000     000     000     
 # 000   000  000   000      0      000   0000000   000   000     000     00000000
 
-{ clamp, unresolve, joinFilePos, post, log, _
-} = require 'kxk'
+{ clamp, unresolve, joinFilePos, post, log, _ } = require 'kxk'
 
 class Navigate
     

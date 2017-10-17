@@ -1,12 +1,13 @@
+###
+00     00  00000000  000   000  000   000
+000   000  000       0000  000  000   000
+000000000  0000000   000 0 000  000   000
+000 0 000  000       000  0000  000   000
+000   000  00000000  000   000   0000000 
+###
 
-# 00     00  00000000  000   000  000   000
-# 000   000  000       0000  000  000   000
-# 000000000  0000000   000 0 000  000   000
-# 000 0 000  000       000  0000  000   000
-# 000   000  00000000  000   000   0000000 
+{ fileList, unresolve, prefs, fs, post, path, log } = require 'kxk'
 
-{ fileList, unresolve, prefs, fs, post, path, log
-}        = require 'kxk'
 pkg      = require '../../package.json'
 electron = require 'electron'
 AppMenu  = electron.Menu

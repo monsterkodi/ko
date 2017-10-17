@@ -5,8 +5,8 @@
 # 000  0000  000   000  000 0 000  000   000  000       000   000       000
 # 000   000   0000000   000   000  0000000    00000000  000   000  0000000 
 
-{ str, setStyle, elem, log, $, _
-}     = require 'kxk'
+{ str, setStyle, elem, log, $, _ } = require 'kxk'
+
 event = require 'events'
 
 class Numbers extends event

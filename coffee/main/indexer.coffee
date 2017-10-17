@@ -5,8 +5,8 @@
 # 000  000  0000  000   000  000        000 000   000       000   000
 # 000  000   000  0000000    00000000  000   000  00000000  000   000
 
-{ packagePath, fileExists, unresolve, fileName, resolve, empty, post, path, fs, log, _
-}        = require 'kxk'
+{ packagePath, fileExists, unresolve, fileName, resolve, empty, post, path, fs, log, _ } = require 'kxk'
+
 Walker   = require '../tools/walker'
 electron = require 'electron'
 

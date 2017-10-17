@@ -5,8 +5,8 @@
 000   000  000   000  000      000   000  000  0000  000       000       000   000
 0000000    000   000  0000000  000   000  000   000   0000000  00000000  000   000
 ###
-{ empty, str, log, error, _
-}      = require 'kxk'
+{ empty, str, log, error, _ } = require 'kxk'
+
 matchr = require '../tools/matchr'
 
 class Balancer

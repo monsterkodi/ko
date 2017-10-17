@@ -5,8 +5,7 @@
 # 000   000  000   000  000   000
 # 000   000   0000000   00     00
 
-{ elem, keyinfo, clamp, empty, post, error, log, $, _ 
-} = require 'kxk'
+{ elem, keyinfo, clamp, empty, post, error, log, $, _ } = require 'kxk' 
 
 syntax = require '../editor/syntax'
 

@@ -5,8 +5,8 @@
 # 000        000 000   000       000       000   000     000     000
 # 00000000  000   000  00000000   0000000   0000000      000     00000000
 
-{ noon, str, post, error, log, _
-}        = require 'kxk'
+{ noon, str, post, error, log, _ } = require 'kxk'
+
 colors   = require 'colors'
 coffee   = require 'coffee-script'
 pty      = require 'node-pty'

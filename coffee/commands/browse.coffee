@@ -5,8 +5,8 @@
 # 000   000  000   000  000   000  000   000       000  000       
 # 0000000    000   000   0000000   00     00  0000000   00000000  
 
-{ dirExists, process, unresolve, resolve, post, str, log, $
-}           = require 'kxk'
+{ dirExists, process, unresolve, resolve, post, str, log, $ } = require 'kxk'
+
 Command     = require '../commandline/command'
 FileBrowser = require '../browser/filebrowser'
 

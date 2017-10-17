@@ -6,6 +6,7 @@
 #  0000000   000     000     0000000    000  000       000         
 
 { escapePath, resolve, childp, path, str, log, _ } = require 'kxk'
+
 stripAnsi = require 'strip-ansi'
 
 gitDiff = (file) ->

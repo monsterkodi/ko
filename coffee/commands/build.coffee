@@ -5,8 +5,8 @@
 # 000   000  000   000  000  000      000   000
 # 0000000     0000000   000  0000000  0000000  
 
-{ fileExists, dirExists, resolve, log, $, _
-}        = require 'kxk'
+{ fileExists, dirExists, resolve, log, $, _ } = require 'kxk'
+
 Command  = require '../commandline/command'
 
 class Build extends Command
