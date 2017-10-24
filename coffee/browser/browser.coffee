@@ -261,11 +261,11 @@ class Browser extends Stage
         if items.length
             items.sort (a,b) -> a.line - b.line
             opt.parent ?= item
-            @clearColumnsFrom opt.column #, pop:true
+            @clearColumnsFrom opt.column
             @loadItems items, opt
         else
             ext = path.extname file  
-            if ext in ['.gif', '.png', '.jpg']
+            if ext in ['.gif', '.png', '.jpg', '.jpeg', '.svg']
                 @clearColumnsFrom opt.column, pop:true
                 @loadImage row, file
             else if ext in ['.icns', '.tiff', '.tif']
@@ -323,5 +323,5 @@ class Browser extends Stage
         cnt = elem class: 'browserImageContainer', child: 
             elem 'img', class: 'browserImage', src: "file://#{encodePath file}"
         col.table.appendChild cnt
-
+        
 module.exports = Browser
