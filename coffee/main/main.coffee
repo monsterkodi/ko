@@ -109,7 +109,7 @@ winWithID   = (winID) ->
 hideDock = ->
     
     return if prefs.get 'trayOnly', false
-    app.dock.hide() if app.dock
+    app.dock?.hide()
 
 # 00000000    0000000    0000000  000000000  
 # 000   000  000   000  000          000     
@@ -149,12 +149,14 @@ post.on 'shellCommand', (cfg) ->
 # 000   000  000   000  000  000   000
 
 class Main
-    
-    constructor: (openFiles) -> 
-        
-        if app.makeSingleInstance @otherInstanceStarted
-            app.exit 0
-            return
+
+    constructor: (openFiles) ->
+
+        log 'Main.constructor'
+        # if app.makeSingleInstance @otherInstanceStarted
+        #     log 'single instance'
+        #     app.exit 0
+        #     return
 
         @debugger     = new Debugger
         @indexer      = new Indexer
@@ -231,7 +233,7 @@ class Main
         
         for w in wins()
             w.show()
-            app.dock.show()
+            app.dock?.show()
         @
             
     raiseWindows: ->
@@ -393,23 +395,28 @@ class Main
     # 000   000  00000000  0000000      000      0000000   000   000  00000000
     
     moveWindowStashes: ->
-        userData = app.getPath 'userData' 
-        stashDir = path.join(userData, 'win')
+        userData = app.getPath 'userData'
+        stashDir = path.join userData, 'win'
         if dirExists stashDir
             fs.moveSync stashDir, path.join(userData, 'old'), overwrite: true
-
+                
     restoreWindows: ->
         userData = app.getPath 'userData'
+        log 'restoreWindows userData', userData
+        fs.ensureDirSync userData
         stashFiles = fileList path.join(userData, 'old'), matchExt: ['.noon']
+        stashFiles ?= []
+        log 'restoreWindows stashFiles', stashFiles
         for file in stashFiles
+            log 'createWindow file', file
             @createWindow restore:file
-                
+       
     #  0000000  00000000   00000000   0000000   000000000  00000000
     # 000       000   000  000       000   000     000     000     
     # 000       0000000    0000000   000000000     000     0000000 
     # 000       000   000  000       000   000     000     000     
     #  0000000  000   000  00000000  000   000     000     00000000
-       
+        
     createWindow: (opt) ->
         
         opt ?= {}
@@ -433,21 +440,23 @@ class Main
             hasShadow:        false
             backgroundColor:  scheme == 'bright' and "#fff" or '#000'
             titleBarStyle:    'hidden'
-
+                
         if opt.restore?
             newStash = path.join app.getPath('userData'), 'win', "#{win.id}.noon"
             fs.copySync opt.restore, newStash
-                
+            
         htmlFile  = resolve "#{__dirname}/../#{scheme}.html"
         if not fileExists htmlFile
             pugRender = pug.compileFile "#{__dirname}/../../pug/index.pug"
             html = pugRender scheme: scheme
             fs.writeFileSync htmlFile, html, 'utf8'
-            
-        win.loadURL "file://#{htmlFile}"
         
-        app.dock.show()
+        win.loadURL "file://#{htmlFile}"
+
+        app.dock?.show()
+                
         win.on 'close',  @onCloseWin
+                
         win.on 'resize', @onResizeWin
         
         winLoaded = ->
@@ -456,10 +465,9 @@ class Main
                 post.toWin win.id, 'loadFiles', opt.files
             else if opt.file?
                 post.toWin win.id, 'loadFile', opt.file
-                
             if opt.debugFileLine?
                 post.toWin win.id, 'debugFileLine', opt.debugFileLine
-                
+    
             post.toWins 'winLoaded', win.id
             post.toWins 'numWins', wins().length
             
@@ -471,9 +479,9 @@ class Main
     # 0000000    0000000   0000000   000    000    0000000 
     # 000   000  000            000  000   000     000     
     # 000   000  00000000  0000000   000  0000000  00000000
-    
-    onResizeWin: (event) ->
         
+    onResizeWin: (event) ->
+
         return if disableSnap
         frameSize = 6
         wb = event.sender.getBounds()

@@ -38,23 +38,23 @@ commandline = null
 titlebar    = null
 tabs        = null
 
-window.onerror = (event, source, line, col, err) -> 
-    f = require('sorcery').loadSync(source.replace /coffee/g, 'js')
-    if f?
+window.onerror = (event, source, line, col, err) ->
+    # f = require('sorcery').loadSync(source.replace /coffee/g, 'js')
+    if false #f?
         l = f.trace(line)
         s = "▲ #{l.source}:#{l.line} ▲ [ERROR] #{err}"
     else
         s = "▲ [ERROR] #{err} #{unresolve source}:#{line}:#{col}"
     post.emit 'error', s
-    post.emit 'slog', s 
+    post.emit 'slog', s
     console.log s
 
-    
+
 # 00000000   00000000   00000000  00000000   0000000
-# 000   000  000   000  000       000       000     
-# 00000000   0000000    0000000   000000    0000000 
+# 000   000  000   000  000       000       000
+# 00000000   0000000    0000000   000000    0000000
 # 000        000   000  000       000            000
-# 000        000   000  00000000  000       0000000 
+# 000        000   000  00000000  000       0000000
 
 prefs.init()
 window.prefs = prefs
@@ -63,7 +63,7 @@ window.stash = new stash "win/#{winID}"
 post.setMaxListeners 20
 
 addToRecent = (file) ->
-    
+
     recent = prefs.get 'recentFiles', []
     _.pull recent, file
     recent.unshift file
@@ -71,30 +71,30 @@ addToRecent = (file) ->
         recent.pop()
     prefs.set 'recentFiles', recent
     commandline.commands.open.setHistory recent.reverse()
-    
-saveStash = -> 
-    
+
+saveStash = ->
+
     post.emit 'stash'
     editor.saveScrollCursorsAndSelections()
     window.stash.save()
     post.toMain 'stashSaved'
 
 restoreWin = ->
-    
+
     if bounds = window.stash.get 'bounds'
         win.setBounds bounds
-        
+
     if window.stash.get 'devTools'
         win.webContents.openDevTools()
-    
-# 00000000    0000000    0000000  000000000  
-# 000   000  000   000  000          000     
-# 00000000   000   000  0000000      000     
-# 000        000   000       000     000     
-# 000         0000000   0000000      000     
+
+# 00000000    0000000    0000000  000000000
+# 000   000  000   000  000          000
+# 00000000   000   000  0000000      000
+# 000        000   000       000     000
+# 000         0000000   0000000      000
 
 post.on 'shellCallbackData', (cmdData) -> commandline.commands['term'].onShellCallbackData cmdData
-post.on 'singleCursorAtPos', (pos, opt) -> 
+post.on 'singleCursorAtPos', (pos, opt) ->
     editor.singleCursorAtPos pos, opt
     editor.scroll.cursorToTop()
 post.on 'focusEditor',       -> split.focus 'editor'
@@ -105,7 +105,7 @@ post.on 'saveFileAs',        -> saveFileAs()
 post.on 'saveFile',          -> saveFile()
 post.on 'saveStash',         -> saveStash()
 post.on 'openFile',   (opt)  -> openFile  opt
-post.on 'reloadTab', (file)  -> reloadTab file 
+post.on 'reloadTab', (file)  -> reloadTab file
 post.on 'loadFile',  (file)  -> loadFile  file
 post.on 'loadFiles', (files) -> openFiles files
 post.on 'menuCombo', (combo) -> menuCombo combo
@@ -116,27 +116,27 @@ post.on 'editorFocus', (editor) ->
 # testing related ...
 
 post.on 'ping', (wID, argA, argB) -> post.toWin wID, 'pong', winID, argA, argB
-post.on 'postEditorState', -> 
-    post.toAll 'editorState', winID, 
-        lines:      editor.lines() 
-        cursors:    editor.cursors() 
+post.on 'postEditorState', ->
+    post.toAll 'editorState', winID,
+        lines:      editor.lines()
+        cursors:    editor.cursors()
         main:       editor.mainCursor()
         selections: editor.selections()
         highlights: editor.highlights()
 
-# 000   000  000  000   000  00     00   0000000   000  000   000  
-# 000 0 000  000  0000  000  000   000  000   000  000  0000  000  
-# 000000000  000  000 0 000  000000000  000000000  000  000 0 000  
-# 000   000  000  000  0000  000 0 000  000   000  000  000  0000  
-# 00     00  000  000   000  000   000  000   000  000  000   000  
+# 000   000  000  000   000  00     00   0000000   000  000   000
+# 000 0 000  000  0000  000  000   000  000   000  000  0000  000
+# 000000000  000  000 0 000  000000000  000000000  000  000 0 000
+# 000   000  000  000  0000  000 0 000  000   000  000  000  0000
+# 00     00  000  000   000  000   000  000   000  000  000   000
 
 winMain = ->
-    
-    # 000  000   000  000  000000000  
-    # 000  0000  000  000     000     
-    # 000  000 0 000  000     000     
-    # 000  000  0000  000     000     
-    # 000  000   000  000     000     
+
+    # 000  000   000  000  000000000
+    # 000  0000  000  000     000
+    # 000  000 0 000  000     000
+    # 000  000  0000  000     000
+    # 000  000   000  000     000
 
     titlebar    = window.titlebar    = new Titlebar
     tabs        = window.tabs        = titlebar.tabs
@@ -149,21 +149,21 @@ winMain = ->
     logview     = window.logview     = new LogView 'logview'
     info        = window.info        = new Info editor
     fps         = window.fps         = new FPS()
-    
+
     window.textEditor = window.focusEditor = editor
-    
+
     restoreWin()
-    
+
     split.on 'split', (s) ->
         area.resized()
         terminal.resized()
         commandline.resized()
         editor.resized()
         logview.resized()
-    
+
     terminal.on 'fileSearchResultChange', (file, lineChange) -> # sends changes to all windows
         post.toWins 'fileLineChanges', file, [lineChange]
-    
+
     editor.on 'changed', (changeInfo) ->
         return if changeInfo.foreign
         if changeInfo.changes.length
@@ -172,56 +172,56 @@ winMain = ->
 
     s = window.stash.get 'fontSize'
     editor.setFontSize s if s
-    
+
     if window.stash.get 'centerText'
         screenWidth = screenSize().width
         editor.centerText sw() == screenWidth, 0
-        
+
     post.emit 'restore'
     win.show()
     editor.focus()
-        
-# 00000000  0000000    000  000000000   0000000   00000000 
+
+# 00000000  0000000    000  000000000   0000000   00000000
 # 000       000   000  000     000     000   000  000   000
-# 0000000   000   000  000     000     000   000  0000000  
+# 0000000   000   000  000     000     000   000  0000000
 # 000       000   000  000     000     000   000  000   000
 # 00000000  0000000    000     000      0000000   000   000
 
 window.editorWithName = (n) ->
-    
+
     switch n
         when 'editor'   then editor
         when 'command', 'commandline' then commandline
         when 'terminal' then terminal
         when 'logview'  then logview
         else editor
-                 
+
 #  0000000   0000000   000   000  00000000
-# 000       000   000  000   000  000     
-# 0000000   000000000   000 000   0000000 
-#      000  000   000     000     000     
+# 000       000   000  000   000  000
+# 0000000   000000000   000 000   0000000
+#      000  000   000     000     000
 # 0000000   000   000      0      00000000
 
 saveFile = (file) ->
-    
+
     file ?= editor.currentFile
-    
+
     if not file?
         saveFileAs()
         return
 
     editor.stopWatcher()
-    
+
     if fileExists file
         stat = fs.statSync file
         mode = stat.mode
     else
         mode = 438
-        
+
     atomic file, editor.text(), { encoding: 'utf8', mode: mode }, (err) ->
-        
+
         editor.saveScrollCursorsAndSelections()
-        
+
         if err?
             log "error saving file #{file}:", err
         else
@@ -230,22 +230,22 @@ saveFile = (file) ->
             post.emit     'saved',     file
 
 window.saveChanges = ->
-    
+
     if editor.currentFile? and editor.do.hasLineChanges() and fileExists editor.currentFile
         stat = fs.statSync editor.currentFile
-        atomic editor.currentFile, editor.text(), { encoding: 'utf8', mode: stat.mode }, (err) ->            
+        atomic editor.currentFile, editor.text(), { encoding: 'utf8', mode: stat.mode }, (err) ->
             return error "window.saveChanges failed #{err}" if err
 
-#  0000000   000   000   0000000  000       0000000    0000000  00000000  
-# 000   000  0000  000  000       000      000   000  000       000       
-# 000   000  000 0 000  000       000      000   000  0000000   0000000   
-# 000   000  000  0000  000       000      000   000       000  000       
-#  0000000   000   000   0000000  0000000   0000000   0000000   00000000  
+#  0000000   000   000   0000000  000       0000000    0000000  00000000
+# 000   000  0000  000  000       000      000   000  000       000
+# 000   000  000 0 000  000       000      000   000  0000000   0000000
+# 000   000  000  0000  000       000      000   000       000  000
+#  0000000   000   000   0000000  0000000   0000000   0000000   00000000
 
 onMove  = -> window.stash.set 'bounds', win.getBounds()
 
 clearListeners = ->
-    
+
     document.removeEventListener 'keydown', onKeyDown
     win.removeListener 'close', onClose
     win.removeListener 'move',  onMove
@@ -253,18 +253,18 @@ clearListeners = ->
     win.webContents.removeAllListeners 'devtools-closed'
 
 onClose = ->
-    
+
     window.saveChanges()
     editor.setText ''
     editor.stopWatcher()
     window.stash.clear()
     clearListeners()
 
-#  0000000   000   000  000       0000000    0000000   0000000    
-# 000   000  0000  000  000      000   000  000   000  000   000  
-# 000   000  000 0 000  000      000   000  000000000  000   000  
-# 000   000  000  0000  000      000   000  000   000  000   000  
-#  0000000   000   000  0000000   0000000   000   000  0000000    
+#  0000000   000   000  000       0000000    0000000   0000000
+# 000   000  0000  000  000      000   000  000   000  000   000
+# 000   000  000 0 000  000      000   000  000000000  000   000
+# 000   000  000  0000  000      000   000  000   000  000   000
+#  0000000   000   000  0000000   0000000   000   000  0000000
 
 window.onload = ->
 
@@ -274,100 +274,100 @@ window.onload = ->
     win.on 'move',  onMove
     win.webContents.on 'devtools-opened', -> window.stash.set 'devTools', true
     win.webContents.on 'devtools-closed', -> window.stash.set 'devTools'
-    
-# 00000000   00000000  000       0000000    0000000   0000000    
-# 000   000  000       000      000   000  000   000  000   000  
-# 0000000    0000000   000      000   000  000000000  000   000  
-# 000   000  000       000      000   000  000   000  000   000  
-# 000   000  00000000  0000000   0000000   000   000  0000000    
+
+# 00000000   00000000  000       0000000    0000000   0000000
+# 000   000  000       000      000   000  000   000  000   000
+# 0000000    0000000   000      000   000  000000000  000   000
+# 000   000  000       000      000   000  000   000  000   000
+# 000   000  00000000  0000000   0000000   000   000  0000000
 
 reloadWin = ->
-    
+
     saveStash()
     clearListeners()
     editor.stopWatcher()
     win.webContents.reloadIgnoringCache()
 
-# 000       0000000    0000000   0000000  
+# 000       0000000    0000000   0000000
 # 000      000   000  000   000  000   000
 # 000      000   000  000000000  000   000
 # 000      000   000  000   000  000   000
-# 0000000   0000000   000   000  0000000  
+# 0000000   0000000   000   000  0000000
 
 reloadFile = ->
-    
-    loadFile editor.currentFile, 
+
+    loadFile editor.currentFile,
         reload:   true
         dontSave: true
-        
+
     if editor.currentFile?
         post.toOtherWins 'reloadTab', editor.currentFile
 
 reloadTab = (file) ->
-    if file == editor.currentFile
-        loadFile editor.currentFile, 
+    if file == editor?.currentFile
+        loadFile editor?.currentFile,
             reload:   true
             dontSave: true
-    else 
+    else
         post.emit 'revertFile', file
 
 loadFile = (file, opt={}) ->
 
     file = null if file? and file.length <= 0
-    
+
     editor.saveScrollCursorsAndSelections()
-    
+
     if file?
         [file, pos] = splitFilePos file
         file = resolve file
-        
-    if file != editor.currentFile or opt?.reload
+
+    if file != editor?.currentFile or opt?.reload
         if file? and not fileExists file
             file = null
-            
-        if not opt?.dontSave 
+
+        if not opt?.dontSave
             window.saveChanges()
-            
-        post.toMain 'navigate', 
+
+        post.toMain 'navigate',
             action: 'addFilePos'
             file: editor.currentFile
             pos:  editor.cursorPos()
             for: 'load'
-        
-        editor.clear skip:file? 
+
+        editor.clear skip:file?
 
         if file?
-            
+
             addToRecent file
-            
+
             if tab = tabs.tab file
                 tab.setActive()
 
             editor.setCurrentFile file, opt
-            
+
             post.toOthers 'fileLoaded', file, winID
             commandline.fileLoaded file
-            
+
     window.split.show 'editor'
-        
+
     if pos? and pos[0] or pos[1]
         editor.singleCursorAtPos pos
-        editor.scroll.cursorToTop()        
-  
-openFile = loadFile
+        editor.scroll.cursorToTop()
+
+# openFile = loadFile
 
 #  0000000   00000000   00000000  000   000        00000000  000  000      00000000   0000000
-# 000   000  000   000  000       0000  000        000       000  000      000       000     
-# 000   000  00000000   0000000   000 0 000        000000    000  000      0000000   0000000 
+# 000   000  000   000  000       0000  000        000       000  000      000       000
+# 000   000  00000000   0000000   000 0 000        000000    000  000      0000000   0000000
 # 000   000  000        000       000  0000        000       000  000      000            000
-#  0000000   000        00000000  000   000        000       000  0000000  00000000  0000000 
+#  0000000   000        00000000  000   000        000       000  0000000  00000000  0000000
 
 openFiles = (ofiles, options) -> # called from file dialog, open command and browser
-    
+
     if ofiles?.length
-        
+
         files = fileList ofiles, ignoreHidden: false
-        
+
         if files.length >= 10
             answer = dialog.showMessageBox
                 type: 'warning'
@@ -378,40 +378,40 @@ openFiles = (ofiles, options) -> # called from file dialog, open command and bro
                 message: "You have selected #{files.length} files."
                 detail: "Are you sure you want to open that many files?"
             return if answer != 1
-            
+
         if files.length == 0
             log 'window.openFiles.warning: no files for:', ofiles
             return []
-            
+
         window.stash.set 'openFilePath', path.dirname files[0]
-        
+
         if not options?.newWindow and not options?.newTab
             file = resolve files.shift()
             loadFile file
-            
+
         for file in files
             if options?.newWindow
                 post.toMain 'newWindowWithFile', file
             else
                 post.emit 'newTabWithFile', file
-            
+
         return ofiles
 
 window.openFiles = openFiles
 window.openFile  = openFile
 window.loadFile  = loadFile
 
-# 0000000    000   0000000   000       0000000    0000000 
-# 000   000  000  000   000  000      000   000  000      
+# 0000000    000   0000000   000       0000000    0000000
+# 000   000  000  000   000  000      000   000  000
 # 000   000  000  000000000  000      000   000  000  0000
 # 000   000  000  000   000  000      000   000  000   000
-# 0000000    000  000   000  0000000   0000000    0000000 
+# 0000000    000  000   000  0000000   0000000    0000000
 
 openFile = (options) ->
-    
-    dir = path.dirname editor.currentFile if editor.currentFile
+
+    dir = path.dirname editor.currentFile if editor?.currentFile
     dir ?= resolve '.'
-    dialog.showOpenDialog 
+    dialog.showOpenDialog
         title: "Open File"
         defaultPath: window.stash.get 'openFilePath',  dir
         properties: ['openFile', 'openDirectory', 'multiSelections']
@@ -548,15 +548,15 @@ window.onfocus = (event) ->
             split.focus 'commandline-editor'
 
 # 000   000  00000000  000   000
-# 000  000   000        000 000 
-# 0000000    0000000     00000  
-# 000  000   000          000   
-# 000   000  00000000     000   
+# 000  000   000        000 000
+# 0000000    0000000     00000
+# 000  000   000          000
+# 000   000  00000000     000
 
 menuCombo = (combo) ->
-    
+
     {mod, key, combo, char} = keyinfo.forCombo combo
-    return if 'unhandled' != window.focusEditor.handleModKeyComboCharEvent mod, key, combo, char
+    return if window.focusEditor and 'unhandled' != window.focusEditor.handleModKeyComboCharEvent mod, key, combo, char
     handleModKeyComboCharEvent mod, key, combo, char
 
 onKeyDown = (event) ->

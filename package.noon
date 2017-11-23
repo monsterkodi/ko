@@ -1,6 +1,6 @@
 name            ko-editor
 productName     ko
-version         0.33.2
+version         0.33.3
 description     an editor for macOS
 main            js/main/main.js
 preferGlobal    true
@@ -49,7 +49,7 @@ dependencies
                 mocha           ^4.0.1
                 nconf           ^0.8.5
                 node-abi        ^2.1.1
-                node-pty        ^0.7.1
+                node-pty        ^0.7.3
                 noon            >=1.1.0
                 opener          ^1.4.3
                 performance-now  ^2.1.0
@@ -65,11 +65,10 @@ dependencies
                 walkdir         0.0.12
                 write-file-atomic  ^2.3.0
 devDependencies
-                appdmg          ^0.4.5
                 devtron         ^1.4.0
-                electron        =1.6.6
-                electron-rebuild  =1.5.7
+                electron        ^1.6.6
                 electron-packager  =8.6.0
+                electron-rebuild  ^1.5.7
 coffeelintConfig
                 no_trailing_whitespace
                   level           ignore

@@ -54,17 +54,17 @@ class Menu
                 type: 'separator'
             ,
                 label:       "Hide #{pkg.productName}"
-                accelerator: 'Command+H'
+                accelerator: 'CmdOrCtrl+H'
                 role:        'hide'
             ,
                 label:       'Hide Others'
-                accelerator: 'Command+Alt+H'
+                accelerator: 'CmdOrCtrl+Alt+H'
                 role:        'hideothers'
             ,
                 type: 'separator'
             ,
                 label:       'Quit'
-                accelerator: 'Command+Q'
+                accelerator: 'CmdOrCtrl+Q'
                 click:       main.quit
             ]
         ,
@@ -78,11 +78,11 @@ class Menu
             role: 'file'
             submenu: [
                 label:       'New Tab'
-                accelerator: 'Command+N'
+                accelerator: 'CmdOrCtrl+N'
                 click:       (i,win) -> post.toWin win.id, "newTabWithFile"
             ,
                 label:       'New Window'
-                accelerator: 'Command+Shift+N'
+                accelerator: 'CmdOrCtrl+Shift+N'
                 click:       (i,win) -> post.toWin win.id, "cloneFile"
             ,
                 type: 'separator'
@@ -101,7 +101,7 @@ class Menu
                 type: 'separator'
             ,
                 label:       'Save'
-                accelerator: 'Command+S'
+                accelerator: 'CmdOrCtrl+S'
                 click:       (i,win) -> post.toWin win.id, 'saveFile'
             ,            
                 label:       'Save As ...'
