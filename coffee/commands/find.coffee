@@ -5,7 +5,7 @@
 # 000       000  000  0000  000   000
 # 000       000  000   000  0000000  
 
-{ log } = require 'kxk'
+{ log, os } = require 'kxk'
 
 Command = require '../commandline/command'
 
@@ -13,7 +13,10 @@ class Find extends Command
 
     constructor: (@commandline) ->
         
-        @shortcuts = ["command+f", "ctrl+f", "alt+f", "alt+ctrl+f", "command+alt+f", "command+ctrl+f"]
+        if os.platform() == 'win32'
+            @shortcuts = ["ctrl+f", "alt+f", "alt+ctrl+f", "", ""]
+        else
+            @shortcuts = ["command+f", "ctrl+f", "alt+f", "alt+ctrl+f", "command+alt+f", "command+ctrl+f"]
         @types     = ['str',  'Str',   'reg',    'Reg',    'fuzzy', 'glob']
         @names     = ['find', 'Find',  '/find/', '/Find/', 'fiZd',  'f*nd']
         super @commandline

@@ -556,6 +556,7 @@ window.onfocus = (event) ->
 menuCombo = (combo) ->
 
     {mod, key, combo, char} = keyinfo.forCombo combo
+    log 'menuCombo', mod, key, combo, char
     return if window.focusEditor and 'unhandled' != window.focusEditor.handleModKeyComboCharEvent mod, key, combo, char
     handleModKeyComboCharEvent mod, key, combo, char
 

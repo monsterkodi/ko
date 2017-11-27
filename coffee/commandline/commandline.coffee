@@ -6,7 +6,7 @@
  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 ###
 
-{ fileList, stopEvent, elem, keyinfo, clamp, post, path, error, log, str, $, _ } = require 'kxk'
+{ fileList, stopEvent, elem, keyinfo, clamp, post, path, error, log, str, os, $, _ } = require 'kxk'
 
 TextEditor = require '../editor/texteditor'
 render     = require '../editor/render'
@@ -285,12 +285,12 @@ class Commandline extends TextEditor
             if document.activeElement == @view then return @cancel()
 
         for n,c of @commands
-
             for sc in c.shortcuts
                 if sc == combo then return @startCommand n, combo, event
 
         if @command?
             return @command.globalModKeyComboEvent mod, key, combo, event
+            
         'unhandled'
 
     handleModKeyComboCharEvent: (mod, key, combo, char, event) ->

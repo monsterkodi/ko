@@ -6,7 +6,7 @@
 000   000  00000000  000   000   0000000 
 ###
 
-{ fileList, unresolve, prefs, fs, post, path, log } = require 'kxk'
+{ fileList, unresolve, prefs, fs, post, path, os, log } = require 'kxk'
 
 pkg      = require '../../package.json'
 electron = require 'electron'
@@ -45,7 +45,7 @@ class Menu
             # 000  000   000   000
             # 000   000   0000000 
             
-            label: pkg.name   
+            label: pkg.productName   
             submenu: [     
                 label:       "About #{pkg.productName}"
                 accelerator: 'Alt+.'
@@ -151,7 +151,7 @@ class Menu
                 label:      'Search'
                 submenu:    [
                         label:      'Case Insensitive'
-                        accelerator: 'CmdOrCtrl+shift+f'
+                        accelerator: 'CmdOrCtrl+Shift+F'
                         click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+shift+f'
                     ,
                         label:      'Case Sensitive'
@@ -413,15 +413,15 @@ class Menu
         ,
             label: 'Cut', 
             click: (i,win) -> post.toWin win.id, 'menuCombo', 'command+x'
-            accelerator: 'CmdOrCtrl+X'
+            accelerator: os.platform() == 'win32' and 'Ctrl+X' or 'CmdOrCtrl+X'
         ,
             label: 'Copy', 
             click: (i,win) -> post.toWin win.id, 'menuCombo', 'command+c'
-            accelerator: 'CmdOrCtrl+C'
+            accelerator: os.platform() == 'win32' and 'Ctrl+C' or 'CmdOrCtrl+C'
         ,
             label: 'Paste', 
             click: (i,win) -> post.toWin win.id, 'menuCombo', 'command+v'
-            accelerator: 'CmdOrCtrl+V'
+            accelerator: os.platform() == 'win32' and 'Ctrl+V' or 'CmdOrCtrl+V'
         ,
             type: 'separator'
         ]

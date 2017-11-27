@@ -5,7 +5,7 @@
 #      000  000       000   000  000   000  000       000   000
 # 0000000   00000000  000   000  000   000   0000000  000   000
 
-{ packagePath, unresolve, path, post, fs, log, _ } = require 'kxk'
+{ packagePath, unresolve, path, post, fs, os, log, _ } = require 'kxk'
 
 walker   = require '../tools/walker'
 matchr   = require '../tools/matchr'
@@ -16,8 +16,11 @@ stream   = require 'stream'
 class Search extends Command
 
     constructor: (@commandline) ->
-        @shortcuts = ["command+shift+f", "ctrl+shift+f", "alt+shift+f", "alt+ctrl+shift+f"]
-        @names     = ["search", "Search", "/search/", "/Search/"]
+        if os.platform() == 'win32'
+            @shortcuts = ["ctrl+shift+f", "alt+shift+f", "alt+ctrl+shift+f", ""]
+        else
+            @shortcuts = ["command+shift+f", "ctrl+shift+f", "alt+shift+f", "alt+ctrl+shift+f"]
+        @names = ["search", "Search", "/search/", "/Search/"]
         super @commandline
      
     historyKey: -> @name

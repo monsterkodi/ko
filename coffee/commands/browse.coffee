@@ -5,7 +5,7 @@
 # 000   000  000   000  000   000  000   000       000  000       
 # 0000000    000   000   0000000   00     00  0000000   00000000  
 
-{ dirExists, process, unresolve, resolve, post, str, log, $ } = require 'kxk'
+{ dirExists, process, unresolve, resolve, post, str, log, os, $ } = require 'kxk'
 
 Command     = require '../commandline/command'
 FileBrowser = require '../browser/filebrowser'
@@ -13,11 +13,14 @@ FileBrowser = require '../browser/filebrowser'
 class Browse extends Command
     
     constructor: (@commandline) ->
-        
+
+        if os.platform() == 'win32'
+            @shortcuts = ['ctrl+.', 'ctrl+shift+.']
+        else
+            @shortcuts = ['command+.', 'command+shift+.']
         @cmdID     = 0
         @browser   = new FileBrowser window.area.view
         @commands  = Object.create null
-        @shortcuts = ['command+.', 'command+shift+.']
         @names     = ["browse", "Browse"]
         
         window.area.on 'resized', @onAreaResized

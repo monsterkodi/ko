@@ -6,7 +6,7 @@
 #    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000
 
 { error, log, fileExists, keyinfo, stopEvent, setStyle,
-  prefs, drag, elem, path, post, clamp, pos, str, sw, $, _ } = require 'kxk' 
+  prefs, drag, elem, path, post, clamp, pos, str, sw, os, $, _ } = require 'kxk' 
   
 render       = require './render'
 EditorScroll = require './editorscroll'
@@ -709,6 +709,12 @@ class TextEditor extends Editor
             when 'command+shift+z' then return @do.redo()
             when 'command+t'       then return post.emit 'newTabWithFile'
 
+        if os.platform() == 'win32'
+            switch combo
+                when 'ctrl+x' then return @cut()
+                when 'ctrl+c' then return @copy()
+                when 'ctrl+v' then return @paste()
+            
         if char and mod in ["shift", ""]
             return @insertCharacter char
 

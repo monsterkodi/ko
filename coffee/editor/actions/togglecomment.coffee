@@ -5,8 +5,7 @@
 #    000     000   000  000   000  000   000  000      000             00000000  00000000  00000000  
 #    000      0000000    0000000    0000000   0000000  00000000         00  00    00  00    00  00   
 
-{ log, _
-} = require 'kxk'
+{ log, _ } = require 'kxk'
 
 module.exports =
     
@@ -15,11 +14,11 @@ module.exports =
         
         toggleComment:
             name:  'Toggle Comment'
-            combo: 'command+/'
+            combo: 'CmdOrCtrl+/'
             
         toggleHeader:
             name:  'Toggle Header'
-            combo: 'command+alt+/'
+            combo: 'CmdOrCtrl+alt+/'
 
     # 000   000  00000000   0000000   0000000    00000000  00000000   
     # 000   000  000       000   000  000   000  000       000   000  
