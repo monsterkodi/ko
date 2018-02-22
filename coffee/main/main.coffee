@@ -1,4 +1,3 @@
-
 # 00     00   0000000   000  000   000
 # 000   000  000   000  000  0000  000
 # 000000000  000000000  000  000 0 000
@@ -6,14 +5,14 @@
 # 000   000  000   000  000  000   000
 
 { splitFilePos, fileExists, dirExists, fileList, resolve,
-  childp, about, prefs, store, noon, post, path, fs, str, error, log, _ } = require 'kxk'
+  childp, about, prefs, store, noon, post, path, os, fs, str, error, log, _ } = require 'kxk'
   
 pkg      = require '../../package.json'
 Execute  = require './execute'
 Navigate = require './navigate'
 Debugger = require './debugger'
 Indexer  = require './indexer'
-Menu     = require './menu'
+Menu     = if os.platform() == 'win32' then require './menu-win' else require './menu'
 pug      = require 'pug'
 colors   = require 'colors'
 electron = require 'electron'
@@ -108,6 +107,7 @@ winWithID   = (winID) ->
 
 hideDock = ->
     
+    return if os.platform() == 'win32'
     return if prefs.get 'trayOnly', false
     app.dock?.hide()
 
@@ -162,8 +162,9 @@ class Main
         @indexer      = new Indexer
         coffeeExecute = new Execute main: @
 
-        tray = new Tray "#{__dirname}/../../img/menu.png"
-        tray.on 'click', @toggleWindows
+        if os.platform() != 'win32'
+            tray = new Tray "#{__dirname}/../../img/menu.png"
+            tray.on 'click', @toggleWindows
                                 
         app.setName pkg.productName
                                 
@@ -437,9 +438,9 @@ class Main
             fullscreenable:   true
             acceptFirstMouse: true
             show:             false
-            hasShadow:        false
+            hasShadow:        true
             backgroundColor:  scheme == 'bright' and "#fff" or '#000'
-            titleBarStyle:    'hidden'
+            #titleBarStyle:    'hidden'
                 
         if opt.restore?
             newStash = path.join app.getPath('userData'), 'win', "#{win.id}.noon"

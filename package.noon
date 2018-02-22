@@ -25,50 +25,50 @@ maintainers
 bugs
                 url  https://github.com/monsterkodi/ko/issues
 dependencies
-                assert          ^1.4.1
-                chai            ^4.1.2
-                chokidar        ^1.7.0
-                chrome-remote-interface  ^0.25.1
-                coffee-script   ^1.12.7
-                colors          ^1.1.2
-                dmg             ^0.1.0
-                download        ^6.2.5
-                entities        ^1.1.1
-                eve             ^0.5.4
-                font-awesome    ^4.7.0
-                fs-extra        ^4.0.2
-                fuzzaldrin      ^2.1.0
-                fuzzy           ^0.1.3
-                html-entities   ^1.2.1
-                isbinaryfile    ^3.0.2
-                js-beautify     ^1.7.4
-                karg            >=1.0.10
-                keycode         ^2.1.9
-                kxk             >=0.17.8
-                lodash          ^4.17.4
-                mocha           ^4.0.1
-                nconf           ^0.8.5
-                node-abi        ^2.1.1
-                node-pty        ^0.7.3
-                noon            >=1.1.0
-                opener          ^1.4.3
-                performance-now  ^2.1.0
-                pug             ^2.0.0-rc.4
-                seamless-immutable  ^7.1.2
-                sorcery         ^0.10.0
-                source-map      ^0.6.1
-                strip-ansi      ^4.0.0
-                textextensions  ^2.1.0
-                three           ^0.87.1
-                traceback       ^0.3.1
-                underscore.string  ^3.3.4
-                walkdir         0.0.12
-                write-file-atomic  ^2.3.0
+                assert          =1.4.1
+                chai            =4.1.2
+                chokidar        =1.7.0
+                chrome-remote-interface  =0.25.1
+                coffee-script   =1.12.7
+                colors          =1.1.2
+                dmg             =0.1.0
+                download        =6.2.5
+                entities        =1.1.1
+                eve             =0.5.4
+                font-awesome    =4.7.0
+                fs-extra        =4.0.2
+                fuzzaldrin      =2.1.0
+                fuzzy           =0.1.3
+                html-entities   =1.2.1
+                isbinaryfile    =3.0.2
+                js-beautify     =1.7.4
+                karg            =1.0.10
+                keycode         =2.1.9
+                kxk             =0.17.8
+                lodash          =4.17.4
+                mocha           =4.0.1
+                nconf           =0.8.5
+                node-abi        =2.1.1
+                node-pty        =0.7.3
+                noon            =1.1.0
+                opener          =1.4.3
+                performance-now  =2.1.0
+                pug             =2.0.0-rc.4
+                seamless-immutable  =7.1.2
+                sorcery         =0.10.0
+                source-map      =0.6.1
+                strip-ansi      =4.0.0
+                textextensions  =2.1.0
+                three           =0.87.1
+                traceback       =0.3.1
+                underscore.string  =3.3.4
+                walkdir         =0.0.12
+                write-file-atomic  =2.3.0
 devDependencies
-                devtron         ^1.4.0
-                electron        ^1.6.6
+                devtron         =1.4.0
+                electron        =1.6.6
                 electron-packager  =8.6.0
-                electron-rebuild  ^1.5.7
+                electron-rebuild  =1.5.7
 coffeelintConfig
                 no_trailing_whitespace
                   level           ignore
