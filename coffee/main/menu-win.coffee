@@ -33,25 +33,25 @@ class Menu
         # ]
         # return    
         
-        # fileLabel = (f) ->
-            # return path.basename(f) + ' - ' + unresolve path.dirname(f) if f?
-            # 'untitled'
-#     
-        # recent = []
-        # for f in prefs.get 'recentFiles', []
-            # if fs.existsSync f
-                # recent.unshift
-                    # label: fileLabel f
-                    # path: f
-                    # click: (i, win) -> post.toWin win.id, 'newTabWithFile', i.path
-        # if recent.length
-            # recent.push
-                # type: 'separator'
-            # recent.push
-                # label: 'Clear List'
-                # click: (i) ->
-                    # prefs.set 'recentFiles', []
-                    # Menu.init main
+        fileLabel = (f) ->
+            return path.basename(f) + ' - ' + unresolve path.dirname(f) if f?
+            'untitled'
+
+        recent = []
+        for f in prefs.get 'recentFiles', []
+            if fs.existsSync f
+                recent.unshift
+                    label: fileLabel f
+                    path: f
+                    click: (i, win) -> post.toWin win.id, 'newTabWithFile', i.path
+        if recent.length
+            recent.push
+                type: 'separator'
+            recent.push
+                label: 'Clear List'
+                click: (i) ->
+                    prefs.set 'recentFiles', []
+                    Menu.init main
 
         menu = AppMenu.buildFromTemplate [
             
@@ -324,14 +324,8 @@ class Menu
             ,
                 type: 'separator'
             ,
-                label:       'Close All Windows'
-                accelerator: 'Ctrl+Alt+W'
-                click:       main.closeWindows
-            ,
-                type: 'separator'
-            ,
                 label:       'Arrange'
-                accelerator: 'Alt+Cmd+A'
+                accelerator: 'Ctrl+Alt+A'
                 click:       main.arrangeWindows
             ,                            
                 type: 'separator'
@@ -367,28 +361,28 @@ class Menu
             
         actionFiles = fileList path.join __dirname, '../editor/actions'
         log 'actionFiles:', actionFiles
-        # for actionFile in actionFiles
-            # continue if path.extname(actionFile) not in ['.js', '.coffee']
-            # actions = require actionFile
-            # for key,value of actions
-                # menuName = 'Misc'
-                # if key == 'actions'
-                    # if value['menu']? 
-                        # menuName = value['menu']
-                        # submenu[menuName] ?= new AppMenu
-                    # for k,v of value
-                        # if v.name and v.combo
-                            # menuCombo = (c) -> (i,win) -> post.toWin win.id, 'menuCombo', c
-                            # item = new MenuItem 
-                                # label:       v.name
-                                # accelerator: v.combo
-                                # click: menuCombo v.combo
-                            # if v.menu?
-                                # submenu[v.menu] ?= new AppMenu
-                            # if v.separator
-                                # submenu[v.menu ? menuName].append new MenuItem type: 'separator'
-                            # submenu[v.menu ? menuName].append item
-                    # submenu[menuName].append new MenuItem type: 'separator'
+        for actionFile in actionFiles
+            continue if path.extname(actionFile) not in ['.js', '.coffee']
+            actions = require actionFile
+            for key,value of actions
+                menuName = 'Misc'
+                if key == 'actions'
+                    if value['menu']? 
+                        menuName = value['menu']
+                        submenu[menuName] ?= new AppMenu
+                    for k,v of value
+                        if v.name and v.combo
+                            menuCombo = (c) -> (i,win) -> post.toWin win.id, 'menuCombo', c
+                            item = new MenuItem 
+                                label:       v.name
+                                accelerator: v.combo
+                                click: menuCombo v.combo
+                            if v.menu?
+                                submenu[v.menu] ?= new AppMenu
+                            if v.separator
+                                submenu[v.menu ? menuName].append new MenuItem type: 'separator'
+                            submenu[v.menu ? menuName].append item
+                    submenu[menuName].append new MenuItem type: 'separator'
         
         editMenu = AppMenu.buildFromTemplate [
             label: 'Undo', 
@@ -416,8 +410,8 @@ class Menu
             type: 'separator'
         ]
         
-        # for k,v of submenu
-            # editMenu.append new MenuItem label: k, submenu: v
+        for k,v of submenu
+            editMenu.append new MenuItem label: k, submenu: v
         
         menu.insert 2, new MenuItem label: 'Edit', submenu: editMenu
                 
