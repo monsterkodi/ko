@@ -50,33 +50,33 @@ module.exports =
                 set cursors at selection boundaries, if a selection exists.
                 select brackets or quotes otherwise.
                 """
-            combo: 'command+alt+b'
+            combo: 'CmdOrCtrl+alt+b'
 
         addCursors:
             name: 'Add Cursors up|down'
-            combos: ['command+up', 'command+down']
+            combos: ['CmdOrCtrl+up', 'CmdOrCtrl+down']
 
         addCursorsUp:
             separator: true
             name: 'Add Cursors Up'
-            combo: 'command+up'
+            combo: 'CmdOrCtrl+up'
 
         addCursorsDown:
             name: 'Add Cursors Down'
-            combo: 'command+down'
+            combo: 'CmdOrCtrl+down'
 
         delCursors:
             name: 'Remove Cursors up|down'
-            combos: ['command+shift+up', 'command+shift+down']
+            combos: ['CmdOrCtrl+shift+up', 'CmdOrCtrl+shift+down']
 
         delCursorsUp:
             separator: true
             name: 'Remove Cursors Up'
-            combo: 'command+shift+up'
+            combo: 'CmdOrCtrl+shift+up'
 
         delCursorsDown:
             name: 'Remove Cursors Down'
-            combo: 'command+shift+down'
+            combo: 'CmdOrCtrl+shift+down'
 
         cursorHome:
             combo: 'home'

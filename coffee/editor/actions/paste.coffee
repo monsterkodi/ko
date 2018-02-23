@@ -14,11 +14,11 @@ module.exports =
 
     actions:
         cut:
-            combo: 'command+x'
+            combo: 'CmdOrCtrl+x'
         copy:
-            combo: 'command+c'
+            combo: 'CmdOrCtrl+c'
         paste:
-            combo: 'command+v'
+            combo: 'CmdOrCtrl+v'
     
     cut: ->
         @do.start()

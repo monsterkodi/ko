@@ -15,21 +15,21 @@ module.exports =
         highlightWordAndAddToSelection:
             name:  'Highlight and Select Word'
             text:  'highlights all occurrences of text in selection or word at cursor and selects the first|next highlight.'
-            combo: 'command+d'
+            combo: 'CmdOrCtrl+d'
             
         selectAllWords:
             name:  'Select All Words'
-            combo: 'command+alt+d'
+            combo: 'CmdOrCtrl+alt+d'
             
         removeSelectedHighlight:
             name: 'Remove Highlighted Word from Selection'
             text:  "does the inverse of 'highlight and select' word"
-            combo: 'command+shift+d'
+            combo: 'CmdOrCtrl+shift+d'
             
         highlightTextOfSelectionOrWordAtCursor:
             name:  'Highlight and Select Word'
             text:  'highlights all occurrences of text in selection or word at cursor and selects it. expands to the left if already selected.'
-            combo: 'command+e'
+            combo: 'CmdOrCtrl+e'
 
     # 000000000  00000000  000   000  000000000  
     #    000     000        000 000      000     

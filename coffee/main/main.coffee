@@ -440,7 +440,8 @@ class Main
             show:             false
             hasShadow:        true
             backgroundColor:  scheme == 'bright' and "#fff" or '#000'
-            #titleBarStyle:    'hidden'
+            autoHideMenuBar:  true
+            titleBarStyle:    'hidden'
                 
         if opt.restore?
             newStash = path.join app.getPath('userData'), 'win', "#{win.id}.noon"

@@ -21,7 +21,7 @@ module.exports =
 
         deleteBackwardIgnoreLineBoundary:
             name:   'Delete Backward Over Line Boundaries'
-            combo:  'command+backspace'
+            combo:  'CmdOrCtrl+backspace'
 
         deleteBackwardSwallowWhitespace:
             name:   'Delete Backward Over Whitespace'

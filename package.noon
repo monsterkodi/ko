@@ -33,7 +33,6 @@ dependencies
                 colors          =1.1.2
                 dmg             =0.1.0
                 download        =6.2.5
-                electron        ^1.6.17
                 entities        =1.1.1
                 eve             =0.5.4
                 font-awesome    =4.7.0
@@ -78,5 +77,6 @@ coffeelintConfig
                   value   4
                   level   warn
 devDependencies
+                electron        =1.6.17
                 electron-packager  ^11.0.1
                 electron-rebuild  ^1.7.3

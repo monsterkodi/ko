@@ -17,22 +17,6 @@ class Menu
     
     @init: (main) ->
         
-        # AppMenu.setApplicationMenu AppMenu.buildFromTemplate [
-        #     label: pkg.productName   
-        #     submenu: [     
-        #         label:       "About #{pkg.productName}"
-        #         accelerator: 'Alt+.'
-        #         click:        main.showAbout
-        #     ,
-        #         type: 'separator'
-        #     ,
-        #         label:       'Quit'
-        #         accelerator: 'Ctrl+Q'
-        #         click:       main.quit
-        #     ]
-        # ]
-        # return    
-        
         fileLabel = (f) ->
             return path.basename(f) + ' - ' + unresolve path.dirname(f) if f?
             'untitled'
@@ -245,12 +229,12 @@ class Menu
             label: 'View'
             submenu: [
                 label:      'Navigate Backward'
-                accelerator: 'ctrl+alt+left'
-                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+ctrl+left'
+                accelerator: 'alt+ctrl+left'
+                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+alt+left'
             ,
                 label:      'Navigate Forward'
-                accelerator: 'ctrl+alt+right'
-                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+ctrl+right'
+                accelerator: 'alt+ctrl+right'
+                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+alt+right'
             ,
                 type: 'separator'
             ,
@@ -360,7 +344,7 @@ class Menu
             Misc: new AppMenu
             
         actionFiles = fileList path.join __dirname, '../editor/actions'
-        log 'actionFiles:', actionFiles
+        # log 'actionFiles:', actionFiles
         for actionFile in actionFiles
             continue if path.extname(actionFile) not in ['.js', '.coffee']
             actions = require actionFile

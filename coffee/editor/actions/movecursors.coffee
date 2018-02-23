@@ -17,15 +17,15 @@ module.exports =
             name:   'set cursors at selections or move to line boundaries'
             text:   """sets cursors at selection boundaries, if multiple selections exist but only one cursor.
                 otherwise moves cursors to line boundaries."""
-            combos: ['command+left', 'command+right']
+            combos: ['CmdOrCtrl+left', 'CmdOrCtrl+right']
 
         moveCursorsAtBoundaryLeft: 
             name: 'Move Cursors to Indent or Start of Line'
-            combo: 'command+left'
+            combo: 'CmdOrCtrl+left'
 
         moveCursorsAtBoundaryRight: 
             name: 'Move Cursors to End of Line'
-            combo: 'command+right'
+            combo: 'CmdOrCtrl+right'
                 
         moveCursorsToWordBoundary:
             name:   'move cursors to word boundaries'
@@ -44,7 +44,7 @@ module.exports =
         moveCursorsToLineBoundary:
             name:   'move cursors to line boundaries'
             text:   'moves cursors to line boundaries. extends selections, if shift is pressed.'
-            combos: ['command+shift+left', 'command+shift+right', 'ctrl+e', 'ctrl+shift+e', 'ctrl+a', 'ctrl+shift+a']
+            combos: ['CmdOrCtrl+shift+left', 'CmdOrCtrl+shift+right', 'ctrl+e', 'ctrl+shift+e', 'ctrl+a', 'ctrl+shift+a']
 
         moveMainCursor:
             name:   'move main cursor'

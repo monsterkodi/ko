@@ -15,8 +15,8 @@ Titlebar    = require './titlebar'
 LogView     = require './logview'
 Info        = require './info'
 Area        = require '../stage/area'
-FileEditor  = require '../editor/fileeditor'
 Commandline = require '../commandline/commandline'
+FileEditor  = require '../editor/fileeditor'
 Navigate    = require '../main/navigate'
 FPS         = require '../tools/fps'
 encode      = require '../tools/encode'
@@ -80,7 +80,6 @@ saveStash = ->
     post.toMain 'stashSaved'
 
 restoreWin = ->
-
     if bounds = window.stash.get 'bounds'
         win.setBounds bounds
 
@@ -561,11 +560,13 @@ menuCombo = (combo) ->
     handleModKeyComboCharEvent mod, key, combo, char
 
 onKeyDown = (event) ->
-    
+    log 'onKeyDown', event?, event.metaKey, event.altKey, event.ctrlKey, event.shiftKey
     {mod, key, combo, char} = keyinfo.forEvent event
     handleModKeyComboCharEvent mod, key, combo, char, event
 
 handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
+    
+    log 'handleModKeyComboCharEvent', 'mod', mod, 'key', key, 'combo', combo, 'char', char
     
     return if not combo
     return stopEvent(event) if 'unhandled' != window.titlebar   .globalModKeyComboEvent mod, key, combo, event
@@ -576,16 +577,16 @@ handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
             return stopEvent event, post.toMain 'activateWindow', i
     
     switch combo
-        when 'command+alt+i'      then return stopEvent event, win.webContents.toggleDevTools()
+        when 'CmdOrCtrl+alt+i'    then return stopEvent event, win.webContents.toggleDevTools()
         when 'ctrl+w'             then return stopEvent event, loadFile()
         when 'f3'                 then return stopEvent event, screenShot()
         when 'alt+i'              then return stopEvent event, scheme.toggle()
         when 'command+\\'         then return stopEvent event, toggleCenterText()
-        when 'command+k'          then return stopEvent event, commandline.clear()
-        when 'command+alt+k'      then return stopEvent event, split.toggleLog()
-        when 'alt+ctrl+left'      then return stopEvent event, post.toMain 'activatePrevWindow', winID
-        when 'alt+ctrl+right'     then return stopEvent event, post.toMain 'activateNextWindow', winID
-        when 'command+alt+ctrl+k' then return stopEvent event, split.showOrClearLog()
+        when 'CmdOrCtrl+alt+k'        then return stopEvent event, commandline.clear()
+        when 'CmdOrCtrl+alt+shift+k'    then return stopEvent event, split.toggleLog()
+        # when 'alt+ctrl+left'      then return stopEvent event, post.toMain 'activatePrevWindow', winID
+        # when 'alt+ctrl+right'     then return stopEvent event, post.toMain 'activateNextWindow', winID
+        when 'command+alt+shift+k', 'alt+ctrl+shift+k' then return stopEvent event, split.showOrClearLog()
         when 'command+='          then return stopEvent event, changeFontSize +1
         when 'command+-'          then return stopEvent event, changeFontSize -1
         when 'command+0'          then return stopEvent event, resetFontSize()
@@ -593,8 +594,8 @@ handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
         when 'command+shift+-'    then return stopEvent event, @changeZoom -1
         when 'command+shift+0'    then return stopEvent event, @resetZoom()
         when 'alt+`'              then return stopEvent event, titlebar.showList()
-        when 'command+ctrl+left'  then return stopEvent event, navigate.backward()
-        when 'command+ctrl+right' then return stopEvent event, navigate.forward()
+        when 'command+alt+left',  'alt+ctrl+left'   then return stopEvent event, navigate.backward()
+        when 'command+alt+right', 'alt+ctrl+right'  then return stopEvent event, navigate.forward()
         when 'command+shift+y'    then return stopEvent event, split.maximizeEditor()
         when 'command+alt+y'      then return stopEvent event, split.do 'minimize editor'
 

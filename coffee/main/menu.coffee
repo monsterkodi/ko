@@ -239,12 +239,12 @@ class Menu
             label: 'View'
             submenu: [
                 label:      'Navigate Backward'
-                accelerator: 'command+ctrl+left'
-                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+ctrl+left'
+                accelerator: 'CmdOrCtrl+Alt+left'
+                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'CmdOrCtrl+Alt+left'
             ,
                 label:      'Navigate Forward'
-                accelerator: 'command+ctrl+right'
-                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+ctrl+right'
+                accelerator: 'CmdOrCtrl+Alt+right'
+                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'CmdOrCtrl+Alt+right'
             ,
                 type: 'separator'
             ,
