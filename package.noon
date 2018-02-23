@@ -77,6 +77,6 @@ coffeelintConfig
                   value   4
                   level   warn
 devDependencies
-                electron        =1.6.17
+                electron        ^1.6.17
                 electron-packager  ^11.0.1
                 electron-rebuild  ^1.7.3

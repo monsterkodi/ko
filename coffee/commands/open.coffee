@@ -18,7 +18,9 @@ fuzzy    = require 'fuzzy'
     
 class Open extends Command
 
-    constructor: (@commandline) ->
+    constructor: (commandline) ->
+        
+        super commandline
         
         @shortcuts  = ['command+p', 'command+shift+p', 'command+alt+p']
         @names      = ["open", "new tab", "new window"]
@@ -29,8 +31,6 @@ class Open extends Command
         @combo      = null
         @selected   = 0
         @navigating = false
-                
-        super @commandline
                     
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000
@@ -105,7 +105,7 @@ class Open extends Command
                     @setText pdir + '/'
                     @changed @getText()
                     return true
-            super
+            super()
     
     # 000   000  00000000  000   0000000   000   000  000000000
     # 000 0 000  000       000  000        000   000     000   
@@ -273,7 +273,7 @@ class Open extends Command
     cancelList: ->
         
         @stopWalkers()
-        super
+        super()
 
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -417,7 +417,7 @@ class Open extends Command
     hideList: ->
 
         @stopWalkers()
-        super
+        super()
         
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     

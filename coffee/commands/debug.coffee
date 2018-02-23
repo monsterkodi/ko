@@ -13,7 +13,9 @@ DebugCtrl     = require '../win/debugctrl'
 
 class Debug extends Command
     
-    constructor: (@commandline) ->
+    constructor: (commandline) ->
+        
+        super commandline
         
         @cmdID      = 0
         @browser    = new ObjectBrowser window.area.view
@@ -30,7 +32,6 @@ class Debug extends Command
         @browser.on 'willRemoveRow', @onWillRemoveRow
         window.area.on 'resized', @onAreaResized
                 
-        super @commandline
         @syntaxName = 'browser'
         
     restoreState: (state) ->         
@@ -141,11 +142,11 @@ class Debug extends Command
         post.removeListener 'debuggerChanged', @onDebuggerChanged
         
         @debugCtrl.cancel()
-        super
+        super()
         
     clear: ->
         return if @browser.cleanUp()
-        super
+        super()
 
     onItemActivated: (item) => 
         

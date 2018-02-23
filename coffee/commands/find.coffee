@@ -11,7 +11,9 @@ Command = require '../commandline/command'
 
 class Find extends Command
 
-    constructor: (@commandline) ->
+    constructor: (commandline) ->
+        
+        super commandline
         
         if os.platform() == 'win32'
             @shortcuts = ["ctrl+f", "alt+f", "alt+ctrl+f", "", ""]
@@ -19,7 +21,6 @@ class Find extends Command
             @shortcuts = ["command+f", "ctrl+f", "alt+f", "alt+ctrl+f", "command+alt+f", "command+ctrl+f"]
         @types     = ['str',  'Str',   'reg',    'Reg',    'fuzzy', 'glob']
         @names     = ['find', 'Find',  '/find/', '/Find/', 'fiZd',  'f*nd']
-        super @commandline
        
     historyKey: -> @name
         

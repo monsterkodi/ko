@@ -17,17 +17,17 @@ class ObjectEditor extends TextEditor
 
     constructor: (viewElem, opt) ->
         
+        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Brackets', 'Strings']
         @fontSizeDefault = 14
         @syntaxName = opt?.syntax ? 'js'
-        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Brackets', 'Strings']
         viewElem.setAttribute 'tabindex', 5
         @numbers.elem.style.fontSize = "#{@fontSizeDefault}px"        
 
 class ObjectBrowser extends Browser
     
-    constructor: (@view) -> 
+    constructor: (view) -> 
                 
-        super @view
+        super view
         @name = 'ObjectBrowser'
 
     #  0000000   0000000          000  00000000   0000000  000000000  
@@ -352,6 +352,6 @@ class ObjectBrowser extends Browser
 
     clear: ->
         delete @columns[0].parent
-        super
+        super()
                 
 module.exports = ObjectBrowser

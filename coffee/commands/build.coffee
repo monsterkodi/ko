@@ -11,14 +11,15 @@ Command  = require '../commandline/command'
 
 class Build extends Command
     
-    constructor: (@commandline) ->
+    constructor: (commandline) ->
+        
+        super commandline
         
         @cmdID      = 0
         @commands   = Object.create null
         @shortcuts  = ['command+b', 'command+shift+b']
         @names      = ["build", 'Build']
         window.area.on 'resized', @onAreaResized
-        super @commandline
 
     restoreState: (state) -> 
         

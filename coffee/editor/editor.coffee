@@ -17,14 +17,14 @@ class Editor extends Buffer
 
     constructor: (@name) ->
         
+        super()
+        
         Editor.initActions() if not Editor.actions?
-            
+        
         @indentString    = _.padStart "", 4
         @stickySelection = false
         @dbg             = false
         @syntax          = new Syntax @
-        
-        super
         @do              = new Do @
         @setupFileType()
 
@@ -50,8 +50,9 @@ class Editor extends Buffer
                     @prototype[key] = value
                 else if key == 'actions'
                     for k,v of value
-                        v.key = k if not v.key?
-                        @actions.push v
+                        if not _.isString v
+                            v.key = k if not v.key?
+                            @actions.push v
                         
         # too early for log here!            
         # console.log str @actions

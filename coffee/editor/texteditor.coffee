@@ -18,10 +18,13 @@ class TextEditor extends Editor
 
     constructor: (viewElem, @config) ->
 
+        name = viewElem
+        name = name.slice 1 if name[0] == '.'
+
+        super name
+
         @clickCount = 0
 
-        @name = viewElem
-        @name = @name.slice 1 if @name[0] == '.'
         @view =$ viewElem
 
         @layers      = elem class: "layers"
@@ -55,9 +58,7 @@ class TextEditor extends Editor
         @view.addEventListener 'focus',    @onFocus
         @view.addEventListener 'keydown',  @onKeyDown
 
-        @initDrag()
-
-        super
+        @initDrag()        
 
         for feature in @config.features
             featureName = feature.toLowerCase()
@@ -83,7 +84,7 @@ class TextEditor extends Editor
         @view.removeEventListener 'focus',   @onFocus
         @view.innerHTML = ''
 
-        super
+        super()
 
     # 00000000   0000000    0000000  000   000   0000000
     # 000       000   000  000       000   000  000
@@ -389,7 +390,7 @@ class TextEditor extends Editor
 
         if @numHighlights()
             $('.highlights', @layers).innerHTML = ''
-            super
+            super()
 
     # 00000000   00000000  000   000  0000000    00000000  00000000
     # 000   000  000       0000  000  000   000  000       000   000

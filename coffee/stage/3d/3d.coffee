@@ -10,7 +10,7 @@ Stage = require '../stage'
 
 class Three extends Stage
     
-    constructor: (@view) -> super @view
+    constructor: (view) -> super view
     
     start: -> 
         @elem = elem 'div'

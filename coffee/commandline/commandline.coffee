@@ -16,11 +16,11 @@ class Commandline extends TextEditor
 
     constructor: (viewElem) ->
 
+        super viewElem, features: []
+
         @fontSizeDefault = 24
         @mainCommands = ['open', 'search', 'find', 'coffee', 'goto', 'term', 'browse', 'debug', 'build', 'macro']
         @hideCommands = ['selecto', 'Term', 'Build', 'Browse']
-
-        super viewElem, features: []
 
         @size.lineHeight = 30
         @scroll.setLineHeight @size.lineHeight
@@ -265,7 +265,7 @@ class Commandline extends TextEditor
 
         @list?.resized?()
         @command?.commandList?.resized()
-        super
+        super()
 
     focusTerminal: ->
 

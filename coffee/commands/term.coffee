@@ -14,7 +14,9 @@ Command  = require '../commandline/command'
 
 class Term extends Command
 
-    constructor: (@commandline) ->
+    constructor: (commandline) ->
+
+        super commandline
 
         post.on 'shellCommandData', @onShellCommandData
         @idCommands = Object.create null
@@ -22,7 +24,7 @@ class Term extends Command
         @shortcuts  = ['command+,', 'command+shift+,']
         @names      = ['term', 'Term']
         @alias      = new store 'alias'
-        super @commandline
+        
         @maxHistory = 99
         @headers    = false
         @autocd     = true
@@ -178,7 +180,7 @@ class Term extends Command
 
         @idCommands = @getState 'idCommands', Object.create null
         @commandIDs = @getState 'commandIDs', Object.create null
-        super
+        super()
 
     clearHistory: ->
 
@@ -186,7 +188,7 @@ class Term extends Command
         @commandIDs = Object.create null
         @setState 'commandIDs', @commandIDs
         @setState 'idCommands', @idCommands
-        super
+        super()
 
     deleteCommandWithID: (id) ->
 

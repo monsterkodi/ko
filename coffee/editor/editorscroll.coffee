@@ -14,6 +14,7 @@ class EditorScroll extends events
 
     constructor: (@editor) ->
 
+        super()
         @lineHeight = @editor.size.lineHeight ? 0
         @viewHeight = -1
         @init()

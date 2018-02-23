@@ -13,6 +13,7 @@ class MapScroll extends events
 
     constructor: (cfg) ->
 
+        super()
         @lineHeight = cfg.lineHeight ? 0
         @viewHeight = cfg.viewHeight ? 0
         @exposeMax  = cfg.exposeMax ? -4 # <0: -v * viewLines | 0: unlimited | >0: v * 1

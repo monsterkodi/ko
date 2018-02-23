@@ -12,7 +12,9 @@ FileBrowser = require '../browser/filebrowser'
 
 class Browse extends Command
     
-    constructor: (@commandline) ->
+    constructor: (commandline) ->
+
+        super commandline
 
         if os.platform() == 'win32'
             @shortcuts = ['ctrl+.', 'ctrl+shift+.']
@@ -27,7 +29,6 @@ class Browse extends Command
         
         @browser.on 'itemActivated', @onItemActivated
         
-        super @commandline
         @syntaxName = 'browser'
         
     restoreState: (state) -> 
@@ -39,7 +40,7 @@ class Browse extends Command
 
     clear: ->
         return if @browser.cleanUp()
-        super
+        super()
     
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   

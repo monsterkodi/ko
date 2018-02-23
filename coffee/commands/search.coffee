@@ -15,13 +15,15 @@ stream   = require 'stream'
 
 class Search extends Command
 
-    constructor: (@commandline) ->
+    constructor: (commandline) ->
+        
+        super commandline
+        
         if os.platform() == 'win32'
             @shortcuts = ["ctrl+shift+f", "alt+shift+f", "alt+ctrl+shift+f", ""]
         else
             @shortcuts = ["command+shift+f", "ctrl+shift+f", "alt+shift+f", "alt+ctrl+shift+f"]
         @names = ["search", "Search", "/search/", "/Search/"]
-        super @commandline
      
     historyKey: -> @name
                 
@@ -128,6 +130,7 @@ class FileSearcher extends stream.Writable
     
     constructor: (@command, @opt, @file) ->
         
+        super()
         @line = 0
         @flags = ''
         @patterns = switch @opt.name
@@ -141,7 +144,6 @@ class FileSearcher extends stream.Writable
             @syntaxName = extn
         else
             @syntaxName = null
-        super
             
     write: (chunk, encoding, cb) ->
         

@@ -17,17 +17,6 @@ class FileEditor extends TextEditor
 
     constructor: (viewElem) ->
 
-        @currentFile = null
-        @watch       = null
-
-        window.split.on 'commandline', @onCommandline
-
-        post.on 'jumpTo',        @jumpTo
-        post.on 'jumpToFile',    @jumpToFile
-        post.on 'setBreakpoint', @onSetBreakpoint
-
-        @fontSizeDefault = 18
-
         super viewElem, features: [
             'Diffbar'
             'Scrollbar'
@@ -38,6 +27,17 @@ class FileEditor extends TextEditor
             'Brackets'
             'Strings'
         ]
+
+        @currentFile = null
+        @watch       = null
+
+        window.split.on 'commandline', @onCommandline
+
+        post.on 'jumpTo',        @jumpTo
+        post.on 'jumpToFile',    @jumpToFile
+        post.on 'setBreakpoint', @onSetBreakpoint
+
+        @fontSizeDefault = 18
 
         @initPigments()
         @initInvisibles()

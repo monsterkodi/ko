@@ -17,8 +17,7 @@ pug      = require 'pug'
 colors   = require 'colors'
 electron = require 'electron'
 
-{ BrowserWindow, Tray, app, clipboard, dialog        
-}             = electron
+{ BrowserWindow, Tray, app, clipboard, dialog } = electron
 disableSnap   = false
 main          = undefined # < created in app.on 'ready'
 tray          = undefined # < created in Main.constructor
@@ -65,8 +64,8 @@ if args.verbose
     log noon.stringify args, colors:true
     log ''
 
-app.commandLine.appendSwitch('headless')
-app.commandLine.appendSwitch('remote-debugging-port', '9222')
+# app.commandLine.appendSwitch('headless')
+# app.commandLine.appendSwitch('remote-debugging-port', '9222')
 
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000     
@@ -79,7 +78,8 @@ alias = new store 'alias'
 
 if args.prefs
     log colors.yellow.bold 'prefs'
-    log noon.stringify prefs.store, colors:true
+    log colors.green.bold 'prefs file:', prefs.store.file
+    log noon.stringify prefs.store.data, colors:true
 
 mostRecentFile = -> _.first prefs.get 'recentFiles'
 
@@ -182,6 +182,7 @@ class Main
             @restoreWindows() if not args.noprefs
 
         if not wins().length
+            log 'Main.constructor no windows created', args.show
             if args.show
                 w = @createWindow file:mostRecentFile()
         
@@ -427,6 +428,8 @@ class Main
         
         scheme = prefs.get 'scheme', 'dark'
         
+        log 'createWindow', opt, scheme
+        
         win = new BrowserWindow
             x:                parseInt (width-ww)/2
             y:                0
@@ -437,12 +440,14 @@ class Main
             useContentSize:   true
             fullscreenable:   true
             acceptFirstMouse: true
-            show:             false
+            show:             true
             hasShadow:        true
             backgroundColor:  scheme == 'bright' and "#fff" or '#000'
             autoHideMenuBar:  true
             titleBarStyle:    'hidden'
-                
+            
+        log 'createWindow', win
+            
         if opt.restore?
             newStash = path.join app.getPath('userData'), 'win', "#{win.id}.noon"
             fs.copySync opt.restore, newStash
@@ -458,15 +463,17 @@ class Main
         app.dock?.show()
                 
         win.on 'close',  @onCloseWin
-                
         win.on 'resize', @onResizeWin
         
         winLoaded = ->
+
+            log 'createWindow.winLoaded', win.id, opt
 
             if opt.files?
                 post.toWin win.id, 'loadFiles', opt.files
             else if opt.file?
                 post.toWin win.id, 'loadFile', opt.file
+                
             if opt.debugFileLine?
                 post.toWin win.id, 'debugFileLine', opt.debugFileLine
     

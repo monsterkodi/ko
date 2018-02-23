@@ -13,8 +13,8 @@ vorono = require './voronoinet'
 
 class Voronoi extends Stage
     
-    constructor: (@view) ->
-        super @view
+    constructor: (view) ->
+        super view
         
         @s = new snap()
         @view.appendChild @s.node

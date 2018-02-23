@@ -14,6 +14,8 @@ class Autocomplete extends event
 
     constructor: (@editor) -> 
         
+        super()
+        
         @wordinfo  = {}
         @matchList = []
         @clones    = []

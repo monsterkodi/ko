@@ -21,6 +21,8 @@ class Split extends event
     
     constructor: () ->
 
+        super()
+
         @commandlineHeight = 30
         @handleHeight      = 6
         

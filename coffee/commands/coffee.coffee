@@ -14,14 +14,16 @@ coffee        = require 'coffee-script'
 
 class Coffee extends Command
     
-    constructor: (@commandline) ->
+    constructor: (commandline) ->
+        
+        super commandline
         
         @cmdID      = 0
         @browser    = new ObjectBrowser window.area.view
         @commands   = Object.create null
         @shortcuts  = ['alt+c', 'alt+shift+c']
         @names      = ["coffee", "Coffee"]
-        super @commandline
+        
         @maxHistory = 99
         @syntaxName = 'coffee'
         
@@ -36,7 +38,7 @@ class Coffee extends Command
     # 0000000      000     000   000     000     00000000  
     
     state: -> 
-        s = super
+        s = super()
         if @browser.column(0)
             s.browse = ( r.item.name for r in @browser.column(0).rows )
         s
@@ -104,7 +106,7 @@ class Coffee extends Command
 
     clear: ->
         return if @browser.cleanUp()
-        super
+        super()
                 
     #  0000000   0000000   00000000  00000000  00000000  00000000  
     # 000       000   000  000       000       000       000       

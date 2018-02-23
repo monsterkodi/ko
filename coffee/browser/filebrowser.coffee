@@ -15,9 +15,9 @@ forkfunc = require '../tools/forkfunc'
 
 class FileBrowser extends Browser
     
-    constructor: (@view) ->
+    constructor: (view) ->
                 
-        super @view
+        super view
         @loadID = 0
         @name = 'FileBrowser'
         

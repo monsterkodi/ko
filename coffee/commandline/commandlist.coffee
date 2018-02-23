@@ -16,14 +16,14 @@ class CommandList extends TextEditor
 
     constructor: (@command, viewElem, opt) ->
 
+        super viewElem,
+            features: ['Scrollbar', 'Numbers', 'Meta']
+            lineHeight: 1.4
+
         @fontSizeDefault = 19
         @maxLines        = 17
         @metaQueue       = []
         @syntaxName      = opt.syntax ? 'ko'
-
-        super viewElem,
-            features: ['Scrollbar', 'Numbers', 'Meta']
-            lineHeight: 1.4
 
         @numbers.elem.style.fontSize = "#{@fontSizeDefault}px"
 
@@ -125,6 +125,6 @@ class CommandList extends TextEditor
     clear: ->
         
         @meta.clear()
-        super
+        super()
 
 module.exports = CommandList

@@ -20,13 +20,15 @@ syntax  = require '../editor/syntax'
 
 class Macro extends Command
 
-    constructor: (@commandline) ->
+    constructor: (commandline) ->
+
+        super commandline
 
         @shortcuts = ['command+m']
         @macros    = ['clean', 'help', 'dbg', 'class', 'req', 'inv', 'blink', 'color', 'fps', 'test']
         @macros    = @macros.concat window.editor.Transform.transformNames
         @names     = ['macro']
-        super @commandline
+        
 
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000

@@ -18,7 +18,8 @@ endOf   = (r) -> r[0] + Math.max 1, r[1]-r[0]
 
 class Buffer extends event
     
-    constructor: () -> 
+    constructor: () ->
+        super()
         @wordRegExp = new RegExp "(\\s+|\\w+|[^\\s])", 'g'
         @setState new State()
 
