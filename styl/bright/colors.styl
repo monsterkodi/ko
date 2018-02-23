@@ -105,8 +105,6 @@ span.ko
         color           #0a0
     &.coffee
         color           #800
-    &.debug
-        color           #888
     &.build
         color           #aaa
     &.macro
@@ -121,14 +119,6 @@ span.ko
 // 000          000     0000000    000
 // 000          000     000   000  000
 //  0000000     000     000   000  0000000
-
-#debugCtrl
-    background          backColor
-
-#debugCtrl.running #step
-#debugCtrl.running #into
-#debugCtrl.running #out
-    color               titleColor
 
 .ctrl
     color               #888
@@ -351,8 +341,6 @@ span.ko
     &.dbg
         opacity             0.8
         background          #f00
-        &.breakpoint
-            background      #f80
 
 .linenumber span .saveButton
     background              #f80

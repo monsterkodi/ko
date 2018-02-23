@@ -82,7 +82,6 @@ class Buffer extends event
 
     wordAtCursor: -> @wordAtPos @mainCursor()
     wordAtPos: (c) -> @textInRange @rangeForWordAtPos c
-    # wordsAtCursors: (cs=@cursors(), opt) -> (@textInRange @rangeForWordAtPos(c, opt) for c in cs)
     wordsAtCursors: (cs=@cursors(), opt) -> (@textInRange r for r in @rangesForWordsAtCursors cs, opt)
 
     rangesForWordsAtCursors: (cs=@cursors(), opt) -> 

@@ -85,9 +85,9 @@ class Menu
                 accelerator: 'Ctrl+Shift+O'
                 click:       (i,win) -> post.toWin win.id, "openFile", newWindow: true
             ,
-                # label:       'Open Recent'
-                # submenu:     recent
-            # ,
+                label:       'Open Recent'
+                submenu:     recent
+            ,
                 type: 'separator'
             ,
                 label:       'Save'
@@ -331,6 +331,10 @@ class Menu
                 label:       'Toggle FullScreen'
                 accelerator: 'Ctrl+Alt+F'
                 click:       (i,win) -> win?.setFullScreen !win.isFullScreen()
+            ,                
+                label:       'Toggle DevTools'
+                accelerator: 'Ctrl+Alt+I'
+                click:       (i,win) -> win?.webContents.openDevTools()                
             ]
         ]
 

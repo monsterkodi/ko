@@ -16,9 +16,8 @@ class Terminal extends TextEditor
 
     constructor: (viewElem) ->
         
-        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Meta']
+        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Meta'], fontSize: 15
         
-        @fontSizeDefault = 15
         @metaQueue = []
         
         @initInvisibles()

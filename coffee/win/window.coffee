@@ -320,6 +320,8 @@ loadFile = (file, opt={}) ->
         [file, pos] = splitFilePos file
         file = resolve file
 
+    log 'window.loadFile', file, editor?.currentFile, opt
+
     if file != editor?.currentFile or opt?.reload
         if file? and not fileExists file
             file = null
@@ -560,15 +562,14 @@ menuCombo = (combo) ->
     handleModKeyComboCharEvent mod, key, combo, char
 
 onKeyDown = (event) ->
-    log 'onKeyDown', event?, event.metaKey, event.altKey, event.ctrlKey, event.shiftKey
+    # log 'onKeyDown', event?, event.metaKey, event.altKey, event.ctrlKey, event.shiftKey
     {mod, key, combo, char} = keyinfo.forEvent event
     handleModKeyComboCharEvent mod, key, combo, char, event
 
 handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
-    
-    log 'handleModKeyComboCharEvent', 'mod', mod, 'key', key, 'combo', combo, 'char', char
-    
+        
     return if not combo
+    log 'handleModKeyComboCharEvent', 'mod', mod, 'key', key, 'combo', combo, 'char', char
     return stopEvent(event) if 'unhandled' != window.titlebar   .globalModKeyComboEvent mod, key, combo, event
     return stopEvent(event) if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
 

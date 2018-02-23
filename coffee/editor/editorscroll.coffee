@@ -31,6 +31,7 @@ class EditorScroll extends events
         @offsetTop    =  0 # height of view above first visible line (pixels)
         @offsetSmooth =  0 # smooth scrolling offset / part of top line that is hidden (pixels)
         
+        @viewHeight   = -1
         @fullHeight   = -1 # total height of buffer (pixels)
         @fullLines    = -1 # number of full lines fitting in view (excluding partials)
         @viewLines    = -1 # number of lines fitting in view (including partials)
@@ -38,6 +39,15 @@ class EditorScroll extends events
         @numLines     = -1 # total number of lines in buffer
         @top          = -1 # index of first visible line in view
         @bot          = -1 # index of last  visible line in view
+        # @log 'editorscroll.init'
+
+    start: (@viewHeight, @numLines) =>
+        
+        @fullHeight = @numLines * @lineHeight
+        @top = 0
+        @bot = @top-1
+        @calc()
+        @by 0
 
     #  0000000   0000000   000       0000000  
     # 000       000   000  000      000       
@@ -47,12 +57,11 @@ class EditorScroll extends events
     
     calc: ->
         
-        if @viewHeight < 0
+        if @viewHeight <= 0
             return
         @scrollMax   = Math.max(0,@fullHeight - @viewHeight)   # maximum scroll offset (pixels)
         @fullLines   = Math.floor(@viewHeight / @lineHeight)   # number of lines in view (excluding partials)
         @viewLines   = Math.ceil(@viewHeight / @lineHeight)+1  # number of lines in view (including partials)
-        # @log @info()
         
     # 0000000    000   000
     # 000   000   000 000 
@@ -128,7 +137,6 @@ class EditorScroll extends events
     # 000   000  00000000  0000000   00000000     000   
     
     reset: =>
-        
         @emit 'clearLines'
         @init()
         @updateOffset()
@@ -140,7 +148,6 @@ class EditorScroll extends events
     #     0      000  00000000  00     00  000   000  00000000  000   0000000   000   000     000   
 
     setViewHeight: (h) =>
-        
         if @viewHeight != h
             @bot = @top-1 # always emit showLines if height changes
             @viewHeight = h
@@ -154,7 +161,6 @@ class EditorScroll extends events
     # 000   000   0000000   000   000  0000000  000  000   000  00000000  0000000 
         
     setNumLines: (n, opt) =>
-        
         if @numLines != n
             @fullHeight = n * @lineHeight
             if n

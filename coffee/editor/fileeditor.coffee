@@ -17,16 +17,18 @@ class FileEditor extends TextEditor
 
     constructor: (viewElem) ->
 
-        super viewElem, features: [
-            'Diffbar'
-            'Scrollbar'
-            'Numbers'
-            'Minimap'
-            'Meta'
-            'Autocomplete'
-            'Brackets'
-            'Strings'
-        ]
+        super viewElem, 
+            features: [
+                'Diffbar'
+                'Scrollbar'
+                'Numbers'
+                'Minimap'
+                'Meta'
+                'Autocomplete'
+                'Brackets'
+                'Strings'
+            ],
+            fontSize: 18
 
         @currentFile = null
         @watch       = null
@@ -35,9 +37,6 @@ class FileEditor extends TextEditor
 
         post.on 'jumpTo',        @jumpTo
         post.on 'jumpToFile',    @jumpToFile
-        post.on 'setBreakpoint', @onSetBreakpoint
-
-        @fontSizeDefault = 18
 
         @initPigments()
         @initInvisibles()
@@ -99,7 +98,6 @@ class FileEditor extends TextEditor
 
             @restoreScrollCursorsAndSelections()
             post.emit 'file', @currentFile # titlebar -> tabs -> tab
-            post.toMain 'getBreakpoints', window.winID, @currentFile, window.winID
         else
             if not opt?.skip
                 @setLines ['']
@@ -107,12 +105,12 @@ class FileEditor extends TextEditor
         if not opt?.skip
             if not @currentFile?
                 post.emit 'file', @currentFile # titlebar -> tabs -> tab
-            # log 'emit file', @currentFile
+            log 'emit file', @currentFile
             @emit 'file', @currentFile # diffbar, pigments, ...
 
     restoreFromTabState: (tabsState) ->
 
-        # log 'restoreFromTabState', tabsState
+        log 'restoreFromTabState', tabsState
         return error "no tabsState.file?" if not tabsState.file?
         @clear skip:true
         @setCurrentFile tabsState.file, restoreState:tabsState.state
@@ -385,33 +383,9 @@ class FileEditor extends TextEditor
         if event.metaKey
             if pos(event).x <= @size.numbersWidth
                 @singleCursorAtPos p
-                @toggleBreakpoint()
                 return
 
         super p, event
-
-    # 0000000    00000000   00000000   0000000   000   000  00000000    0000000   000  000   000  000000000
-    # 000   000  000   000  000       000   000  000  000   000   000  000   000  000  0000  000     000
-    # 0000000    0000000    0000000   000000000  0000000    00000000   000   000  000  000 0 000     000
-    # 000   000  000   000  000       000   000  000  000   000        000   000  000  000  0000     000
-    # 0000000    000   000  00000000  000   000  000   000  000         0000000   000  000   000     000
-
-    toggleBreakpoint: ->
-
-        return if path.extname(@currentFile) not in ['.js', '.coffee']
-        for cp in @cursors()
-            continue if not @line(cp[1]).trim().length
-            wid = window.commandline.commands.debug.activeWid()
-            post.toMain 'setBreakpoint', wid, @currentFile, cp[1]+1
-
-    onSetBreakpoint: (breakpoint) =>
-
-        return if not samePath breakpoint.file, @currentFile
-        line = breakpoint.line
-        switch breakpoint.status
-            when 'active'   then @meta.addDbgMeta line:line-1, clss:'dbg breakpoint'
-            when 'inactive' then @meta.addDbgMeta line:line-1, clss:'dbg breakpoint inactive'
-            when 'remove'   then @meta.delDbgMeta line-1
 
     # 000   000  00000000  000   000
     # 000  000   000        000 000
@@ -426,7 +400,6 @@ class FileEditor extends TextEditor
             when 'ctrl+enter'       then return window.commandline.commands.coffee.executeText @text()
             when 'ctrl+shift+enter' then return window.commandline.commands.coffee.executeTextInMain @text()
             when 'command+alt+up'   then return @jumpToCounterpart()
-            when 'f7'               then return @toggleBreakpoint()
             when 'esc'
                 split = window.split
                 if split.terminalVisible()

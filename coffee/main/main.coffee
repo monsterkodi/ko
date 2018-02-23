@@ -10,7 +10,6 @@
 pkg      = require '../../package.json'
 Execute  = require './execute'
 Navigate = require './navigate'
-Debugger = require './debugger'
 Indexer  = require './indexer'
 Menu     = if os.platform() == 'win32' then require './menu-win' else require './menu'
 pug      = require 'pug'
@@ -63,9 +62,6 @@ if args.verbose
     log colors.yellow.bold '\nargs'
     log noon.stringify args, colors:true
     log ''
-
-# app.commandLine.appendSwitch('headless')
-# app.commandLine.appendSwitch('remote-debugging-port', '9222')
 
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000     
@@ -158,7 +154,6 @@ class Main
         #     app.exit 0
         #     return
 
-        @debugger     = new Debugger
         @indexer      = new Indexer
         coffeeExecute = new Execute main: @
 
@@ -182,7 +177,6 @@ class Main
             @restoreWindows() if not args.noprefs
 
         if not wins().length
-            log 'Main.constructor no windows created', args.show
             if args.show
                 w = @createWindow file:mostRecentFile()
         
@@ -410,7 +404,6 @@ class Main
         stashFiles ?= []
         log 'restoreWindows stashFiles', stashFiles
         for file in stashFiles
-            log 'createWindow file', file
             @createWindow restore:file
        
     #  0000000  00000000   00000000   0000000   000000000  00000000
@@ -428,8 +421,6 @@ class Main
         
         scheme = prefs.get 'scheme', 'dark'
         
-        log 'createWindow', opt, scheme
-        
         win = new BrowserWindow
             x:                parseInt (width-ww)/2
             y:                0
@@ -445,8 +436,6 @@ class Main
             backgroundColor:  scheme == 'bright' and "#fff" or '#000'
             autoHideMenuBar:  true
             titleBarStyle:    'hidden'
-            
-        log 'createWindow', win
             
         if opt.restore?
             newStash = path.join app.getPath('userData'), 'win', "#{win.id}.noon"
@@ -467,16 +456,13 @@ class Main
         
         winLoaded = ->
 
-            log 'createWindow.winLoaded', win.id, opt
+            log 'createWindow.winLoaded', win.id
 
             if opt.files?
                 post.toWin win.id, 'loadFiles', opt.files
             else if opt.file?
                 post.toWin win.id, 'loadFile', opt.file
                 
-            if opt.debugFileLine?
-                post.toWin win.id, 'debugFileLine', opt.debugFileLine
-    
             post.toWins 'winLoaded', win.id
             post.toWins 'numWins', wins().length
             

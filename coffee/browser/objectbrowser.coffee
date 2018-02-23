@@ -17,11 +17,10 @@ class ObjectEditor extends TextEditor
 
     constructor: (viewElem, opt) ->
         
-        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Brackets', 'Strings']
-        @fontSizeDefault = 14
+        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Brackets', 'Strings'], fontSize: 14
         @syntaxName = opt?.syntax ? 'js'
         viewElem.setAttribute 'tabindex', 5
-        @numbers.elem.style.fontSize = "#{@fontSizeDefault}px"        
+        @numbers.elem.style.fontSize = "14px"        
 
 class ObjectBrowser extends Browser
     

@@ -13,9 +13,8 @@ class LogView extends TextEditor
 
     constructor: (viewElem) ->
         
-        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap']
+        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap'], fontSize: 12
         
-        @fontSizeDefault = 12
         @syntaxName = 'logview'
         
         @setLines ['']

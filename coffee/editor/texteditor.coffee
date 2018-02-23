@@ -40,16 +40,15 @@ class TextEditor extends Editor
         layer.push 'numbers' if 'Numbers' in @config.features
         @initLayers layer
 
-        @size   = {}
-        @elem   = @layerDict.lines
+        @size = {}
+        @elem = @layerDict.lines
 
         @spanCache = [] # cache for rendered line spans
         @lineDivs  = {} # maps line numbers to displayed divs
 
         @config.lineHeight ?= 1.2
 
-        @setFontSize prefs.get "#{@name}FontSize", @fontSizeDefault
-
+        @setFontSize prefs.get "#{@name}FontSize", @config.fontSize ? 18
         @scroll = new EditorScroll @
         @scroll.on 'shiftLines', @shiftLines
         @scroll.on 'showLines',  @showLines
@@ -152,11 +151,8 @@ class TextEditor extends Editor
         @scroll.reset()
 
         viewHeight = @viewHeight()
-        if @scroll.viewHeight != viewHeight
-            @scroll.setViewHeight viewHeight
-            @emit 'viewHeight', viewHeight
-
-        @scroll.setNumLines @numLines()
+        
+        @scroll.start viewHeight, @numLines()
 
         @layerScroll.scrollLeft = 0
         @layersWidth  = @layerScroll.offsetWidth
@@ -287,7 +283,6 @@ class TextEditor extends Editor
         div.replaceChild @spanCache[li], div.firstChild
         
     refreshLines: (top, bot) ->
-        
         for li in [top..bot]
             @syntax.getDiss li, true
             @updateLine li
@@ -299,7 +294,7 @@ class TextEditor extends Editor
     # 0000000   000   000   0000000   00     00     0000000  000  000   000  00000000  0000000
 
     showLines: (top, bot, num) =>
-        
+
         @lineDivs = {}
         @elem.innerHTML = ''
 
@@ -576,7 +571,9 @@ class TextEditor extends Editor
         @elem.innerHTML = ''
         @emit 'clearLines'
 
-    clear: => @setLines []
+    clear: => 
+        log 'TextEditor.clear', @name
+        @setLines []
 
     focus: -> @view.focus()
 

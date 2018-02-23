@@ -19,13 +19,13 @@ class CommandList extends TextEditor
         super viewElem,
             features: ['Scrollbar', 'Numbers', 'Meta']
             lineHeight: 1.4
+            fontSize:   19
 
-        @fontSizeDefault = 19
         @maxLines        = 17
         @metaQueue       = []
         @syntaxName      = opt.syntax ? 'ko'
 
-        @numbers.elem.style.fontSize = "#{@fontSizeDefault}px"
+        @numbers.elem.style.fontSize = "19px"
 
     #  0000000   0000000    0000000    000  000000000  00000000  00     00   0000000
     # 000   000  000   000  000   000  000     000     000       000   000  000
