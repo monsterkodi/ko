@@ -294,21 +294,21 @@ class Column
         
         {mod, key, combo, char} = keyinfo.forEvent event
 
-        # log mod, key, combo, char
+        log mod, key, combo, char
 
         switch combo
             when 'up', 'down', 'page up', 'page down', 'home', 'end' 
                 return stopEvent event, @navigateRows key
             when 'right', 'left', 'enter'                            
                 return stopEvent event, @navigateCols key
-            when 'command+enter'       then return @openFileInNewWindow()
-            when 'command+left', 'command+up','command+right', 'command+down'
+            when 'command+enter', 'ctrl+enter' then return @openFileInNewWindow()
+            when 'command+left', 'command+up', 'command+right', 'command+down', 'ctrl+left', 'ctrl+up', 'ctrl+right', 'ctrl+down'
                 return stopEvent event, @navigateRoot key
             when 'backspace', 'delete' then return stopEvent event, @clearSearch().removeObject()
             when 'ctrl+t'              then return stopEvent event, @sortByType()
             when 'ctrl+n'              then return stopEvent event, @sortByName()
-            when 'command+i'           then return stopEvent event, @toggleDotFiles()
-            when 'command+k'           then return stopEvent event if @browser.cleanUp()
+            when 'command+i', 'ctrl+i' then return stopEvent event, @toggleDotFiles()
+            when 'command+k', 'ctrl+k' then return stopEvent event if @browser.cleanUp()
             when 'tab'    
                 if @search.length then @doSearch ''
                 return stopEvent event

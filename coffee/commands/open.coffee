@@ -7,7 +7,7 @@
 ###
 
 { packagePath, splitFilePos, joinFilePos, fileExists, fileName, dirExists, valid, empty,
-  unresolve, relative, resolve, prefs, clamp, post, path, fs, error, log, _ } = require 'kxk'
+  unresolve, resolve, prefs, clamp, post, path, fs, os, error, log, _ } = require 'kxk'
   
 profile  = require '../tools/profile'
 Walker   = require '../tools/walker'
@@ -15,6 +15,28 @@ Command  = require '../commandline/command'
 render   = require '../editor/render'
 syntax   = require '../editor/syntax'
 fuzzy    = require 'fuzzy'
+    
+slashreg = new RegExp "\\\\", 'g'
+slashpath = (p) ->
+    p = p.replace slashreg, "/" if path.sep == "\\"
+    p
+
+slashjoin = -> [].map.call(arguments, (p) -> slashpath p).join "/"
+
+relative = (absolute, to) ->
+    absolute = slashpath resolve absolute
+    return absolute if not path.isAbsolute absolute
+    to = slashpath to
+    homedir = slashpath os.homedir()
+    d = slashpath path.normalize path.resolve to.replace /\~/, homedir
+    r = slashpath path.relative d, absolute
+    if r.startsWith '../../' 
+        unresolved = absolute.replace(homedir, "~")
+        if unresolved.length < r.length
+            r = unresolved
+    if absolute.length < r.length    
+        r = absolute
+    r    
     
 class Open extends Command
 
@@ -178,6 +200,7 @@ class Open extends Command
         
         @lastFileIndex = 0
         @dir = resolve '~' if not @dir?
+        log 'open/listItems', @dir, resolve '~'
 
         if @history? and not @navigating and not opt?.currentText and @history.length > 1
             f = @history[@history.length-2]
@@ -207,6 +230,9 @@ class Open extends Command
                 
         for file in @files
             rel = relative file[0], @dir
+            
+            # log 'open.listItems file:', file[0], '@dir:', @dir, 'rel:', rel
+            
             if rel.length
                 item = Object.create null
                 if file[1].isDirectory()
@@ -290,6 +316,7 @@ class Open extends Command
             opt.dir  = path.dirname opt.file
         else 
             @dir ?= process.cwd()
+            log 'open.start', @dir
             opt.dir = @dir
             
         @loadDir opt
@@ -325,9 +352,13 @@ class Open extends Command
             if not dirExists opt.dir
                 return false
 
+        log 'open.loadDir opt.dir:', opt.dir
         @dir ?= resolve '.'
+        log 'open.loadDir @dir:', @dir
         newdir = @resolvedPath(opt.dir) ? @dir
         return false if newdir == @dir and not opt.reload
+        
+        log 'open.loadDir newdir:', newdir
         
         @dir = newdir
         
@@ -471,6 +502,8 @@ class Open extends Command
         options.newWindow = true if @name == "new window"
         options.newTab    = true if @name == "new tab"
         
+        log 'open.execute files:', files
+        
         opened = window.openFiles files, options
         
         if opened?.length
@@ -498,7 +531,7 @@ class Open extends Command
     resolvedPath: (p, parent=@dir) ->
         
         return (parent ? resolve '~') if not p?
-        if p[0] in ['~', '/']
+        if p[0] in ['~', '/'] or p[1] == ':'
             resolve p
         else
             resolve path.join parent, p

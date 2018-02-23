@@ -11,10 +11,10 @@ pkg      = require '../../package.json'
 Execute  = require './execute'
 Navigate = require './navigate'
 Indexer  = require './indexer'
-Menu     = if os.platform() == 'win32' then require './menu-win' else require './menu'
 pug      = require 'pug'
 colors   = require 'colors'
 electron = require 'electron'
+Menu     = if os.platform() == 'win32' then require './menu-win' else require './menu'
 
 { BrowserWindow, Tray, app, clipboard, dialog } = electron
 disableSnap   = false
@@ -431,7 +431,7 @@ class Main
             useContentSize:   true
             fullscreenable:   true
             acceptFirstMouse: true
-            show:             true
+            show:             false
             hasShadow:        true
             backgroundColor:  scheme == 'bright' and "#fff" or '#000'
             autoHideMenuBar:  true

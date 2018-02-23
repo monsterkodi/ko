@@ -165,7 +165,7 @@ class Menu
                     ,
                         label:      'Case Sensitive'
                         #accelerator: 'ctrl+f'
-                        click:       (i,win) -> post.toWin win.id, 'menuCombo', #'ctrl+f'
+                        click:       (i,win) -> post.toWin win.id, 'menuCombo', '' #'ctrl+f'
                     ,
                         label:      'Regexp Case Insensitive'
                         #accelerator: 'alt+f'
@@ -173,7 +173,7 @@ class Menu
                     ,
                         label:      'Regexp Case Sensitive'
                         #accelerator: 'alt+ctrl+f'
-                        click:       (i,win) -> post.toWin win.id, 'menuCombo', ''# 'alt+ctrl+f'
+                        click:       (i,win) -> post.toWin win.id, 'menuCombo', '' # 'alt+ctrl+f'
                     ,
                         label:      'Fuzzy'
                         #accelerator: 'command+alt+f'
@@ -332,7 +332,7 @@ class Menu
                 accelerator: 'Ctrl+Alt+F'
                 click:       (i,win) -> win?.setFullScreen !win.isFullScreen()
             ,                
-                label:       'Toggle DevTools'
+                label:       'Open DevTools'
                 accelerator: 'Ctrl+Alt+I'
                 click:       (i,win) -> win?.webContents.openDevTools()                
             ]
