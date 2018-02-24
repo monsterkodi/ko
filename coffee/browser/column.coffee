@@ -5,7 +5,7 @@
 # 000       000   000  000      000   000  000 0 000  000  0000
 #  0000000   0000000   0000000   0000000   000   000  000   000
 
-{ packagePath, stopEvent, keyinfo, slash, path, post, elem, clamp, empty, error, log, _ } = require 'kxk'
+{ stopEvent, keyinfo, slash, post, elem, clamp, empty, error, log, _ } = require 'kxk'
 
 Row        = require './row'
 Scroller   = require './scroller'
@@ -241,7 +241,6 @@ class Column
     removeObject: ->
         
         if row = @activeRow()
-            # delete @parent.obj[row.item.name]
             @browser.emit 'willRemoveRow', row, @
             nextOrPrev = row.next() ? row.prev()
             row.div.remove()
@@ -250,8 +249,8 @@ class Column
             nextOrPrev?.activate()
         @
   
-    sortByName: -> 
-        log 'sortByName'
+    sortByName: ->
+         
         @rows.sort (a,b) -> 
             a.item.name.localeCompare b.item.name
             
@@ -261,10 +260,10 @@ class Column
         @
         
     sortByType: ->
-        # log 'sortByType'
+        
         @rows.sort (a,b) -> 
-            atype = a.item.type == 'file' and path.extname(a.item.name).slice(1) or a.item.type
-            btype = b.item.type == 'file' and path.extname(b.item.name).slice(1) or b.item.type
+            atype = a.item.type == 'file' and slash.extname(a.item.name).slice(1) or a.item.type
+            btype = b.item.type == 'file' and slash.extname(b.item.name).slice(1) or b.item.type
             (atype + a.item.name).localeCompare btype + b.item.name
             
         @table.innerHTML = ''

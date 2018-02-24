@@ -5,7 +5,7 @@
 #      000  000       000   000  000   000  000       000   000
 # 0000000   00000000  000   000  000   000   0000000  000   000
 
-{ packagePath, slash, path, post, fs, os, log, _ } = require 'kxk'
+{ slash, post, fs, os, log, _ } = require 'kxk'
 
 walker   = require '../tools/walker'
 matchr   = require '../tools/matchr'
@@ -77,8 +77,8 @@ class Search extends Command
         terminal.appendMeta clss: 'searchHeader', diss: syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'
         terminal.appendMeta clss: 'spacer'
         terminal.singleCursorAtPos [0, terminal.numLines()-2]
-        dir = packagePath path.dirname opt.file
-        dir ?= path.dirname opt.file
+        dir = slash.pkg slash.dirname opt.file
+        dir ?= slash.dirname opt.file
         @walker = new walker
             root:        dir
             maxDepth:    6
@@ -137,7 +137,7 @@ class FileSearcher extends stream.Writable
             when '/search/' then @flags='i'; @opt.text
             when '/Search/' then @opt.text
         @found = []
-        extn = path.extname(@file).slice 1
+        extn = slash.extname(@file).slice 1
         if extn in syntax.syntaxNames
             @syntaxName = extn
         else

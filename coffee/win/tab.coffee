@@ -5,7 +5,7 @@
 #    000     000   000  000   000
 #    000     000   000  0000000  
 
-{ packagePath, elem, post, atomic, slash, path, fs, error, log, _ } = require 'kxk'
+{ elem, post, atomic, slash, fs, error, log, _ } = require 'kxk'
 
 render  = require '../editor/render'
 syntax  = require '../editor/syntax'
@@ -84,8 +84,8 @@ class Tab
         
         if @info.file != oldFile
             if @info.file?
-                @info.pkg = packagePath @info.file
-                @info.pkg = path.basename @info.pkg if @info.pkg?
+                @info.pkg = slash.pkg @info.file
+                @info.pkg = slash.basename @info.pkg if @info.pkg?
             else
                 delete @info.pkg
         else
@@ -99,7 +99,7 @@ class Tab
         @pkg = elem 'span', class:'pkg', text: @info.pkg and (@info.pkg + " ▸ ") or ''
         @div.appendChild @pkg
             
-        diss = syntax.dissForTextAndSyntax path.basename(@file()), 'ko' #, join: true 
+        diss = syntax.dissForTextAndSyntax slash.basename(@file()), 'ko' #, join: true 
         name = elem 'span', class:'name', html:render.line(diss, charWidth:0)
         @div.appendChild name
 

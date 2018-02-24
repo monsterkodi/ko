@@ -5,7 +5,7 @@
 # 000   000  000   000  000   000  000   000       000  000       000   000  
 # 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 
-{ fileName, encodePath, swapExt, elem, post, clamp, childp, slash, path, fs, os, error, log,  _ } = require 'kxk'
+{ elem, post, clamp, childp, slash, fs, os, error, log,  _ } = require 'kxk'
 
 Column = require './column'
 Stage  = require '../stage/stage'
@@ -238,7 +238,7 @@ class Browser extends Stage
 
         items = []
         file  = item.file
-        name  = fileName file
+        name  = slash.fileName file
         
         files = post.get 'indexer', 'files', file
 
@@ -263,7 +263,7 @@ class Browser extends Stage
             @clearColumnsFrom opt.column
             @loadItems items, opt
         else
-            ext = path.extname file  
+            ext = slash.extname file  
             if ext in ['.gif', '.png', '.jpg', '.jpeg', '.svg']
                 @clearColumnsFrom opt.column, pop:true
                 @loadImage row, file
@@ -293,7 +293,7 @@ class Browser extends Stage
         item = row.item
         file = item.file
         tmpPXM = slash.join os.tmpdir(), "ko-#{fileName file}.pxm"
-        tmpPNG = swapExt tmpPXM, '.png'
+        tmpPNG = slash.swapExt tmpPXM, '.png'
 
         fs.copy file, tmpPXM, (err) =>
             return error "can't copy pxm image #{file} to #{tmpPXM}: #{err}" if err?
@@ -306,7 +306,7 @@ class Browser extends Stage
         
         item = row.item
         file = item.file
-        tmpImage = slash.join os.tmpdir(), "ko-#{path.basename file}.png"
+        tmpImage = slash.join os.tmpdir(), "ko-#{slash.basename file}.png"
         
         childp.exec "/usr/bin/sips -s format png \"#{file}\" --out \"#{tmpImage}\"", (err) =>
             return error "can't convert image #{file}: #{err}" if err?
@@ -315,12 +315,12 @@ class Browser extends Stage
     loadImage: (row, file) ->
         
         return if not row.isActive()
-        item = row.item
+        # item = row.item
 
         col = @emptyColumn opt?.column
         @clearColumnsFrom col.index
         cnt = elem class: 'browserImageContainer', child: 
-            elem 'img', class: 'browserImage', src: "file://#{encodePath file}"
+            elem 'img', class: 'browserImage', src: slash.fileUrl file
         col.table.appendChild cnt
         
 module.exports = Browser

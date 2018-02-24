@@ -5,8 +5,7 @@
 000       000  000      000             000       000   000  000     000     000   000  000   000
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
-{ fileName, samePath, joinFileLine, splitFilePos, fileExists, swapExt, path, empty, fs,
-  setStyle, post, pos, error, log, str, _ } = require 'kxk'
+{ fileExists, empty, fs, setStyle, post, pos, error, log, str, _ } = require 'kxk'
   
 srcmap     = require '../tools/srcmap'
 watcher    = require './watcher'
@@ -215,7 +214,7 @@ class FileEditor extends TextEditor
             file: @currentFile
             pos:  @cursorPos()
 
-        [file, fpos] = splitFilePos opt.file
+        [file, fpos] = slash.splitFilePos opt.file
         opt.pos = fpos
         opt.pos[0] = opt.col if opt.col
         opt.pos[1] = opt.line-1 if opt.line
@@ -270,7 +269,7 @@ class FileEditor extends TextEditor
         if not type or type == 'file'
             files = post.get 'indexer', 'files'
             for file, info of files
-                if fileName(file).toLowerCase() == find and file != @currentFile
+                if slash.fileName(file).toLowerCase() == find and file != @currentFile
                     @jumpToFile file:file, line:6
                     return true
 
@@ -290,18 +289,18 @@ class FileEditor extends TextEditor
     jumpToCounterpart: () ->
 
         cp = @cursorPos()
-        currext = path.extname @currentFile
+        currext = slash.extname @currentFile
 
         switch currext
             when '.coffee'
                 [file,line,col] = srcmap.toJs @currentFile, cp[1]+1, cp[0]
                 if file?
-                    window.loadFile joinFileLine file,line,col
+                    window.loadFile slash.joinFileLine file,line,col
                     return true
             when '.js'
                 [file,line,col] = srcmap.toCoffee @currentFile, cp[1]+1, cp[0]
                 if file?
-                    window.loadFile joinFileLine file,line,col
+                    window.loadFile slash.joinFileLine file,line,col
                     return true
 
         counterparts =
@@ -317,8 +316,8 @@ class FileEditor extends TextEditor
             '.styl':    ['.css']
 
         for ext in (counterparts[currext] ? [])
-            if fileExists swapExt @currentFile, ext
-                window.loadFile swapExt @currentFile, ext
+            if fileExists slash.swapExt @currentFile, ext
+                window.loadFile slash.swapExt @currentFile, ext
                 return true
 
         for ext in (counterparts[currext] ? [])

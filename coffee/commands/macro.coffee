@@ -5,7 +5,7 @@
 # 000 0 000  000   000  000       000   000  000   000
 # 000   000  000   000   0000000  000   000   0000000
 
-{ packagePath, fileExists, fileName, fileList, reversed, relative, splitExt,
+{ fileExists, fileName, fileList, reversed, relative, splitExt,
   post, noon, slash, path, fs, error, log, _ } = require 'kxk'
   
 indexer = require '../main/indexer'
@@ -176,7 +176,7 @@ class Macro extends Command
                 lastIndex = 0
                 texts = []
                 # search project for path build open search term
-                pkgPath = packagePath editor.currentFile
+                pkgPath = slash.pkg editor.currentFile
                 if pkgPath
                     projectFiles = fileList pkgPath, depth: 4, matchExt: editor.currentFile
                 else

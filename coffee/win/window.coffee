@@ -37,7 +37,7 @@ commandline = null
 titlebar    = null
 tabs        = null
 
-post.debug()
+# post.debug()
 
 window.onerror = (event, source, line, col, err) ->
     # f = require('sorcery').loadSync(source.replace /coffee/g, 'js')

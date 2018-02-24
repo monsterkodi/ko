@@ -5,7 +5,7 @@
 # 000   000  000   000  000  000      000   000
 # 0000000     0000000   000  0000000  0000000  
 
-{ fileExists, dirExists, resolve, log, $, _ } = require 'kxk'
+{ fileExists, dirExists, log, $, _ } = require 'kxk'
 
 Command  = require '../commandline/command'
 
@@ -53,7 +53,6 @@ class Build extends Command
             # log "reset #{command} #{@instance?.name} #{@instance.reset?}", _.isFunction @instance.reset
             @instance.reset()
         else
-            log "#{__dirname}/../stage/#{command}"
             if dirExists "#{__dirname}/../stage/#{command}"
                 if fileExists "#{__dirname}/../stage/#{command}/main.js"
                     file = "#{__dirname}/../stage/#{command}/main.js"
@@ -62,8 +61,8 @@ class Build extends Command
             else if fileExists "#{__dirname}/../#{command}/#{command}.js"
                 file = "#{__dirname}/../#{command}/#{command}.js"
             else if dirExists command
-                if fileExists "#{resolve command}/main.js"
-                    file = "#{resolve command}/main.js"
+                if fileExists "#{slash.resolve command}/main.js"
+                    file = "#{slash.resolve command}/main.js"
                 
             if file?
                 mod = require file

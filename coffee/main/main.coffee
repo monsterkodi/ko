@@ -51,7 +51,7 @@ version  #{pkg.version}
 app.exit 0 if not args?
 
 if process.cwd() == '/'
-    process.chdir resolve '~'
+    process.chdir slash.resolve '~'
 while args.filelist.length and dirExists _.first args.filelist
     process.chdir args.filelist.shift()
     
@@ -445,14 +445,14 @@ class Main
             newStash = slash.join app.getPath('userData'), 'win', "#{win.id}.noon"
             fs.copySync opt.restore, newStash
             
-        htmlFile  = resolve "#{__dirname}/../#{scheme}.html"
+        htmlFile  = slash.resolve "#{__dirname}/../#{scheme}.html"
         if not fileExists htmlFile
-            pugRender = pug.compileFile "#{__dirname}/../../pug/index.pug"
+            pugRender = pug.compileFile slash.path "#{__dirname}/../../pug/index.pug"
             html = pugRender scheme: scheme
             fs.writeFileSync htmlFile, html, 'utf8'
         
-        win.loadURL "file://#{htmlFile}"
-
+        win.loadURL slash.fileUrl htmlFile
+        
         app.dock?.show()
                 
         win.on 'close',  @onCloseWin

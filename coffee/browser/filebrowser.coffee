@@ -6,8 +6,7 @@
 000       000  0000000  00000000        0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 ###
 
-{ packagePath, encodePath, fileName, swapExt, resolve, empty, elem, post, clamp, 
-  childp, prefs, slash, path, fs, os, error, log, $ } = require 'kxk'
+{ empty, elem, post, clamp, childp, prefs, slash, path, fs, os, error, log, $ } = require 'kxk'
   
 Browser  = require './browser'
 dirlist  = require '../tools/dirlist'
@@ -34,7 +33,7 @@ class FileBrowser extends Browser
     
     loadFile: (file, opt = focus:true, column:0) ->
         
-        dir  = packagePath file
+        dir  = slash.pkg file
         dir ?= slash.dirname file
         opt.file = file
         @skipJump = opt.dontJump

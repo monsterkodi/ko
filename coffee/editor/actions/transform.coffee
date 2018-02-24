@@ -5,7 +5,7 @@
 #    000     000   000  000   000  000  0000       000  000       000   000  000   000  000 0 000
 #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000
 
-{ reversed, fileName, slash, path, str, error, log, _ } = require 'kxk'
+{ reversed, slash, str, error, log, _ } = require 'kxk'
 
 matchr = require '../../tools/matchr'
 
@@ -153,22 +153,22 @@ class Transform
 
     basename: ->
 
-        @apply (t) -> path.basename t
+        @apply (t) -> slash.basename t
         'basename'
 
     dirname: ->
 
-        @apply (t) -> path.dirname t
+        @apply (t) -> slash.dirname t
         'dirname'
 
     extname: ->
 
-        @apply (t) -> path.extname t
+        @apply (t) -> slash.extname t
         'extname'
 
     filename: ->
 
-        @apply (t) -> fileName t
+        @apply (t) -> slash.fileName t
         'filename'
 
     #  0000000   00000000   00000000   000      000   000

@@ -6,7 +6,7 @@
  0000000   000        00000000  000   000
 ###
 
-{ packagePath, fileExists, fileName, dirExists, valid, empty,
+{ fileExists, fileName, dirExists, valid, empty,
   prefs, clamp, post, slash, path, fs, os, error, log, _ } = require 'kxk'
   
 profile  = require '../tools/profile'
@@ -351,7 +351,7 @@ class Open extends Command
         
         @dir = newdir
         
-        @pkg        = opt.noPkg and @dir or packagePath(@dir) or @dir
+        @pkg        = opt.noPkg and @dir or slash.pkg(@dir) or @dir
         @file       = opt.file
         @files      = []
         @selected   = null

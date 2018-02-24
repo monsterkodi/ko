@@ -5,8 +5,7 @@
 #    000     000       000   000  000 0 000
 #    000     00000000  000   000  000   000
 
-{ packagePath, dirExists, reversed, unresolve, resolve, slash, path, fs,
-  post, noon, store, clamp, log, _ } = require 'kxk'
+{ dirExists, reversed, slash, fs, post, noon, store, clamp, log, _ } = require 'kxk'
   
 Walker   = require '../tools/walker'
 Syntax   = require '../editor/syntax'
@@ -45,7 +44,7 @@ class Term extends Command
                 cwd = cmdData.data
                 switch @pwdTag
                     when 'autocd'
-                        pkgPath = packagePath window.editor.currentFile
+                        pkgPath = slash.pkg window.editor.currentFile
                         if pkgPath? and not cwd.startsWith pkgPath
                             @execute "cd #{pkgPath}"
                     when 'complete'
@@ -89,7 +88,7 @@ class Term extends Command
             for k,v of process.env
                 if k == dir.slice i+1, i+1+k.length
                     dir = dir.slice(0, i) + v + dir.slice(i+k.length+1)
-        resolve dir
+        slash.resolve dir
 
     resolveDirWord: (dir, word) =>
 
@@ -452,11 +451,11 @@ class Term extends Command
                     for file in Object.keys(files).sort()
                         continue if args.length and not filterRegExp(args).test file
                         info = files[file]
-                        pth  = unresolve file
+                        pth  = slash.tilde file
                         if lastDir != slash.dirname pth
                             lastDir = slash.dirname pth
                         else
-                            pth = _.padStart('', lastDir.length+1) + path.basename pth
+                            pth = _.padStart('', lastDir.length+1) + slash.basename pth
                         meta =
                             diss: Syntax.dissForTextAndSyntax "◼ #{pth}", 'ko'
                             href: "#{file}:1"
@@ -490,7 +489,7 @@ class Term extends Command
                                 char = func[0]
                                 terminal.queueMeta clss: 'salt', text: char
                                 
-                            classOrFile = info.class? and "#{info.static and '◆' or '●'} #{info.class}" or "◼ #{path.basename info.file}"
+                            classOrFile = info.class? and "#{info.static and '◆' or '●'} #{info.class}" or "◼ #{slash.basename info.file}"
                             
                             if i == 0
                                 diss = Syntax.dissForTextAndSyntax "▸ #{func} #{classOrFile}", 'ko'
