@@ -5,7 +5,7 @@
 # 000  0000  000   000     000     000  000   000  000   000     000     000     
 # 000   000  000   000      0      000   0000000   000   000     000     00000000
 
-{ clamp, unresolve, joinFilePos, post, log, _ } = require 'kxk'
+{ clamp, slash, post, log, _ } = require 'kxk'
 
 class Navigate
     
@@ -51,7 +51,7 @@ class Navigate
                     @filePositions = @filePositions.filter (filePos) -> 
                         not (filePos.file == opt.file and Math.abs(filePos.pos[1] - opt.pos[1]) < 2)
                     
-                    filePos = unresolve joinFilePos opt.file, opt.pos
+                    filePos = slash.tilde slash.joinFilePos opt.file, opt.pos
                     @filePositions.push 
                         file:   opt.file
                         pos:    opt.pos

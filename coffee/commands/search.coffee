@@ -5,7 +5,7 @@
 #      000  000       000   000  000   000  000       000   000
 # 0000000   00000000  000   000  000   000   0000000  000   000
 
-{ packagePath, unresolve, path, post, fs, os, log, _ } = require 'kxk'
+{ packagePath, slash, path, post, fs, os, log, _ } = require 'kxk'
 
 walker   = require '../tools/walker'
 matchr   = require '../tools/matchr'
@@ -163,7 +163,7 @@ class FileSearcher extends stream.Writable
             terminal = window.terminal
             
             meta = 
-                diss: syntax.dissForTextAndSyntax "◼ #{unresolve @file}", 'ko'
+                diss: syntax.dissForTextAndSyntax "◼ #{slash.tilde @file}", 'ko'
                 href: @file
                 click: @command.onMetaClick
                 

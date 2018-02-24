@@ -47,6 +47,7 @@ class Meta
             for meta in @metasAtLineIndex li
                 if meta[2].clss == "searchResult" and meta[2].href?
                     [file, line] = meta[2].href.split ':'
+                    log 'meta.onChanged searchResult:', file, line
                     line -= 1
                     localChange = _.cloneDeep change
                     localChange.oldIndex = line
@@ -124,6 +125,9 @@ class Meta
                     num = meta[2].line? and meta[2].line if not num
                     num = meta[2].href?.split(':')[1] if not num
                     num = '?' if not num
+                     
+                    # log 'meta.onNumber', num, meta[2]
+                    
                     e.numberSpan.innerHTML = num
                 when 'spacer'
                     e.numberSpan.innerHTML = '&nbsp;'

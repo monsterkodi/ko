@@ -5,8 +5,8 @@
 #    000     000   000  000   000  000  0000       000  000       000   000  000   000  000 0 000
 #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000
 
-{ resolve, unresolve, reversed, fileName, path, str, error, log, _
-} = require 'kxk'
+{ reversed, fileName, slash, path, str, error, log, _ } = require 'kxk'
+
 matchr = require '../../tools/matchr'
 
 class Transform
@@ -135,14 +135,14 @@ class Transform
 
         cwd = process.cwd()
         if @editor.currentFile?
-            process.chdir path.dirname @editor.currentFile
-        @apply (t) -> resolve t
+            process.chdir slash.dirname @editor.currentFile
+        @apply (t) -> slash.resolve t
         process.chdir cwd
         'resolve'
 
     unresolve: ->
 
-        @apply (t) -> unresolve t
+        @apply (t) -> slash.unresolve t
         'unresolve'
 
     # 00000000    0000000   000000000  000   000

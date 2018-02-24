@@ -6,13 +6,12 @@
 # 000   000  000   000   0000000  000   000   0000000
 
 { packagePath, fileExists, fileName, fileList, reversed, relative, splitExt,
-  post, noon, path, fs, error, log, _ } = require 'kxk'
+  post, noon, slash, path, fs, error, log, _ } = require 'kxk'
   
 indexer = require '../main/indexer'
 salt    = require '../tools/salt'
 Command = require '../commandline/command'
 colors  = require 'colors'
-process = require 'process'
 atomic  = require 'write-file-atomic'
 Mocha   = require 'mocha'
 Report  = require '../test/report'
@@ -125,12 +124,13 @@ class Macro extends Command
 
             when 'test'
                 
-                mocha = new Mocha reporter: Report.forRunner, timeout: 4000
+                # mocha = new Mocha reporter: Report.forRunner, timeout: 4000
+                mocha = new Mocha()
                 
                 if _.isEmpty args
-                    files = fileList path.join(__dirname, '..', 'test'), matchExt:['.js', '.coffee']
+                    files = fileList slash.join(__dirname, '..', 'test'), matchExt:['.js', '.coffee']
                 else
-                    files = (path.join(__dirname, '..', 'test', f + '.js') for f in args)
+                    files = (slash.join(__dirname, '..', 'test', f + '.js') for f in args)
                 for file in files
                     delete require.cache[file] # mocha listens only on initial compile
                     mocha.addFile file
@@ -192,7 +192,7 @@ class Macro extends Command
 
                     for f in projectFiles
                         if pth == fileName f
-                            pth = splitExt relative f, path.dirname editor.currentFile
+                            pth = splitExt relative f, slash.dirname editor.currentFile
                             pth = './' + pth if not pth.startsWith '../'
                             break
 
@@ -254,8 +254,8 @@ class Macro extends Command
 
                 clss = args.length and args[0] or _.last editor.textsInRanges(editor.selections())
                 clss ?= 'Class'
-                dir = editor.currentFile? and path.dirname(editor.currentFile) or process.cwd()
-                file = path.join dir, clss.toLowerCase() + '.coffee'
+                dir = editor.currentFile? and slash.dirname(editor.currentFile) or process.cwd()
+                file = slash.join dir, clss.toLowerCase() + '.coffee'
                 if fileExists file
                     return text: "file #{file} exists!"
                 text = '\n'

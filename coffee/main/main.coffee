@@ -4,8 +4,8 @@
 # 000 0 000  000   000  000  000  0000
 # 000   000  000   000  000  000   000
 
-{ splitFilePos, fileExists, dirExists, fileList, resolve,
-  childp, about, prefs, store, noon, post, path, os, fs, str, error, log, _ } = require 'kxk'
+{ fileExists, dirExists, fileList, childp, about, prefs, store, 
+  noon, post, slash, os, fs, str, empty, error, log, _ } = require 'kxk'
   
 pkg      = require '../../package.json'
 Execute  = require './execute'
@@ -22,7 +22,6 @@ main          = undefined # < created in app.on 'ready'
 tray          = undefined # < created in Main.constructor
 coffeeExecute = undefined # <
 openFiles     = []
-wins          = []
 WIN_SNAP_DIST = 150
 
 process.env.NODE_ENV = 'production'
@@ -191,7 +190,7 @@ class Main
     # 000   000  000  000  0000  000   000  000   000  000   000       000
     # 00     00  000  000   000  0000000     0000000   00     00  0000000 
         
-    wins:        wins
+    wins:        wins()
     winWithID:   winWithID
     activeWin:   activeWin
     visibleWins: visibleWins
@@ -335,6 +334,7 @@ class Main
     # 000   000  000   000  000   000  000   000  000   000   0000000   00000000
         
     arrangeWindows: =>
+        
         disableSnap = true
         frameSize = 6
         wl = visibleWins()
@@ -391,20 +391,22 @@ class Main
     # 000   000  00000000  0000000      000      0000000   000   000  00000000
     
     moveWindowStashes: ->
-        userData = app.getPath 'userData'
-        stashDir = path.join userData, 'win'
+        
+        userData = slash.path app.getPath 'userData'
+        stashDir = slash.join userData, 'win'
         if dirExists stashDir
-            fs.moveSync stashDir, path.join(userData, 'old'), overwrite: true
+            fs.moveSync stashDir, slash.join(userData, 'old'), overwrite: true
                 
     restoreWindows: ->
-        userData = app.getPath 'userData'
+        
+        userData = slash.path app.getPath 'userData'
         log 'restoreWindows userData', userData
         fs.ensureDirSync userData
-        stashFiles = fileList path.join(userData, 'old'), matchExt: ['.noon']
-        stashFiles ?= []
-        log 'restoreWindows stashFiles', stashFiles
-        for file in stashFiles
-            @createWindow restore:file
+        stashFiles = fileList slash.join(userData, 'old'), matchExt: ['.noon']
+        if not empty stashFiles
+            log 'restoreWindows stashFiles', stashFiles
+            for file in stashFiles
+                @createWindow restore:file
        
     #  0000000  00000000   00000000   0000000   000000000  00000000
     # 000       000   000  000       000   000     000     000     
@@ -415,6 +417,8 @@ class Main
     createWindow: (opt) ->
         
         opt ?= {}
+        
+        log 'Main.createWindow', opt
         
         {width, height} = @screenSize()
         ww = height + 122
@@ -438,7 +442,7 @@ class Main
             titleBarStyle:    'hidden'
             
         if opt.restore?
-            newStash = path.join app.getPath('userData'), 'win', "#{win.id}.noon"
+            newStash = slash.join app.getPath('userData'), 'win', "#{win.id}.noon"
             fs.copySync opt.restore, newStash
             
         htmlFile  = resolve "#{__dirname}/../#{scheme}.html"
@@ -456,12 +460,16 @@ class Main
         
         winLoaded = ->
 
-            log 'createWindow.winLoaded', win.id
+            log 'createWindow.winLoaded id', win.id
 
             if opt.files?
+                log 'createWindow.winLoaded loadFiles', opt.files
                 post.toWin win.id, 'loadFiles', opt.files
             else if opt.file?
+                log 'createWindow.winLoaded loadFile', opt.file
                 post.toWin win.id, 'loadFile', opt.file
+            else
+                log 'createWindow.winLoaded no file to open?'
                 
             post.toWins 'winLoaded', win.id
             post.toWins 'numWins', wins().length
@@ -504,8 +512,13 @@ class Main
     onCloseWin: (event) =>
         
         wid = event.sender.id
-        if visibleWins().length == 1
-            hideDock()
+        log 'onCloseWin id', wid
+        if wins().length == 1
+            if os.platform() == 'win32'
+                @quit()
+                return
+            else
+                hideDock()
         post.toAll 'winClosed', wid
         @postDelayedNumWins()
         
@@ -522,27 +535,33 @@ class Main
             continue if arg.startsWith '-'
             file = arg
             if not arg.startsWith '/'
-                file = path.join resolve(dir), arg
-            [fpath, pos] = splitFilePos file
+                file = slash.join slash.resolve(dir), arg
+            [fpath, pos] = slash.splitFilePos file
             if fileExists fpath
                 files.push file
-        # log 'createWindow', files
+
         @createWindow files:files
                     
     quit: ->
         
         toSave = wins().length
+        
+        log 'Main.quit windows to save', toSave 
+        
         if toSave
             post.toWins 'saveStash'
             post.on 'stashSaved', ->
                 toSave -= 1
+                log 'Main.quit stashSaved', toSave 
                 if toSave == 0
                     prefs.save()
+                    log 'Main.quit exit'
                     app.exit     0
                     process.exit 0
             return
         else
             prefs.save()
+            log 'Main.quit exit'
             app.exit     0
             process.exit 0
         
@@ -574,6 +593,9 @@ app.on 'ready', ->
     main.navigate = new Navigate main
     
 app.on 'window-all-closed', ->
+    if os.platform() == 'win32'
+        log 'app.on window-all-closed'
+        app.quit()
     
 app.setName pkg.productName
 

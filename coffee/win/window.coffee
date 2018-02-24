@@ -6,8 +6,8 @@
 00     00  000  000   000  0000000     0000000   00     00
 ###
 
-{ splitFilePos, stopEvent, fileExists, fileList, unresolve, resolve, keyinfo, 
-  prefs, stash, drag, noon, post, path, clamp, pos, str, sw, sh, os, fs, log, error, _ } = require 'kxk' 
+{ stopEvent, fileExists, fileList, keyinfo, atomic, prefs, stash, 
+  drag, noon, post, slash, path, clamp, pos, str, sw, sh, os, fs, log, error, _ } = require 'kxk' 
 
 Split       = require './split'
 Terminal    = require './terminal'
@@ -22,7 +22,6 @@ FPS         = require '../tools/fps'
 encode      = require '../tools/encode'
 scheme      = require '../tools/scheme'
 electron    = require 'electron'
-atomic      = require 'write-file-atomic'
 pkg         = require '../../package.json'
 
 remote      = electron.remote
@@ -38,13 +37,15 @@ commandline = null
 titlebar    = null
 tabs        = null
 
+post.debug()
+
 window.onerror = (event, source, line, col, err) ->
     # f = require('sorcery').loadSync(source.replace /coffee/g, 'js')
     if false #f?
         l = f.trace(line)
         s = "▲ #{l.source}:#{l.line} ▲ [ERROR] #{err}"
     else
-        s = "▲ [ERROR] #{err} #{unresolve source}:#{line}:#{col}"
+        s = "▲ [ERROR] #{err} #{slash.tilde source}:#{line}:#{col}"
     post.emit 'error', s
     post.emit 'slog', s
     console.log s
@@ -74,12 +75,14 @@ addToRecent = (file) ->
 
 saveStash = ->
 
+    log 'window.saveStash'
     post.emit 'stash'
     editor.saveScrollCursorsAndSelections()
     window.stash.save()
     post.toMain 'stashSaved'
 
 restoreWin = ->
+    
     if bounds = window.stash.get 'bounds'
         win.setBounds bounds
 
@@ -161,6 +164,7 @@ winMain = ->
         logview.resized()
 
     terminal.on 'fileSearchResultChange', (file, lineChange) -> # sends changes to all windows
+        log 'winMain terminal.on fileSearchResultChange', file, lineChange
         post.toWins 'fileLineChanges', file, [lineChange]
 
     editor.on 'changed', (changeInfo) ->
@@ -314,11 +318,13 @@ loadFile = (file, opt={}) ->
 
     file = null if file? and file.length <= 0
 
+    post.toMain 'winlog', winID, "loadFile #{file}"
+
     editor.saveScrollCursorsAndSelections()
 
     if file?
-        [file, pos] = splitFilePos file
-        file = resolve file
+        [file, pos] = slash.splitFilePos file
+        file = slash.resolve file
 
     log 'window.loadFile', file, editor?.currentFile, opt
 
@@ -384,10 +390,10 @@ openFiles = (ofiles, options) -> # called from file dialog, open command and bro
             log 'window.openFiles.warning: no files for:', ofiles
             return []
 
-        window.stash.set 'openFilePath', path.dirname files[0]
+        window.stash.set 'openFilePath', slash.dirname files[0]
 
         if not options?.newWindow and not options?.newTab
-            file = resolve files.shift()
+            file = slash.resolve files.shift()
             loadFile file
 
         for file in files
@@ -410,8 +416,8 @@ window.loadFile  = loadFile
 
 openFile = (options) ->
 
-    dir = path.dirname editor.currentFile if editor?.currentFile
-    dir ?= resolve '.'
+    dir = slash.dirname editor.currentFile if editor?.currentFile
+    dir ?= slash.resolve '.'
     dialog.showOpenDialog
         title: "Open File"
         defaultPath: window.stash.get 'openFilePath',  dir
@@ -580,14 +586,17 @@ handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
     switch combo
         when 'CmdOrCtrl+alt+i'    then return stopEvent event, win.webContents.toggleDevTools()
         when 'ctrl+w'             then return stopEvent event, loadFile()
-        when 'f3'                 then return stopEvent event, screenShot()
+        # when 'f3'                 then return stopEvent event, screenShot()
         when 'alt+i'              then return stopEvent event, scheme.toggle()
         when 'command+\\'         then return stopEvent event, toggleCenterText()
-        when 'CmdOrCtrl+alt+k'        then return stopEvent event, commandline.clear()
-        when 'CmdOrCtrl+alt+shift+k'    then return stopEvent event, split.toggleLog()
+        when 'command+alt+k', 'alt+ctrl+k' then return stopEvent event, split.toggleLog()
+        when 'alt+k'    
+            log 'focusEditor', window.focusEditor.name
+            if window.focusEditor == window.editor then window.logview.clear() else window.focusEditor.clear()
+            return stopEvent event
         # when 'alt+ctrl+left'      then return stopEvent event, post.toMain 'activatePrevWindow', winID
         # when 'alt+ctrl+right'     then return stopEvent event, post.toMain 'activateNextWindow', winID
-        when 'command+alt+shift+k', 'alt+ctrl+shift+k' then return stopEvent event, split.showOrClearLog()
+        # when 'command+alt+shift+k', 'alt+ctrl+shift+k' then return stopEvent event, split.showOrClearLog()
         when 'command+='          then return stopEvent event, changeFontSize +1
         when 'command+-'          then return stopEvent event, changeFontSize -1
         when 'command+0'          then return stopEvent event, resetFontSize()

@@ -6,7 +6,7 @@
 000   000  00000000  000   000   0000000 
 ###
 
-{ fileList, unresolve, prefs, fs, post, path, os, log } = require 'kxk'
+{ fileList, unresolve, prefs, fs, post, slash, path, os, log } = require 'kxk'
 
 pkg      = require '../../package.json'
 electron = require 'electron'
@@ -377,7 +377,7 @@ class Menu
         submenu = 
             Misc: new AppMenu
             
-        for actionFile in fileList path.join __dirname, '../editor/actions'
+        for actionFile in fileList slash.join __dirname, '../editor/actions'
             continue if path.extname(actionFile) not in ['.js', '.coffee']
             actions = require actionFile
             for key,value of actions

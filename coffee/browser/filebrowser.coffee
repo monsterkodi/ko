@@ -7,7 +7,7 @@
 ###
 
 { packagePath, encodePath, fileName, swapExt, resolve, empty, elem, post, clamp, 
-  process, childp, prefs, path, fs, os, error, log, $ } = require 'kxk'
+  childp, prefs, slash, path, fs, os, error, log, $ } = require 'kxk'
   
 Browser  = require './browser'
 dirlist  = require '../tools/dirlist'
@@ -35,7 +35,7 @@ class FileBrowser extends Browser
     loadFile: (file, opt = focus:true, column:0) ->
         
         dir  = packagePath file
-        dir ?= path.dirname file
+        dir ?= slash.dirname file
         opt.file = file
         @skipJump = opt.dontJump
         @loadDir dir, opt
@@ -67,6 +67,8 @@ class FileBrowser extends Browser
         @loadID++
         opt.loadID = @loadID
         
+        log 'filebrowser.loadDir', dir, opt
+        
         dirlist dir, opt, (err, items) => 
             
             return if opt.loadID != @loadID
@@ -81,7 +83,7 @@ class FileBrowser extends Browser
                 
             if column == 0 or @columns[column-1].activeRow()?.item.name == '..'
                 
-                updir = resolve path.join dir, '..'
+                updir = slash.resolve slash.join dir, '..'
                 
                 if not (updir == dir == '/')
                     items.unshift 

@@ -196,7 +196,11 @@ class Commandline extends TextEditor
         @
 
     cancel: -> @results @command?.cancel()
-    clear:  -> @results @command?.clear()
+    clear:  -> 
+        if @text() == ''
+            @results @command?.clear()
+        else
+            super.clear()
 
     # 000      000   0000000  000000000
     # 000      000  000          000

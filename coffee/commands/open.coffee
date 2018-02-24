@@ -6,8 +6,8 @@
  0000000   000        00000000  000   000
 ###
 
-{ packagePath, splitFilePos, joinFilePos, fileExists, fileName, dirExists, valid, empty,
-  unresolve, resolve, prefs, clamp, post, path, fs, os, error, log, _ } = require 'kxk'
+{ packagePath, fileExists, fileName, dirExists, valid, empty,
+  prefs, clamp, post, slash, path, fs, os, error, log, _ } = require 'kxk'
   
 profile  = require '../tools/profile'
 Walker   = require '../tools/walker'
@@ -15,29 +15,18 @@ Command  = require '../commandline/command'
 render   = require '../editor/render'
 syntax   = require '../editor/syntax'
 fuzzy    = require 'fuzzy'
-    
-slashreg = new RegExp "\\\\", 'g'
-slashpath = (p) ->
-    p = p.replace slashreg, "/" if path.sep == "\\"
-    p
-
-slashjoin = -> [].map.call(arguments, (p) -> slashpath p).join "/"
-
-relative = (absolute, to) ->
-    absolute = slashpath resolve absolute
-    return absolute if not path.isAbsolute absolute
-    to = slashpath to
-    homedir = slashpath os.homedir()
-    d = slashpath path.normalize path.resolve to.replace /\~/, homedir
-    r = slashpath path.relative d, absolute
+        
+relative = (rel, to) ->
+    r = slash.relative rel, to
+    # log 'open.relative', rel, to, r
     if r.startsWith '../../' 
-        unresolved = absolute.replace(homedir, "~")
-        if unresolved.length < r.length
-            r = unresolved
-    if absolute.length < r.length    
-        r = absolute
+        tilde = slash.tilde rel
+        if tilde.length < r.length
+            r = tilde
+    if rel.length < r.length    
+        r = rel
     r    
-    
+
 class Open extends Command
 
     constructor: (commandline) ->
@@ -76,7 +65,7 @@ class Open extends Command
         if command in ['.', '/', '~'] or command.endsWith '/'
             return @navigateDir command
 
-        [file, pos] = splitFilePos command ? @getText().trim()
+        [file, pos] = slash.splitFilePos command ? @getText().trim()
         items = @listItems flat: true, navigating: @navigating, currentText: file    
         if command.length
             fuzzied = fuzzy.filter path.basename(file), items, extract: (o) -> o.text            
@@ -88,10 +77,10 @@ class Open extends Command
             @select 0
             @positionList()
         else
-            if path.dirname(resolve(command)) == @dir
+            if slash.dirname(slash.resolve(command)) == @dir
                 base = path.basename command
                 items = @listItems flat: false, excludeUp: true
-                items = _.filter items, (i) -> i.file.startsWith resolve(command)
+                items = _.filter items, (i) -> i.file.startsWith slash.resolve(command)
                 if items.length
                     @showItems items
                     @select 0
@@ -109,7 +98,7 @@ class Open extends Command
         
         return if not @commandList? 
         if @commandList.line(@selected).startsWith(path.basename @getText()) and not @getText().trim().endsWith('/')
-            @setText path.join(path.dirname(@getText()), @commandList.line(@selected))
+            @setText slash.join(slash.dirname(@getText()), @commandList.line(@selected))
             if dirExists @getText()
                 @setText @getText() + '/'
                 @changed @getText()
@@ -123,7 +112,7 @@ class Open extends Command
             for p in Object.keys(projects).sort()
                 if p.startsWith @getText()
                     pdir = projects[p].dir
-                    pdir = path.join(pdir, 'coffee') if dirExists path.join pdir, 'coffee'
+                    pdir = slash.join(pdir, 'coffee') if dirExists slash.join pdir, 'coffee'
                     @setText pdir + '/'
                     @changed @getText()
                     return true
@@ -199,8 +188,8 @@ class Open extends Command
         items = []
         
         @lastFileIndex = 0
-        @dir = resolve '~' if not @dir?
-        log 'open/listItems', @dir, resolve '~'
+        @dir = slash.resolve '~' if not @dir?
+        log 'open/listItems', @dir, slash.resolve '~'
 
         if @history? and not @navigating and not opt?.currentText and @history.length > 1
             f = @history[@history.length-2]
@@ -346,14 +335,14 @@ class Open extends Command
         
     loadDir: (opt) ->
                 
-        opt.dir = path.dirname opt.file if not opt.dir? and opt.file?
+        opt.dir = slash.dirname opt.file if not opt.dir? and opt.file?
         if not dirExists opt.dir
-            opt.dir = resolve opt.dir
+            opt.dir = slash.resolve opt.dir
             if not dirExists opt.dir
                 return false
 
         log 'open.loadDir opt.dir:', opt.dir
-        @dir ?= resolve '.'
+        @dir ?= slash.resolve '.'
         log 'open.loadDir @dir:', @dir
         newdir = @resolvedPath(opt.dir) ? @dir
         return false if newdir == @dir and not opt.reload
@@ -481,21 +470,21 @@ class Open extends Command
         @hideList()
 
         if listValue
-            [file, pos] = splitFilePos listValue
+            [file, pos] = slash.splitFilePos listValue
             file = @resolvedPath listValue
-            file = joinFilePos file, pos
+            file = slash.joinFilePos file, pos
             files = [file]
         else
             files = _.words command, new RegExp "[^, ]+", 'g'
             for i in [0...files.length]
                 file = files[i]
-                [file, pos] = splitFilePos file
+                [file, pos] = slash.splitFilePos file
                 file = @resolvedPath file
                 if not fileExists file
                     if '' == path.extname file
                         if fileExists file + '.coffee'
                             file += '.coffee'
-                file = joinFilePos file, pos
+                file = slash.joinFilePos file, pos
                 files.splice i, 1, file
             
         options = {}
@@ -530,11 +519,11 @@ class Open extends Command
     
     resolvedPath: (p, parent=@dir) ->
         
-        return (parent ? resolve '~') if not p?
+        return (parent ? slash.resolve '~') if not p?
         if p[0] in ['~', '/'] or p[1] == ':'
-            resolve p
+            slash.resolve p
         else
-            resolve path.join parent, p
+            slash.resolve path.join parent, p
 
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
@@ -551,7 +540,7 @@ class Open extends Command
                 if not @getText().length and @commandList?.line(@selected) == '..'
                     @loadDir
                         navigating: true
-                        dir:        path.dirname @dir
+                        dir:        slash.dirname @dir
                     return @commandline.results text: @dir, select: true
                 else if @commandline.isSelectedLineAtIndex 0
                     @navigating = true

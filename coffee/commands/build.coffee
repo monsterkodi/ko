@@ -53,11 +53,12 @@ class Build extends Command
             # log "reset #{command} #{@instance?.name} #{@instance.reset?}", _.isFunction @instance.reset
             @instance.reset()
         else
-            if dirExists "#{__dirname}/../area/#{command}"
-                if fileExists "#{__dirname}/../area/#{command}/main.js"
-                    file = "#{__dirname}/../area/#{command}/main.js"
-                else if fileExists "#{__dirname}/../area/#{command}/#{command}.js"
-                    file = "#{__dirname}/../area/#{command}/#{command}.js"
+            log "#{__dirname}/../stage/#{command}"
+            if dirExists "#{__dirname}/../stage/#{command}"
+                if fileExists "#{__dirname}/../stage/#{command}/main.js"
+                    file = "#{__dirname}/../stage/#{command}/main.js"
+                else if fileExists "#{__dirname}/../stage/#{command}/#{command}.js"
+                    file = "#{__dirname}/../stage/#{command}/#{command}.js"
             else if fileExists "#{__dirname}/../#{command}/#{command}.js"
                 file = "#{__dirname}/../#{command}/#{command}.js"
             else if dirExists command

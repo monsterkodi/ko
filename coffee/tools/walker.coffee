@@ -12,7 +12,7 @@ walkdir = require 'walkdir'
 class Walker
 
     constructor: (@cfg) ->
-        
+
         @cfg.files       = []
         @cfg.stats       = []
         @cfg.maxDepth    ?= 3

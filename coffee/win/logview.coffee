@@ -18,12 +18,14 @@ class LogView extends TextEditor
         @syntaxName = 'logview'
         
         @setLines ['']
+        
         post.on 'error', (text) ->
             if post.get 'debugMode'
                 window.split.do 'show logview'
+                
         post.on 'slog', (text) =>
             @appendText text
-            # post.toMain 'winlog', window.winID, text
+            post.toMain 'winlog', window.winID, text
         # log 'happy logging!'
                 
     #  0000000   00000000   00000000   00000000  000   000  0000000    

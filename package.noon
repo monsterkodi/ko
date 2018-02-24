@@ -44,7 +44,7 @@ dependencies
                 js-beautify     =1.7.4
                 karg            =1.0.10
                 keycode         =2.1.9
-                kxk             ^0.19.7
+                kxk             ^0.20.0
                 lodash          =4.17.4
                 mocha           =4.0.1
                 nconf           =0.8.5
@@ -55,6 +55,7 @@ dependencies
                 performance-now  =2.1.0
                 pug             =2.0.0-rc.4
                 seamless-immutable  =7.1.2
+                snapsvg         ^0.5.1
                 sorcery         =0.10.0
                 source-map      =0.6.1
                 strip-ansi      =4.0.0
@@ -77,6 +78,6 @@ coffeelintConfig
                   value   4
                   level   warn
 devDependencies
-                electron        ^1.6.17
+                electron        =1.6.17
                 electron-packager  ^11.0.1
                 electron-rebuild  ^1.7.3

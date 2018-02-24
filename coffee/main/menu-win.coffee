@@ -6,7 +6,7 @@
 000   000  00000000  000   000   0000000 
 ###
 
-{ fileList, unresolve, prefs, fs, post, path, os, log } = require 'kxk'
+{ fileList, prefs, fs, post, slash, path, os, log } = require 'kxk'
 
 pkg      = require '../../package.json'
 electron = require 'electron'
@@ -18,7 +18,7 @@ class Menu
     @init: (main) ->
         
         fileLabel = (f) ->
-            return path.basename(f) + ' - ' + unresolve path.dirname(f) if f?
+            return path.basename(f) + ' - ' + slash.tilde slash.dirname(f) if f?
             'untitled'
 
         recent = []
@@ -347,7 +347,7 @@ class Menu
         submenu = 
             Misc: new AppMenu
             
-        actionFiles = fileList path.join __dirname, '../editor/actions'
+        actionFiles = fileList slash.join __dirname, '../editor/actions'
         # log 'actionFiles:', actionFiles
         for actionFile in actionFiles
             continue if path.extname(actionFile) not in ['.js', '.coffee']

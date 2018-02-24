@@ -5,7 +5,7 @@
 # 000   000  000   000  000   000  000   000       000  000       
 # 0000000    000   000   0000000   00     00  0000000   00000000  
 
-{ dirExists, process, unresolve, resolve, post, str, log, os, $ } = require 'kxk'
+{ dirExists, slash, post, str, log, os, $ } = require 'kxk'
 
 Command     = require '../commandline/command'
 FileBrowser = require '../browser/filebrowser'
@@ -16,10 +16,7 @@ class Browse extends Command
 
         super commandline
 
-        if os.platform() == 'win32'
-            @shortcuts = ['ctrl+.', 'ctrl+shift+.']
-        else
-            @shortcuts = ['command+.', 'command+shift+.']
+        @shortcuts = ['command+.', 'command+shift+.']
         @cmdID     = 0
         @browser   = new FileBrowser window.area.view
         @commands  = Object.create null
@@ -53,6 +50,7 @@ class Browse extends Command
         @browser.start()
         
         if window.editor.currentFile?
+            log 'browse.start loadFile', window.editor.currentFile 
             @browser.loadFile window.editor.currentFile 
         else 
             @browser.loadDir process.cwd()
@@ -81,7 +79,7 @@ class Browse extends Command
     onItemActivated: (item) =>
         
         if item.file 
-            pth = unresolve item.file
+            pth = slash.tilde item.file
             if item.type == 'dir' then pth += '/'
             @commandline.setText pth
 

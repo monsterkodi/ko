@@ -5,7 +5,7 @@
 # 000   000  000   000  000   000  000   000       000  000       000   000  
 # 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 
-{ fileName, encodePath, swapExt, elem, post, clamp, childp, path, fs, os, error, log,  _ } = require 'kxk'
+{ fileName, encodePath, swapExt, elem, post, clamp, childp, slash, path, fs, os, error, log,  _ } = require 'kxk'
 
 Column = require './column'
 Stage  = require '../stage/stage'
@@ -292,7 +292,7 @@ class Browser extends Stage
         
         item = row.item
         file = item.file
-        tmpPXM = path.join os.tmpdir(), "ko-#{fileName file}.pxm"
+        tmpPXM = slash.join os.tmpdir(), "ko-#{fileName file}.pxm"
         tmpPNG = swapExt tmpPXM, '.png'
 
         fs.copy file, tmpPXM, (err) =>
@@ -306,7 +306,7 @@ class Browser extends Stage
         
         item = row.item
         file = item.file
-        tmpImage = path.join os.tmpdir(), "ko-#{path.basename file}.png"
+        tmpImage = slash.join os.tmpdir(), "ko-#{path.basename file}.png"
         
         childp.exec "/usr/bin/sips -s format png \"#{file}\" --out \"#{tmpImage}\"", (err) =>
             return error "can't convert image #{file}: #{err}" if err?

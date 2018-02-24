@@ -5,12 +5,11 @@
 #    000     000   000  000   000
 #    000     000   000  0000000  
 
-{ packagePath, unresolve, elem, post, path, fs, error, log, _ } = require 'kxk'
+{ packagePath, elem, post, atomic, slash, path, fs, error, log, _ } = require 'kxk'
 
 render  = require '../editor/render'
 syntax  = require '../editor/syntax'
 Tooltip = require '../tools/tooltip'
-atomic  = require 'write-file-atomic'
 
 class Tab
     
@@ -77,7 +76,9 @@ class Tab
     #  0000000   000        0000000    000   000     000     00000000  
     
     update: (info) ->
-                
+            
+        log 'tab.update', info    
+            
         oldFile = @info?.file
         oldPkg  = @info?.pkg
         
@@ -105,7 +106,7 @@ class Tab
         @div.appendChild name
 
         if @info.file?
-            diss = syntax.dissForTextAndSyntax unresolve(@file()), 'ko' #, join: true 
+            diss = syntax.dissForTextAndSyntax slash.tilde(@file()), 'ko' #, join: true 
             html = render.line(diss, charWidth:0)
             @tooltip = new Tooltip elem:name, html:html, x:0
             
@@ -132,8 +133,8 @@ class Tab
         @tooltip.del()
         post.emit 'tabClosed', @info.file ? 'untitled'
     
-    hidePkg: -> @pkg.style.display = 'none'
-    showPkg: -> @pkg.style.display = 'initial'
+    hidePkg: -> @pkg?.style.display = 'none'
+    showPkg: -> @pkg?.style.display = 'initial'
     
     revert: -> 
         delete @info.dirty

@@ -5,8 +5,7 @@
 # 000 0 000  000   000     000     000           000       000   000  000   000       000  000   000  000   000       000  
 # 000   000   0000000       0      00000000       0000000   0000000   000   000  0000000    0000000   000   000  0000000   
 
-{ log, _
-} = require 'kxk'
+{ log, _ } = require 'kxk'
 
 module.exports = 
 
@@ -17,15 +16,15 @@ module.exports =
             name:   'set cursors at selections or move to line boundaries'
             text:   """sets cursors at selection boundaries, if multiple selections exist but only one cursor.
                 otherwise moves cursors to line boundaries."""
-            combos: ['CmdOrCtrl+left', 'CmdOrCtrl+right']
+            combos: ['command+left', 'command+right', 'ctrl+left', 'ctrl+right']
 
         moveCursorsAtBoundaryLeft: 
             name: 'Move Cursors to Indent or Start of Line'
-            combo: 'CmdOrCtrl+left'
+            combo: ['command+left', 'control+left']
 
         moveCursorsAtBoundaryRight: 
             name: 'Move Cursors to End of Line'
-            combo: 'CmdOrCtrl+right'
+            combo: ['command+right', 'control+right']
                 
         moveCursorsToWordBoundary:
             name:   'move cursors to word boundaries'
@@ -44,14 +43,14 @@ module.exports =
         moveCursorsToLineBoundary:
             name:   'move cursors to line boundaries'
             text:   'moves cursors to line boundaries. extends selections, if shift is pressed.'
-            combos: ['CmdOrCtrl+shift+left', 'CmdOrCtrl+shift+right', 'ctrl+e', 'ctrl+shift+e', 'ctrl+a', 'ctrl+shift+a']
+            combos: ['command+shift+left', 'command+shift+right', 'ctrl+shift+left', 'ctrl+shift+right', 'ctrl+e', 'ctrl+shift+e', 'ctrl+a', 'ctrl+shift+a']
 
         moveMainCursor:
             name:   'move main cursor'
             text:   """move main cursor independently of other cursors.
                 erases other cursors if shift is pressed. 
                 sets new cursors otherwise."""
-            combos: ['ctrl+up', 'ctrl+down', 'ctrl+left', 'ctrl+right', 
+            combos: [#'ctrl+up', 'ctrl+down', 'ctrl+left', 'ctrl+right', 
                 'ctrl+shift+up', 'ctrl+shift+down', 'ctrl+shift+left', 'ctrl+shift+right']
             
         moveCursors:

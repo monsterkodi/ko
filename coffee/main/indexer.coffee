@@ -5,7 +5,7 @@
 # 000  000  0000  000   000  000        000 000   000       000   000
 # 000  000   000  0000000    00000000  000   000  00000000  000   000
 
-{ packagePath, fileExists, unresolve, fileName, resolve, empty, post, path, fs, os, log, _ } = require 'kxk'
+{ packagePath, fileExists, fileName, empty, post, slash, path, fs, os, log, _ } = require 'kxk'
 
 Walker   = require '../tools/walker'
 electron = require 'electron'
@@ -105,18 +105,18 @@ class Indexer
             w.start()
 
     collectProjects: ->
-        
+
         @projects = {}
         w = new Walker
             maxFiles:    5000
             maxDepth:    3
-            root:        resolve '~'
+            root:        slash.resolve '~'
             include:     ['.git']
             ignore:      ['node_modules', 'img', 'bin', 'js', 'Library']
             skipDir:     (p) -> path.basename(p) == '.git'
             filter:      (p) -> path.extname(p) not in ['.noon', '.json', '.git', '']
-            dir:         (p) => if path.basename(p) == '.git' then @projects[path.basename path.dirname p] = dir: unresolve path.dirname p
-            file:        (p) => if fileName(p) == 'package' then @projects[path.basename path.dirname p] = dir: unresolve path.dirname p
+            dir:         (p) => if path.basename(p) == '.git' then @projects[path.basename path.dirname p] = dir: slash.tilde path.dirname p
+            file:        (p) => if fileName(p) == 'package' then @projects[path.basename path.dirname p] = dir: slash.tilde path.dirname p
         w.start()
 
     # 000  000   000  0000000    00000000  000   000        0000000    000  00000000
@@ -348,7 +348,7 @@ class Indexer
                                 r = fileInfo.require ? []
                                 r.push [m[1], m[2]]
                                 fileInfo.require = r
-                                abspath = resolve path.join path.dirname(file), m[2]
+                                abspath = slash.resolve slash.join path.dirname(file), m[2]
                                 abspath += '.coffee'
                                 if (m[2][0] == '.') and (not @files[abspath]?) and (@queue.indexOf(abspath) < 0)
                                     if fileExists abspath
@@ -366,7 +366,7 @@ class Indexer
                                 r = fileInfo.require ? []
                                 r.push [null, m[1]]
                                 fileInfo.require = r
-                                abspath = resolve path.join path.dirname(file), m[1]
+                                abspath = slash.resolve slash.join path.dirname(file), m[1]
                                 abspath += '.coffee' if not path.extname m[1]
                                 if not @files[abspath]? and @queue.indexOf(abspath) < 0
                                     if fileExists abspath

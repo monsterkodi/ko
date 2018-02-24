@@ -5,7 +5,7 @@
 #    000     000       000   000  000 0 000
 #    000     00000000  000   000  000   000
 
-{ packagePath, dirExists, reversed, unresolve, resolve, path, fs,
+{ packagePath, dirExists, reversed, unresolve, resolve, slash, path, fs,
   post, noon, store, clamp, log, _ } = require 'kxk'
   
 Walker   = require '../tools/walker'
@@ -453,8 +453,8 @@ class Term extends Command
                         continue if args.length and not filterRegExp(args).test file
                         info = files[file]
                         pth  = unresolve file
-                        if lastDir != path.dirname pth
-                            lastDir = path.dirname pth
+                        if lastDir != slash.dirname pth
+                            lastDir = slash.dirname pth
                         else
                             pth = _.padStart('', lastDir.length+1) + path.basename pth
                         meta =
