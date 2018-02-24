@@ -39,8 +39,6 @@ module.exports =
         
     jumpToWordAtPos: (p=@cursorPos()) ->
         
-        # log 'jumpToWordAtPos', p
-        
         return if @jumpToFileAtPos p
         
         text  = @line p[1]

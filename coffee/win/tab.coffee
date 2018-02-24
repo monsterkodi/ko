@@ -77,8 +77,6 @@ class Tab
     
     update: (info) ->
             
-        log 'tab.update', info    
-            
         oldFile = @info?.file
         oldPkg  = @info?.pkg
         

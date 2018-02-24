@@ -563,7 +563,7 @@ class Term extends Command
                         meta =
                             diss: diss
                             line: info.count
-                            href: "search:#{word}"
+                            href: ">search>#{word}"
                             clss: 'searchResult'
                             click: @onMetaClick
                         terminal.queueMeta meta

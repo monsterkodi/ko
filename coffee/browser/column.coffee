@@ -5,7 +5,7 @@
 # 000       000   000  000      000   000  000 0 000  000  0000
 #  0000000   0000000   0000000   0000000   000   000  000   000
 
-{ packagePath, stopEvent, relative, keyinfo, path, post, elem, clamp, empty, error, log, _ } = require 'kxk'
+{ packagePath, stopEvent, keyinfo, slash, path, post, elem, clamp, empty, error, log, _ } = require 'kxk'
 
 Row        = require './row'
 Scroller   = require './scroller'
@@ -128,8 +128,8 @@ class Column
 
         target = _.isString(target) and target or target?.file
         if not @parent then return error "no parent? #{@index}"
-        relpath = relative target, @parent.file
-        relitem = _.first relpath.split path.sep
+        relpath = slash.relative target, @parent.file
+        relitem = _.first slash.split relpath
         row = @row relitem
         if row
             @activateRow row
@@ -177,7 +177,7 @@ class Column
         
         return if not @browser.browse?
         @browser.browse switch key
-            when 'left'  then path.dirname @parent.file
+            when 'left'  then slash.dirname @parent.file
             when 'up'    then @parent.file
             when 'right' then @activeRow().item.file
             when 'down'  then packagePath @parent.file

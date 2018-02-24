@@ -57,7 +57,7 @@ class Search extends Command
         @startSearchInFiles 
             text: command
             name: @name
-            file: file
+            file: slash.path file
             
         focus:  'terminal'
         show:   'terminal'
@@ -83,7 +83,7 @@ class Search extends Command
             root:        dir
             maxDepth:    6
             includeDirs: false
-            file:        (f,stat) => @searchInFile opt, f
+            file:        (f,stat) => @searchInFile opt, slash.path f
         @walker.cfg.ignore.push 'js'
         @walker.start()
         
@@ -100,23 +100,21 @@ class Search extends Command
     
     onMetaClick: (meta, event) =>
 
-        href = meta[2].href      
-        split = href.split ':'
+        href = meta[2].href   
         
-        if split.length == 1 or _.isFinite parseInt split[1]
+        if href.startsWith '>'
+            
+            split = href.split '>'
+            if window.commandline.commands[split[1]]?
+                command = window.commandline.commands[split[1]]
+                window.commandline.startCommand split[1], command.shortcuts[0]
+                window.commandline.setText split[2]
+                command.execute split[2]
+        else
             
             window.split.show 'editor'
             file = href + ':' + window.terminal.posForEvent(event)[0]
             window.openFiles [file], newTab: event.metaKey
-            # window.loadFile file
-            
-        else
-            
-            if window.commandline.commands[split[0]]?
-                command = window.commandline.commands[split[0]]
-                window.commandline.startCommand split[0], command.shortcuts[0]
-                window.commandline.setText split[1]
-                command.execute split[1]
 
         'unhandled'
 

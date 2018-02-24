@@ -5,7 +5,7 @@
 # 000 0 000  000          000     000   000
 # 000   000  00000000     000     000   000
 
-{ stopEvent, empty, elem, post, fs, error, log, $, _ } = require 'kxk'
+{ stopEvent, empty, elem, post, slash, fs, error, log, $, _ } = require 'kxk'
 
 ranges = require '../tools/ranges'
 
@@ -46,7 +46,7 @@ class Meta
             continue if change.change == 'deleted'
             for meta in @metasAtLineIndex li
                 if meta[2].clss == "searchResult" and meta[2].href?
-                    [file, line] = meta[2].href.split ':'
+                    [file, line] = slash.splitFileLine meta[2].href
                     log 'meta.onChanged searchResult:', file, line
                     line -= 1
                     localChange = _.cloneDeep change
@@ -87,7 +87,7 @@ class Meta
 
         for meta in @metasAtLineIndex li
             if meta[2].state == 'unsaved'
-                [file, line] = meta[2].href.split(':')
+                [file, line] = slash.splitFileLine meta[2].href
                 @saveFileLineMetas file, [[line-1, @editor.line(meta[0]), meta]]
 
     saveChanges: ->
@@ -95,7 +95,7 @@ class Meta
         fileLineMetas = {}
         for meta in @metas
             if meta[2].state == 'unsaved'
-                [file, line] = meta[2].href.split(':')
+                [file, line] = slash.splitFileLine meta[2].href
                 fileLineMetas[file] = [] if not fileLineMetas[file]?
                 fileLineMetas[file].push [line-1, @editor.line(meta[0]), meta]
 
@@ -123,11 +123,9 @@ class Meta
                 when 'searchResult', 'termCommand', 'termResult', 'coffeeCommand', 'coffeeResult', 'commandlistItem'                    
                     num = meta[2].state == 'unsaved' and @saveButton(meta[0])
                     num = meta[2].line? and meta[2].line if not num
-                    num = meta[2].href?.split(':')[1] if not num
+                    num = slash.splitFileLine(meta[2].href)[1] if not num
                     num = '?' if not num
                      
-                    # log 'meta.onNumber', num, meta[2]
-                    
                     e.numberSpan.innerHTML = num
                 when 'spacer'
                     e.numberSpan.innerHTML = '&nbsp;'
@@ -208,6 +206,8 @@ class Meta
 
     add: (meta) ->
 
+        log 'meta.add', meta
+
         lineMeta = @addLineMeta [meta.line, [meta.start, meta.end], meta]
 
         if @editor.scroll.top <= meta.line <= @editor.scroll.bot
@@ -256,7 +256,9 @@ class Meta
     #  0000000  0000000  000   0000000  000   000
 
     onMouseDown: (event) ->
-
+        
+        log "Meta.onMouseDown event.target.meta:", event.target.meta
+        
         if event.target.meta?[2].click?
             result = event.target.meta?[2].click event.target.meta, event
             stopEvent event if result != 'unhandled'
