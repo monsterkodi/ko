@@ -5,7 +5,7 @@
 # 000   000  000   000  000   000  000   000       000  000       
 # 0000000    000   000   0000000   00     00  0000000   00000000  
 
-{ dirExists, slash, post, str, log, os, $ } = require 'kxk'
+{ slash, post, str, log, os, $ } = require 'kxk'
 
 Command     = require '../commandline/command'
 FileBrowser = require '../browser/filebrowser'
@@ -73,7 +73,7 @@ class Browse extends Command
         @cmdID += 1
         cmd = command.trim()
         if cmd.length 
-            if dirExists cmd
+            if slash.dirExists cmd
                 @browser.browse cmd
     
     onItemActivated: (item) =>

@@ -5,7 +5,7 @@
 # 000   000  000   000  000      000  000   000       000   000
 # 00     00  000   000  0000000  000   000  00000000  000   000
 
-{ fileExists, dirExists, relative, path, fs, error, log } = require 'kxk'
+{ slash, fs, error, log } = require 'kxk'
 
 walkdir = require 'walkdir'
 
@@ -39,14 +39,14 @@ class Walker
             dir = @cfg.root
             @walker = walkdir.walk dir, max_depth: @cfg.maxDepth
             onWalkerPath = (cfg) -> (p,stat) ->
-                name = path.basename p
-                extn = path.extname p
+                name = slash.basename p
+                extn = slash.extname p
 
                 if cfg.filter?(p)
                     return @ignore p
                 else if name in ['.DS_Store', 'Icon\r'] or extn in ['.pyc']
                     return @ignore p
-                else if cfg.includeDir? and path.dirname(p) == cfg.includeDir
+                else if cfg.includeDir? and slash.dirname(p) == cfg.includeDir
                     cfg.files.push p
                     cfg.stats.push stat
                     @ignore p if name in cfg.ignore
@@ -79,7 +79,7 @@ class Walker
                     if cfg.skipDir? p
                         @ignore p
                 else
-                    if path.extname(p) in cfg.includeExt or path.basename(p) in cfg.include or cfg.includeExt.indexOf('') >= 0
+                    if slash.extname(p) in cfg.includeExt or slash.basename(p) in cfg.include or cfg.includeExt.indexOf('') >= 0
                         cfg.file? p, stat
                                                 
                 if cfg.files.length > cfg.maxFiles

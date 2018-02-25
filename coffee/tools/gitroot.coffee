@@ -5,7 +5,7 @@
 # 000   000  000     000     000   000  000   000  000   000     000     
 #  0000000   000     000     000   000   0000000    0000000      000     
 
-{ empty, dirExists, childp, path, fs } = require 'kxk'
+{ empty, slash, childp, fs } = require 'kxk'
 
 gitRoot = (pth, cb) ->
 
@@ -20,11 +20,11 @@ gitRoot = (pth, cb) ->
                     return cb(null) if err
                     cb stdout.trim()
             else
-                gitRoot path.dirname(pth), cb
+                gitRoot slash.dirname(pth), cb
     else
     
         try
-            cwd = dirExists(pth) and pth or path.dirname(pth)
+            cwd = slash.dirExists(pth) and pth or slash.dirname(pth)
             r = childp.execSync 'git rev-parse --show-toplevel',
                 cwd:      cwd
                 encoding: 'utf8'

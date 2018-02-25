@@ -5,7 +5,7 @@
 # 000   000  000   000  000  000      000   000
 # 0000000     0000000   000  0000000  0000000  
 
-{ fileExists, dirExists, log, $, _ } = require 'kxk'
+{ slash, log, $, _ } = require 'kxk'
 
 Command  = require '../commandline/command'
 
@@ -53,15 +53,15 @@ class Build extends Command
             # log "reset #{command} #{@instance?.name} #{@instance.reset?}", _.isFunction @instance.reset
             @instance.reset()
         else
-            if dirExists "#{__dirname}/../stage/#{command}"
-                if fileExists "#{__dirname}/../stage/#{command}/main.js"
+            if slash.dirExists "#{__dirname}/../stage/#{command}"
+                if slash.fileExists "#{__dirname}/../stage/#{command}/main.js"
                     file = "#{__dirname}/../stage/#{command}/main.js"
-                else if fileExists "#{__dirname}/../stage/#{command}/#{command}.js"
+                else if slash.fileExists "#{__dirname}/../stage/#{command}/#{command}.js"
                     file = "#{__dirname}/../stage/#{command}/#{command}.js"
-            else if fileExists "#{__dirname}/../#{command}/#{command}.js"
+            else if slash.fileExists "#{__dirname}/../#{command}/#{command}.js"
                 file = "#{__dirname}/../#{command}/#{command}.js"
-            else if dirExists command
-                if fileExists "#{slash.resolve command}/main.js"
+            else if slash.dirExists command
+                if slash.fileExists "#{slash.resolve command}/main.js"
                     file = "#{slash.resolve command}/main.js"
                 
             if file?

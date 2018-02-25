@@ -5,7 +5,7 @@
 #    000     000       000   000  000 0 000
 #    000     00000000  000   000  000   000
 
-{ dirExists, reversed, slash, fs, post, noon, store, clamp, log, _ } = require 'kxk'
+{ reversed, slash, fs, post, noon, store, clamp, log, _ } = require 'kxk'
   
 Walker   = require '../tools/walker'
 Syntax   = require '../editor/syntax'
@@ -100,12 +100,12 @@ class Term extends Command
             rest = _.last split
             split.pop()
             start = split.join('/') + '/'
-            if dirExists @resolveDir start
+            if slash.dirExists @resolveDir start
                 dir = start
             else
                 dir = dir + '/' + start
         else
-            if dirExists @resolveDir word
+            if slash.dirExists @resolveDir word
                 dir = word
                 start = word + '/'
                 rest = ''
@@ -125,7 +125,7 @@ class Term extends Command
 
         for f in files
             if rest == '' or f.startsWith rest
-                if dirExists start + f
+                if slash.dirExists start + f
                     list.push start + f + '/'
                 else
                     list.push start + f
@@ -144,7 +144,7 @@ class Term extends Command
             p = split.join(' ') + ' ' if split.length
             items.push p + l
         if _.last(items[0]) != '/'
-            if dirExists @resolveDir _.last items[0].split ' '
+            if slash.dirExists @resolveDir _.last items[0].split ' '
                 items[0] +=  '/'
         @setText items[0]
         if items.length > 1

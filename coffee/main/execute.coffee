@@ -44,7 +44,7 @@ class Execute
             restoreCWD = process.cwd()
             process.chdir __dirname
             coffee.eval """
-                { str, clamp, fileExists, dirExists, resolve, unresolve, post, path, noon, fs, $, _
+                { str, clamp, post, slash, noon, fs, $, _
                 } = require 'kxk'
                 { max, min, abs, round, ceil, floor, sqrt, pow, exp, log10, sin, cos, tan, acos, asin, atan, PI, E
                 } = Math

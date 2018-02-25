@@ -6,8 +6,7 @@
  0000000   000        00000000  000   000
 ###
 
-{ fileExists, fileName, dirExists, valid, empty,
-  prefs, clamp, post, slash, path, fs, os, error, log, _ } = require 'kxk'
+{ valid, empty, prefs, clamp, post, slash, fs, os, error, log, _ } = require 'kxk'
   
 profile  = require '../tools/profile'
 Walker   = require '../tools/walker'
@@ -18,7 +17,7 @@ fuzzy    = require 'fuzzy'
         
 relative = (rel, to) ->
     r = slash.relative rel, to
-    # log 'open.relative', rel, to, r
+
     if r.startsWith '../../' 
         tilde = slash.tilde rel
         if tilde.length < r.length
@@ -68,7 +67,7 @@ class Open extends Command
         [file, pos] = slash.splitFilePos command ? @getText().trim()
         items = @listItems flat: true, navigating: @navigating, currentText: file    
         if command.length
-            fuzzied = fuzzy.filter path.basename(file), items, extract: (o) -> o.text            
+            fuzzied = fuzzy.filter slash.basename(file), items, extract: (o) -> o.text            
             items = (f.original for f in fuzzied)
             items.sort (a,b) -> b.weight - a.weight
                     
@@ -78,7 +77,7 @@ class Open extends Command
             @positionList()
         else
             if slash.dirname(slash.resolve(command)) == @dir
-                base = path.basename command
+                base = slash.basename command
                 items = @listItems flat: false, excludeUp: true
                 items = _.filter items, (i) -> i.file.startsWith slash.resolve(command)
                 if items.length
@@ -97,13 +96,13 @@ class Open extends Command
     complete: -> 
         
         return if not @commandList? 
-        if @commandList.line(@selected).startsWith(path.basename @getText()) and not @getText().trim().endsWith('/')
+        if @commandList.line(@selected).startsWith(slash.basename @getText()) and not @getText().trim().endsWith('/')
             @setText slash.join(slash.dirname(@getText()), @commandList.line(@selected))
-            if dirExists @getText()
+            if slash.dirExists @getText()
                 @setText @getText() + '/'
                 @changed @getText()
             true
-        else if not @getText().trim().endsWith('/') and dirExists @getText()
+        else if not @getText().trim().endsWith('/') and slash.dirExists @getText()
             @setText @getText() + '/'
             @changed @getText()
             true            
@@ -112,7 +111,7 @@ class Open extends Command
             for p in Object.keys(projects).sort()
                 if p.startsWith @getText()
                     pdir = projects[p].dir
-                    pdir = slash.join(pdir, 'coffee') if dirExists slash.join pdir, 'coffee'
+                    pdir = slash.join(pdir, 'coffee') if slash.dirExists slash.join pdir, 'coffee'
                     @setText pdir + '/'
                     @changed @getText()
                     return true
@@ -130,7 +129,7 @@ class Open extends Command
         
         f = item.file
         r = item.text
-        b = path.basename f
+        b = slash.basename f
         n = fileName f
                 
         relBonus = 0
@@ -139,7 +138,7 @@ class Open extends Command
             relBonus  = r.startsWith(opt.currentText) and 65535 * (opt.currentText.length/r.length) or 0 
             nameBonus = n.startsWith(opt.currentText) and 2184  * (opt.currentText.length/n.length) or 0
            
-        extensionBonus = switch path.extname b
+        extensionBonus = switch slash.extname b
             when '.coffee'               then 1000
             when '.cpp', '.hpp', '.h'    then 90
             when '.md', '.styl', '.pug'  then 50
@@ -149,7 +148,7 @@ class Open extends Command
         extensionBonus -= 400 if b[0] == '.'
         extensionBonus += 16777215 if item.text == '..' if @navigating
         
-        lengthPenalty = path.dirname(f).length
+        lengthPenalty = slash.dirname(f).length
                 
         if opt?.flat
             
@@ -214,7 +213,7 @@ class Open extends Command
             item.line = '▸'
             item.clss = 'directory'
             item.text = '..'
-            item.file = path.dirname @dir
+            item.file = slash.dirname @dir
             items.push item
                 
         for file in @files
@@ -302,7 +301,7 @@ class Open extends Command
             
         if window.editor.currentFile?
             opt.file = window.editor.currentFile 
-            opt.dir  = path.dirname opt.file
+            opt.dir  = slash.dirname opt.file
         else 
             @dir ?= process.cwd()
             log 'open.start', @dir
@@ -336,9 +335,9 @@ class Open extends Command
     loadDir: (opt) ->
                 
         opt.dir = slash.dirname opt.file if not opt.dir? and opt.file?
-        if not dirExists opt.dir
+        if not slash.dirExists opt.dir
             opt.dir = slash.resolve opt.dir
-            if not dirExists opt.dir
+            if not slash.dirExists opt.dir
                 return false
 
         log 'open.loadDir opt.dir:', opt.dir
@@ -456,9 +455,9 @@ class Open extends Command
             return text: @dir, select: true
         else
             if @selected >= 0 and listValue? 
-                if dirExists @resolvedPath listValue
+                if slash.dirExists @resolvedPath listValue
                     resolved = @resolvedPath listValue
-            else if dirExists @resolvedPath command
+            else if slash.dirExists @resolvedPath command
                 resolved = @resolvedPath command
                 
             if resolved? 
@@ -480,9 +479,9 @@ class Open extends Command
                 file = files[i]
                 [file, pos] = slash.splitFilePos file
                 file = @resolvedPath file
-                if not fileExists file
-                    if '' == path.extname file
-                        if fileExists file + '.coffee'
+                if not slash.fileExists file
+                    if '' == slash.extname file
+                        if slash.fileExists file + '.coffee'
                             file += '.coffee'
                 file = slash.joinFilePos file, pos
                 files.splice i, 1, file
@@ -504,7 +503,7 @@ class Open extends Command
             else
                 super selected
                 
-            text:  (path.basename(f) for f in opened).join ' '
+            text:  (slash.basename(f) for f in opened).join ' '
             focus:  'editor'
             show:   'editor'
             status: 'ok'
@@ -523,7 +522,7 @@ class Open extends Command
         if p[0] in ['~', '/'] or p[1] == ':'
             slash.resolve p
         else
-            slash.resolve path.join parent, p
+            slash.resolve slash.join parent, p
 
     # 000   000  00000000  000   000
     # 000  000   000        000 000 

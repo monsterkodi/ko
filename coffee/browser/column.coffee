@@ -180,7 +180,7 @@ class Column
             when 'left'  then slash.dirname @parent.file
             when 'up'    then @parent.file
             when 'right' then @activeRow().item.file
-            when 'down'  then packagePath @parent.file
+            when 'down'  then slash.pkg @parent.file
             when '~'     then '~'
             when '/'     then '/'
         @

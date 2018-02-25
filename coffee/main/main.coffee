@@ -4,8 +4,7 @@
 # 000 0 000  000   000  000  000  0000
 # 000   000  000   000  000  000   000
 
-{ fileExists, dirExists, fileList, childp, about, prefs, store, 
-  noon, post, slash, os, fs, str, empty, error, log, _ } = require 'kxk'
+{ fileList, childp, about, prefs, store, noon, post, slash, os, fs, str, empty, error, log, _ } = require 'kxk'
   
 pkg      = require '../../package.json'
 Execute  = require './execute'
@@ -52,7 +51,7 @@ app.exit 0 if not args?
 
 if process.cwd() == '/'
     process.chdir slash.resolve '~'
-while args.filelist.length and dirExists _.first args.filelist
+while args.filelist.length and slash.dirExists _.first args.filelist
     process.chdir args.filelist.shift()
     
 if args.verbose
@@ -394,7 +393,7 @@ class Main
         
         userData = slash.path app.getPath 'userData'
         stashDir = slash.join userData, 'win'
-        if dirExists stashDir
+        if slash.dirExists stashDir
             fs.moveSync stashDir, slash.join(userData, 'old'), overwrite: true
                 
     restoreWindows: ->
@@ -446,7 +445,7 @@ class Main
             fs.copySync opt.restore, newStash
             
         htmlFile  = slash.resolve "#{__dirname}/../#{scheme}.html"
-        if not fileExists htmlFile
+        if not slash.fileExists htmlFile
             pugRender = pug.compileFile slash.path "#{__dirname}/../../pug/index.pug"
             html = pugRender scheme: scheme
             fs.writeFileSync htmlFile, html, 'utf8'
@@ -470,6 +469,7 @@ class Main
                 post.toWin win.id, 'loadFile', opt.file
             else
                 log 'createWindow.winLoaded no file to open?'
+                post.toWin win.id, 'loadFile', slash.path __filename
                 
             post.toWins 'winLoaded', win.id
             post.toWins 'numWins', wins().length
@@ -537,7 +537,7 @@ class Main
             if not arg.startsWith '/'
                 file = slash.join slash.resolve(dir), arg
             [fpath, pos] = slash.splitFilePos file
-            if fileExists fpath
+            if slash.fileExists fpath
                 files.push file
 
         @createWindow files:files
