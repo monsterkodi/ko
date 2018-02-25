@@ -6,7 +6,7 @@
 00     00  000  000   000  0000000     0000000   00     00
 ###
 
-{ stopEvent, fileExists, fileList, keyinfo, atomic, prefs, stash, 
+{ stopEvent, fileList, keyinfo, atomic, prefs, stash, 
   drag, noon, post, slash, clamp, pos, str, sw, sh, os, fs, log, error, _ } = require 'kxk' 
 
 Split       = require './split'
@@ -215,7 +215,7 @@ saveFile = (file) ->
 
     editor.stopWatcher()
 
-    if fileExists file
+    if slash.fileExists file
         stat = fs.statSync file
         mode = stat.mode
     else
@@ -234,7 +234,7 @@ saveFile = (file) ->
 
 window.saveChanges = ->
 
-    if editor.currentFile? and editor.do.hasLineChanges() and fileExists editor.currentFile
+    if editor.currentFile? and editor.do.hasLineChanges() and slash.fileExists editor.currentFile
         stat = fs.statSync editor.currentFile
         atomic editor.currentFile, editor.text(), { encoding: 'utf8', mode: stat.mode }, (err) ->
             return error "window.saveChanges failed #{err}" if err
@@ -329,7 +329,7 @@ loadFile = (file, opt={}) ->
     log 'window.loadFile', file, editor?.currentFile, opt
 
     if file != editor?.currentFile or opt?.reload
-        if file? and not fileExists file
+        if file? and not slash.fileExists file
             file = null
 
         if not opt?.dontSave

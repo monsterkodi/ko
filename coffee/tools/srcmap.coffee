@@ -5,7 +5,7 @@
 # 000       000   000  000       000       000       000              000       000   000       000    
 #  0000000   0000000   000       000       00000000  00000000       000          0000000   0000000     
 
-{ fs, fileExists, log } = require 'kxk'
+{ fs, slash, log } = require 'kxk'
 
 sourceMap = require 'source-map'
 
@@ -14,7 +14,7 @@ toCoffee  = (jsFile, jsLine, jsCol=0) ->
     coffeeFile = jsFile.replace /\/js\//, '/coffee/'
     coffeeFile = coffeeFile.replace /\.js$/, '.coffee'
     
-    if not fileExists coffeeFile 
+    if not slash.fileExists coffeeFile 
         if not jsLine? then return null
         return [null, null, null]
         
@@ -22,7 +22,7 @@ toCoffee  = (jsFile, jsLine, jsCol=0) ->
         
     mapFile = jsFile + '.map'
     
-    if fileExists mapFile
+    if slash.fileExists mapFile
         mapData = fs.readFileSync mapFile, 'utf8'
         consumer = new sourceMap.SourceMapConsumer mapData 
         pos = consumer.originalPositionFor line:jsLine, column:jsCol, bias: sourceMap.SourceMapConsumer.LEAST_UPPER_BOUND
@@ -39,7 +39,7 @@ toJs = (coffeeFile, coffeeLine, coffeeCol=0) ->
     jsFile = coffeeFile.replace /\/coffee\//, '/js/'
     jsFile = jsFile.replace /\.coffee$/, '.js'
     
-    if not fileExists jsFile 
+    if not slash.fileExists jsFile 
         if not jsLine? then return null
         return [null, null, null]
         
@@ -47,7 +47,7 @@ toJs = (coffeeFile, coffeeLine, coffeeCol=0) ->
     
     mapFile = jsFile + '.map'
     
-    if fileExists mapFile
+    if slash.fileExists mapFile
         mapData = fs.readFileSync mapFile, 'utf8'
         consumer = new sourceMap.SourceMapConsumer mapData 
         srcFile = 'coffee/' + coffeeFile.split('/coffee/')[1]

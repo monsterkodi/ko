@@ -130,7 +130,7 @@ class Open extends Command
         f = item.file
         r = item.text
         b = slash.basename f
-        n = fileName f
+        n = slash.fileName f
                 
         relBonus = 0
         nameBonus = 0

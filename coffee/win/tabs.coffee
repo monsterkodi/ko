@@ -5,7 +5,7 @@
 #    000     000   000  000   000       000
 #    000     000   000  0000000    0000000 
 
-{ post, elem, drag, splitFileLine, error, log, _ } = require 'kxk'
+{ post, elem, drag, slash, error, log, _ } = require 'kxk'
 
 Tab = require './tab'
 
@@ -186,7 +186,7 @@ class Tabs
 
     onNewTabWithFile: (file) =>
         
-        [file, line, col] = splitFileLine file
+        [file, line, col] = slash.splitFileLine file
         
         if tab = @tab file
             tab.activate()

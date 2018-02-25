@@ -5,7 +5,7 @@
 000       000  000      000             000       000   000  000     000     000   000  000   000
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
-{ fileExists, empty, fs, setStyle, post, pos, error, log, str, _ } = require 'kxk'
+{ slash, empty, fs, setStyle, post, pos, error, log, str, _ } = require 'kxk'
   
 srcmap     = require '../tools/srcmap'
 watcher    = require './watcher'
@@ -316,14 +316,14 @@ class FileEditor extends TextEditor
             '.styl':    ['.css']
 
         for ext in (counterparts[currext] ? [])
-            if fileExists slash.swapExt @currentFile, ext
+            if slash.fileExists slash.swapExt @currentFile, ext
                 window.loadFile slash.swapExt @currentFile, ext
                 return true
 
         for ext in (counterparts[currext] ? [])
             counter = swapExt @currentFile, ext
             counter = counter.replace "/#{currext.slice 1}/", "/#{ext.slice 1}/"
-            if fileExists counter
+            if slash.fileExists counter
                 window.loadFile counter
                 return true
         false

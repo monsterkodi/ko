@@ -5,8 +5,8 @@
 # 000   000  000  000  0000  
 # 00     00  000  000   000  
 
-{log, post, resolve, fs} = require 'kxk'
-{expect,should} = require 'chai'
+{ log, post, slash, fs } = require 'kxk'
+{ expect,should } = require 'chai'
 should()
 
 try
@@ -20,8 +20,8 @@ winID    = 0
 thisID   = window.winID
 editor   = window.editor
 thisFile = null
-otherWin = null
-tmpFile  = resolve '$TMPDIR/ko/test.coffee'
+otherWin = nullsplit
+tmpFile  = slash.resolve '$TMPDIR/ko/test.coffee'
 text     = "a='hello'\nb='world'"
         
 describe 'win', ->
