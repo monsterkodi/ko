@@ -6,7 +6,7 @@
  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 ###
 
-{ fileList, stopEvent, elem, keyinfo, clamp, post, path, error, log, str, os, $, _ } = require 'kxk'
+{ fileList, stopEvent, elem, keyinfo, clamp, post, slash, error, log, str, os, $, _ } = require 'kxk'
 
 TextEditor = require '../editor/texteditor'
 render     = require '../editor/render'
@@ -80,7 +80,7 @@ class Commandline extends TextEditor
 
         files = fileList "#{__dirname}/../commands"
         for file in files
-            continue if path.extname(file) != '.js'
+            continue if slash.extname(file) != '.js'
             try
                 commandClass = require file
                 command = new commandClass @
@@ -140,7 +140,7 @@ class Commandline extends TextEditor
         if not @command?
             @command = @commands['open']
             @command.loadState()
-            @setText path.basename file
+            @setText slash.basename file
 
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000

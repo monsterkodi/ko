@@ -5,7 +5,7 @@
 # 000   000  000     000     000   000  000   000     000     000       000   000  
 #  0000000   000     000     00     00  000   000     000      0000000  000   000  
 
-{ fileExists, post, slash, path, fs, log } = require 'kxk'
+{ post, slash, fs, log } = require 'kxk'
 
 chokidar = require 'chokidar'
 gitRoot  = require './gitroot'
@@ -28,7 +28,7 @@ class GitWatch
             
             gitFile = slash.join gitDir, '.git', 'HEAD'
             
-            if fileExists gitFile
+            if slash.fileExists gitFile
                 
                 refPath = fs.readFileSync gitFile, 'utf8'
                 if refPath.startsWith 'ref: '

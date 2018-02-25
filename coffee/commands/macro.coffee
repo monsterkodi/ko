@@ -5,8 +5,7 @@
 # 000 0 000  000   000  000       000   000  000   000
 # 000   000  000   000   0000000  000   000   0000000
 
-{ fileExists, fileName, fileList, reversed, relative, splitExt,
-  post, noon, slash, path, fs, error, log, _ } = require 'kxk'
+{ fileList, reversed, post, noon, slash, fs, error, log, _ } = require 'kxk'
   
 indexer = require '../main/indexer'
 salt    = require '../tools/salt'
@@ -191,8 +190,8 @@ class Macro extends Command
                     pth = map[word] ? word.toLowerCase()
 
                     for f in projectFiles
-                        if pth == fileName f
-                            pth = splitExt relative f, slash.dirname editor.currentFile
+                        if pth == slash.fileName f
+                            pth = slash.splitExt slash.relative f, slash.dirname editor.currentFile
                             pth = './' + pth if not pth.startsWith '../'
                             break
 
@@ -256,7 +255,7 @@ class Macro extends Command
                 clss ?= 'Class'
                 dir = editor.currentFile? and slash.dirname(editor.currentFile) or process.cwd()
                 file = slash.join dir, clss.toLowerCase() + '.coffee'
-                if fileExists file
+                if slash.fileExists file
                     return text: "file #{file} exists!"
                 text = '\n'
                 text += ("# "+s for s in salt(clss).split '\n').join '\n'

@@ -5,7 +5,7 @@
 # 000   000  000  000   000  000      000       000     000     
 # 0000000    000  000   000  0000000  000  0000000      000     
 
-{ resolve, relative, fs, path, error, log, _ } = require 'kxk'
+{ fs, slash, error, log, _ } = require 'kxk'
 
 walkdir    = require 'walkdir'
 isTextFile = require './istextfile'
@@ -34,30 +34,30 @@ dirList = (dirPath, opt, cb) ->
     opt.logError     ?= true
     dirs    = []
     files   = []
-    dirPath = resolve dirPath
+    dirPath = slash.resolve dirPath
     
     filter = (p) ->
         
-        if path.basename(p).startsWith '.'
+        if slash.basename(p).startsWith '.'
             if opt.ignoreHidden
                 return true
-            if path.basename(p) in ['.DS_Store', '.git']
+            if slash.basename(p) in ['.DS_Store', '.git']
                 return true
         else if opt.matchExt? 
-            if path.extname(p) != path.extname opt.matchExt
+            if slash.extname(p) != slash.extname opt.matchExt
                 return true
-        if path.basename(p) == 'Icon\r'
+        if slash.basename(p) == 'Icon\r'
             return true
         false
     
     onDir = (d) -> 
         if not filter(d) 
-            dir = type: 'dir', file: d, name: path.basename d # relative d, dirPath 
+            dir = type: 'dir', file: d, name: slash.basename d # relative d, dirPath 
             dirs.push  dir
             
     onFile = (f) -> 
         if not filter(f) 
-            file = type: 'file', file: f, name: path.basename f # relative f, dirPath
+            file = type: 'file', file: f, name: slash.basename f # relative f, dirPath
             file.textFile = true if isTextFile f
             files.push file
 

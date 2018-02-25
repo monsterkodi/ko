@@ -5,7 +5,7 @@
 #    000     000     000     000      000       000   000  000   000  000   000
 #    000     000     000     0000000  00000000  0000000    000   000  000   000
 
-{ stopEvent, elem, post, path, log, $ } = require 'kxk'
+{ stopEvent, elem, post, log, $ } = require 'kxk'
 
 render = require '../editor/render'
 syntax = require '../editor/syntax'

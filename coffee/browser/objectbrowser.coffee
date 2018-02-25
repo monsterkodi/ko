@@ -6,7 +6,7 @@
  0000000   0000000     0000000   00000000   0000000     000           0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 ###
 
-{ fileName, empty, elem, path, post, str, error, log, _ } = require 'kxk'
+{ empty, elem, slash, post, str, error, log, _ } = require 'kxk'
 
 jsbeauty   = require 'js-beautify'
 Browser    = require './browser'
@@ -164,7 +164,7 @@ class ObjectBrowser extends Browser
             key = '▸ '+func
             items = []
             for funci in funcl
-                clss = funci.class ? path.basename funci.file
+                clss = funci.class ? slash.basename funci.file
                 items.push 
                     name: clss
                     text: '● '+clss
@@ -191,13 +191,13 @@ class ObjectBrowser extends Browser
         files = []
 
         filterBase = (name, file) ->
-            file = fileName file
+            file = slash.fileName file
             if not name.startsWith '.'
                 return not (name.length>1 and file.indexOf(name)>=0 or file.startsWith(name))
             false
         
         for k,v of @filter names, 'files', filterBase
-            key = path.basename k
+            key = slash.basename k
             files.push  
                 textFile: isTextFile key
                 name: key

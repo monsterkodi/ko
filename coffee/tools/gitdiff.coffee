@@ -5,16 +5,16 @@
 # 000   000  000     000     000   000  000  000       000         
 #  0000000   000     000     0000000    000  000       000         
 
-{ escapePath, resolve, childp, path, str, log, _ } = require 'kxk'
+{ childp, slash, str, log, _ } = require 'kxk'
 
 stripAnsi = require 'strip-ansi'
 
 gitDiff = (file) ->
 
-    gitCommand = "git --no-pager diff -U0 \"#{escapePath file}\""
+    gitCommand = "git --no-pager diff -U0 \"#{slash.escape file}\""
 
     result = childp.execSync gitCommand, 
-        cwd: path.dirname file
+        cwd: slash.dirname file
         encoding: 'utf8' 
             
     info  = file:file, changes:[]
@@ -66,5 +66,5 @@ gitDiff = (file) ->
 if module.parent
     module.exports = gitDiff
 else
-    log gitDiff resolve process.argv[2]
+    log gitDiff slash.resolve process.argv[2]
     

@@ -58,7 +58,7 @@ class Navigate
                         line:   opt.pos[1]+1
                         column: opt.pos[0]
                         name:   filePos
-                        text:   path.basename filePos
+                        text:   slash.basename filePos
                         
                     @currentIndex = @filePositions.length-1
                     if opt?.for == 'goto'

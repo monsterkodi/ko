@@ -5,7 +5,8 @@
 000       000   000  000     000     000   000  000   000
 00000000  0000000    000     000      0000000   000   000
 ###
-{ fileList, extName, clamp, empty, path, str, error, log, _ } = require 'kxk'
+
+{ fileList, clamp, empty, slash, str, error, log, _ } = require 'kxk'
 
 Buffer  = require './buffer'
 Syntax  = require './syntax'
@@ -42,8 +43,8 @@ class Editor extends Buffer
     @initActions: -> 
         
         @actions = []
-        for actionFile in fileList path.join __dirname, 'actions'
-            continue if path.extname(actionFile) not in ['.js', '.coffee']
+        for actionFile in fileList slash.join __dirname, 'actions'
+            continue if slash.extname(actionFile) not in ['.js', '.coffee']
             actions = require actionFile
             for key,value of actions
                 if _.isFunction value
@@ -69,7 +70,7 @@ class Editor extends Buffer
         @fileType = 'txt'
         @fileType = Syntax.shebang @line(0) if @numLines()
         if @fileType == 'txt' and @currentFile?
-            ext = extName @currentFile
+            ext = slash.ext @currentFile
             if ext in Syntax.syntaxNames
                 @fileType = ext
 

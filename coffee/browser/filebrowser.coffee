@@ -6,7 +6,7 @@
 000       000  0000000  00000000        0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 ###
 
-{ empty, elem, post, clamp, childp, prefs, slash, path, fs, os, error, log, $ } = require 'kxk'
+{ empty, elem, post, clamp, childp, prefs, slash, fs, os, error, log, $ } = require 'kxk'
   
 Browser  = require './browser'
 dirlist  = require '../tools/dirlist'
@@ -76,7 +76,7 @@ class FileBrowser extends Browser
             opt.parent ?=
                 type: 'dir'
                 file: dir
-                name: path.basename dir
+                name: slash.basename dir
 
             column = opt.column ? 0
                 
@@ -146,7 +146,7 @@ class FileBrowser extends Browser
                 if status?
                     icon = {added:'plus', changed:'pencil', 'dirs':'pencil-square-o'}[status]
                     row.div.appendChild elem 'span', 
-                        class:"git #{status} fa fa-#{icon} extname #{path.extname(row.item.file).slice 1}"
+                        class:"git #{status} fa fa-#{icon} extname #{slash.extname(row.item.file).slice 1}"
 
     updateGitStatus: (file) =>
         

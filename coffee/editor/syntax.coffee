@@ -6,7 +6,7 @@
 0000000      000     000   000     000     000   000  000   000
 ###
 
-{ error, log, str, post, elem, empty, fs, noon, path, _ } = require 'kxk'
+{ error, log, str, post, elem, empty, fs, noon, slash, _ } = require 'kxk'
 
 encode   = require '../tools/encode'
 matchr   = require '../tools/matchr'
@@ -211,8 +211,8 @@ class Syntax
         
         for syntaxFile in fs.readdirSync syntaxDir
             
-            syntaxName = path.basename syntaxFile, '.noon'
-            patterns = noon.load path.join syntaxDir, syntaxFile
+            syntaxName = slash.basename syntaxFile, '.noon'
+            patterns = noon.load slash.join syntaxDir, syntaxFile
             
             patterns['\\w+']       = 'text'   # this ensures that all ...
             patterns['[^\\w\\s]+'] = 'syntax' # non-space characters match

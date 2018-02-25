@@ -5,7 +5,7 @@
 # 000       000   000  000       000       000       000              000       000   000       000    
 #  0000000   0000000   000       000       00000000  00000000       000          0000000   0000000     
 
-{ fs, fileExists, path, log } = require 'kxk'
+{ fs, fileExists, log } = require 'kxk'
 
 sourceMap = require 'source-map'
 
