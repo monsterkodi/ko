@@ -424,7 +424,7 @@ class Main
         
         scheme = prefs.get 'scheme', 'dark'
         
-        win = new BrowserWindow
+        cfg = 
             x:                parseInt (width-ww)/2
             y:                0
             width:            ww
@@ -439,6 +439,11 @@ class Main
             backgroundColor:  scheme == 'bright' and "#fff" or '#000'
             autoHideMenuBar:  true
             titleBarStyle:    'hidden'
+            
+        if os.platform() == 'win32'
+            cfg.icon = slash.path __dirname + '/../img/ko.ico'
+            
+        win = new BrowserWindow cfg
             
         if opt.restore?
             newStash = slash.join app.getPath('userData'), 'win', "#{win.id}.noon"
