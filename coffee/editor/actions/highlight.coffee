@@ -20,6 +20,7 @@ module.exports =
         selectAllWords:
             name:  'Select All Words'
             combo: 'CmdOrCtrl+alt+d'
+            accel: 'alt+ctrl+d'
             
         removeSelectedHighlight:
             name: 'Remove Highlighted Word from Selection'

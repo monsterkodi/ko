@@ -14,43 +14,39 @@ module.exports =
                     
         selectAll:
             name:  'Select All'
-            combo: 'command+a'
+            combo: 'cmdorctrl+a'
             
         selectNone:
             name:  'Deselect'
-            combo: 'command+shift+a'
+            combo: 'cmdorctrl+shift+a'
             
         selectInverted:
             name:  'Invert Selection'
             text:  'selects all lines that have no cursors and no selections'
-            combo: 'command+i'
+            combo: 'cmdorctrl+shift+i'
             
         selectNextHighlight:
             separator: true
             name:  'Select Next Highlight'
-            combo: 'command+g'
+            combo: 'cmdorctrl+g'
             
         selectPrevHighlight:
             name:  'Select Previous Highlight'
-            combo: 'command+shift+g'
-            
-        selectAllHighlights:
-            name:  'Select All Highlights'
-            combo: 'command+alt+d'
-            
+            combo: 'cmdorctrl+shift+g'
+                        
         selectTextBetweenCursorsOrSurround:
             name: 'Select Between Cursors, Brackets or Quotes'
             text: """
                 select text between even cursors, if at least two cursors exist. 
                 select text between highlighted brackets or quotes otherwise.
                 """
-            combo: 'command+alt+ctrl+b'
+            combo: 'cmdorctrl+alt+b'
 
         startStickySelection:
             separator: true
             name:  'Toggle Sticky Selection'
             text:  'current selection is not removed when adding new selections'
-            combo: 'command+esc'
+            combo: 'cmdorctrl+`'
             
     selectSingleRange: (r, opt = extend:false) ->
         

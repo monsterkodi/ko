@@ -568,11 +568,11 @@ menuCombo = (combo) ->
     handleModKeyComboCharEvent mod, key, combo, char
 
 menuAction = (name) ->
-    action = Editor.actionWithName name
-    log "window.menuAction #{name}", action
-    if action.key? and _.isFunction window.focusEditor[action.key]
-        log "window.menuAction execute ---------------------- ", action
-        window.focusEditor[action.key]()
+    if action = Editor.actionWithName name
+        # log "window.menuAction #{name}", action
+        if action.key? and _.isFunction window.focusEditor[action.key]
+            # log "window.menuAction execute ---------------------- ", action
+            window.focusEditor[action.key]()
     
 # 000   000  00000000  000   000
 # 000  000   000        000 000

@@ -203,10 +203,6 @@ class Menu
                 accelerator: 'Ctrl+.'
                 click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+.'
             ,
-                label:      'Debug'
-                accelerator: 'alt+d'
-                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'alt+d'
-            ,
                 label:      'Build'
                 accelerator: 'Ctrl+b'
                 click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+b'
