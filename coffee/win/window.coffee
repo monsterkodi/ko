@@ -15,6 +15,7 @@ Titlebar    = require './titlebar'
 LogView     = require './logview'
 Info        = require './info'
 Area        = require '../stage/area'
+Editor      = require '../editor/editor'
 Commandline = require '../commandline/commandline'
 FileEditor  = require '../editor/fileeditor'
 Navigate    = require '../main/navigate'
@@ -111,6 +112,7 @@ post.on 'reloadTab', (file)  -> reloadTab file
 post.on 'loadFile',  (file)  -> loadFile  file
 post.on 'loadFiles', (files) -> openFiles files
 post.on 'menuCombo', (combo) -> menuCombo combo
+post.on 'menuAction', (action) -> menuAction action
 post.on 'editorFocus', (editor) ->
     window.focusEditor = editor
     window.textEditor = editor if editor.name != 'commandline-editor'
@@ -552,31 +554,46 @@ window.onfocus = (event) ->
         else
             split.focus 'commandline-editor'
 
+# 00     00  00000000  000   000  000   000      0000000   0000000   00     00  0000000     0000000   
+# 000   000  000       0000  000  000   000     000       000   000  000   000  000   000  000   000  
+# 000000000  0000000   000 0 000  000   000     000       000   000  000000000  0000000    000   000  
+# 000 0 000  000       000  0000  000   000     000       000   000  000 0 000  000   000  000   000  
+# 000   000  00000000  000   000   0000000       0000000   0000000   000   000  0000000     0000000   
+
+menuCombo = (combo) ->
+
+    { mod, key, combo, char } = keyinfo.forCombo combo
+    log 'menuCombo', mod, key, combo, char
+    return if window.focusEditor and 'unhandled' != window.focusEditor.handleModKeyComboCharEvent mod, key, combo, char
+    handleModKeyComboCharEvent mod, key, combo, char
+
+menuAction = (name) ->
+    action = Editor.actionWithName name
+    log "window.menuAction #{name}", action
+    if action.key? and _.isFunction window.focusEditor[action.key]
+        log "window.menuAction execute ---------------------- ", action
+        window.focusEditor[action.key]()
+    
 # 000   000  00000000  000   000
 # 000  000   000        000 000
 # 0000000    0000000     00000
 # 000  000   000          000
 # 000   000  00000000     000
 
-menuCombo = (combo) ->
-
-    {mod, key, combo, char} = keyinfo.forCombo combo
-    log 'menuCombo', mod, key, combo, char
-    return if window.focusEditor and 'unhandled' != window.focusEditor.handleModKeyComboCharEvent mod, key, combo, char
-    handleModKeyComboCharEvent mod, key, combo, char
-
 onKeyDown = (event) ->
-    # log 'onKeyDown', event?, event.metaKey, event.altKey, event.ctrlKey, event.shiftKey
-    {mod, key, combo, char} = keyinfo.forEvent event
+    
+    { mod, key, combo, char } = keyinfo.forEvent event
     handleModKeyComboCharEvent mod, key, combo, char, event
 
 handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
         
     return if not combo
-    log 'handleModKeyComboCharEvent', 'mod', mod, 'key', key, 'combo', combo, 'char', char
+    # log 'handleModKeyComboCharEvent1', 'mod', mod, 'key', key, 'combo', combo, 'char', char
     return stopEvent(event) if 'unhandled' != window.titlebar   .globalModKeyComboEvent mod, key, combo, event
     return stopEvent(event) if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
 
+    # log 'handleModKeyComboCharEvent2', 'mod', mod, 'key', key, 'combo', combo, 'char', char
+                
     for i in [1..9]
         if combo is "alt+#{i}"
             return stopEvent event, post.toMain 'activateWindow', i

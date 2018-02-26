@@ -5,8 +5,7 @@
 #    000     000   000  000   000  
 #    000     000   000  0000000    
 
-{ stopEvent, _
-} = require 'kxk'
+{ stopEvent, _ } = require 'kxk'
 
 module.exports = 
     

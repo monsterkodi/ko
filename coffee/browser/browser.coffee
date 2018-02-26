@@ -315,7 +315,6 @@ class Browser extends Stage
     loadImage: (row, file) ->
         
         return if not row.isActive()
-        # item = row.item
 
         col = @emptyColumn opt?.column
         @clearColumnsFrom col.index

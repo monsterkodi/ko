@@ -16,11 +16,6 @@ module.exports =
             name:  'Cursor in All Lines'
             combo: 'alt+a'
 
-        alignCursors:
-            name: 'Align Cursors'
-            text: 'align cursors vertically with (top|bottom|left|right)-most cursor'
-            combos: ['alt+ctrl+shift+up', 'alt+ctrl+shift+down', 'alt+ctrl+shift+left', 'alt+ctrl+shift+right']
-
         alignCursorsTop:
             separator: true
             name: 'Align Cursors with Top-most Cursor'
@@ -52,10 +47,6 @@ module.exports =
                 """
             combo: 'CmdOrCtrl+alt+b'
 
-        addCursors:
-            name: 'Add Cursors up|down'
-            combos: ['CmdOrCtrl+up', 'CmdOrCtrl+down']
-
         addCursorsUp:
             separator: true
             name: 'Add Cursors Up'
@@ -64,10 +55,6 @@ module.exports =
         addCursorsDown:
             name: 'Add Cursors Down'
             combo: 'CmdOrCtrl+down'
-
-        delCursors:
-            name: 'Remove Cursors up|down'
-            combos: ['CmdOrCtrl+shift+up', 'CmdOrCtrl+shift+down']
 
         delCursorsUp:
             separator: true
@@ -78,17 +65,10 @@ module.exports =
             name: 'Remove Cursors Down'
             combo: 'CmdOrCtrl+shift+down'
 
-        cursorHome:
-            combo: 'ctrl+home'
+        cursorMoves:
+            name:  'Move Cursors To Start'
+            combos: ['ctrl+home', 'ctrl+end', 'page up', 'page down', 'ctrl+shift+home', 'ctrl+shift+end', 'shift+page up', 'shift+page down']
 
-        cursorEnd:
-            combo: 'ctrl+end'
-
-        cursorPageUp:
-            combo: 'page up'
-
-        cursorPageDown:
-            combo: 'page down'
 
     #  0000000  00000000  000000000
     # 000       000          000
@@ -115,25 +95,16 @@ module.exports =
         @do.setCursors [[c,l]]
         @do.end()
 
-    cursorHome: (key, info) ->
+    cursorMoves: (key, info) ->
         extend = info?.extend ? 0 <= info?.mod.indexOf 'shift'
-        @singleCursorAtPos [0, 0], extend: extend
-
-    cursorEnd: (key, info) ->
-        extend = info?.extend ? 0 <= info?.mod.indexOf 'shift'
-        @singleCursorAtPos [0,@numLines()-1], extend: extend
-
-    cursorPageUp: (key, info) ->
-        stopEvent info?.event
-        extend = info.extend ? 0 <= info.mod.indexOf 'shift'
-        @moveCursorsUp extend, @numFullLines()-3
-
-    cursorPageDown: (key, info) ->
-
-        stopEvent info?.event
-        extend = info.extend ? 0 <= info.mod.indexOf 'shift'
-        @moveCursorsDown extend, @numFullLines()-3
-
+        log 'cursorMoves', key, info, extend
+        
+        switch key
+            when 'home'      then @singleCursorAtPos [0, 0], extend: extend
+            when 'end'       then @singleCursorAtPos [0,@numLines()-1], extend: extend
+            when 'page up'   then @moveCursorsUp   extend, @numFullLines()-3
+            when 'page down' then @moveCursorsDown extend, @numFullLines()-3
+        
     setCursorsAtSelectionBoundariesOrSelectSurround: ->
 
         if @numSelections()
@@ -169,6 +140,9 @@ module.exports =
         @do.setCursors newCursors, main:'last'
         @do.end()
 
+    addCursorsUp:   -> @addCursors 'up'
+    addCursorsDown: -> @addCursors 'down'
+        
     addCursors: (key) ->
 
         dir = key
@@ -230,6 +204,11 @@ module.exports =
         @do.setCursors newCursors
         @do.end()
 
+    alignCursorsUp:    -> @alignCursors 'up'   
+    alignCursorsLeft:  -> @alignCursors 'left'   
+    alignCursorsRight: -> @alignCursors 'right'   
+    alignCursorsDown:  -> @alignCursors 'down'   
+        
     alignCursors: (dir='down') ->
 
         @do.start()
@@ -263,6 +242,9 @@ module.exports =
             @do.setCursors newCursors, main:'closest'
             @do.end()
 
+    delCursorsUp:   -> @delCursors 'up'
+    delCursorsDown: -> @delCursors 'down'
+            
     delCursors: (key, info) ->
         dir = key
         @do.start()

@@ -18,7 +18,7 @@ class Commandline extends TextEditor
 
         super viewElem, features: [], fontSize: 24
 
-        @mainCommands = ['open', 'search', 'find', 'coffee', 'goto', 'term', 'browse', 'debug', 'build', 'macro']
+        @mainCommands = ['browse', 'goto', 'open', 'search', 'find', 'coffee', 'build', 'macro']
         @hideCommands = ['selecto', 'Term', 'Build', 'Browse']
 
         @size.lineHeight = 30
@@ -39,7 +39,6 @@ class Commandline extends TextEditor
         post.on 'stash',   @stash
 
         @view.onblur = =>
-            # return
             @button.classList.remove 'active'
             @list?.remove()
             @list = null
@@ -160,6 +159,9 @@ class Commandline extends TextEditor
         window.split.showCommandline()
 
         @command = @commands[name]
+        
+        log "commandline.startCommand #{name}", @command?
+        
         activeID = document.activeElement.id
         if activeID.startsWith 'column' then activeID = 'editor'
         @command.setFocus activeID != 'commandline-editor' and activeID or null

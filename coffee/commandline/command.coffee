@@ -365,6 +365,7 @@ class Command
         switch combo
             when 'page up', 'page down'
                 if @commandList?
+                    log 'dasasasdasfdwqerwqrq r-qowopgf ias0-gia-0i -'
                     return @select clamp 0, @commandList.numLines(), @selected+@commandList.maxLines*(combo=='page up' and -1 or 1)
         'unhandled'
 

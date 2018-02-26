@@ -5,8 +5,7 @@
 #    000     000        000 000      000           000       000   000  000     000     000   000  000   000
 #    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000
 
-{ error, log, keyinfo, stopEvent, setStyle,
-  prefs, drag, elem, post, clamp, pos, str, sw, os, $, _ } = require 'kxk' 
+{ error, log, keyinfo, stopEvent, setStyle, prefs, drag, elem, post, clamp, pos, str, sw, os, $, _ } = require 'kxk' 
   
 render       = require './render'
 EditorScroll = require './editorscroll'
@@ -680,6 +679,9 @@ class TextEditor extends Editor
             return if 'unhandled' != @autocomplete.handleModKeyComboEvent mod, key, combo, event
 
         switch combo
+            
+            when 'backspace' then return 'unhandled' # has char set on windows?
+            
             when 'esc'
                 if @salterMode
                     return @setSalterMode false
@@ -693,10 +695,8 @@ class TextEditor extends Editor
                     return @selectNone()
 
         for action in Editor.actions
-            if action.combos?
-                combos = action.combos
-            else combos = [action.combo]
-            for actionCombo in combos
+            continue if not action.combos?
+            for actionCombo in action.combos
                 if combo == actionCombo
                     if action.key? and _.isFunction @[action.key]
                         @[action.key] key, combo: combo, mod: mod, event: event
@@ -722,13 +722,13 @@ class TextEditor extends Editor
 
         {mod, key, combo, char} = keyinfo.forEvent event
 
-        # log mod, key, combo, char
-
         return if not combo
         return if key == 'right click' # weird right command key
 
         result = @handleModKeyComboCharEvent mod, key, combo, char, event
 
+        # log 'textEditor.onKeyDown', key, combo, result
+        
         if 'unhandled' != result
             stopEvent event
 

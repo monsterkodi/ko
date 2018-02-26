@@ -199,10 +199,6 @@ class Menu
                 accelerator: 'Ctrl+;'
                 click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+;'
             ,
-                label:      'Term'
-                accelerator: 'Ctrl+,'
-                click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+,'
-            ,
                 label:      'Browse'
                 accelerator: 'Ctrl+.'
                 click:       (i,win) -> post.toWin win.id, 'menuCombo', 'command+.'
@@ -360,11 +356,11 @@ class Menu
                         submenu[menuName] ?= new AppMenu
                     for k,v of value
                         if v.name and v.combo
-                            menuCombo = (c) -> (i,win) -> post.toWin win.id, 'menuCombo', c
+                            menuAction = (c) -> (i,win) -> post.toWin win.id, 'menuAction', c
                             item = new MenuItem 
                                 label:       v.name
-                                accelerator: v.combo
-                                click: menuCombo v.combo
+                                accelerator: v.accel ? v.combo
+                                click: menuAction v.name
                             if v.menu?
                                 submenu[v.menu] ?= new AppMenu
                             if v.separator

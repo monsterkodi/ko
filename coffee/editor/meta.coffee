@@ -257,7 +257,7 @@ class Meta
 
     onMouseDown: (event) ->
         
-        log "Meta.onMouseDown event.target.meta:", event.target.meta
+        # log "Meta.onMouseDown event.target.meta:", event.target.meta
         
         if event.target.meta?[2].click?
             result = event.target.meta?[2].click event.target.meta, event

@@ -58,6 +58,24 @@ class Editor extends Buffer
         # too early for log here!            
         # console.log str @actions
             
+    @actionWithName: (name) -> 
+    
+        for action in Editor.actions
+            if action.name == name
+                return action
+                
+        console.log "can't find action with name '#{name}'"
+        return null
+        
+        # if action.combos?
+            # combos = action.combos
+        # else combos = [action.combo]
+        # for actionCombo in combos
+            # if combo == actionCombo
+                # if action.key? and _.isFunction @[action.key]
+                    # @[action.key] key, combo: combo, mod: mod, event: event
+                    # return
+        
     # 000000000  000   000  00000000   00000000
     #    000      000 000   000   000  000     
     #    000       00000    00000000   0000000 

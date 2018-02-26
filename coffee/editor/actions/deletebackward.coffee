@@ -5,8 +5,7 @@
 # 000   000  000   000  000       000  000   000   000  000   000  000   000  000   000
 # 0000000    000   000   0000000  000   000  00     00  000   000  000   000  0000000
 
-{ reversed, log, _
-} = require 'kxk'
+{ reversed, log, _ } = require 'kxk'
 
 module.exports =
 
@@ -16,24 +15,20 @@ module.exports =
         deleteBackward:
             name:  'Delete Backward'
             text:  'delete character to the left'
-            combos: ['backspace', 'command+backspace', 'alt+backspace', 'shift+backspace']
             combo: 'backspace'
 
         deleteBackwardIgnoreLineBoundary:
             name:   'Delete Backward Over Line Boundaries'
-            combo:  'CmdOrCtrl+backspace'
+            combo:  'cmdorctrl+backspace'
 
         deleteBackwardSwallowWhitespace:
             name:   'Delete Backward Over Whitespace'
             combo:  'alt+backspace'
 
-    deleteBackward: (key, info) ->
-
-        info = key if not info? and _.isObject key
-        opt = _.clone info
-        switch info?.combo
-            when 'command+backspace' then opt.ignoreLineBoundary = true
-            when 'alt+backspace'     then opt.ignoreTabBoundary  = true
+    deleteBackwardIgnoreLineBoundary: -> @deleteBackward ignoreLineBoundary:true 
+    deleteBackwardSwallowWhitespace:  -> @deleteBackward ignoreTabBoundary:true 
+            
+    deleteBackward: (opt) ->
 
         @do.start()
         if @do.numSelections()

@@ -446,8 +446,8 @@ class Main
             show:             false
             hasShadow:        true
             backgroundColor:  scheme == 'bright' and "#fff" or '#000'
-            autoHideMenuBar:  true
             titleBarStyle:    'hidden'
+            # autoHideMenuBar:  true
             
         if os.platform() == 'win32'
             cfg.icon = slash.path __dirname + '/../img/ko.ico'

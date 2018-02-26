@@ -5,8 +5,7 @@
 # 000       000   000  000   000  000   000  000   000  000   000  000   000
 # 000        0000000   000   000  00     00  000   000  000   000  0000000  
 
-{ reversed, log 
-} = require 'kxk' 
+{ reversed, log } = require 'kxk' 
 
 module.exports =
     
@@ -15,7 +14,6 @@ module.exports =
         
         deleteForward:
             name:   'Delete Forward'
-            combos: ['delete', 'ctrl+backspace']
             combo:  'delete'
             text:   'delete character to the right'
 

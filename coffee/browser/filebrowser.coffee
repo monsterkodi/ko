@@ -66,7 +66,7 @@ class FileBrowser extends Browser
         @loadID++
         opt.loadID = @loadID
         
-        log 'filebrowser.loadDir', dir, opt
+        # log 'filebrowser.loadDir', dir, opt
         
         dirlist dir, opt, (err, items) => 
             

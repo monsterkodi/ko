@@ -5,8 +5,7 @@
 #    000     000   000  000   000  000   000  000      000             000   000  000     000
 #    000      0000000    0000000    0000000   0000000  00000000         0000000   000     000
 
-{ reversed, empty, log, _
-} = require 'kxk'
+{ reversed, empty, log, _ } = require 'kxk'
 
 module.exports =
 
