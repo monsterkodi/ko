@@ -10,7 +10,6 @@
 module.exports =
     
     actions:
-        menu: 'Select'
                     
         selectAll:
             name:  'Select All'
@@ -42,11 +41,12 @@ module.exports =
                 """
             combo: 'cmdorctrl+alt+b'
 
-        startStickySelection:
+        toggleStickySelection:
             separator: true
             name:  'Toggle Sticky Selection'
             text:  'current selection is not removed when adding new selections'
-            combo: 'cmdorctrl+`'
+            combo: 'command+`'
+            accel: "ctrl+'"
             
     selectSingleRange: (r, opt = extend:false) ->
         
@@ -65,13 +65,18 @@ module.exports =
     #      000     000     000  000       000  000      000     
     # 0000000      000     000   0000000  000   000     000     
     
-    startStickySelection: () ->
+    toggleStickySelection: ->
+        log 'toggleStickySelection', @stickySelection
+        if @stickySelection then @endStickySelection()
+        else @startStickySelection()
+    
+    startStickySelection: ->
         
         @stickySelection = true
         post.emit 'sticky', true
         @emit 'selection'
 
-    endStickySelection: () ->
+    endStickySelection: ->
         
         @stickySelection = false
         post.emit 'sticky', false

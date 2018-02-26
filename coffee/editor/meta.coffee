@@ -47,7 +47,7 @@ class Meta
             for meta in @metasAtLineIndex li
                 if meta[2].clss == "searchResult" and meta[2].href?
                     [file, line] = slash.splitFileLine meta[2].href
-                    log 'meta.onChanged searchResult:', file, line
+                    # log 'meta.onChanged searchResult:', file, line
                     line -= 1
                     localChange = _.cloneDeep change
                     localChange.oldIndex = line

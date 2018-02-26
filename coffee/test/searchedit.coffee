@@ -46,7 +46,7 @@ describe 'search edit', ->
         expect(editor.text()) .to.eql texta
             
     it 'start search', ->
-        commandline.startCommand 'search', 'command+shift+f'
+        commandline.startCommand 'search'
         expect(commandline.command.name) .to.eql 'search'
         
     it 'search', (done) ->

@@ -21,7 +21,6 @@ class Coffee extends Command
         @cmdID      = 0
         @browser    = new ObjectBrowser window.area.view
         @commands   = Object.create null
-        @shortcuts  = ['alt+c', 'alt+shift+c']
         @names      = ["coffee", "Coffee"]
         
         @maxHistory = 99
@@ -151,8 +150,8 @@ class Coffee extends Command
     #      000     000     000   000  000   000     000     
     # 0000000      000     000   000  000   000     000     
     
-    start: (@combo) ->
-        super @combo
+    start: (name) ->
+        super name
         select: true
         do:     'third commandline'
 

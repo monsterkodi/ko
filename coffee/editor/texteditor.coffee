@@ -710,22 +710,20 @@ class TextEditor extends Editor
 
         if char and mod in ["shift", ""]
             
-            log 'insertCharacter', char
-            
             return @insertCharacter char
 
         'unhandled'
 
     onKeyDown: (event) =>
 
-        {mod, key, combo, char} = keyinfo.forEvent event
+        { mod, key, combo, char } = keyinfo.forEvent event
 
         return if not combo
         return if key == 'right click' # weird right command key
 
         result = @handleModKeyComboCharEvent mod, key, combo, char, event
 
-        # log 'textEditor.onKeyDown', key, combo, result
+        # log 'textEditor.onKeyDown', key, combo, 'unhandled' != result
         
         if 'unhandled' != result
             stopEvent event

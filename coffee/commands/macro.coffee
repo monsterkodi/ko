@@ -22,7 +22,6 @@ class Macro extends Command
 
         super commandline
 
-        @shortcuts = ['command+m']
         @macros    = ['clean', 'help', 'dbg', 'class', 'req', 'inv', 'blink', 'color', 'fps', 'test']
         @macros    = @macros.concat window.editor.Transform.transformNames
         @names     = ['macro']
@@ -34,9 +33,9 @@ class Macro extends Command
     #      000     000     000   000  000   000     000
     # 0000000      000     000   000  000   000     000
 
-    start: (@combo) ->
+    start: (name) ->
         
-        super @combo
+        super name
         text = @last()
         text = 'dbg' if not text?.length
         text:   text

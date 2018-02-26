@@ -20,7 +20,6 @@ class Term extends Command
         post.on 'shellCommandData', @onShellCommandData
         @idCommands = Object.create null
         @commandIDs = Object.create null
-        @shortcuts  = ['command+,', 'command+shift+,']
         @names      = ['term', 'Term']
         @alias      = new store 'alias'
         
@@ -295,11 +294,11 @@ class Term extends Command
     #      000     000     000   000  000   000     000
     # 0000000      000     000   000  000   000     000
 
-    start: (@combo) ->
+    start: (name) ->
 
         @getPWD 'autocd' if @autocd
 
-        super @combo
+        super name
         text:   @last()
         select: true
         do:     'show terminal'

@@ -16,6 +16,7 @@ syntax   = require '../editor/syntax'
 fuzzy    = require 'fuzzy'
         
 relative = (rel, to) ->
+    
     r = slash.relative rel, to
 
     if r.startsWith '../../' 
@@ -32,13 +33,11 @@ class Open extends Command
         
         super commandline
         
-        @shortcuts  = ['command+p', 'command+shift+p', 'command+alt+p']
         @names      = ["open", "new tab", "new window"]
         @files      = null
         @file       = null
         @dir        = null
         @pkg        = null
-        @combo      = null
         @selected   = 0
         @navigating = false
                     
@@ -276,13 +275,14 @@ class Open extends Command
     # 000       000   000  000  0000  000       000       000    
     #  0000000  000   000  000   000   0000000  00000000  0000000
     
-    cancel: (combo) ->
+    cancel: (name) ->
         
-        if combo == @shortcuts[0]
+        if name == @names[0] # command+p command+p to open previous file
             if not @navigating and @commandList? and @lastFileIndex == @selected
                 @stopWalkers()
-                return @execute()                
-        super combo
+                return @execute()
+                
+        super name
     
     cancelList: ->
         
@@ -295,7 +295,7 @@ class Open extends Command
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
         
-    start: (@combo) -> 
+    start: (name) -> 
         
         opt = reload: true
             
@@ -309,7 +309,7 @@ class Open extends Command
             
         @loadDir opt
 
-        super @combo
+        super name
         
         @selected = null
         

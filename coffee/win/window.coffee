@@ -111,7 +111,6 @@ post.on 'openFile',   (opt)  -> openFile  opt
 post.on 'reloadTab', (file)  -> reloadTab file
 post.on 'loadFile',  (file)  -> loadFile  file
 post.on 'loadFiles', (files) -> openFiles files
-post.on 'menuCombo', (combo) -> menuCombo combo
 post.on 'menuAction', (action) -> menuAction action
 post.on 'editorFocus', (editor) ->
     window.focusEditor = editor
@@ -554,37 +553,47 @@ window.onfocus = (event) ->
         else
             split.focus 'commandline-editor'
 
-# 00     00  00000000  000   000  000   000      0000000   0000000   00     00  0000000     0000000   
-# 000   000  000       0000  000  000   000     000       000   000  000   000  000   000  000   000  
-# 000000000  0000000   000 0 000  000   000     000       000   000  000000000  0000000    000   000  
-# 000 0 000  000       000  0000  000   000     000       000   000  000 0 000  000   000  000   000  
-# 000   000  00000000  000   000   0000000       0000000   0000000   000   000  0000000     0000000   
-
-menuCombo = (combo) ->
-
-    { mod, key, combo, char } = keyinfo.forCombo combo
-    log 'menuCombo', mod, key, combo, char
-    return if window.focusEditor and 'unhandled' != window.focusEditor.handleModKeyComboCharEvent mod, key, combo, char
-    handleModKeyComboCharEvent mod, key, combo, char
+# 00     00  00000000  000   000  000   000      0000000    0000000  000000000  000   0000000   000   000  
+# 000   000  000       0000  000  000   000     000   000  000          000     000  000   000  0000  000  
+# 000000000  0000000   000 0 000  000   000     000000000  000          000     000  000   000  000 0 000  
+# 000 0 000  000       000  0000  000   000     000   000  000          000     000  000   000  000  0000  
+# 000   000  00000000  000   000   0000000      000   000   0000000     000     000   0000000   000   000  
 
 menuAction = (name) ->
     
     if action = Editor.actionWithName name
-        # log "window.menuAction #{name}", action
+        # log "window.menuAction #{name}"
         if action.key? and _.isFunction window.focusEditor[action.key]
-            # log "window.menuAction execute ---------------------- ", action
+            # log "window.menuAction execute --- ", name
             window.focusEditor[action.key]()
             return
             
+    log "window.menuAction #{name}"
+            
     switch name
         
-        when 'Undo'    then return @window.focusEditor.do.undo()
-        when 'Redo'    then return @window.focusEditor.do.redo()
-        when 'Cut'     then return @window.focusEditor.cut()
-        when 'Copy'    then return @window.focusEditor.copy()
-        when 'Paste'   then return @window.focusEditor.paste()
-        when 'New Tab' then return post.emit 'newEmptyTab'
-            
+        when 'Undo'               then return @window.focusEditor.do.undo()
+        when 'Redo'               then return @window.focusEditor.do.redo()
+        when 'Cut'                then return @window.focusEditor.cut()
+        when 'Copy'               then return @window.focusEditor.copy()
+        when 'Paste'              then return @window.focusEditor.paste()
+        when 'New Tab'            then return post.emit 'newEmptyTab'
+        when 'Toggle Scheme'      then return scheme.toggle()
+        when 'Toggle Center Text' then return toggleCenterText()
+        when 'Font Size Increase' then return changeFontSize +1
+        when 'Font Size Decrease' then return changeFontSize -1
+        when 'Font Size Reset'    then return resetFontSize()
+        when 'Open Window List'   then return titlebar.showList()
+        when 'Navigate Backward'  then return navigate.backward()
+        when 'Navigate Forward'   then return navigate.forward()
+        when 'Maximize Editor'    then return split.maximizeEditor()
+        
+    
+    if 'unhandled' != window.commandline.handleMenuAction name
+        return
+        
+    log "unhandled menu action! ------------ #{name}"
+        
 # 000   000  00000000  000   000
 # 000  000   000        000 000
 # 0000000    0000000     00000
@@ -599,7 +608,9 @@ onKeyDown = (event) ->
 handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
         
     return if not combo
+    
     # log 'handleModKeyComboCharEvent1', 'mod', mod, 'key', key, 'combo', combo, 'char', char
+    
     return stopEvent(event) if 'unhandled' != window.titlebar   .globalModKeyComboEvent mod, key, combo, event
     return stopEvent(event) if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
 
@@ -613,8 +624,6 @@ handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
         when 'CmdOrCtrl+alt+i'    then return stopEvent event, win.webContents.toggleDevTools()
         when 'ctrl+w'             then return stopEvent event, loadFile()
         # when 'f3'                 then return stopEvent event, screenShot()
-        when 'alt+i'              then return stopEvent event, scheme.toggle()
-        when 'command+\\'         then return stopEvent event, toggleCenterText()
         when 'command+alt+k', 'alt+ctrl+k' then return stopEvent event, split.toggleLog()
         when 'alt+k'    
             log 'focusEditor', window.focusEditor.name
@@ -623,17 +632,12 @@ handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
         # when 'alt+ctrl+left'      then return stopEvent event, post.toMain 'activatePrevWindow', winID
         # when 'alt+ctrl+right'     then return stopEvent event, post.toMain 'activateNextWindow', winID
         # when 'command+alt+shift+k', 'alt+ctrl+shift+k' then return stopEvent event, split.showOrClearLog()
-        when 'command+='          then return stopEvent event, changeFontSize +1
-        when 'command+-'          then return stopEvent event, changeFontSize -1
-        when 'command+0'          then return stopEvent event, resetFontSize()
         when 'command+shift+='    then return stopEvent event, @changeZoom +1
         when 'command+shift+-'    then return stopEvent event, @changeZoom -1
         when 'command+shift+0'    then return stopEvent event, @resetZoom()
-        when 'alt+`'              then return stopEvent event, titlebar.showList()
-        when 'command+alt+left',  'alt+ctrl+left'   then return stopEvent event, navigate.backward()
-        when 'command+alt+right', 'alt+ctrl+right'  then return stopEvent event, navigate.forward()
-        when 'command+shift+y'    then return stopEvent event, split.maximizeEditor()
         when 'command+alt+y'      then return stopEvent event, split.do 'minimize editor'
+        
+    # log 'handleModKeyComboCharEvent3'
 
 document.addEventListener 'keydown', onKeyDown        
         

@@ -19,10 +19,6 @@ class Search extends Command
         
         super commandline
         
-        if os.platform() == 'win32'
-            @shortcuts = ["ctrl+shift+f", "alt+shift+f", "alt+ctrl+shift+f", ""]
-        else
-            @shortcuts = ["command+shift+f", "ctrl+shift+f", "alt+shift+f", "alt+ctrl+shift+f"]
         @names = ["search", "Search", "/search/", "/Search/"]
      
     historyKey: -> @name
@@ -107,7 +103,7 @@ class Search extends Command
             split = href.split '>'
             if window.commandline.commands[split[1]]?
                 command = window.commandline.commands[split[1]]
-                window.commandline.startCommand split[1], command.shortcuts[0]
+                window.commandline.startCommand split[1]
                 window.commandline.setText split[2]
                 command.execute split[2]
         else

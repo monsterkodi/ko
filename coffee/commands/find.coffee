@@ -15,10 +15,6 @@ class Find extends Command
         
         super commandline
         
-        if os.platform() == 'win32'
-            @shortcuts = ["ctrl+f", "alt+f", "alt+ctrl+f", "", ""]
-        else
-            @shortcuts = ["command+f", "ctrl+f", "alt+f", "alt+ctrl+f", "command+alt+f", "command+ctrl+f"]
         @types     = ['str',  'Str',   'reg',    'Reg',    'fuzzy', 'glob']
         @names     = ['find', 'Find',  '/find/', '/Find/', 'fiZd',  'f*nd']
        
@@ -30,9 +26,9 @@ class Find extends Command
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
         
-    start: (@combo) ->
-        @type = @types[@shortcuts.indexOf @combo]
-        super @combo
+    start: (name) ->
+        @type = @types[@names.indexOf name]
+        super name
 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000

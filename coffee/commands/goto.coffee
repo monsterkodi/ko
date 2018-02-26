@@ -15,7 +15,6 @@ class Goto extends Command
         
         super commandline
         
-        @shortcuts = ['command+;', 'command+shift+;']
         @names     = ['goto', 'selecto']
 
     #  0000000  000000000   0000000   00000000   000000000
@@ -24,8 +23,8 @@ class Goto extends Command
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
         
-    start: (@combo) ->
-        super @combo
+    start: (name) ->
+        super name
         @showList()
         @showItems @listItems() 
         @select 0

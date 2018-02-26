@@ -16,7 +16,6 @@ class Browse extends Command
 
         super commandline
 
-        @shortcuts = ['command+.', 'command+shift+.']
         @cmdID     = 0
         @browser   = new FileBrowser window.area.view
         @commands  = Object.create null
@@ -45,7 +44,7 @@ class Browse extends Command
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
     
-    start: (@combo) ->
+    start: (@action) ->
         
         @browser.start()
         
@@ -55,7 +54,7 @@ class Browse extends Command
         else 
             @browser.loadDir process.cwd()
 
-        super @combo
+        super @action
         
         select: true
         do:     @name == 'Browse' and 'half area' or 'quart area'

@@ -15,6 +15,7 @@ fuzzy       = require 'fuzzy'
 class Command
 
     constructor: (@commandline) ->
+        
         @syntaxName   = 'ko'
         @maxHistory   = 20
 
@@ -26,11 +27,9 @@ class Command
     
     state: ->
         text:  @getText()
-        name:  @names[0]
-        combo: @combo
+        name:  @name
         
     restoreState: (state) ->
-        @combo = state.combo
         @name  = state.name
         @loadState()
         
@@ -40,10 +39,9 @@ class Command
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
     
-    start: (@combo) ->
+    start: (name) ->
         
-        index = @shortcuts.indexOf @combo
-        @setName @names[index]
+        @setName name
         @loadState()
         text = @getText()
         text = @last() if not text?.length

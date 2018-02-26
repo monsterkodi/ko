@@ -17,7 +17,6 @@ class Build extends Command
         
         @cmdID      = 0
         @commands   = Object.create null
-        @shortcuts  = ['command+b', 'command+shift+b']
         @names      = ["build", 'Build']
         window.area.on 'resized', @onAreaResized
 
@@ -33,8 +32,8 @@ class Build extends Command
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
     
-    start: (@combo) ->
-        super @combo
+    start: (name) ->
+        super name
         text:   @last()
         select: true
         do:     'show area'

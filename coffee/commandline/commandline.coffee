@@ -147,11 +147,10 @@ class Commandline extends TextEditor
     #      000     000     000   000  000   000     000
     # 0000000      000     000   000  000   000     000
 
-    startCommand: (name, combo, event) ->
+    startCommand: (name) ->
 
-        stopEvent event
-
-        r = @command?.cancel combo
+        r = @command?.cancel name
+        
         if r?.status == 'ok'
             @results r
             return
@@ -167,9 +166,8 @@ class Commandline extends TextEditor
         @command.setFocus activeID != 'commandline-editor' and activeID or null
         @view.focus()
         @setName name
-        combo = @command.shortcuts[0] if not combo?
 
-        @results @command.start combo # <-- command start
+        @results @command.start name # <-- command start
 
         @button.className = "commandline-button active #{@command.prefsID}"
 
@@ -228,19 +226,17 @@ class Commandline extends TextEditor
         @list.style.display = 'unset'
         for name in @mainCommands
             cmmd = @commands[name]
-            for ci in [0...cmmd.shortcuts.length]
-                combo = cmmd.shortcuts[ci]
+            for ci in [0...cmmd.names.length]
                 cname = cmmd.names[ci]
                 continue if cname in @hideCommands
                 div = elem class: "list-item"
-                namespan = "<span class=\"ko command #{cmmd.prefsID}\" style=\"position:absolute; left: #{ci > 0 and 40 or 6}px\">#{cname}</span>"
-                shortcut = "<span class=\"ko shortcut #{cmmd.prefsID}\"style=\"position:absolute; right: 6px;\">#{keyinfo.short combo}</span>"
-                div.innerHTML = namespan + shortcut
-                start = (name,combo) => (event) =>
+                namespan = "<span class=\"ko command #{cmmd.prefsID}\" style=\"position:absolute; left: #{ci > 0 and 80 or 12}px\">#{cname}</span>"
+                div.innerHTML = namespan
+                start = (name) => (event) =>
                     @hideList()
-                    @startCommand name, combo
+                    @startCommand name
                     stopEvent event
-                div.addEventListener 'mousedown', start name, combo
+                div.addEventListener 'mousedown', start name
                 @list.appendChild div
 
     hideList: ->
@@ -284,14 +280,19 @@ class Commandline extends TextEditor
     # 000  000   000          000
     # 000   000  00000000     000
 
+    handleMenuAction: (name) ->
+        
+        for n,c of @commands
+            if n == name
+                @startCommand n
+                return
+                
+        'unhandled'
+    
     globalModKeyComboEvent: (mod, key, combo, event) ->
 
         if combo == 'esc'
             if document.activeElement == @view then return @cancel()
-
-        for n,c of @commands
-            for sc in c.shortcuts
-                if sc == combo then return @startCommand n, combo, event
 
         if @command?
             return @command.globalModKeyComboEvent mod, key, combo, event
