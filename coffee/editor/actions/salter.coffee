@@ -42,6 +42,7 @@ module.exports =
             @do.start()
             newCursors = ([col, r[0]] for r in rgs)
             @do.setCursors newCursors, main: 'last'
+            @do.select []
             @do.end()
             
         else # create new header

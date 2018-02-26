@@ -568,12 +568,23 @@ menuCombo = (combo) ->
     handleModKeyComboCharEvent mod, key, combo, char
 
 menuAction = (name) ->
+    
     if action = Editor.actionWithName name
         # log "window.menuAction #{name}", action
         if action.key? and _.isFunction window.focusEditor[action.key]
             # log "window.menuAction execute ---------------------- ", action
             window.focusEditor[action.key]()
-    
+            return
+            
+    switch name
+        
+        when 'Undo'    then return @window.focusEditor.do.undo()
+        when 'Redo'    then return @window.focusEditor.do.redo()
+        when 'Cut'     then return @window.focusEditor.cut()
+        when 'Copy'    then return @window.focusEditor.copy()
+        when 'Paste'   then return @window.focusEditor.paste()
+        when 'New Tab' then return post.emit 'newEmptyTab'
+            
 # 000   000  00000000  000   000
 # 000  000   000        000 000
 # 0000000    0000000     00000

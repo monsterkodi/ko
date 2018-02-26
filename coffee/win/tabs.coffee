@@ -29,6 +29,8 @@ class Tabs
             onStop:  @onDragStop
         
         post.on 'newTabWithFile',   @onNewTabWithFile
+        post.on 'newEmptyTab',      @onNewEmptyTab
+        
         post.on 'closeTabOrWindow', @onCloseTabOrWindow
         post.on 'closeOtherTabs',   @onCloseOtherTabs
         post.on 'stash',            @stash
@@ -184,6 +186,10 @@ class Tabs
         @update()
         tab
 
+    onNewEmptyTab: =>
+        
+        @addTab('untitled').activate()
+        
     onNewTabWithFile: (file) =>
         
         [file, line, col] = slash.splitFileLine file

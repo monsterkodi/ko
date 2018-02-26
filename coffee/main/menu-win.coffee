@@ -68,8 +68,8 @@ class Menu
             role: 'file'
             submenu: [
                 label:       'New Tab'
-                accelerator: 'Ctrl+N'
-                click:       (i,win) -> post.toWin win.id, "newTabWithFile"
+                accelerator: 'cmdorctrl+n'
+                click:       (i,win) -> post.toWin win.id, 'menuAction', 'New Tab'
             ,
                 label:       'New Window'
                 accelerator: 'Ctrl+Shift+N'
@@ -366,26 +366,26 @@ class Menu
         
         editMenu = AppMenu.buildFromTemplate [
             label: 'Undo', 
-            click: (i,win) -> post.toWin win.id, 'menuCombo', 'command+z'
-            accelerator: 'Ctrl+Z'
+            click: (i,win) -> post.toWin win.id, 'menuAction', 'Undo'
+            accelerator: 'cmdorctrl+z'
         ,
             label: 'Redo', 
-            click: (i,win) -> post.toWin win.id, 'menuCombo', 'command+shift+z'
-            accelerator: 'Ctrl+Shift+Z'
+            click: (i,win) -> post.toWin win.id, 'menuAction', 'Redo'
+            accelerator: 'cmdorctrl+shift+z'
         ,
             type: 'separator'
         ,
             label: 'Cut', 
-            click: (i,win) -> post.toWin win.id, 'menuCombo', 'command+x'
-            accelerator: 'Ctrl+X'
+            click: (i,win) -> post.toWin win.id, 'menuAction', 'Cut'
+            accelerator: 'cmdorctrl+x'
         ,
             label: 'Copy', 
-            click: (i,win) -> post.toWin win.id, 'menuCombo', 'command+c'
-            accelerator: 'Ctrl+C'
+            click: (i,win) -> post.toWin win.id, 'menuAction', 'Copy'
+            accelerator: 'cmdorctrl+c'
         ,
             label: 'Paste', 
-            click: (i,win) -> post.toWin win.id, 'menuCombo', 'command+v'
-            accelerator: 'Ctrl+V'
+            click: (i,win) -> post.toWin win.id, 'menuAction', 'Paste'
+            accelerator: 'cmdorctrl+v'
         ,
             type: 'separator'
         ]

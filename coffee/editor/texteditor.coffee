@@ -695,25 +695,23 @@ class TextEditor extends Editor
                     return @selectNone()
 
         for action in Editor.actions
+            
+            if action.combo == combo
+                log "unhandled on combo? #{combo}"
+                return 'unhandled'
+                
             continue if not action.combos?
+            
             for actionCombo in action.combos
                 if combo == actionCombo
                     if action.key? and _.isFunction @[action.key]
                         @[action.key] key, combo: combo, mod: mod, event: event
                         return
 
-        switch combo
-            when 'command+z'       then return @do.undo()
-            when 'command+shift+z' then return @do.redo()
-            when 'command+t'       then return post.emit 'newTabWithFile'
-
-        if os.platform() == 'win32'
-            switch combo
-                when 'ctrl+x' then return @cut()
-                when 'ctrl+c' then return @copy()
-                when 'ctrl+v' then return @paste()
-            
         if char and mod in ["shift", ""]
+            
+            log 'insertCharacter', char
+            
             return @insertCharacter char
 
         'unhandled'

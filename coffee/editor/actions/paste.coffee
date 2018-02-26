@@ -13,13 +13,16 @@ clipboard = electron.clipboard
 module.exports = 
 
     actions:
-        cut:
-            combo: 'CmdOrCtrl+x'
-        copy:
-            combo: 'CmdOrCtrl+c'
-        paste:
-            combo: 'CmdOrCtrl+v'
+        
+        cutCopyPaste:
+            combos: ['command+x', 'ctrl+x', 'command+c', 'ctrl+c', 'command+v', 'ctrl+v']
     
+    cutCopyPaste: (key, info) ->
+        switch key
+            when 'x' then @cut()
+            when 'c' then @copy()
+            when 'v' then @paste()
+            
     cut: ->
         @do.start()
         @copy()
