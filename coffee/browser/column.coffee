@@ -293,7 +293,7 @@ class Column
         
         {mod, key, combo, char} = keyinfo.forEvent event
 
-        log mod, key, combo, char
+        # log mod, key, combo, char
 
         switch combo
             when 'up', 'down', 'page up', 'page down', 'home', 'end' 

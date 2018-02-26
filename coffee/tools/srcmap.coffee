@@ -7,7 +7,8 @@
 
 { fs, slash, log } = require 'kxk'
 
-sourceMap = require 'source-map'
+sourceMap  = require 'source-map'
+mapConvert = require 'convert-source-map'
 
 toCoffee  = (jsFile, jsLine, jsCol=0) ->
 
@@ -20,11 +21,11 @@ toCoffee  = (jsFile, jsLine, jsCol=0) ->
         
     if not jsLine? then return coffeeFile
         
-    mapFile = jsFile + '.map'
+    mapFile = jsFile
     
     if slash.fileExists mapFile
-        mapData = fs.readFileSync mapFile, 'utf8'
-        consumer = new sourceMap.SourceMapConsumer mapData 
+        mapData = mapConvert.fromSource(fs.readFileSync mapFile, 'utf8').toObject()
+        consumer = new sourceMap.SourceMapConsumer(mapData)
         pos = consumer.originalPositionFor line:jsLine, column:jsCol, bias: sourceMap.SourceMapConsumer.LEAST_UPPER_BOUND
         coffeeLine = pos.line
         coffeeCol  = pos.column
@@ -45,12 +46,12 @@ toJs = (coffeeFile, coffeeLine, coffeeCol=0) ->
         
     if not coffeeLine? then return jsFile
     
-    mapFile = jsFile + '.map'
+    mapFile = jsFile
     
     if slash.fileExists mapFile
-        mapData = fs.readFileSync mapFile, 'utf8'
-        consumer = new sourceMap.SourceMapConsumer mapData 
-        srcFile = 'coffee/' + coffeeFile.split('/coffee/')[1]
+        mapData = mapConvert.fromSource(fs.readFileSync mapFile, 'utf8').toObject()
+        consumer = new sourceMap.SourceMapConsumer mapData
+        srcFile = 'js/'+jsFile.split('/js/')[1]
         poss = consumer.allGeneratedPositionsFor source:srcFile, line:coffeeLine, column:coffeeCol
         if not poss.length and coffeeCol
             poss = consumer.allGeneratedPositionsFor source:srcFile, line:coffeeLine, column:0
@@ -64,7 +65,6 @@ toJs = (coffeeFile, coffeeLine, coffeeCol=0) ->
     [jsFile, jsLine, jsCol]
         
 module.exports =
-    
     toJs:     toJs
     toCoffee: toCoffee
     

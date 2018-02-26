@@ -33,6 +33,7 @@ dependencies
                 chrome-remote-interface  =0.25.1
                 coffee-script   =1.12.7
                 colors          =1.1.2
+                convert-source-map  ^1.5.1
                 dmg             =0.1.0
                 download        =6.2.5
                 entities        =1.1.1

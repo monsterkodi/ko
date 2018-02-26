@@ -29,7 +29,7 @@ module.exports =
             for d in diss
                 if d.start <= p[0] <= d.start+d.match.length
                     [file, line, col] = slash.splitFileLine d.match
-                    if fileExists file
+                    if slash.fileExists file
                         post.emit 'jumpTo', file:file, line:line, col:col
                         return true
         false

@@ -104,12 +104,12 @@ class FileEditor extends TextEditor
         if not opt?.skip
             if not @currentFile?
                 post.emit 'file', @currentFile # titlebar -> tabs -> tab
-            log 'emit file', @currentFile
+            # log 'emit file', @currentFile
             @emit 'file', @currentFile # diffbar, pigments, ...
 
     restoreFromTabState: (tabsState) ->
 
-        log 'restoreFromTabState', tabsState
+        # log 'restoreFromTabState', tabsState
         return error "no tabsState.file?" if not tabsState.file?
         @clear skip:true
         @setCurrentFile tabsState.file, restoreState:tabsState.state
@@ -289,31 +289,33 @@ class FileEditor extends TextEditor
     jumpToCounterpart: () ->
 
         cp = @cursorPos()
-        currext = slash.extname @currentFile
+        currext = slash.ext @currentFile
 
+        # log 'jumpToCounterpart', cp, currext, @currentFile
+        
         switch currext
-            when '.coffee'
+            when 'coffee'
                 [file,line,col] = srcmap.toJs @currentFile, cp[1]+1, cp[0]
                 if file?
                     window.loadFile slash.joinFileLine file,line,col
                     return true
-            when '.js'
+            when 'js'
                 [file,line,col] = srcmap.toCoffee @currentFile, cp[1]+1, cp[0]
                 if file?
                     window.loadFile slash.joinFileLine file,line,col
                     return true
 
         counterparts =
-            '.cpp':     ['.hpp', '.h']
-            '.cc':      ['.hpp', '.h']
-            '.h':       ['.cpp', '.c']
-            '.hpp':     ['.cpp', '.c']
-            '.coffee':  ['.js']
-            '.js':      ['.coffee']
-            '.pug':     ['.html']
-            '.html':    ['.pug']
-            '.css':     ['.styl']
-            '.styl':    ['.css']
+            'cpp':     ['hpp', 'h']
+            'cc':      ['hpp', 'h']
+            'h':       ['cpp', 'c']
+            'hpp':     ['cpp', 'c']
+            'coffee':  ['js']
+            'js':      ['coffee']
+            'pug':     ['html']
+            'html':    ['pug']
+            'css':     ['styl']
+            'styl':    ['css']
 
         for ext in (counterparts[currext] ? [])
             if slash.fileExists slash.swapExt @currentFile, ext
@@ -322,7 +324,7 @@ class FileEditor extends TextEditor
 
         for ext in (counterparts[currext] ? [])
             counter = swapExt @currentFile, ext
-            counter = counter.replace "/#{currext.slice 1}/", "/#{ext.slice 1}/"
+            counter = counter.replace "/#{currext}/", "/#{ext}/"
             if slash.fileExists counter
                 window.loadFile counter
                 return true
@@ -393,12 +395,13 @@ class FileEditor extends TextEditor
     # 000   000  00000000     000
 
     handleModKeyComboCharEvent: (mod, key, combo, char, event) ->
-
+        
         return if 'unhandled' != super mod, key, combo, char, event
+        # log 'unhandled', combo
         switch combo
             when 'ctrl+enter'       then return window.commandline.commands.coffee.executeText @text()
             when 'ctrl+shift+enter' then return window.commandline.commands.coffee.executeTextInMain @text()
-            when 'command+alt+up'   then return @jumpToCounterpart()
+            when 'command+alt+up', 'alt+ctrl+up' then return @jumpToCounterpart()
             when 'esc'
                 split = window.split
                 if split.terminalVisible()

@@ -340,13 +340,13 @@ class Open extends Command
             if not slash.dirExists opt.dir
                 return false
 
-        log 'open.loadDir opt.dir:', opt.dir
+        # log 'open.loadDir opt.dir:', opt.dir
         @dir ?= slash.resolve '.'
-        log 'open.loadDir @dir:', @dir
+        # log 'open.loadDir @dir:', @dir
         newdir = @resolvedPath(opt.dir) ? @dir
         return false if newdir == @dir and not opt.reload
         
-        log 'open.loadDir newdir:', newdir
+        # log 'open.loadDir newdir:', newdir
         
         @dir = newdir
         

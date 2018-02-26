@@ -19,29 +19,29 @@ module.exports =
         alignCursors:
             name: 'Align Cursors'
             text: 'align cursors vertically with (top|bottom|left|right)-most cursor'
-            combos: ['alt+ctrl+up', 'alt+ctrl+down', 'alt+ctrl+left', 'alt+ctrl+right']
+            combos: ['alt+ctrl+shift+up', 'alt+ctrl+shift+down', 'alt+ctrl+shift+left', 'alt+ctrl+shift+right']
 
         alignCursorsTop:
             separator: true
             name: 'Align Cursors with Top-most Cursor'
-            combo: 'alt+ctrl+up'
+            combo: 'alt+ctrl+shift+up'
 
         alignCursorsBottom:
             name: 'Align Cursors with Bottom-most Cursor'
-            combo: 'alt+ctrl+down'
+            combo: 'alt+ctrl+shift+down'
 
         alignCursorsLeft:
             name: 'Align Cursors with Left-most Cursor'
-            combo: 'alt+ctrl+left'
+            combo: 'alt+ctrl+shift+left'
 
         alignCursorsRight:
             name: 'Align Cursors with Right-most Cursor'
-            combo: 'alt+ctrl+right'
+            combo: 'alt+ctrl+shift+right'
 
         alignCursorsAndText:
             name: 'Align Cursors and Text'
             text: 'align text to the right of cursors by inserting spaces'
-            combo: 'alt+ctrl+shift+right'
+            combo: 'alt+ctrl+right'
 
         setCursorsAtSelectionBoundariesOrSelectSurround:
             separator: true
@@ -79,10 +79,10 @@ module.exports =
             combo: 'CmdOrCtrl+shift+down'
 
         cursorHome:
-            combo: 'home'
+            combo: 'ctrl+home'
 
         cursorEnd:
-            combo: 'end'
+            combo: 'ctrl+end'
 
         cursorPageUp:
             combo: 'page up'

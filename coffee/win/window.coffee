@@ -318,7 +318,7 @@ loadFile = (file, opt={}) ->
 
     file = null if file? and file.length <= 0
 
-    post.toMain 'winlog', winID, "loadFile #{file}"
+    log "loadFile #{file}"
 
     editor.saveScrollCursorsAndSelections()
 

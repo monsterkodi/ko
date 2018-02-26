@@ -43,7 +43,7 @@ module.exports =
         moveCursorsToLineBoundary:
             name:   'move cursors to line boundaries'
             text:   'moves cursors to line boundaries. extends selections, if shift is pressed.'
-            combos: ['command+shift+left', 'command+shift+right', 'ctrl+shift+left', 'ctrl+shift+right', 'ctrl+e', 'ctrl+shift+e', 'ctrl+a', 'ctrl+shift+a']
+            combos: ['home', 'end', 'command+shift+left', 'command+shift+right', 'ctrl+shift+left', 'ctrl+shift+right', 'ctrl+e', 'ctrl+shift+e', 'ctrl+a', 'ctrl+shift+a']
 
         moveMainCursor:
             name:   'move main cursor'
@@ -119,8 +119,8 @@ module.exports =
         @do.start()
         extend = info.extend ? 0 <= info.mod.indexOf 'shift'
         func = switch key
-            when 'right', 'e' then (c) => [@do.line(c[1]).length, c[1]]
-            when 'left', 'a'  then (c) => 
+            when 'right', 'e', 'end' then (c) => [@do.line(c[1]).length, c[1]]
+            when 'left', 'a', 'home'  then (c) => 
                 if @do.line(c[1]).slice(0,c[0]).trim().length == 0
                     [0, c[1]]
                 else

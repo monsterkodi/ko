@@ -4,7 +4,7 @@
 # 000 0 000  000   000  000  000  0000
 # 000   000  000   000  000  000   000
 
-{ fileList, childp, about, prefs, store, noon, post, slash, os, fs, str, empty, error, log, _ } = require 'kxk'
+{ fileList, childp, about, prefs, store, noon, post, slash, os, fs, str, empty, error, _ } = require 'kxk'
   
 pkg      = require '../../package.json'
 Execute  = require './execute'
@@ -16,12 +16,21 @@ electron = require 'electron'
 Menu     = if os.platform() == 'win32' then require './menu-win' else require './menu'
 
 { BrowserWindow, Tray, app, clipboard, dialog } = electron
+
 disableSnap   = false
 main          = undefined # < created in app.on 'ready'
 tray          = undefined # < created in Main.constructor
 coffeeExecute = undefined # <
 openFiles     = []
 WIN_SNAP_DIST = 150
+
+slog = require('kxk').log.slog
+slog.filepad = slog.filepad + 5 
+log = -> 
+    s = (str(s) for s in [].slice.call arguments, 0).join " " 
+    slog s
+
+post.on 'slog', (s) -> console.log s
 
 process.env.NODE_ENV = 'production'
 
@@ -125,8 +134,8 @@ post.on 'activateNextWindow', (winID) -> main.activateNextWindow winID
 post.on 'activatePrevWindow', (winID) -> main.activatePrevWindow winID
 post.on 'fileSaved',    (file, winID) -> main.indexer.indexFile file, refresh: true
 post.on 'fileLoaded',   (file, winID) -> main.indexer.indexFile file
-post.on 'winlog',       (winID, text) -> console.log "win#{winID} ", text
 post.on 'ping', (winID, argA, argB) -> post.toWin winID, 'pong', 'main', argA, argB
+post.on 'winlog',       (winID, text) -> console.log "#{winID}>>> " + text
             
 winShells = {}
 
@@ -474,7 +483,7 @@ class Main
                 post.toWin win.id, 'loadFile', opt.file
             else
                 log 'createWindow.winLoaded no file to open?'
-                post.toWin win.id, 'loadFile', slash.path __filename
+                # post.toWin win.id, 'loadFile', slash.path __filename
                 
             post.toWins 'winLoaded', win.id
             post.toWins 'numWins', wins().length
