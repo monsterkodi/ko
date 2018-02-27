@@ -27,6 +27,10 @@ class Find extends Command
     # 0000000      000     000   000  000   000     000   
         
     start: (name) ->
+        if name == 'find'
+            log 'find.start', name
+            window.editor.highlightForFind()
+            window.split.focus 'commandline'
         @type = @types[@names.indexOf name]
         super name
 

@@ -65,6 +65,8 @@ class Editor extends Buffer
                 return action
                 
         console.log "can't find action with name '#{name}'"
+        for action in Editor.actions
+            log action.name
         return null
         
         # if action.combos?

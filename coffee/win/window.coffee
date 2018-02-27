@@ -560,16 +560,10 @@ window.onfocus = (event) ->
 # 000   000  00000000  000   000   0000000      000   000   0000000     000     000   0000000   000   000  
 
 menuAction = (name) ->
-    
-    if action = Editor.actionWithName name
-        # log "window.menuAction #{name}"
-        if action.key? and _.isFunction window.focusEditor[action.key]
-            # log "window.menuAction execute --- ", name
-            window.focusEditor[action.key]()
-            return
-            
-    log "window.menuAction #{name}"
-            
+
+    if 'unhandled' != window.commandline.handleMenuAction name
+        return
+
     switch name
         
         when 'Undo'               then return @window.focusEditor.do.undo()
@@ -587,11 +581,16 @@ menuAction = (name) ->
         when 'Navigate Backward'  then return navigate.backward()
         when 'Navigate Forward'   then return navigate.forward()
         when 'Maximize Editor'    then return split.maximizeEditor()
-        
-    
-    if 'unhandled' != window.commandline.handleMenuAction name
-        return
-        
+
+    log "window.menuAction #{name}"
+            
+    if action = Editor.actionWithName name
+        # log "window.menuAction #{name}"
+        if action.key? and _.isFunction window.focusEditor[action.key]
+            # log "window.menuAction execute --- ", name
+            window.focusEditor[action.key]()
+            return
+                        
     log "unhandled menu action! ------------ #{name}"
         
 # 000   000  00000000  000   000

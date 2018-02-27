@@ -9,6 +9,7 @@
 { empty, elem, post, clamp, childp, prefs, slash, fs, os, error, log, $ } = require 'kxk'
   
 Browser  = require './browser'
+Shelf    = require './shelf'
 dirlist  = require '../tools/dirlist'
 forkfunc = require '../tools/forkfunc'
 
@@ -18,6 +19,7 @@ class FileBrowser extends Browser
                 
         super view
         @loadID = 0
+        @shelf = new Shelf @
         @name = 'FileBrowser'
         
         post.on 'browserColumnItemsSet', @onColumnItemsSet
@@ -25,6 +27,14 @@ class FileBrowser extends Browser
         post.on 'gitRefChanged',         @updateGitStatus
         post.on 'fileIndexed',           @onFileIndexed
     
+    initColumns: ->
+        
+        super()
+        
+        @view.insertBefore @shelf.div, @view.firstChild #childNodes[0]
+        @cols.style.left = '200px'
+        
+        
     # 00000000  000  000      00000000  
     # 000       000  000      000       
     # 000000    000  000      0000000   

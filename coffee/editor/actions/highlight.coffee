@@ -59,6 +59,15 @@ module.exports =
         
     wordHighlights: -> @highlights().filter (h) -> not h[2]?.clss?.startsWith('stringmatch') and not h[2]?.clss?.startsWith('bracketmatch')
 
+    highlightForFind: ->
+        
+        cp = @cursorPos()
+        wordHighlights = @wordHighlights()
+        cursorInWordHighlight = wordHighlights.length and rangeAtPosInRanges cp, wordHighlights
+        if not cursorInWordHighlight
+            @highlightTextOfSelectionOrWordAtCursor() # this also selects
+        @selectNextHighlight()
+    
     highlightWordAndAddToSelection: -> # command+d
         
         cp = @cursorPos()
