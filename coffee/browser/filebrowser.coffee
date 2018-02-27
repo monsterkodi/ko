@@ -31,13 +31,8 @@ class FileBrowser extends Browser
         
         super()
         
-        @view.insertBefore @shelf.div, @view.firstChild #childNodes[0]
-        @shelf.addDir slash.resolve '~'
-        @shelf.addDir '~/s'
-        @shelf.addDir '~/s/kxk'
-        @shelf.addDir '~/s/konrad'
-        @shelf.addDir '~/s/ko'
-        @shelf.addFile '~/s/ko/package.noon'
+        @view.insertBefore @shelf.div, @view.firstChild
+        @shelf.browserDidInitColumns()        
         
         @cols.style.left = '200px'
         
@@ -97,7 +92,7 @@ class FileBrowser extends Browser
 
             column = opt.column ? 0
 
-            log 'filebrowser.loadDir', column, @columns.length
+            # log 'filebrowser.loadDir', column, @columns.length
             
             if column == 0 or @columns[column-1].activeRow()?.item.name == '..'
                 

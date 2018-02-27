@@ -241,6 +241,8 @@ class Split extends event
         n = 'commandline-editor' if n == 'commandline'
         if n == '.' or not $(n)?
             return log "[WARNING] Split.focus -- can't find element '#{n}'"
+            
+        log "split.focus #{n}", $(n)?.focus?
         $(n)?.focus?()
             
     focusAnything: ->

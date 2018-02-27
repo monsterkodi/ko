@@ -17,6 +17,34 @@ class Browser extends Stage
         super view
         @columns = []
 
+    # 000  000   000  000  000000000       0000000   0000000   000      000   000  00     00  000   000   0000000  
+    # 000  0000  000  000     000         000       000   000  000      000   000  000   000  0000  000  000       
+    # 000  000 0 000  000     000         000       000   000  000      000   000  000000000  000 0 000  0000000   
+    # 000  000  0000  000     000         000       000   000  000      000   000  000 0 000  000  0000       000  
+    # 000  000   000  000     000          0000000   0000000   0000000   0000000   000   000  000   000  0000000   
+    
+    initColumns: ->
+        
+        return if @cols? and @cols.parentNode == @view
+        
+        @view.innerHTML = ''
+        
+        if @cols?
+            @view.appendChild @cols
+            return
+            
+        @cols = elem class: 'browser', id: 'columns'
+        @view.appendChild @cols
+        
+        @columns = []
+        for i in [0...2]
+            @newColumn()
+            
+        panes = @columns.map (c) -> div:c.div, min:20
+        @flex = new flex 
+            panes: panes
+            onPaneSize: @updateColumnScrolls
+        
     # 000       0000000    0000000   0000000         000  000000000  00000000  00     00   0000000  
     # 000      000   000  000   000  000   000       000     000     000       000   000  000       
     # 000      000   000  000000000  000   000       000     000     0000000   000000000  0000000   
@@ -186,34 +214,6 @@ class Browser extends Stage
         @popEmptyColumns()
         @flex.relax()
         true
-
-    # 000  000   000  000  000000000       0000000   0000000   000       0000000  
-    # 000  0000  000  000     000         000       000   000  000      000       
-    # 000  000 0 000  000     000         000       000   000  000      0000000   
-    # 000  000  0000  000     000         000       000   000  000           000  
-    # 000  000   000  000     000          0000000   0000000   0000000  0000000   
-    
-    initColumns: ->
-        
-        return if @cols? and @cols.parentNode == @view
-        
-        @view.innerHTML = ''
-        
-        if @cols?
-            @view.appendChild @cols
-            return
-            
-        @cols = elem class: 'browser', id: 'columns'
-        @view.appendChild @cols
-        
-        @columns = []
-        for i in [0...2]
-            @newColumn()
-            
-        panes = @columns.map (c) -> div:c.div, min:20
-        @flex = new flex 
-            panes: panes
-            onPaneSize: @updateColumnScrolls
 
     resized: (w,h) -> @updateColumnScrolls()
     

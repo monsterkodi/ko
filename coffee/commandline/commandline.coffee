@@ -158,20 +158,27 @@ class Commandline extends TextEditor
 
         window.split.showCommandline()
 
-        @command = @commands[name]
+        @command = @commandForName name
         
-        log "commandline.startCommand #{name}", @command?
+        log "commandline.startCommand #{name}"
         
         activeID = document.activeElement.id
         if activeID.startsWith 'column' then activeID = 'editor'
         @command.setFocus activeID != 'commandline-editor' and activeID or null
         @view.focus()
+        
         @setName name
-
         @results @command.start name # <-- command start
 
         @button.className = "commandline-button active #{@command.prefsID}"
 
+    commandForName: (name) ->
+
+        for n,c of @commands
+            if n == name or name in c.names
+                return c
+        
+        
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000
     # 0000000     00000    0000000   000       000   000     000     0000000
@@ -285,10 +292,9 @@ class Commandline extends TextEditor
 
     handleMenuAction: (name) ->
         
-        for n,c of @commands
-            if n == name
-                @startCommand n
-                return
+        if @commandForName name
+            @startCommand name
+            return
                 
         'unhandled'
     

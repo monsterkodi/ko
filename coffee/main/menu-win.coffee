@@ -48,7 +48,7 @@ class Menu
             label: 'ko'
             submenu: [     
                 label:       "About #{pkg.productName}"
-                accelerator: 'Alt+.'
+                accelerator: 'ctrl+shift+/'
                 click:        main.showAbout
             ,
                 type: 'separator'
@@ -123,6 +123,21 @@ class Menu
             
             label: 'Command'
             submenu: [
+                label:      'Browse'
+                submenu:    [
+                        label:      'Small'
+                        accelerator: 'Ctrl+.'
+                        click:       (i,win) -> post.toWin win.id, 'menuAction', 'browse'
+                    ,
+                        label:      'Large'
+                        accelerator: 'alt+ctrl+.'
+                        click:       (i,win) -> post.toWin win.id, 'menuAction', 'Browse'
+                    ,
+                        label:      'Shelf'
+                        accelerator: 'alt+.'
+                        click:       (i,win) -> post.toWin win.id, 'menuAction', 'shelf'
+                ]
+            ,
                 label:      'Open'
                 submenu:    [
                         label:      'In Current Tab'
@@ -190,10 +205,6 @@ class Menu
                 label:      'Goto'
                 accelerator: 'Ctrl+;'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'goto'
-            ,
-                label:      'Browse'
-                accelerator: 'Ctrl+.'
-                click:       (i,win) -> post.toWin win.id, 'menuAction', 'browse'
             ,
                 label:      'Build'
                 accelerator: 'Ctrl+b'

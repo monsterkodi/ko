@@ -319,7 +319,7 @@ loadFile = (file, opt={}) ->
 
     file = null if file? and file.length <= 0
 
-    log "loadFile #{file}"
+    # log "loadFile #{file}"
 
     editor.saveScrollCursorsAndSelections()
 
@@ -327,7 +327,7 @@ loadFile = (file, opt={}) ->
         [file, pos] = slash.splitFilePos file
         file = slash.resolve file
 
-    log 'window.loadFile', file, editor?.currentFile, opt
+    # log 'window.loadFile', file, editor?.currentFile, opt
 
     if file != editor?.currentFile or opt?.reload
         if file? and not slash.fileExists file
@@ -582,7 +582,7 @@ menuAction = (name) ->
         when 'Navigate Forward'   then return navigate.forward()
         when 'Maximize Editor'    then return split.maximizeEditor()
 
-    log "window.menuAction #{name}"
+    # log "window.menuAction #{name}"
             
     if action = Editor.actionWithName name
         # log "window.menuAction #{name}"

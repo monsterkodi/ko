@@ -17,10 +17,9 @@ class Browse extends Command
         super commandline
 
         @cmdID     = 0
-        log 'creating file browser'
         @browser   = new FileBrowser window.area.view
         @commands  = Object.create null
-        @names     = ["browse", "Browse"]
+        @names     = ["browse", "Browse", "shelf"]
         
         window.area.on 'resized', @onAreaResized
         
@@ -46,19 +45,24 @@ class Browse extends Command
     # 0000000      000     000   000  000   000     000   
     
     start: (@action) ->
-        
+
         @browser.start()
         
-        if window.editor.currentFile?
-            log 'browse.start loadFile', window.editor.currentFile 
-            @browser.loadFile window.editor.currentFile 
-        else 
-            @browser.loadDir process.cwd()
+        if @action != 'shelf'
+            
+            if window.editor.currentFile?
+                @browser.loadFile window.editor.currentFile 
+            else 
+                @browser.loadDir process.cwd()
 
-        super @action
+        name = @action
+        name = 'browse' if @action == 'shelf'
         
+        super name
+
         select: true
         do:     @name == 'Browse' and 'half area' or 'quart area'
+        focus:  'shelf' if @action == 'shelf'
 
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000  
     # 000        000 000   000       000       000   000     000     000       

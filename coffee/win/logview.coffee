@@ -25,7 +25,7 @@ class LogView extends TextEditor
                 
         post.on 'slog', (text) =>
             @appendText text
-            post.toMain 'winlog', window.winID, text
+            # post.toMain 'winlog', window.winID, text
                 
     #  0000000   00000000   00000000   00000000  000   000  0000000    
     # 000   000  000   000  000   000  000       0000  000  000   000  

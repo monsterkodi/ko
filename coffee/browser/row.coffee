@@ -37,6 +37,10 @@ class Row
     
     activate: (event) =>
 
+        if @column.index < 0 # shelf handles row activation
+            @column.activateRow @
+            return
+        
         if event?
             {mod} = keyinfo.forEvent event
             switch mod

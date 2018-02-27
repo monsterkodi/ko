@@ -5,7 +5,7 @@
 #      000  000   000  000       000      000     
 # 0000000   000   000  00000000  0000000  000     
 
-{ stopEvent, keyinfo, slash, post, elem, clamp, empty, error, log, _ } = require 'kxk'
+{ stopEvent, keyinfo, slash, post, elem, clamp, empty, error, log, $, _ } = require 'kxk'
 
 Row        = require './row'
 Scroller   = require './scroller'
@@ -34,7 +34,19 @@ class Shelf
         @div.addEventListener 'dblclick',  @onDblClick
         
         @scroll = new Scroller @
-                
+
+    browserDidInitColumns: ->
+        
+        return if @didInit
+        @didInit = true
+        
+        @addDir slash.resolve '~'
+        @addDir '~/s'
+        @addDir '~/s/kxk'
+        @addDir '~/s/konrad'
+        @addDir '~/s/ko'
+        @addFile '~/s/ko/package.noon'
+        
     #  0000000  00000000  000000000  000  000000000  00000000  00     00   0000000  
     # 000       000          000     000     000     000       000   000  000       
     # 0000000   0000000      000     000     000     0000000   000000000  0000000   
@@ -77,15 +89,23 @@ class Shelf
         @rows = []
         @scroll.update()
                     
-    #  0000000    0000000  000000000  000  000   000  00000000  
-    # 000   000  000          000     000  000   000  000       
-    # 000000000  000          000     000   000 000   0000000   
-    # 000   000  000          000     000     000     000       
-    # 000   000   0000000     000     000      0      00000000  
+    #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
+    # 000   000  000          000     000  000   000  000   000     000     000       
+    # 000000000  000          000     000   000 000   000000000     000     0000000   
+    # 000   000  000          000     000     000     000   000     000     000       
+    # 000   000   0000000     000     000      0      000   000     000     00000000  
    
     activateRow: (row) -> 
-        log "Shelf.activateRow row:#{row}"
-        @row(row)?.activate()
+        
+        item = row.item
+        log "Shelf.activateRow row:", item
+        
+        $('.hover')?.classList.remove 'hover'
+        row.setActive emit:false
+        
+        switch item.type
+            when 'dir'   then @browser.loadDir     item.file, column: 0, parent: item
+            when 'file'  then post.emit 'jumpToFile', file:item.file
        
     activeRow: -> _.find @rows, (r) -> r.isActive()
     
@@ -122,6 +142,10 @@ class Shelf
         log 'shelf.onBlur'
         @div.classList.remove 'focus'
     
+    focusBrowser: ->
+        log 'shelf.focusBrowser'
+        @browser.focus()
+        
     # 00     00   0000000   000   000   0000000  00000000  
     # 000   000  000   000  000   000  000       000       
     # 000000000  000   000  000   000  0000000   0000000   
@@ -160,24 +184,6 @@ class Shelf
         error "no row at index #{index}/#{@numRows()-1}?", @numRows() if not @rows[index]?.activate?
         @rows[index].activate()
     
-    navigateCols: (key) -> # move to file browser?
-        
-        switch key
-            when 'left'  then log 'close shelf?'
-            when 'right' then log 'focus browser?'
-            when 'enter'
-                if item = @activeRow()?.item
-                    type = item.type
-                    if type == 'dir'
-                        @browser.browse? item.file
-                    else if type == 'file' and item.textFile
-                        log 'open file?'
-                        post.emit 'focus', 'editor'
-                    else if item.file
-                        log 'open file?'
-                        post.emit 'focus', 'editor'
-        @
-
     openFileInNewWindow: ->  
         
         if item = @activeRow()?.item
@@ -256,8 +262,8 @@ class Shelf
         switch combo
             when 'up', 'down', 'page up', 'page down', 'home', 'end' 
                 return stopEvent event, @navigateRows key
-            when 'right', 'left', 'enter'                            
-                return stopEvent event, @navigateCols key
+            when 'right', 'enter'                            
+                return stopEvent event, @focusBrowser()
             when 'command+enter', 'ctrl+enter' then return @openFileInNewWindow()
             when 'backspace', 'delete' then return stopEvent event, @clearSearch().removeObject()
             when 'command+k', 'ctrl+k' then return stopEvent event if @browser.cleanUp()
