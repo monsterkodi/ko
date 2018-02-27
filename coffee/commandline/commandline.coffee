@@ -64,7 +64,8 @@ class Commandline extends TextEditor
             @command = @commands[name]
             activeID = document.activeElement.id
             if activeID.startsWith 'column' then activeID = 'editor'
-            @command.setFocus activeID != 'commandline-editor' and activeID or null
+            @command?.setFocus activeID != 'commandline-editor' and activeID or null
+            log "no command for name: #{name}?" if not @command?
             @setName name
             @button.className = "commandline-button active #{@command.prefsID}"
             @commands[name]?.restoreState? state
@@ -86,7 +87,7 @@ class Commandline extends TextEditor
                 command.setPrefsID commandClass.name.toLowerCase()
                 @commands[command.prefsID] = command
             catch err
-                if err then error "can't load command from file '#{file}': #{err}"
+                error "can't load command from file '#{file}': #{err}"
 
     setName: (name) ->
 
@@ -227,6 +228,7 @@ class Commandline extends TextEditor
         @list.style.display = 'unset'
         for name in @mainCommands
             cmmd = @commands[name]
+            log 'listCommands mainCommand', name, 'names', cmmd?.names
             for ci in [0...cmmd.names.length]
                 cname = cmmd.names[ci]
                 continue if cname in @hideCommands

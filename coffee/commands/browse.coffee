@@ -17,6 +17,7 @@ class Browse extends Command
         super commandline
 
         @cmdID     = 0
+        log 'creating file browser'
         @browser   = new FileBrowser window.area.view
         @commands  = Object.create null
         @names     = ["browse", "Browse"]

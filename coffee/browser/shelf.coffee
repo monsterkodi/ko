@@ -16,11 +16,12 @@ class Shelf
 
     constructor: (@browser) ->
 
+        @index = -1
+        @items = []
         @rows = []
-        @div = elem id: 'shelf'
+        @div = elem id: 'shelf', tabIndex: 7
         @table = elem class: 'browserColumnTable'
         @div.appendChild @table
-        # @browser.cols.appendChild @div
         
         @div.addEventListener 'focus',     @onFocus
         @div.addEventListener 'blur',      @onBlur
@@ -33,7 +34,7 @@ class Shelf
         @div.addEventListener 'dblclick',  @onDblClick
         
         @scroll = new Scroller @
-        
+                
     #  0000000  00000000  000000000  000  000000000  00000000  00     00   0000000  
     # 000       000          000     000     000     000       000   000  000       
     # 0000000   0000000      000     000     000     0000000   000000000  0000000   
@@ -43,23 +44,35 @@ class Shelf
     setItems: (@items, opt) ->
         
         @clear()
-        @parent = opt.parent
-        error "no parent item?" if not @parent?
         
         for item in @items
             @rows.push new Row @, item
         
         @scroll.update()
-        
-        post.emit 'browserColumnItemsSet', @ # for filebrowser target navigation
         @
+        
+    addDir: (dir) ->
+        
+        @items.push 
+            name: slash.file dir
+            type: 'dir'
+            file: dir
+        
+        @setItems @items
+
+    addFile: (file) ->
+        
+        @items.push 
+            name: slash.file file
+            type: 'file'
+            file: file
+        
+        @setItems @items
         
     isEmpty: -> empty @rows
     clear:   ->
         @clearSearch()
-        delete @parent
         @div.scrollTop = 0
-        @editor?.del()
         @table.innerHTML = ''
         @rows = []
         @scroll.update()
@@ -70,7 +83,9 @@ class Shelf
     # 000   000  000          000     000     000     000       
     # 000   000   0000000     000     000      0      00000000  
    
-    activateRow:  (row) -> @row(row)?.activate()
+    activateRow: (row) -> 
+        log "Shelf.activateRow row:#{row}"
+        @row(row)?.activate()
        
     activeRow: -> _.find @rows, (r) -> r.isActive()
     
@@ -80,12 +95,9 @@ class Shelf
         else if _.isString  row then return _.find @rows, (r) -> r.item.name == row
         else return row
             
-    nextColumn: -> @browser.column @index+1
-    prevColumn: -> @browser.column @index-1
-        
     numRows:    -> @rows.length ? 0   
     rowHeight:  -> @rows[0]?.div.clientHeight ? 0
-    numVisible: -> @rowHeight() and parseInt(@browser.height() / @rowHeight()) or 0
+    numVisible: -> @rowHeight() and parseInt(@browser?.height() / @rowHeight()) or 0
     
     # 00000000   0000000    0000000  000   000   0000000  
     # 000       000   000  000       000   000  000       
@@ -96,13 +108,19 @@ class Shelf
     hasFocus: -> @div.classList.contains 'focus'
 
     focus: ->
+        log 'shelf.focus'
         if not @activeRow() and @numRows()
             @rows[0].setActive emit:true
         @div.focus()
         @
         
-    onFocus: => @div.classList.add 'focus'
-    onBlur:  => @div.classList.remove 'focus'
+    onFocus: => 
+        log 'shelf.onFocus'
+        @div.classList.add 'focus'
+        
+    onBlur:  => 
+        log 'shelf.onBlur'
+        @div.classList.remove 'focus'
     
     # 00     00   0000000   000   000   0000000  00000000  
     # 000   000  000   000  000   000  000       000       
@@ -120,18 +138,6 @@ class Shelf
     # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000   
     # 000  0000  000   000     000     000  000   000  000   000     000     000       
     # 000   000  000   000      0      000   0000000   000   000     000     00000000  
-
-    navigateTo: (target) ->
-
-        target = _.isString(target) and target or target?.file
-        if not @parent then return error "no parent? #{@index}"
-        relpath = slash.relative target, @parent.file
-        relitem = _.first slash.split relpath
-        row = @row relitem
-        if row
-            @activateRow row
-        else            
-            @browser.endNavigateToTarget()
 
     navigateRows: (key) ->
 
@@ -157,31 +163,21 @@ class Shelf
     navigateCols: (key) -> # move to file browser?
         
         switch key
-            when 'left'  then @browser.navigate 'left'
-            when 'right' then @browser.navigate 'right'
+            when 'left'  then log 'close shelf?'
+            when 'right' then log 'focus browser?'
             when 'enter'
                 if item = @activeRow()?.item
                     type = item.type
                     if type == 'dir'
                         @browser.browse? item.file
                     else if type == 'file' and item.textFile
+                        log 'open file?'
                         post.emit 'focus', 'editor'
                     else if item.file
+                        log 'open file?'
                         post.emit 'focus', 'editor'
         @
 
-    navigateRoot: (key) -> # move to file browser?
-        
-        return if not @browser.browse?
-        @browser.browse switch key
-            when 'left'  then slash.dirname @parent.file
-            when 'up'    then @parent.file
-            when 'right' then @activeRow().item.file
-            when 'down'  then slash.pkg @parent.file
-            when '~'     then '~'
-            when '/'     then '/'
-        @
-            
     openFileInNewWindow: ->  
         
         if item = @activeRow()?.item
@@ -238,7 +234,6 @@ class Shelf
     removeObject: ->
         
         if row = @activeRow()
-            @browser.emit 'willRemoveRow', row, @
             nextOrPrev = row.next() ? row.prev()
             row.div.remove()
             @items.splice row.index(), 1
@@ -254,9 +249,9 @@ class Shelf
     
     onKey: (event) =>
         
-        {mod, key, combo, char} = keyinfo.forEvent event
+        { mod, key, combo, char } = keyinfo.forEvent event
 
-        # log mod, key, combo, char
+        log 'shelf.onKey', mod, key, combo, char
 
         switch combo
             when 'up', 'down', 'page up', 'page down', 'home', 'end' 
@@ -264,8 +259,6 @@ class Shelf
             when 'right', 'left', 'enter'                            
                 return stopEvent event, @navigateCols key
             when 'command+enter', 'ctrl+enter' then return @openFileInNewWindow()
-            when 'command+left', 'command+up', 'command+right', 'command+down', 'ctrl+left', 'ctrl+up', 'ctrl+right', 'ctrl+down'
-                return stopEvent event, @navigateRoot key
             when 'backspace', 'delete' then return stopEvent event, @clearSearch().removeObject()
             when 'command+k', 'ctrl+k' then return stopEvent event if @browser.cleanUp()
             when 'tab'    

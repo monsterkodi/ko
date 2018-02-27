@@ -64,7 +64,7 @@ class Editor extends Buffer
             if action.name == name
                 return action
                 
-        console.log "can't find action with name '#{name}'"
+        log "can't find action with name '#{name}'"
         for action in Editor.actions
             log action.name
         return null

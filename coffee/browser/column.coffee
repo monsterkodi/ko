@@ -20,7 +20,7 @@ class Column
         @search = ''
         @searchTimer = null
         @rows = []
-        @div = elem class: 'browserColumn', tabIndex: @index, id: "column#{@index}"
+        @div = elem class: 'browserColumn', tabIndex: 6, id: "column#{@index}"
         @table = elem class: 'browserColumnTable'
         @div.appendChild @table
         @browser.cols.appendChild @div
