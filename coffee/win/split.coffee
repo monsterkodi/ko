@@ -242,7 +242,7 @@ class Split extends event
         if n == '.' or not $(n)?
             return log "[WARNING] Split.focus -- can't find element '#{n}'"
             
-        log "split.focus #{n}", $(n)?.focus?
+        window.setLastFocus n if $(n)?.focus?
         $(n)?.focus?()
             
     focusAnything: ->

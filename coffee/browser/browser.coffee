@@ -162,6 +162,8 @@ class Browser extends Stage
     numCols: -> @columns.length 
     column: (i) -> @columns[i] if 0 <= i < @numCols()
 
+    columnWithName: (name) -> @columns.find (c) -> c.name() == name
+    
     #  0000000   0000000    0000000     0000000   0000000   000      
     # 000   000  000   000  000   000  000       000   000  000      
     # 000000000  000   000  000   000  000       000   000  000      
@@ -238,7 +240,7 @@ class Browser extends Stage
 
         items = []
         file  = item.file
-        name  = slash.fileName file
+        name  = slash.base file
         
         files = post.get 'indexer', 'files', file
 
@@ -263,14 +265,14 @@ class Browser extends Stage
             @clearColumnsFrom opt.column
             @loadItems items, opt
         else
-            ext = slash.extname file  
-            if ext in ['.gif', '.png', '.jpg', '.jpeg', '.svg']
+            ext = slash.ext file  
+            if ext in ['gif', 'png', 'jpg', 'jpeg', 'svg']
                 @clearColumnsFrom opt.column, pop:true
                 @loadImage row, file
-            else if ext in ['.icns', '.tiff', '.tif']
+            else if ext in ['icns', 'tiff', 'tif'] and not slash.win()
                 @clearColumnsFrom opt.column, pop:true
                 @convertImage row
-            else if ext in ['.pxm']
+            else if ext in ['pxm']
                 @clearColumnsFrom opt.column, pop:true
                 @convertPXM row
             else

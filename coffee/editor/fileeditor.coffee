@@ -269,7 +269,7 @@ class FileEditor extends TextEditor
         if not type or type == 'file'
             files = post.get 'indexer', 'files'
             for file, info of files
-                if slash.fileName(file).toLowerCase() == find and file != @currentFile
+                if slash.base(file).toLowerCase() == find and file != @currentFile
                     @jumpToFile file:file, line:6
                     return true
 

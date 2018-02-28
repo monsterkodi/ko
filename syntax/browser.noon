@@ -28,9 +28,13 @@
 ([~\/\.\-\_\w]+)(\.js[\d\:]*\b)        . js      . js.extname
 ([~\/\.\-\_\w]+)(\.py[\d\:]*\b)        . py      . py.extname
 ([~\/\.\-\_\w]+)(\.sh[\d\:]*\b)        . sh      . sh.extname
+([~\/\.\-\_\w]+)(\.exe[\d\:]*\b)       . sh      . sh.extname
 ([~\/\.\-\_\w]+)(\.md[\d\:]*\b)        . md      . md.extname
 ([~\/\.\-\_\w]+)(\.txt[\d\:]*\b)       . txt     . txt.extname
+([~\/\.\-\_\w]+)(\.ini[\d\:]*\b)       . txt     . txt.extname
 ([~\/\.@-_\w]+)(\.png|\.jpg)           . image . image.extname
-([~\/\.@-_\w]+)(\.pxm|\.tiff?|\.icns|\.gif)  . pic . pic.extname
+([~\/\.@-_\w]+)(\.pxm|\.tiff?|\.icns|\.ico|\.gif)  . pic . pic.extname
+
+([~\/\.\-\_\w]+)(\.dll|\.pak|\.bin|\.msg|\.dat)\b  . dotfile   . dotfile.extname
 
 [\/\:]                                 separator

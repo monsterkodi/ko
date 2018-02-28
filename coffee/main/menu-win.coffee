@@ -136,6 +136,13 @@ class Menu
                         label:      'Shelf'
                         accelerator: 'alt+.'
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'shelf'
+                    ,
+                        type: 'separator'
+                    ,
+                        label:      'Add to Shelf'
+                        accelerator: 'alt+shift+.'
+                        click:       (i,win) -> post.toWin win.id, 'menuAction', 'Add to Shelf'
+                    
                 ]
             ,
                 label:      'Open'

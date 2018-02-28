@@ -16,6 +16,8 @@ class Shelf
 
     constructor: (@browser) ->
 
+        log 'shelf.constructor'
+        
         @index = -1
         @items = []
         @rows = []
@@ -33,6 +35,8 @@ class Shelf
         @div.addEventListener 'click',     @onClick
         @div.addEventListener 'dblclick',  @onDblClick
         
+        post.on 'addToShelf', @addPath
+        
         @scroll = new Scroller @
 
     browserDidInitColumns: ->
@@ -46,6 +50,14 @@ class Shelf
         @addDir '~/s/konrad'
         @addDir '~/s/ko'
         @addFile '~/s/ko/package.noon'
+        
+    addPath: (path) =>
+        
+        if slash.isDir path
+            @addDir path
+        else
+            @addFile path
+        
         
     #  0000000  00000000  000000000  000  000000000  00000000  00     00   0000000  
     # 000       000          000     000     000     000       000   000  000       
@@ -114,7 +126,9 @@ class Shelf
         else if _.isElement row then return _.find @rows, (r) -> r.div.contains row
         else if _.isString  row then return _.find @rows, (r) -> r.item.name == row
         else return row
-            
+    
+    name: -> 'shelf'
+        
     numRows:    -> @rows.length ? 0   
     rowHeight:  -> @rows[0]?.div.clientHeight ? 0
     numVisible: -> @rowHeight() and parseInt(@browser?.height() / @rowHeight()) or 0
@@ -135,15 +149,13 @@ class Shelf
         @
         
     onFocus: => 
-        log 'shelf.onFocus'
+        window.setLastFocus 'shelf'
         @div.classList.add 'focus'
         
     onBlur:  => 
-        log 'shelf.onBlur'
         @div.classList.remove 'focus'
     
     focusBrowser: ->
-        log 'shelf.focusBrowser'
         @browser.focus()
         
     # 00     00   0000000   000   000   0000000  00000000  

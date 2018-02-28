@@ -73,6 +73,11 @@ class FileBrowser extends Browser
     loadDir: (dir, opt) -> 
         
         opt ?= {}
+        
+        if opt.column > 0 and slash.isRoot(dir) and @columns[opt.column-1].activeRow()?.item.name == '/'
+            @clearColumnsFrom opt.column, pop:true
+            return 
+        
         opt.ignoreHidden ?= prefs.get "browser:ignoreHidden:#{dir}", true
         
         @loadID++
@@ -97,12 +102,18 @@ class FileBrowser extends Browser
             if column == 0 or @columns[column-1].activeRow()?.item.name == '..'
                 
                 updir = slash.resolve slash.join dir, '..'
-                
-                if not (updir == dir == '/')
+
+                if not (updir == dir == slash.resolve '/')
                     items.unshift 
                         name: '..'
                         type: 'dir'
                         file:  updir
+                else
+                    items.unshift 
+                        name: '/'
+                        type: 'dir'
+                        file: dir
+                    
                         
             @loadItems items, opt
 

@@ -20,7 +20,7 @@ class Column
         @search = ''
         @searchTimer = null
         @rows = []
-        @div = elem class: 'browserColumn', tabIndex: 6, id: "column#{@index}"
+        @div = elem class: 'browserColumn', tabIndex: 6, id: @name()
         @table = elem class: 'browserColumnTable'
         @div.appendChild @table
         @browser.cols.appendChild @div
@@ -76,6 +76,7 @@ class Column
     activateRow:  (row) -> @row(row)?.activate()
        
     activeRow: -> _.find @rows, (r) -> r.isActive()
+    activePath: -> @activeRow().path()
     
     row: (row) -> # accepts element, index, string or row
         if      _.isNumber  row then return 0 <= row < @numRows() and @rows[row] or null
@@ -85,6 +86,8 @@ class Column
             
     nextColumn: -> @browser.column @index+1
     prevColumn: -> @browser.column @index-1
+        
+    name: -> "#{@browser.name}:#{@index}"
         
     numRows:    -> @rows.length ? 0   
     rowHeight:  -> @rows[0]?.div.clientHeight ? 0
@@ -102,6 +105,7 @@ class Column
         if not @activeRow() and @numRows()
             @rows[0].setActive emit:true
         @div.focus()
+        window.setLastFocus @name()
         @
         
     onFocus: => @div.classList.add 'focus'

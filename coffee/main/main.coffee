@@ -431,7 +431,8 @@ class Main
         {width, height} = @screenSize()
         ww = height + 122
 
-        scheme = prefs.get 'scheme', 'dark'
+        scheme  = prefs.get 'scheme'
+        scheme ?= 'dark'
 
         cfg =
             x:                parseInt (width-ww)/2
@@ -443,7 +444,7 @@ class Main
             useContentSize:   true
             fullscreenable:   true
             acceptFirstMouse: true
-            show:             false
+            show:             true
             hasShadow:        true
             backgroundColor:  scheme == 'bright' and "#fff" or '#000'
             titleBarStyle:    'hidden'

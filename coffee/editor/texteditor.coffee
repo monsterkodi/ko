@@ -657,9 +657,9 @@ class TextEditor extends Editor
     clickAtPos: (p, event) ->
 
         if event.altKey
-            @jumpToWordAtPos p
-        else if event.metaKey
             @toggleCursorAtPos p
+        else if event.metaKey or event.ctrlKey
+            @jumpToWordAtPos p
         else
             # if event.ctrlKey
                 # @log jsbeauty.html_beautify @lineDivs[p[1]].firstChild.innerHTML, indent_size:2 , preserve_newlines:false, wrap_line_length:200, unformatted: []

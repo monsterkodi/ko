@@ -191,7 +191,8 @@ class ObjectBrowser extends Browser
         files = []
 
         filterBase = (name, file) ->
-            file = slash.fileName file
+            
+            file = slash.base file
             if not name.startsWith '.'
                 return not (name.length>1 and file.indexOf(name)>=0 or file.startsWith(name))
             false

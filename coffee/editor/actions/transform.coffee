@@ -17,8 +17,8 @@ class Transform
         'up', 'down', 'sort'
         'reverse', 
         'resolve', 'unresolve'
-        'dirname', 'basename'
-        'filename', 'extname'
+        'dir', 'base'
+        'file', 'ext'
     ]
 
     constructor: (@editor) ->
@@ -151,25 +151,25 @@ class Transform
     # 000        000   000     000     000   000
     # 000        000   000     000     000   000
 
-    basename: ->
+    base: ->
 
-        @apply (t) -> slash.basename t
+        @apply (t) -> slash.base t
         'basename'
 
-    dirname: ->
+    dir: ->
 
-        @apply (t) -> slash.dirname t
+        @apply (t) -> slash.dir t
         'dirname'
 
-    extname: ->
+    ext: ->
 
-        @apply (t) -> slash.extname t
-        'extname'
+        @apply (t) -> slash.ext t
+        'ext'
 
-    filename: ->
+    file: ->
 
-        @apply (t) -> slash.fileName t
-        'filename'
+        @apply (t) -> slash.file t
+        'file'
 
     #  0000000   00000000   00000000   000      000   000
     # 000   000  000   000  000   000  000       000 000

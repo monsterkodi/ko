@@ -39,15 +39,24 @@ dirList = (dirPath, opt, cb) ->
     filter = (p) ->
         
         if slash.basename(p).startsWith '.'
+            
             if opt.ignoreHidden
                 return true
+                
             if slash.basename(p) in ['.DS_Store', '.git']
                 return true
+                
         else if opt.matchExt? 
+            
             if slash.extname(p) != slash.extname opt.matchExt
                 return true
+                
         if slash.basename(p) == 'Icon\r'
             return true
+            
+        if slash.basename(p).toLowerCase().startsWith 'ntuser.'
+            return true
+        
         false
     
     onDir = (d) -> 

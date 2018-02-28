@@ -113,6 +113,7 @@ post.on 'loadFile',  (file)  -> loadFile  file
 post.on 'loadFiles', (files) -> openFiles files
 post.on 'menuAction', (action) -> menuAction action
 post.on 'editorFocus', (editor) ->
+    window.setLastFocus editor.name
     window.focusEditor = editor
     window.textEditor = editor if editor.name != 'commandline-editor'
 
@@ -154,6 +155,7 @@ winMain = ->
     fps         = window.fps         = new FPS()
 
     window.textEditor = window.focusEditor = editor
+    window.lastFocus = editor.name
 
     restoreWin()
 
@@ -516,6 +518,17 @@ changeFontSize = (d) ->
 resetFontSize = -> 
     window.stash.set 'fontSize'
     setFontSize editor.fontSizeDefault
+    
+addToShelf = ->
+    log 'addToShelf', window.lastFocus
+    fileBrowser = commandline.commands.browse.browser
+    return if window.lastFocus == 'shelf'
+    if window.lastFocus.startsWith fileBrowser.name
+        path = fileBrowser.columnWithName(window.lastFocus).activePath()
+    else 
+        path = editor.currentFile
+    log 'emit addToShelf', path
+    post.emit 'addToShelf', path
 
 # 0000000   0000000    0000000   00     00
 #    000   000   000  000   000  000   000
@@ -552,6 +565,10 @@ window.onfocus = (event) ->
             split.focus 'editor'
         else
             split.focus 'commandline-editor'
+            
+window.setLastFocus = (name) -> 
+    # log "window.setLastFocus #{name}"
+    window.lastFocus = name
 
 # 00     00  00000000  000   000  000   000      0000000    0000000  000000000  000   0000000   000   000  
 # 000   000  000       0000  000  000   000     000   000  000          000     000  000   000  0000  000  
@@ -581,6 +598,7 @@ menuAction = (name) ->
         when 'Navigate Backward'  then return navigate.backward()
         when 'Navigate Forward'   then return navigate.forward()
         when 'Maximize Editor'    then return split.maximizeEditor()
+        when 'Add to Shelf'       then return addToShelf()
 
     # log "window.menuAction #{name}"
             

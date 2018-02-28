@@ -128,8 +128,8 @@ class Open extends Command
         
         f = item.file
         r = item.text
-        b = slash.basename f
-        n = slash.fileName f
+        b = slash.file f
+        n = slash.base f
                 
         relBonus = 0
         nameBonus = 0

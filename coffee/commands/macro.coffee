@@ -189,7 +189,7 @@ class Macro extends Command
                     pth = map[word] ? word.toLowerCase()
 
                     for f in projectFiles
-                        if pth == slash.fileName f
+                        if pth == slash.base f
                             pth = slash.splitExt slash.relative f, slash.dirname editor.currentFile
                             pth = './' + pth if not pth.startsWith '../'
                             break

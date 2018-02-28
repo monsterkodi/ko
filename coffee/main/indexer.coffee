@@ -114,9 +114,9 @@ class Indexer
             include:     ['.git']
             ignore:      ['node_modules', 'img', 'bin', 'js', 'Library']
             skipDir:     (p) -> slash.basename(p) == '.git'
-            filter:      (p) -> slash.extname(p) not in ['.noon', '.json', '.git', '']
-            dir:         (p) => if slash.basename(p) == '.git' then @projects[slash.basename slash.dirname p] = dir: slash.tilde slash.dirname p
-            file:        (p) => if slash.fileName(p) == 'package' then @projects[slash.basename slash.dirname p] = dir: slash.tilde slash.dirname p
+            filter:      (p) -> slash.ext(p) not in ['noon', 'json', 'git', '']
+            dir:         (p) => if slash.file(p) == '.git'    then @projects[slash.basename slash.dirname p] = dir: slash.tilde slash.dirname p
+            file:        (p) => if slash.base(p) == 'package' then @projects[slash.basename slash.dirname p] = dir: slash.tilde slash.dirname p
         w.start()
 
     # 000  000   000  0000000    00000000  000   000        0000000    000  00000000
@@ -252,7 +252,7 @@ class Indexer
                     while funcStack.length and indent <= _.last(funcStack)[0]
                         _.last(funcStack)[1].last = li - 1
                         funcInfo = funcStack.pop()[1]
-                        funcInfo.class ?= slash.fileName file
+                        funcInfo.class ?= slash.base file
                         fileInfo.funcs.push funcInfo 
 
                     if currentClass? and indent == 4
@@ -348,10 +348,10 @@ class Indexer
                                 r = fileInfo.require ? []
                                 r.push [m[1], m[2]]
                                 fileInfo.require = r
-                                abspath = slash.resolve slash.join slash.dirname(file), m[2]
+                                abspath = slash.resolve slash.join slash.dir(file), m[2]
                                 abspath += '.coffee'
                                 if (m[2][0] == '.') and (not @files[abspath]?) and (@queue.indexOf(abspath) < 0)
-                                    if slash.fileExists abspath
+                                    if slash.isFile abspath
                                         @queue.push abspath
 
                         #  00  00   000  000   000   0000000  000      000   000  0000000    00000000
@@ -366,7 +366,7 @@ class Indexer
                                 r = fileInfo.require ? []
                                 r.push [null, m[1]]
                                 fileInfo.require = r
-                                abspath = slash.resolve slash.join slash.dirname(file), m[1]
+                                abspath = slash.resolve slash.join slash.dir(file), m[1]
                                 abspath += '.coffee' if not slash.extname m[1]
                                 if not @files[abspath]? and @queue.indexOf(abspath) < 0
                                     if slash.fileExists abspath
@@ -376,8 +376,8 @@ class Indexer
                 while funcStack.length
                     _.last(funcStack)[1].last = li - 1
                     funcInfo = funcStack.pop()[1]
-                    funcInfo.class ?= slash.fileName funcInfo.file
-                    funcInfo.class ?= slash.fileName file
+                    funcInfo.class ?= slash.base funcInfo.file
+                    funcInfo.class ?= slash.base file
                     fileInfo.funcs.push funcInfo
 
                 post.toWins 'classesCount', _.size @classes
@@ -388,7 +388,7 @@ class Indexer
             
             post.toWins 'filesCount', _.size @files
 
-            @indexDir slash.dirname file
+            @indexDir slash.dir file
             @indexDir slash.pkg file
 
             @shiftQueue()

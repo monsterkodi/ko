@@ -29,6 +29,12 @@ class Row
     onMouseOut:  -> @div.classList.remove 'hover'
     onMouseOver: -> @div.classList.add 'hover'
 
+    path: -> 
+        if @item.file? and _.isString @item.file
+            return @item.file
+        if @item.obj?.file? and _.isString @item.obj.file
+            return @item.obj.file
+    
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
     # 000   000  000          000     000  000   000  000   000     000     000       
     # 000000000  000          000     000   000 000   000000000     000     0000000   
@@ -85,7 +91,7 @@ class Row
         @column.activeRow()?.clearActive()
         @div.classList.add 'active'
         @column.scroll.toIndex @index() 
-        
+        window.setLastFocus @column.name()
         if opt?.emit then @browser.emit 'itemActivated', @item
         @
                 
