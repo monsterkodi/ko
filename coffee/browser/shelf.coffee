@@ -5,7 +5,7 @@
 #      000  000   000  000       000      000     
 # 0000000   000   000  00000000  0000000  000     
 
-{ stopEvent, keyinfo, slash, post, elem, clamp, empty, error, log, $, _ } = require 'kxk'
+{ stopEvent, keyinfo, slash, prefs, post, elem, clamp, empty, error, log, $, _ } = require 'kxk'
 
 Row        = require './row'
 Scroller   = require './scroller'
@@ -16,8 +16,6 @@ class Shelf
 
     constructor: (@browser) ->
 
-        log 'shelf.constructor'
-        
         @index = -1
         @items = []
         @rows = []
@@ -44,20 +42,17 @@ class Shelf
         return if @didInit
         @didInit = true
         
-        @addDir slash.resolve '~'
-        @addDir '~/s'
-        @addDir '~/s/kxk'
-        @addDir '~/s/konrad'
-        @addDir '~/s/ko'
-        @addFile '~/s/ko/package.noon'
+        items = prefs.get "shelf:items", ['~']
+        if not empty items
+            for item in items
+                @addPath slash.resolve(item), save:false
         
-    addPath: (path) =>
+    addPath: (path, opt) =>
         
         if slash.isDir path
-            @addDir path
+            @addDir path, opt
         else
-            @addFile path
-        
+            @addFile path, opt
         
     #  0000000  00000000  000000000  000  000000000  00000000  00     00   0000000  
     # 000       000          000     000     000     000       000   000  000       
@@ -73,28 +68,36 @@ class Shelf
             @rows.push new Row @, item
         
         @scroll.update()
+        
+        if opt?.save != false
+            items = @rows.map (r) -> r.path()
+            log 'save items', items
+            prefs.set "shelf:items", items
+            
         @
         
-    addDir: (dir) ->
+    addDir: (dir, opt) ->
         
         @items.push 
-            name: slash.file dir
+            name: slash.file slash.tilde dir
             type: 'dir'
-            file: dir
+            file: slash.path dir
         
-        @setItems @items
+        @setItems @items, opt
 
-    addFile: (file) ->
+    addFile: (file, opt) ->
         
         @items.push 
             name: slash.file file
             type: 'file'
-            file: file
+            file: slash.path file
         
-        @setItems @items
+        @setItems @items, opt
         
     isEmpty: -> empty @rows
-    clear:   ->
+    
+    clear: ->
+        
         @clearSearch()
         @div.scrollTop = 0
         @table.innerHTML = ''
