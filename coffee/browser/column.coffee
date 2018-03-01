@@ -98,7 +98,7 @@ class Column
     
     rowIndexAtPos: (pos) ->
         
-        Math.max 0, Math.floor (pos.y - @div.getBoundingClientRect().top) / @rowHeight
+        Math.max 0, Math.floor (pos.y - @div.getBoundingClientRect().top) / @rowHeight()
     
     # 00000000   0000000    0000000  000   000   0000000  
     # 000       000   000  000       000   000  000       
@@ -109,6 +109,7 @@ class Column
     hasFocus: -> @div.classList.contains 'focus'
 
     focus: ->
+        # log 'column.focus', @index
         if not @activeRow() and @numRows()
             @rows[0].setActive emit:true
         @div.focus()

@@ -112,10 +112,15 @@ class Row
     # 0000000    000   000  000   000   0000000   
     
     onDragStart: (d, e) =>
+        @column.focus()
+        @setActive()
 
     onDragMove: (d,e) =>
         
         if not @column.dragDiv
+            
+            return if Math.abs(d.deltaSum.x) < 20 and Math.abs(d.deltaSum.y) < 10
+            
             @column.dragDiv = @div.cloneNode true
             br = @div.getBoundingClientRect()
             @column.dragDiv.style.position = 'absolute'
@@ -129,14 +134,14 @@ class Row
         
         @column.dragDiv.style.transform = "translateX(#{d.deltaSum.x}px) translateY(#{d.deltaSum.y}px)"
 
-    onDragStop: (drag,e) =>
+    onDragStop: (d,e) =>
         
         if @column.dragDiv?
             
             @column.dragDiv.remove()
             delete @column.dragDiv
             
-            if column = @browser.columnAtPos drag.pos
-                column.dropRow? @
+            if column = @browser.columnAtPos d.pos
+                column.dropRow? @, d.pos
         
 module.exports = Row

@@ -235,7 +235,7 @@ class Commandline extends TextEditor
         @list.style.display = 'unset'
         for name in @mainCommands
             cmmd = @commands[name]
-            log 'listCommands mainCommand', name, 'names', cmmd?.names
+            # log 'listCommands mainCommand', name, 'names', cmmd?.names
             for ci in [0...cmmd.names.length]
                 cname = cmmd.names[ci]
                 continue if cname in @hideCommands

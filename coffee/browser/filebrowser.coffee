@@ -80,7 +80,8 @@ class FileBrowser extends Browser
     
     loadFile: (file, opt = focus:true, column:0) ->
         
-        dir  = slash.pkg file
+        dir  = opt.dir 
+        dir ?= slash.pkg file
         dir ?= slash.dirname file
         opt.file = file
         @skipJump = opt.dontJump
@@ -127,7 +128,7 @@ class FileBrowser extends Browser
             
             opt.parent ?=
                 type: 'dir'
-                file: dir
+                file: slash.path dir
                 name: slash.basename dir
 
             column = opt.column ? 0
@@ -149,7 +150,6 @@ class FileBrowser extends Browser
                         type: 'dir'
                         file: dir
                     
-                        
             @loadItems items, opt
 
     # 000       0000000    0000000   0000000         000  000000000  00000000  00     00   0000000  
@@ -162,6 +162,7 @@ class FileBrowser extends Browser
 
         if opt?.file
             @navigateTargetFile = opt.file
+            @navigateTargetOpt  = opt
 
         @getGitStatus opt
             
@@ -247,9 +248,12 @@ class FileBrowser extends Browser
             
             col = @lastUsedColumn()
             
-            if col.parent.type == 'file'
-                @column(col.index-1)?.focus()
-            else
-                col.focus()
+            if @navigateTargetOpt.focus != false
+                if col.parent.type == 'file'
+                    @column(col.index-1)?.focus()
+                else
+                    col.focus()
+                    
+            delete @navigateTargetOpt
     
 module.exports = FileBrowser

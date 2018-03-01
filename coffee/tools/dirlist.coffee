@@ -61,12 +61,18 @@ dirList = (dirPath, opt, cb) ->
     
     onDir = (d) -> 
         if not filter(d) 
-            dir = type: 'dir', file: d, name: slash.basename d # relative d, dirPath 
+            dir = 
+                type: 'dir'
+                file: slash.path d
+                name: slash.basename d
             dirs.push  dir
             
     onFile = (f) -> 
         if not filter(f) 
-            file = type: 'file', file: f, name: slash.basename f # relative f, dirPath
+            file = 
+                type: 'file'
+                file: slash.path f
+                name: slash.basename f
             file.textFile = true if isTextFile f
             files.push file
 
