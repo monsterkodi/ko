@@ -131,10 +131,12 @@ class Row
 
     onDragStop: (drag,e) =>
         
-        @column.dragDiv.remove()
-        delete @column.dragDiv
-        
-        if column = @browser.columnAtPos drag.pos
-            column.dropRow? @
+        if @column.dragDiv?
+            
+            @column.dragDiv.remove()
+            delete @column.dragDiv
+            
+            if column = @browser.columnAtPos drag.pos
+                column.dropRow? @
         
 module.exports = Row

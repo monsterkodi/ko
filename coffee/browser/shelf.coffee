@@ -9,33 +9,35 @@
 
 Row        = require './row'
 Scroller   = require './scroller'
+Column     = require './column'
 fuzzaldrin = require 'fuzzaldrin'
 fuzzy      = require 'fuzzy'
 
-class Shelf
+class Shelf extends Column
 
-    constructor: (@browser) ->
+    constructor: (browser) ->
 
-        @index = -1
-        @items = []
-        @rows = []
-        @div = elem id: 'shelf', tabIndex: 7
-        @table = elem class: 'browserColumnTable'
-        @div.appendChild @table
+        super browser
         
-        @div.addEventListener 'focus',     @onFocus
-        @div.addEventListener 'blur',      @onBlur
-        @div.addEventListener 'keydown',   @onKey
-        
-        @div.addEventListener 'mouseover', @onMouseOver
-        @div.addEventListener 'mouseout',  @onMouseOut
+        # @items = []
+        @index  = -1
+        @div.id = 'shelf'
+        # @table = elem class: 'browserColumnTable'
+        # @div.appendChild @table
+#         
+        # @div.addEventListener 'focus',     @onFocus
+        # @div.addEventListener 'blur',      @onBlur
+        # @div.addEventListener 'keydown',   @onKey
+#         
+        # @div.addEventListener 'mouseover', @onMouseOver
+        # @div.addEventListener 'mouseout',  @onMouseOut
 
-        @div.addEventListener 'click',     @onClick
-        @div.addEventListener 'dblclick',  @onDblClick
-        
+        # @div.addEventListener 'click',     @onClick
+        # @div.addEventListener 'dblclick',  @onDblClick
+#         
         post.on 'addToShelf', @addPath
-        
-        @scroll = new Scroller @
+#         
+        # @scroll = new Scroller @
 
     browserDidInitColumns: ->
         
@@ -54,11 +56,11 @@ class Shelf
         else
             @addFile path, opt
         
-    #  0000000  00000000  000000000  000  000000000  00000000  00     00   0000000  
-    # 000       000          000     000     000     000       000   000  000       
-    # 0000000   0000000      000     000     000     0000000   000000000  0000000   
-    #      000  000          000     000     000     000       000 0 000       000  
-    # 0000000   00000000     000     000     000     00000000  000   000  0000000   
+    # 000  000000000  00000000  00     00   0000000  
+    # 000     000     000       000   000  000       
+    # 000     000     0000000   000000000  0000000   
+    # 000     000     000       000 0 000       000  
+    # 000     000     00000000  000   000  0000000   
 
     savePrefs: -> prefs.set "shelf:items", @itemPaths()
     itemPaths: -> @rows.map (r) -> r.path()
@@ -78,32 +80,35 @@ class Shelf
         
     addDir: (dir, opt) ->
         
-        return if slash.path(dir) in @itemPaths()
-        
-        @items.push 
+        item = 
             name: slash.file slash.tilde dir
             type: 'dir'
             file: slash.path dir
         
-        @setItems @items, opt
+        @addItem item, opt
 
     addFile: (file, opt) ->
         
-        return if slash.path(file) in @itemPaths()
-        
-        @items.push 
+        item = 
             name: slash.file file
             type: 'file'
             file: slash.path file
+            
+        @addItem item, opt
         
-        @setItems @items, opt
+    addItem:  (item, opt) ->
         
-    addFunc:  (item) -> @addItem item
-    addClass: (item) -> @addItem item
-    addItem:  (item) ->
-        @items.push item
+        # remove item if on shelf already
+        
+        if opt?.pos
+            index = @rowIndexAtPos opt.pos
+            @items.splice index, 0, item
+        else
+            @items.push item
         @setItems @items
-        
+
+    dropRow: (row, pos) -> @addItem row.item, pos:pos
+            
     isEmpty: -> empty @rows
     
     clear: ->
@@ -114,16 +119,7 @@ class Shelf
         @rows = []
         @scroll.update()
         @savePrefs()
-            
-    dropRow: (row) ->
-        
-        log "Shelf.dropRow", row.item
-        switch row.item.type
-            when 'file'  then @addFile row.item.file
-            when 'dir'   then @addDir  row.item.file
-            when 'class' then @addClass row.item
-            when 'func'  then @addFunc  row.item
-        
+                            
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
     # 000   000  000          000     000  000   000  000   000     000     000       
     # 000000000  000          000     000   000 000   000000000     000     0000000   
@@ -140,20 +136,23 @@ class Shelf
         switch item.type
             when 'dir'   then @browser.loadDir     item.file, column: 0, parent: item
             when 'file'  then post.emit 'jumpToFile', file:item.file
+            else
+                if item.file
+                    post.emit 'jumpToFile', file:item.file, line:item.line, col:item.column
        
-    activeRow: -> _.find @rows, (r) -> r.isActive()
-    
-    row: (row) -> # accepts element, index, string or row
-        if      _.isNumber  row then return 0 <= row < @numRows() and @rows[row] or null
-        else if _.isElement row then return _.find @rows, (r) -> r.div.contains row
-        else if _.isString  row then return _.find @rows, (r) -> r.item.name == row
-        else return row
+    # activeRow: -> _.find @rows, (r) -> r.isActive()
+#     
+    # row: (row) -> # accepts element, index, string or row
+        # if      _.isNumber  row then return 0 <= row < @numRows() and @rows[row] or null
+        # else if _.isElement row then return _.find @rows, (r) -> r.div.contains row
+        # else if _.isString  row then return _.find @rows, (r) -> r.item.name == row
+        # else return row
     
     name: -> 'shelf'
         
-    numRows:    -> @rows.length ? 0   
-    rowHeight:  -> @rows[0]?.div.clientHeight ? 0
-    numVisible: -> @rowHeight() and parseInt(@browser?.height() / @rowHeight()) or 0
+    # numRows:    -> @rows.length ? 0   
+    # rowHeight:  -> @rows[0]?.div.clientHeight ? 0
+    # numVisible: -> @rowHeight() and parseInt(@browser?.height() / @rowHeight()) or 0
     
     # 00000000   0000000    0000000  000   000   0000000  
     # 000       000   000  000       000   000  000       
@@ -161,14 +160,14 @@ class Shelf
     # 000       000   000  000       000   000       000  
     # 000        0000000    0000000   0000000   0000000   
     
-    hasFocus: -> @div.classList.contains 'focus'
+    # hasFocus: -> @div.classList.contains 'focus'
 
-    focus: ->
-        log 'shelf.focus'
-        if not @activeRow() and @numRows()
-            @rows[0].setActive emit:true
-        @div.focus()
-        @
+    # focus: ->
+        # log 'shelf.focus'
+        # if not @activeRow() and @numRows()
+            # @rows[0].setActive emit:true
+        # @div.focus()
+        # @
         
     onFocus: => 
         window.setLastFocus 'shelf'
@@ -176,11 +175,9 @@ class Shelf
         if @browser.shelfSize < 200
             @browser.setShelfSize 200
         
-    onBlur:  => 
-        @div.classList.remove 'focus'
-    
-    focusBrowser: ->
-        @browser.focus()
+    # onBlur:  => 
+        # @div.classList.remove 'focus'
+#     
         
     # 00     00   0000000   000   000   0000000  00000000  
     # 000   000  000   000  000   000  000       000       
@@ -233,45 +230,45 @@ class Shelf
     #      000  000       000   000  000   000  000       000   000    
     # 0000000   00000000  000   000  000   000   0000000  000   000    
     
-    doSearch: (char) ->
-        
-        return if not @numRows()
-        
-        clearTimeout @searchTimer
-        @searchTimer = setTimeout @clearSearch, 2000
-        @search += char
-        
-        if not @searchDiv
-            @searchDiv = elem class: 'browserSearch'
-            
-        @searchDiv.textContent = @search
+    # doSearch: (char) ->
+#         
+        # return if not @numRows()
+#         
+        # clearTimeout @searchTimer
+        # @searchTimer = setTimeout @clearSearch, 2000
+        # @search += char
+#         
+        # if not @searchDiv
+            # @searchDiv = elem class: 'browserSearch'
+#             
+        # @searchDiv.textContent = @search
 
-        activeIndex  = @activeRow()?.index() ? 0
-        activeIndex += 1 if (@search.length == 1) or (char == '')
-        activeIndex  = 0 if activeIndex >= @numRows()
-        
-        for rows in [@rows.slice(activeIndex), @rows.slice(0,activeIndex+1)]
-            fuzzied = fuzzy.filter @search, rows, extract: (r) -> r.item.name
-            
-            if fuzzied.length
-                row = fuzzied[0].original
-                autoNavi = row.item.name == @search and @browser.endNavigateToTarget? and row.item.type in ['file', 'dir'] # smelly
-                if autoNavi
-                    @browser.navigateTargetFile = row.item.file
-                    @clearSearch()    
-                else
-                    row.div.appendChild @searchDiv
-    
-                row.activate()
-                break
-        @
-    
-    clearSearch: =>
-        
-        @search = ''
-        @searchDiv?.remove()
-        delete @searchDiv
-        @
+        # activeIndex  = @activeRow()?.index() ? 0
+        # activeIndex += 1 if (@search.length == 1) or (char == '')
+        # activeIndex  = 0 if activeIndex >= @numRows()
+#         
+        # for rows in [@rows.slice(activeIndex), @rows.slice(0,activeIndex+1)]
+            # fuzzied = fuzzy.filter @search, rows, extract: (r) -> r.item.name
+#             
+            # if fuzzied.length
+                # row = fuzzied[0].original
+                # autoNavi = row.item.name == @search and @browser.endNavigateToTarget? and row.item.type in ['file', 'dir'] # smelly
+                # if autoNavi
+                    # @browser.navigateTargetFile = row.item.file
+                    # @clearSearch()    
+                # else
+                    # row.div.appendChild @searchDiv
+#     
+                # row.activate()
+                # break
+        # @
+#     
+    # clearSearch: =>
+#         
+        # @search = ''
+        # @searchDiv?.remove()
+        # delete @searchDiv
+        # @
     
     removeObject: ->
         

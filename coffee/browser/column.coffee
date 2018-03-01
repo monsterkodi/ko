@@ -16,14 +16,17 @@ class Column
     
     constructor: (@browser) ->
         
-        @index = @browser.columns.length
+        @index = @browser.columns?.length
         @search = ''
         @searchTimer = null
+        @items = []
         @rows = []
+        
         @div = elem class: 'browserColumn', tabIndex: 6, id: @name()
         @table = elem class: 'browserColumnTable'
         @div.appendChild @table
-        @browser.cols.appendChild @div
+        
+        @browser.cols?.appendChild @div
         
         @div.addEventListener 'focus',     @onFocus
         @div.addEventListener 'blur',      @onBlur
@@ -93,6 +96,10 @@ class Column
     rowHeight:  -> @rows[0]?.div.clientHeight ? 0
     numVisible: -> @rowHeight() and parseInt(@browser.height() / @rowHeight()) or 0
     
+    rowIndexAtPos: (pos) ->
+        
+        Math.max 0, Math.floor (pos.y - @div.getBoundingClientRect().top) / @rowHeight
+    
     # 00000000   0000000    0000000  000   000   0000000  
     # 000       000   000  000       000   000  000       
     # 000000    000   000  000       000   000  0000000   
@@ -110,6 +117,8 @@ class Column
         
     onFocus: => @div.classList.add 'focus'
     onBlur:  => @div.classList.remove 'focus'
+
+    focusBrowser: -> @browser.focus()
     
     # 00     00   0000000   000   000   0000000  00000000  
     # 000   000  000   000  000   000  000       000       
