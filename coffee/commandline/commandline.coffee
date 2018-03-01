@@ -198,7 +198,7 @@ class Commandline extends TextEditor
         @setName r.name if r?.name?
         @setText r.text if r?.text?
         if r?.select then @selectAll() else @selectNone()
-        log 'commandline.results', r
+        # log 'commandline.results', r
         window.split.show   r.show   if r?.show?
         window.split.focus  r.focus  if r?.focus?
         window.split.do     r.do     if r?.do?

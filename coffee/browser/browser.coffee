@@ -45,6 +45,13 @@ class Browser extends Stage
             panes: panes
             onPaneSize: @updateColumnScrolls
         
+    columnAtPos: (pos) ->
+        
+        for column in @columns
+            if elem.containsPos column.div, pos
+                return column
+        null
+                            
     # 000       0000000    0000000   0000000         000  000000000  00000000  00     00   0000000  
     # 000      000   000  000   000  000   000       000     000     000       000   000  000       
     # 000      000   000  000000000  000   000       000     000     0000000   000000000  0000000   

@@ -571,7 +571,7 @@ class TextEditor extends Editor
         @emit 'clearLines'
 
     clear: => 
-        log 'TextEditor.clear', @name
+        # log 'TextEditor.clear', @name
         @setLines []
 
     focus: -> @view.focus()

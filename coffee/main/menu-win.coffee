@@ -251,21 +251,21 @@ class Menu
                 type: 'separator'
             ,
                 label:       'Activate Next Tab'
-                accelerator: 'Ctrl+alt+right'
+                accelerator: 'ctrl+alt+shift+right'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'Activate Next Tab'
             , 
                 label:       'Activate Previous Tab'
-                accelerator: 'Ctrl+alt+left'
+                accelerator: 'ctrl+alt+shift+left'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'Activate Previous Tab'
             ,
                 type: 'separator'
             ,
                 label:       'Move Tab Right'
-                accelerator: 'Ctrl+alt+shift+right'
+                accelerator: 'ctrl+alt+shift+.'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'Move Tab Right'
             , 
                 label:       'Move Tab Left'
-                accelerator: 'Ctrl+alt+shift+left'
+                accelerator: 'Ctrl+alt+shift+,'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'Move Tab Left'
             ,
                 type: 'separator'

@@ -187,7 +187,7 @@ class Open extends Command
         
         @lastFileIndex = 0
         @dir = slash.resolve '~' if not @dir?
-        log 'open/listItems', @dir, slash.resolve '~'
+        # log 'open/listItems', @dir, slash.resolve '~'
 
         if @history? and not @navigating and not opt?.currentText and @history.length > 1
             f = @history[@history.length-2]

@@ -6,7 +6,7 @@
 000       000  0000000  00000000        0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 ###
 
-{ empty, elem, post, clamp, childp, prefs, slash, fs, os, error, log, $ } = require 'kxk'
+{ empty, elem, clamp, drag, post, clamp, childp, prefs, slash, fs, os, error, log, $ } = require 'kxk'
   
 Browser  = require './browser'
 Shelf    = require './shelf'
@@ -27,15 +27,50 @@ class FileBrowser extends Browser
         post.on 'gitRefChanged',         @updateGitStatus
         post.on 'fileIndexed',           @onFileIndexed
     
+        @shelfResize = elem 'div', class: 'shelfResize'
+        @shelfResize.style.position = 'absolute'
+        @shelfResize.style.top      = '0px'
+        @shelfResize.style.bottom   = '0px'
+        @shelfResize.style.left     = '194px'
+        @shelfResize.style.width    = '6px'
+        @shelfResize.style.cursor   = 'ew-resize'
+        
+        @drag = new drag
+            target:  @shelfResize
+            onMove:  @onShelfDrag
+            
+        @shelfSize = prefs.get 'shelf:size', 200
+        
     initColumns: ->
         
         super()
-        
+                
         @view.insertBefore @shelf.div, @view.firstChild
+        @view.insertBefore @shelfResize, null
+        
         @shelf.browserDidInitColumns()        
         
-        @cols.style.left = '200px'
+        @setShelfSize @shelfSize
+
+    columnAtPos: (pos) ->
         
+        if column = super pos
+            return column
+                
+        if elem.containsPos @shelf.div, pos
+            return @shelf
+        
+    onShelfDrag: (drag, event) => 
+        
+        shelfSize = clamp 0, 400, drag.pos.x
+        @setShelfSize shelfSize
+        
+    setShelfSize: (@shelfSize) ->
+        
+        prefs.set 'shelf:size', @shelfSize
+        @shelfResize.style.left = "#{@shelfSize}px"
+        @shelf.div.style.width = "#{@shelfSize}px"
+        @cols.style.left = "#{@shelfSize}px"
         
     # 00000000  000  000      00000000  
     # 000       000  000      000       

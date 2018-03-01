@@ -5,7 +5,7 @@
 # 000   000  000   000  000   000
 # 000   000   0000000   00     00
 
-{ elem, keyinfo, clamp, empty, post, error, log, $, _ } = require 'kxk' 
+{ elem, keyinfo, drag, clamp, empty, post, error, log, $, _ } = require 'kxk' 
 
 syntax = require '../editor/syntax'
 
@@ -22,6 +22,12 @@ class Row
         @div = elem class: 'browserRow', html: html
         @div.classList.add @item.type
         @column.table.appendChild @div
+        
+        @drag = new drag
+            target: @div
+            onStart: @onDragStart
+            onMove:  @onDragMove
+            onStop:  @onDragStop
    
     next:        -> @index() < @column.numRows()-1 and @column.rows[@index()+1] or null
     prev:        -> @index() > 0 and @column.rows[@index()-1] or null
@@ -99,4 +105,36 @@ class Row
         @div.classList.remove 'active'
         @
 
+    # 0000000    00000000    0000000    0000000   
+    # 000   000  000   000  000   000  000        
+    # 000   000  0000000    000000000  000  0000  
+    # 000   000  000   000  000   000  000   000  
+    # 0000000    000   000  000   000   0000000   
+    
+    onDragStart: (d, e) =>
+
+    onDragMove: (d,e) =>
+        
+        if not @column.dragDiv
+            @column.dragDiv = @div.cloneNode true
+            br = @div.getBoundingClientRect()
+            @column.dragDiv.style.position = 'absolute'
+            @column.dragDiv.style.top  = "#{br.top}px"
+            @column.dragDiv.style.left = "#{br.left}px"
+            @column.dragDiv.style.width = "#{br.width-12}px"
+            @column.dragDiv.style.height = "#{br.height-3}px"
+            @column.dragDiv.style.flex = 'unset'
+            @column.dragDiv.style.pointerEvents = 'none'
+            body.appendChild @column.dragDiv
+        
+        @column.dragDiv.style.transform = "translateX(#{d.deltaSum.x}px) translateY(#{d.deltaSum.y}px)"
+
+    onDragStop: (drag,e) =>
+        
+        @column.dragDiv.remove()
+        delete @column.dragDiv
+        
+        if column = @browser.columnAtPos drag.pos
+            column.dropRow? @
+        
 module.exports = Row

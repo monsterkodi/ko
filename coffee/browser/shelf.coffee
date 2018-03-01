@@ -59,6 +59,9 @@ class Shelf
     # 0000000   0000000      000     000     000     0000000   000000000  0000000   
     #      000  000          000     000     000     000       000 0 000       000  
     # 0000000   00000000     000     000     000     00000000  000   000  0000000   
+
+    savePrefs: -> prefs.set "shelf:items", @itemPaths()
+    itemPaths: -> @rows.map (r) -> r.path()
     
     setItems: (@items, opt) ->
         
@@ -70,13 +73,12 @@ class Shelf
         @scroll.update()
         
         if opt?.save != false
-            items = @rows.map (r) -> r.path()
-            log 'save items', items
-            prefs.set "shelf:items", items
-            
+            @savePrefs()            
         @
         
     addDir: (dir, opt) ->
+        
+        return if slash.path(dir) in @itemPaths()
         
         @items.push 
             name: slash.file slash.tilde dir
@@ -87,12 +89,20 @@ class Shelf
 
     addFile: (file, opt) ->
         
+        return if slash.path(file) in @itemPaths()
+        
         @items.push 
             name: slash.file file
             type: 'file'
             file: slash.path file
         
         @setItems @items, opt
+        
+    addFunc:  (item) -> @addItem item
+    addClass: (item) -> @addItem item
+    addItem:  (item) ->
+        @items.push item
+        @setItems @items
         
     isEmpty: -> empty @rows
     
@@ -103,7 +113,17 @@ class Shelf
         @table.innerHTML = ''
         @rows = []
         @scroll.update()
-                    
+        @savePrefs()
+            
+    dropRow: (row) ->
+        
+        log "Shelf.dropRow", row.item
+        switch row.item.type
+            when 'file'  then @addFile row.item.file
+            when 'dir'   then @addDir  row.item.file
+            when 'class' then @addClass row.item
+            when 'func'  then @addFunc  row.item
+        
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
     # 000   000  000          000     000  000   000  000   000     000     000       
     # 000000000  000          000     000   000 000   000000000     000     0000000   
@@ -113,7 +133,6 @@ class Shelf
     activateRow: (row) -> 
         
         item = row.item
-        log "Shelf.activateRow row:", item
         
         $('.hover')?.classList.remove 'hover'
         row.setActive emit:false
@@ -154,6 +173,8 @@ class Shelf
     onFocus: => 
         window.setLastFocus 'shelf'
         @div.classList.add 'focus'
+        if @browser.shelfSize < 200
+            @browser.setShelfSize 200
         
     onBlur:  => 
         @div.classList.remove 'focus'
@@ -260,6 +281,7 @@ class Shelf
             @items.splice row.index(), 1
             @rows.splice row.index(), 1
             nextOrPrev?.activate()
+            @savePrefs()
         @
   
     # 000   000  00000000  000   000  
