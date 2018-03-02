@@ -27,6 +27,11 @@ class Indexer
         m = line.match Indexer.classRegExp
         m?[3]
 
+    @methodNameInLine: (line) ->
+        
+        m = line.match Indexer.methodRegExp
+        m?[1]
+        
     @funcNameInLine: (line) ->
 
         m = line.match Indexer.funcRegExp
@@ -253,10 +258,13 @@ class Indexer
             funcAdded = false
             funcStack = []
             currentClass = null
+            
             for li in [0...lines.length]
+                
                 line = lines[li]
 
                 if line.trim().length # ignoring empty lines
+                    
                     indent = line.search /\S/
 
                     while funcStack.length and indent <= _.last(funcStack)[0]
@@ -265,7 +273,7 @@ class Indexer
                         funcInfo.class ?= slash.base file
                         fileInfo.funcs.push funcInfo 
 
-                    if currentClass? and indent == 4
+                    if currentClass? and indent >= 4
 
                         # 00     00  00000000  000000000  000   000   0000000   0000000     0000000
                         # 000   000  000          000     000   000  000   000  000   000  000
@@ -368,6 +376,7 @@ class Indexer
                         #  00  00   000  000   000   0000000  0000000   0000000   0000000    00000000
                         
                         when '#include'
+                            
                             m = line.match Indexer.includeRegExp
                             if m?[1]?
                                 r = fileInfo.require ? []

@@ -25,4 +25,8 @@ describe 'indexer', ->
         expect(Indexer.classNameInLine('class SOME_API USomeObject : public UObject')).to.eql 'USomeObject'
         expect(Indexer.classNameInLine('struct SOME_API FSomeStruct : public FSomeBase')).to.eql 'FSomeStruct'
     
+    it 'methodNameInLine', -> 
         
+        expect(Indexer.methodNameInLine('   coffeeMethod: ->')).to.eql 'coffeeMethod'
+        expect(Indexer.methodNameInLine('   coffeeMeth_2: () ->')).to.eql 'coffeeMeth_2'
+        expect(Indexer.methodNameInLine('   coffeeMeth_3 : (a,b)  => ')).to.eql 'coffeeMeth_3'
