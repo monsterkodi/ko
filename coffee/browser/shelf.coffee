@@ -87,7 +87,7 @@ class Shelf extends Column
         
         if opt?.pos
             index = @rowIndexAtPos opt.pos
-            @items.splice index, 0, item
+            @items.splice Math.min(index, @items.length), 0, item
         else
             @items.push item
             

@@ -5,7 +5,7 @@
 # 000   000  000       000        000   000  000   000     000     
 # 000   000  00000000  000         0000000   000   000     000     
 
-{str, post, noon, _} = require 'kxk'
+{ str, post, noon, _ } = require 'kxk'
 syntax = require '../editor/syntax'
 
 log = ->

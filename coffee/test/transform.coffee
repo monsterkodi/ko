@@ -5,10 +5,8 @@
 #    000     000   000  000   000  000  0000       000  000       000   000  000   000  000 0 000  
 #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000  
 
-{ post, reversed, fs, log 
-} = require 'kxk'
-{ expect
-} = require 'chai'
+{ post, reversed, fs, log } = require 'kxk'
+{ expect } = require 'chai'
 
 return if not window?.editor
 

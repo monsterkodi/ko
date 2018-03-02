@@ -15,13 +15,23 @@ BrowserWindow = electron.BrowserWindow
 class Indexer
 
     @requireRegExp = /^\s*([\w\{\}]+)\s+=\s+require\s+[\'\"]([\.\/\w]+)[\'\"]/
-    @classRegExp   = /^\s*class\s+(\w+)(\s+extends\s\w+.*|\s*:\s*[\w\,\s\<\>]+)?\s*$/
+    @classRegExp   = /^\s*(class|struct)(\s+\w+_API)?\s+(\w+)(\s+extends\s\w+.*|\s*:\s*[\w\,\s\<\>]+)?\s*$/
     @includeRegExp = /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
     @methodRegExp  = /^\s+([\@]?\w+)\s*\:\s*(\(.*\))?\s*[=-]\>/
     @funcRegExp    = /^\s*([\w\.]+)\s*[\:\=]\s*(\(.*\))?\s*[=-]\>/
     @testRegExp    = /^\s*(describe|it)\s+[\'\"](.+)[\'\"]\s*[\,]\s*(\([^\)]*\))?\s*[=-]\>/
     @splitRegExp   = new RegExp "[^\\w\\d\\_]+", 'g'
 
+    @classNameInLine: (line) ->
+                    
+        m = line.match Indexer.classRegExp
+        m?[3]
+
+    @funcNameInLine: (line) ->
+
+        m = line.match Indexer.funcRegExp
+        m?[1]
+    
     # 000000000  00000000   0000000  000000000  000   000   0000000   00000000   0000000    
     #    000     000       000          000     000 0 000  000   000  000   000  000   000  
     #    000     0000000   0000000      000     000000000  000   000  0000000    000   000  
@@ -38,7 +48,7 @@ class Indexer
             when /^[0\_\-\@\#]+$/.test word then false # exclude when consist of special characters only
             when /\d/.test word then false # exclude when word contains number
             else true
-    
+        
     #  0000000   0000000   000   000   0000000  000000000  00000000   000   000   0000000  000000000   0000000   00000000   
     # 000       000   000  0000  000  000          000     000   000  000   000  000          000     000   000  000   000  
     # 000       000   000  000 0 000  0000000      000     0000000    000   000  000          000     000   000  0000000    
@@ -263,10 +273,8 @@ class Indexer
                         # 000 0 000  000          000     000   000  000   000  000   000       000
                         # 000   000  00000000     000     000   000   0000000   0000000    0000000
 
-                        m = line.match Indexer.methodRegExp
-                        if m?[1]?
-                            funcName = m[1]
-                            funcInfo = @addMethod currentClass, funcName, file, li
+                        if methodName = Indexer.methodNameInLine line
+                            funcInfo = @addMethod currentClass, methodName, file, li
                             funcStack.push [indent, funcInfo]
                             funcAdded = true
                     else
@@ -289,10 +297,9 @@ class Indexer
                         # 000        0000000   000   000   0000000     000     000   0000000   000   000  0000000
 
                         currentClass = null if indent < 4
-                        m = line.match Indexer.funcRegExp
-                        if m?[1]?
 
-                            funcInfo = @addFuncInfo m[1],
+                        if funcName = Indexer.funcNameInLine line
+                            funcInfo = @addFuncInfo funcName,
                                 line: li+1
                                 file: file
 
@@ -324,16 +331,15 @@ class Indexer
                         # 000       000      000   000       000       000
                         #  0000000  0000000  000   000  0000000   0000000
                         
-                        when 'class'
+                        when 'class', 'struct'
                             
-                            m = line.match Indexer.classRegExp
-                            if m?[1]?
-                                currentClass = m[1]
-                                _.set @classes, "#{m[1]}.file", file
-                                _.set @classes, "#{m[1]}.line", li+1
+                            if className = Indexer.classNameInLine line
+                                currentClass = className
+                                _.set @classes, "#{className}.file", file
+                                _.set @classes, "#{className}.line", li+1
                                 
                                 fileInfo.classes.push 
-                                    name: m[1]
+                                    name: className
                                     line: li+1
 
                         # 00000000   00000000   0000000   000   000  000  00000000   00000000
@@ -343,6 +349,7 @@ class Indexer
                         # 000   000  00000000   00000 00   0000000   000  000   000  00000000
                         
                         when 'require'
+                            
                             m = line.match Indexer.requireRegExp
                             if m?[1]? and m[2]?
                                 r = fileInfo.require ? []

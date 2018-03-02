@@ -21,6 +21,6 @@ describe 'dirList', ->
                 type:       'file'
                 textFile:   true
                 name:       slash.basename __filename
-                file:       __filename
+                file:       slash.path __filename
             done()
         

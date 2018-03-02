@@ -15,7 +15,7 @@ class Row
 
         @browser = @column.browser
         text = @item.text ? @item.name
-        if empty text.trim()
+        if empty(text) or empty text.trim()
             html = '&nbsp;'
         else
             html = syntax.spanForTextAndSyntax text, 'browser'
