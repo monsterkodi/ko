@@ -41,10 +41,11 @@ tabs        = null
 # post.debug()
 
 window.onerror = (event, source, line, col, err) ->
-    # f = require('sorcery').loadSync(source.replace /coffee/g, 'js')
-    if false #f?
+
+    f = require('sorcery').loadSync(source.replace /coffee/g, 'js')
+    if f?
         l = f.trace(line)
-        s = "▲ #{l.source}:#{l.line} ▲ [ERROR] #{err}"
+        s = "▲ #{source}:#{l.line} ▲ [ERROR] #{err}"
     else
         s = "▲ [ERROR] #{err} #{slash.tilde source}:#{line}:#{col}"
     post.emit 'error', s

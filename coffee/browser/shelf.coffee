@@ -14,6 +14,14 @@ fuzzaldrin = require 'fuzzaldrin'
 fuzzy      = require 'fuzzy'
 isTextFile = require '../tools/istextfile'
 
+indexAndItemInItemsWith = (item, items, withFunc) ->
+    
+    for index in [0...items.length]
+        if withFunc items[index], item
+            return [index, items[index]]
+    return [-1,null]
+    
+
 class Shelf extends Column
 
     constructor: (browser) ->
@@ -24,7 +32,44 @@ class Shelf extends Column
         @div.id = 'shelf'
 
         post.on 'addToShelf', @addPath
+        @browser.on 'itemActivated', @onBrowserItemActivated
 
+    #  0000000    0000000  000000000  000  000   000   0000000   000000000  0000000     00000000    0000000   000   000  
+    # 000   000  000          000     000  000   000  000   000     000     000         000   000  000   000  000 0 000  
+    # 000000000  000          000     000   000 000   000000000     000     0000000     0000000    000   000  000000000  
+    # 000   000  000          000     000     000     000   000     000     000         000   000  000   000  000   000  
+    # 000   000   0000000     000     000      0      000   000     000     0000000     000   000   0000000   00     00  
+   
+    activateRow: (row) -> 
+        
+        item = row.item
+        
+        $('.hover')?.classList.remove 'hover'
+        row.setActive emit:false
+        
+        switch item.type
+            when 'dir'   then @browser.loadDir item.file, column: 0, parent: item
+            when 'file'  
+                if not @browser.loadSourceItem item, column: 0
+                    @browser.loadFile item.file, focus:false, column:0, dir:slash.dir item.file
+                else
+                    post.emit 'jumpToFile', file:item.file
+            else
+                if item.file
+                    post.emit 'jumpToFile', file:item.file, line:item.line, col:item.column
+        
+    onBrowserItemActivated: (browserItem) =>
+        
+        [index, item] = indexAndItemInItemsWith browserItem, @items, _.isEqual
+        if item
+            @rows[index].setActive()
+            return
+
+        [index, item] = indexAndItemInItemsWith browserItem, @items, (i, o) -> o.file.startsWith i.file
+        if item
+            @rows[index].setActive()
+            return
+                
     browserDidInitColumns: ->
         
         return if @didInit
@@ -105,28 +150,7 @@ class Shelf extends Column
         @rows = []
         @scroll.update()
         @savePrefs()
-                            
-    #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
-    # 000   000  000          000     000  000   000  000   000     000     000       
-    # 000000000  000          000     000   000 000   000000000     000     0000000   
-    # 000   000  000          000     000     000     000   000     000     000       
-    # 000   000   0000000     000     000      0      000   000     000     00000000  
-   
-    activateRow: (row) -> 
-        
-        item = row.item
-        
-        $('.hover')?.classList.remove 'hover'
-        row.setActive emit:false
-        
-        switch item.type
-            when 'dir'   then @browser.loadDir     item.file, column: 0, parent: item
-            when 'file'  
-                @browser.loadFile item.file, focus:false, column:0, dir:slash.dir item.file
-            else
-                if item.file
-                    post.emit 'jumpToFile', file:item.file, line:item.line, col:item.column
-       
+                                   
     name: -> 'shelf'
         
     # 00000000   0000000    0000000  000   000   0000000  

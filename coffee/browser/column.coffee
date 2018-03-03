@@ -336,3 +336,5 @@ class Column
         if mod in ['shift', ''] and char then @doSearch char
         
 module.exports = Column
+
+

@@ -242,10 +242,8 @@ class Browser extends Stage
     # 000       000   000  000  0000     000     000       000  0000     000     
     #  0000000   0000000   000   000     000     00000000  000   000     000     
     
-    loadContent: (row, opt) ->
+    loadSourceItem: (item, opt={}) ->
         
-        item  = row.item
-
         items = []
         file  = item.file
         name  = slash.base file
@@ -272,7 +270,42 @@ class Browser extends Stage
             opt.parent ?= item
             @clearColumnsFrom opt.column
             @loadItems items, opt
-        else
+            return true
+            
+        false
+            
+    loadContent: (row, opt) ->
+        
+        item  = row.item
+
+        # items = []
+        file  = item.file
+        # name  = slash.base file
+#         
+        # files = post.get 'indexer', 'files', file
+
+        # clsss = files[file]?.classes ? []
+        # for clss in clsss
+            # text = '● '+clss.name
+            # items.push name: clss.name, text:text, type:'class', file: file, line: clss.line
+#         
+        # funcs = files[file]?.funcs ? []
+        # for func in funcs
+            # if func.test == 'describe'
+                # text = '● '+func.name
+            # else if func.static
+                # text = '  ◆ '+func.name
+            # else
+                # text = '  ▸ '+func.name
+            # items.push name: func.name, text:text, type:'func', file: file, line: func.line
+
+        # if items.length
+            # items.sort (a,b) -> a.line - b.line
+            # opt.parent ?= item
+            # @clearColumnsFrom opt.column
+            # @loadItems items, opt
+        # else
+        if not @loadSourceItem item
             ext = slash.ext file  
             if ext in ['gif', 'png', 'jpg', 'jpeg', 'svg']
                 @clearColumnsFrom opt.column, pop:true
