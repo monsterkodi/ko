@@ -202,7 +202,7 @@ class Browser extends Stage
     popEmptyColumns: -> @popColumn() while @hasEmptyColumns()
     
     clear: -> @clearColumnsFrom 0, pop:true 
-    clearColumnsFrom: (c, opt=pop:false) ->
+    clearColumnsFrom: (c=0, opt=pop:false) ->
         
         return error "clearColumnsFrom #{c}?" if not c? or c < 0
         
@@ -305,7 +305,7 @@ class Browser extends Stage
             # @clearColumnsFrom opt.column
             # @loadItems items, opt
         # else
-        if not @loadSourceItem item
+        if not @loadSourceItem item, opt
             ext = slash.ext file  
             if ext in ['gif', 'png', 'jpg', 'jpeg', 'svg']
                 @clearColumnsFrom opt.column, pop:true
@@ -335,7 +335,7 @@ class Browser extends Stage
         
         item = row.item
         file = item.file
-        tmpPXM = slash.join os.tmpdir(), "ko-#{fileName file}.pxm"
+        tmpPXM = slash.join os.tmpdir(), "ko-#{slash.base file}.pxm"
         tmpPNG = slash.swapExt tmpPXM, '.png'
 
         fs.copy file, tmpPXM, (err) =>

@@ -14,18 +14,24 @@ BrowserWindow = electron.BrowserWindow
 
 class Indexer
 
-    @requireRegExp = /^\s*([\w\{\}]+)\s+=\s+require\s+[\'\"]([\.\/\w]+)[\'\"]/
-    @classRegExp   = /^\s*(class|struct)(\s+\w+_API)?\s+(\w+)(\s+extends\s\w+.*|\s*:\s*[\w\,\s\<\>]+)?\s*$/
-    @includeRegExp = /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
-    @methodRegExp  = /^\s+([\@]?\w+)\s*\:\s*(\(.*\))?\s*[=-]\>/
-    @funcRegExp    = /^\s*([\w\.]+)\s*[\:\=]\s*(\(.*\))?\s*[=-]\>/
-    @testRegExp    = /^\s*(describe|it)\s+[\'\"](.+)[\'\"]\s*[\,]\s*(\([^\)]*\))?\s*[=-]\>/
-    @splitRegExp   = new RegExp "[^\\w\\d\\_]+", 'g'
+    @requireRegExp   = /^\s*([\w\{\}]+)\s+=\s+require\s+[\'\"]([\.\/\w]+)[\'\"]/
+    @classRegExp     = /^\s*(class|struct)(\s+\w+_API)?\s+(\w+)(\s+extends\s\w+.*|\s*:\s*[\w\,\s\<\>]+)?\s*$/
+    @includeRegExp   = /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
+    @methodRegExp    = /^\s+([\@]?\w+)\s*\:\s*(\(.*\))?\s*[=-]\>/
+    @cppMethodRegExp = /^\s+(\w+\s+)*(\w+)\s*(\(.*\))/
+    @funcRegExp      = /^\s*([\w\.]+)\s*[\:\=]\s*(\(.*\))?\s*[=-]\>/
+    @testRegExp      = /^\s*(describe|it)\s+[\'\"](.+)[\'\"]\s*[\,]\s*(\([^\)]*\))?\s*[=-]\>/
+    @splitRegExp     = new RegExp "[^\\w\\d\\_]+", 'g'
 
     @classNameInLine: (line) ->
                     
         m = line.match Indexer.classRegExp
         m?[3]
+
+    @cppMethodNameInLine: (line) ->
+        
+        m = line.match Indexer.cppMethodRegExp
+        m?[2]
 
     @methodNameInLine: (line) ->
         
@@ -66,7 +72,7 @@ class Indexer
         @collectBins()
         @collectProjects()
     
-        @imageExtensions = ['.png', '.jpg', '.gif', '.tiff', '.pxm', '.icns']        
+        @imageExtensions = ['png', 'jpg', 'gif', 'tiff', 'pxm', 'icns']        
 
         @dirs    = Object.create null
         @files   = Object.create null
@@ -235,14 +241,14 @@ class Indexer
         if @files[file]?
             return @shiftQueue() 
 
-        fileExt = slash.extname file 
+        fileExt = slash.ext file 
 
         if fileExt in @imageExtensions
             @files[file] = {}
             return @shiftQueue()
 
-        isCpp = fileExt in ['.cpp', '.cc']
-        isHpp = fileExt in ['.hpp', '.h' ]
+        isCpp = fileExt in ['cpp', 'cc']
+        isHpp = fileExt in ['hpp', 'h' ]
 
         fs.readFile file, 'utf8', (err, data) =>
             
@@ -258,6 +264,8 @@ class Indexer
             funcAdded = false
             funcStack = []
             currentClass = null
+            
+            # log 'indexing', file
             
             for li in [0...lines.length]
                 
@@ -281,10 +289,17 @@ class Indexer
                         # 000 0 000  000          000     000   000  000   000  000   000       000
                         # 000   000  00000000     000     000   000   0000000   0000000    0000000
 
-                        if methodName = Indexer.methodNameInLine line
-                            funcInfo = @addMethod currentClass, methodName, file, li
-                            funcStack.push [indent, funcInfo]
-                            funcAdded = true
+                        if isCpp or isHpp
+                            log 'isCpp or isHpp', file, currentClass
+                            if methodName = Indexer.cppMethodNameInLine line
+                                funcInfo = @addMethod currentClass, methodName, file, li
+                                funcStack.push [indent, funcInfo]
+                                funcAdded = true                            
+                        else
+                            if methodName = Indexer.methodNameInLine line
+                                funcInfo = @addMethod currentClass, methodName, file, li
+                                funcStack.push [indent, funcInfo]
+                                funcAdded = true
                     else
 
                         if isCpp or isHpp
@@ -383,7 +398,7 @@ class Indexer
                                 r.push [null, m[1]]
                                 fileInfo.require = r
                                 abspath = slash.resolve slash.join slash.dir(file), m[1]
-                                abspath += '.coffee' if not slash.extname m[1]
+                                abspath += '.coffee' if not slash.ext m[1]
                                 if not @files[abspath]? and @queue.indexOf(abspath) < 0
                                     if slash.fileExists abspath
                                         @queue.push abspath

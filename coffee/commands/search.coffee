@@ -133,7 +133,7 @@ class FileSearcher extends stream.Writable
             when '/search/' then @flags='i'; @opt.text
             when '/Search/' then @opt.text
         @found = []
-        extn = slash.extname(@file).slice 1
+        extn = slash.ext @file
         if extn in syntax.syntaxNames
             @syntaxName = extn
         else

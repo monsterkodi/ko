@@ -9,9 +9,13 @@
 
 gitRoot = (pth, cb) ->
 
+    pth = slash.resolve pth
+    
     if cb?
         
         return cb(null) if empty pth
+        
+        pth = slash.unslash(pth)
         
         fs.stat pth, (err, stat) ->
             return cb(null) if err
@@ -24,7 +28,7 @@ gitRoot = (pth, cb) ->
     else
     
         try
-            cwd = slash.dirExists(pth) and pth or slash.dirname(pth)
+            cwd = slash.dirExists(pth) and slash.unslash(pth) or slash.dirname(pth)
             r = childp.execSync 'git rev-parse --show-toplevel',
                 cwd:      cwd
                 encoding: 'utf8'

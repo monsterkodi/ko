@@ -137,12 +137,12 @@ class Open extends Command
             relBonus  = r.startsWith(opt.currentText) and 65535 * (opt.currentText.length/r.length) or 0 
             nameBonus = n.startsWith(opt.currentText) and 2184  * (opt.currentText.length/n.length) or 0
            
-        extensionBonus = switch slash.extname b
-            when '.coffee'               then 1000
-            when '.cpp', '.hpp', '.h'    then 90
-            when '.md', '.styl', '.pug'  then 50
-            when '.noon'                 then 25
-            when '.js', '.json', '.html' then -10
+        extensionBonus = switch slash.ext b
+            when 'coffee'               then 1000
+            when 'cpp', 'hpp', 'h'    then 90
+            when 'md', 'styl', 'pug'  then 50
+            when 'noon'                 then 25
+            when 'js', 'json', 'html' then -10
             else 0 
         extensionBonus -= 400 if b[0] == '.'
         extensionBonus += 16777215 if item.text == '..' if @navigating
@@ -480,7 +480,7 @@ class Open extends Command
                 [file, pos] = slash.splitFilePos file
                 file = @resolvedPath file
                 if not slash.fileExists file
-                    if '' == slash.extname file
+                    if '' == slash.ext file
                         if slash.fileExists file + '.coffee'
                             file += '.coffee'
                 file = slash.joinFilePos file, pos

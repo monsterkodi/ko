@@ -5,13 +5,12 @@
 # 000 0 000  000   000  000       000   000  000   000
 # 000   000  000   000   0000000  000   000   0000000
 
-{ fileList, reversed, post, noon, slash, fs, error, log, _ } = require 'kxk'
+{ fileList, reversed, post, noon, slash, atomic, fs, error, log, _ } = require 'kxk'
   
 indexer = require '../main/indexer'
 salt    = require '../tools/salt'
 Command = require '../commandline/command'
 colors  = require 'colors'
-atomic  = require 'write-file-atomic'
 Mocha   = require 'mocha'
 Report  = require '../test/report'
 syntax  = require '../editor/syntax'
@@ -126,7 +125,7 @@ class Macro extends Command
                 mocha = new Mocha()
                 
                 if _.isEmpty args
-                    files = fileList slash.join(__dirname, '..', 'test'), matchExt:['.js', '.coffee']
+                    files = fileList slash.join(__dirname, '..', 'test'), matchExt:['js', 'coffee']
                 else
                     files = (slash.join(__dirname, '..', 'test', f + '.js') for f in args)
                 for file in files
@@ -176,7 +175,7 @@ class Macro extends Command
                 # search project for path build open search term
                 pkgPath = slash.pkg editor.currentFile
                 if pkgPath
-                    projectFiles = fileList pkgPath, depth: 4, matchExt: editor.currentFile
+                    projectFiles = fileList pkgPath, depth: 4, matchExt: slash.ext editor.currentFile
                 else
                     projectFiles = []
 

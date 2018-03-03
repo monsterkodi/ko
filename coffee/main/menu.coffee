@@ -378,7 +378,7 @@ class Menu
             Misc: new AppMenu
             
         for actionFile in fileList slash.join __dirname, '../editor/actions'
-            continue if slash.extname(actionFile) not in ['.js', '.coffee']
+            continue if slash.ext(actionFile) not in ['js', 'coffee']
             actions = require actionFile
             for key,value of actions
                 menuName = 'Misc'

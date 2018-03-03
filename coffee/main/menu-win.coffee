@@ -352,7 +352,7 @@ class Menu
         actionFiles = fileList slash.join __dirname, '../editor/actions'
         # log 'actionFiles:', actionFiles
         for actionFile in actionFiles
-            continue if slash.extname(actionFile) not in ['.js', '.coffee']
+            continue if slash.ext(actionFile) not in ['js', 'coffee']
             actions = require actionFile
             for key,value of actions
                 menuName = 'Misc'

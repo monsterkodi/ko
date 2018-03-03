@@ -276,8 +276,8 @@ class Column
     sortByType: ->
         
         @rows.sort (a,b) -> 
-            atype = a.item.type == 'file' and slash.extname(a.item.name).slice(1) or a.item.type
-            btype = b.item.type == 'file' and slash.extname(b.item.name).slice(1) or b.item.type
+            atype = a.item.type == 'file' and slash.ext(a.item.name) or a.item.type
+            btype = b.item.type == 'file' and slash.ext(b.item.name) or b.item.type
             (atype + a.item.name).localeCompare btype + b.item.name
             
         @table.innerHTML = ''

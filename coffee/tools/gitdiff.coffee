@@ -5,16 +5,22 @@
 # 000   000  000     000     000   000  000  000       000         
 #  0000000   000     000     0000000    000  000       000         
 
-{ childp, slash, str, log, _ } = require 'kxk'
+{ childp, slash, empty, str, log, _ } = require 'kxk'
 
 stripAnsi = require 'strip-ansi'
 
 gitDiff = (file) ->
 
-    gitCommand = "git --no-pager diff -U0 \"#{slash.escape file}\""
+    [path, drive] = slash.splitDrive file
+    if not empty drive
+        path = '/' + drive.toLowerCase() + path
+        
+    # path = slash.unslash file
+        
+    gitCommand = "git --no-pager diff -U0 \"#{slash.escape path}\""
 
     result = childp.execSync gitCommand, 
-        cwd: slash.dirname file
+        cwd: slash.unslash slash.dirname file
         encoding: 'utf8' 
             
     info  = file:file, changes:[]

@@ -11,13 +11,13 @@ gitRoot = require './gitroot'
 
 gitStatus = (fileOrDir) ->
 
-    gitDir = gitRoot fileOrDir
+    gitDir = slash.unslash gitRoot fileOrDir
 
     return if not gitDir?
     
     result = childp.execSync 'git status -s', 
-        cwd: gitDir
-        encoding: 'utf8' 
+        cwd:      gitDir
+        encoding: 'utf8'
     
     lines = result.split '\n'
 
@@ -41,6 +41,8 @@ gitStatus = (fileOrDir) ->
             when '??' then info.added  .push file
             
     info.dirs = Array.from(dirSet).map (d) -> slash.join gitDir, d
+    
+    # log 'info --- ', info
     
     return info
 

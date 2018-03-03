@@ -410,7 +410,7 @@ class Main
         userData = slash.path app.getPath 'userData'
         log 'restoreWindows userData', userData
         fs.ensureDirSync userData
-        stashFiles = fileList slash.join(userData, 'old'), matchExt: ['.noon']
+        stashFiles = fileList slash.join(userData, 'old'), matchExt: 'noon'
         if not empty stashFiles
             log 'restoreWindows stashFiles', stashFiles
             for file in stashFiles

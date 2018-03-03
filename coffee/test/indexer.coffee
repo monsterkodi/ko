@@ -29,4 +29,12 @@ describe 'indexer', ->
         
         expect(Indexer.methodNameInLine('   coffeeMethod: ->')).to.eql 'coffeeMethod'
         expect(Indexer.methodNameInLine('   coffeeMeth_2: () ->')).to.eql 'coffeeMeth_2'
-        expect(Indexer.methodNameInLine('   coffeeMeth_3 : (a,b)  => ')).to.eql 'coffeeMeth_3'
+        expect(Indexer.methodNameInLine('   coffeeMeth_3 : (a,b)  => ')).to.eql 'coffeeMeth_3'
+        
+    it 'cppMethodNameInLine', -> 
+        
+        expect(Indexer.cppMethodNameInLine('    ACameraPawn();'))
+        .to.eql 'ACameraPawn'
+        
+        expect(Indexer.cppMethodNameInLine('   virtual void DisplayDebug(class UCanvas* Canvas, const class FDebugDisplayInfo& DebugDisplay, float& YL, float& YPos) override;'))
+        .to.eql 'DisplayDebug'

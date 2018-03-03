@@ -185,6 +185,8 @@ class FileBrowser extends Browser
                 log "gitstatus failed for #{file}", err
                 return
                 
+            # log "getGitStatus #{file}", info
+            
             return if empty info
                 
             files = {}
@@ -201,13 +203,15 @@ class FileBrowser extends Browser
             while statusDiv = $('.git', column.div)
                 statusDiv.remove()
                 
+            # log 'files:', files
             for row in rows
                 return if row.item.type not in ['dir', 'file']
+                # log "row.item.file #{row.item.file}"
                 status = files[row.item.file]
                 if status?
                     icon = {added:'plus', changed:'pencil', 'dirs':'pencil-square-o'}[status]
                     row.div.appendChild elem 'span', 
-                        class:"git #{status} fa fa-#{icon} extname #{slash.extname(row.item.file).slice 1}"
+                        class:"git #{status} fa fa-#{icon} extname #{slash.ext(row.item.file)}"
 
     updateGitStatus: (file) =>
         
@@ -223,8 +227,8 @@ class FileBrowser extends Browser
     # 000  000   000  0000000    00000000  000   000  00000000  0000000    
     
     onFileIndexed: (file) =>
-        
         if file == @activeColumn()?.activeRow()?.item.file
+            log "FileBrowser.onFileIndexed", file, @activeColumn().index+1
             @loadContent @activeColumn().activeRow(), column: @activeColumn().index+1
                 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  

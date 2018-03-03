@@ -22,7 +22,6 @@ isTextFile = require './istextfile'
 #   opt:  
 #          ignoreHidden: true # skip files that starts with a dot
 #          logError:     true # print message to console.log if a path doesn't exits
-#          matchExt:     null # only include files that match the extension of the option's value
 
 dirList = (dirPath, opt, cb) ->
     
@@ -44,11 +43,6 @@ dirList = (dirPath, opt, cb) ->
                 return true
                 
             if slash.basename(p) in ['.DS_Store', '.git']
-                return true
-                
-        else if opt.matchExt? 
-            
-            if slash.extname(p) != slash.extname opt.matchExt
                 return true
                 
         if slash.basename(p) == 'Icon\r'

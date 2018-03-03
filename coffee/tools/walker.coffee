@@ -21,10 +21,10 @@ class Walker
         @cfg.maxFiles    ?= 500
         @cfg.ignore      ?= ['node_modules', 'app', 'dist', 'build', 'Library', 'Applications']
         @cfg.include     ?= ['.konrad.noon', '.gitignore', '.npmignore']
-        @cfg.ignoreExt   ?= ['.app']
-        @cfg.includeExt  ?= ['.coffee', '.styl', '.pug', '.md', '.noon', # '.html', '.js', '.css',
-                            '.txt', '.json', '.sh', '.py',                            
-                            '.cpp', '.cc', '.c', '.h', '.hpp']
+        @cfg.ignoreExt   ?= ['app']
+        @cfg.includeExt  ?= ['coffee', '.styl', 'pug', 'md', 'noon', # 'html', 'js', 'css',
+                            'txt', 'json', 'sh', 'py',                            
+                            'cpp', 'cc', 'c', 'h', 'hpp']
       
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -40,11 +40,11 @@ class Walker
             @walker = walkdir.walk dir, max_depth: @cfg.maxDepth
             onWalkerPath = (cfg) -> (p,stat) ->
                 name = slash.basename p
-                extn = slash.extname p
+                extn = slash.ext p
 
                 if cfg.filter?(p)
                     return @ignore p
-                else if name in ['.DS_Store', 'Icon\r'] or extn in ['.pyc']
+                else if name in ['.DS_Store', 'Icon\r'] or extn in ['pyc']
                     return @ignore p
                 else if cfg.includeDir? and slash.dirname(p) == cfg.includeDir
                     cfg.files.push p
@@ -79,7 +79,7 @@ class Walker
                     if cfg.skipDir? p
                         @ignore p
                 else
-                    if slash.extname(p) in cfg.includeExt or slash.basename(p) in cfg.include or cfg.includeExt.indexOf('') >= 0
+                    if slash.ext(p) in cfg.includeExt or slash.basename(p) in cfg.include or cfg.includeExt.indexOf('') >= 0
                         cfg.file? p, stat
                                                 
                 if cfg.files.length > cfg.maxFiles

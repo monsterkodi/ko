@@ -80,7 +80,7 @@ class Commandline extends TextEditor
 
         files = fileList "#{__dirname}/../commands"
         for file in files
-            continue if slash.extname(file) != '.js'
+            continue if slash.ext(file) != 'js'
             try
                 commandClass = require file
                 command = new commandClass @
@@ -160,7 +160,7 @@ class Commandline extends TextEditor
 
         @command = @commandForName name
         
-        log "commandline.startCommand #{name}"
+        # log "commandline.startCommand #{name}"
         
         activeID = document.activeElement.id
         if activeID.startsWith 'column' then activeID = 'editor'
