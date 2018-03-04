@@ -1,13 +1,13 @@
 name            ko-editor
 productName     ko
-version         0.40.0
+version         0.42.0
 description     text editor
 main            js/main/main.js
 preferGlobal    true
 bin
                 ko  ./bin/ko
 scripts
-                test    mocha -R dot --require coffee-script/register "coffee/test/*.coffee"
+                test    mocha -R dot --require coffeescript/register "coffee/test/*.coffee"
                 build   ./bin/build.sh
                 win     bash ./bin/buildwin.sh
 repository
@@ -16,7 +16,7 @@ repository
 keywords
                 mac
                 editor
-                coffee-script
+                coffeescript
                 electron
 license         Unlicense
 author          monsterkodi
@@ -38,21 +38,17 @@ dependencies
                 entities        =1.1.1
                 eve             =0.5.4
                 font-awesome    =4.7.0
-                fs-extra        =4.0.2
                 fuzzaldrin      =2.1.0
                 fuzzy           =0.1.3
                 html-entities   =1.2.1
                 isbinaryfile    =3.0.2
                 js-beautify     =1.7.4
                 karg            >=1.1.1
-                keycode         =2.1.9
-                kxk             ^0.31.0
-                lodash          ^4.17.5
+                kxk             ^0.33.0
                 mocha           =4.0.1
                 nconf           =0.8.5
                 node-abi        ^2.2.0
                 node-pty        ^0.7.4
-                noon            >=1.1.1
                 opener          =1.4.3
                 performance-now  =2.1.0
                 pug             =2.0.0-rc.4
@@ -65,7 +61,6 @@ dependencies
                 three           =0.87.1
                 traceback       =0.3.1
                 underscore.string  =3.3.4
-                walkdir         =0.0.12
 coffeelintConfig
                 no_trailing_whitespace
                   level           ignore

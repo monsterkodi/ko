@@ -5,9 +5,8 @@
 # 000   000  000  000   000  000      000       000     000     
 # 0000000    000  000   000  0000000  000  0000000      000     
 
-{ fs, slash, error, log, _ } = require 'kxk'
+{ fs, walkdir, slash, error, log, _ } = require 'kxk'
 
-walkdir    = require 'walkdir'
 isTextFile = require './istextfile'
 
 #   directory list

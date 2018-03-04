@@ -5,9 +5,7 @@
 # 000   000  000   000  000      000  000   000       000   000
 # 00     00  000   000  0000000  000   000  00000000  000   000
 
-{ slash, fs, error, log } = require 'kxk'
-
-walkdir = require 'walkdir'
+{ slash, walkdir, fs, error, log } = require 'kxk'
 
 class Walker
 

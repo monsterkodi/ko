@@ -48,7 +48,7 @@ class Execute
                 } = require 'kxk'
                 { max, min, abs, round, ceil, floor, sqrt, pow, exp, log10, sin, cos, tan, acos, asin, atan, PI, E
                 } = Math
-                coffee = require 'coffee-script'
+                coffee = require 'coffeescript'
                 (global[r] = require r for r in ['colors', 'electron'])
                 log = ->
                     console.log.apply console, [].slice.call(arguments, 0)

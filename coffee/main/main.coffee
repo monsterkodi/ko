@@ -42,6 +42,8 @@ process.env.NODE_ENV = 'production'
 # 000   000  000   000  000   000       000
 # 000   000  000   000   0000000   0000000
 
+log process.argv
+
 args  = require('karg') """
 
 #{pkg.productName}

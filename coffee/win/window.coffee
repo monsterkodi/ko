@@ -425,9 +425,9 @@ openFile = (options) ->
         defaultPath: window.stash.get 'openFilePath',  dir
         properties: ['openFile', 'openDirectory', 'multiSelections']
         filters: [
-            name: 'Coffee-Script', extensions: ['coffee']
-        ,
             name: 'All Files', extensions: ['*']
+        ,
+            name: 'CoffeeScript', extensions: ['coffee']
         ]
         , (files) -> openFiles files, options
 

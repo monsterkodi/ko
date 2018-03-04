@@ -5,13 +5,10 @@
 #   000   000  000   000  000   000  000  0000  000      000   000  000   000  000   000
 #   0000000     0000000   00     00  000   000  0000000   0000000   000   000  0000000  
 
-fs       = require 'fs-extra'
+{ fs, slash, childp, log } = require 'kxk'
+
 download = require 'download'
-path     = require 'path'
 mount    = require 'dmg'
-cp       = require 'child_process'
-exec     = cp.exec
-log      = console.log
 
 version  = require('../package.json').version
 app      = "/Applications/ko.app"
@@ -20,7 +17,7 @@ dmg      = "#{__dirname}/ko-#{version}.dmg"
 open = () ->
     log "open #{app}"
     args = process.argv.slice(2).join " "
-    exec "open -a #{app} " + args
+    childp.exec "open -a #{app} " + args
 
 unpack = () ->
     log "mounting #{dmg} ..."
@@ -28,7 +25,7 @@ unpack = () ->
         if err
             log err
         else
-            src = path.join dmgPath, "ko.app"
+            src = slash.join dmgPath, "ko.app"
             log "copy #{src} to #{app}"
             fs.copy src, app, (err) =>
                 if err?
