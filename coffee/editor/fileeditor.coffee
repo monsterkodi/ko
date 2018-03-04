@@ -5,12 +5,14 @@
 000       000  000      000             000       000   000  000     000     000   000  000   000
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
-{ slash, empty, fs, setStyle, post, pos, error, log, str, _ } = require 'kxk'
+
+{ popupWindow, slash, empty, fs, setStyle, post, pos, error, log, str, _ } = require 'kxk'
   
 srcmap     = require '../tools/srcmap'
 watcher    = require './watcher'
 TextEditor = require './texteditor'
 syntax     = require './syntax'
+electron   = require 'electron'
 
 class FileEditor extends TextEditor
 
@@ -32,6 +34,8 @@ class FileEditor extends TextEditor
         @currentFile = null
         @watch       = null
 
+        @view.addEventListener "contextmenu", @onContextMenu
+        
         window.split.on 'commandline', @onCommandline
 
         post.on 'jumpTo',        @jumpTo
@@ -373,6 +377,39 @@ class FileEditor extends TextEditor
         else
             @updateLayers()
 
+    # 00000000    0000000   00000000   000   000  00000000     
+    # 000   000  000   000  000   000  000   000  000   000    
+    # 00000000   000   000  00000000   000   000  00000000     
+    # 000        000   000  000        000   000  000          
+    # 000         0000000   000         0000000   000          
+
+    onContextMenu: (event) => @showContextMenu pos event
+              
+    showContextMenu: (absPos) =>
+        
+        if not absPos?
+            absPos = pos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
+        
+        opt = items: [ # ⇧⌥⌘⏎
+            text:   'Maximize'
+            combo:  'ctrl+shift+y' 
+            cb:     -> window.split.maximizeEditor()
+        ,
+            text:   'Browse'
+            combo:  'ctrl+.' 
+            cb:     -> window.commandline.startCommand 'browse'
+        ,
+            text:   'Log View'
+            combo:  'ctrl+alt+k' 
+            cb:     window.split.showLog
+        ]
+        
+        win = electron.remote.getCurrentWindow()
+        opt.x          = absPos.x + win.getBounds().x
+        opt.y          = absPos.y + win.getBounds().y
+        opt.stylesheet = "#{__dirname}/../css/style.css"
+        popupWindow.show opt
+            
     #  0000000  000      000   0000000  000   000
     # 000       000      000  000       000  000
     # 000       000      000  000       0000000
