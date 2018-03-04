@@ -10,7 +10,7 @@
 Syntax        = require '../editor/syntax'
 Command       = require '../commandline/command'
 ObjectBrowser = require '../browser/objectbrowser'
-coffee        = require 'coffee-script'
+coffee        = require 'coffeescript'
 
 class Coffee extends Command
     

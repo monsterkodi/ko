@@ -44,25 +44,25 @@ class Browse extends Command
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
     
-    start: (@action) ->
+    start: (action) ->
 
         @browser.start()
         
-        if @action != 'shelf'
+        if action != 'shelf'
             
             if window.editor.currentFile?
                 @browser.loadFile window.editor.currentFile 
             else 
                 @browser.loadDir process.cwd()
 
-        name = @action
-        name = 'browse' if @action == 'shelf'
+        name = action
+        name = 'browse' if action == 'shelf'
         
         super name
 
         select: true
         do:     @name == 'Browse' and 'half area' or 'quart area'
-        focus:  'shelf' if @action == 'shelf'
+        focus:  action == 'shelf' and 'shelf' or null 
 
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000  
     # 000        000 000   000       000       000   000     000     000       

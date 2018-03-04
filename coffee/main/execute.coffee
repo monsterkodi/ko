@@ -8,7 +8,7 @@
 { noon, str, post, error, log, _ } = require 'kxk'
 
 colors   = require 'colors'
-coffee   = require 'coffee-script'
+coffee   = require 'coffeescript'
 pty      = require 'node-pty'
 
 class Execute

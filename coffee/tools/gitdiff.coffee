@@ -11,13 +11,7 @@ stripAnsi = require 'strip-ansi'
 
 gitDiff = (file) ->
 
-    [path, drive] = slash.splitDrive file
-    if not empty drive
-        path = '/' + drive.toLowerCase() + path
-        
-    # path = slash.unslash file
-        
-    gitCommand = "git --no-pager diff -U0 \"#{slash.escape path}\""
+    gitCommand = "git --no-pager diff -U0 \"#{slash.file file}\""
 
     result = childp.execSync gitCommand, 
         cwd: slash.unslash slash.dirname file
@@ -66,7 +60,6 @@ gitDiff = (file) ->
     
             info.changes.push change
 
-    log 'gitdiff', info
     return info
 
 if module.parent

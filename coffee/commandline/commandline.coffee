@@ -160,7 +160,7 @@ class Commandline extends TextEditor
 
         @command = @commandForName name
         
-        # log "commandline.startCommand #{name}"
+        log "commandline.startCommand #{name}"
         
         activeID = document.activeElement.id
         if activeID.startsWith 'column' then activeID = 'editor'
@@ -246,7 +246,7 @@ class Commandline extends TextEditor
                     @hideList()
                     @startCommand name
                     stopEvent event
-                div.addEventListener 'mousedown', start name
+                div.addEventListener 'mousedown', start cname
                 @list.appendChild div
 
     hideList: ->
