@@ -5,8 +5,9 @@
 # 000      000   000  000   000     000     000  000       000   000
 # 0000000   0000000    0000000       0      000  00000000  00     00
 
-{ post, log } = require 'kxk'
+{ popupWindow, post, pos, log } = require 'kxk'
 
+electron   = require 'electron'
 TextEditor = require '../editor/texteditor'
 
 class LogView extends TextEditor
@@ -14,6 +15,8 @@ class LogView extends TextEditor
     constructor: (viewElem) ->
         
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap'], fontSize: 12
+        
+        @view.addEventListener "contextmenu", @onContextMenu
         
         @syntaxName = 'logview'
         
@@ -52,5 +55,34 @@ class LogView extends TextEditor
         @jumpToFileAtPos p
         
         super p, event
-            
+        
+    # 00000000    0000000   00000000   000   000  00000000     
+    # 000   000  000   000  000   000  000   000  000   000    
+    # 00000000   000   000  00000000   000   000  00000000     
+    # 000        000   000  000        000   000  000          
+    # 000         0000000   000         0000000   000          
+
+    onContextMenu: (event) => @showContextMenu pos event
+              
+    showContextMenu: (absPos) =>
+        
+        if not absPos?
+            absPos = pos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
+        
+        opt = items: [ # ⇧⌥⌘⏎
+            text:   'Clear'
+            combo:  'alt+k' 
+            cb:     @clear
+        ,
+            text:   'Close'
+            combo:  'ctrl+alt+k' 
+            cb:     window.split.hideLog
+        ]
+        
+        win = electron.remote.getCurrentWindow()
+        opt.x          = absPos.x + win.getBounds().x
+        opt.y          = absPos.y + win.getBounds().y
+        opt.stylesheet = "#{__dirname}/../css/style.css"
+        popupWindow.show opt
+        
 module.exports = LogView

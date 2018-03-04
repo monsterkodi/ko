@@ -208,9 +208,10 @@ class Split extends event
     # 000      000   000  000   000
     # 0000000   0000000    0000000 
     
-    showLog:   -> @setLogVisible true
-    hideLog:   -> @setLogVisible false
-    toggleLog: -> @setLogVisible not @isLogVisible()
+    showLog:   => @setLogVisible true
+    hideLog:   => @setLogVisible false
+    toggleLog: => @setLogVisible not @isLogVisible()
+    
     isLogVisible: -> not @flex.isCollapsed 'logview'
     
     setLogVisible: (v) ->

@@ -23,7 +23,7 @@ titlebarHeight        = 22px
 titlebarFontSize      = 14px
 splithandleHeight     = 6px
 thinBorder            = 1px solid
-font                  = "Meslo", "Menlo", "Meslo LG S", "Liberation Mono", "Bitstream Vera Sans Mono", "DejaVu Sans Mono", "Cousine", "Andale Mono", monospace
+font                  = "Meslo", "Meslo LG S", "Menlo", "Liberation Mono", "Bitstream Vera Sans Mono", "DejaVu Sans Mono", "Cousine", "Andale Mono", monospace
 
 fill-abs()
     position            absolute
@@ -126,6 +126,42 @@ body
     max-height          600px
     border              1px solid
 
+// 00000000    0000000   00000000   000   000  00000000   
+// 000   000  000   000  000   000  000   000  000   000  
+// 00000000   000   000  00000000   000   000  00000000   
+// 000        000   000  000        000   000  000        
+// 000         0000000   000         0000000   000        
+
+.popup
+    position            absolute
+    background-color    #222
+    border-radius       3px
+
+.popupWindow
+    background-color    #222
+    
+.popupItem
+    color               #888
+    padding             2px
+    padding-left        2 * frameWidth
+    padding-right       2 * frameWidth + 70px
+    cursor              pointer
+    &:last-child
+        padding-bottom  frameWidth
+    &:first-child
+        padding-top     frameWidth
+    &:not(:last-child)
+        border-bottom       1px solid #222
+    &.selected
+        color           #fff
+
+.popupItem:active
+    color               #ff0
+
+.popupCombo
+    color               #333
+    position            absolute
+    right               2 * frameWidth    
 
 //  0000000  000   000  00000000  000      00000000  
 // 000       000   000  000       000      000       

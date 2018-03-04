@@ -59,7 +59,7 @@ class Commandline extends TextEditor
 
         state = window.stash.get 'commandline'
         @setText state?.text ? ""
-        if state?.name
+        if state?.name?
             name = state.name
             @command = @commands[name]
             activeID = document.activeElement.id

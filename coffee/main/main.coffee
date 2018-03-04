@@ -1,8 +1,10 @@
-# 00     00   0000000   000  000   000
-# 000   000  000   000  000  0000  000
-# 000000000  000000000  000  000 0 000
-# 000 0 000  000   000  000  000  0000
-# 000   000  000   000  000  000   000
+###
+00     00   0000000   000  000   000
+000   000  000   000  000  0000  000
+000000000  000000000  000  000 0 000
+000 0 000  000   000  000  000  0000
+000   000  000   000  000  000   000
+###
 
 { fileList, childp, about, prefs, store, noon, post, slash, os, fs, str, empty, error, _ } = require 'kxk'
 
@@ -408,11 +410,11 @@ class Main
     restoreWindows: ->
 
         userData = slash.path app.getPath 'userData'
-        log 'restoreWindows userData', userData
+        # log 'restoreWindows userData', userData
         fs.ensureDirSync userData
         stashFiles = fileList slash.join(userData, 'old'), matchExt: 'noon'
         if not empty stashFiles
-            log 'restoreWindows stashFiles', stashFiles
+            # log 'restoreWindows stashFiles', stashFiles
             for file in stashFiles
                 @createWindow restore:file
 
@@ -477,10 +479,10 @@ class Main
             log 'createWindow.winLoaded id', win.id
 
             if opt.files?
-                log 'createWindow.winLoaded loadFiles', opt.files
+                # log 'createWindow.winLoaded loadFiles', opt.files
                 post.toWin win.id, 'loadFiles', opt.files
             else if opt.file?
-                log 'createWindow.winLoaded loadFile', opt.file
+                # log 'createWindow.winLoaded loadFile', opt.file
                 post.toWin win.id, 'loadFile', opt.file
             else
                 log 'createWindow.winLoaded no file to open?'
