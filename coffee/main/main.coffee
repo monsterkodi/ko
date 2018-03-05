@@ -15,6 +15,7 @@ Indexer  = require './indexer'
 pug      = require 'pug'
 colors   = require 'colors'
 electron = require 'electron'
+
 Menu     = if os.platform() == 'win32' then require './menu-win' else require './menu'
 
 { BrowserWindow, Tray, app, clipboard, dialog } = electron
@@ -42,7 +43,14 @@ process.env.NODE_ENV = 'production'
 # 000   000  000   000  000   000       000
 # 000   000  000   000   0000000   0000000
 
-log process.argv
+if slash.win() and slash.file(process.argv[0]) == 'ko.exe'
+    ignoreArgs=1
+else
+    ignoreArgs=2
+
+log process.argv.length, process.argv.slice(2).length
+for i in [0...process.argv.length]
+    log "arg #{i}", process.argv[i]
 
 args  = require('karg') """
 
@@ -58,9 +66,12 @@ args  = require('karg') """
 
 version  #{pkg.version}
 
-""", dontExit: true
+""", dontExit: true, ignoreArgs:ignoreArgs
 
 app.exit 0 if not args?
+
+log 'cwd', process.cwd()
+log 'filelist', args.filelist.length, args.filelist
 
 if process.cwd() == '/'
     process.chdir slash.resolve '~'
@@ -159,7 +170,7 @@ class Main
 
     constructor: (openFiles) ->
 
-        log 'Main.constructor'
+        # log 'Main.constructor'
         # if app.makeSingleInstance @otherInstanceStarted
         #     log 'single instance'
         #     app.exit 0
@@ -177,7 +188,7 @@ class Main
         electron.globalShortcut.register prefs.get('shortcut'), @toggleWindows
 
         if not openFiles.length and args.filelist.length
-            openFiles = fileList args.filelist
+            openFiles = fileList args.filelist, ignoreHidden:false
 
         @moveWindowStashes()
 
@@ -414,7 +425,7 @@ class Main
         userData = slash.path app.getPath 'userData'
         # log 'restoreWindows userData', userData
         fs.ensureDirSync userData
-        stashFiles = fileList slash.join(userData, 'old'), matchExt: 'noon'
+        stashFiles = fileList slash.join(userData, 'old'), matchExt:'noon'
         if not empty stashFiles
             # log 'restoreWindows stashFiles', stashFiles
             for file in stashFiles
@@ -430,7 +441,7 @@ class Main
 
         opt ?= {}
 
-        log 'Main.createWindow', opt
+        log 'Main.createWindow opt:', opt
 
         {width, height} = @screenSize()
         ww = height + 122
