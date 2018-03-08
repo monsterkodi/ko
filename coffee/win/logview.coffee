@@ -5,7 +5,7 @@
 # 000      000   000  000   000     000     000  000       000   000
 # 0000000   0000000    0000000       0      000  00000000  00     00
 
-{ popupWindow, post, pos, log } = require 'kxk'
+{ popup, post, pos, log } = require 'kxk'
 
 electron   = require 'electron'
 TextEditor = require '../editor/texteditor'
@@ -80,9 +80,8 @@ class LogView extends TextEditor
         ]
         
         win = electron.remote.getCurrentWindow()
-        opt.x          = absPos.x + win.getBounds().x
-        opt.y          = absPos.y + win.getBounds().y
-        opt.stylesheet = "#{__dirname}/../css/style.css"
-        popupWindow.show opt
+        opt.x = absPos.x
+        opt.y = absPos.y
+        popup.menu opt
         
 module.exports = LogView

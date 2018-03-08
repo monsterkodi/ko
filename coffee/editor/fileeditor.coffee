@@ -6,7 +6,7 @@
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
 
-{ popupWindow, slash, empty, fs, setStyle, post, pos, error, log, str, _ } = require 'kxk'
+{ popup, slash, empty, fs, setStyle, post, pos, error, log, str, _ } = require 'kxk'
   
 srcmap     = require '../tools/srcmap'
 watcher    = require './watcher'
@@ -405,10 +405,11 @@ class FileEditor extends TextEditor
         ]
         
         win = electron.remote.getCurrentWindow()
-        opt.x          = absPos.x + win.getBounds().x
-        opt.y          = absPos.y + win.getBounds().y
-        opt.stylesheet = "#{__dirname}/../css/style.css"
-        popupWindow.show opt
+        opt.x          = absPos.x #+ win.getBounds().x
+        opt.y          = absPos.y #+ win.getBounds().y
+        # opt.stylesheet = "#{__dirname}/../css/style.css"
+        # popupWindow.show opt
+        popup.menu opt
             
     #  0000000  000      000   0000000  000   000
     # 000       000      000  000       000  000

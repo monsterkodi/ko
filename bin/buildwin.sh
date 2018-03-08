@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 cd `dirname $0`/..
 
-rm -f ko-win32-x64
+rm -rf ko-win32-x64
 
 konrad
 

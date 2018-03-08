@@ -1,4 +1,4 @@
-setN###
+###
 00     00   0000000   000  000   000
 000   000  000   000  000  0000  000
 000000000  000000000  000  000 0 000
@@ -91,7 +91,7 @@ if args.verbose
 # 000        000   000  000       000            000
 # 000        000   000  00000000  000       0000000
 
-prefs.init shortcut: 'F2'
+prefs.init shortcut: 'CmdOrCtrl+F1'
 alias = new store 'alias'
 
 if args.prefs
