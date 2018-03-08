@@ -5,7 +5,7 @@
 # 000       000   000  000      000   000  000 0 000  000  0000
 #  0000000   0000000   0000000   0000000   000   000  000   000
 
-{ stopEvent, keyinfo, slash, post, elem, clamp, empty, error, log, _ } = require 'kxk'
+{ stopEvent, popup, keyinfo, slash, post, elem, clamp, empty, error, log, _ } = require 'kxk'
 
 Row        = require './row'
 Scroller   = require './scroller'
@@ -296,6 +296,28 @@ class Column
             @browser.loadDir @parent.file, column:@index, focus:true
             log 'toggleDotFiles', prefsKey, prefs.get prefsKey
         @
+
+    onContextMenu: (event) => @showContextMenu pos event
+              
+    showContextMenu: (absPos) =>
+        
+        if not absPos?
+            absPos = pos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
+        
+        opt = items: [ 
+            text:   'Toggle Invisible'
+            combo:  'ctrl+i' 
+            cb:     @browser.toggleDotFiles
+        ,
+            text:   'Move to Trash'
+            combo:  'ctrl+backspace' 
+            cb:     @browser.moveToTrash
+        ]
+        
+        opt.x = absPos.x
+        opt.y = absPos.y
+        popup.menu opt
+        
         
     # 000   000  00000000  000   000  
     # 000  000   000        000 000   

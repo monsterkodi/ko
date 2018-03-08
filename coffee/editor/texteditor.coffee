@@ -467,38 +467,43 @@ class TextEditor extends Editor
 
     suspendBlink: ->
 
+        return if not @blinkTimer
+        @stopBlink()
         @cursorDiv()?.classList.toggle 'blink', false
         clearTimeout @suspendTimer
-        @suspendTimer = setTimeout @releaseBlink, 600
+        @suspendTimer = setTimeout @releaseBlink, 2000
 
     releaseBlink: =>
 
         clearTimeout @suspendTimer
         delete @suspendTimer
+        @startBlink()
 
     toggleBlink: ->
 
-        @stopBlink()
-        prefs.set 'blink', not prefs.get 'blink', true
-        @startBlink()
+        blink = not prefs.get 'blink', false
+        prefs.set 'blink', blink
+        if blink
+            @startBlink()
+        else
+            @stopBlink()
 
     doBlink: =>
 
-        return if @suspendTimer? or not prefs.get 'blink'
         @blink = not @blink
         @cursorDiv()?.classList.toggle 'blink', @blink
         @minimap?.drawMainCursor @blink
+        
+        clearTimeout @blinkTimer
+        @blinkTimer = setTimeout @doBlink, @blink and 50 or 1950
 
-    startBlink: ->
-
-        return if not prefs.get 'blink'
-        clearInterval @blinkTimer
-        @blinkTimer = setInterval @doBlink, 400
+    startBlink: -> @doBlink()
 
     stopBlink: ->
 
         @cursorDiv()?.classList.toggle 'blink', false
-        clearInterval @blinkTimer
+        
+        clearTimeout @blinkTimer
         delete @blinkTimer
 
     # 00000000   00000000   0000000  000  0000000  00000000

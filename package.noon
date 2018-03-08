@@ -44,7 +44,7 @@ dependencies
                 isbinaryfile    =3.0.2
                 js-beautify     =1.7.4
                 karg            ^1.1.2
-                kxk             ^0.33.0
+                kxk             ^0.36.0
                 mocha           =4.0.1
                 nconf           =0.8.5
                 node-abi        ^2.2.0

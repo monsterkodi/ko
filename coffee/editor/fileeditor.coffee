@@ -390,7 +390,7 @@ class FileEditor extends TextEditor
         if not absPos?
             absPos = pos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
         
-        opt = items: [ # ⇧⌥⌘⏎
+        opt = items: [
             text:   'Maximize'
             combo:  'ctrl+shift+y' 
             cb:     -> window.split.maximizeEditor()
@@ -404,11 +404,8 @@ class FileEditor extends TextEditor
             cb:     window.split.showLog
         ]
         
-        win = electron.remote.getCurrentWindow()
-        opt.x          = absPos.x #+ win.getBounds().x
-        opt.y          = absPos.y #+ win.getBounds().y
-        # opt.stylesheet = "#{__dirname}/../css/style.css"
-        # popupWindow.show opt
+        opt.x = absPos.x
+        opt.y = absPos.y
         popup.menu opt
             
     #  0000000  000      000   0000000  000   000

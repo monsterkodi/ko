@@ -69,7 +69,7 @@ class LogView extends TextEditor
         if not absPos?
             absPos = pos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
         
-        opt = items: [ # ⇧⌥⌘⏎
+        opt = items: [
             text:   'Clear'
             combo:  'alt+k' 
             cb:     @clear
@@ -79,7 +79,6 @@ class LogView extends TextEditor
             cb:     window.split.hideLog
         ]
         
-        win = electron.remote.getCurrentWindow()
         opt.x = absPos.x
         opt.y = absPos.y
         popup.menu opt
