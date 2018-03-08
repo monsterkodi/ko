@@ -1,4 +1,4 @@
-###
+setN###
 00     00   0000000   000  000   000
 000   000  000   000  000  0000  000
 000000000  000000000  000  000 0 000
@@ -48,9 +48,9 @@ if slash.win() and slash.file(process.argv[0]) == 'ko.exe'
 else
     ignoreArgs=2
 
-log process.argv.length, process.argv.slice(2).length
-for i in [0...process.argv.length]
-    log "arg #{i}", process.argv[i]
+# log process.argv.length, process.argv.slice(2).length
+# for i in [0...process.argv.length]
+    # log "arg #{i}", process.argv[i]
 
 args  = require('karg') """
 
@@ -70,8 +70,8 @@ version  #{pkg.version}
 
 app.exit 0 if not args?
 
-log 'cwd', process.cwd()
-log 'filelist', args.filelist.length, args.filelist
+# log 'cwd', process.cwd()
+# log 'filelist', args.filelist.length, args.filelist
 
 if process.cwd() == '/'
     process.chdir slash.resolve '~'
@@ -150,7 +150,9 @@ post.on 'activatePrevWindow', (winID) -> main.activatePrevWindow winID
 post.on 'fileSaved',    (file, winID) -> main.indexer.indexFile file, refresh: true
 post.on 'fileLoaded',   (file, winID) -> main.indexer.indexFile file
 post.on 'ping', (winID, argA, argB) -> post.toWin winID, 'pong', 'main', argA, argB
-post.on 'winlog',       (winID, text) -> console.log "#{winID}>>> " + text
+post.on 'winlog',       (winID, text) -> 
+    if args.verbose
+        console.log "#{winID}>>> " + text
 
 winShells = {}
 
