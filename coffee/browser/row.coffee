@@ -55,7 +55,10 @@ class Row
             if @item.type == 'dir'
                 className = 'folder-icon'
             else
-                className = 'file-icon'
+                if slash.ext(@item.file) == 'noon'
+                    className = 'noon-icon'
+                else
+                    className = 'file-icon'
             
         icon = elem('span', class:className + ' browserFileIcon')
             

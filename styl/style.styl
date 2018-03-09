@@ -134,15 +134,20 @@ body
     width               24px
     opacity             0.5
 
-.file-icon:before
+octicon(char)
     font-family         octicons
-    content             '\f011'
-    // font-family         FontAwesome
-    // content             "\f011"
+    content             char
+
     
-.folder-icon:before     
-    font-family         octicons
-    content             '\f016'
+.file-icon:before
+    octicon('\f011')
+    
+.folder-icon:before 
+    octicon('\f016')
+    
+.noon-icon:before 
+    octicon('\f02a')
+
     // '\f001' bulb
     // '\f002' fork
     // '\f008' gitcat
