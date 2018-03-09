@@ -1,9 +1,10 @@
-
-#  0000000   000  000000000   0000000  000000000   0000000   000000000  000   000   0000000  
-# 000        000     000     000          000     000   000     000     000   000  000       
-# 000  0000  000     000     0000000      000     000000000     000     000   000  0000000   
-# 000   000  000     000          000     000     000   000     000     000   000       000  
-#  0000000   000     000     0000000      000     000   000     000      0000000   0000000   
+###
+ 0000000   000  000000000   0000000  000000000   0000000   000000000  000   000   0000000  
+000        000     000     000          000     000   000     000     000   000  000       
+000  0000  000     000     0000000      000     000000000     000     000   000  0000000   
+000   000  000     000          000     000     000   000     000     000   000       000  
+ 0000000   000     000     0000000      000     000   000     000      0000000   0000000   
+###
 
 { childp, slash, str, log, _ } = require 'kxk'
 
@@ -13,7 +14,7 @@ gitStatus = (fileOrDir) ->
 
     gitDir = slash.unslash gitRoot fileOrDir
 
-    return if not gitDir?
+    return if not gitDir? or not slash.isDir gitDir
     
     result = childp.execSync 'git status -s', 
         cwd:      gitDir
@@ -41,8 +42,6 @@ gitStatus = (fileOrDir) ->
             when '??' then info.added  .push file
             
     info.dirs = Array.from(dirSet).map (d) -> slash.join gitDir, d
-    
-    # log 'info --- ', info
     
     return info
 
