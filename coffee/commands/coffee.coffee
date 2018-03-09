@@ -121,9 +121,9 @@ class Coffee extends Command
             restoreCWD = process.cwd()
             process.chdir __dirname
             coffee.eval """                
-                {str,clamp,post,slash,noon,fs,_,$} = require 'kxk'
+                {str,colors,clamp,post,slash,noon,fs,_,$} = require 'kxk'
                 {max,min,abs,round,ceil,floor,sqrt,pow,exp,log10,sin,cos,tan,acos,asin,atan,PI,E} = Math
-                (global[r] = require r for r in ['colors', 'electron'])                    
+                (global[r] = require r for r in ['electron'])                    
                 Immutable = require 'seamless-immutable'
                 log = -> post.emit 'executeResult', [].slice.call(arguments, 0), cmdID
                 coffee  = window.commandline.commands.coffee

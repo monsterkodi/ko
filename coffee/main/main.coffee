@@ -6,14 +6,13 @@
 000   000  000   000  000  000   000
 ###
 
-{ fileList, childp, about, prefs, store, noon, post, slash, os, fs, str, empty, error, _ } = require 'kxk'
+{ fileList, colors, childp, karg, about, prefs, store, noon, post, slash, os, fs, str, empty, error, _ } = require 'kxk'
 
 pkg      = require '../../package.json'
 Execute  = require './execute'
 Navigate = require './navigate'
 Indexer  = require './indexer'
 pug      = require 'pug'
-colors   = require 'colors'
 electron = require 'electron'
 
 Menu     = if os.platform() == 'win32' then require './menu-win' else require './menu'
@@ -52,7 +51,7 @@ else
 # for i in [0...process.argv.length]
     # log "arg #{i}", process.argv[i]
 
-args  = require('karg') """
+args  = karg """
 
 #{pkg.productName}
 

@@ -345,12 +345,14 @@ class FileEditor extends TextEditor
         @size.centerText = center
         @updateLayers()
 
+        @size.offsetX = Math.floor @size.charWidth/2 + @size.numbersWidth
         if center
-            @size.offsetX = Math.floor @size.charWidth/2 + @size.numbersWidth
-            @size.offsetX = Math.max @size.offsetX, (@screenSize().width - @screenSize().height) / 2
+            br        = @view.getBoundingClientRect()
+            visCols   = parseInt br.width / @size.charWidth
+            newOffset = parseInt @size.charWidth * (visCols - 100) / 2
+            @size.offsetX = Math.max @size.offsetX, newOffset
             @size.centerText = true
         else
-            @size.offsetX = Math.floor @size.charWidth/2 + @size.numbersWidth
             @size.centerText = false
 
         @updateLinePositions animate

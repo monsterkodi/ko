@@ -460,8 +460,7 @@ window.onresize = ->
     split.resized()
     window.stash.set 'bounds', win.getBounds()
     if window.stash.get 'centerText', false
-        screenWidth = screenSize().width
-        editor.centerText sw() == screenWidth, 0
+        editor.centerText true, 200
 
 # 0000000   0000000  00000000   00000000  00000000  000   000   0000000  000   000   0000000   000000000
 #000       000       000   000  000       000       0000  000  000       000   000  000   000     000   
@@ -487,7 +486,7 @@ toggleCenterText = ->
     
     if not window.stash.get 'centerText', false
         window.stash.set 'centerText', true
-        editor.centerText sw() == screenSize().width
+        editor.centerText true # sw() == screenSize().width
     else
         window.stash.set 'centerText', false
         editor.centerText false

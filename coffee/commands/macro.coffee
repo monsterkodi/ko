@@ -5,12 +5,11 @@
 # 000 0 000  000   000  000       000   000  000   000
 # 000   000  000   000   0000000  000   000   0000000
 
-{ fileList, reversed, post, noon, slash, atomic, fs, error, log, _ } = require 'kxk'
+{ fileList, colors, reversed, post, noon, slash, atomic, fs, error, log, _ } = require 'kxk'
   
 indexer = require '../main/indexer'
 salt    = require '../tools/salt'
 Command = require '../commandline/command'
-colors  = require 'colors'
 Mocha   = require 'mocha'
 Report  = require '../test/report'
 syntax  = require '../editor/syntax'

@@ -1,6 +1,6 @@
 name            ko-editor
 productName     ko
-version         0.47.0
+version         0.50.0
 description     text editor
 main            js/main/main.js
 preferGlobal    true
@@ -31,7 +31,6 @@ dependencies
                 chai            =4.1.2
                 chokidar        =1.7.0
                 coffeescript    ^2.2.2
-                colors          =1.1.2
                 convert-source-map  ^1.5.1
                 dmg             =0.1.0
                 download        =6.2.5
@@ -43,12 +42,12 @@ dependencies
                 html-entities   =1.2.1
                 isbinaryfile    =3.0.2
                 js-beautify     =1.7.4
-                karg            ^1.1.2
-                kxk             ^0.37.0
+                kxk             ^0.37.2
                 mocha           =4.0.1
                 nconf           =0.8.5
                 node-abi        ^2.2.0
                 node-pty        ^0.7.4
+                noon            ^1.1.1
                 opener          =1.4.3
                 performance-now  =2.1.0
                 pug             =2.0.0-rc.4
