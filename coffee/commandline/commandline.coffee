@@ -62,13 +62,15 @@ class Commandline extends TextEditor
         if state?.name?
             name = state.name
             @command = @commands[name]
-            activeID = document.activeElement.id
-            if activeID.startsWith 'column' then activeID = 'editor'
-            @command?.setFocus activeID != 'commandline-editor' and activeID or null
-            log "no command for name: #{name}?" if not @command?
-            @setName name
-            @button.className = "commandline-button active #{@command.prefsID}"
-            @commands[name]?.restoreState? state
+            if @command
+                activeID = document.activeElement.id
+                if activeID.startsWith 'column' then activeID = 'editor'
+                @command.setFocus activeID != 'commandline-editor' and activeID or null
+                @setName name
+                @button.className = "commandline-button active #{@command.prefsID}"
+                @commands[name]?.restoreState? state
+            else
+                error "no command for name: #{name} state:", state
 
     # 000       0000000    0000000   0000000
     # 000      000   000  000   000  000   000

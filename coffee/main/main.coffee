@@ -427,6 +427,7 @@ class Main
         userData = slash.path app.getPath 'userData'
         # log 'restoreWindows userData', userData
         fs.ensureDirSync userData
+        fs.ensureDir slash.join userData, 'icons', 'ext'
         stashFiles = fileList slash.join(userData, 'old'), matchExt:'noon'
         if not empty stashFiles
             # log 'restoreWindows stashFiles', stashFiles

@@ -5,9 +5,13 @@
 # 000   000  000   000  000   000
 # 000   000   0000000   00     00
 
-{ elem, keyinfo, drag, clamp, empty, post, error, log, $, _ } = require 'kxk' 
+{ elem, keyinfo, drag, clamp, empty, post, slash, error, log, fs, $, _ } = require 'kxk' 
 
-syntax = require '../editor/syntax'
+syntax      = require '../editor/syntax'
+fileIcons   = require 'file-icons-js'
+electron    = require 'electron'
+
+app = electron.remote.app
 
 class Row
     
@@ -22,6 +26,9 @@ class Row
         @div = elem class: 'browserRow', html: html
         @div.classList.add @item.type
         @column.table.appendChild @div
+
+        if @item.type in ['file', 'dir']
+            @setIcon()
         
         @drag = new drag
             target: @div
@@ -40,7 +47,20 @@ class Row
             return @item.file
         if @item.obj?.file? and _.isString @item.obj.file
             return @item.obj.file
-    
+
+    setIcon: ->
+
+        className = fileIcons.getClass @item.file
+        if empty className
+            if @item.type == 'dir'
+                className = 'folder-icon'
+            else
+                className = 'file-icon'
+            
+        icon = elem('span', class:className + ' browserFileIcon')
+            
+        @div.firstChild.insertBefore icon, @div.firstChild.firstChild
+                    
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
     # 000   000  000          000     000  000   000  000   000     000     000       
     # 000000000  000          000     000   000 000   000000000     000     0000000   
@@ -132,7 +152,7 @@ class Row
             @column.dragDiv.style.height = "#{br.height-3}px"
             @column.dragDiv.style.flex = 'unset'
             @column.dragDiv.style.pointerEvents = 'none'
-            body.appendChild @column.dragDiv
+            document.body.appendChild @column.dragDiv
         
         @column.dragDiv.style.transform = "translateX(#{d.deltaSum.x}px) translateY(#{d.deltaSum.y}px)"
 

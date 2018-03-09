@@ -23,7 +23,6 @@ titlebarHeight        = 22px
 titlebarFontSize      = 14px
 splithandleHeight     = 6px
 thinBorder            = 1px solid
-font                  = "Meslo LG S", "Liberation Mono", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono", "Cousine", "Andale Mono", monospace
 
 fill-abs()
     position            absolute
@@ -34,7 +33,9 @@ fill-abs()
 
 pre
     margin              0
-
+       
+font = "Meslo LG S", "Liberation Mono", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono", "Cousine", "Andale Mono", monospace
+    
 // 0000000     0000000   0000000    000   000
 // 000   000  000   000  000   000   000 000
 // 0000000    000   000  000   000    00000
@@ -125,7 +126,58 @@ body
     max-width           600px
     max-height          600px
     border              1px solid
+    
+.browserFileIcon
+    
+    text-align          left
+    display             inline-block
+    width               24px
+    opacity             0.5
 
+.file-icon:before
+    font-family         octicons
+    content             '\f011'
+    // font-family         FontAwesome
+    // content             "\f011"
+    
+.folder-icon:before     
+    font-family         octicons
+    content             '\f016'
+    // '\f001' bulb
+    // '\f002' fork
+    // '\f008' gitcat
+    // '\f00a' gitcat2
+    // '\f00d' keyboard
+    // '\f00e' tagbox
+    // '\f010' tagdoc
+    // '\f011' textdoc
+    // '\f013' zipdoc
+    // '\f015' tag
+    // '\f016' folder
+    // '\f017' folder-folder
+    // '\f018' person
+    // '\f0b0' linkdoc
+    // '\f01f' -o-
+    // '\f026' circle !
+    // '\f02a' star
+    // '\f02c' circle ?
+    // '\f02b' speech bubble
+    // '\f02e' loupe
+    // '\f02d' triangle !
+    // '\f02f' gear
+    // '\f031' tools
+    // '\f032' exit
+    // '\f03a' checkmark
+    // '\f03d' arrow up
+    // '\f03e' arrow right
+    // '\f03f' arrow down
+    // '\f040' arrow left
+    // '\f041' pin
+    // '\f042' gift
+    // '\f043' stats
+    // '\f044' triangle left
+    // '\f04e' eye
+        
 // 00000000    0000000   00000000   000   000  00000000
 // 000   000  000   000  000   000  000   000  000   000
 // 00000000   000   000  00000000   000   000  00000000

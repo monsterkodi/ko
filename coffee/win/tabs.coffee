@@ -101,7 +101,7 @@ class Tabs
         @dragDiv.style.height = "#{br.height-3}px"
         @dragDiv.style.flex = 'unset'
         @dragDiv.style.pointerEvents = 'none'
-        body.appendChild @dragDiv
+        document.body.appendChild @dragDiv
 
     onDragMove: (d,e) =>
         

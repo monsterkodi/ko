@@ -629,7 +629,8 @@ onKeyDown = (event) ->
 
 handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
         
-    log 'handleModKeyComboCharEvent1', 'mod', mod, 'key', key, 'combo', combo, 'char', char
+    # log 'handleModKeyComboCharEvent1', 'mod', mod, 'key', key, 'combo', combo, 'char', char
+    
     if mod == 'alt' 
         if not combo
             stopEvent event # prevent menu from showing

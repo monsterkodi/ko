@@ -704,7 +704,7 @@ class TextEditor extends Editor
         for action in Editor.actions
             
             if action.combo == combo
-                log "unhandled on combo? #{combo}"
+                # log "unhandled on combo? #{combo}"
                 return 'unhandled'
                 
             continue if not action.combos?
@@ -719,7 +719,7 @@ class TextEditor extends Editor
             
             return @insertCharacter char
 
-        log "TextEditor.handleModKeyComboCharEvent unhandled combo:#{combo}"
+        # log "TextEditor.handleModKeyComboCharEvent unhandled combo:#{combo}"
 
         'unhandled'
 
