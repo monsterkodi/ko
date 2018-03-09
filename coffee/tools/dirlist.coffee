@@ -36,18 +36,22 @@ dirList = (dirPath, opt, cb) ->
     
     filter = (p) ->
         
-        if slash.basename(p).startsWith '.'
+        base = slash.file p
+        if base.startsWith '.'
             
             if opt.ignoreHidden
                 return true
                 
-            if slash.basename(p) in ['.DS_Store', '.git']
+            if base in ['.DS_Store', '.git']
                 return true
                 
-        if slash.basename(p) == 'Icon\r'
+        if base == 'Icon\r'
             return true
             
-        if slash.basename(p).toLowerCase().startsWith 'ntuser.'
+        if base.toLowerCase().startsWith 'ntuser.'
+            return true
+            
+        if base.toLowerCase().startsWith '$recycle'
             return true
         
         false

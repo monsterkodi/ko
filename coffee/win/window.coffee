@@ -629,9 +629,14 @@ onKeyDown = (event) ->
 
 handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
         
-    return if not combo
+    log 'handleModKeyComboCharEvent1', 'mod', mod, 'key', key, 'combo', combo, 'char', char
+    if mod == 'alt' 
+        if not combo
+            stopEvent event # prevent menu from showing
+        else if combo == 'alt+m'
+            win.setMenuBarVisibility not win.isMenuBarVisible()
     
-    # log 'handleModKeyComboCharEvent1', 'mod', mod, 'key', key, 'combo', combo, 'char', char
+    return if not combo
     
     return stopEvent(event) if 'unhandled' != window.titlebar   .globalModKeyComboEvent mod, key, combo, event
     return stopEvent(event) if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
@@ -659,7 +664,7 @@ handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
         when 'command+shift+0'    then return stopEvent event, @resetZoom()
         when 'command+alt+y'      then return stopEvent event, split.do 'minimize editor'
         
-    # log 'handleModKeyComboCharEvent3'
+    # log 'handleModKeyComboCharEvent3', mod, key, combo, char
 
 document.addEventListener 'keydown', onKeyDown        
         

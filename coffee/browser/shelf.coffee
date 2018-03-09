@@ -230,14 +230,8 @@ class Shelf extends Column
     onKey: (event) =>
         
         { mod, key, combo, char } = keyinfo.forEvent event
-
-        # log 'shelf.onKey', mod, key, combo, char
-
+        
         switch combo
-            when 'up', 'down', 'page up', 'page down', 'home', 'end' 
-                return stopEvent event, @navigateRows key
-            when 'right', 'enter'                            
-                return stopEvent event, @focusBrowser()
             when 'command+enter', 'ctrl+enter' then return @openFileInNewWindow()
             when 'backspace', 'delete' then return stopEvent event, @clearSearch().removeObject()
             when 'command+k', 'ctrl+k' then return stopEvent event if @browser.cleanUp()
@@ -249,9 +243,17 @@ class Shelf extends Column
                 else window.split.focus 'commandline-editor'
                 return stopEvent event
 
+        switch key
+            when 'up', 'down', 'page up', 'page down', 'home', 'end' 
+                return stopEvent event, @navigateRows key
+            when 'right', 'enter'
+                return stopEvent event, @focusBrowser()
+                
         switch char
             when '~', '/' then return stopEvent event, @navigateRoot char
             
         if mod in ['shift', ''] and char then @doSearch char
+        
+        if key in ['left'] then return stopEvent event
         
 module.exports = Shelf

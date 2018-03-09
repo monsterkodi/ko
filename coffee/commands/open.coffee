@@ -93,9 +93,8 @@ class Open extends Command
     #  0000000   0000000   000   000  000        0000000  00000000     000     00000000
 
     complete: -> 
-        
-        return if not @commandList? 
-        if @commandList.line(@selected).startsWith(slash.basename @getText()) and not @getText().trim().endsWith('/')
+        log 'open complete', @commandList? 
+        if @commandList? and @commandList.line(@selected).startsWith(slash.basename @getText()) and not @getText().trim().endsWith('/')
             @setText slash.join(slash.dirname(@getText()), @commandList.line(@selected))
             if slash.dirExists @getText()
                 @setText @getText() + '/'

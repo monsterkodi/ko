@@ -363,7 +363,7 @@ class TextEditor extends Editor
     updateLinePositions: (animate=0) ->
         
         for li, div of @lineDivs
-            return error 'no div?' if not div?
+            return error 'no div?' if not div? or not div.style?
             y = @size.lineHeight * (li - @scroll.top)
             div.style.transform = "translate3d(#{@size.offsetX}px,#{y}px, 0)"
             div.style.transition = "all #{animate/1000}s" if animate
@@ -679,6 +679,8 @@ class TextEditor extends Editor
     # 000   000  00000000     000
 
     handleModKeyComboCharEvent: (mod, key, combo, char, event) ->
+        
+        # log "TextEditor.handleModKeyComboCharEvent mod:#{mod} key:#{key} combo:#{combo} char:#{char} event:#{event}"
 
         if @autocomplete?
             return if 'unhandled' != @autocomplete.handleModKeyComboEvent mod, key, combo, event
@@ -716,6 +718,8 @@ class TextEditor extends Editor
         if char and mod in ["shift", ""]
             
             return @insertCharacter char
+
+        log "TextEditor.handleModKeyComboCharEvent unhandled combo:#{combo}"
 
         'unhandled'
 

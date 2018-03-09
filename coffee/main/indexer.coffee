@@ -246,6 +246,8 @@ class Indexer
         if fileExt in @imageExtensions
             @files[file] = {}
             return @shiftQueue()
+            
+        # log 'indexFile', file
 
         isCpp = fileExt in ['cpp', 'cc']
         isHpp = fileExt in ['hpp', 'h' ]

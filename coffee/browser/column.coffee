@@ -5,12 +5,13 @@
 # 000       000   000  000      000   000  000 0 000  000  0000
 #  0000000   0000000   0000000   0000000   000   000  000   000
 
-{ stopEvent, popup, keyinfo, slash, post, elem, clamp, empty, error, log, _ } = require 'kxk'
+{ stopEvent, popup, keyinfo, slash, post, elem, clamp, empty, pos, error, log, _ } = require 'kxk'
 
 Row        = require './row'
 Scroller   = require './scroller'
 fuzzaldrin = require 'fuzzaldrin'
 fuzzy      = require 'fuzzy'
+trash      = require 'trash'
 
 class Column
     
@@ -37,6 +38,8 @@ class Column
 
         @div.addEventListener 'click',     @onClick
         @div.addEventListener 'dblclick',  @onDblClick
+        
+        @div.addEventListener "contextmenu", @onContextMenu
         
         @scroll = new Scroller @
         
@@ -108,9 +111,8 @@ class Column
     
     hasFocus: -> @div.classList.contains 'focus'
 
-    focus: ->
-        # log 'column.focus', @index
-        if not @activeRow() and @numRows()
+    focus: (opt={}) ->
+        if not @activeRow() and @numRows() and opt?.activate != false
             @rows[0].setActive emit:true
         @div.focus()
         window.setLastFocus @name()
@@ -252,7 +254,7 @@ class Column
         delete @searchDiv
         @
     
-    removeObject: ->
+    removeObject: =>
         
         if row = @activeRow()
             @browser.emit 'willRemoveRow', row, @
@@ -285,7 +287,7 @@ class Column
             @table.appendChild row.div
         @
   
-    toggleDotFiles: ->
+    toggleDotFiles: =>
 
         prefsKey = "browser:ignoreHidden:#{@parent.file}"
         if @parent.type == 'dir'            
@@ -296,7 +298,20 @@ class Column
             @browser.loadDir @parent.file, column:@index, focus:true
             log 'toggleDotFiles', prefsKey, prefs.get prefsKey
         @
+        
+    moveToTrash: =>
+        
+        pathToTrash = @activePath()
+        log 'moveToTrash', pathToTrash
+        @removeObject()
+        trash([pathToTrash]).catch (err) -> error "failed to trash #{pathToTrash} #{err}"
 
+    # 00000000    0000000   00000000   000   000  00000000     
+    # 000   000  000   000  000   000  000   000  000   000    
+    # 00000000   000   000  00000000   000   000  00000000     
+    # 000        000   000  000        000   000  000          
+    # 000         0000000   000         0000000   000          
+        
     onContextMenu: (event) => @showContextMenu pos event
               
     showContextMenu: (absPos) =>
@@ -307,11 +322,11 @@ class Column
         opt = items: [ 
             text:   'Toggle Invisible'
             combo:  'ctrl+i' 
-            cb:     @browser.toggleDotFiles
+            cb:     @toggleDotFiles
         ,
             text:   'Move to Trash'
             combo:  'ctrl+backspace' 
-            cb:     @browser.moveToTrash
+            cb:     @moveToTrash
         ]
         
         opt.x = absPos.x
@@ -327,18 +342,17 @@ class Column
     
     onKey: (event) =>
         
-        {mod, key, combo, char} = keyinfo.forEvent event
+        { mod, key, combo, char } = keyinfo.forEvent event
 
-        # log mod, key, combo, char
-
+        # log 'column on key1', combo
+        
         switch combo
-            when 'up', 'down', 'page up', 'page down', 'home', 'end' 
-                return stopEvent event, @navigateRows key
-            when 'right', 'left', 'enter'                            
-                return stopEvent event, @navigateCols key
+            when 'page up', 'page down', 'home', 'end' then return stopEvent event, @navigateRows key
+            when 'enter'               then return stopEvent event, @navigateCols key
             when 'command+enter', 'ctrl+enter' then return @openFileInNewWindow()
             when 'command+left', 'command+up', 'command+right', 'command+down', 'ctrl+left', 'ctrl+up', 'ctrl+right', 'ctrl+down'
                 return stopEvent event, @navigateRoot key
+            when 'alt+left'            then return stopEvent event, window.split.focus 'shelf'
             when 'backspace', 'delete' then return stopEvent event, @clearSearch().removeObject()
             when 'ctrl+t'              then return stopEvent event, @sortByType()
             when 'ctrl+n'              then return stopEvent event, @sortByName()
@@ -352,10 +366,15 @@ class Column
                 else window.split.focus 'commandline-editor'
                 return stopEvent event
 
+        if key in ['up',   'down']  then return stopEvent event, @navigateRows key              
+        if key in ['left', 'right'] then return stopEvent event, @navigateCols key        
+            
         switch char
             when '~', '/' then return stopEvent event, @navigateRoot char
             
         if mod in ['shift', ''] and char then @doSearch char
+                
+        # log 'column on key2', combo
         
 module.exports = Column
 

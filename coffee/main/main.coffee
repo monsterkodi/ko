@@ -33,7 +33,7 @@ log = ->
     s = (str(s) for s in [].slice.call arguments, 0).join " "
     slog s
 
-post.on 'slog', (s) -> console.log s
+# post.on 'slog', (s) -> console.log s
 
 process.env.NODE_ENV = 'production'
 

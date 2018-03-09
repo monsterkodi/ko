@@ -56,10 +56,10 @@ class Row
         if event?
             {mod} = keyinfo.forEvent event
             switch mod
-                when 'alt', 'command', 'command+alt'
+                when 'alt', 'command', 'command+alt', 'ctrl', 'ctrl+alt'
                     if @item.type == 'file' and @item.textFile
                         opt = file:@item.file
-                        if mod == 'command+alt'
+                        if mod in ['command+alt', 'ctrl+alt']
                             opt.newWindow = true
                         else
                             opt.newTab = true 
@@ -92,11 +92,12 @@ class Row
     
     isActive: -> @div.classList.contains 'active'
     
-    setActive: (opt = emit:false) ->
+    setActive: (opt = {}) ->
         
         @column.activeRow()?.clearActive()
         @div.classList.add 'active'
-        @column.scroll.toIndex @index() 
+        if opt?.scroll != false
+            @column.scroll.toIndex @index()
         window.setLastFocus @column.name()
         if opt?.emit then @browser.emit 'itemActivated', @item
         @
@@ -112,8 +113,9 @@ class Row
     # 0000000    000   000  000   000   0000000   
     
     onDragStart: (d, e) =>
-        @column.focus()
-        @setActive()
+        
+        @column.focus activate:false
+        @setActive scroll:false
 
     onDragMove: (d,e) =>
         

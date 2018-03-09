@@ -1,6 +1,6 @@
 name            ko-editor
 productName     ko
-version         0.45.0
+version         0.46.0
 description     text editor
 main            js/main/main.js
 preferGlobal    true
@@ -60,6 +60,7 @@ dependencies
                 textextensions  =2.1.0
                 three           =0.87.1
                 traceback       =0.3.1
+                trash           ^4.3.0
                 underscore.string  =3.3.4
 coffeelintConfig
                 no_trailing_whitespace

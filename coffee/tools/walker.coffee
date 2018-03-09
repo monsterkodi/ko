@@ -17,10 +17,10 @@ class Walker
         @cfg.dotFiles    ?= false
         @cfg.includeDirs ?= true
         @cfg.maxFiles    ?= 500
-        @cfg.ignore      ?= ['node_modules', 'app', 'dist', 'build', 'Library', 'Applications']
+        @cfg.ignore      ?= ['node_modules', 'app', 'dist', 'build', 'Library', 'Applications', 'resources']
         @cfg.include     ?= ['.konrad.noon', '.gitignore', '.npmignore']
-        @cfg.ignoreExt   ?= ['app']
-        @cfg.includeExt  ?= ['coffee', '.styl', 'pug', 'md', 'noon', # 'html', 'js', 'css',
+        @cfg.ignoreExt   ?= ['app', 'asar']
+        @cfg.includeExt  ?= ['coffee', 'styl', 'pug', 'md', 'noon', # 'html', 'js', 'css',
                             'txt', 'json', 'sh', 'py',                            
                             'cpp', 'cc', 'c', 'h', 'hpp']
       
@@ -37,6 +37,7 @@ class Walker
             dir = @cfg.root
             @walker = walkdir.walk dir, max_depth: @cfg.maxDepth
             onWalkerPath = (cfg) -> (p,stat) ->
+                p    = slash.path p
                 name = slash.basename p
                 extn = slash.ext p
 
