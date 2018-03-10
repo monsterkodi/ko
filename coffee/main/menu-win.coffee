@@ -107,7 +107,7 @@ class Menu
                 type: 'separator'
             ,
                 label:       'Close Other Tabs'
-                accelerator: 'Ctrl+Shift+T'
+                accelerator: 'Ctrl+Shift+W'
                 click:       (i,win) -> post.toWin win.id, 'closeOtherTabs'
             ,
                 label:       'Close Tab or Window'

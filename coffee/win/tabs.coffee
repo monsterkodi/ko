@@ -155,7 +155,7 @@ class Tabs
         @
   
     onCloseTabOrWindow: =>
-        
+        log 'tabs.onCloseTabOrWindow', @numTabs()
         if @numTabs() == 1
             window.win.close()
         else

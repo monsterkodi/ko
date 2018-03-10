@@ -30,6 +30,31 @@ body
 .split-handle
     background          frameColor
 
+// 00000000    0000000   00000000   000   000  00000000
+// 000   000  000   000  000   000  000   000  000   000
+// 00000000   000   000  00000000   000   000  00000000
+// 000        000   000  000        000   000  000
+// 000         0000000   000         0000000   000
+
+.popup
+    background-color    #222
+
+.popupWindow
+    background-color    #222
+
+.popupItem
+    color               #888
+    &:not(:last-child)
+        border-bottom       1px solid #222
+    &.selected
+        color           #fff
+
+.popupItem:active
+    color               #ff0
+
+.popupCombo
+    color               titleColor
+    
 // 0000000    00000000    0000000   000   000   0000000  00000000  00000000
 // 000   000  000   000  000   000  000 0 000  000       000       000   000
 // 0000000    0000000    000   000  000000000  0000000   0000000   0000000
