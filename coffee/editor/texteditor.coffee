@@ -495,7 +495,7 @@ class TextEditor extends Editor
         @minimap?.drawMainCursor @blink
         
         clearTimeout @blinkTimer
-        @blinkTimer = setTimeout @doBlink, @blink and 50 or 1950
+        @blinkTimer = setTimeout @doBlink, @blink and 100 or 1900
 
     startBlink: -> @doBlink()
 

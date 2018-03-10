@@ -5,7 +5,7 @@
 # 000   000  000   000  000   000  000   000       000  000       000   000  
 # 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 
-{ elem, post, clamp, childp, slash, fs, os, error, log,  _ } = require 'kxk'
+{ elem, post, clamp, setStyle, childp, slash, fs, os, error, log,  _ } = require 'kxk'
 
 Column = require './column'
 Stage  = require '../stage/stage'
@@ -14,8 +14,12 @@ flex   = require '../win/flex/flex'
 class Browser extends Stage
     
     constructor: (view) ->
+        
         super view
+        
         @columns = []
+        
+        setStyle '.browserRow .extname', 'display', prefs.get('browser:hideExtensions') and 'none' or 'initial'
 
     # 000  000   000  000  000000000       0000000   0000000   000      000   000  00     00  000   000   0000000  
     # 000  0000  000  000     000         000       000   000  000      000   000  000   000  0000  000  000       

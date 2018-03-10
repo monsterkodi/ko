@@ -5,7 +5,7 @@
 # 000       000   000  000      000   000  000 0 000  000  0000
 #  0000000   0000000   0000000   0000000   000   000  000   000
 
-{ stopEvent, popup, keyinfo, slash, post, elem, clamp, empty, pos, error, log, _ } = require 'kxk'
+{ stopEvent, setStyle, popup, keyinfo, slash, post, elem, clamp, empty, pos, error, log, _ } = require 'kxk'
 
 Row        = require './row'
 Scroller   = require './scroller'
@@ -287,16 +287,28 @@ class Column
             @table.appendChild row.div
         @
   
+    # 000000000   0000000    0000000    0000000   000      00000000  
+    #    000     000   000  000        000        000      000       
+    #    000     000   000  000  0000  000  0000  000      0000000   
+    #    000     000   000  000   000  000   000  000      000       
+    #    000      0000000    0000000    0000000   0000000  00000000  
+    
     toggleDotFiles: =>
 
-        prefsKey = "browser:ignoreHidden:#{@parent.file}"
         if @parent.type == 'dir'            
+            prefsKey = "browser:ignoreHidden:#{@parent.file}"
             if prefs.get prefsKey, true
                 prefs.set prefsKey, false
             else
                 prefs.set prefsKey
             @browser.loadDir @parent.file, column:@index, focus:true
-            log 'toggleDotFiles', prefsKey, prefs.get prefsKey
+        @
+        
+    toggleExtensions: =>
+
+        prefsKey = "browser:hideExtensions"
+        prefs.set prefsKey, not prefs.get prefsKey, false
+        setStyle '.browserRow .extname', 'display', prefs.get(prefsKey) and 'none' or 'initial'
         @
         
     moveToTrash: =>
@@ -323,6 +335,10 @@ class Column
             text:   'Toggle Invisible'
             combo:  'ctrl+i' 
             cb:     @toggleDotFiles
+        ,
+            text:   'Toggle Extensions'
+            combo:  'ctrl+e' 
+            cb:     @toggleExtensions
         ,
             text:   'Move to Trash'
             combo:  'ctrl+backspace' 
@@ -352,11 +368,14 @@ class Column
             when 'command+enter', 'ctrl+enter' then return @openFileInNewWindow()
             when 'command+left', 'command+up', 'command+right', 'command+down', 'ctrl+left', 'ctrl+up', 'ctrl+right', 'ctrl+down'
                 return stopEvent event, @navigateRoot key
+            when 'command+backspace', 'ctrl+backspace', 'command+delete', 'ctrl+delete' 
+                return stopEvent event, @moveToTrash()
             when 'alt+left'            then return stopEvent event, window.split.focus 'shelf'
             when 'backspace', 'delete' then return stopEvent event, @clearSearch().removeObject()
             when 'ctrl+t'              then return stopEvent event, @sortByType()
             when 'ctrl+n'              then return stopEvent event, @sortByName()
             when 'command+i', 'ctrl+i' then return stopEvent event, @toggleDotFiles()
+            when 'command+e', 'ctrl+e' then return stopEvent event, @toggleExtensions()
             when 'command+k', 'ctrl+k' then return stopEvent event if @browser.cleanUp()
             when 'tab'    
                 if @search.length then @doSearch ''

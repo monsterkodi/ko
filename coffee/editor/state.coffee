@@ -34,10 +34,10 @@ class State
     selections:    -> @s.selections.asMutable deep: true 
     main:          -> @s.main
     
-    line:      (i) -> 
+    line:      (i) ->
         if not @s.lines[i]?
             console.log 'dafuk?'
-            return null
+            return ''
         @s.lines[i].text
     cursor:    (i) -> @s.cursors[i]   .asMutable deep: true 
     selection: (i) -> @s.selections[i].asMutable deep: true 

@@ -1,6 +1,6 @@
 name            ko-editor
 productName     ko
-version         0.50.0
+version         0.50.2
 description     text editor
 main            js/main/main.js
 preferGlobal    true
@@ -42,7 +42,7 @@ dependencies
                 html-entities   =1.2.1
                 isbinaryfile    =3.0.2
                 js-beautify     =1.7.4
-                kxk             ^0.37.2
+                kxk             ^0.38.0
                 mocha           =4.0.1
                 nconf           =0.8.5
                 node-abi        ^2.2.0
