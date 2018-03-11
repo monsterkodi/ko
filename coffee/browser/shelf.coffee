@@ -59,11 +59,11 @@ class Shelf extends Column
                     post.emit 'jumpToFile', file:item.file, line:item.line, col:item.column
         
     onBrowserItemActivated: (browserItem) =>
-        log "Shelf.onBrowserItemActivated", browserItem.file
+        # log "Shelf.onBrowserItemActivated", browserItem.file
         
         [index, item] = indexAndItemInItemsWithFunc browserItem, @items, _.isEqual
         if item
-            log "Shelf.onBrowserItemActivated1", index, item.file
+            # log "Shelf.onBrowserItemActivated1", index, item.file
             @rows[index].setActive()
             return
 
@@ -73,10 +73,10 @@ class Shelf extends Column
                 matches.push [index, item]
 
         if not empty matches
-            log "matches: #{matches.length}"
+            # log "matches: #{matches.length}"
             matches.sort (a,b) -> b[1].file.length - a[1].file.length
             [index, item] = first matches
-            log "Shelf.onBrowserItemActivated2", index, item.file
+            # log "Shelf.onBrowserItemActivated2", index, item.file
             @rows[index].setActive()
             return
                 

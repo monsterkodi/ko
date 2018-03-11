@@ -5,7 +5,7 @@
 # 000       000   000  000      000   000  000 0 000  000  0000
 #  0000000   0000000   0000000   0000000   000   000  000   000
 
-{ stopEvent, setStyle, popup, keyinfo, slash, post, elem, clamp, empty, pos, error, log, _ } = require 'kxk'
+{ stopEvent, setStyle, popup, keyinfo, slash, post, elem, clamp, empty, pos, error, log, $, _ } = require 'kxk'
 
 Row        = require './row'
 Scroller   = require './scroller'
@@ -62,7 +62,7 @@ class Column
         
         post.emit 'browserColumnItemsSet', @ # for filebrowser target navigation
         @
-        
+
     isEmpty: -> empty @rows
     clear:   ->
         @clearSearch()
@@ -265,6 +265,12 @@ class Column
             nextOrPrev?.activate()
         @
   
+    #  0000000   0000000   00000000   000000000  
+    # 000       000   000  000   000     000     
+    # 0000000   000   000  0000000       000     
+    #      000  000   000  000   000     000     
+    # 0000000    0000000   000   000     000     
+    
     sortByName: ->
          
         @rows.sort (a,b) -> 
@@ -311,6 +317,12 @@ class Column
         setStyle '.browserRow .extname', 'display', prefs.get(prefsKey) and 'none' or 'initial'
         @
         
+    # 000000000  00000000    0000000    0000000  000   000  
+    #    000     000   000  000   000  000       000   000  
+    #    000     0000000    000000000  0000000   000000000  
+    #    000     000   000  000   000       000  000   000  
+    #    000     000   000  000   000  0000000   000   000  
+    
     moveToTrash: =>
         
         pathToTrash = @activePath()
@@ -318,6 +330,28 @@ class Column
         @removeObject()
         trash([pathToTrash]).catch (err) -> error "failed to trash #{pathToTrash} #{err}"
 
+    #  0000000   000  000000000  
+    # 000        000     000     
+    # 000  0000  000     000     
+    # 000   000  000     000     
+    #  0000000   000     000     
+    
+    updateGitFiles: (files) ->
+        for row in @rows
+            # $('.browserStatusIcon', row.div)?.remove()
+            return if row.item.type not in ['dir', 'file']
+            status = files[row.item.file]
+            if status?
+                $('.browserStatusIcon', row.div)?.remove()
+                row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
+            else if @index < 0 # shelf
+                for file, status of files
+                    if file.startsWith row.item.file
+                        status = 'dirs' if row.item.type == 'dir'
+                        $('.browserStatusIcon', row.div)?.remove()
+                        row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
+                        break
+        
     # 00000000    0000000   00000000   000   000  00000000     
     # 000   000  000   000  000   000  000   000  000   000    
     # 00000000   000   000  00000000   000   000  00000000     

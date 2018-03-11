@@ -195,21 +195,23 @@ class FileBrowser extends Browser
                 for file in info[key]
                     files[file] = key
 
-            column = @columns[opt.column]
-            return if not column?
+            @shelf.updateGitFiles files
             
-            rows = column.rows
-            return if empty rows
+            if column = @columns[opt.column]
+                column.updateGitFiles files
             
-            # while statusDiv = $('.git', column.div)
-                # statusDiv.remove()
-                
-            for row in rows
-                $('browserStatusIcon', row.div)?.remove()
-                return if row.item.type not in ['dir', 'file']
-                status = files[row.item.file]
-                if status?
-                    row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
+            # column = @columns[opt.column]
+            # return if not column?
+#             
+            # rows = column.rows
+            # return if empty rows
+#             
+            # for row in rows
+                # $('browserStatusIcon', row.div)?.remove()
+                # return if row.item.type not in ['dir', 'file']
+                # status = files[row.item.file]
+                # if status?
+                    # row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
 
     updateGitStatus: (file) =>
         
