@@ -12,9 +12,12 @@ gitRoot = require './gitroot'
 
 gitStatus = (fileOrDir) ->
 
+    log 'gitStatus', fileOrDir
     gitDir = slash.unslash gitRoot fileOrDir
 
-    return if not gitDir? or not slash.isDir gitDir
+    if not gitDir? or not slash.isDir gitDir
+        log 'no git?', fileOrDir, gitDir
+        return 
     
     result = childp.execSync 'git status -s', 
         cwd:      gitDir

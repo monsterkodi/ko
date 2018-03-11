@@ -5,7 +5,7 @@
 #      000  000   000  000       000      000     
 # 0000000   000   000  00000000  0000000  000     
 
-{ stopEvent, keyinfo, slash, prefs, post, elem, clamp, empty, last, error, log, $, _ } = require 'kxk'
+{ stopEvent, keyinfo, slash, prefs, post, elem, clamp, empty, first, last, error, log, $, _ } = require 'kxk'
 
 Row        = require './row'
 Scroller   = require './scroller'
@@ -14,7 +14,7 @@ fuzzaldrin = require 'fuzzaldrin'
 fuzzy      = require 'fuzzy'
 isTextFile = require '../tools/istextfile'
 
-indexAndItemInItemsWith = (item, items, withFunc) ->
+indexAndItemInItemsWithFunc = (item, items, withFunc) ->
     
     for index in [0...items.length]
         if withFunc items[index], item
@@ -59,14 +59,24 @@ class Shelf extends Column
                     post.emit 'jumpToFile', file:item.file, line:item.line, col:item.column
         
     onBrowserItemActivated: (browserItem) =>
+        log "Shelf.onBrowserItemActivated", browserItem.file
         
-        [index, item] = indexAndItemInItemsWith browserItem, @items, _.isEqual
+        [index, item] = indexAndItemInItemsWithFunc browserItem, @items, _.isEqual
         if item
+            log "Shelf.onBrowserItemActivated1", index, item.file
             @rows[index].setActive()
             return
 
-        [index, item] = indexAndItemInItemsWith browserItem, @items, (i, o) -> o.file.startsWith i.file
-        if item
+        matches = []
+        for index,item of @items
+            if browserItem.file.startsWith item.file
+                matches.push [index, item]
+
+        if not empty matches
+            log "matches: #{matches.length}"
+            matches.sort (a,b) -> b[1].file.length - a[1].file.length
+            [index, item] = first matches
+            log "Shelf.onBrowserItemActivated2", index, item.file
             @rows[index].setActive()
             return
                 

@@ -444,7 +444,7 @@ class Main
 
         log 'Main.createWindow opt:', opt
 
-        {width, height} = @screenSize()
+        { width, height } = @screenSize()
         ww = height + 122
 
         scheme  = prefs.get 'scheme'

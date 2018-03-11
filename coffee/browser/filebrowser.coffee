@@ -175,7 +175,8 @@ class FileBrowser extends Browser
     #  0000000   000     000     0000000      000     000   000     000      0000000   0000000   
     
     getGitStatus: (opt) ->
-            
+          
+        # log 'getGitStatus', opt
         file = opt.file ? opt.parent?.file
         return if not file?
         
@@ -185,7 +186,7 @@ class FileBrowser extends Browser
                 log "gitstatus failed for #{file}", err
                 return
                 
-            # log "getGitStatus #{file}", info
+            # log "getGitStatus --------- #{file}", info
             
             return if empty info
                 
@@ -200,18 +201,15 @@ class FileBrowser extends Browser
             rows = column.rows
             return if empty rows
             
-            while statusDiv = $('.git', column.div)
-                statusDiv.remove()
+            # while statusDiv = $('.git', column.div)
+                # statusDiv.remove()
                 
-            # log 'files:', files
             for row in rows
+                $('browserStatusIcon', row.div)?.remove()
                 return if row.item.type not in ['dir', 'file']
-                # log "row.item.file #{row.item.file}"
                 status = files[row.item.file]
                 if status?
-                    icon = {added:'plus', changed:'pencil', 'dirs':'pencil-square-o'}[status]
-                    row.div.appendChild elem 'span', 
-                        class:"git #{status} fa fa-#{icon} extname #{slash.ext(row.item.file)}"
+                    row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
 
     updateGitStatus: (file) =>
         

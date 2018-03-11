@@ -134,10 +134,30 @@ body
     width               24px
     opacity             0.5
 
+.browserStatusIcon
+    
+    text-align          right
+    display             inline-block
+    width               24px
+    opacity             0.5
+    position            absolute
+    right               6px
+    
 octicon(char)
     font-family         octicons
     content             char
 
+.git-changed-icon:before
+    font-family         FontAwesome
+    content             '\f040'
+    
+.git-added-icon:before
+    font-family         FontAwesome
+    content             '\f067'
+    
+.git-dirs-icon:before
+    font-family         FontAwesome
+    content             '\f044'
     
 .file-icon:before
     octicon('\f011')

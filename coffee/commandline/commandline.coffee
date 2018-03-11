@@ -160,19 +160,21 @@ class Commandline extends TextEditor
 
         window.split.showCommandline()
 
-        @command = @commandForName name
+        if @command = @commandForName name
         
-        log "commandline.startCommand #{name}"
-        
-        activeID = document.activeElement.id
-        if activeID.startsWith 'column' then activeID = 'editor'
-        @command.setFocus activeID != 'commandline-editor' and activeID or null
-        @view.focus()
-        
-        @setName name
-        @results @command.start name # <-- command start
-
-        @button.className = "commandline-button active #{@command.prefsID}"
+            log "commandline.startCommand #{name}", @command?
+            
+            activeID = document.activeElement.id
+            if activeID.startsWith 'column' then activeID = 'editor'
+            @command.setFocus activeID != 'commandline-editor' and activeID or null
+            @view.focus()
+            
+            @setName name
+            @results @command.start name # <-- command start
+    
+            @button.className = "commandline-button active #{@command.prefsID}"
+        else
+            error 'no command'
 
     commandForName: (name) ->
 
