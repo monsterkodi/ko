@@ -81,10 +81,11 @@ class Search extends Command
             includeDirs: false
             file:        (f,stat) => @searchInFile opt, slash.path f
         @walker.cfg.ignore.push 'js'
+        # log 'start walker', @walker.cfg
         @walker.start()
         
     searchInFile: (opt, file) ->
-        
+        # log "searchInFile #{file}"
         stream = fs.createReadStream file, encoding: 'utf8'
         stream.pipe new FileSearcher @, opt, file
 
