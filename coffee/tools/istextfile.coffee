@@ -28,6 +28,7 @@ textbase =
 isTextFile = (f) -> 
     return true if slash.extname(f) and textext[slash.extname f]? 
     return true if textbase[slash.basename(f).toLowerCase()]
+    return false if not slash.isFile f
     return not isBinary.sync f
 
 module.exports = isTextFile

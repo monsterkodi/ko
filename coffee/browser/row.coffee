@@ -5,7 +5,7 @@
 # 000   000  000   000  000   000
 # 000   000   0000000   00     00
 
-{ elem, keyinfo, drag, clamp, empty, post, slash, error, log, fs, $, _ } = require 'kxk' 
+{ elem, keyinfo, drag, clamp, stopEvent, keyinfo, empty, post, slash, error, log, fs, $, _ } = require 'kxk' 
 
 syntax      = require '../editor/syntax'
 fileIcons   = require 'file-icons-js'
@@ -129,6 +129,63 @@ class Row
         @div.classList.remove 'active'
         @
 
+    # 000   000   0000000   00     00  00000000  
+    # 0000  000  000   000  000   000  000       
+    # 000 0 000  000000000  000000000  0000000   
+    # 000  0000  000   000  000 0 000  000       
+    # 000   000  000   000  000   000  00000000  
+            
+    editName: =>
+        return if @input? 
+        @input = elem 'input', class: 'rowNameInput'
+        @input.value = slash.file @item.file
+        
+        @div.appendChild @input
+        @input.addEventListener 'change',   @onNameChange
+        @input.addEventListener 'keydown',  @onNameKeyDown
+        @input.addEventListener 'focusout', @onNameFocusOut
+        @input.focus()
+        
+        @input.setSelectionRange 0, slash.base(@item.file).length
+
+    onNameKeyDown: (event) =>
+        
+        {mod, key, combo} = keyinfo.forEvent event
+        switch combo
+            when 'enter', 'esc'
+                if @input.value == @file or combo != 'enter'
+                    @input.value = @file
+                    event.preventDefault()
+                    event.stopImmediatePropagation()
+                    @onNameFocusOut()
+        event.stopPropagation()
+        
+    removeInput: ->
+        
+        return if not @input?
+        @input.removeEventListener 'focusout', @onNameFocusOut
+        @input.removeEventListener 'change',   @onNameChange
+        @input.removeEventListener 'keydown',  @onNameKeyDown
+        @input.remove()
+        delete @input
+        @input = null
+        if not document.activeElement? or document.activeElement == document.body
+            @column.focus activate:false
+    
+    onNameFocusOut: (event) => @removeInput()
+    
+    onNameChange: (event) =>
+        
+        trimmed = @input.value.trim()
+        if trimmed.length
+            newFile = slash.join slash.dir(@item.file), trimmed
+            unusedFilename = require 'unused-filename'
+            unusedFilename(newFile).then (newFile) =>
+                fs.rename @item.file, newFile, (err) =>
+                    return error 'rename failed', err if err
+                    @browser.loadFile newFile
+        @removeInput()
+        
     # 0000000    00000000    0000000    0000000   
     # 000   000  000   000  000   000  000        
     # 000   000  0000000    000000000  000  0000  

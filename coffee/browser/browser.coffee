@@ -55,7 +55,6 @@ class Browser extends Stage
             if elem.containsPos column.div, pos
                 return column
         null
-        
                             
     # 000       0000000    0000000   0000000         000  000000000  00000000  00     00   0000000  
     # 000      000   000  000   000  000   000       000     000     000       000   000  000       
@@ -281,34 +280,8 @@ class Browser extends Stage
     loadContent: (row, opt) ->
         
         item  = row.item
-
-        # items = []
         file  = item.file
-        # name  = slash.base file
-#         
-        # files = post.get 'indexer', 'files', file
 
-        # clsss = files[file]?.classes ? []
-        # for clss in clsss
-            # text = '● '+clss.name
-            # items.push name: clss.name, text:text, type:'class', file: file, line: clss.line
-#         
-        # funcs = files[file]?.funcs ? []
-        # for func in funcs
-            # if func.test == 'describe'
-                # text = '● '+func.name
-            # else if func.static
-                # text = '  ◆ '+func.name
-            # else
-                # text = '  ▸ '+func.name
-            # items.push name: func.name, text:text, type:'func', file: file, line: func.line
-
-        # if items.length
-            # items.sort (a,b) -> a.line - b.line
-            # opt.parent ?= item
-            # @clearColumnsFrom opt.column
-            # @loadItems items, opt
-        # else
         if not @loadSourceItem item, opt
             ext = slash.ext file  
             if ext in ['gif', 'png', 'jpg', 'jpeg', 'svg']

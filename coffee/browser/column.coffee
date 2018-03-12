@@ -5,7 +5,7 @@
 # 000       000   000  000      000   000  000 0 000  000  0000
 #  0000000   0000000   0000000   0000000   000   000  000   000
 
-{ stopEvent, setStyle, popup, keyinfo, slash, post, elem, clamp, empty, pos, error, log, $, _ } = require 'kxk'
+{ stopEvent, setStyle, popup, keyinfo, slash, post, elem, clamp, empty, pos, fs, error, log, $, _ } = require 'kxk'
 
 Row        = require './row'
 Scroller   = require './scroller'
@@ -264,7 +264,7 @@ class Column
             @rows.splice row.index(), 1
             nextOrPrev?.activate()
         @
-  
+          
     #  0000000   0000000   00000000   000000000  
     # 000       000   000  000   000     000     
     # 0000000   000   000  0000000       000     
@@ -326,10 +326,23 @@ class Column
     moveToTrash: =>
         
         pathToTrash = @activePath()
-        log 'moveToTrash', pathToTrash
         @removeObject()
         trash([pathToTrash]).catch (err) -> error "failed to trash #{pathToTrash} #{err}"
 
+    duplicateFile: =>
+        
+        unusedFilename = require 'unused-filename'
+        unusedFilename(@activePath()).then (fileName) =>
+            fileName = slash.path fileName
+            if fs.copyFile?
+                log 'copy', @activePath(), fileName
+                fs.copyFile 'README.md', 'dafuk.md', (err) =>
+                    return error 'copy file failed', err if err?
+                    log 'loadFile', fileName
+                    @browser.loadFile fileName
+            else
+                log 'no copyFile'
+        
     #  0000000   000  000000000  
     # 000        000     000     
     # 000  0000  000     000     
@@ -374,6 +387,9 @@ class Column
             combo:  'ctrl+e' 
             cb:     @toggleExtensions
         ,
+            text:   'Duplicate'
+            cb:     @duplicateFile
+        ,
             text:   'Move to Trash'
             combo:  'ctrl+backspace' 
             cb:     @moveToTrash
@@ -411,6 +427,7 @@ class Column
             when 'command+i', 'ctrl+i' then return stopEvent event, @toggleDotFiles()
             when 'command+e', 'ctrl+e' then return stopEvent event, @toggleExtensions()
             when 'command+k', 'ctrl+k' then return stopEvent event if @browser.cleanUp()
+            when 'f2'                  then return stopEvent event, @activeRow()?.editName()
             when 'tab'    
                 if @search.length then @doSearch ''
                 return stopEvent event

@@ -33,6 +33,19 @@ module.exports =
                     if slash.fileExists file
                         post.emit 'jumpTo', file:file, line:line, col:col
                         return true
+                        
+        if slash.win()
+            
+            rgx = /([\~\\\w\.]+\\[\w\.]+\w[:\d]*)/ # look for files in line
+            
+            ranges = matchr.ranges rgx, text
+            diss   = matchr.dissect ranges, join:false
+            for d in diss
+                if d.start <= p[0] <= d.start+d.match.length
+                    [file, line, col] = slash.splitFileLine d.match
+                    if slash.fileExists file
+                        post.emit 'jumpTo', file:file, line:line, col:col
+                        return true
         false
     
     jumpToWord: -> @jumpToWordAtPos() 

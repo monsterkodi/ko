@@ -187,7 +187,7 @@ class ObjectBrowser extends Browser
     # 000       000  0000000  00000000  0000000   
     
     loadFiles: (names) ->
-        
+
         files = []
 
         filterBase = (name, file) ->
