@@ -34,6 +34,9 @@ dependencies
                 convert-source-map  ^1.5.1
                 dmg             =0.1.0
                 download        =6.2.5
+                electron        ^1.8.3
+                electron-packager  ^11.1.0
+                electron-rebuild  ^1.7.3
                 entities        =1.1.1
                 eve             =0.5.4
                 file-icons-js   ^1.0.3
@@ -78,6 +81,3 @@ coffeelintConfig
                   value   4
                   level   warn
 devDependencies
-                electron        =1.6.17
-                electron-packager  ^11.0.1
-                electron-rebuild  ^1.7.3
