@@ -384,6 +384,7 @@ class Column
             cb:     @toggleExtensions
         ,
             text:   'Duplicate'
+            combo:  'ctrl+d' 
             cb:     @duplicateFile
         ,
             text:   'Move to Trash'
@@ -421,6 +422,7 @@ class Column
             when 'ctrl+t'              then return stopEvent event, @sortByType()
             when 'ctrl+n'              then return stopEvent event, @sortByName()
             when 'command+i', 'ctrl+i' then return stopEvent event, @toggleDotFiles()
+            when 'command+d', 'ctrl+d' then return stopEvent event, @duplicateFile()
             when 'command+e', 'ctrl+e' then return stopEvent event, @toggleExtensions()
             when 'command+k', 'ctrl+k' then return stopEvent event if @browser.cleanUp()
             when 'f2'                  then return stopEvent event, @activeRow()?.editName()
