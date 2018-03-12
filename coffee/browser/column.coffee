@@ -334,14 +334,10 @@ class Column
         unusedFilename = require 'unused-filename'
         unusedFilename(@activePath()).then (fileName) =>
             fileName = slash.path fileName
-            if fs.copyFile?
-                log 'copy', @activePath(), fileName
-                fs.copyFile 'README.md', 'dafuk.md', (err) =>
+            if fs.copy? # fs.copyFile in node > 8.4
+                fs.copy @activePath(), fileName, (err) =>
                     return error 'copy file failed', err if err?
-                    log 'loadFile', fileName
                     @browser.loadFile fileName
-            else
-                log 'no copyFile'
         
     #  0000000   000  000000000  
     # 000        000     000     
