@@ -14,7 +14,7 @@ class Transform
     @transformNames = [
         'upper', 'lower', 'title', 'case'
         'count', 'add', 'sub'
-        'up', 'down', 'sort'
+        'up', 'down', 'sort', 'uniq'
         'reverse', 
         'resolve', 'unresolve'
         'dir', 'base'
@@ -96,6 +96,23 @@ class Transform
         @trans (l) -> reversed l.sort (a,b) -> a.localeCompare b
         'down'
 
+    # 000   000  000   000  000   0000000   
+    # 000   000  0000  000  000  000   000  
+    # 000   000  000 0 000  000  000 00 00  
+    # 000   000  000  0000  000  000 0000   
+    #  0000000   000   000  000   00000 00  
+    
+    uniq: ->
+        @trans (l) ->
+            v = []
+            r = []
+            for a in l
+                r.push if a in v then '' else
+                    v.push a
+                    a
+            r
+        'uniq'
+        
     #  0000000   0000000    0000000  00000000
     # 000       000   000  000       000
     # 000       000000000  0000000   0000000

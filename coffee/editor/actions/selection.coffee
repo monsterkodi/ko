@@ -10,28 +10,34 @@
 module.exports =
     
     actions:
-                    
+        menu: 'Select'
+        
         selectAll:
             name:  'Select All'
-            combo: 'cmdorctrl+a'
+            combo: 'command+a'
+            accel: 'ctrl+a'
             
         selectNone:
             name:  'Deselect'
-            combo: 'cmdorctrl+shift+a'
+            combo: 'command+shift+a'
+            combo: 'ctrl+shift+a'
             
         selectInverted:
             name:  'Invert Selection'
             text:  'selects all lines that have no cursors and no selections'
-            combo: 'cmdorctrl+shift+i'
+            combo: 'command+shift+i'
+            accel: 'ctrl+shift+i'
             
         selectNextHighlight:
             separator: true
             name:  'Select Next Highlight'
-            combo: 'cmdorctrl+g'
+            combo: 'command+g'
+            accel: 'ctrl+g'
             
         selectPrevHighlight:
             name:  'Select Previous Highlight'
-            combo: 'cmdorctrl+shift+g'
+            combo: 'command+shift+g'
+            accel: 'ctrl+shift+g'
                         
         selectTextBetweenCursorsOrSurround:
             name: 'Select Between Cursors, Brackets or Quotes'
@@ -39,7 +45,8 @@ module.exports =
                 select text between even cursors, if at least two cursors exist. 
                 select text between highlighted brackets or quotes otherwise.
                 """
-            combo: 'cmdorctrl+alt+b'
+            combo: 'command+alt+b'
+            accel: 'alt+ctrl+b'
 
         toggleStickySelection:
             separator: true
@@ -66,7 +73,7 @@ module.exports =
     # 0000000      000     000   0000000  000   000     000     
     
     toggleStickySelection: ->
-        log 'toggleStickySelection', @stickySelection
+        # log 'toggleStickySelection', @stickySelection
         if @stickySelection then @endStickySelection()
         else @startStickySelection()
     
@@ -174,7 +181,6 @@ module.exports =
         @do.end()
         
     selectAll: ->
-        
         @do.start()
         @do.select @rangesForAllLines()
         @do.end()

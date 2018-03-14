@@ -5,7 +5,7 @@
 #    000     000        000 000      000           000       000   000  000     000     000   000  000   000
 #    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000
 
-{ error, log, keyinfo, stopEvent, setStyle, prefs, drag, elem, post, clamp, pos, str, sw, os, $, _ } = require 'kxk' 
+{ error, log, keyinfo, stopEvent, setStyle, slash, prefs, drag, elem, post, clamp, pos, str, sw, os, $, _ } = require 'kxk' 
   
 render       = require './render'
 EditorScroll = require './editorscroll'
@@ -705,9 +705,18 @@ class TextEditor extends Editor
 
         for action in Editor.actions
             
-            if action.combo == combo
+            if action.combo == combo or action.accel == combo
+                switch combo
+                    when 'ctrl+a' then return @selectAll()
                 # log "unhandled on combo? #{combo}"
                 return 'unhandled'
+                
+            if action.accels? and slash.win()
+                for actionCombo in action.accels
+                    if combo == actionCombo
+                        if action.key? and _.isFunction @[action.key]
+                            @[action.key] key, combo: combo, mod: mod, event: event
+                            return
                 
             continue if not action.combos?
             

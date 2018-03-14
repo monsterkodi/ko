@@ -5,7 +5,7 @@
 # 000   000  000  000   000  000   000  000      000  000   000  000   000     000     
 # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     
 
-{ _ } = require 'kxk'
+{ empty, log, _ } = require 'kxk'
 
 module.exports = 
 
@@ -61,11 +61,14 @@ module.exports =
 
     highlightForFind: ->
         
-        cp = @cursorPos()
-        wordHighlights = @wordHighlights()
-        cursorInWordHighlight = wordHighlights.length and rangeAtPosInRanges cp, wordHighlights
-        if not cursorInWordHighlight
-            @highlightTextOfSelectionOrWordAtCursor() # this also selects
+        if @numSelections() == 1 and not empty @textInRange(@selection 0).trim()
+            @highlightText @textInRange(@selection 0)
+        else
+            cp = @cursorPos()
+            wordHighlights = @wordHighlights()
+            cursorInWordHighlight = wordHighlights.length #and rangeAtPosInRanges cp, wordHighlights
+            if not cursorInWordHighlight
+                @highlightTextOfSelectionOrWordAtCursor() # this also selects
         @selectNextHighlight()
     
     highlightWordAndAddToSelection: -> # command+d
@@ -105,7 +108,9 @@ module.exports =
     highlightTextOfSelectionOrWordAtCursor: -> # command+e       
             
         if @numSelections() == 0
-            srange = @rangeForWordAtPos @cursorPos()
+            srange = @rangeForRealWordAtPos @cursorPos()
+            if empty @textInRange(srange).trim()
+                log 'highlightTextOfSelectionOrWordAtCursor empty!'
             @selectSingleRange srange
         
         sel = @selection 0     

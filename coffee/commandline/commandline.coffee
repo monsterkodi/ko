@@ -53,7 +53,10 @@ class Commandline extends TextEditor
     #      000     000     000   000     000     000
     # 0000000      000     000   000     000     00000000
 
-    stash: => if @command? then window.stash.set 'commandline', @command.state()
+    stash: => 
+        if @command? 
+            # post.toMain 'winlog', window.winID, 'stash commandline state ' + str @command.state()
+            window.stash.set 'commandline', @command.state()
 
     restore: =>
 
@@ -162,7 +165,7 @@ class Commandline extends TextEditor
 
         if @command = @commandForName name
         
-            log "commandline.startCommand #{name}", @command?
+            # log "commandline.startCommand #{name}", @command?
             
             activeID = document.activeElement.id
             if activeID.startsWith 'column' then activeID = 'editor'

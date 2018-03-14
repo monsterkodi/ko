@@ -84,7 +84,7 @@ class Search extends Command
         # log 'start walker', @walker.cfg
         @walker.start()
         
-    searchInFile: (opt, file) ->
+    searchInFile: (opt, file) =>
         # log "searchInFile #{file}"
         stream = fs.createReadStream file, encoding: 'utf8'
         stream.pipe new FileSearcher @, opt, file
@@ -133,6 +133,10 @@ class FileSearcher extends stream.Writable
             when 'Search'   then [[new RegExp(_.escapeRegExp(@opt.text)),      'found']]
             when '/search/' then @flags='i'; @opt.text
             when '/Search/' then @opt.text
+            else
+                log 'dafuk? name:', @command.name, 'opt:', @opt, 'file:', @file
+                [[new RegExp(_.escapeRegExp(@opt.text), 'i'), 'found']]
+                
         @found = []
         extn = slash.ext @file
         if extn in syntax.syntaxNames

@@ -275,9 +275,8 @@ class FileEditor extends TextEditor
             for file, info of files
                 if slash.base(file).toLowerCase() == find and file != @currentFile
                     @jumpToFile file:file, line:6
-                    return true
 
-        window.commandline.commands.search.start "command+shift+f"
+        window.commandline.commands.search.start 'search'
         window.commandline.commands.search.execute word
 
         window.split.do 'show terminal'

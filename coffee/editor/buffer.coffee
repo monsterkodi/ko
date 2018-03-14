@@ -102,6 +102,17 @@ class Buffer extends event
         r = rangeAtPosInRanges p, wr
         r
 
+    rangeForRealWordAtPos: (pos, opt) ->
+        
+        p = @clampPos pos
+        wr = @wordRangesInLineAtIndex p[1], opt
+        r = rangeAtPosInRanges p, wr
+        if not r? or empty @textInRange(r).trim()
+            r = rangeBeforePosInRanges p, wr
+        if not r? or empty @textInRange(r).trim()
+            r = rangeAfterPosInRanges p, wr
+        r
+        
     endOfWordAtPos: (c) =>
         
         r = @rangeForWordAtPos c

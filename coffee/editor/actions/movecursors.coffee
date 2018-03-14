@@ -14,11 +14,13 @@ module.exports =
         
         moveCursorsAtBoundaryLeft: 
             name: 'Move Cursors to Indent or Start of Line'
-            combo: 'cmdorctrl+left'
+            combo: 'command+left'
+            accel: 'ctrl+left'
 
         moveCursorsAtBoundaryRight: 
             name: 'Move Cursors to End of Line'
-            combo: 'cmdorctrl+right'
+            combo: 'command+right'
+            accel: 'ctrl+right'
                 
         moveCursorsToWordBoundary:
             name:   'move cursors to word boundaries'
@@ -38,14 +40,15 @@ module.exports =
             name:   'move cursors to line boundaries'
             text:   'moves cursors to line boundaries. extends selections, if shift is pressed.'
             combos: ['home', 'end', 'command+shift+left', 'command+shift+right', 'ctrl+shift+left', 'ctrl+shift+right', 'ctrl+shift+e', 'ctrl+shift+a']
+            accels: ['home', 'end', 'shift+home', 'shift+end', 'ctrl+shift+left', 'ctrl+shift+right']
 
         moveMainCursor:
             name:   'move main cursor'
             text:   """move main cursor independently of other cursors.
                 erases other cursors if shift is pressed. 
                 sets new cursors otherwise."""
-            combos: [ 'ctrl+shift+up', 'ctrl+shift+down', 'ctrl+shift+left', 'ctrl+shift+right']
-            #'ctrl+up', 'ctrl+down', 'ctrl+left', 'ctrl+right',
+            combos: [ 'ctrl+shift+up', 'ctrl+shift+down', 'ctrl+shift+left', 'ctrl+shift+right', 'ctrl+up', 'ctrl+down', 'ctrl+left', 'ctrl+right']
+            accels: [ 'ctrl+shift+up', 'ctrl+shift+down']
             
         moveCursors:
             name:  'move cursors'
