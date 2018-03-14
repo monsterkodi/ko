@@ -649,7 +649,7 @@ handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
     
     switch combo
         # when 'command+alt+i', 'ctrl+alt+i' then return stopEvent event, win.webContents.toggleDevTools()
-        when 'ctrl+w'             then return stopEvent event, loadFile()
+        # when 'ctrl+w'             then return stopEvent event, loadFile()
         # when 'f3'                 then return stopEvent event, screenShot()
         when 'command+alt+k', 'alt+ctrl+k' then return stopEvent event, split.toggleLog()
         when 'alt+k'    
