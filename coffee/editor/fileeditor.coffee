@@ -436,8 +436,8 @@ class FileEditor extends TextEditor
         return if 'unhandled' != super mod, key, combo, char, event
         # log 'unhandled', combo
         switch combo
-            when 'ctrl+enter'       then return window.commandline.commands.coffee.executeText @text()
-            when 'ctrl+shift+enter' then return window.commandline.commands.coffee.executeTextInMain @text()
+            when 'alt+ctrl+enter'       then return window.commandline.commands.coffee.executeText @textOfSelectionForClipboard()
+            when 'alt+ctrl+shift+enter' then return window.commandline.commands.coffee.executeTextInMain @textOfSelectionForClipboardt()
             when 'command+alt+up', 'alt+ctrl+up' then return @jumpToCounterpart()
             when 'esc'
                 split = window.split

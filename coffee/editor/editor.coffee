@@ -183,6 +183,7 @@ class Editor extends Buffer
         if @numSelections()
             @textOfSelection()
         else
+            log 'textOfSelectionForClipboard', @textInRanges @rangesForCursorLines()
             @textInRanges @rangesForCursorLines()
 
     splitStateLineAtPos: (state, pos) ->

@@ -700,6 +700,8 @@ class TextEditor extends Editor
                     return @endStickySelection()
                 if @numSelections()
                     return @selectNone()
+            
+            when 'command+enter', 'ctrl+enter','f12' then @jumpToWord()
 
         for action in Editor.actions
             

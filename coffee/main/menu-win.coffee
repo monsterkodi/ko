@@ -231,11 +231,11 @@ class Menu
             label: 'View'
             submenu: [
                 label:      'Navigate Backward'
-                accelerator: 'alt+ctrl+left'
+                accelerator: 'ctrl+1' #'alt+ctrl+left'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'Navigate Backward'
             ,
                 label:      'Navigate Forward'
-                accelerator: 'alt+ctrl+right'
+                accelerator: 'ctrl+2' # 'alt+ctrl+right'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'Navigate Forward'
             ,
                 type: 'separator'

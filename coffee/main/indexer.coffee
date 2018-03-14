@@ -247,7 +247,7 @@ class Indexer
             @files[file] = {}
             return @shiftQueue()
             
-        log 'indexFile', file
+        # log 'indexFile', file
 
         isCpp = fileExt in ['cpp', 'cc']
         isHpp = fileExt in ['hpp', 'h' ]

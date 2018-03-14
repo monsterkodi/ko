@@ -19,7 +19,7 @@ module.exports =
             
         newlineAtEnd:
             name:  'Insert Newline at End'
-            combo: 'cmdorctrl+enter'
+            combo: 'alt+enter'
 
     newlineAtEnd: () ->
         
