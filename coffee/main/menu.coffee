@@ -48,23 +48,23 @@ class Menu
             label: pkg.productName   
             submenu: [     
                 label:       "About #{pkg.productName}"
-                accelerator: 'Alt+.'
+                accelerator: 'command+shift+/'
                 click:        main.showAbout
             ,
                 type: 'separator'
             ,
                 label:       "Hide #{pkg.productName}"
-                accelerator: 'CmdOrCtrl+H'
+                accelerator: 'command+h'
                 role:        'hide'
             ,
                 label:       'Hide Others'
-                accelerator: 'CmdOrCtrl+Alt+H'
+                accelerator: 'command+alt+h'
                 role:        'hideothers'
             ,
                 type: 'separator'
             ,
                 label:       'Quit'
-                accelerator: 'CmdOrCtrl+Q'
+                accelerator: 'command+Q'
                 click:       main.quit
             ]
         ,
