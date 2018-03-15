@@ -5,8 +5,7 @@
 #    000     000        000 000      000           000       000   000  000     000     000   000  000   000
 #    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000
 
-{ error, log, fileExists, keyinfo, stopEvent, setStyle,
-  prefs, drag, elem, path, post, clamp, pos, str, sw, os, $, _ } = require 'kxk' 
+{ error, log, keyinfo, stopEvent, setStyle, slash, prefs, drag, elem, post, clamp, pos, str, sw, os, $, _ } = require 'kxk' 
   
 render       = require './render'
 EditorScroll = require './editorscroll'
@@ -18,10 +17,13 @@ class TextEditor extends Editor
 
     constructor: (viewElem, @config) ->
 
+        name = viewElem
+        name = name.slice 1 if name[0] == '.'
+
+        super name
+
         @clickCount = 0
 
-        @name = viewElem
-        @name = @name.slice 1 if @name[0] == '.'
         @view =$ viewElem
 
         @layers      = elem class: "layers"
@@ -37,16 +39,15 @@ class TextEditor extends Editor
         layer.push 'numbers' if 'Numbers' in @config.features
         @initLayers layer
 
-        @size   = {}
-        @elem   = @layerDict.lines
+        @size = {}
+        @elem = @layerDict.lines
 
         @spanCache = [] # cache for rendered line spans
         @lineDivs  = {} # maps line numbers to displayed divs
 
         @config.lineHeight ?= 1.2
 
-        @setFontSize prefs.get "#{@name}FontSize", @fontSizeDefault
-
+        @setFontSize prefs.get "#{@name}FontSize", @config.fontSize ? 18
         @scroll = new EditorScroll @
         @scroll.on 'shiftLines', @shiftLines
         @scroll.on 'showLines',  @showLines
@@ -55,9 +56,7 @@ class TextEditor extends Editor
         @view.addEventListener 'focus',    @onFocus
         @view.addEventListener 'keydown',  @onKeyDown
 
-        @initDrag()
-
-        super
+        @initDrag()        
 
         for feature in @config.features
             featureName = feature.toLowerCase()
@@ -83,7 +82,7 @@ class TextEditor extends Editor
         @view.removeEventListener 'focus',   @onFocus
         @view.innerHTML = ''
 
-        super
+        super()
 
     # 00000000   0000000    0000000  000   000   0000000
     # 000       000   000  000       000   000  000
@@ -151,11 +150,8 @@ class TextEditor extends Editor
         @scroll.reset()
 
         viewHeight = @viewHeight()
-        if @scroll.viewHeight != viewHeight
-            @scroll.setViewHeight viewHeight
-            @emit 'viewHeight', viewHeight
-
-        @scroll.setNumLines @numLines()
+        
+        @scroll.start viewHeight, @numLines()
 
         @layerScroll.scrollLeft = 0
         @layersWidth  = @layerScroll.offsetWidth
@@ -286,7 +282,6 @@ class TextEditor extends Editor
         div.replaceChild @spanCache[li], div.firstChild
         
     refreshLines: (top, bot) ->
-        
         for li in [top..bot]
             @syntax.getDiss li, true
             @updateLine li
@@ -298,7 +293,7 @@ class TextEditor extends Editor
     # 0000000   000   000   0000000   00     00     0000000  000  000   000  00000000  0000000
 
     showLines: (top, bot, num) =>
-        
+
         @lineDivs = {}
         @elem.innerHTML = ''
 
@@ -368,7 +363,7 @@ class TextEditor extends Editor
     updateLinePositions: (animate=0) ->
         
         for li, div of @lineDivs
-            return error 'no div?' if not div?
+            return error 'no div?' if not div? or not div.style?
             y = @size.lineHeight * (li - @scroll.top)
             div.style.transform = "translate3d(#{@size.offsetX}px,#{y}px, 0)"
             div.style.transition = "all #{animate/1000}s" if animate
@@ -389,7 +384,7 @@ class TextEditor extends Editor
 
         if @numHighlights()
             $('.highlights', @layers).innerHTML = ''
-            super
+            super()
 
     # 00000000   00000000  000   000  0000000    00000000  00000000
     # 000   000  000       0000  000  000   000  000       000   000
@@ -472,38 +467,43 @@ class TextEditor extends Editor
 
     suspendBlink: ->
 
+        return if not @blinkTimer
+        @stopBlink()
         @cursorDiv()?.classList.toggle 'blink', false
         clearTimeout @suspendTimer
-        @suspendTimer = setTimeout @releaseBlink, 600
+        @suspendTimer = setTimeout @releaseBlink, 2000
 
     releaseBlink: =>
 
         clearTimeout @suspendTimer
         delete @suspendTimer
+        @startBlink()
 
     toggleBlink: ->
 
-        @stopBlink()
-        prefs.set 'blink', not prefs.get 'blink', true
-        @startBlink()
+        blink = not prefs.get 'blink', false
+        prefs.set 'blink', blink
+        if blink
+            @startBlink()
+        else
+            @stopBlink()
 
     doBlink: =>
 
-        return if @suspendTimer? or not prefs.get 'blink'
         @blink = not @blink
         @cursorDiv()?.classList.toggle 'blink', @blink
         @minimap?.drawMainCursor @blink
+        
+        clearTimeout @blinkTimer
+        @blinkTimer = setTimeout @doBlink, @blink and 100 or 1900
 
-    startBlink: ->
-
-        return if not prefs.get 'blink'
-        clearInterval @blinkTimer
-        @blinkTimer = setInterval @doBlink, 400
+    startBlink: -> @doBlink()
 
     stopBlink: ->
 
         @cursorDiv()?.classList.toggle 'blink', false
-        clearInterval @blinkTimer
+        
+        clearTimeout @blinkTimer
         delete @blinkTimer
 
     # 00000000   00000000   0000000  000  0000000  00000000
@@ -575,7 +575,9 @@ class TextEditor extends Editor
         @elem.innerHTML = ''
         @emit 'clearLines'
 
-    clear: => @setLines []
+    clear: => 
+        # log 'TextEditor.clear', @name
+        @setLines []
 
     focus: -> @view.focus()
 
@@ -660,9 +662,9 @@ class TextEditor extends Editor
     clickAtPos: (p, event) ->
 
         if event.altKey
-            @jumpToWordAtPos p
-        else if event.metaKey
             @toggleCursorAtPos p
+        else if event.metaKey or event.ctrlKey
+            @jumpToWordAtPos p
         else
             # if event.ctrlKey
                 # @log jsbeauty.html_beautify @lineDivs[p[1]].firstChild.innerHTML, indent_size:2 , preserve_newlines:false, wrap_line_length:200, unformatted: []
@@ -677,11 +679,16 @@ class TextEditor extends Editor
     # 000   000  00000000     000
 
     handleModKeyComboCharEvent: (mod, key, combo, char, event) ->
+        
+        # log "TextEditor.handleModKeyComboCharEvent mod:#{mod} key:#{key} combo:#{combo} char:#{char} event:#{event}"
 
         if @autocomplete?
             return if 'unhandled' != @autocomplete.handleModKeyComboEvent mod, key, combo, event
 
         switch combo
+            
+            when 'backspace' then return 'unhandled' # has char set on windows?
+            
             when 'esc'
                 if @salterMode
                     return @setSalterMode false
@@ -693,44 +700,51 @@ class TextEditor extends Editor
                     return @endStickySelection()
                 if @numSelections()
                     return @selectNone()
+            
+            when 'command+enter', 'ctrl+enter','f12' then @jumpToWord()
 
         for action in Editor.actions
-            if action.combos?
-                combos = action.combos
-            else combos = [action.combo]
-            for actionCombo in combos
+            
+            if action.combo == combo or action.accel == combo
+                switch combo
+                    when 'ctrl+a' then return @selectAll()
+                # log "unhandled on combo? #{combo}"
+                return 'unhandled'
+                
+            if action.accels? and slash.win()
+                for actionCombo in action.accels
+                    if combo == actionCombo
+                        if action.key? and _.isFunction @[action.key]
+                            @[action.key] key, combo: combo, mod: mod, event: event
+                            return
+                
+            continue if not action.combos?
+            
+            for actionCombo in action.combos
                 if combo == actionCombo
                     if action.key? and _.isFunction @[action.key]
                         @[action.key] key, combo: combo, mod: mod, event: event
                         return
 
-        switch combo
-            when 'command+z'       then return @do.undo()
-            when 'command+shift+z' then return @do.redo()
-            when 'command+t'       then return post.emit 'newTabWithFile'
-
-        if os.platform() == 'win32'
-            switch combo
-                when 'ctrl+x' then return @cut()
-                when 'ctrl+c' then return @copy()
-                when 'ctrl+v' then return @paste()
-            
         if char and mod in ["shift", ""]
+            
             return @insertCharacter char
+
+        # log "TextEditor.handleModKeyComboCharEvent unhandled combo:#{combo}"
 
         'unhandled'
 
     onKeyDown: (event) =>
 
-        {mod, key, combo, char} = keyinfo.forEvent event
-
-        # log mod, key, combo, char
+        { mod, key, combo, char } = keyinfo.forEvent event
 
         return if not combo
         return if key == 'right click' # weird right command key
 
         result = @handleModKeyComboCharEvent mod, key, combo, char, event
 
+        # log 'textEditor.onKeyDown', key, combo, 'unhandled' != result
+        
         if 'unhandled' != result
             stopEvent event
 

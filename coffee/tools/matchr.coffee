@@ -63,6 +63,11 @@ ranges = (regexes, text, flags) ->
     return rgs if not text?
     for r in [0...regexes.length]
         reg = regexes[r][0]
+        
+        if not reg? or not reg.exec?
+            console.error 'no reg?', regexes, text, flags
+            return rgs
+        
         arg = regexes[r][1]
         i = 0
         s = text

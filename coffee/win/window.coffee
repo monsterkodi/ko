@@ -6,8 +6,8 @@
 00     00  000  000   000  0000000     0000000   00     00
 ###
 
-{ splitFilePos, stopEvent, fileExists, fileList, unresolve, resolve, keyinfo, 
-  prefs, stash, drag, noon, post, path, clamp, pos, str, sw, sh, os, fs, log, error, _ } = require 'kxk' 
+{ stopEvent, fileList, keyinfo, atomic, prefs, stash, 
+  drag, noon, post, slash, clamp, pos, str, sw, sh, os, fs, log, error, _ } = require 'kxk' 
 
 Split       = require './split'
 Terminal    = require './terminal'
@@ -15,14 +15,14 @@ Titlebar    = require './titlebar'
 LogView     = require './logview'
 Info        = require './info'
 Area        = require '../stage/area'
-FileEditor  = require '../editor/fileeditor'
+Editor      = require '../editor/editor'
 Commandline = require '../commandline/commandline'
+FileEditor  = require '../editor/fileeditor'
 Navigate    = require '../main/navigate'
 FPS         = require '../tools/fps'
 encode      = require '../tools/encode'
 scheme      = require '../tools/scheme'
 electron    = require 'electron'
-atomic      = require 'write-file-atomic'
 pkg         = require '../../package.json'
 
 remote      = electron.remote
@@ -38,13 +38,16 @@ commandline = null
 titlebar    = null
 tabs        = null
 
+# post.debug()
+
 window.onerror = (event, source, line, col, err) ->
-    # f = require('sorcery').loadSync(source.replace /coffee/g, 'js')
-    if false #f?
+
+    f = require('sorcery').loadSync(source.replace /coffee/g, 'js')
+    if f?
         l = f.trace(line)
-        s = "▲ #{l.source}:#{l.line} ▲ [ERROR] #{err}"
+        s = "▲ #{source}:#{l.line} ▲ [ERROR] #{err}"
     else
-        s = "▲ [ERROR] #{err} #{unresolve source}:#{line}:#{col}"
+        s = "▲ [ERROR] #{err} #{slash.tilde source}:#{line}:#{col}"
     post.emit 'error', s
     post.emit 'slog', s
     console.log s
@@ -74,13 +77,14 @@ addToRecent = (file) ->
 
 saveStash = ->
 
+    log 'window.saveStash'
     post.emit 'stash'
     editor.saveScrollCursorsAndSelections()
     window.stash.save()
     post.toMain 'stashSaved'
 
 restoreWin = ->
-
+    
     if bounds = window.stash.get 'bounds'
         win.setBounds bounds
 
@@ -108,8 +112,9 @@ post.on 'openFile',   (opt)  -> openFile  opt
 post.on 'reloadTab', (file)  -> reloadTab file
 post.on 'loadFile',  (file)  -> loadFile  file
 post.on 'loadFiles', (files) -> openFiles files
-post.on 'menuCombo', (combo) -> menuCombo combo
+post.on 'menuAction', (action) -> menuAction action
 post.on 'editorFocus', (editor) ->
+    window.setLastFocus editor.name
     window.focusEditor = editor
     window.textEditor = editor if editor.name != 'commandline-editor'
 
@@ -151,6 +156,7 @@ winMain = ->
     fps         = window.fps         = new FPS()
 
     window.textEditor = window.focusEditor = editor
+    window.lastFocus = editor.name
 
     restoreWin()
 
@@ -162,6 +168,7 @@ winMain = ->
         logview.resized()
 
     terminal.on 'fileSearchResultChange', (file, lineChange) -> # sends changes to all windows
+        log 'winMain terminal.on fileSearchResultChange', file, lineChange
         post.toWins 'fileLineChanges', file, [lineChange]
 
     editor.on 'changed', (changeInfo) ->
@@ -212,7 +219,7 @@ saveFile = (file) ->
 
     editor.stopWatcher()
 
-    if fileExists file
+    if slash.fileExists file
         stat = fs.statSync file
         mode = stat.mode
     else
@@ -231,7 +238,7 @@ saveFile = (file) ->
 
 window.saveChanges = ->
 
-    if editor.currentFile? and editor.do.hasLineChanges() and fileExists editor.currentFile
+    if editor.currentFile? and editor.do.hasLineChanges() and slash.fileExists editor.currentFile
         stat = fs.statSync editor.currentFile
         atomic editor.currentFile, editor.text(), { encoding: 'utf8', mode: stat.mode }, (err) ->
             return error "window.saveChanges failed #{err}" if err
@@ -315,14 +322,18 @@ loadFile = (file, opt={}) ->
 
     file = null if file? and file.length <= 0
 
+    # log "loadFile #{file}"
+
     editor.saveScrollCursorsAndSelections()
 
     if file?
-        [file, pos] = splitFilePos file
-        file = resolve file
+        [file, pos] = slash.splitFilePos file
+        file = slash.resolve file
+
+    # log 'window.loadFile', file, editor?.currentFile, opt
 
     if file != editor?.currentFile or opt?.reload
-        if file? and not fileExists file
+        if file? and not slash.fileExists file
             file = null
 
         if not opt?.dontSave
@@ -354,8 +365,6 @@ loadFile = (file, opt={}) ->
         editor.singleCursorAtPos pos
         editor.scroll.cursorToTop()
 
-# openFile = loadFile
-
 #  0000000   00000000   00000000  000   000        00000000  000  000      00000000   0000000
 # 000   000  000   000  000       0000  000        000       000  000      000       000
 # 000   000  00000000   0000000   000 0 000        000000    000  000      0000000   0000000
@@ -383,10 +392,10 @@ openFiles = (ofiles, options) -> # called from file dialog, open command and bro
             log 'window.openFiles.warning: no files for:', ofiles
             return []
 
-        window.stash.set 'openFilePath', path.dirname files[0]
+        window.stash.set 'openFilePath', slash.dirname files[0]
 
         if not options?.newWindow and not options?.newTab
-            file = resolve files.shift()
+            file = slash.resolve files.shift()
             loadFile file
 
         for file in files
@@ -409,16 +418,16 @@ window.loadFile  = loadFile
 
 openFile = (options) ->
 
-    dir = path.dirname editor.currentFile if editor?.currentFile
-    dir ?= resolve '.'
+    dir = slash.dirname editor.currentFile if editor?.currentFile
+    dir ?= slash.resolve '.'
     dialog.showOpenDialog
         title: "Open File"
         defaultPath: window.stash.get 'openFilePath',  dir
         properties: ['openFile', 'openDirectory', 'multiSelections']
         filters: [
-            name: 'Coffee-Script', extensions: ['coffee']
-        ,
             name: 'All Files', extensions: ['*']
+        ,
+            name: 'CoffeeScript', extensions: ['coffee']
         ]
         , (files) -> openFiles files, options
 
@@ -451,8 +460,7 @@ window.onresize = ->
     split.resized()
     window.stash.set 'bounds', win.getBounds()
     if window.stash.get 'centerText', false
-        screenWidth = screenSize().width
-        editor.centerText sw() == screenWidth, 0
+        editor.centerText true, 200
 
 # 0000000   0000000  00000000   00000000  00000000  000   000   0000000  000   000   0000000   000000000
 #000       000       000   000  000       000       0000  000  000       000   000  000   000     000   
@@ -478,7 +486,7 @@ toggleCenterText = ->
     
     if not window.stash.get 'centerText', false
         window.stash.set 'centerText', true
-        editor.centerText sw() == screenSize().width
+        editor.centerText true # sw() == screenSize().width
     else
         window.stash.set 'centerText', false
         editor.centerText false
@@ -510,6 +518,17 @@ changeFontSize = (d) ->
 resetFontSize = -> 
     window.stash.set 'fontSize'
     setFontSize editor.fontSizeDefault
+    
+addToShelf = ->
+    log 'addToShelf', window.lastFocus
+    fileBrowser = commandline.commands.browse.browser
+    return if window.lastFocus == 'shelf'
+    if window.lastFocus.startsWith fileBrowser.name
+        path = fileBrowser.columnWithName(window.lastFocus).activePath()
+    else 
+        path = editor.currentFile
+    log 'emit addToShelf', path
+    post.emit 'addToShelf', path
 
 # 0000000   0000000    0000000   00     00
 #    000   000   000  000   000  000   000
@@ -546,57 +565,108 @@ window.onfocus = (event) ->
             split.focus 'editor'
         else
             split.focus 'commandline-editor'
+            
+window.setLastFocus = (name) -> 
+    # log "window.setLastFocus #{name}"
+    window.lastFocus = name
 
+# 00     00  00000000  000   000  000   000      0000000    0000000  000000000  000   0000000   000   000  
+# 000   000  000       0000  000  000   000     000   000  000          000     000  000   000  0000  000  
+# 000000000  0000000   000 0 000  000   000     000000000  000          000     000  000   000  000 0 000  
+# 000 0 000  000       000  0000  000   000     000   000  000          000     000  000   000  000  0000  
+# 000   000  00000000  000   000   0000000      000   000   0000000     000     000   0000000   000   000  
+
+menuAction = (name) ->
+
+    log 'menuAction ', name
+    
+    if 'unhandled' != window.commandline.handleMenuAction name
+        return
+
+    switch name
+        
+        when 'Undo'               then return @window.focusEditor.do.undo()
+        when 'Redo'               then return @window.focusEditor.do.redo()
+        when 'Cut'                then return @window.focusEditor.cut()
+        when 'Copy'               then return @window.focusEditor.copy()
+        when 'Paste'              then return @window.focusEditor.paste()
+        when 'New Tab'            then return post.emit 'newEmptyTab'
+        when 'Toggle Scheme'      then return scheme.toggle()
+        when 'Toggle Center Text' then return toggleCenterText()
+        when 'Font Size Increase' then return changeFontSize +1
+        when 'Font Size Decrease' then return changeFontSize -1
+        when 'Font Size Reset'    then return resetFontSize()
+        when 'Open Window List'   then return titlebar.showList()
+        when 'Navigate Backward'  then return navigate.backward()
+        when 'Navigate Forward'   then return navigate.forward()
+        when 'Maximize Editor'    then return split.maximizeEditor()
+        when 'Add to Shelf'       then return addToShelf()
+        when 'Activate Next Tab'     then return window.tabs.navigate 'right'
+        when 'Activate Previous Tab' then return window.tabs.navigate 'left'
+        when 'Move Tab Left'         then return window.tabs.move 'left'
+        when 'Move Tab Right'        then return window.tabs.move 'right'
+        
+    # log "window.menuAction #{name}"
+            
+    if action = Editor.actionWithName name
+        # log "window.menuAction #{name}"
+        if action.key? and _.isFunction window.focusEditor[action.key]
+            # log "window.menuAction execute --- ", name
+            window.focusEditor[action.key]()
+            return
+                        
+    log "unhandled menu action! ------------ #{name}"
+        
 # 000   000  00000000  000   000
 # 000  000   000        000 000
 # 0000000    0000000     00000
 # 000  000   000          000
 # 000   000  00000000     000
 
-menuCombo = (combo) ->
-
-    {mod, key, combo, char} = keyinfo.forCombo combo
-    log 'menuCombo', mod, key, combo, char
-    return if window.focusEditor and 'unhandled' != window.focusEditor.handleModKeyComboCharEvent mod, key, combo, char
-    handleModKeyComboCharEvent mod, key, combo, char
-
 onKeyDown = (event) ->
     
-    {mod, key, combo, char} = keyinfo.forEvent event
+    { mod, key, combo, char } = keyinfo.forEvent event
     handleModKeyComboCharEvent mod, key, combo, char, event
 
 handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
+        
+    # log 'handleModKeyComboCharEvent1', 'mod', mod, 'key', key, 'combo', combo, 'char', char
+    
+    if mod == 'alt' 
+        if not combo
+            stopEvent event # prevent menu from showing
+        else if combo == 'alt+m'
+            win.setMenuBarVisibility not win.isMenuBarVisible()
     
     return if not combo
+    
     return stopEvent(event) if 'unhandled' != window.titlebar   .globalModKeyComboEvent mod, key, combo, event
     return stopEvent(event) if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
 
+    # log 'handleModKeyComboCharEvent2', 'mod', mod, 'key', key, 'combo', combo, 'char', char
+                
     for i in [1..9]
         if combo is "alt+#{i}"
             return stopEvent event, post.toMain 'activateWindow', i
     
     switch combo
-        when 'command+alt+i'      then return stopEvent event, win.webContents.toggleDevTools()
-        when 'ctrl+w'             then return stopEvent event, loadFile()
-        when 'f3'                 then return stopEvent event, screenShot()
-        when 'alt+i'              then return stopEvent event, scheme.toggle()
-        when 'command+\\'         then return stopEvent event, toggleCenterText()
-        when 'command+k'          then return stopEvent event, commandline.clear()
-        when 'command+alt+k'      then return stopEvent event, split.toggleLog()
-        when 'alt+ctrl+left'      then return stopEvent event, post.toMain 'activatePrevWindow', winID
-        when 'alt+ctrl+right'     then return stopEvent event, post.toMain 'activateNextWindow', winID
-        when 'command+alt+ctrl+k' then return stopEvent event, split.showOrClearLog()
-        when 'command+='          then return stopEvent event, changeFontSize +1
-        when 'command+-'          then return stopEvent event, changeFontSize -1
-        when 'command+0'          then return stopEvent event, resetFontSize()
+        # when 'command+alt+i', 'ctrl+alt+i' then return stopEvent event, win.webContents.toggleDevTools()
+        # when 'ctrl+w'             then return stopEvent event, loadFile()
+        # when 'f3'                 then return stopEvent event, screenShot()
+        when 'command+alt+k', 'alt+ctrl+k' then return stopEvent event, split.toggleLog()
+        when 'alt+k'    
+            log 'focusEditor', window.focusEditor.name
+            if window.focusEditor == window.editor then window.logview.clear() else window.focusEditor.clear()
+            return stopEvent event
+        # when 'alt+ctrl+left'      then return stopEvent event, post.toMain 'activatePrevWindow', winID
+        # when 'alt+ctrl+right'     then return stopEvent event, post.toMain 'activateNextWindow', winID
+        # when 'command+alt+shift+k', 'alt+ctrl+shift+k' then return stopEvent event, split.showOrClearLog()
         when 'command+shift+='    then return stopEvent event, @changeZoom +1
         when 'command+shift+-'    then return stopEvent event, @changeZoom -1
         when 'command+shift+0'    then return stopEvent event, @resetZoom()
-        when 'alt+`'              then return stopEvent event, titlebar.showList()
-        when 'command+ctrl+left'  then return stopEvent event, navigate.backward()
-        when 'command+ctrl+right' then return stopEvent event, navigate.forward()
-        when 'command+shift+y'    then return stopEvent event, split.maximizeEditor()
         when 'command+alt+y'      then return stopEvent event, split.do 'minimize editor'
+        
+    # log 'handleModKeyComboCharEvent3', mod, key, combo, char
 
 document.addEventListener 'keydown', onKeyDown        
         

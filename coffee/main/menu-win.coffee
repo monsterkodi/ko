@@ -20,7 +20,7 @@ class Menu
         fileLabel = (f) ->
             return slash.basename(f) + ' - ' + slash.tilde slash.dirname(f) if f?
             'untitled'
-    
+
         recent = []
         for f in prefs.get 'recentFiles', []
             if fs.existsSync f
@@ -45,26 +45,16 @@ class Menu
             # 000  000   000   000
             # 000   000   0000000 
             
-            label: pkg.productName   
+            label: 'ko'
             submenu: [     
                 label:       "About #{pkg.productName}"
-                accelerator: 'Alt+.'
+                accelerator: 'ctrl+shift+/'
                 click:        main.showAbout
             ,
                 type: 'separator'
             ,
-                label:       "Hide #{pkg.productName}"
-                accelerator: 'CmdOrCtrl+H'
-                role:        'hide'
-            ,
-                label:       'Hide Others'
-                accelerator: 'CmdOrCtrl+Alt+H'
-                role:        'hideothers'
-            ,
-                type: 'separator'
-            ,
                 label:       'Quit'
-                accelerator: 'CmdOrCtrl+Q'
+                accelerator: 'Ctrl+Q'
                 click:       main.quit
             ]
         ,
@@ -78,21 +68,21 @@ class Menu
             role: 'file'
             submenu: [
                 label:       'New Tab'
-                accelerator: 'CmdOrCtrl+N'
-                click:       (i,win) -> post.toWin win.id, "newTabWithFile"
+                accelerator: 'cmdorctrl+n'
+                click:       (i,win) -> post.toWin win.id, 'menuAction', 'New Tab'
             ,
                 label:       'New Window'
-                accelerator: 'CmdOrCtrl+Shift+N'
+                accelerator: 'Ctrl+Shift+N'
                 click:       (i,win) -> post.toWin win.id, "cloneFile"
             ,
                 type: 'separator'
             ,
                 label:       'Open...'
-                accelerator: 'CmdOrCtrl+O'
+                accelerator: 'Ctrl+O'
                 click:       (i,win) -> post.toWin win.id, "openFile"
             ,
                 label:       'Open In New Window...'
-                accelerator: 'CmdOrCtrl+Shift+O'
+                accelerator: 'Ctrl+Shift+O'
                 click:       (i,win) -> post.toWin win.id, "openFile", newWindow: true
             ,
                 label:       'Open Recent'
@@ -101,27 +91,27 @@ class Menu
                 type: 'separator'
             ,
                 label:       'Save'
-                accelerator: 'CmdOrCtrl+S'
+                accelerator: 'Ctrl+S'
                 click:       (i,win) -> post.toWin win.id, 'saveFile'
             ,            
                 label:       'Save As ...'
-                accelerator: 'CmdOrCtrl+Shift+S'
+                accelerator: 'Ctrl+Shift+S'
                 click:       (i,win) -> post.toWin win.id, 'saveFileAs'
             ,
                 type: 'separator'
             ,
                 label:       'Reload'
-                accelerator: 'CmdOrCtrl+R'
+                accelerator: 'Ctrl+R'
                 click:       (i,win) -> post.toWin win.id, 'reloadFile'
             ,
                 type: 'separator'
             ,
                 label:       'Close Other Tabs'
-                accelerator: 'CmdOrCtrl+Shift+T'
+                accelerator: 'ctrl+shift+w'
                 click:       (i,win) -> post.toWin win.id, 'closeOtherTabs'
             ,
                 label:       'Close Tab or Window'
-                accelerator: 'CmdOrCtrl+W'
+                accelerator: 'ctrl+w'
                 click:       (i,win) -> post.toWin win.id, 'closeTabOrWindow'
             ]
         ,
@@ -136,11 +126,11 @@ class Menu
                 label:      'Browse'
                 submenu:    [
                         label:      'Small'
-                        accelerator: 'command+.'
+                        accelerator: 'Ctrl+.'
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'browse'
                     ,
                         label:      'Large'
-                        accelerator: 'command+alt+.'
+                        accelerator: 'alt+ctrl+.'
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'Browse'
                     ,
                         label:      'Shelf'
@@ -158,22 +148,22 @@ class Menu
                 label:      'Open'
                 submenu:    [
                         label:      'In Current Tab'
-                        accelerator: 'command+p'
+                        accelerator: 'Ctrl+p'
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'open'
                     ,
                         label:      'In New Tab'
-                        accelerator: 'command+shift+p'
+                        accelerator: 'Ctrl+shift+p'
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'new tab'
                     ,
                         label:      'In New Window'
-                        accelerator: 'command+alt+p'
+                        accelerator: 'Ctrl+alt+p'
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'new window'
                 ]
             ,
                 label:      'Search'
                 submenu:    [
                         label:      'Case Insensitive'
-                        accelerator: 'command+Shift+F'
+                        accelerator: 'Ctrl+Shift+F'
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'search'
                     ,
                         label:      'Case Sensitive'
@@ -189,7 +179,7 @@ class Menu
                 label:      'Find'
                 submenu:    [
                         label:      'Case Insensitive'
-                        accelerator: 'command+f'
+                        accelerator: 'Ctrl+f'
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'find'
                     ,
                         label:      'Case Sensitive'
@@ -220,15 +210,15 @@ class Menu
                 ]
             ,
                 label:      'Goto'
-                accelerator: 'command+;'
+                accelerator: 'Ctrl+;'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'goto'
             ,
                 label:      'Build'
-                accelerator: 'command+b'
+                accelerator: 'Ctrl+b'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'build'
             ,
                 label:      'Macro'
-                accelerator: 'command+m'
+                accelerator: 'Ctrl+m'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'macro'
             ]   
         ,
@@ -241,41 +231,41 @@ class Menu
             label: 'View'
             submenu: [
                 label:      'Navigate Backward'
-                accelerator: 'command+1' #'alt+ctrl+left'
+                accelerator: 'ctrl+1' #'alt+ctrl+left'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'Navigate Backward'
             ,
                 label:      'Navigate Forward'
-                accelerator: 'command+2' # 'alt+ctrl+right'
+                accelerator: 'ctrl+2' # 'alt+ctrl+right'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'Navigate Forward'
             ,
                 type: 'separator'
             ,
                 label:      'Maximize Editor'
-                accelerator: 'command+shift+y'
+                accelerator: 'Ctrl+shift+y'
                 click:      (i,win) -> post.toWin win.id, 'menuAction', 'Maximize Editor'
             ,
                 label:      'Toggle Center Text'
-                accelerator: 'command+\\'
+                accelerator: 'Ctrl+\\'
                 click:      (i,win) -> post.toWin win.id, 'menuAction', 'Toggle Center Text'
             ,
                 type: 'separator'
             ,
                 label:       'Activate Next Tab'
-                accelerator: 'command+alt+shift+right'
+                accelerator: 'ctrl+alt+shift+right'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'Activate Next Tab'
             , 
                 label:       'Activate Previous Tab'
-                accelerator: 'command+alt+shift+left'
+                accelerator: 'ctrl+alt+shift+left'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'Activate Previous Tab'
             ,
                 type: 'separator'
             ,
                 label:       'Move Tab Right'
-                accelerator: 'command+alt+shift+.'
+                accelerator: 'ctrl+alt+shift+.'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'Move Tab Right'
             , 
                 label:       'Move Tab Left'
-                accelerator: 'command+alt+shift+,'
+                accelerator: 'Ctrl+alt+shift+,'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'Move Tab Left'
             ,
                 type: 'separator'
@@ -283,15 +273,15 @@ class Menu
                 label: 'Font Size'
                 submenu: [
                     label:       'Increase'
-                    accelerator: 'command+='
+                    accelerator: 'Ctrl+='
                     click:      (i,win) -> post.toWin win.id, 'menuAction', 'Font Size Increase'
                 ,
                     label:       'Decrease'
-                    accelerator: 'command+-'
+                    accelerator: 'Ctrl+-'
                     click:      (i,win) -> post.toWin win.id, 'menuAction', 'Font Size Decrease'
                 ,
                     label:       'Reset'
-                    # accelerator: 'command+0' # broken on mac! fix me 
+                    accelerator: 'Ctrl+0'
                     click:      (i,win) -> post.toWin win.id, 'menuAction', 'Font Size Reset'
                 ]
             ]
@@ -305,23 +295,23 @@ class Menu
             label: 'Window'
             submenu: [
                 label:       'Toggle Scheme'
-                accelerator: 'command+i'
+                accelerator: 'alt+i'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'Toggle Scheme'
             ,
                 type: 'separator'
             ,                            
                 label:       'Minimize'
-                accelerator: 'command+Alt+M'
+                accelerator: 'Ctrl+Alt+M'
                 click:       (i,win) -> win?.minimize()
             ,
                 label:       'Maximize'
-                accelerator: 'command+Alt+Shift+m'
+                accelerator: 'Ctrl+Alt+Shift+m'
                 click:       (i,win) -> main.toggleMaximize win
             ,
                 type: 'separator'
             ,
                 label:       'Arrange'
-                accelerator: 'command+Alt+A'
+                accelerator: 'Ctrl+Alt+A'
                 click:       main.arrangeWindows
             ,                            
                 type: 'separator'
@@ -331,33 +321,23 @@ class Menu
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'Open Window List'
             ,
                 label:       'Cycle Through Windows'
-                accelerator: 'command+`'
+                accelerator: 'Ctrl+`'
                 click:       (i,win) -> main.activateNextWindow win
             ,
                 type: 'separator'
             ,   
                 label:       'Reload Window'
-                accelerator: 'command+Alt+L'
+                accelerator: 'Ctrl+Alt+L'
                 click:       (i,win) -> post.toWin win.id, 'reloadWin'
             ,                
                 label:       'Toggle FullScreen'
-                accelerator: 'command+Alt+F'
+                accelerator: 'Ctrl+Alt+F'
                 click:       (i,win) -> win?.setFullScreen !win.isFullScreen()
             ,                
                 label:       'Open DevTools'
-                accelerator: 'command+Alt+I'
+                accelerator: 'Ctrl+Alt+I'
                 click:       (i,win) -> win?.webContents.openDevTools()                
             ]
-        ,      
-            # 000   000  00000000  000      00000000 
-            # 000   000  000       000      000   000
-            # 000000000  0000000   000      00000000 
-            # 000   000  000       000      000      
-            # 000   000  00000000  0000000  000      
-            
-            label: 'Help'
-            role: 'help'
-            submenu: []            
         ]
 
         # 00000000  0000000    000  000000000  
@@ -397,25 +377,25 @@ class Menu
         editMenu = AppMenu.buildFromTemplate [
             label: 'Undo', 
             click: (i,win) -> post.toWin win.id, 'menuAction', 'Undo'
-            accelerator: 'command+z'
+            accelerator: 'cmdorctrl+z'
         ,
             label: 'Redo', 
             click: (i,win) -> post.toWin win.id, 'menuAction', 'Redo'
-            accelerator: 'command+shift+z'
+            accelerator: 'cmdorctrl+shift+z'
         ,
             type: 'separator'
         ,
             label: 'Cut', 
             click: (i,win) -> post.toWin win.id, 'menuAction', 'Cut'
-            accelerator: 'command+x'
+            accelerator: 'cmdorctrl+x'
         ,
             label: 'Copy', 
             click: (i,win) -> post.toWin win.id, 'menuAction', 'Copy'
-            accelerator: 'command+c'
+            accelerator: 'cmdorctrl+c'
         ,
             label: 'Paste', 
             click: (i,win) -> post.toWin win.id, 'menuAction', 'Paste'
-            accelerator: 'command+v'
+            accelerator: 'cmdorctrl+v'
         ,
             type: 'separator'
         ]

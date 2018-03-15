@@ -5,20 +5,20 @@
 # 000   000  000   000  000  000      000   000
 # 0000000     0000000   000  0000000  0000000  
 
-{ fileExists, dirExists, resolve, log, $, _ } = require 'kxk'
+{ slash, log, $, _ } = require 'kxk'
 
 Command  = require '../commandline/command'
 
 class Build extends Command
     
-    constructor: (@commandline) ->
+    constructor: (commandline) ->
+        
+        super commandline
         
         @cmdID      = 0
         @commands   = Object.create null
-        @shortcuts  = ['command+b', 'command+shift+b']
         @names      = ["build", 'Build']
         window.area.on 'resized', @onAreaResized
-        super @commandline
 
     restoreState: (state) -> 
         
@@ -32,8 +32,8 @@ class Build extends Command
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
     
-    start: (@combo) ->
-        super @combo
+    start: (name) ->
+        super name
         text:   @last()
         select: true
         do:     'show area'
@@ -49,19 +49,18 @@ class Build extends Command
         command = command.trim()
         return if not command.length
         if @instance?.name == command and @instance.reset?
-            # log "reset #{command} #{@instance?.name} #{@instance.reset?}", _.isFunction @instance.reset
             @instance.reset()
         else
-            if dirExists "#{__dirname}/../area/#{command}"
-                if fileExists "#{__dirname}/../area/#{command}/main.js"
-                    file = "#{__dirname}/../area/#{command}/main.js"
-                else if fileExists "#{__dirname}/../area/#{command}/#{command}.js"
-                    file = "#{__dirname}/../area/#{command}/#{command}.js"
-            else if fileExists "#{__dirname}/../#{command}/#{command}.js"
+            if slash.dirExists "#{__dirname}/../stage/#{command}"
+                if slash.fileExists "#{__dirname}/../stage/#{command}/main.js"
+                    file = "#{__dirname}/../stage/#{command}/main.js"
+                else if slash.fileExists "#{__dirname}/../stage/#{command}/#{command}.js"
+                    file = "#{__dirname}/../stage/#{command}/#{command}.js"
+            else if slash.fileExists "#{__dirname}/../#{command}/#{command}.js"
                 file = "#{__dirname}/../#{command}/#{command}.js"
-            else if dirExists command
-                if fileExists "#{resolve command}/main.js"
-                    file = "#{resolve command}/main.js"
+            else if slash.dirExists command
+                if slash.fileExists "#{slash.resolve command}/main.js"
+                    file = "#{slash.resolve command}/main.js"
                 
             if file?
                 mod = require file

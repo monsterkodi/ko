@@ -5,21 +5,24 @@
 # 000        000   000       000     000     000     
 # 000        000   000  0000000      000     00000000
 
-{ empty, log, _
-}         = require 'kxk'
+{ empty, log, _ } = require 'kxk'
+
 electron  = require 'electron'
 clipboard = electron.clipboard
         
 module.exports = 
 
     actions:
-        cut:
-            combo: 'command+x'
-        copy:
-            combo: 'command+c'
-        paste:
-            combo: 'command+v'
+        
+        cutCopyPaste:
+            combos: ['command+x', 'ctrl+x', 'command+c', 'ctrl+c', 'command+v', 'ctrl+v']
     
+    cutCopyPaste: (key, info) ->
+        switch key
+            when 'x' then @cut()
+            when 'c' then @copy()
+            when 'v' then @paste()
+            
     cut: ->
         @do.start()
         @copy()

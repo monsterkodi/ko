@@ -5,25 +5,29 @@
 # 000       000   000  000      000   000  000 0 000  000  0000
 #  0000000   0000000   0000000   0000000   000   000  000   000
 
-{ packagePath, stopEvent, relative, keyinfo, path, post, elem, clamp, empty, error, log, _ } = require 'kxk'
+{ stopEvent, setStyle, popup, keyinfo, slash, post, elem, clamp, empty, pos, fs, error, log, $, _ } = require 'kxk'
 
 Row        = require './row'
 Scroller   = require './scroller'
 fuzzaldrin = require 'fuzzaldrin'
 fuzzy      = require 'fuzzy'
+trash      = require 'trash'
 
 class Column
     
     constructor: (@browser) ->
         
-        @index = @browser.columns.length
+        @index = @browser.columns?.length
         @search = ''
         @searchTimer = null
+        @items = []
         @rows = []
-        @div = elem class: 'browserColumn', tabIndex: @index, id: "column#{@index}"
+        
+        @div = elem class: 'browserColumn', tabIndex: 6, id: @name()
         @table = elem class: 'browserColumnTable'
         @div.appendChild @table
-        @browser.cols.appendChild @div
+        
+        @browser.cols?.appendChild @div
         
         @div.addEventListener 'focus',     @onFocus
         @div.addEventListener 'blur',      @onBlur
@@ -34,6 +38,8 @@ class Column
 
         @div.addEventListener 'click',     @onClick
         @div.addEventListener 'dblclick',  @onDblClick
+        
+        @div.addEventListener "contextmenu", @onContextMenu
         
         @scroll = new Scroller @
         
@@ -56,7 +62,7 @@ class Column
         
         post.emit 'browserColumnItemsSet', @ # for filebrowser target navigation
         @
-        
+
     isEmpty: -> empty @rows
     clear:   ->
         @clearSearch()
@@ -76,6 +82,7 @@ class Column
     activateRow:  (row) -> @row(row)?.activate()
        
     activeRow: -> _.find @rows, (r) -> r.isActive()
+    activePath: -> @activeRow().path()
     
     row: (row) -> # accepts element, index, string or row
         if      _.isNumber  row then return 0 <= row < @numRows() and @rows[row] or null
@@ -86,9 +93,15 @@ class Column
     nextColumn: -> @browser.column @index+1
     prevColumn: -> @browser.column @index-1
         
+    name: -> "#{@browser.name}:#{@index}"
+        
     numRows:    -> @rows.length ? 0   
     rowHeight:  -> @rows[0]?.div.clientHeight ? 0
     numVisible: -> @rowHeight() and parseInt(@browser.height() / @rowHeight()) or 0
+    
+    rowIndexAtPos: (pos) ->
+        
+        Math.max 0, Math.floor (pos.y - @div.getBoundingClientRect().top) / @rowHeight()
     
     # 00000000   0000000    0000000  000   000   0000000  
     # 000       000   000  000       000   000  000       
@@ -98,14 +111,17 @@ class Column
     
     hasFocus: -> @div.classList.contains 'focus'
 
-    focus: ->
-        if not @activeRow() and @numRows()
+    focus: (opt={}) ->
+        if not @activeRow() and @numRows() and opt?.activate != false
             @rows[0].setActive emit:true
         @div.focus()
+        window.setLastFocus @name()
         @
         
     onFocus: => @div.classList.add 'focus'
     onBlur:  => @div.classList.remove 'focus'
+
+    focusBrowser: -> @browser.focus()
     
     # 00     00   0000000   000   000   0000000  00000000  
     # 000   000  000   000  000   000  000       000       
@@ -128,8 +144,8 @@ class Column
 
         target = _.isString(target) and target or target?.file
         if not @parent then return error "no parent? #{@index}"
-        relpath = relative target, @parent.file
-        relitem = _.first relpath.split path.sep
+        relpath = slash.relative target, @parent.file
+        relitem = _.first slash.split relpath
         row = @row relitem
         if row
             @activateRow row
@@ -177,10 +193,10 @@ class Column
         
         return if not @browser.browse?
         @browser.browse switch key
-            when 'left'  then path.dirname @parent.file
+            when 'left'  then slash.dirname @parent.file
             when 'up'    then @parent.file
             when 'right' then @activeRow().item.file
-            when 'down'  then packagePath @parent.file
+            when 'down'  then slash.pkg @parent.file
             when '~'     then '~'
             when '/'     then '/'
         @
@@ -238,10 +254,9 @@ class Column
         delete @searchDiv
         @
     
-    removeObject: ->
+    removeObject: =>
         
         if row = @activeRow()
-            # delete @parent.obj[row.item.name]
             @browser.emit 'willRemoveRow', row, @
             nextOrPrev = row.next() ? row.prev()
             row.div.remove()
@@ -249,9 +264,15 @@ class Column
             @rows.splice row.index(), 1
             nextOrPrev?.activate()
         @
-  
-    sortByName: -> 
-        log 'sortByName'
+          
+    #  0000000   0000000   00000000   000000000  
+    # 000       000   000  000   000     000     
+    # 0000000   000   000  0000000       000     
+    #      000  000   000  000   000     000     
+    # 0000000    0000000   000   000     000     
+    
+    sortByName: ->
+         
         @rows.sort (a,b) -> 
             a.item.name.localeCompare b.item.name
             
@@ -261,10 +282,10 @@ class Column
         @
         
     sortByType: ->
-        # log 'sortByType'
+        
         @rows.sort (a,b) -> 
-            atype = a.item.type == 'file' and path.extname(a.item.name).slice(1) or a.item.type
-            btype = b.item.type == 'file' and path.extname(b.item.name).slice(1) or b.item.type
+            atype = a.item.type == 'file' and slash.ext(a.item.name) or a.item.type
+            btype = b.item.type == 'file' and slash.ext(b.item.name) or b.item.type
             (atype + a.item.name).localeCompare btype + b.item.name
             
         @table.innerHTML = ''
@@ -272,17 +293,109 @@ class Column
             @table.appendChild row.div
         @
   
-    toggleDotFiles: ->
+    # 000000000   0000000    0000000    0000000   000      00000000  
+    #    000     000   000  000        000        000      000       
+    #    000     000   000  000  0000  000  0000  000      0000000   
+    #    000     000   000  000   000  000   000  000      000       
+    #    000      0000000    0000000    0000000   0000000  00000000  
+    
+    toggleDotFiles: =>
 
-        prefsKey = "browser:ignoreHidden:#{@parent.file}"
         if @parent.type == 'dir'            
+            prefsKey = "browser:ignoreHidden:#{@parent.file}"
             if prefs.get prefsKey, true
                 prefs.set prefsKey, false
             else
                 prefs.set prefsKey
             @browser.loadDir @parent.file, column:@index, focus:true
-            log 'toggleDotFiles', prefsKey, prefs.get prefsKey
         @
+        
+    toggleExtensions: =>
+
+        prefsKey = "browser:hideExtensions"
+        prefs.set prefsKey, not prefs.get prefsKey, false
+        setStyle '.browserRow .extname', 'display', prefs.get(prefsKey) and 'none' or 'initial'
+        @
+        
+    # 000000000  00000000    0000000    0000000  000   000  
+    #    000     000   000  000   000  000       000   000  
+    #    000     0000000    000000000  0000000   000000000  
+    #    000     000   000  000   000       000  000   000  
+    #    000     000   000  000   000  0000000   000   000  
+    
+    moveToTrash: =>
+        
+        pathToTrash = @activePath()
+        @removeObject()
+        trash([pathToTrash]).catch (err) -> error "failed to trash #{pathToTrash} #{err}"
+
+    duplicateFile: =>
+        
+        unusedFilename = require 'unused-filename'
+        unusedFilename(@activePath()).then (fileName) =>
+            fileName = slash.path fileName
+            if fs.copy? # fs.copyFile in node > 8.4
+                fs.copy @activePath(), fileName, (err) =>
+                    return error 'copy file failed', err if err?
+                    @browser.loadFile fileName
+        
+    #  0000000   000  000000000  
+    # 000        000     000     
+    # 000  0000  000     000     
+    # 000   000  000     000     
+    #  0000000   000     000     
+    
+    updateGitFiles: (files) ->
+        for row in @rows
+            # $('.browserStatusIcon', row.div)?.remove()
+            return if row.item.type not in ['dir', 'file']
+            status = files[row.item.file]
+            if status?
+                $('.browserStatusIcon', row.div)?.remove()
+                row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
+            else if @index < 0 # shelf
+                for file, status of files
+                    if file.startsWith row.item.file
+                        status = 'dirs' if row.item.type == 'dir'
+                        $('.browserStatusIcon', row.div)?.remove()
+                        row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
+                        break
+        
+    # 00000000    0000000   00000000   000   000  00000000     
+    # 000   000  000   000  000   000  000   000  000   000    
+    # 00000000   000   000  00000000   000   000  00000000     
+    # 000        000   000  000        000   000  000          
+    # 000         0000000   000         0000000   000          
+        
+    onContextMenu: (event) => @showContextMenu pos event
+              
+    showContextMenu: (absPos) =>
+        
+        if not absPos?
+            absPos = pos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
+        
+        opt = items: [ 
+            text:   'Toggle Invisible'
+            combo:  'ctrl+i' 
+            cb:     @toggleDotFiles
+        ,
+            text:   'Toggle Extensions'
+            combo:  'ctrl+e' 
+            cb:     @toggleExtensions
+        ,
+            text:   'Duplicate'
+            combo:  'ctrl+d' 
+            cb:     @duplicateFile
+        ,
+            text:   'Move to Trash'
+            combo:  'ctrl+backspace' 
+            cb:     @moveToTrash
+        ]
+        
+        opt.x = absPos.x
+        opt.y = absPos.y
+        popup.menu opt
+        
         
     # 000   000  00000000  000   000  
     # 000  000   000        000 000   
@@ -292,23 +405,27 @@ class Column
     
     onKey: (event) =>
         
-        {mod, key, combo, char} = keyinfo.forEvent event
+        { mod, key, combo, char } = keyinfo.forEvent event
 
-        # log mod, key, combo, char
-
+        # log 'column on key1', combo
+        
         switch combo
-            when 'up', 'down', 'page up', 'page down', 'home', 'end' 
-                return stopEvent event, @navigateRows key
-            when 'right', 'left', 'enter'                            
-                return stopEvent event, @navigateCols key
-            when 'command+enter'       then return @openFileInNewWindow()
-            when 'command+left', 'command+up','command+right', 'command+down'
+            when 'page up', 'page down', 'home', 'end' then return stopEvent event, @navigateRows key
+            when 'enter'               then return stopEvent event, @navigateCols key
+            when 'command+enter', 'ctrl+enter' then return @openFileInNewWindow()
+            when 'command+left', 'command+up', 'command+right', 'command+down', 'ctrl+left', 'ctrl+up', 'ctrl+right', 'ctrl+down'
                 return stopEvent event, @navigateRoot key
+            when 'command+backspace', 'ctrl+backspace', 'command+delete', 'ctrl+delete' 
+                return stopEvent event, @moveToTrash()
+            when 'alt+left'            then return stopEvent event, window.split.focus 'shelf'
             when 'backspace', 'delete' then return stopEvent event, @clearSearch().removeObject()
             when 'ctrl+t'              then return stopEvent event, @sortByType()
             when 'ctrl+n'              then return stopEvent event, @sortByName()
-            when 'command+i'           then return stopEvent event, @toggleDotFiles()
-            when 'command+k'           then return stopEvent event if @browser.cleanUp()
+            when 'command+i', 'ctrl+i' then return stopEvent event, @toggleDotFiles()
+            when 'command+d', 'ctrl+d' then return stopEvent event, @duplicateFile()
+            when 'command+e', 'ctrl+e' then return stopEvent event, @toggleExtensions()
+            when 'command+k', 'ctrl+k' then return stopEvent event if @browser.cleanUp()
+            when 'f2'                  then return stopEvent event, @activeRow()?.editName()
             when 'tab'    
                 if @search.length then @doSearch ''
                 return stopEvent event
@@ -317,9 +434,16 @@ class Column
                 else window.split.focus 'commandline-editor'
                 return stopEvent event
 
+        if key in ['up',   'down']  then return stopEvent event, @navigateRows key              
+        if key in ['left', 'right'] then return stopEvent event, @navigateCols key        
+            
         switch char
             when '~', '/' then return stopEvent event, @navigateRoot char
             
         if mod in ['shift', ''] and char then @doSearch char
+                
+        # log 'column on key2', combo
         
 module.exports = Column
+
+

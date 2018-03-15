@@ -13,8 +13,7 @@ if module.parent
     # 000 0 000  000   000  000  000  0000
     # 000   000  000   000  000  000   000
 
-    { childp, path, log 
-    } = require 'kxk'
+    { childp, slash, log } = require 'kxk'
 
     forkfunc = (file, args..., callback) ->
         
@@ -60,7 +59,7 @@ if module.parent
         
         if /^[.]?\.\//.test file
             stack = new Error().stack.split /\r\n|\n/
-            file  = path.join path.dirname(/\((.*?):/.exec(stack[3])[1]), file
+            file  = slash.join slash.dirname(/\((.*?):/.exec(stack[3])[1]), file
 
         name = null
         args = /(.*)::(.*)/.exec file

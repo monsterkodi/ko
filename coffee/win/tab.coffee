@@ -5,12 +5,11 @@
 #    000     000   000  000   000
 #    000     000   000  0000000  
 
-{ packagePath, unresolve, elem, post, path, fs, error, log, _ } = require 'kxk'
+{ elem, post, atomic, slash, fs, error, log, _ } = require 'kxk'
 
 render  = require '../editor/render'
 syntax  = require '../editor/syntax'
 Tooltip = require '../tools/tooltip'
-atomic  = require 'write-file-atomic'
 
 class Tab
     
@@ -77,7 +76,7 @@ class Tab
     #  0000000   000        0000000    000   000     000     00000000  
     
     update: (info) ->
-                
+            
         oldFile = @info?.file
         oldPkg  = @info?.pkg
         
@@ -85,8 +84,8 @@ class Tab
         
         if @info.file != oldFile
             if @info.file?
-                @info.pkg = packagePath @info.file
-                @info.pkg = path.basename @info.pkg if @info.pkg?
+                @info.pkg = slash.pkg @info.file
+                @info.pkg = slash.basename @info.pkg if @info.pkg?
             else
                 delete @info.pkg
         else
@@ -94,18 +93,21 @@ class Tab
                         
         @div.innerHTML = ''
         @div.classList.toggle 'dirty', @dirty()
-                        
-        @div.appendChild elem 'span', class:'dot', text:'●'
+                
+        sep = '●'
+        sep = '■' if window.editor.newlineCharacters == '\r\n'
+        @div.appendChild elem 'span', class:'dot', text:sep
         
-        @pkg = elem 'span', class:'pkg', text: @info.pkg and (@info.pkg + " ▸ ") or ''
+        sep = " ▸ "
+        @pkg = elem 'span', class:'pkg', text: @info.pkg and (@info.pkg + sep) or ''
         @div.appendChild @pkg
             
-        diss = syntax.dissForTextAndSyntax path.basename(@file()), 'ko' #, join: true 
+        diss = syntax.dissForTextAndSyntax slash.basename(@file()), 'ko' #, join: true 
         name = elem 'span', class:'name', html:render.line(diss, charWidth:0)
         @div.appendChild name
 
         if @info.file?
-            diss = syntax.dissForTextAndSyntax unresolve(@file()), 'ko' #, join: true 
+            diss = syntax.dissForTextAndSyntax slash.tilde(@file()), 'ko' #, join: true 
             html = render.line(diss, charWidth:0)
             @tooltip = new Tooltip elem:name, html:html, x:0
             
@@ -132,8 +134,8 @@ class Tab
         @tooltip.del()
         post.emit 'tabClosed', @info.file ? 'untitled'
     
-    hidePkg: -> @pkg.style.display = 'none'
-    showPkg: -> @pkg.style.display = 'initial'
+    hidePkg: -> @pkg?.style.display = 'none'
+    showPkg: -> @pkg?.style.display = 'initial'
     
     revert: -> 
         delete @info.dirty

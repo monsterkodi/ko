@@ -5,17 +5,13 @@
 # 000 0 000  000   000     000     000       000      000  000  0000  000            000  
 # 000   000   0000000       0      00000000  0000000  000  000   000  00000000  0000000   
 
-_ = require 'lodash'
+{ _ } = require 'kxk'
 
 module.exports =
     
     actions:
         menu: 'Line'
         
-        moveLines:
-            name: 'move lines'
-            combos: ['alt+up', 'alt+down']
-            
         moveLinesUp:
             name: 'Move Lines Up'
             combo: 'alt+up'
@@ -24,8 +20,11 @@ module.exports =
             name: 'Move Lines Down'
             combo: 'alt+down'
     
-    moveLines: (key, info) ->
-        dir = key
+    moveLinesUp:   -> @moveLines 'up'
+    moveLinesDown: -> @moveLines 'down'
+            
+    moveLines: (dir) ->
+
         csr = @continuousCursorAndSelectedLineIndexRanges()
         
         return if not csr.length

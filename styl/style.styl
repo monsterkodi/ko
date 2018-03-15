@@ -1,8 +1,8 @@
 /*
- 0000000  000000000  000   000  000    
-000          000      000 000   000    
-0000000      000       00000    000    
-     000     000        000     000    
+ 0000000  000000000  000   000  000
+000          000      000 000   000
+0000000      000       00000    000
+     000     000        000     000
 0000000      000        000     0000000
 */
 
@@ -23,7 +23,6 @@ titlebarHeight        = 22px
 titlebarFontSize      = 14px
 splithandleHeight     = 6px
 thinBorder            = 1px solid
-font                  = "Menlo", "Meslo LG S", "Liberation Mono", "Bitstream Vera Sans Mono", "DejaVu Sans Mono", "Cousine", "Andale Mono", monospace
 
 fill-abs()
     position            absolute
@@ -32,18 +31,20 @@ fill-abs()
     left                0
     top                 0
 
-pre 
+pre
     margin              0
-
+       
+font = "Meslo LG S", "Liberation Mono", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono", "Cousine", "Andale Mono", monospace
+    
 // 0000000     0000000   0000000    000   000
-// 000   000  000   000  000   000   000 000 
-// 0000000    000   000  000   000    00000  
-// 000   000  000   000  000   000     000   
-// 0000000     0000000   0000000       000   
+// 000   000  000   000  000   000   000 000
+// 0000000    000   000  000   000    00000
+// 000   000  000   000  000   000     000
+// 0000000     0000000   0000000       000
 
 *
     outline-width       0
-    
+
 body
     fill-abs()
     margin              0
@@ -51,15 +52,15 @@ body
     font-family         font
     -webkit-user-select none
     -webkit-app-region  no-drag
-    animation           fadein 0.5s
 
 @keyframes fadein
-  from 
+  from
     opacity 0
   to
     opacity 1
 
 #main
+    animation           fadein 1.0s
     position            absolute
     top                 titlebarHeight
     left                0
@@ -67,11 +68,11 @@ body
     bottom              0
 
 //  0000000  00000000   000      000  000000000
-// 000       000   000  000      000     000   
-// 0000000   00000000   000      000     000   
-//      000  000        000      000     000   
-// 0000000   000        0000000  000     000   
-        
+// 000       000   000  000      000     000
+// 0000000   00000000   000      000     000
+//      000  000        000      000     000
+// 0000000   000        0000000  000     000
+
 #split
     position            relative
     overflow            hidden
@@ -80,11 +81,11 @@ body
     box-sizing          border-box
     width               100%
 
-// 0000000    00000000    0000000   000   000   0000000  00000000  00000000   
-// 000   000  000   000  000   000  000 0 000  000       000       000   000  
-// 0000000    0000000    000   000  000000000  0000000   0000000   0000000    
-// 000   000  000   000  000   000  000   000       000  000       000   000  
-// 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
+// 0000000    00000000    0000000   000   000   0000000  00000000  00000000
+// 000   000  000   000  000   000  000 0 000  000       000       000   000
+// 0000000    0000000    000   000  000000000  0000000   0000000   0000000
+// 000   000  000   000  000   000  000   000       000  000       000   000
+// 0000000    000   000   0000000   00     00  0000000   00000000  000   000
 
 .browser
     position            absolute
@@ -112,7 +113,16 @@ body
     & .git
         float           right
         padding-top     1px
-    
+
+.rowNameInput
+    font-family         font
+    font-size           15px
+    border              none
+    white-space         nowrap
+    position            absolute
+    left                30px
+    right               30px
+        
 .browserSearch
     padding-right       12px
     float               right
@@ -125,29 +135,145 @@ body
     max-width           600px
     max-height          600px
     border              1px solid
+    
+.browserFileIcon
+    
+    text-align          left
+    display             inline-block
+    width               24px
+    opacity             0.5
+
+.browserStatusIcon
+    
+    text-align          right
+    display             inline-block
+    width               24px
+    opacity             0.5
+    position            absolute
+    right               6px
+    
+octicon(char)
+    font-family         octicons
+    content             char
+
+.git-changed-icon:before
+    font-family         FontAwesome
+    content             '\f040'
+    
+.git-added-icon:before
+    font-family         FontAwesome
+    content             '\f067'
+    
+.git-dirs-icon:before
+    font-family         FontAwesome
+    content             '\f044'
+    
+.file-icon:before
+    octicon('\f011')
+    
+.folder-icon:before 
+    octicon('\f016')
+    
+.noon-icon:before 
+    octicon('\f02a')
+
+    // '\f001' bulb
+    // '\f002' fork
+    // '\f008' gitcat
+    // '\f00a' gitcat2
+    // '\f00d' keyboard
+    // '\f00e' tagbox
+    // '\f010' tagdoc
+    // '\f011' textdoc
+    // '\f013' zipdoc
+    // '\f015' tag
+    // '\f016' folder
+    // '\f017' folder-folder
+    // '\f018' person
+    // '\f0b0' linkdoc
+    // '\f01f' -o-
+    // '\f026' circle !
+    // '\f02a' star
+    // '\f02c' circle ?
+    // '\f02b' speech bubble
+    // '\f02e' loupe
+    // '\f02d' triangle !
+    // '\f02f' gear
+    // '\f031' tools
+    // '\f032' exit
+    // '\f03a' checkmark
+    // '\f03d' arrow up
+    // '\f03e' arrow right
+    // '\f03f' arrow down
+    // '\f040' arrow left
+    // '\f041' pin
+    // '\f042' gift
+    // '\f043' stats
+    // '\f044' triangle left
+    // '\f04e' eye
+        
+// 00000000    0000000   00000000   000   000  00000000
+// 000   000  000   000  000   000  000   000  000   000
+// 00000000   000   000  00000000   000   000  00000000
+// 000        000   000  000        000   000  000
+// 000         0000000   000         0000000   000
+
+.popup
+    position            absolute
+    border-radius       3px
+
+.popupItem
+    padding             2px
+    padding-left        2 * frameWidth
+    padding-right       2 * frameWidth + 70px
+    cursor              pointer
+    &:last-child
+        padding-bottom  frameWidth
+    &:first-child
+        padding-top     frameWidth
+
+.popupCombo
+    position            absolute
+    right               2 * frameWidth
+
+//  0000000  000   000  00000000  000      00000000
+// 000       000   000  000       000      000
+// 0000000   000000000  0000000   000      000000
+//      000  000   000  000       000      000
+// 0000000   000   000  00000000  0000000  000
+
+#shelf
+    overflow            hidden
+    position            absolute
+    left                0
+    top                 0
+    bottom              0
+
+#shelfResize
+    background          transparent
 
 //  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
-// 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
-// 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 
-// 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
+// 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000
+// 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000
+// 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000
 //  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 
 #commandline
     padding             0
     margin              0
-    white-space         nowrap 
+    white-space         nowrap
     display             flex
 
 .ko.shortcut
     opacity             0.5
 .ko.command
     font-weight         bold
-        
+
 #commandline-span
     position            relative
     flex-grow           1
-    white-space         nowrap 
-            
+    white-space         nowrap
+
 #commandline-editor
     font-family         font
     height              commandlineHeight
@@ -156,10 +282,10 @@ body
     overflow-y          hidden
 
 //  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000   0000000  000000000
-// 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  000          000   
-// 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  0000000      000   
-// 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000       000     000   
-//  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  0000000      000   
+// 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  000          000
+// 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  0000000      000
+// 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000       000     000
+//  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  0000000      000
 
 .commandlist
     position            absolute
@@ -170,18 +296,18 @@ body
     & .linenumber
         padding-top     0
         margin-top      -2px
-    
+
 .commandlist.coffee
     width               800px
 
 .commandlist.open
     width               600px
 
-// 0000000    000   000  000000000  000000000   0000000   000   000  
-// 000   000  000   000     000        000     000   000  0000  000  
-// 0000000    000   000     000        000     000   000  000 0 000  
-// 000   000  000   000     000        000     000   000  000  0000  
-// 0000000     0000000      000        000      0000000   000   000  
+// 0000000    000   000  000000000  000000000   0000000   000   000
+// 000   000  000   000     000        000     000   000  0000  000
+// 0000000    000   000     000        000     000   000  000 0 000
+// 000   000  000   000     000        000     000   000  000  0000
+// 0000000     0000000      000        000      0000000   000   000
 
 #commandline-button
     font-family         font
@@ -192,15 +318,15 @@ body
     cursor              pointer
     min-width           (numbersWidth + 1px)
     box-sizing          border-box
-    white-space         nowrap 
+    white-space         nowrap
     &.empty
         border-right    thinBorder
-        
+
 //   00000000  00000000    0000000
-//   000       000   000  000     
-//   000000    00000000   0000000 
+//   000       000   000  000
+//   000000    00000000   0000000
 //   000       000             000
-//   000       000        0000000 
+//   000       000        0000000
 
 .fps
     pointer-events  none
@@ -213,11 +339,11 @@ body
 .fpsCanvas
     background-color transparent
 
-//  0000000  000000000  00000000   000      
-// 000          000     000   000  000      
-// 000          000     0000000    000      
-// 000          000     000   000  000      
-//  0000000     000     000   000  0000000  
+//  0000000  000000000  00000000   000
+// 000          000     000   000  000
+// 000          000     0000000    000
+// 000          000     000   000  000
+//  0000000     000     000   000  0000000
 
 #debugCtrl
     fill-abs()
@@ -229,13 +355,13 @@ body
     padding-top         3px
     padding-left        10px
     padding-right       6px
-    
-// 000  000   000  00000000   0000000 
+
+// 000  000   000  00000000   0000000
 // 000  0000  000  000       000   000
 // 000  000 0 000  000000    000   000
 // 000  000  0000  000       000   000
-// 000  000   000  000        0000000 
-    
+// 000  000   000  000        0000000
+
 #info
     overflow            hidden
     width               minimapWidth
@@ -244,23 +370,23 @@ body
     top                 0
     bottom              0
     padding-top         1px
-    border-left         thinBorder    
+    border-left         thinBorder
     font-family         font
     font-size           12px
     & .info-line
         display         block
 
-infoPadding = 6px   
-    
+infoPadding = 6px
+
 .info-words
 .info-lines
 .info-funcs
 .info-files
-.info-sticky    
+.info-sticky
 .info-classes
 .info-cursors
 .info-selections
-.info-highlights     
+.info-highlights
 .info-cursor-line
 .info-cursor-column
     cursor              pointer
@@ -268,9 +394,9 @@ infoPadding = 6px
     &.empty
         display         none
 
-// 000000000  000  000000000  000      00000000  0000000     0000000   00000000 
+// 000000000  000  000000000  000      00000000  0000000     0000000   00000000
 //    000     000     000     000      000       000   000  000   000  000   000
-//    000     000     000     000      0000000   0000000    000000000  0000000  
+//    000     000     000     000      0000000   0000000    000000000  0000000
 //    000     000     000     000      000       000   000  000   000  000   000
 //    000     000     000     0000000  00000000  0000000    000   000  000   000
 
@@ -290,7 +416,7 @@ infoPadding = 6px
     padding-left        6px
     padding-right       9px
     margin-top          -1px
-        
+
 #titlebar .winid
     flex                0 0 0
     display             inline-block
@@ -308,11 +434,11 @@ infoPadding = 6px
     padding-left        12px
     padding-top         3px
 
-// 000000000   0000000    0000000   000      000000000  000  00000000   
-//    000     000   000  000   000  000         000     000  000   000  
-//    000     000   000  000   000  000         000     000  00000000   
-//    000     000   000  000   000  000         000     000  000        
-//    000      0000000    0000000   0000000     000     000  000        
+// 000000000   0000000    0000000   000      000000000  000  00000000
+//    000     000   000  000   000  000         000     000  000   000
+//    000     000   000  000   000  000         000     000  00000000
+//    000     000   000  000   000  000         000     000  000
+//    000      0000000    0000000   0000000     000     000  000
 
 .tooltip
     white-space         nowrap
@@ -328,12 +454,12 @@ infoPadding = 6px
     transform           scaleY(0)
     transition          transform 0.2s ease-in, opacity 0.2s ease-in
     overflow            hidden
-    
-// 000000000   0000000   0000000     0000000    
-//    000     000   000  000   000  000         
-//    000     000000000  0000000    0000000     
-//    000     000   000  000   000       000    
-//    000     000   000  0000000    0000000     
+
+// 000000000   0000000   0000000     0000000
+//    000     000   000  000   000  000
+//    000     000000000  0000000    0000000
+//    000     000   000  000   000       000
+//    000     000   000  0000000    0000000
 
 .tabs
     flex                1 1 0
@@ -341,20 +467,20 @@ infoPadding = 6px
     flex-direction      row
     overflow-x          auto
     overflow-y          hidden
-    
+
     -webkit-app-region  drag
-        
+
     &::-webkit-scrollbar
         height          2px
 
 .tabs .name
     -webkit-app-region  no-drag
 
-// 000000000   0000000   0000000    
-//    000     000   000  000   000  
-//    000     000000000  0000000    
-//    000     000   000  000   000  
-//    000     000   000  0000000    
+// 000000000   0000000   0000000
+//    000     000   000  000   000
+//    000     000000000  0000000
+//    000     000   000  000   000
+//    000     000   000  0000000
 
 .tab
     flex                1 1 0
@@ -364,10 +490,11 @@ infoPadding = 6px
     padding-left        6px
     padding-right       6px
     padding-top         3px
+    cursor              pointer
     &:not(.active)
         opacity         0.5
-    
-//  0000000   00000000   00000000   0000000 
+
+//  0000000   00000000   00000000   0000000
 // 000   000  000   000  000       000   000
 // 000000000  0000000    0000000   000000000
 // 000   000  000   000  000       000   000
@@ -377,14 +504,14 @@ infoPadding = 6px
     position            relative
     overflow            hidden
     pointer-events      auto
-    
+
 #area
 #terminal
     border-top          frameBorder
 
-// 00000000  0000000    000  000000000   0000000   00000000 
+// 00000000  0000000    000  000000000   0000000   00000000
 // 000       000   000  000     000     000   000  000   000
-// 0000000   000   000  000     000     000   000  0000000  
+// 0000000   000   000  000     000     000   000  0000000
 // 000       000   000  000     000     000   000  000   000
 // 00000000  0000000    000     000      0000000   000   000
 
@@ -394,15 +521,15 @@ infoPadding = 6px
     position            relative
     overflow            hidden
     font-family         font
-    
+
 #logview
     border-bottom       frameBorder
 
-// 000       0000000   000   000  00000000  00000000   
-// 000      000   000   000 000   000       000   000  
-// 000      000000000    00000    0000000   0000000    
-// 000      000   000     000     000       000   000  
-// 0000000  000   000     000     00000000  000   000  
+// 000       0000000   000   000  00000000  00000000
+// 000      000   000   000 000   000       000   000
+// 000      000000000    00000    0000000   0000000
+// 000      000   000     000     000       000   000
+// 0000000  000   000     000     00000000  000   000
 
 .layerScroll
     fill-abs()
@@ -410,22 +537,22 @@ infoPadding = 6px
     overflow-y          hidden
     &::-webkit-scrollbar
         height          2px
-    
+
 .layers
     position            relative
     height              10000000px
-        
+
 #commandline-editor .layers
     min-height          commandlineHeight
     &::-webkit-scrollbar
         height          2px
 
 // 000      000  000   000  00000000   0000000
-// 000      000  0000  000  000       000     
-// 000      000  000 0 000  0000000   0000000 
+// 000      000  0000  000  000       000
+// 000      000  000 0 000  0000000   0000000
 // 000      000  000  0000  000            000
-// 0000000  000  000   000  00000000  0000000 
-    
+// 0000000  000  000   000  00000000  0000000
+
 .lines
     cursor              default
     font-size           inherit
@@ -439,12 +566,12 @@ infoPadding = 6px
         position        absolute
         pointer-events  none
 
-//  0000000  000   000  00000000    0000000   0000000   00000000 
+//  0000000  000   000  00000000    0000000   0000000   00000000
 // 000       000   000  000   000  000       000   000  000   000
-// 000       000   000  0000000    0000000   000   000  0000000  
+// 000       000   000  0000000    0000000   000   000  0000000
 // 000       000   000  000   000       000  000   000  000   000
 //  0000000   0000000   000   000  0000000    0000000   000   000
-        
+
 .cursor
     width                2px
     margin-right        -1px
@@ -456,13 +583,13 @@ infoPadding = 6px
         width            4px
         margin-right    -2px
         margin-left     -2px
-        border-radius    2px       
-                
+        border-radius    2px
+
 // 000   000  000   000  00     00  0000000    00000000  00000000    0000000
-// 0000  000  000   000  000   000  000   000  000       000   000  000     
-// 000 0 000  000   000  000000000  0000000    0000000   0000000    0000000 
+// 0000  000  000   000  000   000  000   000  000       000   000  000
+// 000 0 000  000   000  000000000  0000000    0000000   0000000    0000000
 // 000  0000  000   000  000 0 000  000   000  000       000   000       000
-// 000   000   0000000   000   000  0000000    00000000  000   000  0000000 
+// 000   000   0000000   000   000  0000000    00000000  000   000  0000000
 
 .numbers
     position            absolute
@@ -475,17 +602,17 @@ infoPadding = 6px
     font-family         font
 
 .linenumber
-    width               numbersWidth    
+    width               numbersWidth
     border-right        thinBorder
     position            absolute
-    
+
     & span
         display         inline-block
         width           (numbersWidth - 8px)
         text-align      right
         padding-top     2px
 
-// 00     00  00000000  000000000   0000000 
+// 00     00  00000000  000000000   0000000
 // 000   000  000          000     000   000
 // 000000000  0000000      000     000000000
 // 000 0 000  000          000     000   000
@@ -494,7 +621,7 @@ infoPadding = 6px
 .meta
     position            absolute
     pointer-events      auto
-    
+
     &.coffeeResult
     &.searchResult
     &.termResult
@@ -506,7 +633,7 @@ infoPadding = 6px
         padding-left                 editorPadding
         border-top-right-radius      metaRadius
         border-bottom-right-radius   metaRadius
-    
+
     &.termCommand
     &.coffeeCommand
     &.searchResult
@@ -517,24 +644,24 @@ infoPadding = 6px
     &.termResult
     &.spacer
         background          transparent
-    
+
     &.spacer
         border-top-right-radius    0
         border-bottom-right-radius 0
-        
+
     &.git
         width               numbersWidth
         &.toggled
             opacity         1
-            
-    &.dbg  
+
+    &.dbg
         z-index             1
         border-radius       6px
         margin-top          3px
         margin-left         4px
         width               12px
         height              12px
-        
+
     &.dbg.pointer
         z-index             2
         width               0
@@ -543,17 +670,17 @@ infoPadding = 6px
         margin-left         10px
         background          transparent
         border-top          6px solid transparent
-        border-bottom       6px solid transparent       
+        border-bottom       6px solid transparent
         border-left         6px solid
-        
+
     &.pigment
         opacity             1
         border-radius       2px
         margin-left        -8px
         padding-left        8px
         padding-right       8px
-                
-.linenumber span .saveButton    
+
+.linenumber span .saveButton
     pointer-events      auto
     cursor              pointer
     width               initial
@@ -562,12 +689,12 @@ infoPadding = 6px
     padding-left        4px
     padding-right       4px
     border-radius       4px
-        
-// 00     00  000  000   000  000  00     00   0000000   00000000 
+
+// 00     00  000  000   000  000  00     00   0000000   00000000
 // 000   000  000  0000  000  000  000   000  000   000  000   000
-// 000000000  000  000 0 000  000  000000000  000000000  00000000 
-// 000 0 000  000  000  0000  000  000 0 000  000   000  000      
-// 000   000  000  000   000  000  000   000  000   000  000      
+// 000000000  000  000 0 000  000  000000000  000000000  00000000
+// 000 0 000  000  000  0000  000  000 0 000  000   000  000
+// 000   000  000  000   000  000  000   000  000   000  000
 
 .minimap
     position            absolute
@@ -601,13 +728,13 @@ infoPadding = 6px
 .minimapSelections
 .minimapCursors
     background-color    transparent
-        
+
 // 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000
-// 000   000  000  000        000   000  000      000  000        000   000     000   
-// 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000   
-// 000   000  000  000   000  000   000  000      000  000   000  000   000     000   
-// 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000   
-            
+// 000   000  000  000        000   000  000      000  000        000   000     000
+// 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000
+// 000   000  000  000   000  000   000  000      000  000   000  000   000     000
+// 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000
+
 .highlight
     position            absolute
     pointer-events      none
@@ -627,17 +754,17 @@ infoPadding = 6px
 // 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
 //      000  000       000      000       000          000     000  000   000  000  0000
 // 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
-    
+
 .selection
     position            absolute
     pointer-events      none
-    
+
     & .empty // used in selections of empty lines
         width            1px
         margin-right    -1px
-    
+
 .selection
-.highlight    
+.highlight
     padding-right       selectionRadiusCursor
     margin-right        - selectionRadiusCursor
     padding-left        selectionRadiusCursor
@@ -648,27 +775,27 @@ infoPadding = 6px
 
 .comment.header
     border-radius       0.3em
-    border-width        0.15em 
+    border-width        0.15em
     border-left-style   solid
     border-bottom-style solid
     border-top-style    hidden
     border-right-style  hidden
     height 1.2em
-        
+
 .stringmatch
 .bracketmatch
 .selection
-.highlight    
+.highlight
     &.tl
         border-top-left-radius selectionRadius
         &.start
             border-top-left-radius 0
-            
+
     &.bl
         border-bottom-left-radius selectionRadius
         &.start
             border-bottom-left-radius 0
-            
+
     &.tr
         border-top-right-radius selectionRadius
     &.br
@@ -682,10 +809,10 @@ infoPadding = 6px
     margin-left         0
 
 // 000      000   0000000  000000000
-// 000      000  000          000   
-// 000      000  0000000      000   
-// 000      000       000     000   
-// 0000000  000  0000000      000   
+// 000      000  000          000
+// 000      000  0000000      000
+// 000      000       000     000
+// 0000000  000  0000000      000
 
 .list
     position            absolute
@@ -698,7 +825,7 @@ infoPadding = 6px
 .list.commands
     width               200px
     max-height          800px
-    
+
 .list-item
     width               100%
     height              20px
@@ -712,28 +839,28 @@ infoPadding = 6px
     cursor              pointer
     white-space         nowrap
     -webkit-user-select none
-    &::-webkit-scrollbar    
+    &::-webkit-scrollbar
         height          1px
 
-// 000   000  000  000   000  000      000   0000000  000000000  
-// 000 0 000  000  0000  000  000      000  000          000     
-// 000000000  000  000 0 000  000      000  0000000      000     
-// 000   000  000  000  0000  000      000       000     000     
-// 00     00  000  000   000  0000000  000  0000000      000     
+// 000   000  000  000   000  000      000   0000000  000000000
+// 000 0 000  000  0000  000  000      000  000          000
+// 000000000  000  000 0 000  000      000  0000000      000
+// 000   000  000  000  0000  000      000       000     000
+// 00     00  000  000   000  0000000  000  0000000      000
 
-.winlist 
+.winlist
     position            absolute
     min-width           100px
     max-width           800px
     z-index             99
     overflow-x          auto
     border-bottom-right-radius 6px
-    &::-webkit-scrollbar  
+    &::-webkit-scrollbar
         height          0px
     & .dot
         padding-left    10px
         padding-right   10px
-    & .winid    
+    & .winid
         padding-left    73px
         padding-right   14px
 
@@ -741,20 +868,20 @@ infoPadding = 6px
     padding-top         4px
     padding-right       13px
     cursor              pointer
-    font-size           titlebarFontSize    
+    font-size           titlebarFontSize
     height              titlebarHeight // 20px
     white-space         nowrap
-    
+
 //  0000000   000   000  000000000   0000000    0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
-// 000   000  000   000     000     000   000  000       000   000  000   000  000   000  000      000          000     000     
-// 000000000  000   000     000     000   000  000       000   000  000000000  00000000   000      0000000      000     0000000 
-// 000   000  000   000     000     000   000  000       000   000  000 0 000  000        000      000          000     000     
+// 000   000  000   000     000     000   000  000       000   000  000   000  000   000  000      000          000     000
+// 000000000  000   000     000     000   000  000       000   000  000000000  00000000   000      0000000      000     0000000
+// 000   000  000   000     000     000   000  000       000   000  000 0 000  000        000      000          000     000
 // 000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
 
 .autocomplete-span
-    opacity             1  
-    
-.autocomplete-list 
+    opacity             1
+
+.autocomplete-list
     pointer-events      auto
     position            absolute
     max-height          200px
@@ -767,7 +894,7 @@ infoPadding = 6px
         width            4px
     &::-webkit-scrollbar-thumb
         width            2px
-    
+
 .autocomplete-item
     pointer-events      auto
     white-space         nowrap
@@ -777,17 +904,17 @@ infoPadding = 6px
     padding-right       10px
     overflow            hidden
     cursor              pointer
-    -webkit-user-select none    
+    -webkit-user-select none
 
-// 00     00   0000000   00000000   000   000  0000000     0000000   000   000  000   000  
-// 000   000  000   000  000   000  000  000   000   000  000   000  000 0 000  0000  000  
-// 000000000  000000000  0000000    0000000    000   000  000   000  000000000  000 0 000  
-// 000 0 000  000   000  000   000  000  000   000   000  000   000  000   000  000  0000  
-// 000   000  000   000  000   000  000   000  0000000     0000000   00     00  000   000  
+// 00     00   0000000   00000000   000   000  0000000     0000000   000   000  000   000
+// 000   000  000   000  000   000  000  000   000   000  000   000  000 0 000  0000  000
+// 000000000  000000000  0000000    0000000    000   000  000   000  000000000  000 0 000
+// 000 0 000  000   000  000   000  000  000   000   000  000   000  000   000  000  0000
+// 000   000  000   000  000   000  000   000  0000000     0000000   00     00  000   000
 
 .markdown.li1::before
     content         ''
-    position        absolute    
+    position        absolute
     border-style    solid
     border-width    0.35em
     border-radius   0.35em
@@ -798,33 +925,33 @@ infoPadding = 6px
 
 .markdown.li2::before
     content         ''
-    position        absolute    
+    position        absolute
     height          0.0em
     width           0.0em
     top             0.25em
     border-top      0.4em solid transparent
     border-bottom   0.4em solid transparent
     border-left     0.6em solid
-  
+
 .markdown.li3::before
     content         ''
-    position        absolute    
+    position        absolute
     border-style    solid
     border-width    0.35em
     height          0.0em
     width           0.0em
     top             0.3em
     left            0.02em
-    
-//  0000000   00000000   00000000    0000000   000   000   0000000    
-// 000   000  000   000  000   000  000   000  000 0 000  000         
-// 000000000  0000000    0000000    000   000  000000000  0000000     
-// 000   000  000   000  000   000  000   000  000   000       000    
-// 000   000  000   000  000   000   0000000   00     00  0000000     
+
+//  0000000   00000000   00000000    0000000   000   000   0000000
+// 000   000  000   000  000   000  000   000  000 0 000  000
+// 000000000  0000000    0000000    000   000  000000000  0000000
+// 000   000  000   000  000   000  000   000  000   000       000
+// 000   000  000   000  000   000   0000000   00     00  0000000
 
 .function.marker.tail::before
     content                     ''
-    position                    absolute   
+    position                    absolute
     border-top                  0.15em solid
     border-bottom               0.15em solid
     border-left                 0.0em solid transparent
@@ -834,7 +961,7 @@ infoPadding = 6px
     height                      0.0em
     width                       1.08ch
     top                         0.5em
-    
+
 .function.marker.tail.bound::before
     content                     ''
     position                    absolute
@@ -847,10 +974,10 @@ infoPadding = 6px
     height                      0.1em
     width                       1.08ch
     top                         0.45em
-    
+
 .function.marker.head::before
     content                     ''
-    position                    absolute    
+    position                    absolute
     height                      0.0em
     width                       0.0em
     top                         0.35em
@@ -858,26 +985,26 @@ infoPadding = 6px
     border-top                  0.3em solid transparent
     border-bottom               0.3em solid transparent
     border-left                 0.8em solid
-    
-//  0000000   0000000  00000000    0000000   000      000      0000000     0000000   00000000 
+
+//  0000000   0000000  00000000    0000000   000      000      0000000     0000000   00000000
 // 000       000       000   000  000   000  000      000      000   000  000   000  000   000
-// 0000000   000       0000000    000   000  000      000      0000000    000000000  0000000  
+// 0000000   000       0000000    000   000  000      000      0000000    000000000  0000000
 //      000  000       000   000  000   000  000      000      000   000  000   000  000   000
 // 0000000    0000000  000   000   0000000   0000000  0000000  0000000    000   000  000   000
 
 ::-webkit-scrollbar
     width               scrollhandleWidth
-    height              scrollhandleWidth  
+    height              scrollhandleWidth
     background-color    transparent
 
 ::-webkit-scrollbar-track
     background-color    transparent
-    
+
 .scrollbar
     position            absolute
     top                 0
     cursor              ns-resize
-        
+
     &.left
         bottom          0
         left            0
@@ -894,5 +1021,5 @@ infoPadding = 6px
     &.left
         left            0
     &.right
-        right           0    
-    
+        right           0
+

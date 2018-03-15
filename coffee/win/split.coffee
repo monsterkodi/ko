@@ -21,6 +21,8 @@ class Split extends event
     
     constructor: () ->
 
+        super()
+
         @commandlineHeight = 30
         @handleHeight      = 6
         
@@ -206,9 +208,10 @@ class Split extends event
     # 000      000   000  000   000
     # 0000000   0000000    0000000 
     
-    showLog:   -> @setLogVisible true
-    hideLog:   -> @setLogVisible false
-    toggleLog: -> @setLogVisible not @isLogVisible()
+    showLog:   => @setLogVisible true
+    hideLog:   => @setLogVisible false
+    toggleLog: => @setLogVisible not @isLogVisible()
+    
     isLogVisible: -> not @flex.isCollapsed 'logview'
     
     setLogVisible: (v) ->
@@ -239,6 +242,8 @@ class Split extends event
         n = 'commandline-editor' if n == 'commandline'
         if n == '.' or not $(n)?
             return log "[WARNING] Split.focus -- can't find element '#{n}'"
+            
+        window.setLastFocus n if $(n)?.focus?
         $(n)?.focus?()
             
     focusAnything: ->

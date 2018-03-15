@@ -5,9 +5,9 @@
 #      000  000   000  000         000     000       000   000  
 # 0000000   000   000  0000000     000     00000000  000   000  
 
-{log,_}  = require 'kxk'
-{expect} = require 'chai'
-assert   = require 'assert'
+{ log, _ } = require 'kxk'
+{ expect } = require 'chai'
+assert = require 'assert'
 
 Editor = require '../editor/editor'
 editor = new Editor 'test_salter'

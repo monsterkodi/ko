@@ -5,27 +5,30 @@
 # 000      000   000  000   000     000     000  000       000   000
 # 0000000   0000000    0000000       0      000  00000000  00     00
 
-{ post, log } = require 'kxk'
+{ popup, post, pos, log } = require 'kxk'
 
+electron   = require 'electron'
 TextEditor = require '../editor/texteditor'
 
 class LogView extends TextEditor
 
     constructor: (viewElem) ->
         
-        @fontSizeDefault = 12
+        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap'], fontSize: 12
+        
+        @view.addEventListener "contextmenu", @onContextMenu
+        
         @syntaxName = 'logview'
         
-        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap']
-        
         @setLines ['']
+        
         post.on 'error', (text) ->
             if post.get 'debugMode'
                 window.split.do 'show logview'
+                
         post.on 'slog', (text) =>
             @appendText text
             # post.toMain 'winlog', window.winID, text
-        # log 'happy logging!'
                 
     #  0000000   00000000   00000000   00000000  000   000  0000000    
     # 000   000  000   000  000   000  000       0000  000  000   000  
@@ -52,5 +55,32 @@ class LogView extends TextEditor
         @jumpToFileAtPos p
         
         super p, event
-            
+        
+    # 00000000    0000000   00000000   000   000  00000000     
+    # 000   000  000   000  000   000  000   000  000   000    
+    # 00000000   000   000  00000000   000   000  00000000     
+    # 000        000   000  000        000   000  000          
+    # 000         0000000   000         0000000   000          
+
+    onContextMenu: (event) => @showContextMenu pos event
+              
+    showContextMenu: (absPos) =>
+        
+        if not absPos?
+            absPos = pos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
+        
+        opt = items: [
+            text:   'Clear'
+            combo:  'alt+k' 
+            cb:     @clear
+        ,
+            text:   'Close'
+            combo:  'ctrl+alt+k' 
+            cb:     window.split.hideLog
+        ]
+        
+        opt.x = absPos.x
+        opt.y = absPos.y
+        popup.menu opt
+        
 module.exports = LogView

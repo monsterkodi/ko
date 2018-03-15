@@ -30,6 +30,31 @@ body
 .split-handle
     background          frameColor
 
+// 00000000    0000000   00000000   000   000  00000000
+// 000   000  000   000  000   000  000   000  000   000
+// 00000000   000   000  00000000   000   000  00000000
+// 000        000   000  000        000   000  000
+// 000         0000000   000         0000000   000
+
+.popup
+    background-color    #222
+
+.popupWindow
+    background-color    #222
+
+.popupItem
+    color               #888
+    &:not(:last-child)
+        border-bottom       1px solid #222
+    &.selected
+        color           #fff
+
+.popupItem:active
+    color               #ff0
+
+.popupCombo
+    color               titleColor
+    
 // 0000000    00000000    0000000   000   000   0000000  00000000  00000000
 // 000   000  000   000  000   000  000 0 000  000       000       000   000
 // 0000000    0000000    000   000  000000000  0000000   0000000   0000000
@@ -46,14 +71,35 @@ body
         background      #111
 
     &.active
+        &.dir
+            color       #ff8
         background      frameColor
 
+.rowNameInput
+    color               #ff0
+    background-color    frameColor
+        
 .browserColumn.focus .browserRow.active
     background          #22a
-
+    
 .browserImage
     border              1px solid frameColor
 
+//  0000000  000   000  00000000  000      00000000    
+// 000       000   000  000       000      000         
+// 0000000   000000000  0000000   000      000000      
+//      000  000   000  000       000      000         
+// 0000000   000   000  00000000  0000000  000         
+
+#shelf .browserRow.active
+    background          backColor
+
+#shelf
+    background          darkColor
+    
+#shelf.focus
+    background          frameColor
+    
 //  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
 // 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000
 // 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000
@@ -134,14 +180,6 @@ span.macro
 // 000          000     0000000    000
 // 000          000     000   000  000
 //  0000000     000     000   000  0000000
-
-#debugCtrl
-    background          backColor
-
-#debugCtrl.running #step
-#debugCtrl.running #into
-#debugCtrl.running #out
-    color               titleColor
 
 .ctrl
     color               #888
@@ -378,8 +416,6 @@ span.macro
     &.dbg
         opacity             0.8
         background          #f00
-        &.breakpoint
-            background      #f80
         &.pointer
             opacity         1
             border-left-color #ff0

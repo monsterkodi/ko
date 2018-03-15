@@ -16,11 +16,10 @@ class Terminal extends TextEditor
 
     constructor: (viewElem) ->
         
-        @fontSizeDefault = 15
+        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Meta'], fontSize: 15
+        
         @metaQueue = []
         
-        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Meta']
-
         @initInvisibles()
         @ansidiss = new ansiDiss()    
         @setLines ['']
@@ -136,7 +135,7 @@ class Terminal extends TextEditor
     clear: ->
         @meta.clear()
         @singleCursorAtPos [0,0]
-        super
+        super()
 
     setAutoClear: (state) -> prefs.set 'terminal:autoclear', state
     getAutoClear: -> prefs.get 'terminal:autoclear', true

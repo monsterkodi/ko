@@ -5,8 +5,7 @@
 # 000   000  000   000  000  000  0000  000      000  000  0000  000            000  
 #  0000000    0000000   000  000   000  0000000  000  000   000  00000000  0000000   
 
-{ log
-} = require 'kxk'
+{ log } = require 'kxk'
 
 module.exports = 
     
@@ -15,7 +14,7 @@ module.exports =
         
         joinLines:
             name: 'Join Lines'
-            combo: 'command+j'
+            combo: 'CmdOrCtrl+j'
 
     insertThen: (before, after) ->
         if /(when|if)/.test before 

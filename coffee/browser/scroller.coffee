@@ -127,9 +127,9 @@ class Scroller
             @handle.style.backgroundColor = cs
 
         if @column.parent?.type == 'preview'
-            if @column.prevColumn().div.scrollTop != @target.scrollTop
+            if @column.prevColumn?().div.scrollTop != @target.scrollTop
                 @column.prevColumn().div.scrollTop = @target.scrollTop
-        else if @column.nextColumn()?.parent?.type == 'preview'
+        else if @column.nextColumn?()?.parent?.type == 'preview'
             if @column.nextColumn().div.scrollTop != @target.scrollTop
                 @column.nextColumn().div.scrollTop = @target.scrollTop
             

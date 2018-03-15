@@ -5,7 +5,7 @@
 #      000  000       000   000  000       000 0 000  000       
 # 0000000    0000000  000   000  00000000  000   000  00000000  
 
-{ prefs, elem, post, path, log, $, _ } = require 'kxk'
+{ prefs, elem, post, slash, log, $, _ } = require 'kxk'
 
 class Scheme
     
@@ -14,7 +14,7 @@ class Scheme
     @toggle: (schemes = ['dark', 'bright']) ->
         
         link =$ '.scheme-link'
-        currentScheme = path.basename path.dirname link.href
+        currentScheme = slash.basename slash.dirname link.href
         
         nextSchemeIndex = ( schemes.indexOf(currentScheme) + 1) % schemes.length
         nextScheme = schemes[nextSchemeIndex]
@@ -26,7 +26,7 @@ class Scheme
         @colors = {}
         
         for link in document.querySelectorAll '.scheme-link'
-            css = path.basename link.href
+            css = slash.basename link.href
             newlink = elem 'link', 
                 href:  "css/#{scheme}/#{css}"
                 rel:   'stylesheet'

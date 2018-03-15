@@ -5,7 +5,7 @@
 #    000     000   000  000   000       000
 #    000     000   000  0000000    0000000 
 
-{ post, elem, drag, splitFileLine, error, log, _ } = require 'kxk'
+{ post, elem, drag, slash, error, log, _ } = require 'kxk'
 
 Tab = require './tab'
 
@@ -29,6 +29,8 @@ class Tabs
             onStop:  @onDragStop
         
         post.on 'newTabWithFile',   @onNewTabWithFile
+        post.on 'newEmptyTab',      @onNewEmptyTab
+        
         post.on 'closeTabOrWindow', @onCloseTabOrWindow
         post.on 'closeOtherTabs',   @onCloseOtherTabs
         post.on 'stash',            @stash
@@ -54,7 +56,7 @@ class Tabs
         
     onFileSaved: (file, winID) =>
         if winID == window.winID
-            # error "fileSaved from this window? #{file} #{winID}" 
+            error "fileSaved from this window? #{file} #{winID}" 
             return 
         tab = @tab file
         if tab? and tab != @activeTab()
@@ -71,11 +73,12 @@ class Tabs
             
         if tab = @tab event.target
             if event.target.classList.contains 'dot'
-                if @numTabs() == 1
-                    @tabs[0].update file: null
-                    @tabs[0].activate()
-                else
-                    @closeTab tab
+                @onCloseTabOrWindow()
+                # if @numTabs() == 1
+                    # @tabs[0].update file: null
+                    # @tabs[0].activate()
+                # else
+                    # @closeTab tab
             else
                 tab.activate()
         true
@@ -99,7 +102,7 @@ class Tabs
         @dragDiv.style.height = "#{br.height-3}px"
         @dragDiv.style.flex = 'unset'
         @dragDiv.style.pointerEvents = 'none'
-        body.appendChild @dragDiv
+        document.body.appendChild @dragDiv
 
     onDragMove: (d,e) =>
         
@@ -153,7 +156,7 @@ class Tabs
         @
   
     onCloseTabOrWindow: =>
-        
+        log 'tabs.onCloseTabOrWindow', @numTabs()
         if @numTabs() == 1
             window.win.close()
         else
@@ -184,9 +187,13 @@ class Tabs
         @update()
         tab
 
+    onNewEmptyTab: =>
+        
+        @addTab('untitled').activate()
+        
     onNewTabWithFile: (file) =>
         
-        [file, line, col] = splitFileLine file
+        [file, line, col] = slash.splitFileLine file
         
         if tab = @tab file
             tab.activate()

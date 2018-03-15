@@ -6,7 +6,7 @@
  0000000   0000000     0000000   00000000   0000000     000           0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 ###
 
-{ fileName, empty, elem, path, post, str, error, log, _ } = require 'kxk'
+{ empty, elem, slash, post, str, error, log, _ } = require 'kxk'
 
 jsbeauty   = require 'js-beautify'
 Browser    = require './browser'
@@ -17,17 +17,16 @@ class ObjectEditor extends TextEditor
 
     constructor: (viewElem, opt) ->
         
-        @fontSizeDefault = 14
+        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Brackets', 'Strings'], fontSize: 14
         @syntaxName = opt?.syntax ? 'js'
-        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Brackets', 'Strings']
         viewElem.setAttribute 'tabindex', 5
-        @numbers.elem.style.fontSize = "#{@fontSizeDefault}px"        
+        @numbers.elem.style.fontSize = "14px"        
 
 class ObjectBrowser extends Browser
     
-    constructor: (@view) -> 
+    constructor: (view) -> 
                 
-        super @view
+        super view
         @name = 'ObjectBrowser'
 
     #  0000000   0000000          000  00000000   0000000  000000000  
@@ -165,7 +164,7 @@ class ObjectBrowser extends Browser
             key = '▸ '+func
             items = []
             for funci in funcl
-                clss = funci.class ? path.basename funci.file
+                clss = funci.class ? slash.basename funci.file
                 items.push 
                     name: clss
                     text: '● '+clss
@@ -188,17 +187,18 @@ class ObjectBrowser extends Browser
     # 000       000  0000000  00000000  0000000   
     
     loadFiles: (names) ->
-        
+
         files = []
 
         filterBase = (name, file) ->
-            file = fileName file
+            
+            file = slash.base file
             if not name.startsWith '.'
                 return not (name.length>1 and file.indexOf(name)>=0 or file.startsWith(name))
             false
         
         for k,v of @filter names, 'files', filterBase
-            key = path.basename k
+            key = slash.basename k
             files.push  
                 textFile: isTextFile key
                 name: key
@@ -352,6 +352,6 @@ class ObjectBrowser extends Browser
 
     clear: ->
         delete @columns[0].parent
-        super
+        super()
                 
 module.exports = ObjectBrowser

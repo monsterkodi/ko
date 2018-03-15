@@ -5,8 +5,7 @@
 #      000  000       000      000       000          000           000      000  000  0000  000            000  
 # 0000000   00000000  0000000  00000000   0000000     000           0000000  000  000   000  00000000  0000000   
 
-{ reversed, _
-} = require 'kxk'
+{ reversed, _ } = require 'kxk'
 
 module.exports =
 
@@ -15,12 +14,12 @@ module.exports =
         
         selectMoreLines:
             name:  'Select More Lines'
-            combo: 'command+l'
+            combo: 'CmdOrCtrl+l'
             text:  'selects line at cursor or next line if cursor line is selected already'
             
         selectLessLines:
             name: 'Select Less Lines'
-            combo: 'command+shift+l'
+            combo: 'CmdOrCtrl+shift+l'
             text:  'removes a line from each block of selected lines'
 
     selectMoreLines: ->

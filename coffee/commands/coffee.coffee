@@ -10,18 +10,19 @@
 Syntax        = require '../editor/syntax'
 Command       = require '../commandline/command'
 ObjectBrowser = require '../browser/objectbrowser'
-coffee        = require 'coffee-script'
+coffee        = require 'coffeescript'
 
 class Coffee extends Command
     
-    constructor: (@commandline) ->
+    constructor: (commandline) ->
+        
+        super commandline
         
         @cmdID      = 0
         @browser    = new ObjectBrowser window.area.view
         @commands   = Object.create null
-        @shortcuts  = ['alt+c', 'alt+shift+c']
         @names      = ["coffee", "Coffee"]
-        super @commandline
+        
         @maxHistory = 99
         @syntaxName = 'coffee'
         
@@ -36,7 +37,7 @@ class Coffee extends Command
     # 0000000      000     000   000     000     00000000  
     
     state: -> 
-        s = super
+        s = super()
         if @browser.column(0)
             s.browse = ( r.item.name for r in @browser.column(0).rows )
         s
@@ -104,7 +105,7 @@ class Coffee extends Command
 
     clear: ->
         return if @browser.cleanUp()
-        super
+        super()
                 
     #  0000000   0000000   00000000  00000000  00000000  00000000  
     # 000       000   000  000       000       000       000       
@@ -120,9 +121,9 @@ class Coffee extends Command
             restoreCWD = process.cwd()
             process.chdir __dirname
             coffee.eval """                
-                {str,clamp,fileExists,dirExists,post,path,noon,fs,_,$} = require 'kxk'
+                {str,colors,clamp,post,slash,noon,fs,_,$} = require 'kxk'
                 {max,min,abs,round,ceil,floor,sqrt,pow,exp,log10,sin,cos,tan,acos,asin,atan,PI,E} = Math
-                (global[r] = require r for r in ['colors', 'electron'])                    
+                (global[r] = require r for r in ['electron'])                    
                 Immutable = require 'seamless-immutable'
                 log = -> post.emit 'executeResult', [].slice.call(arguments, 0), cmdID
                 coffee  = window.commandline.commands.coffee
@@ -149,8 +150,8 @@ class Coffee extends Command
     #      000     000     000   000  000   000     000     
     # 0000000      000     000   000  000   000     000     
     
-    start: (@combo) ->
-        super @combo
+    start: (name) ->
+        super name
         select: true
         do:     'third commandline'
 

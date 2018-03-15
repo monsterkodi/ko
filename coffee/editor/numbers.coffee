@@ -13,6 +13,7 @@ class Numbers extends event
 
     constructor: (@editor) ->
         
+        super()
         @lineDivs = {}
         
         @elem =$ ".numbers", @editor.view

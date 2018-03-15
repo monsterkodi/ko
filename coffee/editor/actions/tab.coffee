@@ -5,25 +5,24 @@
 #    000     000   000  000   000  
 #    000     000   000  0000000    
 
-{ stopEvent, _
-} = require 'kxk'
+{ stopEvent, _ } = require 'kxk'
 
 module.exports = 
     
     actions:
+        insertOrDeleteTab:
+            combos: ['tab', 'shift+tab']
         
-        insertTab:
-            menu:  'Insert'
-            name:  'Insert Tab'
-            combo: 'tab'
-            
-        deleteTab:
-            menu:  'Delete'
-            name:  'Delete Tab'
-            combo: 'shift+tab'
-
-    insertTab: (key, info) ->
+    insertOrDeleteTab: (key, info) ->
+        
         stopEvent info?.event
+        
+        switch info.combo
+            when 'tab'       then @insertTab()
+            when 'shift+tab' then @deleteTab()
+            
+    insertTab: ->
+        
         if @numSelections()
             @indent()
         else
@@ -37,8 +36,8 @@ module.exports =
             @do.setCursors newCursors
             @do.end()   
 
-    deleteTab: (key, info) ->
-        stopEvent info?.event
+    deleteTab: ->
+        
         if @numSelections()
             @deIndent()
         else

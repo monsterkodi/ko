@@ -5,11 +5,10 @@
 #    000     000   000  000   000  000           000  
 #    000      0000000    0000000   0000000  0000000   
 
-{log, path, _} = require 'kxk'
-{expect}       = require 'chai'
-assert         = require 'assert'
-
-dirList = require '../tools/dirlist'
+{ log, slash, _ } = require 'kxk'
+{ expect } = require 'chai'
+assert     = require 'assert'
+dirList    = require '../tools/dirlist'
 
 describe 'dirList', ->
     
@@ -21,7 +20,7 @@ describe 'dirList', ->
             expect(list) .to.deep.include 
                 type:       'file'
                 textFile:   true
-                name:       path.basename __filename
-                file:       __filename
+                name:       slash.basename __filename
+                file:       slash.path __filename
             done()
         

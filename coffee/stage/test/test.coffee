@@ -10,8 +10,8 @@ Stage  = require '../stage'
 
 class Test extends Stage
     
-    constructor: (@view) ->
-        super @view
+    constructor: (view) ->
+        super view
         
     start: ->
         @view.style.background = "#030"

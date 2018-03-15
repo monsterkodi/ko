@@ -5,7 +5,7 @@
 #      000  000       000   000  000   000  000       000   000
 # 0000000   00000000  000   000  000   000   0000000  000   000
 
-{ packagePath, unresolve, path, post, fs, os, log, _ } = require 'kxk'
+{ slash, post, fs, os, log, _ } = require 'kxk'
 
 walker   = require '../tools/walker'
 matchr   = require '../tools/matchr'
@@ -15,13 +15,11 @@ stream   = require 'stream'
 
 class Search extends Command
 
-    constructor: (@commandline) ->
-        if os.platform() == 'win32'
-            @shortcuts = ["ctrl+shift+f", "alt+shift+f", "alt+ctrl+shift+f", ""]
-        else
-            @shortcuts = ["command+shift+f", "ctrl+shift+f", "alt+shift+f", "alt+ctrl+shift+f"]
+    constructor: (commandline) ->
+        
+        super commandline
+        
         @names = ["search", "Search", "/search/", "/Search/"]
-        super @commandline
      
     historyKey: -> @name
                 
@@ -55,7 +53,7 @@ class Search extends Command
         @startSearchInFiles 
             text: command
             name: @name
-            file: file
+            file: slash.path file
             
         focus:  'terminal'
         show:   'terminal'
@@ -72,21 +70,22 @@ class Search extends Command
         
         terminal = window.terminal
         terminal.appendMeta clss: 'salt', text: opt.text.slice 0, 14
-        terminal.appendMeta clss: 'searchHeader', diss: syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'
+        terminal.appendMeta clss: 'searchHeader', diss: syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'
         terminal.appendMeta clss: 'spacer'
         terminal.singleCursorAtPos [0, terminal.numLines()-2]
-        dir = packagePath path.dirname opt.file
-        dir ?= path.dirname opt.file
+        dir = slash.pkg slash.dirname opt.file
+        dir ?= slash.dirname opt.file
         @walker = new walker
             root:        dir
             maxDepth:    6
             includeDirs: false
-            file:        (f,stat) => @searchInFile opt, f
+            file:        (f,stat) => @searchInFile opt, slash.path f
         @walker.cfg.ignore.push 'js'
+        # log 'start walker', @walker.cfg
         @walker.start()
         
-    searchInFile: (opt, file) ->
-        
+    searchInFile: (opt, file) =>
+        # log "searchInFile #{file}"
         stream = fs.createReadStream file, encoding: 'utf8'
         stream.pipe new FileSearcher @, opt, file
 
@@ -98,23 +97,21 @@ class Search extends Command
     
     onMetaClick: (meta, event) =>
 
-        href = meta[2].href      
-        split = href.split ':'
+        href = meta[2].href   
         
-        if split.length == 1 or _.isFinite parseInt split[1]
+        if href.startsWith '>'
+            
+            split = href.split '>'
+            if window.commandline.commands[split[1]]?
+                command = window.commandline.commands[split[1]]
+                window.commandline.startCommand split[1]
+                window.commandline.setText split[2]
+                command.execute split[2]
+        else
             
             window.split.show 'editor'
             file = href + ':' + window.terminal.posForEvent(event)[0]
             window.openFiles [file], newTab: event.metaKey
-            # window.loadFile file
-            
-        else
-            
-            if window.commandline.commands[split[0]]?
-                command = window.commandline.commands[split[0]]
-                window.commandline.startCommand split[0], command.shortcuts[0]
-                window.commandline.setText split[1]
-                command.execute split[1]
 
         'unhandled'
 
@@ -128,6 +125,7 @@ class FileSearcher extends stream.Writable
     
     constructor: (@command, @opt, @file) ->
         
+        super()
         @line = 0
         @flags = ''
         @patterns = switch @opt.name
@@ -135,13 +133,16 @@ class FileSearcher extends stream.Writable
             when 'Search'   then [[new RegExp(_.escapeRegExp(@opt.text)),      'found']]
             when '/search/' then @flags='i'; @opt.text
             when '/Search/' then @opt.text
+            else
+                log 'dafuk? name:', @command.name, 'opt:', @opt, 'file:', @file
+                [[new RegExp(_.escapeRegExp(@opt.text), 'i'), 'found']]
+                
         @found = []
-        extn = path.extname(@file).slice 1
+        extn = slash.ext @file
         if extn in syntax.syntaxNames
             @syntaxName = extn
         else
             @syntaxName = null
-        super
             
     write: (chunk, encoding, cb) ->
         
@@ -161,7 +162,7 @@ class FileSearcher extends stream.Writable
             terminal = window.terminal
             
             meta = 
-                diss: syntax.dissForTextAndSyntax "◼ #{unresolve @file}", 'ko'
+                diss: syntax.dissForTextAndSyntax "◼ #{slash.tilde @file}", 'ko'
                 href: @file
                 click: @command.onMetaClick
                 

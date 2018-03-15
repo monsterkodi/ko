@@ -5,7 +5,8 @@
 000       000   000  000     000     000   000  000   000
 00000000  0000000    000     000      0000000   000   000
 ###
-{ fileList, extName, clamp, empty, path, str, error, log, _ } = require 'kxk'
+
+{ fileList, clamp, empty, slash, str, error, log, _ } = require 'kxk'
 
 Buffer  = require './buffer'
 Syntax  = require './syntax'
@@ -17,15 +18,15 @@ class Editor extends Buffer
 
     constructor: (@name) ->
         
-        Editor.initActions() if not Editor.actions?
-            
-        @indentString    = _.padStart "", 4
-        @stickySelection = false
-        @dbg             = false
-        @syntax          = new Syntax @
+        super()
         
-        super
-        @do              = new Do @
+        Editor.initActions() if not Editor.actions?
+        
+        @indentString      = _.padStart "", 4
+        @stickySelection   = false
+        @dbg               = false
+        @syntax            = new Syntax @
+        @do                = new Do @
         @setupFileType()
 
     del: ->
@@ -42,20 +43,32 @@ class Editor extends Buffer
     @initActions: -> 
         
         @actions = []
-        for actionFile in fileList path.join __dirname, 'actions'
-            continue if path.extname(actionFile) not in ['.js', '.coffee']
+        for actionFile in fileList slash.join __dirname, 'actions'
+            continue if slash.ext(actionFile) not in ['js', 'coffee']
             actions = require actionFile
             for key,value of actions
                 if _.isFunction value
                     @prototype[key] = value
                 else if key == 'actions'
                     for k,v of value
-                        v.key = k if not v.key?
-                        @actions.push v
+                        if not _.isString v
+                            v.key = k if not v.key?
+                            @actions.push v
                         
         # too early for log here!            
         # console.log str @actions
             
+    @actionWithName: (name) -> 
+    
+        for action in Editor.actions
+            if action.name == name
+                return action
+                
+        log "can't find action with name '#{name}'"
+        for action in Editor.actions
+            log action.name
+        return null
+                
     # 000000000  000   000  00000000   00000000
     #    000      000 000   000   000  000     
     #    000       00000    00000000   0000000 
@@ -68,7 +81,7 @@ class Editor extends Buffer
         @fileType = 'txt'
         @fileType = Syntax.shebang @line(0) if @numLines()
         if @fileType == 'txt' and @currentFile?
-            ext = extName @currentFile
+            ext = slash.ext @currentFile
             if ext in Syntax.syntaxNames
                 @fileType = ext
 
@@ -145,10 +158,20 @@ class Editor extends Buffer
 
         if @syntax.name == 'txt'
             @syntax.name = Syntax.shebang text.slice 0, text.search /\r?\n/
+                
+        lines = text.split /\n/
+
+        @newlineCharacters = '\n'
+        if not empty lines
+            if lines[0].endsWith '\r'
+                lines = text.split /\r?\n/
+                @newlineCharacters = '\r\n'
         
-        rgx = new RegExp '\t', 'g'
-        indent = @indentString
-        @setLines text.split(/\n/).map (l) -> l.replace rgx, indent
+        tabrgx = new RegExp '\t', 'g'
+        indent = @indentString                
+        lines  = lines.map (l) -> l.replace tabrgx, indent
+        
+        @setLines lines
 
     setLines: (lines) ->
         
@@ -161,6 +184,7 @@ class Editor extends Buffer
         if @numSelections()
             @textOfSelection()
         else
+            log 'textOfSelectionForClipboard', @textInRanges @rangesForCursorLines()
             @textInRanges @rangesForCursorLines()
 
     splitStateLineAtPos: (state, pos) ->

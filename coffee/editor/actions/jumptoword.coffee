@@ -5,8 +5,8 @@
 # 000   000  000   000  000 0 000  000           000     000   000  000   000  000   000  000   000  000   000  
 #  0000000    0000000   000   000  000           000      0000000   00     00   0000000   000   000  0000000    
         
-{ splitFileLine, fileExists, post, log
-}      = require 'kxk'
+{ slash, post, log } = require 'kxk'
+
 matchr = require '../../tools/matchr'
 
 module.exports = 
@@ -29,8 +29,21 @@ module.exports =
             diss   = matchr.dissect ranges, join:false
             for d in diss
                 if d.start <= p[0] <= d.start+d.match.length
-                    [file, line, col] = splitFileLine d.match
-                    if fileExists file
+                    [file, line, col] = slash.splitFileLine d.match
+                    if slash.fileExists file
+                        post.emit 'jumpTo', file:file, line:line, col:col
+                        return true
+                        
+        if slash.win()
+            
+            rgx = /([\~\\\w\.]+\\[\w\.]+\w[:\d]*)/ # look for files in line
+            
+            ranges = matchr.ranges rgx, text
+            diss   = matchr.dissect ranges, join:false
+            for d in diss
+                if d.start <= p[0] <= d.start+d.match.length
+                    [file, line, col] = slash.splitFileLine d.match
+                    if slash.fileExists file
                         post.emit 'jumpTo', file:file, line:line, col:col
                         return true
         false
@@ -38,8 +51,6 @@ module.exports =
     jumpToWord: -> @jumpToWordAtPos() 
         
     jumpToWordAtPos: (p=@cursorPos()) ->
-        
-        # log 'jumpToWordAtPos', p
         
         return if @jumpToFileAtPos p
         

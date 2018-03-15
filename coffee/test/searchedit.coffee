@@ -5,8 +5,9 @@
 #      000  000       000   000  000   000  000       000   000  000       000   000  000     000     
 # 0000000   00000000  000   000  000   000   0000000  000   000  00000000  0000000    000     000     
 
-{log, post, resolve, fs} = require 'kxk'
-{expect,should} = require 'chai'
+{ log, post, slash, fs } = require 'kxk'
+{ expect,should } = require 'chai'
+
 should()
 
 try
@@ -24,9 +25,9 @@ commandline = window.commandline
 thisFile    = null
 otherWin    = null
 resultLines = null
-tmpFile     = resolve '$TMPDIR/ko/test.coffee'
-txtFile     = resolve '$TMPDIR/ko/test.txt'
-pkgFile     = resolve '$TMPDIR/ko/package.json'
+tmpFile     = slash.resolve '$TMPDIR/ko/test.coffee'
+txtFile     = slash.resolve '$TMPDIR/ko/test.txt'
+pkgFile     = slash.resolve '$TMPDIR/ko/package.json'
 texta       = "a='hello'\nb='world'"
 textb       = "hell on earth"
 
@@ -46,7 +47,7 @@ describe 'search edit', ->
         expect(editor.text()) .to.eql texta
             
     it 'start search', ->
-        commandline.startCommand 'search', 'command+shift+f'
+        commandline.startCommand 'search'
         expect(commandline.command.name) .to.eql 'search'
         
     it 'search', (done) ->

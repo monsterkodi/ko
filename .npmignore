@@ -4,6 +4,7 @@ wiki
 .gitignore
 .konrad.noon
 ko-darwin-x64
+ko-winw32-x64
 coffee
 syntax
 test

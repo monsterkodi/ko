@@ -18,7 +18,9 @@ endOf   = (r) -> r[0] + Math.max 1, r[1]-r[0]
 
 class Buffer extends event
     
-    constructor: () -> 
+    constructor: () ->
+        super()
+        @newlineCharacters = '\n'
         @wordRegExp = new RegExp "(\\s+|\\w+|[^\\s])", 'g'
         @setState new State()
 
@@ -81,7 +83,6 @@ class Buffer extends event
 
     wordAtCursor: -> @wordAtPos @mainCursor()
     wordAtPos: (c) -> @textInRange @rangeForWordAtPos c
-    # wordsAtCursors: (cs=@cursors(), opt) -> (@textInRange @rangeForWordAtPos(c, opt) for c in cs)
     wordsAtCursors: (cs=@cursors(), opt) -> (@textInRange r for r in @rangesForWordsAtCursors cs, opt)
 
     rangesForWordsAtCursors: (cs=@cursors(), opt) -> 
@@ -102,6 +103,17 @@ class Buffer extends event
         r = rangeAtPosInRanges p, wr
         r
 
+    rangeForRealWordAtPos: (pos, opt) ->
+        
+        p = @clampPos pos
+        wr = @wordRangesInLineAtIndex p[1], opt
+        r = rangeAtPosInRanges p, wr
+        if not r? or empty @textInRange(r).trim()
+            r = rangeBeforePosInRanges p, wr
+        if not r? or empty @textInRange(r).trim()
+            r = rangeAfterPosInRanges p, wr
+        r
+        
     endOfWordAtPos: (c) =>
         
         r = @rangeForWordAtPos c
@@ -195,8 +207,8 @@ class Buffer extends event
     #    000     000        000 000      000   
     #    000     00000000  000   000     000   
 
-    text:            -> @state.text()
-    textInRange: (r) -> @line(r[0]).slice? r[1][0], r[1][1]
+    text:                -> @state.text @newlineCharacters
+    textInRange:   (rg)  -> @line(rg[0]).slice? rg[1][0], rg[1][1]
     textsInRanges: (rgs) -> (@textInRange(r) for r in rgs)
     textInRanges:  (rgs) -> @textsInRanges(rgs).join '\n'
     textOfSelection:     -> @textInRanges @selections()

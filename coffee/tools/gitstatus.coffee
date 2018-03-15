@@ -1,23 +1,27 @@
+###
+ 0000000   000  000000000   0000000  000000000   0000000   000000000  000   000   0000000  
+000        000     000     000          000     000   000     000     000   000  000       
+000  0000  000     000     0000000      000     000000000     000     000   000  0000000   
+000   000  000     000          000     000     000   000     000     000   000       000  
+ 0000000   000     000     0000000      000     000   000     000      0000000   0000000   
+###
 
-#  0000000   000  000000000   0000000  000000000   0000000   000000000  000   000   0000000  
-# 000        000     000     000          000     000   000     000     000   000  000       
-# 000  0000  000     000     0000000      000     000000000     000     000   000  0000000   
-# 000   000  000     000          000     000     000   000     000     000   000       000  
-#  0000000   000     000     0000000      000     000   000     000      0000000   0000000   
-
-{ escapePath, childp, dirExists, process, path, str, log, _ } = require 'kxk'
+{ childp, slash, str, log, _ } = require 'kxk'
 
 gitRoot = require './gitroot'
 
 gitStatus = (fileOrDir) ->
 
-    gitDir = gitRoot fileOrDir
+    log 'gitStatus', fileOrDir
+    gitDir = slash.unslash gitRoot fileOrDir
 
-    return if not gitDir?
+    if not gitDir? or not slash.isDir gitDir
+        log 'no git?', fileOrDir, gitDir
+        return 
     
     result = childp.execSync 'git status -s', 
-        cwd: gitDir
-        encoding: 'utf8' 
+        cwd:      gitDir
+        encoding: 'utf8'
     
     lines = result.split '\n'
 
@@ -30,8 +34,8 @@ gitStatus = (fileOrDir) ->
     
     while line = lines.shift()
         rel    = line.slice 3
-        file   = path.join gitDir, line.slice 3
-        while (rel = path.dirname rel) != '.'
+        file   = slash.join gitDir, line.slice 3
+        while (rel = slash.dirname rel) != '.'
             dirSet.add rel
             
         header = line.slice 0,2
@@ -40,7 +44,7 @@ gitStatus = (fileOrDir) ->
             when ' M' then info.changed.push file
             when '??' then info.added  .push file
             
-    info.dirs = Array.from(dirSet).map (d) -> path.join gitDir, d
+    info.dirs = Array.from(dirSet).map (d) -> slash.join gitDir, d
     
     return info
 

@@ -5,39 +5,41 @@
 000       000  000      000             000       000   000  000     000     000   000  000   000
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
-{ fileName, samePath, joinFileLine, splitFilePos, fileExists, swapExt, path, empty, fs,
-  setStyle, post, pos, error, log, str, _ } = require 'kxk'
+
+{ popup, slash, empty, fs, setStyle, post, pos, error, log, str, _ } = require 'kxk'
   
 srcmap     = require '../tools/srcmap'
 watcher    = require './watcher'
 TextEditor = require './texteditor'
 syntax     = require './syntax'
+electron   = require 'electron'
 
 class FileEditor extends TextEditor
 
     constructor: (viewElem) ->
 
+        super viewElem, 
+            features: [
+                'Diffbar'
+                'Scrollbar'
+                'Numbers'
+                'Minimap'
+                'Meta'
+                'Autocomplete'
+                'Brackets'
+                'Strings'
+            ],
+            fontSize: 18
+
         @currentFile = null
         @watch       = null
 
+        @view.addEventListener "contextmenu", @onContextMenu
+        
         window.split.on 'commandline', @onCommandline
 
         post.on 'jumpTo',        @jumpTo
         post.on 'jumpToFile',    @jumpToFile
-        post.on 'setBreakpoint', @onSetBreakpoint
-
-        @fontSizeDefault = 18
-
-        super viewElem, features: [
-            'Diffbar'
-            'Scrollbar'
-            'Numbers'
-            'Minimap'
-            'Meta'
-            'Autocomplete'
-            'Brackets'
-            'Strings'
-        ]
 
         @initPigments()
         @initInvisibles()
@@ -99,7 +101,6 @@ class FileEditor extends TextEditor
 
             @restoreScrollCursorsAndSelections()
             post.emit 'file', @currentFile # titlebar -> tabs -> tab
-            post.toMain 'getBreakpoints', window.winID, @currentFile, window.winID
         else
             if not opt?.skip
                 @setLines ['']
@@ -217,7 +218,7 @@ class FileEditor extends TextEditor
             file: @currentFile
             pos:  @cursorPos()
 
-        [file, fpos] = splitFilePos opt.file
+        [file, fpos] = slash.splitFilePos opt.file
         opt.pos = fpos
         opt.pos[0] = opt.col if opt.col
         opt.pos[1] = opt.line-1 if opt.line
@@ -272,11 +273,10 @@ class FileEditor extends TextEditor
         if not type or type == 'file'
             files = post.get 'indexer', 'files'
             for file, info of files
-                if fileName(file).toLowerCase() == find and file != @currentFile
+                if slash.base(file).toLowerCase() == find and file != @currentFile
                     @jumpToFile file:file, line:6
-                    return true
 
-        window.commandline.commands.search.start "command+shift+f"
+        window.commandline.commands.search.start 'search'
         window.commandline.commands.search.execute word
 
         window.split.do 'show terminal'
@@ -292,41 +292,43 @@ class FileEditor extends TextEditor
     jumpToCounterpart: () ->
 
         cp = @cursorPos()
-        currext = path.extname @currentFile
+        currext = slash.ext @currentFile
 
+        # log 'jumpToCounterpart', cp, currext, @currentFile
+        
         switch currext
-            when '.coffee'
+            when 'coffee'
                 [file,line,col] = srcmap.toJs @currentFile, cp[1]+1, cp[0]
                 if file?
-                    window.loadFile joinFileLine file,line,col
+                    window.loadFile slash.joinFileLine file,line,col
                     return true
-            when '.js'
+            when 'js'
                 [file,line,col] = srcmap.toCoffee @currentFile, cp[1]+1, cp[0]
                 if file?
-                    window.loadFile joinFileLine file,line,col
+                    window.loadFile slash.joinFileLine file,line,col
                     return true
 
         counterparts =
-            '.cpp':     ['.hpp', '.h']
-            '.cc':      ['.hpp', '.h']
-            '.h':       ['.cpp', '.c']
-            '.hpp':     ['.cpp', '.c']
-            '.coffee':  ['.js']
-            '.js':      ['.coffee']
-            '.pug':     ['.html']
-            '.html':    ['.pug']
-            '.css':     ['.styl']
-            '.styl':    ['.css']
+            'cpp':     ['hpp', 'h']
+            'cc':      ['hpp', 'h']
+            'h':       ['cpp', 'c']
+            'hpp':     ['cpp', 'c']
+            'coffee':  ['js']
+            'js':      ['coffee']
+            'pug':     ['html']
+            'html':    ['pug']
+            'css':     ['styl']
+            'styl':    ['css']
 
         for ext in (counterparts[currext] ? [])
-            if fileExists swapExt @currentFile, ext
-                window.loadFile swapExt @currentFile, ext
+            if slash.fileExists slash.swapExt @currentFile, ext
+                window.loadFile slash.swapExt @currentFile, ext
                 return true
 
         for ext in (counterparts[currext] ? [])
             counter = swapExt @currentFile, ext
-            counter = counter.replace "/#{currext.slice 1}/", "/#{ext.slice 1}/"
-            if fileExists counter
+            counter = counter.replace "/#{currext}/", "/#{ext}/"
+            if slash.fileExists counter
                 window.loadFile counter
                 return true
         false
@@ -342,12 +344,14 @@ class FileEditor extends TextEditor
         @size.centerText = center
         @updateLayers()
 
+        @size.offsetX = Math.floor @size.charWidth/2 + @size.numbersWidth
         if center
-            @size.offsetX = Math.floor @size.charWidth/2 + @size.numbersWidth
-            @size.offsetX = Math.max @size.offsetX, (@screenSize().width - @screenSize().height) / 2
+            br        = @view.getBoundingClientRect()
+            visCols   = parseInt br.width / @size.charWidth
+            newOffset = parseInt @size.charWidth * (visCols - 100) / 2
+            @size.offsetX = Math.max @size.offsetX, newOffset
             @size.centerText = true
         else
-            @size.offsetX = Math.floor @size.charWidth/2 + @size.numbersWidth
             @size.centerText = false
 
         @updateLinePositions animate
@@ -374,6 +378,37 @@ class FileEditor extends TextEditor
         else
             @updateLayers()
 
+    # 00000000    0000000   00000000   000   000  00000000     
+    # 000   000  000   000  000   000  000   000  000   000    
+    # 00000000   000   000  00000000   000   000  00000000     
+    # 000        000   000  000        000   000  000          
+    # 000         0000000   000         0000000   000          
+
+    onContextMenu: (event) => @showContextMenu pos event
+              
+    showContextMenu: (absPos) =>
+        
+        if not absPos?
+            absPos = pos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
+        
+        opt = items: [
+            text:   'Maximize'
+            combo:  'ctrl+shift+y' 
+            cb:     -> window.split.maximizeEditor()
+        ,
+            text:   'Browse'
+            combo:  'ctrl+.' 
+            cb:     -> window.commandline.startCommand 'browse'
+        ,
+            text:   'Log View'
+            combo:  'ctrl+alt+k' 
+            cb:     window.split.showLog
+        ]
+        
+        opt.x = absPos.x
+        opt.y = absPos.y
+        popup.menu opt
+            
     #  0000000  000      000   0000000  000   000
     # 000       000      000  000       000  000
     # 000       000      000  000       0000000
@@ -385,33 +420,9 @@ class FileEditor extends TextEditor
         if event.metaKey
             if pos(event).x <= @size.numbersWidth
                 @singleCursorAtPos p
-                @toggleBreakpoint()
                 return
 
         super p, event
-
-    # 0000000    00000000   00000000   0000000   000   000  00000000    0000000   000  000   000  000000000
-    # 000   000  000   000  000       000   000  000  000   000   000  000   000  000  0000  000     000
-    # 0000000    0000000    0000000   000000000  0000000    00000000   000   000  000  000 0 000     000
-    # 000   000  000   000  000       000   000  000  000   000        000   000  000  000  0000     000
-    # 0000000    000   000  00000000  000   000  000   000  000         0000000   000  000   000     000
-
-    toggleBreakpoint: ->
-
-        return if path.extname(@currentFile) not in ['.js', '.coffee']
-        for cp in @cursors()
-            continue if not @line(cp[1]).trim().length
-            wid = window.commandline.commands.debug.activeWid()
-            post.toMain 'setBreakpoint', wid, @currentFile, cp[1]+1
-
-    onSetBreakpoint: (breakpoint) =>
-
-        return if not samePath breakpoint.file, @currentFile
-        line = breakpoint.line
-        switch breakpoint.status
-            when 'active'   then @meta.addDbgMeta line:line-1, clss:'dbg breakpoint'
-            when 'inactive' then @meta.addDbgMeta line:line-1, clss:'dbg breakpoint inactive'
-            when 'remove'   then @meta.delDbgMeta line-1
 
     # 000   000  00000000  000   000
     # 000  000   000        000 000
@@ -420,13 +431,13 @@ class FileEditor extends TextEditor
     # 000   000  00000000     000
 
     handleModKeyComboCharEvent: (mod, key, combo, char, event) ->
-
+        
         return if 'unhandled' != super mod, key, combo, char, event
+        # log 'unhandled', combo
         switch combo
-            when 'ctrl+enter'       then return window.commandline.commands.coffee.executeText @text()
-            when 'ctrl+shift+enter' then return window.commandline.commands.coffee.executeTextInMain @text()
-            when 'command+alt+up'   then return @jumpToCounterpart()
-            when 'f7'               then return @toggleBreakpoint()
+            when 'alt+ctrl+enter'       then return window.commandline.commands.coffee.executeText @textOfSelectionForClipboard()
+            when 'alt+ctrl+shift+enter' then return window.commandline.commands.coffee.executeTextInMain @textOfSelectionForClipboardt()
+            when 'command+alt+up', 'alt+ctrl+up' then return @jumpToCounterpart()
             when 'esc'
                 split = window.split
                 if split.terminalVisible()

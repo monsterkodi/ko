@@ -8,7 +8,7 @@
 
 class Class extends Other
 
-    constructor:-> @this
+    constructor:()-> super()
     @static:()-> @that
     method: () -> text
     ugly : (  ) => @func arg

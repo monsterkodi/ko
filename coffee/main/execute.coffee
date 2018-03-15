@@ -5,10 +5,9 @@
 # 000        000 000   000       000       000   000     000     000
 # 00000000  000   000  00000000   0000000   0000000      000     00000000
 
-{ noon, str, post, error, log, _ } = require 'kxk'
+{ noon, colors, str, post, error, log, _ } = require 'kxk'
 
-colors   = require 'colors'
-coffee   = require 'coffee-script'
+coffee   = require 'coffeescript'
 pty      = require 'node-pty'
 
 class Execute
@@ -44,13 +43,10 @@ class Execute
             restoreCWD = process.cwd()
             process.chdir __dirname
             coffee.eval """
-                { str, clamp, fileExists, dirExists, resolve, unresolve, post, path, noon, fs, $, _
-                } = require 'kxk'
-                { max, min, abs, round, ceil, floor, sqrt, pow, exp, log10, sin, cos, tan, acos, asin, atan, PI, E
-                } = Math
-                coffee = require 'coffee-script'
-                cri = require 'chrome-remote-interface'
-                (global[r] = require r for r in ['colors', 'electron'])
+                { str, colors, clamp, post, slash, noon, fs, $, _ } = require 'kxk'
+                { max, min, abs, round, ceil, floor, sqrt, pow, exp, log10, sin, cos, tan, acos, asin, atan, PI, E } = Math
+                coffee = require 'coffeescript'
+                (global[r] = require r for r in ['electron'])
                 log = ->
                     console.log.apply console, [].slice.call(arguments, 0)
                     if winID? then post.toWin winID, 'executeResult', [].slice.call(arguments, 0), cmdID

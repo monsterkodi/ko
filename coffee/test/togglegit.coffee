@@ -5,8 +5,7 @@
 #    000     000   000  000   000  000   000  000      000             000   000  000     000       
 #    000      0000000    0000000    0000000   0000000  00000000         0000000   000     000       
 
-{ childp, path, empty, post, log, _
-}        = require 'kxk'
+{ childp, slash, empty, post, log, _ } = require 'kxk'
 {expect} = require 'chai'
 gitRoot  = require '../tools/gitroot'
 
@@ -17,7 +16,7 @@ test = (a, b) ->
     expect(a).to.eql b
 
 editor          = window.editor
-simpleFile      = path.join gitRoot(__dirname), 'coffee', 'test', 'dir', 'simple.txt'
+simpleFile      = slash.join gitRoot(__dirname), 'coffee', 'test', 'dir', 'simple.txt'
 simpleText      = '123456'.split('').join '\n'
 
 # 000       0000000    0000000   0000000    
@@ -315,7 +314,7 @@ describe 'togglegit', ->
     
     describe 'complex', ->
     
-        complexFile     = path.join gitRoot(__dirname), 'coffee', 'test', 'dir', 'git.txt'
+        complexFile     = slash.join gitRoot(__dirname), 'coffee', 'test', 'dir', 'git.txt'
         complexText     = 'abcdefghijklmnopqrstuvwxyz'.split('').join '\n'
         complexModified = 'a\nbad\ncool\nd\nhello\nh\ni\nj\nl\nm\np\n\n\n1\n23q\nr\n4s\nt5\nv\n6\n\n7\n\nw\nx\ny\nz'
             

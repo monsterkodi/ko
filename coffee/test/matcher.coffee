@@ -5,10 +5,9 @@
 # 000 0 000  000   000     000     000       000   000  000       000   000  
 # 000   000  000   000     000      0000000  000   000  00000000  000   000  
 
-{ _ }      = require 'kxk'
-{expect}   = require 'chai'
+{ noon, _ } = require 'kxk'
+{ expect } = require 'chai'
 assert     = require 'assert'
-noon       = require 'noon'
 Immutable  = require 'seamless-immutable'
 matchr     = require '../tools/matchr'
 

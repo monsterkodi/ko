@@ -2,4 +2,5 @@ ignore
     /syntax/
     /md/
     /bin/cheet.noon
-coffee  . map file 
+    /ko-win32-x64/
+coffee  . map inline 

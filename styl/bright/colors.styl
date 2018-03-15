@@ -30,6 +30,31 @@ body
 .split-handle
     background          frameColor
 
+// 00000000    0000000   00000000   000   000  00000000
+// 000   000  000   000  000   000  000   000  000   000
+// 00000000   000   000  00000000   000   000  00000000
+// 000        000   000  000        000   000  000
+// 000         0000000   000         0000000   000
+
+.popup
+    background-color    frameColor
+
+.popupWindow
+    background-color    frameColor
+
+.popupItem
+    color               #888
+    &:not(:last-child)
+        border-bottom       1px solid frameColor
+    &.selected
+        color           textColor
+
+.popupItem:active
+    color               textColor
+
+.popupCombo
+    color               titleColor
+    
 // 0000000    00000000    0000000   000   000   0000000  00000000  00000000
 // 000   000  000   000  000   000  000 0 000  000       000       000   000
 // 0000000    0000000    000   000  000000000  0000000   0000000   0000000
@@ -105,8 +130,6 @@ span.ko
         color           #0a0
     &.coffee
         color           #800
-    &.debug
-        color           #888
     &.build
         color           #aaa
     &.macro
@@ -121,14 +144,6 @@ span.ko
 // 000          000     0000000    000
 // 000          000     000   000  000
 //  0000000     000     000   000  0000000
-
-#debugCtrl
-    background          backColor
-
-#debugCtrl.running #step
-#debugCtrl.running #into
-#debugCtrl.running #out
-    color               titleColor
 
 .ctrl
     color               #888
@@ -351,8 +366,6 @@ span.ko
     &.dbg
         opacity             0.8
         background          #f00
-        &.breakpoint
-            background      #f80
 
 .linenumber span .saveButton
     background              #f80

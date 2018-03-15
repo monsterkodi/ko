@@ -5,7 +5,7 @@
 # 000   000  000   000  000   000  000   000       000  000       000   000  
 # 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 
-{ fileName, encodePath, swapExt, elem, post, clamp, childp, path, fs, os, error, log,  _ } = require 'kxk'
+{ elem, post, clamp, setStyle, childp, slash, fs, os, error, log,  _ } = require 'kxk'
 
 Column = require './column'
 Stage  = require '../stage/stage'
@@ -13,11 +13,49 @@ flex   = require '../win/flex/flex'
 
 class Browser extends Stage
     
-    constructor: (@view) -> 
-                
+    constructor: (view) ->
+        
+        super view
+        
         @columns = []
-        super @view
+        
+        setStyle '.browserRow .extname', 'display', prefs.get('browser:hideExtensions') and 'none' or 'initial'
 
+    # 000  000   000  000  000000000       0000000   0000000   000      000   000  00     00  000   000   0000000  
+    # 000  0000  000  000     000         000       000   000  000      000   000  000   000  0000  000  000       
+    # 000  000 0 000  000     000         000       000   000  000      000   000  000000000  000 0 000  0000000   
+    # 000  000  0000  000     000         000       000   000  000      000   000  000 0 000  000  0000       000  
+    # 000  000   000  000     000          0000000   0000000   0000000   0000000   000   000  000   000  0000000   
+    
+    initColumns: ->
+        
+        return if @cols? and @cols.parentNode == @view
+        
+        @view.innerHTML = ''
+        
+        if @cols?
+            @view.appendChild @cols
+            return
+            
+        @cols = elem class: 'browser', id: 'columns'
+        @view.appendChild @cols
+        
+        @columns = []
+        for i in [0...2]
+            @newColumn()
+            
+        panes = @columns.map (c) -> div:c.div, min:20
+        @flex = new flex 
+            panes: panes
+            onPaneSize: @updateColumnScrolls
+        
+    columnAtPos: (pos) ->
+        
+        for column in @columns
+            if elem.containsPos column.div, pos
+                return column
+        null
+                            
     # 000       0000000    0000000   0000000         000  000000000  00000000  00     00   0000000  
     # 000      000   000  000   000  000   000       000     000     000       000   000  000       
     # 000      000   000  000000000  000   000       000     000     0000000   000000000  0000000   
@@ -135,6 +173,8 @@ class Browser extends Stage
     numCols: -> @columns.length 
     column: (i) -> @columns[i] if 0 <= i < @numCols()
 
+    columnWithName: (name) -> @columns.find (c) -> c.name() == name
+    
     #  0000000   0000000    0000000     0000000   0000000   000      
     # 000   000  000   000  000   000  000       000   000  000      
     # 000000000  000   000  000   000  000       000   000  000      
@@ -165,7 +205,7 @@ class Browser extends Stage
     popEmptyColumns: -> @popColumn() while @hasEmptyColumns()
     
     clear: -> @clearColumnsFrom 0, pop:true 
-    clearColumnsFrom: (c, opt=pop:false) ->
+    clearColumnsFrom: (c=0, opt=pop:false) ->
         
         return error "clearColumnsFrom #{c}?" if not c? or c < 0
         
@@ -188,34 +228,6 @@ class Browser extends Stage
         @flex.relax()
         true
 
-    # 000  000   000  000  000000000       0000000   0000000   000       0000000  
-    # 000  0000  000  000     000         000       000   000  000      000       
-    # 000  000 0 000  000     000         000       000   000  000      0000000   
-    # 000  000  0000  000     000         000       000   000  000           000  
-    # 000  000   000  000     000          0000000   0000000   0000000  0000000   
-    
-    initColumns: ->
-        
-        return if @cols? and @cols.parentNode == @view
-        
-        @view.innerHTML = ''
-        
-        if @cols?
-            @view.appendChild @cols
-            return
-            
-        @cols = elem class: 'browser', id: 'columns'
-        @view.appendChild @cols
-        
-        @columns = []
-        for i in [0...2]
-            @newColumn()
-            
-        panes = @columns.map (c) -> div:c.div, min:20
-        @flex = new flex 
-            panes: panes
-            onPaneSize: @updateColumnScrolls
-
     resized: (w,h) -> @updateColumnScrolls()
     
     updateColumnScrolls: =>
@@ -233,13 +245,11 @@ class Browser extends Stage
     # 000       000   000  000  0000     000     000       000  0000     000     
     #  0000000   0000000   000   000     000     00000000  000   000     000     
     
-    loadContent: (row, opt) ->
+    loadSourceItem: (item, opt={}) ->
         
-        item  = row.item
-
         items = []
         file  = item.file
-        name  = fileName file
+        name  = slash.base file
         
         files = post.get 'indexer', 'files', file
 
@@ -263,15 +273,24 @@ class Browser extends Stage
             opt.parent ?= item
             @clearColumnsFrom opt.column
             @loadItems items, opt
-        else
-            ext = path.extname file  
-            if ext in ['.gif', '.png', '.jpg', '.jpeg', '.svg']
+            return true
+            
+        false
+            
+    loadContent: (row, opt) ->
+        
+        item  = row.item
+        file  = item.file
+
+        if not @loadSourceItem item, opt
+            ext = slash.ext file  
+            if ext in ['gif', 'png', 'jpg', 'jpeg', 'svg']
                 @clearColumnsFrom opt.column, pop:true
                 @loadImage row, file
-            else if ext in ['.icns', '.tiff', '.tif']
+            else if ext in ['icns', 'tiff', 'tif'] and not slash.win()
                 @clearColumnsFrom opt.column, pop:true
                 @convertImage row
-            else if ext in ['.pxm']
+            else if ext in ['pxm']
                 @clearColumnsFrom opt.column, pop:true
                 @convertPXM row
             else
@@ -293,8 +312,8 @@ class Browser extends Stage
         
         item = row.item
         file = item.file
-        tmpPXM = path.join os.tmpdir(), "ko-#{fileName file}.pxm"
-        tmpPNG = swapExt tmpPXM, '.png'
+        tmpPXM = slash.join os.tmpdir(), "ko-#{slash.base file}.pxm"
+        tmpPNG = slash.swapExt tmpPXM, '.png'
 
         fs.copy file, tmpPXM, (err) =>
             return error "can't copy pxm image #{file} to #{tmpPXM}: #{err}" if err?
@@ -307,7 +326,7 @@ class Browser extends Stage
         
         item = row.item
         file = item.file
-        tmpImage = path.join os.tmpdir(), "ko-#{path.basename file}.png"
+        tmpImage = slash.join os.tmpdir(), "ko-#{slash.basename file}.png"
         
         childp.exec "/usr/bin/sips -s format png \"#{file}\" --out \"#{tmpImage}\"", (err) =>
             return error "can't convert image #{file}: #{err}" if err?
@@ -316,12 +335,11 @@ class Browser extends Stage
     loadImage: (row, file) ->
         
         return if not row.isActive()
-        item = row.item
 
         col = @emptyColumn opt?.column
         @clearColumnsFrom col.index
         cnt = elem class: 'browserImageContainer', child: 
-            elem 'img', class: 'browserImage', src: "file://#{encodePath file}"
+            elem 'img', class: 'browserImage', src: slash.fileUrl file
         col.table.appendChild cnt
         
 module.exports = Browser

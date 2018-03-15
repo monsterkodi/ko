@@ -5,9 +5,8 @@
 # 000   000  000  000   000  000      000       000     000     
 # 0000000    000  000   000  0000000  000  0000000      000     
 
-{ resolve, relative, fs, path, error, log, _ } = require 'kxk'
+{ fs, walkdir, slash, error, log, _ } = require 'kxk'
 
-walkdir    = require 'walkdir'
 isTextFile = require './istextfile'
 
 #   directory list
@@ -22,7 +21,6 @@ isTextFile = require './istextfile'
 #   opt:  
 #          ignoreHidden: true # skip files that starts with a dot
 #          logError:     true # print message to console.log if a path doesn't exits
-#          matchExt:     null # only include files that match the extension of the option's value
 
 dirList = (dirPath, opt, cb) ->
     
@@ -34,30 +32,44 @@ dirList = (dirPath, opt, cb) ->
     opt.logError     ?= true
     dirs    = []
     files   = []
-    dirPath = resolve dirPath
+    dirPath = slash.resolve dirPath
     
     filter = (p) ->
         
-        if path.basename(p).startsWith '.'
+        base = slash.file p
+        if base.startsWith '.'
+            
             if opt.ignoreHidden
                 return true
-            if path.basename(p) in ['.DS_Store', '.git']
+                
+            if base in ['.DS_Store', '.git']
                 return true
-        else if opt.matchExt? 
-            if path.extname(p) != path.extname opt.matchExt
-                return true
-        if path.basename(p) == 'Icon\r'
+                
+        if base == 'Icon\r'
             return true
+            
+        if base.toLowerCase().startsWith 'ntuser.'
+            return true
+            
+        if base.toLowerCase().startsWith '$recycle'
+            return true
+        
         false
     
     onDir = (d) -> 
         if not filter(d) 
-            dir = type: 'dir', file: d, name: path.basename d # relative d, dirPath 
+            dir = 
+                type: 'dir'
+                file: slash.path d
+                name: slash.basename d
             dirs.push  dir
             
     onFile = (f) -> 
         if not filter(f) 
-            file = type: 'file', file: f, name: path.basename f # relative f, dirPath
+            file = 
+                type: 'file'
+                file: slash.path f
+                name: slash.basename f
             file.textFile = true if isTextFile f
             files.push file
 

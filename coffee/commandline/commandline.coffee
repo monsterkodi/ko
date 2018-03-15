@@ -6,7 +6,7 @@
  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 ###
 
-{ fileList, stopEvent, elem, keyinfo, clamp, post, path, error, log, str, os, $, _ } = require 'kxk'
+{ fileList, stopEvent, elem, keyinfo, clamp, post, slash, error, log, str, os, $, _ } = require 'kxk'
 
 TextEditor = require '../editor/texteditor'
 render     = require '../editor/render'
@@ -16,11 +16,10 @@ class Commandline extends TextEditor
 
     constructor: (viewElem) ->
 
-        @fontSizeDefault = 24
-        @mainCommands = ['open', 'search', 'find', 'coffee', 'goto', 'term', 'browse', 'debug', 'build', 'macro']
-        @hideCommands = ['selecto', 'Term', 'Build', 'Browse']
+        super viewElem, features: [], fontSize: 24
 
-        super viewElem, features: []
+        @mainCommands = ['browse', 'goto', 'open', 'search', 'find', 'coffee', 'build', 'macro']
+        @hideCommands = ['selecto', 'Term', 'Build', 'Browse']
 
         @size.lineHeight = 30
         @scroll.setLineHeight @size.lineHeight
@@ -40,7 +39,6 @@ class Commandline extends TextEditor
         post.on 'stash',   @stash
 
         @view.onblur = =>
-            # return
             @button.classList.remove 'active'
             @list?.remove()
             @list = null
@@ -55,21 +53,27 @@ class Commandline extends TextEditor
     #      000     000     000   000     000     000
     # 0000000      000     000   000     000     00000000
 
-    stash: => if @command? then window.stash.set 'commandline', @command.state()
+    stash: => 
+        if @command? 
+            # post.toMain 'winlog', window.winID, 'stash commandline state ' + str @command.state()
+            window.stash.set 'commandline', @command.state()
 
     restore: =>
 
         state = window.stash.get 'commandline'
         @setText state?.text ? ""
-        if state?.name
+        if state?.name?
             name = state.name
             @command = @commands[name]
-            activeID = document.activeElement.id
-            if activeID.startsWith 'column' then activeID = 'editor'
-            @command.setFocus activeID != 'commandline-editor' and activeID or null
-            @setName name
-            @button.className = "commandline-button active #{@command.prefsID}"
-            @commands[name]?.restoreState? state
+            if @command
+                activeID = document.activeElement.id
+                if activeID.startsWith 'column' then activeID = 'editor'
+                @command.setFocus activeID != 'commandline-editor' and activeID or null
+                @setName name
+                @button.className = "commandline-button active #{@command.prefsID}"
+                @commands[name]?.restoreState? state
+            else
+                error "no command for name: #{name} state:", state
 
     # 000       0000000    0000000   0000000
     # 000      000   000  000   000  000   000
@@ -81,14 +85,14 @@ class Commandline extends TextEditor
 
         files = fileList "#{__dirname}/../commands"
         for file in files
-            continue if path.extname(file) != '.js'
+            continue if slash.ext(file) != 'js'
             try
                 commandClass = require file
                 command = new commandClass @
                 command.setPrefsID commandClass.name.toLowerCase()
                 @commands[command.prefsID] = command
             catch err
-                if err then error "can't load command from file '#{file}': #{err}"
+                error "can't load command from file '#{file}': #{err}"
 
     setName: (name) ->
 
@@ -141,7 +145,7 @@ class Commandline extends TextEditor
         if not @command?
             @command = @commands['open']
             @command.loadState()
-            @setText path.basename file
+            @setText slash.basename file
 
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000
@@ -149,29 +153,39 @@ class Commandline extends TextEditor
     #      000     000     000   000  000   000     000
     # 0000000      000     000   000  000   000     000
 
-    startCommand: (name, combo, event) ->
+    startCommand: (name) ->
 
-        stopEvent event
-
-        r = @command?.cancel combo
+        r = @command?.cancel name
+        
         if r?.status == 'ok'
             @results r
             return
 
         window.split.showCommandline()
 
-        @command = @commands[name]
-        activeID = document.activeElement.id
-        if activeID.startsWith 'column' then activeID = 'editor'
-        @command.setFocus activeID != 'commandline-editor' and activeID or null
-        @view.focus()
-        @setName name
-        combo = @command.shortcuts[0] if not combo?
+        if @command = @commandForName name
+        
+            # log "commandline.startCommand #{name}", @command?
+            
+            activeID = document.activeElement.id
+            if activeID.startsWith 'column' then activeID = 'editor'
+            @command.setFocus activeID != 'commandline-editor' and activeID or null
+            @view.focus()
+            
+            @setName name
+            @results @command.start name # <-- command start
+    
+            @button.className = "commandline-button active #{@command.prefsID}"
+        else
+            error 'no command'
 
-        @results @command.start combo # <-- command start
+    commandForName: (name) ->
 
-        @button.className = "commandline-button active #{@command.prefsID}"
-
+        for n,c of @commands
+            if n == name or name in c.names
+                return c
+        
+        
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000
     # 0000000     00000    0000000   000       000   000     000     0000000
@@ -191,13 +205,18 @@ class Commandline extends TextEditor
         @setName r.name if r?.name?
         @setText r.text if r?.text?
         if r?.select then @selectAll() else @selectNone()
+        # log 'commandline.results', r
         window.split.show   r.show   if r?.show?
         window.split.focus  r.focus  if r?.focus?
         window.split.do     r.do     if r?.do?
         @
 
     cancel: -> @results @command?.cancel()
-    clear:  -> @results @command?.clear()
+    clear:  -> 
+        if @text() == ''
+            @results @command?.clear()
+        else
+            super.clear()
 
     # 000      000   0000000  000000000
     # 000      000  000          000
@@ -223,19 +242,18 @@ class Commandline extends TextEditor
         @list.style.display = 'unset'
         for name in @mainCommands
             cmmd = @commands[name]
-            for ci in [0...cmmd.shortcuts.length]
-                combo = cmmd.shortcuts[ci]
+            # log 'listCommands mainCommand', name, 'names', cmmd?.names
+            for ci in [0...cmmd.names.length]
                 cname = cmmd.names[ci]
                 continue if cname in @hideCommands
                 div = elem class: "list-item"
-                namespan = "<span class=\"ko command #{cmmd.prefsID}\" style=\"position:absolute; left: #{ci > 0 and 40 or 6}px\">#{cname}</span>"
-                shortcut = "<span class=\"ko shortcut #{cmmd.prefsID}\"style=\"position:absolute; right: 6px;\">#{keyinfo.short combo}</span>"
-                div.innerHTML = namespan + shortcut
-                start = (name,combo) => (event) =>
+                namespan = "<span class=\"ko command #{cmmd.prefsID}\" style=\"position:absolute; left: #{ci > 0 and 80 or 12}px\">#{cname}</span>"
+                div.innerHTML = namespan
+                start = (name) => (event) =>
                     @hideList()
-                    @startCommand name, combo
+                    @startCommand name
                     stopEvent event
-                div.addEventListener 'mousedown', start name, combo
+                div.addEventListener 'mousedown', start cname
                 @list.appendChild div
 
     hideList: ->
@@ -265,7 +283,7 @@ class Commandline extends TextEditor
 
         @list?.resized?()
         @command?.commandList?.resized()
-        super
+        super()
 
     focusTerminal: ->
 
@@ -279,14 +297,18 @@ class Commandline extends TextEditor
     # 000  000   000          000
     # 000   000  00000000     000
 
+    handleMenuAction: (name) ->
+        
+        if @commandForName name
+            @startCommand name
+            return
+                
+        'unhandled'
+    
     globalModKeyComboEvent: (mod, key, combo, event) ->
 
         if combo == 'esc'
             if document.activeElement == @view then return @cancel()
-
-        for n,c of @commands
-            for sc in c.shortcuts
-                if sc == combo then return @startCommand n, combo, event
 
         if @command?
             return @command.globalModKeyComboEvent mod, key, combo, event

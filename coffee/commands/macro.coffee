@@ -5,28 +5,24 @@
 # 000 0 000  000   000  000       000   000  000   000
 # 000   000  000   000   0000000  000   000   0000000
 
-{ packagePath, fileExists, fileName, fileList, reversed, relative, splitExt,
-  post, noon, path, fs, error, log, _ } = require 'kxk'
+{ fileList, colors, reversed, post, noon, slash, atomic, fs, error, log, _ } = require 'kxk'
   
 indexer = require '../main/indexer'
 salt    = require '../tools/salt'
 Command = require '../commandline/command'
-colors  = require 'colors'
-process = require 'process'
-atomic  = require 'write-file-atomic'
 Mocha   = require 'mocha'
 Report  = require '../test/report'
 syntax  = require '../editor/syntax'
 
 class Macro extends Command
 
-    constructor: (@commandline) ->
+    constructor: (commandline) ->
 
-        @shortcuts = ['command+m']
-        @macros    = ['clean', 'help', 'dbg', 'class', 'req', 'inv', 'blink', 'color', 'fps', 'test']
+        super commandline
+
+        @macros    = ['clean', 'help', 'dbg', 'class', 'req', 'inv', 'blink', 'color', 'fps', 'test', 'unix']
         @macros    = @macros.concat window.editor.Transform.transformNames
         @names     = ['macro']
-        super @commandline
 
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000
@@ -34,9 +30,9 @@ class Macro extends Command
     #      000     000     000   000  000   000     000
     # 0000000      000     000   000  000   000     000
 
-    start: (@combo) ->
+    start: (name) ->
         
-        super @combo
+        super name
         text = @last()
         text = 'dbg' if not text?.length
         text:   text
@@ -123,12 +119,13 @@ class Macro extends Command
 
             when 'test'
                 
-                mocha = new Mocha reporter: Report.forRunner, timeout: 4000
+                # mocha = new Mocha reporter: Report.forRunner, timeout: 4000
+                mocha = new Mocha()
                 
                 if _.isEmpty args
-                    files = fileList path.join(__dirname, '..', 'test'), matchExt:['.js', '.coffee']
+                    files = fileList slash.join(__dirname, '..', 'test'), matchExt:['js', 'coffee']
                 else
-                    files = (path.join(__dirname, '..', 'test', f + '.js') for f in args)
+                    files = (slash.join(__dirname, '..', 'test', f + '.js') for f in args)
                 for file in files
                     delete require.cache[file] # mocha listens only on initial compile
                     mocha.addFile file
@@ -174,9 +171,9 @@ class Macro extends Command
                 lastIndex = 0
                 texts = []
                 # search project for path build open search term
-                pkgPath = packagePath editor.currentFile
+                pkgPath = slash.pkg editor.currentFile
                 if pkgPath
-                    projectFiles = fileList pkgPath, depth: 4, matchExt: editor.currentFile
+                    projectFiles = fileList pkgPath, depth: 4, matchExt: slash.ext editor.currentFile
                 else
                     projectFiles = []
 
@@ -189,8 +186,8 @@ class Macro extends Command
                     pth = map[word] ? word.toLowerCase()
 
                     for f in projectFiles
-                        if pth == fileName f
-                            pth = splitExt relative f, path.dirname editor.currentFile
+                        if pth == slash.base f
+                            pth = slash.splitExt slash.relative f, slash.dirname editor.currentFile
                             pth = './' + pth if not pth.startsWith '../'
                             break
 
@@ -252,9 +249,9 @@ class Macro extends Command
 
                 clss = args.length and args[0] or _.last editor.textsInRanges(editor.selections())
                 clss ?= 'Class'
-                dir = editor.currentFile? and path.dirname(editor.currentFile) or process.cwd()
-                file = path.join dir, clss.toLowerCase() + '.coffee'
-                if fileExists file
+                dir = editor.currentFile? and slash.dirname(editor.currentFile) or process.cwd()
+                file = slash.join dir, clss.toLowerCase() + '.coffee'
+                if slash.fileExists file
                     return text: "file #{file} exists!"
                 text = '\n'
                 text += ("# "+s for s in salt(clss).split '\n').join '\n'
@@ -291,6 +288,11 @@ class Macro extends Command
                     if line != cleaned
                         editor.do.change li, cleaned
                 editor.do.end()
+                
+            when 'unix'
+                
+                editor.newlineCharacters = '\n'
+                post.emit 'saveFile'
                 
             # 000   000  00000000   0000000   0000000    00000000  00000000   
             # 000   000  000       000   000  000   000  000       000   000  

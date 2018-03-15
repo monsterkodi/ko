@@ -5,53 +5,55 @@
 #      000  000       000      000       000          000     000  000   000  000  0000
 # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
 
-{ post, error, log, _
-} = require 'kxk'
+{ post, error, log, _ } = require 'kxk'
 
 module.exports =
     
     actions:
         menu: 'Select'
-                    
+        
         selectAll:
             name:  'Select All'
             combo: 'command+a'
+            accel: 'ctrl+a'
             
         selectNone:
             name:  'Deselect'
             combo: 'command+shift+a'
+            accel: 'ctrl+shift+a'
             
         selectInverted:
             name:  'Invert Selection'
             text:  'selects all lines that have no cursors and no selections'
-            combo: 'command+i'
+            combo: 'command+shift+i'
+            accel: 'ctrl+shift+i'
             
         selectNextHighlight:
             separator: true
             name:  'Select Next Highlight'
             combo: 'command+g'
+            accel: 'ctrl+g'
             
         selectPrevHighlight:
             name:  'Select Previous Highlight'
             combo: 'command+shift+g'
-            
-        selectAllHighlights:
-            name:  'Select All Highlights'
-            combo: 'command+alt+d'
-            
+            accel: 'ctrl+shift+g'
+                        
         selectTextBetweenCursorsOrSurround:
             name: 'Select Between Cursors, Brackets or Quotes'
             text: """
                 select text between even cursors, if at least two cursors exist. 
                 select text between highlighted brackets or quotes otherwise.
                 """
-            combo: 'command+alt+ctrl+b'
+            combo: 'command+alt+b'
+            accel: 'alt+ctrl+b'
 
-        startStickySelection:
+        toggleStickySelection:
             separator: true
             name:  'Toggle Sticky Selection'
             text:  'current selection is not removed when adding new selections'
-            combo: 'command+esc'
+            combo: 'command+`'
+            accel: "ctrl+'"
             
     selectSingleRange: (r, opt = extend:false) ->
         
@@ -70,13 +72,18 @@ module.exports =
     #      000     000     000  000       000  000      000     
     # 0000000      000     000   0000000  000   000     000     
     
-    startStickySelection: () ->
+    toggleStickySelection: ->
+        # log 'toggleStickySelection', @stickySelection
+        if @stickySelection then @endStickySelection()
+        else @startStickySelection()
+    
+    startStickySelection: ->
         
         @stickySelection = true
         post.emit 'sticky', true
         @emit 'selection'
 
-    endStickySelection: () ->
+    endStickySelection: ->
         
         @stickySelection = false
         post.emit 'sticky', false
@@ -174,7 +181,6 @@ module.exports =
         @do.end()
         
     selectAll: ->
-        
         @do.start()
         @do.select @rangesForAllLines()
         @do.end()

@@ -1,27 +1,28 @@
+###
+000   000  00000000  000   000  000      000  000   000  00000000
+0000  000  000       000 0 000  000      000  0000  000  000     
+000 0 000  0000000   000000000  000      000  000 0 000  0000000 
+000  0000  000       000   000  000      000  000  0000  000     
+000   000  00000000  00     00  0000000  000  000   000  00000000
+###
 
-# 000   000  00000000  000   000  000      000  000   000  00000000
-# 0000  000  000       000 0 000  000      000  0000  000  000     
-# 000 0 000  0000000   000000000  000      000  000 0 000  0000000 
-# 000  0000  000       000   000  000      000  000  0000  000     
-# 000   000  00000000  00     00  0000000  000  000   000  00000000
-
-{ log, _
-} = require 'kxk'    
+{ log, _ } = require 'kxk'    
 
 module.exports = 
     
     actions:
-        menu: 'Insert'
+        menu: 'Line'
         
         newline:
             name: 'Insert Newline'
-            combo: 'enter'
+            combos: ['enter']
             
         newlineAtEnd:
             name:  'Insert Newline at End'
-            combo: 'command+enter'
+            combo: 'alt+enter'
 
     newlineAtEnd: () ->
+        
         @moveCursorsToLineBoundary 'right'  
         @newline indent: true
 

@@ -10,10 +10,6 @@ module.exports =
     actions:
         menu: 'Line'
         
-        duplicateLines:
-            name: 'duplicate lines'
-            combos: ['alt+shift+up', 'alt+shift+down']
-            
         duplicateLinesUp:
             name: 'Duplicate Lines Up'
             combo: 'alt+shift+up'
@@ -22,8 +18,11 @@ module.exports =
             name: 'Duplicate Lines Down'
             combo: 'alt+shift+down'
 
-    duplicateLines: (key, info) ->
-        dir = key
+    duplicateLinesUp:   -> @duplicateLines 'up'
+    duplicateLinesDown: -> @duplicateLines 'down'
+            
+    duplicateLines: (dir) ->
+        
         csr = @continuousCursorAndSelectedLineIndexRanges()
         
         return if not csr.length

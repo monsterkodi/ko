@@ -5,10 +5,9 @@
 # 000      000  000  0000  000       000   000  000  000       000         
 # 0000000  000  000   000  00000000  0000000    000  000       000         
 
-{log}    = require 'kxk'
-{expect} = require 'chai'
+{ log, _ } = require 'kxk'
+{ expect } = require 'chai'
 assert   = require 'assert'
-_        = require 'lodash'
 
 lineDiff = require '../tools/linediff'
 

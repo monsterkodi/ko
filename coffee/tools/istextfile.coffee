@@ -5,7 +5,7 @@
 # 000       000     000     000        000 000      000     000       000  000      000       
 # 000  0000000      000     00000000  000   000     000     000       000  0000000  00000000  
 
-{ path, _ } = require 'kxk'
+{ slash, _ } = require 'kxk'
 
 isBinary = require 'isbinaryfile'
 
@@ -26,8 +26,9 @@ textbase =
     '.npmignore':1
 
 isTextFile = (f) -> 
-    return true if path.extname(f) and textext[path.extname f]? 
-    return true if textbase[path.basename(f).toLowerCase()]
+    return true if slash.extname(f) and textext[slash.extname f]? 
+    return true if textbase[slash.basename(f).toLowerCase()]
+    return false if not slash.isFile f
     return not isBinary.sync f
 
 module.exports = isTextFile

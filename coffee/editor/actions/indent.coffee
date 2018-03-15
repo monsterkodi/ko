@@ -12,11 +12,11 @@ module.exports =
         
         indent:
             name:  'Indent'
-            combo: 'command+]'
+            combo: 'CmdOrCtrl+]'
             
         deIndent:
             name:  'Outdent'
-            combo: 'command+['
+            combo: 'CmdOrCtrl+['
             
     indent: ->
         @do.start()

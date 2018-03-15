@@ -6,19 +6,20 @@
 000       000  0000000  00000000        0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 ###
 
-{ packagePath, encodePath, fileName, swapExt, resolve, empty, elem, post, clamp, 
-  process, childp, prefs, path, fs, os, error, log, $ } = require 'kxk'
+{ empty, elem, clamp, drag, post, clamp, childp, prefs, slash, fs, os, error, log, $ } = require 'kxk'
   
 Browser  = require './browser'
+Shelf    = require './shelf'
 dirlist  = require '../tools/dirlist'
 forkfunc = require '../tools/forkfunc'
 
 class FileBrowser extends Browser
     
-    constructor: (@view) ->
+    constructor: (view) ->
                 
-        super @view
+        super view
         @loadID = 0
+        @shelf = new Shelf @
         @name = 'FileBrowser'
         
         post.on 'browserColumnItemsSet', @onColumnItemsSet
@@ -26,6 +27,51 @@ class FileBrowser extends Browser
         post.on 'gitRefChanged',         @updateGitStatus
         post.on 'fileIndexed',           @onFileIndexed
     
+        @shelfResize = elem 'div', class: 'shelfResize'
+        @shelfResize.style.position = 'absolute'
+        @shelfResize.style.top      = '0px'
+        @shelfResize.style.bottom   = '0px'
+        @shelfResize.style.left     = '194px'
+        @shelfResize.style.width    = '6px'
+        @shelfResize.style.cursor   = 'ew-resize'
+        
+        @drag = new drag
+            target:  @shelfResize
+            onMove:  @onShelfDrag
+            
+        @shelfSize = prefs.get 'shelf:size', 200
+        
+    initColumns: ->
+        
+        super()
+                
+        @view.insertBefore @shelf.div, @view.firstChild
+        @view.insertBefore @shelfResize, null
+        
+        @shelf.browserDidInitColumns()        
+        
+        @setShelfSize @shelfSize
+
+    columnAtPos: (pos) ->
+        
+        if column = super pos
+            return column
+                
+        if elem.containsPos @shelf.div, pos
+            return @shelf
+        
+    onShelfDrag: (drag, event) => 
+        
+        shelfSize = clamp 0, 400, drag.pos.x
+        @setShelfSize shelfSize
+        
+    setShelfSize: (@shelfSize) ->
+        
+        prefs.set 'shelf:size', @shelfSize
+        @shelfResize.style.left = "#{@shelfSize}px"
+        @shelf.div.style.width = "#{@shelfSize}px"
+        @cols.style.left = "#{@shelfSize}px"
+        
     # 00000000  000  000      00000000  
     # 000       000  000      000       
     # 000000    000  000      0000000   
@@ -34,8 +80,9 @@ class FileBrowser extends Browser
     
     loadFile: (file, opt = focus:true, column:0) ->
         
-        dir  = packagePath file
-        dir ?= path.dirname file
+        dir  = opt.dir 
+        dir ?= slash.pkg file
+        dir ?= slash.dirname file
         opt.file = file
         @skipJump = opt.dontJump
         @loadDir dir, opt
@@ -62,10 +109,17 @@ class FileBrowser extends Browser
     loadDir: (dir, opt) -> 
         
         opt ?= {}
+        
+        if opt.column > 0 and slash.isRoot(dir) and @columns[opt.column-1].activeRow()?.item.name == '/'
+            @clearColumnsFrom opt.column, pop:true
+            return 
+        
         opt.ignoreHidden ?= prefs.get "browser:ignoreHidden:#{dir}", true
         
         @loadID++
         opt.loadID = @loadID
+        
+        # log 'filebrowser.loadDir', dir, opt
         
         dirlist dir, opt, (err, items) => 
             
@@ -74,21 +128,28 @@ class FileBrowser extends Browser
             
             opt.parent ?=
                 type: 'dir'
-                file: dir
-                name: path.basename dir
+                file: slash.path dir
+                name: slash.basename dir
 
             column = opt.column ? 0
-                
+
+            # log 'filebrowser.loadDir', column, @columns.length
+            
             if column == 0 or @columns[column-1].activeRow()?.item.name == '..'
                 
-                updir = resolve path.join dir, '..'
-                
-                if not (updir == dir == '/')
+                updir = slash.resolve slash.join dir, '..'
+
+                if not (updir == dir == slash.resolve '/')
                     items.unshift 
                         name: '..'
                         type: 'dir'
                         file:  updir
-                        
+                else
+                    items.unshift 
+                        name: '/'
+                        type: 'dir'
+                        file: dir
+                    
             @loadItems items, opt
 
     # 000       0000000    0000000   0000000         000  000000000  00000000  00     00   0000000  
@@ -101,6 +162,7 @@ class FileBrowser extends Browser
 
         if opt?.file
             @navigateTargetFile = opt.file
+            @navigateTargetOpt  = opt
 
         @getGitStatus opt
             
@@ -113,7 +175,8 @@ class FileBrowser extends Browser
     #  0000000   000     000     0000000      000     000   000     000      0000000   0000000   
     
     getGitStatus: (opt) ->
-            
+          
+        # log 'getGitStatus', opt
         file = opt.file ? opt.parent?.file
         return if not file?
         
@@ -123,6 +186,8 @@ class FileBrowser extends Browser
                 log "gitstatus failed for #{file}", err
                 return
                 
+            # log "getGitStatus --------- #{file}", info
+            
             return if empty info
                 
             files = {}
@@ -130,22 +195,23 @@ class FileBrowser extends Browser
                 for file in info[key]
                     files[file] = key
 
-            column = @columns[opt.column]
-            return if not column?
+            @shelf.updateGitFiles files
             
-            rows = column.rows
-            return if empty rows
+            if column = @columns[opt.column]
+                column.updateGitFiles files
             
-            while statusDiv = $('.git', column.div)
-                statusDiv.remove()
-                
-            for row in rows
-                return if row.item.type not in ['dir', 'file']
-                status = files[row.item.file]
-                if status?
-                    icon = {added:'plus', changed:'pencil', 'dirs':'pencil-square-o'}[status]
-                    row.div.appendChild elem 'span', 
-                        class:"git #{status} fa fa-#{icon} extname #{path.extname(row.item.file).slice 1}"
+            # column = @columns[opt.column]
+            # return if not column?
+#             
+            # rows = column.rows
+            # return if empty rows
+#             
+            # for row in rows
+                # $('browserStatusIcon', row.div)?.remove()
+                # return if row.item.type not in ['dir', 'file']
+                # status = files[row.item.file]
+                # if status?
+                    # row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
 
     updateGitStatus: (file) =>
         
@@ -161,8 +227,8 @@ class FileBrowser extends Browser
     # 000  000   000  0000000    00000000  000   000  00000000  0000000    
     
     onFileIndexed: (file) =>
-        
         if file == @activeColumn()?.activeRow()?.item.file
+            log "FileBrowser.onFileIndexed", file, @activeColumn().index+1
             @loadContent @activeColumn().activeRow(), column: @activeColumn().index+1
                 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
@@ -186,9 +252,12 @@ class FileBrowser extends Browser
             
             col = @lastUsedColumn()
             
-            if col.parent.type == 'file'
-                @column(col.index-1)?.focus()
-            else
-                col.focus()
+            if @navigateTargetOpt.focus != false
+                if col.parent.type == 'file'
+                    @column(col.index-1)?.focus()
+                else
+                    col.focus()
+                    
+            delete @navigateTargetOpt
     
 module.exports = FileBrowser

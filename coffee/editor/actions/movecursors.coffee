@@ -5,32 +5,27 @@
 # 000 0 000  000   000     000     000           000       000   000  000   000       000  000   000  000   000       000  
 # 000   000   0000000       0      00000000       0000000   0000000   000   000  0000000    0000000   000   000  0000000   
 
-{ log, _
-} = require 'kxk'
+{ log, _ } = require 'kxk'
 
 module.exports = 
 
     actions:
         menu: 'Cursors'
         
-        setOrMoveCursorsAtBoundary:
-            name:   'set cursors at selections or move to line boundaries'
-            text:   """sets cursors at selection boundaries, if multiple selections exist but only one cursor.
-                otherwise moves cursors to line boundaries."""
-            combos: ['command+left', 'command+right']
-
         moveCursorsAtBoundaryLeft: 
             name: 'Move Cursors to Indent or Start of Line'
             combo: 'command+left'
+            accel: 'ctrl+left'
 
         moveCursorsAtBoundaryRight: 
             name: 'Move Cursors to End of Line'
             combo: 'command+right'
+            accel: 'ctrl+right'
                 
         moveCursorsToWordBoundary:
             name:   'move cursors to word boundaries'
             text:   'moves cursors to word boundaries. extends selections, if shift is pressed.'            
-            combos: ['alt+left', 'alt+right', 'alt+shift+left', 'alt+shift+right']
+            combos: ['alt+shift+left', 'alt+shift+right']
         
         moveCursorsToWordBoundaryLeft:
             separator: true
@@ -44,20 +39,24 @@ module.exports =
         moveCursorsToLineBoundary:
             name:   'move cursors to line boundaries'
             text:   'moves cursors to line boundaries. extends selections, if shift is pressed.'
-            combos: ['command+shift+left', 'command+shift+right', 'ctrl+e', 'ctrl+shift+e', 'ctrl+a', 'ctrl+shift+a']
+            combos: ['home', 'end', 'command+shift+left', 'command+shift+right', 'ctrl+shift+left', 'ctrl+shift+right', 'ctrl+shift+e', 'ctrl+shift+a']
+            accels: ['home', 'end', 'shift+home', 'shift+end', 'ctrl+shift+left', 'ctrl+shift+right']
 
         moveMainCursor:
             name:   'move main cursor'
             text:   """move main cursor independently of other cursors.
                 erases other cursors if shift is pressed. 
                 sets new cursors otherwise."""
-            combos: ['ctrl+up', 'ctrl+down', 'ctrl+left', 'ctrl+right', 
-                'ctrl+shift+up', 'ctrl+shift+down', 'ctrl+shift+left', 'ctrl+shift+right']
+            combos: [ 'ctrl+shift+up', 'ctrl+shift+down', 'ctrl+shift+left', 'ctrl+shift+right', 'ctrl+up', 'ctrl+down', 'ctrl+left', 'ctrl+right']
+            accels: [ 'ctrl+shift+up', 'ctrl+shift+down']
             
         moveCursors:
             name:  'move cursors'
             combos: ['left', 'right', 'up', 'down', 'shift+down', 'shift+right', 'shift+up', 'shift+left']
 
+    moveCursorsAtBoundaryLeft:  -> @setOrMoveCursorsAtBoundary 'left'
+    moveCursorsAtBoundaryRight: -> @setOrMoveCursorsAtBoundary 'right'
+        
     setOrMoveCursorsAtBoundary: (key) ->
         
         if @numSelections() > 1 and @numCursors() == 1
@@ -101,6 +100,10 @@ module.exports =
     # 000   000  000   000  000   000  000   000  
     # 00     00   0000000   000   000  0000000    
     
+    
+    moveCursorsToWordBoundaryLeft:  -> @moveCursorsToWordBoundary 'left'
+    moveCursorsToWordBoundaryRight: -> @moveCursorsToWordBoundary 'right'
+    
     moveCursorsToWordBoundary: (leftOrRight, info = extend:false) ->
         extend = info.extend ? 0 <= info.mod.indexOf 'shift'
         f = switch leftOrRight
@@ -120,8 +123,8 @@ module.exports =
         @do.start()
         extend = info.extend ? 0 <= info.mod.indexOf 'shift'
         func = switch key
-            when 'right', 'e' then (c) => [@do.line(c[1]).length, c[1]]
-            when 'left', 'a'  then (c) => 
+            when 'right', 'e', 'end' then (c) => [@do.line(c[1]).length, c[1]]
+            when 'left', 'a', 'home'  then (c) => 
                 if @do.line(c[1]).slice(0,c[0]).trim().length == 0
                     [0, c[1]]
                 else

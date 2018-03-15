@@ -8,13 +8,13 @@
 { rad2deg, log } = require 'kxk'
 
 Stage  = require '../stage'
-snap   = require './snap.svg'
-vorono = require './voronoinet'
+snap   = require 'snapsvg'
+vorono = require '../../../coffee/stage/voronoi/voronoinet'
 
 class Voronoi extends Stage
     
-    constructor: (@view) ->
-        super @view
+    constructor: (view) ->
+        super view
         
         @s = new snap()
         @view.appendChild @s.node

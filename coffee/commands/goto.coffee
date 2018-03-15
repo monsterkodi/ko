@@ -11,11 +11,11 @@ Command = require '../commandline/command'
 
 class Goto extends Command
 
-    constructor: (@commandline) ->
+    constructor: (commandline) ->
         
-        @shortcuts = ['command+;', 'command+shift+;']
+        super commandline
+        
         @names     = ['goto', 'selecto']
-        super @commandline
 
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -23,8 +23,8 @@ class Goto extends Command
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
         
-    start: (@combo) ->
-        super @combo
+    start: (name) ->
+        super name
         @showList()
         @showItems @listItems() 
         @select 0

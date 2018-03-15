@@ -7,10 +7,11 @@
 
 { elem, log } = require 'kxk'
 Stage = require '../stage'
+THREE = require 'three'
 
 class Three extends Stage
     
-    constructor: (@view) -> super @view
+    constructor: (view) -> super view
     
     start: -> 
         @elem = elem 'div'
@@ -115,7 +116,7 @@ class Three extends Stage
     resized: (w,h) -> 
         @aspect = w/h
         @camera?.aspect = @aspect
-        @camera.updateProjectionMatrix()
+        @camera?.updateProjectionMatrix()
         @renderer?.setSize w,h
 
 module.exports = Three

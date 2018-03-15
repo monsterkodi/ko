@@ -5,8 +5,8 @@
 #    000     000   000  000   000  000  0000       000  000       000   000  000   000  000 0 000
 #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000
 
-{ resolve, unresolve, reversed, fileName, path, str, error, log, _
-} = require 'kxk'
+{ reversed, slash, str, error, log, _ } = require 'kxk'
+
 matchr = require '../../tools/matchr'
 
 class Transform
@@ -14,11 +14,11 @@ class Transform
     @transformNames = [
         'upper', 'lower', 'title', 'case'
         'count', 'add', 'sub'
-        'up', 'down', 'sort'
+        'up', 'down', 'sort', 'uniq'
         'reverse', 
         'resolve', 'unresolve'
-        'dirname', 'basename'
-        'filename', 'extname'
+        'dir', 'base'
+        'file', 'ext'
     ]
 
     constructor: (@editor) ->
@@ -96,6 +96,23 @@ class Transform
         @trans (l) -> reversed l.sort (a,b) -> a.localeCompare b
         'down'
 
+    # 000   000  000   000  000   0000000   
+    # 000   000  0000  000  000  000   000  
+    # 000   000  000 0 000  000  000 00 00  
+    # 000   000  000  0000  000  000 0000   
+    #  0000000   000   000  000   00000 00  
+    
+    uniq: ->
+        @trans (l) ->
+            v = []
+            r = []
+            for a in l
+                r.push if a in v then '' else
+                    v.push a
+                    a
+            r
+        'uniq'
+        
     #  0000000   0000000    0000000  00000000
     # 000       000   000  000       000
     # 000       000000000  0000000   0000000
@@ -135,14 +152,14 @@ class Transform
 
         cwd = process.cwd()
         if @editor.currentFile?
-            process.chdir path.dirname @editor.currentFile
-        @apply (t) -> resolve t
+            process.chdir slash.dirname @editor.currentFile
+        @apply (t) -> slash.resolve t
         process.chdir cwd
         'resolve'
 
     unresolve: ->
 
-        @apply (t) -> unresolve t
+        @apply (t) -> slash.unresolve t
         'unresolve'
 
     # 00000000    0000000   000000000  000   000
@@ -151,25 +168,25 @@ class Transform
     # 000        000   000     000     000   000
     # 000        000   000     000     000   000
 
-    basename: ->
+    base: ->
 
-        @apply (t) -> path.basename t
+        @apply (t) -> slash.base t
         'basename'
 
-    dirname: ->
+    dir: ->
 
-        @apply (t) -> path.dirname t
+        @apply (t) -> slash.dir t
         'dirname'
 
-    extname: ->
+    ext: ->
 
-        @apply (t) -> path.extname t
-        'extname'
+        @apply (t) -> slash.ext t
+        'ext'
 
-    filename: ->
+    file: ->
 
-        @apply (t) -> fileName t
-        'filename'
+        @apply (t) -> slash.file t
+        'file'
 
     #  0000000   00000000   00000000   000      000   000
     # 000   000  000   000  000   000  000       000 000

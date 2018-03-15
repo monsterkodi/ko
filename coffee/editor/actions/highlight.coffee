@@ -5,7 +5,7 @@
 # 000   000  000  000   000  000   000  000      000  000   000  000   000     000     
 # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     
 
-_ = require 'lodash'
+{ empty, log, _ } = require 'kxk'
 
 module.exports = 
 
@@ -15,21 +15,22 @@ module.exports =
         highlightWordAndAddToSelection:
             name:  'Highlight and Select Word'
             text:  'highlights all occurrences of text in selection or word at cursor and selects the first|next highlight.'
-            combo: 'command+d'
+            combo: 'CmdOrCtrl+d'
             
         selectAllWords:
             name:  'Select All Words'
-            combo: 'command+alt+d'
+            combo: 'CmdOrCtrl+alt+d'
+            accel: 'alt+ctrl+d'
             
         removeSelectedHighlight:
             name: 'Remove Highlighted Word from Selection'
             text:  "does the inverse of 'highlight and select' word"
-            combo: 'command+shift+d'
+            combo: 'CmdOrCtrl+shift+d'
             
         highlightTextOfSelectionOrWordAtCursor:
             name:  'Highlight and Select Word'
             text:  'highlights all occurrences of text in selection or word at cursor and selects it. expands to the left if already selected.'
-            combo: 'command+e'
+            combo: 'CmdOrCtrl+e'
 
     # 000000000  00000000  000   000  000000000  
     #    000     000        000 000      000     
@@ -58,6 +59,18 @@ module.exports =
         
     wordHighlights: -> @highlights().filter (h) -> not h[2]?.clss?.startsWith('stringmatch') and not h[2]?.clss?.startsWith('bracketmatch')
 
+    highlightForFind: ->
+        
+        if @numSelections() == 1 and not empty @textInRange(@selection 0).trim()
+            @highlightText @textInRange(@selection 0)
+        else
+            cp = @cursorPos()
+            wordHighlights = @wordHighlights()
+            cursorInWordHighlight = wordHighlights.length #and rangeAtPosInRanges cp, wordHighlights
+            if not cursorInWordHighlight
+                @highlightTextOfSelectionOrWordAtCursor() # this also selects
+        @selectNextHighlight()
+    
     highlightWordAndAddToSelection: -> # command+d
         
         cp = @cursorPos()
@@ -95,7 +108,9 @@ module.exports =
     highlightTextOfSelectionOrWordAtCursor: -> # command+e       
             
         if @numSelections() == 0
-            srange = @rangeForWordAtPos @cursorPos()
+            srange = @rangeForRealWordAtPos @cursorPos()
+            if empty @textInRange(srange).trim()
+                log 'highlightTextOfSelectionOrWordAtCursor empty!'
             @selectSingleRange srange
         
         sel = @selection 0     

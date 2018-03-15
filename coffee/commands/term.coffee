@@ -5,8 +5,7 @@
 #    000     000       000   000  000 0 000
 #    000     00000000  000   000  000   000
 
-{ packagePath, dirExists, reversed, unresolve, resolve, path, fs,
-  post, noon, store, clamp, log, _ } = require 'kxk'
+{ reversed, slash, fs, post, noon, store, clamp, log, _ } = require 'kxk'
   
 Walker   = require '../tools/walker'
 Syntax   = require '../editor/syntax'
@@ -14,15 +13,16 @@ Command  = require '../commandline/command'
 
 class Term extends Command
 
-    constructor: (@commandline) ->
+    constructor: (commandline) ->
+
+        super commandline
 
         post.on 'shellCommandData', @onShellCommandData
         @idCommands = Object.create null
         @commandIDs = Object.create null
-        @shortcuts  = ['command+,', 'command+shift+,']
         @names      = ['term', 'Term']
         @alias      = new store 'alias'
-        super @commandline
+        
         @maxHistory = 99
         @headers    = false
         @autocd     = true
@@ -43,7 +43,7 @@ class Term extends Command
                 cwd = cmdData.data
                 switch @pwdTag
                     when 'autocd'
-                        pkgPath = packagePath window.editor.currentFile
+                        pkgPath = slash.pkg window.editor.currentFile
                         if pkgPath? and not cwd.startsWith pkgPath
                             @execute "cd #{pkgPath}"
                     when 'complete'
@@ -87,7 +87,7 @@ class Term extends Command
             for k,v of process.env
                 if k == dir.slice i+1, i+1+k.length
                     dir = dir.slice(0, i) + v + dir.slice(i+k.length+1)
-        resolve dir
+        slash.resolve dir
 
     resolveDirWord: (dir, word) =>
 
@@ -99,12 +99,12 @@ class Term extends Command
             rest = _.last split
             split.pop()
             start = split.join('/') + '/'
-            if dirExists @resolveDir start
+            if slash.dirExists @resolveDir start
                 dir = start
             else
                 dir = dir + '/' + start
         else
-            if dirExists @resolveDir word
+            if slash.dirExists @resolveDir word
                 dir = word
                 start = word + '/'
                 rest = ''
@@ -124,7 +124,7 @@ class Term extends Command
 
         for f in files
             if rest == '' or f.startsWith rest
-                if dirExists start + f
+                if slash.dirExists start + f
                     list.push start + f + '/'
                 else
                     list.push start + f
@@ -143,7 +143,7 @@ class Term extends Command
             p = split.join(' ') + ' ' if split.length
             items.push p + l
         if _.last(items[0]) != '/'
-            if dirExists @resolveDir _.last items[0].split ' '
+            if slash.dirExists @resolveDir _.last items[0].split ' '
                 items[0] +=  '/'
         @setText items[0]
         if items.length > 1
@@ -178,7 +178,7 @@ class Term extends Command
 
         @idCommands = @getState 'idCommands', Object.create null
         @commandIDs = @getState 'commandIDs', Object.create null
-        super
+        super()
 
     clearHistory: ->
 
@@ -186,7 +186,7 @@ class Term extends Command
         @commandIDs = Object.create null
         @setState 'commandIDs', @commandIDs
         @setState 'idCommands', @idCommands
-        super
+        super()
 
     deleteCommandWithID: (id) ->
 
@@ -294,11 +294,11 @@ class Term extends Command
     #      000     000     000   000  000   000     000
     # 0000000      000     000   000  000   000     000
 
-    start: (@combo) ->
+    start: (name) ->
 
         @getPWD 'autocd' if @autocd
 
-        super @combo
+        super name
         text:   @last()
         select: true
         do:     'show terminal'
@@ -450,11 +450,11 @@ class Term extends Command
                     for file in Object.keys(files).sort()
                         continue if args.length and not filterRegExp(args).test file
                         info = files[file]
-                        pth  = unresolve file
-                        if lastDir != path.dirname pth
-                            lastDir = path.dirname pth
+                        pth  = slash.tilde file
+                        if lastDir != slash.dirname pth
+                            lastDir = slash.dirname pth
                         else
-                            pth = _.padStart('', lastDir.length+1) + path.basename pth
+                            pth = _.padStart('', lastDir.length+1) + slash.basename pth
                         meta =
                             diss: Syntax.dissForTextAndSyntax "◼ #{pth}", 'ko'
                             href: "#{file}:1"
@@ -488,7 +488,7 @@ class Term extends Command
                                 char = func[0]
                                 terminal.queueMeta clss: 'salt', text: char
                                 
-                            classOrFile = info.class? and "#{info.static and '◆' or '●'} #{info.class}" or "◼ #{path.basename info.file}"
+                            classOrFile = info.class? and "#{info.static and '◆' or '●'} #{info.class}" or "◼ #{slash.basename info.file}"
                             
                             if i == 0
                                 diss = Syntax.dissForTextAndSyntax "▸ #{func} #{classOrFile}", 'ko'
@@ -561,7 +561,7 @@ class Term extends Command
                         meta =
                             diss: diss
                             line: info.count
-                            href: "search:#{word}"
+                            href: ">search>#{word}"
                             clss: 'searchResult'
                             click: @onMetaClick
                         terminal.queueMeta meta
