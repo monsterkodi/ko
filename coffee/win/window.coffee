@@ -578,6 +578,8 @@ window.setLastFocus = (name) ->
 
 menuAction = (name) ->
 
+    log 'menuAction ', name
+    
     if 'unhandled' != window.commandline.handleMenuAction name
         return
 
