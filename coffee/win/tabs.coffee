@@ -73,11 +73,12 @@ class Tabs
             
         if tab = @tab event.target
             if event.target.classList.contains 'dot'
-                if @numTabs() == 1
-                    @tabs[0].update file: null
-                    @tabs[0].activate()
-                else
-                    @closeTab tab
+                @onCloseTabOrWindow()
+                # if @numTabs() == 1
+                    # @tabs[0].update file: null
+                    # @tabs[0].activate()
+                # else
+                    # @closeTab tab
             else
                 tab.activate()
         true
