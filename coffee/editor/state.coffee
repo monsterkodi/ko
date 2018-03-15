@@ -27,7 +27,7 @@ class State
     
     # read only:
     
-    text:          -> @lines().join '\n'
+    text: (n='\n') -> @lines().join n
     lines:         -> @s.lines.map (l) -> l.text
     cursors:       -> @s.cursors.asMutable deep: true 
     highlights:    -> @s.highlights.asMutable deep: true 

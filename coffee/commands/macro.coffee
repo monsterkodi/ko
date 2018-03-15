@@ -20,10 +20,9 @@ class Macro extends Command
 
         super commandline
 
-        @macros    = ['clean', 'help', 'dbg', 'class', 'req', 'inv', 'blink', 'color', 'fps', 'test']
+        @macros    = ['clean', 'help', 'dbg', 'class', 'req', 'inv', 'blink', 'color', 'fps', 'test', 'unix']
         @macros    = @macros.concat window.editor.Transform.transformNames
         @names     = ['macro']
-        
 
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000
@@ -289,6 +288,11 @@ class Macro extends Command
                     if line != cleaned
                         editor.do.change li, cleaned
                 editor.do.end()
+                
+            when 'unix'
+                
+                editor.newlineCharacters = '\n'
+                post.emit 'saveFile'
                 
             # 000   000  00000000   0000000   0000000    00000000  00000000   
             # 000   000  000       000   000  000   000  000       000   000  

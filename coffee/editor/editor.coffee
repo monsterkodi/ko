@@ -22,11 +22,11 @@ class Editor extends Buffer
         
         Editor.initActions() if not Editor.actions?
         
-        @indentString    = _.padStart "", 4
-        @stickySelection = false
-        @dbg             = false
-        @syntax          = new Syntax @
-        @do              = new Do @
+        @indentString      = _.padStart "", 4
+        @stickySelection   = false
+        @dbg               = false
+        @syntax            = new Syntax @
+        @do                = new Do @
         @setupFileType()
 
     del: ->
@@ -158,10 +158,20 @@ class Editor extends Buffer
 
         if @syntax.name == 'txt'
             @syntax.name = Syntax.shebang text.slice 0, text.search /\r?\n/
+                
+        lines = text.split /\n/
+
+        @newlineCharacters = '\n'
+        if not empty lines
+            if lines[0].endsWith '\r'
+                lines = text.split /\r?\n/
+                @newlineCharacters = '\r\n'
         
-        rgx = new RegExp '\t', 'g'
-        indent = @indentString
-        @setLines text.split(/\n/).map (l) -> l.replace rgx, indent
+        tabrgx = new RegExp '\t', 'g'
+        indent = @indentString                
+        lines  = lines.map (l) -> l.replace tabrgx, indent
+        
+        @setLines lines
 
     setLines: (lines) ->
         

@@ -1,9 +1,10 @@
-
-#  0000000  000   000  00000000    0000000   0000000   00000000
-# 000       000   000  000   000  000       000   000  000   000
-# 000       000   000  0000000    0000000   000   000  0000000
-# 000       000   000  000   000       000  000   000  000   000
-#  0000000   0000000   000   000  0000000    0000000   000   000
+###
+ 0000000  000   000  00000000    0000000   0000000   00000000
+000       000   000  000   000  000       000   000  000   000
+000       000   000  0000000    0000000   000   000  0000000  
+000       000   000  000   000       000  000   000  000   000
+ 0000000   0000000   000   000  0000000    0000000   000   000
+###
 
 { reversed, stopEvent, first, last, log, _ } = require 'kxk'
 
@@ -97,7 +98,7 @@ module.exports =
 
     cursorMoves: (key, info) ->
         extend = info?.extend ? 0 <= info?.mod.indexOf 'shift'
-        log 'cursorMoves', key, info, extend
+        # log 'cursorMoves', key, info, extend
         
         switch key
             when 'home'      then @singleCursorAtPos [0, 0], extend: extend

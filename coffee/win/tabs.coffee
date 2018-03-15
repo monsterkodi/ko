@@ -56,7 +56,7 @@ class Tabs
         
     onFileSaved: (file, winID) =>
         if winID == window.winID
-            # error "fileSaved from this window? #{file} #{winID}" 
+            error "fileSaved from this window? #{file} #{winID}" 
             return 
         tab = @tab file
         if tab? and tab != @activeTab()

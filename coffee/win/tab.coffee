@@ -93,10 +93,13 @@ class Tab
                         
         @div.innerHTML = ''
         @div.classList.toggle 'dirty', @dirty()
-                        
-        @div.appendChild elem 'span', class:'dot', text:'●'
+                
+        sep = '●'
+        sep = '■' if window.editor.newlineCharacters == '\r\n'
+        @div.appendChild elem 'span', class:'dot', text:sep
         
-        @pkg = elem 'span', class:'pkg', text: @info.pkg and (@info.pkg + " ▸ ") or ''
+        sep = " ▸ "
+        @pkg = elem 'span', class:'pkg', text: @info.pkg and (@info.pkg + sep) or ''
         @div.appendChild @pkg
             
         diss = syntax.dissForTextAndSyntax slash.basename(@file()), 'ko' #, join: true 

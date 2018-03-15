@@ -1,0 +1,6 @@
+this should have
+windows line endings
+
+lets see 
+if we can 
+keep them

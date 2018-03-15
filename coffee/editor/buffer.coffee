@@ -20,6 +20,7 @@ class Buffer extends event
     
     constructor: () ->
         super()
+        @newlineCharacters = '\n'
         @wordRegExp = new RegExp "(\\s+|\\w+|[^\\s])", 'g'
         @setState new State()
 
@@ -206,8 +207,8 @@ class Buffer extends event
     #    000     000        000 000      000   
     #    000     00000000  000   000     000   
 
-    text:            -> @state.text()
-    textInRange: (r) -> @line(r[0]).slice? r[1][0], r[1][1]
+    text:                -> @state.text @newlineCharacters
+    textInRange:   (rg)  -> @line(rg[0]).slice? rg[1][0], rg[1][1]
     textsInRanges: (rgs) -> (@textInRange(r) for r in rgs)
     textInRanges:  (rgs) -> @textsInRanges(rgs).join '\n'
     textOfSelection:     -> @textInRanges @selections()

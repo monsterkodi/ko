@@ -49,7 +49,6 @@ class Build extends Command
         command = command.trim()
         return if not command.length
         if @instance?.name == command and @instance.reset?
-            # log "reset #{command} #{@instance?.name} #{@instance.reset?}", _.isFunction @instance.reset
             @instance.reset()
         else
             if slash.dirExists "#{__dirname}/../stage/#{command}"
