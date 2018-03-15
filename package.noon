@@ -7,14 +7,16 @@ preferGlobal    true
 bin
                 ko  ./bin/ko
 scripts
-                test  mocha -R dot --require coffee-script/register "coffee/test/*.coffee"
+                test    mocha -R dot --require coffeescript/register "coffee/test/*.coffee"
+                build   ./bin/build.sh
+                win     bash ./bin/buildwin.sh
 repository
                 type  git
                 url   git+https://github.com/monsterkodi/ko.git
 keywords
                 mac
                 editor
-                coffee-script
+                coffeescript
                 electron
 license         Unlicense
 author          monsterkodi
@@ -27,51 +29,35 @@ bugs
 dependencies
                 assert          ^1.4.1
                 chai            ^4.1.2
-                chokidar        ^1.7.0
-                chrome-remote-interface  ^0.25.1
-                coffeescript    ^2.2.3
-                colors          ^1.1.2
+                chokidar        ^2.0.2
+                coffeescript    ^2.2.2
                 convert-source-map  ^1.5.1
                 dmg             ^0.1.0
                 download        ^6.2.5
-                entities        ^1.1.1
-                eve             ^0.5.4
                 file-icons-js   ^1.0.3
-                font-awesome    ^4.7.0
-                fs-extra        ^4.0.2
                 fuzzaldrin      ^2.1.0
                 fuzzy           ^0.1.3
                 html-entities   ^1.2.1
                 isbinaryfile    ^3.0.2
-                js-beautify     ^1.7.4
-                karg            >=1.0.10
-                keycode         ^2.1.9
-                kxk             >=0.17.8
-                lodash          ^4.17.4
-                mocha           ^4.0.1
-                nconf           ^0.8.5
-                node-abi        ^2.1.1
-                node-pty        ^0.7.3
-                noon            >=1.1.0
+                js-beautify     ^1.7.5
+                kxk             ^0.42.0
+                mocha           ^5.0.4
+                node-abi        ^2.3.0
+                node-pty        ^0.7.4
+                noon            ^1.1.1
                 opener          ^1.4.3
                 performance-now  ^2.1.0
-                pug             ^2.0.0-rc.4
-                seamless-immutable  ^7.1.2
+                pug             ^2.0.1
+                seamless-immutable  ^7.1.3
+                snapsvg         ^0.5.1
                 sorcery         ^0.10.0
-                source-map      ^0.6.1
+                source-map      ^0.7.2
                 strip-ansi      ^4.0.0
-                textextensions  ^2.1.0
-                three           ^0.87.1
+                textextensions  ^2.2.0
+                three           ^0.90.0
                 traceback       ^0.3.1
                 trash           ^4.3.0
-                underscore.string  ^3.3.4
-                walkdir         0.0.12
-                write-file-atomic  ^2.3.0
-devDependencies
-                devtron         ^1.4.0
-                electron        ^1.6.6
-                electron-packager  =8.6.0
-                electron-rebuild  ^1.5.7
+                unused-filename  ^1.0.0
 coffeelintConfig
                 no_trailing_whitespace
                   level           ignore
@@ -84,3 +70,7 @@ coffeelintConfig
                 indentation
                   value   4
                   level   warn
+devDependencies
+                electron        ^1.8.3
+                electron-packager  ^11.1.0
+                electron-rebuild  ^1.7.3
