@@ -20,7 +20,7 @@ module.exports =
         selectNone:
             name:  'Deselect'
             combo: 'command+shift+a'
-            combo: 'ctrl+shift+a'
+            accel: 'ctrl+shift+a'
             
         selectInverted:
             name:  'Invert Selection'
