@@ -71,7 +71,6 @@ class MapScroll extends events
     # 000   000  00000000  0000000   00000000     000   
     
     reset: =>
-        # log "scroll.reset #{@name}" if @name.startsWith 'editor'
         @emit 'clearLines'
         @init()
 
@@ -124,7 +123,6 @@ class MapScroll extends events
         return if oldTop == @top and oldBot == @bot and @exposeBot >= @bot
                             
         if (@top >= @exposeBot) or (@bot <= @exposeTop) # new range outside, start from scratch
-            # log "#{@name} - range outside - top:#{@top} bot:#{@bot} exposeTop:#{@exposeTop} exposeBot:#{@exposeBot}" if @name.startsWith 'editor'
             @emit 'clearLines'
             @exposeTop = @top
             @exposeBot = @bot

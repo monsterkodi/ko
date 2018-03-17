@@ -302,19 +302,19 @@ class Column
     toggleDotFiles: =>
 
         if @parent.type == 'dir'            
-            prefsKey = "browser:ignoreHidden:#{@parent.file}"
-            if prefs.get prefsKey, true
-                prefs.set prefsKey, false
+            stateKey = "browser|ignoreHidden|#{@parent.file}"
+            if state.get stateKey, true
+                state.set stateKey, false
             else
-                prefs.set prefsKey
+                state.set stateKey
             @browser.loadDir @parent.file, column:@index, focus:true
         @
         
     toggleExtensions: =>
 
-        prefsKey = "browser:hideExtensions"
-        prefs.set prefsKey, not prefs.get prefsKey, false
-        setStyle '.browserRow .extname', 'display', prefs.get(prefsKey) and 'none' or 'initial'
+        stateKey = "browser|hideExtensions"
+        state.set stateKey, not state.get stateKey, false
+        setStyle '.browserRow .extname', 'display', state.get(stateKey) and 'none' or 'initial'
         @
         
     # 000000000  00000000    0000000    0000000  000   000  

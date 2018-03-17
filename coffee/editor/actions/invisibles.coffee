@@ -5,7 +5,7 @@
 # 000  000  0000     000     000       000  000  000   000  000      000            000
 # 000  000   000      0      000  0000000   000  0000000    0000000  00000000  0000000
 
-{ prefs, error, log } = require 'kxk'
+{ state, error, log } = require 'kxk'
    
 class Invisibles
 
@@ -15,7 +15,7 @@ class Invisibles
 
     onFile: (file) =>
 
-        if prefs.get "invisibles:#{file}"
+        if state.get "invisibles|#{file}"
             @show()
         else
             @clear()
@@ -58,12 +58,12 @@ class Invisibles
     
     activate: ->
 
-        prefs.set "invisibles:#{@editor.currentFile ? @editor.name}", true
+        state.set "invisibles:#{@editor.currentFile ? @editor.name}", true
         @show()
         
     deactivate: ->
 
-        prefs.set "invisibles:#{@editor.currentFile}"
+        state.set "invisibles:#{@editor.currentFile}"
         @clear()
 
 
@@ -107,7 +107,7 @@ module.exports =
     toggleInvisibles: ->
 
         return if not @invisibles
-        if prefs.get "invisibles:#{@currentFile ? @name}"
+        if state.get "invisibles|#{@currentFile ? @name}"
             @invisibles.deactivate()
         else
             @invisibles.activate()

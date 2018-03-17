@@ -6,7 +6,7 @@
 000   000  00000000  000   000   0000000 
 ###
 
-{ fileList, prefs, fs, post, slash, os, log } = require 'kxk'
+{ fileList, state, fs, post, slash, os, log } = require 'kxk'
 
 pkg      = require '../../package.json'
 electron = require 'electron'
@@ -22,7 +22,7 @@ class Menu
             'untitled'
     
         recent = []
-        for f in prefs.get 'recentFiles', []
+        for f in state.get 'recentFiles', []
             if fs.existsSync f
                 recent.unshift
                     label: fileLabel f
@@ -34,7 +34,7 @@ class Menu
             recent.push
                 label: 'Clear List'
                 click: (i) ->
-                    prefs.set 'recentFiles', []
+                    state.set 'recentFiles', []
                     Menu.init main
 
         menu = AppMenu.buildFromTemplate [

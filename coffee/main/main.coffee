@@ -6,7 +6,7 @@
 000   000  000   000  000  000   000
 ###
 
-{ fileList, first, colors, childp, karg, about, prefs, store, noon, post, slash, os, fs, str, empty, error, _ } = require 'kxk'
+{ fileList, first, colors, childp, karg, about, prefs, state, store, noon, post, slash, os, fs, str, empty, error, _ } = require 'kxk'
 
 pkg      = require '../../package.json'
 Execute  = require './execute'
@@ -32,8 +32,6 @@ log = ->
     s = (str(s) for s in [].slice.call arguments, 0).join " "
     slog s
 
-# post.on 'slog', (s) -> console.log s
-
 process.env.NODE_ENV = 'production'
 
 #  0000000   00000000    0000000    0000000
@@ -47,10 +45,6 @@ if slash.win() and slash.file(process.argv[0]) == 'ko.exe'
 else
     ignoreArgs=2
 
-# log process.argv.length, process.argv.slice(2).length
-# for i in [0...process.argv.length]
-    # log "arg #{i}", process.argv[i]
-
 args  = karg """
 
 #{pkg.productName}
@@ -59,6 +53,8 @@ args  = karg """
     show      . ? open window on startup  . = true
     prefs     . ? show preferences        . = false
     noprefs   . ? don't load preferences  . = false
+    state     . ? show state              . = false
+    nostate   . ? don't load state        . = false
     verbose   . ? log more                . = false
     DevTools  . ? open developer tools    . = false
     debug     .                             = false
@@ -68,9 +64,6 @@ version  #{pkg.version}
 """, dontExit: true, ignoreArgs:ignoreArgs
 
 app.exit 0 if not args?
-
-# log 'cwd', process.cwd()
-# log 'filelist', args.filelist.length, args.filelist
 
 if process.cwd() == '/'
     process.chdir slash.resolve '~'
@@ -91,6 +84,7 @@ if args.verbose
 # 000        000   000  00000000  000       0000000
 
 prefs.init shortcut: 'CmdOrCtrl+F1'
+state.init()
 alias = new store 'alias'
 
 if args.prefs
@@ -98,7 +92,12 @@ if args.prefs
     log colors.green.bold 'prefs file:', prefs.store.file
     log noon.stringify prefs.store.data, colors:true
 
-mostRecentFile = -> first prefs.get 'recentFiles'
+if args.state
+    log colors.yellow.bold 'state'
+    log colors.green.bold 'state file:', state.store.file
+    log noon.stringify state.store.data, colors:true
+    
+mostRecentFile = -> first state.get 'recentFiles'
 
 # 000   000  000  000   000   0000000
 # 000 0 000  000  0000  000  000
@@ -197,7 +196,7 @@ class Main
             for file in openFiles
                 @createWindow file:file
         else
-            @restoreWindows() if not args.noprefs
+            @restoreWindows() if not args.nostate
 
         if not wins().length
             if args.show
@@ -424,11 +423,9 @@ class Main
     restoreWindows: ->
 
         userData = slash.path app.getPath 'userData'
-        # log 'restoreWindows userData', userData
         fs.ensureDirSync userData
         stashFiles = fileList slash.join(userData, 'old'), matchExt:'noon'
         if not empty stashFiles
-            # log 'restoreWindows stashFiles', stashFiles
             for file in stashFiles
                 @createWindow restore:file
 
@@ -490,13 +487,9 @@ class Main
 
         winLoaded = ->
 
-            log 'createWindow.winLoaded id', win.id
-
             if opt.files?
-                # log 'createWindow.winLoaded loadFiles', opt.files
                 post.toWin win.id, 'loadFiles', opt.files
             else if opt.file?
-                # log 'createWindow.winLoaded loadFile', opt.file
                 post.toWin win.id, 'loadFile', opt.file
             else
                 log 'createWindow.winLoaded no file to open?'
@@ -585,12 +578,14 @@ class Main
                 log 'Main.quit stashSaved', toSave
                 if toSave == 0
                     prefs.save()
+                    state.save()
                     log 'Main.quit exit'
                     app.exit     0
                     process.exit 0
             return
         else
             prefs.save()
+            state.save()
             log 'Main.quit exit'
             app.exit     0
             process.exit 0

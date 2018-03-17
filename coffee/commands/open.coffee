@@ -6,7 +6,7 @@
  0000000   000        00000000  000   000
 ###
 
-{ valid, empty, prefs, clamp, post, slash, fs, os, error, log, _ } = require 'kxk'
+{ valid, empty, clamp, post, slash, fs, os, error, log, _ } = require 'kxk'
   
 profile  = require '../tools/profile'
 Walker   = require '../tools/walker'

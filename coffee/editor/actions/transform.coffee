@@ -20,6 +20,11 @@ class Transform
         'dir', 'base'
         'file', 'ext'
     ]
+    @transformMenus =
+        Case: ['upper', 'lower', 'title', 'case']
+        Calc: ['count', 'add', 'sub']
+        Sort: ['up', 'down', 'sort', 'uniq', 'reverse']
+        Path: [ 'resolve', 'unresolve', 'dir', 'base', 'file', 'ext' ] 
 
     constructor: (@editor) ->
 
@@ -286,5 +291,5 @@ module.exports =
 
     toggleCase:        -> Transform.do @, 'toggleCase'
     reverseSelection:  -> Transform.do @, 'reverse'
-    doTransform: (arg) -> log "#{@name}.doTransform #{arg}"; Transform.do @, arg
+    doTransform: (arg) -> Transform.do @, arg
     Transform:         Transform

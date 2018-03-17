@@ -6,7 +6,7 @@
  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
 ###
 
-{ reversed, clamp, prefs, elem, error, log, _ } = require 'kxk'
+{ reversed, clamp, state, elem, error, log, _ } = require 'kxk'
 
 Syntax      = require '../editor/syntax'
 CommandList = require './commandlist'
@@ -337,15 +337,15 @@ class Command
     setState: (key, value) ->
         return if not @prefsID
         if @prefsID
-            prefs.set "command:#{@prefsID}:#{key}", value
+            state.set "command|#{@prefsID}|#{key}", value
         
     getState: (key, value) ->
         return value if not @prefsID
-        prefs.get "command:#{@prefsID}:#{key}", value
+        state.get "command|#{@prefsID}|#{key}", value
         
     delState: (key) ->
         return if not @prefsID
-        prefs.del "command:#{@prefsID}:#{key}"
+        state.del "command|#{@prefsID}|#{key}"
 
     isActive: -> @commandline.command == @
         

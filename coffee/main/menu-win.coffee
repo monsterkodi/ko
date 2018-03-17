@@ -3,10 +3,10 @@
 000   000  000       0000  000  000   000
 000000000  0000000   000 0 000  000   000
 000 0 000  000       000  0000  000   000
-000   000  00000000  000   000   0000000 
+000   000  00000000  000   000   0000000
 ###
 
-{ fileList, prefs, fs, post, slash, os, log } = require 'kxk'
+{ fileList, state, fs, post, slash, os, log } = require 'kxk'
 
 pkg       = require '../../package.json'
 Transform = require '../editor/actions/transform'
@@ -16,15 +16,15 @@ AppMenu   = electron.Menu
 MenuItem  = electron.MenuItem
 
 class Menu
-    
+
     @init: (main) ->
-        
+
         fileLabel = (f) ->
             return slash.basename(f) + ' - ' + slash.tilde slash.dirname(f) if f?
             'untitled'
 
         recent = []
-        for f in prefs.get 'recentFiles', []
+        for f in state.get 'recentFiles', []
             if fs.existsSync f
                 recent.unshift
                     label: fileLabel f
@@ -36,36 +36,42 @@ class Menu
             recent.push
                 label: 'Clear List'
                 click: (i) ->
-                    prefs.set 'recentFiles', []
+                    state.set 'recentFiles', []
                     Menu.init main
 
         activateMacro = (i,win) -> post.toWin win.id, 'menuAction', 'macro'
         MacroMenu = [ label:'macro', accelerator:'CmdOrCtrl+m', click:activateMacro ]
         for macro in Macro.macroNames
-            onClick = (m) -> (i,win) -> 
+            onClick = (m) -> (i,win) ->
                 post.toWin win.id, 'menuAction', 'doMacro', m
             MacroMenu.push
                 label: macro
                 click: onClick macro
-        
+
         TransformMenu = []
-        for transform in Transform.Transform.transformNames
-            onClick = (t) -> (i,win) -> 
-                post.toWin win.id, 'menuAction', 'doTransform', t
+        for transformMenu, transformList of Transform.Transform.transformMenus
+            transformSubmenu = []
+            for transform in transformList
+                onClick = (t) -> (i,win) ->
+                    post.toWin win.id, 'menuAction', 'doTransform', t
+                transformSubmenu.push
+                    label: transform
+                    click: onClick transform
+
             TransformMenu.push
-                label: transform
-                click: onClick transform
+                label: transformMenu
+                submenu: transformSubmenu
 
         menu = AppMenu.buildFromTemplate [
-            
-            # 000   000   0000000 
+
+            # 000   000   0000000
             # 000  000   000   000
             # 0000000    000   000
             # 000  000   000   000
-            # 000   000   0000000 
-            
+            # 000   000   0000000
+
             label: 'ko'
-            submenu: [     
+            submenu: [
                 label:       "About #{pkg.productName}"
                 accelerator: 'ctrl+shift+/'
                 click:        main.showAbout
@@ -78,11 +84,11 @@ class Menu
             ]
         ,
             # 00000000  000  000      00000000
-            # 000       000  000      000     
-            # 000000    000  000      0000000 
-            # 000       000  000      000     
+            # 000       000  000      000
+            # 000000    000  000      0000000
+            # 000       000  000      000
             # 000       000  0000000  00000000
-            
+
             label: 'File'
             role: 'file'
             submenu: [
@@ -112,7 +118,7 @@ class Menu
                 label:       'Save'
                 accelerator: 'Ctrl+S'
                 click:       (i,win) -> post.toWin win.id, 'saveFile'
-            ,            
+            ,
                 label:       'Save As ...'
                 accelerator: 'Ctrl+Shift+S'
                 click:       (i,win) -> post.toWin win.id, 'saveFileAs'
@@ -134,21 +140,21 @@ class Menu
                 click:       (i,win) -> post.toWin win.id, 'closeTabOrWindow'
             ]
         ,
-            #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    
-            # 000       000   000  000   000  000   000  000   000  0000  000  000   000  
-            # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  
-            # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  
-            #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    
-            
+            #  0000000   0000000   00     00  00     00   0000000   000   000  0000000
+            # 000       000   000  000   000  000   000  000   000  0000  000  000   000
+            # 000       000   000  000000000  000000000  000000000  000 0 000  000   000
+            # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
+            #  0000000   0000000   000   000  000   000  000   000  000   000  0000000
+
             label: 'Command'
             submenu: [
-                
-                # 0000000    00000000    0000000   000   000   0000000  00000000  
-                # 000   000  000   000  000   000  000 0 000  000       000       
-                # 0000000    0000000    000   000  000000000  0000000   0000000   
-                # 000   000  000   000  000   000  000   000       000  000       
-                # 0000000    000   000   0000000   00     00  0000000   00000000  
-                
+
+                # 0000000    00000000    0000000   000   000   0000000  00000000
+                # 000   000  000   000  000   000  000 0 000  000       000
+                # 0000000    0000000    000   000  000000000  0000000   0000000
+                # 000   000  000   000  000   000  000   000       000  000
+                # 0000000    000   000   0000000   00     00  0000000   00000000
+
                 label:      'Browse'
                 submenu:    [
                         label:      'Small'
@@ -168,15 +174,15 @@ class Menu
                         label:      'Add to Shelf'
                         accelerator: 'alt+shift+.'
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'Add to Shelf'
-                    
+
                 ]
             ,
-                #  0000000   00000000   00000000  000   000  
-                # 000   000  000   000  000       0000  000  
-                # 000   000  00000000   0000000   000 0 000  
-                # 000   000  000        000       000  0000  
-                #  0000000   000        00000000  000   000  
-                
+                #  0000000   00000000   00000000  000   000
+                # 000   000  000   000  000       0000  000
+                # 000   000  00000000   0000000   000 0 000
+                # 000   000  000        000       000  0000
+                #  0000000   000        00000000  000   000
+
                 label:      'Open'
                 submenu:    [
                         label:      'In Current Tab'
@@ -192,12 +198,12 @@ class Menu
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'new window'
                 ]
             ,
-                #  0000000  00000000   0000000   00000000    0000000  000   000  
-                # 000       000       000   000  000   000  000       000   000  
-                # 0000000   0000000   000000000  0000000    000       000000000  
-                #      000  000       000   000  000   000  000       000   000  
-                # 0000000   00000000  000   000  000   000   0000000  000   000  
-                
+                #  0000000  00000000   0000000   00000000    0000000  000   000
+                # 000       000       000   000  000   000  000       000   000
+                # 0000000   0000000   000000000  0000000    000       000000000
+                #      000  000       000   000  000   000  000       000   000
+                # 0000000   00000000  000   000  000   000   0000000  000   000
+
                 label:      'Search'
                 submenu:    [
                         label:      'Case Insensitive'
@@ -214,12 +220,12 @@ class Menu
                         click:       (i,win) -> post.toWin win.id, 'menuAction', '/Search/'
                 ]
             ,
-                # 00000000  000  000   000  0000000    
-                # 000       000  0000  000  000   000  
-                # 000000    000  000 0 000  000   000  
-                # 000       000  000  0000  000   000  
-                # 000       000  000   000  0000000    
-                
+                # 00000000  000  000   000  0000000
+                # 000       000  0000  000  000   000
+                # 000000    000  000 0 000  000   000
+                # 000       000  000  0000  000   000
+                # 000       000  000   000  0000000
+
                 label:      'Find'
                 submenu:    [
                         label:      'Case Insensitive'
@@ -242,12 +248,12 @@ class Menu
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'f*nd'
                 ]
             ,
-                #  0000000   0000000   00000000  00000000  00000000  00000000  
-                # 000       000   000  000       000       000       000       
-                # 000       000   000  000000    000000    0000000   0000000   
-                # 000       000   000  000       000       000       000       
-                #  0000000   0000000   000       000       00000000  00000000  
-                
+                #  0000000   0000000   00000000  00000000  00000000  00000000
+                # 000       000   000  000       000       000       000
+                # 000       000   000  000000    000000    0000000   0000000
+                # 000       000   000  000       000       000       000
+                #  0000000   0000000   000       000       00000000  00000000
+
                 label:      'Coffee'
                 submenu:    [
                         label:      'In Window Process'
@@ -259,12 +265,12 @@ class Menu
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'Coffee'
                 ]
             ,
-                # 00     00   0000000    0000000  00000000    0000000   
-                # 000   000  000   000  000       000   000  000   000  
-                # 000000000  000000000  000       0000000    000   000  
-                # 000 0 000  000   000  000       000   000  000   000  
-                # 000   000  000   000   0000000  000   000   0000000   
-                
+                # 00     00   0000000    0000000  00000000    0000000
+                # 000   000  000   000  000       000   000  000   000
+                # 000000000  000000000  000       0000000    000   000
+                # 000 0 000  000   000  000       000   000  000   000
+                # 000   000  000   000   0000000  000   000   0000000
+
                 label:      'Macro'
                 submenu:    MacroMenu
             ,
@@ -278,14 +284,14 @@ class Menu
                 label:      'Build'
                 accelerator: 'Ctrl+b'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'build'
-            ]   
+            ]
         ,
-            # 000   000  000  00000000  000   000  
-            # 000   000  000  000       000 0 000  
-            #  000 000   000  0000000   000000000  
-            #    000     000  000       000   000  
-            #     0      000  00000000  00     00  
-            
+            # 000   000  000  00000000  000   000
+            # 000   000  000  000       000 0 000
+            #  000 000   000  0000000   000000000
+            #    000     000  000       000   000
+            #     0      000  00000000  00     00
+
             label: 'View'
             submenu: [
                 label:      'Navigate Backward'
@@ -311,7 +317,7 @@ class Menu
                 label:       'Activate Next Tab'
                 accelerator: 'ctrl+alt+shift+right'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'Activate Next Tab'
-            , 
+            ,
                 label:       'Activate Previous Tab'
                 accelerator: 'ctrl+alt+shift+left'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'Activate Previous Tab'
@@ -321,7 +327,7 @@ class Menu
                 label:       'Move Tab Right'
                 accelerator: 'ctrl+alt+shift+.'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'Move Tab Right'
-            , 
+            ,
                 label:       'Move Tab Left'
                 accelerator: 'Ctrl+alt+shift+,'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'Move Tab Left'
@@ -349,7 +355,7 @@ class Menu
             # 000000000  000  000 0 000  000   000  000   000  000000000
             # 000   000  000  000  0000  000   000  000   000  000   000
             # 00     00  000  000   000  0000000     0000000   00     00
-            
+
             label: 'Window'
             submenu: [
                 label:       'Toggle Scheme'
@@ -357,7 +363,7 @@ class Menu
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'Toggle Scheme'
             ,
                 type: 'separator'
-            ,                            
+            ,
                 label:       'Minimize'
                 accelerator: 'Ctrl+Alt+M'
                 click:       (i,win) -> win?.minimize()
@@ -371,7 +377,7 @@ class Menu
                 label:       'Arrange'
                 accelerator: 'Ctrl+Alt+A'
                 click:       main.arrangeWindows
-            ,                            
+            ,
                 type: 'separator'
             ,
                 label:       'Open Window List'
@@ -383,30 +389,30 @@ class Menu
                 click:       (i,win) -> main.activateNextWindow win
             ,
                 type: 'separator'
-            ,   
+            ,
                 label:       'Reload Window'
                 accelerator: 'Ctrl+Alt+L'
                 click:       (i,win) -> post.toWin win.id, 'reloadWin'
-            ,                
+            ,
                 label:       'Toggle FullScreen'
                 accelerator: 'Ctrl+Alt+F'
                 click:       (i,win) -> win?.setFullScreen !win.isFullScreen()
-            ,                
+            ,
                 label:       'Open DevTools'
                 accelerator: 'Ctrl+Alt+I'
-                click:       (i,win) -> win?.webContents.openDevTools()                
+                click:       (i,win) -> win?.webContents.openDevTools()
             ]
         ]
 
-        # 00000000  0000000    000  000000000  
-        # 000       000   000  000     000     
-        # 0000000   000   000  000     000     
-        # 000       000   000  000     000     
-        # 00000000  0000000    000     000     
-        
-        submenu = 
+        # 00000000  0000000    000  000000000
+        # 000       000   000  000     000
+        # 0000000   000   000  000     000
+        # 000       000   000  000     000
+        # 00000000  0000000    000     000
+
+        submenu =
             Misc: new AppMenu
-            
+
         actionFiles = fileList slash.join __dirname, '../editor/actions'
         # log 'actionFiles:', actionFiles
         for actionFile in actionFiles
@@ -415,13 +421,13 @@ class Menu
             for key,value of actions
                 menuName = 'Misc'
                 if key == 'actions'
-                    if value['menu']? 
+                    if value['menu']?
                         menuName = value['menu']
                         submenu[menuName] ?= new AppMenu
                     for k,v of value
                         if v.name and v.combo
                             menuAction = (c) -> (i,win) -> post.toWin win.id, 'menuAction', c
-                            item = new MenuItem 
+                            item = new MenuItem
                                 label:       v.name
                                 accelerator: v.accel ? v.combo
                                 click: menuAction v.name
@@ -431,38 +437,38 @@ class Menu
                                 submenu[v.menu ? menuName].append new MenuItem type: 'separator'
                             submenu[v.menu ? menuName].append item
                     submenu[menuName].append new MenuItem type: 'separator'
-        
+
         editMenu = AppMenu.buildFromTemplate [
-            label: 'Undo', 
+            label: 'Undo',
             click: (i,win) -> post.toWin win.id, 'menuAction', 'Undo'
             accelerator: 'cmdorctrl+z'
         ,
-            label: 'Redo', 
+            label: 'Redo',
             click: (i,win) -> post.toWin win.id, 'menuAction', 'Redo'
             accelerator: 'cmdorctrl+shift+z'
         ,
             type: 'separator'
         ,
-            label: 'Cut', 
+            label: 'Cut',
             click: (i,win) -> post.toWin win.id, 'menuAction', 'Cut'
             accelerator: 'cmdorctrl+x'
         ,
-            label: 'Copy', 
+            label: 'Copy',
             click: (i,win) -> post.toWin win.id, 'menuAction', 'Copy'
             accelerator: 'cmdorctrl+c'
         ,
-            label: 'Paste', 
+            label: 'Paste',
             click: (i,win) -> post.toWin win.id, 'menuAction', 'Paste'
             accelerator: 'cmdorctrl+v'
         ,
             type: 'separator'
         ]
-        
+
         for k,v of submenu
             editMenu.append new MenuItem label: k, submenu: v
-        
+
         menu.insert 2, new MenuItem label: 'Edit', submenu: editMenu
-                
+
         AppMenu.setApplicationMenu menu
-        
+
 module.exports = Menu

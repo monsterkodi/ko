@@ -5,7 +5,7 @@
 #      000  000   000  000       000      000     
 # 0000000   000   000  00000000  0000000  000     
 
-{ stopEvent, keyinfo, slash, prefs, post, elem, clamp, empty, first, last, error, log, $, _ } = require 'kxk'
+{ stopEvent, keyinfo, slash, state, post, elem, clamp, empty, first, last, error, log, $, _ } = require 'kxk'
 
 Row        = require './row'
 Scroller   = require './scroller'
@@ -85,7 +85,7 @@ class Shelf extends Column
         return if @didInit
         @didInit = true
         
-        items = prefs.get "shelf:items"
+        items = state.get "shelf|items"
         if not empty items
             @setItems items, save:false
         
@@ -102,7 +102,7 @@ class Shelf extends Column
     # 000     000     000       000 0 000       000  
     # 000     000     00000000  000   000  0000000   
 
-    savePrefs: -> prefs.set "shelf:items", @items
+    savePrefs: -> state.set "shelf|items", @items
     itemPaths: -> @rows.map (r) -> r.path()
     
     setItems: (@items, opt) ->
