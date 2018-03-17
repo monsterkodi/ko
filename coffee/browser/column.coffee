@@ -346,6 +346,7 @@ class Column
     #  0000000   000     000     
     
     updateGitFiles: (files) ->
+        
         for row in @rows
             # $('.browserStatusIcon', row.div)?.remove()
             return if row.item.type not in ['dir', 'file']
@@ -353,10 +354,16 @@ class Column
             if status?
                 $('.browserStatusIcon', row.div)?.remove()
                 row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
-            else if @index < 0 # shelf
+            else if row.item.type == 'dir'
+                    for file, status of files
+                        if row.item.name != '..' and file.startsWith row.item.file
+                            $('.browserStatusIcon', row.div)?.remove()
+                            row.div.appendChild elem 'span', class:"git-dirs-icon browserStatusIcon"
+                            break
+                    
+            else if @index < 0 # shelf - is this still needed?
                 for file, status of files
                     if file.startsWith row.item.file
-                        status = 'dirs' if row.item.type == 'dir'
                         $('.browserStatusIcon', row.div)?.remove()
                         row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
                         break

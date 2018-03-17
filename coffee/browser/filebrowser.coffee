@@ -119,8 +119,6 @@ class FileBrowser extends Browser
         @loadID++
         opt.loadID = @loadID
         
-        # log 'filebrowser.loadDir', dir, opt
-        
         dirlist dir, opt, (err, items) => 
             
             return if opt.loadID != @loadID
@@ -133,8 +131,6 @@ class FileBrowser extends Browser
 
             column = opt.column ? 0
 
-            # log 'filebrowser.loadDir', column, @columns.length
-            
             if column == 0 or @columns[column-1].activeRow()?.item.name == '..'
                 
                 updir = slash.resolve slash.join dir, '..'
@@ -176,7 +172,6 @@ class FileBrowser extends Browser
     
     getGitStatus: (opt) ->
           
-        # log 'getGitStatus', opt
         file = opt.file ? opt.parent?.file
         return if not file?
         
@@ -186,7 +181,6 @@ class FileBrowser extends Browser
                 log "gitstatus failed for #{file}", err
                 return
                 
-            # log "getGitStatus --------- #{file}", info
             
             return if empty info
                 
@@ -197,28 +191,14 @@ class FileBrowser extends Browser
 
             @shelf.updateGitFiles files
             
-            if column = @columns[opt.column]
-                column.updateGitFiles files
+            for c in [0..@lastUsedColumn().index]
+                if column = @columns[c]
+                    column.updateGitFiles files
             
-            # column = @columns[opt.column]
-            # return if not column?
-#             
-            # rows = column.rows
-            # return if empty rows
-#             
-            # for row in rows
-                # $('browserStatusIcon', row.div)?.remove()
-                # return if row.item.type not in ['dir', 'file']
-                # status = files[row.item.file]
-                # if status?
-                    # row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
-
     updateGitStatus: (file) =>
-        
-        if lastUsed = @lastUsedColumn()
-            for c in [0..lastUsed.index]
-                @getGitStatus column:c, file:file
-
+        log 'updateGitStatus', file, @lastUsedColumn().index
+        for c in [0..@lastUsedColumn().index]
+            @getGitStatus column:c, file:file
 
     # 000  000   000  0000000    00000000  000   000  00000000  0000000    
     # 000  0000  000  000   000  000        000 000   000       000   000  
