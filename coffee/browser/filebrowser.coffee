@@ -78,8 +78,10 @@ class FileBrowser extends Browser
     # 000       000  000      000       
     # 000       000  0000000  00000000  
     
-    loadFile: (file, opt = focus:true, column:0) ->
+    loadFile: (file, opt={}) ->
         
+        opt.focus ?= true
+        opt.column ?= 0
         dir  = opt.dir 
         dir ?= slash.pkg file
         dir ?= slash.dirname file
@@ -196,7 +198,7 @@ class FileBrowser extends Browser
                     column.updateGitFiles files
             
     updateGitStatus: (file) =>
-        log 'updateGitStatus', file, @lastUsedColumn().index
+        # log 'updateGitStatus', file, @lastUsedColumn().index
         for c in [0..@lastUsedColumn().index]
             @getGitStatus column:c, file:file
 

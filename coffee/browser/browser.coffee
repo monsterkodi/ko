@@ -96,7 +96,7 @@ class Browser extends Stage
             @columns[index].focus().activeRow().activate()
         @
 
-    navigatePath: (pth) ->
+    navigatePath: (pth) -> # unused?
         
         if _.isString pth
             pth = pth.split ':'
@@ -250,6 +250,8 @@ class Browser extends Stage
         items = []
         file  = item.file
         name  = slash.base file
+        
+        # log 'loadSourceItem', item
         
         files = post.get 'indexer', 'files', file
 

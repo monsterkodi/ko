@@ -392,13 +392,17 @@ class FileEditor extends TextEditor
             absPos = pos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
         
         opt = items: [
-            text:   'Maximize'
-            combo:  'ctrl+shift+y' 
-            cb:     -> window.split.maximizeEditor()
-        ,
             text:   'Browse'
             combo:  'ctrl+.' 
             cb:     -> window.commandline.startCommand 'browse'
+        ,
+            text:   'Jump To'
+            combo:  'ctrl+return'
+            cb:     -> window.editor.jumpToWordAtPos()
+        ,
+            text:   'Maximize'
+            combo:  'ctrl+shift+y' 
+            cb:     -> window.split.maximizeEditor()
         ,
             text:   'Log View'
             combo:  'ctrl+alt+k' 

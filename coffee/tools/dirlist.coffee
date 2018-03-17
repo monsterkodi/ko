@@ -80,7 +80,7 @@ dirList = (dirPath, opt, cb) ->
         walker.on 'file',      onFile
         walker.on 'end',         -> cb null, dirs.sort(fileSort).concat files.sort(fileSort)
         walker.on 'error', (err) -> cb err
-        
+        walker
     catch err
         cb err
 

@@ -193,7 +193,7 @@ class Commandline extends TextEditor
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
 
     execute: -> @results @command?.execute @line 0
-
+    
     # 00000000   00000000   0000000  000   000  000      000000000   0000000
     # 000   000  000       000       000   000  000         000     000
     # 0000000    0000000   0000000   000   000  000         000     0000000
@@ -325,8 +325,8 @@ class Commandline extends TextEditor
             when 'enter'                then return @execute()
             when 'command+enter'        then return @execute() + window.split.do "focus #{@command?.focus}"
             when 'command+shift+enter'  then return @focusTerminal()
-            when 'up'                   then return @setAndSelectText @command?.prev()
-            when 'down'                 then return @setAndSelectText @command?.next()
+            when 'up'                   then return @command?.selectListItem 'up'
+            when 'down'                 then return @command?.selectListItem 'down'
             when 'esc'                  then return @cancel()
             when 'command+k'            then return @clear()
             when 'shift+tab'            then return
@@ -336,15 +336,7 @@ class Commandline extends TextEditor
             when 'ctrl+up'              then return split.do 'enlarge editor by 20'
             when 'alt+down'             then return split.do 'reduce editor'
             when 'ctrl+down'            then return split.do 'reduce editor by 20'
-            when 'right', 'tab'
-                if @isCursorAtEndOfLine()
-                    if @command?.complete()
-                        return
-                    if @numSelections()
-                        @select []
-                    return
-                else if combo == 'tab'
-                    return
+            when 'right', 'tab'         then return if @command?.onTabCompletion combo
 
         return super mod, key, combo, char, event
 

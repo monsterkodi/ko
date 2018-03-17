@@ -21,9 +21,10 @@ class CommandList extends TextEditor
             lineHeight: 1.4
             fontSize:   19
 
-        @maxLines        = 17
-        @metaQueue       = []
-        @syntaxName      = opt.syntax ? 'ko'
+        @items      = []
+        @maxLines   = 17
+        @metaQueue  = []
+        @syntaxName = opt.syntax ? 'ko'
 
         @numbers.elem.style.fontSize = "19px"
 
@@ -41,13 +42,16 @@ class CommandList extends TextEditor
         viewHeight = @size.lineHeight * Math.min @maxLines, items.length
         @view.style.height = "#{viewHeight}px"
         if viewHeight != @scroll.viewHeight
-            @log 'addItems', viewHeight
+            # @log 'addItems', viewHeight
             @resized()
 
         for item in items
             continue if not item?
             text = (item.text ? item).trim?()
             continue if not text?.length
+            
+            @items.push item
+            
             rngs = item.rngs ? []
 
             if item.clss?
@@ -124,6 +128,7 @@ class CommandList extends TextEditor
 
     clear: ->
         
+        @items = []
         @meta.clear()
         super()
 

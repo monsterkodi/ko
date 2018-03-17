@@ -13,7 +13,6 @@ Icon?
 *.html
 *.dmg
 npm-debug.log
-yarn.lock
 ./md/test.md
 bin/github-release
 package-lock.json

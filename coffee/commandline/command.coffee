@@ -72,6 +72,7 @@ class Command
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000  
     
     changed: (command) ->
+        
         return if not @commandList?
         
         command = command.trim()
@@ -141,6 +142,8 @@ class Command
     
     listClick: (index) =>
         
+        log 'command.listClick', index, @commandList.line index 
+        log 'command.listClick', index, @commandList.items[index]
         @selected = index
         @execute @commandList.line index 
     
@@ -171,7 +174,7 @@ class Command
     # 0000000   00000000  0000000  00000000   0000000     000   
         
     select: (i) -> 
-        
+        # log 'select', i
         @selected = clamp -1, @commandList?.numLines()-1, i
         if @selected >= 0
             @commandList?.selectSingleRange @commandList.rangeForLineAtIndex @selected
@@ -179,6 +182,12 @@ class Command
         else
             @commandList?.singleCursorAtPos [0,0] 
                 
+    selectListItem: (dir) ->
+        
+        switch dir
+            when 'up'   then @setAndSelectText @prev()
+            when 'down' then @setAndSelectText @next()
+            
     # 00000000   00000000   00000000  000   000
     # 000   000  000   000  000       000   000
     # 00000000   0000000    0000000    000 000 
@@ -186,7 +195,6 @@ class Command
     # 000        000   000  00000000      0    
             
     prev: -> 
-        
         if @commandList?
             @select clamp -1, @commandList.numLines()-1, @selected-1
             if @selected < 0
@@ -208,7 +216,6 @@ class Command
     # 000   000  00000000  000   000     000   
     
     next: -> 
-        
         if not @commandList? and @listItems().length
             @showItems @listItems() 
             @select -1
@@ -362,8 +369,17 @@ class Command
         switch combo
             when 'page up', 'page down'
                 if @commandList?
-                    log 'dasasasdasfdwqerwqrq r-qowopgf ias0-gia-0i -'
                     return @select clamp 0, @commandList.numLines(), @selected+@commandList.maxLines*(combo=='page up' and -1 or 1)
         'unhandled'
 
+    onTabCompletion: (combo) ->
+        
+        if @isCursorAtEndOfLine()
+            @complete()
+            true
+        else if combo == 'tab' 
+            true
+        else
+            false
+        
 module.exports = Command

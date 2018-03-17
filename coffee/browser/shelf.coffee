@@ -45,7 +45,7 @@ class Shelf extends Column
         item = row.item
         
         $('.hover')?.classList.remove 'hover'
-        row.setActive emit:false
+        row.setActive emit:true
         
         switch item.type
             when 'dir'   then @browser.loadDir item.file, column: 0, parent: item
@@ -55,6 +55,7 @@ class Shelf extends Column
                 else
                     post.emit 'jumpToFile', file:item.file
             else
+                @browser.loadSourceItem item, column: 0
                 if item.file
                     post.emit 'jumpToFile', file:item.file, line:item.line, col:item.column
         

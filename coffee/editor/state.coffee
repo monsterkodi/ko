@@ -39,9 +39,9 @@ class State
             console.log 'dafuk?'
             return ''
         @s.lines[i].text
-    cursor:    (i) -> @s.cursors[i]   .asMutable deep: true 
-    selection: (i) -> @s.selections[i].asMutable deep: true 
-    highlight: (i) -> @s.highlights[i].asMutable deep: true 
+    cursor:    (i) -> @s.cursors[i]?.asMutable deep: true 
+    selection: (i) -> @s.selections[i]?.asMutable deep: true 
+    highlight: (i) -> @s.highlights[i]?.asMutable deep: true 
         
     numLines:      -> @s.lines.length
     numCursors:    -> @s.cursors.length
