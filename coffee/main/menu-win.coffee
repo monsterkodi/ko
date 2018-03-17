@@ -6,7 +6,7 @@
 000   000  00000000  000   000   0000000
 ###
 
-{ fileList, state, fs, post, slash, os, log } = require 'kxk'
+{ fileList, state, prefs, fs, post, slash, os, log } = require 'kxk'
 
 pkg       = require '../../package.json'
 Transform = require '../editor/actions/transform'
@@ -75,6 +75,12 @@ class Menu
                 label:       "About #{pkg.productName}"
                 accelerator: 'ctrl+shift+/'
                 click:        main.showAbout
+            ,
+                type: 'separator'
+            ,
+                label:       'Preferences'
+                accelerator: 'CmdOrCtrl+,'
+                click:       (i,win) -> post.toWin win.id, 'loadFiles', [prefs.store.file], newTab:true
             ,
                 type: 'separator'
             ,

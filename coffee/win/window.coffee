@@ -114,7 +114,7 @@ post.on 'saveStash',         -> saveStash()
 post.on 'openFile',   (opt)  -> openFile  opt
 post.on 'reloadTab', (file)  -> reloadTab file
 post.on 'loadFile',  (file)  -> loadFile  file
-post.on 'loadFiles', (files) -> openFiles files
+post.on 'loadFiles', (files, opt) -> openFiles files, opt
 post.on 'menuAction', (action, args) -> menuAction action, args
 post.on 'editorFocus', (editor) ->
     window.setLastFocus editor.name
@@ -529,14 +529,12 @@ resetFontSize = ->
 
 addToShelf = ->
     
-    log 'addToShelf', window.lastFocus
     fileBrowser = commandline.commands.browse.browser
     return if window.lastFocus == 'shelf'
     if window.lastFocus.startsWith fileBrowser.name
         path = fileBrowser.columnWithName(window.lastFocus).activePath()
     else
         path = editor.currentFile
-    log 'emit addToShelf', path
     post.emit 'addToShelf', path
 
 # 0000000   0000000    0000000   00     00
@@ -649,30 +647,22 @@ handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
     return stopEvent(event) if 'unhandled' != window.titlebar   .globalModKeyComboEvent mod, key, combo, event
     return stopEvent(event) if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
 
-    # log 'handleModKeyComboCharEvent2', 'mod', mod, 'key', key, 'combo', combo, 'char', char
-
     for i in [1..9]
         if combo is "alt+#{i}"
             return stopEvent event, post.toMain 'activateWindow', i
 
     switch combo
-        # when 'command+alt+i', 'ctrl+alt+i' then return stopEvent event, win.webContents.toggleDevTools()
-        # when 'ctrl+w'             then return stopEvent event, loadFile()
         # when 'f3'                 then return stopEvent event, screenShot()
         when 'command+alt+k', 'alt+ctrl+k' then return stopEvent event, split.toggleLog()
         when 'alt+k'
-            log 'focusEditor', window.focusEditor.name
             if window.focusEditor == window.editor then window.logview.clear() else window.focusEditor.clear()
             return stopEvent event
-        # when 'alt+ctrl+left'      then return stopEvent event, post.toMain 'activatePrevWindow', winID
-        # when 'alt+ctrl+right'     then return stopEvent event, post.toMain 'activateNextWindow', winID
-        # when 'command+alt+shift+k', 'alt+ctrl+shift+k' then return stopEvent event, split.showOrClearLog()
         when 'command+shift+='    then return stopEvent event, @changeZoom +1
         when 'command+shift+-'    then return stopEvent event, @changeZoom -1
         when 'command+shift+0'    then return stopEvent event, @resetZoom()
         when 'command+alt+y'      then return stopEvent event, split.do 'minimize editor'
 
-    # log 'handleModKeyComboCharEvent3', mod, key, combo, char
+    # log 'handleModKeyComboCharEvent2', mod, key, combo, char
 
 document.addEventListener 'keydown', onKeyDown
 
