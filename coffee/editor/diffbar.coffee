@@ -196,7 +196,7 @@ class Diffbar
         if @editor.currentFile
 
             @changes = file:@editor.currentFile
-            
+
             forkfunc '../tools/gitdiff', @editor.currentFile, (err, changes) =>
                 
                 if not empty err
@@ -210,12 +210,12 @@ class Diffbar
                     
                 @updateMetas()
                 @updateScroll()
-                @editor.emit 'diffbarUpdated', @changes
+                @editor.emit 'diffbarUpdated', @changes # only used in tests
         else   
             @changes = null
             @updateMetas()
             @updateScroll()
-            @editor.emit 'diffbarUpdated', @changes
+            @editor.emit 'diffbarUpdated', @changes # only used in tests
             
     #  0000000   0000000  00000000    0000000   000      000      
     # 000       000       000   000  000   000  000      000      
@@ -226,8 +226,7 @@ class Diffbar
     updateScroll: =>
         
         w  = 2
-        # h  = Math.min @editor.scroll.fullHeight, @editor.view.clientHeight
-        h  = @editor.scroll.fullHeight
+        h  = @editor.view.clientHeight
         lh = h / @editor.numLines()
 
         ctx = @elem.getContext '2d'
@@ -237,7 +236,7 @@ class Diffbar
         alpha = (o) -> 0.5 + Math.max 0, (16-o*lh)*(0.5/16)
 
         if @changes
-
+            
             for meta in @editor.meta.metas
                 
                 continue if not meta?[2]?.git?
