@@ -180,7 +180,7 @@ winMain = ->
             post.toOtherWins 'fileLineChanges', editor.currentFile, changeInfo.changes
             navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
 
-    s = window.stash.get 'fontSize'
+    s = window.stash.get 'fontSize', prefs.get 'editorFontSize', 18
     editor.setFontSize s if s
 
     if window.stash.get 'centerText'
@@ -501,13 +501,16 @@ toggleCenterText = ->
 # 000        0000000   000   000     000        0000000   000  0000000  00000000
 
 setFontSize = (s) ->
-
+        
+    s = prefs.get('editorFontSize', 18) if not _.isFinite s
     s = clamp 8, 100, s
+
     window.stash.set "fontSize", s
     editor.setFontSize s
     loadFile editor.currentFile, reload:true if editor.currentFile?
 
 changeFontSize = (d) ->
+    
     if      editor.size.fontSize >= 30
         f = 4
     else if editor.size.fontSize >= 50
@@ -519,10 +522,13 @@ changeFontSize = (d) ->
     setFontSize editor.size.fontSize + f*d
 
 resetFontSize = ->
-    window.stash.set 'fontSize'
-    setFontSize editor.fontSizeDefault
+    
+    defaultFontSize = prefs.get 'editorFontSize', 18
+    window.stash.set 'fontSize', defaultFontSize
+    setFontSize defaultFontSize
 
 addToShelf = ->
+    
     log 'addToShelf', window.lastFocus
     fileBrowser = commandline.commands.browse.browser
     return if window.lastFocus == 'shelf'
