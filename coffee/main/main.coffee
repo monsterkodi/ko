@@ -6,7 +6,7 @@
 000   000  000   000  000  000   000
 ###
 
-{ fileList, colors, childp, karg, about, prefs, store, noon, post, slash, os, fs, str, empty, error, _ } = require 'kxk'
+{ fileList, first, colors, childp, karg, about, prefs, store, noon, post, slash, os, fs, str, empty, error, _ } = require 'kxk'
 
 pkg      = require '../../package.json'
 Execute  = require './execute'
@@ -74,7 +74,7 @@ app.exit 0 if not args?
 
 if process.cwd() == '/'
     process.chdir slash.resolve '~'
-while args.filelist.length and slash.dirExists _.first args.filelist
+while args.filelist.length and slash.dirExists first args.filelist
     process.chdir args.filelist.shift()
 
 if args.verbose
@@ -98,7 +98,7 @@ if args.prefs
     log colors.green.bold 'prefs file:', prefs.store.file
     log noon.stringify prefs.store.data, colors:true
 
-mostRecentFile = -> _.first prefs.get 'recentFiles'
+mostRecentFile = -> first prefs.get 'recentFiles'
 
 # 000   000  000  000   000   0000000
 # 000 0 000  000  0000  000  000
@@ -464,7 +464,7 @@ class Main
             hasShadow:        true
             backgroundColor:  scheme == 'bright' and "#fff" or '#000'
             titleBarStyle:    'hidden'
-            autoHideMenuBar:  true
+            autoHideMenuBar:  prefs.get 'autoHideMenuBar', true
 
         if os.platform() == 'win32'
             cfg.icon = slash.path __dirname + '/../img/ko.ico'

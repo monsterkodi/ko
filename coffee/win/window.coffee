@@ -6,7 +6,7 @@
 00     00  000  000   000  0000000     0000000   00     00
 ###
 
-{ stopEvent, fileList, keyinfo, atomic, prefs, stash, 
+{ stopEvent, fileList, keyinfo, atomic, prefs, stash, first, reversed,
   drag, noon, post, slash, clamp, pos, str, sw, sh, os, fs, log, error, _ } = require 'kxk' 
 
 Split       = require './split'
@@ -68,16 +68,17 @@ post.setMaxListeners 20
 addToRecent = (file) ->
 
     recent = prefs.get 'recentFiles', []
+    return if file == first recent
     _.pull recent, file
     recent.unshift file
     while recent.length > prefs.get 'recentFilesLength', 20
         recent.pop()
+
     prefs.set 'recentFiles', recent
-    commandline.commands.open.setHistory recent.reverse()
+    commandline.commands.open.setHistory reversed recent
 
 saveStash = ->
 
-    log 'window.saveStash'
     post.emit 'stash'
     editor.saveScrollCursorsAndSelections()
     window.stash.save()
@@ -112,7 +113,7 @@ post.on 'openFile',   (opt)  -> openFile  opt
 post.on 'reloadTab', (file)  -> reloadTab file
 post.on 'loadFile',  (file)  -> loadFile  file
 post.on 'loadFiles', (files) -> openFiles files
-post.on 'menuAction', (action) -> menuAction action
+post.on 'menuAction', (action, args) -> menuAction action, args
 post.on 'editorFocus', (editor) ->
     window.setLastFocus editor.name
     window.focusEditor = editor
@@ -576,45 +577,47 @@ window.setLastFocus = (name) ->
 # 000 0 000  000       000  0000  000   000     000   000  000          000     000  000   000  000  0000  
 # 000   000  00000000  000   000   0000000      000   000   0000000     000     000   0000000   000   000  
 
-menuAction = (name) ->
+menuAction = (name, args) ->
 
-    log 'menuAction ', name
+    log "window.menuAction0 #{name} #{args}"
+            
+    if action = Editor.actionWithName name
+        log "window.menuAction1--- #{name}", action.key, args
+        if action.key? and _.isFunction window.focusEditor[action.key]
+            window.focusEditor[action.key] args
+            return
+    
+    log "window.menuAction2 #{name}"
     
     if 'unhandled' != window.commandline.handleMenuAction name
         return
 
+    log "window.menuAction3 #{name}"
+        
     switch name
         
-        when 'Undo'               then return @window.focusEditor.do.undo()
-        when 'Redo'               then return @window.focusEditor.do.redo()
-        when 'Cut'                then return @window.focusEditor.cut()
-        when 'Copy'               then return @window.focusEditor.copy()
-        when 'Paste'              then return @window.focusEditor.paste()
-        when 'New Tab'            then return post.emit 'newEmptyTab'
-        when 'Toggle Scheme'      then return scheme.toggle()
-        when 'Toggle Center Text' then return toggleCenterText()
-        when 'Font Size Increase' then return changeFontSize +1
-        when 'Font Size Decrease' then return changeFontSize -1
-        when 'Font Size Reset'    then return resetFontSize()
-        when 'Open Window List'   then return titlebar.showList()
-        when 'Navigate Backward'  then return navigate.backward()
-        when 'Navigate Forward'   then return navigate.forward()
-        when 'Maximize Editor'    then return split.maximizeEditor()
-        when 'Add to Shelf'       then return addToShelf()
+        when 'doMacro'               then return window.commandline.commands.macro.execute args
+        when 'Undo'                  then return @window.focusEditor.do.undo()
+        when 'Redo'                  then return @window.focusEditor.do.redo()
+        when 'Cut'                   then return @window.focusEditor.cut()
+        when 'Copy'                  then return @window.focusEditor.copy()
+        when 'Paste'                 then return @window.focusEditor.paste()
+        when 'New Tab'               then return post.emit 'newEmptyTab'
+        when 'Toggle Scheme'         then return scheme.toggle()
+        when 'Toggle Center Text'    then return toggleCenterText()
+        when 'Font Size Increase'    then return changeFontSize +1
+        when 'Font Size Decrease'    then return changeFontSize -1
+        when 'Font Size Reset'       then return resetFontSize()
+        when 'Open Window List'      then return titlebar.showList()
+        when 'Navigate Backward'     then return navigate.backward()
+        when 'Navigate Forward'      then return navigate.forward()
+        when 'Maximize Editor'       then return split.maximizeEditor()
+        when 'Add to Shelf'          then return addToShelf()
         when 'Activate Next Tab'     then return window.tabs.navigate 'right'
         when 'Activate Previous Tab' then return window.tabs.navigate 'left'
         when 'Move Tab Left'         then return window.tabs.move 'left'
         when 'Move Tab Right'        then return window.tabs.move 'right'
-        
-    # log "window.menuAction #{name}"
-            
-    if action = Editor.actionWithName name
-        # log "window.menuAction #{name}"
-        if action.key? and _.isFunction window.focusEditor[action.key]
-            # log "window.menuAction execute --- ", name
-            window.focusEditor[action.key]()
-            return
-                        
+                                
     log "unhandled menu action! ------------ #{name}"
         
 # 000   000  00000000  000   000

@@ -257,9 +257,8 @@ class Command
         @selected = -1
         @setState @historyKey(), @history
    
-    setHistory: (history) ->
+    setHistory: (@history) ->
         
-        @history = history
         @setState @historyKey(), @history
     
     setCurrent: (command) ->

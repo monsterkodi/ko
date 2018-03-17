@@ -7,21 +7,24 @@
 
 { fileList, colors, reversed, post, noon, slash, atomic, fs, error, log, _ } = require 'kxk'
   
-indexer = require '../main/indexer'
-salt    = require '../tools/salt'
-Command = require '../commandline/command'
-Mocha   = require 'mocha'
-Report  = require '../test/report'
-syntax  = require '../editor/syntax'
+indexer   = require '../main/indexer'
+salt      = require '../tools/salt'
+Command   = require '../commandline/command'
+Mocha     = require 'mocha'
+Report    = require '../test/report'
+syntax    = require '../editor/syntax'
+Transform = require '../editor/actions/transform'
 
 class Macro extends Command
 
+    @macroNames = ['clean', 'help', 'dbg', 'class', 'req', 'inv', 'blink', 'color', 'fps', 'test', 'unix']
+    
     constructor: (commandline) ->
 
         super commandline
 
-        @macros    = ['clean', 'help', 'dbg', 'class', 'req', 'inv', 'blink', 'color', 'fps', 'test', 'unix']
-        @macros    = @macros.concat window.editor.Transform.transformNames
+        @macros    = Macro.macroNames
+        @macros    = @macros.concat Transform.transformNames
         @names     = ['macro']
 
     #  0000000  000000000   0000000   00000000   000000000
@@ -324,7 +327,7 @@ class Macro extends Command
                 #    000     000   000  000   000  000  0000       000  000       000   000  000   000  000 0 000    
                 #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000    
                 
-                if cmmd in editor.Transform.transformNames
+                if cmmd in Transform.transformNames
                     window.textEditor.Transform.do.apply null, [window.textEditor, cmmd].concat args
                 else
                     if _.last(@history) == command.trim()

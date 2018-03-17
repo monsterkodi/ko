@@ -269,6 +269,8 @@ module.exports =
 
     actions:
 
+        menu: "Edit"
+        
         toggleCase:
             name:  'Toggle Case'
             text:  'toggles selected texts between lower- upper- and title-case'
@@ -278,7 +280,11 @@ module.exports =
             name:  'reverse selection'
             text:  'reverses the order of selected texts'
             combo: 'command+alt+ctrl+r'
+            
+        doTransform:
+            name:  'doTransform'
 
     toggleCase:        -> Transform.do @, 'toggleCase'
     reverseSelection:  -> Transform.do @, 'reverse'
+    doTransform: (arg) -> log "#{@name}.doTransform #{arg}"; Transform.do @, arg
     Transform:         Transform

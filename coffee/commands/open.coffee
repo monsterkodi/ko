@@ -489,7 +489,7 @@ class Open extends Command
         options.newWindow = true if @name == "new window"
         options.newTab    = true if @name == "new tab"
         
-        log 'open.execute files:', files
+        # log 'open.execute files:', files
         
         opened = window.openFiles files, options
         

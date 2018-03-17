@@ -64,9 +64,9 @@ class Editor extends Buffer
             if action.name == name
                 return action
                 
-        log "can't find action with name '#{name}'"
-        for action in Editor.actions
-            log action.name
+        # log "can't find action with name '#{name}'"
+        # for action in Editor.actions
+            # log action.name
         return null
                 
     # 000000000  000   000  00000000   00000000
@@ -184,7 +184,7 @@ class Editor extends Buffer
         if @numSelections()
             @textOfSelection()
         else
-            log 'textOfSelectionForClipboard', @textInRanges @rangesForCursorLines()
+            # log 'textOfSelectionForClipboard', @textInRanges @rangesForCursorLines()
             @textInRanges @rangesForCursorLines()
 
     splitStateLineAtPos: (state, pos) ->

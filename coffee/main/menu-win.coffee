@@ -8,10 +8,12 @@
 
 { fileList, prefs, fs, post, slash, os, log } = require 'kxk'
 
-pkg      = require '../../package.json'
-electron = require 'electron'
-AppMenu  = electron.Menu
-MenuItem = electron.MenuItem
+pkg       = require '../../package.json'
+Transform = require '../editor/actions/transform'
+Macro     = require '../commands/macro'
+electron  = require 'electron'
+AppMenu   = electron.Menu
+MenuItem  = electron.MenuItem
 
 class Menu
     
@@ -36,6 +38,23 @@ class Menu
                 click: (i) ->
                     prefs.set 'recentFiles', []
                     Menu.init main
+
+        activateMacro = (i,win) -> post.toWin win.id, 'menuAction', 'macro'
+        MacroMenu = [ label:'macro', accelerator:'CmdOrCtrl+m', click:activateMacro ]
+        for macro in Macro.macroNames
+            onClick = (m) -> (i,win) -> 
+                post.toWin win.id, 'menuAction', 'doMacro', m
+            MacroMenu.push
+                label: macro
+                click: onClick macro
+        
+        TransformMenu = []
+        for transform in Transform.Transform.transformNames
+            onClick = (t) -> (i,win) -> 
+                post.toWin win.id, 'menuAction', 'doTransform', t
+            TransformMenu.push
+                label: transform
+                click: onClick transform
 
         menu = AppMenu.buildFromTemplate [
             
@@ -123,6 +142,13 @@ class Menu
             
             label: 'Command'
             submenu: [
+                
+                # 0000000    00000000    0000000   000   000   0000000  00000000  
+                # 000   000  000   000  000   000  000 0 000  000       000       
+                # 0000000    0000000    000   000  000000000  0000000   0000000   
+                # 000   000  000   000  000   000  000   000       000  000       
+                # 0000000    000   000   0000000   00     00  0000000   00000000  
+                
                 label:      'Browse'
                 submenu:    [
                         label:      'Small'
@@ -145,6 +171,12 @@ class Menu
                     
                 ]
             ,
+                #  0000000   00000000   00000000  000   000  
+                # 000   000  000   000  000       0000  000  
+                # 000   000  00000000   0000000   000 0 000  
+                # 000   000  000        000       000  0000  
+                #  0000000   000        00000000  000   000  
+                
                 label:      'Open'
                 submenu:    [
                         label:      'In Current Tab'
@@ -160,6 +192,12 @@ class Menu
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'new window'
                 ]
             ,
+                #  0000000  00000000   0000000   00000000    0000000  000   000  
+                # 000       000       000   000  000   000  000       000   000  
+                # 0000000   0000000   000000000  0000000    000       000000000  
+                #      000  000       000   000  000   000  000       000   000  
+                # 0000000   00000000  000   000  000   000   0000000  000   000  
+                
                 label:      'Search'
                 submenu:    [
                         label:      'Case Insensitive'
@@ -176,6 +214,12 @@ class Menu
                         click:       (i,win) -> post.toWin win.id, 'menuAction', '/Search/'
                 ]
             ,
+                # 00000000  000  000   000  0000000    
+                # 000       000  0000  000  000   000  
+                # 000000    000  000 0 000  000   000  
+                # 000       000  000  0000  000   000  
+                # 000       000  000   000  0000000    
+                
                 label:      'Find'
                 submenu:    [
                         label:      'Case Insensitive'
@@ -198,6 +242,12 @@ class Menu
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'f*nd'
                 ]
             ,
+                #  0000000   0000000   00000000  00000000  00000000  00000000  
+                # 000       000   000  000       000       000       000       
+                # 000       000   000  000000    000000    0000000   0000000   
+                # 000       000   000  000       000       000       000       
+                #  0000000   0000000   000       000       00000000  00000000  
+                
                 label:      'Coffee'
                 submenu:    [
                         label:      'In Window Process'
@@ -209,6 +259,18 @@ class Menu
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'Coffee'
                 ]
             ,
+                # 00     00   0000000    0000000  00000000    0000000   
+                # 000   000  000   000  000       000   000  000   000  
+                # 000000000  000000000  000       0000000    000   000  
+                # 000 0 000  000   000  000       000   000  000   000  
+                # 000   000  000   000   0000000  000   000   0000000   
+                
+                label:      'Macro'
+                submenu:    MacroMenu
+            ,
+                label:      'Transform'
+                submenu:    TransformMenu
+            ,
                 label:      'Goto'
                 accelerator: 'Ctrl+;'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'goto'
@@ -216,10 +278,6 @@ class Menu
                 label:      'Build'
                 accelerator: 'Ctrl+b'
                 click:       (i,win) -> post.toWin win.id, 'menuAction', 'build'
-            ,
-                label:      'Macro'
-                accelerator: 'Ctrl+m'
-                click:       (i,win) -> post.toWin win.id, 'menuAction', 'macro'
             ]   
         ,
             # 000   000  000  00000000  000   000  
