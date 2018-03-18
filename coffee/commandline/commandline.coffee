@@ -9,15 +9,15 @@
 { fileList, stopEvent, elem, keyinfo, clamp, post, slash, error, log, str, os, $, _ } = require 'kxk'
 
 TextEditor = require '../editor/texteditor'
-render     = require '../editor/render'
-syntax     = require '../editor/syntax'
 
 class Commandline extends TextEditor
 
     constructor: (viewElem) ->
 
-        super viewElem, features: [], fontSize: 24
+        super viewElem, features: [], fontSize: 24, syntaxName: 'commandline'
 
+        log 'Commandline', @syntax.name
+        
         @mainCommands = ['browse', 'goto', 'open', 'search', 'find', 'coffee', 'build', 'macro']
         @hideCommands = ['selecto', 'Term', 'Build', 'Browse']
 
@@ -61,6 +61,7 @@ class Commandline extends TextEditor
     restore: =>
 
         state = window.stash.get 'commandline'
+        
         @setText state?.text ? ""
         if state?.name?
             name = state.name

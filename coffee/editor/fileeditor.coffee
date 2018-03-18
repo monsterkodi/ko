@@ -84,6 +84,7 @@ class FileEditor extends TextEditor
         @currentFile = file
 
         @setupFileType()
+        @syntax?.setFileType @fileType
 
         if @currentFile?
 

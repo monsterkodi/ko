@@ -1,0 +1,33 @@
+
+#  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000  
+# 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000       
+# 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000   
+# 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000       
+#  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000  
+
+# (?:^\s*|\/)(\.[\-\_\w][\.\-\_\w]*)(?:\s|$)  dotfile
+([^\/]+)(\.coffee$)    . coffee  . coffee.extname
+([^\/]+)(\.noon$)      . noon    . noon.extname
+([^\/]+)(\.json$)      . json    . json.extname
+([^\/]+)(\.styl$)      . styl    . styl.extname
+([^\/]+)(\.html$)      . html    . html.extname
+([^\/]+)(\.pug$)       . pug     . pug.extname
+([^\/]+)(\.css$)       . css     . css.extname
+([^\/]+)(\.cp?p?$)     . cpp     . cpp.extname
+([^\/]+)(\.cc$)        . cpp     . cpp.extname
+([^\/]+)(\.hp?p?$)     . hpp     . hpp.extname
+([^\/]+)(\.js.map$)    . dotfile . dotfile.extname
+([^\/]+)(\.js$)        . js      . js.extname
+([^\/]+)(\.py$)        . py      . py.extname
+([^\/]+)(\.sh$)        . sh      . sh.extname
+([^\/]+)(\.md$)        . md      . md.extname
+([^\/]+)(\.txt$)       . txt     . txt.extname
+([^\/]+)(\.png|\.jpg|\.gif)$     . image . image.extname
+([^\/]+)(\.pxm|\.tiff?|\.icns)   . pic . pic.extname
+
+([^\/]+)(?:\/)    dir
+
+[~]                                extname
+[\/\:]                             separator
+# [\/\:]                             xtname
+

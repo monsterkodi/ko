@@ -16,17 +16,22 @@ class Editor extends Buffer
 
     @actions = null
 
-    constructor: (@name) ->
+    constructor: (name, config) ->
         
         super()
         
+        @name   = name
+        @config = config
+        
         Editor.initActions() if not Editor.actions?
+        
         
         @indentString      = _.padStart "", 4
         @stickySelection   = false
         @dbg               = false
         @syntax            = new Syntax @
         @do                = new Do @
+        
         @setupFileType()
 
     del: ->
@@ -142,11 +147,8 @@ class Editor extends Buffer
                 
         # _______________________________________________________________ comment
                    
-        @syntax.setFileType @fileType 
-        
         @lineComment = @syntax.balancer.regions.lineComment.open
         @multiComment = @syntax.balancer.regions.multiComment
-        
                 
     #  0000000  00000000  000000000         000      000  000   000  00000000   0000000  
     # 000       000          000            000      000  0000  000  000       000       

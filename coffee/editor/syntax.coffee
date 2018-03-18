@@ -16,7 +16,9 @@ class Syntax
 
     constructor: (@editor) ->
 
-        @name     = @editor.syntaxName ? 'txt'
+        # @name     = @editor.syntaxName ? @editor.config?.syntaxName ? 'txt'
+        @name = @editor.config?.syntaxName ? 'txt'
+        
         @diss     = []
         @colors   = {}
         @balancer = new Balancer @
@@ -88,7 +90,7 @@ class Syntax
     # 000       000  0000000  00000000     000        000     000        00000000  
     
     setFileType: (fileType) -> 
-        
+
         @name = fileType
         @balancer.setFileType fileType
         
@@ -99,6 +101,7 @@ class Syntax
     #  0000000  0000000  00000000  000   000  000   000
 
     clear: -> 
+        
         @diss = []
         @balancer.clear()
 

@@ -16,12 +16,13 @@ electron     = require 'electron'
 
 class TextEditor extends Editor
 
-    constructor: (viewElem, @config) ->
+    constructor: (viewElem, config) ->
 
         name = viewElem
         name = name.slice 1 if name[0] == '.'
 
-        super name
+        # log 'TextEditor.constructor', config
+        super name, config
 
         @clickCount = 0
 

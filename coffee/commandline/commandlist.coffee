@@ -21,11 +21,11 @@ class CommandList extends TextEditor
             features: ['Scrollbar', 'Numbers', 'Meta']
             lineHeight: 1.4
             fontSize:   19
+            syntaxName: opt.syntaxName ? 'ko'
 
         @items      = []
         @maxLines   = 17
         @metaQueue  = []
-        @syntaxName = opt.syntax ? 'ko'
 
         @numbers.elem.style.fontSize = "19px"
 
@@ -65,7 +65,7 @@ class CommandList extends TextEditor
                 line: item.line ? ' '
                 text: text
                 rngs: rngs
-                type: item.type ? @syntaxName
+                type: item.type ? @config.syntaxName
                 clss: 'commandlistItem'
                 index: index
                 click: @onMetaClick

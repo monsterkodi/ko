@@ -17,8 +17,7 @@ class ObjectEditor extends TextEditor
 
     constructor: (viewElem, opt) ->
         
-        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Brackets', 'Strings'], fontSize: 14
-        @syntaxName = opt?.syntax ? 'js'
+        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Brackets', 'Strings'], fontSize: 14, syntaxName: opt?.syntaxName ? 'js'
         viewElem.setAttribute 'tabindex', 5
         @numbers.elem.style.fontSize = "14px"        
 
