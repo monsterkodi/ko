@@ -21,7 +21,7 @@ class Row
         @browser = @column.browser
         text = @item.text ? @item.name
         if empty(text) or empty text.trim()
-            html = '&nbsp;'
+            html = '<span> </span>'
         else
             html = syntax.spanForTextAndSyntax text, 'browser'
         @div = elem class: 'browserRow', html: html
@@ -66,10 +66,10 @@ class Row
             
         icon = elem('span', class:className + ' browserFileIcon')
             
-        if @item.text ? @item.name
-            @div.firstChild.insertBefore icon, @div.firstChild.firstChild
-        else
-            @div.appendChild icon
+        @div.firstChild.insertBefore icon, @div.firstChild.firstChild
+        # if @item.text ? @item.name
+        # else
+            # @div.appendChild icon
                     
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
     # 000   000  000          000     000  000   000  000   000     000     000       
@@ -100,7 +100,9 @@ class Row
             
         $('.hover')?.classList.remove 'hover'
         
-        @setActive emit:event? # or true?
+        # @setActive emit:event? # or true?
+        @setActive emit:true
+        
         @browser.skipJump = true if not event? and @item.type == 'file'
         
         switch @item.type

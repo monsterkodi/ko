@@ -49,10 +49,7 @@ class Shelf extends Column
         
         item = row.item
         
-        if item.type == 'historySeperator'
-            # if row == @activeRow()
-                # @toggleHistory()
-            # else
+        if item.type == 'historySeparator'
             row.setActive emit:false
             return
         
@@ -77,7 +74,6 @@ class Shelf extends Column
         
         [index, item] = indexAndItemInItemsWithFunc browserItem, @items, _.isEqual
         if item
-            # log "Shelf.onBrowserItemActivated1", index, item.file
             @rows[index].setActive()
             return
 
@@ -87,10 +83,8 @@ class Shelf extends Column
                 matches.push [index, item]
 
         if not empty matches
-            # log "matches: #{matches.length}"
             matches.sort (a,b) -> b[1].file.length - a[1].file.length
             [index, item] = first matches
-            # log "Shelf.onBrowserItemActivated2", index, item.file
             @rows[index].setActive()
             return
                 
@@ -176,6 +170,7 @@ class Shelf extends Column
             @items.push item
             
         @setItems @items
+        @loadHistory() if @isHistory
 
     dropRow: (row, pos) -> @addItem row.item, pos:pos
             
@@ -204,6 +199,7 @@ class Shelf extends Column
             @loadHistory()
         else
             @removeHistory()
+        window.stash.set 'shelf:history', @isHistory
     
     clearHistory: =>
         
@@ -217,7 +213,7 @@ class Shelf extends Column
     historySeparatorIndex: ->
         
         for i in [0...@numRows()]
-            if @row(i).item.type == 'historySeperator'
+            if @row(i).item.type == 'historySeparator'
                 return i
         return @numRows()
         
@@ -229,7 +225,7 @@ class Shelf extends Column
 
     onNavigateHistoryChanged: (filePositions, currentIndex) =>
         
-        if @isHistory # and not @hasFocus()
+        if @isHistory
             @setHistoryItems filePositions
             @onNavigateIndexChanged currentIndex, filePositions[currentIndex]
 
@@ -254,8 +250,8 @@ class Shelf extends Column
         items.reverse()
         
         items.unshift
-            type: 'historySeperator'
-            icon: 'noon-icon'
+            type: 'historySeparator'
+            icon: 'history-icon'
         
         @addItems items
             
@@ -321,7 +317,7 @@ class Shelf extends Column
         if row = @activeRow()
             
             if @isHistory
-                if row.item.type == 'historySeperator'
+                if row.item.type == 'historySeparator'
                     @toggleHistory()
                     return
                 window.navigate.delFilePos row.item

@@ -596,7 +596,7 @@ class TextEditor extends Editor
         @drag = new drag
             target:  @layerScroll
             # cursor:  'default'
-            cursor:  'text'
+            # cursor:  'text'
             onStart: (drag, event) =>
                 
                 @view.focus()
@@ -646,6 +646,9 @@ class TextEditor extends Editor
                 else
                     @singleCursorAtPos p, extend:true
 
+            onStop: =>
+                @selectNone() if @numSelections() and empty @textOfSelection()
+                    
     startClickTimer: =>
 
         clearTimeout @clickTimer
