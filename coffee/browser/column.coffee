@@ -189,6 +189,7 @@ class Column
                     if type == 'dir'
                         @browser.browse? item.file
                     else if item.file
+                        post.emit 'jumpTo', item
                         post.emit 'focus', 'editor'
         @
 

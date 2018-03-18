@@ -208,7 +208,11 @@ class Shelf extends Column
     clearHistory: =>
         
         window.navigate.clear()
-        if @isHistory then @toggleHistory()
+        if @isHistory then @setHistoryItems [
+            file:   window.editor.currentFile
+            pos:    window.editor.mainCursor()
+            text:   slash.file window.editor.currentFile
+        ]
         
     historySeparatorIndex: ->
         
@@ -233,7 +237,6 @@ class Shelf extends Column
         
         if @isHistory
             reverseIndex = @numRows() - currentIndex - 1
-            log @numRows(), reverseIndex, currentIndex, currentItem.file
             if not @hasFocus()
                 @row(reverseIndex)?.setActive()
             

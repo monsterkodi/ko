@@ -100,7 +100,8 @@ class Row
             
         $('.hover')?.classList.remove 'hover'
         
-        @setActive emit:true
+        @setActive emit:event? # or true?
+        @browser.skipJump = true if not event? and @item.type == 'file'
         
         switch @item.type
             when 'dir'   then @browser.loadDir     @item.file, column: @column.index+1, parent: @item
