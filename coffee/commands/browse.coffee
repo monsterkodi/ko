@@ -1,9 +1,10 @@
-
-# 0000000    00000000    0000000   000   000   0000000  00000000  
-# 000   000  000   000  000   000  000 0 000  000       000       
-# 0000000    0000000    000   000  000000000  0000000   0000000   
-# 000   000  000   000  000   000  000   000       000  000       
-# 0000000    000   000   0000000   00     00  0000000   00000000  
+###
+0000000    00000000    0000000   000   000   0000000  00000000  
+000   000  000   000  000   000  000 0 000  000       000       
+0000000    0000000    000   000  000000000  0000000   0000000   
+000   000  000   000  000   000  000   000       000  000       
+0000000    000   000   0000000   00     00  0000000   00000000  
+###
 
 { slash, fileList, post, stopEvent, empty, str, os, clamp, log, error, $ } = require 'kxk'
 
@@ -104,6 +105,8 @@ class Browse extends Command
                     # log 'show items', items
                     @showItems items
                     @select 0
+                    return
+        @hideList()
     
     complete: ->
         
@@ -133,22 +136,42 @@ class Browse extends Command
     # 000       000   000  000   000  000  0000  000   000  000       000   000    
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000      
 
+    commonPrefix: (strA,strB) ->
+        prefix = ''
+        for i in [0...Math.min(strA.length, strB.length)]
+            break if strA[i] != strB[i]
+            prefix += strA[i]
+        prefix
+    
+    clearBrokenPartForFiles: (files) ->
+        
+        brokenPath = slash.resolve @getText()
+        longestMatch = ''
+        for file in files
+            file = file.file
+            prefix = @commonPrefix file, brokenPath
+            if prefix.length > longestMatch.length
+                longestMatch = prefix 
+        l = @getText().length
+        d = brokenPath.length-longestMatch.length
+  
+        @setText slash.tilde longestMatch
+        @complete()
+                
     changedCallback: (err, files) =>
         
         if not err?
-            # log 'changedCallback:', files.map (f) -> f.file
-            # log 'changedCallback:', @getText().trim().length, @getText().trim(), @commandline.mainCursor()
-            
+
             if empty @getText().trim()
                 @hideList()
                 return
                 
             path = slash.resolve @getText().trim()
             matches = files.filter (f) -> f.file.startsWith path
-            # log 'matches', matches
                                                 
             if empty matches
-                @hideList()
+                @clearBrokenPartForFiles files
+                # @hideList()
                 return
 
             s = slash.tilde(path).length
@@ -157,8 +180,6 @@ class Browse extends Command
             @setText text
             
             l = text.length
-            
-            # log 'selectSingleRange', s, l
             
             @commandline.selectSingleRange [0, [s,l]], before: true
 
@@ -182,12 +203,10 @@ class Browse extends Command
                     item.file = m.file
                     item
     
-                # log 'show items', items
                 @showItems items
     
     changed: (command) ->
         
-        # log 'changed', command
         text = @getText().trim()
         if not text.endsWith '/'
             @walker?.end()
@@ -197,17 +216,14 @@ class Browse extends Command
         
     handleModKeyComboEvent: (mod, key, combo, event) -> 
         
-        # log "browse.coffee handleModKeyComboEvent #{key}"
         switch combo
             when 'backspace'
-                cursorAtSelectionStart = commandline.mainCursor()[0] == commandline.selection(0)?[1][0]
-                return 'unhandled' if not cursorAtSelectionStart
-                
-                commandline.do.start()         # force simultaneous deletion of selection 
-                commandline.deleteSelection()  # and backspace. 
-                commandline.deleteBackward()   # it should feel as if selection isn't there
-                commandline.do.end()
-                return #stopEvent event
+                if commandline.mainCursor()[0] == commandline.selection(0)?[1][0] # cursor is at selection start
+                    commandline.do.start()         # force simultaneous 
+                    commandline.deleteSelection()  # deletion of selection 
+                    commandline.deleteBackward()   # and backspace. 
+                    commandline.do.end()           # it should feel as if selection wasn't there.
+                    return
         'unhandled'
             
     # 000      000   0000000  000000000   0000000  000      000   0000000  000   000  

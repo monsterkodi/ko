@@ -41,6 +41,12 @@ class FileBrowser extends Browser
             
         @shelfSize = state.get 'shelf:size', 200
         
+    #  0000000   0000000   000      000   000  00     00  000   000   0000000  
+    # 000       000   000  000      000   000  000   000  0000  000  000       
+    # 000       000   000  000      000   000  000000000  000 0 000  0000000   
+    # 000       000   000  000      000   000  000 0 000  000  0000       000  
+    #  0000000   0000000   0000000   0000000   000   000  000   000  0000000   
+    
     initColumns: ->
         
         super()
@@ -59,7 +65,23 @@ class FileBrowser extends Browser
                 
         if elem.containsPos @shelf.div, pos
             return @shelf
+            
+    lastColumnPath: ->
         
+        if lastColumn = @lastUsedColumn()
+            return lastColumn.parent.file
+
+    onBackspaceInColumn: (column) -> 
+    
+        column.clearSearch()
+        @navigate 'left'
+            
+    #  0000000  000   000  00000000  000      00000000  
+    # 000       000   000  000       000      000       
+    # 0000000   000000000  0000000   000      000000    
+    #      000  000   000  000       000      000       
+    # 0000000   000   000  00000000  0000000  000       
+    
     onShelfDrag: (drag, event) => 
         
         shelfSize = clamp 0, 400, drag.pos.x
@@ -80,6 +102,18 @@ class FileBrowser extends Browser
     
     loadFile: (file, opt={}) ->
         
+        if @lastColumnPath() == file
+            item  = @lastUsedColumn().activeRow()?.item
+            if item
+                @lastUsedColumn().focus()
+            else
+                item = @lastUsedColumn().prevColumn()?.activeRow()?.item
+                if item
+                    @lastUsedColumn().prevColumn().focus()
+                
+            if item then @emit 'itemActivated', item
+            return
+        
         opt.focus ?= true
         opt.column ?= 0
         dir  = opt.dir 
@@ -97,20 +131,21 @@ class FileBrowser extends Browser
     
     browse: (dir) -> 
 
+        # if @lastColumnPath() == dir
+            # log 'dir already loaded!', dir
+        
         return error "no dir?" if not dir?
         
         @clearColumnsFrom 1, pop:true
         @loadDir dir, column:0, row: 0, focus:true
 
-    # 0000000    000  00000000   
-    # 000   000  000  000   000  
-    # 000   000  000  0000000    
-    # 000   000  000  000   000  
-    # 0000000    000  000   000  
+    # 000       0000000    0000000   0000000          0000000    000  00000000   
+    # 000      000   000  000   000  000   000        000   000  000  000   000  
+    # 000      000   000  000000000  000   000        000   000  000  0000000    
+    # 000      000   000  000   000  000   000        000   000  000  000   000  
+    # 0000000   0000000   000   000  0000000          0000000    000  000   000  
     
-    loadDir: (dir, opt) -> 
-        
-        opt ?= {}
+    loadDir: (dir, opt={}) -> 
         
         if opt.column > 0 and slash.isRoot(dir) and @columns[opt.column-1].activeRow()?.item.name == '/'
             @clearColumnsFrom opt.column, pop:true

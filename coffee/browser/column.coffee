@@ -1,9 +1,10 @@
-
-#  0000000   0000000   000      000   000  00     00  000   000
-# 000       000   000  000      000   000  000   000  0000  000
-# 000       000   000  000      000   000  000000000  000 0 000
-# 000       000   000  000      000   000  000 0 000  000  0000
-#  0000000   0000000   0000000   0000000   000   000  000   000
+###
+ 0000000   0000000   000      000   000  00     00  000   000
+000       000   000  000      000   000  000   000  0000  000
+000       000   000  000      000   000  000000000  000 0 000
+000       000   000  000      000   000  000 0 000  000  0000
+ 0000000   0000000   0000000   0000000   000   000  000   000
+###
 
 { stopEvent, setStyle, popup, keyinfo, slash, post, elem, clamp, empty, pos, fs, error, log, $, _ } = require 'kxk'
 
@@ -132,7 +133,11 @@ class Column
     onMouseOver: (event) => @row(event.target)?.onMouseOver()
     onMouseOut:  (event) => @row(event.target)?.onMouseOut()
     onClick:     (event) => @row(event.target)?.activate event
-    onDblClick:  (event) => @navigateCols 'enter'
+    onDblClick:  (event) => 
+        @navigateCols 'enter'
+        if item = @activeRow()?.item
+            if item.file and item.type == 'file' # jump to top of file on double click
+                post.emit 'singleCursorAtPos', [0, 0]
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       
@@ -183,8 +188,6 @@ class Column
                     type = item.type
                     if type == 'dir'
                         @browser.browse? item.file
-                    else if type == 'file' and item.textFile
-                        post.emit 'focus', 'editor'
                     else if item.file
                         post.emit 'focus', 'editor'
         @
@@ -425,7 +428,7 @@ class Column
             when 'command+backspace', 'ctrl+backspace', 'command+delete', 'ctrl+delete' 
                 return stopEvent event, @moveToTrash()
             when 'alt+left'            then return stopEvent event, window.split.focus 'shelf'
-            when 'backspace', 'delete' then return stopEvent event, @clearSearch().removeObject()
+            when 'backspace', 'delete' then return stopEvent event, @browser.onBackspaceInColumn @
             when 'ctrl+t'              then return stopEvent event, @sortByType()
             when 'ctrl+n'              then return stopEvent event, @sortByName()
             when 'command+i', 'ctrl+i' then return stopEvent event, @toggleDotFiles()
