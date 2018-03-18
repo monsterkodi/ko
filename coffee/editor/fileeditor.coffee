@@ -397,9 +397,21 @@ class FileEditor extends TextEditor
             combo:  'ctrl+.' 
             cb:     -> window.commandline.startCommand 'browse'
         ,
+            text:   'Go Back'
+            combo:  'ctrl+1'
+            cb:     -> window.menuAction 'Navigate Backward'
+        ,
+            text:   'Go Forward'
+            combo:  'ctrl+2'
+            cb:     -> window.menuAction 'Navigate Forward'
+        ,
             text:   'Jump To'
             combo:  'ctrl+return'
-            cb:     -> window.editor.jumpToWordAtPos()
+            cb:     -> window.editor.jumpToWord()
+        ,
+            text:   'Show Menu'
+            combo:  'alt+m'
+            cb:     -> window.menuAction 'Show Menu'
         ,
             text:   'Maximize'
             combo:  'ctrl+shift+y' 

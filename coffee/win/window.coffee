@@ -618,8 +618,12 @@ menuAction = (name, args) ->
         when 'Activate Previous Tab' then return window.tabs.navigate 'left'
         when 'Move Tab Left'         then return window.tabs.move 'left'
         when 'Move Tab Right'        then return window.tabs.move 'right'
+        when 'Toggle Menu'           then return win.setMenuBarVisibility not win.isMenuBarVisible()
+        when 'Show Menu'             then return win.setMenuBarVisibility true
 
     log "unhandled menu action! ------------ #{name}"
+
+window.menuAction = menuAction
 
 # 000   000  00000000  000   000
 # 000  000   000        000 000
@@ -640,7 +644,7 @@ handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
         if not combo
             stopEvent event # prevent menu from showing
         else if combo == 'alt+m'
-            win.setMenuBarVisibility not win.isMenuBarVisible()
+            menuAction 'Toggle Menu'
 
     return if not combo
 

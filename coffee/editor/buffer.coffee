@@ -22,6 +22,7 @@ class Buffer extends event
         super()
         @newlineCharacters = '\n'
         @wordRegExp = new RegExp "(\\s+|\\w+|[^\\s])", 'g'
+        @realWordRegExp = new RegExp "(\\w+)", 'g'
         @setState new State()
 
     setLines: (lines) ->
@@ -82,7 +83,8 @@ class Buffer extends event
     # 00     00   0000000   000   000  0000000  
 
     wordAtCursor: -> @wordAtPos @mainCursor()
-    wordAtPos: (c) -> @textInRange @rangeForWordAtPos c
+    # wordAtPos: (c) -> @textInRange @rangeForWordAtPos c
+    wordAtPos: (c) -> @textInRange @rangeForRealWordAtPos c
     wordsAtCursors: (cs=@cursors(), opt) -> (@textInRange r for r in @rangesForWordsAtCursors cs, opt)
 
     rangesForWordsAtCursors: (cs=@cursors(), opt) -> 
@@ -106,7 +108,8 @@ class Buffer extends event
     rangeForRealWordAtPos: (pos, opt) ->
         
         p = @clampPos pos
-        wr = @wordRangesInLineAtIndex p[1], opt
+        wr = @realWordRangesInLineAtIndex p[1], opt
+        
         r = rangeAtPosInRanges p, wr
         if not r? or empty @textInRange(r).trim()
             r = rangeBeforePosInRanges p, wr
@@ -133,14 +136,22 @@ class Buffer extends event
                 r = @rangeForWordAtPos [c[0]-1, c[1]]
         [r[1][0], r[0]]
         
-    wordRangesInLineAtIndex: (li, opt={regExp:@wordRegExp}) ->
+    wordRangesInLineAtIndex: (li, opt={}) ->
         
+        opt.regExp ?= @wordRegExp
         opt.regExp = new RegExp "(\\s+|[\\w#{opt.include}]+|[^\\s])", 'g' if opt?.include?.length
         r = []
         while (mtch = opt.regExp.exec(@line(li))) != null
             r.push [li, [mtch.index, opt.regExp.lastIndex]]
         r.length and r or [[li, [0,0]]]
 
+    realWordRangesInLineAtIndex: (li, opt={}) ->
+        
+        r = []
+        while (mtch = @realWordRegExp.exec(@line(li))) != null
+            r.push [li, [mtch.index, @realWordRegExp.lastIndex]]
+        r.length and r or [[li, [0,0]]]
+        
     # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000   0000000
     # 000   000  000  000        000   000  000      000  000        000   000     000     000     
     # 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000     0000000 

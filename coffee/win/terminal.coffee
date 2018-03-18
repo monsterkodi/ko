@@ -6,7 +6,7 @@
    000     00000000  000   000  000   000  000  000   000  000   000  0000000
 ###
 
-{ reversed, prefs, error, log, _  } = require 'kxk'
+{ reversed, prefs, pos, popup, error, log, _  } = require 'kxk'
 
 salt       = require '../tools/salt'
 TextEditor = require '../editor/texteditor'
@@ -18,6 +18,8 @@ class Terminal extends TextEditor
     constructor: (viewElem) ->
         
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Meta'], fontSize: 15
+        
+        @view.addEventListener "contextmenu", @onContextMenu
         
         @metaQueue = []
         
@@ -141,7 +143,34 @@ class Terminal extends TextEditor
     setAutoClear: (state) -> prefs.set 'terminal:autoclear', state
     getAutoClear: -> prefs.get 'terminal:autoclear', true
     doAutoClear: -> if @getAutoClear() then @clear()
+
+    # 00000000    0000000   00000000   000   000  00000000     
+    # 000   000  000   000  000   000  000   000  000   000    
+    # 00000000   000   000  00000000   000   000  00000000     
+    # 000        000   000  000        000   000  000          
+    # 000         0000000   000         0000000   000          
+
+    onContextMenu: (event) => @showContextMenu pos event
+              
+    showContextMenu: (absPos) =>
         
+        if not absPos?
+            absPos = pos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
+        
+        opt = items: [
+            text:   'Clear'
+            combo:  'alt+k' 
+            cb:     @clear
+        ,
+            text:   'Close'
+            combo:  'ctrl+alt+k' 
+            cb:     window.split.hideTerminal
+        ]
+        
+        opt.x = absPos.x
+        opt.y = absPos.y
+        popup.menu opt
+    
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
     # 0000000    0000000     00000  

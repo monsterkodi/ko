@@ -5,7 +5,7 @@
 # 000   000  000   000  000 0 000  000           000     000   000  000   000  000   000  000   000  000   000  
 #  0000000    0000000   000   000  000           000      0000000   00     00   0000000   000   000  0000000    
         
-{ slash, post, log } = require 'kxk'
+{ slash, post, empty, log } = require 'kxk'
 
 matchr = require '../../tools/matchr'
 
@@ -48,15 +48,22 @@ module.exports =
                         return true
         false
     
-    jumpToWord: -> @jumpToWordAtPos() 
+    jumpToWord: -> @jumpToWordAtPos @cursorPos()
         
     jumpToWordAtPos: (p=@cursorPos()) ->
+        
+        selectionText = @textOfSelection().trim()
+        
+        if not empty selectionText
+            post.emit 'jumpTo', selectionText, {}
+            return
         
         return if @jumpToFileAtPos p
         
         text  = @line p[1]
         word  = @wordAtPos p
-        range = @rangeForWordAtPos p
+        range = @rangeForRealWordAtPos p
+        
         opt   = {}
         line  = @line range[0] 
 

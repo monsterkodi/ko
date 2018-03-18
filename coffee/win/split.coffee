@@ -154,6 +154,11 @@ class Split extends event
             when 'logview'          then @showLog()
             else error "split.show -- unhandled: #{n}!"
 
+    hideEditor:     => @flex.collapse 'editor'
+    hideTerminal:   => 
+        log @flex.panes.map (p) -> p.id
+        @flex.collapse 'terminal'
+            
     # 00000000    0000000   000   0000000  00000000  
     # 000   000  000   000  000  000       000       
     # 0000000    000000000  000  0000000   0000000   
@@ -279,10 +284,7 @@ class Split extends event
     editorHeight:   -> @flex.sizeOfPane 2
     logviewHeight:  -> @flex.sizeOfPane 3
     termEditHeight: -> @terminalHeight() + @commandlineHeight + @editorHeight()
-    
-    hideTerminal:   -> @flex.collapse 'terminal'
-    hideEditor:     -> @flex.collapse 'editor'
-    
+        
     commandlineVisible: -> not @flex.isCollapsed 'commandline'
     terminalVisible:    -> not @flex.isCollapsed 'terminal'
     editorVisible:      -> not @flex.isCollapsed 'editor'

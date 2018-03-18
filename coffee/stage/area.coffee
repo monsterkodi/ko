@@ -12,7 +12,7 @@ event = require 'events'
 
 class Area extends event
     
-    constructor: (viewElem) ->
+    constructor: (viewElem) ->   
         super()
         @view =$ viewElem 
         @view.style.display = 'none'

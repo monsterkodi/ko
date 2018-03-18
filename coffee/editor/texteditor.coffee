@@ -6,7 +6,7 @@
    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000
 ###
 
-{ error, log, keyinfo, stopEvent, setStyle, slash, prefs, drag, elem, post, clamp, pos, str, sw, os, $, _ } = require 'kxk' 
+{ keyinfo, stopEvent, setStyle, slash, prefs, drag, empty, elem, post, clamp, pos, str, sw, os, error, log, $, _ } = require 'kxk' 
   
 render       = require './render'
 EditorScroll = require './editorscroll'
@@ -597,11 +597,20 @@ class TextEditor extends Editor
             target:  @layerScroll
             cursor:  'default'
             onStart: (drag, event) =>
-
+                
                 @view.focus()
-
+                    
                 eventPos = @posForEvent event
 
+                if event.button == 2
+                    if empty @textOfSelection()
+                        @singleCursorAtPos eventPos
+                    return 'skip'
+                else if event.button == 1
+                    # @singleCursorAtPos eventPos
+                    @jumpToWordAtPos eventPos
+                    return 'skip'
+                
                 if @clickCount
                     if isSamePos eventPos, @clickPos
                         @startClickTimer()
@@ -694,16 +703,11 @@ class TextEditor extends Editor
             when 'backspace' then return 'unhandled' # has char set on windows?
             
             when 'esc'
-                if @salterMode
-                    return @setSalterMode false
-                if @numHighlights()
-                    return @clearHighlights()
-                if @numCursors() > 1
-                    return @clearCursors()
-                if @stickySelection
-                    return @endStickySelection()
-                if @numSelections()
-                    return @selectNone()
+                if @salterMode          then return @setSalterMode false
+                if @numHighlights()     then return @clearHighlights()
+                if @numCursors() > 1    then return @clearCursors()
+                if @stickySelection     then return @endStickySelection()
+                if @numSelections()     then return @selectNone()
             
             when 'command+enter', 'ctrl+enter','f12' then @jumpToWord()
 
