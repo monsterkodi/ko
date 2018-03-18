@@ -262,12 +262,16 @@ class Column
         if row = @activeRow()
             @browser.emit 'willRemoveRow', row, @
             nextOrPrev = row.next() ? row.prev()
-            row.div.remove()
-            @items.splice row.index(), 1
-            @rows.splice row.index(), 1
+            @removeRow row
             nextOrPrev?.activate()
         @
-          
+
+    removeRow: (row) ->
+        
+        row.div.remove()
+        @items.splice row.index(), 1
+        @rows.splice row.index(), 1
+        
     #  0000000   0000000   00000000   000000000  
     # 000       000   000  000   000     000     
     # 0000000   000   000  0000000       000     

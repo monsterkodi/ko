@@ -171,16 +171,19 @@ class Menu
                         accelerator: 'alt+ctrl+.'
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'Browse'
                     ,
+                        type: 'separator'
+                    ,
                         label:      'Shelf'
                         accelerator: 'alt+.'
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'shelf'
                     ,
-                        type: 'separator'
-                    ,
                         label:      'Add to Shelf'
                         accelerator: 'alt+shift+.'
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'Add to Shelf'
-
+                    ,
+                        label:      'Toggle History'
+                        accelerator: 'alt+h'
+                        click:       (i,win) -> post.toWin win.id, 'menuAction', 'Toggle History'
                 ]
             ,
                 #  0000000   00000000   00000000  000   000

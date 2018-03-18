@@ -84,17 +84,18 @@ if args.verbose
 # 000        000   000  00000000  000       0000000
 
 prefs.init 
-    shortcut:           'CmdOrCtrl+F1'
-    scheme:             'dark'
-    blink:              true
-    cursorBlinkDelay:   [800,200]
-    recentFilesLength:  20
-    editorFontSize:     18
-    logviewFontSize:    14
-    terminalFontSize:   16
-    autoHideMenuBar:    true
+    shortcut:               'CmdOrCtrl+F1'
+    scheme:                 'dark'
+    blink:                  true
+    cursorBlinkDelay:       [800,200]
+    recentFilesLength:      20
+    navigateHistoryLength:  10
+    editorFontSize:         18
+    logviewFontSize:        14
+    terminalFontSize:       16
+    autoHideMenuBar:        true
     terminal:
-        autoclear:      true
+        autoclear:          true
     
 state.init()
 alias = new store 'alias'

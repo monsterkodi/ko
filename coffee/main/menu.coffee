@@ -143,16 +143,19 @@ class Menu
                         accelerator: 'command+alt+.'
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'Browse'
                     ,
+                        type: 'separator'
+                    ,
                         label:      'Shelf'
                         accelerator: 'alt+.'
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'shelf'
                     ,
-                        type: 'separator'
-                    ,
                         label:      'Add to Shelf'
                         accelerator: 'alt+shift+.'
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'Add to Shelf'
-                    
+                    ,
+                        label:      'Toggle History'
+                        accelerator: 'alt+h'
+                        click:       (i,win) -> post.toWin win.id, 'menuAction', 'Toggle History'
                 ]
             ,
                 label:      'Open'

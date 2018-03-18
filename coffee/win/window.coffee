@@ -615,6 +615,7 @@ menuAction = (name, args) ->
         when 'Navigate Forward'      then return navigate.forward()
         when 'Maximize Editor'       then return split.maximizeEditor()
         when 'Add to Shelf'          then return addToShelf()
+        when 'Toggle History'        then return window.commandline.commands.browse.browser.shelf.toggleHistory()
         when 'Activate Next Tab'     then return window.tabs.navigate 'right'
         when 'Activate Previous Tab' then return window.tabs.navigate 'left'
         when 'Move Tab Left'         then return window.tabs.move 'left'

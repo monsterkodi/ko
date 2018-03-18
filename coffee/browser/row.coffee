@@ -28,7 +28,7 @@ class Row
         @div.classList.add @item.type
         @column.table.appendChild @div
 
-        if @item.type in ['file', 'dir']
+        if @item.type in ['file', 'dir'] or @item.icon
             @setIcon()
         
         @drag = new drag
@@ -51,19 +51,25 @@ class Row
 
     setIcon: ->
 
-        className = fileIcons.getClass slash.removeLinePos @item.file
-        if empty className
-            if @item.type == 'dir'
-                className = 'folder-icon'
-            else
-                if slash.ext(@item.file) == 'noon'
-                    className = 'noon-icon'
+        if @item.icon
+            className = @item.icon
+        else
+            className = fileIcons.getClass slash.removeLinePos @item.file
+            if empty className
+                if @item.type == 'dir'
+                    className = 'folder-icon'
                 else
-                    className = 'file-icon'
+                    if slash.ext(@item.file) == 'noon'
+                        className = 'noon-icon'
+                    else
+                        className = 'file-icon'
             
         icon = elem('span', class:className + ' browserFileIcon')
             
-        @div.firstChild.insertBefore icon, @div.firstChild.firstChild
+        if @item.text ? @item.name
+            @div.firstChild.insertBefore icon, @div.firstChild.firstChild
+        else
+            @div.appendChild icon
                     
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
     # 000   000  000          000     000  000   000  000   000     000     000       

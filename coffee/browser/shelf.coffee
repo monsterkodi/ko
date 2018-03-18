@@ -31,10 +31,11 @@ class Shelf extends Column
         @index  = -1
         @div.id = 'shelf'
         
-        @isHistory = false
+        @isHistory = window.stash.get 'shelf:history', true
 
         post.on 'addToShelf', @addPath
         post.on 'navigateHistoryChanged', @onNavigateHistoryChanged
+        post.on 'navigateIndexChanged',   @onNavigateIndexChanged
         
         @browser.on 'itemActivated', @onBrowserItemActivated
 
@@ -47,6 +48,13 @@ class Shelf extends Column
     activateRow: (row) -> 
         
         item = row.item
+        
+        if item.type == 'historySeperator'
+            # if row == @activeRow()
+                # @toggleHistory()
+            # else
+            row.setActive emit:false
+            return
         
         $('.hover')?.classList.remove 'hover'
         row.setActive emit:true
@@ -64,8 +72,9 @@ class Shelf extends Column
                     post.emit 'jumpToFile', file:item.file, line:item.line, col:item.column
         
     onBrowserItemActivated: (browserItem) =>
-        # log "Shelf.onBrowserItemActivated", browserItem.file
+
         return if @isHistory
+        
         [index, item] = indexAndItemInItemsWithFunc browserItem, @items, _.isEqual
         if item
             # log "Shelf.onBrowserItemActivated1", index, item.file
@@ -91,8 +100,10 @@ class Shelf extends Column
         @didInit = true
         
         @loadShelfItems()
+        @loadHistory() if @isHistory
         
     loadShelfItems: ->
+        
         items = state.get "shelf|items"
         @setItems items, save:false
         
@@ -120,14 +131,20 @@ class Shelf extends Column
         
         @clear()
         
-        if not empty @items
-            for item in @items
-                @rows.push new Row @, item
-        
-        @scroll.update()
+        @addItems @items
         
         if opt?.save != false
             @savePrefs()            
+        @
+        
+    addItems: (items, opt) ->
+        
+        return if empty items
+        
+        for item in items
+            @rows.push new Row @, item
+            
+        @scroll.update()
         @
         
     addDir: (dir, opt) ->
@@ -186,30 +203,58 @@ class Shelf extends Column
         if @isHistory
             @loadHistory()
         else
-            @loadShelfItems()
+            @removeHistory()
     
     clearHistory: =>
         
         window.navigate.clear()
         if @isHistory then @toggleHistory()
+        
+    historySeparatorIndex: ->
+        
+        for i in [0...@numRows()]
+            if @row(i).item.type == 'historySeperator'
+                return i
+        return @numRows()
+        
+    removeHistory: ->
+        
+        separatorIndex = @historySeparatorIndex()
+        while @numRows() > separatorIndex
+            @removeRow @row(@numRows()-1)
 
     onNavigateHistoryChanged: (filePositions, currentIndex) =>
         
-        if @isHistory and not @hasFocus()
+        if @isHistory # and not @hasFocus()
             @setHistoryItems filePositions
+            @onNavigateIndexChanged currentIndex, filePositions[currentIndex]
 
+    onNavigateIndexChanged: (currentIndex, currentItem) =>
+        
+        if @isHistory
+            reverseIndex = @numRows() - currentIndex - 1
+            log @numRows(), reverseIndex, currentIndex, currentItem.file
+            if not @hasFocus()
+                @row(reverseIndex)?.setActive()
+            
     loadHistory: ->
         
         @setHistoryItems post.get 'navigate', 'filePositions'
 
     setHistoryItems: (items) ->
     
+        @removeHistory()
+        
         items.map (h) -> 
             h.type = 'file'
             h.text = slash.removeColumn h.text
         items.reverse()
-        # log 'setHistoryItems', items
-        @setItems items
+        
+        items.unshift
+            type: 'historySeperator'
+            icon: 'noon-icon'
+        
+        @addItems items
             
     # 00000000   0000000    0000000  000   000   0000000  
     # 000       000   000  000       000   000  000       
@@ -271,8 +316,13 @@ class Shelf extends Column
     removeObject: =>
                 
         if row = @activeRow()
+            
             if @isHistory
+                if row.item.type == 'historySeperator'
+                    @toggleHistory()
+                    return
                 window.navigate.delFilePos row.item
+                
             nextOrPrev = row.next() ? row.prev()
             row.div.remove()
             @items.splice row.index(), 1
