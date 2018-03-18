@@ -17,27 +17,27 @@ module.exports =
             name:  'Cursor in All Lines'
             combo: 'alt+a'
 
-        alignCursorsTop:
+        alignCursorsUp:
             separator: true
             name: 'Align Cursors with Top-most Cursor'
             combo: 'alt+ctrl+shift+up'
 
-        alignCursorsBottom:
+        alignCursorsDown:
             name: 'Align Cursors with Bottom-most Cursor'
             combo: 'alt+ctrl+shift+down'
 
         alignCursorsLeft:
             name: 'Align Cursors with Left-most Cursor'
-            combo: 'alt+ctrl+shift+left'
+            # combo: 'alt+ctrl+shift+left'
 
         alignCursorsRight:
             name: 'Align Cursors with Right-most Cursor'
-            combo: 'alt+ctrl+shift+right'
+            # combo: 'alt+ctrl+shift+right'
 
         alignCursorsAndText:
             name: 'Align Cursors and Text'
             text: 'align text to the right of cursors by inserting spaces'
-            combo: 'alt+ctrl+right'
+            combo: 'alt+shift+a'
 
         setCursorsAtSelectionBoundariesOrSelectSurround:
             separator: true

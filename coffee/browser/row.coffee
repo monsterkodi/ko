@@ -51,7 +51,7 @@ class Row
 
     setIcon: ->
 
-        className = fileIcons.getClass @item.file
+        className = fileIcons.getClass slash.removeLinePos @item.file
         if empty className
             if @item.type == 'dir'
                 className = 'folder-icon'
@@ -137,6 +137,7 @@ class Row
     # 000   000  000   000  000   000  00000000  
             
     editName: =>
+        
         return if @input? 
         @input = elem 'input', class: 'rowNameInput'
         @input.value = slash.file @item.file

@@ -214,20 +214,20 @@ class FileEditor extends TextEditor
     #  0000000    0000000   000   000  000
 
     jumpToFile: (opt) =>
-
-        window.navigate.addFilePos
-            file: @currentFile
-            pos:  @cursorPos()
-
-        [file, fpos] = slash.splitFilePos opt.file
-        opt.pos = fpos
-        opt.pos[0] = opt.col if opt.col
-        opt.pos[1] = opt.line-1 if opt.line
-
-        opt.winID = window.winID
+        
         if opt.newTab
             post.emit 'newTabWithFile', opt.file
         else
+            
+            [file, fpos] = slash.splitFilePos opt.file
+            opt.pos = fpos
+            opt.pos[0] = opt.col if opt.col
+            opt.pos[1] = opt.line-1 if opt.line
+            opt.winID  = window.winID
+
+            opt.oldPos = @cursorPos()
+            opt.oldFile = @currentFile
+            
             window.navigate.gotoFilePos opt
 
     jumpTo: (word, opt) =>

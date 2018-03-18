@@ -24,10 +24,16 @@ class Browse extends Command
         @names     = ["browse", "Browse", "shelf"]
         
         window.area.on 'resized', @onAreaResized
+        post.on 'file', @onFile
         
         @browser.on 'itemActivated', @onItemActivated
         
         @syntaxName = 'browser'
+        
+    onFile: (file) =>
+        # log 'onFile', file, slash.resolve @getText()
+        if file != slash.resolve @getText()
+            @setText slash.tilde file
         
     restoreState: (state) -> 
         

@@ -595,7 +595,8 @@ class TextEditor extends Editor
 
         @drag = new drag
             target:  @layerScroll
-            cursor:  'default'
+            # cursor:  'default'
+            cursor:  'text'
             onStart: (drag, event) =>
                 
                 @view.focus()

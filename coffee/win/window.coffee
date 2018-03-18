@@ -342,11 +342,11 @@ loadFile = (file, opt={}) ->
         if not opt?.dontSave
             window.saveChanges()
 
-        post.toMain 'navigate',
-            action: 'addFilePos'
-            file: editor.currentFile
-            pos:  editor.cursorPos()
-            for: 'load'
+        # post.toMain 'navigate',
+            # action: 'addFilePos'
+            # file: editor.currentFile
+            # pos:  editor.cursorPos()
+            # for: 'load'
 
         editor.clear skip:file?
 
@@ -588,6 +588,7 @@ menuAction = (name, args) ->
     # log "window.menuAction0 #{name} #{args}"
 
     if action = Editor.actionWithName name
+        # log 'menuAction', name, action
         if action.key? and _.isFunction window.focusEditor[action.key]
             window.focusEditor[action.key] args
             return

@@ -404,8 +404,7 @@ class Column
         
         opt.x = absPos.x
         opt.y = absPos.y
-        popup.menu opt
-        
+        popup.menu opt        
         
     # 000   000  00000000  000   000  
     # 000  000   000        000 000   

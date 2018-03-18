@@ -6,7 +6,7 @@
 0000000   000   000  00000000  0000000  000     
 ###
 
-{ stopEvent, keyinfo, slash, state, post, elem, clamp, empty, first, last, error, log, $, _ } = require 'kxk'
+{ stopEvent, keyinfo, slash, state, post, popup, elem, clamp, empty, first, last, error, log, $, _ } = require 'kxk'
 
 Row        = require './row'
 Scroller   = require './scroller'
@@ -22,7 +22,6 @@ indexAndItemInItemsWithFunc = (item, items, withFunc) ->
             return [index, items[index]]
     return [-1,null]
     
-
 class Shelf extends Column
 
     constructor: (browser) ->
@@ -31,8 +30,12 @@ class Shelf extends Column
         
         @index  = -1
         @div.id = 'shelf'
+        
+        @isHistory = false
 
         post.on 'addToShelf', @addPath
+        post.on 'navigateHistoryChanged', @onNavigateHistoryChanged
+        
         @browser.on 'itemActivated', @onBrowserItemActivated
 
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  0000000     00000000    0000000   000   000  
@@ -62,7 +65,7 @@ class Shelf extends Column
         
     onBrowserItemActivated: (browserItem) =>
         # log "Shelf.onBrowserItemActivated", browserItem.file
-        
+        return if @isHistory
         [index, item] = indexAndItemInItemsWithFunc browserItem, @items, _.isEqual
         if item
             # log "Shelf.onBrowserItemActivated1", index, item.file
@@ -87,9 +90,11 @@ class Shelf extends Column
         return if @didInit
         @didInit = true
         
+        @loadShelfItems()
+        
+    loadShelfItems: ->
         items = state.get "shelf|items"
-        if not empty items
-            @setItems items, save:false
+        @setItems items, save:false
         
     addPath: (path, opt) =>
         
@@ -104,15 +109,20 @@ class Shelf extends Column
     # 000     000     000       000 0 000       000  
     # 000     000     00000000  000   000  0000000   
 
-    savePrefs: -> state.set "shelf|items", @items
     itemPaths: -> @rows.map (r) -> r.path()
+    
+    savePrefs: -> 
+        if not @isHistory 
+            log 'save shelf items'
+            state.set "shelf|items", @items
     
     setItems: (@items, opt) ->
         
         @clear()
         
-        for item in @items
-            @rows.push new Row @, item
+        if not empty @items
+            for item in @items
+                @rows.push new Row @, item
         
         @scroll.update()
         
@@ -161,10 +171,46 @@ class Shelf extends Column
         @table.innerHTML = ''
         @rows = []
         @scroll.update()
-        @savePrefs()
                                    
     name: -> 'shelf'
         
+    # 000   000  000   0000000  000000000   0000000   00000000   000   000  
+    # 000   000  000  000          000     000   000  000   000   000 000   
+    # 000000000  000  0000000      000     000   000  0000000      00000    
+    # 000   000  000       000     000     000   000  000   000     000     
+    # 000   000  000  0000000      000      0000000   000   000     000     
+    
+    toggleHistory: =>
+        
+        @isHistory = not @isHistory
+        if @isHistory
+            @loadHistory()
+        else
+            @loadShelfItems()
+    
+    clearHistory: =>
+        
+        window.navigate.clear()
+        if @isHistory then @toggleHistory()
+
+    onNavigateHistoryChanged: (filePositions, currentIndex) =>
+        
+        if @isHistory and not @hasFocus()
+            @setHistoryItems filePositions
+
+    loadHistory: ->
+        
+        @setHistoryItems post.get 'navigate', 'filePositions'
+
+    setHistoryItems: (items) ->
+    
+        items.map (h) -> 
+            h.type = 'file'
+            h.text = slash.removeColumn h.text
+        items.reverse()
+        # log 'setHistoryItems', items
+        @setItems items
+            
     # 00000000   0000000    0000000  000   000   0000000  
     # 000       000   000  000       000   000  000       
     # 000000    000   000  000       000   000  0000000   
@@ -222,9 +268,11 @@ class Shelf extends Column
                 window.openFiles [item.file], newWindow: true
         @
     
-    removeObject: ->
-        
+    removeObject: =>
+                
         if row = @activeRow()
+            if @isHistory
+                window.navigate.delFilePos row.item
             nextOrPrev = row.next() ? row.prev()
             row.div.remove()
             @items.splice row.index(), 1
@@ -232,7 +280,39 @@ class Shelf extends Column
             nextOrPrev?.activate()
             @savePrefs()
         @
-  
+
+    # 00000000    0000000   00000000   000   000  00000000   
+    # 000   000  000   000  000   000  000   000  000   000  
+    # 00000000   000   000  00000000   000   000  00000000   
+    # 000        000   000  000        000   000  000        
+    # 000         0000000   000         0000000   000        
+    
+    showContextMenu: (absPos) =>
+        
+        if not absPos?
+            absPos = pos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
+        
+        opt = items: [ 
+            text:   'Toggle History'
+            combo:  'alt+h' 
+            cb:     @toggleHistory
+        ,
+            text:   'Toggle Extensions'
+            combo:  'ctrl+e' 
+            cb:     @toggleExtensions
+        ,
+            text:   'Remove'
+            combo:  'backspace' 
+            cb:     @removeObject
+        ,
+            text:   'Clear History'
+            cb:     @clearHistory
+        ]
+        
+        opt.x = absPos.x
+        opt.y = absPos.y
+        popup.menu opt
+        
     # 000   000  00000000  000   000  
     # 000  000   000        000 000   
     # 0000000    0000000     00000    
