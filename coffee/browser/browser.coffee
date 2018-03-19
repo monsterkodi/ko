@@ -170,7 +170,7 @@ class Browser extends Stage
 
     hasEmptyColumns: -> _.last(@columns).isEmpty()
 
-    height: -> @flex.height()
+    height: -> @flex?.height()
     numCols: -> @columns.length 
     column: (i) -> @columns[i] if 0 <= i < @numCols()
 

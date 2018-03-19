@@ -66,11 +66,13 @@ class Goto extends Command
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
         
     execute: (command) ->
+        
         command = super command
+        
         if /^\-?\d+$/.test command # goto line number
             line = parseInt command
-            editor = window.editorWithName @focus
-            return error "no editor? focus: #{@focus}" if not editor?
+            editor = @receivingEditor()
+            return error "no editor? focus: #{@receiver}" if not editor?
             if line < 0
                 line = editor.numLines() + line
             else 
@@ -78,7 +80,7 @@ class Goto extends Command
             line = clamp 0, editor.numLines()-1, line
             editor.singleCursorAtPos [0,line], extend: @name == 'selecto'
             editor.scroll.cursorToTop()
-            focus: @focus
+            focus: @receiver
             do: "show #{editor.name}"
         else if command.length
             type = @types[command] ? 'func'

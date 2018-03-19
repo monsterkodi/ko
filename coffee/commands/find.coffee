@@ -6,7 +6,7 @@
 000       000  000   000  0000000  
 ###
 
-{ log, os } = require 'kxk'
+{empty, log, os } = require 'kxk'
 
 Command = require '../commandline/command'
 
@@ -28,12 +28,31 @@ class Find extends Command
     # 0000000      000     000   000  000   000     000   
         
     start: (name) ->
+        
         if name == 'find'
-            window.editor.highlightForFind()
+            editor = @receivingEditor()
+            editor.highlightForFind()
             window.split.focus 'commandline'
+            if @getText() != editor.textOfHighlight() and not empty editor.textOfHighlight()
+                @setText editor.textOfHighlight()
+            
         @type = @types[@names.indexOf name]
+        
         super name
 
+    #  0000000   0000000   000   000   0000000  00000000  000    
+    # 000       000   000  0000  000  000       000       000    
+    # 000       000000000  000 0 000  000       0000000   000    
+    # 000       000   000  000  0000  000       000       000    
+    #  0000000  000   000  000   000   0000000  00000000  0000000
+    
+    cancel: ->
+        
+        @hideList()  
+        @receivingEditor()?.clearHighlights()
+        focus: @receiver
+        show: 'editor'
+        
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000
     # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000

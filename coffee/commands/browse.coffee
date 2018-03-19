@@ -26,13 +26,14 @@ class Browse extends Command
         window.area.on 'resized', @onAreaResized
         post.on 'file', @onFile
         
-        @browser.on 'itemActivated', @onItemActivated
+        @browser.on 'itemActivated', @onBrowserItemActivated
         
         @syntaxName = 'browser'
         
     onFile: (file) =>
-        # log 'onFile', file, slash.resolve @getText()
-        if file != slash.resolve @getText()
+        
+        if @isActive() and @getText() != slash.tilde file
+            # log 'onFile', file, slash.resolve @getText()
             @setText slash.tilde file
         
     restoreState: (state) -> 
@@ -280,7 +281,19 @@ class Browse extends Command
         switch dir
             when 'up'   then @select @selected-1
             when 'down' then @select @selected+1
-                            
+
+    #  0000000   0000000   000   000   0000000  00000000  000      
+    # 000       000   000  0000  000  000       000       000      
+    # 000       000000000  000 0 000  000       0000000   000      
+    # 000       000   000  000  0000  000       000       000      
+    #  0000000  000   000  000   000   0000000  00000000  0000000  
+    
+    cancel: ->
+        
+        @hideList()
+        focus: @receiver
+        show: 'editor'
+            
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000  
     # 000        000 000   000       000       000   000     000     000       
     # 0000000     00000    0000000   000       000   000     000     0000000   
@@ -290,6 +303,8 @@ class Browse extends Command
     execute: (command) ->
         
         return error "no command?" if not command?
+        
+        @hideList()
         
         @cmdID += 1
         cmd = command.trim()
@@ -301,13 +316,19 @@ class Browse extends Command
             else if slash.fileExists slash.removeLinePos cmd
                 @browser.loadFile cmd
                 @commandline.setText cmd
+                log 'jumpTo', cmd
+                post.emit 'jumpToFile', file:cmd
                 return
 
         error 'browse.execute -- unhandled', cmd     
     
-    onItemActivated: (item) =>
+    onBrowserItemActivated: (item) =>
 
-        if item.file 
+        if not @isActive()
+            @commandline.command.onBrowserItemActivated? item
+            return
+        
+        if item.file
             pth = slash.tilde item.file
             if item.type == 'dir' 
                 pth += '/'

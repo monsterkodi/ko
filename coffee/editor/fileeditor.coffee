@@ -216,7 +216,9 @@ class FileEditor extends TextEditor
     jumpToFile: (opt) =>
         
         if opt.newTab
+            
             post.emit 'newTabWithFile', opt.file
+            
         else
             
             [file, fpos] = slash.splitFilePos opt.file
@@ -228,6 +230,7 @@ class FileEditor extends TextEditor
             opt.oldPos = @cursorPos()
             opt.oldFile = @currentFile
             
+            # log 'opt:', opt
             window.navigate.gotoFilePos opt
 
     jumpTo: (word, opt) =>

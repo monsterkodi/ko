@@ -107,7 +107,7 @@ class Command
         
         @hideList()        
         text: ''
-        focus: @focus
+        focus: @receiver
         show: 'editor'
         
     clear: ->
@@ -323,10 +323,21 @@ class Command
     # 000        0000000    0000000   0000000   0000000 
     
     grabFocus: -> @commandline.focus()
-    setFocus: (focus) -> 
-        return if focus == 'body'
-        @focus = focus ? 'editor'
+    
+    # 00000000   00000000   0000000  00000000  000  000   000  00000000  00000000   
+    # 000   000  000       000       000       000  000   000  000       000   000  
+    # 0000000    0000000   000       0000000   000   000 000   0000000   0000000    
+    # 000   000  000       000       000       000     000     000       000   000  
+    # 000   000  00000000   0000000  00000000  000      0      00000000  000   000  
+    
+    setReceiver: (receiver) ->
+        
+        return if receiver == 'body'
+        @receiver = receiver ? 'editor'
+        log @receiver
 
+    receivingEditor: -> window.editorWithName @receiver
+        
     #  0000000  000000000   0000000   000000000  00000000
     # 000          000     000   000     000     000     
     # 0000000      000     000000000     000     0000000 

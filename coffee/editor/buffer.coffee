@@ -223,6 +223,7 @@ class Buffer extends event
     textsInRanges: (rgs) -> (@textInRange(r) for r in rgs)
     textInRanges:  (rgs) -> @textsInRanges(rgs).join '\n'
     textOfSelection:     -> @textInRanges @selections()
+    textOfHighlight:     -> @numHighlights() and @textInRange(@highlight 0) or ''
 
     # 000  000   000  0000000    00000000  000   000  000000000
     # 000  0000  000  000   000  000       0000  000     000   

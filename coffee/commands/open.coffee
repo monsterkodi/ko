@@ -33,6 +33,8 @@ class Open extends Command
         
         super commandline
         
+        post.on 'file', @onFile
+        
         @names      = ["open", "new tab", "new window"]
         @files      = null
         @file       = null
@@ -40,7 +42,13 @@ class Open extends Command
         @pkg        = null
         @selected   = 0
         @navigating = false
-                    
+          
+    onFile: (file) =>
+        
+        if @isActive() and @getText() != slash.file file
+            log 'onFile', file, slash.resolve @getText()
+            @setText slash.file file
+        
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000
     # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
@@ -508,7 +516,15 @@ class Open extends Command
             status: 'ok'
         else
             status: 'failed'
+  
+    onBrowserItemActivated: (item) =>
 
+        return if not @isActive()
+        
+        # if item.file
+            # if item.type == 'file' 
+                # @commandline.setText pth
+            
     # 00000000   00000000   0000000   0000000   000      000   000  00000000  0000000  
     # 000   000  000       000       000   000  000      000   000  000       000   000
     # 0000000    0000000   0000000   000   000  000       000 000   0000000   000   000

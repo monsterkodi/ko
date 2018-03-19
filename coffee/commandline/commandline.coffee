@@ -16,8 +16,6 @@ class Commandline extends TextEditor
 
         super viewElem, features: [], fontSize: 24, syntaxName: 'commandline'
 
-        log 'Commandline', @syntax.name
-        
         @mainCommands = ['browse', 'goto', 'open', 'search', 'find', 'coffee', 'build', 'macro']
         @hideCommands = ['selecto', 'Term', 'Build', 'Browse']
 
@@ -37,7 +35,7 @@ class Commandline extends TextEditor
 
         post.on 'restore', @restore
         post.on 'stash',   @stash
-
+        
         @view.onblur = =>
             @button.classList.remove 'active'
             @list?.remove()
@@ -69,7 +67,7 @@ class Commandline extends TextEditor
             if @command
                 activeID = document.activeElement.id
                 if activeID.startsWith 'column' then activeID = 'editor'
-                @command.setFocus activeID != 'commandline-editor' and activeID or null
+                @command.setReceiver activeID != 'commandline-editor' and activeID or null
                 @setName name
                 @button.className = "commandline-button active #{@command.prefsID}"
                 @commands[name]?.restoreState? state
@@ -112,7 +110,7 @@ class Commandline extends TextEditor
         @selectSingleRange @rangeForLineAtIndex 0
 
     setText: (t) ->
-        
+
         @setLines [t ? '']
         @singleCursorAtPos [@line(0).length, 0]
 
@@ -141,12 +139,13 @@ class Commandline extends TextEditor
     # 000       000  000      000             000      000   000  000   000  000   000  000       000   000
     # 000       000  0000000  00000000        0000000   0000000   000   000  0000000    00000000  0000000
 
-    fileLoaded: (file) ->
+    # fileLoaded: (file) ->
 
-        if not @command?
-            @command = @commands['open']
-            @command.loadState()
-            @setText slash.basename file
+        # log @command?, file
+        # if not @command?
+            # @command = @commands['open']
+            # @command.loadState()
+            # @setText slash.basename file
 
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000
@@ -170,7 +169,9 @@ class Commandline extends TextEditor
             
             activeID = document.activeElement.id
             if activeID.startsWith 'column' then activeID = 'editor'
-            @command.setFocus activeID != 'commandline-editor' and activeID or null
+            if activeID and activeID != 'commandline-editor'
+                @command.setReceiver activeID
+                
             @view.focus()
             
             @setName name
