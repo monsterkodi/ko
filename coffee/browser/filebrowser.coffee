@@ -26,6 +26,7 @@ class FileBrowser extends Browser
         post.on 'saved',                 @updateGitStatus
         post.on 'gitRefChanged',         @updateGitStatus
         post.on 'fileIndexed',           @onFileIndexed
+        post.on 'sourceInfoForFile',     @loadSourceInfo
     
         @shelfResize = elem 'div', class: 'shelfResize'
         @shelfResize.style.position = 'absolute'

@@ -70,6 +70,7 @@ class Indexer
     constructor: () ->
         
         post.onGet 'indexer', @onGet
+        post.on 'sourceInfoForFile', @onSourceInfoForFile
         @collectBins()
         @collectProjects()
     
@@ -106,6 +107,12 @@ class Indexer
                         if cn.length>1 and lc.indexOf(cn)>=0 or lc.startsWith(cn)
                             return true
         value
+        
+    onSourceInfoForFile: (opt) =>
+        file = opt.item.file
+        # log 'sourceInfoForFile', file, @files[file]
+        if @files[file]?
+            post.toWin opt.winID, 'sourceInfoForFile', @files[file], opt
         
     #  0000000   0000000   000      000      00000000   0000000  000000000  
     # 000       000   000  000      000      000       000          000     

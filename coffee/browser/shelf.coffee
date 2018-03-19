@@ -61,8 +61,7 @@ class Shelf extends Column
             when 'file'  
                 if not @browser.loadSourceItem item, column: 0
                     @browser.loadFile item.file, focus:false, column:0, dir:slash.dir item.file
-                else
-                    post.emit 'jumpToFile', file:item.file
+                post.emit 'jumpToFile', file:item.file
             else
                 @browser.loadSourceItem item, column: 0
                 if item.file

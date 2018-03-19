@@ -83,7 +83,7 @@ class Column
     activateRow:  (row) -> @row(row)?.activate()
        
     activeRow: -> _.find @rows, (r) -> r.isActive()
-    activePath: -> @activeRow().path()
+    activePath: -> @activeRow()?.path()
     
     row: (row) -> # accepts element, index, string or row
         if      _.isNumber  row then return 0 <= row < @numRows() and @rows[row] or null

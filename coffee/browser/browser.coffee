@@ -248,22 +248,19 @@ class Browser extends Stage
     # 000       000   000  000  0000     000     000       000  0000     000     
     #  0000000   0000000   000   000     000     00000000  000   000     000     
     
-    loadSourceItem: (item, opt={}) ->
+    loadSourceInfo: (info, opt) =>
         
-        items = []
-        file  = item.file
-        name  = slash.base file
-        
-        # log 'loadSourceItem', item
-        
-        files = post.get 'indexer', 'files', file
+        file = opt.item.file
+        if file != @activeColumn()?.activePath()
+            return
 
-        clsss = files[file]?.classes ? []
+        items = []
+        clsss = info?.classes ? []
         for clss in clsss
             text = '● '+clss.name
             items.push name: clss.name, text:text, type:'class', file: file, line: clss.line
         
-        funcs = files[file]?.funcs ? []
+        funcs = info?.funcs ? []
         for func in funcs
             if func.test == 'describe'
                 text = '● '+func.name
@@ -275,11 +272,34 @@ class Browser extends Stage
 
         if items.length
             items.sort (a,b) -> a.line - b.line
-            opt.parent ?= item
+            opt.parent ?= opt.item
             @clearColumnsFrom opt.column
             @loadItems items, opt
-            return true
-            
+            true
+        else
+            false
+    
+    loadSourceItem: (item, opt={}) ->
+        
+        file = item.file
+        if opt.async
+            opt.item = item
+            if not @indexedFiles?[file]
+                opt.winID = window.winID
+                post.toMain 'sourceInfoForFile', opt
+            else
+                clearTimeout @loadSourceInfoTimer
+                delayedLoadSourceInfo = =>
+                    @loadSourceInfo @indexedFiles[file], opt
+                @loadSourceInfoTimer = setTimeout delayedLoadSourceInfo, 100
+            return false
+        
+        items = []
+        
+        @indexedFiles ?= post.get 'indexer', 'files' #, file
+
+        if @indexedFiles[file]?
+            return @loadSourceInfo @indexedFiles[file], opt
         false
             
     loadContent: (row, opt) ->
@@ -298,7 +318,7 @@ class Browser extends Stage
             else if ext in ['pxm']
                 @clearColumnsFrom opt.column, pop:true
                 @convertPXM row
-            else
+            else if not opt.async
                 @clearColumnsFrom opt.column
             @endNavigateToTarget?()
             
