@@ -6,7 +6,7 @@
    000     00000000  000   000  000   000
 ###
 
-{ reversed, slash, fs, post, noon, store, clamp, log, _ } = require 'kxk'
+{ reversed, slash, fs, post, noon, store, childp, clamp, empty, error, log, _ } = require 'kxk'
   
 Walker   = require '../tools/walker'
 Syntax   = require '../editor/syntax'
@@ -56,6 +56,8 @@ class Term extends Command
 
     getPWD: (@pwdTag) ->
 
+        return if slash.win()
+        
         @pwdID = @cmdID
         post.toMain 'shellCommand', winID: window.winID, cmdID: @cmdID, command: "pwd"
         @cmdID += 1
@@ -315,7 +317,11 @@ class Term extends Command
         return if not rawCommand.trim().length
 
         terminal = window.terminal
-        cmds = @splitAlias rawCommand
+        if not rawCommand.startsWith 'alias'
+            cmds = @splitAlias rawCommand
+        else
+            cmds = [rawCommand]
+
         command = cmds.join ' '
 
         terminal.doAutoClear()
@@ -578,7 +584,15 @@ class Term extends Command
 
                     appendCommandMeta cmmd
 
-                    post.toMain 'shellCommand', winID: window.winID, cmdID: @cmdID, command: cmmd
+                    if slash.win()
+                        
+                        childp.exec cmmd, {cwd:process.cwd(), encoding: 'utf8'}, (err, stdout, stderr) ->
+                            return error stderr, stdout, err if not empty err
+                            terminal = window.terminal
+                            terminal.output stdout
+                            terminal.output stderr
+                    else
+                        post.toMain 'shellCommand', winID: window.winID, cmdID: @cmdID, command: cmmd
 
                     terminal.singleCursorAtPos [0, terminal.numLines()-1]
 

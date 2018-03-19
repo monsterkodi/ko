@@ -27,7 +27,7 @@ class Macro extends Command
         @macros    = Macro.macroNames
         @macros    = @macros.concat Transform.transformNames
         @names     = ['macro']
-
+        
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000
     # 0000000      000     000000000  0000000       000
@@ -328,9 +328,10 @@ class Macro extends Command
                 #    000     000   000  000   000  000  0000       000  000       000   000  000   000  000 0 000    
                 #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000    
                 
-                if cmmd in Transform.transformNames
+                if Transform.transformNames and cmmd in Transform.transformNames
                     window.textEditor.Transform.do.apply null, [window.textEditor, cmmd].concat args
                 else
+                    log 'unhandled macro', cmmd
                     if _.last(@history) == command.trim()
                         @history.pop()
 

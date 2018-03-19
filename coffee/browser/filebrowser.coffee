@@ -6,7 +6,7 @@
 000       000  0000000  00000000        0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 ###
 
-{ empty, elem, clamp, drag, post, clamp, childp, state, slash, fs, os, error, log, $ } = require 'kxk'
+{ empty, elem, clamp, drag, post, clamp, state, slash, fs, os, error, log, $ } = require 'kxk'
   
 Browser  = require './browser'
 Shelf    = require './shelf'
@@ -235,6 +235,7 @@ class FileBrowser extends Browser
             
     updateGitStatus: (file) =>
         # log 'updateGitStatus', file, @lastUsedColumn().index
+        return if not @lastUsedColumn()
         for c in [0..@lastUsedColumn().index]
             @getGitStatus column:c, file:file
 

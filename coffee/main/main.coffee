@@ -6,7 +6,7 @@
 000   000  000   000  000  000   000
 ###
 
-{ fileList, first, colors, childp, karg, about, prefs, state, store, noon, post, slash, os, fs, str, empty, error, _ } = require 'kxk'
+{ fileList, first, colors, karg, about, prefs, state, store, noon, post, slash, os, fs, str, empty, error, _ } = require 'kxk'
 
 pkg      = require '../../package.json'
 Execute  = require './execute'

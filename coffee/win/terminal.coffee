@@ -6,7 +6,7 @@
    000     00000000  000   000  000   000  000  000   000  000   000  0000000
 ###
 
-{ reversed, prefs, pos, popup, error, log, _  } = require 'kxk'
+{ reversed, prefs, pos, popup, childp, empty, error, log, _  } = require 'kxk'
 
 salt       = require '../tools/salt'
 TextEditor = require '../editor/texteditor'
@@ -144,6 +144,16 @@ class Terminal extends TextEditor
     getAutoClear: -> prefs.get 'terminal:autoclear', true
     doAutoClear: -> if @getAutoClear() then @clear()
 
+    # 00000000  000   000  00000000   0000000  000   000  000000000  00000000  
+    # 000        000 000   000       000       000   000     000     000       
+    # 0000000     00000    0000000   000       000   000     000     0000000   
+    # 000        000 000   000       000       000   000     000     000       
+    # 00000000  000   000  00000000   0000000   0000000      000     00000000  
+    
+    execute: (cmmd) ->
+        
+        window.commandlist.commands.term.execute cmmd        
+    
     # 00000000    0000000   00000000   000   000  00000000     
     # 000   000  000   000  000   000  000   000  000   000    
     # 00000000   000   000  00000000   000   000  00000000     

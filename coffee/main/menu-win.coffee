@@ -79,7 +79,7 @@ class Menu
                 type: 'separator'
             ,
                 label:       'Preferences'
-                accelerator: 'CmdOrCtrl+,'
+                accelerator: 'ctrl+shift+,'
                 click:       (i,win) -> post.toWin win.id, 'loadFiles', [prefs.store.file], newTab:true
             ,
                 type: 'separator'
@@ -272,6 +272,23 @@ class Menu
                         label:      'In Main Process'
                         accelerator: 'alt+shift+c'
                         click:       (i,win) -> post.toWin win.id, 'menuAction', 'Coffee'
+                ]
+            ,
+                # 000000000  00000000  00000000   00     00  000  000   000   0000000   000
+                #    000     000       000   000  000   000  000  0000  000  000   000  000
+                #    000     0000000   0000000    000000000  000  000 0 000  000000000  000
+                #    000     000       000   000  000 0 000  000  000  0000  000   000  000
+                #    000     00000000  000   000  000   000  000  000   000  000   000  0000000
+
+                label:      'Terminal'
+                submenu:    [
+                        label:      'small'
+                        accelerator: 'ctrl+,'
+                        click:       (i,win) -> post.toWin win.id, 'menuAction', 'term'
+                    ,
+                        label:      'large'
+                        accelerator: 'alt+,'
+                        click:       (i,win) -> post.toWin win.id, 'menuAction', 'Term'
                 ]
             ,
                 # 00     00   0000000    0000000  00000000    0000000

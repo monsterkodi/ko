@@ -7,7 +7,7 @@
 ###
 
 { stopEvent, fileList, keyinfo, atomic, prefs, state, stash, first, reversed,
-  drag, noon, post, slash, clamp, pos, str, sw, sh, os, fs, log, error, _ } = require 'kxk'
+  drag, noon, post, slash, clamp, pos, str, sw, sh, os, fs, empty, log, error, _ } = require 'kxk'
 
 Split       = require './split'
 Terminal    = require './terminal'
@@ -232,8 +232,8 @@ saveFile = (file) ->
 
         editor.saveScrollCursorsAndSelections()
 
-        if err?
-            log "error saving file #{file}:", err
+        if not empty err
+            error "saving file #{file}:", err
         else
             editor.setCurrentFile      file
             post.toOthers 'fileSaved', file, window.winID
