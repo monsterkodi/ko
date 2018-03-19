@@ -282,8 +282,9 @@ class Browser extends Stage
     loadSourceItem: (item, opt={}) ->
         
         file = item.file
+        opt.item = item
+        
         if opt.async
-            opt.item = item
             if not @indexedFiles?[file]
                 opt.winID = window.winID
                 post.toMain 'sourceInfoForFile', opt
