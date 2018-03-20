@@ -412,6 +412,10 @@ class FileEditor extends TextEditor
             combo:  'ctrl+return'
             cb:     -> window.editor.jumpToWord()
         ,
+            text:   'Git'
+            combo:  'alt+g'
+            cb:     -> window.menuAction 'doMacro', 'git'
+        ,
             text:   'Show Menu'
             combo:  'alt+m'
             cb:     -> window.menuAction 'Show Menu'

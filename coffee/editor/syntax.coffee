@@ -14,14 +14,14 @@ Balancer = require './balancer'
 
 class Syntax
 
-    constructor: (@editor) ->
+    constructor: (syntax, getLine) ->
 
-        # @name     = @editor.syntaxName ? @editor.config?.syntaxName ? 'txt'
-        @name = @editor.config?.syntaxName ? 'txt'
+        # @name = @editor.config?.syntaxName ? 'txt'
+        @name = syntax
         
         @diss     = []
         @colors   = {}
-        @balancer = new Balancer @
+        @balancer = new Balancer @, getLine
  
         post.on 'schemeChanged', @onSchemeChanged
 

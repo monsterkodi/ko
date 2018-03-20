@@ -56,10 +56,16 @@ class GitInfo
         matchr.sortRanges rgs
         dss = matchr.dissect rgs, join:true
         
+        clss = switch change.change
+            when 'added'   then 'searchResult gitInfoAdded'
+            when 'deleted' then 'searchResult gitInfoDeleted'
+            when 'changed' then 'searchResult gitInfoChanged'
+            when 'new'     then 'searchResult'
+        
         meta =
             diss: dss
             href: "#{change.file}:#{change.line}"
-            clss: 'searchResult'
+            clss: clss
             click: @onMetaClick
                         
         terminal.appendMeta meta
@@ -121,6 +127,7 @@ class GitInfo
             terminal.appendMeta clss: 'spacer'
                 
             for file in info.deleted
+                
                 @logFile 'deleted', file
                 
             for file in info.added
@@ -130,7 +137,7 @@ class GitInfo
                 lines = data.split /\r?\n/
                 line  = 1
                 for text in lines
-                    @logChange text:text, file:file, line:line
+                    @logChange text:text, file:file, line:line, change:'new'
                     line+=1
                 terminal.appendMeta clss: 'spacer'
                 
@@ -141,15 +148,16 @@ class GitInfo
                     line = change.line
                     if not empty change.mod
                         for mod in change.mod
-                            @logChange text:mod.new, file:changeInfo.file, line:line
+                            @logChange text:mod.new, file:changeInfo.file, line:line, change:'changed'
                             line += 1
                     if not empty change.add
                         for mod in change.add
-                            @logChange text:mod.new, file:changeInfo.file, line:line
+                            @logChange text:mod.new, file:changeInfo.file, line:line, change:'added'
                             line += 1
                     if not empty change.del
                         for mod in change.del
-                            @logChange text:mod.old, file:changeInfo.file, line:line
+                            log mod
+                            @logChange text:mod.old, file:changeInfo.file, line:line, change:'deleted'
                             line += 1
                     terminal.appendMeta clss: 'spacer'
 

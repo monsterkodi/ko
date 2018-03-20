@@ -11,9 +11,8 @@ matchr = require '../tools/matchr'
 
 class Balancer
 
-    constructor: (@syntax) ->
+    constructor: (@syntax, @getLine) ->
 
-        @editor = @syntax.editor
         @unbalanced = []
         @setFileType 'txt'
         
@@ -123,10 +122,10 @@ class Balancer
 
     dissForLine: (li) ->
 
-        text = @editor.line li
+        text = @getLine li
 
         if not text?
-            return error "#{@editor.name} no line at index #{li}? #{@editor.numLines()}"
+            return error "dissForLine -- no line at index #{li}?"
 
         @mergeRegions @parse(text, li), text, li
     

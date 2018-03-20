@@ -25,11 +25,12 @@ class Editor extends Buffer
         
         Editor.initActions() if not Editor.actions?
         
+        syntaxName = @config?.syntaxName ? 'txt'
         
         @indentString      = _.padStart "", 4
         @stickySelection   = false
         @dbg               = false
-        @syntax            = new syntax @
+        @syntax            = new syntax syntaxName, @line
         @do                = new Do @
         
         @setupFileType()

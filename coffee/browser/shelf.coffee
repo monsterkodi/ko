@@ -221,7 +221,7 @@ class Shelf extends Column
     removeHistory: ->
         
         separatorIndex = @historySeparatorIndex()
-        log 'separatorIndex', separatorIndex, @numRows()
+        # log 'separatorIndex', separatorIndex, @numRows()
         while @numRows() and @numRows() > separatorIndex
             @removeRow @row(@numRows()-1)
 
