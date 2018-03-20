@@ -28,6 +28,7 @@ class Shelf extends Column
 
         super browser
         
+        @items  = []
         @index  = -1
         @div.id = 'shelf'
         
@@ -124,6 +125,7 @@ class Shelf extends Column
         
         @clear()
         
+        @items ?= []
         @addItems @items
         
         if opt?.save != false
@@ -219,7 +221,8 @@ class Shelf extends Column
     removeHistory: ->
         
         separatorIndex = @historySeparatorIndex()
-        while @numRows() > separatorIndex
+        log 'separatorIndex', separatorIndex, @numRows()
+        while @numRows() and @numRows() > separatorIndex
             @removeRow @row(@numRows()-1)
 
     onNavigateHistoryChanged: (filePositions, currentIndex) =>
