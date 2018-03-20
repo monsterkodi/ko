@@ -8,7 +8,7 @@
 
 { post, str, error, log, _ } = require 'kxk'
 
-Syntax        = require '../editor/syntax'
+syntax        = require '../editor/syntax'
 Command       = require '../commandline/command'
 ObjectBrowser = require '../browser/objectbrowser'
 coffee        = require 'coffeescript'
@@ -68,7 +68,7 @@ class Coffee extends Command
             window.split.raise 'terminal'        
             terminal.appendMeta 
                 line: "#{cmdID} ⚡"
-                diss: Syntax.dissForTextAndSyntax str(result.error), 'coffee'
+                diss: syntax.dissForTextAndSyntax str(result.error), 'coffee'
                 clss: 'coffeeResult'
         else
             
@@ -80,7 +80,7 @@ class Coffee extends Command
                 li += 1
                 terminal.appendMeta 
                     line: "#{cmdID} ▶"
-                    diss: Syntax.dissForTextAndSyntax l, 'coffee'
+                    diss: syntax.dissForTextAndSyntax l, 'coffee'
                     clss: 'coffeeResult'                    
                     
     # 0000000    00000000    0000000   000   000   0000000  00000000  
@@ -191,7 +191,7 @@ class Coffee extends Command
             continue if not l.trim().length
             terminal.appendMeta 
                 line: "#{@cmdID} ■"
-                diss: Syntax.dissForTextAndSyntax l, 'coffee'
+                diss: syntax.dissForTextAndSyntax l, 'coffee'
                 clss: 'coffeeCommand'
                 command: command
                 click: @onMetaClick

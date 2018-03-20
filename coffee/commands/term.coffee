@@ -9,7 +9,7 @@
 { reversed, slash, fs, post, noon, store, childp, clamp, empty, error, log, _ } = require 'kxk'
   
 Walker   = require '../tools/walker'
-Syntax   = require '../editor/syntax'
+syntax   = require '../editor/syntax'
 Command  = require '../commandline/command'
 
 class Term extends Command
@@ -247,7 +247,7 @@ class Term extends Command
             key = aliasList[0]
             cmd = @alias.get key
             meta =
-                diss: Syntax.dissForTextAndSyntax "#{_.padEnd key, 10} #{cmd}" , 'noon'
+                diss: syntax.dissForTextAndSyntax "#{_.padEnd key, 10} #{cmd}" , 'noon'
                 line: 0
                 clss: 'termResult'
             terminal.appendMeta meta
@@ -267,7 +267,7 @@ class Term extends Command
         for key,cmd of @alias.data
             li += 1
             meta =
-                diss: Syntax.dissForTextAndSyntax "#{_.padEnd key, 10} #{cmd}" , 'noon'
+                diss: syntax.dissForTextAndSyntax "#{_.padEnd key, 10} #{cmd}" , 'noon'
                 line: li
                 clss: 'termResult'
             terminal.appendMeta meta
@@ -295,17 +295,7 @@ class Term extends Command
                 if split[0] == '!'
                     return ['history']
                 else if split[0][1] == '!'
-                    if split[0][2] == '~'
-                        @deleteCommandWithID @commandIDs[_.last @history]
-                        return ['history']
-                    else
-                        split.splice 0, 1, _.last @history
-                else if split[0][1] == '~'
-                    if split[0].length > 2
-                        @deleteCommandWithID split[0].slice 2
-                    for id in split.slice 1
-                        @deleteCommandWithID id
-                    return ['history']
+                    split.splice 0, 1, _.last @history
                 else if @idCommands[parseInt(split[0].slice(1))]?
                     split.splice 0, 1, @idCommands[parseInt(split[0].slice(1))]
 
@@ -390,6 +380,23 @@ class Term extends Command
             switch cmd
                 when 'alias' then @aliasCmd args
                 when 'clear' then terminal.clear()
+                
+                when 'help'
+                
+                    terminal = window.terminal
+                    text = fs.readFileSync "#{__dirname}/../../bin/help-terminal.noon", encoding: 'utf8'
+                    for l in text.split '\n'
+                        terminal.appendLineDiss l, syntax.dissForTextAndSyntax l, 'noon'
+    
+                    terminal.scroll.cursorToTop 1
+                    window.split.do 'show terminal'
+                
+                #  0000000  000000000   0000000   00000000   
+                # 000          000     000   000  000   000  
+                # 0000000      000     000   000  00000000   
+                #      000     000     000   000  000        
+                # 0000000      000      0000000   000        
+                
                 when 'stop'
 
                     if slash.win() then continue
@@ -402,7 +409,7 @@ class Term extends Command
                         if meta[2].cmdID?
                             meta[2].span?.innerHTML = "■"
 
-                when 'header'
+                when 'header', 'headers'
 
                     # 000   000  00000000   0000000   0000000    00000000  00000000
                     # 000   000  000       000   000  000   000  000       000   000
@@ -462,7 +469,7 @@ class Term extends Command
                         continue if args.length and not filterRegExp(args).test h
                         continue if not @commandIDs[h]
                         meta =
-                            diss: Syntax.dissForTextAndSyntax "#{h}", 'ko'
+                            diss: syntax.dissForTextAndSyntax "#{h}", 'ko'
                             cmmd: h
                             line: @commandIDs[h]
                             clss: 'termResult'
@@ -492,7 +499,7 @@ class Term extends Command
                         else
                             pth = _.padStart('', lastDir.length+1) + slash.basename pth
                         meta =
-                            diss: Syntax.dissForTextAndSyntax "◼ #{pth}", 'ko'
+                            diss: syntax.dissForTextAndSyntax "◼ #{pth}", 'ko'
                             href: "#{file}:1"
                             line: li
                             clss: 'searchResult'
@@ -527,10 +534,10 @@ class Term extends Command
                             classOrFile = info.class? and "#{info.static and '◆' or '●'} #{info.class}" or "◼ #{slash.basename info.file}"
                             
                             if i == 0
-                                diss = Syntax.dissForTextAndSyntax "▸ #{func} #{classOrFile}", 'ko'
+                                diss = syntax.dissForTextAndSyntax "▸ #{func} #{classOrFile}", 'ko'
                             else
                                 spcs = _.padStart '', "▸ #{func}".length
-                                diss = Syntax.dissForTextAndSyntax "#{spcs} #{classOrFile}", 'ko'
+                                diss = syntax.dissForTextAndSyntax "#{spcs} #{classOrFile}", 'ko'
                                 
                             meta =
                                 diss: diss
@@ -559,7 +566,7 @@ class Term extends Command
                         info = classes[clss]
                         terminal.queueMeta clss: 'salt', text: clss
                         meta =
-                            diss: Syntax.dissForTextAndSyntax "● #{clss}", 'ko'
+                            diss: syntax.dissForTextAndSyntax "● #{clss}", 'ko'
                             href: "#{info.file}:#{info.line}"
                             clss: 'termResult'
                             click: @onMetaClick
@@ -567,7 +574,7 @@ class Term extends Command
 
                         for mthd, minfo of info.methods
                             meta =
-                                diss: Syntax.dissForTextAndSyntax "    #{minfo.static and '◆' or '▸'} #{mthd}", 'ko'
+                                diss: syntax.dissForTextAndSyntax "    #{minfo.static and '◆' or '▸'} #{mthd}", 'ko'
                                 href: "#{minfo.file}:#{minfo.line}"
                                 clss: 'searchResult'
                                 click: @onMetaClick
@@ -593,7 +600,7 @@ class Term extends Command
                         if word[0] != char
                             char = word[0]
                             terminal.queueMeta clss: 'salt', text: char
-                        diss = Syntax.dissForTextAndSyntax "▸ #{word}", 'ko'
+                        diss = syntax.dissForTextAndSyntax "▸ #{word}", 'ko'
                         meta =
                             diss: diss
                             line: info.count
@@ -615,11 +622,15 @@ class Term extends Command
 
                     if slash.win()
                         
-                        childp.exec cmmd, {cwd:@cwd, encoding: 'utf8'}, (err, stdout, stderr) ->
+                        topLine = window.terminal.numLines()
+                        # log 'currentLine', topLine
+                        childp.exec cmmd, {cwd:@cwd, encoding: 'utf8'}, (err, stdout, stderr) =>
                             return error stderr, stdout, err if not empty err
                             terminal = window.terminal
                             terminal.output stdout
                             terminal.output stderr
+                            # log 'scroll', topLine
+                            terminal.scroll.cursorToTop topLine + 1 #+ @headers and 7 or 1
                     else
                         post.toMain 'shellCommand', winID: window.winID, cmdID: @cmdID, command: cmmd
 

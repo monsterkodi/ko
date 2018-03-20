@@ -33,8 +33,8 @@ display
     ⌘-          decrease font size
     ⌘=          increase font size
     ⌘0          reset font size
-    ⌘\          toggle text offset when window is as wide as screen
-    ⌘⇧Y         close terminal and commandline
+    ⌘\          toggle centered layout
+    ⌘⇧Y         maximize editor (close terminal, logview and commandline)
     
 commandline
     ⌘up|down    move commandline to top|bottom
@@ -47,16 +47,20 @@ misc
     ^⌘left|right  jump to previous|next editing location
             
 term
-    alias [alias command]   set alias
+    alias               list aliases
+    alias name          show alias
+    alias name command  set alias
+    alias del name      remove alias
     files [regexp]      list files
     class [regexp]      list classes
     funcs [regexp]      list functions
     words [regexp]      list indexer words
-    clear               clear terminal ⌘K
+    clear  ⌘K           clear terminal 
     stop                terminate process and restart shell
-    autocd [on|off]     set autocd mode
-    headers [on|off]    set headers mode
-    history [regexp]    show command history
+    autocd [on|off]     
+    headers [on|off]    
+    autoclear [on|off]  
+    history [regexp]    
     !n                  repeat history command at index n
     !!                  repeat last history command
 

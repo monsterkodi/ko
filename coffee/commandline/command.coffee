@@ -8,7 +8,7 @@
 
 { reversed, clamp, state, elem, error, log, _ } = require 'kxk'
 
-Syntax      = require '../editor/syntax'
+syntax      = require '../editor/syntax'
 CommandList = require './commandlist'
 fuzzy       = require 'fuzzy'
 

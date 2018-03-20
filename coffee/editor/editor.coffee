@@ -9,7 +9,7 @@
 { fileList, clamp, empty, slash, str, error, log, _ } = require 'kxk'
 
 Buffer  = require './buffer'
-Syntax  = require './syntax'
+syntax  = require './syntax'
 Do      = require './do'
 
 class Editor extends Buffer
@@ -29,7 +29,7 @@ class Editor extends Buffer
         @indentString      = _.padStart "", 4
         @stickySelection   = false
         @dbg               = false
-        @syntax            = new Syntax @
+        @syntax            = new syntax @
         @do                = new Do @
         
         @setupFileType()
@@ -84,10 +84,10 @@ class Editor extends Buffer
         
         oldType   = @fileType
         @fileType = 'txt'
-        @fileType = Syntax.shebang @line(0) if @numLines()
+        @fileType = syntax.shebang @line(0) if @numLines()
         if @fileType == 'txt' and @currentFile?
             ext = slash.ext @currentFile
-            if ext in Syntax.syntaxNames
+            if ext in syntax.syntaxNames
                 @fileType = ext
 
         @setFileType @fileType
@@ -159,7 +159,7 @@ class Editor extends Buffer
     setText: (text="") -> 
 
         if @syntax.name == 'txt'
-            @syntax.name = Syntax.shebang text.slice 0, text.search /\r?\n/
+            @syntax.name = syntax.shebang text.slice 0, text.search /\r?\n/
                 
         lines = text.split /\n/
 
