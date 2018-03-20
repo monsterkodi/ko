@@ -20,6 +20,7 @@ Commandline = require '../commandline/commandline'
 FileEditor  = require '../editor/fileeditor'
 Navigate    = require '../main/navigate'
 FPS         = require '../tools/fps'
+CWD         = require '../tools/cwd'
 encode      = require '../tools/encode'
 scheme      = require '../tools/scheme'
 electron    = require 'electron'
@@ -157,6 +158,7 @@ winMain = ->
     logview     = window.logview     = new LogView 'logview'
     info        = window.info        = new Info editor
     fps         = window.fps         = new FPS()
+    cwd         = window.cwd         = new CWD()
 
     window.textEditor = window.focusEditor = editor
     window.lastFocus = editor.name

@@ -131,7 +131,12 @@ class Row
         if opt?.scroll != false
             @column.scroll.toIndex @index()
         window.setLastFocus @column.name()
-        if opt?.emit then @browser.emit 'itemActivated', @item
+        if opt?.emit 
+            @browser.emit 'itemActivated', @item
+            if @item.type == 'dir'
+                post.emit 'setCWD', @item.file
+            else if @item.type == 'file'
+                post.emit 'setCWD', slash.dir @item.file
         @
                 
     clearActive: ->

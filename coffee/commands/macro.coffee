@@ -114,6 +114,7 @@ class Macro extends Command
             # 000       000        0000000   
             
             when 'fps'   then window.fps?.toggle()
+            when 'cwd'   then window.cwd?.toggle()
 
             # 000000000  00000000   0000000  000000000
             #    000     000       000          000

@@ -19,6 +19,8 @@ class Term extends Command
         super commandline
 
         post.on 'shellCommandData', @onShellCommandData
+        post.on 'setCWD',           @setCWD
+        
         @idCommands = Object.create null
         @commandIDs = Object.create null
         @names      = ['term', 'Term']
@@ -30,14 +32,35 @@ class Term extends Command
         @cmdID      = 0
         @pwdID      = -1
         @bins       = post.get 'indexer', 'bins'
+        
+        @setCWD process.cwd()
 
+    #  0000000  00000000  000000000   0000000  000   000  0000000    
+    # 000       000          000     000       000 0 000  000   000  
+    # 0000000   0000000      000     000       000000000  000   000  
+    #      000  000          000     000       000   000  000   000  
+    # 0000000   00000000     000      0000000  00     00  0000000    
+    
+    setCWD: (cwd) => # only used on win (stupid terminal)
+        
+        if slash.isAbsolute slash.untilde cwd
+            @cwd = slash.resolve cwd
+        else
+            @cwd = slash.resolve slash.join @cwd, cwd
+        if not slash.isDir @cwd
+            @cwd = process.cwd()
+            
+        post.emit 'cwdSet', @cwd
+        
+        log @cwd
+        
     #  0000000   000   000        0000000     0000000   000000000   0000000
     # 000   000  0000  000        000   000  000   000     000     000   000
     # 000   000  000 0 000        000   000  000000000     000     000000000
     # 000   000  000  0000        000   000  000   000     000     000   000
     #  0000000   000   000        0000000    000   000     000     000   000
 
-    onShellCommandData: (cmdData) =>
+    onShellCommandData: (cmdData) => # only used on mac (pty terminal)
 
         if cmdData.cmd == @pwdID
             if cmdData.data != "pwd"
@@ -54,7 +77,7 @@ class Term extends Command
             terminal.output cmdData.data
             terminal.scroll.cursorToTop @headers and 7 or 1
 
-    getPWD: (@pwdTag) ->
+    getPWD: (@pwdTag) -> # only used on mac (pty terminal)
 
         return if slash.win()
         
@@ -357,11 +380,13 @@ class Term extends Command
 
             filterRegExp = (args) -> new RegExp("(#{args.join '|'})", 'i')
 
-            if cmd == 'alias'
-                @aliasCmd args
-                continue
-
+            if slash.win()
+                switch cmd
+                    when '..', '~', '/' then @setCWD cmd; continue
+                    when 'cd' then @setCWD args[0]; continue
+            
             switch cmd
+                when 'alias' then @aliasCmd args
                 when 'clear' then terminal.clear()
                 when 'stop'
 
@@ -586,7 +611,7 @@ class Term extends Command
 
                     if slash.win()
                         
-                        childp.exec cmmd, {cwd:process.cwd(), encoding: 'utf8'}, (err, stdout, stderr) ->
+                        childp.exec cmmd, {cwd:@cwd, encoding: 'utf8'}, (err, stdout, stderr) ->
                             return error stderr, stdout, err if not empty err
                             terminal = window.terminal
                             terminal.output stdout
