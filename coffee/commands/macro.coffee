@@ -10,6 +10,7 @@
   
 indexer   = require '../main/indexer'
 salt      = require '../tools/salt'
+GitInfo   = require '../win/gitinfo'
 Command   = require '../commandline/command'
 Mocha     = require 'mocha'
 Report    = require '../test/report'
@@ -107,14 +108,15 @@ class Macro extends Command
             
             when 'color' then editor.togglePigments()
             
-            # 00000000  00000000    0000000  
-            # 000       000   000  000       
-            # 000000    00000000   0000000   
-            # 000       000             000  
-            # 000       000        0000000   
+            # 00000000  00000000    0000000         0000000  000   000  0000000           0000000   000  000000000  
+            # 000       000   000  000             000       000 0 000  000   000        000        000     000     
+            # 000000    00000000   0000000         000       000000000  000   000        000  0000  000     000     
+            # 000       000             000        000       000   000  000   000        000   000  000     000     
+            # 000       000        0000000          0000000  00     00  0000000           0000000   000     000     
             
             when 'fps'   then window.fps?.toggle()
             when 'cwd'   then window.cwd?.toggle()
+            when 'git'   then GitInfo.start()
 
             # 000000000  00000000   0000000  000000000
             #    000     000       000          000

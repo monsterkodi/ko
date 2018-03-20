@@ -334,7 +334,7 @@ class Command
         
         return if receiver == 'body'
         @receiver = receiver ? 'editor'
-        log @receiver
+        # log @receiver
 
     receivingEditor: -> window.editorWithName @receiver
         

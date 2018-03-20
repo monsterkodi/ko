@@ -12,20 +12,21 @@ gitRoot = require './gitroot'
 
 gitStatus = (fileOrDir) ->
 
-    log 'gitStatus', fileOrDir
+    # log 'gitStatus', fileOrDir
     gitDir = slash.unslash gitRoot fileOrDir
 
     if not gitDir? or not slash.isDir gitDir
         log 'no git?', fileOrDir, gitDir
         return 
     
-    result = childp.execSync 'git status -s', 
+    result = childp.execSync 'git status --porcelain', 
         cwd:      gitDir
         encoding: 'utf8'
     
     lines = result.split '\n'
 
     info = 
+        gitDir:  gitDir
         changed: []
         deleted: []
         added:   []
@@ -51,5 +52,5 @@ gitStatus = (fileOrDir) ->
 if module.parent
     module.exports = gitStatus
 else
-    gitStatus process.cwd()
+    log gitStatus process.cwd()
     

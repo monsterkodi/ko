@@ -15,7 +15,7 @@ gitDiff = (file) ->
     gitCommand = "git --no-pager diff -U0 \"#{slash.file file}\""
 
     result = childp.execSync gitCommand, 
-        cwd: slash.unslash slash.dirname file
+        cwd: slash.unslash slash.dir file
         encoding: 'utf8' 
             
     info  = file:file, changes:[]

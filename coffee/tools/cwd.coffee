@@ -25,9 +25,9 @@ class CWD
         
         @onCwdSet window.commandline.commands.term.cwd 
             
-    onCwdSet: (cwd) => 
+    onCwdSet: (@cwd) =>
         
-        text = slash.tilde cwd
+        text = slash.tilde @cwd
         html = syntax.spanForTextAndSyntax text, 'browser'
         @elem.innerHTML = html
     

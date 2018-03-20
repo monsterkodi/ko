@@ -441,13 +441,9 @@ saveFileAs = ->
 
     dialog.showSaveDialog
         title: "Save File As"
-        defaultPath: editor.currentFile
+        defaultPath: slash.unslash slash.dir editor.currentFile
         properties: ['openFile', 'createDirectory']
-        filters: [
-            name: 'Coffee-Script', extensions: ['coffee']
-        ,
-            name: 'All Files', extensions: ['*']
-        ]
+        # filters: [ name: 'All Files', extensions: ['*'] , name: 'Coffee-Script', extensions: ['coffee'] ]
         , (file) ->
             if file
                 addToRecent file

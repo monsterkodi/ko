@@ -49,7 +49,7 @@ class Search extends Command
         
         return if not file?
         
-        terminal.doAutoClear()
+        window.terminal.doAutoClear()
         
         @startSearchInFiles 
             text: command
