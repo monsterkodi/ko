@@ -6,7 +6,7 @@
    000     00000000  000   000  000   000
 ###
 
-{ reversed, slash, fs, post, noon, store, childp, clamp, empty, error, log, _ } = require 'kxk'
+{ reversed, slash, fs, post, noon, prefs, store, childp, clamp, empty, error, log, _ } = require 'kxk'
   
 Walker   = require '../tools/walker'
 syntax   = require '../editor/syntax'
@@ -27,7 +27,6 @@ class Term extends Command
         @alias      = new store 'alias'
         
         @maxHistory = 99
-        @headers    = false
         @autocd     = true
         @cmdID      = 0
         @pwdID      = -1
@@ -75,7 +74,7 @@ class Term extends Command
         else
             terminal = window.terminal
             terminal.output cmdData.data
-            terminal.scroll.cursorToTop @headers and 7 or 1
+            terminal.scroll.cursorToTop terminal.getHeader() and 7 or 1
 
     getPWD: (@pwdTag) -> # only used on mac (pty terminal)
 
@@ -361,7 +360,7 @@ class Term extends Command
 
         for cmmd in cmds
 
-            if @headers
+            if terminal.getHeader()
                 terminal.appendMeta clss: 'salt', text: cmmd.slice 0, 32
                 terminal.singleCursorAtPos [0, terminal.numLines()-1]
 
@@ -409,20 +408,6 @@ class Term extends Command
                         if meta[2].cmdID?
                             meta[2].span?.innerHTML = "■"
 
-                when 'header', 'headers'
-
-                    # 000   000  00000000   0000000   0000000    00000000  00000000
-                    # 000   000  000       000   000  000   000  000       000   000
-                    # 000000000  0000000   000000000  000   000  0000000   0000000
-                    # 000   000  000       000   000  000   000  000       000   000
-                    # 000   000  00000000  000   000  0000000    00000000  000   000
-
-                    if args.length
-                        if args[0] in ['on', 'true', '1'] then   @headers = true
-                        if args[0] in ['off', 'false', '0'] then @headers = false
-
-                    appendCommandMeta "header #{@headers and 'on' or 'off'}"
-
                 #  0000000   000   000  000000000   0000000    0000000  0000000
                 # 000   000  000   000     000     000   000  000       000   000
                 # 000000000  000   000     000     000   000  000       000   000
@@ -434,8 +419,23 @@ class Term extends Command
                     if args.length
                         if args[0] in ['on',   'true', '1'] then @autocd = true
                         if args[0] in ['off', 'false', '0'] then @autocd = false
+                        prefs.set 'terminal|autocd', @autocd
 
                     appendCommandMeta "autocd #{@autocd and 'on' or 'off'}"
+                            
+                when 'header', 'headers'
+
+                    # 000   000  00000000   0000000   0000000    00000000  00000000
+                    # 000   000  000       000   000  000   000  000       000   000
+                    # 000000000  0000000   000000000  000   000  0000000   0000000
+                    # 000   000  000       000   000  000   000  000       000   000
+                    # 000   000  00000000  000   000  0000000    00000000  000   000
+
+                    if args.length
+                        if args[0] in ['on', 'true', '1'] then   terminal.setHeader true
+                        if args[0] in ['off', 'false', '0'] then terminal.setHeader false
+
+                    appendCommandMeta "header #{terminal.getHeader() and 'on' or 'off'}"
 
                 #  0000000   000   000  000000000   0000000    0000000  000      00000000   0000000   00000000   
                 # 000   000  000   000     000     000   000  000       000      000       000   000  000   000  
@@ -448,6 +448,7 @@ class Term extends Command
                     if args.length
                         if args[0] in ['on',   'true', '1'] then terminal.setAutoClear true
                         if args[0] in ['off', 'false', '0'] then terminal.setAutoClear false
+                        prefs.set 'terminal|autoclear', @autocd
 
                     appendCommandMeta "autoclear #{terminal.getAutoClear() and 'on' or 'off'}"
 
@@ -630,7 +631,7 @@ class Term extends Command
                             terminal.output stdout
                             terminal.output stderr
                             # log 'scroll', topLine
-                            terminal.scroll.cursorToTop topLine + 1 #+ @headers and 7 or 1
+                            terminal.scroll.cursorToTop topLine + 1 # + terminal.getHeader() and 7 or 1
                     else
                         post.toMain 'shellCommand', winID: window.winID, cmdID: @cmdID, command: cmmd
 

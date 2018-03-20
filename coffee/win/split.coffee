@@ -184,7 +184,7 @@ class Split extends event
         
         log 'raise', n, @terminalHeight()
         # @flex.expand 'terminal', 0.33
-        if @terminalHeight() < @flex.size()/24
+        if @terminalHeight() < @flex.size()/8
             @flex.moveHandleToPos @flex.handles[0], @flex.size()/4
 
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
