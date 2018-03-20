@@ -51,8 +51,8 @@ class Term extends Command
             @cwd = process.cwd()
             
         post.emit 'cwdSet', @cwd
-        
-        log @cwd
+
+        slash.tilde @cwd
         
     #  0000000   000   000        0000000     0000000   000000000   0000000
     # 000   000  0000  000        000   000  000   000     000     000   000
@@ -382,14 +382,18 @@ class Term extends Command
 
             if slash.win()
                 switch cmd
-                    when '..', '~', '/' then @setCWD cmd; continue
-                    when 'cd' then @setCWD args[0]; continue
+                    when '.'            then appendCommandMeta @setCWD slash.dir window.editor.currentFile; continue
+                    when '..', '~', '/' then appendCommandMeta @setCWD cmd; continue
+                    when 'cd..'         then appendCommandMeta @setCWD '..'; continue
+                    when 'cd'           then appendCommandMeta @setCWD args[0]; continue
             
             switch cmd
                 when 'alias' then @aliasCmd args
                 when 'clear' then terminal.clear()
                 when 'stop'
 
+                    if slash.win() then continue
+                    
                     appendCommandMeta 'stop'
 
                     post.toMain 'restartShell', winID: window.winID
