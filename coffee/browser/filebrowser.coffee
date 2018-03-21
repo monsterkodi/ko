@@ -245,9 +245,11 @@ class FileBrowser extends Browser
     # 000  000  0000  000   000  000        000 000   000       000   000  
     # 000  000   000  0000000    00000000  000   000  00000000  0000000    
     
-    onFileIndexed: (file) =>
+    onFileIndexed: (file, info) =>
+        
+        @indexedFiles ?= {}
+        @indexedFiles[file] = info
         if file == @activeColumn()?.activeRow()?.item.file
-            # log "FileBrowser.onFileIndexed", file, @activeColumn().index+1
             @loadContent @activeColumn().activeRow(), column: @activeColumn().index+1
                 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
