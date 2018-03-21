@@ -15,7 +15,8 @@ class CWD
     constructor: () ->
                     
         @elem = elem class: 'cwd'
-        @elem.style.display = 'none'
+        if not window.stash.get('cwd')
+            @elem.style.display = 'none'
 
         $('commandline-span').appendChild @elem
         
@@ -33,12 +34,12 @@ class CWD
     
     visible: -> @elem.style.display != 'none'
 
-    restore: => @toggle() if window.stash.get 'cwd'
+    restore: => @toggle() if window.stash.get('cwd') != @visible()
     stash:   => if @visible() then window.stash.set('cwd', true) else window.stash.set 'cwd'
 
     toggle: -> 
         
-        @elem.style.display = @visible() and 'none' or 'unset'       
+        @elem.style.display = @visible() and 'none' or 'unset'
         @stash()
 
 module.exports = CWD
