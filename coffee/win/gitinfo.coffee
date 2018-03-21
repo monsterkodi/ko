@@ -35,6 +35,42 @@ class GitInfo
         terminal = window.terminal
         terminal.appendMeta clss: 'searchHeader', diss: syntax.dissForTextAndSyntax text, 'ko'
 
+    #  0000000  000   000   0000000   000   000   0000000   00000000   0000000  
+    # 000       000   000  000   000  0000  000  000        000       000       
+    # 000       000000000  000000000  000 0 000  000  0000  0000000   0000000   
+    # 000       000   000  000   000  000  0000  000   000  000            000  
+    #  0000000  000   000  000   000  000   000   0000000   00000000  0000000   
+    
+    logChanges: (changes) ->
+        
+        terminal = window.terminal
+        
+        extn = slash.ext changes.file
+        if extn in syntax.syntaxNames
+            syntaxName = extn
+        else
+            syntaxName = null
+        
+        sytx = new syntax syntaxName, (i) -> changes.lines[i]
+        
+        index = 0
+        for text in changes.lines
+            
+            dss = sytx.getDiss index
+            
+            if changes.change == 'deleted'
+                dss.map (ds) -> ds.clss += ' ' + 'deleted'
+            
+            meta =
+                diss: dss
+                href: "#{changes.file}:#{changes.line}"
+                clss: 'searchResult'
+                click: @onMetaClick
+                            
+            terminal.appendMeta meta
+            post.emit 'search-result', meta
+            index += 1
+        
     #  0000000  000   000   0000000   000   000   0000000   00000000  
     # 000       000   000  000   000  0000  000  000        000       
     # 000       000000000  000000000  000 0 000  000  0000  0000000   
@@ -86,7 +122,7 @@ class GitInfo
             when 'added'   then '◼'
             when 'deleted' then '✘'
             
-        log text, slash.tilde file
+        log text, slash.tilde file # dont delete this for now :)
         
         terminal = window.terminal
         meta = 
@@ -109,7 +145,7 @@ class GitInfo
     start: -> 
         
         dirOrFile = window.cwd.cwd ? window.editor.currentFile
-        log 'Git:', slash.tilde dirOrFile
+        log 'Git:', slash.tilde dirOrFile # dont delete this for now :)
 
         window.split.raise 'terminal'
         terminal = window.terminal
@@ -127,37 +163,39 @@ class GitInfo
                 
             for file in info.deleted
                 
-                @logFile 'deleted', file
+                @logFile 'deleted', file # dont delete this for now :)
                 
             for file in info.added
                 
-                @logFile 'added', file 
+                @logFile 'added', file  # dont delete this for now :)
+                
                 data  = fs.readFileSync file, encoding: 'utf8'
                 lines = data.split /\r?\n/
                 line  = 1
-                for text in lines
-                    @logChange text:text, file:file, line:line, change:'new'
-                    line+=1
+                
+                line += @logChanges lines:lines, file:file, line:line, change:'new'
+                    
                 terminal.appendMeta clss: 'spacer'
                 
             for changeInfo in info.changed                
                 
-                @logFile 'changed', changeInfo.file
+                @logFile 'changed', changeInfo.file # dont delete this for now :)
+                
                 for change in changeInfo.changes
                     line = change.line
+                    
                     if not empty change.mod
-                        for mod in change.mod
-                            @logChange text:mod.new, file:changeInfo.file, line:line, change:'changed'
-                            line += 1
+                        lines = change.mod.map (l) -> l.new
+                        line += @logChanges lines:lines, file:changeInfo.file, line:line, change:'changed'
+                        
                     if not empty change.add
-                        for mod in change.add
-                            @logChange text:mod.new, file:changeInfo.file, line:line, change:'added'
-                            line += 1
+                        lines = change.add.map (l) -> l.new
+                        line += @logChanges lines:lines, file:changeInfo.file, line:line, change:'added'
+                        
                     if not empty change.del
-                        for mod in change.del
-                            # log mod
-                            @logChange text:mod.old, file:changeInfo.file, line:line, change:'deleted'
-                            line += 1
+                        lines = change.del.map (l) -> l.old
+                        line += @logChanges lines:lines, file:changeInfo.file, line:line, change:'deleted'
+                        
                     terminal.appendMeta clss: 'spacer'
 
             terminal.scroll.cursorToTop 7

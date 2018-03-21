@@ -14,11 +14,8 @@ Balancer = require './balancer'
 
 class Syntax
 
-    constructor: (syntax, getLine) ->
+    constructor: (@name, getLine) ->
 
-        # @name = @editor.config?.syntaxName ? 'txt'
-        @name = syntax
-        
         @diss     = []
         @colors   = {}
         @balancer = new Balancer @, getLine

@@ -359,11 +359,10 @@ loadFile = (file, opt={}) ->
             if tab = tabs.tab file
                 tab.setActive()
 
-            # log 'set current', file, opt
             editor.setCurrentFile file, opt
 
             post.toOthers 'fileLoaded', file, winID
-            # commandline.fileLoaded file # ???
+            post.emit 'cwdSet', slash.dir file
 
     window.split.show 'editor'
 
