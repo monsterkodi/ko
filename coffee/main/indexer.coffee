@@ -9,6 +9,7 @@
 { empty, post, slash, fs, os, log, _ } = require 'kxk'
 
 Walker   = require '../tools/walker'
+matchr   = require '../tools/matchr'
 electron = require 'electron'
 
 BrowserWindow = electron.BrowserWindow
@@ -37,11 +38,20 @@ class Indexer
     @methodNameInLine: (line) ->
         
         m = line.match Indexer.methodRegExp
+        if m?
+            rgs = matchr.ranges Indexer.methodRegExp, line
+            if rgs[0].start > 11
+                return null
         m?[1]
         
     @funcNameInLine: (line) ->
 
         m = line.match Indexer.funcRegExp
+        if m?
+            rgs = matchr.ranges Indexer.funcRegExp, line
+            if rgs[0].start > 7
+                return null
+            
         m?[1]
     
     # 000000000  00000000   0000000  000000000  000   000   0000000   00000000   0000000    
@@ -423,7 +433,7 @@ class Indexer
 
                 post.toWins 'classesCount', _.size @classes
                 post.toWins 'funcsCount',   _.size @funcs
-                post.toWins 'fileIndexed',  file
+                post.toWins 'fileIndexed',  file, fileInfo
 
             @files[file] = fileInfo
             

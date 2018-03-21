@@ -132,9 +132,6 @@ class FileBrowser extends Browser
     
     browse: (dir) -> 
 
-        # if @lastColumnPath() == dir
-            # log 'dir already loaded!', dir
-        
         return error "no dir?" if not dir?
         
         @clearColumnsFrom 1, pop:true
