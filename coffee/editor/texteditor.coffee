@@ -610,6 +610,7 @@ class TextEditor extends Editor
                 else if event.button == 1
                     # @singleCursorAtPos eventPos
                     @jumpToWordAtPos eventPos
+                    stopEvent event
                     return 'skip'
                 
                 if @clickCount
