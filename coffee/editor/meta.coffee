@@ -48,7 +48,6 @@ class Meta
             for meta in @metasAtLineIndex li
                 if meta[2].clss == "searchResult" and meta[2].href?
                     [file, line] = slash.splitFileLine meta[2].href
-                    # log 'meta.onChanged searchResult:', file, line
                     line -= 1
                     localChange = _.cloneDeep change
                     localChange.oldIndex = line
@@ -119,14 +118,16 @@ class Meta
         metas = @metasAtLineIndex e.lineIndex
         for meta in metas
             meta[2].span = e.numberSpan
-
+            e.numberSpan.className = ''
+            e.numberSpan.parentNode.className = 'linenumber'
             switch meta[2].clss
-                when 'searchResult', 'termCommand', 'termResult', 'coffeeCommand', 'coffeeResult', 'commandlistItem'                    
+                when 'searchResult', 'termCommand', 'termResult', 'coffeeCommand', 'coffeeResult', 'commandlistItem', 'gitInfoFile'
                     num = meta[2].state == 'unsaved' and @saveButton(meta[0])
                     num = meta[2].line? and meta[2].line if not num
                     num = slash.splitFileLine(meta[2].href)[1] if not num
                     num = '?' if not num
-                     
+                    e.numberSpan.parentNode.className = 'linenumber ' + meta[2].lineClss if meta[2].lineClss?
+                    e.numberSpan.className = meta[2].lineClss if meta[2].lineClss?
                     e.numberSpan.innerHTML = num
                 when 'spacer'
                     e.numberSpan.innerHTML = '&nbsp;'
@@ -148,7 +149,7 @@ class Meta
         
         size = @editor.size
         ty = size.lineHeight * (meta[0] - @editor.scroll.top)
-        tx = size.charWidth *  meta[1][0] + size.offsetX
+        tx = size.charWidth *  meta[1][0] + size.offsetX - size.charWidth/2
         @setMetaPos meta, tx, ty
             
     #  0000000   0000000    0000000          0000000    000  000   000
@@ -161,7 +162,7 @@ class Meta
 
         size = @editor.size
         sw = size.charWidth * (meta[1][1]-meta[1][0])
-        tx = size.charWidth *  meta[1][0] + size.offsetX
+        tx = size.charWidth *  meta[1][0] + size.offsetX - size.charWidth/2
         ty = size.lineHeight * (meta[0] - @editor.scroll.top)
         lh = size.lineHeight
 
@@ -224,23 +225,6 @@ class Meta
 
         meta.diff = true
         @addNumberMeta meta
-
-    # 0000000    0000000     0000000
-    # 000   000  000   000  000
-    # 000   000  0000000    000  0000
-    # 000   000  000   000  000   000
-    # 0000000    0000000     0000000
-
-    addDbgMeta: (meta) ->
-
-        meta.dbg  = true
-        meta.no_h = true
-        @addNumberMeta meta
-
-    delDbgMeta: (line) ->
-
-        for meta in @metasAtLineIndex line
-            @delMeta meta if meta[2].dbg
 
     addNumberMeta: (meta) ->
 
@@ -351,7 +335,7 @@ class Meta
 
         size = @editor.size
         for meta in rangesFromTopToBotInRanges li, @editor.scroll.bot, @metas
-            tx = size.charWidth *  meta[1][0] + size.offsetX
+            tx = size.charWidth * meta[1][0] + size.offsetX - size.charWidth/2
             ty = size.lineHeight * (meta[0] - @editor.scroll.top)
             @setMetaPos meta, tx, ty
 

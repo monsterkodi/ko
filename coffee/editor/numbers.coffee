@@ -154,6 +154,8 @@ class Numbers extends event
     updateColor: (li) =>
 
         return if not @lineDivs[li]? # ok: e.g. commandlist
+        if @lineDivs[li].firstChild? and @lineDivs[li].firstChild.classList.contains 'gitInfoLine'
+            return
         
         si = (s[0] for s in rangesFromTopToBotInRanges li, li, @editor.selections())
         hi = (s[0] for s in rangesFromTopToBotInRanges li, li, @editor.highlights())

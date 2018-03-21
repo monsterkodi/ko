@@ -44,7 +44,6 @@ class GitInfo
     logChange: (change) ->
         
         terminal = window.terminal
-        # log 'change', change
         
         extn = slash.ext change.file
         if extn in syntax.syntaxNames
@@ -56,16 +55,13 @@ class GitInfo
         matchr.sortRanges rgs
         dss = matchr.dissect rgs, join:true
         
-        clss = switch change.change
-            when 'added'   then 'searchResult gitInfoAdded'
-            when 'deleted' then 'searchResult gitInfoDeleted'
-            when 'changed' then 'searchResult gitInfoChanged'
-            when 'new'     then 'searchResult'
+        if change.change == 'deleted'
+            dss.map (ds) -> ds.clss += ' ' + 'deleted'
         
         meta =
             diss: dss
             href: "#{change.file}:#{change.line}"
-            clss: clss
+            clss: 'searchResult'
             click: @onMetaClick
                         
         terminal.appendMeta meta
@@ -80,13 +76,13 @@ class GitInfo
     logFile: (change, file) -> 
         
         text = switch change
-            when 'changed' then '  ○ '
+            when 'changed' then '  ● '
             when 'added'   then '  ◼ '
             when 'deleted' then '  ✘ '
             
         symbol = switch change
 
-            when 'changed' then '○'
+            when 'changed' then '●'
             when 'added'   then '◼'
             when 'deleted' then '✘'
             
@@ -94,9 +90,12 @@ class GitInfo
         
         terminal = window.terminal
         meta = 
-            diss: syntax.dissForTextAndSyntax "#{symbol} #{slash.tilde file}", 'ko'
-            href: file
-            click: @onMetaClick
+            diss:       syntax.dissForTextAndSyntax "#{slash.tilde file}", 'ko'
+            href:       file
+            clss:       'gitInfoFile'
+            click:      @onMetaClick
+            line:       symbol
+            lineClss:   'gitInfoLine '+change
             
         terminal.appendMeta meta
         terminal.appendMeta clss: 'spacer'
@@ -156,7 +155,7 @@ class GitInfo
                             line += 1
                     if not empty change.del
                         for mod in change.del
-                            log mod
+                            # log mod
                             @logChange text:mod.old, file:changeInfo.file, line:line, change:'deleted'
                             line += 1
                     terminal.appendMeta clss: 'spacer'
