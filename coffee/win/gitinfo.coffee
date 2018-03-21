@@ -10,7 +10,6 @@
 
 forkfunc = require '../tools/forkfunc'
 syntax   = require '../editor/syntax'
-matchr   = require '../tools/matchr'
 
 class GitInfo
     
@@ -70,38 +69,6 @@ class GitInfo
             terminal.appendMeta meta
             post.emit 'search-result', meta
             index += 1
-        
-    #  0000000  000   000   0000000   000   000   0000000   00000000  
-    # 000       000   000  000   000  0000  000  000        000       
-    # 000       000000000  000000000  000 0 000  000  0000  0000000   
-    # 000       000   000  000   000  000  0000  000   000  000       
-    #  0000000  000   000  000   000  000   000   0000000   00000000  
-    
-    logChange: (change) ->
-        
-        terminal = window.terminal
-        
-        extn = slash.ext change.file
-        if extn in syntax.syntaxNames
-            syntaxName = extn
-        else
-            syntaxName = null
-        
-        rgs = syntax.rangesForTextAndSyntax change.text, syntaxName
-        matchr.sortRanges rgs
-        dss = matchr.dissect rgs, join:true
-        
-        if change.change == 'deleted'
-            dss.map (ds) -> ds.clss += ' ' + 'deleted'
-        
-        meta =
-            diss: dss
-            href: "#{change.file}:#{change.line}"
-            clss: 'searchResult'
-            click: @onMetaClick
-                        
-        terminal.appendMeta meta
-        post.emit 'search-result', meta
         
     # 00000000  000  000      00000000  
     # 000       000  000      000       
