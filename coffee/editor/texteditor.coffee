@@ -608,8 +608,8 @@ class TextEditor extends Editor
                         @singleCursorAtPos eventPos
                     return 'skip'
                 else if event.button == 1
-                    # @singleCursorAtPos eventPos
-                    @jumpToWordAtPos eventPos
+                    if not @jumpToFileAtPos eventPos
+                        @jumpToWordAtPos eventPos
                     stopEvent event
                     return 'skip'
                 

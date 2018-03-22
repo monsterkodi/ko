@@ -27,10 +27,24 @@ module.exports =
             
             ranges = matchr.ranges rgx, text
             diss   = matchr.dissect ranges, join:false
+            
             for d in diss
+                
                 if d.start <= p[0] <= d.start+d.match.length
                     [file, line, col] = slash.splitFileLine d.match
                     if slash.fileExists file
+                        post.emit 'jumpTo', file:file, line:line, col:col
+                        return true
+                        
+                if not slash.isAbsolute d.match
+                    
+                    cwd = window.cwd.cwd
+                    [file, line, col] = slash.splitFileLine slash.join cwd, d.match
+                    if slash.isFile file
+                        post.emit 'jumpTo', file:file, line:line, col:col
+                        return true
+                    else if slash.isFile slash.swapExt file, slash.ext @currentFile
+                        file = slash.swapExt file, slash.ext @currentFile
                         post.emit 'jumpTo', file:file, line:line, col:col
                         return true
                         

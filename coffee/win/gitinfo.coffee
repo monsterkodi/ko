@@ -25,7 +25,6 @@ class GitInfo
         
         if href = meta[2].href
             href += ':' + window.terminal.posForEvent(event)[0]
-            window.split.show 'editor'
             window.openFiles [href], newTab: event.metaKey
         'unhandled' # otherwise cursor doesn't get set
         
@@ -58,11 +57,11 @@ class GitInfo
             dss = sytx.getDiss index
             
             if changes.change == 'deleted'
-                dss.map (ds) -> ds.clss += ' ' + 'deleted'
+                dss.map (ds) -> ds.clss += ' ' + 'git-deleted'
             
             meta =
                 diss: dss
-                href: "#{changes.file}:#{changes.line}"
+                href: "#{changes.file}:#{changes.line+index}"
                 clss: 'searchResult'
                 click: @onMetaClick
                             

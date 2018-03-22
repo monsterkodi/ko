@@ -138,7 +138,7 @@ class Split extends event
     # 0000000   000   000   0000000   00     00  
 
     show: (n) ->
-        # log "Split.show #{n}"
+        log "Split.show #{n}"
         switch n
             when 'terminal', 'area' then @raise n
             when 'editor'     
@@ -174,17 +174,19 @@ class Split extends event
             @flex.panes[0].div = nju
 
     raise: (n) ->
-        # log "Split.raise #{n}"   
+        log "Split.raise #{n}"   
         switch n
             when 'terminal' then @swap @area, @terminal
             when 'area'     then @swap @terminal, @area
-           
             
         @flex.calculate()
-        
-        # @flex.expand 'terminal', 0.33
-        if @terminalHeight() < @flex.size()/8
-            @flex.moveHandleToPos @flex.handles[0], @flex.size()/4
+
+        if n == 'editor'
+            if @editorHeight() < @flex.size()/8
+                @flex.moveHandleToPos @flex.handles[0], 3*@flex.size()/4
+        else
+            if @terminalHeight() < @flex.size()/8
+                @flex.moveHandleToPos @flex.handles[0], @flex.size()/4
 
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
     # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     

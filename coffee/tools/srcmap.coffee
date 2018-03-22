@@ -53,6 +53,7 @@ toJs = (coffeeFile, coffeeLine, coffeeCol=0) ->
         mapData = mapConvert.fromSource(fs.readFileSync mapFile, 'utf8').toObject()
         consumer = new sourceMap.SourceMapConsumer mapData
         srcFile = 'js/'+jsFile.split('/js/')[1]
+        log consumer?
         poss = consumer.allGeneratedPositionsFor source:srcFile, line:coffeeLine, column:coffeeCol
         if not poss.length and coffeeCol
             poss = consumer.allGeneratedPositionsFor source:srcFile, line:coffeeLine, column:0

@@ -14,9 +14,9 @@ class Scrollbar
 
     constructor: (@editor) ->
 
-        @editor.scroll.on 'scroll',     @update
-        @editor.on 'linesShown',        @update
-        @editor.on 'viewHeight',        @update
+        @editor.scroll.on 'scroll', @update
+        @editor.on 'linesShown',    @update
+        @editor.on 'viewHeight',    @update
 
         @elem = elem class: 'scrollbar left'
         @editor.view.appendChild @elem

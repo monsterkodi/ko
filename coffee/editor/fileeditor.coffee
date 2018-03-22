@@ -298,7 +298,7 @@ class FileEditor extends TextEditor
         cp = @cursorPos()
         currext = slash.ext @currentFile
 
-        # log 'jumpToCounterpart', cp, currext, @currentFile
+        log 'jumpToCounterpart', cp, currext, @currentFile
         
         switch currext
             when 'coffee'
@@ -426,7 +426,7 @@ class FileEditor extends TextEditor
         ,
             text:   'Log View'
             combo:  'ctrl+alt+k' 
-            cb:     window.split.showLog
+            cb:     window.split.toggleLog
         ]
         
         opt.x = absPos.x
@@ -461,7 +461,7 @@ class FileEditor extends TextEditor
         switch combo
             when 'alt+ctrl+enter'       then return window.commandline.commands.coffee.executeText @textOfSelectionForClipboard()
             when 'alt+ctrl+shift+enter' then return window.commandline.commands.coffee.executeTextInMain @textOfSelectionForClipboardt()
-            when 'command+alt+up', 'alt+ctrl+up' then return @jumpToCounterpart()
+            when 'command+alt+up', 'alt+o' then return @jumpToCounterpart()
             when 'esc'
                 split = window.split
                 if split.terminalVisible()

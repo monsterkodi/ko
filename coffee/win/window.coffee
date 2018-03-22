@@ -173,7 +173,6 @@ winMain = ->
         logview.resized()
 
     terminal.on 'fileSearchResultChange', (file, lineChange) -> # sends changes to all windows
-        log 'winMain terminal.on fileSearchResultChange', file, lineChange
         post.toWins 'fileLineChanges', file, [lineChange]
 
     editor.on 'changed', (changeInfo) ->
@@ -327,15 +326,11 @@ loadFile = (file, opt={}) ->
 
     file = null if file? and file.length <= 0
 
-    # log "loadFile #{file}"
-
     editor.saveScrollCursorsAndSelections()
 
     if file?
         [file, pos] = slash.splitFilePos file
         file = slash.resolve file
-
-    # log 'window.loadFile', file, editor?.currentFile, opt
 
     if file != editor?.currentFile or opt?.reload
         if file? and not slash.fileExists file
@@ -343,12 +338,6 @@ loadFile = (file, opt={}) ->
 
         if not opt?.dontSave
             window.saveChanges()
-
-        # post.toMain 'navigate',
-            # action: 'addFilePos'
-            # file: editor.currentFile
-            # pos:  editor.cursorPos()
-            # for: 'load'
 
         editor.clear skip:file?
 
@@ -364,7 +353,7 @@ loadFile = (file, opt={}) ->
             post.toOthers 'fileLoaded', file, winID
             post.emit 'cwdSet', slash.dir file
 
-    window.split.show 'editor'
+    window.split.raise 'editor'
 
     if pos? and pos[0] or pos[1]
         editor.singleCursorAtPos pos
