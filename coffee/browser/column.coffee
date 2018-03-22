@@ -37,7 +37,7 @@ class Column
         @div.addEventListener 'mouseover', @onMouseOver
         @div.addEventListener 'mouseout',  @onMouseOut
 
-        @div.addEventListener 'click',     @onClick
+        @div.addEventListener 'mouseup',   @onClick
         @div.addEventListener 'dblclick',  @onDblClick
         
         @div.addEventListener "contextmenu", @onContextMenu

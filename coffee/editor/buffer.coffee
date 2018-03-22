@@ -30,8 +30,7 @@ class Buffer extends event
         @setState new State lines:lines
         @emit 'numLines', @numLines()
 
-    setState: (state) ->
-        @state = new State state.s
+    setState: (state) -> @state = new State state.s
     
     mainCursor:    -> @state.mainCursor()
     line:      (i) => @state.line i

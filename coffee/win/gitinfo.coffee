@@ -47,9 +47,10 @@ class GitInfo
         if extn in syntax.syntaxNames
             syntaxName = extn
         else
-            syntaxName = null
+            syntaxName = 'txt'
         
         sytx = new syntax syntaxName, (i) -> changes.lines[i]
+        sytx.setFileType syntaxName
         
         index = 0
         for text in changes.lines

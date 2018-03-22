@@ -7,6 +7,7 @@
 
 { noon, _ } = require 'kxk'
 { expect } = require 'chai'
+
 assert     = require 'assert'
 Immutable  = require 'seamless-immutable'
 matchr     = require '../tools/matchr'

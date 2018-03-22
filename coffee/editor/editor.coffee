@@ -81,17 +81,22 @@ class Editor extends Buffer
     #    000        000     000        000     
     #    000        000     000        00000000
     
-    setupFileType: ->
+    shebangFileType: ->
         
-        oldType   = @fileType
-        @fileType = 'txt'
-        @fileType = syntax.shebang @line(0) if @numLines()
-        if @fileType == 'txt' and @currentFile?
+        fileType = 'txt'
+        fileType = syntax.shebang @line(0) if @numLines()
+        if fileType == 'txt' and @currentFile?
             ext = slash.ext @currentFile
             if ext in syntax.syntaxNames
-                @fileType = ext
-
-        @setFileType @fileType
+                fileType = ext
+        fileType
+    
+    setupFileType: ->
+        
+        oldType = @fileType
+        newType = @shebangFileType()
+        @syntax?.setFileType newType
+        @setFileType newType
         
         if oldType != @fileType
             @emit 'fileTypeChanged', @fileType

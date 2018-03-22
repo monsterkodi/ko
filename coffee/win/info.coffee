@@ -91,6 +91,7 @@ class Info
         tooltip @files, 'files'
         
         @words = elem 'span', class: "info-words empty"
+        @words.style.display = 'none'
         @words.onclick = (e) => @onClick e, 'word'
         @botline.appendChild @words
         tooltip @words, 'words'

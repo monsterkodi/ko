@@ -7,8 +7,8 @@
 
 { log, _ } = require 'kxk'
 { expect } = require 'chai'
-assert   = require 'assert'
 
+assert = require 'assert'
 Ranges = require '../tools/ranges'
 
 describe 'ranges', ->

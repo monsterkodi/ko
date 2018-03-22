@@ -14,7 +14,6 @@ class Balancer
     constructor: (@syntax, @getLine) ->
 
         @unbalanced = []
-        # @setFileType 'txt'
         
     # 00000000  000  000      00000000  000000000  000   000  00000000   00000000  
     # 000       000  000      000          000      000 000   000   000  000       
@@ -24,12 +23,10 @@ class Balancer
     
     setFileType: (fileType) ->
 
-        log fileType
-        
         lineComment = switch fileType
             when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug', 'md' then '//'
             else '#'
-            
+
         multiComment = switch fileType
             when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug' then open: '/*',   close: '*/'
             when 'html', 'md'                           then open: '<!--', close: '-->'
@@ -78,8 +75,6 @@ class Balancer
     # 0000000    000  0000000   0000000 
 
     dissForLine: (li) ->
-
-        @setFileType 'txt' if not @regions
         
         text = @getLine li
 

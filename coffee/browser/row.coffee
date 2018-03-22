@@ -83,12 +83,13 @@ class Row
             @column.activateRow @
             return
         
+        opt = file: @item.file
+                        
         if event?
-            {mod} = keyinfo.forEvent event
+            { mod } = keyinfo.forEvent event
             switch mod
                 when 'alt', 'command', 'command+alt', 'ctrl', 'ctrl+alt'
                     if @item.type == 'file' and @item.textFile
-                        opt = file:@item.file
                         if mod in ['command+alt', 'ctrl+alt']
                             opt.newWindow = true
                         else
@@ -97,27 +98,33 @@ class Row
                     else
                         post.emit 'jumpTo', word:@item.name
                     return
+            if event.button == 1
+                opt.newTab = true
             
         $('.hover')?.classList.remove 'hover'
         
         @setActive emit:true
         
         @browser.skipJump = true if not event? and @item.type == 'file'
-        
+                
         switch @item.type
             when 'dir'   then @browser.loadDir     @item.file, column: @column.index+1, parent: @item
-            when 'file'  then @browser.loadContent @, column: @column.index+1, item:@item, async:not event?
-            else
+            when 'file'  then @browser.loadContent @, column: @column.index+1, item:@item, newTab:opt.newTab, async:not event?
+            else                
                 if @item.file? and _.isString @item.file
-                    post.emit 'jumpToFile', file:@item.file, line:@item.line, col:@item.column
+                    opt.line = @item.line
+                    opt.col  = @item.column
+                    post.emit 'jumpToFile', opt
                 else if @column.parent.obj? and @column.parent.type == 'obj'
                     @browser.loadObjectItem  @item, column:@column.index+1
                     if @item.type == 'obj'
                         @browser.previewObjectItem  @item, column:@column.index+2
                         if @item.obj?.file? and _.isString @item.obj.file
-                            post.emit 'jumpToFile', file:@item.obj.file, line:@item.obj.line, col:@item.obj.column
+                            opt.line = @item.obj.line
+                            opt.col  = @item.obj.column
+                            post.emit 'jumpToFile', opt
                 else if @item.obj?.file? and _.isString @item.obj.file
-                    post.emit 'jumpToFile', file:@item.obj.file, line:@item.obj.line, col:@item.obj.column
+                    post.emit 'jumpToFile', file:@item.obj.file, line:@item.obj.line, col:@item.obj.column, newTab:opt.newTab
                 else
                     @browser.clearColumnsFrom @column.index+1
         @

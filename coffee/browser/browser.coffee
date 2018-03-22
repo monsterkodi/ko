@@ -324,7 +324,7 @@ class Browser extends Stage
             @endNavigateToTarget?()
             
         if item.textFile and not @skipJump
-            post.emit 'jumpTo', file:file
+            post.emit 'jumpTo', file:file, newTab:opt.newTab
             
         delete @skipJump
 

@@ -84,7 +84,6 @@ class FileEditor extends TextEditor
         @currentFile = file
 
         @setupFileType()
-        @syntax?.setFileType @fileType
 
         if @currentFile?
 
@@ -217,7 +216,10 @@ class FileEditor extends TextEditor
         
         if opt.newTab
             
-            post.emit 'newTabWithFile', opt.file
+            file = opt.file
+            file += ':' + opt.line if opt.line
+            file += ':' + opt.col if opt.col
+            post.emit 'newTabWithFile', file
             
         else
             
