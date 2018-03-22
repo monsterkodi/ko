@@ -174,7 +174,7 @@ class Split extends event
             @flex.panes[0].div = nju
 
     raise: (n) ->
-        log "Split.raise #{n}"   
+        # log "Split.raise #{n}"   
         switch n
             when 'terminal' then @swap @area, @terminal
             when 'area'     then @swap @terminal, @area

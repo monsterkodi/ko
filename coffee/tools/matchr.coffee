@@ -6,7 +6,7 @@
 000   000  000   000     000      0000000  000   000  000   000
 ###
 
-{ last, str, _ } = require 'kxk'
+{ empty, last, str, _ } = require 'kxk'
 
 #  0000000   0000000   000   000  00000000  000   0000000 
 # 000       000   000  0000  000  000       000  000      
@@ -62,7 +62,9 @@ ranges = (regexes, text, flags) ->
 
     rgs = []
     return rgs if not text?
+    
     for r in [0...regexes.length]
+        
         reg = regexes[r][0]
         
         if not reg? or not reg.exec?
@@ -101,7 +103,6 @@ ranges = (regexes, text, flags) ->
                     else if _.isObject(value) and j < _.size(value) 
                         value = [_.keys(value)[j], value[_.keys(value)[j]]]
                     break if not match[j+1]?
-                    # break if match[j+1].length == 0
                     gi = match[0].slice(gs).indexOf match[j+1]
                     
                     rgs.push
@@ -133,7 +134,7 @@ ranges = (regexes, text, flags) ->
 
 dissect = (ranges, opt = join:false) -> 
     
-    log = opt?.log ? ->
+    # log = opt?.log ? ->
         
     return [] if not ranges.length
     # console.log "dissect -- #{JSON.stringify ranges}"
