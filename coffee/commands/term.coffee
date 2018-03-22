@@ -646,7 +646,6 @@ class Term extends Command
 
         if meta[2].command? then @execute meta[2].command
         if meta[2].href?
-            window.split.show 'editor'
             window.loadFile meta[2].href
 
     # 000   000  00000000  000   000

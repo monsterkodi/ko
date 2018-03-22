@@ -109,8 +109,6 @@ class Search extends Command
                 window.commandline.setText split[2]
                 command.execute split[2]
         else
-            
-            window.split.show 'editor'
             file = href + ':' + window.terminal.posForEvent(event)[0]
             window.openFiles [file], newTab: event.metaKey
 
