@@ -14,7 +14,7 @@ class Balancer
     constructor: (@syntax, @getLine) ->
 
         @unbalanced = []
-        @setFileType 'txt'
+        # @setFileType 'txt'
         
     # 00000000  000  000      00000000  000000000  000   000  00000000   00000000  
     # 000       000  000      000          000      000 000   000   000  000       
@@ -24,6 +24,8 @@ class Balancer
     
     setFileType: (fileType) ->
 
+        log fileType
+        
         lineComment = switch fileType
             when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug', 'md' then '//'
             else '#'
@@ -69,6 +71,23 @@ class Balancer
 
         @openRegions = _.filter @regions, (r) -> r.close == null
                 
+    # 0000000    000   0000000   0000000
+    # 000   000  000  000       000     
+    # 000   000  000  0000000   0000000 
+    # 000   000  000       000       000
+    # 0000000    000  0000000   0000000 
+
+    dissForLine: (li) ->
+
+        @setFileType 'txt' if not @regions
+        
+        text = @getLine li
+
+        if not text?
+            return error "dissForLine -- no line at index #{li}?"
+
+        @mergeRegions @parse(text, li), text, li                
+                
     # 00     00  00000000  00000000    0000000   00000000
     # 000   000  000       000   000  000        000
     # 000000000  0000000   0000000    000  0000  0000000
@@ -76,7 +95,6 @@ class Balancer
     # 000   000  00000000  000   000   0000000   00000000
 
     mergeRegions: (regions, text, li) ->
-        # console.log str regions
         
         unbalanced = @getUnbalanced li
         
@@ -113,21 +131,6 @@ class Balancer
             addDiss p, text.length
 
         merged
-
-    # 0000000    000   0000000   0000000
-    # 000   000  000  000       000     
-    # 000   000  000  0000000   0000000 
-    # 000   000  000       000       000
-    # 0000000    000  0000000   0000000 
-
-    dissForLine: (li) ->
-
-        text = @getLine li
-
-        if not text?
-            return error "dissForLine -- no line at index #{li}?"
-
-        @mergeRegions @parse(text, li), text, li
     
     dissForClass: (text, start, clss) ->
 
@@ -139,19 +142,22 @@ class Balancer
         p = s = start
         while p < text.length
 
-            c = text[p++]
-
+            c = text[p]
+            p += 1
+            
             if c != ' '
                 s = p-1 if m == ''
                 m += c
                 continue if p < text.length
-
+                
             if m != ''
+                
                 diss.push
                     start: s
                     match: m
                     clss:  clss
                 m = ''
+                
         diss
         
     ###
@@ -163,7 +169,7 @@ class Balancer
     ###
     
     parse: (text, li) ->
-
+        
         p       = 0
         escapes = 0
         
@@ -280,7 +286,8 @@ class Balancer
 
         while p < text.length
 
-            ch = text[p++]
+            ch = text[p]
+            p += 1
             
             top = _.last stack
             

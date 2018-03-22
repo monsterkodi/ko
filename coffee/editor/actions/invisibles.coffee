@@ -6,6 +6,8 @@
 # 000  000   000      0      000  0000000   000  0000000    0000000  00000000  0000000
 
 { state, error, log } = require 'kxk'
+
+matchr = require '../../tools/matchr'
    
 class Invisibles
 
@@ -36,6 +38,16 @@ class Invisibles
             start: line.length
             end:   line.length
             clss:  'invisible ' + kind
+            
+        ti = 0
+        for range in matchr.ranges /\t/, line
+            @editor.meta.add
+                line:  li
+                html:  '&#9656'
+                start: range.start+ti*3
+                end:   range.start+ti*3
+                clss:  'invisible'
+            ti++
 
     #  0000000  000   000   0000000   000   000   0000000   00000000  
     # 000       000   000  000   000  0000  000  000        000       

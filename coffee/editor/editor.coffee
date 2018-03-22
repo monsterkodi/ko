@@ -170,9 +170,9 @@ class Editor extends Buffer
                 lines = text.split /\r?\n/
                 @newlineCharacters = '\r\n'
         
-        tabrgx = new RegExp '\t', 'g'
-        indent = @indentString                
-        lines  = lines.map (l) -> l.replace tabrgx, indent
+        # tabrgx = new RegExp '\t', 'g'
+        # indent = @indentString
+        # lines  = lines.map (l) -> l.replace tabrgx, indent
         
         @setLines lines
 
