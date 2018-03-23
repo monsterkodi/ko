@@ -138,7 +138,7 @@ class Split extends event
     # 0000000   000   000   0000000   00     00  
 
     show: (n) ->
-        log "Split.show #{n}"
+        # log "Split.show #{n}"
         switch n
             when 'terminal', 'area' then @raise n
             when 'editor'     

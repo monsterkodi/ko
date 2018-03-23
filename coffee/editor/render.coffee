@@ -8,8 +8,6 @@
 
 { str, elem, log, } = require 'kxk'
 
-encode = require '../tools/encode'
-
 class Render
                 
     # 000      000  000   000  00000000
@@ -25,7 +23,7 @@ class Render
                 d = diss[di]
                 tx = d.start * size.charWidth
                 clss = d.clss? and " class=\"#{d.clss}\"" or ''
-                clrzd = "<span style=\"transform:translatex(#{tx}px);#{d.styl ? ''}\"#{clss}>#{encode d.match}</span>"
+                clrzd = "<span style=\"transform:translatex(#{tx}px);#{d.styl ? ''}\"#{clss}>#{str.encode d.match}</span>"
                 l = clrzd + l
         l
         
