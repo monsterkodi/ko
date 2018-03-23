@@ -29,7 +29,7 @@ class FileEditor extends TextEditor
                 'Brackets'
                 'Strings'
             ],
-            fontSize: 18
+            fontSize: 19
 
         @currentFile = null
         @watch       = null

@@ -90,7 +90,7 @@ prefs.init
     cursorBlinkDelay:       [800,200]
     recentFilesLength:      20
     navigateHistoryLength:  10
-    editorFontSize:         18
+    editorFontSize:         19
     logviewFontSize:        14
     terminalFontSize:       16
     autoHideMenuBar:        true

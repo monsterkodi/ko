@@ -49,7 +49,7 @@ class TextEditor extends Editor
 
         @config.lineHeight ?= 1.2
 
-        @setFontSize prefs.get "#{@name}FontSize", @config.fontSize ? 18
+        @setFontSize prefs.get "#{@name}FontSize", @config.fontSize ? 19
         @scroll = new EditorScroll @
         @scroll.on 'shiftLines', @shiftLines
         @scroll.on 'showLines',  @showLines

@@ -181,7 +181,7 @@ winMain = ->
             post.toOtherWins 'fileLineChanges', editor.currentFile, changeInfo.changes
             navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
 
-    s = window.stash.get 'fontSize', prefs.get 'editorFontSize', 18
+    s = window.stash.get 'fontSize', prefs.get 'editorFontSize', 19
     editor.setFontSize s if s
 
     if window.stash.get 'centerText'
@@ -489,9 +489,11 @@ toggleCenterText = ->
 
 setFontSize = (s) ->
         
-    s = prefs.get('editorFontSize', 18) if not _.isFinite s
+    s = prefs.get('editorFontSize', 19) if not _.isFinite s
     s = clamp 8, 100, s
 
+    # log s
+    
     window.stash.set "fontSize", s
     editor.setFontSize s
     loadFile editor.currentFile, reload:true if editor.currentFile?
@@ -510,7 +512,7 @@ changeFontSize = (d) ->
 
 resetFontSize = ->
     
-    defaultFontSize = prefs.get 'editorFontSize', 18
+    defaultFontSize = prefs.get 'editorFontSize', 19
     window.stash.set 'fontSize', defaultFontSize
     setFontSize defaultFontSize
 

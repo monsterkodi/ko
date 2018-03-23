@@ -17,9 +17,7 @@ replaceTabs = (s) ->
         if s[i] == '\t'
             n = 4-(i%4)
             s = s.splice i, 1, _.padStart "", n
-            i += 1
-        else
-            i += 1
+        i += 1
     s
     
 class State
@@ -44,6 +42,7 @@ class State
         tabLines = @s.lines.map (l) -> l.text
         tabLines.join n
     
+    tabline:   (i) -> @s.lines[i].text
     line:      (i) ->
         if not @s.lines[i]?
             console.log 'dafuk?'

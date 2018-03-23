@@ -148,8 +148,8 @@ class Meta
     updatePos: (meta) ->
         
         size = @editor.size
-        ty = size.lineHeight * (meta[0] - @editor.scroll.top)
-        tx = size.charWidth *  meta[1][0] + size.offsetX - size.charWidth/2
+        ty = size.lineHeight * (meta[0] - @editor.scroll.top) + (meta[2].yOffset ? 0)
+        tx = size.charWidth *  meta[1][0] + size.offsetX
         @setMetaPos meta, tx, ty
             
     #  0000000   0000000    0000000          0000000    000  000   000
@@ -162,8 +162,8 @@ class Meta
 
         size = @editor.size
         sw = size.charWidth * (meta[1][1]-meta[1][0])
-        tx = size.charWidth *  meta[1][0] + size.offsetX - size.charWidth/2
-        ty = size.lineHeight * (meta[0] - @editor.scroll.top)
+        tx = size.charWidth *  meta[1][0] + size.offsetX
+        ty = size.lineHeight * (meta[0] - @editor.scroll.top) + (meta[2].yOffset ? 0)
         lh = size.lineHeight
 
         div = elem class: "meta #{meta[2].clss ? ''}"

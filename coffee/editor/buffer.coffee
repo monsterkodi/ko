@@ -34,6 +34,7 @@ class Buffer extends event
     
     mainCursor:    -> @state.mainCursor()
     line:      (i) => @state.line i
+    tabline:   (i) -> @state.tabline i
     cursor:    (i) -> @state.cursor i
     highlight: (i) -> @state.highlight i
     selection: (i) -> @state.selection i

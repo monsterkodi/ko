@@ -5,10 +5,8 @@
 # 000  000  0000     000     000       000  000  000   000  000      000            000
 # 000  000   000      0      000  0000000   000  0000000    0000000  00000000  0000000
 
-{ state, error, log } = require 'kxk'
+{ state, error, log, _ } = require 'kxk'
 
-matchr = require '../../tools/matchr'
-   
 class Invisibles
 
     constructor: (@editor) -> @editor.on 'file', @onFile
@@ -37,18 +35,25 @@ class Invisibles
             html:  '&#9687'
             start: line.length
             end:   line.length
+            yOffset: -1
             clss:  'invisible ' + kind
             
-        ti = 0
-        for range in matchr.ranges /\t/, line
-            @editor.meta.add
-                line:  li
-                html:  '&#9656'
-                start: range.start+ti*3
-                end:   range.start+ti*3
-                clss:  'invisible'
-            ti++
-
+        s = @editor.tabline li
+        p = 0
+        while p < s.length
+            n = 1
+            if s[p] == '\t'
+                n = 4-(p%4)
+                s = s.splice p, 1, _.padStart "", n
+                @editor.meta.add
+                    line:  li
+                    html:  '&#9656'
+                    start: p
+                    end:   p
+                    yOffset: -1
+                    clss:  'invisible invisible-tab'
+            p += n
+            
     #  0000000  000   000   0000000   000   000   0000000   00000000  
     # 000       000   000  000   000  0000  000  000        000       
     # 000       000000000  000000000  000 0 000  000  0000  0000000   
