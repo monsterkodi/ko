@@ -173,10 +173,6 @@ class FileSearcher extends stream.Writable
                 
                 f = @found[fi]
                 
-                # rgs = f[2].concat syntax.rangesForTextAndSyntax f[1], @syntaxName
-                # matchr.sortRanges rgs
-                # dss = matchr.dissect rgs, join:true
-                
                 sytx = new syntax @syntaxName, (i) -> f[1]
                 sytx.setFileType @syntaxName
                 dss = sytx.balancer.dissForLineAndRanges f[1], f[2]

@@ -208,7 +208,7 @@ class Meta
 
     add: (meta) ->
 
-        # log 'meta.add', meta
+        log 'meta.add', meta
 
         lineMeta = @addLineMeta [meta.line, [meta.start, meta.end], meta]
 

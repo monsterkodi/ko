@@ -8,6 +8,7 @@
 
 { post, slash, elem, empty, error, log, fs, $, _ } = require 'kxk'
 
+lineDiff = require '../tools/linediff'
 forkfunc = require '../tools/forkfunc'
 syntax   = require '../editor/syntax'
 
@@ -58,8 +59,20 @@ class GitInfo
             dss = sytx.getDiss index
             
             if changes.change == 'deleted'
+                
                 dss.map (ds) -> ds.clss += ' ' + 'git-deleted'
-            
+                
+            else if changes.change == 'changed'
+                
+                diffs = lineDiff changes.info.mod[index].old, changes.info.mod[index].new
+                for diff in diffs 
+                    lineMeta =
+                        line:   terminal.numLines()
+                        start:  diff.new
+                        end:    diff.new+diff.length
+                        clss:   'gitInfoChange'
+                    terminal.meta.add lineMeta
+                
             meta =
                 diss: dss
                 href: "#{changes.file}:#{changes.line+index}"
@@ -69,6 +82,7 @@ class GitInfo
             terminal.appendMeta meta
             post.emit 'search-result', meta
             index += 1
+        index
         
     # 00000000  000  000      00000000  
     # 000       000  000      000       
@@ -153,15 +167,15 @@ class GitInfo
                     
                     if not empty change.mod
                         lines = change.mod.map (l) -> l.new
-                        line += @logChanges lines:lines, file:changeInfo.file, line:line, change:'changed'
+                        line += @logChanges lines:lines, file:changeInfo.file, line:line, info:change, change:'changed'
                         
                     if not empty change.add
                         lines = change.add.map (l) -> l.new
-                        line += @logChanges lines:lines, file:changeInfo.file, line:line, change:'added'
+                        line += @logChanges lines:lines, file:changeInfo.file, line:line, info:change, change:'added'
                         
                     if not empty change.del
                         lines = change.del.map (l) -> l.old
-                        line += @logChanges lines:lines, file:changeInfo.file, line:line, change:'deleted'
+                        line += @logChanges lines:lines, file:changeInfo.file, line:line, info:change, change:'deleted'
                         
                     terminal.appendMeta clss: 'spacer'
 
