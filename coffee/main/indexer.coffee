@@ -133,7 +133,7 @@ class Indexer
     collectBins: ->
         
         @bins = []
-        return if os.platform() == 'win32'
+        return if slash.win()
         for dir in ['/bin', '/usr/bin', '/usr/local/bin']
             w = new Walker
                 maxFiles:    1000

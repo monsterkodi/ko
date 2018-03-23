@@ -155,9 +155,7 @@ class Split extends event
             else error "split.show -- unhandled: #{n}!"
 
     hideEditor:     => @flex.collapse 'editor'
-    hideTerminal:   => 
-        log @flex.panes.map (p) -> p.id
-        @flex.collapse 'terminal'
+    hideTerminal:   => @flex.collapse 'terminal'
             
     # 00000000    0000000   000   0000000  00000000  
     # 000   000  000   000  000  000       000       

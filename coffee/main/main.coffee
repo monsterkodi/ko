@@ -15,7 +15,7 @@ Indexer  = require './indexer'
 pug      = require 'pug'
 electron = require 'electron'
 
-Menu     = if os.platform() == 'win32' then require './menu-win' else require './menu'
+Menu     = if slash.win() then require './menu-win' else require './menu'
 
 { BrowserWindow, Tray, app, clipboard, dialog } = electron
 
@@ -136,7 +136,7 @@ winWithID   = (winID) ->
 
 hideDock = ->
 
-    return if os.platform() == 'win32'
+    return if slash.win()
     return if prefs.get 'trayOnly', false
     app.dock?.hide()
 
@@ -192,7 +192,7 @@ class Main
         @indexer      = new Indexer
         coffeeExecute = new Execute main: @
 
-        if os.platform() != 'win32'
+        if not slash.win()
             tray = new Tray "#{__dirname}/../../img/menu.png"
             tray.on 'click', @toggleWindows
 
@@ -475,8 +475,9 @@ class Main
             backgroundColor:  scheme == 'bright' and "#fff" or '#000'
             titleBarStyle:    'hidden'
             autoHideMenuBar:  prefs.get 'autoHideMenuBar', true
-
-        if os.platform() == 'win32'
+            
+        if slash.win()
+            cfg.frame = false
             cfg.icon = slash.path __dirname + '/../img/ko.ico'
 
         win = new BrowserWindow cfg
@@ -550,7 +551,7 @@ class Main
         wid = event.sender.id
         log 'onCloseWin id', wid
         if wins().length == 1
-            if os.platform() == 'win32'
+            if slash.win()
                 @quit()
                 return
             else
@@ -631,7 +632,7 @@ app.on 'ready', ->
     main.navigate = new Navigate main
 
 app.on 'window-all-closed', ->
-    if os.platform() == 'win32'
+    if slash.win()
         log 'app.on window-all-closed'
         app.quit()
 
