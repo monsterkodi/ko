@@ -123,6 +123,25 @@ class FileEditor extends TextEditor
         @watch?.stop()
         @watch = null
 
+    # 000000000  000   000  00000000   00000000  
+    #    000      000 000   000   000  000       
+    #    000       00000    00000000   0000000   
+    #    000        000     000        000       
+    #    000        000     000        00000000  
+    
+    shebangFileType: ->
+        
+        fileType = syntax.shebang @line(0) if @numLines()
+        if fileType == 'txt' 
+            if @currentFile?
+                ext = slash.ext @currentFile
+                if ext in syntax.syntaxNames
+                    return ext
+        else
+            return fileType
+            
+        super()
+        
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
     # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000
     # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000
