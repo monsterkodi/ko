@@ -199,8 +199,79 @@ dissect = (ranges, opt = join:false) ->
                     d.splice i+1, 1
     d
 
+# 00     00  00000000  00000000    0000000   00000000  
+# 000   000  000       000   000  000        000       
+# 000000000  0000000   0000000    000  0000  0000000   
+# 000 0 000  000       000   000  000   000  000       
+# 000   000  00000000  000   000   0000000   00000000  
+ 
+# merges two sorted lists of dissections
+    
+merge = (dssA, dssB) ->
+    
+    result = []
+    A = dssA.shift()
+    B = dssB.shift()
+    
+    while A and B
+
+        if A.start+A.match.length < B.start
+            result.push A
+            A = dssA.shift()
+            continue
+            
+        if B.start+B.match.length < A.start
+            result.push B
+            B = dssB.shift()
+            continue
+            
+        if A.start < B.start
+            d = B.start-A.start
+            result.push
+                start: A.start
+                clss:  A.clss
+                match: A.match.slice 0, d
+            A.start += d
+            A.match = A.match.slice d
+            continue
+            
+        if B.start < A.start
+            d = A.start-B.start
+            result.push
+                start: B.start
+                clss:  B.clss
+                match: B.match.slice 0, d
+            B.start += d
+            B.match = B.match.slice d
+            continue
+            
+        if A.start == B.start
+            d = A.match.length - B.match.length
+            result.push
+                start: A.start
+                clss:  A.clss + " " + B.clss
+                match: d >= 0 and B.match or A.match
+            if d > 0
+                A.match = A.match.slice B.match.length
+                A.start += B.match.length
+                B = dssB.shift()
+            else if d < 0
+                B.match = B.match.slice A.match.length
+                B.start += A.match.length
+                A = dssA.shift()
+            else
+                A = dssA.shift()
+                B = dssB.shift()
+        
+    if B and not A
+        result = result.concat [B], dssB 
+    if A and not B
+        result = result.concat [A], dssA 
+    result
+    
 module.exports = 
     config:     config
     ranges:     ranges
     dissect:    dissect
     sortRanges: sortRanges
+    merge:      merge

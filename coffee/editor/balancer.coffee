@@ -82,7 +82,12 @@ class Balancer
             return error "dissForLine -- no line at index #{li}?"
 
         @mergeRegions @parse(text, li), text, li                
-                
+      
+    dissForLineAndRanges: (line, rgs) ->
+        
+        regions = @mergeRegions @parse(line, 0), line, 0
+        matchr.merge regions, matchr.dissect rgs
+        
     # 00     00  00000000  00000000    0000000   00000000
     # 000   000  000       000   000  000        000
     # 000000000  0000000   0000000    000  0000  0000000

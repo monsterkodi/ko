@@ -82,11 +82,10 @@ class Search extends Command
             includeDirs: false
             file:        (f,stat) => @searchInFile opt, slash.path f
         @walker.cfg.ignore.push 'js'
-        # log 'start walker', @walker.cfg
         @walker.start()
         
     searchInFile: (opt, file) =>
-        # log "searchInFile #{file}"
+
         stream = fs.createReadStream file, encoding: 'utf8'
         stream.pipe new FileSearcher @, opt, file
 
@@ -161,19 +160,27 @@ class FileSearcher extends stream.Writable
             terminal = window.terminal
             
             meta = 
-                diss: syntax.dissForTextAndSyntax "◼ #{slash.tilde @file}", 'ko'
-                href: @file
-                click: @command.onMetaClick
+                diss:       syntax.dissForTextAndSyntax "#{slash.tilde @file}", 'ko'
+                href:       @file
+                clss:       'gitInfoFile'
+                click:      @command.onMetaClick
+                line:       '◼'
                 
             terminal.appendMeta meta
             terminal.appendMeta clss: 'spacer'
-            
+                        
             for fi in [0...@found.length]
-                f = @found[fi]
-                rgs = f[2].concat syntax.rangesForTextAndSyntax f[1], @syntaxName
-                matchr.sortRanges rgs
-                dss = matchr.dissect rgs, join:true
                 
+                f = @found[fi]
+                
+                # rgs = f[2].concat syntax.rangesForTextAndSyntax f[1], @syntaxName
+                # matchr.sortRanges rgs
+                # dss = matchr.dissect rgs, join:true
+                
+                sytx = new syntax @syntaxName, (i) -> f[1]
+                sytx.setFileType @syntaxName
+                dss = sytx.balancer.dissForLineAndRanges f[1], f[2]
+                                
                 meta =
                     diss: dss
                     href: "#{@file}:#{f[0]}"
