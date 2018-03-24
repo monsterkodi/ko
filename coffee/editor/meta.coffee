@@ -148,8 +148,8 @@ class Meta
     updatePos: (meta) ->
         
         size = @editor.size
+        tx = size.charWidth *  meta[1][0] + size.offsetX + (meta[2].xOffset ? 0)
         ty = size.lineHeight * (meta[0] - @editor.scroll.top) + (meta[2].yOffset ? 0)
-        tx = size.charWidth *  meta[1][0] + size.offsetX
         @setMetaPos meta, tx, ty
             
     #  0000000   0000000    0000000          0000000    000  000   000
@@ -162,8 +162,6 @@ class Meta
 
         size = @editor.size
         sw = size.charWidth * (meta[1][1]-meta[1][0])
-        tx = size.charWidth *  meta[1][0] + size.offsetX
-        ty = size.lineHeight * (meta[0] - @editor.scroll.top) + (meta[2].yOffset ? 0)
         lh = size.lineHeight
 
         div = elem class: "meta #{meta[2].clss ? ''}"
@@ -181,12 +179,12 @@ class Meta
             for k,v of meta[2].style
                 div.style[k] = v
 
-        @setMetaPos meta, tx, ty
-
         if not meta[2].no_x
             div.style.width = "#{sw}px"
 
         @elem.appendChild div
+
+        @updatePos meta
 
     # 0000000    00000000  000           0000000    000  000   000
     # 000   000  000       000           000   000  000  000   000
@@ -240,8 +238,6 @@ class Meta
 
     onMouseDown: (event) ->
         
-        # log "Meta.onMouseDown event.target.meta:", event.target.meta
-        
         if event.target.meta?[2].click?
             result = event.target.meta?[2].click event.target.meta, event
             stopEvent event if result != 'unhandled'
@@ -267,8 +263,9 @@ class Meta
         lineMeta
 
     moveLineMeta: (lineMeta, d) ->
+
         return error 'invalid move?', lineMeta, d if not lineMeta? or d == 0
-        # log 'moveLineMeta', lineMeta[0], d
+        
         _.pull @lineMetas[lineMeta[0]], lineMeta
         delete @lineMetas[lineMeta[0]] if empty @lineMetas[lineMeta[0]]
         lineMeta[0] += d
@@ -281,7 +278,6 @@ class Meta
         for meta in @metasAtLineIndex e.lineIndex
             meta[1][1] = e.text.length if meta[1][1] is 0
 
-    # metasAtLineIndex: (li) -> rangesAtLineIndexInRanges li, @metas
     metasAtLineIndex: (li) -> @lineMetas[li] ? []
         
     hrefAtLineIndex:  (li) ->
@@ -297,8 +293,6 @@ class Meta
 
     onLinesShown: (top, bot, num) =>
         
-        # @editor.log "Meta.onLinesShown", top, bot
-
         for meta in @metas
             @delDiv meta
             if top <= meta[0] <= bot
@@ -312,7 +306,6 @@ class Meta
 
     onLinesShifted: (top, bot, num) =>
 
-        # log 'meta.linesShifted', top, bot, num
         if num > 0
             for meta in rangesFromTopToBotInRanges top-num, top-1, @metas
                 @delDiv meta
@@ -333,9 +326,7 @@ class Meta
 
         size = @editor.size
         for meta in rangesFromTopToBotInRanges li, @editor.scroll.bot, @metas
-            tx = size.charWidth * meta[1][0] + size.offsetX - size.charWidth/2
-            ty = size.lineHeight * (meta[0] - @editor.scroll.top)
-            @setMetaPos meta, tx, ty
+            @updatePos meta
 
     onLineInserted: (li) =>
 

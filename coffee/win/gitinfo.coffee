@@ -68,10 +68,11 @@ class GitInfo
                 for diff in diffs 
                     continue if diff.change == 'delete'
                     lineMeta =
-                        line:   terminal.numLines()
-                        start:  diff.new
-                        end:    diff.new+diff.length
-                        clss:   'gitInfoChange'
+                        line:       terminal.numLines()
+                        start:      diff.new
+                        end:        diff.new+diff.length
+                        clss:       'gitInfoChange'
+                        # xOffset:    terminal.size.charWidth
                     terminal.meta.add lineMeta
                 
             meta =
