@@ -334,7 +334,7 @@ class Macro extends Command
                 if Transform.transformNames and cmmd in Transform.transformNames
                     window.textEditor.Transform.do.apply null, [window.textEditor, cmmd].concat args
                 else
-                    log 'unhandled macro', cmmd
+                    log 'unhandled macro', cmmd, Transform.transformNames
                     if _.last(@history) == command.trim()
                         @history.pop()
 

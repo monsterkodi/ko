@@ -293,3 +293,5 @@ module.exports =
     reverseSelection:  -> Transform.do @, 'reverse'
     doTransform: (arg) -> Transform.do @, arg
     Transform:         Transform
+    transformNames:    Transform.transformNames
+    
