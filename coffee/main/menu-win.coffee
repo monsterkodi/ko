@@ -16,7 +16,7 @@ AppMenu   = electron.Menu
 MenuItem  = electron.MenuItem
 
 class Menu
-
+    
     @init: (main) ->
 
         fileLabel = (f) ->

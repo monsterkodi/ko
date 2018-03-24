@@ -170,9 +170,7 @@ awesome(char)
     awesome('\f044')
 
 .history-icon:before
-    // awesome('\f0c9')
     awesome('\f141')
-
     
 .file-icon:before
     octicon('\f011')
@@ -183,40 +181,15 @@ awesome(char)
 .noon-icon:before 
     octicon('\f02a')
     
-    // '\f001' bulb
-    // '\f002' fork
-    // '\f008' gitcat
-    // '\f00a' gitcat2
-    // '\f00d' keyboard
-    // '\f00e' tagbox
-    // '\f010' tagdoc
-    // '\f011' textdoc
-    // '\f013' zipdoc
-    // '\f015' tag
-    // '\f016' folder
-    // '\f017' folder-folder
-    // '\f018' person
-    // '\f0b0' linkdoc
-    // '\f01f' -o-
-    // '\f026' circle !
-    // '\f02a' star
-    // '\f02c' circle ?
-    // '\f02b' speech bubble
-    // '\f02e' loupe
-    // '\f02d' triangle !
-    // '\f02f' gear
-    // '\f031' tools
-    // '\f032' exit
-    // '\f03a' checkmark
-    // '\f03d' arrow up
-    // '\f03e' arrow right
-    // '\f03f' arrow down
-    // '\f040' arrow left
-    // '\f041' pin
-    // '\f042' gift
-    // '\f043' stats
-    // '\f044' triangle left
-    // '\f04e' eye
+    // '\f001' bulb       '\f02a' star           '\f013' zipdoc         '\f03a' checkmark
+    // '\f002' fork       '\f02c' circle ?       '\f015' tag            '\f03d' arrow up
+    // '\f008' gitcat     '\f02b' speech bubble  '\f016' folder         '\f03e' arrow right
+    // '\f00a' gitcat2    '\f02e' loupe          '\f017' folder-folder  '\f03f' arrow down
+    // '\f00d' keyboard   '\f02d' triangle !     '\f018' person         '\f040' arrow left
+    // '\f00e' tagbox     '\f02f' gear           '\f0b0' linkdoc        '\f041' pin
+    // '\f010' tagdoc     '\f031' tools          '\f01f' -o-            '\f042' gift
+    // '\f011' textdoc    '\f032' exit           '\f026' circle !       '\f043' stats
+    // '\f04e' eye        '\f044' triangle left   
         
 // 00000000    0000000   00000000   000   000  00000000
 // 000   000  000   000  000   000  000   000  000   000
@@ -227,6 +200,7 @@ awesome(char)
 .popup
     position            absolute
     border-radius       3px
+    z-index             100
 
 .popupItem
     padding             2px
@@ -237,11 +211,40 @@ awesome(char)
         padding-bottom  frameWidth
     &:first-child
         padding-top     frameWidth
+        
+.popupItem.separator
+    padding                 0
+    cursor                  default
+    border                  0
+    height                  0
+    border-top 1px solid #000
 
 .popupCombo
     position            absolute
     right               2 * frameWidth
 
+// 00     00  00000000  000   000  000   000  
+// 000   000  000       0000  000  000   000  
+// 000000000  0000000   000 0 000  000   000  
+// 000 0 000  000       000  0000  000   000  
+// 000   000  00000000  000   000   0000000   
+
+#menu
+    height              titlebarHeight
+    pointer-events      auto
+    -webkit-app-region  no-drag
+    
+.menuItem
+    -webkit-app-region  no-drag
+    cursor              pointer
+    padding-left        10px
+    padding-right       10px
+    padding-top         2px
+    font-weight         bold
+    display             inline-block
+    height              titlebarHeight
+    overflow            visible
+        
 //  0000000  000   000  00000000  000      00000000
 // 000       000   000  000       000      000
 // 0000000   000000000  0000000   000      000000
@@ -429,7 +432,6 @@ infoPadding = 6px
     height              titlebarHeight
     box-sizing          border-box
     font-size           titlebarFontSize
-    padding-left        70px
     white-space         nowrap
     -webkit-app-region  drag
 
@@ -444,7 +446,7 @@ infoPadding = 6px
     flex                0 0 0
     display             inline-block
     vertical-align      top
-    padding-left        3px
+    padding-left        10px
     padding-top         3px
     padding-right       12px
 
@@ -490,14 +492,10 @@ infoPadding = 6px
     flex-direction      row
     overflow-x          auto
     overflow-y          hidden
-
-    -webkit-app-region  drag
+    -webkit-app-region  no-drag
 
     &::-webkit-scrollbar
         height          2px
-
-.tabs .name
-    -webkit-app-region  no-drag
 
 // 000000000   0000000   0000000
 //    000     000   000  000   000
@@ -903,7 +901,7 @@ infoPadding = 6px
     padding-right       13px
     cursor              pointer
     font-size           titlebarFontSize
-    height              titlebarHeight // 20px
+    height              titlebarHeight
     white-space         nowrap
 
 //  0000000   000   000  000000000   0000000    0000000   0000000   00     00  00000000   000      00000000  000000000  00000000

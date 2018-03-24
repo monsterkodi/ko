@@ -12,6 +12,7 @@
 Split       = require './split'
 Terminal    = require './terminal'
 Titlebar    = require './titlebar'
+Menu        = require './menu'
 LogView     = require './logview'
 Info        = require './info'
 Area        = require '../stage/area'
@@ -32,6 +33,7 @@ Browser     = remote.BrowserWindow
 win         = window.win   = remote.getCurrentWindow()
 winID       = window.winID = win.id
 editor      = null
+menu        = null
 logview     = null
 area        = null
 terminal    = null
@@ -157,6 +159,7 @@ winMain = ->
     commandline = window.commandline = new Commandline 'commandline-editor'
     logview     = window.logview     = new LogView 'logview'
     info        = window.info        = new Info editor
+    menu        = window.menu        = new Menu 'menu'
     fps         = window.fps         = new FPS()
     cwd         = window.cwd         = new CWD()
 
@@ -609,8 +612,8 @@ menuAction = (name, args) ->
         when 'Activate Previous Tab' then return window.tabs.navigate 'left'
         when 'Move Tab Left'         then return window.tabs.move 'left'
         when 'Move Tab Right'        then return window.tabs.move 'right'
-        when 'Toggle Menu'           then return win.setMenuBarVisibility not win.isMenuBarVisible()
-        when 'Show Menu'             then return win.setMenuBarVisibility true
+        when 'Toggle Menu'           then return window.menu.toggle()
+        when 'Show Menu'             then return window.menu.show()
 
     log "unhandled menu action! ------------ #{name}"
 
@@ -632,10 +635,10 @@ handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
     # log 'handleModKeyComboCharEvent1', 'mod', mod, 'key', key, 'combo', combo, 'char', char
 
     if mod == 'alt'
-        if not combo
-            stopEvent event # prevent menu from showing
-        else if combo == 'alt+m'
+        if combo == 'alt+m'
             menuAction 'Toggle Menu'
+        # else if not combo
+            # stopEvent event # prevent menu from showing
 
     return if not combo
 

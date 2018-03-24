@@ -66,6 +66,7 @@ class GitInfo
                 
                 diffs = lineDiff changes.info.mod[index].old, changes.info.mod[index].new
                 for diff in diffs 
+                    continue if diff.change == 'delete'
                     lineMeta =
                         line:   terminal.numLines()
                         start:  diff.new

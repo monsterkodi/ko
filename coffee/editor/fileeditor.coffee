@@ -417,29 +417,33 @@ class FileEditor extends TextEditor
             absPos = pos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
         
         opt = items: [
-            text:   'Browse'
-            combo:  'ctrl+.' 
-            cb:     -> window.commandline.startCommand 'browse'
-        ,
-            text:   'Go Back'
+            text:   'Back'
             combo:  'ctrl+1'
             cb:     -> window.menuAction 'Navigate Backward'
         ,
-            text:   'Go Forward'
+            text:   'Forward'
             combo:  'ctrl+2'
             cb:     -> window.menuAction 'Navigate Forward'
         ,
-            text:   'Jump To'
-            combo:  'ctrl+return'
-            cb:     -> window.editor.jumpToWord()
+            # text:   'Jump'
+            # combo:  'ctrl+return'
+            # cb:     -> window.editor.jumpToWord()
+        # , 
+            text:   ''
+        ,
+            text:   'Browse'
+            combo:  'ctrl+.' 
+            cb:     -> window.commandline.startCommand 'browse'
         ,
             text:   'Git'
             combo:  'alt+g'
             cb:     -> window.menuAction 'doMacro', 'git'
         ,
-            text:   'Show Menu'
-            combo:  'alt+m'
-            cb:     -> window.menuAction 'Show Menu'
+            # text:   'Toggle Menu'
+            # combo:  'alt+m'
+            # cb:     -> window.menuAction 'Toggle Menu'
+        # ,
+            text:   ''
         ,
             text:   'Maximize'
             combo:  'ctrl+shift+y' 
