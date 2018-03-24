@@ -11,6 +11,7 @@
 srcmap     = require '../tools/srcmap'
 watcher    = require './watcher'
 TextEditor = require './texteditor'
+Menu       = require '../win/menu'
 syntax     = require './syntax'
 electron   = require 'electron'
 
@@ -425,10 +426,6 @@ class FileEditor extends TextEditor
             combo:  'ctrl+2'
             cb:     -> window.menuAction 'Navigate Forward'
         ,
-            # text:   'Jump'
-            # combo:  'ctrl+return'
-            # cb:     -> window.editor.jumpToWord()
-        # , 
             text:   ''
         ,
             text:   'Browse'
@@ -439,10 +436,6 @@ class FileEditor extends TextEditor
             combo:  'alt+g'
             cb:     -> window.menuAction 'doMacro', 'git'
         ,
-            # text:   'Toggle Menu'
-            # combo:  'alt+m'
-            # cb:     -> window.menuAction 'Toggle Menu'
-        # ,
             text:   ''
         ,
             text:   'Maximize'
@@ -452,7 +445,12 @@ class FileEditor extends TextEditor
             text:   'Log View'
             combo:  'ctrl+alt+k' 
             cb:     window.split.toggleLog
+        , 
+            text:   ''        
         ]
+        
+        mainMenu = Menu.template()
+        opt.items = opt.items.concat mainMenu
         
         opt.x = absPos.x
         opt.y = absPos.y

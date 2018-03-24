@@ -310,7 +310,7 @@ class Menu
         
     visible: => @elem.style.display != 'none'
     toggle:  => @elem.style.display = @visible() and 'none' or 'inline-block'
-    show:    => @elem.style.display = 'inline-block'; @menu.focus()
+    show:    => @elem.style.display = 'inline-block'; @menu?.focus?()
     hide:    => @elem.style.display = 'none'
     toggle:  => if @visible() then @hide() else @show()
 

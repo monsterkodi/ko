@@ -53,7 +53,6 @@ class Commandline extends TextEditor
 
     stash: => 
         if @command? 
-            # post.toMain 'winlog', window.winID, 'stash commandline state ' + str @command.state()
             window.stash.set 'commandline', @command.state()
 
     restore: =>
@@ -61,18 +60,16 @@ class Commandline extends TextEditor
         state = window.stash.get 'commandline'
         
         @setText state?.text ? ""
-        if state?.name?
-            name = state.name
-            @command = @commands[name]
-            if @command
-                activeID = document.activeElement.id
-                if activeID.startsWith 'column' then activeID = 'editor'
-                @command.setReceiver activeID != 'commandline-editor' and activeID or null
-                @setName name
-                @button.className = "commandline-button active #{@command.prefsID}"
-                @commands[name]?.restoreState? state
-            else
-                error "no command for name: #{name} state:", state
+
+        name = state?.name ? 'open'
+        
+        if @command = @commandForName name
+            activeID = document.activeElement.id
+            if activeID.startsWith 'column' then activeID = 'editor'
+            @command.setReceiver activeID != 'commandline-editor' and activeID or null
+            @setName name
+            @button.className = "commandline-button active #{@command.prefsID}"
+            @commands[name]?.restoreState? state
 
     # 000       0000000    0000000   0000000
     # 000      000   000  000   000  000   000
@@ -133,20 +130,6 @@ class Commandline extends TextEditor
         @command?.onBot? s[1]
         @positionList()
 
-    # 00000000  000  000      00000000        000       0000000    0000000   0000000    00000000  0000000
-    # 000       000  000      000             000      000   000  000   000  000   000  000       000   000
-    # 000000    000  000      0000000         000      000   000  000000000  000   000  0000000   000   000
-    # 000       000  000      000             000      000   000  000   000  000   000  000       000   000
-    # 000       000  0000000  00000000        0000000   0000000   000   000  0000000    00000000  0000000
-
-    # fileLoaded: (file) ->
-
-        # log @command?, file
-        # if not @command?
-            # @command = @commands['open']
-            # @command.loadState()
-            # @setText slash.basename file
-
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000
     # 0000000      000     000000000  0000000       000
@@ -165,8 +148,6 @@ class Commandline extends TextEditor
 
         if @command = @commandForName name
         
-            # log "commandline.startCommand #{name}", @command?
-            
             activeID = document.activeElement.id
             if activeID.startsWith 'column' then activeID = 'editor'
             if activeID and activeID != 'commandline-editor'
@@ -207,7 +188,6 @@ class Commandline extends TextEditor
         @setName r.name if r?.name?
         @setText r.text if r?.text?
         if r?.select then @selectAll() else @selectNone()
-        # log 'commandline.results', r
         window.split.show   r.show   if r?.show?
         window.split.focus  r.focus  if r?.focus?
         window.split.do     r.do     if r?.do?
@@ -244,7 +224,6 @@ class Commandline extends TextEditor
         @list.style.display = 'unset'
         for name in @mainCommands
             cmmd = @commands[name]
-            # log 'listCommands mainCommand', name, 'names', cmmd?.names
             for ci in [0...cmmd.names.length]
                 cname = cmmd.names[ci]
                 continue if cname in @hideCommands
