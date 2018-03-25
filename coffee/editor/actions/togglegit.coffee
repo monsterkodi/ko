@@ -13,7 +13,8 @@ module.exports =
 
         toggleGitChange:
             name:  'Toggle Git Changes at Cursors'
-            combo: 'CmdOrCtrl+u'
+            combo: 'command+u'
+            accel: 'ctrl+u'
 
     toggleGitChange: (key, info) ->
 

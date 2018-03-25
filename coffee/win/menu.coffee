@@ -6,7 +6,7 @@
 000   000  00000000  000   000   0000000 
 ###
 
-{ post, elem, log, menu, $, _ } = require 'kxk'
+{ fileList, post, elem, slash, sds, log, menu, $, _ } = require 'kxk'
 
 Transform = require '../editor/actions/transform'
 Macro     = require '../commands/macro'
@@ -14,6 +14,51 @@ Macro     = require '../commands/macro'
 class Menu
 
     @template: ->
+
+        EditMenu = [
+                text: 'Undo',   accel: 'ctrl+z'
+            ,
+                text: 'Redo',   accel: 'ctrl+shift+z'
+            ,
+                text: ''
+            ,
+                text: 'Cut',    accel: 'ctrl+x'
+            ,
+                text: 'Copy',   accel: 'ctrl+c'
+            ,
+                text: 'Paste',  accel: 'ctrl+v'
+            ,
+                text: ''
+            ]
+        
+        actionFiles = fileList slash.join __dirname, '../editor/actions'
+        # log 'actionFiles:', actionFiles
+        submenu = Misc: []
+        
+        for actionFile in actionFiles
+            continue if slash.ext(actionFile) not in ['js', 'coffee']
+            actions = require actionFile
+            for key,value of actions
+                menuName = 'Misc'
+                if key == 'actions'
+                    if value['menu']?
+                        menuName = value['menu']
+                        submenu[menuName] ?= []
+                    for k,v of value
+                        if v.name and v.combo
+                            menuAction = (c) -> (i,win) -> post.toWin win.id, 'menuAction', c
+                            item = 
+                                text:   v.name
+                                accel:  v.accel ? v.combo
+                            if v.menu?
+                                submenu[v.menu] ?= []
+                            if v.separator
+                                submenu[v.menu ? menuName].push text: ''
+                            submenu[v.menu ? menuName].push item
+                    submenu[menuName].push text: ''
+                    
+        for key, menu of submenu
+            EditMenu.push text:key, menu:menu
         
         MacroMenu = [ text:'Macro', accel:'ctrl+m', action:'macro' ]
         for macro in Macro.macroNames
@@ -91,6 +136,9 @@ class Menu
             ,
                 text:   'Close Tab or Window',          accel:  'ctrl+w'
             ]
+        ,
+            text: 'Edit'
+            menu: EditMenu
         ,
             #  0000000   0000000   00     00  00     00   0000000   000   000  0000000
             # 000       000   000  000   000  000   000  000   000  0000  000  000   000
@@ -317,4 +365,24 @@ class Menu
     restore: => @toggle() if window.stash.get('menu') != @visible()
     stash:   => if @visible() then window.stash.set('menu', true) else window.stash.set 'menu'
 
+    # 000   000  00000000  000   000
+    # 000  000   000        000 000 
+    # 0000000    0000000     00000  
+    # 000  000   000          000   
+    # 000   000  00000000     000   
+    
+    globalModKeyComboEvent: (mod, key, combo, event) ->
+
+        if not @mainMenu
+            @mainMenu = Menu.template()
+
+        for keypath in sds.find.key @mainMenu, 'accel'
+            if combo == sds.get @mainMenu, keypath
+                keypath.pop()
+                item = sds.get @mainMenu, keypath
+                post.emit 'menuAction', item.action ? item.text, item.actarg
+                return item
+                
+        'unhandled'
+    
 module.exports = Menu

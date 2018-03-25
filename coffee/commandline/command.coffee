@@ -271,7 +271,9 @@ class Command
     setCurrent: (command) ->
         
         @loadState() if not @history?
-        error 'Command.setCurrent -- @history not an array?', typeof @history if not _.isArray @history
+        if not _.isArray @history
+            error "Command.setCurrent -- #{@historyKey()} : history not an array?", typeof @history 
+            @history = []
         _.pull @history, command
         @history.push command if command.trim().length
         while @history.length > @maxHistory

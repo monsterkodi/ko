@@ -22,7 +22,6 @@ FileEditor  = require '../editor/fileeditor'
 Navigate    = require '../main/navigate'
 FPS         = require '../tools/fps'
 CWD         = require '../tools/cwd'
-encode      = require '../tools/encode'
 scheme      = require '../tools/scheme'
 electron    = require 'electron'
 pkg         = require '../../package.json'
@@ -614,8 +613,16 @@ menuAction = (name, args) ->
         when 'Move Tab Right'        then return window.tabs.move 'right'
         when 'Toggle Menu'           then return window.menu.toggle()
         when 'Show Menu'             then return window.menu.show()
+        when 'Open DevTools'         then return win.webContents.openDevTools()
+        when 'Save'                  then return saveFile()
+        when 'Save As ...'           then return saveFileAs()
+        when 'Preferences'           
+            log 'prefs.store.file', prefs.store.file
+            return openFiles [prefs.store.file], newTab:true
 
-    log "unhandled menu action! ------------ #{name}"
+    log "unhandled menu action! ------------ posting to main #{name}"
+    
+    post.toMain 'menuAction', name, args
 
 window.menuAction = menuAction
 
@@ -642,6 +649,7 @@ handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
 
     return if not combo
 
+    return stopEvent(event) if 'unhandled' != window.menu       .globalModKeyComboEvent mod, key, combo, event
     return stopEvent(event) if 'unhandled' != window.titlebar   .globalModKeyComboEvent mod, key, combo, event
     return stopEvent(event) if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
 

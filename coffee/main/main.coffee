@@ -6,7 +6,9 @@
 000   000  000   000  000  000   000
 ###
 
-{ fileList, first, colors, karg, about, prefs, state, store, noon, post, slash, os, fs, str, empty, error, _ } = require 'kxk'
+{ fileList, first, colors, karg, about, prefs, state, store, noon, post, slash, os, fs, str, empty, error, log, _ } = require 'kxk'
+
+# post.debug?()
 
 pkg      = require '../../package.json'
 Execute  = require './execute'
@@ -15,7 +17,7 @@ Indexer  = require './indexer'
 pug      = require 'pug'
 electron = require 'electron'
 
-Menu     = if slash.win() then require './menu-win' else require './menu'
+Menu     = if not slash.win() then require './menu'
 
 { BrowserWindow, Tray, app, clipboard, dialog } = electron
 
@@ -26,13 +28,7 @@ coffeeExecute = undefined # <
 openFiles     = []
 WIN_SNAP_DIST = 150
 
-slog = require('kxk').log.slog
-slog.filepad = slog.filepad + 5
-log = ->
-    s = (str(s) for s in [].slice.call arguments, 0).join " "
-    slog s
-
-process.env.NODE_ENV = 'production'
+process.env.NODE_ENV = 'production' # ???
 
 #  0000000   00000000    0000000    0000000
 # 000   000  000   000  000        000
@@ -160,6 +156,7 @@ post.on 'activateNextWindow', (winID) -> main.activateNextWindow winID
 post.on 'activatePrevWindow', (winID) -> main.activatePrevWindow winID
 post.on 'fileSaved',    (file, winID) -> main.indexer.indexFile file, refresh: true
 post.on 'fileLoaded',   (file, winID) -> main.indexer.indexFile file
+post.on 'menuAction',   (action, arg) -> main?.onMenuAction action, arg
 post.on 'ping', (winID, argA, argB) -> post.toWin winID, 'pong', 'main', argA, argB
 post.on 'winlog',       (winID, text) -> 
     if args.verbose
@@ -218,7 +215,8 @@ class Main
         if args.DevTools
             wins()?[0]?.webContents.openDevTools()
 
-        Menu.init @
+        if not slash.win()
+            Menu.init @
 
     # 000   000  000  000   000  0000000     0000000   000   000   0000000
     # 000 0 000  000  0000  000  000   000  000   000  000 0 000  000
@@ -604,6 +602,13 @@ class Main
             app.exit     0
             process.exit 0
 
+    onMenuAction: (action, arg) =>
+        
+        log 'onMenuAction', action, arg
+        switch action
+            when 'Quit'     then @quit()
+            when 'About ko' then @showAbout()
+            
     #  0000000   0000000     0000000   000   000  000000000
     # 000   000  000   000  000   000  000   000     000
     # 000000000  0000000    000   000  000   000     000

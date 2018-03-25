@@ -159,7 +159,7 @@ class Titlebar
                 width = div.getBoundingClientRect().width
                 break
 
-    loadWindowWithID: (id) ->
+    loadWindowWithID: (id) -> 
         
         @closeList()
         post.toMain 'activateWindow', id

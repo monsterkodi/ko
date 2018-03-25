@@ -14,11 +14,13 @@ module.exports =
         
         toggleComment:
             name:  'Toggle Comment'
-            combo: 'CmdOrCtrl+/'
+            combo: 'command+/'
+            accel: 'ctrl+/'
             
         toggleHeader:
             name:  'Toggle Header'
-            combo: 'CmdOrCtrl+alt+/'
+            combo: 'command+alt+/'
+            accel: 'ctrl+alt+/'
 
     # 000   000  00000000   0000000   0000000    00000000  00000000   
     # 000   000  000       000   000  000   000  000       000   000  

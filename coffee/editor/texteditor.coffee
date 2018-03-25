@@ -65,7 +65,7 @@ class TextEditor extends Editor
             featureClss = require "./#{featureName}"
             @[featureName] = new featureClss @
 
-        if @minimap? then post.on 'schemeChanged', @onSchemeChanged
+        post.on 'schemeChanged', @onSchemeChanged
 
     # 0000000    00000000  000
     # 000   000  000       000
@@ -75,7 +75,7 @@ class TextEditor extends Editor
 
     del: ->
 
-        if @minimap? then post.removeListener 'schemeChanged', @onSchemeChanged
+        post.removeListener 'schemeChanged', @onSchemeChanged
         
         @scrollbar?.del()
 
@@ -105,8 +105,10 @@ class TextEditor extends Editor
 
     onSchemeChanged: =>
 
-        updateMinimap = => @minimap?.drawLines()
-        setTimeout updateMinimap, 10
+        @syntax?.schemeChanged()
+        if @minimap
+            updateMinimap = => @minimap?.drawLines()
+            setTimeout updateMinimap, 10
 
     # 000       0000000   000   000  00000000  00000000    0000000
     # 000      000   000   000 000   000       000   000  000

@@ -9,7 +9,7 @@
 { fileList, clamp, empty, slash, str, error, log, _ } = require 'kxk'
 
 Buffer  = require './buffer'
-syntax  = require './syntax'
+Syntax  = require './syntax'
 Do      = require './do'
 
 class Editor extends Buffer
@@ -30,14 +30,13 @@ class Editor extends Buffer
         @indentString      = _.padStart "", 4
         @stickySelection   = false
         @dbg               = false
-        @syntax            = new syntax syntaxName, @line
+        @syntax            = new Syntax syntaxName, @line
         @do                = new Do @
         
         @setupFileType()
 
     del: ->
                 
-        @syntax.del()
         @do.del()
     
     #  0000000    0000000  000000000  000   0000000   000   000   0000000  
@@ -166,10 +165,6 @@ class Editor extends Buffer
             if lines[0].endsWith '\r'
                 lines = text.split /\r?\n/
                 @newlineCharacters = '\r\n'
-        
-        # tabrgx = new RegExp '\t', 'g'
-        # indent = @indentString
-        # lines  = lines.map (l) -> l.replace tabrgx, indent
         
         @setLines lines
 

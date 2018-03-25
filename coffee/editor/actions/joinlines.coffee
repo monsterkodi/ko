@@ -14,7 +14,8 @@ module.exports =
         
         joinLines:
             name: 'Join Lines'
-            combo: 'CmdOrCtrl+j'
+            combo: 'command+j'
+            accel: 'ctrl+j'
 
     insertThen: (before, after) ->
         if /(when|if)/.test before 

@@ -32,7 +32,7 @@ class Shelf extends Column
         @index  = -1
         @div.id = 'shelf'
         
-        @isHistory = window.stash.get 'shelf:history', true
+        @showHistory = window.stash.get 'shelf:history', true
 
         post.on 'addToShelf', @addPath
         post.on 'navigateHistoryChanged', @onNavigateHistoryChanged
@@ -70,7 +70,7 @@ class Shelf extends Column
         
     onBrowserItemActivated: (browserItem) =>
 
-        return if @isHistory
+        # return if @showHistory
         
         [index, item] = indexAndItemInItemsWithFunc browserItem, @items, _.isEqual
         if item
@@ -94,7 +94,7 @@ class Shelf extends Column
         @didInit = true
         
         @loadShelfItems()
-        @loadHistory() if @isHistory
+        @loadHistory() if @showHistory
         
     loadShelfItems: ->
         
@@ -117,9 +117,8 @@ class Shelf extends Column
     itemPaths: -> @rows.map (r) -> r.path()
     
     savePrefs: -> 
-        if not @isHistory 
-            log 'save shelf items'
-            state.set "shelf|items", @items
+        log 'save shelf items'
+        state.set "shelf|items", @items
     
     setItems: (@items, opt) ->
         
@@ -130,6 +129,8 @@ class Shelf extends Column
         
         if opt?.save != false
             @savePrefs()            
+        else
+            log 'no save?'
         @
         
     addItems: (items, opt) ->
@@ -171,7 +172,7 @@ class Shelf extends Column
             @items.push item
             
         @setItems @items
-        @loadHistory() if @isHistory
+        @loadHistory() if @showHistory
 
     dropRow: (row, pos) -> @addItem row.item, pos:pos
             
@@ -195,17 +196,17 @@ class Shelf extends Column
     
     toggleHistory: =>
         
-        @isHistory = not @isHistory
-        if @isHistory
+        @showHistory = not @showHistory
+        if @showHistory
             @loadHistory()
         else
             @removeHistory()
-        window.stash.set 'shelf:history', @isHistory
+        window.stash.set 'shelf:history', @showHistory
     
     clearHistory: =>
         
         window.navigate.clear()
-        if @isHistory then @setHistoryItems [
+        if @showHistory then @setHistoryItems [
             file:   window.editor.currentFile
             pos:    window.editor.mainCursor()
             text:   slash.file window.editor.currentFile
@@ -227,13 +228,13 @@ class Shelf extends Column
 
     onNavigateHistoryChanged: (filePositions, currentIndex) =>
         
-        if @isHistory
+        if @showHistory
             @setHistoryItems filePositions
             @onNavigateIndexChanged currentIndex, filePositions[currentIndex]
 
     onNavigateIndexChanged: (currentIndex, currentItem) =>
         
-        if @isHistory
+        if @showHistory
             reverseIndex = @numRows() - currentIndex - 1
             if not @hasFocus()
                 @row(reverseIndex)?.setActive()
@@ -317,12 +318,12 @@ class Shelf extends Column
     removeObject: =>
                 
         if row = @activeRow()
-            
-            if @isHistory
+            if @showHistory
                 if row.item.type == 'historySeparator'
                     @toggleHistory()
                     return
-                window.navigate.delFilePos row.item
+                if row.index() > @historySeparatorIndex()
+                    window.navigate.delFilePos row.item
                 
             nextOrPrev = row.next() ? row.prev()
             row.div.remove()

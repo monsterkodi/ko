@@ -6,9 +6,8 @@
 0000000      000     000   000     000     000   000  000   000
 ###
 
-{ error, log, str, post, elem, empty, fs, noon, slash, _ } = require 'kxk'
+{ error, log, str, elem, empty, fs, noon, slash, _ } = require 'kxk'
 
-encode   = require '../tools/encode'
 matchr   = require '../tools/matchr'
 Balancer = require './balancer' 
 
@@ -20,10 +19,6 @@ class Syntax
         @colors   = {}
         @balancer = new Balancer @, getLine
  
-        post.on 'schemeChanged', @onSchemeChanged
-
-    del: -> post.removeListener 'schemeChanged', @onSchemeChanged
-
     # 0000000    000   0000000   0000000
     # 000   000  000  000       000
     # 000   000  000  0000000   0000000
@@ -131,7 +126,7 @@ class Syntax
 
         return @colors[styl]
 
-    onSchemeChanged: => @colors = {}
+    schemeChanged: -> @colors = {}
 
     ###
      0000000  000000000   0000000   000000000  000   0000000
@@ -159,7 +154,7 @@ class Syntax
                     spc += '&nbsp;'
                 last  = d.start + d.match.length
                 clss  = d.clss? and d.clss.length and " class=\"#{d.clss}\"" or ''
-                clrzd = "<span#{style}#{clss}>#{spc}#{encode d.match}</span>"
+                clrzd = "<span#{style}#{clss}>#{spc}#{str.encode d.match}</span>"
                 l += clrzd
         l
 

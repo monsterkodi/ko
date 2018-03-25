@@ -9,7 +9,7 @@
 { error, log } = require 'kxk' 
 
 TextEditor = require '../editor/texteditor'
-syntax     = require '../editor/syntax'
+Syntax     = require '../editor/syntax'
 matchr     = require '../tools/matchr'
 salt       = require '../tools/salt'
 
@@ -101,11 +101,11 @@ class CommandList extends TextEditor
         @meta.addDiv @meta.append meta
 
         if meta.diss?
-            @appendLineDiss syntax.lineForDiss(meta.diss), meta.diss
+            @appendLineDiss Syntax.lineForDiss(meta.diss), meta.diss
         else if meta.text? and meta.text.trim().length
             r    = meta.rngs ? []
             text = meta.text.trim()
-            rngs = r.concat syntax.rangesForTextAndSyntax text, meta.type or 'ko'
+            rngs = r.concat Syntax.rangesForTextAndSyntax text, meta.type or 'ko'
             matchr.sortRanges rngs
             diss = matchr.dissect rngs, join:true
             @appendLineDiss text, diss            

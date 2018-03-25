@@ -20,7 +20,8 @@ module.exports =
                 insert ascii-header of text in selection or word at cursor.
                 switch to ascii-header mode in any case.
                 """
-            combo: 'CmdOrCtrl+3'
+            combo: 'command+3'
+            accel: 'ctrl+3'
 
     #  0000000  000000000   0000000   00000000   000000000  
     # 000          000     000   000  000   000     000     
