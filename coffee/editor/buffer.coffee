@@ -83,7 +83,6 @@ class Buffer extends event
     # 00     00   0000000   000   000  0000000  
 
     wordAtCursor: -> @wordAtPos @mainCursor()
-    # wordAtPos: (c) -> @textInRange @rangeForWordAtPos c
     wordAtPos: (c) -> @textInRange @rangeForRealWordAtPos c
     wordsAtCursors: (cs=@cursors(), opt) -> (@textInRange r for r in @rangesForWordsAtCursors cs, opt)
 
@@ -115,6 +114,7 @@ class Buffer extends event
             r = rangeBeforePosInRanges p, wr
         if not r? or empty @textInRange(r).trim()
             r = rangeAfterPosInRanges p, wr
+        r ?= rangeForPos p
         r
         
     endOfWordAtPos: (c) =>

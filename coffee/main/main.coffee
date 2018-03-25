@@ -446,9 +446,7 @@ class Main
     # 000       000   000  000       000   000     000     000
     #  0000000  000   000  00000000  000   000     000     00000000
 
-    createWindow: (opt) ->
-
-        opt ?= {}
+    createWindow: (opt={}) ->
 
         log 'Main.createWindow opt:', opt
 
@@ -604,10 +602,14 @@ class Main
 
     onMenuAction: (action, arg) =>
         
-        log 'onMenuAction', action, arg
         switch action
-            when 'Quit'     then @quit()
-            when 'About ko' then @showAbout()
+            when 'Quit'             then @quit()
+            when 'About ko'         then @showAbout()
+            when 'Cycle Windows'    then @activateNextWindow()
+            when 'Arrange Windows'  then @arrangeWindows()
+            when 'New Window'       then @createWindow()
+            else
+                log 'onhandled menuAction', action, arg
             
     #  0000000   0000000     0000000   000   000  000000000
     # 000   000  000   000  000   000  000   000     000

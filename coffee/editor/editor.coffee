@@ -21,16 +21,15 @@ class Editor extends Buffer
         super()
         
         @name   = name
-        @config = config
+        @config = config ? {}
+        @config.syntaxName = 'txt'
         
         Editor.initActions() if not Editor.actions?
-        
-        syntaxName = @config?.syntaxName ? 'txt'
-        
+                
         @indentString      = _.padStart "", 4
         @stickySelection   = false
         @dbg               = false
-        @syntax            = new Syntax syntaxName, @line
+        @syntax            = new Syntax @config.syntaxName, @line
         @do                = new Do @
         
         @setupFileType()
@@ -63,7 +62,7 @@ class Editor extends Buffer
         # too early for log here!            
         # console.log str @actions
             
-    @actionWithName: (name) -> 
+    @actionWithName: (name) ->
     
         for action in Editor.actions
             if action.name == name
@@ -80,7 +79,7 @@ class Editor extends Buffer
     #    000        000     000        000     
     #    000        000     000        00000000
     
-    shebangFileType: -> @config.syntaxName ? 'txt'
+    shebangFileType: -> @config?.syntaxName ? 'txt'
             
     setupFileType: ->
         
@@ -156,7 +155,7 @@ class Editor extends Buffer
     setText: (text="") -> 
 
         if @syntax.name == 'txt'
-            @syntax.name = syntax.shebang text.slice 0, text.search /\r?\n/
+            @syntax.name = Syntax.shebang text.slice 0, text.search /\r?\n/
                 
         lines = text.split /\n/
 

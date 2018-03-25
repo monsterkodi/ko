@@ -113,7 +113,7 @@ module.exports =
             name:  'Toggle Pigments'
             text:  'toggle pigments for current file'
             combo: 'command+alt+shift+p'
-            accel: 'ctrl+alt+shift+p'
+            accel: 'alt+ctrl+shift+p'
 
     initPigments: -> @pigments ?= new Pigments @
 

@@ -47,7 +47,7 @@ module.exports =
                 select brackets or quotes otherwise.
                 """
             combo: 'command+alt+b'
-            accel: 'ctrl+alt+b'
+            accel: 'alt+ctrl+b'
 
         addCursorsUp:
             separator: true

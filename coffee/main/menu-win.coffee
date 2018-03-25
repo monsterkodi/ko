@@ -400,7 +400,7 @@ class Menu
             ,
                 type: 'separator'
             ,
-                label:       'Arrange'
+                label:       'Arrange Windows'
                 accelerator: 'Ctrl+Alt+A'
                 click:       main.arrangeWindows
             ,

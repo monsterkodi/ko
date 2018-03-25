@@ -74,7 +74,7 @@ class LogView extends TextEditor
             cb:     @clear
         ,
             text:   'Close'
-            combo:  'ctrl+alt+k' 
+            combo:  'alt+ctrl+k'
             cb:     window.split.hideLog
         ]
         

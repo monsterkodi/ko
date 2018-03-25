@@ -182,7 +182,7 @@ class Menu
                 ,
                     text:   'In New Tab',               accel:  'ctrl+shift+p', action: 'new tab'
                 ,
-                    text:   'In New Window',            accel:  'ctrl+alt+p',   action: 'new window'
+                    text:   'In New Window',            accel:  'alt+ctrl+p',   action: 'new window'
                 ]
             ,
                 #  0000000  00000000   0000000   00000000    0000000  000   000
@@ -244,9 +244,9 @@ class Menu
     
                 text:   'Terminal'
                 menu:   [
-                    text:   'small',                    accel:  'ctrl+,',       action: 'term'
+                    text:   'Small',                    accel:  'ctrl+,',       action: 'term'
                 ,
-                    text:   'large',                    accel:  'alt+,',        action: 'Term'
+                    text:   'Large',                    accel:  'alt+,',        action: 'Term'
                 ]
             ,
                 # 00     00   0000000    0000000  00000000    0000000
@@ -284,19 +284,15 @@ class Menu
             ,
                 text:   ''
             ,
-                text:   'Activate Next Tab',            accel:  'ctrl+alt+shift+right'
+                text:   'Activate Previous Tab',        accel:  'alt+ctrl+shift+left'
             ,
-                text:   'Activate Previous Tab',        accel:  'ctrl+alt+shift+left'
-            ,
-                text:   ''
-            ,
-                text:   'Move Tab Right',               accel:  'ctrl+alt+shift+.'
-            ,
-                text:   'Move Tab Left',                accel:  'ctrl+alt+shift+,'
+                text:   'Activate Next Tab',            accel:  'alt+ctrl+shift+right'
             ,
                 text:   ''
             ,
-                text:   'Toggle Menu',                  accel:  'alt+m'
+                text:   'Move Tab Left',                accel:  'alt+ctrl+shift+,'
+            ,
+                text:   'Move Tab Right',               accel: 'alt+ctrl+shift+.'
             ,
                 text:   ''
             ,
@@ -318,31 +314,29 @@ class Menu
     
             text:   'Window'
             menu: [
+                text:   'Toggle Menu',                  accel:  'alt+m'
+            ,
                 text:   'Toggle Scheme',                accel:  'alt+i'
             ,
                 text:   ''
             ,
-                text:   'Minimize',                     accel:  'ctrl+alt+m'
-            ,
-                text:   'Maximize',                     accel:  'ctrl+alt+shift+m'
-            ,
-                text:   ''
-            ,
-                text:   'Arrange',                      accel:  'ctrl+alt+a'
-            ,
-                text:   ''
+                text:   'Arrange Windows',              accel:  'alt+ctrl+a'
             ,
                 text:   'Open Window List',             accel:  'alt+`'
             ,
                 text:   'Cycle Windows',                accel:  'ctrl+`'
             ,
                 text:   ''
+            ,                                                       
+                text:   'Toggle Fullscreen',            accel:  'alt+ctrl+f'
+            ,                                                       
+                text:   'Maximize',                     accel:  'alt+ctrl+shift+m'
             ,
-                text:   'Reload Window',                accel:  'ctrl+alt+l'
+                text:   ''
             ,
-                text:   'Toggle FullScreen',            accel:  'ctrl+alt+f'
+                text:   'Reload Window',                accel:  'alt+ctrl+l'
             ,
-                text:   'Open DevTools',                accel:  'ctrl+alt+i'
+                text:   'Open DevTools',                accel:  'alt+ctrl+i'
             ]
         ]
     

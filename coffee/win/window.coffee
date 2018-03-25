@@ -616,6 +616,8 @@ menuAction = (name, args) ->
         when 'Open DevTools'         then return win.webContents.openDevTools()
         when 'Save'                  then return saveFile()
         when 'Save As ...'           then return saveFileAs()
+        when 'Reload Window'         then return reloadWin()
+        when 'Toggle Fullscreen'     then return win.setFullScreen !win.isFullScreen()
         when 'Preferences'           
             log 'prefs.store.file', prefs.store.file
             return openFiles [prefs.store.file], newTab:true

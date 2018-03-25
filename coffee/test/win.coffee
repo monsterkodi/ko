@@ -21,7 +21,7 @@ winID    = 0
 thisID   = window.winID
 editor   = window.editor
 thisFile = null
-otherWin = nullsplit
+otherWin = null
 tmpFile  = slash.resolve '$TMPDIR/ko/test.coffee'
 text     = "a='hello'\nb='world'"
         

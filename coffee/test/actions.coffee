@@ -187,28 +187,9 @@ describe 'actions', ->
             
             editor.singleCursorAtPos [5,1]
             editor.highlightTextOfSelectionOrWordAtCursor()
-            hlgtIs [[0,[6,11]], [1,[5,10]]]
-            expect(editor.numHighlights()) .to.eql 2
-            selsIs [[1,[5,10]]]
-            editor.selectNextHighlight()
-            selsIs [[0,[6,11]]]
-            editor.selectPrevHighlight()
-            selsIs [[1,[5,10]]]        
-            editor.highlightWordAndAddToSelection()
-            selsIs [[0,[6,11]], [1,[5,10]]]
-            editor.deleteSelection()
-            textIs """
-                  0123 567
-                  23467
-                0 1 345678 0"""
-            editor.singleCursorAtPos [1,2]
-            editor.highlightTextOfSelectionOrWordAtCursor()
-            editor.selectAllWords()
-            editor.deleteSelection()
-            textIs """
-                0123567
-                23467
-                013456780"""
+            hlgtIs [[1,[2,5]]]
+            expect(editor.numHighlights()) .to.eql 1
+            selsIs [[1,[2,5]]]
             
         it 'deleteToEndOfLine', ->
             

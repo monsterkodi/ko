@@ -443,7 +443,7 @@ class FileEditor extends TextEditor
             cb:     -> window.split.maximizeEditor()
         ,
             text:   'Log View'
-            combo:  'ctrl+alt+k' 
+            combo:  'alt+ctrl+k'
             cb:     window.split.toggleLog
         , 
             text:   ''        
