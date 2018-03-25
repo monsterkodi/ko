@@ -619,6 +619,7 @@ menuAction = (name, args) ->
         when 'Move Tab Right'        then return window.tabs.move 'right'
         when 'Toggle Menu'           then return window.mainmenu.toggle()
         when 'Show Menu'             then return window.mainmenu.show()
+        when 'Hide Menu'             then return window.mainmenu.hide()
         when 'Open DevTools'         then return win.webContents.openDevTools()
         when 'Open...'               then return openFileDialog()
         when 'Open In New Tab...'    then return openFileDialog newTab: true
@@ -656,14 +657,6 @@ onKeyDown = (event) ->
     handleModKeyComboCharEvent mod, key, combo, char, event
 
 handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
-
-    # log 'handleModKeyComboCharEvent1', 'mod', mod, 'key', key, 'combo', combo, 'char', char
-
-    if mod == 'alt'
-        if combo == 'alt+m'
-            menuAction 'Toggle Menu'
-        # else if not combo
-            # stopEvent event # prevent menu from showing
 
     return if not combo
 

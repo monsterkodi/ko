@@ -28,6 +28,10 @@ module.exports =
         return if not csr.length
         
         @do.start()
+        
+        if @numSelections()
+            @setCursorsAtSelectionBoundary 'left'
+            
         newCursors = @do.cursors()
 
         for r in csr.reverse()

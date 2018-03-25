@@ -8,6 +8,7 @@
 
 { fileList, post, elem, slash, sds, log, fs, $, _ } = require 'kxk'
 
+Syntax    = require '../editor/syntax'
 Transform = require '../editor/actions/transform'
 Macro     = require '../commands/macro'
 
@@ -79,15 +80,21 @@ class Menu
                 text: transformMenu
                 menu: transformSubmenu
         
-        fileLabel = (f) ->
-            return slash.basename(f) + ' - ' + slash.tilde slash.dirname(f) if f?
-            'untitled'
+        fileSpan = (f) ->
+            if f?
+                span  = Syntax.spanForTextAndSyntax slash.basename(f), 'browser'
+                span += '<span> - </span>'
+                span += Syntax.spanForTextAndSyntax slash.tilde(slash.dirname(f)), 'browser'
+            return span
+            # return slash.basename(f) + ' - ' + slash.tilde slash.dirname(f) if f?
                 
         RecentMenu = []
         for f in state.get 'recentFiles', []
             if fs.existsSync f
+                
                 RecentMenu.unshift
-                    text: fileLabel f
+                    # text: fileLabel f
+                    html: fileSpan f
                     arg: f
                     cb: (arg) -> post.emit 'newTabWithFile', arg
                      
@@ -336,7 +343,11 @@ class Menu
     
             text:   'Window'
             menu: [
-                text:   'Toggle Menu',                  accel:  'alt+m'
+                text:   'Show Menu',                    accel:  'alt+m'
+            ,
+                text:   'Hide Menu',                    accel:  'alt+shift+m'
+            ,
+                text:   ''
             ,
                 text:   'Toggle Scheme',                accel:  'alt+i'
             ,
@@ -381,7 +392,7 @@ class Menu
     visible: => @elem.style.display != 'none'
     toggle:  => @elem.style.display = @visible() and 'none' or 'inline-block'
     show:    => @elem.style.display = 'inline-block'; @menu?.focus?()
-    hide:    => @elem.style.display = 'none'
+    hide:    => @menu?.close(); @elem.style.display = 'none'
     toggle:  => if @visible() then @hide() else @show()
 
     restore: => @toggle() if window.stash.get('menu') != @visible()

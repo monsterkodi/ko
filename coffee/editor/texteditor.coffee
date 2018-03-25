@@ -596,8 +596,7 @@ class TextEditor extends Editor
 
         @drag = new drag
             target:  @layerScroll
-            # cursor:  'default'
-            # cursor:  'text'
+
             onStart: (drag, event) =>
                 
                 @view.focus()
@@ -605,8 +604,6 @@ class TextEditor extends Editor
                 eventPos = @posForEvent event
 
                 if event.button == 2
-                    if empty @textOfSelection()
-                        @singleCursorAtPos eventPos
                     return 'skip'
                 else if event.button == 1
                     if not @jumpToFileAtPos eventPos

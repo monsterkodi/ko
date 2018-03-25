@@ -8,7 +8,7 @@
 
 { elem, keyinfo, drag, clamp, stopEvent, keyinfo, empty, post, slash, error, log, fs, $, _ } = require 'kxk' 
 
-syntax      = require '../editor/syntax'
+Syntax      = require '../editor/syntax'
 fileIcons   = require 'file-icons-js'
 electron    = require 'electron'
 
@@ -23,7 +23,7 @@ class Row
         if empty(text) or empty text.trim()
             html = '<span> </span>'
         else
-            html = syntax.spanForTextAndSyntax text, 'browser'
+            html = Syntax.spanForTextAndSyntax text, 'browser'
         @div = elem class: 'browserRow', html: html
         @div.classList.add @item.type
         @column.table.appendChild @div
