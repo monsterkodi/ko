@@ -6,7 +6,7 @@
    000     000     000     0000000  00000000  0000000    000   000  000   000
 ###
 
-{ stopEvent, elem, post, log, $ } = require 'kxk'
+{ stopEvent, elem, slash, post, log, $ } = require 'kxk'
 
 render = require '../editor/render'
 syntax = require '../editor/syntax'
@@ -37,12 +37,17 @@ class Titlebar
         post.on 'sticky',   @onSticky
         post.on 'dirty',    @onDirty
         post.on 'file',     @onFile
+
+        @winicon = elem class: 'winicon'
+        @winicon.appendChild elem 'img', src:slash.fileUrl(__dirname + '/../../img/menu@2x.png')
+        @elem.appendChild @winicon
+        @winicon.addEventListener 'click', -> post.emit 'menuAction', 'Toggle Menu'   
+        
+        @tabs = new Tabs @elem
         
         @winid = elem class: 'winid'
         @elem.appendChild @winid
         @winid.addEventListener 'click', @showList
-        
-        @tabs = new Tabs @elem
         
         @winnum = elem class: 'winnum'
         @elem.appendChild @winnum
@@ -82,10 +87,17 @@ class Titlebar
     update: ->
 
         s = @info.sticky and "○" or ''
-        @winid.innerHTML = "#{s}#{window.winID}#{s}"
         @elem.classList.toggle 'focus', @info.focus
         @winid.classList.toggle 'focus', @info.focus
-        @winnum.innerHTML = @info.numWins > 1 and "#{@info.numWins}" or ''
+        if @info.numWins > 1
+            @winid.innerHTML = "#{s}#{window.winID}#{s}"
+            @winnum.innerHTML = @info.numWins
+            @winnum.style.display = 'unset'
+        else
+            @winnum.style.display = 'none'
+            @winnum.innerHTML = ''
+            @winid.innerHTML = ''
+            
         @tabs.activeTab()?.update @info
         @tabs.update()
 
@@ -134,8 +146,8 @@ class Titlebar
             continue if info.id == window.winID
             
             div = elem class: "winlist-item", children: [
-                elem 'span', class: 'winid', text: info.id
                 elem 'span', class: 'wintabs', text: ''
+                # elem 'span', class: 'winid', text: info.id
             ]
             div.winID = info.id
             

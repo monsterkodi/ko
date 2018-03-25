@@ -203,21 +203,22 @@ awesome(char)
     z-index             100
 
 .popupItem
-    padding             2px
+    padding             1px
     padding-left        2 * frameWidth
     padding-right       2 * frameWidth + 70px
     cursor              pointer
+    font-weight         bold
     &:last-child
         padding-bottom  frameWidth
     &:first-child
         padding-top     frameWidth
         
 .popupItem.separator
-    padding                 0
-    cursor                  default
-    border                  0
-    height                  0
-    border-top 1px solid #000
+    padding             0
+    cursor              default
+    border              0
+    height              0
+    border-top          1px solid #000
 
 .popupCombo
     pointer-events      none
@@ -434,7 +435,9 @@ infoPadding = 6px
     box-sizing          border-box
     font-size           titlebarFontSize
     white-space         nowrap
-    -webkit-app-region  drag
+    pointer-events      auto
+    cursor              pointer
+    
 
 .dot
     display             inline-block
@@ -443,6 +446,12 @@ infoPadding = 6px
     padding-right       9px
     margin-top          -1px
 
+#titlebar .winicon img
+    padding-left        6px
+    padding-right       2px
+    width               titlebarHeight
+    height              titlebarHeight
+    
 #titlebar .winid
     flex                0 0 0
     display             inline-block
@@ -450,8 +459,12 @@ infoPadding = 6px
     padding-left        10px
     padding-top         6px
     padding-right       12px
+    pointer-events      auto
+    cursor              pointer
+    -webkit-app-region  no-drag
 
 #titlebar .winnum
+    -webkit-app-region  drag
     flex                0 0 0
     float               right
     display             inline-block
@@ -883,26 +896,26 @@ infoPadding = 6px
 
 .winlist
     position            absolute
+    right               frameWidth
+    top                 titlebarHeight + frameWidth
     min-width           100px
     max-width           800px
     z-index             99
     overflow-x          auto
-    border-bottom-right-radius 6px
+    border-bottom-left-radius 6px
     &::-webkit-scrollbar
         height          0px
     & .dot
         padding-left    10px
         padding-right   10px
-    & .winid
-        padding-left    73px
-        padding-right   14px
 
 .winlist-item
     padding-top         4px
+    padding-bottom      4px
     padding-right       13px
     cursor              pointer
-    font-size           titlebarFontSize
-    height              titlebarHeight
+    font-size           16px
+    height              22px
     white-space         nowrap
 
 //  0000000   000   000  000000000   0000000    0000000   0000000   00     00  00000000   000      00000000  000000000  00000000

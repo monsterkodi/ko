@@ -418,7 +418,8 @@ openFileDialog = (opt) ->
     dialog.showOpenDialog
         title: "Open File"
         defaultPath: window.stash.get 'openFilePath',  dir
-        properties: ['openFile', 'openDirectory', 'multiSelections']
+        # properties: ['openFile', 'openDirectory', 'multiSelections']
+        properties: ['openFile', 'multiSelections']
         filters: [
             name: 'All Files', extensions: ['*']
         ,

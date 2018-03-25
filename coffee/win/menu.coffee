@@ -82,11 +82,9 @@ class Menu
         
         fileSpan = (f) ->
             if f?
-                span  = Syntax.spanForTextAndSyntax slash.basename(f), 'browser'
-                span += '<span> - </span>'
-                span += Syntax.spanForTextAndSyntax slash.tilde(slash.dirname(f)), 'browser'
+                span  = Syntax.spanForTextAndSyntax slash.tilde(slash.dirname(f)), 'browser'
+                span += Syntax.spanForTextAndSyntax '/' + slash.basename(f), 'browser'
             return span
-            # return slash.basename(f) + ' - ' + slash.tilde slash.dirname(f) if f?
                 
         RecentMenu = []
         for f in state.get 'recentFiles', []
@@ -386,7 +384,7 @@ class Menu
         {menu} = require 'kxk'
         @menu = new menu items:Menu.template()
         @elem = @menu.elem
-        window.titlebar.elem.insertBefore @elem, window.titlebar.elem.firstChild
+        window.titlebar.elem.insertBefore @elem, window.titlebar.elem.firstChild.nextSibling
         @show()
         
     visible: => @elem.style.display != 'none'

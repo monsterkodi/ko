@@ -15,7 +15,7 @@ class Transform
         'upper', 'lower', 'title', 'case'
         'count', 'add', 'sub'
         'up', 'down', 'sort', 'uniq'
-        'reverse', 
+        'reverse',
         'resolve', 'unresolve'
         'dir', 'base'
         'file', 'ext'
@@ -24,7 +24,7 @@ class Transform
         Case: ['upper', 'lower', 'title', 'case']
         Calc: ['count', 'add', 'sub']
         Sort: ['up', 'down', 'sort', 'uniq', 'reverse']
-        Path: [ 'resolve', 'unresolve', 'dir', 'base', 'file', 'ext' ] 
+        Path: [ 'resolve', 'unresolve', 'dir', 'base', 'file', 'ext' ]
 
     constructor: (@editor) ->
 
@@ -34,22 +34,22 @@ class Transform
         @resolveFuncs = ['resolve', 'unresolve']
         @sortFuncs    = ['up', 'down']
 
-    #  0000000   0000000   000   000  000   000  000000000  
-    # 000       000   000  000   000  0000  000     000     
-    # 000       000   000  000   000  000 0 000     000     
-    # 000       000   000  000   000  000  0000     000     
-    #  0000000   0000000    0000000   000   000     000     
-    
+    #  0000000   0000000   000   000  000   000  000000000
+    # 000       000   000  000   000  0000  000     000
+    # 000       000   000  000   000  000 0 000     000
+    # 000       000   000  000   000  000  0000     000
+    #  0000000   0000000    0000000   000   000     000
+
     count: (typ='dec', offset=0, step=1) ->
-        
+
         offset = parseInt offset
         step   = parseInt step
-        
+
         @editor.do.start()
         @editor.fillVirtualSpaces()
         cs = @editor.do.cursors()
         @editor.do.select rangesFromPositions cs
-        
+
         switch typ
             when 'hex'
                 base = 16
@@ -60,21 +60,21 @@ class Transform
 
         pad = Number(step*(cs.length-1)+offset).toString(base).length
         numbers = (_.padStart Number(step*i+offset).toString(base), pad, '0' for i in [0...cs.length])
-                    
+
         @editor.replaceSelectedText numbers
         @editor.do.end()
         'count'
 
     add: (d=1) ->
-        
+
         @apply (t) -> str(parseInt(t) + parseInt(d))
         'add'
 
     sub: (d=1) ->
-        
+
         @apply (t) -> str(parseInt(t) - parseInt(d))
         'sub'
-        
+
     # 00000000   00000000  000   000  00000000  00000000    0000000  00000000
     # 000   000  000       000   000  000       000   000  000       000
     # 0000000    0000000    000 000   0000000   0000000    0000000   0000000
@@ -101,12 +101,12 @@ class Transform
         @trans (l) -> reversed l.sort (a,b) -> a.localeCompare b
         'down'
 
-    # 000   000  000   000  000   0000000   
-    # 000   000  0000  000  000  000   000  
-    # 000   000  000 0 000  000  000 00 00  
-    # 000   000  000  0000  000  000 0000   
-    #  0000000   000   000  000   00000 00  
-    
+    # 000   000  000   000  000   0000000
+    # 000   000  0000  000  000  000   000
+    # 000   000  000 0 000  000  000 00 00
+    # 000   000  000  0000  000  000 0000
+    #  0000000   000   000  000   00000 00
+
     uniq: ->
         @trans (l) ->
             v = []
@@ -117,7 +117,7 @@ class Transform
                     a
             r
         'uniq'
-        
+
     #  0000000   0000000    0000000  00000000
     # 000       000   000  000       000
     # 000       000000000  0000000   0000000
@@ -275,23 +275,25 @@ module.exports =
     actions:
 
         menu: "Edit"
-        
+
         toggleCase:
             name:  'Toggle Case'
             text:  'toggles selected texts between lower- upper- and title-case'
             combo: 'command+alt+ctrl+u'
+            accel: 'alt+ctrl+u'
 
         reverseSelection:
-            name:  'reverse selection'
+            name:  'Reverse Selection'
             text:  'reverses the order of selected texts'
             combo: 'command+alt+ctrl+r'
-            
+            accel: 'alt+ctrl+r'
+
         doTransform:
             name:  'doTransform'
 
-    toggleCase:        -> Transform.do @, 'toggleCase'
+    toggleCase:        -> Transform.do @, 'case'
     reverseSelection:  -> Transform.do @, 'reverse'
     doTransform: (arg) -> Transform.do @, arg
     Transform:         Transform
     transformNames:    Transform.transformNames
-    
+
