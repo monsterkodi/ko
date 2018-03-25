@@ -21,7 +21,6 @@ class TextEditor extends Editor
         name = viewElem
         name = name.slice 1 if name[0] == '.'
 
-        # log 'TextEditor.constructor', config
         super name, config
 
         @clickCount = 0

@@ -6,7 +6,7 @@
 000   000  00000000  000   000   0000000 
 ###
 
-{ fileList, post, elem, slash, sds, log, menu, $, _ } = require 'kxk'
+{ fileList, post, elem, slash, sds, log, fs, $, _ } = require 'kxk'
 
 Transform = require '../editor/actions/transform'
 Macro     = require '../commands/macro'
@@ -32,7 +32,6 @@ class Menu
             ]
         
         actionFiles = fileList slash.join __dirname, '../editor/actions'
-        # log 'actionFiles:', actionFiles
         submenu = Misc: []
         
         for actionFile in actionFiles
@@ -80,6 +79,27 @@ class Menu
                 text: transformMenu
                 menu: transformSubmenu
         
+        fileLabel = (f) ->
+            return slash.basename(f) + ' - ' + slash.tilde slash.dirname(f) if f?
+            'untitled'
+                
+        RecentMenu = []
+        for f in state.get 'recentFiles', []
+            if fs.existsSync f
+                RecentMenu.unshift
+                    text: fileLabel f
+                    arg: f
+                    cb: (arg) -> post.emit 'newTabWithFile', arg
+                     
+        if RecentMenu.length
+            RecentMenu.push
+                text: ''
+            RecentMenu.push
+                text: 'Clear List'
+                cb: ->
+                    state.set 'recentFiles', []
+                    window.mainmenu.loadMenu()
+                
         [
             # 000   000   0000000
             # 000  000   000   000
@@ -116,10 +136,12 @@ class Menu
             ,
                 text:   'Open...',                      accel:  'ctrl+o'
             ,
-                text:   'Open In New Window...',        accel:  'ctrl+shift+o'
+                text:   'Open In New Tab...',           accel:  'ctrl+shift+o'
             ,
-                # text:       'Open Recent', menu:     recent
-            # ,
+                text:   'Open In New Window...',        accel:  'alt+shift+o'
+            ,
+                text:   'Open Recent',                  menu:   RecentMenu
+            ,
                 text:   ''
             ,
                 text:   'Save',                         accel:  'ctrl+s'
@@ -342,13 +364,19 @@ class Menu
     
     constructor: ->
         
-        @menu = new menu items:Menu.template()
-        
-        @elem = @menu.elem
-        window.titlebar.elem.insertBefore @elem, window.titlebar.elem.firstChild
+        @loadMenu()
         
         post.on 'stash',   @stash
         post.on 'restore', @restore
+        
+    loadMenu: =>
+        
+        @elem?.remove()
+        {menu} = require 'kxk'
+        @menu = new menu items:Menu.template()
+        @elem = @menu.elem
+        window.titlebar.elem.insertBefore @elem, window.titlebar.elem.firstChild
+        @show()
         
     visible: => @elem.style.display != 'none'
     toggle:  => @elem.style.display = @visible() and 'none' or 'inline-block'

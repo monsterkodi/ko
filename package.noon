@@ -1,6 +1,6 @@
 name            ko-editor
 productName     ko
-version         0.73.0
+version         0.74.0
 description     text editor
 main            js/main/main.js
 preferGlobal    true
@@ -39,7 +39,7 @@ dependencies
                 fuzzy           ^0.1.3
                 isbinaryfile    ^3.0.2
                 js-beautify     ^1.7.5
-                kxk             ^0.65.0
+                kxk             ^0.67.0
                 mocha           ^5.0.4
                 node-abi        ^2.3.0
                 node-pty        ^0.7.4

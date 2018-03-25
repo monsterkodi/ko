@@ -117,7 +117,6 @@ class Shelf extends Column
     itemPaths: -> @rows.map (r) -> r.path()
     
     savePrefs: -> 
-        log 'save shelf items'
         state.set "shelf|items", @items
     
     setItems: (@items, opt) ->
@@ -129,8 +128,6 @@ class Shelf extends Column
         
         if opt?.save != false
             @savePrefs()            
-        else
-            log 'no save?'
         @
         
     addItems: (items, opt) ->

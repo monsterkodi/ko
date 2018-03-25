@@ -75,12 +75,12 @@ class Pigments
 
     activate: ->
 
-        state.set "pigments:#{@editor.currentFile}", true
+        state.set "pigments|#{@editor.currentFile}", true
         @pigmentize()
 
     deactivate: ->
 
-        state.set "pigments:#{@editor.currentFile}"
+        state.set "pigments|#{@editor.currentFile}"
         @clear()
 
     clear: ->

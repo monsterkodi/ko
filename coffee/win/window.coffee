@@ -32,7 +32,7 @@ Browser     = remote.BrowserWindow
 win         = window.win   = remote.getCurrentWindow()
 winID       = window.winID = win.id
 editor      = null
-menu        = null
+mainmenu    = null
 logview     = null
 area        = null
 terminal    = null
@@ -113,7 +113,7 @@ post.on 'reloadWin',         -> reloadWin()
 post.on 'saveFileAs',        -> saveFileAs()
 post.on 'saveFile',          -> saveFile()
 post.on 'saveStash',         -> saveStash()
-post.on 'openFile',   (opt)  -> openFile  opt
+post.on 'openFile',   (opt)  -> openFileDialog opt
 post.on 'reloadTab', (file)  -> reloadTab file
 post.on 'loadFile',  (file)  -> loadFile  file
 post.on 'loadFiles', (files, opt) -> openFiles files, opt
@@ -158,7 +158,7 @@ winMain = ->
     commandline = window.commandline = new Commandline 'commandline-editor'
     logview     = window.logview     = new LogView 'logview'
     info        = window.info        = new Info editor
-    menu        = window.menu        = new Menu 'menu'
+    mainmenu    = window.mainmenu    = new Menu 'menu'
     fps         = window.fps         = new FPS()
     cwd         = window.cwd         = new CWD()
 
@@ -187,8 +187,7 @@ winMain = ->
     editor.setFontSize s if s
 
     if window.stash.get 'centerText'
-        screenWidth = screenSize().width
-        editor.centerText sw() == screenWidth, 0
+        editor.centerText true, 0
 
     post.emit 'restore'
     win.show()
@@ -402,9 +401,9 @@ openFiles = (ofiles, options) -> # called from file dialog, open command and bro
 
         return ofiles
 
-window.openFiles = openFiles
-window.openFile  = openFile
-window.loadFile  = loadFile
+window.openFiles        = openFiles
+window.openFileDialog   = openFileDialog
+window.loadFile         = loadFile
 
 # 0000000    000   0000000   000       0000000    0000000
 # 000   000  000  000   000  000      000   000  000
@@ -412,7 +411,7 @@ window.loadFile  = loadFile
 # 000   000  000  000   000  000      000   000  000   000
 # 0000000    000  000   000  0000000   0000000    0000000
 
-openFile = (options) ->
+openFileDialog = (opt) ->
 
     dir = slash.dirname editor.currentFile if editor?.currentFile
     dir ?= slash.resolve '.'
@@ -425,7 +424,7 @@ openFile = (options) ->
         ,
             name: 'CoffeeScript', extensions: ['coffee']
         ]
-        , (files) -> openFiles files, options
+        , (files) -> openFiles files, opt
 
 saveFileAs = ->
 
@@ -476,12 +475,19 @@ screenShot = ->
 
 toggleCenterText = ->
 
+    if state.get "invisibles|#{editor.currentFile}", false
+        editor.toggleInvisibles()
+        restoreInvisibles = true
+        
     if not window.stash.get 'centerText', false
         window.stash.set 'centerText', true
-        editor.centerText true # sw() == screenSize().width
+        editor.centerText true
     else
         window.stash.set 'centerText', false
         editor.centerText false
+        
+    if restoreInvisibles
+        editor.toggleInvisibles()
 
 # 00000000   0000000   000   000  000000000      0000000  000  0000000  00000000
 # 000       000   000  0000  000     000        000       000     000   000
@@ -611,18 +617,28 @@ menuAction = (name, args) ->
         when 'Activate Previous Tab' then return window.tabs.navigate 'left'
         when 'Move Tab Left'         then return window.tabs.move 'left'
         when 'Move Tab Right'        then return window.tabs.move 'right'
-        when 'Toggle Menu'           then return window.menu.toggle()
-        when 'Show Menu'             then return window.menu.show()
+        when 'Toggle Menu'           then return window.mainmenu.toggle()
+        when 'Show Menu'             then return window.mainmenu.show()
         when 'Open DevTools'         then return win.webContents.openDevTools()
+        when 'Open...'               then return openFileDialog()
+        when 'Open In New Tab...'    then return openFileDialog newTab: true
+        when 'Open In New Window...' then return openFileDialog newWindow: true
         when 'Save'                  then return saveFile()
         when 'Save As ...'           then return saveFileAs()
+        when 'Reload'                then return reloadFile()
         when 'Reload Window'         then return reloadWin()
         when 'Toggle Fullscreen'     then return win.setFullScreen !win.isFullScreen()
+        when 'Close Tab or Window'   then return post.emit 'closeTabOrWindow'
+        when 'Close Other Tabs'      then return post.emit 'closeOtherTabs'
+        
         when 'Preferences'           
-            log 'prefs.store.file', prefs.store.file
+            # log 'prefs.store.file', prefs.store.file
             return openFiles [prefs.store.file], newTab:true
 
-    log "unhandled menu action! ------------ posting to main #{name}"
+    switch name
+        when 'Cycle Windows' then args = winID
+    
+    log "unhandled menu action! ------------ posting to main '#{name}' args: #{args}"
     
     post.toMain 'menuAction', name, args
 
@@ -651,7 +667,7 @@ handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
 
     return if not combo
 
-    return stopEvent(event) if 'unhandled' != window.menu       .globalModKeyComboEvent mod, key, combo, event
+    return stopEvent(event) if 'unhandled' != window.mainmenu   .globalModKeyComboEvent mod, key, combo, event
     return stopEvent(event) if 'unhandled' != window.titlebar   .globalModKeyComboEvent mod, key, combo, event
     return stopEvent(event) if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
 

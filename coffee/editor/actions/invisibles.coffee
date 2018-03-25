@@ -75,14 +75,13 @@ class Invisibles
     
     activate: ->
 
-        state.set "invisibles:#{@editor.currentFile ? @editor.name}", true
+        state.set "invisibles|#{@editor.currentFile ? @editor.name}", true
         @show()
         
     deactivate: ->
 
-        state.set "invisibles:#{@editor.currentFile}"
+        state.set "invisibles|#{@editor.currentFile}"
         @clear()
-
 
     #  0000000  000      00000000   0000000   00000000   
     # 000       000      000       000   000  000   000  
@@ -124,7 +123,8 @@ module.exports =
     toggleInvisibles: ->
 
         return if not @invisibles
-        if state.get "invisibles|#{@currentFile ? @name}"
+        
+        if state.get "invisibles|#{@currentFile ? @name}", false
             @invisibles.deactivate()
         else
             @invisibles.activate()

@@ -43,7 +43,7 @@ module.exports =
                     if slash.isFile file
                         post.emit 'jumpTo', file:file, line:line, col:col
                         return true
-                    else if slash.isFile slash.swapExt file, slash.ext @currentFile
+                    else if not empty @currentFile and slash.isFile slash.swapExt file, slash.ext @currentFile
                         file = slash.swapExt file, slash.ext @currentFile
                         post.emit 'jumpTo', file:file, line:line, col:col
                         return true

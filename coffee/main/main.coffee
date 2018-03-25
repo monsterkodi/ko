@@ -218,6 +218,23 @@ class Main
         if not slash.win()
             Menu.init @
 
+    #  0000000    0000000  000000000  000   0000000   000   000  
+    # 000   000  000          000     000  000   000  0000  000  
+    # 000000000  000          000     000  000   000  000 0 000  
+    # 000   000  000          000     000  000   000  000  0000  
+    # 000   000   0000000     000     000   0000000   000   000  
+    
+    onMenuAction: (action, arg) =>
+        
+        switch action
+            when 'Quit'             then @quit()
+            when 'About ko'         then @showAbout()
+            when 'Cycle Windows'    then @activateNextWindow arg
+            when 'Arrange Windows'  then @arrangeWindows()
+            when 'New Window'       then @createWindow()
+            else
+                log 'onhandled menuAction', action, arg
+            
     # 000   000  000  000   000  0000000     0000000   000   000   0000000
     # 000 0 000  000  0000  000  000   000  000   000  000 0 000  000
     # 000000000  000  000 0 000  000   000  000   000  000000000  0000000
@@ -599,17 +616,6 @@ class Main
             log 'Main.quit exit'
             app.exit     0
             process.exit 0
-
-    onMenuAction: (action, arg) =>
-        
-        switch action
-            when 'Quit'             then @quit()
-            when 'About ko'         then @showAbout()
-            when 'Cycle Windows'    then @activateNextWindow()
-            when 'Arrange Windows'  then @arrangeWindows()
-            when 'New Window'       then @createWindow()
-            else
-                log 'onhandled menuAction', action, arg
             
     #  0000000   0000000     0000000   000   000  000000000
     # 000   000  000   000  000   000  000   000     000

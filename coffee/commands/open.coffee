@@ -45,9 +45,11 @@ class Open extends Command
           
     onFile: (file) =>
         
-        if @isActive() and @getText() != slash.file file
-            # log 'onFile', file, slash.resolve @getText()
-            @setText slash.file file
+        if @isActive() 
+            if empty file
+                @setText ''
+            else if @getText() != slash.file file
+                @setText slash.file file
         
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000

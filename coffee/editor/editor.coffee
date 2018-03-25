@@ -22,7 +22,7 @@ class Editor extends Buffer
         
         @name   = name
         @config = config ? {}
-        @config.syntaxName = 'txt'
+        @config.syntaxName ?= 'txt'
         
         Editor.initActions() if not Editor.actions?
                 
