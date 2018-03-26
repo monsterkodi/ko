@@ -34,6 +34,7 @@ class Tabs
         
         post.on 'closeTabOrWindow', @onCloseTabOrWindow
         post.on 'closeOtherTabs',   @onCloseOtherTabs
+        post.on 'closeWindow',      @onCloseWindow
         post.on 'stash',            @stash
         post.on 'restore',          @restore
         post.on 'revertFile',       @revertFile
@@ -151,6 +152,8 @@ class Tabs
         @update()
         @
   
+    onCloseWindow: -> window.win.close()
+        
     onCloseTabOrWindow: (tab) =>
         if @numTabs() == 1
             window.win.close()

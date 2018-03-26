@@ -162,6 +162,8 @@ class Menu
                 text:   'Close Other Tabs',             accel:  'ctrl+shift+w'
             ,
                 text:   'Close Tab or Window',          accel:  'ctrl+w'
+            ,
+                text:   'Close Window',                 accel:  'alt+w'
             ]
         ,
             text: 'Edit'
@@ -341,27 +343,29 @@ class Menu
     
             text:   'Window'
             menu: [
-                text:   'Show Menu',                    accel:  'alt+m'
+                text:   'Minimize',                     accel:  'alt+ctrl+m'
+            ,                                                       
+                text:   'Maximize',                     accel:  'alt+ctrl+shift+m'
             ,
-                text:   'Hide Menu',                    accel:  'alt+shift+m'
-            ,
-                text:   ''
-            ,
-                text:   'Toggle Scheme',                accel:  'alt+i'
+                text:   'Fullscreen',                   accel:  'alt+ctrl+f'
             ,
                 text:   ''
             ,
                 text:   'Arrange Windows',              accel:  'alt+ctrl+a'
             ,
-                text:   'Open Window List',             accel:  'alt+`'
-            ,
                 text:   'Cycle Windows',                accel:  'ctrl+`'
+            ,
+                text:   'Open Window List',             accel:  'alt+`'
             ,
                 text:   ''
             ,                                                       
-                text:   'Toggle Fullscreen',            accel:  'alt+ctrl+f'
-            ,                                                       
-                text:   'Maximize',                     accel:  'alt+ctrl+shift+m'
+                text:   'Hide Menu',                    accel:  'alt+shift+m'
+            ,
+                text:   'Show Menu',                    accel:  'alt+m'
+            ,
+                text:   ''
+            ,
+                text:   'Toggle Scheme',                accel:  'alt+i'
             ,
                 text:   ''
             ,

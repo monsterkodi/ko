@@ -233,7 +233,7 @@ class Main
             when 'Arrange Windows'  then @arrangeWindows()
             when 'New Window'       then @createWindow()
             else
-                log 'onhandled menuAction', action, arg
+                log 'unhandled menuAction', action, arg
             
     # 000   000  000  000   000  0000000     0000000   000   000   0000000
     # 000 0 000  000  0000  000  000   000  000   000  000 0 000  000

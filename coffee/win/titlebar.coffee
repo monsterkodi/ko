@@ -39,20 +39,21 @@ class Titlebar
         post.on 'file',     @onFile
 
         @winicon = elem class: 'winicon'
-        @winicon.appendChild elem 'img', src:slash.fileUrl(__dirname + '/../../img/menu@2x.png')
+        @winicon.appendChild elem 'img', src:slash.fileUrl __dirname + '/../../img/menu@2x.png'
         @elem.appendChild @winicon
         @winicon.addEventListener 'click', -> post.emit 'menuAction', 'Toggle Menu'   
         
         @tabs = new Tabs @elem
-        
-        @winid = elem class: 'winid'
-        @elem.appendChild @winid
-        @winid.addEventListener 'click', @showList
-        
+                
         @winnum = elem class: 'winnum'
         @elem.appendChild @winnum
         @winnum.addEventListener 'click', @showList
-
+        
+        @close = elem class: 'winclose'
+        @elem.appendChild @close
+        @close.appendChild elem 'img', src:slash.fileUrl __dirname + '/../../img/close.png'
+        @close.addEventListener 'click', -> post.emit 'menuAction', 'Close Window'
+        
     onNumWins: (numWins) => 
         if @info.numWins != numWins
             @info.numWins = numWins
@@ -88,15 +89,12 @@ class Titlebar
 
         s = @info.sticky and "○" or ''
         @elem.classList.toggle 'focus', @info.focus
-        @winid.classList.toggle 'focus', @info.focus
         if @info.numWins > 1
-            @winid.innerHTML = "#{s}#{window.winID}#{s}"
             @winnum.innerHTML = @info.numWins
             @winnum.style.display = 'unset'
         else
             @winnum.style.display = 'none'
             @winnum.innerHTML = ''
-            @winid.innerHTML = ''
             
         @tabs.activeTab()?.update @info
         @tabs.update()
@@ -147,7 +145,6 @@ class Titlebar
             
             div = elem class: "winlist-item", children: [
                 elem 'span', class: 'wintabs', text: ''
-                # elem 'span', class: 'winid', text: info.id
             ]
             div.winID = info.id
             

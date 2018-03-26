@@ -629,9 +629,12 @@ menuAction = (name, args) ->
         when 'Save As ...'           then return saveFileAs()
         when 'Reload'                then return reloadFile()
         when 'Reload Window'         then return reloadWin()
-        when 'Toggle Fullscreen'     then return win.setFullScreen !win.isFullScreen()
         when 'Close Tab or Window'   then return post.emit 'closeTabOrWindow'
         when 'Close Other Tabs'      then return post.emit 'closeOtherTabs'
+        when 'Close Window'          then return post.emit 'closeWindow'
+        when 'Maximize'              then return post.toMain 'maximizeWindow', winID
+        when 'Minimize'              then return win.minimize()
+        when 'Fullscreen'            then return win.setFullScreen !win.isFullScreen()
         
         when 'Preferences'           
             # log 'prefs.store.file', prefs.store.file

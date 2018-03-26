@@ -203,7 +203,8 @@ awesome(char)
     z-index             100
 
 .popupItem
-    padding             1px
+    padding-top         3px
+    padding-bottom      2px
     padding-left        2 * frameWidth
     padding-right       2 * frameWidth + 70px
     cursor              pointer
@@ -218,7 +219,8 @@ awesome(char)
     cursor              default
     border              0
     height              0
-    border-top          1px solid #000
+    margin-top          2px
+    margin-bottom       2px
 
 .popupCombo
     pointer-events      none
@@ -472,7 +474,31 @@ infoPadding = 6px
     padding-right       12px
     padding-left        12px
     padding-top         6px
+    
+#titlebar .winclose
+    flex                0 0 0
+    float               right
+    display             inline-block
+    vertical-align      top
+    padding-right       frameWidth
+    padding-left        frameWidth
+    padding-top         frameWidth
+    
+    & img
+        padding-left    1px
+        padding-right   2px
+        width           11px
+        height          11px
+        opacity         0.2
 
+    &:hover
+        & img
+            opacity     1
+    &:active
+        background-color #f00
+        & img
+            opacity     1
+        
 // 000000000   0000000    0000000   000      000000000  000  00000000
 //    000     000   000  000   000  000         000     000  000   000
 //    000     000   000  000   000  000         000     000  00000000
