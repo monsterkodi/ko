@@ -49,6 +49,16 @@ class Titlebar
         @elem.appendChild @winnum
         @winnum.addEventListener 'click', @showList
         
+        @minimize = elem class: 'winclose gray'
+        @elem.appendChild @minimize
+        @minimize.appendChild elem 'img', src:slash.fileUrl __dirname + '/../../img/minimize.png'
+        @minimize.addEventListener 'click', -> post.emit 'menuAction', 'Minimize'
+
+        @maximize = elem class: 'winclose gray'
+        @elem.appendChild @maximize
+        @maximize.appendChild elem 'img', src:slash.fileUrl __dirname + '/../../img/maximize.png'
+        @maximize.addEventListener 'click', -> post.emit 'menuAction', 'Maximize'
+        
         @close = elem class: 'winclose'
         @elem.appendChild @close
         @close.appendChild elem 'img', src:slash.fileUrl __dirname + '/../../img/close.png'
@@ -92,9 +102,11 @@ class Titlebar
         if @info.numWins > 1
             @winnum.innerHTML = @info.numWins
             @winnum.style.display = 'unset'
+            @elem.classList.add 'tight'
         else
             @winnum.style.display = 'none'
             @winnum.innerHTML = ''
+            @elem.classList.remove 'tight'
             
         @tabs.activeTab()?.update @info
         @tabs.update()

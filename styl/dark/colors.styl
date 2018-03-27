@@ -273,17 +273,25 @@ span.macro
 .dot:hover
     color               #f40
 
-#titlebar .winid
-    color               #555
-    &.focus
-        color           #080
-
-#titlebar .winnum
-    color               titleColor
-
 #titlebar.focus .winnum
     color               #555
-
+    
+#titlebar .winnum
+    color               #444
+    &:hover
+        color           #fff
+    &:active
+        background      #555
+        color           #fff
+    
+#titlebar .winclose    
+    &:active
+        background-color #a00
+#titlebar .winclose.gray
+    &:active
+        background-color #555
+    
+    
 // 000000000   0000000    0000000   000      000000000  000  00000000
 //    000     000   000  000   000  000         000     000  000   000
 //    000     000   000  000   000  000         000     000  00000000

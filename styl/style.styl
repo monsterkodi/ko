@@ -467,17 +467,14 @@ infoPadding = 6px
     padding-top         6px
     
 #titlebar .winclose
-    flex                0 0 0
+    flex                0 0 45px
     float               right
     display             inline-block
     vertical-align      top
-    padding-right       frameWidth
-    padding-left        frameWidth
     padding-top         frameWidth
     
     & img
-        padding-left    1px
-        padding-right   2px
+        padding-left    18px
         width           11px
         height          11px
         opacity         0.2
@@ -489,6 +486,11 @@ infoPadding = 6px
         background-color #f00
         & img
             opacity     1
+       
+#titlebar.tight .winclose
+    flex                0 0 34px
+    & img
+        padding-left    12px
         
 // 000000000   0000000    0000000   000      000000000  000  00000000
 //    000     000   000  000   000  000         000     000  000   000

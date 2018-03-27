@@ -8,9 +8,10 @@
 
 { post, slash, elem, empty, error, log, fs, $, _ } = require 'kxk'
 
-lineDiff = require '../tools/linediff'
-forkfunc = require '../tools/forkfunc'
-syntax   = require '../editor/syntax'
+lineDiff   = require '../tools/linediff'
+forkfunc   = require '../tools/forkfunc'
+isTextFile = require '../tools/istextfile'
+syntax     = require '../editor/syntax'
 
 class GitInfo
     
@@ -152,11 +153,12 @@ class GitInfo
                 
                 @logFile 'added', file  # dont delete this for now :)
                 
-                data  = fs.readFileSync file, encoding: 'utf8'
-                lines = data.split /\r?\n/
-                line  = 1
-                
-                line += @logChanges lines:lines, file:file, line:line, change:'new'
+                if isTextFile file
+                    data  = fs.readFileSync file, encoding: 'utf8'
+                    lines = data.split /\r?\n/
+                    line  = 1
+                    
+                    line += @logChanges lines:lines, file:file, line:line, change:'new'
                     
                 terminal.appendMeta clss: 'spacer'
                 
