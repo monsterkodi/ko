@@ -14,11 +14,12 @@ ko
 
 # braces
 
-[\(\)\{\}\[\]]                 bracket
+[\(\)\[\]]                     bracket
+[\{\}]                         bracket.marker
 
 # include
 
-(#)(include)\s+([\<\"])(.*)([\>\"])   . macro.marker . macro.define . string.marker.require . string.require . string.marker.require
+# (#)(include)\s+([\<\"])(.*)([\>\"])   . macro.marker . macro.define . string.marker.require . string.require . string.marker.require
 
 # class
 
@@ -32,7 +33,8 @@ false                          bool.false
 
 # punctuation
 
-[\,\.\;\:\/\&\*]               punctuation
+[\,\.\:\/\&\*]                 punctuation
+[\;]                           punctuation.marker
 (\&\&|\|\|)                    keyword
 
 # null
@@ -64,16 +66,28 @@ new\s+(\w+)                    class.callee
 
 # keywords
 this                           keyword.this
-(^|\s)(if|else|then|for|using|namespace|while|do|return|break|continue|new|switch|case|static|const_cast|static_cast|dynamic_cast|reinterpret_cast|public:?|protected:?|private:?)([\;\s]|$)  . none . keyword . none
+(^|\s)(if|else|then|for|using|namespace|while|do|return|break|continue|new|switch|case|const_cast|static_cast|dynamic_cast|reinterpret_cast|public:?|protected:?|private:?)([\;\s]|$)  . none . keyword . none
     
-\b(uint32_t|void|bool|int|uint|auto|float|double|long|unsigned|virtual|typedef|const|default)\b   keyword
+\b(void|bool|int|uint|auto|float|double|long|unsigned|virtual|typedef|default|enum|struct)\b   keyword
+\b(const|static)\b                     . keyword.marker
+\b(u?int(8|16|32|64)(_t)?)\b    . keyword
+
 
 # macros
 
-(\#)(else|endif)                                  . macro.marker . macro.define
+(\#)(else|endif|include)                          . macro.marker . macro.define
 (\#)(define|pragma|ifdef|ifndef|if|elif)(\s.*|$)  . macro.marker . macro.define . macro
-\b[A-Z0-9\_]+\b                                macro
-    
+\b[A-Z_][A-Z0-9\_]+\b                               macro
+
+# unreal
+
+(UFUNCTION|UPROPERTY|UCLASS|USTRUCT|UENUM|GENERATED_BODY|GENERATED_UCLASS_BODY)\s*\(   . comment.marker
+(BlueprintCallable|BlueprintPure|Keywords|AdvancedDisplay|DisplayName|Blueprintable|ClassGroup|BlueprintImplementable|EditAnywhere|BlueprintType|BlueprintReadOnly|BlueprintReadWrite|Category|Exec|exec|Meta|meta)  . namespace.marker
+\b([UA][A-Z]\w+)   . class
+\b(F[A-Z]\w+)      . keyword
+\b(E[A-Z]\w+)      . property
+\b(TMap|TArray|TSubclassOf)  . template
+
 #number
 
 (?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+f?)(?:$|[^\.\"\'\w]|\.\.\.?)   
