@@ -30,7 +30,9 @@ class Command
         name:  @name
         
     restoreState: (state) ->
-        @name  = state.name
+        
+        if state?.name
+            @name = state.name
         @loadState()
         
     #  0000000  000000000   0000000   00000000   000000000

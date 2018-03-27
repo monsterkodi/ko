@@ -572,8 +572,16 @@ class Main
         post.toAll 'winClosed', wid
         @postDelayedNumWins()
 
+    #  0000000   000000000  000   000  00000000  00000000       000  000   000   0000000  000000000  
+    # 000   000     000     000   000  000       000   000      000  0000  000  000          000     
+    # 000   000     000     000000000  0000000   0000000        000  000 0 000  0000000      000     
+    # 000   000     000     000   000  000       000   000      000  000  0000       000     000     
+    #  0000000      000     000   000  00000000  000   000      000  000   000  0000000      000     
+    
     otherInstanceStarted: (args, dir) =>
 
+        # post.toWins 'mainlog', 'other instance args:', args, 'dir', dir
+        
         if not visibleWins().length
             @toggleWindows()
 
@@ -581,17 +589,32 @@ class Main
             visibleWins()[0]?.focus()
 
         files = []
-        for arg in args.slice(2)
+        if first(args).endsWith 'ko.exe'
+            fileargs = args.slice 1
+        else
+            fileargs = args.slice 2
+            
+        for arg in fileargs
             continue if arg.startsWith '-'
             file = arg
-            if not arg.startsWith '/'
+            if slash.isRelative file
                 file = slash.join slash.resolve(dir), arg
             [fpath, pos] = slash.splitFilePos file
             if slash.fileExists fpath
                 files.push file
 
-        @createWindow files:files
+        # post.toWins 'mainlog', 'other instance files:', files
+        
+        post.toWin first(visibleWins()).id, 'loadFiles', files, newTab:true
+        
+        # @createWindow files:files
 
+    #  0000000   000   000  000  000000000  
+    # 000   000  000   000  000     000     
+    # 000 00 00  000   000  000     000     
+    # 000 0000   000   000  000     000     
+    #  00000 00   0000000   000     000     
+    
     quit: ->
 
         toSave = wins().length

@@ -125,6 +125,8 @@ post.on 'editorFocus', (editor) ->
 
 # testing related ...
 
+post.on 'mainlog', -> log.apply log, arguments 
+
 post.on 'ping', (wID, argA, argB) -> post.toWin wID, 'pong', winID, argA, argB
 post.on 'postEditorState', ->
     post.toAll 'editorState', winID,
