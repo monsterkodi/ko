@@ -18,7 +18,7 @@ class Walker
         @cfg.dotFiles    ?= false
         @cfg.includeDirs ?= true
         @cfg.maxFiles    ?= 500
-        @cfg.ignore      ?= ['node_modules', 'app', 'dist', 'build', 'Library', 'Applications', 'resources']
+        @cfg.ignore      ?= ['node_modules', 'app', 'dist', 'build', 'Build', 'Library', 'Applications', 'resources', 'ThirdParty', 'Binaries', 'Intermediate', 'Saved', 'Programs', 'Shaders', 'DerivedDataCache', 'Content', 'Samples']
         @cfg.include     ?= ['.konrad.noon', '.gitignore', '.npmignore']
         @cfg.ignoreExt   ?= ['app', 'asar']
         @cfg.includeExt  ?= ['coffee', 'styl', 'pug', 'md', 'noon', # 'html', 'js', 'css',

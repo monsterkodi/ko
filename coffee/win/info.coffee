@@ -96,8 +96,7 @@ class Info
         @botline.appendChild @words
         tooltip @words, 'words'
         
-        post.on 'filesCount', (count) => @onFilesCount count
-        window.editor.autocomplete.on 'wordCount', @onWordCount # use post
+        post.on 'filesCount',        @onFilesCount
 
         @elem.appendChild @botline
         
@@ -145,9 +144,11 @@ class Info
     # 000   000  00000000  0000000   0000000   000   000  0000000  
     
     reload: =>
-        @onClassesCount _.size post.get 'indexer', 'classes'
-        @onFuncsCount   _.size post.get 'indexer', 'funcs'
-        @onFilesCount   _.size post.get 'indexer', 'files'
+        counts = post.get 'indexer', 'counts'
+        @onClassesCount counts.classes
+        @onFuncsCount   counts.funcs
+        @onFilesCount   counts.files
+        @onWordCount    counts.words
 
     #  0000000   000   000                     
     # 000   000  0000  000                     

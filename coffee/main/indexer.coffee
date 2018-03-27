@@ -101,12 +101,22 @@ class Indexer
     #  0000000   000   000   0000000   00000000     000     
     
     onGet: (key, filter...) =>
-
+        
+        log 'onGet', key, filter
+        
+        if key == 'counts'
+            return 
+                classes:@classes.length
+                files:  @files.length
+                funcs:  @funcs.length
+                words:  @words.length
+                dirs:   @dirs.length
+        
         value = @[key]
         if not empty filter
             
             names = _.filter filter, (c) -> not empty c
-            
+                        
             if not empty names
                 
                 names = names.map (c) -> c?.toLowerCase()
@@ -120,7 +130,7 @@ class Indexer
         
     onSourceInfoForFile: (opt) =>
         file = opt.item.file
-        # log 'sourceInfoForFile', file, @files[file]
+        log 'sourceInfoForFile', file, @files[file]
         if @files[file]?
             post.toWin opt.winID, 'sourceInfoForFile', @files[file], opt
         
@@ -145,6 +155,8 @@ class Indexer
 
     collectProjects: ->
 
+        log 'collectProjects'
+        
         @projects = {}
         w = new Walker
             maxFiles:    5000
@@ -156,6 +168,7 @@ class Indexer
             filter:      (p) -> slash.ext(p) not in ['noon', 'json', 'git', '']
             dir:         (p) => if slash.file(p) == '.git'    then @projects[slash.basename slash.dirname p] = dir: slash.tilde slash.dirname p
             file:        (p) => if slash.base(p) == 'package' then @projects[slash.basename slash.dirname p] = dir: slash.tilde slash.dirname p
+            done:        => log 'collectProjects done', @projects
         w.start()
 
     # 000  000   000  0000000    00000000  000   000        0000000    000  00000000
@@ -167,6 +180,9 @@ class Indexer
     indexDir: (dir) ->
 
         return if not dir? or @dirs[dir]?
+        
+        log 'indexDir', dir
+        
         @dirs[dir] =
             name: slash.basename dir
 
@@ -176,11 +192,15 @@ class Indexer
             includeDirs: true
             dir:         @onWalkerDir
             file:        @onWalkerFile
-            done:        @shiftQueue
+            maxDepth:    12
+            maxFiles:    100000
+            done:        (w) => 
+                log 'indexDir done', w.cfg.root, w.cfg.files.length
+                @shiftQueue
 
         @walker = new Walker wopt
         @walker.cfg.ignore.push 'js'
-        @walker.cfg.includeExt = @walker.cfg.includeExt.concat @imageExtensions
+        # @walker.cfg.includeExt = @walker.cfg.includeExt.concat @imageExtensions
         @walker.start()
 
     onWalkerDir: (p, stat) =>
@@ -310,7 +330,6 @@ class Indexer
                         # 000   000  00000000     000     000   000   0000000   0000000    0000000
 
                         if isCpp or isHpp
-                            log 'isCpp or isHpp', file, currentClass
                             if methodName = Indexer.cppMethodNameInLine line
                                 funcInfo = @addMethod currentClass, methodName, file, li
                                 funcStack.push [indent, funcInfo]

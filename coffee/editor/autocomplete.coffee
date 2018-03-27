@@ -41,7 +41,7 @@ class Autocomplete extends event
         @editor.on 'cursor',         @close
         @editor.on 'blur',           @close
         
-        post.on 'funcsCount',        @onFuncsCount
+        # post.on 'funcsCount',        @onFuncsCount
         
     #  0000000   000   000  00000000  0000000    000  000000000
     # 000   000  0000  000  000       000   000  000     000   
@@ -297,17 +297,19 @@ class Autocomplete extends event
                 info.temp = true if opt.action is 'change'
                 @wordinfo[w] = info
                 
-        @emit 'wordCount', _.size @wordinfo
+        post.emit 'autocompleteCount', _.size @wordinfo
                 
-    onFuncsCount: =>
-        
-        funcs = post.get 'indexer', 'funcs'
-        for func,info of funcs
-            info  = @wordinfo[func] ? {}
-            info.count = Math.max 20, info.count ? 1
-            @wordinfo[func] = info
-            
-        @emit 'wordCount', _.size @wordinfo
+    # onFuncsCount: =>
+#         
+        # log 'onFuncsCount'
+#         
+        # funcs = post.get 'indexer', 'funcs'
+        # for func,info of funcs
+            # info  = @wordinfo[func] ? {}
+            # info.count = Math.max 20, info.count ? 1
+            # @wordinfo[func] = info
+#             
+        # @emit 'wordCount', _.size @wordinfo
             
     #  0000000  000   000  00000000    0000000   0000000   00000000   000   000   0000000   00000000   0000000  
     # 000       000   000  000   000  000       000   000  000   000  000 0 000  000   000  000   000  000   000
