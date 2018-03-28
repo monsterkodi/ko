@@ -10,9 +10,6 @@
 
 Walker   = require '../tools/walker'
 matchr   = require '../tools/matchr'
-electron = require 'electron'
-
-BrowserWindow = electron.BrowserWindow
 
 class Indexer
 
