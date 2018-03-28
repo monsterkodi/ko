@@ -46,8 +46,8 @@ false                                 bool.false
 
 # null
 
-null|undefined                        keyword.null
-return                                keyword.return
+\bnull\b|\bundefined\b                keyword.null
+\breturn\b                            keyword.return
 
 # .property
 

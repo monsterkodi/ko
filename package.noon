@@ -37,9 +37,10 @@ dependencies
                 file-icons-js   ^1.0.3
                 fuzzaldrin      ^2.1.0
                 fuzzy           ^0.1.3
+                ignore          ^3.3.7
                 isbinaryfile    ^3.0.2
                 js-beautify     ^1.7.5
-                kxk             ^0.69.0
+                kxk             ^0.71.0
                 mocha           ^5.0.4
                 node-abi        ^2.3.0
                 node-pty        ^0.7.4

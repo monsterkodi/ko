@@ -6,10 +6,11 @@
 000  000   000  0000000    00000000  000   000  00000000  000   000
 ###
 
-{ empty, post, slash, fs, os, log, _ } = require 'kxk'
+{ empty, post, slash, fs, os, error, log, _ } = require 'kxk'
 
 Walker   = require '../tools/walker'
 matchr   = require '../tools/matchr'
+forkfunc = require '../tools/forkfunc'
 
 class Indexer
 
@@ -79,7 +80,7 @@ class Indexer
         post.onGet 'indexer', @onGet
         post.on 'sourceInfoForFile', @onSourceInfoForFile
         @collectBins()
-        @collectProjects()
+        # @collectProjects()
     
         @imageExtensions = ['png', 'jpg', 'gif', 'tiff', 'pxm', 'icns']        
 
@@ -90,6 +91,8 @@ class Indexer
         @words   = Object.create null
         @walker  = null
         @queue   = []
+        
+        @indexedProjects = []
 
     #  0000000   000   000   0000000   00000000  000000000  
     # 000   000  0000  000  000        000          000     
@@ -99,15 +102,15 @@ class Indexer
     
     onGet: (key, filter...) =>
         
-        log 'onGet', key, filter
-        
         if key == 'counts'
             return 
-                classes:@classes.length
-                files:  @files.length
-                funcs:  @funcs.length
-                words:  @words.length
-                dirs:   @dirs.length
+                classes: @classes.length ? 0
+                files:   @files.length ? 0
+                funcs:   @funcs.length ? 0
+                words:   @words.length ? 0
+                dirs:    @dirs.length ? 0
+        
+        log 'onGet', key, filter
         
         value = @[key]
         if not empty filter
@@ -126,6 +129,7 @@ class Indexer
         value
         
     onSourceInfoForFile: (opt) =>
+        
         file = opt.item.file
         log 'sourceInfoForFile', file, @files[file]
         if @files[file]?
@@ -141,6 +145,7 @@ class Indexer
         
         @bins = []
         return if slash.win()
+        
         for dir in ['/bin', '/usr/bin', '/usr/local/bin']
             w = new Walker
                 maxFiles:    1000
@@ -168,6 +173,43 @@ class Indexer
             done:        => log 'collectProjects done', @projects
         w.start()
 
+    # 00000000   00000000    0000000         000  00000000   0000000  000000000  
+    # 000   000  000   000  000   000        000  000       000          000     
+    # 00000000   0000000    000   000        000  0000000   000          000     
+    # 000        000   000  000   000  000   000  000       000          000     
+    # 000        000   000   0000000    0000000   00000000   0000000     000     
+    
+    indexProject: (file) ->
+        
+        if @currentlyIndexing
+            @indexQueue ?= []
+            @indexQueue.push file
+            log 'indexProject queued', @indexQueue
+            return
+        
+        file = slash.resolve file 
+        
+        for project in @indexedProjects
+            if file.startsWith project.dir + '/'
+                # log 'indexProject ---- already indexed', project.dir
+                return
+              
+        @currentlyIndexing = file
+        log 'indexProject currentlyIndexing', @currentlyIndexing
+        
+        forkfunc './indexprj', file, (err, info) =>
+            return error 'indexing failed', err if not empty err
+            log 'indexProject ++++++ indexed', @currentlyIndexing, info
+            delete @currentlyIndexing
+            @indexedProjects.push info if info
+            doShift = empty @queue
+            @queue = @queue.concat info.files
+            if not empty @indexQueue
+                @indexProject @indexQueue.shift()
+            @shiftQueue() if doShift
+                
+        # @indexDir slash.pkg(file) ? slash.dir(file)
+        
     # 000  000   000  0000000    00000000  000   000        0000000    000  00000000
     # 000  0000  000  000   000  000        000 000         000   000  000  000   000
     # 000  000 0 000  000   000  0000000     00000          000   000  000  0000000
@@ -274,7 +316,7 @@ class Indexer
         @removeFile file if opt?.refresh
 
         if @files[file]?
-            return @shiftQueue() 
+            return @shiftQueue()
 
         fileExt = slash.ext file 
 
@@ -282,7 +324,7 @@ class Indexer
             @files[file] = {}
             return @shiftQueue()
             
-        # log 'indexFile', file
+        log 'indexFile', file
 
         isCpp = fileExt in ['cpp', 'cc']
         isHpp = fileExt in ['hpp', 'h' ]
@@ -455,12 +497,15 @@ class Indexer
             
             post.toWins 'filesCount', _.size @files
 
-            @indexDir slash.dir file
-            @indexDir slash.pkg file
-
             @shiftQueue()
         @
 
+    #  0000000  000   000  000  00000000  000000000  
+    # 000       000   000  000  000          000     
+    # 0000000   000000000  000  000000       000     
+    #      000  000   000  000  000          000     
+    # 0000000   000   000  000  000          000     
+    
     shiftQueue: =>
         
         if @queue.length

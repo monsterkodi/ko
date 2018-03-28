@@ -155,7 +155,10 @@ post.on 'activateWindow',     (winID) -> main.activateWindowWithID winID
 post.on 'activateNextWindow', (winID) -> main.activateNextWindow winID
 post.on 'activatePrevWindow', (winID) -> main.activatePrevWindow winID
 post.on 'fileSaved',    (file, winID) -> main.indexer.indexFile file, refresh: true
-post.on 'fileLoaded',   (file, winID) -> main.indexer.indexFile file
+post.on 'fileLoaded',   (file, winID) -> 
+    # log 'fileLoaded', winID, file
+    main.indexer.indexFile file
+    main.indexer.indexProject file
 post.on 'menuAction',   (action, arg) -> main?.onMenuAction action, arg
 post.on 'ping', (winID, argA, argB) -> post.toWin winID, 'pong', 'main', argA, argB
 post.on 'winlog',       (winID, text) -> 

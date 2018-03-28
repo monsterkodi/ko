@@ -30,7 +30,9 @@ class Term extends Command
         @autocd     = true
         @cmdID      = 0
         @pwdID      = -1
-        @bins       = post.get 'indexer', 'bins'
+        
+        if not slash.win()
+            @bins = post.get 'indexer', 'bins'
         
         @setCWD process.cwd()
 
