@@ -195,11 +195,12 @@ class Indexer
                 return
               
         @currentlyIndexing = file
-        log 'indexProject currentlyIndexing', @currentlyIndexing
+        # log 'indexProject currentlyIndexing', @currentlyIndexing
         
         forkfunc './indexprj', file, (err, info) =>
             return error 'indexing failed', err if not empty err
-            log 'indexProject ++++++ indexed', @currentlyIndexing, info
+            # log 'indexProject ++++++ indexed', @currentlyIndexing, info
+            log 'indexProject ++++++ indexed', @currentlyIndexing, info.files.length
             delete @currentlyIndexing
             @indexedProjects.push info if info
             doShift = empty @queue
@@ -324,7 +325,7 @@ class Indexer
             @files[file] = {}
             return @shiftQueue()
             
-        log 'indexFile', file
+        # log 'indexFile', file
 
         isCpp = fileExt in ['cpp', 'cc']
         isHpp = fileExt in ['hpp', 'h' ]

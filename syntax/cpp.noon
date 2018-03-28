@@ -70,8 +70,7 @@ this                           keyword.this
     
 \b(void|bool|int|uint|auto|float|double|long|unsigned|virtual|typedef|default|enum|struct)\b   keyword
 \b(const|static)\b                     . keyword.marker
-\b(u?int(8|16|32|64)(_t)?)\b    . keyword
-
+\b(u?int8|u?int16|u?int32|u?int64)\b   . keyword
 
 # macros
 

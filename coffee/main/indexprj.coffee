@@ -6,9 +6,47 @@
 000  000   000  0000000    00000000  000   000  000        000   000   0000000     
 ###
 
-{ slash, walkdir, empty, fs, log } = require 'kxk'
+{ slash, walkdir, empty, noon, fs, log } = require 'kxk'
 
 ignore = require 'ignore'
+
+sourceFileExtensions = [ 'coffee', 'styl', 'pug', 'md', 'noon', 'txt', 'json', 'sh', 'py', 'cpp', 'cc', 'c', 'cs', 'h', 'hpp' ]
+
+shouldIndex = (path, stat) ->
+    
+    if slash.ext(path) in sourceFileExtensions
+        if stat.size > 654321
+            log 'file to big!', path
+            return false
+        else
+            return true
+    false
+
+indexKoFiles = (kofiles, info) ->
+    
+    for kofile in kofiles
+        
+        kodata = noon.load kofile
+        return if empty kodata.index
+        
+        for dir,cfg of kodata.index
+            
+            opt = 
+                max_depth: cfg.depth ? 4
+                no_return: true
+                
+            ign = ignore()
+            ign.add cfg.ignore if not empty cfg.ignore
+                        
+            absDir = slash.join slash.dir(kofile), dir
+            
+            walkdir.sync absDir, opt, (path, stat) ->
+                  
+                if ign.ignores slash.relative path, dir
+                    @ignore path
+                else if stat.isFile() 
+                    if shouldIndex path, stat
+                        info.files.push slash.path path
 
 indexProject = (file) ->
 
@@ -69,14 +107,11 @@ indexProject = (file) ->
             if file == '.ko.noon'
                 kofiles.push path
                 
-            if slash.ext(path) in [ 'coffee', 'styl', 'pug', 'md', 'noon', 'txt', 'json', 'sh', 'py',                            
-                                    'cpp', 'cc', 'c', 'cs', 'h', 'hpp' ]
-                if stat.size > 654321
-                    log 'file to big!', path
-                    return
+            if shouldIndex path, stat
                 info.files.push slash.path path
                 
-    log 'kofiles', kofiles
+    indexKoFiles kofiles, info
+    
     info
 
 if module.parent
