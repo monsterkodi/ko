@@ -26,7 +26,7 @@ describe 'indexer', ->
         expect(Indexer.classNameInLine('class USimple : public UObject')).to.eql 'USimple'
         expect(Indexer.classNameInLine('class SOME_API USomeObject : public UObject')).to.eql 'USomeObject'
         expect(Indexer.classNameInLine('struct SOME_API FSomeStruct : public FSomeBase')).to.eql 'FSomeStruct'
-    
+        
     it 'methodNameInLine', -> 
         
         expect(Indexer.methodNameInLine('   coffeeMethod: ->')).to.eql 'coffeeMethod'
@@ -76,6 +76,9 @@ describe 'indexer', ->
         .to.eql 'DisplayDebug'
         expect(Indexer.hppMethodNameInLine '    EPathFollowingRequestResult::Type MoveToActor(AActor* Goal, float AcceptanceRadius = -1, bool bStopOnOverlap = true,')
         .to.eql 'MoveToActor'
+        
+        expect(Indexer.hppMethodNameInLine '    ').to.eql undefined
+        expect(Indexer.hppMethodNameInLine '    UPROPERTY(BlueprintReadWrite, EditAnywhere)').to.eql undefined
         
     it 'cppFiles', (done) ->
         

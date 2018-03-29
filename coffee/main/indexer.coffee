@@ -15,29 +15,39 @@ forkfunc = require '../tools/forkfunc'
 class Indexer
 
     @requireRegExp   = /^\s*([\w\{\}]+)\s+=\s+require\s+[\'\"]([\.\/\w]+)[\'\"]/
-    @classRegExp     = /^\s*(class|struct)(\s+\w+_API)?\s+(\w+)(\s+extends\s\w+.*|\s*:\s*[\w\,\s\<\>]+)?\s*$/
     @includeRegExp   = /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
     @methodRegExp    = /^\s+([\@]?\w+)\s*\:\s*(\(.*\))?\s*[=-]\>/
     @cppMethodRegExp = /^\s*(\w+\s+)*(\w+)\s*(\(.*\))/
     @funcRegExp      = /^\s*([\w\.]+)\s*[\:\=]\s*(\(.*\))?\s*[=-]\>/
     @testRegExp      = /^\s*(describe|it)\s+[\'\"](.+)[\'\"]\s*[\,]\s*(\([^\)]*\))?\s*[=-]\>/
     @splitRegExp     = new RegExp "[^\\w\\d\\_]+", 'g'
+    @classRegExp     = /// ^ \s* 
+        (enum\s+)?
+        (class\s+|struct\s+)
+        (\w+_API\s+)?
+        (\w+)
+        (
+            \s+extends\s\w+.* | 
+            \s*:\s*[\w\,\s\<\>]+
+        )?
+        \s* $ 
+        ///
     @hppMethodRegExp = /// ^ \s*
-          (UFUNCTION\([^\)]*\)\s*)?
-          ([\w\*\&\>\<\,\:]*\s)*
-          (\w+) 
-          \s* \( \s*
-          (
-            .*\, |
-            .*\)[\w\s]*[\;\{] |
-            $
-          )
-        ///i
+        (UFUNCTION\([^\)]*\)\s*)?
+        ([\w\*\&\>\<\,\:]*\s)*
+        (\w+) 
+        \s* \( \s*
+        (
+          .*\,\s*$ |
+          .*\)[\w\s]*[\;\{] |
+          $
+        )
+        ///
 
     @classNameInLine: (line) ->
                     
         m = line.match Indexer.classRegExp
-        m?[3]
+        m?[4]
 
     @cppMethodNameInLine: (line) ->
         
