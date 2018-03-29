@@ -18,7 +18,8 @@ class Indexer
     @classRegExp     = /^\s*(class|struct)(\s+\w+_API)?\s+(\w+)(\s+extends\s\w+.*|\s*:\s*[\w\,\s\<\>]+)?\s*$/
     @includeRegExp   = /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
     @methodRegExp    = /^\s+([\@]?\w+)\s*\:\s*(\(.*\))?\s*[=-]\>/
-    @cppMethodRegExp = /^\s+(\w+\s+)*(\w+)\s*(\(.*\))/
+    @cppMethodRegExp = /^\s*(\w+\s+)*(\w+)\s*(\(.*\))/
+    @hppMethodRegExp = /^\s*(UFUNCTION\([^\)]*\)\s*)?([\w\*\&\>\<\,\:]+\s+)*(\w+)\s*\(((.*\))(\s*\w+\s*)*\s*[\;\{]|\s*$|.+,\s*$)/
     @funcRegExp      = /^\s*([\w\.]+)\s*[\:\=]\s*(\(.*\))?\s*[=-]\>/
     @testRegExp      = /^\s*(describe|it)\s+[\'\"](.+)[\'\"]\s*[\,]\s*(\([^\)]*\))?\s*[=-]\>/
     @splitRegExp     = new RegExp "[^\\w\\d\\_]+", 'g'
@@ -33,6 +34,11 @@ class Indexer
         m = line.match Indexer.cppMethodRegExp
         m?[2]
 
+    @hppMethodNameInLine: (line) ->
+        
+        m = line.match Indexer.hppMethodRegExp
+        m?[3]
+        
     @methodNameInLine: (line) ->
         
         m = line.match Indexer.methodRegExp
@@ -69,11 +75,11 @@ class Indexer
             when /\d/.test word then false # exclude when word contains number
             else true
         
-    #  0000000   0000000   000   000   0000000  000000000  00000000   000   000   0000000  000000000   0000000   00000000   
-    # 000       000   000  0000  000  000          000     000   000  000   000  000          000     000   000  000   000  
-    # 000       000   000  000 0 000  0000000      000     0000000    000   000  000          000     000   000  0000000    
-    # 000       000   000  000  0000       000     000     000   000  000   000  000          000     000   000  000   000  
-    #  0000000   0000000   000   000  0000000      000     000   000   0000000    0000000     000      0000000   000   000  
+    # 000  000   000  0000000    00000000  000   000  00000000  00000000   
+    # 000  0000  000  000   000  000        000 000   000       000   000  
+    # 000  000 0 000  000   000  0000000     00000    0000000   0000000    
+    # 000  000  0000  000   000  000        000 000   000       000   000  
+    # 000  000   000  0000000    00000000  000   000  00000000  000   000  
     
     constructor: () ->
         
@@ -200,14 +206,16 @@ class Indexer
         forkfunc './indexprj', file, (err, info) =>
             return error 'indexing failed', err if not empty err
             # log 'indexProject ++++++ indexed', @currentlyIndexing, info
-            log 'indexProject ++++++ indexed', @currentlyIndexing, info.files.length
+            log 'indexProject ++++++ indexed', info.dir, info.files.length
             delete @currentlyIndexing
             @indexedProjects.push info if info
             doShift = empty @queue
-            @queue = @queue.concat info.files
+            if not empty info.files
+                @queue = @queue.concat info.files
             if not empty @indexQueue
                 @indexProject @indexQueue.shift()
             @shiftQueue() if doShift
+            log 'done'
                 
         # @indexDir slash.pkg(file) ? slash.dir(file)
         
@@ -325,14 +333,12 @@ class Indexer
             @files[file] = {}
             return @shiftQueue()
             
-        # log 'indexFile', file
-
         isCpp = fileExt in ['cpp', 'cc']
         isHpp = fileExt in ['hpp', 'h' ]
 
         fs.readFile file, 'utf8', (err, data) =>
             
-            return log "can't index #{file}", err if err?
+            return error "can't index #{file}", err if not empty err
             
             lines = data.split /\r?\n/
             
@@ -344,8 +350,6 @@ class Indexer
             funcAdded = false
             funcStack = []
             currentClass = null
-            
-            # log 'indexing', file
             
             for li in [0...lines.length]
                 
@@ -361,7 +365,7 @@ class Indexer
                         funcInfo.class ?= slash.base file
                         fileInfo.funcs.push funcInfo 
 
-                    if currentClass? and indent >= 4
+                    if currentClass? # and indent >= 4
 
                         # 00     00  00000000  000000000  000   000   0000000   0000000     0000000
                         # 000   000  000          000     000   000  000   000  000   000  000
@@ -370,7 +374,12 @@ class Indexer
                         # 000   000  00000000     000     000   000   0000000   0000000    0000000
 
                         if isCpp or isHpp
-                            if methodName = Indexer.cppMethodNameInLine line
+                            if isCpp
+                                methodName = Indexer.cppMethodNameInLine line
+                            else
+                                methodName = Indexer.hppMethodNameInLine line
+                            if methodName
+                                # log 'isCpp', isCpp, 'isHpp', isHpp, methodName
                                 funcInfo = @addMethod currentClass, methodName, file, li
                                 funcStack.push [indent, funcInfo]
                                 funcAdded = true                            
@@ -490,13 +499,15 @@ class Indexer
                     funcInfo.class ?= slash.base file
                     fileInfo.funcs.push funcInfo
 
-                post.toWins 'classesCount', _.size @classes
-                post.toWins 'funcsCount',   _.size @funcs
-                post.toWins 'fileIndexed',  file, fileInfo
+                if opt?.post != false
+                    post.toWins 'classesCount', _.size @classes
+                    post.toWins 'funcsCount',   _.size @funcs
+                    post.toWins 'fileIndexed',  file, fileInfo
 
             @files[file] = fileInfo
             
-            post.toWins 'filesCount', _.size @files
+            if opt?.post != false
+                post.toWins 'filesCount', _.size @files
 
             @shiftQueue()
         @
@@ -508,9 +519,9 @@ class Indexer
     # 0000000   000   000  000  000          000     
     
     shiftQueue: =>
-        
         if @queue.length
             file = @queue.shift()
+            log @queue.length, file
             @indexFile file
 
 module.exports = Indexer

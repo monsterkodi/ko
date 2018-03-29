@@ -98,22 +98,22 @@ describe 'syntax', ->
             diss 0, 1, 'string double'
             diss 0, 2, 'string marker double'
     
-        it 'triple', ->
-    
-            text 'log """txt"""'
-            diss 0, 1, 'string marker triple'
-            diss 0, 2, 'string triple'
-            diss 0, 3, 'string marker triple'
-    
-            text 'log """t\'t"""'
-            diss 0, 1, 'string marker triple'
-            diss 0, 2, 'string triple'
-            diss 0, 3, 'string marker triple'
-    
-            text 'log """t"\'\'"t"""'
-            diss 0, 1, 'string marker triple'
-            diss 0, 2, 'string triple'
-            diss 0, 3, 'string marker triple'
+        # it 'triple', ->
+#     
+            # text 'log """txt"""'
+            # diss 0, 1, 'string marker triple'
+            # diss 0, 2, 'string triple'
+            # diss 0, 3, 'string marker triple'
+#     
+            # text 'log """t\'t"""'
+            # diss 0, 1, 'string marker triple'
+            # diss 0, 2, 'string triple'
+            # diss 0, 3, 'string marker triple'
+#     
+            # text 'log """t"\'\'"t"""'
+            # diss 0, 1, 'string marker triple'
+            # diss 0, 2, 'string triple'
+            # diss 0, 3, 'string marker triple'
                 
         it 'escape', ->
     
@@ -127,10 +127,10 @@ describe 'syntax', ->
             diss 0, 1, 'string double'
             diss 0, 2, 'string marker double'
     
-            text '"""\\"\\\'\\""""'
-            diss 0, 0, 'string marker triple'
-            diss 0, 1, 'string triple'
-            diss 0, 2, 'string marker triple'
+            # text '"""\\"\\\'\\""""'
+            # diss 0, 0, 'string marker triple'
+            # diss 0, 1, 'string triple'
+            # diss 0, 2, 'string marker triple'
                 
         it 'unbalanced', ->
     
@@ -144,14 +144,14 @@ describe 'syntax', ->
             diss 0, 1, 'syntax'
             test diss(0).length, 2
         
-        it 'interpolation', ->
-            
-            text '"#{1}"'
-            diss 0, 0, 'string marker double'
-            diss 0, 1, 'interpolation marker'
-            diss 0, 2, 'number int'
-            diss 0, 3, 'interpolation marker'
-            diss 0, 4, 'string marker double'
+        # it 'interpolation', ->
+#             
+            # text '"#{1}"'
+            # diss 0, 0, 'string marker double'
+            # diss 0, 1, 'interpolation marker'
+            # diss 0, 2, 'number int'
+            # diss 0, 3, 'interpolation marker'
+            # diss 0, 4, 'string marker double'
     
         it 'fake interpolation', ->
             
@@ -170,14 +170,24 @@ describe 'syntax', ->
             
     it 'brackets', ->
         
+        # text "{ }"
+        # diss 0, 0, 'bracket open'
+        # diss 0, 1, 'bracket close'
+        # test diss(0).length, 2
+
+        # text "{}"
+        # diss 0, 0, 'bracket open'
+        # diss 0, 1, 'bracket close'
+        # test diss(0).length, 2
+        
         text "{ }"
-        diss 0, 0, 'bracket open'
-        diss 0, 1, 'bracket close'
+        diss 0, 0, 'bracket syntax'
+        diss 0, 1, 'bracket syntax'
         test diss(0).length, 2
 
         text "{}"
-        diss 0, 0, 'bracket open'
-        diss 0, 1, 'bracket close'
+        diss 0, 0, 'bracket syntax'
+        diss 0, 1, 'bracket syntax'
         test diss(0).length, 2
 
     it 'numbers', ->
