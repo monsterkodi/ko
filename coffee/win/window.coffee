@@ -6,7 +6,7 @@
 00     00  000  000   000  0000000     0000000   00     00
 ###
 
-{ stopEvent, fileList, keyinfo, atomic, prefs, state, stash, first, reversed,
+{ stopEvent, fileList, keyinfo, atomic, prefs, state, stash, first, reversed, childp, 
   drag, noon, post, slash, clamp, pos, str, sw, sh, os, fs, empty, log, error, _ } = require 'kxk'
 
 Split       = require './split'
@@ -232,17 +232,42 @@ saveFile = (file) ->
     else
         mode = 438
 
+    isWritable = (p) ->
+        try
+            fs.accessSync slash.resolve(p), fs.R_OK | fs.W_OK
+            return true
+        catch
+            return false
+        
     atomic file, editor.text(), { encoding: 'utf8', mode: mode }, (err) ->
 
         editor.saveScrollCursorsAndSelections()
 
         if not empty err
+            if err.code == 'EPERM' and slash.win()
+                p = slash.resolve file
+                try
+                    childp.exec "p4 edit #{slash.unslash(p)}", (err) ->
+                        return error "p4 edit failed", err if not empty err
+                        if isWritable p
+                            saveFile p
+                            return
+                        else
+                            log 'still not writable?', p
+                catch err
+                    error "can't p4 edit", err
+                    
             error "saving file #{file}:", err
+            split.show 'logview'
         else
-            editor.setCurrentFile      file
-            post.toOthers 'fileSaved', file, window.winID
-            post.emit     'saved',     file
+            fileSavedSuccessfully file
 
+fileSavedSuccessfully = (file) ->
+    
+    editor.setCurrentFile      file
+    post.toOthers 'fileSaved', file, window.winID
+    post.emit     'saved',     file
+            
 window.saveChanges = ->
 
     if editor.currentFile? and editor.do.hasLineChanges() and slash.fileExists editor.currentFile

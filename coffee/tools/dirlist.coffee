@@ -43,7 +43,7 @@ dirList = (dirPath, opt, cb) ->
             if opt.ignoreHidden
                 return true
                 
-            if base in ['.DS_Store', '.git']
+            if base in ['.DS_Store']
                 return true
                 
         if base == 'Icon\r'
