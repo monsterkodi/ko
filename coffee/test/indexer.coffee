@@ -65,13 +65,16 @@ describe 'indexer', ->
         .to.eql 'JMeth'
         expect(Indexer.hppMethodNameInLine '    NamespaceCrap::Type KMeth();')
         .to.eql 'KMeth'
+        expect(Indexer.hppMethodNameInLine '    UFUNCTION( BlueprintCallable ) bool LMeth();')
+        .to.eql 'LMeth'
+        
         expect(Indexer.hppMethodNameInLine '    UGridItem * AddGridItem(AActor * actor);')
         .to.eql 'AddGridItem'
         expect(Indexer.hppMethodNameInLine '    const TMap<FIntVector, UGridItem*> & ActorAtPos(const FIntVector & pos);')
         .to.eql 'ActorAtPos'
-        expect(Indexer.hppMethodNameInLine 'virtual void DisplayDebug(class UCanvas* Canvas, const class FDebugDisplayInfo& DebugDisplay, float& YL, float& YPos) override;')
+        expect(Indexer.hppMethodNameInLine '    virtual void DisplayDebug(class UCanvas* Canvas, const class FDebugDisplayInfo& DebugDisplay, float& YL, float& YPos) override;')
         .to.eql 'DisplayDebug'
-        expect(Indexer.hppMethodNameInLine 'EPathFollowingRequestResult::Type MoveToActor(AActor* Goal, float AcceptanceRadius = -1, bool bStopOnOverlap = true,')
+        expect(Indexer.hppMethodNameInLine '    EPathFollowingRequestResult::Type MoveToActor(AActor* Goal, float AcceptanceRadius = -1, bool bStopOnOverlap = true,')
         .to.eql 'MoveToActor'
         
     it 'cppFiles', (done) ->
@@ -80,7 +83,7 @@ describe 'indexer', ->
         cpp = slash.resolve "#{__dirname}/dir/class.cpp"
         
         indexer = new Indexer()
-        indexer.indexFile hpp,post:false
+        indexer.indexFile hpp, post:false
         indexer.indexFile cpp, post:false
         check = ->
             if _.size(indexer.files) < 2
@@ -105,4 +108,26 @@ describe 'indexer', ->
         setTimeout check, 100
             # expect(indexer.files).to.include slash.resolve './dir/class.h'
         
+    it 'specific files', (done) ->
+        # return done()
+        indexer = new Indexer()
+        files = [
+            'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Classes/Actions/PawnAction_Wait.h'
+            'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Classes/AIController.h'
+        ]
+        
+        for file in files
+            indexer.indexFile file, post:false
+            
+        check = ->
+            if _.size(indexer.files) < files.length
+                setTimeout check, 100
+                return
+            try
+                expect(indexer.funcs).to.not.be.empty
+                done()
+            catch err
+                done err
+            
+        setTimeout check, 100
         

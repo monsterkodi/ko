@@ -19,10 +19,20 @@ class Indexer
     @includeRegExp   = /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
     @methodRegExp    = /^\s+([\@]?\w+)\s*\:\s*(\(.*\))?\s*[=-]\>/
     @cppMethodRegExp = /^\s*(\w+\s+)*(\w+)\s*(\(.*\))/
-    @hppMethodRegExp = /^\s*(UFUNCTION\([^\)]*\)\s*)?([\w\*\&\>\<\,\:]+\s+)*(\w+)\s*\(((.*\))(\s*\w+\s*)*\s*[\;\{]|\s*$|.+,\s*$)/
     @funcRegExp      = /^\s*([\w\.]+)\s*[\:\=]\s*(\(.*\))?\s*[=-]\>/
     @testRegExp      = /^\s*(describe|it)\s+[\'\"](.+)[\'\"]\s*[\,]\s*(\([^\)]*\))?\s*[=-]\>/
     @splitRegExp     = new RegExp "[^\\w\\d\\_]+", 'g'
+    @hppMethodRegExp = /// ^ \s*
+          (UFUNCTION\([^\)]*\)\s*)?
+          ([\w\*\&\>\<\,\:]*\s)*
+          (\w+) 
+          \s* \( \s*
+          (
+            .*\, |
+            .*\)[\w\s]*[\;\{] |
+            $
+          )
+        ///i
 
     @classNameInLine: (line) ->
                     
@@ -353,7 +363,9 @@ class Indexer
             
             for li in [0...lines.length]
                 
+                
                 line = lines[li]
+                # log li, line
 
                 if line.trim().length # ignoring empty lines
                     
@@ -377,12 +389,14 @@ class Indexer
                             if isCpp
                                 methodName = Indexer.cppMethodNameInLine line
                             else
+                                # log 'xx-------', line
                                 methodName = Indexer.hppMethodNameInLine line
+                                # log 'yy------- ', methodName
                             if methodName
                                 # log 'isCpp', isCpp, 'isHpp', isHpp, methodName
                                 funcInfo = @addMethod currentClass, methodName, file, li
                                 funcStack.push [indent, funcInfo]
-                                funcAdded = true                            
+                                funcAdded = true       
                         else
                             if methodName = Indexer.methodNameInLine line
                                 funcInfo = @addMethod currentClass, methodName, file, li
