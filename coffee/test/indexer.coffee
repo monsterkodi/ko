@@ -165,7 +165,12 @@ describe 'indexer', ->
             # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Classes/EnvironmentQuery/EnvQueryManager.h'
             # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Classes/EnvironmentQuery/EQSQueryResultSourceInterface.h'
             # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/Core/Public/Delegates/DelegateBase.h'
-            'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/CoreUObject/Public/UObject/ClassTree.h'
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/CoreUObject/Public/UObject/ClassTree.h'
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/Json/Public/Serialization/JsonWriter.h'
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/Core/Public/Misc/Base64.h'
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/Engine/Classes/Engine/EngineTypes.h'
+            'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/Engine/Classes/Materials/MaterialParameterCollectionInstance.h'
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/Engine/Public/MatineeDelegates.h'
         ]
         
         for file in files

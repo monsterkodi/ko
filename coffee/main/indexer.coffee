@@ -376,6 +376,7 @@ class Indexer
                 
                 indexHpp = new IndexHpp
                 parsed = indexHpp.parse data
+                funcAdded = not empty(parsed.classes) or not empty(parsed.funcs)
                 
                 for clss in parsed.classes
                     fileInfo.classes.push 
@@ -385,7 +386,7 @@ class Indexer
                 for func in parsed.funcs
                     funcInfo = @addMethod func.class, func.method, file, func.line
                     fileInfo.funcs.push funcInfo
-                    funcAdded = true
+                    
                     
             else
                 for li in [0...lines.length]
@@ -562,7 +563,7 @@ class Indexer
     shiftQueue: =>
         if @queue.length
             file = @queue.shift()
-            log @queue.length, file
+            # log @queue.length, file
             @indexFile file
 
 module.exports = Indexer

@@ -81,7 +81,9 @@ this                           keyword.this
 # unreal
 
 (UFUNCTION|UPROPERTY|UCLASS|USTRUCT|UENUM|GENERATED_BODY|GENERATED_UCLASS_BODY)\s*\(   . comment.marker
-(BlueprintCallable|BlueprintPure|Keywords|AdvancedDisplay|DisplayName|Blueprintable|ClassGroup|BlueprintImplementable|EditAnywhere|BlueprintType|BlueprintReadOnly|BlueprintReadWrite|Category|Exec|exec|Meta|meta)  . namespace.marker
+(BlueprintCallable|BlueprintPure|Keywords|Blueprintable|ClassGroup|BlueprintImplementableEvent|EditAnywhere|BlueprintType|BlueprintReadOnly|BlueprintReadWrite|Exec|exec)  . namespace.marker
+(AdvancedDisplay|Keywords|DisplayName|Category|[Mm]eta)\s*\=   . namespace.marker
+
 \b([UA][A-Z]\w+)   . class
 \b(F[A-Z]\w+)      . keyword
 \b(E[A-Z]\w+)      . property

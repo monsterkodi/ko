@@ -17,7 +17,6 @@ class IndexHpp
             string:          open: '"',  close: '"'
             bracketArgs:     open: '(',  close: ')'
             bracketSquare:   open: '[',  close: ']'
-            # bracketTemplate: open: '<',  close: '>'
             codeBlock:       open: '{',  close: '}'
             blockComment:    open: '/*', close: '*/'
             lineComment:     open: '//', close: null
@@ -41,7 +40,6 @@ class IndexHpp
         
         if last(@tokenStack)?.class and not last(@tokenStack).name
             if @lastWord.startsWith '>'
-                # log 'template?', lineText, last @tokenStack
                 @tokenStack.pop()
             else
                 last(@tokenStack).name = @lastWord
@@ -51,6 +49,10 @@ class IndexHpp
         while p < lineText.length-1
             p += 1
             ch = lineText[p]
+            
+            advance = (n) ->
+                p += n-1 if n > 1
+                rest = rest.slice n
             
             if ch in [' ', '\t']
                 @lastWord = @currentWord if not empty @currentWord
@@ -75,18 +77,14 @@ class IndexHpp
             if empty(@regionStack) or last(@regionStack).region == 'codeBlock'
                 
                 if empty(@tokenStack) or last(@tokenStack).class
-                    # if match = rest.match @classRegExp
                     if p == 0 and match = lineText.match @classRegExp
-                        # if p == 0 or lineText[p-1] in [' ', '\t']
                         @tokenStack.push
                             line:    lineIndex
                             col:     p
                             class:   match[2]
                             depth:   @regionStack.length
-                        p += match[0].length-1
-                        rest = rest.slice match[0].length
+                        advance match[0].length
                         @currentWord = ''
-                        log lineIndex, p, last @tokenStack
                         continue
                          
                 if last(@tokenStack)?.class
@@ -106,11 +104,15 @@ class IndexHpp
             
             topRegion = last @regionStack
             
-            if topRegion?.region == 'blockComment'
-                if not rest.startsWith @regions.blockComment.close
-                    rest = rest.slice 1
+            if topRegion?.region in ['blockComment', 'string', 'character']
+                if topRegion.region in ['string', 'character']
+                    if rest.startsWith '\\'
+                        advance 2
+                        continue
+                if not rest.startsWith @regions[topRegion.region].close
+                    advance 1
                     continue
-            
+                    
             for key,region of @regions
 
                 if rest.startsWith(region.open) and (not topRegion or region.open != region.close or topRegion.region != key)
@@ -158,7 +160,8 @@ class IndexHpp
                         
                     break
                     
-            rest = rest.slice 1
+            # rest = rest.slice 1
+            advance 1
             
         true
             
