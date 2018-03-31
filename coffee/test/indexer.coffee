@@ -11,6 +11,7 @@
 
 assert  = require 'assert'
 Indexer = require '../main/indexer'
+IndexHpp = require '../main/indexhpp'
 
 should()
 
@@ -134,3 +135,45 @@ describe 'indexer', ->
             
         setTimeout check, 100
         
+    it 'indexhpp', (done) ->
+        return done()
+        indexHpp = new IndexHpp
+        text = """
+        /* class inside comment */
+        // this is not an enum nor a struct !!
+        classy stuff;
+        class forward;
+        typedef struct AName {
+        } BName;
+        class Hello : public World
+        {
+            Hello() {}
+            class Inner {};
+        };
+        """
+        result = indexHpp.parse text
+        # log result
+        expect(result.classes).to.not.be.empty
+
+    it 'indexhpp files', (done) ->
+        # return done()
+        indexHpp = new IndexHpp
+        files = [
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Classes/Actions/PawnAction_Wait.h'
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Classes/AIController.h'
+            'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Public/GraphAStar.h'
+        ]
+        
+        for file in files
+            text = fs.readFileSync file, 'utf8'
+            result = indexHpp.parse text
+            log 'classes:'
+            for clss in result.classes
+                log clss.line, clss.name
+            log 'funcs:'
+            for func in result.funcs
+                log func.line, func.method
+            expect(result.classes).to.not.be.empty
+            
+        done()
+            
