@@ -22,7 +22,7 @@ class IndexHpp
             blockComment:    open: '/*', close: '*/'
             lineComment:     open: '//', close: null
             
-        @classRegExp  = /^(class|enum|struct)\s+/
+        @classRegExp  = /^\s*(typedef\s+)?(enum|enum\s+class|class|struct)\s+/
         @methodRegExp = /^([\w\&\*]+)\s+(\w+)\s*\(/
         @constrRegExp = /^\~?(\w+)\s*\(/
 
@@ -34,13 +34,17 @@ class IndexHpp
     
     parseLine: (lineIndex, lineText) ->
         
-        log lineIndex, lineText
+        # log lineIndex, lineText
         
         @lastWord = @currentWord if not empty @currentWord
         @currentWord = ''
         
         if last(@tokenStack)?.class and not last(@tokenStack).name
-            last(@tokenStack).name = @lastWord
+            if @lastWord.startsWith '>'
+                # log 'template?', lineText, last @tokenStack
+                @tokenStack.pop()
+            else
+                last(@tokenStack).name = @lastWord
                 
         p    = -1
         rest = lineText
@@ -64,19 +68,26 @@ class IndexHpp
                     if rest[0] == ';'
                         @tokenStack.pop()
             else if topToken?.method
-                if rest[0] == ';' and topToken.args.end
+                if rest[0] == ';' and topToken.args.end and not topToken.codeBlock?.start?
                     @result.funcs.push topToken
                     @tokenStack.pop()
                 
             if empty(@regionStack) or last(@regionStack).region == 'codeBlock'
                 
                 if empty(@tokenStack) or last(@tokenStack).class
-                    if match = rest.match @classRegExp
+                    # if match = rest.match @classRegExp
+                    if p == 0 and match = lineText.match @classRegExp
+                        # if p == 0 or lineText[p-1] in [' ', '\t']
                         @tokenStack.push
                             line:    lineIndex
                             col:     p
-                            class:   match[1]
+                            class:   match[2]
                             depth:   @regionStack.length
+                        p += match[0].length-1
+                        rest = rest.slice match[0].length
+                        @currentWord = ''
+                        log lineIndex, p, last @tokenStack
+                        continue
                          
                 if last(@tokenStack)?.class
                     if match = rest.match @methodRegExp

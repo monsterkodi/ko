@@ -82,7 +82,7 @@ describe 'indexer', ->
         expect(Indexer.hppMethodNameInLine '    UPROPERTY(BlueprintReadWrite, EditAnywhere)').to.eql undefined
         
     it 'cppFiles', (done) ->
-        
+        return done()
         hpp = slash.resolve "#{__dirname}/dir/class.h"
         cpp = slash.resolve "#{__dirname}/dir/class.cpp"
         
@@ -113,7 +113,7 @@ describe 'indexer', ->
             # expect(indexer.files).to.include slash.resolve './dir/class.h'
         
     it 'specific files', (done) ->
-        # return done()
+        return done()
         indexer = new Indexer()
         files = [
             'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Classes/Actions/PawnAction_Wait.h'
@@ -161,18 +161,22 @@ describe 'indexer', ->
         files = [
             # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Classes/Actions/PawnAction_Wait.h'
             # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Classes/AIController.h'
-            'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Public/GraphAStar.h'
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Public/GraphAStar.h'
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Classes/EnvironmentQuery/EnvQueryManager.h'
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Classes/EnvironmentQuery/EQSQueryResultSourceInterface.h'
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/Core/Public/Delegates/DelegateBase.h'
+            'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/CoreUObject/Public/UObject/ClassTree.h'
         ]
         
         for file in files
             text = fs.readFileSync file, 'utf8'
             result = indexHpp.parse text
-            log 'classes:'
-            for clss in result.classes
-                log clss.line, clss.name
-            log 'funcs:'
-            for func in result.funcs
-                log func.line, func.method
+            # log 'classes:'
+            # for clss in result.classes
+                # log clss.line, clss.name
+            # log 'funcs:'
+            # for func in result.funcs
+                # log func.line, func.method
             expect(result.classes).to.not.be.empty
             
         done()
