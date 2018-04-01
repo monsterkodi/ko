@@ -8,7 +8,7 @@ bin
                 ko  ./bin/ko
 scripts
                 test    mocha -R dot --require coffeescript/register "coffee/test/*.coffee"
-                build   ./bin/build.sh
+                mac   ./bin/buildmac.sh
                 win     bash ./bin/buildwin.sh
 repository
                 type  git
