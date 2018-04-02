@@ -6,7 +6,7 @@
 000       0000000  00000000  000   000  
 ###
 
-{ getStyle, clamp, drag, def, error, log, _ } = require 'kxk'
+{ getStyle, clamp, last, drag, def, error, log, _ } = require 'kxk'
 
 Pane   = require './pane'
 Handle = require './handle'
@@ -32,7 +32,7 @@ class Flex
         @handleClass = horz and 'split-handle split-handle-horizontal' or 'split-handle split-handle-vertical'
         @paddingA    = horz and 'paddingLeft' or 'paddingTop'
         @paddingB    = horz and 'paddingRight' or 'paddingBottom'
-        @cursor = opt.cursor ? horz and 'ew-resize' or 'ns-resize'
+        @cursor      = opt.cursor ? horz and 'ew-resize' or 'ns-resize'
         
         @panes   = []
         @handles = []
@@ -71,12 +71,19 @@ class Flex
     # 000        000   000  000        
     # 000         0000000   000        
     
-    popPane: ->
+    popPane: (opt={}) ->
+        
+        if opt?.relax == false
+            @unrelax()  
         
         if @panes.length > 1
             @panes.pop().del()
             @handles.pop().del()
-        @relax()    
+            
+        if opt?.relax != false
+            @relax()    
+        else
+            last(@panes).setSize last(@panes).actualSize()
 
     # 00000000   00000000  000       0000000   000   000  
     # 000   000  000       000      000   000   000 000   

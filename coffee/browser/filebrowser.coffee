@@ -282,5 +282,7 @@ class FileBrowser extends Browser
                     col.focus()
                     
             delete @navigateTargetOpt
+            
+            @popEmptyColumns()
     
 module.exports = FileBrowser

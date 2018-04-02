@@ -159,23 +159,22 @@ describe 'indexer', ->
         # return done()
         indexHpp = new IndexHpp
         files = [
-            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Classes/Actions/PawnAction_Wait.h'
-            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Classes/AIController.h'
-            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Public/GraphAStar.h'
-            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Classes/EnvironmentQuery/EnvQueryManager.h'
-            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Classes/EnvironmentQuery/EQSQueryResultSourceInterface.h'
-            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/Core/Public/Delegates/DelegateBase.h'
-            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/CoreUObject/Public/UObject/ClassTree.h'
-            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/Json/Public/Serialization/JsonWriter.h'
-            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/Core/Public/Misc/Base64.h'
-            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/Engine/Classes/Engine/EngineTypes.h'
-            'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/Engine/Classes/Materials/MaterialParameterCollectionInstance.h'
-            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/Engine/Public/MatineeDelegates.h'
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/Core/Public/Math/Quat.h'
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/Engine/Classes/Engine/LocalPlayer.h'
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/CoreUObject/Public/UObject/Package.h'
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/XmlParser/Private/FastXml.cpp'
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/Engine/Private/NetworkObjectList.cpp'
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Private/BehaviorTree/BlackboardData.cpp'
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Private/Actions/PawnActionsComponent.cpp'
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Private/BehaviorTree/BlueprintNodeHelpers.cpp'
+            # 'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Private/BehaviorTree/BTFunctionLibrary.cpp'
+            'C:/Users/kodi/u/rts/UnrealEngine/Engine/Source/Runtime/AIModule/Private/EnvironmentQuery/EnvQueryDebugHelpers.cpp'
         ]
         
         for file in files
             text = fs.readFileSync file, 'utf8'
             result = indexHpp.parse text
+            log result
             # log 'classes:'
             # for clss in result.classes
                 # log clss.line, clss.name

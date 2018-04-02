@@ -21,9 +21,10 @@ class IndexHpp
             blockComment:    open: '/*', close: '*/'
             lineComment:     open: '//', close: null
             
-        @classRegExp  = /^\s*(typedef\s+)?(enum|enum\s+class|class|struct)\s+/
-        @methodRegExp = /^([\w\&\*]+)\s+(\w+)\s*\(/
-        @constrRegExp = /^\~?(\w+)\s*\(/
+        @classRegExp   = /^\s*(\S+\s+)?(enum|enum\s+class|class|struct)\s+/
+        @methodRegExp  = /^([\w\&\*]+)\s+(\w+)\s*\(/
+        @constrRegExp  = /^(\~?\w+)\s*\(/
+        @topMethRegExp = /^(\w+)\:\:(\w+)\s*\(/
 
     # 00000000    0000000   00000000    0000000  00000000       000      000  000   000  00000000  
     # 000   000  000   000  000   000  000       000            000      000  0000  000  000       
@@ -38,7 +39,7 @@ class IndexHpp
         @lastWord = @currentWord if not empty @currentWord
         @currentWord = ''
         
-        if last(@tokenStack)?.class and not last(@tokenStack).name
+        if last(@tokenStack)?.classType and not last(@tokenStack).name
             if @lastWord.startsWith '>'
                 @tokenStack.pop()
             else
@@ -62,12 +63,13 @@ class IndexHpp
                 
             topToken = last @tokenStack
             
-            if topToken?.class 
+            if topToken?.classType 
                 if not topToken.name
                     if rest[0] == ':'
                         topToken.name = @lastWord
                 if not topToken.codeBlock?.start
-                    if rest[0] == ';'
+                    # if rest[0] == ';'
+                    if rest[0] in [';', '*', '&']
                         @tokenStack.pop()
             else if topToken?.method
                 if rest[0] == ';' and topToken.args.end and not topToken.codeBlock?.start?
@@ -76,31 +78,50 @@ class IndexHpp
                 
             if empty(@regionStack) or last(@regionStack).region == 'codeBlock'
                 
-                if empty(@tokenStack) or last(@tokenStack).class
+                if empty(@tokenStack) or last(@tokenStack).classType
                     if p == 0 and match = lineText.match @classRegExp
                         @tokenStack.push
-                            line:    lineIndex
-                            col:     p
-                            class:   match[2]
-                            depth:   @regionStack.length
+                            line:       lineIndex
+                            col:        p
+                            classType:  match[2]
+                            depth:      @regionStack.length
                         advance match[0].length
                         @currentWord = ''
                         continue
-                         
-                if last(@tokenStack)?.class
+                
+                if empty(@tokenStack)
+                    if empty @regionStack # namespace codeBlocks?
+                        if match = rest.match @topMethRegExp
+                            @tokenStack.push
+                                line:   lineIndex
+                                col:    p
+                                method: match[2]
+                                depth:  0
+                                class:  match[1]
+                                
+                            if match[1] not in @result.classes.map (ci) -> ci.name
+                                @result.classes.push
+                                    line:   lineIndex
+                                    col:    p
+                                    name:   match[1]
+                            # log 'topMeth', last(@tokenStack)
+                        
+                else if last(@tokenStack).classType
                     if match = rest.match @methodRegExp
                         @tokenStack.push
                             line:    lineIndex
                             col:     p
                             method:  match[2]
-                            depth:   @regionStack.length
+                            depth:   @regionStack.length # tokenStack.length?
+                            class:   last(@tokenStack).name
                     else if match = rest.match @constrRegExp
-                        if match[1] == last(@tokenStack)?.name
+                        if match[1] == last(@tokenStack).name or match[1] == '~'+last(@tokenStack).name
                             @tokenStack.push
                                 line:    lineIndex
                                 col:     p
                                 method:  match[1]
-                                depth:   @regionStack.length
+                                depth:   @regionStack.length # tokenStack.length?
+                                class:   last(@tokenStack).name
             
             topRegion = last @regionStack
             
@@ -148,7 +169,7 @@ class IndexHpp
                             line:   lineIndex
                             col:    p
                         @tokenStack.pop()
-                        if topToken.class
+                        if topToken.classType
                             @result.classes.push topToken
                         else
                             @result.funcs.push topToken
@@ -160,7 +181,6 @@ class IndexHpp
                         
                     break
                     
-            # rest = rest.slice 1
             advance 1
             
         true

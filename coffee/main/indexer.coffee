@@ -18,47 +18,48 @@ class Indexer
     @requireRegExp   = /^\s*([\w\{\}]+)\s+=\s+require\s+[\'\"]([\.\/\w]+)[\'\"]/
     @includeRegExp   = /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
     @methodRegExp    = /^\s+([\@]?\w+)\s*\:\s*(\(.*\))?\s*[=-]\>/
-    @cppMethodRegExp = /^\s*(\w+\s+)*(\w+)\s*(\(.*\))/
+    # @cppMethodRegExp = /^\s*(\w+\s+)*(\w+)\s*(\(.*\))/
     @funcRegExp      = /^\s*([\w\.]+)\s*[\:\=]\s*(\(.*\))?\s*[=-]\>/
     @testRegExp      = /^\s*(describe|it)\s+[\'\"](.+)[\'\"]\s*[\,]\s*(\([^\)]*\))?\s*[=-]\>/
     @splitRegExp     = new RegExp "[^\\w\\d\\_]+", 'g'
-    @classRegExp     = /// ^ \s* 
-        (enum\s+)?
-        (class\s+|struct\s+)
-        (\w+_API\s+)?
-        (\w+)
-        (
-            \s+extends\s\w+.* | 
-            \s*:\s*[\w\,\s\<\>]+
-        )?
-        \s* $ 
-        ///
-    @hppMethodRegExp = /// ^ \s*
-        (UFUNCTION\([^\)]*\)\s*)?
-        ([\w\*\&\>\<\,\:]*\s)*
-        (\w+) 
-        \s* \( \s*
-        (
-          .*\,\s*$ |
-          .*\)[\w\s]*[\;\{] |
-          $
-        )
-        ///
+    @classRegExp     = /^class\s+(\w+)/
+    # @classRegExp     = /// ^ \s* 
+        # (enum\s+)?
+        # (class\s+|struct\s+)
+        # (\w+_API\s+)?
+        # (\w+)
+        # (
+            # \s+extends\s\w+.* | 
+            # \s*:\s*[\w\,\s\<\>]+
+        # )?
+        # \s* $ 
+        # ///
+    # @hppMethodRegExp = /// ^ \s*
+        # (UFUNCTION\([^\)]*\)\s*)?
+        # ([\w\*\&\>\<\,\:]*\s)*
+        # (\w+) 
+        # \s* \( \s*
+        # (
+          # .*\,\s*$ |
+          # .*\)[\w\s]*[\;\{] |
+          # $
+        # )
+        # ///
 
     @classNameInLine: (line) ->
                     
         m = line.match Indexer.classRegExp
-        m?[4]
+        m?[1]
 
-    @cppMethodNameInLine: (line) ->
-        
-        m = line.match Indexer.cppMethodRegExp
-        m?[2]
+    # @cppMethodNameInLine: (line) ->
+#         
+        # m = line.match Indexer.cppMethodRegExp
+        # m?[2]
 
-    @hppMethodNameInLine: (line) ->
-        
-        m = line.match Indexer.hppMethodRegExp
-        m?[3]
+    # @hppMethodNameInLine: (line) ->
+#         
+        # m = line.match Indexer.hppMethodRegExp
+        # m?[3]
         
     @methodNameInLine: (line) ->
         
@@ -372,13 +373,19 @@ class Indexer
             funcStack = []
             currentClass = null
             
-            if isHpp
+            if isHpp or isCpp
+                
+                # log 'indexHpp', file
                 
                 indexHpp = new IndexHpp
                 parsed = indexHpp.parse data
                 funcAdded = not empty(parsed.classes) or not empty(parsed.funcs)
                 
                 for clss in parsed.classes
+                    
+                    _.set @classes, "#{clss.name}.file", file
+                    _.set @classes, "#{clss.name}.line", clss.line+1
+                    
                     fileInfo.classes.push 
                         name: clss.name
                         line: clss.line+1
@@ -386,7 +393,6 @@ class Indexer
                 for func in parsed.funcs
                     funcInfo = @addMethod func.class, func.method, file, func.line
                     fileInfo.funcs.push funcInfo
-                    
                     
             else
                 for li in [0...lines.length]
@@ -412,35 +418,32 @@ class Indexer
                             # 000 0 000  000          000     000   000  000   000  000   000       000
                             # 000   000  00000000     000     000   000   0000000   0000000    0000000
     
-                            if isCpp or isHpp
-                                if isCpp
-                                    methodName = Indexer.cppMethodNameInLine line
-                                else
-                                    # log 'xx-------', line
-                                    methodName = Indexer.hppMethodNameInLine line
-                                    # log 'yy------- ', methodName
-                                if methodName
-                                    # log 'isCpp', isCpp, 'isHpp', isHpp, methodName
-                                    funcInfo = @addMethod currentClass, methodName, file, li
-                                    funcStack.push [indent, funcInfo]
-                                    funcAdded = true       
-                            else
-                                if methodName = Indexer.methodNameInLine line
-                                    funcInfo = @addMethod currentClass, methodName, file, li
-                                    funcStack.push [indent, funcInfo]
-                                    funcAdded = true
+                            # if isCpp or isHpp
+                                # if isCpp
+                                    # methodName = Indexer.cppMethodNameInLine line
+                                # else
+                                    # methodName = Indexer.hppMethodNameInLine line
+                                # if methodName
+                                    # funcInfo = @addMethod currentClass, methodName, file, li
+                                    # funcStack.push [indent, funcInfo]
+                                    # funcAdded = true       
+                            # else
+                            if methodName = Indexer.methodNameInLine line
+                                funcInfo = @addMethod currentClass, methodName, file, li
+                                funcStack.push [indent, funcInfo]
+                                funcAdded = true
                         else
     
-                            if isCpp or isHpp
-                                methodRegExp = /(\w+)(\<[^\>]+\>)?\:\:(\w+)\s*(\([^\)]*\))\s*(const)?$/
-                                m = line.match methodRegExp
-                                if m?[1]? and m?[3]?
-                                    className = m[1]
-                                    funcName  = m[3]
-                                    funcInfo = @addMethod className, funcName, file, li
-                                    funcStack.push [indent, funcInfo]
-                                    funcAdded = true
-                                    continue
+                            # if isCpp or isHpp
+                                # methodRegExp = /(\w+)(\<[^\>]+\>)?\:\:(\w+)\s*(\([^\)]*\))\s*(const)?$/
+                                # m = line.match methodRegExp
+                                # if m?[1]? and m?[3]?
+                                    # className = m[1]
+                                    # funcName  = m[3]
+                                    # funcInfo = @addMethod className, funcName, file, li
+                                    # funcStack.push [indent, funcInfo]
+                                    # funcAdded = true
+                                    # continue
     
                             # 00000000  000   000  000   000   0000000  000000000  000   0000000   000   000   0000000
                             # 000       000   000  0000  000  000          000     000  000   000  0000  000  000
@@ -483,7 +486,7 @@ class Indexer
                             # 000       000      000   000       000       000
                             #  0000000  0000000  000   000  0000000   0000000
                             
-                            when 'class', 'struct'
+                            when 'class' #, 'struct'
                                 
                                 if className = Indexer.classNameInLine line
                                     currentClass = className
@@ -519,18 +522,18 @@ class Indexer
                             # 00000000  000  000  0000  000       000      000   000  000   000  000
                             #  00  00   000  000   000   0000000  0000000   0000000   0000000    00000000
                             
-                            when '#include'
-                                
-                                m = line.match Indexer.includeRegExp
-                                if m?[1]?
-                                    r = fileInfo.require ? []
-                                    r.push [null, m[1]]
-                                    fileInfo.require = r
-                                    abspath = slash.resolve slash.join slash.dir(file), m[1]
-                                    abspath += '.coffee' if not slash.ext m[1]
-                                    if not @files[abspath]? and @queue.indexOf(abspath) < 0
-                                        if slash.fileExists abspath
-                                            @queue.push abspath
+                            # when '#include'
+#                                 
+                                # m = line.match Indexer.includeRegExp
+                                # if m?[1]?
+                                    # r = fileInfo.require ? []
+                                    # r.push [null, m[1]]
+                                    # fileInfo.require = r
+                                    # abspath = slash.resolve slash.join slash.dir(file), m[1]
+                                    # abspath += '.coffee' if not slash.ext m[1]
+                                    # if not @files[abspath]? and @queue.indexOf(abspath) < 0
+                                        # if slash.fileExists abspath
+                                            # @queue.push abspath
                                         
             if funcAdded
 

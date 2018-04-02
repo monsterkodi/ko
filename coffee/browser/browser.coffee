@@ -78,6 +78,9 @@ class Browser extends Stage
         if opt.focus
             @focus()
             @lastUsedColumn()?.activeRow()?.setActive()            
+            
+        # log 'popEmptyColumns'
+        @popEmptyColumns relax:false
         @
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
@@ -200,12 +203,12 @@ class Browser extends Stage
     # 000   000  000       000        
     # 0000000    00000000  0000000    
     
-    popColumn: ->
+    popColumn: (opt) ->
         
-        @flex.popPane()
+        @flex.popPane opt
         @columns.pop()
         
-    popEmptyColumns: -> @popColumn() while @hasEmptyColumns()
+    popEmptyColumns: (opt) -> @popColumn(opt) while @hasEmptyColumns()
     
     clear: -> @clearColumnsFrom 0, pop:true 
     clearColumnsFrom: (c=0, opt=pop:false) ->
