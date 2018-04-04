@@ -7,9 +7,9 @@ preferGlobal    true
 bin
                 ko  ./bin/ko
 scripts
-                test    mocha -R dot --require coffeescript/register "coffee/test/*.coffee"
+                test  mocha -R dot --require coffeescript/register "coffee/test/*.coffee"
                 mac   ./bin/buildmac.sh
-                win     bash ./bin/buildwin.sh
+                win   bash ./bin/buildwin.sh
 repository
                 type  git
                 url   git+https://github.com/monsterkodi/ko.git

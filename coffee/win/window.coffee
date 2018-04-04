@@ -256,7 +256,7 @@ saveFile = (file) ->
                             log 'still not writable?', p
                 catch err
                     error "can't p4 edit", err
-                    
+                return
             error "saving file #{file}:", err
             split.show 'logview'
         else
