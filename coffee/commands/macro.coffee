@@ -12,10 +12,10 @@ indexer   = require '../main/indexer'
 salt      = require '../tools/salt'
 GitInfo   = require '../win/gitinfo'
 Command   = require '../commandline/command'
-Mocha     = require 'mocha'
 Report    = require '../test/report'
 syntax    = require '../editor/syntax'
 Transform = require '../editor/actions/transform'
+Mocha     = require 'mocha'
 
 class Macro extends Command
 
@@ -260,11 +260,13 @@ class Macro extends Command
                 file = slash.join dir, clss.toLowerCase() + '.coffee'
                 if slash.fileExists file
                     return text: "file #{file} exists!"
-                text = '\n'
-                text += ("# "+s for s in salt(clss).split '\n').join '\n'
-                text += '\n'
+                text = "###\n"
+                text += (s for s in salt(clss).split '\n').join '\n'
+                text += "\n###\n"
                 text += """
 
+                { log, _ } = require 'kxk'
+                
                 class #{clss}
 
                     constructor: () ->
@@ -277,7 +279,7 @@ class Macro extends Command
                     if err?
                         log 'writing class skeleton failed', err
                         return
-                    post.toMain 'newWindowWithFile', file
+                    post.emit 'newTabWithFile', file
                 return focus: editor.name
 
             #  0000000  000      00000000   0000000   000   000
