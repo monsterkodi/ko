@@ -1,8 +1,7 @@
 node_modules
 wiki
 package.json
-ko-darwin-x64
-ko-win32-x64
+*-x64
 bin/download.js
 bin/*.json
 bin/*.js.map

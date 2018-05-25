@@ -4,7 +4,7 @@ cd `dirname $0`/..
 2>/dev/null 1>/dev/null killall ko
 2>/dev/null 1>/dev/null killall ko
 
-if rm -rf ko-win32-x64; then
+if rm -rf ko-darwin-x64; then
 
     konrad --run
     node_modules/.bin/electron-rebuild

@@ -46,6 +46,8 @@ class Walker
                     return @ignore p
                 else if name in ['.DS_Store', 'Icon\r'] or extn in ['pyc']
                     return @ignore p
+                else if name.endsWith '-x64'
+                    return @ignore p
                 else if cfg.includeDir? and slash.dirname(p) == cfg.includeDir
                     cfg.files.push sp
                     cfg.stats.push stat
