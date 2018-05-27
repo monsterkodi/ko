@@ -159,7 +159,6 @@ class Indexer
     onSourceInfoForFile: (opt) =>
         
         file = opt.item.file
-        log 'sourceInfoForFile', file, @files[file]
         if @files[file]?
             post.toWin opt.winID, 'sourceInfoForFile', @files[file], opt
         

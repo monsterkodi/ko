@@ -349,7 +349,7 @@ class Menu
             ,                
                 label:       'Open DevTools'
                 accelerator: 'command+Alt+I'
-                click:       (i,win) -> win?.webContents.openDevTools()                
+                click:       (i,win) -> win?.webContents.toggleDevTools()
             ]
         ,      
             # 000   000  00000000  000      00000000 
