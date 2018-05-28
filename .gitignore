@@ -2,6 +2,7 @@ node_modules
 wiki
 package.json
 *-x64
+inno
 bin/download.js
 bin/*.json
 bin/*.js.map

@@ -3,4 +3,5 @@ ignore
     /md/
     /bin/cheet.noon
     /.*-x64/
+    /inno/
 coffee  . map inline 

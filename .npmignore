@@ -4,6 +4,7 @@ wiki
 .gitignore
 .konrad.noon
 *-x64
+inno
 coffee
 syntax
 test
