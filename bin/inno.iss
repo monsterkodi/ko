@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ko"
-#define MyAppVersion "0.86.0"
+#define MyAppVersion "0.87.0"
 #define MyAppPublisher "monsterkodi"
 #define MyAppURL "https://github.com/monsterkodi/ko"
 #define MyAppExeName "ko.exe"
@@ -22,7 +22,7 @@ DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 OutputDir=C:\Users\kodi\s\{#MyAppName}\inno
-OutputBaseFilename=setup
+OutputBaseFilename={#MyAppName}-setup-{#MyAppVersion}
 SetupIconFile=C:\Users\kodi\s\{#MyAppName}\img\{#MyAppName}.ico
 Compression=lzma
 SolidCompression=yes
