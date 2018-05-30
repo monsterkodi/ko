@@ -648,7 +648,7 @@ menuAction = (name, args) ->
         when 'Toggle Menu'           then return window.mainmenu.toggle()
         when 'Show Menu'             then return window.mainmenu.show()
         when 'Hide Menu'             then return window.mainmenu.hide()
-        when 'Open DevTools'         then return win.webContents.openDevTools()
+        when 'Open DevTools'         then return win.webContents.toggleDevTools()
         when 'Open...'               then return openFileDialog()
         when 'Open In New Tab...'    then return openFileDialog newTab: true
         when 'Open In New Window...' then return openFileDialog newWindow: true

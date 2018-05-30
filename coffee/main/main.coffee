@@ -583,7 +583,7 @@ class Main
     
     otherInstanceStarted: (args, dir) =>
 
-        # post.toWins 'mainlog', 'other instance args:', args, 'dir', dir
+        post.toWins 'mainlog', 'other instance args:', args, 'dir', dir
         
         if not visibleWins().length
             @toggleWindows()
@@ -606,7 +606,7 @@ class Main
             if slash.fileExists fpath
                 files.push file
 
-        # post.toWins 'mainlog', 'other instance files:', files
+        post.toWins 'mainlog', 'other instance files:', files
         
         post.toWin first(visibleWins()).id, 'loadFiles', files, newTab:true
         
@@ -659,10 +659,13 @@ class Main
 
 app.on 'open-file', (event, file) ->
 
+    log 'open-file:', main?, file
+    
     if not main?
         openFiles.push file
     else
         main.createWindow file:file
+        
     event.preventDefault()
 
 app.on 'ready', ->
