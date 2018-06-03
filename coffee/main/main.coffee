@@ -39,25 +39,19 @@ if slash.win() and slash.file(process.argv[0]) == 'ko.exe'
 else
     ignoreArgs=2
 
-args  = karg """
+args  = args.init """
 
-#{pkg.productName}
+    filelist  files to open           **
+    show      open window on startup  true
+    prefs     show preferences        false
+    noprefs   don't load preferences  false
+    state     show state              false
+    nostate   don't load state        false
+    verbose   log more                false
+    DevTools  open developer tools    false
+    debug     |                       false
 
-    filelist  . ? files to open           . **
-    show      . ? open window on startup  . = true
-    prefs     . ? show preferences        . = false
-    noprefs   . ? don't load preferences  . = false
-    state     . ? show state              . = false
-    nostate   . ? don't load state        . = false
-    verbose   . ? log more                . = false
-    DevTools  . ? open developer tools    . = false
-    debug     .                             = false
-
-version  #{pkg.version}
-
-""", dontExit: true, ignoreArgs:ignoreArgs
-
-app.exit 0 if not args?
+""", ignoreArgs:ignoreArgs
 
 if process.cwd() == '/'
     process.chdir slash.resolve '~'
