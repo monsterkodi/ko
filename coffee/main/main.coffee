@@ -17,8 +17,6 @@ Indexer  = require './indexer'
 pug      = require 'pug'
 electron = require 'electron'
 
-Menu     = if not slash.win() then require './menu'
-
 { BrowserWindow, Tray, app, clipboard, dialog } = electron
 
 disableSnap   = false
@@ -217,9 +215,6 @@ class Main
 
         if args.DevTools
             wins()?[0]?.webContents.openDevTools()
-
-        if not slash.win()
-            Menu.init @
 
     #  0000000    0000000  000000000  000   0000000   000   000  
     # 000   000  000          000     000  000   000  0000  000  
@@ -488,12 +483,13 @@ class Main
             acceptFirstMouse: true
             show:             true
             hasShadow:        true
+            transparent:      true
+            frame:            false
             backgroundColor:  scheme == 'bright' and "#fff" or '#000'
-            titleBarStyle:    'hidden'
-            autoHideMenuBar:  prefs.get 'autoHideMenuBar', true
+            # titleBarStyle:    'hidden'
+            # autoHideMenuBar:  prefs.get 'autoHideMenuBar', true
             
         if slash.win()
-            cfg.frame = false
             cfg.icon = slash.path __dirname + '/../img/ko.ico'
 
         win = new BrowserWindow cfg
