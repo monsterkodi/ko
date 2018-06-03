@@ -6,7 +6,7 @@
 000   000  000   000  000  000   000
 ###
 
-{ fileList, first, colors, karg, about, prefs, state, store, noon, post, slash, os, fs, str, empty, error, log, _ } = require 'kxk'
+{ udp, fileList, first, colors, karg, about, prefs, state, store, noon, post, slash, os, fs, str, empty, error, log, _ } = require 'kxk'
 
 # post.debug?()
 
@@ -480,8 +480,6 @@ class Main
             transparent:      true
             frame:            false
             backgroundColor:  scheme == 'bright' and "#fff" or '#000'
-            # titleBarStyle:    'hidden'
-            # autoHideMenuBar:  prefs.get 'autoHideMenuBar', true
             
         if slash.win()
             cfg.icon = slash.path __dirname + '/../img/ko.ico'
@@ -570,16 +568,20 @@ class Main
     # 000   000     000     000000000  0000000   0000000        000  000 0 000  0000000      000     
     # 000   000     000     000   000  000       000   000      000  000  0000       000     000     
     #  0000000      000     000   000  00000000  000   000      000  000   000  0000000      000     
-    
-    otherInstanceStarted: (args, dir) =>
 
-        post.toWins 'mainlog', 'other instance args:', args, 'dir', dir
-        
+    activateOneWindow: ->
+    
         if not visibleWins().length
             @toggleWindows()
 
         if not activeWin()
             visibleWins()[0]?.focus()
+            
+    otherInstanceStarted: (args, dir) =>
+
+        post.toWins 'mainlog', 'other instance args:', args, 'dir', dir
+        
+        activateOneWindow()
 
         files = []
         if first(args).endsWith 'ko.exe'
@@ -670,3 +672,16 @@ app.on 'window-all-closed', ->
 
 app.setName pkg.productName
 
+# 000   000  0000000    00000000     
+# 000   000  000   000  000   000    
+# 000   000  000   000  00000000     
+# 000   000  000   000  000          
+#  0000000   0000000    000          
+
+onMsg = (file) ->
+    
+    log 'onMsg', file
+    main.activateOneWindow()
+    post.toWin first(visibleWins()).id, 'loadFiles', [file], newTab:true
+
+koReceiver = new udp port:9779, onMsg:onMsg
