@@ -6,13 +6,19 @@
 00     00  000  000   000  0000000     0000000   00     00
 ###
 
-{ stopEvent, fileList, keyinfo, atomic, prefs, state, stash, first, reversed, childp, 
+{ win, stopEvent, fileList, keyinfo, atomic, prefs, state, stash, first, reversed, childp, 
   drag, noon, post, slash, clamp, pos, str, sw, sh, os, fs, empty, log, error, _ } = require 'kxk'
 
+w = new win 
+    dir:    __dirname
+    pkg:    require '../../package.json'
+    menu:   '../../coffee/menu.noon'
+    icon:   '../../img/menu@2x.png'
+    scheme: false
+  
 Split       = require './split'
 Terminal    = require './terminal'
-Titlebar    = require './titlebar'
-Menu        = require './menu'
+Tabs        = require './tabs'
 LogView     = require './logview'
 Info        = require './info'
 Area        = require '../stage/area'
@@ -61,7 +67,6 @@ window.onerror = (event, source, line, col, err) ->
 # 000        000   000  000       000            000
 # 000        000   000  00000000  000       0000000
 
-prefs.init()
 state.init()
 window.prefs = prefs
 window.state = state
@@ -117,7 +122,6 @@ post.on 'openFile',   (opt)  -> openFileDialog opt
 post.on 'reloadTab', (file)  -> reloadTab file
 post.on 'loadFile',  (file)  -> loadFile  file
 post.on 'loadFiles', (files, opt) -> openFiles files, opt
-post.on 'menuAction', (action, args) -> menuAction action, args
 post.on 'editorFocus', (editor) ->
     window.setLastFocus editor.name
     window.focusEditor = editor
@@ -150,9 +154,8 @@ winMain = ->
     # 000  000  0000  000     000
     # 000  000   000  000     000
 
-    titlebar    = window.titlebar    = new Titlebar
-    tabs        = window.tabs        = titlebar.tabs
-    navigate    = window.navigate    = new Navigate
+    tabs        = window.tabs        = new Tabs window.titlebar.elem
+    navigate    = window.navigate    = new Navigate()
     split       = window.split       = new Split()
     terminal    = window.terminal    = new Terminal 'terminal'
     area        = window.area        = new Area 'area'
@@ -160,7 +163,6 @@ winMain = ->
     commandline = window.commandline = new Commandline 'commandline-editor'
     logview     = window.logview     = new LogView 'logview'
     info        = window.info        = new Info editor
-    mainmenu    = window.mainmenu    = new Menu 'menu'
     fps         = window.fps         = new FPS()
     cwd         = window.cwd         = new CWD()
 
@@ -168,6 +170,7 @@ winMain = ->
     window.lastFocus = editor.name
 
     restoreWin()
+    scheme.set prefs.get 'scheme', 'dark'
 
     split.on 'split', (s) ->
         area.resized()
@@ -192,7 +195,6 @@ winMain = ->
         editor.centerText true, 0
 
     post.emit 'restore'
-    win.show()
     editor.focus()
 
 # 00000000  0000000    000  000000000   0000000   00000000
@@ -285,7 +287,6 @@ onMove  = -> window.stash.set 'bounds', win.getBounds()
 
 clearListeners = ->
 
-    document.removeEventListener 'keydown', onKeyDown
     win.removeListener 'close', onClose
     win.removeListener 'move',  onMove
     win.webContents.removeAllListeners 'devtools-opened'
@@ -528,8 +529,6 @@ setFontSize = (s) ->
     s = prefs.get('editorFontSize', 19) if not _.isFinite s
     s = clamp 8, 100, s
 
-    # log s
-    
     window.stash.set "fontSize", s
     editor.setFontSize s
     loadFile editor.currentFile, reload:true if editor.currentFile?
@@ -599,7 +598,6 @@ window.onfocus = (event) ->
             split.focus 'commandline-editor'
 
 window.setLastFocus = (name) ->
-    # log "window.setLastFocus #{name}"
     window.lastFocus = name
 
 # 00     00  00000000  000   000  000   000      0000000    0000000  000000000  000   0000000   000   000
@@ -608,12 +606,9 @@ window.setLastFocus = (name) ->
 # 000 0 000  000       000  0000  000   000     000   000  000          000     000  000   000  000  0000
 # 000   000  00000000  000   000   0000000      000   000   0000000     000     000   0000000   000   000
 
-menuAction = (name, args) ->
-
-    # log "window.menuAction0 #{name} #{args}"
+onMenuAction = (name, args) ->
 
     if action = Editor.actionWithName name
-        # log 'menuAction', name, action
         if action.key? and _.isFunction window.focusEditor[action.key]
             window.focusEditor[action.key] args
             return
@@ -645,22 +640,16 @@ menuAction = (name, args) ->
         when 'Activate Previous Tab' then return window.tabs.navigate 'left'
         when 'Move Tab Left'         then return window.tabs.move 'left'
         when 'Move Tab Right'        then return window.tabs.move 'right'
-        when 'Toggle Menu'           then return window.mainmenu.toggle()
-        when 'Show Menu'             then return window.mainmenu.show()
-        when 'Hide Menu'             then return window.mainmenu.hide()
-        when 'Open DevTools'         then return win.webContents.toggleDevTools()
         when 'Open...'               then return openFileDialog()
         when 'Open In New Tab...'    then return openFileDialog newTab: true
         when 'Open In New Window...' then return openFileDialog newWindow: true
         when 'Save'                  then return saveFile()
         when 'Save As ...'           then return saveFileAs()
-        when 'Reload'                then return reloadFile()
+        when 'Revert'                then return reloadFile()
         when 'Reload Window'         then return reloadWin()
         when 'Close Tab or Window'   then return post.emit 'closeTabOrWindow'
         when 'Close Other Tabs'      then return post.emit 'closeOtherTabs'
-        when 'Close Window'          then return post.emit 'closeWindow'
-        when 'Maximize'              then return post.toMain 'maximizeWindow', winID
-        when 'Minimize'              then return win.minimize()
+        # when 'Close Window'          then return post.emit 'closeWindow'
         when 'Fullscreen'            then return win.setFullScreen !win.isFullScreen()
         
         when 'Preferences'           
@@ -674,7 +663,7 @@ menuAction = (name, args) ->
     
     post.toMain 'menuAction', name, args
 
-window.menuAction = menuAction
+post.onMenuAction = onMenuAction
 
 # 000   000  00000000  000   000
 # 000  000   000        000 000
@@ -682,17 +671,12 @@ window.menuAction = menuAction
 # 000  000   000          000
 # 000   000  00000000     000
 
-onKeyDown = (event) ->
-
-    { mod, key, combo, char } = keyinfo.forEvent event
-    handleModKeyComboCharEvent mod, key, combo, char, event
-
-handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
+onCombo = (combo, info) ->
 
     return if not combo
 
-    return stopEvent(event) if 'unhandled' != window.mainmenu   .globalModKeyComboEvent mod, key, combo, event
-    return stopEvent(event) if 'unhandled' != window.titlebar   .globalModKeyComboEvent mod, key, combo, event
+    { mod, key, combo, char, event } = info
+    
     return stopEvent(event) if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
 
     for i in [1..9]
@@ -709,9 +693,5 @@ handleModKeyComboCharEvent = (mod, key, combo, char, event) ->
         when 'command+shift+-'    then return stopEvent event, @changeZoom -1
         when 'command+shift+0'    then return stopEvent event, @resetZoom()
         when 'command+alt+y'      then return stopEvent event, split.do 'minimize editor'
-
-    # log 'handleModKeyComboCharEvent2', mod, key, combo, char
-
-document.addEventListener 'keydown', onKeyDown
 
 winMain()

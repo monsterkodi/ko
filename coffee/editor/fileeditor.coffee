@@ -420,11 +420,11 @@ class FileEditor extends TextEditor
         opt = items: [
             text:   'Back'
             combo:  'ctrl+1'
-            cb:     -> window.menuAction 'Navigate Backward'
+            cb:     -> post.emit 'menuAction', 'Navigate Backward'
         ,
             text:   'Forward'
             combo:  'ctrl+2'
-            cb:     -> window.menuAction 'Navigate Forward'
+            cb:     -> post.emit 'menuAction', 'Navigate Forward'
         ,
             text:   ''
         ,
@@ -434,7 +434,7 @@ class FileEditor extends TextEditor
         ,
             text:   'Git'
             combo:  'alt+g'
-            cb:     -> window.menuAction 'doMacro', 'git'
+            cb:     -> post.emit 'menuAction', 'doMacro', 'git'
         ,
             text:   ''
         ,

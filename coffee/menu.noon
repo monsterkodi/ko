@@ -1,0 +1,176 @@
+
+# 00     00  00000000  000   000  000   000  
+# 000   000  000       0000  000  000   000  
+# 000000000  0000000   000 0 000  000   000  
+# 000 0 000  000       000  0000  000   000  
+# 000   000  00000000  000   000   0000000   
+
+ko
+    About                   ctrl+shift+/
+    -
+    Preferences             ctrl+shift+,
+    --
+    Quit                    ctrl+q
+
+# 00000000  000  000      00000000
+# 000       000  000      000
+# 000000    000  000      0000000
+# 000       000  000      000
+# 000       000  0000000  00000000
+
+File
+    New Tab                 ctrl+n
+    New Window              ctrl+shift+n
+    -                       
+    Open...                 ctrl+o
+    Open In New Tab...      ctrl+shift+o
+    Open In New Window...   alt+shift+o
+    --                      
+    Save                    ctrl+s
+    Save As ...             ctrl+shift+s
+    ---                     
+    Revert                  ctrl+r
+    Close                   ctrl+w w
+    ----                    
+    Close Other Tabs        ctrl+shift+w
+    Close Tab or Window     ctrl+w
+    Close Window            alt+w
+
+Edit
+    EditMenu
+
+#  0000000   0000000   00     00  00     00   0000000   000   000  0000000
+# 000       000   000  000   000  000   000  000   000  0000  000  000   000
+# 000       000   000  000000000  000000000  000000000  000 0 000  000   000
+# 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
+#  0000000   0000000   000   000  000   000  000   000  000   000  0000000
+
+Command
+    
+    # 0000000    00000000    0000000   000   000   0000000  00000000
+    # 000   000  000   000  000   000  000 0 000  000       000
+    # 0000000    0000000    000   000  000000000  0000000   0000000
+    # 000   000  000   000  000   000  000   000       000  000
+    # 0000000    000   000   0000000   00     00  0000000   00000000
+
+    Browse
+        Small               ctrl+.  
+        Large               alt+ctrl+.
+        -    
+        Shelf               alt+.
+        Add to Shelf        alt+shift+.
+        Toggle History      alt+h
+
+    #  0000000   00000000   00000000  000   000
+    # 000   000  000   000  000       0000  000
+    # 000   000  00000000   0000000   000 0 000
+    # 000   000  000        000       000  0000
+    #  0000000   000        00000000  000   000
+
+    Open
+        In Current Tab      ctrl+p   
+        In New Tab          ctrl+shift+
+        In New Window       alt+ctrl+p
+
+    #  0000000  00000000   0000000   00000000    0000000  000   000
+    # 000       000       000   000  000   000  000       000   000
+    # 0000000   0000000   000000000  0000000    000       000000000
+    #      000  000       000   000  000   000  000       000   000
+    # 0000000   00000000  000   000  000   000   0000000  000   000
+
+    Search
+        Case Insensitive    ctrl+shift+f
+        Case Sensitive                                 
+        Regexp Case Insensitive                        
+        Regexp Case Sensitive                          
+
+    # 00000000  000  000   000  0000000
+    # 000       000  0000  000  000   000
+    # 000000    000  000 0 000  000   000
+    # 000       000  000  0000  000   000
+    # 000       000  000   000  0000000
+
+    Find
+        Case Insensitive    ctrl+f   
+        Case Sensitive                               
+        Regexp Case Insensitive                      
+        Regexp Case Sensitive                        
+        Fuzzy                                        
+        Glob                                         
+
+    #  0000000   0000000   00000000  00000000  00000000  00000000
+    # 000       000   000  000       000       000       000
+    # 000       000   000  000000    000000    0000000   0000000
+    # 000       000   000  000       000       000       000
+    #  0000000   0000000   000       000       00000000  00000000
+
+    Coffee
+        In Window Process   alt+c    
+        In Main Process     alt+shift+c
+
+    # 000000000  00000000  00000000   00     00  000  000   000   0000000   000
+    #    000     000       000   000  000   000  000  0000  000  000   000  000
+    #    000     0000000   0000000    000000000  000  000 0 000  000000000  000
+    #    000     000       000   000  000 0 000  000  000  0000  000   000  000
+    #    000     00000000  000   000  000   000  000  000   000  000   000  0000000
+
+    Terminal
+        Small               ctrl+,   
+        Large               alt+,    
+
+    # 00     00   0000000    0000000  00000000    0000000
+    # 000   000  000   000  000       000   000  000   000
+    # 000000000  000000000  000       0000000    000   000
+    # 000 0 000  000   000  000       000   000  000   000
+    # 000   000  000   000   0000000  000   000   0000000
+
+    Macro                   MacroMenu
+    Transform               TransformMenu
+    Goto                    ctrl+;   
+    Build                   ctrl+b   
+
+# 000   000  000  00000000  000   000
+# 000   000  000  000       000 0 000
+#  000 000   000  0000000   000000000
+#    000     000  000       000   000
+#     0      000  00000000  00     00
+
+View
+    Maximize Editor         ctrl+shift+y
+    Toggle Center Text      ctrl+\\
+    -   
+    Navigate Backward       ctrl+1
+    Navigate Forward        ctrl+2
+    --   
+    Activate Previous Tab   alt+ctrl+shift+left
+    Activate Next Tab       alt+ctrl+shift+right
+    ---   
+    Move Tab Left           alt+ctrl+shift+,
+    Move Tab Right          alt+ctrl+shift+.
+    ----   
+    Font Size   
+        Increase            ctrl+=
+        Decrease            ctrl+-
+        Reset               ctrl+0
+
+# 000   000  000  000   000  0000000     0000000   000   000
+# 000 0 000  000  0000  000  000   000  000   000  000 0 000
+# 000000000  000  000 0 000  000   000  000   000  000000000
+# 000   000  000  000  0000  000   000  000   000  000   000
+# 00     00  000  000   000  0000000     0000000   00     00
+
+
+Window
+    Arrange Windows         alt+ctrl+a
+    Cycle Windows           ctrl+`
+    Open Window List        alt+`
+    -
+    Toggle Menu             alt+m m
+    Toggle Scheme           alt+i ctrl+i
+    --
+    Minimize                alt+ctrl+shift+m
+    Maximize                alt+ctrl+m
+    Fullscreen              alt+ctrl+f
+    ---
+    Reload                  alt+ctrl+l r
+    DevTools                alt+ctrl+i i

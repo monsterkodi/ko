@@ -6,17 +6,18 @@
    000     000   000  0000000    0000000 
 ###
 
-{ post, elem, drag, slash, error, log, _ } = require 'kxk'
+{ post, elem, drag, slash, error, log, $, _ } = require 'kxk'
 
 Tab = require './tab'
 
 class Tabs
     
-    constructor: (view) ->
+    constructor: (titlebar) ->
         
         @tabs = []
         @div = elem class: 'tabs'
-        view.appendChild @div
+        
+        titlebar.insertBefore @div, $ ".minimize"
         
         @div.addEventListener 'click',     @onClick
         

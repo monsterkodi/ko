@@ -6,18 +6,19 @@
 000   000  000   000  000  000   000
 ###
 
-{ args, udp, fileList, first, colors, about, prefs, state, store, noon, post, slash, os, fs, str, empty, error, log, _ } = require 'kxk'
+{ app, args, udp, fileList, first, colors, about, prefs, state, store, noon, post, slash, os, fs, str, empty, error, log, _ } = require 'kxk'
+
+pkg = require '../../package.json'
+electron = require 'electron'
 
 # post.debug?()
 
-pkg      = require '../../package.json'
 Execute  = require './execute'
 Navigate = require './navigate'
 Indexer  = require './indexer'
 pug      = require 'pug'
-electron = require 'electron'
 
-{ BrowserWindow, Tray, app, clipboard, dialog } = electron
+{ BrowserWindow, Tray, clipboard, dialog } = electron
 
 disableSnap   = false
 main          = undefined # < created in app.on 'ready'
@@ -34,69 +35,24 @@ process.env.NODE_ENV = 'production' # ???
 # 000   000  000   000  000   000       000
 # 000   000  000   000   0000000   0000000
 
-if slash.win() and slash.file(process.argv[0]) == 'ko.exe'
-    ignoreArgs=1
-else
-    ignoreArgs=2
+# if slash.win() and slash.file(process.argv[0]) == 'ko.exe'
+    # ignoreArgs=1
+# else
+    # ignoreArgs=2
 
-args  = args.init """
+# args  = args.init """
 
-    filelist  files to open           **
-    show      open window on startup  true
-    prefs     show preferences        false
-    noprefs   don't load preferences  false
-    state     show state              false
-    nostate   don't load state        false
-    verbose   log more                false
-    DevTools  open developer tools    false
-    debug     |                       false
+    # filelist  files to open           **
+    # show      open window on startup  true
+    # prefs     show preferences        false
+    # noprefs   don't load preferences  false
+    # state     show state              false
+    # nostate   don't load state        false
+    # verbose   log more                false
+    # DevTools  open developer tools    false
+    # debug     |                       false
 
-""", ignoreArgs:ignoreArgs
-
-if process.cwd() == '/'
-    process.chdir slash.resolve '~'
-while args.filelist.length and slash.dirExists first args.filelist
-    process.chdir args.filelist.shift()
-
-if args.verbose
-    log colors.white.bold "\nko", colors.gray "v#{pkg.version}\n"
-    log noon.stringify {cwd: process.cwd()}, colors:true
-    log colors.yellow.bold '\nargs'
-    log noon.stringify args, colors:true
-    log ''
-
-# 00000000   00000000   00000000  00000000   0000000
-# 000   000  000   000  000       000       000
-# 00000000   0000000    0000000   000000    0000000
-# 000        000   000  000       000            000
-# 000        000   000  00000000  000       0000000
-
-prefs.init 
-    shortcut:               'CmdOrCtrl+F1'
-    scheme:                 'dark'
-    blink:                  true
-    cursorBlinkDelay:       [800,200]
-    recentFilesLength:      20
-    navigateHistoryLength:  10
-    editorFontSize:         19
-    logviewFontSize:        14
-    terminalFontSize:       16
-    autoHideMenuBar:        true
-    terminal:
-        autoclear:          true
-    
-state.init()
-alias = new store 'alias'
-
-if args.prefs
-    log colors.yellow.bold 'prefs'
-    log colors.green.bold 'prefs file:', prefs.store.file
-    log noon.stringify prefs.store.data, colors:true
-
-if args.state
-    log colors.yellow.bold 'state'
-    log colors.green.bold 'state file:', state.store.file
-    log noon.stringify state.store.data, colors:true
+# """, ignoreArgs:ignoreArgs
     
 mostRecentFile = -> first state.get 'recentFiles'
 
@@ -122,11 +78,7 @@ winWithID   = (winID) ->
 # 000   000  000   000  000       000  000
 # 0000000     0000000    0000000  000   000
 
-hideDock = ->
-
-    return if slash.win()
-    return if prefs.get 'trayOnly', false
-    app.dock?.hide()
+hideDock = -> app.hideDock()
 
 # 00000000    0000000    0000000  000000000
 # 000   000  000   000  000          000
@@ -171,16 +123,100 @@ post.on 'shellCommand', (cfg) ->
 # 000 0 000  000   000  000  000  0000
 # 000   000  000   000  000  000   000
 
-class Main
+class Main extends app
 
     constructor: (openFiles) ->
 
-        log 'Main.constructor'
-        if app.makeSingleInstance @otherInstanceStarted
-            log 'single instance'
-            app.exit 0
-            return
+        # log 'Main.constructor'
+        # if app.makeSingleInstance @otherInstanceStarted
+            # log 'single instance'
+            # app.exit 0
+            # return
+        
+        # 00000000   00000000   00000000  00000000   0000000
+        # 000   000  000   000  000       000       000
+        # 00000000   0000000    0000000   000000    0000000
+        # 000        000   000  000       000            000
+        # 000        000   000  00000000  000       0000000
+        
+        # prefs.init 
+            # shortcut:               'CmdOrCtrl+F1'
+            # scheme:                 'dark'
+            # blink:                  true
+            # cursorBlinkDelay:       [800,200]
+            # recentFilesLength:      20
+            # navigateHistoryLength:  10
+            # editorFontSize:         19
+            # logviewFontSize:        14
+            # terminalFontSize:       16
+            # autoHideMenuBar:        true
+            # terminal:
+                # autoclear:          true
+                                
+        { width, height } = electron.screen.getPrimaryDisplay().workAreaSize
+        
+        if slash.win() and slash.file(process.argv[0]) == 'ko.exe'
+            ignoreArgs=1
+        else
+            ignoreArgs=2
+        
+        # htmlFile  = slash.resolve "#{__dirname}/../#{scheme}.html"
+        # if not slash.fileExists htmlFile
+            # pugRender = pug.compileFile slash.path "#{__dirname}/../../pug/index.pug"
+            # html = pugRender scheme: scheme
+            # fs.writeFileSync htmlFile, html, 'utf8'
+            
+        super
+            dir:        __dirname
+            pkg:        pkg
+            shortcut:   'CmdOrCtrl+F1'
+            index:      '../index.html'
+            icon:       '../../img/app.ico'
+            tray:       '../../img/menu@2x.png'
+            about:      '../../img/about.png'
+            width:      height + 122
+            height:     height
+            minWidth:   240
+            minHeight:  230
+            argsOpt:    ignoreArgs:ignoreArgs
+            args: """
+                filelist  files to open           **
+                show      open window on startup  true
+                prefs     show preferences        false
+                noprefs   don't load preferences  false
+                state     show state              false
+                nostate   don't load state        false
+                verbose   log more                false
+                """
+                    
+        if process.cwd() == '/'
+            process.chdir slash.resolve '~'
+            
+        while args.filelist.length and slash.dirExists first args.filelist
+            process.chdir args.filelist.shift()
+        
+        log args
+            
+        if args.verbose
+            log colors.white.bold "\nko", colors.gray "v#{pkg.version}\n"
+            log noon.stringify {cwd: process.cwd()}, colors:true
+            log colors.yellow.bold '\nargs'
+            log noon.stringify args, colors:true
+            log ''
 
+        state.init()
+        alias = new store 'alias'
+        
+        if args.prefs
+            log colors.yellow.bold 'prefs'
+            log colors.green.bold 'prefs file:', prefs.store.file
+            log noon.stringify prefs.store.data, colors:true
+        
+        if args.state
+            log colors.yellow.bold 'state'
+            log colors.green.bold 'state file:', state.store.file
+            log noon.stringify state.store.data, colors:true
+            
         @indexer      = new Indexer
         coffeeExecute = new Execute main: @
 
@@ -188,9 +224,9 @@ class Main
             tray = new Tray "#{__dirname}/../../img/menu.png"
             tray.on 'click', @toggleWindows
 
-        app.setName pkg.productName
+        # app.setName pkg.productName
 
-        electron.globalShortcut.register prefs.get('shortcut'), @toggleWindows
+        # electron.globalShortcut.register prefs.get('shortcut'), @toggleWindows
 
         if not openFiles.length and args.filelist.length
             openFiles = fileList args.filelist, ignoreHidden:false
@@ -219,8 +255,7 @@ class Main
     onMenuAction: (action, arg) =>
         
         switch action
-            when 'Quit'             then @quit()
-            when 'About ko'         then @showAbout()
+            # when 'Quit'             then @quit()
             when 'Cycle Windows'    then @activateNextWindow arg
             when 'Arrange Windows'  then @arrangeWindows()
             when 'New Window'       then @createWindow()
@@ -238,6 +273,8 @@ class Main
     activeWin:   activeWin
     visibleWins: visibleWins
 
+    saveBounds: => log 'saveBounds'
+    
     toggleMaximize: (win) ->
 
         disableSnap = true
@@ -271,7 +308,7 @@ class Main
 
         for w in wins()
             w.show()
-            app.dock?.show()
+            @showDock()
         @
 
     raiseWindows: ->
@@ -435,14 +472,14 @@ class Main
 
     moveWindowStashes: ->
 
-        userData = slash.path app.getPath 'userData'
+        userData = slash.path electron.app.getPath 'userData'
         stashDir = slash.join userData, 'win'
         if slash.dirExists stashDir
             fs.moveSync stashDir, slash.join(userData, 'old'), overwrite: true
 
     restoreWindows: ->
 
-        userData = slash.path app.getPath 'userData'
+        userData = slash.path electron.app.getPath 'userData'
         fs.ensureDirSync userData
         stashFiles = fileList slash.join(userData, 'old'), matchExt:'noon'
         if not empty stashFiles
@@ -455,68 +492,68 @@ class Main
     # 000       000   000  000       000   000     000     000
     #  0000000  000   000  00000000  000   000     000     00000000
 
-    createWindow: (opt={}) ->
+    # createWindowOld: (opt={}) ->
 
-        log 'Main.createWindow opt:', opt
+        # log 'Main.createWindow opt:', opt
 
-        { width, height } = @screenSize()
-        ww = height + 122
+        # { width, height } = @screenSize()
+        # ww = height + 122
 
-        scheme  = prefs.get 'scheme'
-        scheme ?= 'dark'
+        # scheme  = prefs.get 'scheme'
+        # scheme ?= 'dark'
 
-        cfg =
-            x:                parseInt (width-ww)/2
-            y:                0
-            width:            ww
-            height:           height
-            minWidth:         140
-            minHeight:        130
-            useContentSize:   true
-            fullscreenable:   true
-            acceptFirstMouse: true
-            show:             true
-            hasShadow:        true
-            transparent:      true
-            frame:            false
-            backgroundColor:  scheme == 'bright' and "#fff" or '#000'
-            
-        if slash.win()
-            cfg.icon = slash.path __dirname + '/../img/ko.ico'
+        # cfg =
+            # x:                parseInt (width-ww)/2
+            # y:                0
+            # width:            ww
+            # height:           height
+            # minWidth:         140
+            # minHeight:        130
+            # useContentSize:   true
+            # fullscreenable:   true
+            # acceptFirstMouse: true
+            # show:             true
+            # hasShadow:        true
+            # transparent:      true
+            # frame:            false
+            # backgroundColor:  scheme == 'bright' and "#fff" or '#000'
+#             
+        # if slash.win()
+            # cfg.icon = slash.path __dirname + '/../img/ko.ico'
 
-        win = new BrowserWindow cfg
+        # win = new BrowserWindow cfg
 
-        if opt.restore?
-            newStash = slash.join app.getPath('userData'), 'win', "#{win.id}.noon"
-            fs.copySync opt.restore, newStash
+        # if opt.restore?
+            # newStash = slash.join electron.app.getPath('userData'), 'win', "#{win.id}.noon"
+            # fs.copySync opt.restore, newStash
 
-        htmlFile  = slash.resolve "#{__dirname}/../#{scheme}.html"
-        if not slash.fileExists htmlFile
-            pugRender = pug.compileFile slash.path "#{__dirname}/../../pug/index.pug"
-            html = pugRender scheme: scheme
-            fs.writeFileSync htmlFile, html, 'utf8'
+        # htmlFile  = slash.resolve "#{__dirname}/../#{scheme}.html"
+        # if not slash.fileExists htmlFile
+            # pugRender = pug.compileFile slash.path "#{__dirname}/../../pug/index.pug"
+            # html = pugRender scheme: scheme
+            # fs.writeFileSync htmlFile, html, 'utf8'
 
-        win.loadURL slash.fileUrl htmlFile
+        # win.loadURL slash.fileUrl htmlFile
 
-        app.dock?.show()
+        # @showDock()
 
-        win.on 'close',  @onCloseWin
-        win.on 'resize', @onResizeWin
+        # win.on 'close',  @onCloseWin
+        # win.on 'resize', @onResizeWin
 
-        winLoaded = ->
+        # winLoaded = ->
 
-            if opt.files?
-                post.toWin win.id, 'loadFiles', opt.files
-            else if opt.file?
-                post.toWin win.id, 'loadFile', opt.file
-            else
-                log 'createWindow.winLoaded no file to open?'
+            # if opt.files?
+                # post.toWin win.id, 'loadFiles', opt.files
+            # else if opt.file?
+                # post.toWin win.id, 'loadFile', opt.file
+            # else
+                # log 'createWindow.winLoaded no file to open?'
 
-            post.toWins 'winLoaded', win.id
-            post.toWins 'numWins', wins().length
+            # post.toWins 'winLoaded', win.id
+            # post.toWins 'numWins', wins().length
 
-        win.webContents.on 'did-finish-load', winLoaded
-        win
+        # win.webContents.on 'did-finish-load', winLoaded
+        # win
 
     # 00000000   00000000   0000000  000  0000000  00000000
     # 000   000  000       000       000     000   000
@@ -579,30 +616,32 @@ class Main
             
     otherInstanceStarted: (args, dir) =>
 
-        post.toWins 'mainlog', 'other instance args:', args, 'dir', dir
+        log 'otherInstanceStarted', args, dir
         
-        activateOneWindow()
+        # post.toWins 'mainlog', 'other instance args:', args, 'dir', dir
+#         
+        # @activateOneWindow()
 
-        files = []
-        if first(args).endsWith 'ko.exe'
-            fileargs = args.slice 1
-        else
-            fileargs = args.slice 2
-            
-        for arg in fileargs
-            continue if arg.startsWith '-'
-            file = arg
-            if slash.isRelative file
-                file = slash.join slash.resolve(dir), arg
-            [fpath, pos] = slash.splitFilePos file
-            if slash.fileExists fpath
-                files.push file
+        # files = []
+        # if first(args).endsWith 'ko.exe'
+            # fileargs = args.slice 1
+        # else
+            # fileargs = args.slice 2
+#             
+        # for arg in fileargs
+            # continue if arg.startsWith '-'
+            # file = arg
+            # if slash.isRelative file
+                # file = slash.join slash.resolve(dir), arg
+            # [fpath, pos] = slash.splitFilePos file
+            # if slash.fileExists fpath
+                # files.push file
 
-        post.toWins 'mainlog', 'other instance files:', files
+        # post.toWins 'mainlog', 'other instance files:', files
+#         
+        # post.toWin first(visibleWins()).id, 'loadFiles', files, newTab:true
         
-        post.toWin first(visibleWins()).id, 'loadFiles', files, newTab:true
-        
-        # @createWindow files:files
+        # #@createWindow files:files
 
     #  0000000   000   000  000  000000000  
     # 000   000  000   000  000     000     
@@ -625,14 +664,14 @@ class Main
                     prefs.save()
                     state.save()
                     log 'Main.quit exit'
-                    app.exit     0
+                    electron.app.exit 0
                     process.exit 0
             return
         else
             prefs.save()
             state.save()
             log 'Main.quit exit'
-            app.exit     0
+            electron.app.exit     0
             process.exit 0
             
     #  0000000   0000000     0000000   000   000  000000000
@@ -641,7 +680,7 @@ class Main
     # 000   000  000   000  000   000  000   000     000
     # 000   000  0000000     0000000    0000000      000
 
-    showAbout: -> about img:"#{__dirname}/../../img/about.png", pkg:pkg, color:"#fff", background:'#111'
+    # showAbout: -> about img:"#{__dirname}/../../img/about.png", pkg:pkg, color:"#fff", background:'#111'
 
 #  0000000   00000000   00000000         0000000   000   000
 # 000   000  000   000  000   000       000   000  0000  000
@@ -649,7 +688,7 @@ class Main
 # 000   000  000        000        000  000   000  000  0000
 # 000   000  000        000        000   0000000   000   000
 
-app.on 'open-file', (event, file) ->
+electron.app.on 'open-file', (event, file) ->
 
     log 'open-file:', main?, file
     
@@ -660,17 +699,17 @@ app.on 'open-file', (event, file) ->
         
     event.preventDefault()
 
-app.on 'ready', ->
+electron.app.on 'ready', ->
 
     main          = new Main openFiles
     main.navigate = new Navigate main
 
-app.on 'window-all-closed', ->
-    if slash.win()
-        # log 'app.on window-all-closed'
-        app.quit()
+electron.app.on 'window-all-closed', ->
+    # if slash.win()
+        # # log 'app.on window-all-closed'
+        # app.quit()
 
-app.setName pkg.productName
+# electron.app.setName pkg.productName
 
 # 000   000  0000000    00000000     
 # 000   000  000   000  000   000    
