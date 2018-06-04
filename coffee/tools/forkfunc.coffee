@@ -54,7 +54,7 @@ if module.parent
             stack   = new Error().stack.split /\r\n|\n/
             regx    = /\(([^\)]*)\)/
             match   = regx.exec stack[3]
-            dirname = slash.dirname match[1]
+            dirname = slash.dir match[1]
             file    = slash.join dirname, file
 
         file

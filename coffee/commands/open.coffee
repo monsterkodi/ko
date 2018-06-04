@@ -105,7 +105,7 @@ class Open extends Command
     complete: -> 
 
         if @commandList? and @commandList.line(@selected).startsWith(slash.basename @getText()) and not @getText().trim().endsWith('/')
-            @setText slash.join(slash.dirname(@getText()), @commandList.line(@selected))
+            @setText slash.join(slash.dir(@getText()), @commandList.line(@selected))
             if slash.dirExists @getText()
                 @setText @getText() + '/'
                 @changed @getText()
@@ -156,7 +156,7 @@ class Open extends Command
         extensionBonus -= 400 if b[0] == '.'
         extensionBonus += 16777215 if item.text == '..' if @navigating
         
-        lengthPenalty = slash.dirname(f).length
+        lengthPenalty = slash.dir(f).length
                 
         if opt?.flat
             
@@ -221,7 +221,7 @@ class Open extends Command
             item.line = '▸'
             item.clss = 'directory'
             item.text = '..'
-            item.file = slash.dirname @dir
+            item.file = slash.dir @dir
             items.push item
                 
         for file in @files
@@ -310,7 +310,7 @@ class Open extends Command
             
         if window.editor.currentFile?
             opt.file = window.editor.currentFile 
-            opt.dir  = slash.dirname opt.file
+            opt.dir  = slash.dir opt.file
         else 
             @dir ?= process.cwd()
             log 'open.start', @dir
@@ -343,7 +343,7 @@ class Open extends Command
         
     loadDir: (opt) ->
                 
-        opt.dir = slash.dirname opt.file if not opt.dir? and opt.file?
+        opt.dir = slash.dir opt.file if not opt.dir? and opt.file?
         if not slash.dirExists opt.dir
             opt.dir = slash.resolve opt.dir
             if not slash.dirExists opt.dir
@@ -556,7 +556,7 @@ class Open extends Command
                 if not @getText().length and @commandList?.line(@selected) == '..'
                     @loadDir
                         navigating: true
-                        dir:        slash.dirname @dir
+                        dir:        slash.dir @dir
                     return @commandline.results text: @dir, select: true
                 else if @commandline.isSelectedLineAtIndex 0
                     @navigating = true

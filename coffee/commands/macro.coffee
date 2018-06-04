@@ -194,7 +194,7 @@ class Macro extends Command
 
                     for f in projectFiles
                         if pth == slash.base f
-                            pth = slash.splitExt slash.relative f, slash.dirname editor.currentFile
+                            pth = slash.splitExt slash.relative f, slash.dir editor.currentFile
                             pth = './' + pth if not pth.startsWith '../'
                             break
 
@@ -256,7 +256,7 @@ class Macro extends Command
 
                 clss = args.length and args[0] or _.last editor.textsInRanges(editor.selections())
                 clss ?= 'Class'
-                dir = editor.currentFile? and slash.dirname(editor.currentFile) or process.cwd()
+                dir = editor.currentFile? and slash.dir(editor.currentFile) or process.cwd()
                 file = slash.join dir, clss.toLowerCase() + '.coffee'
                 if slash.fileExists file
                     return text: "file #{file} exists!"

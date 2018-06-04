@@ -36,7 +36,7 @@ gitStatus = (fileOrDir) ->
     while line = lines.shift()
         rel    = line.slice 3
         file   = slash.join gitDir, line.slice 3
-        while (rel = slash.dirname rel) != '.'
+        while (rel = slash.dir rel) != '.'
             dirSet.add rel
             
         header = line.slice 0,2

@@ -32,7 +32,7 @@ class Shelf extends Column
         @index  = -1
         @div.id = 'shelf'
         
-        @showHistory = window.stash.get 'shelf:history', true
+        @showHistory = window.stash.get 'shelf:history', false
 
         post.on 'addToShelf', @addPath
         post.on 'navigateHistoryChanged', @onNavigateHistoryChanged
@@ -69,8 +69,6 @@ class Shelf extends Column
                     post.emit 'jumpToFile', file:item.file, line:item.line, col:item.column
         
     onBrowserItemActivated: (browserItem) =>
-
-        # return if @showHistory
         
         [index, item] = indexAndItemInItemsWithFunc browserItem, @items, _.isEqual
         if item
@@ -94,6 +92,8 @@ class Shelf extends Column
         @didInit = true
         
         @loadShelfItems()
+        
+        log 'browserDidInitColumns', @showHistory
         @loadHistory() if @showHistory
         
     loadShelfItems: ->
@@ -169,6 +169,7 @@ class Shelf extends Column
             @items.push item
             
         @setItems @items
+        log 'addItem', @showHistory
         @loadHistory() if @showHistory
 
     dropRow: (row, pos) -> @addItem row.item, pos:pos

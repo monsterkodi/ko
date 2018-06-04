@@ -497,8 +497,8 @@ class Term extends Command
                         continue if args.length and not filterRegExp(args).test file
                         info = files[file]
                         pth  = slash.tilde file
-                        if lastDir != slash.dirname pth
-                            lastDir = slash.dirname pth
+                        if lastDir != slash.dir pth
+                            lastDir = slash.dir pth
                         else
                             pth = _.padStart('', lastDir.length+1) + slash.basename pth
                         meta =

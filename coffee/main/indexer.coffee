@@ -18,48 +18,15 @@ class Indexer
     @requireRegExp   = /^\s*([\w\{\}]+)\s+=\s+require\s+[\'\"]([\.\/\w]+)[\'\"]/
     @includeRegExp   = /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
     @methodRegExp    = /^\s+([\@]?\w+)\s*\:\s*(\(.*\))?\s*[=-]\>/
-    # @cppMethodRegExp = /^\s*(\w+\s+)*(\w+)\s*(\(.*\))/
     @funcRegExp      = /^\s*([\w\.]+)\s*[\:\=]\s*(\(.*\))?\s*[=-]\>/
     @testRegExp      = /^\s*(describe|it)\s+[\'\"](.+)[\'\"]\s*[\,]\s*(\([^\)]*\))?\s*[=-]\>/
     @splitRegExp     = new RegExp "[^\\w\\d\\_]+", 'g'
     @classRegExp     = /^class\s+(\w+)/
-    # @classRegExp     = /// ^ \s* 
-        # (enum\s+)?
-        # (class\s+|struct\s+)
-        # (\w+_API\s+)?
-        # (\w+)
-        # (
-            # \s+extends\s\w+.* | 
-            # \s*:\s*[\w\,\s\<\>]+
-        # )?
-        # \s* $ 
-        # ///
-    # @hppMethodRegExp = /// ^ \s*
-        # (UFUNCTION\([^\)]*\)\s*)?
-        # ([\w\*\&\>\<\,\:]*\s)*
-        # (\w+) 
-        # \s* \( \s*
-        # (
-          # .*\,\s*$ |
-          # .*\)[\w\s]*[\;\{] |
-          # $
-        # )
-        # ///
 
     @classNameInLine: (line) ->
                     
         m = line.match Indexer.classRegExp
         m?[1]
-
-    # @cppMethodNameInLine: (line) ->
-#         
-        # m = line.match Indexer.cppMethodRegExp
-        # m?[2]
-
-    # @hppMethodNameInLine: (line) ->
-#         
-        # m = line.match Indexer.hppMethodRegExp
-        # m?[3]
         
     @methodNameInLine: (line) ->
         
@@ -108,7 +75,6 @@ class Indexer
         post.onGet 'indexer', @onGet
         post.on 'sourceInfoForFile', @onSourceInfoForFile
         @collectBins()
-        # @collectProjects()
     
         @imageExtensions = ['png', 'jpg', 'gif', 'tiff', 'pxm', 'icns']        
 
@@ -193,10 +159,10 @@ class Indexer
             root:        slash.resolve '~'
             include:     ['.git']
             ignore:      ['node_modules', 'img', 'bin', 'js', 'Library']
-            skipDir:     (p) -> slash.basename(p) == '.git'
+            skipDir:     (p) -> slash.base(p) == '.git'
             filter:      (p) -> slash.ext(p) not in ['noon', 'json', 'git', '']
-            dir:         (p) => if slash.file(p) == '.git'    then @projects[slash.basename slash.dirname p] = dir: slash.tilde slash.dirname p
-            file:        (p) => if slash.base(p) == 'package' then @projects[slash.basename slash.dirname p] = dir: slash.tilde slash.dirname p
+            dir:         (p) => if slash.file(p) == '.git'    then @projects[slash.base slash.dir p] = dir: slash.tilde slash.dir p
+            file:        (p) => if slash.base(p) == 'package' then @projects[slash.base slash.dir p] = dir: slash.tilde slash.dir p
             done:        => log 'collectProjects done', @projects
         w.start()
 
@@ -211,23 +177,18 @@ class Indexer
         if @currentlyIndexing
             @indexQueue ?= []
             @indexQueue.push file
-            log 'indexProject queued', @indexQueue
             return
         
         file = slash.resolve file 
         
         for project in @indexedProjects
             if file.startsWith project.dir + '/'
-                # log 'indexProject ---- already indexed', project.dir
                 return
               
         @currentlyIndexing = file
-        # log 'indexProject currentlyIndexing', @currentlyIndexing
         
         forkfunc './indexprj', file, (err, info) =>
             return error 'indexing failed', err if not empty err
-            # log 'indexProject ++++++ indexed', @currentlyIndexing, info
-            log 'indexProject ++++++ indexed', info.dir, info.files.length
             delete @currentlyIndexing
             @indexedProjects.push info if info
             doShift = empty @queue
@@ -236,10 +197,7 @@ class Indexer
             if not empty @indexQueue
                 @indexProject @indexQueue.shift()
             @shiftQueue() if doShift
-            log 'done'
                 
-        # @indexDir slash.pkg(file) ? slash.dir(file)
-        
     # 000  000   000  0000000    00000000  000   000        0000000    000  00000000
     # 000  0000  000  000   000  000        000 000         000   000  000  000   000
     # 000  000 0 000  000   000  0000000     00000          000   000  000  0000000
@@ -269,7 +227,6 @@ class Indexer
 
         @walker = new Walker wopt
         @walker.cfg.ignore.push 'js'
-        # @walker.cfg.includeExt = @walker.cfg.includeExt.concat @imageExtensions
         @walker.start()
 
     onWalkerDir: (p, stat) =>
@@ -374,8 +331,6 @@ class Indexer
             
             if isHpp or isCpp
                 
-                # log 'indexHpp', file
-                
                 indexHpp = new IndexHpp
                 parsed = indexHpp.parse data
                 funcAdded = not empty(parsed.classes) or not empty(parsed.funcs)
@@ -397,7 +352,6 @@ class Indexer
                 for li in [0...lines.length]
                     
                     line = lines[li]
-                    # log li, line
     
                     if line.trim().length # ignoring empty lines
                         
@@ -417,33 +371,12 @@ class Indexer
                             # 000 0 000  000          000     000   000  000   000  000   000       000
                             # 000   000  00000000     000     000   000   0000000   0000000    0000000
     
-                            # if isCpp or isHpp
-                                # if isCpp
-                                    # methodName = Indexer.cppMethodNameInLine line
-                                # else
-                                    # methodName = Indexer.hppMethodNameInLine line
-                                # if methodName
-                                    # funcInfo = @addMethod currentClass, methodName, file, li
-                                    # funcStack.push [indent, funcInfo]
-                                    # funcAdded = true       
-                            # else
                             if methodName = Indexer.methodNameInLine line
                                 funcInfo = @addMethod currentClass, methodName, file, li
                                 funcStack.push [indent, funcInfo]
                                 funcAdded = true
                         else
-    
-                            # if isCpp or isHpp
-                                # methodRegExp = /(\w+)(\<[^\>]+\>)?\:\:(\w+)\s*(\([^\)]*\))\s*(const)?$/
-                                # m = line.match methodRegExp
-                                # if m?[1]? and m?[3]?
-                                    # className = m[1]
-                                    # funcName  = m[3]
-                                    # funcInfo = @addMethod className, funcName, file, li
-                                    # funcStack.push [indent, funcInfo]
-                                    # funcAdded = true
-                                    # continue
-    
+        
                             # 00000000  000   000  000   000   0000000  000000000  000   0000000   000   000   0000000
                             # 000       000   000  0000  000  000          000     000  000   000  0000  000  000
                             # 000000    000   000  000 0 000  000          000     000  000   000  000 0 000  0000000
@@ -514,26 +447,7 @@ class Indexer
                                     if (m[2][0] == '.') and (not @files[abspath]?) and (@queue.indexOf(abspath) < 0)
                                         if slash.isFile abspath
                                             @queue.push abspath
-    
-                            #  00  00   000  000   000   0000000  000      000   000  0000000    00000000
-                            # 00000000  000  0000  000  000       000      000   000  000   000  000
-                            #  00  00   000  000 0 000  000       000      000   000  000   000  0000000
-                            # 00000000  000  000  0000  000       000      000   000  000   000  000
-                            #  00  00   000  000   000   0000000  0000000   0000000   0000000    00000000
-                            
-                            # when '#include'
-#                                 
-                                # m = line.match Indexer.includeRegExp
-                                # if m?[1]?
-                                    # r = fileInfo.require ? []
-                                    # r.push [null, m[1]]
-                                    # fileInfo.require = r
-                                    # abspath = slash.resolve slash.join slash.dir(file), m[1]
-                                    # abspath += '.coffee' if not slash.ext m[1]
-                                    # if not @files[abspath]? and @queue.indexOf(abspath) < 0
-                                        # if slash.fileExists abspath
-                                            # @queue.push abspath
-                                        
+                                            
             if funcAdded
 
                 while funcStack.length
@@ -565,7 +479,6 @@ class Indexer
     shiftQueue: =>
         if @queue.length
             file = @queue.shift()
-            # log @queue.length, file
             @indexFile file
 
 module.exports = Indexer

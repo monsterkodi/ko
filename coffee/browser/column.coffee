@@ -197,7 +197,7 @@ class Column
         
         return if not @browser.browse?
         @browser.browse switch key
-            when 'left'  then slash.dirname @parent.file
+            when 'left'  then slash.dir @parent.file
             when 'up'    then @parent.file
             when 'right' then @activeRow().item.file
             when 'down'  then slash.pkg @parent.file

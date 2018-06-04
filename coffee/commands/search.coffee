@@ -74,8 +74,8 @@ class Search extends Command
         terminal.appendMeta clss: 'searchHeader', diss: syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'
         terminal.appendMeta clss: 'spacer'
         terminal.singleCursorAtPos [0, terminal.numLines()-2]
-        dir = slash.pkg slash.dirname opt.file
-        dir ?= slash.dirname opt.file
+        dir = slash.pkg slash.dir opt.file
+        dir ?= slash.dir opt.file
         @walker = new walker
             root:        dir
             maxDepth:    6

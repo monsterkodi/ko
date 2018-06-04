@@ -15,7 +15,7 @@ class Scheme
     @toggle: (schemes = ['dark', 'bright']) ->
         
         link =$ '.scheme-link'
-        currentScheme = slash.basename slash.dirname link.href
+        currentScheme = slash.basename slash.dir link.href
         
         nextSchemeIndex = ( schemes.indexOf(currentScheme) + 1) % schemes.length
         nextScheme = schemes[nextSchemeIndex]

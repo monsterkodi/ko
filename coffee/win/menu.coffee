@@ -82,8 +82,8 @@ class Menu
         
         fileSpan = (f) ->
             if f?
-                span  = Syntax.spanForTextAndSyntax slash.tilde(slash.dirname(f)), 'browser'
-                span += Syntax.spanForTextAndSyntax '/' + slash.basename(f), 'browser'
+                span  = Syntax.spanForTextAndSyntax slash.tilde(slash.dir(f)), 'browser'
+                span += Syntax.spanForTextAndSyntax '/' + slash.base(f), 'browser'
             return span
                 
         RecentMenu = []

@@ -6,7 +6,7 @@
 000   000  000   000  000  000   000
 ###
 
-{ udp, fileList, first, colors, karg, about, prefs, state, store, noon, post, slash, os, fs, str, empty, error, log, _ } = require 'kxk'
+{ args, udp, fileList, first, colors, about, prefs, state, store, noon, post, slash, os, fs, str, empty, error, log, _ } = require 'kxk'
 
 # post.debug?()
 
@@ -667,7 +667,7 @@ app.on 'ready', ->
 
 app.on 'window-all-closed', ->
     if slash.win()
-        log 'app.on window-all-closed'
+        # log 'app.on window-all-closed'
         app.quit()
 
 app.setName pkg.productName
@@ -680,7 +680,7 @@ app.setName pkg.productName
 
 onMsg = (file) ->
     
-    log 'onMsg', file
+    # log 'onMsg', file
     main.activateOneWindow()
     post.toWin first(visibleWins()).id, 'loadFiles', [file], newTab:true
 

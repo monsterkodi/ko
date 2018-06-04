@@ -157,7 +157,7 @@ class Transform
 
         cwd = process.cwd()
         if @editor.currentFile?
-            process.chdir slash.dirname @editor.currentFile
+            process.chdir slash.dir @editor.currentFile
         @apply (t) -> slash.resolve t
         process.chdir cwd
         'resolve'

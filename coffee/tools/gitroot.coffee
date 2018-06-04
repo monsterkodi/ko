@@ -25,11 +25,11 @@ gitRoot = (pth, cb) ->
                     return cb(null) if err
                     cb stdout.trim()
             else
-                gitRoot slash.dirname(pth), cb
+                gitRoot slash.dir(pth), cb
     else
     
         try
-            cwd = slash.dirExists(pth) and slash.unslash(pth) or slash.dirname(pth)
+            cwd = slash.dirExists(pth) and slash.unslash(pth) or slash.dir(pth)
             r = childp.execSync 'git rev-parse --show-toplevel',
                 cwd:      cwd
                 encoding: 'utf8'

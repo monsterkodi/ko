@@ -398,7 +398,7 @@ openFiles = (ofiles, options) -> # called from file dialog, open command and bro
     if ofiles?.length
 
         files = fileList ofiles, ignoreHidden: false
-
+        
         if files.length >= 10
             answer = dialog.showMessageBox
                 type: 'warning'
@@ -414,7 +414,7 @@ openFiles = (ofiles, options) -> # called from file dialog, open command and bro
             log 'window.openFiles.warning: no files for:', ofiles
             return []
 
-        window.stash.set 'openFilePath', slash.dirname files[0]
+        window.stash.set 'openFilePath', slash.dir files[0]
 
         if not options?.newWindow and not options?.newTab
             file = slash.resolve files.shift()
@@ -440,7 +440,7 @@ window.loadFile         = loadFile
 
 openFileDialog = (opt) ->
 
-    dir = slash.dirname editor.currentFile if editor?.currentFile
+    dir = slash.dir editor.currentFile if editor?.currentFile
     dir ?= slash.resolve '.'
     dialog.showOpenDialog
         title: "Open File"

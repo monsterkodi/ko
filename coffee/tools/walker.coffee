@@ -48,7 +48,7 @@ class Walker
                     return @ignore p
                 else if name.endsWith '-x64'
                     return @ignore p
-                else if cfg.includeDir? and slash.dirname(p) == cfg.includeDir
+                else if cfg.includeDir? and slash.dir(p) == cfg.includeDir
                     cfg.files.push sp
                     cfg.stats.push stat
                     @ignore p if name in cfg.ignore

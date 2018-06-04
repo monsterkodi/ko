@@ -124,7 +124,7 @@ class FileBrowser extends Browser
         opt.column ?= 0
         dir  = opt.dir 
         dir ?= slash.pkg file
-        dir ?= slash.dirname file
+        dir ?= slash.dir file
         opt.file = file
         @skipJump = opt.dontJump
         @loadDir dir, opt
