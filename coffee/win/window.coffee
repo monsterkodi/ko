@@ -608,6 +608,8 @@ window.setLastFocus = (name) ->
 
 onMenuAction = (name, args) ->
 
+    log 'onMenuAction', name
+
     if action = Editor.actionWithName name
         if action.key? and _.isFunction window.focusEditor[action.key]
             window.focusEditor[action.key] args
@@ -663,7 +665,7 @@ onMenuAction = (name, args) ->
     
     post.toMain 'menuAction', name, args
 
-post.onMenuAction = onMenuAction
+post.on 'menuAction', onMenuAction
 
 # 000   000  00000000  000   000
 # 000  000   000        000 000
@@ -693,5 +695,7 @@ onCombo = (combo, info) ->
         when 'command+shift+-'    then return stopEvent event, @changeZoom -1
         when 'command+shift+0'    then return stopEvent event, @resetZoom()
         when 'command+alt+y'      then return stopEvent event, split.do 'minimize editor'
+
+post.on 'combo', onCombo
 
 winMain()

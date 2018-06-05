@@ -65,7 +65,7 @@ indexProject = (file) ->
     kofiles = []
     info = dir:dir, files:[]
 
-    log 'indexProject dir', dir
+    # log 'indexProject dir', dir
 
     ign = ignore()
     

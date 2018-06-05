@@ -35,7 +35,7 @@ class FileEditor extends TextEditor
         @currentFile = null
         @watch       = null
 
-        @view.addEventListener "contextmenu", @onContextMenu
+        # @view.addEventListener "contextmenu", @onContextMenu
         
         window.split.on 'commandline', @onCommandline
 

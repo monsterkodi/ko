@@ -132,7 +132,7 @@ class Tab
     close: ->
         
         @div.remove()
-        @tooltip.del()
+        @tooltip?.del()
         post.emit 'tabClosed', @info.file ? 'untitled'
     
     hidePkg: -> @pkg?.style.display = 'none'

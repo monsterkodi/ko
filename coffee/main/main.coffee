@@ -273,7 +273,7 @@ class Main extends app
     activeWin:   activeWin
     visibleWins: visibleWins
 
-    saveBounds: => log 'saveBounds'
+    saveBounds: => #log 'saveBounds'
     
     toggleMaximize: (win) ->
 
