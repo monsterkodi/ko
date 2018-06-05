@@ -280,7 +280,7 @@ class Commandline extends TextEditor
 
     handleMenuAction: (name, args) ->
         
-        log 'handleMenuAction', name, args
+        # log 'handleMenuAction', name, args
         if args?.command
             if @commandForName args.command           
                 @startCommand args.command    

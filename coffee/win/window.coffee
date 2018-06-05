@@ -611,17 +611,18 @@ window.setLastFocus = (name) ->
 
 onMenuAction = (name, args) ->
 
-    log 'onMenuAction', name, args
-
     if action = Editor.actionWithName name
         if action.key? and _.isFunction window.focusEditor[action.key]
-            # window.focusEditor[action.key] args
             window.focusEditor[action.key] args.actarg
+            log 'handled by focus editor', name
             return
 
     if 'unhandled' != window.commandline.handleMenuAction name, args
+        log 'handled by commandline', name
         return
 
+    log 'onMenuAction', name, args
+            
     switch name
 
         when 'doMacro'               then return window.commandline.commands.macro.execute args

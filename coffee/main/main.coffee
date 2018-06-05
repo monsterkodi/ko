@@ -195,8 +195,6 @@ class Main extends app
         while args.filelist.length and slash.dirExists first args.filelist
             process.chdir args.filelist.shift()
         
-        log args
-            
         if args.verbose
             log colors.white.bold "\nko", colors.gray "v#{pkg.version}\n"
             log noon.stringify {cwd: process.cwd()}, colors:true

@@ -12,7 +12,6 @@ metaRadius            = 0.15em
 
 minimapWidth          = 130px
 scrollbarWidth        = 12px // transparent scroll area
-scrollhandleWidth     = 6px
 numbersWidth          = 50px
 editorPadding         = (8px + numbersWidth)
 bottomCornerRadius    = 4px
@@ -196,65 +195,7 @@ unicode(char)
     // '\f010' tagdoc     '\f031' tools          '\f01f' -o-            '\f042' gift
     // '\f011' textdoc    '\f032' exit           '\f026' circle !       '\f043' stats
     // '\f04e' eye        '\f044' triangle left   
-        
-// 00000000    0000000   00000000   000   000  00000000
-// 000   000  000   000  000   000  000   000  000   000
-// 00000000   000   000  00000000   000   000  00000000
-// 000        000   000  000        000   000  000
-// 000         0000000   000         0000000   000
-
-// .popup
-//     position            absolute
-//     border-radius       3px
-//     z-index             100
-// 
-// .popupItem
-//     padding-top         3px
-//     padding-bottom      2px
-//     padding-left        2 * frameWidth
-//     padding-right       2 * frameWidth + 70px
-//     cursor              pointer
-//     font-weight         bold
-//     &:last-child
-//         padding-bottom  frameWidth
-//     &:first-child
-//         padding-top     frameWidth
-// 
-// .popupItem.separator
-//     padding             0
-//     cursor              default
-//     border              0
-//     height              0
-//     margin-top          2px
-//     margin-bottom       2px
-// 
-// .popupCombo
-//     pointer-events      none
-//     position            absolute
-//     right               2 * frameWidth
-
-// 00     00  00000000  000   000  000   000  
-// 000   000  000       0000  000  000   000  
-// 000000000  0000000   000 0 000  000   000  
-// 000 0 000  000       000  0000  000   000  
-// 000   000  00000000  000   000   0000000   
-
-// #menu
-//     height              titlebarHeight
-//     pointer-events      auto
-//     -webkit-app-region  no-drag
-// 
-// .menuItem
-//     -webkit-app-region  no-drag
-//     cursor              pointer
-//     padding-left        10px
-//     padding-right       10px
-//     padding-top         6px
-//     font-weight         bold
-//     display             inline-block
-//     height              titlebarHeight
-//     overflow            visible
-        
+                
 //  0000000  000   000  00000000  000      00000000
 // 000       000   000  000       000      000
 // 0000000   000000000  0000000   000      000000
@@ -490,7 +431,7 @@ infoPadding = 6px
     font-size           titlebarFontSize
     padding-left        6px
     padding-right       6px
-    padding-top         6px
+    padding-top         7px
     cursor              pointer
     
     box-sizing          border-box
@@ -1154,19 +1095,11 @@ infoPadding = 6px
 //      000  000       000   000  000   000  000      000      
 // 0000000    0000000  000   000   0000000   0000000  0000000  
 
-// ::-webkit-scrollbar
-//     width               scrollhandleWidth
-//     height              scrollhandleWidth
-//     background-color    transparent
-// 
-// ::-webkit-scrollbar-track
-//     background-color    transparent
-
 ::-webkit-scrollbar
     width                   frameWidth
-::-webkit-scrollbar
     height                  frameWidth  
     background-color        transparent
+    
 ::-webkit-scrollbar-track
     background-color        transparent
     

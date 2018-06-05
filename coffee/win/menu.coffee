@@ -88,7 +88,6 @@ menu = (template) ->
     RecentMenu = []
     
     recent = window.state?.get 'recentFiles', []
-    log window.state?, recent?
     recent ?= []
     for f in recent
         if fs.existsSync f
@@ -115,40 +114,6 @@ menu = (template) ->
 
 module.exports = menu
 
-# Syntax    = require '../editor/syntax'
-# Transform = require '../editor/actions/transform'
-# Macro     = require '../commands/macro'
-# 
-        #     text: 'Command'
-        #     menu: [
-        # 
-        #         # 0000000    00000000    0000000   000   000   0000000  00000000
-        #         # 000   000  000   000  000   000  000 0 000  000       000
-        #         # 0000000    0000000    000   000  000000000  0000000   0000000
-        #         # 000   000  000   000  000   000  000   000       000  000
-        #         # 0000000    000   000   0000000   00     00  0000000   00000000
-        # 
-        #         text:   'Browse'
-        #         menu:   [
-        #             text:   'Small',                    accel:  'ctrl+.',      action: 'browse'
-        #         ,
-        #             text:   'Large',                    accel:  'alt+ctrl+.',  action: 'Browse'
-        #         ,
-        #             text:   ''
-        #         ,
-        #             text:   'Shelf',                    accel:  'alt+.',        action: 'shelf'
-        #         ,
-        #             text:   'Add to Shelf',             accel:  'alt+shift+.'
-        #         ,
-        #             text:   'Toggle History',           accel:  'alt+h'
-        #         ]
-        #     ,
-        #         #  0000000   00000000   00000000  000   000
-        #         # 000   000  000   000  000       0000  000
-        #         # 000   000  00000000   0000000   000 0 000
-        #         # 000   000  000        000       000  0000
-        #         #  0000000   000        00000000  000   000
-        # 
         #         text:      'Open'
         #         menu:    [
         #             text:   'In Current Tab',           accel:  'ctrl+p',       action: 'open'

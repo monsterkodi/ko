@@ -111,7 +111,7 @@ class Brackets
             i -= 1
                     
         i = rngs.length-1 
-        while i > 0 #remove trivial: (), {}, []
+        while i > 0 # remove trivial: (), {}, []
             if rngs[i-1].value == 'open' and rngs[i].value == 'close' and
                 @open[rngs[i-1].match] == rngs[i].match and 
                     rngs[i-1].start == rngs[i].start - 1
