@@ -6,7 +6,7 @@
 000   000  00000000  000   000   0000000 
 ###
 
-{ fileList, post, slash, fs, log, _ } = require 'kxk'
+{ fileList, post, slash, fs, str, log, _ } = require 'kxk'
 
 Syntax    = require '../editor/syntax'
 Transform = require '../editor/actions/transform'
@@ -91,7 +91,7 @@ menu = (template) ->
     recent ?= []
     for f in recent
         if fs.existsSync f
-            log 'fileSpan', fileSpan f
+            # log 'fileSpan', str.encode fileSpan f
             RecentMenu.unshift
                 # text: fileLabel f
                 html: fileSpan f
