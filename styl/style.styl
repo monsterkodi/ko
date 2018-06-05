@@ -430,94 +430,33 @@ infoPadding = 6px
     &.empty
         display         none
 
-// 000000000  000  000000000  000      00000000  0000000     0000000   00000000
-//    000     000     000     000      000       000   000  000   000  000   000
-//    000     000     000     000      0000000   0000000    000000000  0000000
-//    000     000     000     000      000       000   000  000   000  000   000
-//    000     000     000     0000000  00000000  0000000    000   000  000   000
+.dot
+    display             inline-block
+    vertical-align      top
+    padding-left        6px
+    padding-right       9px
+    margin-top          -1px
 
-// #titlebar
-//     display             flex
-//     flex-direction      row
-//     height              titlebarHeight
-//     box-sizing          border-box
-//     font-size           titlebarFontSize
-//     white-space         nowrap
-//     pointer-events      auto
-//     cursor              pointer
-// 
-// 
-// .dot
-//     display             inline-block
-//     vertical-align      top
-//     padding-left        6px
-//     padding-right       9px
-//     margin-top          -1px
-// 
-// #titlebar .winicon img
-//     padding-left        6px
-//     padding-right       2px
-//     width               titlebarHeight
-//     height              titlebarHeight
-// 
-// #titlebar .winnum
-//     pointer-events      auto
-//     cursor              pointer
-//     -webkit-app-region  no-drag
-//     flex                0 0 0
-//     float               right
-//     display             inline-block
-//     vertical-align      top
-//     padding-right       12px
-//     padding-left        12px
-//     padding-top         6px
-// 
-// #titlebar .winclose
-//     flex                0 0 45px
-//     float               right
-//     display             inline-block
-//     vertical-align      top
-//     padding-top         frameWidth
-// 
-//     & img
-//         padding-left    18px
-//         width           11px
-//         height          11px
-//         opacity         0.2
-// 
-//     &:hover
-//         & img
-//             opacity     1
-//     &:active
-//         background-color #f00
-//         & img
-//             opacity     1
-// 
-// #titlebar.tight .winclose
-//     flex                0 0 34px
-//     & img
-//         padding-left    12px
-        
 // 000000000   0000000    0000000   000      000000000  000  00000000
 //    000     000   000  000   000  000         000     000  000   000
 //    000     000   000  000   000  000         000     000  00000000
 //    000     000   000  000   000  000         000     000  000
 //    000      0000000    0000000   0000000     000     000  000
 
-// .tooltip
-//     white-space         nowrap
-//     padding             3px
-//     padding-left        frameWidth
-//     padding-right       frameWidth
-//     border-bottom-left-radius  frameWidth
-//     border-bottom-right-radius frameWidth
-//     position            absolute
-//     top                 titlebarHeight
-//     font-size           titlebarFontSize
-//     opacity             0
-//     transform           scaleY(0)
-//     transition          transform 0.2s ease-in, opacity 0.2s ease-in
-//     overflow            hidden
+.tooltip
+    white-space         nowrap
+    padding             3px
+    padding-left        frameWidth
+    padding-right       frameWidth
+    border-bottom-left-radius  frameWidth
+    border-bottom-right-radius frameWidth
+    position            absolute
+    top                 titlebarHeight
+    font-size           titlebarFontSize
+    opacity             0
+    transform           scaleY(0)
+    transition          transform 0.2s ease-in, opacity 0.2s ease-in
+    overflow            hidden
 
 // 000000000   0000000   0000000     0000000
 //    000     000   000  000   000  000
@@ -526,7 +465,7 @@ infoPadding = 6px
 //    000     000   000  0000000    0000000
 
 .tabs
-    flex                1 1 0
+    flex                10 1 0
     display             flex
     flex-direction      row
     overflow-x          auto
@@ -544,13 +483,21 @@ infoPadding = 6px
 
 .tab
     flex                1 1 0
-    border-top-left-radius  6px
-    border-top-right-radius 6px
+    &:not(:first-child)    
+        border-top-left-radius  10px
+    &:not(:last-child)
+        border-top-right-radius 10px
     font-size           titlebarFontSize
     padding-left        6px
     padding-right       6px
     padding-top         6px
     cursor              pointer
+    
+    box-sizing          border-box
+    height              titlebarHeight + 3px
+    font-size           titlebarFontSize
+    font-family         titlebarFont
+    
     &:not(.active)
         opacity         0.5
 
@@ -564,10 +511,6 @@ infoPadding = 6px
     position            relative
     overflow            hidden
     pointer-events      auto
-
-#area
-#terminal
-    border-top          frameBorder
 
 // 00000000  0000000    000  000000000   0000000   00000000
 // 000       000   000  000     000     000   000  000   000
@@ -1063,14 +1006,6 @@ infoPadding = 6px
 //      000  000       000   000  000   000  000      000      000   000  000   000  000   000
 // 0000000    0000000  000   000   0000000   0000000  0000000  0000000    000   000  000   000
 
-// ::-webkit-scrollbar
-//     width               scrollhandleWidth
-//     height              scrollhandleWidth
-//     background-color    transparent
-// 
-// ::-webkit-scrollbar-track
-//     background-color    transparent
-
 .scrollbar
     position            absolute
     top                 0
@@ -1103,8 +1038,8 @@ infoPadding = 6px
 #titlebar
     display             flex
     flex-direction      row
-    height              titlebarHeight
     box-sizing          border-box
+    height              titlebarHeight
     font-size           titlebarFontSize
     font-family         titlebarFont
     white-space         nowrap
@@ -1218,6 +1153,14 @@ infoPadding = 6px
 // 0000000   000       0000000    000   000  000      000      
 //      000  000       000   000  000   000  000      000      
 // 0000000    0000000  000   000   0000000   0000000  0000000  
+
+// ::-webkit-scrollbar
+//     width               scrollhandleWidth
+//     height              scrollhandleWidth
+//     background-color    transparent
+// 
+// ::-webkit-scrollbar-track
+//     background-color    transparent
 
 ::-webkit-scrollbar
     width                   frameWidth

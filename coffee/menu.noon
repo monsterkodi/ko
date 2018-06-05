@@ -54,10 +54,16 @@ Command
     # 0000000    000   000   0000000   00     00  0000000   00000000
 
     Browse
-        Small               ctrl+.  
-        Large               alt+ctrl+.
+        Small               
+            accel           ctrl+.  
+            command         browse
+        Large               
+            accel           alt+ctrl+.
+            command         Browse
         -    
-        Shelf               alt+.
+        Shelf               
+            accel           alt+.
+            command         shelf
         Add to Shelf        alt+shift+.
         Toggle History      alt+h
 
@@ -79,10 +85,15 @@ Command
     # 0000000   00000000  000   000  000   000   0000000  000   000
 
     Search
-        Case Insensitive    ctrl+shift+f
-        Case Sensitive                                 
-        Regexp Case Insensitive                        
-        Regexp Case Sensitive                          
+        Case Insensitive   
+            accel           ctrl+shift+f
+            command         search
+        Case Sensitive            
+            command         Search
+        Regexp Case Insensitive 
+            command         /search/
+        Regexp Case Sensitive      
+            command         /Search/
 
     # 00000000  000  000   000  0000000
     # 000       000  0000  000  000   000
@@ -91,12 +102,19 @@ Command
     # 000       000  000   000  0000000
 
     Find
-        Case Insensitive    ctrl+f   
-        Case Sensitive                               
-        Regexp Case Insensitive                      
-        Regexp Case Sensitive                        
-        Fuzzy                                        
-        Glob                                         
+        Case Insensitive    
+            accel           ctrl+f   
+            command         find
+        Case Sensitive        
+            command         Find
+        Regexp Case Insensitive
+            command         /find/
+        Regexp Case Sensitive     
+            command         /Find/
+        Fuzzy                     
+            command         fiZd
+        Glob                    
+            command         f*nd
 
     #  0000000   0000000   00000000  00000000  00000000  00000000
     # 000       000   000  000       000       000       000
@@ -105,8 +123,11 @@ Command
     #  0000000   0000000   000       000       00000000  00000000
 
     Coffee
-        In Window Process   alt+c    
+        In Window Process   
+            accel           alt+c    
+            command         coffee
         In Main Process     alt+shift+c
+            command         Coffee
 
     # 000000000  00000000  00000000   00     00  000  000   000   0000000   000
     #    000     000       000   000  000   000  000  0000  000  000   000  000
@@ -115,8 +136,12 @@ Command
     #    000     00000000  000   000  000   000  000  000   000  000   000  0000000
 
     Terminal
-        Small               ctrl+,   
-        Large               alt+,    
+        Small               
+            accel           ctrl+,   
+            command         terminal
+        Large               
+            accel           alt+,  
+            command         Terminal  
 
     # 00     00   0000000    0000000  00000000    0000000
     # 000   000  000   000  000       000   000  000   000

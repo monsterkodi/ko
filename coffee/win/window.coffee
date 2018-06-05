@@ -608,14 +608,15 @@ window.setLastFocus = (name) ->
 
 onMenuAction = (name, args) ->
 
-    log 'onMenuAction', name
+    log 'onMenuAction', name, args
 
     if action = Editor.actionWithName name
         if action.key? and _.isFunction window.focusEditor[action.key]
-            window.focusEditor[action.key] args
+            # window.focusEditor[action.key] args
+            window.focusEditor[action.key] args.actarg
             return
 
-    if 'unhandled' != window.commandline.handleMenuAction name
+    if 'unhandled' != window.commandline.handleMenuAction name, args
         return
 
     switch name
@@ -665,7 +666,8 @@ onMenuAction = (name, args) ->
     
     post.toMain 'menuAction', name, args
 
-post.on 'menuAction', onMenuAction
+post.on 'menuAction
+', onMenuAction
 
 # 000   000  00000000  000   000
 # 000  000   000        000 000

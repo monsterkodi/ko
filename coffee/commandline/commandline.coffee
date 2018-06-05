@@ -278,10 +278,10 @@ class Commandline extends TextEditor
     # 000  000   000          000
     # 000   000  00000000     000
 
-    handleMenuAction: (name) ->
+    handleMenuAction: (name, args) ->
         
-        if @commandForName name
-            @startCommand name
+        if @commandForName args.command           
+            @startCommand args.command    
             return
                 
         'unhandled'
