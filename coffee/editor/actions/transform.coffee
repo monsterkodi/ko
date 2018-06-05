@@ -274,7 +274,7 @@ module.exports =
 
     actions:
 
-        menu: "Edit"
+        menu: "Misc"
 
         toggleCase:
             name:  'Toggle Case'

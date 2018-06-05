@@ -6,7 +6,7 @@
 000   000  00000000  000   000   0000000 
 ###
 
-{ fileList, slash, fs, log, _ } = require 'kxk'
+{ fileList, post, slash, fs, log, _ } = require 'kxk'
 
 Syntax    = require '../editor/syntax'
 Transform = require '../editor/actions/transform'
@@ -53,7 +53,6 @@ menu = (template) ->
     
     editMenu = getMenu template, 'Edit'
     editMenu.menu = editMenu.menu.concat EditMenu
-    log 'template', template
     
     MacroMenu = [ text:'Macro', accel:'ctrl+m', action:'macro' ]
     for macro in Macro.macroNames
@@ -62,7 +61,8 @@ menu = (template) ->
             actarg: macro
             action: 'doMacro'
 
-    log MacroMenu
+    commandMenu = getMenu template, 'Command'
+    commandMenu.menu = commandMenu.menu.concat text:'Macro', menu:MacroMenu
 
     TransformMenu = []
     for transformMenu, transformList of Transform.Transform.transformMenus
@@ -77,7 +77,7 @@ menu = (template) ->
             text: transformMenu
             menu: transformSubmenu
 
-    log TransformMenu
+    editMenu.menu = editMenu.menu.concat text:'Transform', menu:TransformMenu
 
     fileSpan = (f) ->
         if f?
@@ -107,10 +107,10 @@ menu = (template) ->
             # cb: ->
             #     state.set 'recentFiles', []
             #     window.mainmenu.loadMenu()
-
-    log RecentMenu
+        fileMenu = getMenu template, 'File'
+        fileMenu.menu = [{text:'Recent', menu: RecentMenu}, {text:''}].concat fileMenu.menu
     
-    
+    # log 'template', template    
     template
 
 module.exports = menu

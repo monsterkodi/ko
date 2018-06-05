@@ -280,10 +280,11 @@ class Commandline extends TextEditor
 
     handleMenuAction: (name, args) ->
         
-        if @commandForName args.command           
-            @startCommand args.command    
-            return
-                
+        log 'handleMenuAction', name, args
+        if args?.command
+            if @commandForName args.command           
+                @startCommand args.command    
+                return
         'unhandled'
     
     globalModKeyComboEvent: (mod, key, combo, event) ->

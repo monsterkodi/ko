@@ -46,6 +46,7 @@ class Goto extends Command
         
         files = post.get 'indexer', 'files'
         funcs = files[window.editor.currentFile]?.funcs
+        funcs ?= []
         
         for func in funcs
             items.push text: func.name, line:'▸', clss:'method'
