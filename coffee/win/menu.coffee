@@ -6,118 +6,119 @@
 000   000  00000000  000   000   0000000 
 ###
 
+{ fileList, slash, fs, log, _ } = require 'kxk'
+
+Syntax    = require '../editor/syntax'
+Transform = require '../editor/actions/transform'
+Macro     = require '../commands/macro'
+
+getMenu = (template, name) ->
+    
+    for item in template
+        if item.text == name
+            return item
+
+menu = (template) ->
+        
+    template = _.cloneDeep template
+        
+    actionFiles = fileList slash.join __dirname, '../editor/actions'
+    submenu = Misc: []
+
+    EditMenu = []
+    for actionFile in actionFiles
+        continue if slash.ext(actionFile) not in ['js', 'coffee']
+        actions = require actionFile
+        for key,value of actions
+            menuName = 'Misc'
+            if key == 'actions'
+                if value['menu']?
+                    menuName = value['menu']
+                    submenu[menuName] ?= []
+                for k,v of value
+                    if v.name and v.combo
+                        menuAction = (c) -> (i,win) -> post.toWin win.id, 'menuAction', c
+                        item = 
+                            text:   v.name
+                            accel:  v.accel ? v.combo
+                        if v.menu?
+                            submenu[v.menu] ?= []
+                        if v.separator
+                            submenu[v.menu ? menuName].push text: ''
+                        submenu[v.menu ? menuName].push item
+                submenu[menuName].push text: ''
+
+    for key, menu of submenu
+        EditMenu.push text:key, menu:menu
+    
+    editMenu = getMenu template, 'Edit'
+    editMenu.menu = editMenu.menu.concat EditMenu
+    log 'template', template
+    
+    MacroMenu = [ text:'Macro', accel:'ctrl+m', action:'macro' ]
+    for macro in Macro.macroNames
+        MacroMenu.push
+            text:   macro
+            actarg: macro
+            action: 'doMacro'
+
+    log MacroMenu
+
+    TransformMenu = []
+    for transformMenu, transformList of Transform.Transform.transformMenus
+        transformSubmenu = []
+        for transform in transformList
+            transformSubmenu.push
+                text:   transform
+                actarg: transform
+                action: 'doTransform'
+
+        TransformMenu.push
+            text: transformMenu
+            menu: transformSubmenu
+
+    log TransformMenu
+
+    fileSpan = (f) ->
+        if f?
+            span  = Syntax.spanForTextAndSyntax slash.tilde(slash.dir(f)), 'browser'
+            span += Syntax.spanForTextAndSyntax '/' + slash.base(f), 'browser'
+        return span
+
+    RecentMenu = []
+    
+    recent = window.state?.get 'recentFiles', []
+    log window.state?, recent?
+    recent ?= []
+    for f in recent
+        if fs.existsSync f
+
+            RecentMenu.unshift
+                # text: fileLabel f
+                html: fileSpan f
+                arg: f
+                cb: (arg) -> post.emit 'newTabWithFile', arg
+
+    if RecentMenu.length
+        RecentMenu.push
+            text: ''
+        RecentMenu.push
+            text: 'Clear List'
+            # cb: ->
+            #     state.set 'recentFiles', []
+            #     window.mainmenu.loadMenu()
+
+    log RecentMenu
+    
+    
+    template
+
+module.exports = menu
+
 # Syntax    = require '../editor/syntax'
 # Transform = require '../editor/actions/transform'
 # Macro     = require '../commands/macro'
 # 
-# class Menu
-# 
-#     @template: ->
-# 
-#         EditMenu = [
-#                 text: 'Undo',   accel: 'ctrl+z'
-#             ,
-#                 text: 'Redo',   accel: 'ctrl+shift+z'
-#             ,
-#                 text: ''
-#             ,
-#                 text: 'Cut',    accel: 'ctrl+x'
-#             ,
-#                 text: 'Copy',   accel: 'ctrl+c'
-#             ,
-#                 text: 'Paste',  accel: 'ctrl+v'
-#             ,
-#                 text: ''
-#             ]
-# 
-#         actionFiles = fileList slash.join __dirname, '../editor/actions'
-#         submenu = Misc: []
-# 
-#         for actionFile in actionFiles
-#             continue if slash.ext(actionFile) not in ['js', 'coffee']
-#             actions = require actionFile
-#             for key,value of actions
-#                 menuName = 'Misc'
-#                 if key == 'actions'
-#                     if value['menu']?
-#                         menuName = value['menu']
-#                         submenu[menuName] ?= []
-#                     for k,v of value
-#                         if v.name and v.combo
-#                             menuAction = (c) -> (i,win) -> post.toWin win.id, 'menuAction', c
-#                             item = 
-#                                 text:   v.name
-#                                 accel:  v.accel ? v.combo
-#                             if v.menu?
-#                                 submenu[v.menu] ?= []
-#                             if v.separator
-#                                 submenu[v.menu ? menuName].push text: ''
-#                             submenu[v.menu ? menuName].push item
-#                     submenu[menuName].push text: ''
-# 
-#         for key, menu of submenu
-#             EditMenu.push text:key, menu:menu
-# 
-#         MacroMenu = [ text:'Macro', accel:'ctrl+m', action:'macro' ]
-#         for macro in Macro.macroNames
-#             MacroMenu.push
-#                 text:   macro
-#                 actarg: macro
-#                 action: 'doMacro'
-# 
-#         TransformMenu = []
-#         for transformMenu, transformList of Transform.Transform.transformMenus
-#             transformSubmenu = []
-#             for transform in transformList
-#                 transformSubmenu.push
-#                     text:   transform
-#                     actarg: transform
-#                     action: 'doTransform'
-# 
-#             TransformMenu.push
-#                 text: transformMenu
-#                 menu: transformSubmenu
-# 
-#         fileSpan = (f) ->
-#             if f?
-#                 span  = Syntax.spanForTextAndSyntax slash.tilde(slash.dir(f)), 'browser'
-#                 span += Syntax.spanForTextAndSyntax '/' + slash.base(f), 'browser'
-#             return span
-# 
-#         RecentMenu = []
-#         for f in state.get 'recentFiles', []
-#             if fs.existsSync f
-# 
-#                 RecentMenu.unshift
-#                     # text: fileLabel f
-#                     html: fileSpan f
-#                     arg: f
-#                     cb: (arg) -> post.emit 'newTabWithFile', arg
-# 
-#         if RecentMenu.length
-#             RecentMenu.push
-#                 text: ''
-#             RecentMenu.push
-#                 text: 'Clear List'
-#                 cb: ->
-#                     state.set 'recentFiles', []
-#                     window.mainmenu.loadMenu()
-# 
-
-
-
-
-        #     ,
-        #         text:   'Open Recent',                  menu:   RecentMenu
-        #     ,
-        #         text:   ''
-        # 
-        #     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000
-        #     # 000       000   000  000   000  000   000  000   000  0000  000  000   000
-        #     # 000       000   000  000000000  000000000  000000000  000 0 000  000   000
-        #     # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
-        #     #  0000000   0000000   000   000  000   000  000   000  000   000  0000000
-        # 
         #     text: 'Command'
         #     menu: [
         # 

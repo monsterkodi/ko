@@ -9,12 +9,15 @@
 { win, stopEvent, fileList, keyinfo, atomic, prefs, state, stash, first, reversed, childp, 
   drag, noon, post, slash, clamp, pos, str, sw, sh, os, fs, empty, log, error, _ } = require 'kxk'
 
+menu = require './menu'
+
 w = new win 
     dir:    __dirname
     pkg:    require '../../package.json'
     menu:   '../../coffee/menu.noon'
     icon:   '../../img/menu@2x.png'
     scheme: false
+    menuTemplate: menu
   
 Split       = require './split'
 Terminal    = require './terminal'
