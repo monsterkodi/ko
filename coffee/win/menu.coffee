@@ -91,7 +91,7 @@ menu = (template) ->
     recent ?= []
     for f in recent
         if fs.existsSync f
-
+            log 'fileSpan', fileSpan f
             RecentMenu.unshift
                 # text: fileLabel f
                 html: fileSpan f
@@ -109,50 +109,7 @@ menu = (template) ->
         fileMenu = getMenu template, 'File'
         fileMenu.menu = [{text:'Recent', menu: RecentMenu}, {text:''}].concat fileMenu.menu
     
-    # log 'template', template    
     template
 
 module.exports = menu
 
-        # 
-        #         text:   'Terminal'
-        #         menu:   [
-        #             text:   'Small',                    accel:  'ctrl+,',       action: 'term'
-        #         ,
-        #             text:   'Large',                    accel:  'alt+,',        action: 'Term'
-        #         ]
-        # 
-        #         text:   'Transform',    menu:   TransformMenu
-        #     ,
-        #         text:   'Goto',                         accel:  'ctrl+;',       action: 'goto'
-        #     ,
-        #         text:   'Build',                        accel:  'ctrl+b',       action: 'build'
-        #     ]
-        # ,
-        #     # 000   000  000  00000000  000   000
-        #     # 000   000  000  000       000 0 000
-        #     #  000 000   000  0000000   000000000
-        #     #    000     000  000       000   000
-        #     #     0      000  00000000  00     00
-        # 
-        # 
-        #         text:   'Font Size'
-        #         menu: [
-        #             text:   'Increase',                 accel:  'ctrl+=',   action: 'Font Size Increase'   
-        #         ,
-        #             text:   'Decrease',                 accel:  'ctrl+-',   action: 'Font Size Decrease'
-        #         ,
-        #             text:   'Reset',                    accel:  'ctrl+0',   action: 'Font Size Reset'
-        #         ]
-        #     ]
-        # ,
-    # constructor: ->
-    # 
-    #     post.on 'stash',   @stash
-    #     post.on 'restore', @restore
-            
-    # restore: => @toggle() if window.stash.get('menu') != @visible()
-    # stash:   => if @visible() then window.stash.set('menu', true) else window.stash.set 'menu'
-
-
-    
