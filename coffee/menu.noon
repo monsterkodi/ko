@@ -157,10 +157,10 @@ Command
     Terminal
         Small               
             accel           ctrl+,   
-            command         terminal
+            command         term
         Large               
             accel           alt+,  
-            command         Terminal  
+            command         Term
 
 # 000   000  000  00000000  000   000
 # 000   000  000  000       000 0 000

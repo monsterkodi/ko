@@ -63,6 +63,8 @@ class Macro extends Command
 
     execute: (command) ->
 
+        log 'macro.execute', command
+        
         command = super command
 
         editor  = window.editor

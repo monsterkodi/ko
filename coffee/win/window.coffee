@@ -22,6 +22,7 @@ w = new win
 Split       = require './split'
 Terminal    = require './terminal'
 Tabs        = require './tabs'
+Titlebar    = require './titlebar'
 LogView     = require './logview'
 Info        = require './info'
 Area        = require '../stage/area'
@@ -158,6 +159,7 @@ winMain = ->
     # 000  000   000  000     000
 
     tabs        = window.tabs        = new Tabs window.titlebar.elem
+    titlebar    =                      new Titlebar
     navigate    = window.navigate    = new Navigate()
     split       = window.split       = new Split()
     terminal    = window.terminal    = new Terminal 'terminal'
@@ -625,7 +627,7 @@ onMenuAction = (name, args) ->
             
     switch name
 
-        when 'doMacro'               then return window.commandline.commands.macro.execute args
+        when 'doMacro'               then return window.commandline.commands.macro.execute args.actarg
         when 'Undo'                  then return @window.focusEditor.do.undo()
         when 'Redo'                  then return @window.focusEditor.do.redo()
         when 'Cut'                   then return @window.focusEditor.cut()
@@ -634,9 +636,9 @@ onMenuAction = (name, args) ->
         when 'New Tab'               then return post.emit 'newEmptyTab'
         when 'Toggle Scheme'         then return scheme.toggle()
         when 'Toggle Center Text'    then return toggleCenterText()
-        when 'Font Size Increase'    then return changeFontSize +1
-        when 'Font Size Decrease'    then return changeFontSize -1
-        when 'Font Size Reset'       then return resetFontSize()
+        when 'Increase'              then return changeFontSize +1
+        when 'Decrease'              then return changeFontSize -1
+        when 'Reset'                 then return resetFontSize()
         when 'Open Window List'      then return titlebar.showList()
         when 'Navigate Backward'     then return navigate.backward()
         when 'Navigate Forward'      then return navigate.forward()

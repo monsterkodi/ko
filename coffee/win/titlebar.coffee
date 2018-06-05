@@ -6,19 +6,13 @@
    000     000     000     0000000  00000000  0000000    000   000  000   000
 ###
 
-{ stopEvent, elem, slash, post, log, $ } = require 'kxk'
-
-render = require '../editor/render'
-syntax = require '../editor/syntax'
-Tabs   = require './tabs'
-mini   = require '../test/mini'
+{ stopEvent, elem, post, log, $ } = require 'kxk'
 
 class Titlebar
     
-    constructor: () ->
+    constructor: ->
 
         @elem =$ 'titlebar'
-        @elem.ondblclick = (event) -> post.toMain 'maximizeWindow', window.winID
         @selected = -1
         
         document.body.addEventListener 'focusout', @closeList
@@ -37,32 +31,6 @@ class Titlebar
         post.on 'sticky',   @onSticky
         post.on 'dirty',    @onDirty
         post.on 'file',     @onFile
-
-        @winicon = elem class: 'winicon'
-        @winicon.appendChild elem 'img', src:slash.fileUrl __dirname + '/../../img/menu@2x.png'
-        @elem.appendChild @winicon
-        @winicon.addEventListener 'click', -> post.emit 'menuAction', 'Toggle Menu'   
-        
-        @tabs = new Tabs @elem
-                
-        @winnum = elem class: 'winnum'
-        @elem.appendChild @winnum
-        @winnum.addEventListener 'click', @showList
-        
-        @minimize = elem class: 'winclose gray'
-        @elem.appendChild @minimize
-        @minimize.appendChild elem 'img', src:slash.fileUrl __dirname + '/../../img/minimize.png'
-        @minimize.addEventListener 'click', -> post.emit 'menuAction', 'Minimize'
-
-        @maximize = elem class: 'winclose gray'
-        @elem.appendChild @maximize
-        @maximize.appendChild elem 'img', src:slash.fileUrl __dirname + '/../../img/maximize.png'
-        @maximize.addEventListener 'click', -> post.emit 'menuAction', 'Maximize'
-        
-        @close = elem class: 'winclose'
-        @elem.appendChild @close
-        @close.appendChild elem 'img', src:slash.fileUrl __dirname + '/../../img/close.png'
-        @close.addEventListener 'click', -> post.emit 'menuAction', 'Close Window'
         
     onNumWins: (numWins) => 
         if @info.numWins != numWins
@@ -98,18 +66,9 @@ class Titlebar
     update: ->
 
         s = @info.sticky and "○" or ''
-        @elem.classList.toggle 'focus', @info.focus
-        if @info.numWins > 1
-            @winnum.innerHTML = @info.numWins
-            @winnum.style.display = 'unset'
-            @elem.classList.add 'tight'
-        else
-            @winnum.style.display = 'none'
-            @winnum.innerHTML = ''
-            @elem.classList.remove 'tight'
-            
-        @tabs.activeTab()?.update @info
-        @tabs.update()
+        @elem.classList.toggle 'focus', @info.focus            
+        window.tabs.activeTab()?.update @info
+        window.tabs.update()
 
     # 000      000   0000000  000000000
     # 000      000  000          000   
@@ -118,11 +77,7 @@ class Titlebar
     # 0000000  000  0000000      000   
     
     showList: (event) => 
-        
-        mini 0
-        mini 10
-        mini 100
-        
+                
         return if @list?
         winInfos = post.get 'winInfos'
         return if winInfos.length <= 1
@@ -210,8 +165,8 @@ class Titlebar
     globalModKeyComboEvent: (mod, key, combo, event) ->
 
         switch combo
-            when 'command+alt+left', 'command+alt+right' then return @tabs.navigate key
-            when 'command+alt+shift+left', 'command+alt+shift+right' then return @tabs.move key
+            when 'command+alt+left', 'command+alt+right' then return winow.tabs.navigate key
+            when 'command+alt+shift+left', 'command+alt+shift+right' then return window.tabs.move key
 
         if @list?
             switch combo
