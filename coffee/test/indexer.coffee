@@ -9,8 +9,8 @@
 
 { expect, should } = require 'chai'
 
-assert  = require 'assert'
-Indexer = require '../main/indexer'
+assert   = require 'assert'
+Indexer  = require '../main/indexer'
 IndexHpp = require '../main/indexhpp'
 
 should()

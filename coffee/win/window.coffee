@@ -379,8 +379,10 @@ loadFile = (file, opt={}) ->
 
             addToRecent file
 
-            if tab = tabs.tab file
-                tab.setActive()
+            tab = tabs.tab file
+            if empty tab
+                tab = tabs.addTab file
+            tab.setActive()
 
             editor.setCurrentFile file, opt
 
@@ -628,11 +630,11 @@ onMenuAction = (name, args) ->
     switch name
 
         when 'doMacro'               then return window.commandline.commands.macro.execute args.actarg
-        when 'Undo'                  then return @window.focusEditor.do.undo()
-        when 'Redo'                  then return @window.focusEditor.do.redo()
-        when 'Cut'                   then return @window.focusEditor.cut()
-        when 'Copy'                  then return @window.focusEditor.copy()
-        when 'Paste'                 then return @window.focusEditor.paste()
+        when 'Undo'                  then return window.focusEditor.do.undo()
+        when 'Redo'                  then return window.focusEditor.do.redo()
+        when 'Cut'                   then return window.focusEditor.cut()
+        when 'Copy'                  then return window.focusEditor.copy()
+        when 'Paste'                 then return window.focusEditor.paste()
         when 'New Tab'               then return post.emit 'newEmptyTab'
         when 'Toggle Scheme'         then return scheme.toggle()
         when 'Toggle Center Text'    then return toggleCenterText()

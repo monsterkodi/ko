@@ -6,7 +6,7 @@
    000     000   000  0000000    0000000 
 ###
 
-{ post, elem, drag, slash, error, log, $, _ } = require 'kxk'
+{ post, elem, drag, slash, empty, error, log, $, _ } = require 'kxk'
 
 Tab = require './tab'
 
@@ -21,8 +21,8 @@ class Tabs
         
         @div.addEventListener 'click',     @onClick
         
-        @tabs.push new Tab @
-        @tabs[0].setActive()
+        # @tabs.push new Tab @
+        # @tabs[0].setActive()
         
         @drag = new drag
             target: @div
@@ -192,6 +192,8 @@ class Tabs
         
     onNewTabWithFile: (file) =>
         
+        log 'onNewTabWithFile', file
+        
         [file, line, col] = slash.splitFileLine file
         
         if tab = @tab file
@@ -243,13 +245,14 @@ class Tabs
 
         window.stash.set 'tabs', 
             files:  ( t.file() for t in @tabs )
-            active: @activeTab().index()
+            active: @activeTab()?.index()
     
     restore: =>
         
         active = window.stash.get 'tabs:active', 0
         files  = window.stash.get 'tabs:files'
-        return if _.isEmpty files # happens when first window opens
+        
+        return if empty files # happens when first window opens
         
         @tabs[0].update file: files.shift()
         while files.length
@@ -271,6 +274,8 @@ class Tabs
 
         @stash()
 
+        return if empty @tabs
+        
         pkg = @tabs[0].info.pkg
         @tabs[0].showPkg()
         for tab in @tabs.slice 1

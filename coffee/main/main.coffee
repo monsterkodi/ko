@@ -6,7 +6,7 @@
 000   000  000   000  000  000   000
 ###
 
-{ app, args, udp, fileList, first, colors, about, prefs, state, store, noon, post, slash, os, fs, str, empty, error, log, _ } = require 'kxk'
+{ app, args, udp, fileList, first, colors, about, prefs, state, store, noon, post, slash, os, fs, str, empty, valid, error, log, _ } = require 'kxk'
 
 pkg = require '../../package.json'
 electron = require 'electron'
@@ -160,7 +160,7 @@ class Main extends app
         if process.cwd() == '/'
             process.chdir slash.resolve '~'
             
-        while args.filelist.length and slash.dirExists first args.filelist
+        while valid(args.filelist) and slash.dirExists first args.filelist
             process.chdir args.filelist.shift()
         
         if args.verbose
@@ -192,7 +192,7 @@ class Main extends app
 
         # electron.globalShortcut.register prefs.get('shortcut'), @toggleWindows
 
-        if not openFiles.length and args.filelist.length
+        if not openFiles.length and valid args.filelist
             openFiles = fileList args.filelist, ignoreHidden:false
 
         @moveWindowStashes()
