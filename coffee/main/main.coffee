@@ -436,6 +436,7 @@ class Main extends app
 
     moveWindowStashes: ->
 
+        log 'moveWindowStashes'
         userData = slash.path electron.app.getPath 'userData'
         stashDir = slash.join userData, 'win'
         if slash.dirExists stashDir
@@ -443,6 +444,7 @@ class Main extends app
 
     restoreWindows: ->
 
+        log 'restoreWindows'
         userData = slash.path electron.app.getPath 'userData'
         fs.ensureDirSync userData
         stashFiles = fileList slash.join(userData, 'old'), matchExt:'noon'

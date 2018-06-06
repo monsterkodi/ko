@@ -6,7 +6,7 @@
    000     00000000  000   000  000   000  000  000   000  000   000  0000000
 ###
 
-{ reversed, prefs, pos, popup, childp, empty, error, log, _  } = require 'kxk'
+{ reversed, stopEvent, prefs, pos, popup, childp, empty, error, log, _  } = require 'kxk'
 
 salt       = require '../tools/salt'
 TextEditor = require '../editor/texteditor'
