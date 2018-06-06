@@ -16,7 +16,6 @@ electron = require 'electron'
 Execute  = require './execute'
 Navigate = require './navigate'
 Indexer  = require './indexer'
-pug      = require 'pug'
 
 { BrowserWindow, Tray, clipboard, dialog } = electron
 
@@ -28,31 +27,6 @@ openFiles     = []
 WIN_SNAP_DIST = 150
 
 process.env.NODE_ENV = 'production' # ???
-
-#  0000000   00000000    0000000    0000000
-# 000   000  000   000  000        000
-# 000000000  0000000    000  0000  0000000
-# 000   000  000   000  000   000       000
-# 000   000  000   000   0000000   0000000
-
-# if slash.win() and slash.file(process.argv[0]) == 'ko.exe'
-    # ignoreArgs=1
-# else
-    # ignoreArgs=2
-
-# args  = args.init """
-
-    # filelist  files to open           **
-    # show      open window on startup  true
-    # prefs     show preferences        false
-    # noprefs   don't load preferences  false
-    # state     show state              false
-    # nostate   don't load state        false
-    # verbose   log more                false
-    # DevTools  open developer tools    false
-    # debug     |                       false
-
-# """, ignoreArgs:ignoreArgs
     
 mostRecentFile = -> first state.get 'recentFiles'
 
@@ -160,12 +134,6 @@ class Main extends app
         else
             ignoreArgs=2
         
-        # htmlFile  = slash.resolve "#{__dirname}/../#{scheme}.html"
-        # if not slash.fileExists htmlFile
-            # pugRender = pug.compileFile slash.path "#{__dirname}/../../pug/index.pug"
-            # html = pugRender scheme: scheme
-            # fs.writeFileSync htmlFile, html, 'utf8'
-            
         super
             dir:        __dirname
             pkg:        pkg
@@ -221,8 +189,6 @@ class Main extends app
         if not slash.win()
             tray = new Tray "#{__dirname}/../../img/menu.png"
             tray.on 'click', @toggleWindows
-
-        # app.setName pkg.productName
 
         # electron.globalShortcut.register prefs.get('shortcut'), @toggleWindows
 
@@ -610,7 +576,12 @@ class Main extends app
             @toggleWindows()
 
         if not activeWin()
-            visibleWins()[0]?.focus()
+            if win = visibleWins()[0]
+                wxw = require 'wxw'                
+                wxw.foreground slash.resolve process.argv[0]
+                win.focus()
+            else
+                log 'no visible win?'
             
     otherInstanceStarted: (args, dir) =>
 
@@ -706,8 +677,6 @@ electron.app.on 'window-all-closed', ->
     # if slash.win()
         # # log 'app.on window-all-closed'
         # app.quit()
-
-# electron.app.setName pkg.productName
 
 # 000   000  0000000    00000000     
 # 000   000  000   000  000   000    

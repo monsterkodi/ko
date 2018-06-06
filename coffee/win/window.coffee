@@ -616,11 +616,11 @@ onMenuAction = (name, args) ->
     if action = Editor.actionWithName name
         if action.key? and _.isFunction window.focusEditor[action.key]
             window.focusEditor[action.key] args.actarg
-            log 'handled by focus editor', name
+            # log 'handled by focus editor', name
             return
 
     if 'unhandled' != window.commandline.handleMenuAction name, args
-        log 'handled by commandline', name
+        # log 'handled by commandline', name
         return
 
     log 'onMenuAction', name, args
@@ -672,8 +672,7 @@ onMenuAction = (name, args) ->
     
     post.toMain 'menuAction', name, args
 
-post.on 'menuAction
-', onMenuAction
+post.on 'menuAction', onMenuAction
 
 # 000   000  00000000  000   000
 # 000  000   000        000 000

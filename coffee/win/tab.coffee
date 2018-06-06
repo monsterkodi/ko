@@ -99,8 +99,9 @@ class Tab
         sep = '■' if window.editor.newlineCharacters == '\r\n'
         @div.appendChild elem 'span', class:'dot', text:sep
         
-        sep = " ▸ "
-        @pkg = elem 'span', class:'pkg', text: @info.pkg and (@info.pkg + sep) or ''
+        # sep = " ▸ "
+        sep = "<span class='dot'>▸</span>"
+        @pkg = elem 'span', class:'pkg', html: @info.pkg and (@info.pkg + sep) or ''
         @div.appendChild @pkg
             
         diss = syntax.dissForTextAndSyntax slash.basename(@file()), 'ko' #, join: true 
