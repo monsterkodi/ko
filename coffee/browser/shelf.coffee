@@ -93,7 +93,6 @@ class Shelf extends Column
         
         @loadShelfItems()
         
-        log 'browserDidInitColumns', @showHistory
         @loadHistory() if @showHistory
         
     loadShelfItems: ->

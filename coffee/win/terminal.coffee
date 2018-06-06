@@ -19,7 +19,7 @@ class Terminal extends TextEditor
         
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Meta'], fontSize: 15
         
-        # @view.addEventListener "contextmenu", @onContextMenu
+        @view.addEventListener "contextmenu", @onContextMenu
         
         @metaQueue = []
         
@@ -164,7 +164,7 @@ class Terminal extends TextEditor
     # 000        000   000  000        000   000  000          
     # 000         0000000   000         0000000   000          
 
-    onContextMenu: (event) => @showContextMenu pos event
+    onContextMenu: (event) => stopEvent event, @showContextMenu pos event
               
     showContextMenu: (absPos) =>
         

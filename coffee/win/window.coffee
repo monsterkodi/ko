@@ -625,7 +625,7 @@ onMenuAction = (name, args) ->
         # log 'handled by commandline', name
         return
 
-    log 'onMenuAction', name, args
+    # log 'onMenuAction', name, args
             
     switch name
 

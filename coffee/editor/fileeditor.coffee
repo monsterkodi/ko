@@ -6,12 +6,11 @@
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
 
-{ popup, slash, empty, fs, setStyle, post, pos, error, log, str, _ } = require 'kxk'
+{ popup, stopEvent, setStyle, post, pos, slash, fs, empty, error, log, str, _ } = require 'kxk'
   
 srcmap     = require '../tools/srcmap'
 watcher    = require './watcher'
 TextEditor = require './texteditor'
-Menu       = require '../win/menu'
 syntax     = require './syntax'
 electron   = require 'electron'
 
@@ -35,7 +34,7 @@ class FileEditor extends TextEditor
         @currentFile = null
         @watch       = null
 
-        # @view.addEventListener "contextmenu", @onContextMenu
+        @view.addEventListener "contextmenu", @onContextMenu
         
         window.split.on 'commandline', @onCommandline
 
@@ -410,7 +409,7 @@ class FileEditor extends TextEditor
     # 000        000   000  000        000   000  000          
     # 000         0000000   000         0000000   000          
 
-    onContextMenu: (event) => @showContextMenu pos event
+    onContextMenu: (event) => stopEvent event, @showContextMenu pos event
               
     showContextMenu: (absPos) =>
         
@@ -449,8 +448,7 @@ class FileEditor extends TextEditor
             text:   ''        
         ]
         
-        mainMenu = Menu.template()
-        opt.items = opt.items.concat mainMenu
+        opt.items = opt.items.concat window.titlebar.menuTemplate()
         
         opt.x = absPos.x
         opt.y = absPos.y

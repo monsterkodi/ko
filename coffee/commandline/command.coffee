@@ -6,7 +6,7 @@
  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
 ###
 
-{ reversed, clamp, state, elem, error, log, _ } = require 'kxk'
+{ reversed, clamp, state, empty, elem, error, log, _ } = require 'kxk'
 
 syntax      = require '../editor/syntax'
 CommandList = require './commandlist'
@@ -57,6 +57,9 @@ class Command
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
         
     execute: (command) ->
+        
+        if empty command
+            return error 'no command!'
         
         if @commandList? 
             if 0 <= @selected < @commandList.numLines()

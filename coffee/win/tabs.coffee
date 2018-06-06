@@ -6,7 +6,7 @@
    000     000   000  0000000    0000000 
 ###
 
-{ post, elem, drag, slash, empty, error, log, $, _ } = require 'kxk'
+{ post, elem, drag, popup, stopEvent, slash, valid, empty, pos, error, log, $, _ } = require 'kxk'
 
 Tab = require './tab'
 
@@ -19,10 +19,8 @@ class Tabs
         
         titlebar.insertBefore @div, $ ".minimize"
         
-        @div.addEventListener 'click',     @onClick
-        
-        # @tabs.push new Tab @
-        # @tabs[0].setActive()
+        @div.addEventListener 'click',       @onClick
+        @div.addEventListener 'contextmenu', @onContextMenu
         
         @drag = new drag
             target: @div
@@ -87,9 +85,13 @@ class Tabs
     # 000   000  000   000  000   000  000   000  
     # 0000000    000   000  000   000   0000000   
     
-    onDragStart: (d, e) => 
+    onDragStart: (d, event) => 
         
-        @dragTab = @tab e.target
+        @dragTab = @tab event.target
+        
+        return 'skip' if empty @dragTab
+        return 'skip' if event.button != 1
+        
         @dragDiv = @dragTab.div.cloneNode true
         @dragTab.div.style.opacity = '0'
         br = @dragTab.div.getBoundingClientRect()
@@ -192,8 +194,6 @@ class Tabs
         
     onNewTabWithFile: (file) =>
         
-        log 'onNewTabWithFile', file
-        
         [file, line, col] = slash.splitFileLine file
         
         if tab = @tab file
@@ -254,7 +254,9 @@ class Tabs
         
         return if empty files # happens when first window opens
         
-        @tabs[0].update file: files.shift()
+        if valid @tabs
+            @tabs[0].update file: files.shift()
+            
         while files.length
             @addTab files.shift()
         
@@ -285,5 +287,33 @@ class Tabs
                 pkg = tab.info.pkg
                 tab.showPkg()
         @
+
+    #  0000000   0000000   000   000  000000000  00000000  000   000  000000000  
+    # 000       000   000  0000  000     000     000        000 000      000     
+    # 000       000   000  000 0 000     000     0000000     00000       000     
+    # 000       000   000  000  0000     000     000        000 000      000     
+    #  0000000   0000000   000   000     000     00000000  000   000     000     
+    
+    onContextMenu: (event) => stopEvent event, @showContextMenu pos event
+              
+    showContextMenu: (absPos) =>
+        
+        if tab = @tab event.target
+            tab.activate()
+            
+        if not absPos?
+            absPos = pos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
+        
+        opt = items: [ 
+            text:   'Close Other Tabs'
+            combo:  'ctrl+shift+w' 
+        ,
+            text:   'New Window'
+            combo:  'ctrl+shift+n' 
+        ]
+        
+        opt.x = absPos.x
+        opt.y = absPos.y
+        popup.menu opt        
         
 module.exports = Tabs

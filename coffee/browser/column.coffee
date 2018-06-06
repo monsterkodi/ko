@@ -40,7 +40,7 @@ class Column
         @div.addEventListener 'mouseup',   @onClick
         @div.addEventListener 'dblclick',  @onDblClick
         
-        # @div.addEventListener "contextmenu", @onContextMenu
+        @div.addEventListener "contextmenu", @onContextMenu
         
         @scroll = new Scroller @
         
@@ -382,7 +382,7 @@ class Column
     # 000        000   000  000        000   000  000          
     # 000         0000000   000         0000000   000          
         
-    onContextMenu: (event) => @showContextMenu pos event
+    onContextMenu: (event) => stopEvent event, @showContextMenu pos event
               
     showContextMenu: (absPos) =>
         

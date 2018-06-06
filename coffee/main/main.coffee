@@ -6,12 +6,10 @@
 000   000  000   000  000  000   000
 ###
 
-{ app, args, udp, fileList, first, colors, about, prefs, state, store, noon, post, slash, os, fs, str, empty, valid, error, log, _ } = require 'kxk'
+{ app, args, udp, stopEvent, fileList, first, colors, about, prefs, state, store, noon, post, slash, os, fs, str, empty, valid, error, log, _ } = require 'kxk'
 
-pkg = require '../../package.json'
+pkg      = require '../../package.json'
 electron = require 'electron'
-
-# post.debug?()
 
 Execute  = require './execute'
 Navigate = require './navigate'
@@ -156,7 +154,9 @@ class Main extends app
                 nostate   don't load state        false
                 verbose   log more                false
                 """
-                    
+               
+        log 'args', args
+                
         if process.cwd() == '/'
             process.chdir slash.resolve '~'
             
@@ -223,8 +223,8 @@ class Main extends app
             when 'Cycle Windows'    then @activateNextWindow arg
             when 'Arrange Windows'  then @arrangeWindows()
             when 'New Window'       then @createWindow()
-            else
-                log 'unhandled menuAction', action, arg
+            # else
+                # log 'unhandled menuAction', action, arg
             
     # 000   000  000  000   000  0000000     0000000   000   000   0000000
     # 000 0 000  000  0000  000  000   000  000   000  000 0 000  000

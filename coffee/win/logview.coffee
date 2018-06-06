@@ -6,7 +6,7 @@
 0000000   0000000    0000000       0      000  00000000  00     00
 ###
 
-{ popup, post, pos, log } = require 'kxk'
+{ stopEvent, popup, post, pos, log } = require 'kxk'
 
 electron   = require 'electron'
 TextEditor = require '../editor/texteditor'
@@ -17,7 +17,7 @@ class LogView extends TextEditor
         
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap'], fontSize: 12, syntaxName: 'logview'
         
-        # @view.addEventListener "contextmenu", @onContextMenu
+        @view.addEventListener "contextmenu", @onContextMenu
                 
         @setLines ['']
         
@@ -61,7 +61,7 @@ class LogView extends TextEditor
     # 000        000   000  000        000   000  000          
     # 000         0000000   000         0000000   000          
 
-    onContextMenu: (event) => @showContextMenu pos event
+    onContextMenu: (event) => stopEvent event, @showContextMenu pos event
               
     showContextMenu: (absPos) =>
         

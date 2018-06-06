@@ -6,7 +6,7 @@
 000   000  000   000   0000000  000   000   0000000
 ###
 
-{ fileList, colors, reversed, post, noon, slash, atomic, fs, error, log, _ } = require 'kxk'
+{ fileList, colors, reversed, post, noon, slash, atomic, fs, empty, error, log, _ } = require 'kxk'
   
 indexer   = require '../main/indexer'
 salt      = require '../tools/salt'
@@ -63,6 +63,8 @@ class Macro extends Command
 
     execute: (command) ->
 
+        return error 'no command!' if empty command
+        
         log 'macro.execute', command
         
         command = super command
