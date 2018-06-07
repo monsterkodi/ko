@@ -603,22 +603,4 @@ onMsg = (file) ->
     post.toWin first(visibleWins()).id, 'loadFiles', [file], newTab:true
 
 koReceiver = new udp port:9779, onMsg:onMsg
-
-process.on 'uncaughtException', (err) ->
-
-    # switch typeof err
-        # when "object"
-            # log err.message
-        # when "string"
-            # log err
-    
-    error 'main.uncaughtException'
-    error err.message ? err
-    
-    try # fancy log with source-mapped files and line numbers
-        sutil = require 'stack-utils'
-        stack = new sutil cwd: process.cwd(), internals: sutil.nodeInternals()
-        log stack.captureString()
-    catch err
-        error err.message ? err
     

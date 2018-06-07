@@ -27,9 +27,14 @@ toCoffee  = (jsFile, jsLine, jsCol=0) ->
     if slash.fileExists mapFile
         mapData = mapConvert.fromSource(fs.readFileSync mapFile, 'utf8').toObject()
         consumer = new sourceMap.SourceMapConsumer(mapData)
-        pos = consumer.originalPositionFor line:jsLine, column:jsCol, bias: sourceMap.SourceMapConsumer.LEAST_UPPER_BOUND
-        coffeeLine = pos.line
-        coffeeCol  = pos.column
+        if consumer.originalPositionFor
+            pos = consumer.originalPositionFor line:jsLine, column:jsCol, bias: sourceMap.SourceMapConsumer.LEAST_UPPER_BOUND
+            coffeeLine = pos.line
+            coffeeCol  = pos.column
+        else
+            log consumer
+            coffeeLine = null
+            coffeeCol  = null
     else
         coffeeLine = null
         coffeeCol  = null

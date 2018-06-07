@@ -260,7 +260,8 @@ class FileBrowser extends Browser
         @indexedFiles ?= {}
         @indexedFiles[file] = info
         
-        log 'onFileIndexed file', file, 'last', @lastUsedColumn()?.parent.file
+        # if @lastUsedColumn()?.parent.file
+            # log 'onFileIndexed file', file, 'last', @lastUsedColumn()?.parent.file
         if file == @activeColumn()?.activeRow()?.item.file
             @loadContent @activeColumn().activeRow(), column: @activeColumn().index+1
                 
