@@ -7,6 +7,7 @@
 
 (● )(.+)                  . class.marker . class
 (◆ )(.+)                  . static.method.marker . static.method
+(⬢ )(.+)                  . post.func.marker . post.func
 (▸ )(.+)                  . func.marker . func
 (⦿ )(.+)                  . class.member.marker . class.member
 (\d+\s+)(▫\s)             . arrayIndex . arrayDot

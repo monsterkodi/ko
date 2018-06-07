@@ -99,32 +99,12 @@ class Main extends app
 
     constructor: (openFiles) ->
 
-        # log 'Main.constructor'
-        # if app.makeSingleInstance @otherInstanceStarted
-            # log 'single instance'
-            # app.exit 0
-            # return
-        
         # 00000000   00000000   00000000  00000000   0000000
         # 000   000  000   000  000       000       000
         # 00000000   0000000    0000000   000000    0000000
         # 000        000   000  000       000            000
         # 000        000   000  00000000  000       0000000
         
-        # prefs.init 
-            # shortcut:               'CmdOrCtrl+F1'
-            # scheme:                 'dark'
-            # blink:                  true
-            # cursorBlinkDelay:       [800,200]
-            # recentFilesLength:      20
-            # navigateHistoryLength:  10
-            # editorFontSize:         19
-            # logviewFontSize:        14
-            # terminalFontSize:       16
-            # autoHideMenuBar:        true
-            # terminal:
-                # autoclear:          true
-                                
         { width, height } = electron.screen.getPrimaryDisplay().workAreaSize
         
         if slash.win() and slash.file(process.argv[0]) == 'ko.exe'
@@ -155,8 +135,6 @@ class Main extends app
                 verbose   log more                false
                 """
                
-        log 'args', args
-                
         if process.cwd() == '/'
             process.chdir slash.resolve '~'
             
@@ -436,7 +414,6 @@ class Main extends app
 
     moveWindowStashes: ->
 
-        log 'moveWindowStashes'
         userData = slash.path electron.app.getPath 'userData'
         stashDir = slash.join userData, 'win'
         if slash.dirExists stashDir
@@ -450,76 +427,9 @@ class Main extends app
         stashFiles = fileList slash.join(userData, 'old'), matchExt:'noon'
         if not empty stashFiles
             for file in stashFiles
-                @createWindow restore:file
-
-    #  0000000  00000000   00000000   0000000   000000000  00000000
-    # 000       000   000  000       000   000     000     000
-    # 000       0000000    0000000   000000000     000     0000000
-    # 000       000   000  000       000   000     000     000
-    #  0000000  000   000  00000000  000   000     000     00000000
-
-    # createWindowOld: (opt={}) ->
-
-        # log 'Main.createWindow opt:', opt
-
-        # { width, height } = @screenSize()
-        # ww = height + 122
-
-        # scheme  = prefs.get 'scheme'
-        # scheme ?= 'dark'
-
-        # cfg =
-            # x:                parseInt (width-ww)/2
-            # y:                0
-            # width:            ww
-            # height:           height
-            # minWidth:         140
-            # minHeight:        130
-            # useContentSize:   true
-            # fullscreenable:   true
-            # acceptFirstMouse: true
-            # show:             true
-            # hasShadow:        true
-            # transparent:      true
-            # frame:            false
-            # backgroundColor:  scheme == 'bright' and "#fff" or '#000'
-#             
-        # if slash.win()
-            # cfg.icon = slash.path __dirname + '/../img/ko.ico'
-
-        # win = new BrowserWindow cfg
-
-        # if opt.restore?
-            # newStash = slash.join electron.app.getPath('userData'), 'win', "#{win.id}.noon"
-            # fs.copySync opt.restore, newStash
-
-        # htmlFile  = slash.resolve "#{__dirname}/../#{scheme}.html"
-        # if not slash.fileExists htmlFile
-            # pugRender = pug.compileFile slash.path "#{__dirname}/../../pug/index.pug"
-            # html = pugRender scheme: scheme
-            # fs.writeFileSync htmlFile, html, 'utf8'
-
-        # win.loadURL slash.fileUrl htmlFile
-
-        # @showDock()
-
-        # win.on 'close',  @onCloseWin
-        # win.on 'resize', @onResizeWin
-
-        # winLoaded = ->
-
-            # if opt.files?
-                # post.toWin win.id, 'loadFiles', opt.files
-            # else if opt.file?
-                # post.toWin win.id, 'loadFile', opt.file
-            # else
-                # log 'createWindow.winLoaded no file to open?'
-
-            # post.toWins 'winLoaded', win.id
-            # post.toWins 'numWins', wins().length
-
-        # win.webContents.on 'did-finish-load', winLoaded
-        # win
+                win = @createWindow()
+                newStash = slash.join electron.app.getPath('userData'), 'win', "#{win.id}.noon"
+                fs.copySync file, newStash
 
     # 00000000   00000000   0000000  000  0000000  00000000
     # 000   000  000       000       000     000   000

@@ -124,9 +124,9 @@ class ObjectBrowser extends Browser
             key = '● '+clss
             items = [name: clss, text: '● '+clss, type:'class', file: clsso.file, line: clsso.line]
             
-            for mthd,mthdo of clsso.methods
+            for mthd,mthod of clsso.methods
                 
-                if mthdo.static
+                if mthod.static
                     text = '  ◆ '+mthd
                 else
                     text = '  ▸ '+mthd
@@ -135,8 +135,8 @@ class ObjectBrowser extends Browser
                     name: mthd
                     text: text
                     type:'method'
-                    file: mthdo.file
-                    line: mthdo.line
+                    file: mthod.file
+                    line: mthod.line
                 
             classes[key] =
                 _browse_items_:items          

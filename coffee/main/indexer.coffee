@@ -15,10 +15,13 @@ IndexHpp = require './indexhpp'
 
 class Indexer
 
+    # post.on 'combo', (combo, info) -> 
+    
     @requireRegExp   = /^\s*([\w\{\}]+)\s+=\s+require\s+[\'\"]([\.\/\w]+)[\'\"]/
     @includeRegExp   = /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
     @methodRegExp    = /^\s+([\@]?\w+)\s*\:\s*(\(.*\))?\s*[=-]\>/
     @funcRegExp      = /^\s*([\w\.]+)\s*[\:\=]\s*(\(.*\))?\s*[=-]\>/
+    @postRegExp      = /^\s*post\.on\s+[\'\"](\w+)[\'\"]\s*\,\s*(\(.*\))?\s*[=-]\>/
     @testRegExp      = /^\s*(describe|it)\s+[\'\"](.+)[\'\"]\s*[\,]\s*(\([^\)]*\))?\s*[=-]\>/
     @splitRegExp     = new RegExp "[^\\w\\d\\_]+", 'g'
     @classRegExp     = /^class\s+(\w+)/
@@ -39,14 +42,20 @@ class Indexer
         
     @funcNameInLine: (line) ->
 
-        m = line.match Indexer.funcRegExp
-        if m?
+        if m = line.match Indexer.funcRegExp
             rgs = matchr.ranges Indexer.funcRegExp, line
             if rgs[0].start > 7
                 return null
             
         m?[1]
-    
+
+    @postNameInLine: (line) ->        
+        
+        if m = line.match Indexer.postRegExp
+            rgs = matchr.ranges Indexer.postRegExp, line
+        
+        m?[1]
+        
     # 000000000  00000000   0000000  000000000  000   000   0000000   00000000   0000000    
     #    000     000       000          000     000 0 000  000   000  000   000  000   000  
     #    000     0000000   0000000      000     000000000  000   000  0000000    000   000  
@@ -389,6 +398,15 @@ class Indexer
                                 funcInfo = @addFuncInfo funcName,
                                     line: li+1
                                     file: file
+    
+                                funcStack.push [indent, funcInfo]
+                                funcAdded = true
+
+                            else if funcName = Indexer.postNameInLine line
+                                funcInfo = @addFuncInfo funcName,
+                                    line: li+1
+                                    file: file
+                                    post: true
     
                                 funcStack.push [indent, funcInfo]
                                 funcAdded = true

@@ -182,6 +182,9 @@ class Tabs
     
     addTab: (file) ->
 
+        if @tabs.length > 4
+            @closeTab @tabs[0]
+        
         tab = new Tab @
         tab.update file:file
         @tabs.push tab

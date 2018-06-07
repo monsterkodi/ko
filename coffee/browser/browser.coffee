@@ -269,6 +269,8 @@ class Browser extends Stage
                 text = '● '+func.name
             else if func.static
                 text = '  ◆ '+func.name
+            else if func.post
+                text = '  ⬢ '+func.name
             else
                 text = '  ▸ '+func.name
             items.push name: func.name, text:text, type:'func', file: file, line: func.line
