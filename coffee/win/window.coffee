@@ -6,8 +6,8 @@
 00     00  000  000   000  0000000     0000000   00     00
 ###
 
-{ win, stopEvent, fileList, keyinfo, atomic, prefs, state, stash, first, reversed, childp, 
-  drag, noon, post, slash, clamp, pos, str, sw, sh, os, fs, empty, log, error, _ } = require 'kxk'
+{ post, win, stopEvent, fileList, keyinfo, atomic, prefs, state, stash, first, reversed, childp, 
+  drag, noon, slash, clamp, pos, str, sw, sh, os, fs, empty, log, error, _ } = require 'kxk'
 
 menu = require './menu'
 

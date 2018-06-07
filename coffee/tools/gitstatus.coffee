@@ -6,17 +6,22 @@
  0000000   000     000     0000000      000     000   000     000      0000000   0000000   
 ###
 
-{ childp, slash, str, log, _ } = require 'kxk'
+{ childp, slash, str, error, log, _ } = require 'kxk'
 
 gitRoot = require './gitroot'
 
 gitStatus = (fileOrDir) ->
 
     # log 'gitStatus', fileOrDir
-    gitDir = slash.unslash gitRoot fileOrDir
+    root = gitRoot fileOrDir
+    if not root
+        # log 'no git:', fileOrDir
+        return
+        
+    gitDir = slash.unslash root
 
     if not gitDir? or not slash.isDir gitDir
-        log 'no git?', fileOrDir, gitDir
+        # log 'no git?', fileOrDir, gitDir
         return 
     
     result = childp.execSync 'git status --porcelain', 

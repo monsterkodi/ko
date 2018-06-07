@@ -113,7 +113,7 @@ class Indexer
                 words:   @words.length ? 0
                 dirs:    @dirs.length ? 0
         
-        log 'onGet', key, filter
+        # log 'onGet', key, filter
         
         value = @[key]
         if not empty filter

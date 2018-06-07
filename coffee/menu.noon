@@ -175,8 +175,8 @@ View
     Navigate Backward       ctrl+1
     Navigate Forward        ctrl+2
     --   
-    Activate Previous Tab   alt+ctrl+shift+left
-    Activate Next Tab       alt+ctrl+shift+right
+    Activate Previous Tab   alt+ctrl+shift+left ctrl+shift+tab
+    Activate Next Tab       alt+ctrl+shift+right ctrl+tab
     ---   
     Move Tab Left           alt+ctrl+shift+,
     Move Tab Right          alt+ctrl+shift+.

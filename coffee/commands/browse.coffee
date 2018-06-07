@@ -178,7 +178,6 @@ class Browse extends Command
                                                 
             if empty matches
                 @clearBrokenPartForFiles files
-                # @hideList()
                 return
 
             s = slash.tilde(path).length
@@ -258,8 +257,6 @@ class Browse extends Command
         
         @selected = clamp -1, @commandList?.numLines()-1, i
         
-        # log 'select', i, @selected
-        
         if @selected < 0
             log 'hideList'
             @hideList()
@@ -333,7 +330,7 @@ class Browse extends Command
             if item.type == 'dir' 
                 pth += '/'
                 if item.name == '..' and @browser.activeColumn()?.parent?.file
-                    # show current path instead of updir when .. item was acticated
+                    # show current path instead of updir when .. item was activated
                     pth = slash.tilde @browser.activeColumn()?.parent?.file
             
             @commandline.setText pth

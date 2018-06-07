@@ -65,6 +65,7 @@ class Browser extends Stage
     
     loadItems: (items, opt) ->
 
+        return if not @flex
         col = @emptyColumn opt?.column
         @clearColumnsFrom col.index
         col.setItems items, opt
@@ -79,7 +80,6 @@ class Browser extends Stage
             @focus()
             @lastUsedColumn()?.activeRow()?.setActive()            
             
-        # log 'popEmptyColumns'
         @popEmptyColumns relax:false
         @
 
@@ -193,6 +193,8 @@ class Browser extends Stage
         col
       
     addColumn: ->
+        
+        return if not @flex
         col = @newColumn()
         @flex.addPane div:col.div, size:50
         col
@@ -205,6 +207,7 @@ class Browser extends Stage
     
     popColumn: (opt) ->
         
+        return if not @flex
         @flex.popPane opt
         @columns.pop()
         
@@ -254,6 +257,9 @@ class Browser extends Stage
     loadSourceInfo: (info, opt) =>
         
         file = opt.item.file
+        
+        # log 'loadSourceInfo', opt
+        
         if file != @activeColumn()?.activePath()
             return
 
@@ -280,8 +286,16 @@ class Browser extends Stage
             opt.parent ?= opt.item
             @clearColumnsFrom opt.column
             @loadItems items, opt
+            if @focusOn
+                log 'loadSourceInfo loadItems focusOn', @focusOn
+                window.split.focus @focusOn
+                delete @focusOn
             true
         else
+            if @focusOn
+                log 'loadSourceInfo loadItems focusOn', @focusOn
+                window.split.focus @focusOn
+                delete @focusOn
             false
     
     loadSourceItem: (item, opt={}) ->

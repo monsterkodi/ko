@@ -6,7 +6,8 @@
 000   000  000   000  000  000   000
 ###
 
-{ app, args, udp, stopEvent, fileList, first, colors, about, prefs, state, store, noon, post, slash, os, fs, str, empty, valid, error, log, _ } = require 'kxk'
+{ post, app, args, udp, stopEvent, fileList, first, colors, about, prefs, 
+  state, store, noon, slash, os, fs, str, empty, valid, error, log, _ } = require 'kxk'
 
 pkg      = require '../../package.json'
 electron = require 'electron'
@@ -421,7 +422,6 @@ class Main extends app
 
     restoreWindows: ->
 
-        log 'restoreWindows'
         userData = slash.path electron.app.getPath 'userData'
         fs.ensureDirSync userData
         stashFiles = fileList slash.join(userData, 'old'), matchExt:'noon'
@@ -603,3 +603,22 @@ onMsg = (file) ->
     post.toWin first(visibleWins()).id, 'loadFiles', [file], newTab:true
 
 koReceiver = new udp port:9779, onMsg:onMsg
+
+process.on 'uncaughtException', (err) ->
+
+    # switch typeof err
+        # when "object"
+            # log err.message
+        # when "string"
+            # log err
+    
+    error 'main.uncaughtException'
+    error err.message ? err
+    
+    try # fancy log with source-mapped files and line numbers
+        sutil = require 'stack-utils'
+        stack = new sutil cwd: process.cwd(), internals: sutil.nodeInternals()
+        log stack.captureString()
+    catch err
+        error err.message ? err
+    

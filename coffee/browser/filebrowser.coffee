@@ -6,7 +6,7 @@
 000       000  0000000  00000000        0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 ###
 
-{ empty, elem, clamp, drag, post, clamp, state, slash, fs, os, error, log, $ } = require 'kxk'
+{ post, empty, elem, clamp, drag, clamp, state, slash, fs, os, error, log, $ } = require 'kxk'
   
 Browser  = require './browser'
 Shelf    = require './shelf'
@@ -27,6 +27,7 @@ class FileBrowser extends Browser
         post.on 'gitRefChanged',         @updateGitStatus
         post.on 'fileIndexed',           @onFileIndexed
         post.on 'sourceInfoForFile',     @loadSourceInfo
+        post.on 'file',                  @onFile
     
         @shelfResize = elem 'div', class: 'shelfResize'
         @shelfResize.style.position = 'absolute'
@@ -129,6 +130,12 @@ class FileBrowser extends Browser
         @skipJump = opt.dontJump
         @loadDir dir, opt
 
+    onFile: (file) =>
+        delete @focusOn
+        return if file == @lastUsedColumn()?.parent.file
+        log 'onFile', file, window.lastFocus, @lastUsedColumn()?.parent.file
+        @loadFile file, dontJump:true, focus:window.lastFocus
+        
     # 0000000    00000000    0000000   000   000   0000000  00000000  
     # 000   000  000   000  000   000  000 0 000  000       000       
     # 0000000    0000000    000   000  000000000  0000000   0000000   
@@ -231,9 +238,10 @@ class FileBrowser extends Browser
 
             @shelf.updateGitFiles files
             
-            for c in [0..@lastUsedColumn().index]
-                if column = @columns[c]
-                    column.updateGitFiles files
+            if @lastUsedColumn()
+                for c in [0..@lastUsedColumn().index]
+                    if column = @columns[c]
+                        column.updateGitFiles files
             
     updateGitStatus: (file) =>
         # log 'updateGitStatus', file, @lastUsedColumn().index
@@ -251,6 +259,8 @@ class FileBrowser extends Browser
         
         @indexedFiles ?= {}
         @indexedFiles[file] = info
+        
+        log 'onFileIndexed file', file, 'last', @lastUsedColumn()?.parent.file
         if file == @activeColumn()?.activeRow()?.item.file
             @loadContent @activeColumn().activeRow(), column: @activeColumn().index+1
                 
@@ -281,8 +291,14 @@ class FileBrowser extends Browser
                 else
                     col.focus()
                     
-            delete @navigateTargetOpt
+            if @navigateTargetOpt.focus
+                if @navigateTargetOpt.focus != 'shelf'
+                    @focusOn = @navigateTargetOpt.focus
+                    log 'focusOn', @focusOn
+                else
+                    delete @focusOn
             
+            delete @navigateTargetOpt
             @popEmptyColumns()
-    
+            
 module.exports = FileBrowser
