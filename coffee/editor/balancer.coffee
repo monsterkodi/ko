@@ -24,13 +24,13 @@ class Balancer
     setFileType: (fileType) ->
 
         lineComment = switch fileType
-            when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug', 'md' then '//'
+            when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug', 'md', 'rs' then '//'
             else '#'
 
         multiComment = switch fileType
-            when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug' then open: '/*',   close: '*/'
-            when 'html', 'md'                           then open: '<!--', close: '-->'
-            else                                             open: '###',  close: '###'
+            when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug', 'rs' then open: '/*',   close: '*/'
+            when 'html', 'md'                                 then open: '<!--', close: '-->'
+            else                                                   open: '###',  close: '###'
         
         @regions =
             # regexp:        clss: 'regexp',         open: '/',   close: '/'
