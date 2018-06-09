@@ -69,7 +69,7 @@ class Split extends event
     restore: => 
 
         if state = window.stash.get 'split'
-            log 'split.restore', window.stash.get 'split'
+            # log 'split.restore', window.stash.get 'split'
             @flex.restoreState state
             @emitSplit()
                 

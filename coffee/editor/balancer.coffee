@@ -100,7 +100,7 @@ class Balancer
         
         merged = []
         p = 0
-
+        
         addDiss = (start, end, force) =>
             
             slice = text.slice start, end

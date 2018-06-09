@@ -16,11 +16,10 @@ Execute  = require './execute'
 Navigate = require './navigate'
 Indexer  = require './indexer'
 
-{ BrowserWindow, Tray, clipboard, dialog } = electron
+{ BrowserWindow, clipboard, dialog } = electron
 
 disableSnap   = false
 main          = undefined # < created in app.on 'ready'
-tray          = undefined # < created in Main.constructor
 coffeeExecute = undefined # <
 openFiles     = []
 WIN_SNAP_DIST = 150
@@ -45,14 +44,6 @@ winWithID   = (winID) ->
     for w in wins()
         return w if w.id == wid
 
-# 0000000     0000000    0000000  000   000
-# 000   000  000   000  000       000  000
-# 000   000  000   000  000       0000000
-# 000   000  000   000  000       000  000
-# 0000000     0000000    0000000  000   000
-
-hideDock = -> app.hideDock()
-
 # 00000000    0000000    0000000  000000000
 # 000   000  000   000  000          000
 # 00000000   000   000  0000000      000
@@ -66,7 +57,7 @@ post.onGet 'logSync',   ->
     return true
 
 post.on 'restartShell',       (cfg)   -> winShells[cfg.winID].restartShell()
-post.on 'newWindowWithFile',  (file)  -> main.createWindow file:file
+post.on 'newWindowWithFile',  (file)  -> main.createWindowWithFile file:file
 post.on 'maximizeWindow',     (winID) -> main.toggleMaximize winWithID winID
 post.on 'activateWindow',     (winID) -> main.activateWindowWithID winID
 post.on 'activateNextWindow', (winID) -> main.activateNextWindow winID
@@ -100,14 +91,6 @@ class Main extends app
 
     constructor: (openFiles) ->
 
-        # 00000000   00000000   00000000  00000000   0000000
-        # 000   000  000   000  000       000       000
-        # 00000000   0000000    0000000   000000    0000000
-        # 000        000   000  000       000            000
-        # 000        000   000  00000000  000       0000000
-        
-        { width, height } = electron.screen.getPrimaryDisplay().workAreaSize
-        
         if slash.win() and slash.file(process.argv[0]) == 'ko.exe'
             ignoreArgs=1
         else
@@ -121,14 +104,14 @@ class Main extends app
             icon:       '../../img/app.ico'
             tray:       '../../img/menu@2x.png'
             about:      '../../img/about.png'
-            width:      height + 122
-            height:     height
+            onShow:     -> main.onShow()
+            width:      1000
+            height:     1000
             minWidth:   240
             minHeight:  230
             argsOpt:    ignoreArgs:ignoreArgs
             args: """
                 filelist  files to open           **
-                show      open window on startup  true
                 prefs     show preferences        false
                 noprefs   don't load preferences  false
                 state     show state              false
@@ -167,29 +150,32 @@ class Main extends app
         @indexer      = new Indexer
         coffeeExecute = new Execute main: @
 
-        if not slash.win()
-            tray = new Tray "#{__dirname}/../../img/menu.png"
-            tray.on 'click', @toggleWindows
-
-        # electron.globalShortcut.register prefs.get('shortcut'), @toggleWindows
-
         if not openFiles.length and valid args.filelist
             openFiles = fileList args.filelist, ignoreHidden:false
 
         @moveWindowStashes()
+        
+        @openFiles = openFiles
 
-        if openFiles.length
-            for file in openFiles
-                @createWindow file:file
+    #  0000000   000   000   0000000  000   000   0000000   000   000  
+    # 000   000  0000  000  000       000   000  000   000  000 0 000  
+    # 000   000  000 0 000  0000000   000000000  000   000  000000000  
+    # 000   000  000  0000       000  000   000  000   000  000   000  
+    #  0000000   000   000  0000000   000   000   0000000   00     00  
+    
+    onShow: =>
+
+        if valid @openFiles
+            log 'onShow @openFiles', @openFiles
+            for file in @openFiles
+                @createWindowWithFile file:file
+            delete @openFiles
         else
             @restoreWindows() if not args.nostate
-
+        
         if not wins().length
-            if args.show
-                w = @createWindow file:mostRecentFile()
-
-        if args.DevTools
-            wins()?[0]?.webContents.openDevTools()
+            log 'onShow fallback to mostRecentFile:', mostRecentFile()
+            @createWindowWithFile file:mostRecentFile()
 
     #  0000000    0000000  000000000  000   0000000   000   000  
     # 000   000  000          000     000  000   000  0000  000  
@@ -200,7 +186,6 @@ class Main extends app
     onMenuAction: (action, arg) =>
         
         switch action
-            # when 'Quit'             then @quit()
             when 'Cycle Windows'    then @activateNextWindow arg
             when 'Arrange Windows'  then @arrangeWindows()
             when 'New Window'       then @createWindow()
@@ -218,6 +203,13 @@ class Main extends app
     activeWin:   activeWin
     visibleWins: visibleWins
 
+    createWindowWithFile: (opt) ->
+        
+        win = @createWindow()
+        log 'openFile in win #{win.id}', opt.file
+        post.toWin win.id, 'openFile', opt.file
+        win
+    
     saveBounds: => #log 'saveBounds'
     
     toggleMaximize: (win) ->
@@ -246,7 +238,7 @@ class Main extends app
 
         for w in wins()
             w.hide()
-            hideDock()
+            @hideDock()
         @
 
     showWindows: ->
@@ -301,17 +293,21 @@ class Main extends app
 
     closeOtherWindows: =>
 
+        log 'closeOtherWindows'
         for w in wins()
             if w != activeWin()
                 @closeWindow w
 
-    closeWindow: (w) -> w?.close()
+    closeWindow: (w) -> 
+        log 'closeWindow'
+        w?.close()
 
     closeWindows: =>
 
+        log 'closeWindows'
         for w in wins()
             @closeWindow w
-        hideDock()
+        @hideDock()
 
     postDelayedNumWins: ->
 
@@ -329,6 +325,7 @@ class Main extends app
     screenSize: -> electron.screen.getPrimaryDisplay().workAreaSize
 
     stackWindows: ->
+        
         {width, height} = @screenSize()
         ww = height + 122
         wl = visibleWins()
@@ -342,6 +339,7 @@ class Main extends app
         activeWin().show()
 
     windowsAreStacked: ->
+        
         wl = visibleWins()
         w.setFullScreen false for w in wl
         return false if not wl.length
@@ -424,13 +422,15 @@ class Main extends app
 
     restoreWindows: ->
 
-        userData = slash.path electron.app.getPath 'userData'
-        fs.ensureDirSync userData
-        stashFiles = fileList slash.join(userData, 'old'), matchExt:'noon'
+        log 'restoreWindows', @userData
+        # userData = slash.path electron.app.getPath 'userData'
+        fs.ensureDirSync @userData
+        stashFiles = fileList slash.join(@userData, 'old'), matchExt:'noon'
         if not empty stashFiles
+            log 'stashFiles', stashFiles
             for file in stashFiles
                 win = @createWindow()
-                newStash = slash.join electron.app.getPath('userData'), 'win', "#{win.id}.noon"
+                newStash = slash.join @userData, 'win', "#{win.id}.noon"
                 fs.copySync file, newStash
 
     # 00000000   00000000   0000000  000  0000000  00000000
@@ -474,7 +474,7 @@ class Main extends app
                 @quit()
                 return
             else
-                hideDock()
+                @hideDock()
         post.toAll 'winClosed', wid
         @postDelayedNumWins()
 
@@ -573,16 +573,17 @@ electron.app.on 'open-file', (event, file) ->
     if not main?
         openFiles.push file
     else
-        main.createWindow file:file
+        main.createWindowWithFile file:file
         
     event.preventDefault()
 
-electron.app.on 'ready', ->
+# electron.app.on 'ready', ->
 
-    main          = new Main openFiles
-    main.navigate = new Navigate main
+    # main          = new Main openFiles
+    # main.navigate = new Navigate main
 
 electron.app.on 'window-all-closed', ->
+    log 'window-all-closed'
     # if slash.win()
         # # log 'app.on window-all-closed'
         # app.quit()
@@ -600,4 +601,7 @@ onMsg = (file) ->
     post.toWin first(visibleWins()).id, 'loadFiles', [file], newTab:true
 
 koReceiver = new udp port:9779, onMsg:onMsg
+
+main          = new Main openFiles
+main.navigate = new Navigate main
     

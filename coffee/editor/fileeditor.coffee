@@ -137,7 +137,7 @@ class FileEditor extends TextEditor
                 ext = slash.ext @currentFile
                 if ext in syntax.syntaxNames
                     return ext
-        else
+        else if fileType
             return fileType
             
         super()

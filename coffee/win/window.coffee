@@ -84,7 +84,7 @@ addToRecent = (file) ->
     return if file == first recent
     _.pull recent, file
     recent.unshift file
-    while recent.length > prefs.get 'recentFilesLength', 20
+    while recent.length > prefs.get 'recentFilesLength', 15
         recent.pop()
 
     state.set 'recentFiles', recent
@@ -660,9 +660,8 @@ onMenuAction = (name, args) ->
         when 'Reload Window'         then return reloadWin()
         when 'Close Tab or Window'   then return post.emit 'closeTabOrWindow'
         when 'Close Other Tabs'      then return post.emit 'closeOtherTabs'
-        # when 'Close Window'          then return post.emit 'closeWindow'
         when 'Fullscreen'            then return win.setFullScreen !win.isFullScreen()
-        
+        when 'Clear List'            then return state.set 'recentFiles', []
         when 'Preferences'           
             # log 'prefs.store.file', prefs.store.file
             return openFiles [prefs.store.file], newTab:true
@@ -670,7 +669,7 @@ onMenuAction = (name, args) ->
     switch name
         when 'Cycle Windows' then args = winID
     
-    log "unhandled menu action! ------------ posting to main '#{name}' args: #{args}"
+    log "unhandled menu action! posting to main '#{name}' args: #{args}"
     
     post.toMain 'menuAction', name, args
 

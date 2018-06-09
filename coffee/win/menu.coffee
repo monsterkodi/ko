@@ -91,9 +91,7 @@ menu = (template) ->
     recent ?= []
     for f in recent
         if fs.existsSync f
-            # log 'fileSpan', str.encode fileSpan f
             RecentMenu.unshift
-                # text: fileLabel f
                 html: fileSpan f
                 arg: f
                 cb: (arg) -> post.emit 'newTabWithFile', arg
@@ -103,9 +101,6 @@ menu = (template) ->
             text: ''
         RecentMenu.push
             text: 'Clear List'
-            # cb: ->
-            #     state.set 'recentFiles', []
-            #     window.mainmenu.loadMenu()
         fileMenu = getMenu template, 'File'
         fileMenu.menu = [{text:'Recent', menu: RecentMenu}, {text:''}].concat fileMenu.menu
     

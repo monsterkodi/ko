@@ -164,7 +164,8 @@ class Syntax
 
     @dissForTextAndSyntax: (text, n) ->
         
-        return error "no syntax? #{n}" if not n? or not Syntax.matchrConfigs[n]?
+        if not n? or not Syntax.matchrConfigs[n]?
+            return error "no syntax? #{n}" 
         matchr.dissect matchr.ranges Syntax.matchrConfigs[n], text 
 
     @lineForDiss: (dss) ->
