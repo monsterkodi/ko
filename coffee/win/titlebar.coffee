@@ -78,7 +78,6 @@ class Titlebar
     
     showList: (event) => 
               
-        log 'showList'
         return if @list?
         winInfos = post.get 'winInfos'
         return if winInfos.length <= 1
@@ -124,6 +123,7 @@ class Titlebar
             @list.appendChild div
             
         post.toOtherWins 'sendTabs', window.winID
+        @navigate 'down'
         @
 
     onWinTabs: (winID, tabs) =>

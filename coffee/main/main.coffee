@@ -165,6 +165,11 @@ class Main extends app
     
     onShow: =>
 
+        { width, height } = electron.screen.getPrimaryDisplay().workAreaSize
+        
+        @opt.width  = height + 122
+        @opt.height = height
+         
         if valid @openFiles
             log 'onShow @openFiles', @openFiles
             for file in @openFiles
@@ -205,9 +210,9 @@ class Main extends app
 
     createWindowWithFile: (opt) ->
         
-        win = @createWindow()
-        log "openFile in win #{win.id}", opt.file
-        post.toWin win.id, 'loadFiles', [opt.file]
+        win = @createWindow (win) -> 
+            log "openFile in win #{win.id}", opt.file
+            post.toWin win.id, 'loadFiles', [opt.file]
         win
     
     saveBounds: => #log 'saveBounds'
@@ -341,12 +346,18 @@ class Main extends app
     windowsAreStacked: ->
         
         wl = visibleWins()
-        w.setFullScreen false for w in wl
-        return false if not wl.length
-        return false if wl.length == 1 and wl[0].getBounds().width == @screenSize().width
-        w0 = wl[0].getBounds()
+        return false if empty wl
+        
+        for w in wl
+            if w.isFullScreen()
+                w.setFullScreen false 
+        
+        bounds = wl[0].getBounds()
+                
+        return false if wl.length == 1 and bounds.width == @screenSize().width
+        
         for wi in [1...wl.length]
-            if not _.isEqual wl[wi].getBounds(), w0
+            if not _.isEqual wl[wi].getBounds(), bounds
                 return false
         true
 
@@ -361,15 +372,18 @@ class Main extends app
         disableSnap = true
         frameSize = 6
         wl = visibleWins()
-        {width, height} = @screenSize()
+        { width, height } = @screenSize()
 
         if not @windowsAreStacked()
+            log 'stackWindows'
             @stackWindows()
             disableSnap = false
             return
 
-        w.setFullScreen false for w in wl
+        # w.setFullScreen false for w in wl
 
+        log 'arrangeWindows', wl.length
+        
         if wl.length == 1
             wl[0].showInactive()
             wl[0].setBounds

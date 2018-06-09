@@ -675,7 +675,7 @@ onMenuAction = (name, args) ->
     switch name
         when 'Cycle Windows' then args = winID
     
-    log "unhandled menu action! posting to main '#{name}' args: #{args}"
+    # log "unhandled menu action! posting to main '#{name}' args:", args
     
     post.toMain 'menuAction', name, args
 
@@ -694,6 +694,7 @@ onCombo = (combo, info) ->
     { mod, key, combo, char, event } = info
     
     return stopEvent(event) if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
+    return stopEvent(event) if 'unhandled' != titlebar.globalModKeyComboEvent mod, key, combo, event
 
     for i in [1..9]
         if combo is "alt+#{i}"
