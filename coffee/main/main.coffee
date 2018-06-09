@@ -206,8 +206,8 @@ class Main extends app
     createWindowWithFile: (opt) ->
         
         win = @createWindow()
-        log 'openFile in win #{win.id}', opt.file
-        post.toWin win.id, 'openFile', opt.file
+        log "openFile in win #{win.id}", opt.file
+        post.toWin win.id, 'loadFiles', [opt.file]
         win
     
     saveBounds: => #log 'saveBounds'
@@ -415,24 +415,31 @@ class Main extends app
 
     moveWindowStashes: ->
 
-        userData = slash.path electron.app.getPath 'userData'
-        stashDir = slash.join userData, 'win'
+        stashDir = slash.join @userData, 'win'
         if slash.dirExists stashDir
-            fs.moveSync stashDir, slash.join(userData, 'old'), overwrite: true
+            fs.moveSync stashDir, slash.join(@userData, 'old'), overwrite: true
 
     restoreWindows: ->
 
-        log 'restoreWindows', @userData
-        # userData = slash.path electron.app.getPath 'userData'
         fs.ensureDirSync @userData
         stashFiles = fileList slash.join(@userData, 'old'), matchExt:'noon'
         if not empty stashFiles
-            log 'stashFiles', stashFiles
+            log 'restoreWindows stashFiles:', stashFiles
             for file in stashFiles
                 win = @createWindow()
                 newStash = slash.join @userData, 'win', "#{win.id}.noon"
                 fs.copySync file, newStash
 
+    toggleWindowFromTray: => 
+            
+        if valid wins()
+            for win in wins()
+                win.show()
+        else
+            log 'restoreWindows'
+            @moveWindowStashes()
+            @restoreWindows()
+                
     # 00000000   00000000   0000000  000  0000000  00000000
     # 000   000  000       000       000     000   000
     # 0000000    0000000   0000000   000    000    0000000

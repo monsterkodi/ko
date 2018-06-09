@@ -302,7 +302,10 @@ onClose = ->
     window.saveChanges()
     editor.setText ''
     editor.stopWatcher()
-    window.stash.clear()
+    
+    if Browser.getAllWindows().length > 1
+        window.stash.clear()
+        
     clearListeners()
 
 #  0000000   000   000  000       0000000    0000000   0000000
@@ -402,6 +405,8 @@ loadFile = (file, opt={}) ->
 #  0000000   000        00000000  000   000        000       000  0000000  00000000  0000000
 
 openFiles = (ofiles, options) -> # called from file dialog, open command and browser
+
+    log 'window.openFiles', ofiles, options
 
     if ofiles?.length
 
@@ -636,6 +641,7 @@ onMenuAction = (name, args) ->
         when 'Copy'                  then return window.focusEditor.copy()
         when 'Paste'                 then return window.focusEditor.paste()
         when 'New Tab'               then return post.emit 'newEmptyTab'
+        when 'New Window'            then return post.toMain 'newWindowWithFile', editor.currentFile
         when 'Toggle Scheme'         then return scheme.toggle()
         when 'Toggle Center Text'    then return toggleCenterText()
         when 'Increase'              then return changeFontSize +1
