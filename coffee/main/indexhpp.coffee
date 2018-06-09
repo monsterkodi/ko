@@ -34,8 +34,6 @@ class IndexHpp
     
     parseLine: (lineIndex, lineText) ->
         
-        # log lineIndex, lineText
-        
         @lastWord = @currentWord if not empty @currentWord
         @currentWord = ''
         
@@ -104,7 +102,6 @@ class IndexHpp
                                     line:   lineIndex
                                     col:    p
                                     name:   match[1]
-                            # log 'topMeth', last(@tokenStack)
                         
                 else if last(@tokenStack).classType
                     if match = rest.match @methodRegExp

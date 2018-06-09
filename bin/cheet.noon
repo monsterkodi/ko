@@ -75,9 +75,6 @@ macro
     class           create a new file with class template
     clean           remove trailing spaces
     
-    test            run tests
-    help            prints this text in the terminal
-
     upper           uppercase selected texts
     lower           lowercase selected texts
     title           titlecase selected texts
