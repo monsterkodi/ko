@@ -77,7 +77,8 @@ class Titlebar
     # 0000000  000  0000000      000   
     
     showList: (event) => 
-                
+              
+        log 'showList'
         return if @list?
         winInfos = post.get 'winInfos'
         return if winInfos.length <= 1

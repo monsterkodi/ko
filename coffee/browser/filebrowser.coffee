@@ -131,9 +131,11 @@ class FileBrowser extends Browser
         @loadDir dir, opt
 
     onFile: (file) =>
+        
         delete @focusOn
+        return if not @flex
         return if file == @lastUsedColumn()?.parent.file
-        log 'onFile', file, window.lastFocus, @lastUsedColumn()?.parent.file
+        # log 'onFile', file, window.lastFocus, @lastUsedColumn()?.parent.file
         @loadFile file, dontJump:true, focus:window.lastFocus
         
     # 0000000    00000000    0000000   000   000   0000000  00000000  
@@ -220,14 +222,13 @@ class FileBrowser extends Browser
     getGitStatus: (opt) ->
           
         file = opt.file ? opt.parent?.file
-        return if not file?
+        return if empty file
         
         forkfunc '../tools/gitstatus', file, (err, info) =>
             
             if not empty err
                 log "gitstatus failed for #{file}", err
                 return
-                
             
             return if empty info
                 
@@ -295,7 +296,6 @@ class FileBrowser extends Browser
             if @navigateTargetOpt.focus
                 if @navigateTargetOpt.focus != 'shelf'
                     @focusOn = @navigateTargetOpt.focus
-                    log 'focusOn', @focusOn
                 else
                     delete @focusOn
             

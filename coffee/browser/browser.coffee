@@ -287,13 +287,11 @@ class Browser extends Stage
             @clearColumnsFrom opt.column
             @loadItems items, opt
             if @focusOn
-                log 'loadSourceInfo loadItems focusOn', @focusOn
                 window.split.focus @focusOn
                 delete @focusOn
             true
         else
             if @focusOn
-                log 'loadSourceInfo loadItems focusOn', @focusOn
                 window.split.focus @focusOn
                 delete @focusOn
             false

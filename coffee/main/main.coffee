@@ -135,7 +135,9 @@ class Main extends app
                 nostate   don't load state        false
                 verbose   log more                false
                 """
-               
+            
+        @opt.onQuit = @quit
+                
         if process.cwd() == '/'
             process.chdir slash.resolve '~'
             
@@ -530,7 +532,7 @@ class Main extends app
     # 000 0000   000   000  000     000     
     #  00000 00   0000000   000     000     
     
-    quit: ->
+    quit: =>
 
         toSave = wins().length
 
@@ -538,22 +540,17 @@ class Main extends app
 
         if toSave
             post.toWins 'saveStash'
-            post.on 'stashSaved', ->
+            post.on 'stashSaved', =>
                 toSave -= 1
                 log 'Main.quit stashSaved', toSave
                 if toSave == 0
-                    prefs.save()
                     state.save()
                     log 'Main.quit exit'
-                    electron.app.exit 0
-                    process.exit 0
-            return
+                    @exitApp()
+            log 'delay exit'
+            'delay'
         else
-            prefs.save()
             state.save()
-            log 'Main.quit exit'
-            electron.app.exit     0
-            process.exit 0
             
     #  0000000   0000000     0000000   000   000  000000000
     # 000   000  000   000  000   000  000   000     000

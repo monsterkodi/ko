@@ -2,7 +2,3 @@ ignore
     /syntax/
     /md/
     /bin/cheet.noon
-    /.*-x64/
-    /inno/
-    menu.noon
-coffee  . map inline 

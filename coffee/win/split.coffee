@@ -61,11 +61,17 @@ class Split extends event
     onDrag: => if @flex? then @emitSplit()
     emitSplit: => @emit 'split', @flex.panePositions() 
     
-    stash: => window.stash.set 'split', @flex.getState()
+    stash: => 
+        
+        log 'split.stash', @flex.getState()
+        window.stash.set 'split', @flex.getState()
+        
     restore: => 
 
-        @flex.restoreState window.stash.get 'split'
-        @emitSplit()    
+        if state = window.stash.get 'split'
+            log 'split.restore', window.stash.get 'split'
+            @flex.restoreState state
+            @emitSplit()
                 
     # 0000000     0000000 
     # 000   000  000   000
