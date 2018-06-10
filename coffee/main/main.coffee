@@ -90,11 +90,6 @@ post.on 'shellCommand', (cfg) ->
 class Main extends app
 
     constructor: (openFiles) ->
-
-        if slash.win() and slash.file(process.argv[0]) == 'ko.exe'
-            ignoreArgs=1
-        else
-            ignoreArgs=2
         
         super
             dir:        __dirname
@@ -105,11 +100,11 @@ class Main extends app
             tray:       '../../img/menu@2x.png'
             about:      '../../img/about.png'
             onShow:     -> main.onShow()
+            onOtherInstance: (args, dir) -> main.onOtherInstance args, dir
             width:      1000
             height:     1000
             minWidth:   240
             minHeight:  230
-            argsOpt:    ignoreArgs:ignoreArgs
             args: """
                 filelist  files to open           **
                 prefs     show preferences        false
@@ -518,34 +513,28 @@ class Main extends app
             else
                 log 'no visible win?'
             
-    otherInstanceStarted: (args, dir) =>
+    onOtherInstance: (args, dir) =>
 
-        log 'otherInstanceStarted', args, dir
+        log 'onOtherInstance', args
         
-        # post.toWins 'mainlog', 'other instance args:', args, 'dir', dir
-#         
-        # @activateOneWindow()
+        @activateOneWindow()
 
-        # files = []
-        # if first(args).endsWith 'ko.exe'
-            # fileargs = args.slice 1
-        # else
-            # fileargs = args.slice 2
-#             
-        # for arg in fileargs
-            # continue if arg.startsWith '-'
-            # file = arg
-            # if slash.isRelative file
-                # file = slash.join slash.resolve(dir), arg
-            # [fpath, pos] = slash.splitFilePos file
-            # if slash.fileExists fpath
-                # files.push file
+        files = []
+        if first(args).endsWith "#{pkg.name}.exe"
+            fileargs = args.slice 1
+        else
+            fileargs = args.slice 2
 
-        # post.toWins 'mainlog', 'other instance files:', files
-#         
-        # post.toWin first(visibleWins()).id, 'loadFiles', files, newTab:true
-        
-        # #@createWindow files:files
+        for arg in fileargs
+            continue if arg.startsWith '-'
+            file = arg
+            if slash.isRelative file
+                file = slash.join slash.resolve(dir), arg
+            [fpath, pos] = slash.splitFilePos file
+            if slash.exists fpath
+                files.push file
+
+        post.toWin first(visibleWins()).id, 'loadFiles', files, newTab:true
 
     #  0000000   000   000  000  000000000  
     # 000   000  000   000  000     000     
@@ -598,16 +587,7 @@ electron.app.on 'open-file', (event, file) ->
         
     event.preventDefault()
 
-# electron.app.on 'ready', ->
-
-    # main          = new Main openFiles
-    # main.navigate = new Navigate main
-
-electron.app.on 'window-all-closed', ->
-    log 'window-all-closed'
-    # if slash.win()
-        # # log 'app.on window-all-closed'
-        # app.quit()
+electron.app.on 'window-all-closed', -> log 'window-all-closed'
 
 # 000   000  0000000    00000000     
 # 000   000  000   000  000   000    
@@ -625,4 +605,6 @@ koReceiver = new udp port:9779, onMsg:onMsg
 
 main          = new Main openFiles
 main.navigate = new Navigate main
+
+log 'ko main'
     
