@@ -406,7 +406,7 @@ loadFile = (file, opt={}) ->
 
 openFiles = (ofiles, options) -> # called from file dialog, open command and browser
 
-    log 'window.openFiles', ofiles, options
+    # log 'window.openFiles', ofiles, options
 
     if ofiles?.length
 
@@ -620,8 +620,6 @@ window.setLastFocus = (name) ->
 
 onMenuAction = (name, args) ->
 
-    log 'onMenuAction', name, args
-    
     if action = Editor.actionWithName name
         if action.key? and _.isFunction window.focusEditor[action.key]
             window.focusEditor[action.key] args.actarg

@@ -100,7 +100,7 @@ class FileEditor extends TextEditor
                 @setText fs.readFileSync @currentFile, encoding: 'utf8'
 
             @restoreScrollCursorsAndSelections()
-            log 'post.emit file', @currentFile
+            # log 'post.emit file', @currentFile
             post.emit 'file', @currentFile # titlebar -> tabs -> tab
         else
             if not opt?.skip
@@ -110,8 +110,7 @@ class FileEditor extends TextEditor
             if not @currentFile?
                 log 'post.emit file null'
                 post.emit 'file', null # titlebar -> tabs -> tab
-            # log 'emit file', @currentFile
-            log '@emit file', @currentFile
+            # log '@emit file', @currentFile
             @emit 'file', @currentFile # diffbar, pigments, ...
 
     restoreFromTabState: (tabsState) ->

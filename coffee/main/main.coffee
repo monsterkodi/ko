@@ -9,6 +9,15 @@
 { post, app, args, udp, stopEvent, fileList, first, colors, about, prefs, 
   state, store, noon, slash, os, fs, str, empty, valid, error, log, _ } = require 'kxk'
 
+process.on 'uncaughtException', (err) ->
+    error err.message ? err
+    sutil = require 'stack-utils'
+    stack = new sutil cwd: process.cwd(), internals: sutil.nodeInternals()
+    stackTrace = stack.captureString()
+    # console.log 'stackTrace', stackTrace.split('\n').length, stackTrace
+    log stackTrace 
+    log 'clean:', stack.clean new Error().stack
+  
 pkg      = require '../../package.json'
 electron = require 'electron'
 
@@ -433,7 +442,7 @@ class Main extends app
         fs.ensureDirSync @userData
         stashFiles = fileList slash.join(@userData, 'old'), matchExt:'noon'
         if not empty stashFiles
-            log 'restoreWindows stashFiles:', stashFiles
+            # log 'restoreWindows stashFiles:', stashFiles
             for file in stashFiles
                 win = @createWindow()
                 newStash = slash.join @userData, 'win', "#{win.id}.noon"

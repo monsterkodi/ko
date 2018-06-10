@@ -139,7 +139,7 @@ class FileBrowser extends Browser
         return if not file
         return if not @flex
         return if file == @lastUsedColumn()?.parent.file
-        log 'onFile', file, window.lastFocus, @lastUsedColumn()?.parent.file
+        # log 'onFile', file, window.lastFocus, @lastUsedColumn()?.parent.file
         @loadFile file, dontJump:true, focus:window.lastFocus
         
     # 0000000    00000000    0000000   000   000   0000000  00000000  
@@ -163,7 +163,7 @@ class FileBrowser extends Browser
     
     loadDir: (dir, opt={}) -> 
         
-        log 'loadDir', dir, opt
+        # log 'loadDir', dir, opt
         
         if opt.column > 0 and slash.isRoot(dir) and @columns[opt.column-1].activeRow()?.item.name == '/'
             @clearColumnsFrom opt.column, pop:true
