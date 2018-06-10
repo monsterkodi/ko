@@ -142,16 +142,20 @@ class Tabs
     # 000       000      000   000       000  000       
     #  0000000  0000000   0000000   0000000   00000000  
     
-    closeTab: (tab = @activeTab()) ->
+    closeTab: (tab = @activeTab(), opt) ->
         
         if tab.dirty()
             tab.saveChanges()
             
-        tab.nextOrPrev().activate()
+        if not opt?.skipActivate
+            tab.nextOrPrev().activate()
+            
         tab.close()
         
         _.pull @tabs, tab
-        @update()
+        
+        if not opt?.skipUpdate
+            @update()
         @
           
     onCloseTabOrWindow: (tab) =>
@@ -181,12 +185,13 @@ class Tabs
     addTab: (file) ->
 
         if @tabs.length > 4
-            @closeTab @tabs[0]
+            @closeTab @tabs[0], skipActivate:true, skipUpdate:true
         
         tab = new Tab @
         tab.update file:file
         @tabs.push tab
         @update()
+            
         tab
 
     onNewEmptyTab: =>
@@ -261,7 +266,7 @@ class Tabs
         while files.length
             @addTab files.shift()
         
-        @tabs[active].activate()
+        @tabs[active]?.activate()
             
         @update()
 

@@ -165,7 +165,7 @@ class Main extends app
     
     onShow: =>
 
-        { width, height } = electron.screen.getPrimaryDisplay().workAreaSize
+        { width, height } = @screenSize()
         
         @opt.width  = height + 122
         @opt.height = height

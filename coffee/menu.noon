@@ -169,7 +169,7 @@ Command
 
 View
     Maximize Editor         ctrl+shift+y
-    Toggle Center Text      ctrl+\\
+    Toggle Center Text      ctrl+\
     -   
     Navigate Backward       ctrl+1
     Navigate Forward        ctrl+2

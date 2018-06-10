@@ -6,7 +6,7 @@
 000       000  000   000  0000000  
 ###
 
-{empty, log, os } = require 'kxk'
+{ empty, log, os } = require 'kxk'
 
 Command = require '../commandline/command'
 

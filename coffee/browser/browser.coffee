@@ -6,7 +6,7 @@
 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 ###
 
-{ elem, post, clamp, setStyle, childp, slash, state, fs, os, error, log,  _ } = require 'kxk'
+{ post, elem, clamp, setStyle, childp, slash, state, fs, os, error, log,  _ } = require 'kxk'
 
 Column = require './column'
 Stage  = require '../stage/stage'

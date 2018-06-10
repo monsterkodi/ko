@@ -6,7 +6,7 @@
 0000000    000   000   0000000   00     00  0000000   00000000  
 ###
 
-{ slash, fileList, post, stopEvent, empty, str, os, clamp, log, error, $ } = require 'kxk'
+{ slash, fileList, post, stopEvent, valid, empty, str, os, clamp, log, error, $ } = require 'kxk'
 
 Command     = require '../commandline/command'
 FileBrowser = require '../browser/filebrowser'
@@ -33,14 +33,14 @@ class Browse extends Command
     onFile: (file) =>
         
         if @isActive() and @getText() != slash.tilde file
-            # log 'onFile', file, slash.resolve @getText()
             @setText slash.tilde file
         
     restoreState: (state) -> 
         
         super state
         @browser.start()
-        @browser.loadFile state.text, focus:false, dontJump:true
+        if valid state.text
+            @browser.loadFile state.text, focus:false, dontJump:true
         window.split.swap $('terminal'), $('area')
 
     clear: ->
@@ -82,11 +82,9 @@ class Browse extends Command
     completeCallback: (err, files) =>
         
         if not err?
-            # log 'completeCallback:', files.map (f) -> f.file
             if not empty @getText().trim()
                 text = slash.resolve @getText().trim()
                 matches = files.filter (f) -> f.file.startsWith text
-                # log 'matches', matches
                 
                 if not empty matches
                     @setText slash.tilde matches[0].file
@@ -109,7 +107,6 @@ class Browse extends Command
                         item.file = m.file
                         item
     
-                    # log 'show items', items
                     @showItems items
                     @select 0
                     return

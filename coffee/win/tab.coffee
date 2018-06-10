@@ -6,11 +6,10 @@
    000     000   000  0000000  
 ###
 
-{ elem, post, atomic, slash, fs, error, log, _ } = require 'kxk'
+{ post, elem, tooltip, atomic, slash, fs, error, log, _ } = require 'kxk'
 
 render  = require '../editor/render'
 syntax  = require '../editor/syntax'
-Tooltip = require '../tools/tooltip'
 
 class Tab
     
@@ -111,7 +110,7 @@ class Tab
         if @info.file?
             diss = syntax.dissForTextAndSyntax slash.tilde(@file()), 'ko' #, join: true 
             html = render.line(diss, charWidth:0)
-            @tooltip = new Tooltip elem:name, html:html, x:0
+            @tooltip = new tooltip elem:name, html:html, x:0
             
         @div.appendChild elem 'span', class:'dot', text:'●' if @dirty()
         @
