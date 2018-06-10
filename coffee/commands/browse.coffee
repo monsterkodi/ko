@@ -62,7 +62,8 @@ class Browse extends Command
             if window.editor.currentFile?
                 @browser.loadFile window.editor.currentFile 
             else 
-                @browser.loadDir process.cwd()
+                log 'browse start process.cwd', process.cwd()
+                post.emit 'filebrowser', 'loadItem', file:process.cwd(), type:'dir'
 
         name = action
         name = 'browse' if action == 'shelf'

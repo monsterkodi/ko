@@ -105,13 +105,16 @@ class Indexer
     
     onGet: (key, filter...) =>
         
-        if key == 'counts'
-            return 
-                classes: @classes.length ? 0
-                files:   @files.length ? 0
-                funcs:   @funcs.length ? 0
-                words:   @words.length ? 0
-                dirs:    @dirs.length ? 0
+        switch key
+            when 'counts'
+                return 
+                    classes: @classes.length ? 0
+                    files:   @files.length ? 0
+                    funcs:   @funcs.length ? 0
+                    words:   @words.length ? 0
+                    dirs:    @dirs.length ? 0
+            when 'file'
+                return @files[filter[0]]
         
         # log 'onGet', key, filter
         

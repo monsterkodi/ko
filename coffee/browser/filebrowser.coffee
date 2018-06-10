@@ -6,7 +6,7 @@
 000       000  0000000  00000000        0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 ###
 
-{ post, empty, elem, clamp, drag, clamp, state, slash, fs, os, error, log, $ } = require 'kxk'
+{ post, valid, empty, elem, clamp, drag, clamp, state, slash, fs, os, error, log, $ } = require 'kxk'
   
 Browser  = require './browser'
 Shelf    = require './shelf'
@@ -28,6 +28,7 @@ class FileBrowser extends Browser
         post.on 'fileIndexed',           @onFileIndexed
         post.on 'sourceInfoForFile',     @loadSourceInfo
         post.on 'file',                  @onFile
+        post.on 'filebrowser',           @onFileBrowser
     
         @shelfResize = elem 'div', class: 'shelfResize'
         @shelfResize.style.position = 'absolute'
@@ -42,6 +43,116 @@ class FileBrowser extends Browser
             onMove:  @onShelfDrag
             
         @shelfSize = state.get 'shelf:size', 200
+        
+    onFileBrowser: (action, item, col) =>
+        
+        switch action
+            when 'loadItem'     then @loadItem     item
+            when 'activateItem' then @activateItem item, col
+
+    loadItem: (item) ->
+        
+        item.name ?= slash.file item.file
+        
+        switch item.type
+            when 'file' then @loadFileItem item
+            when 'dir'  then @loadDirItem  item
+
+    activateItem: (item, col) ->
+        
+        switch item.type
+            when 'file' then @loadFileItem item, col+1
+            when 'dir'  then @loadDirItem  item, col+1
+            
+    loadFileItem: (item, col=0) ->
+        
+        log 'loadFileItem', col, item
+
+        @clearColumnsFrom col, pop:true
+        
+        if col >= @numCols()
+            log 'addColumn'
+            @addColumn()
+        
+        file = item.file
+
+        switch slash.ext file  
+            when 'gif', 'png', 'jpg', 'jpeg', 'svg', 'bmp', 'ico'
+                cnt = elem class: 'browserImageContainer', child: 
+                    elem 'img', class: 'browserImage', src: slash.fileUrl file
+                @columns[col].table.appendChild cnt
+            when 'tiff', 'tif'
+                if not slash.win()
+                    @convertImage row
+            when 'pxm'
+                if not slash.win()
+                    @convertPXM row
+            else
+                @loadSourceItem item, col
+            
+    loadSourceItem: (item, col) ->
+        
+        info = post.get 'indexer', 'file', item.file
+            
+        return if empty info
+        
+        items = []
+        clsss = info.classes ? []
+        for clss in clsss
+            text = '● '+clss.name
+            items.push name: clss.name, text:text, type:'class', file: item.file, line: clss.line
+        
+        funcs = info.funcs ? []
+        for func in funcs
+            if func.test == 'describe'
+                text = '● '+func.name
+            else if func.static
+                text = '  ◆ '+func.name
+            else if func.post
+                text = '  ⬢ '+func.name
+            else
+                text = '  ▸ '+func.name
+            items.push name: func.name, text:text, type:'func', file: item.file, line: func.line
+
+        if valid items
+            items.sort (a,b) -> a.line - b.line
+            @columns[col].loadItems items, item
+        else
+            log 'not valid'
+            
+    loadDirItem: (item, col=0) ->
+        
+        log 'loadDirItem', col, item
+        
+        return if col>0 and item.name == '/'
+        
+        dir = item.file
+        
+        dirlist dir, (err, items) => 
+            
+            if err? then return error "can't load dir #{dir}: #{err}"
+            
+            updir = slash.resolve slash.join dir, '..'
+
+            if col == 0 or @columns[col-1].activeRow().item.name == '..'
+                if not (updir == dir == slash.resolve '/') 
+                    items.unshift 
+                        name: '..'
+                        type: 'dir'
+                        file:  updir
+                else
+                    items.unshift 
+                        name: '/'
+                        type: 'dir'
+                        file: dir
+             
+            if col >= @numCols()
+                log 'addColumn'
+                @addColumn()
+            else
+                @clearColumnsFrom col+1, pop:true
+            @columns[col].loadItems items, item
+            @getGitStatus item
         
     #  0000000   0000000   000      000   000  00     00  000   000   0000000  
     # 000       000   000  000      000   000  000   000  0000  000  000       
@@ -71,8 +182,16 @@ class FileBrowser extends Browser
     lastColumnPath: ->
         
         if lastColumn = @lastUsedColumn()
-            return lastColumn.parent.file
+            return lastColumn.path()
 
+    lastDirColumn: ->
+        
+        if lastColumn = @lastUsedColumn()
+            if lastColumn.isDir()
+                return lastColumn
+            else
+                return lastColumn.prevColumn()
+                
     onBackspaceInColumn: (column) -> 
     
         column.clearSearch()
@@ -112,6 +231,8 @@ class FileBrowser extends Browser
         if empty file
             return error 'FileBrowser.loadFile -- no file?'
         
+        log 'loadFile', @lastColumnPath(), file
+            
         if @lastColumnPath() == file
             item  = @lastUsedColumn().activeRow()?.item
             if item
@@ -123,6 +244,12 @@ class FileBrowser extends Browser
                 
             if item then @emit 'itemActivated', item
             return
+            
+        if lastDir = @lastDirColumn()
+            if slash.samePath lastDir.path(), slash.dir(file) 
+                lastDir.row(slash.file file)?.activate()
+                @loadContent lastDir.row(slash.file file), column:lastDir.index+1
+                return
         
         opt.focus ?= true
         opt.column ?= 0
@@ -139,7 +266,7 @@ class FileBrowser extends Browser
         return if not file
         return if not @flex
         return if file == @lastUsedColumn()?.parent.file
-        # log 'onFile', file, window.lastFocus, @lastUsedColumn()?.parent.file
+        log 'onFile', window.lastFocus, file
         @loadFile file, dontJump:true, focus:window.lastFocus
         
     # 0000000    00000000    0000000   000   000   0000000  00000000  
@@ -151,6 +278,8 @@ class FileBrowser extends Browser
     browse: (dir) -> 
 
         return error "no dir?" if not dir?
+
+        log 'browse', dir
         
         @clearColumnsFrom 1, pop:true
         @loadDir dir, column:0, row: 0, focus:true
@@ -163,7 +292,7 @@ class FileBrowser extends Browser
     
     loadDir: (dir, opt={}) -> 
         
-        # log 'loadDir', dir, opt
+        log 'loadDir', dir, opt
         
         if opt.column > 0 and slash.isRoot(dir) and @columns[opt.column-1].activeRow()?.item.name == '/'
             @clearColumnsFrom opt.column, pop:true
@@ -200,7 +329,8 @@ class FileBrowser extends Browser
                         name: '/'
                         type: 'dir'
                         file: dir
-                    
+             
+            # log 'loadItems', items.length, opt
             @loadItems items, opt
 
     # 000       0000000    0000000   0000000         000  000000000  00000000  00     00   0000000  
@@ -301,6 +431,7 @@ class FileBrowser extends Browser
                     
             if @navigateTargetOpt.focus
                 if @navigateTargetOpt.focus != 'shelf'
+                    log '@focusOn = ', @navigateTargetOpt.focus
                     @focusOn = @navigateTargetOpt.focus
                 else
                     delete @focusOn

@@ -16,7 +16,8 @@ process.on 'uncaughtException', (err) ->
     stackTrace = stack.captureString()
     # console.log 'stackTrace', stackTrace.split('\n').length, stackTrace
     log stackTrace 
-    log 'clean:', stack.clean new Error().stack
+    if err.stack?
+        log 'clean:', stack.clean err.stack
   
 pkg      = require '../../package.json'
 electron = require 'electron'

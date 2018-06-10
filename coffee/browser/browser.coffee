@@ -287,11 +287,13 @@ class Browser extends Stage
             @clearColumnsFrom opt.column
             @loadItems items, opt
             if @focusOn
+                log 'focusOn', @focusOn
                 window.split.focus @focusOn
                 delete @focusOn
             true
         else
             if @focusOn
+                log 'focusOn', @focusOn
                 window.split.focus @focusOn
                 delete @focusOn
             false
@@ -318,6 +320,7 @@ class Browser extends Stage
 
         if @indexedFiles[file]?
             return @loadSourceInfo @indexedFiles[file], opt
+            
         false
             
     loadContent: (row, opt) ->
@@ -325,6 +328,8 @@ class Browser extends Stage
         item  = row.item
         file  = item.file
 
+        log 'loadContent', file
+        
         if not @loadSourceItem item, opt
             ext = slash.ext file  
             if ext in ['gif', 'png', 'jpg', 'jpeg', 'svg']

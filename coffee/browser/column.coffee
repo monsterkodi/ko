@@ -50,6 +50,22 @@ class Column
     #      000  000          000     000     000     000       000 0 000       000  
     # 0000000   00000000     000     000     000     00000000  000   000  0000000   
     
+    loadItems: (items, parent) ->
+        
+        @clear()
+        
+        @items  = items
+        @parent = parent
+        
+        error "no parent item?" if not @parent?
+        
+        for item in @items
+            @rows.push new Row @, item
+        
+        @scroll.update()
+        # post.emit 'browserColumnItemsSet', @ # for filebrowser target navigation
+        @
+
     setItems: (@items, opt) ->
         
         @clear()
@@ -64,6 +80,9 @@ class Column
         post.emit 'browserColumnItemsSet', @ # for filebrowser target navigation
         @
 
+    isDir:  -> @parent.type == 'dir' 
+    isFile: -> @parent.type == 'file' 
+        
     isEmpty: -> empty @rows
     clear:   ->
         @clearSearch()
@@ -95,6 +114,7 @@ class Column
     prevColumn: -> @browser.column @index-1
         
     name: -> "#{@browser.name}:#{@index}"
+    path: -> @parent.file
         
     numRows:    -> @rows.length ? 0   
     rowHeight:  -> @rows[0]?.div.clientHeight ? 0
@@ -187,7 +207,7 @@ class Column
                 if item = @activeRow()?.item
                     type = item.type
                     if type == 'dir'
-                        @browser.browse? item.file
+                        post.emit 'filebrowser', 'loadItem', item
                     else if item.file
                         post.emit 'jumpTo', item
                         post.emit 'focus', 'editor'
