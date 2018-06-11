@@ -235,6 +235,8 @@ class FileEditor extends TextEditor
 
     jumpToFile: (opt) =>
         
+        log 'jumpToFile', opt
+        
         if opt.newTab
             
             file = opt.file

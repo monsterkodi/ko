@@ -106,13 +106,13 @@ class Row
         @setActive emit:true
         
         @browser.skipJump = true if not event? and @item.type == 'file'
-                
         
         switch @item.type
-            when 'dir', 'file' then post.emit 'filebrowser', 'activateItem', @item, @column.index
-            # when 'dir'   then @browser.loadDir     @item.file, column: @column.index+1, parent: @item
-            # when 'file'  then @browser.loadContent @, column: @column.index+1, item:@item, newTab:opt.newTab, async:not event?
-            else                
+            when 'dir', 'file' 
+                post.emit 'filebrowser', 'activateItem', @item, @column.index
+                post.emit 'jumpToFile', opt if @item.type == 'file'
+            else    
+                log 'row.activate', @item.type
                 if @item.file? and _.isString @item.file
                     opt.line = @item.line
                     opt.col  = @item.column
