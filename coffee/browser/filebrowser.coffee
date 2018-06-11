@@ -22,11 +22,9 @@ class FileBrowser extends Browser
         @shelf = new Shelf @
         @name = 'FileBrowser'
         
-        post.on 'browserColumnItemsSet', @onColumnItemsSet
         post.on 'saved',                 @updateGitStatus
         post.on 'gitRefChanged',         @updateGitStatus
         post.on 'fileIndexed',           @onFileIndexed
-        post.on 'sourceInfoForFile',     @loadSourceInfo
         post.on 'file',                  @onFile
         post.on 'filebrowser',           @onFileBrowser
     
@@ -153,7 +151,44 @@ class FileBrowser extends Browser
                 @clearColumnsFrom col+1, pop:true
             @columns[col].loadItems items, item
             @getGitStatus item
+
+    onFile: (file) =>
         
+        return if not file
+        return if not @flex
+        
+        @navigateToFile file
+        
+    navigateToFile: (file) ->
+        
+        lastPath = @lastUsedColumn()?.parent.file
+        return if file == lastPath
+        # window.lastFocus 
+        log 'navigateToFile', file, lastPath
+        baseDir = @columns[0].path()
+        # log 'baseDir', baseDir
+        pkgDir = slash.pkg file
+        # log 'pkgDir', pkgDir
+        # if slash.samePath baseDir, pkgDir
+            # log 'same base/pkg!'
+        # else
+            # log 'load path from', pkgDir
+        
+        lastlist = slash.pathlist lastPath
+        pkglist  = slash.pathlist pkgDir
+        filelist = slash.pathlist file
+            
+        listindex = pkglist.length - 1 
+        col0index = listindex
+        col = 0
+        while col0index < lastlist.length and col0index < filelist.length and lastlist[col0index] == filelist[col0index]
+            col0index += 1
+            col += 1
+            
+        log "col #{col} col0index #{col0index}", filelist.slice col0index
+            
+        # @loadFile file, dontJump:true, focus:window.lastFocus
+            
     #  0000000   0000000   000      000   000  00     00  000   000   0000000  
     # 000       000   000  000      000   000  000   000  0000  000  000       
     # 000       000   000  000      000   000  000000000  000 0 000  0000000   
@@ -226,48 +261,39 @@ class FileBrowser extends Browser
     # 000       000  000      000       
     # 000       000  0000000  00000000  
     
-    loadFile: (file, opt={}) ->
-        
-        if empty file
-            return error 'FileBrowser.loadFile -- no file?'
-        
-        log 'loadFile', @lastColumnPath(), file
-            
-        if @lastColumnPath() == file
-            item  = @lastUsedColumn().activeRow()?.item
-            if item
-                @lastUsedColumn().focus()
-            else
-                item = @lastUsedColumn().prevColumn()?.activeRow()?.item
-                if item
-                    @lastUsedColumn().prevColumn().focus()
-                
-            if item then @emit 'itemActivated', item
-            return
-            
-        if lastDir = @lastDirColumn()
-            if slash.samePath lastDir.path(), slash.dir(file) 
-                lastDir.row(slash.file file)?.activate()
-                @loadContent lastDir.row(slash.file file), column:lastDir.index+1
-                return
-        
-        opt.focus ?= true
-        opt.column ?= 0
-        dir  = opt.dir 
-        dir ?= slash.pkg file
-        dir ?= slash.dir file
-        opt.file = file
-        @skipJump = opt.dontJump
-        @loadDir dir, opt
-
-    onFile: (file) =>
-        
-        delete @focusOn
-        return if not file
-        return if not @flex
-        return if file == @lastUsedColumn()?.parent.file
-        log 'onFile', window.lastFocus, file
-        @loadFile file, dontJump:true, focus:window.lastFocus
+    # loadFile: (file, opt={}) -> # unused ???
+#         
+        # if empty file
+            # return error 'FileBrowser.loadFile -- no file?'
+#         
+        # log 'loadFile', @lastColumnPath(), file
+#             
+        # if @lastColumnPath() == file
+            # item  = @lastUsedColumn().activeRow()?.item
+            # if item
+                # @lastUsedColumn().focus()
+            # else
+                # item = @lastUsedColumn().prevColumn()?.activeRow()?.item
+                # if item
+                    # @lastUsedColumn().prevColumn().focus()
+#                 
+            # if item then @emit 'itemActivated', item
+            # return
+#             
+        # if lastDir = @lastDirColumn()
+            # if slash.samePath lastDir.path(), slash.dir(file) 
+                # lastDir.row(slash.file file)?.activate()
+                # @loadContent lastDir.row(slash.file file), column:lastDir.index+1
+                # return
+#         
+        # opt.focus ?= true
+        # opt.column ?= 0
+        # dir  = opt.dir 
+        # dir ?= slash.pkg file
+        # dir ?= slash.dir file
+        # opt.file = file
+        # @skipJump = opt.dontJump
+        # @loadDir dir, opt
         
     # 0000000    00000000    0000000   000   000   0000000  00000000  
     # 000   000  000   000  000   000  000 0 000  000       000       
@@ -339,11 +365,11 @@ class FileBrowser extends Browser
     # 000      000   000  000   000  000   000       000     000     000       000 0 000       000  
     # 0000000   0000000   000   000  0000000         000     000     00000000  000   000  0000000   
     
-    loadItems: (items, opt) ->
+    loadItems: (items, opt) -> # unused???
 
-        if opt?.file
-            @navigateTargetFile = opt.file
-            @navigateTargetOpt  = opt
+        # if opt?.file
+            # @navigateTargetFile = opt.file
+            # @navigateTargetOpt  = opt
 
         @getGitStatus opt
             
@@ -397,46 +423,8 @@ class FileBrowser extends Browser
         @indexedFiles ?= {}
         @indexedFiles[file] = info
         
-        # if @lastUsedColumn()?.parent.file
-            # log 'onFileIndexed file', file, 'last', @lastUsedColumn()?.parent.file
         if file == @activeColumn()?.activeRow()?.item.file
-            @loadContent @activeColumn().activeRow(), column: @activeColumn().index+1
-                
-    # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
-    # 0000  000  000   000  000   000  000  000        000   000     000     000       
-    # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000   
-    # 000  0000  000   000     000     000  000   000  000   000     000     000       
-    # 000   000  000   000      0      000   0000000   000   000     000     00000000  
-    
-    onColumnItemsSet: (column) => 
-        
-        if @navigateTargetFile
-            column.navigateTo @navigateTargetFile
-    
-    navigateTo: (opt) -> @columns[0].navigateTo opt
-    
-    endNavigateToTarget: ->
-        
-        if @navigateTargetFile
-            
-            delete @navigateTargetFile
-            
-            col = @lastUsedColumn()
-            
-            if @navigateTargetOpt.focus != false
-                if col.parent.type == 'file'
-                    @column(col.index-1)?.focus()
-                else
-                    col.focus()
-                    
-            if @navigateTargetOpt.focus
-                if @navigateTargetOpt.focus != 'shelf'
-                    log '@focusOn = ', @navigateTargetOpt.focus
-                    @focusOn = @navigateTargetOpt.focus
-                else
-                    delete @focusOn
-            
-            delete @navigateTargetOpt
-            @popEmptyColumns()
+            log 'loadContent?', file
+            # @loadContent @activeColumn().activeRow(), column: @activeColumn().index+1
             
 module.exports = FileBrowser

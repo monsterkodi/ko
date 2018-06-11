@@ -373,13 +373,15 @@ infoPadding = 6px
 
 .dot
     display             inline-block
-    vertical-align      top
+    vertical-align      middle
     padding-left        6px
-    padding-right       9px
+    padding-right       6px
     margin-top          -1px
 
 .pkg .dot
-    vertical-align      baseline
+    // vertical-align      middle
+    // padding-right       6px
+    font-size           titlebarFontSize - 3px
     
 // 000000000   0000000    0000000   000      000000000  000  00000000
 //    000     000   000  000   000  000         000     000  000   000
@@ -428,6 +430,7 @@ infoPadding = 6px
 
 .tab
     flex                1 1 0
+    position            relative
     &:not(:first-child)    
         border-top-left-radius  10px
     &:not(:last-child)
@@ -439,13 +442,20 @@ infoPadding = 6px
     cursor              pointer
     
     box-sizing          border-box
-    // height              titlebarHeight + 3px
     font-size           titlebarFontSize
     font-family         titlebarFont
     
     &:not(.active)
         opacity         0.5
 
+.tabdrag
+    -webkit-app-region  drag
+    height              titlebarHeight
+    width               titlebarHeight
+    position            absolute
+    top                 0
+    right               0
+        
 //  0000000   00000000   00000000   0000000
 // 000   000  000   000  000       000   000
 // 000000000  0000000    0000000   000000000
@@ -994,7 +1004,8 @@ infoPadding = 6px
     -webkit-app-region  drag
 
 .titlebar-title
-    flex                1 1 0
+    // flex                1 1 0
+    flex                0 0 90px
     display             inline-block
     flex-direction      row
     padding-top         7px
@@ -1028,7 +1039,16 @@ infoPadding = 6px
     padding-top         2px
     &.minimize
         padding-top     5px
+        flex            0 0 46px
 
+#titlebar .topframe
+    -webkit-app-region  no-drag
+    height              2px
+    position            absolute
+    left                0
+    top                 0
+    right               135px
+        
 // 00     00  00000000  000   000  000   000  
 // 000   000  000       0000  000  000   000  
 // 000000000  0000000   000 0 000  000   000  

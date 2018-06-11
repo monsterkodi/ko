@@ -11,6 +11,8 @@
 
 menu = require './menu'
 
+# post.debug()
+
 w = new win 
     dir:    __dirname
     pkg:    require '../../package.json'
@@ -50,20 +52,23 @@ commandline = null
 titlebar    = null
 tabs        = null
 
+# sms = require 'source-map-support/register'
+
 # post.debug()
+# window.onerror = function(error, url, line) {
+# message, filename, lineno, colno, error
+# window.onerror = (event, source, line, col, err) ->
 
-window.onerror = (event, source, line, col, err) ->
-
-    f = require('sorcery').loadSync(source.replace /coffee/g, 'js')
-    if f?
-        l = f.trace(line)
-        s = "▲ #{source}:#{l.line} ▲ [ERROR] #{err}"
-    else
-        s = "▲ [ERROR] #{err} #{slash.tilde source}:#{line}:#{col}"
-    post.emit 'error', s
-    post.emit 'slog', s
-    console.log s
-
+    # error event, source, line, err.message ? err
+    # f = require('sorcery').loadSync(source.replace /coffee/g, 'js')
+    # if f?
+        # l = f.trace(line)
+        # s = "▲ #{source}:#{l.line} ▲ [ERROR] #{err}"
+    # else
+        # s = "▲ [ERROR] #{err} #{slash.tilde source}:#{line}:#{col}"
+    # console.log s
+    # post.emit 'error', s
+    # post.emit 'slog', s
 
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000

@@ -97,8 +97,8 @@ class Tabs
         @dragDiv.style.position = 'absolute'
         @dragDiv.style.top  = "#{br.top}px"
         @dragDiv.style.left = "#{br.left}px"
-        @dragDiv.style.width = "#{br.width-12}px"
-        @dragDiv.style.height = "#{br.height-3}px"
+        @dragDiv.style.width = "#{br.width}px"
+        @dragDiv.style.height = "#{br.height}px"
         @dragDiv.style.flex = 'unset'
         @dragDiv.style.pointerEvents = 'none'
         document.body.appendChild @dragDiv

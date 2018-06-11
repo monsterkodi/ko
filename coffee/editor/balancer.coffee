@@ -5,7 +5,7 @@
 000   000  000   000  000      000   000  000  0000  000       000       000   000
 0000000    000   000  0000000  000   000  000   000   0000000  00000000  000   000
 ###
-{ empty, str, log, error, _ } = require 'kxk'
+{ valid, empty, str, log, error, _ } = require 'kxk'
 
 matchr = require '../tools/matchr'
 
@@ -81,12 +81,16 @@ class Balancer
         if not text?
             return error "dissForLine -- no line at index #{li}?"
 
-        @mergeRegions @parse(text, li), text, li                
+        diss = @mergeRegions @parse(text, li), text, li                
+        console.log 'dissForLine', li, text, diss
+        diss
       
     dissForLineAndRanges: (line, rgs) ->
         
         regions = @mergeRegions @parse(line, 0), line, 0
-        matchr.merge regions, matchr.dissect rgs
+        diss = matchr.merge regions, matchr.dissect rgs
+        console.log 'dissForLine', line, rgs, diss
+        diss
         
     # 00     00  00000000  00000000    0000000   00000000
     # 000   000  000       000   000  000        000
@@ -384,7 +388,8 @@ class Balancer
                 closeStackItem _.last stack 
             # console.log "balanced #{li}", text
             @setUnbalanced li
-            
+           
+        console.log 'parse result', result if valid result
         result
 
     # 000   000  000   000  0000000     0000000   000       0000000   000   000   0000000  00000000  0000000

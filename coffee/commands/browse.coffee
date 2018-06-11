@@ -6,7 +6,7 @@
 0000000    000   000   0000000   00     00  0000000   00000000  
 ###
 
-{ slash, fileList, post, stopEvent, valid, empty, str, os, clamp, log, error, $ } = require 'kxk'
+{ post, slash, fileList, stopEvent, valid, empty, str, os, clamp, log, error, $ } = require 'kxk'
 
 Command     = require '../commandline/command'
 FileBrowser = require '../browser/filebrowser'
@@ -40,7 +40,7 @@ class Browse extends Command
         super state
         @browser.start()
         if valid state.text
-            @browser.loadFile state.text, focus:false, dontJump:true
+            @browser.navigateToFile state.text
         window.split.swap $('terminal'), $('area')
 
     clear: ->
@@ -60,7 +60,7 @@ class Browse extends Command
         if action != 'shelf'
             
             if window.editor.currentFile?
-                @browser.loadFile window.editor.currentFile 
+                @browser.navigateToFile window.editor.currentFile 
             else 
                 log 'browse start process.cwd', process.cwd()
                 post.emit 'filebrowser', 'loadItem', file:process.cwd(), type:'dir'
@@ -218,7 +218,7 @@ class Browse extends Command
         else
             @hideList()
         
-    handleModKeyComboEvent: (mod, key, combo, event) -> 
+    handleModKeyComboEvent: (mod, key, combo, event) ->
         
         switch combo
             when 'backspace'
@@ -309,7 +309,7 @@ class Browse extends Command
                 @commandline.setText cmd
                 return
             else if slash.fileExists slash.removeLinePos cmd
-                @browser.loadFile cmd
+                # @browser.navigateToFile cmd
                 @commandline.setText cmd
                 log 'jumpTo', cmd
                 post.emit 'jumpToFile', file:cmd

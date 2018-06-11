@@ -156,6 +156,7 @@ class Syntax
                 clss  = d.clss? and d.clss.length and " class=\"#{d.clss}\"" or ''
                 clrzd = "<span#{style}#{clss}>#{spc}#{str.encode d.match}</span>"
                 l += clrzd
+        # console.log 'spanForTextAndSyntax', text, 'span', l
         l
 
     @rangesForTextAndSyntax: (line, n) ->

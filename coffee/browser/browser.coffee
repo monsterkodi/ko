@@ -254,101 +254,101 @@ class Browser extends Stage
     # 000       000   000  000  0000     000     000       000  0000     000     
     #  0000000   0000000   000   000     000     00000000  000   000     000     
     
-    loadSourceInfo: (info, opt) =>
-        
-        file = opt.item.file
-        
-        # log 'loadSourceInfo', opt
-        
-        if file != @activeColumn()?.activePath()
-            return
+    # loadSourceInfo: (info, opt) => # unused ???
+#         
+        # file = opt.item.file
+#         
+        # # log 'loadSourceInfo', opt
+#         
+        # if file != @activeColumn()?.activePath()
+            # return
 
-        items = []
-        clsss = info?.classes ? []
-        for clss in clsss
-            text = '● '+clss.name
-            items.push name: clss.name, text:text, type:'class', file: file, line: clss.line
-        
-        funcs = info?.funcs ? []
-        for func in funcs
-            if func.test == 'describe'
-                text = '● '+func.name
-            else if func.static
-                text = '  ◆ '+func.name
-            else if func.post
-                text = '  ⬢ '+func.name
-            else
-                text = '  ▸ '+func.name
-            items.push name: func.name, text:text, type:'func', file: file, line: func.line
+        # items = []
+        # clsss = info?.classes ? []
+        # for clss in clsss
+            # text = '● '+clss.name
+            # items.push name: clss.name, text:text, type:'class', file: file, line: clss.line
+#         
+        # funcs = info?.funcs ? []
+        # for func in funcs
+            # if func.test == 'describe'
+                # text = '● '+func.name
+            # else if func.static
+                # text = '  ◆ '+func.name
+            # else if func.post
+                # text = '  ⬢ '+func.name
+            # else
+                # text = '  ▸ '+func.name
+            # items.push name: func.name, text:text, type:'func', file: file, line: func.line
 
-        if items.length
-            items.sort (a,b) -> a.line - b.line
-            opt.parent ?= opt.item
-            @clearColumnsFrom opt.column
-            @loadItems items, opt
-            if @focusOn
-                log 'focusOn', @focusOn
-                window.split.focus @focusOn
-                delete @focusOn
-            true
-        else
-            if @focusOn
-                log 'focusOn', @focusOn
-                window.split.focus @focusOn
-                delete @focusOn
-            false
+        # if items.length
+            # items.sort (a,b) -> a.line - b.line
+            # opt.parent ?= opt.item
+            # @clearColumnsFrom opt.column
+            # @loadItems items, opt
+            # if @focusOn
+                # log 'focusOn', @focusOn
+                # window.split.focus @focusOn
+                # delete @focusOn
+            # true
+        # else
+            # if @focusOn
+                # log 'focusOn', @focusOn
+                # window.split.focus @focusOn
+                # delete @focusOn
+            # false
     
-    loadSourceItem: (item, opt={}) ->
-        
-        file = item.file
-        opt.item = item
-        
-        if opt.async
-            if not @indexedFiles?[file]
-                opt.winID = window.winID
-                post.toMain 'sourceInfoForFile', opt
-            else
-                clearTimeout @loadSourceInfoTimer
-                delayedLoadSourceInfo = =>
-                    @loadSourceInfo @indexedFiles[file], opt
-                @loadSourceInfoTimer = setTimeout delayedLoadSourceInfo, 100
-            return false
-        
-        items = []
-        
-        @indexedFiles ?= post.get 'indexer', 'files' #, file
+    # loadSourceItem: (item, opt={}) ->
+#         
+        # file = item.file
+        # opt.item = item
+#         
+        # if opt.async
+            # if not @indexedFiles?[file]
+                # opt.winID = window.winID
+                # post.toMain 'sourceInfoForFile', opt
+            # else
+                # clearTimeout @loadSourceInfoTimer
+                # delayedLoadSourceInfo = =>
+                    # @loadSourceInfo @indexedFiles[file], opt
+                # @loadSourceInfoTimer = setTimeout delayedLoadSourceInfo, 100
+            # return false
+#         
+        # items = []
+#         
+        # @indexedFiles ?= post.get 'indexer', 'files' #, file
 
-        if @indexedFiles[file]?
-            return @loadSourceInfo @indexedFiles[file], opt
-            
-        false
-            
-    loadContent: (row, opt) ->
-        
-        item  = row.item
-        file  = item.file
+        # if @indexedFiles[file]?
+            # return @loadSourceInfo @indexedFiles[file], opt
+#             
+        # false
+#             
+    # loadContent: (row, opt) -> # unused ???
+#         
+        # item  = row.item
+        # file  = item.file
 
-        log 'loadContent', file
-        
-        if not @loadSourceItem item, opt
-            ext = slash.ext file  
-            if ext in ['gif', 'png', 'jpg', 'jpeg', 'svg']
-                @clearColumnsFrom opt.column, pop:true
-                @loadImage row, file
-            else if ext in ['icns', 'tiff', 'tif'] and not slash.win()
-                @clearColumnsFrom opt.column, pop:true
-                @convertImage row
-            else if ext in ['pxm']
-                @clearColumnsFrom opt.column, pop:true
-                @convertPXM row
-            else if not opt.async
-                @clearColumnsFrom opt.column
-            @endNavigateToTarget?()
-            
-        if item.textFile and not @skipJump
-            post.emit 'jumpTo', file:file, newTab:opt.newTab
-            
-        delete @skipJump
+        # log 'loadContent', file
+#         
+        # if not @loadSourceItem item, opt
+            # ext = slash.ext file  
+            # if ext in ['gif', 'png', 'jpg', 'jpeg', 'svg']
+                # @clearColumnsFrom opt.column, pop:true
+                # @loadImage row, file
+            # else if ext in ['icns', 'tiff', 'tif'] and not slash.win()
+                # @clearColumnsFrom opt.column, pop:true
+                # @convertImage row
+            # else if ext in ['pxm']
+                # @clearColumnsFrom opt.column, pop:true
+                # @convertPXM row
+            # else if not opt.async
+                # @clearColumnsFrom opt.column
+            # # @endNavigateToTarget?()
+#             
+        # if item.textFile and not @skipJump
+            # post.emit 'jumpTo', file:file, newTab:opt.newTab
+#             
+        # delete @skipJump
 
     # 000  00     00   0000000    0000000   00000000  
     # 000  000   000  000   000  000        000       

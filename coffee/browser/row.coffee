@@ -207,7 +207,7 @@ class Row
             unusedFilename(newFile).then (newFile) =>
                 fs.rename @item.file, newFile, (err) =>
                     return error 'rename failed', err if err
-                    @browser.loadFile newFile
+                    post.emit 'loadFile', newFile
         @removeInput()
         
     # 0000000    00000000    0000000    0000000   

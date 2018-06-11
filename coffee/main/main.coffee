@@ -9,16 +9,32 @@
 { post, app, args, udp, stopEvent, fileList, first, colors, about, prefs, 
   state, store, noon, slash, os, fs, str, empty, valid, error, log, _ } = require 'kxk'
 
+# post.debug()
+
+coffeestack = require 'coffeestack'
+
 process.on 'uncaughtException', (err) ->
-    error err.message ? err
-    sutil = require 'stack-utils'
-    stack = new sutil cwd: process.cwd(), internals: sutil.nodeInternals()
-    stackTrace = stack.captureString()
-    # console.log 'stackTrace', stackTrace.split('\n').length, stackTrace
-    log stackTrace 
-    if err.stack?
-        log 'clean:', stack.clean err.stack
-  
+    srcmap = require '../tools/srcmap'
+    convertedLines = []
+    atLinePattern = /^(\s+at .* )\((.*):(\d+):(\d+)\)/
+    for stackTraceLine in err.stack.split('\n')
+        if match = atLinePattern.exec(stackTraceLine)
+            filePath = match[2]
+            line = match[3]
+            column = match[4]
+            if slash.ext(filePath) is 'js'
+                mappedLine = srcmap.toCoffee filePath, line, column
+            if mappedLine?
+                convertedLines.push("#{match[1]}(#{mappedLine[0]}:#{mappedLine[1]}:#{mappedLine[2]})")
+            else
+                convertedLines.push(stackTraceLine)
+        else
+            convertedLines.push(stackTraceLine)
+  
+    convertedLines.join('\n')
+    log convertedLines
+    
+        
 pkg      = require '../../package.json'
 electron = require 'electron'
 
@@ -68,7 +84,6 @@ post.onGet 'logSync',   ->
 
 post.on 'restartShell',       (cfg)   -> winShells[cfg.winID].restartShell()
 post.on 'newWindowWithFile',  (file)  -> main.createWindowWithFile file:file
-post.on 'maximizeWindow',     (winID) -> main.toggleMaximize winWithID winID
 post.on 'activateWindow',     (winID) -> main.activateWindowWithID winID
 post.on 'activateNextWindow', (winID) -> main.activateNextWindow winID
 post.on 'activatePrevWindow', (winID) -> main.activatePrevWindow winID
@@ -161,7 +176,7 @@ class Main extends app
         @moveWindowStashes()
         
         @openFiles = openFiles
-
+        
     #  0000000   000   000   0000000  000   000   0000000   000   000  
     # 000   000  0000  000  000       000   000  000   000  000 0 000  
     # 000   000  000 0 000  0000000   000000000  000   000  000000000  
@@ -194,7 +209,7 @@ class Main extends app
     # 000   000   0000000     000     000   0000000   000   000  
     
     onMenuAction: (action, arg) =>
-        
+        log action
         switch action
             when 'Cycle Windows'    then @activateNextWindow arg
             when 'Arrange Windows'  then @arrangeWindows()
@@ -222,15 +237,6 @@ class Main extends app
     
     saveBounds: => #log 'saveBounds'
     
-    toggleMaximize: (win) ->
-
-        disableSnap = true
-        if win.isMaximized()
-            win.unmaximize()
-        else
-            win.maximize()
-        disableSnap = false
-
     toggleWindows: =>
 
         if wins().length
@@ -249,6 +255,7 @@ class Main extends app
         for w in wins()
             w.hide()
             @hideDock()
+        throw new Error 'test'
         @
 
     showWindows: ->
@@ -256,6 +263,7 @@ class Main extends app
         for w in wins()
             w.show()
             @showDock()
+        throw new Error 'test'
         @
 
     raiseWindows: ->
@@ -265,6 +273,7 @@ class Main extends app
                 w.showInactive()
             visibleWins()[0].showInactive()
             visibleWins()[0].focus()
+        throw new Error 'test'
         @
 
     activateNextWindow: (win) ->
@@ -276,6 +285,7 @@ class Main extends app
                 i = 1 + allWindows.indexOf w
                 i = 0 if i >= allWindows.length
                 @activateWindowWithID allWindows[i].id
+                throw new Error 'test'
                 return w
         null
 
@@ -289,6 +299,7 @@ class Main extends app
                 i = allWindows.length-1 if i < 0
                 @activateWindowWithID allWindows[i].id
                 return w
+        throw new Error 'test'
         null
 
     activateWindowWithID: (wid) ->
@@ -300,31 +311,6 @@ class Main extends app
         else
             w.focus()
         w
-
-    closeOtherWindows: =>
-
-        log 'closeOtherWindows'
-        for w in wins()
-            if w != activeWin()
-                @closeWindow w
-
-    closeWindow: (w) -> 
-        log 'closeWindow'
-        w?.close()
-
-    closeWindows: =>
-
-        log 'closeWindows'
-        for w in wins()
-            @closeWindow w
-        @hideDock()
-
-    postDelayedNumWins: ->
-
-        clearTimeout @postDelayedNumWinsTimer
-        postNumWins = ->
-            post.toWins 'numWins', wins().length
-        @postDelayedNumWinsTimer = setTimeout postNumWins, 300
 
     #  0000000  000000000   0000000    0000000  000   000
     # 000          000     000   000  000       000  000
@@ -618,3 +604,4 @@ main.navigate = new Navigate main
 
 log 'ko main'
     
+throw new Error 'start1'

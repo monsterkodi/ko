@@ -63,7 +63,6 @@ class Column
             @rows.push new Row @, item
         
         @scroll.update()
-        # post.emit 'browserColumnItemsSet', @ # for filebrowser target navigation
         @
 
     setItems: (@items, opt) ->
@@ -76,8 +75,6 @@ class Column
             @rows.push new Row @, item
         
         @scroll.update()
-        
-        post.emit 'browserColumnItemsSet', @ # for filebrowser target navigation
         @
 
     isDir:  -> @parent.type == 'dir' 
@@ -114,7 +111,7 @@ class Column
     prevColumn: -> @browser.column @index-1
         
     name: -> "#{@browser.name}:#{@index}"
-    path: -> @parent.file
+    path: -> @parent?.file ? ''
         
     numRows:    -> @rows.length ? 0   
     rowHeight:  -> @rows[0]?.div.clientHeight ? 0
@@ -164,18 +161,6 @@ class Column
     # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000   
     # 000  0000  000   000     000     000  000   000  000   000     000     000       
     # 000   000  000   000      0      000   0000000   000   000     000     00000000  
-
-    navigateTo: (target) ->
-
-        target = _.isString(target) and target or target?.file
-        if not @parent then return error "no parent? #{@index}"
-        relpath = slash.relative target, @parent.file
-        relitem = _.first slash.split relpath
-        row = @row relitem
-        if row
-            @activateRow row
-        else            
-            @browser.endNavigateToTarget()
 
     navigateRows: (key) ->
 
@@ -260,13 +245,7 @@ class Column
             
             if fuzzied.length
                 row = fuzzied[0].original
-                autoNavi = row.item.name == @search and @browser.endNavigateToTarget? and row.item.type in ['file', 'dir'] # smelly
-                if autoNavi
-                    @browser.navigateTargetFile = row.item.file
-                    @clearSearch()    
-                else
-                    row.div.appendChild @searchDiv
-    
+                row.div.appendChild @searchDiv
                 row.activate()
                 break
         @
@@ -365,7 +344,7 @@ class Column
             if fs.copy? # fs.copyFile in node > 8.4
                 fs.copy @activePath(), fileName, (err) =>
                     return error 'copy file failed', err if err?
-                    @browser.loadFile fileName
+                    post.emit 'loadFile', fileName
         
     #  0000000   000  000000000  
     # 000        000     000     

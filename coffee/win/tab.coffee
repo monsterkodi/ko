@@ -98,8 +98,7 @@ class Tab
         sep = '■' if window.editor.newlineCharacters == '\r\n'
         @div.appendChild elem 'span', class:'dot', text:sep
         
-        # sep = " ▸ "
-        sep = "<span class='dot'>▸</span>"
+        sep = "<span class='dot'>⯈</span>"
         @pkg = elem 'span', class:'pkg', html: @info.pkg and (@info.pkg + sep) or ''
         @div.appendChild @pkg
             
@@ -107,6 +106,8 @@ class Tab
         name = elem 'span', class:'name', html:render.line(diss, charWidth:0)
         @div.appendChild name
 
+        @div.appendChild elem 'span', class:'tabdrag'
+        
         if @info.file?
             diss = syntax.dissForTextAndSyntax slash.tilde(@file()), 'ko' #, join: true 
             html = render.line(diss, charWidth:0)
