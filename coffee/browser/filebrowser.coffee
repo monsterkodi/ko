@@ -144,7 +144,7 @@ class FileBrowser extends Browser
             items.sort (a,b) -> a.line - b.line
             @columns[col].loadItems items, item
         else
-            log 'not valid', items, 'info', info
+            log 'not valid', item.file, 'info', info
             
     # 0000000    000  00000000   000  000000000  00000000  00     00  
     # 000   000  000  000   000  000     000     000       000   000  

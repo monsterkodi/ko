@@ -518,15 +518,7 @@ class Open extends Command
             status: 'ok'
         else
             status: 'failed'
-  
-    onBrowserItemActivated: (item) =>
-
-        return if not @isActive()
-        
-        # if item.file
-            # if item.type == 'file' 
-                # @commandline.setText pth
-            
+              
     # 00000000   00000000   0000000   0000000   000      000   000  00000000  0000000  
     # 000   000  000       000       000   000  000      000   000  000       000   000
     # 0000000    0000000   0000000   000   000  000       000 000   0000000   000   000
