@@ -57,8 +57,6 @@ class Shelf extends Column
         $('.hover')?.classList.remove 'hover'
         row.setActive emit:true
         
-        log 'shelf.activateRow', item
-        
         if item.type == 'file'
             post.emit 'loadFile', item.file
         else

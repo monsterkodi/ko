@@ -102,30 +102,22 @@ class Row
             when 'dir', 'file' 
                 post.emit 'filebrowser', 'activateItem', @item, @column.index
             else    
-                log 'row.activate', @item.type
                 if @item.file? and _.isString(@item.file) and @item.type != 'obj'
                     opt.line = @item.line
                     opt.col  = @item.column
-                    log 'jumpToFile1', @item.file
                     post.emit 'jumpToFile', opt
                 else if @column.parent.obj? and @column.parent.type == 'obj'
                     if @item.type == 'obj'
-                        log 'row.activate2', @column.index+1
                         @browser.loadObjectItem @item, column:@column.index+1
                         @browser.previewObjectItem  @item, column:@column.index+2
                         if @item.obj?.file? and _.isString @item.obj.file
                             opt.line = @item.obj.line
                             opt.col  = @item.obj.column
-                            log 'jumpToFile1', @item, opt
                             post.emit 'jumpToFile', opt
-                    else
-                        log 'method?', @item
                 else if @item.obj?.file? and _.isString @item.obj.file
                     opt = file:@item.obj.file, line:@item.obj.line, col:@item.obj.column, newTab:opt.newTab
-                    log 'jumpToFile2', opt
                     post.emit 'jumpToFile', opt
                 else
-                    log 'row.activate3 clear', @column.index+1
                     @browser.clearColumnsFrom @column.index+1
         @
     

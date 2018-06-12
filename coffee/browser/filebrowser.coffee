@@ -124,7 +124,6 @@ class FileBrowser extends Browser
     loadSourceItem: (item, col) ->
         
         if not @srcCache[item.file]?
-            log 'get src', item.file
             @srcCache[item.file] = post.get 'indexer', 'file', item.file
             
         info = @srcCache[item.file]
