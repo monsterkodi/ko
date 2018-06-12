@@ -6,7 +6,7 @@
 000       000  0000000  00000000        0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 ###
 
-{ post, valid, empty, elem, clamp, drag, clamp, state, slash, fs, os, error, log, $ } = require 'kxk'
+{ post, valid, empty, last, elem, clamp, drag, clamp, state, slash, fs, os, error, log, $ } = require 'kxk'
   
 Browser  = require './browser'
 Shelf    = require './shelf'
@@ -48,28 +48,50 @@ class FileBrowser extends Browser
             when 'loadItem'     then @loadItem     item
             when 'activateItem' then @activateItem item, col
 
+    # 000       0000000    0000000   0000000    000  000000000  00000000  00     00  
+    # 000      000   000  000   000  000   000  000     000     000       000   000  
+    # 000      000   000  000000000  000   000  000     000     0000000   000000000  
+    # 000      000   000  000   000  000   000  000     000     000       000 0 000  
+    # 0000000   0000000   000   000  0000000    000     000     00000000  000   000  
+    
     loadItem: (item) ->
         
         item.name ?= slash.file item.file
+        
+        @clearColumnsFrom 1, pop:true
         
         switch item.type
             when 'file' then @loadFileItem item
             when 'dir'  then @loadDirItem  item
 
+    #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
+    # 000   000  000          000     000  000   000  000   000     000     000       
+    # 000000000  000          000     000   000 000   000000000     000     0000000   
+    # 000   000  000          000     000     000     000   000     000     000       
+    # 000   000   0000000     000     000      0      000   000     000     00000000  
+    
     activateItem: (item, col) ->
+        
+        @clearColumnsFrom col+2, pop:true
         
         switch item.type
             when 'file' then @loadFileItem item, col+1
             when 'dir'  then @loadDirItem  item, col+1
             
+    # 00000000  000  000      00000000  000  000000000  00000000  00     00  
+    # 000       000  000      000       000     000     000       000   000  
+    # 000000    000  000      0000000   000     000     0000000   000000000  
+    # 000       000  000      000       000     000     000       000 0 000  
+    # 000       000  0000000  00000000  000     000     00000000  000   000  
+    
     loadFileItem: (item, col=0) ->
         
-        log 'loadFileItem', col, item
+        # log 'loadFileItem', col, item
 
         @clearColumnsFrom col, pop:true
         
         if col >= @numCols()
-            log 'addColumn'
+            # log 'addColumn'
             @addColumn()
         
         file = item.file
@@ -88,6 +110,12 @@ class FileBrowser extends Browser
             else
                 @loadSourceItem item, col
             
+    #  0000000   0000000   000   000  00000000    0000000  00000000  000  000000000  00000000  00     00  
+    # 000       000   000  000   000  000   000  000       000       000     000     000       000   000  
+    # 0000000   000   000  000   000  0000000    000       0000000   000     000     0000000   000000000  
+    #      000  000   000  000   000  000   000  000       000       000     000     000       000 0 000  
+    # 0000000    0000000    0000000   000   000   0000000  00000000  000     000     00000000  000   000  
+    
     loadSourceItem: (item, col) ->
         
         info = post.get 'indexer', 'file', item.file
@@ -116,11 +144,17 @@ class FileBrowser extends Browser
             items.sort (a,b) -> a.line - b.line
             @columns[col].loadItems items, item
         else
-            log 'not valid'
+            log 'not valid', items, 'info', info
             
+    # 0000000    000  00000000   000  000000000  00000000  00     00  
+    # 000   000  000  000   000  000     000     000       000   000  
+    # 000   000  000  0000000    000     000     0000000   000000000  
+    # 000   000  000  000   000  000     000     000       000 0 000  
+    # 0000000    000  000   000  000     000     00000000  000   000  
+    
     loadDirItem: (item, col=0) ->
         
-        log 'loadDirItem', col, item
+        # log 'loadDirItem', col, @numCols(), item
         
         return if col>0 and item.name == '/'
         
@@ -130,9 +164,11 @@ class FileBrowser extends Browser
             
             if err? then return error "can't load dir #{dir}: #{err}"
             
+            # log 'loadDirItem', col, @numCols(), dir
+            
             updir = slash.resolve slash.join dir, '..'
 
-            if col == 0 or @columns[col-1].activeRow().item.name == '..'
+            if col == 0 or col-1 < @numCols() and @columns[col-1].activeRow()?.item.name == '..'
                 if not (updir == dir == slash.resolve '/') 
                     items.unshift 
                         name: '..'
@@ -144,35 +180,28 @@ class FileBrowser extends Browser
                         type: 'dir'
                         file: dir
              
-            if col >= @numCols()
-                log 'addColumn'
+            while col >= @numCols()
+                # log 'addColumn'
                 @addColumn()
-            else
-                @clearColumnsFrom col+1, pop:true
+             
+            # log 'col', col, @numCols()
             @columns[col].loadItems items, item
             @getGitStatus item
-
-    onFile: (file) =>
         
-        return if not file
-        return if not @flex
-        
-        @navigateToFile file
-        
+    # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
+    # 0000  000  000   000  000   000  000  000        000   000     000     000       
+    # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000   
+    # 000  0000  000   000     000     000  000   000  000   000     000     000       
+    # 000   000  000   000      0      000   0000000   000   000     000     00000000  
+    
     navigateToFile: (file) ->
         
         lastPath = @lastUsedColumn()?.parent.file
         return if file == lastPath
-        # window.lastFocus 
-        log 'navigateToFile', file, lastPath
+
+        # log 'navigateToFile', file, lastPath
         baseDir = @columns[0].path()
-        # log 'baseDir', baseDir
         pkgDir = slash.pkg file
-        # log 'pkgDir', pkgDir
-        # if slash.samePath baseDir, pkgDir
-            # log 'same base/pkg!'
-        # else
-            # log 'load path from', pkgDir
         
         lastlist = slash.pathlist lastPath
         pkglist  = slash.pathlist pkgDir
@@ -185,9 +214,36 @@ class FileBrowser extends Browser
             col0index += 1
             col += 1
             
-        log "col #{col} col0index #{col0index}", filelist.slice col0index
+        paths = filelist.slice col0index
+        # log "col #{col} col0index #{col0index}", paths
+        
+        if slash.isFile last paths
+            lastType = 'file'
+        else
+            lastType = 'dir'
+        
+        @popColumnsFrom   col+paths.length
+        @clearColumnsFrom col
             
-        # @loadFile file, dontJump:true, focus:window.lastFocus
+        for index in [0...paths.length]
+            file = paths[index]
+            item =
+                file: file
+                type: if index == paths.length-1 then lastType else 'dir'
+            @loadDirItem item, col+index
+
+    #  0000000   000   000  00000000  000  000      00000000  
+    # 000   000  0000  000  000       000  000      000       
+    # 000   000  000 0 000  000000    000  000      0000000   
+    # 000   000  000  0000  000       000  000      000       
+    #  0000000   000   000  000       000  0000000  00000000  
+    
+    onFile: (file) =>
+        
+        return if not file
+        return if not @flex
+        
+        @navigateToFile file
             
     #  0000000   0000000   000      000   000  00     00  000   000   0000000  
     # 000       000   000  000      000   000  000   000  0000  000  000       

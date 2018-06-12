@@ -59,7 +59,10 @@ class Shelf extends Column
         
         log 'shelf.activateRow', item
         
-        post.emit 'filebrowser', 'loadItem', item
+        if item.type == 'file'
+            post.emit 'loadFile', item.file
+        else
+            post.emit 'filebrowser', 'loadItem', item
         
         # switch item.type
             # when 'dir'   then @browser.loadDir item.file, column: 0, parent: item

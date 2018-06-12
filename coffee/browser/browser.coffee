@@ -212,11 +212,16 @@ class Browser extends Stage
         @columns.pop()
         
     popEmptyColumns: (opt) -> @popColumn(opt) while @hasEmptyColumns()
-    
+    popColumnsFrom: (col) -> 
+        while @numCols() > col 
+            @popColumn()
+        
     clear: -> @clearColumnsFrom 0, pop:true 
     clearColumnsFrom: (c=0, opt=pop:false) ->
         
         return error "clearColumnsFrom #{c}?" if not c? or c < 0
+        
+        # log 'clearColumnsFrom', c, @numCols(), opt
         
         if c < @numCols()
             @columns[c].clear()

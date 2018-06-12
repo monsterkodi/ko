@@ -604,4 +604,4 @@ main.navigate = new Navigate main
 
 log 'ko main'
     
-throw new Error 'start1'
+# throw new Error 'start1'
