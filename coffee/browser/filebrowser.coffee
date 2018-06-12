@@ -75,8 +75,12 @@ class FileBrowser extends Browser
         @clearColumnsFrom col+2, pop:true
         
         switch item.type
-            when 'file' then @loadFileItem item, col+1
-            when 'dir'  then @loadDirItem  item, col+1
+            when 'dir'  
+                @loadDirItem  item, col+1
+            when 'file' 
+                @loadFileItem item, col+1
+                if item.textFile
+                    post.emit 'jumpToFile', item 
             
     # 00000000  000  000      00000000  000  000000000  00000000  00     00  
     # 000       000  000      000       000     000     000       000   000  
@@ -86,12 +90,11 @@ class FileBrowser extends Browser
     
     loadFileItem: (item, col=0) ->
         
-        # log 'loadFileItem', col, item
+        log 'loadFileItem', col, item
 
         @clearColumnsFrom col, pop:true
         
-        if col >= @numCols()
-            # log 'addColumn'
+        while col >= @numCols()
             @addColumn()
         
         file = item.file
@@ -117,6 +120,8 @@ class FileBrowser extends Browser
     # 0000000    0000000    0000000   000   000   0000000  00000000  000     000     00000000  000   000  
     
     loadSourceItem: (item, col) ->
+        
+        # log "FileBrowser.loadSourceItem col:#{col}", item
         
         info = post.get 'indexer', 'file', item.file
             
@@ -181,7 +186,6 @@ class FileBrowser extends Browser
                         file: dir
              
             while col >= @numCols()
-                # log 'addColumn'
                 @addColumn()
              
             # log 'col', col, @numCols()
@@ -227,10 +231,10 @@ class FileBrowser extends Browser
             
         for index in [0...paths.length]
             file = paths[index]
-            item =
-                file: file
-                type: if index == paths.length-1 then lastType else 'dir'
-            @loadDirItem item, col+index
+            item = file:file, type:if index == paths.length-1 then lastType else 'dir'
+            switch item.type
+                when 'file' then @loadFileItem item, col+index
+                when 'dir'  then @loadDirItem  item, col+index
 
     #  0000000   000   000  00000000  000  000      00000000  
     # 000   000  0000  000  000       000  000      000       
@@ -310,61 +314,21 @@ class FileBrowser extends Browser
         @shelfResize.style.left = "#{@shelfSize}px"
         @shelf.div.style.width = "#{@shelfSize}px"
         @cols.style.left = "#{@shelfSize}px"
-        
-    # 00000000  000  000      00000000  
-    # 000       000  000      000       
-    # 000000    000  000      0000000   
-    # 000       000  000      000       
-    # 000       000  0000000  00000000  
-    
-    # loadFile: (file, opt={}) -> # unused ???
-#         
-        # if empty file
-            # return error 'FileBrowser.loadFile -- no file?'
-#         
-        # log 'loadFile', @lastColumnPath(), file
-#             
-        # if @lastColumnPath() == file
-            # item  = @lastUsedColumn().activeRow()?.item
-            # if item
-                # @lastUsedColumn().focus()
-            # else
-                # item = @lastUsedColumn().prevColumn()?.activeRow()?.item
-                # if item
-                    # @lastUsedColumn().prevColumn().focus()
-#                 
-            # if item then @emit 'itemActivated', item
-            # return
-#             
-        # if lastDir = @lastDirColumn()
-            # if slash.samePath lastDir.path(), slash.dir(file) 
-                # lastDir.row(slash.file file)?.activate()
-                # @loadContent lastDir.row(slash.file file), column:lastDir.index+1
-                # return
-#         
-        # opt.focus ?= true
-        # opt.column ?= 0
-        # dir  = opt.dir 
-        # dir ?= slash.pkg file
-        # dir ?= slash.dir file
-        # opt.file = file
-        # @skipJump = opt.dontJump
-        # @loadDir dir, opt
-        
+                
     # 0000000    00000000    0000000   000   000   0000000  00000000  
     # 000   000  000   000  000   000  000 0 000  000       000       
     # 0000000    0000000    000   000  000000000  0000000   0000000   
     # 000   000  000   000  000   000  000   000       000  000       
     # 0000000    000   000   0000000   00     00  0000000   00000000  
     
-    browse: (dir) -> 
+    # browse: (dir) -> 
 
-        return error "no dir?" if not dir?
+        # return error "no dir?" if not dir?
 
-        log 'browse', dir
-        
-        @clearColumnsFrom 1, pop:true
-        @loadDir dir, column:0, row: 0, focus:true
+        # log 'browse', dir
+#         
+        # @clearColumnsFrom 1, pop:true
+        # @loadDir dir, column:0, row: 0, focus:true
 
     # 000       0000000    0000000   0000000          0000000    000  00000000   
     # 000      000   000  000   000  000   000        000   000  000  000   000  
@@ -372,48 +336,48 @@ class FileBrowser extends Browser
     # 000      000   000  000   000  000   000        000   000  000  000   000  
     # 0000000   0000000   000   000  0000000          0000000    000  000   000  
     
-    loadDir: (dir, opt={}) -> 
-        
-        log 'loadDir', dir, opt
-        
-        if opt.column > 0 and slash.isRoot(dir) and @columns[opt.column-1].activeRow()?.item.name == '/'
-            @clearColumnsFrom opt.column, pop:true
-            return 
-        
-        opt.ignoreHidden ?= state.get "browser|ignoreHidden|#{dir}", true
-        
-        @loadID++
-        opt.loadID = @loadID
-        
-        dirlist dir, opt, (err, items) => 
-            
-            return if opt.loadID != @loadID
-            if err? then return error "can't load dir #{dir}: #{err}"
-            
-            opt.parent ?=
-                type: 'dir'
-                file: slash.path dir
-                name: slash.basename dir
+    # loadDir: (dir, opt={}) -> 
+#         
+        # log 'loadDir', dir, opt
+#         
+        # if opt.column > 0 and slash.isRoot(dir) and @columns[opt.column-1].activeRow()?.item.name == '/'
+            # @clearColumnsFrom opt.column, pop:true
+            # return 
+#         
+        # opt.ignoreHidden ?= state.get "browser|ignoreHidden|#{dir}", true
+#         
+        # @loadID++
+        # opt.loadID = @loadID
+#         
+        # dirlist dir, opt, (err, items) => 
+#             
+            # return if opt.loadID != @loadID
+            # if err? then return error "can't load dir #{dir}: #{err}"
+#             
+            # opt.parent ?=
+                # type: 'dir'
+                # file: slash.path dir
+                # name: slash.basename dir
 
-            column = opt.column ? 0
+            # column = opt.column ? 0
 
-            if column == 0 or @columns[column-1].activeRow()?.item.name == '..'
-                
-                updir = slash.resolve slash.join dir, '..'
+            # if column == 0 or @columns[column-1].activeRow()?.item.name == '..'
+#                 
+                # updir = slash.resolve slash.join dir, '..'
 
-                if not (updir == dir == slash.resolve '/')
-                    items.unshift 
-                        name: '..'
-                        type: 'dir'
-                        file:  updir
-                else
-                    items.unshift 
-                        name: '/'
-                        type: 'dir'
-                        file: dir
-             
-            # log 'loadItems', items.length, opt
-            @loadItems items, opt
+                # if not (updir == dir == slash.resolve '/')
+                    # items.unshift 
+                        # name: '..'
+                        # type: 'dir'
+                        # file:  updir
+                # else
+                    # items.unshift 
+                        # name: '/'
+                        # type: 'dir'
+                        # file: dir
+#              
+            # # log 'loadItems', items.length, opt
+            # @loadItems items, opt
 
     # 000       0000000    0000000   0000000         000  000000000  00000000  00     00   0000000  
     # 000      000   000  000   000  000   000       000     000     000       000   000  000       
@@ -421,15 +385,15 @@ class FileBrowser extends Browser
     # 000      000   000  000   000  000   000       000     000     000       000 0 000       000  
     # 0000000   0000000   000   000  0000000         000     000     00000000  000   000  0000000   
     
-    loadItems: (items, opt) -> # unused???
+    # loadItems: (items, opt) -> # unused???
 
-        # if opt?.file
-            # @navigateTargetFile = opt.file
-            # @navigateTargetOpt  = opt
+        # # if opt?.file
+            # # @navigateTargetFile = opt.file
+            # # @navigateTargetOpt  = opt
 
-        @getGitStatus opt
-            
-        super items, opt
+        # @getGitStatus opt
+#             
+        # super items, opt
 
     #  0000000   000  000000000   0000000  000000000   0000000   000000000  000   000   0000000  
     # 000        000     000     000          000     000   000     000     000   000  000       

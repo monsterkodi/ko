@@ -314,7 +314,7 @@ class Column
                 state.set stateKey, false
             else
                 state.set stateKey
-            @browser.loadDir @parent.file, column:@index, focus:true
+            # @browser.loadDir @parent.file, column:@index, focus:true
         @
         
     toggleExtensions: =>

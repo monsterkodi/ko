@@ -83,34 +83,24 @@ class Row
             @column.activateRow @
             return
         
-        opt = file: @item.file
-                        
         if event?
             { mod } = keyinfo.forEvent event
             switch mod
-                when 'alt', 'command', 'command+alt', 'ctrl', 'ctrl+alt'
+                when 'alt', 'command+alt', 'ctrl+alt'
                     if @item.type == 'file' and @item.textFile
-                        if mod in ['command+alt', 'ctrl+alt']
-                            opt.newWindow = true
-                        else
-                            opt.newTab = true 
-                        post.emit 'jumpTo', opt
-                    else
-                        post.emit 'jumpTo', word:@item.name
-                    return
-            if event.button == 1
-                opt.newTab = true
+                        log 'newWindowWithFile', @item.file
+                        post.toMain 'newWindowWithFile', @item.file
+                        return
             
         $('.hover')?.classList.remove 'hover'
         
         @setActive emit:true
         
-        @browser.skipJump = true if not event? and @item.type == 'file'
+        opt = file: @item.file
         
         switch @item.type
             when 'dir', 'file' 
                 post.emit 'filebrowser', 'activateItem', @item, @column.index
-                post.emit 'jumpToFile', opt if @item.type == 'file'
             else    
                 log 'row.activate', @item.type
                 if @item.file? and _.isString @item.file
@@ -124,9 +114,12 @@ class Row
                         if @item.obj?.file? and _.isString @item.obj.file
                             opt.line = @item.obj.line
                             opt.col  = @item.obj.column
+                            log 'jumpToFile1', opt
                             post.emit 'jumpToFile', opt
                 else if @item.obj?.file? and _.isString @item.obj.file
-                    post.emit 'jumpToFile', file:@item.obj.file, line:@item.obj.line, col:@item.obj.column, newTab:opt.newTab
+                    opt = file:@item.obj.file, line:@item.obj.line, col:@item.obj.column, newTab:opt.newTab
+                    log 'jumpToFile2', opt
+                    post.emit 'jumpToFile', opt
                 else
                     @browser.clearColumnsFrom @column.index+1
         @
