@@ -6,8 +6,9 @@
  0000000   000     000     0000000      000     000   000     000      0000000   0000000   
 ###
 
-{ childp, slash, str, error, log, _ } = require 'kxk'
+{ childp, empty, slash, str, _ } = require 'kxk'
 
+log     = console.log
 gitRoot = require './gitroot'
 
 gitStatus = (fileOrDir) ->
@@ -15,19 +16,22 @@ gitStatus = (fileOrDir) ->
     # log 'gitStatus', fileOrDir
     root = gitRoot fileOrDir
     if not root
-        # log 'no git:', fileOrDir
+        log 'no git!', fileOrDir
         return
-        
+
     gitDir = slash.unslash root
+    # log 'gitRoot', gitDir
 
     if not gitDir? or not slash.isDir gitDir
-        # log 'no git?', fileOrDir, gitDir
+        log 'no git?', fileOrDir, gitDir
         return 
     
     result = childp.execSync 'git status --porcelain', 
         cwd:      gitDir
         encoding: 'utf8'
     
+    # log 'result', result
+        
     lines = result.split '\n'
 
     info = 
@@ -41,7 +45,7 @@ gitStatus = (fileOrDir) ->
     while line = lines.shift()
         rel    = line.slice 3
         file   = slash.join gitDir, line.slice 3
-        while (rel = slash.dir rel) != '.'
+        while (rel = slash.dir rel) != ''
             dirSet.add rel
             
         header = line.slice 0,2
@@ -51,11 +55,17 @@ gitStatus = (fileOrDir) ->
             when '??' then info.added  .push file
             
     info.dirs = Array.from(dirSet).map (d) -> slash.join gitDir, d
-    
+    # log info
     return info
 
 if module.parent
     module.exports = gitStatus
 else
-    log gitStatus process.cwd()
+    if not empty process.argv[2]
+        dir = slash.resolve process.argv[2]
+    else
+        dir = process.cwd()
+    
+    log 'gitStatus', dir
+    log gitStatus dir
     

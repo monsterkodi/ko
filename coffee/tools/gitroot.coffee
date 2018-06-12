@@ -8,6 +8,8 @@
 
 { empty, slash, childp, fs } = require 'kxk'
 
+log = console.log
+
 gitRoot = (pth, cb) ->
 
     pth = slash.resolve pth
@@ -30,9 +32,11 @@ gitRoot = (pth, cb) ->
     
         try
             cwd = slash.dirExists(pth) and slash.unslash(pth) or slash.dir(pth)
+            # log 'cwd', cwd
             r = childp.execSync 'git rev-parse --show-toplevel',
                 cwd:      cwd
                 encoding: 'utf8'
+            # log 'r', r
             return r.trim()
             
         catch err

@@ -36,6 +36,8 @@ class ObjectBrowser extends Browser
     
     loadObject: (obj, opt) =>
         
+        # log 'loadObject', obj, opt
+        
         opt ?= {}
         opt.column ?= 0
         opt.focus  ?= opt.column == 0
@@ -50,9 +52,13 @@ class ObjectBrowser extends Browser
         objName = (opt.text ? opt.name) ? obj.constructor?.name
         
         itemForKeyValue = (key, value) =>
-            type: @valueType value
-            obj:  value
-            name: key
+            item = 
+                type: @valueType value
+                obj:  value
+                name: key
+            item.file = value.file if value.file
+            item.line = value.line if value.line
+            item
 
         sort = true
             
@@ -137,7 +143,7 @@ class ObjectBrowser extends Browser
                     type:'method'
                     file: mthod.file
                     line: mthod.line
-                
+            
             classes[key] =
                 _browse_items_:items          
                 text: key

@@ -309,7 +309,6 @@ class Browse extends Command
                 @commandline.setText cmd
                 return
             else if slash.fileExists slash.removeLinePos cmd
-                # @browser.navigateToFile cmd
                 @commandline.setText cmd
                 log 'jumpTo', cmd
                 post.emit 'jumpToFile', file:cmd

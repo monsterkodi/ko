@@ -6,7 +6,7 @@
 0000000    000  000       000       0000000    000   000  000   000
 ###
 
-{ log, error, elem, str, empty, post, fs, } = require 'kxk'
+{ elem, str, empty, post, fs, error, log } = require 'kxk'
 
 gitWatch = require '../tools/gitwatch'
 lineDiff = require '../tools/linediff'
@@ -95,8 +95,6 @@ class Diffbar
 
         return if not @changes?.changes?.length
         
-        # log "Diffbar.updateMetas", @changes
-
         for change in @changes.changes
 
             boring = @isBoring change 

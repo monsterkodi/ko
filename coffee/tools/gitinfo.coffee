@@ -6,7 +6,7 @@
  0000000   000     000     000  000   000  000        0000000   
 ###
 
-{ childp, empty, slash, str, log, _ } = require 'kxk'
+{ childp, empty, slash, str, _ } = require 'kxk'
 
 gitStatus = require './gitstatus'
 gitDiff   = require './gitdiff'
@@ -26,5 +26,5 @@ else
         dir = slash.resolve process.argv[2]
     else
         dir = process.cwd()
-    log gitInfo dir
+    console.log gitInfo dir
     

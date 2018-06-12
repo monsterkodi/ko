@@ -6,8 +6,9 @@
  0000000   000     000     0000000    000  000       000         
 ###
 
-{ childp, slash, empty, str, log, _ } = require 'kxk'
+{ childp, slash, empty, str, _ } = require 'kxk'
 
+log = console.log
 stripAnsi = require 'strip-ansi'
 
 gitDiff = (file) ->

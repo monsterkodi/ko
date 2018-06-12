@@ -355,7 +355,6 @@ class Column
     updateGitFiles: (files) ->
         
         for row in @rows
-            # $('.browserStatusIcon', row.div)?.remove()
             return if row.item.type not in ['dir', 'file']
             status = files[row.item.file]
             if status?

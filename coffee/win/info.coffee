@@ -101,7 +101,7 @@ class Info
         @setEditor editor        
 
     onClick: (event, cmd) ->
-        if event.metaKey
+        if event.altKey
             window.commandline.commands.term.execute cmd
         else
             window.commandline.commands.coffee.execute cmd

@@ -63,18 +63,7 @@ class Shelf extends Column
             post.emit 'loadFile', item.file
         else
             post.emit 'filebrowser', 'loadItem', item
-        
-        # switch item.type
-            # when 'dir'   then @browser.loadDir item.file, column: 0, parent: item
-            # when 'file'  
-                # if not @browser.loadSourceItem item, column: 0
-                    # @browser.loadFile item.file, focus:false, column:0, dir:slash.dir item.file
-                # post.emit 'jumpToFile', file:item.file
-            # else
-                # @browser.loadSourceItem item, column: 0
-                # if item.file
-                    # post.emit 'jumpToFile', file:item.file, line:item.line, col:item.column
-        
+                
     onBrowserItemActivated: (browserItem) =>
         
         [index, item] = indexAndItemInItemsWithFunc browserItem, @items, _.isEqual
