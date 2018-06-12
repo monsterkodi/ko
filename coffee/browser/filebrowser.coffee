@@ -332,7 +332,6 @@ class FileBrowser extends Browser
         return if empty file
         
         if @gitCache[file]
-            log 'cached', file
             @applyGitStatus file, @gitCache[file], col
             
         else
@@ -360,8 +359,6 @@ class FileBrowser extends Browser
             
     updateGitStatus: (file) =>
         
-        log 'updateGitStatus', file
-        
         for path in slash.pathlist file
             delete @gitCache[path]
         
@@ -379,11 +376,7 @@ class FileBrowser extends Browser
         
         @srcCache[file] = info
         
-        # log 'onFileIndexed', file
-        
         if file == @activeColumn()?.activeRow()?.item.file
-            log 'loadContent?', file
             @loadSourceItem {file:file}, @activeColumn().index+1
-            # @loadContent @activeColumn().activeRow(), column: @activeColumn().index+1
             
 module.exports = FileBrowser
