@@ -253,6 +253,8 @@ class Browser extends Stage
     stop:  -> @cols.remove(); @cols = null
     start: -> @initColumns()
 
+    refresh: => reset()
+        
     # 000  00     00   0000000    0000000   00000000  
     # 000  000   000  000   000  000        000       
     # 000  000000000  000000000  000  0000  0000000   

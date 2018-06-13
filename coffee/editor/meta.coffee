@@ -9,6 +9,7 @@
 { stopEvent, empty, elem, post, slash, fs, error, log, $, _ } = require 'kxk'
 
 ranges = require '../tools/ranges'
+File   = require '../tools/file'
 
 class Meta
 
@@ -75,12 +76,13 @@ class Meta
             for lineMeta in lineMetas
                 lines[lineMeta[0]] = lineMeta[1]
             data = lines.join '\n'
-            fs.writeFile file, data, encoding: 'utf8', (err) ->
+            
+            File.save file, data, (err, file) ->
                 if err? then return error "Meta.saveFileLineMetas -- writeFile err:#{err}"
                 for lineMeta in lineMetas
                     meta = lineMeta[2]
                     delete meta[2].state
-                    meta[2].span.innerHTML = lineMeta[0]+1
+                    meta[2].span?.innerHTML = lineMeta[0]+1
                 post.emit 'search-saved', file
 
     saveLine: (li) ->
@@ -99,6 +101,8 @@ class Meta
                 fileLineMetas[file] = [] if not fileLineMetas[file]?
                 fileLineMetas[file].push [line-1, @editor.line(meta[0]), meta]
 
+        log 'saveChanges', fileLineMetas.length
+        
         for file, lineMetas of fileLineMetas
             @saveFileLineMetas file, lineMetas
 

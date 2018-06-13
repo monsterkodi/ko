@@ -7,7 +7,7 @@
 ###
 
 { post, win, stopEvent, fileList, keyinfo, atomic, prefs, state, stash, first, reversed, childp, 
-  drag, noon, slash, clamp, pos, str, sw, sh, os, fs, empty, log, error, _ } = require 'kxk'
+  drag, noon, slash, clamp, pos, str, sw, sh, os, fs, valid, empty, log, error, _ } = require 'kxk'
 
 menu = require './menu'
 
@@ -32,6 +32,7 @@ Editor      = require '../editor/editor'
 Commandline = require '../commandline/commandline'
 FileEditor  = require '../editor/fileeditor'
 Navigate    = require '../main/navigate'
+File        = require '../tools/file'
 FPS         = require '../tools/fps'
 CWD         = require '../tools/cwd'
 scheme      = require '../tools/scheme'
@@ -52,9 +53,6 @@ commandline = null
 titlebar    = null
 tabs        = null
 
-# sms = require 'source-map-support/register'
-
-# post.debug()
 # window.onerror = function(error, url, line) {
 # message, filename, lineno, colno, error
 # window.onerror = (event, source, line, col, err) ->
@@ -237,49 +235,19 @@ saveFile = (file) ->
         return
 
     editor.stopWatcher()
-
-    if slash.fileExists file
-        stat = fs.statSync file
-        mode = stat.mode
-    else
-        mode = 438
-
-    isWritable = (p) ->
-        try
-            fs.accessSync slash.resolve(p), fs.R_OK | fs.W_OK
-            return true
-        catch
-            return false
+    
+    File.save file, editor.text(), (err, file) ->
         
-    atomic file, editor.text(), { encoding: 'utf8', mode: mode }, (err) ->
-
         editor.saveScrollCursorsAndSelections()
-
-        if not empty err
-            if err.code == 'EPERM' and slash.win()
-                p = slash.resolve file
-                try
-                    childp.exec "p4 edit #{slash.unslash(p)}", (err) ->
-                        return error "p4 edit failed", err if not empty err
-                        if isWritable p
-                            saveFile p
-                            return
-                        else
-                            log 'still not writable?', p
-                catch err
-                    error "can't p4 edit", err
-                return
-            error "saving file #{file}:", err
+        
+        if valid err
+            error "saving '#{file}' failed:", err
             split.show 'logview'
         else
-            fileSavedSuccessfully file
+            editor.setCurrentFile      file
+            post.toOthers 'fileSaved', file, window.winID
+            post.emit     'saved',     file
 
-fileSavedSuccessfully = (file) ->
-    
-    editor.setCurrentFile      file
-    post.toOthers 'fileSaved', file, window.winID
-    post.emit     'saved',     file
-            
 window.saveChanges = ->
 
     if editor.currentFile? and editor.do.hasLineChanges() and slash.fileExists editor.currentFile

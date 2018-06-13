@@ -345,7 +345,7 @@ class Column
                 fs.copy @activePath(), fileName, (err) =>
                     return error 'copy file failed', err if err?
                     post.emit 'loadFile', fileName
-        
+                            
     #  0000000   000  000000000  
     # 000        000     000     
     # 000  0000  000     000     
@@ -395,6 +395,10 @@ class Column
             text:   'Toggle Extensions'
             combo:  'ctrl+e' 
             cb:     @toggleExtensions
+        ,
+            text:   'Refresh'
+            combo:  'ctrl+r' 
+            cb:     @browser.refresh
         ,
             text:   'Duplicate'
             combo:  'ctrl+d' 

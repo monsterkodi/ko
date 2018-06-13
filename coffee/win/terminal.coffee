@@ -116,11 +116,13 @@ class Terminal extends TextEditor
             @appendLineDiss ''
         
     queueMeta: (meta) ->
+        
         @metaQueue.push meta
         clearTimeout @metaTimer
         @metaTimer = setTimeout @dequeueMeta, 0
         
     dequeueMeta: =>
+        
         count = 0
         while meta = @metaQueue.shift()
             @appendMeta meta
@@ -192,18 +194,22 @@ class Terminal extends TextEditor
     # 000   000  00000000     000   
     
     handleModKeyComboCharEvent: (mod, key, combo, char, event) ->
+        
         return if 'unhandled' != super mod, key, combo, char, event
+        
+        log 'combo', combo
+        
         switch combo
             when 'enter'
                 if href = @meta.hrefAtLineIndex @cursorPos()[1]
                     window.loadFile "#{href}" 
                 return
-            when 'command+enter'
+            when 'ctrl+enter', 'command+enter'
                 if href = @meta.hrefAtLineIndex @cursorPos()[1]
                     window.loadFile "#{href}" 
                     window.editor.focus()
                 return
-            when 'command+s'
+            when 'ctrl+s', 'command+s'
                 return if @meta.saveChanges()
             when 'esc'
                 split = window.split

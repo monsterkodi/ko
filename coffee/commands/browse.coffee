@@ -58,12 +58,13 @@ class Browse extends Command
         @browser.start()
         
         if action != 'shelf'
-            
+            log 'browse.start', window.editor.currentFile
             if window.editor.currentFile?
                 @browser.navigateToFile window.editor.currentFile 
             else 
                 log 'browse start process.cwd', process.cwd()
                 post.emit 'filebrowser', 'loadItem', file:process.cwd(), type:'dir'
+            @browser.focus()
 
         name = action
         name = 'browse' if action == 'shelf'
@@ -72,7 +73,7 @@ class Browse extends Command
 
         select: true
         do:     @name == 'Browse' and 'half area' or 'quart area'
-        focus:  action == 'shelf' and 'shelf' or null 
+        focus:  action == 'shelf' and 'shelf' or null
 
     #  0000000   0000000   00     00  00000000   000      00000000  000000000  00000000  
     # 000       000   000  000   000  000   000  000      000          000     000       
@@ -310,7 +311,6 @@ class Browse extends Command
                 return
             else if slash.fileExists slash.removeLinePos cmd
                 @commandline.setText cmd
-                log 'jumpTo', cmd
                 post.emit 'jumpToFile', file:cmd
                 return
 

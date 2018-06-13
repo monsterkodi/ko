@@ -78,7 +78,8 @@ class Search extends Command
         dir ?= slash.dir opt.file
         @walker = new walker
             root:        dir
-            maxDepth:    6
+            maxDepth:    12
+            maxFiles:    5000
             includeDirs: false
             file:        (f,stat) => @searchInFile opt, slash.path f
         @walker.cfg.ignore.push 'js'

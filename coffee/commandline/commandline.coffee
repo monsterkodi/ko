@@ -168,7 +168,6 @@ class Commandline extends TextEditor
             if n == name or name in c.names
                 return c
         
-        
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000
     # 0000000     00000    0000000   000       000   000     000     0000000

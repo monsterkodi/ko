@@ -158,14 +158,14 @@ class FileBrowser extends Browser
     # 000   000  000  000   000  000     000     000       000 0 000  
     # 0000000    000  000   000  000     000     00000000  000   000  
     
-    loadDirItem: (item, col=0) ->
+    loadDirItem: (item, col=0, opt={}) ->
         
         return if col>0 and item.name == '/'
         
         dir = item.file
         
         if @dirCache[dir]
-            @loadDirItems dir, item, @dirCache[dir], col
+            @loadDirItems dir, item, @dirCache[dir], col, opt
         else
             dirlist dir, (err, items) => 
                 
@@ -173,9 +173,9 @@ class FileBrowser extends Browser
                 
                 # log 'dirlist', dir
                 @dirCache[dir] = items
-                @loadDirItems dir, item, items, col
+                @loadDirItems dir, item, items, col, opt
             
-    loadDirItems: (dir, item, items, col) =>
+    loadDirItems: (dir, item, items, col, opt) =>
             
         updir = slash.resolve slash.join dir, '..'
 
@@ -196,6 +196,10 @@ class FileBrowser extends Browser
             @addColumn()
          
         @columns[col].loadItems items, item
+        
+        if opt.active
+            @columns[col].row(slash.file opt.active)?.setActive()
+        
         @getGitStatus item, col
         
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
@@ -206,8 +210,10 @@ class FileBrowser extends Browser
     
     navigateToFile: (file) ->
         
-        lastPath = @lastUsedColumn()?.parent.file
-        return if file == lastPath
+        lastPath = @lastUsedColumn()?.path()
+        if file == lastPath
+            log 'already lastPath', lastPath
+            return
 
         baseDir = @columns[0].path()
         pkgDir = slash.pkg file
@@ -233,12 +239,20 @@ class FileBrowser extends Browser
         @popColumnsFrom   col+paths.length
         @clearColumnsFrom col
             
+        if col > 0
+            @columns[col-1].row(slash.file paths[0])?.setActive()
+        
         for index in [0...paths.length]
+            type = if index == paths.length-1 then lastType else 'dir'
             file = paths[index]
-            item = file:file, type:if index == paths.length-1 then lastType else 'dir'
-            switch item.type
+            item = file:file, type:type
+            switch type
                 when 'file' then @loadFileItem item, col+index
-                when 'dir'  then @loadDirItem  item, col+index
+                when 'dir'  
+                    opt = {}
+                    if index < paths.length-1
+                        opt.active = paths[index+1]
+                    @loadDirItem item, col+index, opt
 
     #  0000000   000   000  00000000  000  000      00000000  
     # 000   000  0000  000  000       000  000      000       
@@ -365,6 +379,16 @@ class FileBrowser extends Browser
             for col in [0..@lastUsedColumn().index]
                 @getGitStatus file:file, col
 
+    refresh: =>
+        
+        @dirCache = {}
+        @gitCache = {}
+        @srcCache = {}
+        
+        log 'refresh', @lastUsedColumn()?.path()
+        if @lastUsedColumn()
+            @navigateToFile @lastUsedColumn()?.path()
+                
     # 000  000   000  0000000    00000000  000   000  00000000  0000000    
     # 000  0000  000  000   000  000        000 000   000       000   000  
     # 000  000 0 000  000   000  0000000     00000    0000000   000   000  
