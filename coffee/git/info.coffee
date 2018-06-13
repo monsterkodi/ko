@@ -8,16 +8,36 @@
 
 { childp, empty, slash, str, _ } = require 'kxk'
 
+log = console.log
+
 status = require './status'
 diff   = require './diff'
 
-info = (fileOrDir) ->
+info = (fileOrDir, cb) ->
+    
+    if _.isFunction cb
+        
+        status fileOrDir, (stts) ->
+            if empty stts
+                cb {}
+            else
+                numFiles = stts.changed.length
+                changed = []
+                for file in stts.changed
+                    diff file, (dsts) -> 
+                        changed.push dsts
+                        numFiles -= 1
+                        if numFiles == 0
+                            stts.changed = changed
+                            cb stts
+    else
 
-    stts = status fileOrDir
-    
-    stts.changed = stts.changed.map (file) -> diff file
-    
-    return stts
+        stts = status fileOrDir
+        if empty stts
+            return {}
+        else
+            stts.changed = stts.changed.map (file) -> diff file
+            return stts
 
 # 00     00   0000000   0000000    000   000  000      00000000  
 # 000   000  000   000  000   000  000   000  000      000       

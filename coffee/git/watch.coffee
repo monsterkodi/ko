@@ -9,7 +9,7 @@
 { post, slash, fs, log } = require 'kxk'
 
 chokidar = require 'chokidar'
-gitRoot  = require './gitroot'
+root     = require './root'
 
 class GitWatch
     
@@ -23,7 +23,7 @@ class GitWatch
 
         return if not file?
         
-        gitRoot file, (gitDir) =>
+        root file, (gitDir) =>
             
             return if not gitDir?
             
