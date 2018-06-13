@@ -9,27 +9,35 @@
 { childp, slash, valid, empty, str, _ } = require 'kxk'
 
 log       = console.log
-forkfunc  = require '../tools/forkfunc'
 stripAnsi = require 'strip-ansi'
 
-gitDiff = (file, cb) ->
+gitCmd  = (file) -> "git --no-pager diff -U0 \"#{slash.file file}\""
+execOpt = (cwd)  -> cwd:cwd, encoding:'utf8', stdio:['pipe', 'pipe', 'ignore']
 
-    if _.isFunction cb
-        forkfunc __filename, file, (err, info) ->
-            cb({}) if valid err
-            cb info
-        return
+gitDiff = (file, cb) ->
     
     file = slash.resolve file
 
-    return {} if not slash.isFile file
+    if _.isFunction cb
+        
+        slash.isFile file, (stat) ->
+            cb({}) if empty stat
+            childp.exec gitCmd(file), execOpt(slash.unslash slash.dir file), (err,r) ->
+                if valid err then cb({}) 
+                else cb parseResult file, r
+    else
     
-    gitCommand = "git --no-pager diff -U0 \"#{slash.file file}\""
+        return {} if not slash.isFile file
+        parseResult file, childp.execSync gitCmd(file), execOpt(slash.unslash slash.dir file)
+    
+# 00000000    0000000   00000000    0000000  00000000  
+# 000   000  000   000  000   000  000       000       
+# 00000000   000000000  0000000    0000000   0000000   
+# 000        000   000  000   000       000  000       
+# 000        000   000  000   000  0000000   00000000  
 
-    result = childp.execSync gitCommand, 
-        cwd: slash.unslash slash.dir file
-        encoding: 'utf8' 
-            
+parseResult = (file, result) ->
+    
     info  = file:file, changes:[]
     lines = (stripAnsi l for l in result.split '\n')
 
@@ -74,6 +82,12 @@ gitDiff = (file, cb) ->
             info.changes.push change
 
     return info
+
+# 00     00   0000000   0000000    000   000  000      00000000  
+# 000   000  000   000  000   000  000   000  000      000       
+# 000000000  000   000  000   000  000   000  000      0000000   
+# 000 0 000  000   000  000   000  000   000  000      000       
+# 000   000   0000000   0000000     0000000   0000000  00000000  
 
 if module.parent
     
