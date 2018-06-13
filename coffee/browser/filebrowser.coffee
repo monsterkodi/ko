@@ -345,9 +345,11 @@ class FileBrowser extends Browser
         return if empty file
         
         if @gitCache[file]
+            
             @applyGitStatus file, @gitCache[file], col
             
         else
+            log 'gitstatus', file
             forkfunc '../tools/gitstatus', file, (err, info) =>
                 
                 if valid err
