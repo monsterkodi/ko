@@ -1,9 +1,9 @@
 ###
- 0000000   000  000000000  0000000    000  00000000  00000000    
-000        000     000     000   000  000  000       000         
-000  0000  000     000     000   000  000  000000    000000      
-000   000  000     000     000   000  000  000       000         
- 0000000   000     000     0000000    000  000       000         
+0000000    000  00000000  00000000    
+000   000  000  000       000         
+000   000  000  000000    000000      
+000   000  000  000       000         
+0000000    000  000       000         
 ###
 
 { childp, slash, valid, empty, str, _ } = require 'kxk'
@@ -11,10 +11,10 @@
 log       = console.log
 stripAnsi = require 'strip-ansi'
 
-gitCmd  = (file) -> "git --no-pager diff -U0 \"#{slash.file file}\""
-execOpt = (cwd)  -> cwd:cwd, encoding:'utf8', stdio:['pipe', 'pipe', 'ignore']
+gitCmd = (file) -> "git --no-pager diff -U0 \"#{slash.file file}\""
+gitOpt = (cwd)  -> cwd:cwd, encoding:'utf8', stdio:['pipe', 'pipe', 'ignore']
 
-gitDiff = (file, cb) ->
+diff = (file, cb) ->
     
     file = slash.resolve file
 
@@ -22,13 +22,13 @@ gitDiff = (file, cb) ->
         
         slash.isFile file, (stat) ->
             cb({}) if empty stat
-            childp.exec gitCmd(file), execOpt(slash.unslash slash.dir file), (err,r) ->
+            childp.exec gitCmd(file), gitOpt(slash.unslash slash.dir file), (err,r) ->
                 if valid err then cb({}) 
                 else cb parseResult file, r
     else
     
         return {} if not slash.isFile file
-        parseResult file, childp.execSync gitCmd(file), execOpt(slash.unslash slash.dir file)
+        parseResult file, childp.execSync gitCmd(file), gitOpt(slash.unslash slash.dir file)
     
 # 00000000    0000000   00000000    0000000  00000000  
 # 000   000  000   000  000   000  000       000       
@@ -91,7 +91,7 @@ parseResult = (file, result) ->
 
 if module.parent
     
-    module.exports = gitDiff
+    module.exports = diff
     
 else
     
@@ -100,5 +100,5 @@ else
     else
         file = process.cwd()
     
-    log gitDiff file
+    log diff file
     

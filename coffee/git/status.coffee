@@ -1,32 +1,45 @@
 ###
- 0000000   000  000000000   0000000  000000000   0000000   000000000  000   000   0000000  
-000        000     000     000          000     000   000     000     000   000  000       
-000  0000  000     000     0000000      000     000000000     000     000   000  0000000   
-000   000  000     000          000     000     000   000     000     000   000       000  
- 0000000   000     000     0000000      000     000   000     000      0000000   0000000   
+ 0000000  000000000   0000000   000000000  000   000   0000000  
+000          000     000   000     000     000   000  000       
+0000000      000     000000000     000     000   000  0000000   
+     000     000     000   000     000     000   000       000  
+0000000      000     000   000     000      0000000   0000000   
 ###
 
-{ childp, empty, slash, str, _ } = require 'kxk'
+{ childp, valid, empty, slash, str, _ } = require 'kxk'
 
-log     = console.log
-gitRoot = require './gitroot'
+log  = console.log
+root = require './root'
 
-gitStatus = (fileOrDir) ->
+gitCmd = 'git status --porcelain'
+gitOpt = (gitDir) -> encoding: 'utf8', cwd: slash.unslash gitDir
 
-    root = gitRoot fileOrDir
-    if not root
-        # log 'no git!', fileOrDir
-        return
+status = (fileOrDir, cb) ->
 
-    gitDir = slash.unslash root
-
-    if not gitDir? or not slash.isDir gitDir
-        # log 'no git?', fileOrDir, gitDir
-        return 
+    if _.isFunction cb
+        
+        root fileOrDir, (gitDir) ->
+            
+            if empty gitDir
+                cb {}
+            else
+                childp.exec gitCmd, gitOpt(gitDir), (err,r) ->
+                    if valid err
+                        cb {}
+                    else
+                        cb parseResult gitDir, r
+    else
+        gitDir = root fileOrDir
+        return {} if empty gitDir
+        parseResult gitDir, childp.execSync gitCmd, gitOpt gitDir
     
-    result = childp.execSync 'git status --porcelain', 
-        cwd:      gitDir
-        encoding: 'utf8'
+# 00000000    0000000   00000000    0000000  00000000  
+# 000   000  000   000  000   000  000       000       
+# 00000000   000000000  0000000    0000000   0000000   
+# 000        000   000  000   000       000  000       
+# 000        000   000  000   000  0000000   00000000  
+
+parseResult = (gitDir, result) ->
     
     lines = result.split '\n'
 
@@ -51,15 +64,23 @@ gitStatus = (fileOrDir) ->
             when '??' then info.added  .push file
             
     info.dirs = Array.from(dirSet).map (d) -> slash.join gitDir, d
-    return info
+    info
+
+# 00     00   0000000   0000000    000   000  000      00000000  
+# 000   000  000   000  000   000  000   000  000      000       
+# 000000000  000   000  000   000  000   000  000      0000000   
+# 000 0 000  000   000  000   000  000   000  000      000       
+# 000   000   0000000   0000000     0000000   0000000  00000000  
 
 if module.parent
-    module.exports = gitStatus
+    
+    module.exports = status
+    
 else
     if not empty process.argv[2]
         dir = slash.resolve process.argv[2]
     else
         dir = process.cwd()
     
-    log gitStatus dir
+    log status dir
     
