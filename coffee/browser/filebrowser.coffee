@@ -62,7 +62,7 @@ class FileBrowser extends Browser
         
         item.name ?= slash.file item.file
         
-        @clearColumnsFrom 1, pop:true
+        @popColumnsFrom 1
         
         switch item.type
             when 'file' then @loadFileItem item
@@ -160,7 +160,7 @@ class FileBrowser extends Browser
     
     loadDirItem: (item, col=0, opt={}) ->
         
-        return if col>0 and item.name == '/'
+        return if col > 0 and item.name == '/'
         
         dir = item.file
         
@@ -212,10 +212,8 @@ class FileBrowser extends Browser
         
         lastPath = @lastUsedColumn()?.path()
         if file == lastPath
-            log 'already lastPath', lastPath
             return
 
-        baseDir = @columns[0].path()
         pkgDir = slash.pkg file
         
         lastlist = slash.pathlist lastPath
@@ -238,6 +236,9 @@ class FileBrowser extends Browser
         
         @popColumnsFrom   col+paths.length
         @clearColumnsFrom col
+        while @numCols() < paths.length
+            log 'addColumn', @numCols(), @flex?
+            @addColumn()
             
         if col > 0
             @columns[col-1].row(slash.file paths[0])?.setActive()

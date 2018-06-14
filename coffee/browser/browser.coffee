@@ -42,12 +42,9 @@ class Browser extends Stage
         @view.appendChild @cols
         
         @columns = []
-        for i in [0...2]
-            @newColumn()
-            
-        panes = @columns.map (c) -> div:c.div, min:20
+
         @flex = new flex 
-            panes: panes
+            view:       @cols
             onPaneSize: @updateColumnScrolls
         
     columnAtPos: (pos) ->
@@ -186,24 +183,21 @@ class Browser extends Stage
     # 000000000  000   000  000   000  000       000   000  000      
     # 000   000  000   000  000   000  000       000   000  000      
     # 000   000  0000000    0000000     0000000   0000000   0000000  
-    
-    newColumn: ->
-        col = new Column @
-        @columns.push col
-        col
-      
+          
     addColumn: ->
         
         return if not @flex
-        col = @newColumn()
+
+        col = new Column @
+        @columns.push col
         @flex.addPane div:col.div, size:50
         col
     
-    # 0000000    00000000  000        
-    # 000   000  000       000        
-    # 000   000  0000000   000        
-    # 000   000  000       000        
-    # 0000000    00000000  0000000    
+    # 00000000    0000000   00000000   
+    # 000   000  000   000  000   000  
+    # 00000000   000   000  00000000   
+    # 000        000   000  000        
+    # 000         0000000   000        
     
     popColumn: (opt) ->
         
@@ -212,29 +206,44 @@ class Browser extends Stage
         @columns.pop()
         
     popEmptyColumns: (opt) -> @popColumn(opt) while @hasEmptyColumns()
+        
     popColumnsFrom: (col) -> 
+        
         while @numCols() > col 
             @popColumn()
         
+    #  0000000  000      00000000   0000000   00000000   
+    # 000       000      000       000   000  000   000  
+    # 000       000      0000000   000000000  0000000    
+    # 000       000      000       000   000  000   000  
+    #  0000000  0000000  00000000  000   000  000   000  
+    
     clear: -> @clearColumnsFrom 0, pop:true 
+    
     clearColumnsFrom: (c=0, opt=pop:false) ->
         
         return error "clearColumnsFrom #{c}?" if not c? or c < 0
         
-        # log 'clearColumnsFrom', c, @numCols(), opt
-        
-        if c < @numCols()
-            @columns[c].clear()
-            c++
-            
         if opt.pop
+            if c < @numCols()
+                @columns[c].clear()
+                c++
             while c < @numCols()
                 @popColumn()
+                c++
         else
             while c < @numCols()
-                @columns[c++].clear()
+                @columns[c].clear()
+                c++
 
+    #  0000000  000      00000000   0000000   000   000  
+    # 000       000      000       000   000  0000  000  
+    # 000       000      0000000   000000000  000 0 000  
+    # 000       000      000       000   000  000  0000  
+    #  0000000  0000000  00000000  000   000  000   000  
+    
     isMessy: -> not @flex.relaxed or @hasEmptyColumns()
+    
     cleanUp: -> 
         return false if not @flex?
         return false if not @isMessy()

@@ -58,11 +58,11 @@ class Browse extends Command
         @browser.start()
         
         if action != 'shelf'
-            log 'browse.start', window.editor.currentFile
+            # log 'browse.start', window.editor.currentFile
             if window.editor.currentFile?
                 @browser.navigateToFile window.editor.currentFile 
             else 
-                log 'browse start process.cwd', process.cwd()
+                # log 'browse start process.cwd', process.cwd()
                 post.emit 'filebrowser', 'loadItem', file:process.cwd(), type:'dir'
             @browser.focus()
 

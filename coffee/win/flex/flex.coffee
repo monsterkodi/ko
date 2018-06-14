@@ -6,7 +6,7 @@
 000       0000000  00000000  000   000  
 ###
 
-{ getStyle, clamp, last, drag, def, error, log, _ } = require 'kxk'
+{ getStyle, clamp, valid, empty, last, drag, def, error, log, _ } = require 'kxk'
 
 Pane   = require './pane'
 Handle = require './handle'
@@ -37,11 +37,12 @@ class Flex
         @panes   = []
         @handles = []
 
-        @view = opt.panes[0].div.parentNode
+        @view = opt.view ? opt.panes[0].div.parentNode
         @view.style.display = 'flex'
         @view.style.flexDirection = horz and 'row' or 'column'
         
-        @addPane p for p in opt.panes
+        if valid opt.panes
+            @addPane p for p in opt.panes
                     
     #  0000000   0000000    0000000    
     # 000   000  000   000  000   000  
