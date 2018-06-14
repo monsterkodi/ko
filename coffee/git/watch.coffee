@@ -9,39 +9,28 @@
 { post, slash, fs, log } = require 'kxk'
 
 chokidar = require 'chokidar'
-root     = require './root'
 
 class GitWatch
     
-    constructor: ->
+    constructor: (@gitDir) ->
         
-        @watcher = null
-    
-    watch: (file) ->
+        return if not @gitDir?
         
-        @unwatch()        
+        gitFile = slash.join gitDir, '.git', 'HEAD'
+        
+        if slash.fileExists gitFile
+            
+            refPath = fs.readFileSync gitFile, 'utf8'
+            if refPath.startsWith 'ref: '
+                gitFile = slash.join gitDir, '.git', refPath.slice(5).trim()
 
-        return if not file?
-        
-        root file, (gitDir) =>
-            
-            return if not gitDir?
-            
-            gitFile = slash.join gitDir, '.git', 'HEAD'
-            
-            if slash.fileExists gitFile
-                
-                refPath = fs.readFileSync gitFile, 'utf8'
-                if refPath.startsWith 'ref: '
-                    gitFile = slash.join gitDir, '.git', refPath.slice(5).trim()
-
-                @watcher = chokidar.watch gitFile
-                @watcher.on 'change', (path) -> 
-                    post.emit 'gitRefChanged', file, gitDir
+            @watcher = chokidar.watch gitFile
+            @watcher.on 'change', (path) -> 
+                post.emit 'gitRefChanged', gitDir
 
     unwatch: ->
         
         @watcher?.close()
         delete @watcher
                 
-module.exports = new GitWatch()
+module.exports = GitWatch
