@@ -237,7 +237,6 @@ class FileBrowser extends Browser
         @popColumnsFrom   col+paths.length
         @clearColumnsFrom col
         while @numCols() < paths.length
-            log 'addColumn', @numCols(), @flex?
             @addColumn()
             
         if col > 0

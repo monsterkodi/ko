@@ -209,7 +209,7 @@ class Main extends app
     # 000   000   0000000     000     000   0000000   000   000  
     
     onMenuAction: (action, arg) =>
-        log action
+
         switch action
             when 'Cycle Windows'    then @activateNextWindow arg
             when 'Arrange Windows'  then @arrangeWindows()
@@ -234,8 +234,6 @@ class Main extends app
             log "openFile in win #{win.id}", opt.file
             post.toWin win.id, 'loadFiles', [opt.file]
         win
-    
-    saveBounds: => #log 'saveBounds'
     
     toggleWindows: =>
 
@@ -371,10 +369,6 @@ class Main extends app
             disableSnap = false
             return
 
-        # w.setFullScreen false for w in wl
-
-        log 'arrangeWindows', wl.length
-        
         if wl.length == 1
             wl[0].showInactive()
             wl[0].setBounds
@@ -542,18 +536,13 @@ class Main extends app
 
         toSave = wins().length
 
-        log 'Main.quit windows to save', toSave
-
         if toSave
             post.toWins 'saveStash'
             post.on 'stashSaved', =>
                 toSave -= 1
-                log 'Main.quit stashSaved', toSave
                 if toSave == 0
                     state.save()
-                    log 'Main.quit exit'
                     @exitApp()
-            log 'delay exit'
             'delay'
         else
             state.save()
@@ -602,6 +591,5 @@ koReceiver = new udp port:9779, onMsg:onMsg
 main          = new Main openFiles
 main.navigate = new Navigate main
 
-log 'ko main'
-    
+# log 'ko main'
 # throw new Error 'start1'

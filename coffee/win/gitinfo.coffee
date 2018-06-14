@@ -9,9 +9,9 @@
 { post, slash, elem, empty, error, log, fs, $, _ } = require 'kxk'
 
 lineDiff   = require '../tools/linediff'
-forkfunc   = require '../tools/forkfunc'
 isTextFile = require '../tools/istextfile'
 syntax     = require '../editor/syntax'
+hub        = require '../git/hub'
 
 class GitInfo
     
@@ -73,7 +73,6 @@ class GitInfo
                         start:      diff.new
                         end:        diff.new+diff.length
                         clss:       'gitInfoChange'
-                        # xOffset:    terminal.size.charWidth
                     terminal.meta.add lineMeta
                 
             meta =
@@ -128,6 +127,8 @@ class GitInfo
     
     start: -> 
         
+        log 'gitinfo.start'
+        
         dirOrFile = window.cwd.cwd ? window.editor.currentFile
         log 'Git:', slash.tilde dirOrFile # dont delete this for now :)
 
@@ -135,10 +136,8 @@ class GitInfo
         terminal = window.terminal
         terminal.doAutoClear()
         
-        forkfunc '../tools/gitinfo', dirOrFile, (err, info) =>
-            
-            return error "gitinfo failed for #{file}", err if not empty err
-            
+        hub.info dirOrFile, (info) =>
+
             return if empty info
             
             terminal = window.terminal
