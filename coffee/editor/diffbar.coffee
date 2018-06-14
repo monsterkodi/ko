@@ -10,7 +10,7 @@
 
 gitWatch = require '../tools/gitwatch'
 lineDiff = require '../tools/linediff'
-forkfunc = require '../tools/forkfunc'
+hub      = require '../git/hub'
 
 class Diffbar
 
@@ -195,16 +195,11 @@ class Diffbar
 
             @changes = file:@editor.currentFile
 
-            forkfunc '../tools/gitdiff', @editor.currentFile, (err, changes) =>
+            hub.diff @editor.currentFile, (changes) =>
                 
-                if not empty err
-                    return if 0 <= err.indexOf 'Not a git repository'
-                    log 'git diff error!', err
-                    @changes.error = err
-                else if changes.file == @editor.currentFile
-                    @changes = changes
-                else
-                    return
+                if changes.file != @editor.currentFile then return {}
+                    
+                @changes = changes
                     
                 @updateMetas()
                 @updateScroll()
