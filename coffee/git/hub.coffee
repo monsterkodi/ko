@@ -16,13 +16,21 @@ root     = require './root'
 
 watchers = {}
 roots    = {}
+stati    = {}
 
 class Hub
     
-    @watch: (gitRoot) ->
+    @watch: (gitDir) ->
         
-        watchers[gitRoot] = new watch gitRoot
+        return if watchers[gitDir]
+        log 'hub.watch', gitDir
+        watchers[gitDir] = new watch gitDir, Hub.onGitRefChanged
             
+    @onGitRefChanged: (gitDir) ->
+        
+        log 'hub.onGitRefChanged', gitDir
+        delete stati[gitDir]
+        
     # 0000000    000  00000000  00000000  
     # 000   000  000  000       000       
     # 000   000  000  000000    000000    
@@ -31,7 +39,7 @@ class Hub
     
     @diff: (file, cb) ->
                 
-        log 'hub.diff', file
+        # log 'hub.diff', file
         diff file, (changes) => cb changes
     
     #  0000000  000000000   0000000   000000000  000   000   0000000  
@@ -40,10 +48,24 @@ class Hub
     #      000     000     000   000     000     000   000       000  
     # 0000000      000     000   000     000      0000000   0000000   
     
-    @status: (file, cb) ->
+    @status: (dirOrFile, cb) ->
         
-        log 'hub.status', file
-        status file, (info) => cb info
+        rootStatus = (gitRoot) ->
+            if stati[gitRoot]
+                cb stati[gitRoot]
+            else
+                log 'hub get status', gitRoot
+                status gitRoot, (info) => 
+                    stati[gitRoot] = info
+                    cb info
+        
+        if roots[dirOrFile]
+            rootStatus roots[dirOrFile]
+        else
+            root dirOrFile, (gitDir) ->
+                roots[dirOrFile] = gitDir
+                Hub.watch gitDir
+                rootStatus gitDir            
                     
     # 000  000   000  00000000   0000000   
     # 000  0000  000  000       000   000  

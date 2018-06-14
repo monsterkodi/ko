@@ -8,28 +8,24 @@
 
 { childp, valid, empty, slash, str, _ } = require 'kxk'
 
-log  = console.log
-root = require './root'
+log = console.log
 
 gitCmd = 'git status --porcelain'
 gitOpt = (gitDir) -> encoding: 'utf8', cwd: slash.unslash gitDir
 
-status = (fileOrDir, cb) ->
+status = (gitDir, cb) ->
 
     if _.isFunction cb
         
-        root fileOrDir, (gitDir) ->
-            
-            if empty gitDir
-                cb {}
-            else
-                childp.exec gitCmd, gitOpt(gitDir), (err,r) ->
-                    if valid err
-                        cb {}
-                    else
-                        cb parseResult gitDir, r
+        if empty gitDir
+            cb {}
+        else
+            childp.exec gitCmd, gitOpt(gitDir), (err,r) ->
+                if valid err
+                    cb {}
+                else
+                    cb parseResult gitDir, r
     else
-        gitDir = root fileOrDir
         return {} if empty gitDir
         parseResult gitDir, childp.execSync gitCmd, gitOpt gitDir
     

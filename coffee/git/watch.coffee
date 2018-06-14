@@ -12,21 +12,22 @@ chokidar = require 'chokidar'
 
 class GitWatch
     
-    constructor: (@gitDir) ->
+    constructor: (@gitDir, cb) ->
         
         return if not @gitDir?
         
-        gitFile = slash.join gitDir, '.git', 'HEAD'
+        gitFile = slash.join @gitDir, '.git', 'HEAD'
         
         if slash.fileExists gitFile
             
             refPath = fs.readFileSync gitFile, 'utf8'
             if refPath.startsWith 'ref: '
-                gitFile = slash.join gitDir, '.git', refPath.slice(5).trim()
+                gitFile = slash.join @gitDir, '.git', refPath.slice(5).trim()
 
             @watcher = chokidar.watch gitFile
-            @watcher.on 'change', (path) -> 
-                post.emit 'gitRefChanged', gitDir
+            @watcher.on 'change', (path) => 
+                cb @gitDir
+                post.emit 'gitRefChanged', @gitDir
 
     unwatch: ->
         

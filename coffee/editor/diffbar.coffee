@@ -8,7 +8,6 @@
 
 { elem, str, empty, post, fs, error, log } = require 'kxk'
 
-gitWatch = require '../tools/gitwatch'
 lineDiff = require '../tools/linediff'
 hub      = require '../git/hub'
 
@@ -27,7 +26,6 @@ class Diffbar
         @editor.on 'redone',     @update
         @editor.on 'linesShown', @updateScroll
 
-        gitWatch.watch @editor.currentFile
         post.on 'gitRefChanged', @update
 
     #  0000000  000      000   0000000  000   000
@@ -178,10 +176,7 @@ class Diffbar
     # 000       000  000      000
     # 000       000  0000000  00000000
 
-    onEditorFile: =>
-
-        gitWatch.watch @editor.currentFile
-        @update()
+    onEditorFile: => @update()
 
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000

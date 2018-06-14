@@ -6,7 +6,7 @@
 000  000   000  0000000    00000000  000   000  00000000  000   000
 ###
 
-{ empty, post, slash, fs, os, error, log, _ } = require 'kxk'
+{ post, valid, empty, slash, fs, os, error, log, _ } = require 'kxk'
 
 Walker   = require '../tools/walker'
 matchr   = require '../tools/matchr'
@@ -162,7 +162,7 @@ class Indexer
 
     collectProjects: ->
 
-        log 'collectProjects'
+        # log 'collectProjects'
         
         @projects = {}
         w = new Walker
@@ -200,7 +200,7 @@ class Indexer
         @currentlyIndexing = file
         
         forkfunc './indexprj', file, (err, info) =>
-            return error 'indexing failed', err if not empty err
+            return error 'indexing failed', err if valid err
             delete @currentlyIndexing
             @indexedProjects.push info if info
             doShift = empty @queue
@@ -220,7 +220,7 @@ class Indexer
 
         return if not dir? or @dirs[dir]?
         
-        log 'indexDir', dir
+        # log 'indexDir', dir
         
         @dirs[dir] =
             name: slash.basename dir

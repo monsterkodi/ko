@@ -11,7 +11,7 @@
 Browser  = require './browser'
 Shelf    = require './shelf'
 dirlist  = require '../tools/dirlist'
-forkfunc = require '../tools/forkfunc'
+hub      = require '../git/hub'
 
 class FileBrowser extends Browser
     
@@ -23,11 +23,10 @@ class FileBrowser extends Browser
         @name = 'FileBrowser'
         
         @dirCache = {}
-        @gitCache = {}
         @srcCache = {}
         
-        post.on 'saved',                 @updateGitStatus
-        post.on 'gitRefChanged',         @updateGitStatus
+        # post.on 'saved',                 @updateGitStatus
+        post.on 'gitRefChanged',         @onGitRefChanged
         post.on 'fileIndexed',           @onFileIndexed
         post.on 'file',                  @onFile
         post.on 'filebrowser',           @onFileBrowser
@@ -344,47 +343,27 @@ class FileBrowser extends Browser
         file = item.file ? item.parent?.file
         return if empty file
         
-        if @gitCache[file]
+        hub.status file, (info) =>
             
-            @applyGitStatus file, @gitCache[file], col
-            
-        else
-            log 'gitstatus', file
-            forkfunc '../tools/gitstatus', file, (err, info) =>
+            return if empty info
                 
-                if valid err
-                    log "gitstatus failed for #{file}", err
-                    return
-                
-                @gitCache[file] = info
-                    
-                if valid info
-                    @applyGitStatus file, info, col
-              
-    applyGitStatus: (file, info, col) ->
-        
-        files = {}
-        for key in ['changed', 'added', 'dirs']
-            for file in info[key]
-                files[file] = key
-
-        @shelf.updateGitFiles files
-        
-        @columns[col]?.updateGitFiles files
+            files = {}
+            for key in ['changed', 'added', 'dirs']
+                for file in info[key]
+                    files[file] = key
+    
+            # @shelf.updateGitFiles files
             
-    updateGitStatus: (file) =>
+            @columns[col]?.updateGitFiles files
+            
+    onGitRefChanged: (gitDir) =>
         
-        for path in slash.pathlist file
-            delete @gitCache[path]
-        
-        if @lastUsedColumn()
-            for col in [0..@lastUsedColumn().index]
-                @getGitStatus file:file, col
-
+        for col in [0..@columns.length]
+            @getGitStatus(@columns[col], col)
+            
     refresh: =>
         
         @dirCache = {}
-        @gitCache = {}
         @srcCache = {}
         
         log 'refresh', @lastUsedColumn()?.path()
