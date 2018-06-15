@@ -357,25 +357,24 @@ class Column
         for row in @rows
             return if row.item.type not in ['dir', 'file']
             status = files[row.item.file]
+            
+            $('.browserStatusIcon', row.div)?.remove()
+            
             if status?
-                $('.browserStatusIcon', row.div)?.remove()
+                # $('.browserStatusIcon', row.div)?.remove()
                 row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
             else if row.item.type == 'dir'
                 for file, status of files
                     if row.item.name != '..' and file.startsWith row.item.file
-                        $('.browserStatusIcon', row.div)?.remove()
+                        # $('.browserStatusIcon', row.div)?.remove()
                         row.div.appendChild elem 'span', class:"git-dirs-icon browserStatusIcon"
                         break
             else if @index < 0 # shelf - is this still needed?
                 for file, status of files
                     if file.startsWith row.item.file
-                        $('.browserStatusIcon', row.div)?.remove()
+                        # $('.browserStatusIcon', row.div)?.remove()
                         row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
                         break
-            else
-                if $('.browserStatusIcon', row.div)?
-                    log 'clear status?', row.item.file
-                    $('.browserStatusIcon', row.div)?.remove()
         
     # 00000000    0000000   00000000   000   000  00000000     
     # 000   000  000   000  000   000  000   000  000   000    
