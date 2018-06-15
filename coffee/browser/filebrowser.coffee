@@ -6,7 +6,7 @@
 000       000  0000000  00000000        0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 ###
 
-{ post, valid, empty, last, elem, clamp, drag, clamp, state, slash, fs, os, str, error, log, $ } = require 'kxk'
+{ post, valid, empty, last, elem, clamp, drag, clamp, state, slash, fs, os, str, error, log, $, _ } = require 'kxk'
   
 Browser  = require './browser'
 Shelf    = require './shelf'
@@ -26,7 +26,7 @@ class FileBrowser extends Browser
         @srcCache = {}
         
         # post.on 'saved',                 @updateGitStatus
-        post.on 'gitRefChanged',         @onGitRefChanged
+        post.on 'gitStatus',             @onGitStatus
         post.on 'fileIndexed',           @onFileIndexed
         post.on 'file',                  @onFile
         post.on 'filebrowser',           @onFileBrowser
@@ -343,30 +343,31 @@ class FileBrowser extends Browser
         file = item.file ? item.parent?.file
         return if empty file
         
-        hub.status file, (info) =>
-            
-            return if empty info
-                
-            files = {}
-            for key in ['changed', 'added', 'dirs']
-                for file in info[key]
-                    files[file] = key
-    
-            # @shelf.updateGitFiles files
-            
-            @columns[col]?.updateGitFiles files
-            
-    onGitRefChanged: (gitDir) =>
+        hub.status file, (status) => @applyGitStatus col, status
         
+    applyGitStatus: (col, status) =>
+        
+        return if empty status
+        
+        files = {}
+        for key in ['changed', 'added', 'dirs']
+            for file in status[key]
+                files[file] = key
+            
+        @columns[col]?.updateGitFiles files
+            
+    onGitStatus: (gitDir, status) =>
+        
+        log 'onGitStatus', gitDir
         for col in [0..@columns.length]
-            @getGitStatus(@columns[col], col)
+            @applyGitStatus col, status
             
     refresh: =>
         
         @dirCache = {}
         @srcCache = {}
         
-        log 'refresh', @lastUsedColumn()?.path()
+        # log 'refresh', @lastUsedColumn()?.path()
         if @lastUsedColumn()
             @navigateToFile @lastUsedColumn()?.path()
                 
