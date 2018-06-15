@@ -41,6 +41,11 @@ class Hub
     @onGitRefChanged: (gitDir) ->
         
         delete stati[gitDir]
+        
+        log 'before', diffs
+        diffs = _.filter diffs, (v,k) -> not k.startsWith gitDir
+        log 'after', diffs
+        
         Hub.status gitDir, (status) -> 
             post.emit 'gitStatus', gitDir, status
         
@@ -50,6 +55,9 @@ class Hub
             delete diffs[file]
             Hub.diff file, (changes) -> 
                 post.emit 'gitDiff', file, changes
+                
+        Hub.applyRoot file, (gitDir) ->
+            Hub.onGitRefChanged gitDir if gitDir
         
     # 0000000    000  00000000  00000000  
     # 000   000  000  000       000       

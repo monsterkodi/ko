@@ -27,7 +27,7 @@ class Diffbar
         @editor.on 'redone',     @update
         @editor.on 'linesShown', @updateScroll
 
-        # post.on 'gitRefChanged', @update
+        post.on 'gitStatus',     @update
         post.on 'gitDiff',       @update
 
     #  0000000  000      000   0000000  000   000
