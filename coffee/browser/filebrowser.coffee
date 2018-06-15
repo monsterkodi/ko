@@ -347,22 +347,22 @@ class FileBrowser extends Browser
         
     applyGitStatus: (col, status) =>
         
-        return if empty status
-        
         files = {}
         for key in ['changed', 'added', 'dirs']
             for file in status[key]
                 files[file] = key
             
+        log 'applyGitStatus', col, files
         @columns[col]?.updateGitFiles files
             
     onGitStatus: (gitDir, status) =>
         
-        log 'onGitStatus', gitDir
         for col in [0..@columns.length]
             @applyGitStatus col, status
             
     refresh: =>
+        
+        hub.refresh()
         
         @dirCache = {}
         @srcCache = {}

@@ -20,6 +20,8 @@ stati    = {}
 
 class Hub
     
+    @refresh: -> stati = {}
+    
     @watch: (gitDir) ->
         
         return if watchers[gitDir]
