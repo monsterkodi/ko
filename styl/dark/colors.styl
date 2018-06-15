@@ -231,7 +231,7 @@ span.macro
 //    000     000   000  0000000    0000000
 
 .tabs
-    background          titleColor
+    background          frameColor // titleColor
     color               #aaa
 
 #titlebar.focus .tabs
@@ -253,10 +253,10 @@ span.macro
         color           #060
 
 .tab
-    // background          #1a1a1a
-    background          titleColor
+    // background          #111
+    background          frameColor
     &.active
-        background      frameColor
+        background      titleColor
 
 //  0000000   00000000   00000000   0000000
 // 000   000  000   000  000       000   000
