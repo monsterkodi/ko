@@ -375,6 +375,7 @@ class Column
             else
                 if $('.browserStatusIcon', row.div)?
                     log 'clear status?', row.item.file
+                    $('.browserStatusIcon', row.div)?.remove()
         
     # 00000000    0000000   00000000   000   000  00000000     
     # 000   000  000   000  000   000  000   000  000   000    
