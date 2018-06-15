@@ -25,7 +25,6 @@ class FileBrowser extends Browser
         @dirCache = {}
         @srcCache = {}
         
-        # post.on 'saved',                 @updateGitStatus
         post.on 'gitStatus',             @onGitStatus
         post.on 'fileIndexed',           @onFileIndexed
         post.on 'file',                  @onFile
@@ -352,7 +351,7 @@ class FileBrowser extends Browser
             for file in status[key]
                 files[file] = key
             
-        log 'applyGitStatus', col, files
+        # log 'applyGitStatus', col, files
         @columns[col]?.updateGitFiles files
             
     onGitStatus: (gitDir, status) =>

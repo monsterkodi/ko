@@ -6,9 +6,8 @@
 0000000    000  000       000         
 ###
 
-{ childp, slash, valid, empty, str, _ } = require 'kxk'
+{ childp, slash, valid, empty, str, log, _ } = require 'kxk'
 
-log       = console.log
 stripAnsi = require 'strip-ansi'
 
 gitCmd = (file) -> "git --no-pager diff -U0 \"#{slash.file file}\""
@@ -19,12 +18,13 @@ diff = (file, cb) ->
     file = slash.resolve file
 
     if _.isFunction cb
-        
         slash.isFile file, (stat) ->
             cb({}) if empty stat
             childp.exec gitCmd(file), gitOpt(slash.unslash slash.dir file), (err,r) ->
-                if valid err then cb({}) 
-                else cb parseResult file, r
+                if valid err 
+                    cb {} 
+                else
+                    cb parseResult file, r
     else
     
         return {} if not slash.isFile file

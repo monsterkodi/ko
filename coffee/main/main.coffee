@@ -261,7 +261,7 @@ class Main extends app
         for w in wins()
             w.show()
             @showDock()
-        throw new Error 'test'
+        # throw new Error 'test'
         @
 
     raiseWindows: ->

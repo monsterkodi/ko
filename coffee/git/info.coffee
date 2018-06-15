@@ -6,9 +6,9 @@
 000  000   000  000        0000000   
 ###
 
-{ childp, empty, slash, str, _ } = require 'kxk'
+{ childp, empty, slash, str, log, _ } = require 'kxk'
 
-log = console.log
+# log = console.log
 
 status = require './status'
 diff   = require './diff'
@@ -16,22 +16,28 @@ diff   = require './diff'
 info = (fileOrDir, cb) ->
     
     if _.isFunction cb
-        
+
         status fileOrDir, (stts) ->
             if empty stts
                 cb {}
             else
                 numFiles = stts.changed.length
+                # log 'git/info numFiles', numFiles, stts.changed
                 changed = []
                 for file in stts.changed
-                    diff file, (dsts) -> 
+                    
+                    pushFile = (file) -> (dsts) -> 
+                        log 'git/info', file, 'changes:', dsts
                         changed.push dsts
                         numFiles -= 1
                         if numFiles == 0
                             stts.changed = changed
+                            log 'git/info', stts
                             cb stts
+                    
+                    diff file, pushFile file
     else
-
+        log 'git/info sync'
         stts = status fileOrDir
         if empty stts
             return {}

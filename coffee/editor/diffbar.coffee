@@ -21,12 +21,14 @@ class Diffbar
         @elem.style.top  = '0'
         
         @editor.view.appendChild @elem
+        
         @editor.on 'file',       @onEditorFile
         @editor.on 'undone',     @update
         @editor.on 'redone',     @update
         @editor.on 'linesShown', @updateScroll
 
-        post.on 'gitRefChanged', @update
+        # post.on 'gitRefChanged', @update
+        post.on 'gitDiff',       @update
 
     #  0000000  000      000   0000000  000   000
     # 000       000      000  000       000  000

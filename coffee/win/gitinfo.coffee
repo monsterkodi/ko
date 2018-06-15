@@ -105,8 +105,6 @@ class GitInfo
             when 'added'   then '◼'
             when 'deleted' then '✘'
             
-        log text, slash.tilde file # dont delete this for now :)
-        
         terminal = window.terminal
         meta = 
             diss:       syntax.dissForTextAndSyntax "#{slash.tilde file}", 'ko'
@@ -127,10 +125,7 @@ class GitInfo
     
     start: -> 
         
-        log 'gitinfo.start'
-        
         dirOrFile = window.cwd.cwd ? window.editor.currentFile
-        log 'Git:', slash.tilde dirOrFile # dont delete this for now :)
 
         window.split.raise 'terminal'
         terminal = window.terminal
