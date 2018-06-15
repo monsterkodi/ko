@@ -6,12 +6,10 @@
 0000000      000     000   000     000      0000000   0000000   
 ###
 
-{ childp, valid, empty, slash, str, _ } = require 'kxk'
-
-log = console.log
+{ childp, valid, empty, slash, str, log, _ } = require 'kxk'
 
 gitCmd = 'git status --porcelain'
-gitOpt = (gitDir) -> encoding: 'utf8', cwd: slash.unslash gitDir
+gitOpt = (gitDir) -> encoding: 'utf8', cwd: slash.unslash(gitDir), stdio:['pipe', 'pipe', 'ignore']
 
 status = (gitDir, cb) ->
 
@@ -20,14 +18,22 @@ status = (gitDir, cb) ->
         if empty gitDir
             cb {}
         else
-            childp.exec gitCmd, gitOpt(gitDir), (err,r) ->
-                if valid err
-                    cb {}
-                else
-                    cb parseResult gitDir, r
+            try
+                childp.exec gitCmd, gitOpt(gitDir), (err,r) ->
+                    if valid err
+                        cb {}
+                    else
+                        cb parseResult gitDir, r
+            catch err
+                cb {}
     else
         return {} if empty gitDir
-        parseResult gitDir, childp.execSync gitCmd, gitOpt gitDir
+        try
+            r = childp.execSync gitCmd, gitOpt gitDir
+        catch err
+            return {}
+        
+        parseResult gitDir, r
     
 # 00000000    0000000   00000000    0000000  00000000  
 # 000   000  000   000  000   000  000       000       
@@ -36,6 +42,8 @@ status = (gitDir, cb) ->
 # 000        000   000  000   000  0000000   00000000  
 
 parseResult = (gitDir, result) ->
+    
+    if result.startsWith 'fatal:' then return {}
     
     lines = result.split '\n'
 

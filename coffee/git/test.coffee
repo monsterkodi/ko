@@ -7,6 +7,7 @@ info   = require './info'
 status = require './status'
 
 rootDir = slash.dir slash.dir __dirname
+process.chdir __dirname
 
 should()
 
@@ -14,23 +15,25 @@ describe 'git', ->
 
     describe 'info', ->
         
-        it 'info file', ->  expect(info __filename).to.include gitDir:rootDir
-        it 'info dir',  ->  expect(info __dirname).to.include gitDir:rootDir
+        it 'info file', ->  expect(info rootDir).to.include gitDir:rootDir
+        it 'info dir',  ->  expect(info __dirname).to.include gitDir:__dirname
         it 'info /',    ->  expect(info '/').to.be.empty
 
-        it 'info cb file', (done) ->  info __filename, (r) -> expect(r).to.include gitDir:rootDir ; done()
-        it 'info cb dir',  (done) ->  info __dirname,  (r) -> expect(r).to.include gitDir:rootDir ; done()
-        it 'info cb /',    (done) ->  info '/',        (r) -> expect(r).to.be.empty               ; done()
+        it 'info cb file', (done) ->  info rootDir,   (r) -> expect(r).to.include gitDir:rootDir   ; done()
+        it 'info cb dir',  (done) ->  info __dirname, (r) -> expect(r).to.include gitDir:__dirname ; done()
+        it 'info cb /',    (done) ->  info '/',       (r) -> expect(r).to.be.empty                 ; done()
     
     describe 'status', ->
         
-        it 'status file', ->  expect(status __filename).to.include gitDir:rootDir
-        it 'status dir',  ->  expect(status __dirname).to.include gitDir:rootDir
+        it 'status dir',  ->  expect(status rootDir).to.include gitDir:rootDir
+        it 'status dir',  ->  expect(status __dirname).to.include gitDir:__dirname
+        it 'status file', ->  expect(status __filename).to.be.empty
         it 'status /',    ->  expect(status '/').to.be.empty
 
-        it 'status cb file', (done) ->  status __filename, (r) -> expect(r).to.include gitDir:rootDir ; done()
-        it 'status cb dir',  (done) ->  status __dirname,  (r) -> expect(r).to.include gitDir:rootDir ; done()
-        it 'status cb /',    (done) ->  status '/',        (r) -> expect(r).to.be.empty               ; done()
+        it 'status cb file', (done) ->  status rootDir,    (r) -> expect(r).to.include gitDir:rootDir   ; done()
+        it 'status cb dir',  (done) ->  status __dirname,  (r) -> expect(r).to.include gitDir:__dirname ; done()
+        it 'status cb /',    (done) ->  status __filename, (r) -> expect(r).to.be.empty                 ; done()
+        it 'status cb /',    (done) ->  status '/',        (r) -> expect(r).to.be.empty                 ; done()
         
     describe 'root', ->
         

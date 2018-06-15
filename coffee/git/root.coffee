@@ -6,9 +6,7 @@
 000   000   0000000    0000000      000     
 ###
 
-{ valid, empty, slash, childp, fs, _ } = require 'kxk'
-
-log     = console.log
+{ valid, empty, slash, childp, fs, log, _ } = require 'kxk'
 
 fixPath = (p) ->
     
