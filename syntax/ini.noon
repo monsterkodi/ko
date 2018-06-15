@@ -1,0 +1,46 @@
+# 000  000   000  000
+# 000  0000  000  000
+# 000  000 0 000  000
+# 000  000  0000  000
+# 000  000   000  000
+
+ko
+    extnames                        . ini . iss
+
+[\<\>\+\-\=\/\*]                      math
+
+!=                                    math
+(-)(>)                              . function.marker.tail       . function.marker.head
+(=)(>)                              . function.marker.tail.bound . function.marker.head.bound
+
+# punctuation
+
+[\,]                                punctuation
+
+# braces
+
+[\(\{\[]                              bracket.open
+[\)\}\]]                              bracket.close
+
+# bool
+
+True                                  bool.true
+False                                 bool.false
+
+# dictionary key
+
+(\S+)\s*([=:])                         . dictionary.key . punctuation.marker
+
+#number
+
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+\.\d+)(?:$|[^\.\"\'\w]|\.\.\.?)
+    number.float.sign
+    number.float
+
+(?:^|[^\.\"\'\w]|\.\.\.?)([\+\-]?)(\d+)(?:$|[^\.\"\'\w]|\.\.\.?)
+    number.int.sign
+    number.int
+
+(?:^|[^\.\"\'\w]|\.\.\.?)(0x)([\da-f]+)(?:$|[^\.\"\'\w]|\.\.\.?)
+    number.int.marker
+    number.int

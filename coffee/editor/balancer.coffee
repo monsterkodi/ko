@@ -24,13 +24,14 @@ class Balancer
     setFileType: (fileType) ->
 
         lineComment = switch fileType
-            when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug', 'md', 'rs' then '//'
-            else '#'
+            when 'coffee', 'sh', 'bat', 'noon'  then '#'
+            when 'iss'                          then ';'
+            else  '//'
 
         multiComment = switch fileType
-            when 'cpp', 'cc', 'hpp', 'h', 'styl', 'pug', 'rs' then open: '/*',   close: '*/'
-            when 'html', 'md'                                 then open: '<!--', close: '-->'
-            else                                                   open: '###',  close: '###'
+            when 'coffee'     then open: '###',  close: '###'
+            when 'html', 'md' then open: '<!--', close: '-->'
+            else                   open: '/*',   close: '*/'
         
         @regions =
             # regexp:        clss: 'regexp',         open: '/',   close: '/'
@@ -52,7 +53,7 @@ class Balancer
                 @regions.multiString   = clss: 'string triple',  open: '"""', close: '"""', multi: true
                 @regions.interpolation = clss: 'interpolation',  open: '#{',  close: '}',   multi: true
                 
-            when 'noon'
+            when 'noon', 'iss'
                 @regions.lineComment.solo = true # only spaces before comments allowed
                 
             when 'md'
