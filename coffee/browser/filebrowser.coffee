@@ -19,8 +19,8 @@ class FileBrowser extends Browser
                 
         super view
         @loadID = 0
-        @shelf = new Shelf @
-        @name = 'FileBrowser'
+        @shelf  = new Shelf @
+        @name   = 'FileBrowser'
         
         @dirCache = {}
         @srcCache = {}
@@ -342,22 +342,20 @@ class FileBrowser extends Browser
         file = item.file ? item.parent?.file
         return if empty file
         
-        hub.status file, (status) => @applyGitStatus col, status
+        hub.status file, (status) => @applyGitStatusFiles col, hub.statusFiles status
         
-    applyGitStatus: (col, status) =>
-        
-        files = {}
-        for key in ['changed', 'added', 'dirs']
-            for file in status[key]
-                files[file] = key
-            
-        # log 'applyGitStatus', col, files
+    applyGitStatusFiles: (col, files) =>
+                    
         @columns[col]?.updateGitFiles files
             
     onGitStatus: (gitDir, status) =>
         
+        files = hub.statusFiles status
         for col in [0..@columns.length]
-            @applyGitStatus col, status
+            @applyGitStatusFiles col, files
+            
+        log 'updateGitFiles shelf'
+        @shelf.updateGitFiles files
             
     refresh: =>
         
@@ -366,7 +364,6 @@ class FileBrowser extends Browser
         @dirCache = {}
         @srcCache = {}
         
-        # log 'refresh', @lastUsedColumn()?.path()
         if @lastUsedColumn()
             @navigateToFile @lastUsedColumn()?.path()
                 

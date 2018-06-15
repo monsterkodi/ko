@@ -24,7 +24,7 @@ class Column
         @items = []
         @rows = []
         
-        @div = elem class: 'browserColumn', tabIndex: 6, id: @name()
+        @div   = elem class: 'browserColumn', tabIndex: 6, id: @name()
         @table = elem class: 'browserColumnTable'
         @div.appendChild @table
         
@@ -358,23 +358,21 @@ class Column
             return if row.item.type not in ['dir', 'file']
             status = files[row.item.file]
             
-            $('.browserStatusIcon', row.div)?.remove()
-            
             if status?
-                # $('.browserStatusIcon', row.div)?.remove()
+                $('.browserStatusIcon', row.div)?.remove()
                 row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
             else if row.item.type == 'dir'
                 for file, status of files
                     if row.item.name != '..' and file.startsWith row.item.file
-                        # $('.browserStatusIcon', row.div)?.remove()
+                        $('.browserStatusIcon', row.div)?.remove()
                         row.div.appendChild elem 'span', class:"git-dirs-icon browserStatusIcon"
                         break
-            else if @index < 0 # shelf - is this still needed?
-                for file, status of files
-                    if file.startsWith row.item.file
+            # else if @index < 0 # shelf - is this still needed?
+                # for file, status of files
+                    # if file.startsWith row.item.file
                         # $('.browserStatusIcon', row.div)?.remove()
-                        row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
-                        break
+                        # row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
+                        # break
         
     # 00000000    0000000   00000000   000   000  00000000     
     # 000   000  000   000  000   000  000   000  000   000    

@@ -89,7 +89,15 @@ class Hub
                     cb info
                     
         Hub.applyRoot dirOrFile, rootStatus cb
-                    
+              
+    @statusFiles: (status) ->
+        
+        files = {}
+        for key in ['changed', 'added', 'dirs']
+            for file in status[key]
+                files[file] = key
+        files
+        
     # 000  000   000  00000000   0000000   
     # 000  0000  000  000       000   000  
     # 000  000 0 000  000000    000   000  

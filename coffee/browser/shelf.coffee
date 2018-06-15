@@ -14,6 +14,7 @@ Column     = require './column'
 fuzzaldrin = require 'fuzzaldrin'
 fuzzy      = require 'fuzzy'
 isTextFile = require '../tools/istextfile'
+hub        = require '../git/hub'
 
 indexAndItemInItemsWithFunc = (item, items, withFunc) ->
     
@@ -39,7 +40,7 @@ class Shelf extends Column
         post.on 'navigateIndexChanged',   @onNavigateIndexChanged
         
         @browser.on 'itemActivated', @onBrowserItemActivated
-
+        
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  0000000     00000000    0000000   000   000  
     # 000   000  000          000     000  000   000  000   000     000     000         000   000  000   000  000 0 000  
     # 000000000  000          000     000   000 000   000000000     000     0000000     0000000    000   000  000000000  
@@ -80,20 +81,29 @@ class Shelf extends Column
             @rows[index].setActive()
             return
                 
+    # 000  000   000  000  000000000  
+    # 000  0000  000  000     000     
+    # 000  000 0 000  000     000     
+    # 000  000  0000  000     000     
+    # 000  000   000  000     000     
+    
     browserDidInitColumns: ->
         
         return if @didInit
+        
         @didInit = true
         
         @loadShelfItems()
         
         @loadHistory() if @showHistory
         
+        @loadGitStatus()
+                
     loadShelfItems: ->
         
         items = state.get "shelf|items"
         @setItems items, save:false
-        
+                
     addPath: (path, opt) =>
         
         if slash.isDir path
@@ -162,8 +172,13 @@ class Shelf extends Column
             @items.push item
             
         @setItems @items
-        log 'addItem', @showHistory
         @loadHistory() if @showHistory
+        @loadGitStatus()
+        
+    loadGitStatus: ->
+        
+        for file in @itemPaths()
+            hub.status file, (status) => @updateGitFiles hub.statusFiles status        
 
     dropRow: (row, pos) -> @addItem row.item, pos:pos
             
