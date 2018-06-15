@@ -309,12 +309,12 @@ class Column
     toggleDotFiles: =>
 
         if @parent.type == 'dir'            
-            stateKey = "browser|ignoreHidden|#{@parent.file}"
-            if state.get stateKey, true
+            stateKey = "browser|showHidden|#{@parent.file}"
+            if state.get stateKey
                 state.set stateKey, false
             else
-                state.set stateKey
-            # @browser.loadDir @parent.file, column:@index, focus:true
+                state.set stateKey, true
+            @browser.loadDirItem @parent, @index, ignoreCache:true
         @
         
     toggleExtensions: =>
@@ -358,13 +358,15 @@ class Column
             return if row.item.type not in ['dir', 'file']
             status = files[row.item.file]
             
+            $('.browserStatusIcon', row.div)?.remove()
+            
             if status?
-                $('.browserStatusIcon', row.div)?.remove()
+                # $('.browserStatusIcon', row.div)?.remove()
                 row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
             else if row.item.type == 'dir'
                 for file, status of files
                     if row.item.name != '..' and file.startsWith row.item.file
-                        $('.browserStatusIcon', row.div)?.remove()
+                        # $('.browserStatusIcon', row.div)?.remove()
                         row.div.appendChild elem 'span', class:"git-dirs-icon browserStatusIcon"
                         break
             # else if @index < 0 # shelf - is this still needed?

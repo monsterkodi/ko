@@ -43,10 +43,9 @@ class Hub
         delete stati[gitDir]
         
         diffs = _.filter diffs, (v,k) -> 
-            log 'v,k', v, k
+            log 'k,v', k, v if not k.startsWith?
             not k.startsWith? gitDir
             
-        log diffs
         Hub.status gitDir, (status) -> 
             post.emit 'gitStatus', gitDir, status
         
@@ -97,8 +96,9 @@ class Hub
         
         files = {}
         for key in ['changed', 'added', 'dirs']
-            for file in status[key]
-                files[file] = key
+            if valid status[key]
+                for file in status[key]
+                    files[file] = key
         files
         
     # 000  000   000  00000000   0000000   

@@ -162,14 +162,15 @@ class FileBrowser extends Browser
         
         dir = item.file
         
-        if @dirCache[dir]
+        if @dirCache[dir] and not opt.ignoreCache
             @loadDirItems dir, item, @dirCache[dir], col, opt
         else
-            dirlist dir, (err, items) => 
+            opt = ignoreHidden: not state.get "browser|showHidden|#{dir}"
+            
+            dirlist dir, opt, (err, items) => 
                 
                 if err? then return error "can't load dir #{dir}: #{err}"
                 
-                # log 'dirlist', dir
                 @dirCache[dir] = items
                 @loadDirItems dir, item, items, col, opt
             
@@ -354,7 +355,6 @@ class FileBrowser extends Browser
         for col in [0..@columns.length]
             @applyGitStatusFiles col, files
             
-        log 'updateGitFiles shelf'
         @shelf.updateGitFiles files
             
     refresh: =>
