@@ -42,9 +42,9 @@ class Hub
         
         delete stati[gitDir]
         
-        log 'before', diffs
+        log 'before', _.keys diffs
         diffs = _.filter diffs, (v,k) -> not k.startsWith gitDir
-        log 'after', diffs
+        log 'after', _.keys diffs
         
         Hub.status gitDir, (status) -> 
             post.emit 'gitStatus', gitDir, status
