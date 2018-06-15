@@ -6,7 +6,7 @@
 000   000   0000000   0000000    
 ###
 
-{ valid, empty, error, log, _ } = require 'kxk'
+{ post, valid, empty, error, log, _ } = require 'kxk'
 
 watch    = require './watch'
 status   = require './status'
@@ -30,6 +30,7 @@ class Hub
         
         log 'hub.onGitRefChanged', gitDir
         delete stati[gitDir]
+        Hub.status gitDir, (status) -> post.emit 'gitStatus', gitDir, status
         
     # 0000000    000  00000000  00000000  
     # 000   000  000  000       000       
@@ -54,7 +55,7 @@ class Hub
             if stati[gitRoot]
                 cb stati[gitRoot]
             else
-                log 'hub get status', gitRoot
+                # log 'hub get status', gitRoot
                 status gitRoot, (info) => 
                     stati[gitRoot] = info
                     cb info
@@ -64,6 +65,7 @@ class Hub
         else
             root dirOrFile, (gitDir) ->
                 roots[dirOrFile] = gitDir
+                roots[gitDir]    = gitDir
                 Hub.watch gitDir
                 rootStatus gitDir            
                     
