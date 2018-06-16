@@ -210,12 +210,31 @@ class Balancer
                     top.clss  = top.region.clss
                     delete top.region
 
-                    while top.match.length and top.match[0] == ' '
-                        top.match = top.match.slice 1
-                        top.start += 1
+                    advance = -> 
+                        while top.match.length and top.match[0] == ' '
+                            top.match = top.match.slice 1
+                            top.start += 1
+                    advance()
+
+                    top.match = top.match.trimRight()
 
                     if top.match.length
-                        result.push top
+                        
+                        if top.clss in ['string single', 'string double', 'string triple']
+                            split = top.match.split /\s\s+/
+                            if split.length == 1
+                                result.push top
+                            else
+                                while word = split.shift()
+                                    oldmatch = top.match
+                                    top.match = word
+                                    result.push top
+                                    top = _.cloneDeep top
+                                    top.start += word.length + 2
+                                    top.match = oldmatch.slice word.length + 2
+                                    advance()
+                        else
+                            result.push top
 
         # 00000000   0000000   00000000    0000000  00000000  
         # 000       000   000  000   000  000       000       
@@ -297,7 +316,8 @@ class Balancer
             
             if ch == '\\' then escapes++
             else
-                # if ch == ' ' then continue
+                if ch == ' ' 
+                    continue
                 
                 if escapes
                     if escapes % 2 and (ch != "#" or top and top.region.clss != 'interpolation')
@@ -323,7 +343,7 @@ class Balancer
                 if popRegion rest
                     continue
 
-                if  @regions.multiComment and rest.startsWith @regions.multiComment.open
+                if @regions.multiComment and rest.startsWith @regions.multiComment.open
                     pushRegion @regions.multiComment
                     continue
 
@@ -331,7 +351,7 @@ class Balancer
                     pushRegion @regions.multiString
                     continue
 
-                else if not top
+                else if empty top
                     forced = false
                     pushed = false
                     for openRegion in @openRegions
@@ -361,29 +381,9 @@ class Balancer
 
             else 
 
-                if ch == ' ' and rest.startsWith('  ') and top.region.clss in ['string single', 'string double', 'string triple']
-
-                    # split strings at spaces
+                if top.region.clss in ['string double', 'string triple']
                     
-                    clss = top.region.clss
-
-                    pushTop()
-                    stack.pop()
-                    pushString = (region) -> 
-                        stack.push
-                            start:  p
-                            region: region
-                    
-                    switch clss
-                        when 'string single' then pushString @regions.singleString
-                        when 'string double' then pushString @regions.doubleString
-                        when 'string triple' then pushString @regions.multiString
-                        
-                    continue
-            
-                if top.region.clss in ['string double', 'string triple'] # string interpolation
-                    
-                    if @regions.interpolation and rest.startsWith @regions.interpolation.open
+                    if @regions.interpolation and rest.startsWith @regions.interpolation.open # string interpolation
                         pushRegion @regions.interpolation
                         continue
                         
@@ -394,7 +394,7 @@ class Balancer
         
         closeStackItem = (stackItem) =>
             result = result.concat @dissForClass text, _.last(result).start + _.last(result).match.length, stackItem.region.clss
-            
+        
         if realStack.length
             @setUnbalanced li, realStack
             closeStackItem _.last realStack 

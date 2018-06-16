@@ -19,6 +19,7 @@ test = (a, b) ->
 text = (txt, typ='coffee') ->
     
     editor.setFileType typ
+    editor.syntax.setFileType typ
     editor.setText txt
     
 diss = (li, di, clss, match) ->
@@ -40,13 +41,13 @@ describe 'syntax', ->
         
         it 'simple', ->
             
-            text "hello // comment"
+            text "hello # comment"
             diss 0, 0, 'text'
             diss 0, 1, 'comment marker'
             diss 0, 2, 'comment'
 
         it 'solo', -> 
-            text "// a comment"
+            text "# a comment"
             diss 0, 0, 'comment marker'
             diss 0, 1, 'comment'
             
@@ -98,23 +99,47 @@ describe 'syntax', ->
             diss 0, 1, 'string double'
             diss 0, 2, 'string marker double'
     
-        # it 'triple', ->
-#     
-            # text 'log """txt"""'
-            # diss 0, 1, 'string marker triple'
-            # diss 0, 2, 'string triple'
-            # diss 0, 3, 'string marker triple'
-#     
-            # text 'log """t\'t"""'
-            # diss 0, 1, 'string marker triple'
-            # diss 0, 2, 'string triple'
-            # diss 0, 3, 'string marker triple'
-#     
-            # text 'log """t"\'\'"t"""'
-            # diss 0, 1, 'string marker triple'
-            # diss 0, 2, 'string triple'
-            # diss 0, 3, 'string marker triple'
-                
+        it 'triple', ->
+    
+            text 'log """txt"""'
+            diss 0, 1, 'string marker triple'
+            diss 0, 2, 'string triple'
+            diss 0, 3, 'string marker triple'
+    
+            text 'log """t\'t"""'
+            diss 0, 1, 'string marker triple'
+            diss 0, 2, 'string triple'
+            diss 0, 3, 'string marker triple'
+    
+            text 'log """t"\'\'"t"""'
+            diss 0, 1, 'string marker triple'
+            diss 0, 2, 'string triple'
+            diss 0, 3, 'string marker triple'
+            
+        it 'multi line', ->
+            
+            text 'log """hello\nworld"""'
+            diss 0, 1, 'string marker triple'
+            diss 0, 2, 'string triple'
+            diss 1, 0, 'string triple'
+            diss 1, 1, 'string marker triple'
+
+            text 'log """\nhello\nworld\n"""'
+            diss 0, 1, 'string marker triple'
+            diss 1, 0, 'string triple'
+            diss 2, 0, 'string triple'
+            diss 3, 0, 'string marker triple'
+            
+            text """    log \"\"\"
+                            filelist    files to open
+                            nostate     don't load state false
+                            \"\"\"
+                 """
+            diss 0, 1, 'string marker triple'
+            diss 1, 0, 'string triple'
+            diss 2, 0, 'string triple'
+            diss 3, 0, 'string marker triple'
+            
         it 'escape', ->
     
             text "'\\'\\\"\\''"
@@ -127,10 +152,10 @@ describe 'syntax', ->
             diss 0, 1, 'string double'
             diss 0, 2, 'string marker double'
     
-            # text '"""\\"\\\'\\""""'
-            # diss 0, 0, 'string marker triple'
-            # diss 0, 1, 'string triple'
-            # diss 0, 2, 'string marker triple'
+            text '"""\\"\\\'\\""""'
+            diss 0, 0, 'string marker triple'
+            diss 0, 1, 'string triple'
+            diss 0, 2, 'string marker triple'
                 
         it 'unbalanced', ->
     
@@ -144,14 +169,14 @@ describe 'syntax', ->
             diss 0, 1, 'syntax'
             test diss(0).length, 2
         
-        # it 'interpolation', ->
-#             
-            # text '"#{1}"'
-            # diss 0, 0, 'string marker double'
-            # diss 0, 1, 'interpolation marker'
-            # diss 0, 2, 'number int'
-            # diss 0, 3, 'interpolation marker'
-            # diss 0, 4, 'string marker double'
+        it 'interpolation', ->
+            
+            text '"#{1}"'
+            diss 0, 0, 'string marker double'
+            diss 0, 1, 'interpolation marker'
+            diss 0, 2, 'number int'
+            diss 0, 3, 'interpolation marker'
+            diss 0, 4, 'string marker double'
     
         it 'fake interpolation', ->
             
@@ -169,17 +194,7 @@ describe 'syntax', ->
             diss 0, 1, 'string double'
             
     it 'brackets', ->
-        
-        # text "{ }"
-        # diss 0, 0, 'bracket open'
-        # diss 0, 1, 'bracket close'
-        # test diss(0).length, 2
-
-        # text "{}"
-        # diss 0, 0, 'bracket open'
-        # diss 0, 1, 'bracket close'
-        # test diss(0).length, 2
-        
+                
         text "{ }"
         diss 0, 0, 'bracket syntax'
         diss 0, 1, 'bracket syntax'

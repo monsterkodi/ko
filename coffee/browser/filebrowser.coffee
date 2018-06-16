@@ -128,11 +128,14 @@ class FileBrowser extends Browser
     loadSourceItem: (item, col) ->
         
         if not @srcCache[item.file]?
+            
             @srcCache[item.file] = post.get 'indexer', 'file', item.file
             
         info = @srcCache[item.file]
             
-        return if empty info
+        if empty info
+            @columns[col].loadItems [], item
+            return 
         
         items = []
         clsss = info.classes ? []
@@ -168,12 +171,12 @@ class FileBrowser extends Browser
         
         dir = item.file
         
-        # log 'loadDirItem', item
+        # log 'loadDirItem', item, opt
         
         if @dirCache[dir] and not opt.ignoreCache
             @loadDirItems dir, item, @dirCache[dir], col, opt
         else
-            opt = ignoreHidden: not state.get "browser|showHidden|#{dir}"
+            opt.ignoreHidden = not state.get "browser|showHidden|#{dir}"
             
             dirlist dir, opt, (err, items) => 
                 
@@ -385,7 +388,7 @@ class FileBrowser extends Browser
         
         @srcCache[file] = info
         
-        if file == @activeColumn()?.activeRow()?.item.file
-            @loadSourceItem {file:file}, @activeColumn().index+1
+        if file == last(@columns)?.parent.file
+            @loadSourceItem { file:file, type:'file' }, last(@columns)?.index
             
 module.exports = FileBrowser

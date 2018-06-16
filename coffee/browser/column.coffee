@@ -6,7 +6,7 @@
  0000000   0000000   0000000   0000000   000   000  000   000
 ###
 
-{ stopEvent, setStyle, popup, keyinfo, slash, post, elem, clamp, empty, pos, fs, error, log, $, _ } = require 'kxk'
+{ stopEvent, setStyle, popup, keyinfo, slash, post, elem, clamp, valid, empty, pos, fs, error, log, $, _ } = require 'kxk'
 
 Row        = require './row'
 Scroller   = require './scroller'
@@ -59,10 +59,11 @@ class Column
         
         error "no parent item?" if not @parent?
         
-        for item in @items
-            @rows.push new Row @, item
+        if valid @items
+            for item in @items
+                @rows.push new Row @, item
         
-        @scroll.update()
+            @scroll.update()
         @
 
     setItems: (@items, opt) ->

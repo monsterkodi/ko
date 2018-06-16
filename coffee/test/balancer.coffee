@@ -44,12 +44,13 @@ describe 'balancer', ->
         diss 0, 1, 'string double'
         diss 0, 2, 'string double'
         diss 0, 3, 'string double marker'
-
-        text = ["'h e l l o'"]
+         
+        text = ["'  h e l l   o'"]
         diss 0, 0, 'string single marker'
         diss 0, 1, 'string single'
-        diss 0, 2, 'string single marker'
-
+        diss 0, 2, 'string single'
+        diss 0, 3, 'string single marker'
+         
         text = ['"""h e l l o"""']
         diss 0, 0, 'string triple marker'
         diss 0, 1, 'string triple'

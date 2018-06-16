@@ -294,7 +294,7 @@ class Flex
     collapse: (i) -> 
         
         if pane = @pane i
-            log i, pane.collapsed?, pane
+            # log i, pane.collapsed?, pane
             if not pane.collapsed
                 pane.collapse()
                 @calculate()
