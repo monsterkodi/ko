@@ -6,7 +6,7 @@
 000   000   0000000   0000000    
 ###
 
-{ post, valid, empty, error, log, _ } = require 'kxk'
+{ post, valid, empty, filter, error, log, _ } = require 'kxk'
 
 watch    = require './watch'
 status   = require './status'
@@ -42,7 +42,7 @@ class Hub
         
         delete stati[gitDir]
         
-        diffs = _.filter diffs, (v,k) -> 
+        diffs = filter diffs, (v,k) -> 
             log 'k,v', k, v if not k.startsWith?
             not k.startsWith? gitDir
             

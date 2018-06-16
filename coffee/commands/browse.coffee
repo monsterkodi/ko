@@ -35,14 +35,6 @@ class Browse extends Command
         if @isActive() and @getText() != slash.tilde file
             @setText slash.tilde file
         
-    restoreState: (state) -> 
-        
-        super state
-        @browser.start()
-        if valid state.text
-            @browser.navigateToFile state.text
-        window.split.swap $('terminal'), $('area')
-
     clear: ->
         return if @browser.cleanUp()
         super()

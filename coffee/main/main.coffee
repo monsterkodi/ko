@@ -413,12 +413,16 @@ class Main extends app
     # 000   000  00000000  0000000      000      0000000   000   000  00000000
 
     moveWindowStashes: ->
+        
+        log "Main.moveWindowStashes"
 
         stashDir = slash.join @userData, 'win'
         if slash.dirExists stashDir
             fs.moveSync stashDir, slash.join(@userData, 'old'), overwrite: true
 
     restoreWindows: ->
+
+        log "Main.restoreWindows"
 
         fs.ensureDirSync @userData
         stashFiles = fileList slash.join(@userData, 'old'), matchExt:'noon'
@@ -505,7 +509,7 @@ class Main extends app
             
     onOtherInstance: (args, dir) =>
 
-        log 'onOtherInstance', args
+        log 'onOtherInstance args', args
         
         @activateOneWindow()
 
@@ -515,6 +519,8 @@ class Main extends app
         else
             fileargs = args.slice 2
 
+        log 'onOtherInstance fileargs', fileargs
+            
         for arg in fileargs
             continue if arg.startsWith '-'
             file = arg
@@ -524,6 +530,8 @@ class Main extends app
             if slash.exists fpath
                 files.push file
 
+        log 'onOtherInstance files', files
+                        
         post.toWin first(visibleWins()).id, 'loadFiles', files, newTab:true
 
     #  0000000   000   000  000  000000000  
@@ -547,14 +555,6 @@ class Main extends app
         else
             state.save()
             
-    #  0000000   0000000     0000000   000   000  000000000
-    # 000   000  000   000  000   000  000   000     000
-    # 000000000  0000000    000   000  000   000     000
-    # 000   000  000   000  000   000  000   000     000
-    # 000   000  0000000     0000000    0000000      000
-
-    # showAbout: -> about img:"#{__dirname}/../../img/about.png", pkg:pkg, color:"#fff", background:'#111'
-
 #  0000000   00000000   00000000         0000000   000   000
 # 000   000  000   000  000   000       000   000  0000  000
 # 000000000  00000000   00000000        000   000  000 0 000

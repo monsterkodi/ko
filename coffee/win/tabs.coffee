@@ -261,7 +261,7 @@ class Tabs
         return if empty files # happens when first window opens
         
         if valid @tabs
-            @tabs[0].update file: files.shift()
+            @tabs[0].update file:files.shift(), type:'file'
             
         while files.length
             @addTab files.shift()

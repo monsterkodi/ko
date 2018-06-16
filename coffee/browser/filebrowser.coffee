@@ -44,6 +44,8 @@ class FileBrowser extends Browser
             
         @shelfSize = state.get 'shelf:size', 200
         
+        @initColumns()
+        
     onFileBrowser: (action, item, col) =>
         
         switch action
@@ -62,6 +64,8 @@ class FileBrowser extends Browser
         
         @popColumnsFrom 1
         
+        # log 'loadItem', item
+        
         switch item.type
             when 'file' then @loadFileItem item
             when 'dir'  then @loadDirItem  item
@@ -75,6 +79,8 @@ class FileBrowser extends Browser
     activateItem: (item, col) ->
         
         @clearColumnsFrom col+2, pop:true
+        
+        # log 'activateItem', item
         
         switch item.type
             when 'dir'  
@@ -161,6 +167,8 @@ class FileBrowser extends Browser
         return if col > 0 and item.name == '/'
         
         dir = item.file
+        
+        # log 'loadDirItem', item
         
         if @dirCache[dir] and not opt.ignoreCache
             @loadDirItems dir, item, @dirCache[dir], col, opt

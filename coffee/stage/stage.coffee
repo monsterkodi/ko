@@ -12,8 +12,11 @@ event = require 'events'
 
 class Stage extends event
     
-    constructor: (@view) -> 
+    constructor: (view) -> 
+        
         super()
+        
+        @view = view
         @paused = false
         @view.onkeydown = @onKeyDown
         @view.onkeyup   = @onKeyUp

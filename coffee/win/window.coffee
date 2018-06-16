@@ -431,13 +431,7 @@ openFileDialog = (opt) ->
     dialog.showOpenDialog
         title: "Open File"
         defaultPath: window.stash.get 'openFilePath',  dir
-        # properties: ['openFile', 'openDirectory', 'multiSelections']
         properties: ['openFile', 'multiSelections']
-        filters: [
-            name: 'All Files', extensions: ['*']
-        ,
-            name: 'CoffeeScript', extensions: ['coffee']
-        ]
         , (files) -> openFiles files, opt
 
 saveFileAs = ->
@@ -446,7 +440,6 @@ saveFileAs = ->
         title: "Save File As"
         defaultPath: slash.unslash slash.dir editor.currentFile
         properties: ['openFile', 'createDirectory']
-        # filters: [ name: 'All Files', extensions: ['*'] , name: 'Coffee-Script', extensions: ['coffee'] ]
         , (file) ->
             if file
                 addToRecent file
@@ -457,8 +450,6 @@ saveFileAs = ->
 # 0000000    0000000   0000000   000    000    0000000
 # 000   000  000            000  000   000     000
 # 000   000  00000000  0000000   000  0000000  00000000
-
-screenSize = -> electron.screen.getPrimaryDisplay().workAreaSize
 
 window.onresize = ->
 

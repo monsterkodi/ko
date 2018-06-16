@@ -39,7 +39,7 @@ class Split extends event
 
         @flex = new Flex
             panes: [
-                    div:        @terminal
+                    div:        @area
                     collapsed:  true
                 ,
                     div:        @commandline
@@ -61,17 +61,25 @@ class Split extends event
     onDrag: => if @flex? then @emitSplit()
     emitSplit: => @emit 'split', @flex.panePositions() 
     
+    #  0000000  000000000   0000000    0000000  000   000  
+    # 000          000     000   000  000       000   000  
+    # 0000000      000     000000000  0000000   000000000  
+    #      000     000     000   000       000  000   000  
+    # 0000000      000     000   000  0000000   000   000  
+    
     stash: => 
         
-        # log 'split.stash', @flex.getState()
-        window.stash.set 'split', @flex.getState()
+        window.stash.set 'split|flex', @flex.getState()
+        window.stash.set 'split|area', @flex.panes[0].div == @area
         
     restore: => 
 
-        if state = window.stash.get 'split'
-            # log 'split.restore', window.stash.get 'split'
+        if state = window.stash.get 'split|flex'
             @flex.restoreState state
             @emitSplit()
+            
+        if @flex.panes[0].div == @area and not window.stash.get 'split|area'
+            @raise 'terminal'
                 
     # 0000000     0000000 
     # 000   000  000   000
@@ -80,8 +88,6 @@ class Split extends event
     # 0000000     0000000 
     
     do: (sentence) ->
-        
-        # log "Split.do #{sentence}"
         
         sentence = sentence.trim()
         return if not sentence.length
@@ -124,7 +130,6 @@ class Split extends event
 
     maximizeEditor: -> 
         
-        # log "Split.maximizeEditor"
         @focus 'editor'
         @flex.expand 'editor'
         @hideLog()
@@ -144,7 +149,7 @@ class Split extends event
     # 0000000   000   000   0000000   00     00  
 
     show: (n) ->
-        # log "Split.show #{n}"
+
         switch n
             when 'terminal', 'area' then @raise n
             when 'editor'     
@@ -178,7 +183,7 @@ class Split extends event
             @flex.panes[0].div = nju
 
     raise: (n) ->
-        # log "Split.raise #{n}"   
+
         switch n
             when 'terminal' then @swap @area, @terminal
             when 'area'     then @swap @terminal, @area
