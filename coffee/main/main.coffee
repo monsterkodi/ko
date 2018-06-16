@@ -235,18 +235,32 @@ class Main extends app
             post.toWin win.id, 'loadFiles', [opt.file]
         win
     
-    toggleWindows: =>
+    toggleWindows: (cb) =>
 
-        if wins().length
-            if visibleWins().length
+        log 'toggleWindows'
+        
+        if valid wins()
+            
+            log 'toggleWindows valid wins'
+            
+            if valid visibleWins()
+                
+                log 'toggleWindows valid visibleWins'
+                
                 if activeWin()
+                    log 'toggleWindows hideWindows'
                     @hideWindows()
                 else
+                    log 'toggleWindows raiseWindows'
                     @raiseWindows()
             else
+                log 'toggleWindows showWindows'
                 @showWindows()
+                
+            cb first visibleWins()
         else
-            @createWindow()
+            log 'toggleWindows createWindow'
+            @createWindow cb
 
     hideWindows: ->
 
@@ -266,12 +280,12 @@ class Main extends app
 
     raiseWindows: ->
 
-        if visibleWins().length
+        if valid visibleWins()
             for w in visibleWins()
                 w.showInactive()
             visibleWins()[0].showInactive()
             visibleWins()[0].focus()
-        throw new Error 'test'
+        # throw new Error 'test'
         @
 
     activateNextWindow: (win) ->
@@ -494,45 +508,55 @@ class Main extends app
     # 000   000     000     000   000  000       000   000      000  000  0000       000     000     
     #  0000000      000     000   000  00000000  000   000      000  000   000  0000000      000     
 
-    activateOneWindow: ->
+    activateOneWindow: (cb) ->
     
-        if not visibleWins().length
-            @toggleWindows()
+        log 'activateOneWindow'
+        
+        if empty visibleWins()
+            log 'activateOneWindow empty visibleWins -> toggleWindows'
+            @toggleWindows cb
+            return
 
         if not activeWin()
+            log 'activateOneWindow no activeWin'
             if win = visibleWins()[0]
+                log 'activateOneWindow focus first visible'
                 wxw = require 'wxw'                
                 wxw.foreground slash.resolve process.argv[0]
                 win.focus()
+                cb win
             else
                 log 'no visible win?'
+                cb null
             
     onOtherInstance: (args, dir) =>
 
         log 'onOtherInstance args', args
         
-        @activateOneWindow()
+        @activateOneWindow (win) ->
 
-        files = []
-        if first(args).endsWith "#{pkg.name}.exe"
-            fileargs = args.slice 1
-        else
-            fileargs = args.slice 2
-
-        log 'onOtherInstance fileargs', fileargs
+            log 'onOtherInstance activeWin', win.id
             
-        for arg in fileargs
-            continue if arg.startsWith '-'
-            file = arg
-            if slash.isRelative file
-                file = slash.join slash.resolve(dir), arg
-            [fpath, pos] = slash.splitFilePos file
-            if slash.exists fpath
-                files.push file
-
-        log 'onOtherInstance files', files
-                        
-        post.toWin first(visibleWins()).id, 'loadFiles', files, newTab:true
+            files = []
+            if first(args).endsWith "#{pkg.name}.exe"
+                fileargs = args.slice 1
+            else
+                fileargs = args.slice 2
+    
+            log 'onOtherInstance fileargs', fileargs
+                
+            for arg in fileargs
+                continue if arg.startsWith '-'
+                file = arg
+                if slash.isRelative file
+                    file = slash.join slash.resolve(dir), arg
+                [fpath, pos] = slash.splitFilePos file
+                if slash.exists fpath
+                    files.push file
+    
+            log 'onOtherInstance files', files
+                            
+            post.toWin win.id, 'loadFiles', files, newTab:true
 
     #  0000000   000   000  000  000000000  
     # 000   000  000   000  000     000     
@@ -583,8 +607,9 @@ electron.app.on 'window-all-closed', -> log 'window-all-closed'
 onMsg = (file) ->
     
     # log 'onMsg', file
-    main.activateOneWindow()
-    post.toWin first(visibleWins()).id, 'loadFiles', [file], newTab:true
+    main.activateOneWindow (win) ->
+        log 'onMsg', win.id, file
+        post.toWin win.id, 'loadFiles', [file], newTab:true
 
 koReceiver = new udp port:9779, onMsg:onMsg
 

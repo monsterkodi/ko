@@ -39,7 +39,7 @@ class Split extends event
 
         @flex = new Flex
             panes: [
-                    div:        @area
+                    div:        @terminal
                     collapsed:  true
                 ,
                     div:        @commandline
@@ -78,8 +78,8 @@ class Split extends event
             @flex.restoreState state
             @emitSplit()
             
-        if @flex.panes[0].div == @area and not window.stash.get 'split|area'
-            @raise 'terminal'
+        if @flex.panes[0].div != @area and window.stash.get 'split|area'
+            @raise 'area'
                 
     # 0000000     0000000 
     # 000   000  000   000

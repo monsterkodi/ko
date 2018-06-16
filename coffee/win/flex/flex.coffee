@@ -290,21 +290,25 @@ class Flex
     #  0000000   0000000   0000000  0000000  000   000  000        0000000   00000000  
     
     isCollapsed: (i) -> @pane(i).collapsed
+    
     collapse: (i) -> 
-        pane = @pane i
-        if not pane.collapsed
-            pane.collapse()
-            @calculate()
+        
+        if pane = @pane i
+            log i, pane.collapsed?, pane
+            if not pane.collapsed
+                pane.collapse()
+                @calculate()
         
     expand: (i, factor=0.5) ->
-        pane = @pane i
-        if pane.collapsed
-            pane.expand()
-            if flex = @closestVisFlex pane
-                use = pane.fixed ? flex.size * factor
-                flex.size -= use
-                pane.size = use
-            @calculate()
+        
+        if pane = @pane i
+            if pane.collapsed
+                pane.expand()
+                if flex = @closestVisFlex pane
+                    use = pane.fixed ? flex.size * factor
+                    flex.size -= use
+                    pane.size = use
+                @calculate()
 
     # 000   000  000   0000000  00000000  000      00000000  000   000  
     # 000   000  000  000       000       000      000        000 000   
