@@ -1,13 +1,13 @@
 name            ko
 productName     ko
-version         0.125.0
+version         0.126.0
 description     text editor
 main            js/main/main.js
 preferGlobal    true
 bin
                 ko  ./bin/ko
 scripts
-                test  mocha -R dot --require coffeescript/register "coffee/test/*.coffee"
+                test  mocha -c -R dot --require coffeescript/register "coffee/test/*.coffee"
                 mac   ./bin/buildmac.sh
                 win   bash ./bin/buildwin.sh
 repository

@@ -35,7 +35,8 @@ class Shelf extends Column
         
         @showHistory = window.stash.get 'shelf:history', false
 
-        post.on 'addToShelf', @addPath
+        post.on 'gitStatus',              @loadGitStatus
+        post.on 'addToShelf',             @addPath
         post.on 'navigateHistoryChanged', @onNavigateHistoryChanged
         post.on 'navigateIndexChanged',   @onNavigateIndexChanged
         
@@ -174,12 +175,7 @@ class Shelf extends Column
         @setItems @items
         @loadHistory() if @showHistory
         @loadGitStatus()
-        
-    loadGitStatus: ->
-        
-        for file in @itemPaths()
-            hub.status file, (status) => @updateGitFiles hub.statusFiles status        
-
+                        
     dropRow: (row, pos) -> @addItem row.item, pos:pos
             
     isEmpty: -> empty @rows
@@ -193,7 +189,31 @@ class Shelf extends Column
         @scroll.update()
                                    
     name: -> 'shelf'
+
+    #  0000000   000  000000000  
+    # 000        000     000     
+    # 000  0000  000     000     
+    # 000   000  000     000     
+    #  0000000   000     000     
+    
+    loadGitStatus: =>
         
+        for row in @rows
+            
+            $('.browserStatusIcon', row.div)?.remove()
+            
+            fileStatus = (row) -> (status) =>
+                for file, status of hub.statusFiles status
+                    if file.startsWith row.path()
+                        if row.item.type == 'dir'
+                            status = 'dirs'
+                        row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
+                        break
+            
+            hub.status row.path(), fileStatus row
+
+    updateGitFiles: -> @loadGitStatus()
+    
     # 000   000  000   0000000  000000000   0000000   00000000   000   000  
     # 000   000  000  000          000     000   000  000   000   000 000   
     # 000000000  000  0000000      000     000   000  0000000      00000    
