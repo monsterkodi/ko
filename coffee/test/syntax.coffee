@@ -40,13 +40,13 @@ describe 'syntax', ->
         
         it 'simple', ->
             
-            text "hello # comment"
+            text "hello // comment"
             diss 0, 0, 'text'
             diss 0, 1, 'comment marker'
             diss 0, 2, 'comment'
 
         it 'solo', -> 
-            text "# a comment"
+            text "// a comment"
             diss 0, 0, 'comment marker'
             diss 0, 1, 'comment'
             

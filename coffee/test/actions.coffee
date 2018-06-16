@@ -123,7 +123,7 @@ describe 'actions', ->
         it 'toggleComment', ->
             
             editor.toggleComment()
-            textIs "ab\n# cd\n    cd\n        cd"
+            textIs "ab\n// cd\n    cd\n        cd"
             editor.toggleComment()
             textIs "ab\ncd\n    cd\n        cd"
             
