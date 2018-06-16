@@ -127,9 +127,12 @@ class Row
         
         @column.activeRow()?.clearActive()
         @div.classList.add 'active'
+        
         if opt?.scroll != false
             @column.scroll.toIndex @index()
+            
         window.setLastFocus @column.name()
+        
         if opt?.emit 
             @browser.emit 'itemActivated', @item
             if @item.type == 'dir'

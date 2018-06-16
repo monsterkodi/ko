@@ -311,7 +311,7 @@ class Browse extends Command
     onBrowserItemActivated: (item) =>
 
         if not @isActive()
-            @commandline.command.onBrowserItemActivated? item
+            @commandline.command?.onBrowserItemActivated? item
             return
         
         if item.file

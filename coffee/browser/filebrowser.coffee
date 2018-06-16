@@ -246,6 +246,7 @@ class FileBrowser extends Browser
         
         @popColumnsFrom   col+paths.length
         @clearColumnsFrom col
+        
         while @numCols() < paths.length
             @addColumn()
             
@@ -263,6 +264,10 @@ class FileBrowser extends Browser
                     if index < paths.length-1
                         opt.active = paths[index+1]
                     @loadDirItem item, col+index, opt
+              
+        lastItem = file:last(paths), type:lastType
+        # log 'itemActivated', lastItem
+        @emit 'itemActivated', lastItem
 
     #  0000000   000   000  00000000  000  000      00000000  
     # 000   000  0000  000  000       000  000      000       
