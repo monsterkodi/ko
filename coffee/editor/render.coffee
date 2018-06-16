@@ -28,9 +28,9 @@ class Render
         l
         
     @lineSpan: (diss, size) ->
-        
+
         div = elem class: 'linespans'
-        
+
         if diss?.length
             for d in diss
                 span = elem 'span'

@@ -5,6 +5,7 @@
 000   000  000   000  000      000   000  000  0000  000       000       000   000
 0000000    000   000  0000000  000   000  000   000   0000000  00000000  000   000
 ###
+
 { valid, empty, str, log, error, _ } = require 'kxk'
 
 matchr = require '../tools/matchr'
@@ -83,14 +84,12 @@ class Balancer
             return error "dissForLine -- no line at index #{li}?"
 
         diss = @mergeRegions @parse(text, li), text, li                
-        # console.log 'dissForLine', li, text, diss
         diss
       
     dissForLineAndRanges: (line, rgs) ->
         
         regions = @mergeRegions @parse(line, 0), line, 0
         diss = matchr.merge regions, matchr.dissect rgs
-        # console.log 'dissForLine', line, rgs, diss
         diss
         
     # 00     00  00000000  00000000    0000000   00000000
@@ -298,7 +297,7 @@ class Balancer
             
             if ch == '\\' then escapes++
             else
-                if ch == ' ' then continue
+                # if ch == ' ' then continue
                 
                 if escapes
                     if escapes % 2 and (ch != "#" or top and top.region.clss != 'interpolation')
@@ -319,7 +318,7 @@ class Balancer
                     
             rest = text.slice p-1
 
-            if not top or top.region.clss == 'interpolation'
+            if empty(top) or top.region?.clss == 'interpolation'
 
                 if popRegion rest
                     continue
@@ -360,13 +359,34 @@ class Balancer
                     pushRegion @regions.doubleString
                     continue
 
-            else # string or regexp
+            else 
 
-                if top.region.clss in ['string double', 'string triple']
+                if ch == ' ' and rest.startsWith('  ') and top.region.clss in ['string single', 'string double', 'string triple']
+
+                    # split strings at spaces
+                    
+                    clss = top.region.clss
+
+                    pushTop()
+                    stack.pop()
+                    pushString = (region) -> 
+                        stack.push
+                            start:  p
+                            region: region
+                    
+                    switch clss
+                        when 'string single' then pushString @regions.singleString
+                        when 'string double' then pushString @regions.doubleString
+                        when 'string triple' then pushString @regions.multiString
+                        
+                    continue
+            
+                if top.region.clss in ['string double', 'string triple'] # string interpolation
+                    
                     if @regions.interpolation and rest.startsWith @regions.interpolation.open
                         pushRegion @regions.interpolation
                         continue
-
+                        
                 if popRegion rest
                     continue
              
@@ -376,23 +396,17 @@ class Balancer
             result = result.concat @dissForClass text, _.last(result).start + _.last(result).match.length, stackItem.region.clss
             
         if realStack.length
-            # console.log "unbalanced #{li} stack:", str(realStack), '\nresult:', str(result)                
             @setUnbalanced li, realStack
             closeStackItem _.last realStack 
         else if keepUnbalanced.length
-            # console.log "keeper #{li} keepUnbalanced:", str(keepUnbalanced), '\nresult:', str(result)                
             @setUnbalanced li, keepUnbalanced
             if stack.length
                 closeStackItem _.last stack 
         else
             if stack.length and _.last(stack).region.close == null
                 closeStackItem _.last stack 
-            # console.log "balanced #{li}", text
             @setUnbalanced li
            
-        # fix me! 
-        # string content needs to be split at spaces! 
-        # console.log 'parse result', result if valid result 
         result
 
     # 000   000  000   000  0000000     0000000   000       0000000   000   000   0000000  00000000  0000000
