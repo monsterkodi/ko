@@ -10,7 +10,8 @@
 
 sourceMap  = require 'source-map'
 mapConvert = require 'convert-source-map'
-regex      = /^\s+at\s+(\S+)\s+\((.*):(\d+):(\d+)\)/
+regex1     = /^\s+at\s+(\S+)\s+\((.*):(\d+):(\d+)\)/
+regex2     = /^\s+at\s+(.*):(\d+):(\d+)/
 
 # 00000000  000  000      00000000  00000000    0000000    0000000  
 # 000       000  000      000       000   000  000   000  000       
@@ -20,13 +21,30 @@ regex      = /^\s+at\s+(\S+)\s+\((.*):(\d+):(\d+)\)/
 
 filePos = (line) ->
 
-    if match = regex.exec line
+    if match = regex1.exec line
         
         result =
             func: match[1].replace '.<anonymous>', ''
             file: match[2]
             line: match[3]
             col:  match[4]
+        
+        if slash.ext(result.file) == 'js'
+            
+            mappedLine = toCoffee result.file, result.line, result.col
+            
+            if mappedLine?
+                result.file = mappedLine[0]
+                result.line = mappedLine[1]
+                result.col  = mappedLine[2]
+
+    else if match = regex2.exec line
+        
+        result =
+            func: slash.file match[1]
+            file: match[1]
+            line: match[2]
+            col:  match[3]
         
         if slash.ext(result.file) == 'js'
             

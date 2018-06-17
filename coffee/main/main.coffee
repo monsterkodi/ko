@@ -283,7 +283,7 @@ class Main extends app
                 i = 1 + allWindows.indexOf w
                 i = 0 if i >= allWindows.length
                 @activateWindowWithID allWindows[i].id
-                throw new Error 'test'
+                throw new Error 'main'
                 return w
         null
 

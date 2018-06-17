@@ -53,20 +53,16 @@ commandline = null
 titlebar    = null
 tabs        = null
 
-# window.onerror = function(error, url, line) {
-# message, filename, lineno, colno, error
-# window.onerror = (event, source, line, col, err) ->
-
-    # error event, source, line, err.message ? err
-    # f = require('sorcery').loadSync(source.replace /coffee/g, 'js')
-    # if f?
-        # l = f.trace(line)
-        # s = "▲ #{source}:#{l.line} ▲ [ERROR] #{err}"
-    # else
-        # s = "▲ [ERROR] #{err} #{slash.tilde source}:#{line}:#{col}"
-    # console.log s
-    # post.emit 'error', s
-    # post.emit 'slog', s
+window.onerror = (msg, source, line, col, err) ->
+    
+    srcmap = require '../tools/srcmap'    
+    console.log srcmap.errorStack err
+    trace = srcmap.errorTrace err
+    log.ulog str:trace.text, source:trace.lines[0].file, line:trace.lines[0].line, sep:'💥'
+    for line in trace.lines
+        sep = if slash.isAbsolute line.file then '🐞' else '🔼'
+        log.ulog str:'       '+line.func, source:line.file, line:line.line, sep:sep
+    true
 
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000
@@ -467,10 +463,12 @@ window.onresize = ->
 screenShot = ->
 
     win.capturePage (img) ->
-        file = 'screenShot.png'
-        remote.require('fs').writeFile file, img.toPng(), (err) ->
-            log 'saving screenshot failed', err if err?
-            log "screenshot saved to #{file}"
+        file = slash.resolve '~/ko-screenshot.png'
+        fs.writeFile file, img.toPNG(), (err) ->
+            if valid err
+                log 'saving screenshot failed', err
+            else
+                log "screenshot saved to #{file}"
 
 #  0000000  00000000  000   000  000000000  00000000  00000000       000000000  00000000  000   000  000000000
 # 000       000       0000  000     000     000       000   000         000     000        000 000      000
@@ -640,8 +638,11 @@ onMenuAction = (name, args) ->
         when 'Cycle Windows' then args = winID
     
     # log "unhandled menu action! posting to main '#{name}' args:", args
-    
+
     post.toMain 'menuAction', name, args
+    
+    if name == 'Arrange Windows'
+        throw new Error 'win'
 
 post.on 'menuAction', onMenuAction
 
@@ -665,7 +666,7 @@ onCombo = (combo, info) ->
             return stopEvent event, post.toMain 'activateWindow', i
 
     switch combo
-        # when 'f3'                 then return stopEvent event, screenShot()
+        when 'f3'                 then return stopEvent event, screenShot()
         when 'command+alt+k', 'alt+ctrl+k' then return stopEvent event, split.toggleLog()
         when 'alt+k'
             if window.focusEditor == window.editor then window.logview.clear() else window.focusEditor.clear()
