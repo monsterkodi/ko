@@ -154,5 +154,6 @@ module.exports =
     toJs:       toJs
     toCoffee:   toCoffee
     errorStack: errorStack
+    errorTrace: errorTrace
     
     

@@ -298,19 +298,7 @@ class Autocomplete extends event
                 @wordinfo[w] = info
                 
         post.emit 'autocompleteCount', _.size @wordinfo
-                
-    # onFuncsCount: =>
-#         
-        # log 'onFuncsCount'
-#         
-        # funcs = post.get 'indexer', 'funcs'
-        # for func,info of funcs
-            # info  = @wordinfo[func] ? {}
-            # info.count = Math.max 20, info.count ? 1
-            # @wordinfo[func] = info
-#             
-        # @emit 'wordCount', _.size @wordinfo
-            
+                            
     #  0000000  000   000  00000000    0000000   0000000   00000000   000   000   0000000   00000000   0000000  
     # 000       000   000  000   000  000       000   000  000   000  000 0 000  000   000  000   000  000   000
     # 000       000   000  0000000    0000000   000   000  0000000    000000000  000   000  0000000    000   000
