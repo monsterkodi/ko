@@ -9,7 +9,7 @@
 
 Stage  = require '../stage'
 snap   = require 'snapsvg'
-vorono = require '../../../coffee/stage/voronoi/voronoinet'
+vorono = require '../../../bin/voronoinet'
 
 class Voronoi extends Stage
     

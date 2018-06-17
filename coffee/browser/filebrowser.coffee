@@ -82,8 +82,6 @@ class FileBrowser extends Browser
         
         @clearColumnsFrom col+2, pop:true
         
-        # log 'activateItem', item
-        
         switch item.type
             when 'dir'  
                 @loadDirItem  item, col+1
@@ -173,8 +171,6 @@ class FileBrowser extends Browser
         
         dir = item.file
         
-        # log 'loadDirItem', item, opt
-        
         if @dirCache[dir] and not opt.ignoreCache
             @loadDirItems dir, item, @dirCache[dir], col, opt
         else
@@ -229,24 +225,21 @@ class FileBrowser extends Browser
         filelist = slash.pathlist file
         lastlist = slash.pathlist lastPath
         
-        if valid filelist
-            relative = slash.relative file, slash.dir last lastlist
-            
-            # log 'relative', relative
-            
+        if valid lastlist
+            lastdir = last lastlist
+            if @lastUsedColumn()?.isFile()
+                lastdir = slash.dir lastdir
+            relative = slash.relative file, lastdir
+                        
             upCount = 0
             while relative.startsWith '../'
                 upCount += 1
                 relative = relative.substr 3
                 
-            # log 'upCount', upCount
-            
             if upCount < @numCols()-1
-                # log "remove #{upCount} columns"
                 col   = @numCols() - 1 - upCount
                 relst = slash.pathlist relative
                 paths = filelist.slice filelist.length - relst.length
-                # log 'col', col, 'paths', paths
 
         if empty paths
             
@@ -257,20 +250,17 @@ class FileBrowser extends Browser
             col0index = listindex
             col = 0
             
-            # log 'filelist[col0index] == @columns[0].path()', filelist[col0index], @columns[0]?.path()
             if filelist[col0index] == @columns[0]?.path()
                 while col0index < lastlist.length and col0index < filelist.length and lastlist[col0index] == filelist[col0index]
                     col0index += 1
                     col += 1
                 
             paths = filelist.slice col0index
-        
+            
         if slash.isFile last paths
             lastType = 'file'
         else
             lastType = 'dir'
-        
-        # log 'paths', col, @numCols(), lastType, paths
         
         @popColumnsFrom   col+paths.length
         @clearColumnsFrom col

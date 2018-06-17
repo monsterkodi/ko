@@ -6,8 +6,9 @@
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
 
-{ popup, stopEvent, setStyle, post, pos, slash, srcmap, fs, empty, error, log, str, _ } = require 'kxk'
+{ post, srcmap, popup, stopEvent, setStyle, pos, slash, fs, empty, error, log, str, _ } = require 'kxk'
   
+# srcmap     = require '../srcmap'
 watcher    = require './watcher'
 TextEditor = require './texteditor'
 syntax     = require './syntax'
@@ -322,8 +323,6 @@ class FileEditor extends TextEditor
         cp = @cursorPos()
         currext = slash.ext @currentFile
 
-        log 'jumpToCounterpart', cp, currext, @currentFile
-        
         switch currext
             when 'coffee'
                 [file,line,col] = srcmap.toJs @currentFile, cp[1]+1, cp[0]
@@ -335,6 +334,8 @@ class FileEditor extends TextEditor
                 if file?
                     window.loadFile slash.joinFileLine file,line,col
                     return true
+                else
+                    log 'jumpToCounterpart no soruce map?',file,line,col
 
         counterparts =
             'cpp':     ['hpp', 'h']

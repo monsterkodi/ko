@@ -6,6 +6,7 @@
 #   000000   0000000  
 
 { elem, log } = require 'kxk'
+
 Stage = require '../stage'
 THREE = require 'three'
 
