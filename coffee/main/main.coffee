@@ -352,7 +352,6 @@ class Main extends app
         if not @windowsAreStacked()
             @stackWindows()
             disableSnap = false
-            throw new Error 'test'
             return
 
         if wl.length == 1

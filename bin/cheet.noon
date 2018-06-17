@@ -91,4 +91,8 @@ macro
     add num                             add to selected numbers
     sub num                             subtract from selected numbers
 
+coffee
+    class [filter]  list classes in object browser
+    func  [filter]  list functions in object browser
+    file  [filter]  list files in object browser
     
