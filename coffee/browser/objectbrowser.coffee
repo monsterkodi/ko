@@ -27,7 +27,7 @@ class ObjectBrowser extends Browser
                 
         super view
         @name = 'ObjectBrowser'
-
+        
     #  0000000   0000000          000  00000000   0000000  000000000  
     # 000   000  000   000        000  000       000          000     
     # 000   000  0000000          000  0000000   000          000     
@@ -43,6 +43,8 @@ class ObjectBrowser extends Browser
         opt.focus  ?= opt.column == 0
 
         @initColumns()
+        @addColumn()
+        @addColumn()
         
         if @columns[0].parent?.type != 'obj'
             @clearColumnsFrom 2, pop:true

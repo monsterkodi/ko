@@ -1,15 +1,88 @@
 ###
- 0000000   0000000   00000000  00000000  00000000  00000000       000               000   0000000    
-000       000   000  000       000       000       000              000             000  000         
-000       000   000  000000    000000    0000000   0000000            000           000  0000000     
-000       000   000  000       000       000       000              000       000   000       000    
- 0000000   0000000   000       000       00000000  00000000       000          0000000   0000000     
+ 0000000  00000000    0000000  00     00   0000000   00000000   
+000       000   000  000       000   000  000   000  000   000  
+0000000   0000000    000       000000000  000000000  00000000   
+     000  000   000  000       000 0 000  000   000  000        
+0000000   000   000   0000000  000   000  000   000  000        
 ###
 
-{ fs, valid, empty, slash, log } = require 'kxk'
+{ fs, valid, empty, slash, log, _ } = require 'kxk'
 
 sourceMap  = require 'source-map'
 mapConvert = require 'convert-source-map'
+regex      = /^\s+at\s+(\S+)\s+\((.*):(\d+):(\d+)\)/
+
+# 00000000  000  000      00000000  00000000    0000000    0000000  
+# 000       000  000      000       000   000  000   000  000       
+# 000000    000  000      0000000   00000000   000   000  0000000   
+# 000       000  000      000       000        000   000       000  
+# 000       000  0000000  00000000  000         0000000   0000000   
+
+filePos = (line) ->
+
+    if match = regex.exec line
+        
+        result =
+            func: match[1].replace '.<anonymous>', ''
+            file: match[2]
+            line: match[3]
+            col:  match[4]
+        
+        if slash.ext(result.file) == 'js'
+            
+            mappedLine = toCoffee result.file, result.line, result.col
+            
+            if mappedLine?
+                result.file = mappedLine[0]
+                result.line = mappedLine[1]
+                result.col  = mappedLine[2]
+    result
+
+#  0000000  000000000   0000000    0000000  000   000  
+# 000          000     000   000  000       000  000   
+# 0000000      000     000000000  000       0000000    
+#      000     000     000   000  000       000  000   
+# 0000000      000     000   000   0000000  000   000  
+
+errorStack = (err) ->
+    
+    lines = []
+    
+    for stackLine in err.stack.split '\n' 
+        
+        if fp = filePos stackLine
+            lines.push "       #{_.padEnd fp.func, 30} #{fp.file}:#{fp.line}" 
+        else
+            lines.push stackLine 
+  
+    lines.join '\n'
+
+# 000000000  00000000    0000000    0000000  00000000  
+#    000     000   000  000   000  000       000       
+#    000     0000000    000000000  000       0000000   
+#    000     000   000  000   000  000       000       
+#    000     000   000  000   000   0000000  00000000  
+
+errorTrace = (err) ->
+    
+    lines = []
+    text  = []
+
+    for stackLine in err.stack.split '\n' 
+        
+        if fp = filePos stackLine
+            lines.push fp
+        else
+            text.push stackLine 
+  
+    lines:  lines
+    text:   text.join '\n'
+    
+# 000000000   0000000          0000000   0000000   00000000  00000000  00000000  00000000  
+#    000     000   000        000       000   000  000       000       000       000       
+#    000     000   000        000       000   000  000000    000000    0000000   0000000   
+#    000     000   000        000       000   000  000       000       000       000       
+#    000      0000000          0000000   0000000   000       000       00000000  00000000  
 
 toCoffee  = (jsFile, jsLine, jsCol=0) ->
 
@@ -34,6 +107,12 @@ toCoffee  = (jsFile, jsLine, jsCol=0) ->
         
     [coffeeFile, coffeeLine, coffeeCol]
 
+# 000000000   0000000               000   0000000  
+#    000     000   000              000  000       
+#    000     000   000              000  0000000   
+#    000     000   000        000   000       000  
+#    000      0000000          0000000   0000000   
+
 toJs = (coffeeFile, coffeeLine, coffeeCol=0) ->
     
     jsFile = coffeeFile.replace /\/coffee\//, '/js/'
@@ -48,10 +127,11 @@ toJs = (coffeeFile, coffeeLine, coffeeCol=0) ->
     mapFile = jsFile
     
     if slash.fileExists mapFile
-        log 'mapFile', mapFile
+
         mapData = mapConvert.fromSource(fs.readFileSync mapFile, 'utf8').toObject()
-        log mapData
+
         consumer = new sourceMap.SourceMapConsumer mapData
+        
         if consumer?.allGeneratedPositionsFor?
             srcFile = 'js/'+jsFile.split('/js/')[1]
             poss = consumer.allGeneratedPositionsFor source:srcFile, line:coffeeLine, column:coffeeCol
@@ -60,6 +140,7 @@ toJs = (coffeeFile, coffeeLine, coffeeCol=0) ->
         else
             log consumer?, consumer?.allGeneratedPositionsFor?
             log 'no allGeneratedPositionsFor in', consumer
+            
         return [jsFile,null,null] if empty poss
         jsLine = poss[0].line
         jsCol  = poss[0].column
@@ -70,6 +151,8 @@ toJs = (coffeeFile, coffeeLine, coffeeCol=0) ->
     [jsFile, jsLine, jsCol]
         
 module.exports =
-    toJs:     toJs
-    toCoffee: toCoffee
+    toJs:       toJs
+    toCoffee:   toCoffee
+    errorStack: errorStack
+    
     

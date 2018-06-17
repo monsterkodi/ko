@@ -14,26 +14,8 @@
 coffeestack = require 'coffeestack'
 
 process.on 'uncaughtException', (err) ->
-    srcmap = require '../tools/srcmap'
-    convertedLines = []
-    atLinePattern = /^(\s+at .* )\((.*):(\d+):(\d+)\)/
-    for stackTraceLine in err.stack.split('\n')
-        if match = atLinePattern.exec(stackTraceLine)
-            filePath = match[2]
-            line = match[3]
-            column = match[4]
-            if slash.ext(filePath) is 'js'
-                mappedLine = srcmap.toCoffee filePath, line, column
-            if mappedLine?
-                convertedLines.push("#{match[1]}(#{mappedLine[0]}:#{mappedLine[1]}:#{mappedLine[2]})")
-            else
-                convertedLines.push(stackTraceLine)
-        else
-            convertedLines.push(stackTraceLine)
-  
-    convertedLines.join('\n')
-    log convertedLines
-    
+    srcmap = require '../tools/srcmap'    
+    log srcmap.errorStack err
         
 pkg      = require '../../package.json'
 electron = require 'electron'
@@ -267,7 +249,6 @@ class Main extends app
         for w in wins()
             w.hide()
             @hideDock()
-        throw new Error 'test'
         @
 
     showWindows: ->
@@ -275,7 +256,6 @@ class Main extends app
         for w in wins()
             w.show()
             @showDock()
-        # throw new Error 'test'
         @
 
     raiseWindows: ->
@@ -285,7 +265,6 @@ class Main extends app
                 w.showInactive()
             visibleWins()[0].showInactive()
             visibleWins()[0].focus()
-        # throw new Error 'test'
         @
 
     activateNextWindow: (win) ->
@@ -311,7 +290,6 @@ class Main extends app
                 i = allWindows.length-1 if i < 0
                 @activateWindowWithID allWindows[i].id
                 return w
-        throw new Error 'test'
         null
 
     activateWindowWithID: (wid) ->
@@ -378,9 +356,9 @@ class Main extends app
         { width, height } = @screenSize()
 
         if not @windowsAreStacked()
-            log 'stackWindows'
             @stackWindows()
             disableSnap = false
+            throw new Error 'test'
             return
 
         if wl.length == 1
@@ -419,6 +397,8 @@ class Main extends app
                     width:  parseInt w + ((i-w2 == 0 or i == wl.length-1) and frameSize/2 or frameSize)
                     height: parseInt rh/2
         disableSnap = false
+        
+        throw new Error 'test'
 
     # 00000000   00000000   0000000  000000000   0000000   00000000   00000000
     # 000   000  000       000          000     000   000  000   000  000

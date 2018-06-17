@@ -108,8 +108,8 @@ class FileEditor extends TextEditor
 
         if not opt?.skip
             if not @currentFile?
-                log 'post.emit file null'
-                post.emit 'file', null # titlebar -> tabs -> tab
+                log 'post.emit file null?'
+                # post.emit 'file', null # titlebar -> tabs -> tab
             # log '@emit file', @currentFile
             @emit 'file', @currentFile # diffbar, pigments, ...
 
