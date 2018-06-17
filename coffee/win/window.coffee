@@ -53,17 +53,6 @@ commandline = null
 titlebar    = null
 tabs        = null
 
-window.onerror = (msg, source, line, col, err) ->
-    
-    srcmap = require '../tools/srcmap'    
-    console.log srcmap.errorStack err
-    trace = srcmap.errorTrace err
-    log.ulog str:trace.text, source:trace.lines[0].file, line:trace.lines[0].line, sep:'💥'
-    for line in trace.lines
-        sep = if slash.isAbsolute line.file then '🐞' else '🔼'
-        log.ulog str:'       '+line.func, source:line.file, line:line.line, sep:sep
-    true
-
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000
 # 00000000   0000000    0000000   000000    0000000
@@ -641,9 +630,6 @@ onMenuAction = (name, args) ->
 
     post.toMain 'menuAction', name, args
     
-    if name == 'Arrange Windows'
-        throw new Error 'win'
-
 post.on 'menuAction', onMenuAction
 
 # 000   000  00000000  000   000

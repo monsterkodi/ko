@@ -11,19 +11,6 @@
 
 # post.debug()
 
-coffeestack = require 'coffeestack'
-
-process.on 'uncaughtException', (err) ->
-    srcmap = require '../tools/srcmap'    
-    console.log srcmap.errorStack err
-    trace = srcmap.errorTrace err
-    log.ulog str:trace.text, source:trace.lines[0].file, line:trace.lines[0].line, sep:'🔻'
-    for line in trace.lines
-        if slash.isAbsolute line.file
-            log.ulog str:'       '+line.func, source:line.file, line:line.line, sep:'🐞'
-        else
-            log.ulog str:'       '+line.func, source:line.file, line:line.line, sep:'🔼'
-        
 pkg      = require '../../package.json'
 electron = require 'electron'
 
@@ -71,6 +58,7 @@ post.onGet 'logSync',   ->
     console.log.apply console, [].slice.call(arguments, 0)
     return true
 
+post.on 'throwError',                 -> throw new Error 'err'
 post.on 'restartShell',       (cfg)   -> winShells[cfg.winID].restartShell()
 post.on 'newWindowWithFile',  (file)  -> main.createWindowWithFile file:file
 post.on 'activateWindow',     (winID) -> main.activateWindowWithID winID
@@ -283,7 +271,6 @@ class Main extends app
                 i = 1 + allWindows.indexOf w
                 i = 0 if i >= allWindows.length
                 @activateWindowWithID allWindows[i].id
-                throw new Error 'main'
                 return w
         null
 

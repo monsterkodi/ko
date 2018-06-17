@@ -6,7 +6,7 @@
 000   000  000   000   0000000  000   000   0000000
 ###
 
-{ fileList, colors, reversed, post, noon, slash, atomic, fs, empty, error, log, _ } = require 'kxk'
+{ post, fileList, colors, reversed, noon, slash, atomic, fs, empty, error, log, _ } = require 'kxk'
   
 indexer   = require '../main/indexer'
 salt      = require '../tools/salt'
@@ -121,6 +121,9 @@ class Macro extends Command
             when 'fps'   then window.fps?.toggle()
             when 'cwd'   then window.cwd?.toggle()
             when 'git'   then GitInfo.start()
+            when 'err'   
+                post.toMain 'throwError'
+                throw new Error 'err'
 
             # 000000000  00000000   0000000  000000000
             #    000     000       000          000
