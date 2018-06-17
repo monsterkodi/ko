@@ -135,6 +135,7 @@ class Browse extends Command
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000      
 
     commonPrefix: (strA,strB) ->
+        
         prefix = ''
         for i in [0...Math.min(strA.length, strB.length)]
             break if strA[i] != strB[i]
@@ -151,10 +152,10 @@ class Browse extends Command
             if prefix.length > longestMatch.length
                 longestMatch = prefix 
         l = @getText().length
-        d = brokenPath.length-longestMatch.length
   
-        @setText slash.tilde longestMatch
-        @complete()
+        if not empty longestMatch
+            @setText slash.tilde longestMatch
+            @complete()
                 
     changedCallback: (err, files) =>
         
@@ -211,6 +212,12 @@ class Browse extends Command
         else
             @hideList()
         
+    # 000   000  00000000  000   000  
+    # 000  000   000        000 000   
+    # 0000000    0000000     00000    
+    # 000  000   000          000     
+    # 000   000  00000000     000     
+    
     handleModKeyComboEvent: (mod, key, combo, event) ->
         
         switch combo
@@ -221,6 +228,11 @@ class Browse extends Command
                     commandline.deleteBackward()   # and backspace. 
                     commandline.do.end()           # it should feel as if selection wasn't there.
                     return
+            when 'enter'
+                @execute @getText()
+                focusBrowser = => @browser.focus()
+                setTimeout focusBrowser, 100
+                return
         'unhandled'
             
     # 000      000   0000000  000000000   0000000  000      000   0000000  000   000  
@@ -298,7 +310,7 @@ class Browse extends Command
         cmd = command.trim()
         if cmd.length 
             if slash.dirExists slash.removeLinePos cmd
-                @browser.browse cmd
+                @browser.loadItem file:cmd, type:'dir'
                 @commandline.setText cmd
                 return
             else if slash.fileExists slash.removeLinePos cmd

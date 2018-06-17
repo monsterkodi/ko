@@ -132,7 +132,7 @@ class Column
 
     focus: (opt={}) ->
         if not @activeRow() and @numRows() and opt?.activate != false
-            @rows[0].setActive emit:true
+            @rows[0].setActive() #emit:true
         @div.focus()
         window.setLastFocus @name()
         @
@@ -193,7 +193,7 @@ class Column
                 if item = @activeRow()?.item
                     type = item.type
                     if type == 'dir'
-                        post.emit 'filebrowser', 'loadItem', item
+                        post.emit 'filebrowser', 'loadItem', item, focus:true
                     else if item.file
                         post.emit 'jumpTo', item
                         post.emit 'focus', 'editor'

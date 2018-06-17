@@ -73,7 +73,7 @@ class Shelf extends Column
 
         matches = []
         for index,item of @items
-            if browserItem.file.startsWith item.file
+            if browserItem.file?.startsWith item.file
                 matches.push [index, item]
 
         if not empty matches

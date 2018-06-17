@@ -46,11 +46,11 @@ class FileBrowser extends Browser
         
         @initColumns()
         
-    onFileBrowser: (action, item, col) =>
+    onFileBrowser: (action, item, arg) =>
         
         switch action
-            when 'loadItem'     then @loadItem     item
-            when 'activateItem' then @activateItem item, col
+            when 'loadItem'     then @loadItem     item, arg
+            when 'activateItem' then @activateItem item, arg
 
     # 000       0000000    0000000   0000000    000  000000000  00000000  00     00  
     # 000      000   000  000   000  000   000  000     000     000       000   000  
@@ -58,17 +58,19 @@ class FileBrowser extends Browser
     # 000      000   000  000   000  000   000  000     000     000       000 0 000  
     # 0000000   0000000   000   000  0000000    000     000     00000000  000   000  
     
-    loadItem: (item) ->
+    loadItem: (item, opt) ->
         
+        opt ?= {}
         item.name ?= slash.file item.file
         
         @popColumnsFrom 1
         
-        # log 'loadItem', item
-        
         switch item.type
             when 'file' then @loadFileItem item
-            when 'dir'  then @loadDirItem  item
+            when 'dir'  then @loadDirItem  item, 0, active:'..'
+            
+        if opt.focus
+            @columns[0].focus()
 
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
     # 000   000  000          000     000  000   000  000   000     000     000       
@@ -223,26 +225,52 @@ class FileBrowser extends Browser
         lastPath = @lastUsedColumn()?.path()
         if file == lastPath
             return
-
-        pkgDir = slash.pkg file
-        
-        lastlist = slash.pathlist lastPath
-        pkglist  = slash.pathlist pkgDir
+            
         filelist = slash.pathlist file
+        lastlist = slash.pathlist lastPath
+        
+        if valid filelist
+            relative = slash.relative file, slash.dir last lastlist
             
-        listindex = pkglist.length - 1 
-        col0index = listindex
-        col = 0
-        while col0index < lastlist.length and col0index < filelist.length and lastlist[col0index] == filelist[col0index]
-            col0index += 1
-            col += 1
+            # log 'relative', relative
             
-        paths = filelist.slice col0index
+            upCount = 0
+            while relative.startsWith '../'
+                upCount += 1
+                relative = relative.substr 3
+                
+            # log 'upCount', upCount
+            
+            if upCount < @numCols()-1
+                # log "remove #{upCount} columns"
+                col   = @numCols() - 1 - upCount
+                relst = slash.pathlist relative
+                paths = filelist.slice filelist.length - relst.length
+                # log 'col', col, 'paths', paths
+
+        if empty paths
+            
+            pkgDir   = slash.pkg file
+            pkglist  = slash.pathlist pkgDir
+                
+            listindex = pkglist.length - 1 
+            col0index = listindex
+            col = 0
+            
+            # log 'filelist[col0index] == @columns[0].path()', filelist[col0index], @columns[0]?.path()
+            if filelist[col0index] == @columns[0]?.path()
+                while col0index < lastlist.length and col0index < filelist.length and lastlist[col0index] == filelist[col0index]
+                    col0index += 1
+                    col += 1
+                
+            paths = filelist.slice col0index
         
         if slash.isFile last paths
             lastType = 'file'
         else
             lastType = 'dir'
+        
+        # log 'paths', col, @numCols(), lastType, paths
         
         @popColumnsFrom   col+paths.length
         @clearColumnsFrom col

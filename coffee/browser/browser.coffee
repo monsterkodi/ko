@@ -115,8 +115,8 @@ class Browser extends Stage
     # 000       000   000  000       000   000       000  
     # 000        0000000    0000000   0000000   0000000   
     
-    focus: -> 
-        @lastUsedColumn()?.focus()
+    focus: (opt) => 
+        @lastUsedColumn()?.focus opt
         @
     
     focusColumn: -> 
