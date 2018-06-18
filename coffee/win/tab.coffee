@@ -164,7 +164,8 @@ class Tab
         if @state?
             @restoreState()
         else
-            window.loadFile @info.file, dontSave:true
+            post.emit 'jumpToFile', file:@info.file
+            # window.loadFile @info.file, dontSave:true
             
         if @foreign?.length
             for changes in @foreign

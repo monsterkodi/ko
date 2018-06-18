@@ -9,7 +9,7 @@
 { post, valid, empty, clamp, slash, fs, os, error, log, _ } = require 'kxk'
   
 profile  = require '../tools/profile'
-Walker   = require '../tools/walker'
+Projects = require '../tools/projects'
 Command  = require '../commandline/command'
 render   = require '../editor/render'
 syntax   = require '../editor/syntax'
@@ -34,14 +34,14 @@ class Open extends Command
         super commandline
         
         post.on 'file', @onFile
+        post.on 'dir',  @onDir
         
-        @names      = ["open", "new tab", "new window"]
-        @files      = null
+        @names      = ["open", "new window"]
+        @files      = []
         @file       = null
         @dir        = null
         @pkg        = null
         @selected   = 0
-        @navigating = false
           
     onFile: (file) =>
         
@@ -50,6 +50,14 @@ class Open extends Command
                 @setText ''
             else if @getText() != slash.file file
                 @setText slash.file file
+                
+    onDir: (dir) =>
+        
+        if @isActive() 
+            if empty dir
+                @setText ''
+            else if @getText() != slash.file dir
+                @setText slash.file dir
         
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000
@@ -61,40 +69,19 @@ class Open extends Command
         
         command = command.trim()
 
-        if command == '.' and @navigating == false
-            @setText ''
-            @navigating = true
-            @showItems @listItems includeThis: false
-            @select 0
-            @positionList()            
-            @setAndSelectText @dir  
-            return
-        
-        if command in ['.', '/', '~'] or command.endsWith '/'
-            return @navigateDir command
-
         [file, pos] = slash.splitFilePos command ? @getText().trim()
-        items = @listItems flat: true, navigating: @navigating, currentText: file    
+        # items = @listItems flat: true, currentText: file    
+        items = @listItems flat: true, currentText:file, maxItems:10000
+        # items = @listItems currentText:file, maxItems:10000
         if command.length
             fuzzied = fuzzy.filter slash.basename(file), items, extract: (o) -> o.text            
             items = (f.original for f in fuzzied)
             items.sort (a,b) -> b.weight - a.weight
                     
         if items.length
-            @showItems items
+            @showItems items.slice 0, 200
             @select 0
             @positionList()
-        else
-            if slash.dirname(slash.resolve(command)) == @dir
-                base = slash.basename command
-                items = @listItems flat: false, excludeUp: true
-                items = _.filter items, (i) -> i.file.startsWith slash.resolve(command)
-                if items.length
-                    @showItems items
-                    @select 0
-                    @positionList()
-                    return
-            @navigateDir command
 
     #  0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
     # 000       000   000  000   000  000   000  000      000          000     000     
@@ -143,7 +130,7 @@ class Open extends Command
                 
         relBonus = 0
         nameBonus = 0
-        if opt?.currentText?.length
+        if opt.currentText?.length
             relBonus  = r.startsWith(opt.currentText) and 65535 * (opt.currentText.length/r.length) or 0 
             nameBonus = n.startsWith(opt.currentText) and 2184  * (opt.currentText.length/n.length) or 0
            
@@ -154,12 +141,14 @@ class Open extends Command
             when 'noon'                 then 25
             when 'js', 'json', 'html' then -10
             else 0 
-        extensionBonus -= 400 if b[0] == '.'
-        extensionBonus += 16777215 if item.text == '..' if @navigating
+        # extensionBonus -= 400 if b[0] == '.'
+        
+        if @file and slash.ext(@file) == slash.ext b
+            extensionBonus += 1000
         
         lengthPenalty = slash.dir(f).length
                 
-        if opt?.flat
+        if opt.flat
             
             updirPenalty = r.split('../').length * 819
             
@@ -193,13 +182,19 @@ class Open extends Command
 
     listItems: (opt) ->
         
+        opt ?= {}
+        opt.maxItems ?= 200
+        opt.flat ?= true
+        
+        # log 'listItems', opt
+        
         items = []
         
         @lastFileIndex = 0
+        
         @dir = slash.resolve '~' if not @dir?
-        # log 'open/listItems', @dir, slash.resolve '~'
 
-        if @history? and not @navigating and not opt?.currentText and @history.length > 1
+        if @history? and not opt.currentText and @history.length > 1
             f = @history[@history.length-2]
             item = Object.create null
             item.text = relative f, @dir
@@ -208,42 +203,24 @@ class Open extends Command
             item.bonus = 1048575
             items.push item
             @lastFileIndex = 0
-
-        if @navigating and opt?.includeThis
-            item = Object.create null
-            item.line = '▸'
-            item.clss = 'directory'
-            item.text = '.'
-            item.file = @dir
-            items.push item            
-        
-        if @dir != '/' and not opt?.excludeUp
-            item = Object.create null
-            item.line = '▸'
-            item.clss = 'directory'
-            item.text = '..'
-            item.file = slash.dir @dir
-            items.push item
                 
         for file in @files
-            rel = relative file[0], @dir
             
-            # log 'open.listItems file:', file[0], '@dir:', @dir, 'rel:', rel
+            rel = relative file, @dir
             
             if rel.length
                 item = Object.create null
-                if file[1].isDirectory()
-                    item.line = '▸'
-                    item.clss = 'directory'
-                else
-                    item.line = ' '
+                item.line = ' ' # < insert file type icon?
                 item.text = rel
-                item.file = file[0]
+                item.file = file
                 items.push item
 
         items = @weightedItems items, opt
         items = _.uniqBy items, (o) -> o.text
-        items
+        
+        # log 'listItems', items.length
+        
+        items.slice 0, opt.maxItems
     
     # 000   000  000   0000000  000000000   0000000   00000000   000   000  
     # 000   000  000  000          000     000   000  000   000   000 000   
@@ -253,7 +230,7 @@ class Open extends Command
     
     showHistory: () ->
 
-        if @history.length > 1 and (@selected < 0 or not @navigating and @selected == 0)
+        if @history.length > 1 and @selected <= 0
             items = []
             bonus = 1048575
             for f in @history
@@ -264,7 +241,6 @@ class Open extends Command
                 items.push item
                 bonus -= 1 
             items.pop()
-            @stopWalkers()
             @showItems items
             @select items.length-1
             @setAndSelectText items[@selected].text
@@ -274,7 +250,7 @@ class Open extends Command
     showFirst: () ->
         
         if @commandList and @selected == @commandList.meta.metas.length - 1
-            @showItems @listItems includeThis: false
+            @showItems @listItems()
             @select 0
         else
             'unhandled'
@@ -288,17 +264,11 @@ class Open extends Command
     cancel: (name) ->
         
         if name == @names[0] # command+p command+p to open previous file
-            if not @navigating and @commandList? and @lastFileIndex == @selected
-                @stopWalkers()
+            if @commandList? and @lastFileIndex == @selected
                 return @execute()
                 
         super name
     
-    cancelList: ->
-        
-        @stopWalkers()
-        super()
-
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
     # 0000000      000     000000000  0000000       000   
@@ -307,148 +277,49 @@ class Open extends Command
         
     start: (name) -> 
         
-        opt = reload: true
+        if @commandline.lastFocus == 'commandline-editor' == window.lastFocus
             
-        if window.editor.currentFile?
-            opt.file = window.editor.currentFile 
-            opt.dir  = slash.dir opt.file
-        else 
-            @dir ?= process.cwd()
-            log 'open.start', @dir
-            opt.dir = @dir
+            @file = window.editor.currentFile
+            if dir = slash.resolve @commandline.text()
+                @dir = dir
+            else
+                @dir = slash.dir(@file) ? process.cwd()
+        
+        else if @commandline.lastFocus == 'shelf' or @commandline.lastFocus.startsWith 'FileBrowser'
             
-        @loadDir opt
-
-        super name
-        
-        @selected = null
-        
-        text: ''
-       
-    navigateDir: (dir) ->
-        
-        r = @loadDir 
-            dir: dir
-            noPkg: true
-            navigating: true
+            item = window.filebrowser.lastUsedColumn().parent
             
-        if r
-            @hideList()
-            @select -1                
-    
-    # 000       0000000    0000000   0000000          0000000    000  00000000 
-    # 000      000   000  000   000  000   000        000   000  000  000   000
-    # 000      000   000  000000000  000   000        000   000  000  0000000  
-    # 000      000   000  000   000  000   000        000   000  000  000   000
-    # 0000000   0000000   000   000  0000000          0000000    000  000   000
-        
-    loadDir: (opt) ->
-                
-        opt.dir = slash.dir opt.file if not opt.dir? and opt.file?
-        if not slash.dirExists opt.dir
-            opt.dir = slash.resolve opt.dir
-            if not slash.dirExists opt.dir
-                return false
-
-        # log 'open.loadDir opt.dir:', opt.dir
-        @dir ?= slash.resolve '.'
-        # log 'open.loadDir @dir:', @dir
-        newdir = @resolvedPath(opt.dir) ? @dir
-        return false if newdir == @dir and not opt.reload
-        
-        # log 'open.loadDir newdir:', newdir
-        
-        @dir = newdir
-        
-        @pkg        = opt.noPkg and @dir or slash.pkg(@dir) or @dir
-        @file       = opt.file
-        @files      = []
-        @selected   = null
-        @navigating = opt.navigating ? false
-
-        if @walker and not @walker.running and @walker.cfg.root == @pkg and valid @walker.cfg.files
-            setImmediate => @walkerDone @walker
-            return true
-        
-        @stopWalkers()
-                
-        topt = 
-            done:        @walkerDone
-            root:        @dir
-            includeDir:  @dir
-            includeDirs: true
-            maxFiles:    100
-            maxDepth:    1
-        
-        @thisWalker = new Walker topt
-        @thisWalker.start()
-        
-        fopt = 
-            done:        @walkerDone
-            root:        @dir
-            includeDir:  @dir
-            includeDirs: true
-            maxFiles:    300
-            maxDepth:    2
-         
-        @fastWalker = new Walker fopt
-        @fastWalker.start()
-
-        wopt = 
-            done:        @walkerDone
-            root:        @pkg
-            includeDir:  @dir
-            includeDirs: true
-            maxFiles:    2000
-            maxDepth:    5
-            slowdown:    true
-         
-        @walker = new Walker wopt
-        @walker.start()
+            switch item.type
+                when 'dir'
+                    @file = window.editor.currentFile
+                    @dir  = item.file
+                when 'file'
+                    @file = item.file
+                    @dir  = slash.dir @file
                     
-        true
-        
-    # 000   000   0000000   000      000   000  00000000  00000000 
-    # 000 0 000  000   000  000      000  000   000       000   000
-    # 000000000  000000000  000      0000000    0000000   0000000  
-    # 000   000  000   000  000      000  000   000       000   000
-    # 00     00  000   000  0000000  000   000  00000000  000   000
+        else if window.editor.currentFile?
             
-    walkerDone: (walker) =>
-
-        log 'walkerDone', walker.cfg.files.length
-        for i in [0...walker.cfg.files.length]
-            @files.push [walker.cfg.files[i], walker.cfg.stats[i]]
+            @file = window.editor.currentFile
+            @dir  = slash.dir @file
             
-        # @files = _.sortBy @files, (o) => relative(o[0], @dir).replace(/\./g, 'z')
+        else 
+            
+            @file = null
+            @dir  = process.cwd()
+            
+        # log 'open.start @dir', @dir
         
+        @files = Projects.files @dir
+        # log 'open.loadDir @files', @files.length
+        @loadState()
         @showList()
-        @showItems @listItems includeThis: false
+        @showItems @listItems()
         @grabFocus()
-        @select @selected ? @lastFileIndex
+        @select 0  
         
-        if not @navigating
-            
-            if @getText() == ''
-                @setAndSelectText @commandList.line @selected
-            else if @getText() != @commandList.line @selected
-                @changed @getText()
+        text:   @commandList.line @selected
+        select: true
                 
-        else if @getText() == '.'
-            
-            @setText @dir
-            
-    stopWalkers: ->
-
-        @thisWalker?.stop()
-        @fastWalker?.stop()
-        @walker?.stop()
-
-    hideList: ->
-
-        @stopWalkers()
-        super()
-        
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000     
     # 0000000     00000    0000000   000       000   000     000     0000000 
@@ -457,64 +328,57 @@ class Open extends Command
         
     execute: (command) ->
         
-        listValue = @commandList?.line(@selected) if @selected >= 0
+        if @selected >= 0
+            # log "execute #{@selected}:", @commandList?.line @selected
+            listValue = @commandList?.line(@selected) 
 
-        if command in ['.', '..', '/', '~']
-            @loadDir
-                navigating: true
-                dir:        @resolvedPath command
-            return text: @dir, select: true
-        else
-            if @selected >= 0 and listValue? 
-                if slash.dirExists @resolvedPath listValue
-                    resolved = @resolvedPath listValue
-            else if slash.dirExists @resolvedPath command
-                resolved = @resolvedPath command
-                
-            if resolved? 
-                @loadDir
-                    navigating: true
-                    dir:        resolved
-                return text: @dir+'/', select: false
-        
+        if @selected >= 0 and listValue? 
+            if slash.dirExists @resolvedPath listValue
+                resolved = @resolvedPath listValue
+        else if slash.dirExists @resolvedPath command
+            resolved = @resolvedPath command
+                    
         @hideList()
 
         if listValue
             [file, pos] = slash.splitFilePos listValue
             file = @resolvedPath listValue
             file = slash.joinFilePos file, pos
-            files = [file]
+            # files = [file]
+            if @name == 'new window'
+                post.toMain 'newWindowWithFile', file
+            else
+                post.emit 'jumpToFile', file:file
         else
-            files = _.words command, new RegExp "[^, ]+", 'g'
-            for i in [0...files.length]
-                file = files[i]
-                [file, pos] = slash.splitFilePos file
-                file = @resolvedPath file
-                if not slash.fileExists file
-                    if '' == slash.ext file
-                        if slash.fileExists file + '.coffee'
-                            file += '.coffee'
-                file = slash.joinFilePos file, pos
-                files.splice i, 1, file
+            log 'dafuk?'
+            # files = _.words command, new RegExp "[^, ]+", 'g'
+            # for i in [0...files.length]
+                # file = files[i]
+                # [file, pos] = slash.splitFilePos file
+                # file = @resolvedPath file
+                # if not slash.fileExists file
+                    # if '' == slash.ext file
+                        # if slash.fileExists file + '.coffee'
+                            # file += '.coffee'
+                # file = slash.joinFilePos file, pos
+                # files.splice i, 1, file
             
-        options = {}
-        options.newWindow = true if @name == "new window"
-        options.newTab    = true if @name == "new tab"
+        # options = {}
+        # options.newWindow = true if @name == "new window"
         
         # log 'open.execute files:', files
         
-        opened = window.openFiles files, options
+        # opened = window.openFiles files, options
         
-        if opened?.length
+        if file #opened?.length
             
-            @stopWalkers()
-            
-            if opened.length == 1
-                super opened[0]
-            else
-                super selected
+            super file
+            # if opened.length == 1
+                # super opened[0]
+            # else
+                # super selected
                 
-            text:  (slash.basename(f) for f in opened).join ' '
+            text:   file # (slash.basename(f) for f in opened).join ' '
             focus:  'editor'
             show:   'editor'
             status: 'ok'
@@ -546,14 +410,6 @@ class Open extends Command
         switch combo
             when 'up'   then return @showHistory()
             when 'down' then return @showFirst()
-            when 'backspace'
-                if not @getText().length and @commandList?.line(@selected) == '..'
-                    @loadDir
-                        navigating: true
-                        dir:        slash.dir @dir
-                    return @commandline.results text: @dir, select: true
-                else if @commandline.isSelectedLineAtIndex 0
-                    @navigating = true
         super mod, key, combo, event
 
 module.exports = Open

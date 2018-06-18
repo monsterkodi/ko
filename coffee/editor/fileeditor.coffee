@@ -8,7 +8,6 @@
 
 { post, srcmap, popup, stopEvent, setStyle, pos, slash, fs, empty, error, log, str, _ } = require 'kxk'
   
-# srcmap     = require '../srcmap'
 watcher    = require './watcher'
 TextEditor = require './texteditor'
 syntax     = require './syntax'

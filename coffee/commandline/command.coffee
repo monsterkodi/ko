@@ -147,8 +147,8 @@ class Command
     
     listClick: (index) =>
         
-        log 'command.listClick', index, @commandList.line index 
-        log 'command.listClick', index, @commandList.items[index]
+        # log 'command.listClick', index, @commandList.line index 
+        # log 'command.listClick', index, @commandList.items[index]
         @selected = index
         @execute @commandList.line index 
     
@@ -179,7 +179,6 @@ class Command
     # 0000000   00000000  0000000  00000000   0000000     000   
         
     select: (i) -> 
-        # log 'select', i
         return if not @commandList?
         @selected = clamp -1, @commandList.numLines()-1, i
         if @selected >= 0

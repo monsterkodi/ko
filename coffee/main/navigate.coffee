@@ -91,11 +91,11 @@ class Navigate
                     @currentIndex = @filePositions.length-1
                     
                     if opt?.for == 'goto'
+                        post.toWins 'navigateHistoryChanged', @filePositions, @currentIndex
                         @loadFilePos @filePositions[@currentIndex], opt
                     else
                         @currentIndex = @filePositions.length
-                        
-                    post.toWins 'navigateHistoryChanged', @filePositions, @currentIndex
+                        post.toWins 'navigateHistoryChanged', @filePositions, @currentIndex
                     
     loadFilePos: (filePos, opt) ->
 
@@ -104,7 +104,7 @@ class Navigate
         else
             error 'no winID?' if not opt?.winID?
             post.toWin opt.winID, 'loadFile', "#{filePos.file}:#{filePos.pos[1]+1}:#{filePos.pos[0]}"
-            
+        
         post.toWins 'navigateIndexChanged', @currentIndex, @filePositions[@currentIndex]
         
         filePos

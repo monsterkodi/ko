@@ -122,6 +122,8 @@ class Indexer
                     dirs:    @dirs.length ? 0
             when 'file'
                 return @files[filter[0]]
+            when 'project'
+                return @projectInfo filter[0]
         
         # log 'onGet', key, filter
         
@@ -191,6 +193,13 @@ class Indexer
     # 000        000   000  000   000  000   000  000       000          000     
     # 000        000   000   0000000    0000000   00000000   0000000     000     
     
+    projectInfo: (path) ->
+        
+        for project in @indexedProjects
+            if slash.samePath(project.dir, path) or path.startsWith project.dir + '/'
+                return project
+        {}
+    
     indexProject: (file) ->
         
         if @currentlyIndexing
@@ -200,9 +209,7 @@ class Indexer
         
         file = slash.resolve file 
         
-        for project in @indexedProjects
-            if slash.samePath(project.dir, file) or file.startsWith project.dir + '/'
-                return
+        return if valid @projectInfo file
               
         @currentlyIndexing = file
         

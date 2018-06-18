@@ -21,13 +21,21 @@ class Projects
         
         files[info.dir] = info.files
         numFiles += info.files.length
-        log 'Projects.onIndexed', info.dir, info.files.length, numFiles
+        # log 'Projects.onIndexed', info.dir, info.files.length, numFiles
         
     @files: (file) ->
         
-        for dir,files of files
-            if file.startsWith dir
-                return files
+        for dir,list of files
+            if file.startsWith(dir)
+                return list
+            
+        if dir = slash.pkg file
+            if info = post.get 'indexer', 'project', dir
+                Projects.onIndexed info
+                return files[info.dir]
+                
+        log "no project files for file #{file}", Object.keys files
+        []
  
 post.on 'projectIndexed', Projects.onIndexed
         

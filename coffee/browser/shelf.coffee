@@ -40,7 +40,7 @@ class Shelf extends Column
         post.on 'navigateHistoryChanged', @onNavigateHistoryChanged
         post.on 'navigateIndexChanged',   @onNavigateIndexChanged
         
-        @browser.on 'itemActivated', @onBrowserItemActivated
+        post.on 'file', @onFile
         
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  0000000     00000000    0000000   000   000  
     # 000   000  000          000     000  000   000  000   000     000     000         000   000  000   000  000 0 000  
@@ -60,20 +60,26 @@ class Shelf extends Column
         row.setActive emit:true
         
         if item.type == 'file'
-            post.emit 'loadFile', item.file
+            post.emit 'jumpToFile', item
         else
             post.emit 'filebrowser', 'loadItem', item
                 
-    onBrowserItemActivated: (browserItem) =>
+    #  0000000   000   000      00000000  000  000      00000000  
+    # 000   000  0000  000      000       000  000      000       
+    # 000   000  000 0 000      000000    000  000      0000000   
+    # 000   000  000  0000      000       000  000      000       
+    #  0000000   000   000      000       000  0000000  00000000  
+    
+    onFile: (file) =>
         
-        [index, item] = indexAndItemInItemsWithFunc browserItem, @items, _.isEqual
+        [index, item] = indexAndItemInItemsWithFunc file, @items, (f,i) -> i.file == f
         if item
             @rows[index].setActive()
             return
 
         matches = []
         for index,item of @items
-            if browserItem.file?.startsWith item.file
+            if file?.startsWith item.file
                 matches.push [index, item]
 
         if not empty matches
@@ -81,7 +87,9 @@ class Shelf extends Column
             [index, item] = first matches
             @rows[index].setActive()
             return
-                
+        else
+            log 'nada'
+                            
     # 000  000   000  000  000000000  
     # 000  0000  000  000     000     
     # 000  000 0 000  000     000     
@@ -248,22 +256,18 @@ class Shelf extends Column
     removeHistory: ->
         
         separatorIndex = @historySeparatorIndex()
-        # log 'separatorIndex', separatorIndex, @numRows()
         while @numRows() and @numRows() > separatorIndex
             @removeRow @row(@numRows()-1)
 
     onNavigateHistoryChanged: (filePositions, currentIndex) =>
-        
         if @showHistory
             @setHistoryItems filePositions
-            @onNavigateIndexChanged currentIndex, filePositions[currentIndex]
 
     onNavigateIndexChanged: (currentIndex, currentItem) =>
-        
+
         if @showHistory
             reverseIndex = @numRows() - currentIndex - 1
-            if not @hasFocus()
-                @row(reverseIndex)?.setActive()
+            @row(reverseIndex)?.setActive()
             
     loadHistory: ->
         
@@ -291,6 +295,7 @@ class Shelf extends Column
     # 000        0000000    0000000   0000000   0000000   
     
     onFocus: => 
+
         window.setLastFocus 'shelf'
         @div.classList.add 'focus'
         if @browser.shelfSize < 200
@@ -323,16 +328,19 @@ class Shelf extends Column
             when 'up'        then index-1
             when 'down'      then index+1
             when 'home'      then 0
-            when 'end'       then @numRows()-1
+            when 'end'       then @items.length #@numRows()-1
             when 'page up'   then index-@numVisible()
-            when 'page down' then index+@numVisible()
+            when 'page down' then clamp 0, @items.length, index+@numVisible()
             else index
             
         error "no index #{index}? #{@numVisible()}" if not index? or Number.isNaN index        
         index = clamp 0, @numRows()-1, index
         
         error "no row at index #{index}/#{@numRows()-1}?", @numRows() if not @rows[index]?.activate?
-        @rows[index].activate()
+
+        if      key == 'up'   and index > @items.length     then post.emit 'menuAction', 'Navigate Forward'
+        else if key == 'down' and index > @items.length + 1 then post.emit 'menuAction', 'Navigate Backward'
+        else @rows[index].activate()
     
     openFileInNewWindow: ->  
         

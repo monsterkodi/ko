@@ -154,8 +154,8 @@ class Commandline extends TextEditor
             if activeID and activeID != 'commandline-editor'
                 @command.setReceiver activeID
                 
+            @lastFocus = window.lastFocus
             @view.focus()
-            
             @setName name
             @results @command.start name # <-- command start
     

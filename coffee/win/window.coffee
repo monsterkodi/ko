@@ -517,7 +517,7 @@ resetFontSize = ->
 
 addToShelf = ->
     
-    fileBrowser = commandline.commands.browse.browser
+    fileBrowser = window.filebrowser
     return if window.lastFocus == 'shelf'
     if window.lastFocus.startsWith fileBrowser.name
         path = fileBrowser.columnWithName(window.lastFocus).activePath()
@@ -562,6 +562,7 @@ window.onfocus = (event) ->
             split.focus 'commandline-editor'
 
 window.setLastFocus = (name) ->
+    # log 'window.setLastFocus', name
     window.lastFocus = name
 
 # 00     00  00000000  000   000  000   000      0000000    0000000  000000000  000   0000000   000   000
@@ -604,7 +605,7 @@ onMenuAction = (name, args) ->
         when 'Navigate Forward'      then return navigate.forward()
         when 'Maximize Editor'       then return split.maximizeEditor()
         when 'Add to Shelf'          then return addToShelf()
-        when 'Toggle History'        then return window.commandline.commands.browse.browser.shelf.toggleHistory()
+        when 'Toggle History'        then return window.filebrowser.shelf.toggleHistory()
         when 'Activate Next Tab'     then return window.tabs.navigate 'right'
         when 'Activate Previous Tab' then return window.tabs.navigate 'left'
         when 'Move Tab Left'         then return window.tabs.move 'left'

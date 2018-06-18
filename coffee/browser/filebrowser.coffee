@@ -18,6 +18,9 @@ class FileBrowser extends Browser
     constructor: (view) ->
                 
         super view
+        
+        window.filebrowser = @
+        
         @loadID = 0
         @shelf  = new Shelf @
         @name   = 'FileBrowser'
@@ -173,6 +176,7 @@ class FileBrowser extends Browser
         
         if @dirCache[dir] and not opt.ignoreCache
             @loadDirItems dir, item, @dirCache[dir], col, opt
+            post.emit 'dir', dir
         else
             opt.ignoreHidden = not state.get "browser|showHidden|#{dir}"
             
@@ -184,6 +188,7 @@ class FileBrowser extends Browser
                 
                 @dirCache[dir] = items
                 @loadDirItems dir, item, items, col, opt
+                post.emit 'dir', dir
             
     loadDirItems: (dir, item, items, col, opt) =>
             
@@ -414,7 +419,7 @@ class FileBrowser extends Browser
         @srcCache[file] = info
         
         if file == @lastUsedColumn()?.parent?.file
-            log 'onFileIndexed loadSourceItem', file
+            # log 'onFileIndexed loadSourceItem', file
             @loadSourceItem { file:file, type:'file' }, @lastUsedColumn()?.index
             
 module.exports = FileBrowser

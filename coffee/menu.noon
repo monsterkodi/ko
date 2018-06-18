@@ -86,14 +86,11 @@ Command
     #  0000000   000        00000000  000   000
 
     Open
-        In Current Tab      
+        In New Tab      
             accel           ctrl+p   
             command         open
-        In New Tab          
-            accel           ctrl+shift+
-            command         new tab
         In New Window       
-            accel           alt+ctrl+p
+            accel           alt+p
             command         new window
 
     #  0000000  00000000   0000000   00000000    0000000  000   000
