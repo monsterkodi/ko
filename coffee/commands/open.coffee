@@ -6,7 +6,7 @@
  0000000   000        00000000  000   000
 ###
 
-{ valid, empty, clamp, post, slash, fs, os, error, log, _ } = require 'kxk'
+{ post, valid, empty, clamp, slash, fs, os, error, log, _ } = require 'kxk'
   
 profile  = require '../tools/profile'
 Walker   = require '../tools/walker'
@@ -115,6 +115,7 @@ class Open extends Command
             @changed @getText()
             true            
         else
+            log 'post.get indexer projects'
             projects = post.get 'indexer', 'projects'
             for p in Object.keys(projects).sort()
                 if p.startsWith @getText()
@@ -415,6 +416,7 @@ class Open extends Command
             
     walkerDone: (walker) =>
 
+        log 'walkerDone', walker.cfg.files.length
         for i in [0...walker.cfg.files.length]
             @files.push [walker.cfg.files[i], walker.cfg.stats[i]]
             

@@ -111,11 +111,13 @@ indexProject = (file) ->
                 info.files.push slash.path path
                 
     indexKoFiles kofiles, info
-    
+        
     info
 
 if module.parent
+    
     module.exports = indexProject
+    
 else
     info = indexProject slash.resolve process.argv[2]
     # log info 

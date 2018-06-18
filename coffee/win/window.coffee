@@ -36,6 +36,7 @@ File        = require '../tools/file'
 FPS         = require '../tools/fps'
 CWD         = require '../tools/cwd'
 scheme      = require '../tools/scheme'
+projects    = require '../tools/projects' 
 electron    = require 'electron'
 pkg         = require '../../package.json'
 

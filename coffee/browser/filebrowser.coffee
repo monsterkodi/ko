@@ -179,6 +179,8 @@ class FileBrowser extends Browser
             dirlist dir, opt, (err, items) => 
                 
                 if err? then return error "can't load dir #{dir}: #{err}"
+            
+                post.toMain 'dirLoaded', dir
                 
                 @dirCache[dir] = items
                 @loadDirItems dir, item, items, col, opt
@@ -411,7 +413,8 @@ class FileBrowser extends Browser
         
         @srcCache[file] = info
         
-        if file == last(@columns)?.parent.file
-            @loadSourceItem { file:file, type:'file' }, last(@columns)?.index
+        if file == @lastUsedColumn()?.parent?.file
+            log 'onFileIndexed loadSourceItem', file
+            @loadSourceItem { file:file, type:'file' }, @lastUsedColumn()?.index
             
 module.exports = FileBrowser

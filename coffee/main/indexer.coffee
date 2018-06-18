@@ -6,7 +6,7 @@
 000  000   000  0000000    00000000  000   000  00000000  000   000
 ###
 
-{ post, valid, empty, slash, fs, os, error, log, _ } = require 'kxk'
+{ post, valid, empty, slash, fs, os, str, error, log, _ } = require 'kxk'
 
 Walker   = require '../tools/walker'
 matchr   = require '../tools/matchr'
@@ -83,6 +83,13 @@ class Indexer
         
         post.onGet 'indexer', @onGet
         post.on 'sourceInfoForFile', @onSourceInfoForFile
+        
+        post.on 'fileSaved',    (file, winID) => @indexFile file, refresh: true
+        post.on 'dirLoaded',    (dir)         => @indexProject dir
+        post.on 'fileLoaded',   (file, winID) => 
+            @indexFile file
+            @indexProject file
+        
         @collectBins()
     
         @imageExtensions = ['png', 'jpg', 'gif', 'tiff', 'pxm', 'icns']        
@@ -194,20 +201,34 @@ class Indexer
         file = slash.resolve file 
         
         for project in @indexedProjects
-            if file.startsWith project.dir + '/'
+            if slash.samePath(project.dir, file) or file.startsWith project.dir + '/'
+                log 'skip indexProject', file
                 return
               
         @currentlyIndexing = file
         
+        log 'indexProject', file
+        
         forkfunc './indexprj', file, (err, info) =>
+            
             return error 'indexing failed', err if valid err
+
+            log "indexProject #{info.dir} indexed: #{info.files.length} files"
+            
             delete @currentlyIndexing
+            
             @indexedProjects.push info if info
+            
+            post.toWins 'projectIndexed', info
+            
             doShift = empty @queue
+            
             if not empty info.files
                 @queue = @queue.concat info.files
+                
             if not empty @indexQueue
                 @indexProject @indexQueue.shift()
+                
             @shiftQueue() if doShift
                 
     # 000  000   000  0000000    00000000  000   000        0000000    000  00000000
@@ -220,7 +241,7 @@ class Indexer
 
         return if not dir? or @dirs[dir]?
         
-        # log 'indexDir', dir
+        log 'indexDir', dir
         
         @dirs[dir] =
             name: slash.basename dir
@@ -498,6 +519,7 @@ class Indexer
     # 0000000   000   000  000  000          000     
     
     shiftQueue: =>
+        
         if @queue.length
             file = @queue.shift()
             @indexFile file
