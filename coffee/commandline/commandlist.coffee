@@ -23,6 +23,7 @@ class CommandList extends TextEditor
             fontSize:   19
             syntaxName: opt.syntaxName ? 'ko'
 
+        @name       = 'commandlist-editor'
         @items      = []
         @maxLines   = 17
         @metaQueue  = []

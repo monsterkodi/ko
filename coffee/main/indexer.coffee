@@ -202,7 +202,6 @@ class Indexer
         
         for project in @indexedProjects
             if slash.samePath(project.dir, file) or file.startsWith project.dir + '/'
-                log 'skip indexProject', file
                 return
               
         @currentlyIndexing = file

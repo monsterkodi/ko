@@ -55,13 +55,14 @@ module.exports =
             combo: 'command+`'
             accel: "ctrl+'"
             
-    selectSingleRange: (r, opt = extend:false) ->
+    selectSingleRange: (r, opt) ->
         
         if not r?
             return error "Editor.#{name}.selectSingleRange -- undefined range!"
             
+        cursorX = if opt?.before then r[1][0] else r[1][1]
         @do.start()
-        @do.setCursors [[opt?.before and r[1][0] or r[1][1], r[0]]]
+        @do.setCursors [[cursorX, r[0]]]
         @do.select [r]
         @do.end()
         @
@@ -73,7 +74,7 @@ module.exports =
     # 0000000      000     000   0000000  000   000     000     
     
     toggleStickySelection: ->
-        # log 'toggleStickySelection', @stickySelection
+
         if @stickySelection then @endStickySelection()
         else @startStickySelection()
     
@@ -96,7 +97,7 @@ module.exports =
     # 0000000      000     000   000  000   000     000             00000000  000   000  0000000    
     
     startSelection: (opt = extend:false) ->
-        # @log 'startSel', opt.extend
+
         if not opt?.extend
             @startSelectionCursors = null
             if not @stickySelection

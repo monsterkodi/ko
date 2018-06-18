@@ -180,12 +180,12 @@ class Command
         
     select: (i) -> 
         # log 'select', i
-        @selected = clamp -1, @commandList?.numLines()-1, i
+        return if not @commandList?
+        @selected = clamp -1, @commandList.numLines()-1, i
         if @selected >= 0
-            @commandList?.selectSingleRange @commandList.rangeForLineAtIndex @selected
-            @commandList?.do.cursors [[0, @selected]]
+            @commandList.selectSingleRange @commandList.rangeForLineAtIndex(@selected), before:true
         else
-            @commandList?.singleCursorAtPos [0,0] 
+            @commandList.singleCursorAtPos [0,0] 
                 
     selectListItem: (dir) ->
         
