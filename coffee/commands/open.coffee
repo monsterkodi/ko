@@ -8,13 +8,14 @@
 
 { post, valid, empty, clamp, slash, fs, os, error, log, _ } = require 'kxk'
   
-profile  = require '../tools/profile'
-Projects = require '../tools/projects'
-Command  = require '../commandline/command'
-render   = require '../editor/render'
-syntax   = require '../editor/syntax'
-fuzzy    = require 'fuzzy'
-        
+profile   = require '../tools/profile'
+Projects  = require '../tools/projects'
+Command   = require '../commandline/command'
+render    = require '../editor/render'
+syntax    = require '../editor/syntax'
+fuzzy     = require 'fuzzy'
+fileIcons = require 'file-icons-js'
+                 
 relative = (rel, to) ->
     
     r = slash.relative rel, to
@@ -34,14 +35,13 @@ class Open extends Command
         super commandline
         
         post.on 'file', @onFile
-        post.on 'dir',  @onDir
         
-        @names      = ["open", "new window"]
-        @files      = []
-        @file       = null
-        @dir        = null
-        @pkg        = null
-        @selected   = 0
+        @names    = ["open", "new window"]
+        @files    = []
+        @file     = null
+        @dir      = null
+        @pkg      = null
+        @selected = 0
           
     onFile: (file) =>
         
@@ -49,16 +49,8 @@ class Open extends Command
             if empty file
                 @setText ''
             else if @getText() != slash.file file
-                @setText slash.file file
+                @setText slash.tilde file
                 
-    onDir: (dir) =>
-        
-        if @isActive() 
-            if empty dir
-                @setText ''
-            else if @getText() != slash.file dir
-                @setText slash.file dir
-        
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000  
     # 000       000   000  000   000  0000  000  000        000       000   000
     # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
@@ -70,18 +62,21 @@ class Open extends Command
         command = command.trim()
 
         [file, pos] = slash.splitFilePos command ? @getText().trim()
-        # items = @listItems flat: true, currentText: file    
-        items = @listItems flat: true, currentText:file, maxItems:10000
-        # items = @listItems currentText:file, maxItems:10000
+
+        items = @listItems currentText:command, maxItems:10000
+        
         if command.length
+            
             fuzzied = fuzzy.filter slash.basename(file), items, extract: (o) -> o.text            
             items = (f.original for f in fuzzied)
             items.sort (a,b) -> b.weight - a.weight
                     
         if items.length
-            @showItems items.slice 0, 200
+            @showItems items.slice 0, 300
             @select 0
             @positionList()
+        else
+            @hideList()
 
     #  0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
     # 000       000   000  000   000  000   000  000      000          000     000     
@@ -135,43 +130,30 @@ class Open extends Command
             nameBonus = n.startsWith(opt.currentText) and 2184  * (opt.currentText.length/n.length) or 0
            
         extensionBonus = switch slash.ext b
-            when 'coffee'               then 1000
+            when 'coffee'             then 1000
             when 'cpp', 'hpp', 'h'    then 90
             when 'md', 'styl', 'pug'  then 50
-            when 'noon'                 then 25
+            when 'noon'               then 25
             when 'js', 'json', 'html' then -10
             else 0 
-        # extensionBonus -= 400 if b[0] == '.'
         
         if @file and slash.ext(@file) == slash.ext b
             extensionBonus += 1000
         
         lengthPenalty = slash.dir(f).length
-                
-        if opt.flat
             
-            updirPenalty = r.split('../').length * 819
-            
-            item.weight = relBonus + nameBonus + extensionBonus - lengthPenalty - updirPenalty
-            
+        updirPenalty   = r.split('../').length * 819
+        
+        if f.startsWith @dir
+            localBonus = Math.max 0, (5-r.split('/').length) * 4095
         else
+            localBonus = Math.max 0, (5-r.split('../').length) * 819
+        
+        item.weight = localBonus + relBonus + nameBonus + extensionBonus - lengthPenalty - updirPenalty
             
-            directoryBonus = item.line == '▸' and 500 or 0
-            
-            if f.startsWith @dir
-                localBonus = Math.max 0, (5-r.split('/').length) * 4095
-            else
-                localBonus = Math.max 0, (5-r.split('../').length) * 819
-            
-            item.weight = localBonus + directoryBonus + relBonus + nameBonus + extensionBonus - lengthPenalty
-            
-        item.weight     
-
     weightedItems: (items, opt) -> 
-        # log 'weightedItems', items.length, opt
+        
         items.sort (a,b) => @weight(b, opt) - @weight(a, opt)
-        # for item in items.slice 0, 10
-            # log item.weight, item.file, item.text, item.bonus ? ''
         items
     
     # 000      000   0000000  000000000
@@ -179,14 +161,21 @@ class Open extends Command
     # 000      000  0000000      000   
     # 000      000       000     000   
     # 0000000  000  0000000      000   
-
+        
     listItems: (opt) ->
         
         opt ?= {}
         opt.maxItems ?= 200
         opt.flat ?= true
         
-        # log 'listItems', opt
+        iconSpan = (file) ->
+            className = fileIcons.getClass file
+            if empty className
+                if slash.ext(file) == 'noon'
+                    className = 'noon-icon'
+                else
+                    className = 'file-icon'
+            "<span class='#{className} openFileIcon'/>"
         
         items = []
         
@@ -198,7 +187,7 @@ class Open extends Command
             f = @history[@history.length-2]
             item = Object.create null
             item.text = relative f, @dir
-            item.line = ' '
+            item.line = iconSpan f
             item.file = f
             item.bonus = 1048575
             items.push item
@@ -207,18 +196,16 @@ class Open extends Command
         for file in @files
             
             rel = relative file, @dir
-            
+                        
             if rel.length
                 item = Object.create null
-                item.line = ' ' # < insert file type icon?
+                item.line = iconSpan file
                 item.text = rel
                 item.file = file
                 items.push item
 
         items = @weightedItems items, opt
         items = _.uniqBy items, (o) -> o.text
-        
-        # log 'listItems', items.length
         
         items.slice 0, opt.maxItems
     
@@ -277,6 +264,8 @@ class Open extends Command
         
     start: (name) -> 
         
+        @setName name
+        
         if @commandline.lastFocus == 'commandline-editor' == window.lastFocus
             
             @file = window.editor.currentFile
@@ -328,57 +317,27 @@ class Open extends Command
         
     execute: (command) ->
         
-        if @selected >= 0
-            # log "execute #{@selected}:", @commandList?.line @selected
-            listValue = @commandList?.line(@selected) 
-
-        if @selected >= 0 and listValue? 
-            if slash.dirExists @resolvedPath listValue
-                resolved = @resolvedPath listValue
-        else if slash.dirExists @resolvedPath command
-            resolved = @resolvedPath command
+        if @selected < 0 then return status:'failed'
+            
+        path = @commandList?.line @selected
                     
         @hideList()
 
-        if listValue
-            [file, pos] = slash.splitFilePos listValue
-            file = @resolvedPath listValue
+        if valid path
+            
+            [file, pos] = slash.splitFilePos path
+            
+            file = @resolvedPath path
             file = slash.joinFilePos file, pos
-            # files = [file]
+            
             if @name == 'new window'
                 post.toMain 'newWindowWithFile', file
             else
                 post.emit 'jumpToFile', file:file
-        else
-            log 'dafuk?'
-            # files = _.words command, new RegExp "[^, ]+", 'g'
-            # for i in [0...files.length]
-                # file = files[i]
-                # [file, pos] = slash.splitFilePos file
-                # file = @resolvedPath file
-                # if not slash.fileExists file
-                    # if '' == slash.ext file
-                        # if slash.fileExists file + '.coffee'
-                            # file += '.coffee'
-                # file = slash.joinFilePos file, pos
-                # files.splice i, 1, file
-            
-        # options = {}
-        # options.newWindow = true if @name == "new window"
-        
-        # log 'open.execute files:', files
-        
-        # opened = window.openFiles files, options
-        
-        if file #opened?.length
-            
+                        
             super file
-            # if opened.length == 1
-                # super opened[0]
-            # else
-                # super selected
                 
-            text:   file # (slash.basename(f) for f in opened).join ' '
+            text:   file
             focus:  'editor'
             show:   'editor'
             status: 'ok'

@@ -185,6 +185,7 @@ class Command
             @commandList.selectSingleRange @commandList.rangeForLineAtIndex(@selected), before:true
         else
             @commandList.singleCursorAtPos [0,0] 
+        @commandList.scroll.cursorIntoView()
                 
     selectListItem: (dir) ->
         
@@ -248,6 +249,7 @@ class Command
             
     hideList: ->
 
+        @selected = -1
         @commandList?.del()
         @commandList?.view?.remove()
         @commandList = null
@@ -386,7 +388,8 @@ class Command
         switch combo
             when 'page up', 'page down'
                 if @commandList?
-                    return @select clamp 0, @commandList.numLines(), @selected+@commandList.maxLines*(combo=='page up' and -1 or 1)
+                    # return @select clamp 0, @commandList.numLines(), @selected+@commandList.maxLines*(combo=='page up' and -1 or 1)
+                    return @select clamp 0, @commandList.numLines()-1, @selected+(@commandList.numFullLines()-1)*(combo=='page up' and -1 or 1)
         'unhandled'
 
     onTabCompletion: (combo) ->

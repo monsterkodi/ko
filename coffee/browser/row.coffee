@@ -67,9 +67,6 @@ class Row
         icon = elem('span', class:className + ' browserFileIcon')
             
         @div.firstChild.insertBefore icon, @div.firstChild.firstChild
-        # if @item.text ? @item.name
-        # else
-            # @div.appendChild icon
                     
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
     # 000   000  000          000     000  000   000  000   000     000     000       

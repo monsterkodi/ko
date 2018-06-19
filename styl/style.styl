@@ -144,6 +144,12 @@ body
     width               24px
     opacity             0.5
 
+.openFileIcon
+    display             inline-block
+    width               24px
+    // opacity             0.5
+    margin-top          -3px
+    
 .browserStatusIcon
     
     text-align          right
@@ -268,18 +274,11 @@ unicode(char)
     position            absolute
     left                0
     overflow            hidden
-    // width               500px
-    min-width           800px
+    width               800px
 
     & .linenumber
         padding-top     0
         margin-top      -2px
-
-.commandlist.coffee
-    width               800px
-
-.commandlist.open
-    width               600px
 
 // 0000000    000   000  000000000  000000000   0000000   000   000
 // 000   000  000   000     000        000     000   000  0000  000
@@ -1131,5 +1130,9 @@ infoPadding = 6px
     
 ::-webkit-scrollbar-track
     background-color        transparent
+
+.commandlist::-webkit-scrollbar
+.commandlist .layerScroll::-webkit-scrollbar
+        height          8px
     
     

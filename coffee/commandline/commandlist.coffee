@@ -22,6 +22,7 @@ class CommandList extends TextEditor
             lineHeight: 1.4
             fontSize:   19
             syntaxName: opt.syntaxName ? 'ko'
+            scrollOffset: 0
 
         @name       = 'commandlist-editor'
         @items      = []

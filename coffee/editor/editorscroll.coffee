@@ -6,8 +6,9 @@
 00000000  0000000    000     000      0000000   000   000        0000000    0000000  000   000   0000000   0000000  0000000  
 ###
 
-{ clamp, log } = require 'kxk'
+{ clamp } = require 'kxk'
 
+log    = console.log
 events = require 'events'
 kxk    = require 'kxk'
 
@@ -60,6 +61,7 @@ class EditorScroll extends events
         
         if @viewHeight <= 0
             return
+            
         @scrollMax   = Math.max(0,@fullHeight - @viewHeight)   # maximum scroll offset (pixels)
         @fullLines   = Math.floor(@viewHeight / @lineHeight)   # number of lines in view (excluding partials)
         @viewLines   = Math.ceil(@viewHeight / @lineHeight)+1  # number of lines in view (including partials)
@@ -97,7 +99,6 @@ class EditorScroll extends events
             @offsetTop = parseInt offset
             @updateOffset()
             @emit 'scroll', @scroll, @offsetTop
-                        
 
     #  0000000  00000000  000000000  000000000   0000000   00000000 
     # 000       000          000        000     000   000  000   000
@@ -138,6 +139,7 @@ class EditorScroll extends events
     # 000   000  00000000  0000000   00000000     000   
     
     reset: =>
+        
         @emit 'clearLines'
         @init()
         @updateOffset()
@@ -149,6 +151,7 @@ class EditorScroll extends events
     #     0      000  00000000  00     00  000   000  00000000  000   0000000   000   000     000   
 
     setViewHeight: (h) =>
+        
         if @viewHeight != h
             @bot = @top-1 # always emit showLines if height changes
             @viewHeight = h
@@ -162,6 +165,7 @@ class EditorScroll extends events
     # 000   000   0000000   000   000  0000000  000  000   000  00000000  0000000 
         
     setNumLines: (n, opt) =>
+        
         if @numLines != n
             @fullHeight = n * @lineHeight
             if n
@@ -220,7 +224,7 @@ class EditorScroll extends events
             if sl.length == 0 == hl.length
                 @by @lineHeight * (cp[1] - @top - topDist)
 
-    cursorIntoView: (topDist=7) ->
+    cursorIntoView: ->
 
         if delta = @deltaToEnsureMainCursorIsVisible()
             @by delta * @lineHeight - @offsetSmooth
@@ -231,10 +235,13 @@ class EditorScroll extends events
         
         maindelta = 0
         cl = @editor.mainCursor()[1]
-        if cl < @top + 2
-            maindelta = Math.max(0, cl - 2) - @top
-        else if cl > @bot - 4
-            maindelta = Math.min(@numLines+1, cl + 4) - @bot
+        
+        offset = @editor.config?.scrollOffset ? 2
+        
+        if cl < @top + offset + @offsetTop / @lineHeight
+            maindelta = cl - (@top + offset + @offsetTop / @lineHeight)
+        else if cl > @top + @fullLines - offset - 1
+            maindelta = cl - (@top + @fullLines - offset - 1)
 
         maindelta
             

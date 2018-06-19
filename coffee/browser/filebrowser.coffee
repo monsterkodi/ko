@@ -229,10 +229,13 @@ class FileBrowser extends Browser
         if file == lastPath
             return
             
+        # log 'navigateToFile', lastPath, file
+            
         filelist = slash.pathlist file
         lastlist = slash.pathlist lastPath
         
         if valid lastlist
+            
             lastdir = last lastlist
             if @lastUsedColumn()?.isFile()
                 lastdir = slash.dir lastdir

@@ -568,7 +568,8 @@ class TextEditor extends Editor
                     return span: e, offsetLeft: offset, offsetChar: parseInt offset/@size.charWidth
         null
 
-    numFullLines: -> Math.floor(@viewHeight() / @size.lineHeight)
+    # numFullLines: -> Math.floor(@viewHeight() / @size.lineHeight)
+    numFullLines: -> @scroll.fullLines
     
     viewHeight: -> 
         

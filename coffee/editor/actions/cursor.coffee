@@ -108,7 +108,9 @@ module.exports =
         switch key
             when 'home'      then @singleCursorAtPos [0, 0], extend: extend
             when 'end'       then @singleCursorAtPos [0,@numLines()-1], extend: extend
-            when 'page up'   then @moveCursorsUp   extend, @numFullLines()-3
+            when 'page up'   
+                log 'moveCursorsUp', @numFullLines()
+                @moveCursorsUp   extend, @numFullLines()-3
             when 'page down' then @moveCursorsDown extend, @numFullLines()-3
         
     setCursorsAtSelectionBoundariesOrSelectSurround: ->
