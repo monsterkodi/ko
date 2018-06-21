@@ -8,7 +8,7 @@
 
 { log, _ } = require 'kxk'
 
-matchr = require '../tools/matchr'
+matchr  = require '../tools/matchr'
 
 class Brackets
     
@@ -24,8 +24,14 @@ class Brackets
         @open   = @editor.bracketCharacters.open
         @config = @editor.bracketCharacters.regexps
         
+    #  0000000   000   000       0000000  000   000  00000000    0000000   0000000   00000000   
+    # 000   000  0000  000      000       000   000  000   000  000       000   000  000   000  
+    # 000   000  000 0 000      000       000   000  0000000    0000000   000   000  0000000    
+    # 000   000  000  0000      000       000   000  000   000       000  000   000  000   000  
+    #  0000000   000   000       0000000   0000000   000   000  0000000    0000000   000   000  
+    
     onCursor: => 
-        
+
         if @editor.numHighlights() # don't highlight brackets when other highlights exist
             for h in @editor.highlights()
                 return if not h[2]?
@@ -37,15 +43,23 @@ class Brackets
             if after.length and _.first(after).start == cp[0] and _.first(after).value == 'open' then cp[0] += 1
             if before.length and _.last(before).start == cp[0]-1 and _.last(before).value == 'close' then cp[0] -= 1
 
-        return if @highlightInside cp
-                
+        if @highlightInside cp
+            return
+            
         @clear()
         @editor.renderHighlights()
 
+    # 000  000   000   0000000  000  0000000    00000000  
+    # 000  0000  000  000       000  000   000  000       
+    # 000  000 0 000  0000000   000  000   000  0000000   
+    # 000  000  0000       000  000  000   000  000       
+    # 000  000   000  0000000   000  0000000    00000000  
+    
     highlightInside: (pos) ->
         
         stack = []
-        pp = pos
+        pp    = pos
+        cnt   = 0
         while pp[1] >= 0 # find last open bracket before
             [before, after] = @beforeAfterForPos pp
             while before.length 
@@ -65,6 +79,7 @@ class Brackets
             
             break if lastOpen?
             return if pp[1] < 1
+            return if cnt++ > 1000 # maximum number of lines exceeded
             pp = [@editor.line(pp[1]-1).length, pp[1]-1]
         
         return if not lastOpen?
@@ -81,7 +96,7 @@ class Brackets
                             stack.pop()                            
                             continue
                         else
-                            log "brackets stack mismatch at #{pp[0]} #{pp[1]} stack: #{_.last(stack).match} != next: #{next.match}"
+                            # log "brackets stack mismatch at #{pp[0]} #{pp[1]} stack: #{_.last(stack).match} != next: #{next.match}"
                             return # stack mismatch
                     firstClose = next
                     break
@@ -90,6 +105,7 @@ class Brackets
                 
             break if firstClose?
             return if pp[1] >= @editor.numLines()-1
+            return if cnt++ > 1000 # maximum number of lines exceeded
             pp = [0, pp[1]+1]
         
         return if not firstClose?
@@ -97,6 +113,12 @@ class Brackets
         if @open[lastOpen.match] == firstClose.match
             @highlight lastOpen, firstClose
             true
+    
+    # 0000000    00000000  00000000   0000000   00000000   00000000   0000000   00000000  000000000  00000000  00000000   
+    # 000   000  000       000       000   000  000   000  000       000   000  000          000     000       000   000  
+    # 0000000    0000000   000000    000   000  0000000    0000000   000000000  000000       000     0000000   0000000    
+    # 000   000  000       000       000   000  000   000  000       000   000  000          000     000       000   000  
+    # 0000000    00000000  000        0000000   000   000  00000000  000   000  000          000     00000000  000   000  
     
     beforeAfterForPos: (pos) ->
         
@@ -130,6 +152,12 @@ class Brackets
             return [before, after]
         [[],[]]
     
+    # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000  
+    # 000   000  000  000        000   000  000      000  000        000   000     000     
+    # 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000     
+    # 000   000  000  000   000  000   000  000      000  000   000  000   000     000     
+    # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     
+    
     highlight: (opn, cls) ->
         
         @clear()
@@ -139,6 +167,12 @@ class Brackets
         @editor.addHighlight [cls.line, [cls.start, cls.start+cls.match.length], cls]
         @editor.renderHighlights()
 
+    #  0000000  000      00000000   0000000   00000000   
+    # 000       000      000       000   000  000   000  
+    # 000       000      0000000   000000000  0000000    
+    # 000       000      000       000   000  000   000  
+    #  0000000  0000000  00000000  000   000  000   000  
+    
     clear: ->
         
         @editor.setHighlights @editor.highlights().filter (h) -> h[2]?.clss != 'bracketmatch'
