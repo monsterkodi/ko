@@ -450,7 +450,6 @@ class Term extends Command
                     if args.length
                         if args[0] in ['on',   'true', '1'] then terminal.setAutoClear true
                         if args[0] in ['off', 'false', '0'] then terminal.setAutoClear false
-                        prefs.set 'terminal|autoclear', @autocd
 
                     appendCommandMeta "autoclear #{terminal.getAutoClear() and 'on' or 'off'}"
 

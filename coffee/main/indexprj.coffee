@@ -16,7 +16,7 @@ shouldIndex = (path, stat) ->
     
     if slash.ext(path) in sourceFileExtensions
         if stat.size > 654321
-            log 'file to big!', path
+            # log 'file to big!', path
             return false
         else
             return true

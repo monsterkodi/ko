@@ -86,10 +86,7 @@ class Shelf extends Column
             matches.sort (a,b) -> b[1].file.length - a[1].file.length
             [index, item] = first matches
             @rows[index].setActive()
-            return
-        else
-            log 'nada'
-                            
+
     # 000  000   000  000  000000000  
     # 000  0000  000  000     000     
     # 000  000 0 000  000     000     
