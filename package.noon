@@ -1,6 +1,6 @@
 name            ko
 productName     ko
-version         0.142.0
+version         0.144.0
 description     text editor
 main            js/main/main.js
 preferGlobal    true
@@ -8,7 +8,7 @@ bin
                 ko  ./bin/ko
 scripts
                 test  mocha -c -R dot --require coffeescript/register "coffee/test/*.coffee"
-                mac   ./bin/buildmac.sh
+                mac   bash ./bin/buildmac.sh
                 win   bash ./bin/buildwin.sh
 repository
                 type  git
@@ -59,7 +59,8 @@ dependencies
                 traceback       ^0.3.1
                 trash           ^4.3.0
                 unused-filename  ^1.0.0
-                wxw             https://github.com/monsterkodi/wxw.git
+optionalDependencies
+                wxw  https://github.com/monsterkodi/wxw.git
 coffeelintConfig
                 no_trailing_whitespace
                   level           ignore

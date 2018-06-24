@@ -467,8 +467,9 @@ class Main extends app
 
         if not activeWin()
             if win = visibleWins()[0]
-                wxw = require 'wxw'                
-                wxw.foreground slash.resolve process.argv[0]
+                if slash.win()
+                    wxw = require 'wxw'                
+                    wxw.foreground slash.resolve process.argv[0]
                 win.focus()
                 cb win
             else
