@@ -201,5 +201,6 @@ Window
     Maximize                alt+ctrl+m
     Fullscreen              alt+ctrl+f
     ---
+    Screenshot              f3
     Reload                  alt+ctrl+l
     DevTools                alt+ctrl+i

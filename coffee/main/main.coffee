@@ -65,10 +65,7 @@ post.on 'newWindowWithFile',  (file)  -> main.createWindowWithFile file:file
 post.on 'activateWindow',     (winID) -> main.activateWindowWithID winID
 post.on 'activateNextWindow', (winID) -> main.activateNextWindow winID
 post.on 'activatePrevWindow', (winID) -> main.activatePrevWindow winID
-# post.on 'fileSaved',    (file, winID) -> main.indexer.indexFile file, refresh: true
-# post.on 'fileLoaded',   (file, winID) -> 
-    # main.indexer.indexFile file
-    # main.indexer.indexProject file
+
 post.on 'menuAction',   (action, arg) -> main?.onMenuAction action, arg
 post.on 'ping', (winID, argA, argB) -> post.toWin winID, 'pong', 'main', argA, argB
 post.on 'winlog',       (winID, text) -> 
@@ -168,7 +165,6 @@ class Main extends app
         @opt.height = height
          
         if valid @openFiles
-            log 'onShow @openFiles', @openFiles
             for file in @openFiles
                 @createWindowWithFile file:file
             delete @openFiles
@@ -176,7 +172,6 @@ class Main extends app
             @restoreWindows() if not args.nostate
         
         if not wins().length
-            log 'onShow fallback to mostRecentFile:', mostRecentFile()
             @createWindowWithFile file:mostRecentFile()
 
     #  0000000    0000000  000000000  000   0000000   000   000  
@@ -208,35 +203,24 @@ class Main extends app
     createWindowWithFile: (opt) ->
         
         win = @createWindow (win) -> 
-            log "openFile in win #{win.id}", opt.file
             post.toWin win.id, 'loadFiles', [opt.file]
         win
     
     toggleWindows: (cb) =>
 
-        log 'toggleWindows'
-        
         if valid wins()
-            
-            log 'toggleWindows valid wins'
             
             if valid visibleWins()
                 
-                log 'toggleWindows valid visibleWins'
-                
                 if activeWin()
-                    log 'toggleWindows hideWindows'
                     @hideWindows()
                 else
-                    log 'toggleWindows raiseWindows'
                     @raiseWindows()
             else
-                log 'toggleWindows showWindows'
                 @showWindows()
                 
             cb first visibleWins()
         else
-            log 'toggleWindows createWindow'
             @createWindow cb
 
     hideWindows: ->
@@ -401,20 +385,15 @@ class Main extends app
 
     moveWindowStashes: ->
         
-        log "Main.moveWindowStashes"
-
         stashDir = slash.join @userData, 'win'
         if slash.dirExists stashDir
             fs.moveSync stashDir, slash.join(@userData, 'old'), overwrite: true
 
     restoreWindows: ->
 
-        log "Main.restoreWindows"
-
         fs.ensureDirSync @userData
         stashFiles = fileList slash.join(@userData, 'old'), matchExt:'noon'
         if not empty stashFiles
-            # log 'restoreWindows stashFiles:', stashFiles
             for file in stashFiles
                 win = @createWindow()
                 newStash = slash.join @userData, 'win', "#{win.id}.noon"
@@ -426,7 +405,6 @@ class Main extends app
             for win in wins()
                 win.show()
         else
-            log 'restoreWindows'
             @moveWindowStashes()
             @restoreWindows()
                 
@@ -554,8 +532,6 @@ class Main extends app
 
 electron.app.on 'open-file', (event, file) ->
 
-    log 'open-file:', main?, file
-    
     if not main?
         openFiles.push file
     else
@@ -571,15 +547,13 @@ electron.app.on 'window-all-closed', -> log 'window-all-closed'
 # 000   000  000   000  000          
 #  0000000   0000000    000          
 
-onMsg = (file) ->
+onUDP = (file) ->
     
     main.activateOneWindow (win) ->
-        post.toWin win.id, 'loadFiles', [file], newTab:true
+        log 'onMsg', file
+        post.toWin win.id, 'loadFiles', [file] 
 
-koReceiver = new udp port:9779, onMsg:onMsg
+koReceiver = new udp port:9779, onMsg:onUDP
 
 main          = new Main openFiles
 main.navigate = new Navigate main
-
-# log 'ko main'
-# throw new Error 'start1'
