@@ -420,23 +420,13 @@ class FileEditor extends TextEditor
             absPos = pos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
         
         opt = items: [
-            text:   'Back'
-            combo:  'ctrl+1'
-            cb:     -> post.emit 'menuAction', 'Navigate Backward'
-        ,
-            text:   'Forward'
-            combo:  'ctrl+2'
-            cb:     -> post.emit 'menuAction', 'Navigate Forward'
-        ,
-            text:   ''
-        ,
             text:   'Browse'
             combo:  'ctrl+.' 
             cb:     -> window.commandline.startCommand 'browse'
         ,
             text:   'Git'
             combo:  'alt+g'
-            cb:     -> post.emit 'menuAction', 'doMacro', 'git'
+            cb:     -> post.emit 'menuAction', 'doMacro', actarg:'git'
         ,
             text:   ''
         ,

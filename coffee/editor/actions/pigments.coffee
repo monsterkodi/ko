@@ -121,7 +121,7 @@ module.exports =
 
     togglePigments: ->
 
-        if state.get "pigments:|#{@currentFile}"
+        if state.get "pigments|#{@currentFile}"
             @pigments.deactivate()
         else
             @pigments.activate()
