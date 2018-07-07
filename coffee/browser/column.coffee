@@ -132,7 +132,7 @@ class Column
 
     focus: (opt={}) ->
         if not @activeRow() and @numRows() and opt?.activate != false
-            @rows[0].setActive() #emit:true
+            @rows[0].setActive()
         @div.focus()
         window.setLastFocus @name()
         @
