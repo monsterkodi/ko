@@ -6,15 +6,13 @@
 00     00  000   000     000      0000000  000   000  00000000  000   000
 ###
 
-{ log, fs } = require 'kxk'
-
-chokidar = require 'chokidar'
+{ watch, log, fs } = require 'kxk'
 
 class Watcher
 
     constructor: (@editor) ->
 
-        @w = chokidar.watch @editor.currentFile, ignoreInitial: true
+        @w = watch.watch @editor.currentFile, ignoreInitial: true
         
         @w.on 'change', (p) =>
             

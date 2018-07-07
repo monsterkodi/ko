@@ -213,7 +213,7 @@ class Indexer
               
         @currentlyIndexing = file
         
-        log 'indexProject', file
+        # log 'indexProject', file
         
         forkfunc './indexprj', file, (err, info) =>
             

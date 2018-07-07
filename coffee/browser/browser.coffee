@@ -96,18 +96,6 @@ class Browser extends Stage
         if @columns[index].numRows()
             @columns[index].focus().activeRow().activate()
         @
-
-    navigatePath: (pth) -> # unused?
-        
-        if _.isString pth
-            pth = pth.split ':'
-        
-        colIndex = 0
-        while (p = pth.shift())?
-            row = @columns[colIndex].row p
-            break if not row?
-            row.activate()
-            colIndex++
         
     # 00000000   0000000    0000000  000   000   0000000  
     # 000       000   000  000       000   000  000       
@@ -132,8 +120,8 @@ class Browser extends Stage
     emptyColumn: (colIndex) ->
         
         if colIndex?
-            for coi in [colIndex...@numCols()]
-                @columns[coi].clear()
+            for c in [colIndex...@numCols()]
+                @clearColumn c
                 
         for col in @columns
             return col if col.isEmpty()
@@ -199,9 +187,12 @@ class Browser extends Stage
     # 000        000   000  000        
     # 000         0000000   000        
     
+    clearColumn: (index) -> @columns[index].clear()
+    
     popColumn: (opt) ->
         
         return if not @flex
+        @clearColumn @columns.length-1
         @flex.popPane opt
         @columns.pop()
         
@@ -226,14 +217,14 @@ class Browser extends Stage
         
         if opt.pop
             if c < @numCols()
-                @columns[c].clear()
+                @clearColumn c
                 c++
             while c < @numCols()
                 @popColumn()
                 c++
         else
             while c < @numCols()
-                @columns[c].clear()
+                @clearColumn c
                 c++
 
     #  0000000  000      00000000   0000000   000   000  

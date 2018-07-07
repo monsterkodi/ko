@@ -52,7 +52,8 @@ class Column
     
     loadItems: (items, parent) ->
         
-        @clear()
+        # @clear()
+        @browser.clearColumn @index
         
         @items  = items
         @parent = parent
@@ -68,7 +69,9 @@ class Column
 
     setItems: (@items, opt) ->
         
-        @clear()
+        # @clear()
+        @browser.clearColumn @index
+        
         @parent = opt.parent
         error "no parent item?" if not @parent?
         

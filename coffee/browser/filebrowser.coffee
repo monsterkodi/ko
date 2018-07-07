@@ -11,6 +11,7 @@
 Browser  = require './browser'
 Shelf    = require './shelf'
 dirlist  = require '../tools/dirlist'
+dirCache = require '../tools/dircache'
 hub      = require '../git/hub'
 
 class FileBrowser extends Browser
@@ -25,13 +26,13 @@ class FileBrowser extends Browser
         @shelf  = new Shelf @
         @name   = 'FileBrowser'
         
-        @dirCache = {}
         @srcCache = {}
         
         post.on 'gitStatus',             @onGitStatus
         post.on 'fileIndexed',           @onFileIndexed
         post.on 'file',                  @onFile
         post.on 'filebrowser',           @onFileBrowser
+        post.on 'dircache',              @onDirCache
     
         @shelfResize = elem 'div', class: 'shelfResize'
         @shelfResize.style.position = 'absolute'
@@ -168,14 +169,28 @@ class FileBrowser extends Browser
     # 000   000  000  000   000  000     000     000       000 0 000  
     # 0000000    000  000   000  000     000     00000000  000   000  
     
+    onDirCache: (dir) =>
+        
+        log 'FileBrowser.onDirCache', dir
+        
+        for column in @columns
+            if column.path() == dir
+                log "update column #{column.index}"
+                @loadDirItem file:dir, column.index
+                return
+    
     loadDirItem: (item, col=0, opt={}) ->
         
         return if col > 0 and item.name == '/'
         
         dir = item.file
         
-        if @dirCache[dir] and not opt.ignoreCache
-            @loadDirItems dir, item, @dirCache[dir], col, opt
+        log "loadDirItem #{col} #{dir}"
+        
+        dirCache.watch dir
+        
+        if dirCache.has(dir) and not opt.ignoreCache
+            @loadDirItems dir, item, dirCache.get(dir), col, opt
             post.emit 'dir', dir
         else
             opt.ignoreHidden = not state.get "browser|showHidden|#{dir}"
@@ -186,7 +201,7 @@ class FileBrowser extends Browser
             
                 post.toMain 'dirLoaded', dir
                 
-                @dirCache[dir] = items
+                dirCache.set dir, items
                 @loadDirItems dir, item, items, col, opt
                 post.emit 'dir', dir
             
@@ -228,8 +243,6 @@ class FileBrowser extends Browser
         lastPath = @lastUsedColumn()?.path()
         if file == lastPath
             return
-            
-        # log 'navigateToFile', lastPath, file
             
         filelist = slash.pathlist file
         lastlist = slash.pathlist lastPath
@@ -294,7 +307,6 @@ class FileBrowser extends Browser
                     @loadDirItem item, col+index, opt
               
         lastItem = file:last(paths), type:lastType
-        # log 'itemActivated', lastItem
         @emit 'itemActivated', lastItem
 
     #  0000000   000   000  00000000  000  000      00000000  
@@ -358,6 +370,12 @@ class FileBrowser extends Browser
         super()
         @shelf.scroll.update()
         
+    clearColumn: (index) ->
+        
+        if @columns[index].parent?.type == 'dir'
+            dirCache.unwatch @columns[index].parent.file
+        super index
+        
     #  0000000  000   000  00000000  000      00000000  
     # 000       000   000  000       000      000       
     # 0000000   000000000  0000000   000      000000    
@@ -405,7 +423,7 @@ class FileBrowser extends Browser
         
         hub.refresh()
         
-        @dirCache = {}
+        dirCache.reset()
         @srcCache = {}
         
         if @lastUsedColumn()
