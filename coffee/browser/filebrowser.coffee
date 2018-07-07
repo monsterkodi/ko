@@ -171,11 +171,8 @@ class FileBrowser extends Browser
     
     onDirCache: (dir) =>
         
-        log 'FileBrowser.onDirCache', dir
-        
         for column in @columns
             if column.path() == dir
-                log "update column #{column.index}"
                 @loadDirItem file:dir, column.index
                 return
     
@@ -184,10 +181,6 @@ class FileBrowser extends Browser
         return if col > 0 and item.name == '/'
         
         dir = item.file
-        
-        log "loadDirItem #{col} #{dir}"
-        
-        # dirCache.watch dir
         
         if dirCache.has(dir) and not opt.ignoreCache
             @loadDirItems dir, item, dirCache.get(dir), col, opt
@@ -440,7 +433,6 @@ class FileBrowser extends Browser
         @srcCache[file] = info
         
         if file == @lastUsedColumn()?.parent?.file
-            # log 'onFileIndexed loadSourceItem', file
             @loadSourceItem { file:file, type:'file' }, @lastUsedColumn()?.index
             
 module.exports = FileBrowser
