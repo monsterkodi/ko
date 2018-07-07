@@ -39,8 +39,7 @@ class DirCache
         
     @unwatch: (dir) -> 
         
-        if DirCache.watches[dir]
-            DirCache.watches[dir].close()
+        DirCache.watches[dir]?.close()
             
         delete DirCache.watches[dir]
         delete DirCache.cache[dir]
@@ -48,7 +47,7 @@ class DirCache
         post.emit 'dircache', dir
 
     @changed: (path) ->
-        
+
         dir = slash.dir path
 
         if DirCache.cache[dir]

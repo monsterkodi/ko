@@ -65,8 +65,6 @@ class Macro extends Command
 
         return error 'no command!' if empty command
         
-        log 'macro.execute', command
-        
         command = super command
 
         editor  = window.editor
@@ -282,7 +280,7 @@ class Macro extends Command
                 module.exports = #{clss}
 
                 """
-                atomic file, text, encoding: 'utf8', (err) ->
+                fs.writeFile file, text, encoding:'utf8', (err) ->
                     if err?
                         log 'writing class skeleton failed', err
                         return
