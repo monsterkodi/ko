@@ -15,12 +15,15 @@ class DirCache
     
     @has: (dir) -> DirCache.cache[dir]?
     @get: (dir) -> DirCache.cache[dir]
-    @set: (dir, items) -> DirCache.cache[dir] = items
-    @reset: -> 
-        dirs = Object.keys DirCache.cache
-        DirCache.cache = {}
-        for dir in dirs
-            post.emit 'dircache', dir
+    @set: (dir, items) -> 
+    
+        DirCache.watch dir
+        DirCache.cache[dir] = items
+        
+    @reset: ->
+        
+        for dir in Object.keys DirCache.cache
+            DirCache.unwatch dir
     
     @watch: (dir) -> 
         
@@ -33,7 +36,6 @@ class DirCache
         watcher.on 'addDir',    DirCache.changed
         watcher.on 'unlinkDir', DirCache.changed
         DirCache.watches[dir] = watcher
-        log "watch", Object.keys DirCache.watches
         
     @unwatch: (dir) -> 
         
@@ -41,15 +43,15 @@ class DirCache
             DirCache.watches[dir].close()
             
         delete DirCache.watches[dir]
-        log "unwatch", Object.keys DirCache.watches
+        delete DirCache.cache[dir]
+        
+        post.emit 'dircache', dir
 
     @changed: (path) ->
         
         dir = slash.dir path
-        log "Dircache.changed #{dir}",  Object.keys DirCache.cache
-        log "Dircache.changed watches", Object.keys DirCache.watches
+
         if DirCache.cache[dir]
-            delete DirCache.cache[dir]
-            post.emit 'dircache', dir
+            DirCache.unwatch dir
         
 module.exports = DirCache

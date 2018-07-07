@@ -187,7 +187,7 @@ class FileBrowser extends Browser
         
         log "loadDirItem #{col} #{dir}"
         
-        dirCache.watch dir
+        # dirCache.watch dir
         
         if dirCache.has(dir) and not opt.ignoreCache
             @loadDirItems dir, item, dirCache.get(dir), col, opt
@@ -372,8 +372,8 @@ class FileBrowser extends Browser
         
     clearColumn: (index) ->
         
-        if @columns[index].parent?.type == 'dir'
-            dirCache.unwatch @columns[index].parent.file
+        # if @columns[index].parent?.type == 'dir'
+            # dirCache.unwatch @columns[index].parent.file
         super index
         
     #  0000000  000   000  00000000  000      00000000  
