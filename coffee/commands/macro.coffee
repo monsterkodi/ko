@@ -6,7 +6,7 @@
 000   000  000   000   0000000  000   000   0000000
 ###
 
-{ post, fileList, colors, reversed, noon, slash, atomic, fs, valid, empty, error, log, _ } = require 'kxk'
+{ post, reversed, fileList, empty, slash, valid, args, fs, error, log, _ } = require 'kxk'
   
 indexer   = require '../main/indexer'
 salt      = require '../tools/salt'
@@ -78,8 +78,7 @@ class Macro extends Command
                 return args
             else
                 cw = editor.wordsAtCursors positionsNotInRanges(editor.cursors(), editor.selections()), opt
-                sw = editor.textsInRanges editor.selections()
-                ws = _.uniq cw.concat sw
+                ws = _.uniq cw.concat editor.textsInRanges editor.selections()
                 ws.filter (w) -> w.trim().length
 
         switch cmmd
@@ -180,9 +179,10 @@ class Macro extends Command
 
             when 'req'
                 
+                return if slash.ext(editor.currentFile) != 'coffee'
                 words = wordsInArgsOrCursorsOrSelection args
                 
-                lines = req editor.currentFile, editor.lines(), words
+                lines = req editor.currentFile, editor.lines(), words, editor
                 
                 if valid lines
                     editor.do.start()

@@ -6,7 +6,7 @@
 0000000     0000000
 ###
 
-{ clamp, str, post, empty, error, log, _ } = require 'kxk'
+{ post, empty, clamp, last, error, log, _ } = require 'kxk'
 
 State = require './state'
 require '../tools/ranges'
@@ -92,7 +92,7 @@ class Do
         @groupCount += 1
         if @groupCount == 1
             @startState = @state = new State @editor.state.s
-            if empty(@history) or @state.s != _.last(@history).s
+            if empty(@history) or @state.s != last(@history).s
                 @history.push @state
 
     isDoing: -> @groupCount > 0
@@ -315,7 +315,7 @@ class Do
 
         while @history.length > 1
             b = @history[@history.length-2]
-            a = _.last @history
+            a = last @history
             if a.s.lines == b.s.lines
                 if @history.length > 2
                     @history.splice @history.length-2, 1

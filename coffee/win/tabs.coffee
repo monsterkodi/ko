@@ -6,7 +6,7 @@
    000     000   000  0000000    0000000 
 ###
 
-{ post, elem, drag, popup, stopEvent, slash, valid, empty, pos, error, log, $, _ } = require 'kxk'
+{ post, stopEvent, popup, valid, empty, first, slash, elem, last, drag, pos, error, log, $, _ } = require 'kxk'
 
 Tab = require './tab'
 
@@ -61,7 +61,7 @@ class Tabs
             return 
         tab = @tab file
         if tab? and tab != @activeTab()
-            log "reverting tab because foreign win saved #{file}", tab.info
+            log "reverting tab because foreign window saved #{file}", tab.info
             tab.revert()
             
     #  0000000  000      000   0000000  000   000  
@@ -170,7 +170,7 @@ class Tabs
         
         keep = _.pullAt @tabs, @activeTab().index()
         while @numTabs()
-            tab = _.last @tabs
+            tab = last @tabs
             if tab.dirty()
                 tab.saveChanges()
             @tabs.pop().close()

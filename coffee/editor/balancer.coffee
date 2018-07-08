@@ -6,7 +6,7 @@
 0000000    000   000  0000000  000   000  000   000   0000000  00000000  000   000
 ###
 
-{ valid, empty, str, log, error, _ } = require 'kxk'
+{ empty, str, error, _ } = require 'kxk'
 
 matchr = require '../tools/matchr'
 
@@ -35,7 +35,6 @@ class Balancer
             else                   open: '/*',   close: '*/'
         
         @regions =
-            # regexp:        clss: 'regexp',         open: '/',   close: '/'
             singleString:  clss: 'string single',  open: "'",   close: "'"
             doubleString:  clss: 'string double',  open: '"',   close: '"'
             lineComment:   clss: 'comment',        open: lineComment, close: null, force: true
@@ -64,10 +63,6 @@ class Balancer
                 @regions.header2 = clss: 'markdown h2', open: '##', close: null, solo: true 
                 @regions.header1 = clss: 'markdown h1', open: '#', close: null, solo: true 
                 
-                # @regions.listitem1 = clss: 'markdown li1', open: '-', close: null, solo: true,         maxX:0
-                # @regions.listitem2 = clss: 'markdown li2', open: '-', close: null, solo: true, minX:1, maxX:4 
-                # @regions.listitem3 = clss: 'markdown li3', open: '-', close: null, solo: true, minX:5
-
         @openRegions = _.filter @regions, (r) -> r.close == null
                 
     # 0000000    000   0000000   0000000
@@ -427,14 +422,12 @@ class Balancer
                 break
                 
         if stack.length
-            # console.log "unbalanced #{li} stack", str(stack)
             return stack
             
         null
 
     setUnbalanced: (li, stack) ->
         
-        # console.log "setUnbalanced #{li} stack:", str(stack)
         _.remove @unbalanced, (u) -> u.line == li
         if stack?
             _.each stack, (s) -> s.line = li
@@ -458,8 +451,6 @@ class Balancer
         @dumpUnbalanced()
 
     dumpUnbalanced: ->
-
-        # console.log '@unbalanced:', str @unbalanced if not empty @unbalanced
 
     clear: ->
 
