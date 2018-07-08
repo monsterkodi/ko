@@ -6,10 +6,11 @@
 000   000  000   000   0000000  000   000   0000000
 ###
 
-{ post, fileList, colors, reversed, noon, slash, atomic, fs, empty, error, log, _ } = require 'kxk'
+{ post, fileList, colors, reversed, noon, slash, atomic, fs, valid, empty, error, log, _ } = require 'kxk'
   
 indexer   = require '../main/indexer'
 salt      = require '../tools/salt'
+req       = require '../tools/req'
 GitInfo   = require '../win/gitinfo'
 Command   = require '../commandline/command'
 Report    = require '../test/report'
@@ -180,46 +181,20 @@ class Macro extends Command
             when 'req'
                 
                 words = wordsInArgsOrCursorsOrSelection args
-                lastIndex = 0
-                texts = []
-                # search project for path build open search term
-                pkgPath = slash.pkg editor.currentFile
-                if pkgPath
-                    projectFiles = fileList pkgPath, depth: 4, matchExt: slash.ext editor.currentFile
-                else
-                    projectFiles = []
-
-                if _.isEmpty words then return error 'no words for req?'
-                for word in words
-                    map =
-                        _:      'lodash'
-                        childp: 'child_process'
-                        pkg:    '../package.json'
-                    pth = map[word] ? word.toLowerCase()
-
-                    for f in projectFiles
-                        if pth == slash.base f
-                            pth = slash.splitExt slash.relative f, slash.dir editor.currentFile
-                            pth = './' + pth if not pth.startsWith '../'
-                            break
-
-                    for li in [Math.min(editor.numLines()-1, 100)..0]
-                        m = editor.line(li).match indexer.requireRegExp
-                        if m?[1]? and m?[2]?
-                            break if m[1] == word and m[2] == pth
-                            if editor.line(li).trim().length and editor.line(li).search(/^\s*\#/) != 0
-                                lastIndex = Math.max lastIndex, li+1
-                    if li <= 0
-                        texts.push "#{word} = require '#{pth}'"
-
-                if texts.length
+                
+                lines = req editor.currentFile, editor.lines(), words
+                
+                if valid lines
                     editor.do.start()
-                    for text in texts.reverse()
-                        editor.do.insert lastIndex, text
-                    editor.moveCursorsDown false, texts.length
+                    for line in lines
+                        if line.op == 'insert'
+                            editor.do.insert line.index, line.text
+                        else
+                            editor.do.change line.index, line.text
+                    editor.moveCursorsDown false, lines.length
                     editor.do.end()
                     return do: "focus editor"
-
+                    
             # 0000000    0000000     0000000
             # 000   000  000   000  000
             # 000   000  0000000    000  0000

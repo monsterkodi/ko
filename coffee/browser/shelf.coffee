@@ -325,7 +325,7 @@ class Shelf extends Column
             when 'up'        then index-1
             when 'down'      then index+1
             when 'home'      then 0
-            when 'end'       then @items.length #@numRows()-1
+            when 'end'       then @items.length
             when 'page up'   then index-@numVisible()
             when 'page down' then clamp 0, @items.length, index+@numVisible()
             else index
