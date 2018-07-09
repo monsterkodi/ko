@@ -1,5 +1,5 @@
 #define MyAppName "ko"
-#define MyAppVersion "0.150.0"
+#define MyAppVersion "0.151.0"
 #define MyAppPublisher "monsterkodi"
 #define MyAppURL "https://github.com/monsterkodi/ko"
 #define MyAppExeName "ko.exe"
