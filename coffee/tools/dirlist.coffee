@@ -55,6 +55,9 @@ dirList = (dirPath, opt, cb) ->
         if base.toLowerCase().startsWith '$recycle'
             return true
         
+        if /\d\d\d\d\d\d\d\d/.test slash.ext(p)
+            return true
+            
         false
     
     onDir = (d) -> 
