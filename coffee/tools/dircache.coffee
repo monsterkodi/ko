@@ -37,7 +37,7 @@ class DirCache
         watcher.on 'unlinkDir', DirCache.changed
         DirCache.watches[dir] = watcher
         
-        log 'DirCache.watch', Object.keys DirCache.cache
+        # log 'DirCache.watch', Object.keys DirCache.cache
         
     @unwatch: (dir) -> 
         
