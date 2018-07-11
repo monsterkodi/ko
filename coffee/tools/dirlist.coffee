@@ -8,8 +8,6 @@
 
 { fs, walkdir, slash, error, log, _ } = require 'kxk'
 
-isTextFile = require './istextfile'
-
 #   directory list
 #
 #   callbacks with a list of objects for files and directories in dirPath
@@ -74,7 +72,7 @@ dirList = (dirPath, opt, cb) ->
                 type: 'file'
                 file: slash.path f
                 name: slash.basename f
-            file.textFile = true if isTextFile f
+            file.textFile = true if slash.isText f
             files.push file
 
     try

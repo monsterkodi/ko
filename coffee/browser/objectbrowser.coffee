@@ -10,7 +10,6 @@
 
 jsbeauty   = require 'js-beautify'
 Browser    = require './browser'
-isTextFile = require '../tools/istextfile'
 TextEditor = require '../editor/texteditor'
 
 class ObjectEditor extends TextEditor
@@ -207,7 +206,7 @@ class ObjectBrowser extends Browser
         for k,v of @filter names, 'files', filterBase
             key = slash.basename k
             files.push  
-                textFile: isTextFile key
+                textFile: slash.isText key
                 name: key
                 type: 'file'
                 file: k

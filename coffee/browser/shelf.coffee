@@ -13,7 +13,6 @@ Scroller   = require './scroller'
 Column     = require './column'
 fuzzaldrin = require 'fuzzaldrin'
 fuzzy      = require 'fuzzy'
-isTextFile = require '../tools/istextfile'
 hub        = require '../git/hub'
 
 indexAndItemInItemsWithFunc = (item, items, withFunc) ->
@@ -164,7 +163,7 @@ class Shelf extends Column
             name: slash.file file
             type: 'file'
             file: slash.path file
-        item.textFile = true if isTextFile file
+        item.textFile = true if slash.isText file
         @addItem item, opt
         
     addItem:  (item, opt) ->

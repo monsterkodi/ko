@@ -9,7 +9,6 @@
 { post, slash, elem, empty, error, log, fs, $, _ } = require 'kxk'
 
 lineDiff   = require '../tools/linediff'
-isTextFile = require '../tools/istextfile'
 syntax     = require '../editor/syntax'
 hub        = require '../git/hub'
 
@@ -147,7 +146,7 @@ class GitInfo
                 
                 @logFile 'added', file  # dont delete this for now :)
                 
-                if isTextFile file
+                if slash.isText file
                     data  = fs.readFileSync file, encoding: 'utf8'
                     lines = data.split /\r?\n/
                     line  = 1
