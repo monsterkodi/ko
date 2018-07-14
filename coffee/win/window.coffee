@@ -353,7 +353,7 @@ loadFile = (file, opt={}) ->
 
     window.split.raise 'editor'
 
-    if pos? and pos[0] or pos[1]
+    if pos? # and pos[0] or pos[1]
         editor.singleCursorAtPos pos
         editor.scroll.cursorToTop()
 
@@ -370,7 +370,7 @@ openFiles = (ofiles, options) -> # called from file dialog, open command and bro
     if ofiles?.length
 
         files = fileList ofiles, ignoreHidden: false
-        
+
         if files.length >= 10
             answer = dialog.showMessageBox
                 type: 'warning'

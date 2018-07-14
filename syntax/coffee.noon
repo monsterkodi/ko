@@ -31,13 +31,18 @@
 
 # globals
 
-(\bconsole\.|\bprocess\.|\bglobal\.|\bmodule\.|\bexports\.|\bpath\.|\bfs\.|\bos\.)  . module
+(\bconsole\.|\bprocess\.|\bglobal\.|\bmodule\.|\bexports\.|\bpath\.)  . module
 
 # special
 
 \blog\b                               function
 \berr\b                               function.call
 \berror\b                             function.call
+
+(^|\s)(post|childp|matchr|prefs|slash|noon|args|os|fs)(,|\s|$)
+    none
+    module
+    none
 
 # bool
 
@@ -86,6 +91,11 @@ new\s+(\w+)                           class.callee
 \S+(\?)                               exists
 
 # keywords
+
+(^|\s)(first|last|valid|empty|clamp|str|elem|stopEvent)(,|\s|$)
+    none
+    keyword
+    none
 
 (^|\s)(if|else|then|for|of|in|is|while|do|unless|not|or|and|try|catch|return|require|break|continue|new|switch|when|super|extends|by)(\s|$)
     none

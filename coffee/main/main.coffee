@@ -551,7 +551,6 @@ electron.app.on 'window-all-closed', -> log 'window-all-closed'
 onUDP = (file) ->
     
     main.activateOneWindow (win) ->
-        # log 'onMsg', file
         post.toWin win.id, 'loadFiles', [file] 
 
 koReceiver = new udp port:9779, onMsg:onUDP

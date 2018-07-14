@@ -6,7 +6,7 @@
 000   000   0000000   00     00
 ###
 
-{ elem, keyinfo, drag, clamp, stopEvent, keyinfo, empty, post, slash, error, log, fs, $, _ } = require 'kxk' 
+{ elem, keyinfo, drag, clamp, stopEvent, empty, post, slash, error, log, fs, $, _ } = require 'kxk' 
 
 Syntax      = require '../editor/syntax'
 fileIcons   = require 'file-icons-js'
