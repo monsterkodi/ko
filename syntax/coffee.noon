@@ -92,7 +92,7 @@ new\s+(\w+)                           class.callee
 
 # keywords
 
-(^|\s)(first|last|valid|empty|clamp|str|elem|stopEvent)(,|\s|$)
+(^|\s)(first|last|valid|empty|clamp|str|elem|stopEvent|pos)(,|\s|$)
     none
     keyword
     none
