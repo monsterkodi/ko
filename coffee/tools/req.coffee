@@ -6,7 +6,7 @@
 000   000  00000000   00000 00
 ###
 
-{ post, slash, valid, empty, _ } = require 'kxk'
+{ post, slash, valid, empty, log, _ } = require 'kxk'
 
 kxk = require 'kxk'
 
@@ -51,7 +51,7 @@ req = (file, lines, words, editor) ->
             regex = if k == '$'
                 new RegExp "[^*\\)\'\"\\\\]\\$"
             else
-                new RegExp "(^|\\s+)#{k}(\\s+[^:]|\\s*$|[\\.\\(])"
+                new RegExp "(^|[:(]|\\s+)#{k}(\\s+[^:]|\\s*$|[\\.\\(])"
             if regex.test lines[li]
                 diss = editor.syntax.getDiss li
                 diss = diss.filter (d) -> not d.clss.startsWith('comment') and not d.clss.startsWith('string')
@@ -80,6 +80,8 @@ req = (file, lines, words, editor) ->
                 modValues.push value:word, module:word.toLowerCase()
 
     kxkValues = _.uniq kxkValues
+    
+    log "req.req kxkValues:#{kxkValues}"
       
     if valid kxkValues
         
