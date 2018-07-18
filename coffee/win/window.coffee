@@ -311,6 +311,7 @@ reloadFile = ->
         post.toOtherWins 'reloadTab', editor.currentFile
 
 reloadTab = (file) ->
+    
     if file == editor?.currentFile
         loadFile editor?.currentFile,
             reload:   true
@@ -325,7 +326,7 @@ loadFile = (file, opt={}) ->
     editor.saveScrollCursorsAndSelections()
 
     if file?
-        [file, pos] = slash.splitFilePos file
+        [file, filePos] = slash.splitFilePos file
         file = slash.resolve file
 
     if file != editor?.currentFile or opt?.reload
@@ -353,8 +354,8 @@ loadFile = (file, opt={}) ->
 
     window.split.raise 'editor'
 
-    if pos? # and pos[0] or pos[1]
-        editor.singleCursorAtPos pos
+    if filePos? and (filePos[0] or filePos[1])
+        editor.singleCursorAtPos filePos
         editor.scroll.cursorToTop()
 
 #  0000000   00000000   00000000  000   000        00000000  000  000      00000000   0000000
