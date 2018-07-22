@@ -52,6 +52,7 @@ class Balancer
             when 'coffee'
                 @regions.multiString   = clss: 'string triple',  open: '"""', close: '"""', multi: true
                 @regions.interpolation = clss: 'interpolation',  open: '#{',  close: '}',   multi: true
+                # @regions.regexp        = clss: 'regexp',  open: '/',  close: '/'
                 
             when 'noon', 'iss'
                 @regions.lineComment.solo = true # only spaces before comments allowed

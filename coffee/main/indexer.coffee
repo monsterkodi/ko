@@ -219,7 +219,7 @@ class Indexer
             
             return error 'indexing failed', err if valid err
 
-            log "indexProject #{info.dir} indexed: #{info.files.length} files"
+            # log "indexProject #{info.dir} indexed: #{info.files.length} files"
             
             delete @currentlyIndexing
             

@@ -10,6 +10,7 @@
 
 matchr   = require '../tools/matchr'
 Balancer = require './balancer' 
+kork     = require 'kork'
 
 class Syntax
 
@@ -166,8 +167,15 @@ class Syntax
     @dissForTextAndSyntax: (text, n) ->
         
         if not n? or not Syntax.matchrConfigs[n]?
-            return error "no syntax? #{n}" 
-        matchr.dissect matchr.ranges Syntax.matchrConfigs[n], text 
+            return error "no syntax? #{n}"
+            
+        if n not in ['browser', 'ko', 'commandline']
+            result = kork.ranges text, n
+            result.map (r) -> r.clss = r.value
+        else
+            result = matchr.dissect matchr.ranges Syntax.matchrConfigs[n], text 
+        # console.log 'syntax', n, text, result
+        result
 
     @lineForDiss: (dss) ->
 

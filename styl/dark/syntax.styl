@@ -39,6 +39,9 @@
 .array
     color           #00f
 
+.type
+    color           #77f
+
 // 00000000  000   000  000   000   0000000  000000000  000   0000000   000   000  
 // 000       000   000  0000  000  000          000     000  000   000  0000  000  
 // 000000    000   000  000 0 000  000          000     000  000   000  000 0 000  
@@ -59,18 +62,19 @@
         opacity     1
         color       #55f
         
-    &.marker.head
-    &.marker.tail
+    &.head
+    &.tail
+        opacity     1
         color       transparent
         
-    &.marker.tail::before
+    &.tail::before
         border-color        #55f
-    &.marker.head::before
+    &.head::before
         border-left-color   #55f
         
-    &.marker.tail.bound::before
+    &.tail.bound::before
         border-color        #f80
-    &.marker.head.bound::before
+    &.head.bound::before
         border-left-color   #f80
             
     &.bracket
@@ -105,6 +109,7 @@
     color           #88f
 
 .marker
+.punctuation
     opacity         0.5
 
 .module
@@ -140,16 +145,24 @@
         color       #ff0
 
 .regexp
+    color           #f4a
+    
 .keypath
+.semver
     color           #f80
 
 .syntax.cond
-.keyword.function.call
+// .keyword.function.call
 .keyword
     color           #aaf
     &.null
         color       #a00
+    &.function
+        color       #666
 
+.struct
+    color           #f63
+    
 // 00     00   0000000    0000000  00000000    0000000   
 // 000   000  000   000  000       000   000  000   000  
 // 000000000  000000000  000       0000000    000   000  
@@ -158,13 +171,14 @@
 
 .macro
     color           #f0f
-    &.define
-        color       #c0c
     &.call
         color       #f0f
     &.argument
         color       #f8f
 
+.define
+    color           #666
+        
 .interpolation.marker
         color       #f80
 
@@ -193,8 +207,6 @@
 .bool
 .true
     color           #88f
-.false
-    color           #d00
 
 .nil
     color           #808
@@ -243,14 +255,9 @@
     color               #222 !important
 
 .require
+    color           #666
     &.variable
         color       #0f0
-    &.string
-        color       #0a0
-    &.keyword.require
-        color       #666
-    &.syntax
-        opacity     0.5
 
 // 000000000  00000000   0000000  000000000
 //    000     000       000          000

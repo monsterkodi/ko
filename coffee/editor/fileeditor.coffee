@@ -254,7 +254,6 @@ class FileEditor extends TextEditor
             opt.oldPos = @cursorPos()
             opt.oldFile = @currentFile
             
-            # log 'opt:', opt
             window.navigate.gotoFilePos opt
 
     jumpTo: (word, opt) =>
