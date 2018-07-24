@@ -199,6 +199,8 @@
     &.double
     &.triple
         color       #0f0
+    &.backtick
+        color       #ccf
     &.interpolation
         opacity     0.5
     &.dictionary
@@ -294,15 +296,23 @@
     &.h5
         color       #88f
     &.li1
-    &.li1::before
-        color       #0f0
+        color   #0f0
+        &.marker
+            color       transparent
+            &::before
+                color   #0f0
     &.li2
-        color       #000
-    &.li2::before
-        border-left-color  #0a0
+        color   #0a0
+        &.marker
+            color       transparent
+            &::before
+                color   #0a0
     &.li3
-    &.li3::before
-        color       #080
+        color   #080
+        &.marker
+            color       transparent
+            &::before
+                color   #080
     &.bold
         color       #ff8
         font-weight bold

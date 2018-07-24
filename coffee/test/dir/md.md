@@ -13,10 +13,7 @@
 ##### header level 5
 
 - indent level 1
-- indent level 1
     - indent level 2
-    - indent level 2
-        - indent level 3
         - indent level 3
 
 ![ko](img/banner.png)
