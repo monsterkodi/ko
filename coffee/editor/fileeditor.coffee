@@ -27,6 +27,7 @@ class FileEditor extends TextEditor
                 'Autocomplete'
                 'Brackets'
                 'Strings'
+                'CursorLine'
             ],
             fontSize: 19
 

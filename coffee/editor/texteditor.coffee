@@ -60,9 +60,12 @@ class TextEditor extends Editor
         @initDrag()        
 
         for feature in @config.features
-            featureName = feature.toLowerCase()
-            featureClss = require "./#{featureName}"
-            @[featureName] = new featureClss @
+            if feature == 'CursorLine'
+                @cursorLine = elem 'div', class:'cursor-line'
+            else
+                featureName = feature.toLowerCase()
+                featureClss = require "./#{featureName}"
+                @[featureName] = new featureClss @
 
         post.on 'schemeChanged', @onSchemeChanged
 
@@ -409,12 +412,12 @@ class TextEditor extends Editor
         for c in @cursors()
             if c[1] >= @scroll.top and c[1] <= @scroll.bot
                 cs.push [c[0], c[1] - @scroll.top]
+                
+        mc = @mainCursor()
 
         if @numCursors() == 1
 
             if cs.length == 1
-
-                mc = @mainCursor()
 
                 return if mc[1] < 0
 
@@ -443,6 +446,12 @@ class TextEditor extends Editor
 
         html = render.cursors cs, @size
         @layerDict.cursors.innerHTML = html
+        
+        ty = (mc[1] - @scroll.top) * @size.lineHeight
+        
+        if @cursorLine
+            @cursorLine.style = "z-index:0;transform:translate3d(0,#{ty}px,0); height:#{@size.lineHeight}px;width:100%;"
+            @layers.insertBefore @cursorLine, @layers.firstChild
 
     renderSelection: ->
 
