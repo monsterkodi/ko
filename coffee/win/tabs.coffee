@@ -201,6 +201,8 @@ class Tabs
         
     onNewTabWithFile: (file) =>
         
+        log "Tabs.onNewTabWithFile file:#{file}"
+        
         [file, line, col] = slash.splitFileLine file
         
         if tab = @tab file
@@ -209,6 +211,7 @@ class Tabs
             @addTab(file).activate()
             
         if line or col
+            
             post.emit 'singleCursorAtPos', [col, line-1]
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  

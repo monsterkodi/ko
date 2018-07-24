@@ -110,7 +110,11 @@ class Syntax
 
             div = elem class: clss
             document.body.appendChild div
-            color = window.getComputedStyle(div).color
+            computedStyle = window.getComputedStyle div 
+            color = computedStyle.color
+            opacity = computedStyle.opacity
+            if opacity != '1'
+                color = 'rgba(' + color.slice(4, color.length-2) + ', ' + opacity + ')' 
             @colors[clss] = color
             div.remove()
 

@@ -208,16 +208,16 @@ class Macro extends Command
                 li += 1 if not editor.isCursorInIndent() and not editor.isCursorInLastLine()
                 insert = indent + 'log "'
                 insert += editor.funcInfoAtLineIndex li
-                lst = args.length and parseInt args[0] or 0
+                lst = args.length and parseInt(args[0]) or 0
                 args.shift() if lst
                 words = wordsInArgsOrCursorsOrSelection args, include: "#@.-"
                 for ti in [0...words.length - lst]
                     t = words[ti]
-                    insert += "#{t}:\#{#{t}} "
+                    insert += "#{t}:\#{str #{t}} "
                 insert = insert.trimRight()
                 insert += '"'
                 if lst
-                    insert += (", #{words[ti]}" for ti in [words.length - lst...words.length]).join ''
+                    insert += (", str(#{words[ti]})" for ti in [words.length - lst...words.length]).join ''
                         
                 editor.do.start()
                 editor.do.insert li, insert

@@ -28,11 +28,11 @@ class FileBrowser extends Browser
         
         @srcCache = {}
         
-        post.on 'gitStatus',             @onGitStatus
-        post.on 'fileIndexed',           @onFileIndexed
-        post.on 'file',                  @onFile
-        post.on 'filebrowser',           @onFileBrowser
-        post.on 'dircache',              @onDirCache
+        post.on 'gitStatus',   @onGitStatus
+        post.on 'fileIndexed', @onFileIndexed
+        post.on 'file',        @onFile
+        post.on 'filebrowser', @onFileBrowser
+        post.on 'dircache',    @onDirCache
     
         @shelfResize = elem 'div', class: 'shelfResize'
         @shelfResize.style.position = 'absolute'
@@ -51,7 +51,6 @@ class FileBrowser extends Browser
         @initColumns()
         
     onFileBrowser: (action, item, arg) =>
-        
         switch action
             when 'loadItem'     then @loadItem     item, arg
             when 'activateItem' then @activateItem item, arg
@@ -246,16 +245,17 @@ class FileBrowser extends Browser
             if @lastUsedColumn()?.isFile()
                 lastdir = slash.dir lastdir
             relative = slash.relative file, lastdir
-                        
-            upCount = 0
-            while relative.startsWith '../'
-                upCount += 1
-                relative = relative.substr 3
-                
-            if upCount < @numCols()-1
-                col   = @numCols() - 1 - upCount
-                relst = slash.pathlist relative
-                paths = filelist.slice filelist.length - relst.length
+                       
+            if slash.isRelative relative
+                upCount = 0
+                while relative.startsWith '../'
+                    upCount += 1
+                    relative = relative.substr 3
+                    
+                if upCount < @numCols()-1
+                    col   = @numCols() - 1 - upCount
+                    relst = slash.pathlist relative
+                    paths = filelist.slice filelist.length - relst.length
 
         if empty paths
             
@@ -362,12 +362,6 @@ class FileBrowser extends Browser
         
         super()
         @shelf.scroll.update()
-        
-    clearColumn: (index) ->
-        
-        # if @columns[index].parent?.type == 'dir'
-            # dirCache.unwatch @columns[index].parent.file
-        super index
         
     #  0000000  000   000  00000000  000      00000000  
     # 000       000   000  000       000      000       
