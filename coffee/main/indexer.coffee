@@ -223,16 +223,16 @@ class Indexer
             
             delete @currentlyIndexing
             
-            @indexedProjects.push info if info
-            
-            post.toWins 'projectIndexed', info
+            if info
+                @indexedProjects.push info 
+                post.toWins 'projectIndexed', info
             
             doShift = empty @queue
             
-            if not empty info.files
+            if valid info.files
                 @queue = @queue.concat info.files
                 
-            if not empty @indexQueue
+            if valid @indexQueue
                 @indexProject @indexQueue.shift()
                 
             @shiftQueue() if doShift

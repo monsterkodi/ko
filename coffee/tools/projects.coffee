@@ -19,9 +19,10 @@ class Projects
         
     @onIndexed: (info) ->
         
-        files[info.dir] = info.files
-        numFiles += info.files.length
-        # log 'Projects.onIndexed', info.dir, info.files.length, numFiles
+        if valid info.files
+            files[info.dir] = info.files
+            numFiles += info.files.length
+            # log 'Projects.onIndexed', info.dir, info.files.length, numFiles
         
     @files: (file) ->
         
