@@ -77,6 +77,8 @@ class Split extends event
         if state = window.stash.get 'split|flex'
             @flex.restoreState state
             @emitSplit()
+        else
+            @do 'maximize editor'
             
         if @flex.panes[0].div != @area and window.stash.get 'split|area'
             @raise 'area'

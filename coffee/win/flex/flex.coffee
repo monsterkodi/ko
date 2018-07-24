@@ -276,12 +276,8 @@ class Flex
     handle:      (i) -> _.isNumber(i) and @handles[i] or i
 
     height: -> @view.getBoundingClientRect().height
-    size: ->
-        @view.getBoundingClientRect()[@dimension]
-        # cs = window.getComputedStyle @view 
-        # @view[@clientDim] - parseFloat(cs[@paddingA]) - parseFloat(cs[@paddingB])
-
-    pos: -> @view.getBoundingClientRect()[@position]
+    size:   -> @view.getBoundingClientRect()[@dimension]
+    pos:    -> @view.getBoundingClientRect()[@position]
                            
     #  0000000   0000000   000      000       0000000   00000000    0000000  00000000  
     # 000       000   000  000      000      000   000  000   000  000       000       

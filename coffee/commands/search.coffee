@@ -8,8 +8,8 @@
 
 { slash, post, fs, os, error, log, _ } = require 'kxk'
 
-walker   = require '../tools/walker'
 matchr   = require '../tools/matchr'
+walker   = require '../tools/walker'
 syntax   = require '../editor/syntax'
 Command  = require '../commandline/command'
 stream   = require 'stream'

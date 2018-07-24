@@ -29,7 +29,7 @@ class Three extends Stage
             logarithmicDepthBuffer: true
             autoClear:              true
                     
-        @renderer.setClearColor 0x008800
+            @renderer.setClearColor 0x008800
         @elem.appendChild @renderer.domElement
         @renderer.setSize @view.offsetWidth, @view.offsetHeight
         

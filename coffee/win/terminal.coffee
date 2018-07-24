@@ -197,8 +197,6 @@ class Terminal extends TextEditor
         
         return if 'unhandled' != super mod, key, combo, char, event
         
-        # log 'combo', combo
-        
         switch combo
             when 'enter'
                 if href = @meta.hrefAtLineIndex @cursorPos()[1]
