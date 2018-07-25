@@ -49,7 +49,6 @@ class Find extends Command
     cancel: ->
         
         @hideList()  
-        @receivingEditor()?.clearHighlights()
         focus: @receiver
         show: 'editor'
         

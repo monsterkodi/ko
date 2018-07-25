@@ -290,7 +290,9 @@ class Commandline extends TextEditor
     globalModKeyComboEvent: (mod, key, combo, event) ->
 
         if combo == 'esc'
-            if document.activeElement == @view then return @cancel()
+            if document.activeElement == @view 
+                stopEvent event
+                return @cancel()
 
         if @command?
             return @command.globalModKeyComboEvent mod, key, combo, event

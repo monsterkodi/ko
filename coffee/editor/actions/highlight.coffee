@@ -95,6 +95,12 @@ module.exports =
 
     selectAllWords: -> # command+alt+d
         
+        if @name == 'commandline-editor' # hack to forward action to main editor
+            if editor = window.commandline?.command?.receivingEditor()
+                editor.selectAllWords()
+                editor.focus()
+                return
+    
         @highlightWordAndAddToSelection()
         @do.start()
         @do.select @do.highlights()

@@ -32,4 +32,7 @@ some 'text' with "strings". stray colon's *suck*.
     - **bold**
     - *italic*
     - `code`
+    - hello **bold**
+    - hello *italic*
+    - hello `code`
     

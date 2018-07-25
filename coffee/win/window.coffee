@@ -222,7 +222,7 @@ saveFile = (file) ->
 
     editor.stopWatcher()
     
-    File.save file, editor.text(), (err, file) ->
+    File.save file, editor.text(), (err, saved) ->
         
         editor.saveScrollCursorsAndSelections()
         
@@ -230,9 +230,9 @@ saveFile = (file) ->
             error "saving '#{file}' failed:", err
             split.show 'logview'
         else
-            editor.setCurrentFile      file
-            post.toOthers 'fileSaved', file, window.winID
-            post.emit     'saved',     file
+            editor.setCurrentFile      saved
+            post.toOthers 'fileSaved', saved, window.winID
+            post.emit     'saved',     saved
 
 window.saveChanges = ->
 
