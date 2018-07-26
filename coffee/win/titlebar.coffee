@@ -6,7 +6,7 @@
    000     000     000     0000000  00000000  0000000    000   000  000   000
 ###
 
-{ stopEvent, elem, post, log, $ } = require 'kxk'
+{ post, stopEvent, elem, $ } = require 'kxk'
 
 class Titlebar
     
@@ -76,7 +76,7 @@ class Titlebar
     # 000      000       000     000   
     # 0000000  000  0000000      000   
     
-    showList: (event) => 
+    showList: (event) =>
               
         return if @list?
         winInfos = post.get 'winInfos'

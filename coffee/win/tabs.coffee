@@ -253,9 +253,12 @@ class Tabs
 
     stash: => 
 
+        files = ( t.file() for t in @tabs )
+        files = files.filter (file) -> file != 'untitled'
+        
         window.stash.set 'tabs', 
-            files:  ( t.file() for t in @tabs )
-            active: @activeTab()?.index()
+            files:  files
+            active: Math.min @activeTab()?.index(), files.length-1
     
     restore: =>
         

@@ -6,7 +6,7 @@
    000     000   000  0000000  
 ###
 
-{ post, elem, tooltip, atomic, slash, fs, error, log, _ } = require 'kxk'
+{ post, tooltip, atomic, slash, elem, fs, error, _ } = require 'kxk'
 
 render  = require '../editor/render'
 syntax  = require '../editor/syntax'

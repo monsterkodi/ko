@@ -101,15 +101,14 @@ class FileEditor extends TextEditor
 
             @restoreScrollCursorsAndSelections()
             # log 'post.emit file', @currentFile
-            post.emit 'file', @currentFile # titlebar -> tabs -> tab
+            post.emit 'file', @currentFile # titlebar & tabs & tab & shelf
         else
             if not opt?.skip
                 @setLines ['']
 
         if not opt?.skip
             if not @currentFile?
-                log 'post.emit file null?'
-                # post.emit 'file', null # titlebar -> tabs -> tab
+                post.emit 'file', null # titlebar & tabs & tab & shelf
             # log '@emit file', @currentFile
             @emit 'file', @currentFile # diffbar, pigments, ...
 

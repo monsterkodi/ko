@@ -39,7 +39,7 @@ module.exports =
     # 000   000  000       000        000      000   000  000       000       
     # 000   000  00000000  000        0000000  000   000   0000000  00000000  
     
-    replaceSelectedText: (lines) ->
+    replaceSelectedText: (lines) -> /
         
         @do.start()
         newSelections = @do.selections()
@@ -127,6 +127,7 @@ module.exports =
             newCursors = [[0, li]] if empty newCursors
             
         if removeLastLine
+            log "removeLastLine numLines:#{@do.numLines()} text:'#{@text()}'"
             @do.delete @do.numLines()-1
                 
         @do.setCursors newCursors

@@ -71,6 +71,8 @@ class Shelf extends Column
     
     onFile: (file) =>
         
+        return if empty file
+        
         [index, item] = indexAndItemInItemsWithFunc file, @items, (f,i) -> i.file == f
         if item
             @rows[index].setActive()

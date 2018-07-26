@@ -41,7 +41,6 @@ class EditorScroll extends events
         @numLines     = -1 # total number of lines in buffer
         @top          = -1 # index of first visible line in view
         @bot          = -1 # index of last  visible line in view
-        # @log 'editorscroll.init'
 
     start: (@viewHeight, @numLines) =>
         
@@ -175,9 +174,7 @@ class EditorScroll extends events
                 @calc()
                 @by 0
             else
-                @log 'setNumLines init and clear'
                 @init()
-                @log 'clearLines'
                 @emit 'clearLines'             
 
     # 000      000  000   000  00000000  000   000  00000000  000   0000000   000   000  000000000
@@ -273,10 +270,4 @@ class EditorScroll extends events
         topbot: "#{@top} .. #{@bot} = #{@bot-@top} / #{@numLines} lines"
         scroll: "#{@scroll} offsetTop #{@offsetTop} viewHeight #{@viewHeight} scrollMax #{@scrollMax} fullLines #{@fullLines} viewLines #{@viewLines}"
         
-    log: ->
-        return if @editor.name != 'editor'
-        log.slog.depth = 3
-        log.apply log, [].splice.call arguments, 0
-        log.slog.depth = 2
-            
 module.exports = EditorScroll
