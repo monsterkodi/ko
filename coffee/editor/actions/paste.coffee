@@ -5,7 +5,7 @@
 # 000        000   000       000     000     000     
 # 000        000   000  0000000      000     00000000
 
-{ empty, log, _ } = require 'kxk'
+{ empty, str, log, _ } = require 'kxk'
 
 electron  = require 'electron'
 clipboard = electron.clipboard
@@ -73,7 +73,7 @@ module.exports =
             @select []
             return
         
-        if (@numLines() == 1 and @text() == '') or areSameRanges @rangesForAllLines(), @selections() 
+        if (@numLines() == 1 and @text() == '' and lines.length > 1) or areSameRanges @rangesForAllLines(), @selections() 
             removeLastLine = true # prevents trailing empty line
             
         @deleteSelection()
@@ -87,19 +87,20 @@ module.exports =
             # replicate single lines for insertion at multiple cursors
             lines = (lines[0] for c in newCursors)
                     
-        if newCursors.length > 1 or lines.length == 1 and (newCursors[0] > 0 or not text.endsWith '\n')
-            
+        if newCursors.length > 1 or (lines.length == 1) #and not text.endsWith '\n') # (newCursors[0] > 0)
             # insert into multiple cursors
+            # log "insert multiple cursor", newCursors.length, lines.length, str newCursors
             
             for ci in [newCursors.length-1..0]
                 c = newCursors[ci]
                 insert = lines[ci % lines.length]
                 @do.change c[1], @do.line(c[1]).splice c[0], 0, insert
+                log 'insert multiple', str(c), insert, '-->', @do.line(c[1])
                 for c in positionsAfterLineColInPositions c[1], c[0]-1, newCursors
                     cursorDelta c, insert.length # move cursors after insertion
                     
-        else # insert at single cursor
-            
+        else # insert new line(s) at single cursor
+            log "insert new line(s) at single cursor"
             cp = newCursors[0]
             li = cp[1]
             newCursors = null
@@ -118,9 +119,11 @@ module.exports =
                         newCursors = [[0,li+lines.length-1]]
             else 
                 if @do.line(li).length == 0 and not removeLastLine
+                    log 'insert after empty'
                     li += 1 # insert after empty line
                 
             for line in lines
+                # log "insert #{li}", line
                 @do.insert li, line
                 li += 1
                 
