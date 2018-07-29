@@ -16,7 +16,7 @@ class Watcher
         
         @w.on 'change', (p) =>
             
-            window.loadFile @editor.currentFile, reload: true, dontSave: true
+            window.loadFile @editor.currentFile, reload:true
             
         @w.on 'unlink', (p) => @editor.setText ""
         

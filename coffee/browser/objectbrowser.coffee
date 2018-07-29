@@ -35,7 +35,7 @@ class ObjectBrowser extends Browser
     
     loadObject: (obj, opt) =>
         
-        # log 'loadObject', obj, opt
+        # log 'LoadObject', obj, opt
         
         opt ?= {}
         opt.column ?= 0

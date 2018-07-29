@@ -246,7 +246,7 @@ class Browse extends Command
         file = @commandList.items[index]?.file
         file = slash.tilde file if file?
         file ?= @commandList.line index
-        log 'browse.listClick', index, file
+        log 'browse.listClick index, file', index, file
         @selected = index
         @execute file
 

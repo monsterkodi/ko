@@ -45,17 +45,17 @@ class Titlebar
     onDirty: (dirty) =>
         if @info.dirty != dirty
             @info.dirty = dirty
-            @update()
+            window.tabs.activeTab()?.update @info
             
     onWinFocus: (focus) =>
         if @info.focus != focus
             @info.focus = focus
-            @update()
+            @elem.classList.toggle 'focus', @info.focus
         
     onFile: (file) =>
         if @info.file != file
             @info.file = file ? 'untitled'
-            @update()
+            window.tabs.update()
     
     # 000   000  00000000   0000000     0000000   000000000  00000000  
     # 000   000  000   000  000   000  000   000     000     000       
@@ -64,11 +64,8 @@ class Titlebar
     #  0000000   000        0000000    000   000     000     00000000  
     
     update: ->
-
-        s = @info.sticky and "○" or ''
-        @elem.classList.toggle 'focus', @info.focus            
-        window.tabs.activeTab()?.update @info
-        window.tabs.update()
+        # window.tabs.activeTab()?.update @info
+        # window.tabs.update()
 
     # 000      000   0000000  000000000
     # 000      000  000          000   

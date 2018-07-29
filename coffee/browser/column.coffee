@@ -52,7 +52,6 @@ class Column
     
     loadItems: (items, parent) ->
         
-        # @clear()
         @browser.clearColumn @index
         
         @items  = items
@@ -69,7 +68,6 @@ class Column
 
     setItems: (@items, opt) ->
         
-        # @clear()
         @browser.clearColumn @index
         
         @parent = opt.parent
@@ -421,8 +419,6 @@ class Column
         
         { mod, key, combo, char } = keyinfo.forEvent event
 
-        # log 'column on key1', combo
-        
         switch combo
             when 'page up', 'page down', 'home', 'end' then return stopEvent event, @navigateRows key
             when 'enter'               then return stopEvent event, @navigateCols key
@@ -456,8 +452,6 @@ class Column
             
         if mod in ['shift', ''] and char then @doSearch char
                 
-        # log 'column on key2', combo
-        
 module.exports = Column
 
 

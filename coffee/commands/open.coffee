@@ -84,7 +84,7 @@ class Open extends Command
     # 000       000   000  000 0 000  000        000      000          000     000     
     #  0000000   0000000   000   000  000        0000000  00000000     000     00000000
 
-    complete: -> 
+    complete: ->
 
         if @commandList? and @commandList.line(@selected).startsWith(slash.basename @getText()) and not @getText().trim().endsWith('/')
             @setText slash.join(slash.dir(@getText()), @commandList.line(@selected))
@@ -97,7 +97,7 @@ class Open extends Command
             @changed @getText()
             true            
         else
-            log 'post.get indexer projects'
+            # log 'post.get indexer projects ...'
             projects = post.get 'indexer', 'projects'
             for p in Object.keys(projects).sort()
                 if p.startsWith @getText()

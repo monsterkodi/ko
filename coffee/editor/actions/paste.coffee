@@ -87,20 +87,16 @@ module.exports =
             # replicate single lines for insertion at multiple cursors
             lines = (lines[0] for c in newCursors)
                     
-        if newCursors.length > 1 or (lines.length == 1) #and not text.endsWith '\n') # (newCursors[0] > 0)
+        if newCursors.length > 1 or (lines.length == 1)
             # insert into multiple cursors
-            # log "insert multiple cursor", newCursors.length, lines.length, str newCursors
-            
             for ci in [newCursors.length-1..0]
                 c = newCursors[ci]
                 insert = lines[ci % lines.length]
                 @do.change c[1], @do.line(c[1]).splice c[0], 0, insert
-                log 'insert multiple', str(c), insert, '-->', @do.line(c[1])
                 for c in positionsAfterLineColInPositions c[1], c[0]-1, newCursors
                     cursorDelta c, insert.length # move cursors after insertion
                     
         else # insert new line(s) at single cursor
-            log "insert new line(s) at single cursor"
             cp = newCursors[0]
             li = cp[1]
             newCursors = null
@@ -123,7 +119,6 @@ module.exports =
                     li += 1 # insert after empty line
                 
             for line in lines
-                # log "insert #{li}", line
                 @do.insert li, line
                 li += 1
                 

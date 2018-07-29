@@ -6,7 +6,7 @@
 00     00  000  000   000  0000000     0000000   00     00
 ###
 
-{ post, win, stopEvent, fileList, keyinfo, atomic, prefs, state, stash, first, reversed, childp, 
+{ post, win, stopEvent, fileList, keyinfo, prefs, state, stash, first, reversed, childp, 
   drag, noon, slash, clamp, pos, str, sw, sh, os, fs, valid, empty, log, error, _ } = require 'kxk'
 
 menu = require './menu'
@@ -120,9 +120,9 @@ post.on 'editorFocus', (editor) ->
     window.focusEditor = editor
     window.textEditor = editor if editor.name != 'commandline-editor'
 
-# testing related ...
+# testing related ... 
 
-post.on 'mainlog', -> log.apply log, arguments 
+post.on 'mainlog', -> log.apply log, arguments
 
 post.on 'ping', (wID, argA, argB) -> post.toWin wID, 'pong', winID, argA, argB
 post.on 'postEditorState', ->
@@ -212,10 +212,19 @@ window.editorWithName = (n) ->
 #      000  000   000     000     000
 # 0000000   000   000      0      00000000
 
+saveAll = ->
+    
+    for tab in tabs.tabs
+        if tab.dirty()
+            if tab == tabs.activeTab()
+                saveFile tab.info.file
+            else
+                tab.saveChanges()
+
 saveFile = (file) ->
 
     file ?= editor.currentFile
-
+    
     if not file?
         saveFileAs()
         return
@@ -233,13 +242,14 @@ saveFile = (file) ->
             editor.setCurrentFile      saved
             post.toOthers 'fileSaved', saved, window.winID
             post.emit     'saved',     saved
+            
+        editor.restoreScrollCursorsAndSelections()
 
 window.saveChanges = ->
-
+    
     if editor.currentFile? and editor.do.hasLineChanges() and slash.fileExists editor.currentFile
-        stat = fs.statSync editor.currentFile
-        atomic editor.currentFile, editor.text(), { encoding: 'utf8', mode: stat.mode }, (err) ->
-            return error "window.saveChanges failed #{err}" if err
+        File.save editor.currentFile, editor.text(), (err) ->
+            error "window.saveChanges failed #{err}" if err
 
 #  0000000   000   000   0000000  000       0000000    0000000  00000000
 # 000   000  0000  000  000       000      000   000  000       000
@@ -303,9 +313,11 @@ reloadWin = ->
 
 reloadFile = ->
 
-    loadFile editor.currentFile,
-        reload:   true
-        dontSave: true
+    if tab = tabs.activeTab()
+        delete tab.state
+        tab.info.dirty = false
+    
+    loadFile editor.currentFile, reload:true
 
     if editor.currentFile?
         post.toOtherWins 'reloadTab', editor.currentFile
@@ -313,15 +325,17 @@ reloadFile = ->
 reloadTab = (file) ->
     
     if file == editor?.currentFile
-        loadFile editor?.currentFile,
-            reload:   true
-            dontSave: true
+        loadFile editor?.currentFile, reload:true
     else
         post.emit 'revertFile', file
 
 loadFile = (file, opt={}) ->
 
     file = null if file? and file.length <= 0
+
+    if activeTab = tabs.activeTab()
+        if activeTab.dirty()
+            activeTab.storeState()
 
     editor.saveScrollCursorsAndSelections()
 
@@ -330,25 +344,26 @@ loadFile = (file, opt={}) ->
         file = slash.resolve file
 
     if file != editor?.currentFile or opt?.reload
+
         if file? and not slash.fileExists file
             file = null
 
-        if not opt?.dontSave
-            window.saveChanges()
-
-        editor.clear skip:file?
+        editor.clear()
 
         if file?
 
             addToRecent file
-
+            
             tab = tabs.tab file
             if empty tab
                 tab = tabs.addTab file
-            tab.setActive()
+                
+            editor.setCurrentFile file
 
-            editor.setCurrentFile file, opt
-
+            tab.activate false # this will restore state
+            
+            editor.restoreScrollCursorsAndSelections()
+            
             post.toOthers 'fileLoaded', file, winID
             post.emit 'cwdSet', slash.dir file
 
@@ -365,8 +380,6 @@ loadFile = (file, opt={}) ->
 #  0000000   000        00000000  000   000        000       000  0000000  00000000  0000000
 
 openFiles = (ofiles, options) -> # called from file dialog, open command and browser
-
-    # log 'window.openFiles', ofiles, options
 
     if ofiles?.length
 
@@ -547,7 +560,6 @@ window.onfocus = (event) ->
             split.focus 'commandline-editor'
 
 window.setLastFocus = (name) ->
-    # log 'window.setLastFocus', name
     window.lastFocus = name
 
 # 00     00  00000000  000   000  000   000      0000000    0000000  000000000  000   0000000   000   000
@@ -561,15 +573,11 @@ onMenuAction = (name, args) ->
     if action = Editor.actionWithName name
         if action.key? and _.isFunction window.focusEditor[action.key]
             window.focusEditor[action.key] args.actarg
-            # log 'handled by focus editor', name
             return
 
     if 'unhandled' != window.commandline.handleMenuAction name, args
-        # log 'handled by commandline', name
         return
 
-    # log 'onMenuAction', name, args
-            
     switch name
 
         when 'doMacro'               then return window.commandline.commands.macro.execute args.actarg
@@ -599,6 +607,7 @@ onMenuAction = (name, args) ->
         when 'Open In New Tab...'    then return openFileDialog newTab: true
         when 'Open In New Window...' then return openFileDialog newWindow: true
         when 'Save'                  then return saveFile()
+        when 'Save All'              then return saveAll()
         when 'Save As ...'           then return saveFileAs()
         when 'Revert'                then return reloadFile()
         when 'Reload Window'         then return reloadWin()

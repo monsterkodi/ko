@@ -6,7 +6,7 @@
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
 
-{ post, srcmap, popup, stopEvent, setStyle, pos, slash, fs, empty, error, log, str, _ } = require 'kxk'
+{ post, stopEvent, setStyle, srcmap, popup, slash, empty, clamp, pos, fs, error, log, _ } = require 'kxk'
   
 watcher    = require './watcher'
 TextEditor = require './texteditor'
@@ -66,20 +66,19 @@ class FileEditor extends TextEditor
     # 000       000  000      000
     # 000       000  0000000  00000000
 
-    clear: (opt = skip:false) -> @setCurrentFile null, opt
-
-    setCurrentFile: (file, opt) ->
-
+    clear: -> 
+        
         @dirty = false
-        if not opt?.skip
-            post.emit 'dirty', false
-
         @setSalterMode false
         @stopWatcher()
-
         @diffbar?.clear()
         @meta?.clear()
+        @setLines ['']
         @do.reset()
+
+    setCurrentFile: (file, restoreState) ->
+
+        @clear()
 
         @currentFile = file
 
@@ -89,35 +88,28 @@ class FileEditor extends TextEditor
 
             @watch = new watcher @
 
-            if opt?.restoreState
+            if restoreState
 
-                @setText opt.restoreState.text()
-                @state = opt.restoreState
+                @setText restoreState.text()
+                @state = restoreState
                 @dirty = true
                 post.emit 'dirty', true
 
             else
                 @setText fs.readFileSync @currentFile, encoding: 'utf8'
+                post.emit 'dirty', false
 
-            @restoreScrollCursorsAndSelections()
-            # log 'post.emit file', @currentFile
             post.emit 'file', @currentFile # titlebar & tabs & tab & shelf
-        else
-            if not opt?.skip
-                @setLines ['']
 
-        if not opt?.skip
-            if not @currentFile?
-                post.emit 'file', null # titlebar & tabs & tab & shelf
-            # log '@emit file', @currentFile
-            @emit 'file', @currentFile # diffbar, pigments, ...
+        if not @currentFile?
+            post.emit 'file', null # titlebar & tabs & tab & shelf
+        @emit 'file', @currentFile # diffbar, pigments, ...
 
     restoreFromTabState: (tabsState) ->
 
-        # log 'restoreFromTabState', tabsState
         return error "no tabsState.file?" if not tabsState.file?
-        @clear skip:true
-        @setCurrentFile tabsState.file, restoreState:tabsState.state
+        @clear()
+        @setCurrentFile tabsState.file, tabsState.state
 
     stopWatcher: ->
         # log 'stopWatcher', @currentFile
@@ -169,14 +161,10 @@ class FileEditor extends TextEditor
         return if not @currentFile
         s = {}
 
-        if opt?.dontSaveCursors
-            s.main       = 0
-            s.cursors    = [@cursorPos()]
-        else
-            s.main       = @state.main()
-            s.cursors    = @state.cursors()    if @numCursors() > 1 or @cursorPos()[0] or @cursorPos()[1]
-            s.selections = @state.selections() if @numSelections()
-            s.highlights = @state.highlights() if @numHighlights()
+        s.main       = @state.main()
+        s.cursors    = @state.cursors()    if @numCursors() > 1 or @cursorPos()[0] or @cursorPos()[1]
+        s.selections = @state.selections() if @numSelections()
+        s.highlights = @state.highlights() if @numHighlights()
 
         s.scroll = @scroll.scroll if @scroll.scroll
 
@@ -201,7 +189,11 @@ class FileEditor extends TextEditor
         if filePositions[@currentFile]?
 
             s = filePositions[@currentFile]
-            @setCursors    s.cursors ? [[0,0]]
+            
+            cursors = s.cursors ? [[0,0]]
+            cursors = cursors.map (c) => [c[0], clamp(0,@numLines()-1,c[1])]
+            
+            @setCursors    cursors
             @setSelections s.selections ? []
             @setHighlights s.highlights ? []
             @setMain       s.main ? 0
@@ -234,13 +226,12 @@ class FileEditor extends TextEditor
 
     jumpToFile: (opt) =>
         
-        # log 'jumpToFile', opt
-        
         if opt.newTab
             
             file = opt.file
             file += ':' + opt.line if opt.line
             file += ':' + opt.col if opt.col
+            log 'fileEditor.jumpToFile newTabWithFile', file
             post.emit 'newTabWithFile', file
             
         else
@@ -253,7 +244,6 @@ class FileEditor extends TextEditor
 
             opt.oldPos = @cursorPos()
             opt.oldFile = @currentFile
-            
             window.navigate.gotoFilePos opt
 
     jumpTo: (word, opt) =>

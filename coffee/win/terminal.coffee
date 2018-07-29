@@ -15,7 +15,7 @@ ansiDiss   = require '../tools/ansidiss'
 
 class Terminal extends TextEditor
 
-    constructor: (viewElem) ->
+    constructor: (viewElem) -> 
         
         super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Meta'], fontSize: 15
         

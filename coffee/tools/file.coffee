@@ -41,8 +41,6 @@ class File
             
     @save: (file, text, cb) ->
     
-        # log 'File.save', file, text.length
-
         slash.fileExists file, (stat) ->
             
             if stat

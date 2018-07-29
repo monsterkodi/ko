@@ -28,6 +28,7 @@ File
     --                      
     Save                    ctrl+s
     Save As ...             ctrl+shift+s
+    Save All                alt+ctrl+s
     ---                     
     Revert                  ctrl+r
     ----                    

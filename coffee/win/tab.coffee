@@ -6,8 +6,9 @@
    000     000   000  0000000  
 ###
 
-{ post, tooltip, atomic, slash, elem, fs, error, _ } = require 'kxk'
+{ post, tooltip, slash, elem, error, log, _ } = require 'kxk'
 
+File    = require '../tools/file'
 render  = require '../editor/render'
 syntax  = require '../editor/syntax'
 
@@ -44,8 +45,7 @@ class Tab
                             when 'inserted' then @state.state = @state.state.insertLine change.doIndex, change.after
                             when 'deleted'  then @state.state = @state.state.deleteLine change.doIndex
             
-            stat = fs.statSync @state.file
-            atomic @state.file, @state.state.text(), { encoding: 'utf8', mode: stat.mode }, (err) =>            
+            File.save @state.file, @state.state.text(), (err) =>
                 return error "tab.saveChanges failed #{err}" if err
                 @revert()
         else
@@ -58,14 +58,12 @@ class Tab
     # 0000000      000     000   000     000     00000000  
     
     storeState: ->
-        
         if window.editor.currentFile
             @state = window.editor.do.tabState()
         
     restoreState: ->
         
         return error 'no file in state?', @state if not @state?.file?
-        
         window.editor.do.setTabState @state
         delete @state
         
@@ -139,6 +137,12 @@ class Tab
     hidePkg: -> @pkg?.style.display = 'none'
     showPkg: -> @pkg?.style.display = 'initial'
     
+    # 00000000   00000000  000   000  00000000  00000000   000000000  
+    # 000   000  000       000   000  000       000   000     000     
+    # 0000000    0000000    000 000   0000000   0000000       000     
+    # 000   000  000          000     000       000   000     000     
+    # 000   000  00000000      0      00000000  000   000     000     
+    
     revert: -> 
         delete @info.dirty
         delete @foreign
@@ -152,20 +156,16 @@ class Tab
     # 000   000  000          000     000     000     000   000     000     000       
     # 000   000   0000000     000     000      0      000   000     000     00000000  
     
-    activate: ->
+    activate: (emitJumpTo=true) ->
         
-        activeTab = @tabs.activeTab()
-
-        if activeTab? and activeTab.dirty()
-            activeTab.storeState()
+        if emitJumpTo
+            post.emit 'jumpToFile', file:@info.file
+            return
         
         @setActive()
         
         if @state?
             @restoreState()
-        else
-            post.emit 'jumpToFile', file:@info.file
-            # window.loadFile @info.file, dontSave:true
             
         if @foreign?.length
             for changes in @foreign

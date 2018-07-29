@@ -121,13 +121,11 @@ class Navigate
         post.toMain 'navigate', action:'delFilePos', winID: window.winID, item:item
 
     addFilePos: (opt) -> # called on editing
-        # log 'addFilePos', opt.file
         opt.action = 'addFilePos'
         opt.for = 'edit'
         post.toMain 'navigate', opt
 
     gotoFilePos: (opt) -> # called on jumpTo
-        # log 'gotoFilePos', opt.file
         opt.action = 'addFilePos'
         opt.for = 'goto'
         post.toMain 'navigate', opt

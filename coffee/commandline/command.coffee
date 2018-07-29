@@ -147,7 +147,7 @@ class Command
     
     listClick: (index) =>
         
-        # log 'command.listClick', index, @commandList.line index 
+        # log 'command.listClick', index, @commandList.line index
         # log 'command.listClick', index, @commandList.items[index]
         @selected = index
         @execute @commandList.line index 

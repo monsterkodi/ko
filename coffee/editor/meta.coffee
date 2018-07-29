@@ -86,11 +86,23 @@ class Meta
                 post.emit 'search-saved', file
 
     saveLine: (li) ->
-
+        
         for meta in @metasAtLineIndex li
             if meta[2].state == 'unsaved'
                 [file, line] = slash.splitFileLine meta[2].href
-                @saveFileLineMetas file, [[line-1, @editor.line(meta[0]), meta]]
+                break
+                
+        if file
+            fileLineMetas = {}
+            for meta in @metas
+                if meta[2].state == 'unsaved'
+                    [mfile, line] = slash.splitFileLine meta[2].href
+                    if mfile == file
+                        fileLineMetas[mfile] ?= []
+                        fileLineMetas[mfile].push [line-1, @editor.line(meta[0]), meta]
+               
+            for file, lineMetas of fileLineMetas
+                @saveFileLineMetas file, lineMetas
 
     saveChanges: ->
 
@@ -98,11 +110,9 @@ class Meta
         for meta in @metas
             if meta[2].state == 'unsaved'
                 [file, line] = slash.splitFileLine meta[2].href
-                fileLineMetas[file] = [] if not fileLineMetas[file]?
+                fileLineMetas[file] ?= []
                 fileLineMetas[file].push [line-1, @editor.line(meta[0]), meta]
 
-        log 'saveChanges', fileLineMetas.length
-        
         for file, lineMetas of fileLineMetas
             @saveFileLineMetas file, lineMetas
 

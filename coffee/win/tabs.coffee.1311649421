@@ -55,7 +55,7 @@ class Tabs
             tab.foreignChanges lineChanges
         
     onFileSaved: (file, winID) =>
-
+        
         if winID == window.winID
             error "fileSaved from this window? #{file} #{winID}" 
             return 
@@ -174,7 +174,7 @@ class Tabs
             if tab.dirty()
                 tab.saveChanges()
             @tabs.pop().close() 
-        @tabs = keep
+        @tabs = keep 
         @update()
     
     #  0000000   0000000    0000000          000000000   0000000   0000000    
@@ -186,10 +186,7 @@ class Tabs
     addTab: (file) ->
 
         if @tabs.length > 4
-            for index in [0...@tabs.length]
-                if not @tabs[index].dirty()
-                    @closeTab @tabs[index], skipActivate:true, skipUpdate:true
-                    break
+            @closeTab @tabs[0], skipActivate:true, skipUpdate:true
         
         tab = new Tab @
         tab.update file:file
