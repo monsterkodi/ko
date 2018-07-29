@@ -169,16 +169,14 @@ class Syntax
         matchr.ranges Syntax.matchrConfigs[n], line
 
     @dissForTextAndSyntax: (text, n) ->
-        
-        if not n? or not Syntax.matchrConfigs[n]?
-            return error "no syntax? #{n}"
-            
-        if n not in ['browser', 'ko', 'commandline']
+                    
+        if n not in ['browser', 'ko', 'commandline', 'logview', 'macro', 'term', 'test']
             result = kork.ranges text, n
             result.map (r) -> r.clss = r.value
         else
+            if not n? or not Syntax.matchrConfigs[n]?
+                return error "no syntax? #{n}"
             result = matchr.dissect matchr.ranges Syntax.matchrConfigs[n], text 
-        # console.log 'syntax', n, text, result
         result
 
     @lineForDiss: (dss) ->
@@ -237,6 +235,9 @@ class Syntax
             else
                 @syntaxNames.push syntaxName
                 @matchrConfigs[syntaxName] = matchr.config patterns
+                
+        kork.init()
+        @syntaxNames = @syntaxNames.concat kork.exts
 
 Syntax.init()
 module.exports = Syntax

@@ -25,9 +25,9 @@ class Balancer
     setFileType: (fileType) ->
 
         lineComment = switch fileType
-            when 'coffee', 'sh', 'bat', 'noon', 'ko', 'txt' then '#'
-            when 'iss'                                      then ';'
-            else  '//'
+            when 'coffee', 'sh', 'bat', 'noon', 'ko', 'txt'         then '#'
+            when 'styl', 'cpp', 'c', 'h', 'hpp', 'cxx', 'cs', 'js'  then '//'
+            when 'iss'                                              then ';'
 
         multiComment = switch fileType
             when 'coffee'     then open: '###',  close: '###'
@@ -35,9 +35,11 @@ class Balancer
             else                   open: '/*',   close: '*/'
         
         @regions =
-            singleString:  clss: 'string single',  open: "'",   close: "'"
-            doubleString:  clss: 'string double',  open: '"',   close: '"'
-            lineComment:   clss: 'comment',        open: lineComment, close: null, force: true
+            doubleString: clss:'string double', open:'"', close:'"'
+            
+        if lineComment
+            @regions.lineComment = clss:'comment', open:lineComment, close:null, force:true
+            @headerRegExp = new RegExp("^(\\s*#{_.escapeRegExp @regions.lineComment.open}\\s*)?(\\s*0[0\\s]+)$")
 
         @regions.multiComment = 
             clss:  'comment triple'
@@ -45,14 +47,16 @@ class Balancer
             close: multiComment.close
             multi: true
 
-        @headerRegExp = new RegExp("^(\\s*#{_.escapeRegExp @regions.lineComment.open}\\s*)?(\\s*0[0\\s]+)$")
             
         switch fileType
             
             when 'coffee'
                 @regions.multiString   = clss: 'string triple',  open: '"""', close: '"""', multi: true
                 @regions.interpolation = clss: 'interpolation',  open: '#{',  close: '}',   multi: true
-                # @regions.regexp        = clss: 'regexp',  open: '/',  close: '/'
+                @regions.singleString  = clss: 'string single',  open: "'", close: "'"
+                
+            when 'js'
+                @regions.singleString  = clss: 'string single',  open: "'", close: "'"
                 
             when 'noon', 'iss'
                 @regions.lineComment.solo = true # only spaces before comments allowed
@@ -134,7 +138,7 @@ class Balancer
     
     dissForClass: (text, start, clss) ->
 
-        if @headerRegExp.test text
+        if @headerRegExp?.test text
             clss += ' header'
         
         diss = []
@@ -367,7 +371,7 @@ class Balancer
                 if @regions.regexp and ch == @regions.regexp.open
                     pushRegion @regions.regexp
                     continue
-                if ch == @regions.singleString.open
+                if ch == @regions.singleString?.open
                     pushRegion @regions.singleString
                     continue
                 if ch == @regions.doubleString.open

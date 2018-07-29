@@ -144,7 +144,7 @@ class Editor extends Buffer
                 
         # _______________________________________________________________ comment
                    
-        @lineComment = @syntax.balancer.regions.lineComment.open
+        @lineComment = @syntax.balancer.regions.lineComment?.open
         @multiComment = @syntax.balancer.regions.multiComment
                 
     #  0000000  00000000  000000000         000      000  000   000  00000000   0000000  

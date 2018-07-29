@@ -161,11 +161,11 @@ class FileSearcher extends stream.Writable
             terminal = window.terminal
             
             meta = 
-                diss:       syntax.dissForTextAndSyntax "#{slash.tilde @file}", 'ko'
-                href:       @file
-                clss:       'gitInfoFile'
-                click:      @command.onMetaClick
-                line:       '◼'
+                diss:  syntax.dissForTextAndSyntax "#{slash.tilde @file}", 'ko'
+                href:  @file
+                clss:  'gitInfoFile'
+                click: @command.onMetaClick
+                line:  '◼'
                 
             terminal.appendMeta meta
             terminal.appendMeta clss: 'spacer'

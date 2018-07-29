@@ -30,6 +30,8 @@ module.exports =
     
     toggleHeader: ->
         
+        return if not @lineComment
+        
         rgs = @salterRangesAtPos @cursorPos()
         return if not rgs
         il     = _.min (@indentationAtLineIndex r[0] for r in rgs)
@@ -60,6 +62,8 @@ module.exports =
     #  0000000   0000000   000   000  000   000  00000000  000   000     000     
     
     toggleComment: ->
+        
+        return if not @lineComment
         
         @do.start()
         newCursors    = @do.cursors()
