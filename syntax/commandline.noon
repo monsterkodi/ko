@@ -6,28 +6,28 @@
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000  
 
 (?:^\s*|\/)(\.[\-\_\w][\.\-\_\w]*)(?:\s|$)  dotfile
-([^\/]+)(\.coffee$)    . coffee  . coffee.extname
-([^\/]+)(\.noon$)      . noon    . noon.extname
-([^\/]+)(\.json$)      . json    . json.extname
-([^\/]+)(\.styl$)      . styl    . styl.extname
-([^\/]+)(\.html$)      . html    . html.extname
-([^\/]+)(\.pug$)       . pug     . pug.extname
-([^\/]+)(\.css$)       . css     . css.extname
-([^\/]+)(\.cp?p?$)     . cpp     . cpp.extname
-([^\/]+)(\.cc$)        . cpp     . cpp.extname
-([^\/]+)(\.hp?p?$)     . hpp     . hpp.extname
-([^\/]+)(\.js.map$)    . dotfile . dotfile.extname
-([^\/]+)(\.js$)        . js      . js.extname
-([^\/]+)(\.py$)        . py      . py.extname
-([^\/]+)(\.sh$)        . sh      . sh.extname
-([^\/]+)(\.md$)        . md      . md.extname
-([^\/]+)(\.txt$)       . txt     . txt.extname
-([^\/]+)(\.png|\.jpg|\.gif)$     . image . image.extname
-([^\/]+)(\.pxm|\.tiff?|\.icns)   . pic . pic.extname
+([^\/]+)(\.coffee$)    . coffee  . coffee.ext
+([^\/]+)(\.noon$)      . noon    . noon.ext
+([^\/]+)(\.json$)      . json    . json.ext
+([^\/]+)(\.styl$)      . styl    . styl.ext
+([^\/]+)(\.html$)      . html    . html.ext
+([^\/]+)(\.pug$)       . pug     . pug.ext
+([^\/]+)(\.css$)       . css     . css.ext
+([^\/]+)(\.cp?p?$)     . cpp     . cpp.ext
+([^\/]+)(\.cc$)        . cpp     . cpp.ext
+([^\/]+)(\.hp?p?$)     . hpp     . hpp.ext
+([^\/]+)(\.js.map$)    . dotfile . dotfile.ext
+([^\/]+)(\.js$)        . js      . js.ext
+([^\/]+)(\.py$)        . py      . py.ext
+([^\/]+)(\.sh$)        . sh      . sh.ext
+([^\/]+)(\.md$)        . md      . md.ext
+([^\/]+)(\.txt$)       . txt     . txt.ext
+([^\/]+)(\.png|\.jpg|\.gif)$     . image . image.ext
+([^\/]+)(\.pxm|\.tiff?|\.icns)   . pic . pic.ext
 
 ([^\/]+)(?:\/)    dir
 
-[~]                                extname
+[~]                                ext
 [\/\:]                             separator
 # [\/\:]                             xtname
 

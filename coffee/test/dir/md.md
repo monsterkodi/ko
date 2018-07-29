@@ -35,4 +35,13 @@ some 'text' with "strings". stray colon's *suck*.
     - hello **bold**
     - hello *italic*
     - hello `code`
+
+    some.txt some.md 
+    some.noon some.coffee 
+    some.svg some.png 
+    some.js some.json
+    
+    ~/some/path/file.coffee
+    some/path/file.noon
+    /path/file.txt
     

@@ -323,7 +323,7 @@ class Column
 
         stateKey = "browser|hideExtensions"
         state.set stateKey, not state.get stateKey, false
-        setStyle '.browserRow .extname', 'display', state.get(stateKey) and 'none' or 'initial'
+        setStyle '.browserRow .ext', 'display', state.get(stateKey) and 'none' or 'initial'
         @
         
     # 000000000  00000000    0000000    0000000  000   000  
