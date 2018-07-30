@@ -35,8 +35,8 @@
 ([~\/\.\-\_\ \(\)\w]+)(\.txt)([\d\:]*\b)       . txt     . txt.ext       . txt.linepos
 ([~\/\.\-\_\ \(\)\w]+)(\.ini)([\d\:]*\b)       . txt     . txt.ext       . txt.linepos
 
-([~\/\.\ \(\)@-_\w]+)(\.png|\.jpg)                       . image . image.ext
-([~\/\.\ \(\)@-_\w]+)(\.pxm|\.tiff?|\.icns|\.ico|\.gif)  . pic . pic.ext
+([~\/\.\ \(\)@-_\w]+)(\.png|\.jpg)                              . image . image.ext
+([~\/\.\ \(\)@-_\w]+)(\.pxm|\.tiff?|\.icns|\.ico|\.gif|\.bmp)   . pic . pic.ext
 ([~\/\.\-\_\ \(\)\w]+)(\.dll|\.pak|\.bin|\.msg|\.dat)\b  . dotfile   . dotfile.ext
 
 [\/\:]                                 separator

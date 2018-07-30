@@ -15,8 +15,6 @@ IndexHpp = require './indexhpp'
 
 class Indexer
 
-    # post.on 'combo', (combo, info) -> 
-    
     @requireRegExp   = /^\s*([\w\{\}]+)\s+=\s+require\s+[\'\"]([\.\/\w]+)[\'\"]/
     @includeRegExp   = /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
     @methodRegExp    = /^\s+([\@]?\w+)\s*\:\s*(\(.*\))?\s*[=-]\>/
@@ -125,8 +123,6 @@ class Indexer
             when 'project'
                 return @projectInfo filter[0]
         
-        # log 'onGet', key, filter
-        
         value = @[key]
         if not empty filter
             
@@ -171,8 +167,6 @@ class Indexer
 
     collectProjects: ->
 
-        # log 'collectProjects'
-        
         @projects = {}
         w = new Walker
             maxFiles:    5000
@@ -213,14 +207,10 @@ class Indexer
               
         @currentlyIndexing = file
         
-        # log 'indexProject', file
-        
         forkfunc './indexprj', file, (err, info) =>
             
             return error 'indexing failed', err if valid err
 
-            # log "indexProject #{info.dir} indexed: #{info.files.length} files"
-            
             delete @currentlyIndexing
             
             if info
@@ -247,8 +237,6 @@ class Indexer
 
         return if not dir? or @dirs[dir]?
         
-        log 'indexDir', dir
-        
         @dirs[dir] =
             name: slash.basename dir
 
@@ -261,7 +249,6 @@ class Indexer
             maxDepth:    12
             maxFiles:    100000
             done:        (w) => 
-                log 'indexDir done', w.cfg.root, w.cfg.files.length
                 @shiftQueue
 
         @walker = new Walker wopt

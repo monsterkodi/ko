@@ -1,16 +1,16 @@
 
-# 00     00  00000000  000   000  000   000  
-# 000   000  000       0000  000  000   000  
-# 000000000  0000000   000 0 000  000   000  
-# 000 0 000  000       000  0000  000   000  
-# 000   000  00000000  000   000   0000000   
+# 00     00  00000000  000   000  000   000
+# 000   000  000       0000  000  000   000
+# 000000000  0000000   000 0 000  000   000
+# 000 0 000  000       000  0000  000   000
+# 000   000  00000000  000   000   0000000
 
 ko
-    About                   ctrl+shift+/
+    About                   cmdctrl+shift+/
     -
-    Preferences             ctrl+shift+,
+    Preferences             cmdctrl+shift+,
     --
-    Quit                    ctrl+q
+    Quit                    cmdctrl+q
 
 # 00000000  000  000      00000000
 # 000       000  000      000
@@ -19,30 +19,30 @@ ko
 # 000       000  0000000  00000000
 
 File
-    New Tab                 ctrl+n
-    New Window              ctrl+shift+n
-    -                       
-    Open...                 ctrl+o
-    Open In New Tab...      ctrl+shift+o
+    New Tab                 cmdctrl+n
+    New Window              cmdctrl+shift+n
+    -
+    Open...                 cmdctrl+o
+    Open In New Tab...      cmdctrl+shift+o
     Open In New Window...   alt+shift+o
-    --                      
-    Save                    ctrl+s
-    Save As ...             ctrl+shift+s
-    Save All                alt+ctrl+s
-    ---                     
-    Revert                  ctrl+r
-    ----                    
-    Close Other Tabs        ctrl+shift+w
-    Close Tab or Window     ctrl+w
+    --
+    Save                    cmdctrl+s
+    Save As ...             cmdctrl+shift+s
+    Save All                alt+cmdctrl+s
+    ---
+    Revert                  cmdctrl+r
+    ----
+    Close Other Tabs        cmdctrl+shift+w
+    Close Tab or Window     cmdctrl+w
     Close Window            alt+w
 
 Edit
-    Undo                    ctrl+z
-    Redo                    ctrl+shift+z
+    Undo                    cmdctrl+z
+    Redo                    cmdctrl+shift+z
     -
-    Cut                     ctrl+x
-    Copy                    ctrl+c
-    Paste                   ctrl+v
+    Cut                     cmdctrl+x
+    Copy                    cmdctrl+c
+    Paste                   cmdctrl+v
     --
 
 #  0000000   0000000   00     00  00     00   0000000   000   000  0000000
@@ -52,14 +52,14 @@ Edit
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000
 
 Command
-    
-    Goto                    
-        accel               ctrl+;   
+
+    Goto
+        accel               cmdctrl+;
         command             goto
-    Build                   
-        accel               ctrl+b   
+    Build
+        accel               cmdctrl+b
         command             build
-    
+
     # 0000000    00000000    0000000   000   000   0000000  00000000
     # 000   000  000   000  000   000  000 0 000  000       000
     # 0000000    0000000    000   000  000000000  0000000   0000000
@@ -67,14 +67,14 @@ Command
     # 0000000    000   000   0000000   00     00  0000000   00000000
 
     Browse
-        Small               
-            accel           ctrl+.  
+        Small
+            accel           cmdctrl+.
             command         browse
-        Large               
-            accel           alt+ctrl+.
+        Large
+            accel           alt+cmdctrl+.
             command         Browse
-        -    
-        Shelf               
+        -
+        Shelf
             accel           alt+.
             command         shelf
         Add to Shelf        alt+shift+.
@@ -87,11 +87,11 @@ Command
     #  0000000   000        00000000  000   000
 
     Open
-        In New Tab      
-            accel           ctrl+p   
+        In New Tab
+            accel           cmdctrl+p
             command         open
-        In New Window       
-            accel           alt+p
+        In New Window
+            accel           cmdctrl+p
             command         new window
 
     #  0000000  00000000   0000000   00000000    0000000  000   000
@@ -101,14 +101,14 @@ Command
     # 0000000   00000000  000   000  000   000   0000000  000   000
 
     Search
-        Case Insensitive   
-            accel           ctrl+shift+f
+        Case Insensitive
+            accel           cmdctrl+shift+f
             command         search
-        Case Sensitive            
+        Case Sensitive
             command         Search
-        Regexp Case Insensitive 
+        Regexp Case Insensitive
             command         /search/
-        Regexp Case Sensitive      
+        Regexp Case Sensitive
             command         /Search/
 
     # 00000000  000  000   000  0000000
@@ -118,18 +118,18 @@ Command
     # 000       000  000   000  0000000
 
     Find
-        Case Insensitive    
-            accel           ctrl+f   
+        Case Insensitive
+            accel           cmdctrl+f
             command         find
-        Case Sensitive        
+        Case Sensitive
             command         Find
         Regexp Case Insensitive
             command         /find/
-        Regexp Case Sensitive     
+        Regexp Case Sensitive
             command         /Find/
-        Fuzzy                     
+        Fuzzy
             command         fiZd
-        Glob                    
+        Glob
             command         f*nd
 
     #  0000000   0000000   00000000  00000000  00000000  00000000
@@ -139,10 +139,11 @@ Command
     #  0000000   0000000   000       000       00000000  00000000
 
     Coffee
-        In Window Process   
-            accel           alt+c    
+        In Window Process
+            accel           alt+c
             command         coffee
-        In Main Process     alt+shift+c
+        In Main Process
+            accel           alt+shift+c
             command         Coffee
 
     # 000000000  00000000  00000000   00     00  000  000   000   0000000   000
@@ -152,11 +153,11 @@ Command
     #    000     00000000  000   000  000   000  000  000   000  000   000  0000000
 
     Terminal
-        Small               
-            accel           ctrl+,   
+        Small
+            accel           cmdctrl+,
             command         term
-        Large               
-            accel           alt+,  
+        Large
+            accel           alt+,
             command         Term
 
 # 000   000  000  00000000  000   000
@@ -166,22 +167,22 @@ Command
 #     0      000  00000000  00     00
 
 View
-    Maximize Editor         ctrl+shift+y
-    Toggle Center Text      ctrl+\
-    -   
-    Navigate Backward       ctrl+1
-    Navigate Forward        ctrl+2
-    --   
-    Activate Previous Tab   alt+ctrl+shift+left ctrl+shift+tab
-    Activate Next Tab       alt+ctrl+shift+right ctrl+tab
-    ---   
-    Move Tab Left           alt+ctrl+shift+,
-    Move Tab Right          alt+ctrl+shift+.
-    ----   
-    Font Size   
-        Increase            ctrl+=
-        Decrease            ctrl+-
-        Reset               ctrl+0
+    Maximize Editor         cmdctrl+shift+y
+    Toggle Center Text      cmdctrl+\
+    -
+    Navigate Backward       cmdctrl+1
+    Navigate Forward        cmdctrl+2
+    --
+    Activate Previous Tab   alt+cmdctrl+shift+left cmdctrl+shift+tab
+    Activate Next Tab       alt+cmdctrl+shift+right cmdctrl+tab
+    ---
+    Move Tab Left           alt+cmdctrl+shift+,
+    Move Tab Right          alt+cmdctrl+shift+.
+    ----
+    Font Size
+        Increase            cmdctrl+=
+        Decrease            cmdctrl+-
+        Reset               cmdctrl+0
 
 # 000   000  000  000   000  0000000     0000000   000   000
 # 000 0 000  000  0000  000  000   000  000   000  000 0 000
@@ -191,17 +192,17 @@ View
 
 
 Window
-    Arrange Windows         alt+ctrl+a
-    Cycle Windows           ctrl+`
+    Arrange Windows         alt+cmdctrl+a
+    Cycle Windows           cmdctrl+`
     Open Window List        alt+`
     -
     Toggle Menu             alt+m
-    Toggle Scheme           alt+i ctrl+i
+    Toggle Scheme           alt+i cmdctrl+i
     --
-    Minimize                alt+ctrl+shift+m
-    Maximize                alt+ctrl+m
-    Fullscreen              alt+ctrl+f
+    Minimize                alt+cmdctrl+shift+m
+    Maximize                alt+cmdctrl+m
+    Fullscreen              alt+cmdctrl+f
     ---
     Screenshot              f3
-    Reload                  alt+ctrl+l
-    DevTools                alt+ctrl+i
+    Reload                  alt+cmdctrl+l
+    DevTools                alt+cmdctrl+i

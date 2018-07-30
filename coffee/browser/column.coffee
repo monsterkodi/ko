@@ -6,7 +6,7 @@
  0000000   0000000   0000000   0000000   000   000  000   000
 ###
 
-{ stopEvent, setStyle, popup, keyinfo, slash, post, elem, clamp, valid, empty, pos, fs, error, log, $, _ } = require 'kxk'
+{ post, stopEvent, setStyle, keyinfo, popup, slash, valid, clamp, empty, state, open, elem, pos, fs, error, $, _ } = require 'kxk'
 
 Row        = require './row'
 Scroller   = require './scroller'
@@ -347,6 +347,20 @@ class Column
                 fs.copy @activePath(), fileName, (err) =>
                     return error 'copy file failed', err if err?
                     post.emit 'loadFile', fileName
+                    
+    # 00000000  000   000  00000000   000       0000000   00000000   00000000  00000000   
+    # 000        000 000   000   000  000      000   000  000   000  000       000   000  
+    # 0000000     00000    00000000   000      000   000  0000000    0000000   0000000    
+    # 000        000 000   000        000      000   000  000   000  000       000   000  
+    # 00000000  000   000  000        0000000   0000000   000   000  00000000  000   000  
+    
+    explorer: =>
+        
+        open slash.dir @activePath()
+        
+    open: =>
+        
+        open @activePath()
                             
     #  0000000   000  000000000  
     # 000        000     000     
@@ -403,6 +417,14 @@ class Column
             text:   'Move to Trash'
             combo:  'ctrl+backspace' 
             cb:     @moveToTrash
+        ,
+            text:   'Explorer'
+            combo:  'alt+e' 
+            cb:     @explorer
+        ,
+            text:   'Open'
+            combo:  'alt+o' 
+            cb:     @open
         ]
         
         opt.x = absPos.x
@@ -420,6 +442,8 @@ class Column
         { mod, key, combo, char } = keyinfo.forEvent event
 
         switch combo
+            when 'alt+e'               then return @explorer()
+            when 'alt+o'               then return @open()
             when 'page up', 'page down', 'home', 'end' then return stopEvent event, @navigateRows key
             when 'enter'               then return stopEvent event, @navigateCols key
             when 'command+enter', 'ctrl+enter' then return @openFileInNewWindow()
