@@ -96,7 +96,7 @@ class Tab
         sep = '■' if window.editor.newlineCharacters == '\r\n'
         @div.appendChild elem 'span', class:'dot', text:sep
         
-        sep = "<span class='dot'>⯈</span>"
+        sep = "<span class='dot'>►</span>"
         @pkg = elem 'span', class:'pkg', html: @info.pkg and (@info.pkg + sep) or ''
         @div.appendChild @pkg
             

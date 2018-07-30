@@ -1,0 +1,163 @@
+{
+  "ko": {
+    "About": "ctrl+shift+/",
+    "-": null,
+    "Preferences": "ctrl+shift+,",
+    "--": null,
+    "Quit": "ctrl+q"
+  },
+  "File": {
+    "New Tab": "ctrl+n",
+    "New Window": "ctrl+shift+n",
+    "-": null,
+    "Open...": "ctrl+o",
+    "Open In New Tab...": "ctrl+shift+o",
+    "Open In New Window...": "alt+shift+o",
+    "--": null,
+    "Save": "ctrl+s",
+    "Save As ...": "ctrl+shift+s",
+    "Save All": "alt+ctrl+s",
+    "---": null,
+    "Revert": "ctrl+r",
+    "----": null,
+    "Close Other Tabs": "ctrl+shift+w",
+    "Close Tab or Window": "ctrl+w",
+    "Close Window": "alt+w"
+  },
+  "Edit": {
+    "Undo": "ctrl+z",
+    "Redo": "ctrl+shift+z",
+    "-": null,
+    "Cut": "ctrl+x",
+    "Copy": "ctrl+c",
+    "Paste": "ctrl+v",
+    "--": null
+  },
+  "Command": {
+    "Goto": {
+      "accel": "ctrl+;",
+      "command": "goto"
+    },
+    "Build": {
+      "accel": "ctrl+b",
+      "command": "build"
+    },
+    "Browse": {
+      "Small": {
+        "accel": "ctrl+.",
+        "command": "browse"
+      },
+      "Large": {
+        "accel": "alt+ctrl+.",
+        "command": "Browse"
+      },
+      "-": null,
+      "Shelf": {
+        "accel": "alt+.",
+        "command": "shelf"
+      },
+      "Add to Shelf": "alt+shift+.",
+      "Toggle History": "alt+h"
+    },
+    "Open": {
+      "In New Tab": {
+        "accel": "ctrl+p",
+        "command": "open"
+      },
+      "In New Window": {
+        "accel": "alt+p",
+        "command": "new window"
+      }
+    },
+    "Search": {
+      "Case Insensitive": {
+        "accel": "ctrl+shift+f",
+        "command": "search"
+      },
+      "Case Sensitive": {
+        "command": "Search"
+      },
+      "Regexp Case Insensitive": {
+        "command": "/search/"
+      },
+      "Regexp Case Sensitive": {
+        "command": "/Search/"
+      }
+    },
+    "Find": {
+      "Case Insensitive": {
+        "accel": "ctrl+f",
+        "command": "find"
+      },
+      "Case Sensitive": {
+        "command": "Find"
+      },
+      "Regexp Case Insensitive": {
+        "command": "/find/"
+      },
+      "Regexp Case Sensitive": {
+        "command": "/Find/"
+      },
+      "Fuzzy": {
+        "command": "fiZd"
+      },
+      "Glob": {
+        "command": "f*nd"
+      }
+    },
+    "Coffee": {
+      "In Window Process": {
+        "accel": "alt+c",
+        "command": "coffee"
+      },
+      "In Main Process": {
+        "command": "Coffee"
+      }
+    },
+    "Terminal": {
+      "Small": {
+        "accel": "ctrl+,",
+        "command": "term"
+      },
+      "Large": {
+        "accel": "alt+,",
+        "command": "Term"
+      }
+    }
+  },
+  "View": {
+    "Maximize Editor": "ctrl+shift+y",
+    "Toggle Center Text": "ctrl+\\",
+    "-": null,
+    "Navigate Backward": "ctrl+1",
+    "Navigate Forward": "ctrl+2",
+    "--": null,
+    "Activate Previous Tab": "alt+ctrl+shift+left ctrl+shift+tab",
+    "Activate Next Tab": "alt+ctrl+shift+right ctrl+tab",
+    "---": null,
+    "Move Tab Left": "alt+ctrl+shift+,",
+    "Move Tab Right": "alt+ctrl+shift+.",
+    "----": null,
+    "Font Size": {
+      "Increase": "ctrl+=",
+      "Decrease": "ctrl+-",
+      "Reset": "ctrl+0"
+    }
+  },
+  "Window": {
+    "Arrange Windows": "alt+ctrl+a",
+    "Cycle Windows": "ctrl+`",
+    "Open Window List": "alt+`",
+    "-": null,
+    "Toggle Menu": "alt+m",
+    "Toggle Scheme": "alt+i ctrl+i",
+    "--": null,
+    "Minimize": "alt+ctrl+shift+m",
+    "Maximize": "alt+ctrl+m",
+    "Fullscreen": "alt+ctrl+f",
+    "---": null,
+    "Screenshot": "f3",
+    "Reload": "alt+ctrl+l",
+    "DevTools": "alt+ctrl+i"
+  }
+}
