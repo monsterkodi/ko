@@ -25,14 +25,14 @@ class Balancer
     setFileType: (fileType) ->
 
         lineComment = switch fileType
-            when 'coffee', 'sh', 'bat', 'noon', 'ko', 'txt'         then '#'
-            when 'styl', 'cpp', 'c', 'h', 'hpp', 'cxx', 'cs', 'js'  then '//'
-            when 'iss'                                              then ';'
+            when 'coffee', 'sh', 'bat', 'noon', 'ko', 'txt'                         then '#'
+            when 'styl', 'cpp', 'c', 'h', 'hpp', 'cxx', 'cs', 'js', 'scss', 'ts'    then '//'
+            when 'iss'                                                              then ';'
 
         multiComment = switch fileType
-            when 'coffee'     then open: '###',  close: '###'
-            when 'html', 'md' then open: '<!--', close: '-->'
-            else                   open: '/*',   close: '*/'
+            when 'coffee'                                                           then open: '###',  close: '###'
+            when 'html', 'md'                                                       then open: '<!--', close: '-->'
+            when 'styl', 'cpp', 'c', 'h', 'hpp', 'cxx', 'cs', 'js', 'scss', 'ts'    then open: '/*',   close: '*/'
         
         @regions =
             doubleString: clss:'string double', open:'"', close:'"'
@@ -41,12 +41,12 @@ class Balancer
             @regions.lineComment = clss:'comment', open:lineComment, close:null, force:true
             @headerRegExp = new RegExp("^(\\s*#{_.escapeRegExp @regions.lineComment.open}\\s*)?(\\s*0[0\\s]+)$")
 
-        @regions.multiComment = 
-            clss:  'comment triple'
-            open:  multiComment.open
-            close: multiComment.close
-            multi: true
-
+        if multiComment
+            @regions.multiComment = 
+                clss:  'comment triple'
+                open:  multiComment.open
+                close: multiComment.close
+                multi: true
             
         switch fileType
             
