@@ -38,9 +38,12 @@ menu = (template) ->
                 for k,v of value
                     if v.name and v.combo
                         menuAction = (c) -> (i,win) -> post.toWin win.id, 'menuAction', c
+                        combo = v.combo
+                        if slash.win() and v.accel
+                            combo = v.accel
                         item = 
                             text:   v.name
-                            accel:  v.accel ? v.combo
+                            accel:  combo
                         if v.menu?
                             submenu[v.menu] ?= []
                         if v.separator

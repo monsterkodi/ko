@@ -410,7 +410,8 @@ class FileEditor extends TextEditor
         
         opt = items: [
             text:   'Browse'
-            combo:  'ctrl+.' 
+            combo:  'command+.' 
+            accel:  'ctrl+.' 
             cb:     -> window.commandline.startCommand 'browse'
         ,
             text:   'Git'
@@ -420,11 +421,13 @@ class FileEditor extends TextEditor
             text:   ''
         ,
             text:   'Maximize'
-            combo:  'ctrl+shift+y' 
+            combo:  'command+shift+y' 
+            accel:  'ctrl+shift+y' 
             cb:     -> window.split.maximizeEditor()
         ,
             text:   'Log View'
-            combo:  'alt+ctrl+k'
+            combo:  'command+alt+k'
+            accel:  'alt+ctrl+k'
             cb:     window.split.toggleLog
         , 
             text:   ''        

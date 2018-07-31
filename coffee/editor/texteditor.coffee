@@ -728,7 +728,7 @@ class TextEditor extends Editor
             
             if action.combo == combo or action.accel == combo
                 switch combo
-                    when 'ctrl+a' then return @selectAll()
+                    when 'ctrl+a', 'command+a' then return @selectAll()
                 # log "unhandled on combo? #{combo}"
                 return 'unhandled'
                 
