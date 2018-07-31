@@ -6,7 +6,7 @@
 0000000    000  000   000   0000000  000   000   0000000  000   000  00000000
 ###
 
-{ post, slash, watch, log, _ } = require 'kxk'
+{ post, slash, log, fs, _ } = require 'kxk'
 
 class DirCache
 
@@ -29,12 +29,8 @@ class DirCache
         
         return if DirCache.watches[dir]
         
-        watcher = watch.watch dir, ignoreInitial:true, depth:0
-        watcher.on 'add',       DirCache.changed
-        watcher.on 'change',    DirCache.changed
-        watcher.on 'unlink',    DirCache.changed
-        watcher.on 'addDir',    DirCache.changed
-        watcher.on 'unlinkDir', DirCache.changed
+        watcher = fs.watch dir
+        watcher.on 'change', DirCache.changed
         DirCache.watches[dir] = watcher
         
         # log 'DirCache.watch', Object.keys DirCache.cache
@@ -48,7 +44,7 @@ class DirCache
         
         post.emit 'dircache', dir
 
-    @changed: (path) ->
+    @changed: (changeType, path) ->
 
         dir = slash.dir path
 

@@ -6,19 +6,22 @@
 00     00  000   000     000      0000000  000   000  00000000  000   000
 ###
 
-{ watch, log, fs } = require 'kxk'
+{ log, fs } = require 'kxk'
 
 class Watcher
 
     constructor: (@editor) ->
 
-        @w = watch.watch @editor.currentFile, ignoreInitial: true
+        @w = fs.watch @editor.currentFile
         
-        @w.on 'change', (p) =>
+        @w.on 'change', (changeType, p) =>
             
-            window.loadFile @editor.currentFile, reload:true
+            if changeType == 'change'
+                window.loadFile @editor.currentFile, reload:true
+            else
+                @editor.setText ""
             
-        @w.on 'unlink', (p) => @editor.setText ""
+        # @w.on 'unlink', (p) => @editor.setText ""
         
     stop: -> @w.close()
 

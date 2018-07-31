@@ -8,8 +8,6 @@
 
 { post, slash, fs, log } = require 'kxk'
 
-chokidar = require 'chokidar'
-
 class GitWatch
     
     constructor: (@gitDir, cb) ->
@@ -24,10 +22,11 @@ class GitWatch
             if refPath.startsWith 'ref: '
                 gitFile = slash.join @gitDir, '.git', refPath.slice(5).trim()
 
-            @watcher = chokidar.watch gitFile
-            @watcher.on 'change', (path) => 
-                cb @gitDir
-                post.emit 'gitRefChanged', @gitDir
+            @watcher = fs.watch gitFile
+            @watcher.on 'change', (changeType, path) => 
+                if changeType == 'change'
+                    cb @gitDir
+                    post.emit 'gitRefChanged', @gitDir
 
     unwatch: ->
         
