@@ -40,11 +40,13 @@ dependencies
                 fuzzy           ^0.1.3
                 ignore          ^3.3.8
                 js-beautify     ^1.7.5
+                kork            ../kork
                 kxk             ../kxk
                 mocha           ^5.2.0
                 node-abi        ^2.4.1
                 node-pty        ^0.7.4
                 noon            ^1.4.0
+                npm             ^6.2.0
                 opener          ^1.4.3
                 performance-now  ^2.1.0
                 pug             ^2.0.3
@@ -56,7 +58,6 @@ dependencies
                 traceback       ^0.3.1
                 trash           ^4.3.0
                 unused-filename  ^1.0.0
-                kork            ../kork
 optionalDependencies
                 wxw  https://github.com/monsterkodi/wxw.git
 coffeelintConfig

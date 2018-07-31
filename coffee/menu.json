@@ -1,54 +1,54 @@
 {
   "ko": {
-    "About": "ctrl+shift+/",
+    "About": "cmdctrl+shift+/",
     "-": null,
-    "Preferences": "ctrl+shift+,",
+    "Preferences": "cmdctrl+shift+,",
     "--": null,
-    "Quit": "ctrl+q"
+    "Quit": "cmdctrl+q"
   },
   "File": {
-    "New Tab": "ctrl+n",
-    "New Window": "ctrl+shift+n",
+    "New Tab": "cmdctrl+n",
+    "New Window": "cmdctrl+shift+n",
     "-": null,
-    "Open...": "ctrl+o",
-    "Open In New Tab...": "ctrl+shift+o",
+    "Open...": "cmdctrl+o",
+    "Open In New Tab...": "cmdctrl+shift+o",
     "Open In New Window...": "alt+shift+o",
     "--": null,
-    "Save": "ctrl+s",
-    "Save As ...": "ctrl+shift+s",
-    "Save All": "alt+ctrl+s",
+    "Save": "cmdctrl+s",
+    "Save As ...": "cmdctrl+shift+s",
+    "Save All": "alt+cmdctrl+s",
     "---": null,
-    "Revert": "ctrl+r",
+    "Revert": "cmdctrl+r",
     "----": null,
-    "Close Other Tabs": "ctrl+shift+w",
-    "Close Tab or Window": "ctrl+w",
+    "Close Other Tabs": "cmdctrl+shift+w",
+    "Close Tab or Window": "cmdctrl+w",
     "Close Window": "alt+w"
   },
   "Edit": {
-    "Undo": "ctrl+z",
-    "Redo": "ctrl+shift+z",
+    "Undo": "cmdctrl+z",
+    "Redo": "cmdctrl+shift+z",
     "-": null,
-    "Cut": "ctrl+x",
-    "Copy": "ctrl+c",
-    "Paste": "ctrl+v",
+    "Cut": "cmdctrl+x",
+    "Copy": "cmdctrl+c",
+    "Paste": "cmdctrl+v",
     "--": null
   },
   "Command": {
     "Goto": {
-      "accel": "ctrl+;",
+      "accel": "cmdctrl+;",
       "command": "goto"
     },
     "Build": {
-      "accel": "ctrl+b",
+      "accel": "cmdctrl+b",
       "command": "build"
     },
     "Browse": {
       "Small": {
-        "accel": "ctrl+.",
+        "accel": "cmdctrl+.",
         "command": "browse"
       },
       "Large": {
-        "accel": "alt+ctrl+.",
+        "accel": "alt+cmdctrl+.",
         "command": "Browse"
       },
       "-": null,
@@ -61,17 +61,17 @@
     },
     "Open": {
       "In New Tab": {
-        "accel": "ctrl+p",
+        "accel": "cmdctrl+p",
         "command": "open"
       },
       "In New Window": {
-        "accel": "alt+p",
+        "accel": "cmdctrl+p",
         "command": "new window"
       }
     },
     "Search": {
       "Case Insensitive": {
-        "accel": "ctrl+shift+f",
+        "accel": "cmdctrl+shift+f",
         "command": "search"
       },
       "Case Sensitive": {
@@ -86,7 +86,7 @@
     },
     "Find": {
       "Case Insensitive": {
-        "accel": "ctrl+f",
+        "accel": "cmdctrl+f",
         "command": "find"
       },
       "Case Sensitive": {
@@ -111,12 +111,13 @@
         "command": "coffee"
       },
       "In Main Process": {
+        "accel": "alt+shift+c",
         "command": "Coffee"
       }
     },
     "Terminal": {
       "Small": {
-        "accel": "ctrl+,",
+        "accel": "cmdctrl+,",
         "command": "term"
       },
       "Large": {
@@ -126,38 +127,38 @@
     }
   },
   "View": {
-    "Maximize Editor": "ctrl+shift+y",
-    "Toggle Center Text": "ctrl+\\",
+    "Maximize Editor": "cmdctrl+shift+y",
+    "Toggle Center Text": "cmdctrl+\\",
     "-": null,
-    "Navigate Backward": "ctrl+1",
-    "Navigate Forward": "ctrl+2",
+    "Navigate Backward": "cmdctrl+1",
+    "Navigate Forward": "cmdctrl+2",
     "--": null,
-    "Activate Previous Tab": "alt+ctrl+shift+left ctrl+shift+tab",
-    "Activate Next Tab": "alt+ctrl+shift+right ctrl+tab",
+    "Activate Previous Tab": "alt+cmdctrl+shift+left cmdctrl+shift+tab",
+    "Activate Next Tab": "alt+cmdctrl+shift+right cmdctrl+tab",
     "---": null,
-    "Move Tab Left": "alt+ctrl+shift+,",
-    "Move Tab Right": "alt+ctrl+shift+.",
+    "Move Tab Left": "alt+cmdctrl+shift+,",
+    "Move Tab Right": "alt+cmdctrl+shift+.",
     "----": null,
     "Font Size": {
-      "Increase": "ctrl+=",
-      "Decrease": "ctrl+-",
-      "Reset": "ctrl+0"
+      "Increase": "cmdctrl+=",
+      "Decrease": "cmdctrl+-",
+      "Reset": "cmdctrl+0"
     }
   },
   "Window": {
-    "Arrange Windows": "alt+ctrl+a",
-    "Cycle Windows": "ctrl+`",
+    "Arrange Windows": "alt+cmdctrl+a",
+    "Cycle Windows": "cmdctrl+`",
     "Open Window List": "alt+`",
     "-": null,
     "Toggle Menu": "alt+m",
-    "Toggle Scheme": "alt+i ctrl+i",
+    "Toggle Scheme": "alt+i cmdctrl+i",
     "--": null,
-    "Minimize": "alt+ctrl+shift+m",
-    "Maximize": "alt+ctrl+m",
-    "Fullscreen": "alt+ctrl+f",
+    "Minimize": "alt+cmdctrl+shift+m",
+    "Maximize": "alt+cmdctrl+m",
+    "Fullscreen": "alt+cmdctrl+f",
     "---": null,
     "Screenshot": "f3",
-    "Reload": "alt+ctrl+l",
-    "DevTools": "alt+ctrl+i"
+    "Reload": "alt+cmdctrl+l",
+    "DevTools": "alt+cmdctrl+i"
   }
 }
