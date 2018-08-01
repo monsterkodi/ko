@@ -6,7 +6,7 @@
 00     00  000   000     000      0000000  000   000  
 ###
 
-{ post, slash, fs, log } = require 'kxk'
+{ post, slash, watch, fs, log } = require 'kxk'
 
 class GitWatch
     
@@ -22,9 +22,9 @@ class GitWatch
             if refPath.startsWith 'ref: '
                 gitFile = slash.join @gitDir, '.git', refPath.slice(5).trim()
 
-            @watcher = fs.watch gitFile
-            @watcher.on 'change', (changeType, path) => 
-                if changeType == 'change'
+            @watcher = watch.file gitFile
+            @watcher.on 'change', (info) => 
+                if info.change == 'change'
                     cb @gitDir
                     post.emit 'gitRefChanged', @gitDir
 
