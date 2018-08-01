@@ -10,7 +10,7 @@
 
 ignore = require 'ignore'
 
-sourceFileExtensions = [ 'coffee', 'styl', 'pug', 'md', 'noon', 'txt', 'json', 'sh', 'py', 'cpp', 'cc', 'c', 'cs', 'h', 'hpp' ]
+sourceFileExtensions = [ 'coffee', 'styl', 'pug', 'md', 'noon', 'txt', 'json', 'sh', 'py', 'cpp', 'cc', 'c', 'cs', 'h', 'hpp', 'ts', 'js']
 
 shouldIndex = (path, stat) ->
     
@@ -53,6 +53,7 @@ indexProject = (file) ->
     depth = 20
     
     dir = slash.pkg file
+    
     if not dir
         depth = 3
         if slash.isFile file
@@ -110,8 +111,10 @@ indexProject = (file) ->
             if shouldIndex path, stat
                 info.files.push slash.path path
                 
+    # log 'indexProject done', dir
+    
     indexKoFiles kofiles, info
-        
+      
     info
 
 if module.parent

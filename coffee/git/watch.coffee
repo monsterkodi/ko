@@ -29,12 +29,9 @@ class GitWatch
             @watcher.on 'change', (info) =>
                 ref = fs.readFileSync @gitFile, 'utf8'
                 if valid(ref) and @ref != ref
-                    log "git change #{info.change} #{info.dir} #{info.path}"
                     @ref = ref
                     cb @gitDir
                     post.emit 'gitRefChanged', @gitDir
-                else
-                    log "invalid or same #{ref} #{@ref}"
 
     unwatch: ->
         

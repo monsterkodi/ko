@@ -196,9 +196,11 @@ class Indexer
     
     indexProject: (file) ->
         
+        
         if @currentlyIndexing
             @indexQueue ?= []
-            @indexQueue.push file
+            if file not in @indexQueue
+                @indexQueue.push file
             return
         
         file = slash.resolve file 
@@ -210,7 +212,7 @@ class Indexer
         forkfunc './indexprj', file, (err, info) =>
             
             return error 'indexing failed', err if valid err
-
+            
             delete @currentlyIndexing
             
             if info

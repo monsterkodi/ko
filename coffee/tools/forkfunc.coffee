@@ -14,7 +14,7 @@ if module.parent
     # 000 0 000  000   000  000  000  0000
     # 000   000  000   000  000  000   000
 
-    { childp, slash } = require 'kxk'
+    { childp, slash, log } = require 'kxk'
 
     forkfunc = (file, args..., callback) ->
         
@@ -30,7 +30,8 @@ if module.parent
         parse()
         
         try
-            cp = childp.fork __filename, stdio: ['pipe', 'pipe', 'pipe', 'ipc'], execPath: 'node'
+            cp = childp.fork __filename
+            
             onExit = ->
                 cp.removeListener 'message', onResult
                 cp.removeListener 'exit',    onExit
@@ -38,10 +39,11 @@ if module.parent
                 cp.kill()
                 
             onResult = (msg) -> 
-                result = JSON.parse msg
+                result = msg
                 callback result.err, result.result
                 onExit()
                 
+            cp.on 'error',   (err) -> callback err, null
             cp.on 'message', onResult
             cp.on 'exit',    onExit
 
@@ -65,10 +67,12 @@ else
     # 000       000   000  000  000      000   000
     #  0000000  000   000  000  0000000  0000000
 
+    { log } = require 'kxk'
+    
     sendResult = (err, result) ->
         
         process.removeListener 'message', callFunc
-        process.send JSON.stringify(err:err, result:result), ->
+        process.send {err:err, result:result}, ->
             process.disconnect() if process.connected
             process.exit 0
         
