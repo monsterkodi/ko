@@ -8,8 +8,6 @@
 
 { post, slash, watch, log, _ } = require 'kxk'
 
-watch = require 'wt'
-
 class DirCache
 
     @cache   = {}
@@ -30,10 +28,9 @@ class DirCache
     @watch: (dir) ->
         
         return if DirCache.watches[dir]
-        return if slash.ext(dir) == 'asar'
         
-        watcher = watch.watch [dir], ignoreHidden:false
-        watcher.on 'all', DirCache.onChange
+        watcher = watch.dir dir
+        watcher.on 'change', DirCache.onChange
         watcher.on 'error', (err) -> log "wt.error #{err}"
         DirCache.watches[dir] = watcher
         
@@ -48,15 +45,9 @@ class DirCache
 
     @onChange: (info) ->
 
-        if info.isDirectory
-            dir = slash.path info.path
-        else
-            dir = slash.dir info.path
+        dir = info.dir
 
         if DirCache.cache[dir]
             DirCache.unwatch dir
-            
-        if info.remove and DirCache.cache[slash.path info.path]
-            DirCache.unwatch slash.path info.path
             
 module.exports = DirCache

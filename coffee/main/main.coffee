@@ -92,6 +92,7 @@ class Main extends app
         
         super
             dir:        __dirname
+            dirs:       ['../', '../browser', '../commandline', '../commands', '../editor', '../git', '../main', '../tools', '../win']
             pkg:        pkg
             shortcut:   'CmdOrCtrl+F1'
             index:      '../index.html'

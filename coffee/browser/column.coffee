@@ -10,7 +10,6 @@
 
 Row        = require './row'
 Scroller   = require './scroller'
-fuzzaldrin = require 'fuzzaldrin'
 fuzzy      = require 'fuzzy'
 trash      = require 'trash'
 

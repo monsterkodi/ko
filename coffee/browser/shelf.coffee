@@ -11,7 +11,6 @@
 Row        = require './row'
 Scroller   = require './scroller'
 Column     = require './column'
-fuzzaldrin = require 'fuzzaldrin'
 fuzzy      = require 'fuzzy'
 hub        = require '../git/hub'
 

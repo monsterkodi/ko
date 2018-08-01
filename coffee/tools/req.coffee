@@ -22,13 +22,16 @@ req = (file, lines, words, editor) ->
     
     if pkgPath = slash.pkg file
         projectFiles = post.get('indexer', 'project', pkgPath).files
-        projectFiles = projectFiles.filter (f) -> slash.ext(f) in ['coffee', 'json', 'js']
-        projectFiles = projectFiles.map (f) -> 
-            p = slash.splitExt(slash.relative f, slash.dir file)[0]
-            p = '.' + p if not p.startsWith '.'
-            p
-    else
-        projectFiles = []
+        if valid projectFiles
+            projectFiles = projectFiles.filter (f) -> slash.ext(f) in ['coffee', 'json', 'js']
+            projectFiles = projectFiles.map (f) -> 
+                p = slash.splitExt(slash.relative f, slash.dir file)[0]
+                p = '.' + p if not p.startsWith '.'
+                p
+        else
+            log "req:- no projectFiles for '#{pkgPath}'??"
+                
+    projectFiles ?= []
     
     requires  = {}
     reqvalues = {}
