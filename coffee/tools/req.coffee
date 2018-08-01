@@ -48,10 +48,10 @@ req = (file, lines, words, editor) ->
             
         for k in Object.keys kxk
             continue if reqvalues[k]
-            regex = if k == '$'
-                new RegExp "[^*\\)\'\"\\\\]\\$"
+            if k == '$'
+                regex = new RegExp "[^*\\)\'\"\\\\]\\$"
             else
-                new RegExp "(^|[:(]|\\s+)#{k}(\\s+[^:]|\\s*$|[\\.\\(])"
+                regex = new RegExp "(^|[\\:\\(\\{]|\\s+)#{k}(\\s+[^:]|\\s*$|[\\.\\(])"
             if regex.test lines[li]
                 diss = editor.syntax.getDiss li
                 diss = diss.filter (d) -> not d.clss.startsWith('comment') and not d.clss.startsWith('string')

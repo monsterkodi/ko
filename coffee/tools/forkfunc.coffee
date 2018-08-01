@@ -34,7 +34,7 @@ if module.parent
             onExit = ->
                 cp.removeListener 'message', onResult
                 cp.removeListener 'exit',    onExit
-                cp.disconnect()
+                cp.disconnect() if cp.connected
                 cp.kill()
                 
             onResult = (msg) -> 
@@ -69,7 +69,7 @@ else
         
         process.removeListener 'message', callFunc
         process.send JSON.stringify(err:err, result:result), ->
-            process.disconnect()
+            process.disconnect() if process.connected
             process.exit 0
         
     callFunc = (msg) ->

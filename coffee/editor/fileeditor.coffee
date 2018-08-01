@@ -84,7 +84,7 @@ class FileEditor extends TextEditor
 
         @setupFileType()
 
-        if @currentFile?
+        if @currentFile? and slash.fileExists @currentFile
 
             @watch = new watcher @
 
@@ -103,6 +103,7 @@ class FileEditor extends TextEditor
 
         if not @currentFile?
             post.emit 'file', null # titlebar & tabs & tab & shelf
+            
         @emit 'file', @currentFile # diffbar, pigments, ...
 
     restoreFromTabState: (tabsState) ->

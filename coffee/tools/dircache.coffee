@@ -6,7 +6,9 @@
 0000000    000  000   000   0000000  000   000   0000000  000   000  00000000
 ###
 
-{ post, slash, log, fs, _ } = require 'kxk'
+{ post, slash, watch, log, _ } = require 'kxk'
+
+watch = require 'wt'
 
 class DirCache
 
@@ -25,15 +27,15 @@ class DirCache
         for dir in Object.keys DirCache.cache
             DirCache.unwatch dir
     
-    @watch: (dir) -> 
+    @watch: (dir) ->
         
         return if DirCache.watches[dir]
+        return if slash.ext(dir) == 'asar'
         
-        watcher = fs.watch dir
-        watcher.on 'change', DirCache.changed
+        watcher = watch.watch [dir], ignoreHidden:false
+        watcher.on 'all', DirCache.onChange
+        watcher.on 'error', (err) -> log "wt.error #{err}"
         DirCache.watches[dir] = watcher
-        
-        # log 'DirCache.watch', Object.keys DirCache.cache
         
     @unwatch: (dir) -> 
         
@@ -44,11 +46,17 @@ class DirCache
         
         post.emit 'dircache', dir
 
-    @changed: (changeType, path) ->
+    @onChange: (info) ->
 
-        dir = slash.dir path
+        if info.isDirectory
+            dir = slash.path info.path
+        else
+            dir = slash.dir info.path
 
         if DirCache.cache[dir]
             DirCache.unwatch dir
-        
+            
+        if info.remove and DirCache.cache[slash.path info.path]
+            DirCache.unwatch slash.path info.path
+            
 module.exports = DirCache
