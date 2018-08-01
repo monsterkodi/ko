@@ -23,7 +23,8 @@ class GitWatch
                 gitFile = slash.join @gitDir, '.git', refPath.slice(5).trim()
 
             @watcher = watch.file gitFile
-            @watcher.on 'change', (info) => 
+            @watcher.on 'change', (info) =>
+                log "git change #{info.change} #{info.file}"
                 if info.change == 'change'
                     cb @gitDir
                     post.emit 'gitRefChanged', @gitDir
