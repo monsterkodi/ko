@@ -25,9 +25,9 @@ class Balancer
     setFileType: (fileType) ->
 
         lineComment = switch fileType
-            when 'coffee', 'sh', 'bat', 'noon', 'ko', 'txt'                         then '#'
+            when 'coffee', 'sh', 'bat', 'noon', 'ko', 'txt', 'fish'                 then '#'
             when 'styl', 'cpp', 'c', 'h', 'hpp', 'cxx', 'cs', 'js', 'scss', 'ts'    then '//'
-            when 'iss'                                                              then ';'
+            when 'iss', 'ini'                                                       then ';'
 
         multiComment = switch fileType
             when 'coffee'                                                           then open: '###',  close: '###'

@@ -1,6 +1,6 @@
 name            ko
 productName     ko
-version         0.169.0
+version         0.171.0
 description     text editor
 main            js/main/main.js
 preferGlobal    true
@@ -54,7 +54,6 @@ dependencies
                 traceback       ^0.3.1
                 trash           ^4.3.0
                 unused-filename  ^1.0.0
-                wt              ^1.2.0
 optionalDependencies
                 wxw  ../wxw
 coffeelintConfig

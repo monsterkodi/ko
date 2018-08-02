@@ -194,6 +194,7 @@ class Tabs
         tab = new Tab @
         tab.update file:file
         @tabs.push tab
+        tab.setActive()
         @update()
             
         tab

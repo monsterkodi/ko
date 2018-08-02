@@ -230,7 +230,7 @@ span.macro
 //    000     000   000  0000000    0000000
 
 .tabs
-    background          frameColor // titleColor
+    background          frameColor
     color               #aaa
 
 #titlebar.focus .tabs
@@ -242,17 +242,23 @@ span.macro
 //    000     000   000  000   000
 //    000     000   000  0000000
 
+.tab .dot
+    color               #444
+    &.focus
+        color           #060
+        
 .tab.dirty
 .tab.dirty .dot
     color               #aaf
 
-.tab.clean .dot
-    color               #444
-    &.focus
-        color           #060
 
+.tab:hover
+    opacity             1
+    
+.dot:hover
+    color               #f80
+    
 .tab
-    // background          #111
     background          frameColor
     &.active
         background      titleColor

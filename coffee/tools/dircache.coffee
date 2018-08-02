@@ -31,7 +31,7 @@ class DirCache
         
         watcher = watch.dir dir
         watcher.on 'change', DirCache.onChange
-        watcher.on 'error', (err) -> log "wt.error #{err}"
+        watcher.on 'error', (err) -> log "watch.error #{err}"
         DirCache.watches[dir] = watcher
         
     @unwatch: (dir) -> 
