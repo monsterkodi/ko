@@ -101,14 +101,14 @@ class Tab
         @div.appendChild @pkg
             
         diss = syntax.dissForTextAndSyntax slash.basename(@file()), 'ko' #, join: true 
-        name = elem 'span', class:'name', html:render.line(diss, charWidth:0)
+        name = elem 'span', class:'name', html:render.line diss, charWidth:0
         @div.appendChild name
 
         @div.appendChild elem 'span', class:'tabdrag'
         
         if @info.file?
             diss = syntax.dissForTextAndSyntax slash.tilde(@file()), 'ko' #, join: true 
-            html = render.line(diss, charWidth:0)
+            html = render.line diss, charWidth:0
             @tooltip = new tooltip elem:name, html:html, x:0
             
         @div.appendChild elem 'span', class:'dot', text:'●' if @dirty()

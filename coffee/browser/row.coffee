@@ -54,15 +54,15 @@ class Row
         if @item.icon
             className = @item.icon
         else
-            className = fileIcons.getClass slash.removeLinePos @item.file
-            if empty className
-                if @item.type == 'dir'
-                    className = 'folder-icon'
+            if @item.type == 'dir'
+                className = 'folder-icon'
+            else
+                if slash.ext(@item.file) == 'noon'
+                    className = 'noon-icon'
                 else
-                    if slash.ext(@item.file) == 'noon'
-                        className = 'noon-icon'
-                    else
-                        className = 'file-icon'
+                    className = fileIcons.getClass slash.removeLinePos @item.file
+                    # log 'icon.getClass', slash.removeLinePos(@item.file), className
+                className ?= 'file-icon'
             
         icon = elem('span', class:className + ' browserFileIcon')
             

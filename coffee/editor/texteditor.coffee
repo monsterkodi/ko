@@ -369,7 +369,8 @@ class TextEditor extends Editor
     updateLinePositions: (animate=0) ->
         
         for li, div of @lineDivs
-            return error 'no div?' if not div? or not div.style?
+            if not div? or not div.style?
+                return error 'no div?', div?
             y = @size.lineHeight * (li - @scroll.top)
             div.style.transform = "translate3d(#{@size.offsetX}px,#{y}px, 0)"
             div.style.transition = "all #{animate/1000}s" if animate

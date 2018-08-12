@@ -105,6 +105,7 @@ class Numbers extends event
     updateLinePositions: ->
 
         for li, div of @lineDivs
+            continue if not div?.style
             y = @editor.size.lineHeight * (li - @editor.scroll.top)
             div.style.transform = "translate3d(0, #{y}px, 0)"
         
