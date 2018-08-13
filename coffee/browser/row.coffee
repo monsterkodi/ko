@@ -60,7 +60,10 @@ class Row
                 if slash.ext(@item.file) == 'noon'
                     className = 'noon-icon'
                 else
-                    className = fileIcons.getClass slash.removeLinePos @item.file
+                    try
+                        className = fileIcons.getClass slash.removeLinePos @item.file
+                    catch err
+                        log "no icon? #{@item.file}"
                     # log 'icon.getClass', slash.removeLinePos(@item.file), className
                 className ?= 'file-icon'
             
