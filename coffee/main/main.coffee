@@ -6,8 +6,7 @@
 000   000  000   000  000  000   000
 ###
 
-{ post, app, args, udp, stopEvent, fileList, first, colors, about, prefs, 
-  state, store, noon, slash, os, fs, str, empty, valid, error, log, _ } = require 'kxk'
+{ post, fileList, colors, first, empty, slash, valid, state, store, prefs, noon, args, win, app, udp, fs, log, _ } = require 'kxk'
 
 # post.debug()
 # log.slog.debug = true
@@ -22,12 +21,12 @@ Indexer  = require './indexer'
 { BrowserWindow, clipboard, dialog } = electron
 
 disableSnap   = false
-main          = undefined # < created in app.on 'ready'
-coffeeExecute = undefined # <
+main          = undefined
+coffeeExecute = undefined
 openFiles     = []
 WIN_SNAP_DIST = 150
 
-process.env.NODE_ENV = 'production' # ???
+# process.env.NODE_ENV = 'production' # ???
     
 mostRecentFile = -> first state.get 'recentFiles'
 
