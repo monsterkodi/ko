@@ -6,7 +6,7 @@
 000   000  00000000  000   000   0000000 
 ###
 
-{ fileList, post, slash, fs, str, log, _ } = require 'kxk'
+{ filelist, post, slash, os, fs, str, log, _ } = require 'kxk'
 
 Syntax    = require '../editor/syntax'
 Transform = require '../editor/actions/transform'
@@ -22,7 +22,7 @@ menu = (template) ->
         
     template = _.cloneDeep template
         
-    actionFiles = fileList slash.join __dirname, '../editor/actions'
+    actionFiles = filelist slash.join __dirname, '../editor/actions'
     submenu = Misc: []
 
     EditMenu = []
@@ -39,7 +39,7 @@ menu = (template) ->
                     if v.name and v.combo
                         menuAction = (c) -> (i,win) -> post.toWin win.id, 'menuAction', c
                         combo = v.combo
-                        if slash.win() and v.accel
+                        if os.platform() != 'darwin' and v.accel
                             combo = v.accel
                         item = 
                             text:   v.name

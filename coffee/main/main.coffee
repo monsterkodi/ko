@@ -6,7 +6,7 @@
 000   000  000   000  000  000   000
 ###
 
-{ post, fileList, colors, first, empty, slash, valid, state, store, prefs, noon, args, win, app, udp, fs, log, _ } = require 'kxk'
+{ post, filelist, colors, first, empty, slash, valid, state, store, prefs, noon, args, win, app, udp, fs, log, _ } = require 'kxk'
 
 # post.debug()
 # log.slog.debug = true
@@ -145,7 +145,7 @@ class Main extends app
         coffeeExecute = new Execute main: @
 
         if not openFiles.length and valid args.filelist
-            openFiles = fileList args.filelist, ignoreHidden:false
+            openFiles = filelist args.filelist, ignoreHidden:false
 
         @moveWindowStashes()
         
@@ -392,7 +392,7 @@ class Main extends app
     restoreWindows: ->
 
         fs.ensureDirSync @userData
-        stashFiles = fileList slash.join(@userData, 'old'), matchExt:'noon'
+        stashFiles = filelist slash.join(@userData, 'old'), matchExt:'noon'
         if not empty stashFiles
             for file in stashFiles
                 win = @createWindow()

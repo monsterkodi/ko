@@ -6,7 +6,7 @@
 000   000  000   000   0000000  000   000   0000000
 ###
 
-{ post, reversed, fileList, empty, slash, valid, args, fs, error, log, _ } = require 'kxk'
+{ post, reversed, filelist, empty, slash, valid, args, fs, error, log, _ } = require 'kxk'
   
 indexer   = require '../main/indexer'
 salt      = require '../tools/salt'
@@ -135,7 +135,7 @@ class Macro extends Command
                 mocha = new Mocha()
                 
                 if _.isEmpty args
-                    files = fileList slash.join(__dirname, '..', 'test'), matchExt:['js', 'coffee']
+                    files = filelist slash.join(__dirname, '..', 'test'), matchExt:['js', 'coffee']
                 else
                     files = (slash.join(__dirname, '..', 'test', f + '.js') for f in args)
                 for file in files

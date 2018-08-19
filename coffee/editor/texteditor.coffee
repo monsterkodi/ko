@@ -733,7 +733,7 @@ class TextEditor extends Editor
                 # log "unhandled on combo? #{combo}"
                 return 'unhandled'
                 
-            if action.accels? and slash.win()
+            if action.accels? and os.platform() != 'darwin'
                 for actionCombo in action.accels
                     if combo == actionCombo
                         if action.key? and _.isFunction @[action.key]

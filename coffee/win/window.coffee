@@ -6,7 +6,7 @@
 00     00  000  000   000  0000000     0000000   00     00
 ###
 
-{ post, win, stopEvent, fileList, keyinfo, prefs, state, stash, first, reversed, childp, 
+{ post, win, stopEvent, filelist, keyinfo, prefs, state, stash, first, reversed, childp, 
   drag, noon, slash, clamp, pos, str, sw, sh, os, fs, valid, empty, log, error, _ } = require 'kxk'
 
 menu = require './menu'
@@ -383,7 +383,7 @@ openFiles = (ofiles, options) -> # called from file dialog, open command and bro
 
     if ofiles?.length
 
-        files = fileList ofiles, ignoreHidden: false
+        files = filelist ofiles, ignoreHidden: false
 
         if files.length >= 10
             answer = dialog.showMessageBox

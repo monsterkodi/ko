@@ -6,7 +6,7 @@
 0000000    000   000   0000000   00     00  0000000   00000000  
 ###
 
-{ post, slash, fileList, stopEvent, valid, empty, str, os, clamp, log, error, $ } = require 'kxk'
+{ post, slash, stopEvent, valid, empty, str, os, clamp, log, error, $ } = require 'kxk'
 
 Command     = require '../commandline/command'
 FileBrowser = require '../browser/filebrowser'

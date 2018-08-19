@@ -6,7 +6,7 @@
  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 ###
 
-{ post, fileList, stopEvent, elem, keyinfo, clamp, slash, error, log, str, os, $, _ } = require 'kxk'
+{ post, filelist, stopEvent, elem, keyinfo, clamp, slash, error, log, str, os, $, _ } = require 'kxk'
 
 TextEditor = require '../editor/texteditor'
 
@@ -80,7 +80,7 @@ class Commandline extends TextEditor
 
     loadCommands: ->
 
-        files = fileList "#{__dirname}/../commands"
+        files = filelist "#{__dirname}/../commands"
         for file in files
             continue if slash.ext(file) != 'js'
             try
