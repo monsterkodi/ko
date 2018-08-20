@@ -36,7 +36,7 @@ class Render
                 span = elem 'span'
                 span.style.transform = "translatex(#{d.start * size.charWidth}px)"
                 span.className = d.clss if d.clss?
-                span.textContent = d.match.replace /\x1b/g, '⍈'
+                span.textContent = d.match.replace /\x1b/g, '🅴'
                 if d.styl?
                     for st in d.styl.split ';'
                         ss = st.split ':'
