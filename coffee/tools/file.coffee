@@ -11,8 +11,14 @@
 class File
 
     @atomic: (file, text, mode, cb) ->
-        
+
         atomic file, text, { encoding: 'utf8', mode: mode }, (err) ->
+            if valid err then cb err
+            else cb null, file
+        
+    @write: (file, text, mode, cb) ->
+            
+        fs.writeFile file, text, { encoding: 'utf8', mode: mode }, (err) ->
             if valid err then cb err
             else cb null, file
     
@@ -23,7 +29,7 @@ class File
             if valid err
                 cb err
             else
-                File.atomic file, text, 0o666, cb
+                File.write file, text, 0o666, cb
             
     @p4edit: (file, text, cb) ->
         
@@ -33,7 +39,7 @@ class File
                     if valid err
                         File.unlock file, text, cb
                     else
-                        File.atomic file, text, 0o666, cb
+                        File.write file, text, 0o666, cb
             catch err
                 File.unlock file, text, cb
         else
@@ -48,12 +54,12 @@ class File
                     
                     if writable
                         
-                        File.atomic file, text, stat.mode, cb
+                        File.write file, text, stat.mode, cb
                         
                     else
                         
                         File.p4edit file, text, cb
             else
-                File.atomic file, text, 438, cb
+                File.write file, text, 438, cb
         
 module.exports = File

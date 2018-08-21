@@ -26,6 +26,10 @@ class Projects
         
     @files: (file) ->
         
+        if not file
+            log 'project.files without file?'
+            return []
+        
         for dir,list of files
             if file.startsWith(dir)
                 return list
