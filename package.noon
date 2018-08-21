@@ -36,14 +36,14 @@ dependencies
                 download        ^7.1.0
                 file-icons-js   ^1.0.3
                 fuzzy           ^0.1.3
-                ignore          ^4.0.3
+                ignore          ^5.0.2
                 js-beautify     ^1.7.5
                 kork            ../kork
                 kxk             ../kxk
                 mocha           ^5.2.0
                 node-abi        ^2.4.3
                 node-pty        ^0.7.6
-                npm             ^6.2.0
+                npm             ^6.4.0
                 performance-now  ^2.1.0
                 pug             ^2.0.3
                 seamless-immutable  ^7.1.3
@@ -69,7 +69,6 @@ coffeelintConfig
                   value   4
                   level   warn
 devDependencies
-                devtron         ^1.4.0
-                electron        ^2.0.6
-                electron-packager  ^12.1.0
+                electron        ^2.0.7
+                electron-packager  ^12.1.1
                 electron-rebuild  ^1.8.2
