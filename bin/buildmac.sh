@@ -3,7 +3,7 @@ cd `dirname $0`/..
 
 if rm -rf ko-darwin-x64; then
 
-    konrad --run
+    ../konrad/bin/konrad --run
     node_modules/.bin/electron-rebuild
     
     IGNORE="/(.*\.dmg$|Icon$|.*md$|.*\.lock$|three/examples)"
