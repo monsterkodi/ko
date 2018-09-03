@@ -57,7 +57,7 @@ menu = (template) ->
     editMenu = getMenu template, 'Edit'
     editMenu.menu = editMenu.menu.concat EditMenu
     
-    MacroMenu = [ text:'Macro', accel:'ctrl+m', command:'macro' ]
+    MacroMenu = [ text:'Macro', combo:'command+m', accel:'ctrl+m', command:'macro' ]
     for macro in Macro.macroNames
         MacroMenu.push
             text:   macro
