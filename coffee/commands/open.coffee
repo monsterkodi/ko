@@ -169,7 +169,11 @@ class Open extends Command
         opt.flat ?= true
         
         iconSpan = (file) ->
-            className = fileIcons.getClass file
+            try
+                className = fileIcons.getClass file
+            catch e
+                error e
+            
             if empty className
                 if slash.ext(file) == 'noon'
                     className = 'noon-icon'

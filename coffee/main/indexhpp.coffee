@@ -93,11 +93,11 @@ class IndexHpp
                             @tokenStack.push
                                 line:   lineIndex
                                 col:    p
+                                class:  match[1]
                                 method: match[2]
                                 depth:  0
-                                class:  match[1]
-                                
-                            if match[1] not in @result.classes.map (ci) -> ci.name
+                            
+                            if match[1] not in @result.classes.map((ci) -> ci.name)
                                 @result.classes.push
                                     line:   lineIndex
                                     col:    p
