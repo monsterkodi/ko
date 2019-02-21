@@ -172,7 +172,7 @@ class Open extends Command
             try
                 className = fileIcons.getClass file
             catch e
-                error e
+                console.log e
             
             if empty className
                 if slash.ext(file) == 'noon'
