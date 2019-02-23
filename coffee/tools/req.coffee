@@ -83,6 +83,7 @@ req = (file, lines, words, editor) ->
                 modValues.push value:word, module:word.toLowerCase()
 
     kxkValues = _.uniq kxkValues
+    kxkValues = kxkValues.filter (v) -> v not in ['state']
     
     log "req.req kxkValues:#{kxkValues}"
       

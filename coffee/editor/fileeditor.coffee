@@ -415,9 +415,9 @@ class FileEditor extends TextEditor
             accel:  'ctrl+.' 
             cb:     -> window.commandline.startCommand 'browse'
         ,
-            text:   'Git'
-            combo:  'alt+g'
-            cb:     -> post.emit 'menuAction', 'doMacro', actarg:'git'
+            text:   'Back'
+            combo:  'command+1'
+            cb:     -> post.emit 'menuAction', 'Navigate Backward'
         ,
             text:   ''
         ,

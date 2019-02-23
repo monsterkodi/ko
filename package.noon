@@ -1,6 +1,6 @@
 name            ko
 productName     ko
-version         0.185.0
+version         0.187.0
 description     text editor
 main            js/main/main.js
 preferGlobal    true
