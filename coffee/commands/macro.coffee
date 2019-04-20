@@ -24,9 +24,9 @@ class Macro extends Command
 
         super commandline
 
-        @macros    = Macro.macroNames
-        @macros    = @macros.concat Transform.transformNames
-        @names     = ['macro']
+        @macros = Macro.macroNames
+        @macros = @macros.concat Transform.transformNames
+        @names  = ['macro']
         
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000
@@ -96,9 +96,12 @@ class Macro extends Command
             # 000   000  000      000  000  0000  000  000   
             # 0000000    0000000  000  000   000  000   000  
             
-            when 'blink' 
+            when 'blink'
                 editor.toggleBlink()
-                @commandline.startBlink()
+                if prefs.get 'blink'
+                    @commandline.startBlink()
+                else
+                    @commandline.stopBlink()
                 
             #  0000000   0000000   000       0000000   00000000   
             # 000       000   000  000      000   000  000   000  

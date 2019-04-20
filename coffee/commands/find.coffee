@@ -16,8 +16,8 @@ class Find extends Command
         
         super commandline
         
-        @types     = ['str',  'Str',   'reg',    'Reg',    'fuzzy', 'glob']
-        @names     = ['find', 'Find',  '/find/', '/Find/', 'fiZd',  'f*nd']
+        @types = ['str',  'Str',   'reg',    'Reg',    'fuzzy', 'glob']
+        @names = ['find', 'Find',  '/find/', '/Find/', 'fiZd',  'f*nd']
        
     historyKey: -> @name
         

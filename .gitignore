@@ -4,7 +4,6 @@ package.json
 *-x64
 *-ia32
 inno
-bin/download.js
 bin/*.json
 bin/*.js.map
 js

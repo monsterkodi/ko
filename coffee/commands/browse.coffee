@@ -18,10 +18,10 @@ class Browse extends Command
 
         super commandline
 
-        @cmdID     = 0
-        @browser   = new FileBrowser $ 'browser'
-        @commands  = Object.create null
-        @names     = ["browse", "Browse", "shelf"]
+        @cmdID    = 0
+        @browser  = new FileBrowser $ 'browser'
+        @commands = Object.create null
+        @names    = ["browse", "Browse", "shelf"]
         
         post.on 'file', @onFile
         

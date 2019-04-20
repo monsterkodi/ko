@@ -505,6 +505,7 @@ class TextEditor extends Editor
     doBlink: =>
 
         @blink = not @blink
+        
         @cursorDiv()?.classList.toggle 'blink', @blink
         @minimap?.drawMainCursor @blink
         
@@ -512,7 +513,10 @@ class TextEditor extends Editor
         blinkDelay = prefs.get 'cursorBlinkDelay', [800,200]
         @blinkTimer = setTimeout @doBlink, @blink and blinkDelay[1] or blinkDelay[0]
 
-    startBlink: -> @doBlink()
+    startBlink: -> 
+    
+        if not @blinkTimer and prefs.get 'blink'
+            @doBlink() 
 
     stopBlink: ->
 

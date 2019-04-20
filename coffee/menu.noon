@@ -56,9 +56,6 @@ Command
     Goto
         accel               cmdctrl+;
         command             goto
-    Build
-        accel               cmdctrl+b
-        command             build
 
     # 0000000    00000000    0000000   000   000   0000000  00000000
     # 000   000  000   000  000   000  000 0 000  000       000
@@ -145,8 +142,8 @@ View
     Navigate Backward       cmdctrl+1
     Navigate Forward        cmdctrl+2
     --
-    Activate Previous Tab   alt+cmdctrl+shift+left cmdctrl+shift+tab
-    Activate Next Tab       alt+cmdctrl+shift+right cmdctrl+tab
+    Activate Previous Tab   alt+cmdctrl+shift+left 
+    Activate Next Tab       alt+cmdctrl+shift+right 
     ---
     Move Tab Left           alt+cmdctrl+shift+,
     Move Tab Right          alt+cmdctrl+shift+.

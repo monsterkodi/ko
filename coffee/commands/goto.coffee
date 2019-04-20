@@ -16,7 +16,7 @@ class Goto extends Command
         
         super commandline
         
-        @names     = ['goto', 'selecto']
+        @names = ['goto', 'selecto']
 
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   

@@ -8,20 +8,20 @@
 
 { post, stopEvent, setStyle, keyinfo, popup, slash, valid, clamp, empty, state, open, elem, pos, fs, error, $, _ } = require 'kxk'
 
-Row        = require './row'
-Scroller   = require './scroller'
-fuzzy      = require 'fuzzy'
-trash      = require 'trash'
+Row      = require './row'
+Scroller = require './scroller'
+fuzzy    = require 'fuzzy'
+trash    = require 'trash'
 
 class Column
     
     constructor: (@browser) ->
         
         @index = @browser.columns?.length
-        @search = ''
         @searchTimer = null
-        @items = []
-        @rows = []
+        @search = ''
+        @items  = []
+        @rows   = []
         
         @div   = elem class: 'browserColumn', tabIndex: 6, id: @name()
         @table = elem class: 'browserColumnTable'

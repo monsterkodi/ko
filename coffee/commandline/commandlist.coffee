@@ -24,10 +24,10 @@ class CommandList extends TextEditor
             syntaxName: opt.syntaxName ? 'ko'
             scrollOffset: 0
 
-        @name       = 'commandlist-editor'
-        @items      = []
-        @maxLines   = 17
-        @metaQueue  = []
+        @name      = 'commandlist-editor'
+        @items     = []
+        @maxLines  = 17
+        @metaQueue = []
 
         @numbers.elem.style.fontSize = "19px"
 

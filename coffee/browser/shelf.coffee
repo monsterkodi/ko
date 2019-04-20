@@ -8,11 +8,11 @@
 
 { stopEvent, keyinfo, slash, state, post, popup, elem, clamp, empty, first, last, error, log, $, _ } = require 'kxk'
 
-Row        = require './row'
-Scroller   = require './scroller'
-Column     = require './column'
-fuzzy      = require 'fuzzy'
-hub        = require '../git/hub'
+Row      = require './row'
+Scroller = require './scroller'
+Column   = require './column'
+fuzzy    = require 'fuzzy'
+hub      = require '../git/hub'
 
 indexAndItemInItemsWithFunc = (item, items, withFunc) ->
     

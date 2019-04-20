@@ -8,9 +8,9 @@
 
 { elem, keyinfo, drag, clamp, stopEvent, empty, post, slash, error, log, fs, $, _ } = require 'kxk' 
 
-Syntax      = require '../editor/syntax'
-fileIcons   = require 'file-icons-js'
-electron    = require 'electron'
+Syntax    = require '../editor/syntax'
+fileIcons = require 'file-icons-js'
+electron  = require 'electron'
 
 app = electron.remote.app
 
@@ -32,7 +32,7 @@ class Row
             @setIcon()
         
         @drag = new drag
-            target: @div
+            target:  @div
             onStart: @onDragStart
             onMove:  @onDragMove
             onStop:  @onDragStop

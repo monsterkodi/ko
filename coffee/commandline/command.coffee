@@ -16,8 +16,8 @@ class Command
 
     constructor: (@commandline) ->
         
-        @syntaxName   = 'ko'
-        @maxHistory   = 20
+        @syntaxName = 'ko'
+        @maxHistory = 20
 
     #  0000000  000000000   0000000   000000000  00000000  
     # 000          000     000   000     000     000       
