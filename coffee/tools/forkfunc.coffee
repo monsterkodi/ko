@@ -18,17 +18,14 @@ if module.parent
 
     forkfunc = (file, args..., callback) ->
         
-        parse = ->
+        if /^[.]?\.\//.test file
+            stack   = new Error().stack.split /\r\n|\n/
+            log 'stack:', stack
+            regx    = /\(([^\)]*)\)/
+            match   = regx.exec stack[3]
+            dirname = slash.dir match[1]
+            file    = slash.join dirname, file
             
-            if /^[.]?\.\//.test file
-                stack   = new Error().stack.split /\r\n|\n/
-                regx    = /\(([^\)]*)\)/
-                match   = regx.exec stack[3]
-                dirname = slash.dir match[1]
-                file    = slash.join dirname, file
-            
-        parse()
-        
         try
             cp = childp.fork __filename
             

@@ -14,7 +14,6 @@
 pkg      = require '../../package.json'
 electron = require 'electron'
 
-Execute  = require './execute'
 Navigate = require './navigate'
 Indexer  = require './indexer'
 
@@ -22,7 +21,6 @@ Indexer  = require './indexer'
 
 disableSnap   = false
 main          = undefined
-coffeeExecute = undefined
 openFiles     = []
 WIN_SNAP_DIST = 150
 
@@ -59,7 +57,6 @@ post.onGet 'logSync',   ->
     return true
 
 post.on 'throwError',                 -> throw new Error 'err'
-post.on 'restartShell',       (cfg)   -> winShells[cfg.winID].restartShell()
 post.on 'newWindowWithFile',  (file)  -> main.createWindowWithFile file:file
 post.on 'activateWindow',     (winID) -> main.activateWindowWithID winID
 post.on 'activateNextWindow', (winID) -> main.activateNextWindow winID
@@ -70,14 +67,6 @@ post.on 'ping', (winID, argA, argB) -> post.toWin winID, 'pong', 'main', argA, a
 post.on 'winlog',       (winID, text) -> 
     if args.verbose
         console.log "#{winID}>>> " + text
-
-winShells = {}
-
-post.on 'shellCommand', (cfg) ->
-    if winShells[cfg.winID]?
-        winShells[cfg.winID].term cfg
-    else
-        winShells[cfg.winID] = new Execute cfg
 
 # 00     00   0000000   000  000   000
 # 000   000  000   000  000  0000  000
@@ -142,7 +131,6 @@ class Main extends app
             log noon.stringify state.store.data, colors:true
             
         @indexer      = new Indexer
-        coffeeExecute = new Execute main: @
 
         if not openFiles.length and valid args.filelist
             openFiles = filelist args.filelist, ignoreHidden:false

@@ -144,13 +144,6 @@ class Info
     # 000   000  000  0000        000  000  000
     #  0000000   000   000        000  000  000
     
-    onClick: (event, cmd) ->
-        log cmd
-        if event.altKey
-            window.commandline.commands.term.execute cmd
-        else
-            window.commandline.commands.coffee.execute cmd
-    
     onNumLines: (lc) => 
         @lines.textContent = shortCount lc ? 0
         

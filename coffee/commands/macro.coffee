@@ -165,6 +165,7 @@ class Macro extends Command
                 
                 terminal = window.terminal
                 text = fs.readFileSync "#{__dirname}/../../bin/cheet.noon", encoding: 'utf8'
+                terminal.clear()
                 for l in text.split '\n'
                     terminal.appendLineDiss l, syntax.dissForTextAndSyntax l, 'noon'
 

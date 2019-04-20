@@ -96,7 +96,6 @@ restoreWin = ->
 # 000        000   000       000     000
 # 000         0000000   0000000      000
 
-post.on 'shellCallbackData', (cmdData) -> commandline.commands['term'].onShellCallbackData cmdData
 post.on 'singleCursorAtPos', (pos, opt) ->
     editor.singleCursorAtPos pos, opt
     editor.scroll.cursorToTop()

@@ -282,8 +282,8 @@ class FileEditor extends TextEditor
                     for i in infos
                         if i.file == @currentFile
                             info = i
-                    if infos.length > 1 and not opt?.dontList
-                        window.commandline.commands.term.execute "func ^#{word}$"
+                    # if infos.length > 1 and not opt?.dontList
+                        # window.commandline.commands.term.execute "func ^#{word}$"
                     @jumpToFile info
                     return true
 

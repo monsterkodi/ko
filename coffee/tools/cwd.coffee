@@ -22,7 +22,7 @@ class CWD
         post.on 'restore', @restore
         post.on 'cwdSet',  @onCwdSet
         
-        @onCwdSet window.commandline.commands.term.cwd 
+        # @onCwdSet window.commandline.commands.term.cwd 
         @restore()
             
     onCwdSet: (@cwd) =>

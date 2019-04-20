@@ -196,7 +196,6 @@ class Indexer
     
     indexProject: (file) ->
         
-        
         if @currentlyIndexing
             @indexQueue ?= []
             if file not in @indexQueue
@@ -209,7 +208,7 @@ class Indexer
               
         @currentlyIndexing = file
         
-        forkfunc './indexprj', file, (err, info) =>
+        forkfunc "#{__dirname}/indexprj", file, (err, info) =>
             
             return error 'indexing failed', err if valid err
             

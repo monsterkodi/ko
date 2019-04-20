@@ -186,7 +186,7 @@ class Open extends Command
         @lastFileIndex = 0
         
         @dir = slash.resolve '~' if not @dir?
-
+        
         if @history? and not opt.currentText and @history.length > 1
             f = @history[@history.length-2]
             item = Object.create null
@@ -300,10 +300,10 @@ class Open extends Command
             @file = null
             @dir  = process.cwd()
             
-        # log 'open.start @dir', @dir
-        
         @files = Projects.files @dir
-        # log 'open.loadDir @files', @files.length
+        
+        # log 'open.loadDir @files', @files?.length
+        
         @loadState()
         @showList()
         @showItems @listItems()
