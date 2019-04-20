@@ -63,7 +63,7 @@ class Row
                     try
                         className = fileIcons.getClass slash.removeLinePos @item.file
                     catch err
-                        log "no icon? #{@item.file}"
+                        console.log "no icon? #{@item.file}"
                     # log 'icon.getClass', slash.removeLinePos(@item.file), className
                 className ?= 'file-icon'
             

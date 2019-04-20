@@ -51,12 +51,10 @@ class Info
         ttip @highlig, 'highlights'
         
         @classes = elem 'span', class: "info-classes empty"
-        @classes.onclick = (e) => @onClick e, 'class'
         @topline.appendChild @classes
         ttip @classes, 'classes'
 
         @funcs = elem 'span', class: "info-funcs empty"
-        @funcs.onclick = (e) => @onClick e, 'func'
         @topline.appendChild @funcs
         ttip @funcs, 'funcs'
         
@@ -84,27 +82,19 @@ class Info
         ttip @lines, 'lines'
 
         @files = elem 'span', class: "info-files"
-        @files.onclick = (e) => @onClick e, 'file'
         @botline.appendChild @files
         ttip @files, 'files'
         
         @words = elem 'span', class: "info-words empty"
         @words.style.display = 'none'
-        @words.onclick = (e) => @onClick e, 'word'
         @botline.appendChild @words
         ttip @words, 'words'
         
-        post.on 'filesCount',        @onFilesCount
+        post.on 'filesCount', @onFilesCount
 
         @elem.appendChild @botline
         
         @setEditor editor        
-
-    onClick: (event, cmd) ->
-        if event.altKey
-            window.commandline.commands.term.execute cmd
-        else
-            window.commandline.commands.coffee.execute cmd
 
     #  0000000  00000000  000000000        00000000  0000000    000  000000000   0000000   00000000 
     # 000       000          000           000       000   000  000     000     000   000  000   000
@@ -153,6 +143,13 @@ class Info
     # 000   000  000 0 000                     
     # 000   000  000  0000        000  000  000
     #  0000000   000   000        000  000  000
+    
+    onClick: (event, cmd) ->
+        log cmd
+        if event.altKey
+            window.commandline.commands.term.execute cmd
+        else
+            window.commandline.commands.coffee.execute cmd
     
     onNumLines: (lc) => 
         @lines.textContent = shortCount lc ? 0
