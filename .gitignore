@@ -7,7 +7,6 @@ inno
 bin/download.js
 bin/*.json
 bin/*.js.map
-./test
 js
 css
 Icon?

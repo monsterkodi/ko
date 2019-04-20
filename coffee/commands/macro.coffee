@@ -13,14 +13,12 @@ salt      = require '../tools/salt'
 req       = require '../tools/req'
 GitInfo   = require '../win/gitinfo'
 Command   = require '../commandline/command'
-Report    = require '../test/report'
 syntax    = require '../editor/syntax'
 Transform = require '../editor/actions/transform'
-Mocha     = require 'mocha'
 
 class Macro extends Command
 
-    @macroNames = ['clean', 'help', 'dbg', 'class', 'req', 'inv', 'blink', 'color', 'fps', 'cwd', 'git', 'test', 'unix']
+    @macroNames = ['clean', 'help', 'dbg', 'class', 'req', 'inv', 'blink', 'color', 'fps', 'cwd', 'git', 'unix']
     
     constructor: (commandline) ->
 
@@ -122,38 +120,6 @@ class Macro extends Command
             when 'err'   
                 post.toMain 'throwError'
                 throw new Error 'err'
-
-            # 000000000  00000000   0000000  000000000
-            #    000     000       000          000
-            #    000     0000000   0000000      000
-            #    000     000            000     000
-            #    000     00000000  0000000      000
-
-            when 'test'
-                
-                # mocha = new Mocha reporter: Report.forRunner, timeout: 4000
-                mocha = new Mocha()
-                
-                if _.isEmpty args
-                    files = filelist slash.join(__dirname, '..', 'test'), matchExt:['js', 'coffee']
-                else
-                    files = (slash.join(__dirname, '..', 'test', f + '.js') for f in args)
-                for file in files
-                    delete require.cache[file] # mocha listens only on initial compile
-                    mocha.addFile file
-                
-                terminal = window.terminal
-                terminal.doAutoClear()
-                autoClear = terminal.getAutoClear()
-                terminal.setAutoClear false
-                
-                onTestsDone = ->
-                    terminal.setAutoClear autoClear
-                    post.removeListener 'testsDone', onTestsDone
-                post.on 'testsDone', onTestsDone
-                
-                mocha.run()                
-                window.split.do 'show terminal'
 
             # 000   000  00000000  000      00000000
             # 000   000  000       000      000   000
