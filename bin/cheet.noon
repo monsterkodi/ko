@@ -34,7 +34,7 @@ display
     ⌘=          increase font size
     ⌘0          reset font size
     ⌘\          toggle centered layout
-    ⌘⇧Y         maximize editor (close terminal, logview and commandline)
+    ⌘⇧Y         maximize editor (close terminal and commandline)
     
 commandline
     ⌘up|down    move commandline to top|bottom

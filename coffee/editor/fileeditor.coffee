@@ -36,8 +36,7 @@ class FileEditor extends TextEditor
 
         @view.addEventListener "contextmenu", @onContextMenu
         
-        window.split.on 'commandline', @onCommandline
-
+        post.on 'commandline',   @onCommandline
         post.on 'jumpTo',        @jumpTo
         post.on 'jumpToFile',    @jumpToFile
 
@@ -425,11 +424,6 @@ class FileEditor extends TextEditor
             combo:  'command+shift+y' 
             accel:  'ctrl+shift+y' 
             cb:     -> window.split.maximizeEditor()
-        ,
-            text:   'Log View'
-            combo:  'command+alt+k'
-            accel:  'alt+ctrl+k'
-            cb:     window.split.toggleLog
         , 
             text:   ''        
         ]

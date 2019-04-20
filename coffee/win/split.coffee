@@ -11,7 +11,7 @@
 event = require 'events'
 Flex  = require './flex/flex'
 
-class Split extends event
+class Split
     
     # 000  000   000  000  000000000
     # 000  0000  000  000     000   
@@ -21,17 +21,14 @@ class Split extends event
     
     constructor: () ->
 
-        super()
-
         @commandlineHeight = 30
         @handleHeight      = 6
         
         @elem        =$ 'split'
         @terminal    =$ 'terminal'
-        @area        =$ 'area'
+        @browser     =$ 'browser'
         @commandline =$ 'commandline'
         @editor      =$ 'editor'
-        @logview     =$ 'logview'
 
         post.on 'focus',   @focus
         post.on 'stash',   @stash
@@ -46,9 +43,6 @@ class Split extends event
                     fixed:      @commandlineHeight
                 ,
                     div:        @editor
-                ,
-                    div:        @logview
-                    collapsed:  true
             ]
             direction:  'vertical'
             handleSize: @handleHeight
@@ -59,7 +53,8 @@ class Split extends event
             snapLast:   100
             
     onDrag: => if @flex? then @emitSplit()
-    emitSplit: => @emit 'split', @flex.panePositions() 
+    
+    emitSplit: => post.emit 'split', @flex.panePositions()
     
     #  0000000  000000000   0000000    0000000  000   000  
     # 000          000     000   000  000       000   000  
@@ -70,7 +65,7 @@ class Split extends event
     stash: => 
         
         window.stash.set 'split|flex', @flex.getState()
-        window.stash.set 'split|area', @flex.panes[0].div == @area
+        window.stash.set 'split|browser', @flex.panes[0].div == @browser
         
     restore: => 
 
@@ -80,8 +75,8 @@ class Split extends event
         else
             @do 'maximize editor'
             
-        if @flex.panes[0].div != @area and window.stash.get 'split|area'
-            @raise 'area'
+        if @flex.panes[0].div != @browser and window.stash.get 'split|browser'
+            @raise 'browser'
                 
     # 0000000     0000000 
     # 000   000  000   000
@@ -122,7 +117,7 @@ class Split extends event
                     
         switch what
             when 'editor' then return @moveCommandLineBy -delta
-            when 'terminal', 'area', 'commandline'
+            when 'terminal', 'browser', 'commandline'
                 @raise what if what != 'commandline'
                 if delta? then @moveCommandLineBy delta
                 if pos? then @flex.moveHandleToPos @flex.handles[0], pos
@@ -134,7 +129,6 @@ class Split extends event
         
         @focus 'editor'
         @flex.expand 'editor'
-        @hideLog()
         @hideCommandline()
         @flex.resized()
 
@@ -153,7 +147,7 @@ class Split extends event
     show: (n) ->
 
         switch n
-            when 'terminal', 'area' then @raise n
+            when 'terminal', 'browser' then @raise n
             when 'editor'     
                 
                 @flex.expand 'editor'
@@ -164,7 +158,6 @@ class Split extends event
                         @flex.moveHandleToPos @flex.handles[2], 2*@flex.size()/3
                         
             when 'command'          then @flex.expand 'commandline'
-            when 'logview'          then @showLog()
             else error "split.show -- unhandled: #{n}!"
 
     hideEditor:     => @flex.collapse 'editor'
@@ -187,8 +180,8 @@ class Split extends event
     raise: (n) ->
 
         switch n
-            when 'terminal' then @swap @area, @terminal
-            when 'area'     then @swap @terminal, @area
+            when 'terminal' then @swap @browser, @terminal
+            when 'browser'  then @swap @terminal, @browser
             
         @flex.calculate()
 
@@ -214,43 +207,14 @@ class Split extends event
         if not @flex.isCollapsed 'commandline'
             @flex.collapse 'terminal'
             @flex.collapse 'commandline'
-            @emit 'commandline', 'hidden'
+            post.emit 'commandline', 'hidden'
         
     showCommandline: ->
         
         if @flex.isCollapsed 'commandline'
             @flex.expand 'commandline'
-            @emit 'commandline', 'shown'
+            post.emit 'commandline', 'shown'
 
-    # 000       0000000    0000000 
-    # 000      000   000  000      
-    # 000      000   000  000  0000
-    # 000      000   000  000   000
-    # 0000000   0000000    0000000 
-    
-    showLog:   => @setLogVisible true
-    hideLog:   => @setLogVisible false
-    toggleLog: => @setLogVisible not @isLogVisible()
-    
-    isLogVisible: -> not @flex.isCollapsed 'logview'
-    
-    setLogVisible: (v) ->
-        
-        if @isLogVisible() != v
-            if not v
-                @flex.collapse 'logview'
-            else
-                @flex.expand 'logview'
-            
-    clearLog: -> window.logview.setText ""
-    
-    showOrClearLog: -> 
-        
-        if @isLogVisible()
-            @clearLog()
-        else
-            @showLog()
-     
     # 00000000   0000000    0000000  000   000   0000000
     # 000       000   000  000       000   000  000     
     # 000000    000   000  000       000   000  0000000 
@@ -297,7 +261,6 @@ class Split extends event
     splitPosY:  (i) -> @flex.posOfHandle i
     terminalHeight: -> @flex.sizeOfPane 0
     editorHeight:   -> @flex.sizeOfPane 2
-    logviewHeight:  -> @flex.sizeOfPane 3
     termEditHeight: -> @terminalHeight() + @commandlineHeight + @editorHeight()
         
     commandlineVisible: -> not @flex.isCollapsed 'commandline'

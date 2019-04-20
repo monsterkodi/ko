@@ -79,6 +79,7 @@ body
     overflow            hidden
     border-left         frameBorder
     border-right        frameBorder
+    border-bottom       frameBorder
     box-sizing          border-box
     width               100%
 
@@ -457,13 +458,13 @@ infoPadding = 6px
     top                 0
     right               0
         
-//  0000000   00000000   00000000   0000000
-// 000   000  000   000  000       000   000
-// 000000000  0000000    0000000   000000000
-// 000   000  000   000  000       000   000
-// 000   000  000   000  00000000  000   000
+// 0000000    00000000    0000000   000   000   0000000  00000000  00000000   
+// 000   000  000   000  000   000  000 0 000  000       000       000   000  
+// 0000000    0000000    000   000  000000000  0000000   0000000   0000000    
+// 000   000  000   000  000   000  000   000       000  000       000   000  
+// 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 
-#area
+#browser
     position            relative
     overflow            hidden
     pointer-events      auto
@@ -475,14 +476,10 @@ infoPadding = 6px
 // 00000000  0000000    000     000      0000000   000   000
 
 #terminal
-#logview
 #editor
     position            relative
     overflow            hidden
     font-family         font
-
-#logview
-    border-bottom       frameBorder
 
 // 000       0000000   000   000  00000000  00000000
 // 000      000   000   000 000   000       000   000

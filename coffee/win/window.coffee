@@ -25,9 +25,7 @@ Split       = require './split'
 Terminal    = require './terminal'
 Tabs        = require './tabs'
 Titlebar    = require './titlebar'
-LogView     = require './logview'
 Info        = require './info'
-Area        = require '../stage/area'
 Editor      = require '../editor/editor'
 Commandline = require '../commandline/commandline'
 FileEditor  = require '../editor/fileeditor'
@@ -47,8 +45,6 @@ win         = window.win   = remote.getCurrentWindow()
 winID       = window.winID = win.id
 editor      = null
 mainmenu    = null
-logview     = null
-area        = null
 terminal    = null
 commandline = null
 titlebar    = null
@@ -152,10 +148,8 @@ winMain = ->
     navigate    = window.navigate    = new Navigate()
     split       = window.split       = new Split()
     terminal    = window.terminal    = new Terminal 'terminal'
-    area        = window.area        = new Area 'area'
     editor      = window.editor      = new FileEditor 'editor'
     commandline = window.commandline = new Commandline 'commandline-editor'
-    logview     = window.logview     = new LogView 'logview'
     info        = window.info        = new Info editor
     fps         = window.fps         = new FPS()
     cwd         = window.cwd         = new CWD()
@@ -165,13 +159,6 @@ winMain = ->
 
     restoreWin()
     scheme.set prefs.get 'scheme', 'dark'
-
-    split.on 'split', (s) ->
-        area.resized()
-        terminal.resized()
-        commandline.resized()
-        editor.resized()
-        logview.resized()
 
     terminal.on 'fileSearchResultChange', (file, lineChange) -> # sends changes to all windows
         post.toWins 'fileLineChanges', file, [lineChange]
@@ -203,7 +190,6 @@ window.editorWithName = (n) ->
         when 'editor'   then editor
         when 'command', 'commandline' then commandline
         when 'terminal' then terminal
-        when 'logview'  then logview
         else editor
 
 #  0000000   0000000   000   000  00000000
@@ -237,7 +223,6 @@ saveFile = (file) ->
         
         if valid err
             error "saving '#{file}' failed:", err
-            split.show 'logview'
         else
             editor.setCurrentFile      saved
             post.toOthers 'fileSaved', saved, window.winID
@@ -458,6 +443,13 @@ window.onresize = ->
     if window.stash.get 'centerText', false
         editor.centerText true, 200
 
+post.on 'split', (s) ->
+    
+    filebrowser.resized()
+    terminal.resized()
+    commandline.resized()
+    editor.resized()
+        
 #  0000000  00000000  000   000  000000000  00000000  00000000       000000000  00000000  000   000  000000000
 # 000       000       0000  000     000     000       000   000         000     000        000 000      000
 # 000       0000000   000 0 000     000     0000000   0000000           000     0000000     00000       000
@@ -533,7 +525,6 @@ resetZoom: ->
 
     webframe.setZoomFactor 1
     editor.resized()
-    logview.resized()
 
 changeZoom: (d) ->
 
@@ -542,7 +533,6 @@ changeZoom: (d) ->
     z = clamp 0.36, 5.23, z
     webframe.setZoomFactor z
     editor.resized()
-    logview.resized()
 
 # 00000000   0000000    0000000  000   000   0000000
 # 000       000   000  000       000   000  000
@@ -649,10 +639,6 @@ onCombo = (combo, info) ->
 
     switch combo
         when 'f3'                 then return stopEvent event, screenShot()
-        when 'command+alt+k', 'alt+ctrl+k' then return stopEvent event, split.toggleLog()
-        when 'alt+k'
-            if window.focusEditor == window.editor then window.logview.clear() else window.focusEditor.clear()
-            return stopEvent event
         when 'command+shift+='    then return stopEvent event, @changeZoom +1
         when 'command+shift+-'    then return stopEvent event, @changeZoom -1
         when 'command+shift+0'    then return stopEvent event, @resetZoom()

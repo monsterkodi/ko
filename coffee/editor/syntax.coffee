@@ -170,7 +170,7 @@ class Syntax
 
     @dissForTextAndSyntax: (text, n) ->
                     
-        if n not in ['browser', 'ko', 'commandline', 'logview', 'macro', 'term', 'test']
+        if n not in ['browser', 'ko', 'commandline', 'macro', 'term', 'test']
             result = kork.ranges text, n
             result.map (r) -> r.clss = r.value
         else

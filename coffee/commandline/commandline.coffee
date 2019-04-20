@@ -16,8 +16,8 @@ class Commandline extends TextEditor
 
         super viewElem, features: [], fontSize: 24, syntaxName:'commandline'
 
-        @mainCommands = ['browse', 'goto', 'open', 'search', 'find', 'coffee', 'build', 'macro', 'term']
-        @hideCommands = ['selecto', 'Term', 'Build', 'Browse']
+        @mainCommands = ['browse', 'goto', 'open', 'search', 'find', 'macro']
+        @hideCommands = ['selecto', 'Browse']
 
         @size.lineHeight = 30
         @scroll.setLineHeight @size.lineHeight
@@ -31,8 +31,7 @@ class Commandline extends TextEditor
 
         @loadCommands()
 
-        window.split.on 'split', @onSplit
-
+        post.on 'split',   @onSplit
         post.on 'restore', @restore
         post.on 'stash',   @stash
         
@@ -161,7 +160,7 @@ class Commandline extends TextEditor
     
             @button.className = "commandline-button active #{@command.prefsID}"
         else
-            error 'no command'
+            error "no command #{name}"
 
     commandForName: (name) ->
 

@@ -19,11 +19,10 @@ class Browse extends Command
         super commandline
 
         @cmdID     = 0
-        @browser   = new FileBrowser window.area.view
+        @browser   = new FileBrowser $ 'browser'
         @commands  = Object.create null
         @names     = ["browse", "Browse", "shelf"]
         
-        window.area.on 'resized', @onAreaResized
         post.on 'file', @onFile
         
         @browser.on 'itemActivated', @onBrowserItemActivated
@@ -64,7 +63,7 @@ class Browse extends Command
         super name
 
         select: true
-        do:     @name == 'Browse' and 'half area' or 'quart area'
+        do:     @name == 'Browse' and 'half browser' or 'quart browser'
         focus:  action == 'shelf' and 'shelf' or null
 
     #  0000000   0000000   00     00  00000000   000      00000000  000000000  00000000  
@@ -336,6 +335,4 @@ class Browse extends Command
             
             @commandline.setText pth
 
-    onAreaResized: (w, h) => @browser.resized? w,h
-                
 module.exports = Browse

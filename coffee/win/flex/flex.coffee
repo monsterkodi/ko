@@ -267,7 +267,7 @@ class Flex
     
     numPanes:        -> @panes.length
     visiblePanes:    -> @panes.filter (p) -> p.isVisible()
-    panePositions:   -> ( p.pos  for p in @panes )
+    panePositions:   -> ( p.pos() for p in @panes )
     paneSizes:       -> ( p.size for p in @panes )
     sizeOfPane:  (i) -> @pane(i).size
     posOfPane:   (i) -> @pane(i).pos()

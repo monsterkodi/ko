@@ -9,14 +9,12 @@
 { post, elem, clamp, setStyle, childp, slash, state, fs, os, error, log,  _ } = require 'kxk'
 
 Column = require './column'
-Stage  = require '../stage/stage'
 flex   = require '../win/flex/flex'
+event  = require 'events'
 
-class Browser extends Stage
+class Browser extends event
     
-    constructor: (view) ->
-        
-        super view
+    constructor: (@view) ->
         
         @columns = []
         
@@ -242,7 +240,7 @@ class Browser extends Stage
         @flex.relax()
         true
 
-    resized: (w,h) -> @updateColumnScrolls()
+    resized: -> @updateColumnScrolls()
     
     updateColumnScrolls: =>
         
