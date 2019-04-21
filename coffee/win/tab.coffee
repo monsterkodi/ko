@@ -9,20 +9,22 @@
 { post, tooltip, slash, elem, error, log, _ } = require 'kxk'
 
 File    = require '../tools/file'
+Watcher = require '../tools/watcher'
 render  = require '../editor/render'
 syntax  = require '../editor/syntax'
 
 class Tab
     
-    constructor: (@tabs, file) ->
+    constructor: (@tabs, @file) ->
         
-        @info = file:file, dirty:false
+        @dirty = false
         @div = elem class: 'tab', text: ''
         @tabs.div.appendChild @div
+        @watcher = new Watcher @file
 
-        if not @info.file.startsWith 'untitled'
-            @info.pkg = slash.pkg @info.file
-            @info.pkg = slash.basename @info.pkg if @info.pkg?
+        if not @file.startsWith 'untitled'
+            @pkg = slash.pkg @file
+            @pkg = slash.basename @pkg if @pkg?
         
         @update()
 
@@ -40,7 +42,7 @@ class Tab
     
     saveChanges: ->
         
-        # log 'tab.saveChanges info:', @info
+        # log 'tab.saveChanges file:',  @file
         # log 'tab.saveChanges state:', @state
         
         if @state
@@ -70,17 +72,17 @@ class Tab
     
     storeState: ->
         
-        # log 'tab.storeState', @info
+        # log 'tab.storeState', @file
         
         if window.editor.currentFile
-            if @info.file != window.editor.currentFile
-                log 'tab.storeState editor.currentFile', window.editor.currentFile, '@info.file', @info.file
+            if @file != window.editor.currentFile
+                log 'tab.storeState editor.currentFile', window.editor.currentFile, '@file', @file
             @state = window.editor.do.tabState()
             # log 'tab.storeState @state', @state
         
     restoreState: ->
         
-        # log 'tab.restoreState', @info.file
+        # log 'tab.restoreState', @file
         # log 'tab.restoreState', @state
         return error 'no file in state?', @state if not @state?.file?
         window.editor.do.setTabState @state
@@ -95,45 +97,44 @@ class Tab
     update: ->
            
         @div.innerHTML = ''
-        @div.classList.toggle 'dirty', @dirty()
+        @div.classList.toggle 'dirty', @dirty # @isDirty()
                 
         sep = '●'
         sep = '■' if window.editor.newlineCharacters == '\r\n'
         @div.appendChild elem 'span', class:'dot', text:sep
         
         sep = "<span class='dot'>►</span>"
-        @pkg = elem 'span', class:'pkg', html: @info.pkg and (@info.pkg + sep) or ''
-        @div.appendChild @pkg
+        @pkgDiv = elem 'span', class:'pkg', html: @pkg and (@pkg + sep) or ''
+        @div.appendChild @pkgDiv
             
-        diss = syntax.dissForTextAndSyntax slash.basename(@file()), 'ko' #, join: true 
+        diss = syntax.dissForTextAndSyntax slash.basename(@file), 'ko' #, join: true 
         name = elem 'span', class:'name', html:render.line diss, charWidth:0
         @div.appendChild name
 
         @div.appendChild elem 'span', class:'tabdrag'
         
-        if @info.file?
-            diss = syntax.dissForTextAndSyntax slash.tilde(@file()), 'ko' #, join: true 
+        if @file?
+            diss = syntax.dissForTextAndSyntax slash.tilde(@file), 'ko' #, join: true 
             html = render.line diss, charWidth:0
             @tooltip = new tooltip elem:name, html:html, x:0
             
-        @div.appendChild elem 'span', class:'dot', text:'●' if @dirty()
+        @div.appendChild elem 'span', class:'dot', text:'●' if @dirty # @isDirty()
         @
 
-    file:  -> @info.file
     index: -> @tabs.tabs.indexOf @
     prev:  -> @tabs.tab @index()-1 if @index() > 0
     next:  -> @tabs.tab @index()+1 if @index() < @tabs.numTabs()-1
     nextOrPrev: -> @next() ? @prev()
             
     close: ->
-        if @dirty()
+        if @dirty # isDirty()
             @saveChanges()
         @div.remove()
         @tooltip?.del()
-        post.emit 'tabClosed', @info.file
+        post.emit 'tabClosed', @file
     
-    hidePkg: -> @pkg?.style.display = 'none'
-    showPkg: -> @pkg?.style.display = 'initial'
+    hidePkg: -> @pkgDiv?.style.display = 'none'
+    showPkg: -> @pkgDiv?.style.display = 'initial'
     
     # 0000000    000  00000000   000000000  000   000  
     # 000   000  000  000   000     000      000 000   
@@ -141,19 +142,18 @@ class Tab
     # 000   000  000  000   000     000        000     
     # 0000000    000  000   000     000        000     
     
-    dirty: ->
-        return true if @state? 
-        return true if @foreign? and @foreign.length > 0 
-        return true if @info.dirty == true
-        # return false even if editor has line changes:
-        # dirty is reset before changed file is saved
-        # log 'tab.dirty == false', @info
-        false
+    # dirty: ->
+        # return true if @state? 
+        # return true if @foreign? and @foreign.length > 0 
+        # return true if @dirty == true
+        # # return false even if editor has line changes:
+        # # dirty is reset before changed file is saved
+        # false
         
     setDirty: (dirty) ->
         
-        if @info.dirty != dirty
-            @info.dirty = dirty
+        if @dirty != dirty
+            @dirty = dirty
             @update()
     
     # 00000000   00000000  000   000  00000000  00000000   000000000  
@@ -166,7 +166,7 @@ class Tab
         
         delete @foreign
         delete @state
-        @info.dirty = false
+        @dirty = false
         @update()
         @tabs.update()
 
@@ -178,7 +178,7 @@ class Tab
     
     activate: -> 
         
-        post.emit 'jumpToFile', file:@info.file
+        post.emit 'jumpToFile', file:@file
         
     finishActivation: ->
         

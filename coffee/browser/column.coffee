@@ -334,7 +334,7 @@ class Column
     moveToTrash: =>
         
         pathToTrash = @activePath()
-        if pathToTrash == window.tabs.activeTab().file()
+        if pathToTrash == window.tabs.activeTab().file
             window.tabs.closeTab window.tabs.activeTab()
         @removeObject()
         

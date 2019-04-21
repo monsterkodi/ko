@@ -91,6 +91,7 @@ post.on 'singleCursorAtPos', (pos, opt) ->
 post.on 'focusEditor',       -> split.focus 'editor'
 post.on 'cloneFile',         -> post.toMain 'newWindowWithFile', editor.currentFile
 post.on 'reloadWin',         -> reloadWin()
+post.on 'closeWindow',       -> window.win.close()
 post.on 'saveStash',         -> saveStash()
 post.on 'editorFocus', (editor) ->
     window.setLastFocus editor.name
@@ -402,6 +403,7 @@ onMenuAction = (name, args) ->
         when 'Reload Window'         then return reloadWin()
         when 'Close Tab or Window'   then return post.emit 'closeTabOrWindow'
         when 'Close Other Tabs'      then return post.emit 'closeOtherTabs'
+        when 'Close Other Windows'   then return post.toOtherWins 'closeWindow'
         when 'Fullscreen'            then return win.setFullScreen !win.isFullScreen()
         when 'Clear List'            then return state.set 'recentFiles', []
         when 'Preferences'           then return post.emit 'openFiles', [prefs.store.file], newTab:true

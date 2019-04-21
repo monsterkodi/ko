@@ -63,7 +63,7 @@ class FileHandler
             if activeTab = tabs.activeTab()
                 if tab != activeTab
                     activeTab.clearActive()
-                    if activeTab.dirty()
+                    if activeTab.dirty # activeTab.isDirty()
                         activeTab.storeState()
                 
             editor.setCurrentFile file
@@ -146,7 +146,7 @@ class FileHandler
         
         if tab = tabs.activeTab()
             delete tab.state
-            tab.info.dirty = false
+            tab.dirty = false
             tab.update()
         
         @loadFile editor.currentFile, reload:true
@@ -163,9 +163,9 @@ class FileHandler
     saveAll: =>
         
         for tab in tabs.tabs
-            if tab.dirty()
+            if tab.dirty # tab.isDirty()
                 if tab == tabs.activeTab()
-                    @saveFile tab.info.file
+                    @saveFile tab.file
                 else
                     tab.saveChanges()
 

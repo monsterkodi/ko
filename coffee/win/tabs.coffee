@@ -32,15 +32,15 @@ class Tabs
         post.on 'newTabWithFile',   @onNewTabWithFile
         post.on 'newEmptyTab',      @onNewEmptyTab
         
-        post.on 'closeTabOrWindow', @onCloseTabOrWindow
-        post.on 'closeOtherTabs',   @onCloseOtherTabs
-        post.on 'stash',            @stash
-        post.on 'dirty',            @onDirty
-        post.on 'restore',          @restore
-        post.on 'revertFile',       @revertFile
-        post.on 'sendTabs',         @onSendTabs
-        post.on 'fileLineChanges',  @onFileLineChanges
-        post.on 'fileSaved',        @onFileSaved
+        post.on 'closeTabOrWindow',  @onCloseTabOrWindow
+        post.on 'closeOtherTabs',    @onCloseOtherTabs
+        post.on 'stash',             @stash
+        post.on 'dirty',             @onDirty
+        post.on 'restore',           @restore
+        post.on 'revertFile',        @revertFile
+        post.on 'sendTabs',          @onSendTabs
+        post.on 'fileLineChanges',   @onFileLineChanges
+        post.on 'fileSaved',         @onFileSaved
         
     onSendTabs: (winID) =>
         
@@ -53,7 +53,7 @@ class Tabs
         
         tab = @tab file
         if tab? and tab != @activeTab()
-            # log 'apply foreignChanges in inactive tab', file, tab.info
+            # log 'apply foreignChanges in inactive tab', file, tab.file
             tab.foreignChanges lineChanges
         
     onFileSaved: (file, winID) =>
@@ -63,7 +63,7 @@ class Tabs
             return 
         tab = @tab file
         if tab? and tab != @activeTab()
-            log "reverting tab because foreign window saved #{file}", tab.info
+            log "reverting tab because foreign window saved #{file}", tab.file
             tab.revert()
             
     #  0000000  000      000   0000000  000   000  
@@ -128,7 +128,7 @@ class Tabs
         
         if _.isNumber  id then return @tabs[id]
         if _.isElement id then return _.find @tabs, (t) -> t.div.contains id
-        if _.isString  id then return _.find @tabs, (t) -> t.info.file == id
+        if _.isString  id then return _.find @tabs, (t) -> t.file == id
 
     activeTab: -> _.find @tabs, (t) -> t.isActive()
     numTabs:   -> @tabs.length
@@ -169,7 +169,7 @@ class Tabs
             @tabs.pop().close() 
         @tabs = keep
         @update()
-    
+        
     #  0000000   0000000    0000000          000000000   0000000   0000000    
     # 000   000  000   000  000   000           000     000   000  000   000  
     # 000000000  000   000  000   000           000     000000000  0000000    
@@ -180,7 +180,7 @@ class Tabs
 
         if @tabs.length > 4
             for index in [0...@tabs.length]
-                if not @tabs[index].dirty()
+                if not @tabs[index].dirty # @tabs[index].isDirty()
                     @closeTab @tabs[index]
                     break
         
@@ -249,7 +249,7 @@ class Tabs
 
     stash: => 
 
-        files = ( t.file() for t in @tabs )
+        files = ( t.file for t in @tabs )
         files = files.filter (file) -> not file.startsWith 'untitled'
         
         window.stash.set 'tabs', 
@@ -289,13 +289,13 @@ class Tabs
 
         return if empty @tabs
         
-        pkg = @tabs[0].info.pkg
+        pkg = @tabs[0].pkg
         @tabs[0].showPkg()
         for tab in @tabs.slice 1
-            if tab.info.pkg == pkg
+            if tab.pkg == pkg
                 tab.hidePkg()
             else
-                pkg = tab.info.pkg
+                pkg = tab.pkg
                 tab.showPkg()
         @
 

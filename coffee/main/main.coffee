@@ -104,10 +104,6 @@ class Main extends app
             
         @opt.onQuit = @quit
                 
-        if os.platform == 'darwin'
-            @app.on 'open-file', (event, path) => log "open-file event #{path}"
-            @app.on 'open-url',  (event, url) => log "open-url event #{url}"
-        
         if process.cwd() == '/'
             process.chdir slash.resolve '~'
             
@@ -454,6 +450,7 @@ class Main extends app
     activateOneWindow: (cb) ->
     
         if empty visibleWins()
+            log 'toggleWindows'
             @toggleWindows cb
             return
 
@@ -466,6 +463,8 @@ class Main extends app
                 cb win
             else
                 cb null
+        else
+            cb visibleWins()[0]
             
     onOtherInstance: (args, dir) =>
 
@@ -526,10 +525,18 @@ class Main extends app
 
 electron.app.on 'open-file', (event, file) ->
 
+    log 'open-file', file
     if not main?
         openFiles.push file
     else
-        main.createWindowWithFile file:file
+        if electron.app.isReady()
+            log 'activateOneWindow'
+            main.activateOneWindow (win) ->
+                log 'activateOneWindow', win.id, file
+                post.toWin win.id, 'openFiles', [file] 
+        else
+            log 'createWindowWithFile'
+            main.createWindowWithFile file:file
         
     event.preventDefault()
 

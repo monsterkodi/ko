@@ -10,9 +10,8 @@
 
 class Watcher
 
-    constructor: (editor) ->
+    constructor: (@file) ->
 
-        @file = editor.currentFile
         @w = fs.watch @file
         
         slash.exists @file, @onExists

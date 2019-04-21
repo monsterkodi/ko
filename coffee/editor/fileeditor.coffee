@@ -8,7 +8,7 @@
 
 { post, stopEvent, setStyle, srcmap, popup, slash, empty, clamp, pos, fs, error, log, _ } = require 'kxk'
   
-watcher    = require './watcher'
+# watcher    = require './watcher'
 TextEditor = require './texteditor'
 syntax     = require './syntax'
 electron   = require 'electron'
@@ -93,8 +93,8 @@ class FileEditor extends TextEditor
         else if fileExists
             @setText fs.readFileSync @currentFile, encoding: 'utf8'
 
-        if fileExists
-            @watch = new watcher @
+        # if fileExists
+            # @watch = new watcher @
             
         post.emit 'file', @currentFile # browser & shelf
 
@@ -109,8 +109,8 @@ class FileEditor extends TextEditor
 
     stopWatcher: ->
 
-        @watch?.stop()
-        @watch = null
+        # @watch?.stop()
+        # @watch = null
 
     # 000000000  000   000  00000000   00000000  
     #    000      000 000   000   000  000       
