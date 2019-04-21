@@ -16,12 +16,13 @@ class Tab
     
     constructor: (@tabs) ->
         
-        @info = file: null
-        @div = elem class: 'tab', text: 'untitled'
+        @info = file:null, dirty:false
+        @div = elem class: 'tab', text: ''
         @tabs.div.appendChild @div
 
     foreignChanges: (lineChanges) ->
         
+        log 'tab.foreignChanges'
         @foreign ?= []
         @foreign.push lineChanges
         @update @info
@@ -58,6 +59,7 @@ class Tab
     # 0000000      000     000   000     000     00000000  
     
     storeState: ->
+        
         if window.editor.currentFile
             @state = window.editor.do.tabState()
         
@@ -75,6 +77,9 @@ class Tab
     
     update: (info) ->
             
+        log 'tab.update new info:', info
+        log 'tab.update old info:', @info
+        
         oldFile = @info?.file
         oldPkg  = @info?.pkg
         
@@ -114,28 +119,42 @@ class Tab
         @div.appendChild elem 'span', class:'dot', text:'●' if @dirty()
         @
 
-    file:  -> @info?.file ? 'untitled' 
+    file:  -> @info?.file
     index: -> @tabs.tabs.indexOf @
     prev:  -> @tabs.tab @index()-1 if @index() > 0
     next:  -> @tabs.tab @index()+1 if @index() < @tabs.numTabs()-1
     nextOrPrev: -> @next() ? @prev()
-    
-    dirty: -> 
-        return true if @state? 
-        return true if @foreign? and @foreign.length > 0 
-        return true if @info?.dirty == true
-        # return false even if editor has line changes:
-        # dirty is reset before changed file is saved
-        false
-        
+            
     close: ->
         
         @div.remove()
         @tooltip?.del()
-        post.emit 'tabClosed', @info.file ? 'untitled'
+        post.emit 'tabClosed', @info.file
     
     hidePkg: -> @pkg?.style.display = 'none'
     showPkg: -> @pkg?.style.display = 'initial'
+    
+    # 0000000    000  00000000   000000000  000   000  
+    # 000   000  000  000   000     000      000 000   
+    # 000   000  000  0000000       000       00000    
+    # 000   000  000  000   000     000        000     
+    # 0000000    000  000   000     000        000     
+    
+    dirty: ->
+        return true if @state? 
+        return true if @foreign? and @foreign.length > 0 
+        return true if @info.dirty == true
+        # return false even if editor has line changes:
+        # dirty is reset before changed file is saved
+        false
+        
+    setDirty: (dirty) ->
+        
+        log "setDirty #{dirty}", @info 
+        
+        if @info.dirty != dirty
+            @info.dirty = dirty
+            @update @info
     
     # 00000000   00000000  000   000  00000000  00000000   000000000  
     # 000   000  000       000   000  000       000   000     000     
@@ -143,10 +162,11 @@ class Tab
     # 000   000  000          000     000       000   000     000     
     # 000   000  00000000      0      00000000  000   000     000     
     
-    revert: -> 
-        delete @info.dirty
+    revert: ->
+        
         delete @foreign
         delete @state
+        @info.dirty = false
         @update @info
         @tabs.update()
 
@@ -156,9 +176,10 @@ class Tab
     # 000   000  000          000     000     000     000   000     000     000       
     # 000   000   0000000     000     000      0      000   000     000     00000000  
     
-    activate: (emitJumpTo=true) ->
+    activate: (emitJumpTo=true) -> 
         
         if emitJumpTo
+            log "tab.activate jumpToFile #{@info.file}"
             post.emit 'jumpToFile', file:@info.file
             return
         

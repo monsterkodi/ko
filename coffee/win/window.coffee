@@ -210,6 +210,8 @@ saveFile = (file) ->
 
     file ?= editor.currentFile
     
+    log "window.saveFile #{file}"
+    
     if not file?
         saveFileAs()
         return
@@ -315,6 +317,8 @@ reloadTab = (file) ->
 
 loadFile = (file, opt={}) ->
 
+    log "window.loadFile", file, opt
+    
     file = null if file? and file.length <= 0
 
     if activeTab = tabs.activeTab()
@@ -325,32 +329,38 @@ loadFile = (file, opt={}) ->
 
     if file?
         [file, filePos] = slash.splitFilePos file
-        file = slash.resolve file
+        if not file.startsWith 'untitled'
+            file = slash.resolve file
 
+    log "window.loadFile", file 
+    log "window.loadFile currentFile:", editor?.currentFile
+        
     if file != editor?.currentFile or opt?.reload
 
-        if file? and not slash.fileExists file
-            file = null
+        fileExists = slash.fileExists file
 
         editor.clear()
 
-        if file?
-
+        log "window.loadFile", file
+        
+        if fileExists
             addToRecent file
+        
+        tab = tabs.tab file
+        if empty tab
+            tab = tabs.addTab file
             
-            tab = tabs.tab file
-            if empty tab
-                tab = tabs.addTab file
-                
-            editor.setCurrentFile file
+        editor.setCurrentFile file
 
-            tab.activate false # this will restore state
-            
-            editor.restoreScrollCursorsAndSelections()
-            
-            post.toOthers 'fileLoaded', file, winID
+        tab.activate false # this will restore state
+        
+        editor.restoreScrollCursorsAndSelections()
+        
+        post.toOthers 'fileLoaded', file, winID
+        
+        if fileExists
             post.emit 'cwdSet', slash.dir file
-
+            
     window.split.raise 'editor'
 
     if filePos? and (filePos[0] or filePos[1])

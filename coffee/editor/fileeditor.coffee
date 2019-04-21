@@ -79,6 +79,8 @@ class FileEditor extends TextEditor
 
         @clear()
 
+        log "fileeditor.setCurrentFile #{file}"
+        
         @currentFile = file
 
         @setupFileType()
@@ -98,11 +100,10 @@ class FileEditor extends TextEditor
                 @setText fs.readFileSync @currentFile, encoding: 'utf8'
                 post.emit 'dirty', false
 
-            post.emit 'file', @currentFile # titlebar & tabs & tab & shelf
+                
+        log "fileeditor.setCurrentFile emit 'file' #{@currentFile}"
+        post.emit 'file', @currentFile # tabs & tab & shelf
 
-        if not @currentFile?
-            post.emit 'file', null # titlebar & tabs & tab & shelf
-            
         @emit 'file', @currentFile # diffbar, pigments, ...
 
     restoreFromTabState: (tabsState) ->
@@ -244,6 +245,7 @@ class FileEditor extends TextEditor
 
             opt.oldPos = @cursorPos()
             opt.oldFile = @currentFile
+            log 'fileEditor.jumpToFile gotoFilePos', opt
             window.navigate.gotoFilePos opt
 
     jumpTo: (word, opt) =>

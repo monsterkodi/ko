@@ -6,7 +6,7 @@
    000     000     000     0000000  00000000  0000000    000   000  000   000
 ###
 
-{ post, stopEvent, elem, $ } = require 'kxk'
+{ post, stopEvent, elem, log, $ } = require 'kxk'
 
 class Titlebar
     
@@ -20,53 +20,30 @@ class Titlebar
         
         @info = 
             numWins: 1  
-            dirty:   false
             sticky:  false
             focus:   true
-            file:    'untitled'
         
         post.on 'numWins',  @onNumWins
         post.on 'winFocus', @onWinFocus
         post.on 'winTabs',  @onWinTabs
         post.on 'sticky',   @onSticky
-        post.on 'dirty',    @onDirty
-        post.on 'file',     @onFile
         
     onNumWins: (numWins) => 
+        
         if @info.numWins != numWins
             @info.numWins = numWins
-            @update()
     
     onSticky: (sticky) =>
+        
         if @info.sticky != sticky
             @info.sticky = sticky
-            @update()
 
-    onDirty: (dirty) =>
-        if @info.dirty != dirty
-            @info.dirty = dirty
-            window.tabs.activeTab()?.update @info
-            
     onWinFocus: (focus) =>
+        
         if @info.focus != focus
             @info.focus = focus
             @elem.classList.toggle 'focus', @info.focus
         
-    onFile: (file) =>
-        if @info.file != file
-            @info.file = file ? 'untitled'
-            window.tabs.update()
-    
-    # 000   000  00000000   0000000     0000000   000000000  00000000  
-    # 000   000  000   000  000   000  000   000     000     000       
-    # 000   000  00000000   000   000  000000000     000     0000000   
-    # 000   000  000        000   000  000   000     000     000       
-    #  0000000   000        0000000    000   000     000     00000000  
-    
-    update: ->
-        # window.tabs.activeTab()?.update @info
-        # window.tabs.update()
-
     # 000      000   0000000  000000000
     # 000      000  000          000   
     # 000      000  0000000      000   

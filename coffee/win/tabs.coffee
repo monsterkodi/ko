@@ -14,6 +14,7 @@ class Tabs
     
     constructor: (titlebar) ->
         
+        @emptyid = 0
         @tabs = []
         @div = elem class: 'tabs'
         
@@ -34,6 +35,7 @@ class Tabs
         post.on 'closeTabOrWindow', @onCloseTabOrWindow
         post.on 'closeOtherTabs',   @onCloseOtherTabs
         post.on 'stash',            @stash
+        post.on 'dirty',            @onDirty
         post.on 'restore',          @restore
         post.on 'revertFile',       @revertFile
         post.on 'sendTabs',         @onSendTabs
@@ -124,6 +126,7 @@ class Tabs
     
     tab: (id) ->
         
+        log "tabs.tab id:#{id}"
         if _.isNumber  id then return @tabs[id]
         if _.isElement id then return _.find @tabs, (t) -> t.div.contains id
         if _.isString  id then return _.find @tabs, (t) -> t.info.file == id
@@ -185,6 +188,7 @@ class Tabs
     
     addTab: (file) ->
 
+        log 'tabs.addTab', file
         if @tabs.length > 4
             for index in [0...@tabs.length]
                 if not @tabs[index].dirty()
@@ -201,7 +205,9 @@ class Tabs
 
     onNewEmptyTab: =>
         
-        @addTab('untitled').activate()
+        @emptyid += 1
+        log "tabs.onNewEmptyTab #{@emptyid}"
+        @addTab("untitled-#{@emptyid}").activate()
         
     onNewTabWithFile: (file) =>
         
@@ -258,7 +264,7 @@ class Tabs
     stash: => 
 
         files = ( t.file() for t in @tabs )
-        files = files.filter (file) -> file != 'untitled'
+        files = files.filter (file) -> not file.startsWith 'untitled'
         
         window.stash.set 'tabs', 
             files:  files
@@ -270,6 +276,8 @@ class Tabs
         files  = window.stash.get 'tabs:files'
         
         return if empty files # happens when first window opens
+        
+        log 'tabs.restore'
         
         if valid @tabs
             @tabs[0].update file:files.shift(), type:'file'
@@ -291,6 +299,8 @@ class Tabs
     
     update: ->
 
+        # log 'tabs.update'
+        
         @stash()
 
         return if empty @tabs
@@ -305,6 +315,11 @@ class Tabs
                 tab.showPkg()
         @
 
+    onDirty: (dirty) =>
+        
+        log 'tabs.onDirty', dirty
+        @activeTab()?.setDirty dirty
+        
     #  0000000   0000000   000   000  000000000  00000000  000   000  000000000  
     # 000       000   000  0000  000     000     000        000 000      000     
     # 000       000   000  000 0 000     000     0000000     00000       000     

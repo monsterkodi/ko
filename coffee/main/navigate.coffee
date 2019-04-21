@@ -76,6 +76,8 @@ class Navigate
 
             when 'addFilePos'
                 
+                log 'navigate.addFilePos', opt
+                
                 return if not opt?.file?.length
                 
                 @addToHistory opt.oldFile, opt.oldPos
