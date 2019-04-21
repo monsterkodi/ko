@@ -28,7 +28,6 @@ class Tab
 
     foreignChanges: (lineChanges) ->
         
-        log 'tab.foreignChanges'
         @foreign ?= []
         @foreign.push lineChanges
         @update()        
@@ -61,7 +60,7 @@ class Tab
             else
                 log 'tab.saveChanges -- nothing to save?'
         else
-            window.saveChanges()
+            post.emit 'saveChanges'
             
     #  0000000  000000000   0000000   000000000  00000000  
     # 000          000     000   000     000     000       

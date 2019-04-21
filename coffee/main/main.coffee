@@ -6,7 +6,7 @@
 000   000  000   000  000  000   000
 ###
 
-{ post, filelist, colors, first, empty, slash, valid, state, store, prefs, noon, args, win, app, udp, fs, log, _ } = require 'kxk'
+{ post, filelist, colors, first, empty, prefs, state, slash, valid, store, noon, args, win, app, udp, os, fs, log, _ } = require 'kxk'
 
 # post.debug()
 # log.slog.debug = true
@@ -104,6 +104,10 @@ class Main extends app
             
         @opt.onQuit = @quit
                 
+        if os.platform == 'darwin'
+            @app.on 'open-file', (event, path) => log "open-file event #{path}"
+            @app.on 'open-url',  (event, url) => log "open-url event #{url}"
+        
         if process.cwd() == '/'
             process.chdir slash.resolve '~'
             
@@ -191,7 +195,7 @@ class Main extends app
     createWindowWithFile: (opt) ->
         
         win = @createWindow (win) -> 
-            post.toWin win.id, 'loadFiles', [opt.file]
+            post.toWin win.id, 'openFiles', [opt.file]
         win
     
     toggleWindows: (cb) =>
@@ -465,19 +469,20 @@ class Main extends app
             
     onOtherInstance: (args, dir) =>
 
-        log 'onOtherInstance args', args
+        log 'onOtherInstance dir:',  dir
+        log 'onOtherInstance args:', args
         
         @activateOneWindow (win) ->
 
-            log 'onOtherInstance activeWin', win.id
+            # log 'onOtherInstance activeWin', win.id
             
             files = []
-            if first(args).endsWith "#{pkg.name}.exe"
+            if first(args)?.endsWith "#{pkg.name}.exe"
                 fileargs = args.slice 1
             else
                 fileargs = args.slice 2
     
-            log 'onOtherInstance fileargs', fileargs
+            # log 'onOtherInstance fileargs', fileargs
                 
             for arg in fileargs
                 continue if arg.startsWith '-'
@@ -490,7 +495,7 @@ class Main extends app
     
             log 'onOtherInstance files', files
                             
-            post.toWin win.id, 'loadFiles', files, newTab:true
+            post.toWin win.id, 'openFiles', files, newTab:true
 
     #  0000000   000   000  000  000000000  
     # 000   000  000   000  000     000     
@@ -539,7 +544,7 @@ electron.app.on 'window-all-closed', -> log 'window-all-closed'
 onUDP = (file) ->
     
     main.activateOneWindow (win) ->
-        post.toWin win.id, 'loadFiles', [file] 
+        post.toWin win.id, 'openFiles', [file] 
 
 koReceiver = new udp port:9779, onMsg:onUDP
 

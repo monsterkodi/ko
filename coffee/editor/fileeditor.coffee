@@ -312,12 +312,12 @@ class FileEditor extends TextEditor
             when 'coffee'
                 [file,line,col] = srcmap.toJs @currentFile, cp[1]+1, cp[0]
                 if file?
-                    window.loadFile slash.joinFileLine file,line,col
+                    post.emit 'loadFile', slash.joinFileLine file,line,col
                     return true
             when 'js'
                 [file,line,col] = srcmap.toCoffee @currentFile, cp[1]+1, cp[0]
                 if file?
-                    window.loadFile slash.joinFileLine file,line,col
+                    post.emit 'loadFile', slash.joinFileLine file,line,col
                     return true
                 else
                     log 'jumpToCounterpart no soruce map?',file,line,col
@@ -336,14 +336,14 @@ class FileEditor extends TextEditor
 
         for ext in (counterparts[currext] ? [])
             if slash.fileExists slash.swapExt @currentFile, ext
-                window.loadFile slash.swapExt @currentFile, ext
+                post.emit 'loadFile', slash.swapExt @currentFile, ext
                 return true
 
         for ext in (counterparts[currext] ? [])
             counter = swapExt @currentFile, ext
             counter = counter.replace "/#{currext}/", "/#{ext}/"
             if slash.fileExists counter
-                window.loadFile counter
+                post.emit 'loadFile', counter
                 return true
         false
 

@@ -26,7 +26,7 @@ class GitInfo
         
         if href = meta[2].href
             href += ':' + window.terminal.posForEvent(event)[0]
-            window.openFiles [href], newTab: event.metaKey
+            post.emit 'openFiles', [href], newTab: event.metaKey
         'unhandled' # otherwise cursor doesn't get set
         
     logText: (text) ->

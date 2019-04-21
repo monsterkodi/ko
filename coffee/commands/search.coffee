@@ -110,7 +110,7 @@ class Search extends Command
                 command.execute split[2]
         else
             file = href + ':' + window.terminal.posForEvent(event)[0]
-            window.openFiles [file], newTab: event.metaKey
+            post.emit 'openFiles', [file], newTab: event.metaKey
 
         'unhandled'
 

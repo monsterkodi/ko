@@ -198,11 +198,11 @@ class Terminal extends TextEditor
         switch combo
             when 'enter'
                 if href = @meta.hrefAtLineIndex @cursorPos()[1]
-                    window.loadFile "#{href}" 
+                    post.emit 'loadFile', "#{href}" 
                 return
             when 'ctrl+enter', 'command+enter'
                 if href = @meta.hrefAtLineIndex @cursorPos()[1]
-                    window.loadFile "#{href}" 
+                    post.emit 'loadFile', "#{href}" 
                     window.editor.focus()
                 return
             when 'ctrl+s', 'command+s'

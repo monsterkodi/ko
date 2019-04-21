@@ -6,7 +6,7 @@
 00     00  000  000   000  0000000     0000000   00     00
 ###
 
-{ post, win, stopEvent, filelist, keyinfo, prefs, state, stash, first, reversed, childp, 
+{ post, win, stopEvent, filelist, keyinfo, prefs, state, stash, childp, 
   drag, noon, slash, clamp, pos, str, sw, sh, os, fs, valid, empty, log, error, _ } = require 'kxk'
 
 menu = require './menu'
@@ -26,11 +26,11 @@ Terminal    = require './terminal'
 Tabs        = require './tabs'
 Titlebar    = require './titlebar'
 Info        = require './info'
+FileHandler = require './filehandler'
 Editor      = require '../editor/editor'
 Commandline = require '../commandline/commandline'
 FileEditor  = require '../editor/fileeditor'
 Navigate    = require '../main/navigate'
-File        = require '../tools/file'
 FPS         = require '../tools/fps'
 CWD         = require '../tools/cwd'
 scheme      = require '../tools/scheme'
@@ -49,6 +49,7 @@ terminal    = null
 commandline = null
 titlebar    = null
 tabs        = null
+filehandler = null
 
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000
@@ -62,18 +63,6 @@ window.state = state
 window.stash = new stash "win/#{winID}"
 
 post.setMaxListeners 20
-
-addToRecent = (file) ->
-
-    recent = state.get 'recentFiles', []
-    return if file == first recent
-    _.pull recent, file
-    recent.unshift file
-    while recent.length > prefs.get 'recentFilesLength', 15
-        recent.pop()
-
-    state.set 'recentFiles', recent
-    commandline.commands.open.setHistory reversed recent
 
 saveStash = ->
 
@@ -101,15 +90,8 @@ post.on 'singleCursorAtPos', (pos, opt) ->
     editor.scroll.cursorToTop()
 post.on 'focusEditor',       -> split.focus 'editor'
 post.on 'cloneFile',         -> post.toMain 'newWindowWithFile', editor.currentFile
-post.on 'reloadFile',        -> reloadFile()
 post.on 'reloadWin',         -> reloadWin()
-post.on 'saveFileAs',        -> saveFileAs()
-post.on 'saveFile',          -> saveFile()
 post.on 'saveStash',         -> saveStash()
-post.on 'openFile',   (opt)  -> openFileDialog opt
-post.on 'reloadTab', (file)  -> reloadTab file
-post.on 'loadFile',  (file)  -> loadFile  file
-post.on 'loadFiles', (files, opt) -> openFiles files, opt
 post.on 'editorFocus', (editor) ->
     window.setLastFocus editor.name
     window.focusEditor = editor
@@ -142,6 +124,7 @@ winMain = ->
     # 000  000  0000  000     000
     # 000  000   000  000     000
 
+    filehandler = window.filehandler = new FileHandler
     tabs        = window.tabs        = new Tabs window.titlebar.elem
     titlebar    =                      new Titlebar
     navigate    = window.navigate    = new Navigate()
@@ -191,52 +174,6 @@ window.editorWithName = (n) ->
         when 'terminal' then terminal
         else editor
 
-#  0000000   0000000   000   000  00000000
-# 000       000   000  000   000  000
-# 0000000   000000000   000 000   0000000
-#      000  000   000     000     000
-# 0000000   000   000      0      00000000
-
-saveAll = ->
-    
-    log 'window.saveAll'
-    
-    for tab in tabs.tabs
-        if tab.dirty()
-            if tab == tabs.activeTab()
-                saveFile tab.info.file
-            else
-                tab.saveChanges()
-
-saveFile = (file) ->
-
-    file ?= editor.currentFile
-    
-    if not file?
-        saveFileAs()
-        return
-
-    editor.stopWatcher()
-    
-    File.save file, editor.text(), (err, saved) ->
-        
-        editor.saveScrollCursorsAndSelections()
-        
-        if valid err
-            error "saving '#{file}' failed:", err
-        else
-            editor.setCurrentFile      saved
-            post.toOthers 'fileSaved', saved, window.winID
-            post.emit     'saved',     saved
-            
-        editor.restoreScrollCursorsAndSelections()
-
-window.saveChanges = ->
-    
-    if editor.currentFile? and editor.do.hasLineChanges() and slash.fileExists editor.currentFile
-        File.save editor.currentFile, editor.text(), (err) ->
-            error "window.saveChanges failed #{err}" if err
-
 #  0000000   000   000   0000000  000       0000000    0000000  00000000
 # 000   000  0000  000  000       000      000   000  000       000
 # 000   000  000 0 000  000       000      000   000  0000000   0000000
@@ -254,7 +191,7 @@ clearListeners = ->
 
 onClose = ->
 
-    window.saveChanges()
+    post.emit 'saveChanges'
     editor.setText ''
     editor.stopWatcher()
     
@@ -290,159 +227,6 @@ reloadWin = ->
     clearListeners()
     editor.stopWatcher()
     win.webContents.reloadIgnoringCache()
-
-# 00000000   00000000  000       0000000    0000000   0000000    
-# 000   000  000       000      000   000  000   000  000   000  
-# 0000000    0000000   000      000   000  000000000  000   000  
-# 000   000  000       000      000   000  000   000  000   000  
-# 000   000  00000000  0000000   0000000   000   000  0000000    
-
-reloadFile = ->
-
-    if tab = tabs.activeTab()
-        delete tab.state
-        tab.info.dirty = false
-        tab.update()
-    
-    loadFile editor.currentFile, reload:true
-
-    if editor.currentFile?
-        post.toOtherWins 'reloadTab', editor.currentFile
-
-reloadTab = (file) ->
-    
-    if file == editor?.currentFile
-        loadFile editor?.currentFile, reload:true
-    else
-        post.emit 'revertFile', file
-
-# 000       0000000    0000000   0000000    00000000  000  000      00000000  
-# 000      000   000  000   000  000   000  000       000  000      000       
-# 000      000   000  000000000  000   000  000000    000  000      0000000   
-# 000      000   000  000   000  000   000  000       000  000      000       
-# 0000000   0000000   000   000  0000000    000       000  0000000  00000000  
-
-loadFile = (file, opt={}) ->
-
-    # log "---------------- window.loadFile #{file}"
-    # log "opt:", opt if valid opt
-    # log "file:", file
-    # log "current:", editor?.currentFile
-    
-    file = null if file? and file.length <= 0
-
-    editor.saveScrollCursorsAndSelections()
-
-    if file?
-        [file, filePos] = slash.splitFilePos file
-        if not file.startsWith 'untitled'
-            file = slash.resolve file
-
-    if file != editor?.currentFile or opt?.reload
-
-        # log "window.loadFile", file
-        
-        if fileExists = slash.fileExists file
-            addToRecent file
-        
-        tab = tabs.tab file
-        if empty tab
-            tab = tabs.addTab file
-        
-        if activeTab = tabs.activeTab()
-            if tab != activeTab
-                activeTab.clearActive()
-                if activeTab.dirty()
-                    activeTab.storeState()
-            
-        editor.setCurrentFile file
-
-        tab.finishActivation() # setActive, restore state, update tabs
-        
-        editor.restoreScrollCursorsAndSelections()
-        
-        if fileExists
-            post.toOthers 'fileLoaded', file, winID # indexer
-            post.emit 'cwdSet', slash.dir file
-            
-    window.split.raise 'editor'
-
-    if filePos? and (filePos[0] or filePos[1])
-        editor.singleCursorAtPos filePos
-        editor.scroll.cursorToTop()
-
-#  0000000   00000000   00000000  000   000        00000000  000  000      00000000   0000000
-# 000   000  000   000  000       0000  000        000       000  000      000       000
-# 000   000  00000000   0000000   000 0 000        000000    000  000      0000000   0000000
-# 000   000  000        000       000  0000        000       000  000      000            000
-#  0000000   000        00000000  000   000        000       000  0000000  00000000  0000000
-
-openFiles = (ofiles, options) -> # called from file dialog, open command and browser
-
-    if ofiles?.length
-
-        files = filelist ofiles, ignoreHidden: false
-
-        if files.length >= 10
-            answer = dialog.showMessageBox
-                type: 'warning'
-                buttons: ['Cancel', 'Open All']
-                defaultId: 0
-                cancelId: 0
-                title: "A Lot of Files Warning"
-                message: "You have selected #{files.length} files."
-                detail: "Are you sure you want to open that many files?"
-            return if answer != 1
-
-        if files.length == 0
-            log 'window.openFiles.warning: no files for:', ofiles
-            return []
-
-        window.stash.set 'openFilePath', slash.dir files[0]
-
-        if not options?.newWindow and not options?.newTab
-            file = slash.resolve files.shift()
-            loadFile file
-
-        for file in files
-            if options?.newWindow
-                post.toMain 'newWindowWithFile', file
-            else
-                post.emit 'newTabWithFile', file
-
-        return ofiles
-
-window.openFiles        = openFiles
-window.openFileDialog   = openFileDialog
-window.loadFile         = loadFile
-window.reloadFile       = reloadFile
-
-# 0000000    000   0000000   000       0000000    0000000
-# 000   000  000  000   000  000      000   000  000
-# 000   000  000  000000000  000      000   000  000  0000
-# 000   000  000  000   000  000      000   000  000   000
-# 0000000    000  000   000  0000000   0000000    0000000
-
-openFileDialog = (opt) ->
-
-    dir = slash.dir editor.currentFile if editor?.currentFile
-    dir ?= slash.resolve '.'
-    dialog.showOpenDialog
-        title: "Open File"
-        defaultPath: window.stash.get 'openFilePath',  dir
-        properties: ['openFile', 'multiSelections']
-        , (files) -> openFiles files, opt
-
-saveFileAs = ->
-
-    dialog.showSaveDialog
-        title: "Save File As"
-        defaultPath: slash.unslash slash.dir editor.currentFile
-        properties: ['openFile', 'createDirectory']
-        , (file) ->
-            if file
-                addToRecent file
-                saveFile file
 
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000
@@ -499,7 +283,8 @@ setFontSize = (s) ->
 
     window.stash.set "fontSize", s
     editor.setFontSize s
-    loadFile editor.currentFile, reload:true if editor.currentFile?
+    if editor.currentFile?
+        post.emit 'loadFile', editor.currentFile, reload:true
 
 changeFontSize = (d) ->
     
@@ -607,21 +392,19 @@ onMenuAction = (name, args) ->
         when 'Activate Previous Tab' then return window.tabs.navigate 'left'
         when 'Move Tab Left'         then return window.tabs.move 'left'
         when 'Move Tab Right'        then return window.tabs.move 'right'
-        when 'Open...'               then return openFileDialog()
-        when 'Open In New Tab...'    then return openFileDialog newTab: true
-        when 'Open In New Window...' then return openFileDialog newWindow: true
-        when 'Save'                  then return saveFile()
-        when 'Save All'              then return saveAll()
-        when 'Save As ...'           then return saveFileAs()
-        when 'Revert'                then return reloadFile()
+        when 'Open...'               then return post.emit 'openFile'
+        when 'Open In New Tab...'    then return post.emit 'openFile', newTab: true
+        when 'Open In New Window...' then return post.emit 'openFile', newWindow: true
+        when 'Save'                  then return post.emit 'saveFile'
+        when 'Save All'              then return post.emit 'saveAll'
+        when 'Save As ...'           then return post.emit 'saveFileAs'
+        when 'Revert'                then return post.emit 'reloadFile'
         when 'Reload Window'         then return reloadWin()
         when 'Close Tab or Window'   then return post.emit 'closeTabOrWindow'
         when 'Close Other Tabs'      then return post.emit 'closeOtherTabs'
         when 'Fullscreen'            then return win.setFullScreen !win.isFullScreen()
         when 'Clear List'            then return state.set 'recentFiles', []
-        when 'Preferences'           
-            # log 'prefs.store.file', prefs.store.file
-            return openFiles [prefs.store.file], newTab:true
+        when 'Preferences'           then return post.emit 'openFiles', [prefs.store.file], newTab:true
 
     switch name
         when 'Cycle Windows' then args = winID

@@ -215,7 +215,7 @@ class Column
         
         if item = @activeRow()?.item
             if item.type == 'file' and item.textFile
-                window.openFiles [item.file], newWindow: true
+                post.emit 'openFiles', [item.file], newWindow: true
         @
 
     #  0000000  00000000   0000000   00000000    0000000  000   000    
