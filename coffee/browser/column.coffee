@@ -6,7 +6,7 @@
  0000000   0000000   0000000   0000000   000   000  000   000
 ###
 
-{ post, stopEvent, setStyle, keyinfo, popup, slash, valid, clamp, empty, state, open, elem, pos, fs, error, $, _ } = require 'kxk'
+{ post, stopEvent, setStyle, keyinfo, popup, slash, valid, clamp, empty, state, open, elem, pos, fs, error, log, $, _ } = require 'kxk'
 
 Row      = require './row'
 Scroller = require './scroller'
@@ -334,7 +334,10 @@ class Column
     moveToTrash: =>
         
         pathToTrash = @activePath()
+        if pathToTrash == window.tabs.activeTab().file()
+            window.tabs.closeTab window.tabs.activeTab()
         @removeObject()
+        
         trash([pathToTrash]).catch (err) -> error "failed to trash #{pathToTrash} #{err}"
 
     duplicateFile: =>

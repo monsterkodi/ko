@@ -147,10 +147,7 @@ class Tabs
     
     closeTab: (tab) ->
         
-        tab.close()
-        
-        _.pull @tabs, tab
-        
+        _.pull @tabs, tab.close()
         @
           
     onCloseTabOrWindow: (tab) =>
