@@ -47,9 +47,12 @@ class File
             
     @save: (file, text, cb) ->
     
+        # log 'File.save', file
+        
         slash.fileExists file, (stat) ->
             
             if stat
+                
                 slash.isWritable file, (writable) ->
                     
                     if writable

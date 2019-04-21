@@ -199,6 +199,8 @@ window.editorWithName = (n) ->
 
 saveAll = ->
     
+    log 'window.saveAll'
+    
     for tab in tabs.tabs
         if tab.dirty()
             if tab == tabs.activeTab()
@@ -209,8 +211,6 @@ saveAll = ->
 saveFile = (file) ->
 
     file ?= editor.currentFile
-    
-    log "window.saveFile #{file}"
     
     if not file?
         saveFileAs()
@@ -291,17 +291,18 @@ reloadWin = ->
     editor.stopWatcher()
     win.webContents.reloadIgnoringCache()
 
-# 000       0000000    0000000   0000000
-# 000      000   000  000   000  000   000
-# 000      000   000  000000000  000   000
-# 000      000   000  000   000  000   000
-# 0000000   0000000   000   000  0000000
+# 00000000   00000000  000       0000000    0000000   0000000    
+# 000   000  000       000      000   000  000   000  000   000  
+# 0000000    0000000   000      000   000  000000000  000   000  
+# 000   000  000       000      000   000  000   000  000   000  
+# 000   000  00000000  0000000   0000000   000   000  0000000    
 
 reloadFile = ->
 
     if tab = tabs.activeTab()
         delete tab.state
         tab.info.dirty = false
+        tab.update()
     
     loadFile editor.currentFile, reload:true
 
@@ -315,15 +316,20 @@ reloadTab = (file) ->
     else
         post.emit 'revertFile', file
 
+# 000       0000000    0000000   0000000    00000000  000  000      00000000  
+# 000      000   000  000   000  000   000  000       000  000      000       
+# 000      000   000  000000000  000   000  000000    000  000      0000000   
+# 000      000   000  000   000  000   000  000       000  000      000       
+# 0000000   0000000   000   000  0000000    000       000  0000000  00000000  
+
 loadFile = (file, opt={}) ->
 
-    log "window.loadFile", file, opt
+    # log "---------------- window.loadFile #{file}"
+    # log "opt:", opt if valid opt
+    # log "file:", file
+    # log "current:", editor?.currentFile
     
     file = null if file? and file.length <= 0
-
-    if activeTab = tabs.activeTab()
-        if activeTab.dirty()
-            activeTab.storeState()
 
     editor.saveScrollCursorsAndSelections()
 
@@ -332,33 +338,31 @@ loadFile = (file, opt={}) ->
         if not file.startsWith 'untitled'
             file = slash.resolve file
 
-    log "window.loadFile", file 
-    log "window.loadFile currentFile:", editor?.currentFile
-        
     if file != editor?.currentFile or opt?.reload
 
-        fileExists = slash.fileExists file
-
-        editor.clear()
-
-        log "window.loadFile", file
+        # log "window.loadFile", file
         
-        if fileExists
+        if fileExists = slash.fileExists file
             addToRecent file
         
         tab = tabs.tab file
         if empty tab
             tab = tabs.addTab file
+        
+        if activeTab = tabs.activeTab()
+            if tab != activeTab
+                activeTab.clearActive()
+                if activeTab.dirty()
+                    activeTab.storeState()
             
         editor.setCurrentFile file
 
-        tab.activate false # this will restore state
+        tab.finishActivation() # setActive, restore state, update tabs
         
         editor.restoreScrollCursorsAndSelections()
         
-        post.toOthers 'fileLoaded', file, winID
-        
         if fileExists
+            post.toOthers 'fileLoaded', file, winID # indexer
             post.emit 'cwdSet', slash.dir file
             
     window.split.raise 'editor'
@@ -411,6 +415,7 @@ openFiles = (ofiles, options) -> # called from file dialog, open command and bro
 window.openFiles        = openFiles
 window.openFileDialog   = openFileDialog
 window.loadFile         = loadFile
+window.reloadFile       = reloadFile
 
 # 0000000    000   0000000   000       0000000    0000000
 # 000   000  000  000   000  000      000   000  000

@@ -76,7 +76,7 @@ class Navigate
 
             when 'addFilePos'
                 
-                log 'navigate.addFilePos', opt
+                # log 'navigate.addFilePos', opt
                 
                 return if not opt?.file?.length
                 

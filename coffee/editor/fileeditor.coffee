@@ -78,42 +78,37 @@ class FileEditor extends TextEditor
     setCurrentFile: (file, restoreState) ->
 
         @clear()
+        @stopWatcher()
 
-        log "fileeditor.setCurrentFile #{file}"
-        
         @currentFile = file
 
         @setupFileType()
+        
+        fileExists = @currentFile? and slash.fileExists @currentFile
 
-        if @currentFile? and slash.fileExists @currentFile
+        if restoreState
+            @setText restoreState.text()
+            @state = restoreState
+            @dirty = true
+        else if fileExists
+            @setText fs.readFileSync @currentFile, encoding: 'utf8'
 
+        if fileExists
             @watch = new watcher @
-
-            if restoreState
-
-                @setText restoreState.text()
-                @state = restoreState
-                @dirty = true
-                post.emit 'dirty', true
-
-            else
-                @setText fs.readFileSync @currentFile, encoding: 'utf8'
-                post.emit 'dirty', false
-
-                
-        log "fileeditor.setCurrentFile emit 'file' #{@currentFile}"
-        post.emit 'file', @currentFile # tabs & tab & shelf
+            
+        post.emit 'file', @currentFile # browser & shelf
 
         @emit 'file', @currentFile # diffbar, pigments, ...
-
+        
+        post.emit 'dirty', @dirty
+        
     restoreFromTabState: (tabsState) ->
 
         return error "no tabsState.file?" if not tabsState.file?
-        @clear()
         @setCurrentFile tabsState.file, tabsState.state
 
     stopWatcher: ->
-        # log 'stopWatcher', @currentFile
+
         @watch?.stop()
         @watch = null
 
@@ -232,7 +227,7 @@ class FileEditor extends TextEditor
             file = opt.file
             file += ':' + opt.line if opt.line
             file += ':' + opt.col if opt.col
-            log 'fileEditor.jumpToFile newTabWithFile', file
+            # log 'fileEditor.jumpToFile newTabWithFile', file
             post.emit 'newTabWithFile', file
             
         else
@@ -245,7 +240,7 @@ class FileEditor extends TextEditor
 
             opt.oldPos = @cursorPos()
             opt.oldFile = @currentFile
-            log 'fileEditor.jumpToFile gotoFilePos', opt
+            # log 'fileEditor.jumpToFile gotoFilePos', opt
             window.navigate.gotoFilePos opt
 
     jumpTo: (word, opt) =>

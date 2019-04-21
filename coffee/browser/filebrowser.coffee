@@ -51,6 +51,7 @@ class FileBrowser extends Browser
         @initColumns()
         
     onFileBrowser: (action, item, arg) =>
+        
         switch action
             when 'loadItem'     then @loadItem     item, arg
             when 'activateItem' then @activateItem item, arg
@@ -82,7 +83,7 @@ class FileBrowser extends Browser
     # 000   000   0000000     000     000      0      000   000     000     00000000  
     
     activateItem: (item, col) ->
-        
+    
         @clearColumnsFrom col+2, pop:true
         
         switch item.type
@@ -177,6 +178,8 @@ class FileBrowser extends Browser
     
     loadDirItem: (item, col=0, opt={}) ->
         
+        # log 'loadDirItem', item?.name, item?.file
+        
         return if col > 0 and item.name == '/'
         
         dir = item.file
@@ -189,7 +192,7 @@ class FileBrowser extends Browser
             
             dirlist dir, opt, (err, items) => 
                 
-                if err? then return error "can't load dir #{dir}: #{err}"
+                if err? then return # error "can't load dir #{dir}: #{err}"
             
                 post.toMain 'dirLoaded', dir
                 
@@ -236,8 +239,14 @@ class FileBrowser extends Browser
         if file == lastPath
             return
             
+        if slash.isRelative file
+            # log "ignore relative file #{file}"
+            return
+            
         filelist = slash.pathlist file
         lastlist = slash.pathlist lastPath
+        
+        # log "navigateToFile #{file}", filelist
         
         if valid lastlist
             

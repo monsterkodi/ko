@@ -6,7 +6,7 @@
    000     000   000  0000000    0000000 
 ###
 
-{ post, stopEvent, popup, valid, empty, first, slash, elem, last, drag, pos, error, log, $, _ } = require 'kxk'
+{ post, stopEvent, popup, valid, empty, first, last, slash, elem, drag, pos, error, log, $, _ } = require 'kxk'
 
 Tab = require './tab'
 
@@ -126,7 +126,6 @@ class Tabs
     
     tab: (id) ->
         
-        log "tabs.tab id:#{id}"
         if _.isNumber  id then return @tabs[id]
         if _.isElement id then return _.find @tabs, (t) -> t.div.contains id
         if _.isString  id then return _.find @tabs, (t) -> t.info.file == id
@@ -146,20 +145,12 @@ class Tabs
     # 000       000      000   000       000  000       
     #  0000000  0000000   0000000   0000000   00000000  
     
-    closeTab: (tab = @activeTab(), opt) ->
+    closeTab: (tab) ->
         
-        if tab.dirty()
-            tab.saveChanges()
-            
-        if not opt?.skipActivate
-            tab.nextOrPrev().activate()
-            
         tab.close()
         
         _.pull @tabs, tab
         
-        if not opt?.skipUpdate
-            @update()
         @
           
     onCloseTabOrWindow: (tab) =>
@@ -167,15 +158,17 @@ class Tabs
         if @numTabs() == 1
             window.win.close()
         else
+            tab ?= @activeTab()
+            newActiveTab = tab.nextOrPrev()
             @closeTab tab
+            newActiveTab.activate()
+            @update()
 
     onCloseOtherTabs: => 
         
         keep = _.pullAt @tabs, @activeTab().index()
         while @numTabs()
             tab = last @tabs
-            if tab.dirty()
-                tab.saveChanges()
             @tabs.pop().close() 
         @tabs = keep
         @update()
@@ -188,26 +181,20 @@ class Tabs
     
     addTab: (file) ->
 
-        log 'tabs.addTab', file
         if @tabs.length > 4
             for index in [0...@tabs.length]
                 if not @tabs[index].dirty()
-                    @closeTab @tabs[index], skipActivate:true, skipUpdate:true
+                    @closeTab @tabs[index]
                     break
         
-        tab = new Tab @
-        tab.update file:file
-        @tabs.push tab
-        tab.setActive()
-        @update()
-            
-        tab
+        @tabs.push new Tab @, file
+        last @tabs
 
     onNewEmptyTab: =>
         
         @emptyid += 1
-        log "tabs.onNewEmptyTab #{@emptyid}"
         @addTab("untitled-#{@emptyid}").activate()
+        @update()
         
     onNewTabWithFile: (file) =>
         
@@ -219,6 +206,8 @@ class Tabs
             tab.activate()
         else
             @addTab(file).activate()
+            
+        @update()
             
         if line or col
             
@@ -277,10 +266,10 @@ class Tabs
         
         return if empty files # happens when first window opens
         
-        log 'tabs.restore'
-        
         if valid @tabs
-            @tabs[0].update file:files.shift(), type:'file'
+            log 'valid tabs?'
+            
+        @tabs = []
             
         while files.length
             @addTab files.shift()
@@ -299,8 +288,6 @@ class Tabs
     
     update: ->
 
-        # log 'tabs.update'
-        
         @stash()
 
         return if empty @tabs
@@ -317,7 +304,6 @@ class Tabs
 
     onDirty: (dirty) =>
         
-        log 'tabs.onDirty', dirty
         @activeTab()?.setDirty dirty
         
     #  0000000   0000000   000   000  000000000  00000000  000   000  000000000  

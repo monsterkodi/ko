@@ -6,23 +6,41 @@
 00     00  000   000     000      0000000  000   000  00000000  000   000
 ###
 
-{ log, fs } = require 'kxk'
+{ slash, log, fs } = require 'kxk'
 
 class Watcher
 
-    constructor: (@editor) ->
+    constructor: (editor) ->
 
-        @w = fs.watch @editor.currentFile
+        @file = editor.currentFile
+        @w = fs.watch @file
+        
+        slash.exists @file, @onExists
         
         @w.on 'change', (changeType, p) =>
             
+            # log 'watcher changeType:', changeType, p
             if changeType == 'change'
-                window.loadFile @editor.currentFile, reload:true
+                if not @stat
+                    log "watcher +++++++++++++ IGNORE: #{@file}"
+                else
+                    slash.exists @file, @onChange
             else
-                @editor.setText ""
+                log "watcher ?????? changeType #{changeType}"
             
-        # @w.on 'unlink', (p) => @editor.setText ""
+        @w.on 'unlink', (p) => 
+            log "watcher.on unlink #{p}"
+            
+    onChange: (stat) =>
         
-    stop: -> @w.close()
+        if stat.mtimeMs != @stat.mtimeMs
+            window.reloadFile()
+        
+    onExists: (@stat) =>
+        
+    stop: ->
+        
+        @w?.close()
+        @w = null
 
 module.exports = Watcher

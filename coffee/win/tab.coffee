@@ -14,19 +14,24 @@ syntax  = require '../editor/syntax'
 
 class Tab
     
-    constructor: (@tabs) ->
+    constructor: (@tabs, file) ->
         
-        @info = file:null, dirty:false
+        @info = file:file, dirty:false
         @div = elem class: 'tab', text: ''
         @tabs.div.appendChild @div
+
+        if not @info.file.startsWith 'untitled'
+            @info.pkg = slash.pkg @info.file
+            @info.pkg = slash.basename @info.pkg if @info.pkg?
+        
+        @update()
 
     foreignChanges: (lineChanges) ->
         
         log 'tab.foreignChanges'
         @foreign ?= []
         @foreign.push lineChanges
-        @update @info
-        @tabs.update()
+        @update()        
         
     #  0000000   0000000   000   000  00000000
     # 000       000   000  000   000  000     
@@ -35,6 +40,9 @@ class Tab
     # 0000000   000   000      0      00000000
     
     saveChanges: ->
+        
+        # log 'tab.saveChanges info:', @info
+        # log 'tab.saveChanges state:', @state
         
         if @state
             
@@ -46,9 +54,12 @@ class Tab
                             when 'inserted' then @state.state = @state.state.insertLine change.doIndex, change.after
                             when 'deleted'  then @state.state = @state.state.deleteLine change.doIndex
             
-            File.save @state.file, @state.state.text(), (err) =>
-                return error "tab.saveChanges failed #{err}" if err
-                @revert()
+            if @state.state 
+                File.save @state.file, @state.state.text(), (err) =>
+                    return error "tab.saveChanges failed #{err}" if err
+                    @revert()
+            else
+                log 'tab.saveChanges -- nothing to save?'
         else
             window.saveChanges()
             
@@ -60,11 +71,18 @@ class Tab
     
     storeState: ->
         
+        # log 'tab.storeState', @info
+        
         if window.editor.currentFile
+            if @info.file != window.editor.currentFile
+                log 'tab.storeState editor.currentFile', window.editor.currentFile, '@info.file', @info.file
             @state = window.editor.do.tabState()
+            # log 'tab.storeState @state', @state
         
     restoreState: ->
         
+        # log 'tab.restoreState', @info.file
+        # log 'tab.restoreState', @state
         return error 'no file in state?', @state if not @state?.file?
         window.editor.do.setTabState @state
         delete @state
@@ -75,25 +93,8 @@ class Tab
     # 000   000  000        000   000  000   000     000     000       
     #  0000000   000        0000000    000   000     000     00000000  
     
-    update: (info) ->
-            
-        log 'tab.update new info:', info
-        log 'tab.update old info:', @info
-        
-        oldFile = @info?.file
-        oldPkg  = @info?.pkg
-        
-        @info = _.clone info
-        
-        if @info.file != oldFile
-            if @info.file?
-                @info.pkg = slash.pkg @info.file
-                @info.pkg = slash.basename @info.pkg if @info.pkg?
-            else
-                delete @info.pkg
-        else
-            @info.pkg = oldPkg
-                        
+    update: ->
+           
         @div.innerHTML = ''
         @div.classList.toggle 'dirty', @dirty()
                 
@@ -119,14 +120,15 @@ class Tab
         @div.appendChild elem 'span', class:'dot', text:'●' if @dirty()
         @
 
-    file:  -> @info?.file
+    file:  -> @info.file
     index: -> @tabs.tabs.indexOf @
     prev:  -> @tabs.tab @index()-1 if @index() > 0
     next:  -> @tabs.tab @index()+1 if @index() < @tabs.numTabs()-1
     nextOrPrev: -> @next() ? @prev()
             
     close: ->
-        
+        if @dirty()
+            @saveChanges()
         @div.remove()
         @tooltip?.del()
         post.emit 'tabClosed', @info.file
@@ -146,15 +148,14 @@ class Tab
         return true if @info.dirty == true
         # return false even if editor has line changes:
         # dirty is reset before changed file is saved
+        # log 'tab.dirty == false', @info
         false
         
     setDirty: (dirty) ->
         
-        log "setDirty #{dirty}", @info 
-        
         if @info.dirty != dirty
             @info.dirty = dirty
-            @update @info
+            @update()
     
     # 00000000   00000000  000   000  00000000  00000000   000000000  
     # 000   000  000       000   000  000       000   000     000     
@@ -167,7 +168,7 @@ class Tab
         delete @foreign
         delete @state
         @info.dirty = false
-        @update @info
+        @update()
         @tabs.update()
 
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
@@ -176,12 +177,11 @@ class Tab
     # 000   000  000          000     000     000     000   000     000     000       
     # 000   000   0000000     000     000      0      000   000     000     00000000  
     
-    activate: (emitJumpTo=true) -> 
+    activate: -> 
         
-        if emitJumpTo
-            log "tab.activate jumpToFile #{@info.file}"
-            post.emit 'jumpToFile', file:@info.file
-            return
+        post.emit 'jumpToFile', file:@info.file
+        
+    finishActivation: ->
         
         @setActive()
         
@@ -204,10 +204,12 @@ class Tab
     isActive: -> @div.classList.contains 'active'
     
     setActive: -> 
+        
         if not @isActive()
-            @tabs.activeTab()?.clearActive()
             @div.classList.add 'active'
             
-    clearActive: -> @div.classList.remove 'active'
+    clearActive: ->
+        
+        @div.classList.remove 'active'
         
 module.exports = Tab
