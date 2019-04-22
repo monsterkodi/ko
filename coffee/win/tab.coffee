@@ -20,19 +20,26 @@ class Tab
         @dirty = false
         @div = elem class: 'tab', text: ''
         @tabs.div.appendChild @div
-        @watcher = new Watcher @file
 
         if not @file.startsWith 'untitled'
             @pkg = slash.pkg @file
             @pkg = slash.basename @pkg if @pkg?
         
         @update()
+        
+        @watcher = new Watcher @file
 
     foreignChanges: (lineChanges) ->
         
         @foreign ?= []
         @foreign.push lineChanges
         @update()        
+        
+    reload: ->
+        
+        delete @state
+        @dirty = false
+        @update()
         
     #  0000000   0000000   000   000  00000000
     # 000       000   000  000   000  000     
@@ -127,11 +134,13 @@ class Tab
     nextOrPrev: -> @next() ? @prev()
             
     close: ->
-        if @dirty # isDirty()
+        @watcher.stop()
+        if @dirty
             @saveChanges()
         @div.remove()
         @tooltip?.del()
         post.emit 'tabClosed', @file
+        @
     
     hidePkg: -> @pkgDiv?.style.display = 'none'
     showPkg: -> @pkgDiv?.style.display = 'initial'

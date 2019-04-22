@@ -152,20 +152,20 @@ class Tabs
           
     onCloseTabOrWindow: (tab) =>
         
-        if @numTabs() == 1
+        log "onCloseTabOrWindow @numTabs #{@numTabs()}"
+        
+        if @numTabs() <= 1
             window.win.close()
         else
             tab ?= @activeTab()
-            newActiveTab = tab.nextOrPrev()
+            tab.nextOrPrev().activate()
             @closeTab tab
-            newActiveTab.activate()
             @update()
 
     onCloseOtherTabs: => 
         
         keep = _.pullAt @tabs, @activeTab().index()
         while @numTabs()
-            tab = last @tabs
             @tabs.pop().close() 
         @tabs = keep
         @update()
