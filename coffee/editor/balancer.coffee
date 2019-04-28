@@ -25,12 +25,12 @@ class Balancer
     setFileType: (fileType) ->
 
         lineComment = switch fileType
-            when 'coffee', 'sh', 'bat', 'noon', 'ko', 'txt', 'fish'                 then '#'
+            when 'coffee', 'koffee', 'sh', 'bat', 'noon', 'ko', 'txt', 'fish'       then '#'
             when 'styl', 'cpp', 'c', 'h', 'hpp', 'cxx', 'cs', 'js', 'scss', 'ts'    then '//'
             when 'iss', 'ini'                                                       then ';'
 
         multiComment = switch fileType
-            when 'coffee'                                                           then open: '###',  close: '###'
+            when 'coffee', 'koffee'                                                 then open: '###',  close: '###'
             when 'html', 'md'                                                       then open: '<!--', close: '-->'
             when 'styl', 'cpp', 'c', 'h', 'hpp', 'cxx', 'cs', 'js', 'scss', 'ts'    then open: '/*',   close: '*/'
         
@@ -50,7 +50,7 @@ class Balancer
             
         switch fileType
             
-            when 'coffee'
+            when 'coffee', 'koffee'
                 @regions.multiString   = clss: 'string triple',  open: '"""', close: '"""', multi: true
                 @regions.interpolation = clss: 'interpolation',  open: '#{',  close: '}',   multi: true
                 @regions.singleString  = clss: 'string single',  open: "'", close: "'"

@@ -57,14 +57,15 @@ class Row
             if @item.type == 'dir'
                 className = 'folder-icon'
             else
-                if slash.ext(@item.file) == 'noon'
-                    className = 'noon-icon'
-                else
-                    try
-                        className = fileIcons.getClass slash.removeLinePos @item.file
-                    catch err
-                        console.log "no icon? #{@item.file}"
-                    # log 'icon.getClass', slash.removeLinePos(@item.file), className
+                switch slash.ext @item.file
+                    when 'noon'   then className = 'noon-icon'
+                    when 'koffee' then className = 'coffee-icon'
+                    else
+                        try
+                            className = fileIcons.getClass slash.removeLinePos @item.file
+                        catch err
+                            console.log "no icon? #{@item.file}"
+                        # log 'icon.getClass', slash.removeLinePos(@item.file), className
                 className ?= 'file-icon'
             
         icon = elem('span', class:className + ' browserFileIcon')

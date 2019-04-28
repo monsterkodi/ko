@@ -21,7 +21,7 @@ class Walker
         @cfg.ignore      ?= ['node_modules', 'build', 'Build', 'Library', 'Applications'] #, 'resources', 'ThirdParty', 'Binaries', 'Intermediate', 'Saved', 'Programs', 'Shaders', 'DerivedDataCache', 'Content', 'Samples']
         @cfg.include     ?= ['.konrad.noon', '.gitignore', '.npmignore']
         @cfg.ignoreExt   ?= ['app', 'asar']
-        @cfg.includeExt  ?= ['coffee', 'styl', 'pug', 'md', 'noon', # 'html', 'css',
+        @cfg.includeExt  ?= ['koffee', 'coffee', 'styl', 'pug', 'md', 'noon', # 'html', 'css',
                             'txt', 'json', 'sh', 'py', 'js', 'ts', 'ini',                          
                             'cpp', 'cc', 'c', 'cs', 'h', 'hpp']
       

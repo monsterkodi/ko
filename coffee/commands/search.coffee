@@ -8,11 +8,11 @@
 
 { slash, post, fs, os, error, log, _ } = require 'kxk'
 
-matchr   = require '../tools/matchr'
-walker   = require '../tools/walker'
-syntax   = require '../editor/syntax'
-Command  = require '../commandline/command'
-stream   = require 'stream'
+matchr  = require '../tools/matchr'
+walker  = require '../tools/walker'
+syntax  = require '../editor/syntax'
+Command = require '../commandline/command'
+stream  = require 'stream'
 
 class Search extends Command
 
@@ -82,7 +82,8 @@ class Search extends Command
             maxFiles:    5000
             includeDirs: false
             file:        (f,stat) => @searchInFile opt, slash.path f
-        @walker.cfg.ignore.push 'js'
+        @walker.cfg.ignore.push 'js'  # these directories are not included in search results
+        @walker.cfg.ignore.push 'lib' # they should be configurable, maybe in package.noon or .konrad.noon?
         @walker.start()
         
     searchInFile: (opt, file) =>

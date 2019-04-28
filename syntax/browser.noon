@@ -16,24 +16,24 @@
 
 (?:^\s*|\/)(\.[\-\_\w][\.\-\_\w]*)(?:\s|$)  dotfile
 
-([~\/\.\-\_\ \(\)\w]+)(\.coffee)([\d\:]*\b)    . coffee  . coffee.ext    . coffee.linepos
-([~\/\.\-\_\ \(\)\w]+)(\.noon)([\d\:]*\b)      . noon    . noon.ext      . noon.linepos
-([~\/\.\-\_\ \(\)\w]+)(\.json)([\d\:]*\b)      . json    . json.ext      . json.linepos
-([~\/\.\-\_\ \(\)\w]+)(\.styl)([\d\:]*\b)      . styl    . styl.ext      . styl.linepos
-([~\/\.\-\_\ \(\)\w]+)(\.html)([\d\:]*\b)      . html    . html.ext      . html.linepos
-([~\/\.\-\_\ \(\)\w]+)(\.pug)([\d\:]*\b)       . pug     . pug.ext       . pug.linepos
-([~\/\.\-\_\ \(\)\w]+)(\.css)([\d\:]*\b)       . css     . css.ext       . css.linepos
-([~\/\.\-\_\ \(\)\w]+)(\.cp?p?)([\d\:]*\b)     . cpp     . cpp.ext       . cpp.linepos
-([~\/\.\-\_\ \(\)\w]+)(\.cc)([\d\:]*\b)        . cpp     . cpp.ext       . cpp.linepos
-([~\/\.\-\_\ \(\)\w]+)(\.hp?p?)([\d\:]*\b)     . hpp     . hpp.ext       . hpp.linepos
-([~\/\.\-\_\ \(\)\w]+)(\.js.map)([\d\:]*\b)    . dotfile . dotfile.ext   . dotfile.linepos
-([~\/\.\-\_\ \(\)\w]+)(\.js)([\d\:]*\b)        . js      . js.ext        . js.linepos
-([~\/\.\-\_\ \(\)\w]+)(\.py)([\d\:]*\b)        . py      . py.ext        . py.linepos
-([~\/\.\-\_\ \(\)\w]+)(\.sh)([\d\:]*\b)        . sh      . sh.ext        . sh.linepos
-([~\/\.\-\_\ \(\)\w]+)(\.exe)([\d\:]*\b)       . sh      . sh.ext        . sh.linepos
-([~\/\.\-\_\ \(\)\w]+)(\.md)([\d\:]*\b)        . md      . md.ext        . md.linepos
-([~\/\.\-\_\ \(\)\w]+)(\.txt)([\d\:]*\b)       . txt     . txt.ext       . txt.linepos
-([~\/\.\-\_\ \(\)\w]+)(\.ini)([\d\:]*\b)       . txt     . txt.ext       . txt.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.[ck]offee)([\d\:]*\b)  . coffee  . coffee.ext    . coffee.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.noon)([\d\:]*\b)       . noon    . noon.ext      . noon.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.json)([\d\:]*\b)       . json    . json.ext      . json.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.styl)([\d\:]*\b)       . styl    . styl.ext      . styl.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.html)([\d\:]*\b)       . html    . html.ext      . html.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.pug)([\d\:]*\b)        . pug     . pug.ext       . pug.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.css)([\d\:]*\b)        . css     . css.ext       . css.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.cp?p?)([\d\:]*\b)      . cpp     . cpp.ext       . cpp.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.cc)([\d\:]*\b)         . cpp     . cpp.ext       . cpp.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.hp?p?)([\d\:]*\b)      . hpp     . hpp.ext       . hpp.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.js.map)([\d\:]*\b)     . dotfile . dotfile.ext   . dotfile.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.js)([\d\:]*\b)         . js      . js.ext        . js.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.py)([\d\:]*\b)         . py      . py.ext        . py.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.sh)([\d\:]*\b)         . sh      . sh.ext        . sh.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.exe)([\d\:]*\b)        . sh      . sh.ext        . sh.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.md)([\d\:]*\b)         . md      . md.ext        . md.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.txt)([\d\:]*\b)        . txt     . txt.ext       . txt.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.ini)([\d\:]*\b)        . txt     . txt.ext       . txt.linepos
 
 ([~\/\.\ \(\)@-_\w]+)(\.png|\.jpg)                              . image . image.ext
 ([~\/\.\ \(\)@-_\w]+)(\.pxm|\.tiff?|\.icns|\.ico|\.gif|\.bmp)   . pic . pic.ext
