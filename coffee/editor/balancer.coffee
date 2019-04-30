@@ -62,11 +62,12 @@ class Balancer
                 @regions.lineComment.solo = true # only spaces before comments allowed
                 
             when 'md'
-                @regions.header5 = clss: 'markdown h5', open: '#####', close: null, solo: true                     
-                @regions.header4 = clss: 'markdown h4', open: '####', close: null, solo: true 
-                @regions.header3 = clss: 'markdown h3', open: '###', close: null, solo: true 
-                @regions.header2 = clss: 'markdown h2', open: '##', close: null, solo: true 
-                @regions.header1 = clss: 'markdown h1', open: '#', close: null, solo: true 
+                @regions.multiString   = clss: 'string triple',  open: '```', close: '```', multi: true
+                @regions.header5       = clss: 'markdown h5', open: '#####', close: null, solo: true                     
+                @regions.header4       = clss: 'markdown h4', open: '####', close: null, solo: true 
+                @regions.header3       = clss: 'markdown h3', open: '###', close: null, solo: true 
+                @regions.header2       = clss: 'markdown h2', open: '##', close: null, solo: true 
+                @regions.header1       = clss: 'markdown h1', open: '#', close: null, solo: true 
                 
         @openRegions = _.filter @regions, (r) -> r.close == null
                 
@@ -83,7 +84,8 @@ class Balancer
         if not text?
             return error "dissForLine -- no line at index #{li}?"
 
-        diss = @mergeRegions @parse(text, li), text, li                
+        diss = @mergeRegions @parse(text, li), text, li  
+        # console.log li, text, diss
         diss
       
     dissForLineAndRanges: (line, rgs) ->

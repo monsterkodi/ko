@@ -10,7 +10,7 @@
 
 ignore = require 'ignore'
 
-sourceFileExtensions = [ 'coffee', 'styl', 'pug', 'md', 'noon', 'txt', 'json', 'sh', 'py', 'cpp', 'cc', 'c', 'cs', 'h', 'hpp', 'ts', 'js']
+sourceFileExtensions = [ 'koffee', 'coffee', 'styl', 'pug', 'md', 'noon', 'txt', 'json', 'sh', 'py', 'cpp', 'cc', 'c', 'cs', 'h', 'hpp', 'ts', 'js']
 
 shouldIndex = (path, stat) ->
     

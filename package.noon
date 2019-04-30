@@ -29,8 +29,8 @@ dependencies
                 fuzzy           ^0.1.3
                 ignore          ^5.1.1
                 js-beautify     ^1.9.1
-                kork            ../kork
-                kxk             ../kxk
+                kork            ^0.1.0
+                kxk             ^0.233.0
                 performance-now  ^2.1.0
                 seamless-immutable  ^7.1.4
                 strip-ansi      ^4.0.0
