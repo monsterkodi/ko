@@ -10,6 +10,7 @@
 module.exports =
     
     insertCharacter: (ch) ->
+        
         return @newline() if ch == '\n'
         return if @salterMode and @insertSalterCharacter ch
         
@@ -21,30 +22,41 @@ module.exports =
                 @do.end()
                 return
     
-        if ch == '>' and @numCursors() == 1 and @lineComment?
-            cp = @cursorPos()
-            cl = @lineComment.length
-            if cp[0] >= cl and @do.line(cp[1]).slice(cp[0]-cl, cp[0]) == @lineComment
-                ws = @wordStartPosAfterPos()
-                if ws?
-                    @do.delete cp[1]
-                    @do.end()
-                    @startSalter ws
-                    return
-        
         @deleteSelection()
 
         newCursors = @do.cursors()
+        
         for cc in newCursors
-            @do.change cc[1], @do.line(cc[1]).splice cc[0], 0, ch
-            for nc in positionsAtLineIndexInPositions cc[1], newCursors
-                if nc[0] >= cc[0]
-                    nc[0] += 1
+            cline = @do.line(cc[1])
+            sline = @twiggleSubstitute line:cline, cursor:cc, char:ch
+            if sline
+                @do.change cc[1], sline
+            else
+                @do.change cc[1], cline.splice cc[0], 0, ch
+                for nc in positionsAtLineIndexInPositions cc[1], newCursors
+                    if nc[0] >= cc[0]
+                        nc[0] += 1
         
         @do.setCursors newCursors
         @do.end()
         @emitEdit 'insert'
 
+    twiggleSubstitute: (line:,cursor:,char:) ->
+        
+        if cursor[0] and line[cursor[0]-1] == '~'
+            substitute = switch char
+                when '>' then '▸'
+                when '<' then '◂'
+                when '^' then '▴'
+                when 'v' then '▾'
+                when 'd' then '◆'
+                when 'c' then '●'
+                when 'o' then '○'
+                when 's' then '▪'
+                when 'S' then '■'
+            if substitute
+                return line.splice cursor[0]-1, 1, substitute
+        
     clampCursorOrFillVirtualSpaces: ->
         
         @do.start()

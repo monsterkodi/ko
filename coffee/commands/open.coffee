@@ -10,11 +10,11 @@
   
 profile   = require '../tools/profile'
 Projects  = require '../tools/projects'
+File      = require '../tools/file'
 Command   = require '../commandline/command'
 render    = require '../editor/render'
 syntax    = require '../editor/syntax'
 fuzzy     = require 'fuzzy'
-fileIcons = require 'file-icons-js'
                  
 relative = (rel, to) ->
     
@@ -130,7 +130,7 @@ class Open extends Command
             nameBonus = n.startsWith(opt.currentText) and 2184  * (opt.currentText.length/n.length) or 0
            
         extensionBonus = switch slash.ext b
-            when 'coffee'             then 1000
+            when 'coffee', 'koffee'   then 1000
             when 'cpp', 'hpp', 'h'    then 90
             when 'md', 'styl', 'pug'  then 50
             when 'noon'               then 25
@@ -169,16 +169,8 @@ class Open extends Command
         opt.flat ?= true
         
         iconSpan = (file) ->
-            try
-                className = fileIcons.getClass file
-            catch e
-                console.log e
             
-            if empty className
-                if slash.ext(file) == 'noon'
-                    className = 'noon-icon'
-                else
-                    className = 'file-icon'
+            className = File.iconClassName file
             "<span class='#{className} openFileIcon'/>"
         
         items = []
@@ -188,6 +180,7 @@ class Open extends Command
         @dir = slash.resolve '~' if not @dir?
         
         if @history? and not opt.currentText and @history.length > 1
+            
             f = @history[@history.length-2]
             item = Object.create null
             item.text = relative f, @dir

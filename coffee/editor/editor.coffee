@@ -28,7 +28,6 @@ class Editor extends Buffer
                 
         @indentString      = _.padStart "", 4
         @stickySelection   = false
-        @dbg               = false
         @syntax            = new Syntax @config.syntaxName, @line
         @do                = new Do @
         
@@ -137,7 +136,7 @@ class Editor extends Buffer
         @insertIndentedEmptyLineBetween = '{}'
 
         switch @fileType
-            when 'coffee' 
+            when 'coffee', 'koffee' 
                 @indentNewLineMore = 
                     lineEndsWith: ['->', '=>', ':', '=']
                     lineRegExp:   /^(\s+when|\s*if|\s*else\s+if\s+)(?!.*\sthen\s)|(^|\s)(else\s*$|switch\s|for\s|while\s|class\s)/

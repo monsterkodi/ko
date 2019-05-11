@@ -10,7 +10,7 @@
                             basename
 
 (\s*~?\.[\-\_\w][\.\-\_\w]*)(?:\s|$)  dotfile
-(\s*~?[\.\/\-\_\w]+\.coffee\b)   coffee
+(\s*~?[\.\/\-\_\w]+\.[ck]offee\b)   coffee
 (\s*~?[\.\/\-\_\w]+\.noon\b)     noon
 (\s*~?[\.\/\-\_\w]+\.json\b)     json
 (\s*~?[\.\/\-\_\w]+\.styl\b)     styl

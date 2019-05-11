@@ -309,7 +309,7 @@ class FileEditor extends TextEditor
         currext = slash.ext @currentFile
 
         switch currext
-            when 'coffee'
+            when 'coffee', 'koffee'
                 [file,line,col] = srcmap.toJs @currentFile, cp[1]+1, cp[0]
                 if file?
                     post.emit 'loadFile', slash.joinFileLine file,line,col
@@ -328,7 +328,8 @@ class FileEditor extends TextEditor
             'h':       ['cpp', 'c']
             'hpp':     ['cpp', 'c']
             'coffee':  ['js']
-            'js':      ['coffee']
+            'koffee':  ['js']
+            'js':      ['coffee','koffee']
             'pug':     ['html']
             'html':    ['pug']
             'css':     ['styl']

@@ -6,7 +6,7 @@
 #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000  
 
 (?:^\s*|\/)(\.[\-\_\w][\.\-\_\w]*)(?:\s|$)  dotfile
-([^\/]+)(\.coffee$)    . coffee  . coffee.ext
+([^\/]+)(\.[ck]offee$)  . coffee  . coffee.ext
 ([^\/]+)(\.noon$)      . noon    . noon.ext
 ([^\/]+)(\.json$)      . json    . json.ext
 ([^\/]+)(\.styl$)      . styl    . styl.ext

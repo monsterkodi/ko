@@ -57,7 +57,7 @@ module.exports =
             if doIndent
                 
                 indent = @indentStringForLineAtIndex c[1] 
-                if @fileType == 'coffee' 
+                if @fileType in ['coffee', 'koffee']
                     if /(when|if)/.test before 
                         if after.startsWith 'then '
                             after = after.slice(4).trimLeft() # remove then

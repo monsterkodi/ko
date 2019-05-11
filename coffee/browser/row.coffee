@@ -9,8 +9,8 @@
 { elem, keyinfo, drag, clamp, stopEvent, empty, post, slash, error, log, fs, $, _ } = require 'kxk' 
 
 Syntax    = require '../editor/syntax'
-fileIcons = require 'file-icons-js'
 electron  = require 'electron'
+File      = require '../tools/file'
 
 app = electron.remote.app
 
@@ -57,16 +57,7 @@ class Row
             if @item.type == 'dir'
                 className = 'folder-icon'
             else
-                switch slash.ext @item.file
-                    when 'noon'   then className = 'noon-icon'
-                    when 'koffee' then className = 'coffee-icon'
-                    else
-                        try
-                            className = fileIcons.getClass slash.removeLinePos @item.file
-                        catch err
-                            console.log "no icon? #{@item.file}"
-                        # log 'icon.getClass', slash.removeLinePos(@item.file), className
-                className ?= 'file-icon'
+                className = File.iconClassName @item.file
             
         icon = elem('span', class:className + ' browserFileIcon')
             

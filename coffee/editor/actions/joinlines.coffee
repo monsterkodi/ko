@@ -35,7 +35,7 @@ module.exports =
                 before = @do.line(c[1]).trimRight() + " "
                 after  = @do.line(c[1]+1).trimLeft()
                 
-                if @fileType == 'coffee'
+                if @fileType in ['coffee', 'koffee']
                     after = @insertThen before, after
                             
                 @do.change c[1], before + after

@@ -17,17 +17,19 @@ class Indexer
 
     @requireRegExp   = /^\s*([\w\{\}]+)\s+=\s+require\s+[\'\"]([\.\/\w]+)[\'\"]/
     @includeRegExp   = /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
-    @methodRegExp    = /^\s+([\@]?\w+)\s*\:\s*(\(.*\))?\s*[=-]\>/
-    @funcRegExp      = /^\s*([\w\.]+)\s*[\:\=]\s*(\(.*\))?\s*[=-]\>/
+    # @methodRegExp    = /^\s+([\@]?\w+)\s*\:\s*(\(.*\))?\s*[=-]\>/
+    @methodRegExp    = /^\s+([\@]?\w+|@)\s*\:\s*(\(.*\))?\s*[=-]\>/
+    # @funcRegExp      = /^\s*([\w\.]+)\s*[\:\=]\s*(\(.*\))?\s*[=-]\>/
+    @funcRegExp      = /^\s*([\w\.]+)\s*[\:\=][^\(\)]*(\(.*\))?\s*[=-]\>/
     @postRegExp      = /^\s*post\.on\s+[\'\"](\w+)[\'\"]\s*\,\s*(\(.*\))?\s*[=-]\>/
     @testRegExp      = /^\s*(describe|it)\s+[\'\"](.+)[\'\"]\s*[\,]\s*(\([^\)]*\))?\s*[=-]\>/
     @splitRegExp     = new RegExp "[^\\w\\d\\_]+", 'g'
-    @classRegExp     = /^class\s+(\w+)/
+    @classRegExp     = /^(\s*\S+\s*=)?\s*class\s+(\w+)/
 
     @classNameInLine: (line) ->
                     
         m = line.match Indexer.classRegExp
-        m?[1]
+        m?[2]
         
     @methodNameInLine: (line) ->
         
@@ -278,7 +280,7 @@ class Indexer
 
     addFuncInfo: (funcName, funcInfo) ->
         
-        if funcName.startsWith '@'
+        if funcName.length > 1 and funcName.startsWith '@'
             funcName = funcName.slice 1
             funcInfo.static = true
             
@@ -390,7 +392,7 @@ class Indexer
                             funcInfo.class ?= slash.base file
                             fileInfo.funcs.push funcInfo 
     
-                        if currentClass? # and indent >= 4
+                        if currentClass? 
     
                             # 00     00  00000000  000000000  000   000   0000000   0000000     0000000
                             # 000   000  000          000     000   000  000   000  000   000  000
@@ -410,7 +412,7 @@ class Indexer
                             # 000       000   000  000  0000  000          000     000  000   000  000  0000       000
                             # 000        0000000   000   000   0000000     000     000   0000000   000   000  0000000
     
-                            currentClass = null if indent < 4
+                            currentClass = null if indent < 2 # was 4
     
                             if funcName = Indexer.funcNameInLine line
                                 funcInfo = @addFuncInfo funcName,
@@ -454,7 +456,7 @@ class Indexer
                             # 000       000      000   000       000       000
                             #  0000000  0000000  000   000  0000000   0000000
                             
-                            when 'class' #, 'struct'
+                            when 'class'
                                 
                                 if className = Indexer.classNameInLine line
                                     currentClass = className

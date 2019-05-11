@@ -105,7 +105,7 @@ indexProject = (file) ->
                 addIgnores path
                 return
                 
-            if file == '.ko.noon'
+            if file == '.ko.noon' # ???
                 kofiles.push path
                 
             if shouldIndex path, stat

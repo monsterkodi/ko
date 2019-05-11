@@ -10,6 +10,22 @@
 
 class File
 
+    @iconClassName: (file) ->
+        
+        file = slash.removeLinePos file
+        switch slash.ext file
+            when 'noon'   then className = 'noon-icon'
+            when 'koffee' then className = 'coffee-icon'
+            else
+                try
+                    fileIcons = require 'file-icons-js'
+                    className = fileIcons.getClass file
+                catch err
+                    console.log "no icon? #{file}"
+                # log 'icon.getClass', slash.removeLinePos(file), className
+        className ?= 'file-icon'
+        className
+    
     @atomic: (file, text, mode, cb) ->
 
         atomic file, text, { encoding: 'utf8', mode: mode }, (err) ->
