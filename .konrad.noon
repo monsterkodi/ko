@@ -2,3 +2,5 @@ ignore
     /syntax/
     /md/
     /bin/cheet.noon
+    /bin/dmg.json
+    /coffee/menu.noon

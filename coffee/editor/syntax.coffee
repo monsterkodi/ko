@@ -10,7 +10,7 @@
 
 matchr   = require '../tools/matchr'
 Balancer = require './balancer' 
-kork     = require 'kork'
+klor     = require 'klor'
 
 class Syntax
 
@@ -171,7 +171,7 @@ class Syntax
     @dissForTextAndSyntax: (text, n) ->
                     
         if n not in ['browser', 'ko', 'commandline', 'macro', 'term', 'test']
-            result = kork.ranges text, n
+            result = klor.ranges text, n
             result.map (r) -> r.clss = r.value
         else
             if not n? or not Syntax.matchrConfigs[n]?
@@ -236,8 +236,8 @@ class Syntax
                 @syntaxNames.push syntaxName
                 @matchrConfigs[syntaxName] = matchr.config patterns
                 
-        kork.init()
-        @syntaxNames = @syntaxNames.concat kork.exts
+        klor.init()
+        @syntaxNames = @syntaxNames.concat klor.exts
 
 Syntax.init()
 module.exports = Syntax
