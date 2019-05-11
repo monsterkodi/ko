@@ -80,7 +80,7 @@ class Row
             switch mod
                 when 'alt', 'command+alt', 'ctrl+alt'
                     if @item.type == 'file' and @item.textFile
-                        log 'newWindowWithFile', @item.file
+                        # log 'newWindowWithFile', @item.file
                         post.toMain 'newWindowWithFile', @item.file
                         return
             
