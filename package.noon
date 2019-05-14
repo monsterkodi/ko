@@ -1,6 +1,6 @@
 name            ko
 productName     ko
-version         0.212.0
+version         0.213.0
 description     text editor
 main            js/main/main.js
 preferGlobal    true
@@ -32,6 +32,7 @@ dependencies
                 klor            ^0.13.0
                 kxk             ^0.278.0
                 performance-now  ^2.1.0
+                pretty-time     ^1.1.0
                 seamless-immutable  ^7.1.4
                 strip-ansi      ^5.2.0
                 trash           ^5.2.0

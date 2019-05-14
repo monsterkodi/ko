@@ -52,10 +52,11 @@ class Balancer
             
             when 'coffee', 'koffee'
                 @regions.multiString   = clss: 'string triple',  open: '"""', close: '"""', multi: true
+                @regions.multiString2  = clss: 'string triple skinny',  open: "'''", close: "'''", multi: true
                 @regions.interpolation = clss: 'interpolation',  open: '#{',  close: '}',   multi: true
                 @regions.singleString  = clss: 'string single',  open: "'", close: "'"
                 
-            when 'js'
+            when 'js' 'ts'
                 @regions.singleString  = clss: 'string single',  open: "'", close: "'"
                 
             when 'noon', 'iss'
@@ -84,15 +85,12 @@ class Balancer
         if not text?
             return error "dissForLine -- no line at index #{li}?"
 
-        diss = @mergeRegions @parse(text, li), text, li  
-        # console.log li, text, diss
-        diss
+        @mergeRegions @parse(text, li), text, li  
       
     dissForLineAndRanges: (line, rgs) ->
         
         regions = @mergeRegions @parse(line, 0), line, 0
-        diss = matchr.merge regions, matchr.dissect rgs
-        diss
+        matchr.merge regions, matchr.dissect rgs
         
     # 00     00  00000000  00000000    0000000   00000000
     # 000   000  000       000   000  000        000
@@ -221,7 +219,7 @@ class Balancer
 
                     if top.match.length
                         
-                        if top.clss in ['string single', 'string double', 'string triple']
+                        if top.clss in ['string single', 'string double', 'string triple', 'string triple skinny']
                             split = top.match.split /\s\s+/
                             if split.length == 1
                                 result.push top
@@ -352,6 +350,10 @@ class Balancer
                     pushRegion @regions.multiString
                     continue
 
+                else if @regions.multiString2 and rest.startsWith @regions.multiString2.open
+                    pushRegion @regions.multiString2
+                    continue
+                    
                 else if empty top
                     forced = false
                     pushed = false
