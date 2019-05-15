@@ -1,26 +1,26 @@
 ###
 000   000  000   000  00     00  0000000    00000000  00000000    0000000
-0000  000  000   000  000   000  000   000  000       000   000  000     
-000 0 000  000   000  000000000  0000000    0000000   0000000    0000000 
+0000  000  000   000  000   000  000   000  000       000   000  000
+000 0 000  000   000  000000000  0000000    0000000   0000000    0000000
 000  0000  000   000  000 0 000  000   000  000       000   000       000
-000   000   0000000   000   000  0000000    00000000  000   000  0000000 
+000   000   0000000   000   000  0000000    00000000  000   000  0000000
 ###
 
-{ str, setStyle, elem, $, _ } = require 'kxk'
+{ setStyle, elem, $, _ } = require 'kxk'
 
 event = require 'events'
 
 class Numbers extends event
 
     constructor: (@editor) ->
-        
+
         super()
         @lineDivs = {}
-        
+
         @elem =$ ".numbers", @editor.view
-        
+
         @editor.on 'clearLines',       @onClearLines
-        
+
         @editor.on 'linesShown',       @onLinesShown
         @editor.on 'linesShifted',     @onLinesShifted
 
@@ -28,61 +28,61 @@ class Numbers extends event
         @editor.on 'highlight',        @updateColors
         @editor.on 'changed',          @updateColors
         @editor.on 'linesSet',         @updateColors
-        
+
         @onFontSizeChange()
-               
-    #  0000000  000   000   0000000   000   000  000   000  
-    # 000       000   000  000   000  000 0 000  0000  000  
-    # 0000000   000000000  000   000  000000000  000 0 000  
-    #      000  000   000  000   000  000   000  000  0000  
-    # 0000000   000   000   0000000   00     00  000   000  
-    
+
+    #  0000000  000   000   0000000   000   000  000   000
+    # 000       000   000  000   000  000 0 000  0000  000
+    # 0000000   000000000  000   000  000000000  000 0 000
+    #      000  000   000  000   000  000   000  000  0000
+    # 0000000   000   000   0000000   00     00  000   000
+
     onLinesShown: (top, bot, num) =>
-        
+
         @elem.innerHTML = ''
         @lineDivs = {}
-        
+
         for li in [top..bot]
-            
+
             div = @addLine li
-            
-            @emit 'numberAdded', 
+
+            @emit 'numberAdded',
                 numberDiv:  div
                 numberSpan: div.firstChild
                 lineIndex:  li
-                
+
             @updateColor li
-            
+
         @updateLinePositions()
 
-    #  0000000  000   000  000  00000000  000000000  00000000  0000000    
-    # 000       000   000  000  000          000     000       000   000  
-    # 0000000   000000000  000  000000       000     0000000   000   000  
-    #      000  000   000  000  000          000     000       000   000  
-    # 0000000   000   000  000  000          000     00000000  0000000    
-    
+    #  0000000  000   000  000  00000000  000000000  00000000  0000000
+    # 000       000   000  000  000          000     000       000   000
+    # 0000000   000000000  000  000000       000     0000000   000   000
+    #      000  000   000  000  000          000     000       000   000
+    # 0000000   000   000  000  000          000     00000000  0000000
+
     onLinesShifted: (top, bot, num) =>
-                
+
         oldTop = top - num
         oldBot = bot - num
 
         divInto = (li,lo) =>
-            
+
             if not @lineDivs[lo]
-                log "#{@editor.name}.onLinesShifted.divInto -- no number div? top #{top} bot #{bot} num #{num} lo #{lo} li #{li}" 
-                return 
-                
+                log "#{@editor.name}.onLinesShifted.divInto -- no number div? top #{top} bot #{bot} num #{num} lo #{lo} li #{li}"
+                return
+
             numberDiv = @lineDivs[li] = @lineDivs[lo]
             delete @lineDivs[lo]
-            
+
             numberSpan = numberDiv.firstChild
-            numberSpan.textContent = li+1            
+            numberSpan.textContent = li+1
             @updateColor li
             @emit 'numberChanged',
                 numberDiv:  numberDiv
                 numberSpan: numberSpan
                 lineIndex:  li
-        
+
         if num > 0
             while oldBot < bot
                 oldBot += 1
@@ -93,61 +93,61 @@ class Numbers extends event
                 oldTop -= 1
                 divInto oldTop, oldBot
                 oldBot -= 1
-       
+
         @updateLinePositions()
 
-    # 000      000  000   000  00000000     00000000    0000000    0000000  
-    # 000      000  0000  000  000          000   000  000   000  000       
-    # 000      000  000 0 000  0000000      00000000   000   000  0000000   
-    # 000      000  000  0000  000          000        000   000       000  
-    # 0000000  000  000   000  00000000     000         0000000   0000000   
-    
+    # 000      000  000   000  00000000     00000000    0000000    0000000
+    # 000      000  0000  000  000          000   000  000   000  000
+    # 000      000  000 0 000  0000000      00000000   000   000  0000000
+    # 000      000  000  0000  000          000        000   000       000
+    # 0000000  000  000   000  00000000     000         0000000   0000000
+
     updateLinePositions: ->
 
         for li, div of @lineDivs
             continue if not div?.style
             y = @editor.size.lineHeight * (li - @editor.scroll.top)
             div.style.transform = "translate3d(0, #{y}px, 0)"
-        
+
     addLine: (li) ->
-        
+
         div = elem class: "linenumber", child: elem "span", text: "#{li+1}"
         div.style.height = "#{@editor.size.lineHeight}px"
         @lineDivs[li] = div
         @elem.appendChild div
         div
-            
-    #  0000000  000      00000000   0000000   00000000   
-    # 000       000      000       000   000  000   000  
-    # 000       000      0000000   000000000  0000000    
-    # 000       000      000       000   000  000   000  
-    #  0000000  0000000  00000000  000   000  000   000  
-    
+
+    #  0000000  000      00000000   0000000   00000000
+    # 000       000      000       000   000  000   000
+    # 000       000      0000000   000000000  0000000
+    # 000       000      000       000   000  000   000
+    #  0000000  0000000  00000000  000   000  000   000
+
     onClearLines: =>
-        
+
         @lineDivs = {}
         @elem.innerHTML = ""
-            
-    # 00000000   0000000   000   000  000000000       0000000  000  0000000  00000000  
-    # 000       000   000  0000  000     000         000       000     000   000       
-    # 000000    000   000  000 0 000     000         0000000   000    000    0000000   
-    # 000       000   000  000  0000     000              000  000   000     000       
-    # 000        0000000   000   000     000         0000000   000  0000000  00000000  
-        
+
+    # 00000000   0000000   000   000  000000000       0000000  000  0000000  00000000
+    # 000       000   000  0000  000     000         000       000     000   000
+    # 000000    000   000  000 0 000     000         0000000   000    000    0000000
+    # 000       000   000  000  0000     000              000  000   000     000
+    # 000        0000000   000   000     000         0000000   000  0000000  00000000
+
     onFontSizeChange: =>
-        
+
         fs = Math.min 22, @editor.size.fontSize-4
         @elem.style.fontSize = "#{fs}px"
         setStyle '.linenumber', 'padding-top', "#{parseInt @editor.size.fontSize/10}px"
 
-    #  0000000   0000000   000       0000000   00000000    0000000  
-    # 000       000   000  000      000   000  000   000  000       
-    # 000       000   000  000      000   000  0000000    0000000   
-    # 000       000   000  000      000   000  000   000       000  
-    #  0000000   0000000   0000000   0000000   000   000  0000000   
-    
+    #  0000000   0000000   000       0000000   00000000    0000000
+    # 000       000   000  000      000   000  000   000  000
+    # 000       000   000  000      000   000  0000000    0000000
+    # 000       000   000  000      000   000  000   000       000
+    #  0000000   0000000   0000000   0000000   000   000  0000000
+
     updateColors: =>
-        
+
         if @editor.scroll.bot > @editor.scroll.top
             for li in [@editor.scroll.top..@editor.scroll.bot]
                 @updateColor li
@@ -157,11 +157,11 @@ class Numbers extends event
         return if not @lineDivs[li]? # ok: e.g. commandlist
         if @lineDivs[li].firstChild? and @lineDivs[li].firstChild.classList.contains 'gitInfoLine'
             return
-        
+
         si = (s[0] for s in rangesFromTopToBotInRanges li, li, @editor.selections())
         hi = (s[0] for s in rangesFromTopToBotInRanges li, li, @editor.highlights())
         ci = (s[0] for s in rangesFromTopToBotInRanges li, li, rangesFromPositions @editor.cursors())
-                        
+
         cls = ''
         if li in ci
             cls += ' cursored'
@@ -170,8 +170,8 @@ class Numbers extends event
         if li in si
             cls += ' selected'
         if li in hi
-            cls += ' highligd'            
-            
+            cls += ' highligd'
+
         @lineDivs[li].className = 'linenumber' + cls
-                
+
 module.exports = Numbers

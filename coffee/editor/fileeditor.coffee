@@ -6,7 +6,7 @@
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
 
-{ post, stopEvent, setStyle, srcmap, popup, slash, empty, clamp, pos, fs, kerror, _ } = require 'kxk'
+{ post, stopEvent, setStyle, srcmap, popup, slash, empty, clamp, kpos, fs, kerror, _ } = require 'kxk'
   
 # watcher    = require './watcher'
 TextEditor = require './texteditor'
@@ -437,7 +437,7 @@ class FileEditor extends TextEditor
     clickAtPos: (p, event) ->
 
         if event.metaKey
-            if pos(event).x <= @size.numbersWidth
+            if kpos(event).x <= @size.numbersWidth
                 @singleCursorAtPos p
                 return
 

@@ -6,10 +6,10 @@
 0000000      000     000   000     000     000   000  000   000
 ###
 
-{ kerror, str, elem, empty, fs, noon, slash, _ } = require 'kxk'
+{ kerror, kstr, elem, empty, fs, noon, slash, _ } = require 'kxk'
 
 matchr   = require '../tools/matchr'
-Balancer = require './balancer' 
+Balancer = require './balancer'
 klor     = require 'klor'
 
 class Syntax
@@ -19,7 +19,7 @@ class Syntax
         @diss     = []
         @colors   = {}
         @balancer = new Balancer @, getLine
- 
+
     # 0000000    000   0000000   0000000
     # 000   000  000  000       000
     # 000   000  000  0000000   0000000
@@ -27,7 +27,7 @@ class Syntax
     # 0000000    000  0000000   0000000
 
     newDiss: (li) ->
-        
+
         diss = @balancer.dissForLine li
         diss
 
@@ -35,16 +35,16 @@ class Syntax
 
         if not @diss[li]?
             @diss[li] = @newDiss li
-                
+
         @diss[li]
 
     setDiss: (li, dss) ->
 
         @diss[li] = dss
         dss
-        
+
     fillDiss: (bot) ->
-        
+
         for li in [0..bot]
             @getDiss li
 
@@ -57,44 +57,44 @@ class Syntax
     changed: (changeInfo) ->
 
         for change in changeInfo.changes
-            
+
             [di,li,ch] = [change.doIndex, change.newIndex, change.change]
-            
+
             switch ch
-                
-                when 'changed'  
-                    
+
+                when 'changed'
+
                     @diss[di] = @newDiss di
-                        
-                when 'deleted'  
-                    
+
+                when 'deleted'
+
                     @balancer.deleteLine di
                     @diss.splice di, 1
-                    
-                when 'inserted' 
-                    
+
+                when 'inserted'
+
                     @balancer.insertLine di
                     @diss.splice di, 0, @newDiss di
 
-    # 00000000  000  000      00000000  000000000  000   000  00000000   00000000  
-    # 000       000  000      000          000      000 000   000   000  000       
-    # 000000    000  000      0000000      000       00000    00000000   0000000   
-    # 000       000  000      000          000        000     000        000       
-    # 000       000  0000000  00000000     000        000     000        00000000  
-    
-    setFileType: (fileType) -> 
+    # 00000000  000  000      00000000  000000000  000   000  00000000   00000000
+    # 000       000  000      000          000      000 000   000   000  000
+    # 000000    000  000      0000000      000       00000    00000000   0000000
+    # 000       000  000      000          000        000     000        000
+    # 000       000  0000000  00000000     000        000     000        00000000
+
+    setFileType: (fileType) ->
 
         @name = fileType
         @balancer.setFileType fileType
-        
+
     #  0000000  000      00000000   0000000   00000000
     # 000       000      000       000   000  000   000
     # 000       000      0000000   000000000  0000000
     # 000       000      000       000   000  000   000
     #  0000000  0000000  00000000  000   000  000   000
 
-    clear: -> 
-        
+    clear: ->
+
         @diss = []
         @balancer.clear()
 
@@ -110,11 +110,11 @@ class Syntax
 
             div = elem class: clss
             document.body.appendChild div
-            computedStyle = window.getComputedStyle div 
+            computedStyle = window.getComputedStyle div
             color = computedStyle.color
             opacity = computedStyle.opacity
             if opacity != '1'
-                color = 'rgba(' + color.slice(4, color.length-2) + ', ' + opacity + ')' 
+                color = 'rgba(' + color.slice(4, color.length-2) + ', ' + opacity + ')'
             @colors[clss] = color
             div.remove()
 
@@ -140,7 +140,7 @@ class Syntax
          000     000     000   000     000     000  000
     0000000      000     000   000     000     000   0000000
     ###
-    
+
     @matchrConfigs = {}
     @syntaxNames = []
 
@@ -159,7 +159,7 @@ class Syntax
                     spc += '&nbsp;'
                 last  = d.start + d.match.length
                 clss  = d.clss? and d.clss.length and " class=\"#{d.clss}\"" or ''
-                clrzd = "<span#{style}#{clss}>#{spc}#{str.encode d.match}</span>"
+                clrzd = "<span#{style}#{clss}>#{spc}#{kstr.encode d.match}</span>"
                 l += clrzd
         l
 
@@ -168,14 +168,14 @@ class Syntax
         matchr.ranges Syntax.matchrConfigs[n], line
 
     @dissForTextAndSyntax: (text, n) ->
-                    
+
         if n not in ['browser', 'ko', 'commandline', 'macro', 'term', 'test']
             result = klor.ranges text, n
             result.map (r) -> r.clss = r.value
         else
             if not n? or not Syntax.matchrConfigs[n]?
                 return kerror "no syntax? #{n}"
-            result = matchr.dissect matchr.ranges Syntax.matchrConfigs[n], text 
+            result = matchr.dissect matchr.ranges Syntax.matchrConfigs[n], text
         result
 
     @lineForDiss: (dss) ->
@@ -214,19 +214,19 @@ class Syntax
     @init: ->
 
         syntaxDir = "#{__dirname}/../../syntax/"
-        
+
         for syntaxFile in fs.readdirSync syntaxDir
-            
+
             syntaxName = slash.basename syntaxFile, '.noon'
             patterns = noon.load slash.join syntaxDir, syntaxFile
-            
+
             patterns['\\w+']       = 'text'   # this ensures that all ...
             patterns['[^\\w\\s]+'] = 'syntax' # non-space characters match
-            
+
             if patterns.ko?.extnames?
                 extnames = patterns.ko.extnames
                 delete patterns.ko
-                
+
                 config = matchr.config patterns
                 for syntaxName in extnames
                     @syntaxNames.push syntaxName
@@ -234,7 +234,7 @@ class Syntax
             else
                 @syntaxNames.push syntaxName
                 @matchrConfigs[syntaxName] = matchr.config patterns
-                
+
         klor.init()
         @syntaxNames = @syntaxNames.concat klor.exts
 

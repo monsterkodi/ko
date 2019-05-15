@@ -6,7 +6,7 @@
  0000000   0000000   0000000   0000000   000   000  000   000
 ###
 
-{ post, stopEvent, setStyle, keyinfo, popup, slash, valid, clamp, empty, state, open, elem, pos, fs, kerror, $, _ } = require 'kxk'
+{ post, stopEvent, setStyle, keyinfo, popup, slash, valid, clamp, empty, state, open, elem, kpos, fs, kerror, $, _ } = require 'kxk'
 
 Row      = require './row'
 Scroller = require './scroller'
@@ -392,12 +392,12 @@ class Column
     # 000        000   000  000        000   000  000          
     # 000         0000000   000         0000000   000          
         
-    onContextMenu: (event) => stopEvent event, @showContextMenu pos event
+    onContextMenu: (event) => stopEvent event, @showContextMenu kpos event
               
     showContextMenu: (absPos) =>
         
         if not absPos?
-            absPos = pos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
+            absPos = kpos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
         
         opt = items: [ 
             text:   'Toggle Invisible'

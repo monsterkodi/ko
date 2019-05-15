@@ -1,17 +1,17 @@
 ###
  0000000  000000000   0000000   000000000  00000000
-000          000     000   000     000     000     
-0000000      000     000000000     000     0000000 
-     000     000     000   000     000     000     
+000          000     000   000     000     000
+0000000      000     000000000     000     0000000
+     000     000     000   000     000     000
 0000000      000     000   000     000     00000000
 ###
 
-{ kerror, str, _ } = require 'kxk'
+{ kerror, _ } = require 'kxk'
 
 Immutable = require 'seamless-immutable'
 
 replaceTabs = (s) ->
-    
+
     i = 0
     while i < s.length
         if s[i] == '\t'
@@ -19,11 +19,11 @@ replaceTabs = (s) ->
             s = s.splice i, 1, _.padStart "", n
         i += 1
     s
-    
+
 class State
-    
+
     constructor: (opt) ->
-        
+
         if opt? and Immutable.isImmutable opt
             @s = opt
         else
@@ -35,30 +35,30 @@ class State
                 selections: []
                 highlights: []
                 main:       0
-    
+
     # read only:
-    
-    text: (n='\n') -> 
+
+    text: (n='\n') ->
         tabLines = @s.lines.map (l) -> l.text
         tabLines.join n
-    
+
     tabline:   (i) -> @s.lines[i].text
     line:      (i) ->
         if not @s.lines[i]?
             kerror "editor/state -- requesting invalid line at index #{i}?"
             return ''
         replaceTabs @s.lines[i].text
-        
+
     lines:         -> @s.lines.map (l) -> replaceTabs l.text
-    cursors:       -> @s.cursors.asMutable deep: true 
-    highlights:    -> @s.highlights.asMutable deep: true 
-    selections:    -> @s.selections.asMutable deep: true 
+    cursors:       -> @s.cursors.asMutable deep: true
+    highlights:    -> @s.highlights.asMutable deep: true
+    selections:    -> @s.selections.asMutable deep: true
     main:          -> @s.main
-            
-    cursor:    (i) -> @s.cursors[i]?.asMutable deep: true 
-    selection: (i) -> @s.selections[i]?.asMutable deep: true 
-    highlight: (i) -> @s.highlights[i]?.asMutable deep: true 
-        
+
+    cursor:    (i) -> @s.cursors[i]?.asMutable deep: true
+    selection: (i) -> @s.selections[i]?.asMutable deep: true
+    highlight: (i) -> @s.highlights[i]?.asMutable deep: true
+
     numLines:      -> @s.lines.length
     numCursors:    -> @s.cursors.length
     numSelections: -> @s.selections.length
@@ -77,5 +77,5 @@ class State
     deleteLine: (i)   -> l = @s.lines.asMutable(); l.splice i, 1;         new State @s.set 'lines', l
     appendLine:   (t) -> l = @s.lines.asMutable(); l.push text:t;         new State @s.set 'lines', l
     addHighlight: (h) -> m = @s.highlights.asMutable(); m.push h;         new State @s.set 'highlights', m
-    
+
 module.exports = State

@@ -6,7 +6,7 @@
 000   000  000  000   000  000  000   000  000   000  000
 ###
 
-{ getStyle, clamp, elem, drag, str } = require 'kxk' 
+{ getStyle, clamp, elem, drag } = require 'kxk' 
 
 MapScroll = require './mapscroll'
 

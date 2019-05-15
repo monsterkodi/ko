@@ -6,7 +6,7 @@
 0000000    000   000  0000000  000   000  000   000   0000000  00000000  000   000
 ###
 
-{ empty, str, kerror, _ } = require 'kxk'
+{ empty, kerror, _ } = require 'kxk'
 
 matchr = require '../tools/matchr'
 
@@ -15,13 +15,13 @@ class Balancer
     constructor: (@syntax, @getLine) ->
 
         @unbalanced = []
-        
-    # 00000000  000  000      00000000  000000000  000   000  00000000   00000000  
-    # 000       000  000      000          000      000 000   000   000  000       
-    # 000000    000  000      0000000      000       00000    00000000   0000000   
-    # 000       000  000      000          000        000     000        000       
-    # 000       000  0000000  00000000     000        000     000        00000000  
-    
+
+    # 00000000  000  000      00000000  000000000  000   000  00000000   00000000
+    # 000       000  000      000          000      000 000   000   000  000
+    # 000000    000  000      0000000      000       00000    00000000   0000000
+    # 000       000  000      000          000        000     000        000
+    # 000       000  0000000  00000000     000        000     000        00000000
+
     setFileType: (fileType) ->
 
         lineComment = switch fileType
@@ -33,65 +33,65 @@ class Balancer
             when 'coffee', 'koffee'                                                 then open: '###',  close: '###'
             when 'html', 'md'                                                       then open: '<!--', close: '-->'
             when 'styl', 'cpp', 'c', 'h', 'hpp', 'cxx', 'cs', 'js', 'scss', 'ts'    then open: '/*',   close: '*/'
-        
+
         @regions =
             doubleString: clss:'string double', open:'"', close:'"'
-            
+
         if lineComment
             @regions.lineComment = clss:'comment', open:lineComment, close:null, force:true
             @headerRegExp = new RegExp("^(\\s*#{_.escapeRegExp @regions.lineComment.open}\\s*)?(\\s*0[0\\s]+)$")
 
         if multiComment
-            @regions.multiComment = 
+            @regions.multiComment =
                 clss:  'comment triple'
                 open:  multiComment.open
                 close: multiComment.close
                 multi: true
-            
+
         switch fileType
-            
+
             when 'coffee', 'koffee'
                 @regions.multiString   = clss: 'string triple',  open: '"""', close: '"""', multi: true
                 @regions.multiString2  = clss: 'string triple skinny',  open: "'''", close: "'''", multi: true
                 @regions.interpolation = clss: 'interpolation',  open: '#{',  close: '}',   multi: true
                 @regions.singleString  = clss: 'string single',  open: "'", close: "'"
-                
+
             when 'js' 'ts'
                 @regions.singleString  = clss: 'string single',  open: "'", close: "'"
-                
+
             when 'noon', 'iss'
                 @regions.lineComment.solo = true # only spaces before comments allowed
-                
+
             when 'md'
                 @regions.multiString   = clss: 'string triple',  open: '```', close: '```', multi: true
-                @regions.header5       = clss: 'markdown h5', open: '#####', close: null, solo: true                     
-                @regions.header4       = clss: 'markdown h4', open: '####', close: null, solo: true 
-                @regions.header3       = clss: 'markdown h3', open: '###', close: null, solo: true 
-                @regions.header2       = clss: 'markdown h2', open: '##', close: null, solo: true 
-                @regions.header1       = clss: 'markdown h1', open: '#', close: null, solo: true 
-                
+                @regions.header5       = clss: 'markdown h5', open: '#####', close: null, solo: true
+                @regions.header4       = clss: 'markdown h4', open: '####', close: null, solo: true
+                @regions.header3       = clss: 'markdown h3', open: '###', close: null, solo: true
+                @regions.header2       = clss: 'markdown h2', open: '##', close: null, solo: true
+                @regions.header1       = clss: 'markdown h1', open: '#', close: null, solo: true
+
         @openRegions = _.filter @regions, (r) -> r.close == null
-                
+
     # 0000000    000   0000000   0000000
-    # 000   000  000  000       000     
-    # 000   000  000  0000000   0000000 
+    # 000   000  000  000       000
+    # 000   000  000  0000000   0000000
     # 000   000  000       000       000
-    # 0000000    000  0000000   0000000 
+    # 0000000    000  0000000   0000000
 
     dissForLine: (li) ->
-        
+
         text = @getLine li
 
         if not text?
             return kerror "dissForLine -- no line at index #{li}?"
 
-        @mergeRegions @parse(text, li), text, li  
-      
+        @mergeRegions @parse(text, li), text, li
+
     dissForLineAndRanges: (line, rgs) ->
-        
+
         regions = @mergeRegions @parse(line, 0), line, 0
         matchr.merge regions, matchr.dissect rgs
-        
+
     # 00     00  00000000  00000000    0000000   00000000
     # 000   000  000       000   000  000        000
     # 000000000  0000000   0000000    000  0000  0000000
@@ -99,14 +99,14 @@ class Balancer
     # 000   000  00000000  000   000   0000000   00000000
 
     mergeRegions: (regions, text, li) ->
-        
+
         unbalanced = @getUnbalanced li
-        
+
         merged = []
         p = 0
-        
+
         addDiss = (start, end, force) =>
-            
+
             slice = text.slice start, end
             if not force and unbalanced? and _.last(unbalanced).region.clss != 'interpolation'
                 diss = @dissForClass slice, 0, _.last(unbalanced).region.clss
@@ -135,12 +135,12 @@ class Balancer
             addDiss p, text.length
 
         merged
-    
+
     dissForClass: (text, start, clss) ->
 
         if @headerRegExp?.test text
             clss += ' header'
-        
+
         diss = []
         m = ''
         p = s = start
@@ -148,21 +148,21 @@ class Balancer
 
             c = text[p]
             p += 1
-            
+
             if c != ' '
                 s = p-1 if m == ''
                 m += c
                 continue if p < text.length
-                
+
             if m != ''
-                
+
                 diss.push
                     start: s
                     match: m
                     clss:  clss
                 m = ''
         diss
-        
+
     ###
     00000000    0000000   00000000    0000000  00000000
     000   000  000   000  000   000  000       000
@@ -170,25 +170,25 @@ class Balancer
     000        000   000  000   000       000  000
     000        000   000  000   000  0000000   00000000
     ###
-    
+
     parse: (text, li) ->
-        
+
         p       = 0
         escapes = 0
-        
+
         stack   = []
         result  = []
 
         unbalanced     = null
         keepUnbalanced = []
-        
-        if unbalanced = @getUnbalanced li            
+
+        if unbalanced = @getUnbalanced li
             for lineStartRegion in unbalanced
-                stack.push 
+                stack.push
                     start:  0
                     region: lineStartRegion.region
                     fake:   true
-        
+
         # 00000000   000   000   0000000  000   000     000000000   0000000   00000000
         # 000   000  000   000  000       000   000        000     000   000  000   000
         # 00000000   000   000  0000000   000000000        000     000   000  00000000
@@ -209,7 +209,7 @@ class Balancer
                     top.clss  = top.region.clss
                     delete top.region
 
-                    advance = -> 
+                    advance = ->
                         while top.match.length and top.match[0] == ' '
                             top.match = top.match.slice 1
                             top.start += 1
@@ -218,7 +218,7 @@ class Balancer
                     top.match = top.match.trimRight()
 
                     if top.match.length
-                        
+
                         if top.clss in ['string single', 'string double', 'string triple', 'string triple skinny']
                             split = top.match.split /\s\s+/
                             if split.length == 1
@@ -235,11 +235,11 @@ class Balancer
                         else
                             result.push top
 
-        # 00000000   0000000   00000000    0000000  00000000  
-        # 000       000   000  000   000  000       000       
-        # 000000    000   000  0000000    000       0000000   
-        # 000       000   000  000   000  000       000       
-        # 000        0000000   000   000   0000000  00000000  
+        # 00000000   0000000   00000000    0000000  00000000
+        # 000       000   000  000   000  000       000
+        # 000000    000   000  0000000    000       0000000
+        # 000       000   000  000   000  000       000
+        # 000        0000000   000   000   0000000  00000000
 
         pushForceRegion = (region) =>
 
@@ -252,7 +252,7 @@ class Balancer
 
             if start < text.length-1
                 result = result.concat @dissForClass text, start, region.clss
-                    
+
         # 00000000   00000000   0000000   000   0000000   000   000
         # 000   000  000       000        000  000   000  0000  000
         # 0000000    0000000   000  0000  000  000   000  000 0 000
@@ -310,21 +310,21 @@ class Balancer
 
             ch = text[p]
             p += 1
-            
+
             top = _.last stack
-            
+
             if ch == '\\' then escapes++
             else
-                if ch == ' ' 
+                if ch == ' '
                     continue
-                
+
                 if escapes
                     if escapes % 2 and (ch != "#" or top and top.region.clss != 'interpolation')
-                        escapes = 0 # character is escaped, 
+                        escapes = 0 # character is escaped,
                         continue    # just continue to next
                     escapes = 0
-                    
-                if ch == ':' 
+
+                if ch == ':'
                     if @syntax.name == 'json' # highlight json dictionary keys
                         if _.last(result).clss == 'string double marker'
                             if result.length > 1 and result[result.length-2].clss == 'string double'
@@ -334,7 +334,7 @@ class Balancer
                                     match: ch
                                     clss:  'dictionary marker'
                                 continue
-                    
+
             rest = text.slice p-1
 
             if empty(top) or top.region?.clss == 'interpolation'
@@ -353,7 +353,7 @@ class Balancer
                 else if @regions.multiString2 and rest.startsWith @regions.multiString2.open
                     pushRegion @regions.multiString2
                     continue
-                    
+
                 else if empty top
                     forced = false
                     pushed = false
@@ -382,34 +382,34 @@ class Balancer
                     pushRegion @regions.doubleString
                     continue
 
-            else 
+            else
 
                 if top.region.clss in ['string double', 'string triple']
-                    
+
                     if @regions.interpolation and rest.startsWith @regions.interpolation.open # string interpolation
                         pushRegion @regions.interpolation
                         continue
-                        
+
                 if popRegion rest
                     continue
-             
+
         realStack = stack.filter (s) -> not s.fake and s.region.close != null and s.region.multi
-        
+
         closeStackItem = (stackItem) =>
             result = result.concat @dissForClass text, _.last(result).start + _.last(result).match.length, stackItem.region.clss
-        
+
         if realStack.length
             @setUnbalanced li, realStack
-            closeStackItem _.last realStack 
+            closeStackItem _.last realStack
         else if keepUnbalanced.length
             @setUnbalanced li, keepUnbalanced
             if stack.length
-                closeStackItem _.last stack 
+                closeStackItem _.last stack
         else
             if stack.length and _.last(stack).region.close == null
-                closeStackItem _.last stack 
+                closeStackItem _.last stack
             @setUnbalanced li
-           
+
         result
 
     # 000   000  000   000  0000000     0000000   000       0000000   000   000   0000000  00000000  0000000
@@ -419,7 +419,7 @@ class Balancer
     #  0000000   000   000  0000000    000   000  0000000  000   000  000   000   0000000  00000000  0000000
 
     getUnbalanced: (li) ->
-        
+
         stack = []
         for u in @unbalanced
             if u.line < li
@@ -429,14 +429,14 @@ class Balancer
                     stack.push u
             if u.line >= li
                 break
-                
+
         if stack.length
             return stack
-            
+
         null
 
     setUnbalanced: (li, stack) ->
-        
+
         _.remove @unbalanced, (u) -> u.line == li
         if stack?
             _.each stack, (s) -> s.line = li

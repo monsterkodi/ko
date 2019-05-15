@@ -6,7 +6,7 @@
  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 ###
 
-{ post, filelist, stopEvent, elem, keyinfo, clamp, slash, kerror, str, os, $, _ } = require 'kxk'
+{ post, filelist, stopEvent, elem, keyinfo, clamp, slash, kerror, os, $, _ } = require 'kxk'
 
 TextEditor = require '../editor/texteditor'
 
@@ -34,7 +34,7 @@ class Commandline extends TextEditor
         post.on 'split',   @onSplit
         post.on 'restore', @restore
         post.on 'stash',   @stash
-        
+
         @view.onblur = =>
             @button.classList.remove 'active'
             @list?.remove()
@@ -50,19 +50,19 @@ class Commandline extends TextEditor
     #      000     000     000   000       000  000   000
     # 0000000      000     000   000  0000000   000   000
 
-    stash: => 
-        
-        if @command? 
+    stash: =>
+
+        if @command?
             window.stash.set 'commandline', @command.state()
 
     restore: =>
 
         state = window.stash.get 'commandline'
-        
+
         @setText state?.text ? ""
 
         name = state?.name ? 'open'
-        
+
         if @command = @commandForName name
             activeID = document.activeElement.id
             if activeID.startsWith 'column' then activeID = 'editor'
@@ -139,7 +139,7 @@ class Commandline extends TextEditor
     startCommand: (name) ->
 
         r = @command?.cancel name
-        
+
         if r?.status == 'ok'
             @results r
             return
@@ -147,17 +147,17 @@ class Commandline extends TextEditor
         window.split.showCommandline()
 
         if @command = @commandForName name
-        
+
             activeID = document.activeElement.id
             if activeID.startsWith 'column' then activeID = 'editor'
             if activeID and activeID != 'commandline-editor'
                 @command.setReceiver activeID
-                
+
             @lastFocus = window.lastFocus
             @view.focus()
             @setName name
             @results @command.start name # <-- command start
-    
+
             @button.className = "commandline-button active #{@command.prefsID}"
         else
             kerror "no command #{name}"
@@ -167,7 +167,7 @@ class Commandline extends TextEditor
         for n,c of @commands
             if n == name or name in c.names
                 return c
-        
+
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000
     # 0000000     00000    0000000   000       000   000     000     0000000
@@ -175,7 +175,7 @@ class Commandline extends TextEditor
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
 
     execute: -> @results @command?.execute @line 0
-    
+
     # 00000000   00000000   0000000  000   000  000      000000000   0000000
     # 000   000  000       000       000   000  000         000     000
     # 0000000    0000000   0000000   000   000  000         000     0000000
@@ -193,7 +193,7 @@ class Commandline extends TextEditor
         @
 
     cancel: -> @results @command?.cancel()
-    clear:  -> 
+    clear:  ->
         if @text() == ''
             @results @command?.clear()
         else
@@ -278,23 +278,23 @@ class Commandline extends TextEditor
     # 000   000  00000000     000
 
     handleMenuAction: (name, args) ->
-        
+
         if args?.command
-            if @commandForName args.command           
-                @startCommand args.command    
+            if @commandForName args.command
+                @startCommand args.command
                 return
         'unhandled'
-    
+
     globalModKeyComboEvent: (mod, key, combo, event) ->
 
         if combo == 'esc'
-            if document.activeElement == @view 
+            if document.activeElement == @view
                 stopEvent event
                 return @cancel()
 
         if @command?
             return @command.globalModKeyComboEvent mod, key, combo, event
-            
+
         'unhandled'
 
     handleModKeyComboCharEvent: (mod, key, combo, char, event) ->

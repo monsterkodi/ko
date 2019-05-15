@@ -1,12 +1,12 @@
 ###
-00000000  0000000    000  000000000   0000000   00000000 
+00000000  0000000    000  000000000   0000000   00000000
 000       000   000  000     000     000   000  000   000
-0000000   000   000  000     000     000   000  0000000  
+0000000   000   000  000     000     000   000  0000000
 000       000   000  000     000     000   000  000   000
 00000000  0000000    000     000      0000000   000   000
 ###
 
-{ clamp, empty, slash, str, kerror, filelist, _ } = require 'kxk'
+{ clamp, empty, slash, kerror, filelist, _ } = require 'kxk'
 
 Buffer  = require './buffer'
 Syntax  = require './syntax'
@@ -17,34 +17,34 @@ class Editor extends Buffer
     @actions = null
 
     constructor: (name, config) ->
-        
+
         super()
-        
+
         @name   = name
         @config = config ? {}
         @config.syntaxName ?= 'txt'
-        
+
         Editor.initActions() if not Editor.actions?
-                
+
         @indentString      = _.padStart "", 4
         @stickySelection   = false
         @syntax            = new Syntax @config.syntaxName, @line
         @do                = new Do @
-        
+
         @setupFileType()
 
     del: ->
-                
+
         @do.del()
-    
-    #  0000000    0000000  000000000  000   0000000   000   000   0000000  
-    # 000   000  000          000     000  000   000  0000  000  000       
-    # 000000000  000          000     000  000   000  000 0 000  0000000   
-    # 000   000  000          000     000  000   000  000  0000       000  
-    # 000   000   0000000     000     000   0000000   000   000  0000000   
-    
-    @initActions: -> 
-        
+
+    #  0000000    0000000  000000000  000   0000000   000   000   0000000
+    # 000   000  000          000     000  000   000  0000  000  000
+    # 000000000  000          000     000  000   000  000 0 000  0000000
+    # 000   000  000          000     000  000   000  000  0000       000
+    # 000   000   0000000     000     000   0000000   000   000  0000000
+
+    @initActions: ->
+
         @actions = []
         for actionFile in filelist slash.join __dirname, 'actions'
             continue if slash.ext(actionFile) not in ['js', 'coffee']
@@ -57,106 +57,106 @@ class Editor extends Buffer
                         if not _.isString v
                             v.key = k if not v.key?
                             @actions.push v
-                        
-        # too early for log here!            
+
+        # too early for log here!
         # console.log str @actions
-            
+
     @actionWithName: (name) ->
-    
+
         for action in Editor.actions
             if action.name == name
                 return action
-                
+
         # log "can't find action with name '#{name}'"
         # for action in Editor.actions
             # log action.name
         return null
-                
+
     # 000000000  000   000  00000000   00000000
-    #    000      000 000   000   000  000     
-    #    000       00000    00000000   0000000 
-    #    000        000     000        000     
+    #    000      000 000   000   000  000
+    #    000       00000    00000000   0000000
+    #    000        000     000        000
     #    000        000     000        00000000
-    
+
     shebangFileType: -> @config?.syntaxName ? 'txt'
-            
+
     setupFileType: ->
-        
+
         oldType = @fileType
         newType = @shebangFileType()
-        
+
         @syntax?.setFileType newType
         @setFileType newType
-        
+
         if oldType != @fileType
             @emit 'fileTypeChanged', @fileType
-            
+
     setFileType: (@fileType) ->
-            
+
         # _______________________________________________________________ strings
-        
+
         @stringCharacters =
             "'":  'single'
             '"':  'double'
-            
+
         switch @fileType
             when 'md'   then @stringCharacters['*'] = 'bold'
             when 'noon' then @stringCharacters['|'] = 'pipe'
 
         # _______________________________________________________________ brackets
-        
-        @bracketCharacters = 
+
+        @bracketCharacters =
             open:
                 '[': ']'
                 '{': '}'
                 '(': ')'
             close:   {}
             regexps: []
-                
+
         switch @fileType
             when 'html' then @bracketCharacters.open['<'] = '>'
 
         for k,v of @bracketCharacters.open
             @bracketCharacters.close[v] = k
-        
+
         @bracketCharacters.regexp = []
         for key in ['open', 'close']
             cstr = _.keys(@bracketCharacters[key]).join ''
             reg = new RegExp "[#{_.escapeRegExp cstr}]"
             @bracketCharacters.regexps.push [reg, key]
-        
+
         # _______________________________________________________________ surround
-        
+
         @initSurround()
-        
+
         # _______________________________________________________________ indent
-        
+
         @indentNewLineMore = null
         @indentNewLineLess = null
         @insertIndentedEmptyLineBetween = '{}'
 
         switch @fileType
-            when 'coffee', 'koffee' 
-                @indentNewLineMore = 
+            when 'coffee', 'koffee'
+                @indentNewLineMore =
                     lineEndsWith: ['->', '=>', ':', '=']
                     lineRegExp:   /^(\s+when|\s*if|\s*else\s+if\s+)(?!.*\sthen\s)|(^|\s)(else\s*$|switch\s|for\s|while\s|class\s)/
-                
+
         # _______________________________________________________________ comment
-                   
+
         @lineComment = @syntax.balancer.regions.lineComment?.open
         @multiComment = @syntax.balancer.regions.multiComment
-                
-    #  0000000  00000000  000000000         000      000  000   000  00000000   0000000  
-    # 000       000          000            000      000  0000  000  000       000       
-    # 0000000   0000000      000            000      000  000 0 000  0000000   0000000   
-    #      000  000          000            000      000  000  0000  000            000  
-    # 0000000   00000000     000            0000000  000  000   000  00000000  0000000   
 
-    setText: (text="") -> 
+    #  0000000  00000000  000000000         000      000  000   000  00000000   0000000
+    # 000       000          000            000      000  0000  000  000       000
+    # 0000000   0000000      000            000      000  000 0 000  0000000   0000000
+    #      000  000          000            000      000  000  0000  000            000
+    # 0000000   00000000     000            0000000  000  000   000  00000000  0000000
+
+    setText: (text="") ->
 
         if @syntax.name == 'txt'
             @syntax.name = Syntax.shebang text.slice 0, text.search /\r?\n/
-                
+
         lines = text.split /\n/
 
         @newlineCharacters = '\n'
@@ -164,78 +164,78 @@ class Editor extends Buffer
             if lines[0].endsWith '\r'
                 lines = text.split /\r?\n/
                 @newlineCharacters = '\r\n'
-        
+
         @setLines lines
 
     setLines: (lines) ->
-        
+
         @syntax.clear()
         super lines
         @emit 'linesSet', lines
-        
-    textOfSelectionForClipboard: -> 
-        
+
+    textOfSelectionForClipboard: ->
+
         if @numSelections()
             @textOfSelection()
         else
             @textInRanges @rangesForCursorLines()
 
     splitStateLineAtPos: (state, pos) ->
-        
+
         l = state.line pos[1]
         kerror "no line at pos #{pos}?" if not l?
         return ['',''] if not l?
         [l.slice(0, pos[0]), l.slice(pos[0])]
-                
+
     # 00000000  00     00  000  000000000       00000000  0000000    000  000000000
-    # 000       000   000  000     000          000       000   000  000     000   
-    # 0000000   000000000  000     000          0000000   000   000  000     000   
-    # 000       000 0 000  000     000          000       000   000  000     000   
-    # 00000000  000   000  000     000          00000000  0000000    000     000   
+    # 000       000   000  000     000          000       000   000  000     000
+    # 0000000   000000000  000     000          0000000   000   000  000     000
+    # 000       000 0 000  000     000          000       000   000  000     000
+    # 00000000  000   000  000     000          00000000  0000000    000     000
 
     emitEdit: (action) ->
-        
+
         mc = @mainCursor()
-        line = @line mc[1] 
-        
+        line = @line mc[1]
+
         @emit 'edit',
             action: action
             line:   line
             before: line.slice 0, mc[0]
             after:  line.slice mc[0]
             cursor: mc
-        
-    # 000  000   000  0000000    00000000  000   000  000000000   0000000  000000000  00000000   
-    # 000  0000  000  000   000  000       0000  000     000     000          000     000   000  
-    # 000  000 0 000  000   000  0000000   000 0 000     000     0000000      000     0000000    
-    # 000  000  0000  000   000  000       000  0000     000          000     000     000   000  
-    # 000  000   000  0000000    00000000  000   000     000     0000000      000     000   000  
-    
+
+    # 000  000   000  0000000    00000000  000   000  000000000   0000000  000000000  00000000
+    # 000  0000  000  000   000  000       0000  000     000     000          000     000   000
+    # 000  000 0 000  000   000  0000000   000 0 000     000     0000000      000     0000000
+    # 000  000  0000  000   000  000       000  0000     000          000     000     000   000
+    # 000  000   000  0000000    00000000  000   000     000     0000000      000     000   000
+
     indentStringForLineAtIndex: (li) ->
-        
+
         while empty(@line(li).trim()) and li > 0
             li--
-        
+
         if 0 <= li < @numLines()
-            
+
             il = 0
             line = @line li
             thisIndent   = @indentationAtLineIndex li
             indentLength = @indentString.length
-            
+
             if @indentNewLineMore?
                 if @indentNewLineMore.lineEndsWith?.length
                     for e in @indentNewLineMore.lineEndsWith
                         if line.trim().endsWith e
                             il = thisIndent + indentLength
-                            break                            
+                            break
                 if il == 0
                     if @indentNewLineMore.lineRegExp? and @indentNewLineMore.lineRegExp.test line
                         il = thisIndent + indentLength
 
             il = thisIndent if il == 0
             il = Math.max il, @indentationAtLineIndex li+1
-            
+
             _.padStart "", il
         else
             ''

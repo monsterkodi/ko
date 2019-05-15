@@ -7,18 +7,18 @@
 ###
 
 { post, win, stopEvent, filelist, keyinfo, prefs, stash, childp, store,
-  drag, noon, slash, clamp, pos, str, sw, sh, os, fs, valid, empty, klog, _ } = require 'kxk'
+  drag, noon, slash, clamp, sw, sh, os, fs, valid, empty, klog, _ } = require 'kxk'
 
 menu = require './menu'
 
-w = new win 
+w = new win
     dir:    __dirname
     pkg:    require '../../package.json'
     menu:   '../../coffee/menu.noon'
     icon:   '../../img/menu@2x.png'
     scheme: false
     menuTemplate: menu
-  
+
 Split       = require './split'
 Terminal    = require './terminal'
 Tabs        = require './tabs'
@@ -32,7 +32,7 @@ Navigate    = require '../main/navigate'
 FPS         = require '../tools/fps'
 CWD         = require '../tools/cwd'
 scheme      = require '../tools/scheme'
-projects    = require '../tools/projects' 
+projects    = require '../tools/projects'
 electron    = require 'electron'
 pkg         = require '../../package.json'
 
@@ -95,7 +95,7 @@ post.on 'editorFocus', (editor) ->
     window.focusEditor = editor
     window.textEditor = editor if editor.name != 'commandline-editor'
 
-# testing related ... 
+# testing related ...
 
 post.on 'mainlog', -> klog.apply klog, arguments
 
@@ -192,10 +192,10 @@ onClose = ->
     post.emit 'saveChanges'
     editor.setText ''
     editor.stopWatcher()
-    
+
     if Browser.getAllWindows().length > 1
         window.stash.clear()
-        
+
     clearListeners()
 
 #  0000000   000   000  000       0000000    0000000   0000000
@@ -240,12 +240,12 @@ window.onresize = ->
         editor.centerText true, 200
 
 post.on 'split', (s) ->
-    
+
     filebrowser.resized()
     terminal.resized()
     commandline.resized()
     editor.resized()
-        
+
 #  0000000  00000000  000   000  000000000  00000000  00000000       000000000  00000000  000   000  000000000
 # 000       000       0000  000     000     000       000   000         000     000        000 000      000
 # 000       0000000   000 0 000     000     0000000   0000000           000     0000000     00000       000
@@ -257,14 +257,14 @@ toggleCenterText = ->
     if window.state.get "invisibles|#{editor.currentFile}", false
         editor.toggleInvisibles()
         restoreInvisibles = true
-        
+
     if not window.stash.get 'centerText', false
         window.stash.set 'centerText', true
         editor.centerText true
     else
         window.stash.set 'centerText', false
         editor.centerText false
-        
+
     if restoreInvisibles
         editor.toggleInvisibles()
 
@@ -275,7 +275,7 @@ toggleCenterText = ->
 # 000        0000000   000   000     000        0000000   000  0000000  00000000
 
 setFontSize = (s) ->
-        
+
     s = prefs.get('editorFontSize', 19) if not _.isFinite s
     s = clamp 8, 100, s
 
@@ -285,7 +285,7 @@ setFontSize = (s) ->
         post.emit 'loadFile', editor.currentFile, reload:true
 
 changeFontSize = (d) ->
-    
+
     if      editor.size.fontSize >= 30
         f = 4
     else if editor.size.fontSize >= 50
@@ -297,13 +297,13 @@ changeFontSize = (d) ->
     setFontSize editor.size.fontSize + f*d
 
 resetFontSize = ->
-    
+
     defaultFontSize = prefs.get 'editorFontSize', 19
     window.stash.set 'fontSize', defaultFontSize
     setFontSize defaultFontSize
 
 addToShelf = ->
-    
+
     fileBrowser = window.filebrowser
     return if window.lastFocus == 'shelf'
     if window.lastFocus.startsWith fileBrowser.name
@@ -407,11 +407,11 @@ onMenuAction = (name, args) ->
 
     switch name
         when 'Cycle Windows' then args = winID
-    
+
     # log "unhandled menu action! posting to main '#{name}' args:", args
 
     post.toMain 'menuAction', name, args
-    
+
 post.on 'menuAction', onMenuAction
 
 # 000   000  00000000  000   000
@@ -425,7 +425,7 @@ onCombo = (combo, info) ->
     return if not combo
 
     { mod, key, combo, char, event } = info
-    
+
     return stopEvent(event) if 'unhandled' != window.commandline.globalModKeyComboEvent mod, key, combo, event
     return stopEvent(event) if 'unhandled' != titlebar.globalModKeyComboEvent mod, key, combo, event
 

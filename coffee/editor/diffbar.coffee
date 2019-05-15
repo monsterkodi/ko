@@ -6,7 +6,7 @@
 0000000    000  000       000       0000000    000   000  000   000
 ###
 
-{ elem, str, empty, post, fs } = require 'kxk'
+{ elem, empty, post, fs } = require 'kxk'
 
 lineDiff = require '../tools/linediff'
 hub      = require '../git/hub'
@@ -19,9 +19,9 @@ class Diffbar
         @elem.style.position = 'absolute'
         @elem.style.left = '0'
         @elem.style.top  = '0'
-        
+
         @editor.view.appendChild @elem
-        
+
         @editor.on 'file',       @onEditorFile
         @editor.on 'undone',     @update
         @editor.on 'redone',     @update
@@ -94,23 +94,23 @@ class Diffbar
         @clearMetas()
 
         return if not @changes?.changes?.length
-        
+
         for change in @changes.changes
 
-            boring = @isBoring change 
-        
+            boring = @isBoring change
+
             if change.mod?
 
                 li = change.line-1
-                
+
                 for mod in change.mod
-                    
+
                     meta =
                         line: li
                         clss: 'git mod' + (boring and ' boring' or '')
                         git:  'mod'
                         change: mod
-                        boring: boring 
+                        boring: boring
                         length: change.mod.length
                         click: @onMetaClick
                     @editor.meta.addDiffMeta meta
@@ -120,7 +120,7 @@ class Diffbar
 
                 mods = change.mod? and change.mod.length or 0
                 li = change.line - 1 + mods
-                
+
                 for add in change.add
                     meta =
                         line: li
@@ -138,16 +138,16 @@ class Diffbar
 
                 mods = change.mod? and change.mod.length or 1
                 li = change.line - 1 + mods
-                
+
                 meta =
                     line: li
                     clss: 'git del' + (boring and ' boring' or '')
                     git:  'del'
                     change: change.del
                     length: 1
-                    boring: boring                        
+                    boring: boring
                     click: @onMetaClick
-                    
+
                 @editor.meta.addDiffMeta meta
 
     # 0000000     0000000   00000000   000  000   000   0000000
@@ -193,28 +193,28 @@ class Diffbar
             @changes = file:@editor.currentFile
 
             hub.diff @editor.currentFile, (changes) =>
-                
+
                 if changes.file != @editor.currentFile then return {}
-                    
+
                 @changes = changes
-                    
+
                 @updateMetas()
                 @updateScroll()
                 @editor.emit 'diffbarUpdated', @changes # only used in tests
-        else   
+        else
             @changes = null
             @updateMetas()
             @updateScroll()
             @editor.emit 'diffbarUpdated', @changes # only used in tests
-            
-    #  0000000   0000000  00000000    0000000   000      000      
-    # 000       000       000   000  000   000  000      000      
-    # 0000000   000       0000000    000   000  000      000      
-    #      000  000       000   000  000   000  000      000      
-    # 0000000    0000000  000   000   0000000   0000000  0000000  
-    
+
+    #  0000000   0000000  00000000    0000000   000      000
+    # 000       000       000   000  000   000  000      000
+    # 0000000   000       0000000    000   000  000      000
+    #      000  000       000   000  000   000  000      000
+    # 0000000    0000000  000   000   0000000   0000000  0000000
+
     updateScroll: =>
-        
+
         w  = 2
         h  = @editor.view.clientHeight
         lh = h / @editor.numLines()
@@ -226,31 +226,31 @@ class Diffbar
         alpha = (o) -> 0.5 + Math.max 0, (16-o*lh)*(0.5/16)
 
         if @changes
-            
+
             for meta in @editor.meta.metas
-                
+
                 continue if not meta?[2]?.git?
-                
+
                 li     = meta[0]
                 length = meta[2].length
                 boring = meta[2].boring
-                
+
                 ctx.fillStyle = switch meta[2].git
-                    
+
                     when 'mod'
                         if boring then "rgba(50, 50,50,#{alpha length})"
                         else           "rgba( 0,255, 0,#{alpha length})"
-                           
+
                     when 'del'
                         if boring then "rgba(50,50,50,#{alpha length})"
                         else           "rgba(255,0,0,#{alpha length})"
-                        
+
                     when 'add'
                         if boring then "rgba(50,50,50,#{alpha length})"
                         else           "rgba(160,160,255,#{alpha length})"
-                        
+
                 ctx.fillRect 0, li * lh, w, lh
-            
+
     #  0000000  000      00000000   0000000   00000000
     # 000       000      000       000   000  000   000
     # 000       000      0000000   000000000  0000000

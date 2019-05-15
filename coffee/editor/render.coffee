@@ -1,21 +1,21 @@
 ###
-00000000   00000000  000   000  0000000    00000000  00000000 
+00000000   00000000  000   000  0000000    00000000  00000000
 000   000  000       0000  000  000   000  000       000   000
-0000000    0000000   000 0 000  000   000  0000000   0000000  
+0000000    0000000   000 0 000  000   000  0000000   0000000
 000   000  000       000  0000  000   000  000       000   000
 000   000  00000000  000   000  0000000    00000000  000   000
 ###
 
-{ str, elem } = require 'kxk'
+{ kstr, elem } = require 'kxk'
 
 class Render
-                
+
     # 000      000  000   000  00000000
-    # 000      000  0000  000  000     
-    # 000      000  000 0 000  0000000 
-    # 000      000  000  0000  000     
+    # 000      000  0000  000  000
+    # 000      000  000 0 000  0000000
+    # 000      000  000  0000  000
     # 0000000  000  000   000  00000000
-    
+
     @line: (diss, size={charWidth:0}) ->
         l = ""
         if diss?.length
@@ -23,10 +23,10 @@ class Render
                 d = diss[di]
                 tx = d.start * size.charWidth
                 clss = d.clss? and " class=\"#{d.clss}\"" or ''
-                clrzd = "<span style=\"transform:translatex(#{tx}px);#{d.styl ? ''}\"#{clss}>#{str.encode d.match}</span>"
+                clrzd = "<span style=\"transform:translatex(#{tx}px);#{d.styl ? ''}\"#{clss}>#{kstr.encode d.match}</span>"
                 l = clrzd + l
         l
-        
+
     @lineSpan: (diss, size) ->
 
         div = elem class: 'linespans'
@@ -43,15 +43,15 @@ class Render
                         span.style[ss[0]] = ss[1]
                 div.appendChild span
         div
-        
+
     #  0000000  000   000  00000000    0000000   0000000   00000000    0000000
-    # 000       000   000  000   000  000       000   000  000   000  000     
-    # 000       000   000  0000000    0000000   000   000  0000000    0000000 
+    # 000       000   000  000   000  000       000   000  000   000  000
+    # 000       000   000  0000000    0000000   000   000  0000000    0000000
     # 000       000   000  000   000       000  000   000  000   000       000
-    #  0000000   0000000   000   000  0000000    0000000   000   000  0000000 
-    
+    #  0000000   0000000   000   000  0000000    0000000   000   000  0000000
+
     @cursors: (cs, size) -> # cs: [ [charIndex, lineIndex] ... ]  (lineIndex relative to view)
-        
+
         i = 0
         h = ""
         cw = size.charWidth
@@ -65,17 +65,17 @@ class Render
             h += "<span class=\"cursor #{cls}\" style=\"z-index:#{zi};transform:translate3d(#{tx}px,#{ty}px,0); height:#{lh}px\"></span>"
             i += 1
         h
-        
+
     #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
     # 000       000       000      000       000          000     000  000   000  0000  000
     # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
     #      000  000       000      000       000          000     000  000   000  000  0000
     # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
-                
+
     @selection: (ss, size, clss='selection') => # ss: [ [lineIndex, [startIndex, endIndex]], ... ]  (lineIndex relative to view)
-        
+
         h = ""
-        p = null      
+        p = null
         n = null
         for si in [0...ss.length]
             s = ss[si]
@@ -84,12 +84,12 @@ class Render
             h += @selectionSpan b, s, n, size, s[2]?.clss ? s[2] ? clss
             p = s
         h
-        
+
     @selectionSpan: (prev, sel, next, size, clss) ->
-                                                                
-        # 0000000     0000000   00000000   0000000    00000000  00000000 
+
+        # 0000000     0000000   00000000   0000000    00000000  00000000
         # 000   000  000   000  000   000  000   000  000       000   000
-        # 0000000    000   000  0000000    000   000  0000000   0000000  
+        # 0000000    000   000  0000000    000   000  0000000   0000000
         # 000   000  000   000  000   000  000   000  000       000   000
         # 0000000     0000000   000   000  0000000    00000000  000   000
 
@@ -101,7 +101,7 @@ class Render
                 border += " tl"
             if (sel[1][1] > prev[1][1]) or (sel[1][1] < prev[1][0])
                 border += " tr"
-            
+
         if not next
             border += " bl br"
         else
@@ -109,10 +109,10 @@ class Render
                 border += " br"
             if (sel[1][0] < next[1][0]) or (sel[1][0] > next[1][1])
                 border += " bl"
-            
+
         if sel[1][0] == 0 and not size.centerText
             border += " start" # wider offset at start of line
-                                                
+
         sw = size.charWidth * (sel[1][1]-sel[1][0])
         tx = size.charWidth *  sel[1][0] + size.offsetX
         ty = size.lineHeight * sel[0]
@@ -122,11 +122,11 @@ class Render
             lh /= 2 if clss.endsWith 'single'
             lh /= 2 if clss.endsWith 'double'
             if clss.endsWith 'bold'
-                ty += lh/4 
-                lh /= 2 
-    
+                ty += lh/4
+                lh /= 2
+
         empty = sel[1][0] == sel[1][1] and "empty" or ""
-        
+
         "<span class=\"#{clss}#{border}#{empty}\" style=\"transform: translate(#{tx}px,#{ty}px); width: #{sw}px; height: #{lh}px\"></span>"
-                                                
+
 module.exports = Render

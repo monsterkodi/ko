@@ -5,7 +5,7 @@
 #    000     000   000  000   000  000  0000       000  000       000   000  000   000  000 0 000
 #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000
 
-{ reversed, slash, str, kerror, _ } = require 'kxk'
+{ reversed, slash, kstr, kerror, _ } = require 'kxk'
 
 matchr = require '../../tools/matchr'
 
@@ -67,12 +67,12 @@ class Transform
 
     add: (d=1) ->
 
-        @apply (t) -> str(parseInt(t) + parseInt(d))
+        @apply (t) -> kstr(parseInt(t) + parseInt(d))
         'add'
 
     sub: (d=1) ->
 
-        @apply (t) -> str(parseInt(t) - parseInt(d))
+        @apply (t) -> kstr(parseInt(t) - parseInt(d))
         'sub'
 
     # 00000000   00000000  000   000  00000000  00000000    0000000  00000000
@@ -296,4 +296,3 @@ module.exports =
     doTransform: (arg) -> Transform.do @, arg
     Transform:         Transform
     transformNames:    Transform.transformNames
-

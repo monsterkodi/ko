@@ -3,25 +3,25 @@
 000   000  000       0000  000  000   000
 000000000  0000000   000 0 000  000   000
 000 0 000  000       000  0000  000   000
-000   000  00000000  000   000   0000000 
+000   000  00000000  000   000   0000000
 ###
 
-{ filelist, post, slash, os, fs, str, _ } = require 'kxk'
+{ filelist, post, slash, os, fs, _ } = require 'kxk'
 
 Syntax    = require '../editor/syntax'
 Transform = require '../editor/actions/transform'
 Macro     = require '../commands/macro'
 
 getMenu = (template, name) ->
-    
+
     for item in template
         if item.text == name
             return item
 
 menu = (template) ->
-        
+
     template = _.cloneDeep template
-        
+
     actionFiles = filelist slash.join __dirname, '../editor/actions'
     submenu = Misc: []
 
@@ -41,7 +41,7 @@ menu = (template) ->
                         combo = v.combo
                         if os.platform() != 'darwin' and v.accel
                             combo = v.accel
-                        item = 
+                        item =
                             text:   v.name
                             accel:  combo
                         if v.menu?
@@ -53,10 +53,10 @@ menu = (template) ->
 
     for key, menu of submenu
         EditMenu.push text:key, menu:menu
-    
+
     editMenu = getMenu template, 'Edit'
     editMenu.menu = editMenu.menu.concat EditMenu
-    
+
     MacroMenu = [ text:'Macro', combo:'command+m', accel:'ctrl+m', command:'macro' ]
     for macro in Macro.macroNames
         MacroMenu.push
@@ -89,7 +89,7 @@ menu = (template) ->
         return span
 
     RecentMenu = []
-    
+
     recent = window.state?.get 'recentFiles', []
     recent ?= []
     for f in recent
@@ -106,8 +106,7 @@ menu = (template) ->
             text: 'Clear List'
         fileMenu = getMenu template, 'File'
         fileMenu.menu = [{text:'Recent', menu: RecentMenu}, {text:''}].concat fileMenu.menu
-    
+
     template
 
 module.exports = menu
-

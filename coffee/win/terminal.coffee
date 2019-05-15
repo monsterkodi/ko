@@ -6,7 +6,7 @@
    000     00000000  000   000  000   000  000  000   000  000   000  0000000
 ###
 
-{ reversed, stopEvent, prefs, pos, popup, childp, empty, _  } = require 'kxk'
+{ reversed, stopEvent, prefs, kpos, popup, childp, empty, _  } = require 'kxk'
 
 salt       = require '../tools/salt'
 TextEditor = require '../editor/texteditor'
@@ -164,12 +164,12 @@ class Terminal extends TextEditor
     # 000        000   000  000        000   000  000          
     # 000         0000000   000         0000000   000          
 
-    onContextMenu: (event) => stopEvent event, @showContextMenu pos event
+    onContextMenu: (event) => stopEvent event, @showContextMenu kpos event
               
     showContextMenu: (absPos) =>
         
         if not absPos?
-            absPos = pos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
+            absPos = kpos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
         
         opt = items: [
             text:   'Clear'

@@ -6,7 +6,7 @@
    000     000   000  0000000    0000000 
 ###
 
-{ post, stopEvent, popup, valid, empty, first, last, slash, elem, drag, pos, kerror, $, _ } = require 'kxk'
+{ post, stopEvent, popup, valid, empty, first, last, slash, elem, drag, kpos, kerror, $, _ } = require 'kxk'
 
 Tab = require './tab'
 
@@ -299,7 +299,7 @@ class Tabs
     # 000       000   000  000  0000     000     000        000 000      000     
     #  0000000   0000000   000   000     000     00000000  000   000     000     
     
-    onContextMenu: (event) => stopEvent event, @showContextMenu pos event
+    onContextMenu: (event) => stopEvent event, @showContextMenu kpos event
               
     showContextMenu: (absPos) =>
         
@@ -307,7 +307,7 @@ class Tabs
             tab.activate()
             
         if not absPos?
-            absPos = pos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
+            absPos = kpos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
         
         opt = items: [ 
             text:   'Close Other Tabs'

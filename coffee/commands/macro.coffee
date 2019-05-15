@@ -7,7 +7,7 @@
 ###
 
 { post, reversed, filelist, empty, slash, valid, args, fs, kerror, _ } = require 'kxk'
-  
+
 indexer   = require '../main/indexer'
 salt      = require '../tools/salt'
 req       = require '../tools/req'
@@ -19,7 +19,7 @@ Transform = require '../editor/actions/transform'
 class Macro extends Command
 
     @macroNames = ['clean', 'help', 'dbg', 'class', 'req', 'inv', 'blink', 'color', 'fps', 'cwd', 'git', 'unix']
-    
+
     constructor: (commandline) ->
 
         super commandline
@@ -27,7 +27,7 @@ class Macro extends Command
         @macros = Macro.macroNames
         @macros = @macros.concat Transform.transformNames
         @names  = ['macro']
-        
+
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000
     # 0000000      000     000000000  0000000       000
@@ -35,7 +35,7 @@ class Macro extends Command
     # 0000000      000     000   000  000   000     000
 
     start: (name) ->
-        
+
         super name
         text = @last()
         text = 'dbg' if not text?.length
@@ -48,8 +48,8 @@ class Macro extends Command
     # 000      000       000     000
     # 0000000  000  0000000      000
 
-    listItems: () -> 
-    
+    listItems: () ->
+
         items = _.uniq _.concat reversed(@history), @macros
 
         ({text: i, line: i in @macros and '◼' or '◆', type: 'macro'} for i in items)
@@ -63,7 +63,7 @@ class Macro extends Command
     execute: (command) ->
 
         return kerror 'no command!' if empty command
-        
+
         command = super command
 
         editor  = window.editor
@@ -90,37 +90,37 @@ class Macro extends Command
             when 'inv'
                 window.textEditor.toggleInvisibles()
 
-            # 0000000    000      000  000   000  000   000  
-            # 000   000  000      000  0000  000  000  000   
-            # 0000000    000      000  000 0 000  0000000    
-            # 000   000  000      000  000  0000  000  000   
-            # 0000000    0000000  000  000   000  000   000  
-            
+            # 0000000    000      000  000   000  000   000
+            # 000   000  000      000  0000  000  000  000
+            # 0000000    000      000  000 0 000  0000000
+            # 000   000  000      000  000  0000  000  000
+            # 0000000    0000000  000  000   000  000   000
+
             when 'blink'
                 editor.toggleBlink()
                 if prefs.get 'blink'
                     @commandline.startBlink()
                 else
                     @commandline.stopBlink()
-                
-            #  0000000   0000000   000       0000000   00000000   
-            # 000       000   000  000      000   000  000   000  
-            # 000       000   000  000      000   000  0000000    
-            # 000       000   000  000      000   000  000   000  
-            #  0000000   0000000   0000000   0000000   000   000  
-            
+
+            #  0000000   0000000   000       0000000   00000000
+            # 000       000   000  000      000   000  000   000
+            # 000       000   000  000      000   000  0000000
+            # 000       000   000  000      000   000  000   000
+            #  0000000   0000000   0000000   0000000   000   000
+
             when 'color' then editor.togglePigments()
-            
-            # 00000000  00000000    0000000         0000000  000   000  0000000           0000000   000  000000000  
-            # 000       000   000  000             000       000 0 000  000   000        000        000     000     
-            # 000000    00000000   0000000         000       000000000  000   000        000  0000  000     000     
-            # 000       000             000        000       000   000  000   000        000   000  000     000     
-            # 000       000        0000000          0000000  00     00  0000000           0000000   000     000     
-            
+
+            # 00000000  00000000    0000000         0000000  000   000  0000000           0000000   000  000000000
+            # 000       000   000  000             000       000 0 000  000   000        000        000     000
+            # 000000    00000000   0000000         000       000000000  000   000        000  0000  000     000
+            # 000       000             000        000       000   000  000   000        000   000  000     000
+            # 000       000        0000000          0000000  00     00  0000000           0000000   000     000
+
             when 'fps'   then window.fps?.toggle()
             when 'cwd'   then window.cwd?.toggle()
             when 'git'   then GitInfo.start()
-            when 'err'   
+            when 'err'
                 post.toMain 'throwError'
                 throw new Error 'err'
 
@@ -131,7 +131,7 @@ class Macro extends Command
             # 000   000  00000000  0000000  000
 
             when 'help'
-                
+
                 terminal = window.terminal
                 text = fs.readFileSync "#{__dirname}/../../bin/cheet.noon", encoding: 'utf8'
                 terminal.clear()
@@ -148,12 +148,12 @@ class Macro extends Command
             # 000   000  00000000   00000 00
 
             when 'req'
-                
+
                 return if slash.ext(editor.currentFile) != 'coffee'
                 words = wordsInArgsOrCursorsOrSelection args
-                
+
                 lines = req editor.currentFile, editor.lines(), words, editor
-                
+
                 if valid lines
                     editor.do.start()
                     for line in lines
@@ -164,7 +164,7 @@ class Macro extends Command
                     editor.moveCursorsDown false, lines.length
                     editor.do.end()
                     return do: "focus editor"
-                    
+
             # 0000000    0000000     0000000
             # 000   000  000   000  000
             # 000   000  0000000    000  0000
@@ -183,17 +183,17 @@ class Macro extends Command
                 words = wordsInArgsOrCursorsOrSelection args, include: "#@.-"
                 for ti in [0...words.length - lst]
                     t = words[ti]
-                    insert += "#{t}:\#{str #{t}} "
+                    insert += "#{t}:\#{kstr #{t}} "
                 insert = insert.trimRight()
                 insert += '"'
                 if lst
-                    insert += (", str(#{words[ti]})" for ti in [words.length - lst...words.length]).join ''
-                        
+                    insert += (", kstr(#{words[ti]})" for ti in [words.length - lst...words.length]).join ''
+
                 editor.do.start()
                 editor.do.insert li, insert
                 editor.singleCursorAtPos [editor.line(li).length, li]
                 editor.do.end()
-                
+
                 focus: editor.name
 
             #  0000000  000       0000000    0000000   0000000
@@ -245,42 +245,42 @@ class Macro extends Command
                     if line != cleaned
                         editor.do.change li, cleaned
                 editor.do.end()
-                
+
             when 'unix'
-                
+
                 editor.newlineCharacters = '\n'
                 post.emit 'saveFile'
-                
-            # 000   000  00000000   0000000   0000000    00000000  00000000   
-            # 000   000  000       000   000  000   000  000       000   000  
-            # 000000000  0000000   000000000  000   000  0000000   0000000    
-            # 000   000  000       000   000  000   000  000       000   000  
-            # 000   000  00000000  000   000  0000000    00000000  000   000  
-            
+
+            # 000   000  00000000   0000000   0000000    00000000  00000000
+            # 000   000  000       000   000  000   000  000       000   000
+            # 000000000  0000000   000000000  000   000  0000000   0000000
+            # 000   000  000       000   000  000   000  000       000   000
+            # 000   000  00000000  000   000  0000000    00000000  000   000
+
             when 'header'
-                
+
                 editor.toggleHeader()
-                
+
             when 'col'
-                    
+
                 num  = args.length > 0 and parseInt(args[0]) or 10
                 step = args.length > 1 and parseInt(args[1]) or 1
                 editor.cursorColumns num, step
 
             when 'line'
-                    
+
                 num  = args.length > 0 and parseInt(args[0]) or 10
                 step = args.length > 1 and parseInt(args[1]) or 1
                 editor.cursorLines num, step
-                
+
             else
-                
-                # 000000000  00000000    0000000   000   000   0000000  00000000   0000000   00000000   00     00    
-                #    000     000   000  000   000  0000  000  000       000       000   000  000   000  000   000    
-                #    000     0000000    000000000  000 0 000  0000000   000000    000   000  0000000    000000000    
-                #    000     000   000  000   000  000  0000       000  000       000   000  000   000  000 0 000    
-                #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000    
-                
+
+                # 000000000  00000000    0000000   000   000   0000000  00000000   0000000   00000000   00     00
+                #    000     000   000  000   000  0000  000  000       000       000   000  000   000  000   000
+                #    000     0000000    000000000  000 0 000  0000000   000000    000   000  0000000    000000000
+                #    000     000   000  000   000  000  0000       000  000       000   000  000   000  000 0 000
+                #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000
+
                 if Transform.transformNames and cmmd in Transform.transformNames
                     window.textEditor.Transform.do.apply null, [window.textEditor, cmmd].concat args
                 else
