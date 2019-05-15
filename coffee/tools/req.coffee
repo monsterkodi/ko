@@ -6,7 +6,7 @@
 000   000  00000000   00000 00
 ###
 
-{ post, slash, valid, empty, log, _ } = require 'kxk'
+{ post, slash, valid, empty, _ } = require 'kxk'
 
 kxk = require 'kxk'
 
@@ -28,8 +28,6 @@ req = (file, lines, words, editor) ->
                 p = slash.splitExt(slash.relative f, slash.dir file)[0]
                 p = '.' + p if not p.startsWith '.'
                 p
-        else
-            log "req:- no projectFiles for '#{pkgPath}'??"
                 
     projectFiles ?= []
     
@@ -85,8 +83,6 @@ req = (file, lines, words, editor) ->
     kxkValues = _.uniq kxkValues
     kxkValues = kxkValues.filter (v) -> v not in ['state']
     
-    log "req.req kxkValues:#{kxkValues}"
-      
     if valid kxkValues
         
         weight = (v) ->

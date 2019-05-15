@@ -6,7 +6,7 @@
  0000000   000     000     000  000   000  000        0000000 
 ###
 
-{ post, slash, elem, empty, error, log, fs, $, _ } = require 'kxk'
+{ post, slash, elem, empty, fs, $, _ } = require 'kxk'
 
 lineDiff   = require '../tools/linediff'
 syntax     = require '../editor/syntax'

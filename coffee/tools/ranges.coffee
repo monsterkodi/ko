@@ -6,7 +6,7 @@
 000   000  000   000  000   000   0000000   00000000  0000000 
 ###
 
-{ log, _ } = require 'kxk'
+{ _ } = require 'kxk'
 
 class Ranges
     

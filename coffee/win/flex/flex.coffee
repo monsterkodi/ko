@@ -6,7 +6,7 @@
 000       0000000  00000000  000   000  
 ###
 
-{ getStyle, clamp, valid, empty, last, drag, def, error, log, _ } = require 'kxk'
+{ getStyle, clamp, valid, empty, last, drag, def, _ } = require 'kxk'
 
 Pane   = require './pane'
 Handle = require './handle'
@@ -163,8 +163,6 @@ class Flex
         prevSize = prev.size + offset
         nextSize = next.size - offset
         
-        # log 'moveHandleToPos', handle.index, pos, prevSize, nextSize
-        
         if @snapFirst? and prevSize < @snapFirst and not @prevVisPane prev
             
             if prevSize <= 0 or offset < @snapFirst # collapse panea
@@ -202,8 +200,6 @@ class Flex
                 
             nextSize = 0
             prevSize -= leftOver
-        
-        # log 'moveHandleToPos', handle.index, pos, prevSize, nextSize
         
         prev.setSize prevSize
         next.setSize nextSize
@@ -290,7 +286,6 @@ class Flex
     collapse: (i) -> 
         
         if pane = @pane i
-            # log i, pane.collapsed?, pane
             if not pane.collapsed
                 pane.collapse()
                 @calculate()

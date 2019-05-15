@@ -6,7 +6,7 @@
  0000000   0000000   0000000   0000000   000   000  000   000
 ###
 
-{ post, stopEvent, setStyle, keyinfo, popup, slash, valid, clamp, empty, state, open, elem, pos, fs, error, log, $, _ } = require 'kxk'
+{ post, stopEvent, setStyle, keyinfo, popup, slash, valid, clamp, empty, state, open, elem, pos, fs, kerror, $, _ } = require 'kxk'
 
 Row      = require './row'
 Scroller = require './scroller'
@@ -56,7 +56,7 @@ class Column
         @items  = items
         @parent = parent
         
-        error "no parent item?" if not @parent?
+        kerror "no parent item?" if not @parent?
         
         if valid @items
             for item in @items
@@ -70,7 +70,7 @@ class Column
         @browser.clearColumn @index
         
         @parent = opt.parent
-        error "no parent item?" if not @parent?
+        kerror "no parent item?" if not @parent?
         
         for item in @items
             @rows.push new Row @, item
@@ -311,18 +311,18 @@ class Column
 
         if @parent.type == 'dir'            
             stateKey = "browser|showHidden|#{@parent.file}"
-            if state.get stateKey
-                state.set stateKey, false
+            if window.state.get stateKey
+                window.state.set stateKey, false
             else
-                state.set stateKey, true
+                window.state.set stateKey, true
             @browser.loadDirItem @parent, @index, ignoreCache:true
         @
         
     toggleExtensions: =>
 
         stateKey = "browser|hideExtensions"
-        state.set stateKey, not state.get stateKey, false
-        setStyle '.browserRow .ext', 'display', state.get(stateKey) and 'none' or 'initial'
+        window.state.set stateKey, not window.state.get stateKey, false
+        setStyle '.browserRow .ext', 'display', window.state.get(stateKey) and 'none' or 'initial'
         @
         
     # 000000000  00000000    0000000    0000000  000   000  

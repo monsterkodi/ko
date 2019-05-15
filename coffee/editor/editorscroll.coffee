@@ -8,7 +8,6 @@
 
 { clamp } = require 'kxk'
 
-log    = console.log
 events = require 'events'
 kxk    = require 'kxk'
 

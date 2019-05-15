@@ -6,7 +6,7 @@
 000       000  0000000  00000000        0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 ###
 
-{ post, valid, empty, last, elem, clamp, drag, clamp, state, slash, fs, os, str, error, log, $, _ } = require 'kxk'
+{ post, valid, empty, last, elem, clamp, drag, clamp, state, slash, fs, os, str, $, _ } = require 'kxk'
   
 Browser  = require './browser'
 Shelf    = require './shelf'
@@ -46,7 +46,7 @@ class FileBrowser extends Browser
             target:  @shelfResize
             onMove:  @onShelfDrag
             
-        @shelfSize = state.get 'shelf:size', 200
+        @shelfSize = window.state.get 'shelf:size', 200
         
         @initColumns()
         
@@ -178,8 +178,6 @@ class FileBrowser extends Browser
     
     loadDirItem: (item, col=0, opt={}) ->
         
-        # log 'loadDirItem', item?.name, item?.file
-        
         return if col > 0 and item.name == '/'
         
         dir = item.file
@@ -188,11 +186,11 @@ class FileBrowser extends Browser
             @loadDirItems dir, item, dirCache.get(dir), col, opt
             post.emit 'dir', dir
         else
-            opt.ignoreHidden = not state.get "browser|showHidden|#{dir}"
+            opt.ignoreHidden = not window.state.get "browser|showHidden|#{dir}"
             
             dirlist dir, opt, (err, items) => 
                 
-                if err? then return # error "can't load dir #{dir}: #{err}"
+                if err? then return
             
                 post.toMain 'dirLoaded', dir
                 
@@ -240,13 +238,10 @@ class FileBrowser extends Browser
             return
             
         if slash.isRelative file
-            # log "ignore relative file #{file}"
             return
             
         filelist = slash.pathlist file
         lastlist = slash.pathlist lastPath
-        
-        # log "navigateToFile #{file}", filelist
         
         if valid lastlist
             
@@ -385,7 +380,7 @@ class FileBrowser extends Browser
         
     setShelfSize: (@shelfSize) ->
         
-        state.set 'shelf|size', @shelfSize
+        window.state.set 'shelf|size', @shelfSize
         @shelfResize.style.left = "#{@shelfSize}px"
         @shelf.div.style.width = "#{@shelfSize}px"
         @cols.style.left = "#{@shelfSize}px"

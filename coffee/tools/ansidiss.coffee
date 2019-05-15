@@ -8,7 +8,7 @@
 
 # based on code from https://github.com/rburns/ansi-to-html
 
-{ log, _ } = require 'kxk'
+{ _ } = require 'kxk'
 
 STYLES =
     f0:  'color:#000' # normal intensity

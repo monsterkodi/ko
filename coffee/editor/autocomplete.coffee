@@ -6,7 +6,7 @@
 000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
 ###
 
-{ error, log, stopEvent, clamp, post, empty, elem, $, _ } = require 'kxk'
+{ kerror, stopEvent, clamp, post, empty, elem, $, _ } = require 'kxk'
 
 Indexer = require '../main/indexer'
 event   = require 'events'
@@ -74,8 +74,6 @@ class Autocomplete extends event
                 matches.sort (a,b) ->
                     (b[1].distance+b[1].count+1/b[0].length) - (a[1].distance+a[1].count+1/a[0].length)
                     
-                # log matches
-                    
                 words = matches.map (m) -> m[0]
                 for w in words
                     if not @firstMatch
@@ -98,7 +96,7 @@ class Autocomplete extends event
         
         cursor = $('.main', @editor.view)
         if not cursor?
-            error "Autocomplete.open --- no cursor?"
+            kerror "Autocomplete.open --- no cursor?"
             return
 
         @span = elem 'span', class: 'autocomplete-span'
@@ -114,9 +112,7 @@ class Autocomplete extends event
             
             p = @editor.posAtXY cr.left, cr.top
             ci = p[1]-@editor.scroll.top
-            log 'p:', p, 'scroll.top', @editor.scroll.top, 'ci', ci, 'num children', @editor.layerDict['lines'].children.length
-            log @editor.lineElemAtXY(cr.left, cr.top)?
-            return error "no span for autocomplete? cursor topleft: #{parseInt cr.left} #{parseInt cr.top}", info
+            return kerror "no span for autocomplete? cursor topleft: #{parseInt cr.left} #{parseInt cr.top}", info
 
         sp = spanInfo.span
         inner = sp.innerHTML
@@ -274,7 +270,7 @@ class Autocomplete extends event
         cursorWord = @cursorWord()
         for l in lines
             if not l?.split?
-                return error "Autocomplete.parseLines -- line has no split? action: #{opt.action} line: #{l}", lines
+                return kerror "Autocomplete.parseLines -- line has no split? action: #{opt.action} line: #{l}", lines
             words = l.split @splitRegExp
             words = words.filter (w) => 
                 return false if not Indexer.testWord w

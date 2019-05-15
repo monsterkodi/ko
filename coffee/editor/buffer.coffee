@@ -6,7 +6,7 @@
 0000000     0000000   000       000       00000000  000   000
 ###
 
-{ clamp, empty, error, log, str, _ } = require 'kxk'
+{ clamp, empty, kerror, str, _ } = require 'kxk'
 
 matchr  = require '../tools/matchr'
 State   = require './state' 
@@ -281,7 +281,7 @@ class Buffer extends event
 
     rangeForLineAtIndex: (i) -> 
         
-        return error "Buffer.rangeForLineAtIndex -- index #{i} >= #{@numLines()}" if i >= @numLines()
+        return kerror "Buffer.rangeForLineAtIndex -- index #{i} >= #{@numLines()}" if i >= @numLines()
         [i, [0, @line(i).length]] 
         
     isRangeInString: (r) -> @rangeOfStringSurroundingRange(r)?

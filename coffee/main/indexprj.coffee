@@ -6,7 +6,7 @@
 000  000   000  0000000    00000000  000   000  000        000   000   0000000     
 ###
 
-{ slash, walkdir, empty, noon, fs, log } = require 'kxk'
+{ slash, walkdir, empty, noon, fs } = require 'kxk'
 
 ignore = require 'ignore'
 
@@ -16,7 +16,6 @@ shouldIndex = (path, stat) ->
     
     if slash.ext(path) in sourceFileExtensions
         if stat.size > 654321
-            # log 'file to big!', path
             return false
         else
             return true
@@ -66,8 +65,6 @@ indexProject = (file) ->
     kofiles = []
     info = dir:dir, files:[]
 
-    # log 'indexProject dir', dir
-
     ign = ignore()
     
     opt = 
@@ -77,7 +74,6 @@ indexProject = (file) ->
     walkdir.sync dir, opt, (path, stat) ->
         
         addIgnores = (gitignore) -> 
-            # log '------------------- ', gitignore
             gitign = fs.readFileSync gitignore, 'utf8'
             gitign = gitign.split /\r?\n/
             gitign = gitign.filter (i) -> not empty(i) and not i.startsWith "#"
@@ -91,7 +87,6 @@ indexProject = (file) ->
             ign.add gitign
         
         if ign.ignores slash.relative path, dir
-            # log 'ign!', slash.relative path, dir
             @ignore path
             return
         
@@ -111,8 +106,6 @@ indexProject = (file) ->
             if shouldIndex path, stat
                 info.files.push slash.path path
                 
-    # log 'indexProject done', dir
-    
     indexKoFiles kofiles, info
       
     info
@@ -123,6 +116,5 @@ if module.parent
     
 else
     info = indexProject slash.resolve process.argv[2]
-    # log info 
     log "#{info.files.length} files"
     

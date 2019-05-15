@@ -6,7 +6,7 @@
 000       000  0000000  00000000  000   000  000   000  000   000  0000000    0000000  00000000  000   000
 ###
 
-{ post, reversed, filelist, empty, slash, first, prefs, valid, error, log, _ } = require 'kxk'
+{ post, reversed, filelist, empty, slash, first, prefs, valid, kerror, _ } = require 'kxk'
 
 File     = require '../tools/file'
 electron = require 'electron'
@@ -36,8 +36,6 @@ class FileHandler
     
     loadFile: (file, opt={}) =>
     
-        # log "---------------- FileHandler.loadFile #{file}"
-        
         file = null if file? and file.length <= 0
     
         editor.saveScrollCursorsAndSelections()
@@ -49,8 +47,6 @@ class FileHandler
     
         if file != editor?.currentFile or opt?.reload
     
-            # log "FileHandler.loadFile", file
-            
             if fileExists = slash.fileExists file
                 @addToRecent file
             
@@ -104,7 +100,6 @@ class FileHandler
                 return if answer != 1
     
             if files.length == 0
-                log 'FileHandler.openFiles -- no files for:', ofiles
                 return []
     
             window.stash.set 'openFilePath', slash.dir files[0]
@@ -146,8 +141,6 @@ class FileHandler
             @reloadActiveTab()
         else if tab = tabs.tab file
             tab.reload()
-        else
-            log "nothing to reload #{file}" 
             
     reloadActiveTab: ->
         
@@ -170,12 +163,8 @@ class FileHandler
         if tab = tabs.tab file
             if tab == tabs.activeTab()
                 if neighborTab = tab.nextOrPrev()
-                    log 'activate neighborTab'
                     neighborTab.activate()
-            log 'tabs.close'
             tabs.closeTab tab
-        else
-            log "nothing to remove #{file}" 
             
     #  0000000   0000000   000   000  00000000         0000000   000      000      
     # 000       000   000  000   000  000             000   000  000      000      
@@ -186,7 +175,7 @@ class FileHandler
     saveAll: =>
         
         for tab in tabs.tabs
-            if tab.dirty # tab.isDirty()
+            if tab.dirty 
                 if tab == tabs.activeTab()
                     @saveFile tab.file
                 else
@@ -213,7 +202,7 @@ class FileHandler
             editor.saveScrollCursorsAndSelections()
             
             if valid err
-                error "saving '#{file}' failed:", err
+                kerror "saving '#{file}' failed:", err
             else
                 editor.setCurrentFile      saved
                 post.toOthers 'fileSaved', saved, window.winID
@@ -229,14 +218,14 @@ class FileHandler
     
     addToRecent: (file) ->
     
-        recent = state.get 'recentFiles', []
+        recent = window.state.get 'recentFiles', []
         return if file == first recent
         _.pull recent, file
         recent.unshift file
         while recent.length > prefs.get 'recentFilesLength', 15
             recent.pop()
     
-        state.set 'recentFiles', recent
+        window.state.set 'recentFiles', recent
         commandline.commands.open.setHistory reversed recent
                 
     #  0000000   0000000   000   000  00000000         0000000  000   000   0000000   000   000   0000000   00000000   0000000  
@@ -249,7 +238,7 @@ class FileHandler
         
         if editor.currentFile? and editor.do.hasLineChanges() and slash.fileExists editor.currentFile
             File.save editor.currentFile, editor.text(), (err) ->
-                error "FileHandler.saveChanges failed #{err}" if err
+                kerror "FileHandler.saveChanges failed #{err}" if err
     
     #  0000000   00000000   00000000  000   000        00000000  000  000      00000000  
     # 000   000  000   000  000       0000  000        000       000  000      000       

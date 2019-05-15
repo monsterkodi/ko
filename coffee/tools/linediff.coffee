@@ -6,7 +6,7 @@
 0000000  000  000   000  00000000  0000000    000  000       000       
 ###
 
-{ empty, log, _ } = require 'kxk'
+{ empty, _ } = require 'kxk'
 
 lineDiff = (oldLine, newLine) ->
     

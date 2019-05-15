@@ -6,12 +6,10 @@
 00     00  000  000   000  0000000     0000000   00     00
 ###
 
-{ post, win, stopEvent, filelist, keyinfo, prefs, state, stash, childp, 
-  drag, noon, slash, clamp, pos, str, sw, sh, os, fs, valid, empty, log, error, _ } = require 'kxk'
+{ post, win, stopEvent, filelist, keyinfo, prefs, stash, childp, store,
+  drag, noon, slash, clamp, pos, str, sw, sh, os, fs, valid, empty, klog, _ } = require 'kxk'
 
 menu = require './menu'
-
-# post.debug()
 
 w = new win 
     dir:    __dirname
@@ -57,9 +55,8 @@ filehandler = null
 # 000        000   000  000       000            000
 # 000        000   000  00000000  000       0000000
 
-state.init()
+window.state = new store 'state', separator: '|'
 window.prefs = prefs
-window.state = state
 window.stash = new stash "win/#{winID}"
 
 post.setMaxListeners 20
@@ -100,7 +97,7 @@ post.on 'editorFocus', (editor) ->
 
 # testing related ... 
 
-post.on 'mainlog', -> log.apply log, arguments
+post.on 'mainlog', -> klog.apply klog, arguments
 
 post.on 'ping', (wID, argA, argB) -> post.toWin wID, 'pong', winID, argA, argB
 post.on 'postEditorState', ->
@@ -257,7 +254,7 @@ post.on 'split', (s) ->
 
 toggleCenterText = ->
 
-    if state.get "invisibles|#{editor.currentFile}", false
+    if window.state.get "invisibles|#{editor.currentFile}", false
         editor.toggleInvisibles()
         restoreInvisibles = true
         
@@ -405,7 +402,7 @@ onMenuAction = (name, args) ->
         when 'Close Other Tabs'      then return post.emit 'closeOtherTabs'
         when 'Close Other Windows'   then return post.toOtherWins 'closeWindow'
         when 'Fullscreen'            then return win.setFullScreen !win.isFullScreen()
-        when 'Clear List'            then return state.set 'recentFiles', []
+        when 'Clear List'            then return window.state.set 'recentFiles', []
         when 'Preferences'           then return post.emit 'openFiles', [prefs.store.file], newTab:true
 
     switch name

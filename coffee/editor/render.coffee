@@ -6,7 +6,7 @@
 000   000  00000000  000   000  0000000    00000000  000   000
 ###
 
-{ str, elem, log, } = require 'kxk'
+{ str, elem } = require 'kxk'
 
 class Render
                 

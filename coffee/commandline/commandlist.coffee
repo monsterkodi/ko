@@ -6,7 +6,7 @@
  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  0000000      000
 ###
 
-{ error, log } = require 'kxk' 
+{ kerror } = require 'kxk' 
 
 TextEditor = require '../editor/texteditor'
 Syntax     = require '../editor/syntax'
@@ -98,7 +98,7 @@ class CommandList extends TextEditor
     appendMeta: (meta) ->
 
         if not meta?
-            return error 'CommandList.appendMeta -- no meta?'
+            return kerror 'CommandList.appendMeta -- no meta?'
             
         @meta.addDiv @meta.append meta
 

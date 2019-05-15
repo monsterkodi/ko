@@ -6,7 +6,7 @@
 0000000    000  000   000   0000000  000   000   0000000  000   000  00000000
 ###
 
-{ post, slash, watch, log, _ } = require 'kxk'
+{ post, slash, watch, _ } = require 'kxk'
 
 class DirCache
 
@@ -31,7 +31,7 @@ class DirCache
         
         watcher = watch.dir dir
         watcher.on 'change', DirCache.onChange
-        watcher.on 'error', (err) -> log "watch.error #{err}"
+        watcher.on 'error', (err) -> error "watch.error #{err}"
         DirCache.watches[dir] = watcher
         
     @unwatch: (dir) -> 

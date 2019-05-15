@@ -6,7 +6,7 @@
 00     00  000   000  0000000  000   000  00000000  000   000
 ###
 
-{ slash, walkdir, fs, error, log } = require 'kxk'
+{ slash, walkdir, fs, kerror } = require 'kxk'
 
 class Walker
 
@@ -32,7 +32,6 @@ class Walker
     # 0000000      000     000   000  000   000     000   
     
     start: ->           
-        # profile 'walker start'
         try
             @running = true
             dir = @cfg.root
@@ -85,7 +84,6 @@ class Walker
                         cfg.file? sp, stat
                                                 
                 if cfg.files.length > cfg.maxFiles
-                    # log "max files reached: #{cfg.files.length}"
                     @end()
 
                 else if cfg.slowdown and (cfg.files.length % 400) == 399
@@ -99,7 +97,7 @@ class Walker
                 
         catch err
             @running = false
-            error "Walker.start -- #{err} dir: #{dir} stack:", err.stack
+            kerror "Walker.start -- #{err} dir: #{dir} stack:", err.stack
 
     stop: ->
         

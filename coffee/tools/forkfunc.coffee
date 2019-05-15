@@ -14,13 +14,12 @@ if module.parent
     # 000 0 000  000   000  000  000  0000
     # 000   000  000   000  000  000   000
 
-    { childp, slash, log } = require 'kxk'
+    { childp, slash } = require 'kxk'
 
     forkfunc = (file, args..., callback) ->
         
         if /^[.]?\.\//.test file
             stack   = new Error().stack.split /\r\n|\n/
-            log 'stack:', stack
             regx    = /\(([^\)]*)\)/
             match   = regx.exec stack[3]
             dirname = slash.dir match[1]
@@ -64,8 +63,6 @@ else
     # 000       000   000  000  000      000   000
     #  0000000  000   000  000  0000000  0000000
 
-    { log } = require 'kxk'
-    
     sendResult = (err, result) ->
         
         process.removeListener 'message', callFunc

@@ -6,7 +6,7 @@
 000       000        0000000 
 ###
 
-{ clamp, post, elem, log, $ } = require 'kxk'
+{ clamp, post, elem, $ } = require 'kxk'
 
 now = require 'performance-now'
 

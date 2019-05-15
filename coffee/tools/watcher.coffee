@@ -6,7 +6,7 @@
 00     00  000   000     000      0000000  000   000  00000000  000   000
 ###
 
-{ slash, post, log, fs } = require 'kxk'
+{ slash, post, fs } = require 'kxk'
 
 class Watcher
 
@@ -28,7 +28,7 @@ class Watcher
                 slash.exists @file, @onRename
             
         @w.on 'unlink', (p) => 
-            log "watcher.on unlink #{p}"
+            # log "watcher.on unlink #{p}"
         
     onChange: (stat) =>
         
@@ -38,7 +38,7 @@ class Watcher
     onRename: (stat) =>
         
         if not stat
-            log "watcher removeFile #{@file}"
+            # log "watcher removeFile #{@file}"
             post.emit 'removeFile', @file
             
     stop: ->

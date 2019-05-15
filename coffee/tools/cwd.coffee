@@ -6,7 +6,7 @@
  0000000  00     00  0000000    
 ###
 
-{ slash, post, elem, log, $ } = require 'kxk'
+{ slash, post, elem, $ } = require 'kxk'
 
 syntax = require '../editor/syntax'
 

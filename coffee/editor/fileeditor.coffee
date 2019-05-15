@@ -6,7 +6,7 @@
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
 
-{ post, stopEvent, setStyle, srcmap, popup, slash, empty, clamp, pos, fs, error, log, _ } = require 'kxk'
+{ post, stopEvent, setStyle, srcmap, popup, slash, empty, clamp, pos, fs, kerror, _ } = require 'kxk'
   
 # watcher    = require './watcher'
 TextEditor = require './texteditor'
@@ -104,7 +104,7 @@ class FileEditor extends TextEditor
         
     restoreFromTabState: (tabsState) ->
 
-        return error "no tabsState.file?" if not tabsState.file?
+        return kerror "no tabsState.file?" if not tabsState.file?
         @setCurrentFile tabsState.file, tabsState.state
 
     stopWatcher: ->
@@ -227,7 +227,6 @@ class FileEditor extends TextEditor
             file = opt.file
             file += ':' + opt.line if opt.line
             file += ':' + opt.col if opt.col
-            # log 'fileEditor.jumpToFile newTabWithFile', file
             post.emit 'newTabWithFile', file
             
         else
@@ -240,7 +239,6 @@ class FileEditor extends TextEditor
 
             opt.oldPos = @cursorPos()
             opt.oldFile = @currentFile
-            # log 'fileEditor.jumpToFile gotoFilePos', opt
             window.navigate.gotoFilePos opt
 
     jumpTo: (word, opt) =>
@@ -255,12 +253,12 @@ class FileEditor extends TextEditor
             @jumpToFile opt
             return true
 
-        return error 'nothing to jump to?' if empty word
+        return kerror 'nothing to jump to?' if empty word
 
         find = word.toLowerCase().trim()
         find = find.slice 1 if find[0] == '@'
 
-        return error 'FileEditor.jumpTo -- nothing to find?' if empty find
+        return kerror 'FileEditor.jumpTo -- nothing to find?' if empty find
 
         type = opt?.type
 
@@ -319,8 +317,6 @@ class FileEditor extends TextEditor
                 if file?
                     post.emit 'loadFile', slash.joinFileLine file,line,col
                     return true
-                else
-                    log 'jumpToCounterpart no soruce map?',file,line,col
 
         counterparts =
             'cpp':     ['hpp', 'h']
@@ -456,7 +452,6 @@ class FileEditor extends TextEditor
     handleModKeyComboCharEvent: (mod, key, combo, char, event) ->
         
         return if 'unhandled' != super mod, key, combo, char, event
-        # log 'unhandled', combo
         switch combo
             when 'alt+ctrl+enter'       then return window.commandline.commands.coffee.executeText @textOfSelectionForClipboard()
             when 'alt+ctrl+shift+enter' then return window.commandline.commands.coffee.executeTextInMain @textOfSelectionForClipboardt()

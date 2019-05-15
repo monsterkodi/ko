@@ -6,7 +6,7 @@
 0000000      000     000   000     000      0000000   0000000   
 ###
 
-{ childp, valid, empty, slash, str, log, _ } = require 'kxk'
+{ childp, valid, empty, slash, str, _ } = require 'kxk'
 
 gitCmd = 'git status --porcelain'
 gitOpt = (gitDir) -> encoding: 'utf8', cwd: slash.unslash(gitDir), stdio:['pipe', 'pipe', 'ignore']

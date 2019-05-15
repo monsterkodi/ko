@@ -5,7 +5,7 @@
 #    000     000   000  000   000  000  0000       000  000       000   000  000   000  000 0 000
 #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000
 
-{ reversed, slash, str, error, log, _ } = require 'kxk'
+{ reversed, slash, str, kerror, _ } = require 'kxk'
 
 matchr = require '../../tools/matchr'
 
@@ -261,7 +261,7 @@ class Transform
         if f and _.isFunction f
             @last = f.apply @, args
         else
-            return error "unhandled transform #{transName}"
+            return kerror "unhandled transform #{transName}"
 
         @last
 

@@ -6,7 +6,7 @@
 00     00  000   000     000      0000000  000   000  
 ###
 
-{ post, slash, watch, valid, fs, log } = require 'kxk'
+{ post, slash, watch, valid, fs } = require 'kxk'
 
 class GitWatch
     

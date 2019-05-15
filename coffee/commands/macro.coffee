@@ -6,7 +6,7 @@
 000   000  000   000   0000000  000   000   0000000
 ###
 
-{ post, reversed, filelist, empty, slash, valid, args, fs, error, log, _ } = require 'kxk'
+{ post, reversed, filelist, empty, slash, valid, args, fs, kerror, _ } = require 'kxk'
   
 indexer   = require '../main/indexer'
 salt      = require '../tools/salt'
@@ -62,7 +62,7 @@ class Macro extends Command
 
     execute: (command) ->
 
-        return error 'no command!' if empty command
+        return kerror 'no command!' if empty command
         
         command = super command
 
@@ -215,8 +215,6 @@ class Macro extends Command
                 text += "\n###\n"
                 text += """
 
-                { log, _ } = require 'kxk'
-                
                 class #{clss}
 
                     constructor: () ->
@@ -227,7 +225,7 @@ class Macro extends Command
                 """
                 fs.writeFile file, text, encoding:'utf8', (err) ->
                     if err?
-                        log 'writing class skeleton failed', err
+                        kerror 'writing class skeleton failed', err
                         return
                     post.emit 'newTabWithFile', file
                 return focus: editor.name
@@ -286,7 +284,7 @@ class Macro extends Command
                 if Transform.transformNames and cmmd in Transform.transformNames
                     window.textEditor.Transform.do.apply null, [window.textEditor, cmmd].concat args
                 else
-                    log 'unhandled macro', cmmd, Transform.transformNames
+                    kerror 'unhandled macro', cmmd, Transform.transformNames
                     if _.last(@history) == command.trim()
                         @history.pop()
 

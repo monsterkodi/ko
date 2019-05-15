@@ -5,7 +5,7 @@
 # 000        000   000       000     000     000     
 # 000        000   000  0000000      000     00000000
 
-{ empty, str, log, _ } = require 'kxk'
+{ empty, str, _ } = require 'kxk'
 
 electron  = require 'electron'
 clipboard = electron.clipboard
@@ -115,7 +115,6 @@ module.exports =
                         newCursors = [[0,li+lines.length-1]]
             else 
                 if @do.line(li).length == 0 and not removeLastLine
-                    log 'insert after empty'
                     li += 1 # insert after empty line
                 
             for line in lines
@@ -125,7 +124,6 @@ module.exports =
             newCursors = [[0, li]] if empty newCursors
             
         if removeLastLine
-            log "removeLastLine numLines:#{@do.numLines()} text:'#{@text()}'"
             @do.delete @do.numLines()-1
                 
         @do.setCursors newCursors

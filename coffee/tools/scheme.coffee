@@ -6,7 +6,7 @@
 0000000    0000000  000   000  00000000  000   000  00000000  
 ###
 
-{ prefs, elem, post, slash, log, $, _ } = require 'kxk'
+{ prefs, elem, post, slash, $, _ } = require 'kxk'
 
 class Scheme
     

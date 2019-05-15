@@ -6,7 +6,7 @@
 0000000   00000000  000   000  000   000   0000000  000   000
 ###
 
-{ slash, post, fs, os, error, log, _ } = require 'kxk'
+{ slash, post, fs, os, kerror, _ } = require 'kxk'
 
 matchr  = require '../tools/matchr'
 walker  = require '../tools/walker'
@@ -37,11 +37,9 @@ class Search extends Command
         switch @name
             when '/search/', '/Search/'
                 if command in ['^', '$', '.']
-                    log 'pattern would match anything!'
                     return 
                 rngs = matchr.ranges command, '  '
                 if rngs.length == 2
-                    log 'pattern would match space!'
                     return
                 
         command = super command
@@ -134,7 +132,7 @@ class FileSearcher extends stream.Writable
             when '/search/' then @flags='i'; @opt.text
             when '/Search/' then @opt.text
             else
-                error "commands/search FileSearcher -- unhandled '#{@opt.name}' command:", @command.name, 'opt:', @opt, 'file:', @file
+                kerror "commands/search FileSearcher -- unhandled '#{@opt.name}' command:", @command.name, 'opt:', @opt, 'file:', @file
                 [[new RegExp(_.escapeRegExp(@opt.text), 'i'), 'found']]
                 
         @found = []

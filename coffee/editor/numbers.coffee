@@ -6,7 +6,7 @@
 000   000   0000000   000   000  0000000    00000000  000   000  0000000 
 ###
 
-{ str, setStyle, elem, log, $, _ } = require 'kxk'
+{ str, setStyle, elem, $, _ } = require 'kxk'
 
 event = require 'events'
 
@@ -69,7 +69,7 @@ class Numbers extends event
         divInto = (li,lo) =>
             
             if not @lineDivs[lo]
-                console.log "#{@editor.name}.onLinesShifted.divInto -- no number div? top #{top} bot #{bot} num #{num} lo #{lo} li #{li}" 
+                log "#{@editor.name}.onLinesShifted.divInto -- no number div? top #{top} bot #{bot} num #{num} lo #{lo} li #{li}" 
                 return 
                 
             numberDiv = @lineDivs[li] = @lineDivs[lo]

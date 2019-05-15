@@ -6,7 +6,7 @@
  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
 ###
 
-{ reversed, clamp, state, empty, elem, error, log, _ } = require 'kxk'
+{ reversed, clamp, empty, elem, kerror, _ } = require 'kxk'
 
 syntax      = require '../editor/syntax'
 CommandList = require './commandlist'
@@ -59,7 +59,7 @@ class Command
     execute: (command) ->
         
         if empty command
-            return error 'no command!'
+            return kerror 'no command!'
         
         if @commandList? 
             if 0 <= @selected < @commandList.numLines()
@@ -147,8 +147,6 @@ class Command
     
     listClick: (index) =>
         
-        # log 'command.listClick', index, @commandList.line index
-        # log 'command.listClick', index, @commandList.items[index]
         @selected = index
         @execute @commandList.line index 
     
@@ -278,7 +276,7 @@ class Command
         
         @loadState() if not @history?
         if not _.isArray @history
-            error "Command.setCurrent -- #{@historyKey()} : history not an array?", typeof @history 
+            kerror "Command.setCurrent -- #{@historyKey()} : history not an array?", typeof @history 
             @history = []
         _.pull @history, command
         @history.push command if command.trim().length
@@ -342,7 +340,6 @@ class Command
         
         return if receiver == 'body'
         @receiver = receiver ? 'editor'
-        # log @receiver
 
     receivingEditor: -> window.editorWithName @receiver
         
@@ -363,15 +360,15 @@ class Command
     setState: (key, value) ->
         return if not @prefsID
         if @prefsID
-            state.set "command|#{@prefsID}|#{key}", value
+            window.state.set "command|#{@prefsID}|#{key}", value
         
     getState: (key, value) ->
         return value if not @prefsID
-        state.get "command|#{@prefsID}|#{key}", value
+        window.state.get "command|#{@prefsID}|#{key}", value
         
     delState: (key) ->
         return if not @prefsID
-        state.del "command|#{@prefsID}|#{key}"
+        window.state.del "command|#{@prefsID}|#{key}"
 
     isActive: -> @commandline.command == @
         
@@ -384,7 +381,6 @@ class Command
     globalModKeyComboEvent: (mod, key, combo, event) -> 'unhandled'
         
     handleModKeyComboEvent: (mod, key, combo, event) -> 
-        # log "command.coffee handleModKeyComboEvent #{key}"
         switch combo
             when 'page up', 'page down'
                 if @commandList?

@@ -6,7 +6,7 @@
    000     000   000  0000000    0000000 
 ###
 
-{ post, stopEvent, popup, valid, empty, first, last, slash, elem, drag, pos, error, log, $, _ } = require 'kxk'
+{ post, stopEvent, popup, valid, empty, first, last, slash, elem, drag, pos, kerror, $, _ } = require 'kxk'
 
 Tab = require './tab'
 
@@ -53,17 +53,14 @@ class Tabs
         
         tab = @tab file
         if tab? and tab != @activeTab()
-            # log 'apply foreignChanges in inactive tab', file, tab.file
             tab.foreignChanges lineChanges
         
     onFileSaved: (file, winID) =>
 
         if winID == window.winID
-            error "fileSaved from this window? #{file} #{winID}" 
-            return 
+            return kerror "fileSaved from this window? #{file} #{winID}" 
         tab = @tab file
         if tab? and tab != @activeTab()
-            log "reverting tab because foreign window saved #{file}", tab.file
             tab.revert()
             
     #  0000000  000      000   0000000  000   000  
@@ -152,8 +149,6 @@ class Tabs
           
     onCloseTabOrWindow: (tab) =>
         
-        log "onCloseTabOrWindow @numTabs #{@numTabs()}"
-        
         if @numTabs() <= 1
             window.win.close()
         else
@@ -194,8 +189,6 @@ class Tabs
         @update()
         
     onNewTabWithFile: (file) =>
-        
-        log "Tabs.onNewTabWithFile file:#{file}"
         
         [file, line, col] = slash.splitFileLine file
         
@@ -262,10 +255,7 @@ class Tabs
         files  = window.stash.get 'tabs:files'
         
         return if empty files # happens when first window opens
-        
-        if valid @tabs
-            log 'valid tabs?'
-            
+                    
         @tabs = []
             
         while files.length

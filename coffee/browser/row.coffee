@@ -6,7 +6,7 @@
 000   000   0000000   00     00
 ###
 
-{ elem, keyinfo, drag, clamp, stopEvent, empty, post, slash, error, log, fs, $, _ } = require 'kxk' 
+{ elem, keyinfo, drag, clamp, stopEvent, empty, post, slash, kerror, fs, $, _ } = require 'kxk' 
 
 Syntax    = require '../editor/syntax'
 electron  = require 'electron'
@@ -80,7 +80,6 @@ class Row
             switch mod
                 when 'alt', 'command+alt', 'ctrl+alt'
                     if @item.type == 'file' and @item.textFile
-                        # log 'newWindowWithFile', @item.file
                         post.toMain 'newWindowWithFile', @item.file
                         return
             
@@ -191,7 +190,7 @@ class Row
             unusedFilename = require 'unused-filename'
             unusedFilename(newFile).then (newFile) =>
                 fs.rename @item.file, newFile, (err) =>
-                    return error 'rename failed', err if err
+                    return kerror 'rename failed', err if err
                     post.emit 'loadFile', newFile
         @removeInput()
         

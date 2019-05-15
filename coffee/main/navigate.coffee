@@ -6,7 +6,7 @@
 000   000  000   000      0      000   0000000   000   000     000     00000000
 ###
 
-{ clamp, slash, prefs, post, log, _ } = require 'kxk'
+{ clamp, slash, prefs, post, _ } = require 'kxk'
 
 class Navigate
 
@@ -75,8 +75,6 @@ class Navigate
                     pull
 
             when 'addFilePos'
-                
-                # log 'navigate.addFilePos', opt
                 
                 return if not opt?.file?.length
                 

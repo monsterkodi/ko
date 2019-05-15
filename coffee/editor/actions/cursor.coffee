@@ -6,7 +6,7 @@
  0000000   0000000   000   000  0000000    0000000   000   000
 ###
 
-{ reversed, stopEvent, first, last, log, _ } = require 'kxk'
+{ reversed, stopEvent, first, last, _ } = require 'kxk'
 
 module.exports =
 
@@ -103,13 +103,11 @@ module.exports =
 
     cursorMoves: (key, info) ->
         extend = info?.extend ? 0 <= info?.mod.indexOf 'shift'
-        # log 'cursorMoves', key, info, extend
         
         switch key
             when 'home'      then @singleCursorAtPos [0, 0], extend: extend
             when 'end'       then @singleCursorAtPos [0,@numLines()-1], extend: extend
             when 'page up'   
-                log 'moveCursorsUp', @numFullLines()
                 @moveCursorsUp   extend, @numFullLines()-3
             when 'page down' then @moveCursorsDown extend, @numFullLines()-3
         
@@ -179,14 +177,12 @@ module.exports =
         @do.end()
 
     cursorColumns: (num, step=1) ->
-        log num, step
         cp = @cursorPos()
         @do.start()
         @do.setCursors ([cp[0]+i*step,cp[1]] for i in [0...num]), main:'closest'
         @do.end()
 
     cursorLines: (num, step=1) ->
-        log num, step
         cp = @cursorPos()
         @do.start()
         @do.setCursors ([cp[0],cp[1]+i*step] for i in [0...num]), main:'closest'

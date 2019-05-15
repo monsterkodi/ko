@@ -6,7 +6,7 @@
    000     00000000  000   000  000   000  000  000   000  000   000  0000000
 ###
 
-{ reversed, stopEvent, prefs, pos, popup, childp, empty, error, log, _  } = require 'kxk'
+{ reversed, stopEvent, prefs, pos, popup, childp, empty, _  } = require 'kxk'
 
 salt       = require '../tools/salt'
 TextEditor = require '../editor/texteditor'
@@ -88,7 +88,7 @@ class Terminal extends TextEditor
     appendMeta: (meta) ->
         
         if not meta?
-            return error 'Terminal.appendMeta -- no meta?'
+            return kerror 'Terminal.appendMeta -- no meta?'
             
         @meta.append meta
         

@@ -6,7 +6,7 @@
 000   000  00000000     000     000   000
 ###
 
-{ stopEvent, empty, elem, post, slash, fs, error, log, $, _ } = require 'kxk'
+{ stopEvent, empty, elem, post, slash, fs, kerror, $, _ } = require 'kxk'
 
 ranges = require '../tools/ranges'
 File   = require '../tools/file'
@@ -71,14 +71,14 @@ class Meta
     saveFileLineMetas: (file, lineMetas) ->
 
         fs.readFile file, encoding: 'utf8', (err, data) ->
-            if err? then return error "Meta.saveFileLineMetas -- readFile err:#{err}"
+            if err? then return kerror "Meta.saveFileLineMetas -- readFile err:#{err}"
             lines = data.split /\r?\n/
             for lineMeta in lineMetas
                 lines[lineMeta[0]] = lineMeta[1]
             data = lines.join '\n'
             
             File.save file, data, (err, file) ->
-                if err? then return error "Meta.saveFileLineMetas -- writeFile err:#{err}"
+                if err? then return kerror "Meta.saveFileLineMetas -- writeFile err:#{err}"
                 for lineMeta in lineMetas
                     meta = lineMeta[2]
                     delete meta[2].state
@@ -208,7 +208,7 @@ class Meta
 
     delDiv: (meta) ->
 
-        return error 'no line meta?', meta if not meta?[2]?
+        return kerror 'no line meta?', meta if not meta?[2]?
         meta[2].div?.remove()
         meta[2].div = null
 
@@ -269,7 +269,7 @@ class Meta
 
     addLineMeta: (lineMeta) ->
         
-        return error 'invalid line meta?', lineMeta if not lineMeta?[2]?
+        return kerror 'invalid line meta?', lineMeta if not lineMeta?[2]?
         
         @lineMetas[lineMeta[0]] ?= []
         @lineMetas[lineMeta[0]].push lineMeta
@@ -278,7 +278,7 @@ class Meta
 
     moveLineMeta: (lineMeta, d) ->
 
-        return error 'invalid move?', lineMeta, d if not lineMeta? or d == 0
+        return kerror 'invalid move?', lineMeta, d if not lineMeta? or d == 0
         
         _.pull @lineMetas[lineMeta[0]], lineMeta
         delete @lineMetas[lineMeta[0]] if empty @lineMetas[lineMeta[0]]
@@ -385,7 +385,7 @@ class Meta
 
     delMeta: (meta) ->
         if not meta?
-            return error 'del no meta?'
+            return kerror 'del no meta?'
         _.pull @lineMetas[meta[0]], meta
         _.pull @metas, meta
         @delDiv meta

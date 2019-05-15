@@ -6,7 +6,7 @@
 000  000   000  0000000    00000000  000   000  00000000  000   000
 ###
 
-{ post, valid, empty, slash, fs, os, str, error, log, _ } = require 'kxk'
+{ post, valid, empty, slash, fs, os, str, kerror, _ } = require 'kxk'
 
 Walker   = require '../tools/walker'
 matchr   = require '../tools/matchr'
@@ -212,7 +212,7 @@ class Indexer
         
         forkfunc "#{__dirname}/indexprj", file, (err, info) =>
             
-            return error 'indexing failed', err if valid err
+            return kerror 'indexing failed', err if valid err
             
             delete @currentlyIndexing
             
@@ -345,7 +345,7 @@ class Indexer
 
         fs.readFile file, 'utf8', (err, data) =>
             
-            return error "can't index #{file}", err if not empty err
+            return kerror "can't index #{file}", err if not empty err
             
             lines = data.split /\r?\n/
             

@@ -6,7 +6,7 @@
  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 ###
 
-{ post, filelist, stopEvent, elem, keyinfo, clamp, slash, error, log, str, os, $, _ } = require 'kxk'
+{ post, filelist, stopEvent, elem, keyinfo, clamp, slash, kerror, str, os, $, _ } = require 'kxk'
 
 TextEditor = require '../editor/texteditor'
 
@@ -88,7 +88,7 @@ class Commandline extends TextEditor
                 command.setPrefsID commandClass.name.toLowerCase()
                 @commands[command.prefsID] = command
             catch err
-                error "can't load command from file '#{file}': #{err}"
+                kerror "can't load command from file '#{file}': #{err}"
 
     setName: (name) ->
 
@@ -160,7 +160,7 @@ class Commandline extends TextEditor
     
             @button.className = "commandline-button active #{@command.prefsID}"
         else
-            error "no command #{name}"
+            kerror "no command #{name}"
 
     commandForName: (name) ->
 
@@ -279,7 +279,6 @@ class Commandline extends TextEditor
 
     handleMenuAction: (name, args) ->
         
-        # log 'handleMenuAction', name, args
         if args?.command
             if @commandForName args.command           
                 @startCommand args.command    

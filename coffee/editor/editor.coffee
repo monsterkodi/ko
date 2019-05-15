@@ -6,7 +6,7 @@
 00000000  0000000    000     000      0000000   000   000
 ###
 
-{ clamp, empty, slash, str, error, filelist, log, _ } = require 'kxk'
+{ clamp, empty, slash, str, kerror, filelist, _ } = require 'kxk'
 
 Buffer  = require './buffer'
 Syntax  = require './syntax'
@@ -183,7 +183,7 @@ class Editor extends Buffer
     splitStateLineAtPos: (state, pos) ->
         
         l = state.line pos[1]
-        error "no line at pos #{pos}?" if not l?
+        kerror "no line at pos #{pos}?" if not l?
         return ['',''] if not l?
         [l.slice(0, pos[0]), l.slice(pos[0])]
                 

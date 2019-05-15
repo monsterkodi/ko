@@ -6,7 +6,7 @@
 0000000    000   000  000   000   0000000  000   000  00000000     000     0000000 
 ###
 
-{ log, _ } = require 'kxk'
+{ _ } = require 'kxk'
 
 matchr  = require '../tools/matchr'
 
@@ -70,7 +70,6 @@ class Brackets
                             stack.pop()                            
                             continue
                         else
-                            # log "brackets stack mismatch at #{pp[0]} #{pp[1]} stack: #{_.last(stack).match} != prev: #{prev.match}"
                             return # stack mismatch
                     lastOpen = prev
                     break
@@ -96,7 +95,6 @@ class Brackets
                             stack.pop()                            
                             continue
                         else
-                            # log "brackets stack mismatch at #{pp[0]} #{pp[1]} stack: #{_.last(stack).match} != next: #{next.match}"
                             return # stack mismatch
                     firstClose = next
                     break

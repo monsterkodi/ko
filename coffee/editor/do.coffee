@@ -6,7 +6,7 @@
 0000000     0000000
 ###
 
-{ post, empty, clamp, last, error, log, _ } = require 'kxk'
+{ post, empty, clamp, last, kerror, _ } = require 'kxk'
 
 State = require './state'
 require '../tools/ranges'
@@ -26,18 +26,17 @@ class Do
             @foreignChanges lineChanges
 
     foreignChanges: (lineChanges) ->
-        # log 'do.foreignChanges', lineChanges
         @start()
         for change in lineChanges
             if change.change != 'deleted' and not change.after?
-                error "Do.foreignChanges -- no after? #{change}"
+                kerror "Do.foreignChanges -- no after? #{change}"
                 continue
             switch change.change
                 when 'changed'  then @change change.doIndex, change.after
                 when 'inserted' then @insert change.doIndex, change.after
                 when 'deleted'  then @delete change.doIndex
                 else
-                    error "Do.foreignChanges -- unknown change #{change.change}"
+                    kerror "Do.foreignChanges -- unknown change #{change.change}"
         @end foreign: true
 
     # 000000000   0000000   0000000     0000000  000000000   0000000   000000000  00000000
@@ -118,7 +117,7 @@ class Do
 
     end: (opt) ->
 
-        nologhere = log # !!! NO log HERE !!!
+        # !!! NO log HERE !!!
 
         @redos = []
         @groupCount -= 1
@@ -128,8 +127,6 @@ class Do
             changes.foreign = opt?.foreign
             @editor.setState @state
             @editor.changed? changes
-
-        log = nologhere
 
     # 000   000  000   000  0000000     0000000
     # 000   000  0000  000  000   000  000   000
@@ -197,7 +194,7 @@ class Do
     setCursors: (newCursors, opt) ->
 
         if not newCursors? or newCursors.length < 1
-            return error "Do.setCursors -- empty cursors?"
+            return kerror "Do.setCursors -- empty cursors?"
 
         if opt?.main
             switch opt.main

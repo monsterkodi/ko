@@ -6,7 +6,7 @@
 0000000   000        0000000  000     000   
 ###
 
-{ post, error, log, $, _ } = require 'kxk'
+{ post, kerror, $, _ } = require 'kxk'
 
 event = require 'events'
 Flex  = require './flex/flex'
@@ -225,7 +225,7 @@ class Split
         
         n = 'commandline-editor' if n == 'commandline'
         if n == '.' or not $(n)?
-            return log "[WARNING] Split.focus -- can't find element '#{n}'"
+            return kerror "Split.focus -- can't find element '#{n}'"
             
         window.setLastFocus n if $(n)?.focus?
         $(n)?.focus?()

@@ -5,7 +5,7 @@
 # 000  000  0000     000     000       000  000  000   000  000      000            000
 # 000  000   000      0      000  0000000   000  0000000    0000000  00000000  0000000
 
-{ state, error, log, _ } = require 'kxk'
+{ kerror, _ } = require 'kxk'
 
 class Invisibles
 
@@ -15,7 +15,7 @@ class Invisibles
 
     onFile: (file) =>
 
-        if state.get "invisibles|#{file}"
+        if window.state.get "invisibles|#{file}"
             @show()
         else
             @clear()
@@ -63,7 +63,7 @@ class Invisibles
     onLineChanged: (li) =>
 
         metas = @editor.meta.metasAtLineIndex(li).filter (m) -> m[2].clss.startsWith 'invisible'
-        return error "no invisible meta at line #{li}?" if not metas.length
+        return kerror "no invisible meta at line #{li}?" if not metas.length
         @editor.meta.delMeta metas[0]
         @onLineInserted li
 
@@ -75,12 +75,12 @@ class Invisibles
     
     activate: ->
 
-        state.set "invisibles|#{@editor.currentFile ? @editor.name}", true
+        window.state.set "invisibles|#{@editor.currentFile ? @editor.name}", true
         @show()
         
     deactivate: ->
 
-        state.set "invisibles|#{@editor.currentFile}"
+        window.state.set "invisibles|#{@editor.currentFile}"
         @clear()
 
     #  0000000  000      00000000   0000000   00000000   
@@ -124,7 +124,7 @@ module.exports =
 
         return if not @invisibles
         
-        if state.get "invisibles|#{@currentFile ? @name}", false
+        if window.state.get "invisibles|#{@currentFile ? @name}", false
             @invisibles.deactivate()
         else
             @invisibles.activate()

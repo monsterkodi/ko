@@ -6,7 +6,7 @@
 000   000   0000000    0000000      000     
 ###
 
-{ valid, empty, slash, childp, fs, log, _ } = require 'kxk'
+{ valid, empty, slash, childp, fs, _ } = require 'kxk'
 
 fixPath = (p) ->
     

@@ -6,7 +6,7 @@
    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000
 ###
 
-{ keyinfo, stopEvent, setStyle, slash, prefs, drag, empty, elem, post, clamp, pos, str, sw, os, error, log, $, _ } = require 'kxk' 
+{ keyinfo, stopEvent, setStyle, slash, prefs, drag, empty, elem, post, clamp, pos, str, sw, os, kerror, klog, $, _ } = require 'kxk' 
   
 render       = require './render'
 EditorScroll = require './editorscroll'
@@ -174,7 +174,7 @@ class TextEditor extends Editor
     appendText: (text) ->
 
         if not text?
-            console.log "#{@name}.appendText - no text?"
+            log "#{@name}.appendText - no text?"
             return
 
         appended = []
@@ -276,11 +276,11 @@ class TextEditor extends Editor
         oi = li if not oi?
 
         if li < @scroll.top or li > @scroll.bot
-            error "dangling line div? #{li}", @lineDivs[li] if @lineDivs[li]?
+            kerror "dangling line div? #{li}", @lineDivs[li] if @lineDivs[li]?
             delete @spanCache[li]
             return
             
-        return error "updateLine - out of bounds? li #{li} oi #{oi}" if not @lineDivs[oi]
+        return kerror "updateLine - out of bounds? li #{li} oi #{oi}" if not @lineDivs[oi]
 
         @spanCache[li] = render.lineSpan @syntax.getDiss(li), @size
 
@@ -331,7 +331,7 @@ class TextEditor extends Editor
         divInto = (li,lo) =>
 
             if not @lineDivs[lo]
-                console.log "#{@name}.shiftLines.divInto - no div? #{top} #{bot} #{num} old #{oldTop} #{oldBot} lo #{lo} li #{li}"
+                log "#{@name}.shiftLines.divInto - no div? #{top} #{bot} #{num} old #{oldTop} #{oldBot} lo #{lo} li #{li}"
                 return
 
             @lineDivs[li] = @lineDivs[lo]
@@ -370,7 +370,7 @@ class TextEditor extends Editor
         
         for li, div of @lineDivs
             if not div? or not div.style?
-                return error 'no div?', div?
+                return kerror 'no div?', div?
             y = @size.lineHeight * (li - @scroll.top)
             div.style.transform = "translate3d(#{@size.offsetX}px,#{y}px, 0)"
             div.style.transition = "all #{animate/1000}s" if animate
@@ -423,11 +423,11 @@ class TextEditor extends Editor
                 return if mc[1] < 0
 
                 if mc[1] > @numLines()-1
-                    return error "#{@name}.renderCursors mainCursor DAFUK?", @numLines(), str @mainCursor()
+                    return kerror "#{@name}.renderCursors mainCursor DAFUK?", @numLines(), str @mainCursor()
 
                 ri = mc[1]-@scroll.top
                 cursorLine = @state.line(mc[1])
-                return error 'no main cursor line?' if not cursorLine?
+                return kerror 'no main cursor line?' if not cursorLine?
                 if mc[0] > cursorLine.length
                     cs[0][2] = 'virtual'
                     cs.push [cursorLine.length, ri, 'main off']
@@ -596,7 +596,6 @@ class TextEditor extends Editor
         @emit 'clearLines'
 
     clear: => 
-        # log 'TextEditor.clear', @name
         @setLines []
 
     focus: -> @view.focus()
@@ -711,8 +710,6 @@ class TextEditor extends Editor
 
     handleModKeyComboCharEvent: (mod, key, combo, char, event) ->
         
-        # log "TextEditor.handleModKeyComboCharEvent mod:#{mod} key:#{key} combo:#{combo} char:#{char} event:#{event}"
-
         if @autocomplete?
             return if 'unhandled' != @autocomplete.handleModKeyComboEvent mod, key, combo, event
 
@@ -734,7 +731,6 @@ class TextEditor extends Editor
             if action.combo == combo or action.accel == combo
                 switch combo
                     when 'ctrl+a', 'command+a' then return @selectAll()
-                # log "unhandled on combo? #{combo}"
                 return 'unhandled'
                 
             if action.accels? and os.platform() != 'darwin'
@@ -756,8 +752,6 @@ class TextEditor extends Editor
             
             return @insertCharacter char
 
-        # log "TextEditor.handleModKeyComboCharEvent unhandled combo:#{combo}"
-
         'unhandled'
 
     onKeyDown: (event) =>
@@ -769,17 +763,13 @@ class TextEditor extends Editor
 
         result = @handleModKeyComboCharEvent mod, key, combo, char, event
 
-        # log 'textEditor.onKeyDown', key, combo, 'unhandled' != result
-        
         if 'unhandled' != result
             stopEvent event
 
     log: ->
-        # return if @name != 'objecteditor'
         return if @name != 'editor'
-        log.slog.depth = 3
-        log.apply log, [].splice.call arguments, 0
-        log.slog.depth = 2
-        # console.log.apply console, [].splice.call arguments, 0
+        klog.slog.depth = 3
+        klog.apply klog, [].splice.call arguments, 0
+        klog.slog.depth = 2
 
 module.exports = TextEditor

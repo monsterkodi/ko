@@ -6,7 +6,7 @@
    000     000   000  0000000  
 ###
 
-{ post, tooltip, slash, elem, error, log, _ } = require 'kxk'
+{ post, tooltip, slash, elem, kerror, _ } = require 'kxk'
 
 File    = require '../tools/file'
 Watcher = require '../tools/watcher'
@@ -49,9 +49,6 @@ class Tab
     
     saveChanges: ->
         
-        # log 'tab.saveChanges file:',  @file
-        # log 'tab.saveChanges state:', @state
-        
         if @state
             
             if @foreign?.length
@@ -64,10 +61,10 @@ class Tab
             
             if @state.state 
                 File.save @state.file, @state.state.text(), (err) =>
-                    return error "tab.saveChanges failed #{err}" if err
+                    return kerror "tab.saveChanges failed #{err}" if err
                     @revert()
             else
-                log 'tab.saveChanges -- nothing to save?'
+                kerror 'tab.saveChanges -- nothing to save?'
         else
             post.emit 'saveChanges'
             
@@ -79,19 +76,12 @@ class Tab
     
     storeState: ->
         
-        # log 'tab.storeState', @file
-        
         if window.editor.currentFile
-            if @file != window.editor.currentFile
-                log 'tab.storeState editor.currentFile', window.editor.currentFile, '@file', @file
             @state = window.editor.do.tabState()
-            # log 'tab.storeState @state', @state
         
     restoreState: ->
         
-        # log 'tab.restoreState', @file
-        # log 'tab.restoreState', @state
-        return error 'no file in state?', @state if not @state?.file?
+        return kerror 'no file in state?', @state if not @state?.file?
         window.editor.do.setTabState @state
         delete @state
         
@@ -104,7 +94,7 @@ class Tab
     update: ->
            
         @div.innerHTML = ''
-        @div.classList.toggle 'dirty', @dirty # @isDirty()
+        @div.classList.toggle 'dirty', @dirty 
                 
         sep = '●'
         sep = '■' if window.editor.newlineCharacters == '\r\n'
@@ -150,15 +140,7 @@ class Tab
     # 000   000  000  0000000       000       00000    
     # 000   000  000  000   000     000        000     
     # 0000000    000  000   000     000        000     
-    
-    # dirty: ->
-        # return true if @state? 
-        # return true if @foreign? and @foreign.length > 0 
-        # return true if @dirty == true
-        # # return false even if editor has line changes:
-        # # dirty is reset before changed file is saved
-        # false
-        
+            
     setDirty: (dirty) ->
         
         if @dirty != dirty

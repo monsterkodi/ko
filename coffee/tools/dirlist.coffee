@@ -6,7 +6,7 @@
 0000000    000  000   000  0000000  000  0000000      000     
 ###
 
-{ fs, walkdir, slash, error, log, _ } = require 'kxk'
+{ fs, walkdir, slash, _ } = require 'kxk'
 
 #   directory list
 #

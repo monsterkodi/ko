@@ -5,8 +5,6 @@
 # 000        000  000   000  000 0 000  000       000  0000     000          000
 # 000        000   0000000   000   000  00000000  000   000     000     0000000
 
-{ state, log } = require 'kxk'
-
 matchr = require '../../tools/matchr'
 
 class Pigments
@@ -64,7 +62,7 @@ class Pigments
 
     onFile: (file) =>
 
-        if state.get "pigments|#{file}"
+        if window.state.get "pigments|#{file}"
             @pigmentize()
 
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000
@@ -75,14 +73,12 @@ class Pigments
 
     activate: ->
 
-        log 'activate'
-        state.set "pigments|#{@editor.currentFile}", true
+        window.state.set "pigments|#{@editor.currentFile}", true
         @pigmentize()
 
     deactivate: ->
 
-        log 'deactivate'
-        state.set "pigments|#{@editor.currentFile}"
+        window.state.set "pigments|#{@editor.currentFile}"
         @clear()
 
     clear: ->
@@ -121,7 +117,7 @@ module.exports =
 
     togglePigments: ->
 
-        if state.get "pigments|#{@currentFile}"
+        if window.state.get "pigments|#{@currentFile}"
             @pigments.deactivate()
         else
             @pigments.activate()

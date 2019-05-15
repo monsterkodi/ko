@@ -6,9 +6,8 @@
 000   000  000  000   000  000  000   000  000   000  000
 ###
 
-{ getStyle, clamp, elem, drag, log, str } = require 'kxk' 
+{ getStyle, clamp, elem, drag, str } = require 'kxk' 
 
-profile   = require '../tools/profile'
 MapScroll = require './mapscroll'
 
 class Minimap

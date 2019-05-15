@@ -6,7 +6,7 @@
 0000000    000   000   0000000   00     00  0000000   00000000  
 ###
 
-{ post, slash, stopEvent, valid, empty, str, os, clamp, log, error, $ } = require 'kxk'
+{ post, slash, stopEvent, valid, empty, str, os, clamp, kerror, $ } = require 'kxk'
 
 Command     = require '../commandline/command'
 FileBrowser = require '../browser/filebrowser'
@@ -49,11 +49,9 @@ class Browse extends Command
         @browser.start()
         
         if action != 'shelf'
-            # log 'browse.start', window.editor.currentFile
             if window.editor.currentFile?
                 @browser.navigateToFile window.editor.currentFile 
             else 
-                # log 'browse start process.cwd', process.cwd()
                 post.emit 'filebrowser', 'loadItem', file:process.cwd(), type:'dir'
             @browser.focus()
 
@@ -245,7 +243,6 @@ class Browse extends Command
         file = @commandList.items[index]?.file
         file = slash.tilde file if file?
         file ?= @commandList.line index
-        log 'browse.listClick index, file', index, file
         @selected = index
         @execute file
 
@@ -260,7 +257,6 @@ class Browse extends Command
         @selected = clamp -1, @commandList?.numLines()-1, i
         
         if @selected < 0
-            log 'hideList'
             @hideList()
             return     
 
@@ -301,7 +297,7 @@ class Browse extends Command
     
     execute: (command) ->
         
-        return error "no command?" if not command?
+        return kerror "no command?" if not command?
         
         @hideList()
         
@@ -317,7 +313,7 @@ class Browse extends Command
                 post.emit 'jumpToFile', file:cmd
                 return
 
-        error 'browse.execute -- unhandled', cmd     
+        kerror 'browse.execute -- unhandled', cmd     
     
     onBrowserItemActivated: (item) =>
 

@@ -1,6 +1,6 @@
 name            ko
 productName     ko
-version         0.213.0
+version         0.215.0
 description     text editor
 main            js/main/main.js
 preferGlobal    true
@@ -30,7 +30,7 @@ dependencies
                 ignore          ^5.1.1
                 js-beautify     ^1.10.0
                 klor            ^0.13.0
-                kxk             ^0.278.0
+                kxk             ^0.278.1
                 performance-now  ^2.1.0
                 pretty-time     ^1.1.0
                 seamless-immutable  ^7.1.4
@@ -40,6 +40,6 @@ dependencies
 optionalDependencies
                 wxw  ../wxw
 devDependencies
-                electron        ^4.1.4
+                electron        ^5.0.1
                 electron-packager  ^13.1.1
                 electron-rebuild  ^1.8.4

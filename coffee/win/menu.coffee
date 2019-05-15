@@ -6,7 +6,7 @@
 000   000  00000000  000   000   0000000 
 ###
 
-{ filelist, post, slash, os, fs, str, log, _ } = require 'kxk'
+{ filelist, post, slash, os, fs, str, _ } = require 'kxk'
 
 Syntax    = require '../editor/syntax'
 Transform = require '../editor/actions/transform'

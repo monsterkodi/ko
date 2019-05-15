@@ -6,7 +6,7 @@
 000  000   000  000        0000000   
 ###
 
-{ childp, empty, slash, str, log, _ } = require 'kxk'
+{ childp, empty, slash, str, _ } = require 'kxk'
 
 status = require './status'
 diff   = require './diff'
@@ -56,5 +56,5 @@ else
     else
         dir = process.cwd()
         
-    console.log info dir
+    log info dir
     

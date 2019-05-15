@@ -6,9 +6,8 @@
  0000000   000        00000000  000   000
 ###
 
-{ post, valid, empty, clamp, slash, fs, os, error, log, _ } = require 'kxk'
+{ post, valid, empty, clamp, slash, fs, os, _ } = require 'kxk'
   
-profile   = require '../tools/profile'
 Projects  = require '../tools/projects'
 File      = require '../tools/file'
 Command   = require '../commandline/command'
@@ -97,7 +96,6 @@ class Open extends Command
             @changed @getText()
             true            
         else
-            # log 'post.get indexer projects ...'
             projects = post.get 'indexer', 'projects'
             for p in Object.keys(projects).sort()
                 if p.startsWith @getText()
@@ -294,8 +292,6 @@ class Open extends Command
             @dir  = process.cwd()
             
         @files = Projects.files @dir
-        
-        # log 'open.loadDir @files', @files?.length
         
         @loadState()
         @showList()

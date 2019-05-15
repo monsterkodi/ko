@@ -6,7 +6,7 @@
 0000000      000     000   000     000     00000000
 ###
 
-{ error, log, str, _ } = require 'kxk'
+{ kerror, str, _ } = require 'kxk'
 
 Immutable = require 'seamless-immutable'
 
@@ -45,7 +45,7 @@ class State
     tabline:   (i) -> @s.lines[i].text
     line:      (i) ->
         if not @s.lines[i]?
-            error "editor/state -- requesting invalid line at index #{i}?"
+            kerror "editor/state -- requesting invalid line at index #{i}?"
             return ''
         replaceTabs @s.lines[i].text
         

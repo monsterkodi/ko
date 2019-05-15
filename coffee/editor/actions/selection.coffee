@@ -5,7 +5,7 @@
 #      000  000       000      000       000          000     000  000   000  000  0000
 # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
 
-{ post, error, log, _ } = require 'kxk'
+{ post, kerror, _ } = require 'kxk'
 
 module.exports =
     
@@ -58,7 +58,7 @@ module.exports =
     selectSingleRange: (r, opt) ->
         
         if not r?
-            return error "Editor.#{name}.selectSingleRange -- undefined range!"
+            return kerror "Editor.#{name}.selectSingleRange -- undefined range!"
             
         cursorX = if opt?.before then r[1][0] else r[1][1]
         @do.start()
@@ -132,14 +132,14 @@ module.exports =
             newCursors   = @do.cursors()
             
             if oldCursors.length != newCursors.length
-                return error "Editor.#{@name}.endSelection -- oldCursors.size != newCursors.size", oldCursors.length, newCursors.length
+                return kerror "Editor.#{@name}.endSelection -- oldCursors.size != newCursors.size", oldCursors.length, newCursors.length
             
             for ci in [0...@do.numCursors()]
                 oc = oldCursors[ci]
                 nc = newCursors[ci]
                 
                 if not oc? or not nc?
-                    return error "Editor.#{@name}.endSelection -- invalid cursors", oc, nc
+                    return kerror "Editor.#{@name}.endSelection -- invalid cursors", oc, nc
                 else
                     ranges = @rangesForLinesBetweenPositions oc, nc, true #< extend to full lines if cursor at start of line                
                     newSelection = newSelection.concat ranges

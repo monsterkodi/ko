@@ -6,7 +6,7 @@
 000       000  0000000  00000000
 ###
 
-{ empty, valid, childp, slash, atomic, fs, log, _ } = require 'kxk'
+{ empty, valid, childp, slash, atomic, fs, _ } = require 'kxk'
 
 class File
 
@@ -21,8 +21,7 @@ class File
                     fileIcons = require 'file-icons-js'
                     className = fileIcons.getClass file
                 catch err
-                    console.log "no icon? #{file}"
-                # log 'icon.getClass', slash.removeLinePos(file), className
+                    log "no icon? #{file}"
         className ?= 'file-icon'
         className
     
@@ -63,8 +62,6 @@ class File
             
     @save: (file, text, cb) ->
     
-        # log 'File.save', file
-        
         slash.fileExists file, (stat) ->
             
             if stat

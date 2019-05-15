@@ -5,7 +5,7 @@
 # 000   000  000  000   000  000   000  000      000  000   000  000   000     000     
 # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     
 
-{ empty, log, _ } = require 'kxk'
+{ empty, kerror, _ } = require 'kxk'
 
 module.exports = 
 
@@ -119,7 +119,7 @@ module.exports =
         if @numSelections() == 0
             srange = @rangeForRealWordAtPos @cursorPos()
             if empty @textInRange(srange).trim()
-                log 'highlightTextOfSelectionOrWordAtCursor empty!'
+                kerror 'highlightTextOfSelectionOrWordAtCursor empty!'
             @selectSingleRange srange
         
         sel = @selection 0     

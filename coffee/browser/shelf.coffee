@@ -6,7 +6,7 @@
 0000000   000   000  00000000  0000000  000     
 ###
 
-{ stopEvent, keyinfo, slash, state, post, popup, elem, clamp, empty, first, last, error, log, $, _ } = require 'kxk'
+{ stopEvent, keyinfo, slash, post, popup, elem, clamp, empty, first, last, kerror, $, _ } = require 'kxk'
 
 Row      = require './row'
 Scroller = require './scroller'
@@ -107,7 +107,7 @@ class Shelf extends Column
                 
     loadShelfItems: ->
         
-        items = state.get "shelf|items"
+        items = window.state.get "shelf|items"
         @setItems items, save:false
                 
     addPath: (path, opt) =>
@@ -126,7 +126,7 @@ class Shelf extends Column
     itemPaths: -> @rows.map (r) -> r.path()
     
     savePrefs: -> 
-        state.set "shelf|items", @items
+        window.state.set "shelf|items", @items
     
     setItems: (@items, opt) ->
         
@@ -317,9 +317,9 @@ class Shelf extends Column
 
     navigateRows: (key) ->
 
-        return error "no rows in column #{@index}?" if not @numRows()
+        return kerror "no rows in column #{@index}?" if not @numRows()
         index = @activeRow()?.index() ? -1
-        error "no index from activeRow? #{index}?", @activeRow() if not index? or Number.isNaN index
+        kerror "no index from activeRow? #{index}?", @activeRow() if not index? or Number.isNaN index
         
         index = switch key
             when 'up'        then index-1
@@ -330,10 +330,10 @@ class Shelf extends Column
             when 'page down' then clamp 0, @items.length, index+@numVisible()
             else index
             
-        error "no index #{index}? #{@numVisible()}" if not index? or Number.isNaN index        
+        kerror "no index #{index}? #{@numVisible()}" if not index? or Number.isNaN index        
         index = clamp 0, @numRows()-1, index
         
-        error "no row at index #{index}/#{@numRows()-1}?", @numRows() if not @rows[index]?.activate?
+        kerror "no row at index #{index}/#{@numRows()-1}?", @numRows() if not @rows[index]?.activate?
 
         if      key == 'up'   and index > @items.length     then post.emit 'menuAction', 'Navigate Forward'
         else if key == 'down' and index > @items.length + 1 then post.emit 'menuAction', 'Navigate Backward'

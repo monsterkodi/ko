@@ -6,7 +6,7 @@
 0000000      000     000   000     000     000   000  000   000
 ###
 
-{ error, log, str, elem, empty, fs, noon, slash, _ } = require 'kxk'
+{ kerror, str, elem, empty, fs, noon, slash, _ } = require 'kxk'
 
 matchr   = require '../tools/matchr'
 Balancer = require './balancer' 
@@ -161,7 +161,6 @@ class Syntax
                 clss  = d.clss? and d.clss.length and " class=\"#{d.clss}\"" or ''
                 clrzd = "<span#{style}#{clss}>#{spc}#{str.encode d.match}</span>"
                 l += clrzd
-        # console.log 'spanForTextAndSyntax', text, 'span', l
         l
 
     @rangesForTextAndSyntax: (line, n) ->
@@ -175,7 +174,7 @@ class Syntax
             result.map (r) -> r.clss = r.value
         else
             if not n? or not Syntax.matchrConfigs[n]?
-                return error "no syntax? #{n}"
+                return kerror "no syntax? #{n}"
             result = matchr.dissect matchr.ranges Syntax.matchrConfigs[n], text 
         result
 

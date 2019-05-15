@@ -6,7 +6,7 @@
 0000000    000   000  0000000  000   000  000   000   0000000  00000000  000   000
 ###
 
-{ empty, str, error, _ } = require 'kxk'
+{ empty, str, kerror, _ } = require 'kxk'
 
 matchr = require '../tools/matchr'
 
@@ -83,7 +83,7 @@ class Balancer
         text = @getLine li
 
         if not text?
-            return error "dissForLine -- no line at index #{li}?"
+            return kerror "dissForLine -- no line at index #{li}?"
 
         @mergeRegions @parse(text, li), text, li  
       

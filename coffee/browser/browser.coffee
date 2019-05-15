@@ -6,7 +6,7 @@
 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 ###
 
-{ post, elem, clamp, setStyle, childp, slash, state, fs, os, error, log,  _ } = require 'kxk'
+{ post, elem, clamp, setStyle, childp, slash, fs, os, kerror, _ } = require 'kxk'
 
 Column = require './column'
 flex   = require '../win/flex/flex'
@@ -18,7 +18,7 @@ class Browser extends event
         
         @columns = []
         
-        setStyle '.browserRow .ext', 'display', state.get('browser|hideExtensions') and 'none' or 'initial'
+        setStyle '.browserRow .ext', 'display', window.state.get('browser|hideExtensions') and 'none' or 'initial'
 
     # 000  000   000  000  000000000       0000000   0000000   000      000   000  00     00  000   000   0000000  
     # 000  0000  000  000     000         000       000   000  000      000   000  000   000  0000  000  000       
@@ -211,7 +211,7 @@ class Browser extends event
     
     clearColumnsFrom: (c=0, opt=pop:false) ->
         
-        return error "clearColumnsFrom #{c}?" if not c? or c < 0
+        return kerror "clearColumnsFrom #{c}?" if not c? or c < 0
         
         if opt.pop
             if c < @numCols()
@@ -267,9 +267,9 @@ class Browser extends event
         tmpPNG = slash.swapExt tmpPXM, '.png'
 
         fs.copy file, tmpPXM, (err) =>
-            return error "can't copy pxm image #{file} to #{tmpPXM}: #{err}" if err?
+            return kerror "can't copy pxm image #{file} to #{tmpPXM}: #{err}" if err?
             childp.exec "open #{__dirname}/../../bin/pxm2png.app --args #{tmpPXM}", (err) =>
-                return error "can't convert pxm image #{tmpPXM} to #{tmpPNG}: #{err}" if err?
+                return kerror "can't convert pxm image #{tmpPXM} to #{tmpPNG}: #{err}" if err?
                 loadDelayed = => @loadImage row, tmpPNG
                 setTimeout loadDelayed, 300
 
@@ -280,7 +280,7 @@ class Browser extends event
         tmpImage = slash.join os.tmpdir(), "ko-#{slash.basename file}.png"
         
         childp.exec "/usr/bin/sips -s format png \"#{file}\" --out \"#{tmpImage}\"", (err) =>
-            return error "can't convert image #{file}: #{err}" if err?
+            return kerror "can't convert image #{file}: #{err}" if err?
             @loadImage row, tmpImage
 
     loadImage: (row, file) ->

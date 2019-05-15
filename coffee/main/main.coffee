@@ -6,7 +6,7 @@
 000   000  000   000  000  000   000
 ###
 
-{ post, filelist, colors, first, empty, prefs, state, slash, valid, store, noon, args, win, app, udp, os, fs, log, _ } = require 'kxk'
+{ post, filelist, colors, first, empty, prefs, store, slash, valid, store, noon, args, win, app, udp, os, fs, _ } = require 'kxk'
 
 # post.debug()
 # log.slog.debug = true
@@ -66,7 +66,7 @@ post.on 'menuAction',   (action, arg) -> main?.onMenuAction action, arg
 post.on 'ping', (winID, argA, argB) -> post.toWin winID, 'pong', 'main', argA, argB
 post.on 'winlog',       (winID, text) -> 
     if args.verbose
-        console.log "#{winID}>>> " + text
+        log "#{winID}>>> " + text
 
 # 00     00   0000000   000  000   000
 # 000   000  000   000  000  0000  000
@@ -117,7 +117,8 @@ class Main extends app
             log noon.stringify args, colors:true
             log ''
 
-        state.init()
+        global.state = new store 'state', separator: '|'
+
         alias = new store 'alias'
         
         if args.prefs
@@ -127,10 +128,10 @@ class Main extends app
         
         if args.state
             log colors.yellow.bold 'state'
-            log colors.green.bold 'state file:', state.store.file
-            log noon.stringify state.store.data, colors:true
+            log colors.green.bold 'state file:', global.state.file
+            log noon.stringify global.state.data, colors:true
             
-        @indexer      = new Indexer
+        @indexer = new Indexer
 
         if not openFiles.length and valid args.filelist
             openFiles = filelist args.filelist, ignoreHidden:false
@@ -511,11 +512,11 @@ class Main extends app
             post.on 'stashSaved', =>
                 toSave -= 1
                 if toSave == 0
-                    state.save()
+                    global.state.save()
                     @exitApp()
             'delay'
         else
-            state.save()
+            global.state.save()
             
 #  0000000   00000000   00000000         0000000   000   000
 # 000   000  000   000  000   000       000   000  0000  000

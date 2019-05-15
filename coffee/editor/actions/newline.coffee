@@ -6,7 +6,7 @@
 000   000  00000000  00     00  0000000  000  000   000  00000000
 ###
 
-{ log, _ } = require 'kxk'    
+{ _ } = require 'kxk'    
 
 module.exports = 
     

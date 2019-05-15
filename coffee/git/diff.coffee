@@ -6,7 +6,7 @@
 0000000    000  000       000         
 ###
 
-{ childp, slash, valid, empty, str, log, _ } = require 'kxk'
+{ childp, slash, valid, empty, str, _ } = require 'kxk'
 
 stripAnsi = require 'strip-ansi'
 
