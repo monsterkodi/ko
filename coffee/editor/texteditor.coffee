@@ -370,7 +370,7 @@ class TextEditor extends Editor
         
         for li, div of @lineDivs
             if not div? or not div.style?
-                return kerror 'no div?', div?
+                return kerror 'no div? style?', div?, div?.style?
             y = @size.lineHeight * (li - @scroll.top)
             div.style.transform = "translate3d(#{@size.offsetX}px,#{y}px, 0)"
             div.style.transition = "all #{animate/1000}s" if animate
