@@ -6,7 +6,7 @@
    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000
 ###
 
-{ keyinfo, stopEvent, setStyle, slash, prefs, drag, empty, elem, post, clamp, pos, str, sw, os, kerror, klog, $, _ } = require 'kxk' 
+{ keyinfo, stopEvent, setStyle, slash, prefs, drag, empty, elem, post, clamp, kpos, str, sw, os, kerror, klog, $, _ } = require 'kxk' 
   
 render       = require './render'
 EditorScroll = require './editorscroll'
