@@ -87,6 +87,7 @@ class Main extends app
             icon:       '../../img/app.ico'
             tray:       '../../img/menu@2x.png'
             about:      '../../img/about.png'
+            aboutDebug: false
             onShow:     -> main.onShow()
             onOtherInstance: (args, dir) -> main.onOtherInstance args, dir
             width:      1000
