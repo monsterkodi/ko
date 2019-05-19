@@ -159,6 +159,7 @@ class Tabs
 
     onCloseOtherTabs: => 
         
+        return if not @activeTab() # should not happen
         keep = _.pullAt @tabs, @activeTab().index()
         while @numTabs()
             @tabs.pop().close() 
@@ -175,7 +176,7 @@ class Tabs
 
         if @tabs.length > 4
             for index in [0...@tabs.length]
-                if not @tabs[index].dirty # @tabs[index].isDirty()
+                if not @tabs[index].dirty
                     @closeTab @tabs[index]
                     break
         

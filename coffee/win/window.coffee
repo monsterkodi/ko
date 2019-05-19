@@ -16,7 +16,6 @@ w = new win
     pkg:    require '../../package.json'
     menu:   '../../coffee/menu.noon'
     icon:   '../../img/menu@2x.png'
-    title:  process.argv[0].endsWith('Electron Helper') and ['version']
     scheme: false
     menuTemplate: menu
 

@@ -170,7 +170,7 @@ class Syntax
     @dissForTextAndSyntax: (text, n) ->
 
         if n not in ['browser', 'ko', 'commandline', 'macro', 'term', 'test']
-            result = klor.ranges text, n
+            result = klor.blockRanges text, n
             result.map (r) -> r.clss = r.value
         else
             if not n? or not Syntax.matchrConfigs[n]?

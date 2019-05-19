@@ -30,7 +30,7 @@ dependencies
                 ignore          ^5.1.1
                 js-beautify     ^1.10.0
                 klor            ^0.15.0
-                kxk             ^0.286.0
+                kxk             ^0.287.0
                 performance-now  ^2.1.0
                 seamless-immutable  ^7.1.4
                 strip-ansi      ^5.2.0
