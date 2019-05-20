@@ -94,12 +94,13 @@ class Balancer
         if not text?
             return kerror "dissForLine -- no line at index #{li}?"
 
-        r = @mergeRegions @parse(text, li), text, li
+        # r = @mergeRegions @parse(text, li), text, li
         
         if @blocks?[li] 
             # log 'blck', li, @blocks[li]
             # log 'diss', li, r
             return @blocks[li]
+        r = @mergeRegions @parse(text, li), text, li
         r
 
     dissForLineAndRanges: (line, rgs) ->
