@@ -39,7 +39,7 @@ class Buffer extends event
     highlight: (i) -> @state.highlight i
     selection: (i) -> @state.selection i
 
-    lines:         -> @state.lines()
+    lines:         => @state.lines()
     cursors:       -> @state.cursors()
     highlights:    -> @state.highlights()
     selections:    -> @state.selections()

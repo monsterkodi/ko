@@ -49,7 +49,7 @@ class State
             return ''
         replaceTabs @s.lines[i].text
 
-    lines:         -> @s.lines.map (l) -> replaceTabs l.text
+    lines:         => @s.lines.map (l) -> replaceTabs l.text
     cursors:       -> @s.cursors.asMutable deep: true
     highlights:    -> @s.highlights.asMutable deep: true
     selections:    -> @s.selections.asMutable deep: true

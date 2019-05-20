@@ -9,7 +9,7 @@
 { post, slash, elem, empty, fs, $, _ } = require 'kxk'
 
 lineDiff   = require '../tools/linediff'
-syntax     = require '../editor/syntax'
+Syntax     = require '../editor/syntax'
 hub        = require '../git/hub'
 
 class GitInfo
@@ -32,7 +32,7 @@ class GitInfo
     logText: (text) ->
         
         terminal = window.terminal
-        terminal.appendMeta clss: 'searchHeader', diss: syntax.dissForTextAndSyntax text, 'ko'
+        terminal.appendMeta clss: 'searchHeader', diss: Syntax.dissForTextAndSyntax text, 'ko'
 
     #  0000000  000   000   0000000   000   000   0000000   00000000   0000000  
     # 000       000   000  000   000  0000  000  000        000       000       
@@ -45,12 +45,12 @@ class GitInfo
         terminal = window.terminal
         
         extn = slash.ext changes.file
-        if extn in syntax.syntaxNames
+        if extn in Syntax.syntaxNames
             syntaxName = extn
         else
             syntaxName = 'txt'
         
-        sytx = new syntax syntaxName, (i) -> changes.lines[i]
+        sytx = new Syntax syntaxName, (i) -> changes.lines[i]
         sytx.setFileType syntaxName
         
         index = 0
@@ -106,7 +106,7 @@ class GitInfo
             
         terminal = window.terminal
         meta = 
-            diss:       syntax.dissForTextAndSyntax "#{slash.tilde file}", 'ko'
+            diss:       Syntax.dissForTextAndSyntax "#{slash.tilde file}", 'ko'
             href:       file
             clss:       'gitInfoFile'
             click:      @onMetaClick

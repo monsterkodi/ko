@@ -29,19 +29,19 @@ class Render
 
     @lineSpan: (diss, size) ->
 
+        # log diss
+        
         div = elem class: 'linespans'
-
-        if diss?.length
-            for d in diss
-                span = elem 'span'
-                span.style.transform = "translatex(#{d.start * size.charWidth}px)"
-                span.className = d.clss if d.clss?
-                span.textContent = d.match.replace /\x1b/g, '🅴'
-                if d.styl?
-                    for st in d.styl.split ';'
-                        ss = st.split ':'
-                        span.style[ss[0]] = ss[1]
-                div.appendChild span
+        for d in diss ? []
+            span = elem 'span'
+            span.style.transform = "translatex(#{d.start * size.charWidth}px)"
+            span.className = d.clss if d.clss?
+            span.textContent = d.match.replace /\x1b/g, '▪'
+            if d.styl?
+                for st in d.styl.split ';'
+                    ss = st.split ':'
+                    span.style[ss[0]] = ss[1]
+            div.appendChild span
         div
 
     #  0000000  000   000  00000000    0000000   0000000   00000000    0000000

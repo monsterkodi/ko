@@ -28,7 +28,7 @@ class Editor extends Buffer
 
         @indentString      = _.padStart "", 4
         @stickySelection   = false
-        @syntax            = new Syntax @config.syntaxName, @line
+        @syntax            = new Syntax @config.syntaxName, @line, @lines
         @do                = new Do @
 
         @setupFileType()
@@ -170,6 +170,7 @@ class Editor extends Buffer
     setLines: (lines) ->
 
         @syntax.clear()
+        @syntax.setLines lines
         super lines
         @emit 'linesSet', lines
 

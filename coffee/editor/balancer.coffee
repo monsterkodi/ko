@@ -6,16 +6,25 @@
 0000000    000   000  0000000  000   000  000   000   0000000  00000000  000   000
 ###
 
-{ empty, kerror, _ } = require 'kxk'
+{ empty, kerror, klog, _ } = require 'kxk'
 
 matchr = require '../tools/matchr'
+klor   = require 'klor'
 
 class Balancer
 
     constructor: (@syntax, @getLine) ->
 
         @unbalanced = []
+        @blocks = null
 
+    setLines: (lines) ->
+        
+        if @syntax.name not in ['browser', 'ko', 'commandline', 'macro', 'term', 'test']
+            klog 'balancer.setLines', lines.length, @syntax.name
+            @blocks = klor.dissected lines, @syntax.name
+            # log '@blocks', @block
+        
     # 00000000  000  000      00000000  000000000  000   000  00000000   00000000
     # 000       000  000      000          000      000 000   000   000  000
     # 000000    000  000      0000000      000       00000    00000000   0000000
@@ -79,7 +88,7 @@ class Balancer
     # 0000000    000  0000000   0000000
 
     dissForLine: (li) ->
-
+        
         text = @getLine li
 
         if not text?

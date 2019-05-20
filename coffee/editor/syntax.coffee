@@ -6,19 +6,19 @@
 0000000      000     000   000     000     000   000  000   000
 ###
 
-{ kerror, kstr, elem, empty, fs, noon, slash, _ } = require 'kxk'
+{ kerror, kstr, valid, klog, elem, empty, fs, noon, slash, _ } = require 'kxk'
 
 matchr   = require '../tools/matchr'
 Balancer = require './balancer'
 klor     = require 'klor'
 
 class Syntax
-
-    constructor: (@name, getLine) ->
+    
+    constructor: (@name, @getLine, @getLines) ->
 
         @diss     = []
         @colors   = {}
-        @balancer = new Balancer @, getLine
+        @balancer = new Balancer @, @getLine
 
     # 0000000    000   0000000   0000000
     # 000   000  000  000       000
@@ -48,6 +48,16 @@ class Syntax
         for li in [0..bot]
             @getDiss li
 
+    #  0000000  00000000  000000000  000      000  000   000  00000000   0000000  
+    # 000       000          000     000      000  0000  000  000       000       
+    # 0000000   0000000      000     000      000  000 0 000  0000000   0000000   
+    #      000  000          000     000      000  000  0000  000            000  
+    # 0000000   00000000     000     0000000  000  000   000  00000000  0000000   
+    
+    setLines: (lines) ->
+        
+        @balancer.setLines lines
+            
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000
     # 000       000   000  000   000  0000  000  000        000       000   000
     # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
@@ -170,8 +180,8 @@ class Syntax
     @dissForTextAndSyntax: (text, n) ->
 
         if n not in ['browser', 'ko', 'commandline', 'macro', 'term', 'test']
-            result = klor.blockRanges text, n
-            result.map (r) -> r.clss = r.value
+            result = klor.dissected [text], n
+            # result.map (r) -> r.clss = r.value
         else
             if not n? or not Syntax.matchrConfigs[n]?
                 return kerror "no syntax? #{n}"

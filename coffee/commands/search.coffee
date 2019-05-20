@@ -10,7 +10,7 @@
 
 matchr  = require '../tools/matchr'
 walker  = require '../tools/walker'
-syntax  = require '../editor/syntax'
+Syntax  = require '../editor/syntax'
 Command = require '../commandline/command'
 stream  = require 'stream'
 
@@ -69,7 +69,7 @@ class Search extends Command
         
         terminal = window.terminal
         # terminal.appendMeta clss: 'salt', text: opt.text.slice 0, 14
-        terminal.appendMeta clss: 'searchHeader', diss: syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'
+        terminal.appendMeta clss: 'searchHeader', diss: Syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'
         terminal.appendMeta clss: 'spacer'
         terminal.singleCursorAtPos [0, terminal.numLines()-2]
         dir = slash.pkg slash.dir opt.file
@@ -137,7 +137,7 @@ class FileSearcher extends stream.Writable
                 
         @found = []
         extn = slash.ext @file
-        if extn in syntax.syntaxNames
+        if extn in Syntax.syntaxNames
             @syntaxName = extn
         else
             @syntaxName = null
@@ -145,7 +145,7 @@ class FileSearcher extends stream.Writable
     write: (chunk, encoding, cb) ->
         
         lines = chunk.split '\n'
-        @syntaxName = syntax.shebang lines[0] if not @syntaxName?
+        @syntaxName = Syntax.shebang lines[0] if not @syntaxName?
         for l in lines
             @line += 1            
             rngs = matchr.ranges @patterns, l, @flags
@@ -160,7 +160,7 @@ class FileSearcher extends stream.Writable
             terminal = window.terminal
             
             meta = 
-                diss:  syntax.dissForTextAndSyntax "#{slash.tilde @file}", 'ko'
+                diss:  Syntax.dissForTextAndSyntax "#{slash.tilde @file}", 'ko'
                 href:  @file
                 clss:  'gitInfoFile'
                 click: @command.onMetaClick
@@ -173,7 +173,7 @@ class FileSearcher extends stream.Writable
                 
                 f = @found[fi]
                 
-                sytx = new syntax @syntaxName, (i) -> f[1]
+                sytx = new Syntax @syntaxName, (i) -> f[1]
                 sytx.setFileType @syntaxName
                 dss = sytx.balancer.dissForLineAndRanges f[1], f[2]
                                 

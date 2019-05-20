@@ -97,14 +97,13 @@ class Minimap
         for li in [top..bot]
             diss = @editor.syntax.getDiss li
             y = parseInt((li-@scroll.exposeTop)*@scroll.lineHeight)
-            if diss?.length
-                for r in diss
-                    break if 2*r.start >= @width
-                    if r.clss?
-                        ctx.fillStyle = @editor.syntax.colorForClassnames r.clss + " minimap"
-                    else
-                        ctx.fillStyle = @editor.syntax.colorForStyle r.styl
-                    ctx.fillRect @offsetLeft+2*r.start, y, 2*r.match.length, @scroll.lineHeight
+            for r in diss ? []
+                break if 2*r.start >= @width
+                if r.clss?
+                    ctx.fillStyle = @editor.syntax.colorForClassnames r.clss + " minimap"
+                else
+                    ctx.fillStyle = @editor.syntax.colorForStyle r.styl
+                ctx.fillRect @offsetLeft+2*r.start, y, 2*r.match.length, @scroll.lineHeight
 
     drawHighlights: =>
 
