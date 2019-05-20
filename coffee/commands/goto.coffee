@@ -49,7 +49,7 @@ class Goto extends Command
         funcs ?= []
         
         for func in funcs
-            items.push text: func.name, line:'▸', clss:'method'
+            items.push text:func.name, line:'▸', clss:'method'
             @types[func.name] = 'func'
             
         clsss = post.get 'indexer', 'classes'

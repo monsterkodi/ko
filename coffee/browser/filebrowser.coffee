@@ -145,7 +145,7 @@ class FileBrowser extends Browser
         clsss = info.classes ? []
         for clss in clsss
             text = '● '+clss.name
-            items.push name: clss.name, text:text, type:'class', file: item.file, line: clss.line
+            items.push name:clss.name, text:text, type:'class', file:item.file, line:clss.line
 
         funcs = info.funcs ? []
         for func in funcs
@@ -157,7 +157,7 @@ class FileBrowser extends Browser
                 text = '  ⬢ '+func.name
             else
                 text = '  ▸ '+func.name
-            items.push name: func.name, text:text, type:'func', file: item.file, line: func.line
+            items.push name:func.name, text:text, type:'func', file:item.file, line:func.line
 
         if valid items
             items.sort (a,b) -> a.line - b.line

@@ -66,6 +66,9 @@ class Syntax
 
     changed: (changeInfo) ->
 
+        if valid changeInfo.changes
+            @balancer.blocks = null
+        
         for change in changeInfo.changes
 
             [di,li,ch] = [change.doIndex, change.newIndex, change.change]
@@ -94,9 +97,11 @@ class Syntax
 
     setFileType: (fileType) ->
 
+        # klog 'Syntax.setFileType', fileType
+        
         @name = fileType
         @balancer.setFileType fileType
-
+        
     #  0000000  000      00000000   0000000   00000000
     # 000       000      000       000   000  000   000
     # 000       000      0000000   000000000  0000000
@@ -168,8 +173,8 @@ class Syntax
                 for sp in [last...d.start]
                     spc += '&nbsp;'
                 last  = d.start + d.match.length
-                clss  = d.clss? and d.clss.length and " class=\"#{d.clss}\"" or ''
-                clrzd = "<span#{style}#{clss}>#{spc}#{kstr.encode d.match}</span>"
+                value = d.value? and d.value.length and " class=\"#{d.value}\"" or ''
+                clrzd = "<span#{style}#{value}>#{spc}#{kstr.encode d.match}</span>"
                 l += clrzd
         l
 
@@ -180,8 +185,8 @@ class Syntax
     @dissForTextAndSyntax: (text, n) ->
 
         if n not in ['browser', 'ko', 'commandline', 'macro', 'term', 'test']
-            result = klor.dissected [text], n
-            # result.map (r) -> r.clss = r.value
+            # result = klor.dissected [text], n
+            result = klor.ranges text, n
         else
             if not n? or not Syntax.matchrConfigs[n]?
                 return kerror "no syntax? #{n}"

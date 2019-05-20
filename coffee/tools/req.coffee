@@ -55,7 +55,7 @@ req = (file, lines, words, editor) ->
                 regex = new RegExp "(^|[\\:\\(\\{]|\\s+)#{k}(\\s+[^:]|\\s*$|[\\.\\(])"
             if regex.test lines[li]
                 diss = editor.syntax.getDiss li
-                diss = diss.filter (d) -> not d.clss.startsWith('comment') and not d.clss.startsWith('string')
+                diss = diss.filter (d) -> not d.value.startsWith('comment') and not d.value.startsWith('string')
                 text = diss.map((s) -> s.match).join ' '
                 if regex.test text
                     kxkValues.push k

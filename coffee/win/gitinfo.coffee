@@ -32,7 +32,7 @@ class GitInfo
     logText: (text) ->
         
         terminal = window.terminal
-        terminal.appendMeta clss: 'searchHeader', diss: Syntax.dissForTextAndSyntax text, 'ko'
+        terminal.appendMeta clss:'searchHeader', diss:Syntax.dissForTextAndSyntax text, 'ko'
 
     #  0000000  000   000   0000000   000   000   0000000   00000000   0000000  
     # 000       000   000  000   000  0000  000  000        000       000       
@@ -60,7 +60,7 @@ class GitInfo
             
             if changes.change == 'deleted'
                 
-                dss.map (ds) -> ds.clss += ' ' + 'git-deleted'
+                dss.map (ds) -> ds.value += ' ' + 'git-deleted'
                 
             else if changes.change == 'changed'
                 

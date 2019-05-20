@@ -128,7 +128,7 @@ ranges = (regexes, text, flags) ->
 
 #     match: the matched substring
 #     start: position of match in str
-#     clss:  string of classnames joined with a space
+#     value: string of classnames joined with a space
 
 #     with none of the [start, start+match.length] ranges overlapping
 
@@ -188,13 +188,13 @@ dissect = (ranges, opt = join:false) ->
     d = d.filter (i) -> i.match?.trim().length
 
     for i in d
-        i.clss = i.cls.join ' '
+        i.value = i.cls.join ' '
         delete i.cls
 
     if d.length > 1
         for i in [d.length-2..0]
             if d[i].start + d[i].match.length == d[i+1].start
-                if d[i].clss == d[i+1].clss
+                if d[i].value == d[i+1].value
                     d[i].match += d[i+1].match
                     d.splice i+1, 1
     d
@@ -229,7 +229,7 @@ merge = (dssA, dssB) ->
             d = B.start-A.start
             result.push
                 start: A.start
-                clss:  A.clss
+                value: A.value
                 match: A.match.slice 0, d
             A.start += d
             A.match = A.match.slice d
@@ -239,7 +239,7 @@ merge = (dssA, dssB) ->
             d = A.start-B.start
             result.push
                 start: B.start
-                clss:  B.clss
+                value: B.value
                 match: B.match.slice 0, d
             B.start += d
             B.match = B.match.slice d
@@ -249,7 +249,7 @@ merge = (dssA, dssB) ->
             d = A.match.length - B.match.length
             result.push
                 start: A.start
-                clss:  A.clss + " " + B.clss
+                value: A.value + " " + B.value
                 match: d >= 0 and B.match or A.match
             if d > 0
                 A.match = A.match.slice B.match.length
