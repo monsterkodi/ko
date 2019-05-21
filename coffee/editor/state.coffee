@@ -6,19 +6,9 @@
 0000000      000     000   000     000     00000000
 ###
 
-{ kerror, _ } = require 'kxk'
+{ kerror, kstr, _ } = require 'kxk'
 
 Immutable = require 'seamless-immutable'
-
-replaceTabs = (s) ->
-
-    i = 0
-    while i < s.length
-        if s[i] == '\t'
-            n = 4-(i%4)
-            s = s.splice i, 1, _.padStart "", n
-        i += 1
-    s
 
 class State
 
@@ -47,9 +37,9 @@ class State
         if not @s.lines[i]?
             kerror "editor/state -- requesting invalid line at index #{i}?"
             return ''
-        replaceTabs @s.lines[i].text
+        kstr.replaceTabs @s.lines[i].text
 
-    lines:         => @s.lines.map (l) -> replaceTabs l.text
+    lines:         -> @s.lines.map (l) -> kstr.replaceTabs l.text
     cursors:       -> @s.cursors.asMutable deep: true
     highlights:    -> @s.highlights.asMutable deep: true
     selections:    -> @s.selections.asMutable deep: true

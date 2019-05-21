@@ -140,7 +140,10 @@ class FileHandler
         if not file
             @reloadActiveTab()
         else if tab = tabs.tab file
-            tab.reload()
+            if tab == tabs.activeTab()
+                @reloadActiveTab()
+            else
+                tab.reload()
             
     reloadActiveTab: ->
         

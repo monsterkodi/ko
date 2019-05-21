@@ -3,7 +3,7 @@ cd `dirname $0`/..
 
 if rm -rf ko-linux-ia32; then
 
-    konrad
+    node_modules/.bin/konrad
 
     node_modules/.bin/electron-rebuild
     

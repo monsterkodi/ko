@@ -6,7 +6,7 @@
 00     00  000   000     000      0000000  000   000  00000000  000   000
 ###
 
-{ slash, post, fs } = require 'kxk'
+{ slash, post, klog, fs } = require 'kxk'
 
 class Watcher
 
@@ -33,6 +33,7 @@ class Watcher
     onChange: (stat) =>
         
         if stat.mtimeMs != @stat.mtimeMs
+            klog "watcher.reloadFile #{@file}"
             post.emit 'reloadFile', @file
 
     onRename: (stat) =>
