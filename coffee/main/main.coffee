@@ -6,7 +6,7 @@
 000   000  000   000  000  000   000
 ###
 
-{ post, filelist, colors, first, empty, prefs, store, slash, valid, store, noon, args, win, app, udp, os, fs, _ } = require 'kxk'
+{ post, filelist, colors, first, empty, prefs, store, slash, valid, store, noon, args, win, app, udp, os, fs, klog, _ } = require 'kxk'
 
 # post.debug()
 # log.slog.debug = true
@@ -433,7 +433,6 @@ class Main extends app
     onCloseWin: (event) =>
 
         wid = event.sender.id
-        log 'onCloseWin id', wid
         if wins().length == 1
             if slash.win()
                 @quit()
@@ -475,16 +474,12 @@ class Main extends app
         
         @activateOneWindow (win) ->
 
-            # log 'onOtherInstance activeWin', win.id
-            
             files = []
             if first(args)?.endsWith "#{pkg.name}.exe"
                 fileargs = args.slice 1
             else
                 fileargs = args.slice 2
     
-            # log 'onOtherInstance fileargs', fileargs
-                
             for arg in fileargs
                 continue if arg.startsWith '-'
                 file = arg
@@ -527,17 +522,13 @@ class Main extends app
 
 electron.app.on 'open-file', (event, file) ->
 
-    log 'open-file', file
     if not main?
         openFiles.push file
     else
         if electron.app.isReady()
-            log 'activateOneWindow'
             main.activateOneWindow (win) ->
-                log 'activateOneWindow', win.id, file
                 post.toWin win.id, 'openFiles', [file] 
         else
-            log 'createWindowWithFile'
             main.createWindowWithFile file:file
         
     event.preventDefault()
@@ -551,7 +542,6 @@ electron.app.on 'window-all-closed', -> log 'window-all-closed'
 #  0000000   0000000    000          
 
 onUDP = (file) ->
-    
     main.activateOneWindow (win) ->
         post.toWin win.id, 'openFiles', [file] 
 

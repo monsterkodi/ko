@@ -33,7 +33,8 @@ class Watcher
     onChange: (stat) =>
         
         if stat.mtimeMs != @stat.mtimeMs
-            klog "watcher.reloadFile #{@file}"
+            klog "watcher.reloadFile #{@file}", stat.mtimeMs, @stat.mtimeMs
+            @stat = stat
             post.emit 'reloadFile', @file
 
     onRename: (stat) =>
