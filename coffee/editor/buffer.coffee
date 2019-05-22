@@ -18,7 +18,7 @@ endOf   = (r) -> r[0] + Math.max 1, r[1]-r[0]
 
 class Buffer extends event
 
-    constructor: () ->
+    constructor: ->
         super()
         @newlineCharacters = '\n'
         @wordRegExp = new RegExp "(\\s+|\\w+|[^\\s])", 'g'
@@ -246,7 +246,7 @@ class Buffer extends event
     # 000        000   000       000
     # 000         0000000   0000000
 
-    lastPos: () ->
+    lastPos: ->
 
         lli = @numLines()-1
         [@line(lli).length, lli]
