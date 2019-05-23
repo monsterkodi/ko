@@ -20,10 +20,8 @@ class Balancer
 
     setLines: (lines) ->
         
-        if @syntax.name not in ['browser', 'ko', 'commandline', 'macro', 'term', 'test']
-            # klog 'balancer.setLines', lines.length, @syntax.name
+        if @syntax.name not in ['browser' 'ko' 'commandline' 'macro' 'term' 'test']
             @blocks = klor.dissect lines, @syntax.name
-            # log '@blocks', @block
         
     # 00000000  000  000      00000000  000000000  000   000  00000000   00000000
     # 000       000  000      000          000      000 000   000   000  000
@@ -34,20 +32,20 @@ class Balancer
     setFileType: (fileType) ->
 
         lineComment = switch fileType
-            when 'coffee', 'koffee', 'sh', 'bat', 'noon', 'ko', 'txt', 'fish'       then '#'
-            when 'styl', 'cpp', 'c', 'h', 'hpp', 'cxx', 'cs', 'js', 'scss', 'ts'    then '//'
-            when 'iss', 'ini'                                                       then ';'
+            when 'coffee' 'koffee' 'sh' 'bat' 'noon' 'ko' 'txt' 'fish'     then '#'
+            when 'styl' 'cpp' 'c' 'h' 'hpp' 'cxx' 'cs' 'js' 'scss' 'ts'    then '//'
+            when 'iss' 'ini'                                               then ';'
 
         multiComment = switch fileType
-            when 'coffee', 'koffee'                                                 then open: '###',  close: '###'
-            when 'html', 'md'                                                       then open: '<!--', close: '-->'
-            when 'styl', 'cpp', 'c', 'h', 'hpp', 'cxx', 'cs', 'js', 'scss', 'ts'    then open: '/*',   close: '*/'
+            when 'coffee' 'koffee'                                         then open:'###'  close:'###'
+            when 'html' 'md'                                               then open:'<!--' close:'-->'
+            when 'styl' 'cpp' 'c' 'h' 'hpp' 'cxx' 'cs' 'js' 'scss' 'ts'    then open:'/*'   close:'*/'
 
         @regions =
-            doubleString: clss:'string double', open:'"', close:'"'
+            doubleString: clss:'string double' open:'"' close:'"'
 
         if lineComment
-            @regions.lineComment = clss:'comment', open:lineComment, close:null, force:true
+            @regions.lineComment = clss:'comment' open:lineComment, close:null, force:true
             @headerRegExp = new RegExp("^(\\s*#{_.escapeRegExp @regions.lineComment.open}\\s*)?(\\s*0[0\\s]+)$")
 
         if multiComment
@@ -59,25 +57,25 @@ class Balancer
 
         switch fileType
 
-            when 'coffee', 'koffee'
-                @regions.multiString   = clss: 'string triple',  open: '"""', close: '"""', multi: true
-                @regions.multiString2  = clss: 'string triple skinny',  open: "'''", close: "'''", multi: true
-                @regions.interpolation = clss: 'interpolation',  open: '#{',  close: '}',   multi: true
-                @regions.singleString  = clss: 'string single',  open: "'", close: "'"
+            when 'coffee' 'koffee'
+                @regions.multiString   = clss:'string triple'        open:'"""' close: '"""' multi: true
+                @regions.multiString2  = clss:'string triple skinny' open:"'''", close: "'''", multi: true
+                @regions.interpolation = clss:'interpolation'        open:'#{'  close: '}'   multi: true
+                @regions.singleString  = clss:'string single'        open:"'", close: "'"
 
             when 'js' 'ts'
-                @regions.singleString  = clss: 'string single',  open: "'", close: "'"
+                @regions.singleString  = clss: 'string single'  open: "'", close: "'"
 
-            when 'noon', 'iss'
+            when 'noon' 'iss'
                 @regions.lineComment.solo = true # only spaces before comments allowed
 
             when 'md'
-                @regions.multiString   = clss: 'string triple',  open: '```', close: '```', multi: true
-                @regions.header5       = clss: 'markdown h5', open: '#####', close: null, solo: true
-                @regions.header4       = clss: 'markdown h4', open: '####', close: null, solo: true
-                @regions.header3       = clss: 'markdown h3', open: '###', close: null, solo: true
-                @regions.header2       = clss: 'markdown h2', open: '##', close: null, solo: true
-                @regions.header1       = clss: 'markdown h1', open: '#', close: null, solo: true
+                @regions.multiString   = clss:'string triple' open:'```'   close: '```' multi: true
+                @regions.header5       = clss:'markdown h5'   open:'#####' close: null, solo: true
+                @regions.header4       = clss:'markdown h4'   open:'####'  close: null, solo: true
+                @regions.header3       = clss:'markdown h3'   open:'###'   close: null, solo: true
+                @regions.header2       = clss:'markdown h2'   open:'##'    close: null, solo: true
+                @regions.header1       = clss:'markdown h1'   open:'#'     close: null, solo: true
 
         @openRegions = _.filter @regions, (r) -> r.close == null
 
@@ -97,8 +95,8 @@ class Balancer
         # r = @mergeRegions @parse(text, li), text, li
         
         if @blocks?[li] 
-            # log 'blck', li, @blocks[li]
-            # log 'diss', li, r
+            # log 'blck' li, @blocks[li]
+            # log 'diss' li, r
             return @blocks[li]
         r = @mergeRegions @parse(text, li), text, li
         r
@@ -235,7 +233,7 @@ class Balancer
 
                     if top.match.length
 
-                        if top.value in ['string single', 'string double', 'string triple', 'string triple skinny']
+                        if top.value in ['string single' 'string double' 'string triple' 'string triple skinny']
                             split = top.match.split /\s\s+/
                             if split.length == 1
                                 result.push top
@@ -400,7 +398,7 @@ class Balancer
 
             else
 
-                if top.region.clss in ['string double', 'string triple']
+                if top.region.clss in ['string double' 'string triple']
 
                     if @regions.interpolation and rest.startsWith @regions.interpolation.open # string interpolation
                         pushRegion @regions.interpolation

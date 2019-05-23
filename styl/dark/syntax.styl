@@ -34,7 +34,7 @@
     &.invisible-tab
         color       #333
     &.trailing
-        color       #d00
+        color       #600
 
 .array
     color           #00f
@@ -101,12 +101,13 @@
     color           #0f0
 
 .this
-    opacity         0.5
-    color           #88f
+    color           #bbf
 
 .marker
 .punct
     opacity         0.5
+    &.dictionary
+        opacity     0.3
 
 .escape
     opacity         0.2
@@ -199,7 +200,7 @@
     color           #0a0
     &.double
     &.triple
-        color       #0f0
+        color       #0e0
     &.backtick
         color       #ccf
     &.interpolation
@@ -322,6 +323,8 @@
         opacity 0.3
 &.code
     color       #ccf
+    &.punct
+        opacity 0.2
 &.italic
     font-style  italic
 
