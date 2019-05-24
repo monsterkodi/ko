@@ -10,42 +10,45 @@
 
 class Watcher
 
+    @id: 0
+    
     constructor: (@file) ->
 
+        @id = Watcher.id++
         slash.exists @file, @onExists
                                 
-    onExists: (@stat) =>
+    onExists: (stat) =>
         
-        return if not @stat
+        return if not stat
+        return if not @id
+        @mtime = stat.mtimeMs
         
         @w = fs.watch @file
         @w.on 'change', (changeType, p) =>
             
-            # log 'watcher changeType:', changeType, p
             if changeType == 'change'
                 slash.exists @file, @onChange
             else
                 slash.exists @file, @onRename
             
-        @w.on 'unlink', (p) => 
-            # log "watcher.on unlink #{p}"
+        @w.on 'unlink', (p) => #klog "unlink #{@id}", slash.basename(@file)
         
     onChange: (stat) =>
         
-        if stat.mtimeMs != @stat.mtimeMs
-            klog "watcher.reloadFile #{@file}"#, stat.mtimeMs, @stat.mtimeMs
-            @stat = stat
+        if stat.mtimeMs != @mtime
+            @mtime = stat.mtimeMs
             post.emit 'reloadFile', @file
 
     onRename: (stat) =>
         
         if not stat
-            # log "watcher removeFile #{@file}"
+            @stop()
             post.emit 'removeFile', @file
             
     stop: ->
         
         @w?.close()
         delete @w
+        @id = 0
 
 module.exports = Watcher

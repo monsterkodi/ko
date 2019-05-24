@@ -1,6 +1,6 @@
 name            ko
 productName     ko
-version         0.225.0
+version         0.226.0
 description     text editor
 main            js/main/main.js
 preferGlobal    true
@@ -37,7 +37,7 @@ dependencies
                 trash           ^5.2.0
                 unused-filename  ^2.1.0
 devDependencies
-                electron        ^5.0.1
+                electron        ^5.0.2
                 electron-packager  ^13.1.1
                 electron-rebuild  ^1.8.4
                 koffee          ^0.45.0

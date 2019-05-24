@@ -124,9 +124,12 @@ class Tab
     nextOrPrev: -> @next() ? @prev()
             
     close: ->
+        
         @watcher.stop()
+        
         if @dirty
             @saveChanges()
+            
         @div.remove()
         @tooltip?.del()
         post.emit 'tabClosed', @file
