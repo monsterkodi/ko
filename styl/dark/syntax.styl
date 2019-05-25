@@ -61,21 +61,14 @@
     &.marker
         opacity     1
         color       #55f
+                
+    &.tail:before
+    &.head:before
+        color               #55f
         
-    &.head
-    &.tail
-        opacity     1
-        color       transparent
-        
-    &.tail::before
-        border-color        #55f
-    &.head::before
-        border-left-color   #55f
-        
-    &.tail.bound::before
-        border-color        #f80
-    &.head.bound::before
-        border-left-color   #f80
+    &.tail.bound:before
+    &.head.bound:before
+        color               #f80
             
     &.bracket
         color       #55f

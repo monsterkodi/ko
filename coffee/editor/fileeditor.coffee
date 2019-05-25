@@ -10,7 +10,7 @@
   
 Watcher    = require '../tools/watcher'
 TextEditor = require './texteditor'
-syntax     = require './syntax'
+Syntax     = require './syntax'
 electron   = require 'electron'
 
 class FileEditor extends TextEditor
@@ -91,7 +91,7 @@ class FileEditor extends TextEditor
             @state = restoreState
             @dirty = true
         else if fileExists
-            @setText fs.readFileSync @currentFile, encoding: 'utf8'
+            @setText slash.readText @currentFile
 
         if fileExists
             @watch = new Watcher @currentFile
@@ -120,11 +120,11 @@ class FileEditor extends TextEditor
     
     shebangFileType: ->
         
-        fileType = syntax.shebang @line(0) if @numLines()
+        fileType = Syntax.shebang @line(0) if @numLines()
         if fileType == 'txt' 
             if @currentFile?
                 ext = slash.ext @currentFile
-                if ext in syntax.syntaxNames
+                if ext in Syntax.syntaxNames
                     return ext
         else if fileType
             return fileType

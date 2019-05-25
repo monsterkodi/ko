@@ -19,7 +19,6 @@ class Balancer
         @blocks = null
 
     setLines: (lines) ->
-        
         if @syntax.name not in ['browser' 'ko' 'commandline' 'macro' 'term' 'test']
             @blocks = klor.dissect lines, @syntax.name
         
