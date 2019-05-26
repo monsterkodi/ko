@@ -21,7 +21,8 @@ class File
                     fileIcons = require 'file-icons-js'
                     className = fileIcons.getClass file
                 catch err
-                    log "no icon? #{file}"
+                    true
+                    # log "no icon? #{file}"
         className ?= 'file-icon'
         className
     

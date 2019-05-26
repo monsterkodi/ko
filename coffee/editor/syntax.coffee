@@ -185,9 +185,7 @@ class Syntax
     @dissForTextAndSyntax: (text, n) ->
 
         if n not in ['browser', 'ko', 'commandline', 'macro', 'term', 'test']
-            # result = klor.dissected [text], n
-            result = klor.blocks text, n
-            # result = klor.ranges text, n
+            result = klor.ranges text, n
         else
             if not n? or not Syntax.matchrConfigs[n]?
                 return kerror "no syntax? #{n}"
