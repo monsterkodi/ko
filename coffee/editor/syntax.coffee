@@ -249,7 +249,7 @@ class Syntax
                 @syntaxNames.push syntaxName
                 @matchrConfigs[syntaxName] = matchr.config patterns
 
-        klor.init()
+        # klor.init()
         @syntaxNames = @syntaxNames.concat klor.exts
 
 Syntax.init()

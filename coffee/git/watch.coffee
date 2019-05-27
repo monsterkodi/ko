@@ -18,16 +18,16 @@ class GitWatch
         
         if slash.fileExists @gitFile
             
-            refPath = fs.readFileSync @gitFile, 'utf8'
+            refPath = slash.readText @gitFile
             if refPath.startsWith 'ref: '
                 @gitFile = slash.join @gitDir, '.git', refPath.slice(5).trim()
-                @ref = fs.readFileSync @gitFile, 'utf8'
+                @ref = slash.readText @gitFile
             else
                 @ref = refPath
                 
             @watcher = watch.file @gitFile
             @watcher.on 'change', (info) =>
-                ref = fs.readFileSync @gitFile, 'utf8'
+                ref = slash.readText @gitFile
                 if valid(ref) and @ref != ref
                     @ref = ref
                     cb @gitDir
