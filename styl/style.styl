@@ -148,7 +148,6 @@ body
 .openFileIcon
     display             inline-block
     width               24px
-    // opacity             0.5
     margin-top          -3px
     
 .browserStatusIcon
@@ -192,17 +191,6 @@ unicode(char)
     
 .noon-icon:before
     unicode('ⓞ')
-    //unicode('ⵙ')
-    
-    // '\f001' bulb       '\f02a' star           '\f013' zipdoc         '\f03a' checkmark
-    // '\f002' fork       '\f02c' circle ?       '\f015' tag            '\f03d' arrow up
-    // '\f008' gitcat     '\f02b' speech bubble  '\f016' folder         '\f03e' arrow right
-    // '\f00a' gitcat2    '\f02e' loupe          '\f017' folder-folder  '\f03f' arrow down
-    // '\f00d' keyboard   '\f02d' triangle !     '\f018' person         '\f040' arrow left
-    // '\f00e' tagbox     '\f02f' gear           '\f0b0' linkdoc        '\f041' pin
-    // '\f010' tagdoc     '\f031' tools          '\f01f' -o-            '\f042' gift
-    // '\f011' textdoc    '\f032' exit           '\f026' circle !       '\f043' stats
-    // '\f04e' eye        '\f044' triangle left   
                 
 //  0000000  000   000  00000000  000      00000000
 // 000       000   000  000       000      000
@@ -510,7 +498,6 @@ infoPadding = 6px
 // 0000000  000  000   000  00000000  0000000
 
 .lines
-    // cursor              default
     cursor              text
     font-size           inherit
     pointer-events      none
@@ -533,8 +520,8 @@ infoPadding = 6px
     width                2px
     margin-right        -1px
     margin-left         -1px
-    position            absolute
     z-index             999999999
+    position            absolute
     display             inline-block
     &.main:not(.off)
         width            4px
@@ -886,13 +873,13 @@ infoPadding = 6px
 // 000   000  000   000  000   000  000   000  0000000     0000000   00     00  000   000
 
 .li1.marker::before
-    content         '▸'
-
-.li2.marker::before
-    content         '▪'
-
-.li3.marker::before
-    content         '◆'
+    content             '▸'
+    
+.li2.marker::before    
+    content             '▪'
+    
+.li3.marker::before    
+    content             '◆'
 
 //  0000000   00000000   00000000    0000000   000   000   0000000
 // 000   000  000   000  000   000  000   000  000 0 000  000
@@ -902,14 +889,14 @@ infoPadding = 6px
 
 .function.head
 .function.tail
-     opacity     1
-     color       transparent
+     opacity            1
+     color              transparent
 
 .function.tail:before
-    content                     ' ▬'
+    content             ' ▬'
      
 .function.head:before
-    content                     ' ▶'
+    content             ' ▶'
     
 //  0000000   0000000  00000000    0000000   000      000      0000000     0000000   00000000
 // 000       000       000   000  000   000  000      000      000   000  000   000  000   000
@@ -1074,12 +1061,12 @@ infoPadding = 6px
 // 0000000    0000000  000   000   0000000   0000000  0000000  
 
 ::-webkit-scrollbar
-    width                   frameWidth
-    height                  frameWidth  
-    background-color        transparent
+    width               frameWidth
+    height              frameWidth  
+    background-color    transparent
     
 ::-webkit-scrollbar-track
-    background-color        transparent
+    background-color    transparent
 
 .commandlist::-webkit-scrollbar
 .commandlist .layerScroll::-webkit-scrollbar
