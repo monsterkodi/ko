@@ -1,0 +1,519 @@
+/*
+ 0000000   0000000   000       0000000   00000000    0000000    
+000       000   000  000      000   000  000   000  000         
+000       000   000  000      000   000  0000000    0000000     
+000       000   000  000      000   000  000   000       000    
+ 0000000   0000000   0000000   0000000   000   000  0000000     
+*/
+body {
+  background: #0d0d0d;
+  color: #fff;
+}
+.split-handle {
+  background: #222;
+}
+.browser {
+  background: #0d0d0d;
+  color: #fff;
+}
+.browserRow.hover {
+  background: #111;
+}
+.browserRow.active {
+  background: #222;
+}
+.browserRow.active.dir {
+  color: #ff8;
+}
+.rowNameInput {
+  color: #ff0;
+  background-color: #222;
+}
+.browserColumn.focus .browserRow.active {
+  background: #22a;
+}
+.browserImage {
+  border: 1px solid #222;
+}
+.browserRow.historySeparator * {
+  color: #555;
+}
+.browserRow.historySeparator.active * {
+  color: #888;
+}
+#shelf .browserRow.active {
+  background: #0d0d0d;
+}
+#shelf {
+  background: #111;
+}
+#shelf.focus {
+  background: #222;
+}
+#commandline-editor {
+  color: #fff;
+  background: #0d0d0d;
+}
+.commandlist {
+  background: #181818;
+}
+.commandlist.open .linenumber.selected span {
+  color: #aaf;
+}
+.commandlist.goto .linenumber.selected span {
+  color: #66f;
+}
+.commandlist.term .linenumber.selected span {
+  color: #f80;
+}
+.commandlistItem {
+  cursor: pointer;
+  padding-right: 4px;
+}
+.commandlistItem:hover {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  background: #111;
+}
+#commandline-button {
+  color: #aaa;
+  background: #222;
+}
+#commandline-button.empty {
+  background: #0d0d0d;
+  border-right-color: #222;
+}
+#commandline-button.active {
+  background: #333;
+}
+span.ko.open,
+span.macro.open,
+#commandline-button.active.open {
+  color: #0f0;
+}
+span.ko.goto,
+span.macro.goto,
+#commandline-button.active.goto {
+  color: #66f;
+}
+span.ko.browse,
+span.macro.browse,
+#commandline-button.active.browse {
+  color: #ff0;
+}
+span.ko.find,
+span.macro.find,
+#commandline-button.active.find {
+  color: #f5f;
+}
+span.ko.search,
+span.macro.search,
+#commandline-button.active.search {
+  color: #0a0;
+}
+span.ko.term,
+span.macro.term,
+#commandline-button.active.term {
+  color: #f80;
+}
+span.ko.coffee,
+span.macro.coffee,
+#commandline-button.active.coffee {
+  color: #f00;
+}
+span.ko.build,
+span.macro.build,
+#commandline-button.active.build {
+  color: #aaa;
+}
+span.ko.macro,
+span.macro.macro,
+#commandline-button.active.macro {
+  color: #888;
+}
+#commandline-button.macro,
+#commandline-button.coffee {
+  color: #aaa;
+}
+.ctrl {
+  color: #888;
+}
+.ctrl:hover {
+  color: #fff;
+}
+.ctrl:active {
+  color: #ff0;
+}
+#info {
+  background: #0d0d0d;
+  border-left-color: #222;
+}
+.info-cursor-line,
+.info-cursor-column {
+  color: #bbb;
+}
+.info-cursor-line.virtual,
+.info-cursor-column.virtual {
+  color: #08f;
+}
+.info-lines {
+  color: #555;
+}
+.info-words {
+  color: #0a0;
+}
+.info-classes {
+  color: #ff8;
+}
+.info-funcs {
+  color: #f80;
+}
+.info-files {
+  color: #44f;
+}
+.info-cursors {
+  color: #f80;
+}
+.info-sticky {
+  color: #88f;
+}
+.info-selections {
+  color: #888;
+}
+.info-highlights {
+  color: #6767ab;
+}
+.tooltip {
+  background: #222;
+}
+.tabs {
+  background: #222;
+  color: #aaa;
+}
+#titlebar.focus .tabs {
+  color: #3c3;
+}
+.tab .dot {
+  color: #444;
+}
+.tab .dot.focus {
+  color: #060;
+}
+.tab.dirty,
+.tab.dirty .dot {
+  color: #aaf;
+}
+.tab:hover {
+  opacity: 1;
+}
+.dot:hover {
+  color: #f80;
+}
+.tab {
+  background: #222;
+}
+.tab.active {
+  background: #333;
+}
+#browser {
+  background: #181818;
+  border-color: #222;
+}
+#terminal,
+#editor {
+  color: #ddd;
+  background: #0d0d0d;
+  border-color: #222;
+}
+#split {
+  border-color: #222;
+}
+*:focus .cursor {
+  background: #f80;
+}
+*:focus .cursor.virtual {
+  background: #008;
+}
+*:focus .cursor.main {
+  background: #ff0;
+}
+*:focus .cursor.blink {
+  background: #f80;
+}
+*:focus .cursor.blink.off {
+  background: transparent;
+}
+.cursors.salterMode .cursor {
+  background: #050;
+}
+.cursors.salterMode .cursor.main {
+  background: #080;
+}
+.cursor {
+  background: #444;
+}
+.cursor.main {
+  background: #666;
+}
+.cursor.virtual {
+  background: #111;
+}
+.cursor-line {
+  background: #111;
+}
+.commandlist .cursor {
+  background: transparent;
+}
+.numbers {
+  background: rgba(15,15,15,0.5);
+}
+.commandlist .layers .numbers {
+  background: rgba(0,0,0,0.1);
+}
+.linenumber {
+  border-right-color: #222;
+}
+.linenumber span {
+  color: #222;
+}
+.linenumber.highligd span {
+  color: rgba(155,155,255,0.6);
+}
+.linenumber.selected span {
+  color: #555;
+}
+.linenumber.highligd.selected:not(.cursored) span {
+  color: #bbf;
+}
+.linenumber.cursored span {
+  color: #f00;
+}
+.linenumber.cursored.selected span {
+  color: #f80;
+}
+.linenumber.cursored.main span {
+  color: #fd0;
+}
+.linenumber.cursored.main.selected span {
+  color: #ff0;
+}
+.meta.href {
+  background-color: #333;
+}
+.meta.gitInfoFile {
+  background: #333;
+  opacity: 0.5;
+  padding-right: 10px;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+.meta.gitInfoChange {
+  background: #080;
+  opacity: 0.25;
+}
+.meta.coffeeCommand,
+.meta.termCommand {
+  background: #222;
+}
+.meta.git {
+  opacity: 0.4;
+  background: #0f0;
+}
+.meta.git.del {
+  background: #f00;
+}
+.meta.git.mod {
+  background: #0f0;
+}
+.meta.git.add {
+  background: #88f;
+}
+.meta.git.boring {
+  background: #666;
+}
+.meta.dbg {
+  opacity: 0.8;
+  background: #f00;
+}
+.meta.dbg.pointer {
+  opacity: 1;
+  border-left-color: #ff0;
+}
+.meta.pigment {
+  opacity: 1;
+}
+.linenumber span .saveButton {
+  background: #f80;
+}
+.linenumber span.gitInfoLine {
+  transform: translateY(-4px);
+}
+.linenumber span.gitInfoLine.changed {
+  color: #080;
+}
+.linenumber span.gitInfoLine.deleted {
+  color: #f00;
+}
+.linenumber span.gitInfoLine.added {
+  color: #ff0;
+}
+.linenumber.gitInfoLine {
+  background: #222;
+}
+.minimap {
+  background: #0d0d0d;
+  border-left-color: #222;
+}
+.topbot {
+  background-color: #181818;
+}
+.minimapTopBot {
+  background-color: #0d0d0d;
+}
+.highlight {
+  color: rgba(255,0,255,0.5);
+  background: rgba(100,100,255,0.3);
+}
+.bracketmatch {
+  background: rgba(255,255,255,0.2);
+}
+.stringmatch {
+  background: rgba(0,255,0,0.3);
+}
+*:focus .selection {
+  background: #444;
+}
+.selection {
+  color: #444;
+  background: #282828;
+}
+.winlist,
+.list {
+  background: #222;
+}
+.winlist-item.selected,
+.list-item.selected {
+  background: #333;
+}
+.winlist-item:hover,
+.list-item:hover {
+  background: #333;
+}
+.winlist .dot {
+  color: #060;
+}
+.winlist .winid {
+  color: #080;
+}
+.autocomplete-span {
+  background: #22a;
+  color: #ff0;
+}
+.autocomplete-span.selected {
+  color: #fff;
+}
+.autocomplete-list {
+  background: #222;
+}
+.autocomplete-list::-webkit-scrollbar {
+  background-color: #333;
+}
+.autocomplete-list::-webkit-scrollbar-thumb {
+  background-color: #44f;
+}
+.autocomplete-item {
+  color: #ccc;
+}
+.autocomplete-item.selected {
+  background: #44f;
+  color: #ff0;
+}
+.scroller.long {
+  color: #2f2f2f;
+}
+.scrollbar.long {
+  color: #3c3c3c;
+}
+.scroller.short {
+  color: #7f7fff;
+}
+.scrollbar.short {
+  color: #a0a0ff;
+}
+.scrollhandle {
+  background: #88f;
+}
+#titlebar {
+  background: #222;
+}
+.titlebar-name {
+  color: #999;
+}
+.titlebar-version {
+  color: #444;
+}
+.titlebar-dot {
+  color: #333;
+}
+#titlebar .winbutton:active {
+  background-color: #f00;
+}
+#titlebar .winbutton:active.gray {
+  background-color: #333;
+}
+#titlebar .winbutton svg {
+  stroke-width: 1px;
+  stroke: #666;
+}
+#titlebar .winbutton:active svg {
+  stroke: #fff;
+}
+#titlebar .winbutton:hover svg {
+  stroke: #fff;
+}
+.menuItem {
+  color: #666;
+  background-color: #222;
+}
+.menuItem.selected {
+  color: #999;
+}
+.menu:focus .menuItem.selected {
+  color: #fff;
+}
+.popup {
+  background-color: #222;
+}
+.popupWindow {
+  background-color: #222;
+}
+.popupItem {
+  color: #666;
+}
+.popupItem:not(:last-child) {
+  border-bottom: 1px solid #222;
+}
+.popupItem.selected {
+  color: #fff;
+}
+.popupItem.selected .popupCombo {
+  color: #666;
+}
+.popupItem.separator {
+  border-top: 1px solid #333;
+}
+.popupItem:not(:last-child) {
+  border-bottom: 1px solid #222;
+}
+.popupCombo {
+  color: #333;
+}
+::-webkit-scrollbar-corner {
+  background-color: #222;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #444;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #b00;
+}

@@ -1,0 +1,83 @@
+// koffee 0.56.0
+
+/*
+0000000    000  00000000    0000000   0000000    0000000  000   000  00000000
+000   000  000  000   000  000       000   000  000       000   000  000     
+000   000  000  0000000    000       000000000  000       000000000  0000000 
+000   000  000  000   000  000       000   000  000       000   000  000     
+0000000    000  000   000   0000000  000   000   0000000  000   000  00000000
+ */
+var DirCache, _, post, ref, slash, watch;
+
+ref = require('kxk'), post = ref.post, slash = ref.slash, watch = ref.watch, _ = ref._;
+
+DirCache = (function() {
+    function DirCache() {}
+
+    DirCache.cache = {};
+
+    DirCache.watches = {};
+
+    DirCache.has = function(dir) {
+        return DirCache.cache[dir] != null;
+    };
+
+    DirCache.get = function(dir) {
+        return DirCache.cache[dir];
+    };
+
+    DirCache.set = function(dir, items) {
+        DirCache.watch(dir);
+        return DirCache.cache[dir] = items;
+    };
+
+    DirCache.reset = function() {
+        var dir, i, len, ref1, results;
+        ref1 = Object.keys(DirCache.cache);
+        results = [];
+        for (i = 0, len = ref1.length; i < len; i++) {
+            dir = ref1[i];
+            results.push(DirCache.unwatch(dir));
+        }
+        return results;
+    };
+
+    DirCache.watch = function(dir) {
+        var watcher;
+        if (DirCache.watches[dir]) {
+            return;
+        }
+        watcher = watch.dir(dir);
+        watcher.on('change', DirCache.onChange);
+        watcher.on('error', function(err) {
+            return console.error("watch.error " + err);
+        });
+        return DirCache.watches[dir] = watcher;
+    };
+
+    DirCache.unwatch = function(dir) {
+        var ref1;
+        if ((ref1 = DirCache.watches[dir]) != null) {
+            ref1.close();
+        }
+        delete DirCache.watches[dir];
+        delete DirCache.cache[dir];
+        return post.emit('dircache', dir);
+    };
+
+    DirCache.onChange = function(info) {
+        var dir;
+        dir = info.dir;
+        if (DirCache.cache[dir]) {
+            return DirCache.unwatch(dir);
+        }
+    };
+
+    return DirCache;
+
+})();
+
+module.exports = DirCache;
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZGlyY2FjaGUuanMiLCJzb3VyY2VSb290IjoiLiIsInNvdXJjZXMiOlsiIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7O0FBQUE7Ozs7Ozs7QUFBQSxJQUFBOztBQVFBLE1BQTRCLE9BQUEsQ0FBUSxLQUFSLENBQTVCLEVBQUUsZUFBRixFQUFRLGlCQUFSLEVBQWUsaUJBQWYsRUFBc0I7O0FBRWhCOzs7SUFFRixRQUFDLENBQUEsS0FBRCxHQUFXOztJQUNYLFFBQUMsQ0FBQSxPQUFELEdBQVc7O0lBRVgsUUFBQyxDQUFBLEdBQUQsR0FBTSxTQUFDLEdBQUQ7ZUFBUztJQUFUOztJQUNOLFFBQUMsQ0FBQSxHQUFELEdBQU0sU0FBQyxHQUFEO2VBQVMsUUFBUSxDQUFDLEtBQU0sQ0FBQSxHQUFBO0lBQXhCOztJQUNOLFFBQUMsQ0FBQSxHQUFELEdBQU0sU0FBQyxHQUFELEVBQU0sS0FBTjtRQUVGLFFBQVEsQ0FBQyxLQUFULENBQWUsR0FBZjtlQUNBLFFBQVEsQ0FBQyxLQUFNLENBQUEsR0FBQSxDQUFmLEdBQXNCO0lBSHBCOztJQUtOLFFBQUMsQ0FBQSxLQUFELEdBQVEsU0FBQTtBQUVKLFlBQUE7QUFBQTtBQUFBO2FBQUEsc0NBQUE7O3lCQUNJLFFBQVEsQ0FBQyxPQUFULENBQWlCLEdBQWpCO0FBREo7O0lBRkk7O0lBS1IsUUFBQyxDQUFBLEtBQUQsR0FBUSxTQUFDLEdBQUQ7QUFFSixZQUFBO1FBQUEsSUFBVSxRQUFRLENBQUMsT0FBUSxDQUFBLEdBQUEsQ0FBM0I7QUFBQSxtQkFBQTs7UUFFQSxPQUFBLEdBQVUsS0FBSyxDQUFDLEdBQU4sQ0FBVSxHQUFWO1FBQ1YsT0FBTyxDQUFDLEVBQVIsQ0FBVyxRQUFYLEVBQXFCLFFBQVEsQ0FBQyxRQUE5QjtRQUNBLE9BQU8sQ0FBQyxFQUFSLENBQVcsT0FBWCxFQUFvQixTQUFDLEdBQUQ7bUJBQU8sT0FBQSxDQUFFLEtBQUYsQ0FBUSxjQUFBLEdBQWUsR0FBdkI7UUFBUCxDQUFwQjtlQUNBLFFBQVEsQ0FBQyxPQUFRLENBQUEsR0FBQSxDQUFqQixHQUF3QjtJQVBwQjs7SUFTUixRQUFDLENBQUEsT0FBRCxHQUFVLFNBQUMsR0FBRDtBQUVOLFlBQUE7O2dCQUFxQixDQUFFLEtBQXZCLENBQUE7O1FBRUEsT0FBTyxRQUFRLENBQUMsT0FBUSxDQUFBLEdBQUE7UUFDeEIsT0FBTyxRQUFRLENBQUMsS0FBTSxDQUFBLEdBQUE7ZUFFdEIsSUFBSSxDQUFDLElBQUwsQ0FBVSxVQUFWLEVBQXNCLEdBQXRCO0lBUE07O0lBU1YsUUFBQyxDQUFBLFFBQUQsR0FBVyxTQUFDLElBQUQ7QUFFUCxZQUFBO1FBQUEsR0FBQSxHQUFNLElBQUksQ0FBQztRQUVYLElBQUcsUUFBUSxDQUFDLEtBQU0sQ0FBQSxHQUFBLENBQWxCO21CQUNJLFFBQVEsQ0FBQyxPQUFULENBQWlCLEdBQWpCLEVBREo7O0lBSk87Ozs7OztBQU9mLE1BQU0sQ0FBQyxPQUFQLEdBQWlCIiwic291cmNlc0NvbnRlbnQiOlsiIyMjXG4wMDAwMDAwICAgIDAwMCAgMDAwMDAwMDAgICAgMDAwMDAwMCAgIDAwMDAwMDAgICAgMDAwMDAwMCAgMDAwICAgMDAwICAwMDAwMDAwMFxuMDAwICAgMDAwICAwMDAgIDAwMCAgIDAwMCAgMDAwICAgICAgIDAwMCAgIDAwMCAgMDAwICAgICAgIDAwMCAgIDAwMCAgMDAwICAgICBcbjAwMCAgIDAwMCAgMDAwICAwMDAwMDAwICAgIDAwMCAgICAgICAwMDAwMDAwMDAgIDAwMCAgICAgICAwMDAwMDAwMDAgIDAwMDAwMDAgXG4wMDAgICAwMDAgIDAwMCAgMDAwICAgMDAwICAwMDAgICAgICAgMDAwICAgMDAwICAwMDAgICAgICAgMDAwICAgMDAwICAwMDAgICAgIFxuMDAwMDAwMCAgICAwMDAgIDAwMCAgIDAwMCAgIDAwMDAwMDAgIDAwMCAgIDAwMCAgIDAwMDAwMDAgIDAwMCAgIDAwMCAgMDAwMDAwMDBcbiMjI1xuXG57IHBvc3QsIHNsYXNoLCB3YXRjaCwgXyB9ID0gcmVxdWlyZSAna3hrJ1xuXG5jbGFzcyBEaXJDYWNoZVxuXG4gICAgQGNhY2hlICAgPSB7fVxuICAgIEB3YXRjaGVzID0ge31cbiAgICBcbiAgICBAaGFzOiAoZGlyKSAtPiBEaXJDYWNoZS5jYWNoZVtkaXJdP1xuICAgIEBnZXQ6IChkaXIpIC0+IERpckNhY2hlLmNhY2hlW2Rpcl1cbiAgICBAc2V0OiAoZGlyLCBpdGVtcykgLT4gXG4gICAgXG4gICAgICAgIERpckNhY2hlLndhdGNoIGRpclxuICAgICAgICBEaXJDYWNoZS5jYWNoZVtkaXJdID0gaXRlbXNcbiAgICAgICAgXG4gICAgQHJlc2V0OiAtPlxuICAgICAgICBcbiAgICAgICAgZm9yIGRpciBpbiBPYmplY3Qua2V5cyBEaXJDYWNoZS5jYWNoZVxuICAgICAgICAgICAgRGlyQ2FjaGUudW53YXRjaCBkaXJcbiAgICBcbiAgICBAd2F0Y2g6IChkaXIpIC0+XG4gICAgICAgIFxuICAgICAgICByZXR1cm4gaWYgRGlyQ2FjaGUud2F0Y2hlc1tkaXJdXG4gICAgICAgIFxuICAgICAgICB3YXRjaGVyID0gd2F0Y2guZGlyIGRpclxuICAgICAgICB3YXRjaGVyLm9uICdjaGFuZ2UnLCBEaXJDYWNoZS5vbkNoYW5nZVxuICAgICAgICB3YXRjaGVyLm9uICdlcnJvcicsIChlcnIpIC0+IGVycm9yIFwid2F0Y2guZXJyb3IgI3tlcnJ9XCJcbiAgICAgICAgRGlyQ2FjaGUud2F0Y2hlc1tkaXJdID0gd2F0Y2hlclxuICAgICAgICBcbiAgICBAdW53YXRjaDogKGRpcikgLT4gXG4gICAgICAgIFxuICAgICAgICBEaXJDYWNoZS53YXRjaGVzW2Rpcl0/LmNsb3NlKClcbiAgICAgICAgICAgIFxuICAgICAgICBkZWxldGUgRGlyQ2FjaGUud2F0Y2hlc1tkaXJdXG4gICAgICAgIGRlbGV0ZSBEaXJDYWNoZS5jYWNoZVtkaXJdXG4gICAgICAgIFxuICAgICAgICBwb3N0LmVtaXQgJ2RpcmNhY2hlJywgZGlyXG5cbiAgICBAb25DaGFuZ2U6IChpbmZvKSAtPlxuXG4gICAgICAgIGRpciA9IGluZm8uZGlyXG5cbiAgICAgICAgaWYgRGlyQ2FjaGUuY2FjaGVbZGlyXVxuICAgICAgICAgICAgRGlyQ2FjaGUudW53YXRjaCBkaXJcbiAgICAgICAgICAgIFxubW9kdWxlLmV4cG9ydHMgPSBEaXJDYWNoZVxuIl19
+//# sourceURL=../../coffee/tools/dircache.coffee

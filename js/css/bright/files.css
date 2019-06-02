@@ -1,0 +1,65 @@
+/*
+00000000  000  000      00000000   0000000
+000       000  000      000       000
+000000    000  000      0000000   0000000
+000       000  000      000            000
+000       000  0000000  00000000  0000000
+*/
+.dir,
+.directory {
+  color: #08f;
+  font-weight: bold;
+}
+.file {
+  color: #888;
+}
+.cc,
+.cpp,
+.coffee {
+  color: #c00;
+}
+.h,
+.hpp,
+.py,
+.noon {
+  color: #0b0;
+}
+.md,
+.txt {
+  color: #008;
+}
+.image {
+  color: #080;
+}
+.pic {
+  color: #0a0;
+}
+.pug,
+.styl {
+  color: #a0a;
+}
+.js,
+.css,
+.json,
+.html {
+  color: #666;
+}
+.sh {
+  color: #f60;
+}
+.dirname {
+  opacity: 0.4;
+}
+.ext {
+  opacity: 0.3;
+}
+.separator {
+  opacity: 0.2;
+}
+.marker {
+  opacity: 0.4;
+}
+.lock,
+.dotfile {
+  color: #666;
+}

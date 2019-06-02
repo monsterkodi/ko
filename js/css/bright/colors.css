@@ -1,0 +1,396 @@
+/*
+ 0000000   0000000   000       0000000   00000000    0000000    
+000       000   000  000      000   000  000   000  000         
+000       000   000  000      000   000  0000000    0000000     
+000       000   000  000      000   000  000   000       000    
+ 0000000   0000000   0000000   0000000   000   000  0000000     
+*/
+body {
+  background: #fff;
+  color: #000;
+}
+.split-handle {
+  background: #eee;
+}
+.popup {
+  background-color: #eee;
+}
+.popupWindow {
+  background-color: #eee;
+}
+.popupItem {
+  color: #888;
+}
+.popupItem:not(:last-child) {
+  border-bottom: 1px solid #eee;
+}
+.popupItem.selected {
+  color: #000;
+}
+.popupItem:active {
+  color: #000;
+}
+.popupCombo {
+  color: #ddd;
+}
+.browser {
+  background: #fff;
+  color: #000;
+}
+.browserRow.hover {
+  background: #fafafa;
+}
+.browserRow.active {
+  background: #eee;
+}
+.browserColumn.focus .browserRow.active {
+  background: #ddf;
+}
+.browserImage {
+  border: 1px solid #eee;
+}
+#commandline-editor {
+  color: #000;
+  background: #fff;
+}
+.commandlist {
+  background: #fafafa;
+}
+.commandlist.open .linenumber.selected span {
+  color: #aaf;
+}
+.commandlist.goto .linenumber.selected span {
+  color: #66f;
+}
+.commandlist.term .linenumber.selected span {
+  color: #f80;
+}
+#commandline-button {
+  color: #aaa;
+  background: #eee;
+}
+#commandline-button.empty {
+  background: #fff;
+  border-right-color: #eee;
+}
+#commandline-button.active {
+  background: #ddd;
+}
+span.ko.open,
+#commandline-button.active.open {
+  color: #000;
+}
+span.ko.goto,
+#commandline-button.active.goto {
+  color: #666;
+}
+span.ko.browse,
+#commandline-button.active.browse {
+  color: #66f;
+}
+span.ko.find,
+#commandline-button.active.find {
+  color: #00a;
+}
+span.ko.search,
+#commandline-button.active.search {
+  color: #a00;
+}
+span.ko.term,
+#commandline-button.active.term {
+  color: #0a0;
+}
+span.ko.coffee,
+#commandline-button.active.coffee {
+  color: #800;
+}
+span.ko.build,
+#commandline-button.active.build {
+  color: #aaa;
+}
+span.ko.macro,
+#commandline-button.active.macro {
+  color: #ccc;
+}
+#commandline-button.macro,
+#commandline-button.coffee {
+  color: #aaa;
+}
+.ctrl {
+  color: #888;
+}
+.ctrl:hover {
+  color: #000;
+}
+.ctrl:active {
+  color: #000;
+}
+#info {
+  background: #fff;
+  border-left-color: #eee;
+}
+.info-cursor-line,
+.info-cursor-column {
+  color: #bbb;
+}
+.info-cursor-line.virtual,
+.info-cursor-column.virtual {
+  color: #88f;
+}
+.info-lines {
+  color: #555;
+}
+.info-words {
+  color: #0a0;
+}
+.info-classes {
+  color: #f00;
+}
+.info-funcs {
+  color: #f60;
+}
+.info-files {
+  color: #44f;
+}
+.info-cursors {
+  color: #f80;
+}
+.info-sticky {
+  color: #88f;
+}
+.info-selections {
+  color: #888;
+}
+.info-highlights {
+  color: #6767ab;
+}
+#titlebar {
+  background: #fff;
+  color: #333;
+}
+.dot:hover {
+  color: #f00;
+}
+#titlebar .winid {
+  color: #555;
+}
+#titlebar .winid.focus {
+  color: #080;
+}
+#titlebar .winnum {
+  color: #fff;
+}
+#titlebar.focus .winnum {
+  color: #ddd;
+}
+.tooltip {
+  background: #eee;
+}
+.tabs {
+  background: #fff;
+  color: #333;
+}
+#titlebar.focus .tabs {
+  color: #3c3;
+}
+.tab.dirty,
+.tab.dirty .dot {
+  color: #aaf;
+}
+.tab.clean .dot {
+  color: #444;
+}
+.tab.clean .dot.focus {
+  color: #060;
+}
+.tab {
+  background: #fff;
+}
+.tab.active {
+  background: #eee;
+}
+#browser {
+  background: #fff;
+  border-color: #eee;
+}
+#terminal,
+#editor {
+  background: #fff;
+  color: #333;
+  border-color: #eee;
+}
+#split {
+  border-color: #eee;
+}
+*:focus .cursor {
+  background: #888;
+}
+*:focus .cursor.virtual {
+  background: #eee;
+}
+*:focus .cursor.main {
+  background: #000;
+}
+*:focus .cursor.blink {
+  background: #888;
+}
+*:focus .cursor.blink.off {
+  background: transparent;
+}
+.cursors.salterMode .cursor {
+  background: #040;
+}
+.cursors.salterMode .cursor.main {
+  background: #080;
+}
+.cursor {
+  background: #aaa;
+}
+.cursor.main {
+  background: #888;
+}
+.cursor.virtual {
+  background: #fff;
+}
+.numbers {
+  background: rgba(255,255,255,0.5);
+}
+.commandlist .layers .numbers {
+  background: rgba(255,255,255,0.1);
+}
+.linenumber {
+  border-right-color: #eee;
+}
+.linenumber span {
+  color: #eee;
+}
+.linenumber.cursored span {
+  color: #888;
+}
+.linenumber.cursored.main span {
+  color: #000;
+}
+.linenumber.highligd span {
+  color: #aaa;
+}
+.linenumber.selected span {
+  color: #88f;
+}
+.linenumber.highligd.selected:not(.cursored) span {
+  color: #00f;
+}
+.linenumber.cursored.selected span {
+  color: #44f;
+}
+.linenumber.cursored.main.selected span {
+  color: #008;
+}
+.meta.href {
+  background-color: #aaf;
+}
+.meta.git {
+  opacity: 0.4;
+}
+.meta.git.del {
+  background: #f60;
+}
+.meta.git.mod {
+  background: #6f6;
+}
+.meta.git.add {
+  background: #aaf;
+}
+.meta.git.boring {
+  background: #ddd;
+}
+.meta.dbg {
+  opacity: 0.8;
+  background: #f00;
+}
+.linenumber span .saveButton {
+  background: #f80;
+}
+.minimap {
+  background: #fff;
+  border-left-color: #eee;
+}
+.topbot {
+  background-color: #eee;
+}
+.minimapTopBot {
+  background-color: #fff;
+}
+.highlight {
+  color: rgba(0,0,0,0.3);
+  background: rgba(0,0,0,0.1);
+}
+.bracketmatch {
+  background: rgba(0,0,0,0.1);
+}
+.stringmatch {
+  background: rgba(0,255,0,0.3);
+}
+*:focus .selection {
+  background: #ddf;
+}
+.selection {
+  color: #ddf;
+  background: #eee;
+}
+.winlist,
+.list {
+  background: #fafafa;
+}
+.winlist-item.selected,
+.list-item.selected {
+  background: #ddd;
+}
+.winlist-item:hover,
+.list-item:hover {
+  background: #eee;
+}
+.winlist .dot {
+  color: #060;
+}
+.winlist .winid {
+  color: #080;
+}
+.autocomplete-list {
+  background: #eee;
+}
+.autocomplete-list::-webkit-scrollbar {
+  background-color: #ddd;
+}
+.autocomplete-list::-webkit-scrollbar-thumb {
+  background-color: #44f;
+}
+.autocomplete-item {
+  color: #000;
+}
+.autocomplete-item.selected {
+  background: #88f;
+  color: #ff0;
+}
+.scroller.long,
+.scrollbar.long {
+  color: #eee;
+}
+.scroller.short,
+.scrollbar.short {
+  color: #000;
+}
+::-webkit-scrollbar-corner {
+  background-color: #eee;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #ddd;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #ddd;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #b00;
+}
+.scrollhandle {
+  background: #88f;
+}

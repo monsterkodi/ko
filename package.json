@@ -1,0 +1,56 @@
+{
+  "name": "ko",
+  "productName": "ko",
+  "version": "0.230.0",
+  "description": "text editor",
+  "main": "js/main/main.js",
+  "preferGlobal": true,
+  "bin": {
+    "ko": "./bin/ko"
+  },
+  "scripts": {
+    "mac": "bash ./bin/buildmac.sh",
+    "win": "bash ./bin/buildwin.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/monsterkodi/ko.git"
+  },
+  "keywords": [
+    "editor",
+    "electron",
+    "coffeescript"
+  ],
+  "license": "Unlicense",
+  "author": "monsterkodi",
+  "maintainers": [
+    {
+      "name": "monsterkodi",
+      "email": "monsterkodi@gmx.net"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/monsterkodi/ko/issues"
+  },
+  "dependencies": {
+    "file-icons-js": "^1.0.3",
+    "fuzzy": "^0.1.3",
+    "ignore": "^5.1.2",
+    "js-beautify": "^1.10.0",
+    "klor": "^0.45.0",
+    "kxk": "^0.298.0",
+    "performance-now": "^2.1.0",
+    "seamless-immutable": "^7.1.4",
+    "strip-ansi": "^5.2.0",
+    "trash": "^6.0.0",
+    "unused-filename": "^2.1.0"
+  },
+  "devDependencies": {
+    "appdmg": "^0.6.0",
+    "electron": "^5.0.2",
+    "electron-packager": "^13.1.1",
+    "electron-rebuild": "^1.8.5",
+    "koffee": "^0.56.0",
+    "konrad": "^0.129.0"
+  }
+}

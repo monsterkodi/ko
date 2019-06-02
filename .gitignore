@@ -1,17 +1,12 @@
 node_modules
 wiki
-package.json
 *-x64
 *-ia32
 inno
 bin/*.json
 bin/*.js.map
-js
-css
 Icon?
-*.html
 *.dmg
 npm-debug.log
 ./md/test.md
 bin/github-release
-package-lock.json
