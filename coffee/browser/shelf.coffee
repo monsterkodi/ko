@@ -13,13 +13,6 @@ Scroller = require './scroller'
 Column   = require './column'
 fuzzy    = require 'fuzzy'
 hub      = require '../git/hub'
-
-indexAndItemInItemsWithFunc = (item, items, withFunc) ->
-    
-    for index in [0...items.length]
-        if withFunc items[index], item
-            return [index, items[index]]
-    return [-1,null]
     
 class Shelf extends Column
 
@@ -31,7 +24,7 @@ class Shelf extends Column
         @index  = -1
         @div.id = 'shelf'
         
-        @showHistory = window.stash.get 'shelf:history', false
+        @showHistory = window.stash.get 'shelf:history', true
 
         post.on 'gitStatus',              @loadGitStatus
         post.on 'addToShelf',             @addPath
@@ -71,12 +64,15 @@ class Shelf extends Column
     onFile: (file) =>
         
         return if empty file
-        
-        [index, item] = indexAndItemInItemsWithFunc file, @items, (f,i) -> i.file == f
-        if item
-            @rows[index].setActive()
+        if @navigatingRows
+            delete @navigatingRows
             return
-
+        
+        for index in [0...@items.length]
+            if @items[index].file == file
+                @rows[index].setActive()
+                return
+        
         matches = []
         for index,item of @items
             if file?.startsWith item.file
@@ -257,6 +253,7 @@ class Shelf extends Column
             @removeRow @row(@numRows()-1)
 
     onNavigateHistoryChanged: (filePositions, currentIndex) =>
+        
         if @showHistory
             @setHistoryItems filePositions
 
@@ -264,7 +261,8 @@ class Shelf extends Column
 
         if @showHistory
             reverseIndex = @numRows() - currentIndex - 1
-            @row(reverseIndex)?.setActive()
+            if currentItem.file != @activeRow()?.item.file
+                @row(reverseIndex)?.setActive()
             
     loadHistory: ->
         
@@ -335,8 +333,12 @@ class Shelf extends Column
         
         kerror "no row at index #{index}/#{@numRows()-1}?", @numRows() if not @rows[index]?.activate?
 
-        if      key == 'up'   and index > @items.length     then post.emit 'menuAction', 'Navigate Forward'
-        else if key == 'down' and index > @items.length + 1 then post.emit 'menuAction', 'Navigate Backward'
+        navigate = (action) =>
+            @navigatingRows = true
+            post.emit 'menuAction', action
+        
+        if      key == 'up'   and index > @items.length     then navigate 'Navigate Forward'
+        else if key == 'down' and index > @items.length + 1 then navigate 'Navigate Backward'
         else @rows[index].activate()
     
     openFileInNewWindow: ->  

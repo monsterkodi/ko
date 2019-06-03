@@ -26,10 +26,10 @@ class Editor extends Buffer
 
         Editor.initActions() if not Editor.actions?
 
-        @indentString      = _.padStart "", 4
-        @stickySelection   = false
-        @syntax            = new Syntax @config.syntaxName, @line, @lines
-        @do                = new Do @
+        @indentString    = _.padStart "", 4
+        @stickySelection = false
+        @syntax          = new Syntax @config.syntaxName, @line, @lines
+        @do              = new Do @
 
         @setupFileType()
 
@@ -46,7 +46,7 @@ class Editor extends Buffer
     @initActions: ->
 
         @actions = []
-        for actionFile in filelist slash.join __dirname, 'actions'
+        for actionFile in filelist(slash.join __dirname, 'actions')
             continue if slash.ext(actionFile) not in ['js', 'coffee']
             actions = require actionFile
             for key,value of actions
@@ -66,11 +66,7 @@ class Editor extends Buffer
         for action in Editor.actions
             if action.name == name
                 return action
-
-        # log "can't find action with name '#{name}'"
-        # for action in Editor.actions
-            # log action.name
-        return null
+        null
 
     # 000000000  000   000  00000000   00000000
     #    000      000 000   000   000  000

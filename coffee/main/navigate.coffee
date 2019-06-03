@@ -29,14 +29,14 @@ class Navigate
     onGet: (key) => @[key]
 
     addToHistory: (file, pos) ->
-        
+
         return if not @main
         return if not file?
         pos ?= [0,0]
-            
+
         _.pullAllWith @filePositions, [file:file, pos:pos], (a,b) ->
             return a.file == b.file
-        
+
         filePos = slash.tilde slash.joinFilePos file, pos
         @filePositions.push
             file:   file
@@ -45,10 +45,10 @@ class Navigate
             column: pos[0]
             name:   filePos
             text:   slash.basename filePos
-    
-        while @filePositions.length > prefs.get 'navigateHistoryLength', 10
+
+        while @filePositions.length > prefs.get 'navigateHistoryLength', 15
             @filePositions.shift()
-                
+
     navigate: (opt) =>
 
         switch opt.action
@@ -70,33 +70,33 @@ class Navigate
                 @loadFilePos @filePositions[@currentIndex], opt
 
             when 'delFilePos'
-                _.pullAllWith @filePositions, [opt.item], (a,b) -> 
+                _.pullAllWith @filePositions, [opt.item], (a,b) ->
                     pull = a.file == b.file and a.line == b.line and a.column == b.column
                     pull
 
             when 'addFilePos'
-                
+
                 return if not opt?.file?.length
-                
+
                 @addToHistory opt.oldFile, opt.oldPos
-                                
+
                 hasFile = _.find @filePositions, (v) -> v.file == opt.file
-                
-                if not @navigating or not hasFile or opt?.for in ['edit', 'goto'] 
-                    
+
+                if not @navigating or not hasFile or opt?.for in ['edit', 'goto']
+
                     @navigating = false if opt?.for in ['edit', 'goto']
-                    
+
                     @addToHistory opt.file, opt.pos
-                                                
+
                     @currentIndex = @filePositions.length-1
-                    
+
                     if opt?.for == 'goto'
                         post.toWins 'navigateHistoryChanged', @filePositions, @currentIndex
                         @loadFilePos @filePositions[@currentIndex], opt
                     else
                         @currentIndex = @filePositions.length
                         post.toWins 'navigateHistoryChanged', @filePositions, @currentIndex
-                    
+
     loadFilePos: (filePos, opt) ->
 
         if opt?.newWindow
@@ -104,9 +104,9 @@ class Navigate
         else
             error 'no winID?' if not opt?.winID?
             post.toWin opt.winID, 'loadFile', "#{filePos.file}:#{filePos.pos[1]+1}:#{filePos.pos[0]}"
-        
+
         post.toWins 'navigateIndexChanged', @currentIndex, @filePositions[@currentIndex]
-        
+
         filePos
 
     # 000   000  000  000   000
@@ -117,7 +117,7 @@ class Navigate
 
     # these are called in window process
 
-    delFilePos: (item) -> 
+    delFilePos: (item) ->
         post.toMain 'navigate', action:'delFilePos', winID: window.winID, item:item
 
     addFilePos: (opt) -> # called on editing

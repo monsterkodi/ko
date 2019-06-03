@@ -49,7 +49,7 @@ class Browse extends Command
         @browser.start()
 
         if action != 'shelf'
-            if window.editor.currentFile?
+            if window.editor.currentFile? and slash.isFile window.editor.currentFile
                 @browser.navigateToFile window.editor.currentFile
             else
                 post.emit 'filebrowser', 'loadItem', file:process.cwd(), type:'dir'

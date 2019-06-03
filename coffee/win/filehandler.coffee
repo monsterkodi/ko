@@ -86,6 +86,7 @@ class FileHandler
     
         if ofiles?.length
     
+            log 'ofiles', JSON.stringify ofiles
             files = filelist ofiles, ignoreHidden: false
     
             if files.length >= 10
@@ -182,7 +183,8 @@ class FileHandler
                 if tab == tabs.activeTab()
                     @saveFile tab.file
                 else
-                    tab.saveChanges()
+                    if not tab.file.startsWith 'untitled'
+                        tab.saveChanges()
 
     #  0000000   0000000   000   000  00000000        00000000  000  000      00000000  
     # 000       000   000  000   000  000             000       000  000      000       
@@ -194,7 +196,7 @@ class FileHandler
     
         file ?= editor.currentFile
         
-        if not file?
+        if not file? or file.startsWith 'untitled'
             @saveFileAs()
             return
     

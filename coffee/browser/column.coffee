@@ -214,7 +214,7 @@ class Column
     openFileInNewWindow: ->  
         
         if item = @activeRow()?.item
-            if item.type == 'file' and item.textFile
+            if item.type == 'file' and item.textFile and item.file
                 post.emit 'openFiles', [item.file], newWindow: true
         @
 
@@ -340,6 +340,12 @@ class Column
         
         trash([pathToTrash]).catch (err) -> error "failed to trash #{pathToTrash} #{err}"
 
+    addToShelf: =>
+        
+        if pathToShelf = @activePath()
+            post.emit 'addToShelf', pathToShelf
+            window.split.focus 'shelf'
+        
     duplicateFile: =>
         
         unusedFilename = require 'unused-filename'
@@ -419,6 +425,10 @@ class Column
             text:   'Move to Trash'
             combo:  'ctrl+backspace' 
             cb:     @moveToTrash
+        ,
+            text:   'Add to Shelf'
+            combo:  'alt+shift+.'
+            cb:     @addToShelf
         ,
             text:   'Explorer'
             combo:  'alt+e' 

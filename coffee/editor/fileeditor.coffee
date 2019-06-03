@@ -7,7 +7,7 @@
 ###
 
 { post, stopEvent, setStyle, srcmap, popup, slash, empty, clamp, kpos, fs, kerror, _ } = require 'kxk'
-  
+
 Watcher    = require '../tools/watcher'
 TextEditor = require './texteditor'
 Syntax     = require './syntax'
@@ -17,7 +17,7 @@ class FileEditor extends TextEditor
 
     constructor: (viewElem) ->
 
-        super viewElem, 
+        super viewElem,
             features: [
                 'Diffbar'
                 'Scrollbar'
@@ -35,7 +35,7 @@ class FileEditor extends TextEditor
         @watch       = null
 
         @view.addEventListener "contextmenu", @onContextMenu
-        
+
         post.on 'commandline',   @onCommandline
         post.on 'jumpTo',        @jumpTo
         post.on 'jumpToFile',    @jumpToFile
@@ -65,8 +65,8 @@ class FileEditor extends TextEditor
     # 000       000  000      000
     # 000       000  0000000  00000000
 
-    clear: -> 
-        
+    clear: ->
+
         @dirty = false
         @setSalterMode false
         @stopWatcher()
@@ -83,7 +83,7 @@ class FileEditor extends TextEditor
         @currentFile = file
 
         @setupFileType()
-        
+
         fileExists = @currentFile? and slash.fileExists @currentFile
 
         if restoreState
@@ -95,13 +95,13 @@ class FileEditor extends TextEditor
 
         if fileExists
             @watch = new Watcher @currentFile
-            
+
         post.emit 'file', @currentFile # browser & shelf
 
         @emit 'file', @currentFile # diffbar, pigments, ...
-        
+
         post.emit 'dirty', @dirty
-        
+
     restoreFromTabState: (tabsState) ->
 
         return kerror "no tabsState.file?" if not tabsState.file?
@@ -112,25 +112,25 @@ class FileEditor extends TextEditor
         @watch?.stop()
         @watch = null
 
-    # 000000000  000   000  00000000   00000000  
-    #    000      000 000   000   000  000       
-    #    000       00000    00000000   0000000   
-    #    000        000     000        000       
-    #    000        000     000        00000000  
-    
+    # 000000000  000   000  00000000   00000000
+    #    000      000 000   000   000  000
+    #    000       00000    00000000   0000000
+    #    000        000     000        000
+    #    000        000     000        00000000
+
     shebangFileType: ->
-        
+
         fileType = Syntax.shebang @line(0) if @numLines()
-        if fileType == 'txt' 
+        if fileType == 'txt'
             if @currentFile?
                 ext = slash.ext @currentFile
                 if ext in Syntax.syntaxNames
                     return ext
         else if fileType
             return fileType
-            
+
         super()
-        
+
     #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
     # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000
     # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000
@@ -185,10 +185,10 @@ class FileEditor extends TextEditor
         if filePositions[@currentFile]?
 
             s = filePositions[@currentFile]
-            
+
             cursors = s.cursors ? [[0,0]]
             cursors = cursors.map (c) => [c[0], clamp(0,@numLines()-1,c[1])]
-            
+
             @setCursors    cursors
             @setSelections s.selections ? []
             @setHighlights s.highlights ? []
@@ -196,7 +196,7 @@ class FileEditor extends TextEditor
             @setState @state
 
             @syntax.fillDiss @mainCursor()[1]
-            
+
             @scroll.to s.scroll if s.scroll
             @scroll.cursorIntoView()
 
@@ -221,16 +221,20 @@ class FileEditor extends TextEditor
     #  0000000    0000000   000   000  000
 
     jumpToFile: (opt) =>
-        
+
+        window.tabs.activeTab true
+
+        # log 'jumpToFile', require('kxk').noon.stringify opt
+
         if opt.newTab
-            
+
             file = opt.file
             file += ':' + opt.line if opt.line
             file += ':' + opt.col if opt.col
             post.emit 'newTabWithFile', file
-            
+
         else
-            
+
             [file, fpos] = slash.splitFilePos opt.file
             opt.pos = fpos
             opt.pos[0] = opt.col if opt.col
@@ -389,23 +393,23 @@ class FileEditor extends TextEditor
         else
             @updateLayers()
 
-    # 00000000    0000000   00000000   000   000  00000000     
-    # 000   000  000   000  000   000  000   000  000   000    
-    # 00000000   000   000  00000000   000   000  00000000     
-    # 000        000   000  000        000   000  000          
-    # 000         0000000   000         0000000   000          
+    # 00000000    0000000   00000000   000   000  00000000
+    # 000   000  000   000  000   000  000   000  000   000
+    # 00000000   000   000  00000000   000   000  00000000
+    # 000        000   000  000        000   000  000
+    # 000         0000000   000         0000000   000
 
     onContextMenu: (event) => stopEvent event, @showContextMenu kpos event
-              
+
     showContextMenu: (absPos) =>
-        
+
         if not absPos?
             absPos = kpos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
-        
+
         opt = items: [
             text:   'Browse'
-            combo:  'command+.' 
-            accel:  'ctrl+.' 
+            combo:  'command+.'
+            accel:  'ctrl+.'
             cb:     -> window.commandline.startCommand 'browse'
         ,
             text:   'Back'
@@ -415,19 +419,19 @@ class FileEditor extends TextEditor
             text:   ''
         ,
             text:   'Maximize'
-            combo:  'command+shift+y' 
-            accel:  'ctrl+shift+y' 
+            combo:  'command+shift+y'
+            accel:  'ctrl+shift+y'
             cb:     -> window.split.maximizeEditor()
-        , 
-            text:   ''        
+        ,
+            text:   ''
         ]
-        
+
         opt.items = opt.items.concat window.titlebar.menuTemplate()
-        
+
         opt.x = absPos.x
         opt.y = absPos.y
         popup.menu opt
-            
+
     #  0000000  000      000   0000000  000   000
     # 000       000      000  000       000  000
     # 000       000      000  000       0000000
@@ -450,7 +454,7 @@ class FileEditor extends TextEditor
     # 000   000  00000000     000
 
     handleModKeyComboCharEvent: (mod, key, combo, char, event) ->
-        
+
         return if 'unhandled' != super mod, key, combo, char, event
         switch combo
             when 'alt+ctrl+enter'       then return window.commandline.commands.coffee.executeText @textOfSelectionForClipboard()

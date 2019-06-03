@@ -162,7 +162,10 @@ class Main extends app
             @restoreWindows() if not args.nostate
         
         if not wins().length
-            @createWindowWithFile file:mostRecentFile()
+            if recent = mostRecentFile()
+                @createWindowWithFile file:recent 
+            else
+                @createWindowWithEmpty()
 
     #  0000000    0000000  000000000  000   0000000   000   000  
     # 000   000  000          000     000  000   000  0000  000  
@@ -176,8 +179,6 @@ class Main extends app
             when 'Cycle Windows'    then @activateNextWindow arg
             when 'Arrange Windows'  then @arrangeWindows()
             when 'New Window'       then @createWindow()
-            # else
-                # log 'unhandled menuAction', action, arg
             
     # 000   000  000  000   000  0000000     0000000   000   000   0000000
     # 000 0 000  000  0000  000  000   000  000   000  000 0 000  000
@@ -195,7 +196,13 @@ class Main extends app
         win = @createWindow (win) -> 
             post.toWin win.id, 'openFiles', [opt.file]
         win
-    
+
+    createWindowWithEmpty: ->
+        
+        win = @createWindow (win) -> 
+            post.toWin win.id, 'newEmptyTab'
+        win
+        
     toggleWindows: (cb) =>
 
         if valid wins()
