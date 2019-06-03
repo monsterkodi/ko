@@ -382,12 +382,10 @@ class Main extends app
     restoreWindows: ->
 
         fs.ensureDirSync @userData
-        stashFiles = filelist slash.join(@userData, 'old'), matchExt:'noon'
-        if not empty stashFiles
-            for file in stashFiles
-                win = @createWindow()
-                newStash = slash.join @userData, 'win', "#{win.id}.noon"
-                fs.copySync file, newStash
+        for file in filelist(slash.join(@userData, 'old'), matchExt:'noon')
+            win = @createWindow()
+            newStash = slash.join @userData, 'win', "#{win.id}.noon"
+            fs.copySync file, newStash
 
     toggleWindowFromTray: => 
             
