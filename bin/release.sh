@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
 cd `dirname $0`/..
 
-APP=`sds -rp productName`
+APP=`sds -rp name`
 VERSION=`sds -rp version`
 VVERSION=v$VERSION
 USER=`sds -rp author`
 DMG=$APP-$VERSION.dmg
 
+echo 'tag and push ...'
+# git tag $VVERSION && git push --tags
+
 echo 'creating release ...'
-github-release release -s $GH_TOKEN -u $USER -r $APP -t $VVERSION -n $VVERSION --pre-release
+github-release release --user $USER --repo $APP --tag $VVERSION --name $VVERSION --pre-release
+
 echo 'uploading dmg ...'
-github-release upload  -s $GH_TOKEN -u $USER -r $APP -t $VVERSION -n $DMG -f $DMG
+github-release upload  --user $USER --repo $APP --tag $VVERSION --name $DMG --file $DMG
 
