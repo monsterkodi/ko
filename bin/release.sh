@@ -1,18 +1,28 @@
 #!/usr/bin/env bash
-cd `dirname $0`/..
 
-APP=`sds -rp name`
-VERSION=`sds -rp version`
+DIR=`dirname $0`
+BIN=$DIR/../node_modules/.bin
+SDS=$BIN/sds
+cd $DIR/..
+
+APP=`$SDS -rp name`
+VERSION=`$SDS version`
 VVERSION=v$VERSION
-USER=`sds -rp author`
+USER=`$SDS author`
 DMG=$APP-$VERSION.dmg
 
-echo 'tag and push ...'
-# git tag $VVERSION && git push --tags
+if $BIN/konrad --commit $VVERSION; then
 
-echo 'creating release ...'
-github-release release --user $USER --repo $APP --tag $VVERSION --name $VVERSION --pre-release
-
-echo 'uploading dmg ...'
-github-release upload  --user $USER --repo $APP --tag $VVERSION --name $DMG --file $DMG
-
+    source ~/.tokens
+    echo 'using token' $GH_TOKEN
+    
+    ./bin/buildmac.sh
+    ./bin/dmg.sh
+    
+    echo 'creating release ...'
+    github-release release -s $GH_TOKEN --user $USER --repo $APP --tag $VVERSION-mac --name "$VVERSION macOS" --pre-release
+    
+    echo 'uploading dmg ...'
+    github-release upload  -s $GH_TOKEN --user $USER --repo $APP --tag $VVERSION-mac --name $DMG --file $DMG
+    
+fi
