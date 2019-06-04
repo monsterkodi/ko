@@ -1,11 +1,11 @@
 #define MyAppName "ko"
-#define MyAppVersion "0.151.0"
+#define MyAppVersion "0.230.0"
 #define MyAppPublisher "monsterkodi"
 #define MyAppURL "https://github.com/monsterkodi/ko"
 #define MyAppExeName "ko.exe"
 
 [Setup]
-AppId={{DB2B07CB-6B37-4C0C-8746-173B1DCFEB94}
+AppId={{CFEFEAE4-DA71-4756-B9ED-72EFE209F3A2}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
