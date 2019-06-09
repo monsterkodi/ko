@@ -8,7 +8,7 @@
 
 { clamp, post, elem, $ } = require 'kxk'
 
-now = require 'performance-now'
+now = require('perf_hooks').performance.now
 
 class FPS
 

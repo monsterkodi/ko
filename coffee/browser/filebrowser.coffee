@@ -173,7 +173,7 @@ class FileBrowser extends Browser
 
         for column in @columns
             if column.path() == dir
-                @loadDirItem file:dir, column.index, active:column.activePath()
+                @loadDirItem {file:dir, type:'dir'}, column.index, active:column.activePath()
                 return
 
     loadDirItem: (item, col=0, opt={}) ->

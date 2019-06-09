@@ -37,9 +37,9 @@ class State
         if not @s.lines[i]?
             kerror "editor/state -- requesting invalid line at index #{i}?"
             return ''
-        kstr.replaceTabs @s.lines[i].text
+        kstr.detab @s.lines[i].text
 
-    lines:         -> @s.lines.map (l) -> kstr.replaceTabs l.text
+    lines:         -> @s.lines.map (l) -> kstr.detab l.text
     cursors:       -> @s.cursors.asMutable deep: true
     highlights:    -> @s.highlights.asMutable deep: true
     selections:    -> @s.selections.asMutable deep: true

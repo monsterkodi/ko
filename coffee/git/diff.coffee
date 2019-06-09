@@ -6,9 +6,9 @@
 0000000    000  000       000
 ###
 
-{ childp, slash, valid, empty, _ } = require 'kxk'
+{ childp, slash, kstr, valid, empty, _ } = require 'kxk'
 
-stripAnsi = require 'strip-ansi'
+# stripAnsi = require 'strip-ansi'
 
 gitCmd = (file) -> "git --no-pager diff -U0 \"#{slash.file file}\""
 gitOpt = (cwd)  -> cwd:cwd, encoding:'utf8', stdio:['pipe', 'pipe', 'ignore']
@@ -39,7 +39,8 @@ diff = (file, cb) ->
 parseResult = (file, result) ->
 
     info  = file:file, changes:[]
-    lines = (stripAnsi l for l in result.split '\n')
+    # lines = (stripAnsi l for l in result.split '\n')
+    lines = (kstr.stripAnsi l for l in result.split '\n')
 
     while line = lines.shift()
 

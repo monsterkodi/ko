@@ -86,7 +86,6 @@ class FileHandler
     
         if ofiles?.length
     
-            log 'ofiles', JSON.stringify ofiles
             files = filelist ofiles, ignoreHidden: false
     
             if files.length >= 10

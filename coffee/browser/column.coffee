@@ -56,7 +56,12 @@ class Column
         @items  = items
         @parent = parent
         
+        if @parent.type == undefined
+            log 'column.loadItems', String @parent
+            @parent.type = slash.isDir(@parent.file) and 'dir' or 'file'
+        
         kerror "no parent item?" if not @parent?
+        kerror "loadItems -- no parent type?", @parent if not @parent.type?
         
         if valid @items
             for item in @items
@@ -71,6 +76,7 @@ class Column
         
         @parent = opt.parent
         kerror "no parent item?" if not @parent?
+        kerror "setItems -- no parent type?", @parent if not @parent.type?
         
         for item in @items
             @rows.push new Row @, item
@@ -309,10 +315,14 @@ class Column
     
     toggleDotFiles: =>
 
+        if @parent.type == undefined
+            log 'column.toggleDotFiles', @parent
+            @parent.type = slash.isDir(@parent.file) and 'dir' or 'file'
+            
         if @parent.type == 'dir'            
             stateKey = "browser|showHidden|#{@parent.file}"
             if window.state.get stateKey
-                window.state.set stateKey, false
+                window.state.del stateKey
             else
                 window.state.set stateKey, true
             @browser.loadDirItem @parent, @index, ignoreCache:true

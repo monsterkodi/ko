@@ -21,8 +21,8 @@ class Indexer
     @methodRegExp    = /^\s+([\@]?\w+|@)\s*\:\s*(\(.*\))?\s*[=-]\>/
     # @funcRegExp      = /^\s*([\w\.]+)\s*[\:\=]\s*(\(.*\))?\s*[=-]\>/
     @funcRegExp      = /^\s*([\w\.]+)\s*[\:\=][^\(\)]*(\(.*\))?\s*[=-]\>/
-    @postRegExp      = /^\s*post\.on\s+[\'\"](\w+)[\'\"]\s*\,\s*(\(.*\))?\s*[=-]\>/
-    @testRegExp      = /^\s*(describe|it)\s+[\'\"](.+)[\'\"]\s*[\,]\s*(\([^\)]*\))?\s*[=-]\>/
+    @postRegExp      = /^\s*post\.on\s+[\'\"](\w+)[\'\"]\s*\,?\s*(\(.*\))?\s*[=-]\>/
+    @testRegExp      = /^\s*(describe|it)\s+[\'\"](.+)[\'\"]\s*\,?\s*(\([^\)]*\))?\s*[=-]\>/
     @splitRegExp     = new RegExp "[^\\w\\d\\_]+", 'g'
     @classRegExp     = /^(\s*\S+\s*=)?\s*class\s+(\w+)/
 
