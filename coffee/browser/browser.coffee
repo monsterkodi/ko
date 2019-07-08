@@ -18,7 +18,7 @@ class Browser extends event
         
         @columns = []
         
-        setStyle '.browserRow .ext', 'display', window.state.get('browser|hideExtensions') and 'none' or 'initial'
+        setStyle '.browserRow .ext' 'display' window.state.get('browser|hideExtensions') and 'none' or 'initial'
 
     # 000  000   000  000  000000000       0000000   0000000   000      000   000  00     00  000   000   0000000  
     # 000  0000  000  000     000         000       000   000  000      000   000  000   000  0000  000  000       
