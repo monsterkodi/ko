@@ -1,6 +1,6 @@
 name            ko
 productName     ko
-version         0.239.0
+version         0.240.0
 description     text editor
 main            js/main/main.js
 preferGlobal    true
@@ -29,14 +29,14 @@ dependencies
                 fuzzy           ^0.1.3
                 ignore          ^5.1.2
                 js-beautify     ^1.10.0
-                klor            ^1.1.1
-                kxk             ^0.316.0
+                klor            ^1.2.0
+                kxk             ^0.323.0
                 seamless-immutable  ^7.1.4
                 trash           ^6.0.0
                 unused-filename  ^2.1.0
 devDependencies
                 electron        ^5.0.6
-                electron-packager  ^14.0.0
+                electron-packager  ^14.0.1
                 electron-rebuild  ^1.8.5
                 koffee          ^1.3.0
                 konrad          ^0.133.0

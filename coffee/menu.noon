@@ -6,7 +6,7 @@
 # 000   000  00000000  000   000   0000000
 
 ko
-    About                   cmdctrl+shift+/
+    About                   cmdctrl+alt+/
     -
     Preferences             cmdctrl+shift+,
     --
@@ -172,6 +172,7 @@ Window
     Minimize                alt+cmdctrl+shift+m
     Maximize                alt+cmdctrl+m
     Fullscreen              alt+cmdctrl+f
+    Hide                    cmdctrl+h
     ---
     Screenshot              f3
     Reload                  alt+cmdctrl+l
