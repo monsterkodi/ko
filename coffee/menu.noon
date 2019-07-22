@@ -6,7 +6,7 @@
 # 000   000  00000000  000   000   0000000
 
 ko
-    About                   cmdctrl+alt+/
+    About                   alt+cmdctrl+/
     -
     Preferences             cmdctrl+shift+,
     --

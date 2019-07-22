@@ -10,5 +10,5 @@ if rm -rf ko-win32-x64; then
     IGNORE="(.*\.dmg$|Icon$|/inno$|.*\.lock$|three/examples)"
     node_modules/.bin/electron-packager . --overwrite --icon=img/app.ico --ignore $IGNORE
     
-    ./ko-win32-x64/ko.exe &
+    start ./ko-win32-x64/ko.exe
 fi    

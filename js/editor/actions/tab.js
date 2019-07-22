@@ -1,4 +1,4 @@
-// koffee 0.56.0
+// koffee 1.3.0
 var _, ref, stopEvent;
 
 ref = require('kxk'), stopEvent = ref.stopEvent, _ = ref._;

@@ -1,4 +1,4 @@
-// koffee 0.56.0
+// koffee 1.3.0
 var _, clipboard, electron, empty, ref;
 
 ref = require('kxk'), empty = ref.empty, _ = ref._;
