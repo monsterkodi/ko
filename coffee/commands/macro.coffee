@@ -217,7 +217,7 @@ class Macro extends Command
 
                 class #{clss}
 
-                    constructor: () ->
+                    @: () ->
 
 
                 module.exports = #{clss}
