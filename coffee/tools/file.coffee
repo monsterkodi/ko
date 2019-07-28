@@ -6,7 +6,7 @@
 000       000  0000000  00000000
 ###
 
-{ empty, valid, childp, slash, atomic, fs, _ } = require 'kxk'
+{ empty, valid, childp, slash, fs, _ } = require 'kxk'
 
 class File
 
@@ -25,18 +25,17 @@ class File
                     # log "no icon? #{file}"
         className ?= 'file-icon'
         className
-    
-    @atomic: (file, text, mode, cb) ->
-
-        atomic file, text, { encoding: 'utf8', mode: mode }, (err) ->
-            if valid err then cb err
-            else cb null, file
-        
-    @write: (file, text, mode, cb) ->
             
-        fs.writeFile file, text, { encoding: 'utf8', mode: mode }, (err) ->
-            if valid err then cb err
-            else cb null, file
+    @write: (file, text, mode, cb) ->
+  
+        slash.writeText file, text, (done) ->
+            if empty done
+                cb "can't write #{file}"
+            else
+                cb null, done
+        # fs.writeFile file, text, { encoding: 'utf8', mode: mode }, (err) ->
+            # if valid err then cb err
+            # else cb null, file
     
     @unlock: (file, text, cb) ->
         
@@ -77,6 +76,6 @@ class File
                         
                         File.p4edit file, text, cb
             else
-                File.write file, text, 438, cb
+                File.write file, text, 0o666, cb
         
 module.exports = File
