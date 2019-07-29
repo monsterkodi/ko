@@ -6,7 +6,7 @@
 0000000    000   000   0000000   00     00  0000000   00000000
 ###
 
-{ post, slash, stopEvent, valid, empty, os, clamp, kerror, $ } = require 'kxk'
+{ post, slash, os, valid, empty, clamp, stopEvent, klog, kerror, $ } = require 'kxk'
 
 Command     = require '../commandline/command'
 FileBrowser = require '../browser/filebrowser'
@@ -21,11 +21,11 @@ class Browse extends Command
         @cmdID    = 0
         @browser  = new FileBrowser $ 'browser'
         @commands = Object.create null
-        @names    = ["browse", "Browse", "shelf"]
+        @names    = ['browse' 'Browse' 'shelf']
 
-        post.on 'file', @onFile
+        post.on 'file' @onFile
 
-        @browser.on 'itemActivated', @onBrowserItemActivated
+        @browser.on 'itemActivated' @onBrowserItemActivated
 
         @syntaxName = 'browser'
 
@@ -46,6 +46,8 @@ class Browse extends Command
 
     start: (action) ->
 
+        klog 'browse.start' action
+        
         @browser.start()
 
         if action != 'shelf'

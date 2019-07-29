@@ -6,7 +6,7 @@
 000       000  0000000  00000000        0000000    000   000   0000000   00     00  0000000   00000000  000   000
 ###
 
-{ post, valid, empty, last, elem, clamp, drag, clamp, state, slash, fs, os, $, _ } = require 'kxk'
+{ post, valid, empty, clamp, last, elem, drag, state, klog, slash, fs, os, $, _ } = require 'kxk'
 
 Browser  = require './browser'
 Shelf    = require './shelf'
@@ -133,7 +133,7 @@ class FileBrowser extends Browser
 
         if not @srcCache[item.file]?
 
-            @srcCache[item.file] = post.get 'indexer', 'file', item.file
+            @srcCache[item.file] = post.get 'indexer' 'file' item.file
 
         info = @srcCache[item.file]
 
@@ -232,7 +232,9 @@ class FileBrowser extends Browser
     # 000   000  000   000      0      000   0000000   000   000     000     00000000
 
     navigateToFile: (file) ->
-
+                
+        # klog 'filebrowser.navigateToFile' file
+                
         lastPath = @lastUsedColumn()?.path()
         if file == lastPath
             return
@@ -276,7 +278,7 @@ class FileBrowser extends Browser
                     col += 1
 
             paths = filelist.slice col0index
-
+            
         if slash.isFile last paths
             lastType = 'file'
         else
@@ -284,27 +286,39 @@ class FileBrowser extends Browser
 
         @popColumnsFrom   col+paths.length
         @clearColumnsFrom col
-
+        
         while @numCols() < paths.length
             @addColumn()
-
+        
         if col > 0
             @columns[col-1].row(slash.file paths[0])?.setActive()
 
         for index in [0...paths.length]
             type = if index == paths.length-1 then lastType else 'dir'
             file = paths[index]
+                      
+            if col == 0 == index and type == 'file'
+                type = 'dir'
+                file = slash.dir file
+                
             item = file:file, type:type
+            
             switch type
                 when 'file' then @loadFileItem item, col+index
                 when 'dir'
                     opt = {}
                     if index < paths.length-1
                         opt.active = paths[index+1]
+                    else if col == 0 == index and paths.length == 1
+                        opt.active = paths[0]
                     @loadDirItem item, col+index, opt
+                    
+            # if col == 0 == index and paths.length == 1
+                # @columns[col].row(slash.file paths[0])?.setActive()
 
         lastItem = file:last(paths), type:lastType
-        @emit 'itemActivated', lastItem
+        
+        @emit 'itemActivated' lastItem
 
     #  0000000   000   000  00000000  000  000      00000000
     # 000   000  0000  000  000       000  000      000
