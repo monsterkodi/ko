@@ -31,14 +31,14 @@ class Balancer
     setFileType: (fileType) ->
 
         lineComment = switch fileType
-            when 'coffee' 'koffee' 'sh' 'bat' 'noon' 'ko' 'txt' 'fish'     then '#'
-            when 'styl' 'cpp' 'c' 'h' 'hpp' 'cxx' 'cs' 'js' 'scss' 'ts'    then '//'
-            when 'iss' 'ini'                                               then ';'
+            when 'coffee' 'koffee' 'sh' 'bat' 'noon' 'ko' 'txt' 'fish'              then '#'
+            when 'styl' 'cpp' 'c' 'h' 'hpp' 'cxx' 'cs' 'js' 'scss' 'ts' 'swift'     then '//'
+            when 'iss' 'ini'                                                        then ';'
 
         multiComment = switch fileType
-            when 'coffee' 'koffee'                                         then open:'###'  close:'###'
-            when 'html' 'md'                                               then open:'<!--' close:'-->'
-            when 'styl' 'cpp' 'c' 'h' 'hpp' 'cxx' 'cs' 'js' 'scss' 'ts'    then open:'/*'   close:'*/'
+            when 'coffee' 'koffee'                                                  then open:'###'  close:'###'
+            when 'html' 'md'                                                        then open:'<!--' close:'-->'
+            when 'styl' 'cpp' 'c' 'h' 'hpp' 'cxx' 'cs' 'js' 'scss' 'ts' 'swift'     then open:'/*'   close:'*/'
 
         @regions =
             doubleString: clss:'string double' open:'"' close:'"'
