@@ -9,12 +9,11 @@
 { slash, walkdir, empty, noon, fs } = require 'kxk'
 
 ignore = require 'ignore'
-
-sourceFileExtensions = [ 'koffee', 'coffee', 'styl', 'pug', 'md', 'noon', 'txt', 'json', 'sh', 'py', 'cpp', 'cc', 'c', 'cs', 'h', 'hpp', 'ts', 'js']
+File = require '../tools/file'
 
 shouldIndex = (path, stat) ->
     
-    if slash.ext(path) in sourceFileExtensions
+    if slash.ext(path) in File.sourceFileExtensions
         if stat.size > 654321
             return false
         else

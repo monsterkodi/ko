@@ -8,6 +8,8 @@
 
 { slash, walkdir, fs, kerror } = require 'kxk'
 
+File = require './file'
+
 class Walker
 
     constructor: (@cfg) ->
@@ -18,12 +20,10 @@ class Walker
         @cfg.dotFiles    ?= false
         @cfg.includeDirs ?= true
         @cfg.maxFiles    ?= 500
-        @cfg.ignore      ?= ['node_modules', 'build', 'Build', 'Library', 'Applications'] #, 'resources', 'ThirdParty', 'Binaries', 'Intermediate', 'Saved', 'Programs', 'Shaders', 'DerivedDataCache', 'Content', 'Samples']
-        @cfg.include     ?= ['.konrad.noon', '.gitignore', '.npmignore']
-        @cfg.ignoreExt   ?= ['app', 'asar']
-        @cfg.includeExt  ?= ['koffee', 'coffee', 'styl', 'pug', 'md', 'noon', # 'html', 'css',
-                            'txt', 'json', 'sh', 'py', 'js', 'ts', 'ini',                          
-                            'cpp', 'cc', 'c', 'cs', 'h', 'hpp']
+        @cfg.ignore      ?= ['node_modules' 'build' 'Build' 'Library' 'Applications'] #, 'resources' 'ThirdParty' 'Binaries' 'Intermediate' 'Saved' 'Programs' 'Shaders' 'DerivedDataCache' 'Content' 'Samples']
+        @cfg.include     ?= ['.konrad.noon' '.gitignore' '.npmignore']
+        @cfg.ignoreExt   ?= ['app' 'asar']
+        @cfg.includeExt  ?= File.sourceFileExtensions
       
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -43,7 +43,7 @@ class Walker
 
                 if cfg.filter?(p)
                     return @ignore p
-                else if name in ['.DS_Store', 'Icon\r'] or extn in ['pyc']
+                else if name in ['.DS_Store' 'Icon\r'] or extn in ['pyc']
                     return @ignore p
                 else if name.endsWith '-x64'
                     return @ignore p

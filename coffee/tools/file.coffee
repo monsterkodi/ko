@@ -9,6 +9,8 @@
 { empty, valid, childp, slash, fs, _ } = require 'kxk'
 
 class File
+    
+    @sourceFileExtensions: [ 'koffee' 'coffee' 'styl' 'swift' 'pug' 'md' 'noon' 'txt' 'json' 'sh' 'py' 'cpp' 'cc' 'c' 'cs' 'h' 'hpp' 'ts' 'js']
 
     @iconClassName: (file) ->
         
