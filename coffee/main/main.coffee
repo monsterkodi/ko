@@ -82,7 +82,7 @@ class Main extends app
             dir:        __dirname
             dirs:       ['../', '../browser', '../commandline', '../commands', '../editor', '../git', '../main', '../tools', '../win']
             pkg:        pkg
-            shortcut:   'CmdOrCtrl+F1'
+            shortcut:   'Alt+F1'
             index:      '../index.html'
             icon:       '../../img/app.ico'
             tray:       '../../img/menu@2x.png'
