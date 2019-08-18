@@ -544,7 +544,7 @@ class TextEditor extends Editor
 
         @emit 'viewHeight', vh
 
-    screenSize: -> electron.screen.getPrimaryDisplay().workAreaSize
+    screenSize: -> electron.remote.screen.getPrimaryDisplay().workAreaSize
 
     # 00000000    0000000    0000000
     # 000   000  000   000  000

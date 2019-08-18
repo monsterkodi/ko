@@ -285,7 +285,7 @@
 .li1.marker {
   color: transparent;
 }
-.li1.marker::before {
+.li1.marker:before {
   color: #0f0;
 }
 .li2 {
@@ -294,7 +294,7 @@
 .li2.marker {
   color: transparent;
 }
-.li2.marker::before {
+.li2.marker:before {
   color: #0a0;
 }
 .li3 {
@@ -303,7 +303,7 @@
 .li3.marker {
   color: transparent;
 }
-.li3.marker::before {
+.li3.marker:before {
   color: #080;
 }
 .bold {

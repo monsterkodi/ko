@@ -115,19 +115,19 @@
         &.punct
             opacity  0.5
 
-    &.marker.head
-    &.marker.tail
-        color       transparent
+    &.marker
+        opacity     1
+        color       #55f
+            
+    &.tail:before
+        color   #88f
+    &.head:before
+        color   #88f
         
-    &.marker.tail::before
-        border-color        #88f
-    &.marker.head::before
-        border-left-color   #88f
-        
-    &.marker.tail.bound::before
-        border-color        #f40
-    &.marker.head.bound::before
-        border-left-color   #f40
+    &.tail.bound:before
+        color   #f40
+    &.head.bound:before
+        color   #f40
             
 // 00     00  00000000  000000000  000   000   0000000   0000000
 // 000   000  000          000     000   000  000   000  000   000
@@ -303,15 +303,15 @@
     color       #060
 &.li1
     color       transparent
-&.li1::before
+&.li1:before
     color       #080
 &.li2
     color       transparent
-&.li2::before
+&.li2:before
     color       #090
 &.li3
     color       transparent
-&.li3::before
+&.li3:before
     color       #0a0
 &.bold
     color        #000

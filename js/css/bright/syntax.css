@@ -109,27 +109,26 @@
 .function.argument.punct {
   opacity: 0.5;
 }
-.func.marker.head,
-.function.marker.head,
-.func.marker.tail,
-.function.marker.tail {
-  color: transparent;
+.func.marker,
+.function.marker {
+  opacity: 1;
+  color: #55f;
 }
-.func.marker.tail::before,
-.function.marker.tail::before {
-  border-color: #88f;
+.func.tail:before,
+.function.tail:before {
+  color: #88f;
 }
-.func.marker.head::before,
-.function.marker.head::before {
-  border-left-color: #88f;
+.func.head:before,
+.function.head:before {
+  color: #88f;
 }
-.func.marker.tail.bound::before,
-.function.marker.tail.bound::before {
-  border-color: #f40;
+.func.tail.bound:before,
+.function.tail.bound:before {
+  color: #f40;
 }
-.func.marker.head.bound::before,
-.function.marker.head.bound::before {
-  border-left-color: #f40;
+.func.head.bound:before,
+.function.head.bound:before {
+  color: #f40;
 }
 .class.function,
 .method {
@@ -279,19 +278,19 @@
 .li1 {
   color: transparent;
 }
-.li1::before {
+.li1:before {
   color: #080;
 }
 .li2 {
   color: transparent;
 }
-.li2::before {
+.li2:before {
   color: #090;
 }
 .li3 {
   color: transparent;
 }
-.li3::before {
+.li3:before {
   color: #0a0;
 }
 .bold {

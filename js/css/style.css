@@ -714,13 +714,13 @@ body {
   cursor: pointer;
   -webkit-user-select: none;
 }
-.li1.marker::before {
+.li1.marker:before {
   content: '▸';
 }
-.li2.marker::before {
+.li2.marker:before {
   content: '▪';
 }
-.li3.marker::before {
+.li3.marker:before {
   content: '◆';
 }
 .function.head,
