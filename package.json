@@ -1,7 +1,7 @@
 {
   "name": "ko",
   "productName": "ko",
-  "version": "0.247.0",
+  "version": "0.248.0",
   "description": "text editor",
   "main": "js/main/main.js",
   "preferGlobal": true,

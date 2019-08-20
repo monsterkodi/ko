@@ -46,7 +46,7 @@ class Browse extends Command
 
     start: (action) ->
 
-        klog 'browse.start' action
+        # klog 'browse.start' action
         
         @browser.start()
 
