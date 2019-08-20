@@ -6,14 +6,14 @@
  0000000   0000000   0000000   0000000   000   000  0000000     
 */
 body {
-  background: #0d0d0d;
+  background: #000;
   color: #fff;
 }
 .split-handle {
   background: #222;
 }
 .browser {
-  background: #0d0d0d;
+  background: #000;
   color: #fff;
 }
 .browserRow.hover {
@@ -42,7 +42,7 @@ body {
   color: #888;
 }
 #shelf .browserRow.active {
-  background: #0d0d0d;
+  background: #000;
 }
 #shelf {
   background: #111;
@@ -52,7 +52,7 @@ body {
 }
 #commandline-editor {
   color: #fff;
-  background: #0d0d0d;
+  background: #000;
 }
 .commandlist {
   background: #181818;
@@ -80,7 +80,7 @@ body {
   background: #222;
 }
 #commandline-button.empty {
-  background: #0d0d0d;
+  background: #000;
   border-right-color: #222;
 }
 #commandline-button.active {
@@ -145,7 +145,7 @@ span.macro.macro,
   color: #ff0;
 }
 #info {
-  background: #0d0d0d;
+  background: #000;
   border-left-color: #222;
 }
 .info-cursor-line,
@@ -222,7 +222,7 @@ span.macro.macro,
 #terminal,
 #editor {
   color: #ddd;
-  background: #0d0d0d;
+  background: #000;
   border-color: #222;
 }
 #split {
@@ -361,14 +361,14 @@ span.macro.macro,
   background: #222;
 }
 .minimap {
-  background: #0d0d0d;
+  background: #000;
   border-left-color: #222;
 }
 .topbot {
   background-color: #181818;
 }
 .minimapTopBot {
-  background-color: #0d0d0d;
+  background-color: #000;
 }
 .highlight {
   color: rgba(255,0,255,0.5);

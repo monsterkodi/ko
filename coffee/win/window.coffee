@@ -55,9 +55,9 @@ filehandler = null
 # 000        000   000  000       000            000
 # 000        000   000  00000000  000       0000000
 
-window.state = new store 'state', separator: '|'
+window.state = new store 'state' separator:'|'
 window.prefs = prefs
-window.stash = new stash "win/#{winID}"
+window.stash = new stash "win/#{winID}" separator:'|'
 
 post.setMaxListeners 20
 
@@ -82,15 +82,15 @@ restoreWin = ->
 # 000        000   000       000     000
 # 000         0000000   0000000      000
 
-post.on 'singleCursorAtPos', (pos, opt) ->
+post.on 'singleCursorAtPos' (pos, opt) ->
     editor.singleCursorAtPos pos, opt
     editor.scroll.cursorToTop()
-post.on 'focusEditor',       -> split.focus 'editor'
-post.on 'cloneFile',         -> post.toMain 'newWindowWithFile', editor.currentFile
-post.on 'reloadWin',         -> reloadWin()
-post.on 'closeWindow',       -> window.win.close()
-post.on 'saveStash',         -> saveStash()
-post.on 'editorFocus', (editor) ->
+post.on 'focusEditor'  -> split.focus 'editor'
+post.on 'cloneFile'    -> post.toMain 'newWindowWithFile', editor.currentFile
+post.on 'reloadWin'    -> reloadWin()
+post.on 'closeWindow'  -> window.win.close()
+post.on 'saveStash'    -> saveStash()
+post.on 'editorFocus' (editor) ->
     window.setLastFocus editor.name
     window.focusEditor = editor
     window.textEditor = editor if editor.name != 'commandline-editor'
@@ -149,7 +149,7 @@ winMain = ->
             post.toOtherWins 'fileLineChanges', editor.currentFile, changeInfo.changes
             navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
 
-    s = window.stash.get 'fontSize', prefs.get 'editorFontSize', 19
+    s = window.stash.get 'fontSize' prefs.get 'editorFontSize', 19
     editor.setFontSize s if s
 
     if window.stash.get 'centerText'
@@ -208,10 +208,10 @@ window.onload = ->
 
     split.resized()
     info.reload()
-    win.on 'close', onClose
-    win.on 'move',  onMove
-    win.webContents.on 'devtools-opened', -> window.stash.set 'devTools', true
-    win.webContents.on 'devtools-closed', -> window.stash.set 'devTools'
+    win.on 'close' onClose
+    win.on 'move'  onMove
+    win.webContents.on 'devtools-opened' -> window.stash.set 'devTools', true
+    win.webContents.on 'devtools-closed' -> window.stash.set 'devTools'
 
 # 00000000   00000000  000       0000000    0000000   0000000
 # 000   000  000       000      000   000  000   000  000   000
@@ -235,8 +235,8 @@ reloadWin = ->
 window.onresize = ->
 
     split.resized()
-    window.stash.set 'bounds', win.getBounds()
-    if window.stash.get 'centerText', false
+    window.stash.set 'bounds' win.getBounds()
+    if window.stash.get 'centerText' false
         editor.centerText true, 200
 
 post.on 'split', (s) ->
@@ -258,11 +258,11 @@ toggleCenterText = ->
         editor.toggleInvisibles()
         restoreInvisibles = true
 
-    if not window.stash.get 'centerText', false
-        window.stash.set 'centerText', true
+    if not window.stash.get 'centerText' false
+        window.stash.set 'centerText' true
         editor.centerText true
     else
-        window.stash.set 'centerText', false
+        window.stash.set 'centerText' false
         editor.centerText false
 
     if restoreInvisibles
@@ -276,13 +276,13 @@ toggleCenterText = ->
 
 setFontSize = (s) ->
 
-    s = prefs.get('editorFontSize', 19) if not _.isFinite s
+    s = prefs.get('editorFontSize' 19) if not _.isFinite s
     s = clamp 8, 100, s
 
-    window.stash.set "fontSize", s
+    window.stash.set "fontSize" s
     editor.setFontSize s
     if editor.currentFile?
-        post.emit 'loadFile', editor.currentFile, reload:true
+        post.emit 'loadFile' editor.currentFile, reload:true
 
 changeFontSize = (d) ->
 
@@ -298,8 +298,8 @@ changeFontSize = (d) ->
 
 resetFontSize = ->
 
-    defaultFontSize = prefs.get 'editorFontSize', 19
-    window.stash.set 'fontSize', defaultFontSize
+    defaultFontSize = prefs.get 'editorFontSize' 19
+    window.stash.set 'fontSize' defaultFontSize
     setFontSize defaultFontSize
 
 addToShelf = ->

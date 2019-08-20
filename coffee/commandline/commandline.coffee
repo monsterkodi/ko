@@ -53,7 +53,7 @@ class Commandline extends TextEditor
     stash: =>
 
         if @command?
-            window.stash.set 'commandline', @command.state()
+            window.stash.set 'commandline' @command.state()
 
     restore: =>
 

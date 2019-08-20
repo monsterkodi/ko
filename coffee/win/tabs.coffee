@@ -268,8 +268,8 @@ class Tabs
 
     restore: =>
 
-        active = window.stash.get 'tabs:active', 0
-        files  = window.stash.get 'tabs:files'
+        active = window.stash.get 'tabs|active' 0
+        files  = window.stash.get 'tabs|files'
 
         return if empty files # happens when first window opens
 

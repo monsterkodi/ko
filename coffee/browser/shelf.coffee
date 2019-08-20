@@ -24,14 +24,14 @@ class Shelf extends Column
         @index  = -1
         @div.id = 'shelf'
         
-        @showHistory = window.stash.get 'shelf:history', true
+        @showHistory = window.stash.get 'shelf|history' true
 
-        post.on 'gitStatus',              @loadGitStatus
-        post.on 'addToShelf',             @addPath
-        post.on 'navigateHistoryChanged', @onNavigateHistoryChanged
-        post.on 'navigateIndexChanged',   @onNavigateIndexChanged
+        post.on 'gitStatus'              @loadGitStatus
+        post.on 'addToShelf'             @addPath
+        post.on 'navigateHistoryChanged' @onNavigateHistoryChanged
+        post.on 'navigateIndexChanged'   @onNavigateIndexChanged
         
-        post.on 'file', @onFile
+        post.on 'file' @onFile
         
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  0000000     00000000    0000000   000   000  
     # 000   000  000          000     000  000   000  000   000     000     000         000   000  000   000  000 0 000  
@@ -228,8 +228,8 @@ class Shelf extends Column
             @loadHistory()
         else
             @removeHistory()
-        window.stash.set 'shelf:history', @showHistory
-    
+        window.stash.set 'shelf|history' @showHistory
+        window.stash.set 'shelf|history' @showHistory
     clearHistory: =>
         
         window.navigate.clear()

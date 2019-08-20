@@ -102,7 +102,7 @@ class FileHandler
             if files.length == 0
                 return []
     
-            window.stash.set 'openFilePath', slash.dir files[0]
+            window.stash.set 'openFilePath' slash.dir files[0]
     
             if not options?.newWindow and not options?.newTab
                 file = slash.resolve files.shift()
@@ -110,9 +110,9 @@ class FileHandler
     
             for file in files
                 if options?.newWindow
-                    post.toMain 'newWindowWithFile', file
+                    post.toMain 'newWindowWithFile' file
                 else
-                    post.emit 'newTabWithFile', file
+                    post.emit 'newTabWithFile' file
     
             return ofiles
           
@@ -127,7 +127,7 @@ class FileHandler
         if file == editor?.currentFile
             @loadFile editor?.currentFile, reload:true
         else
-            post.emit 'revertFile', file
+            post.emit 'revertFile' file
                 
     # 00000000   00000000  000       0000000    0000000   0000000          00000000  000  000      00000000  
     # 000   000  000       000      000   000  000   000  000   000        000       000  000      000       

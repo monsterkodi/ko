@@ -46,7 +46,7 @@ class FileBrowser extends Browser
             target:  @shelfResize
             onMove:  @onShelfDrag
 
-        @shelfSize = window.state.get 'shelf:size', 200
+        @shelfSize = window.state.get 'shelf|size', 200
 
         @initColumns()
 
