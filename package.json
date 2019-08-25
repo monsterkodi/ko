@@ -1,7 +1,7 @@
 {
   "name": "ko",
   "productName": "ko",
-  "version": "0.249.0",
+  "version": "0.250.0",
   "description": "text editor",
   "main": "js/main/main.js",
   "preferGlobal": true,
@@ -38,7 +38,7 @@
     "ignore": "^5.1.4",
     "js-beautify": "^1.10.2",
     "klor": "^1.4.0",
-    "kxk": "^0.336.0",
+    "kxk": "^0.337.0",
     "seamless-immutable": "^7.1.4",
     "trash": "^6.0.0",
     "unused-filename": "^2.1.0"
