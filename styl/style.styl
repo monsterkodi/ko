@@ -53,7 +53,6 @@ body
     overflow            hidden
     font-family         font
     -webkit-user-select none
-    -webkit-app-region  no-drag
 
 @keyframes fadein
    from
@@ -406,7 +405,6 @@ infoPadding = 6px
     flex-direction      row
     overflow-x          auto
     overflow-y          hidden
-    -webkit-app-region  no-drag
 
     &::-webkit-scrollbar
         height          2px
@@ -440,7 +438,6 @@ infoPadding = 6px
         opacity         0.5
 
 .tabdrag
-    -webkit-app-region  drag
     height              titlebarHeight
     width               titlebarHeight
     position            absolute
@@ -944,7 +941,6 @@ infoPadding = 6px
     white-space         nowrap
     pointer-events      auto
     cursor              pointer
-    -webkit-app-region  drag
 
 .titlebar-title
     flex                0
@@ -952,7 +948,6 @@ infoPadding = 6px
     flex-direction      row
     padding-top         7px
     padding-right       10px
-    -webkit-app-region  drag
     font                titlebarFont
     
 .titlebar-dot
@@ -963,14 +958,12 @@ infoPadding = 6px
     margin-top          -1px
 
 #titlebar .winicon img
-    -webkit-app-region  no-drag
     padding-left        10px
     padding-top         3px
     width               22px
     height              22px
     
 #titlebar .winbutton
-    -webkit-app-region  no-drag
     flex                0 0 45px
     display             inline-block
     text-align          center
@@ -982,7 +975,6 @@ infoPadding = 6px
         flex            0 0 46px
 
 #titlebar .topframe
-    -webkit-app-region  no-drag
     height              2px
     position            absolute
     left                0
@@ -995,19 +987,14 @@ infoPadding = 6px
 // 000 0 000  000       000  0000  000   000  
 // 000   000  00000000  000   000   0000000   
             
-.menuItem
-    -webkit-app-region  no-drag
-    
 .menu
     height              titlebarHeight
     pointer-events      auto
-    -webkit-app-region  drag
     flex                1 1 0
     display             flex
     flex-direction      row
     
 .menuItem
-    -webkit-app-region  no-drag
     cursor              pointer
     padding-left        10px
     padding-right       10px

@@ -86,7 +86,7 @@ post.on 'singleCursorAtPos' (pos, opt) ->
     editor.singleCursorAtPos pos, opt
     editor.scroll.cursorToTop()
 post.on 'focusEditor'  -> split.focus 'editor'
-post.on 'cloneFile'    -> post.toMain 'newWindowWithFile', editor.currentFile
+post.on 'cloneFile'    -> post.toMain 'newWindowWithFile' editor.currentFile
 post.on 'reloadWin'    -> reloadWin()
 post.on 'closeWindow'  -> window.win.close()
 post.on 'saveStash'    -> saveStash()
@@ -97,11 +97,11 @@ post.on 'editorFocus' (editor) ->
 
 # testing related ...
 
-post.on 'mainlog', -> klog.apply klog, arguments
+post.on 'mainlog' -> klog.apply klog, arguments
 
-post.on 'ping', (wID, argA, argB) -> post.toWin wID, 'pong', winID, argA, argB
-post.on 'postEditorState', ->
-    post.toAll 'editorState', winID,
+post.on 'ping' (wID, argA, argB) -> post.toWin wID, 'pong' winID, argA, argB
+post.on 'postEditorState' ->
+    post.toAll 'editorState' winID,
         lines:      editor.lines()
         cursors:    editor.cursors()
         main:       editor.mainCursor()
@@ -138,18 +138,18 @@ winMain = ->
     window.lastFocus = editor.name
 
     restoreWin()
-    scheme.set prefs.get 'scheme', 'dark'
+    scheme.set prefs.get 'scheme' 'dark'
 
-    terminal.on 'fileSearchResultChange', (file, lineChange) -> # sends changes to all windows
-        post.toWins 'fileLineChanges', file, [lineChange]
+    terminal.on 'fileSearchResultChange' (file, lineChange) -> # sends changes to all windows
+        post.toWins 'fileLineChanges' file, [lineChange]
 
-    editor.on 'changed', (changeInfo) ->
+    editor.on 'changed' (changeInfo) ->
         return if changeInfo.foreign
         if changeInfo.changes.length
-            post.toOtherWins 'fileLineChanges', editor.currentFile, changeInfo.changes
+            post.toOtherWins 'fileLineChanges' editor.currentFile, changeInfo.changes
             navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
 
-    s = window.stash.get 'fontSize' prefs.get 'editorFontSize', 19
+    s = window.stash.get 'fontSize' prefs.get 'editorFontSize' 19
     editor.setFontSize s if s
 
     if window.stash.get 'centerText'
@@ -168,7 +168,7 @@ window.editorWithName = (n) ->
 
     switch n
         when 'editor'   then editor
-        when 'command', 'commandline' then commandline
+        when 'command' 'commandline' then commandline
         when 'terminal' then terminal
         else editor
 
@@ -178,12 +178,12 @@ window.editorWithName = (n) ->
 # 000   000  000  0000  000       000      000   000       000  000
 #  0000000   000   000   0000000  0000000   0000000   0000000   00000000
 
-onMove  = -> window.stash.set 'bounds', win.getBounds()
+onMove  = -> window.stash.set 'bounds' win.getBounds()
 
 clearListeners = ->
 
-    win.removeListener 'close', onClose
-    win.removeListener 'move',  onMove
+    win.removeListener 'close' onClose
+    win.removeListener 'move'  onMove
     win.webContents.removeAllListeners 'devtools-opened'
     win.webContents.removeAllListeners 'devtools-closed'
 
@@ -210,7 +210,7 @@ window.onload = ->
     info.reload()
     win.on 'close' onClose
     win.on 'move'  onMove
-    win.webContents.on 'devtools-opened' -> window.stash.set 'devTools', true
+    win.webContents.on 'devtools-opened' -> window.stash.set 'devTools' true
     win.webContents.on 'devtools-closed' -> window.stash.set 'devTools'
 
 # 00000000   00000000  000       0000000    0000000   0000000
@@ -239,7 +239,7 @@ window.onresize = ->
     if window.stash.get 'centerText' false
         editor.centerText true, 200
 
-post.on 'split', (s) ->
+post.on 'split' (s) ->
 
     filebrowser.resized()
     terminal.resized()
@@ -310,7 +310,7 @@ addToShelf = ->
         path = fileBrowser.columnWithName(window.lastFocus).activePath()
     else
         path = editor.currentFile
-    post.emit 'addToShelf', path
+    post.emit 'addToShelf' path
 
 # 0000000   0000000    0000000   00     00
 #    000   000   000  000   000  000   000
@@ -337,9 +337,9 @@ changeZoom: (d) ->
 # 000       000   000  000       000   000       000
 # 000        0000000    0000000   0000000   0000000
 
-window.onblur  = (event) -> post.emit 'winFocus', false
+window.onblur  = (event) -> post.emit 'winFocus' false
 window.onfocus = (event) ->
-    post.emit 'winFocus', true
+    post.emit 'winFocus' true
     if document.activeElement.className == 'body'
         if split.editorVisible()
             split.focus 'editor'
@@ -374,7 +374,7 @@ onMenuAction = (name, args) ->
         when 'Copy'                  then return window.focusEditor.copy()
         when 'Paste'                 then return window.focusEditor.paste()
         when 'New Tab'               then return post.emit 'newEmptyTab'
-        when 'New Window'            then return post.toMain 'newWindowWithFile', editor.currentFile
+        when 'New Window'            then return post.toMain 'newWindowWithFile' editor.currentFile
         when 'Toggle Scheme'         then return scheme.toggle()
         when 'Toggle Center Text'    then return toggleCenterText()
         when 'Increase'              then return changeFontSize +1
@@ -391,8 +391,8 @@ onMenuAction = (name, args) ->
         when 'Move Tab Left'         then return window.tabs.move 'left'
         when 'Move Tab Right'        then return window.tabs.move 'right'
         when 'Open...'               then return post.emit 'openFile'
-        when 'Open In New Tab...'    then return post.emit 'openFile', newTab: true
-        when 'Open In New Window...' then return post.emit 'openFile', newWindow: true
+        when 'Open In New Tab...'    then return post.emit 'openFile' newTab: true
+        when 'Open In New Window...' then return post.emit 'openFile' newWindow: true
         when 'Save'                  then return post.emit 'saveFile'
         when 'Save All'              then return post.emit 'saveAll'
         when 'Save As ...'           then return post.emit 'saveFileAs'
@@ -402,17 +402,17 @@ onMenuAction = (name, args) ->
         when 'Close Other Tabs'      then return post.emit 'closeOtherTabs'
         when 'Close Other Windows'   then return post.toOtherWins 'closeWindow'
         when 'Fullscreen'            then return win.setFullScreen !win.isFullScreen()
-        when 'Clear List'            then return window.state.set 'recentFiles', []
-        when 'Preferences'           then return post.emit 'openFiles', [prefs.store.file], newTab:true
+        when 'Clear List'            then return window.state.set 'recentFiles' []
+        when 'Preferences'           then return post.emit 'openFiles' [prefs.store.file], newTab:true
 
     switch name
         when 'Cycle Windows' then args = winID
 
     # log "unhandled menu action! posting to main '#{name}' args:", args
 
-    post.toMain 'menuAction', name, args
+    post.toMain 'menuAction' name, args
 
-post.on 'menuAction', onMenuAction
+post.on 'menuAction' onMenuAction
 
 # 000   000  00000000  000   000
 # 000  000   000        000 000
@@ -431,7 +431,7 @@ onCombo = (combo, info) ->
 
     for i in [1..9]
         if combo is "alt+#{i}"
-            return stopEvent event, post.toMain 'activateWindow', i
+            return stopEvent event, post.toMain 'activateWindow' i
 
     switch combo
         when 'f3'                 then return stopEvent event, screenShot()
@@ -440,6 +440,6 @@ onCombo = (combo, info) ->
         when 'command+shift+0'    then return stopEvent event, @resetZoom()
         when 'command+alt+y'      then return stopEvent event, split.do 'minimize editor'
 
-post.on 'combo', onCombo
+post.on 'combo' onCombo
 
 winMain()

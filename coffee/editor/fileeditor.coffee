@@ -36,9 +36,9 @@ class FileEditor extends TextEditor
 
         @view.addEventListener "contextmenu", @onContextMenu
 
-        post.on 'commandline',   @onCommandline
-        post.on 'jumpTo',        @jumpTo
-        post.on 'jumpToFile',    @jumpToFile
+        post.on 'commandline'   @onCommandline
+        post.on 'jumpTo'        @jumpTo
+        post.on 'jumpToFile'    @jumpToFile
 
         @initPigments()
         @initInvisibles()
@@ -57,7 +57,7 @@ class FileEditor extends TextEditor
         dirty = @do.hasLineChanges()
         if @dirty != dirty
             @dirty = dirty
-            post.emit 'dirty', @dirty
+            post.emit 'dirty' @dirty
 
     # 00000000  000  000      00000000
     # 000       000  000      000
@@ -96,11 +96,11 @@ class FileEditor extends TextEditor
         if fileExists
             @watch = new Watcher @currentFile
 
-        post.emit 'file', @currentFile # browser & shelf
+        post.emit 'file' @currentFile # browser & shelf
 
-        @emit 'file', @currentFile # diffbar, pigments, ...
+        @emit 'file' @currentFile # diffbar, pigments, ...
 
-        post.emit 'dirty', @dirty
+        post.emit 'dirty' @dirty
 
     restoreFromTabState: (tabsState) ->
 
@@ -140,7 +140,7 @@ class FileEditor extends TextEditor
     onCommandline: (e) =>
 
         switch e
-            when 'hidden', 'shown'
+            when 'hidden' 'shown'
                 d = window.split.commandlineHeight + window.split.handleHeight
                 d = Math.min d, @scroll.scrollMax - @scroll.scroll
                 d *= -1 if e == 'hidden'
@@ -224,14 +224,14 @@ class FileEditor extends TextEditor
 
         window.tabs.activeTab true
 
-        # log 'jumpToFile', require('kxk').noon.stringify opt
+        # log 'jumpToFile' require('kxk').noon.stringify opt
 
         if opt.newTab
 
             file = opt.file
             file += ':' + opt.line if opt.line
             file += ':' + opt.col if opt.col
-            post.emit 'newTabWithFile', file
+            post.emit 'newTabWithFile' file
 
         else
 
@@ -267,14 +267,14 @@ class FileEditor extends TextEditor
         type = opt?.type
 
         if not type or type == 'class'
-            classes = post.get 'indexer', 'classes'
+            classes = post.get 'indexer' 'classes'
             for clss, info of classes
                 if clss.toLowerCase() == find
                     @jumpToFile info
                     return true
 
         if not type or type == 'func'
-            funcs = post.get 'indexer', 'funcs'
+            funcs = post.get 'indexer' 'funcs'
             for func, infos of funcs
                 if func.toLowerCase() == find
                     info = infos[0]
@@ -287,7 +287,7 @@ class FileEditor extends TextEditor
                     return true
 
         if not type or type == 'file'
-            files = post.get 'indexer', 'files'
+            files = post.get 'indexer' 'files'
             for file, info of files
                 if slash.base(file).toLowerCase() == find and file != @currentFile
                     @jumpToFile file:file, line:6
@@ -311,25 +311,25 @@ class FileEditor extends TextEditor
         currext = slash.ext @currentFile
 
         switch currext
-            when 'coffee', 'koffee'
+            when 'coffee' 'koffee'
                 [file,line,col] = srcmap.toJs @currentFile, cp[1]+1, cp[0]
                 if file?
-                    post.emit 'loadFile', slash.joinFileLine file,line,col
+                    post.emit 'loadFile' slash.joinFileLine file,line,col
                     return true
             when 'js'
                 [file,line,col] = srcmap.toCoffee @currentFile, cp[1]+1, cp[0]
                 if file?
-                    post.emit 'loadFile', slash.joinFileLine file,line,col
+                    post.emit 'loadFile' slash.joinFileLine file,line,col
                     return true
 
         counterparts =
-            'cpp':     ['hpp', 'h']
-            'cc':      ['hpp', 'h']
-            'h':       ['cpp', 'c']
-            'hpp':     ['cpp', 'c']
+            'cpp':     ['hpp' 'h']
+            'cc':      ['hpp' 'h']
+            'h':       ['cpp' 'c']
+            'hpp':     ['cpp' 'c']
             'coffee':  ['js']
             'koffee':  ['js']
-            'js':      ['coffee','koffee']
+            'js':      ['coffee''koffee']
             'pug':     ['html']
             'html':    ['pug']
             'css':     ['styl']
@@ -337,14 +337,14 @@ class FileEditor extends TextEditor
 
         for ext in (counterparts[currext] ? [])
             if slash.fileExists slash.swapExt @currentFile, ext
-                post.emit 'loadFile', slash.swapExt @currentFile, ext
+                post.emit 'loadFile' slash.swapExt @currentFile, ext
                 return true
 
         for ext in (counterparts[currext] ? [])
             counter = swapExt @currentFile, ext
             counter = counter.replace "/#{currext}/", "/#{ext}/"
             if slash.fileExists counter
-                post.emit 'loadFile', counter
+                post.emit 'loadFile' counter
                 return true
         false
 
@@ -372,11 +372,11 @@ class FileEditor extends TextEditor
         @updateLinePositions animate
 
         if animate
-            layers = ['.selections', '.highlights', '.cursors']
-            transi = ['.selection',  '.highlight',  '.cursor' ].concat layers
+            layers = ['.selections' '.highlights' '.cursors']
+            transi = ['.selection'  '.highlight'  '.cursor' ].concat layers
             resetTrans = =>
-                setStyle '.editor .layers '+l, 'transform', "translateX(0)" for l in layers
-                setStyle '.editor .layers '+t, 'transition', "initial" for t in transi
+                setStyle '.editor .layers '+l, 'transform' "translateX(0)" for l in layers
+                setStyle '.editor .layers '+t, 'transition' "initial" for t in transi
                 @updateLayers()
 
             if center
@@ -387,8 +387,8 @@ class FileEditor extends TextEditor
                 offsetX -= @size.numbersWidth + @size.charWidth/2
                 offsetX *= -1
 
-            setStyle '.editor .layers '+l, 'transform', "translateX(#{offsetX}px)" for l in layers
-            setStyle '.editor .layers '+t, 'transition', "all #{animate/1000}s" for t in transi
+            setStyle '.editor .layers '+l, 'transform' "translateX(#{offsetX}px)" for l in layers
+            setStyle '.editor .layers '+t, 'transition' "all #{animate/1000}s" for t in transi
             setTimeout resetTrans, animate
         else
             @updateLayers()
@@ -414,7 +414,7 @@ class FileEditor extends TextEditor
         ,
             text:   'Back'
             combo:  'command+1'
-            cb:     -> post.emit 'menuAction', 'Navigate Backward'
+            cb:     -> post.emit 'menuAction' 'Navigate Backward'
         ,
             text:   ''
         ,
@@ -459,7 +459,7 @@ class FileEditor extends TextEditor
         switch combo
             when 'alt+ctrl+enter'       then return window.commandline.commands.coffee.executeText @textOfSelectionForClipboard()
             when 'alt+ctrl+shift+enter' then return window.commandline.commands.coffee.executeTextInMain @textOfSelectionForClipboardt()
-            when 'command+alt+up', 'alt+o' then return @jumpToCounterpart()
+            when 'command+alt+up' 'alt+o' then return @jumpToCounterpart()
             when 'esc'
                 split = window.split
                 if split.terminalVisible()

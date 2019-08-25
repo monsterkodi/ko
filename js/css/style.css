@@ -21,7 +21,6 @@ body {
   overflow: hidden;
   font-family: "MesloLGS Nerd Font Mono", "Meslo LG S", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono", "Cousine", "Andale Mono", monospace;
   -webkit-user-select: none;
-  -webkit-app-region: no-drag;
 }
 #main {
   animation: fadein 1s;
@@ -309,7 +308,6 @@ body {
   flex-direction: row;
   overflow-x: auto;
   overflow-y: hidden;
-  -webkit-app-region: no-drag;
 }
 .tabs::-webkit-scrollbar {
   height: 2px;
@@ -332,7 +330,6 @@ body {
   opacity: 0.5;
 }
 .tabdrag {
-  -webkit-app-region: drag;
   height: 30px;
   width: 30px;
   position: absolute;
@@ -770,7 +767,6 @@ body {
   white-space: nowrap;
   pointer-events: auto;
   cursor: pointer;
-  -webkit-app-region: drag;
 }
 .titlebar-title {
   flex: 0;
@@ -778,7 +774,6 @@ body {
   flex-direction: row;
   padding-top: 7px;
   padding-right: 10px;
-  -webkit-app-region: drag;
   font: Bahnschrift Light, Helvetica Neue, Ebrima, Varela Round, Helvetica, Arial;
 }
 .titlebar-dot {
@@ -789,14 +784,12 @@ body {
   margin-top: -1px;
 }
 #titlebar .winicon img {
-  -webkit-app-region: no-drag;
   padding-left: 10px;
   padding-top: 3px;
   width: 22px;
   height: 22px;
 }
 #titlebar .winbutton {
-  -webkit-app-region: no-drag;
   flex: 0 0 45px;
   display: inline-block;
   text-align: center;
@@ -809,26 +802,20 @@ body {
   flex: 0 0 46px;
 }
 #titlebar .topframe {
-  -webkit-app-region: no-drag;
   height: 2px;
   position: absolute;
   left: 0;
   top: 0;
   right: 135px;
 }
-.menuItem {
-  -webkit-app-region: no-drag;
-}
 .menu {
   height: 30px;
   pointer-events: auto;
-  -webkit-app-region: drag;
   flex: 1 1 0;
   display: flex;
   flex-direction: row;
 }
 .menuItem {
-  -webkit-app-region: no-drag;
   cursor: pointer;
   padding-left: 10px;
   padding-right: 10px;
