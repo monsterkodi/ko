@@ -71,7 +71,7 @@ class FileBrowser extends Browser
 
         switch item.type
             when 'file' then @loadFileItem item
-            when 'dir'  then @loadDirItem  item, 0, active:'..'
+            when 'dir'  then @loadDirItem  item, 0, opt #, active:'..'
 
         if opt.focus
             @columns[0].focus()

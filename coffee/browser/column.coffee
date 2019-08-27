@@ -207,7 +207,6 @@ class Column
 
     navigateRoot: (key) -> # move to file browser?
         
-        return if not @browser.browse?
         @browser.browse switch key
             when 'left'  then slash.dir @parent.file
             when 'up'    then @parent.file
@@ -464,24 +463,24 @@ class Column
         { mod, key, combo, char } = keyinfo.forEvent event
 
         switch combo
-            when 'alt+e'               then return @explorer()
-            when 'alt+o'               then return @open()
-            when 'page up', 'page down', 'home', 'end' then return stopEvent event, @navigateRows key
-            when 'enter'               then return stopEvent event, @navigateCols key
-            when 'command+enter', 'ctrl+enter' then return @openFileInNewWindow()
-            when 'command+left', 'command+up', 'command+right', 'command+down', 'ctrl+left', 'ctrl+up', 'ctrl+right', 'ctrl+down'
+            when 'alt+e'                then return @explorer()
+            when 'alt+o'                then return @open()
+            when 'page up' 'page down' 'home' 'end' then return stopEvent event, @navigateRows key
+            when 'enter'                then return stopEvent event, @navigateCols key
+            when 'command+enter' 'ctrl+enter' then return @openFileInNewWindow()
+            when 'command+left' 'command+up' 'command+right' 'command+down' 'ctrl+left' 'ctrl+up' 'ctrl+right' 'ctrl+down'
                 return stopEvent event, @navigateRoot key
-            when 'command+backspace', 'ctrl+backspace', 'command+delete', 'ctrl+delete' 
+            when 'command+backspace' 'ctrl+backspace' 'command+delete' 'ctrl+delete' 
                 return stopEvent event, @moveToTrash()
-            when 'alt+left'            then return stopEvent event, window.split.focus 'shelf'
-            when 'backspace', 'delete' then return stopEvent event, @browser.onBackspaceInColumn @
-            when 'ctrl+t'              then return stopEvent event, @sortByType()
-            when 'ctrl+n'              then return stopEvent event, @sortByName()
-            when 'command+i', 'ctrl+i' then return stopEvent event, @toggleDotFiles()
-            when 'command+d', 'ctrl+d' then return stopEvent event, @duplicateFile()
-            when 'command+e', 'ctrl+e' then return stopEvent event, @toggleExtensions()
-            when 'command+k', 'ctrl+k' then return stopEvent event if @browser.cleanUp()
-            when 'f2'                  then return stopEvent event, @activeRow()?.editName()
+            when 'alt+left'             then return stopEvent event, window.split.focus 'shelf'
+            when 'backspace' 'delete'   then return stopEvent event, @browser.onBackspaceInColumn @
+            when 'ctrl+t'               then return stopEvent event, @sortByType()
+            when 'ctrl+n'               then return stopEvent event, @sortByName()
+            when 'command+i' 'ctrl+i'   then return stopEvent event, @toggleDotFiles()
+            when 'command+d' 'ctrl+d'   then return stopEvent event, @duplicateFile()
+            when 'command+e' 'ctrl+e'   then return stopEvent event, @toggleExtensions()
+            when 'command+k' 'ctrl+k'   then return stopEvent event if @browser.cleanUp()
+            when 'f2'                   then return stopEvent event, @activeRow()?.editName()
             when 'tab'    
                 if @search.length then @doSearch ''
                 return stopEvent event
@@ -490,13 +489,13 @@ class Column
                 else window.split.focus 'commandline-editor'
                 return stopEvent event
 
-        if key in ['up',   'down']  then return stopEvent event, @navigateRows key              
-        if key in ['left', 'right'] then return stopEvent event, @navigateCols key        
+        if key in ['up'   'down']  then return stopEvent event, @navigateRows key              
+        if key in ['left' 'right'] then return stopEvent event, @navigateCols key        
             
         switch char
-            when '~', '/' then return stopEvent event, @navigateRoot char
+            when '~' '/' then return stopEvent event, @navigateRoot char
             
-        if mod in ['shift', ''] and char then @doSearch char
+        if mod in ['shift' ''] and char then @doSearch char
                 
 module.exports = Column
 
