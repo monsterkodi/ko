@@ -110,11 +110,11 @@ class FileBrowser extends Browser
         file = item.file
 
         switch slash.ext file
-            when 'gif', 'png', 'jpg', 'jpeg', 'svg', 'bmp', 'ico'
-                cnt = elem class: 'browserImageContainer', child:
-                    elem 'img', class: 'browserImage', src: slash.fileUrl file
+            when 'gif' 'png' 'jpg' 'jpeg' 'svg' 'bmp' 'ico'
+                cnt = elem class: 'browserImageContainer' child:
+                    elem 'img' class: 'browserImage' src: slash.fileUrl file
                 @columns[col].table.appendChild cnt
-            when 'tiff', 'tif'
+            when 'tiff' 'tif'
                 if not slash.win()
                     @convertImage row
             when 'pxm'
