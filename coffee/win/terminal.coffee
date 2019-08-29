@@ -17,11 +17,13 @@ class Terminal extends TextEditor
 
     constructor: (viewElem) -> 
         
-        super viewElem, features: ['Scrollbar', 'Numbers', 'Minimap', 'Meta'], fontSize: 15
+        super viewElem, features: ['Scrollbar' 'Numbers' 'Minimap' 'Meta'], fontSize: 15
         
         @view.addEventListener "contextmenu", @onContextMenu
         
         @metaQueue = []
+        
+        @setHeader prefs.get 'terminal:header' false
         
         @initInvisibles()
         @ansidiss = new ansiDiss()    
@@ -100,7 +102,7 @@ class Terminal extends TextEditor
             
             @appendMeta clss: 'spacer'
             for l in salt(meta.text).split '\n'
-                @appendMeta clss: 'spacer', text: '# '+l
+                @appendMeta clss:'spacer' text:'# '+l
             @appendMeta clss: 'spacer'
             
         else if meta.clss == 'termCommand'
@@ -142,11 +144,11 @@ class Terminal extends TextEditor
         @singleCursorAtPos [0,0]
         super()
 
-    setAutoClear: (state) -> prefs.set 'terminal:autoclear', state
-    getAutoClear: -> prefs.get 'terminal:autoclear', true
+    setAutoClear: (state) -> prefs.set 'terminal:autoclear' state
+    getAutoClear: -> prefs.get 'terminal:autoclear' true
 
-    setHeader: (state) -> prefs.set 'terminal:header', state
-    getHeader: -> prefs.get 'terminal:header', true
+    setHeader: (state) -> prefs.set 'terminal:header' state
+    getHeader: -> prefs.get 'terminal:header' true
     
     doAutoClear: -> if @getAutoClear() then @clear()
 
@@ -198,14 +200,14 @@ class Terminal extends TextEditor
         switch combo
             when 'enter'
                 if href = @meta.hrefAtLineIndex @cursorPos()[1]
-                    post.emit 'loadFile', "#{href}" 
+                    post.emit 'loadFile' "#{href}" 
                 return
-            when 'ctrl+enter', 'command+enter'
+            when 'ctrl+enter' 'command+enter'
                 if href = @meta.hrefAtLineIndex @cursorPos()[1]
-                    post.emit 'loadFile', "#{href}" 
+                    post.emit 'loadFile' "#{href}" 
                     window.editor.focus()
                 return
-            when 'ctrl+s', 'command+s'
+            when 'ctrl+s' 'command+s'
                 return if @meta.saveChanges()
             when 'esc'
                 split = window.split

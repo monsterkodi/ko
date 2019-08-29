@@ -1,7 +1,7 @@
 {
   "name": "ko",
   "productName": "ko",
-  "version": "0.250.0",
+  "version": "0.251.0",
   "description": "text editor",
   "main": "js/main/main.js",
   "preferGlobal": true,
@@ -38,13 +38,13 @@
     "ignore": "^5.1.4",
     "js-beautify": "^1.10.2",
     "klor": "^1.4.0",
-    "kxk": "^0.337.0",
+    "kxk": "^0.339.0",
     "seamless-immutable": "^7.1.4",
     "trash": "^6.0.0",
     "unused-filename": "^2.1.0"
   },
   "devDependencies": {
-    "electron": "^6.0.4",
+    "electron": "^6.0.5",
     "electron-packager": "^14.0.4",
     "electron-rebuild": "^1.8.6",
     "koffee": "^1.4.0",
