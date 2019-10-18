@@ -1,7 +1,7 @@
 {
   "name": "ko",
   "productName": "ko",
-  "version": "0.251.0",
+  "version": "0.253.0",
   "description": "text editor",
   "main": "js/main/main.js",
   "preferGlobal": true,
@@ -44,8 +44,8 @@
     "unused-filename": "^2.1.0"
   },
   "devDependencies": {
-    "electron": "^6.0.5",
-    "electron-packager": "^14.0.4",
+    "electron": "^6.0.12",
+    "electron-packager": "^14.0.6",
     "electron-rebuild": "^1.8.6",
     "koffee": "^1.4.0",
     "konrad": "^0.159.0",

@@ -24,7 +24,7 @@ class Shelf extends Column
         @index  = -1
         @div.id = 'shelf'
         
-        @showHistory = window.stash.get 'shelf|history' true
+        @showHistory = window.stash.get 'shelf|history' false
 
         post.on 'gitStatus'              @loadGitStatus
         post.on 'addToShelf'             @addPath
