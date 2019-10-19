@@ -4,3 +4,4 @@ ignore
     /bin/cheet.noon
     /bin/dmg.json
     /coffee/menu.noon
+noon    . ext json . replace .. coffee/ js/ 

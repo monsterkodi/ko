@@ -131,10 +131,6 @@ body {
   font-family: octicons;
   content: '\f016';
 }
-.noon-icon:before {
-  font-family: Sans-Serif;
-  content: 'ⓞ';
-}
 #shelf {
   overflow: hidden;
   position: absolute;

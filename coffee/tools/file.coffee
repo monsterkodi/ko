@@ -8,6 +8,8 @@
 
 { empty, valid, childp, slash, fs, _ } = require 'kxk'
 
+icons = require './icons.json'
+
 class File
     
     @sourceFileExtensions: [ 'koffee' 'coffee' 'styl' 'swift' 'pug' 'md' 'noon' 'txt' 'json' 'sh' 'py' 'cpp' 'cc' 'c' 'cs' 'h' 'hpp' 'ts' 'js']
@@ -15,19 +17,12 @@ class File
     @iconClassName: (file) ->
         
         file = slash.removeLinePos file
-        switch slash.ext file
-            when 'noon'   then className = 'noon-icon'
-            when 'koffee' then className = 'coffee-icon'
-            else
-                try
-                    fileIcons = require 'file-icons-js'
-                    className = fileIcons.getClass file
-                catch err
-                    true
-                    # log "no icon? #{file}"
-        className ?= 'file-icon'
-        className
-            
+        
+        clss  = icons.ext[slash.ext file]
+        clss ?= icons.base[slash.base(file).toLowerCase()]
+        clss ?= 'file'
+        "icon #{clss}"
+        
     @write: (file, text, mode, cb) ->
   
         slash.writeText file, text, (done) ->
