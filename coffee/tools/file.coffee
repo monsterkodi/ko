@@ -25,6 +25,8 @@ class File
         
     @write: (file, text, mode, cb) ->
   
+        slash.logErrors = true
+        
         slash.writeText file, text, (done) ->
             if empty done
                 cb "can't write #{file}"
@@ -45,6 +47,8 @@ class File
             
     @p4edit: (file, text, cb) ->
         
+        slash.logErrors = true
+        
         if slash.win()
             try
                 childp.exec "p4 edit #{slash.unslash(file)}", (err) ->
@@ -59,6 +63,8 @@ class File
             
     @save: (file, text, cb) ->
     
+        slash.logErrors = true
+        
         slash.fileExists file, (stat) ->
             
             if stat
