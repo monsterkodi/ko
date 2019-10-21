@@ -50,24 +50,24 @@ class TextEditor extends Editor
 
         @setFontSize prefs.get "#{@name}FontSize", @config.fontSize ? 19
         @scroll = new EditorScroll @
-        @scroll.on 'shiftLines', @shiftLines
-        @scroll.on 'showLines',  @showLines
+        @scroll.on 'shiftLines' @shiftLines
+        @scroll.on 'showLines'  @showLines
 
-        @view.addEventListener 'blur',     @onBlur
-        @view.addEventListener 'focus',    @onFocus
-        @view.addEventListener 'keydown',  @onKeyDown
+        @view.addEventListener 'blur'     @onBlur
+        @view.addEventListener 'focus'    @onFocus
+        @view.addEventListener 'keydown'  @onKeyDown
 
         @initDrag()        
 
         for feature in @config.features
             if feature == 'CursorLine'
-                @cursorLine = elem 'div', class:'cursor-line'
+                @cursorLine = elem 'div' class:'cursor-line'
             else
                 featureName = feature.toLowerCase()
                 featureClss = require "./#{featureName}"
                 @[featureName] = new featureClss @
 
-        post.on 'schemeChanged', @onSchemeChanged
+        post.on 'schemeChanged' @onSchemeChanged
 
     # 0000000    00000000  000
     # 000   000  000       000
@@ -77,13 +77,13 @@ class TextEditor extends Editor
 
     del: ->
 
-        post.removeListener 'schemeChanged', @onSchemeChanged
+        post.removeListener 'schemeChanged' @onSchemeChanged
         
         @scrollbar?.del()
 
-        @view.removeEventListener 'keydown', @onKeyDown
-        @view.removeEventListener 'blur',    @onBlur
-        @view.removeEventListener 'focus',   @onFocus
+        @view.removeEventListener 'keydown' @onKeyDown
+        @view.removeEventListener 'blur'    @onBlur
+        @view.removeEventListener 'focus'   @onFocus
         @view.innerHTML = ''
 
         super()
@@ -97,13 +97,13 @@ class TextEditor extends Editor
     onFocus: =>
 
         @startBlink()
-        @emit 'focus', @
-        post.emit 'editorFocus', @
+        @emit 'focus' @
+        post.emit 'editorFocus' @
 
     onBlur: =>
 
         @stopBlink()
-        @emit 'blur', @
+        @emit 'blur' @
 
     onSchemeChanged: =>
 
@@ -196,8 +196,8 @@ class TextEditor extends Editor
                 lineIndex: li
                 text: @line li
 
-        @emit 'linesAppended', ls
-        @emit 'numLines', @numLines()
+        @emit 'linesAppended' ls
+        @emit 'numLines' @numLines()
 
     # 00000000   0000000   000   000  000000000
     # 000       000   000  0000  000     000
@@ -235,15 +235,15 @@ class TextEditor extends Editor
                 
                 when 'changed'
                     @updateLine li, di
-                    @emit 'lineChanged', li
+                    @emit 'lineChanged' li
                     
                 when 'deleted'
                     @spanCache = @spanCache.slice 0, di
-                    @emit 'lineDeleted', di
+                    @emit 'lineDeleted' di
                     
                 when 'inserted'
                     @spanCache = @spanCache.slice 0, di
-                    @emit 'lineInserted', li, di
+                    @emit 'lineInserted' li, di
 
         if changeInfo.inserts or changeInfo.deletes
             @layersWidth = @layerScroll.offsetWidth
@@ -263,7 +263,7 @@ class TextEditor extends Editor
             @renderSelection()
             @emit 'selection'
 
-        @emit 'changed', changeInfo
+        @emit 'changed' changeInfo
 
     # 000   000  00000000   0000000     0000000   000000000  00000000
     # 000   000  000   000  000   000  000   000     000     000
@@ -308,8 +308,8 @@ class TextEditor extends Editor
 
         @updateLinePositions()
         @updateLayers()
-        @emit 'linesExposed', top:top, bot:bot, num:num
-        @emit 'linesShown', top, bot, num
+        @emit 'linesExposed' top:top, bot:bot, num:num
+        @emit 'linesShown' top, bot, num
 
     appendLine: (li) ->
 
@@ -340,7 +340,7 @@ class TextEditor extends Editor
 
             if @showInvisibles
                 tx = @line(li).length * @size.charWidth + 1
-                span = elem 'span', class: "invisible newline", html: '&#9687'
+                span = elem 'span' class: "invisible newline", html: '&#9687'
                 span.style.transform = "translate(#{tx}px, -1.5px)"
                 @lineDivs[li].appendChild span
 
@@ -355,7 +355,7 @@ class TextEditor extends Editor
                 divInto oldTop, oldBot
                 oldBot -= 1
 
-        @emit 'linesShifted', top, bot, num
+        @emit 'linesShifted' top, bot, num
 
         @updateLinePositions()
         @updateLayers()
@@ -370,7 +370,7 @@ class TextEditor extends Editor
         
         for li, div of @lineDivs
             if not div? or not div.style?
-                return kerror 'no div? style?', div?, div?.style?
+                return kerror 'no div? style?' div?, div?.style?
             y = @size.lineHeight * (li - @scroll.top)
             div.style.transform = "translate3d(#{@size.offsetX}px,#{y}px, 0)"
             div.style.transition = "all #{animate/1000}s" if animate
@@ -390,7 +390,7 @@ class TextEditor extends Editor
     clearHighlights: () ->
 
         if @numHighlights()
-            $('.highlights', @layers).innerHTML = ''
+            $('.highlights' @layers).innerHTML = ''
             super()
 
     # 00000000   00000000  000   000  0000000    00000000  00000000
@@ -451,7 +451,7 @@ class TextEditor extends Editor
         ty = (mc[1] - @scroll.top) * @size.lineHeight
         
         if @cursorLine
-            @cursorLine.style = "z-index:0;transform:translate3d(0,#{ty}px,0); height:#{@size.lineHeight}px;width:100%;"
+            @cursorLine.style = "z-index:0;transform:translate3d(0,#{ty}px,0); height:#{@size.lineHeight}px;"
             @layers.insertBefore @cursorLine, @layers.firstChild
 
     renderSelection: ->
@@ -476,15 +476,15 @@ class TextEditor extends Editor
     # 000   000  000      000  000  0000  000  000
     # 0000000    0000000  000  000   000  000   000
 
-    cursorDiv: -> $ '.cursor.main', @layerDict['cursors']
+    cursorDiv: -> $ '.cursor.main' @layerDict['cursors']
 
     suspendBlink: ->
 
         return if not @blinkTimer
         @stopBlink()
-        @cursorDiv()?.classList.toggle 'blink', false
+        @cursorDiv()?.classList.toggle 'blink' false
         clearTimeout @suspendTimer
-        blinkDelay = prefs.get 'cursorBlinkDelay', [800,200]
+        blinkDelay = prefs.get 'cursorBlinkDelay' [800,200]
         @suspendTimer = setTimeout @releaseBlink, blinkDelay[0]
 
     releaseBlink: =>
@@ -495,8 +495,8 @@ class TextEditor extends Editor
 
     toggleBlink: ->
 
-        blink = not prefs.get 'blink', false
-        prefs.set 'blink', blink
+        blink = not prefs.get 'blink' false
+        prefs.set 'blink' blink
         if blink
             @startBlink()
         else
@@ -506,11 +506,11 @@ class TextEditor extends Editor
 
         @blink = not @blink
         
-        @cursorDiv()?.classList.toggle 'blink', @blink
+        @cursorDiv()?.classList.toggle 'blink' @blink
         @minimap?.drawMainCursor @blink
         
         clearTimeout @blinkTimer
-        blinkDelay = prefs.get 'cursorBlinkDelay', [800,200]
+        blinkDelay = prefs.get 'cursorBlinkDelay' [800,200]
         @blinkTimer = setTimeout @doBlink, @blink and blinkDelay[1] or blinkDelay[0]
 
     startBlink: -> 
@@ -520,7 +520,7 @@ class TextEditor extends Editor
 
     stopBlink: ->
 
-        @cursorDiv()?.classList.toggle 'blink', false
+        @cursorDiv()?.classList.toggle 'blink' false
         
         clearTimeout @blinkTimer
         delete @blinkTimer
@@ -542,7 +542,7 @@ class TextEditor extends Editor
 
         @scroll.setViewHeight vh
 
-        @emit 'viewHeight', vh
+        @emit 'viewHeight' vh
 
     screenSize: -> electron.remote.screen.getPrimaryDisplay().workAreaSize
 
@@ -676,7 +676,7 @@ class TextEditor extends Editor
 
     funcInfoAtLineIndex: (li) ->
 
-        files = post.get 'indexer', 'files', @currentFile
+        files = post.get 'indexer' 'files' @currentFile
         fileInfo = files[@currentFile]
         for func in fileInfo.funcs
             if func.line <= li <= func.last
@@ -724,13 +724,13 @@ class TextEditor extends Editor
                 if @stickySelection     then return @endStickySelection()
                 if @numSelections()     then return @selectNone()
             
-            when 'command+enter', 'ctrl+enter','f12' then @jumpToWord()
+            when 'command+enter' 'ctrl+enter' 'f12' then @jumpToWord()
 
         for action in Editor.actions
             
             if action.combo == combo or action.accel == combo
                 switch combo
-                    when 'ctrl+a', 'command+a' then return @selectAll()
+                    when 'ctrl+a' 'command+a' then return @selectAll()
                 return 'unhandled'
                 
             if action.accels? and os.platform() != 'darwin'

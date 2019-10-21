@@ -259,7 +259,7 @@ span.macro.macro,
   background: #111;
 }
 .cursor-line {
-  background: #111;
+  background: #080808;
 }
 .commandlist .cursor {
   background: transparent;
@@ -381,11 +381,11 @@ span.macro.macro,
   background: rgba(0,255,0,0.3);
 }
 *:focus .selection {
-  background: #444;
+  background: #222;
 }
 .selection {
   color: #444;
-  background: #282828;
+  background: #111;
 }
 .winlist,
 .list {
