@@ -444,7 +444,7 @@ class Column
             cb:     @explorer
         ,
             text:   'Open'
-            combo:  'alt+o' 
+            combo:  'alt+o'
             cb:     @open
         ]
         

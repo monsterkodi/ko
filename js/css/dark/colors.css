@@ -10,7 +10,7 @@ body {
   color: #fff;
 }
 .split-handle {
-  background: #222;
+  background: #111;
 }
 .browser {
   background: #000;
@@ -20,20 +20,20 @@ body {
   background: #111;
 }
 .browserRow.active {
-  background: #222;
+  background: #111;
 }
 .browserRow.active.dir {
   color: #ff8;
 }
 .rowNameInput {
   color: #ff0;
-  background-color: #222;
+  background-color: #111;
 }
 .browserColumn.focus .browserRow.active {
   background: #22a;
 }
 .browserImage {
-  border: 1px solid #222;
+  border: 1px solid #111;
 }
 .browserRow.historySeparator * {
   color: #555;
@@ -45,10 +45,10 @@ body {
   background: #000;
 }
 #shelf {
-  background: #111;
+  background: #0a0a0a;
 }
 #shelf.focus {
-  background: #222;
+  background: #111;
 }
 #commandline-editor {
   color: #fff;
@@ -77,14 +77,14 @@ body {
 }
 #commandline-button {
   color: #aaa;
-  background: #222;
+  background: #111;
 }
 #commandline-button.empty {
   background: #000;
-  border-right-color: #222;
+  border-right-color: #111;
 }
 #commandline-button.active {
-  background: #333;
+  background: #222;
 }
 span.ko.open,
 span.macro.open,
@@ -146,7 +146,7 @@ span.macro.macro,
 }
 #info {
   background: #000;
-  border-left-color: #222;
+  border-left-color: #111;
 }
 .info-cursor-line,
 .info-cursor-column {
@@ -184,10 +184,10 @@ span.macro.macro,
   color: #6767ab;
 }
 .tooltip {
-  background: #222;
+  background: #111;
 }
 .tabs {
-  background: #222;
+  background: #111;
   color: #aaa;
 }
 #titlebar.focus .tabs {
@@ -210,23 +210,23 @@ span.macro.macro,
   color: #f80;
 }
 .tab {
-  background: #222;
+  background: #111;
 }
 .tab.active {
-  background: #333;
+  background: #222;
 }
 #browser {
   background: #181818;
-  border-color: #222;
+  border-color: #111;
 }
 #terminal,
 #editor {
   color: #ddd;
   background: #000;
-  border-color: #222;
+  border-color: #111;
 }
 #split {
-  border-color: #222;
+  border-color: #111;
 }
 *:focus .cursor {
   background: #f80;
@@ -271,10 +271,10 @@ span.macro.macro,
   background: rgba(0,0,0,0.1);
 }
 .linenumber {
-  border-right-color: #222;
+  border-right-color: #111;
 }
 .linenumber span {
-  color: #222;
+  color: #111;
 }
 .linenumber.highligd span {
   color: rgba(155,155,255,0.6);
@@ -298,10 +298,10 @@ span.macro.macro,
   color: #ff0;
 }
 .meta.href {
-  background-color: #333;
+  background-color: #222;
 }
 .meta.gitInfoFile {
-  background: #333;
+  background: #222;
   opacity: 0.5;
   padding-right: 10px;
   border-top-right-radius: 4px;
@@ -313,7 +313,7 @@ span.macro.macro,
 }
 .meta.coffeeCommand,
 .meta.termCommand {
-  background: #222;
+  background: #111;
 }
 .meta.git {
   opacity: 0.4;
@@ -358,17 +358,14 @@ span.macro.macro,
   color: #ff0;
 }
 .linenumber.gitInfoLine {
-  background: #222;
+  background: #111;
 }
 .minimap {
   background: #000;
-  border-left-color: #222;
+  border-left-color: #111;
 }
 .topbot {
-  background-color: #181818;
-}
-.minimapTopBot {
-  background-color: #000;
+  background-color: #111;
 }
 .highlight {
   color: rgba(255,0,255,0.5);
@@ -389,15 +386,15 @@ span.macro.macro,
 }
 .winlist,
 .list {
-  background: #222;
+  background: #111;
 }
 .winlist-item.selected,
 .list-item.selected {
-  background: #333;
+  background: #222;
 }
 .winlist-item:hover,
 .list-item:hover {
-  background: #333;
+  background: #222;
 }
 .winlist .dot {
   color: #060;
@@ -413,10 +410,10 @@ span.macro.macro,
   color: #fff;
 }
 .autocomplete-list {
-  background: #222;
+  background: #111;
 }
 .autocomplete-list::-webkit-scrollbar {
-  background-color: #333;
+  background-color: #222;
 }
 .autocomplete-list::-webkit-scrollbar-thumb {
   background-color: #44f;
@@ -444,7 +441,7 @@ span.macro.macro,
   background: #88f;
 }
 #titlebar {
-  background: #222;
+  background: #111;
 }
 .titlebar-name {
   color: #999;
@@ -453,13 +450,13 @@ span.macro.macro,
   color: #444;
 }
 .titlebar-dot {
-  color: #333;
+  color: #222;
 }
 #titlebar .winbutton:active {
   background-color: #f00;
 }
 #titlebar .winbutton:active.gray {
-  background-color: #333;
+  background-color: #222;
 }
 #titlebar .winbutton svg {
   stroke-width: 1px;
@@ -473,7 +470,7 @@ span.macro.macro,
 }
 .menuItem {
   color: #666;
-  background-color: #222;
+  background-color: #111;
 }
 .menuItem.selected {
   color: #999;
@@ -482,16 +479,16 @@ span.macro.macro,
   color: #fff;
 }
 .popup {
-  background-color: #222;
+  background-color: #111;
 }
 .popupWindow {
-  background-color: #222;
+  background-color: #111;
 }
 .popupItem {
   color: #666;
 }
 .popupItem:not(:last-child) {
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid #111;
 }
 .popupItem.selected {
   color: #fff;
@@ -500,16 +497,16 @@ span.macro.macro,
   color: #666;
 }
 .popupItem.separator {
-  border-top: 1px solid #333;
+  border-top: 1px solid #222;
 }
 .popupItem:not(:last-child) {
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid #111;
 }
 .popupCombo {
-  color: #333;
+  color: #222;
 }
 ::-webkit-scrollbar-corner {
-  background-color: #222;
+  background-color: #111;
 }
 ::-webkit-scrollbar-thumb {
   background-color: #444;
