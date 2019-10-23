@@ -125,7 +125,6 @@ class Tab
 
     close: ->
 
-        klog 'close' @file
         @watcher.stop()
 
         if @dirty
