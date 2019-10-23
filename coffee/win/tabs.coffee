@@ -6,7 +6,7 @@
    000     000   000  0000000    0000000
 ###
 
-{ post, stopEvent, popup, valid, empty, first, last, slash, elem, drag, kpos, kerror, $, _ } = require 'kxk'
+{ post, stopEvent, popup, valid, empty, first, last, slash, elem, drag, kpos, klog, kerror, $, _ } = require 'kxk'
 
 Tab = require './tab'
 
@@ -29,18 +29,18 @@ class Tabs
             onMove:  @onDragMove
             onStop:  @onDragStop
 
-        post.on 'newTabWithFile',   @onNewTabWithFile
-        post.on 'newEmptyTab',      @onNewEmptyTab
+        post.on 'newTabWithFile'   @onNewTabWithFile
+        post.on 'newEmptyTab'      @onNewEmptyTab
 
-        post.on 'closeTabOrWindow', @onCloseTabOrWindow
-        post.on 'closeOtherTabs',   @onCloseOtherTabs
-        post.on 'stash',            @stash
-        post.on 'dirty',            @onDirty
-        post.on 'restore',          @restore
-        post.on 'revertFile',       @revertFile
-        post.on 'sendTabs',         @onSendTabs
-        post.on 'fileLineChanges',  @onFileLineChanges
-        post.on 'fileSaved',        @onFileSaved
+        post.on 'closeTabOrWindow' @onCloseTabOrWindow
+        post.on 'closeOtherTabs'   @onCloseOtherTabs
+        post.on 'stash'            @stash
+        post.on 'dirty'            @onDirty
+        post.on 'restore'          @restore
+        post.on 'revertFile'       @revertFile
+        post.on 'sendTabs'         @onSendTabs
+        post.on 'fileLineChanges'  @onFileLineChanges
+        post.on 'fileSaved'        @onFileSaved
 
     onSendTabs: (winID) =>
 
@@ -59,6 +59,8 @@ class Tabs
 
         if winID == window.winID
             return kerror "fileSaved from this window? #{file} #{winID}"
+            
+        klog 'onFileSaved'
         tab = @tab file
         if tab? and tab != @activeTab()
             tab.revert()
@@ -158,11 +160,13 @@ class Tabs
 
     closeTab: (tab) ->
 
+        klog 'closeTab'
         _.pull @tabs, tab.close()
         @
 
     onCloseTabOrWindow: (tab) =>
 
+        klog 'onCloseTabOrWindow'
         if @numTabs() <= 1
             window.win.close()
         else

@@ -6,7 +6,7 @@
 000       000  0000000  00000000  000   000  000   000  000   000  0000000    0000000  00000000  000   000
 ###
 
-{ post, reversed, filelist, empty, slash, first, prefs, valid, kerror, _ } = require 'kxk'
+{ post, reversed, filelist, empty, slash, first, prefs, klog, valid, kerror, _ } = require 'kxk'
 
 File     = require '../tools/file'
 electron = require 'electron'
@@ -17,16 +17,16 @@ class FileHandler
 
     constructor: () ->
 
-        post.on 'reloadFile',  @reloadFile
-        post.on 'removeFile',  @removeFile
-        post.on 'saveFileAs',  @saveFileAs
-        post.on 'saveFile',    @saveFile
-        post.on 'saveAll',     @saveAll
-        post.on 'saveChanges', @saveChanges
-        post.on 'reloadTab',   @reloadTab
-        post.on 'loadFile',    @loadFile
-        post.on 'openFile',    @openFile
-        post.on 'openFiles',   @openFiles
+        post.on 'reloadFile'  @reloadFile
+        post.on 'removeFile'  @removeFile
+        post.on 'saveFileAs'  @saveFileAs
+        post.on 'saveFile'    @saveFile
+        post.on 'saveAll'     @saveAll
+        post.on 'saveChanges' @saveChanges
+        post.on 'reloadTab'   @reloadTab
+        post.on 'loadFile'    @loadFile
+        post.on 'openFile'    @openFile
+        post.on 'openFiles'   @openFiles
         
     # 000       0000000    0000000   0000000          00000000  000  000      00000000  
     # 000      000   000  000   000  000   000        000       000  000      000       
@@ -167,6 +167,7 @@ class FileHandler
             if tab == tabs.activeTab()
                 if neighborTab = tab.nextOrPrev()
                     neighborTab.activate()
+            klog 'removeFile'
             tabs.closeTab tab
             
     #  0000000   0000000   000   000  00000000         0000000   000      000      
@@ -198,7 +199,7 @@ class FileHandler
         if not file? or file.startsWith 'untitled'
             @saveFileAs()
             return
-    
+              
         editor.stopWatcher()
         
         File.save file, editor.text(), (err, saved) ->
@@ -206,12 +207,12 @@ class FileHandler
             editor.saveScrollCursorsAndSelections()
             
             if valid err
-                kerror "saving '#{file}' failed:", err
+                kerror "saving '#{file}' failed:" err
             else
-                editor.setCurrentFile      saved
-                post.toOthers 'fileSaved', saved, window.winID
-                post.emit     'saved',     saved
-                
+                editor.setCurrentFile     saved
+                post.toOthers 'fileSaved' saved, window.winID
+                post.emit     'saved'     saved
+
             editor.restoreScrollCursorsAndSelections()
                   
     #  0000000   0000000    0000000          00000000   00000000   0000000  00000000  000   000  000000000  

@@ -6,7 +6,7 @@
    000     000   000  0000000
 ###
 
-{ post, tooltip, slash, elem, kerror, _ } = require 'kxk'
+{ post, tooltip, slash, elem, klog, kerror, _ } = require 'kxk'
 
 File    = require '../tools/file'
 Watcher = require '../tools/watcher'
@@ -94,28 +94,28 @@ class Tab
     update: ->
 
         @div.innerHTML = ''
-        @div.classList.toggle 'dirty', @dirty
+        @div.classList.toggle 'dirty' @dirty
 
         sep = '●'
         sep = '■' if window.editor.newlineCharacters == '\r\n'
-        @div.appendChild elem 'span', class:'dot', text:sep
+        @div.appendChild elem 'span' class:'dot' text:sep
 
         sep = "<span class='dot'>►</span>"
-        @pkgDiv = elem 'span', class:'pkg', html: @pkg and (@pkg + sep) or ''
+        @pkgDiv = elem 'span' class:'pkg' html: @pkg and (@pkg + sep) or ''
         @div.appendChild @pkgDiv
 
-        diss = syntax.dissForTextAndSyntax slash.basename(@file), 'ko' #, join: true
-        name = elem 'span', class:'name', html:render.line diss, charWidth:0
+        diss = syntax.dissForTextAndSyntax slash.basename(@file), 'ko'
+        name = elem 'span' class:'name' html:render.line diss, charWidth:0
         @div.appendChild name
 
-        @div.appendChild elem 'span', class:'tabdrag'
+        @div.appendChild elem 'span' class:'tabdrag'
 
         if @file?
-            diss = syntax.dissForTextAndSyntax slash.tilde(@file), 'ko' #, join: true
+            diss = syntax.dissForTextAndSyntax slash.tilde(@file), 'ko'
             html = render.line diss, charWidth:0
             @tooltip = new tooltip elem:name, html:html, x:0
 
-        @div.appendChild elem 'span', class:'dot', text:'●' if @dirty # @isDirty()
+        @div.appendChild elem 'span' class:'dot' text:'●' if @dirty
         @
 
     index: -> @tabs.tabs.indexOf @
@@ -125,6 +125,7 @@ class Tab
 
     close: ->
 
+        klog 'close' @file
         @watcher.stop()
 
         if @dirty
@@ -132,7 +133,7 @@ class Tab
 
         @div.remove()
         @tooltip?.del()
-        post.emit 'tabClosed', @file
+        post.emit 'tabClosed' @file
         @
 
     hidePkg: -> @pkgDiv?.style.display = 'none'

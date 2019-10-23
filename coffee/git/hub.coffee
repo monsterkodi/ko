@@ -46,14 +46,14 @@ class Hub
             not k.startsWith? gitDir
             
         Hub.status gitDir, (status) -> 
-            post.emit 'gitStatus', gitDir, status
+            post.emit 'gitStatus' gitDir, status
         
     @onSaved: (file) ->
         
         if diffs[file]
             delete diffs[file]
             Hub.diff file, (changes) -> 
-                post.emit 'gitDiff', file, changes
+                post.emit 'gitDiff' file, changes
                 
         Hub.applyRoot file, (gitDir) ->
             Hub.onGitRefChanged gitDir if gitDir
@@ -129,6 +129,6 @@ class Hub
                 Hub.watch gitDir
                 cb gitDir   
             
-post.on 'saved', Hub.onSaved
+post.on 'saved' Hub.onSaved
         
 module.exports = Hub

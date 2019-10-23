@@ -116,7 +116,7 @@ class Editor extends Buffer
             @bracketCharacters.close[v] = k
 
         @bracketCharacters.regexp = []
-        for key in ['open', 'close']
+        for key in ['open' 'close']
             cstr = _.keys(@bracketCharacters[key]).join ''
             reg = new RegExp "[#{_.escapeRegExp cstr}]"
             @bracketCharacters.regexps.push [reg, key]
