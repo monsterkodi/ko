@@ -36,7 +36,7 @@ class Browser extends event
             @view.appendChild @cols
             return
             
-        @cols = elem class: 'browser', id: 'columns'
+        @cols = elem class:'browser' id:'columns'
         @view.appendChild @cols
         
         @columns = []
@@ -270,22 +270,20 @@ class Browser extends event
             return kerror "can't copy pxm image #{file} to #{tmpPXM}: #{err}" if err?
             childp.exec "open #{__dirname}/../../bin/pxm2png.app --args #{tmpPXM}", (err) =>
                 return kerror "can't convert pxm image #{tmpPXM} to #{tmpPNG}: #{err}" if err?
-                loadDelayed = => @loadImage row, tmpPNG
+                loadDelayed = => @loadImage tmpPNG
                 setTimeout loadDelayed, 300
 
-    convertImage: (row) ->
-        
-        item = row.item
-        file = item.file
+    convertImage: (file) ->
+        klog 'convertImage' file
         tmpImage = slash.join os.tmpdir(), "ko-#{slash.basename file}.png"
-        
         childp.exec "/usr/bin/sips -s format png \"#{file}\" --out \"#{tmpImage}\"", (err) =>
             return kerror "can't convert image #{file}: #{err}" if err?
-            @loadImage row, tmpImage
+            @loadImage tmpImage
 
-    loadImage: (row, file) ->
+    loadImage: (file) ->
         
-        return if not row.isActive()
+        row = @row file
+        return if not row?.isActive()
 
         col = @emptyColumn opt?.column
         @clearColumnsFrom col.index

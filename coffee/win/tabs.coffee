@@ -160,7 +160,6 @@ class Tabs
 
     closeTab: (tab) ->
 
-        klog 'closeTab'
         _.pull @tabs, tab.close()
         @
 
