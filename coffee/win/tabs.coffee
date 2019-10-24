@@ -165,7 +165,6 @@ class Tabs
 
     onCloseTabOrWindow: (tab) =>
 
-        klog 'onCloseTabOrWindow'
         if @numTabs() <= 1
             window.win.close()
         else
