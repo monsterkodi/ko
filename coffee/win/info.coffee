@@ -50,16 +50,16 @@ class Info
         @topline.appendChild @highlig
         ttip @highlig, 'highlights'
         
-        @classes = elem 'span', class: "info-classes empty"
-        @topline.appendChild @classes
-        ttip @classes, 'classes'
+        # @classes = elem 'span', class: "info-classes empty"
+        # @topline.appendChild @classes
+        # ttip @classes, 'classes'
 
-        @funcs = elem 'span', class: "info-funcs empty"
-        @topline.appendChild @funcs
-        ttip @funcs, 'funcs'
+        # @funcs = elem 'span', class: "info-funcs empty"
+        # @topline.appendChild @funcs
+        # ttip @funcs, 'funcs'
         
-        post.on 'classesCount', (count) => @onClassesCount count
-        post.on 'funcsCount', (count) => @onFuncsCount count
+        # post.on 'classesCount', (count) => @onClassesCount count
+        # post.on 'funcsCount', (count) => @onFuncsCount count
 
         @elem.appendChild @topline
 
@@ -81,16 +81,16 @@ class Info
         @botline.appendChild @lines
         ttip @lines, 'lines'
 
-        @files = elem 'span', class: "info-files"
-        @botline.appendChild @files
-        ttip @files, 'files'
+        # @files = elem 'span', class: "info-files"
+        # @botline.appendChild @files
+        # ttip @files, 'files'
         
-        @words = elem 'span', class: "info-words empty"
-        @words.style.display = 'none'
-        @botline.appendChild @words
-        ttip @words, 'words'
-        
-        post.on 'filesCount', @onFilesCount
+        # @words = elem 'span', class: "info-words empty"
+        # @words.style.display = 'none'
+        # @botline.appendChild @words
+        # ttip @words, 'words'
+
+        # post.on 'filesCount', @onFilesCount
 
         @elem.appendChild @botline
         
@@ -107,21 +107,21 @@ class Info
         return if editor == @editor         
         
         if @editor?
-            @editor.removeListener 'numLines',     @onNumLines
-            @editor.removeListener 'lineInserted', @onNumLines
-            @editor.removeListener 'lineDeleted',  @onNumLines
-            @editor.removeListener 'selection',    @onSelection
-            @editor.removeListener 'highlight',    @onHighlight
-            @editor.removeListener 'cursor',       @onCursor
+            @editor.removeListener 'numLines'     @onNumLines
+            @editor.removeListener 'lineInserted' @onNumLines
+            @editor.removeListener 'lineDeleted'  @onNumLines
+            @editor.removeListener 'selection'    @onSelection
+            @editor.removeListener 'highlight'    @onHighlight
+            @editor.removeListener 'cursor'       @onCursor
                 
         @editor = editor
         
-        @editor.on 'numLines',     @onNumLines
-        @editor.on 'lineInserted', @onNumLines
-        @editor.on 'lineDeleted',  @onNumLines
-        @editor.on 'selection',    @onSelection
-        @editor.on 'highlight',    @onHighlight
-        @editor.on 'cursor',       @onCursor
+        @editor.on 'numLines'     @onNumLines
+        @editor.on 'lineInserted' @onNumLines
+        @editor.on 'lineDeleted'  @onNumLines
+        @editor.on 'selection'    @onSelection
+        @editor.on 'highlight'    @onHighlight
+        @editor.on 'cursor'       @onCursor
         
         @onNumLines @editor.numLines()
 
@@ -132,11 +132,11 @@ class Info
     # 000   000  00000000  0000000   0000000   000   000  0000000  
     
     reload: =>
-        counts = post.get 'indexer', 'counts'
-        @onClassesCount counts.classes
-        @onFuncsCount   counts.funcs
-        @onFilesCount   counts.files
-        @onWordCount    counts.words
+        # counts = post.get 'indexer' 'counts'
+        # @onClassesCount counts.classes
+        # @onFuncsCount   counts.funcs
+        # @onFilesCount   counts.files
+        # @onWordCount    counts.words
 
     #  0000000   000   000                     
     # 000   000  0000  000                     
@@ -147,21 +147,21 @@ class Info
     onNumLines: (lc) => 
         @lines.textContent = shortCount lc ? 0
         
-    onWordCount: (wc) =>
-        @words.textContent = shortCount  wc
-        @words.classList.toggle 'empty', wc == 0
+    # onWordCount: (wc) =>
+        # @words.textContent = shortCount  wc
+        # @words.classList.toggle 'empty', wc == 0
 
-    onClassesCount: (cc) =>
-        @classes.textContent = shortCount  cc
-        @classes.classList.toggle 'empty', cc == 0
+    # onClassesCount: (cc) =>
+        # @classes.textContent = shortCount  cc
+        # @classes.classList.toggle 'empty', cc == 0
 
-    onFuncsCount: (fc) =>
-        @funcs.textContent = shortCount  fc
-        @funcs.classList.toggle 'empty', fc == 0
+    # onFuncsCount: (fc) =>
+        # @funcs.textContent = shortCount  fc
+        # @funcs.classList.toggle 'empty', fc == 0
 
-    onFilesCount: (fc) =>
-        @files.textContent = shortCount  fc
-        @files.classList.toggle 'empty', fc == 0
+    # onFilesCount: (fc) =>
+        # @files.textContent = shortCount  fc
+        # @files.classList.toggle 'empty', fc == 0
     
     onCursor: => 
         @cursorLine.textContent   = @editor.mainCursor()[1]+1
