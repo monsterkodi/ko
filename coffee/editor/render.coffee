@@ -127,6 +127,6 @@ class Render
 
         empty = sel[1][0] == sel[1][1] and "empty" or ""
 
-        "<span class=\"#{clss}#{border}#{empty}\" style=\"transform: translate(#{tx}px,#{ty}px); width: #{sw}px; height: #{lh}px\"></span>"
+        "<span class=\"#{clss}#{border} #{empty}\" style=\"transform: translate(#{tx}px,#{ty}px); width: #{sw}px; height: #{lh}px\"></span>"
 
 module.exports = Render

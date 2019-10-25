@@ -24,7 +24,7 @@ class Tabs
         @div.addEventListener 'contextmenu', @onContextMenu
 
         @drag = new drag
-            target: @div
+            target:  @div
             onStart: @onDragStart
             onMove:  @onDragMove
             onStop:  @onDragStop
