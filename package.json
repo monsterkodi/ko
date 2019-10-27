@@ -1,7 +1,7 @@
 {
   "name": "ko",
   "productName": "ko",
-  "version": "0.260.0",
+  "version": "0.261.0",
   "description": "text editor",
   "main": "js/main/main.js",
   "preferGlobal": true,
@@ -40,7 +40,8 @@
     "kxk": "^0.340.0",
     "seamless-immutable": "^7.1.4",
     "trash": "^6.0.0",
-    "unused-filename": "^2.1.0"
+    "unused-filename": "^2.1.0",
+    "wxw": "^1.87.0"
   },
   "devDependencies": {
     "electron": "^7.0.0",

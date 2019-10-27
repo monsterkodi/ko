@@ -456,20 +456,22 @@ class Main extends app
     activateOneWindow: (cb) ->
     
         if empty visibleWins()
-            log 'toggleWindows'
             @toggleWindows cb
             return
 
         if not activeWin()
             if win = visibleWins()[0]
-                # if slash.win()
-                #     wxw = require 'wxw'                
-                #     wxw.foreground slash.resolve process.argv[0]
+                if slash.win()
+                    wxw = require 'wxw'   
+                    wxw 'raise' slash.resolve process.argv[0]
                 win.focus()
                 cb win
             else
                 cb null
         else
+            if slash.win()
+                wxw = require 'wxw'   
+                wxw 'raise' slash.resolve process.argv[0]
             cb visibleWins()[0]
             
     onOtherInstance: (args, dir) =>
