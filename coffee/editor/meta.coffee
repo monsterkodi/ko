@@ -6,7 +6,7 @@
 000   000  00000000     000     000   000
 ###
 
-{ stopEvent, empty, elem, post, slash, fs, kerror, $, _ } = require 'kxk'
+{ stopEvent, empty, elem, post, slash, fs, klog, kerror, $, _ } = require 'kxk'
 
 ranges = require '../tools/ranges'
 File   = require '../tools/file'

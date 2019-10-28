@@ -38,11 +38,11 @@ class Minimap
         @elem.addEventListener 'wheel', @editor.scrollbar?.onWheel
 
         @editor.view.appendChild    @elem
-        @editor.on 'viewHeight',    @onEditorViewHeight
-        @editor.on 'numLines',      @onEditorNumLines
-        @editor.on 'changed',       @onChanged
-        @editor.on 'highlight',     @drawHighlights
-        @editor.scroll.on 'scroll', @onEditorScroll
+        @editor.on 'viewHeight'    @onEditorViewHeight
+        @editor.on 'numLines'      @onEditorNumLines
+        @editor.on 'changed'       @onChanged
+        @editor.on 'highlight'     @drawHighlights
+        @editor.scroll.on 'scroll' @onEditorScroll
 
         @scroll = new MapScroll
             exposeMax:  @height/4
@@ -57,11 +57,11 @@ class Minimap
             onMove:  @onDrag
             cursor: 'pointer'
 
-        @scroll.on 'clearLines',  @clearAll
-        @scroll.on 'scroll',      @onScroll
-        @scroll.on 'exposeLines', @onExposeLines
-        @scroll.on 'vanishLines', @onVanishLines
-        @scroll.on 'exposeLine',  @exposeLine
+        @scroll.on 'clearLines'  @clearAll
+        @scroll.on 'scroll'      @onScroll
+        @scroll.on 'exposeLines' @onExposeLines
+        @scroll.on 'vanishLines' @onVanishLines
+        @scroll.on 'exposeLine'  @exposeLine
 
         @onScroll()
         @drawLines()
