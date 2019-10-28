@@ -369,8 +369,10 @@ class TextEditor extends Editor
     updateLinePositions: (animate=0) ->
         
         for li, div of @lineDivs
-            if not div? or not div.style?
-                return kerror 'no div? style?' div?, div?.style?
+            if not div? 
+                return kerror 'no div?' li
+            if not div.style?
+                return kerror 'no div.style?' li, _.isElement(div), typeof div
             y = @size.lineHeight * (li - @scroll.top)
             div.style.transform = "translate3d(#{@size.offsetX}px,#{y}px, 0)"
             div.style.transition = "all #{animate/1000}s" if animate
@@ -579,7 +581,7 @@ class TextEditor extends Editor
                 br = e.getBoundingClientRect()
                 if br.left <= x <= br.left+br.width
                     offset = x-br.left
-                    return span: e, offsetLeft: offset, offsetChar: parseInt offset/@size.charWidth
+                    return span:e, offsetLeft:offset, offsetChar:parseInt offset/@size.charWidth
         null
 
     # numFullLines: -> Math.floor(@viewHeight() / @size.lineHeight)
@@ -634,8 +636,10 @@ class TextEditor extends Editor
                             if event.metaKey or @stickySelection
                                 @addRangeToSelection range
                             else
-                                @selectSingleRange range
+                                # @selectSingleRange range
+                                @highlightWordAndAddToSelection()
                         if @clickCount == 3
+                            @clearHighlights()
                             r = @rangeForLineAtIndex @clickPos[1]
                             if event.metaKey
                                 @addRangeToSelection r
