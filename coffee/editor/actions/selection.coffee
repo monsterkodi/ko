@@ -175,6 +175,7 @@ module.exports =
         @do.select newSelections
         @do.end()        
 
+    clearSelection: -> @selectNone()
     selectNone: -> 
         
         @do.start()

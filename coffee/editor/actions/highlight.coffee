@@ -74,7 +74,7 @@ module.exports =
                 @highlightTextOfSelectionOrWordAtCursor() # this also selects
         @selectNextHighlight()
     
-    highlightWordAndAddToSelection: -> # command+d
+    highlightWordAndAddToSelection: (skipScroll) -> # command+d
         
         cp = @cursorPos()
         wordHighlights = @wordHighlights()
@@ -90,7 +90,8 @@ module.exports =
                 r = rangeAtPosInRanges cp, wordHighlights
             r ?= wordHighlights[0]
             @addRangeToSelection r
-            @scroll?.cursorToTop() # < sucks!
+            if not skipScroll
+                @scroll?.cursorToTop() # < sucks!
             @do.end()
 
     selectAllWords: -> # command+alt+d
