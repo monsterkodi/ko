@@ -375,6 +375,8 @@ class Meta
 
         for meta in @metas
             @delDiv meta
+        @metas     = []
+        @lineMetas = {}
         @elem.innerHTML = ""
 
     clear: =>
