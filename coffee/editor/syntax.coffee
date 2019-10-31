@@ -14,7 +14,7 @@ klor     = require 'klor'
 
 class Syntax
     
-    constructor: (@name, @getLine, @getLines) ->
+    @: (@name, @getLine, @getLines) ->
 
         @diss     = []
         @colors   = {}

@@ -12,7 +12,7 @@ now = require('perf_hooks').performance.now
 
 class FPS
 
-    constructor: () ->
+    @: () ->
                     
         @elem = elem class: 'fps'
         @elem.style.display = 'none'

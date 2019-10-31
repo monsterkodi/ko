@@ -12,7 +12,7 @@ File = require './file'
 
 class Walker
 
-    constructor: (@cfg) ->
+    @: (@cfg) ->
 
         @cfg.files       = []
         @cfg.stats       = []

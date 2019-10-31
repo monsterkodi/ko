@@ -13,7 +13,7 @@ hub      = require '../git/hub'
 
 class Diffbar
 
-    constructor: (@editor) ->
+    @: (@editor) ->
 
         @elem = elem 'canvas', class: 'diffbar'
         @elem.style.position = 'absolute'
@@ -22,13 +22,13 @@ class Diffbar
 
         @editor.view.appendChild @elem
 
-        @editor.on 'file',       @onEditorFile
-        @editor.on 'undone',     @update
-        @editor.on 'redone',     @update
-        @editor.on 'linesShown', @updateScroll
-
-        post.on 'gitStatus',     @update
-        post.on 'gitDiff',       @update
+        @editor.on 'file'       @onEditorFile
+        @editor.on 'undone'     @update
+        @editor.on 'redone'     @update
+        @editor.on 'linesShown' @updateScroll
+        
+        post.on 'gitStatus'     @update
+        post.on 'gitDiff'       @update
 
     #  0000000  000      000   0000000  000   000
     # 000       000      000  000       000  000

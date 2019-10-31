@@ -16,7 +16,7 @@ class Editor extends Buffer
 
     @actions = null
 
-    constructor: (name, config) ->
+    @: (name, config) ->
 
         super()
 

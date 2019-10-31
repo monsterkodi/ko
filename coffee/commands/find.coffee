@@ -12,12 +12,12 @@ Command = require '../commandline/command'
 
 class Find extends Command
 
-    constructor: (commandline) ->
+    @: (commandline) ->
         
         super commandline
         
-        @types = ['str',  'Str',   'reg',    'Reg',    'fuzzy', 'glob']
-        @names = ['find', 'Find',  '/find/', '/Find/', 'fiZd',  'f*nd']
+        @types = ['str'  'Str'   'reg'    'Reg'    'fuzzy' 'glob']
+        @names = ['find' 'Find'  '/find/' '/Find/' 'fiZd'  'f*nd']
        
     historyKey: -> @name
         
@@ -31,7 +31,6 @@ class Find extends Command
         
         if name == 'find'
             editor = @receivingEditor()
-            editor.highlightForFind()
             window.split.focus 'commandline'
             if @getText() != editor.textOfHighlight() and not empty editor.textOfHighlight()
                 @setText editor.textOfHighlight()
@@ -63,7 +62,7 @@ class Find extends Command
         super command
         
         if command.length
-            if @type in ['reg', 'Reg'] and command.trim() in ['^', '$', '^$', '.', '?', '\\', '\\b']
+            if @type in ['reg', 'Reg'] and command.trim() in ['^' '$' '^$' '.' '?' '\\' '\\b']
                 window.textEditor.clearHighlights()
             else if not command.trim().startsWith('|') and not command.trim().endsWith('|')
                 window.textEditor.highlightText command, 
@@ -99,7 +98,7 @@ class Find extends Command
         
         switch combo
             
-            when 'shift+enter', 'command+shift+g'
+            when 'shift+enter' 'command+shift+g'
                 
                 window.textEditor.highlightText @getText(),
                     type: @type

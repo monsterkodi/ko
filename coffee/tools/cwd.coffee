@@ -12,7 +12,7 @@ syntax = require '../editor/syntax'
 
 class CWD
 
-    constructor: () ->
+    @: () ->
                     
         @elem = elem class: 'cwd'
 

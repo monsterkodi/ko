@@ -10,7 +10,7 @@
 
 class Pane
     
-    constructor: (opt) ->
+    @: (opt) ->
         
         @[k] = v for k,v of opt
         @collapsed ?= false

@@ -15,7 +15,7 @@ module.exports =
     actions:
 
         cutCopyPaste:
-            combos: ['command+x', 'ctrl+x', 'command+c', 'ctrl+c', 'command+v', 'ctrl+v']
+            combos: ['command+x' 'ctrl+x' 'command+c' 'ctrl+c' 'command+v' 'ctrl+v']
 
     cutCopyPaste: (key, info) ->
         switch key

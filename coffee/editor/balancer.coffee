@@ -13,7 +13,7 @@ klor   = require 'klor'
 
 class Balancer
 
-    constructor: (@syntax, @getLine) ->
+    @: (@syntax, @getLine) ->
 
         @unbalanced = []
         @blocks = null

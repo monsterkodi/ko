@@ -74,7 +74,7 @@ toHexString = (num) ->
 
 class AnsiDiss
     
-    constructor: () ->
+    @: () ->
 
     dissect: (@input) ->
         @diss  = []

@@ -16,7 +16,7 @@ app = electron.remote.app
 
 class Row
     
-    constructor: (@column, @item) ->
+    @: (@column, @item) ->
 
         @browser = @column.browser
         text = @item.text ? @item.name
@@ -24,11 +24,11 @@ class Row
             html = '<span> </span>'
         else
             html = Syntax.spanForTextAndSyntax text, 'browser'
-        @div = elem class: 'browserRow', html: html
+        @div = elem class: 'browserRow' html: html
         @div.classList.add @item.type
         @column.table.appendChild @div
 
-        if @item.type in ['file', 'dir'] or @item.icon
+        if @item.type in ['file' 'dir'] or @item.icon
             @setIcon()
         
         @drag = new drag
@@ -59,7 +59,7 @@ class Row
             else
                 className = File.iconClassName @item.file
             
-        icon = elem('span', class:className + ' browserFileIcon')
+        icon = elem('span' class:className + ' browserFileIcon')
             
         @div.firstChild.insertBefore icon, @div.firstChild.firstChild
                     
@@ -78,9 +78,9 @@ class Row
         if event?
             { mod } = keyinfo.forEvent event
             switch mod
-                when 'alt', 'command+alt', 'ctrl+alt'
+                when 'alt' 'command+alt' 'ctrl+alt'
                     if @item.type == 'file' and @item.textFile
-                        post.toMain 'newWindowWithFile', @item.file
+                        post.toMain 'newWindowWithFile' @item.file
                         return
             
         $('.hover')?.classList.remove 'hover'
@@ -90,13 +90,13 @@ class Row
         opt = file:@item.file
         
         switch @item.type
-            when 'dir', 'file' 
-                post.emit 'filebrowser', 'activateItem', @item, @column.index
+            when 'dir' 'file' 
+                post.emit 'filebrowser' 'activateItem' @item, @column.index
             else    
                 if @item.file? and _.isString(@item.file) and @item.type != 'obj'
                     opt.line = @item.line
                     opt.col  = @item.column
-                    post.emit 'jumpToFile', opt
+                    post.emit 'jumpToFile' opt
                 else if @column.parent.obj? and @column.parent.type == 'obj'
                     if @item.type == 'obj'
                         @browser.loadObjectItem @item, column:@column.index+1
@@ -104,10 +104,10 @@ class Row
                         if @item.obj?.file? and _.isString @item.obj.file
                             opt.line = @item.obj.line
                             opt.col  = @item.obj.column
-                            post.emit 'jumpToFile', opt
+                            post.emit 'jumpToFile' opt
                 else if @item.obj?.file? and _.isString @item.obj.file
                     opt = file:@item.obj.file, line:@item.obj.line, col:@item.obj.column, newTab:opt.newTab
-                    post.emit 'jumpToFile', opt
+                    post.emit 'jumpToFile' opt
                 else
                     @browser.clearColumnsFrom @column.index+1
         @
@@ -125,11 +125,11 @@ class Row
         window.setLastFocus @column.name()
         
         if opt?.emit 
-            @browser.emit 'itemActivated', @item
+            @browser.emit 'itemActivated' @item
             if @item.type == 'dir'
-                post.emit 'setCWD', @item.file
+                post.emit 'setCWD' @item.file
             else if @item.type == 'file'
-                post.emit 'setCWD', slash.dir @item.file
+                post.emit 'setCWD' slash.dir @item.file
         @
                 
     clearActive: ->
@@ -145,13 +145,13 @@ class Row
     editName: =>
         
         return if @input? 
-        @input = elem 'input', class: 'rowNameInput'
+        @input = elem 'input' class: 'rowNameInput'
         @input.value = slash.file @item.file
         
         @div.appendChild @input
-        @input.addEventListener 'change',   @onNameChange
-        @input.addEventListener 'keydown',  @onNameKeyDown
-        @input.addEventListener 'focusout', @onNameFocusOut
+        @input.addEventListener 'change'   @onNameChange
+        @input.addEventListener 'keydown'  @onNameKeyDown
+        @input.addEventListener 'focusout' @onNameFocusOut
         @input.focus()
         
         @input.setSelectionRange 0, slash.base(@item.file).length
@@ -160,7 +160,7 @@ class Row
         
         {mod, key, combo} = keyinfo.forEvent event
         switch combo
-            when 'enter', 'esc'
+            when 'enter' 'esc'
                 if @input.value == @file or combo != 'enter'
                     @input.value = @file
                     event.preventDefault()
@@ -171,9 +171,9 @@ class Row
     removeInput: ->
         
         return if not @input?
-        @input.removeEventListener 'focusout', @onNameFocusOut
-        @input.removeEventListener 'change',   @onNameChange
-        @input.removeEventListener 'keydown',  @onNameKeyDown
+        @input.removeEventListener 'focusout' @onNameFocusOut
+        @input.removeEventListener 'change'   @onNameChange
+        @input.removeEventListener 'keydown'  @onNameKeyDown
         @input.remove()
         delete @input
         @input = null
@@ -190,8 +190,8 @@ class Row
             unusedFilename = require 'unused-filename'
             unusedFilename(newFile).then (newFile) =>
                 fs.rename @item.file, newFile, (err) =>
-                    return kerror 'rename failed', err if err
-                    post.emit 'loadFile', newFile
+                    return kerror 'rename failed' err if err
+                    post.emit 'loadFile' newFile
         @removeInput()
         
     # 0000000    00000000    0000000    0000000   

@@ -9,7 +9,7 @@
 
 class Invisibles
 
-    constructor: (@editor) -> @editor.on 'file', @onFile
+    @: (@editor) -> @editor.on 'file', @onFile
 
     del: -> @editor.removeListener 'file', @onFile
 

@@ -16,7 +16,7 @@ hub      = require '../git/hub'
     
 class Shelf extends Column
 
-    constructor: (browser) ->
+    @: (browser) ->
 
         super browser
         

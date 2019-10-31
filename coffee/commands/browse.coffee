@@ -13,7 +13,7 @@ FileBrowser = require '../browser/filebrowser'
 
 class Browse extends Command
 
-    constructor: (commandline) ->
+    @: (commandline) ->
 
         super commandline
 

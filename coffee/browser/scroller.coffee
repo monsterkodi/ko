@@ -12,7 +12,7 @@ scheme = require '../tools/scheme'
 
 class Scroller
 
-    constructor: (@column) ->
+    @: (@column) ->
 
         @elem = elem class: 'scrollbar right'
         @column.div.insertBefore @elem, @column.table

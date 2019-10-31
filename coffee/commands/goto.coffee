@@ -12,7 +12,7 @@ Command = require '../commandline/command'
 
 class Goto extends Command
 
-    constructor: (commandline) ->
+    @: (commandline) ->
         
         super commandline
         

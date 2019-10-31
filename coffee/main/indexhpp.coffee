@@ -10,16 +10,16 @@
 
 class IndexHpp
 
-    constructor: ->
+    @: ->
 
         @regions =
-            character:       open: "'",  close: "'"
-            string:          open: '"',  close: '"'
-            bracketArgs:     open: '(',  close: ')'
-            bracketSquare:   open: '[',  close: ']'
-            codeBlock:       open: '{',  close: '}'
-            blockComment:    open: '/*', close: '*/'
-            lineComment:     open: '//', close: null
+            character:       open: "'"  close: "'"
+            string:          open: '"'  close: '"'
+            bracketArgs:     open: '('  close: ')'
+            bracketSquare:   open: '['  close: ']'
+            codeBlock:       open: '{'  close: '}'
+            blockComment:    open: '/*' close: '*/'
+            lineComment:     open: '//' close: null
 
         @classRegExp   = /^\s*(\S+\s+)?(enum|enum\s+class|class|struct)\s+/
         @methodRegExp  = /^([\w\&\*]+)\s+(\w+)\s*\(/
@@ -122,8 +122,8 @@ class IndexHpp
 
             topRegion = last @regionStack
 
-            if topRegion?.region in ['blockComment', 'string', 'character']
-                if topRegion.region in ['string', 'character']
+            if topRegion?.region in ['blockComment' 'string' 'character']
+                if topRegion.region in ['string' 'character']
                     if rest.startsWith '\\'
                         advance 2
                         continue

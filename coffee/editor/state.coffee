@@ -12,7 +12,7 @@ Immutable = require 'seamless-immutable'
 
 class State
 
-    constructor: (opt) ->
+    @: (opt) ->
 
         if opt? and Immutable.isImmutable opt
             @s = opt
@@ -57,15 +57,15 @@ class State
 
     # modify:
 
-    setSelections: (s) -> new State @s.set 'selections', s
-    setHighlights: (h) -> new State @s.set 'highlights', h
-    setCursors:    (c) -> new State @s.set 'cursors',    c
-    setMain:       (m) -> new State @s.set 'main',       m
+    setSelections: (s) -> new State @s.set 'selections' s
+    setHighlights: (h) -> new State @s.set 'highlights' h
+    setCursors:    (c) -> new State @s.set 'cursors'    c
+    setMain:       (m) -> new State @s.set 'main'       m
 
-    changeLine: (i,t) -> new State @s.setIn ['lines', i], text:t
-    insertLine: (i,t) -> l = @s.lines.asMutable(); l.splice i, 0, text:t; new State @s.set 'lines', l
-    deleteLine: (i)   -> l = @s.lines.asMutable(); l.splice i, 1;         new State @s.set 'lines', l
-    appendLine:   (t) -> l = @s.lines.asMutable(); l.push text:t;         new State @s.set 'lines', l
-    addHighlight: (h) -> m = @s.highlights.asMutable(); m.push h;         new State @s.set 'highlights', m
+    changeLine: (i,t) -> new State @s.setIn ['lines' i], text:t
+    insertLine: (i,t) -> l = @s.lines.asMutable(); l.splice i, 0, text:t; new State @s.set 'lines' l
+    deleteLine: (i)   -> l = @s.lines.asMutable(); l.splice i, 1;         new State @s.set 'lines' l
+    appendLine:   (t) -> l = @s.lines.asMutable(); l.push text:t;         new State @s.set 'lines' l
+    addHighlight: (h) -> m = @s.highlights.asMutable(); m.push h;         new State @s.set 'highlights' m
 
 module.exports = State

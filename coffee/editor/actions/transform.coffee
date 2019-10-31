@@ -26,7 +26,7 @@ class Transform
         Sort: ['up', 'down', 'sort', 'uniq', 'reverse']
         Path: [ 'resolve', 'unresolve', 'dir', 'base', 'file', 'ext' ]
 
-    constructor: (@editor) ->
+    @: (@editor) ->
 
         @editor.transform = @
         @last         = null

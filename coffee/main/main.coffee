@@ -50,21 +50,21 @@ winWithID   = (winID) ->
 # 000        000   000       000     000
 # 000         0000000   0000000      000
 
-post.onGet 'debugMode', -> args.debug
-post.onGet 'winInfos',  -> (id: w.id for w in wins())
-post.onGet 'logSync',   ->
+post.onGet 'debugMode' -> args.debug
+post.onGet 'winInfos'  -> (id: w.id for w in wins())
+post.onGet 'logSync'   ->
     console.log.apply console, [].slice.call(arguments, 0)
     return true
 
-post.on 'throwError',                 -> throw new Error 'err'
-post.on 'newWindowWithFile',  (file)  -> main.createWindowWithFile file:file
-post.on 'activateWindow',     (winID) -> main.activateWindowWithID winID
-post.on 'activateNextWindow', (winID) -> main.activateNextWindow winID
-post.on 'activatePrevWindow', (winID) -> main.activatePrevWindow winID
+post.on 'throwError'                 -> throw new Error 'err'
+post.on 'newWindowWithFile'  (file)  -> main.createWindowWithFile file:file
+post.on 'activateWindow'     (winID) -> main.activateWindowWithID winID
+post.on 'activateNextWindow' (winID) -> main.activateNextWindow winID
+post.on 'activatePrevWindow' (winID) -> main.activatePrevWindow winID
 
-post.on 'menuAction',   (action, arg) -> main?.onMenuAction action, arg
-post.on 'ping', (winID, argA, argB) -> post.toWin winID, 'pong', 'main', argA, argB
-post.on 'winlog',       (winID, text) -> 
+post.on 'menuAction'   (action, arg) -> main?.onMenuAction action, arg
+post.on 'ping' (winID, argA, argB) -> post.toWin winID, 'pong' 'main' argA, argB
+post.on 'winlog'       (winID, text) -> 
     if args.verbose
         log "#{winID}>>> " + text
 
@@ -76,11 +76,11 @@ post.on 'winlog',       (winID, text) ->
 
 class Main extends app
 
-    constructor: (openFiles) ->
+    @: (openFiles) ->
         
         super
             dir:        __dirname
-            dirs:       ['../', '../browser', '../commandline', '../commands', '../editor', '../git', '../main', '../tools', '../win']
+            dirs:       ['../' '../browser' '../commandline' '../commands' '../editor' '../git' '../main' '../tools' '../win']
             pkg:        pkg
             shortcut:   'Alt+F1'
             index:      '../index.html'
@@ -118,7 +118,7 @@ class Main extends app
             log noon.stringify args, colors:true
             log ''
 
-        global.state = new store 'state', separator: '|'
+        global.state = new store 'state' separator: '|'
 
         alias = new store 'alias'
         

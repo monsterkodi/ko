@@ -94,7 +94,7 @@ class Hub
     @statusFiles: (status) ->
         
         files = {}
-        for key in ['changed', 'added', 'dirs']
+        for key in ['changed' 'added' 'dirs']
             if valid status[key]
                 for file in status[key]
                     files[file] = key

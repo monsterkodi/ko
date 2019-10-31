@@ -16,7 +16,7 @@ stream  = require 'stream'
 
 class Search extends Command
 
-    constructor: (commandline) ->
+    @: (commandline) ->
         
         super commandline
         
@@ -121,7 +121,7 @@ class Search extends Command
 
 class FileSearcher extends stream.Writable
     
-    constructor: (@command, @opt, @file) ->
+    @: (@command, @opt, @file) ->
         
         super()
         @line = 0

@@ -6,14 +6,14 @@
 0000000     0000000
 ###
 
-{ post, empty, clamp, last, kerror, _ } = require 'kxk'
+{ post, kerror, empty, clamp, last, klog, _ } = require 'kxk'
 
 State = require './state'
 require '../tools/ranges'
 
 class Do
 
-    constructor: (@editor) ->
+    @: (@editor) ->
 
         @reset()
 
@@ -193,6 +193,8 @@ class Do
 
     setCursors: (newCursors, opt) ->
 
+        # klog 'do.setCursors' newCursors
+        
         if not newCursors? or newCursors.length < 1
             return kerror "Do.setCursors -- empty cursors?"
 
@@ -214,6 +216,9 @@ class Do
 
         @state = @state.setCursors newCursors
         @state = @state.setMain mainIndex
+        
+        # klog 'setCursors' @editor.mainCursor()[1] if @editor.name == 'editor'
+        # @state
 
     #  0000000   0000000   000       0000000  000   000  000       0000000   000000000  00000000
     # 000       000   000  000      000       000   000  000      000   000     000     000

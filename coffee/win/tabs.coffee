@@ -12,7 +12,7 @@ Tab = require './tab'
 
 class Tabs
 
-    constructor: (titlebar) ->
+    @: (titlebar) ->
 
         @emptyid = 0
         @tabs = []
@@ -220,7 +220,7 @@ class Tabs
 
         if line or col
 
-            post.emit 'singleCursorAtPos', [col, line-1]
+            post.emit 'singleCursorAtPos' [col, line-1]
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000
     # 0000  000  000   000  000   000  000  000        000   000     000     000

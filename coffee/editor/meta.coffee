@@ -13,27 +13,27 @@ File   = require '../tools/file'
 
 class Meta
 
-    constructor: (@editor) ->
+    @: (@editor) ->
 
         @metas     = [] # [ [lineIndex, [start, end], {href: ...}], ... ]
         @lineMetas = {} # { lineIndex: [ lineMeta, ... ], ... }
 
-        @elem =$ ".meta", @editor.view
+        @elem =$ ".meta" @editor.view
 
-        @editor.on 'changed',          @onChanged
-        @editor.on 'lineAppended',     @onLineAppended
-        @editor.on 'clearLines',       @onClearLines
-        @editor.on 'lineInserted',     @onLineInserted
-        @editor.on 'lineDeleted',      @onLineDeleted
+        @editor.on 'changed'          @onChanged
+        @editor.on 'lineAppended'     @onLineAppended
+        @editor.on 'clearLines'       @onClearLines
+        @editor.on 'lineInserted'     @onLineInserted
+        @editor.on 'lineDeleted'      @onLineDeleted
 
-        @editor.on 'linesShown',       @onLinesShown
-        @editor.on 'linesShifted',     @onLinesShifted
+        @editor.on 'linesShown'       @onLinesShown
+        @editor.on 'linesShifted'     @onLinesShifted
 
         if @editor.numbers?
-            @editor.numbers.on 'numberAdded',   @onNumber
-            @editor.numbers.on 'numberChanged', @onNumber
+            @editor.numbers.on 'numberAdded'   @onNumber
+            @editor.numbers.on 'numberChanged' @onNumber
 
-        @elem.addEventListener 'mousedown', @onMouseDown
+        @elem.addEventListener 'mousedown' @onMouseDown
 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000
     # 000       000   000  000   000  0000  000  000        000       000   000
@@ -135,7 +135,7 @@ class Meta
             e.numberSpan.className = ''
             e.numberSpan.parentNode.className = 'linenumber'
             switch meta[2].clss
-                when 'searchResult', 'termCommand', 'termResult', 'coffeeCommand', 'coffeeResult', 'commandlistItem', 'gitInfoFile'
+                when 'searchResult' 'termCommand' 'termResult' 'coffeeCommand' 'coffeeResult' 'commandlistItem' 'gitInfoFile'
                     num = meta[2].state == 'unsaved' and @saveButton(meta[0])
                     num = meta[2].line? and meta[2].line if not num
                     num = slash.splitFileLine(meta[2].href)[1] if not num
@@ -208,7 +208,7 @@ class Meta
 
     delDiv: (meta) ->
 
-        return kerror 'no line meta?', meta if not meta?[2]?
+        return kerror 'no line meta?' meta if not meta?[2]?
         meta[2].div?.remove()
         meta[2].div = null
 

@@ -9,7 +9,7 @@ matchr = require '../../tools/matchr'
 
 class Pigments
 
-    constructor: (@editor) ->
+    @: (@editor) ->
 
         @test = /#[a-fA-F0-9]{3}|rgba?/
         trio  = /#[a-fA-F0-9]{3}(?![\w\d])/

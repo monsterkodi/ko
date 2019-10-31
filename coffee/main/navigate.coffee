@@ -10,7 +10,7 @@
 
 class Navigate
 
-    constructor: (@main) ->
+    @: (@main) ->
 
         return if not @main? # not very obvious: this is instantiated in main and window processes
 
@@ -130,8 +130,8 @@ class Navigate
         opt.for = 'goto'
         post.toMain 'navigate', opt
 
-    backward: () -> post.toMain 'navigate', action: 'backward', winID: window.winID
-    forward:  () -> post.toMain 'navigate', action: 'forward',  winID: window.winID
-    clear:    () -> post.toMain 'navigate', action: 'clear',    winID: window.winID
+    backward: () -> post.toMain 'navigate' action: 'backward' winID: window.winID
+    forward:  () -> post.toMain 'navigate' action: 'forward'  winID: window.winID
+    clear:    () -> post.toMain 'navigate' action: 'clear'    winID: window.winID
 
 module.exports = Navigate

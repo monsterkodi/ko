@@ -14,7 +14,7 @@ fuzzy       = require 'fuzzy'
 
 class Command
 
-    constructor: (@commandline) ->
+    @: (@commandline) ->
         
         @syntaxName = 'ko'
         @maxHistory = 20

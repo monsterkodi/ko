@@ -29,7 +29,7 @@ relative = (rel, to) ->
 
 class Open extends Command
 
-    constructor: (commandline) ->
+    @: (commandline) ->
         
         super commandline
         

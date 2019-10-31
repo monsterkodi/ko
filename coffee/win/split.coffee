@@ -19,7 +19,7 @@ class Split
     # 000  000  0000  000     000   
     # 000  000   000  000     000   
     
-    constructor: () ->
+    @: () ->
 
         @commandlineHeight = 30
         @handleHeight      = 6

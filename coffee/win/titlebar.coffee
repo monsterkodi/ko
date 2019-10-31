@@ -10,7 +10,7 @@
 
 class Titlebar
     
-    constructor: ->
+    @: ->
 
         @elem =$ 'titlebar'
         @selected = -1

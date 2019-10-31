@@ -18,9 +18,9 @@ Transform = require '../editor/actions/transform'
 
 class Macro extends Command
 
-    @macroNames = ['clean', 'help', 'dbg', 'class', 'req', 'inv', 'blink', 'color', 'fps', 'cwd', 'git', 'unix']
+    @macroNames = ['clean' 'help' 'dbg' 'class' 'req' 'inv' 'blink' 'color' 'fps' 'cwd' 'git' 'unix']
 
-    constructor: (commandline) ->
+    @: (commandline) ->
 
         super commandline
 

@@ -12,7 +12,7 @@ TextEditor = require '../editor/texteditor'
 
 class Commandline extends TextEditor
 
-    constructor: (viewElem) ->
+    @: (viewElem) ->
 
         super viewElem, features: [], fontSize: 24, syntaxName:'commandline'
 

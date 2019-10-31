@@ -15,7 +15,7 @@ trash    = require 'trash'
 
 class Column
     
-    constructor: (@browser) ->
+    @: (@browser) ->
         
         @index = @browser.columns?.length
         @searchTimer = null
@@ -23,23 +23,23 @@ class Column
         @items  = []
         @rows   = []
         
-        @div   = elem class: 'browserColumn', tabIndex: 6, id: @name()
+        @div   = elem class: 'browserColumn' tabIndex: 6, id: @name()
         @table = elem class: 'browserColumnTable'
         @div.appendChild @table
         
         @browser.cols?.appendChild @div
         
-        @div.addEventListener 'focus',     @onFocus
-        @div.addEventListener 'blur',      @onBlur
-        @div.addEventListener 'keydown',   @onKey
+        @div.addEventListener 'focus'     @onFocus
+        @div.addEventListener 'blur'      @onBlur
+        @div.addEventListener 'keydown'   @onKey
         
-        @div.addEventListener 'mouseover', @onMouseOver
-        @div.addEventListener 'mouseout',  @onMouseOut
+        @div.addEventListener 'mouseover' @onMouseOver
+        @div.addEventListener 'mouseout'  @onMouseOut
 
-        @div.addEventListener 'mouseup',   @onClick
-        @div.addEventListener 'dblclick',  @onDblClick
+        @div.addEventListener 'mouseup'   @onClick
+        @div.addEventListener 'dblclick'  @onDblClick
         
-        @div.addEventListener "contextmenu", @onContextMenu
+        @div.addEventListener 'ontextmenu' @onContextMenu
         
         @scroll = new Scroller @
         
@@ -57,7 +57,7 @@ class Column
         @parent = parent
         
         if @parent.type == undefined
-            log 'column.loadItems', String @parent
+            log 'column.loadItems' String @parent
             @parent.type = slash.isDir(@parent.file) and 'dir' or 'file'
         
         kerror "no parent item?" if not @parent?
@@ -161,7 +161,7 @@ class Column
         @navigateCols 'enter'
         if item = @activeRow()?.item
             if item.file and item.type == 'file' # jump to top of file on double click
-                post.emit 'singleCursorAtPos', [0, 0]
+                post.emit 'singleCursorAtPos' [0, 0]
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       
@@ -199,10 +199,10 @@ class Column
                 if item = @activeRow()?.item
                     type = item.type
                     if type == 'dir'
-                        post.emit 'filebrowser', 'loadItem', item, focus:true
+                        post.emit 'filebrowser' 'loadItem' item, focus:true
                     else if item.file
-                        post.emit 'jumpTo', item
-                        post.emit 'focus', 'editor'
+                        post.emit 'jumpTo' item
+                        post.emit 'focus' 'editor'
         @
 
     navigateRoot: (key) -> # move to file browser?
@@ -220,7 +220,7 @@ class Column
         
         if item = @activeRow()?.item
             if item.type == 'file' and item.textFile and item.file
-                post.emit 'openFiles', [item.file], newWindow: true
+                post.emit 'openFiles' [item.file], newWindow: true
         @
 
     #  0000000  00000000   0000000   00000000    0000000  000   000    
@@ -266,7 +266,7 @@ class Column
     removeObject: =>
         
         if row = @activeRow()
-            @browser.emit 'willRemoveRow', row, @
+            @browser.emit 'willRemoveRow' row, @
             nextOrPrev = row.next() ? row.prev()
             @removeRow row
             nextOrPrev?.activate()
@@ -315,7 +315,7 @@ class Column
     toggleDotFiles: =>
 
         if @parent.type == undefined
-            log 'column.toggleDotFiles', @parent
+            log 'column.toggleDotFiles' @parent
             @parent.type = slash.isDir(@parent.file) and 'dir' or 'file'
             
         if @parent.type == 'dir'            
@@ -331,7 +331,7 @@ class Column
 
         stateKey = "browser|hideExtensions"
         window.state.set stateKey, not window.state.get stateKey, false
-        setStyle '.browserRow .ext', 'display', window.state.get(stateKey) and 'none' or 'initial'
+        setStyle '.browserRow .ext' 'display' window.state.get(stateKey) and 'none' or 'initial'
         @
         
     # 000000000  00000000    0000000    0000000  000   000  
@@ -352,7 +352,7 @@ class Column
     addToShelf: =>
         
         if pathToShelf = @activePath()
-            post.emit 'addToShelf', pathToShelf
+            post.emit 'addToShelf' pathToShelf
             window.split.focus 'shelf'
         
     duplicateFile: =>
@@ -362,8 +362,8 @@ class Column
             fileName = slash.path fileName
             if fs.copy? # fs.copyFile in node > 8.4
                 fs.copy @activePath(), fileName, (err) =>
-                    return error 'copy file failed', err if err?
-                    post.emit 'loadFile', fileName
+                    return error 'copy file failed' err if err?
+                    post.emit 'loadFile' fileName
                     
     # 00000000  000   000  00000000   000       0000000   00000000   00000000  00000000   
     # 000        000 000   000   000  000      000   000  000   000  000       000   000  
@@ -388,17 +388,17 @@ class Column
     updateGitFiles: (files) ->
         
         for row in @rows
-            return if row.item.type not in ['dir', 'file']
+            return if row.item.type not in ['dir' 'file']
             status = files[row.item.file]
             
-            $('.browserStatusIcon', row.div)?.remove()
+            $('.browserStatusIcon' row.div)?.remove()
             
             if status?
-                row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
+                row.div.appendChild elem 'span' class:"git-#{status}-icon browserStatusIcon"
             else if row.item.type == 'dir'
                 for file, status of files
                     if row.item.name != '..' and file.startsWith row.item.file
-                        row.div.appendChild elem 'span', class:"git-dirs-icon browserStatusIcon"
+                        row.div.appendChild elem 'span' class:"git-dirs-icon browserStatusIcon"
                         break
         
     # 00000000    0000000   00000000   000   000  00000000     

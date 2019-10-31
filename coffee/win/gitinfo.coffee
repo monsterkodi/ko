@@ -14,7 +14,7 @@ hub        = require '../git/hub'
 
 class GitInfo
     
-    constructor: ->
+    @: ->
         
     #  0000000  000      000   0000000  000   000  
     # 000       000      000  000       000  000   

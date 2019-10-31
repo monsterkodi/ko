@@ -13,7 +13,7 @@ event   = require 'events'
 
 class Autocomplete extends event
 
-    constructor: (@editor) -> 
+    @: (@editor) ->
         
         super()
         
@@ -32,14 +32,14 @@ class Autocomplete extends event
         @specialWordRegExp = new RegExp "(\\s+|[\\w#{@especial}]+|[^\\s])", 'g'
         @splitRegExp       = new RegExp "[^\\w\\d#{@especial}]+", 'g'        
     
-        @editor.on 'edit',           @onEdit
-        @editor.on 'linesSet',       @onLinesSet
-        @editor.on 'lineInserted',   @onLineInserted
-        @editor.on 'willDeleteLine', @onWillDeleteLine
-        @editor.on 'lineChanged',    @onLineChanged
-        @editor.on 'linesAppended',  @onLinesAppended
-        @editor.on 'cursor',         @close
-        @editor.on 'blur',           @close
+        @editor.on 'edit'           @onEdit
+        @editor.on 'linesSet'       @onLinesSet
+        @editor.on 'lineInserted'   @onLineInserted
+        @editor.on 'willDeleteLine' @onWillDeleteLine
+        @editor.on 'lineChanged'    @onLineChanged
+        @editor.on 'linesAppended'  @onLinesAppended
+        @editor.on 'cursor'         @close
+        @editor.on 'blur'           @close
         
         # post.on 'funcsCount',        @onFuncsCount
         

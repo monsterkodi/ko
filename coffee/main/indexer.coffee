@@ -79,20 +79,20 @@ class Indexer
     # 000  000  0000  000   000  000        000 000   000       000   000  
     # 000  000   000  0000000    00000000  000   000  00000000  000   000  
     
-    constructor: () ->
+    @: () ->
         
-        post.onGet 'indexer', @onGet
-        post.on 'sourceInfoForFile', @onSourceInfoForFile
+        post.onGet 'indexer' @onGet
+        post.on 'sourceInfoForFile' @onSourceInfoForFile
         
-        post.on 'fileSaved',    (file, winID) => @indexFile file, refresh: true
-        post.on 'dirLoaded',    (dir)         => @indexProject dir
-        post.on 'fileLoaded',   (file, winID) => 
+        post.on 'fileSaved'    (file, winID) => @indexFile file, refresh: true
+        post.on 'dirLoaded'    (dir)         => @indexProject dir
+        post.on 'fileLoaded'   (file, winID) => 
             @indexFile file
             @indexProject file
         
         @collectBins()
     
-        @imageExtensions = ['png', 'jpg', 'gif', 'tiff', 'pxm', 'icns']        
+        @imageExtensions = ['png' 'jpg' 'gif' 'tiff' 'pxm' 'icns']        
 
         @dirs    = Object.create null
         @files   = Object.create null
@@ -145,7 +145,7 @@ class Indexer
         
         file = opt.item.file
         if @files[file]?
-            post.toWin opt.winID, 'sourceInfoForFile', @files[file], opt
+            post.toWin opt.winID, 'sourceInfoForFile' @files[file], opt
         
     #  0000000   0000000   000      000      00000000   0000000  000000000  
     # 000       000   000  000      000      000       000          000     
@@ -158,7 +158,7 @@ class Indexer
         @bins = []
         return if slash.win()
         
-        for dir in ['/bin', '/usr/bin', '/usr/local/bin']
+        for dir in ['/bin' '/usr/bin' '/usr/local/bin']
             w = new Walker
                 maxFiles:    1000
                 root:        dir
@@ -175,12 +175,12 @@ class Indexer
             maxDepth:    3
             root:        slash.resolve '~'
             include:     ['.git']
-            ignore:      ['node_modules', 'img', 'bin', 'js', 'Library']
+            ignore:      ['node_modules' 'img' 'bin' 'js' 'Library']
             skipDir:     (p) -> slash.base(p) == '.git'
-            filter:      (p) -> slash.ext(p) not in ['noon', 'json', 'git', '']
+            filter:      (p) -> slash.ext(p) not in ['noon' 'json' 'git' '']
             dir:         (p) => if slash.file(p) == '.git'    then @projects[slash.base slash.dir p] = dir: slash.tilde slash.dir p
             file:        (p) => if slash.base(p) == 'package' then @projects[slash.base slash.dir p] = dir: slash.tilde slash.dir p
-            done:        => log 'collectProjects done', @projects
+            done:        => log 'collectProjects done' @projects
         w.start()
 
     # 00000000   00000000    0000000         000  00000000   0000000  000000000  
@@ -496,14 +496,14 @@ class Indexer
                     fileInfo.funcs.push funcInfo
 
                 if opt?.post != false
-                    post.toWins 'classesCount', _.size @classes
-                    post.toWins 'funcsCount',   _.size @funcs
-                    post.toWins 'fileIndexed',  file, fileInfo
+                    post.toWins 'classesCount' _.size @classes
+                    post.toWins 'funcsCount'   _.size @funcs
+                    post.toWins 'fileIndexed'  file, fileInfo
 
             @files[file] = fileInfo
             
             if opt?.post != false
-                post.toWins 'filesCount', _.size @files
+                post.toWins 'filesCount' _.size @files
 
             @shiftQueue()
         @

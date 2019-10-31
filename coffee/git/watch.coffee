@@ -10,7 +10,7 @@
 
 class GitWatch
     
-    constructor: (@gitDir, cb) ->
+    @: (@gitDir, cb) ->
         
         return if not @gitDir?
         

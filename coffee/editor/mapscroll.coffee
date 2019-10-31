@@ -12,7 +12,7 @@ events = require 'events'
 
 class MapScroll extends events
 
-    constructor: (cfg) ->
+    @: (cfg) ->
 
         super()
         @lineHeight = cfg.lineHeight ? 0

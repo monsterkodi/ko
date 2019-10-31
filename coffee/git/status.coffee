@@ -9,7 +9,7 @@
 { childp, valid, empty, slash, str, _ } = require 'kxk'
 
 gitCmd = 'git status --porcelain'
-gitOpt = (gitDir) -> encoding: 'utf8', cwd: slash.unslash(gitDir), stdio:['pipe', 'pipe', 'ignore']
+gitOpt = (gitDir) -> encoding: 'utf8' cwd: slash.unslash(gitDir), stdio:['pipe' 'pipe' 'ignore']
 
 status = (gitDir, cb) ->
 

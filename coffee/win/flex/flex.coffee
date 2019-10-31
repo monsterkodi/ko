@@ -13,7 +13,7 @@ Handle = require './handle'
 
 class Flex 
     
-    constructor: (opt) ->
+    @: (opt) ->
         
         @handleSize  = opt.handleSize ? 6
         @direction   = opt.direction ? 'horizontal'

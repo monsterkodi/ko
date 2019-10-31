@@ -10,7 +10,7 @@
 
 class Handle
     
-    constructor: (opt) ->
+    @: (opt) ->
         
         @[k] = v for k,v of opt
         

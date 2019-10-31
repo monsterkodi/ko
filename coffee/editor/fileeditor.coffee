@@ -15,7 +15,7 @@ electron   = require 'electron'
 
 class FileEditor extends TextEditor
 
-    constructor: (viewElem) ->
+    @: (viewElem) ->
 
         super viewElem,
             features: [
@@ -112,11 +112,11 @@ class FileEditor extends TextEditor
         else
             slash.path process.cwd()
         
-    restoreFromTabState: (tabsState) ->
+    restoreFromTabState: (tabState) ->
 
         klog 'restoreFromTabState' tabState
-        return kerror "no tabsState.file?" if not tabsState.file?
-        @setCurrentFile tabsState.file, tabsState.state
+        return kerror "no tabState.file?" if not tabState.file?
+        @setCurrentFile tabState.file, tabState.state
 
     stopWatcher: ->
 

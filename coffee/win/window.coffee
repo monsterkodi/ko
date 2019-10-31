@@ -82,8 +82,8 @@ restoreWin = ->
 # 000        000   000       000     000
 # 000         0000000   0000000      000
 
-post.on 'singleCursorAtPos' (pos, opt) ->
-    editor.singleCursorAtPos pos, opt
+post.on 'singleCursorAtPos' (pos, opt) -> # browser double click and newTabWithFile :l:c
+    editor.singleCursorAtPos pos, opt 
     editor.scroll.cursorToTop()
 post.on 'focusEditor'  -> split.focus 'editor'
 post.on 'cloneFile'    -> post.toMain 'newWindowWithFile' editor.currentFile

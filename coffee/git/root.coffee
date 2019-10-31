@@ -16,7 +16,7 @@ fixPath = (p) ->
     return slash.resolve p    
 
 gitCmd  = 'git rev-parse --show-toplevel'
-gitOpt = (cwd) -> cwd:cwd, encoding:'utf8', stdio:['pipe', 'pipe', 'ignore']
+gitOpt = (cwd) -> cwd:cwd, encoding:'utf8' stdio:['pipe' 'pipe' 'ignore']
     
 root = (pth, cb) ->
 

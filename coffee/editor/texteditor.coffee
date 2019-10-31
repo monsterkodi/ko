@@ -16,7 +16,7 @@ electron     = require 'electron'
 
 class TextEditor extends Editor
 
-    constructor: (viewElem, config) ->
+    @: (viewElem, config) ->
 
         name = viewElem
         name = name.slice 1 if name[0] == '.'
@@ -636,8 +636,7 @@ class TextEditor extends Editor
                             if event.metaKey or @stickySelection
                                 @addRangeToSelection range
                             else
-                                # @selectSingleRange range
-                                @highlightWordAndAddToSelection 'skipScroll'
+                                @highlightWordAndAddToSelection()
                         if @clickCount == 3
                             @clearHighlights()
                             r = @rangeForLineAtIndex @clickPos[1]

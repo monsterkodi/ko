@@ -6,14 +6,14 @@
 00000000  0000000    000     000      0000000   000   000        0000000    0000000  000   000   0000000   0000000  0000000  
 ###
 
-{ clamp } = require 'kxk'
+{ clamp, klog } = require 'kxk'
 
 events = require 'events'
 kxk    = require 'kxk'
 
 class EditorScroll extends events
 
-    constructor: (@editor) ->
+    @: (@editor) ->
 
         super()
         @lineHeight = @editor.size.lineHeight ? 0
@@ -96,8 +96,8 @@ class EditorScroll extends events
                         
             @offsetTop = parseInt offset
             @updateOffset()
-            @emit 'scroll', @scroll, @offsetTop
-
+            @emit 'scroll' @scroll, @offsetTop
+            
     #  0000000  00000000  000000000  000000000   0000000   00000000 
     # 000       000          000        000     000   000  000   000
     # 0000000   0000000      000        000     000   000  00000000 
@@ -119,14 +119,14 @@ class EditorScroll extends events
             num = @bot - @top + 1
             
             if num > 0
-                @emit 'showLines', @top, @bot, num
+                @emit 'showLines' @top, @bot, num
 
         else   
             
             num = @top - oldTop
             
             if 0 < Math.abs num
-                @emit 'shiftLines', @top, @bot, num
+                @emit 'shiftLines' @top, @bot, num
                 
     lineIndexIsInView: (li) -> @top <= li <= @bot
     
@@ -207,7 +207,7 @@ class EditorScroll extends events
     #  0000000   0000000   000   000  0000000    0000000   000   000  
             
     cursorToTop: (topDist=7) ->
-        
+                
         cp = @editor.cursorPos()
         
         if cp[1] - @top > topDist
@@ -218,6 +218,7 @@ class EditorScroll extends events
             hl = @editor.highlightsInLineIndexRange rg
             
             if sl.length == 0 == hl.length
+                klog 'cursorToTop' (cp[1] - @top - topDist)
                 @by @lineHeight * (cp[1] - @top - topDist)
 
     cursorIntoView: ->

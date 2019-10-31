@@ -15,7 +15,7 @@ hub      = require '../git/hub'
 
 class FileBrowser extends Browser
 
-    constructor: (view) ->
+    @: (view) ->
 
         super view
 
@@ -27,11 +27,11 @@ class FileBrowser extends Browser
 
         @srcCache = {}
 
-        post.on 'gitStatus',   @onGitStatus
-        post.on 'fileIndexed', @onFileIndexed
-        post.on 'file',        @onFile
-        post.on 'filebrowser', @onFileBrowser
-        post.on 'dircache',    @onDirCache
+        post.on 'gitStatus'   @onGitStatus
+        post.on 'fileIndexed' @onFileIndexed
+        post.on 'file'        @onFile
+        post.on 'filebrowser' @onFileBrowser
+        post.on 'dircache'    @onDirCache
 
         @shelfResize = elem 'div', class: 'shelfResize'
         @shelfResize.style.position = 'absolute'
@@ -202,7 +202,7 @@ class FileBrowser extends Browser
         updir = slash.resolve slash.join dir, '..'
 
         if col == 0 or col-1 < @numCols() and @columns[col-1].activeRow()?.item.name == '..'
-            if items[0].name not in ['..', '/']
+            if items[0].name not in ['..' '/']
                 if not (updir == dir == slash.resolve '/')
                     items.unshift
                         name: '..'
@@ -393,7 +393,7 @@ class FileBrowser extends Browser
 
     setShelfSize: (@shelfSize) ->
 
-        window.state.set 'shelf|size', @shelfSize
+        window.state.set 'shelf|size' @shelfSize
         @shelfResize.style.left = "#{@shelfSize}px"
         @shelf.div.style.width = "#{@shelfSize}px"
         @cols.style.left = "#{@shelfSize}px"

@@ -12,7 +12,7 @@ class Watcher
 
     @id: 0
     
-    constructor: (@file) ->
+    @: (@file) ->
 
         @id = Watcher.id++
         slash.exists @file, @onExists

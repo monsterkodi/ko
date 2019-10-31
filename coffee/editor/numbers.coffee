@@ -12,22 +12,22 @@ event = require 'events'
 
 class Numbers extends event
 
-    constructor: (@editor) ->
+    @: (@editor) ->
 
         super()
         @lineDivs = {}
 
-        @elem =$ ".numbers", @editor.view
+        @elem =$ '.numbers' @editor.view
 
-        @editor.on 'clearLines',       @onClearLines
+        @editor.on 'clearLines'       @onClearLines
 
-        @editor.on 'linesShown',       @onLinesShown
-        @editor.on 'linesShifted',     @onLinesShifted
+        @editor.on 'linesShown'       @onLinesShown
+        @editor.on 'linesShifted'     @onLinesShifted
 
-        @editor.on 'fontSizeChanged',  @onFontSizeChange
-        @editor.on 'highlight',        @updateColors
-        @editor.on 'changed',          @updateColors
-        @editor.on 'linesSet',         @updateColors
+        @editor.on 'fontSizeChanged'  @onFontSizeChange
+        @editor.on 'highlight'        @updateColors
+        @editor.on 'changed'          @updateColors
+        @editor.on 'linesSet'         @updateColors
 
         @onFontSizeChange()
 

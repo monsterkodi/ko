@@ -15,7 +15,7 @@ salt       = require '../tools/salt'
 
 class CommandList extends TextEditor
 
-    constructor: (@command, viewElem, opt) ->
+    @: (@command, viewElem, opt) ->
 
         super viewElem,
             features: ['Scrollbar', 'Numbers', 'Meta']

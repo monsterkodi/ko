@@ -15,7 +15,7 @@ dialog   = remote.dialog
 
 class FileHandler
 
-    constructor: () ->
+    @: () ->
 
         post.on 'reloadFile'  @reloadFile
         post.on 'removeFile'  @removeFile

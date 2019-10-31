@@ -12,11 +12,11 @@ scheme = require '../tools/scheme'
 
 class Scrollbar
 
-    constructor: (@editor) ->
+    @: (@editor) ->
 
-        @editor.scroll.on 'scroll', @update
-        @editor.on 'linesShown',    @update
-        @editor.on 'viewHeight',    @update
+        @editor.scroll.on 'scroll' @update
+        @editor.on 'linesShown'    @update
+        @editor.on 'viewHeight'    @update
 
         @elem = elem class: 'scrollbar left'
         @editor.view.appendChild @elem
@@ -33,8 +33,8 @@ class Scrollbar
             onMove:  @onDrag
             cursor:  'ns-resize'
 
-        @elem       .addEventListener 'wheel', @onWheel
-        @editor.view.addEventListener 'wheel', @onWheel
+        @elem       .addEventListener 'wheel' @onWheel
+        @editor.view.addEventListener 'wheel' @onWheel
 
     del: ->
         
