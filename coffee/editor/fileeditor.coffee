@@ -6,7 +6,7 @@
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
 
-{ post, stopEvent, setStyle, srcmap, popup, slash, empty, clamp, kpos, fs, kerror, _ } = require 'kxk'
+{ post, stopEvent, setStyle, kerror, srcmap, slash, clamp, empty, popup, klog, kpos, _ } = require 'kxk'
 
 Watcher    = require '../tools/watcher'
 TextEditor = require './texteditor'
@@ -77,6 +77,8 @@ class FileEditor extends TextEditor
 
     setCurrentFile: (file, restoreState) ->
 
+        klog 'setCurrentFile' file        
+        
         @clear()
         @stopWatcher()
 
@@ -95,15 +97,24 @@ class FileEditor extends TextEditor
 
         if fileExists
             @watch = new Watcher @currentFile
-
+            window.tabs.activeTab()?.setFile @currentFile
+            
         post.emit 'file' @currentFile # browser & shelf
 
         @emit 'file' @currentFile # diffbar, pigments, ...
 
         post.emit 'dirty' @dirty
 
+    currentDir: ->
+        
+        if @currentFile? and slash.fileExists @currentFile
+            slash.dir @currentFile
+        else
+            slash.path process.cwd()
+        
     restoreFromTabState: (tabsState) ->
 
+        klog 'restoreFromTabState' tabState
         return kerror "no tabsState.file?" if not tabsState.file?
         @setCurrentFile tabsState.file, tabsState.state
 

@@ -10,7 +10,6 @@
 
 Browser  = require './browser'
 Shelf    = require './shelf'
-dirlist  = require '../tools/dirlist'
 dirCache = require '../tools/dircache'
 hub      = require '../git/hub'
 
@@ -91,8 +90,9 @@ class FileBrowser extends Browser
                 @loadDirItem  item, col+1
             when 'file'
                 @loadFileItem item, col+1
+                klog 'activateItem' item.textFile, item.file
                 if item.textFile
-                    post.emit 'jumpToFile', item
+                    post.emit 'jumpToFile' item
 
     # 00000000  000  000      00000000  000  000000000  00000000  00     00
     # 000       000  000      000       000     000     000       000   000
@@ -187,16 +187,15 @@ class FileBrowser extends Browser
             post.emit 'dir', dir
         else
             opt.ignoreHidden = not window.state.get "browser|showHidden|#{dir}"
+            opt.textTest = true
+            
+            slash.list dir, opt, (items) =>
 
-            dirlist dir, opt, (err, items) =>
-
-                if err? then return
-
-                post.toMain 'dirLoaded', dir
+                post.toMain 'dirLoaded' dir
 
                 dirCache.set dir, items
                 @loadDirItems dir, item, items, col, opt
-                post.emit 'dir', dir
+                post.emit 'dir' dir
 
     loadDirItems: (dir, item, items, col, opt) =>
 

@@ -10,7 +10,6 @@
 
 Command     = require '../commandline/command'
 FileBrowser = require '../browser/filebrowser'
-dirList     = require '../tools/dirlist'
 
 class Browse extends Command
 
@@ -54,7 +53,7 @@ class Browse extends Command
             if window.editor.currentFile? and slash.isFile window.editor.currentFile
                 @browser.navigateToFile window.editor.currentFile
             else
-                post.emit 'filebrowser', 'loadItem', file:process.cwd(), type:'dir'
+                post.emit 'filebrowser' 'loadItem' file:process.cwd(), type:'dir'
             @browser.focus()
 
         name = action
@@ -72,37 +71,36 @@ class Browse extends Command
     # 000       000   000  000 0 000  000        000      000          000     000
     #  0000000   0000000   000   000  000        0000000  00000000     000     00000000
 
-    completeCallback: (err, files) =>
+    completeCallback: (files) =>
 
-        if not err?
-            if not empty @getText().trim()
-                text = slash.resolve @getText().trim()
-                matches = files.filter (f) -> f.file.startsWith text
+        if not empty @getText().trim()
+            text = slash.resolve @getText().trim()
+            matches = files.filter (f) -> f.file.startsWith text
 
-                if not empty matches
-                    @setText slash.tilde matches[0].file
+            if not empty matches
+                @setText slash.tilde matches[0].file
 
-                if matches.length > 1
+            if matches.length > 1
 
-                    items = matches.map (m) ->
+                items = matches.map (m) ->
 
-                        item = Object.create null
+                    item = Object.create null
 
-                        switch m.type
-                            when 'file'
-                                item.line = ' '
-                                item.clss = 'file'
-                            when 'dir'
-                                item.line = '▸'
-                                item.clss = 'directory'
+                    switch m.type
+                        when 'file'
+                            item.line = ' '
+                            item.clss = 'file'
+                        when 'dir'
+                            item.line = '▸'
+                            item.clss = 'directory'
 
-                        item.text = slash.file m.file
-                        item.file = m.file
-                        item
+                    item.text = slash.file m.file
+                    item.file = m.file
+                    item
 
-                    @showItems items
-                    @select 0
-                    return
+                @showItems items
+                @select 0
+                return
         @hideList()
 
     complete: ->
@@ -115,11 +113,11 @@ class Browse extends Command
             true
         else if text.endsWith '/'
             if slash.dirExists slash.resolve text
-                dirList slash.resolve(text), @completeCallback
+                slash.list slash.resolve(text), @completeCallback
                 true
         else if not empty slash.dir text
             if slash.dirExists slash.resolve slash.dir text
-                dirList slash.resolve(slash.dir(text)), @completeCallback
+                slash.list slash.resolve(slash.dir(text)), @completeCallback
                 true
 
     onTabCompletion: ->
@@ -156,58 +154,59 @@ class Browse extends Command
             @setText slash.tilde longestMatch
             @complete()
 
-    changedCallback: (err, files) =>
+    changedCallback: (files) =>
 
-        if not err?
+        klog 'changedCallback' files
+        
+        if empty @getText().trim()
+            @hideList()
+            return
 
-            if empty @getText().trim()
-                @hideList()
-                return
+        path = slash.resolve @getText().trim()
+        matches = files.filter (f) -> f.file.startsWith path
 
-            path = slash.resolve @getText().trim()
-            matches = files.filter (f) -> f.file.startsWith path
+        if empty matches
+            @clearBrokenPartForFiles files
+            return
 
-            if empty matches
-                @clearBrokenPartForFiles files
-                return
+        s = slash.tilde(path).length
 
-            s = slash.tilde(path).length
+        text = slash.tilde slash.tilde matches[0].file
+        @setText text
 
-            text = slash.tilde slash.tilde matches[0].file
-            @setText text
+        l = text.length
 
-            l = text.length
+        @commandline.selectSingleRange [0, [s,l]], before: true
 
-            @commandline.selectSingleRange [0, [s,l]], before: true
+        if matches.length < 2
+            @hideList()
+        else
 
-            if matches.length < 2
-                @hideList()
-            else
+            items = matches.map (m) ->
 
-                items = matches.map (m) ->
+                item = Object.create null
 
-                    item = Object.create null
+                switch m.type
+                    when 'file'
+                        item.line = ' '
+                        item.clss = 'file'
+                    when 'dir'
+                        item.line = '▸'
+                        item.clss = 'directory'
 
-                    switch m.type
-                        when 'file'
-                            item.line = ' '
-                            item.clss = 'file'
-                        when 'dir'
-                            item.line = '▸'
-                            item.clss = 'directory'
+                item.text = slash.file m.file
+                item.file = m.file
+                item
 
-                    item.text = slash.file m.file
-                    item.file = m.file
-                    item
-
-                @showItems items
+            @showItems items
 
     changed: (command) ->
 
+        klog 'browse.changed' command
         text = @getText().trim()
         if not text.endsWith '/'
             @walker?.end()
-            @walker = dirList slash.resolve(slash.dir(text)), @changedCallback
+            @walker = slash.list slash.resolve(slash.dir(text)), @changedCallback
         else
             @hideList()
 
@@ -312,7 +311,7 @@ class Browse extends Command
                 return
             else if slash.fileExists slash.removeLinePos cmd
                 @commandline.setText cmd
-                post.emit 'jumpToFile', file:cmd
+                post.emit 'jumpToFile' file:cmd
                 return
 
         kerror 'browse.execute -- unhandled', cmd

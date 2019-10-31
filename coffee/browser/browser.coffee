@@ -14,7 +14,7 @@ event  = require 'events'
 
 class Browser extends event
     
-    constructor: (@view) ->
+    @: (@view) ->
         
         @columns = []
         

@@ -15,10 +15,10 @@ syntax  = require '../editor/syntax'
 
 class Tab
 
-    constructor: (@tabs, @file) ->
+    @: (@tabs, @file) ->
 
         @dirty = false
-        @div = elem class: 'tab', text: ''
+        @div = elem class: 'tab' text: ''
         @tabs.div.appendChild @div
 
         if not @file.startsWith 'untitled'
@@ -68,6 +68,13 @@ class Tab
         else
             post.emit 'saveChanges'
 
+    setFile: (newFile) ->
+        
+        if not slash.samePath @file, newFile
+            klog 'setFile' slash.path newFile
+            @file = slash.path newFile
+            @update()
+            
     #  0000000  000000000   0000000   000000000  00000000
     # 000          000     000   000     000     000
     # 0000000      000     000000000     000     0000000
@@ -174,7 +181,7 @@ class Tab
 
     activate: ->
 
-        post.emit 'jumpToFile', file:@file
+        post.emit 'jumpToFile' file:@file
         @
 
     finishActivation: ->

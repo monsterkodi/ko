@@ -36,6 +36,8 @@ class FileHandler
     
     loadFile: (file, opt={}) =>
     
+        klog 'loadFile' file
+        
         file = null if file? and file.length <= 0
     
         editor.saveScrollCursorsAndSelections()
@@ -44,6 +46,12 @@ class FileHandler
             [file, filePos] = slash.splitFilePos file
             if not file.startsWith 'untitled'
                 file = slash.resolve file
+                klog 'loadFile' file
+                try
+                    process.chdir slash.dir file
+                    klog 'cwd' process.cwd()
+                catch err
+                    kerror err
     
         if file != editor?.currentFile or opt?.reload
     
@@ -67,8 +75,8 @@ class FileHandler
             editor.restoreScrollCursorsAndSelections()
             
             if fileExists
-                post.toOthers 'fileLoaded', file, winID # indexer
-                post.emit 'cwdSet', slash.dir file
+                post.toOthers 'fileLoaded' file, winID # indexer
+                post.emit 'cwdSet' slash.dir file
                 
         split.raise 'editor'
     
@@ -258,8 +266,8 @@ class FileHandler
         dialog.showOpenDialog
             title: "Open File"
             defaultPath: window.stash.get 'openFilePath', dir
-            properties: ['openFile', 'multiSelections']
-            , (files) -> post.emit 'openFiles', files, opt
+            properties: ['openFile' 'multiSelections']
+            , (files) -> post.emit 'openFiles' files, opt
                 
     #  0000000   0000000   000   000  00000000        00000000  000  000      00000000     0000000    0000000  
     # 000       000   000  000   000  000             000       000  000      000         000   000  000       
@@ -269,13 +277,10 @@ class FileHandler
     
     saveFileAs: =>
     
-        dialog.showSaveDialog
-            title: "Save File As"
-            defaultPath: slash.unslash slash.dir editor.currentFile
-            properties: ['openFile', 'createDirectory']
-            , (file) =>
-                if file
-                    @addToRecent file
-                    @saveFile file
+        defaultPath = slash.unslash editor?.currentDir()
+        dialog.showSaveDialog(title:'Save File As' defaultPath:defaultPath).then (result) =>
+            if not result.cancelled and result.filePath
+                @addToRecent result.filePath
+                @saveFile result.filePath
             
 module.exports = FileHandler
