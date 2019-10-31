@@ -77,7 +77,7 @@ class FileEditor extends TextEditor
 
     setCurrentFile: (file, restoreState) ->
 
-        klog 'setCurrentFile' file        
+        # klog 'setCurrentFile' file        
         
         @clear()
         @stopWatcher()

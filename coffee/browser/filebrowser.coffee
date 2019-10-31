@@ -83,14 +83,14 @@ class FileBrowser extends Browser
 
     activateItem: (item, col) ->
 
-        @clearColumnsFrom col+2, pop:true
+        @clearColumnsFrom col+2 pop:true
 
         switch item.type
             when 'dir'
                 @loadDirItem  item, col+1
             when 'file'
                 @loadFileItem item, col+1
-                klog 'activateItem' item.textFile, item.file
+                # klog 'activateItem' item.textFile, item.file
                 if item.textFile
                     post.emit 'jumpToFile' item
 

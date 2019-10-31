@@ -36,7 +36,7 @@ class FileHandler
     
     loadFile: (file, opt={}) =>
     
-        klog 'loadFile' file
+        # klog 'loadFile' file
         
         file = null if file? and file.length <= 0
     
@@ -46,10 +46,10 @@ class FileHandler
             [file, filePos] = slash.splitFilePos file
             if not file.startsWith 'untitled'
                 file = slash.resolve file
-                klog 'loadFile' file
+                # klog 'loadFile' file
                 try
                     process.chdir slash.dir file
-                    klog 'cwd' process.cwd()
+                    # klog 'cwd' process.cwd()
                 catch err
                     kerror err
     
