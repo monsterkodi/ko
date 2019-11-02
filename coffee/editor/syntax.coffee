@@ -143,7 +143,7 @@ class Syntax
             document.body.appendChild div
             @colors[styl] = window.getComputedStyle(div).color
             div.remove()
-
+            
         return @colors[styl]
 
     schemeChanged: -> @colors = {}

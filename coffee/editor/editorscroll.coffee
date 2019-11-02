@@ -218,7 +218,7 @@ class EditorScroll extends events
             hl = @editor.highlightsInLineIndexRange rg
             
             if sl.length == 0 == hl.length
-                klog 'cursorToTop' (cp[1] - @top - topDist)
+                # klog 'cursorToTop' (cp[1] - @top - topDist)
                 @by @lineHeight * (cp[1] - @top - topDist)
 
     cursorIntoView: ->

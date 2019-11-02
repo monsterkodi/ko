@@ -114,7 +114,6 @@ class FileEditor extends TextEditor
         
     restoreFromTabState: (tabState) ->
 
-        klog 'restoreFromTabState' tabState
         return kerror "no tabState.file?" if not tabState.file?
         @setCurrentFile tabState.file, tabState.state
 
