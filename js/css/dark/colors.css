@@ -55,7 +55,7 @@ body {
   background: #000;
 }
 .commandlist {
-  background: #181818;
+  background: #0a0a0a;
 }
 .commandlist.open .linenumber.selected span {
   color: #aaf;

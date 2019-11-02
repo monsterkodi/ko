@@ -39,7 +39,7 @@ class Column
         @div.addEventListener 'mouseup'   @onClick
         @div.addEventListener 'dblclick'  @onDblClick
         
-        @div.addEventListener 'ontextmenu' @onContextMenu
+        @div.addEventListener 'contextmenu' @onContextMenu
         
         @scroll = new Scroller @
         
@@ -61,7 +61,7 @@ class Column
             @parent.type = slash.isDir(@parent.file) and 'dir' or 'file'
         
         kerror "no parent item?" if not @parent?
-        kerror "loadItems -- no parent type?", @parent if not @parent.type?
+        kerror "loadItems -- no parent type?" @parent if not @parent.type?
         
         if valid @items
             for item in @items
@@ -76,7 +76,7 @@ class Column
         
         @parent = opt.parent
         kerror "no parent item?" if not @parent?
-        kerror "setItems -- no parent type?", @parent if not @parent.type?
+        kerror "setItems -- no parent type?" @parent if not @parent.type?
         
         for item in @items
             @rows.push new Row @, item

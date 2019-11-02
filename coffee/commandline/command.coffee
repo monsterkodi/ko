@@ -133,7 +133,7 @@ class Command
         if not @commandList?
             listView = elem class: "commandlist #{@prefsID}"
             window.split.elem.appendChild listView
-            @commandList = new CommandList @, '.commandlist', syntaxName: @syntaxName
+            @commandList = new CommandList @, '.commandlist' syntaxName:@syntaxName
     
     listItems: () -> reversed @history
 

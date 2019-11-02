@@ -12,27 +12,27 @@ matchr = require '../../tools/matchr'
 class Transform
 
     @transformNames = [
-        'upper', 'lower', 'title', 'case'
-        'count', 'add', 'sub'
-        'up', 'down', 'sort', 'uniq'
-        'reverse',
-        'resolve', 'unresolve'
-        'dir', 'base'
-        'file', 'ext'
+        'upper' 'lower' 'title' 'case'
+        'count' 'add' 'sub'
+        'up' 'down' 'sort' 'uniq'
+        'reverse'
+        'resolve' 'unresolve'
+        'dir' 'base'
+        'file' 'ext'
     ]
     @transformMenus =
-        Case: ['upper', 'lower', 'title', 'case']
-        Calc: ['count', 'add', 'sub']
-        Sort: ['up', 'down', 'sort', 'uniq', 'reverse']
-        Path: [ 'resolve', 'unresolve', 'dir', 'base', 'file', 'ext' ]
+        Case: ['upper' 'lower' 'title' 'case']
+        Calc: ['count' 'add' 'sub']
+        Sort: ['up' 'down' 'sort' 'uniq' 'reverse']
+        Path: [ 'resolve' 'unresolve' 'dir' 'base' 'file' 'ext' ]
 
     @: (@editor) ->
 
         @editor.transform = @
         @last         = null
-        @caseFuncs    = ['upper', 'lower', 'title']
-        @resolveFuncs = ['resolve', 'unresolve']
-        @sortFuncs    = ['up', 'down']
+        @caseFuncs    = ['upper' 'lower' 'title']
+        @resolveFuncs = ['resolve' 'unresolve']
+        @sortFuncs    = ['up' 'down']
 
     #  0000000   0000000   000   000  000   000  000000000
     # 000       000   000  000   000  0000  000     000
@@ -40,7 +40,7 @@ class Transform
     # 000       000   000  000   000  000  0000     000
     #  0000000   0000000    0000000   000   000     000
 
-    count: (typ='dec', offset=0, step=1) ->
+    count: (typ='dec' offset=0, step=1) ->
 
         offset = parseInt offset
         step   = parseInt step

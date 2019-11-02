@@ -27,7 +27,7 @@ menu = (template) ->
 
     EditMenu = []
     for actionFile in actionFiles
-        continue if slash.ext(actionFile) not in ['js', 'coffee']
+        continue if slash.ext(actionFile) not in ['js' 'coffee']
         actions = require actionFile
         for key,value of actions
             menuName = 'Misc'
@@ -37,7 +37,7 @@ menu = (template) ->
                     submenu[menuName] ?= []
                 for k,v of value
                     if v.name and v.combo
-                        menuAction = (c) -> (i,win) -> post.toWin win.id, 'menuAction', c
+                        menuAction = (c) -> (i,win) -> post.toWin win.id, 'menuAction' c
                         combo = v.combo
                         if os.platform() != 'darwin' and v.accel
                             combo = v.accel
@@ -49,7 +49,7 @@ menu = (template) ->
                         if v.separator
                             submenu[v.menu ? menuName].push text: ''
                         submenu[v.menu ? menuName].push item
-                submenu[menuName].push text: ''
+                # submenu[menuName].push text: ''
 
     for key, menu of submenu
         EditMenu.push text:key, menu:menu
@@ -57,7 +57,7 @@ menu = (template) ->
     editMenu = getMenu template, 'Edit'
     editMenu.menu = editMenu.menu.concat EditMenu
 
-    MacroMenu = [ text:'Macro', combo:'command+m', accel:'ctrl+m', command:'macro' ]
+    MacroMenu = [ text:'Macro' combo:'command+m' accel:'ctrl+m' command:'macro' ]
     for macro in Macro.macroNames
         MacroMenu.push
             text:   macro
@@ -65,7 +65,7 @@ menu = (template) ->
             action: 'doMacro'
 
     commandMenu = getMenu template, 'Command'
-    commandMenu.menu = commandMenu.menu.concat text:'Macro', menu:MacroMenu
+    commandMenu.menu = commandMenu.menu.concat text:'Macro' menu:MacroMenu
 
     TransformMenu = []
     for transformMenu, transformList of Transform.Transform.transformMenus
@@ -80,7 +80,7 @@ menu = (template) ->
             text: transformMenu
             menu: transformSubmenu
 
-    editMenu.menu = editMenu.menu.concat text:'Transform', menu:TransformMenu
+    editMenu.menu = editMenu.menu.concat text:'Transform' menu:TransformMenu
 
     fileSpan = (f) ->
         if f?
@@ -90,14 +90,14 @@ menu = (template) ->
 
     RecentMenu = []
 
-    recent = window.state?.get 'recentFiles', []
+    recent = window.state?.get 'recentFiles' []
     recent ?= []
     for f in recent
         if fs.existsSync f
             RecentMenu.unshift
                 html: fileSpan f
                 arg: f
-                cb: (arg) -> post.emit 'newTabWithFile', arg
+                cb: (arg) -> post.emit 'newTabWithFile' arg
 
     if RecentMenu.length
         RecentMenu.push
@@ -105,7 +105,7 @@ menu = (template) ->
         RecentMenu.push
             text: 'Clear List'
         fileMenu = getMenu template, 'File'
-        fileMenu.menu = [{text:'Recent', menu: RecentMenu}, {text:''}].concat fileMenu.menu
+        fileMenu.menu = [{text:'Recent' menu:RecentMenu}, {text:''}].concat fileMenu.menu
 
     template
 
