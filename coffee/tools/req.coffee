@@ -57,7 +57,6 @@ req = (file, lines, words, editor) ->
         if lines[li].trim().startsWith 'module.exports'
             name = lines[li].trim().split('=')[1]?.trim()
             if name and /\w+/.test name
-                # klog "exports #{name} #{name.toLowerCase()}"
                 exports[name.toLowerCase()] = true
             
         for k in Object.keys kxk
@@ -71,7 +70,6 @@ req = (file, lines, words, editor) ->
                 diss = diss.filter (d) -> d?.clss and not d.clss.startsWith('comment') and not d.clss.startsWith('string')
                 text = diss.map((s) -> s.match).join ' '
                 if regex.test text
-                    # klog "match #{k} #{li}: #{lines[li]} |#{text}|"
                     kxkValues.push k
     
     firstIndex ?= 0

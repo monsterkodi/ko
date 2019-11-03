@@ -161,7 +161,7 @@ class Macro extends Command
                             editor.do.insert line.index, line.text
                         else
                             editor.do.change line.index, line.text
-                    editor.moveCursorsDown false, lines.length
+                    # editor.moveCursorsDown false, lines.length
                     editor.do.end()
                     return do: "focus editor"
 
