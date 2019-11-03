@@ -6,7 +6,7 @@
  0000000   000        00000000  000   000
 ###
 
-{ post, valid, empty, clamp, slash, fs, os, _ } = require 'kxk'
+{ post, slash, empty, valid, _ } = require 'kxk'
   
 Projects  = require '../tools/projects'
 File      = require '../tools/file'

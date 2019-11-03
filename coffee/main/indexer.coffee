@@ -6,10 +6,9 @@
 000  000   000  0000000    00000000  000   000  00000000  000   000
 ###
 
-{ post, valid, empty, slash, fs, os, str, kerror, _ } = require 'kxk'
+{ post, matchr, filter, empty, slash, valid, fs, kerror, _ } = require 'kxk'
 
 Walker   = require '../tools/walker'
-matchr   = require '../tools/matchr'
 forkfunc = require '../tools/forkfunc'
 IndexHpp = require './indexhpp'
 

@@ -6,11 +6,10 @@
  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  0000000      000
 ###
 
-{ kerror } = require 'kxk' 
+{ matchr, kerror } = require 'kxk'
 
 TextEditor = require '../editor/texteditor'
 Syntax     = require '../editor/syntax'
-matchr     = require '../tools/matchr'
 salt       = require '../tools/salt'
 
 class CommandList extends TextEditor
@@ -60,7 +59,7 @@ class CommandList extends TextEditor
                 rngs.push
                     match: text
                     start: 0
-                    value: item.clss
+                    clss:  item.clss
                     index: 0
 
             @appendMeta

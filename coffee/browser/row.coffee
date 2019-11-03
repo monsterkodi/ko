@@ -6,7 +6,7 @@
 000   000   0000000   00     00
 ###
 
-{ elem, keyinfo, drag, clamp, stopEvent, empty, post, slash, kerror, fs, $, _ } = require 'kxk' 
+{ post, keyinfo, empty, slash, elem, drag, app, fs, kerror, $, _ } = require 'kxk'
 
 Syntax    = require '../editor/syntax'
 electron  = require 'electron'

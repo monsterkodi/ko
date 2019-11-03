@@ -6,7 +6,7 @@
 000   000  00000000  000   000  0000000    00000000  000   000
 ###
 
-{ kstr, elem } = require 'kxk'
+{ empty, kstr, elem, sw } = require 'kxk'
 
 class Render
 
@@ -22,20 +22,18 @@ class Render
             for di in [diss.length-1..0]
                 d = diss[di]
                 tx = d.start * size.charWidth
-                value = d.value? and " class=\"#{d.value}\"" or ''
-                clrzd = "<span style=\"transform:translatex(#{tx}px);#{d.styl ? ''}\"#{value}>#{kstr.encode d.match}</span>"
+                clss = d.clss? and " class=\"#{d.clss}\"" or ''
+                clrzd = "<span style=\"transform:translatex(#{tx}px);#{d.styl ? ''}\"#{clss}>#{kstr.encode d.match}</span>"
                 l = clrzd + l
         l
 
     @lineSpan: (diss, size) ->
 
-        # log diss
-        
         div = elem class: 'linespans'
         for d in diss ? []
             span = elem 'span'
             span.style.transform = "translatex(#{d.start * size.charWidth}px)"
-            span.className = d.value if d.value?
+            span.className = d.clss if d.clss?
             span.textContent = d.match.replace /\x1b/g, '▪'
             if d.styl?
                 for st in d.styl.split ';'

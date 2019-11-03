@@ -6,7 +6,7 @@
  0000000    0000000      000      0000000 
 ###
 
-{ clamp, post, _ } = require 'kxk'
+{ post, clamp, _ } = require 'kxk'
 
 Command = require '../commandline/command'
 
@@ -44,18 +44,18 @@ class Goto extends Command
         items = []
         @types = {}
         
-        files = post.get 'indexer', 'files'
+        files = post.get 'indexer' 'files'
         funcs = files[window.editor.currentFile]?.funcs
         funcs ?= []
         
         for func in funcs
-            items.push text:func.name, line:'▸', clss:'method'
+            items.push text:func.name, line:'▸' clss:'method'
             @types[func.name] = 'func'
             
-        clsss = post.get 'indexer', 'classes'
+        clsss = post.get 'indexer' 'classes'
         for k in _.keys clsss
             name = k
-            items.push text: k, line:'●', clss:'class'
+            items.push text: k, line:'●' clss:'class'
             @types[name] = 'class'
             
         items

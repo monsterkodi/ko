@@ -6,7 +6,7 @@
 00000000  0000000    000     000      0000000   000   000
 ###
 
-{ clamp, empty, slash, kerror, filelist, _ } = require 'kxk'
+{ filelist, slash, empty, kerror, _ } = require 'kxk'
 
 Buffer  = require './buffer'
 Syntax  = require './syntax'

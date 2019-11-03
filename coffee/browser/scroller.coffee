@@ -6,7 +6,7 @@
 0000000    0000000  000   000   0000000   0000000  0000000  00000000  000   000
 ###
 
-{ stopEvent, clamp, drag, elem } = require 'kxk'
+{ stopEvent, clamp, elem, drag } = require 'kxk'
 
 scheme = require '../tools/scheme'
 

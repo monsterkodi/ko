@@ -6,7 +6,7 @@
 000       000  0000000  00000000
 ###
 
-{ empty, valid, childp, slash, fs, _ } = require 'kxk'
+{ childp, slash, empty, valid, fs } = require 'kxk'
 
 icons = require './icons.json'
 

@@ -6,7 +6,7 @@
 000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
 ###
 
-{ kerror, stopEvent, clamp, post, empty, elem, $, _ } = require 'kxk'
+{ post, stopEvent, empty, clamp, elem, kerror, $, _ } = require 'kxk'
 
 Indexer = require '../main/indexer'
 event   = require 'events'

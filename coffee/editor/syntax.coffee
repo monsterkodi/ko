@@ -6,11 +6,9 @@
 0000000      000     000   000     000     000   000  000   000
 ###
 
-{ kerror, kstr, valid, klog, elem, empty, fs, noon, slash, _ } = require 'kxk'
+{ matchr, valid, slash, elem, last, kstr, klor, noon, fs, kerror, _ } = require 'kxk'
 
-matchr   = require '../tools/matchr'
 Balancer = require './balancer'
-klor     = require 'klor'
 
 class Syntax
     
@@ -173,8 +171,8 @@ class Syntax
                 for sp in [last...d.start]
                     spc += '&nbsp;'
                 last  = d.start + d.match.length
-                value = d.value? and d.value.length and " class=\"#{d.value}\"" or ''
-                clrzd = "<span#{style}#{value}>#{spc}#{kstr.encode d.match}</span>"
+                clss = d.clss? and d.clss.length and " class=\"#{d.clss}\"" or ''
+                clrzd = "<span#{style}#{clss}>#{spc}#{kstr.encode d.match}</span>"
                 l += clrzd
         l
 
@@ -184,7 +182,7 @@ class Syntax
 
     @dissForTextAndSyntax: (text, n) ->
 
-        if n not in ['browser', 'ko', 'commandline', 'macro', 'term', 'test']
+        if n not in ['browser' 'ko' 'commandline' 'macro' 'term' 'test']
             result = klor.ranges text, n
         else
             if not n? or not Syntax.matchrConfigs[n]?

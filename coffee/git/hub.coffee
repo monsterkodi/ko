@@ -6,7 +6,7 @@
 000   000   0000000   0000000    
 ###
 
-{ post, valid, empty, filter, _ } = require 'kxk'
+{ post, filter, valid } = require 'kxk'
 
 watch    = require './watch'
 status   = require './status'

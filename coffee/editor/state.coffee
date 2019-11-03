@@ -6,7 +6,7 @@
 0000000      000     000   000     000     00000000
 ###
 
-{ kerror, kstr, _ } = require 'kxk'
+{ kstr, kerror } = require 'kxk'
 
 Immutable = require 'seamless-immutable'
 

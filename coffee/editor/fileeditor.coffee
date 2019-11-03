@@ -6,7 +6,7 @@
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
 
-{ post, stopEvent, setStyle, kerror, srcmap, slash, clamp, empty, popup, klog, kpos, _ } = require 'kxk'
+{ post, stopEvent, setStyle, srcmap, slash, clamp, empty, popup, kpos, kerror, _ } = require 'kxk'
 
 Watcher    = require '../tools/watcher'
 TextEditor = require './texteditor'

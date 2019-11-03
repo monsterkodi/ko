@@ -6,13 +6,13 @@
 0000000    0000000  000   000  00000000  000   000  00000000  
 ###
 
-{ prefs, elem, post, slash, $, _ } = require 'kxk'
+{ post, slash, prefs, elem, $, _ } = require 'kxk'
 
 class Scheme
     
     @colors = {}
     
-    @toggle: (schemes = ['dark', 'bright']) ->
+    @toggle: (schemes = ['dark' 'bright']) ->
         
         link =$ '.scheme-link'
         currentScheme = slash.basename slash.dir link.href
@@ -36,8 +36,8 @@ class Scheme
                 
             link.parentNode.replaceChild newlink, link
             
-        prefs.set 'scheme', scheme    
-        post.emit 'schemeChanged', scheme
+        prefs.set 'scheme' scheme    
+        post.emit 'schemeChanged' scheme
 
     @colorForClass: (clss) ->
         

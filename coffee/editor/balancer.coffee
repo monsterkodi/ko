@@ -6,10 +6,7 @@
 0000000    000   000  0000000  000   000  000   000   0000000  00000000  000   000
 ###
 
-{ empty, kerror, klog, _ } = require 'kxk'
-
-matchr = require '../tools/matchr'
-klor   = require 'klor'
+{ matchr, empty, klor, kerror, _ } = require 'kxk'
 
 class Balancer
 
@@ -58,23 +55,23 @@ class Balancer
 
             when 'coffee' 'koffee'
                 @regions.multiString   = clss:'string triple'        open:'"""' close: '"""' multi: true
-                @regions.multiString2  = clss:'string triple skinny' open:"'''", close: "'''", multi: true
+                @regions.multiString2  = clss:'string triple skinny' open:"'''" close: "'''" multi: true
                 @regions.interpolation = clss:'interpolation'        open:'#{'  close: '}'   multi: true
-                @regions.singleString  = clss:'string single'        open:"'", close: "'"
+                @regions.singleString  = clss:'string single'        open:"'" close: "'"
 
             when 'js' 'ts'
-                @regions.singleString  = clss: 'string single'  open: "'", close: "'"
+                @regions.singleString  = clss: 'string single'  open: "'" close: "'"
 
             when 'noon' 'iss'
                 @regions.lineComment.solo = true # only spaces before comments allowed
 
             when 'md'
                 @regions.multiString   = clss:'string triple' open:'```'   close: '```' multi: true
-                @regions.header5       = clss:'markdown h5'   open:'#####' close: null, solo: true
-                @regions.header4       = clss:'markdown h4'   open:'####'  close: null, solo: true
-                @regions.header3       = clss:'markdown h3'   open:'###'   close: null, solo: true
-                @regions.header2       = clss:'markdown h2'   open:'##'    close: null, solo: true
-                @regions.header1       = clss:'markdown h1'   open:'#'     close: null, solo: true
+                @regions.header5       = clss:'markdown h5'   open:'#####' close: null  solo: true
+                @regions.header4       = clss:'markdown h4'   open:'####'  close: null  solo: true
+                @regions.header3       = clss:'markdown h3'   open:'###'   close: null  solo: true
+                @regions.header2       = clss:'markdown h2'   open:'##'    close: null  solo: true
+                @regions.header1       = clss:'markdown h1'   open:'#'     close: null  solo: true
 
         @openRegions = _.filter @regions, (r) -> r.close == null
 
@@ -91,11 +88,7 @@ class Balancer
         if not text?
             return kerror "dissForLine -- no line at index #{li}?"
 
-        # r = @mergeRegions @parse(text, li), text, li
-        
         if @blocks?[li] 
-            # log 'blck' li, @blocks[li]
-            # log 'diss' li, r
             return @blocks[li]
         r = @mergeRegions @parse(text, li), text, li
         r
@@ -172,7 +165,7 @@ class Balancer
                 diss.push
                     start: s
                     match: m
-                    value: clss
+                    clss: clss
                 m = ''
         diss
 
@@ -219,7 +212,7 @@ class Balancer
                     top = _.cloneDeep top
                     top.start = le
                     top.match = text.slice le, p-1
-                    top.value = top.region.clss
+                    top.clss = top.region.clss
                     delete top.region
 
                     advance = ->
@@ -232,7 +225,7 @@ class Balancer
 
                     if top.match.length
 
-                        if top.value in ['string single' 'string double' 'string triple' 'string triple skinny']
+                        if top.clss in ['string single' 'string double' 'string triple' 'string triple skinny']
                             split = top.match.split /\s\s+/
                             if split.length == 1
                                 result.push top
@@ -261,7 +254,7 @@ class Balancer
             result.push
                 start: p-1
                 match: region.open
-                value: region.clss + ' marker'
+                clss: region.clss + ' marker'
 
             if start < text.length-1
                 result = result.concat @dissForClass text, start, region.clss
@@ -279,7 +272,7 @@ class Balancer
             result.push
                 start: p-1
                 match: region.open
-                value: region.clss + ' marker'
+                clss: region.clss + ' marker'
 
             stack.push
                 start:  p-1+region.open.length
@@ -306,7 +299,7 @@ class Balancer
 
                 result.push
                     start: p-1
-                    value: top.region.clss + ' marker'
+                    clss: top.region.clss + ' marker'
                     match: top.region.close
 
                 p += top.region.close.length-1
@@ -332,20 +325,20 @@ class Balancer
                     continue
 
                 if escapes
-                    if escapes % 2 and (ch != "#" or top and top.region.value != 'interpolation')
+                    if escapes % 2 and (ch != "#" or top and top.region.clss != 'interpolation')
                         escapes = 0 # character is escaped,
                         continue    # just continue to next
                     escapes = 0
 
                 if ch == ':'
                     if @syntax.name == 'json' # highlight json dictionary keys
-                        if _.last(result).value == 'string double marker'
-                            if result.length > 1 and result[result.length-2].value == 'string double'
-                                result[result.length-2].value = 'string dictionary key'
+                        if _.last(result).clss == 'string double marker'
+                            if result.length > 1 and result[result.length-2].clss == 'string double'
+                                result[result.length-2].clss = 'string dictionary key'
                                 result.push
                                     start: p-1
                                     match: ch
-                                    value: 'dictionary marker'
+                                    clss: 'dictionary marker'
                                 continue
 
             rest = text.slice p-1

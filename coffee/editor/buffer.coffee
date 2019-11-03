@@ -6,9 +6,8 @@
 0000000     0000000   000       000       00000000  000   000
 ###
 
-{ clamp, empty, kerror, _ } = require 'kxk'
+{ matchr, empty, clamp, kerror, _ } = require 'kxk'
 
-matchr  = require '../tools/matchr'
 State   = require './state'
 fuzzy   = require 'fuzzy'
 event   = require 'events'

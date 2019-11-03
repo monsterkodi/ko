@@ -6,9 +6,8 @@
 0000000   00000000  000   000  000   000   0000000  000   000
 ###
 
-{ slash, post, fs, os, kerror, _ } = require 'kxk'
+{ post, matchr, slash, fs, kerror, _ } = require 'kxk'
 
-matchr  = require '../tools/matchr'
 walker  = require '../tools/walker'
 Syntax  = require '../editor/syntax'
 Command = require '../commandline/command'

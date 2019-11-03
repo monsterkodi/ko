@@ -14,8 +14,8 @@ if module.parent
     # 000 0 000  000   000  000  000  0000
     # 000   000  000   000  000  000   000
 
-    { childp, slash } = require 'kxk'
-
+    { childp, slash, args } = require 'kxk'
+    
     forkfunc = (file, args..., callback) ->
         
         if /^[.]?\.\//.test file
@@ -29,8 +29,8 @@ if module.parent
             cp = childp.fork __filename
             
             onExit = ->
-                cp.removeListener 'message', onResult
-                cp.removeListener 'exit',    onExit
+                cp.removeListener 'message' onResult
+                cp.removeListener 'exit'    onExit
                 cp.disconnect() if cp.connected
                 cp.kill()
                 
@@ -39,9 +39,9 @@ if module.parent
                 callback result.err, result.result
                 onExit()
                 
-            cp.on 'error',   (err) -> callback err, null
-            cp.on 'message', onResult
-            cp.on 'exit',    onExit
+            cp.on 'error'   (err) -> callback err, null
+            cp.on 'message' onResult
+            cp.on 'exit'    onExit
 
             cp.send
                 file:  file
@@ -65,7 +65,7 @@ else
 
     sendResult = (err, result) ->
         
-        process.removeListener 'message', callFunc
+        process.removeListener 'message' callFunc
         process.send {err:err, result:result}, ->
             process.disconnect() if process.connected
             process.exit 0
@@ -82,4 +82,4 @@ else
             
             sendResult err.stack
 
-    process.on 'message', callFunc
+    process.on 'message' callFunc

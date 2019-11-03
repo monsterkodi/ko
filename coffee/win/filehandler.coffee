@@ -6,7 +6,7 @@
 000       000  0000000  00000000  000   000  000   000  000   000  0000000    0000000  00000000  000   000
 ###
 
-{ post, reversed, filelist, empty, slash, first, prefs, klog, valid, kerror, _ } = require 'kxk'
+{ post, filelist, reversed, slash, empty, valid, first, prefs, kerror, klog, _ } = require 'kxk'
 
 File     = require '../tools/file'
 electron = require 'electron'
@@ -15,7 +15,7 @@ dialog   = remote.dialog
 
 class FileHandler
 
-    @: () ->
+    @: ->
 
         post.on 'reloadFile'  @reloadFile
         post.on 'removeFile'  @removeFile
@@ -209,6 +209,8 @@ class FileHandler
             return
               
         editor.stopWatcher()
+        
+        post.emit 'menuAction' 'doMacro' actarg:'req' # !!!!!!!
         
         File.save file, editor.text(), (err, saved) ->
             

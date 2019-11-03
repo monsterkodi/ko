@@ -6,7 +6,7 @@
 000       0000000  00000000  000   000  
 ###
 
-{ getStyle, clamp, valid, empty, last, drag, def, _ } = require 'kxk'
+{ valid, last, drag, _ } = require 'kxk'
 
 Pane   = require './pane'
 Handle = require './handle'

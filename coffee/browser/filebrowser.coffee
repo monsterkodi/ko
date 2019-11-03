@@ -6,7 +6,7 @@
 000       000  0000000  00000000        0000000    000   000   0000000   00     00  0000000   00000000  000   000
 ###
 
-{ post, valid, empty, clamp, last, elem, drag, state, klog, slash, fs, os, $, _ } = require 'kxk'
+{ post, filelist, slash, empty, valid, clamp, elem, drag, last } = require 'kxk'
 
 Browser  = require './browser'
 Shelf    = require './shelf'

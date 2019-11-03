@@ -6,7 +6,7 @@
 000   000   0000000   000   000  0000000    00000000  000   000  0000000
 ###
 
-{ setStyle, elem, $, _ } = require 'kxk'
+{ setStyle, elem, $ } = require 'kxk'
 
 event = require 'events'
 
@@ -136,9 +136,9 @@ class Numbers extends event
 
     onFontSizeChange: =>
 
-        fs = Math.min 22, @editor.size.fontSize-4
-        @elem.style.fontSize = "#{fs}px"
-        setStyle '.linenumber', 'padding-top', "#{parseInt @editor.size.fontSize/10}px"
+        fsz = Math.min 22, @editor.size.fontSize-4
+        @elem.style.fontSize = "#{fsz}px"
+        setStyle '.linenumber' 'padding-top' "#{parseInt @editor.size.fontSize/10}px"
 
     #  0000000   0000000   000       0000000   00000000    0000000
     # 000       000   000  000      000   000  000   000  000

@@ -6,7 +6,7 @@
  0000000   000     000     000  000   000  000        0000000 
 ###
 
-{ post, slash, elem, empty, fs, $, _ } = require 'kxk'
+{ post, slash, empty, fs } = require 'kxk'
 
 lineDiff   = require '../tools/linediff'
 Syntax     = require '../editor/syntax'
@@ -60,7 +60,7 @@ class GitInfo
             
             if changes.change == 'deleted'
                 
-                dss.map (ds) -> ds.value += ' ' + 'git-deleted'
+                dss.map (ds) -> ds.clss += ' ' + 'git-deleted'
                 
             else if changes.change == 'changed'
                 

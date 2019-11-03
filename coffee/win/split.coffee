@@ -6,7 +6,7 @@
 0000000   000        0000000  000     000   
 ###
 
-{ post, kerror, $, _ } = require 'kxk'
+{ post, kerror, $ } = require 'kxk'
 
 event = require 'events'
 Flex  = require './flex/flex'
@@ -19,7 +19,7 @@ class Split
     # 000  000  0000  000     000   
     # 000  000   000  000     000   
     
-    @: () ->
+    @: ->
 
         @commandlineHeight = 30
         @handleHeight      = 6
@@ -30,9 +30,9 @@ class Split
         @commandline =$ 'commandline'
         @editor      =$ 'editor'
 
-        post.on 'focus',   @focus
-        post.on 'stash',   @stash
-        post.on 'restore', @restore
+        post.on 'focus'   @focus
+        post.on 'stash'   @stash
+        post.on 'restore' @restore
 
         @flex = new Flex
             panes: [
@@ -54,7 +54,7 @@ class Split
             
     onDrag: => if @flex? then @emitSplit()
     
-    emitSplit: => post.emit 'split', @flex.panePositions()
+    emitSplit: => post.emit 'split' @flex.panePositions()
     
     #  0000000  000000000   0000000    0000000  000   000  
     # 000          000     000   000  000       000   000  

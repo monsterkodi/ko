@@ -6,7 +6,7 @@
 0000000    000  000   000   0000000  000   000   0000000  000   000  00000000
 ###
 
-{ post, slash, watch, _ } = require 'kxk'
+{ post, watch } = require 'kxk'
 
 class DirCache
 
@@ -41,7 +41,7 @@ class DirCache
         delete DirCache.watches[dir]
         delete DirCache.cache[dir]
         
-        post.emit 'dircache', dir
+        post.emit 'dircache' dir
 
     @onChange: (info) ->
 

@@ -6,13 +6,13 @@
  0000000  00     00  0000000    
 ###
 
-{ slash, post, elem, $ } = require 'kxk'
+{ post, slash, elem, $ } = require 'kxk'
 
 syntax = require '../editor/syntax'
 
 class CWD
 
-    @: () ->
+    @: ->
                     
         @elem = elem class: 'cwd'
 
@@ -22,7 +22,6 @@ class CWD
         post.on 'restore' @restore
         post.on 'cwdSet'  @onCwdSet
         
-        # @onCwdSet window.commandline.commands.term.cwd 
         @restore()
             
     onCwdSet: (@cwd) =>

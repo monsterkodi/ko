@@ -6,7 +6,7 @@
  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 ###
 
-{ post, filelist, stopEvent, elem, keyinfo, clamp, slash, kerror, os, $, _ } = require 'kxk'
+{ post, stopEvent, filelist, slash, elem, args, kerror, $ } = require 'kxk'
 
 TextEditor = require '../editor/texteditor'
 
@@ -16,24 +16,24 @@ class Commandline extends TextEditor
 
         super viewElem, features: [], fontSize: 24, syntaxName:'commandline'
 
-        @mainCommands = ['browse', 'goto', 'open', 'search', 'find', 'macro']
-        @hideCommands = ['selecto', 'Browse']
+        @mainCommands = ['browse' 'goto' 'open' 'search' 'find' 'macro']
+        @hideCommands = ['selecto' 'Browse']
 
         @size.lineHeight = 30
         @scroll.setLineHeight @size.lineHeight
 
         @button =$ 'commandline-button'
         @button.classList.add 'empty'
-        @button.addEventListener 'mousedown', @onCmmdClick
+        @button.addEventListener 'mousedown' @onCmmdClick
 
         @commands = {}
         @command = null
 
         @loadCommands()
 
-        post.on 'split',   @onSplit
-        post.on 'restore', @restore
-        post.on 'stash',   @stash
+        post.on 'split'   @onSplit
+        post.on 'restore' @restore
+        post.on 'stash'   @stash
 
         @view.onblur = =>
             @button.classList.remove 'active'

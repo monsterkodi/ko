@@ -6,7 +6,7 @@
 0000000  000  000   000  00000000  0000000    000  000       000       
 ###
 
-{ empty, _ } = require 'kxk'
+{ empty, last } = require 'kxk'
 
 lineDiff = (oldLine, newLine) ->
     
@@ -52,9 +52,9 @@ lineDiff = (oldLine, newLine) ->
                 
                 else # change
                     
-                    last = _.last changes 
-                    if last?.change == 'change' and last.old + last.length == oi
-                        last.length += 1
+                    lst = last changes 
+                    if lst?.change == 'change' and lst.old + lst.length == oi
+                        lst.length += 1
                     else
                         changes.push change: 'change', old: oi, new: ni, length: 1
                     oi += 1

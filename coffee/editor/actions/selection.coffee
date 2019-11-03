@@ -267,7 +267,7 @@ module.exports =
         r = rangeAfterPosInRanges @cursorPos(), @highlights()
         r ?= @highlight 0
         if r?
-            @selectSingleRange r, before: r[2]?.value == 'close'
+            @selectSingleRange r, before:r[2]?.clss == 'close'
             @scrollCursorIntoView?() # < this also sucks
 
     selectPrevHighlight: -> # command+shift+g

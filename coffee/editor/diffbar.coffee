@@ -6,7 +6,7 @@
 0000000    000  000       000       0000000    000   000  000   000
 ###
 
-{ elem, empty, post, fs } = require 'kxk'
+{ post, empty, elem } = require 'kxk'
 
 lineDiff = require '../tools/linediff'
 hub      = require '../git/hub'

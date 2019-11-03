@@ -5,7 +5,7 @@
 # 000        000   000       000     000     000
 # 000        000   000  0000000      000     00000000
 
-{ empty, _ } = require 'kxk'
+{ empty, os, _ } = require 'kxk'
 
 electron  = require 'electron'
 clipboard = electron.clipboard

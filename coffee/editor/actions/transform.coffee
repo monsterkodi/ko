@@ -5,9 +5,7 @@
 #    000     000   000  000   000  000  0000       000  000       000   000  000   000  000 0 000
 #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000
 
-{ reversed, slash, kstr, kerror, _ } = require 'kxk'
-
-matchr = require '../../tools/matchr'
+{ reversed, matchr, slash, kstr, args, kerror, _ } = require 'kxk'
 
 class Transform
 

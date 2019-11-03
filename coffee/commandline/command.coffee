@@ -6,7 +6,7 @@
  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
 ###
 
-{ reversed, clamp, empty, elem, kerror, _ } = require 'kxk'
+{ reversed, history, empty, clamp, elem, kerror, _ } = require 'kxk'
 
 syntax      = require '../editor/syntax'
 CommandList = require './commandlist'
@@ -276,7 +276,7 @@ class Command
         
         @loadState() if not @history?
         if not _.isArray @history
-            kerror "Command.setCurrent -- #{@historyKey()} : history not an array?", typeof @history 
+            kerror "Command.setCurrent -- #{@historyKey()} : history not an array?" typeof @history 
             @history = []
         _.pull @history, command
         @history.push command if command.trim().length

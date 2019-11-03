@@ -329,13 +329,13 @@ class Shelf extends Column
             else index
             
         kerror "no index #{index}? #{@numVisible()}" if not index? or Number.isNaN index        
-        index = clamp 0, @numRows()-1, index
+        index = clamp 0 @numRows()-1 index
         
-        kerror "no row at index #{index}/#{@numRows()-1}?", @numRows() if not @rows[index]?.activate?
+        kerror "no row at index #{index}/#{@numRows()-1}?" @numRows() if not @rows[index]?.activate?
 
         navigate = (action) =>
             @navigatingRows = true
-            post.emit 'menuAction', action
+            post.emit 'menuAction' action
         
         if      key == 'up'   and index > @items.length     then navigate 'Navigate Forward'
         else if key == 'down' and index > @items.length + 1 then navigate 'Navigate Backward'
@@ -360,8 +360,8 @@ class Shelf extends Column
                 
             nextOrPrev = row.next() ? row.prev()
             row.div.remove()
-            @items.splice row.index(), 1
-            @rows.splice row.index(), 1
+            @items.splice row.index() 1
+            @rows.splice row.index() 1
             nextOrPrev?.activate()
             @savePrefs()
         @

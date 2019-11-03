@@ -21,9 +21,9 @@ req = (file, lines, words, editor) ->
     words = words.filter (w) -> not globalRegExp.test w
     
     if pkgPath = slash.pkg file
-        projectFiles = post.get('indexer', 'project', pkgPath).files
+        projectFiles = post.get('indexer' 'project' pkgPath).files
         if valid projectFiles
-            projectFiles = projectFiles.filter (f) -> slash.ext(f) in ['coffee', 'json', 'js']
+            projectFiles = projectFiles.filter (f) -> slash.ext(f) in ['coffee' 'json' 'js']
             projectFiles = projectFiles.map (f) -> 
                 p = slash.splitExt(slash.relative f, slash.dir file)[0]
                 p = '.' + p if not p.startsWith '.'
@@ -33,37 +33,53 @@ req = (file, lines, words, editor) ->
     
     requires  = {}
     reqvalues = {}
+    exports   = {}
     kxkValues = []
     modValues = []
     firstIndex = null
+    indent = ''
     
     for li in [0...lines.length]
         
         m = lines[li].match requireRegExp
         if m?[1]? and m?[2]?
             if not requires[m[2]]
-                requires[m[2]] = index:li, value:m[1].trim(), module:m[2]
+                if m[2] == 'kxk'
+                    ci = 0
+                    while m[1][ci] == ' '
+                        indent += ' '
+                        ci += 1
+                requires[m[2]] = index:li, value:m[1].trim(), module:m[2] 
                 reqvalues[m[1].trim()] = m[2]
                 firstIndex ?= li
             continue
             
+        if lines[li].trim().startsWith 'module.exports'
+            name = lines[li].trim().split('=')[1]?.trim()
+            if name and /\w+/.test name
+                # klog "exports #{name} #{name.toLowerCase()}"
+                exports[name.toLowerCase()] = true
+            
         for k in Object.keys kxk
             continue if reqvalues[k]
             if k == '$'
-                regex = new RegExp "[^*\\)\'\"\\\\]\\$"
+                regex = /[^*\)\'\"\\]?\$[\s\(]/
             else
                 regex = new RegExp "(^|[\\:\\(\\{]|\\s+)#{k}(\\s+[^:]|\\s*$|[\\.\\(])"
             if regex.test lines[li]
                 diss = editor.syntax.getDiss li
-                diss = diss.filter (d) -> not d.value.startsWith('comment') and not d.value.startsWith('string')
+                diss = diss.filter (d) -> d?.clss and not d.clss.startsWith('comment') and not d.clss.startsWith('string')
                 text = diss.map((s) -> s.match).join ' '
                 if regex.test text
+                    # klog "match #{k} #{li}: #{lines[li]} |#{text}|"
                     kxkValues.push k
     
     firstIndex ?= 0
     
     if requires['kxk']
         firstIndex = requires['kxk'].index + 1
+    else 
+        return []
     
     for word in words
         
@@ -81,30 +97,30 @@ req = (file, lines, words, editor) ->
                 modValues.push value:word, module:word.toLowerCase()
 
     kxkValues = _.uniq kxkValues
-    kxkValues = kxkValues.filter (v) -> v not in ['state']
+    kxkValues = kxkValues.filter (v) -> v not in Object.keys(exports).concat ['state']
     
     if valid kxkValues
         
         weight = (v) ->
             switch v
-                when 'post'  then 0
-                when '_'     then 1000
-                when '$'     then 999
-                when 'error' then 900
-                when 'log'   then 901
+                when 'post'   then 0
+                when '_'      then 1000
+                when '$'      then 999
+                when 'kerror' then 900
+                when 'klog'   then 901
                 else Math.max(0, 500 - v.length)
                 
         kxkValues.sort (a,b) -> weight(a) - weight(b)
         
-        text = "{ #{kxkValues.join ', '} } = require 'kxk'"
+        text = "#{indent}{ #{kxkValues.join ', '} } = require 'kxk'"
         if requires['kxk']
-            operations.push op:'change', index:requires['kxk'].index, text:text
+            operations.push op:'change' index:requires['kxk'].index, text:text
         else
-            operations.push op:'insert', index:firstIndex, text:text
+            operations.push op:'insert' index:firstIndex, text:text
     
     for modValue in modValues
         if empty requires[modValue.module]
-            operations.push op:'insert', index:firstIndex, text:"#{modValue.value} = require '#{modValue.module}'"
+            operations.push op:'insert' index:firstIndex, text:"#{modValue.value} = require '#{modValue.module}'"
             
     return operations
 

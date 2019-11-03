@@ -6,7 +6,7 @@
 000  000   000  0000000    00000000  000   000  000        000   000   0000000     
 ###
 
-{ slash, walkdir, empty, noon, fs } = require 'kxk'
+{ walkdir, slash, empty, noon, fs } = require 'kxk'
 
 ignore = require 'ignore'
 File = require '../tools/file'

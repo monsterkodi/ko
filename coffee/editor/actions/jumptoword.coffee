@@ -5,9 +5,7 @@
 # 000   000  000   000  000 0 000  000           000     000   000  000   000  000   000  000   000  000   000  
 #  0000000    0000000   000   000  000           000      0000000   00     00   0000000   000   000  0000000    
         
-{ slash, post, empty } = require 'kxk'
-
-matchr = require '../../tools/matchr'
+{ post, matchr, slash, empty } = require 'kxk'
 
 module.exports = 
     

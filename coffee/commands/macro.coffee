@@ -6,7 +6,7 @@
 000   000  000   000   0000000  000   000   0000000
 ###
 
-{ post, reversed, kerror, empty, prefs, slash, valid, fs, _ } = require 'kxk'
+{ post, reversed, empty, prefs, slash, valid, args, fs, kerror, _ } = require 'kxk'
 
 indexer   = require '../main/indexer'
 salt      = require '../tools/salt'
@@ -150,8 +150,8 @@ class Macro extends Command
             when 'req'
 
                 return if slash.ext(editor.currentFile) != 'coffee'
-                words = wordsInArgsOrCursorsOrSelection args
-
+                # words = wordsInArgsOrCursorsOrSelection args
+                words = []
                 lines = req editor.currentFile, editor.lines(), words, editor
 
                 if valid lines

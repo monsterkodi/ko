@@ -6,9 +6,7 @@
 0000000      000     000   000  000  000   000   0000000   0000000 
 ###
 
-{ _ } = require 'kxk'
-
-matchr = require '../tools/matchr'
+{ matchr, _ } = require 'kxk'
 
 class Strings
     

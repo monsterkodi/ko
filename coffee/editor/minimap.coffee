@@ -6,7 +6,7 @@
 000   000  000  000   000  000  000   000  000   000  000
 ###
 
-{ getStyle, clamp, elem, drag } = require 'kxk' 
+{ getStyle, clamp, elem, drag } = require 'kxk'
 
 MapScroll = require './mapscroll'
 
@@ -99,8 +99,8 @@ class Minimap
             y = parseInt((li-@scroll.exposeTop)*@scroll.lineHeight)
             for r in diss ? []
                 break if 2*r.start >= @width
-                if r.value?
-                    ctx.fillStyle = @editor.syntax.colorForClassnames r.value + " minimap"
+                if r.clss?
+                    ctx.fillStyle = @editor.syntax.colorForClassnames r.clss + " minimap"
                 else if r.styl?
                     ctx.fillStyle = @editor.syntax.colorForStyle r.styl
                 ctx.fillRect @offsetLeft+2*r.start, y, 2*r.match.length, @scroll.lineHeight

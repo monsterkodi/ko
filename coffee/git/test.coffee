@@ -1,4 +1,4 @@
-{ slash, _ } = require 'kxk'
+{ slash } = require 'kxk'
 { expect, should } = require 'chai'
 
 root   = require './root'

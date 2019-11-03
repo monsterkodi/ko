@@ -6,7 +6,7 @@
 000  000   000  000        0000000 
 ###
 
-{ shortCount, tooltip, post, elem, $, _ } = require 'kxk'
+{ post, shortCount, tooltip, elem, $ } = require 'kxk'
 
 class Info
     

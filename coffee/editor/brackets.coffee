@@ -6,9 +6,7 @@
 0000000    000   000  000   000   0000000  000   000  00000000     000     0000000 
 ###
 
-{ _ } = require 'kxk'
-
-matchr  = require '../tools/matchr'
+{ matchr, _ } = require 'kxk'
 
 class Brackets
     
@@ -40,8 +38,8 @@ class Brackets
         [before, after] = @beforeAfterForPos cp
 
         if after.length or before.length
-            if after.length and _.first(after).start == cp[0] and _.first(after).value == 'open' then cp[0] += 1
-            if before.length and _.last(before).start == cp[0]-1 and _.last(before).value == 'close' then cp[0] -= 1
+            if after.length and _.first(after).start == cp[0] and _.first(after).clss == 'open' then cp[0] += 1
+            if before.length and _.last(before).start == cp[0]-1 and _.last(before).clss == 'close' then cp[0] -= 1
 
         if @highlightInside cp
             return
@@ -64,7 +62,7 @@ class Brackets
             [before, after] = @beforeAfterForPos pp
             while before.length 
                 prev = before.pop()
-                if prev.value == 'open'
+                if prev.clss == 'open'
                     if stack.length
                         if @open[prev.match] == _.last(stack).match
                             stack.pop()                            
@@ -89,7 +87,7 @@ class Brackets
             [before, after] = @beforeAfterForPos pp
             while after.length
                 next = after.shift()
-                if next.value == 'close'
+                if next.clss == 'close'
                     if stack.length
                         if @open[_.last(stack).match] == next.match
                             stack.pop()                            
@@ -132,7 +130,7 @@ class Brackets
                     
         i = rngs.length-1 
         while i > 0 # remove trivial: (), {}, []
-            if rngs[i-1].value == 'open' and rngs[i].value == 'close' and
+            if rngs[i-1].clss == 'open' and rngs[i].clss == 'close' and
                 @open[rngs[i-1].match] == rngs[i].match and 
                     rngs[i-1].start == rngs[i].start - 1
                         rngs.splice i-1, 2

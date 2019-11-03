@@ -5,7 +5,7 @@
 # 000  000  0000       000  000       000   000     000   
 # 000  000   000  0000000   00000000  000   000     000   
 
-{ clamp, reversed, _ } = require 'kxk'
+{ reversed, clamp, _ } = require 'kxk'
 
 module.exports =
     

@@ -6,7 +6,7 @@
 000  000   000  000        0000000   
 ###
 
-{ childp, empty, slash, str, _ } = require 'kxk'
+{ empty, slash, _ } = require 'kxk'
 
 status = require './status'
 diff   = require './diff'

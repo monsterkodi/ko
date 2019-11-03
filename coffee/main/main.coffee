@@ -6,7 +6,7 @@
 000   000  000   000  000  000   000
 ###
 
-{ post, filelist, colors, first, empty, prefs, store, slash, valid, store, noon, args, win, app, udp, os, fs, klog, _ } = require 'kxk'
+{ post, filelist, colors, first, slash, valid, store, prefs, empty, args, noon, app, win, udp, fs, _ } = require 'kxk'
 
 # post.debug()
 # log.slog.debug = true

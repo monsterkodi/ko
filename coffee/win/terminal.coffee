@@ -6,12 +6,11 @@
    000     00000000  000   000  000   000  000  000   000  000   000  0000000
 ###
 
-{ reversed, stopEvent, prefs, kpos, popup, childp, empty, _  } = require 'kxk'
+{ post, stopEvent, prefs, popup, kpos, kerror } = require 'kxk'
 
 salt       = require '../tools/salt'
 TextEditor = require '../editor/texteditor'
 syntax     = require '../editor/syntax'
-ansiDiss   = require '../tools/ansidiss'
 
 class Terminal extends TextEditor
 
@@ -19,50 +18,14 @@ class Terminal extends TextEditor
         
         super viewElem, features: ['Scrollbar' 'Numbers' 'Minimap' 'Meta'], fontSize: 15
         
-        @view.addEventListener "contextmenu", @onContextMenu
+        @view.addEventListener "contextmenu" @onContextMenu
         
         @metaQueue = []
         
         @setHeader prefs.get 'terminal:header' false
         
         @initInvisibles()
-        @ansidiss = new ansiDiss()    
         @setLines ['']
-
-    #  0000000   000   000  000000000  00000000   000   000  000000000
-    # 000   000  000   000     000     000   000  000   000     000   
-    # 000   000  000   000     000     00000000   000   000     000   
-    # 000   000  000   000     000     000        000   000     000   
-    #  0000000    0000000      000     000         0000000      000   
-
-    output: (s) ->
-        
-        for l in s.split '\n'
-            t = l.trim()
-            if /ko_term_done/.test t
-                if /^ko_term_done\s\d+$/.test t
-                    cid = parseInt _.last t.split ' '
-                    for meta in reversed @meta.metas
-                        if meta[2].cmdID == cid
-                            meta[2].span?.innerHTML = "■"
-                            break
-                continue
-            skip = false
-            for meta in reversed @meta.metas
-                if meta[2].command == t 
-                    if t != 'pwd'
-                        spinningCog = '<i class="fa fa-cog fa-spin fa-1x fa-fw"></i>'
-                        meta[2].span?.innerHTML = spinningCog
-                        stopSpin = ->
-                            if meta[2].span?.innerHTML == spinningCog
-                                meta[2].span?.innerHTML = '<i class="fa fa-cog fa-1x fa-fw"></i>'
-                        setTimeout stopSpin, 3000
-                    skip = true
-                    break
-            continue if skip
-            [text,diss] = @ansidiss.dissect l
-            @syntax.setDiss @numLines(), diss if diss?.length
-            @appendText text
                 
     #  0000000   00000000   00000000   00000000  000   000  0000000  
     # 000   000  000   000  000   000  000       0000  000  000   000
