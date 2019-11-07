@@ -8,6 +8,12 @@
 pre {
   margin: 0;
 }
+@font-face {
+  font-family: font;
+  font-weight: normal;
+  font-style: normal;
+  src: url("../../pug/Meslo.woff");
+}
 * {
   outline-width: 0;
 }
@@ -19,7 +25,7 @@ body {
   top: 0;
   margin: 0;
   overflow: hidden;
-  font-family: "MesloLGS Nerd Font Mono", "Meslo LG S", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono", "Cousine", "Andale Mono", monospace;
+  font-family: font;
   -webkit-user-select: none;
 }
 #main {
@@ -67,7 +73,7 @@ body {
   padding-top: 1px;
 }
 .rowNameInput {
-  font-family: "MesloLGS Nerd Font Mono", "Meslo LG S", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono", "Cousine", "Andale Mono", monospace;
+  font-family: font;
   font-size: 15px;
   border: none;
   white-space: nowrap;
@@ -159,7 +165,7 @@ body {
   white-space: nowrap;
 }
 #commandline-editor {
-  font-family: "MesloLGS Nerd Font Mono", "Meslo LG S", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono", "Cousine", "Andale Mono", monospace;
+  font-family: font;
   height: 30px;
   position: absolute;
   bottom: 0;
@@ -175,7 +181,7 @@ body {
   white-space: nowrap;
   font-size: 22px;
   font-weight: bold;
-  font-family: "MesloLGS Nerd Font Mono", "Meslo LG S", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono", "Cousine", "Andale Mono", monospace;
+  font-family: font;
   right: 142px;
   top: 0;
   height: 30px;
@@ -191,7 +197,7 @@ body {
   margin-top: -2px;
 }
 #commandline-button {
-  font-family: "MesloLGS Nerd Font Mono", "Meslo LG S", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono", "Cousine", "Andale Mono", monospace;
+  font-family: font;
   font-size: 24px;
   padding-top: 0px;
   padding-left: 9px;
@@ -239,7 +245,7 @@ body {
   bottom: 0;
   padding-top: 1px;
   border-left: 1px solid;
-  font-family: "MesloLGS Nerd Font Mono", "Meslo LG S", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono", "Cousine", "Andale Mono", monospace;
+  font-family: font;
   font-size: 12px;
 }
 #info .info-line {
@@ -341,7 +347,7 @@ body {
 #editor {
   position: relative;
   overflow: hidden;
-  font-family: "MesloLGS Nerd Font Mono", "Meslo LG S", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono", "Cousine", "Andale Mono", monospace;
+  font-family: font;
 }
 .layerScroll {
   position: absolute;
@@ -407,7 +413,7 @@ body {
   width: 50px;
   pointer-events: none;
   font-size: 13px;
-  font-family: "MesloLGS Nerd Font Mono", "Meslo LG S", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono", "Cousine", "Andale Mono", monospace;
+  font-family: font;
 }
 .linenumber {
   width: 50px;
@@ -637,7 +643,7 @@ body {
 .list-item {
   width: 100%;
   height: 20px;
-  font-family: "MesloLGS Nerd Font Mono", "Meslo LG S", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono", "Cousine", "Andale Mono", monospace;
+  font-family: font;
   font-size: 16px;
   padding-left: 5px;
   padding-top: 2px;
