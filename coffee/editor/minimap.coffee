@@ -13,6 +13,8 @@ MapScroll = require './mapscroll'
 class Minimap
 
     @: (@editor) ->
+        
+        # add highlights and cursors at right border
 
         minimapWidth = parseInt getStyle '.minimap', 'width'
 
@@ -85,6 +87,7 @@ class Minimap
             if 2*r[1][0] < @width
                 offset = r[1][0] and @offsetLeft or 0
                 ctx.fillRect offset+2*r[1][0], y, 2*(r[1][1]-r[1][0]), @scroll.lineHeight
+                ctx.fillRect 260-6, y, 2, @scroll.lineHeight
 
     drawLines: (top=@scroll.exposeTop, bot=@scroll.exposeBot) =>
 
@@ -116,7 +119,7 @@ class Minimap
             y = (r[0]-@scroll.exposeTop)*@scroll.lineHeight
             if 2*r[1][0] < @width
                 ctx.fillRect @offsetLeft+2*r[1][0], y, 2*(r[1][1]-r[1][0]), @scroll.lineHeight
-            ctx.fillRect 0, y, @offsetLeft, @scroll.lineHeight
+            ctx.fillRect 260-4, y, 4, @scroll.lineHeight
 
     drawCursors: =>
 
@@ -130,7 +133,7 @@ class Minimap
                 ctx.fillStyle = '#f80'
                 ctx.fillRect @offsetLeft+2*r[1][0], y, 2, @scroll.lineHeight
             ctx.fillStyle = 'rgba(255,128,0,0.5)'
-            ctx.fillRect @offsetLeft-4, y, @offsetLeft-2, @scroll.lineHeight
+            ctx.fillRect 260-8, y, 4, @scroll.lineHeight
         @drawMainCursor()
 
     drawMainCursor: (blink) =>
@@ -141,7 +144,7 @@ class Minimap
         y = (mc[1]-@scroll.exposeTop)*@scroll.lineHeight
         if 2*mc[0] < @width
             ctx.fillRect @offsetLeft+2*mc[0], y, 2, @scroll.lineHeight
-        ctx.fillRect @offsetLeft-4, y, @offsetLeft-2, @scroll.lineHeight
+        ctx.fillRect 260-8, y, 8, @scroll.lineHeight
 
     drawTopBot: =>
 

@@ -424,7 +424,7 @@ class FileEditor extends TextEditor
         ,
             text:   'Back'
             combo:  'command+1'
-            cb:     -> post.emit 'menuAction' 'Navigate Backward'
+            cb:     -> post.emit 'menuAction' 'Navigate Backward' # fix me! in same file navigation!
         ,
             text:   ''
         ,
