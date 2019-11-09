@@ -6,7 +6,7 @@
 0000000   000   000  00000000  0000000  000     
 ###
 
-{ stopEvent, keyinfo, slash, post, popup, elem, clamp, empty, first, last, kerror, $, _ } = require 'kxk'
+{ post, stopEvent, keyinfo, empty, first, slash, clamp, popup, elem, kerror, $, _ } = require 'kxk'
 
 Row      = require './row'
 Scroller = require './scroller'
@@ -51,9 +51,9 @@ class Shelf extends Column
         row.setActive emit:true
         
         if item.type == 'file'
-            post.emit 'jumpToFile', item
+            post.emit 'jumpToFile' item
         else
-            post.emit 'filebrowser', 'loadItem', item
+            post.emit 'filebrowser' 'loadItem' item
                 
     #  0000000   000   000      00000000  000  000      00000000  
     # 000   000  0000  000      000       000  000      000       
@@ -360,8 +360,8 @@ class Shelf extends Column
                 
             nextOrPrev = row.next() ? row.prev()
             row.div.remove()
-            @items.splice row.index() 1
-            @rows.splice row.index() 1
+            @items.splice row.index(), 1
+            @rows.splice row.index(), 1
             nextOrPrev?.activate()
             @savePrefs()
         @

@@ -53,7 +53,7 @@ class IndexHpp
                 p += n-1 if n > 1
                 rest = rest.slice n
 
-            if ch in [' ', '\t']
+            if ch in [' ' '\t']
                 @lastWord = @currentWord if not empty @currentWord
                 @currentWord = ''
             else
@@ -67,7 +67,7 @@ class IndexHpp
                         topToken.name = @lastWord
                 if not topToken.codeBlock?.start
                     # if rest[0] == ';'
-                    if rest[0] in [';', '*', '&']
+                    if rest[0] in [';' '*' '&']
                         @tokenStack.pop()
             else if topToken?.method
                 if rest[0] == ';' and topToken.args.end and not topToken.codeBlock?.start?

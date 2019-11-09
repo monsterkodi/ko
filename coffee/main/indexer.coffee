@@ -48,7 +48,7 @@ class Indexer
             
         m?[1]
 
-    @postNameInLine: (line) ->        
+    @postNameInLine: (line) ->
         
         if m = line.match Indexer.postRegExp
             rgs = matchr.ranges Indexer.postRegExp, line

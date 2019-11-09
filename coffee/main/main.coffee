@@ -66,7 +66,7 @@ post.on 'menuAction'   (action, arg) -> main?.onMenuAction action, arg
 post.on 'ping' (winID, argA, argB) -> post.toWin winID, 'pong' 'main' argA, argB
 post.on 'winlog'       (winID, text) -> 
     if args.verbose
-        log "#{winID}>>> " + text
+        log "#{winID}>> " + text
 
 # 00     00   0000000   000  000   000
 # 000   000  000   000  000  0000  000
