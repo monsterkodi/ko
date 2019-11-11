@@ -147,17 +147,17 @@ class Split
     show: (n) ->
 
         switch n
-            when 'terminal', 'browser' then @raise n
+            when 'terminal' 'browser' then @raise n
             when 'editor'     
                 
                 @flex.expand 'editor'
                 if @editorHeight() < @flex.size()/3
-                    if @flex.handles[1].pos() > @flex.size()/3
+                    if @flex.handles[1]?.pos() > @flex.size()/3
                         @flex.moveHandleToPos @flex.handles[1], @flex.size()/3
-                    if @flex.handles[2].pos() < 2*@flex.size()/3
+                    if @flex.handles[2]?.pos() < 2*@flex.size()/3
                         @flex.moveHandleToPos @flex.handles[2], 2*@flex.size()/3
                         
-            when 'command'          then @flex.expand 'commandline'
+            when 'command' then @flex.expand 'commandline'
             else error "split.show -- unhandled: #{n}!"
 
     hideEditor:     => @flex.collapse 'editor'

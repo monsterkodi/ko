@@ -331,7 +331,11 @@ class TextEditor extends Editor
         divInto = (li,lo) =>
 
             if not @lineDivs[lo]
-                log "#{@name}.shiftLines.divInto - no div? #{top} #{bot} #{num} old #{oldTop} #{oldBot} lo #{lo} li #{li}"
+                klog "#{@name}.shiftLines.divInto - no div? #{top} #{bot} #{num} old #{oldTop} #{oldBot} lo #{lo} li #{li}"
+                return
+                
+            if not _.isElement @lineDivs[lo]
+                klog "#{@name}.shiftLines.divInto - no element? #{top} #{bot} #{num} old #{oldTop} #{oldBot} lo #{lo} li #{li}"
                 return
 
             @lineDivs[li] = @lineDivs[lo]
