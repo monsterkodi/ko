@@ -23,7 +23,18 @@ thinBorder            = 1px solid
 
 titlebarHeight        = 30px
 titlebarFontSize      = 15px
-titlebarFont          = Bahnschrift Light, Helvetica Neue, Ebrima, Varela Round, Helvetica, Arial
+
+@font-face 
+    font-family     titlebarFont
+    font-weight     normal
+    font-style      normal
+    src             url("../../node_modules/kxk/styl/Bahnschrift.woff")
+
+@font-face 
+    font-family     fontMono
+    font-weight     normal
+    font-style      normal
+    src             url("../../node_modules/kxk/styl/Meslo.woff")
 
 fill-abs()
     position            absolute
@@ -35,12 +46,6 @@ fill-abs()
 pre
     margin              0
        
-@font-face 
-    font-family     font
-    font-weight     normal
-    font-style      normal
-    src             url("../../pug/Meslo.woff")
-
 // 0000000     0000000   0000000    000   000
 // 000   000  000   000  000   000   000 000
 // 0000000    000   000  000   000    00000
@@ -54,7 +59,7 @@ body
     fill-abs()
     margin              0
     overflow            hidden
-    font-family         font
+    font-family         fontMono
     -webkit-user-select none
 
 @keyframes fadein
@@ -120,7 +125,7 @@ body
         padding-top     1px
 
 .rowNameInput
-    font-family         font
+    font-family         fontMono
     font-size           15px
     border              none
     white-space         nowrap
@@ -234,7 +239,7 @@ unicode(char)
     white-space         nowrap
 
 #commandline-editor
-    font-family         font
+    font-family         fontMono
     height              commandlineHeight
     fill-abs()
     overflow-x          auto
@@ -252,7 +257,7 @@ unicode(char)
     white-space         nowrap
     font-size           22px
     font-weight         bold
-    font-family         font
+    font-family         fontMono
     right               (minimapWidth + 12)
     top                 0
     height              commandlineHeight
@@ -280,7 +285,7 @@ unicode(char)
 // 0000000     0000000      000        000      0000000   000   000
 
 #commandline-button
-    font-family         font
+    font-family         fontMono
     font-size           24px
     padding-top         0px
     padding-left        9px
@@ -341,7 +346,7 @@ unicode(char)
     bottom              0
     padding-top         1px
     border-left         thinBorder
-    font-family         font
+    font-family         fontMono
     font-size           12px
     & .info-line
         display         block
@@ -423,10 +428,6 @@ infoPadding = 6px
     position            relative
     border-top-left-radius  6px
     border-top-right-radius 6px
-    // &:not(:first-child)    
-        // border-top-left-radius  10px
-    // &:not(:last-child)
-        // border-top-right-radius 10px
     font-size           titlebarFontSize
     padding-left        6px
     padding-right       12px
@@ -468,7 +469,7 @@ infoPadding = 6px
 #editor
     position            relative
     overflow            hidden
-    font-family         font
+    font-family         fontMono
 
 // 000       0000000   000   000  00000000  00000000
 // 000      000   000   000 000   000       000   000
@@ -550,7 +551,7 @@ infoPadding = 6px
     width               numbersWidth
     pointer-events      none
     font-size           13px
-    font-family         font
+    font-family         fontMono
 
 .linenumber
     width               numbersWidth
@@ -790,7 +791,7 @@ infoPadding = 6px
 .list-item
     width               100%
     height              20px
-    font-family         font
+    font-family         fontMono
     font-size           16px
     padding-left        5px
     padding-top         2px
@@ -1014,6 +1015,7 @@ infoPadding = 6px
 // 000         0000000   000         0000000   000
 
 .popup
+    line-height         1.05
     z-index             9999
     position            absolute
     border-radius       3px
@@ -1030,8 +1032,8 @@ infoPadding = 6px
         cursor          default
         border          0
         height          0
-        margin-top      2px
-        margin-bottom   2px
+        margin-top      6px
+        margin-bottom   6px
     &:last-child
         padding-bottom  frameWidth
     &:first-child

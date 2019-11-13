@@ -18,16 +18,17 @@
 // #050 #060 #080 #0a0 #3c3 #0f0            
 // #08f #f5f                                
 
-backColor           = #000 //#0d0d0d
-darkColor           = #0a0a0a // #111
+backColor           = #000000
+darkColor           = #0a0a0a
 
-bgColor             = #181818
-frameColor          = #111111 // #222
+separatorColor      = #0e0e0e
+bgColor             = #0d0d0d
+frameColor          = #111111
 scrollHoverColor    = #b00
 titleRedColor       = #f00
-titleColor          = #222 // #333
+titleColor          = #222
 scrollColor         = #444
-textBlurColor       = #666
+textBlurColor       = #444
 textActiveColor     = #999
 textFocusColor      = #fff
 
@@ -601,7 +602,7 @@ span.macro
         & .popupCombo
             color           textBlurColor
     &.separator
-        border-top          1px solid titleColor
+        border-top          1px solid separatorColor
     &:not(:last-child)
         border-bottom       1px solid frameColor
 

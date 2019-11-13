@@ -5,14 +5,20 @@
      000     000        000     000
 0000000      000        000     0000000
 */
-pre {
-  margin: 0;
-}
 @font-face {
-  font-family: font;
+  font-family: titlebarFont;
   font-weight: normal;
   font-style: normal;
-  src: url("../../pug/Meslo.woff");
+  src: url("../../node_modules/kxk/styl/Bahnschrift.woff");
+}
+@font-face {
+  font-family: fontMono;
+  font-weight: normal;
+  font-style: normal;
+  src: url("../../node_modules/kxk/styl/Meslo.woff");
+}
+pre {
+  margin: 0;
 }
 * {
   outline-width: 0;
@@ -25,7 +31,7 @@ body {
   top: 0;
   margin: 0;
   overflow: hidden;
-  font-family: font;
+  font-family: fontMono;
   -webkit-user-select: none;
 }
 #main {
@@ -73,7 +79,7 @@ body {
   padding-top: 1px;
 }
 .rowNameInput {
-  font-family: font;
+  font-family: fontMono;
   font-size: 15px;
   border: none;
   white-space: nowrap;
@@ -165,7 +171,7 @@ body {
   white-space: nowrap;
 }
 #commandline-editor {
-  font-family: font;
+  font-family: fontMono;
   height: 30px;
   position: absolute;
   bottom: 0;
@@ -181,7 +187,7 @@ body {
   white-space: nowrap;
   font-size: 22px;
   font-weight: bold;
-  font-family: font;
+  font-family: fontMono;
   right: 142px;
   top: 0;
   height: 30px;
@@ -197,7 +203,7 @@ body {
   margin-top: -2px;
 }
 #commandline-button {
-  font-family: font;
+  font-family: fontMono;
   font-size: 24px;
   padding-top: 0px;
   padding-left: 9px;
@@ -245,7 +251,7 @@ body {
   bottom: 0;
   padding-top: 1px;
   border-left: 1px solid;
-  font-family: font;
+  font-family: fontMono;
   font-size: 12px;
 }
 #info .info-line {
@@ -298,7 +304,7 @@ body {
   position: absolute;
   top: 30px;
   font-size: 15px;
-  font-family: Bahnschrift Light, Helvetica Neue, Ebrima, Varela Round, Helvetica, Arial;
+  font-family: titlebarFont;
   opacity: 0;
   transform: scaleY(0);
   transition: transform 0.2s ease-in, opacity 0.2s ease-in;
@@ -326,7 +332,7 @@ body {
   cursor: pointer;
   box-sizing: border-box;
   font-size: 15px;
-  font-family: Bahnschrift Light, Helvetica Neue, Ebrima, Varela Round, Helvetica, Arial;
+  font-family: titlebarFont;
 }
 .tab:not(.active) {
   opacity: 0.5;
@@ -347,7 +353,7 @@ body {
 #editor {
   position: relative;
   overflow: hidden;
-  font-family: font;
+  font-family: fontMono;
 }
 .layerScroll {
   position: absolute;
@@ -413,7 +419,7 @@ body {
   width: 50px;
   pointer-events: none;
   font-size: 13px;
-  font-family: font;
+  font-family: fontMono;
 }
 .linenumber {
   width: 50px;
@@ -643,7 +649,7 @@ body {
 .list-item {
   width: 100%;
   height: 20px;
-  font-family: font;
+  font-family: fontMono;
   font-size: 16px;
   padding-left: 5px;
   padding-top: 2px;
@@ -658,7 +664,7 @@ body {
   height: 1px;
 }
 .winlist {
-  font-family: Bahnschrift Light, Helvetica Neue, Ebrima, Varela Round, Helvetica, Arial;
+  font-family: titlebarFont;
   position: absolute;
   right: 6px;
   top: 30px;
@@ -766,7 +772,7 @@ body {
   box-sizing: border-box;
   height: 30px;
   font-size: 15px;
-  font-family: Bahnschrift Light, Helvetica Neue, Ebrima, Varela Round, Helvetica, Arial;
+  font-family: titlebarFont;
   white-space: nowrap;
   pointer-events: auto;
   cursor: pointer;
@@ -777,7 +783,7 @@ body {
   flex-direction: row;
   padding-top: 7px;
   padding-right: 10px;
-  font: Bahnschrift Light, Helvetica Neue, Ebrima, Varela Round, Helvetica, Arial;
+  font: titlebarFont;
 }
 .titlebar-dot {
   display: inline-block;
@@ -828,11 +834,12 @@ body {
   overflow: visible;
 }
 .popup {
+  line-height: 1.05;
   z-index: 9999;
   position: absolute;
   border-radius: 3px;
   font-size: 15px;
-  font-family: Bahnschrift Light, Helvetica Neue, Ebrima, Varela Round, Helvetica, Arial;
+  font-family: titlebarFont;
 }
 .popupItem {
   padding: 4px;
@@ -845,8 +852,8 @@ body {
   cursor: default;
   border: 0;
   height: 0;
-  margin-top: 2px;
-  margin-bottom: 2px;
+  margin-top: 6px;
+  margin-bottom: 6px;
 }
 .popupItem:last-child {
   padding-bottom: 6px;

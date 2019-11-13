@@ -460,7 +460,7 @@ span.macro.macro,
 }
 #titlebar .winbutton svg {
   stroke-width: 1px;
-  stroke: #666;
+  stroke: #444;
 }
 #titlebar .winbutton:active svg {
   stroke: #fff;
@@ -469,7 +469,7 @@ span.macro.macro,
   stroke: #fff;
 }
 .menuItem {
-  color: #666;
+  color: #444;
   background-color: #111;
 }
 .menuItem.selected {
@@ -485,7 +485,7 @@ span.macro.macro,
   background-color: #111;
 }
 .popupItem {
-  color: #666;
+  color: #444;
 }
 .popupItem:not(:last-child) {
   border-bottom: 1px solid #111;
@@ -494,10 +494,10 @@ span.macro.macro,
   color: #fff;
 }
 .popupItem.selected .popupCombo {
-  color: #666;
+  color: #444;
 }
 .popupItem.separator {
-  border-top: 1px solid #222;
+  border-top: 1px solid #0e0e0e;
 }
 .popupItem:not(:last-child) {
   border-bottom: 1px solid #111;

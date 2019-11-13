@@ -40,4 +40,4 @@
 ([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.md\b)           . md       . md.ext
 
 # \.[\-\_\w]+\s*$             extname
-[\/]                        separator
+[\/]                        sep

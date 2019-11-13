@@ -39,4 +39,4 @@
 ([~\/\.\ \(\)@-_\w]+)(\.pxm|\.tiff?|\.icns|\.ico|\.gif|\.bmp)   . pic . pic.ext
 ([~\/\.\-\_\ \(\)\w]+)(\.dll|\.pak|\.bin|\.msg|\.dat)\b  . dotfile   . dotfile.ext
 
-[\/\:]                                 separator
+[\/\:]                                 sep
