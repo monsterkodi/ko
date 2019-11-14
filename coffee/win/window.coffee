@@ -6,17 +6,7 @@
 00     00  000  000   000  0000000     0000000   00     00
 ###
 
-{ post, stopEvent, store, prefs, stash, clamp, klog, args, win, _ } = require 'kxk'
-
-menu = require './menu'
-
-w = new win
-    dir:    __dirname
-    pkg:    require '../../package.json'
-    menu:   '../../coffee/menu.noon'
-    icon:   '../../img/menu@2x.png'
-    scheme: false
-    menuTemplate: menu
+{ post, stopEvent, prefs, store, stash, clamp, args, win, klog, _ } = require 'kxk'
 
 Split       = require './split'
 Terminal    = require './terminal'
@@ -38,8 +28,6 @@ pkg         = require '../../package.json'
 remote      = electron.remote
 dialog      = remote.dialog
 Browser     = remote.BrowserWindow
-win         = window.win   = remote.getCurrentWindow()
-winID       = window.winID = win.id
 editor      = null
 mainmenu    = null
 terminal    = null
@@ -48,6 +36,124 @@ titlebar    = null
 tabs        = null
 filehandler = null
 
+# 000   000  000  000   000  0000000     0000000   000   000  
+# 000 0 000  000  0000  000  000   000  000   000  000 0 000  
+# 000000000  000  000 0 000  000   000  000   000  000000000  
+# 000   000  000  000  0000  000   000  000   000  000   000  
+# 00     00  000  000   000  0000000     0000000   00     00  
+
+class Window extends win
+    
+    @: ->
+
+        super
+            dir:            __dirname
+            menuTemplate:   require './menu'
+            pkg:            require '../../package.json'
+            menu:           '../../coffee/menu.noon'
+            icon:           '../../img/menu@2x.png'
+            scheme:         false
+    
+        filehandler = window.filehandler = new FileHandler
+        tabs        = window.tabs        = new Tabs window.titlebar.elem
+        titlebar    =                      new Titlebar
+        navigate    = window.navigate    = new Navigate()
+        split       = window.split       = new Split()
+        terminal    = window.terminal    = new Terminal 'terminal'
+        editor      = window.editor      = new FileEditor 'editor'
+        commandline = window.commandline = new Commandline 'commandline-editor'
+        info        = window.info        = new Info editor
+        fps         = window.fps         = new FPS()
+        cwd         = window.cwd         = new CWD()
+    
+        window.textEditor = window.focusEditor = editor
+        window.lastFocus = editor.name
+    
+        restoreWin()
+        scheme.set prefs.get 'scheme' 'dark'
+    
+        terminal.on 'fileSearchResultChange' (file, lineChange) -> # sends changes to all windows
+            post.toWins 'fileLineChanges' file, [lineChange]
+    
+        editor.on 'changed' (changeInfo) ->
+            return if changeInfo.foreign
+            if changeInfo.changes.length
+                post.toOtherWins 'fileLineChanges' editor.currentFile, changeInfo.changes
+                navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
+    
+        s = window.stash.get 'fontSize' prefs.get 'editorFontSize' 19
+        editor.setFontSize s if s
+    
+        if window.stash.get 'centerText'
+            editor.centerText true, 0
+    
+        post.emit 'restore'
+        editor.focus()
+
+    # 00     00  00000000  000   000  000   000      0000000    0000000  000000000  000   0000000   000   000
+    # 000   000  000       0000  000  000   000     000   000  000          000     000  000   000  0000  000
+    # 000000000  0000000   000 0 000  000   000     000000000  000          000     000  000   000  000 0 000
+    # 000 0 000  000       000  0000  000   000     000   000  000          000     000  000   000  000  0000
+    # 000   000  00000000  000   000   0000000      000   000   0000000     000     000   0000000   000   000
+    
+    onMenuAction: (name, args) =>
+    
+        if action = Editor.actionWithName name
+            if action.key? and _.isFunction window.focusEditor[action.key]
+                window.focusEditor[action.key] args.actarg
+                return
+    
+        if 'unhandled' != window.commandline.handleMenuAction name, args
+            return
+    
+        switch name
+    
+            when 'doMacro'               then return window.commandline.commands.macro.execute args.actarg
+            when 'Undo'                  then return window.focusEditor.do.undo()
+            when 'Redo'                  then return window.focusEditor.do.redo()
+            when 'Cut'                   then return window.focusEditor.cut()
+            when 'Copy'                  then return window.focusEditor.copy()
+            when 'Paste'                 then return window.focusEditor.paste()
+            when 'New Tab'               then return post.emit 'newEmptyTab'
+            when 'New Window'            then return post.toMain 'newWindowWithFile' editor.currentFile
+            when 'Toggle Scheme'         then return scheme.toggle()
+            when 'Toggle Center Text'    then return toggleCenterText()
+            when 'Increase'              then return changeFontSize +1
+            when 'Decrease'              then return changeFontSize -1
+            when 'Reset'                 then return resetFontSize()
+            when 'Open Window List'      then return titlebar.showList()
+            when 'Navigate Backward'     then return navigate.backward()
+            when 'Navigate Forward'      then return navigate.forward()
+            when 'Maximize Editor'       then return split.maximizeEditor()
+            when 'Add to Shelf'          then return addToShelf()
+            when 'Toggle History'        then return window.filebrowser.shelf.toggleHistory()
+            when 'Activate Next Tab'     then return window.tabs.navigate 'right'
+            when 'Activate Previous Tab' then return window.tabs.navigate 'left'
+            when 'Move Tab Left'         then return window.tabs.move 'left'
+            when 'Move Tab Right'        then return window.tabs.move 'right'
+            when 'Open...'               then return post.emit 'openFile'
+            when 'Open In New Tab...'    then return post.emit 'openFile' newTab: true
+            when 'Open In New Window...' then return post.emit 'openFile' newWindow: true
+            when 'Save'                  then return post.emit 'saveFile'
+            when 'Save All'              then return post.emit 'saveAll'
+            when 'Save As ...'           then return post.emit 'saveFileAs'
+            when 'Revert'                then return post.emit 'reloadFile'
+            when 'Reload'                then return reloadWin()
+            when 'Close Tab or Window'   then return post.emit 'closeTabOrWindow'
+            when 'Close Other Tabs'      then return post.emit 'closeOtherTabs'
+            when 'Close Other Windows'   then return post.toOtherWins 'closeWindow'
+            when 'Fullscreen'            then return win.setFullScreen !win.isFullScreen()
+            when 'Clear List'            then return window.state.set 'recentFiles' []
+            when 'Preferences'           then return post.emit 'openFiles' [prefs.store.file], newTab:true
+            when 'Cycle Windows'         then args = winID
+    
+        # log "unhandled menu action! posting to main '#{name}' args:", args
+    
+        super name, args
+    
+win   = window.win   = remote.getCurrentWindow()
+winID = window.winID = win.id
+        
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000
 # 00000000   0000000    0000000   000000    0000000
@@ -86,7 +192,6 @@ post.on 'singleCursorAtPos' (pos, opt) -> # browser double click and newTabWithF
     editor.scroll.cursorToTop()
 post.on 'focusEditor'  -> split.focus 'editor'
 post.on 'cloneFile'    -> post.toMain 'newWindowWithFile' editor.currentFile
-post.on 'reloadWin'    -> reloadWin()
 post.on 'closeWindow'  -> window.win.close()
 post.on 'saveStash'    -> saveStash()
 post.on 'editorFocus' (editor) ->
@@ -106,56 +211,6 @@ post.on 'postEditorState' ->
         main:       editor.mainCursor()
         selections: editor.selections()
         highlights: editor.highlights()
-
-# 000   000  000  000   000  00     00   0000000   000  000   000
-# 000 0 000  000  0000  000  000   000  000   000  000  0000  000
-# 000000000  000  000 0 000  000000000  000000000  000  000 0 000
-# 000   000  000  000  0000  000 0 000  000   000  000  000  0000
-# 00     00  000  000   000  000   000  000   000  000  000   000
-
-winMain = ->
-
-    # 000  000   000  000  000000000
-    # 000  0000  000  000     000
-    # 000  000 0 000  000     000
-    # 000  000  0000  000     000
-    # 000  000   000  000     000
-
-    filehandler = window.filehandler = new FileHandler
-    tabs        = window.tabs        = new Tabs window.titlebar.elem
-    titlebar    =                      new Titlebar
-    navigate    = window.navigate    = new Navigate()
-    split       = window.split       = new Split()
-    terminal    = window.terminal    = new Terminal 'terminal'
-    editor      = window.editor      = new FileEditor 'editor'
-    commandline = window.commandline = new Commandline 'commandline-editor'
-    info        = window.info        = new Info editor
-    fps         = window.fps         = new FPS()
-    cwd         = window.cwd         = new CWD()
-
-    window.textEditor = window.focusEditor = editor
-    window.lastFocus = editor.name
-
-    restoreWin()
-    scheme.set prefs.get 'scheme' 'dark'
-
-    terminal.on 'fileSearchResultChange' (file, lineChange) -> # sends changes to all windows
-        post.toWins 'fileLineChanges' file, [lineChange]
-
-    editor.on 'changed' (changeInfo) ->
-        return if changeInfo.foreign
-        if changeInfo.changes.length
-            post.toOtherWins 'fileLineChanges' editor.currentFile, changeInfo.changes
-            navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
-
-    s = window.stash.get 'fontSize' prefs.get 'editorFontSize' 19
-    editor.setFontSize s if s
-
-    if window.stash.get 'centerText'
-        editor.centerText true, 0
-
-    post.emit 'restore'
-    editor.focus()
 
 # 00000000  0000000    000  000000000   0000000   00000000
 # 000       000   000  000     000     000   000  000   000
@@ -223,7 +278,7 @@ reloadWin = ->
     saveStash()
     clearListeners()
     editor.stopWatcher()
-    win.webContents.reloadIgnoringCache()
+    post.toMain 'reloadWin' winID:win.id, file:editor.currentFile
 
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000
@@ -276,7 +331,7 @@ toggleCenterText = ->
 setFontSize = (s) ->
 
     s = prefs.get('editorFontSize' 19) if not _.isFinite s
-    s = clamp 8, 100, s
+    s = clamp 8 100 s
 
     window.stash.set "fontSize" s
     editor.setFontSize s
@@ -323,10 +378,10 @@ resetZoom: ->
     editor.resized()
 
 changeZoom: (d) ->
-
+    
     z = webframe.getZoomFactor()
     z *= 1+d/20
-    z = clamp 0.36, 5.23, z
+    z = clamp 0.36 5.23 z
     webframe.setZoomFactor z
     editor.resized()
 
@@ -347,71 +402,6 @@ window.onfocus = (event) ->
 
 window.setLastFocus = (name) ->
     window.lastFocus = name
-
-# 00     00  00000000  000   000  000   000      0000000    0000000  000000000  000   0000000   000   000
-# 000   000  000       0000  000  000   000     000   000  000          000     000  000   000  0000  000
-# 000000000  0000000   000 0 000  000   000     000000000  000          000     000  000   000  000 0 000
-# 000 0 000  000       000  0000  000   000     000   000  000          000     000  000   000  000  0000
-# 000   000  00000000  000   000   0000000      000   000   0000000     000     000   0000000   000   000
-
-onMenuAction = (name, args) ->
-
-    if action = Editor.actionWithName name
-        if action.key? and _.isFunction window.focusEditor[action.key]
-            window.focusEditor[action.key] args.actarg
-            return
-
-    if 'unhandled' != window.commandline.handleMenuAction name, args
-        return
-
-    switch name
-
-        when 'doMacro'               then return window.commandline.commands.macro.execute args.actarg
-        when 'Undo'                  then return window.focusEditor.do.undo()
-        when 'Redo'                  then return window.focusEditor.do.redo()
-        when 'Cut'                   then return window.focusEditor.cut()
-        when 'Copy'                  then return window.focusEditor.copy()
-        when 'Paste'                 then return window.focusEditor.paste()
-        when 'New Tab'               then return post.emit 'newEmptyTab'
-        when 'New Window'            then return post.toMain 'newWindowWithFile' editor.currentFile
-        when 'Toggle Scheme'         then return scheme.toggle()
-        when 'Toggle Center Text'    then return toggleCenterText()
-        when 'Increase'              then return changeFontSize +1
-        when 'Decrease'              then return changeFontSize -1
-        when 'Reset'                 then return resetFontSize()
-        when 'Open Window List'      then return titlebar.showList()
-        when 'Navigate Backward'     then return navigate.backward()
-        when 'Navigate Forward'      then return navigate.forward()
-        when 'Maximize Editor'       then return split.maximizeEditor()
-        when 'Add to Shelf'          then return addToShelf()
-        when 'Toggle History'        then return window.filebrowser.shelf.toggleHistory()
-        when 'Activate Next Tab'     then return window.tabs.navigate 'right'
-        when 'Activate Previous Tab' then return window.tabs.navigate 'left'
-        when 'Move Tab Left'         then return window.tabs.move 'left'
-        when 'Move Tab Right'        then return window.tabs.move 'right'
-        when 'Open...'               then return post.emit 'openFile'
-        when 'Open In New Tab...'    then return post.emit 'openFile' newTab: true
-        when 'Open In New Window...' then return post.emit 'openFile' newWindow: true
-        when 'Save'                  then return post.emit 'saveFile'
-        when 'Save All'              then return post.emit 'saveAll'
-        when 'Save As ...'           then return post.emit 'saveFileAs'
-        when 'Revert'                then return post.emit 'reloadFile'
-        when 'Reload Window'         then return reloadWin()
-        when 'Close Tab or Window'   then return post.emit 'closeTabOrWindow'
-        when 'Close Other Tabs'      then return post.emit 'closeOtherTabs'
-        when 'Close Other Windows'   then return post.toOtherWins 'closeWindow'
-        when 'Fullscreen'            then return win.setFullScreen !win.isFullScreen()
-        when 'Clear List'            then return window.state.set 'recentFiles' []
-        when 'Preferences'           then return post.emit 'openFiles' [prefs.store.file], newTab:true
-
-    switch name
-        when 'Cycle Windows' then args = winID
-
-    # log "unhandled menu action! posting to main '#{name}' args:", args
-
-    post.toMain 'menuAction' name, args
-
-post.on 'menuAction' onMenuAction
 
 # 000   000  00000000  000   000
 # 000  000   000        000 000
@@ -441,4 +431,4 @@ onCombo = (combo, info) ->
 
 post.on 'combo' onCombo
 
-winMain()
+new Window

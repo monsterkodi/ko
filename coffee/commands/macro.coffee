@@ -48,11 +48,11 @@ class Macro extends Command
     # 000      000       000     000
     # 0000000  000  0000000      000
 
-    listItems: () ->
+    listItems: ->
 
         items = _.uniq _.concat reversed(@history), @macros
 
-        ({text: i, line: i in @macros and '◼' or '◆', type: 'macro'} for i in items)
+        ({text: i, line: i in @macros and '◼' or '◆', type:'macro'} for i in items)
 
     # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
     # 000        000 000   000       000       000   000     000     000

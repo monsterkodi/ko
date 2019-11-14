@@ -139,6 +139,8 @@ class Main extends app
 
         @moveWindowStashes()
         
+        post.on 'reloadWin' @reloadWin
+        
         @openFiles = openFiles
         
     #  0000000   000   000   0000000  000   000   0000000   000   000  
@@ -194,7 +196,7 @@ class Main extends app
     createWindowWithFile: (opt) ->
         
         win = @createWindow (win) -> 
-            post.toWin win.id, 'openFiles', [opt.file]
+            post.toWin win.id, 'openFiles' [opt.file]
         win
 
     createWindowWithEmpty: ->
@@ -435,18 +437,6 @@ class Main extends app
                             width:  b.x+b.width - (wb.x+wb.width-frameSize)
                             height: b.height
 
-    onCloseWin: (event) =>
-
-        wid = event.sender.id
-        if wins().length == 1
-            if slash.win()
-                @quit()
-                return
-            else
-                @hideDock()
-        post.toAll 'winClosed', wid
-        @postDelayedNumWins()
-
     #  0000000   000000000  000   000  00000000  00000000       000  000   000   0000000  000000000  
     # 000   000     000     000   000  000       000   000      000  0000  000  000          000     
     # 000   000     000     000000000  0000000   0000000        000  000 0 000  0000000      000     
@@ -496,10 +486,17 @@ class Main extends app
                 if slash.exists fpath
                     files.push file
     
-            log 'onOtherInstance files', files
+            log 'onOtherInstance files' files
                             
-            post.toWin win.id, 'openFiles', files, newTab:true
+            post.toWin win.id, 'openFiles' files, newTab:true
 
+
+    reloadWin: (winID:, file:) =>
+        
+        if win = winWithID winID
+            win.webContents.reloadIgnoringCache()
+            post.toWin win.id, 'openFiles' file
+                
     #  0000000   000   000  000  000000000  
     # 000   000  000   000  000     000     
     # 000 00 00  000   000  000     000     
@@ -512,7 +509,7 @@ class Main extends app
 
         if toSave
             post.toWins 'saveStash'
-            post.on 'stashSaved', =>
+            post.on 'stashSaved' =>
                 toSave -= 1
                 if toSave == 0
                     global.state.save()
@@ -534,7 +531,7 @@ electron.app.on 'open-file', (event, file) ->
     else
         if electron.app.isReady()
             main.activateOneWindow (win) ->
-                post.toWin win.id, 'openFiles', [file] 
+                post.toWin win.id, 'openFiles' [file] 
         else
             main.createWindowWithFile file:file
         

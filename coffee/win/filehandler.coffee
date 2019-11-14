@@ -98,13 +98,13 @@ class FileHandler
     
             if files.length >= 10
                 answer = dialog.showMessageBox
-                    type: 'warning'
-                    buttons: ['Cancel', 'Open All']
-                    defaultId: 0
-                    cancelId: 0
-                    title: "A Lot of Files Warning"
-                    message: "You have selected #{files.length} files."
-                    detail: "Are you sure you want to open that many files?"
+                    type:       'warning'
+                    buttons:    ['Cancel' 'Open All']
+                    defaultId:  0
+                    cancelId:   0
+                    title:      'A Lot of Files Warning'
+                    message:    "You have selected #{files.length} files."
+                    detail:     'Are you sure you want to open that many files?'
                 return if answer != 1
     
             if files.length == 0
@@ -233,14 +233,14 @@ class FileHandler
     
     addToRecent: (file) ->
     
-        recent = window.state.get 'recentFiles', []
+        recent = window.state.get 'recentFiles' []
         return if file == first recent
         _.pull recent, file
         recent.unshift file
-        while recent.length > prefs.get 'recentFilesLength', 15
+        while recent.length > prefs.get 'recentFilesLength' 15
             recent.pop()
     
-        window.state.set 'recentFiles', recent
+        window.state.set 'recentFiles' recent
         commandline.commands.open.setHistory reversed recent
                 
     #  0000000   0000000   000   000  00000000         0000000  000   000   0000000   000   000   0000000   00000000   0000000  
