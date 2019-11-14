@@ -10,3 +10,4 @@ Icon?
 npm-debug.log
 ./md/test.md
 bin/github-release
+.konrad.json
