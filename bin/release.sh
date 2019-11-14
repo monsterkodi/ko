@@ -16,7 +16,7 @@ if $BIN/konrad --commit $VVERSION; then
     source ~/.tokens
     echo 'using token' $GH_TOKEN
     
-    ./bin/buildmac.sh
+    konrad -m
     ./bin/dmg.sh
     
     echo 'creating release ...'

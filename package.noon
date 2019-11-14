@@ -1,5 +1,4 @@
 name            ko
-productName     ko
 version         0.274.0
 description     text editor
 main            js/main/main.js

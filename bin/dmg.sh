@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 cd `dirname $0`/..
 
-NAME=`sds -rp productName`
-VERSION=`sds -rp version`
+NAME=`sds name`
+VERSION=`sds version`
 
 npm rebuild
 rm -f $NAME-*.dmg
