@@ -160,7 +160,6 @@ View
 # 000   000  000  000  0000  000   000  000   000  000   000
 # 00     00  000  000   000  0000000     0000000   00     00
 
-
 Window
     Arrange Windows         alt+cmdctrl+a
     Cycle Windows           cmdctrl+`

@@ -286,7 +286,6 @@ body {
 }
 .dot {
   display: inline-block;
-  vertical-align: middle;
   padding-left: 6px;
   padding-right: 6px;
   margin-top: -1px;
@@ -328,7 +327,7 @@ body {
   font-size: 15px;
   padding-left: 6px;
   padding-right: 12px;
-  padding-top: 7px;
+  padding-top: 5px;
   cursor: pointer;
   box-sizing: border-box;
   font-size: 15px;

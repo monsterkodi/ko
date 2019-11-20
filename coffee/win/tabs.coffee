@@ -6,7 +6,7 @@
    000     000   000  0000000    0000000
 ###
 
-{ post, stopEvent, popup, valid, empty, first, last, slash, elem, drag, kpos, klog, kerror, $, _ } = require 'kxk'
+{ post, stopEvent, empty, first, slash, popup, elem, drag, last, kpos, kerror, $, _ } = require 'kxk'
 
 Tab = require './tab'
 
@@ -60,7 +60,6 @@ class Tabs
         if winID == window.winID
             return kerror "fileSaved from this window? #{file} #{winID}"
             
-        klog 'onFileSaved'
         tab = @tab file
         if tab? and tab != @activeTab()
             tab.revert()

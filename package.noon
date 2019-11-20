@@ -1,5 +1,5 @@
 name            ko
-version         0.274.0
+version         0.276.0
 description     text editor
 main            js/main/main.js
 preferGlobal    true
@@ -29,13 +29,13 @@ dependencies
                 js-beautify     ^1.10.2
                 kxk             ^0.370.0
                 seamless-immutable  ^7.1.4
-                trash           ^6.0.0
+                trash           ^6.1.1
                 unused-filename  ^2.1.0
                 wxw             ^1.88.0
 devDependencies
-                electron        ^7.1.1
+                electron        ^7.1.2
                 electron-packager  ^14.1.0
-                electron-rebuild  ^1.8.6
+                electron-rebuild  ^1.8.8
                 koffee          ^1.4.0
                 konrad          ^0.169.0
                 node-abi        ^2.12.0
