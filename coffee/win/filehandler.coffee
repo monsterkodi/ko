@@ -210,7 +210,10 @@ class FileHandler
               
         editor.stopWatcher()
         
-        post.emit 'menuAction' 'doMacro' actarg:'req' # !!!!!!!
+        try
+            post.emit 'menuAction' 'doMacro' actarg:'req' # !!!!!!!
+        catch err
+            kerror "macro req failed #{err}"
         
         File.save file, editor.text(), (err, saved) ->
             

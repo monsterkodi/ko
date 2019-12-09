@@ -133,7 +133,7 @@ class Macro extends Command
             when 'help'
 
                 terminal = window.terminal
-                text = fs.readFileSync "#{__dirname}/../../bin/cheet.noon", encoding: 'utf8'
+                text = fs.readFileSync "#{__dirname}/../../bin/cheet.noon" encoding:'utf8'
                 terminal.clear()
                 for l in text.split '\n'
                     terminal.appendLineDiss l, syntax.dissForTextAndSyntax l, 'noon'
@@ -150,9 +150,7 @@ class Macro extends Command
             when 'req'
 
                 return if slash.ext(editor.currentFile) != 'coffee'
-                # words = wordsInArgsOrCursorsOrSelection args
-                words = []
-                lines = req editor.currentFile, editor.lines(), words, editor
+                lines = req editor.currentFile, editor.lines(), editor
 
                 if valid lines
                     editor.do.start()
@@ -161,7 +159,7 @@ class Macro extends Command
                             editor.do.insert line.index, line.text
                         else
                             editor.do.change line.index, line.text
-                    # editor.moveCursorsDown false, lines.length
+
                     editor.do.end()
                     return do: "focus editor"
 
@@ -225,9 +223,9 @@ class Macro extends Command
                 """
                 fs.writeFile file, text, encoding:'utf8', (err) ->
                     if err?
-                        kerror 'writing class skeleton failed', err
+                        kerror 'writing class skeleton failed' err
                         return
-                    post.emit 'newTabWithFile', file
+                    post.emit 'newTabWithFile' file
                 return focus: editor.name
 
             #  0000000  000      00000000   0000000   000   000

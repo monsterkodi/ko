@@ -6,51 +6,71 @@
 000   000  00000000   00000 00
 ###
 
-{ post, slash, valid, empty, _ } = require 'kxk'
+{ _, kerror, kstr, slash, valid } = require 'kxk'
 
-kxk = require 'kxk'
+requireRegExp = /^(\s*\{.+\})\s*=\s*require\s+([\'\"][\.\/\w]+[\'\"])/
+mathRegExp = /^(\s*\{.+\})\s*=\s*(Math)\s*$/
 
-requireRegExp = /^(.+)=\s+require\s+[\'\"]([\.\/\w]+)[\'\"]/
-globalRegExp  = /^(console|process|global|module|exports|window|null|undefined|true|false|return|if|then|else|for|in|not|continue|break|switch|when)$/
+req = (file, lines, editor) ->
 
-req = (file, lines, words, editor) ->
-    
-    operations = []
-
-    words = words.filter (w) -> /\w+/.test w
-    words = words.filter (w) -> not globalRegExp.test w
-    
-    if pkgPath = slash.pkg file
-        projectFiles = post.get('indexer' 'project' pkgPath).files
-        if valid projectFiles
-            projectFiles = projectFiles.filter (f) -> slash.ext(f) in ['coffee' 'json' 'js']
-            projectFiles = projectFiles.map (f) -> 
-                p = slash.splitExt(slash.relative f, slash.dir file)[0]
-                p = '.' + p if not p.startsWith '.'
-                p
-                
-    projectFiles ?= []
-    
     requires  = {}
-    reqvalues = {}
     exports   = {}
-    kxkValues = []
-    modValues = []
+    reqValues = {}
+    regexes   = '$': /[^*\)\'\"\\]?\$[\s\(]/
     firstIndex = null
-    indent = ''
     
+    keys = Math: [
+        'E''LN2''LN10''LOG2E''LOG10E''PI''SQRT1_2''SQRT2'
+        'abs''acos''acosh''asin''asinh''atan''atanh''atan2'
+        'cbrt''ceil''clz32''cos''cosh''exp''expm1''floor''fround'
+        'hypot''imul''log1p''log10''log2''max''min''pow''random'
+        'round''sign''sin''sinh''sqrt''tan''tanh''trunc'
+        ]
+   
     for li in [0...lines.length]
         
         m = lines[li].match requireRegExp
+        # klog li, lines[li], m
+        if not m?[1]?
+            m = lines[li].match mathRegExp
+        
         if m?[1]? and m?[2]?
+            
             if not requires[m[2]]
-                if m[2] == 'kxk'
-                    ci = 0
-                    while m[1][ci] == ' '
-                        indent += ' '
-                        ci += 1
-                requires[m[2]] = index:li, value:m[1].trim(), module:m[2] 
-                reqvalues[m[1].trim()] = m[2]
+                indent = ''
+                ci = 0
+                while m[1][ci] == ' '
+                    indent += ' '
+                    ci += 1
+                requires[m[2]] = index:li, value:m[1].trim(), module:m[2], indent:indent
+                
+                if requires[m[2]].value.startsWith '{'
+                    if not keys[m[2]]
+                        try
+                            moduleName = kstr.strip m[2], '"\''
+                            
+                            if pkgDir = slash.pkg file
+                                nodeModules = slash.unslash slash.join pkgDir, 'node_modules'
+                                if nodeModules not in module.paths
+                                    module.paths.push nodeModules
+                                
+                            if moduleName.startsWith '.'
+                                fileDir = slash.resolve(slash.join slash.dir(file), moduleName).replace '/coffee/' '/js/'
+                                fileDir = slash.unslash slash.dir fileDir
+                                if fileDir not in module.paths
+                                    module.paths.unshift fileDir
+                                moduleName = slash.file moduleName
+                                
+                            required = require moduleName
+                            newKeys = Object.keys required
+                            keys[m[2]] = newKeys
+
+                            for k in newKeys
+                                regexes[k] ?= new RegExp "(^|[\\:\\(\\{]|\\s+)#{k}(\\s+[^:]|\\s*$|[\\.\\(])"
+                            
+                        catch err
+                            kerror "can't require #{m[2]} for #{file}: #{err} \nmodule.paths:" module.paths
+                
                 firstIndex ?= li
             continue
             
@@ -58,68 +78,55 @@ req = (file, lines, words, editor) ->
             name = lines[li].trim().split('=')[1]?.trim()
             if name and /\w+/.test name
                 exports[name.toLowerCase()] = true
-            
-        for k in Object.keys kxk
-            continue if reqvalues[k]
-            if k == '$'
-                regex = /[^*\)\'\"\\]?\$[\s\(]/
-            else
-                regex = new RegExp "(^|[\\:\\(\\{]|\\s+)#{k}(\\s+[^:]|\\s*$|[\\.\\(])"
-            if regex.test lines[li]
-                diss = editor.syntax.getDiss li
-                diss = diss.filter (d) -> d?.clss and not d.clss.startsWith('comment') and not d.clss.startsWith('string')
-                text = diss.map((s) -> s.match).join ' '
-                if regex.test text
-                    kxkValues.push k
-    
-    firstIndex ?= 0
-    
-    if requires['kxk']
-        firstIndex = requires['kxk'].index + 1
-    else 
-        return []
-    
-    for word in words
-        
-        if word in Object.keys kxk
-            kxkValues.push word
-        else
-            
-            for f in projectFiles
-                if word.toLowerCase() == slash.base f
-                    modValues.push value:word, module:f
-                    handled = true
-                    break
-                    
-            if not handled
-                modValues.push value:word, module:word.toLowerCase()
+                         
+        for mod,values of keys
 
-    kxkValues = _.uniq kxkValues
-    kxkValues = kxkValues.filter (v) -> v not in Object.keys(exports).concat ['state']
-    
-    if valid kxkValues
-        
-        weight = (v) ->
-            switch v
-                when 'post'   then 0
-                when '_'      then 1000
-                when '$'      then 999
-                when 'kerror' then 900
-                when 'klog'   then 901
-                else Math.max(0, 500 - v.length)
+            for k in values
+
+                reqValues[mod] ?= []
+
+                if k in reqValues[mod]
+                    continue
                 
-        kxkValues.sort (a,b) -> weight(a) - weight(b)
-        
-        text = "#{indent}{ #{kxkValues.join ', '} } = require 'kxk'"
-        if requires['kxk']
-            operations.push op:'change' index:requires['kxk'].index, text:text
-        else
-            operations.push op:'insert' index:firstIndex, text:text
+                regexes[k] ?= new RegExp "(^|[\\:\\(\\{]|\\s+)#{k}(\\s+[^:]|\\s*$|[\\.\\(])"
+                    
+                if regexes[k].test lines[li]
+                    
+                    diss = editor.syntax.getDiss li
+                    diss = diss.filter (d) -> d?.clss and not d.clss.startsWith('comment') and not d.clss.startsWith('string')
+                    text = diss.map((s) -> s.match).join ' '
+                    
+                    if regexes[k].test text
+                        reqValues[mod].push k
+
+    operations = []
+         
+    for mod,values of reqValues
     
-    for modValue in modValues
-        if empty requires[modValue.module]
-            operations.push op:'insert' index:firstIndex, text:"#{modValue.value} = require '#{modValue.module}'"
+        firstIndex ?= 0
+        
+        if requires[mod]
+            firstIndex = requires[mod].index + 1
+        else 
+            continue
+                        
+        values = _.uniq values
+        values = values.filter (v) -> v not in Object.keys(exports).concat ['state']
+        
+        if valid values
+    
+            values.sort()
             
-    return operations
+            if mod == 'Math'
+                text = "#{requires[mod].indent}{ #{values.join ', '} } = #{mod}"
+            else
+                text = "#{requires[mod].indent}{ #{values.join ', '} } = require #{mod}"
+                
+            if requires[mod]
+                operations.push op:'change' index:requires[mod].index, text:text
+            else
+                operations.push op:'insert' index:firstIndex, text:text
+                
+    operations
 
 module.exports = req

@@ -360,7 +360,7 @@ body {
   right: 0;
   left: 0;
   top: 0;
-  overflow-x: visible;
+  overflow-x: auto;
   overflow-y: hidden;
 }
 .layerScroll::-webkit-scrollbar {
@@ -408,7 +408,7 @@ body {
   position: absolute;
   left: 0;
   top: 0;
-  width: 10000px;
+  right: 0;
 }
 .numbers {
   position: absolute;

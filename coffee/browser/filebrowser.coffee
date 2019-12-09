@@ -184,7 +184,7 @@ class FileBrowser extends Browser
 
         if dirCache.has(dir) and not opt.ignoreCache
             @loadDirItems dir, item, dirCache.get(dir), col, opt
-            post.emit 'dir', dir
+            post.emit 'dir' dir
         else
             opt.ignoreHidden = not window.state.get "browser|showHidden|#{dir}"
             opt.textTest = true

@@ -291,8 +291,6 @@ class FileEditor extends TextEditor
                     for i in infos
                         if i.file == @currentFile
                             info = i
-                    # if infos.length > 1 and not opt?.dontList
-                        # window.commandline.commands.term.execute "func ^#{word}$"
                     @jumpToFile info
                     return true
 
@@ -333,17 +331,17 @@ class FileEditor extends TextEditor
                     return true
 
         counterparts =
-            'cpp':     ['hpp' 'h']
-            'cc':      ['hpp' 'h']
-            'h':       ['cpp' 'c']
-            'hpp':     ['cpp' 'c']
-            'coffee':  ['js']
-            'koffee':  ['js']
-            'js':      ['coffee''koffee']
-            'pug':     ['html']
-            'html':    ['pug']
-            'css':     ['styl']
-            'styl':    ['css']
+            cpp:     ['hpp' 'h']
+            cc:      ['hpp' 'h']
+            h:       ['cpp' 'c']
+            hpp:     ['cpp' 'c']
+            coffee:  ['js']
+            koffee:  ['js']
+            js:      ['coffee''koffee']
+            pug:     ['html']
+            html:    ['pug']
+            css:     ['styl']
+            styl:    ['css']
 
         for ext in (counterparts[currext] ? [])
             if slash.fileExists slash.swapExt @currentFile, ext
@@ -352,7 +350,7 @@ class FileEditor extends TextEditor
 
         for ext in (counterparts[currext] ? [])
             counter = swapExt @currentFile, ext
-            counter = counter.replace "/#{currext}/", "/#{ext}/"
+            counter = counter.replace "/#{currext}/" "/#{ext}/"
             if slash.fileExists counter
                 post.emit 'loadFile' counter
                 return true

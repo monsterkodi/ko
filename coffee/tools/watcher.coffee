@@ -6,7 +6,7 @@
 00     00  000   000     000      0000000  000   000  00000000  000   000
 ###
 
-{ post, slash, fs, klog } = require 'kxk'
+{ fs, klog, post, slash } = require 'kxk'
 
 class Watcher
 
