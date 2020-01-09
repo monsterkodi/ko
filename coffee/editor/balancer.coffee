@@ -6,7 +6,7 @@
 0000000    000   000  0000000  000   000  000   000   0000000  00000000  000   000
 ###
 
-{ matchr, empty, klor, kerror, _ } = require 'kxk'
+{ _, empty, kerror, klor, matchr } = require 'kxk'
 
 class Balancer
 
@@ -29,13 +29,13 @@ class Balancer
 
         lineComment = switch fileType
             when 'coffee' 'koffee' 'sh' 'bat' 'noon' 'ko' 'txt' 'fish'              then '#'
-            when 'styl' 'cpp' 'c' 'h' 'hpp' 'cxx' 'cs' 'js' 'scss' 'ts' 'swift'     then '//'
+            when 'styl' 'cpp' 'c' 'h' 'hpp' 'cxx' 'cs' 'js' 'scss' 'ts' 'swift' 'frag' 'vert' then '//'
             when 'iss' 'ini'                                                        then ';'
 
         multiComment = switch fileType
             when 'coffee' 'koffee'                                                  then open:'###'  close:'###'
             when 'html' 'md'                                                        then open:'<!--' close:'-->'
-            when 'styl' 'cpp' 'c' 'h' 'hpp' 'cxx' 'cs' 'js' 'scss' 'ts' 'swift'     then open:'/*'   close:'*/'
+            when 'styl' 'cpp' 'c' 'h' 'hpp' 'cxx' 'cs' 'js' 'scss' 'ts' 'swift' 'frag' 'vert' then open:'/*'   close:'*/'
 
         @regions =
             doubleString: clss:'string double' open:'"' close:'"'

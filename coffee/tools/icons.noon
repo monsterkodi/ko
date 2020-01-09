@@ -211,6 +211,7 @@ ext
     for                   fortran
     fpp                   fortran
     fr                    frege
+    frag                  c
     framework             dylib
     fs                    fsharp
     ftl                   freemarker
@@ -696,6 +697,7 @@ ext
     vcl                   varnish
     vcproj                vs
     veo                   verilog
+    vert                  c
     vh                    sysverilog
     vhd                   vhdl
     vhdl                  vhdl

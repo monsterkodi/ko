@@ -25,6 +25,7 @@ class IndexHpp
         @methodRegExp  = /^([\w\&\*]+)\s+(\w+)\s*\(/
         @constrRegExp  = /^(\~?\w+)\s*\(/
         @topMethRegExp = /^(\w+)\:\:(\w+)\s*\(/
+        @funcRegExp    = /^(\w+)\s+(\w+)\s*\(/
 
     # 00000000    0000000   00000000    0000000  00000000       000      000  000   000  00000000
     # 000   000  000   000  000   000  000       000            000      000  0000  000  000
@@ -102,6 +103,14 @@ class IndexHpp
                                     line:   lineIndex
                                     col:    p
                                     name:   match[1]
+                        else if match = rest.match @funcRegExp
+                            @tokenStack.push
+                                line:   lineIndex
+                                col:    p
+                                method: match[2]
+                                name:   match[2]
+                                depth:  0
+                                static: true
 
                 else if last(@tokenStack).classType
                     if match = rest.match @methodRegExp

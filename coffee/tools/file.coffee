@@ -12,7 +12,7 @@ icons = require './icons.json'
 
 class File
     
-    @sourceFileExtensions: [ 'koffee' 'coffee' 'styl' 'swift' 'pug' 'md' 'noon' 'txt' 'json' 'sh' 'py' 'cpp' 'cc' 'c' 'cs' 'h' 'hpp' 'ts' 'js']
+    @sourceFileExtensions: [ 'koffee' 'coffee' 'styl' 'swift' 'pug' 'md' 'noon' 'txt' 'json' 'sh' 'py' 'cpp' 'cc' 'c' 'cs' 'h' 'hpp' 'ts' 'js' 'frag' 'vert']
 
     @iconClassName: (file) ->
         

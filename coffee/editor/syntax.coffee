@@ -6,7 +6,7 @@
 0000000      000     000   000     000     000   000  000   000
 ###
 
-{ matchr, valid, slash, elem, last, kstr, klor, noon, fs, kerror, _ } = require 'kxk'
+{ _, elem, fs, kerror, klor, kstr, last, matchr, noon, slash, valid } = require 'kxk'
 
 Balancer = require './balancer'
 
@@ -95,7 +95,7 @@ class Syntax
 
     setFileType: (fileType) ->
 
-        # klog 'Syntax.setFileType', fileType
+        # klog 'Syntax.setFileType' fileType
         
         @name = fileType
         @balancer.setFileType fileType

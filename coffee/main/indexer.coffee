@@ -6,7 +6,7 @@
 000  000   000  0000000    00000000  000   000  00000000  000   000
 ###
 
-{ post, matchr, filter, empty, slash, valid, fs, kerror, _ } = require 'kxk'
+{ _, empty, filter, fs, kerror, klog, matchr, post, slash, valid } = require 'kxk'
 
 Walker   = require '../tools/walker'
 forkfunc = require '../tools/forkfunc'
@@ -279,6 +279,9 @@ class Indexer
 
     addFuncInfo: (funcName, funcInfo) ->
         
+        if not funcName
+            klog "addFuncInfo #{funcName}" funcInfo
+        
         if funcName.length > 1 and funcName.startsWith '@'
             funcName = funcName.slice 1
             funcInfo.static = true
@@ -339,10 +342,10 @@ class Indexer
             @files[file] = {}
             return @shiftQueue()
             
-        isCpp = fileExt in ['cpp', 'cc']
-        isHpp = fileExt in ['hpp', 'h' ]
+        isCpp = fileExt in ['cpp' 'cc' 'c' 'frag' 'vert']
+        isHpp = fileExt in ['hpp' 'h' ]
 
-        fs.readFile file, 'utf8', (err, data) =>
+        fs.readFile file, 'utf8' (err, data) =>
             
             return kerror "can't index #{file}", err if not empty err
             

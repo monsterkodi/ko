@@ -27,8 +27,8 @@ class TextEditor extends Editor
 
         @view =$ viewElem
 
-        @layers      = elem class: "layers"
-        @layerScroll = elem class: "layerScroll", child: @layers
+        @layers      = elem class:"layers"
+        @layerScroll = elem class:"layerScroll" child:@layers
         @view.appendChild @layerScroll
 
         layer = []
@@ -372,15 +372,12 @@ class TextEditor extends Editor
 
     updateLinePositions: (animate=0) ->
         
-        for li, div of @lineDivs
-            if not div? 
-                return kerror 'no div?' li
-            if not div.style?
-                return kerror 'no div.style?' li, _.isElement(div), typeof div
-            y = @size.lineHeight * (li - @scroll.top)
-            div.style.transform = "translate3d(#{@size.offsetX}px,#{y}px, 0)"
-            div.style.transition = "all #{animate/1000}s" if animate
-            div.style.zIndex = li
+        for li,div of @lineDivs
+            if div?.style?
+                y = @size.lineHeight * (li - @scroll.top)
+                div.style.transform = "translate3d(#{@size.offsetX}px,#{y}px, 0)"
+                div.style.transition = "all #{animate/1000}s" if animate
+                div.style.zIndex = li
 
         if animate
             resetTrans = =>
