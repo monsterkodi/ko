@@ -207,8 +207,6 @@ class FileEditor extends TextEditor
             @setMain       s.main ? 0
             @setState @state
 
-            @syntax.fillDiss @mainCursor()[1]
-
             @scroll.to s.scroll if s.scroll
             @scroll.cursorIntoView()
 

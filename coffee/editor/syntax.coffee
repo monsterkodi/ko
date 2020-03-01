@@ -23,25 +23,15 @@ class Syntax
 
     newDiss: (li) ->
         
-        diss = klor.dissect([@getLine li], @name)[0]
-        diss
+        klor.dissect([@getLine li], @name)[0]
 
     getDiss: (li) ->
 
-        if not @diss[li]?
-            @diss[li] = @newDiss li
-
-        @diss[li]
+        @diss[li] ?= @newDiss li
 
     setDiss: (li, dss) ->
 
         @diss[li] = dss
-        dss
-
-    fillDiss: (bot) ->
-
-        for li in [0..bot]
-            @getDiss li
 
     #  0000000  00000000  000000000  000      000  000   000  00000000   0000000  
     # 000       000          000     000      000  0000  000  000       000       
@@ -61,42 +51,16 @@ class Syntax
 
     changed: (changeInfo) ->
 
-        # if valid changeInfo.changes
-            # @blocks = null
-        
         for change in changeInfo.changes
 
             [di,li,ch] = [change.doIndex, change.newIndex, change.change]
 
             switch ch
+                when 'changed'  then @diss[di] = @newDiss di
+                when 'deleted'  then @diss.splice di, 1
+                when 'inserted' then @diss.splice di, 0, @newDiss di
 
-                when 'changed'
-
-                    @diss[di] = @newDiss di
-
-                when 'deleted'
-
-                    @diss.splice di, 1
-
-                when 'inserted'
-
-                    @diss.splice di, 0, @newDiss di
-
-    setFileType: (fileType) ->
-
-        # klog 'Syntax.setFileType' fileType
-        
-        @name = fileType
-        
-    #  0000000  000      00000000   0000000   00000000
-    # 000       000      000       000   000  000   000
-    # 000       000      0000000   000000000  0000000
-    # 000       000      000       000   000  000   000
-    #  0000000  0000000  00000000  000   000  000   000
-
-    clear: ->
-
-        @diss = []
+    setFileType: (@name) ->
 
     #  0000000   0000000   000       0000000   00000000
     # 000       000   000  000      000   000  000   000
@@ -158,7 +122,7 @@ class Syntax
                 for sp in [last...d.start]
                     spc += '&nbsp;'
                 last  = d.start + d.match.length
-                clss = d.clss? and d.clss.length and " class=\"#{d.clss}\"" or ''
+                clss  = d.clss? and d.clss.length and " class=\"#{d.clss}\"" or ''
                 clrzd = "<span#{style}#{clss}>#{spc}#{kstr.encode d.match}</span>"
                 l += clrzd
         l

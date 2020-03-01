@@ -175,10 +175,9 @@ class Editor extends Buffer
 
     setLines: (lines) ->
 
-        @syntax.clear()
         @syntax.setLines lines
         super lines
-        @emit 'linesSet', lines
+        @emit 'linesSet' lines
 
     textOfSelectionForClipboard: ->
 
