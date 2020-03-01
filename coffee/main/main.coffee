@@ -6,7 +6,7 @@
 000   000  000   000  000  000   000
 ###
 
-{ post, filelist, colors, first, slash, valid, store, prefs, empty, args, noon, app, win, udp, fs, _ } = require 'kxk'
+{ _, app, args, colors, empty, filelist, first, fs, noon, post, prefs, slash, store, udp, valid, win } = require 'kxk'
 
 # post.debug()
 # log.slog.debug = true
@@ -80,7 +80,9 @@ class Main extends app
         
         super
             dir:        __dirname
-            dirs:       ['../' '../browser' '../commandline' '../commands' '../editor' '../git' '../main' '../tools' '../win']
+            dirs:       ['../' 
+                         '../browser' '../commandline' '../commands' '../editor' '../editor/actions'
+                         '../git' '../main' '../tools' '../win']
             pkg:        pkg
             shortcut:   'Alt+F1'
             index:      '../index.html'

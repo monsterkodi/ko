@@ -6,7 +6,7 @@
    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000
 ###
 
-{ post, stopEvent, keyinfo, prefs, clamp, empty, elem, drag, os, kerror, klog, $, _ } = require 'kxk'
+{ $, _, clamp, drag, elem, empty, kerror, keyinfo, klog, os, post, prefs, stopEvent, valid } = require 'kxk'
   
 render       = require './render'
 EditorScroll = require './editorscroll'
@@ -27,8 +27,8 @@ class TextEditor extends Editor
 
         @view =$ viewElem
 
-        @layers      = elem class:"layers"
-        @layerScroll = elem class:"layerScroll" child:@layers
+        @layers      = elem class:'layers'
+        @layerScroll = elem class:'layerScroll' child:@layers
         @view.appendChild @layerScroll
 
         layer = []
@@ -226,6 +226,9 @@ class TextEditor extends Editor
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000
 
     changed: (changeInfo) ->
+
+        if valid changeInfo.changes
+            klog 'texteditor.changed' changeInfo
 
         @syntax.changed changeInfo
 
@@ -700,10 +703,6 @@ class TextEditor extends Editor
         else if event.metaKey or event.ctrlKey
             @jumpToWordAtPos p
         else
-            # if event.ctrlKey
-                # @log jsbeauty.html_beautify @lineDivs[p[1]].firstChild.innerHTML, indent_size:2 , preserve_newlines:false, wrap_line_length:200, unformatted: []
-                # @log @line p[1]
-                # @syntax.newDiss p[1]
             @singleCursorAtPos p, extend:event.shiftKey
 
     # 000   000  00000000  000   000

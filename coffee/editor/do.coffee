@@ -6,10 +6,14 @@
 0000000     0000000
 ###
 
-{ post, empty, clamp, last, kerror, _ } = require 'kxk'
+{ _, clamp, empty, kerror, last, post } = require 'kxk'
 
 State = require './state'
 require '../tools/ranges'
+# 1
+# 2
+# 1
+# 2
 
 class Do
 
@@ -17,9 +21,9 @@ class Do
 
         @reset()
 
-        post.on 'fileLineChanges', @onFileLineChanges
+        post.on 'fileLineChanges' @onFileLineChanges
 
-    del: -> post.removeListener 'fileLineChanges', @onFileLineChanges
+    del: -> post.removeListener 'fileLineChanges' @onFileLineChanges
 
     onFileLineChanges: (file, lineChanges) =>
         if file == @editor.currentFile
@@ -106,7 +110,7 @@ class Do
     insert: (index, text) -> @state = @state.insertLine index, text
     delete: (index) ->
         if @numLines() >= 1 and 0 <= index < @numLines()
-            @editor.emit 'willDeleteLine', @line index
+            @editor.emit 'willDeleteLine' @line index
             @state = @state.deleteLine index
 
     # 00000000  000   000  0000000
@@ -248,7 +252,7 @@ class Do
 
                 if not nl? # new state has not enough lines, mark remaining lines in oldState as deleted
                     deletions += 1
-                    changes.push change: 'deleted', oldIndex: oi, doIndex: oi+dd
+                    changes.push change: 'deleted' oldIndex: oi, doIndex: oi+dd
                     oi += 1
                     dd -= 1
 
@@ -259,41 +263,35 @@ class Do
                     nl = newLines[ni]
 
                 else
-                    inserts = newLines.slice(ni).findIndex (v) -> v==ol # insertion
-                    deletes = oldLines.slice(oi).findIndex (v) -> v==nl # deletion
 
-                    if inserts > 0 and (deletes <= 0 or inserts < deletes)
+                    if nl == oldLines[oi+1]
 
-                        while inserts
-                            changes.push change: 'inserted', newIndex: ni, doIndex: oi+dd, after: nl.text
-                            ni += 1
-                            dd += 1
-                            inserts -= 1
-                            insertions += 1
-                        nl = newLines[ni]
-
-                    else if deletes > 0 and (inserts <= 0 or deletes < inserts)
-
-                        while deletes
-                            changes.push change: 'deleted', oldIndex: oi, doIndex: oi+dd
-                            oi += 1
-                            dd -= 1
-                            deletes -= 1
-                            deletions += 1
+                        changes.push change: 'deleted' oldIndex: oi, doIndex: oi+dd
+                        oi += 1
+                        dd -= 1
+                        deletions += 1
                         ol = oldLines[oi]
 
-                    else # change
+                    else if newLines[ni+1] == ol
 
-                        changes.push change: 'changed', oldIndex: oi, newIndex: ni, doIndex: oi+dd, after: nl.text
+                        changes.push change: 'inserted' newIndex: ni, doIndex: oi+dd, after: nl
+                        ni += 1 
+                        dd += 1 
+                        insertions += 1
+                        nl = newLines[ni]
+
+                    else # change
+                        
+                        changes.push change: 'changed' oldIndex: oi, newIndex: ni, doIndex: oi+dd, after: nl
                         oi += 1
                         ol = oldLines[oi]
                         ni += 1
                         nl = newLines[ni]
 
-            while ni < newLines.length # mark remaing lines in newState as inserted
+            while ni < newLines.length # mark remaining lines in newState as inserted
 
                 insertions += 1
-                changes.push change: 'inserted', newIndex: ni, doIndex: ni, after: nl.text
+                changes.push change: 'inserted' newIndex: ni, doIndex: ni, after: nl
                 ni += 1
                 nl = newLines[ni]
 

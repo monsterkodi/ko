@@ -244,6 +244,7 @@ class EditorScroll extends events
             
     updateCursorOffset: ->
         
+        return
         offsetX     = @editor.size.offsetX
         charWidth   = @editor.size.charWidth
         layersWidth = @editor.layersWidth

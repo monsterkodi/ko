@@ -6,7 +6,7 @@
 000   000  000  000   000  000  000   000  000   000  000
 ###
 
-{ getStyle, clamp, elem, drag } = require 'kxk'
+{ clamp, drag, elem, getStyle } = require 'kxk'
 
 MapScroll = require './mapscroll'
 
@@ -190,7 +190,7 @@ class Minimap
 
         for change in changeInfo.changes
             li = change.oldIndex
-            break if not change.change in ['deleted', 'inserted']
+            break if not change.change in ['deleted' 'inserted']
             @drawLines li, li
 
         if li <= @scroll.exposeBot

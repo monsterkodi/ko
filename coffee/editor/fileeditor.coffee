@@ -6,7 +6,7 @@
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
 
-{ _, clamp, empty, kerror, klog, kpos, popup, post, setStyle, slash, srcmap, stopEvent } = require 'kxk'
+{ _, clamp, empty, kerror, kpos, popup, post, setStyle, slash, srcmap, stopEvent } = require 'kxk'
 
 Watcher    = require '../tools/watcher'
 TextEditor = require './texteditor'
@@ -93,8 +93,7 @@ class FileEditor extends TextEditor
             @state = restoreState
             @dirty = true
         else if fileExists
-            klog 'fileEditor.setCurrentFile' @currentFile
-            ▸profile 'setCurrentFile setText'
+            ▸profile 'setText'
                 @setText slash.readText @currentFile
 
         if fileExists

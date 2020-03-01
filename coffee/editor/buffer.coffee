@@ -26,10 +26,8 @@ class Buffer extends event
 
     setLines: (lines) ->
         @emit 'numLines' 0 # give listeners a chance to clear their stuff
-        ▸profile 'state'
-            @state = new State lines:lines
-        ▸profile 'num1'
-            @emit 'numLines' @numLines()
+        @state = new State lines:lines
+        @emit 'numLines' @numLines()
 
     setState: (state) -> @state = new State state.s
 

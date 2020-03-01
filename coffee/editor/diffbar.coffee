@@ -6,7 +6,7 @@
 0000000    000  000       000       0000000    000   000  000   000
 ###
 
-{ post, empty, elem } = require 'kxk'
+{ elem, empty, post } = require 'kxk'
 
 lineDiff = require '../tools/linediff'
 hub      = require '../git/hub'
@@ -216,7 +216,8 @@ class Diffbar
     updateScroll: =>
 
         w  = 2
-        h  = @editor.view.clientHeight
+        #h  = @editor.view.clientHeight
+        h  = @editor.scroll.viewHeight
         lh = h / @editor.numLines()
 
         ctx = @elem.getContext '2d'

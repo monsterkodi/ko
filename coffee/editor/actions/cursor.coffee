@@ -6,7 +6,7 @@
  0000000   0000000   000   000  0000000    0000000   000   000
 ###
 
-{ reversed, first, last, _ } = require 'kxk'
+{ _, first, last, reversed } = require 'kxk'
 
 module.exports =
 
@@ -86,9 +86,14 @@ module.exports =
 
         if @numLines() == 0
             @do.start()
-            @do.insert 0, ''
+            @do.insert 0 ''
             @do.end()
         p = @clampPos p
+
+        mc = @mainCursor()
+        if p[0] == mc[0] and p[1] == mc[1]
+            return
+        # klog 'singleCursorAtPos' p, mc
 
         @do.start()
         @startSelection opt

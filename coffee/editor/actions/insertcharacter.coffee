@@ -5,7 +5,7 @@
 # 000  000  0000       000  000       000   000     000   
 # 000  000   000  0000000   00000000  000   000     000   
 
-{ reversed, clamp, _ } = require 'kxk'
+{ _, clamp, reversed } = require 'kxk'
 
 module.exports =
     
@@ -27,7 +27,7 @@ module.exports =
         newCursors = @do.cursors()
         
         for cc in newCursors
-            cline = @do.line(cc[1])
+            cline = @do.line cc[1]
             sline = @twiggleSubstitute line:cline, cursor:cc, char:ch
             if sline
                 @do.change cc[1], sline
@@ -56,7 +56,7 @@ module.exports =
                 when 'S' then '■'
             if substitute
                 return line.splice cursor[0]-1, 1, substitute
-        
+    
     clampCursorOrFillVirtualSpaces: ->
         
         @do.start()

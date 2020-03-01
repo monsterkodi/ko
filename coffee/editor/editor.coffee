@@ -6,7 +6,7 @@
 00000000  0000000    000     000      0000000   000   000
 ###
 
-{ _, empty, filelist, kerror, klog, slash, valid } = require 'kxk'
+{ _, empty, filelist, kerror, slash, valid } = require 'kxk'
 
 Buffer  = require './buffer'
 Syntax  = require './syntax'
@@ -173,7 +173,6 @@ class Editor extends Buffer
 
     setLines: (lines) ->
 
-        klog "lines #{lines.length}"
         ▸profile 'syntax'
             @syntax.setLines lines
         ▸profile 'super'
@@ -192,7 +191,7 @@ class Editor extends Buffer
 
         l = state.line pos[1]
         kerror "no line at pos #{pos}?" if not l?
-        return ['',''] if not l?
+        return ['' ''] if not l?
         [l.slice(0, pos[0]), l.slice(pos[0])]
 
     # 00000000  00     00  000  000000000       00000000  0000000    000  000000000
