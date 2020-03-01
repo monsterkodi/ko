@@ -73,8 +73,8 @@ module.exports =
 
         cursorMoves:
             name:  'Move Cursors To Start'
-            combos: ['ctrl+home', 'ctrl+end', 'page up', 'page down', 'ctrl+shift+home', 'ctrl+shift+end', 'shift+page up', 'shift+page down']
-
+            combos: ['ctrl+home' 'ctrl+end' 'page up' 'page down' 'ctrl+shift+home' 
+                     'ctrl+shift+end' 'shift+page up' 'shift+page down']
 
     #  0000000  00000000  000000000
     # 000       000          000
@@ -93,7 +93,6 @@ module.exports =
         mc = @mainCursor()
         if p[0] == mc[0] and p[1] == mc[1]
             return
-        # klog 'singleCursorAtPos' p, mc
 
         @do.start()
         @startSelection opt

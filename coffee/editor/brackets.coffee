@@ -6,14 +6,14 @@
 0000000    000   000  000   000   0000000  000   000  00000000     000     0000000 
 ###
 
-{ matchr, _ } = require 'kxk'
+{ _, matchr } = require 'kxk'
 
 class Brackets
     
     @: (@editor) ->
         
-        @editor.on 'cursor',          @onCursor
-        @editor.on 'fileTypeChanged', @setupConfig
+        @editor.on 'cursor'          @onCursor
+        @editor.on 'fileTypeChanged' @setupConfig
         
         @setupConfig()
             

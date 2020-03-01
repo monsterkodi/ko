@@ -6,7 +6,7 @@
    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000
 ###
 
-{ $, _, clamp, drag, elem, empty, kerror, keyinfo, klog, os, post, prefs, stopEvent, valid } = require 'kxk'
+{ $, _, clamp, drag, elem, empty, kerror, keyinfo, klog, os, post, prefs, stopEvent } = require 'kxk'
   
 render       = require './render'
 EditorScroll = require './editorscroll'
@@ -227,8 +227,8 @@ class TextEditor extends Editor
 
     changed: (changeInfo) ->
 
-        if valid changeInfo.changes
-            klog 'texteditor.changed' changeInfo
+        # if valid changeInfo.changes
+            # klog 'texteditor.changed' changeInfo
 
         @syntax.changed changeInfo
 
@@ -311,9 +311,8 @@ class TextEditor extends Editor
 
         @updateLinePositions()
         @updateLayers()
-        @emit 'linesExposed' top:top, bot:bot, num:num
         @emit 'linesShown' top, bot, num
-
+    
     appendLine: (li) ->
 
         @lineDivs[li] = elem class: 'line'
@@ -334,17 +333,17 @@ class TextEditor extends Editor
         divInto = (li,lo) =>
 
             if not @lineDivs[lo]
-                klog "#{@name}.shiftLines.divInto - no div? #{top} #{bot} #{num} old #{oldTop} #{oldBot} lo #{lo} li #{li}"
+                log "#{@name}.shiftLines.divInto - no div? #{top} #{bot} #{num} old #{oldTop} #{oldBot} lo #{lo} li #{li}"
                 return
                 
             if not _.isElement @lineDivs[lo]
-                klog "#{@name}.shiftLines.divInto - no element? #{top} #{bot} #{num} old #{oldTop} #{oldBot} lo #{lo} li #{li}"
+                log "#{@name}.shiftLines.divInto - no element? #{top} #{bot} #{num} old #{oldTop} #{oldBot} lo #{lo} li #{li}"
                 return
 
             @lineDivs[li] = @lineDivs[lo]
             delete @lineDivs[lo]
             @lineDivs[li].replaceChild @cachedSpan(li), @lineDivs[li].firstChild
-
+            
             if @showInvisibles
                 tx = @line(li).length * @size.charWidth + 1
                 span = elem 'span' class: "invisible newline", html: '&#9687'

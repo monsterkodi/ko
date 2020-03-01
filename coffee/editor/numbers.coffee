@@ -6,7 +6,7 @@
 000   000   0000000   000   000  0000000    00000000  000   000  0000000
 ###
 
-{ setStyle, elem, $ } = require 'kxk'
+{ $, elem, setStyle } = require 'kxk'
 
 event = require 'events'
 
@@ -52,7 +52,7 @@ class Numbers extends event
                 lineIndex:  li
 
             @updateColor li
-
+    
         @updateLinePositions()
 
     #  0000000  000   000  000  00000000  000000000  00000000  0000000

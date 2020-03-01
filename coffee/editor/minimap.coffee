@@ -26,10 +26,10 @@ class Minimap
 
         @elem    = elem class: 'minimap'
         @topbot  = elem class: 'topbot'
-        @selecti = elem 'canvas', class: 'minimapSelections', width: @width, height: @height
-        @lines   = elem 'canvas', class: 'minimapLines',      width: @width, height: @height
-        @highlig = elem 'canvas', class: 'minimapHighlights', width: @width, height: @height
-        @cursors = elem 'canvas', class: 'minimapCursors',    width: @width, height: @height
+        @selecti = elem 'canvas' class: 'minimapSelections' width: @width, height: @height
+        @lines   = elem 'canvas' class: 'minimapLines'      width: @width, height: @height
+        @highlig = elem 'canvas' class: 'minimapHighlights' width: @width, height: @height
+        @cursors = elem 'canvas' class: 'minimapCursors'    width: @width, height: @height
 
         @elem.appendChild @topbot
         @elem.appendChild @selecti
@@ -37,7 +37,7 @@ class Minimap
         @elem.appendChild @highlig
         @elem.appendChild @cursors
 
-        @elem.addEventListener 'wheel', @editor.scrollbar?.onWheel
+        @elem.addEventListener 'wheel' @editor.scrollbar?.onWheel
 
         @editor.view.appendChild    @elem
         @editor.on 'viewHeight'    @onEditorViewHeight
@@ -217,16 +217,19 @@ class Minimap
 
     jumpToLine: (li, event) ->
 
-        @editor.scroll.to (li-5) * @editor.scroll.lineHeight
+        jumpTo = =>
+            @editor.scroll.to (li-5) * @editor.scroll.lineHeight
 
-        if not event.metaKey
-            @editor.singleCursorAtPos [0, li+5], extend:event.shiftKey
+            if not event.metaKey
+                @editor.singleCursorAtPos [0, li+5], extend:event.shiftKey
+    
+            @editor.focus()
+            @onEditorScroll()
 
-        @editor.focus()
-        @onEditorScroll()
-
+        clearImmediate @jumpToTimer
+        @jumpToTimer = setImmediate jumpTo
+            
     lineIndexForEvent: (event) ->
-
         st = @elem.scrollTop
         br = @elem.getBoundingClientRect()
         ly = clamp 0, @elem.offsetHeight, event.clientY - br.top

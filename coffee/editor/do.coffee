@@ -6,14 +6,10 @@
 0000000     0000000
 ###
 
-{ _, clamp, empty, kerror, last, post } = require 'kxk'
+{ _, clamp, empty, kerror, klog, last, post } = require 'kxk'
 
 State = require './state'
 require '../tools/ranges'
-# 1
-# 2
-# 1
-# 2
 
 class Do
 
@@ -258,13 +254,24 @@ class Do
 
                 else if ol == nl # same lines in old and new
                     oi += 1
-                    ol = oldLines[oi]
                     ni += 1
+                    ol = oldLines[oi]
                     nl = newLines[ni]
 
                 else
 
-                    if nl == oldLines[oi+1]
+                    if nl == oldLines[oi+1] and ol == newLines[ni+1]
+                        
+                        changes.push change: 'changed' oldIndex: oi, newIndex: ni, doIndex: oi+dd, after: nl
+                        oi += 1
+                        ni += 1
+                        changes.push change: 'changed' oldIndex: oi, newIndex: ni, doIndex: oi+dd, after: ol
+                        oi += 1
+                        ni += 1
+                        ol = oldLines[oi]
+                        nl = newLines[ni]
+                        
+                    else if nl == oldLines[oi+1] and oldLines[oi+1] != newLines[ni+1]
 
                         changes.push change: 'deleted' oldIndex: oi, doIndex: oi+dd
                         oi += 1
@@ -272,7 +279,7 @@ class Do
                         deletions += 1
                         ol = oldLines[oi]
 
-                    else if newLines[ni+1] == ol
+                    else if ol == newLines[ni+1] and oldLines[oi+1] != newLines[ni+1]
 
                         changes.push change: 'inserted' newIndex: ni, doIndex: oi+dd, after: nl
                         ni += 1 
@@ -287,6 +294,8 @@ class Do
                         ol = oldLines[oi]
                         ni += 1
                         nl = newLines[ni]
+                        
+                    klog changes.length
 
             while ni < newLines.length # mark remaining lines in newState as inserted
 

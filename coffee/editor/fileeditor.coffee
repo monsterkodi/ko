@@ -77,7 +77,7 @@ class FileEditor extends TextEditor
 
     setCurrentFile: (file, restoreState) ->
 
-        # klog 'setCurrentFile' file        
+        # klog 'setCurrentFile' file
         
         @clear()
         @stopWatcher()
@@ -93,8 +93,7 @@ class FileEditor extends TextEditor
             @state = restoreState
             @dirty = true
         else if fileExists
-            ▸profile 'setText'
-                @setText slash.readText @currentFile
+            @setText slash.readText @currentFile
 
         if fileExists
             @watch = new Watcher @currentFile

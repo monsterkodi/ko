@@ -173,12 +173,9 @@ class Editor extends Buffer
 
     setLines: (lines) ->
 
-        ▸profile 'syntax'
-            @syntax.setLines lines
-        ▸profile 'super'
-            super lines
-        ▸profile 'emit'
-            @emit 'linesSet' lines
+        @syntax.setLines lines
+        super lines
+        @emit 'linesSet' lines
 
     textOfSelectionForClipboard: ->
 
