@@ -6,7 +6,7 @@
 0000000     0000000   000       000       00000000  000   000
 ###
 
-{ matchr, empty, clamp, kerror, _ } = require 'kxk'
+{ _, clamp, empty, kerror, matchr } = require 'kxk'
 
 State   = require './state'
 fuzzy   = require 'fuzzy'
@@ -25,9 +25,11 @@ class Buffer extends event
         @setState new State()
 
     setLines: (lines) ->
-        @emit 'numLines', 0 # give listeners a chance to clear their stuff
-        @setState new State lines:lines
-        @emit 'numLines', @numLines()
+        @emit 'numLines' 0 # give listeners a chance to clear their stuff
+        ▸profile 'state'
+            @state = new State lines:lines
+        ▸profile 'num1'
+            @emit 'numLines' @numLines()
 
     setState: (state) -> @state = new State state.s
 

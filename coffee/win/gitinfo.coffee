@@ -6,7 +6,7 @@
  0000000   000     000     000  000   000  000        0000000 
 ###
 
-{ post, slash, empty, fs } = require 'kxk'
+{ empty, fs, post, slash } = require 'kxk'
 
 lineDiff   = require '../tools/linediff'
 Syntax     = require '../editor/syntax'
@@ -51,7 +51,6 @@ class GitInfo
             syntaxName = 'txt'
         
         sytx = new Syntax syntaxName, (i) -> changes.lines[i]
-        sytx.setFileType syntaxName
         
         index = 0
         for text in changes.lines

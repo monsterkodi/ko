@@ -94,7 +94,7 @@ class FileEditor extends TextEditor
             @dirty = true
         else if fileExists
             klog 'fileEditor.setCurrentFile' @currentFile
-            ▸profile 'setText'
+            ▸profile 'setCurrentFile setText'
                 @setText slash.readText @currentFile
 
         if fileExists

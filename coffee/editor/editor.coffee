@@ -6,7 +6,7 @@
 00000000  0000000    000     000      0000000   000   000
 ###
 
-{ _, empty, filelist, kerror, slash } = require 'kxk'
+{ _, empty, filelist, kerror, klog, slash, valid } = require 'kxk'
 
 Buffer  = require './buffer'
 Syntax  = require './syntax'
@@ -81,7 +81,7 @@ class Editor extends Buffer
         oldType = @fileType
         newType = @shebangFileType()
 
-        @syntax?.setFileType newType
+        @syntax?.name = newType
         @setFileType newType
 
         if oldType != @fileType
@@ -120,8 +120,6 @@ class Editor extends Buffer
             cstr = _.keys(@bracketCharacters[key]).join ''
             reg = new RegExp "[#{_.escapeRegExp cstr}]"
             @bracketCharacters.regexps.push [reg, key]
-
-        # _______________________________________________________________ surround
 
         @initSurround()
 
@@ -166,7 +164,7 @@ class Editor extends Buffer
         lines = text.split /\n/
 
         @newlineCharacters = '\n'
-        if not empty lines
+        if valid lines
             if lines[0].endsWith '\r'
                 lines = text.split /\r?\n/
                 @newlineCharacters = '\r\n'
@@ -175,9 +173,13 @@ class Editor extends Buffer
 
     setLines: (lines) ->
 
-        @syntax.setLines lines
-        super lines
-        @emit 'linesSet' lines
+        klog "lines #{lines.length}"
+        ▸profile 'syntax'
+            @syntax.setLines lines
+        ▸profile 'super'
+            super lines
+        ▸profile 'emit'
+            @emit 'linesSet' lines
 
     textOfSelectionForClipboard: ->
 

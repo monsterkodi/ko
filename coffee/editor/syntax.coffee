@@ -60,8 +60,6 @@ class Syntax
                 when 'deleted'  then @diss.splice di, 1
                 when 'inserted' then @diss.splice di, 0, @newDiss di
 
-    setFileType: (@name) ->
-
     #  0000000   0000000   000       0000000   00000000
     # 000       000   000  000      000   000  000   000
     # 000       000   000  000      000   000  0000000
