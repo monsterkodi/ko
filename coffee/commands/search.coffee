@@ -6,7 +6,7 @@
 0000000   00000000  000   000  000   000   0000000  000   000
 ###
 
-{ post, matchr, slash, fs, kerror, _ } = require 'kxk'
+{ _, fs, kerror, klor, matchr, post, slash } = require 'kxk'
 
 walker  = require '../tools/walker'
 Syntax  = require '../editor/syntax'
@@ -19,7 +19,7 @@ class Search extends Command
         
         super commandline
         
-        @names = ["search", "Search", "/search/", "/Search/"]
+        @names = ['search' 'Search' '/search/' '/Search/']
      
     historyKey: -> @name
                 
@@ -35,14 +35,14 @@ class Search extends Command
         
         switch @name
             when '/search/', '/Search/'
-                if command in ['^', '$', '.']
+                if command in ['^' '$' '.']
                     return 
                 rngs = matchr.ranges command, '  '
                 if rngs.length == 2
                     return
                 
         command = super command
-        file = window.editor.currentFile ? _.first _.keys(post.get('indexer', 'files'))
+        file = window.editor.currentFile ? _.first _.keys(post.get('indexer' 'files'))
         
         return if not file?
         
@@ -68,7 +68,7 @@ class Search extends Command
         
         terminal = window.terminal
         # terminal.appendMeta clss: 'salt', text: opt.text.slice 0, 14
-        terminal.appendMeta clss:'searchHeader', diss:Syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':", 'ko'
+        terminal.appendMeta clss:'searchHeader' diss:Syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':" 'ko'
         terminal.appendMeta clss:'spacer'
         terminal.singleCursorAtPos [0, terminal.numLines()-2]
         dir = slash.pkg slash.dir opt.file
@@ -108,7 +108,7 @@ class Search extends Command
                 command.execute split[2]
         else
             file = href + ':' + window.terminal.posForEvent(event)[0]
-            post.emit 'openFiles', [file], newTab: event.metaKey
+            post.emit 'openFiles' [file], newTab: event.metaKey
 
         'unhandled'
 
@@ -159,7 +159,7 @@ class FileSearcher extends stream.Writable
             terminal = window.terminal
             
             meta = 
-                diss:  Syntax.dissForTextAndSyntax "#{slash.tilde @file}", 'ko'
+                diss:  Syntax.dissForTextAndSyntax "#{slash.tilde @file}" 'ko'
                 href:  @file
                 clss:  'gitInfoFile'
                 click: @command.onMetaClick
@@ -172,10 +172,9 @@ class FileSearcher extends stream.Writable
                 
                 f = @found[fi]
                 
-                sytx = new Syntax @syntaxName, (i) -> f[1]
-                sytx.setFileType @syntaxName
-                dss = sytx.balancer.dissForLineAndRanges f[1], f[2]
-                                
+                regions = klor.dissect([f[1]], @syntaxName)[0]
+                dss = matchr.merge regions, matchr.dissect f[2]
+                
                 meta =
                     diss: dss
                     href: "#{@file}:#{f[0]}"
@@ -186,7 +185,7 @@ class FileSearcher extends stream.Writable
                     terminal.appendMeta clss: 'spacer'
                     
                 terminal.appendMeta meta
-                post.emit 'search-result', meta
+                post.emit 'search-result' meta
                 
             terminal.appendMeta clss: 'spacer'
             terminal.scroll.cursorToTop()

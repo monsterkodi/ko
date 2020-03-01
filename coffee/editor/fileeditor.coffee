@@ -6,7 +6,7 @@
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
 
-{ post, stopEvent, setStyle, srcmap, slash, clamp, empty, popup, kpos, kerror, _ } = require 'kxk'
+{ _, clamp, empty, kerror, klog, kpos, popup, post, setStyle, slash, srcmap, stopEvent } = require 'kxk'
 
 Watcher    = require '../tools/watcher'
 TextEditor = require './texteditor'
@@ -93,7 +93,9 @@ class FileEditor extends TextEditor
             @state = restoreState
             @dirty = true
         else if fileExists
-            @setText slash.readText @currentFile
+            klog 'fileEditor.setCurrentFile' @currentFile
+            ▸profile 'setText'
+                @setText slash.readText @currentFile
 
         if fileExists
             @watch = new Watcher @currentFile
@@ -189,7 +191,7 @@ class FileEditor extends TextEditor
     restoreScrollCursorsAndSelections: ->
 
         return if not @currentFile
-
+        
         filePositions = window.stash.get 'filePositions' {}
 
         if filePositions[@currentFile]?
@@ -233,8 +235,6 @@ class FileEditor extends TextEditor
     jumpToFile: (opt) =>
 
         window.tabs.activeTab true
-
-        # log 'jumpToFile' require('kxk').noon.stringify opt
 
         if opt.newTab
 

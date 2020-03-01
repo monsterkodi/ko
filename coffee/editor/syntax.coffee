@@ -6,17 +6,14 @@
 0000000      000     000   000     000     000   000  000   000
 ###
 
-{ _, elem, fs, kerror, klor, kstr, last, matchr, noon, slash, valid } = require 'kxk'
-
-Balancer = require './balancer'
+{ _, elem, fs, kerror, klor, kstr, last, matchr, noon, slash } = require 'kxk'
 
 class Syntax
     
     @: (@name, @getLine, @getLines) ->
 
-        @diss     = []
-        @colors   = {}
-        @balancer = new Balancer @, @getLine
+        @diss   = []
+        @colors = {}
 
     # 0000000    000   0000000   0000000
     # 000   000  000  000       000
@@ -25,8 +22,8 @@ class Syntax
     # 0000000    000  0000000   0000000
 
     newDiss: (li) ->
-
-        diss = @balancer.dissForLine li
+        
+        diss = klor.dissect([@getLine li], @name)[0]
         diss
 
     getDiss: (li) ->
@@ -54,7 +51,7 @@ class Syntax
     
     setLines: (lines) ->
         
-        @balancer.setLines lines
+        @diss = klor.dissect lines, @name
             
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000
     # 000       000   000  000   000  0000  000  000        000       000   000
@@ -64,8 +61,8 @@ class Syntax
 
     changed: (changeInfo) ->
 
-        if valid changeInfo.changes
-            @balancer.blocks = null
+        # if valid changeInfo.changes
+            # @blocks = null
         
         for change in changeInfo.changes
 
@@ -79,26 +76,17 @@ class Syntax
 
                 when 'deleted'
 
-                    @balancer.deleteLine di
                     @diss.splice di, 1
 
                 when 'inserted'
 
-                    @balancer.insertLine di
                     @diss.splice di, 0, @newDiss di
-
-    # 00000000  000  000      00000000  000000000  000   000  00000000   00000000
-    # 000       000  000      000          000      000 000   000   000  000
-    # 000000    000  000      0000000      000       00000    00000000   0000000
-    # 000       000  000      000          000        000     000        000
-    # 000       000  0000000  00000000     000        000     000        00000000
 
     setFileType: (fileType) ->
 
         # klog 'Syntax.setFileType' fileType
         
         @name = fileType
-        @balancer.setFileType fileType
         
     #  0000000  000      00000000   0000000   00000000
     # 000       000      000       000   000  000   000
@@ -109,7 +97,6 @@ class Syntax
     clear: ->
 
         @diss = []
-        @balancer.clear()
 
     #  0000000   0000000   000       0000000   00000000
     # 000       000   000  000      000   000  000   000

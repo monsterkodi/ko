@@ -8,8 +8,7 @@
 
 { post, kerror, $ } = require 'kxk'
 
-event = require 'events'
-Flex  = require './flex/flex'
+Flex = require './flex/flex'
 
 class Split
     

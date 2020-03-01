@@ -6,7 +6,7 @@
 00000000  0000000    000     000      0000000   000   000
 ###
 
-{ filelist, slash, empty, kerror, _ } = require 'kxk'
+{ _, empty, filelist, kerror, slash } = require 'kxk'
 
 Buffer  = require './buffer'
 Syntax  = require './syntax'
@@ -138,9 +138,19 @@ class Editor extends Buffer
                     lineRegExp:   /^(\s+when|\s*if|\s*else\s+if\s+)(?!.*\sthen\s)|(^|\s)(else\s*$|switch\s|for\s|while\s|class\s)/
 
         # _______________________________________________________________ comment
-
-        @lineComment = @syntax.balancer.regions.lineComment?.open
-        @multiComment = @syntax.balancer.regions.multiComment
+        
+        @multiComment = switch @fileType
+            when 'coffee' 'koffee'                                                  then open:'###'  close:'###'
+            when 'html' 'md'                                                        then open:'<!--' close:'-->'
+            when 'styl' 'cpp' 'c' 'h' 'hpp' 'cxx' 'cs' 'js' 'scss' 'ts' 'swift' 'frag' 'vert' then open:'/*'   close:'*/'
+        
+        @lineComment = switch @fileType
+             when 'coffee' 'koffee' 'sh' 'bat' 'noon' 'ko' 'txt' 'fish'              then '#'
+             when 'styl' 'cpp' 'c' 'h' 'hpp' 'cxx' 'cs' 'js' 'scss' 'ts' 'swift' 'frag' 'vert' then '//'
+             when 'iss' 'ini'                                                        then ';'
+             
+        if @lineComment
+            @headerRegExp = new RegExp("^(\\s*#{_.escapeRegExp @lineComment}\\s*)?(\\s*0[0\\s]+)$")
 
     #  0000000  00000000  000000000         000      000  000   000  00000000   0000000
     # 000       000          000            000      000  0000  000  000       000
