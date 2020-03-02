@@ -6,7 +6,7 @@
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
 
-{ _, clamp, empty, kerror, kpos, popup, post, setStyle, slash, srcmap, stopEvent } = require 'kxk'
+{ _, clamp, empty, kerror, kpos, popup, post, setStyle, slash, srcmap, stopEvent, valid } = require 'kxk'
 
 Watcher    = require '../tools/watcher'
 TextEditor = require './texteditor'
@@ -322,7 +322,7 @@ class FileEditor extends TextEditor
                     return true
             when 'js'
                 [file,line,col] = srcmap.toCoffee @currentFile, cp[1]+1, cp[0]
-                if file?
+                if valid(file) and slash.fileExists file
                     post.emit 'loadFile' slash.joinFileLine file,line,col
                     return true
 
@@ -345,7 +345,7 @@ class FileEditor extends TextEditor
                 return true
 
         for ext in (counterparts[currext] ? [])
-            counter = swapExt @currentFile, ext
+            counter = slash.swapExt @currentFile, ext
             counter = counter.replace "/#{currext}/" "/#{ext}/"
             if slash.fileExists counter
                 post.emit 'loadFile' counter

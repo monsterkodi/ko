@@ -47,7 +47,7 @@ class Editor extends Buffer
 
         @actions = []
         for actionFile in filelist(slash.join __dirname, 'actions')
-            continue if slash.ext(actionFile) not in ['js', 'coffee']
+            continue if slash.ext(actionFile) not in ['js' 'coffee']
             actions = require actionFile
             for key,value of actions
                 if _.isFunction value
