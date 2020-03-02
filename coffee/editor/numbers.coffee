@@ -15,6 +15,7 @@ class Numbers extends event
     @: (@editor) ->
 
         super()
+        
         @lineDivs = {}
 
         @elem =$ '.numbers' @editor.view
@@ -111,7 +112,7 @@ class Numbers extends event
 
     addLine: (li) ->
 
-        div = elem class: "linenumber", child: elem "span", text: "#{li+1}"
+        div = elem class: 'linenumber', child: elem 'span', text: "#{li+1}"
         div.style.height = "#{@editor.size.lineHeight}px"
         @lineDivs[li] = div
         @elem.appendChild div

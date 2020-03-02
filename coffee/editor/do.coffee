@@ -6,7 +6,7 @@
 0000000     0000000
 ###
 
-{ _, clamp, empty, kerror, klog, last, post } = require 'kxk'
+{ _, clamp, empty, kerror, last, post } = require 'kxk'
 
 State = require './state'
 require '../tools/ranges'
@@ -295,8 +295,6 @@ class Do
                         ni += 1
                         nl = newLines[ni]
                         
-                    klog changes.length
-
             while ni < newLines.length # mark remaining lines in newState as inserted
 
                 insertions += 1

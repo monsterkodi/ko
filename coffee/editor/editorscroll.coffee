@@ -60,9 +60,9 @@ class EditorScroll extends events
         if @viewHeight <= 0
             return
             
-        @scrollMax   = Math.max(0,@fullHeight - @viewHeight)   # maximum scroll offset (pixels)
-        @fullLines   = Math.floor(@viewHeight / @lineHeight)   # number of lines in view (excluding partials)
-        @viewLines   = Math.ceil(@viewHeight / @lineHeight)+1  # number of lines in view (including partials)
+        @scrollMax = Math.max(0,@fullHeight - @viewHeight)   # maximum scroll offset (pixels)
+        @fullLines = Math.floor(@viewHeight / @lineHeight)   # number of lines in view (excluding partials)
+        @viewLines = Math.ceil(@viewHeight / @lineHeight)+1  # number of lines in view (including partials)
         
     # 0000000    000   000
     # 000   000   000 000 

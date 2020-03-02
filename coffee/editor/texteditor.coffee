@@ -720,11 +720,17 @@ class TextEditor extends Editor
             when 'backspace' then return 'unhandled' # has char set on windows?
             
             when 'esc'
-                if @salterMode          then return @setSalterMode false
-                if @numHighlights()     then return @clearHighlights()
-                if @numCursors() > 1    then return @clearCursors()
-                if @stickySelection     then return @endStickySelection()
-                if @numSelections()     then return @selectNone()
+                @setSalterMode false
+                @clearHighlights()
+                @clearCursors()
+                @endStickySelection()
+                @selectNone()
+                return
+                # if @salterMode          then return @setSalterMode false
+                # if @numHighlights()     then return @clearHighlights()
+                # if @numCursors() > 1    then return @clearCursors()
+                # if @stickySelection     then return @endStickySelection()
+                # if @numSelections()     then return @selectNone()
             
             when 'command+enter' 'ctrl+enter' 'f12' then @jumpToWord()
 
