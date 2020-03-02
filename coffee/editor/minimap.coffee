@@ -164,8 +164,11 @@ class Minimap
     # 000        000 000   000        000   000       000  000
     # 00000000  000   000  000         0000000   0000000   00000000
 
-    exposeLine:   (li) => @drawLines li, li
-    onExposeLines: (e) => @drawLines @scroll.exposeTop, @scroll.exposeBot
+    exposeLine:   (li) =>
+        @drawLines li, li
+        
+    onExposeLines: (e) => 
+        @drawLines @scroll.exposeTop, @scroll.exposeBot
 
     onVanishLines: (e) =>
         if e.top?
@@ -181,20 +184,20 @@ class Minimap
 
     onChanged: (changeInfo) =>
 
+        if @scroll.numLines != @editor.numLines() or (changeInfo.inserts or changeInfo.deletes)
+            @scroll.setNumLines 0
+            @scroll.setNumLines @editor.numLines()
+            @onEditorScroll()
+            @drawSelections()
+            @drawCursors()
+            return
+
         @drawSelections() if changeInfo.selects
         @drawCursors()    if changeInfo.cursors
-
-        return if not changeInfo.changes.length
-
-        @scroll.setNumLines @editor.numLines()
-
+            
         for change in changeInfo.changes
-            li = change.oldIndex
-            break if not change.change in ['deleted' 'inserted']
+            li = change.oldIndex ? change.doIndex
             @drawLines li, li
-
-        if li <= @scroll.exposeBot
-            @drawLines li, @scroll.exposeBot
 
     # 00     00   0000000   000   000   0000000  00000000
     # 000   000  000   000  000   000  000       000

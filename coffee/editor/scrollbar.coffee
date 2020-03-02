@@ -6,7 +6,7 @@
 0000000    0000000  000   000   0000000   0000000  0000000  0000000    000   000  000   000
 ###
 
-{ stopEvent, clamp, elem, drag } = require 'kxk'
+{ clamp, drag, elem, scheme, stopEvent } = require 'kxk'
 
 scheme = require '../tools/scheme'
 
@@ -26,6 +26,7 @@ class Scrollbar
 
         @scrollX  = 0
         @scrollY  = 0
+        @scrollDelta = 0
 
         @drag = new drag
             target:  @elem
@@ -63,8 +64,14 @@ class Scrollbar
 
     onDrag: (drag) =>
 
-        delta = (drag.delta.y / (@editor.scroll.viewLines * @editor.scroll.lineHeight)) * @editor.scroll.fullHeight
-        @editor.scroll.by delta
+        @scrollDelta += (drag.delta.y / (@editor.scroll.viewLines * @editor.scroll.lineHeight)) * @editor.scroll.fullHeight
+        
+        scroll = =>
+            @editor.scroll.by @scrollDelta
+            @scrollDelta = 0
+        
+        clearImmediate @scrollTimer
+        @scrollTimer = setImmediate scroll
 
     # 000   000  000   000  00000000  00000000  000
     # 000 0 000  000   000  000       000       000
