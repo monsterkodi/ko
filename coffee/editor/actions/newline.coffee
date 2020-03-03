@@ -6,7 +6,7 @@
 000   000  00000000  00     00  0000000  000  000   000  00000000
 ###
 
-{ _ } = require 'kxk'
+{ _, klog, last } = require 'kxk'
 
 module.exports = 
     
@@ -31,9 +31,11 @@ module.exports =
         if not info? and _.isObject key
             info = key
 
-        if @salterMode 
+        if @salterMode
+            klog 'newline endSalter'
             @endSalter()
-            @singleCursorAtPos _.last @cursors()
+            @singleCursorAtPos last @cursors()
+            klog 'newline cursors' @cursors()
             @newlineAtEnd()
             return
         

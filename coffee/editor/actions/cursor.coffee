@@ -88,10 +88,11 @@ module.exports =
             @do.start()
             @do.insert 0 ''
             @do.end()
+            
         p = @clampPos p
-
         mc = @mainCursor()
-        if p[0] == mc[0] and p[1] == mc[1]
+        
+        if p[0] == mc[0] and p[1] == mc[1] and @numCursors() == 1
             return
 
         @do.start()
@@ -111,8 +112,7 @@ module.exports =
         switch key
             when 'home'      then @singleCursorAtPos [0, 0], extend: extend
             when 'end'       then @singleCursorAtPos [0,@numLines()-1], extend: extend
-            when 'page up'   
-                @moveCursorsUp   extend, @numFullLines()-3
+            when 'page up'   then @moveCursorsUp   extend, @numFullLines()-3
             when 'page down' then @moveCursorsDown extend, @numFullLines()-3
         
     setCursorsAtSelectionBoundariesOrSelectSurround: ->
