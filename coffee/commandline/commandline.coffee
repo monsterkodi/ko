@@ -6,7 +6,7 @@
  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 ###
 
-{ post, stopEvent, filelist, slash, elem, args, kerror, $ } = require 'kxk'
+{ $, args, elem, filelist, kerror, post, slash, stopEvent } = require 'kxk'
 
 TextEditor = require '../editor/texteditor'
 
