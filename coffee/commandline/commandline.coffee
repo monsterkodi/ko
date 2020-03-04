@@ -31,9 +31,10 @@ class Commandline extends TextEditor
 
         @loadCommands()
 
-        post.on 'split'   @onSplit
-        post.on 'restore' @restore
-        post.on 'stash'   @stash
+        post.on 'split'      @onSplit
+        post.on 'restore'    @restore
+        post.on 'stash'      @stash
+        post.on 'searchText' @onSearchText
 
         @view.onblur = =>
             @button.classList.remove 'active'
@@ -44,6 +45,21 @@ class Commandline extends TextEditor
         @view.onfocus = =>
             @button.className = "commandline-button active #{@command?.prefsID}"
 
+    #  0000000  00000000   0000000   00000000    0000000  000   000  000000000  00000000  000   000  000000000  
+    # 000       000       000   000  000   000  000       000   000     000     000        000 000      000     
+    # 0000000   0000000   000000000  0000000    000       000000000     000     0000000     00000       000     
+    #      000  000       000   000  000   000  000       000   000     000     000        000 000      000     
+    # 0000000   00000000  000   000  000   000   0000000  000   000     000     00000000  000   000     000     
+    
+    onSearchText: (text) =>
+        
+        if window.split.commandlineVisible()
+            if @command?.prefsID not in ['search' 'find']
+                @startCommand 'find' 
+        @commands.find.currentText = text
+        @commands.search.currentText = text
+        @setText text
+            
     #  0000000  000000000   0000000    0000000  000   000
     # 000          000     000   000  000       000   000
     # 0000000      000     000000000  0000000   000000000
@@ -158,6 +174,9 @@ class Commandline extends TextEditor
             @setName name
             @results @command.start name # <-- command start
 
+            if name in ['search' 'find']
+                window.textEditor.highlightTextOfSelectionOrWordAtCursor()
+                @view.focus()
             @button.className = "commandline-button active #{@command.prefsID}"
         else
             kerror "no command #{name}"
@@ -312,13 +331,13 @@ class Commandline extends TextEditor
             when 'esc'                  then return @cancel()
             when 'command+k'            then return @clear()
             when 'shift+tab'            then return
-            when 'home', 'command+up'   then return split.do 'maximize editor'
-            when 'end', 'command+down'  then return split.do 'minimize editor'
+            when 'home' 'command+up'    then return split.do 'maximize editor'
+            when 'end' 'command+down'   then return split.do 'minimize editor'
             when 'alt+up'               then return split.do 'enlarge editor'
             when 'ctrl+up'              then return split.do 'enlarge editor by 20'
             when 'alt+down'             then return split.do 'reduce editor'
             when 'ctrl+down'            then return split.do 'reduce editor by 20'
-            when 'right', 'tab'         then return if @command?.onTabCompletion combo
+            when 'right' 'tab'          then return if @command?.onTabCompletion combo
 
         return super mod, key, combo, char, event
 

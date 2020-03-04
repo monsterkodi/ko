@@ -6,7 +6,7 @@
  0000000   0000000   000   000  000   000  000   000  000   000  0000000  
 ###
 
-{ reversed, history, empty, clamp, elem, kerror, _ } = require 'kxk'
+{ _, clamp, elem, empty, history, kerror, reversed } = require 'kxk'
 
 syntax      = require '../editor/syntax'
 CommandList = require './commandlist'

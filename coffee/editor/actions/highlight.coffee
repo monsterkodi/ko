@@ -5,7 +5,7 @@
 # 000   000  000  000   000  000   000  000      000  000   000  000   000     000     
 # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     
 
-{ empty, klog, _ } = require 'kxk'
+{ _, empty, klog, post } = require 'kxk'
 
 module.exports = 
 
@@ -140,14 +140,7 @@ module.exports =
             if @renderHighlights?
                 @renderHighlights()
                 @emit 'highlight'
-
-                if window.split.commandlineVisible()
-                    if window.commandline.command?.prefsID not in ['search' 'find']
-                        window.commandline.startCommand 'find' 
-                window.commandline.commands.find.currentText = text
-                window.commandline.commands.search.currentText = text
-                window.commandline.setText text
-                
+                post.emit 'searchText' text
                 @focus()
 
     #  0000000  000      00000000   0000000   00000000   
