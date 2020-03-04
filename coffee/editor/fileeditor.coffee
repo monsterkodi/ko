@@ -317,14 +317,13 @@ class FileEditor extends TextEditor
         switch currext
             when 'coffee' 'koffee'
                 [file,line,col] = srcmap.toJs @currentFile, cp[1]+1, cp[0]
-                if file?
-                    post.emit 'loadFile' slash.joinFileLine file,line,col
-                    return true
             when 'js'
                 [file,line,col] = srcmap.toCoffee @currentFile, cp[1]+1, cp[0]
-                if valid(file) and slash.fileExists file
-                    post.emit 'loadFile' slash.joinFileLine file,line,col
-                    return true
+                
+        if valid(file) and slash.fileExists file
+            # klog 'loadFile' slash.joinFileLine file,line,col
+            post.emit 'loadFile' slash.joinFileLine file,line,col
+            return true
 
         counterparts =
             cpp:     ['hpp' 'h']
