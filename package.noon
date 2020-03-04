@@ -27,7 +27,7 @@ dependencies
                 fuzzy           ^0.1.3
                 ignore          ^5.1.4
                 js-beautify     ^1.10.3
-                kxk             ^0.378.0
+                kxk             ^0.380.0
                 seamless-immutable  ^7.1.4
                 trash           ^6.1.1
                 unused-filename  ^2.1.0
@@ -37,6 +37,6 @@ devDependencies
                 electron-packager  ^14.2.1
                 electron-rebuild  ^1.10.0
                 koffee          ^1.11.0
-                konrad          ^0.174.0
+                konrad          ^0.176.0
                 node-abi        ^2.15.0
                 sds             ^3.2.0

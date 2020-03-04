@@ -250,7 +250,11 @@ class TextEditor extends Editor
 
         if changeInfo.inserts or changeInfo.deletes
             @layersWidth = @layerScroll.offsetWidth
-            @scroll.setNumLines @numLines()
+            if @numLines() != @scroll.numLines
+                @scroll.setNumLines @numLines()
+            else
+                num = @scroll.bot - @scroll.top + 1
+                @showLines @scroll.top, @scroll.bot, num
             @updateLinePositions()
 
         if changeInfo.changes.length
@@ -291,6 +295,7 @@ class TextEditor extends Editor
         div.replaceChild @spanCache[li], div.firstChild
         
     refreshLines: (top, bot) ->
+        
         for li in [top..bot]
             @syntax.getDiss li, true
             @updateLine li
@@ -326,7 +331,7 @@ class TextEditor extends Editor
     # 0000000   000   000  000  000          000        0000000  000  000   000  00000000  0000000
 
     shiftLines: (top, bot, num) =>
-        
+
         oldTop = top - num
         oldBot = bot - num
 
@@ -587,7 +592,6 @@ class TextEditor extends Editor
                     return span:e, offsetLeft:offset, offsetChar:parseInt offset/@size.charWidth
         null
 
-    # numFullLines: -> Math.floor(@viewHeight() / @size.lineHeight)
     numFullLines: -> @scroll.fullLines
     
     viewHeight: -> 

@@ -129,8 +129,8 @@ class MapScroll extends events
             @exposeBot = @bot
             num = @bot - @top + 1
             if num > 0
-                @emit 'exposeLines', top:@top, bot:@bot, num: num
-                @emit 'scroll', @scroll, @offsetTop
+                @emit 'exposeLines' top:@top, bot:@bot, num: num
+                @emit 'scroll' @scroll, @offsetTop
             return
         
         if @top < @exposeTop
@@ -138,22 +138,22 @@ class MapScroll extends events
             @exposeTop = Math.max 0, @top - (Math.min @viewLines, @exposeNum - @viewLines)
             num = oldTop - @exposeTop
             if num > 0
-                @emit 'exposeLines', top:@exposeTop, bot:oldTop-1, num: num
+                @emit 'exposeLines' top:@exposeTop, bot:oldTop-1, num: num
                 
         while @bot > @exposeBot
             @exposeBot += 1
-            @emit 'exposeLine', @exposeBot
+            @emit 'exposeLine' @exposeBot
             
         if @exposeBot-@exposeTop+1 > @exposeNum 
             num  = @exposeBot-@exposeTop+1 - @exposeNum
             if @top>oldTop
                 n = clamp 0, @top-@exposeTop, num
                 @exposeTop += n
-                @emit 'vanishLines', top: n
+                @emit 'vanishLines' top: n
             else
                 n = clamp 0, @exposeBot-@bot, num
                 @exposeBot -= n
-                @emit 'vanishLines', bot: n
+                @emit 'vanishLines' bot: n
                 
     # 000  000   000   0000000  00000000  00000000   000000000
     # 000  0000  000  000       000       000   000     000   
