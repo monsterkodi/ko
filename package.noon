@@ -33,10 +33,10 @@ dependencies
                 unused-filename  ^2.1.0
                 wxw             ^1.88.0
 devDependencies
-                electron        ^8.0.2
+                electron        ^8.0.3
                 electron-packager  ^14.2.1
                 electron-rebuild  ^1.10.0
-                koffee          ^1.7.0
+                koffee          ^1.11.0
                 konrad          ^0.174.0
                 node-abi        ^2.15.0
                 sds             ^3.2.0
