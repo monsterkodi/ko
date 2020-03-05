@@ -6,7 +6,7 @@
 000        000   000   0000000    0000000   00000000   0000000     000     0000000   
 ###
 
-{ post, valid, slash } = require 'kxk'
+{ post, slash, valid } = require 'kxk'
 
 files    = {}
 numFiles = 0

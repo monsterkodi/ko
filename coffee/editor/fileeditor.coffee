@@ -8,7 +8,6 @@
 
 { _, clamp, empty, kerror, kpos, popup, post, setStyle, slash, srcmap, stopEvent, valid } = require 'kxk'
 
-Watcher    = require '../tools/watcher'
 TextEditor = require './texteditor'
 Syntax     = require './syntax'
 electron   = require 'electron'
@@ -32,7 +31,6 @@ class FileEditor extends TextEditor
             fontSize: 19
 
         @currentFile = null
-        @watch       = null
 
         @view.addEventListener "contextmenu", @onContextMenu
 
@@ -69,7 +67,6 @@ class FileEditor extends TextEditor
 
         @dirty = false
         @setSalterMode false
-        @stopWatcher()
         @diffbar?.clear()
         @meta?.clear()
         @setLines ['']
@@ -80,8 +77,7 @@ class FileEditor extends TextEditor
         # klog 'setCurrentFile' file
         
         @clear()
-        @stopWatcher()
-
+        
         @currentFile = file
 
         @setupFileType()
@@ -96,7 +92,6 @@ class FileEditor extends TextEditor
             @setText slash.readText @currentFile
 
         if fileExists
-            @watch = new Watcher @currentFile
             window.tabs.activeTab()?.setFile @currentFile
             
         post.emit 'file' @currentFile # browser & shelf
@@ -116,11 +111,6 @@ class FileEditor extends TextEditor
 
         return kerror "no tabState.file?" if not tabState.file?
         @setCurrentFile tabState.file, tabState.state
-
-    stopWatcher: ->
-
-        @watch?.stop()
-        @watch = null
 
     # 000000000  000   000  00000000   00000000
     #    000      000 000   000   000  000

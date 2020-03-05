@@ -11,7 +11,7 @@
 State = require './state'
 require '../tools/ranges'
 
-class Do
+class Do 
 
     @: (@editor) ->
 

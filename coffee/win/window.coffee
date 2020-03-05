@@ -6,7 +6,7 @@
 00     00  000  000   000  0000000     0000000   00     00
 ###
 
-{ post, stopEvent, prefs, store, stash, clamp, args, win, klog, _ } = require 'kxk'
+{ _, args, clamp, klog, post, prefs, scheme, stash, stopEvent, store, win } = require 'kxk'
 
 Split       = require './split'
 Terminal    = require './terminal'
@@ -14,6 +14,7 @@ Tabs        = require './tabs'
 Titlebar    = require './titlebar'
 Info        = require './info'
 FileHandler = require './filehandler'
+FileWatcher = require '../tools/watcher'
 Editor      = require '../editor/editor'
 Commandline = require '../commandline/commandline'
 FileEditor  = require '../editor/fileeditor'
@@ -35,6 +36,7 @@ commandline = null
 titlebar    = null
 tabs        = null
 filehandler = null
+filewatcher = null
 
 # 000   000  000  000   000  0000000     0000000   000   000  
 # 000 0 000  000  0000  000  000   000  000   000  000 0 000  
@@ -55,6 +57,7 @@ class Window extends win
             scheme:         false
     
         filehandler = window.filehandler = new FileHandler
+        filewatcher = window.filewatcher = new FileWatcher
         tabs        = window.tabs        = new Tabs window.titlebar.elem
         titlebar    =                      new Titlebar
         navigate    = window.navigate    = new Navigate()
@@ -245,7 +248,7 @@ onClose = ->
 
     post.emit 'saveChanges'
     editor.setText ''
-    editor.stopWatcher()
+    # editor.stopWatcher()
 
     if Browser.getAllWindows().length > 1
         window.stash.clear()
@@ -277,7 +280,7 @@ reloadWin = ->
 
     saveStash()
     clearListeners()
-    editor.stopWatcher()
+    # editor.stopWatcher()
     post.toMain 'reloadWin' winID:win.id, file:editor.currentFile
 
 # 00000000   00000000   0000000  000  0000000  00000000

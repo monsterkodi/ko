@@ -6,10 +6,9 @@
    000     000   000  0000000
 ###
 
-{ post, tooltip, slash, elem, klog, kerror, _ } = require 'kxk'
+{ elem, kerror, klog, post, slash, tooltip } = require 'kxk'
 
 File    = require '../tools/file'
-Watcher = require '../tools/watcher'
 render  = require '../editor/render'
 syntax  = require '../editor/syntax'
 
@@ -27,7 +26,7 @@ class Tab
 
         @update()
 
-        @watcher = new Watcher @file
+        post.emit 'watch' @file
 
     foreignChanges: (lineChanges) ->
 
@@ -71,8 +70,9 @@ class Tab
     setFile: (newFile) ->
         
         if not slash.samePath @file, newFile
-            klog 'setFile' slash.path newFile
+            klog 'tab.setFile' slash.path newFile
             @file = slash.path newFile
+            post.emit 'watch' @file
             @update()
             
     #  0000000  000000000   0000000   000000000  00000000
@@ -88,7 +88,7 @@ class Tab
 
     restoreState: ->
 
-        return kerror 'no file in state?', @state if not @state?.file?
+        return kerror 'no file in state?' @state if not @state?.file?
         window.editor.do.setTabState @state
         delete @state
 
@@ -132,7 +132,7 @@ class Tab
 
     close: ->
 
-        @watcher.stop()
+        post.emit 'unwatch' @file
 
         if @dirty
             @saveChanges()

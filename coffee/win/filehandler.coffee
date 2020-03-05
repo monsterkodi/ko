@@ -6,7 +6,7 @@
 000       000  0000000  00000000  000   000  000   000  000   000  0000000    0000000  00000000  000   000
 ###
 
-{ post, filelist, reversed, slash, empty, valid, first, prefs, kerror, klog, _ } = require 'kxk'
+{ _, empty, filelist, first, kerror, klog, post, prefs, reversed, slash, valid } = require 'kxk'
 
 File     = require '../tools/file'
 electron = require 'electron'
@@ -36,8 +36,6 @@ class FileHandler
     
     loadFile: (file, opt={}) =>
     
-        # klog 'loadFile' file
-        
         file = null if file? and file.length <= 0
     
         editor.saveScrollCursorsAndSelections()
@@ -46,10 +44,8 @@ class FileHandler
             [file, filePos] = slash.splitFilePos file
             if not file.startsWith 'untitled'
                 file = slash.resolve file
-                # klog 'loadFile' file
                 try
                     process.chdir slash.dir file
-                    # klog 'cwd' process.cwd()
                 catch err
                     kerror err
     
@@ -65,7 +61,7 @@ class FileHandler
             if activeTab = tabs.activeTab()
                 if tab != activeTab
                     activeTab.clearActive()
-                    if activeTab.dirty # activeTab.isDirty()
+                    if activeTab.dirty
                         activeTab.storeState()
                 
             editor.setCurrentFile file
@@ -208,7 +204,9 @@ class FileHandler
             @saveFileAs()
             return
               
-        editor.stopWatcher()
+        post.emit 'unwatch' file
+        
+        tabState = editor.do.tabState()
         
         try
             post.emit 'menuAction' 'doMacro' actarg:'req' # !!!!!!!
@@ -223,8 +221,10 @@ class FileHandler
                 kerror "saving '#{file}' failed:" err
             else
                 editor.setCurrentFile     saved
+                editor.do.history = tabState.history
                 post.toOthers 'fileSaved' saved, window.winID
                 post.emit     'saved'     saved
+                post.emit     'watch'     saved
 
             editor.restoreScrollCursorsAndSelections()
                   

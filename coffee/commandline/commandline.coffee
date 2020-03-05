@@ -58,7 +58,7 @@ class Commandline extends TextEditor
                 @startCommand 'find' 
         @commands.find.currentText = text
         @commands.search.currentText = text
-        @setText text
+        @setAndSelectText text
             
     #  0000000  000000000   0000000    0000000  000   000
     # 000          000     000   000  000       000   000
