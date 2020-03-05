@@ -5,7 +5,7 @@
 #      000  000   000  000   000  000   000  000   000  000   000  000  0000  000   000
 # 0000000    0000000   000   000  000   000   0000000    0000000   000   000  0000000  
 
-{ reversed, os, _ } = require 'kxk'
+{ _, os, reversed } = require 'kxk'
 
 module.exports =
 
@@ -84,13 +84,13 @@ module.exports =
     
     insertSurroundCharacter: (ch) ->
 
-        if ch == '"' and @fileType in ['coffee', 'koffee'] and @insertTripleQuotes()
+        if ch == '"' and @fileType in ['coffee' 'koffee'] and @insertTripleQuotes()
             return true
 
         if @isUnbalancedSurroundCharacter ch
             return false 
         
-        if @numSelections() and ch in ['"', "'"] and @selectionContainsOnlyQuotes()
+        if @numSelections() and ch in ['"' "'"] and @selectionContainsOnlyQuotes()
             return false
         
         newCursors = @do.cursors()
@@ -109,7 +109,7 @@ module.exports =
                     @surroundStack.pop()
                     return false 
         
-        if ch == '#' and @fileType in ['coffee', 'koffee'] # check if any cursor or selection is inside a string
+        if ch == '#' and @fileType in ['coffee' 'koffee'] # check if any cursor or selection is inside a string
             found = false
             for s in @do.selections()
                 if @isRangeInString s
@@ -147,7 +147,7 @@ module.exports =
                     if @do.line(sr[0])[sr[1][1]-1] == "'"
                         @do.change ns[0], @do.line(ns[0]).splice sr[1][1]-1, 1, '"'
                         
-            else if @fileType in ['coffee', 'koffee'] and cl == '(' and lengthOfRange(ns) > 0 # remove space after callee
+            else if @fileType in ['coffee' 'koffee'] and cl == '(' and lengthOfRange(ns) > 0 # remove space after callee
                 [before, after] = @splitStateLineAtPos @do, rangeStartPos ns
                 trimmed = before.trimRight()
                 beforeGood = /\w$/.test(trimmed) and not /(if|when|in|and|or|is|not|else|return)$/.test trimmed

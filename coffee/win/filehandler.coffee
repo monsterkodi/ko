@@ -221,7 +221,8 @@ class FileHandler
                 kerror "saving '#{file}' failed:" err
             else
                 editor.setCurrentFile     saved
-                editor.do.history = tabState.history
+                editor.do.history   = tabState.history
+                editor.do.saveIndex = tabState.history.length
                 post.toOthers 'fileSaved' saved, window.winID
                 post.emit     'saved'     saved
                 post.emit     'watch'     saved
@@ -254,7 +255,7 @@ class FileHandler
     
     saveChanges: =>
         
-        if editor.currentFile? and editor.do.hasLineChanges() and slash.fileExists editor.currentFile
+        if editor.currentFile? and editor.do.hasChanges() and slash.fileExists editor.currentFile
             File.save editor.currentFile, editor.text(), (err) ->
                 kerror "FileHandler.saveChanges failed #{err}" if err
     

@@ -5,7 +5,7 @@
 # 000   000  000  000   000  000   000  000      000  000   000  000   000     000     
 # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     
 
-{ _, empty, klog, post } = require 'kxk'
+{ _, empty, post } = require 'kxk'
 
 module.exports = 
 
@@ -131,7 +131,6 @@ module.exports =
                                 largerText = @textInRange largerRange
                         text = largerText              
                         if @numSelections() == 1
-                            klog 'largerRange ----------- ' largerRange
                             @selectSingleRange largerRange 
             
             @setHighlights @rangesForText text, max:9999

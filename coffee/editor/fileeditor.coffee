@@ -52,10 +52,12 @@ class FileEditor extends TextEditor
     changed: (changeInfo) ->
 
         super changeInfo
-        dirty = @do.hasLineChanges()
-        if @dirty != dirty
-            @dirty = dirty
-            post.emit 'dirty' @dirty
+        
+        if changeInfo.changes.length
+            dirty = @do.hasChanges()
+            if @dirty != dirty
+                @dirty = dirty
+                post.emit 'dirty' @dirty
 
     # 00000000  000  000      00000000
     # 000       000  000      000
@@ -74,8 +76,6 @@ class FileEditor extends TextEditor
 
     setCurrentFile: (file, restoreState) ->
 
-        # klog 'setCurrentFile' file
-        
         @clear()
         
         @currentFile = file
@@ -311,7 +311,6 @@ class FileEditor extends TextEditor
                 [file,line,col] = srcmap.toCoffee @currentFile, cp[1]+1, cp[0]
                 
         if valid(file) and slash.fileExists file
-            # klog 'loadFile' slash.joinFileLine file,line,col
             post.emit 'loadFile' slash.joinFileLine file,line,col
             return true
 

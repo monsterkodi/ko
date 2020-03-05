@@ -47,19 +47,21 @@ class Do
 
     tabState: ->
 
-        history: @history
-        redos:   @redos
-        state:   @state
-        file:    @editor.currentFile
+        saveIndex: @saveIndex
+        history:   @history
+        redos:     @redos
+        state:     @state
+        file:      @editor.currentFile
 
     setTabState: (state) ->
 
         @editor.restoreFromTabState state
 
         @groupCount = 0
-        @history = state.history
-        @redos   = state.redos
-        @state   = state.state
+        @saveIndex  = state.saveIndex
+        @history    = state.history
+        @redos      = state.redos
+        @state      = state.state
 
     # 00000000   00000000   0000000  00000000  000000000
     # 000   000  000       000       000          000
@@ -70,16 +72,17 @@ class Do
     reset: ->
 
         @groupCount = 0
-        @history = []
-        @redos   = []
-        @state   = null
+        @saveIndex  = 0
+        @history    = []
+        @redos      = []
+        @state      = null
 
-    hasLineChanges: ->
+    hasChanges: ->
 
-        return false if @history.length == 0
-        return false if _.first(@history).s.lines == @editor.state.s.lines
-        _.first(@history).text() != @editor.text()
-
+        if @history.length > @saveIndex and @history[@saveIndex]?.text() == @editor.text()
+            return false 
+        return true
+        
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000
     # 0000000      000     000000000  0000000       000
