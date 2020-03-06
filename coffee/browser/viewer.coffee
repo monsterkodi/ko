@@ -8,8 +8,7 @@
 
 { $, elem, empty, keyinfo, klog, open, slash } = require 'kxk'
 
-File    = require '../tools/file'
-# Header  = require './header'
+File = require '../tools/file'
 
 class Viewer
 
@@ -30,9 +29,6 @@ class Viewer
                             
     loadImages: (images) ->
             
-        # @header = new Header @browser
-        # @header.setFile @path
-        
         @div = elem class:'viewer' tabindex:1
         
         @focus = document.activeElement
@@ -71,7 +67,6 @@ class Viewer
     close: =>
 
         @browser.viewer = null
-        # @header.del()
         @div.remove()
         @focus.focus()
 

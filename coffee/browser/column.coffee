@@ -418,7 +418,7 @@ class Column
         if not @rows[newIndex]?.activate?
             error "no row at index #{newIndex}/#{@numRows()-1}?", @numRows() 
             
-        @rows[newIndex].activate()
+        # @rows[newIndex].activate()
         @browser.select.row @rows[newIndex]
     
     navigateCols: (key) -> # move to file browser?

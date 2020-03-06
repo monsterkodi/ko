@@ -6,7 +6,7 @@
 0000000   000   000  00000000  0000000  000     
 ###
 
-{ $, _, clamp, elem, empty, first, kerror, keyinfo, kpos, popup, post, prefs, slash, stopEvent } = require 'kxk'
+{ $, _, clamp, elem, empty, first, kerror, keyinfo, kpos, popup, post, slash, stopEvent } = require 'kxk'
 
 Row      = require './row'
 Scroller = require './scroller'
@@ -104,7 +104,7 @@ class Shelf extends Column
                 
     loadShelfItems: ->
         
-        items = prefs.get "shelf▸items"
+        items = window.state.get "shelf|items"
         @setItems items, save:false
                 
     addPath: (path, opt) =>

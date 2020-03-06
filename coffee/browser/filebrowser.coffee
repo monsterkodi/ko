@@ -133,8 +133,10 @@ class FileBrowser extends Browser
         lastPath = @lastDirColumn()?.path()
         
         file = slash.path file
+
+        klog 'navigateToFile' file, lastPath, @lastColumnPath()
         
-        if file == lastPath or slash.isRelative file
+        if file == lastPath or file == @lastColumnPath() or slash.isRelative file
             return
 
         col = @sharedColumnIndex file
@@ -156,7 +158,9 @@ class FileBrowser extends Browser
             item = @fileItem paths[index]
             
             switch item.type
-                when 'file' then @loadFileItem item, col+1+index
+                when 'file' 
+                    # klog 'filebrowser.navigateToFile' item.file
+                    @loadFileItem item, col+1+index
                 when 'dir'
                     opt = {}
                     if index < paths.length-1
@@ -221,6 +225,7 @@ class FileBrowser extends Browser
 
     activateItem: (item, col) ->
 
+        klog 'activateItem' item.file
         @clearColumnsFrom col+2 pop:true
 
         switch item.type
@@ -229,7 +234,7 @@ class FileBrowser extends Browser
             when 'file'
                 @loadFileItem item, col+1
                 if item.textFile or File.isText item.file
-                    # klog 'activateItem' item.file
+                    klog 'activateItem jumpToFile' item.file
                     post.emit 'jumpToFile' item
 
     # 00000000  000  000      00000000  000  000000000  00000000  00     00
@@ -240,6 +245,7 @@ class FileBrowser extends Browser
 
     loadFileItem: (item, col=0) ->
 
+        klog 'loadFileItem' col, item.file
         @clearColumnsFrom col, pop:true
 
         while col >= @numCols()
@@ -269,12 +275,6 @@ class FileBrowser extends Browser
                     if not File.isClass item.file
                         @columns[col].table.appendChild @fileInfo file
 
-                # when 'gif' 'png' 'jpg' 'jpeg' 'svg' 'bmp' 'ico'
-                    # cnt = elem class: 'browserImageContainer' child:
-                        # elem 'img' class: 'browserImage' src: slash.fileUrl file
-                    # @columns[col].table.appendChild cnt
-                    
-                    
         post.emit 'load' column:col, item:item
                 
         @updateColumnScrolls()
@@ -286,7 +286,8 @@ class FileBrowser extends Browser
     # 000  000   000  000   000   0000000   00000000      000  000   000  000        0000000   
     
     imageInfo: (file) ->
-            
+        
+        klog 'imageInfo' file
         img = elem 'img' class:'browserImage' src:slash.fileUrl file
         cnt = elem class:'browserImageContainer' child:img
         cnt.addEventListener 'dblclick' => clearTimeout @openViewerTimer; open file
@@ -330,6 +331,7 @@ class FileBrowser extends Browser
         
     fileInfo: (file) ->
         
+        klog 'fileInfo' file
         stat = slash.fileExists file
         size = pbytes(stat.size).split ' '
         
@@ -365,14 +367,7 @@ class FileBrowser extends Browser
              if column.path() == dir
                  @loadDirItem {file:dir, type:'dir'}, column.index, active:column.activePath()
                  return
- 
-         if dirCache.has(dir) and not opt.ignoreCache
-             @loadDirItems dir, item, dirCache.get(dir), col, opt
-             post.emit 'dir' dir
-         else
-             opt.ignoreHidden = not window.state.get "browser|showHidden|#{dir}"
-             opt.textTest = true
-        
+         
      # 000  000   000  0000000    00000000  000   000  00000000  0000000
      # 000  0000  000  000   000  000        000 000   000       000   000
      # 000  000 0 000  000   000  0000000     00000    0000000   000   000
@@ -506,6 +501,7 @@ class FileBrowser extends Browser
 
     onFile: (file) =>
 
+        klog 'onFile' file
         return if not file
         return if not @flex
 

@@ -85,11 +85,13 @@ class Row
                 post.emit 'filebrowser' 'activateItem' @item, @column.index
                 
                 col = @column.index
-                @browser.clearColumnsFrom col+1, pop:true, clear:col+1
+                # @browser.clearColumnsFrom col+1, pop:true, clear:col+1
         
                 switch @item.type
                     when 'dir'  then @browser.loadDirItem  @item, col+1, focus:false
-                    when 'file' then @browser.loadFileItem @item, col+1
+                    # when 'file' 
+                        # klog 'row.activate' @item.file
+                        # @browser.loadFileItem @item, col+1
 
                 @browser.select.row @, false
                 
