@@ -291,7 +291,7 @@ class FileBrowser extends Browser
     
     imageInfo: (file) ->
         
-        klog 'imageInfo' file
+        # klog 'imageInfo' file
         img = elem 'img' class:'browserImage' src:slash.fileUrl file
         cnt = elem class:'browserImageContainer' child:img
         cnt.addEventListener 'dblclick' => clearTimeout @openTimer; open file
@@ -334,7 +334,7 @@ class FileBrowser extends Browser
         
     fileInfo: (file) ->
         
-        klog 'fileInfo' file
+        # klog 'fileInfo' file
         
         stat = slash.fileExists file
         size = pbytes(stat.size).split ' '

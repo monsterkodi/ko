@@ -106,10 +106,8 @@ body
 
 .browserColumn
     position            relative
-    line-height         1.15
 
 .browserColumnContent
-    // border              1px solid #333
     position            absolute
     width               100%
     bottom              0px
@@ -127,6 +125,7 @@ body
     height              100%
 
 .browserRow
+    height              21px
     display             block
     padding-left        6px
     padding-right       6px
@@ -136,6 +135,10 @@ body
     & .git
         float           right
         padding-top     1px
+        
+.browserColumnCode
+    & .browserRow
+        height          19px
 
 .rowNameInput
     font-family         fontMono
@@ -192,7 +195,7 @@ body
     padding-top         1vw
     padding-bottom      1vw
     &:before
-        font-size       10vw
+        font-size       6vw
 
 .fileInfoFile
     text-align          center

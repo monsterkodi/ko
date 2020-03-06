@@ -6,7 +6,7 @@
  0000000  000   000   0000000   000   000  0000000  
 ###
 
-{ elem, klog, kpos, slash } = require 'kxk'
+{ elem, kpos, slash } = require 'kxk'
 
 File = require '../tools/file'
 
@@ -21,9 +21,7 @@ class Crumb
         @column.div.insertBefore @elem, @column.div.firstChild
 
     show: -> @elem.style.display = 'block'
-    hide: -> 
-        klog 'hode'
-        @elem.style.display = 'none'
+    hide: -> @elem.style.display = 'none'
         
     onMouseDown: (event) =>
         
@@ -61,7 +59,7 @@ class Crumb
         if @column.index == 0
             @elem.innerHTML = File.crumbSpan slash.tilde file
         else
-            @elem.innerHTML = slash.base file
+            @elem.innerHTML = slash.file file
         
     clear: -> @elem.innerHTML = ''
     

@@ -6,7 +6,7 @@
    000     000   000  0000000    0000000
 ###
 
-{ post, stopEvent, empty, first, slash, popup, elem, drag, last, kpos, kerror, $, _ } = require 'kxk'
+{ $, _, drag, elem, empty, first, kerror, kpos, last, popup, post, slash, stopEvent } = require 'kxk'
 
 Tab = require './tab'
 
@@ -20,8 +20,8 @@ class Tabs
 
         titlebar.insertBefore @div, $ ".minimize"
 
-        @div.addEventListener 'click',       @onClick
-        @div.addEventListener 'contextmenu', @onContextMenu
+        @div.addEventListener 'click'       @onClick
+        @div.addEventListener 'contextmenu' @onContextMenu
 
         @drag = new drag
             target:  @div
@@ -47,7 +47,7 @@ class Tabs
         t = ''
         for tab in @tabs
             t += tab.div.innerHTML
-        post.toWin winID, 'winTabs', window.winID, t
+        post.toWin winID, 'winTabs' window.winID, t
 
     onFileLineChanges: (file, lineChanges) =>
 
@@ -207,7 +207,7 @@ class Tabs
 
     onNewTabWithFile: (file) =>
 
-        log 'onNewTabWithFile', file
+        log 'onNewTabWithFile' file
         [file, line, col] = slash.splitFileLine file
 
         if tab = @tab file

@@ -254,6 +254,7 @@ class Column
             @crumb.setFile @parent.file
         else
             if File.isCode @parent.file
+                @crumb.setFile @parent.file
                 @div.classList.add 'browserColumnCode'
                 
         if @parent.type == undefined
