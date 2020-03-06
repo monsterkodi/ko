@@ -558,7 +558,6 @@ class Column
     toggleDotFiles: =>
 
         if @parent.type == undefined
-            # log 'column.toggleDotFiles' @parent
             @parent.type = slash.isDir(@parent.file) and 'dir' or 'file'
             
         if @parent.type == 'dir'            
@@ -618,7 +617,6 @@ class Column
             
         if path
             if File.isText path
-                @browser.viewer = new Editor @browser, path
                 return
                 
             if slash.isFile path

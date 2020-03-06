@@ -53,6 +53,13 @@ body {
 #shelf.focus {
   background: #111;
 }
+.fileInfoData {
+  margin-top: 20px;
+  color: #444;
+}
+.fileInfoData .punct {
+  color: #222;
+}
 #commandline-editor {
   color: #fff;
   background: #000;

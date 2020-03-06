@@ -264,8 +264,10 @@ class FileBrowser extends Browser
                     else
                         @columns[col].table.appendChild @fileInfo file
                 else
-                    # @columns[col].table.appendChild @fileInfo file
-                    @loadSourceItem item, col
+                    if File.isText item.file
+                        @loadSourceItem item, col
+                    if not File.isClass item.file
+                        @columns[col].table.appendChild @fileInfo file
 
                 # when 'gif' 'png' 'jpg' 'jpeg' 'svg' 'bmp' 'ico'
                     # cnt = elem class: 'browserImageContainer' child:

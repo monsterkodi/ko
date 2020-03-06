@@ -119,6 +119,34 @@ body {
   position: absolute;
   right: 6px;
 }
+.browserFileInfo {
+  position: relative;
+  padding: 6px;
+}
+.fileInfoIcon {
+  text-align: center;
+  padding-top: 1vw;
+  padding-bottom: 1vw;
+}
+.fileInfoIcon:before {
+  font-size: 10vw;
+}
+.fileInfoFile {
+  text-align: center;
+  display: block;
+  font-size: 28px;
+}
+.fileInfoData {
+  margin: auto;
+  font-size: 16px;
+  line-height: 1.1;
+}
+.fileInfoData th {
+  text-align: right;
+}
+.fileInfoData td {
+  text-align: left;
+}
 .git-changed-icon:before {
   font-family: FontAwesome;
   content: '\f040';
