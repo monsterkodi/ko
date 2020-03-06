@@ -78,6 +78,8 @@ class Row
         
         opt = file:@item.file
 
+        # klog 'activate' @item
+        
         switch @item.type
             
             when 'dir' 'file'
@@ -96,23 +98,26 @@ class Row
                 @browser.select.row @, false
                 
             else    
-                if @item.file? and _.isString(@item.file) and @item.type != 'obj'
-                    opt.line = @item.line
-                    opt.col  = @item.column
-                    if emit then post.emit 'jumpToFile' opt
-                else if @column.parent.obj? and @column.parent.type == 'obj'
-                    if @item.type == 'obj'
-                        @browser.loadObjectItem @item, column:@column.index+1
-                        @browser.previewObjectItem  @item, column:@column.index+2
-                        if @item.obj?.file? and _.isString @item.obj.file
-                            opt.line = @item.obj.line
-                            opt.col  = @item.obj.column
-                            if emit then post.emit 'jumpToFile' opt
-                else if @item.obj?.file? and _.isString @item.obj.file
-                    opt = file:@item.obj.file, line:@item.obj.line, col:@item.obj.column, newTab:opt.newTab
-                    if emit then post.emit 'jumpToFile' opt
-                else
-                    @browser.clearColumnsFrom @column.index+1
+                # if @item.file? and _.isString(@item.file) and @item.type != 'obj'
+                opt.line = @item.line
+                opt.col  = @item.column
+                    
+                @browser.clearColumnsFrom @column.index+1, pop:true #, clear:@column.index+1
+                
+                if emit then post.emit 'jumpToFile' opt
+                # else if @column.parent.obj? and @column.parent.type == 'obj'
+                    # if @item.type == 'obj'
+                        # @browser.loadObjectItem @item, column:@column.index+1
+                        # @browser.previewObjectItem  @item, column:@column.index+2
+                        # if @item.obj?.file? and _.isString @item.obj.file
+                            # opt.line = @item.obj.line
+                            # opt.col  = @item.obj.column
+                            # if emit then post.emit 'jumpToFile' opt
+                # else if @item.obj?.file? and _.isString @item.obj.file
+                    # opt = file:@item.obj.file, line:@item.obj.line, col:@item.obj.column, newTab:opt.newTab
+                    # if emit then post.emit 'jumpToFile' opt
+                # else
+                    # @browser.clearColumnsFrom @column.index+1
         @
     
     isActive: -> @div.classList.contains 'active'

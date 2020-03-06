@@ -6,7 +6,7 @@
 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 ###
 
-{ childp, clamp, elem, fs, kerror, klog, kpos, os, setStyle, slash } = require 'kxk'
+{ childp, clamp, elem, fs, kerror, kpos, os, setStyle, slash } = require 'kxk'
 
 Column = require './column'
 flex   = require '../win/flex/flex'
@@ -56,7 +56,6 @@ class Browser extends event
         
         for column in @columns
             cpos = kpos column.div.getBoundingClientRect().left, column.div.getBoundingClientRect().top
-            klog x, cpos
             pos = kpos x, cpos.y
             if elem.containsPos column.div, pos
                 return column
@@ -305,8 +304,8 @@ class Browser extends event
 
         col = @emptyColumn opt?.column
         @clearColumnsFrom col.index
-        cnt = elem class: 'browserImageContainer', child: 
-            elem 'img', class: 'browserImage', src: slash.fileUrl file
+        cnt = elem class:'browserImageContainer' child: 
+            elem 'img' class:'browserImage' src:slash.fileUrl file
         col.table.appendChild cnt
         
 module.exports = Browser

@@ -232,28 +232,29 @@ class Column
         
         @browser.clearColumn @index
 
-        if @index == 0 or @index-1 < @browser.numCols() and @browser.columns[@index-1].activeRow()?.item.name == '..' and not slash.isRoot parent.file
+        @parent = parent
+        
+        if @index == 0 or @index-1 < @browser.numCols() and @browser.columns[@index-1].activeRow()?.item.name == '..' and not slash.isRoot @parent.file
             if items[0]?.name not in ['..' '/']
-                dir = parent.file
+                dir = @parent.file
                 updir = slash.dir dir
                 if updir != dir
-                    # klog '@numCols()' @numCols()
-                    # klog '@columns[col-1].activeRow()?.item.name' @columns[col-1]?.activeRow()?.item.name
-                    # klog 'col' col
-                    # klog 'items[0]' items[0]?.name
-                    klog 'updir' updir
-                    klog 'dir' dir
                     items.unshift
                         name: '..'
                         type: 'dir'
                         file:  updir
         
-        @items  = items
-        @parent = parent
+        @items = items
   
+        @div.classList.remove 'browserColumnCode'
+        
+        @crumb.show()
+        
         if @parent.type == 'dir'
-            # klog @parent
             @crumb.setFile @parent.file
+        else
+            if File.isCode @parent.file
+                @div.classList.add 'browserColumnCode'
                 
         if @parent.type == undefined
             @parent.type = slash.isDir(@parent.file) and 'dir' or 'file'
@@ -690,7 +691,7 @@ class Column
         @browser.shiftColumnsTo @index
         
         if @browser.columns[0].items[0].name != '..'
-            klog 'makeRoot'
+
             @unshiftItem 
                 name: '..'
                 type: 'dir'

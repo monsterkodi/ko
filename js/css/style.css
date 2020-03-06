@@ -68,6 +68,10 @@ body {
   bottom: 0px;
   top: 30px;
 }
+.browserColumnCode {
+  font-family: fontMono;
+  font-size: 16px;
+}
 .browserColumnTable {
   overflow: hidden;
   position: absolute;

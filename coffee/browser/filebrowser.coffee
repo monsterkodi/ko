@@ -128,7 +128,7 @@ class FileBrowser extends Browser
         
         file = slash.path file
 
-        klog 'navigateToFile' file, lastPath, @lastColumnPath()
+        # klog 'navigateToFile' file, lastPath, @lastColumnPath()
         
         if file == lastPath or file == @lastColumnPath() or slash.isRelative file
             return
@@ -219,7 +219,7 @@ class FileBrowser extends Browser
 
     activateItem: (item, col) ->
 
-        klog 'activateItem' item.file
+        # klog 'activateItem' item.file
         @clearColumnsFrom col+2 pop:true
 
         switch item.type
@@ -228,7 +228,7 @@ class FileBrowser extends Browser
             when 'file'
                 @loadFileItem item, col+1
                 if item.textFile or File.isText item.file
-                    klog 'activateItem jumpToFile' item.file
+                    # klog 'activateItem jumpToFile' item.file
                     post.emit 'jumpToFile' item
 
     # 00000000  000  000      00000000  000  000000000  00000000  00     00
@@ -239,7 +239,7 @@ class FileBrowser extends Browser
 
     loadFileItem: (item, col=0) ->
 
-        klog 'loadFileItem' col, item.file
+        # klog 'loadFileItem' col, item.file
         @clearColumnsFrom col, pop:true
 
         while col >= @numCols()
@@ -250,29 +250,39 @@ class FileBrowser extends Browser
         @columns[col].parent = item
         
         if File.isImage file
-            @columns[col].table.appendChild @imageInfo file
+            @imageInfoColumn col, file
         else
             switch slash.ext file
                 when 'tiff' 'tif'
                     if not slash.win()
                         @convertImage row
                     else
-                        @columns[col].table.appendChild @fileInfo file
+                        @fileInfoColumn col, file
                 when 'pxm'
                     if not slash.win()
                         @convertPXM row
                     else
-                        @columns[col].table.appendChild @fileInfo file
+                        @fileInfoColumn col, file
                 else
                     if File.isText item.file
                         @loadSourceItem item, col
-                    if not File.isClass item.file
-                        @columns[col].table.appendChild @fileInfo file
+                    if not File.isCode item.file
+                        @fileInfoColumn col, file
 
         post.emit 'load' column:col, item:item
                 
         @updateColumnScrolls()
 
+    imageInfoColumn: (col, file) ->
+        
+        @columns[col].crumb.hide()
+        @columns[col].table.appendChild @imageInfo file
+        
+    fileInfoColumn: (col, file) ->
+        
+        @columns[col].crumb.hide()
+        @columns[col].table.appendChild @fileInfo file
+        
     # 000  00     00   0000000    0000000   00000000      000  000   000  00000000   0000000   
     # 000  000   000  000   000  000        000           000  0000  000  000       000   000  
     # 000  000000000  000000000  000  0000  0000000       000  000 0 000  000000    000   000  
@@ -325,6 +335,7 @@ class FileBrowser extends Browser
     fileInfo: (file) ->
         
         klog 'fileInfo' file
+        
         stat = slash.fileExists file
         size = pbytes(stat.size).split ' '
         
@@ -443,22 +454,6 @@ class FileBrowser extends Browser
         
         @updateColumnScrolls()
                             
-        # updir = slash.resolve slash.join dir, '..'
-
-        # if col == 0 or col-1 < @numCols() and @columns[col-1].activeRow()?.item.name == '..'
-            # if items[0]?.name not in ['..' '/']
-                # if updir != dir
-                    # klog '@numCols()' @numCols()
-                    # klog '@columns[col-1].activeRow()?.item.name' @columns[col-1]?.activeRow()?.item.name
-                    # klog 'col' col
-                    # klog 'items[0]' items[0]?.name
-                    # klog 'updir' updir
-                    # klog 'dir' dir
-                    # items.unshift
-                        # name: '..'
-                        # type: 'dir'
-                        # file:  updir
-
         while col >= @numCols()
             @addColumn()
 
@@ -493,7 +488,7 @@ class FileBrowser extends Browser
 
     onFile: (file) =>
 
-        klog 'onFile' file
+        # klog 'onFile' file
         return if not file
         return if not @flex
 

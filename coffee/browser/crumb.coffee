@@ -6,7 +6,7 @@
  0000000  000   000   0000000   000   000  0000000  
 ###
 
-{ elem, kpos, slash } = require 'kxk'
+{ elem, klog, kpos, slash } = require 'kxk'
 
 File = require '../tools/file'
 
@@ -20,6 +20,11 @@ class Crumb
         @elem.addEventListener 'mouseup'   @onMouseUp
         @column.div.insertBefore @elem, @column.div.firstChild
 
+    show: -> @elem.style.display = 'block'
+    hide: -> 
+        klog 'hode'
+        @elem.style.display = 'none'
+        
     onMouseDown: (event) =>
         
         @downPos = kpos window.win.getBounds()
