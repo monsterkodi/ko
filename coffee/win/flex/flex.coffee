@@ -6,7 +6,7 @@
 000       0000000  00000000  000   000  
 ###
 
-{ valid, last, drag, _ } = require 'kxk'
+{ _, drag, last, valid } = require 'kxk'
 
 Pane   = require './pane'
 Handle = require './handle'
@@ -86,6 +86,20 @@ class Flex
         else
             last(@panes).setSize last(@panes).actualSize()
 
+    shiftPane: ->
+        
+        if @panes.length > 1
+            @panes.shift().del()
+            @handles.shift().del()
+            
+        for i in [0...@panes.length]
+            @panes[i].index = i
+
+        for i in [0...@handles.length]
+            @handles[i].index = i
+            
+        @relax()  
+            
     # 00000000   00000000  000       0000000   000   000  
     # 000   000  000       000      000   000   000 000   
     # 0000000    0000000   000      000000000    00000    

@@ -6,7 +6,7 @@
 000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
 ###
 
-{ $, _, clamp, elem, empty, kerror, klog, kstr, last, matchr, stopEvent } = require 'kxk'
+{ $, _, clamp, elem, empty, kerror, kstr, last, matchr, stopEvent } = require 'kxk'
 
 Indexer = require '../main/indexer'
 event   = require 'events'
@@ -23,14 +23,12 @@ class Autocomplete extends event
         @matchList = []
         @clones    = []
         @cloned    = []
-        str = new String()
         
         @close()
         
         specials = "_-@#"
         @especial = ("\\"+c for c in specials.split '').join ''
         @headerRegExp      = new RegExp "^[0#{@especial}]+$"
-        
         @notSpecialRegExp  = new RegExp "[^#{@especial}]"
         @specialWordRegExp = new RegExp "(\\s+|[\\w#{@especial}]+|[^\\s])" 'g'
         @splitRegExp       = new RegExp "[^\\w\\d#{@especial}]+" 'g'   
@@ -69,7 +67,7 @@ class Autocomplete extends event
     
         if @newRegExp.test line
             match = line.match @newRegExp
-            klog match[2], match[1]
+            # klog match[2], match[1]
             
             try
                 clss = eval match[2]

@@ -6,7 +6,7 @@
 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 ###
 
-{ setStyle, childp, clamp, slash, elem, os, fs, kerror, klog, _ } = require 'kxk'
+{ childp, clamp, elem, fs, kerror, klog, kpos, os, setStyle, slash } = require 'kxk'
 
 Column = require './column'
 flex   = require '../win/flex/flex'
@@ -51,33 +51,23 @@ class Browser extends event
             if elem.containsPos column.div, pos
                 return column
         null
+        
+    columnAtX: (x) ->
+        
+        for column in @columns
+            cpos = kpos column.div.getBoundingClientRect().left, column.div.getBoundingClientRect().top
+            klog x, cpos
+            pos = kpos x, cpos.y
+            if elem.containsPos column.div, pos
+                return column
+        null
+        
+    rowAtPos: (pos) ->
+        
+        if column = @columnAtPos pos
+            return column.rowAtPos pos
+        null
                             
-    # 000       0000000    0000000   0000000         000  000000000  00000000  00     00   0000000  
-    # 000      000   000  000   000  000   000       000     000     000       000   000  000       
-    # 000      000   000  000000000  000   000       000     000     0000000   000000000  0000000   
-    # 000      000   000  000   000  000   000       000     000     000       000 0 000       000  
-    # 0000000   0000000   000   000  0000000         000     000     00000000  000   000  0000000   
-    
-    loadItems: (items, opt) ->
-
-        return if not @flex
-        col = @emptyColumn opt?.column
-        @clearColumnsFrom col.index
-        col.setItems items, opt
-
-        if opt.activate?
-            col.row(opt.activate)?.activate()
-                
-        if opt.row?
-            col.focus()
-            
-        if opt.focus
-            @focus()
-            @lastUsedColumn()?.activeRow()?.setActive()            
-            
-        @popEmptyColumns relax:false
-        @
-
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       
     # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000   
@@ -85,14 +75,31 @@ class Browser extends event
     # 000   000  000   000      0      000   0000000   000   000     000     00000000  
     
     navigate: (key) ->
+  
+        @select.clear()
         
-        index = @focusColumn()?.index ? 0
-        index += switch key
-            when 'left'  then -1
-            when 'right' then +1
-        index = clamp 0, @numCols()-1, index
-        if @columns[index].numRows()
-            @columns[index].focus().activeRow().activate()
+        if key == 'up'
+            if @activeColumnIndex() > 0
+                if col = @activeColumn()
+                    if row = col.activeRow()
+                        @loadItem @fileItem row.item.file
+                    else
+                        @loadItem @fileItem col.path()
+            else
+                if not slash.isRoot @columns[0].path()
+                    @loadItem @fileItem slash.dir @columns[0].path()
+        else        
+            index = @focusColumn()?.index ? 0
+            nuidx = index + switch key
+                when 'left''up' then -1
+                when 'right'    then +1
+                                
+            nuidx = clamp 0, @numCols()-1, nuidx
+            return if nuidx == index
+            if @columns[nuidx].numRows()
+                @columns[nuidx].focus().activeRow().activate()
+            
+        @updateColumnScrolls()
         @
         
     # 00000000   0000000    0000000  000   000   0000000  
@@ -102,7 +109,7 @@ class Browser extends event
     # 000        0000000    0000000   0000000   0000000   
     
     focus: (opt) => 
-        @lastUsedColumn()?.focus opt
+        @lastDirColumn()?.focus opt
         @
     
     focusColumn: -> 
@@ -138,13 +145,7 @@ class Browser extends event
         for col in @columns
             if col.hasFocus() then return col.index
         0
-        
-    activeColumnID: ->
-        
-        for col in @columns
-            if col.hasFocus() then return col.div.id
-        'column0'
-
+                
     lastUsedColumn: ->
         
         used = null
@@ -154,15 +155,11 @@ class Browser extends event
             else break
         used
 
-    hasEmptyColumns: -> _.last(@columns).isEmpty()
+    hasEmptyColumns: -> @columns[-1].isEmpty()
 
     height: -> @flex?.height()
     numCols: -> @columns.length 
     column: (i) -> @columns[i] if 0 <= i < @numCols()
-
-    columnWithName: (name) -> @columns.find (c) -> c.name() == name
-
-    onBackspaceInColumn: (column) -> column.clearSearch().removeObject()    
     
     #  0000000   0000000    0000000     0000000   0000000   000      
     # 000   000  000   000  000   000  000       000   000  000      
@@ -185,7 +182,18 @@ class Browser extends event
     # 000        000   000  000        
     # 000         0000000   000        
     
-    clearColumn: (index) -> @columns[index].clear()
+    clearColumn: (index) -> if index < @columns.length then @columns[index].clear()
+    
+    shiftColumn: ->
+        
+        return if not @flex
+        return if not @columns.length
+        @clearColumn 0
+        @flex.shiftPane()
+        @columns.shift()
+        
+        for i in [0...@columns.length]
+            @columns[i].setIndex i
     
     popColumn: (opt) ->
         
@@ -194,12 +202,18 @@ class Browser extends event
         @flex.popPane opt
         @columns.pop()
         
-    popEmptyColumns: (opt) -> @popColumn(opt) while @hasEmptyColumns()
+    popEmptyColumns: (opt) -> 
         
-    popColumnsFrom: (col) -> 
+        @clearColumnsFrom @lastDirColumn()?.index ? 0, pop:true
         
-        while @numCols() > col 
-            @popColumn()
+    shiftColumnsTo: (col) ->
+        
+        @closeViewer()
+        
+        for i in [0...col]
+            @shiftColumn()
+            
+        @updateColumnScrolls()
         
     #  0000000  000      00000000   0000000   00000000   
     # 000       000      000       000   000  000   000  
@@ -213,15 +227,17 @@ class Browser extends event
         
         return kerror "clearColumnsFrom #{c}?" if not c? or c < 0
         
+        num = @numCols()
         if opt.pop
-            if c < @numCols()
-                @clearColumn c
-                c++
-            while c < @numCols()
+            if opt.clear?
+                while c <= opt.clear
+                    @clearColumn c
+                    c++
+            while c < num
                 @popColumn()
                 c++
         else
-            while c < @numCols()
+            while c < num
                 @clearColumn c
                 c++
 
@@ -240,11 +256,16 @@ class Browser extends event
         @flex.relax()
         true
 
-    resized: -> @updateColumnScrolls()
+    resized: -> 
+
+        @viewer?.resized?()
+        
+        @updateColumnScrolls()
     
     updateColumnScrolls: =>
         
         for c in @columns
+            c.updateCrumb()
             c.scroll.update()
 
     reset: -> delete @cols; @initColumns()
@@ -261,8 +282,8 @@ class Browser extends event
     
     convertPXM: (row) ->
         
-        item = row.item
-        file = item.file
+        item   = row.item
+        file   = item.file
         tmpPXM = slash.join os.tmpdir(), "ko-#{slash.base file}.pxm"
         tmpPNG = slash.swapExt tmpPXM, '.png'
 
@@ -270,20 +291,22 @@ class Browser extends event
             return kerror "can't copy pxm image #{file} to #{tmpPXM}: #{err}" if err?
             childp.exec "open #{__dirname}/../../bin/pxm2png.app --args #{tmpPXM}", (err) =>
                 return kerror "can't convert pxm image #{tmpPXM} to #{tmpPNG}: #{err}" if err?
-                loadDelayed = => @loadImage tmpPNG
+                loadDelayed = => @loadImage row, tmpPNG
                 setTimeout loadDelayed, 300
 
-    convertImage: (file) ->
-        klog 'convertImage' file
-        tmpImage = slash.join os.tmpdir(), "ko-#{slash.basename file}.png"
-        childp.exec "/usr/bin/sips -s format png \"#{file}\" --out \"#{tmpImage}\"", (err) =>
-            return kerror "can't convert image #{file}: #{err}" if err?
-            @loadImage tmpImage
-
-    loadImage: (file) ->
+    convertImage: (row) ->
         
-        row = @row file
-        return if not row?.isActive()
+        item   = row.item
+        file   = item.file
+        tmpImg = slash.join os.tmpdir(), "ko-#{slash.basename file}.png"
+        
+        childp.exec "/usr/bin/sips -s format png \"#{file}\" --out \"#{tmpImg}\"", (err) =>
+            return kerror "can't convert image #{file}: #{err}" if err?
+            @loadImage row, tmpImg
+
+    loadImage: (row, file) ->
+        
+        return if not row.isActive()
 
         col = @emptyColumn opt?.column
         @clearColumnsFrom col.index

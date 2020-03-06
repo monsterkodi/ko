@@ -6,7 +6,7 @@
 000   000   0000000   00     00
 ###
 
-{ post, keyinfo, empty, slash, elem, drag, app, fs, kerror, $, _ } = require 'kxk'
+{ $, _, app, elem, empty, keyinfo, post, slash, stopEvent } = require 'kxk'
 
 Syntax    = require '../editor/syntax'
 electron  = require 'electron'
@@ -24,19 +24,13 @@ class Row
             html = '<span> </span>'
         else
             html = Syntax.spanForTextAndSyntax text, 'browser'
-        @div = elem class: 'browserRow' html: html
+        @div = elem class:'browserRow' html: html
         @div.classList.add @item.type
         @column.table.appendChild @div
 
         if @item.type in ['file' 'dir'] or @item.icon
             @setIcon()
         
-        @drag = new drag
-            target:  @div
-            onStart: @onDragStart
-            onMove:  @onDragMove
-            onStop:  @onDragStop
-   
     next:        -> @index() < @column.numRows()-1 and @column.rows[@index()+1] or null
     prev:        -> @index() > 0 and @column.rows[@index()-1] or null
     index:       -> @column.rows.indexOf @    
@@ -58,10 +52,13 @@ class Row
                 className = 'folder-icon'
             else
                 className = File.iconClassName @item.file
+                
+        if slash.base(@item.file).startsWith('.')
+            className += ' dotfile'
             
         icon = elem('span' class:className + ' browserFileIcon')
             
-        @div.firstChild.insertBefore icon, @div.firstChild.firstChild
+        @div.firstChild?.insertBefore icon, @div.firstChild.firstChild
                     
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
     # 000   000  000          000     000  000   000  000   000     000     000       
@@ -74,24 +71,28 @@ class Row
         if @column.index < 0 # shelf handles row activation
             @column.activateRow @
             return
-        
-        if event?
-            { mod } = keyinfo.forEvent event
-            switch mod
-                when 'alt' 'command+alt' 'ctrl+alt'
-                    if @item.type == 'file' and @item.textFile
-                        post.toMain 'newWindowWithFile' @item.file
-                        return
-            
+                    
         $('.hover')?.classList.remove 'hover'
         
         @setActive emit:true
         
         opt = file:@item.file
-        
+
         switch @item.type
-            when 'dir' 'file' 
+            
+            when 'dir' 'file'
+                
                 post.emit 'filebrowser' 'activateItem' @item, @column.index
+                
+                col = @column.index
+                @browser.clearColumnsFrom col+1, pop:true, clear:col+1
+        
+                switch @item.type
+                    when 'dir'  then @browser.loadDirItem  @item, col+1, focus:false
+                    when 'file' then @browser.loadFileItem @item, col+1
+
+                @browser.select.row @, false
+                
             else    
                 if @item.file? and _.isString(@item.file) and @item.type != 'obj'
                     opt.line = @item.line
@@ -114,26 +115,45 @@ class Row
     
     isActive: -> @div.classList.contains 'active'
     
-    setActive: (opt = {}) ->
+    setActive: (opt={}) ->
         
-        @column.activeRow()?.clearActive()
+        if @column.activeRow() != @
+            @column.activeRow()?.clearActive()
+            
         @div.classList.add 'active'
         
-        if opt?.scroll != false
-            @column.scroll.toIndex @index()
-            
         window.setLastFocus @column.name()
         
-        if opt?.emit 
+        if opt?.scroll != false
+            @column.scroll.toIndex @index()            
+            
+        if opt?.emit
+            # klog 'emit itemActivated' @item
             @browser.emit 'itemActivated' @item
             if @item.type == 'dir'
                 post.emit 'setCWD' @item.file
             else if @item.type == 'file'
                 post.emit 'setCWD' slash.dir @item.file
         @
-                
+                 
     clearActive: ->
         @div.classList.remove 'active'
+        @
+        
+    #  0000000  00000000  000      00000000   0000000  000000000  00000000  0000000    
+    # 000       000       000      000       000          000     000       000   000  
+    # 0000000   0000000   000      0000000   000          000     0000000   000   000  
+    #      000  000       000      000       000          000     000       000   000  
+    # 0000000   00000000  0000000  00000000   0000000     000     00000000  0000000    
+    
+    isSelected: -> @div.classList.contains 'selected'
+    
+    setSelected: ->
+        @div.classList.add 'selected'
+        @
+        
+    clearSelected: ->
+        @div.classList.remove 'selected'
         @
 
     # 000   000   0000000   00     00  00000000  
@@ -145,7 +165,7 @@ class Row
     editName: =>
         
         return if @input? 
-        @input = elem 'input' class: 'rowNameInput'
+        @input = elem 'input' class:'rowNameInput'
         @input.value = slash.file @item.file
         
         @div.appendChild @input
@@ -159,17 +179,24 @@ class Row
     onNameKeyDown: (event) =>
         
         {mod, key, combo} = keyinfo.forEvent event
+
         switch combo
-            when 'enter' 'esc'
-                if @input.value == @file or combo != 'enter'
-                    @input.value = @file
+            when 'esc'
+                if @input.value != slash.file @item.file
+                    @input.value = slash.file @item.file
                     event.preventDefault()
                     event.stopImmediatePropagation()
-                    @onNameFocusOut()
+                @onNameFocusOut()
+            when 'enter'
+                if @input.value != slash.file @item.file
+                    @onNameChange()
+                else
+                    @removeInput()
+                stopEvent event
         event.stopPropagation()
         
     removeInput: ->
-        
+
         return if not @input?
         @input.removeEventListener 'focusout' @onNameFocusOut
         @input.removeEventListener 'change'   @onNameChange
@@ -182,56 +209,33 @@ class Row
     
     onNameFocusOut: (event) => @removeInput()
     
+    #  0000000  000   000   0000000   000   000   0000000   00000000  
+    # 000       000   000  000   000  0000  000  000        000       
+    # 000       000000000  000000000  000 0 000  000  0000  0000000   
+    # 000       000   000  000   000  000  0000  000   000  000       
+    #  0000000  000   000  000   000  000   000   0000000   00000000  
+    
     onNameChange: (event) =>
         
-        trimmed = @input.value.trim()
-        if trimmed.length
-            newFile = slash.join slash.dir(@item.file), trimmed
-            unusedFilename = require 'unused-filename'
-            unusedFilename(newFile).then (newFile) =>
-                fs.rename @item.file, newFile, (err) =>
-                    return kerror 'rename failed' err if err
-                    post.emit 'loadFile' newFile
+        targetFile = slash.join slash.dir(@item.file), @input.value.trim()
+        
         @removeInput()
         
-    # 0000000    00000000    0000000    0000000   
-    # 000   000  000   000  000   000  000        
-    # 000   000  0000000    000000000  000  0000  
-    # 000   000  000   000  000   000  000   000  
-    # 0000000    000   000  000   000   0000000   
+        @rename targetFile
+        
+    # 00000000   00000000  000   000   0000000   00     00  00000000  
+    # 000   000  000       0000  000  000   000  000   000  000       
+    # 0000000    0000000   000 0 000  000000000  000000000  0000000   
+    # 000   000  000       000  0000  000   000  000 0 000  000       
+    # 000   000  00000000  000   000  000   000  000   000  00000000  
     
-    onDragStart: (d, e) =>
+    rename: (targetFile) =>
         
-        @column.focus activate:false
-        @setActive scroll:false
-
-    onDragMove: (d,e) =>
-        
-        if not @column.dragDiv
+        return if slash.samePath @item.file, targetFile
+                
+        File.rename @item.file, targetFile, (source, target) =>
             
-            return if Math.abs(d.deltaSum.x) < 20 and Math.abs(d.deltaSum.y) < 10
-            
-            @column.dragDiv = @div.cloneNode true
-            br = @div.getBoundingClientRect()
-            @column.dragDiv.style.position = 'absolute'
-            @column.dragDiv.style.top  = "#{br.top}px"
-            @column.dragDiv.style.left = "#{br.left}px"
-            @column.dragDiv.style.width = "#{br.width-12}px"
-            @column.dragDiv.style.height = "#{br.height-3}px"
-            @column.dragDiv.style.flex = 'unset'
-            @column.dragDiv.style.pointerEvents = 'none'
-            document.body.appendChild @column.dragDiv
-        
-        @column.dragDiv.style.transform = "translateX(#{d.deltaSum.x}px) translateY(#{d.deltaSum.y}px)"
-
-    onDragStop: (d,e) =>
-        
-        if @column.dragDiv?
-            
-            @column.dragDiv.remove()
-            delete @column.dragDiv
-            
-            if column = @browser.columnAtPos d.pos
-                column.dropRow? @, d.pos
-        
+            @column.removeRow @
+            @browser.navigateToFile target
+    
 module.exports = Row

@@ -6,7 +6,7 @@
 0000000   000   000  00000000  0000000  000     
 ###
 
-{ post, stopEvent, keyinfo, empty, first, slash, clamp, popup, elem, kerror, $, _ } = require 'kxk'
+{ $, _, clamp, elem, empty, first, kerror, keyinfo, kpos, popup, post, prefs, slash, stopEvent } = require 'kxk'
 
 Row      = require './row'
 Scroller = require './scroller'
@@ -41,13 +41,14 @@ class Shelf extends Column
    
     activateRow: (row) -> 
         
-        item = row.item
+        $('.hover')?.classList.remove 'hover'
         
+        item = row.item
+         
         if item.type == 'historySeparator'
             row.setActive emit:false
             return
         
-        $('.hover')?.classList.remove 'hover'
         row.setActive emit:true
         
         if item.type == 'file'
@@ -103,7 +104,7 @@ class Shelf extends Column
                 
     loadShelfItems: ->
         
-        items = window.state.get "shelf|items"
+        items = prefs.get "shelf▸items"
         @setItems items, save:false
                 
     addPath: (path, opt) =>
@@ -121,8 +122,8 @@ class Shelf extends Column
 
     itemPaths: -> @rows.map (r) -> r.path()
     
-    savePrefs: -> 
-        window.state.set "shelf|items", @items
+    savePrefs: -> window.state.set "shelf|items" @items
+        # prefs.set "shelf▸items" @items
     
     setItems: (@items, opt) ->
         
@@ -163,6 +164,16 @@ class Shelf extends Column
         item.textFile = true if slash.isText file
         @addItem item, opt
         
+    addFiles: (files, opt) ->
+        # klog 'files' files
+        for file in files
+            if slash.isDir file
+                # klog 'addDir' file
+                @addDir file, opt
+            else
+                # klog 'addFile' file
+                @addFile file, opt
+        
     addItem:  (item, opt) ->
         
         _.pullAllWith @items, [item], _.isEqual # remove item if on shelf already
@@ -174,11 +185,15 @@ class Shelf extends Column
             @items.push item
             
         @setItems @items
-        @loadHistory() if @showHistory
-        @loadGitStatus()
                         
-    dropRow: (row, pos) -> @addItem row.item, pos:pos
-            
+    onDrop: (event) => 
+    
+        action = event.getModifierState('Shift') and 'copy' or 'move'
+        source = event.dataTransfer.getData 'text/plain'
+        
+        item = @browser.fileItem source
+        @addItem item, pos:kpos event
+    
     isEmpty: -> empty @rows
     
     clear: ->
@@ -196,7 +211,7 @@ class Shelf extends Column
     # 000  0000  000     000     
     # 000   000  000     000     
     #  0000000   000     000     
-    
+
     loadGitStatus: =>
         
         for row in @rows
@@ -282,7 +297,7 @@ class Shelf extends Column
             icon: 'history-icon'
         
         @addItems items
-            
+                
     # 00000000   0000000    0000000  000   000   0000000  
     # 000       000   000  000       000   000  000       
     # 000000    000   000  000       000   000  0000000   
@@ -291,11 +306,10 @@ class Shelf extends Column
     
     onFocus: => 
 
-        window.setLastFocus 'shelf'
         @div.classList.add 'focus'
         if @browser.shelfSize < 200
             @browser.setShelfSize 200
-        
+            
     # 00     00   0000000   000   000   0000000  00000000  
     # 000   000  000   000  000   000  000       000       
     # 000000000  000   000  000   000  0000000   0000000   
@@ -329,9 +343,9 @@ class Shelf extends Column
             else index
             
         kerror "no index #{index}? #{@numVisible()}" if not index? or Number.isNaN index        
-        index = clamp 0 @numRows()-1 index
+        index = clamp 0, @numRows()-1, index
         
-        kerror "no row at index #{index}/#{@numRows()-1}?" @numRows() if not @rows[index]?.activate?
+        kerror "no row at index #{index}/#{@numRows()-1}?", @numRows() if not @rows[index]?.activate?
 
         navigate = (action) =>
             @navigatingRows = true
@@ -351,6 +365,7 @@ class Shelf extends Column
     removeObject: =>
                 
         if row = @activeRow()
+            
             if @showHistory
                 if row.item.type == 'historySeparator'
                     @toggleHistory()
@@ -409,28 +424,32 @@ class Shelf extends Column
         { mod, key, combo, char } = keyinfo.forEvent event
         
         switch combo
-            when 'command+enter', 'ctrl+enter' then return @openFileInNewWindow()
-            when 'backspace', 'delete' then return stopEvent event, @clearSearch().removeObject()
-            when 'command+k', 'ctrl+k' then return stopEvent event if @browser.cleanUp()
+            when 'command+enter' 'ctrl+enter' then return @openFileInNewWindow()
+            when 'backspace' 'delete' then return stopEvent event, @clearSearch().removeObject()
+            when 'command+k' 'ctrl+k' then return stopEvent event if @browser.cleanUp()
             when 'tab'    
                 if @search.length then @doSearch ''
                 return stopEvent event
             when 'esc'
+                if @dragDiv
+                    @dragDiv.drag.dragStop()
+                    @dragDiv.remove()
+                    delete @dragDiv
                 if @search.length then @clearSearch()
-                else window.split.focus 'commandline-editor'
                 return stopEvent event
-
-        switch key
-            when 'up', 'down', 'page up', 'page down', 'home', 'end' 
+            when 'up' 'down' 'page up' 'page down' 'home' 'end' 
                 return stopEvent event, @navigateRows key
-            when 'right', 'enter'
+            when 'right' 'alt+right' 'enter'
                 return stopEvent event, @focusBrowser()
                 
-        switch char
-            when '~', '/' then return stopEvent event, @navigateRoot char
-            
-        if mod in ['shift', ''] and char then @doSearch char
+        if mod in ['shift' ''] and char then @doSearch char
         
-        if key in ['left'] then return stopEvent event
+        if @dragDiv
+            @updateDragIndicator event
+            
+    onKeyUp: (event) =>
+        
+        if @dragDiv
+            @updateDragIndicator event
         
 module.exports = Shelf

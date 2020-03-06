@@ -1,5 +1,5 @@
 name            ko
-version         0.289.0
+version         0.290.0
 description     text editor
 main            js/main/main.js
 preferGlobal    true
@@ -28,6 +28,8 @@ dependencies
                 ignore          ^5.1.4
                 js-beautify     ^1.10.3
                 kxk             ^0.380.0
+                moment          ^2.24.0
+                pretty-bytes    ^5.3.0
                 seamless-immutable  ^7.1.4
                 trash           ^6.1.1
                 unused-filename  ^2.1.0

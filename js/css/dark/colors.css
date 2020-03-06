@@ -25,6 +25,9 @@ body {
 .browserRow.active.dir {
   color: #ff8;
 }
+.browserRow.selected {
+  background: #116;
+}
 .rowNameInput {
   color: #ff0;
   background-color: #111;
@@ -218,6 +221,23 @@ span.macro.macro,
 #browser {
   background: #181818;
   border-color: #111;
+}
+.crumb {
+  background: #111;
+}
+.crumb:hover {
+  background: #0e0e0e;
+}
+.crumb .path:hover {
+  color: #aaf;
+}
+.crumb,
+.dir {
+  color: #aaf;
+}
+.crumb .inline:hover {
+  color: #fff;
+  opacity: 1;
 }
 #terminal,
 #editor {

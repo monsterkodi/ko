@@ -6,7 +6,7 @@
 0000000    000   000   0000000   00     00  0000000   00000000
 ###
 
-{ post, slash, empty, clamp, kerror, klog, $ } = require 'kxk'
+{ $, clamp, empty, kerror, klog, post, slash } = require 'kxk'
 
 Command     = require '../commandline/command'
 FileBrowser = require '../browser/filebrowser'
@@ -318,6 +318,7 @@ class Browse extends Command
 
     onBrowserItemActivated: (item) =>
 
+        # klog 'onBrowserItemActivated' item
         if not @isActive()
             @commandline.command?.onBrowserItemActivated? item
             return

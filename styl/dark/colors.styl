@@ -25,6 +25,7 @@ separatorColor      = #0e0e0e
 bgColor             = #0d0d0d
 frameColor          = #111111
 scrollHoverColor    = #b00
+crumbHoverColor     = #0e0e0e
 titleRedColor       = #f00
 titleColor          = #222
 scrollColor         = #444
@@ -53,9 +54,13 @@ body
             color       #ff8
         background      frameColor
 
+    &.selected
+        background      #116
+                
 .rowNameInput
     color               #ff0
     background-color    frameColor
+    // margin-left         -2px
         
 .browserColumn.focus .browserRow.active
     background          #22a
@@ -274,6 +279,21 @@ span.macro
     background          #181818
     border-color        frameColor
 
+.crumb 
+    background          frameColor
+    &:hover
+        background      crumbHoverColor
+    & .path:hover
+        color       #aaf
+    
+.crumb
+.dir
+    color           #aaf
+
+.crumb .inline:hover
+    color           white
+    opacity         1
+    
 // 00000000  0000000    000  000000000   0000000   00000000
 // 000       000   000  000     000     000   000  000   000
 // 0000000   000   000  000     000     000   000  0000000
