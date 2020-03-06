@@ -18,8 +18,7 @@ class Crumb
         @elem.columnIndex = @column.index
         @elem.addEventListener 'mousedown' @onMouseDown
         @elem.addEventListener 'mouseup'   @onMouseUp
-        # $('crumbs').appendChild @elem
-        @column.div.appendChild @elem
+        @column.div.insertBefore @elem, @column.div.firstChild
 
     onMouseDown: (event) =>
         
@@ -53,6 +52,7 @@ class Crumb
         
     setFile: (file) ->
         
+        # klog 'setFile' file
         if @column.index == 0
             @elem.innerHTML = File.crumbSpan slash.tilde file
         else
@@ -60,9 +60,4 @@ class Crumb
         
     clear: -> @elem.innerHTML = ''
     
-    updateRect: (br) ->
-        
-        @elem.style.left = "#{br.left}px"
-        @elem.style.width = "#{br.right - br.left}px"
-        
 module.exports = Crumb

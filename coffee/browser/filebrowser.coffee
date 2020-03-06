@@ -118,18 +118,12 @@ class FileBrowser extends Browser
             return 0
         Math.max -1, col-2
 
-    closeViewer: -> @viewer?.close()
-        
     browse: (file, opt) => 
             
-        @closeViewer()
-        
         if file then @loadItem @fileItem(file), opt
         
     navigateToFile: (file) =>
 
-        @closeViewer()
-        
         lastPath = @lastDirColumn()?.path()
         
         file = slash.path file
@@ -230,7 +224,7 @@ class FileBrowser extends Browser
 
         switch item.type
             when 'dir'
-                @loadDirItem  item, col+1
+                @loadDirItem  item, col+1, focus:false
             when 'file'
                 @loadFileItem item, col+1
                 if item.textFile or File.isText item.file
@@ -290,8 +284,7 @@ class FileBrowser extends Browser
         klog 'imageInfo' file
         img = elem 'img' class:'browserImage' src:slash.fileUrl file
         cnt = elem class:'browserImageContainer' child:img
-        cnt.addEventListener 'dblclick' => clearTimeout @openViewerTimer; open file
-        cnt.addEventListener 'click' => clearTimeout @openViewerTimer; @openViewerTimer = setTimeout (=> @lastDirColumn()?.openViewer()), 500
+        cnt.addEventListener 'dblclick' => clearTimeout @openTimer; open file
                     
         img.onload = ->
             img =$ '.browserImage'
@@ -349,10 +342,7 @@ class FileBrowser extends Browser
             elem 'div' class:"fileInfoFile #{slash.ext file}" html:File.span file
             elem 'table' class:"fileInfoData" html:"<tr><th>#{size[0]}</th><td>#{size[1]}</td></tr><tr><th>#{num}</th><td>#{range}</td></tr>"
         ]
-        
-        info.addEventListener 'dblclick' => clearTimeout @openViewerTimer; open file
-        info.addEventListener 'click' => clearTimeout @openViewerTimer; @openViewerTimer = setTimeout (=> @lastDirColumn()?.openViewer()), 500
-        
+                
         info
         
      # 0000000    000  00000000    0000000   0000000    0000000  000   000  00000000  
@@ -449,11 +439,6 @@ class FileBrowser extends Browser
                 @loadDirItems dir, item, items, col, opt
                 post.emit 'dir' dir
                 
-                # if @skipOnDblClick
-                    # delete @skipOnDblClick
-                    # if col > 0
-                        # return 
-
     loadDirItems: (dir, item, items, col, opt) =>
         
         @updateColumnScrolls()
@@ -486,6 +471,7 @@ class FileBrowser extends Browser
         
         if opt.focus != false and empty(document.activeElement) and empty($('.popup')?.outerHTML)
             if lastColumn = @lastDirColumn()
+                klog 'lastColumn focus'
                 lastColumn.focus()
                 
         opt.cb? column:col, item:item

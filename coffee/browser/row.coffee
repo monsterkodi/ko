@@ -66,7 +66,7 @@ class Row
     # 000   000  000          000     000     000     000   000     000     000       
     # 000   000   0000000     000     000      0      000   000     000     00000000  
     
-    activate: (event) =>
+    activate: (event, emit=true) =>
 
         if @column.index < 0 # shelf handles row activation
             @column.activateRow @
@@ -74,7 +74,7 @@ class Row
                     
         $('.hover')?.classList.remove 'hover'
         
-        @setActive emit:true
+        @setActive emit:emit
         
         opt = file:@item.file
 
@@ -99,7 +99,7 @@ class Row
                 if @item.file? and _.isString(@item.file) and @item.type != 'obj'
                     opt.line = @item.line
                     opt.col  = @item.column
-                    post.emit 'jumpToFile' opt
+                    if emit then post.emit 'jumpToFile' opt
                 else if @column.parent.obj? and @column.parent.type == 'obj'
                     if @item.type == 'obj'
                         @browser.loadObjectItem @item, column:@column.index+1
@@ -107,10 +107,10 @@ class Row
                         if @item.obj?.file? and _.isString @item.obj.file
                             opt.line = @item.obj.line
                             opt.col  = @item.obj.column
-                            post.emit 'jumpToFile' opt
+                            if emit then post.emit 'jumpToFile' opt
                 else if @item.obj?.file? and _.isString @item.obj.file
                     opt = file:@item.obj.file, line:@item.obj.line, col:@item.obj.column, newTab:opt.newTab
-                    post.emit 'jumpToFile' opt
+                    if emit then post.emit 'jumpToFile' opt
                 else
                     @browser.clearColumnsFrom @column.index+1
         @

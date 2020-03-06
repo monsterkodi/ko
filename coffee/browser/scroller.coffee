@@ -15,7 +15,7 @@ class Scroller
     @: (@column) ->
 
         @elem = elem class: 'scrollbar right'
-        @column.div.insertBefore @elem, @column.table
+        @column.div.appendChild @elem
 
         @handle = elem class: 'scrollhandle right'
         @elem.appendChild @handle

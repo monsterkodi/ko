@@ -12,7 +12,6 @@ Row      = require './row'
 Crumb    = require './crumb'
 Scroller = require './scroller'
 File     = require '../tools/file'
-Viewer   = require './viewer'
 fuzzy    = require 'fuzzy'
 wxw      = require 'wxw'
 electron = require 'electron'
@@ -231,8 +230,10 @@ class Column
         
         @items  = items
         @parent = parent
-        
-        @crumb.setFile @parent.file
+  
+        if @parent.type == 'dir'
+            # klog @parent
+            @crumb.setFile @parent.file
                 
         if @parent.type == undefined
             @parent.type = slash.isDir(@parent.file) and 'dir' or 'file'
@@ -368,8 +369,6 @@ class Column
         @browser.skipOnDblClick = true
         @navigateCols 'enter'
     
-    updateCrumb: => @crumb.updateRect @div.getBoundingClientRect()
-           
     extendSelection: (key) ->
         
         return error "no rows in column #{@index}?" if not @numRows()        
@@ -413,13 +412,9 @@ class Column
             
         newIndex = clamp 0, @numRows()-1, newIndex
         
-        return if newIndex == index
-        
-        if not @rows[newIndex]?.activate?
-            error "no row at index #{newIndex}/#{@numRows()-1}?", @numRows() 
-            
-        # @rows[newIndex].activate()
-        @browser.select.row @rows[newIndex]
+        if newIndex != index
+            klog 'navigateRows' newIndex
+            @rows[newIndex].activate null, false
     
     navigateCols: (key) -> # move to file browser?
         
@@ -601,29 +596,6 @@ class Column
         
         if pathToShelf = @activePath()
             post.emit 'addToShelf' pathToShelf
-
-    # 000   000  000  00000000  000   000  00000000  00000000   
-    # 000   000  000  000       000 0 000  000       000   000  
-    #  000 000   000  0000000   000000000  0000000   0000000    
-    #    000     000  000       000   000  000       000   000  
-    #     0      000  00000000  00     00  00000000  000   000  
-    
-    openViewer: =>
-        
-        if @activeRow()?.item.name != '..' 
-            path = @activePath()
-        else
-            path = @parent.file
-            
-        if path
-            if File.isText path
-                return
-                
-            if slash.isFile path
-                if not File.isImage path
-                    path = @path()
-            
-            @browser.viewer = new Viewer @browser, path
         
     newFolder: =>
         
@@ -746,14 +718,6 @@ class Column
             combo:  'ctrl+e' 
             cb:     @toggleExtensions
         ,            
-            # text:   'Open'
-            # combo:  'return alt+o'
-            # cb:     @open
-        # ,
-            # text:   'Viewer'
-            # combo:  'space alt+v' 
-            # cb:     @openViewer
-        # ,
             text:   ''
         ,
             text:   'Explorer'
@@ -852,9 +816,8 @@ class Column
             when '/'                                then return stopEvent event, @browser.browse '/'
             when 'alt+shift+.'                      then return stopEvent event, @addToShelf()
             when 'alt+e'                            then return @explorer()
-            when 'alt+o'                            then return @open()
+            # when 'alt+o'                            then return @open()
             when 'alt+n'                            then return @newFolder()
-            when 'space' 'alt+v'                    then return @openViewer()
             when 'ctrl+x' 'command+x'               then return @cutPaths()
             when 'ctrl+c' 'command+c'               then return @copyPaths()
             when 'ctrl+v' 'command+v'               then return @pastePaths()

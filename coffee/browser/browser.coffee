@@ -208,8 +208,6 @@ class Browser extends event
         
     shiftColumnsTo: (col) ->
         
-        @closeViewer()
-        
         for i in [0...col]
             @shiftColumn()
             
@@ -258,14 +256,11 @@ class Browser extends event
 
     resized: -> 
 
-        @viewer?.resized?()
-        
         @updateColumnScrolls()
     
     updateColumnScrolls: =>
         
         for c in @columns
-            c.updateCrumb()
             c.scroll.update()
 
     reset: -> delete @cols; @initColumns()

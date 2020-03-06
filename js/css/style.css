@@ -61,11 +61,13 @@ body {
 .browserColumn {
   overflow: hidden;
   position: relative;
+  line-height: 1.15;
 }
 .browserColumnTable {
+  position: absolute;
   display: table;
   width: 100%;
-  height: 100%;
+  top: 30px;
 }
 .browserRow {
   display: block;
@@ -173,6 +175,35 @@ body {
 .folder-icon:before {
   font-family: octicons;
   content: '\f016';
+}
+.inline {
+  display: inline-block;
+}
+.crumb {
+  font-size: 15px;
+  padding-top: 1px;
+  line-height: 30px;
+  position: absolute;
+  text-align: center;
+  cursor: pointer;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  display: block;
+  white-space: nowrap;
+  height: 30px;
+}
+.crumb .path {
+  opacity: 0.5;
+}
+.crumb .punct {
+  padding: 0.2em;
+  opacity: 0.2;
+}
+.crumb .dot {
+  padding-left: 10px;
+  padding-right: 10px;
 }
 #shelf {
   overflow: hidden;
@@ -375,6 +406,8 @@ body {
   right: 0;
 }
 #browser {
+  font-family: titlebarFont;
+  font-size: 18px;
   position: relative;
   overflow: hidden;
   pointer-events: auto;
