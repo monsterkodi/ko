@@ -6,7 +6,7 @@
  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  0000000      000
 ###
 
-{ matchr, kerror } = require 'kxk'
+{ kerror, matchr } = require 'kxk'
 
 TextEditor = require '../editor/texteditor'
 Syntax     = require '../editor/syntax'
@@ -17,16 +17,16 @@ class CommandList extends TextEditor
     @: (@command, viewElem, opt) ->
 
         super viewElem,
-            features: ['Scrollbar' 'Numbers' 'Meta']
-            lineHeight: 1.4
-            fontSize:   19
-            syntaxName: opt.syntaxName ? 'ko'
+            features:     ['Scrollbar' 'Numbers' 'Meta']
+            lineHeight:   1.4
+            fontSize:     19
             scrollOffset: 0
+            syntaxName:   opt.syntaxName ? 'ko'
 
         @name      = 'commandlist-editor'
         @items     = []
-        @maxLines  = 17
         @metaQueue = []
+        @maxLines  = 17
 
         @numbers.elem.style.fontSize = '19px'
 

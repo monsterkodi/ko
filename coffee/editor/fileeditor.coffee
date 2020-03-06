@@ -32,7 +32,7 @@ class FileEditor extends TextEditor
 
         @currentFile = null
 
-        @view.addEventListener "contextmenu", @onContextMenu
+        @view.addEventListener 'contextmenu' @onContextMenu
 
         post.on 'commandline'   @onCommandline
         post.on 'jumpTo'        @jumpTo
@@ -40,7 +40,7 @@ class FileEditor extends TextEditor
 
         @initPigments()
         @initInvisibles()
-
+        
         @setText ''
 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000
@@ -406,7 +406,7 @@ class FileEditor extends TextEditor
         ,
             text:   'Back'
             combo:  'command+1'
-            cb:     -> post.emit 'menuAction' 'Navigate Backward' # fix me! in same file navigation!
+            cb:     -> post.emit 'menuAction' 'Navigate Backward'
         ,
             text:   ''
         ,

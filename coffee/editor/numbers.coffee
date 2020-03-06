@@ -29,7 +29,7 @@ class Numbers extends event
         @editor.on 'highlight'        @updateColors
         @editor.on 'changed'          @updateColors
         @editor.on 'linesSet'         @updateColors
-
+        
         @onFontSizeChange()
 
     #  0000000  000   000   0000000   000   000  000   000
@@ -112,7 +112,7 @@ class Numbers extends event
 
     addLine: (li) ->
 
-        div = elem class: 'linenumber', child: elem 'span', text: "#{li+1}"
+        div = elem class:'linenumber' child:elem 'span' text:"#{li+1}"
         div.style.height = "#{@editor.size.lineHeight}px"
         @lineDivs[li] = div
         @elem.appendChild div

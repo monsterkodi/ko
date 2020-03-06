@@ -6,10 +6,11 @@
 000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
 ###
 
-{ $, _, clamp, elem, empty, kerror, last, matchr, stopEvent } = require 'kxk'
+{ $, _, clamp, elem, empty, kerror, klog, kstr, last, matchr, stopEvent } = require 'kxk'
 
 Indexer = require '../main/indexer'
 event   = require 'events'
+req     = require '../tools/req'
 
 class Autocomplete extends event
 
@@ -22,6 +23,7 @@ class Autocomplete extends event
         @matchList = []
         @clones    = []
         @cloned    = []
+        str = new String()
         
         @close()
         
@@ -32,7 +34,10 @@ class Autocomplete extends event
         @notSpecialRegExp  = new RegExp "[^#{@especial}]"
         @specialWordRegExp = new RegExp "(\\s+|[\\w#{@especial}]+|[^\\s])" 'g'
         @splitRegExp       = new RegExp "[^\\w\\d#{@especial}]+" 'g'   
-        @methodRegExp      = /([\@]?\w+|@)\.(\w+)/
+        @methodRegExp      = /([@]?\w+|@)\.(\w+)/
+        @moduleRegExp      = /^\s*(\w+)\s*=\s*require\s+([\'\"][\.\/\w]+[\'\"])/
+        @newRegExp         = /([@]?\w+)\s*=\s*new\s+(\w+)/
+        @baseRegExp        = /\w\s+extends\s+(\w+)/
     
         @editor.on 'edit'           @onEdit
         @editor.on 'linesSet'       @onLinesSet
@@ -43,6 +48,52 @@ class Autocomplete extends event
         @editor.on 'cursor'         @close
         @editor.on 'blur'           @close
         
+    # 00     00   0000000   0000000    000   000  000      00000000  
+    # 000   000  000   000  000   000  000   000  000      000       
+    # 000000000  000   000  000   000  000   000  000      0000000   
+    # 000 0 000  000   000  000   000  000   000  000      000       
+    # 000   000   0000000   0000000     0000000   0000000  00000000  
+    
+    jsClass = 
+        RegExp: ['test' 'compile' 'exec' 'toString']
+        String: ['endsWith' 'startsWith' 'split' 'slice' 'substring' 'padEnd' 'padStart' 'indexOf' 'match' 'trim' 'trimEnd' 'trimStart']
+    
+    parseModule: (line) ->
+        
+        if @moduleRegExp.test line
+            match = line.match @moduleRegExp
+            moduleName = kstr.strip match[2], "'"
+            for key in req.moduleKeys moduleName, @editor.currentFile
+                @mthdinfo[match[1]] ?= {}
+                @mthdinfo[match[1]][key] ?= 1
+    
+        if @newRegExp.test line
+            match = line.match @newRegExp
+            klog match[2], match[1]
+            
+            try
+                clss = eval match[2]
+            catch err
+                true
+            if clss?.prototype?
+                if jsClass[match[2]]
+                    @mthdinfo[match[1]] ?= {}
+                    for key in jsClass[match[2]]
+                        # klog 'add' match[1], key
+                        @mthdinfo[match[1]][key] ?= 1
+            else
+                if @mthdinfo[match[2]]
+                    @mthdinfo[match[1]] ?= {}
+                    for key in Object.keys @mthdinfo[match[2]]
+                        # klog 'add' match[1], key
+                        @mthdinfo[match[1]][key] ?= 1
+            
+        if @baseRegExp.test line
+            match = line.match @baseRegExp
+            if @mthdinfo[match[1]]
+                for key in Object.keys @mthdinfo[match[1]]
+                    @wordinfo["@#{key}"] ?= count:1
+                
     # 00     00  00000000  000000000  000   000   0000000   0000000    
     # 000   000  000          000     000   000  000   000  000   000  
     # 000000000  0000000      000     000000000  000   000  000   000  
@@ -122,12 +173,12 @@ class Autocomplete extends event
     
     open: (info) ->
 
-        cursor = $('.main', @editor.view)
+        cursor =$ '.main' @editor.view
         if not cursor?
             kerror "Autocomplete.open --- no cursor?"
             return
 
-        @span = elem 'span', class: 'autocomplete-span'
+        @span = elem 'span' class: 'autocomplete-span'
         @span.textContent = @completion
         @span.style.opacity    = 1
         @span.style.background = "#44a"
@@ -308,6 +359,7 @@ class Autocomplete extends event
                 return kerror "Autocomplete.parseLines -- line has no split? action: #{opt.action} line: #{l}", lines
                 
             @parseMethod l
+            @parseModule l
             
             words = l.split @splitRegExp
             words = words.filter (w) => 

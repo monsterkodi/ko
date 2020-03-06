@@ -9,7 +9,6 @@
 { clamp } = require 'kxk'
 
 events = require 'events'
-kxk    = require 'kxk'
 
 class EditorScroll extends events
 

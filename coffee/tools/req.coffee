@@ -6,11 +6,34 @@
 000   000  00000000   00000 00
 ###
 
-{ _, kerror, kstr, slash, valid } = require 'kxk'
+{ _, kerror, klog, kstr, slash, valid } = require 'kxk'
 
 requireRegExp = /^(\s*\{.+\})\s*=\s*require\s+([\'\"][\.\/\w]+[\'\"])/
 mathRegExp = /^(\s*\{.+\})\s*=\s*(Math)\s*$/
 
+moduleKeys = (moduleName, file) ->
+    
+    if pkgDir = slash.pkg file
+        nodeModules = slash.unslash slash.join pkgDir, 'node_modules'
+        if nodeModules not in module.paths
+            module.paths.push nodeModules
+         
+    if moduleName.startsWith '.'
+        fileDir = slash.resolve(slash.join slash.dir(file), moduleName).replace '/coffee/' '/js/'
+        fileDir = slash.unslash slash.dir fileDir
+        if fileDir not in module.paths
+            module.paths.unshift fileDir
+        moduleName = slash.file moduleName
+         
+    required = require moduleName
+    if required
+        if required.prototype
+            return Object.keys required.prototype
+        if required.getOwnPropertyNames
+            klog 'getOwnPropertyNames' required.getOwnPropertyNames()
+            return required.getOwnPropertyNames()
+        Object.keys required
+    
 req = (file, lines, editor) ->
 
     requires  = {}
@@ -30,7 +53,7 @@ req = (file, lines, editor) ->
     for li in [0...lines.length]
         
         m = lines[li].match requireRegExp
-        # klog li, lines[li], m
+
         if not m?[1]?
             m = lines[li].match mathRegExp
         
@@ -48,23 +71,8 @@ req = (file, lines, editor) ->
                     if not keys[m[2]]
                         try
                             moduleName = kstr.strip m[2], '"\''
-                            
-                            if pkgDir = slash.pkg file
-                                nodeModules = slash.unslash slash.join pkgDir, 'node_modules'
-                                if nodeModules not in module.paths
-                                    module.paths.push nodeModules
-                                
-                            if moduleName.startsWith '.'
-                                fileDir = slash.resolve(slash.join slash.dir(file), moduleName).replace '/coffee/' '/js/'
-                                fileDir = slash.unslash slash.dir fileDir
-                                if fileDir not in module.paths
-                                    module.paths.unshift fileDir
-                                moduleName = slash.file moduleName
-                                
-                            required = require moduleName
-                            newKeys = Object.keys required
+                            newKeys = moduleKeys moduleName, file
                             keys[m[2]] = newKeys
-
                             for k in newKeys
                                 regexes[k] ?= new RegExp "(^|[\\:\\(\\{]|\\s+)#{k}(\\s+[^:]|\\s*$|[\\.\\(])"
                             
@@ -129,4 +137,6 @@ req = (file, lines, editor) ->
                 
     operations
 
+req.moduleKeys = moduleKeys
+    
 module.exports = req

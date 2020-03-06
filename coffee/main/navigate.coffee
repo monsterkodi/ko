@@ -6,7 +6,7 @@
 000   000  000   000      0      000   0000000   000   000     000     00000000
 ###
 
-{ post, slash, prefs, clamp, _ } = require 'kxk'
+{ _, clamp, post, prefs, slash } = require 'kxk'
 
 class Navigate
 
@@ -55,8 +55,6 @@ class Navigate
             name:   filePos
             text:   slash.file filePos
             
-        # klog '+' @filePositions.map (fp) -> fp.text
-
         while @filePositions.length > prefs.get 'navigateHistoryLength' 15
             @filePositions.shift()
 
@@ -70,14 +68,14 @@ class Navigate
 
             when 'backward'
                 return if not @filePositions.length
-                # klog '<' @filePositions.map (fp) -> fp.text
+                # klog '<<'  @filePositions.map (fp) -> fp.text
                 @currentIndex = clamp 0, Math.max(0,@filePositions.length-2), @currentIndex-1
                 @navigating = true
                 @loadFilePos @filePositions[@currentIndex], opt
 
             when 'forward'
                 return if not @filePositions.length
-                # klog '>' @filePositions.map (fp) -> fp.text
+                # klog '>>' @filePositions.map (fp) ->  fp.text
                 @currentIndex = clamp 0, @filePositions.length-1, @currentIndex+1
                 @navigating = true
                 @loadFilePos @filePositions[@currentIndex], opt
