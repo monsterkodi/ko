@@ -425,12 +425,12 @@ class FileBrowser extends Browser
         dir = item.file
 
         if dirCache.has(dir) and not opt.ignoreCache
+            # klog "dirCache #{dir}"
             @loadDirItems dir, item, dirCache.get(dir), col, opt
             post.emit 'dir' dir
         else
             opt.ignoreHidden = not window.state.get "browser|showHidden|#{dir}"
             opt.textTest = true
-            
             slash.list dir, opt, (items) =>
 
                 post.toMain 'dirLoaded' dir
@@ -443,15 +443,21 @@ class FileBrowser extends Browser
         
         @updateColumnScrolls()
                             
-        updir = slash.resolve slash.join dir, '..'
+        # updir = slash.resolve slash.join dir, '..'
 
-        if col == 0 or col-1 < @numCols() and @columns[col-1].activeRow()?.item.name == '..'
-            if items[0]?.name not in ['..' '/']
-                if updir != dir
-                    items.unshift
-                        name: '..'
-                        type: 'dir'
-                        file:  updir
+        # if col == 0 or col-1 < @numCols() and @columns[col-1].activeRow()?.item.name == '..'
+            # if items[0]?.name not in ['..' '/']
+                # if updir != dir
+                    # klog '@numCols()' @numCols()
+                    # klog '@columns[col-1].activeRow()?.item.name' @columns[col-1]?.activeRow()?.item.name
+                    # klog 'col' col
+                    # klog 'items[0]' items[0]?.name
+                    # klog 'updir' updir
+                    # klog 'dir' dir
+                    # items.unshift
+                        # name: '..'
+                        # type: 'dir'
+                        # file:  updir
 
         while col >= @numCols()
             @addColumn()
@@ -471,7 +477,7 @@ class FileBrowser extends Browser
         
         if opt.focus != false and empty(document.activeElement) and empty($('.popup')?.outerHTML)
             if lastColumn = @lastDirColumn()
-                klog 'lastColumn focus'
+                # klog 'lastColumn focus'
                 lastColumn.focus()
                 
         opt.cb? column:col, item:item

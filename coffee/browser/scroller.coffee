@@ -12,13 +12,11 @@ scheme = require '../tools/scheme'
 
 class Scroller
 
-    @: (@column) ->
+    @: (@column, @parent) ->
 
-        @elem = elem class: 'scrollbar right'
-        @column.div.appendChild @elem
-
-        @handle = elem class: 'scrollhandle right'
-        @elem.appendChild @handle
+        @elem   = elem class:'scrollbar right'    parent:@parent
+        @handle = elem class:'scrollhandle right' parent:@elem
+        @target = @column.table
 
         @drag = new drag
             target:  @elem
@@ -28,13 +26,12 @@ class Scroller
 
         @elem.addEventListener       'wheel'  @onWheel
         @column.div.addEventListener 'wheel'  @onWheel
-        @column.div.addEventListener 'scroll' @onScroll
-        @target = @column.div
+        @target.addEventListener 'scroll' @onScroll
         
     numRows:   -> @column.numRows()
-    visRows:   -> 1 + parseInt @column.browser.height() / @column.rowHeight()
+    visRows:   -> 1 + parseInt @height() / @column.rowHeight()
     rowHeight: -> @column.rowHeight()
-    height:    -> @column.browser.height()
+    height:    -> @parent.getBoundingClientRect().height
     
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000
@@ -100,7 +97,6 @@ class Scroller
         if @numRows() * @rowHeight() < @height()
             
             @elem.style.display   = 'none'
-            @elem.style.top       = "0"
             @handle.style.top     = "0"
             @handle.style.height  = "0"
             @handle.style.width   = "0"
@@ -115,8 +111,6 @@ class Scroller
             scrollTop    = Math.min scrollTop, @height()-scrollHeight
             scrollTop    = Math.max 0, scrollTop
 
-            @elem.style.top = "#{@target.scrollTop}px"
-
             @handle.style.top     = "#{scrollTop}px"
             @handle.style.height  = "#{scrollHeight}px"
             @handle.style.width   = "2px"
@@ -126,13 +120,6 @@ class Scroller
             cf = 1 - clamp 0, 1, (scrollHeight-10)/200
             cs = scheme.fadeColor longColor, shortColor, cf
             @handle.style.backgroundColor = cs
-
-        if @column.parent?.type == 'preview'
-            if @column.prevColumn?().div.scrollTop != @target.scrollTop
-                @column.prevColumn().div.scrollTop = @target.scrollTop
-        else if @column.nextColumn?()?.parent?.type == 'preview'
-            if @column.nextColumn().div.scrollTop != @target.scrollTop
-                @column.nextColumn().div.scrollTop = @target.scrollTop
             
         @handle.style.right = "-#{@target.scrollLeft}px"
 

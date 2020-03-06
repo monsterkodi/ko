@@ -25,11 +25,9 @@ class Column
         @items  = []
         @rows   = []
         
-        @div   = elem class: 'browserColumn' tabIndex:6 id: @name()
-        @table = elem class: 'browserColumnTable'
-        @div.appendChild @table
-        
-        # @setIndex @browser.columns?.length
+        @div    = elem class: 'browserColumn'        tabIndex:6 id: @name()
+        content = elem class: 'browserColumnContent' parent: @div
+        @table  = elem class: 'browserColumnTable'   parent: content
         
         @browser.cols?.appendChild @div
         
@@ -52,7 +50,7 @@ class Column
             onStop:  @onDragStop
         
         @crumb  = new Crumb @
-        @scroll = new Scroller @
+        @scroll = new Scroller @, content
         
         @setIndex @browser.columns?.length
         
@@ -224,9 +222,31 @@ class Column
         @rows.push row
         row
     
+    # 000       0000000    0000000   0000000    000  000000000  00000000  00     00   0000000  
+    # 000      000   000  000   000  000   000  000     000     000       000   000  000       
+    # 000      000   000  000000000  000   000  000     000     0000000   000000000  0000000   
+    # 000      000   000  000   000  000   000  000     000     000       000 0 000       000  
+    # 0000000   0000000   000   000  0000000    000     000     00000000  000   000  0000000   
+    
     loadItems: (items, parent) ->
         
         @browser.clearColumn @index
+
+        if @index == 0 or @index-1 < @browser.numCols() and @browser.columns[@index-1].activeRow()?.item.name == '..' and not slash.isRoot parent.file
+            if items[0]?.name not in ['..' '/']
+                dir = parent.file
+                updir = slash.dir dir
+                if updir != dir
+                    # klog '@numCols()' @numCols()
+                    # klog '@columns[col-1].activeRow()?.item.name' @columns[col-1]?.activeRow()?.item.name
+                    # klog 'col' col
+                    # klog 'items[0]' items[0]?.name
+                    klog 'updir' updir
+                    klog 'dir' dir
+                    items.unshift
+                        name: '..'
+                        type: 'dir'
+                        file:  updir
         
         @items  = items
         @parent = parent
@@ -396,7 +416,7 @@ class Column
 
         return error "no rows in column #{@index}?" if not @numRows()
         index = @activeRow()?.index() ? -1
-        error "no index from activeRow? #{index}?", @activeRow() if not index? or Number.isNaN index
+        error "no index from activeRow? #{index}?" @activeRow() if not index? or Number.isNaN index
         
         newIndex = switch key
             when 'up'        then index-1
@@ -410,11 +430,11 @@ class Column
         if not newIndex? or Number.isNaN newIndex        
             error "no index #{newIndex}? #{@numVisible()}"
             
-        newIndex = clamp 0, @numRows()-1, newIndex
+        newIndex = clamp 0 @numRows()-1 newIndex
         
         if newIndex != index
-            klog 'navigateRows' newIndex
-            @rows[newIndex].activate null, false
+            # klog 'navigateRows' newIndex, @parent
+            @rows[newIndex].activate null @parent.type=='file'
     
     navigateCols: (key) -> # move to file browser?
         
@@ -670,6 +690,7 @@ class Column
         @browser.shiftColumnsTo @index
         
         if @browser.columns[0].items[0].name != '..'
+            klog 'makeRoot'
             @unshiftItem 
                 name: '..'
                 type: 'dir'
