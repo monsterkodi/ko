@@ -6,7 +6,7 @@
 000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
 ###
 
-{ post, stopEvent, empty, clamp, elem, kerror, $, _ } = require 'kxk'
+{ $, _, clamp, elem, empty, kerror, last, matchr, stopEvent } = require 'kxk'
 
 Indexer = require '../main/indexer'
 event   = require 'events'
@@ -18,6 +18,7 @@ class Autocomplete extends event
         super()
         
         @wordinfo  = {}
+        @mthdinfo  = {}
         @matchList = []
         @clones    = []
         @cloned    = []
@@ -29,8 +30,9 @@ class Autocomplete extends event
         @headerRegExp      = new RegExp "^[0#{@especial}]+$"
         
         @notSpecialRegExp  = new RegExp "[^#{@especial}]"
-        @specialWordRegExp = new RegExp "(\\s+|[\\w#{@especial}]+|[^\\s])", 'g'
-        @splitRegExp       = new RegExp "[^\\w\\d#{@especial}]+", 'g'        
+        @specialWordRegExp = new RegExp "(\\s+|[\\w#{@especial}]+|[^\\s])" 'g'
+        @splitRegExp       = new RegExp "[^\\w\\d#{@especial}]+" 'g'   
+        @methodRegExp      = /([\@]?\w+|@)\.(\w+)/
     
         @editor.on 'edit'           @onEdit
         @editor.on 'linesSet'       @onLinesSet
@@ -41,7 +43,30 @@ class Autocomplete extends event
         @editor.on 'cursor'         @close
         @editor.on 'blur'           @close
         
-        # post.on 'funcsCount',        @onFuncsCount
+    # 00     00  00000000  000000000  000   000   0000000   0000000    
+    # 000   000  000          000     000   000  000   000  000   000  
+    # 000000000  0000000      000     000000000  000   000  000   000  
+    # 000 0 000  000          000     000   000  000   000  000   000  
+    # 000   000  00000000     000     000   000   0000000   0000000    
+    
+    parseMethod: (line) ->
+        
+        rgs = matchr.ranges [@methodRegExp, ['obj' 'mth']], line
+        for i in [0..rgs.length-2] by 2
+            @mthdinfo[rgs[i].match] ?= {}
+            @mthdinfo[rgs[i].match][rgs[i+1].match] ?= 0
+            @mthdinfo[rgs[i].match][rgs[i+1].match] += 1
+    
+    completeMethod: (info) ->
+        
+        lst = last info.before.split ' '
+        obj = lst.slice 0 -1
+        return if not @mthdinfo[obj]
+        mthds = Object.keys @mthdinfo[obj]
+        mcnt = mthds.map (m) => [m,@mthdinfo[obj][m]]
+        mcnt.sort (a,b) -> a[1]!=b[1] and b[1]-a[1] or a[0].localeCompare b[0]
+        @firstMatch = mthds[0]
+        @matchList  = mthds.slice 1
         
     #  0000000   000   000  00000000  0000000    000  000000000
     # 000   000  0000  000  000       000   000  000     000   
@@ -62,28 +87,31 @@ class Autocomplete extends event
                     
             when 'insert'
                 
-                return if not @word?.length
-                return if empty @wordinfo
-                
-                matches = _.pickBy @wordinfo, (c,w) => w.startsWith(@word) and w.length > @word.length            
-                matches = _.toPairs matches
-                for m in matches
-                    d = @editor.distanceOfWord m[0]
-                    m[1].distance = 100 - Math.min d, 100
+                if not @word?.length
+                    if info.before[-1] == '.'
+                        @completeMethod info
+                else
+                    return if empty @wordinfo
                     
-                matches.sort (a,b) ->
-                    (b[1].distance+b[1].count+1/b[0].length) - (a[1].distance+a[1].count+1/a[0].length)
-                    
-                words = matches.map (m) -> m[0]
-                for w in words
-                    if not @firstMatch
-                        @firstMatch = w 
-                    else
-                        @matchList.push w
-                            
+                    matches = _.pickBy @wordinfo, (c,w) => w.startsWith(@word) and w.length > @word.length            
+                    matches = _.toPairs matches
+                    for m in matches
+                        d = @editor.distanceOfWord m[0]
+                        m[1].distance = 100 - Math.min d, 100
+                        
+                    matches.sort (a,b) ->
+                        (b[1].distance+b[1].count+1/b[0].length) - (a[1].distance+a[1].count+1/a[0].length)
+                        
+                    words = matches.map (m) -> m[0]
+                    for w in words
+                        if not @firstMatch
+                            @firstMatch = w 
+                        else
+                            @matchList.push w
+                                
                 return if not @firstMatch?
                 @completion = @firstMatch.slice @word.length
-                
+            
                 @open info
         
     #  0000000   00000000   00000000  000   000
@@ -93,7 +121,7 @@ class Autocomplete extends event
     #  0000000   000        00000000  000   000
     
     open: (info) ->
-        
+
         cursor = $('.main', @editor.view)
         if not cursor?
             kerror "Autocomplete.open --- no cursor?"
@@ -104,7 +132,7 @@ class Autocomplete extends event
         @span.style.opacity    = 1
         @span.style.background = "#44a"
         @span.style.color      = "#fff"
-
+        
         cr = cursor.getBoundingClientRect()
         spanInfo = @editor.lineSpanAtXY cr.left, cr.top
         
@@ -123,32 +151,33 @@ class Autocomplete extends event
         ws = @word.slice @word.search /\w/
         wi = ws.length
         
-        @clones[0].innerHTML = inner.slice 0, spanInfo.offsetChar + 1 
-        @clones[1].innerHTML = inner.slice    spanInfo.offsetChar + 1
-                    
+        @clones[0].innerHTML = inner.slice 0 spanInfo.offsetChar + 1 
+        @clones[1].innerHTML = inner.slice   spanInfo.offsetChar + 1
+        
         sibling = sp
         while sibling = sibling.nextSibling
             @clones.push sibling.cloneNode true
             @cloned.push sibling
-            
+
         sp.parentElement.appendChild @span
         
         for c in @cloned
             c.style.display = 'none'
 
         for c in @clones
-            @span.insertAdjacentElement 'afterend', c
+            @span.insertAdjacentElement 'afterend' c
             
         @moveClonesBy @completion.length            
         
         if @matchList.length
             
             @list = elem class: 'autocomplete-list'
-            @list.addEventListener 'wheel', @onWheel
-            @list.addEventListener 'mousedown', @onMouseDown
+            @list.addEventListener 'wheel'     @onWheel
+            @list.addEventListener 'mousedown' @onMouseDown
+            
             index = 0
             for m in @matchList
-                item = elem class: 'autocomplete-item', index:index++
+                item = elem class: 'autocomplete-item' index:index++
                 item.textContent = m
                 @list.appendChild item
             cursor.appendChild @list
@@ -162,8 +191,8 @@ class Autocomplete extends event
     close: =>
         
         if @list?
-            @list.removeEventListener 'wheel', @onWheel
-            @list.removeEventListener 'click', @onClick
+            @list.removeEventListener 'wheel' @onWheel
+            @list.removeEventListener 'click' @onClick
             @list.remove()
             
         @span?.remove()
@@ -261,6 +290,12 @@ class Autocomplete extends event
     # 000        000   000  000   000       000  000     
     # 000        000   000  000   000  0000000   00000000
     
+    parseLinesDelayed: (lines, opt) ->
+        
+        delay = (l, o) => => @parseLines l, o
+        if lines.length > 1
+            setTimeout (delay lines, opt), 200
+    
     parseLines:(lines, opt) ->
         
         @close()
@@ -271,6 +306,9 @@ class Autocomplete extends event
         for l in lines
             if not l?.split?
                 return kerror "Autocomplete.parseLines -- line has no split? action: #{opt.action} line: #{l}", lines
+                
+            @parseMethod l
+            
             words = l.split @splitRegExp
             words = words.filter (w) => 
                 return false if not Indexer.testWord w
@@ -293,15 +331,13 @@ class Autocomplete extends event
                 info.temp = true if opt.action is 'change'
                 @wordinfo[w] = info
                 
-        post.emit 'autocompleteCount', _.size @wordinfo
-                            
     #  0000000  000   000  00000000    0000000   0000000   00000000   000   000   0000000   00000000   0000000  
     # 000       000   000  000   000  000       000   000  000   000  000 0 000  000   000  000   000  000   000
     # 000       000   000  0000000    0000000   000   000  0000000    000000000  000   000  0000000    000   000
     # 000       000   000  000   000       000  000   000  000   000  000   000  000   000  000   000  000   000
     #  0000000   0000000   000   000  0000000    0000000   000   000  00     00   0000000   000   000  0000000  
     
-    cursorWords: -> 
+    cursorWords: ->
         
         cp = @editor.cursorPos()
         words = @editor.wordRangesInLineAtIndex cp[1], regExp: @specialWordRegExp        
@@ -310,7 +346,6 @@ class Autocomplete extends event
         
     cursorWord: -> @cursorWords()[1]
                 
-    
     #  0000000   000   000
     # 000   000  0000  000
     # 000   000  000 0 000
@@ -321,7 +356,8 @@ class Autocomplete extends event
     onLineInserted:   (li)       => @parseLines [@editor.line(li)], action: 'insert'
     onLineChanged:    (li)       => @parseLines [@editor.line(li)], action: 'change', count: 0
     onWillDeleteLine: (line)     => @parseLines [line], action: 'delete', count: -1
-    onLinesSet:       (lines)    => @parseLines lines, action: 'set' if lines.length
+    # onLinesSet:       (lines)    => klog 'onLinesSet'; @parseLines lines, action: 'set' if lines.length
+    onLinesSet:       (lines)    => @parseLinesDelayed lines, action: 'set' if lines.length
 
     # 000   000  00000000  000   000
     # 000  000   000        000 000 
