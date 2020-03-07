@@ -125,7 +125,7 @@ class Column
     
         @dragStartRow = @row e.target
         
-        @browser.skipOnDblClick = false
+        # @browser.skipOnDblClick = false
         
         delete @toggle
         
@@ -427,7 +427,12 @@ class Column
     onDblClick:  (event) => 
         
         @browser.skipOnDblClick = true
-        @navigateCols 'enter'
+        item = @activeRow()?.item
+        if item.type == 'dir'
+            @browser.clearColumnsFrom 1 pop:true 
+            @browser.loadDirItem item, 0 activate:false
+        else
+            editor.focus() # test if editor.currentFile == item.file ?
     
     extendSelection: (key) ->
         

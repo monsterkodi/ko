@@ -340,7 +340,10 @@ class FileBrowser extends Browser
 
         dir = item.file
 
-        # klog 'loadDirItem' dir
+        # if @skipOnDblClick
+            # klog 'loadDirItem skip' col, dir
+            # delete @skipOnDblClick
+            # return 
         
         opt.ignoreHidden = not window.state.get "browser|showHidden|#{dir}"
         slash.list dir, opt, (items) =>
@@ -352,16 +355,19 @@ class FileBrowser extends Browser
         
         @updateColumnScrolls()
                             
+        # klog 'loadDirItems' col, dir
+        if @skipOnDblClick and col > 0
+            delete @skipOnDblClick
+            return
+        
         while col >= @numCols()
             @addColumn()
-
-        # klog 'loadDirItems' dir
+        
         @columns[col].loadItems items, item
 
         post.emit 'load' column:col, item:item
                             
         if opt.activate
-            # klog 'opt.activate'
             if row = @columns[col].row slash.file opt.activate
                 row.activate()
                 post.emit 'load' column:col+1 item:row.item
