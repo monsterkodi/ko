@@ -6,7 +6,7 @@
 000       000  0000000  00000000
 ###
 
-{ childp, empty, fs, kerror, slash, valid } = require 'kxk'
+{ childp, empty, fs, kerror, klog, slash, valid } = require 'kxk'
 
 icons = require './icons.json'
 
@@ -29,6 +29,17 @@ class File
 
             fs.move from, to, overwrite:true, (err) ->
                 return kerror "rename failed #{err}" if err
+                
+                if editor.currentFile == from
+                    editor.currentFile = to
+                    if tabs.activeTab()?.file == from
+                        tabs.activeTab().setFile to
+                    if commandline.command.name == 'browse'
+                        if commandline.text() == slash.tilde from
+                            commandline.setText slash.tilde to
+                    if not tabs.tab to
+                        klog 'recreate tab!' tabs.activeTab().file, to
+                
                 cb from, to
 
     @duplicate: (from, cb) -> 

@@ -76,18 +76,8 @@ class FileBrowser extends Browser
         for source in sources
             
             switch action
-                when 'move'
-                    File.rename source, target, (source, target) =>
-                        if sourceColumn = @columnForFile source 
-                            sourceColumn.removeFile source
-                        if targetColumn = @columnForFile target
-                            if not targetColumn.row target
-                                targetColumn.insertFile target
-                when 'copy'
-                    File.copy source, target, (source, target) =>
-                        if targetColumn = @columnForFile target
-                            if not targetColumn.row target
-                                targetColumn.insertFile target
+                when 'move' then File.rename source, target, (source, target) => # klog 'file moved' source, target
+                when 'copy' then File.copy source, target, (source, target) => # klog 'file copied' source, target
                     
     columnForFile: (file) ->
         
@@ -127,8 +117,6 @@ class FileBrowser extends Browser
         
         file = slash.path file
 
-        # klog 'navigateToFile' file, lastPath, @lastColumnPath()
-        
         if file == lastPath or file == @lastColumnPath() or slash.isRelative file
             return
 
@@ -157,6 +145,7 @@ class FileBrowser extends Browser
                     opt = {}
                     if index < paths.length-1
                         opt.active = paths[index+1]
+                    # klog 'navigateToFile'
                     @loadDirItem item, col+1+index, opt
                     
         if col = @lastDirColumn()
@@ -199,6 +188,7 @@ class FileBrowser extends Browser
         opt ?= active:'..' focus:true
         item.name ?= slash.file item.file
 
+        # klog 'loadItem'
         @clearColumnsFrom 1, pop:true, clear:opt.clear ? 1
 
         switch item.type
@@ -223,6 +213,7 @@ class FileBrowser extends Browser
 
         switch item.type
             when 'dir'
+                # klog 'activateItem'
                 @loadDirItem  item, col+1, focus:false
             when 'file'
                 @loadFileItem item, col+1
@@ -334,11 +325,12 @@ class FileBrowser extends Browser
     # 000   000  000  000   000  000     000     000       000 0 000
     # 0000000    000  000   000  000     000     00000000  000   000
 
-    onDirChanged: (dir) =>
+    onDirChanged: (info) =>
  
+        # klog 'onDirChanged' info.change, info.dir, info.path
         for column in @columns
-            if column.path() == dir
-                @loadDirItem {file:dir, type:'dir'}, column.index, active:column.activePath()
+            if column.path() == info.dir
+                @loadDirItem {file:info.dir, type:'dir'}, column.index, active:column.activePath(), focus:false
                 return
     
     loadDirItem: (item, col=0, opt={}) ->
@@ -347,8 +339,9 @@ class FileBrowser extends Browser
 
         dir = item.file
 
+        # klog 'loadDirItem' dir
+        
         opt.ignoreHidden = not window.state.get "browser|showHidden|#{dir}"
-        opt.textTest = true
         slash.list dir, opt, (items) =>
             post.toMain 'dirLoaded' dir
             @loadDirItems dir, item, items, col, opt
@@ -361,11 +354,13 @@ class FileBrowser extends Browser
         while col >= @numCols()
             @addColumn()
 
+        # klog 'loadDirItems' dir
         @columns[col].loadItems items, item
 
         post.emit 'load' column:col, item:item
                             
         if opt.activate
+            # klog 'opt.activate'
             if row = @columns[col].row slash.file opt.activate
                 row.activate()
                 post.emit 'load' column:col+1 item:row.item

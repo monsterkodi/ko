@@ -168,10 +168,14 @@ class FileHandler
     removeFile: (file) =>
         
         if tab = tabs.tab file
+            klog 'removeFile' file
             if tab == tabs.activeTab()
                 if neighborTab = tab.nextOrPrev()
                     neighborTab.activate()
-            klog 'removeFile' file
+                else
+                    if editor?.currentFile == file
+                        klog 'close editor file'
+            klog 'close tab'
             tabs.closeTab tab
             
     #  0000000   0000000   000   000  00000000         0000000   000      000      

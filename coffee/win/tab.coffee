@@ -6,7 +6,7 @@
    000     000   000  0000000
 ###
 
-{ elem, kerror, klog, post, slash, tooltip } = require 'kxk'
+{ elem, kerror, post, slash, tooltip } = require 'kxk'
 
 File    = require '../tools/file'
 render  = require '../editor/render'
@@ -70,7 +70,7 @@ class Tab
     setFile: (newFile) ->
         
         if not slash.samePath @file, newFile
-            klog 'tab.setFile' slash.path newFile
+            # klog 'tab.setFile' slash.path newFile
             @file = slash.path newFile
             post.emit 'watch' @file
             @update()

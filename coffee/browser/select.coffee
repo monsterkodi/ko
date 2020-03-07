@@ -10,7 +10,7 @@
 
 class Select
 
-    @: (@browser) -> 
+    @: (@browser) ->
     
         @rows = []
         @active = null

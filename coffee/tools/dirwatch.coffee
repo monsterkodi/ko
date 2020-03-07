@@ -6,8 +6,7 @@
 0000000    000  000   000  00     00  000   000     000      0000000  000   000  
 ###
 
-{ klog, post, watch } = require 'kxk'
-
+{ post, watch } = require 'kxk'
 class DirWatch
        
     @watches = {}
@@ -15,20 +14,20 @@ class DirWatch
     @watch: (dir) ->
         
         return if DirWatch.watches[dir]
-        klog "watch #{dir}"
+        # klog "watch #{dir}" Object.keys DirWatch.watches
         
         watcher = watch.dir dir
         watcher.on 'change' (info) -> 
+            # klog info.change, info.path, info.dir
             if info.change != 'change'
-                klog 'info' info.change, info.path
-                post.emit 'dirChanged' info.dir
+                post.emit 'dirChanged' info
         watcher.on 'error' (err) -> error "watch.error #{err}"
         DirWatch.watches[dir] = watcher
         
     @unwatch: (dir) -> 
         
-        klog "unwatch #{dir}"
         DirWatch.watches[dir]?.close()
         delete DirWatch.watches[dir]
+        # klog "unwatch #{dir}" Object.keys DirWatch.watches
 
 module.exports = DirWatch

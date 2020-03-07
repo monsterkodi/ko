@@ -86,9 +86,6 @@ class Row
                 
                 col = @column.index
         
-                switch @item.type
-                    when 'dir'  then @browser.loadDirItem  @item, col+1, focus:false
-
                 @browser.select.row @, false
                 
             else    
@@ -220,8 +217,6 @@ class Row
         return if slash.samePath @item.file, targetFile
                 
         File.rename @item.file, targetFile, (source, target) =>
-            
-            @column.removeRow @
-            @browser.navigateToFile target
+            # klog 'row.rename' source, target
     
 module.exports = Row

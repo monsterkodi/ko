@@ -201,7 +201,7 @@ class Browser extends event
         @flex.popPane opt
         @columns.pop()
         
-    popEmptyColumns: (opt) -> 
+    popEmptyColumns: (opt) ->
         
         @clearColumnsFrom @lastDirColumn()?.index ? 0, pop:true
         

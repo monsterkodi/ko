@@ -210,7 +210,32 @@ body
         text-align      right
     & td
         text-align      left
-    
+  
+.dragIndicator
+    height              20px
+    &.copy
+        margin-left         10px
+        margin-top         -4px
+        margin-bottom       4px
+        &:before
+            font-size       20px
+            color           #ff0
+            content         '✚'
+    &.move
+        margin-left         2px
+        margin-top         -10px
+        margin-bottom       10px
+        &:before
+            font-size       40px
+            color           #0f0
+            content         '▾'
+        
+// 000   0000000   0000000   000   000  
+// 000  000       000   000  0000  000  
+// 000  000       000   000  000 0 000  
+// 000  000       000   000  000  0000  
+// 000   0000000   0000000   000   000  
+
 octicon(char)
     font-family         octicons
     content             char

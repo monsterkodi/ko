@@ -63,7 +63,8 @@ class Column
     
     loadItems: (items, parent) ->
         
-        @browser.clearColumn @index
+        # klog @parent?.file, parent.file, items.length
+        @clear()
 
         @parent = parent
         
@@ -84,6 +85,7 @@ class Column
         @crumb.show()
         
         if @parent.type == 'dir'
+            # klog 'loadItems' @parent.file
             DirWatch.watch @parent.file
             @crumb.setFile @parent.file
         else
@@ -338,8 +340,11 @@ class Column
         
     isEmpty: -> empty @parent
     clear:   ->
-        @clearSearch()
+        if @parent?.file and @parent?.type == 'dir'
+            # klog 'column.clear unwatch?' @parent.file
+            DirWatch.unwatch @parent.file
         delete @parent
+        @clearSearch()
         @div.scrollTop = 0
         @table.innerHTML = ''
         @crumb.clear()
@@ -614,6 +619,7 @@ class Column
                 window.state.del stateKey
             else
                 prefs.set stateKey, true
+            klog 'toggleDotFiles'
             @browser.loadDirItem @parent, @index, ignoreCache:true
         @
          
@@ -829,8 +835,8 @@ class Column
     #  0000000   0000000   000           000     
     
     copyPaths: ->
-        
         paths = @browser.select.files().join '\n'
+        klog 'copy paths' paths
         electron.clipboard.writeText paths
         paths
         
@@ -842,6 +848,9 @@ class Column
         
         text = electron.clipboard.readText()
         paths = text.split '\n'
+        
+        klog 'pastePaths' paths
+        
         if text == @browser.cutPaths
             action = 'move'
         else
@@ -864,26 +873,28 @@ class Column
         switch combo
             when 'shift+`' '~'                      then return stopEvent event, @browser.browse '~'
             when '/'                                then return stopEvent event, @browser.browse '/'
-            when 'alt+shift+.'                      then return stopEvent event, @addToShelf()
-            when 'alt+e'                            then return @explorer()
-            when 'alt+n'                            then return @newFolder()
-            when 'ctrl+x' 'command+x'               then return @cutPaths()
-            when 'ctrl+c' 'command+c'               then return @copyPaths()
-            when 'ctrl+v' 'command+v'               then return @pastePaths()
-            when 'shift+up' 'shift+down' 'shift+home' 'shift+end' 'shift+page up' 'shift+page down' then return stopEvent event, @extendSelection key
-            when 'page up' 'page down' 'home' 'end' then return stopEvent event, @navigateRows key
-            when 'command+up' 'ctrl+up'             then return stopEvent event, @navigateRows 'home'
-            when 'command+down' 'ctrl+down'         then return stopEvent event, @navigateRows 'end'
-            when 'enter''alt+up'                    then return stopEvent event, @navigateCols key
             when 'backspace'                        then return stopEvent event, @browser.onBackspaceInColumn @
             when 'delete'                           then return stopEvent event, @browser.onDeleteInColumn @
+            when 'alt+left'                         then return stopEvent event, window.split.focus 'shelf'
+            when 'alt+shift+.'                      then return stopEvent event, @addToShelf()
+            when 'alt+e'                            then return stopEvent event, @explorer()
+            when 'alt+n'                            then return stopEvent event, @newFolder()
+            when 'ctrl+x' 'command+x'               then return stopEvent event, @cutPaths()
+            when 'ctrl+c' 'command+c'               then return stopEvent event, @copyPaths()
+            when 'ctrl+v' 'command+v'               then return stopEvent event, @pastePaths()
+            when 'page up' 'page down' 'home' 'end' then return stopEvent event, @navigateRows key
+            when 'enter''alt+up'                    then return stopEvent event, @navigateCols key
+            when 'command+up' 'ctrl+up'             then return stopEvent event, @navigateRows 'home'
+            when 'command+down' 'ctrl+down'         then return stopEvent event, @navigateRows 'end'
             when 'ctrl+t'                           then return stopEvent event, @sortByType()
             when 'ctrl+n'                           then return stopEvent event, @sortByName()
             when 'ctrl+a'                           then return stopEvent event, @sortByDateAdded()
             when 'command+i' 'ctrl+i'               then return stopEvent event, @toggleDotFiles()
             when 'command+d' 'ctrl+d'               then return stopEvent event, @duplicateFile()
-            when 'command+k' 'ctrl+k'               then return stopEvent event if @browser.cleanUp()
+            when 'command+k' 'ctrl+k'               then return stopEvent event if @browser.cleanUp() # needed?
             when 'f2'                               then return stopEvent event, @activeRow()?.editName()
+            when 'shift+up' 'shift+down' 'shift+home' 'shift+end' 'shift+page up' 'shift+page down' 
+                return stopEvent event, @extendSelection key
             when 'command+left' 'command+right' 'ctrl+left' 'ctrl+right'
                 return stopEvent event, @navigateRoot key
             when 'command+backspace' 'ctrl+backspace' 'command+delete' 'ctrl+delete' 
