@@ -78,8 +78,6 @@ class Row
         
         opt = file:@item.file
 
-        # klog 'activate' @item
-        
         switch @item.type
             
             when 'dir' 'file'
@@ -87,37 +85,19 @@ class Row
                 post.emit 'filebrowser' 'activateItem' @item, @column.index
                 
                 col = @column.index
-                # @browser.clearColumnsFrom col+1, pop:true, clear:col+1
         
                 switch @item.type
                     when 'dir'  then @browser.loadDirItem  @item, col+1, focus:false
-                    # when 'file' 
-                        # klog 'row.activate' @item.file
-                        # @browser.loadFileItem @item, col+1
 
                 @browser.select.row @, false
                 
             else    
-                # if @item.file? and _.isString(@item.file) and @item.type != 'obj'
                 opt.line = @item.line
                 opt.col  = @item.column
                     
-                @browser.clearColumnsFrom @column.index+1, pop:true #, clear:@column.index+1
+                @browser.clearColumnsFrom @column.index+1, pop:true
                 
                 if emit then post.emit 'jumpToFile' opt
-                # else if @column.parent.obj? and @column.parent.type == 'obj'
-                    # if @item.type == 'obj'
-                        # @browser.loadObjectItem @item, column:@column.index+1
-                        # @browser.previewObjectItem  @item, column:@column.index+2
-                        # if @item.obj?.file? and _.isString @item.obj.file
-                            # opt.line = @item.obj.line
-                            # opt.col  = @item.obj.column
-                            # if emit then post.emit 'jumpToFile' opt
-                # else if @item.obj?.file? and _.isString @item.obj.file
-                    # opt = file:@item.obj.file, line:@item.obj.line, col:@item.obj.column, newTab:opt.newTab
-                    # if emit then post.emit 'jumpToFile' opt
-                # else
-                    # @browser.clearColumnsFrom @column.index+1
         @
     
     isActive: -> @div.classList.contains 'active'
@@ -135,7 +115,6 @@ class Row
             @column.scroll.toIndex @index()            
             
         if opt?.emit
-            # klog 'emit itemActivated' @item
             @browser.emit 'itemActivated' @item
             if @item.type == 'dir'
                 post.emit 'setCWD' @item.file

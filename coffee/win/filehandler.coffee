@@ -269,11 +269,12 @@ class FileHandler
     
         dir = slash.dir editor.currentFile if editor?.currentFile
         dir ?= slash.resolve '.'
-        dialog.showOpenDialog
+        dialog.showOpenDialog(
             title: "Open File"
-            defaultPath: window.stash.get 'openFilePath', dir
-            properties: ['openFile' 'multiSelections']
-            , (files) -> post.emit 'openFiles' files, opt
+            defaultPath: window.stash.get 'openFilePath' dir
+            properties: ['openFile' 'multiSelections']).then (result) =>
+                if not result.cancelled and valid result.filePaths
+                    post.emit 'openFiles' result.filePaths, opt
                 
     #  0000000   0000000   000   000  00000000        00000000  000  000      00000000     0000000    0000000  
     # 000       000   000  000   000  000             000       000  000      000         000   000  000       

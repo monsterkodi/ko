@@ -223,17 +223,11 @@ class Column
             delete @dragDiv
             delete @dragStartRow
             
-            klog d.pos.y
             if row = @browser.rowAtPos d.pos
-                klog 'row at pos' d.pos, row.item.file
                 column = row.column
                 target = row.item.file
             else if column = @browser.columnAtPos d.pos
-                klog 'col at pos' column.parent?.file
                 target = column.parent?.file
-            # else if column = @browser.columnAtX d.pos.x
-                # klog 'col at x' column.parent?.file
-                # target = column.parent?.file
             else
                 klog 'no drop target'
                 return
