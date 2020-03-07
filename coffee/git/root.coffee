@@ -6,7 +6,7 @@
 000   000   0000000    0000000      000     
 ###
 
-{ childp, slash, empty, valid, _ } = require 'kxk'
+{ _, childp, empty, slash, valid } = require 'kxk'
 
 fixPath = (p) ->
     
@@ -15,7 +15,7 @@ fixPath = (p) ->
         p = p[1].toUpperCase() + ':' + p.slice 2
     return slash.resolve p    
 
-gitCmd  = 'git rev-parse --show-toplevel'
+gitCmd = 'git rev-parse --show-toplevel'
 gitOpt = (cwd) -> cwd:cwd, encoding:'utf8' stdio:['pipe' 'pipe' 'ignore']
     
 root = (pth, cb) ->

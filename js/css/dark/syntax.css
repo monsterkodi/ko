@@ -89,7 +89,11 @@
 }
 .marker,
 .punct {
-  opacity: 0.45;
+  opacity: 0.4;
+}
+.marker.minor,
+.punct.minor {
+  opacity: 0.15;
 }
 .marker.dictionary,
 .punct.dictionary {

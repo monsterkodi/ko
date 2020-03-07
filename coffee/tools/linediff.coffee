@@ -23,7 +23,7 @@ lineDiff = (oldLine, newLine) ->
         while oi < oldLine.length
             
             if not nc? # new line has not enough characters, mark remaining characters in old line as deleted
-                changes.push change: 'delete', old: oi, new: ni, length: oldLine.length-oi
+                changes.push change:'delete' old: oi, new: ni, length: oldLine.length-oi
                 break
                 
             else if oc == nc # same character in old and new
@@ -40,13 +40,13 @@ lineDiff = (oldLine, newLine) ->
                 
                 if inserts > 0 and (deletes <= 0 or inserts < deletes)
                     
-                    changes.push change: 'insert', old: oi, new: ni, length: inserts
+                    changes.push change:'insert' old: oi, new: ni, length: inserts
                     ni += inserts
                     nc = newLine[ni]
                     
                 else if deletes > 0 and (inserts <= 0 or deletes < inserts)                                    
                     
-                    changes.push change: 'delete', old: oi, new: ni, length: deletes
+                    changes.push change:'delete' old: oi, new: ni, length: deletes
                     oi += deletes
                     oc = oldLine[oi]
                 
@@ -56,7 +56,7 @@ lineDiff = (oldLine, newLine) ->
                     if lst?.change == 'change' and lst.old + lst.length == oi
                         lst.length += 1
                     else
-                        changes.push change: 'change', old: oi, new: ni, length: 1
+                        changes.push change:'change' old: oi, new: ni, length: 1
                     oi += 1
                     oc = oldLine[oi]
                     ni += 1
@@ -64,7 +64,7 @@ lineDiff = (oldLine, newLine) ->
                         
         if ni < newLine.length # mark remaing characters in new line as inserted
             
-            changes.push change: 'insert', old: oi, new: ni, length: newLine.length - ni
+            changes.push change: 'insert' old: oi, new: ni, length: newLine.length - ni
     
     changes
 

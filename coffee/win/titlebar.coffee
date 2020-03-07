@@ -6,7 +6,7 @@
    000     000     000     0000000  00000000  0000000    000   000  000   000
 ###
 
-{ post, stopEvent, elem, $ } = require 'kxk'
+{ $, elem, post, stopEvent } = require 'kxk'
 
 class Titlebar
     
@@ -15,18 +15,18 @@ class Titlebar
         @elem =$ 'titlebar'
         @selected = -1
         
-        document.body.addEventListener 'focusout', @closeList
-        document.body.addEventListener 'focusin',  @closeList
+        document.body.addEventListener 'focusout' @closeList
+        document.body.addEventListener 'focusin'  @closeList
         
         @info = 
             numWins: 1  
             sticky:  false
             focus:   true
         
-        post.on 'numWins',  @onNumWins
-        post.on 'winFocus', @onWinFocus
-        post.on 'winTabs',  @onWinTabs
-        post.on 'sticky',   @onSticky
+        post.on 'numWins'  @onNumWins
+        post.on 'winFocus' @onWinFocus
+        post.on 'winTabs'  @onWinTabs
+        post.on 'sticky'   @onSticky
         
     onNumWins: (numWins) => 
         
@@ -42,7 +42,7 @@ class Titlebar
         
         if @info.focus != focus
             @info.focus = focus
-            @elem.classList.toggle 'focus', @info.focus
+            @elem.classList.toggle 'focus' @info.focus
         
     # 000      000   0000000  000000000
     # 000      000  000          000   
@@ -84,8 +84,8 @@ class Titlebar
             
             continue if info.id == window.winID
             
-            div = elem class: "winlist-item", children: [
-                elem 'span', class: 'wintabs', text: ''
+            div = elem class: "winlist-item" children: [
+                elem 'span' class:'wintabs' text: ''
             ]
             div.winID = info.id
             
@@ -93,10 +93,10 @@ class Titlebar
                 @loadWindowWithID id
                 stopEvent event
                 
-            div.addEventListener 'mousedown', activateWindow info.id
+            div.addEventListener 'mousedown' activateWindow info.id
             @list.appendChild div
             
-        post.toOtherWins 'sendTabs', window.winID
+        post.toOtherWins 'sendTabs' window.winID
         @navigate 'down'
         @
 
@@ -113,7 +113,7 @@ class Titlebar
     loadWindowWithID: (id) -> 
         
         @closeList()
-        post.toMain 'activateWindow', id
+        post.toMain 'activateWindow' id
         
     loadSelected: ->
         
@@ -140,13 +140,13 @@ class Titlebar
     globalModKeyComboEvent: (mod, key, combo, event) ->
 
         switch combo
-            when 'command+alt+left', 'command+alt+right' then return winow.tabs.navigate key
-            when 'command+alt+shift+left', 'command+alt+shift+right' then return window.tabs.move key
+            when 'command+alt+left' 'command+alt+right' then return winow.tabs.navigate key
+            when 'command+alt+shift+left' 'command+alt+shift+right' then return window.tabs.move key
 
         if @list?
             switch combo
-                when 'esc', 'alt+`'    then return @closeList()
-                when 'up', 'down'      then return @navigate key
+                when 'esc' 'alt+`'    then return @closeList()
+                when 'up' 'down'      then return @navigate key
                 when 'enter'
                     return @loadSelected()
         'unhandled'

@@ -126,12 +126,12 @@ class Main extends app
         
         if args.prefs
             log colors.yellow.bold 'prefs'
-            log colors.green.bold 'prefs file:', prefs.store.file
+            log colors.green.bold 'prefs file:' prefs.store.file
             log noon.stringify prefs.store.data, colors:true
         
         if args.state
             log colors.yellow.bold 'state'
-            log colors.green.bold 'state file:', global.state.file
+            log colors.green.bold 'state file:' global.state.file
             log noon.stringify global.state.data, colors:true
             
         @indexer = new Indexer
@@ -395,7 +395,7 @@ class Main extends app
         fs.ensureDirSync @userData
         for file in filelist(slash.join(@userData, 'old'), matchExt:'noon')
             win = @createWindow()
-            newStash = slash.join @userData, 'win', "#{win.id}.noon"
+            newStash = slash.join @userData, 'win' "#{win.id}.noon"
             fs.copySync file, newStash
 
     toggleWindowFromTray: => 
@@ -468,8 +468,8 @@ class Main extends app
             
     onOtherInstance: (args, dir) =>
 
-        log 'onOtherInstance dir:',  dir
-        log 'onOtherInstance args:', args
+        log 'onOtherInstance dir:'  dir
+        log 'onOtherInstance args:' args
         
         @activateOneWindow (win) ->
 
@@ -526,7 +526,7 @@ class Main extends app
 # 000   000  000        000        000  000   000  000  0000
 # 000   000  000        000        000   0000000   000   000
 
-electron.app.on 'open-file', (event, file) ->
+electron.app.on 'open-file' (event, file) ->
 
     if not main?
         openFiles.push file
@@ -539,7 +539,7 @@ electron.app.on 'open-file', (event, file) ->
         
     event.preventDefault()
 
-electron.app.on 'window-all-closed', -> log 'window-all-closed'
+electron.app.on 'window-all-closed' -> log 'window-all-closed'
 
 # 000   000  0000000    00000000     
 # 000   000  000   000  000   000    
@@ -549,7 +549,7 @@ electron.app.on 'window-all-closed', -> log 'window-all-closed'
 
 onUDP = (file) ->
     main.activateOneWindow (win) ->
-        post.toWin win.id, 'openFiles', [file] 
+        post.toWin win.id, 'openFiles' [file] 
 
 koReceiver = new udp port:9779, onMsg:onUDP
 

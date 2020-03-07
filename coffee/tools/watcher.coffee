@@ -31,7 +31,7 @@ class Watcher
             else
                 setTimeout (=> slash.exists @file, @onRename), 200
         
-        @w.on 'unlink' (p) => klog "unlink #{@id}", slash.basename(@file)
+        @w.on 'unlink' (p) => klog "unlink #{@id}" slash.basename(@file)
     
     onChange: (stat) =>
         

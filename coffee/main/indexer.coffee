@@ -209,15 +209,15 @@ class Indexer
               
         @currentlyIndexing = file
         
-        forkfunc "#{__dirname}/indexprj", file, (err, info) =>
+        forkfunc "#{__dirname}/indexprj" file, (err, info) =>
             
-            return kerror 'indexing failed', err if valid err
+            return kerror 'indexing failed' err if valid err
             
             delete @currentlyIndexing
             
             if info
                 @indexedProjects.push info 
-                post.toWins 'projectIndexed', info
+                post.toWins 'projectIndexed' info
             
             doShift = empty @queue
             
@@ -301,7 +301,7 @@ class Indexer
             file:  file
             class: className
 
-        _.set @classes, "#{className}.methods.#{funcInfo.name}", funcInfo
+        _.set @classes, "#{className}.methods.#{funcInfo.name}" funcInfo
 
         funcInfo
 
@@ -347,7 +347,7 @@ class Indexer
 
         fs.readFile file, 'utf8' (err, data) =>
             
-            return kerror "can't index #{file}", err if not empty err
+            return kerror "can't index #{file}" err if not empty err
             
             lines = data.split /\r?\n/
             
@@ -368,8 +368,8 @@ class Indexer
                 
                 for clss in parsed.classes
                     
-                    _.set @classes, "#{clss.name}.file", file
-                    _.set @classes, "#{clss.name}.line", clss.line+1
+                    _.set @classes, "#{clss.name}.file" file
+                    _.set @classes, "#{clss.name}.line" clss.line+1
                     
                     fileInfo.classes.push 
                         name: clss.name
@@ -462,8 +462,8 @@ class Indexer
                                 
                                 if className = Indexer.classNameInLine line
                                     currentClass = className
-                                    _.set @classes, "#{className}.file", file
-                                    _.set @classes, "#{className}.line", li+1
+                                    _.set @classes, "#{className}.file" file
+                                    _.set @classes, "#{className}.line" li+1
                                     
                                     fileInfo.classes.push 
                                         name: className

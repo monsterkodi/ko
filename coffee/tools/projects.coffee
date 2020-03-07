@@ -33,11 +33,11 @@ class Projects
                 return list
             
         if dir = slash.pkg file
-            if info = post.get 'indexer', 'project', dir
+            if info = post.get 'indexer' 'project' dir
                 Projects.onIndexed info
                 return files[info.dir]
                 
-        log "no project files for file #{file}", Object.keys files
+        log "no project files for file #{file}" Object.keys files
         []
  
 post.on 'projectIndexed', Projects.onIndexed
