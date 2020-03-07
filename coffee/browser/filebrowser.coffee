@@ -331,7 +331,8 @@ class FileBrowser extends Browser
         for column in @columns
             if column.path() == info.dir
                 @loadDirItem {file:info.dir, type:'dir'}, column.index, active:column.activePath(), focus:false
-                return
+            if column.path() == info.path and info.change == 'remove'
+                column.clear()
     
     loadDirItem: (item, col=0, opt={}) ->
 

@@ -6,7 +6,7 @@
 000       000  0000000  00000000  000   000  000   000  000   000  0000000    0000000  00000000  000   000
 ###
 
-{ _, empty, filelist, first, kerror, klog, post, prefs, reversed, slash, valid } = require 'kxk'
+{ _, empty, filelist, first, kerror, post, prefs, reversed, slash, valid } = require 'kxk'
 
 File     = require '../tools/file'
 electron = require 'electron'
@@ -168,14 +168,9 @@ class FileHandler
     removeFile: (file) =>
         
         if tab = tabs.tab file
-            klog 'removeFile' file
             if tab == tabs.activeTab()
                 if neighborTab = tab.nextOrPrev()
                     neighborTab.activate()
-                else
-                    if editor?.currentFile == file
-                        klog 'close editor file'
-            klog 'close tab'
             tabs.closeTab tab
             
     #  0000000   0000000   000   000  00000000         0000000   000      000      
@@ -249,6 +244,7 @@ class FileHandler
             recent.pop()
     
         window.state.set 'recentFiles' recent
+        window.titlebar.refreshMenu()
         commandline.commands.open.setHistory reversed recent
                 
     #  0000000   0000000   000   000  00000000         0000000  000   000   0000000   000   000   0000000   00000000   0000000  

@@ -146,7 +146,10 @@ class Window extends win
             when 'Close Other Tabs'      then return post.emit 'closeOtherTabs'
             when 'Close Other Windows'   then return post.toOtherWins 'closeWindow'
             when 'Fullscreen'            then return win.setFullScreen !win.isFullScreen()
-            when 'Clear List'            then return window.state.set 'recentFiles' []
+            when 'Clear List'            
+                window.state.set 'recentFiles' []
+                window.titlebar.refreshMenu()
+                return 
             when 'Preferences'           then return post.emit 'openFiles' [prefs.store.file], newTab:true
             when 'Cycle Windows'         then args = winID
     
@@ -280,7 +283,6 @@ reloadWin = ->
 
     saveStash()
     clearListeners()
-    # editor.stopWatcher()
     post.toMain 'reloadWin' winID:win.id, file:editor.currentFile
 
 # 00000000   00000000   0000000  000  0000000  00000000

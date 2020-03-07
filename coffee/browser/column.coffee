@@ -242,7 +242,6 @@ class Column
                 else
                     @browser.shelf.addFiles files, pos:d.pos
             else
-                klog "action #{action} #{target}" files
                 @browser.dropAction action, files, target
         else
             
@@ -836,7 +835,6 @@ class Column
     
     copyPaths: ->
         paths = @browser.select.files().join '\n'
-        klog 'copy paths' paths
         electron.clipboard.writeText paths
         paths
         
@@ -848,8 +846,6 @@ class Column
         
         text = electron.clipboard.readText()
         paths = text.split '\n'
-        
-        klog 'pastePaths' paths
         
         if text == @browser.cutPaths
             action = 'move'

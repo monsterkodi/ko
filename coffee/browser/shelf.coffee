@@ -352,7 +352,13 @@ class Shelf extends Column
         
         if      key == 'up'   and index > @items.length     then navigate 'Navigate Forward'
         else if key == 'down' and index > @items.length + 1 then navigate 'Navigate Backward'
-        else @rows[index].activate()
+        else
+            row = @rows[index]
+            row.setActive emit:false
+            if row.item.type == 'file'
+                post.emit 'jumpToFile' row.item
+            else
+                post.emit 'filebrowser' 'loadItem' row.item, focus:false
     
     openFileInNewWindow: ->  
         

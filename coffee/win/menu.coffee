@@ -6,7 +6,7 @@
 000   000  00000000  000   000   0000000
 ###
 
-{ post, filelist, slash, win, os, fs, _ } = require 'kxk'
+{ _, filelist, fs, os, post, slash, win } = require 'kxk'
 
 Syntax    = require '../editor/syntax'
 Transform = require '../editor/actions/transform'
@@ -49,7 +49,6 @@ menu = (template) ->
                         if v.separator
                             submenu[v.menu ? menuName].push text: ''
                         submenu[v.menu ? menuName].push item
-                # submenu[menuName].push text: ''
 
     for key, menu of submenu
         EditMenu.push text:key, menu:menu

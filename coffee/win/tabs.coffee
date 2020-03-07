@@ -6,7 +6,7 @@
    000     000   000  0000000    0000000
 ###
 
-{ $, _, drag, elem, empty, first, kerror, klog, kpos, last, popup, post, slash, stopEvent } = require 'kxk'
+{ $, _, drag, elem, empty, first, kerror, kpos, last, popup, post, slash, stopEvent } = require 'kxk'
 
 Tab = require './tab'
 
@@ -162,7 +162,6 @@ class Tabs
         _.pull @tabs, tab.close()
         
         if empty @tabs
-            klog 'empty tabs -> new empty tab'
             @onNewEmptyTab()
         @
 
