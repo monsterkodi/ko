@@ -88,7 +88,7 @@ class Window extends win
         editor.setFontSize s if s
     
         if window.stash.get 'centerText'
-            editor.centerText true, 0
+            editor.centerText true 0
     
         post.emit 'restore'
         editor.focus()

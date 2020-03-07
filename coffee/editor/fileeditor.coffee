@@ -375,7 +375,6 @@ class FileEditor extends TextEditor
                 offsetX = @size.offsetX - @size.numbersWidth - @size.charWidth/2
             else
                 offsetX = Math.floor @size.charWidth/2 + @size.numbersWidth
-                offsetX = Math.max offsetX, (@screenSize().width - @screenSize().height) / 2
                 offsetX -= @size.numbersWidth + @size.charWidth/2
                 offsetX *= -1
 

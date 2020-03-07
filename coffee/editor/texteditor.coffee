@@ -11,8 +11,6 @@
 render       = require './render'
 EditorScroll = require './editorscroll'
 Editor       = require './editor'
-jsbeauty     = require 'js-beautify'
-electron     = require 'electron'
 
 class TextEditor extends Editor
 
@@ -23,13 +21,10 @@ class TextEditor extends Editor
 
         super name, config
 
-        @clickCount = 0
-
         @view =$ viewElem
 
         @layers      = elem class:'layers'
-        @layerScroll = elem class:'layerScroll' child:@layers
-        @view.appendChild @layerScroll
+        @layerScroll = elem class:'layerScroll' child:@layers, parent:@view
 
         layer = []
         layer.push 'selections'
@@ -213,7 +208,9 @@ class TextEditor extends Editor
         @size.lineHeight   = Math.floor fontSize * @config.lineHeight
         @size.charWidth    = fontSize * 0.6
         @size.offsetX      = Math.floor @size.charWidth/2 + @size.numbersWidth
-        @size.offsetX      = Math.max @size.offsetX, (@screenSize().width - @screenSize().height) / 2 if @size.centerText
+        if @size.centerText
+            @centerText false 0
+            @centerText true 0
 
         @scroll?.setLineHeight @size.lineHeight
 
@@ -226,9 +223,6 @@ class TextEditor extends Editor
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000
 
     changed: (changeInfo) ->
-
-        # if valid changeInfo.changes
-            # klog 'texteditor.changed' changeInfo
 
         @syntax.changed changeInfo
 
@@ -553,8 +547,6 @@ class TextEditor extends Editor
         @scroll.setViewHeight vh
 
         @emit 'viewHeight' vh
-
-    screenSize: -> electron.remote.screen.getPrimaryDisplay().workAreaSize
 
     # 00000000    0000000    0000000
     # 000   000  000   000  000

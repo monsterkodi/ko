@@ -171,7 +171,7 @@ class FileHandler
             if tab == tabs.activeTab()
                 if neighborTab = tab.nextOrPrev()
                     neighborTab.activate()
-            klog 'removeFile'
+            klog 'removeFile' file
             tabs.closeTab tab
             
     #  0000000   0000000   000   000  00000000         0000000   000      000      

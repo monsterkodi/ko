@@ -12,7 +12,6 @@ Browser  = require './browser'
 Shelf    = require './shelf'
 Select   = require './select'
 File     = require '../tools/file'
-dirCache = require '../tools/dircache'
 hub      = require '../git/hub'
 pbytes   = require 'pretty-bytes'
 moment   = require 'moment'
@@ -39,7 +38,7 @@ class FileBrowser extends Browser
 
         post.on 'gitStatus'      @onGitStatus
         post.on 'fileIndexed'    @onFileIndexed
-        post.on 'dircache'       @onDirCache
+        post.on 'dirChanged'     @onDirChanged
         
         @shelfResize = elem 'div' class: 'shelfResize'
         @shelfResize.style.position = 'absolute'
@@ -334,7 +333,7 @@ class FileBrowser extends Browser
         
     fileInfo: (file) ->
         
-        # klog 'fileInfo' file
+        klog 'fileInfo' file
         
         stat = slash.fileExists file
         size = pbytes(stat.size).split ' '
@@ -356,14 +355,15 @@ class FileBrowser extends Browser
                 
         info
         
-     # 0000000    000  00000000    0000000   0000000    0000000  000   000  00000000  
-     # 000   000  000  000   000  000       000   000  000       000   000  000       
-     # 000   000  000  0000000    000       000000000  000       000000000  0000000   
-     # 000   000  000  000   000  000       000   000  000       000   000  000       
-     # 0000000    000  000   000   0000000  000   000   0000000  000   000  00000000  
+     # 0000000    000  00000000    0000000  000   000   0000000   000   000   0000000   00000000  0000000    
+     # 000   000  000  000   000  000       000   000  000   000  0000  000  000        000       000   000  
+     # 000   000  000  0000000    000       000000000  000000000  000 0 000  000  0000  0000000   000   000  
+     # 000   000  000  000   000  000       000   000  000   000  000  0000  000   000  000       000   000  
+     # 0000000    000  000   000   0000000  000   000  000   000  000   000   0000000   00000000  0000000    
      
-     onDirCache: (dir) =>
+     onDirChanged: (dir) =>
  
+         klog 'onDirChanged' dir
          for column in @columns
              if column.path() == dir
                  @loadDirItem {file:dir, type:'dir'}, column.index, active:column.activePath()
@@ -435,20 +435,12 @@ class FileBrowser extends Browser
 
         dir = item.file
 
-        if dirCache.has(dir) and not opt.ignoreCache
-            # klog "dirCache #{dir}"
-            @loadDirItems dir, item, dirCache.get(dir), col, opt
+        opt.ignoreHidden = not window.state.get "browser|showHidden|#{dir}"
+        opt.textTest = true
+        slash.list dir, opt, (items) =>
+            post.toMain 'dirLoaded' dir
+            @loadDirItems dir, item, items, col, opt
             post.emit 'dir' dir
-        else
-            opt.ignoreHidden = not window.state.get "browser|showHidden|#{dir}"
-            opt.textTest = true
-            slash.list dir, opt, (items) =>
-
-                post.toMain 'dirLoaded' dir
-
-                dirCache.set dir, items
-                @loadDirItems dir, item, items, col, opt
-                post.emit 'dir' dir
                 
     loadDirItems: (dir, item, items, col, opt) =>
         
@@ -615,7 +607,6 @@ class FileBrowser extends Browser
     refresh: =>
 
         hub.refresh()
-        dirCache.reset()
         @srcCache = {}
 
         if @lastUsedColumn()
