@@ -1,11 +1,12 @@
+###
+ 0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
+000       000       000      000       000          000     000  000   000  0000  000
+0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
+     000  000       000      000       000          000     000  000   000  000  0000
+0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
+###
 
-#  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
-# 000       000       000      000       000          000     000  000   000  0000  000
-# 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
-#      000  000       000      000       000          000     000  000   000  000  0000
-# 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
-
-{ post, kerror, _ } = require 'kxk'
+{ _, kerror, post } = require 'kxk'
 
 module.exports =
     
@@ -45,8 +46,8 @@ module.exports =
                 select text between even cursors, if at least two cursors exist. 
                 select text between highlighted brackets or quotes otherwise.
                 """
-            combo: 'command+alt+b'
-            accel: 'alt+ctrl+b'
+            combo: 'alt+b'
+            accel: 'alt+b'
 
         toggleStickySelection:
             separator: true

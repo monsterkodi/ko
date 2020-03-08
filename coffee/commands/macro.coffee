@@ -6,7 +6,7 @@
 000   000  000   000   0000000  000   000   0000000
 ###
 
-{ post, reversed, empty, prefs, slash, valid, args, fs, kerror, _ } = require 'kxk'
+{ _, args, empty, fs, kerror, post, prefs, reversed, slash, valid } = require 'kxk'
 
 indexer   = require '../main/indexer'
 salt      = require '../tools/salt'
@@ -109,7 +109,7 @@ class Macro extends Command
             # 000       000   000  000      000   000  000   000
             #  0000000   0000000   0000000   0000000   000   000
 
-            when 'color' then editor.togglePigments()
+            when 'color' 'colors' then editor.togglePigments()
 
             # 00000000  00000000    0000000         0000000  000   000  0000000           0000000   000  000000000
             # 000       000   000  000             000       000 0 000  000   000        000        000     000

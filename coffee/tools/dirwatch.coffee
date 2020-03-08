@@ -6,7 +6,7 @@
 0000000    000  000   000  00     00  000   000     000      0000000  000   000  
 ###
 
-{ klog, post, watch } = require 'kxk'
+{ post, watch } = require 'kxk'
 
 class DirWatch
        
@@ -20,7 +20,7 @@ class DirWatch
         watcher = watch.dir dir
         watcher.on 'change' (info) ->
             if info.change != 'change'
-                klog 'DirWatch' info.change, info.path, info.dir
+                # klog 'DirWatch' info.change, info.path, info.dir
                 post.emit 'dirChanged' info
         watcher.on 'error' (err) -> error "watch.error #{err}"
         DirWatch.watches[dir] = watcher

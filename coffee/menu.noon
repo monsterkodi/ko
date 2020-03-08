@@ -103,6 +103,7 @@ Command
             accel           cmdctrl+shift+f
             command         search
         Case Sensitive
+            accel           alt+shift+f
             command         Search
         Regexp Case Insensitive
             command         /search/
@@ -120,6 +121,7 @@ Command
             accel           cmdctrl+f
             command         find
         Case Sensitive
+            accel           alt+f
             command         Find
         Regexp Case Insensitive
             command         /find/
