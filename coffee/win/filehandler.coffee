@@ -244,7 +244,7 @@ class FileHandler
             recent.pop()
     
         window.state.set 'recentFiles' recent
-        window.titlebar.refreshMenu()
+        # window.titlebar.refreshMenu()
         commandline.commands.open.setHistory reversed recent
                 
     #  0000000   0000000   000   000  00000000         0000000  000   000   0000000   000   000   0000000   00000000   0000000  

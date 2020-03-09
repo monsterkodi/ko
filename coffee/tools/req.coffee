@@ -6,7 +6,7 @@
 000   000  00000000   00000 00
 ###
 
-{ _, kerror, klog, kstr, slash, valid } = require 'kxk'
+{ _, kerror, kstr, slash, valid } = require 'kxk'
 
 requireRegExp = /^(\s*\{.+\})\s*=\s*require\s+([\'\"][\.\/\w]+[\'\"])/
 mathRegExp = /^(\s*\{.+\})\s*=\s*(Math)\s*$/
@@ -25,14 +25,18 @@ moduleKeys = (moduleName, file) ->
             module.paths.unshift fileDir
         moduleName = slash.file moduleName
          
-    required = require moduleName
+    try
+        required = require moduleName
+    catch err
+        error "can't require #{moduleName} #{err}"
+        
     if required
         if required.prototype
             return Object.keys required.prototype
         if required.getOwnPropertyNames
-            klog 'getOwnPropertyNames' required.getOwnPropertyNames()
             return required.getOwnPropertyNames()
-        Object.keys required
+        return Object.keys required
+    []
     
 req = (file, lines, editor) ->
 

@@ -6,7 +6,7 @@
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
 
-{ _, clamp, empty, kerror, kpos, popup, post, setStyle, slash, srcmap, stopEvent, valid } = require 'kxk'
+{ _, clamp, empty, fs, kerror, kpos, popup, post, setStyle, slash, srcmap, stopEvent, valid } = require 'kxk'
 
 TextEditor = require './texteditor'
 Syntax     = require './syntax'
@@ -419,6 +419,34 @@ class FileEditor extends TextEditor
 
         opt.items = opt.items.concat window.titlebar.menuTemplate()
 
+        RecentMenu = []
+        
+        fileSpan = (f) ->
+            if f?
+                span  = Syntax.spanForTextAndSyntax slash.tilde(slash.dir(f)), 'browser'
+                span += Syntax.spanForTextAndSyntax '/' + slash.base(f), 'browser'
+            return span
+        
+        recent = window.state?.get 'recentFiles' []
+        recent ?= []
+        for f in recent
+            if fs.existsSync f
+                RecentMenu.unshift
+                    html: fileSpan f
+                    arg: f
+                    cb: (arg) -> post.emit 'newTabWithFile' arg
+        
+        getMenu = (template, name) ->
+            for item in template
+                if item.text == name
+                    return item
+                                
+        if RecentMenu.length
+            RecentMenu.push text: ''
+            RecentMenu.push text: 'Clear List'
+            fileMenu = getMenu opt.items, 'File'
+            fileMenu.menu = [{text:'Recent' menu:RecentMenu}, {text:''}].concat fileMenu.menu
+        
         opt.x = absPos.x
         opt.y = absPos.y
         popup.menu opt

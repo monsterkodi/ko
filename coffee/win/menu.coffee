@@ -6,7 +6,7 @@
 000   000  00000000  000   000   0000000
 ###
 
-{ _, filelist, fs, os, post, slash, win } = require 'kxk'
+{ _, filelist, os, post, slash, win } = require 'kxk'
 
 Syntax    = require '../editor/syntax'
 Transform = require '../editor/actions/transform'
@@ -80,31 +80,6 @@ menu = (template) ->
             menu: transformSubmenu
 
     editMenu.menu = editMenu.menu.concat text:'Transform' menu:TransformMenu
-
-    fileSpan = (f) ->
-        if f?
-            span  = Syntax.spanForTextAndSyntax slash.tilde(slash.dir(f)), 'browser'
-            span += Syntax.spanForTextAndSyntax '/' + slash.base(f), 'browser'
-        return span
-
-    RecentMenu = []
-
-    recent = window.state?.get 'recentFiles' []
-    recent ?= []
-    for f in recent
-        if fs.existsSync f
-            RecentMenu.unshift
-                html: fileSpan f
-                arg: f
-                cb: (arg) -> post.emit 'newTabWithFile' arg
-
-    if RecentMenu.length
-        RecentMenu.push
-            text: ''
-        RecentMenu.push
-            text: 'Clear List'
-        fileMenu = getMenu template, 'File'
-        fileMenu.menu = [{text:'Recent' menu:RecentMenu}, {text:''}].concat fileMenu.menu
 
     template
 

@@ -17,7 +17,7 @@ class DirWatch
         return if DirWatch.watches[dir]
         # klog "watch #{dir}" Object.keys DirWatch.watches
         
-        watcher = watch.dir dir
+        watcher = watch.dir dir, skipSave:true
         watcher.on 'change' (info) ->
             if info.change != 'change'
                 # klog 'DirWatch' info.change, info.path, info.dir
