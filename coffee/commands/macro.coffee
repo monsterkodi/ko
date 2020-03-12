@@ -178,7 +178,7 @@ class Macro extends Command
                 insert += editor.funcInfoAtLineIndex li
                 lst = args.length and parseInt(args[0]) or 0
                 args.shift() if lst
-                words = wordsInArgsOrCursorsOrSelection args, include: "#@.-"
+                words = wordsInArgsOrCursorsOrSelection args, include: '#@.-'
                 for ti in [0...words.length - lst]
                     t = words[ti]
                     insert += "#{t}:\#{kstr #{t}} "
