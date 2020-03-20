@@ -99,8 +99,6 @@ class Buffer extends event
 
     rangeForWordAtPos: (pos, opt) ->
 
-        # fix me! this is fucking slow on very long lines. 
-        # we could just walk forward and backwards from pos until word boundary is detected!
         p = @clampPos pos
         wr = @wordRangesInLineAtIndex p[1], opt
         r = rangeAtPosInRanges p, wr

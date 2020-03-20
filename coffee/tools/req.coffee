@@ -6,7 +6,7 @@
 000   000  00000000   00000 00
 ###
 
-{ _, kerror, kstr, slash, valid } = require 'kxk'
+{ _, kerror, klog, kstr, slash, valid } = require 'kxk'
 
 requireRegExp = /^(\s*\{.+\})\s*=\s*require\s+([\'\"][\.\/\w]+[\'\"])/
 mathRegExp = /^(\s*\{.+\})\s*=\s*(Math)\s*$/
@@ -78,7 +78,7 @@ req = (file, lines, editor) ->
                             newKeys = moduleKeys moduleName, file
                             keys[m[2]] = newKeys
                             for k in newKeys
-                                regexes[k] ?= new RegExp "(^|[\\:\\(\\{]|\\s+)#{k}(\\s+[^:]|\\s*$|[\\.\\(])"
+                                regexes[k] ?= new RegExp "(^|[\\:\\(\\{]|\\s+)#{k}(\\s+[^:]|\\s*$|[\\.\\,\\(])"
                             
                         catch err
                             kerror "can't require #{m[2]} for #{file}: #{err} \nmodule.paths:" module.paths
@@ -100,7 +100,7 @@ req = (file, lines, editor) ->
                 if k in reqValues[mod]
                     continue
                 
-                regexes[k] ?= new RegExp "(^|[\\:\\(\\{]|\\s+)#{k}(\\s+[^:]|\\s*$|[\\.\\(])"
+                regexes[k] ?= new RegExp "(^|[\\:\\(\\{]|\\s+)#{k}(\\s+[^:]|\\s*$|[\\.\\,\\(])"
                     
                 if regexes[k].test lines[li]
                     

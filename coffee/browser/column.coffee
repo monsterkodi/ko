@@ -368,9 +368,9 @@ class Column
     activePath: -> @activeRow()?.path() ? @parent.file
     
     row: (row) -> # accepts element, index, string or row
-        if      _.isNumber  row then return 0 <= row < @numRows() and @rows[row] or null
-        else if _.isElement row then return _.find @rows, (r) -> r.div.contains row
-        else if _.isString  row then return _.find @rows, (r) -> r.item.name == row or r.item.file == row
+        if      Number.isInteger(row) then return 0 <= row < @numRows() and @rows[row] or null
+        else if typeof(row) == 'string' then return _.find @rows, (r) -> r.item.name == row or r.item.file == row
+        else if row instanceof HTMLElement then return _.find @rows, (r) -> r.div.contains row
         else return row
             
     nextColumn: -> @browser.column @index+1
@@ -421,8 +421,8 @@ class Column
     # 000 0 000  000   000  000   000       000  000       
     # 000   000   0000000    0000000   0000000   00000000  
     
-    onMouseOver: (event) => @row(event.target)?.onMouseOver()
-    onMouseOut:  (event) => @row(event.target)?.onMouseOut()
+    onMouseOver: (event) => @row(event.target)?.onMouseOver?()
+    onMouseOut:  (event) => @row(event.target)?.onMouseOut?()
     
     onDblClick:  (event) => 
         

@@ -6,7 +6,7 @@
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
 
-{ _, clamp, empty, fs, kerror, kpos, popup, post, setStyle, slash, srcmap, stopEvent, valid } = require 'kxk'
+{ clamp, empty, fs, kerror, kpos, popup, post, setStyle, slash, srcmap, stopEvent, valid } = require 'kxk'
 
 TextEditor = require './texteditor'
 Syntax     = require './syntax'
@@ -165,8 +165,10 @@ class FileEditor extends TextEditor
         s.scroll = @scroll.scroll if @scroll.scroll
 
         filePositions = window.stash.get 'filePositions' Object.create null
-        if not _.isPlainObject filePositions
+        
+        if not filePositions or typeof(filePositions) != 'object'
             filePositions = Object.create null
+            
         filePositions[@currentFile] = s
         window.stash.set 'filePositions' filePositions
 
@@ -243,7 +245,7 @@ class FileEditor extends TextEditor
 
     jumpTo: (word, opt) =>
 
-        if _.isObject(word) and not opt?
+        if typeof(word) == 'object' and not opt?
             opt  = word
             word = opt.word
 

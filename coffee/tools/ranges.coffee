@@ -13,6 +13,7 @@ class Ranges
     @pollute: ->
         for member in Object.getOwnPropertyNames Ranges.prototype 
             continue if member in ['constructor']
+            # klog "pollute #{member}"
             global[member] = Ranges.prototype[member]
         Ranges
 
