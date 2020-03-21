@@ -127,7 +127,7 @@ class GitInfo
 
         window.split.raise 'terminal'
         terminal = window.terminal
-        terminal.doAutoClear()
+        terminal.clear()
         
         hub.info dirOrFile, (info) =>
 

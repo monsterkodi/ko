@@ -6,7 +6,7 @@
 000       000  0000000  00000000        0000000    000   000   0000000   00     00  0000000   00000000  000   000
 ###
 
-{ $, clamp, drag, elem, empty, filelist, klog, post, slash, valid } = require 'kxk'
+{ $, clamp, drag, elem, empty, filelist, klog, post, prefs, slash, valid } = require 'kxk'
 
 Browser  = require './browser'
 Shelf    = require './shelf'
@@ -345,7 +345,8 @@ class FileBrowser extends Browser
             # delete @skipOnDblClick
             # return 
         
-        opt.ignoreHidden = not window.state.get "browser|showHidden|#{dir}"
+        # opt.ignoreHidden = not window.state.get "browser|showHidden|#{dir}"
+        opt.ignoreHidden = not prefs.get "browser▸showHidden▸#{dir}"
         slash.list dir, opt, (items) =>
             post.toMain 'dirLoaded' dir
             @loadDirItems dir, item, items, col, opt

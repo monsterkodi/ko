@@ -46,7 +46,7 @@ class Search extends Command
         
         return if not file?
         
-        window.terminal.doAutoClear()
+        window.terminal.clear()
         
         @startSearchInFiles 
             text: command

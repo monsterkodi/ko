@@ -156,8 +156,6 @@ class Browse extends Command
 
     changedCallback: (files) =>
 
-        klog 'changedCallback' files
-        
         if empty @getText().trim()
             @hideList()
             return

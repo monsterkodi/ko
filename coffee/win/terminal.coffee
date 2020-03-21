@@ -6,7 +6,7 @@
    000     00000000  000   000  000   000  000  000   000  000   000  0000000
 ###
 
-{ post, stopEvent, prefs, popup, kpos, kerror } = require 'kxk'
+{ kerror, kpos, popup, post, stopEvent } = require 'kxk'
 
 salt       = require '../tools/salt'
 TextEditor = require '../editor/texteditor'
@@ -21,8 +21,6 @@ class Terminal extends TextEditor
         @view.addEventListener "contextmenu" @onContextMenu
         
         @metaQueue = []
-        
-        @setHeader prefs.get 'terminal:header' false
         
         @initInvisibles()
         @setLines ['']
@@ -107,22 +105,6 @@ class Terminal extends TextEditor
         @singleCursorAtPos [0,0]
         super()
 
-    setAutoClear: (state) -> prefs.set 'terminal:autoclear' state
-    getAutoClear: -> prefs.get 'terminal:autoclear' true
-
-    setHeader: (state) -> prefs.set 'terminal:header' state
-    getHeader: -> prefs.get 'terminal:header' true
-    
-    doAutoClear: -> if @getAutoClear() then @clear()
-
-    # 00000000  000   000  00000000   0000000  000   000  000000000  00000000  
-    # 000        000 000   000       000       000   000     000     000       
-    # 0000000     00000    0000000   000       000   000     000     0000000   
-    # 000        000 000   000       000       000   000     000     000       
-    # 00000000  000   000  00000000   0000000   0000000      000     00000000  
-    
-    # execute: (cmmd) ->
-        
     # 00000000    0000000   00000000   000   000  00000000     
     # 000   000  000   000  000   000  000   000  000   000    
     # 00000000   000   000  00000000   000   000  00000000     

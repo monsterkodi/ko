@@ -614,16 +614,17 @@ class Column
     
     toggleDotFiles: =>
 
+        # klog 'toggleDotFiles'
         if @parent.type == undefined
             @parent.type = slash.isDir(@parent.file) and 'dir' or 'file'
             
         if @parent.type == 'dir'            
-            stateKey = "browser|showHidden|#{@parent.file}"
-            if window.state.get stateKey
-                window.state.del stateKey
+            stateKey = "browser▸showHidden▸#{@parent.file}"
+            klog 'toggleDotFiles' stateKey
+            if prefs.get stateKey
+                prefs.del stateKey
             else
                 prefs.set stateKey, true
-            klog 'toggleDotFiles'
             @browser.loadDirItem @parent, @index, ignoreCache:true
         @
          
