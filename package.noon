@@ -1,5 +1,5 @@
 name            ko
-version         0.308.0
+version         0.309.0
 description     text editor
 main            js/main/main.js
 preferGlobal    true

@@ -1,4 +1,4 @@
-// koffee 1.11.0
+// koffee 1.12.0
 var empty, matchr, post, ref, slash;
 
 ref = require('kxk'), post = ref.post, matchr = ref.matchr, slash = ref.slash, empty = ref.empty;

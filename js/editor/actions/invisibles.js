@@ -1,4 +1,4 @@
-// koffee 1.11.0
+// koffee 1.12.0
 var Invisibles, _, kerror, ref,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 

@@ -244,8 +244,7 @@ class Column
             else
                 @browser.dropAction action, files, target
         else
-            
-            @focus activate:false
+            # @focus activate:false # this breaks contextmenu popups
             
             if row = @row e.target
                 if row.isSelected()
@@ -404,7 +403,7 @@ class Column
                 
         if not @activeRow() and @numRows() and opt?.activate != false
             @rows[0].setActive()
-            
+          
         @div.focus()
         @div.classList.add 'focus'
         window.setLastFocus @name()
