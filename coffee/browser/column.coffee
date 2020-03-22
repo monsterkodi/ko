@@ -244,7 +244,8 @@ class Column
             else
                 @browser.dropAction action, files, target
         else
-            # @focus activate:false # this breaks contextmenu popups
+            if e.button == 0
+                @focus activate:false
             
             if row = @row e.target
                 if row.isSelected()
