@@ -991,6 +991,8 @@ infoPadding = 6px
 // 000   000  000   000  000   000  000   000  000   000       000
 // 000   000  000   000  000   000   0000000   00     00  0000000
 
+.arrow.head
+.arrow.tail
 .function.head
 .function.tail
      opacity            1
@@ -998,9 +1000,21 @@ infoPadding = 6px
 
 .function.tail:before
     content             ' ▬'
-     
+         
 .function.head:before
     content             ' ▶'
+    
+
+.arrow.tail:before
+    content             ' ━'
+    position            absolute
+    top                 -0.06ex
+    left                0.2ex
+    
+.arrow.head:before
+    content             ' ▶'
+    position            absolute
+    top                 -0.1ex
     
 //  0000000   0000000  00000000    0000000   000      000      0000000     0000000   00000000
 // 000       000       000   000  000   000  000      000      000   000  000   000  000   000

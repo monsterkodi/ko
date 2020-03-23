@@ -828,6 +828,8 @@ body {
 .li3.marker:before {
   content: '◆';
 }
+.arrow.head,
+.arrow.tail,
 .function.head,
 .function.tail {
   opacity: 1;
@@ -838,6 +840,17 @@ body {
 }
 .function.head:before {
   content: ' ▶';
+}
+.arrow.tail:before {
+  content: ' ━';
+  position: absolute;
+  top: -0.06ex;
+  left: 0.2ex;
+}
+.arrow.head:before {
+  content: ' ▶';
+  position: absolute;
+  top: -0.1ex;
 }
 .scrollbar {
   position: absolute;
