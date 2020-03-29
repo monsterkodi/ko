@@ -6,7 +6,7 @@
 000   000  000   000  000  000   000
 ###
 
-{ _, app, args, colors, empty, filelist, first, fs, noon, post, prefs, slash, store, udp, valid, win } = require 'kxk'
+{ _, app, args, empty, filelist, first, fs, kolor, noon, post, prefs, slash, store, udp, valid, win } = require 'kxk'
 
 # post.debug()
 # log.slog.debug = true
@@ -114,24 +114,19 @@ class Main extends app
             process.chdir args.filelist.shift()
         
         if args.verbose
-            log colors.white.bold "\nko", colors.gray "v#{pkg.version}\n"
+            log kolor.white kolor.bold "\nko", kolor.gray "v#{pkg.version}\n"
             log noon.stringify {cwd: process.cwd()}, colors:true
-            log colors.yellow.bold '\nargs'
+            log kolor.yellow kolor.bold '\nargs'
             log noon.stringify args, colors:true
             log ''
 
         global.state = new store 'state' separator: '|'
 
         alias = new store 'alias'
-        
-        if args.prefs
-            log colors.yellow.bold 'prefs'
-            log colors.green.bold 'prefs file:' prefs.store.file
-            log noon.stringify prefs.store.data, colors:true
-        
+                
         if args.state
-            log colors.yellow.bold 'state'
-            log colors.green.bold 'state file:' global.state.file
+            log kolor.yellow kolor.bold 'state'
+            log kolor.green kolor.bold 'state file:' global.state.file
             log noon.stringify global.state.data, colors:true
             
         @indexer = new Indexer
@@ -157,7 +152,12 @@ class Main extends app
         
         @opt.width  = height + 122
         @opt.height = height
-         
+      
+        if args.prefs
+            log kolor.yellow kolor.bold 'prefs'
+            log kolor.green kolor.bold prefs.store?.file
+            log noon.stringify prefs.store?.data, colors:true
+        
         if valid @openFiles
             for file in @openFiles
                 @createWindowWithFile file:file

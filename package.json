@@ -1,6 +1,6 @@
 {
   "name": "ko",
-  "version": "0.310.0",
+  "version": "0.311.0",
   "description": "text editor",
   "main": "js/main/main.js",
   "preferGlobal": true,
