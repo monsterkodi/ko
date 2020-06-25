@@ -6,7 +6,7 @@
 000   000  00000000   00000 00
 ###
 
-{ _, kerror, klog, kstr, slash, valid } = require 'kxk'
+{ _, kerror, kstr, slash, valid } = require 'kxk'
 
 requireRegExp = /^(\s*\{.+\})\s*=\s*require\s+([\'\"][\.\/\w]+[\'\"])/
 mathRegExp = /^(\s*\{.+\})\s*=\s*(Math)\s*$/
