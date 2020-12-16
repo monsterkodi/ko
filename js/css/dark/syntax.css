@@ -73,7 +73,6 @@
 .arrow.tail:before,
 .arrow.head:before {
   color: #555;
-  padding-bottom: 0.8ex;
 }
 .obj,
 .owner,
