@@ -366,6 +366,7 @@ class Column
        
     activeRow: -> _.find @rows, (r) -> r.isActive()
     activePath: -> @activeRow()?.path() ? @parent.file
+    selectedRow: -> _.find @rows, (r) -> r.isSelected()
     
     row: (row) -> # accepts element, index, string or row
         if      Number.isInteger(row) then return 0 <= row < @numRows() and @rows[row] or null
@@ -648,7 +649,10 @@ class Column
             selectRow = @row index
         
         for row in @browser.select.rows
-            wxw 'trash' row.path()
+            if slash.win()
+                wxw 'trash' row.path()
+            else
+                fs.removeSync row.path()
             @removeRow row
            
         if selectRow
@@ -797,7 +801,7 @@ class Column
         ,
             text:   ''
         ,
-            text:   'Move to Trash'
+            text:   'Delete'
             combo:  'ctrl+backspace' 
             cb:     @moveToTrash
         ,   
@@ -891,6 +895,7 @@ class Column
             when 'ctrl+t'                           then return stopEvent event, @sortByType()
             when 'ctrl+n'                           then return stopEvent event, @sortByName()
             when 'ctrl+a'                           then return stopEvent event, @sortByDateAdded()
+            when 'ctrl+e'                           then return stopEvent event, @toggleExtensions()
             when 'command+i' 'ctrl+i'               then return stopEvent event, @toggleDotFiles()
             when 'command+d' 'ctrl+d'               then return stopEvent event, @duplicateFile()
             when 'command+k' 'ctrl+k'               then return stopEvent event if @browser.cleanUp() # needed?

@@ -367,9 +367,10 @@ class Shelf extends Column
         @
     
     removeObject: =>
-                
-        if row = @activeRow()
-            
+        
+        row = @activeRow() ? @selectedRow()
+        
+        if row
             if @showHistory
                 if row.item.type == 'historySeparator'
                     @toggleHistory()
@@ -427,10 +428,13 @@ class Shelf extends Column
         
         { mod, key, combo, char } = keyinfo.forEvent event
         
+        # klog 'combo:' combo
+        
         switch combo
             when 'command+enter' 'ctrl+enter' then return @openFileInNewWindow()
             when 'backspace' 'delete' then return stopEvent event, @clearSearch().removeObject()
             when 'command+k' 'ctrl+k' then return stopEvent event if @browser.cleanUp()
+            when 'ctrl+e' then @toggleExtensions()
             when 'tab'    
                 if @search.length then @doSearch ''
                 return stopEvent event
