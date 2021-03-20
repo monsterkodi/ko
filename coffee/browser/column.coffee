@@ -652,7 +652,8 @@ class Column
             if slash.win()
                 wxw 'trash' row.path()
             else
-                fs.removeSync row.path()
+                trashPath = slash.resolve '~/.Trash/' + slash.base row.path()
+                fs.rename row.path(), trashPath, -> 
             @removeRow row
            
         if selectRow

@@ -100,7 +100,7 @@ req = (file, lines, editor) ->
                 if k in reqValues[mod]
                     continue
                 
-                regexes[k] ?= new RegExp "(^|[\\:\\(\\{]|\\s+)#{k}(\\s+[^:]|\\s*$|[\\.\\,\\(])"
+                regexes[k] ?= new RegExp "(^|[\\,\\:\\(\\[\\{]|\\s+)#{k}(\\s+[^:]|\\s*$|[\\.\\,\\(])"
                     
                 if regexes[k].test lines[li]
                     

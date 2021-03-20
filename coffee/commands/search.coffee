@@ -67,7 +67,7 @@ class Search extends Command
     startSearchInFiles: (opt) ->
         
         terminal = window.terminal
-        # terminal.appendMeta clss: 'salt', text: opt.text.slice 0, 14
+
         terminal.appendMeta clss:'searchHeader' diss:Syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':" 'ko'
         terminal.appendMeta clss:'spacer'
         terminal.singleCursorAtPos [0, terminal.numLines()-2]
@@ -81,6 +81,7 @@ class Search extends Command
             file:        (f,stat) => @searchInFile opt, slash.path f
         @walker.cfg.ignore.push 'js'  # these directories are not included in search results
         @walker.cfg.ignore.push 'lib' # they should be configurable, maybe in package.noon or .konrad.noon?
+        @walker.cfg.ignore.push 'data' 
         @walker.start()
         
     searchInFile: (opt, file) =>
