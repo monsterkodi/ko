@@ -12,8 +12,6 @@ Syntax    = require '../editor/syntax'
 electron  = require 'electron'
 File      = require '../tools/file'
 
-app = electron.remote.app
-
 class Row
     
     @: (@column, @item) ->

@@ -26,9 +26,6 @@ projects    = require '../tools/projects'
 electron    = require 'electron'
 pkg         = require '../../package.json'
 
-remote      = electron.remote
-dialog      = remote.dialog
-Browser     = remote.BrowserWindow
 editor      = null
 mainmenu    = null
 terminal    = null
@@ -56,6 +53,8 @@ class Window extends win
             icon:           '../../img/menu@2x.png'
             scheme:         false
     
+        window.stash = new stash "win/#{@id}" separator:'|'
+            
         filehandler = window.filehandler = new FileHandler
         filewatcher = window.filewatcher = new FileWatcher
         tabs        = window.tabs        = new Tabs window.titlebar.elem
@@ -151,15 +150,12 @@ class Window extends win
                 window.titlebar.refreshMenu()
                 return 
             when 'Preferences'           then return post.emit 'openFiles' [prefs.store.file], newTab:true
-            when 'Cycle Windows'         then args = winID
+            when 'Cycle Windows'         then args = @id
     
         # log "unhandled menu action! posting to main '#{name}' args:", args
     
         super name, args
-    
-win   = window.win   = remote.getCurrentWindow()
-winID = window.winID = win.id
-        
+            
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000
 # 00000000   0000000    0000000   000000    0000000
@@ -168,7 +164,6 @@ winID = window.winID = win.id
 
 window.state = new store 'state' separator:'|'
 window.prefs = prefs
-window.stash = new stash "win/#{winID}" separator:'|'
 
 post.setMaxListeners 20
 
@@ -209,9 +204,9 @@ post.on 'editorFocus' (editor) ->
 
 post.on 'mainlog' -> klog.apply klog, arguments
 
-post.on 'ping' (wID, argA, argB) -> post.toWin wID, 'pong' winID, argA, argB
+post.on 'ping' (wID, argA, argB) -> post.toWin wID, 'pong' window.winID, argA, argB
 post.on 'postEditorState' ->
-    post.toAll 'editorState' winID,
+    post.toAll 'editorState' window.winID,
         lines:      editor.lines()
         cursors:    editor.cursors()
         main:       editor.mainCursor()
@@ -238,7 +233,9 @@ window.editorWithName = (n) ->
 # 000   000  000  0000  000       000      000   000       000  000
 #  0000000   000   000   0000000  0000000   0000000   0000000   00000000
 
-onMove  = -> window.stash.set 'bounds' win.getBounds()
+onMove  = -> 
+    bounds = require('electron').ipcRenderer.sendSync 'getWinBounds'
+    window.stash.set 'bounds' bounds
 
 clearListeners = ->
 
@@ -283,7 +280,7 @@ reloadWin = ->
 
     saveStash()
     clearListeners()
-    post.toMain 'reloadWin' winID:win.id, file:editor.currentFile
+    post.toMain 'reloadWin' winID:window.winID, file:editor.currentFile
 
 # 00000000   00000000   0000000  000  0000000  00000000
 # 000   000  000       000       000     000   000

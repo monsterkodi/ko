@@ -10,8 +10,6 @@
 
 File     = require '../tools/file'
 electron = require 'electron'
-remote   = electron.remote
-dialog   = remote.dialog
 
 class FileHandler
 
@@ -71,7 +69,7 @@ class FileHandler
             editor.restoreScrollCursorsAndSelections()
             
             if fileExists
-                post.toOthers 'fileLoaded' file, winID # indexer
+                post.toOtherWins 'fileLoaded' file # indexer
                 post.emit 'cwdSet' slash.dir file
                 
         split.raise 'editor'
@@ -222,7 +220,8 @@ class FileHandler
                 editor.setCurrentFile     saved
                 editor.do.history   = tabState.history
                 editor.do.saveIndex = tabState.history.length
-                post.toOthers 'fileSaved' saved, window.winID
+                post.toOtherWins 'fileSaved' saved, window.winID
+                # post.toMain 'fileSaved' saved, window.winID
                 post.emit     'saved'     saved
                 post.emit     'watch'     saved
 

@@ -1,6 +1,7 @@
 node_modules
 wiki
 *-x64
+*-arm64
 *-ia32
 inno
 bin/*.json

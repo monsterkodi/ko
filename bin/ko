@@ -21,6 +21,9 @@ if [ $_DEV ]; then
 elif [ -x "$HOME/s/ko/ko-darwin-x64/$_NAME" ]; then
     _PATH="$HOME/s/ko/ko-darwin-x64"
     echo "using dev build $_PATH"
+elif [ -x "$HOME/s/ko/ko-darwin-arm64/$_NAME" ]; then
+    _PATH="$HOME/s/ko/ko-darwin-arm64"
+    echo "using dev build $_PATH"
 elif [ -x "/Applications/$_NAME" ]; then
     _PATH="/Applications"
 elif [ -x "$HOME/Applications/$_NAME" ]; then

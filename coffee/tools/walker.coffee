@@ -6,7 +6,7 @@
 00     00  000   000  0000000  000   000  00000000  000   000
 ###
 
-{ walkdir, slash, kerror } = require 'kxk'
+{ kerror, os, slash, walkdir } = require 'kxk'
 
 File = require './file'
 
@@ -45,7 +45,7 @@ class Walker
                     return @ignore p
                 else if name in ['.DS_Store' 'Icon\r'] or extn in ['pyc']
                     return @ignore p
-                else if name.endsWith '-x64'
+                else if name.endsWith "-#{os.arch()}"
                     return @ignore p
                 else if cfg.includeDir? and slash.dir(p) == cfg.includeDir
                     cfg.files.push sp
