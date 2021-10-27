@@ -168,7 +168,7 @@ class Tabs
     onCloseTabOrWindow: (tab) =>
 
         if @numTabs() <= 1
-            window.win.close()
+            post.emit 'menuAction' 'close'
         else
             tab ?= @activeTab()
             tab.nextOrPrev().activate()

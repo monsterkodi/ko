@@ -35,7 +35,7 @@ File
     Close Other Tabs        cmdctrl+shift+w
     Close Other Windows     cmdctrl+alt+shift+w
     Close Tab or Window     cmdctrl+w
-    Close Window            alt+w
+    Close                   alt+w
 
 Edit
     Undo                    cmdctrl+z

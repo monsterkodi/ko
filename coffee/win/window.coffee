@@ -100,6 +100,8 @@ class Window extends win
     
     onMenuAction: (name, args) =>
     
+        klog 'ko.window.onMenuAction' name, args
+        
         if action = Editor.actionWithName name
             if action.key? and _.isFunction window.focusEditor[action.key]
                 window.focusEditor[action.key] args.actarg
@@ -140,11 +142,10 @@ class Window extends win
             when 'Save All'              then return post.emit 'saveAll'
             when 'Save As ...'           then return post.emit 'saveFileAs'
             when 'Revert'                then return post.emit 'reloadFile'
-            when 'Reload'                then return reloadWin()
+            # when 'Reload'                then return reloadWin()
             when 'Close Tab or Window'   then return post.emit 'closeTabOrWindow'
             when 'Close Other Tabs'      then return post.emit 'closeOtherTabs'
             when 'Close Other Windows'   then return post.toOtherWins 'closeWindow'
-            when 'Fullscreen'            then return win.setFullScreen !win.isFullScreen()
             when 'Clear List'            
                 window.state.set 'recentFiles' []
                 window.titlebar.refreshMenu()
@@ -176,11 +177,12 @@ saveStash = ->
 
 restoreWin = ->
 
+    klog 'ko.window.restoreWin'
     if bounds = window.stash.get 'bounds'
-        win.setBounds bounds
+        window.win.setBounds bounds
 
     if window.stash.get 'devTools'
-        win.webContents.openDevTools()
+        post.emit 'menuAction' 'devtools'
 
 # 00000000    0000000    0000000  000000000
 # 000   000  000   000  000          000
@@ -193,14 +195,15 @@ post.on 'singleCursorAtPos' (pos, opt) -> # browser double click and newTabWithF
     editor.scroll.cursorToTop()
 post.on 'focusEditor'  -> split.focus 'editor'
 post.on 'cloneFile'    -> post.toMain 'newWindowWithFile' editor.currentFile
-post.on 'closeWindow'  -> window.win.close()
+post.on 'closeWindow'  -> post.emit 'menuAction' 'Close'
 post.on 'saveStash'    -> saveStash()
 post.on 'editorFocus' (editor) ->
     window.setLastFocus editor.name
     window.focusEditor = editor
     window.textEditor = editor if editor.name != 'commandline-editor'
 
-# testing related ...
+post.on 'devTools' (open) -> 
+    klog "ko.window.post.on devTools #{open}"
 
 post.on 'mainlog' -> klog.apply klog, arguments
 
@@ -233,16 +236,17 @@ window.editorWithName = (n) ->
 # 000   000  000  0000  000       000      000   000       000  000
 #  0000000   000   000   0000000  0000000   0000000   0000000   00000000
 
-onMove  = -> 
-    bounds = require('electron').ipcRenderer.sendSync 'getWinBounds'
-    window.stash.set 'bounds' bounds
+onMove = -> 
+
+    klog 'ko.window.onMove'
+    window.stash.set 'bounds' window.win.getBounds()
 
 clearListeners = ->
 
-    win.removeListener 'close' onClose
-    win.removeListener 'move'  onMove
-    win.webContents.removeAllListeners 'devtools-opened'
-    win.webContents.removeAllListeners 'devtools-closed'
+    #win.removeListener 'close' onClose
+    #win.removeListener 'move'  onMove
+    #win.webContents.removeAllListeners 'devtools-opened'
+    #win.webContents.removeAllListeners 'devtools-closed'
 
 onClose = ->
 
@@ -265,10 +269,6 @@ window.onload = ->
 
     split.resized()
     info.reload()
-    win.on 'close' onClose
-    win.on 'move'  onMove
-    win.webContents.on 'devtools-opened' -> window.stash.set 'devTools' true
-    win.webContents.on 'devtools-closed' -> window.stash.set 'devTools'
 
 # 00000000   00000000  000       0000000    0000000   0000000
 # 000   000  000       000      000   000  000   000  000   000
@@ -291,7 +291,7 @@ reloadWin = ->
 window.onresize = ->
 
     split.resized()
-    window.stash.set 'bounds' win.getBounds()
+    window.stash.set 'bounds' window.win.getBounds()
     if window.stash.get 'centerText' false
         editor.centerText true, 200
 
@@ -310,7 +310,7 @@ post.on 'split' (s) ->
 
 toggleCenterText = ->
 
-    if window.state.get "invisibles|#{editor.currentFile}", false
+    if window.state.get "invisibles|#{editor.currentFile}" false
         editor.toggleInvisibles()
         restoreInvisibles = true
 
@@ -402,8 +402,7 @@ window.onfocus = (event) ->
         else
             split.focus 'commandline-editor'
 
-window.setLastFocus = (name) ->
-    window.lastFocus = name
+window.setLastFocus = (name) -> window.lastFocus = name
 
 # 000   000  00000000  000   000
 # 000  000   000        000 000

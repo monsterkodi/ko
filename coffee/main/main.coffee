@@ -6,7 +6,7 @@
 000   000  000   000  000  000   000
 ###
 
-{ _, app, args, empty, filelist, first, fs, kolor, noon, post, prefs, slash, store, udp, valid, win } = require 'kxk'
+{ _, app, args, empty, filelist, first, fs, klog, kolor, noon, post, prefs, slash, store, udp, valid, win } = require 'kxk'
 
 # post.debug()
 # log.slog.debug = true
@@ -79,12 +79,12 @@ class Main extends app
     @: (openFiles) ->
         
         super
+            pkg:        pkg
             dir:        __dirname
             dirs:       ['../' 
                          '../browser' '../commandline' '../commands' '../editor' '../editor/actions'
                          '../git' '../main' '../tools' '../win']
-            pkg:        pkg
-            shortcut:   'Alt+F1'
+            shortcut:   'CmdOrCtrl+F1'
             index:      '../index.html'
             icon:       '../../img/app.ico'
             tray:       '../../img/menu@2x.png'
@@ -177,7 +177,7 @@ class Main extends app
     # 000   000  000          000     000  000   000  000  0000  
     # 000   000   0000000     000     000   0000000   000   000  
     
-    onMenuAction: (action, arg) =>
+    onMenuAction_OLD: (action, arg) =>
 
         switch action
             when 'Cycle Windows'    then @activateNextWindow arg
@@ -418,6 +418,9 @@ class Main extends app
         return if disableSnap
         frameSize = 6
         wb = event.sender.getBounds()
+        
+        klog 'ko.main.onResizeWin'
+        
         for w in wins()
             continue if w == event.sender
             b = w.getBounds()
@@ -516,7 +519,7 @@ class Main extends app
                 if toSave == 0
                     global.state.save()
                     @exitApp()
-            'delay'
+                'delay'
         else
             global.state.save()
             
