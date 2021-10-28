@@ -6,7 +6,7 @@
 000  000   000  0000000    00000000  000   000  00000000  000   000
 ###
 
-{ _, empty, filter, fs, kerror, klog, matchr, post, slash, valid } = require 'kxk'
+{ _, empty, filter, kerror, klog, matchr, post, slash, valid } = require 'kxk'
 
 Walker   = require '../tools/walker'
 forkfunc = require '../tools/forkfunc'
@@ -331,6 +331,8 @@ class Indexer
 
     indexFile: (file, opt) ->
         
+        # klog 'indexFile' file
+        
         @removeFile file if opt?.refresh
 
         if @files[file]?
@@ -345,11 +347,9 @@ class Indexer
         isCpp = fileExt in ['cpp' 'cc' 'c' 'frag' 'vert']
         isHpp = fileExt in ['hpp' 'h' ]
 
-        fs.readFile file, 'utf8' (err, data) =>
+        slash.readText file, (text) =>
             
-            return kerror "can't index #{file}" err if not empty err
-            
-            lines = data.split /\r?\n/
+            lines = text.split /\r?\n/
             
             fileInfo =
                 lines: lines.length
@@ -363,7 +363,7 @@ class Indexer
             if isHpp or isCpp
                 
                 indexHpp = new IndexHpp
-                parsed = indexHpp.parse data
+                parsed = indexHpp.parse text
                 funcAdded = not empty(parsed.classes) or not empty(parsed.funcs)
                 
                 for clss in parsed.classes

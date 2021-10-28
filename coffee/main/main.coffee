@@ -17,7 +17,7 @@ electron = require 'electron'
 Navigate = require './navigate'
 Indexer  = require './indexer'
 
-{ BrowserWindow, clipboard, dialog } = electron
+BrowserWindow = electron.BrowserWindow
 
 disableSnap   = false
 main          = undefined
@@ -90,6 +90,7 @@ class Main extends app
             tray:       '../../img/menu@2x.png'
             about:      '../../img/about.png'
             aboutDebug: false
+            saveBounds: false
             onShow:     -> main.onShow()
             onOtherInstance: (args, dir) -> main.onOtherInstance args, dir
             width:      1000
@@ -511,15 +512,16 @@ class Main extends app
     quit: =>
 
         toSave = wins().length
-
+        klog 'ko.quit' toSave
         if toSave
-            post.toWins 'saveStash'
             post.on 'stashSaved' =>
                 toSave -= 1
+                klog 'ko.quit stashSaved' toSave 
                 if toSave == 0
                     global.state.save()
                     @exitApp()
-                'delay'
+            post.toWins 'saveStash'
+            'delay'
         else
             global.state.save()
             
@@ -541,8 +543,6 @@ electron.app.on 'open-file' (event, file) ->
             main.createWindowWithFile file:file
         
     event.preventDefault()
-
-electron.app.on 'window-all-closed' -> log 'window-all-closed'
 
 # 000   000  0000000    00000000     
 # 000   000  000   000  000   000    

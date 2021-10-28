@@ -6,7 +6,7 @@
  0000000    0000000      000      0000000 
 ###
 
-{ post, clamp, _ } = require 'kxk'
+{ _, clamp, post } = require 'kxk'
 
 Command = require '../commandline/command'
 
@@ -16,7 +16,7 @@ class Goto extends Command
         
         super commandline
         
-        @names = ['goto', 'selecto']
+        @names = ['goto' 'selecto']
 
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -30,7 +30,7 @@ class Goto extends Command
         @showItems @listItems() 
         @select 0
         @positionList()
-        text: @commandList.line(0)
+        text: @commandList?.line(0) ? ''
         select: true
      
     # 000      000   0000000  000000000  000  000000000  00000000  00     00   0000000

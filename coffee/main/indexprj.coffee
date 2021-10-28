@@ -6,14 +6,14 @@
 000  000   000  0000000    00000000  000   000  000        000   000   0000000     
 ###
 
-{ walkdir, slash, empty, noon, fs } = require 'kxk'
-
-ignore = require 'ignore'
-File = require '../tools/file'
+ignore  = require 'ignore'
+slash   = require 'kslash'
+walkdir = require 'walkdir'
 
 shouldIndex = (path, stat) ->
     
-    if slash.ext(path) in File.sourceFileExtensions
+    exts = [ 'coffee' 'styl' 'pug' 'md' 'noon' 'txt' 'json' 'sh' 'py' 'cpp' 'cc' 'c' 'cs' 'h' 'hpp' 'js' ]
+    if slash.ext(path) in exts
         if stat.size > 654321
             return false
         else
@@ -24,8 +24,9 @@ indexKoFiles = (kofiles, info) ->
     
     for kofile in kofiles
         
+        noon = require 'noon'
         kodata = noon.load kofile
-        return if empty kodata.index
+        return if not kodata.index
         
         for dir,cfg of kodata.index
             
@@ -34,7 +35,7 @@ indexKoFiles = (kofiles, info) ->
                 no_return: true
                 
             ign = ignore()
-            ign.add cfg.ignore if not empty cfg.ignore
+            ign.add cfg.ignore if cfg.ignore
                         
             absDir = slash.join slash.dir(kofile), dir
             
@@ -73,9 +74,9 @@ indexProject = (file) ->
     walkdir.sync dir, opt, (path, stat) ->
         
         addIgnores = (gitignore) -> 
-            gitign = fs.readFileSync gitignore, 'utf8'
+            gitign = slash.readText gitignore
             gitign = gitign.split /\r?\n/
-            gitign = gitign.filter (i) -> not empty(i) and not i.startsWith "#"
+            gitign = gitign.filter (i) -> i?.startsWith? and not i.startsWith "#"
             gitdir = slash.dir gitignore
             if not slash.samePath gitdir, dir
                 gitign = gitign.map (i) -> 

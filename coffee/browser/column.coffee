@@ -200,7 +200,7 @@ class Column
             clearTimeout @browser.springLoadTimer
             delete @browser.springLoadTarget
             if row = @browser.rowAtPos d.pos
-                if row.item.type == 'dir'
+                if row.item?.type == 'dir'
                     @browser.springLoadTimer = setTimeout onSpringLoadTimeout, 1000
                     @browser.springLoadTarget = row.item.file
             
@@ -226,9 +226,11 @@ class Column
             delete @dragStartRow
             
             if row = @browser.rowAtPos d.pos
+                klog 'got row' row
                 column = row.column
-                target = row.item.file
+                target = row.item?.file
             else if column = @browser.columnAtPos d.pos
+                klog 'got column' column
                 target = column.parent?.file
             else
                 klog 'no drop target'
@@ -238,10 +240,13 @@ class Column
                 
             if column == @browser.shelf 
                 if target and (e.ctrlKey or e.shiftKey or e.metaKey or e.altKey)
+                    klog 'drop into shelf item'
                     @browser.dropAction action, files, target
                 else
+                    klog 'add to shelf'
                     @browser.shelf.addFiles files, pos:d.pos
             else
+                klog 'drop into folder column' target
                 @browser.dropAction action, files, target
         else
             if e.button == 0
@@ -388,8 +393,9 @@ class Column
     
     rowIndexAtPos: (pos) ->
         dy = pos.y - @content.getBoundingClientRect().top
-        if dy >= 0
-            Math.floor dy/@rowHeight()
+        rh = @rowHeight()
+        if dy >= 0 and rh > 0
+            Math.floor dy/rh
         else
             -1            
     

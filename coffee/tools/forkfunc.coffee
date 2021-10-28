@@ -14,11 +14,10 @@ if module.parent
     # 000 0 000  000   000  000  000  0000
     # 000   000  000   000  000  000   000
 
-    { childp, slash, args } = require 'kxk'
-    
     forkfunc = (file, args..., callback) ->
         
         if /^[.]?\.\//.test file
+            slash   = require 'kslash'
             stack   = new Error().stack.split /\r\n|\n/
             regx    = /\(([^\)]*)\)/
             match   = regx.exec stack[3]
@@ -26,6 +25,7 @@ if module.parent
             file    = slash.join dirname, file
             
         try
+            childp = require 'child_process'
             cp = childp.fork __filename
             
             onExit = ->

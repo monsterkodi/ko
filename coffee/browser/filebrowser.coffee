@@ -280,6 +280,8 @@ class FileBrowser extends Browser
 
     onFileIndexed: (file, info) =>
  
+        # klog 'onFileIndexed' file
+        
         @srcCache[file] = info
  
         if file == @lastUsedColumn()?.parent?.file

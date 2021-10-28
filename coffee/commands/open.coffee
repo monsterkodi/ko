@@ -6,7 +6,7 @@
  0000000   000        00000000  000   000
 ###
 
-{ post, slash, empty, valid, _ } = require 'kxk'
+{ _, empty, post, slash, valid } = require 'kxk'
   
 Projects  = require '../tools/projects'
 File      = require '../tools/file'
@@ -188,16 +188,17 @@ class Open extends Command
             items.push item
             @lastFileIndex = 0
                 
-        for file in @files
-            
-            rel = relative file, @dir
-                        
-            if rel.length
-                item = Object.create null
-                item.line = iconSpan file
-                item.text = rel
-                item.file = file
-                items.push item
+        if valid @files
+            for file in @files
+                
+                rel = relative file, @dir
+                            
+                if rel.length
+                    item = Object.create null
+                    item.line = iconSpan file
+                    item.text = rel
+                    item.file = file
+                    items.push item
 
         items = @weightedItems items, opt
         items = _.uniqBy items, (o) -> o.text
@@ -229,9 +230,9 @@ class Open extends Command
         else
             'unhandled'
 
-    showFirst: () ->
+    showFirst: ->
         
-        if @commandList and @selected == @commandList.meta.metas.length - 1
+        if @commandList and @selected == @commandList.meta?.metas?.length - 1
             @showItems @listItems()
             @select 0
         else

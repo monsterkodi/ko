@@ -92,6 +92,8 @@ class Window extends win
         post.emit 'restore'
         editor.focus()
 
+    onMoved: (bounds) => window.stash.set 'bounds' bounds
+        
     # 00     00  00000000  000   000  000   000      0000000    0000000  000000000  000   0000000   000   000
     # 000   000  000       0000  000  000   000     000   000  000          000     000  000   000  0000  000
     # 000000000  0000000   000 0 000  000   000     000000000  000          000     000  000   000  000 0 000
@@ -170,10 +172,10 @@ post.setMaxListeners 20
 
 saveStash = ->
 
+    klog 'window.saveStash'
     post.emit 'stash'
     editor.saveScrollCursorsAndSelections()
-    window.stash.save()
-    post.toMain 'stashSaved'
+    window.stash.save()  
 
 restoreWin = ->
 
@@ -236,18 +238,6 @@ window.editorWithName = (n) ->
 # 000   000  000  0000  000       000      000   000       000  000
 #  0000000   000   000   0000000  0000000   0000000   0000000   00000000
 
-onMove = -> 
-
-    klog 'ko.window.onMove'
-    window.stash.set 'bounds' window.win.getBounds()
-
-clearListeners = ->
-
-    #win.removeListener 'close' onClose
-    #win.removeListener 'move'  onMove
-    #win.webContents.removeAllListeners 'devtools-opened'
-    #win.webContents.removeAllListeners 'devtools-closed'
-
 onClose = ->
 
     post.emit 'saveChanges'
@@ -256,8 +246,6 @@ onClose = ->
 
     if Browser.getAllWindows().length > 1
         window.stash.clear()
-
-    clearListeners()
 
 #  0000000   000   000  000       0000000    0000000   0000000
 # 000   000  0000  000  000      000   000  000   000  000   000
@@ -290,8 +278,9 @@ reloadWin = ->
 
 window.onresize = ->
 
+    klog 'ko.window.onresize'
     split.resized()
-    window.stash.set 'bounds' window.win.getBounds()
+    window.win.onMoved window.win.getBounds()
     if window.stash.get 'centerText' false
         editor.centerText true, 200
 
