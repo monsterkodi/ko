@@ -45,7 +45,7 @@ class Browse extends Command
 
     start: (action) ->
 
-        # klog 'browse.start' action
+        klog 'browse.start' action
         
         @browser.start()
 
@@ -54,7 +54,7 @@ class Browse extends Command
                 @browser.navigateToFile window.editor.currentFile
             else
                 post.emit 'filebrowser' 'loadItem' file:process.cwd(), type:'dir'
-            @browser.focus()
+            @browser.focus force:true
 
         name = action
         name = 'browse' if action == 'shelf'
@@ -226,8 +226,9 @@ class Browse extends Command
                     return
             when 'enter'
                 @execute @getText()
-                focusBrowser = => @browser.focus()
-                setTimeout focusBrowser, 100
+                # focusBrowser = => @browser.focus()
+                # setTimeout focusBrowser, 100
+                setTimeout @browser.focus, 100
                 return
         'unhandled'
 
@@ -316,7 +317,8 @@ class Browse extends Command
 
     onBrowserItemActivated: (item) =>
 
-        # klog 'onBrowserItemActivated' item
+        klog 'onBrowserItemActivated' item
+        
         if not @isActive()
             @commandline.command?.onBrowserItemActivated? item
             return

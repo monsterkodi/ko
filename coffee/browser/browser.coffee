@@ -6,7 +6,7 @@
 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 ###
 
-{ childp, clamp, elem, fs, kerror, kpos, os, setStyle, slash } = require 'kxk'
+{ childp, clamp, elem, fs, kerror, klog, kpos, os, setStyle, slash } = require 'kxk'
 
 Column = require './column'
 flex   = require '../win/flex/flex'
@@ -96,7 +96,8 @@ class Browser extends event
             nuidx = clamp 0, @numCols()-1, nuidx
             return if nuidx == index
             if @columns[nuidx].numRows()
-                @columns[nuidx].focus().activeRow().activate()
+                klog 'browser.navigate focus' @columns[nuidx].name() 
+                @columns[nuidx].focus()?.activeRow()?.activate()
             
         @updateColumnScrolls()
         @
@@ -108,7 +109,7 @@ class Browser extends event
     # 000        0000000    0000000   0000000   0000000   
     
     focus: (opt) => 
-        @lastDirColumn()?.focus opt
+        @lastDirOrSrcColumn()?.focus opt
         @
     
     focusColumn: -> 

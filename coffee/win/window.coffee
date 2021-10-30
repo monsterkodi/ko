@@ -69,7 +69,7 @@ class Window extends win
         cwd         = window.cwd         = new CWD()
     
         window.textEditor = window.focusEditor = editor
-        window.lastFocus = editor.name
+        window.setLastFocus editor.name
     
         restoreWin()
         scheme.set prefs.get 'scheme' 'dark'
@@ -278,7 +278,7 @@ reloadWin = ->
 
 window.onresize = ->
 
-    klog 'ko.window.onresize'
+    # klog 'ko.window.onresize'
     split.resized()
     window.win.onMoved window.win.getBounds()
     if window.stash.get 'centerText' false
@@ -349,10 +349,10 @@ resetFontSize = ->
 
 addToShelf = ->
 
-    fileBrowser = window.filebrowser
     return if window.lastFocus == 'shelf'
-    if window.lastFocus.startsWith fileBrowser.name
-        path = fileBrowser.columnWithName(window.lastFocus).activePath()
+    fb = window.filebrowser
+    if window.lastFocus.startsWith fb.name
+        path = fb.columnWithName(window.lastFocus).activePath()
     else
         path = editor.currentFile
     post.emit 'addToShelf' path
@@ -391,7 +391,9 @@ window.onfocus = (event) ->
         else
             split.focus 'commandline-editor'
 
-window.setLastFocus = (name) -> window.lastFocus = name
+window.setLastFocus = (name) -> 
+    klog 'setLastFocus' name
+    window.lastFocus = name
 
 # 000   000  00000000  000   000
 # 000  000   000        000 000

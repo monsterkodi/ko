@@ -6,7 +6,7 @@
  0000000   000        00000000  000   000
 ###
 
-{ _, empty, post, slash, valid } = require 'kxk'
+{ _, empty, klog, post, slash, valid } = require 'kxk'
   
 Projects  = require '../tools/projects'
 File      = require '../tools/file'
@@ -261,6 +261,10 @@ class Open extends Command
     start: (name) -> 
         
         @setName name
+        
+        klog 'open.start' name
+        klog 'open.start @commandline.lastFocus' @commandline.lastFocus
+        klog 'open.start window.lastFocus' window.lastFocus
         
         if @commandline.lastFocus == 'commandline-editor' == window.lastFocus
             

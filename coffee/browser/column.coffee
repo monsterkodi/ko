@@ -250,7 +250,7 @@ class Column
                 @browser.dropAction action, files, target
         else
             if e.button == 0
-                @focus activate:false
+                @focus activate:false force:true
             
             if row = @row e.target
                 if row.isSelected()
@@ -341,6 +341,12 @@ class Column
         
     isDir:  -> @parent?.type == 'dir' 
     isFile: -> @parent?.type == 'file' 
+    isSrc:  -> 
+        if @parent?.type == 'file'
+            if @items[0]?.type in ['class' 'func']
+                klog 'isSrc!'
+                return true
+        false
         
     isEmpty: -> empty @parent
     clear:   ->
@@ -407,9 +413,14 @@ class Column
     
     hasFocus: -> @div.classList.contains 'focus'
 
-    focus: (opt={}) ->
+    focus: (opt) ->
+        
+        opt ?= {}
+        klog 'focus name' @name(), 'last' window.lastFocus, opt
                 
-        if not @activeRow() and @numRows() and opt?.activate != false
+        return @ if not opt.force and not window.lastFocus.startsWith @browser.name
+        
+        if not @activeRow() and @numRows() and opt.activate != false
             @rows[0].setActive()
           
         @div.focus()
@@ -420,7 +431,10 @@ class Column
     onFocus: => @div.classList.add 'focus'
     onBlur:  => @div.classList.remove 'focus'
 
-    focusBrowser: -> @browser.focus()
+    focusBrowser: -> 
+    
+        klog 'focusBrowser'
+        @browser.focus force:true
     
     # 00     00   0000000   000   000   0000000  00000000  
     # 000   000  000   000  000   000  000       000       

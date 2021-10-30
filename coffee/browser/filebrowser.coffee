@@ -32,7 +32,6 @@ class FileBrowser extends Browser
         post.on 'file'           @onFile
         post.on 'browse'         @browse
         post.on 'filebrowser'    @onFileBrowser
-        post.on 'navigateToFile' @navigateToFile
 
         post.on 'gitStatus'      @onGitStatus
         post.on 'fileIndexed'    @onFileIndexed
@@ -106,20 +105,29 @@ class FileBrowser extends Browser
         Math.max -1, col-2
 
     browse: (file, opt) => 
-            
+
+        klog 'browse' file, opt
         if file then @loadItem @fileItem(file), opt
         
-    onFile: (file) => if file and @flex then @navigateToFile file
+    onFile: (file) => 
+    
+        klog 'onFile' file
+        if file and @flex then @navigateToFile file
     
     navigateToFile: (file) =>
 
+        klog 'navigateToFile' file
+        
         lastPath = @lastDirColumn()?.path()
         
         file = slash.path file
 
         if file == lastPath or file == @lastColumnPath() or slash.isRelative file
+            klog 'navigateToFile SKIP already loaded' file
             return
 
+        klog 'lastColumnPath' @lastColumnPath()
+            
         col = @sharedColumnIndex file
         
         filelist = slash.pathlist file
@@ -145,7 +153,6 @@ class FileBrowser extends Browser
                     opt = {}
                     if index < paths.length-1
                         opt.active = paths[index+1]
-                    # klog 'navigateToFile'
                     @loadDirItem item, col+1+index, opt
                     
         if col = @lastDirColumn()
@@ -159,7 +166,7 @@ class FileBrowser extends Browser
         @srcCache = {}
 
         if @lastUsedColumn()
-            @navigateToFile @lastUsedColumn()?.path()
+            @navigateToFile @lastUsedColumn().path()
                 
     # 000  000000000  00000000  00     00  
     # 000     000     000       000   000  
@@ -199,6 +206,7 @@ class FileBrowser extends Browser
                 @loadDirItem @fileItem(slash.dir(item.file)), 0, opt
 
         if opt.focus
+            klog 'loadItem focus columns[0]' 
             @columns[0]?.focus()
             
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000
@@ -381,6 +389,7 @@ class FileBrowser extends Browser
         
         if opt.focus != false and empty(document.activeElement) and empty($('.popup')?.outerHTML)
             if lastColumn = @lastDirColumn()
+                klog 'loadDirItems lastColumn.focus'
                 lastColumn.focus()
                 
         opt.cb? column:col, item:item
@@ -426,6 +435,14 @@ class FileBrowser extends Browser
             else
                 return lastColumn.prevColumn()
 
+    lastDirOrSrcColumn: ->
+
+        if lastColumn = @lastUsedColumn()
+            if lastColumn.isDir() or lastColumn.isSrc()
+                return lastColumn
+            else
+                return lastColumn.prevColumn()
+                
     onBackspaceInColumn: (column) ->
 
         column.backspaceSearch()
@@ -491,6 +508,7 @@ class FileBrowser extends Browser
         if @shelfSize < 1
             @setShelfSize 200
         else
+            klog 'toggleShelf lastUsedColumn.focus'
             @lastUsedColumn()?.focus()
             @setShelfSize 0
             

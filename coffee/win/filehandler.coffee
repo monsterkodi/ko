@@ -112,7 +112,6 @@ class FileHandler
                             @openFiles ofiles, options
                 return
                 
-    
             if files.length == 0
                 return []
     

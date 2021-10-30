@@ -6,7 +6,7 @@
 000   000   0000000   00     00
 ###
 
-{ $, _, app, elem, empty, keyinfo, post, slash, stopEvent } = require 'kxk'
+{ $, _, elem, empty, keyinfo, post, slash, stopEvent } = require 'kxk'
 
 Syntax    = require '../editor/syntax'
 electron  = require 'electron'
@@ -104,7 +104,10 @@ class Row
             
         @div.classList.add 'active'
         
-        window.setLastFocus @column.name()
+        # klog 'setActive setLastFocus? ' @browser.name, window.lastFocus 
+        # if window.lastFocus.startsWith @browser.name
+            # klog 'setActive setLastFocus! ' @column.name()
+            # window.setLastFocus @column.name()
         
         if opt?.scroll != false
             @column.scroll.toIndex @index()            
