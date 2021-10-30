@@ -6,45 +6,39 @@
 000   000  00000000   00000 00
 ###
 
-{ _, kerror, kstr, slash, valid } = require 'kxk'
+kxk = require 'kxk'
+{ _, kerror, klog, kstr, slash, valid } = kxk
+requireLike = require 'require-like'
 
 requireRegExp = /^(\s*\{.+\})\s*=\s*require\s+([\'\"][\.\/\w]+[\'\"])/
-mathRegExp = /^(\s*\{.+\})\s*=\s*(Math)\s*$/
+mathRegExp  = /^(\s*\{.+\})\s*=\s*(Math)\s*$/
 
 moduleKeys = (moduleName, file) ->
     
-    
-    oldWindow = _.clone window
-    oldModule = _.clone module.paths
-    
-    if pkgDir = slash.pkg file
-        nodeModules = slash.unslash slash.join pkgDir, 'node_modules'
-        if nodeModules not in module.paths
-            module.paths.push nodeModules
-         
-    if moduleName.startsWith '.'
-        fileDir = slash.resolve(slash.join slash.dir(file), moduleName).replace '/coffee/' '/js/'
-        fileDir = slash.unslash slash.dir fileDir
-        if fileDir not in module.paths
-            module.paths.unshift fileDir
-        moduleName = slash.file moduleName
-         
+    # klog 'file' file
+    # if moduleName.startsWith '.'
+        # moduleName = slash.resolve(slash.join slash.dir(file), moduleName).replace '/coffee/' '/js/'
+
     try
-        required = require moduleName
+        if moduleName.endsWith 'kxk'
+            required = kxk
+        else
+            mRequire = requireLike file, true
+            required = mRequire moduleName
+        
     catch err
-        error "can't require #{moduleName} #{err}"
-        
-    window       = oldWindow
-    module.paths = oldModule
-        
+        error "can't require #{moduleName}" err
+    
     keys = []
-    if required.prototype 
-        keys = Object.keys required.prototype
-    else if _.isFunction required.getOwnPropertyNames
-        keys = required.getOwnPropertyNames()
-    else if _.isObject required
-        keys = Object.keys required
-    # klog 'moduleKeys' file, moduleName, keys
+    if required
+        if required.prototype 
+            keys = Object.keys required.prototype
+        else if _.isFunction required.getOwnPropertyNames
+            keys = required.getOwnPropertyNames()
+        else if _.isObject required
+            keys = Object.keys required
+            
+    if moduleName.endsWith 'kxk' then keys.push 'app' # omg! what an ugly hack :-)
     keys
     
 req = (file, lines, editor) ->

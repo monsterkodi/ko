@@ -6,7 +6,7 @@
 000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
 ###
 
-{ $, _, clamp, elem, empty, kerror, kstr, last, matchr, stopEvent } = require 'kxk'
+{ $, _, clamp, elem, empty, kerror, last, matchr, stopEvent } = require 'kxk'
 
 Indexer = require '../main/indexer'
 event   = require 'events'
@@ -58,12 +58,12 @@ class Autocomplete extends event
     
     parseModule: (line) ->
         
-        if @moduleRegExp.test line
-            match = line.match @moduleRegExp
-            moduleName = kstr.strip match[2], "'"
-            for key in req.moduleKeys moduleName, @editor.currentFile
-                @mthdinfo[match[1]] ?= {}
-                @mthdinfo[match[1]][key] ?= 1
+        # if @moduleRegExp.test line
+            # match = line.match @moduleRegExp
+            # moduleName = kstr.strip match[2], "'"
+            # for key in req.moduleKeys moduleName, @editor.currentFile
+                # @mthdinfo[match[1]] ?= {}
+                # @mthdinfo[match[1]][key] ?= 1
     
         if @newRegExp.test line
             match = line.match @newRegExp

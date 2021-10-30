@@ -102,7 +102,7 @@ class Window extends win
     
     onMenuAction: (name, args) =>
     
-        klog 'ko.window.onMenuAction' name, args
+        # klog 'ko.window.onMenuAction' name, args
         
         if action = Editor.actionWithName name
             if action.key? and _.isFunction window.focusEditor[action.key]

@@ -6,7 +6,7 @@
 000       000  0000000  00000000  000   000  000   000  000   000  0000000    0000000  00000000  000   000
 ###
 
-{ _, empty, filelist, first, kerror, post, prefs, reversed, slash, valid } = require 'kxk'
+{ _, empty, filelist, first, kerror, klog, post, prefs, reversed, slash, valid } = require 'kxk'
 
 File     = require '../tools/file'
 electron = require 'electron'
@@ -86,32 +86,44 @@ class FileHandler
     
     openFiles: (ofiles, options) => # called from file dialog, open command and browser
     
+        options ?= {}
+        
         if ofiles?.length
     
             files = filelist ofiles, ignoreHidden: false
+            
+            maxTabs = prefs.get 'maximalNumberOfTabs' 8
+            
+            if not options.newWindow
+                files = files[0...maxTabs]
     
-            if files.length >= 10
-                answer = dialog.showMessageBox
+            if files.length >= Math.max(11, maxTabs) and not options.skipCheck
+                window.win.messageBox
                     type:       'warning'
                     buttons:    ['Cancel' 'Open All']
-                    defaultId:  0
+                    defaultId:  1
                     cancelId:   0
                     title:      'A Lot of Files Warning'
                     message:    "You have selected #{files.length} files."
                     detail:     'Are you sure you want to open that many files?'
-                return if answer != 1
+                    cb: (answer) => 
+                        if answer == 1 
+                            options.skipCheck = true
+                            @openFiles ofiles, options
+                return
+                
     
             if files.length == 0
                 return []
     
             window.stash.set 'openFilePath' slash.dir files[0]
     
-            if not options?.newWindow and not options?.newTab
+            if not options.newWindow and not options.newTab
                 file = slash.resolve files.shift()
                 @loadFile file
     
             for file in files
-                if options?.newWindow
+                if options.newWindow
                     post.toMain 'newWindowWithFile' file
                 else
                     post.emit 'newTabWithFile' file
@@ -268,25 +280,28 @@ class FileHandler
     
         dir = slash.dir editor.currentFile if editor?.currentFile
         dir ?= slash.resolve '.'
-        dialog.showOpenDialog(
-            title: "Open File"
-            defaultPath: window.stash.get 'openFilePath' dir
-            properties: ['openFile' 'multiSelections']).then (result) =>
-                if not result.cancelled and valid result.filePaths
-                    post.emit 'openFiles' result.filePaths, opt
+        window.win?.openFileDialog(
+            title: 'Open File'
+            defaultPath: window.stash.get('openFilePath' dir)
+            properties: ['openFile' 'multiSelections'] 
+            cb: (files) => post.emit 'openFiles' files, opt
+            )
                 
-    #  0000000   0000000   000   000  00000000        00000000  000  000      00000000     0000000    0000000  
-    # 000       000   000  000   000  000             000       000  000      000         000   000  000       
-    # 0000000   000000000   000 000   0000000         000000    000  000      0000000     000000000  0000000   
-    #      000  000   000     000     000             000       000  000      000         000   000       000  
-    # 0000000   000   000      0      00000000        000       000  0000000  00000000    000   000  0000000   
+    #  0000000   0000000   000   000  00000000        00000000  000  000      00000000          0000000    0000000  
+    # 000       000   000  000   000  000             000       000  000      000              000   000  000       
+    # 0000000   000000000   000 000   0000000         000000    000  000      0000000          000000000  0000000   
+    #      000  000   000     000     000             000       000  000      000              000   000       000  
+    # 0000000   000   000      0      00000000        000       000  0000000  00000000         000   000  0000000   
     
     saveFileAs: =>
     
-        defaultPath = slash.unslash editor?.currentDir()
-        dialog.showSaveDialog(title:'Save File As' defaultPath:defaultPath).then (result) =>
-            if not result.cancelled and result.filePath
-                @addToRecent result.filePath
-                @saveFile result.filePath
+        window.win?.saveFileDialog(
+            title: 'Save File As' 
+            defaultPath: slash.unslash editor?.currentDir()
+            cb: (file) =>
+                klog 'saveFileAs' file
+                @addToRecent file
+                @saveFile file
+            )
             
 module.exports = FileHandler

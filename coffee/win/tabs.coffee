@@ -6,7 +6,7 @@
    000     000   000  0000000    0000000
 ###
 
-{ $, _, drag, elem, empty, first, kerror, kpos, last, popup, post, slash, stopEvent } = require 'kxk'
+{ $, _, drag, elem, empty, first, kerror, kpos, last, popup, post, prefs, slash, stopEvent } = require 'kxk'
 
 Tab = require './tab'
 
@@ -192,7 +192,7 @@ class Tabs
 
     addTab: (file) ->
 
-        if @tabs.length > 4
+        if @tabs.length >= prefs.get 'maximalNumberOfTabs' 8
             for index in [0...@tabs.length]
                 if not @tabs[index].dirty
                     @closeTab @tabs[index]
