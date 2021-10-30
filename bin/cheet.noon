@@ -8,7 +8,7 @@ selection
     ⌘L          select more lines 
     ⌘⇧L         select less lines
     ⌥⌘B         select block boundary
-    ^⌥⌘B        select block content
+    ⌥B          select string, square- or curly-block content
     ⌘I          invert selection
     
 cursors

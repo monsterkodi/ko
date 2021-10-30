@@ -392,7 +392,7 @@ window.onfocus = (event) ->
             split.focus 'commandline-editor'
 
 window.setLastFocus = (name) -> 
-    klog 'setLastFocus' name
+    # klog 'setLastFocus' name
     window.lastFocus = name
 
 # 000   000  00000000  000   000

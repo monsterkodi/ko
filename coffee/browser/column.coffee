@@ -344,7 +344,6 @@ class Column
     isSrc:  -> 
         if @parent?.type == 'file'
             if @items[0]?.type in ['class' 'func']
-                klog 'isSrc!'
                 return true
         false
         
@@ -416,7 +415,7 @@ class Column
     focus: (opt) ->
         
         opt ?= {}
-        klog 'focus name' @name(), 'last' window.lastFocus, opt
+        # klog 'focus name' @name(), 'last' window.lastFocus, opt
                 
         return @ if not opt.force and not window.lastFocus.startsWith @browser.name
         

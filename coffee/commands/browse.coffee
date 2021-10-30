@@ -20,7 +20,7 @@ class Browse extends Command
         @cmdID    = 0
         @browser  = new FileBrowser $ 'browser'
         @commands = Object.create null
-        @names    = ['browse' 'Browse' 'shelf']
+        @names    = ['browse' 'Browse' 'shelf'] # Browse and shelf are hidden in commandline menu
 
         post.on 'file' @onFile
 
@@ -30,6 +30,7 @@ class Browse extends Command
 
     onFile: (file) =>
 
+        klog 'browse.onFile' file
         if @isActive() and @getText() != slash.tilde file
             @setText slash.tilde file
 
@@ -51,6 +52,7 @@ class Browse extends Command
 
         if action != 'shelf'
             if window.editor.currentFile? and slash.isFile window.editor.currentFile
+                @setText slash.tilde window.editor.currentFile
                 @browser.navigateToFile window.editor.currentFile
             else
                 post.emit 'filebrowser' 'loadItem' file:process.cwd(), type:'dir'
@@ -200,7 +202,7 @@ class Browse extends Command
 
     changed: (command) ->
 
-        klog 'browse.changed' command
+        # klog 'browse.changed' command
         text = @getText().trim()
         if not text.endsWith '/'
             @walker?.end()
@@ -226,9 +228,8 @@ class Browse extends Command
                     return
             when 'enter'
                 @execute @getText()
-                # focusBrowser = => @browser.focus()
-                # setTimeout focusBrowser, 100
-                setTimeout @browser.focus, 100
+                focusBrowser = => @browser.focus force:true
+                setTimeout focusBrowser, 100
                 return
         'unhandled'
 
@@ -313,11 +314,11 @@ class Browse extends Command
                 post.emit 'jumpToFile' file:cmd
                 return
 
-        kerror 'browse.execute -- unhandled', cmd
+        kerror 'browse.execute -- unhandled' cmd
 
     onBrowserItemActivated: (item) =>
 
-        klog 'onBrowserItemActivated' item
+        klog 'onBrowserItemActivated' item.type, item.file
         
         if not @isActive()
             @commandline.command?.onBrowserItemActivated? item

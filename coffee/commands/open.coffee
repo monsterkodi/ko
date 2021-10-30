@@ -318,20 +318,26 @@ class Open extends Command
         if @selected < 0 then return status:'failed'
             
         path = @commandList?.line @selected
-                    
+        
+        # klog 'open.execute' command, path
+        
         @hideList()
 
         if valid path
             
-            [file, pos] = slash.splitFilePos path
+            [file, pos] = slash.splitFilePos command
+            
+            klog 'open.execute' file, pos
             
             file = @resolvedPath path
             file = slash.joinFilePos file, pos
             
+            klog 'open.execute' file
+            
             if @name == 'new window'
                 post.toMain 'newWindowWithFile', file
             else
-                post.emit 'jumpToFile', file:file
+                post.emit 'jumpToFile' file:file
                         
             super file
                 
