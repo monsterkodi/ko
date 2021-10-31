@@ -6,7 +6,7 @@
    000     000   000  0000000    0000000
 ###
 
-{ $, _, drag, elem, empty, first, kerror, kpos, last, popup, post, prefs, slash, stopEvent } = require 'kxk'
+{ $, _, drag, elem, empty, filter, first, kerror, klog, kpos, last, popup, post, prefs, slash, stopEvent } = require 'kxk'
 
 Tab = require './tab'
 
@@ -87,10 +87,17 @@ class Tabs
 
     onDragStart: (d, event) =>
 
+        return 'skip' if event.target.classList.contains 'tab'
+        
+        if event.target.classList.contains 'tabstate'
+            # @dragTab?.togglePinned()
+            # delete @dragTab
+            return 'skip' 
+        
         @dragTab = @tab event.target
 
         return 'skip' if empty @dragTab
-        return 'skip' if event.button != 1
+        return 'skip' if event.button != 0
 
         @dragDiv = @dragTab.div.cloneNode true
         @dragTab.div.style.opacity = '0'
@@ -178,10 +185,16 @@ class Tabs
     onCloseOtherTabs: =>
 
         return if not @activeTab() # should not happen
-        keep = _.pullAt @tabs, @activeTab().index()
-        while @numTabs()
-            @tabs.pop().close()
-        @tabs = keep
+        # keep = _.pullAt @tabs, @activeTab().index()
+        # keep = filter @tabs, (t) => not t.pinned and t != @activeTab()
+        keep = filter @tabs, (t) => t.pinned or t == @activeTab()
+        clse = filter @tabs, (t) => not t.pinned and t != @activeTab()
+        klog 'closeOtherTabs' keep.length, close.length
+        # while @numTabs()
+            # @tabs.pop().close()
+        # @tabs = keep
+        for t in clse
+            @closeTab t
         @update()
 
     #  0000000   0000000    0000000          000000000   0000000   0000000
@@ -194,7 +207,7 @@ class Tabs
 
         if @tabs.length >= prefs.get 'maximalNumberOfTabs' 8
             for index in [0...@tabs.length]
-                if not @tabs[index].dirty
+                if not @tabs[index].dirty and not @tabs[index].pinned
                     @closeTab @tabs[index]
                     break
 
@@ -263,17 +276,21 @@ class Tabs
 
     stash: =>
 
-        files = ( t.file for t in @tabs )
-        files = files.filter (file) -> not file.startsWith 'untitled'
+        files  = ( t.file for t in @tabs )
+        pinned = ( t.pinned for t in @tabs )
+        files  = files.filter (file) -> not file.startsWith 'untitled'
 
         window.stash.set 'tabs',
             files:  files
+            pinned: pinned
             active: Math.min @activeTab()?.index(), files.length-1
 
     restore: =>
 
         active = window.stash.get 'tabs|active' 0
         files  = window.stash.get 'tabs|files'
+        pinned = window.stash.get 'tabs|pinned'
+        pinned ?= []
 
         return if empty files # happens when first window opens
 
@@ -283,6 +300,10 @@ class Tabs
             @addTab files.shift()
 
         @tabs[active]?.activate()
+        
+        for pi in 0...pinned.length
+            if pinned[pi]
+                @tabs[pi].togglePinned()
 
         @update()
 

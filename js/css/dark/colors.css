@@ -226,6 +226,12 @@ span.macro.macro,
 .tab.active {
   background: #222;
 }
+.tabstate {
+  stroke: #888;
+}
+.tabstate:hover {
+  background: #333;
+}
 #browser {
   background: #181818;
   border-color: #111;

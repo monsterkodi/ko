@@ -1,5 +1,5 @@
 name            ko
-version         0.325.0
+version         0.326.0
 description     text editor
 main            js/main/main.js
 repository      github:monsterkodi/ko

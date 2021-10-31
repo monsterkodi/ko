@@ -17,6 +17,7 @@ class Tab
     @: (@tabs, @file) ->
 
         @dirty = false
+        @pinned = false
         @div = elem class: 'tab' text: ''
         @tabs.div.appendChild @div
 
@@ -115,7 +116,16 @@ class Tab
         name = elem 'span' class:'name' html:render.line diss, charWidth:0
         @div.appendChild name
 
-        @div.appendChild elem 'span' class:'tabdrag'
+        html = ''
+        if @pinned
+            html = """
+            <svg width="100%" height="100%" viewBox="0 0 30 30">
+                <circle cx="15" cy="12" r="4" />
+                <line x1="15" y1="16"  x2="15"  y2="22" stroke-linecap="round"></line>
+            </svg>
+            """
+                
+        @div.appendChild elem class:'tabstate' html:html, click:@togglePinned
 
         if @file?
             diss = syntax.dissForTextAndSyntax slash.tilde(@file), 'ko'
@@ -156,6 +166,11 @@ class Tab
         if @dirty != dirty
             @dirty = dirty
             @update()
+        @
+        
+    togglePinned: =>
+        @pinned = not @pinned
+        @update()
         @
 
     # 00000000   00000000  000   000  00000000  00000000   000000000

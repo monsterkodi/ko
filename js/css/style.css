@@ -434,7 +434,8 @@ body {
 .tab:not(.active) {
   opacity: 0.5;
 }
-.tabdrag {
+.tabstate {
+  stroke-width: 2;
   height: 30px;
   width: 30px;
   position: absolute;

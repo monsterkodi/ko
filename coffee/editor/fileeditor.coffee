@@ -159,8 +159,8 @@ class FileEditor extends TextEditor
 
         s.main       = @state.main()
         s.cursors    = @state.cursors()    if @numCursors() > 1 or @cursorPos()[0] or @cursorPos()[1]
-        s.selections = @state.selections() if @numSelections()
-        s.highlights = @state.highlights() if @numHighlights()
+        s.selections = @state.selections() if @numSelections() and @numSelections() < 10
+        s.highlights = @state.highlights() if @numHighlights() and @numHighlights() < 10
 
         s.scroll = @scroll.scroll if @scroll.scroll
 
@@ -222,7 +222,7 @@ class FileEditor extends TextEditor
 
     jumpToFile: (opt) =>
 
-        klog 'jumpToFile' opt
+        klog 'jumpToFile' opt.type, opt.file
         
         window.tabs.activeTab true
 
