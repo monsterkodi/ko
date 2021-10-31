@@ -723,7 +723,8 @@ class TextEditor extends Editor
                 @selectNone()
                 return
             
-            when 'command+enter' 'ctrl+enter' 'f12' then @jumpToWord()
+            when 'command+enter' 'ctrl+enter' 'f12' 
+                if @name == 'editor' then return @jumpToWord()
 
         # klog 'texteditor' mod, key, combo, char                
             
@@ -734,7 +735,8 @@ class TextEditor extends Editor
             if action.combo == combo or action.accel == combo and os.platform() != 'darwin'
                 switch combo
                     when 'ctrl+a' 'command+a' then return @selectAll()
-                return 'unhandled' # why return here?
+                # return unhandled here because the action will be triggered via menuAction
+                return 'unhandled'
                 
             if action.accels? and os.platform() != 'darwin'
                 for actionCombo in action.accels

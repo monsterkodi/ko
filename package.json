@@ -1,6 +1,6 @@
 {
   "name": "ko",
-  "version": "0.328.0",
+  "version": "0.329.0",
   "description": "text editor",
   "main": "js/main/main.js",
   "repository": "github:monsterkodi/ko",

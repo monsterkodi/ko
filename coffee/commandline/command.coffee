@@ -382,7 +382,7 @@ class Command
         
     handleModKeyComboEvent: (mod, key, combo, event) -> 
         switch combo
-            when 'page up', 'page down'
+            when 'page up' 'page down'
                 if @commandList?
                     # return @select clamp 0, @commandList.numLines(), @selected+@commandList.maxLines*(combo=='page up' and -1 or 1)
                     return @select clamp 0, @commandList.numLines()-1, @selected+(@commandList.numFullLines()-1)*(combo=='page up' and -1 or 1)

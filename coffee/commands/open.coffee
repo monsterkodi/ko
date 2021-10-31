@@ -6,7 +6,7 @@
  0000000   000        00000000  000   000
 ###
 
-{ _, empty, klog, post, slash, valid } = require 'kxk'
+{ _, empty, post, slash, valid } = require 'kxk'
   
 Projects  = require '../tools/projects'
 File      = require '../tools/file'
@@ -262,9 +262,9 @@ class Open extends Command
         
         @setName name
         
-        klog 'open.start' name
-        klog 'open.start @commandline.lastFocus' @commandline.lastFocus
-        klog 'open.start window.lastFocus' window.lastFocus
+        # klog 'open.start' name
+        # klog 'open.start @commandline.lastFocus' @commandline.lastFocus
+        # klog 'open.start window.lastFocus' window.lastFocus
         
         if @commandline.lastFocus == 'commandline-editor' == window.lastFocus
             
@@ -327,12 +327,8 @@ class Open extends Command
             
             [file, pos] = slash.splitFilePos command
             
-            klog 'open.execute' file, pos
-            
             file = @resolvedPath path
             file = slash.joinFilePos file, pos
-            
-            klog 'open.execute' file
             
             if @name == 'new window'
                 post.toMain 'newWindowWithFile' file

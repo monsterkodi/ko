@@ -222,7 +222,7 @@ class FileEditor extends TextEditor
 
     jumpToFile: (opt) =>
 
-        # klog 'jumpToFile' opt.type, opt.file
+        # klog 'jumpToFile' opt
         
         window.tabs.activeTab true
 
@@ -233,8 +233,8 @@ class FileEditor extends TextEditor
             file += ':' + opt.col if opt.col
             post.emit 'newTabWithFile' file
 
-        else
-
+        else if window.lastFocus == 'editor'
+            
             [file, fpos] = slash.splitFilePos opt.file
             opt.pos = fpos
             opt.pos[0] = opt.col if opt.col
@@ -244,6 +244,10 @@ class FileEditor extends TextEditor
             opt.oldPos = @cursorPos()
             opt.oldFile = @currentFile
             window.navigate.gotoFilePos opt
+        else
+            file = slash.joinFileLine opt.file, opt.line, opt.col
+            # klog 'bypass navigation history' file
+            post.emit 'loadFile' file
 
     jumpTo: (word, opt) =>
 

@@ -6,7 +6,7 @@
 000   000  000   000      0      000   0000000   000   000     000     00000000
 ###
 
-{ _, clamp, post, prefs, slash } = require 'kxk'
+{ _, clamp, filter, post, prefs, slash } = require 'kxk'
 
 class Navigate
 
@@ -16,7 +16,7 @@ class Navigate
 
         post.onGet 'navigate' @onGet
         post.on 'navigate' @navigate
-        @filePositions = []
+        @filePositions = prefs.get 'filePositions' []
         @currentIndex = -1
         @navigating = false
 
@@ -47,6 +47,9 @@ class Navigate
 
         filePos = slash.tilde slash.joinFilePos file, pos
         
+        if @filePositions[-1]?.file == file and @filePositions[-1]?.pos[1] == pos[1]-1
+            @filePositions.pop()
+        
         @filePositions.push
             file:   file
             pos:    pos
@@ -54,9 +57,11 @@ class Navigate
             column: pos[0]
             name:   filePos
             text:   slash.file filePos
-            
-        while @filePositions.length > prefs.get 'navigateHistoryLength' 15
+
+        while @filePositions.length > prefs.get 'navigateHistoryLength' 100
             @filePositions.shift()
+            
+        prefs.set 'filePositions' @filePositions
 
     navigate: (opt) =>
 
@@ -68,22 +73,24 @@ class Navigate
 
             when 'backward'
                 return if not @filePositions.length
-                # klog '<<'  @filePositions.map (fp) -> fp.text
                 @currentIndex = clamp 0, Math.max(0,@filePositions.length-2), @currentIndex-1
                 @navigating = true
                 @loadFilePos @filePositions[@currentIndex], opt
 
             when 'forward'
                 return if not @filePositions.length
-                # klog '>>' @filePositions.map (fp) ->  fp.text
                 @currentIndex = clamp 0, @filePositions.length-1, @currentIndex+1
                 @navigating = true
                 @loadFilePos @filePositions[@currentIndex], opt
-
+                
             when 'delFilePos'
-                _.pullAllWith @filePositions, [opt.item], (a,b) ->
-                    a.file == b.file and a.line == b.line and a.column == b.column
 
+                opt.item.line ?= opt.item.pos?[1]+1
+
+                @filePositions = filter @filePositions, (f) -> f.file != opt.item.file or f.line != opt.item.line
+                @currentIndex = clamp 0, @filePositions.length-1, @currentIndex
+                post.toWins 'navigateHistoryChanged' @filePositions, @currentIndex
+                
             when 'addFilePos'
 
                 return if not opt?.file?.length

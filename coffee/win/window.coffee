@@ -70,10 +70,10 @@ class Window extends win
     
         window.textEditor = window.focusEditor = editor
         window.setLastFocus editor.name
-    
+
         restoreWin()
         scheme.set prefs.get 'scheme' 'dark'
-    
+
         terminal.on 'fileSearchResultChange' (file, lineChange) -> # sends changes to all windows
             post.toWins 'fileLineChanges' file, [lineChange]
     
@@ -81,7 +81,11 @@ class Window extends win
             return if changeInfo.foreign
             if changeInfo.changes.length
                 post.toOtherWins 'fileLineChanges' editor.currentFile, changeInfo.changes
-                navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
+                # klog 'window.editor.on.changed' changeInfo
+                if changeInfo.deletes == 1
+                    navigate.delFilePos file: editor.currentFile, pos: [0 changeInfo.changes[0].oldIndex]
+                else
+                    navigate.addFilePos file: editor.currentFile, pos: editor.cursorPos()
     
         s = window.stash.get 'fontSize' prefs.get 'editorFontSize' 19
         editor.setFontSize s if s

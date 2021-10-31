@@ -472,8 +472,8 @@ class Main extends app
             
     onOtherInstance: (args, dir) =>
 
-        log 'onOtherInstance dir:'  dir
-        log 'onOtherInstance args:' args
+        # log 'onOtherInstance dir:'  dir
+        # log 'onOtherInstance args:' args
         
         @activateOneWindow (win) ->
 
@@ -492,9 +492,9 @@ class Main extends app
                 if slash.exists fpath
                     files.push file
     
-            log 'onOtherInstance files' files
-                            
             post.toWin win.id, 'openFiles' files, newTab:true
+            win.show()
+            win.focus()
 
 
     reloadWin: (winID:, file:) =>
