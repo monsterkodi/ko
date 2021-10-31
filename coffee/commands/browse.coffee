@@ -6,7 +6,7 @@
 0000000    000   000   0000000   00     00  0000000   00000000
 ###
 
-{ $, clamp, empty, kerror, klog, post, slash } = require 'kxk'
+{ $, clamp, empty, kerror, post, slash } = require 'kxk'
 
 Command     = require '../commandline/command'
 FileBrowser = require '../browser/filebrowser'
@@ -30,7 +30,7 @@ class Browse extends Command
 
     onFile: (file) =>
 
-        klog 'browse.onFile' file
+        # klog 'browse.onFile' file
         if @isActive() and @getText() != slash.tilde file
             @setText slash.tilde file
 
@@ -46,7 +46,7 @@ class Browse extends Command
 
     start: (action) ->
 
-        klog 'browse.start' action
+        # klog 'browse.start' action
         
         @browser.start()
 
@@ -318,7 +318,7 @@ class Browse extends Command
 
     onBrowserItemActivated: (item) =>
 
-        klog 'onBrowserItemActivated' item.type, item.file
+        # klog 'onBrowserItemActivated' item.type, item.file
         
         if not @isActive()
             @commandline.command?.onBrowserItemActivated? item

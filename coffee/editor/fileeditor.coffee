@@ -6,7 +6,7 @@
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
 
-{ clamp, empty, fs, kerror, klog, kpos, popup, post, setStyle, slash, srcmap, stopEvent, valid } = require 'kxk'
+{ clamp, empty, fs, kerror, kpos, popup, post, setStyle, slash, srcmap, stopEvent, valid } = require 'kxk'
 
 TextEditor = require './texteditor'
 Syntax     = require './syntax'
@@ -222,7 +222,7 @@ class FileEditor extends TextEditor
 
     jumpToFile: (opt) =>
 
-        klog 'jumpToFile' opt.type, opt.file
+        # klog 'jumpToFile' opt.type, opt.file
         
         window.tabs.activeTab true
 

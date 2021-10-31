@@ -209,7 +209,7 @@ class Tabs
 
     addTab: (file) ->
 
-        klog 'addTab' file
+        # klog 'addTab' file
         
         if @tabs.length >= prefs.get 'maximalNumberOfTabs' 8
             for index in [0...@tabs.length]

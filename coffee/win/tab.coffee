@@ -6,7 +6,7 @@
    000     000   000  0000000
 ###
 
-{ elem, kerror, klog, post, slash, tooltip } = require 'kxk'
+{ elem, kerror, post, slash, tooltip } = require 'kxk'
 
 File    = require '../tools/file'
 render  = require '../editor/render'
@@ -212,8 +212,6 @@ class Tab
 
     finishActivation: ->
 
-        klog 'tab.finishActivation' @file
-        
         @setActive()
 
         if @state?

@@ -135,9 +135,9 @@ class FileBrowser extends Browser
             # klog 'navigateToFile SKIP already loaded' lastPath, @lastColumnPath()
             return
 
-        klog 'navigateToFile' file
-        klog 'navigateToFile' @lastColumnPath()
-        klog 'navigateToFile' @lastDirColumn()?.path()
+        # klog 'navigateToFile' file
+        # klog 'navigateToFile' @lastColumnPath()
+        # klog 'navigateToFile' @lastDirColumn()?.path()
             
         col = @sharedColumnIndex file
         
@@ -195,7 +195,7 @@ class FileBrowser extends Browser
         
     onFileBrowser: (action, item, arg) =>
 
-        klog 'onFileBrowser' action, item.type, arg
+        # klog 'onFileBrowser' action, item.type, arg
         switch action
             when 'loadItem'     then @loadItem     item, arg
             when 'activateItem' then @activateItem item, arg
@@ -217,7 +217,7 @@ class FileBrowser extends Browser
         clears all columns, loads the dir in column 0 and the file in column 1, if any
         ###
 
-        klog 'loadItem' item, opt
+        # klog 'loadItem' item, opt
         
         opt ?= active:'..' focus:true
         item.name ?= slash.file item.file
@@ -232,7 +232,7 @@ class FileBrowser extends Browser
                 @loadDirItem @fileItem(slash.dir(item.file)), 0, opt
 
         if opt.focus
-            klog 'loadItem focus columns[0]' 
+            # klog 'loadItem focus columns[0]' 
             @columns[0]?.focus()
             
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000
@@ -248,7 +248,7 @@ class FileBrowser extends Browser
         loads item in the column to the right of col while keeping the other columns
         ###
 
-        klog 'activateItem' item.type, item.file, col
+        # klog 'activateItem' item.type, item.file, col
         
         @clearColumnsFrom col+2 pop:true
 
