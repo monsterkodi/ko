@@ -722,20 +722,19 @@ class TextEditor extends Editor
                 @endStickySelection()
                 @selectNone()
                 return
-                # if @salterMode          then return @setSalterMode false
-                # if @numHighlights()     then return @clearHighlights()
-                # if @numCursors() > 1    then return @clearCursors()
-                # if @stickySelection     then return @endStickySelection()
-                # if @numSelections()     then return @selectNone()
             
             when 'command+enter' 'ctrl+enter' 'f12' then @jumpToWord()
 
+        # klog 'texteditor' mod, key, combo, char                
+            
         for action in Editor.actions
             
-            if action.combo == combo or action.accel == combo
+            # klog 'action' action
+            
+            if action.combo == combo or action.accel == combo and os.platform() != 'darwin'
                 switch combo
                     when 'ctrl+a' 'command+a' then return @selectAll()
-                return 'unhandled'
+                return 'unhandled' # why return here?
                 
             if action.accels? and os.platform() != 'darwin'
                 for actionCombo in action.accels
@@ -747,8 +746,11 @@ class TextEditor extends Editor
             continue if not action.combos?
             
             for actionCombo in action.combos
+                # klog 'texteditor actionCombo' action.key, actionCombo
                 if combo == actionCombo
+                    # klog 'combo match' combo, action.key, _.isFunction @[action.key]
                     if action.key? and _.isFunction @[action.key]
+                        # klog 'texteditor action.key' action.key
                         @[action.key] key, combo: combo, mod: mod, event: event
                         return
 

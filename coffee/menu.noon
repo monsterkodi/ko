@@ -168,7 +168,7 @@ Window
     Open Window List        alt+`
     -
     Toggle Menu             alt+m
-    Toggle Scheme           alt+i cmdctrl+i
+    Toggle Scheme           alt+i
     --
     Minimize                alt+cmdctrl+shift+m
     Maximize                alt+cmdctrl+m

@@ -74,7 +74,7 @@ module.exports =
         cursorMoves:
             name:  'Move Cursors To Start'
             combos: ['ctrl+home' 'ctrl+end' 'page up' 'page down' 'ctrl+shift+home' 
-                     'ctrl+shift+end' 'shift+page up' 'shift+page down']
+                     'ctrl+shift+end' 'shift+page up' 'shift+page down' 'alt+-' 'alt+=' 'alt+[' 'alt+]']
 
     #  0000000  00000000  000000000
     # 000       000          000
@@ -108,6 +108,12 @@ module.exports =
 
     cursorMoves: (key, info) ->
         extend = info?.extend ? 0 <= info?.mod.indexOf 'shift'
+
+        switch info.combo
+            when 'alt+-' then key = 'page up'
+            when 'alt+=' then key = 'page down'
+            when 'alt+[' then key = 'home'
+            when 'alt+]' then key = 'end'
         
         switch key
             when 'home'      then @singleCursorAtPos [0, 0], extend: extend

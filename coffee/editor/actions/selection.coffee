@@ -6,7 +6,7 @@
 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
 ###
 
-{ _, kerror, post } = require 'kxk'
+{ _, kerror, klog, post } = require 'kxk'
 
 module.exports =
     
@@ -26,8 +26,8 @@ module.exports =
         selectInverted:
             name:  'Invert Selection'
             text:  'selects all lines that have no cursors and no selections'
-            combo: 'command+shift+i'
-            accel: 'ctrl+shift+i'
+            combo: 'command+i'
+            accel: 'ctrl+i'
             
         selectNextHighlight:
             separator: true
@@ -53,7 +53,7 @@ module.exports =
             separator: true
             name:  'Toggle Sticky Selection'
             text:  'current selection is not removed when adding new selections'
-            combo: 'command+`'
+            combo: "ctrl+'"
             accel: "ctrl+'"
             
     selectSingleRange: (r, opt) ->
@@ -76,6 +76,7 @@ module.exports =
     
     toggleStickySelection: ->
 
+        klog 'toggleStickySelection'
         if @stickySelection then @endStickySelection()
         else @startStickySelection()
     

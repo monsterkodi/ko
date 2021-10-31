@@ -7,9 +7,11 @@ selection
     ⌘⇧D         deselects last selected word
     ⌘L          select more lines 
     ⌘⇧L         select less lines
-    ⌥⌘B         select block boundary
     ⌥B          select string, square- or curly-block content
+    ⌥⌘B         select block boundary
     ⌘I          invert selection
+    ^'          toggle sticky selection
+    ^left|right remove from selection in sticky mode
     
 cursors
     ^cursor     move and add main cursor independently
@@ -19,6 +21,10 @@ cursors
     ^⇧up|down   extend only main cursor vertically
     ⌘right      move cursors to end of lines
     ⌘left       move cursors to first-non-space|start of line
+    ⌥-          page up
+    ⌥=          page down
+    ⌥[          home
+    ⌥]          end
     
 editing
     ⌘/          toggle comment

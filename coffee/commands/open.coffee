@@ -71,7 +71,7 @@ class Open extends Command
             items.sort (a,b) -> b.weight - a.weight
                     
         if items.length
-            @showItems items.slice 0, 300
+            @showItems items.slice 0 300
             @select 0
             @positionList()
         else
@@ -211,7 +211,7 @@ class Open extends Command
     # 000   000  000       000     000     000   000  000   000     000     
     # 000   000  000  0000000      000      0000000   000   000     000     
     
-    showHistory: () ->
+    showHistory: ->
 
         if @history.length > 1 and @selected <= 0
             items = []

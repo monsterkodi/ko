@@ -5,7 +5,7 @@
 # 000 0 000  000   000     000     000           000       000   000  000   000       000  000   000  000   000       000  
 # 000   000   0000000       0      00000000       0000000   0000000   000   000  0000000    0000000   000   000  0000000   
 
-{ _ } = require 'kxk'
+{ _, klog } = require 'kxk'
 
 module.exports = 
 
@@ -25,7 +25,7 @@ module.exports =
         moveCursorsToWordBoundary:
             name:   'move cursors to word boundaries'
             text:   'moves cursors to word boundaries. extends selections, if shift is pressed.'            
-            combos: ['alt+shift+left', 'alt+shift+right']
+            combos: ['alt+shift+left' 'alt+shift+right']
         
         moveCursorsToWordBoundaryLeft:
             separator: true
@@ -39,20 +39,18 @@ module.exports =
         moveCursorsToLineBoundary:
             name:   'move cursors to line boundaries'
             text:   'moves cursors to line boundaries. extends selections, if shift is pressed.'
-            combos: ['home', 'end', 'command+shift+left', 'command+shift+right', 'ctrl+shift+left', 'ctrl+shift+right']
-            accels: ['home', 'end', 'shift+home', 'shift+end', 'ctrl+shift+left', 'ctrl+shift+right']
+            combos: ['home' 'end' 'command+shift+left' 'command+shift+right']
+            accels: ['home' 'end' 'shift+home' 'shift+end' 'ctrl+shift+left' 'ctrl+shift+right']
 
         moveMainCursor:
             name:   'move main cursor'
             text:   """move main cursor independently of other cursors.
-                erases other cursors if shift is pressed. 
-                sets new cursors otherwise."""
-            combos: [ 'ctrl+shift+up', 'ctrl+shift+down', 'ctrl+shift+left', 'ctrl+shift+right', 'ctrl+up', 'ctrl+down', 'ctrl+left', 'ctrl+right']
-            accels: [ 'ctrl+shift+up', 'ctrl+shift+down']
+                keeps current main cursor position in cursors if shift is pressed."""
+            combos: [ 'ctrl+shift+up' 'ctrl+shift+down' 'ctrl+shift+left' 'ctrl+shift+right' 'ctrl+up' 'ctrl+down' 'ctrl+left' 'ctrl+right']
             
         moveCursors:
             name:  'move cursors'
-            combos: ['left', 'right', 'up', 'down', 'shift+down', 'shift+right', 'shift+up', 'shift+left']
+            combos: ['left' 'right' 'up' 'down' 'shift+down' 'shift+right' 'shift+up' 'shift+left' 'ctrl+left' 'ctrl+right']
 
     moveCursorsAtBoundaryLeft:  -> @setOrMoveCursorsAtBoundary 'left'
     moveCursorsAtBoundaryRight: -> @setOrMoveCursorsAtBoundary 'right'
@@ -73,9 +71,8 @@ module.exports =
     moveMainCursor: (key, info) ->
         
         dir = key 
-        hrz = key in ['left', 'right']
         opt = _.clone info
-        opt.erase ?= info.mod?.indexOf('shift') >= 0 or hrz
+        opt.erase ?= info.mod?.indexOf('shift') < 0
         @do.start()
         [dx, dy] = switch dir
             when 'up'    then [0,-1]
@@ -92,7 +89,7 @@ module.exports =
                 isSamePos(c, newMain)
         newCursors.push newMain
         @do.setCursors newCursors, main:newMain
-        @do.end()
+        @do.end()        
 
     # 000   000   0000000   00000000   0000000    
     # 000 0 000  000   000  000   000  000   000  
@@ -123,8 +120,8 @@ module.exports =
         @do.start()
         extend = info.extend ? 0 <= info.mod.indexOf 'shift'
         func = switch key
-            when 'right', 'e', 'end' then (c) => [@do.line(c[1]).length, c[1]]
-            when 'left', 'a', 'home'  then (c) => 
+            when 'right' 'e' 'end' then (c) => [@do.line(c[1]).length, c[1]]
+            when 'left' 'a' 'home' then (c) => 
                 if @do.line(c[1]).slice(0,c[0]).trim().length == 0
                     [0, c[1]]
                 else
@@ -134,6 +131,9 @@ module.exports =
         @do.end()
 
     moveCursors: (key, info = extend:false) ->
+ 
+        if @stickySelection and info.mod == 'ctrl'
+            klog 'substract from sticky?' key
         
         extend = info.extend ? 'shift' == info.mod
         switch key
