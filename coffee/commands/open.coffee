@@ -335,9 +335,9 @@ class Open extends Command
             klog 'open.execute' file
             
             if @name == 'new window'
-                post.toMain 'newWindowWithFile', file
+                post.toMain 'newWindowWithFile' file
             else
-                post.emit 'jumpToFile' file:file
+                post.emit 'jumpToFile' type:'file' file:file
                         
             super file
                 

@@ -124,6 +124,7 @@ class Window extends win
             when 'New Window'            then return post.toMain 'newWindowWithFile' editor.currentFile
             when 'Toggle Scheme'         then return scheme.toggle()
             when 'Toggle Center Text'    then return toggleCenterText()
+            when 'Toggle Tab Pinned'     then return toggleTabPinned()
             when 'Increase'              then return changeFontSize +1
             when 'Decrease'              then return changeFontSize -1
             when 'Reset'                 then return resetFontSize()
@@ -179,7 +180,7 @@ saveStash = ->
 
 restoreWin = ->
 
-    klog 'ko.window.restoreWin'
+    # klog 'ko.window.restoreWin'
     if bounds = window.stash.get 'bounds'
         window.win.setBounds bounds
 
@@ -204,7 +205,7 @@ post.on 'editorFocus' (editor) ->
     window.focusEditor = editor
     window.textEditor = editor if editor.name != 'commandline-editor'
 
-post.on 'devTools' (open) -> 
+post.on 'devTools' (open) ->
     klog "ko.window.post.on devTools #{open}"
 
 post.on 'mainlog' -> klog.apply klog, arguments
@@ -312,6 +313,11 @@ toggleCenterText = ->
 
     if restoreInvisibles
         editor.toggleInvisibles()
+        
+toggleTabPinned = ->
+    
+    if t = window.tabs.activeTab()
+        t.togglePinned()
 
 # 00000000   0000000   000   000  000000000      0000000  000  0000000  00000000
 # 000       000   000  0000  000     000        000       000     000   000
@@ -392,7 +398,7 @@ window.onfocus = (event) ->
             split.focus 'commandline-editor'
 
 window.setLastFocus = (name) -> 
-    # klog 'setLastFocus' name
+    klog 'setLastFocus' name
     window.lastFocus = name
 
 # 000   000  00000000  000   000

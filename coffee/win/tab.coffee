@@ -6,7 +6,7 @@
    000     000   000  0000000
 ###
 
-{ elem, kerror, post, slash, tooltip } = require 'kxk'
+{ elem, kerror, klog, post, slash, tooltip } = require 'kxk'
 
 File    = require '../tools/file'
 render  = require '../editor/render'
@@ -124,6 +124,14 @@ class Tab
                 <line x1="15" y1="16"  x2="15"  y2="22" stroke-linecap="round"></line>
             </svg>
             """
+        else if @tmpTab
+            html = """
+            <svg width="100%" height="100%" viewBox="0 0 30 30">
+                <circle cx="15" cy="10" r="2" />
+                <circle cx="15" cy="15" r="2" />
+                <circle cx="15" cy="20" r="2" />
+            </svg>
+            """
                 
         @div.appendChild elem class:'tabstate' html:html, click:@togglePinned
 
@@ -165,11 +173,14 @@ class Tab
 
         if @dirty != dirty
             @dirty = dirty
+            if @dirty then delete @tmpTab
             @update()
         @
         
     togglePinned: =>
+        
         @pinned = not @pinned
+        delete @tmpTab
         @update()
         @
 
@@ -201,6 +212,8 @@ class Tab
 
     finishActivation: ->
 
+        klog 'tab.finishActivation' @file
+        
         @setActive()
 
         if @state?

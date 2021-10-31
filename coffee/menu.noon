@@ -141,6 +141,7 @@ Command
 View
     Maximize Editor         cmdctrl+shift+y
     Toggle Center Text      cmdctrl+\
+    Toggle Tab Pinned       alt+cmdctrl+p
     -
     Navigate Backward       cmdctrl+1
     Navigate Forward        cmdctrl+2

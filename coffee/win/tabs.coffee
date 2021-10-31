@@ -41,6 +41,7 @@ class Tabs
         post.on 'sendTabs'         @onSendTabs
         post.on 'fileLineChanges'  @onFileLineChanges
         post.on 'fileSaved'        @onFileSaved
+        post.on 'editorFocus'      @onEditorFocus
 
     onSendTabs: (winID) =>
 
@@ -158,6 +159,14 @@ class Tabs
             br = t.div.getBoundingClientRect()
             br.left <= x <= br.left + br.width
 
+    onEditorFocus: (editor) =>
+        if editor.name == 'editor'
+            if t = @getTmpTab()
+                if t.file == window.textEditor.currentFile
+                    delete t.tmpTab
+                    t.update()
+                    @update()
+            
     #  0000000  000       0000000    0000000  00000000
     # 000       000      000   000  000       000
     # 000       000      000   000  0000000   0000000
@@ -166,6 +175,8 @@ class Tabs
 
     closeTab: (tab) ->
 
+        return if empty tab
+        
         _.pull @tabs, tab.close()
         
         if empty @tabs
@@ -185,15 +196,8 @@ class Tabs
     onCloseOtherTabs: =>
 
         return if not @activeTab() # should not happen
-        # keep = _.pullAt @tabs, @activeTab().index()
-        # keep = filter @tabs, (t) => not t.pinned and t != @activeTab()
-        keep = filter @tabs, (t) => t.pinned or t == @activeTab()
-        clse = filter @tabs, (t) => not t.pinned and t != @activeTab()
-        klog 'closeOtherTabs' keep.length, close.length
-        # while @numTabs()
-            # @tabs.pop().close()
-        # @tabs = keep
-        for t in clse
+        tabsToClose = filter @tabs, (t) => not t.pinned and t != @activeTab()
+        for t in tabsToClose
             @closeTab t
         @update()
 
@@ -205,6 +209,8 @@ class Tabs
 
     addTab: (file) ->
 
+        klog 'addTab' file
+        
         if @tabs.length >= prefs.get 'maximalNumberOfTabs' 8
             for index in [0...@tabs.length]
                 if not @tabs[index].dirty and not @tabs[index].pinned
@@ -214,6 +220,20 @@ class Tabs
         @tabs.push new Tab @, file
         last @tabs
 
+    getTmpTab: ->
+        
+        for t in @tabs
+            return t if t.tmpTab
+        
+    addTmpTab: (file) ->
+        
+        @closeTab @getTmpTab()
+        
+        tab = @addTab file
+        tab.tmpTab = true
+        tab.update()
+        tab
+        
     onNewEmptyTab: =>
 
         @emptyid += 1
@@ -223,12 +243,13 @@ class Tabs
 
     onNewTabWithFile: (file) =>
 
-        log 'onNewTabWithFile' file
+        klog 'onNewTabWithFile' file
         [file, line, col] = slash.splitFileLine file
 
         if tab = @tab file
             tab.activate()
         else
+            klog 'onNewTabWithFile' file
             @addTab(file).activate()
 
         @update()

@@ -54,19 +54,23 @@ class FileHandler
             
             tab = tabs.tab file
             if empty tab
-                tab = tabs.addTab file
+                tab = tabs.addTmpTab file
             
             if activeTab = tabs.activeTab()
                 if tab != activeTab
                     activeTab.clearActive()
                     if activeTab.dirty
                         activeTab.storeState()
-                
+
+            klog 'fileHandler.loadFile' file, opt
             editor.setCurrentFile file
     
             tab.finishActivation() # setActive, restore state, update tabs
             
+            klog 'fileHandler.loadFile restore'
             editor.restoreScrollCursorsAndSelections()
+            
+            klog 'fileHandler.loadFile done'
             
             if fileExists
                 post.toOtherWins 'fileLoaded' file # indexer
