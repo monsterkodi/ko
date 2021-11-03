@@ -6,7 +6,7 @@
 00     00  000  000   000  0000000     0000000   00     00
 ###
 
-{ _, args, clamp, klog, post, prefs, scheme, stash, stopEvent, store, win } = require 'kxk'
+{ _, clamp, klog, post, prefs, scheme, stash, stopEvent, store, win } = require 'kxk'
 
 Split       = require './split'
 Terminal    = require './terminal'
@@ -104,21 +104,21 @@ class Window extends win
     # 000 0 000  000       000  0000  000   000     000   000  000          000     000  000   000  000  0000
     # 000   000  00000000  000   000   0000000      000   000   0000000     000     000   0000000   000   000
     
-    onMenuAction: (name, args) =>
+    onMenuAction: (name, opts) =>
     
-        # klog 'ko.window.onMenuAction' name, args
+        # klog 'ko.window.onMenuAction' name, opts
         
         if action = Editor.actionWithName name
             if action.key? and _.isFunction window.focusEditor[action.key]
-                window.focusEditor[action.key] args.actarg
+                window.focusEditor[action.key] opts.actarg
                 return
     
-        if 'unhandled' != window.commandline.handleMenuAction name, args
+        if 'unhandled' != window.commandline.handleMenuAction name, opts
             return
     
         switch name
     
-            when 'doMacro'               then return window.commandline.commands.macro.execute args.actarg
+            when 'doMacro'               then return window.commandline.commands.macro.execute opts.actarg
             when 'Undo'                  then return window.focusEditor.do.undo()
             when 'Redo'                  then return window.focusEditor.do.redo()
             when 'Cut'                   then return window.focusEditor.cut()
@@ -158,11 +158,11 @@ class Window extends win
                 window.titlebar.refreshMenu()
                 return 
             when 'Preferences'           then return post.emit 'openFiles' [prefs.store.file], newTab:true
-            when 'Cycle Windows'         then args = @id
+            when 'Cycle Windows'         then opts = @id
     
-        # log "unhandled menu action! posting to main '#{name}' args:", args
+        # log "unhandled menu action! posting to main '#{name}' opts:", opts
     
-        super name, args
+        super name, opts
             
 # 00000000   00000000   00000000  00000000   0000000
 # 000   000  000   000  000       000       000

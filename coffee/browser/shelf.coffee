@@ -6,7 +6,7 @@
 0000000   000   000  00000000  0000000  000     
 ###
 
-{ $, _, clamp, elem, empty, first, kerror, keyinfo, kpos, popup, post, slash, stopEvent } = require 'kxk'
+{ $, _, clamp, elem, empty, first, kerror, keyinfo, klog, kpos, popup, post, slash, stopEvent } = require 'kxk'
 
 Row      = require './row'
 Scroller = require './scroller'
@@ -243,7 +243,7 @@ class Shelf extends Column
         else
             @removeHistory()
         window.stash.set 'shelf|history' @showHistory
-        window.stash.set 'shelf|history' @showHistory
+        
     clearHistory: =>
         
         window.navigate.clear()
@@ -274,9 +274,10 @@ class Shelf extends Column
     onNavigateIndexChanged: (currentIndex, currentItem) =>
 
         if @showHistory
+            klog 'onNavigateIndexChanged' currentIndex, currentItem
             reverseIndex = @numRows() - currentIndex - 1
-            if currentItem.file != @activeRow()?.item.file
-                @row(reverseIndex)?.setActive()
+            # if currentItem.file != @activeRow()?.item.file
+            @row(reverseIndex)?.setActive()
             
     loadHistory: ->
         

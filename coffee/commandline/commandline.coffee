@@ -6,7 +6,7 @@
  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 ###
 
-{ $, args, elem, filelist, kerror, post, slash, stopEvent } = require 'kxk'
+{ $, elem, filelist, kerror, post, slash, stopEvent } = require 'kxk'
 
 TextEditor = require '../editor/texteditor'
 
@@ -296,11 +296,11 @@ class Commandline extends TextEditor
     # 000  000   000          000
     # 000   000  00000000     000
 
-    handleMenuAction: (name, args) ->
+    handleMenuAction: (name, opt) ->
 
-        if args?.command
-            if @commandForName args.command
-                @startCommand args.command
+        if opt?.command
+            if @commandForName opt.command
+                @startCommand opt.command
                 return
         'unhandled'
 

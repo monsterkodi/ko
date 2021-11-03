@@ -22,6 +22,8 @@ moduleKeys = (moduleName, file) ->
     try
         if moduleName.endsWith 'kxk'
             required = kxk
+        else if moduleName == 'electron'
+            required = require 'electron'
         else
             mRequire = requireLike file, true
             required = mRequire moduleName

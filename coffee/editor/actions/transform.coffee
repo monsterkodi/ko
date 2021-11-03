@@ -5,7 +5,7 @@
 #    000     000   000  000   000  000  0000       000  000       000   000  000   000  000 0 000
 #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000
 
-{ reversed, matchr, slash, kstr, args, kerror, _ } = require 'kxk'
+{ _, kerror, kstr, matchr, reversed, slash } = require 'kxk'
 
 class Transform
 
@@ -252,21 +252,21 @@ class Transform
     # 000   000  000   000
     # 0000000     0000000
 
-    do: (transName, args...) ->
+    do: (transName, opts...) ->
 
         f = @[transName]
 
         if f and _.isFunction f
-            @last = f.apply @, args
+            @last = f.apply @, opts
         else
             return kerror "unhandled transform #{transName}"
 
         @last
 
-    @do: (editor, transName, args...) ->
+    @do: (editor, transName, opts...) ->
 
         t = editor.transform ? new Transform editor
-        t.do.apply t, [transName].concat args
+        t.do.apply t, [transName].concat opts
 
 module.exports =
 

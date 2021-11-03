@@ -6,7 +6,7 @@
 000   000  000   000   0000000  000   000   0000000
 ###
 
-{ _, args, empty, fs, kerror, post, prefs, reversed, slash, valid } = require 'kxk'
+{ _, empty, fs, kerror, post, prefs, reversed, slash, valid } = require 'kxk'
 
 indexer   = require '../main/indexer'
 salt      = require '../tools/salt'
@@ -68,12 +68,12 @@ class Macro extends Command
 
         editor  = window.editor
         cp      = editor.cursorPos()
-        args    = command.split /\s+/
-        cmmd    = args.shift()
+        cmds    = command.split /\s+/
+        cmmd    = cmds.shift()
 
-        wordsInArgsOrCursorsOrSelection = (args, opt) ->
-            if args.length
-                return args
+        wordsInArgsOrCursorsOrSelection = (argl, opt) ->
+            if argl.length
+                return argl
             else
                 cw = editor.wordsAtCursors positionsNotInRanges(editor.cursors(), editor.selections()), opt
                 ws = _.uniq cw.concat editor.textsInRanges editor.selections()
@@ -176,9 +176,9 @@ class Macro extends Command
                 li += 1 if not editor.isCursorInIndent() and not editor.isCursorInLastLine()
                 insert = indent + 'log "'
                 insert += editor.funcInfoAtLineIndex li
-                lst = args.length and parseInt(args[0]) or 0
-                args.shift() if lst
-                words = wordsInArgsOrCursorsOrSelection args, include: "#@.-"
+                lst = cmds.length and parseInt(cmds[0]) or 0
+                cmds.shift() if lst
+                words = wordsInArgsOrCursorsOrSelection cmds, include: "#@.-"
                 for ti in [0...words.length - lst]
                     t = words[ti]
                     insert += "#{t}:\#{kstr #{t}} "
@@ -202,7 +202,7 @@ class Macro extends Command
 
             when 'class'
 
-                clss = args.length and args[0] or _.last editor.textsInRanges(editor.selections())
+                clss = cmds.length and cmds[0] or _.last editor.textsInRanges(editor.selections())
                 clss ?= 'Class'
                 dir = editor.currentFile? and slash.dir(editor.currentFile) or process.cwd()
                 file = slash.join dir, clss.toLowerCase() + '.coffee'
@@ -261,14 +261,14 @@ class Macro extends Command
 
             when 'col'
 
-                num  = args.length > 0 and parseInt(args[0]) or 10
-                step = args.length > 1 and parseInt(args[1]) or 1
+                num  = cmds.length > 0 and parseInt(cmds[0]) or 10
+                step = cmds.length > 1 and parseInt(cmds[1]) or 1
                 editor.cursorColumns num, step
 
             when 'line'
 
-                num  = args.length > 0 and parseInt(args[0]) or 10
-                step = args.length > 1 and parseInt(args[1]) or 1
+                num  = cmds.length > 0 and parseInt(cmds[0]) or 10
+                step = cmds.length > 1 and parseInt(cmds[1]) or 1
                 editor.cursorLines num, step
 
             else
@@ -280,7 +280,7 @@ class Macro extends Command
                 #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000
 
                 if Transform.transformNames and cmmd in Transform.transformNames
-                    window.textEditor.Transform.do.apply null, [window.textEditor, cmmd].concat args
+                    window.textEditor.Transform.do.apply null, [window.textEditor, cmmd].concat cmds
                 else
                     kerror 'unhandled macro', cmmd, Transform.transformNames
                     if _.last(@history) == command.trim()

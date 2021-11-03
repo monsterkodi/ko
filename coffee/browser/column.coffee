@@ -226,11 +226,9 @@ class Column
             delete @dragStartRow
             
             if row = @browser.rowAtPos d.pos
-                klog 'got row' row
                 column = row.column
                 target = row.item?.file
             else if column = @browser.columnAtPos d.pos
-                klog 'got column' column
                 target = column.parent?.file
             else
                 klog 'no drop target'
