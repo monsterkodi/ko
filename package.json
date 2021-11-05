@@ -41,6 +41,7 @@
     "kslash": "^2.4.0",
     "kxk": "^0.420.0",
     "moment": "^2.29.1",
+    "noon": "^3.1.0",
     "pretty-bytes": "^5.6.0",
     "require-like": "^0.1.2",
     "seamless-immutable": "^7.1.4",
