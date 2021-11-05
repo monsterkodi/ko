@@ -29,18 +29,20 @@ dependencies
                 fuzzy           ^0.1.3
                 ignore          ^5.1.9
                 js-beautify     ^1.14.0
-                kxk             ^0.418.0
+                kslash          ^2.4.0
+                kxk             ^0.419.0
                 moment          ^2.29.1
                 pretty-bytes    ^5.6.0
                 require-like    ^0.1.2
                 seamless-immutable  ^7.1.4
                 trash           ^8.0.0
                 unused-filename  ^3.0.1
+                walkdir         ^0.4.1
                 wxw             ^1.89.0
 devDependencies
                 electron        ^15.3.0
                 electron-builder  ^22.13.1
                 koffee          ^1.14.0
-                konrad          ^0.189.0
+                konrad          ^0.191.0
                 node-abi        ^3.3.0
                 sds             ^4.4.0
