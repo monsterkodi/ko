@@ -1,4 +1,4 @@
-// koffee 1.14.0
+// koffee 1.16.0
 var reversed,
     indexOf = [].indexOf;
 

@@ -1,4 +1,4 @@
-// koffee 1.14.0
+// koffee 1.16.0
 
 /*
  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
@@ -9,8 +9,8 @@
  */
 var $, Commandline, TextEditor, elem, filelist, kerror, post, ref, slash, stopEvent,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    hasProp = {}.hasOwnProperty,
+    extend = function(child, parent) { for (var key in parent) { if (hasProp(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    hasProp = Object.hasOwn,
     indexOf = [].indexOf;
 
 ref = require('kxk'), $ = ref.$, elem = ref.elem, filelist = ref.filelist, kerror = ref.kerror, post = ref.post, slash = ref.slash, stopEvent = ref.stopEvent;

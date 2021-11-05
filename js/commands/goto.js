@@ -1,4 +1,4 @@
-// koffee 1.14.0
+// koffee 1.16.0
 
 /*
  0000000    0000000   000000000   0000000 
@@ -8,8 +8,8 @@
  0000000    0000000      000      0000000
  */
 var Command, Goto, _, clamp, post, ref,
-    extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    hasProp = {}.hasOwnProperty;
+    extend = function(child, parent) { for (var key in parent) { if (hasProp(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    hasProp = Object.hasOwn;
 
 ref = require('kxk'), _ = ref._, clamp = ref.clamp, post = ref.post;
 

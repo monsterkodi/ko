@@ -106,7 +106,7 @@ class Titlebar
         return if winID == window.winID
         for div in @list.children
             if div.winID == winID
-                $('.wintabs', div)?.innerHTML = tabs
+                $('.wintabs' div)?.innerHTML = tabs
                 width = div.getBoundingClientRect().width
                 break
 

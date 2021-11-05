@@ -1,4 +1,4 @@
-// koffee 1.14.0
+// koffee 1.16.0
 
 /*
 00000000  000  000      00000000        0000000    00000000    0000000   000   000   0000000  00000000  00000000
@@ -9,8 +9,8 @@
  */
 var $, Browser, File, FileBrowser, Info, Select, Shelf, clamp, drag, elem, empty, filelist, hub, klog, post, prefs, ref, slash, valid,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    hasProp = {}.hasOwnProperty;
+    extend = function(child, parent) { for (var key in parent) { if (hasProp(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    hasProp = Object.hasOwn;
 
 ref = require('kxk'), $ = ref.$, clamp = ref.clamp, drag = ref.drag, elem = ref.elem, empty = ref.empty, filelist = ref.filelist, klog = ref.klog, post = ref.post, prefs = ref.prefs, slash = ref.slash, valid = ref.valid;
 

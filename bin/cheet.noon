@@ -49,7 +49,7 @@ commandline
 misc
     F2          global shortcut to activate ko
     ⌘R          discard changes and reload current file
-    ⌥⌘up        jump to counterpart file
+    ⌥o          jump to counterpart file
     ^⌘left|right  jump to previous|next editing location
             
 macro

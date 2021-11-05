@@ -26,13 +26,13 @@ class GitInfo
         
         if href = meta[2].href
             href += ':' + window.terminal.posForEvent(event)[0]
-            post.emit 'openFiles', [href], newTab: event.metaKey
+            post.emit 'openFiles' [href], newTab: event.metaKey
         'unhandled' # otherwise cursor doesn't get set
         
     logText: (text) ->
         
         terminal = window.terminal
-        terminal.appendMeta clss:'searchHeader', diss:Syntax.dissForTextAndSyntax text, 'ko'
+        terminal.appendMeta clss:'searchHeader' diss:Syntax.dissForTextAndSyntax text, 'ko'
 
     #  0000000  000   000   0000000   000   000   0000000   00000000   0000000  
     # 000       000   000  000   000  0000  000  000        000       000       
@@ -80,7 +80,7 @@ class GitInfo
                 click: @onMetaClick
                             
             terminal.appendMeta meta
-            post.emit 'search-result', meta
+            post.emit 'search-result' meta
             index += 1
         index
         
@@ -134,16 +134,16 @@ class GitInfo
             return if empty info
             
             terminal = window.terminal
-            terminal.appendMeta clss: 'salt', text: slash.tilde info.gitDir
+            terminal.appendMeta clss: 'salt' text: slash.tilde info.gitDir
             terminal.appendMeta clss: 'spacer'
                 
             for file in info.deleted
                 
-                @logFile 'deleted', file # dont delete this for now :)
+                @logFile 'deleted' file # dont delete this for now :)
                 
             for file in info.added
                 
-                @logFile 'added', file  # dont delete this for now :)
+                @logFile 'added' file  # dont delete this for now :)
                 
                 if slash.isText file
                     data  = fs.readFileSync file, encoding: 'utf8'
@@ -156,7 +156,7 @@ class GitInfo
                 
             for changeInfo in info.changed                
                 
-                @logFile 'changed', changeInfo.file # dont delete this for now :)
+                @logFile 'changed' changeInfo.file # dont delete this for now :)
                 
                 for change in changeInfo.changes
                     line = change.line

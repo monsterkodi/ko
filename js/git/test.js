@@ -1,4 +1,4 @@
-// koffee 1.14.0
+// koffee 1.16.0
 var diff, expect, info, ref, root, rootDir, should, slash, status;
 
 slash = require('kxk').slash;

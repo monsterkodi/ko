@@ -116,7 +116,7 @@ class Split
                     
         switch what
             when 'editor' then return @moveCommandLineBy -delta
-            when 'terminal', 'browser', 'commandline'
+            when 'terminal' 'browser' 'commandline'
                 @raise what if what != 'commandline'
                 if delta? then @moveCommandLineBy delta
                 if pos? then @flex.moveHandleToPos @flex.handles[0], pos
@@ -206,13 +206,13 @@ class Split
         if not @flex.isCollapsed 'commandline'
             @flex.collapse 'terminal'
             @flex.collapse 'commandline'
-            post.emit 'commandline', 'hidden'
+            post.emit 'commandline' 'hidden'
         
     showCommandline: ->
         
         if @flex.isCollapsed 'commandline'
             @flex.expand 'commandline'
-            post.emit 'commandline', 'shown'
+            post.emit 'commandline' 'shown'
 
     # 00000000   0000000    0000000  000   000   0000000
     # 000       000   000  000       000   000  000     

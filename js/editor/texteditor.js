@@ -1,4 +1,4 @@
-// koffee 1.14.0
+// koffee 1.16.0
 
 /*
 000000000  00000000  000   000  000000000        00000000  0000000    000  000000000   0000000   00000000
@@ -9,8 +9,8 @@
  */
 var $, Editor, EditorScroll, TextEditor, _, clamp, drag, elem, empty, kerror, keyinfo, klog, os, post, prefs, ref, render, stopEvent,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    hasProp = {}.hasOwnProperty,
+    extend = function(child, parent) { for (var key in parent) { if (hasProp(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    hasProp = Object.hasOwn,
     indexOf = [].indexOf;
 
 ref = require('kxk'), $ = ref.$, _ = ref._, clamp = ref.clamp, drag = ref.drag, elem = ref.elem, empty = ref.empty, kerror = ref.kerror, keyinfo = ref.keyinfo, klog = ref.klog, os = ref.os, post = ref.post, prefs = ref.prefs, stopEvent = ref.stopEvent;
