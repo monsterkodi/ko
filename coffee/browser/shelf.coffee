@@ -26,7 +26,7 @@ class Shelf extends Column
         
         @showHistory = window.stash.get 'shelf|history' false
 
-        post.on 'gitStatus'              @loadGitStatus
+        post.on 'gitStatus'              @onGitStatus
         post.on 'addToShelf'             @addPath
         post.on 'navigateHistoryChanged' @onNavigateHistoryChanged
         post.on 'navigateIndexChanged'   @onNavigateIndexChanged
@@ -102,7 +102,7 @@ class Shelf extends Column
         
         @loadHistory() if @showHistory
         
-        @loadGitStatus()
+        setTimeout @loadGitStatus, 2000
                 
     loadShelfItems: ->
         
@@ -211,24 +211,37 @@ class Shelf extends Column
     # 000   000  000     000     
     #  0000000   000     000     
 
-    loadGitStatus: =>
+    onGitStatus: (gitDir, status) =>
+        
+        # log 'onGitStatus' gitDir, status
         
         for row in @rows
-            
-            $('.browserStatusIcon', row.div)?.remove()
-            
-            fileStatus = (row) -> (status) =>
-                for file, status of hub.statusFiles status
-                    if file.startsWith row.path()
-                        if row.item.type == 'dir'
-                            status = 'dirs'
-                        row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
-                        break
-            
-            hub.status row.path(), fileStatus row
+            if gitDir.startsWith row.path()
+                if row.item.type == 'dir'
+                    status = 'dirs'
+                $('.browserStatusIcon', row.div)?.remove()
+                row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
+                return
+        
+    loadGitStatus: =>
+        
+        rows = _.clone @rows
+        
+        fileStatus = (row, rows) -> (status) =>
+            for file, status of hub.statusFiles status
+                if file.startsWith row.path()
+                    if row.item.type == 'dir'
+                        status = 'dirs'
+                    $('.browserStatusIcon', row.div)?.remove()
+                    row.div.appendChild elem 'span', class:"git-#{status}-icon browserStatusIcon"
+                    break
+            if rows.length
+                row = rows.shift()
+                hub.status row.path(), fileStatus row, rows
+        
+        row = rows.shift()
+        hub.status row.path(), fileStatus row, rows
 
-    updateGitFiles: -> @loadGitStatus()
-    
     # 000   000  000   0000000  000000000   0000000   00000000   000   000  
     # 000   000  000  000          000     000   000  000   000   000 000   
     # 000000000  000  0000000      000     000   000  0000000      00000    

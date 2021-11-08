@@ -6,16 +6,16 @@
 0000000      000        000     0000000
 */
 @font-face {
-  font-family: titlebarFont;
-  font-weight: normal;
-  font-style: normal;
-  src: url("../../node_modules/kxk/styl/Bahnschrift.woff");
-}
-@font-face {
   font-family: fontMono;
   font-weight: normal;
   font-style: normal;
-  src: url("../../node_modules/kxk/styl/Meslo.woff");
+  src: url("../../img/Meslo.woff");
+}
+@font-face {
+  font-family: titlebarFont;
+  font-weight: normal;
+  font-style: normal;
+  src: url("../../img/Bahnschrift.woff");
 }
 pre {
   margin: 0;
@@ -31,12 +31,13 @@ body {
   top: 0;
   margin: 0;
   overflow: hidden;
-  font-family: fontMono;
+  font-family: Arial, fontMono;
   -webkit-user-select: none;
 }
 #main {
-  animation: fadein 1s;
   position: absolute;
+  animation: fadein 1s;
+  font-family: fontMono;
   top: 30px;
   left: 0;
   right: 0;
@@ -453,7 +454,6 @@ body {
 #editor {
   position: relative;
   overflow: hidden;
-  font-family: fontMono;
 }
 .layerScroll {
   position: absolute;

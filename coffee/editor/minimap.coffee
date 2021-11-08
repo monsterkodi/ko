@@ -37,7 +37,7 @@ class Minimap
         @elem.appendChild @highlig
         @elem.appendChild @cursors
 
-        @elem.addEventListener 'wheel' @editor.scrollbar?.onWheel
+        @elem.addEventListener 'wheel' @editor.scrollbar?.onWheel, passive:true
 
         @editor.view.appendChild    @elem
         @editor.on 'viewHeight'    @onEditorViewHeight

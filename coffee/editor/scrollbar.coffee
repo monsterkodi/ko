@@ -6,7 +6,7 @@
 0000000    0000000  000   000   0000000   0000000  0000000  0000000    000   000  000   000
 ###
 
-{ clamp, drag, elem, scheme, stopEvent } = require 'kxk'
+{ clamp, drag, elem, scheme } = require 'kxk'
 
 scheme = require '../tools/scheme'
 
@@ -34,8 +34,8 @@ class Scrollbar
             onMove:  @onDrag
             cursor:  'ns-resize'
 
-        @elem       .addEventListener 'wheel' @onWheel
-        @editor.view.addEventListener 'wheel' @onWheel
+        @elem       .addEventListener 'wheel' @onWheel, passive:true
+        @editor.view.addEventListener 'wheel' @onWheel, passive:true
 
     del: ->
         
@@ -95,7 +95,7 @@ class Scrollbar
         if @scrollX or @scrollY
             window.requestAnimationFrame @wheelScroll
 
-        stopEvent event
+        # stopEvent event
 
     wheelScroll: =>
 

@@ -209,8 +209,7 @@ post.on 'editorFocus' (editor) ->
     window.focusEditor = editor
     window.textEditor = editor if editor.name != 'commandline-editor'
 
-post.on 'devTools' (open) ->
-    klog "ko.window.post.on devTools #{open}"
+# post.on 'devTools' (open) -> klog "ko.window.post.on devTools #{open}"
 
 post.on 'mainlog' -> klog.apply klog, arguments
 

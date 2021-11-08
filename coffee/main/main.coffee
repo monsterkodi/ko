@@ -150,7 +150,7 @@ class Main extends app
     onShow: =>
 
         { width, height } = @screenSize()
-        
+                
         @opt.width  = height + 122
         @opt.height = height
       
@@ -171,7 +171,19 @@ class Main extends app
                 @createWindowWithFile file:recent 
             else
                 @createWindowWithEmpty()
+                
+        new udp port:9779, onMsg:@onUDP
 
+    # 000   000  0000000    00000000     
+    # 000   000  000   000  000   000    
+    # 000   000  000   000  00000000     
+    # 000   000  000   000  000          
+    #  0000000   0000000    000          
+    
+    onUDP: (file) =>
+        @activateOneWindow (win) ->
+            post.toWin win.id, 'openFiles' [file] 
+                
     #  0000000    0000000  000000000  000   0000000   000   000  
     # 000   000  000          000     000  000   000  0000  000  
     # 000000000  000          000     000  000   000  000 0 000  
@@ -495,8 +507,7 @@ class Main extends app
             post.toWin win.id, 'openFiles' files, newTab:true
             win.show()
             win.focus()
-
-
+            
     reloadWin: (winID:, file:) =>
         
         if win = winWithID winID
@@ -543,18 +554,6 @@ electron.app.on 'open-file' (event, file) ->
             main.createWindowWithFile file:file
         
     event.preventDefault()
-
-# 000   000  0000000    00000000     
-# 000   000  000   000  000   000    
-# 000   000  000   000  00000000     
-# 000   000  000   000  000          
-#  0000000   0000000    000          
-
-onUDP = (file) ->
-    main.activateOneWindow (win) ->
-        post.toWin win.id, 'openFiles' [file] 
-
-koReceiver = new udp port:9779, onMsg:onUDP
 
 main          = new Main openFiles
 main.navigate = new Navigate main

@@ -221,8 +221,8 @@ class Autocomplete extends event
         if @matchList.length
             
             @list = elem class: 'autocomplete-list'
-            @list.addEventListener 'wheel'     @onWheel
-            @list.addEventListener 'mousedown' @onMouseDown
+            @list.addEventListener 'wheel'     @onWheel     , passive:true
+            @list.addEventListener 'mousedown' @onMouseDown , passive:true
             
             index = 0
             for m in @matchList

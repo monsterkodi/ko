@@ -34,11 +34,7 @@ root = (pth, cb) ->
                 if empty pth
                     cb '' 
                 else
-                    childp.exec gitCmd, gitOpt(pth), (err,r) ->
-                        if valid err
-                            cb '' 
-                        else
-                            cb fixPath r
+                    slash.git pth, cb
     else
     
         return '' if empty pth
@@ -47,7 +43,6 @@ root = (pth, cb) ->
             pth = if slash.dirExists(pth) then slash.unslash(pth) else slash.dir(pth)
             return '' if empty pth
             return fixPath childp.execSync gitCmd, gitOpt(pth)
-            
         catch err
             return ''
 

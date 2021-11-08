@@ -200,12 +200,12 @@ class Diffbar
 
                 @updateMetas()
                 @updateScroll()
-                @editor.emit 'diffbarUpdated', @changes # only used in tests
+                @editor.emit 'diffbarUpdated' @changes # only used in tests
         else
             @changes = null
             @updateMetas()
             @updateScroll()
-            @editor.emit 'diffbarUpdated', @changes # only used in tests
+            @editor.emit 'diffbarUpdated' @changes # only used in tests
 
     #  0000000   0000000  00000000    0000000   000      000
     # 000       000       000   000  000   000  000      000

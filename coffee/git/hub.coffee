@@ -6,7 +6,7 @@
 000   000   0000000   0000000    
 ###
 
-{ post, filter, valid } = require 'kxk'
+{ filter, post, valid, watch } = require 'kxk'
 
 watch    = require './watch'
 status   = require './status'
@@ -81,6 +81,7 @@ class Hub
     
     @status: (dirOrFile, cb) ->
         
+        # log 'git.hub.status' dirOrFile
         rootStatus = (cb) -> (gitDir) ->
             if stati[gitDir]
                 cb stati[gitDir]
@@ -108,6 +109,7 @@ class Hub
     
     @info: (dirOrFile, cb) ->
         
+        # log 'git.hub.info' dirOrFile
         rootInfo = (cb) -> (gitDir) -> info gitDir, (info) -> cb info
         
         Hub.applyRoot dirOrFile, rootInfo cb

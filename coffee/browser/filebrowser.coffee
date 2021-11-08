@@ -514,8 +514,6 @@ class FileBrowser extends Browser
         for col in [0..@columns.length]
             @applyGitStatusFiles col, files
 
-        @shelf?.updateGitFiles files
-
     #  0000000  000   000  00000000  000      00000000  
     # 000       000   000  000       000      000       
     # 0000000   000000000  0000000   000      000000    

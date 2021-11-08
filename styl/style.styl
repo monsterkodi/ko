@@ -25,16 +25,16 @@ titlebarHeight        = 30px
 titlebarFontSize      = 15px
 
 @font-face 
-    font-family     titlebarFont
-    font-weight     normal
-    font-style      normal
-    src             url("../../node_modules/kxk/styl/Bahnschrift.woff")
-
-@font-face 
     font-family     fontMono
     font-weight     normal
     font-style      normal
-    src             url("../../node_modules/kxk/styl/Meslo.woff")
+    src             url("../../img/Meslo.woff")
+    
+@font-face 
+    font-family     titlebarFont
+    font-weight     normal
+    font-style      normal
+    src             url("../../img/Bahnschrift.woff")
 
 fill-abs()
     position            absolute
@@ -59,7 +59,7 @@ body
     fill-abs()
     margin              0
     overflow            hidden
-    font-family         fontMono
+    font-family         Arial,fontMono
     -webkit-user-select none
 
 @keyframes fadein
@@ -69,8 +69,9 @@ body
     opacity 1
 
 #main
-    animation           fadein 1.0s
     position            absolute
+    animation           fadein 1.0s
+    font-family         fontMono    
     top                 titlebarHeight
     left                0
     right               0
@@ -570,7 +571,7 @@ infoPadding = 6px
 #editor
     position            relative
     overflow            hidden
-    font-family         fontMono
+    // font-family         fontMono
 
 // 000       0000000   000   000  00000000  00000000
 // 000      000   000   000 000   000       000   000

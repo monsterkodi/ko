@@ -157,6 +157,8 @@ class Editor extends Buffer
     # 0000000   00000000     000            0000000  000  000   000  00000000  0000000
 
     setText: (text="") ->
+        
+        # klog 'setText' text.length
 
         if @syntax.name == 'txt'
             @syntax.name = Syntax.shebang text.slice 0, text.search /\r?\n/

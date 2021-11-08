@@ -1,4 +1,4 @@
-// koffee 1.16.0
+// koffee 1.19.0
 var reversed;
 
 reversed = require('kxk').reversed;

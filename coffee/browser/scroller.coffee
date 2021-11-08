@@ -6,7 +6,7 @@
 0000000    0000000  000   000   0000000   0000000  0000000  00000000  000   000
 ###
 
-{ clamp, drag, elem, scheme, stopEvent } = require 'kxk'
+{ clamp, drag, elem, scheme } = require 'kxk'
 
 scheme = require '../tools/scheme'
 
@@ -24,8 +24,8 @@ class Scroller
             onMove:  @onDrag
             cursor:  'ns-resize'
 
-        @elem.addEventListener       'wheel'  @onWheel
-        @column.div.addEventListener 'wheel'  @onWheel
+        @elem.addEventListener       'wheel'  @onWheel, passive:true
+        @column.div.addEventListener 'wheel'  @onWheel, passive:true
         @target.addEventListener 'scroll' @onScroll
         
     numRows:   -> @column.numRows()
@@ -71,7 +71,6 @@ class Scroller
             @target.scrollLeft += event.deltaX
         else
             @target.scrollTop += event.deltaY
-        stopEvent event    
         
     onScroll: (event) => @update()
 

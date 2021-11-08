@@ -77,6 +77,7 @@ req = (file, lines, editor) ->
                 requires[m[2]] = index:li, value:m[1].trim(), module:m[2], indent:indent
                 
                 if requires[m[2]].value.startsWith '{'
+                    # klog 'requires[m[2]].value.startsWith {' requires[m[2]]
                     if not keys[m[2]]
                         try
                             moduleName = kstr.strip m[2], '"\''
@@ -86,7 +87,7 @@ req = (file, lines, editor) ->
                                 regexes[k] ?= new RegExp "(^|[\\:\\(\\{]|\\s+)#{k}(\\s+[^:]|\\s*$|[\\.\\,\\(])"
                             
                         catch err
-                            kerror "can't require #{m[2]} for #{file}: #{err} \nmodule.paths:" module.paths
+                            kerror "ko can't require #{m[2]} for #{file}: #{err} \nmodule.paths:" module.paths
                 
                 firstIndex ?= li
             continue

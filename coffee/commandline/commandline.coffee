@@ -252,7 +252,7 @@ class Commandline extends TextEditor
                     @hideList()
                     @startCommand name
                     stopEvent event
-                div.addEventListener 'mousedown', start cname
+                div.addEventListener 'mousedown' start cname
                 @list.appendChild div
 
     hideList: ->
