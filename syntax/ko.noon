@@ -23,7 +23,8 @@
 [✘]                         method
 
 (?:^\s*|\/)(\.[\-\_\w][\.\-\_\w]*)(?:\s|$)    . dotfile  
-([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.[ck]offee\b)    . coffee   . coffee.ext
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.coffee\b)       . coffee   . coffee.ext
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.kode\b)         . kode     . kode.ext
 ([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.noon\b)         . noon     . noon.ext
 ([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.json\b)         . json     . json.ext
 ([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.styl\b)         . styl     . styl.ext

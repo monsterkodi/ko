@@ -16,7 +16,8 @@
 
 (?:^\s*|\/)(\.[\-\_\w][\.\-\_\w]*)(?:\s|$)  dotfile
 
-([~\/\.\-\_\ \(\)\w]+)(\.[ck]offee)([\d\:]*\b)  . coffee  . coffee.ext    . coffee.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.coffee)([\d\:]*\b)     . coffee  . coffee.ext    . coffee.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.kode)([\d\:]*\b)       . kode    . kode.ext      . kode.linepos
 ([~\/\.\-\_\ \(\)\w]+)(\.noon)([\d\:]*\b)       . noon    . noon.ext      . noon.linepos
 ([~\/\.\-\_\ \(\)\w]+)(\.json)([\d\:]*\b)       . json    . json.ext      . json.linepos
 ([~\/\.\-\_\ \(\)\w]+)(\.styl)([\d\:]*\b)       . styl    . styl.ext      . styl.linepos

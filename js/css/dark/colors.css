@@ -122,16 +122,6 @@ span.macro.search,
 #commandline-button.active.search {
   color: #0a0;
 }
-span.ko.term,
-span.macro.term,
-#commandline-button.active.term {
-  color: #f80;
-}
-span.ko.coffee,
-span.macro.coffee,
-#commandline-button.active.coffee {
-  color: #f00;
-}
 span.ko.build,
 span.macro.build,
 #commandline-button.active.build {
@@ -142,8 +132,7 @@ span.macro.macro,
 #commandline-button.active.macro {
   color: #888;
 }
-#commandline-button.macro,
-#commandline-button.coffee {
+#commandline-button.macro {
   color: #aaa;
 }
 .ctrl {
@@ -344,10 +333,6 @@ span.macro.macro,
 .meta.gitInfoChange {
   background: #080;
   opacity: 0.25;
-}
-.meta.coffeeCommand,
-.meta.termCommand {
-  background: #111;
 }
 .meta.git {
   opacity: 0.4;

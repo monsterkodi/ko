@@ -112,7 +112,6 @@ ext
     cmake                 cmake
     cmd                   windows
     coffee                coffee
-    coffee                coffee
     com                   windows
     conf                  config
     coq                   coq
@@ -308,7 +307,7 @@ ext
     kid                   genshi
     knt                   keynote
     ko                    binary
-    koffee                coffee
+    kode                  coffee
     ksh                   terminal
     kt                    kotlin
     ktm                   kotlin

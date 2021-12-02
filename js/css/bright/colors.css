@@ -96,24 +96,11 @@ span.ko.search,
 #commandline-button.active.search {
   color: #a00;
 }
-span.ko.term,
-#commandline-button.active.term {
-  color: #0a0;
-}
-span.ko.coffee,
-#commandline-button.active.coffee {
-  color: #800;
-}
-span.ko.build,
-#commandline-button.active.build {
-  color: #aaa;
-}
 span.ko.macro,
 #commandline-button.active.macro {
   color: #ccc;
 }
-#commandline-button.macro,
-#commandline-button.coffee {
+#commandline-button.macro {
   color: #aaa;
 }
 .ctrl {

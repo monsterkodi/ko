@@ -12,9 +12,9 @@ icons = require './icons.json'
 
 class File
     
-    @sourceFileExtensions: [ 'koffee' 'coffee' 'styl' 'swift' 'pug' 'md' 'noon' 'txt' 'json' 'sh' 'py' 'cpp' 'cc' 'c' 'cs' 'h' 'hpp' 'ts' 'js' 'frag' 'vert']
+    @sourceFileExtensions: [ 'kode' 'coffee' 'styl' 'swift' 'pug' 'md' 'noon' 'txt' 'json' 'sh' 'py' 'cpp' 'cc' 'c' 'cs' 'h' 'hpp' 'ts' 'js' 'frag' 'vert']
 
-    @isCode:  (file) -> slash.ext(file) in ['coffee' 'py' 'cpp' 'cc' 'c' 'cs' 'ts' 'js' 'h' 'hpp' 'frag' 'vert']
+    @isCode:  (file) -> slash.ext(file) in ['coffee' 'kode' 'py' 'cpp' 'cc' 'c' 'cs' 'ts' 'js' 'h' 'hpp' 'frag' 'vert']
     @isImage: (file) -> slash.ext(file) in ['gif' 'png' 'jpg' 'jpeg' 'svg' 'bmp' 'ico']
     @isText:  (file) -> slash.isText file
    

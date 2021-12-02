@@ -8,10 +8,13 @@
 
 { _, elem, fs, kerror, klor, kstr, last, matchr, noon, slash } = require 'kxk'
 
+klor = require 'klor'
+
 class Syntax
     
     @: (@name, @getLine, @getLines) ->
 
+        log 'Syntax' @name
         @diss   = []
         @colors = {}
 

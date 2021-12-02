@@ -99,7 +99,7 @@ class Autocomplete extends event
     # 000   000  00000000     000     000   000   0000000   0000000    
     
     parseMethod: (line) ->
-        
+
         rgs = matchr.ranges [@methodRegExp, ['obj' 'mth']], line
         for i in [0..rgs.length-2] by 2
             @mthdinfo[rgs[i].match] ?= {}
@@ -355,6 +355,10 @@ class Autocomplete extends event
         for l in lines
             if not l?.split?
                 return kerror "Autocomplete.parseLines -- line has no split? action: #{opt.action} line: #{l}", lines
+
+            if l.length > 240 
+                # if l.startsWith '//# sourceMapping'
+                continue
                 
             @parseMethod l
             @parseModule l

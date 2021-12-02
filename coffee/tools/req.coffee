@@ -25,11 +25,14 @@ moduleKeys = (moduleName, file) ->
         else if moduleName == 'electron'
             required = require 'electron'
         else
-            mRequire = requireLike file, true
-            required = mRequire moduleName
+            # mRequire = requireLike file, true
+            # required = mRequire moduleName
+            log 'require' moduleName
+            required = require moduleName
         
     catch err
         error "can't require #{moduleName}" err
+        return []
     
     keys = []
     if required

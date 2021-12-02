@@ -12,7 +12,7 @@ walkdir = require 'walkdir'
 
 shouldIndex = (path, stat) ->
     
-    exts = [ 'coffee' 'styl' 'pug' 'md' 'noon' 'txt' 'json' 'sh' 'py' 'cpp' 'cc' 'c' 'cs' 'h' 'hpp' 'js' ]
+    exts = [ 'coffee' 'kode' 'styl' 'pug' 'md' 'noon' 'txt' 'json' 'sh' 'py' 'cpp' 'cc' 'c' 'cs' 'h' 'hpp' 'js' ]
     if slash.ext(path) in exts
         if stat.size > 654321
             return false

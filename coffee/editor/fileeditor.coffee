@@ -6,7 +6,7 @@
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
 
-{ clamp, empty, fs, kerror, klog, kpos, popup, post, setStyle, slash, srcmap, stopEvent, valid } = require 'kxk'
+{ clamp, empty, fs, kerror, kpos, popup, post, setStyle, slash, srcmap, stopEvent, valid } = require 'kxk'
 
 TextEditor = require './texteditor'
 Syntax     = require './syntax'
@@ -76,7 +76,7 @@ class FileEditor extends TextEditor
 
     setCurrentFile: (file, restoreState) ->
 
-        klog 'setCurrentFile' file
+        # klog 'setCurrentFile' file
         @clear()
         
         @currentFile = file
@@ -314,7 +314,7 @@ class FileEditor extends TextEditor
         currext = slash.ext @currentFile
 
         switch currext
-            when 'coffee' 'koffee'
+            when 'coffee' 'kode'
                 [file,line,col] = srcmap.toJs @currentFile, cp[1]+1, cp[0]
             when 'js'
                 [file,line,col] = srcmap.toCoffee @currentFile, cp[1]+1, cp[0]
@@ -329,8 +329,8 @@ class FileEditor extends TextEditor
             h:       ['cpp' 'c']
             hpp:     ['cpp' 'c']
             coffee:  ['js']
-            koffee:  ['js']
-            js:      ['coffee''koffee']
+            kode:    ['js']
+            js:      ['coffee' 'kode']
             pug:     ['html']
             html:    ['pug']
             css:     ['styl']

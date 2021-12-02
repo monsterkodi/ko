@@ -483,7 +483,7 @@ class Indexer
                                     r.push [m[1], m[2]]
                                     fileInfo.require = r
                                     abspath = slash.resolve slash.join slash.dir(file), m[2]
-                                    abspath += '.coffee'
+                                    abspath += '.coffee' # fixme for kode!
                                     if (m[2][0] == '.') and (not @files[abspath]?) and (@queue.indexOf(abspath) < 0)
                                         if slash.isFile abspath
                                             @queue.push abspath

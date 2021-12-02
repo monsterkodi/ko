@@ -31,7 +31,7 @@ menu = (template) ->
 
     EditMenu = []
     for actionFile in actionFiles
-        continue if slash.ext(actionFile) not in ['js' 'coffee']
+        continue if slash.ext(actionFile) not in ['js' 'coffee' 'kode']
         actions = require actionFile
         for key,value of actions
             menuName = 'Misc'

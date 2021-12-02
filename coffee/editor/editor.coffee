@@ -47,7 +47,7 @@ class Editor extends Buffer
 
         @actions = []
         for actionFile in filelist(slash.join __dirname, 'actions')
-            continue if slash.ext(actionFile) not in ['js' 'coffee']
+            continue if slash.ext(actionFile) not in ['js' 'coffee' 'kode']
             actions = require actionFile
             for key,value of actions
                 if _.isFunction value
@@ -85,7 +85,7 @@ class Editor extends Buffer
         @setFileType newType
 
         if oldType != @fileType
-            @emit 'fileTypeChanged', @fileType
+            @emit 'fileTypeChanged' @fileType
 
     setFileType: (@fileType) ->
 
@@ -130,7 +130,7 @@ class Editor extends Buffer
         @insertIndentedEmptyLineBetween = '{}'
 
         switch @fileType
-            when 'coffee', 'koffee'
+            when 'coffee' 'kode'
                 @indentNewLineMore =
                     lineEndsWith: ['->', '=>', ':', '=']
                     lineRegExp:   /^(\s+when|\s*if|\s*else\s+if\s+)(?!.*\sthen\s)|(^|\s)(else\s*$|switch\s|for\s|while\s|class\s)/
@@ -138,12 +138,12 @@ class Editor extends Buffer
         # _______________________________________________________________ comment
         
         @multiComment = switch @fileType
-            when 'coffee' 'koffee'                                                  then open:'###'  close:'###'
+            when 'coffee' 'kode'                                                    then open:'###'  close:'###'
             when 'html' 'md'                                                        then open:'<!--' close:'-->'
             when 'styl' 'cpp' 'c' 'h' 'hpp' 'cxx' 'cs' 'js' 'scss' 'ts' 'swift' 'frag' 'vert' then open:'/*'   close:'*/'
         
         @lineComment = switch @fileType
-             when 'coffee' 'koffee' 'sh' 'bat' 'noon' 'ko' 'txt' 'fish'              then '#'
+             when 'coffee' 'kode' 'sh' 'bat' 'noon' 'ko' 'txt' 'fish'                then '#'
              when 'styl' 'cpp' 'c' 'h' 'hpp' 'cxx' 'cs' 'js' 'scss' 'ts' 'swift' 'frag' 'vert' then '//'
              when 'iss' 'ini'                                                        then ';'
              

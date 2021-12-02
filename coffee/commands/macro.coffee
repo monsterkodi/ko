@@ -149,7 +149,7 @@ class Macro extends Command
 
             when 'req'
 
-                return if slash.ext(editor.currentFile) != 'coffee'
+                return if slash.ext(editor.currentFile) not in ['coffee' 'kode']
                 lines = req editor.currentFile, editor.lines(), editor
 
                 if valid lines
@@ -205,7 +205,7 @@ class Macro extends Command
                 clss = cmds.length and cmds[0] or _.last editor.textsInRanges(editor.selections())
                 clss ?= 'Class'
                 dir = editor.currentFile? and slash.dir(editor.currentFile) or process.cwd()
-                file = slash.join dir, clss.toLowerCase() + '.coffee'
+                file = slash.join dir, clss.toLowerCase() + '.coffee' # fixme for kode!
                 if slash.fileExists file
                     return text: "file #{file} exists!"
                 text = "###\n"

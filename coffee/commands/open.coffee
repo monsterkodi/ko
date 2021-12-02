@@ -128,11 +128,11 @@ class Open extends Command
             nameBonus = n.startsWith(opt.currentText) and 2184  * (opt.currentText.length/n.length) or 0
            
         extensionBonus = switch slash.ext b
-            when 'coffee', 'koffee'   then 1000
-            when 'cpp', 'hpp', 'h'    then 90
-            when 'md', 'styl', 'pug'  then 50
-            when 'noon'               then 25
-            when 'js', 'json', 'html' then -10
+            when 'coffee' 'kode'    then 1000
+            when 'cpp' 'hpp' 'h'    then 90
+            when 'md' 'styl' 'pug'  then 50
+            when 'noon'             then 25
+            when 'js' 'json' 'html' then -10
             else 0 
         
         if @file and slash.ext(@file) == slash.ext b
