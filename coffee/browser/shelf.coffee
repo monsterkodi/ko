@@ -329,8 +329,8 @@ class Shelf extends Column
     # 000 0 000  000   000  000   000       000  000       
     # 000   000   0000000    0000000   0000000   00000000  
     
-    onMouseOver: (event) => @row(event.target)?.onMouseOver()
-    onMouseOut:  (event) => @row(event.target)?.onMouseOut()
+    onMouseOver: (event) => @row(event.target)?.onMouseOver?()
+    onMouseOut:  (event) => @row(event.target)?.onMouseOut?()
     onDblClick:  (event) => @navigateCols 'enter'
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  

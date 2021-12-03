@@ -318,8 +318,10 @@ class FileEditor extends TextEditor
                 [file,line,col] = srcmap.toJs @currentFile, cp[1]+1, cp[0]
             when 'js'
                 [file,line,col] = srcmap.toCoffee @currentFile, cp[1]+1, cp[0]
+
+        log 'counterpart' @currentFile, file, line, col
                 
-        if valid(file) and slash.fileExists file
+        if valid(file) and not slash.samePath(@currentFile, file) and slash.fileExists file
             post.emit 'loadFile' slash.joinFileLine file,line,col
             return true
 
@@ -336,19 +338,29 @@ class FileEditor extends TextEditor
             css:     ['styl']
             styl:    ['css']
 
-        for ext in (counterparts[currext] ? [])
+        for ext in counterparts[currext] ? []
             if slash.fileExists slash.swapExt @currentFile, ext
                 post.emit 'loadFile' slash.swapExt @currentFile, ext
                 return true
 
-        for ext in (counterparts[currext] ? [])
+        for ext in counterparts[currext] ? []
             counter = slash.swapExt @currentFile, ext
-            counter = counter.replace "/#{currext}/" "/#{ext}/"
+
+            counter = @swapLastDir counter, currext, ext
             if slash.fileExists counter
                 post.emit 'loadFile' counter
                 return true
+                
+        log 'cant find counterpart' @currentFile
         false
 
+    swapLastDir: (path, from, to) ->
+        
+        lastIndex = path.lastIndexOf "/#{from}/"
+        if lastIndex >= 0
+            path = path[..lastIndex] + to + path[lastIndex+("/#{from}").length..]
+        path
+        
     #  0000000  00000000  000   000  000000000  00000000  00000000
     # 000       000       0000  000     000     000       000   000
     # 000       0000000   000 0 000     000     0000000   0000000

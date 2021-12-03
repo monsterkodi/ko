@@ -149,6 +149,10 @@
   font-family: FontAwesome;
   content: "\f0f4";
 }
+.icon.kode:before {
+  font-family: Devicons;
+  content: "\e680";
+}
 .icon.css3:before {
   font-family: FontAwesome;
   content: "\f13c";

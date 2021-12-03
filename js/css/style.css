@@ -450,6 +450,15 @@ body {
   overflow: hidden;
   pointer-events: auto;
 }
+.kodeIcon {
+  padding-right: 0.35em;
+  padding-left: 0.1em;
+  overflow: hidden;
+}
+.kodeIcon svg {
+  fill: #0a0;
+  transform: translateY(2px);
+}
 #terminal,
 #editor {
   position: relative;
