@@ -6,7 +6,8 @@
 0000000      000     000   000     000     000   000  000   000
 ###
 
-{ _, elem, fs, kerror, klor, kstr, last, matchr, noon, slash } = require 'kxk'
+kxk = require 'kxk'
+{ _, elem, fs, kerror, kstr, last, matchr, noon, slash } = kxk
 
 klor = require 'klor'
 

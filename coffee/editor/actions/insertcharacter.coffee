@@ -54,6 +54,7 @@ module.exports =
                 when 'o' then '○'
                 when 's' then '▪'
                 when 'S' then '■'
+                when 't' then '➜'
             if substitute
                 return line.splice cursor[0]-1, 1, substitute
     

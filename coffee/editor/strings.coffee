@@ -6,7 +6,7 @@
 0000000      000     000   000  000  000   000   0000000   0000000 
 ###
 
-{ matchr, _ } = require 'kxk'
+{ _, matchr } = require 'kxk'
 
 class Strings
     
@@ -16,10 +16,12 @@ class Strings
         @editor.on 'fileTypeChanged' @setupConfig
         @setupConfig()
             
-    setupConfig: => 
+    setupConfig: =>
+        
         @config = ( [new RegExp(_.escapeRegExp(p)), a] for p,a of @editor.stringCharacters )
         
     onCursor: =>
+        
         if @editor.numHighlights() # don't highlight strings when other highlights exist
             for h in @editor.highlights()
                 return if not h[2]?
@@ -30,6 +32,7 @@ class Strings
         @editor.renderHighlights()
 
     highlightInside: (pos) ->
+        
         stack = []
         pairs = []
         pair  = null
