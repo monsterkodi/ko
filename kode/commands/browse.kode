@@ -6,7 +6,8 @@
 0000000    000   000   0000000   00     00  0000000   00000000
 ###
 
-{ $, clamp, empty, kerror, post, slash } = require 'kxk'
+kxk = require 'kxk'
+{ $, clamp, kerror, post, slash } = kxk
 
 Command     = require '../commandline/command'
 FileBrowser = require '../browser/filebrowser'

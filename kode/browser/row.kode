@@ -6,7 +6,8 @@
 000   000   0000000   00     00
 ###
 
-{ $, _, elem, empty, keyinfo, post, slash, stopEvent } = require 'kxk'
+kxk = require 'kxk'
+{ $, _, elem, keyinfo, post, slash, stopEvent } = kxk
 
 Syntax    = require '../editor/syntax'
 electron  = require 'electron'
@@ -32,8 +33,8 @@ function Row
     next:        -> @index() < @column.numRows()-1 and @column.rows[@index()+1] or null
     prev:        -> @index() > 0 and @column.rows[@index()-1] or null
     index:       -> @column.rows.indexOf @    
-    onMouseOut:  -> @div.classList.remove 'hover'
-    onMouseOver: -> @div.classList.add 'hover'
+    onMouseOut:  => @div?.classList.remove 'hover'
+    onMouseOver: => @div?.classList.add 'hover'
 
     path: -> 
         if @item.file? and _.isString @item.file

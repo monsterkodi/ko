@@ -6,7 +6,8 @@
 000       000  0000000  00000000        0000000    000   000   0000000   00     00  0000000   00000000  000   000
 ###
 
-{ $, clamp, drag, elem, empty, filelist, klog, post, prefs, slash, valid } = require 'kxk'
+kxk = require 'kxk'
+{ $, clamp, drag, elem, filelist, klog, post, prefs, slash } = kxk
 
 Browser  = require './browser'
 Shelf    = require './shelf'

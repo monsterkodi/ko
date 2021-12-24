@@ -1,6 +1,6 @@
 // monsterkodi/kode 0.212.0
 
-var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}}
+var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined}
 
 var $, clamp, elem, event, Indexer, jsClass, kerror, kxk, last, matchr, req, stopEvent, _
 
@@ -122,15 +122,17 @@ class Autocomplete extends event
 
     parseMethod (line)
     {
-        var i, rgs, _103_36_, _104_52_
+        var i, rgs, _103_40_, _104_56_
 
-        rgs = matchr.ranges([this.methodRegExp,['obj','mth']],line)
-        for (var _102_18_ = i = 0, _102_21_ = rgs.length - 2; (_102_18_ <= _102_21_ ? i <= rgs.length - 2 : i >= rgs.length - 2); (_102_18_ <= _102_21_ ? ++i : --i))
+        if (!_k_.empty((rgs = matchr.ranges([this.methodRegExp,['obj','mth']],line))))
         {
-            this.mthdinfo[rgs[i].match] = ((_103_36_=this.mthdinfo[rgs[i].match]) != null ? _103_36_ : {})
-            this.mthdinfo[rgs[i].match][rgs[i + 1].match] = ((_104_52_=this.mthdinfo[rgs[i].match][rgs[i + 1].match]) != null ? _104_52_ : 0)
-            this.mthdinfo[rgs[i].match][rgs[i + 1].match] += 1
-            i++
+            for (var _102_21_ = i = 0, _102_25_ = rgs.length - 1; (_102_21_ <= _102_25_ ? i < rgs.length - 1 : i > rgs.length - 1); (_102_21_ <= _102_25_ ? ++i : --i))
+            {
+                this.mthdinfo[rgs[i].match] = ((_103_40_=this.mthdinfo[rgs[i].match]) != null ? _103_40_ : {})
+                this.mthdinfo[rgs[i].match][rgs[i + 1].match] = ((_104_56_=this.mthdinfo[rgs[i].match][rgs[i + 1].match]) != null ? _104_56_ : 0)
+                this.mthdinfo[rgs[i].match][rgs[i + 1].match] += 1
+                i++
+            }
         }
     }
 

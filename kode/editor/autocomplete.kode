@@ -98,12 +98,12 @@ class Autocomplete extends event
     
     parseMethod: (line) ->
 
-        rgs = matchr.ranges [@methodRegExp, ['obj' 'mth']], line
-        for i in [0..rgs.length-2]
-            @mthdinfo[rgs[i].match] ?= {}
-            @mthdinfo[rgs[i].match][rgs[i+1].match] ?= 0
-            @mthdinfo[rgs[i].match][rgs[i+1].match] += 1
-            i++
+        if valid (rgs = matchr.ranges [@methodRegExp, ['obj' 'mth']], line)
+            for i in 0...rgs.length-1
+                @mthdinfo[rgs[i].match] ?= {}
+                @mthdinfo[rgs[i].match][rgs[i+1].match] ?= 0
+                @mthdinfo[rgs[i].match][rgs[i+1].match] += 1
+                i++
     
     completeMethod: (info) ->
         

@@ -2,14 +2,14 @@
 
 var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}}
 
-var $, Browse, clamp, Command, FileBrowser, kerror, post, slash
+var $, Browse, clamp, Command, FileBrowser, kerror, kxk, post, slash
 
-$ = require('kxk').$
-clamp = require('kxk').clamp
-empty = require('kxk').empty
-kerror = require('kxk').kerror
-post = require('kxk').post
-slash = require('kxk').slash
+kxk = require('kxk')
+$ = kxk.$
+clamp = kxk.clamp
+kerror = kxk.kerror
+post = kxk.post
+slash = kxk.slash
 
 Command = require('../commandline/command')
 FileBrowser = require('../browser/filebrowser')
@@ -53,7 +53,7 @@ Browse = (function ()
 
     Browse.prototype["start"] = function (action)
     {
-        var name, _54_40_
+        var name, _55_40_
 
         this.browser.start()
         if (action !== 'shelf')
@@ -164,7 +164,7 @@ Browse = (function ()
         var i, prefix
 
         prefix = ''
-        for (var _139_18_ = i = 0, _139_22_ = Math.min(strA.length,strB.length); (_139_18_ <= _139_22_ ? i < Math.min(strA.length,strB.length) : i > Math.min(strA.length,strB.length)); (_139_18_ <= _139_22_ ? ++i : --i))
+        for (var _140_18_ = i = 0, _140_22_ = Math.min(strA.length,strB.length); (_140_18_ <= _140_22_ ? i < Math.min(strA.length,strB.length) : i > Math.min(strA.length,strB.length)); (_140_18_ <= _140_22_ ? ++i : --i))
         {
             if (strA[i] !== strB[i])
             {
@@ -182,9 +182,9 @@ Browse = (function ()
         brokenPath = slash.resolve(this.getText())
         longestMatch = ''
         var list = _k_.list(files)
-        for (var _148_17_ = 0; _148_17_ < list.length; _148_17_++)
+        for (var _149_17_ = 0; _149_17_ < list.length; _149_17_++)
         {
-            file = list[_148_17_]
+            file = list[_149_17_]
             file = file.file
             prefix = this.commonPrefix(file,brokenPath)
             if (prefix.length > longestMatch.length)
@@ -257,7 +257,7 @@ Browse = (function ()
 
     Browse.prototype["changed"] = function (command)
     {
-        var text, _208_19_
+        var text, _209_19_
 
         text = this.getText().trim()
         if (!text.endsWith('/'))
@@ -273,7 +273,7 @@ Browse = (function ()
 
     Browse.prototype["handleModKeyComboEvent"] = function (mod, key, combo, event)
     {
-        var focusBrowser, _223_74_
+        var focusBrowser, _224_74_
 
         switch (combo)
         {
@@ -317,7 +317,7 @@ Browse = (function ()
 
     Browse.prototype["select"] = function (i)
     {
-        var l, s, text, _258_42_, _264_20_, _265_20_
+        var l, s, text, _259_42_, _265_20_, _266_20_
 
         this.selected = clamp(-1,(this.commandList != null ? this.commandList.numLines() : undefined) - 1,i)
         if (this.selected < 0)
@@ -336,7 +336,7 @@ Browse = (function ()
 
     Browse.prototype["selectListItem"] = function (dir)
     {
-        var _275_34_
+        var _276_34_
 
         if (!(this.commandList != null))
         {
@@ -391,11 +391,11 @@ Browse = (function ()
 
     Browse.prototype["onBrowserItemActivated"] = function (item)
     {
-        var pth, _324_32_, _324_56_, _331_64_, _331_72_, _333_61_, _333_69_
+        var pth, _325_32_, _325_56_, _332_64_, _332_72_, _334_61_, _334_69_
 
         if (!this.isActive())
         {
-            ;((_324_32_=this.commandline.command) != null ? typeof (_324_56_=_324_32_.onBrowserItemActivated) === "function" ? _324_56_(item) : undefined : undefined)
+            ;((_325_32_=this.commandline.command) != null ? typeof (_325_56_=_325_32_.onBrowserItemActivated) === "function" ? _325_56_(item) : undefined : undefined)
             return
         }
         if (item.file)
@@ -404,9 +404,9 @@ Browse = (function ()
             if (item.type === 'dir')
             {
                 pth += '/'
-                if (item.name === '..' && ((_331_64_=this.browser.activeColumn()) != null ? (_331_72_=_331_64_.parent) != null ? _331_72_.file : undefined : undefined))
+                if (item.name === '..' && ((_332_64_=this.browser.activeColumn()) != null ? (_332_72_=_332_64_.parent) != null ? _332_72_.file : undefined : undefined))
                 {
-                    pth = slash.tilde(((_333_61_=this.browser.activeColumn()) != null ? (_333_69_=_333_61_.parent) != null ? _333_69_.file : undefined : undefined))
+                    pth = slash.tilde(((_334_61_=this.browser.activeColumn()) != null ? (_334_69_=_334_61_.parent) != null ? _334_69_.file : undefined : undefined))
                 }
             }
             return this.commandline.setText(pth)

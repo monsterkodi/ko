@@ -6,7 +6,8 @@
  0000000   0000000   0000000   0000000   000   000  000   000
 ###
 
-{ $, _, clamp, drag, elem, empty, fs, kerror, keyinfo, klog, kpos, open, popup, post, prefs, setStyle, slash, stopEvent, valid } = require 'kxk'
+kxk = require 'kxk'
+{ $, _, clamp, drag, elem, fs, kerror, keyinfo, klog, kpos, open, popup, post, prefs, setStyle, slash, stopEvent} = kxk
 
 Row      = require './row'
 Crumb    = require './crumb'
@@ -732,9 +733,11 @@ function Column
         
         for row in @rows
             return if row.item.type not in ['dir' 'file']
+            return if not row.div
             status = files[row.item.file]
-            
-            $('.browserStatusIcon' row.div)?.remove()
+
+            if icon =$ '.browserStatusIcon' row.div
+                icon.remove()
             
             if status?
                 row.div.appendChild elem 'span' class:"git-#{status}-icon browserStatusIcon"

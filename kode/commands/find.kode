@@ -6,8 +6,6 @@
 000       000  000   000  0000000  
 ###
 
-{ empty } = require 'kxk'
-
 Command = require '../commandline/command'
 
 function Find extends Command

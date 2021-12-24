@@ -4,8 +4,6 @@ var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c
 
 var Command, Find
 
-empty = require('kxk').empty
-
 Command = require('../commandline/command')
 
 Find = (function ()
