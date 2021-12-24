@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.214.0
+// monsterkodi/kode 0.218.0
 
 var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, valid: undefined, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
@@ -73,7 +73,7 @@ Open = (function ()
         var f, file, fuzzied, items, pos
 
         command = command.trim()
-        var _64_20_ = slash.splitFilePos((command != null ? command : this.getText().trim())) ; file = _64_20_[0]        ; pos = _64_20_[1]
+        var _64_20_ = slash.splitFilePos((command != null ? command : this.getText().trim())); file = _64_20_[0]; pos = _64_20_[1]
 
         items = this.listItems({currentText:command,maxItems:10000})
         if (command.length)
@@ -398,7 +398,7 @@ Open = (function ()
         this.hideList()
         if (!_k_.empty(path))
         {
-            var _329_24_ = slash.splitFilePos(command) ; file = _329_24_[0]            ; pos = _329_24_[1]
+            var _329_24_ = slash.splitFilePos(command); file = _329_24_[0]; pos = _329_24_[1]
 
             file = this.resolvedPath(path)
             file = slash.joinFilePos(file,pos)

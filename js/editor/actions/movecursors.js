@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.214.0
+// monsterkodi/kode 0.218.0
 
 var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}}
 
@@ -50,7 +50,7 @@ keeps current main cursor position in cursors if shift is pressed.`,combos:['ctr
 
         }
 
-    }).bind(this))() ; dx = _77_17_[0]    ; dy = _77_17_[1]
+    }).bind(this))(); dx = _77_17_[0]; dy = _77_17_[1]
 
     newCursors = this.do.cursors()
     oldMain = this.mainCursor()

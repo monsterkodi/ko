@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.214.0
+// monsterkodi/kode 0.218.0
 
 var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}}
 
@@ -43,7 +43,7 @@ class Brackets
             }
         }
         cp = this.editor.cursorPos()
-        var _38_24_ = this.beforeAfterForPos(cp) ; before = _38_24_[0]        ; after = _38_24_[1]
+        var _38_24_ = this.beforeAfterForPos(cp); before = _38_24_[0]; after = _38_24_[1]
 
         if (after.length || before.length)
         {
@@ -73,7 +73,7 @@ class Brackets
         cnt = 0
         while (pp[1] >= 0)
         {
-            var _62_28_ = this.beforeAfterForPos(pp) ; before = _62_28_[0]            ; after = _62_28_[1]
+            var _62_28_ = this.beforeAfterForPos(pp); before = _62_28_[0]; after = _62_28_[1]
 
             while (before.length)
             {
@@ -122,7 +122,7 @@ class Brackets
         pp = pos
         while (pp[1] <= this.editor.numLines())
         {
-            var _87_28_ = this.beforeAfterForPos(pp) ; before = _87_28_[0]            ; after = _87_28_[1]
+            var _87_28_ = this.beforeAfterForPos(pp); before = _87_28_[0]; after = _87_28_[1]
 
             while (after.length)
             {
@@ -178,7 +178,7 @@ class Brackets
     {
         var after, before, cp, firstAfterIndex, fst, i, li, line, lst, r, rngs
 
-        var _121_17_ = pos ; cp = _121_17_[0]        ; li = _121_17_[1]
+        var _121_17_ = pos; cp = _121_17_[0]; li = _121_17_[1]
 
         line = this.editor.line(li)
         rngs = matchr.ranges(this.config,line)

@@ -108,16 +108,14 @@ function Window extends win
     
     onMenuAction: (name, opts) =>
     
-        # klog 'ko.window.onMenuAction' name, opts
-        
         if action = Editor.actionWithName name
             if action.key? and _.isFunction window.focusEditor[action.key]
                 window.focusEditor[action.key] opts.actarg
-                return
+                return 
     
         if 'unhandled' != window.commandline.handleMenuAction name, opts
-            return
-    
+            return 
+            
         switch name
     
             'doMacro'               ➜ return window.commandline.commands.macro.execute opts.actarg

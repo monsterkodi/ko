@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.214.0
+// monsterkodi/kode 0.218.0
 
 var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined, list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}}
 
@@ -65,7 +65,7 @@ parseResult = function (file, result)
     {
         if (line.startsWith('@@'))
         {
-            var _46_31_ = line.split(' ') ; x = _46_31_[0]            ; before = _46_31_[1]            ; after = _46_31_[2]
+            var _46_31_ = line.split(' '); x = _46_31_[0]; before = _46_31_[1]; after = _46_31_[2]
 
             afterSplit = after.split(',')
             numOld = parseInt(((_49_51_=before.split(',')[1]) != null ? _49_51_ : 1))

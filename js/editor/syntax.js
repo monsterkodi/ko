@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.214.0
+// monsterkodi/kode 0.218.0
 
 var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
@@ -59,7 +59,7 @@ class Syntax
         for (var _58_19_ = 0; _58_19_ < list.length; _58_19_++)
         {
             change = list[_58_19_]
-            var _60_23_ = [change.doIndex,change.newIndex,change.change] ; di = _60_23_[0]            ; li = _60_23_[1]            ; ch = _60_23_[2]
+            var _60_23_ = [change.doIndex,change.newIndex,change.change]; di = _60_23_[0]; li = _60_23_[1]; ch = _60_23_[2]
 
             switch (ch)
             {

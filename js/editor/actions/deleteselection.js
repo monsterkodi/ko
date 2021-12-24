@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.214.0
+// monsterkodi/kode 0.218.0
 
 var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
@@ -43,7 +43,7 @@ module.exports = {deleteSelectionOrCursorLines:function ()
             }
             if ((csel != null))
             {
-                var _37_29_ = csel ; sp = _37_29_[0]                ; ep = _37_29_[1]
+                var _37_29_ = csel; sp = _37_29_[0]; ep = _37_29_[1]
 
                 var list1 = _k_.list(positionsBetweenPosAndPosInPositions(sp,ep,newCursors))
                 for (var _38_27_ = 0; _38_27_ < list1.length; _38_27_++)

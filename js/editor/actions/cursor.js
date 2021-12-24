@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.214.0
+// monsterkodi/kode 0.218.0
 
 var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}}
 
@@ -180,7 +180,7 @@ select brackets or quotes otherwise.`,combo:'command+alt+b',accel:'alt+ctrl+b'},
     var i
 
     this.do.start()
-    this.do.setCursors((function () { var _186__36_ = []; for (var _186_40_ = i = 0, _186_44_ = this.numLines(); (_186_40_ <= _186_44_ ? i < this.numLines() : i > this.numLines()); (_186_40_ <= _186_44_ ? ++i : --i))  { _186__36_.push([0,i])  } return _186__36_ }).bind(this)()({main:'closest'}))
+    this.do.setCursors((function () { var _186__36_ = []; for (var _186_40_ = i = 0, _186_44_ = this.numLines(); (_186_40_ <= _186_44_ ? i < this.numLines() : i > this.numLines()); (_186_40_ <= _186_44_ ? ++i : --i))  { _186__36_.push([0,i])  } return _186__36_ }).bind(this)(),{main:'closest'})
     return this.do.end()
 },cursorColumns:function (num, step = 1)
 {
@@ -188,7 +188,7 @@ select brackets or quotes otherwise.`,combo:'command+alt+b',accel:'alt+ctrl+b'},
 
     cp = this.cursorPos()
     this.do.start()
-    this.do.setCursors((function () { var _192__51_ = []; for (var _192_55_ = i = 0, _192_59_ = num; (_192_55_ <= _192_59_ ? i < num : i > num); (_192_55_ <= _192_59_ ? ++i : --i))  { _192__51_.push([cp[0] + i * step,cp[1]])  } return _192__51_ }).bind(this)()({main:'closest'}))
+    this.do.setCursors((function () { var _192__51_ = []; for (var _192_55_ = i = 0, _192_59_ = num; (_192_55_ <= _192_59_ ? i < num : i > num); (_192_55_ <= _192_59_ ? ++i : --i))  { _192__51_.push([cp[0] + i * step,cp[1]])  } return _192__51_ }).bind(this)(),{main:'closest'})
     return this.do.end()
 },cursorLines:function (num, step = 1)
 {
@@ -196,7 +196,7 @@ select brackets or quotes otherwise.`,combo:'command+alt+b',accel:'alt+ctrl+b'},
 
     cp = this.cursorPos()
     this.do.start()
-    this.do.setCursors((function () { var _198__51_ = []; for (var _198_55_ = i = 0, _198_59_ = num; (_198_55_ <= _198_59_ ? i < num : i > num); (_198_55_ <= _198_59_ ? ++i : --i))  { _198__51_.push([cp[0],cp[1] + i * step])  } return _198__51_ }).bind(this)()({main:'closest'}))
+    this.do.setCursors((function () { var _198__51_ = []; for (var _198_55_ = i = 0, _198_59_ = num; (_198_55_ <= _198_59_ ? i < num : i > num); (_198_55_ <= _198_59_ ? ++i : --i))  { _198__51_.push([cp[0],cp[1] + i * step])  } return _198__51_ }).bind(this)(),{main:'closest'})
     return this.do.end()
 },alignCursorsAndText:function ()
 {

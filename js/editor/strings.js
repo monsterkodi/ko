@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.214.0
+// monsterkodi/kode 0.218.0
 
 var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}}
 
@@ -58,7 +58,7 @@ class Strings
         stack = []
         pairs = []
         pair = null
-        var _39_17_ = pos ; cp = _39_17_[0]        ; li = _39_17_[1]
+        var _39_17_ = pos; cp = _39_17_[0]; li = _39_17_[1]
 
         line = this.editor.line(li)
         rngs = matchr.ranges(this.config,line)
@@ -120,7 +120,7 @@ class Strings
         var cls, opn
 
         this.clear()
-        var _77_18_ = pair ; opn = _77_18_[0]        ; cls = _77_18_[1]
+        var _77_18_ = pair; opn = _77_18_[0]; cls = _77_18_[1]
 
         pair[0].clss = `stringmatch ${this.editor.stringCharacters[opn.match]}`
         pair[1].clss = `stringmatch ${this.editor.stringCharacters[cls.match]}`

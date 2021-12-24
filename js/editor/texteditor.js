@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.214.0
+// monsterkodi/kode 0.218.0
 
 var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}}
 
@@ -248,7 +248,7 @@ TextEditor = (function ()
         for (var _230_19_ = 0; _230_19_ < list.length; _230_19_++)
         {
             change = list[_230_19_]
-            var _231_23_ = [change.doIndex,change.newIndex,change.change] ; di = _231_23_[0]            ; li = _231_23_[1]            ; ch = _231_23_[2]
+            var _231_23_ = [change.doIndex,change.newIndex,change.change]; di = _231_23_[0]; li = _231_23_[1]; ch = _231_23_[2]
 
             switch (ch)
             {

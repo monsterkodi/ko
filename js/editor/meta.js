@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.214.0
+// monsterkodi/kode 0.218.0
 
 var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
@@ -71,7 +71,7 @@ class Meta
                 meta = list1[_50_21_]
                 if (meta[2].clss === "searchResult" && (meta[2].href != null))
                 {
-                    var _52_33_ = slash.splitFileLine(meta[2].href) ; file = _52_33_[0]                    ; line = _52_33_[1]
+                    var _52_33_ = slash.splitFileLine(meta[2].href); file = _52_33_[0]; line = _52_33_[1]
 
                     line -= 1
                     localChange = _.cloneDeep(change)
@@ -151,7 +151,7 @@ class Meta
             meta = list[_91_17_]
             if (meta[2].state === 'unsaved')
             {
-                var _93_29_ = slash.splitFileLine(meta[2].href) ; file = _93_29_[0]                ; line = _93_29_[1]
+                var _93_29_ = slash.splitFileLine(meta[2].href); file = _93_29_[0]; line = _93_29_[1]
 
                 break
             }
@@ -165,7 +165,7 @@ class Meta
                 meta = list1[_98_21_]
                 if (meta[2].state === 'unsaved')
                 {
-                    var _100_34_ = slash.splitFileLine(meta[2].href) ; mfile = _100_34_[0]                    ; line = _100_34_[1]
+                    var _100_34_ = slash.splitFileLine(meta[2].href); mfile = _100_34_[0]; line = _100_34_[1]
 
                     if (mfile === file)
                     {
@@ -193,7 +193,7 @@ class Meta
             meta = list[_111_17_]
             if (meta[2].state === 'unsaved')
             {
-                var _113_29_ = slash.splitFileLine(meta[2].href) ; file = _113_29_[0]                ; line = _113_29_[1]
+                var _113_29_ = slash.splitFileLine(meta[2].href); file = _113_29_[0]; line = _113_29_[1]
 
                 fileLineMetas[file] = ((_114_36_=fileLineMetas[file]) != null ? _114_36_ : [])
                 fileLineMetas[file].push([line - 1,this.editor.line(meta[0]),meta])

@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.214.0
+// monsterkodi/kode 0.218.0
 
 var _k_ = {in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}}
 
@@ -37,7 +37,7 @@ module.exports = {initSurround:function ()
     {
         return false
     }
-    var _43_16_ = this.surroundPairs[ch] ; cl = _43_16_[0]    ; cr = _43_16_[1]
+    var _43_16_ = this.surroundPairs[ch]; cl = _43_16_[0]; cr = _43_16_[1]
 
     if (cl.length > 1)
     {
@@ -98,7 +98,7 @@ module.exports = {initSurround:function ()
         return false
     }
     p = this.cursorPos()
-    var _69_24_ = this.splitStateLineAtPos(this.state,p) ; before = _69_24_[0]    ; after = _69_24_[1]
+    var _69_24_ = this.splitStateLineAtPos(this.state,p); before = _69_24_[0]; after = _69_24_[1]
 
     if (!before.endsWith('""'))
     {
@@ -211,7 +211,7 @@ module.exports = {initSurround:function ()
     {
         newSelections = this.do.selections()
     }
-    var _137_16_ = this.surroundPairs[ch] ; cl = _137_16_[0]    ; cr = _137_16_[1]
+    var _137_16_ = this.surroundPairs[ch]; cl = _137_16_[0]; cr = _137_16_[1]
 
     this.surroundStack.push([cl,cr])
     var list4 = _k_.list(reversed(newSelections))
@@ -234,7 +234,7 @@ module.exports = {initSurround:function ()
         }
         else if (_k_.in(this.fileType,['coffee','kode']) && cl === '(' && lengthOfRange(ns) > 0)
         {
-            var _151_32_ = this.splitStateLineAtPos(this.do,rangeStartPos(ns)) ; before = _151_32_[0]            ; after = _151_32_[1]
+            var _151_32_ = this.splitStateLineAtPos(this.do,rangeStartPos(ns)); before = _151_32_[0]; after = _151_32_[1]
 
             trimmed = before.trimRight()
             beforeGood = /\w$/.test(trimmed) && !/(if|when|in|and|or|is|not|else|return)$/.test(trimmed)
@@ -325,7 +325,7 @@ module.exports = {initSurround:function ()
     for (var _218_14_ = 0; _218_14_ < list2.length; _218_14_++)
     {
         c = list2[_218_14_]
-        var _219_20_ = openClosePairs.shift() ; so = _219_20_[0]        ; sc = _219_20_[1]
+        var _219_20_ = openClosePairs.shift(); so = _219_20_[0]; sc = _219_20_[1]
 
         this.do.change(c[1],this.do.line(c[1]).splice(c[0] - so.length,so.length + sc.length))
         var list3 = _k_.list(positionsAfterLineColInPositions(c[1],c[0],cs))

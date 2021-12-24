@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.214.0
+// monsterkodi/kode 0.218.0
 
 var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined}
 
@@ -288,8 +288,8 @@ class Autocomplete extends event
         if (this.matchList.length)
         {
             this.list = elem({class:'autocomplete-list'})
-            this.list.addEventListener('wheel',this.onWheel({passive:true}))
-            this.list.addEventListener('mousedown',this.onMouseDown({passive:true}))
+            this.list.addEventListener('wheel',this.onWheel,{passive:true})
+            this.list.addEventListener('mousedown',this.onMouseDown,{passive:true})
             index = 0
             var list2 = _k_.list(this.matchList)
             for (var _227_18_ = 0; _227_18_ < list2.length; _227_18_++)
@@ -543,7 +543,7 @@ class Autocomplete extends event
 
         cp = this.editor.cursorPos()
         words = this.editor.wordRangesInLineAtIndex(cp[1],{regExp:this.specialWordRegExp})
-        var _397_30_ = rangesSplitAtPosInRanges(cp,words) ; befor = _397_30_[0]        ; cursr = _397_30_[1]        ; after = _397_30_[2]
+        var _397_30_ = rangesSplitAtPosInRanges(cp,words); befor = _397_30_[0]; cursr = _397_30_[1]; after = _397_30_[2]
 
         return [this.editor.textsInRanges(befor),this.editor.textInRange(cursr),this.editor.textsInRanges(after)]
     }

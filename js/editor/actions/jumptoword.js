@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.214.0
+// monsterkodi/kode 0.218.0
 
 var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}}
 
@@ -25,7 +25,7 @@ module.exports = {actions:{jumpToWord:{name:'Jump to Word',text:'jump to word at
             d = list[_30_18_]
             if ((d.start <= p[0] && p[0] <= d.start + d.match.length))
             {
-                var _33_38_ = slash.splitFileLine(d.match) ; file = _33_38_[0]                ; line = _33_38_[1]                ; col = _33_38_[2]
+                var _33_38_ = slash.splitFileLine(d.match); file = _33_38_[0]; line = _33_38_[1]; col = _33_38_[2]
 
                 if (slash.fileExists(file))
                 {
@@ -36,7 +36,7 @@ module.exports = {actions:{jumpToWord:{name:'Jump to Word',text:'jump to word at
             if (!slash.isAbsolute(d.match))
             {
                 cwd = window.cwd.cwd
-                var _41_38_ = slash.splitFileLine(slash.join(cwd,d.match)) ; file = _41_38_[0]                ; line = _41_38_[1]                ; col = _41_38_[2]
+                var _41_38_ = slash.splitFileLine(slash.join(cwd,d.match)); file = _41_38_[0]; line = _41_38_[1]; col = _41_38_[2]
 
                 if (slash.isFile(file))
                 {
@@ -63,7 +63,7 @@ module.exports = {actions:{jumpToWord:{name:'Jump to Word',text:'jump to word at
             d = list1[_56_18_]
             if ((d.start <= p[0] && p[0] <= d.start + d.match.length))
             {
-                var _58_38_ = slash.splitFileLine(d.match) ; file = _58_38_[0]                ; line = _58_38_[1]                ; col = _58_38_[2]
+                var _58_38_ = slash.splitFileLine(d.match); file = _58_38_[0]; line = _58_38_[1]; col = _58_38_[2]
 
                 if (slash.fileExists(file))
                 {

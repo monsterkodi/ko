@@ -221,8 +221,12 @@ class FileHandler
             post.emit 'menuAction' 'doMacro' actarg:'req' # !!!!!!!
         catch err
             kerror "macro req failed #{err}"
+            
+        dbg 'File.save' file
         
         File.save file, editor.text(), (err, saved) ->
+            
+            dbg 'File.saved' err, file
             
             editor.saveScrollCursorsAndSelections()
             

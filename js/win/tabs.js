@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.214.0
+// monsterkodi/kode 0.218.0
 
 var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}}
 
@@ -365,7 +365,7 @@ class Tabs
         var col, line, tab
 
         klog('onNewTabWithFile',file)
-        var _248_26_ = slash.splitFileLine(file) ; file = _248_26_[0]        ; line = _248_26_[1]        ; col = _248_26_[2]
+        var _248_26_ = slash.splitFileLine(file); file = _248_26_[0]; line = _248_26_[1]; col = _248_26_[2]
 
         if (tab = this.tab(file))
         {
@@ -413,7 +413,7 @@ class Tabs
         }
         if (ta.index() > tb.index())
         {
-            var _280_17_ = [tb,ta] ; ta = _280_17_[0]            ; tb = _280_17_[1]
+            var _280_17_ = [tb,ta]; ta = _280_17_[0]; tb = _280_17_[1]
 
         }
         this.tabs[ta.index()] = tb

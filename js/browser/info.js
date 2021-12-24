@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.214.0
+// monsterkodi/kode 0.218.0
 
 var _k_
 
@@ -37,7 +37,7 @@ imageInfo = function (file)
         stat = slash.fileExists(file)
         size = pbytes(stat.size).split(' ')
         age = moment().to(moment(stat.mtime),true)
-        var _41_21_ = age.split(' ') ; num = _41_21_[0]        ; range = _41_21_[1]
+        var _41_21_ = age.split(' '); num = _41_21_[0]; range = _41_21_[1]
 
         if (num[0] === 'a')
         {
@@ -61,7 +61,7 @@ fileInfo = function (file)
     size = pbytes(stat.size).split(' ')
     t = moment(stat.mtime)
     age = moment().to(t,true)
-    var _71_17_ = age.split(' ') ; num = _71_17_[0]    ; range = _71_17_[1]
+    var _71_17_ = age.split(' '); num = _71_17_[0]; range = _71_17_[1]
 
     if (num[0] === 'a')
     {

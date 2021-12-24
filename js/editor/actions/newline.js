@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.214.0
+// monsterkodi/kode 0.218.0
 
 var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
@@ -43,7 +43,7 @@ module.exports = {actions:{menu:'Line',newline:{name:'Insert Newline',combos:['e
     for (var _52_14_ = 0; _52_14_ < list.length; _52_14_++)
     {
         c = list[_52_14_]
-        var _54_28_ = this.splitStateLineAtPos(this.do,c) ; before = _54_28_[0]        ; after = _54_28_[1]
+        var _54_28_ = this.splitStateLineAtPos(this.do,c); before = _54_28_[0]; after = _54_28_[1]
 
         if (doIndent)
         {

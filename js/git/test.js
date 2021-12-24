@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.214.0
+// monsterkodi/kode 0.218.0
 
 var _k_
 
@@ -36,7 +36,7 @@ describe('git',function ()
         {
             return info(rootDir,function (r)
             {
-                expect(r).to.include({gitDir:rootDir()})
+                expect(r).to.include({gitDir:rootDir})
                 return done()
             })
         })
@@ -44,7 +44,7 @@ describe('git',function ()
         {
             return info(__dirname,function (r)
             {
-                expect(r).to.include({gitDir:__dirname()})
+                expect(r).to.include({gitDir:__dirname})
                 return done()
             })
         })
@@ -52,7 +52,7 @@ describe('git',function ()
         {
             return info('/',function (r)
             {
-                expect(r).to.be.empty()
+                expect(r).to.be.empty
                 return done()
             })
         })
@@ -79,7 +79,7 @@ describe('git',function ()
         {
             return status(rootDir,function (r)
             {
-                expect(r).to.include({gitDir:rootDir()})
+                expect(r).to.include({gitDir:rootDir})
                 return done()
             })
         })
@@ -87,7 +87,7 @@ describe('git',function ()
         {
             return status(__dirname,function (r)
             {
-                expect(r).to.include({gitDir:__dirname()})
+                expect(r).to.include({gitDir:__dirname})
                 return done()
             })
         })
@@ -95,7 +95,7 @@ describe('git',function ()
         {
             return status(__filename,function (r)
             {
-                expect(r).to.be.empty()
+                expect(r).to.be.empty
                 return done()
             })
         })
@@ -103,7 +103,7 @@ describe('git',function ()
         {
             return status('/',function (r)
             {
-                expect(r).to.be.empty()
+                expect(r).to.be.empty
                 return done()
             })
         })
@@ -149,7 +149,7 @@ describe('git',function ()
         {
             return root('.',function (r)
             {
-                expect(r).to.eql(rootDir())
+                expect(r).to.eql(rootDir)
                 return done()
             })
         })
@@ -157,7 +157,7 @@ describe('git',function ()
         {
             return root('..',function (r)
             {
-                expect(r).to.eql(rootDir())
+                expect(r).to.eql(rootDir)
                 return done()
             })
         })
@@ -165,7 +165,7 @@ describe('git',function ()
         {
             return root(__filename,function (r)
             {
-                expect(r).to.eql(rootDir())
+                expect(r).to.eql(rootDir)
                 return done()
             })
         })
@@ -173,7 +173,7 @@ describe('git',function ()
         {
             return root(rootDir,function (r)
             {
-                expect(r).to.eql(rootDir())
+                expect(r).to.eql(rootDir)
                 return done()
             })
         })
@@ -181,7 +181,7 @@ describe('git',function ()
         {
             return root(slash.join(__dirname,'blark'),function (r)
             {
-                expect(r).to.eql(rootDir())
+                expect(r).to.eql(rootDir)
                 return done()
             })
         })
@@ -224,7 +224,7 @@ describe('git',function ()
         {
             return diff(__filename,function (r)
             {
-                expect(r).to.include({file:slash.resolve(__filename)})()
+                expect(r).to.include({file:slash.resolve(__filename)})
                 return done()
             })
         })
@@ -232,7 +232,7 @@ describe('git',function ()
         {
             return diff(__dirname,function (r)
             {
-                expect(r).to.be.empty()
+                expect(r).to.be.empty
                 return done()
             })
         })

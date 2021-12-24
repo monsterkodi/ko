@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.214.0
+// monsterkodi/kode 0.218.0
 
 var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
@@ -35,7 +35,7 @@ class Ranges
     {
         if (!(y != null) && x.length >= 2)
         {
-            var _25_14_ = x ; x = _25_14_[0]            ; y = _25_14_[1]
+            var _25_14_ = x; x = _25_14_[0]; y = _25_14_[1]
 
         }
         c[0] = x
@@ -217,7 +217,7 @@ class Ranges
     {
         var a, b
 
-        var _87_14_ = sortPositions([p1,p2]) ; a = _87_14_[0]        ; b = _87_14_[1]
+        var _87_14_ = sortPositions([p1,p2]); a = _87_14_[0]; b = _87_14_[1]
 
         return pl.filter(function (r)
         {
@@ -414,7 +414,7 @@ class Ranges
         {
             return [[],null,[]]
         }
-        var _162_21_ = [[],null,[]] ; bef = _162_21_[0]        ; at = _162_21_[1]        ; aft = _162_21_[2]
+        var _162_21_ = [[],null,[]]; bef = _162_21_[0]; at = _162_21_[1]; aft = _162_21_[2]
 
         for (var _163_19_ = ri = 0, _163_23_ = ranges.length; (_163_19_ <= _163_23_ ? ri < ranges.length : ri > ranges.length); (_163_19_ <= _163_23_ ? ++ri : --ri))
         {

@@ -70,8 +70,9 @@ class File
     @write: (file, text, mode, cb) ->
   
         slash.logErrors = true
-        
+        dbg "file.write" file
         slash.writeText file, text, (done) ->
+            dbg "file.write #{done}"
             if empty done
                 cb "can't write #{file}"
             else
@@ -108,21 +109,20 @@ class File
     @save: (file, text, cb) ->
     
         slash.logErrors = true
-        
+        dbg 'file.save' file
         slash.fileExists file, (stat) ->
-            
             if stat
-                
+                dbg 'file.save exists'
                 slash.isWritable file, (writable) ->
-                    
                     if writable
-                        
+                        dbg 'file.save writable'
                         File.write file, text, stat.mode, cb
                         
                     else
-                        
+                        dbg 'file.save p4edit'
                         File.p4edit file, text, cb
             else
+                dbg 'file.save new'
                 File.write file, text, 0o666, cb
         
     @span: (text) ->

@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.214.0
+// monsterkodi/kode 0.218.0
 
 var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}}
 
@@ -108,7 +108,7 @@ module.exports = {actions:{cutCopyPaste:{combos:['command+x','ctrl+x','command+c
         newCursors = null
         if (cp[0] > 0)
         {
-            var _107_32_ = this.splitStateLineAtPos(this.do,cp) ; before = _107_32_[0]            ; after = _107_32_[1]
+            var _107_32_ = this.splitStateLineAtPos(this.do,cp); before = _107_32_[0]; after = _107_32_[1]
 
             after = after.trimLeft()
             indt = _.padStart("",indentationInLine(this.do.line(cp[1])))
