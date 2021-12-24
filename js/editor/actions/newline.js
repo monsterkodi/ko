@@ -1,104 +1,106 @@
-// koffee 1.20.0
+// monsterkodi/kode 0.212.0
 
-/*
-000   000  00000000  000   000  000      000  000   000  00000000
-0000  000  000       000 0 000  000      000  0000  000  000     
-000 0 000  0000000   000000000  000      000  000 0 000  0000000 
-000  0000  000       000   000  000      000  000  0000  000     
-000   000  00000000  00     00  0000000  000  000   000  00000000
- */
-var _, last, ref;
+var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
-ref = require('kxk'), _ = ref._, last = ref.last;
+var last, _
 
-module.exports = {
-    actions: {
-        menu: 'Line',
-        newline: {
-            name: 'Insert Newline',
-            combos: ['enter']
-        },
-        newlineAtEnd: {
-            name: 'Insert Newline at End',
-            combo: 'alt+enter'
+_ = require('kxk')._
+last = require('kxk').last
+
+module.exports = {actions:{menu:'Line',newline:{name:'Insert Newline',combos:['enter']},newlineAtEnd:{name:'Insert Newline at End',combo:'alt+enter'}},newlineAtEnd:function ()
+{
+    this.moveCursorsToLineBoundary('right')
+    return this.newline({indent:true})
+},newline:function (key, info)
+{
+    var after, before, bl, c, doIndent, indent, nc, newCursors, _40_32_, _82_50_
+
+    if (!(info != null) && _.isObject(key))
+    {
+        info = key
+    }
+    if (this.salterMode)
+    {
+        this.endSalter()
+        this.singleCursorAtPos(last(this.cursors()))
+        this.newlineAtEnd()
+        return
+    }
+    doIndent = ((_40_32_=(info != null ? info.indent : undefined)) != null ? _40_32_ : !this.isCursorInIndent())
+    this.surroundStack = []
+    this.deleteSelection()
+    this.do.start()
+    if (this.salterMode)
+    {
+        newCursors = [rangeEndPos(this.rangeForLineAtIndex(this.mainCursor()[1]))]
+        this.setSalterMode(false)
+    }
+    else
+    {
+        newCursors = this.do.cursors()
+    }
+    var list = _k_.list(this.do.cursors().reverse())
+    for (var _52_14_ = 0; _52_14_ < list.length; _52_14_++)
+    {
+        c = list[_52_14_]
+        var _54_28_ = this.splitStateLineAtPos(this.do,c) ; before = _54_28_[0]        ; after = _54_28_[1]
+
+        if (doIndent)
+        {
+            after = after.trimLeft()
         }
-    },
-    newlineAtEnd: function() {
-        this.moveCursorsToLineBoundary('right');
-        return this.newline({
-            indent: true
-        });
-    },
-    newline: function(key, info) {
-        var after, before, bl, c, doIndent, i, indent, j, len, len1, nc, newCursors, ref1, ref2, ref3, ref4, ref5;
-        if ((info == null) && _.isObject(key)) {
-            info = key;
-        }
-        if (this.salterMode) {
-            this.endSalter();
-            this.singleCursorAtPos(last(this.cursors()));
-            this.newlineAtEnd();
-            return;
-        }
-        doIndent = (ref1 = info != null ? info.indent : void 0) != null ? ref1 : !this.isCursorInIndent();
-        this.surroundStack = [];
-        this.deleteSelection();
-        this["do"].start();
-        if (this.salterMode) {
-            newCursors = [rangeEndPos(this.rangeForLineAtIndex(this.mainCursor()[1]))];
-            this.setSalterMode(false);
-        } else {
-            newCursors = this["do"].cursors();
-        }
-        ref2 = this["do"].cursors().reverse();
-        for (i = 0, len = ref2.length; i < len; i++) {
-            c = ref2[i];
-            ref3 = this.splitStateLineAtPos(this["do"], c), before = ref3[0], after = ref3[1];
-            if (doIndent) {
-                after = after.trimLeft();
-            }
-            if (doIndent) {
-                indent = this.indentStringForLineAtIndex(c[1]);
-                if ((ref4 = this.fileType) === 'coffee' || ref4 === 'kode') {
-                    if (/(when|if)/.test(before)) {
-                        if (after.startsWith('then ')) {
-                            after = after.slice(4).trimLeft();
-                            indent += this.indentString;
-                        } else if (before.trim().endsWith('then')) {
-                            before = before.trimRight();
-                            before = before.slice(0, before.length - 4);
-                            indent += this.indentString;
-                        }
+        if (doIndent)
+        {
+            indent = this.indentStringForLineAtIndex(c[1])
+            if (_k_.in(this.fileType,['coffee','kode']))
+            {
+                if (/(when|if)/.test(before))
+                {
+                    if (after.startsWith('then '))
+                    {
+                        after = after.slice(4).trimLeft()
+                        indent += this.indentString
+                    }
+                    else if (before.trim().endsWith('then'))
+                    {
+                        before = before.trimRight()
+                        before = before.slice(0,before.length - 4)
+                        indent += this.indentString
                     }
                 }
-            } else {
-                if (c[0] <= indentationInLine(this["do"].line(c[1]))) {
-                    indent = this["do"].line(c[1]).slice(0, c[0]);
-                } else {
-                    indent = '';
-                }
-            }
-            bl = c[0];
-            if (c[0] >= this["do"].line(c[1]).length) {
-                this["do"].insert(c[1] + 1, indent);
-            } else {
-                this["do"].insert(c[1] + 1, indent + after);
-                if ((this.insertIndentedEmptyLineBetween != null) && before.trimRight().endsWith(this.insertIndentedEmptyLineBetween[0] && after.trimLeft().startsWith(this.insertIndentedEmptyLineBetween[1]))) {
-                    indent += this.indentString;
-                    this["do"].insert(c[1] + 1, indent);
-                }
-                this["do"].change(c[1], before);
-            }
-            ref5 = positionsFromPosInPositions(c, newCursors);
-            for (j = 0, len1 = ref5.length; j < len1; j++) {
-                nc = ref5[j];
-                cursorDelta(nc, nc[1] === c[1] && indent.length - bl || 0, 1);
             }
         }
-        this["do"].setCursors(newCursors);
-        return this["do"].end();
+        else
+        {
+            if (c[0] <= indentationInLine(this.do.line(c[1])))
+            {
+                indent = this.do.line(c[1]).slice(0,c[0])
+            }
+            else
+            {
+                indent = ''
+            }
+        }
+        bl = c[0]
+        if (c[0] >= this.do.line(c[1]).length)
+        {
+            this.do.insert(c[1] + 1,indent)
+        }
+        else
+        {
+            this.do.insert(c[1] + 1,indent + after)
+            if ((this.insertIndentedEmptyLineBetween != null) && before.trimRight().endsWith(this.insertIndentedEmptyLineBetween[0] && after.trimLeft().startsWith(this.insertIndentedEmptyLineBetween[1])(indent += this.indentString,this.do.insert(c[1] + 1,indent))))
+            {
+            }
+            this.do.change(c[1],before)
+        }
+        var list1 = _k_.list(positionsFromPosInPositions(c,newCursors))
+        for (var _90_19_ = 0; _90_19_ < list1.length; _90_19_++)
+        {
+            nc = list1[_90_19_]
+            cursorDelta(nc,nc[1] === c[1] && indent.length - bl || 0,1)
+        }
     }
-};
-
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibmV3bGluZS5qcyIsInNvdXJjZVJvb3QiOiIuLi8uLi8uLi9jb2ZmZWUvZWRpdG9yL2FjdGlvbnMiLCJzb3VyY2VzIjpbIm5ld2xpbmUuY29mZmVlIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7O0FBQUE7Ozs7Ozs7QUFBQSxJQUFBOztBQVFBLE1BQWMsT0FBQSxDQUFRLEtBQVIsQ0FBZCxFQUFFLFNBQUYsRUFBSzs7QUFFTCxNQUFNLENBQUMsT0FBUCxHQUVJO0lBQUEsT0FBQSxFQUNJO1FBQUEsSUFBQSxFQUFNLE1BQU47UUFFQSxPQUFBLEVBQ0k7WUFBQSxJQUFBLEVBQU0sZ0JBQU47WUFDQSxNQUFBLEVBQVEsQ0FBQyxPQUFELENBRFI7U0FISjtRQU1BLFlBQUEsRUFDSTtZQUFBLElBQUEsRUFBTyx1QkFBUDtZQUNBLEtBQUEsRUFBTyxXQURQO1NBUEo7S0FESjtJQVdBLFlBQUEsRUFBYyxTQUFBO1FBRVYsSUFBQyxDQUFBLHlCQUFELENBQTJCLE9BQTNCO2VBQ0EsSUFBQyxDQUFBLE9BQUQsQ0FBUztZQUFBLE1BQUEsRUFBUSxJQUFSO1NBQVQ7SUFIVSxDQVhkO0lBZ0JBLE9BQUEsRUFBUyxTQUFDLEdBQUQsRUFBTSxJQUFOO0FBRUwsWUFBQTtRQUFBLElBQU8sY0FBSixJQUFjLENBQUMsQ0FBQyxRQUFGLENBQVcsR0FBWCxDQUFqQjtZQUNJLElBQUEsR0FBTyxJQURYOztRQUdBLElBQUcsSUFBQyxDQUFBLFVBQUo7WUFDSSxJQUFDLENBQUEsU0FBRCxDQUFBO1lBQ0EsSUFBQyxDQUFBLGlCQUFELENBQW1CLElBQUEsQ0FBSyxJQUFDLENBQUEsT0FBRCxDQUFBLENBQUwsQ0FBbkI7WUFDQSxJQUFDLENBQUEsWUFBRCxDQUFBO0FBQ0EsbUJBSko7O1FBTUEsUUFBQSxpRUFBMEIsQ0FBSSxJQUFDLENBQUEsZ0JBQUQsQ0FBQTtRQUU5QixJQUFDLENBQUEsYUFBRCxHQUFpQjtRQUNqQixJQUFDLENBQUEsZUFBRCxDQUFBO1FBQ0EsSUFBQyxFQUFBLEVBQUEs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SUFBQyxFQUFBLEVBQUEsRUFBRSxDQUFDLE1BQUosQ0FBVyxDQUFFLENBQUEsQ0FBQSxDQUFGLEdBQUssQ0FBaEIsRUFBbUIsTUFBbkIsRUFKWjs7Z0JBS0EsSUFBQyxFQUFBLEVBQUEsRUFBRSxDQUFDLE1BQUosQ0FBVyxDQUFFLENBQUEsQ0FBQSxDQUFiLEVBQWlCLE1BQWpCLEVBVEo7O0FBWUE7QUFBQSxpQkFBQSx3Q0FBQTs7Z0JBQ0ksV0FBQSxDQUFZLEVBQVosRUFBZ0IsRUFBRyxDQUFBLENBQUEsQ0FBSCxLQUFTLENBQUUsQ0FBQSxDQUFBLENBQVgsSUFBa0IsTUFBTSxDQUFDLE1BQVAsR0FBZ0IsRUFBbEMsSUFBd0MsQ0FBeEQsRUFBMkQsQ0FBM0Q7QUFESjtBQXRDSjtRQXlDQSxJQUFDLEVBQUEsRUFBQSxFQUFFLENBQUMsVUFBSixDQUFlLFVBQWY7ZUFDQSxJQUFDLEVBQUEsRUFBQSxFQUFFLENBQUMsR0FBSixDQUFBO0lBakVLLENBaEJUIiwic291cmNlc0NvbnRlbnQiOlsiIyMjXG4wMDAgICAwMDAgIDAwMDAwMDAwICAwMDAgICAwMDAgIDAwMCAgICAgIDAwMCAgMDAwICAgMDAwICAwMDAwMDAwMFxuMDAwMCAgMDAwICAwMDAgICAgICAgMDAwIDAgMDAwICAwMDAgICAgICAwMDAgIDAwMDAgIDAwMCAgMDAwICAgICBcbjAwMCAwIDAwMCAgMDAwMDAwMCAgIDAwMDAwMDAwMCAgMDAwICAgICAgMDAwICAwMDAgMCAwMDAgIDAwMDAwMDAgXG4wMDAgIDAwMDAgIDAwMCAgICAgICAwMDAgICAwMDAgIDAwMCAgICAgIDAwMCAgMDAwICAwMDAwICAwMDAgICAgIFxuMDAwICAgMDAwICAwMDAwMDAwMCAgMDAgICAgIDAwICAwMDAwMDAwICAwMDAgIDAwMCAgIDAwMCAgMDAwMDAwMDBcbiMjI1xuXG57IF8sIGxhc3QgfSA9IHJlcXVpcmUgJ2t4aydcblxubW9kdWxlLmV4cG9ydHMgPSBcbiAgICBcbiAgICBhY3Rpb25zOlxuICAgICAgICBtZW51OiAnTGluZSdcbiAgICAgICAgXG4gICAgICAgIG5ld2xpbmU6XG4gICAgICAgICAgICBuYW1lOiAnSW5zZXJ0IE5ld2xpbmUnXG4gICAgICAgICAgICBjb21ib3M6IFsnZW50ZXInXVxuICAgICAgICAgICAgXG4gICAgICAgIG5ld2xpbmVBdEVuZDpcbiAgICAgICAgICAgIG5hbWU6ICAnSW5zZXJ0IE5ld2xpbmUgYXQgRW5kJ1xuICAgICAgICAgICAgY29tYm86ICdhbHQrZW50ZXInXG5cbiAgICBuZXdsaW5lQXRFbmQ6ICgpIC0+XG4gICAgICAgIFxuICAgICAgICBAbW92ZUN1cnNvcnNUb0xpbmVCb3VuZGFyeSAncmlnaHQnICBcbiAgICAgICAgQG5ld2xpbmUgaW5kZW50OiB0cnVlXG5cbiAgICBuZXdsaW5lOiAoa2V5LCBpbmZvKSAtPlxuICAgICAgICBcbiAgICAgICAgaWYgbm90IGluZm8/IGFuZCBfLmlzT2JqZWN0IGtleVxuICAgICAgICAgICAgaW5mbyA9IGtleVxuXG4gICAgICAgIGlmIEBzYWx0ZXJNb2RlXG4gICAgICAgICAgICBAZW5kU2FsdGVyKClcbiAgICAgICAgICAgIEBzaW5nbGVDdXJzb3JBdFBvcyBsYXN0IEBjdXJzb3JzKClcbiAgICAgICAgICAgIEBuZXdsaW5lQXRFbmQoKVxuICAgICAgICAgICAgcmV0dXJuXG4gICAgICAgIFxuICAgICAgICBkb0luZGVudCA9IGluZm8/LmluZGVudCA/IG5vdCBAaXNDdXJzb3JJbkluZGVudCgpXG4gICAgICAgIFxuICAgICAgICBAc3Vycm91bmRTdGFjayA9IFtdXG4gICAgICAgIEBkZWxldGVTZWxlY3Rpb24oKVxuICAgICAgICBAZG8uc3RhcnQoKVxuICAgICAgICBcbiAgICAgICAgaWYgQHNhbHRlck1vZGVcbiAgICAgICAgICAgIG5ld0N1cnNvcnMgPSBbcmFuZ2VFbmRQb3MgQHJhbmdlRm9yTGluZUF0SW5kZXggQG1haW5DdXJzb3IoKVsxXV1cbiAgICAgICAgICAgIEBzZXRTYWx0ZXJNb2RlIGZhbHNlXG4gICAgICAgIGVsc2VcbiAgICAgICAgICAgIG5ld0N1cnNvcnMgPSBAZG8uY3Vyc29ycygpXG4gICAgICAgIFxuICAgICAgICBmb3IgYyBpbiBAZG8uY3Vyc29ycygpLnJldmVyc2UoKVxuICAgICAgICBcbiAgICAgICAgICAgIFtiZWZvcmUsIGFmdGVyXSA9IEBzcGxpdFN0YXRlTGluZUF0UG9zIEBkbywgY1xuICAgICAgICAgICAgYWZ0ZXIgPSBhZnRlci50cmltTGVmdCgpIGlmIGRvSW5kZW50XG4gICAgICAgIFxuICAgICAgICAgICAgaWYgZG9JbmRlbnRcbiAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgICAgICBpbmRlbnQgPSBAaW5kZW50U3RyaW5nRm9yTGluZUF0SW5kZXggY1sxXSBcbiAgICAgICAgICAgICAgICBpZiBAZmlsZVR5cGUgaW4gWydjb2ZmZWUnLCAna29kZSddXG4gICAgICAgICAgICAgICAgICAgIGlmIC8od2hlbnxpZikvLnRlc3QgYmVmb3JlIFxuICAgICAgICAgICAgICAgICAgICAgICAgaWYgYWZ0ZXIuc3RhcnRzV2l0aCAndGhlbiAnXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgYWZ0ZXIgPSBhZnRlci5zbGljZSg0KS50cmltTGVmdCgpICMgcmVtb3ZlIHRoZW5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbmRlbnQgKz0gQGluZGVudFN0cmluZ1xuICAgICAgICAgICAgICAgICAgICAgICAgZWxzZSBpZiBiZWZvcmUudHJpbSgpLmVuZHNXaXRoICd0aGVuJ1xuICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJlZm9yZSA9IGJlZm9yZS50cmltUmlnaHQoKVxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJlZm9yZSA9IGJlZm9yZS5zbGljZSAwLCBiZWZvcmUubGVuZ3RoLTQgIyByZW1vdmUgdGhlbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbmRlbnQgKz0gQGluZGVudFN0cmluZ1xuICAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgIGVsc2VcbiAgICAgICAgICAgICAgICBpZiBjWzBdIDw9IGluZGVudGF0aW9uSW5MaW5lIEBkby5saW5lIGNbMV1cbiAgICAgICAgICAgICAgICAgICAgaW5kZW50ID0gQGRvLmxpbmUoY1sxXSkuc2xpY2UgMCxjWzBdXG4gICAgICAgICAgICAgICAgZWxzZVxuICAgICAgICAgICAgICAgICAgICBpbmRlbnQgPSAnJ1xuXG4gICAgICAgICAgICBibCA9IGNbMF1cbiAgICAgICAgICAgIFxuICAgICAgICAgICAgaWYgY1swXSA+PSBAZG8ubGluZShjWzFdKS5sZW5ndGggIyBjdXJzb3IgYXQgZW5kIG9mIGxpbmVcbiAgICAgICAgICAgICAgICBAZG8uaW5zZXJ0IGNbMV0rMSwgaW5kZW50XG4gICAgICAgICAgICBlbHNlXG4gICAgICAgICAgICAgICAgQGRvLmluc2VydCBjWzFdKzEsIGluZGVudCArIGFmdGVyXG4gICAgICAgICAgICAgICAgaWYgQGluc2VydEluZGVudGVkRW1wdHlMaW5lQmV0d2Vlbj8gYW5kXG4gICAgICAgICAgICAgICAgICAgIGJlZm9yZS50cmltUmlnaHQoKS5lbmRzV2l0aCBAaW5zZXJ0SW5kZW50ZWRFbXB0eUxpbmVCZXR3ZWVuWzBdIGFuZFxuICAgICAgICAgICAgICAgICAgICAgICAgYWZ0ZXIudHJpbUxlZnQoKS5zdGFydHNXaXRoIEBpbnNlcnRJbmRlbnRlZEVtcHR5TGluZUJldHdlZW5bMV1cbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbmRlbnQgKz0gQGluZGVudFN0cmluZ1xuICAgICAgICAgICAgICAgICAgICAgICAgICAgIEBkby5pbnNlcnQgY1sxXSsxLCBpbmRlbnRcbiAgICAgICAgICAgICAgICBAZG8uY2hhbmdlIGNbMV0sIGJlZm9yZVxuXG4gICAgICAgICAgICAjIG1vdmUgY3Vyc29ycyBpbiBhbmQgYmVsb3cgaW5zZXJ0ZWQgbGluZSBkb3duXG4gICAgICAgICAgICBmb3IgbmMgaW4gcG9zaXRpb25zRnJvbVBvc0luUG9zaXRpb25zIGMsIG5ld0N1cnNvcnNcbiAgICAgICAgICAgICAgICBjdXJzb3JEZWx0YSBuYywgbmNbMV0gPT0gY1sxXSBhbmQgaW5kZW50Lmxlbmd0aCAtIGJsIG9yIDAsIDFcbiAgICAgICAgXG4gICAgICAgIEBkby5zZXRDdXJzb3JzIG5ld0N1cnNvcnNcbiAgICAgICAgQGRvLmVuZCgpXG4iXX0=
-//# sourceURL=../../../coffee/editor/actions/newline.coffee
+    this.do.setCursors(newCursors)
+    return this.do.end()
+}}

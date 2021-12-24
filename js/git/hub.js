@@ -1,151 +1,172 @@
-// koffee 1.19.0
+// monsterkodi/kode 0.212.0
 
-/*
-000   000  000   000  0000000    
-000   000  000   000  000   000  
-000000000  000   000  0000000    
-000   000  000   000  000   000  
-000   000   0000000   0000000
- */
-var Hub, diff, diffs, filter, info, post, ref, root, roots, stati, status, valid, watch, watchers;
+var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined, list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}}
 
-ref = require('kxk'), filter = ref.filter, post = ref.post, valid = ref.valid, watch = ref.watch;
+var diff, diffs, filter, info, kxk, post, root, roots, stati, status, watch, watchers
 
-watch = require('./watch');
+kxk = require('kxk')
+filter = kxk.filter
+post = kxk.post
 
-status = require('./status');
+watch = require('./watch')
+status = require('./status')
+diff = require('./diff')
+info = require('./info')
+root = require('./root')
+watchers = {}
+roots = {}
+stati = {}
+diffs = {}
+class Hub
+{
+    static refresh ()
+    {
+        stati = {}
+        roots = {}
+        return diffs = {}
+    }
 
-diff = require('./diff');
-
-info = require('./info');
-
-root = require('./root');
-
-watchers = {};
-
-roots = {};
-
-stati = {};
-
-diffs = {};
-
-Hub = (function() {
-    function Hub() {}
-
-    Hub.refresh = function() {
-        stati = {};
-        roots = {};
-        return diffs = {};
-    };
-
-    Hub.watch = function(gitDir) {
-        if (watchers[gitDir]) {
-            return;
+    static watch (gitDir)
+    {
+        if (watchers[gitDir])
+        {
+            return
         }
-        return watchers[gitDir] = new watch(gitDir, Hub.onGitRefChanged);
-    };
+        return watchers[gitDir] = new watch(gitDir,Hub.onGitRefChanged)
+    }
 
-    Hub.onGitRefChanged = function(gitDir) {
-        delete stati[gitDir];
-        diffs = filter(diffs, function(v, k) {
-            return !(typeof k.startsWith === "function" ? k.startsWith(gitDir) : void 0);
-        });
-        return Hub.status(gitDir, function(status) {
-            return post.emit('gitStatus', gitDir, status);
-        });
-    };
+    static onGitRefChanged (gitDir)
+    {
+        delete stati[gitDir]
+        diffs = filter(diffs,function (v, k)
+        {
+            var _47_28_
 
-    Hub.onSaved = function(file) {
-        if (diffs[file]) {
-            delete diffs[file];
-            Hub.diff(file, function(changes) {
-                return post.emit('gitDiff', file, changes);
-            });
+            return !(typeof k.startsWith === "function" ? k.startsWith(gitDir) : undefined)
+        })
+        return Hub.status(gitDir,function (status)
+        {
+            return post.emit('gitStatus',gitDir,status)
+        })
+    }
+
+    static onSaved (file)
+    {
+        if (diffs[file])
+        {
+            delete diffs[file]
+            Hub.diff(file,function (changes)
+            {
+                return post.emit('gitDiff',file,changes)
+            })
         }
-        return Hub.applyRoot(file, function(gitDir) {
-            if (gitDir) {
-                return Hub.onGitRefChanged(gitDir);
+        return Hub.applyRoot(file,function (gitDir)
+        {
+            if (gitDir)
+            {
+                return Hub.onGitRefChanged(gitDir)
             }
-        });
-    };
+        })
+    }
 
-    Hub.diff = function(file, cb) {
-        if (diffs[file]) {
-            return cb(diffs[file]);
-        } else {
-            return diff(file, function(changes) {
-                diffs[file] = changes;
-                return cb(changes);
-            });
+    static diff (file, cb)
+    {
+        if (diffs[file])
+        {
+            return cb(diffs[file])
         }
-    };
+        else
+        {
+            return diff(file,function (changes)
+            {
+                diffs[file] = changes
+                return cb(changes)
+            })
+        }
+    }
 
-    Hub.status = function(dirOrFile, cb) {
-        var rootStatus;
-        rootStatus = function(cb) {
-            return function(gitDir) {
-                if (stati[gitDir]) {
-                    return cb(stati[gitDir]);
-                } else {
-                    return status(gitDir, function(info) {
-                        stati[gitDir] = info;
-                        return cb(info);
-                    });
+    static status (dirOrFile, cb)
+    {
+        var rootStatus
+
+        rootStatus = function (cb)
+        {
+            return function (gitDir)
+            {
+                if (stati[gitDir])
+                {
+                    return cb(stati[gitDir])
                 }
-            };
-        };
-        return Hub.applyRoot(dirOrFile, rootStatus(cb));
-    };
-
-    Hub.statusFiles = function(status) {
-        var file, files, i, j, key, len, len1, ref1, ref2;
-        files = {};
-        ref1 = ['changed', 'added', 'dirs'];
-        for (i = 0, len = ref1.length; i < len; i++) {
-            key = ref1[i];
-            if (valid(status[key])) {
-                ref2 = status[key];
-                for (j = 0, len1 = ref2.length; j < len1; j++) {
-                    file = ref2[j];
-                    files[file] = key;
+                else
+                {
+                    return status(gitDir,function (info)
+                    {
+                        stati[gitDir] = info
+                        return cb(info)
+                    })
                 }
             }
         }
-        return files;
-    };
+        return Hub.applyRoot(dirOrFile,rootStatus(cb))
+    }
 
-    Hub.info = function(dirOrFile, cb) {
-        var rootInfo;
-        rootInfo = function(cb) {
-            return function(gitDir) {
-                return info(gitDir, function(info) {
-                    return cb(info);
-                });
-            };
-        };
-        return Hub.applyRoot(dirOrFile, rootInfo(cb));
-    };
+    static statusFiles (status)
+    {
+        var file, files, key
 
-    Hub.applyRoot = function(dirOrFile, cb) {
-        if (roots[dirOrFile]) {
-            return cb(roots[dirOrFile]);
-        } else {
-            return root(dirOrFile, function(gitDir) {
-                roots[dirOrFile] = gitDir;
-                roots[gitDir] = gitDir;
-                Hub.watch(gitDir);
-                return cb(gitDir);
-            });
+        files = {}
+        var list = ['changed','added','dirs']
+        for (var _99_16_ = 0; _99_16_ < list.length; _99_16_++)
+        {
+            key = list[_99_16_]
+            if (!_k_.empty(status[key]))
+            {
+                var list1 = _k_.list(status[key])
+                for (var _101_25_ = 0; _101_25_ < list1.length; _101_25_++)
+                {
+                    file = list1[_101_25_]
+                    files[file] = key
+                }
+            }
         }
-    };
+        return files
+    }
 
-    return Hub;
+    static info (dirOrFile, cb)
+    {
+        var rootInfo
 
-})();
+        rootInfo = function (cb)
+        {
+            return function (gitDir)
+            {
+                return info(gitDir,function (info)
+                {
+                    return cb(info)
+                })
+            }
+        }
+        return Hub.applyRoot(dirOrFile,rootInfo(cb))
+    }
 
-post.on('saved', Hub.onSaved);
+    static applyRoot (dirOrFile, cb)
+    {
+        if (roots[dirOrFile])
+        {
+            return cb(roots[dirOrFile])
+        }
+        else
+        {
+            return root(dirOrFile,function (gitDir)
+            {
+                roots[dirOrFile] = gitDir
+                roots[gitDir] = gitDir
+                Hub.watch(gitDir)
+                return cb(gitDir)
+            })
+        }
+    }
+}
 
-module.exports = Hub;
-
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaHViLmpzIiwic291cmNlUm9vdCI6Ii4uLy4uL2NvZmZlZS9naXQiLCJzb3VyY2VzIjpbImh1Yi5jb2ZmZWUiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7QUFBQTs7Ozs7OztBQUFBLElBQUE7O0FBUUEsTUFBaUMsT0FBQSxDQUFRLEtBQVIsQ0FBakMsRUFBRSxtQkFBRixFQUFVLGVBQVYsRUFBZ0IsaUJBQWhCLEVBQXVCOztBQUV2QixLQUFBLEdBQVcsT0FBQSxDQUFRLFNBQVI7O0FBQ1gsTUFBQSxHQUFXLE9BQUEsQ0FBUSxVQUFSOztBQUNYLElBQUEsR0FBVyxPQUFBLENBQVEsUUFBUjs7QUFDWCxJQUFBLEdBQVcsT0FBQSxDQUFRLFFBQVI7O0FBQ1gsSUFBQSxHQUFXLE9BQUEsQ0FBUSxRQUFSOztBQUVYLFFBQUEsR0FBVzs7QUFDWCxLQUFBLEdBQVc7O0FBQ1gsS0FBQSxHQUFXOztBQUNYLEtBQUEsR0FBVzs7QUFFTDs7O0lBRUYsR0FBQyxDQUFBLE9BQUQsR0FBVSxTQUFBO1FBRU4sS0FBQSxHQUFRO1FBQ1IsS0FBQSxHQUFRO2VBQ1IsS0FBQSxHQUFRO0lBSkY7O0lBWVYsR0FBQyxDQUFBLEtBQUQsR0FBUSxTQUFDLE1BQUQ7UUFFSixJQUFVLFFBQVMsQ0FBQSxNQUFBLENBQW5CO0FBQUEsbUJBQUE7O2VBQ0EsUUFBUyxDQUFBLE1BQUEsQ0FBVCxHQUFtQixJQUFJLEtBQUosQ0FBVSxNQUFWLEVBQWtCLEdBQUcsQ0FBQyxlQUF0QjtJQUhmOztJQUtSLEdBQUMsQ0FBQSxlQUFELEdBQWtCLFNBQUMsTUFBRDtRQUVkLE9BQU8sS0FBTSxDQUFBLE1BQUE7UUFFYixLQUFBLEdBQVEsTUFBQSxDQUFPLEtBQVAsRUFBYyxTQUFDLENBQUQsRUFBRyxDQUFIO21CQUNsQix1Q0FBSSxDQUFDLENBQUMsV0FBWTtRQURBLENBQWQ7ZUFHUixHQUFHLENBQUMsTUFBSixDQUFXLE1BQVgsRUFBbUIsU0FBQyxNQUFEO21CQUNmLElBQUksQ0FBQyxJQUFMLENBQVUsV0FB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QWlCIiwic291cmNlc0NvbnRlbnQiOlsiIyMjXG4wMDAgICAwMDAgIDAwMCAgIDAwMCAgMDAwMDAwMCAgICBcbjAwMCAgIDAwMCAgMDAwICAgMDAwICAwMDAgICAwMDAgIFxuMDAwMDAwMDAwICAwMDAgICAwMDAgIDAwMDAwMDAgICAgXG4wMDAgICAwMDAgIDAwMCAgIDAwMCAgMDAwICAgMDAwICBcbjAwMCAgIDAwMCAgIDAwMDAwMDAgICAwMDAwMDAwICAgIFxuIyMjXG5cbnsgZmlsdGVyLCBwb3N0LCB2YWxpZCwgd2F0Y2ggfSA9IHJlcXVpcmUgJ2t4aydcblxud2F0Y2ggICAgPSByZXF1aXJlICcuL3dhdGNoJ1xuc3RhdHVzICAgPSByZXF1aXJlICcuL3N0YXR1cydcbmRpZmYgICAgID0gcmVxdWlyZSAnLi9kaWZmJ1xuaW5mbyAgICAgPSByZXF1aXJlICcuL2luZm8nXG5yb290ICAgICA9IHJlcXVpcmUgJy4vcm9vdCdcblxud2F0Y2hlcnMgPSB7fVxucm9vdHMgICAgPSB7fVxuc3RhdGkgICAgPSB7fVxuZGlmZnMgICAgPSB7fVxuXG5jbGFzcyBIdWJcbiAgICBcbiAgICBAcmVmcmVzaDogLT4gXG4gICAgICAgIFxuICAgICAgICBzdGF0aSA9IHt9XG4gICAgICAgIHJvb3RzID0ge31cbiAgICAgICAgZGlmZnMgPSB7fVxuICAgIFxuICAgICMgMDAwICAgMDAwICAgMDAwMDAwMCAgIDAwMDAwMDAwMCAgIDAwMDAwMDAgIDAwMCAgIDAwMCAgXG4gICAgIyAwMDAgMCAwMDAgIDAwMCAgIDAwMCAgICAgMDAwICAgICAwMDAgICAgICAgMDAwICAgMDAwICBcbiAgICAjIDAwMDAwMDAwMCAgMDAwMDAwMDAwICAgICAwMDAgICAgIDAwMCAgICAgICAwMDAwMDAwMDAgIFxuICAgICMgMDAwICAgMDAwICAwMDAgICAwMDAgICAgIDAwMCAgICAgMDAwICAgICAgIDAwMCAgIDAwMCAgXG4gICAgIyAwMCAgICAgMDAgIDAwMCAgIDAwMCAgICAgMDAwICAgICAgMDAwMDAwMCAgMDAwICAgMDAwICBcbiAgICBcbiAgICBAd2F0Y2g6IChnaXREaXIpIC0+XG4gICAgICAgIFxuICAgICAgICByZXR1cm4gaWYgd2F0Y2hlcnNbZ2l0RGlyXVxuICAgICAgICB3YXRjaGVyc1tnaXREaXJdID0gbmV3IHdhdGNoIGdpdERpciwgSHViLm9uR2l0UmVmQ2hhbmdlZFxuICAgICAgICAgICAgXG4gICAgQG9uR2l0UmVmQ2hhbmdlZDogKGdpdERpcikgLT5cbiAgICAgICAgXG4gICAgICAgIGRlbGV0ZSBzdGF0aVtnaXREaXJdXG4gICAgICAgIFxuICAgICAgICBkaWZmcyA9IGZpbHRlciBkaWZmcywgKHYsaykgLT4gXG4gICAgICAgICAgICBub3Qgay5zdGFydHNXaXRoPyBnaXREaXJcbiAgICAgICAgICAgIFxuICAgICAgICBIdWIuc3RhdHVzIGdpdERpciwgKHN0YXR1cykgLT4gXG4gICAgICAgICAgICBwb3N0LmVtaXQgJ2dpdFN0YXR1cycgZ2l0RGlyLCBzdGF0dXNcbiAgICAgICAgXG4gICAgQG9uU2F2ZWQ6IChmaWxlKSAtPlxuICAgICAgICBcbiAgICAgICAgaWYgZGlmZnNbZmlsZV1cbiAgICAgICAgICAgIGRlbGV0ZSBkaWZmc1tmaWxlXVxuICAgICAgICAgICAgSHViLmRpZmYgZmlsZSwgKGNoYW5nZXMpIC0+IFxuICAgICAgICAgICAgICAgIHBvc3QuZW1pdCAnZ2l0RGlmZicgZmlsZSwgY2hhbmdlc1xuICAgICAgICAgICAgICAgIFxuICAgICAgICBIdWIuYXBwbHlSb290IGZpbGUsIChnaXREaXIpIC0+XG4gICAgICAgICAgICBIdWIub25HaXRSZWZDaGFuZ2VkIGdpdERpciBpZiBnaXREaXJcbiAgICAgICAgXG4gICAgIyAwMDAwMDAwICAgIDAwMCAgMDAwMDAwMDAgIDAwMDAwMDAwICBcbiAgICAjIDAwMCAgIDAwMCAgMDAwICAwMDAgICAgICAgMDAwICAgICAgIFxuICAgICMgMDAwICAgMDAwICAwMDAgIDAwMDAwMCAgICAwMDAwMDAgICAgXG4gICAgIyAwMDAgICAwMDAgIDAwMCAgMDAwICAgICAgIDAwMCAgICAgICBcbiAgICAjIDAwMDAwMDAgICAgMDAwICAwMDAgICAgICAgMDAwICAgICAgIFxuICAgIFxuICAgIEBkaWZmOiAoZmlsZSwgY2IpIC0+XG4gICAgICAgICAgICAgICBcbiAgICAgICAgaWYgZGlmZnNbZmlsZV1cbiAgICAgICAgICAgIGNiIGRpZmZzW2ZpbGVdXG4gICAgICAgIGVsc2VcbiAgICAgICAgICAgIGRpZmYgZmlsZSwgKGNoYW5nZXMpIC0+IFxuICAgICAgICAgICAgICAgIGRpZmZzW2ZpbGVdID0gY2hhbmdlc1xuICAgICAgICAgICAgICAgIGNiIGNoYW5nZXNcbiAgICBcbiAgICAjICAwMDAwMDAwICAwMDAwMDAwMDAgICAwMDAwMDAwICAgMDAwMDAwMDAwICAwMDAgICAwMDAgICAwMDAwMDAwICBcbiAgICAjIDAwMCAgICAgICAgICAwMDAgICAgIDAwMCAgIDAwMCAgICAgMDAwICAgICAwMDAgICAwMDAgIDAwMCAgICAgICBcbiAgICAjIDAwMDAwMDAgICAgICAwMDAgICAgIDAwMDAwMDAwMCAgICAgMDAwICAgICAwMDAgICAwMDAgIDAwMDAwMDAgICBcbiAgICAjICAgICAgMDAwICAgICAwMDAgICAgIDAwMCAgIDAwMCAgICAgMDAwICAgICAwMDAgICAwMDAgICAgICAgMDAwICBcbiAgICAjIDAwMDAwMDAgICAgICAwMDAgICAgIDAwMCAgIDAwMCAgICAgMDAwICAgICAgMDAwMDAwMCAgIDAwMDAwMDAgICBcbiAgICBcbiAgICBAc3RhdHVzOiAoZGlyT3JGaWxlLCBjYikgLT5cbiAgICAgICAgXG4gICAgICAgICMgbG9nICdnaXQuaHViLnN0YXR1cycgZGlyT3JGaWxlXG4gICAgICAgIHJvb3RTdGF0dXMgPSAoY2IpIC0+IChnaXREaXIpIC0+XG4gICAgICAgICAgICBpZiBzdGF0aVtnaXREaXJdXG4gICAgICAgICAgICAgICAgY2Igc3RhdGlbZ2l0RGlyXVxuICAgICAgICAgICAgZWxzZVxuICAgICAgICAgICAgICAgIHN0YXR1cyBnaXREaXIsIChpbmZvKSAtPiBcbiAgICAgICAgICAgICAgICAgICAgc3RhdGlbZ2l0RGlyXSA9IGluZm9cbiAgICAgICAgICAgICAgICAgICAgY2IgaW5mb1xuICAgICAgICAgICAgICAgICAgICBcbiAgICAgICAgSHViLmFwcGx5Um9vdCBkaXJPckZpbGUsIHJvb3RTdGF0dXMgY2JcbiAgICAgICAgICAgICAgXG4gICAgQHN0YXR1c0ZpbGVzOiAoc3RhdHVzKSAtPlxuICAgICAgICBcbiAgICAgICAgZmlsZXMgPSB7fVxuICAgICAgICBmb3Iga2V5IGluIFsnY2hhbmdlZCcgJ2FkZGVkJyAnZGlycyddXG4gICAgICAgICAgICBpZiB2YWxpZCBzdGF0dXNba2V5XVxuICAgICAgICAgICAgICAgIGZvciBmaWxlIGluIHN0YXR1c1trZXldXG4gICAgICAgICAgICAgICAgICAgIGZpbGVzW2ZpbGVdID0ga2V5XG4gICAgICAgIGZpbGVzXG4gICAgICAgIFxuICAgICMgMDAwICAwMDAgICAwMDAgIDAwMDAwMDAwICAgMDAwMDAwMCAgIFxuICAgICMgMDAwICAwMDAwICAwMDAgIDAwMCAgICAgICAwMDAgICAwMDAgIFxuICAgICMgMDAwICAwMDAgMCAwMDAgIDAwMDAwMCAgICAwMDAgICAwMDAgIFxuICAgICMgMDAwICAwMDAgIDAwMDAgIDAwMCAgICAgICAwMDAgICAwMDAgIFxuICAgICMgMDAwICAwMDAgICAwMDAgIDAwMCAgICAgICAgMDAwMDAwMCAgIFxuICAgIFxuICAgIEBpbmZvOiAoZGlyT3JGaWxlLCBjYikgLT5cbiAgICAgICAgXG4gICAgICAgICMgbG9nICdnaXQuaHViLmluZm8nIGRpck9yRmlsZVxuICAgICAgICByb290SW5mbyA9IChjYikgLT4gKGdpdERpcikgLT4gaW5mbyBnaXREaXIsIChpbmZvKSAtPiBjYiBpbmZvXG4gICAgICAgIFxuICAgICAgICBIdWIuYXBwbHlSb290IGRpck9yRmlsZSwgcm9vdEluZm8gY2JcbiAgICAgICAgXG4gICAgIyAgMDAwMDAwMCAgIDAwMDAwMDAwICAgMDAwMDAwMDAgICAwMDAgICAgICAwMDAgICAwMDAgICAwMDAwMDAwMCAgICAwMDAwMDAwICAgIDAwMDAwMDAgICAwMDAwMDAwMDAgIFxuICAgICMgMDAwICAgMDAwICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgMDAwICAgICAgIDAwMCAwMDAgICAgMDAwICAgMDAwICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgICAgMDAwICAgICBcbiAgICAjIDAwMDAwMDAwMCAgMDAwMDAwMDAgICAwMDAwMDAwMCAgIDAwMCAgICAgICAgMDAwMDAgICAgIDAwMDAwMDAgICAgMDAwICAgMDAwICAwMDAgICAwMDAgICAgIDAwMCAgICAgXG4gICAgIyAwMDAgICAwMDAgIDAwMCAgICAgICAgMDAwICAgICAgICAwMDAgICAgICAgICAwMDAgICAgICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgMDAwICAgMDAwICAgICAwMDAgICAgIFxuICAgICMgMDAwICAgMDAwICAwMDAgICAgICAgIDAwMCAgICAgICAgMDAwMDAwMCAgICAgMDAwICAgICAgMDAwICAgMDAwICAgMDAwMDAwMCAgICAwMDAwMDAwICAgICAgMDAwICAgICBcbiAgICBcbiAgICBAYXBwbHlSb290OiAoZGlyT3JGaWxlLCBjYikgLT5cbiAgICAgICAgXG4gICAgICAgIGlmIHJvb3RzW2Rpck9yRmlsZV1cbiAgICAgICAgICAgIGNiIHJvb3RzW2Rpck9yRmlsZV1cbiAgICAgICAgZWxzZVxuICAgICAgICAgICAgcm9vdCBkaXJPckZpbGUsIChnaXREaXIpIC0+XG4gICAgICAgICAgICAgICAgcm9vdHNbZGlyT3JGaWxlXSA9IGdpdERpclxuICAgICAgICAgICAgICAgIHJvb3RzW2dpdERpcl0gICAgPSBnaXREaXJcbiAgICAgICAgICAgICAgICBIdWIud2F0Y2ggZ2l0RGlyXG4gICAgICAgICAgICAgICAgY2IgZ2l0RGlyICAgXG4gICAgICAgICAgICBcbnBvc3Qub24gJ3NhdmVkJyBIdWIub25TYXZlZFxuICAgICAgICBcbm1vZHVsZS5leHBvcnRzID0gSHViXG4iXX0=
-//# sourceURL=../../coffee/git/hub.coffee
+post.on('saved',Hub.onSaved)
+module.exports = Hub

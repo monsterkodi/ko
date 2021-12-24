@@ -1,241 +1,230 @@
-// koffee 1.19.0
+// monsterkodi/kode 0.212.0
 
-/*
- 0000000  00000000   0000000   00000000    0000000  000   000
-000       000       000   000  000   000  000       000   000
-0000000   0000000   000000000  0000000    000       000000000
-     000  000       000   000  000   000  000       000   000
-0000000   00000000  000   000  000   000   0000000  000   000
- */
-var Command, FileSearcher, Search, Syntax, _, fs, kerror, klor, matchr, post, ref, slash, stream, walker,
-    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    extend = function(child, parent) { for (var key in parent) { if (hasProp(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    hasProp = Object.hasOwn,
-    indexOf = [].indexOf;
+var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}}
 
-ref = require('kxk'), _ = ref._, fs = ref.fs, kerror = ref.kerror, klor = ref.klor, matchr = ref.matchr, post = ref.post, slash = ref.slash;
+var Command, FileSearcher, fs, kerror, klor, matchr, post, Search, slash, stream, Syntax, walker, WritableStream, _
 
-walker = require('../tools/walker');
+_ = require('kxk')._
+fs = require('kxk').fs
+kerror = require('kxk').kerror
+klor = require('kxk').klor
+matchr = require('kxk').matchr
+post = require('kxk').post
+slash = require('kxk').slash
 
-Syntax = require('../editor/syntax');
+walker = require('../tools/walker')
+Syntax = require('../editor/syntax')
+Command = require('../commandline/command')
+stream = require('stream')
 
-Command = require('../commandline/command');
-
-stream = require('stream');
-
-Search = (function(superClass) {
-    extend(Search, superClass);
-
-    function Search(commandline) {
-        this.onMetaClick = bind(this.onMetaClick, this);
-        this.searchInFile = bind(this.searchInFile, this);
-        Search.__super__.constructor.call(this, commandline);
-        this.names = ['search', 'Search', '/search/', '/Search/'];
+Search = (function ()
+{
+    _k_.extend(Search, Command)
+    function Search (commandline)
+    {
+        this["onMetaClick"] = this["onMetaClick"].bind(this)
+        this["searchInFile"] = this["searchInFile"].bind(this)
+        Search.__super__.constructor.call(this,commandline)
+        this.names = ['search','Search','/search/','/Search/']
     }
 
-    Search.prototype.historyKey = function() {
-        return this.name;
-    };
+    Search.prototype["historyKey"] = function ()
+    {
+        return this.name
+    }
 
-    Search.prototype.execute = function(command) {
-        var file, ref1, rngs;
-        if (!command.length) {
-            return;
+    Search.prototype["execute"] = function (command)
+    {
+        var file, rngs, _45_41_
+
+        if (!command.length)
+        {
+            return
         }
-        switch (this.name) {
+        switch (this.name)
+        {
             case '/search/':
             case '/Search/':
-                if (command === '^' || command === '$' || command === '.') {
-                    return;
+                if (_k_.in(command,['^','$','.']))
+                {
+                    return
                 }
-                rngs = matchr.ranges(command, '  ');
-                if (rngs.length === 2) {
-                    return;
+                rngs = matchr.ranges(command,'  ')
+                if (rngs.length === 2)
+                {
+                    return
                 }
+                break
         }
-        command = Search.__super__.execute.call(this, command);
-        file = (ref1 = window.editor.currentFile) != null ? ref1 : _.first(_.keys(post.get('indexer', 'files')));
-        if (file == null) {
-            return;
+
+        command = Search.__super__.execute.call(this,command)
+        file = ((_45_41_=window.editor.currentFile) != null ? _45_41_ : _.first(_.keys(post.get('indexer','files'))))
+        if (!(file != null))
+        {
+            return
         }
-        window.terminal.clear();
-        this.startSearchInFiles({
-            text: command,
-            name: this.name,
-            file: slash.path(file)
-        });
-        return {
-            focus: 'terminal',
-            show: 'terminal',
-            text: command,
-            select: true
-        };
-    };
+        window.terminal.clear()
+        this.startSearchInFiles({text:command,name:this.name,file:slash.path(file)})
+        return {focus:'terminal',show:'terminal',text:command,select:true}
+    }
 
-    Search.prototype.startSearchInFiles = function(opt) {
-        var dir, terminal;
-        terminal = window.terminal;
-        terminal.appendMeta({
-            clss: 'searchHeader',
-            diss: Syntax.dissForTextAndSyntax("▸ Search for '" + opt.text + "':", 'ko')
-        });
-        terminal.appendMeta({
-            clss: 'spacer'
-        });
-        terminal.singleCursorAtPos([0, terminal.numLines() - 2]);
-        dir = slash.pkg(slash.dir(opt.file));
-        if (dir != null) {
-            dir;
-        } else {
-            dir = slash.dir(opt.file);
-        }
-        this.walker = new walker({
-            root: dir,
-            maxDepth: 12,
-            maxFiles: 5000,
-            includeDirs: false,
-            file: (function(_this) {
-                return function(f, stat) {
-                    return _this.searchInFile(opt, slash.path(f));
-                };
-            })(this)
-        });
-        this.walker.cfg.ignore.push('js');
-        this.walker.cfg.ignore.push('lib');
-        this.walker.cfg.ignore.push('data');
-        return this.walker.start();
-    };
+    Search.prototype["startSearchInFiles"] = function (opt)
+    {
+        var dir, terminal
 
-    Search.prototype.searchInFile = function(opt, file) {
-        stream = fs.createReadStream(file, {
-            encoding: 'utf8'
-        });
-        return stream.pipe(new FileSearcher(this, opt, file));
-    };
+        terminal = window.terminal
+        terminal.appendMeta({clss:'searchHeader',diss:Syntax.dissForTextAndSyntax(`▸ Search for '${opt.text}':`,'ko')})
+        terminal.appendMeta({clss:'spacer'})
+        terminal.singleCursorAtPos([0,terminal.numLines() - 2])
+        dir = slash.pkg(slash.dir(opt.file))
+        dir = (dir != null ? dir : slash.dir(opt.file))
+        this.walker = new walker({root:dir,maxDepth:12,maxFiles:5000,includeDirs:false,file:(function (f, stat)
+        {
+            return this.searchInFile(opt,slash.path(f))
+        }).bind(this)})
+        this.walker.cfg.ignore.push('js')
+        this.walker.cfg.ignore.push('lib')
+        this.walker.cfg.ignore.push('data')
+        return this.walker.start()
+    }
 
-    Search.prototype.onMetaClick = function(meta, event) {
-        var command, file, href, split;
-        href = meta[2].href;
-        if (href.startsWith('>')) {
-            split = href.split('>');
-            if (window.commandline.commands[split[1]] != null) {
-                command = window.commandline.commands[split[1]];
-                window.commandline.startCommand(split[1]);
-                window.commandline.setText(split[2]);
-                command.execute(split[2]);
+    Search.prototype["searchInFile"] = function (opt, file)
+    {
+        stream = fs.createReadStream(file,{encoding:'utf8'})
+        return stream.pipe(new FileSearcher(this,opt,file))
+    }
+
+    Search.prototype["onMetaClick"] = function (meta, event)
+    {
+        var command, file, href, split
+
+        href = meta[2].href
+        if (href.startsWith('>'))
+        {
+            split = href.split('>')
+            if ((window.commandline.commands[split[1]] != null))
+            {
+                command = window.commandline.commands[split[1]]
+                window.commandline.startCommand(split[1])
+                window.commandline.setText(split[2])
+                command.execute(split[2])
             }
-        } else {
-            file = href + ':' + window.terminal.posForEvent(event)[0];
-            post.emit('openFiles', [file], {
-                newTab: event.metaKey
-            });
         }
-        return 'unhandled';
-    };
+        else
+        {
+            file = href + ':' + window.terminal.posForEvent(event)[0]
+            post.emit('openFiles',[file],{newTab:event.metaKey})
+        }
+        return 'unhandled'
+    }
 
-    return Search;
+    return Search
+})()
 
-})(Command);
+WritableStream = stream.Writable
 
-FileSearcher = (function(superClass) {
-    extend(FileSearcher, superClass);
+FileSearcher = (function ()
+{
+    _k_.extend(FileSearcher, WritableStream)
+    function FileSearcher (command, opt, file)
+    {
+        var extn
 
-    function FileSearcher(command1, opt1, file1) {
-        var extn;
-        this.command = command1;
-        this.opt = opt1;
-        this.file = file1;
-        this.end = bind(this.end, this);
-        FileSearcher.__super__.constructor.call(this);
-        this.line = 0;
-        this.flags = '';
-        this.patterns = (function() {
-            switch (this.opt.name) {
+        this.command = command
+        this.opt = opt
+        this.file = file
+    
+        this["end"] = this["end"].bind(this)
+        FileSearcher.__super__.constructor.call(this)
+        this.line = 0
+        this.flags = ''
+        this.patterns = ((function ()
+        {
+            switch (this.opt.name)
+            {
                 case 'search':
-                    return [[new RegExp(_.escapeRegExp(this.opt.text), 'i'), 'found']];
+                    return [[new RegExp(_.escapeRegExp(this.opt.text),'i'),'found']]
+
                 case 'Search':
-                    return [[new RegExp(_.escapeRegExp(this.opt.text)), 'found']];
+                    return [[new RegExp(_.escapeRegExp(this.opt.text)),'found']]
+
                 case '/search/':
-                    this.flags = 'i';
-                    return this.opt.text;
+                    this.flags = 'i'
+                    return this.opt.text
+
                 case '/Search/':
-                    return this.opt.text;
+                    return this.opt.text
+
                 default:
-                    kerror("commands/search FileSearcher -- unhandled '" + this.opt.name + "' command:", this.command.name, 'opt:', this.opt, 'file:', this.file);
-                    return [[new RegExp(_.escapeRegExp(this.opt.text), 'i'), 'found']];
+                    kerror(`commands/search FileSearcher -- unhandled '${this.opt.name}' command:`,this.command.name,'opt:',this.opt,'file:',this.file)
+                    return [[new RegExp(_.escapeRegExp(this.opt.text),'i'),'found']]
             }
-        }).call(this);
-        this.found = [];
-        extn = slash.ext(this.file);
-        if (indexOf.call(Syntax.syntaxNames, extn) >= 0) {
-            this.syntaxName = extn;
-        } else {
-            this.syntaxName = null;
+
+        }).bind(this))()
+        this.found = []
+        extn = slash.ext(this.file)
+        if (_k_.in(extn,Syntax.syntaxNames))
+        {
+            this.syntaxName = extn
+        }
+        else
+        {
+            this.syntaxName = null
         }
     }
 
-    FileSearcher.prototype.write = function(chunk, encoding, cb) {
-        var i, l, len, lines, rngs;
-        lines = chunk.split('\n');
-        if (this.syntaxName == null) {
-            this.syntaxName = Syntax.shebang(lines[0]);
+    FileSearcher.prototype["write"] = function (chunk, encoding, cb)
+    {
+        var l, lines, rngs, _150_64_
+
+        lines = chunk.split('\n')
+        if (!(this.syntaxName != null))
+        {
+            this.syntaxName = Syntax.shebang(lines[0])
         }
-        for (i = 0, len = lines.length; i < len; i++) {
-            l = lines[i];
-            this.line += 1;
-            rngs = matchr.ranges(this.patterns, l, this.flags);
-            if (rngs.length) {
-                this.found.push([this.line, l, rngs]);
+        var list = _k_.list(lines)
+        for (var _151_14_ = 0; _151_14_ < list.length; _151_14_++)
+        {
+            l = list[_151_14_]
+            this.line += 1
+            rngs = matchr.ranges(this.patterns,l,this.flags)
+            if (rngs.length)
+            {
+                this.found.push([this.line,l,rngs])
             }
         }
-        return true;
-    };
+        return true
+    }
 
-    FileSearcher.prototype.end = function(chunk, encoding, cb) {
-        var dss, f, fi, i, meta, ref1, regions, terminal;
-        if (this.found.length) {
-            terminal = window.terminal;
-            meta = {
-                diss: Syntax.dissForTextAndSyntax("" + (slash.tilde(this.file)), 'ko'),
-                href: this.file,
-                clss: 'gitInfoFile',
-                click: this.command.onMetaClick,
-                line: '◼'
-            };
-            terminal.appendMeta(meta);
-            terminal.appendMeta({
-                clss: 'spacer'
-            });
-            for (fi = i = 0, ref1 = this.found.length; 0 <= ref1 ? i < ref1 : i > ref1; fi = 0 <= ref1 ? ++i : --i) {
-                f = this.found[fi];
-                regions = klor.dissect([f[1]], this.syntaxName)[0];
-                dss = matchr.merge(regions, matchr.dissect(f[2]));
-                meta = {
-                    diss: dss,
-                    href: this.file + ":" + f[0],
-                    clss: 'searchResult',
-                    click: this.command.onMetaClick
-                };
-                if (fi && this.found[fi - 1][0] !== f[0] - 1) {
-                    terminal.appendMeta({
-                        clss: 'spacer'
-                    });
+    FileSearcher.prototype["end"] = function (chunk, encoding, cb)
+    {
+        var dss, f, fi, meta, regions, terminal
+
+        if (this.found.length)
+        {
+            terminal = window.terminal
+            meta = {diss:Syntax.dissForTextAndSyntax(`${slash.tilde(this.file)}`,'ko'),href:this.file,clss:'gitInfoFile',click:this.command.onMetaClick,line:'◼'}
+            terminal.appendMeta(meta)
+            terminal.appendMeta({clss:'spacer'})
+            for (var _174_23_ = fi = 0, _174_27_ = this.found.length; (_174_23_ <= _174_27_ ? fi < this.found.length : fi > this.found.length); (_174_23_ <= _174_27_ ? ++fi : --fi))
+            {
+                f = this.found[fi]
+                regions = klor.dissect([f[1]],this.syntaxName)[0]
+                dss = matchr.merge(regions,matchr.dissect(f[2]))
+                meta = {diss:dss,href:`${this.file}:${f[0]}`,clss:'searchResult',click:this.command.onMetaClick}
+                if (fi && this.found[fi - 1][0] !== f[0] - 1)
+                {
+                    terminal.appendMeta({clss:'spacer'})
                 }
-                terminal.appendMeta(meta);
-                post.emit('search-result', meta);
+                terminal.appendMeta(meta)
+                post.emit('search-result',meta)
             }
-            terminal.appendMeta({
-                clss: 'spacer'
-            });
-            return terminal.scroll.cursorToTop();
+            terminal.appendMeta({clss:'spacer'})
+            return terminal.scroll.cursorToTop()
         }
-    };
+    }
 
-    return FileSearcher;
+    return FileSearcher
+})()
 
-})(stream.Writable);
-
-module.exports = Search;
-
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic2VhcmNoLmpzIiwic291cmNlUm9vdCI6Ii4uLy4uL2NvZmZlZS9jb21tYW5kcyIsInNvdXJjZXMiOlsic2VhcmNoLmNvZmZlZSJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOztBQUFBOzs7Ozs7O0FBQUEsSUFBQSxvR0FBQTtJQUFBOzs7OztBQVFBLE1BQStDLE9BQUEsQ0FBUSxLQUFSLENBQS9DLEVBQUUsU0FBRixFQUFLLFdBQUwsRUFBUyxtQkFBVCxFQUFpQixlQUFqQixFQUF1QixtQkFBdkIsRUFBK0IsZUFBL0IsRUFBcUM7O0FBRXJDLE1BQUEsR0FBVSxPQUFBLENBQVEsaUJBQVI7O0FBQ1YsTUFBQSxHQUFVLE9BQUEsQ0FBUSxrQkFBUjs7QUFDVixPQUFBLEdBQVUsT0FBQSxDQUFRLHdCQUFSOztBQUNWLE1BQUEsR0FBVSxPQUFBLENBQVEsUUFBUjs7QUFFSjs7O0lBRUMsZ0JBQUMsV0FBRDs7O1FBRUMsd0NBQU0sV0FBTjtRQUVBLElBQUMsQ0FBQSxLQUFELEdBQVMsQ0FBQyxRQUFELEVBQVUsUUFBVixFQUFtQixVQUFuQixFQUE4QixVQUE5QjtJQUpWOztxQkFNSCxVQUFBLEdBQVksU0FBQTtlQUFHLElBQUMsQ0FBQTtJQUFKOztxQkFRWixPQUFBLEdBQVMsU0FBQyxPQUFEO0FBRUwsWUFBQTtRQUFBLElBQVUsQ0FBSSxPQUFPLENBQUMsTUFBdEI7QUFBQSxtQkFBQTs7QUFFQSxnQkFBTyxJQUFDLENBQUEsSUFBUjtBQUFBLGlCQUNTLFVBRFQ7QUFBQSxpQkFDcUIsVUFEckI7Z0JBRVEsSUFBRyxPQUFBLEtBQVksR0FBWixJQUFBLE9BQUEsS0FBZ0IsR0FBaEIsSUFBQSxPQUFBLEtBQW9CLEdBQXZCO0FBQ0ksMkJBREo7O2dCQUVBLElBQUEsR0FBTyxNQUFNLENBQUMsTUFBUCxDQUFjLE9BQWQsRUFBdUIsSUFBdkI7Z0JBQ1AsSUFBRyxJQUFJLENBQUMsTUFBTCxLQUFlLENBQWxCO0FBQ0ksMkJBREo7O0FBTFI7UUFRQSxPQUFBLEdBQVUsb0NBQU0s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QSxFQUFNLEdBQU47b0JBQ0EsSUFBQSxFQUFTLElBQUMsQ0FBQSxJQUFGLEdBQU8sR0FBUCxHQUFVLENBQUUsQ0FBQSxDQUFBLENBRHBCO29CQUVBLElBQUEsRUFBTSxjQUZOO29CQUdBLEtBQUEsRUFBTyxJQUFDLENBQUEsT0FBTyxDQUFDLFdBSGhCOztnQkFLSixJQUFHLEVBQUEsSUFBTyxJQUFDLENBQUEsS0FBTSxDQUFBLEVBQUEsR0FBRyxDQUFILENBQU0sQ0FBQSxDQUFBLENBQWIsS0FBbUIsQ0FBRSxDQUFBLENBQUEsQ0FBRixHQUFLLENBQWxDO29CQUNJLFFBQVEsQ0FBQyxVQUFULENBQW9CO3dCQUFBLElBQUEsRUFBTSxRQUFOO3FCQUFwQixFQURKOztnQkFHQSxRQUFRLENBQUMsVUFBVCxDQUFvQixJQUFwQjtnQkFDQSxJQUFJLENBQUMsSUFBTCxDQUFVLGVBQVYsRUFBMEIsSUFBMUI7QUFqQko7WUFtQkEsUUFBUSxDQUFDLFVBQVQsQ0FBb0I7Z0JBQUEsSUFBQSxFQUFNLFFBQU47YUFBcEI7bUJBQ0EsUUFBUSxDQUFDLE1BQU0sQ0FBQyxXQUFoQixDQUFBLEVBbENKOztJQUZDOzs7O0dBbENrQixNQUFNLENBQUM7O0FBd0VsQyxNQUFNLENBQUMsT0FBUCxHQUFpQiIsInNvdXJjZXNDb250ZW50IjpbIiMjI1xuIDAwMDAwMDAgIDAwMDAwMDAwICAgMDAwMDAwMCAgIDAwMDAwMDAwICAgIDAwMDAwMDAgIDAwMCAgIDAwMFxuMDAwICAgICAgIDAwMCAgICAgICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgMDAwICAgICAgIDAwMCAgIDAwMFxuMDAwMDAwMCAgIDAwMDAwMDAgICAwMDAwMDAwMDAgIDAwMDAwMDAgICAgMDAwICAgICAgIDAwMDAwMDAwMFxuICAgICAwMDAgIDAwMCAgICAgICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgMDAwICAgICAgIDAwMCAgIDAwMFxuMDAwMDAwMCAgIDAwMDAwMDAwICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgIDAwMDAwMDAgIDAwMCAgIDAwMFxuIyMjXG5cbnsgXywgZnMsIGtlcnJvciwga2xvciwgbWF0Y2hyLCBwb3N0LCBzbGFzaCB9ID0gcmVxdWlyZSAna3hrJ1xuXG53YWxrZXIgID0gcmVxdWlyZSAnLi4vdG9vbHMvd2Fsa2VyJ1xuU3ludGF4ICA9IHJlcXVpcmUgJy4uL2VkaXRvci9zeW50YXgnXG5Db21tYW5kID0gcmVxdWlyZSAnLi4vY29tbWFuZGxpbmUvY29tbWFuZCdcbnN0cmVhbSAgPSByZXF1aXJlICdzdHJlYW0nXG5cbmNsYXNzIFNlYXJjaCBleHRlbmRzIENvbW1hbmRcblxuICAgIEA6IChjb21tYW5kbGluZSkgLT5cbiAgICAgICAgXG4gICAgICAgIHN1cGVyIGNvbW1hbmRsaW5lXG4gICAgICAgIFxuICAgICAgICBAbmFtZXMgPSBbJ3NlYXJjaCcgJ1NlYXJjaCcgJy9zZWFyY2gvJyAnL1NlYXJjaC8nXVxuICAgICBcbiAgICBoaXN0b3J5S2V5OiAtPiBAbmFtZVxuICAgICAgICAgICAgICAgIFxuICAgICMgMDAwMDAwMDAgIDAwMCAgIDAwMCAgMDAwMDAwMDAgICAwMDAwMDAwICAwMDAgICAwMDAgIDAwMDAwMDAwMCAgMDAwMDAwMDBcbiAgICAjIDAwMCAgICAgICAgMDAwIDAwMCAgIDAwMCAgICAgICAwMDAgICAgICAgMDAwICAgMDAwICAgICAwMDAgICAgIDAwMCAgICAgXG4gICAgIyAwMDAwMDAwICAgICAwMDAwMCAgICAwMDAwMDAwICAgMDAwICAgICAgIDAwMCAgIDAwMCAgICAgMDAwICAgICAwMDAwMDAwIFxuICAgICMgMDAwICAgICAgICAwMDAgMDAwICAgMDAwICAgICAgIDAwMCAgICAgICAwMDAgICAwMDAgICAgIDAwMCAgICAgMDAwICAgICBcbiAgICAjIDAwMDAwMDAwICAwMDAgICAwMDAgIDAwMDAwMDAwICAgMDAwMDAwMCAgIDAwMDAwMDAgICAgICAwMDAgICAgIDAwMDAwMDAwXG4gICAgXG4gICAgZXhlY3V0ZTogKGNvbW1hbmQpIC0+XG4gICAgICAgIFxuICAgICAgICByZXR1cm4gaWYgbm90IGNvbW1hbmQubGVuZ3RoXG4gICAgICAgIFxuICAgICAgICBzd2l0Y2ggQG5hbWVcbiAgICAgICAgICAgIHdoZW4gJy9zZWFyY2gvJywgJy9TZWFyY2gvJ1xuICAgICAgICAgICAgICAgIGlmIGNvbW1hbmQgaW4gWydeJyAnJCcgJy4nXVxuICAgICAgICAgICAgICAgICAgICByZXR1cm4gXG4gICAgICAgICAgICAgICAgcm5ncyA9IG1hdGNoci5yYW5nZXMgY29tbWFuZCwgJyAgJ1xuICAgICAgICAgICAgICAgIGlmIHJuZ3MubGVuZ3RoID09IDJcbiAgICAgICAgICAgICAgICAgICAgcmV0dXJuXG4gICAgICAgICAgICAgICAgXG4gICAgICAgIGNvbW1hbmQgPSBzdXBlciBjb21tYW5kXG4gICAgICAgIGZpbGUgPSB3aW5kb3cuZWRpdG9yLmN1cnJlbnRGaWxlID8gXy5maXJzdCBfLmtleXMocG9zdC5nZXQoJ2luZGV4ZXInICdmaWxlcycpKVxuICAgICAgICBcbiAgICAgICAgcmV0dXJuIGlmIG5vdCBmaWxlP1xuICAgICAgICBcbiAgICAgICAgd2luZG93LnRlcm1pbmFsLmNsZWFyKClcbiAgICAgICAgXG4gICAgICAgIEBzdGFydFNlYXJjaEluRmlsZXMgXG4gICAgICAgICAgICB0ZXh0OiBjb21tYW5kXG4gICAgICAgICAgICBuYW1lOiBAbmFtZVxuICAgICAgICAgICAgZmlsZTogc2xhc2gucGF0aCBmaWxlXG4gICAgICAgICAgICBcbiAgICAgICAgZm9jdXM6ICAndGVybWluYWwnXG4gICAgICAgIHNob3c6ICAgJ3Rlcm1pbmFsJ1xuICAgICAgICB0ZXh0OiAgIGNvbW1hbmRcbiAgICAgICAgc2VsZWN0OiB0cnVlXG4gICAgICBcbiAgICAjICAwMDAwMDAwICAwMDAwMDAwMCAgIDAwMDAwMDAgICAwMDAwMDAwMCAgICAwMDAwMDAwICAwMDAgICAwMDBcbiAgICAjIDAwMCAgICAgICAwMDAgICAgICAgMDAwICAgMDAwICAwMDAgICAwMDAgIDAwMCAgICAgICAwMDAgICAwMDBcbiAgICAjIDAwMDAwMDAgICAwMDAwMDAwICAgMDAwMDAwMDAwICAwMDAwMDAwICAgIDAwMCAgICAgICAwMDAwMDAwMDBcbiAgICAjICAgICAgMDAwICAwMDAgICAgICAgMDAwICAgMDAwICAwMDAgICAwMDAgIDAwMCAgICAgICAwMDAgICAwMDBcbiAgICAjIDAwMDAwMDAgICAwMDAwMDAwMCAgMDAwICAgMDAwICAwMDAgICAwMDAgICAwMDAwMDAwICAwMDAgICAwMDBcbiAgICBcbiAgICBzdGFydFNlYXJjaEluRmlsZXM6IChvcHQpIC0+XG4gICAgICAgIFxuICAgICAgICB0ZXJtaW5hbCA9IHdpbmRvdy50ZXJtaW5hbFxuXG4gICAgICAgIHRlcm1pbmFsLmFwcGVuZE1ldGEgY2xzczonc2VhcmNoSGVhZGVyJyBkaXNzOlN5bnRheC5kaXNzRm9yVGV4dEFuZFN5bnRheCBcIuKWuCBTZWFyY2ggZm9yICcje29wdC50ZXh0fSc6XCIgJ2tvJ1xuICAgICAgICB0ZXJtaW5hbC5hcHBlbmRNZXRhIGNsc3M6J3NwYWNlcidcbiAgICAgICAgdGVybWluYWwuc2luZ2xlQ3Vyc29yQXRQb3MgWzAsIHRlcm1pbmFsLm51bUxpbmVzKCktMl1cbiAgICAgICAgZGlyID0gc2xhc2gucGtnIHNsYXNoLmRpciBvcHQuZmlsZVxuICAgICAgICBkaXIgPz0gc2xhc2guZGlyIG9wdC5maWxlXG4gICAgICAgIEB3YWxrZXIgPSBuZXcgd2Fsa2VyXG4gICAgICAgICAgICByb290OiAgICAgICAgZGlyXG4gICAgICAgICAgICBtYXhEZXB0aDogICAgMTJcbiAgICAgICAgICAgIG1heEZpbGVzOiAgICA1MDAwXG4gICAgICAgICAgICBpbmNsdWRlRGlyczogZmFsc2VcbiAgICAgICAgICAgIGZpbGU6ICAgICAgICAoZixzdGF0KSA9PiBAc2VhcmNoSW5GaWxlIG9wdCwgc2xhc2gucGF0aCBmXG4gICAgICAgIEB3YWxrZXIuY2ZnLmlnbm9yZS5wdXNoICdqcycgICMgdGhlc2UgZGlyZWN0b3JpZXMgYXJlIG5vdCBpbmNsdWRlZCBpbiBzZWFyY2ggcmVzdWx0c1xuICAgICAgICBAd2Fsa2VyLmNmZy5pZ25vcmUucHVzaCAnbGliJyAjIHRoZXkgc2hvdWxkIGJlIGNvbmZpZ3VyYWJsZSwgbWF5YmUgaW4gcGFja2FnZS5ub29uIG9yIC5rb25yYWQubm9vbj9cbiAgICAgICAgQHdhbGtlci5jZmcuaWdub3JlLnB1c2ggJ2RhdGEnIFxuICAgICAgICBAd2Fsa2VyLnN0YXJ0KClcbiAgICAgICAgXG4gICAgc2VhcmNoSW5GaWxlOiAob3B0LCBmaWxlKSA9PlxuXG4gICAgICAgIHN0cmVhbSA9IGZzLmNyZWF0ZVJlYWRTdHJlYW0gZmlsZSwgZW5jb2Rpbmc6ICd1dGY4J1xuICAgICAgICBzdHJlYW0ucGlwZSBuZXcgRmlsZVNlYXJjaGVyIEAsIG9wdCwgZmlsZVxuXG4gICAgIyAwMCAgICAgMDAgIDAwMDAwMDAwICAwMDAwMDAwMDAgICAwMDAwMDAwICAgIDAwMDAwMDAgIDAwMCAgICAgIDAwMCAgIDAwMDAwMDAgIDAwMCAgIDAwMCAgXG4gICAgIyAwMDAgICAwMDAgIDAwMCAgICAgICAgICAwMDAgICAgIDAwMCAgIDAwMCAgMDAwICAgICAgIDAwMCAgICAgIDAwMCAgMDAwICAgICAgIDAwMCAgMDAwICAgXG4gICAgIyAwMDAwMDAwMDAgIDAwMDAwMDAgICAgICAwMDAgICAgIDAwMDAwMDAwMCAgMDAwICAgICAgIDAwMCAgICAgIDAwMCAgMDAwICAgICAgIDAwMDAwMDAgICAgXG4gICAgIyAwMDAgMCAwMDAgIDAwMCAgICAgICAgICAwMDAgICAgIDAwMCAgIDAwMCAgMDAwICAgICAgIDAwMCAgICAgIDAwMCAgMDAwICAgICAgIDAwMCAgMDAwICAgXG4gICAgIyAwMDAgICAwMDAgIDAwMDAwMDAwICAgICAwMDAgICAgIDAwMCAgIDAwMCAgIDAwMDAwMDAgIDAwMDAwMDAgIDAwMCAgIDAwMDAwMDAgIDAwMCAgIDAwMCAgXG4gICAgXG4gICAgb25NZXRhQ2xpY2s6IChtZXRhLCBldmVudCkgPT5cblxuICAgICAgICBocmVmID0gbWV0YVsyXS5ocmVmICAgXG4gICAgICAgIFxuICAgICAgICBpZiBocmVmLnN0YXJ0c1dpdGggJz4nXG4gICAgICAgICAgICBcbiAgICAgICAgICAgIHNwbGl0ID0gaHJlZi5zcGxpdCAnPidcbiAgICAgICAgICAgIGlmIHdpbmRvdy5jb21tYW5kbGluZS5jb21tYW5kc1tzcGxpdFsxXV0/XG4gICAgICAgICAgICAgICAgY29tbWFuZCA9IHdpbmRvdy5jb21tYW5kbGluZS5jb21tYW5kc1tzcGxpdFsxXV1cbiAgICAgICAgICAgICAgICB3aW5kb3cuY29tbWFuZGxpbmUuc3RhcnRDb21tYW5kIHNwbGl0WzFdXG4gICAgICAgICAgICAgICAgd2luZG93LmNvbW1hbmRsaW5lLnNldFRleHQgc3BsaXRbMl1cbiAgICAgICAgICAgICAgICBjb21tYW5kLmV4ZWN1dGUgc3BsaXRbMl1cbiAgICAgICAgZWxzZVxuICAgICAgICAgICAgZmlsZSA9IGhyZWYgKyAnOicgKyB3aW5kb3cudGVybWluYWwucG9zRm9yRXZlbnQoZXZlbnQpWzBdXG4gICAgICAgICAgICBwb3N0LmVtaXQgJ29wZW5GaWxlcycgW2ZpbGVdLCBuZXdUYWI6IGV2ZW50Lm1ldGFLZXlcblxuICAgICAgICAndW5oYW5kbGVkJ1xuXG4jICAwMDAwMDAwICAwMDAwMDAwMCAgIDAwMDAwMDAgICAwMDAwMDAwMCAgICAwMDAwMDAwICAwMDAgICAwMDAgIDAwMDAwMDAwICAwMDAwMDAwMCBcbiMgMDAwICAgICAgIDAwMCAgICAgICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgMDAwICAgICAgIDAwMCAgIDAwMCAgMDAwICAgICAgIDAwMCAgIDAwMFxuIyAwMDAwMDAwICAgMDAwMDAwMCAgIDAwMDAwMDAwMCAgMDAwMDAwMCAgICAwMDAgICAgICAgMDAwMDAwMDAwICAwMDAwMDAwICAgMDAwMDAwMCAgXG4jICAgICAgMDAwICAwMDAgICAgICAgMDAwICAgMDAwICAwMDAgICAwMDAgIDAwMCAgICAgICAwMDAgICAwMDAgIDAwMCAgICAgICAwMDAgICAwMDBcbiMgMDAwMDAwMCAgIDAwMDAwMDAwICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgIDAwMDAwMDAgIDAwMCAgIDAwMCAgMDAwMDAwMDAgIDAwMCAgIDAwMFxuXG5jbGFzcyBGaWxlU2VhcmNoZXIgZXh0ZW5kcyBzdHJlYW0uV3JpdGFibGVcbiAgICBcbiAgICBAOiAoQGNvbW1hbmQsIEBvcHQsIEBmaWxlKSAtPlxuICAgICAgICBcbiAgICAgICAgc3VwZXIoKVxuICAgICAgICBAbGluZSA9IDBcbiAgICAgICAgQGZsYWdzID0gJydcbiAgICAgICAgQHBhdHRlcm5zID0gc3dpdGNoIEBvcHQubmFtZVxuICAgICAgICAgICAgd2hlbiAnc2VhcmNoJyAgIHRoZW4gW1tuZXcgUmVnRXhwKF8uZXNjYXBlUmVnRXhwKEBvcHQudGV4dCksICdpJyksICdmb3VuZCddXVxuICAgICAgICAgICAgd2hlbiAnU2VhcmNoJyAgIHRoZW4gW1tuZXcgUmVnRXhwKF8uZXNjYXBlUmVnRXhwKEBvcHQudGV4dCkpLCAgICAgICdmb3VuZCddXVxuICAgICAgICAgICAgd2hlbiAnL3NlYXJjaC8nIHRoZW4gQGZsYWdzPSdpJzsgQG9wdC50ZXh0XG4gICAgICAgICAgICB3aGVuICcvU2VhcmNoLycgdGhlbiBAb3B0LnRleHRcbiAgICAgICAgICAgIGVsc2VcbiAgICAgICAgICAgICAgICBrZXJyb3IgXCJjb21tYW5kcy9zZWFyY2ggRmlsZVNlYXJjaGVyIC0tIHVuaGFuZGxlZCAnI3tAb3B0Lm5hbWV9JyBjb21tYW5kOlwiLCBAY29tbWFuZC5uYW1lLCAnb3B0OicsIEBvcHQsICdmaWxlOicsIEBmaWxlXG4gICAgICAgICAgICAgICAgW1tuZXcgUmVnRXhwKF8uZXNjYXBlUmVnRXhwKEBvcHQudGV4dCksICdpJyksICdmb3VuZCddXVxuICAgICAgICAgICAgICAgIFxuICAgICAgICBAZm91bmQgPSBbXVxuICAgICAgICBleHRuID0gc2xhc2guZXh0IEBmaWxlXG4gICAgICAgIGlmIGV4dG4gaW4gU3ludGF4LnN5bnRheE5hbWVzXG4gICAgICAgICAgICBAc3ludGF4TmFtZSA9IGV4dG5cbiAgICAgICAgZWxzZVxuICAgICAgICAgICAgQHN5bnRheE5hbWUgPSBudWxsXG4gICAgICAgICAgICBcbiAgICB3cml0ZTogKGNodW5rLCBlbmNvZGluZywgY2IpIC0+XG4gICAgICAgIFxuICAgICAgICBsaW5lcyA9IGNodW5rLnNwbGl0ICdcXG4nXG4gICAgICAgIEBzeW50YXhOYW1lID0gU3ludGF4LnNoZWJhbmcgbGluZXNbMF0gaWYgbm90IEBzeW50YXhOYW1lP1xuICAgICAgICBmb3IgbCBpbiBsaW5lc1xuICAgICAgICAgICAgQGxpbmUgKz0gMSAgICAgICAgICAgIFxuICAgICAgICAgICAgcm5ncyA9IG1hdGNoci5yYW5nZXMgQHBhdHRlcm5zLCBsLCBAZmxhZ3NcbiAgICAgICAgICAgIGlmIHJuZ3MubGVuZ3RoXG4gICAgICAgICAgICAgICAgQGZvdW5kLnB1c2ggW0BsaW5lLCBsLCBybmdzXVxuICAgICAgICB0cnVlXG4gICAgICAgIFxuICAgIGVuZDogKGNodW5rLCBlbmNvZGluZywgY2IpID0+XG4gICAgICAgIFxuICAgICAgICBpZiBAZm91bmQubGVuZ3RoXG4gICAgICAgICAgICBcbiAgICAgICAgICAgIHRlcm1pbmFsID0gd2luZG93LnRlcm1pbmFsXG4gICAgICAgICAgICBcbiAgICAgICAgICAgIG1ldGEgPSBcbiAgICAgICAgICAgICAgICBkaXNzOiAgU3ludGF4LmRpc3NGb3JUZXh0QW5kU3ludGF4IFwiI3tzbGFzaC50aWxkZSBAZmlsZX1cIiAna28nXG4gICAgICAgICAgICAgICAgaHJlZjogIEBmaWxlXG4gICAgICAgICAgICAgICAgY2xzczogICdnaXRJbmZvRmlsZSdcbiAgICAgICAgICAgICAgICBjbGljazogQGNvbW1hbmQub25NZXRhQ2xpY2tcbiAgICAgICAgICAgICAgICBsaW5lOiAgJ+KXvCdcbiAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgIHRlcm1pbmFsLmFwcGVuZE1ldGEgbWV0YVxuICAgICAgICAgICAgdGVybWluYWwuYXBwZW5kTWV0YSBjbHNzOiAnc3BhY2VyJ1xuICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgICAgICBmb3IgZmkgaW4gWzAuLi5AZm91bmQubGVuZ3RoXVxuICAgICAgICAgICAgICAgIFxuICAgICAgICAgICAgICAgIGYgPSBAZm91bmRbZmldXG4gICAgICAgICAgICAgICAgXG4gICAgICAgICAgICAgICAgcmVnaW9ucyA9IGtsb3IuZGlzc2VjdChbZlsxXV0sIEBzeW50YXhOYW1lKVswXVxuICAgICAgICAgICAgICAgIGRzcyA9IG1hdGNoci5tZXJnZSByZWdpb25zLCBtYXRjaHIuZGlzc2VjdCBmWzJdXG4gICAgICAgICAgICAgICAgXG4gICAgICAgICAgICAgICAgbWV0YSA9XG4gICAgICAgICAgICAgICAgICAgIGRpc3M6IGRzc1xuICAgICAgICAgICAgICAgICAgICBocmVmOiBcIiN7QGZpbGV9OiN7ZlswXX1cIlxuICAgICAgICAgICAgICAgICAgICBjbHNzOiAnc2VhcmNoUmVzdWx0J1xuICAgICAgICAgICAgICAgICAgICBjbGljazogQGNvbW1hbmQub25NZXRhQ2xpY2tcbiAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgICAgICAgICAgaWYgZmkgYW5kIEBmb3VuZFtmaS0xXVswXSAhPSBmWzBdLTFcbiAgICAgICAgICAgICAgICAgICAgdGVybWluYWwuYXBwZW5kTWV0YSBjbHNzOiAnc3BhY2VyJ1xuICAgICAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgICAgICB0ZXJtaW5hbC5hcHBlbmRNZXRhIG1ldGFcbiAgICAgICAgICAgICAgICBwb3N0LmVtaXQgJ3NlYXJjaC1yZXN1bHQnIG1ldGFcbiAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgIHRlcm1pbmFsLmFwcGVuZE1ldGEgY2xzczogJ3NwYWNlcidcbiAgICAgICAgICAgIHRlcm1pbmFsLnNjcm9sbC5jdXJzb3JUb1RvcCgpXG4gICAgICAgICAgICAgICAgXG5tb2R1bGUuZXhwb3J0cyA9IFNlYXJjaFxuIl19
-//# sourceURL=../../coffee/commands/search.coffee
+module.exports = Search

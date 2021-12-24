@@ -1,147 +1,173 @@
-// koffee 1.20.0
+// monsterkodi/kode 0.212.0
 
-/*
-000  000   000  0000000    00000000  000   000  00000000   00000000         000    
-000  0000  000  000   000  000        000 000   000   000  000   000        000    
-000  000 0 000  000   000  0000000     00000    00000000   0000000          000    
-000  000  0000  000   000  000        000 000   000        000   000  000   000    
-000  000   000  0000000    00000000  000   000  000        000   000   0000000
- */
-var ignore, indexKoFiles, indexProject, info, shouldIndex, slash, walkdir,
-    indexOf = [].indexOf;
+var _k_ = {in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}}
 
-ignore = require('ignore');
+var ignore, indexKoFiles, indexProject, info, shouldIndex, slash, walkdir
 
-slash = require('kslash');
+ignore = require('ignore')
+slash = require('kslash')
+walkdir = require('walkdir')
 
-walkdir = require('walkdir');
+shouldIndex = function (path, stat)
+{
+    var exts
 
-shouldIndex = function(path, stat) {
-    var exts, ref;
-    exts = ['coffee', 'kode', 'styl', 'pug', 'md', 'noon', 'txt', 'json', 'sh', 'py', 'cpp', 'cc', 'c', 'cs', 'h', 'hpp', 'js'];
-    if (ref = slash.ext(path), indexOf.call(exts, ref) >= 0) {
-        if (stat.size > 654321) {
-            return false;
-        } else {
-            return true;
+    exts = ['coffee','kode','styl','pug','md','noon','txt','json','sh','py','cpp','cc','c','cs','h','hpp','js']
+    if (_k_.in(slash.ext(path),exts))
+    {
+        if (stat.size > 654321)
+        {
+            return false
+        }
+        else
+        {
+            return true
         }
     }
-    return false;
-};
-
-indexKoFiles = function(kofiles, info) {
-    var absDir, cfg, dir, ign, j, kodata, kofile, len, noon, opt, ref, ref1;
-    for (j = 0, len = kofiles.length; j < len; j++) {
-        kofile = kofiles[j];
-        noon = require('noon');
-        kodata = noon.load(kofile);
-        if (!kodata.index) {
-            return;
-        }
-        ref = kodata.index;
-        for (dir in ref) {
-            cfg = ref[dir];
-            opt = {
-                max_depth: (ref1 = cfg.depth) != null ? ref1 : 4,
-                no_return: true
-            };
-            ign = ignore();
-            if (cfg.ignore) {
-                ign.add(cfg.ignore);
-            }
-            absDir = slash.join(slash.dir(kofile), dir);
-            walkdir.sync(absDir, opt, function(path, stat) {
-                if (ign.ignores(slash.relative(path, dir))) {
-                    return this.ignore(path);
-                } else if (stat.isFile()) {
-                    if (shouldIndex(path, stat)) {
-                        return info.files.push(slash.path(path));
-                    }
-                }
-            });
-        }
-    }
-};
-
-indexProject = function(file) {
-    var depth, dir, ign, info, kofiles, opt;
-    depth = 20;
-    dir = slash.pkg(file);
-    if (!dir) {
-        depth = 3;
-        if (slash.isFile(file)) {
-            dir = slash.dir(file);
-        } else if (slash.isDir(file)) {
-            dir = file;
-        }
-    }
-    if (!dir) {
-        return;
-    }
-    kofiles = [];
-    info = {
-        dir: dir,
-        files: []
-    };
-    ign = ignore();
-    opt = {
-        max_depth: depth,
-        no_return: true
-    };
-    walkdir.sync(dir, opt, function(path, stat) {
-        var addIgnores, gitignore;
-        addIgnores = function(gitignore) {
-            var gitdir, gitign;
-            gitign = slash.readText(gitignore);
-            gitign = gitign.split(/\r?\n/);
-            gitign = gitign.filter(function(i) {
-                return ((i != null ? i.startsWith : void 0) != null) && !i.startsWith("#");
-            });
-            gitdir = slash.dir(gitignore);
-            if (!slash.samePath(gitdir, dir)) {
-                gitign = gitign.map(function(i) {
-                    if (i[0] === '!') {
-                        return '!' + slash.relative(gitdir, dir) + i.slice(1);
-                    } else {
-                        return slash.relative(gitdir, dir) + i;
-                    }
-                });
-            }
-            return ign.add(gitign);
-        };
-        if (ign.ignores(slash.relative(path, dir))) {
-            this.ignore(path);
-            return;
-        }
-        if (stat.isDirectory()) {
-            gitignore = slash.join(path, '.gitignore');
-            if (slash.isFile(gitignore)) {
-                return addIgnores(gitignore);
-            }
-        } else {
-            file = slash.file(path);
-            if (file === '.gitignore') {
-                addIgnores(path);
-                return;
-            }
-            if (file === '.ko.noon') {
-                kofiles.push(path);
-            }
-            if (shouldIndex(path, stat)) {
-                return info.files.push(slash.path(path));
-            }
-        }
-    });
-    indexKoFiles(kofiles, info);
-    return info;
-};
-
-if (module.parent) {
-    module.exports = indexProject;
-} else {
-    info = indexProject(slash.resolve(process.argv[2]));
-    console.log(info.files.length + " files");
+    return false
 }
 
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXhwcmouanMiLCJzb3VyY2VSb290IjoiLi4vLi4vY29mZmVlL21haW4iLCJzb3VyY2VzIjpbImluZGV4cHJqLmNvZmZlZSJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOztBQUFBOzs7Ozs7O0FBQUEsSUFBQSxxRUFBQTtJQUFBOztBQVFBLE1BQUEsR0FBVSxPQUFBLENBQVEsUUFBUjs7QUFDVixLQUFBLEdBQVUsT0FBQSxDQUFRLFFBQVI7O0FBQ1YsT0FBQSxHQUFVLE9BQUEsQ0FBUSxTQUFSOztBQUVWLFdBQUEsR0FBYyxTQUFDLElBQUQsRUFBTyxJQUFQO0FBRVYsUUFBQTtJQUFBLElBQUEsR0FBTyxDQUFFLFFBQUYsRUFBVyxNQUFYLEVBQWtCLE1BQWxCLEVBQXlCLEtBQXpCLEVBQStCLElBQS9CLEVBQW9DLE1BQXBDLEVBQTJDLEtBQTNDLEVBQWlELE1BQWpELEVBQXdELElBQXhELEVBQTZELElBQTdELEVBQWtFLEtBQWxFLEVBQXdFLElBQXhFLEVBQTZFLEdBQTdFLEVBQWlGLElBQWpGLEVBQXNGLEdBQXRGLEVBQTBGLEtBQTFGLEVBQWdHLElBQWhHO0lBQ1AsVUFBRyxLQUFLLENBQUMsR0FBTixDQUFVLElBQVYsQ0FBQSxFQUFBLGFBQW1CLElBQW5CLEVBQUEsR0FBQSxNQUFIO1FBQ0ksSUFBRyxJQUFJLENBQUMsSUFBTCxHQUFZLE1BQWY7QUFDSSxtQkFBTyxNQURYO1NBQUEsTUFBQTtBQUdJLG1CQUFPLEtBSFg7U0FESjs7V0FLQTtBQVJVOztBQVVkLFlBQUEsR0FBZSxTQUFDLE9BQUQsRUFBVSxJQUFWO0FBRVgsUUFBQTtBQUFBLFNBQUEseUNBQUE7O1FBRUksSUFBQSxHQUFPLE9BQUEsQ0FBUSxNQUFSO1FBQ1AsTUFBQSxHQUFTLElBQUksQ0FBQyxJQUFMLENBQVUsTUFBVjtRQUNULElBQVUsQ0FBSSxNQUFNLENBQUMsS0FBckI7QUFBQSxtQkFBQTs7QUFFQTtBQUFBLGFBQUEsVUFBQTs7WUFFSSxHQUFBLEdBQ0k7Z0JBQUEsU0FBQSxzQ0FB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ZSxJQUFmLEVBQXFCLEdBQXJCLENBQVosQ0FBSDtZQUNJLElBQUMsQ0FBQSxNQUFELENBQVEsSUFBUjtBQUNBLG1CQUZKOztRQUlBLElBQUcsSUFBSSxDQUFDLFdBQUwsQ0FBQSxDQUFIO1lBQ0ksU0FBQSxHQUFZLEtBQUssQ0FBQyxJQUFOLENBQVcsSUFBWCxFQUFpQixZQUFqQjtZQUNaLElBQUcsS0FBSyxDQUFDLE1BQU4sQ0FBYSxTQUFiLENBQUg7dUJBQ0ksVUFBQSxDQUFXLFNBQVgsRUFESjthQUZKO1NBQUEsTUFBQTtZQUtJLElBQUEsR0FBTyxLQUFLLENBQUMsSUFBTixDQUFXLElBQVg7WUFDUCxJQUFHLElBQUEsS0FBUSxZQUFYO2dCQUNJLFVBQUEsQ0FBVyxJQUFYO0FBQ0EsdUJBRko7O1lBSUEsSUFBRyxJQUFBLEtBQVEsVUFBWDtnQkFDSSxPQUFPLENBQUMsSUFBUixDQUFhLElBQWIsRUFESjs7WUFHQSxJQUFHLFdBQUEsQ0FBWSxJQUFaLEVBQWtCLElBQWxCLENBQUg7dUJBQ0ksSUFBSSxDQUFDLEtBQUssQ0FBQyxJQUFYLENBQWdCLEtBQUssQ0FBQyxJQUFOLENBQVcsSUFBWCxDQUFoQixFQURKO2FBYko7O0lBbkJtQixDQUF2QjtJQW1DQSxZQUFBLENBQWEsT0FBYixFQUFzQixJQUF0QjtXQUVBO0FBN0RXOztBQStEZixJQUFHLE1BQU0sQ0FBQyxNQUFWO0lBRUksTUFBTSxDQUFDLE9BQVAsR0FBaUIsYUFGckI7Q0FBQSxNQUFBO0lBS0ksSUFBQSxHQUFPLFlBQUEsQ0FBYSxLQUFLLENBQUMsT0FBTixDQUFjLE9BQU8sQ0FBQyxJQUFLLENBQUEsQ0FBQSxDQUEzQixDQUFiO0lBQTBDLE9BQUEsQ0FDakQsR0FEaUQsQ0FDMUMsSUFBSSxDQUFDLEtBQUssQ0FBQyxNQUFaLEdBQW1CLFFBRHdCLEVBTHJEIiwic291cmNlc0NvbnRlbnQiOlsiIyMjXG4wMDAgIDAwMCAgIDAwMCAgMDAwMDAwMCAgICAwMDAwMDAwMCAgMDAwICAgMDAwICAwMDAwMDAwMCAgIDAwMDAwMDAwICAgICAgICAgMDAwICAgIFxuMDAwICAwMDAwICAwMDAgIDAwMCAgIDAwMCAgMDAwICAgICAgICAwMDAgMDAwICAgMDAwICAgMDAwICAwMDAgICAwMDAgICAgICAgIDAwMCAgICBcbjAwMCAgMDAwIDAgMDAwICAwMDAgICAwMDAgIDAwMDAwMDAgICAgIDAwMDAwICAgIDAwMDAwMDAwICAgMDAwMDAwMCAgICAgICAgICAwMDAgICAgXG4wMDAgIDAwMCAgMDAwMCAgMDAwICAgMDAwICAwMDAgICAgICAgIDAwMCAwMDAgICAwMDAgICAgICAgIDAwMCAgIDAwMCAgMDAwICAgMDAwICAgIFxuMDAwICAwMDAgICAwMDAgIDAwMDAwMDAgICAgMDAwMDAwMDAgIDAwMCAgIDAwMCAgMDAwICAgICAgICAwMDAgICAwMDAgICAwMDAwMDAwICAgICBcbiMjI1xuXG5pZ25vcmUgID0gcmVxdWlyZSAnaWdub3JlJ1xuc2xhc2ggICA9IHJlcXVpcmUgJ2tzbGFzaCdcbndhbGtkaXIgPSByZXF1aXJlICd3YWxrZGlyJ1xuXG5zaG91bGRJbmRleCA9IChwYXRoLCBzdGF0KSAtPlxuICAgIFxuICAgIGV4dHMgPSBbICdjb2ZmZWUnICdrb2RlJyAnc3R5bCcgJ3B1ZycgJ21kJyAnbm9vbicgJ3R4dCcgJ2pzb24nICdzaCcgJ3B5JyAnY3BwJyAnY2MnICdjJyAnY3MnICdoJyAnaHBwJyAnanMnIF1cbiAgICBpZiBzbGFzaC5leHQocGF0aCkgaW4gZXh0c1xuICAgICAgICBpZiBzdGF0LnNpemUgPiA2NTQzMjFcbiAgICAgICAgICAgIHJldHVybiBmYWxzZVxuICAgICAgICBlbHNlXG4gICAgICAgICAgICByZXR1cm4gdHJ1ZVxuICAgIGZhbHNlXG5cbmluZGV4S29GaWxlcyA9IChrb2ZpbGVzLCBpbmZvKSAtPlxuICAgIFxuICAgIGZvciBrb2ZpbGUgaW4ga29maWxlc1xuICAgICAgICBcbiAgICAgICAgbm9vbiA9IHJlcXVpcmUgJ25vb24nXG4gICAgICAgIGtvZGF0YSA9IG5vb24ubG9hZCBrb2ZpbGVcbiAgICAgICAgcmV0dXJuIGlmIG5vdCBrb2RhdGEuaW5kZXhcbiAgICAgICAgXG4gICAgICAgIGZvciBkaXIsY2ZnIG9mIGtvZGF0YS5pbmRleFxuICAgICAgICAgICAgXG4gICAgICAgICAgICBvcHQgPSBcbiAgICAgICAgICAgICAgICBtYXhfZGVwdGg6IGNmZy5kZXB0aCA/IDRcbiAgICAgICAgICAgICAgICBub19yZXR1cm46IHRydWVcbiAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgIGlnbiA9IGlnbm9yZSgpXG4gICAgICAgICAgICBpZ24uYWRkIGNmZy5pZ25vcmUgaWYgY2ZnLmlnbm9yZVxuICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgICAgICBhYnNEaXIgPSBzbGFzaC5qb2luIHNsYXNoLmRpcihrb2ZpbGUpLCBkaXJcbiAgICAgICAgICAgIFxuICAgICAgICAgICAgd2Fsa2Rpci5zeW5jIGFic0Rpciwgb3B0LCAocGF0aCwgc3RhdCkgLT5cbiAgICAgICAgICAgICAgICAgIFxuICAgICAgICAgICAgICAgIGlmIGlnbi5pZ25vcmVzIHNsYXNoLnJlbGF0aXZlIHBhdGgsIGRpclxuICAgICAgICAgICAgICAgICAgICBAaWdub3JlIHBhdGhcbiAgICAgICAgICAgICAgICBlbHNlIGlmIHN0YXQuaXNGaWxlKCkgXG4gICAgICAgICAgICAgICAgICAgIGlmIHNob3VsZEluZGV4IHBhdGgsIHN0YXRcbiAgICAgICAgICAgICAgICAgICAgICAgIGluZm8uZmlsZXMucHVzaCBzbGFzaC5wYXRoIHBhdGhcblxuaW5kZXhQcm9qZWN0ID0gKGZpbGUpIC0+XG5cbiAgICBkZXB0aCA9IDIwXG4gICAgXG4gICAgZGlyID0gc2xhc2gucGtnIGZpbGVcbiAgICBcbiAgICBpZiBub3QgZGlyXG4gICAgICAgIGRlcHRoID0gM1xuICAgICAgICBpZiBzbGFzaC5pc0ZpbGUgZmlsZVxuICAgICAgICAgICAgZGlyID0gc2xhc2guZGlyIGZpbGVcbiAgICAgICAgZWxzZSBpZiBzbGFzaC5pc0RpciBmaWxlXG4gICAgICAgICAgICBkaXIgPSBmaWxlXG4gICAgICAgICAgICBcbiAgICByZXR1cm4gaWYgbm90IGRpclxuICAgIFxuICAgIGtvZmlsZXMgPSBbXVxuICAgIGluZm8gPSBkaXI6ZGlyLCBmaWxlczpbXVxuXG4gICAgaWduID0gaWdub3JlKClcbiAgICBcbiAgICBvcHQgPSBcbiAgICAgICAgbWF4X2RlcHRoOiBkZXB0aFxuICAgICAgICBub19yZXR1cm46IHRydWVcbiAgICAgICAgICAgICAgICBcbiAgICB3YWxrZGlyLnN5bmMgZGlyLCBvcHQsIChwYXRoLCBzdGF0KSAtPlxuICAgICAgICBcbiAgICAgICAgYWRkSWdub3JlcyA9IChnaXRpZ25vcmUpIC0+IFxuICAgICAgICAgICAgZ2l0aWduID0gc2xhc2gucmVhZFRleHQgZ2l0aWdub3JlXG4gICAgICAgICAgICBnaXRpZ24gPSBnaXRpZ24uc3BsaXQgL1xccj9cXG4vXG4gICAgICAgICAgICBnaXRpZ24gPSBnaXRpZ24uZmlsdGVyIChpKSAtPiBpPy5zdGFydHNXaXRoPyBhbmQgbm90IGkuc3RhcnRzV2l0aCBcIiNcIlxuICAgICAgICAgICAgZ2l0ZGlyID0gc2xhc2guZGlyIGdpdGlnbm9yZVxuICAgICAgICAgICAgaWYgbm90IHNsYXNoLnNhbWVQYXRoIGdpdGRpciwgZGlyXG4gICAgICAgICAgICAgICAgZ2l0aWduID0gZ2l0aWduLm1hcCAoaSkgLT4gXG4gICAgICAgICAgICAgICAgICAgIGlmIGlbMF09PSchJ1xuICAgICAgICAgICAgICAgICAgICAgICAgJyEnICsgc2xhc2gucmVsYXRpdmUoZ2l0ZGlyLCBkaXIpICsgaS5zbGljZSAxXG4gICAgICAgICAgICAgICAgICAgIGVsc2VcbiAgICAgICAgICAgICAgICAgICAgICAgIHNsYXNoLnJlbGF0aXZlKGdpdGRpciwgZGlyKSArIGlcbiAgICAgICAgICAgIGlnbi5hZGQgZ2l0aWduXG4gICAgICAgIFxuICAgICAgICBpZiBpZ24uaWdub3JlcyBzbGFzaC5yZWxhdGl2ZSBwYXRoLCBkaXJcbiAgICAgICAgICAgIEBpZ25vcmUgcGF0aFxuICAgICAgICAgICAgcmV0dXJuXG4gICAgICAgIFxuICAgICAgICBpZiBzdGF0LmlzRGlyZWN0b3J5KClcbiAgICAgICAgICAgIGdpdGlnbm9yZSA9IHNsYXNoLmpvaW4gcGF0aCwgJy5naXRpZ25vcmUnXG4gICAgICAgICAgICBpZiBzbGFzaC5pc0ZpbGUgZ2l0aWdub3JlXG4gICAgICAgICAgICAgICAgYWRkSWdub3JlcyBnaXRpZ25vcmVcbiAgICAgICAgZWxzZVxuICAgICAgICAgICAgZmlsZSA9IHNsYXNoLmZpbGUgcGF0aFxuICAgICAgICAgICAgaWYgZmlsZSA9PSAnLmdpdGlnbm9yZSdcbiAgICAgICAgICAgICAgICBhZGRJZ25vcmVzIHBhdGhcbiAgICAgICAgICAgICAgICByZXR1cm5cbiAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgIGlmIGZpbGUgPT0gJy5rby5ub29uJyAjID8/P1xuICAgICAgICAgICAgICAgIGtvZmlsZXMucHVzaCBwYXRoXG4gICAgICAgICAgICAgICAgXG4gICAgICAgICAgICBpZiBzaG91bGRJbmRleCBwYXRoLCBzdGF0XG4gICAgICAgICAgICAgICAgaW5mby5maWxlcy5wdXNoIHNsYXNoLnBhdGggcGF0aFxuICAgICAgICAgICAgICAgIFxuICAgIGluZGV4S29GaWxlcyBrb2ZpbGVzLCBpbmZvXG4gICAgICBcbiAgICBpbmZvXG5cbmlmIG1vZHVsZS5wYXJlbnRcbiAgICBcbiAgICBtb2R1bGUuZXhwb3J0cyA9IGluZGV4UHJvamVjdFxuICAgIFxuZWxzZVxuICAgIGluZm8gPSBpbmRleFByb2plY3Qgc2xhc2gucmVzb2x2ZSBwcm9jZXNzLmFyZ3ZbMl1cbiAgICBsb2cgXCIje2luZm8uZmlsZXMubGVuZ3RofSBmaWxlc1wiXG4gICAgIl19
-//# sourceURL=../../coffee/main/indexprj.coffee
+indexKoFiles = function (kofiles, info)
+{
+    var absDir, cfg, dir, ign, kodata, kofile, noon, opt, _34_37_
+
+    var list = _k_.list(kofiles)
+    for (var _25_15_ = 0; _25_15_ < list.length; _25_15_++)
+    {
+        kofile = list[_25_15_]
+        noon = require('noon')
+        kodata = noon.load(kofile)
+        if (!kodata.index)
+        {
+            return
+        }
+        for (dir in kodata.index)
+        {
+            cfg = kodata.index[dir]
+            opt = {max_depth:((_34_37_=cfg.depth) != null ? _34_37_ : 4),no_return:true}
+            ign = ignore()
+            if (cfg.ignore)
+            {
+                ign.add(cfg.ignore)
+            }
+            absDir = slash.join(slash.dir(kofile),dir)
+            walkdir.sync(absDir,opt,function (path, stat)
+            {
+                if (ign.ignores(slash.relative(path,dir)))
+                {
+                    return this.ignore(path)
+                }
+                else if (stat.isFile())
+                {
+                    if (shouldIndex(path,stat))
+                    {
+                        return info.files.push(slash.path(path))
+                    }
+                }
+            })
+        }
+    }
+}
+
+indexProject = function (file)
+{
+    var depth, dir, ign, info, kofiles, opt
+
+    depth = 20
+    dir = slash.pkg(file)
+    if (!dir)
+    {
+        depth = 3
+        if (slash.isFile(file))
+        {
+            dir = slash.dir(file)
+        }
+        else if (slash.isDir(file))
+        {
+            dir = file
+        }
+    }
+    if (!dir)
+    {
+        return
+    }
+    kofiles = []
+    info = {dir:dir,files:[]}
+    ign = ignore()
+    opt = {max_depth:depth,no_return:true}
+    walkdir.sync(dir,opt,function (path, stat)
+    {
+        var addIgnores, gitignore
+
+        addIgnores = function (gitignore)
+        {
+            var gitdir, gitign
+
+            gitign = slash.readText(gitignore)
+            gitign = gitign.split(/\r?\n/)
+            gitign = gitign.filter(function (i)
+            {
+                var _79_55_
+
+                return ((i != null ? i.startsWith : undefined) != null) && !i.startsWith("#")
+            })
+            gitdir = slash.dir(gitignore)
+            if (!slash.samePath(gitdir,dir))
+            {
+                gitign = gitign.map(function (i)
+                {
+                    if (i[0] === '!')
+                    {
+                        return '!' + slash.relative(gitdir,dir) + i.slice(1)
+                    }
+                    else
+                    {
+                        return slash.relative(gitdir,dir) + i
+                    }
+                })
+            }
+            return ign.add(gitign)
+        }
+        if (ign.ignores(slash.relative(path,dir)))
+        {
+            this.ignore(path)
+            return
+        }
+        if (stat.isDirectory())
+        {
+            gitignore = slash.join(path,'.gitignore')
+            if (slash.isFile(gitignore))
+            {
+                return addIgnores(gitignore)
+            }
+        }
+        else
+        {
+            file = slash.file(path)
+            if (file === '.gitignore')
+            {
+                addIgnores(path)
+                return
+            }
+            if (file === '.ko.noon')
+            {
+                kofiles.push(path)
+            }
+            if (shouldIndex(path,stat))
+            {
+                return info.files.push(slash.path(path))
+            }
+        }
+    })
+    indexKoFiles(kofiles,info)
+    return info
+}
+if (module.parent)
+{
+    module.exports = indexProject
+}
+else
+{
+    info = indexProject(slash.resolve(process.argv[2]))
+    console.log(`${info.files.length} files`)
+}

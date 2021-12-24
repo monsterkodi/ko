@@ -1,107 +1,103 @@
-// koffee 1.19.0
+// monsterkodi/kode 0.212.0
 
-/*
-00000000  000  000   000  0000000  
-000       000  0000  000  000   000
-000000    000  000 0 000  000   000
-000       000  000  0000  000   000
-000       000  000   000  0000000
- */
-var Command, Find, empty,
-    extend = function(child, parent) { for (var key in parent) { if (hasProp(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    hasProp = Object.hasOwn;
+var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
-empty = require('kxk').empty;
+var Command, Find
 
-Command = require('../commandline/command');
+empty = require('kxk').empty
 
-Find = (function(superClass) {
-    extend(Find, superClass);
+Command = require('../commandline/command')
 
-    function Find(commandline) {
-        Find.__super__.constructor.call(this, commandline);
-        this.types = ['str', 'Str', 'reg', 'Reg', 'fuzzy', 'glob'];
-        this.names = ['find', 'Find', '/find/', '/Find/', 'fiZd', 'f*nd'];
+Find = (function ()
+{
+    _k_.extend(Find, Command)
+    function Find (commandline)
+    {
+        Find.__super__.constructor.call(this,commandline)
+    
+        this.types = ['str','Str','reg','Reg','fuzzy','glob']
+        this.names = ['find','Find','/find/','/Find/','fiZd','f*nd']
     }
 
-    Find.prototype.historyKey = function() {
-        return this.name;
-    };
+    Find.prototype["historyKey"] = function ()
+    {
+        return this.name
+    }
 
-    Find.prototype.start = function(name) {
-        var editor;
-        if (name === 'find') {
-            editor = this.receivingEditor();
-            window.split.focus('commandline');
-            if (this.getText() !== editor.textOfHighlight() && !empty(editor.textOfHighlight())) {
-                this.setText(editor.textOfHighlight());
+    Find.prototype["start"] = function (name)
+    {
+        var editor
+
+        if (name === 'find')
+        {
+            editor = this.receivingEditor()
+            window.split.focus('commandline')
+            if (this.getText() !== editor.textOfHighlight() && !_k_.empty(editor.textOfHighlight()))
+            {
+                this.setText(editor.textOfHighlight())
             }
         }
-        this.type = this.types[this.names.indexOf(name)];
-        return Find.__super__.start.call(this, name);
-    };
+        this.type = this.types[this.names.indexOf(name)]
+        return Find.__super__.start.call(this,name)
+    }
 
-    Find.prototype.cancel = function() {
-        this.hideList();
-        return {
-            focus: this.receiver,
-            show: 'editor'
-        };
-    };
+    Find.prototype["cancel"] = function ()
+    {
+        this.hideList()
+        return {focus:this.receiver,show:'editor'}
+    }
 
-    Find.prototype.changed = function(command) {
-        var ref, ref1;
-        Find.__super__.changed.call(this, command);
-        if (command.length) {
-            if (((ref = this.type) === 'reg' || ref === 'Reg') && ((ref1 = command.trim()) === '^' || ref1 === '$' || ref1 === '^$' || ref1 === '.' || ref1 === '?' || ref1 === '\\' || ref1 === '\\b')) {
-                return window.textEditor.clearHighlights();
-            } else if (!command.trim().startsWith('|') && !command.trim().endsWith('|')) {
-                return window.textEditor.highlightText(command, {
-                    type: this.type,
-                    select: 'keep'
-                });
+    Find.prototype["changed"] = function (command)
+    {
+        Find.__super__.changed.call(this,command)
+    
+        if (command.length)
+        {
+            if (_k_.in(this.type,['reg','Reg']) && _k_.in(command.trim(),['^','$','^$','.','?','\\','\\b']))
+            {
+                return window.textEditor.clearHighlights()
             }
-        } else {
-            return window.textEditor.clearHighlights();
+            else if (!command.trim().startsWith('|') && !command.trim().endsWith('|'))
+            {
+                return window.textEditor.highlightText(command,{type:this.type,select:'keep'})
+            }
         }
-    };
+        else
+        {
+            return window.textEditor.clearHighlights()
+        }
+    }
 
-    Find.prototype.execute = function(command) {
-        command = Find.__super__.execute.call(this, command);
-        window.textEditor.highlightText(command, {
-            type: this.type,
-            select: 'after'
-        });
-        return {
-            text: command,
-            select: true
-        };
-    };
+    Find.prototype["execute"] = function (command)
+    {
+        command = Find.__super__.execute.call(this,command)
+        window.textEditor.highlightText(command,{type:this.type,select:'after'})
+        return {text:command,select:true}
+    }
 
-    Find.prototype.handleModKeyComboEvent = function(mod, key, combo, event) {
-        switch (combo) {
+    Find.prototype["handleModKeyComboEvent"] = function (mod, key, combo, event)
+    {
+        switch (combo)
+        {
             case 'shift+enter':
             case 'command+shift+g':
-                window.textEditor.highlightText(this.getText(), {
-                    type: this.type,
-                    select: 'before'
-                });
-                return;
+                window.textEditor.highlightText(this.getText(),{type:this.type,select:'before'})
+                return
+
             case 'command+g':
-                this.execute(this.getText());
-                return;
+                this.execute(this.getText())
+                return
+
             case 'tab':
-                window.textEditor.focus();
-                return;
+                window.textEditor.focus()
+                return
+
         }
-        return Find.__super__.handleModKeyComboEvent.call(this, mod, key, combo, event);
-    };
 
-    return Find;
+        return Find.__super__.handleModKeyComboEvent.call(this,mod,key,combo,event)
+    }
 
-})(Command);
+    return Find
+})()
 
-module.exports = Find;
-
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZmluZC5qcyIsInNvdXJjZVJvb3QiOiIuLi8uLi9jb2ZmZWUvY29tbWFuZHMiLCJzb3VyY2VzIjpbImZpbmQuY29mZmVlIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7O0FBQUE7Ozs7Ozs7QUFBQSxJQUFBLG9CQUFBO0lBQUE7OztBQVFFLFFBQVUsT0FBQSxDQUFRLEtBQVI7O0FBRVosT0FBQSxHQUFVLE9BQUEsQ0FBUSx3QkFBUjs7QUFFSjs7O0lBRUMsY0FBQyxXQUFEO1FBRUMsc0NBQU0sV0FBTjtRQUVBLElBQUMsQ0FBQSxLQUFELEdBQVMsQ0FBQyxLQUFELEVBQVEsS0FBUixFQUFnQixLQUFoQixFQUF5QixLQUF6QixFQUFrQyxPQUFsQyxFQUEwQyxNQUExQztRQUNULElBQUMsQ0FBQSxLQUFELEdBQVMsQ0FBQyxNQUFELEVBQVEsTUFBUixFQUFnQixRQUFoQixFQUF5QixRQUF6QixFQUFrQyxNQUFsQyxFQUEwQyxNQUExQztJQUxWOzttQkFPSCxVQUFBLEdBQVksU0FBQTtlQUFHLElBQUMsQ0FBQTtJQUFKOzttQkFRWixLQUFBLEdBQU8sU0FBQyxJQUFEO0FBRUgsWUFBQTtRQUFBLElBQUcsSUFBQSxLQUFRLE1BQVg7WUFDSSxNQUFBLEdBQVMsSUFBQyxDQUFBLGVBQUQsQ0FBQTtZQUNULE1BQU0sQ0FBQyxLQUFLLENBQUMsS0FBYixDQUFtQixhQUFuQjtZQUNBLElBQUcsSUFBQyxDQUFBLE9BQUQsQ0FBQSxDQUFBLEtBQWMsTUFBTSxDQUFDLGVBQVAsQ0FBQSxDQUFkLElBQTJDLENBQUksS0FBQSxDQUFNLE1BQU0sQ0FBQyxlQUFQLENBQUEsQ0FBTixDQUFsRDtnQkFDSSxJQUFDLENBQUEsT0FBRCxDQUFTLE1BQU0sQ0FBQyxlQUFQLENBQUEsQ0FBVCxFQURKO2FBSEo7O1FBTUEsSUFBQyxDQUFBLElBQUQsR0FBUSxJQUFDLENBQUEsS0FBTSxDQUFBLElBQUMsQ0FBQSxLQUFLLENBQUMsT0FBUCxDQUFlLElBQWYsQ0FBQTtlQUVmLGdDQUFNLElBQU47SUFWRzs7bUJBa0JQLE1BQUEsR0FBUSxTQUFBO1FBRUosSUFBQyxDQUFBLFFBQUQsQ0FBQTtlQUNBO1lBQUEsS0FBQSxFQUFPLElBQUMsQ0FBQSxRQUFSO1lBQ0EsSUFBQSxFQUFNLFFBRE47O0lBSEk7O21CQVlSLE9BQUEsR0FBUyxTQUFDLE9BQUQ7QUFFTCxZQUFBO1FBQUEsa0NBQU0sT0FBTjtRQUVBLElBQUcsT0FBTyxDQUFDLE1BQVg7WUFDSSxJQUFHLFFBQUEsSUFBQyxDQUFBLEtBQUQsS0FBVSxLQUFWLElBQUEsR0FBQSxLQUFpQixLQUFqQixDQUFBLElBQTRCLFNBQUEsT0FBTyxDQUFDLElBQVIsQ0FBQSxFQUFBLEtBQW1CLEdBQW5CLElBQUEsSUFBQSxLQUF1QixHQUF2QixJQUFBLElBQUEsS0FBMkIsSUFBM0IsSUFBQSxJQUFBLEtBQWdDLEdBQWhDLElBQUEsSUFBQSxLQUFvQyxHQUFwQyxJQUFBLElBQUEsS0FBd0MsSUFBeEMsSUFBQSxJQUFBLEtBQTZDLEtBQTdDLENBQS9CO3VCQUNJLE1BQU0sQ0FBQyxVQUFVLENBQUMsZUFBbEIsQ0FBQSxFQURKO2FBQUEsTUFFSyxJQUFHLENBQUksT0FBTyxDQUFDLElBQVIsQ0FBQSxDQUFjLENBQUMsVUFBZixDQUEwQixHQUExQixDQUFKLElBQXVDLENBQUksT0FBTyxDQUFDLElBQVIsQ0FBQSxDQUFjLENBQUMsUUFBZixDQUF3QixHQUF4QixDQUE5Qzt1QkFDRCxNQUFNLENBQUMsVUFBVSxDQUFDLGFBQWxCLENBQWdDLE9BQWhDLEVBQ0k7b0JBQUEsSUFBQSxFQUFRLElBQUMsQ0FBQSxJQUFUO29CQUNBLE1BQUEsRUFBUSxNQURSO2lCQURKLEVBREM7YUFIVDtTQUFBLE1BQUE7bUJBUUksTUFBTSxDQUFDLFVBQVUsQ0FBQyxlQUFsQixDQUFBLEVBUko7O0lBSks7O21CQW9CVCxPQUFBLEdBQVMsU0FBQyxPQUFEO1FBRUwsT0FBQSxHQUFVLGtDQUFNLE9BQU47UUFFVixNQUFNLENBQUMsVUFBVSxDQUFDLGFBQWxCLENBQWdDLE9BQWhDLEVBQ0k7WUFBQSxJQUFBLEVBQU0sSUFBQyxDQUFBLElBQVA7WUFDQSxNQUFBLEVBQVEsT0FEUjtTQURKO2VBSUE7WUFBQSxJQUFBLEVBQVEsT0FBUjtZQUNBLE1BQUEsRUFBUSxJQURSOztJQVJLOzttQkFpQlQsc0JBQUEsR0FBd0IsU0FBQyxHQUFELEVBQU0sR0FBTixFQUFXLEtBQVgsRUFBa0IsS0FBbEI7QUFFcEIsZ0JBQU8sS0FBUDtBQUFBLGlCQUVTLGFBRlQ7QUFBQSxpQkFFdUIsaUJBRnZCO2dCQUlRLE1BQU0sQ0FBQyxVQUFVLENBQUMsYUFBbEIsQ0FBZ0MsSUFBQyxDQUFBLE9BQUQsQ0FBQSxDQUFoQyxFQUNJO29CQUFBLElBQUEsRUFBTSxJQUFDLENBQUEsSUFBUDtvQkFDQSxNQUFBLEVBQVEsUUFEUjtpQkFESjtBQUdBO0FBUFIsaUJBU1MsV0FUVDtnQkFXUSxJQUFDLENBQUEsT0FBRCxDQUFTLElBQUMsQ0FBQSxPQUFELENBQUEsQ0FBVDtBQUNBO0FBWlIsaUJBY1MsS0FkVDtnQkFnQlEsTUFBTSxDQUFDLFVBQVUsQ0FBQyxLQUFsQixDQUFBO0FBQ0E7QUFqQlI7ZUFtQkEsaURBQU0sR0FBTixFQUFXLEdBQVgsRUFBZ0IsS0FBaEIsRUFBdUIsS0FBdkI7SUFyQm9COzs7O0dBcEZUOztBQTJHbkIsTUFBTSxDQUFDLE9BQVAsR0FBaUIiLCJzb3VyY2VzQ29udGVudCI6WyIjIyNcbjAwMDAwMDAwICAwMDAgIDAwMCAgIDAwMCAgMDAwMDAwMCAgXG4wMDAgICAgICAgMDAwICAwMDAwICAwMDAgIDAwMCAgIDAwMFxuMDAwMDAwICAgIDAwMCAgMDAwIDAgMDAwICAwMDAgICAwMDBcbjAwMCAgICAgICAwMDAgIDAwMCAgMDAwMCAgMDAwICAgMDAwXG4wMDAgICAgICAgMDAwICAwMDAgICAwMDAgIDAwMDAwMDAgIFxuIyMjXG5cbnsgZW1wdHkgfSA9IHJlcXVpcmUgJ2t4aydcblxuQ29tbWFuZCA9IHJlcXVpcmUgJy4uL2NvbW1hbmRsaW5lL2NvbW1hbmQnXG5cbmNsYXNzIEZpbmQgZXh0ZW5kcyBDb21tYW5kXG5cbiAgICBAOiAoY29tbWFuZGxpbmUpIC0+XG4gICAgICAgIFxuICAgICAgICBzdXBlciBjb21tYW5kbGluZVxuICAgICAgICBcbiAgICAgICAgQHR5cGVzID0gWydzdHInICAnU3RyJyAgICdyZWcnICAgICdSZWcnICAgICdmdXp6eScgJ2dsb2InXVxuICAgICAgICBAbmFtZXMgPSBbJ2ZpbmQnICdGaW5kJyAgJy9maW5kLycgJy9GaW5kLycgJ2ZpWmQnICAnZipuZCddXG4gICAgICAgXG4gICAgaGlzdG9yeUtleTogLT4gQG5hbWVcbiAgICAgICAgXG4gICAgIyAgMDAwMDAwMCAgMDAwMDAwMDAwICAgMDAwMDAwMCAgIDAwMDAwMDAwICAgMDAwMDAwMDAwXG4gICAgIyAwMDAgICAgICAgICAgMDAwICAgICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgICAgMDAwICAgXG4gICAgIyAwMDAwMDAwICAgICAgMDAwICAgICAwMDAwMDAwMDAgIDAwMDAwMDAgICAgICAgMDAwICAgXG4gICAgIyAgICAgIDAwMCAgICAgMDAwICAgICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgICAgMDAwICAgXG4gICAgIyAwMDAwMDAwICAgICAgMDAwICAgICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgICAgMDAwICAgXG4gICAgICAgIFxuICAgIHN0YXJ0OiAobmFtZSkgLT5cbiAgICAgICAgXG4gICAgICAgIGlmIG5hbWUgPT0gJ2ZpbmQnXG4gICAgICAgICAgICBlZGl0b3IgPSBAcmVjZWl2aW5nRWRpdG9yKClcbiAgICAgICAgICAgIHdpbmRvdy5zcGxpdC5mb2N1cyAnY29tbWFuZGxpbmUnXG4gICAgICAgICAgICBpZiBAZ2V0VGV4dCgpICE9IGVkaXRvci50ZXh0T2ZIaWdobGlnaHQoKSBhbmQgbm90IGVtcHR5IGVkaXRvci50ZXh0T2ZIaWdobGlnaHQoKVxuICAgICAgICAgICAgICAgIEBzZXRUZXh0IGVkaXRvci50ZXh0T2ZIaWdobGlnaHQoKVxuICAgICAgICAgICAgXG4gICAgICAgIEB0eXBlID0gQHR5cGVzW0BuYW1lcy5pbmRleE9mIG5hbWVdXG4gICAgICAgIFxuICAgICAgICBzdXBlciBuYW1lXG5cbiAgICAjICAwMDAwMDAwICAgMDAwMDAwMCAgIDAwMCAgIDAwMCAgIDAwMDAwMDAgIDAwMDAwMDAwICAwMDAgICAgXG4gICAgIyAwMDAgICAgICAgMDAwICAgMDAwICAwMDAwICAwMDAgIDAwMCAgICAgICAwMDAgICAgICAgMDAwICAgIFxuICAgICMgMDAwICAgICAgIDAwMDAwMDAwMCAgMDAwIDAgMDAwICAwMDAgICAgICAgMDAwMDAwMCAgIDAwMCAgICBcbiAgICAjIDAwMCAgICAgICAwMDAgICAwMDAgIDAwMCAgMDAwMCAgMDAwICAgICAgIDAwMCAgICAgICAwMDAgICAgXG4gICAgIyAgMDAwMDAwMCAgMDAwICAgMDAwICAwMDAgICAwMDAgICAwMDAwMDAwICAwMDAwMDAwMCAgMDAwMDAwMFxuICAgIFxuICAgIGNhbmNlbDogLT5cbiAgICAgICAgXG4gICAgICAgIEBoaWRlTGlzdCgpICBcbiAgICAgICAgZm9jdXM6IEByZWNlaXZlclxuICAgICAgICBzaG93OiAnZWRpdG9yJ1xuICAgICAgICBcbiAgICAjICAwMDAwMDAwICAwMDAgICAwMDAgICAwMDAwMDAwICAgMDAwICAgMDAwICAgMDAwMDAwMCAgIDAwMDAwMDAwICAwMDAwMDAwICBcbiAgICAjIDAwMCAgICAgICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgMDAwMCAgMDAwICAwMDAgICAgICAgIDAwMCAgICAgICAwMDAgICAwMDBcbiAgICAjIDAwMCAgICAgICAwMDAwMDAwMDAgIDAwMDAwMDAwMCAgMDAwIDAgMDAwICAwMDAgIDAwMDAgIDAwMDAwMDAgICAwMDAgICAwMDBcbiAgICAjIDAwMCAgICAgICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgMDAwICAwMDAwICAwMDAgICAwMDAgIDAwMCAgICAgICAwMDAgICAwMDBcbiAgICAjICAwMDAwMDAwICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgMDAwICAgMDAwICAgMDAwMDAwMCAgIDAwMDAwMDAwICAwMDAwMDAwICBcblxuICAgIGNoYW5nZWQ6IChjb21tYW5kKSAtPlxuICAgICAgICBcbiAgICAgICAgc3VwZXIgY29tbWFuZFxuICAgICAgICBcbiAgICAgICAgaWYgY29tbWFuZC5sZW5ndGhcbiAgICAgICAgICAgIGlmIEB0eXBlIGluIFsncmVnJywgJ1JlZyddIGFuZCBjb21tYW5kLnRyaW0oKSBpbiBbJ14nICckJyAnXiQnICcuJyAnPycgJ1xcXFwnICdcXFxcYiddXG4gICAgICAgICAgICAgICAgd2luZG93LnRleHRFZGl0b3IuY2xlYXJIaWdobGlnaHRzKClcbiAgICAgICAgICAgIGVsc2UgaWYgbm90IGNvbW1hbmQudHJpbSgpLnN0YXJ0c1dpdGgoJ3wnKSBhbmQgbm90IGNvbW1hbmQudHJpbSgpLmVuZHNXaXRoKCd8JylcbiAgICAgICAgICAgICAgICB3aW5kb3cudGV4dEVkaXRvci5oaWdobGlnaHRUZXh0IGNvbW1hbmQsIFxuICAgICAgICAgICAgICAgICAgICB0eXBlOiAgIEB0eXBlXG4gICAgICAgICAgICAgICAgICAgIHNlbGVjdDogJ2tlZXAnXG4gICAgICAgIGVsc2VcbiAgICAgICAgICAgIHdpbmRvdy50ZXh0RWRpdG9yLmNsZWFySGlnaGxpZ2h0cygpXG4gICAgXG4gICAgIyAwMDAwMDAwMCAgMDAwICAgMDAwICAwMDAwMDAwMCAgIDAwMDAwMDAgIDAwMCAgIDAwMCAgMDAwMDAwMDAwICAwMDAwMDAwMFxuICAgICMgMDAwICAgICAgICAwMDAgMDAwICAgMDAwICAgICAgIDAwMCAgICAgICAwMDAgICAwMDAgICAgIDAwMCAgICAgMDAwICAgICBcbiAgICAjIDAwMDAwMDAgICAgIDAwMDAwICAgIDAwMDAwMDAgICAwMDAgICAgICAgMDAwICAgMDAwICAgICAwMDAgICAgIDAwMDAwMDAgXG4gICAgIyAwMDAgICAgICAgIDAwMCAwMDAgICAwMDAgICAgICAgMDAwICAgICAgIDAwMCAgIDAwMCAgICAgMDAwICAgICAwMDAgICAgIFxuICAgICMgMDAwMDAwMDAgIDAwMCAgIDAwMCAgMDAwMDAwMDAgICAwMDAwMDAwICAgMDAwMDAwMCAgICAgIDAwMCAgICAgMDAwMDAwMDBcbiAgICBcbiAgICBleGVjdXRlOiAoY29tbWFuZCkgLT5cbiAgICAgICAgXG4gICAgICAgIGNvbW1hbmQgPSBzdXBlciBjb21tYW5kXG4gICAgICAgIFxuICAgICAgICB3aW5kb3cudGV4dEVkaXRvci5oaWdobGlnaHRUZXh0IGNvbW1hbmQsIFxuICAgICAgICAgICAgdHlwZTogQHR5cGVcbiAgICAgICAgICAgIHNlbGVjdDogJ2FmdGVyJ1xuICAgICAgICAgICAgICAgIFxuICAgICAgICB0ZXh0OiAgIGNvbW1hbmRcbiAgICAgICAgc2VsZWN0OiB0cnVlXG4gICAgICAgIFxuICAgICMgMDAwICAgMDAwICAwMDAwMDAwMCAgMDAwICAgMDAwXG4gICAgIyAwMDAgIDAwMCAgIDAwMCAgICAgICAgMDAwIDAwMCBcbiAgICAjIDAwMDAwMDAgICAgMDAwMDAwMCAgICAgMDAwMDAgIFxuICAgICMgMDAwICAwMDAgICAwMDAgICAgICAgICAgMDAwICAgXG4gICAgIyAwMDAgICAwMDAgIDAwMDAwMDAwICAgICAwMDAgICBcbiAgICBcbiAgICBoYW5kbGVNb2RLZXlDb21ib0V2ZW50OiAobW9kLCBrZXksIGNvbWJvLCBldmVudCkgLT4gXG4gICAgICAgIFxuICAgICAgICBzd2l0Y2ggY29tYm9cbiAgICAgICAgICAgIFxuICAgICAgICAgICAgd2hlbiAnc2hpZnQrZW50ZXInICdjb21tYW5kK3NoaWZ0K2cnXG4gICAgICAgICAgICAgICAgXG4gICAgICAgICAgICAgICAgd2luZG93LnRleHRFZGl0b3IuaGlnaGxpZ2h0VGV4dCBAZ2V0VGV4dCgpLFxuICAgICAgICAgICAgICAgICAgICB0eXBlOiBAdHlwZVxuICAgICAgICAgICAgICAgICAgICBzZWxlY3Q6ICdiZWZvcmUnXG4gICAgICAgICAgICAgICAgcmV0dXJuXG4gICAgICAgICAgICAgICAgICAgIFxuICAgICAgICAgICAgd2hlbiAnY29tbWFuZCtnJyBcbiAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgICAgICBAZXhlY3V0ZSBAZ2V0VGV4dCgpICAgIFxuICAgICAgICAgICAgICAgIHJldHVyblxuICAgICAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgIHdoZW4gJ3RhYidcbiAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgICAgICB3aW5kb3cudGV4dEVkaXRvci5mb2N1cygpXG4gICAgICAgICAgICAgICAgcmV0dXJuXG4gICAgICAgICAgICAgICAgICAgIFxuICAgICAgICBzdXBlciBtb2QsIGtleSwgY29tYm8sIGV2ZW50XG4gICAgICBcbm1vZHVsZS5leHBvcnRzID0gRmluZFxuIl19
-//# sourceURL=../../coffee/commands/find.coffee
+module.exports = Find

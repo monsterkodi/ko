@@ -1,100 +1,101 @@
-// koffee 1.19.0
+// monsterkodi/kode 0.212.0
 
-/*
-00000000  00000000    0000000
-000       000   000  000     
-000000    00000000   0000000 
-000       000             000
-000       000        0000000
- */
-var $, FPS, clamp, elem, now, post, ref,
-    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+var _k_
 
-ref = require('kxk'), post = ref.post, clamp = ref.clamp, elem = ref.elem, $ = ref.$;
+var $, clamp, elem, now, post
 
-now = require('perf_hooks').performance.now;
+$ = require('kxk').$
+clamp = require('kxk').clamp
+elem = require('kxk').elem
+post = require('kxk').post
 
-FPS = (function() {
-    function FPS() {
-        this.stash = bind(this.stash, this);
-        this.restore = bind(this.restore, this);
-        this.draw = bind(this.draw, this);
-        var x, y;
-        this.elem = elem({
-            "class": 'fps'
-        });
-        this.elem.style.display = 'none';
-        this.canvas = elem('canvas', {
-            "class": "fpsCanvas",
-            width: 130 * 2,
-            height: 30 * 2
-        });
-        this.elem.appendChild(this.canvas);
-        y = parseInt(-30 / 2);
-        x = parseInt(-130 / 2);
-        this.canvas.style.transform = "translate3d(" + x + "px, " + y + "px, 0px) scale3d(0.5, 0.5, 1)";
-        this.history = [];
-        this.last = now();
-        $('commandline-span').appendChild(this.elem);
-        post.on('stash', this.stash);
-        post.on('restore', this.restore);
+now = require('perf_hooks').performance.now
+class FPS
+{
+    constructor ()
+    {
+        var x, y
+
+        this.stash = this.stash.bind(this)
+        this.restore = this.restore.bind(this)
+        this.draw = this.draw.bind(this)
+        this.elem = elem({class:'fps'})
+        this.elem.style.display = 'none'
+        this.canvas = elem('canvas',{class:"fpsCanvas",width:130 * 2,height:30 * 2})
+        this.elem.appendChild(this.canvas)
+        y = parseInt(-30 / 2)
+        x = parseInt(-130 / 2)
+        this.canvas.style.transform = `translate3d(${x}px, ${y}px, 0px) scale3d(0.5, 0.5, 1)`
+        this.history = []
+        this.last = now()
+        $('commandline-span').appendChild(this.elem)
+        post.on('stash',this.stash)
+        post.on('restore',this.restore)
     }
 
-    FPS.prototype.draw = function() {
-        var ctx, green, h, i, j, ms, red, ref1, time;
-        time = now();
-        this.history.push(time - this.last);
-        while (this.history.length > 260) {
-            this.history.shift();
+    draw ()
+    {
+        var ctx, green, h, i, ms, red, time
+
+        time = now()
+        this.history.push(time - this.last)
+        while (this.history.length > 260)
+        {
+            this.history.shift()
         }
-        this.canvas.height = this.canvas.height;
-        ctx = this.canvas.getContext('2d');
-        for (i = j = 0, ref1 = this.history.length; 0 <= ref1 ? j < ref1 : j > ref1; i = 0 <= ref1 ? ++j : --j) {
-            ms = Math.max(0, this.history[i] - 17);
-            red = parseInt(32 + 223 * clamp(0, 1, (ms - 16) / 16));
-            green = parseInt(32 + 223 * clamp(0, 1, (ms - 32) / 32));
-            ctx.fillStyle = "rgb(" + red + ", " + green + ", 32)";
-            h = Math.min(ms, 60);
-            ctx.fillRect(260 - this.history.length + i, 60 - h, 2, h);
+        this.canvas.height = this.canvas.height
+        ctx = this.canvas.getContext('2d')
+        for (var _48_18_ = i = 0, _48_22_ = this.history.length; (_48_18_ <= _48_22_ ? i < this.history.length : i > this.history.length); (_48_18_ <= _48_22_ ? ++i : --i))
+        {
+            ms = Math.max(0,this.history[i] - 17)
+            red = parseInt(32 + 223 * clamp(0,1,(ms - 16) / 16))
+            green = parseInt(32 + 223 * clamp(0,1,(ms - 32) / 32))
+            ctx.fillStyle = `rgb(${red}, ${green}, 32)`
+            h = Math.min(ms,60)
+            ctx.fillRect(260 - this.history.length + i,60 - h,2,h)
         }
-        this.last = time;
-        if (this.elem.style.display !== 'none') {
-            return window.requestAnimationFrame(this.draw);
+        this.last = time
+        if (this.elem.style.display !== 'none')
+        {
+            return window.requestAnimationFrame(this.draw)
         }
-    };
+    }
 
-    FPS.prototype.visible = function() {
-        return this.elem.style.display !== 'none';
-    };
+    visible ()
+    {
+        return this.elem.style.display !== 'none'
+    }
 
-    FPS.prototype.restore = function() {
-        if (window.stash.get('fps')) {
-            return this.toggle();
+    restore ()
+    {
+        if (window.stash.get('fps'))
+        {
+            return this.toggle()
         }
-    };
+    }
 
-    FPS.prototype.stash = function() {
-        if (this.visible()) {
-            return window.stash.set('fps', true);
-        } else {
-            return window.stash.set('fps');
+    stash ()
+    {
+        if (this.visible())
+        {
+            return window.stash.set('fps',true)
         }
-    };
-
-    FPS.prototype.toggle = function() {
-        this.elem.style.display = this.visible() && 'none' || 'unset';
-        this.history.push(49);
-        if (this.visible()) {
-            window.requestAnimationFrame(this.draw);
+        else
+        {
+            return window.stash.set('fps')
         }
-        return this.stash();
-    };
+    }
 
-    return FPS;
+    toggle ()
+    {
+        this.elem.style.display = this.visible() && 'none' || 'unset'
+        this.history.push(49)
+        if (this.visible())
+        {
+            window.requestAnimationFrame(this.draw)
+        }
+        return this.stash()
+    }
+}
 
-})();
-
-module.exports = FPS;
-
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZnBzLmpzIiwic291cmNlUm9vdCI6Ii4uLy4uL2NvZmZlZS90b29scyIsInNvdXJjZXMiOlsiZnBzLmNvZmZlZSJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOztBQUFBOzs7Ozs7O0FBQUEsSUFBQSxtQ0FBQTtJQUFBOztBQVFBLE1BQTJCLE9BQUEsQ0FBUSxLQUFSLENBQTNCLEVBQUUsZUFBRixFQUFRLGlCQUFSLEVBQWUsZUFBZixFQUFxQjs7QUFFckIsR0FBQSxHQUFNLE9BQUEsQ0FBUSxZQUFSLENBQXFCLENBQUMsV0FBVyxDQUFDOztBQUVsQztJQUVDLGFBQUE7Ozs7QUFFQyxZQUFBO1FBQUEsSUFBQyxDQUFBLElBQUQsR0FBUSxJQUFBLENBQUs7WUFBQSxDQUFBLEtBQUEsQ0FBQSxFQUFPLEtBQVA7U0FBTDtRQUNSLElBQUMsQ0FBQSxJQUFJLENBQUMsS0FBSyxDQUFDLE9BQVosR0FBc0I7UUFFdEIsSUFBQyxDQUFBLE1BQUQsR0FBVSxJQUFBLENBQUssUUFBTCxFQUFlO1lBQUEsQ0FBQSxLQUFBLENBQUEsRUFBTyxXQUFQO1lBQW9CLEtBQUEsRUFBTyxHQUFBLEdBQUksQ0FBL0I7WUFBa0MsTUFBQSxFQUFRLEVBQUEsR0FBRyxDQUE3QztTQUFmO1FBQ1YsSUFBQyxDQUFBLElBQUksQ0FBQyxXQUFOLENBQWtCLElBQUMsQ0FBQSxNQUFuQjtRQUVBLENBQUEsR0FBSSxRQUFBLENBQVUsQ0FBQyxFQUFELEdBQUksQ0FBZDtRQUNKLENBQUEsR0FBSSxRQUFBLENBQVMsQ0FBQyxHQUFELEdBQUssQ0FBZDtRQUNKLElBQUMsQ0FBQSxNQUFNLENBQUMsS0FBSyxDQUFDLFNBQWQsR0FBMEIsY0FBQSxHQUFlLENBQWYsR0FBaUIsTUFBakIsR0FBdUIsQ0FBdkIsR0FBeUI7UUFFbkQsSUFBQyxDQUFBLE9BQUQsR0FBVztRQUNYLElBQUMsQ0FBQSxJQUFELEdBQVEsR0FBQSxDQUFBO1FBRVIsQ0FBQSxDQUFFLGtCQUFGLENBQXFCLENBQUMsV0FBdEIsQ0FBa0MsSUFB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LE1BQU0sQ0FBQyxPQUFQLEdBQWlCIiwic291cmNlc0NvbnRlbnQiOlsiIyMjXG4wMDAwMDAwMCAgMDAwMDAwMDAgICAgMDAwMDAwMFxuMDAwICAgICAgIDAwMCAgIDAwMCAgMDAwICAgICBcbjAwMDAwMCAgICAwMDAwMDAwMCAgIDAwMDAwMDAgXG4wMDAgICAgICAgMDAwICAgICAgICAgICAgIDAwMFxuMDAwICAgICAgIDAwMCAgICAgICAgMDAwMDAwMCBcbiMjI1xuXG57IHBvc3QsIGNsYW1wLCBlbGVtLCAkIH0gPSByZXF1aXJlICdreGsnXG5cbm5vdyA9IHJlcXVpcmUoJ3BlcmZfaG9va3MnKS5wZXJmb3JtYW5jZS5ub3dcblxuY2xhc3MgRlBTXG5cbiAgICBAOiAoKSAtPlxuICAgICAgICAgICAgICAgICAgICBcbiAgICAgICAgQGVsZW0gPSBlbGVtIGNsYXNzOiAnZnBzJ1xuICAgICAgICBAZWxlbS5zdHlsZS5kaXNwbGF5ID0gJ25vbmUnXG5cbiAgICAgICAgQGNhbnZhcyA9IGVsZW0gJ2NhbnZhcycsIGNsYXNzOiBcImZwc0NhbnZhc1wiLCB3aWR0aDogMTMwKjIsIGhlaWdodDogMzAqMlxuICAgICAgICBAZWxlbS5hcHBlbmRDaGlsZCBAY2FudmFzXG5cbiAgICAgICAgeSA9IHBhcnNlSW50ICAtMzAvMlxuICAgICAgICB4ID0gcGFyc2VJbnQgLTEzMC8yXG4gICAgICAgIEBjYW52YXMuc3R5bGUudHJhbnNmb3JtID0gXCJ0cmFuc2xhdGUzZCgje3h9cHgsICN7eX1weCwgMHB4KSBzY2FsZTNkKDAuNSwgMC41LCAxKVwiXG4gICAgICAgIFxuICAgICAgICBAaGlzdG9yeSA9IFtdXG4gICAgICAgIEBsYXN0ID0gbm93KClcbiAgICAgICAgXG4gICAgICAgICQoJ2NvbW1hbmRsaW5lLXNwYW4nKS5hcHBlbmRDaGlsZCBAZWxlbVxuICAgICAgICBcbiAgICAgICAgcG9zdC5vbiAnc3Rhc2gnLCAgIEBzdGFzaFxuICAgICAgICBwb3N0Lm9uICdyZXN0b3JlJywgQHJlc3RvcmVcbiAgICAgICAgICAgIFxuICAgICMgMDAwMDAwMCAgICAwMDAwMDAwMCAgICAwMDAwMDAwICAgMDAwICAgMDAwXG4gICAgIyAwMDAgICAwMDAgIDAwMCAgIDAwMCAgMDAwICAgMDAwICAwMDAgMCAwMDBcbiAgICAjIDAwMCAgIDAwMCAgMDAwMDAwMCAgICAwMDAwMDAwMDAgIDAwMDAwMDAwMFxuICAgICMgMDAwICAgMDAwICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgMDAwICAgMDAwXG4gICAgIyAwMDAwMDAwICAgIDAwMCAgIDAwMCAgMDAwICAgMDAwICAwMCAgICAgMDBcbiAgICAgICAgICAgICAgICBcbiAgICBkcmF3OiA9PlxuICAgICAgICBcbiAgICAgICAgdGltZSA9IG5vdygpXG4gICAgICAgIEBoaXN0b3J5LnB1c2ggdGltZS1AbGFzdFxuICAgICAgICBAaGlzdG9yeS5zaGlmdCgpIHdoaWxlIEBoaXN0b3J5Lmxlbmd0aCA+IDI2MFxuICAgICAgICBAY2FudmFzLmhlaWdodCA9IEBjYW52YXMuaGVpZ2h0XG4gICAgICAgIGN0eCA9IEBjYW52YXMuZ2V0Q29udGV4dCAnMmQnICAgICAgICBcbiAgICAgICAgZm9yIGkgaW4gWzAuLi5AaGlzdG9yeS5sZW5ndGhdICBcbiAgICAgICAgICAgIG1zICAgID0gTWF0aC5tYXggMCwgQGhpc3RvcnlbaV0tMTdcbiAgICAgICAgICAgIHJlZCAgID0gcGFyc2VJbnQgMzIgKyAyMjMgKiBjbGFtcCAwLDEsIChtcy0xNikvMTZcbiAgICAgICAgICAgIGdyZWVuID0gcGFyc2VJbnQgMzIgKyAyMjMgKiBjbGFtcCAwLDEsIChtcy0zMikvMzJcbiAgICAgICAgICAgIGN0eC5maWxsU3R5bGUgPSBcInJnYigje3JlZH0sICN7Z3JlZW59LCAzMilcIlxuICAgICAgICAgICAgaCA9IE1hdGgubWluIG1zLCA2MFxuICAgICAgICAgICAgY3R4LmZpbGxSZWN0IDI2MC1AaGlzdG9yeS5sZW5ndGgraSwgNjAtaCwgMiwgaFxuICAgICAgICBAbGFzdCA9IHRpbWVcbiAgICAgICAgaWYgQGVsZW0uc3R5bGUuZGlzcGxheSAhPSAnbm9uZSdcbiAgICAgICAgICAgIHdpbmRvdy5yZXF1ZXN0QW5pbWF0aW9uRnJhbWUgQGRyYXdcblxuICAgIHZpc2libGU6IC0+IEBlbGVtLnN0eWxlLmRpc3BsYXkgIT0gJ25vbmUnXG5cbiAgICByZXN0b3JlOiA9PiBAdG9nZ2xlKCkgaWYgd2luZG93LnN0YXNoLmdldCAnZnBzJ1xuICAgIHN0YXNoOiAgID0+IGlmIEB2aXNpYmxlKCkgdGhlbiB3aW5kb3cuc3Rhc2guc2V0KCdmcHMnIHRydWUpIGVsc2Ugd2luZG93LnN0YXNoLnNldCAnZnBzJ1xuXG4gICAgdG9nZ2xlOiAtPiBcbiAgICAgICAgXG4gICAgICAgIEBlbGVtLnN0eWxlLmRpc3BsYXkgPSBAdmlzaWJsZSgpIGFuZCAnbm9uZScgb3IgJ3Vuc2V0JyAgICAgICBcbiAgICAgICAgQGhpc3RvcnkucHVzaCA0OVxuICAgICAgICBpZiBAdmlzaWJsZSgpXG4gICAgICAgICAgICB3aW5kb3cucmVxdWVzdEFuaW1hdGlvbkZyYW1lIEBkcmF3XG4gICAgICAgIEBzdGFzaCgpXG5cbm1vZHVsZS5leHBvcnRzID0gRlBTXG5cbiJdfQ==
-//# sourceURL=../../coffee/tools/fps.coffee
+module.exports = FPS

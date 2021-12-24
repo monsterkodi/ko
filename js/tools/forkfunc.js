@@ -1,86 +1,91 @@
-// koffee 1.19.0
+// monsterkodi/kode 0.212.0
 
-/*
-00000000   0000000   00000000   000   000  00000000  000   000  000   000   0000000    
-000       000   000  000   000  000  000   000       000   000  0000  000  000         
-000000    000   000  0000000    0000000    000000    000   000  000 0 000  000         
-000       000   000  000   000  000  000   000       000   000  000  0000  000         
-000        0000000   000   000  000   000  000        0000000   000   000   0000000
- */
-var callFunc, forkfunc, sendResult,
-    slice = [].slice;
+var _k_
 
-if (module.parent) {
-    forkfunc = function() {
-        var args, callback, childp, cp, dirname, err, file, i, match, onExit, onResult, regx, slash, stack;
-        file = arguments[0], args = 3 <= arguments.length ? slice.call(arguments, 1, i = arguments.length - 1) : (i = 1, []), callback = arguments[i++];
-        if (/^[.]?\.\//.test(file)) {
-            slash = require('kslash');
-            stack = new Error().stack.split(/\r\n|\n/);
-            regx = /\(([^\)]*)\)/;
-            match = regx.exec(stack[3]);
-            dirname = slash.dir(match[1]);
-            file = slash.join(dirname, file);
+var callFunc, forkfunc, sendResult
+
+if (module.parent)
+{
+    forkfunc = function (file, ...args)
+    {
+        var callback, childp, cp, dirname, match, onExit, onResult, regx, slash, stack
+
+        callback = args.pop()
+        if (/^[.]?\.\//.test(file))
+        {
+            slash = require('kslash')
+            stack = new Error().stack.split(/\r\n|\n/)
+            regx = /\(([^\)]*)\)/
+            match = regx.exec(stack[3])
+            dirname = slash.dir(match[1])
+            file = slash.join(dirname,file)
         }
-        try {
-            childp = require('child_process');
-            cp = childp.fork(__filename);
-            onExit = function() {
-                cp.removeListener('message', onResult);
-                cp.removeListener('exit', onExit);
-                if (cp.connected) {
-                    cp.disconnect();
+        try
+        {
+            childp = require('child_process')
+            cp = childp.fork(__filename)
+            onExit = function ()
+            {
+                cp.removeListener('message',onResult)
+                cp.removeListener('exit',onExit)
+                if (cp.connected)
+                {
+                    cp.disconnect()
                 }
-                return cp.kill();
-            };
-            onResult = function(msg) {
-                var result;
-                result = msg;
-                callback(result.err, result.result);
-                return onExit();
-            };
-            cp.on('error', function(err) {
-                return callback(err, null);
-            });
-            cp.on('message', onResult);
-            cp.on('exit', onExit);
-            cp.send({
-                file: file,
-                args: args
-            });
-        } catch (error) {
-            err = error;
-            callback(err, null);
-        }
-        return cp;
-    };
-    module.exports = forkfunc;
-} else {
-    sendResult = function(err, result) {
-        process.removeListener('message', callFunc);
-        return process.send({
-            err: err,
-            result: result
-        }, function() {
-            if (process.connected) {
-                process.disconnect();
+                return cp.kill()
             }
-            return process.exit(0);
-        });
-    };
-    callFunc = function(msg) {
-        var err, func, result;
-        try {
-            func = require(msg.file);
-            result = func.apply(func, msg.args);
-            return sendResult(null, result);
-        } catch (error) {
-            err = error;
-            return sendResult(err.stack);
-        }
-    };
-    process.on('message', callFunc);
-}
+            onResult = function (msg)
+            {
+                var result
 
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZm9ya2Z1bmMuanMiLCJzb3VyY2VSb290IjoiLi4vLi4vY29mZmVlL3Rvb2xzIiwic291cmNlcyI6WyJmb3JrZnVuYy5jb2ZmZWUiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7QUFBQTs7Ozs7OztBQUFBLElBQUEsOEJBQUE7SUFBQTs7QUFRQSxJQUFHLE1BQU0sQ0FBQyxNQUFWO0lBUUksUUFBQSxHQUFXLFNBQUE7QUFFUCxZQUFBO1FBRlEscUJBQU0saUdBQVM7UUFFdkIsSUFBRyxXQUFXLENBQUMsSUFBWixDQUFpQixJQUFqQixDQUFIO1lBQ0ksS0FBQSxHQUFVLE9BQUEsQ0FBUSxRQUFSO1lBQ1YsS0FBQSxHQUFVLElBQUksS0FBSixDQUFBLENBQVcsQ0FBQyxLQUFLLENBQUMsS0FBbEIsQ0FBd0IsU0FBeEI7WUFDVixJQUFBLEdBQVU7WUFDVixLQUFBLEdBQVUsSUFBSSxDQUFDLElBQUwsQ0FBVSxLQUFNLENBQUEsQ0FBQSxDQUFoQjtZQUNWLE9BQUEsR0FBVSxLQUFLLENBQUMsR0FBTixDQUFVLEtBQU0sQ0FBQSxDQUFBLENBQWhCO1lBQ1YsSUFBQSxHQUFVLEtBQUssQ0FBQyxJQUFOLENBQVcsT0FBWCxFQUFvQixJQUFwQixFQU5kOztBQVFBO1lBQ0ksTUFBQSxHQUFTLE9BQUEsQ0FBUSxlQUFSO1lBQ1QsRUFBQSxHQUFLLE1BQU0sQ0FBQyxJQUFQLENBQVksVUFBWjtZQUVMLE1BQUEsR0FBUyxTQUFBO2dCQUNMLEVBQUUsQ0FBQyxjQUFILENBQWtCLFNBQWxCLEVBQTRCLFFBQTVCO2dCQUNBLEVBQUUsQ0FBQyxjQUFILENBQWtCLE1BQWxCLEVBQTRCLE1BQTVCO2dCQUNBLElBQW1CLEVBQUUsQ0FBQyxTQUF0QjtvQkFBQSxFQUFFLENBQUMsVUFBSCxDQUFBLEVBQUE7O3VCQUNBLEVBQUUsQ0FBQyxJQUFILENBQUE7WUFKSztZQU1ULFFBQUEsR0FBVyxTQUFDLEdBQUQ7QUFDUCxvQkFBQTtnQkFBQSxNQUFBLEdBQVM7Z0JBQ1QsUUFBQSxDQUFTLE1BQU0sQ0FBQyxHQUFoQixFQUFxQixNQUFNLENBQUMsTUFBNUI7dUJBQ0EsTUFBQSxDQUFBO1lBSE87WUFLWCxFQUFFLENBQUMsRUFBSCxDQUFNLE9BQU4sRUFBZ0IsU0FBQyxHQUFEO3VCQUFTLFFBQUEsQ0FBUyxHQUFULEVBQWMsSUFBZDtZQUFULENBQWhCO1lBQ0EsRUFBRSxDQUFDLEVBQUgsQ0FBTSxTQUFOLEVBQWdCLFFBQWhCO1lBQ0EsRUFBRSxDQUFDLEVBQUgsQ0FBTSxNQUFOLEVBQWdCLE1BQWhCO1lBRUEsRUFBRSxDQUFDLElBQUgsQ0FDSTtnQkFBQSxJQUFBLEVBQU8sSUFBUDtnQkFDQSxJQUFBLEVBQU8sSUFEUDthQURKLEVBbkJKO1NBQUEsYUFBQTtZQXVCTTtZQUVGLFFBQUEsQ0FBUyxHQUFULEVBQWMsSUFBZCxFQXpCSjs7ZUEyQkE7SUFyQ087SUF1Q1gsTUFBTSxDQUFDLE9BQVAsR0FBaUIsU0EvQ3JCO0NBQUEsTUFBQTtJQXlESSxVQUFBLEdBQWEsU0FBQyxHQUFELEVBQU0sTUFBTjtRQUVULE9BQU8sQ0FBQyxjQUFSLENBQXVCLFNBQXZCLEVBQWlDLFFBQWpDO2VBQ0EsT0FBTyxDQUFDLElBQVIsQ0FBYTtZQUFDLEdBQUEsRUFBSSxHQUFMO1lBQVUsTUFBQSxFQUFPLE1BQWpCO1NBQWIsRUFBdUMsU0FBQTtZQUNuQyxJQUF3QixPQUFPLENBQUMsU0FBaEM7Z0JBQUEsT0FBTyxDQUFDLFVBQVIsQ0FBQSxFQUFBOzttQkFDQSxPQUFPLENBQUMsSUFBUixDQUFhLENBQWI7UUFGbUMsQ0FBdkM7SUFIUztJQU9iLFFBQUEsR0FBVyxTQUFDLEdBQUQ7QUFFUCxZQUFBO0FBQUE7WUFFSSxJQUFBLEdBQU8sT0FBQSxDQUFRLEdBQUcsQ0FBQyxJQUFaO1lBQ1AsTUFBQSxHQUFTLElBQUksQ0FBQyxLQUFMLENBQVcsSUFBWCxFQUFpQixHQUFHLENBQUMsSUFBckI7bUJBQ1QsVUFBQSxDQUFXLElBQVgsRUFBaUIsTUFBakIsRUFKSjtTQUFBLGFBQUE7WUFNTTttQkFFRixVQUFBLENBQVcsR0FBRyxDQUFDLEtBQWYsRUFSSjs7SUFGTztJQVlYLE9BQU8sQ0FBQyxFQUFSLENBQVcsU0FBWCxFQUFxQixRQUFyQixFQTVFSiIsInNvdXJjZXNDb250ZW50IjpbIiMjI1xuMDAwMDAwMDAgICAwMDAwMDAwICAgMDAwMDAwMDAgICAwMDAgICAwMDAgIDAwMDAwMDAwICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgIDAwMDAwMDAgICAgXG4wMDAgICAgICAgMDAwICAgMDAwICAwMDAgICAwMDAgIDAwMCAgMDAwICAgMDAwICAgICAgIDAwMCAgIDAwMCAgMDAwMCAgMDAwICAwMDAgICAgICAgICBcbjAwMDAwMCAgICAwMDAgICAwMDAgIDAwMDAwMDAgICAgMDAwMDAwMCAgICAwMDAwMDAgICAgMDAwICAgMDAwICAwMDAgMCAwMDAgIDAwMCAgICAgICAgIFxuMDAwICAgICAgIDAwMCAgIDAwMCAgMDAwICAgMDAwICAwMDAgIDAwMCAgIDAwMCAgICAgICAwMDAgICAwMDAgIDAwMCAgMDAwMCAgMDAwICAgICAgICAgXG4wMDAgICAgICAgIDAwMDAwMDAgICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgMDAwICAgICAgICAwMDAwMDAwICAgMDAwICAgMDAwICAgMDAwMDAwMCAgICBcbiMjI1xuXG5pZiBtb2R1bGUucGFyZW50XG5cbiAgICAjIDAwICAgICAwMCAgIDAwMDAwMDAgICAwMDAgIDAwMCAgIDAwMFxuICAgICMgMDAwICAgMDAwICAwMDAgICAwMDAgIDAwMCAgMDAwMCAgMDAwXG4gICAgIyAwMDAwMDAwMDAgIDAwMDAwMDAwMCAgMDAwICAwMDAgMCAwMDBcbiAgICAjIDAwMCAwIDAwMCAgMDAwICAgMDAwICAwMDAgIDAwMCAgMDAwMFxuICAgICMgMDAwICAgMDAwICAwMDAgICAwMDAgIDAwMCAgMDAwICAgMDAwXG5cbiAgICBmb3JrZnVuYyA9IChmaWxlLCBhcmdzLi4uLCBjYWxsYmFjaykgLT5cbiAgICAgICAgXG4gICAgICAgIGlmIC9eWy5dP1xcLlxcLy8udGVzdCBmaWxlXG4gICAgICAgICAgICBzbGFzaCAgID0gcmVxdWlyZSAna3NsYXNoJ1xuICAgICAgICAgICAgc3RhY2sgICA9IG5ldyBFcnJvcigpLnN0YWNrLnNwbGl0IC9cXHJcXG58XFxuL1xuICAgICAgICAgICAgcmVneCAgICA9IC9cXCgoW15cXCldKilcXCkvXG4gICAgICAgICAgICBtYXRjaCAgID0gcmVneC5leGVjIHN0YWNrWzNdXG4gICAgICAgICAgICBkaXJuYW1lID0gc2xhc2guZGlyIG1hdGNoWzFdXG4gICAgICAgICAgICBmaWxlICAgID0gc2xhc2guam9pbiBkaXJuYW1lLCBmaWxlXG4gICAgICAgICAgICBcbiAgICAgICAgdHJ5XG4gICAgICAgICAgICBjaGlsZHAgPSByZXF1aXJlICdjaGlsZF9wcm9jZXNzJ1xuICAgICAgICAgICAgY3AgPSBjaGlsZHAuZm9yayBfX2ZpbGVuYW1lXG4gICAgICAgICAgICBcbiAgICAgICAgICAgIG9uRXhpdCA9IC0+XG4gICAgICAgICAgICAgICAgY3AucmVtb3ZlTGlzdGVuZXIgJ21lc3NhZ2UnIG9uUmVzdWx0XG4gICAgICAgICAgICAgICAgY3AucmVtb3ZlTGlzdGVuZXIgJ2V4aXQnICAgIG9uRXhpdFxuICAgICAgICAgICAgICAgIGNwLmRpc2Nvbm5lY3QoKSBpZiBjcC5jb25uZWN0ZWRcbiAgICAgICAgICAgICAgICBjcC5raWxsKClcbiAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgIG9uUmVzdWx0ID0gKG1zZykgLT4gXG4gICAgICAgICAgICAgICAgcmVzdWx0ID0gbXNnXG4gICAgICAgICAgICAgICAgY2FsbGJhY2sgcmVzdWx0LmVyciwgcmVzdWx0LnJlc3VsdFxuICAgICAgICAgICAgICAgIG9uRXhpdCgpXG4gICAgICAgICAgICAgICAgXG4gICAgICAgICAgICBjcC5vbiAnZXJyb3InICAgKGVycikgLT4gY2FsbGJhY2sgZXJyLCBudWxsXG4gICAgICAgICAgICBjcC5vbiAnbWVzc2FnZScgb25SZXN1bHRcbiAgICAgICAgICAgIGNwLm9uICdleGl0JyAgICBvbkV4aXRcblxuICAgICAgICAgICAgY3Auc2VuZFxuICAgICAgICAgICAgICAgIGZpbGU6ICBmaWxlXG4gICAgICAgICAgICAgICAgYXJnczogIGFyZ3NcblxuICAgICAgICBjYXRjaCBlcnJcbiAgICAgICAgICAgIFxuICAgICAgICAgICAgY2FsbGJhY2sgZXJyLCBudWxsXG4gICAgICAgICAgICBcbiAgICAgICAgY3BcblxuICAgIG1vZHVsZS5leHBvcnRzID0gZm9ya2Z1bmNcblxuZWxzZVxuXG4gICAgIyAgMDAwMDAwMCAgMDAwICAgMDAwICAwMDAgIDAwMCAgICAgIDAwMDAwMDAgIFxuICAgICMgMDAwICAgICAgIDAwMCAgIDAwMCAgMDAwICAwMDAgICAgICAwMDAgICAwMDBcbiAgICAjIDAwMCAgICAgICAwMDAwMDAwMDAgIDAwMCAgMDAwICAgICAgMDAwICAgMDAwXG4gICAgIyAwMDAgICAgICAgMDAwICAgMDAwICAwMDAgIDAwMCAgICAgIDAwMCAgIDAwMFxuICAgICMgIDAwMDAwMDAgIDAwMCAgIDAwMCAgMDAwICAwMDAwMDAwICAwMDAwMDAwXG5cbiAgICBzZW5kUmVzdWx0ID0gKGVyciwgcmVzdWx0KSAtPlxuICAgICAgICBcbiAgICAgICAgcHJvY2Vzcy5yZW1vdmVMaXN0ZW5lciAnbWVzc2FnZScgY2FsbEZ1bmNcbiAgICAgICAgcHJvY2Vzcy5zZW5kIHtlcnI6ZXJyLCByZXN1bHQ6cmVzdWx0fSwgLT5cbiAgICAgICAgICAgIHByb2Nlc3MuZGlzY29ubmVjdCgpIGlmIHByb2Nlc3MuY29ubmVjdGVkXG4gICAgICAgICAgICBwcm9jZXNzLmV4aXQgMFxuICAgICAgICBcbiAgICBjYWxsRnVuYyA9IChtc2cpIC0+XG4gICAgICAgIFxuICAgICAgICB0cnlcbiAgICAgICAgICAgIFxuICAgICAgICAgICAgZnVuYyA9IHJlcXVpcmUgbXNnLmZpbGVcbiAgICAgICAgICAgIHJlc3VsdCA9IGZ1bmMuYXBwbHkgZnVuYywgbXNnLmFyZ3NcbiAgICAgICAgICAgIHNlbmRSZXN1bHQgbnVsbCwgcmVzdWx0XG4gICAgICAgICAgICBcbiAgICAgICAgY2F0Y2ggZXJyXG4gICAgICAgICAgICBcbiAgICAgICAgICAgIHNlbmRSZXN1bHQgZXJyLnN0YWNrXG5cbiAgICBwcm9jZXNzLm9uICdtZXNzYWdlJyBjYWxsRnVuY1xuIl19
-//# sourceURL=../../coffee/tools/forkfunc.coffee
+                result = msg
+                callback(result.err,result.result)
+                return onExit()
+            }
+            cp.on('error',function (err)
+            {
+                return callback(err,null)
+            })
+            cp.on('message',onResult)
+            cp.on('exit',onExit)
+            cp.send({file:file,args:args})
+        }
+        catch (err)
+        {
+            callback(err,null)
+        }
+        return cp
+    }
+    module.exports = forkfunc
+}
+else
+{
+    sendResult = function (err, result)
+    {
+        process.removeListener('message',callFunc)
+        return process.send({err:err,result:result},function ()
+        {
+            if (process.connected)
+            {
+                process.disconnect()
+            }
+            return process.exit(0)
+        })
+    }
+    callFunc = function (msg)
+    {
+        var func, result
+
+        try
+        {
+            func = require(msg.file)
+            result = func.apply(func,msg.args)
+            return sendResult(null,result)
+        }
+        catch (err)
+        {
+            return sendResult(err.stack)
+        }
+    }
+    process.on('message',callFunc)
+}

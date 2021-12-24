@@ -1,516 +1,609 @@
-// koffee 1.19.0
+// monsterkodi/kode 0.212.0
 
-/*
-00000000  000      00000000  000   000  
-000       000      000        000 000   
-000000    000      0000000     00000    
-000       000      000        000 000   
-000       0000000  00000000  000   000
- */
-var Flex, Handle, Pane, _, drag, last, ref, valid;
+var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined, list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}}
 
-ref = require('kxk'), _ = ref._, drag = ref.drag, last = ref.last, valid = ref.valid;
+var drag, Handle, kxk, last, Pane, _
 
-Pane = require('./pane');
+kxk = require('kxk')
+_ = kxk._
+drag = kxk.drag
+last = kxk.last
 
-Handle = require('./handle');
+Pane = require('./pane')
+Handle = require('./handle')
+class Flex
+{
+    constructor (opt)
+    {
+        var horz, p, _19_38_, _20_37_, _36_34_, _41_25_
 
-Flex = (function() {
-    function Flex(opt) {
-        var horz, j, len, p, ref1, ref2, ref3, ref4, ref5;
-        this.handleSize = (ref1 = opt.handleSize) != null ? ref1 : 6;
-        this.direction = (ref2 = opt.direction) != null ? ref2 : 'horizontal';
-        this.snapFirst = opt.snapFirst;
-        this.snapLast = opt.snapLast;
-        this.onPaneSize = opt.onPaneSize;
-        this.onDragStart = opt.onDragStart;
-        this.onDrag = opt.onDrag;
-        this.onDragEnd = opt.onDragEnd;
-        horz = this.direction === 'horizontal';
-        this.dimension = horz && 'width' || 'height';
-        this.clientDim = horz && 'clientWidth' || 'clientHeight';
-        this.axis = horz && 'x' || 'y';
-        this.position = horz && 'left' || 'top';
-        this.handleClass = horz && 'split-handle split-handle-horizontal' || 'split-handle split-handle-vertical';
-        this.paddingA = horz && 'paddingLeft' || 'paddingTop';
-        this.paddingB = horz && 'paddingRight' || 'paddingBottom';
-        this.cursor = (ref3 = opt.cursor) != null ? ref3 : horz && 'ew-resize' || 'ns-resize';
-        this.panes = [];
-        this.handles = [];
-        this.view = (ref4 = opt.view) != null ? ref4 : opt.panes[0].div.parentNode;
-        this.view.style.display = 'flex';
-        this.view.style.flexDirection = horz && 'row' || 'column';
-        if (valid(opt.panes)) {
-            ref5 = opt.panes;
-            for (j = 0, len = ref5.length; j < len; j++) {
-                p = ref5[j];
-                this.addPane(p);
+        this.handleSize = ((_19_38_=opt.handleSize) != null ? _19_38_ : 6)
+        this.direction = ((_20_37_=opt.direction) != null ? _20_37_ : 'horizontal')
+        this.snapFirst = opt.snapFirst
+        this.snapLast = opt.snapLast
+        this.onPaneSize = opt.onPaneSize
+        this.onDragStart = opt.onDragStart
+        this.onDrag = opt.onDrag
+        this.onDragEnd = opt.onDragEnd
+        horz = this.direction === 'horizontal'
+        this.dimension = horz && 'width' || 'height'
+        this.clientDim = horz && 'clientWidth' || 'clientHeight'
+        this.axis = horz && 'x' || 'y'
+        this.position = horz && 'left' || 'top'
+        this.handleClass = horz && 'split-handle split-handle-horizontal' || 'split-handle split-handle-vertical'
+        this.paddingA = horz && 'paddingLeft' || 'paddingTop'
+        this.paddingB = horz && 'paddingRight' || 'paddingBottom'
+        this.cursor = ((_36_34_=opt.cursor) != null ? _36_34_ : horz && 'ew-resize' || 'ns-resize')
+        this.panes = []
+        this.handles = []
+        this.view = ((_41_25_=opt.view) != null ? _41_25_ : opt.panes[0].div.parentNode)
+        this.view.style.display = 'flex'
+        this.view.style.flexDirection = horz && 'row' || 'column'
+        if (!_k_.empty(opt.panes))
+        {
+            var list = _k_.list(opt.panes)
+            for (var _46_29_ = 0; _46_29_ < list.length; _46_29_++)
+            {
+                p = list[_46_29_]
+                this.addPane(p)
             }
         }
     }
 
-    Flex.prototype.addPane = function(p) {
-        var lastPane, newPane;
-        newPane = new Pane(_.defaults(p, {
-            flex: this,
-            index: this.panes.length
-        }));
-        if (lastPane = _.last(this.panes)) {
-            this.handles.push(new Handle({
-                flex: this,
-                index: lastPane.index,
-                panea: lastPane,
-                paneb: newPane
-            }));
-        }
-        this.panes.push(newPane);
-        return this.relax();
-    };
+    addPane (p)
+    {
+        var lastPane, newPane
 
-    Flex.prototype.popPane = function(opt) {
-        if (opt == null) {
-            opt = {};
+        newPane = new Pane(_.defaults(p,{flex:this,index:this.panes.length}))
+        if (lastPane = _.last(this.panes))
+        {
+            this.handles.push(new Handle({flex:this,index:lastPane.index,panea:lastPane,paneb:newPane}))
         }
-        if ((opt != null ? opt.relax : void 0) === false) {
-            this.unrelax();
-        }
-        if (this.panes.length > 1) {
-            this.panes.pop().del();
-            this.handles.pop().del();
-        }
-        if ((opt != null ? opt.relax : void 0) !== false) {
-            return this.relax();
-        } else {
-            return last(this.panes).setSize(last(this.panes).actualSize());
-        }
-    };
+        this.panes.push(newPane)
+        return this.relax()
+    }
 
-    Flex.prototype.shiftPane = function() {
-        var i, j, k, ref1, ref2;
-        if (this.panes.length > 1) {
-            this.panes.shift().del();
-            this.handles.shift().del();
+    popPane (opt = {})
+    {
+        if ((opt != null ? opt.relax : undefined) === false)
+        {
+            this.unrelax()
         }
-        for (i = j = 0, ref1 = this.panes.length; 0 <= ref1 ? j < ref1 : j > ref1; i = 0 <= ref1 ? ++j : --j) {
-            this.panes[i].index = i;
+        if (this.panes.length > 1)
+        {
+            this.panes.pop().del()
+            this.handles.pop().del()
         }
-        for (i = k = 0, ref2 = this.handles.length; 0 <= ref2 ? k < ref2 : k > ref2; i = 0 <= ref2 ? ++k : --k) {
-            this.handles[i].index = i;
+        if ((opt != null ? opt.relax : undefined) !== false)
+        {
+            return this.relax()
         }
-        return this.relax();
-    };
+        else
+        {
+            return last(this.panes).setSize(last(this.panes).actualSize())
+        }
+    }
 
-    Flex.prototype.relax = function() {
-        var j, len, p, ref1, results;
-        this.relaxed = true;
-        ref1 = this.visiblePanes();
-        results = [];
-        for (j = 0, len = ref1.length; j < len; j++) {
-            p = ref1[j];
-            p.div.style.flex = "1 1 0";
-            results.push(p.size = 0);
-        }
-        return results;
-    };
+    shiftPane ()
+    {
+        var i
 
-    Flex.prototype.unrelax = function() {
-        var j, len, p, ref1, results;
-        this.relaxed = false;
-        ref1 = this.visiblePanes();
-        results = [];
-        for (j = 0, len = ref1.length; j < len; j++) {
-            p = ref1[j];
-            results.push(p.size = p.actualSize());
+        if (this.panes.length > 1)
+        {
+            this.panes.shift().del()
+            this.handles.shift().del()
         }
-        return results;
-    };
+        for (var _96_18_ = i = 0, _96_22_ = this.panes.length; (_96_18_ <= _96_22_ ? i < this.panes.length : i > this.panes.length); (_96_18_ <= _96_22_ ? ++i : --i))
+        {
+            this.panes[i].index = i
+        }
+        for (var _99_18_ = i = 0, _99_22_ = this.handles.length; (_99_18_ <= _99_22_ ? i < this.handles.length : i > this.handles.length); (_99_18_ <= _99_22_ ? ++i : --i))
+        {
+            this.handles[i].index = i
+        }
+        return this.relax()
+    }
 
-    Flex.prototype.calculate = function() {
-        var avail, diff, flexPanes, h, j, k, l, len, len1, len2, len3, m, p, ref1, visPanes;
-        visPanes = this.panes.filter(function(p) {
-            return !p.collapsed;
-        });
-        flexPanes = visPanes.filter(function(p) {
-            return !p.fixed;
-        });
-        avail = this.size();
-        ref1 = this.handles;
-        for (j = 0, len = ref1.length; j < len; j++) {
-            h = ref1[j];
-            h.update();
-            if (h.isVisible()) {
-                avail -= h.size();
+    relax ()
+    {
+        var p
+
+        this.relaxed = true
+        var list = _k_.list(this.visiblePanes())
+        for (var _113_14_ = 0; _113_14_ < list.length; _113_14_++)
+        {
+            p = list[_113_14_]
+            if (p.div)
+            {
+                p.div.style.flex = "1 1 0"
+            }
+            p.size = 0
+        }
+    }
+
+    unrelax ()
+    {
+        var p
+
+        this.relaxed = false
+        var list = _k_.list(this.visiblePanes())
+        for (var _120_14_ = 0; _120_14_ < list.length; _120_14_++)
+        {
+            p = list[_120_14_]
+            p.size = p.actualSize()
+        }
+    }
+
+    calculate ()
+    {
+        var avail, diff, flexPanes, h, p, visPanes, _150_19_
+
+        visPanes = this.panes.filter(function (p)
+        {
+            return !p.collapsed
+        })
+        flexPanes = visPanes.filter(function (p)
+        {
+            return !p.fixed
+        })
+        avail = this.size()
+        var list = _k_.list(this.handles)
+        for (var _135_14_ = 0; _135_14_ < list.length; _135_14_++)
+        {
+            h = list[_135_14_]
+            h.update()
+            if (h.isVisible())
+            {
+                avail -= h.size()
             }
         }
-        for (k = 0, len1 = visPanes.length; k < len1; k++) {
-            p = visPanes[k];
-            avail -= p.size;
+        var list1 = _k_.list(visPanes)
+        for (var _139_14_ = 0; _139_14_ < list1.length; _139_14_++)
+        {
+            p = list1[_139_14_]
+            avail -= p.size
         }
-        diff = avail / flexPanes.length;
-        for (l = 0, len2 = flexPanes.length; l < len2; l++) {
-            p = flexPanes[l];
-            p.size += diff;
+        diff = avail / flexPanes.length
+        var list2 = _k_.list(flexPanes)
+        for (var _144_14_ = 0; _144_14_ < list2.length; _144_14_++)
+        {
+            p = list2[_144_14_]
+            p.size += diff
         }
-        for (m = 0, len3 = visPanes.length; m < len3; m++) {
-            p = visPanes[m];
-            p.setSize(p.size);
+        var list3 = _k_.list(visPanes)
+        for (var _147_14_ = 0; _147_14_ < list3.length; _147_14_++)
+        {
+            p = list3[_147_14_]
+            p.setSize(p.size)
         }
-        return typeof this.onPaneSize === "function" ? this.onPaneSize() : void 0;
-    };
+        return (typeof this.onPaneSize === "function" ? this.onPaneSize() : undefined)
+    }
 
-    Flex.prototype.moveHandle = function(opt) {
-        var handle;
-        handle = this.handles[opt.index];
-        return this.moveHandleToPos(handle, opt.pos);
-    };
+    moveHandle (opt)
+    {
+        var handle
 
-    Flex.prototype.moveHandleToPos = function(handle, pos) {
-        var deduct, leftOver, next, nextHandle, nextSize, nextVisFlex, offset, prev, prevHandle, prevSize, prevVisFlex, ref1, ref2, ref3, ref4;
-        pos = parseInt(pos);
-        if (this.relaxed) {
-            this.unrelax();
-        }
-        offset = pos - handle.actualPos();
-        if (Math.abs(offset) < 1) {
-            return;
-        }
-        prev = (ref1 = (ref2 = this.prevAllInv(handle)) != null ? ref2 : this.prevVisFlex(handle)) != null ? ref1 : this.prevFlex(handle);
-        next = (ref3 = (ref4 = this.nextAllInv(handle)) != null ? ref4 : this.nextVisFlex(handle)) != null ? ref3 : this.nextFlex(handle);
-        delete prev.collapsed;
-        delete next.collapsed;
-        prevSize = prev.size + offset;
-        nextSize = next.size - offset;
-        if ((this.snapFirst != null) && prevSize < this.snapFirst && !this.prevVisPane(prev)) {
-            if (prevSize <= 0 || offset < this.snapFirst) {
-                prevSize = -1;
-                nextSize = next.size + prev.size + this.handleSize;
-            }
-        } else if (prevSize < 0) {
-            leftOver = -prevSize;
-            prevHandle = handle.prev();
-            while (leftOver > 0 && prevHandle && (prevVisFlex = this.prevVisFlex(prevHandle))) {
-                deduct = Math.min(leftOver, prevVisFlex.size);
-                leftOver -= deduct;
-                prevVisFlex.setSize(prevVisFlex.size - deduct);
-                prevHandle = prevHandle.prev();
-            }
-            prevSize = 0;
-            nextSize -= leftOver;
-        }
-        if ((this.snapLast != null) && nextSize < this.snapLast && !this.nextVisPane(next)) {
-            if (nextSize <= 0 || -offset < this.snapLast) {
-                nextSize = -1;
-                prevSize = prev.size + next.size + this.handleSize;
-            }
-        } else if (nextSize < 0) {
-            leftOver = -nextSize;
-            nextHandle = handle.next();
-            while (leftOver > 0 && nextHandle && (nextVisFlex = this.nextVisFlex(nextHandle))) {
-                deduct = Math.min(leftOver, nextVisFlex.size);
-                leftOver -= deduct;
-                nextVisFlex.setSize(nextVisFlex.size - deduct);
-                nextHandle = nextHandle.next();
-            }
-            nextSize = 0;
-            prevSize -= leftOver;
-        }
-        prev.setSize(prevSize);
-        next.setSize(nextSize);
-        this.update();
-        return typeof this.onPaneSize === "function" ? this.onPaneSize() : void 0;
-    };
+        handle = this.handles[opt.index]
+        return this.moveHandleToPos(handle,opt.pos)
+    }
 
-    Flex.prototype.restoreState = function(state) {
-        var j, pane, ref1, s, si;
-        if (!(state != null ? state.length : void 0)) {
-            return;
+    moveHandleToPos (handle, pos)
+    {
+        var deduct, leftOver, next, nextHandle, nextSize, nextVisFlex, offset, prev, prevHandle, prevSize, prevVisFlex, _172_36_, _172_59_, _173_36_, _173_59_, _181_21_, _200_20_, _222_19_
+
+        pos = parseInt(pos)
+        if (this.relaxed)
+        {
+            this.unrelax()
         }
-        for (si = j = 0, ref1 = state.length; 0 <= ref1 ? j < ref1 : j > ref1; si = 0 <= ref1 ? ++j : --j) {
-            s = state[si];
-            pane = this.pane(si);
-            delete pane.collapsed;
-            if (s.size < 0) {
-                pane.collapse();
-            }
-            if (s.size >= 0) {
-                pane.setSize(s.size);
+        offset = pos - handle.actualPos()
+        if (Math.abs(offset) < 1)
+        {
+            return
+        }
+        prev = ((_172_36_=this.prevAllInv(handle)) != null ? _172_36_ : ((_172_59_=this.prevVisFlex(handle)) != null ? _172_59_ : this.prevFlex(handle)))
+        next = ((_173_36_=this.nextAllInv(handle)) != null ? _173_36_ : ((_173_59_=this.nextVisFlex(handle)) != null ? _173_59_ : this.nextFlex(handle)))
+        delete prev.collapsed
+        delete next.collapsed
+        prevSize = prev.size + offset
+        nextSize = next.size - offset
+        if ((this.snapFirst != null) && prevSize < this.snapFirst && !this.prevVisPane(prev))
+        {
+            if (prevSize <= 0 || offset < this.snapFirst)
+            {
+                prevSize = -1
+                nextSize = next.size + prev.size + this.handleSize
             }
         }
-        this.updateHandles();
-        return typeof this.onPaneSize === "function" ? this.onPaneSize() : void 0;
-    };
-
-    Flex.prototype.getState = function() {
-        var j, len, p, ref1, state;
-        state = [];
-        ref1 = this.panes;
-        for (j = 0, len = ref1.length; j < len; j++) {
-            p = ref1[j];
-            state.push({
-                id: p.id,
-                size: p.size,
-                pos: p.pos()
-            });
+        else if (prevSize < 0)
+        {
+            leftOver = -prevSize
+            prevHandle = handle.prev()
+            while (leftOver > 0 && prevHandle && (prevVisFlex = this.prevVisFlex(prevHandle)))
+            {
+                deduct = Math.min(leftOver,prevVisFlex.size)
+                leftOver -= deduct
+                prevVisFlex.setSize(prevVisFlex.size - deduct)
+                prevHandle = prevHandle.prev()
+            }
+            prevSize = 0
+            nextSize -= leftOver
         }
-        return state;
-    };
-
-    Flex.prototype.resized = function() {
-        return this.update().calculate();
-    };
-
-    Flex.prototype.update = function() {
-        return this.updatePanes().updateHandles();
-    };
-
-    Flex.prototype.updatePanes = function() {
-        var j, len, p, ref1;
-        ref1 = this.panes;
-        for (j = 0, len = ref1.length; j < len; j++) {
-            p = ref1[j];
-            p.update();
-        }
-        return this;
-    };
-
-    Flex.prototype.updateHandles = function() {
-        var h, j, len, ref1;
-        ref1 = this.handles;
-        for (j = 0, len = ref1.length; j < len; j++) {
-            h = ref1[j];
-            h.update();
-        }
-        return this;
-    };
-
-    Flex.prototype.handleStart = function(handle) {
-        return typeof this.onDragStart === "function" ? this.onDragStart() : void 0;
-    };
-
-    Flex.prototype.handleDrag = function(handle, drag) {
-        this.moveHandleToPos(handle, drag.pos[this.axis] - this.pos() - 4);
-        return typeof this.onDrag === "function" ? this.onDrag() : void 0;
-    };
-
-    Flex.prototype.handleEnd = function() {
-        this.update();
-        return typeof this.onDragEnd === "function" ? this.onDragEnd() : void 0;
-    };
-
-    Flex.prototype.numPanes = function() {
-        return this.panes.length;
-    };
-
-    Flex.prototype.visiblePanes = function() {
-        return this.panes.filter(function(p) {
-            return p.isVisible();
-        });
-    };
-
-    Flex.prototype.panePositions = function() {
-        var j, len, p, ref1, results;
-        ref1 = this.panes;
-        results = [];
-        for (j = 0, len = ref1.length; j < len; j++) {
-            p = ref1[j];
-            results.push(p.pos());
-        }
-        return results;
-    };
-
-    Flex.prototype.paneSizes = function() {
-        var j, len, p, ref1, results;
-        ref1 = this.panes;
-        results = [];
-        for (j = 0, len = ref1.length; j < len; j++) {
-            p = ref1[j];
-            results.push(p.size);
-        }
-        return results;
-    };
-
-    Flex.prototype.sizeOfPane = function(i) {
-        return this.pane(i).size;
-    };
-
-    Flex.prototype.posOfPane = function(i) {
-        return this.pane(i).pos();
-    };
-
-    Flex.prototype.posOfHandle = function(i) {
-        return this.handle(i).pos();
-    };
-
-    Flex.prototype.pane = function(i) {
-        return _.isNumber(i) && this.panes[i] || _.isString(i) && _.find(this.panes, function(p) {
-            return p.id === i;
-        }) || i;
-    };
-
-    Flex.prototype.handle = function(i) {
-        return _.isNumber(i) && this.handles[i] || i;
-    };
-
-    Flex.prototype.height = function() {
-        return this.view.getBoundingClientRect().height;
-    };
-
-    Flex.prototype.size = function() {
-        return this.view.getBoundingClientRect()[this.dimension];
-    };
-
-    Flex.prototype.pos = function() {
-        return this.view.getBoundingClientRect()[this.position];
-    };
-
-    Flex.prototype.isCollapsed = function(i) {
-        return this.pane(i).collapsed;
-    };
-
-    Flex.prototype.collapse = function(i) {
-        var pane;
-        if (pane = this.pane(i)) {
-            if (!pane.collapsed) {
-                pane.collapse();
-                return this.calculate();
+        if ((this.snapLast != null) && nextSize < this.snapLast && !this.nextVisPane(next))
+        {
+            if (nextSize <= 0 || -offset < this.snapLast)
+            {
+                nextSize = -1
+                prevSize = prev.size + next.size + this.handleSize
             }
         }
-    };
-
-    Flex.prototype.expand = function(i, factor) {
-        var flex, pane, ref1, use;
-        if (factor == null) {
-            factor = 0.5;
+        else if (nextSize < 0)
+        {
+            leftOver = -nextSize
+            nextHandle = handle.next()
+            while (leftOver > 0 && nextHandle && (nextVisFlex = this.nextVisFlex(nextHandle)))
+            {
+                deduct = Math.min(leftOver,nextVisFlex.size)
+                leftOver -= deduct
+                nextVisFlex.setSize(nextVisFlex.size - deduct)
+                nextHandle = nextHandle.next()
+            }
+            nextSize = 0
+            prevSize -= leftOver
         }
-        if (pane = this.pane(i)) {
-            if (pane.collapsed) {
-                pane.expand();
-                if (flex = this.closestVisFlex(pane)) {
-                    use = (ref1 = pane.fixed) != null ? ref1 : flex.size * factor;
-                    flex.size -= use;
-                    pane.size = use;
+        prev.setSize(prevSize)
+        next.setSize(nextSize)
+        this.update()
+        return (typeof this.onPaneSize === "function" ? this.onPaneSize() : undefined)
+    }
+
+    restoreState (state)
+    {
+        var pane, s, si, _240_19_
+
+        if (!(state != null ? state.length : undefined))
+        {
+            return
+        }
+        for (var _232_19_ = si = 0, _232_23_ = state.length; (_232_19_ <= _232_23_ ? si < state.length : si > state.length); (_232_19_ <= _232_23_ ? ++si : --si))
+        {
+            s = state[si]
+            pane = this.pane(si)
+            delete pane.collapsed
+            if (s.size < 0)
+            {
+                pane.collapse()
+            }
+            if (s.size >= 0)
+            {
+                pane.setSize(s.size)
+            }
+        }
+        this.updateHandles()
+        return (typeof this.onPaneSize === "function" ? this.onPaneSize() : undefined)
+    }
+
+    getState ()
+    {
+        var p, state
+
+        state = []
+        var list = _k_.list(this.panes)
+        for (var _244_14_ = 0; _244_14_ < list.length; _244_14_++)
+        {
+            p = list[_244_14_]
+            state.push({id:p.id,size:p.size,pos:p.pos()})
+        }
+        return state
+    }
+
+    resized ()
+    {
+        return this.update().calculate()
+    }
+
+    update ()
+    {
+        return this.updatePanes().updateHandles()
+    }
+
+    updatePanes ()
+    {
+        var p
+
+        var list = _k_.list(this.panes)
+        for (var _260_39_ = 0; _260_39_ < list.length; _260_39_++)
+        {
+            p = list[_260_39_]
+            p.update()
+        }
+        return this
+    }
+
+    updateHandles ()
+    {
+        var h
+
+        var list = _k_.list(this.handles)
+        for (var _261_39_ = 0; _261_39_ < list.length; _261_39_++)
+        {
+            h = list[_261_39_]
+            h.update()
+        }
+        return this
+    }
+
+    handleStart (handle)
+    {
+        var _265_41_
+
+        return (typeof this.onDragStart === "function" ? this.onDragStart() : undefined)
+    }
+
+    handleDrag (handle, drag)
+    {
+        var _268_15_
+
+        this.moveHandleToPos(handle,drag.pos[this.axis] - this.pos() - 4)
+        return (typeof this.onDrag === "function" ? this.onDrag() : undefined)
+    }
+
+    handleEnd ()
+    {
+        var _271_18_
+
+        this.update()
+        return (typeof this.onDragEnd === "function" ? this.onDragEnd() : undefined)
+    }
+
+    numPanes ()
+    {
+        return this.panes.length
+    }
+
+    visiblePanes ()
+    {
+        return this.panes.filter(function (p)
+        {
+            return p.isVisible()
+        })
+    }
+
+    panePositions ()
+    {
+        var p
+
+        return (function () { var _281__40_ = []; var list = _k_.list(this.panes); for (var _281_40_ = 0; _281_40_ < list.length; _281_40_++)  { p = list[_281_40_];_281__40_.push(p.pos())  } return _281__40_ }).bind(this)()
+    }
+
+    paneSizes ()
+    {
+        var p
+
+        return (function () { var _282__39_ = []; var list = _k_.list(this.panes); for (var _282_39_ = 0; _282_39_ < list.length; _282_39_++)  { p = list[_282_39_];_282__39_.push(p.size)  } return _282__39_ }).bind(this)()
+    }
+
+    sizeOfPane (i)
+    {
+        return this.pane(i).size
+    }
+
+    posOfPane (i)
+    {
+        return this.pane(i).pos()
+    }
+
+    posOfHandle (i)
+    {
+        return this.handle(i).pos()
+    }
+
+    pane (i)
+    {
+        return _.isNumber(i) && this.panes[i] || _.isString(i) && _.find(this.panes,function (p)
+        {
+            return p.id === i
+        }) || i
+    }
+
+    handle (i)
+    {
+        return _.isNumber(i) && this.handles[i] || i
+    }
+
+    height ()
+    {
+        return this.view.getBoundingClientRect().height
+    }
+
+    size ()
+    {
+        return this.view.getBoundingClientRect()[this.dimension]
+    }
+
+    pos ()
+    {
+        return this.view.getBoundingClientRect()[this.position]
+    }
+
+    isCollapsed (i)
+    {
+        return this.pane(i).collapsed
+    }
+
+    collapse (i)
+    {
+        var pane
+
+        if (pane = this.pane(i))
+        {
+            if (!pane.collapsed)
+            {
+                pane.collapse()
+                return this.calculate()
+            }
+        }
+    }
+
+    expand (i, factor = 0.5)
+    {
+        var flex, pane, use, _314_37_
+
+        if (pane = this.pane(i))
+        {
+            if (pane.collapsed)
+            {
+                pane.expand()
+                if (flex = this.closestVisFlex(pane))
+                {
+                    use = ((_314_37_=pane.fixed) != null ? _314_37_ : flex.size * factor)
+                    flex.size -= use
+                    pane.size = use
                 }
-                return this.calculate();
+                return this.calculate()
             }
         }
-    };
+    }
 
-    Flex.prototype.nextVisPane = function(p) {
-        var next, pi;
-        pi = this.panes.indexOf(p);
-        if (pi >= this.panes.length - 1) {
-            return null;
-        }
-        next = this.panes[pi + 1];
-        if (next.isVisible()) {
-            return next;
-        }
-        return this.nextVisPane(next);
-    };
+    nextVisPane (p)
+    {
+        var next, pi
 
-    Flex.prototype.prevVisPane = function(p) {
-        var pi, prev;
-        pi = this.panes.indexOf(p);
-        if (pi <= 0) {
-            return null;
+        pi = this.panes.indexOf(p)
+        if (pi >= this.panes.length - 1)
+        {
+            return null
         }
-        prev = this.panes[pi - 1];
-        if (prev.isVisible()) {
-            return prev;
+        next = this.panes[pi + 1]
+        if (next.isVisible())
+        {
+            return next
         }
-        return this.prevVisPane(prev);
-    };
+        return this.nextVisPane(next)
+    }
 
-    Flex.prototype.closestVisFlex = function(p) {
-        var d, isVisFlexPane, pi;
-        d = 1;
-        pi = this.panes.indexOf(p);
-        isVisFlexPane = (function(_this) {
-            return function(i) {
-                if (i >= 0 && i < _this.panes.length) {
-                    if (!_this.panes[i].collapsed && !_this.panes[i].fixed) {
-                        return true;
-                    }
+    prevVisPane (p)
+    {
+        var pi, prev
+
+        pi = this.panes.indexOf(p)
+        if (pi <= 0)
+        {
+            return null
+        }
+        prev = this.panes[pi - 1]
+        if (prev.isVisible())
+        {
+            return prev
+        }
+        return this.prevVisPane(prev)
+    }
+
+    closestVisFlex (p)
+    {
+        var d, isVisFlexPane, pi
+
+        d = 1
+        pi = this.panes.indexOf(p)
+        isVisFlexPane = (function (i)
+        {
+            if (i >= 0 && i < this.panes.length)
+            {
+                if (!this.panes[i].collapsed && !this.panes[i].fixed)
+                {
+                    return true
                 }
-            };
-        })(this);
-        while (d < this.panes.length - 1) {
-            if (isVisFlexPane(pi + d)) {
-                return this.panes[pi + d];
-            } else if (isVisFlexPane(pi - d)) {
-                return this.panes[pi - d];
             }
-            d++;
+        }).bind(this)
+        while (d < this.panes.length - 1)
+        {
+            if (isVisFlexPane(pi + d))
+            {
+                return this.panes[pi + d]
+            }
+            else if (isVisFlexPane(pi - d))
+            {
+                return this.panes[pi - d]
+            }
+            d++
         }
-    };
+    }
 
-    Flex.prototype.travPrev = function(h, f) {
-        return f(h) && h.panea || h.index > 0 && this.travPrev(this.handles[h.index - 1], f) || null;
-    };
+    travPrev (h, f)
+    {
+        return f(h) && h.panea || h.index > 0 && this.travPrev(this.handles[h.index - 1],f) || null
+    }
 
-    Flex.prototype.travNext = function(h, f) {
-        return f(h) && h.paneb || h.index < this.handles.length - 1 && this.travNext(this.handles[h.index + 1], f) || null;
-    };
+    travNext (h, f)
+    {
+        return f(h) && h.paneb || h.index < this.handles.length - 1 && this.travNext(this.handles[h.index + 1],f) || null
+    }
 
-    Flex.prototype.prevVisFlex = function(h) {
-        return this.travPrev(h, function(v) {
-            return !v.panea.collapsed && !v.panea.fixed;
-        });
-    };
+    prevVisFlex (h)
+    {
+        return this.travPrev(h,function (v)
+        {
+            return !v.panea.collapsed && !v.panea.fixed
+        })
+    }
 
-    Flex.prototype.nextVisFlex = function(h) {
-        return this.travNext(h, function(v) {
-            return !v.paneb.collapsed && !v.paneb.fixed;
-        });
-    };
+    nextVisFlex (h)
+    {
+        return this.travNext(h,function (v)
+        {
+            return !v.paneb.collapsed && !v.paneb.fixed
+        })
+    }
 
-    Flex.prototype.prevFlex = function(h) {
-        return this.travPrev(h, function(v) {
-            return !v.panea.fixed;
-        });
-    };
+    prevFlex (h)
+    {
+        return this.travPrev(h,function (v)
+        {
+            return !v.panea.fixed
+        })
+    }
 
-    Flex.prototype.nextFlex = function(h) {
-        return this.travNext(h, function(v) {
-            return !v.paneb.fixed;
-        });
-    };
+    nextFlex (h)
+    {
+        return this.travNext(h,function (v)
+        {
+            return !v.paneb.fixed
+        })
+    }
 
-    Flex.prototype.prevVis = function(h) {
-        return this.travPrev(h, function(v) {
-            return !v.panea.collapsed;
-        });
-    };
+    prevVis (h)
+    {
+        return this.travPrev(h,function (v)
+        {
+            return !v.panea.collapsed
+        })
+    }
 
-    Flex.prototype.nextVis = function(h) {
-        return this.travNext(h, function(v) {
-            return !v.paneb.collapsed;
-        });
-    };
+    nextVis (h)
+    {
+        return this.travNext(h,function (v)
+        {
+            return !v.paneb.collapsed
+        })
+    }
 
-    Flex.prototype.prevAllInv = function(h) {
-        var p;
-        p = !this.prevVis(h) && h.panea || null;
-        if (p != null) {
-            p.expand();
-        }
-        return p;
-    };
+    prevAllInv (h)
+    {
+        var p
 
-    Flex.prototype.nextAllInv = function(h) {
-        var p;
-        p = !this.nextVis(h) && h.paneb || null;
-        if (p != null) {
-            p.expand();
-        }
-        return p;
-    };
+        p = !this.prevVis(h) && h.panea || null
+        ;(p != null ? p.expand() : undefined)
+        return p
+    }
 
-    return Flex;
+    nextAllInv (h)
+    {
+        var p
 
-})();
+        p = !this.nextVis(h) && h.paneb || null
+        ;(p != null ? p.expand() : undefined)
+        return p
+    }
+}
 
-module.exports = Flex;
-
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZmxleC5qcyIsInNvdXJjZVJvb3QiOiIuLi8uLi8uLi9jb2ZmZWUvd2luL2ZsZXgiLCJzb3VyY2VzIjpbImZsZXguY29mZmVlIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7O0FBQUE7Ozs7Ozs7QUFBQSxJQUFBOztBQVFBLE1BQTJCLE9BQUEsQ0FBUSxLQUFSLENBQTNCLEVBQUUsU0FBRixFQUFLLGVBQUwsRUFBVyxlQUFYLEVBQWlCOztBQUVqQixJQUFBLEdBQVMsT0FBQSxDQUFRLFFBQVI7O0FBQ1QsTUFBQSxHQUFTLE9BQUEsQ0FBUSxVQUFSOztBQUVIO0lBRUMsY0FBQyxHQUFEO0FBRUMsWUFBQTtRQUFBLElBQUMsQ0FBQSxVQUFELDRDQUFnQztRQUNoQyxJQUFDLENBQUEsU0FBRCwyQ0FBK0I7UUFDL0IsSUFBQyxDQUFBLFNBQUQsR0FBZSxHQUFHLENBQUM7UUFDbkIsSUFBQyxDQUFBLFFBQUQsR0FBZSxHQUFHLENBQUM7UUFDbkIsSUFBQyxDQUFBLFVBQUQsR0FBZSxHQUFHLENBQUM7UUFDbkIsSUFBQyxDQUFBLFdBQUQsR0FBZSxHQUFHLENBQUM7UUFDbkIsSUFBQyxDQUFBLE1BQUQsR0FBZSxHQUFHLENBQUM7UUFDbkIsSUFBQyxDQUFBLFNBQUQsR0FBZSxHQUFHLENBQUM7UUFFbkIsSUFBQSxHQUFlLElBQUMsQ0FBQSxTQUFELEtBQWM7UUFDN0IsSUFBQyxDQUFBLFNBQUQsR0FBZSxJQUFBLElBQVMsT0FBVCxJQUFvQjtRQUNuQyxJQUFDLENBQUEsU0FBRCxHQUFlLElBQUEsSUFBUyxhQUFULElBQTBCO1FBQ3pDLElBQUMsQ0FBQSxJQUFELEdBQWUsSUFBQSxJQUFTLEdBQVQsSUFBZ0I7UUFDL0IsSUFBQyxDQUFBLFFBQUQsR0FBZSxJQUFBLElBQVMsTUFBVCxJQUFtQjtRQUNsQyxJQUFDLENBQUEsV0FBRCxHQUFlLElBQUEsSUFBUyxzQ0FBVCxJQUFtRDtRQUNsRSxJQUFDLENBQUEsUUFBRCxHQUFlLElBQUEsSUFBUyxhQUFULElBQTBCO1FBQ3pD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QyxDQUFBLFFBQUQsQ0FBVSxDQUFWLEVBQWEsU0FBQyxDQUFEO21CQUFPLENBQUksQ0FBQyxDQUFDLEtBQUssQ0FBQztRQUFuQixDQUFiO0lBQVA7O21CQUNiLE9BQUEsR0FBYSxTQUFDLENBQUQ7ZUFBTyxJQUFDLENBQUEsUUFBRCxDQUFVLENBQVYsRUFBYSxTQUFDLENBQUQ7bUJBQU8sQ0FBSSxDQUFDLENBQUMsS0FBSyxDQUFDO1FBQW5CLENBQWI7SUFBUDs7bUJBQ2IsVUFBQSxHQUFhLFNBQUMsQ0FBRDtBQUFPLFlBQUE7UUFBQSxDQUFBLEdBQUksQ0FBSSxJQUFDLENBQUEsT0FBRCxDQUFTLENBQVQsQ0FBSixJQUFvQixDQUFDLENBQUMsS0FBdEIsSUFBK0I7O1lBQU0sQ0FBQyxDQUFFLE1BQUgsQ0FBQTs7ZUFBYTtJQUE3RDs7bUJBQ2IsVUFBQSxHQUFhLFNBQUMsQ0FBRDtBQUFPLFlBQUE7UUFBQSxDQUFBLEdBQUksQ0FBSSxJQUFDLENBQUEsT0FBRCxDQUFTLENBQVQsQ0FBSixJQUFvQixDQUFDLENBQUMsS0FBdEIsSUFBK0I7O1lBQU0sQ0FBQyxDQUFFLE1BQUgsQ0FBQTs7ZUFBYTtJQUE3RDs7Ozs7O0FBRWpCLE1BQU0sQ0FBQyxPQUFQLEdBQWlCIiwic291cmNlc0NvbnRlbnQiOlsiIyMjXG4wMDAwMDAwMCAgMDAwICAgICAgMDAwMDAwMDAgIDAwMCAgIDAwMCAgXG4wMDAgICAgICAgMDAwICAgICAgMDAwICAgICAgICAwMDAgMDAwICAgXG4wMDAwMDAgICAgMDAwICAgICAgMDAwMDAwMCAgICAgMDAwMDAgICAgXG4wMDAgICAgICAgMDAwICAgICAgMDAwICAgICAgICAwMDAgMDAwICAgXG4wMDAgICAgICAgMDAwMDAwMCAgMDAwMDAwMDAgIDAwMCAgIDAwMCAgXG4jIyNcblxueyBfLCBkcmFnLCBsYXN0LCB2YWxpZCB9ID0gcmVxdWlyZSAna3hrJ1xuXG5QYW5lICAgPSByZXF1aXJlICcuL3BhbmUnXG5IYW5kbGUgPSByZXF1aXJlICcuL2hhbmRsZSdcblxuY2xhc3MgRmxleCBcbiAgICBcbiAgICBAOiAob3B0KSAtPlxuICAgICAgICBcbiAgICAgICAgQGhhbmRsZVNpemUgID0gb3B0LmhhbmRsZVNpemUgPyA2XG4gICAgICAgIEBkaXJlY3Rpb24gICA9IG9wdC5kaXJlY3Rpb24gPyAnaG9yaXpvbnRhbCdcbiAgICAgICAgQHNuYXBGaXJzdCAgID0gb3B0LnNuYXBGaXJzdFxuICAgICAgICBAc25hcExhc3QgICAgPSBvcHQuc25hcExhc3RcbiAgICAgICAgQG9uUGFuZVNpemUgID0gb3B0Lm9uUGFuZVNpemVcbiAgICAgICAgQG9uRHJhZ1N0YXJ0ID0gb3B0Lm9uRHJhZ1N0YXJ0XG4gICAgICAgIEBvbkRyYWcgICAgICA9IG9wdC5vbkRyYWdcbiAgICAgICAgQG9uRHJhZ0VuZCAgID0gb3B0Lm9uRHJhZ0VuZFxuICAgIFxuICAgICAgICBob3J6ICAgICAgICAgPSBAZGlyZWN0aW9uID09ICdob3Jpem9udGFsJ1xuICAgICAgICBAZGltZW5zaW9uICAgPSBob3J6IGFuZCAnd2lkdGgnIG9yICdoZWlnaHQnXG4gICAgICAgIEBjbGllbnREaW0gICA9IGhvcnogYW5kICdjbGllbnRXaWR0aCcgb3IgJ2NsaWVudEhlaWdodCdcbiAgICAgICAgQGF4aXMgICAgICAgID0gaG9yeiBhbmQgJ3gnIG9yICd5J1xuICAgICAgICBAcG9zaXRpb24gICAgPSBob3J6IGFuZCAnbGVmdCcgb3IgJ3RvcCdcbiAgICAgICAgQGhhbmRsZUNsYXNzID0gaG9yeiBhbmQgJ3NwbGl0LWhhbmRsZSBzcGxpdC1oYW5kbGUtaG9yaXpvbnRhbCcgb3IgJ3NwbGl0LWhhbmRsZSBzcGxpdC1oYW5kbGUtdmVydGljYWwnXG4gICAgICAgIEBwYWRkaW5nQSAgICA9IGhvcnogYW5kICdwYWRkaW5nTGVmdCcgb3IgJ3BhZGRpbmdUb3AnXG4gICAgICAgIEBwYWRkaW5nQiAgICA9IGhvcnogYW5kICdwYWRkaW5nUmlnaHQnIG9yICdwYWRkaW5nQm90dG9tJ1xuICAgICAgICBAY3Vyc29yICAgICAgPSBvcHQuY3Vyc29yID8gaG9yeiBhbmQgJ2V3LXJlc2l6ZScgb3IgJ25zLXJlc2l6ZSdcbiAgICAgICAgXG4gICAgICAgIEBwYW5lcyAgID0gW11cbiAgICAgICAgQGhhbmRsZXMgPSBbXVxuXG4gICAgICAgIEB2aWV3ID0gb3B0LnZpZXcgPyBvcHQucGFuZXNbMF0uZGl2LnBhcmVudE5vZGVcbiAgICAgICAgQHZpZXcuc3R5bGUuZGlzcGxheSA9ICdmbGV4J1xuICAgICAgICBAdmlldy5zdHlsZS5mbGV4RGlyZWN0aW9uID0gaG9yeiBhbmQgJ3Jvdycgb3IgJ2NvbHVtbidcbiAgICAgICAgXG4gICAgICAgIGlmIHZhbGlkIG9wdC5wYW5lc1xuICAgICAgICAgICAgQGFkZFBhbmUgcCBmb3IgcCBpbiBvcHQucGFuZXNcbiAgICAgICAgICAgICAgICAgICAgXG4gICAgIyAgMDAwMDAwMCAgIDAwMDAwMDAgICAgMDAwMDAwMCAgICBcbiAgICAjIDAwMCAgIDAwMCAgMDAwICAgMDAwICAwMDAgICAwMDAgIFxuICAgICMgMDAwMDAwMDAwICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgXG4gICAgIyAwMDAgICAwMDAgIDAwMCAgIDAwMCAgMDAwICAgMDAwICBcbiAgICAjIDAwMCAgIDAwMCAgMDAwMDAwMCAgICAwMDAwMDAwICAgIFxuICAgIFxuICAgIGFkZFBhbmU6IChwKSAtPlxuXG4gICAgICAgIG5ld1BhbmUgPSBuZXcgUGFuZSBfLmRlZmF1bHRzIHAsIFxuICAgICAgICAgICAgZmxleDogICBAIFxuICAgICAgICAgICAgaW5kZXg6ICBAcGFuZXMubGVuZ3RoXG4gICAgICAgICAgICBcbiAgICAgICAgaWYgbGFzdFBhbmUgPSBfLmxhc3QgQHBhbmVzXG4gICAgICAgICAgICBAaGFuZGxlcy5wdXNoIG5ldyBIYW5kbGVcbiAgICAgICAgICAgICAgICBmbGV4OiAgQFxuICAgICAgICAgICAgICAgIGluZGV4OiBsYXN0UGFuZS5pbmRleFxuICAgICAgICAgICAgICAgIHBhbmVhOiBsYXN0UGFuZVxuICAgICAgICAgICAgICAgIHBhbmViOiBuZXdQYW5lXG4gICAgICAgICAgICBcbiAgICAgICAgQHBhbmVzLnB1c2ggbmV3UGFuZVxuICAgICAgICBAcmVsYXgoKVxuXG4gICAgIyAwMDAwMDAwMCAgICAwMDAwMDAwICAgMDAwMDAwMDAgICBcbiAgICAjIDAwMCAgIDAwMCAgMDAwICAgMDAwICAwMDAgICAwMDAgIFxuICAgICMgMDAwMDAwMDAgICAwMDAgICAwMDAgIDAwMDAwMDAwICAgXG4gICAgIyAwMDAgICAgICAgIDAwMCAgIDAwMCAgMDAwICAgICAgICBcbiAgICAjIDAwMCAgICAgICAgIDAwMDAwMDAgICAwMDAgICAgICAgIFxuICAgIFxuICAgIHBvcFBhbmU6IChvcHQ9e30pIC0+XG4gICAgICAgIFxuICAgICAgICBpZiBvcHQ/LnJlbGF4ID09IGZhbHNlXG4gICAgICAgICAgICBAdW5yZWxheCgpICBcbiAgICAgICAgXG4gICAgICAgIGlmIEBwYW5lcy5sZW5ndGggPiAxXG4gICAgICAgICAgICBAcGFuZXMucG9wKCkuZGVsKClcbiAgICAgICAgICAgIEBoYW5kbGVzLnBvcCgpLmRlbCgpXG4gICAgICAgICAgICBcbiAgICAgICAgaWYgb3B0Py5yZWxheCAhPSBmYWxzZVxuICAgICAgICAgICAgQHJlbGF4KCkgICAgXG4gICAgICAgIGVsc2VcbiAgICAgICAgICAgIGxhc3QoQHBhbmVzKS5zZXRTaXplIGxhc3QoQHBhbmVzKS5hY3R1YWxTaXplKClcblxuICAgIHNoaWZ0UGFuZTogLT5cbiAgICAgICAgXG4gICAgICAgIGlmIEBwYW5lcy5sZW5ndGggPiAxXG4gICAgICAgICAgICBAcGFuZXMuc2hpZnQoKS5kZWwoKVxuICAgICAgICAgICAgQGhhbmRsZXMuc2hpZnQoKS5kZWwoKVxuICAgICAgICAgICAgXG4gICAgICAgIGZvciBpIGluIFswLi4uQHBhbmVzLmxlbmd0aF1cbiAgICAgICAgICAgIEBwYW5lc1tpXS5pbmRleCA9IGlcblxuICAgICAgICBmb3IgaSBpbiBbMC4uLkBoYW5kbGVzLmxlbmd0aF1cbiAgICAgICAgICAgIEBoYW5kbGVzW2ldLmluZGV4ID0gaVxuICAgICAgICAgICAgXG4gICAgICAgIEByZWxheCgpICBcbiAgICAgICAgICAgIFxuICAgICMgMDAwMDAwMDAgICAwMDAwMDAwMCAgMDAwICAgICAgIDAwMDAwMDAgICAwMDAgICAwMDAgIFxuICAgICMgMDAwICAgMDAwICAwMDAgICAgICAgMDAwICAgICAgMDAwICAgMDAwICAgMDAwIDAwMCAgIFxuICAgICMgMDAwMDAwMCAgICAwMDAwMDAwICAgMDAwICAgICAgMDAwMDAwMDAwICAgIDAwMDAwICAgIFxuICAgICMgMDAwICAgMDAwICAwMDAgICAgICAgMDAwICAgICAgMDAwICAgMDAwICAgMDAwIDAwMCAgIFxuICAgICMgMDAwICAgMDAwICAwMDAwMDAwMCAgMDAwMDAwMCAgMDAwICAgMDAwICAwMDAgICAwMDAgIFxuICAgIFxuICAgIHJlbGF4OiAtPlxuICAgICAgICBcbiAgICAgICAgQHJlbGF4ZWQgPSB0cnVlXG4gICAgICAgIGZvciBwIGluIEB2aXNpYmxlUGFuZXMoKVxuICAgICAgICAgICAgcC5kaXYuc3R5bGUuZmxleCA9IFwiMSAxIDBcIlxuICAgICAgICAgICAgcC5zaXplID0gMFxuXG4gICAgdW5yZWxheDogLT5cbiAgICAgICAgXG4gICAgICAgIEByZWxheGVkID0gZmFsc2VcbiAgICAgICAgZm9yIHAgaW4gQHZpc2libGVQYW5lcygpXG4gICAgICAgICAgICBwLnNpemUgPSBwLmFjdHVhbFNpemUoKVxuXG4gICAgIyAgMDAwMDAwMCAgIDAwMDAwMDAgICAwMDAgICAgICAgMDAwMDAwMCAgXG4gICAgIyAwMDAgICAgICAgMDAwICAgMDAwICAwMDAgICAgICAwMDAgICAgICAgXG4gICAgIyAwMDAgICAgICAgMDAwMDAwMDAwICAwMDAgICAgICAwMDAgICAgICAgXG4gICAgIyAwMDAgICAgICAgMDAwICAgMDAwICAwMDAgICAgICAwMDAgICAgICAgXG4gICAgIyAgMDAwMDAwMCAgMDAwICAgMDAwICAwMDAwMDAwICAgMDAwMDAwMCAgXG4gICAgXG4gICAgY2FsY3VsYXRlOiAtPlxuXG4gICAgICAgIHZpc1BhbmVzICA9IEBwYW5lcy5maWx0ZXIgKHApIC0+IG5vdCBwLmNvbGxhcHNlZFxuICAgICAgICBmbGV4UGFuZXMgPSB2aXNQYW5lcy5maWx0ZXIgKHApIC0+IG5vdCBwLmZpeGVkXG4gICAgICAgIGF2YWlsICAgICA9IEBzaXplKClcbiAgICAgICAgXG4gICAgICAgIGZvciBoIGluIEBoYW5kbGVzXG4gICAgICAgICAgICBoLnVwZGF0ZSgpIFxuICAgICAgICAgICAgYXZhaWwgLT0gaC5zaXplKCkgaWYgaC5pc1Zpc2libGUoKVxuICAgICAgICAgICAgXG4gICAgICAgIGZvciBwIGluIHZpc1BhbmVzXG4gICAgICAgICAgICBhdmFpbCAtPSBwLnNpemVcbiAgICAgICAgICAgIFxuICAgICAgICBkaWZmID0gYXZhaWwgLyBmbGV4UGFuZXMubGVuZ3RoXG4gICAgICAgIFxuICAgICAgICBmb3IgcCBpbiBmbGV4UGFuZXNcbiAgICAgICAgICAgIHAuc2l6ZSArPSBkaWZmXG4gICAgICAgICAgICBcbiAgICAgICAgZm9yIHAgaW4gdmlzUGFuZXNcbiAgICAgICAgICAgIHAuc2V0U2l6ZSBwLnNpemVcblxuICAgICAgICBAb25QYW5lU2l6ZT8oKVxuICAgIFxuICAgICMgMDAgICAgIDAwICAgMDAwMDAwMCAgIDAwMCAgIDAwMCAgMDAwMDAwMDAgIFxuICAgICMgMDAwICAgMDAwICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgMDAwICAgICAgIFxuICAgICMgMDAwMDAwMDAwICAwMDAgICAwMDAgICAwMDAgMDAwICAgMDAwMDAwMCAgIFxuICAgICMgMDAwIDAgMDAwICAwMDAgICAwMDAgICAgIDAwMCAgICAgMDAwICAgICAgIFxuICAgICMgMDAwICAgMDAwICAgMDAwMDAwMCAgICAgICAwICAgICAgMDAwMDAwMDAgIFxuXG4gICAgbW92ZUhhbmRsZTogKG9wdCkgLT4gXG4gICAgICAgIFxuICAgICAgICBoYW5kbGUgPSBAaGFuZGxlc1tvcHQuaW5kZXhdXG4gICAgICAgIEBtb3ZlSGFuZGxlVG9Qb3MgaGFuZGxlLCBvcHQucG9zICAgICAgICBcbiAgICBcbiAgICBtb3ZlSGFuZGxlVG9Qb3M6IChoYW5kbGUsIHBvcykgLT5cbiAgICAgICAgXG4gICAgICAgIHBvcyA9IHBhcnNlSW50IHBvc1xuICAgICAgICBpZiBAcmVsYXhlZCB0aGVuIEB1bnJlbGF4KClcbiAgICAgICAgXG4gICAgICAgIG9mZnNldCA9IHBvcyAtIGhhbmRsZS5hY3R1YWxQb3MoKVxuICAgICAgICBcbiAgICAgICAgcmV0dXJuIGlmIE1hdGguYWJzKG9mZnNldCkgPCAxXG4gICAgICAgIFxuICAgICAgICBwcmV2ICA9IEBwcmV2QWxsSW52KGhhbmRsZSkgPyBAcHJldlZpc0ZsZXgoaGFuZGxlKSA/IEBwcmV2RmxleCBoYW5kbGVcbiAgICAgICAgbmV4dCAgPSBAbmV4dEFsbEludihoYW5kbGUpID8gQG5leHRWaXNGbGV4KGhhbmRsZSkgPyBAbmV4dEZsZXggaGFuZGxlXG4gICAgICAgIFxuICAgICAgICBkZWxldGUgcHJldi5jb2xsYXBzZWRcbiAgICAgICAgZGVsZXRlIG5leHQuY29sbGFwc2VkXG4gICAgICAgIFxuICAgICAgICBwcmV2U2l6ZSA9IHByZXYuc2l6ZSArIG9mZnNldFxuICAgICAgICBuZXh0U2l6ZSA9IG5leHQuc2l6ZSAtIG9mZnNldFxuICAgICAgICBcbiAgICAgICAgaWYgQHNuYXBGaXJzdD8gYW5kIHByZXZTaXplIDwgQHNuYXBGaXJzdCBhbmQgbm90IEBwcmV2VmlzUGFuZSBwcmV2XG4gICAgICAgICAgICBcbiAgICAgICAgICAgIGlmIHByZXZTaXplIDw9IDAgb3Igb2Zmc2V0IDwgQHNuYXBGaXJzdCAjIGNvbGxhcHNlIHBhbmVhXG4gICAgICAgICAgICAgICAgcHJldlNpemUgPSAtMVxuICAgICAgICAgICAgICAgIG5leHRTaXplID0gbmV4dC5zaXplICsgcHJldi5zaXplICsgQGhhbmRsZVNpemVcbiAgICAgICAgICAgICAgICBcbiAgICAgICAgZWxzZSBpZiBwcmV2U2l6ZSA8IDBcbiAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgIGxlZnRPdmVyID0gLXByZXZTaXplXG4gICAgICAgICAgICBwcmV2SGFuZGxlID0gaGFuZGxlLnByZXYoKVxuICAgICAgICAgICAgd2hpbGUgbGVmdE92ZXIgPiAwIGFuZCBwcmV2SGFuZGxlIGFuZCBwcmV2VmlzRmxleCA9IEBwcmV2VmlzRmxleCBwcmV2SGFuZGxlXG4gICAgICAgICAgICAgICAgZGVkdWN0ID0gTWF0aC5taW4gbGVmdE92ZXIsIHByZXZWaXNGbGV4LnNpemVcbiAgICAgICAgICAgICAgICBsZWZ0T3ZlciAtPSBkZWR1Y3RcbiAgICAgICAgICAgICAgICBwcmV2VmlzRmxleC5zZXRTaXplIHByZXZWaXNGbGV4LnNpemUgLSBkZWR1Y3RcbiAgICAgICAgICAgICAgICBwcmV2SGFuZGxlID0gcHJldkhhbmRsZS5wcmV2KClcbiAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgIHByZXZTaXplID0gMFxuICAgICAgICAgICAgbmV4dFNpemUgLT0gbGVmdE92ZXJcbiAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgIGlmIEBzbmFwTGFzdD8gYW5kIG5leHRTaXplIDwgQHNuYXBMYXN0IGFuZCBub3QgQG5leHRWaXNQYW5lIG5leHRcbiAgICAgICAgICAgIFxuICAgICAgICAgICAgaWYgbmV4dFNpemUgPD0gMCBvciAtb2Zmc2V0IDwgQHNuYXBMYXN0ICMgY29sbGFwc2UgcGFuZWJcbiAgICAgICAgICAgICAgICBuZXh0U2l6ZSA9IC0xXG4gICAgICAgICAgICAgICAgcHJldlNpemUgPSBwcmV2LnNpemUgKyBuZXh0LnNpemUgKyBAaGFuZGxlU2l6ZVxuICAgICAgICAgICAgICAgIFxuICAgICAgICBlbHNlIGlmIG5leHRTaXplIDwgMFxuICAgICAgICAgICAgICAgIFxuICAgICAgICAgICAgbGVmdE92ZXIgPSAtbmV4dFNpemVcbiAgICAgICAgICAgIG5leHRIYW5kbGUgPSBoYW5kbGUubmV4dCgpXG4gICAgICAgICAgICB3aGlsZSBsZWZ0T3ZlciA+IDAgYW5kIG5leHRIYW5kbGUgYW5kIG5leHRWaXNGbGV4ID0gQG5leHRWaXNGbGV4IG5leHRIYW5kbGVcbiAgICAgICAgICAgICAgICBkZWR1Y3QgPSBNYXRoLm1pbiBsZWZ0T3ZlciwgbmV4dFZpc0ZsZXguc2l6ZVxuICAgICAgICAgICAgICAgIGxlZnRPdmVyIC09IGRlZHVjdFxuICAgICAgICAgICAgICAgIG5leHRWaXNGbGV4LnNldFNpemUgbmV4dFZpc0ZsZXguc2l6ZSAtIGRlZHVjdFxuICAgICAgICAgICAgICAgIG5leHRIYW5kbGUgPSBuZXh0SGFuZGxlLm5leHQoKVxuICAgICAgICAgICAgICAgIFxuICAgICAgICAgICAgbmV4dFNpemUgPSAwXG4gICAgICAgICAgICBwcmV2U2l6ZSAtPSBsZWZ0T3ZlclxuICAgICAgICBcbiAgICAgICAgcHJldi5zZXRTaXplIHByZXZTaXplXG4gICAgICAgIG5leHQuc2V0U2l6ZSBuZXh0U2l6ZVxuICAgICAgICBAdXBkYXRlKClcbiAgICAgICAgQG9uUGFuZVNpemU/KClcblxuICAgICMgIDAwMDAwMDAgIDAwMDAwMDAwMCAgIDAwMDAwMDAgICAwMDAwMDAwMDAgIDAwMDAwMDAwICBcbiAgICAjIDAwMCAgICAgICAgICAwMDAgICAgIDAwMCAgIDAwMCAgICAgMDAwICAgICAwMDAgICAgICAgXG4gICAgIyAwMDAwMDAwICAgICAgMDAwICAgICAwMDAwMDAwMDAgICAgIDAwMCAgICAgMDAwMDAwMCAgIFxuICAgICMgICAgICAwMDAgICAgIDAwMCAgICAgMDAwICAgMDAwICAgICAwMDAgICAgIDAwMCAgICAgICBcbiAgICAjIDAwMDAwMDAgICAgICAwMDAgICAgIDAwMCAgIDAwMCAgICAgMDAwICAgICAwMDAwMDAwMCAgXG4gICAgXG4gICAgcmVzdG9yZVN0YXRlOiAoc3RhdGUpIC0+XG4gICAgICAgIHJldHVybiBpZiBub3Qgc3RhdGU/Lmxlbmd0aFxuICAgICAgICBmb3Igc2kgaW4gWzAuLi5zdGF0ZS5sZW5ndGhdXG4gICAgICAgICAgICBzID0gc3RhdGVbc2ldXG4gICAgICAgICAgICBwYW5lID0gQHBhbmUgc2lcbiAgICAgICAgICAgIGRlbGV0ZSBwYW5lLmNvbGxhcHNlZFxuICAgICAgICAgICAgcGFuZS5jb2xsYXBzZSgpICAgICAgaWYgcy5zaXplIDwgMFxuICAgICAgICAgICAgcGFuZS5zZXRTaXplKHMuc2l6ZSkgaWYgcy5zaXplID49IDBcblxuICAgICAgICBAdXBkYXRlSGFuZGxlcygpXG4gICAgICAgIEBvblBhbmVTaXplPygpXG4gICAgICAgIFxuICAgIGdldFN0YXRlOiAoKSAtPlxuICAgICAgICBzdGF0ZSA9IFtdXG4gICAgICAgIGZvciBwIGluIEBwYW5lc1xuICAgICAgICAgICAgc3RhdGUucHVzaFxuICAgICAgICAgICAgICAgIGlkOiAgIHAuaWRcbiAgICAgICAgICAgICAgICBzaXplOiBwLnNpemVcbiAgICAgICAgICAgICAgICBwb3M6ICBwLnBvcygpXG4gICAgICAgIHN0YXRlXG5cbiAgICAjICAwMDAwMDAwICAwMDAgIDAwMDAwMDAgIDAwMDAwMDAwICBcbiAgICAjIDAwMCAgICAgICAwMDAgICAgIDAwMCAgIDAwMCAgICAgICBcbiAgICAjIDAwMDAwMDAgICAwMDAgICAgMDAwICAgIDAwMDAwMDAgICBcbiAgICAjICAgICAgMDAwICAwMDAgICAwMDAgICAgIDAwMCAgICAgICBcbiAgICAjIDAwMDAwMDAgICAwMDAgIDAwMDAwMDAgIDAwMDAwMDAwICBcbiAgICAgICAgXG4gICAgcmVzaXplZDogICAgICAgLT4gQHVwZGF0ZSgpLmNhbGN1bGF0ZSgpXG5cbiAgICB1cGRhdGU6ICAgICAgICAtPiBAdXBkYXRlUGFuZXMoKS51cGRhdGVIYW5kbGVzKClcbiAgICB1cGRhdGVQYW5lczogICAtPiBwLnVwZGF0ZSgpIGZvciBwIGluIEBwYW5lcyAgIDsgQFxuICAgIHVwZGF0ZUhhbmRsZXM6IC0+IGgudXBkYXRlKCkgZm9yIGggaW4gQGhhbmRsZXMgOyBAXG5cbiAgICAjIGhhbmRsZSBkcmFnIGNhbGxiYWNrc1xuICAgIFxuICAgIGhhbmRsZVN0YXJ0OiAoaGFuZGxlKSAtPiBAb25EcmFnU3RhcnQ/KClcbiAgICBoYW5kbGVEcmFnOiAgKGhhbmRsZSwgZHJhZykgLT5cbiAgICAgICAgQG1vdmVIYW5kbGVUb1BvcyBoYW5kbGUsIGRyYWcucG9zW0BheGlzXSAtIEBwb3MoKSAtIDRcbiAgICAgICAgQG9uRHJhZz8oKVxuICAgIGhhbmRsZUVuZDogKCkgLT5cbiAgICAgICAgQHVwZGF0ZSgpXG4gICAgICAgIEBvbkRyYWdFbmQ/KClcblxuICAgICMgIDAwMDAwMDAgICAwMDAwMDAwMCAgMDAwMDAwMDAwICBcbiAgICAjIDAwMCAgICAgICAgMDAwICAgICAgICAgIDAwMCAgICAgXG4gICAgIyAwMDAgIDAwMDAgIDAwMDAwMDAgICAgICAwMDAgICAgIFxuICAgICMgMDAwICAgMDAwICAwMDAgICAgICAgICAgMDAwICAgICBcbiAgICAjICAwMDAwMDAwICAgMDAwMDAwMDAgICAgIDAwMCAgICAgXG4gICAgXG4gICAgbnVtUGFuZXM6ICAgICAgICAtPiBAcGFuZXMubGVuZ3RoXG4gICAgdmlzaWJsZVBhbmVzOiAgICAtPiBAcGFuZXMuZmlsdGVyIChwKSAtPiBwLmlzVmlzaWJsZSgpXG4gICAgcGFuZVBvc2l0aW9uczogICAtPiAoIHAucG9zKCkgZm9yIHAgaW4gQHBhbmVzIClcbiAgICBwYW5lU2l6ZXM6ICAgICAgIC0+ICggcC5zaXplIGZvciBwIGluIEBwYW5lcyApXG4gICAgc2l6ZU9mUGFuZTogIChpKSAtPiBAcGFuZShpKS5zaXplXG4gICAgcG9zT2ZQYW5lOiAgIChpKSAtPiBAcGFuZShpKS5wb3MoKVxuICAgIHBvc09mSGFuZGxlOiAoaSkgLT4gQGhhbmRsZShpKS5wb3MoKVxuICAgIHBhbmU6ICAgICAgICAoaSkgLT4gXy5pc051bWJlcihpKSBhbmQgQHBhbmVzW2ldICAgb3IgXy5pc1N0cmluZyhpKSBhbmQgXy5maW5kKEBwYW5lcywgKHApIC0+IHAuaWQgPT0gaSkgb3IgaVxuICAgIGhhbmRsZTogICAgICAoaSkgLT4gXy5pc051bWJlcihpKSBhbmQgQGhhbmRsZXNbaV0gb3IgaVxuXG4gICAgaGVpZ2h0OiAtPiBAdmlldy5nZXRCb3VuZGluZ0NsaWVudFJlY3QoKS5oZWlnaHRcbiAgICBzaXplOiAgIC0+IEB2aWV3LmdldEJvdW5kaW5nQ2xpZW50UmVjdCgpW0BkaW1lbnNpb25dXG4gICAgcG9zOiAgICAtPiBAdmlldy5nZXRCb3VuZGluZ0NsaWVudFJlY3QoKVtAcG9zaXRpb25dXG4gICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgICAjICAwMDAwMDAwICAgMDAwMDAwMCAgIDAwMCAgICAgIDAwMCAgICAgICAwMDAwMDAwICAgMDAwMDAwMDAgICAgMDAwMDAwMCAgMDAwMDAwMDAgIFxuICAgICMgMDAwICAgICAgIDAwMCAgIDAwMCAgMDAwICAgICAgMDAwICAgICAgMDAwICAgMDAwICAwMDAgICAwMDAgIDAwMCAgICAgICAwMDAgICAgICAgXG4gICAgIyAwMDAgICAgICAgMDAwICAgMDAwICAwMDAgICAgICAwMDAgICAgICAwMDAwMDAwMDAgIDAwMDAwMDAwICAgMDAwMDAwMCAgIDAwMDAwMDAgICBcbiAgICAjIDAwMCAgICAgICAwMDAgICAwMDAgIDAwMCAgICAgIDAwMCAgICAgIDAwMCAgIDAwMCAgMDAwICAgICAgICAgICAgIDAwMCAgMDAwICAgICAgIFxuICAgICMgIDAwMDAwMDAgICAwMDAwMDAwICAgMDAwMDAwMCAgMDAwMDAwMCAgMDAwICAgMDAwICAwMDAgICAgICAgIDAwMDAwMDAgICAwMDAwMDAwMCAgXG4gICAgXG4gICAgaXNDb2xsYXBzZWQ6IChpKSAtPiBAcGFuZShpKS5jb2xsYXBzZWRcbiAgICBcbiAgICBjb2xsYXBzZTogKGkpIC0+IFxuICAgICAgICBcbiAgICAgICAgaWYgcGFuZSA9IEBwYW5lIGlcbiAgICAgICAgICAgIGlmIG5vdCBwYW5lLmNvbGxhcHNlZFxuICAgICAgICAgICAgICAgIHBhbmUuY29sbGFwc2UoKVxuICAgICAgICAgICAgICAgIEBjYWxjdWxhdGUoKVxuICAgICAgICBcbiAgICBleHBhbmQ6IChpLCBmYWN0b3I9MC41KSAtPlxuICAgICAgICBcbiAgICAgICAgaWYgcGFuZSA9IEBwYW5lIGlcbiAgICAgICAgICAgIGlmIHBhbmUuY29sbGFwc2VkXG4gICAgICAgICAgICAgICAgcGFuZS5leHBhbmQoKVxuICAgICAgICAgICAgICAgIGlmIGZsZXggPSBAY2xvc2VzdFZpc0ZsZXggcGFuZVxuICAgICAgICAgICAgICAgICAgICB1c2UgPSBwYW5lLmZpeGVkID8gZmxleC5zaXplICogZmFjdG9yXG4gICAgICAgICAgICAgICAgICAgIGZsZXguc2l6ZSAtPSB1c2VcbiAgICAgICAgICAgICAgICAgICAgcGFuZS5zaXplID0gdXNlXG4gICAgICAgICAgICAgICAgQGNhbGN1bGF0ZSgpXG5cbiAgICAjIDAwMCAgIDAwMCAgMDAwICAgMDAwMDAwMCAgMDAwMDAwMDAgIDAwMCAgICAgIDAwMDAwMDAwICAwMDAgICAwMDAgIFxuICAgICMgMDAwICAgMDAwICAwMDAgIDAwMCAgICAgICAwMDAgICAgICAgMDAwICAgICAgMDAwICAgICAgICAwMDAgMDAwICAgXG4gICAgIyAgMDAwIDAwMCAgIDAwMCAgMDAwMDAwMCAgIDAwMDAwMCAgICAwMDAgICAgICAwMDAwMDAwICAgICAwMDAwMCAgICBcbiAgICAjICAgIDAwMCAgICAgMDAwICAgICAgIDAwMCAgMDAwICAgICAgIDAwMCAgICAgIDAwMCAgICAgICAgMDAwIDAwMCAgIFxuICAgICMgICAgIDAgICAgICAwMDAgIDAwMDAwMDAgICAwMDAgICAgICAgMDAwMDAwMCAgMDAwMDAwMDAgIDAwMCAgIDAwMCAgXG4gICAgXG4gICAgbmV4dFZpc1BhbmU6IChwKSAtPlxuICAgICAgICBwaSA9IEBwYW5lcy5pbmRleE9mIHBcbiAgICAgICAgcmV0dXJuIG51bGwgaWYgcGkgPj0gQHBhbmVzLmxlbmd0aC0xXG4gICAgICAgIG5leHQgPSBAcGFuZXNbcGkrMV1cbiAgICAgICAgcmV0dXJuIG5leHQgaWYgbmV4dC5pc1Zpc2libGUoKVxuICAgICAgICBAbmV4dFZpc1BhbmUgbmV4dFxuICAgICAgICBcbiAgICBwcmV2VmlzUGFuZTogKHApIC0+XG4gICAgICAgIHBpID0gQHBhbmVzLmluZGV4T2YgcFxuICAgICAgICByZXR1cm4gbnVsbCBpZiBwaSA8PSAwXG4gICAgICAgIHByZXYgPSBAcGFuZXNbcGktMV1cbiAgICAgICAgcmV0dXJuIHByZXYgaWYgcHJldi5pc1Zpc2libGUoKVxuICAgICAgICBAcHJldlZpc1BhbmUgcHJldlxuXG4gICAgY2xvc2VzdFZpc0ZsZXg6IChwKSAtPlxuICAgICAgICBkID0gMVxuICAgICAgICBwaSA9IEBwYW5lcy5pbmRleE9mIHBcbiAgICAgICAgXG4gICAgICAgIGlzVmlzRmxleFBhbmUgPSAoaSkgPT5cbiAgICAgICAgICAgIGlmIGkgPj0gMCBhbmQgaSA8IEBwYW5lcy5sZW5ndGhcbiAgICAgICAgICAgICAgICBpZiBub3QgQHBhbmVzW2ldLmNvbGxhcHNlZCBhbmQgbm90IEBwYW5lc1tpXS5maXhlZFxuICAgICAgICAgICAgICAgICAgICByZXR1cm4gdHJ1ZSBcbiAgICAgICAgICAgIFxuICAgICAgICB3aGlsZSBkIDwgQHBhbmVzLmxlbmd0aC0xXG4gICAgICAgICAgICBpZiBpc1Zpc0ZsZXhQYW5lIHBpICsgZFxuICAgICAgICAgICAgICAgIHJldHVybiBAcGFuZXNbcGkgKyBkXVxuICAgICAgICAgICAgZWxzZSBpZiBpc1Zpc0ZsZXhQYW5lIHBpIC0gZFxuICAgICAgICAgICAgICAgIHJldHVybiBAcGFuZXNbcGkgLSBkXVxuICAgICAgICAgICAgZCsrXG5cbiAgICB0cmF2UHJldjogKGgsIGYpIC0+IGYoaCkgYW5kIGgucGFuZWEgb3IgaC5pbmRleCA+IDAgYW5kIEB0cmF2UHJldihAaGFuZGxlc1toLmluZGV4LTFdLCBmKSBvciBudWxsICAgIFxuICAgIHRyYXZOZXh0OiAoaCwgZikgLT4gZihoKSBhbmQgaC5wYW5lYiBvciBoLmluZGV4IDwgQGhhbmRsZXMubGVuZ3RoLTEgYW5kIEB0cmF2TmV4dChAaGFuZGxlc1toLmluZGV4KzFdLCBmKSBvciBudWxsXG4gICAgcHJldlZpc0ZsZXg6IChoKSAtPiBAdHJhdlByZXYgaCwgKHYpIC0+IG5vdCB2LnBhbmVhLmNvbGxhcHNlZCBhbmQgbm90IHYucGFuZWEuZml4ZWRcbiAgICBuZXh0VmlzRmxleDogKGgpIC0+IEB0cmF2TmV4dCBoLCAodikgLT4gbm90IHYucGFuZWIuY29sbGFwc2VkIGFuZCBub3Qgdi5wYW5lYi5maXhlZCBcbiAgICBwcmV2RmxleDogICAgKGgpIC0+IEB0cmF2UHJldiBoLCAodikgLT4gbm90IHYucGFuZWEuZml4ZWRcbiAgICBuZXh0RmxleDogICAgKGgpIC0+IEB0cmF2TmV4dCBoLCAodikgLT4gbm90IHYucGFuZWIuZml4ZWQgXG4gICAgcHJldlZpczogICAgIChoKSAtPiBAdHJhdlByZXYgaCwgKHYpIC0+IG5vdCB2LnBhbmVhLmNvbGxhcHNlZCBcbiAgICBuZXh0VmlzOiAgICAgKGgpIC0+IEB0cmF2TmV4dCBoLCAodikgLT4gbm90IHYucGFuZWIuY29sbGFwc2VkIFxuICAgIHByZXZBbGxJbnY6ICAoaCkgLT4gcCA9IG5vdCBAcHJldlZpcyhoKSBhbmQgaC5wYW5lYSBvciBudWxsOyBwPy5leHBhbmQoKTsgcFxuICAgIG5leHRBbGxJbnY6ICAoaCkgLT4gcCA9IG5vdCBAbmV4dFZpcyhoKSBhbmQgaC5wYW5lYiBvciBudWxsOyBwPy5leHBhbmQoKTsgcFxuICAgICAgICBcbm1vZHVsZS5leHBvcnRzID0gRmxleFxuIl19
-//# sourceURL=../../../coffee/win/flex/flex.coffee
+module.exports = Flex

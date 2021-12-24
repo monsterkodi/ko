@@ -1,59 +1,42 @@
-// koffee 1.19.0
+// monsterkodi/kode 0.212.0
 
-/*
- 0000000   000   000   0000000   000000000  00000000   0000000    
-000   000  000   000  000   000     000     000       000         
-000 00 00  000   000  000   000     000     0000000   0000000     
-000 0000   000   000  000   000     000     000            000    
- 00000 00   0000000    0000000      000     00000000  0000000
- */
-var klog;
+var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}}
 
-klog = require('kxk').klog;
+var klog
 
-module.exports = {
-    actions: {
-        menu: 'Quotes',
-        singleQuotes: {
-            name: 'Single',
-            combo: "alt+command+'",
-            accel: "alt+ctrl+'"
-        },
-        doubleQuotes: {
-            name: 'Double',
-            combo: "alt+command+shift+'",
-            accel: "alt+ctrl+shift+'"
-        }
-    },
-    singleQuotes: function() {
-        return this.swapQuotes("'");
-    },
-    doubleQuotes: function() {
-        return this.swapQuotes('"');
-    },
-    swapQuotes: function(quote) {
-        var cc, cline, cursors, i, j, len, len1, nc, ref, tmpCursors;
-        this["do"].start();
-        cursors = this["do"].cursors();
-        this.selectSurround();
-        this.deleteSelection();
-        tmpCursors = this["do"].cursors();
-        for (i = 0, len = tmpCursors.length; i < len; i++) {
-            cc = tmpCursors[i];
-            cline = this["do"].line(cc[1]);
-            this["do"].change(cc[1], cline.splice(cc[0], 0, quote));
-            ref = positionsAtLineIndexInPositions(cc[1], tmpCursors);
-            for (j = 0, len1 = ref.length; j < len1; j++) {
-                nc = ref[j];
-                if (nc[0] >= cc[0]) {
-                    nc[0] += 1;
-                }
+klog = require('kxk').klog
+
+module.exports = {actions:{menu:'Quotes',singleQuotes:{name:'Single',combo:"alt+command+'",accel:"alt+ctrl+'"},doubleQuotes:{name:'Double',combo:"alt+command+shift+'",accel:"alt+ctrl+shift+'"}},singleQuotes:function ()
+{
+    return this.swapQuotes("'")
+},doubleQuotes:function ()
+{
+    return this.swapQuotes('"')
+},swapQuotes:function (quote)
+{
+    var cc, cline, cursors, nc, tmpCursors
+
+    this.do.start()
+    cursors = this.do.cursors()
+    this.selectSurround()
+    this.deleteSelection()
+    tmpCursors = this.do.cursors()
+    var list = _k_.list(tmpCursors)
+    for (var _38_15_ = 0; _38_15_ < list.length; _38_15_++)
+    {
+        cc = list[_38_15_]
+        cline = this.do.line(cc[1])
+        this.do.change(cc[1],cline.splice(cc[0],0,quote))
+        var list1 = _k_.list(positionsAtLineIndexInPositions(cc[1],tmpCursors))
+        for (var _41_19_ = 0; _41_19_ < list1.length; _41_19_++)
+        {
+            nc = list1[_41_19_]
+            if (nc[0] >= cc[0])
+            {
+                nc[0] += 1
             }
         }
-        this["do"].setCursors(cursors);
-        return this["do"].end();
     }
-};
-
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicXVvdGVzLmpzIiwic291cmNlUm9vdCI6Ii4uLy4uLy4uL2NvZmZlZS9lZGl0b3IvYWN0aW9ucyIsInNvdXJjZXMiOlsicXVvdGVzLmNvZmZlZSJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOztBQUFBOzs7Ozs7O0FBQUEsSUFBQTs7QUFRRSxPQUFTLE9BQUEsQ0FBUSxLQUFSOztBQUVYLE1BQU0sQ0FBQyxPQUFQLEdBRUk7SUFBQSxPQUFBLEVBQ0k7UUFBQSxJQUFBLEVBQU0sUUFBTjtRQUVBLFlBQUEsRUFDSTtZQUFBLElBQUEsRUFBTyxRQUFQO1lBQ0EsS0FBQSxFQUFPLGVBRFA7WUFFQSxLQUFBLEVBQU8sWUFGUDtTQUhKO1FBT0EsWUFBQSxFQUNJO1lBQUEsSUFBQSxFQUFPLFFBQVA7WUFDQSxLQUFBLEVBQU8scUJBRFA7WUFFQSxLQUFBLEVBQU8sa0JBRlA7U0FSSjtLQURKO0lBYUEsWUFBQSxFQUFjLFNBQUE7ZUFBRyxJQUFDLENBQUEsVUFBRCxDQUFZLEdBQVo7SUFBSCxDQWJkO0lBY0EsWUFBQSxFQUFjLFNBQUE7ZUFBRyxJQUFDLENBQUEsVUFBRCxDQUFZLEdBQVo7SUFBSCxDQWRkO0lBZ0JBLFVBQUEsRUFBWSxTQUFDLEtBQUQ7QUFFUixZQUFBO1FBQUEsSUFBQyxFQUFBLEVBQUEsRUFBRSxDQUFDLEtBQUosQ0FBQTtRQUNBLE9BQUEsR0FBVSxJQUFDLEVBQUEsRUFBQSxFQUFFLENBQUMsT0FBSixDQUFBO1FBRVYsSUFBQyxDQUFBLGNBQUQsQ0FBQTtRQUNBLElBQUMsQ0FBQSxlQUFELENBQUE7UUFFQSxVQUFBLEdBQWEsSUFBQyxFQUFBLEVBQUEsRUFBRSxDQUFDLE9BQUosQ0FBQTtBQUNiLGFBQUEsNENBQUE7O1lBQ0ksS0FBQSxHQUFRLElBQUMsRUFBQSxFQUFBLEVBQUUsQ0FBQyxJQUFKLENBQVMsRUFBRyxDQUFBLENBQUEsQ0FBWjtZQUNSLElBQUMsRUFBQSxFQUFBLEVBQUUsQ0FBQyxNQUFKLENBQVcsRUFBRyxDQUFBLENBQUEsQ0FBZCxFQUFrQixLQUFLLENBQUMsTUFBTixDQUFhLEVBQUcsQ0FBQSxDQUFBLENBQWhCLEVBQW9CLENBQXBCLEVBQXVCLEtBQXZCLENBQWxCO0FBQ0E7QUFBQSxpQkFBQSx1Q0FBQTs7Z0JBQ0ksSUFBRyxFQUFHLENBQUEsQ0FBQSxDQUFILElBQVMsRUFBRyxDQUFBLENBQUEsQ0FBZjtvQkFDSSxFQUFHLENBQUEsQ0FBQSxDQUFILElBQVMsRUFEYjs7QUFESjtBQUhKO1FBT0EsSUFBQyxFQUFBLEVBQUEsRUFBRSxDQUFDLFVBQUosQ0FBZSxPQUFmO2VBQ0EsSUFBQyxFQUFBLEVBQUEsRUFBRSxDQUFDLEdBQUosQ0FBQTtJQWpCUSxDQWhCWiIsInNvdXJjZXNDb250ZW50IjpbIiMjI1xuIDAwMDAwMDAgICAwMDAgICAwMDAgICAwMDAwMDAwICAgMDAwMDAwMDAwICAwMDAwMDAwMCAgIDAwMDAwMDAgICAgXG4wMDAgICAwMDAgIDAwMCAgIDAwMCAgMDAwICAgMDAwICAgICAwMDAgICAgIDAwMCAgICAgICAwMDAgICAgICAgICBcbjAwMCAwMCAwMCAgMDAwICAgMDAwICAwMDAgICAwMDAgICAgIDAwMCAgICAgMDAwMDAwMCAgIDAwMDAwMDAgICAgIFxuMDAwIDAwMDAgICAwMDAgICAwMDAgIDAwMCAgIDAwMCAgICAgMDAwICAgICAwMDAgICAgICAgICAgICAwMDAgICAgXG4gMDAwMDAgMDAgICAwMDAwMDAwICAgIDAwMDAwMDAgICAgICAwMDAgICAgIDAwMDAwMDAwICAwMDAwMDAwICAgICBcbiMjI1xuXG57IGtsb2cgfSA9IHJlcXVpcmUgJ2t4aydcblxubW9kdWxlLmV4cG9ydHMgPVxuICAgIFxuICAgIGFjdGlvbnM6XG4gICAgICAgIG1lbnU6ICdRdW90ZXMnXG4gICAgICAgIFxuICAgICAgICBzaW5nbGVRdW90ZXM6XG4gICAgICAgICAgICBuYW1lOiAgJ1NpbmdsZSdcbiAgICAgICAgICAgIGNvbWJvOiBcImFsdCtjb21tYW5kKydcIlxuICAgICAgICAgICAgYWNjZWw6IFwiYWx0K2N0cmwrJ1wiXG5cbiAgICAgICAgZG91YmxlUXVvdGVzOlxuICAgICAgICAgICAgbmFtZTogICdEb3VibGUnXG4gICAgICAgICAgICBjb21ibzogXCJhbHQrY29tbWFuZCtzaGlmdCsnXCJcbiAgICAgICAgICAgIGFjY2VsOiBcImFsdCtjdHJsK3NoaWZ0KydcIlxuICAgICAgICBcbiAgICBzaW5nbGVRdW90ZXM6IC0+IEBzd2FwUXVvdGVzIFwiJ1wiXG4gICAgZG91YmxlUXVvdGVzOiAtPiBAc3dhcFF1b3RlcyAnXCInXG4gICAgICAgICAgICBcbiAgICBzd2FwUXVvdGVzOiAocXVvdGUpIC0+XG4gICAgICAgIFxuICAgICAgICBAZG8uc3RhcnQoKVxuICAgICAgICBjdXJzb3JzID0gQGRvLmN1cnNvcnMoKVxuICAgICAgICBcbiAgICAgICAgQHNlbGVjdFN1cnJvdW5kKClcbiAgICAgICAgQGRlbGV0ZVNlbGVjdGlvbigpXG4gICAgICAgIFxuICAgICAgICB0bXBDdXJzb3JzID0gQGRvLmN1cnNvcnMoKSBcbiAgICAgICAgZm9yIGNjIGluIHRtcEN1cnNvcnNcbiAgICAgICAgICAgIGNsaW5lID0gQGRvLmxpbmUgY2NbMV1cbiAgICAgICAgICAgIEBkby5jaGFuZ2UgY2NbMV0sIGNsaW5lLnNwbGljZSBjY1swXSwgMCwgcXVvdGVcbiAgICAgICAgICAgIGZvciBuYyBpbiBwb3NpdGlvbnNBdExpbmVJbmRleEluUG9zaXRpb25zIGNjWzFdLCB0bXBDdXJzb3JzXG4gICAgICAgICAgICAgICAgaWYgbmNbMF0gPj0gY2NbMF1cbiAgICAgICAgICAgICAgICAgICAgbmNbMF0gKz0gMVxuICAgICAgICBcbiAgICAgICAgQGRvLnNldEN1cnNvcnMgY3Vyc29yc1xuICAgICAgICBAZG8uZW5kKClcbiAgICAgICAgICAgICAgICAiXX0=
-//# sourceURL=../../../coffee/editor/actions/quotes.coffee
+    this.do.setCursors(cursors)
+    return this.do.end()
+}}
