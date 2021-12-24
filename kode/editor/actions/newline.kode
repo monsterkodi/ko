@@ -79,11 +79,11 @@ module.exports =
                 @do.insert c[1]+1, indent
             else
                 @do.insert c[1]+1, indent + after
-                if @insertIndentedEmptyLineBetween? and
+                if  @insertIndentedEmptyLineBetween? and
                     before.trimRight().endsWith @insertIndentedEmptyLineBetween[0] and
-                        after.trimLeft().startsWith @insertIndentedEmptyLineBetween[1]
-                            indent += @indentString
-                            @do.insert c[1]+1, indent
+                    after.trimLeft().startsWith @insertIndentedEmptyLineBetween[1]
+                    indent += @indentString
+                    @do.insert c[1]+1, indent
                 @do.change c[1], before
 
             # move cursors in and below inserted line down

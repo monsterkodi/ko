@@ -414,6 +414,8 @@ window.setLastFocus = (name) ->
 
 onCombo = (combo, info) ->
 
+    dbg combo, info
+    
     return if not combo
 
     { mod, key, combo, char, event } = info

@@ -42,9 +42,9 @@ module.exports =
             for li in [r[0]..r[1]]
                 ls.push @do.line(li)
             
-            switch dir 
-                when 'up'   then (si = r[0]-1) ; ls.push @do.line(si)
-                when 'down' then (si = r[0])   ; ls.unshift @do.line(r[1]+1)
+            switch dir
+                'up'   ➜ si = r[0]-1; ls.push @do.line(si)
+                'down' ➜ si = r[0];   ls.unshift @do.line(r[1]+1)
 
             for i in [0...ls.length]
                 @do.change si+i, ls[i]

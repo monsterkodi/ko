@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.212.0
+// monsterkodi/kode 0.214.0
 
 var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}}
 
@@ -45,11 +45,11 @@ module.exports = {actions:{menu:'Line',moveLinesUp:{name:'Move Lines Up',combo:'
         switch (dir)
         {
             case 'up':
-                (si = r[0] - 1)()
+                si = r[0] - 1
                 ls.push(this.do.line(si))
                 break
             case 'down':
-                (si = r[0])()
+                si = r[0]
                 ls.unshift(this.do.line(r[1] + 1))
                 break
         }

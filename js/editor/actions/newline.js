@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.212.0
+// monsterkodi/kode 0.214.0
 
 var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
@@ -13,7 +13,7 @@ module.exports = {actions:{menu:'Line',newline:{name:'Insert Newline',combos:['e
     return this.newline({indent:true})
 },newline:function (key, info)
 {
-    var after, before, bl, c, doIndent, indent, nc, newCursors, _40_32_, _82_50_
+    var after, before, bl, c, doIndent, indent, nc, newCursors, _40_32_, _82_51_
 
     if (!(info != null) && _.isObject(key))
     {
@@ -89,8 +89,10 @@ module.exports = {actions:{menu:'Line',newline:{name:'Insert Newline',combos:['e
         else
         {
             this.do.insert(c[1] + 1,indent + after)
-            if ((this.insertIndentedEmptyLineBetween != null) && before.trimRight().endsWith(this.insertIndentedEmptyLineBetween[0] && after.trimLeft().startsWith(this.insertIndentedEmptyLineBetween[1])(indent += this.indentString,this.do.insert(c[1] + 1,indent))))
+            if ((this.insertIndentedEmptyLineBetween != null) && before.trimRight().endsWith(this.insertIndentedEmptyLineBetween[0] && after.trimLeft().startsWith(this.insertIndentedEmptyLineBetween[1])))
             {
+                indent += this.indentString
+                this.do.insert(c[1] + 1,indent)
             }
             this.do.change(c[1],before)
         }
