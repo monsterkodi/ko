@@ -1,32 +1,25 @@
-name            ko
+name            ko2
 version         0.336.0
 description     text editor
-main            js/main/main.js
-repository      github:monsterkodi/ko
-preferGlobal    true
-bin
-                ko  ./bin/ko
-build
-                asar  false
-                mac
-                  icon  img/app.icns
 keywords
                 editor
                 electron
                 coffeescript
-license         Unlicense
 author          monsterkodi
-maintainers
-                .
-                  name    monsterkodi
-                  email   monsterkodi@gmx.net
-bugs
-                url  https://github.com/monsterkodi/ko/issues
+license         Unlicense
+bin
+                ko2  ./bin/ko2
+main            js/main/main.js
+repository      github:monsterkodi/ko
+build
+                asar  false
+                mac
+                  icon  img/app.icns
 dependencies
                 noon            monsterkodi/noon
                 kslash          monsterkodi/kslash
                 klor            monsterkodi/klor
-                kxk             monsterkodi/kxk#bb599ae9ac7d749f7c2a525a3587d841e10a015b
+                kxk             monsterkodi/kxk
                 wxw             ^1.89.0
                 fuzzy           ^0.1.3
                 ignore          ^5.1.9
@@ -39,9 +32,7 @@ dependencies
                 unused-filename  ^4.0.0
                 walkdir         ^0.4.1
 devDependencies
-                koffee          monsterkodi/koffee
-                konrad          monsterkodi/konrad
+                kode            monsterkodi/kode
                 electron        ^16.0.3
                 electron-builder  ^22.14.5
-                node-abi        ^3.5.0
                 sds             ^4.4.0

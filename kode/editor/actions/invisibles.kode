@@ -1,0 +1,132 @@
+
+# 000  000   000  000   000  000   0000000  000  0000000    000      00000000   0000000
+# 000  0000  000  000   000  000  000       000  000   000  000      000       000
+# 000  000 0 000   000 000   000  0000000   000  0000000    000      0000000   0000000
+# 000  000  0000     000     000       000  000  000   000  000      000            000
+# 000  000   000      0      000  0000000   000  0000000    0000000  00000000  0000000
+
+{ _, kerror } = require 'kxk'
+
+class Invisibles
+
+    @: (@editor) -> @editor.on 'file', @onFile
+
+    del: -> @editor.removeListener 'file', @onFile
+
+    onFile: (file) =>
+
+        if window.state.get "invisibles|#{file}"
+            @show()
+        else
+            @clear()
+
+    # 000  000   000   0000000  00000000  00000000   000000000  
+    # 000  0000  000  000       000       000   000     000     
+    # 000  000 0 000  0000000   0000000   0000000       000     
+    # 000  000  0000       000  000       000   000     000     
+    # 000  000   000  0000000   00000000  000   000     000     
+    
+    onLineInserted: (li) =>
+
+        line = @editor.line li
+        kind = line.endsWith(' ') and 'trailing' or 'newline'
+        @editor.meta.add
+            line:  li
+            html:  '&#9687'
+            start: line.length
+            end:   line.length
+            yOffset: -1
+            clss:  'invisible ' + kind
+            
+        s = @editor.tabline li
+        p = 0
+        while p < s.length
+            n = 1
+            if s[p] == '\t'
+                n = 4-(p%4)
+                s = s.splice p, 1, _.padStart "", n
+                @editor.meta.add
+                    line:  li
+                    html:  '&#9656'
+                    start: p
+                    end:   p
+                    yOffset: -1
+                    clss:  'invisible invisible-tab'
+            p += n
+            
+    #  0000000  000   000   0000000   000   000   0000000   00000000  
+    # 000       000   000  000   000  0000  000  000        000       
+    # 000       000000000  000000000  000 0 000  000  0000  0000000   
+    # 000       000   000  000   000  000  0000  000   000  000       
+    #  0000000  000   000  000   000  000   000   0000000   00000000  
+    
+    onLineChanged: (li) =>
+
+        metas = @editor.meta.metasAtLineIndex(li).filter (m) -> m[2].clss.startsWith 'invisible'
+        return kerror "no invisible meta at line #{li}?" if not metas.length
+        @editor.meta.delMeta metas[0]
+        @onLineInserted li
+
+    #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
+    # 000   000  000          000     000  000   000  000   000     000     000       
+    # 000000000  000          000     000   000 000   000000000     000     0000000   
+    # 000   000  000          000     000     000     000   000     000     000       
+    # 000   000   0000000     000     000      0      000   000     000     00000000  
+    
+    activate: ->
+
+        window.state.set "invisibles|#{@editor.currentFile ? @editor.name}", true
+        @show()
+        
+    deactivate: ->
+
+        window.state.set "invisibles|#{@editor.currentFile}"
+        @clear()
+
+    #  0000000  000      00000000   0000000   00000000   
+    # 000       000      000       000   000  000   000  
+    # 000       000      0000000   000000000  0000000    
+    # 000       000      000       000   000  000   000  
+    #  0000000  0000000  00000000  000   000  000   000  
+    
+    clear: ->
+
+        @editor.removeListener 'lineChanged',  @onLineChanged
+        @editor.removeListener 'lineInserted', @onLineInserted
+        @editor.meta.delClass 'invisible'
+
+    #  0000000  000   000   0000000   000   000  
+    # 000       000   000  000   000  000 0 000  
+    # 0000000   000000000  000   000  000000000  
+    #      000  000   000  000   000  000   000  
+    # 0000000   000   000   0000000   00     00  
+    
+    show: ->
+
+        @clear()
+
+        @editor.on 'lineChanged',  @onLineChanged
+        @editor.on 'lineInserted', @onLineInserted
+
+        for li in [0...@editor.numLines()]
+            @onLineInserted li
+
+module.exports =
+
+    actions:
+
+        toggleInvisibles:
+            name:  'Toggle Invisibles'
+            text:  'toggle invisibles for current file'
+            combo: 'ctrl+i'
+
+    toggleInvisibles: ->
+
+        return if not @invisibles
+        
+        if window.state.get "invisibles|#{@currentFile ? @name}", false
+            @invisibles.deactivate()
+        else
+            @invisibles.activate()
+
+    initInvisibles: -> @invisibles ?= new Invisibles @

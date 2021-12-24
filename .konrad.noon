@@ -3,5 +3,5 @@ ignore
     /md/
     /bin/cheet.noon
     /bin/dmg.json
-    /coffee/menu.noon
-noon    . ext json . replace .. coffee/ js/ 
+    /kode/menu.noon
+noon    . ext json . replace .. kode/ js/ 
