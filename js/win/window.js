@@ -2,7 +2,7 @@
 
 var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, isFunc: function (o) {return typeof o === 'function'}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }}
 
-var addToShelf, changeFontSize, changeZoom, commandline, Commandline, CWD, editor, Editor, electron, FileEditor, filehandler, FileHandler, filewatcher, FileWatcher, FPS, info, Info, klog, kxk, mainmenu, Navigate, onClose, onCombo, pkg, post, prefs, projects, reloadWin, resetFontSize, resetZoom, restoreWin, saveStash, scheme, setFontSize, split, Split, stash, stopEvent, store, tabs, Tabs, terminal, Terminal, titlebar, Titlebar, toggleCenterText, toggleTabPinned, win, Window
+var addToShelf, changeFontSize, changeZoom, clearStash, commandline, Commandline, CWD, editor, Editor, electron, FileEditor, filehandler, FileHandler, filewatcher, FileWatcher, FPS, info, Info, klog, kxk, mainmenu, Navigate, onCombo, pkg, post, prefs, projects, reloadWin, resetFontSize, resetZoom, restoreWin, saveStash, scheme, setFontSize, split, Split, stash, stopEvent, store, tabs, Tabs, terminal, Terminal, titlebar, Titlebar, toggleCenterText, toggleTabPinned, win, Window
 
 kxk = require('kxk')
 klog = kxk.klog
@@ -267,6 +267,11 @@ saveStash = function ()
     return window.stash.save()
 }
 
+clearStash = function ()
+{
+    return window.stash.clear()
+}
+
 restoreWin = function ()
 {
     var bounds
@@ -300,6 +305,10 @@ post.on('closeWindow',function ()
 post.on('saveStash',function ()
 {
     return saveStash()
+})
+post.on('clearStash',function ()
+{
+    return clearStash()
 })
 post.on('editorFocus',function (editor)
 {
@@ -343,16 +352,6 @@ window.editorWithName = function (n)
 
 }
 
-onClose = function ()
-{
-    post.emit('saveChanges')
-    editor.setText('')
-    if (Browser.getAllWindows().length > 1)
-    {
-        return window.stash.clear()
-    }
-}
-
 window.onload = function ()
 {
     ;(split != null ? split.resized() : undefined)
@@ -377,7 +376,7 @@ window.onresize = function ()
 }
 post.on('split',function (s)
 {
-    var _296_22_
+    var _286_22_
 
     ;(window.filebrowser != null ? window.filebrowser.resized() : undefined)
     terminal.resized()
@@ -422,7 +421,7 @@ toggleTabPinned = function ()
 
 setFontSize = function (s)
 {
-    var _341_25_
+    var _331_25_
 
     if (!(_k_.isNum(s)))
     {

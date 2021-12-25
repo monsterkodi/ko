@@ -199,16 +199,25 @@ function Main extends app
     winWithID: (id) -> winWithID id
     activeWin:   -> activeWin()
     visibleWins: -> visibleWins()
+    
+    createWindow: (cb) =>
+        win = super cb
+        # dbg 'createWindow' win.id
+        win.on 'close' (e) ->
+            # dbg wins().length
+            post.toWin e.sender.id, 'clearStash'
+        
+    onWinClose: (e) -> super e
 
     createWindowWithFile: (opt) ->
         
-        win = @createWindow (win) -> 
+        win = @createWindow (win) ->
             post.toWin win.id, 'openFiles' [opt.file]
         win
 
     createWindowWithEmpty: ->
         
-        win = @createWindow (win) -> 
+        win = @createWindow (win) ->
             post.toWin win.id, 'newEmptyTab'
         win
         
@@ -512,11 +521,10 @@ function Main extends app
     quit: =>
 
         toSave = wins().length
-        klog 'ko.quit' toSave
         if toSave
             post.on 'stashSaved' =>
                 toSave -= 1
-                klog 'ko.quit stashSaved' toSave 
+                # klog 'ko.quit stashSaved' toSave 
                 if toSave == 0
                     global.state.save()
                     @exitApp()

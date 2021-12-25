@@ -159,6 +159,7 @@ Main = (function ()
         this["toggleWindowFromTray"] = this["toggleWindowFromTray"].bind(this)
         this["arrangeWindows"] = this["arrangeWindows"].bind(this)
         this["toggleWindows"] = this["toggleWindows"].bind(this)
+        this["createWindow"] = this["createWindow"].bind(this)
         this["onUDP"] = this["onUDP"].bind(this)
         this["onShow"] = this["onShow"].bind(this)
         Main.__super__.constructor.call(this,{pkg:pkg,dir:__dirname,dirs:['../','../browser','../commandline','../commands','../editor','../editor/actions','../git','../main','../tools','../win'],shortcut:'CmdOrCtrl+F1',index:'../index.html',icon:'../../img/app.ico',tray:'../../img/menu@2x.png',about:'../../img/about.png',aboutDebug:false,saveBounds:false,onShow:function ()
@@ -284,6 +285,20 @@ Main = (function ()
         return visibleWins()
     }
 
+    Main.prototype["createWindow"] = function (cb)
+    {
+        win = Main.__super__.createWindow.call(this,cb)
+        return win.on('close',function (e)
+        {
+            return post.toWin(e.sender.id,'clearStash')
+        })
+    }
+
+    Main.prototype["onWinClose"] = function (e)
+    {
+        return Main.__super__.onWinClose.call(this,e)
+    }
+
     Main.prototype["createWindowWithFile"] = function (opt)
     {
         win = this.createWindow(function (win)
@@ -334,9 +349,9 @@ Main = (function ()
         var w
 
         var list = _k_.list(wins())
-        for (var _234_14_ = 0; _234_14_ < list.length; _234_14_++)
+        for (var _243_14_ = 0; _243_14_ < list.length; _243_14_++)
         {
-            w = list[_234_14_]
+            w = list[_243_14_]
             w.hide()
             this.hideDock()
         }
@@ -348,9 +363,9 @@ Main = (function ()
         var w
 
         var list = _k_.list(wins())
-        for (var _241_14_ = 0; _241_14_ < list.length; _241_14_++)
+        for (var _250_14_ = 0; _250_14_ < list.length; _250_14_++)
         {
-            w = list[_241_14_]
+            w = list[_250_14_]
             w.show()
             this.showDock()
         }
@@ -364,9 +379,9 @@ Main = (function ()
         if (!_k_.empty(visibleWins()))
         {
             var list = _k_.list(visibleWins())
-            for (var _249_18_ = 0; _249_18_ < list.length; _249_18_++)
+            for (var _258_18_ = 0; _258_18_ < list.length; _258_18_++)
             {
-                w = list[_249_18_]
+                w = list[_258_18_]
                 w.showInactive()
             }
             visibleWins()[0].showInactive()
@@ -385,9 +400,9 @@ Main = (function ()
         }
         allWindows = wins()
         var list = _k_.list(allWindows)
-        for (var _259_14_ = 0; _259_14_ < list.length; _259_14_++)
+        for (var _268_14_ = 0; _268_14_ < list.length; _268_14_++)
         {
-            w = list[_259_14_]
+            w = list[_268_14_]
             if (w === win)
             {
                 i = 1 + allWindows.indexOf(w)
@@ -412,9 +427,9 @@ Main = (function ()
         }
         allWindows = wins()
         var list = _k_.list(allWindows)
-        for (var _271_14_ = 0; _271_14_ < list.length; _271_14_++)
+        for (var _280_14_ = 0; _280_14_ < list.length; _280_14_++)
         {
-            w = list[_271_14_]
+            w = list[_280_14_]
             if (w === win)
             {
                 i = -1 + allWindows.indexOf(w)
@@ -466,9 +481,9 @@ Main = (function ()
         ww = height + 122
         wl = visibleWins()
         var list = _k_.list(wl)
-        for (var _302_14_ = 0; _302_14_ < list.length; _302_14_++)
+        for (var _311_14_ = 0; _311_14_ < list.length; _311_14_++)
         {
-            w = list[_302_14_]
+            w = list[_311_14_]
             w.showInactive()
             w.setBounds({x:x + parseInt((width - ww) / 2),y:y,width:parseInt(ww),height:parseInt(height)})
         }
@@ -485,9 +500,9 @@ Main = (function ()
             return false
         }
         var list = _k_.list(wl)
-        for (var _316_14_ = 0; _316_14_ < list.length; _316_14_++)
+        for (var _325_14_ = 0; _325_14_ < list.length; _325_14_++)
         {
-            w = list[_316_14_]
+            w = list[_325_14_]
             if (w.isFullScreen())
             {
                 w.setFullScreen(false)
@@ -501,7 +516,7 @@ Main = (function ()
         {
             return false
         }
-        for (var _327_19_ = wi = 1, _327_23_ = wl.length; (_327_19_ <= _327_23_ ? wi < wl.length : wi > wl.length); (_327_19_ <= _327_23_ ? ++wi : --wi))
+        for (var _335_19_ = wi = 1, _335_23_ = wl.length; (_335_19_ <= _335_23_ ? wi < wl.length : wi > wl.length); (_335_19_ <= _335_23_ ? ++wi : --wi))
         {
             if (!_.isEqual(wl[wi].getBounds(),bounds))
             {
@@ -538,7 +553,7 @@ Main = (function ()
         else if (wl.length === 2 || wl.length === 3)
         {
             w = width / wl.length
-            for (var _356_22_ = i = 0, _356_26_ = wl.length; (_356_22_ <= _356_26_ ? i < wl.length : i > wl.length); (_356_22_ <= _356_26_ ? ++i : --i))
+            for (var _364_22_ = i = 0, _364_26_ = wl.length; (_364_22_ <= _364_26_ ? i < wl.length : i > wl.length); (_364_22_ <= _364_26_ ? ++i : --i))
             {
                 wl[i].showInactive()
                 wl[i].setBounds({x:x + parseInt(i * w - (i > 0 && frameSize / 2 || 0)),width:parseInt(w + ((i === 0 || i === wl.length - 1) && frameSize / 2 || frameSize)),y:y + parseInt(0),height:parseInt(height)})
@@ -548,13 +563,13 @@ Main = (function ()
         {
             w2 = parseInt(wl.length / 2)
             rh = height
-            for (var _366_22_ = i = 0, _366_26_ = w2; (_366_22_ <= _366_26_ ? i < w2 : i > w2); (_366_22_ <= _366_26_ ? ++i : --i))
+            for (var _374_22_ = i = 0, _374_26_ = w2; (_374_22_ <= _374_26_ ? i < w2 : i > w2); (_374_22_ <= _374_26_ ? ++i : --i))
             {
                 w = width / w2
                 wl[i].showInactive()
                 wl[i].setBounds({x:x + parseInt(i * w - (i > 0 && frameSize / 2 || 0)),width:parseInt(w + ((i === 0 || i === w2 - 1) && frameSize / 2 || frameSize)),y:y + parseInt(0),height:parseInt(rh / 2)})
             }
-            for (var _374_22_ = i = w2, _374_27_ = wl.length; (_374_22_ <= _374_27_ ? i < wl.length : i > wl.length); (_374_22_ <= _374_27_ ? ++i : --i))
+            for (var _382_22_ = i = w2, _382_27_ = wl.length; (_382_22_ <= _382_27_ ? i < wl.length : i > wl.length); (_382_22_ <= _382_27_ ? ++i : --i))
             {
                 w = width / (wl.length - w2)
                 wl[i].showInactive()
@@ -581,9 +596,9 @@ Main = (function ()
 
         fs.ensureDirSync(this.userData)
         var list = _k_.list(filelist(slash.join(this.userData,'old'),{matchExt:'noon'}))
-        for (var _399_17_ = 0; _399_17_ < list.length; _399_17_++)
+        for (var _407_17_ = 0; _407_17_ < list.length; _407_17_++)
         {
-            file = list[_399_17_]
+            file = list[_407_17_]
             win = this.createWindow()
             newStash = slash.join(this.userData,'win',`${win.id}.noon`)
             fs.copySync(file,newStash)
@@ -595,9 +610,9 @@ Main = (function ()
         if (!_k_.empty(wins()))
         {
             var list = _k_.list(wins())
-            for (var _407_20_ = 0; _407_20_ < list.length; _407_20_++)
+            for (var _415_20_ = 0; _415_20_ < list.length; _415_20_++)
             {
-                win = list[_407_20_]
+                win = list[_415_20_]
                 win.show()
             }
         }
@@ -620,9 +635,9 @@ Main = (function ()
         wb = event.sender.getBounds()
         klog('ko.main.onResizeWin')
         var list = _k_.list(wins())
-        for (var _427_14_ = 0; _427_14_ < list.length; _427_14_++)
+        for (var _435_14_ = 0; _435_14_ < list.length; _435_14_++)
         {
-            w = list[_427_14_]
+            w = list[_435_14_]
             if (w === event.sender)
             {
                 continue
@@ -691,7 +706,7 @@ Main = (function ()
     {
         return this.activateOneWindow(function (win)
         {
-            var arg, file, fileargs, files, fpath, pos, _483_26_
+            var arg, file, fileargs, files, fpath, pos, _491_26_
 
             files = []
             if ((_k_.first(args) != null ? _k_.first(args).endsWith(`${pkg.name}.exe`) : undefined))
@@ -703,9 +718,9 @@ Main = (function ()
                 fileargs = args.slice(2)
             }
             var list = _k_.list(fileargs)
-            for (var _488_20_ = 0; _488_20_ < list.length; _488_20_++)
+            for (var _496_20_ = 0; _496_20_ < list.length; _496_20_++)
             {
-                arg = list[_488_20_]
+                arg = list[_496_20_]
                 if (arg.startsWith('-'))
                 {
                     continue
@@ -715,7 +730,7 @@ Main = (function ()
                 {
                     file = slash.join(slash.resolve(dir),arg)
                 }
-                var _493_29_ = slash.splitFilePos(file); fpath = _493_29_[0]; pos = _493_29_[1]
+                var _501_29_ = slash.splitFilePos(file); fpath = _501_29_[0]; pos = _501_29_[1]
 
                 if (slash.exists(fpath))
                 {
@@ -742,13 +757,11 @@ Main = (function ()
         var toSave
 
         toSave = wins().length
-        klog('ko.quit',toSave)
         if (toSave)
         {
             post.on('stashSaved',(function ()
             {
                 toSave -= 1
-                klog('ko.quit stashSaved',toSave)
                 if (toSave === 0)
                 {
                     global.state.save()
