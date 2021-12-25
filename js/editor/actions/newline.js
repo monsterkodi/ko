@@ -1,10 +1,9 @@
-// monsterkodi/kode 0.223.0
+// monsterkodi/kode 0.227.0
 
-var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
+var _k_ = {isObj: function (o) {return !(o == null || typeof o != 'object' || o.constructor.name !== 'Object')}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
-var last, _
+var last
 
-_ = require('kxk')._
 last = require('kxk').last
 
 module.exports = {actions:{menu:'Line',newline:{name:'Insert Newline',combos:['enter']},newlineAtEnd:{name:'Insert Newline at End',combo:'alt+enter'}},newlineAtEnd:function ()
@@ -15,7 +14,7 @@ module.exports = {actions:{menu:'Line',newline:{name:'Insert Newline',combos:['e
 {
     var after, before, bl, c, doIndent, indent, nc, newCursors, _40_32_, _82_51_
 
-    if (!(info != null) && _.isObject(key))
+    if (!(info != null) && _k_.isObj(key))
     {
         info = key
     }

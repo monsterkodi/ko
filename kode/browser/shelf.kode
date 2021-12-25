@@ -226,7 +226,7 @@ function Shelf extends Column
         
     loadGitStatus: =>
         
-        rows = _.clone @rows
+        rows = clone @rows
         
         fileStatus = (row, rows) -> (status) =>
             for file, status of hub.statusFiles status

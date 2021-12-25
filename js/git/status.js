@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.223.0
+// monsterkodi/kode 0.227.0
 
 var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined}
 
@@ -20,7 +20,7 @@ status = function (gitDir, cb)
 {
     var r
 
-    if (_.isFunction(cb))
+    if (typeof(cb) === 'function')
     {
         if (_k_.empty(gitDir))
         {

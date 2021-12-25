@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.223.0
+// monsterkodi/kode 0.227.0
 
 var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined}
 
@@ -29,7 +29,7 @@ gitOpt = function (cwd)
 root = function (pth, cb)
 {
     pth = slash.resolve(pth)
-    if (_.isFunction(cb))
+    if (typeof(cb) === 'function')
     {
         if (_k_.empty(pth))
         {

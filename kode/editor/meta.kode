@@ -51,7 +51,7 @@ class Meta
                 if meta[2].clss == "searchResult" and meta[2].href?
                     [file, line] = slash.splitFileLine meta[2].href
                     line -= 1
-                    localChange = _.cloneDeep change
+                    localChange = clone change
                     localChange.oldIndex = line
                     localChange.newIndex = line
                     localChange.doIndex  = line
@@ -396,7 +396,7 @@ class Meta
 
     delClass: (clss) ->
 
-        for meta in _.clone @metas
+        for meta in clone @metas
             clsss = meta?[2]?.clss?.split ' '
             if not empty(clsss) and clss in clsss
                 @delMeta meta

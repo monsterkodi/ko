@@ -14,7 +14,7 @@ gitOpt = (gitDir) -> encoding:'utf8' cwd:slash.unslash(gitDir), stdio:['pipe' 'p
 
 status = (gitDir, cb) ->
 
-    if _.isFunction cb
+    if cb is 'function'
         
         if empty gitDir
             cb {}

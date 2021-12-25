@@ -1,6 +1,6 @@
-// monsterkodi/kode 0.223.0
+// monsterkodi/kode 0.227.0
 
-var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}}
+var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}}
 
 var clamp, kerror, kxk, last, post, State, _
 
@@ -162,7 +162,7 @@ class Do
 
         if (this.history.length)
         {
-            if (_.isEmpty(this.redos))
+            if (_k_.empty(this.redos))
             {
                 this.redos.unshift(this.editor.state)
             }
@@ -185,7 +185,7 @@ class Do
             {
                 this.history.push(this.redos.shift())
             }
-            this.state = _.first(this.redos)
+            this.state = this.redos[0]
             if (this.redos.length === 1)
             {
                 this.redos = []

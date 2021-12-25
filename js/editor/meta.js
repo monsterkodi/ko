@@ -1,6 +1,6 @@
-// monsterkodi/kode 0.223.0
+// monsterkodi/kode 0.227.0
 
-var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
+var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, clone: function (o,v) { v ??= new Map(); if (o instanceof Array) { if (!v.has(o)) {var r = []; v.set(o,r); for (var i=0; i < o.length; i++) {if (!v.has(o[i])) { v.set(o[i],_k_.clone(o[i],v)) }; r.push(v.get(o[i]))}}; return v.get(o) } else if (typeof o == 'string') { if (!v.has(o)) {v.set(o,''+o)}; return v.get(o) } else if (o != null && typeof o == 'object' && o.constructor.name == 'Object') { if (!v.has(o)) { var k, r = {}; v.set(o,r); for (k in o) { if (!v.has(o[k])) { v.set(o[k],_k_.clone(o[k],v)) }; r[k] = v.get(o[k]) }; }; return v.get(o) } else {return o} }, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
 var $, elem, File, fs, kerror, kxk, post, ranges, slash, stopEvent, sw, _
 
@@ -74,7 +74,7 @@ class Meta
                     var _52_33_ = slash.splitFileLine(meta[2].href); file = _52_33_[0]; line = _52_33_[1]
 
                     line -= 1
-                    localChange = _.cloneDeep(change)
+                    localChange = _k_.clone(change)
                     localChange.oldIndex = line
                     localChange.newIndex = line
                     localChange.doIndex = line
@@ -593,7 +593,7 @@ class Meta
     {
         var clsss, meta, _400_34_
 
-        var list = _k_.list(_.clone(this.metas))
+        var list = _k_.list(_k_.clone(this.metas))
         for (var _399_17_ = 0; _399_17_ < list.length; _399_17_++)
         {
             meta = list[_399_17_]

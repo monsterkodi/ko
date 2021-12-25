@@ -1,6 +1,6 @@
-// monsterkodi/kode 0.223.0
+// monsterkodi/kode 0.227.0
 
-var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}}
+var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, isStr: function (o) {return typeof o === 'string' || o instanceof String}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
 
 var clamp, Command, CommandList, elem, fuzzy, history, kerror, kxk, reversed, syntax, _
 
@@ -97,11 +97,11 @@ Command = (function ()
                 {
                     if ((o != null))
                     {
-                        if (_.isString(o))
+                        if (_k_.isStr(o))
                         {
                             return o
                         }
-                        if (_.isString(o.text))
+                        if (_k_.isStr(o.text))
                         {
                             return o.text
                         }
@@ -380,7 +380,7 @@ Command = (function ()
         {
             this.loadState()
         }
-        if (!_.isArray(this.history))
+        if (!(this.history instanceof Array))
         {
             kerror(`Command.setCurrent -- ${this.historyKey()} : history not an array?`,typeof(this.history))
             this.history = []

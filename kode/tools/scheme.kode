@@ -6,7 +6,7 @@
 0000000    0000000  000   000  00000000  000   000  00000000  
 ###
 
-{ $, _, elem, post, prefs, slash } = require 'kxk'
+{ $, elem, post, prefs, slash } = require 'kxk'
 
 class Scheme
     
@@ -62,7 +62,7 @@ class Scheme
     
     @parseColor: (c) ->
         
-        if _.isString(c) and c.startsWith 'rgb'
+        if c is str and c.startsWith 'rgb'
             s = c.indexOf '('
             e = c.indexOf ')'
             c = c.slice s+1, e

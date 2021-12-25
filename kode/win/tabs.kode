@@ -133,9 +133,9 @@ class Tabs
 
     tab: (id) ->
 
-        if _.isNumber  id then return @tabs[id]
+        if id is num then return @tabs[id]
         if _.isElement id then return _.find @tabs, (t) -> t.div.contains id
-        if _.isString  id then return _.find @tabs, (t) -> t.file == id
+        if id is str then return _.find @tabs, (t) -> t.file == id
 
     activeTab: (create) ->
 

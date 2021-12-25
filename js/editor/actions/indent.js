@@ -1,6 +1,6 @@
-// monsterkodi/kode 0.223.0
+// monsterkodi/kode 0.227.0
 
-var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}}
+var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
 
 module.exports = {actions:{menu:'Line',indent:{name:'Indent',combo:'command+]',accel:'ctrl+]'},deIndent:{name:'Outdent',combo:'command+[',accel:'ctrl+['}},indent:function ()
 {

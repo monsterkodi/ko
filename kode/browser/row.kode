@@ -37,9 +37,9 @@ function Row
     onMouseOver: => @div?.classList.add 'hover'
 
     path: -> 
-        if @item.file? and _.isString @item.file
+        if @item.file? and @item.file is str
             return @item.file
-        if @item.obj?.file? and _.isString @item.obj.file
+        if @item.obj?.file? and @item.obj.file is str
             return @item.obj.file
 
     setIcon: ->

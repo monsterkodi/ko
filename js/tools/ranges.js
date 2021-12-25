@@ -1,6 +1,6 @@
-// monsterkodi/kode 0.223.0
+// monsterkodi/kode 0.227.0
 
-var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
+var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && isFinite(o)}}
 
 var _
 
@@ -111,12 +111,12 @@ class Ranges
 
     isPos (p)
     {
-        return (p != null ? p.length : undefined) === 2 && (function(o){return !isNaN(o) && !isNaN(parseFloat(o)) && isFinite(o)})(p[0]) && (function(o){return !isNaN(o) && !isNaN(parseFloat(o)) && isFinite(o)})(p[1])
+        return (p != null ? p.length : undefined) === 2 && _k_.isNum(p[0]) && _k_.isNum(p[1])
     }
 
     isRange (r)
     {
-        return (r != null ? r.length : undefined) >= 2 && (function(o){return !isNaN(o) && !isNaN(parseFloat(o)) && isFinite(o)})(r[0]) && (r[1] != null ? r[1].length : undefined) >= 2 && (function(o){return !isNaN(o) && !isNaN(parseFloat(o)) && isFinite(o)})(r[1][0]) && (function(o){return !isNaN(o) && !isNaN(parseFloat(o)) && isFinite(o)})(r[1][1])
+        return (r != null ? r.length : undefined) >= 2 && _k_.isNum(r[0]) && (r[1] != null ? r[1].length : undefined) >= 2 && _k_.isNum(r[1][0]) && _k_.isNum(r[1][1])
     }
 
     isSameRange (a, b)

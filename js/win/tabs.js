@@ -1,6 +1,6 @@
-// monsterkodi/kode 0.223.0
+// monsterkodi/kode 0.227.0
 
-var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}}
+var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && isFinite(o)}, isStr: function (o) {return typeof o === 'string' || o instanceof String}}
 
 var $, drag, elem, filter, first, kerror, klog, kpos, kxk, last, popup, post, prefs, slash, stopEvent, Tab, _
 
@@ -179,7 +179,7 @@ class Tabs
 
     tab (id)
     {
-        if (_.isNumber(id))
+        if (_k_.isNum(id))
         {
             return this.tabs[id]
         }
@@ -190,7 +190,7 @@ class Tabs
                 return t.div.contains(id)
             })
         }
-        if (_.isString(id))
+        if (_k_.isStr(id))
         {
             return _.find(this.tabs,function (t)
             {

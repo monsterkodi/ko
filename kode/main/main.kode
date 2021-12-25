@@ -268,7 +268,7 @@ function Main extends app
 
     activateNextWindow: (win) ->
 
-        if _.isNumber win then win = winWithID win
+        if win is num then win = winWithID win
         allWindows = wins()
         for w in allWindows
             if w == win
@@ -280,7 +280,7 @@ function Main extends app
 
     activatePrevWindow: (win) ->
 
-        if _.isNumber win then win = winWithID win
+        if win is num then win = winWithID win
         allWindows = wins()
         for w in allWindows
             if w == win

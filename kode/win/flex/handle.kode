@@ -6,7 +6,7 @@
 000   000  000   000  000   000  0000000    0000000  00000000
 ###
 
-{ _, drag, elem } = require 'kxk'
+{ drag, elem } = require 'kxk'
 
 class Handle
     
@@ -36,7 +36,7 @@ class Handle
     update:    -> @div.style.flex = "0 0 #{@size()}px"; @div.style.display = @isVisible() and 'block' or 'none'
     isVisible: -> not (@panea.collapsed and @paneb.collapsed)
     isFirst:   -> @index == 0
-    isLast:    -> _.last(@flex.handles) == @
+    isLast:    -> @flex.handles[-1] == @
     prev:      -> @flex.handles[@index-1] if not @isFirst()
     next:      -> @flex.handles[@index+1] if not @isLast()
     index:     -> @flex.handles.indexOf @

@@ -1,6 +1,6 @@
-// monsterkodi/kode 0.223.0
+// monsterkodi/kode 0.227.0
 
-var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, each_r: function (o) {return o instanceof Array ? [] : typeof o == 'string' ? o.split('') : {}}, extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined}
+var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, each_r: function (o) {return o instanceof Array ? [] : typeof o == 'string' ? o.split('') : {}}, extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && isFinite(o)}}
 
 var activeWin, app, args, BrowserWindow, disableSnap, electron, filelist, first, fs, Indexer, klog, kolor, kxk, main, Main, mostRecentFile, Navigate, openFiles, pkg, post, prefs, slash, store, udp, visibleWins, win, WIN_SNAP_DIST, wins, winWithID, _
 
@@ -393,7 +393,7 @@ Main = (function ()
     {
         var allWindows, i, w
 
-        if (_.isNumber(win))
+        if (_k_.isNum(win))
         {
             win = winWithID(win)
         }
@@ -420,7 +420,7 @@ Main = (function ()
     {
         var allWindows, i, w
 
-        if (_.isNumber(win))
+        if (_k_.isNum(win))
         {
             win = winWithID(win)
         }

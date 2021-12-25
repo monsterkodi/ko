@@ -14,7 +14,7 @@ diff   = require './diff'
 
 info = (gitDir, cb) ->
     
-    if _.isFunction cb
+    if cb is 'function'
 
         status gitDir, (stts) ->
             if empty stts

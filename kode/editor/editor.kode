@@ -51,7 +51,7 @@ function Editor extends Buffer
             continue if slash.ext(actionFile) not in ['js' 'coffee' 'kode']
             actions = require actionFile
             for key,value of actions
-                if _.isFunction value
+                if value is 'function'
                     @prototype[key] = value
                 else if key == 'actions'
                     for k,v of value

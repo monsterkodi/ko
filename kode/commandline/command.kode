@@ -88,8 +88,8 @@ function Command
             if command.length
                 fuzzied = fuzzy.filter command, items, extract: (o) -> 
                     if o?
-                        return o if _.isString o
-                        return o.text if _.isString o.text
+                        return o if o is str
+                        return o.text if o.text is str
                     ''            
                 items = (f.original for f in _.sortBy fuzzied, (o) -> o.index)
             @showItems @weightedItems items, currentText: command
@@ -276,7 +276,7 @@ function Command
     setCurrent: (command) ->
         
         @loadState() if not @history?
-        if not _.isArray @history
+        if not @history is Array
             kerror "Command.setCurrent -- #{@historyKey()} : history not an array?" typeof @history 
             @history = []
         _.pull @history, command

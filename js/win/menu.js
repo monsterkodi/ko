@@ -1,10 +1,9 @@
-// monsterkodi/kode 0.223.0
+// monsterkodi/kode 0.227.0
 
-var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
+var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, clone: function (o,v) { v ??= new Map(); if (o instanceof Array) { if (!v.has(o)) {var r = []; v.set(o,r); for (var i=0; i < o.length; i++) {if (!v.has(o[i])) { v.set(o[i],_k_.clone(o[i],v)) }; r.push(v.get(o[i]))}}; return v.get(o) } else if (typeof o == 'string') { if (!v.has(o)) {v.set(o,''+o)}; return v.get(o) } else if (o != null && typeof o == 'object' && o.constructor.name == 'Object') { if (!v.has(o)) { var k, r = {}; v.set(o,r); for (k in o) { if (!v.has(o[k])) { v.set(o[k],_k_.clone(o[k],v)) }; r[k] = v.get(o[k]) }; }; return v.get(o) } else {return o} }, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
-var filelist, getMenu, klog, Macro, menu, os, post, slash, Syntax, Transform, win, _
+var filelist, getMenu, klog, Macro, menu, os, post, slash, Syntax, Transform, win
 
-_ = require('kxk')._
 filelist = require('kxk').filelist
 klog = require('kxk').klog
 os = require('kxk').os
@@ -35,14 +34,14 @@ menu = function (template)
 {
     var actionFile, actionFiles, actions, combo, commandMenu, editMenu, EditMenu, item, k, key, macro, MacroMenu, menuAction, menuName, submenu, transform, transformList, transformMenu, TransformMenu, transformSubmenu, v, value, _41_38_, _51_33_, _52_44_, _54_43_, _55_39_
 
-    if (_.isFunction(template.hasOwnProperty))
+    if (template instanceof Array)
     {
-        template = _.cloneDeep(template)
+        template = _k_.clone(template)
     }
     else
     {
-        klog('no own property?',typeof(template),template)
-        template = {}
+        klog('no array?',typeof(template),template)
+        template = []
     }
     actionFiles = filelist(slash.join(__dirname,'../editor/actions'))
     submenu = {Misc:[]}

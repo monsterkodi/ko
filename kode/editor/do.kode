@@ -142,7 +142,7 @@ class Do
 
         if @history.length
 
-            if _.isEmpty @redos
+            if empty @redos
                 @redos.unshift @editor.state
 
             @state = @history.pop()
@@ -166,7 +166,7 @@ class Do
             if @redos.length > 1
                 @history.push @redos.shift()
 
-            @state = _.first @redos
+            @state = @redos[0]
             if @redos.length == 1
                 @redos = []
 

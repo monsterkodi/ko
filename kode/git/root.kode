@@ -23,7 +23,7 @@ root = (pth, cb) ->
 
     pth = slash.resolve pth
     
-    if _.isFunction cb
+    if cb is 'function'
         
         if empty pth
             cb ''

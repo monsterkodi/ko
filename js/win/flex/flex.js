@@ -1,6 +1,6 @@
-// monsterkodi/kode 0.223.0
+// monsterkodi/kode 0.227.0
 
-var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined, list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}}
+var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && isFinite(o)}, isStr: function (o) {return typeof o === 'string' || o instanceof String}}
 
 var drag, Handle, kxk, last, Pane, _
 
@@ -400,7 +400,7 @@ class Flex
 
     pane (i)
     {
-        return _.isNumber(i) && this.panes[i] || _.isString(i) && _.find(this.panes,function (p)
+        return _k_.isNum(i) && this.panes[i] || _k_.isStr(i) && _.find(this.panes,function (p)
         {
             return p.id === i
         }) || i
@@ -408,7 +408,7 @@ class Flex
 
     handle (i)
     {
-        return _.isNumber(i) && this.handles[i] || i
+        return _k_.isNum(i) && this.handles[i] || i
     }
 
     height ()

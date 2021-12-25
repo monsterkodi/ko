@@ -6,7 +6,7 @@
 000   000  00000000  00     00  0000000  000  000   000  00000000
 ###
 
-{ _, last } = require 'kxk'
+{ last } = require 'kxk'
 
 module.exports = 
     
@@ -28,7 +28,7 @@ module.exports =
 
     newline: (key, info) ->
         
-        if not info? and _.isObject key
+        if not info? and key is obj
             info = key
 
         if @salterMode

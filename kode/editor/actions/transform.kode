@@ -254,7 +254,7 @@ class Transform
 
         f = @[transName]
 
-        if f and _.isFunction f
+        if f and f is 'function'
             @last = f.apply @, opts
         else
             return kerror "unhandled transform #{transName}"

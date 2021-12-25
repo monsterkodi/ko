@@ -1,6 +1,6 @@
-// monsterkodi/kode 0.223.0
+// monsterkodi/kode 0.227.0
 
-var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
+var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, isStr: function (o) {return typeof o === 'string' || o instanceof String}}
 
 var $, electron, elem, File, keyinfo, kxk, post, Row, slash, stopEvent, Syntax, _
 
@@ -86,11 +86,11 @@ Row = (function ()
     {
         var _40_21_, _42_20_, _42_26_
 
-        if ((this.item.file != null) && _.isString(this.item.file))
+        if ((this.item.file != null) && _k_.isStr(this.item.file))
         {
             return this.item.file
         }
-        if (((this.item.obj != null ? this.item.obj.file : undefined) != null) && _.isString(this.item.obj.file))
+        if (((this.item.obj != null ? this.item.obj.file : undefined) != null) && _k_.isStr(this.item.obj.file))
         {
             return this.item.obj.file
         }

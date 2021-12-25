@@ -6,7 +6,7 @@
 000   000  00000000  000   000   0000000
 ###
 
-{ _, filelist, klog, os, post, slash, win } = require 'kxk'
+{ filelist, klog, os, post, slash, win } = require 'kxk'
 
 Syntax    = require '../editor/syntax'
 Transform = require '../editor/actions/transform'
@@ -20,11 +20,11 @@ getMenu = (template, name) ->
 
 menu = (template) ->
 
-    if _.isFunction template.hasOwnProperty
-        template = _.cloneDeep template
+    if template is Array
+        template = clone template
     else
-        klog 'no own property?' typeof(template), template
-        template = {}
+        klog 'no array?' typeof(template), template
+        template = []
 
     actionFiles = filelist slash.join __dirname, '../editor/actions'
     submenu = Misc: []

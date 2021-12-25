@@ -6,7 +6,7 @@
 00     00  000  000   000  0000000     0000000   00     00
 ###
 
-{ _, clamp, klog, post, prefs, scheme, stash, stopEvent, store, win } = require 'kxk'
+{ clamp, klog, post, prefs, scheme, stash, stopEvent, store, win } = require 'kxk'
 
 Split       = require './split'
 Terminal    = require './terminal'
@@ -109,7 +109,7 @@ function Window extends win
     onMenuAction: (name, opts) =>
     
         if action = Editor.actionWithName name
-            if action.key? and _.isFunction window.focusEditor[action.key]
+            if action.key? and window.focusEditor[action.key] is 'function'
                 window.focusEditor[action.key] opts.actarg
                 return 
     
@@ -330,7 +330,7 @@ toggleTabPinned = ->
 
 setFontSize = (s) ->
 
-    s = prefs.get('editorFontSize' 19) if not _.isFinite s
+    s = prefs.get('editorFontSize' 19) if not s is num
     s = clamp 8 100 s
 
     window.stash.set "fontSize" s

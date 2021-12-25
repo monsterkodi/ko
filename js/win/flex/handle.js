@@ -1,10 +1,9 @@
-// monsterkodi/kode 0.223.0
+// monsterkodi/kode 0.227.0
 
 var _k_
 
-var drag, elem, _
+var drag, elem
 
-_ = require('kxk')._
 drag = require('kxk').drag
 elem = require('kxk').elem
 
@@ -71,7 +70,7 @@ class Handle
 
     isLast ()
     {
-        return _.last(this.flex.handles) === this
+        return this.flex.handles.slice(-1)[0] === this
     }
 
     prev ()

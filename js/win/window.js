@@ -1,10 +1,9 @@
-// monsterkodi/kode 0.223.0
+// monsterkodi/kode 0.227.0
 
-var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}}
+var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && isFinite(o)}}
 
-var addToShelf, changeFontSize, changeZoom, clamp, commandline, Commandline, CWD, editor, Editor, electron, FileEditor, filehandler, FileHandler, filewatcher, FileWatcher, FPS, info, Info, klog, mainmenu, Navigate, onClose, onCombo, pkg, post, prefs, projects, reloadWin, resetFontSize, resetZoom, restoreWin, saveStash, scheme, setFontSize, split, Split, stash, stopEvent, store, tabs, Tabs, terminal, Terminal, titlebar, Titlebar, toggleCenterText, toggleTabPinned, win, Window, _
+var addToShelf, changeFontSize, changeZoom, clamp, commandline, Commandline, CWD, editor, Editor, electron, FileEditor, filehandler, FileHandler, filewatcher, FileWatcher, FPS, info, Info, klog, mainmenu, Navigate, onClose, onCombo, pkg, post, prefs, projects, reloadWin, resetFontSize, resetZoom, restoreWin, saveStash, scheme, setFontSize, split, Split, stash, stopEvent, store, tabs, Tabs, terminal, Terminal, titlebar, Titlebar, toggleCenterText, toggleTabPinned, win, Window
 
-_ = require('kxk')._
 clamp = require('kxk').clamp
 klog = require('kxk').klog
 post = require('kxk').post
@@ -117,7 +116,7 @@ Window = (function ()
 
         if (action = Editor.actionWithName(name))
         {
-            if ((action.key != null) && _.isFunction(window.focusEditor[action.key]))
+            if ((action.key != null) && typeof(window.focusEditor[action.key]) === 'function')
             {
                 window.focusEditor[action.key](opts.actarg)
                 return
@@ -419,7 +418,7 @@ setFontSize = function (s)
 {
     var _338_25_
 
-    if (!_.isFinite(s))
+    if (!(_k_.isNum(s)))
     {
         s = prefs.get('editorFontSize',19)
     }

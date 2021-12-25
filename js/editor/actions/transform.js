@@ -1,6 +1,6 @@
-// monsterkodi/kode 0.223.0
+// monsterkodi/kode 0.227.0
 
-var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
+var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
 var kerror, kstr, matchr, reversed, slash, _
 
@@ -299,7 +299,7 @@ class Transform
         var f
 
         f = this[transName]
-        if (f && _.isFunction(f))
+        if (f && typeof(f) === 'function')
         {
             this.last = f.apply(this,opts)
         }
